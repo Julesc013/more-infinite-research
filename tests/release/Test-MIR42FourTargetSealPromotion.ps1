@@ -11,7 +11,9 @@ function Assert-MIR42SealTest {
   if (-not $Condition) { throw "[mir42-seal-test] $Code" }
 }
 
+$RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 $root = Join-Path $RepoRoot ('build/test-results/mir42-four-target-seal-' + [guid]::NewGuid().ToString('N'))
+$externalForgedTrustRoot = ''
 try {
   $assets = Join-Path $root 'assets'
   $rows = Join-Path $root 'target-rows'
@@ -65,6 +67,7 @@ try {
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath
   Assert-MIR42SealTest ($readiness.status -ceq 'MIR-4.2-FOUR-TARGET-TECHNICAL-SEAL-BLOCKED') 'missing-gates-block-seal'
   Assert-MIR42SealTest ([bool]$readiness.checks.candidate -and -not [bool]$readiness.checks.qualification -and -not [bool]$readiness.checks.campaign -and -not [bool]$readiness.checks.reviewer -and -not [bool]$readiness.technical_seal_authorized) 'candidate-only-readiness'
+  Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_trust_root -and (@($readiness.blockers) -match 'mir42-seal-external-t16-trust-root-or-verifier-missing').Count -eq 1) 'external-t16-trust-root-required'
   Assert-MIR42SealTest (-not [bool]$readiness.checks.programme -and (@($readiness.blockers) -match 'mir42-seal-current-programme-transition-not-authorized').Count -eq 1) 'current-4-2-release-cut-blocks-unapproved-freeze'
   $mislabelledQualification = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetExactCandidateQualificationV1';status='MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED'
@@ -210,6 +213,86 @@ try {
   try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $plainManifestPath | Out-Null } catch { $plainRejected = $_.Exception.Message -match 'mir42-seal-candidate-archive-invalid' }
   Assert-MIR42SealTest $plainRejected 'candidate-plain-text-zip-rejected'
 
+  # A syntactically complete chain with real alternate signatures is still not
+  # authority when all of its roots live in the mutable candidate workspace.
+  $sshKeygen = 'C:\Windows\System32\OpenSSH\ssh-keygen.exe'
+  $forgedTrustRoot = Join-Path $root 'coherent-alternate-t16'
+  New-Item -ItemType Directory -Force -Path $forgedTrustRoot | Out-Null
+  $forgedOperatorPrivate = Join-Path $forgedTrustRoot 'alternate-operator'
+  & $sshKeygen -q -t ed25519 -N '' -f $forgedOperatorPrivate | Out-Null
+  Assert-MIR42SealTest ($LASTEXITCODE -eq 0) 'coherent-alternate-key-created'
+  $forgedOperatorPublicPath = $forgedOperatorPrivate + '.pub'
+  $forgedOperatorPublic = (Get-Content -Raw -LiteralPath $forgedOperatorPublicPath).Trim()
+  $forgedOperatorFingerprint = Get-MIR4OpenSshPublicKeyFingerprintV1 -SshKeygenPath $sshKeygen -PublicKeyPath $forgedOperatorPublicPath
+  $forgedOperator = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42ExternalOperatorTrustSourceV1';status='active-external-protected-operator-trust-source'
+    operator=[pscustomobject]@{identity='alternate-operator';algorithm='ssh-ed25519';public_key=$forgedOperatorPublic;fingerprint=$forgedOperatorFingerprint}
+    namespaces=@('mir4-t16-trust-root');record_sha256=''
+  }
+  $forgedOperator.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedOperator
+  $forgedOperatorPath = Join-Path $forgedTrustRoot 'operator-trust.json'
+  Write-MIR4BootstrapRecord -Record $forgedOperator -Path $forgedOperatorPath | Out-Null
+  $forgedRootPath = Join-Path $forgedTrustRoot 't16-ledger-trust-root.json'
+  $forgedRootSignaturePath = $forgedRootPath + '.sig'
+  $forgedRoot = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42ExternalT16LedgerTrustRootV1';status='MIR-4.2-T16-PROTECTED-SIGNING-RECOVERY-ACCEPTED';release_line='4.2';turn='T16';scope='four-target-release-cut'
+    signing_ceremony=[pscustomobject]@{path=(Join-Path $forgedTrustRoot 'alternate-signing-ceremony.json');sha256=('A' * 64);record_sha256=('B' * 64)}
+    authorized_signer=[pscustomobject]@{principal='alternate-operator';algorithm='ssh-ed25519';public_key=$forgedOperatorPublic;fingerprint=$forgedOperatorFingerprint;namespaces=@('mir4-source','mir4-target','mir4-ledger')}
+    independent_reviewer=[pscustomobject]@{identity='alternate-reviewer';public_key=$forgedOperatorPublic;fingerprint=$forgedOperatorFingerprint}
+    recovery=[pscustomobject]@{synthetic='not-accepted'}
+    operator_trust=[pscustomobject]@{path=$forgedOperatorPath;sha256=(Get-FileHash -LiteralPath $forgedOperatorPath -Algorithm SHA256).Hash.ToUpperInvariant();record_sha256=$forgedOperator.record_sha256}
+    ledger=[pscustomobject]@{repository_path=$RepoRoot;ref='refs/heads/release-ledger/mir4';commit=('0' * 40);event_path='t16-ledger-trust-root.json';event_sha256=('C' * 64)}
+    trust_signature=[pscustomobject]@{identity='alternate-operator';namespace='mir4-t16-trust-root';signature_path=$forgedRootSignaturePath;signature_sha256='';payload_sha256=''};record_sha256=''
+  }
+  $forgedRootPayload = ConvertTo-MIR4BootstrapCanonicalJson -Value (Get-MIR42T16TrustRootSignaturePayload -Record $forgedRoot)
+  $forgedRootPayloadPath = Join-Path $forgedTrustRoot 't16-root-payload.json'
+  [IO.File]::WriteAllText($forgedRootPayloadPath, $forgedRootPayload, [Text.UTF8Encoding]::new($false))
+  & $sshKeygen -Y sign -f $forgedOperatorPrivate -n 'mir4-t16-trust-root' $forgedRootPayloadPath | Out-Null
+  $generatedSignaturePath = $forgedRootPayloadPath + '.sig'
+  Move-Item -LiteralPath $generatedSignaturePath -Destination $forgedRootSignaturePath
+  Assert-MIR42SealTest (Test-MIR4OpenSshSignatureV1 -SshKeygenPath $sshKeygen -PublicKeyPath $forgedOperatorPublicPath -Identity 'alternate-operator' -Namespace 'mir4-t16-trust-root' -PayloadPath $forgedRootPayloadPath -SignaturePath $forgedRootSignaturePath -ScratchRoot (Join-Path $forgedTrustRoot 'verify')) 'coherent-alternate-root-signature-valid'
+  $forgedRoot.trust_signature.signature_sha256 = (Get-FileHash -LiteralPath $forgedRootSignaturePath -Algorithm SHA256).Hash.ToUpperInvariant()
+  $forgedRoot.trust_signature.payload_sha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($forgedRootPayload)))
+  $forgedRoot.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedRoot
+  Write-MIR4BootstrapRecord -Record $forgedRoot -Path $forgedRootPath | Out-Null
+  $forgedTrustRejected = $false
+  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $forgedRootPath -OperatorTrustSourcePath $forgedOperatorPath -SshKeygenPath $sshKeygen | Out-Null } catch { $forgedTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-trust-root-repository' }
+  Assert-MIR42SealTest $forgedTrustRejected 'coherent-alternate-t16-chain-in-candidate-rejected'
+
+  # Moving the same alternate key chain beside the checkout does not make it
+  # trusted: the current identity can still mutate the external source.
+  $externalForgedTrustRoot = Join-Path ((Resolve-Path -LiteralPath ([IO.Path]::GetTempPath())).Path) ('mir42-writable-external-t16-' + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Force -Path $externalForgedTrustRoot | Out-Null
+  $externalOperator = $forgedOperator | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+  $externalOperator.record_sha256 = ''
+  $externalOperator.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $externalOperator
+  $externalOperatorPath = Join-Path $externalForgedTrustRoot 'operator-trust.json'
+  Write-MIR4BootstrapRecord -Record $externalOperator -Path $externalOperatorPath | Out-Null
+  $externalRoot = $forgedRoot | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+  $externalRoot.signing_ceremony.path = Join-Path $externalForgedTrustRoot 'alternate-signing-ceremony.json'
+  $externalRoot.operator_trust.path = $externalOperatorPath
+  $externalRoot.operator_trust.sha256 = (Get-FileHash -LiteralPath $externalOperatorPath -Algorithm SHA256).Hash.ToUpperInvariant()
+  $externalRoot.operator_trust.record_sha256 = $externalOperator.record_sha256
+  $externalRoot.ledger.repository_path = $externalForgedTrustRoot
+  $externalRoot.trust_signature.signature_path = Join-Path $externalForgedTrustRoot 't16-ledger-trust-root.json.sig'
+  $externalRoot.trust_signature.signature_sha256 = ''
+  $externalRoot.trust_signature.payload_sha256 = ''
+  $externalRoot.record_sha256 = ''
+  $externalRootPayload = ConvertTo-MIR4BootstrapCanonicalJson -Value (Get-MIR42T16TrustRootSignaturePayload -Record $externalRoot)
+  $externalRootPayloadPath = Join-Path $externalForgedTrustRoot 't16-root-payload.json'
+  [IO.File]::WriteAllText($externalRootPayloadPath, $externalRootPayload, [Text.UTF8Encoding]::new($false))
+  & $sshKeygen -Y sign -f $forgedOperatorPrivate -n 'mir4-t16-trust-root' $externalRootPayloadPath | Out-Null
+  Move-Item -LiteralPath ($externalRootPayloadPath + '.sig') -Destination $externalRoot.trust_signature.signature_path
+  Assert-MIR42SealTest (Test-MIR4OpenSshSignatureV1 -SshKeygenPath $sshKeygen -PublicKeyPath $forgedOperatorPublicPath -Identity 'alternate-operator' -Namespace 'mir4-t16-trust-root' -PayloadPath $externalRootPayloadPath -SignaturePath $externalRoot.trust_signature.signature_path -ScratchRoot (Join-Path $externalForgedTrustRoot 'verify')) 'coherent-writable-external-root-signature-valid'
+  $externalRoot.trust_signature.signature_sha256 = (Get-FileHash -LiteralPath $externalRoot.trust_signature.signature_path -Algorithm SHA256).Hash.ToUpperInvariant()
+  $externalRoot.trust_signature.payload_sha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($externalRootPayload)))
+  $externalRoot.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $externalRoot
+  $externalRootPath = Join-Path $externalForgedTrustRoot 't16-ledger-trust-root.json'
+  Write-MIR4BootstrapRecord -Record $externalRoot -Path $externalRootPath | Out-Null
+  $writableExternalTrustRejected = $false
+  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $externalRootPath -OperatorTrustSourcePath $externalOperatorPath -SshKeygenPath $sshKeygen | Out-Null } catch { $writableExternalTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-trust-root-not-protected' }
+  Assert-MIR42SealTest $writableExternalTrustRejected 'coherent-writable-external-t16-chain-rejected'
+
   $forgedFreeze = [pscustomobject][ordered]@{
     schema=1;kind='MIR42SourceFreezeAuthorizationV1';status='MIR-4.2-SOURCE-FROZEN-AND-CANDIDATE-ALLOCATED'
     source=$readiness._state.candidate.source;candidate_manifest=[pscustomobject]@{sha256=$readiness._state.candidate.identity.sha256;record_sha256=$readiness._state.candidate.identity.record.record_sha256}
@@ -250,7 +333,13 @@ try {
   $assetRejected = $false
   try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath | Out-Null } catch { $assetRejected = $_.Exception.Message -match 'mir42-seal-candidate-asset-drift' }
   Assert-MIR42SealTest $assetRejected 'candidate-asset-drift-rejected'
-  Write-Output 'MIR 4.2 seal passed exact-archive, path, source, real-engine, forged-freeze, missing-evidence, and no-bypass checks; no remote mutation occurred.'
+  Write-Output 'MIR 4.2 seal passed exact-archive, path, source, real-engine, external T16 trust-root, forged-freeze, missing-evidence, and no-bypass checks; no remote mutation occurred.'
 } finally {
   if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
+  if (-not [string]::IsNullOrWhiteSpace($externalForgedTrustRoot) -and (Test-Path -LiteralPath $externalForgedTrustRoot)) {
+    $external = (Resolve-Path -LiteralPath $externalForgedTrustRoot).Path
+    $temp = (Resolve-Path -LiteralPath ([IO.Path]::GetTempPath())).Path.TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar))
+    if (-not $external.StartsWith($temp + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw "[mir42-seal-test-external-cleanup-path] $external" }
+    Remove-Item -LiteralPath $external -Recurse -Force
+  }
 }

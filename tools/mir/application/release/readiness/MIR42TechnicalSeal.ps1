@@ -93,6 +93,243 @@ function Resolve-MIR42SealImmutableFile {
   return $full
 }
 
+function Test-MIR42SealCurrentIdentityHasEffectiveRights {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][Security.AccessControl.FileSystemRights]$RequestedRights)
+  try {
+    $principal = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
+    [int64]$denied = 0; [int64]$allowed = 0
+    foreach ($rule in @((Get-Acl -LiteralPath $Path).GetAccessRules($true,$true,[Security.Principal.SecurityIdentifier]))) {
+      if ($principal.IsInRole([Security.Principal.SecurityIdentifier]$rule.IdentityReference)) {
+        if ($rule.AccessControlType -eq [Security.AccessControl.AccessControlType]::Deny) {
+          $denied = $denied -bor [int64]$rule.FileSystemRights
+        } elseif ($rule.AccessControlType -eq [Security.AccessControl.AccessControlType]::Allow) {
+          $allowed = $allowed -bor [int64]$rule.FileSystemRights
+        }
+      }
+    }
+    return (($allowed -band (-bnot $denied) -band [int64]$RequestedRights) -ne 0)
+  } catch {
+    throw '[mir42-seal-external-trust-acl-unreadable]'
+  }
+}
+
+function Test-MIR42SealCurrentIdentityCanWritePath {
+  param([Parameter(Mandatory)][string]$Path,[switch]$Ancestor)
+  $rights = if ($Ancestor) {
+    [Security.AccessControl.FileSystemRights]::DeleteSubdirectoriesAndFiles -bor
+      [Security.AccessControl.FileSystemRights]::Delete -bor
+      [Security.AccessControl.FileSystemRights]::ChangePermissions -bor
+      [Security.AccessControl.FileSystemRights]::TakeOwnership
+  } else {
+    [Security.AccessControl.FileSystemRights]::WriteData -bor
+      [Security.AccessControl.FileSystemRights]::AppendData -bor
+      [Security.AccessControl.FileSystemRights]::WriteAttributes -bor
+      [Security.AccessControl.FileSystemRights]::WriteExtendedAttributes -bor
+      [Security.AccessControl.FileSystemRights]::Delete -bor
+      [Security.AccessControl.FileSystemRights]::ChangePermissions -bor
+      [Security.AccessControl.FileSystemRights]::TakeOwnership
+  }
+  return Test-MIR42SealCurrentIdentityHasEffectiveRights -Path $Path -RequestedRights $rights
+}
+
+function Resolve-MIR42SealExternalProtectedFile {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Code)
+  if ([string]::IsNullOrWhiteSpace($Path) -or -not [IO.Path]::IsPathRooted($Path)) { throw "[$Code-path]" }
+  $full = [IO.Path]::GetFullPath($Path)
+  $repo = [IO.Path]::GetFullPath($RepoRoot).TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar))
+  if ($full -ceq $repo -or $full.StartsWith($repo + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) {
+    throw "[$Code-repository]"
+  }
+  if (-not (Test-Path -LiteralPath $full -PathType Leaf)) { throw "[$Code-missing]" }
+  $null = Resolve-MIR42SealImmutableFile -Path $full -Sha256 ((Get-FileHash -LiteralPath $full -Algorithm SHA256).Hash.ToUpperInvariant()) -Code $Code
+  $cursor = $full; $ancestor = $false
+  while ($true) {
+    if (Test-MIR42SealCurrentIdentityCanWritePath -Path $cursor -Ancestor:$ancestor) { throw "[$Code-not-protected]" }
+    $parent = Split-Path -Parent $cursor
+    if ([string]::IsNullOrEmpty($parent) -or $parent -ceq $cursor) { break }
+    $cursor = $parent; $ancestor = $true
+  }
+  return $full
+}
+
+function Resolve-MIR42SealExternalProtectedDirectory {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Code)
+  if ([string]::IsNullOrWhiteSpace($Path) -or -not [IO.Path]::IsPathRooted($Path)) { throw "[$Code-path]" }
+  $full = [IO.Path]::GetFullPath($Path)
+  $repo = [IO.Path]::GetFullPath($RepoRoot).TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar))
+  if ($full -ceq $repo -or $full.StartsWith($repo + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) {
+    throw "[$Code-repository]"
+  }
+  if (-not (Test-Path -LiteralPath $full -PathType Container)) { throw "[$Code-missing]" }
+  try {
+    $cursor = $full; $ancestor = $false
+    while ($true) {
+      if (((Get-Item -LiteralPath $cursor -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'reparse' }
+      if (Test-MIR42SealCurrentIdentityCanWritePath -Path $cursor -Ancestor:$ancestor) { throw 'not-protected' }
+      $parent = Split-Path -Parent $cursor
+      if ([string]::IsNullOrEmpty($parent) -or $parent -ceq $cursor) { break }
+      $cursor = $parent; $ancestor = $true
+    }
+  } catch {
+    if ($_.Exception.Message -eq 'not-protected') { throw "[$Code-not-protected]" }
+    throw "[$Code-reparse]"
+  }
+  return $full
+}
+
+function Get-MIR42SealGitBlobSha256 {
+  param([Parameter(Mandatory)][string]$RepositoryPath,[Parameter(Mandatory)][string]$Revision,[Parameter(Mandatory)][string]$Code)
+  $info = [Diagnostics.ProcessStartInfo]::new()
+  $info.FileName = 'git'; $info.UseShellExecute = $false; $info.RedirectStandardOutput = $true; $info.RedirectStandardError = $true
+  foreach ($argument in @('-C',$RepositoryPath,'show',$Revision)) { $null = $info.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::new(); $process.StartInfo = $info
+  try {
+    if (-not $process.Start()) { throw "[$Code-start]" }
+    $bytes = [IO.MemoryStream]::new()
+    try { $process.StandardOutput.BaseStream.CopyTo($bytes); $digest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes.ToArray())) }
+    finally { $bytes.Dispose() }
+    $stderr = $process.StandardError.ReadToEnd(); $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "[$Code-show] $stderr" }
+    return $digest
+  } finally { $process.Dispose() }
+}
+
+function Assert-MIR42SealAuthorizedLedgerCommitSignature {
+  param(
+    [Parameter(Mandatory)][string]$RepositoryPath,
+    [Parameter(Mandatory)][string]$Commit,
+    [Parameter(Mandatory)]$AuthorizedSigner,
+    [Parameter(Mandatory)][string]$SshKeygenPath
+  )
+  $scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir42-ledger-commit-' + [guid]::NewGuid().ToString('N'))
+  try {
+    New-Item -ItemType Directory -Force -Path $scratch | Out-Null
+    $publicKeyPath = Join-Path $scratch 'ledger.pub'; $allowedSignersPath = Join-Path $scratch 'allowed-signers'
+    [IO.File]::WriteAllText($publicKeyPath, ([string]$AuthorizedSigner.public_key).Trim() + "`n", [Text.UTF8Encoding]::new($false))
+    if ((Get-MIR4OpenSshPublicKeyFingerprintV1 -SshKeygenPath $SshKeygenPath -PublicKeyPath $publicKeyPath) -cne [string]$AuthorizedSigner.fingerprint) {
+      throw '[mir42-seal-external-t16-ledger-commit-key-fingerprint]'
+    }
+    [IO.File]::WriteAllText($allowedSignersPath, "$([string]$AuthorizedSigner.principal) namespaces=`"git`" $([string]$AuthorizedSigner.public_key)`n", [Text.UTF8Encoding]::new($false))
+    $info = [Diagnostics.ProcessStartInfo]::new()
+    $info.FileName = 'git'; $info.UseShellExecute = $false; $info.RedirectStandardOutput = $true; $info.RedirectStandardError = $true
+    foreach ($argument in @('-C',$RepositoryPath,'-c','gpg.format=ssh','-c',("gpg.ssh.allowedSignersFile=" + $allowedSignersPath),'verify-commit',$Commit)) { $null = $info.ArgumentList.Add($argument) }
+    $process = [Diagnostics.Process]::new(); $process.StartInfo = $info
+    try {
+      if (-not $process.Start()) { throw '[mir42-seal-external-t16-ledger-commit-start]' }
+      $null = $process.StandardOutput.ReadToEnd(); $stderr = $process.StandardError.ReadToEnd(); $process.WaitForExit()
+      if ($process.ExitCode -ne 0) { throw "[mir42-seal-external-t16-ledger-commit-signature] $stderr" }
+    } finally { $process.Dispose() }
+  } finally {
+    if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+  }
+}
+
+function Get-MIR42T16TrustRootSignaturePayload {
+  param([Parameter(Mandatory)]$Record)
+  return [pscustomobject][ordered]@{
+    schema = [int]$Record.schema
+    kind = [string]$Record.kind
+    status = [string]$Record.status
+    release_line = [string]$Record.release_line
+    turn = [string]$Record.turn
+    scope = [string]$Record.scope
+    signing_ceremony = $Record.signing_ceremony
+    authorized_signer = $Record.authorized_signer
+    independent_reviewer = $Record.independent_reviewer
+    recovery = $Record.recovery
+    operator_trust = $Record.operator_trust
+    ledger = $Record.ledger
+  }
+}
+
+function Get-MIR42ExternalT16LedgerTrustRoot {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$T16TrustRootPath,
+    [Parameter(Mandatory)][string]$OperatorTrustSourcePath,
+    [Parameter(Mandatory)][string]$SshKeygenPath
+  )
+  if ([string]::IsNullOrWhiteSpace($T16TrustRootPath) -or [string]::IsNullOrWhiteSpace($OperatorTrustSourcePath) -or [string]::IsNullOrWhiteSpace($SshKeygenPath)) {
+    throw '[mir42-seal-external-t16-trust-root-required]'
+  }
+  $trustPath = Resolve-MIR42SealExternalProtectedFile -RepoRoot $RepoRoot -Path $T16TrustRootPath -Code 'mir42-seal-external-t16-trust-root'
+  $operatorPath = Resolve-MIR42SealExternalProtectedFile -RepoRoot $RepoRoot -Path $OperatorTrustSourcePath -Code 'mir42-seal-external-operator-trust-source'
+  $trust = Read-MIR42SealRecord -Path $trustPath -Code 'mir42-seal-external-t16-trust-root'
+  $operator = Read-MIR42SealRecord -Path $operatorPath -Code 'mir42-seal-external-operator-trust-source'
+  $record = $trust.record
+  $operatorRecord = $operator.record
+  Assert-MIR42SealPropertyNames -Value $operatorRecord -Expected @('schema','kind','status','operator','namespaces','record_sha256') -Code 'mir42-seal-external-operator-trust-source-shape'
+  Assert-MIR42SealPropertyNames -Value $operatorRecord.operator -Expected @('identity','algorithm','public_key','fingerprint') -Code 'mir42-seal-external-operator-trust-source-operator-shape'
+  if ([int]$operatorRecord.schema -ne 1 -or [string]$operatorRecord.kind -cne 'MIR42ExternalOperatorTrustSourceV1' -or
+      [string]$operatorRecord.status -cne 'active-external-protected-operator-trust-source' -or
+      [string]$operatorRecord.operator.algorithm -cne 'ssh-ed25519' -or
+      [string]$operatorRecord.operator.public_key -notmatch '^ssh-ed25519\s+' -or
+      [string]$operatorRecord.operator.fingerprint -notmatch '^SHA256:' -or
+      (@($operatorRecord.namespaces | ForEach-Object { [string]$_ }) -join '|') -cne 'mir4-t16-trust-root') {
+    throw '[mir42-seal-external-operator-trust-source-state]'
+  }
+  Assert-MIR42SealPropertyNames -Value $record -Expected @('schema','kind','status','release_line','turn','scope','signing_ceremony','authorized_signer','independent_reviewer','recovery','operator_trust','ledger','trust_signature','record_sha256') -Code 'mir42-seal-external-t16-trust-root-shape'
+  Assert-MIR42SealPropertyNames -Value $record.signing_ceremony -Expected @('path','sha256','record_sha256') -Code 'mir42-seal-external-t16-trust-root-signing-shape'
+  Assert-MIR42SealPropertyNames -Value $record.authorized_signer -Expected @('principal','algorithm','public_key','fingerprint','namespaces') -Code 'mir42-seal-external-t16-trust-root-signer-shape'
+  Assert-MIR42SealPropertyNames -Value $record.independent_reviewer -Expected @('identity','public_key','fingerprint') -Code 'mir42-seal-external-t16-trust-root-reviewer-shape'
+  Assert-MIR42SealPropertyNames -Value $record.operator_trust -Expected @('path','sha256','record_sha256') -Code 'mir42-seal-external-t16-trust-root-operator-binding-shape'
+  Assert-MIR42SealPropertyNames -Value $record.ledger -Expected @('repository_path','ref','commit','event_path','event_sha256') -Code 'mir42-seal-external-t16-trust-root-ledger-shape'
+  Assert-MIR42SealPropertyNames -Value $record.trust_signature -Expected @('identity','namespace','signature_path','signature_sha256','payload_sha256') -Code 'mir42-seal-external-t16-trust-root-signature-shape'
+  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42ExternalT16LedgerTrustRootV1' -or
+      [string]$record.status -cne 'MIR-4.2-T16-PROTECTED-SIGNING-RECOVERY-ACCEPTED' -or [string]$record.release_line -cne '4.2' -or
+      [string]$record.turn -cne 'T16' -or [string]$record.scope -cne 'four-target-release-cut' -or
+      [string]$record.authorized_signer.algorithm -cne 'ssh-ed25519' -or [string]$record.authorized_signer.public_key -notmatch '^ssh-ed25519\s+' -or
+      [string]$record.authorized_signer.fingerprint -notmatch '^SHA256:' -or
+      (@($record.authorized_signer.namespaces | ForEach-Object { [string]$_ }) -join '|') -cne 'mir4-source|mir4-target|mir4-ledger' -or
+      [string]$record.independent_reviewer.public_key -notmatch '^ssh-ed25519\s+' -or [string]$record.independent_reviewer.fingerprint -notmatch '^SHA256:' -or
+      [string]$record.operator_trust.path -cne $operator.path -or [string]$record.operator_trust.sha256 -cne $operator.sha256 -or
+      [string]$record.operator_trust.record_sha256 -cne [string]$operator.record.record_sha256 -or
+      [string]$record.trust_signature.identity -cne [string]$operatorRecord.operator.identity -or
+      [string]$record.trust_signature.namespace -cne 'mir4-t16-trust-root' -or
+      [string]$record.trust_signature.signature_sha256 -notmatch '^[A-F0-9]{64}$') {
+    throw '[mir42-seal-external-t16-trust-root-state]'
+  }
+  $ledgerPath = Resolve-MIR42SealExternalProtectedDirectory -RepoRoot $RepoRoot -Path ([string]$record.ledger.repository_path) -Code 'mir42-seal-external-t16-ledger'
+  if ([string]$record.ledger.ref -notmatch '^refs/heads/release-ledger/mir4$' -or
+      [string]$record.ledger.commit -notmatch '^[0-9a-f]{40}$' -or [string]$record.ledger.event_path -match '(^|[\\/])\.\.([\\/]|$)' -or
+      [IO.Path]::IsPathRooted([string]$record.ledger.event_path) -or [string]$record.ledger.event_sha256 -cne [string]$trust.sha256) {
+    throw '[mir42-seal-external-t16-ledger-state]'
+  }
+  $refCommit = (& git -C $ledgerPath rev-parse ([string]$record.ledger.ref) 2>$null).Trim()
+  $revision = ([string]$record.ledger.commit) + ':' + ([string]$record.ledger.event_path)
+  $blobSha256 = Get-MIR42SealGitBlobSha256 -RepositoryPath $ledgerPath -Revision $revision -Code 'mir42-seal-external-t16-ledger'
+  if ($LASTEXITCODE -ne 0 -or $refCommit -cne [string]$record.ledger.commit -or
+      $blobSha256 -cne [string]$trust.sha256) {
+    throw '[mir42-seal-external-t16-ledger-binding]'
+  }
+  Assert-MIR42SealAuthorizedLedgerCommitSignature -RepositoryPath $ledgerPath -Commit ([string]$record.ledger.commit) -AuthorizedSigner $record.authorized_signer -SshKeygenPath $SshKeygenPath
+  $signaturePath = Resolve-MIR42SealExternalProtectedFile -RepoRoot $RepoRoot -Path ([string]$record.trust_signature.signature_path) -Code 'mir42-seal-external-t16-trust-signature'
+  if ((Get-FileHash -LiteralPath $signaturePath -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$record.trust_signature.signature_sha256) {
+    throw '[mir42-seal-external-t16-trust-signature-hash]'
+  }
+  $payload = ConvertTo-MIR4BootstrapCanonicalJson -Value (Get-MIR42T16TrustRootSignaturePayload -Record $record)
+  $payloadSha = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($payload)))
+  if ([string]$record.trust_signature.payload_sha256 -cne $payloadSha) { throw '[mir42-seal-external-t16-trust-signature-payload]' }
+  $scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir42-t16-trust-root-' + [guid]::NewGuid().ToString('N'))
+  try {
+    New-Item -ItemType Directory -Force -Path $scratch | Out-Null
+    $publicKeyPath = Join-Path $scratch 'operator.pub'; $authorizedSignerPath = Join-Path $scratch 'authorized-signer.pub'; $reviewerPath = Join-Path $scratch 'reviewer.pub'; $payloadPath = Join-Path $scratch 'trust-root.json'
+    [IO.File]::WriteAllText($publicKeyPath, ([string]$operatorRecord.operator.public_key).Trim() + "`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($authorizedSignerPath, ([string]$record.authorized_signer.public_key).Trim() + "`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($reviewerPath, ([string]$record.independent_reviewer.public_key).Trim() + "`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($payloadPath, $payload, [Text.UTF8Encoding]::new($false))
+    if ((Get-MIR4OpenSshPublicKeyFingerprintV1 -SshKeygenPath $SshKeygenPath -PublicKeyPath $publicKeyPath) -cne [string]$operatorRecord.operator.fingerprint -or
+        (Get-MIR4OpenSshPublicKeyFingerprintV1 -SshKeygenPath $SshKeygenPath -PublicKeyPath $authorizedSignerPath) -cne [string]$record.authorized_signer.fingerprint -or
+        (Get-MIR4OpenSshPublicKeyFingerprintV1 -SshKeygenPath $SshKeygenPath -PublicKeyPath $reviewerPath) -cne [string]$record.independent_reviewer.fingerprint -or
+        -not (Test-MIR4OpenSshSignatureV1 -SshKeygenPath $SshKeygenPath -PublicKeyPath $publicKeyPath -Identity ([string]$operatorRecord.operator.identity) -Namespace 'mir4-t16-trust-root' -PayloadPath $payloadPath -SignaturePath $signaturePath -ScratchRoot (Join-Path $scratch 'verify'))) {
+      throw '[mir42-seal-external-t16-trust-signature-verification]'
+    }
+  } finally {
+    if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+  }
+  return [pscustomobject][ordered]@{path=$trust.path;sha256=$trust.sha256;record=$record;operator=$operator}
+}
+
 function Get-MIR42ExactFourTargetCandidate {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$CandidateManifestPath)
   $candidateInput = Read-MIR42SealRecord -Path $CandidateManifestPath -Code 'mir42-seal-candidate'
@@ -620,7 +857,7 @@ function Get-MIR42ExactIndependentVerificationReceipt {
 }
 
 function Get-MIR42ProtectedSigningCeremony {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$T16TrustRoot)
   $receipt = Read-MIR42SealRecord -Path $Path -Code 'mir42-seal-signing'
   $schema = Join-Path $RepoRoot 'spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json'
   $raw = Get-Content -Raw -LiteralPath $receipt.path
@@ -628,36 +865,18 @@ function Get-MIR42ProtectedSigningCeremony {
   if ([string]$receipt.record.status -cne 'accepted-protected-signing-authority' -or
       [string]$receipt.record.authorization.decision -cne 'AUTHORIZED' -or
       [bool]$receipt.record.secret_values_present) { throw '[mir42-seal-signing-state]' }
-  $governancePath = Join-Path $RepoRoot '.mir/releases/governance/mir4/release-governance.json'
-  try { $governance = Get-Content -Raw -LiteralPath $governancePath | ConvertFrom-Json -Depth 100 -DateKind String }
-  catch { throw '[mir42-seal-governance-json]' }
-  if ([string]$governance.kind -cne 'MIR4ReleaseGovernanceV1' -or
-      [string]$governance.state -cne 'RELEASE-GOVERNANCE-READY' -or [string]$governance.acceptance -cne 'ACCEPTED' -or
-      [bool]$governance.secret_values_present -or [string]$governance.signing_authority.public_key -cne [string]$receipt.record.public_signer.public_key -or
-      [string]$governance.signing_authority.fingerprint -cne [string]$receipt.record.public_signer.fingerprint) {
-    throw '[mir42-seal-governance-not-production-ready]'
+  $root = $T16TrustRoot.record
+  if ([string]$root.signing_ceremony.path -cne [string]$receipt.path -or [string]$root.signing_ceremony.sha256 -cne [string]$receipt.sha256 -or
+      [string]$root.signing_ceremony.record_sha256 -cne [string]$receipt.record.record_sha256 -or
+      [string]$root.authorized_signer.principal -cne [string]$receipt.record.public_signer.principal -or
+      [string]$root.authorized_signer.algorithm -cne [string]$receipt.record.public_signer.algorithm -or
+      [string]$root.authorized_signer.public_key -cne [string]$receipt.record.public_signer.public_key -or
+      [string]$root.authorized_signer.fingerprint -cne [string]$receipt.record.public_signer.fingerprint -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value @($root.authorized_signer.namespaces)) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value @($receipt.record.public_signer.namespaces)) -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $root.recovery) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.record.recovery)) {
+    throw '[mir42-seal-external-t16-signing-binding]'
   }
-  $allowedPath = Join-Path $RepoRoot '.mir/releases/governance/mir4/allowed-signers.json'
-  $allowed = Read-MIR42SealRecord -Path $allowedPath -Code 'mir42-seal-allowed-signers'
-  $namespaces = @($allowed.record.rows | ForEach-Object { [string]$_.namespace } | Sort-Object -Unique)
-  $ledgerRows = @($allowed.record.rows | Where-Object { [string]$_.namespace -ceq 'mir4-ledger' })
-  $signerRows = @($allowed.record.rows | Where-Object {
-    [string]$_.status -cne 'active' -or
-    [string]$_.principal -cne [string]$receipt.record.public_signer.principal -or
-    [string]$_.public_key -cne [string]$receipt.record.public_signer.public_key -or
-    [string]$_.fingerprint -cne [string]$receipt.record.public_signer.fingerprint
-  })
-  if ([string]$receipt.record.allowed_signers.record_sha256 -cne [string]$allowed.record.record_sha256 -or
-      [string]$allowed.record.kind -cne 'MIR4AllowedSignersV1' -or [string]$allowed.record.state -ceq 'awaiting-protected-key' -or
-      @($allowed.record.rows).Count -ne 3 -or (($namespaces -join '|') -cne 'mir4-ledger|mir4-source|mir4-target') -or
-      $signerRows.Count -ne 0 -or
-      $ledgerRows.Count -ne 1 -or [string]$ledgerRows[0].status -cne 'active' -or
-      [string]$ledgerRows[0].principal -cne [string]$receipt.record.public_signer.principal -or
-      [string]$ledgerRows[0].public_key -cne [string]$receipt.record.public_signer.public_key -or
-      [string]$ledgerRows[0].fingerprint -cne [string]$receipt.record.public_signer.fingerprint) {
-    throw '[mir42-seal-approved-signer-missing]'
-  }
-  return [pscustomobject][ordered]@{path=$receipt.path;sha256=$receipt.sha256;record=$receipt.record;ledger_signer=$ledgerRows[0]}
+  return [pscustomobject][ordered]@{path=$receipt.path;sha256=$receipt.sha256;record=$receipt.record;ledger_signer=$root.authorized_signer;independent_reviewer=$root.independent_reviewer;t16_trust_root=$T16TrustRoot}
 }
 
 function Assert-MIR42SealPropertyNames {
@@ -810,6 +1029,11 @@ function Get-MIR42SourceFreezeAuthority {
       [string]$record.promotion_base.commit -notmatch '^[0-9a-f]{40}$') {
     throw '[mir42-seal-freeze-promotion-topology-binding]'
   }
+  if ([string]$record.independent_reviewer.identity -cne [string]$Signing.independent_reviewer.identity -or
+      [string]$record.independent_reviewer.public_key -cne [string]$Signing.independent_reviewer.public_key -or
+      [string]$record.independent_reviewer.fingerprint -cne [string]$Signing.independent_reviewer.fingerprint) {
+    throw '[mir42-seal-freeze-reviewer-trust-binding]'
+  }
   Assert-MIR42SourceFreezeLedgerSignature -RepoRoot $RepoRoot -Authority $authority -Signing $Signing -SshKeygenPath $SshKeygenPath
   $programme = Get-MIR42LiveProgrammeTransition -RepoRoot $RepoRoot
   if ([string]$record.programme.path -cne [string]$programme.path -or [string]$record.programme.sha256 -cne [string]$programme.sha256 -or
@@ -898,6 +1122,8 @@ function Get-MIR42FourTargetTechnicalSealReadiness {
     [string]$RealEngineCampaignPath='',
     [string]$IndependentVerificationPath='',
     [string]$SigningCeremonyPath='',
+    [string]$T16TrustRootPath='',
+    [string]$OperatorTrustSourcePath='',
     [string]$SourceFreezeAuthorityPath='',
     [string]$ReviewerAttestationPath='',
     [string]$SshKeygenPath=''
@@ -905,13 +1131,14 @@ function Get-MIR42FourTargetTechnicalSealReadiness {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $checks = [ordered]@{}
   $blockers = [Collections.Generic.List[string]]::new()
-  $state = [ordered]@{candidate=$null;programme=$null;qualification=$null;campaign=$null;independent=$null;signing=$null;freeze=$null;reviewer=$null}
+  $state = [ordered]@{candidate=$null;programme=$null;qualification=$null;campaign=$null;independent=$null;t16_trust_root=$null;signing=$null;freeze=$null;reviewer=$null}
   try { $state.candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath; $checks.candidate = $true } catch { $checks.candidate = $false; $blockers.Add($_.Exception.Message) }
   if ($checks.candidate) { try { $state.programme = Get-MIR42LiveProgrammeTransition -RepoRoot $repo; $checks.programme = $true } catch { $checks.programme = $false; $blockers.Add($_.Exception.Message) } } else { $checks.programme = $false; $blockers.Add('[mir42-seal-programme-unavailable]') }
   if ($checks.candidate -and -not [string]::IsNullOrWhiteSpace($QualificationPath)) { try { $state.qualification = Get-MIR42ExactQualificationReceipt -Path $QualificationPath -Candidate $state.candidate; $checks.qualification = $true } catch { $checks.qualification = $false; $blockers.Add($_.Exception.Message) } } else { $checks.qualification = $false; $blockers.Add('[mir42-seal-qualification-missing]') }
   if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($RealEngineCampaignPath)) { try { $state.campaign = Get-MIR42RealEngineCandidateCampaign -RepoRoot $repo -Path $RealEngineCampaignPath -Candidate $state.candidate -Reconciliation $state.qualification; $checks.campaign = $true } catch { $checks.campaign = $false; $blockers.Add($_.Exception.Message) } } else { $checks.campaign = $false; $blockers.Add('[mir42-seal-real-engine-campaign-missing]') }
   if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($IndependentVerificationPath)) { try { $state.independent = Get-MIR42ExactIndependentVerificationReceipt -Path $IndependentVerificationPath -Candidate $state.candidate -Qualification $state.qualification; $checks.independent = $true } catch { $checks.independent = $false; $blockers.Add($_.Exception.Message) } } else { $checks.independent = $false; $blockers.Add('[mir42-seal-independent-missing]') }
-  if (-not [string]::IsNullOrWhiteSpace($SigningCeremonyPath)) { try { $state.signing = Get-MIR42ProtectedSigningCeremony -RepoRoot $repo -Path $SigningCeremonyPath; $checks.signing = $true } catch { $checks.signing = $false; $blockers.Add($_.Exception.Message) } } else { $checks.signing = $false; $blockers.Add('[mir42-seal-signing-missing]') }
+  if (-not [string]::IsNullOrWhiteSpace($T16TrustRootPath) -and -not [string]::IsNullOrWhiteSpace($OperatorTrustSourcePath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.t16_trust_root = Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $repo -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -SshKeygenPath $SshKeygenPath; $checks.t16_trust_root = $true } catch { $checks.t16_trust_root = $false; $blockers.Add($_.Exception.Message) } } else { $checks.t16_trust_root = $false; $blockers.Add('[mir42-seal-external-t16-trust-root-or-verifier-missing]') }
+  if ($checks.t16_trust_root -and -not [string]::IsNullOrWhiteSpace($SigningCeremonyPath)) { try { $state.signing = Get-MIR42ProtectedSigningCeremony -RepoRoot $repo -Path $SigningCeremonyPath -T16TrustRoot $state.t16_trust_root; $checks.signing = $true } catch { $checks.signing = $false; $blockers.Add($_.Exception.Message) } } else { $checks.signing = $false; $blockers.Add('[mir42-seal-signing-or-external-t16-trust-root-missing]') }
   if ($checks.candidate -and $checks.signing -and -not [string]::IsNullOrWhiteSpace($SourceFreezeAuthorityPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.freeze = Get-MIR42SourceFreezeAuthority -RepoRoot $repo -Path $SourceFreezeAuthorityPath -Candidate $state.candidate -Signing $state.signing -SshKeygenPath $SshKeygenPath; $checks.freeze = $true } catch { $checks.freeze = $false; $blockers.Add($_.Exception.Message) } } else { $checks.freeze = $false; $blockers.Add('[mir42-seal-freeze-authority-or-verifier-missing]') }
   if ($checks.qualification -and $checks.campaign -and $checks.independent -and $checks.freeze -and -not [string]::IsNullOrWhiteSpace($ReviewerAttestationPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.reviewer = Get-MIR42IndependentReviewerAttestation -RepoRoot $repo -Path $ReviewerAttestationPath -Independent $state.independent -Campaign $state.campaign -Freeze $state.freeze -SshKeygenPath $SshKeygenPath; $checks.reviewer = $true } catch { $checks.reviewer = $false; $blockers.Add($_.Exception.Message) } } else { $checks.reviewer = $false; $blockers.Add('[mir42-seal-independent-reviewer-attestation-missing]') }
   $ready = @($checks.GetEnumerator() | Where-Object { -not [bool]$_.Value }).Count -eq 0
@@ -956,6 +1183,8 @@ function New-MIR42FourTargetTechnicalSeal {
     [AllowEmptyString()][string]$RealEngineCampaignPath='',
     [AllowEmptyString()][string]$IndependentVerificationPath='',
     [AllowEmptyString()][string]$SigningCeremonyPath='',
+    [AllowEmptyString()][string]$T16TrustRootPath='',
+    [AllowEmptyString()][string]$OperatorTrustSourcePath='',
     [AllowEmptyString()][string]$SourceFreezeAuthorityPath='',
     [AllowEmptyString()][string]$ReviewerAttestationPath='',
     [AllowEmptyString()][string]$SshKeygenPath='',
@@ -963,7 +1192,8 @@ function New-MIR42FourTargetTechnicalSeal {
   )
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
-    -SigningCeremonyPath $SigningCeremonyPath -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
+    -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath `
+    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-seal-not-authorized] $($readiness.blockers -join '; ')" }
   $state = $readiness._state
   $seal = [pscustomobject][ordered]@{
@@ -975,6 +1205,7 @@ function New-MIR42FourTargetTechnicalSeal {
     qualification = [ordered]@{sha256=[string]$state.qualification.sha256;record_sha256=[string]$state.qualification.record.record_sha256}
     real_engine_campaign = [ordered]@{sha256=[string]$state.campaign.sha256;record_sha256=[string]$state.campaign.record.record_sha256}
     independent_verification = [ordered]@{sha256=[string]$state.independent.sha256;record_sha256=[string]$state.independent.record.record_sha256}
+    t16_ledger_trust_root = [ordered]@{path=[string]$state.t16_trust_root.path;sha256=[string]$state.t16_trust_root.sha256;record_sha256=[string]$state.t16_trust_root.record.record_sha256}
     signing_ceremony = [ordered]@{sha256=[string]$state.signing.sha256;record_sha256=[string]$state.signing.record.record_sha256}
     source_freeze_authority = [ordered]@{sha256=[string]$state.freeze.sha256;record_sha256=[string]$state.freeze.record.record_sha256}
     independent_reviewer_attestation = [ordered]@{sha256=[string]$state.reviewer.sha256;record_sha256=[string]$state.reviewer.record.record_sha256}

@@ -274,6 +274,7 @@ function Assert-MIR42ExpectedTechnicalSeal {
     qualification = [ordered]@{sha256=[string]$state.qualification.sha256;record_sha256=[string]$state.qualification.record.record_sha256}
     real_engine_campaign = [ordered]@{sha256=[string]$state.campaign.sha256;record_sha256=[string]$state.campaign.record.record_sha256}
     independent_verification = [ordered]@{sha256=[string]$state.independent.sha256;record_sha256=[string]$state.independent.record.record_sha256}
+    t16_ledger_trust_root = [ordered]@{path=[string]$state.t16_trust_root.path;sha256=[string]$state.t16_trust_root.sha256;record_sha256=[string]$state.t16_trust_root.record.record_sha256}
     signing_ceremony = [ordered]@{sha256=[string]$state.signing.sha256;record_sha256=[string]$state.signing.record.record_sha256}
     source_freeze_authority = [ordered]@{sha256=[string]$state.freeze.sha256;record_sha256=[string]$state.freeze.record.record_sha256}
     independent_reviewer_attestation = [ordered]@{sha256=[string]$state.reviewer.sha256;record_sha256=[string]$state.reviewer.record.record_sha256}
@@ -300,6 +301,8 @@ function Get-MIR42ProtectedMainPromotionPlan {
     [Parameter(Mandatory)][string]$RealEngineCampaignPath,
     [Parameter(Mandatory)][string]$IndependentVerificationPath,
     [Parameter(Mandatory)][string]$SigningCeremonyPath,
+    [AllowEmptyString()][string]$T16TrustRootPath='',
+    [AllowEmptyString()][string]$OperatorTrustSourcePath='',
     [Parameter(Mandatory)][string]$SourceFreezeAuthorityPath,
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
@@ -308,7 +311,8 @@ function Get-MIR42ProtectedMainPromotionPlan {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
-    -SigningCeremonyPath $SigningCeremonyPath -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
+    -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath `
+    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-promotion-verified-seal-inputs] $($readiness.blockers -join '; ')" }
   $candidate = $readiness._state.candidate
   $seal = Read-MIR42SealRecord -Path $TechnicalSealPath -Code 'mir42-promotion-seal'
@@ -328,6 +332,7 @@ function Get-MIR42ProtectedMainPromotionPlan {
     @('qualification',$readiness._state.qualification),
     @('real_engine_campaign',$readiness._state.campaign),
     @('independent_verification',$readiness._state.independent),
+    @('t16_ledger_trust_root',$readiness._state.t16_trust_root),
     @('signing_ceremony',$readiness._state.signing),
     @('source_freeze_authority',$readiness._state.freeze),
     @('independent_reviewer_attestation',$readiness._state.reviewer)
