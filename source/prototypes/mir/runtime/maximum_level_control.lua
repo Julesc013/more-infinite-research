@@ -392,9 +392,10 @@ local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
   -- disable it performed and the original visibility boolean. Upgrade those
   -- exact shapes once a V3 policy is accepted. A boolean visibility record
   -- paired with no V2 disable record proves that V2 did not own enablement.
-  -- If that exact V2 state is disabled at V3 entry, retain its false value
-  -- only across the next cap transition: Factorio can reset it before the
-  -- cap=0 configuration callback. This is continuity, never MIR ownership.
+  -- That exact pair retains the foreign false state V2 observed even if
+  -- Factorio has reset enabled before the V3 configuration callback. Restore
+  -- it once here, before V3 cap enforcement can mistake that reset for its
+  -- own enabled-to-disabled write. This is continuity, never MIR ownership.
   -- Do not infer either ownership or continuity from any other legacy shape.
   if not policy or policy.blocked_reason
       or policy.policy_transport ~= "transported-v3" then return end
@@ -403,7 +404,7 @@ local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
   local migrated_disable = legacy_disable == true
   local technology = force.technologies[technology_name]
   local migrated_unowned_disable = migrated_visibility and legacy_disable == nil
-    and technology and technology.enabled == false
+    and unowned_disabled_by_cap[technology_name] == nil
   if migrated_visibility then
     visibility_by_cap[technology_name] = captured_visibility(
       visibility_by_cap[technology_name], force, policy)
@@ -431,6 +432,11 @@ local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
       enabled_before_cap = false,
       migrated_from_policy_version = 2
     }
+    -- Do this only on the exact V2-to-V3 migration. While the cap remains
+    -- active, ordinary normalization must not override later foreign writes.
+    -- When the cap is relaxed, restore_unowned_disable_continuity applies the
+    -- same persisted state once more and clears this record.
+    technology.enabled = false
     log("[more-infinite-research] Captured maximum-level V2 unowned-disable"
       .. " continuity force=" .. tostring(force.name)
       .. " technology=" .. tostring(technology_name)
