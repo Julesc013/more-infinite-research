@@ -3137,6 +3137,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
+      "classification": "historical",
+      "sha256": "B24C97A9574309C2E8B6FE912711FC518C010F2DCBD951C58D0280205D8A3AE3",
+      "hash_mode": "canonical-text-v1",
+      "lines": 217,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1",
       "classification": "canonical-internal",
       "sha256": "D716647C9954C348FB27F92B55FC270FD0F17AE4D48ADB8505D85DE2D94C4B7D",
@@ -5870,7 +5878,7 @@
     "canonical_internal": 400,
     "compatibility_wrapper": 168,
     "migration_only": 59,
-    "historical": 17,
+    "historical": 18,
     "obsolete": 0,
     "unknown": 0,
     "duplicate_command_keys": 0
@@ -5882,5 +5890,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:17b9868f7f6df38d2dc41b43960d796ace54fd86c6989d927297f132ca304272"
+  "digest": "sha256:643b223d9d097b5b953bd040d9b4a5dc2b8ef56d6354964ed61b98499d4aa8c4"
 }
