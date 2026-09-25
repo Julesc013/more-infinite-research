@@ -1,4 +1,43 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.2.21000
+Date: 2026-09-26
+
+  Changes:
+
+    - Added the embedded research browser with localized search, personal views, and bounded research and settings details.
+    - Added guarded finite ordinary-material productivity research with three +2% levels by default for eligible recipes.
+
+  Bugfixes:
+
+    - Recognized explicit offshore-pump sources, native water offsets, and actual lab inputs in science selection.
+    - Preserved a foreign-disabled technology through V2-to-V3 cap migration and subsequent cap relaxation.
+    - Preserved native queues and force-owned state through cap transitions while refusing forged cap policies.
+
+  Compatibility:
+
+    - Raised the F210 base, optional Recycler, and optional Space Age dependency floor to Factorio 2.1.18.
+    - Excluded unavailable, cyclic, externally owned, and productivity-denied material routes from generated research.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.1.21000
+Date: 2026-09-05
+  Changes:
+    - Prepared the four-target MIR 4.1 release through one resource-bounded production-readiness coordinator.
+---------------------------------------------------------------------------------------------------
+Version: 4.0.21000
+Date: 2026-08-30
+
+  Changes:
+
+    - Began MIR 4 with independently generated target packages from one canonical source release.
+    - Preserved the proven player compiler and emitter behind explicit target and release boundaries.
+
+  Compatibility:
+
+    - Preserved the direct Factorio 2.1 upgrade from MIR 3.2.11, technology IDs, settings, and runtime state.
+    - Set the F210 package compatibility floor to Factorio 2.1.8 and kept optional features target-gated.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.2.11
 Date: 2026-08-17
 

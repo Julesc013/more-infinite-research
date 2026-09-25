@@ -1,4 +1,43 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.2.20000
+Date: 2026-09-26
+
+  Changes:
+
+    - Added the embedded research browser with localized search, personal views, and bounded research and settings details.
+    - Added guarded finite ordinary-material productivity research with three +2% levels by default for eligible recipes.
+
+  Bugfixes:
+
+    - Repaired chemical-science reachability in the locked Bob/Angel profile while retaining military-only weapon frontiers.
+    - Recognized explicit offshore-pump fluid sources and actual lab inputs when selecting science for generated research.
+    - Corrected settings-derived maximum-level transitions while preserving completed research and MIR-owned cap state.
+
+  Compatibility:
+
+    - Excluded unavailable, cyclic, externally owned, and productivity-denied material routes from generated research.
+    - Preserved existing technology and setting identities while composing the Factorio 2.0 package from shared source.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.1.20000
+Date: 2026-09-05
+  Changes:
+    - Prepared the four-target MIR 4.1 release through one resource-bounded production-readiness coordinator.
+---------------------------------------------------------------------------------------------------
+Version: 4.0.20000
+Date: 2026-08-30
+
+  Changes:
+
+    - Began MIR 4 with independently generated target packages from one canonical source release.
+    - Preserved the proven player compiler and emitter behind explicit target and release boundaries.
+
+  Compatibility:
+
+    - Preserved the direct Factorio 2.0 upgrade from MIR 2.5.11, technology IDs, settings, and runtime state.
+    - Omitted Factorio 2.1-only effects, prototypes, transports, settings, and runtime handlers.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.5.11
 Date: 2026-08-18
 
