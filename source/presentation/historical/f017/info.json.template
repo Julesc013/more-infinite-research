@@ -1,0 +1,11 @@
+{
+  "name": "more-infinite-research",
+  "version": "4.2.01700",
+  "title": "More Infinite Research",
+  "author": "Julesc013",
+  "description": "Private MIR 4.2 reduced research playtest for Factorio 0.17.",
+  "factorio_version": "0.17",
+  "dependencies": [
+    "base >= 0.17"
+  ]
+}
