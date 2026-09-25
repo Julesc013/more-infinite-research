@@ -136,6 +136,31 @@ $signatureText = (& git -C $repo verify-tag v4.1.0 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0 -or -not $signatureText.Contains([string]$inputAuthority.public_v410_checksums.verified_tag_fingerprint)) {
   throw '[mir42-engine-published-v410-tag-signature]'
 }
+$publishedRelease = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.1.0' | Out-String) | ConvertFrom-Json -Depth 30 -DateKind String
+if ($LASTEXITCODE -ne 0 -or [string]$publishedRelease.tag_name -cne 'v4.1.0' -or [bool]$publishedRelease.draft) {
+  throw '[mir42-engine-published-v410-release-metadata]'
+}
+$checksumAsset = @($publishedRelease.assets | Where-Object { [string]$_.name -ceq 'SHA256SUMS.txt' })
+if ($checksumAsset.Count -ne 1 -or
+    [int64]$checksumAsset[0].id -ne [int64]$inputAuthority.public_v410_checksums.release_asset_id -or
+    [string]$checksumAsset[0].digest -cne ('sha256:' + [string]$inputAuthority.public_v410_checksums.sha256).ToLowerInvariant() -or
+    [int64]$checksumAsset[0].size -ne [int64]$inputAuthority.public_v410_checksums.release_asset_bytes -or
+    [string]$checksumAsset[0].state -cne 'uploaded') {
+  throw '[mir42-engine-published-v410-checksum-asset]'
+}
+$assetCheckRoot = Join-Path $repo ('build/v410-public-checksum-verification-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $assetCheckRoot | Out-Null
+try {
+  $null = & gh release download v4.1.0 -R Julesc013/more-infinite-research -p SHA256SUMS.txt -D $assetCheckRoot
+  if ($LASTEXITCODE -ne 0) { throw '[mir42-engine-published-v410-checksum-download]' }
+  $downloadedChecksum = Assert-MIR42EngineRunFile -Path (Join-Path $assetCheckRoot 'SHA256SUMS.txt') -Label 'mir42-published-v410-checksum-download'
+  if ((Get-MIR42EngineRunSha -Path $downloadedChecksum) -cne [string]$inputAuthority.public_v410_checksums.sha256 -or
+      [int64](Get-Item -LiteralPath $downloadedChecksum).Length -ne [int64]$checksumAsset[0].size) {
+    throw '[mir42-engine-published-v410-checksum-download-content]'
+  }
+} finally {
+  Remove-Item -LiteralPath $assetCheckRoot -Recurse -Force
+}
 
 $selected = [ordered]@{
   f210 = [ordered]@{ engine=$F210Engine; predecessor=$F210Predecessor; from='4.1.21000'; to='4.2.21000'; fixture='assert-upgrade-4-0-21000-to-4-1-21000'; engine_major='2.1' }
@@ -240,10 +265,17 @@ foreach ($target in $targets) {
         '-ScenarioWorker','-Scenario',$scenario,'-FactorioBin',$row.engine,
         '-UserDataDir',(Join-Path $freshRoot 'work'),'-CandidateZip',$row.candidate,
         '-MaxParallel','1','-ValidationSummaryPath',$summaryPath)
+      if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) {
+        throw "[mir42-$target-$scenario-engine-drift-before]"
+      }
       if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) {
         throw "[mir42-$target-$scenario-staged-candidate-drift-before]"
       }
       $null = Invoke-MIR42BoundedUpgrade -PowerShell $pwsh -Arguments $freshArgs -StdoutPath $freshStdout -StderrPath $freshStderr -DeadlineSeconds $RowDeadlineSeconds
+
+      if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) {
+        throw "[mir42-$target-$scenario-engine-drift-after]"
+      }
       if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) {
         throw "[mir42-$target-$scenario-staged-candidate-drift-after]"
       }
@@ -280,7 +312,9 @@ foreach ($target in $targets) {
     '-FixtureName',$row.fixture,'-Archetype','base-default','-OutputPath',$receiptPath,
     '-WorkRoot',(Join-Path $rowRoot 'work'),'-Retention','OnFailure')
   if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-staged-candidate-drift-before-upgrade]" }
+  if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) { throw "[mir42-$target-engine-drift-before-upgrade]" }
   $exitCode = Invoke-MIR42BoundedUpgrade -PowerShell $pwsh -Arguments $args -StdoutPath $stdoutPath -StderrPath $stderrPath -DeadlineSeconds $RowDeadlineSeconds
+  if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) { throw "[mir42-$target-engine-drift-after-upgrade]" }
   if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-staged-candidate-drift-after-upgrade]" }
   $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 50 -DateKind String
   $missingAssertions = @(@('exact-candidate-normal-mod-directory-load','upgraded-save-reload-passed','upgraded-save-second-reload-passed') |
@@ -324,6 +358,7 @@ $record = [ordered]@{
   source=[ordered]@{commit=$head;tree=$tree}
   candidate_manifest=[ordered]@{path=$manifestPath;sha256=(Get-MIR42EngineRunSha -Path $manifestPath);record_sha256=[string]$manifest.record_sha256}
   predecessor_authority=[ordered]@{path=$inputAuthorityPath;sha256=(Get-MIR42EngineRunSha -Path $inputAuthorityPath);record_sha256=[string]$inputAuthority.record_sha256}
+  public_v410_checksum_asset=[ordered]@{release_id=[int64]$publishedRelease.id;asset_id=[int64]$checksumAsset[0].id;digest=[string]$checksumAsset[0].digest;bytes=[int64]$checksumAsset[0].size;download_verified=$true}
   runner=[ordered]@{path=$runner;sha256=(Get-MIR42EngineRunSha -Path $runner)}
   harness=[ordered]@{path=$harness;sha256=(Get-MIR42EngineRunSha -Path $harness)}
   targets=@($results.ToArray())
