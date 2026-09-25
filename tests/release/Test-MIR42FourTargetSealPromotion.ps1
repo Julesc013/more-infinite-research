@@ -67,6 +67,7 @@ try {
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath
   Assert-MIR42SealTest ($readiness.status -ceq 'MIR-4.2-FOUR-TARGET-TECHNICAL-SEAL-BLOCKED') 'missing-gates-block-seal'
   Assert-MIR42SealTest ([bool]$readiness.checks.candidate -and -not [bool]$readiness.checks.qualification -and -not [bool]$readiness.checks.campaign -and -not [bool]$readiness.checks.reviewer -and -not [bool]$readiness.technical_seal_authorized) 'candidate-only-readiness'
+  Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_acl_contract -and (@($readiness.blockers) -match 'mir42-seal-t16-acl-contract-human-input-required').Count -eq 1) 'human-approved-t16-acl-contract-required'
   Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_trust_root -and (@($readiness.blockers) -match 'mir42-seal-external-t16-trust-root-or-verifier-missing').Count -eq 1) 'external-t16-trust-root-required'
   Assert-MIR42SealTest (-not [bool]$readiness.checks.programme -and (@($readiness.blockers) -match 'mir42-seal-current-programme-transition-not-authorized').Count -eq 1) 'current-4-2-release-cut-blocks-unapproved-freeze'
   $mislabelledQualification = [pscustomobject][ordered]@{
@@ -216,6 +217,8 @@ try {
   # A syntactically complete chain with real alternate signatures is still not
   # authority when all of its roots live in the mutable candidate workspace.
   $sshKeygen = 'C:\Windows\System32\OpenSSH\ssh-keygen.exe'
+  $testAclSid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+  $testAclContract = New-MIR42T16AclContract -ApprovedOwnerSid $testAclSid -ApprovedMutationSids @($testAclSid)
   $forgedTrustRoot = Join-Path $root 'coherent-alternate-t16'
   New-Item -ItemType Directory -Force -Path $forgedTrustRoot | Out-Null
   $forgedOperatorPrivate = Join-Path $forgedTrustRoot 'alternate-operator'
@@ -256,7 +259,7 @@ try {
   $forgedRoot.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedRoot
   Write-MIR4BootstrapRecord -Record $forgedRoot -Path $forgedRootPath | Out-Null
   $forgedTrustRejected = $false
-  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $forgedRootPath -OperatorTrustSourcePath $forgedOperatorPath -SshKeygenPath $sshKeygen | Out-Null } catch { $forgedTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-trust-root-repository' }
+  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $forgedRootPath -OperatorTrustSourcePath $forgedOperatorPath -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $forgedTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-trust-root-repository' }
   Assert-MIR42SealTest $forgedTrustRejected 'coherent-alternate-t16-chain-in-candidate-rejected'
 
   # Moving the same alternate key chain beside the checkout does not make it
@@ -290,8 +293,21 @@ try {
   $externalRootPath = Join-Path $externalForgedTrustRoot 't16-ledger-trust-root.json'
   Write-MIR4BootstrapRecord -Record $externalRoot -Path $externalRootPath | Out-Null
   $writableExternalTrustRejected = $false
-  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $externalRootPath -OperatorTrustSourcePath $externalOperatorPath -SshKeygenPath $sshKeygen | Out-Null } catch { $writableExternalTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-trust-root-not-protected' }
+  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $externalRootPath -OperatorTrustSourcePath $externalOperatorPath -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $writableExternalTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-trust-root-not-protected' }
   Assert-MIR42SealTest $writableExternalTrustRejected 'coherent-writable-external-t16-chain-rejected'
+
+  $aclProbePath = Join-Path $root 'unapproved-mutation-ace.txt'
+  [IO.File]::WriteAllText($aclProbePath, 'acl probe', [Text.UTF8Encoding]::new($false))
+  $probeAcl = [Security.AccessControl.FileSecurity]::new()
+  $probeAcl.SetOwner([Security.Principal.SecurityIdentifier]$testAclSid)
+  $probeAcl.SetAccessRuleProtection($true,$false)
+  $probeAcl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new([Security.Principal.SecurityIdentifier]$testAclSid,[Security.AccessControl.FileSystemRights]::FullControl,[Security.AccessControl.AccessControlType]::Allow))
+  $unapprovedSid = [Security.Principal.SecurityIdentifier]::new('S-1-5-21-777777777-666666666-555555555-444444444')
+  $probeAcl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new($unapprovedSid,[Security.AccessControl.FileSystemRights]::Modify,[Security.AccessControl.AccessControlType]::Allow))
+  Set-Acl -LiteralPath $aclProbePath -AclObject $probeAcl
+  $unapprovedAceRejected = $false
+  try { Assert-MIR42SealT16AclContract -Path $aclProbePath -AclContract $testAclContract -Code 'mir42-seal-test-unapproved-ace' } catch { $unapprovedAceRejected = $_.Exception.Message -match 'mir42-seal-test-unapproved-ace-acl-allow-sid' }
+  Assert-MIR42SealTest $unapprovedAceRejected 'unapproved-mutable-sid-ace-rejected'
 
   $forgedFreeze = [pscustomobject][ordered]@{
     schema=1;kind='MIR42SourceFreezeAuthorizationV1';status='MIR-4.2-SOURCE-FROZEN-AND-CANDIDATE-ALLOCATED'
