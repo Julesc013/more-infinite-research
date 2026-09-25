@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4F200BobAngelMaterialRouteObservationV1",
-  "scope": "F200 Bob plus Angel final-data observation and assertion for the sixteen ordinary material stream candidates. This fixture records normalized route and risk facts, active-mod versions, graph decisions, and emitted MIR effect ownership. It asserts fifteen exact emitted effect sets and one absent technology without changing product prototypes.",
+  "scope": "F200 Bob plus Angel final-data observation and assertion for the sixteen ordinary material stream candidates. This fixture records normalized route and risk facts, active-mod versions, graph decisions, and emitted MIR effect ownership. It asserts sixteen exact emitted effect sets without changing product prototypes.",
   "streams": [
     "research_material_aluminium",
     "research_material_gold",
@@ -43,7 +43,16 @@
     },
     "guard_observation": "The name-only material graph reaches each route input only through Bob recipes that Angel disables and hides in this exact profile: bob-silver-from-lead and bob-silver-nitrate. The profile lock and exact route/risk certificates retain the guard outside this observed lock."
   },
-  "explicit_non_claims": [
+  "ordinary_graph_guard_observation": {
+    "platinum": {
+      "route": "angels-wire-platinum-2",
+      "final_shape": "F200 with Angel smelting active and no bob-platinum-plate item",
+      "admission_reason": "no-recipe-return-path",
+      "expected_owner": "recipe-prod-research_material_platinum-1:0.02",
+      "excluded_routes": ["bob-platinum-plate", "angels-wire-platinum", "angels-wire-coil-platinum", "angels-wire-coil-platinum-2", "angels-plate-platinum", "angels-plate-platinum-2"],
+      "certificate_status": "ordinary material-family graph guard; no reviewed-forward certificate"
+    }
+  },  "explicit_non_claims": [
     "route admission under other mod locks",
     "route admission under a different Bob/Angel mod lock",
     "science reachability",

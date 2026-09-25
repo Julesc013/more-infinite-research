@@ -1,5 +1,6 @@
 local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
+local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 
 local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
 local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
@@ -797,6 +798,15 @@ local function aluminium_mod_active(name)
   return (mods and mods[name] ~= nil) or (script and script.active_mods and script.active_mods[name] ~= nil)
 end
 
+-- Stream declarations are also loaded by settings and control. Prototype
+-- lookup is meaningful only during the data stage; retain the normal Bob
+-- declaration whenever that stage is unavailable.
+local function data_stage_item_prototype(name)
+  if type(data) ~= "table" or type(data.extend) ~= "function" then return nil end
+  if lookup.item_prototype("iron-plate") == nil then return nil end
+  return lookup.item_prototype(name)
+end
+
 local function aluminium_material_family()
   if aluminium_mod_active("bobplates") and aluminium_mod_active("angelssmelting") then
     return material_family("bob-aluminium-plate", {
@@ -824,6 +834,18 @@ local function bob_or_angel_wire_material_family(material)
   if aluminium_mod_active("angelssmelting") and not aluminium_mod_active("bobplates") then
     local item = "angels-wire-" .. material
     return material_family(item, {item .. "-2"}, {"angelssmelting"})
+  end
+  -- The exact F200 Bob/Angel lock removes Bob's Platinum plate entirely, but
+  -- keeps Angel's ordinary, productivity-permitted final wire route. Select
+  -- that one route only in this finalized shape. A present Bob plate always
+  -- keeps the established Bob selection, and direct-wire and coil routes
+  -- remain outside the declaration and the material-family graph guard.
+  if material == "platinum"
+    and f200_angel_material_routes
+    and aluminium_mod_active("angelssmelting")
+    and data_stage_item_prototype("bob-platinum-plate") == nil
+    and data_stage_item_prototype("angels-wire-platinum") ~= nil then
+    return material_family("angels-wire-platinum", {"angels-wire-platinum-2"}, {"bobplates", "angelssmelting"})
   end
   local routes = {"bob-" .. material .. "-plate"}
   if (material == "gold" or material == "silver") and f200_angel_material_routes then
