@@ -19,11 +19,8 @@ if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
 
 $predecessorCommit='f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e'
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$qualificationPolicy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
-if(-not [bool]$qualificationPolicy.qualification.current_engine_api_prototype_data_mod_capsule_admitted){
-  throw '[mir42-v2-v3-cap-migration-engine-admission-pending]'
-}
-$engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin -SteamManifest $SteamManifest
+$engineResolution=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo `
+  -HarnessId 'runtime.maximum-level-v2-v3-migration-f210' -FactorioBin $FactorioBin -SteamManifest $SteamManifest
 $engine=[string]$engineResolution.engine.path
 $fixtureName='mir-fixture-assert-mir42-v2-v3-cap-migration'
 $technologyName='recipe-prod-research_copper-1'
@@ -54,6 +51,34 @@ function Get-Artifact([string]$Path){
   $resolved=(Resolve-Path -LiteralPath $Path).Path
   Assert-Migration ($resolved.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) "artifact is outside the repository: $resolved"
   [ordered]@{path=$resolved.Substring($repo.Length+1).Replace('\','/');bytes=(Get-Item -LiteralPath $resolved).Length;raw_sha256=Get-MigrationSha $resolved}
+}
+function New-IsolatedPredecessorCandidate([string]$PredecessorWorktree,[string]$CandidateId){
+  $shellPath=(Get-Process -Id $PID).Path
+  Assert-Migration (-not [string]::IsNullOrWhiteSpace($shellPath) -and (Test-Path -LiteralPath $shellPath -PathType Leaf)) 'Could not resolve the current PowerShell executable for predecessor materialization.'
+  $priorWorktree=$env:MIR42_PREDECESSOR_WORKTREE
+  $priorCandidateId=$env:MIR42_PREDECESSOR_CANDIDATE_ID
+  $payload=@'
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+$repo=(Resolve-Path -LiteralPath $env:MIR42_PREDECESSOR_WORKTREE).Path
+. (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+$result=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId $env:MIR42_PREDECESSOR_CANDIDATE_ID -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/m42mig/packages'
+$result | ConvertTo-Json -Depth 20 -Compress
+'@
+  $encoded=[Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($payload))
+  try{
+    $env:MIR42_PREDECESSOR_WORKTREE=$PredecessorWorktree
+    $env:MIR42_PREDECESSOR_CANDIDATE_ID=$CandidateId
+    $output=@(& $shellPath -NoProfile -EncodedCommand $encoded 2>&1)
+    if($LASTEXITCODE -ne 0){throw "Pinned predecessor materialization failed: $($output -join '; ')"}
+    try{$record=($output -join "`n")|ConvertFrom-Json -Depth 100 -DateKind String}catch{throw "Pinned predecessor materialization did not return one composition result: $($_.Exception.Message)"}
+    Assert-Migration ([string]$record.kind -ceq 'MIR4PackageCompositionResultV1' -and [string]$record.target -ceq 'f210') 'Pinned predecessor materialization result differs.'
+    Assert-Migration (Test-Path -LiteralPath ([string]$record.archive_path) -PathType Leaf) 'Pinned predecessor materialization archive is absent.'
+    return $record
+  } finally {
+    if($null -eq $priorWorktree){Remove-Item Env:MIR42_PREDECESSOR_WORKTREE -ErrorAction SilentlyContinue}else{$env:MIR42_PREDECESSOR_WORKTREE=$priorWorktree}
+    if($null -eq $priorCandidateId){Remove-Item Env:MIR42_PREDECESSOR_CANDIDATE_ID -ErrorAction SilentlyContinue}else{$env:MIR42_PREDECESSOR_CANDIDATE_ID=$priorCandidateId}
+  }
 }
 function Read-State([string]$Text,[string]$Stage){
   $matches=@([regex]::Matches($Text,'\[mir42-v2-v3-cap-migration\] STATE JSON (?<json>\{[^\r\n]+\})')|ForEach-Object{
@@ -133,8 +158,7 @@ try{
   $worktreeOutput=@(& git -C $repo worktree add --detach $predecessorWorktree $predecessorCommit 2>&1)
   if($LASTEXITCODE -ne 0){throw "Could not materialize pinned predecessor worktree: $($worktreeOutput -join '; ')"}
   $predecessorCommitTree=(& git -C $predecessorWorktree rev-parse 'HEAD^{tree}').Trim()
-  . (Join-Path $predecessorWorktree 'tools/mir/application/package/TargetMaterializer.ps1')
-  $old=New-MIR4TargetPackage -RepoRoot $predecessorWorktree -Target f210 -CandidateId ('M42-V2-PREDECESSOR-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/m42mig/packages'
+  $old=New-IsolatedPredecessorCandidate -PredecessorWorktree $predecessorWorktree -CandidateId ('M42-V2-PREDECESSOR-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant())
   $oldArchive=(Resolve-Path -LiteralPath ([string]$old.archive_path)).Path
   $predecessorCandidate=Join-Path $run (Split-Path -Leaf $oldArchive)
   Copy-Item -LiteralPath $oldArchive -Destination $predecessorCandidate
@@ -154,7 +178,9 @@ $current=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('M42-V
 $currentCandidate=(Resolve-Path -LiteralPath ([string]$current.archive_path)).Path
 Assert-CandidateExclusions $currentCandidate
 Assert-Migration ((Get-ZipEntryText $currentCandidate 'prototypes/mir/emit/mod_data.lua') -match 'maximum-level-policy-v3') 'Current package does not contain V3 transport.'
-Assert-Migration ((Get-ZipEntryText $currentCandidate 'prototypes/mir/runtime/maximum_level_control.lua') -match 'local POLICY_VERSION = 3') 'Current package does not contain the V3 controller.'
+$currentMaximumLevelControl=Get-ZipEntryText $currentCandidate 'prototypes/mir/runtime/maximum_level_control.lua'
+Assert-Migration ($currentMaximumLevelControl -match 'local POLICY_VERSION = 3') 'Current package does not contain the V3 controller.'
+Assert-Migration ($currentMaximumLevelControl -match 'unowned_disabled_by_cap' -and $currentMaximumLevelControl -match 'migrated_unowned_disable' -and $currentMaximumLevelControl -match 'restore_unowned_disable_continuity') 'Current package does not contain the V2 unowned-disable continuity repair.'
 
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
 function New-Stage([string]$Name,[string]$Candidate,[string]$FixtureVersion,[int]$Cap){
@@ -244,8 +270,10 @@ $v3Text=Get-Content -Raw -LiteralPath $v3Log
 $v3State=Read-State $v3Text 'v3-capped'
 $ownedMigration=[regex]::Matches($v3Text,'\[more-infinite-research\] Migrated maximum-level V2 ownership force=v2-owned technology=recipe-prod-research_copper-1 enablement-owned=true visibility-owned=true policy-version=3[.]')
 $foreignMigration=[regex]::Matches($v3Text,'\[more-infinite-research\] Migrated maximum-level V2 ownership force=v2-foreign-disabled technology=recipe-prod-research_copper-1 enablement-owned=false visibility-owned=true policy-version=3[.]')
+$unownedDisableContinuity=[regex]::Matches($v3Text,'\[more-infinite-research\] Captured maximum-level V2 unowned-disable continuity force=v2-foreign-disabled technology=recipe-prod-research_copper-1 original-enabled=false policy-version=3[.]')
 Assert-Migration ($ownedMigration.Count -eq 1) "Expected exactly one admitted V2 owned migration diagnostic; observed $($ownedMigration.Count)."
 Assert-Migration ($foreignMigration.Count -eq 1) "Expected exactly one admitted V2 foreign visibility-only migration diagnostic; observed $($foreignMigration.Count)."
+Assert-Migration ($unownedDisableContinuity.Count -eq 1) "Expected exactly one V2 unowned-disable continuity diagnostic; observed $($unownedDisableContinuity.Count)."
 
 $relaxedSave=Join-Path $relaxedStage.userdata 'saves/mir42-v2-v3-cap-migration-v3-relaxed.zip'
 $relaxedLog=Invoke-ServerSave $relaxedStage 'v3-relaxed' $v3Save $relaxedSave 'v3-relaxed'
@@ -300,7 +328,7 @@ $result=[ordered]@{
   fixture_source_hashes=[ordered]@{info=Get-MigrationSha (Join-Path $fixture 'info.json');data_final_fixes=Get-MigrationSha (Join-Path $fixture 'data-final-fixes.lua');control=Get-MigrationSha (Join-Path $fixture 'control.lua')}
   harness_sha256=Get-MigrationSha $PSCommandPath
   stages=@((Get-StageManifest $v2UnboundedStage $predecessorCandidate),(Get-StageManifest $v2CappedStage $predecessorCandidate),(Get-StageManifest $v3Stage $currentCandidate),(Get-StageManifest $relaxedStage $currentCandidate))
-  migration_diagnostics=[ordered]@{owned_enablement_and_visibility_count=$ownedMigration.Count;foreign_visibility_only_count=$foreignMigration.Count;policy_version=3}
+  migration_diagnostics=[ordered]@{owned_enablement_and_visibility_count=$ownedMigration.Count;foreign_visibility_only_count=$foreignMigration.Count;unowned_disable_continuity_count=$unownedDisableContinuity.Count;policy_version=3}
   state_receipts=[ordered]@{predecessor_v2_unbounded=$v2UnboundedState;predecessor_v2_capped=$v2CappedState;v3_capped=$v3State;v3_relaxed=$relaxedState;terminal=$terminalState}
   save_lineage=$lineage
   f200_disposition=[ordered]@{status='settings-derived-V3-transition-qualified-no-transported-V2-migration';factorio_version='2.0.77';target_profile='source/adapters/f200/prototypes/mir/platform/factorio/target_profiles.lua';separate_qualification='tests/runtime/Test-MIR42F200SettingsCapTransition.ps1';reason='The F200 profile declares prototype_shapes.mod_data=false. Current settings-derived V3 records capture current MIR ownership and have a separately exact-engine-qualified finite-to-zero transition; authentic V2 transport remains read-only and is not migrated on F200.';reconsider_when='An F200-specific accepted V3 binding transport plus an authentic persisted V2 predecessor case is implemented and qualified on the exact F200 engine.'}

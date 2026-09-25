@@ -19,11 +19,8 @@ if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
 }
 
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$qualificationPolicy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
-if(-not [bool]$qualificationPolicy.qualification.current_engine_api_prototype_data_mod_capsule_admitted){
-  throw '[mir42-cap-ownership-multiforce-engine-admission-pending]'
-}
-$engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin -SteamManifest $SteamManifest
+$engineResolution=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo `
+  -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin $FactorioBin -SteamManifest $SteamManifest
 $engine=[string]$engineResolution.engine.path
 $fixtureName='mir-fixture-assert-mir42-cap-ownership-multiforce'
 $blockerName='late-mir42-cap-binding-blocker'
@@ -395,7 +392,7 @@ Assert-MIR42Data $policyBlockedData '3'
 $policyBlockedState=Read-MIR42State $policyBlockedText 'policy-blocked'
 $policyBlockerRecords=[regex]::Matches($policyBlockedText,'\[late-mir42-policy-binding-blocker\] DATA technology=recipe-prod-research_copper-1 prototype=infinite cap-pre=3 cap-post=4 artifact-identity=stale')
 Assert-MIR42 ($policyBlockerRecords.Count -eq 1) "expected exactly one late policy blocker data receipt; observed $($policyBlockerRecords.Count)."
-$policyConflicts=[regex]::Matches($policyBlockedText,'\[more-infinite-research\] Maximum-level conflict technology=recipe-prod-research_copper-1 selected=3 final-observed=4294967295 binding-operation=emit source=generated-stream reason=maximum_level_policy_fingerprint_invalid setting=ips-max-level-research_copper; runtime queue normalization was refused[.]')
+$policyConflicts=[regex]::Matches($policyBlockedText,'\[more-infinite-research\] Maximum-level conflict technology=recipe-prod-research_copper-1 selected=4 final-observed=4294967295 binding-operation=emit source=generated-stream reason=maximum_level_policy_fingerprint_invalid setting=ips-max-level-research_copper; runtime queue normalization was refused[.]')
 Assert-MIR42 ($policyConflicts.Count -eq 1) "expected exactly one Copper invalid-policy refusal; observed $($policyConflicts.Count)."
 
 $blockedSave=Join-Path $blockedStage.userdata 'saves/mir42-cap-ownership-multiforce-blocked.zip'
@@ -447,18 +444,18 @@ $removedForces=@(
   [pscustomobject]@{name='foreign-disabled';level=4;enabled=$false;visible_when_disabled=$false},
   [pscustomobject]@{name='below-cap';level=2;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='event-probe';level=4;enabled=$true;visible_when_disabled=$false},
-  [pscustomobject]@{name='reset-probe';level=4;enabled=$false;visible_when_disabled=$true},
+  [pscustomobject]@{name='reset-probe';level=4;enabled=$true;visible_when_disabled=$true},
   [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$true},
   [pscustomobject]@{name='merge-destination';level=4;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='merge-reuse';level=4;enabled=$true;visible_when_disabled=$true}
 )
 Assert-MIR42State $seedState 'seed' 0 0 $false $false 0 0 @() $seedForces
 Assert-MIR42State $cappedState 'capped' 3 3 $false $false 1 0 @() $cappedForces
-Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false $false 1 1 @('automation') $eventForces
-Assert-MIR42State $policyBlockedState 'policy-blocked' 3 0 $false $true 2 1 @('automation') $eventForces
-Assert-MIR42State $blockedState 'blocked' 3 0 $true $false 3 1 @('automation') $eventForces
-Assert-MIR42State $removalState 'removal' 0 0 $false $false 4 1 @('automation') $removedForces
-Assert-MIR42State $terminalState 'terminal' 0 0 $false $false 4 1 @('automation') $removedForces
+Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false $false 1 1 @('mir42-cap-native-queue-probe') $eventForces
+Assert-MIR42State $policyBlockedState 'policy-blocked' 3 0 $false $true 2 1 @('mir42-cap-native-queue-probe') $eventForces
+Assert-MIR42State $blockedState 'blocked' 3 0 $true $false 3 1 @('mir42-cap-native-queue-probe') $eventForces
+Assert-MIR42State $removalState 'removal' 0 0 $false $false 4 1 @('mir42-cap-native-queue-probe') $removedForces
+Assert-MIR42State $terminalState 'terminal' 0 0 $false $false 4 1 @('mir42-cap-native-queue-probe') $removedForces
 Assert-MIR42StableForceIndices $seedState $cappedState 'seed-to-capped'
 Assert-MIR42StableForceIndices $seedState $eventProbeState 'seed-to-event-probe'
 Assert-MIR42StableForceIndices $eventProbeState $policyBlockedState 'event-probe-to-policy-blocked'
@@ -537,7 +534,7 @@ $result=[ordered]@{
   )
   v3_observations=[ordered]@{seed=$seedData;capped=$cappedData;policy_blocked=$policyBlockedData;blocked=$blockedData;removal=$removalData;terminal=$terminalData}
   named_force_state_receipts=[ordered]@{seed=$seedState;capped=$cappedState;event_probe=$eventProbeState;policy_blocked=$policyBlockedState;blocked=$blockedState;removal=$removalState;terminal=$terminalState}
-  policy_conflict=[ordered]@{technology=$technologyName;selected_cap=3;runtime_prototype_max_level=4294967295;reason='maximum_level_policy_fingerprint_invalid';count=$policyConflicts.Count}
+  policy_conflict=[ordered]@{technology=$technologyName;configured_cap=3;forged_policy_cap=4;runtime_reported_selected_cap=4;runtime_prototype_max_level=4294967295;reason='maximum_level_policy_fingerprint_invalid';count=$policyConflicts.Count}
   late_conflict=[ordered]@{technology=$technologyName;selected_cap=3;late_observed_prototype_max_level=5;reason='maximum_level_late_prototype_mutation';count=$lateConflicts.Count}
   save_lineage=$lineage
   logs=[ordered]@{

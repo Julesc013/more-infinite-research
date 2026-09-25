@@ -1,4 +1,5 @@
 local technology_name = "recipe-prod-research_copper-1"
+local native_queue_technology_name = "mir42-cap-native-queue-probe"
 local setting_name = "ips-max-level-research_copper"
 local blocker_name = "late-mir42-cap-binding-blocker"
 local policy_blocker_name = "late-mir42-policy-binding-blocker"
@@ -151,7 +152,7 @@ local function expect_event_probe()
   expect("merge-destination", 4, false, true)
   expect("merge-reuse", 4, true, false)
   local queue = game.forces["event-probe"].research_queue or {}
-  if #queue ~= 1 or queue[1].name ~= "automation" then
+  if #queue ~= 1 or queue[1].name ~= native_queue_technology_name then
     fail("event-probe native queue changed outside MIR-owned copper normalization")
   end
 end
@@ -161,10 +162,11 @@ local function expect_removed()
   expect("foreign-disabled", 4, false, false)
   expect("below-cap", 2, true, false)
   expect("event-probe", 4, true, false)
-  -- LuaForce.reset invalidates the old ownership record. The post-reset
-  -- foreign presentation must not be changed back to the pre-reset baseline
-  -- when the cap is later removed.
-  expect("reset-probe", 4, false, true)
+  -- LuaForce.reset invalidates the old ownership record. The next
+  -- configuration transition restores enablement from the prototype, while
+  -- the post-reset foreign presentation must not return to the pre-reset
+  -- visible=false baseline when the cap is removed.
+  expect("reset-probe", 4, true, true)
   -- This force was deliberately changed after its synchronous creation event,
   -- so MIR owns no restoration record for it. Factorio reapplies the prior
   -- data-stage presentation value during the next prototype transition; MIR
@@ -210,11 +212,15 @@ local function advance_seed_to_capped()
   configure_force_before_cap_transition(reset_force, 4, false, true)
   expect("reset-probe", 4, false, true)
 
-  local automation = event_force.technologies["automation"]
-  if not automation then fail("event-probe automation technology is absent") end
-  event_force.research_queue = {automation}
-  if event_force.research_queue[1] and event_force.research_queue[1].name == technology_name then
-    fail("event-probe queue unexpectedly contains the cap-managed Copper technology")
+  local native_queue_technology = event_force.technologies[native_queue_technology_name]
+  if not native_queue_technology or native_queue_technology.researched
+      or native_queue_technology.enabled == false then
+    fail("event-probe native queue technology is not researchable")
+  end
+  event_force.research_queue = {native_queue_technology}
+  local native_queue = event_force.research_queue or {}
+  if #native_queue ~= 1 or native_queue[1].name ~= native_queue_technology_name then
+    fail("event-probe could not establish an unowned native queue")
   end
 
   state.force_names[#state.force_names + 1] = "new-force"

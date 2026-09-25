@@ -25,6 +25,11 @@ try {
 if (-not $historicalWriteRejected) { throw '[mir4-f210-historical-policy-write-fail-closed]' }
 $policy = Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
 $receipt = Get-MIR4F210CurrentQualificationPolicySuccessionV1 -RepoRoot $repo
+$admission = Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo
+if ((Get-FileHash -LiteralPath (Join-Path $repo '.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json') -Algorithm SHA256).Hash.ToUpperInvariant() -cne 'EA6339603DE411827193344C57F48A636D5E64BC7959C77207EC59D54DED5FF8' -or
+    (Get-FileHash -LiteralPath (Join-Path $repo '.mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json') -Algorithm SHA256).Hash.ToUpperInvariant() -cne '8A6B206B529FA1D20F2AC63625AE3EF895F7FB6F0D03032BA77C0E6839C645F8') {
+  throw '[mir4-f210-current-policy-v2-immutability]'
+}
 $f210GenerationInput = Get-Content -Raw -LiteralPath (Join-Path $repo 'source/presentation/f210/info.json.template') | ConvertFrom-Json -Depth 20
 $requiredF210Dependencies = @('base >= 2.1.18','? recycler >= 2.1.18','? space-age >= 2.1.18')
 if (@($requiredF210Dependencies | Where-Object { $_ -notin @($f210GenerationInput.dependencies) }).Count -ne 0 -or
@@ -48,6 +53,9 @@ $requiredPolicyTestInputs = @(
   'fixtures/assert-mir42-cap-ownership-multiforce/info.json',
   'fixtures/assert-mir42-v2-v3-cap-migration/info.json',
   '.mir/fixtures.yml',
+  '.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json',
+  'spec/schemas/mir4-f210-current-engine-cap-harness-admission-v3.schema.json',
+  'spec/engines/mir4-factorio-2.1-experimental-channel-v1.json',
   'validation/tests.yml'
 )
 if ($policyTest.Count -ne 1 -or
@@ -63,19 +71,22 @@ $progressionHarnessContracts = @(
     harness = 'tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1'
     fixture_info = 'fixtures/assert-mir42-cap-ownership-multiforce/info.json'
     runtime_test = 'runtime.maximum-level-cap-ownership-multiforce-f210'
-    admission_marker = 'mir42-cap-ownership-multiforce-engine-admission-pending'
+    harness_id = 'runtime.maximum-level-cap-ownership-multiforce-f210'
   },
   [ordered]@{
     id = 'maximum-level-v2-v3-migration-f210'
     harness = 'tests/runtime/Test-MIR42V2V3CapMigration.ps1'
     fixture_info = 'fixtures/assert-mir42-v2-v3-cap-migration/info.json'
     runtime_test = 'runtime.maximum-level-v2-v3-migration-f210'
-    admission_marker = 'mir42-v2-v3-cap-migration-engine-admission-pending'
+    harness_id = 'runtime.maximum-level-v2-v3-migration-f210'
   }
 )
 $requiredRuntimePolicyInputs = @(
   '.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json',
   'spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json',
+  '.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json',
+  'spec/schemas/mir4-f210-current-engine-cap-harness-admission-v3.schema.json',
+  'spec/engines/mir4-factorio-2.1-experimental-channel-v1.json',
   'tools/mir/application/release/F210QualificationPolicy.ps1'
 )
 $fixtureAuthorityText = [IO.File]::ReadAllText((Join-Path $repo '.mir/fixtures.yml'))
@@ -83,10 +94,8 @@ foreach ($contract in $progressionHarnessContracts) {
   $harnessText = [IO.File]::ReadAllText((Join-Path $repo ([string]$contract.harness)))
   foreach ($requiredText in @(
     'tools/mir/application/release/F210QualificationPolicy.ps1',
-    'Get-MIR4F210CurrentQualificationPolicyV2',
-    'current_engine_api_prototype_data_mod_capsule_admitted',
-    ([string]$contract.admission_marker),
-    'Get-MIR4F210EngineResolutionV2'
+    'Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3',
+    ([string]$contract.harness_id)
   )) {
     if (-not $harnessText.Contains($requiredText,[StringComparison]::Ordinal)) {
       throw "[mir4-f210-progression-harness-policy-binding] $($contract.harness):$requiredText"
@@ -98,16 +107,17 @@ foreach ($contract in $progressionHarnessContracts) {
 
   $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$contract.fixture_info)) | ConvertFrom-Json -Depth 20
   $officialDependencies = @($fixtureInfo.dependencies | Where-Object { [string]$_ -match '^(?:base|elevated-rails|quality|recycler|space-age)\s*>=' })
-  if ($officialDependencies.Count -ne 5 -or @($officialDependencies | Where-Object { [string]$_ -notmatch '>=\s*2[.]1[.]18$' }).Count -ne 0) {
+  if ($officialDependencies.Count -ne 5 -or @($officialDependencies | Where-Object { [string]$_ -notmatch '>=\s*2[.]1[.]20$' }).Count -ne 0) {
     throw "[mir4-f210-progression-fixture-floor] $($contract.fixture_info)"
   }
 
   $fixturePattern = '(?ms)^  ' + [regex]::Escape([string]$contract.id) + ':\r?\n(?<body>.*?)(?=^  [^\s].*:\r?$|\z)'
   $fixtureMatch = [regex]::Match($fixtureAuthorityText,$fixturePattern)
   if (-not $fixtureMatch.Success -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'minimum_factorio_version:\s*"2[.]1[.]18"' -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'engine_selection_authority:\s*[.]mir/control/MIR4-F210-Current-Qualification-PolicyV2[.]json' -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'engine_admission:\s*pending-exact-engine-api-prototype-data-and-official-mod-capsule' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_version:\s*"2[.]1[.]20"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_file_version:\s*"2[.]1[.]20[.]87512"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'engine_selection_authority:\s*[.]mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3[.]json' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'engine_admission:\s*admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only' -or
       $fixtureMatch.Groups['body'].Value -match 'factorio_version:\s*"2[.]1[.]17"|exact-engine-2[.]1[.]17') {
     throw "[mir4-f210-progression-fixture-authority] $($contract.id)"
   }
@@ -136,6 +146,21 @@ if ([string]$policy.kind -cne 'MIR4F210CurrentQualificationPolicyV2' -or
     [string]$receipt.historical_policy.record_sha256 -cne [string]$historical.record_sha256 -or
     @($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
   throw '[mir4-f210-current-policy-contract]'
+}
+if ([string]$admission.kind -cne 'MIR4F210CurrentEngineCapHarnessAdmissionV3' -or
+    [string]$admission.admission.scope -cne 'exact-current-engine-cap-harness-execution-only' -or
+    -not [bool]$admission.admission.admitted -or
+    ((@($admission.admission.harnesses | Sort-Object) -join '|') -cne 'runtime.maximum-level-cap-ownership-multiforce-f210|runtime.maximum-level-v2-v3-migration-f210') -or
+    -not [bool]$admission.qualification.current_engine_api_prototype_data_mod_capsule_admitted -or
+    -not [bool]$admission.qualification.current_engine_cap_harness_execution_admitted -or
+    [bool]$admission.qualification.current_engine_qualification_passed -or
+    [bool]$admission.qualification.stable_transition_recorded -or
+    [bool]$admission.qualification.stable_qualification_passed -or
+    @($admission.boundaries.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0 -or
+    [string]$admission.engine.version -cne '2.1.20' -or [int]$admission.engine.build -ne 87512 -or
+    [string]$admission.engine.binary.sha256 -cne 'E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92' -or
+    [string]$admission.steam.build_id -cne '25458442' -or [string]$admission.steam.app_manifest.sha256 -cne '49EB6468E975B7226242DC52300F7EE882D396EA197BA4944DFA5EF321561FD5') {
+  throw '[mir4-f210-current-cap-harness-admission-contract]'
 }
 
 Assert-MIR4F210HistoricalEngineFactsV1 -Policy $historical -Version '2.1.17' -Build 87315 -FileVersion '2.1.17.87315' `
@@ -190,9 +215,16 @@ try { Test-MIR4F210StableLaneSetV2 -Policy $policy -MinimumLane $invalidStable -
 if (-not $stableRejected) { throw '[mir4-f210-current-stable-floor-fail-closed]' }
 
 if ($IsWindows -and (Test-Path -LiteralPath ([string]$policy.pre_freeze.steam.factorio_binary) -PathType Leaf)) {
-  $installedBelowFloor = $false
-  try { Get-MIR4F210EngineResolutionV2 -RepoRoot $repo | Out-Null } catch { $installedBelowFloor = $_.Exception.Message -match 'mir4-f210-current-engine-floor' }
-  if (-not $installedBelowFloor) { throw '[mir4-f210-current-engine-admission-boundary]' }
+  $scopeRejected = $false
+  try { Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -HarnessId 'runtime.not-admitted' | Out-Null } catch { $scopeRejected = $_.Exception.Message -match 'current-cap-harness-admission-scope' }
+  if (-not $scopeRejected) { throw '[mir4-f210-current-cap-harness-admission-scope-fail-closed]' }
+  $resolved = Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210'
+  if ([string]$resolved.engine.sha256 -cne [string]$admission.engine.binary.sha256 -or
+      [string]$resolved.admission.record_sha256 -cne [string]$admission.record_sha256 -or
+      [bool]$resolved.admission.current_engine_qualification_passed -or
+      [bool]$resolved.admission.release_transition_authorized) {
+    throw '[mir4-f210-current-cap-harness-admission-resolution]'
+  }
 }
 
-Write-Host '[ok] Historical F210 2.1.8/2.1.17 evidence is immutable; the current policy requires 2.1.18, computes the stable lane by numeric maximum, and remains engine-unqualified.'
+Write-Host '[ok] Historical F210 evidence and current V2 policy remain immutable; the V3 successor admits only the exact 2.1.20.87512 cap harnesses while qualification and release boundaries stay closed.'
