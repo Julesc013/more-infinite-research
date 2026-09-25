@@ -224,6 +224,10 @@ function Write-MIR42FourTargetManifest {
   }
   $path = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath 'candidate-manifest.json'
   Write-MIR4BootstrapRecord -Record $manifest -Path $path | Out-Null
+  $schema = Join-Path $mir42CandidateBuildRoot 'spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json'
+  if (-not (Get-Content -Raw -LiteralPath $path | Test-Json -SchemaFile $schema)) {
+    throw '[mir42-four-target-deterministic-manifest-schema]'
+  }
   return $manifest
 }
 

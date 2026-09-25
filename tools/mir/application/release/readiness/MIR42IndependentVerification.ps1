@@ -94,6 +94,10 @@ function Invoke-MIR42FourTargetIndependentVerification {
   $builderPath = (Resolve-Path -LiteralPath $CandidateManifestPath).Path
   $builderRoot = Split-Path -Parent $builderPath
   $builder = Read-MIR42IndependentRecord -Path $builderPath -Code 'mir42-independent-builder'
+  $builderSchema = Join-Path $mir42IndependentRoot 'spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json'
+  if (-not (Get-Content -Raw -LiteralPath $builderPath | Test-Json -SchemaFile $builderSchema)) {
+    throw '[mir42-independent-builder-schema]'
+  }
   $qualificationPathResolved = (Resolve-Path -LiteralPath $QualificationPath).Path
   $qualification = Read-MIR42IndependentRecord -Path $qualificationPathResolved -Code 'mir42-independent-qualification'
   if ([string]$builder.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or

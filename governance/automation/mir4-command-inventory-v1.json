@@ -3041,6 +3041,22 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/release/Invoke-MIR42FourTargetExactCandidateQualification.ps1",
+      "classification": "canonical-internal",
+      "sha256": "C16D0CE12AC196734369488B7674E4A274C1E3AE8DE7B895F25FBB8C21DFDD59",
+      "hash_mode": "canonical-text-v1",
+      "lines": 22,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/release/Invoke-MIR42FourTargetIndependentVerification.ps1",
+      "classification": "canonical-internal",
+      "sha256": "04506EB1977F124D7F163E9C7474032E0D42490AB98E54E4EFCB9CDE4633C1EE",
+      "hash_mode": "canonical-text-v1",
+      "lines": 21,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/release/Invoke-MIR42FourTargetReleasePreflight.ps1",
       "classification": "canonical-internal",
       "sha256": "D26BF38EAC597AE1596410B7856F3C4319E5976A44F8479B37C7A93791E34FD7",
@@ -5171,9 +5187,17 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
       "classification": "canonical-internal",
-      "sha256": "B381C9BBD6C3CD34CAA12F35796DA23DADF03B5FCD558EFC89D3665A793D73D1",
+      "sha256": "B564EFCF381AB36BCC5C76DD016EB6BFA6A1902CD5FC27110888A52AD5DFC7F4",
       "hash_mode": "canonical-text-v1",
-      "lines": 382,
+      "lines": 386,
+      "package_visible": false
+    },
+    {
+      "path": "tools/mir/application/release/readiness/MIR42ExactCandidateQualification.ps1",
+      "classification": "canonical-internal",
+      "sha256": "DF15FC83883941B4CD87A095B8FA1B214798C8CA8EDE0737693E36D9D13F9D5C",
+      "hash_mode": "canonical-text-v1",
+      "lines": 413,
       "package_visible": false
     },
     {
@@ -5182,6 +5206,14 @@
       "sha256": "FB93CD7DF48E83DC26B464B21C91A9C2ED330682FFC3F5D9B04851D8DDC69A34",
       "hash_mode": "canonical-text-v1",
       "lines": 212,
+      "package_visible": false
+    },
+    {
+      "path": "tools/mir/application/release/readiness/MIR42IndependentVerification.ps1",
+      "classification": "canonical-internal",
+      "sha256": "09A4588DD483919C7F90FD46ECF2C902BDE78056B2CB7EF0B48FDBCEB9615B84",
+      "hash_mode": "canonical-text-v1",
+      "lines": 217,
       "package_visible": false
     },
     {
@@ -5827,7 +5859,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 395,
+    "canonical_internal": 399,
     "compatibility_wrapper": 168,
     "migration_only": 59,
     "historical": 17,
@@ -5842,5 +5874,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4a509632adc5f9adf5c365b56b58eb90bfa83082796b4b492909f35d34b741d8"
+  "digest": "sha256:054ba3ce38f74c7219a9d5cf9483a1b59799e3f4a507e77815a34a401157eca7"
 }
