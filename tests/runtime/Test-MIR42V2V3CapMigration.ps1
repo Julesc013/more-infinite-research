@@ -52,6 +52,34 @@ function Get-Artifact([string]$Path){
   Assert-Migration ($resolved.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) "artifact is outside the repository: $resolved"
   [ordered]@{path=$resolved.Substring($repo.Length+1).Replace('\','/');bytes=(Get-Item -LiteralPath $resolved).Length;raw_sha256=Get-MigrationSha $resolved}
 }
+function New-IsolatedPredecessorCandidate([string]$PredecessorWorktree,[string]$CandidateId){
+  $shellPath=(Get-Process -Id $PID).Path
+  Assert-Migration (-not [string]::IsNullOrWhiteSpace($shellPath) -and (Test-Path -LiteralPath $shellPath -PathType Leaf)) 'Could not resolve the current PowerShell executable for predecessor materialization.'
+  $priorWorktree=$env:MIR42_PREDECESSOR_WORKTREE
+  $priorCandidateId=$env:MIR42_PREDECESSOR_CANDIDATE_ID
+  $payload=@'
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+$repo=(Resolve-Path -LiteralPath $env:MIR42_PREDECESSOR_WORKTREE).Path
+. (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+$result=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId $env:MIR42_PREDECESSOR_CANDIDATE_ID -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/m42mig/packages'
+$result | ConvertTo-Json -Depth 20 -Compress
+'@
+  $encoded=[Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($payload))
+  try{
+    $env:MIR42_PREDECESSOR_WORKTREE=$PredecessorWorktree
+    $env:MIR42_PREDECESSOR_CANDIDATE_ID=$CandidateId
+    $output=@(& $shellPath -NoProfile -EncodedCommand $encoded 2>&1)
+    if($LASTEXITCODE -ne 0){throw "Pinned predecessor materialization failed: $($output -join '; ')"}
+    try{$record=($output -join "`n")|ConvertFrom-Json -Depth 100 -DateKind String}catch{throw "Pinned predecessor materialization did not return one composition result: $($_.Exception.Message)"}
+    Assert-Migration ([string]$record.kind -ceq 'MIR4PackageCompositionResultV1' -and [string]$record.target -ceq 'f210') 'Pinned predecessor materialization result differs.'
+    Assert-Migration (Test-Path -LiteralPath ([string]$record.archive_path) -PathType Leaf) 'Pinned predecessor materialization archive is absent.'
+    return $record
+  } finally {
+    if($null -eq $priorWorktree){Remove-Item Env:MIR42_PREDECESSOR_WORKTREE -ErrorAction SilentlyContinue}else{$env:MIR42_PREDECESSOR_WORKTREE=$priorWorktree}
+    if($null -eq $priorCandidateId){Remove-Item Env:MIR42_PREDECESSOR_CANDIDATE_ID -ErrorAction SilentlyContinue}else{$env:MIR42_PREDECESSOR_CANDIDATE_ID=$priorCandidateId}
+  }
+}
 function Read-State([string]$Text,[string]$Stage){
   $matches=@([regex]::Matches($Text,'\[mir42-v2-v3-cap-migration\] STATE JSON (?<json>\{[^\r\n]+\})')|ForEach-Object{
     try{$value=$_.Groups['json'].Value|ConvertFrom-Json -ErrorAction Stop}catch{throw "Invalid migration state JSON: $($_.Exception.Message)"}
@@ -130,8 +158,7 @@ try{
   $worktreeOutput=@(& git -C $repo worktree add --detach $predecessorWorktree $predecessorCommit 2>&1)
   if($LASTEXITCODE -ne 0){throw "Could not materialize pinned predecessor worktree: $($worktreeOutput -join '; ')"}
   $predecessorCommitTree=(& git -C $predecessorWorktree rev-parse 'HEAD^{tree}').Trim()
-  . (Join-Path $predecessorWorktree 'tools/mir/application/package/TargetMaterializer.ps1')
-  $old=New-MIR4TargetPackage -RepoRoot $predecessorWorktree -Target f210 -CandidateId ('M42-V2-PREDECESSOR-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/m42mig/packages'
+  $old=New-IsolatedPredecessorCandidate -PredecessorWorktree $predecessorWorktree -CandidateId ('M42-V2-PREDECESSOR-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant())
   $oldArchive=(Resolve-Path -LiteralPath ([string]$old.archive_path)).Path
   $predecessorCandidate=Join-Path $run (Split-Path -Leaf $oldArchive)
   Copy-Item -LiteralPath $oldArchive -Destination $predecessorCandidate

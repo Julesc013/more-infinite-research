@@ -451,11 +451,11 @@ $removedForces=@(
 )
 Assert-MIR42State $seedState 'seed' 0 0 $false $false 0 0 @() $seedForces
 Assert-MIR42State $cappedState 'capped' 3 3 $false $false 1 0 @() $cappedForces
-Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false $false 1 1 @('automation') $eventForces
-Assert-MIR42State $policyBlockedState 'policy-blocked' 3 0 $false $true 2 1 @('automation') $eventForces
-Assert-MIR42State $blockedState 'blocked' 3 0 $true $false 3 1 @('automation') $eventForces
-Assert-MIR42State $removalState 'removal' 0 0 $false $false 4 1 @('automation') $removedForces
-Assert-MIR42State $terminalState 'terminal' 0 0 $false $false 4 1 @('automation') $removedForces
+Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false $false 1 1 @('mir42-cap-native-queue-probe') $eventForces
+Assert-MIR42State $policyBlockedState 'policy-blocked' 3 0 $false $true 2 1 @('mir42-cap-native-queue-probe') $eventForces
+Assert-MIR42State $blockedState 'blocked' 3 0 $true $false 3 1 @('mir42-cap-native-queue-probe') $eventForces
+Assert-MIR42State $removalState 'removal' 0 0 $false $false 4 1 @('mir42-cap-native-queue-probe') $removedForces
+Assert-MIR42State $terminalState 'terminal' 0 0 $false $false 4 1 @('mir42-cap-native-queue-probe') $removedForces
 Assert-MIR42StableForceIndices $seedState $cappedState 'seed-to-capped'
 Assert-MIR42StableForceIndices $seedState $eventProbeState 'seed-to-event-probe'
 Assert-MIR42StableForceIndices $eventProbeState $policyBlockedState 'event-probe-to-policy-blocked'
