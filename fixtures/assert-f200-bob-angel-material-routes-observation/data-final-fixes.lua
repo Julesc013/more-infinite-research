@@ -10,7 +10,7 @@ local subjects = {
   {stream = "research_material_gold", item = "bob-gold-plate", recipes = {"bob-gold-plate"}},
   {stream = "research_material_lead", item = "bob-lead-plate", recipes = {"bob-lead-plate", "bob-lead-plate-2"}},
   {stream = "research_material_nickel", item = "bob-nickel-plate", recipes = {"bob-nickel-plate", "angels-plate-nickel", "angels-plate-nickel-2"}},
-  {stream = "research_material_platinum", item = "bob-platinum-plate", recipes = {"bob-platinum-plate"}},
+  {stream = "research_material_platinum", item = "angels-wire-platinum", recipes = {"bob-platinum-plate", "angels-wire-platinum", "angels-wire-platinum-2", "angels-wire-coil-platinum-2"}},
   {stream = "research_material_silver", item = "bob-silver-plate", recipes = {"bob-silver-plate", "angels-plate-silver", "angels-plate-silver-2"}},
   {stream = "research_material_tin", item = "bob-tin-plate", recipes = {"bob-tin-plate"}},
   {stream = "research_material_titanium", item = "bob-titanium-plate", recipes = {"bob-titanium-plate"}},
@@ -147,7 +147,7 @@ compiler_context.with_active(compiler_context.new(), function()
   end
 end)
 
--- The current exact F200 Bob/Angel profile has fifteen ordinary finished
+-- The current exact F200 Bob/Angel profile has sixteen ordinary finished
 -- materials. Assert the emitted recipe effects, rather than inferring delivery
 -- from a declaration or from a recipe merely existing in data.raw.
 local expected_effects = {
@@ -155,6 +155,7 @@ local expected_effects = {
   gold = {"angels-plate-gold", "angels-plate-gold-2"},
   lead = {"angels-plate-lead", "angels-plate-lead-2"},
   nickel = {"angels-plate-nickel", "angels-plate-nickel-2"},
+  platinum = {"angels-wire-platinum-2"},
   tin = {"angels-plate-tin", "angels-plate-tin-2"},
   titanium = {"angels-plate-titanium", "angels-plate-titanium-2"},
   copper_tungsten = {"bob-copper-tungsten-alloy"},
@@ -185,6 +186,32 @@ for key, expected in pairs(expected_effects) do
       .. table.concat(expected, ",") .. " actual=" .. table.concat(actual, ","))
   end
 end
+
+-- The Platinum exception applies only in the final F200 Angel shape where Bob's
+-- Platinum plate is absent. It must retain the graph guard and have exactly one
+-- MIR owner; Bob plate, direct wire, Angel plate, and either coil route must
+-- never receive an effect.
+compiler_context.with_active(compiler_context.new(), function()
+  local platinum_route = recipe_facts.view("angels-wire-platinum-2")
+  local admitted, reason = recipe_matching.material_route_is_acyclic(platinum_route)
+  if not admitted then
+    error("MIR F200 Platinum wire route failed the material graph guard reason=" .. tostring(reason))
+  end
+  local platinum_owner = "recipe-prod-research_material_platinum-1:0.02"
+  if effect_owners("angels-wire-platinum-2") ~= platinum_owner then
+    error("MIR F200 Platinum wire ownership differs actual=" .. effect_owners("angels-wire-platinum-2"))
+  end
+  for _, recipe_name in ipairs({"bob-platinum-plate", "angels-wire-platinum", "angels-wire-coil-platinum", "angels-wire-coil-platinum-2", "angels-plate-platinum", "angels-plate-platinum-2"}) do
+    if effect_owners(recipe_name) ~= "-" then
+      error("MIR F200 Platinum excluded route received an effect recipe=" .. recipe_name
+        .. " owners=" .. effect_owners(recipe_name))
+    end
+  end
+  log("[mir-f200-material-routes] PLATINUM recipe=angels-wire-platinum-2"
+    .. " admitted=" .. tostring(admitted)
+    .. " reason=" .. tostring(reason)
+    .. " owner=" .. platinum_owner)
+end)
 
 -- The product logs the final reviewed-forward decision while it compiles.
 -- Its selection helper has relative module imports and is intentionally not a
@@ -222,9 +249,4 @@ compiler_context.with_active(compiler_context.new(), function()
       .. " effect=present")
   end
 end)
-for _, key in ipairs({"platinum"}) do
-  if data.raw.technology["recipe-prod-research_material_" .. key .. "-1"] then
-    error("MIR F200 material unexpectedly emitted " .. key)
-  end
-end
-log("[mir-f200-material-routes] PASS emitted=15 absent=1")
+log("[mir-f200-material-routes] PASS emitted=16 absent=0")
