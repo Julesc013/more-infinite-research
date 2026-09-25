@@ -178,7 +178,9 @@ $current=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('M42-V
 $currentCandidate=(Resolve-Path -LiteralPath ([string]$current.archive_path)).Path
 Assert-CandidateExclusions $currentCandidate
 Assert-Migration ((Get-ZipEntryText $currentCandidate 'prototypes/mir/emit/mod_data.lua') -match 'maximum-level-policy-v3') 'Current package does not contain V3 transport.'
-Assert-Migration ((Get-ZipEntryText $currentCandidate 'prototypes/mir/runtime/maximum_level_control.lua') -match 'local POLICY_VERSION = 3') 'Current package does not contain the V3 controller.'
+$currentMaximumLevelControl=Get-ZipEntryText $currentCandidate 'prototypes/mir/runtime/maximum_level_control.lua'
+Assert-Migration ($currentMaximumLevelControl -match 'local POLICY_VERSION = 3') 'Current package does not contain the V3 controller.'
+Assert-Migration ($currentMaximumLevelControl -match 'unowned_disabled_by_cap' -and $currentMaximumLevelControl -match 'migrated_unowned_disable' -and $currentMaximumLevelControl -match 'restore_unowned_disable_continuity') 'Current package does not contain the V2 unowned-disable continuity repair.'
 
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
 function New-Stage([string]$Name,[string]$Candidate,[string]$FixtureVersion,[int]$Cap){
@@ -268,8 +270,10 @@ $v3Text=Get-Content -Raw -LiteralPath $v3Log
 $v3State=Read-State $v3Text 'v3-capped'
 $ownedMigration=[regex]::Matches($v3Text,'\[more-infinite-research\] Migrated maximum-level V2 ownership force=v2-owned technology=recipe-prod-research_copper-1 enablement-owned=true visibility-owned=true policy-version=3[.]')
 $foreignMigration=[regex]::Matches($v3Text,'\[more-infinite-research\] Migrated maximum-level V2 ownership force=v2-foreign-disabled technology=recipe-prod-research_copper-1 enablement-owned=false visibility-owned=true policy-version=3[.]')
+$unownedDisableContinuity=[regex]::Matches($v3Text,'\[more-infinite-research\] Captured maximum-level V2 unowned-disable continuity force=v2-foreign-disabled technology=recipe-prod-research_copper-1 original-enabled=false policy-version=3[.]')
 Assert-Migration ($ownedMigration.Count -eq 1) "Expected exactly one admitted V2 owned migration diagnostic; observed $($ownedMigration.Count)."
 Assert-Migration ($foreignMigration.Count -eq 1) "Expected exactly one admitted V2 foreign visibility-only migration diagnostic; observed $($foreignMigration.Count)."
+Assert-Migration ($unownedDisableContinuity.Count -eq 1) "Expected exactly one V2 unowned-disable continuity diagnostic; observed $($unownedDisableContinuity.Count)."
 
 $relaxedSave=Join-Path $relaxedStage.userdata 'saves/mir42-v2-v3-cap-migration-v3-relaxed.zip'
 $relaxedLog=Invoke-ServerSave $relaxedStage 'v3-relaxed' $v3Save $relaxedSave 'v3-relaxed'
@@ -324,7 +328,7 @@ $result=[ordered]@{
   fixture_source_hashes=[ordered]@{info=Get-MigrationSha (Join-Path $fixture 'info.json');data_final_fixes=Get-MigrationSha (Join-Path $fixture 'data-final-fixes.lua');control=Get-MigrationSha (Join-Path $fixture 'control.lua')}
   harness_sha256=Get-MigrationSha $PSCommandPath
   stages=@((Get-StageManifest $v2UnboundedStage $predecessorCandidate),(Get-StageManifest $v2CappedStage $predecessorCandidate),(Get-StageManifest $v3Stage $currentCandidate),(Get-StageManifest $relaxedStage $currentCandidate))
-  migration_diagnostics=[ordered]@{owned_enablement_and_visibility_count=$ownedMigration.Count;foreign_visibility_only_count=$foreignMigration.Count;policy_version=3}
+  migration_diagnostics=[ordered]@{owned_enablement_and_visibility_count=$ownedMigration.Count;foreign_visibility_only_count=$foreignMigration.Count;unowned_disable_continuity_count=$unownedDisableContinuity.Count;policy_version=3}
   state_receipts=[ordered]@{predecessor_v2_unbounded=$v2UnboundedState;predecessor_v2_capped=$v2CappedState;v3_capped=$v3State;v3_relaxed=$relaxedState;terminal=$terminalState}
   save_lineage=$lineage
   f200_disposition=[ordered]@{status='settings-derived-V3-transition-qualified-no-transported-V2-migration';factorio_version='2.0.77';target_profile='source/adapters/f200/prototypes/mir/platform/factorio/target_profiles.lua';separate_qualification='tests/runtime/Test-MIR42F200SettingsCapTransition.ps1';reason='The F200 profile declares prototype_shapes.mod_data=false. Current settings-derived V3 records capture current MIR ownership and have a separately exact-engine-qualified finite-to-zero transition; authentic V2 transport remains read-only and is not migrated on F200.';reconsider_when='An F200-specific accepted V3 binding transport plus an authentic persisted V2 predecessor case is implemented and qualified on the exact F200 engine.'}

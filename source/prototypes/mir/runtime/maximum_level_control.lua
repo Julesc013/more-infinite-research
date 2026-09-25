@@ -342,7 +342,10 @@ local function force_cap_state(force)
   state.disabled_by_cap[force.index] = state.disabled_by_cap[force.index] or {}
   state.visibility_by_cap = state.visibility_by_cap or {}
   state.visibility_by_cap[force.index] = state.visibility_by_cap[force.index] or {}
-  return state.disabled_by_cap[force.index], state.visibility_by_cap[force.index]
+  state.unowned_disabled_by_cap = state.unowned_disabled_by_cap or {}
+  state.unowned_disabled_by_cap[force.index] = state.unowned_disabled_by_cap[force.index] or {}
+  return state.disabled_by_cap[force.index], state.visibility_by_cap[force.index],
+    state.unowned_disabled_by_cap[force.index]
 end
 
 local function captured_visibility(value, force, policy)
@@ -375,16 +378,32 @@ local function owns_disable(record, force, policy)
     and policy and policy.legacy ~= true
 end
 
+local function owns_unowned_disable_continuity(record, force, policy)
+  return owns_visibility(record, force, policy)
+    and record.enabled_before_cap == false
+    and record.migrated_from_policy_version == 2
+    and policy and policy.legacy ~= true
+end
+
 local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
+    unowned_disabled_by_cap,
     technology_name, force, policy, cap)
   -- V2 stored only values written by its own cap controller: true for a
   -- disable it performed and the original visibility boolean. Upgrade those
-  -- exact shapes once a V3 policy is accepted, including an immediate cap=0
-  -- relaxation. Do not infer ownership from any other legacy shape.
+  -- exact shapes once a V3 policy is accepted. A boolean visibility record
+  -- paired with no V2 disable record proves that V2 did not own enablement.
+  -- If that exact V2 state is disabled at V3 entry, retain its false value
+  -- only across the next cap transition: Factorio can reset it before the
+  -- cap=0 configuration callback. This is continuity, never MIR ownership.
+  -- Do not infer either ownership or continuity from any other legacy shape.
   if not policy or policy.blocked_reason
       or policy.policy_transport ~= "transported-v3" then return end
   local migrated_visibility = type(visibility_by_cap[technology_name]) == "boolean"
-  local migrated_disable = disabled_by_cap[technology_name] == true
+  local legacy_disable = disabled_by_cap[technology_name]
+  local migrated_disable = legacy_disable == true
+  local technology = force.technologies[technology_name]
+  local migrated_unowned_disable = migrated_visibility and legacy_disable == nil
+    and technology and technology.enabled == false
   if migrated_visibility then
     visibility_by_cap[technology_name] = captured_visibility(
       visibility_by_cap[technology_name], force, policy)
@@ -400,6 +419,22 @@ local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
       enabled_before_cap = true,
       migrated_from_policy_version = 2
     }
+  end
+  if migrated_unowned_disable then
+    unowned_disabled_by_cap[technology_name] = {
+      policy_version = POLICY_VERSION,
+      force_index = force.index,
+      cap = cap,
+      binding_fingerprint = policy.binding_fingerprint,
+      ownership_key = ownership_key(policy),
+      ownership_kind = policy.ownership_kind,
+      enabled_before_cap = false,
+      migrated_from_policy_version = 2
+    }
+    log("[more-infinite-research] Captured maximum-level V2 unowned-disable"
+      .. " continuity force=" .. tostring(force.name)
+      .. " technology=" .. tostring(technology_name)
+      .. " original-enabled=false policy-version=" .. tostring(POLICY_VERSION) .. ".")
   end
   if migrated_visibility or migrated_disable then
     log("[more-infinite-research] Migrated maximum-level V2 ownership"
@@ -455,9 +490,20 @@ local function restore_visibility(technology, visibility_by_cap, technology_name
   end
 end
 
+local function restore_unowned_disable_continuity(technology, unowned_disabled_by_cap,
+    technology_name, force, policy, cap)
+  local record = unowned_disabled_by_cap[technology_name]
+  if not cap and owns_unowned_disable_continuity(record, force, policy) then
+    -- This restores one exact V2 state captured before Factorio's
+    -- cap-relaxation transition, but does not give MIR enablement ownership.
+    technology.enabled = false
+    unowned_disabled_by_cap[technology_name] = nil
+  end
+end
+
 local function normalize_force(force, managed, caps, transport_blocked, prior_managed)
   if not (force and force.valid) then return end
-  local disabled_by_cap, visibility_by_cap = force_cap_state(force)
+  local disabled_by_cap, visibility_by_cap, unowned_disabled_by_cap = force_cap_state(force)
   preserve_valid_queue(force, caps)
 
   local all_managed = {}
@@ -478,7 +524,10 @@ local function normalize_force(force, managed, caps, transport_blocked, prior_ma
     if technology and not transport_blocked
         and not (current_policy and current_policy.blocked_reason) then
       migrate_legacy_force_state(
-        disabled_by_cap, visibility_by_cap, technology_name, force, policy, cap)
+        disabled_by_cap, visibility_by_cap, unowned_disabled_by_cap,
+        technology_name, force, policy, cap)
+      restore_unowned_disable_continuity(
+        technology, unowned_disabled_by_cap, technology_name, force, policy, cap)
       if cap and technology.level > cap then
         if visibility_by_cap[technology_name] == nil then
           visibility_by_cap[technology_name] = captured_visibility(
@@ -552,6 +601,7 @@ local function clear_force_index(index)
   local state = ensure_state()
   if state.disabled_by_cap then state.disabled_by_cap[index] = nil end
   if state.visibility_by_cap then state.visibility_by_cap[index] = nil end
+  if state.unowned_disabled_by_cap then state.unowned_disabled_by_cap[index] = nil end
   for key, _ in pairs(state.observations or {}) do
     if key:sub(1, #tostring(index) + 1) == tostring(index) .. "/" then
       state.observations[key] = nil
