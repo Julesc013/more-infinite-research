@@ -8,7 +8,7 @@
     "channel": "latest-experimental",
     "source": "official-steam-current-installation",
     "patch_pinned": false,
-    "minimum_version": "2.1.8",
+    "minimum_version": "2.1.18",
     "rule": "select-latest-installed-official-2.1-experimental",
     "stable_transition": "stop-and-reopen-policy-when-official-2.1-stable-appears"
   },
