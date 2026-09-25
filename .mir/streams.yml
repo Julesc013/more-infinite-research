@@ -1570,7 +1570,7 @@ streams:
       source: community-material-route-declaration
       capability: recipe-productivity
       family: material_nickel
-      policy: exact-acyclic-material-manufacturing
+      policy: exact-reviewed-forward-material-manufacturing
       identity_state: stable-unreleased
       generated_technology: recipe-prod-research_material_nickel-1
       stream_key: research_material_nickel
@@ -1583,6 +1583,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-f200-bob-angel-material-routes-observation
 
     recipe-prod-research_material_nitinol-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_nitinol-1
@@ -1671,7 +1672,7 @@ streams:
       source: community-material-route-declaration
       capability: recipe-productivity
       family: material_silver
-      policy: exact-acyclic-material-manufacturing
+      policy: exact-reviewed-forward-material-manufacturing
       identity_state: stable-unreleased
       generated_technology: recipe-prod-research_material_silver-1
       stream_key: research_material_silver
@@ -1685,6 +1686,7 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
           - fixtures/assert-community-manufacturing-intake
+          - fixtures/assert-f200-bob-angel-material-routes-observation
 
     recipe-prod-research_material_tin-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_tin-1

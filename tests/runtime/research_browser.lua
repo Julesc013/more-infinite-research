@@ -6,6 +6,20 @@ local function snapshot(force)
   local queue = {}; for _, tech in ipairs(force.research_queue or {}) do queue[#queue+1]=tech.name end
   return helpers.table_to_json{technologies=rows,queue=queue,progress=force.research_progress}
 end
+local function has_browser_action(element, action)
+  if element.tags and element.tags.mir_browser == action then return true end
+  for _, child in ipairs(element.children or {}) do
+    if has_browser_action(child, action) then return true end
+  end
+  return false
+end
+local function has_browser_fact(element, fact)
+  if element.tags and element.tags.mir_browser_fact == fact then return true end
+  for _, child in ipairs(element.children or {}) do
+    if has_browser_fact(child, fact) then return true end
+  end
+  return false
+end
 script.on_nth_tick(1,function()
   local count=0
   local function check(value,message) assert(value,message); count=count+1 end
@@ -35,6 +49,10 @@ script.on_nth_tick(1,function()
   check(#capped.rows==2,"effective MIR cap classification")
   local literal=browser_core.query(catalogue,{mode=1,status=1,page=1,search="%["})
   check(#literal.rows==0,"literal search")
+  local localized=browser_core.query(catalogue,{mode=1,status=1,page=1,search="localized finite"},nil,{["mir-browser-test-finite"]="Localized finite technology"})
+  check(#localized.rows==1 and localized.rows[1].key=="mir-browser-test-finite","localized search with stable-ID fallback")
+  local descending=browser_core.query(catalogue,{mode=1,status=1,page=1,sort="name-desc",search="mir-browser-test"})
+  check(#descending.rows==2 and descending.rows[1].key=="mir-browser-test-infinite","descending deterministic sort")
   local player={valid=true,force=force,permission_group={allows_action=function() return false end}}
   local tech=force.technologies["mir-browser-test-finite"]
   check(not browser_actions.can_enqueue(player,tech,defines.input_action.start_research),"permission negative")
@@ -61,6 +79,11 @@ script.on_nth_tick(1,function()
     check(actual.gui.screen.mir_research_browser.valid,"native frame valid")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search="mir-"}),"native settings GUI")
+    check(has_browser_fact(actual.gui.screen.mir_research_browser,"profile_import"),"native settings profile summary")
+    check(remote.call("more-infinite-research-browser","open",actual.index,{mode=1,sort="name-desc",selected="mir-browser-test-finite"}),"native sorted technology detail GUI")
+    local root=actual.gui.screen.mir_research_browser
+    check(has_browser_action(root,"sort"),"native sort control")
+    check(has_browser_action(root,"open-vanilla"),"native technology link")
     check(before==snapshot(force),"native GUI force noninterference")
   end
   helpers.write_file("browser-test.json",helpers.table_to_json{status="passed",assertions=count,scope="exact-package-load-and-controlled-personal-view-model-on-real-force; native-two-client-GUI-not-qualified",native_players=native_players,engine=helpers.game_version},false)

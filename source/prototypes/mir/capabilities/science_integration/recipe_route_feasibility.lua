@@ -42,6 +42,10 @@ local function same_identity(left, right)
   return left and right and left.type == right.type and left.name == right.name
 end
 
+-- Assigned below with the diagnostic helpers. The forward declaration lets
+-- every nested result/category/source iterator charge the same work budget.
+local diagnostic_visit
+
 local function entry_positive(entry)
   if type(entry) ~= "table" then return false end
   local amount = tonumber(entry.amount or entry.amount_max or entry[2] or entry.amount_min or 1) or 0
@@ -49,8 +53,9 @@ local function entry_positive(entry)
   return finite_positive(amount) and finite_positive(probability) and probability <= 1
 end
 
-local function results_include_positive(results, output_identity)
+local function results_include_positive(results, output_identity, options)
   for _, result in ipairs(results or {}) do
+    if not diagnostic_visit(options) then return false end
     if same_identity(normalize_identity(result), output_identity) and entry_positive(result) then return true end
   end
   return false
@@ -71,10 +76,11 @@ local function variants_for(fact)
   }}
 end
 
-local function normalized_results(variant)
+local function normalized_results(variant, options)
   if variant.results then return variant.results end
   local results = {}
   for _, name in ipairs(variant.result_names or {}) do
+    if not diagnostic_visit(options) then return nil end
     table.insert(results, {type = "item", name = name, amount = 1, probability = 1})
   end
   return results
@@ -96,6 +102,52 @@ local function resolved_options(options)
   return copied
 end
 
+-- Diagnostics are deliberately observer-only. Production callers do not pass
+-- this callback, and no admission or memo decision may depend on it.
+--
+-- A diagnostic observer may additionally provide query-local checkpoints. A
+-- recipe has OR semantics across its variants, and acquisition has OR
+-- semantics across producer recipes. If a later branch succeeds, observations
+-- from earlier rejected branches are not a cause of the selected result and
+-- must be discarded with that branch. This keeps a successful structural
+-- alternative from masking the later technology/self-lock rejection which is
+-- actually decisive for a pack candidate.
+local function record_diagnostic_failure(options, failure)
+  local observer = options and options.diagnostic_observer
+  if observer and type(observer.record) == "function" then
+    observer:record(deepcopy(failure), options.diagnostic_depth or 0)
+  elseif type(options.diagnostic_failure) == "function" then
+    options.diagnostic_failure(deepcopy(failure))
+  end
+end
+
+local function diagnostic_checkpoint(options)
+  local observer = options and options.diagnostic_observer
+  if observer and type(observer.checkpoint) == "function" then return observer:checkpoint() end
+  return nil
+end
+
+local function diagnostic_rollback(options, checkpoint)
+  local observer = options and options.diagnostic_observer
+  if checkpoint and observer and type(observer.rollback) == "function" then
+    observer:rollback(checkpoint)
+  end
+end
+
+-- Diagnostic work is irreversible even where its explanatory trace is not.
+-- The observer is absent in normal admission, preserving feasibility
+-- semantics; when present, every raw-prototype scan and recursive descent
+-- must reserve work before inspecting its next node.
+diagnostic_visit = function(options, depth)
+  local observer = options and options.diagnostic_observer
+  if not observer then return true end
+  if type(observer.is_stopped) == "function" and observer:is_stopped() then return false end
+  if type(observer.reserve_visit) == "function" then
+    return observer:reserve_visit(depth or options.diagnostic_depth or 0)
+  end
+  return true
+end
+
 local function recipe_source_epoch()
   return recipe_facts.source_epoch and recipe_facts.source_epoch() or nil
 end
@@ -108,6 +160,7 @@ local function reset_state(state, epoch, context, recipe_index)
   state.recipe_index = recipe_index
   state.visiting = {}
   state.acquisition_memo = {}
+  state.stable_acquisition_memo = {}
   state.machine_categories = nil
   state.source_catalog = nil
   state.surface_locations = nil
@@ -126,19 +179,50 @@ end
 local function query_state(state, recipe_index)
   local epoch = recipe_source_epoch()
   local context = compiler_context.current()
-  if not state or state.recipe_source_epoch ~= epoch or state.compiler_context ~= context
-    or state.recipe_index ~= recipe_index then
+  if not state or state.recipe_source_epoch ~= epoch or state.compiler_context ~= context then
+    return reset_state(state, epoch, context, recipe_index)
+  end
+  if state.recipe_index ~= recipe_index then
+    -- A direct-source preflight intentionally starts without a recipe index.
+    -- Once the same query proceeds to recipe feasibility, retain its immutable
+    -- prototype catalogs while establishing the previously absent index. An
+    -- explicit replacement with a different populated index remains a new
+    -- query identity and must discard every prior memo.
+    if state.recipe_index == nil and recipe_index ~= nil then
+      state.recipe_index = recipe_index
+      state.visiting = {}
+      state.acquisition_memo = {}
+      state.stable_acquisition_memo = {}
+      return state
+    end
     return reset_state(state, epoch, context, recipe_index)
   end
   return state
 end
 
-local function category_set_from_prototypes(state)
+-- Direct-source checks do not need a recipe index, but a caller may supply a
+-- state which has already acquired one. Preserve that state when its context
+-- and source epoch match so separate science-pack roots can reuse the same
+-- immutable resource, machine, and surface observations.
+local function source_query_state(state)
+  local epoch = recipe_source_epoch()
+  local context = compiler_context.current()
+  if not state or state.recipe_source_epoch ~= epoch or state.compiler_context ~= context then
+    return reset_state(state, epoch, context, nil)
+  end
+  return state
+end
+
+local function category_set_from_prototypes(state, options)
   if state.machine_categories then return state.machine_categories end
   local categories = {}
   for _, prototype_type in ipairs(MACHINE_TYPES) do
     for _, machine in pairs(data_raw.prototypes(prototype_type)) do
-      for _, category in ipairs(machine.crafting_categories or {}) do categories[category] = true end
+      if not diagnostic_visit(options) then return categories end
+      for _, category in ipairs(machine.crafting_categories or {}) do
+        if not diagnostic_visit(options) then return categories end
+        categories[category] = true
+      end
     end
   end
   state.machine_categories = categories
@@ -149,11 +233,12 @@ local function compatible_machine(category, options, state)
   if type(options.machine_category_witness) == "function" then
     return options.machine_category_witness(category) == true
   end
-  return category_set_from_prototypes(state)[category] == true
+  return category_set_from_prototypes(state, options)[category] == true
 end
 
-local function surface_conditions_satisfied(conditions, properties)
+local function surface_conditions_satisfied(conditions, properties, options)
   for _, condition in ipairs(conditions or {}) do
+    if not diagnostic_visit(options) then return false end
     local property = condition.property
     local value = property and properties and properties[property] or nil
     if type(value) ~= "number" then return false end
@@ -163,9 +248,10 @@ local function surface_conditions_satisfied(conditions, properties)
   return true
 end
 
-local function condition_key(conditions)
+local function condition_key(conditions, options)
   local values = {}
   for _, condition in ipairs(conditions or {}) do
+    if not diagnostic_visit(options) then return nil end
     table.insert(values, table.concat({
       type(condition.property) .. ":" .. tostring(condition.property),
       type(condition.min) .. ":" .. tostring(condition.min),
@@ -175,14 +261,17 @@ local function condition_key(conditions)
   return table.concat(values, "\1")
 end
 
-local function all_surfaces(state)
+local function all_surfaces(state, options)
   if state.surface_locations then return state.surface_locations end
   local locations = {}
   -- A space-location can be orbital or otherwise non-buildable. Surface
   -- feasibility needs a real SurfacePrototype or a planet, not merely a
   -- matching space-location record.
   for _, prototype_type in ipairs({"surface", "planet"}) do
-    for _, location in pairs(data_raw.prototypes(prototype_type)) do table.insert(locations, location) end
+    for _, location in pairs(data_raw.prototypes(prototype_type)) do
+      if not diagnostic_visit(options) then return locations end
+      table.insert(locations, location)
+    end
   end
   state.surface_locations = locations
   return locations
@@ -193,10 +282,12 @@ local function surface_satisfied(conditions, options, state)
   if type(options.surface_witness) == "function" then
     return options.surface_witness(conditions) == true
   end
-  local key = condition_key(conditions)
+  local key = condition_key(conditions, options)
+  if not key then return false end
   if state.surface_results[key] ~= nil then return state.surface_results[key] end
-  for _, location in ipairs(all_surfaces(state)) do
-    if surface_conditions_satisfied(conditions, location.surface_properties or {}) then
+  for _, location in ipairs(all_surfaces(state, options)) do
+    if not diagnostic_visit(options) then return false end
+    if surface_conditions_satisfied(conditions, location.surface_properties or {}, options) then
       state.surface_results[key] = true
       return true
     end
@@ -211,24 +302,84 @@ local function minable_results(source)
   return minable.results or {}
 end
 
-local function default_source_catalog(state)
-  if state.source_catalog then return state.source_catalog end
-  local sources = {}
-  for _, resource in pairs(data_raw.prototypes("resource")) do
-    for _, result in ipairs(minable_results(resource)) do
+local function append_minable_sources(sources, prototype_type, witness_kind, options)
+  for _, source in pairs(data_raw.prototypes(prototype_type)) do
+    if not diagnostic_visit(options) then return false end
+    for _, result in ipairs(minable_results(source)) do
+      if not diagnostic_visit(options) then return false end
       local identity = normalize_identity(result)
       if identity and entry_positive(result) then
         local key = identity_key(identity)
         sources[key] = sources[key] or {}
         table.insert(sources[key], {
-          kind = "minable-resource",
+          kind = witness_kind,
           product = identity,
-          surface_conditions = deepcopy(resource.surface_conditions)
+          surface_conditions = deepcopy(source.surface_conditions)
         })
       end
     end
   end
+  return true
+end
+
+local function has_unconditional_source(sources, identity)
+  for _, witness in ipairs(sources[identity_key(identity)] or {}) do
+    if type(witness.surface_conditions) ~= "table" or #witness.surface_conditions == 0 then
+      return true
+    end
+  end
+  return false
+end
+
+-- Boilers are prototype-defined fluid conversions rather than recipes. A
+-- boiler whose input fluid already has an unconditional natural source gives
+-- a concrete acquisition route for its declared output fluid. As with recipe
+-- machine checks, this witness deliberately does not claim machine, fuel,
+-- power, throughput, or placement acquisition. Surface-constrained boiler or
+-- input sources remain conservative until a same-surface witness is modeled.
+local function append_boiler_sources(sources, options)
+  for _, boiler in pairs(data_raw.prototypes("boiler")) do
+    if not diagnostic_visit(options) then return false end
+    local input = normalize_identity({
+      type = "fluid",
+      name = boiler.fluid_box and boiler.fluid_box.filter
+    })
+    local output = normalize_identity({
+      type = "fluid",
+      name = boiler.output_fluid_box and boiler.output_fluid_box.filter
+    })
+    local target_temperature = tonumber(boiler.target_temperature)
+    if input and output and not same_identity(input, output)
+      and finite_positive(target_temperature)
+      and boiler.energy_consumption ~= nil
+      and type(boiler.energy_source) == "table"
+      and (type(boiler.surface_conditions) ~= "table" or #boiler.surface_conditions == 0)
+      and has_unconditional_source(sources, input) then
+      local key = identity_key(output)
+      sources[key] = sources[key] or {}
+      table.insert(sources[key], {
+        kind = "boiler-conversion",
+        prototype = boiler.name,
+        product = output,
+        input = input,
+        target_temperature = target_temperature
+      })
+    end
+  end
+  return true
+end
+
+local function default_source_catalog(state, options)
+  if state.source_catalog then return state.source_catalog end
+  local sources = {}
+  if not append_minable_sources(sources, "resource", "minable-resource", options) then return sources end
+  -- Trees are concrete natural acquisition sources (for example, the
+  -- starting wood used by an early electronics board).  They are not stored
+  -- in data.raw.resource, so omitting their MinableProperties turns a real
+  -- seeded route into a false no-source cycle.
+  if not append_minable_sources(sources, "tree", "minable-entity", options) then return sources end
   for _, pump in pairs(data_raw.prototypes("offshore-pump")) do
+    if not diagnostic_visit(options) then return sources end
     local identity = normalize_identity({type = "fluid", name = pump.fluid})
     if identity then
       local key = identity_key(identity)
@@ -240,6 +391,7 @@ local function default_source_catalog(state)
       })
     end
   end
+  if not append_boiler_sources(sources, options) then return sources end
   state.source_catalog = sources
   return sources
 end
@@ -262,7 +414,8 @@ local function source_witness(identity, options, state)
       end
     end
   end
-  for _, witness in ipairs(default_source_catalog(state)[identity_key(identity)] or {}) do
+  for _, witness in ipairs(default_source_catalog(state, options)[identity_key(identity)] or {}) do
+    if not diagnostic_visit(options) then return nil end
     if surface_satisfied(witness.surface_conditions, options, state) then
       local copied = deepcopy(witness)
       copied.surface_conditions = nil
@@ -272,15 +425,17 @@ local function source_witness(identity, options, state)
   return nil
 end
 
-function M.source_witness(identity, options)
+function M.source_witness(identity, options, state)
   local candidate = normalize_identity(identity)
   if not candidate then return nil end
   -- A direct source check does not need to materialize the potentially large
-  -- recipe index merely to inspect resources and offshore pumps.
-  return source_witness(candidate, copy_options(options), new_state())
+  -- recipe index merely to inspect resources and offshore pumps. Callers may
+  -- share a source-epoch-bound state; it contains no contextual research route
+  -- conclusion and therefore cannot alter admission semantics.
+  return source_witness(candidate, copy_options(options), source_query_state(state))
 end
 
-local function sorted_producers(index, output_identity)
+local function sorted_producers(index, output_identity, options)
   local producers = {}
   local exact = index.by_output_identity and index.by_output_identity[identity_key(output_identity)]
   -- Fixture and historical callers may still expose only the legacy index.
@@ -290,7 +445,10 @@ local function sorted_producers(index, output_identity)
   if selected == nil and index.by_output_identity == nil and output_identity.type == "item" then
     selected = index.by_output[output_identity.name]
   end
-  for _, recipe_name in ipairs(selected or {}) do table.insert(producers, recipe_name) end
+  for _, recipe_name in ipairs(selected or {}) do
+    if not diagnostic_visit(options) then break end
+    table.insert(producers, recipe_name)
+  end
   table.sort(producers)
   return producers
 end
@@ -298,32 +456,121 @@ end
 local acquisition_witness
 
 local function route_for_recipe(recipe_name, output_identity, options, state, require_enabled)
+  if not diagnostic_visit(options) then return nil end
   local fact = options.recipe_index.facts[recipe_name]
-  if not fact or fact.hidden == true then return nil end
+  if not fact then
+    record_diagnostic_failure(options, {
+      kind = "identity",
+      recipe = recipe_name,
+      identity = deepcopy(output_identity),
+      reason = "missing-recipe-fact"
+    })
+    return nil
+  end
+  if fact.hidden == true then
+    record_diagnostic_failure(options, {
+      kind = "identity",
+      recipe = recipe_name,
+      identity = deepcopy(output_identity),
+      reason = "hidden-recipe"
+    })
+    return nil
+  end
+  local route_checkpoint = diagnostic_checkpoint(options)
   for _, variant in ipairs(variants_for(fact)) do
-    if variant.hidden ~= true and (not require_enabled or variant.enabled == true) then
-      local results = normalized_results(variant)
-      if results_include_positive(results, output_identity)
-        and (variant.energy_required == nil or finite_positive(tonumber(variant.energy_required)))
-        and surface_satisfied(variant.surface_conditions, options, state) then
+    if not diagnostic_visit(options) then return nil end
+    -- The next alternative is the one currently selected for explanation.
+    -- A failed sibling is not an ancestor of this branch, so retaining it
+    -- would manufacture a mixed failure tree.
+    diagnostic_rollback(options, route_checkpoint)
+    local variant_name = variant.name or "default"
+    if variant.hidden == true then
+      record_diagnostic_failure(options, {
+        kind = "identity",
+        recipe = recipe_name,
+        variant = variant_name,
+        identity = deepcopy(output_identity),
+        reason = "hidden-variant"
+      })
+    elseif require_enabled and variant.enabled ~= true then
+      record_diagnostic_failure(options, {
+        kind = "identity",
+        recipe = recipe_name,
+        variant = variant_name,
+        identity = deepcopy(output_identity),
+        reason = "recipe-not-enabled"
+      })
+    else
+      local results = normalized_results(variant, options)
+      if not diagnostic_visit(options) then return nil
+      elseif not results_include_positive(results, output_identity, options) then
+        record_diagnostic_failure(options, {
+          kind = "identity",
+          recipe = recipe_name,
+          variant = variant_name,
+          identity = deepcopy(output_identity),
+          reason = "output-identity-mismatch"
+        })
+      elseif variant.energy_required ~= nil
+        and not finite_positive(tonumber(variant.energy_required)) then
+        record_diagnostic_failure(options, {
+          kind = "identity",
+          recipe = recipe_name,
+          variant = variant_name,
+          identity = deepcopy(output_identity),
+          reason = "invalid-energy-required"
+        })
+      elseif not surface_satisfied(variant.surface_conditions, options, state) then
+        record_diagnostic_failure(options, {
+          kind = "identity",
+          recipe = recipe_name,
+          variant = variant_name,
+          identity = deepcopy(output_identity),
+          reason = "surface-conditions-unsatisfied"
+        })
+      else
         local has_machine = false
-        for _, category in ipairs(variant.categories or {"crafting"}) do
+        local categories = variant.categories or {"crafting"}
+        for _, category in ipairs(categories) do
+          if not diagnostic_visit(options) then return nil end
           if compatible_machine(category, options, state) then has_machine = true; break end
         end
         if has_machine then
           local ingredients_ok, ingredient_witnesses = true, {}
           for _, ingredient in ipairs(normalized_ingredients(variant)) do
+            if not diagnostic_visit(options) then return nil end
             local ingredient_identity = normalize_identity(ingredient)
             if not ingredient_identity
               or not finite_positive(tonumber(ingredient.amount or ingredient.amount_max or ingredient[2] or 1)) then
+              record_diagnostic_failure(options, {
+                kind = "identity",
+                recipe = recipe_name,
+                variant = variant_name,
+                identity = deepcopy(output_identity),
+                reason = "invalid-ingredient-identity"
+              })
               ingredients_ok = false
               break
             end
             local witness = acquisition_witness(ingredient_identity, options, state)
-            if not witness then ingredients_ok = false; break end
+            if not witness then
+              record_diagnostic_failure(options, {
+                kind = "ingredient",
+                recipe = recipe_name,
+                variant = variant_name,
+                identity = deepcopy(ingredient_identity),
+                reason = "unreachable-acquisition"
+              })
+              ingredients_ok = false
+              break
+            end
             table.insert(ingredient_witnesses, witness)
           end
           if ingredients_ok then
+            -- A reachable variant selects this recipe route. None of the
+            -- diagnostic events produced by discarded sibling alternatives
+            -- are a structural failure of the selected route.
+            diagnostic_rollback(options, route_checkpoint)
             return {
               kind = "recipe",
               recipe = recipe_name,
@@ -332,6 +579,15 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
               ingredients = ingredient_witnesses
             }
           end
+        else
+          record_diagnostic_failure(options, {
+            kind = "category",
+            recipe = recipe_name,
+            variant = variant_name,
+            category = categories[1],
+            identity = deepcopy(output_identity),
+            reason = "no-compatible-machine-category"
+          })
         end
       end
     end
@@ -343,14 +599,47 @@ local function cacheable(options)
   return type(options.source_witness) ~= "function"
     and type(options.machine_category_witness) ~= "function"
     and type(options.surface_witness) ~= "function"
+    -- An unlock witness is contextual: its caller carries the active
+    -- technology/science traversal.  A conclusion from that branch must not
+    -- become a reusable acquisition answer for another traversal.
+    and type(options.research_unlock_witness) ~= "function"
+end
+
+local function stable_cacheable(options)
+  return options.diagnostic_observer == nil
+    and type(options.source_witness) ~= "function"
+    and type(options.machine_category_witness) ~= "function"
+    and type(options.surface_witness) ~= "function"
+end
+
+local STABLE_SOURCE_KINDS = {
+  ["minable-resource"] = true,
+  ["minable-entity"] = true,
+  ["offshore-pump"] = true,
+  ["boiler-conversion"] = true
+}
+
+local function stable_acquisition_witness(witness)
+  if type(witness) ~= "table" then return false end
+  if STABLE_SOURCE_KINDS[witness.kind] then return true end
+  if witness.kind ~= "recipe" then return false end
+  for _, ingredient in ipairs(witness.ingredients or {}) do
+    if not stable_acquisition_witness(ingredient) then return false end
+  end
+  return true
 end
 
 -- A source witness or one enabled recipe alternative proves a product. The
 -- active type/name set makes recursive requirements AND, recipe alternatives
 -- OR, and rejects unseeded cycles. Default raw-prototype scans are cached only
 -- inside this one query state; no feasibility result is retained globally.
-acquisition_witness = function(output_identity, options, state)
+local function acquisition_witness_impl(output_identity, options, state)
+  if not diagnostic_visit(options) then return nil end
   local key = identity_key(output_identity)
+  local may_use_stable = stable_cacheable(options)
+  if may_use_stable and state.stable_acquisition_memo[key] ~= nil then
+    return deepcopy(state.stable_acquisition_memo[key])
+  end
   -- A recursive answer is conditional on the caller's active cycle set. Only
   -- a root query can safely memoize a positive or negative acquisition result;
   -- recursive calls still reuse the bounded raw-prototype scan indexes.
@@ -358,19 +647,67 @@ acquisition_witness = function(output_identity, options, state)
   local may_cache = root_query and cacheable(options)
   if may_cache and state.acquisition_memo[key] ~= nil then
     local cached = state.acquisition_memo[key]
-    return cached == false and nil or deepcopy(cached)
+    if cached == false then return nil end
+    return deepcopy(cached)
   end
-  if state.visiting[key] then return nil end
+  if state.visiting[key] then
+    record_diagnostic_failure(options, {
+      kind = "cycle",
+      identity = deepcopy(output_identity),
+      reason = "active-acquisition-identity"
+    })
+    return nil
+  end
 
   local direct = source_witness(output_identity, options, state)
   if direct then
+    if may_use_stable and stable_acquisition_witness(direct) then
+      state.stable_acquisition_memo[key] = deepcopy(direct)
+    end
     if may_cache then state.acquisition_memo[key] = deepcopy(direct) end
     return direct
   end
 
+  local acquisition_checkpoint = diagnostic_checkpoint(options)
   state.visiting[key] = true
-  for _, recipe_name in ipairs(sorted_producers(options.recipe_index, output_identity)) do
+  for _, recipe_name in ipairs(sorted_producers(options.recipe_index, output_identity, options)) do
+    if not diagnostic_visit(options) then
+      state.visiting[key] = nil
+      return nil
+    end
+    -- Producer recipes are alternatives. Preserve only the branch being
+    -- evaluated, rather than accumulating causes from discarded siblings.
+    diagnostic_rollback(options, acquisition_checkpoint)
     local witness = route_for_recipe(recipe_name, output_identity, options, state, true)
+    if witness then
+      state.visiting[key] = nil
+      -- As with recipe variants, one reachable producer proves acquisition;
+      -- provisional failures from other producers cannot be propagated as the
+      -- selected branch's explanation.
+      diagnostic_rollback(options, acquisition_checkpoint)
+      if may_use_stable and stable_acquisition_witness(witness) then
+        state.stable_acquisition_memo[key] = deepcopy(witness)
+      end
+      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      return witness
+    end
+  end
+  -- An enabled route is preferred, but an ingredient can also be supplied by
+  -- a concrete recipe whose unlock technology is already researchable.  The
+  -- caller supplies that proof because this generic structural module neither
+  -- owns the technology graph nor decides which research mechanisms qualify.
+  -- Keep the output active while asking for it so a locked reciprocal route
+  -- remains an unseeded cycle rather than becoming a bootstrap witness.
+  if type(options.research_unlock_witness) == "function" then
+    -- A researched acquisition is the final alternative. If it rejects, its
+    -- concrete technology/pair cause is more specific than an earlier
+    -- disabled producer and is therefore the selected failure tree.
+    diagnostic_rollback(options, acquisition_checkpoint)
+    if not diagnostic_visit(options) then
+      state.visiting[key] = nil
+      return nil
+    end
+    local witness = options.research_unlock_witness(deepcopy(output_identity), state)
     if witness then
       state.visiting[key] = nil
       if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
@@ -379,7 +716,26 @@ acquisition_witness = function(output_identity, options, state)
   end
   state.visiting[key] = nil
   if may_cache then state.acquisition_memo[key] = false end
+  record_diagnostic_failure(options, {
+    kind = "ingredient",
+    identity = deepcopy(output_identity),
+    reason = "no-enabled-acquisition-route"
+  })
   return nil
+end
+
+acquisition_witness = function(output_identity, options, state)
+  -- Depth is observation-only and lives on the already query-local options
+  -- table. It never participates in source selection, cycle detection, or
+  -- acquisition memoization.
+  local previous_depth = options.diagnostic_depth or 0
+  options.diagnostic_depth = previous_depth + 1
+  local witness
+  if diagnostic_visit(options, options.diagnostic_depth) then
+    witness = acquisition_witness_impl(output_identity, options, state)
+  end
+  options.diagnostic_depth = previous_depth
+  return witness
 end
 
 function M.acquisition_witness(identity, options, state)
@@ -392,19 +748,25 @@ end
 -- Prove a concrete route for a named output. Locked recipes may be checked as
 -- future production routes with require_enabled=false; their inputs still use
 -- only enabled alternatives or declared natural sources.
-function M.recipe_witness(recipe_name, output, options)
+function M.recipe_witness(recipe_name, output, options, state)
   local output_identity = normalize_identity(output)
   if not output_identity then return nil end
   local resolved = resolved_options(options)
-  return route_for_recipe(recipe_name, output_identity, resolved, new_state(resolved.recipe_index), resolved.require_enabled == true)
+  return route_for_recipe(
+    recipe_name,
+    output_identity,
+    resolved,
+    query_state(state, resolved.recipe_index),
+    resolved.require_enabled == true
+  )
 end
 
-function M.initial_recipe_witness(recipe_name, output, options)
+function M.initial_recipe_witness(recipe_name, output, options, state)
   -- Never mutate the caller's option table: a caller can safely reuse it for a
   -- later locked-route query without inheriting require_enabled=true.
   local initial_options = copy_options(options)
   initial_options.require_enabled = true
-  return M.recipe_witness(recipe_name, output, initial_options)
+  return M.recipe_witness(recipe_name, output, initial_options, state)
 end
 
 return M

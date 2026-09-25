@@ -35,6 +35,11 @@ end
 
 local native = assert(data.raw.technology["kr-imersite-productivity"], "missing native Imersite owner")
 local mir = assert(data.raw.technology["recipe-prod-research_material_imersite-1"], "missing MIR Imersite owner")
+local mir_name = mir.localised_name
+assert(type(mir_name) == "table" and mir_name[1] == "" and type(mir_name[2]) == "table"
+  and mir_name[2][1] == "description.productivity-bonus" and mir_name[3] == ": "
+  and type(mir_name[4]) == "table" and mir_name[4][1] == "item-name.kr-imersite-powder",
+  "MIR Imersite presentation must name the MIR-owned powder route")
 local native_effects = productivity_effects(native)
 local mir_effects = productivity_effects(mir)
 local exact_owners = {}

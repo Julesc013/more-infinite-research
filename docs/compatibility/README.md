@@ -376,7 +376,7 @@ Claims must stay precise:
 
 ## Known Limits
 
-- No mod can observe another mod's later `data-final-fixes.lua` mutations without a load-order edge. MIR adds hidden optional ordering for evidenced late finalizers such as Space Exploration and Pyanodons Post-processing and requires a lifecycle fixture for each new case.
+- No mod can observe another mod's later `data-final-fixes.lua` mutations without a load-order edge. MIR adds hidden optional ordering for evidenced late finalizers such as Space Exploration, Pyanodons Post-processing, and F200 Angel Smelting, and requires a lifecycle fixture for each new case.
 - MIR's final safety pass uses target-aware contracts to prune impossible known targets such as missing recipes from generated and external technology effects, then asserts every remaining known reference. Unknown effect types are retained and diagnosed rather than guessed. A mod that is still ordered after MIR can invalidate prototypes afterward, so newly evidenced cases require metadata ordering rather than a recipe-name exception.
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.

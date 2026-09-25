@@ -28,8 +28,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f200 adapter source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 516,
-      "expected_sha256": "658FB982FC22D3D5430BABA30A0722094757076334CDDBAD25FB55C1AD3E2AFB",
+      "expected_bytes": 542,
+      "expected_sha256": "74BF74CF28786AF3B18A6CCD436D31736BEC59538E353EDD0D896246B9BD1FEE",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -892,8 +892,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6723,
-      "expected_sha256": "6FA484A249426216E645EDA302E41DD509DD7986997C0CA2FA08A876EBDEACDA",
+      "expected_bytes": 7556,
+      "expected_sha256": "05612E7115C1544FB4A222847FB8304556360116790D6BF52B62EAEEBE15717F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 10432,
-      "expected_sha256": "B3EE1ADF007284C5501E66B333A4F21AFD5F5B9A8EB12B3E38662D4DF38E484B",
+      "expected_bytes": 51044,
+      "expected_sha256": "8DA1EB4BF01EF625352FFA2C3D7F566DA4DE36FC041B45AF8E811D4DB95CEFCE",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16111,
-      "expected_sha256": "825896AD24077BD563600B308FDBCCEE5050AA74684BE5A15040283A0327C836",
+      "expected_bytes": 31276,
+      "expected_sha256": "ADEEE69C12812FA575EB5EAD30ADA2F31FA339FCA554301FF07F338CC4084DCD",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -940,8 +940,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3630,
-      "expected_sha256": "95305C1745565238F9728C2CE8850F139FE898D9948E4DD3640CA7A6CC3CB63D",
+      "expected_bytes": 3754,
+      "expected_sha256": "FD29C6DC1D97AE4A21349E0A74C11495969372C3669B183EC3D7A5BA2D41434F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -972,8 +972,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3553,
-      "expected_sha256": "D8655FA70DD2C6AE3D032C2745193976AC3DB46868ACEA7742E6E82C4F97A1ED",
+      "expected_bytes": 5026,
+      "expected_sha256": "83284645BAC4BC985C92D3370C674B7975533F789F39FCBDC87879EDA9F07921",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -1036,8 +1036,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5429,
-      "expected_sha256": "8E904F45D33DE7ACCC796C7AAFAC357A80A836ED5EB994F9B4A20B83F2287AE2",
+      "expected_bytes": 11152,
+      "expected_sha256": "7AF0AE8FB058E783CD59D56CCFDE725079B6D6D035D9024BA3EF76F24193B642",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3724,8 +3724,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 52656,
-      "expected_sha256": "308206E0E04E5CE638B7C1E09B3614C427134590669A15D21FB23DD6B803D782",
+      "expected_bytes": 52674,
+      "expected_sha256": "07B57FF5B40214AD997040DEB12A25F2AA74E48BB81B26F4A2420974747F4B71",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3772,8 +3772,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 36271,
-      "expected_sha256": "15E231720AD229E9D2227851394B160E4D1B0B8FE47BA082508FE330DD45114A",
+      "expected_bytes": 40779,
+      "expected_sha256": "18BFD1086D70B15B7317051E6836B14CBA07791CF178B11481EDD0BA6D8E13E8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3804,8 +3804,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 22130,
-      "expected_sha256": "217D5610C140D44FE3AB8026D5F3F0DBF3F2D61F128182316E1F8CFC45B43272",
+      "expected_bytes": 28200,
+      "expected_sha256": "25F791AE9804AE56CAA495F47DCC93F3517A4CE4982C0E95958BA21606C00C8D",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3836,8 +3836,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical copied-data research query core for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16459,
-      "expected_sha256": "16F49B9514EB80FA698D71DC7C33B00E0D34D9C1B24000DA49C8D34749D3F763",
+      "expected_bytes": 16984,
+      "expected_sha256": "DD2532AB186900EB8ADABC9C6B44A7F04F7230FCC82EEBF5BB8E68B67C71A220",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "package-excluded-no-mir-core-fixture",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "661447A663A16C8D56AD898316F060F4B23325EA536313AED16684D4E1BAC1BE"
+  "record_sha256": "42F98724AFCAE4EC5DAED1180ECBDECB7C6E905505B2CACEFEB565CDA2280BF2"
 }

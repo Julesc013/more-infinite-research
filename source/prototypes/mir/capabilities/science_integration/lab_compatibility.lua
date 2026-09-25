@@ -29,30 +29,45 @@ local function policy()
   return "reduce"
 end
 
-local function lab_accepts_all(lab, packs)
+-- Only the private bounded rejection projection supplies this observer. The
+-- normal lab policy has no cap and retains its existing admission semantics.
+local function diagnostic_visit(observer)
+  if not observer then return true end
+  if type(observer.is_stopped) == "function" and observer:is_stopped() then return false end
+  if type(observer.reserve_visit) == "function" then return observer:reserve_visit(0) end
+  return true
+end
+
+local function lab_accepts_all(lab, packs, diagnostic_observer)
   local accepted = {}
-  for _, input in ipairs((lab and lab.inputs) or {}) do accepted[input] = true end
+  for _, input in ipairs((lab and lab.inputs) or {}) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
+    accepted[input] = true
+  end
   for _, pack in ipairs(packs or {}) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
     if not accepted[pack] then return false end
   end
   return true
 end
 
-function M.any_lab_accepts_all(packs)
+function M.any_lab_accepts_all(packs, diagnostic_observer)
   if not packs or #packs == 0 then return false end
   for _, lab in pairs(data_raw.prototypes("lab")) do
-    if lab_accepts_all(lab, packs) then return true end
+    if not diagnostic_visit(diagnostic_observer) then return false end
+    if lab_accepts_all(lab, packs, diagnostic_observer) then return true end
   end
   return false
 end
 
-function M.valid_research_ingredients(ingredients)
+function M.valid_research_ingredients(ingredients, diagnostic_observer)
   local packs = {}
   for _, ingredient in ipairs(ingredients or {}) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
     local name = M.ingredient_name(ingredient)
     if name then table.insert(packs, name) end
   end
-  return M.any_lab_accepts_all(packs)
+  return M.any_lab_accepts_all(packs, diagnostic_observer)
 end
 
 local function required_set(required_packs)

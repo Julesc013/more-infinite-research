@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "MIR4F200BobAngelMaterialRouteObservationV1",
+  "scope": "F200 Bob plus Angel final-data observation and assertion for the sixteen ordinary material stream candidates. This fixture records normalized route and risk facts, active-mod versions, graph decisions, and emitted MIR effect ownership. It asserts fifteen exact emitted effect sets and one absent technology without changing product prototypes.",
+  "streams": [
+    "research_material_aluminium",
+    "research_material_gold",
+    "research_material_lead",
+    "research_material_nickel",
+    "research_material_platinum",
+    "research_material_silver",
+    "research_material_tin",
+    "research_material_titanium",
+    "research_material_copper_tungsten",
+    "research_material_zinc",
+    "research_material_bronze",
+    "research_material_brass",
+    "research_material_gunmetal",
+    "research_material_invar",
+    "research_material_cobalt_steel",
+    "research_material_nitinol"
+  ],
+  "pinned_return_path_certificates": {
+    "evidence_id": "F200-BobAngel-NickelSilver-return-witness-2.0.77-v1",
+    "profile": {
+      "base": "2.0.77",
+      "boblibrary": "2.1.0",
+      "bobores": "2.1.2",
+      "bobplates": "2.1.1",
+      "bobelectronics": "2.1.1",
+      "bobtech": "2.1.0",
+      "angelsrefining": "2.0.4",
+      "angelsrefininggraphics": "2.0.0",
+      "angelssmelting": "2.0.5",
+      "angelssmeltinggraphics": "2.0.0",
+      "angelspetrochem": "2.0.3",
+      "angelspetrochemgraphics": "2.0.1",
+      "more-infinite-research": "4.2.20000"
+    },
+    "routes": {
+      "nickel": ["angels-plate-nickel", "angels-plate-nickel-2"],
+      "silver": ["angels-plate-silver", "angels-plate-silver-2"]
+    },
+    "guard_observation": "The name-only material graph reaches each route input only through Bob recipes that Angel disables and hides in this exact profile: bob-silver-from-lead and bob-silver-nitrate. The profile lock and exact route/risk certificates retain the guard outside this observed lock."
+  },
+  "explicit_non_claims": [
+    "route admission under other mod locks",
+    "route admission under a different Bob/Angel mod lock",
+    "science reachability",
+    "technology ownership mutation",
+    "release qualification"
+  ]
+}

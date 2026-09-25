@@ -23,6 +23,21 @@ foreach ($target in @('f210','f200','f110','f100')) {
   }
 }
 
+# Angel Smelting performs supported F200 Bob/Angel recipe rewrites in its
+# data-final-fixes stage. The hidden optional edge is therefore a package-load
+# ordering contract, not a user-facing required/recommended dependency. Keep
+# the edge target-specific until an independent F210 case establishes it.
+$f200Context = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f200'
+$f200Info = Get-MIR4CurrentTargetPackageOutputText -Context $f200Context -RelativePath 'info.json' | ConvertFrom-Json
+$f210Context = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+$f210Info = Get-MIR4CurrentTargetPackageOutputText -Context $f210Context -RelativePath 'info.json' | ConvertFrom-Json
+if (@($f200Info.dependencies | Where-Object { [string]$_ -ceq '(?) angelssmelting' }).Count -ne 1) {
+  throw '[mir4-current-target-package-f200-angelssmelting-ordering]'
+}
+if (@($f210Info.dependencies | Where-Object { [string]$_ -ceq '(?) angelssmelting' }).Count -ne 0) {
+  throw '[mir4-current-target-package-f210-unsupported-angelssmelting-ordering]'
+}
+
 # The former repository-root player projection has no current source or test
 # authority.  Package-shaped paths belong only to source plus a selected
 # composition (or to pinned historical Git/archive readers outside this test).

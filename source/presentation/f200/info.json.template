@@ -8,6 +8,7 @@
   "dependencies": [
     "base >= 2.0.77",
     "(?) elevated-rails",
+    "(?) angelssmelting",
     "? recycler >= 2.0.77",
     "(?) quality",
     "(?) pypostprocessing",

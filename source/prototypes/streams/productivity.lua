@@ -1,4 +1,5 @@
 local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 
 local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
 local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
@@ -755,11 +756,12 @@ local streams = {
 }
 
 
-local function material_family(item, routes, mod_names)
+local function material_family(item, routes, mod_names, display_item)
+  display_item = display_item or item
   return {
     required_items = {item},
-    icon_item = item,
-    localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name." .. item}},
+    icon_item = display_item,
+    localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name." .. display_item}},
     ui_visibility = {mode = "visible-if-mods-any", mods_any = mod_names, hidden_reason = "material-ecosystem-not-active"},
     identity_state = "stable-unreleased",
     science_packs = "derive-from-unlocks",
@@ -771,6 +773,20 @@ local function material_family(item, routes, mod_names)
     require_acyclic_process = true,
     groups = {{change = 0.02, recipe_patterns = exact_recipe_patterns(routes), reject_explicit_productivity_denial = true}}
   }
+end
+
+-- The additional Angel final routes in this batch have an exact F200
+-- combined-world observation. Keep F210 on its prior declarations until its
+-- own ordering and engine case are qualified.
+local f200_angel_material_routes = target_profiles.current().factorio_version == "2.0"
+
+local function f200_material_routes(existing, additions)
+  local routes = {}
+  for _, recipe in ipairs(existing) do routes[#routes + 1] = recipe end
+  if f200_angel_material_routes then
+    for _, recipe in ipairs(additions) do routes[#routes + 1] = recipe end
+  end
+  return routes
 end
 
 -- Aluminium uses one stable technology identity, but the eligible final
@@ -809,28 +825,38 @@ local function bob_or_angel_wire_material_family(material)
     local item = "angels-wire-" .. material
     return material_family(item, {item .. "-2"}, {"angelssmelting"})
   end
-  return material_family("bob-" .. material .. "-plate", {"bob-" .. material .. "-plate"}, {"bobplates", "angelssmelting"})
+  local routes = {"bob-" .. material .. "-plate"}
+  if (material == "gold" or material == "silver") and f200_angel_material_routes then
+    -- The finalized combined Bob/Angel profile makes Bob's plate through
+    -- these ordinary Angel recipes; its Bob recipe is hidden in that profile.
+    routes[#routes + 1] = "angels-plate-" .. material
+    routes[#routes + 1] = "angels-plate-" .. material .. "-2"
+  end
+  return material_family("bob-" .. material .. "-plate", routes, {"bobplates", "angelssmelting"})
 end
 
 -- Separate requested materials share policy, never translated-name matching.
 streams.research_material_aluminium = aluminium_material_family()
 streams.research_material_gold = bob_or_angel_wire_material_family("gold")
-streams.research_material_lead = material_family("bob-lead-plate", {"bob-lead-plate", "bob-lead-plate-2"}, {"bobplates", "angelssmelting"})
-streams.research_material_nickel = material_family("bob-nickel-plate", {"bob-nickel-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_lead = material_family("bob-lead-plate", f200_material_routes({"bob-lead-plate", "bob-lead-plate-2"}, {"angels-plate-lead", "angels-plate-lead-2"}), {"bobplates", "angelssmelting"})
+streams.research_material_nickel = material_family("bob-nickel-plate", f200_material_routes({"bob-nickel-plate"}, {"angels-plate-nickel", "angels-plate-nickel-2"}), {"bobplates", "angelssmelting"})
 streams.research_material_platinum = bob_or_angel_wire_material_family("platinum")
 streams.research_material_silver = bob_or_angel_wire_material_family("silver")
-streams.research_material_tin = material_family("bob-tin-plate", {"bob-tin-plate"}, {"bobplates", "angelssmelting"})
-streams.research_material_titanium = material_family("bob-titanium-plate", {"bob-titanium-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_tin = material_family("bob-tin-plate", f200_material_routes({"bob-tin-plate"}, {"angels-plate-tin", "angels-plate-tin-2"}), {"bobplates", "angelssmelting"})
+streams.research_material_titanium = material_family("bob-titanium-plate", f200_material_routes({"bob-titanium-plate"}, {"angels-plate-titanium", "angels-plate-titanium-2"}), {"bobplates", "angelssmelting"})
 streams.research_material_copper_tungsten = material_family("bob-copper-tungsten-alloy", {"bob-copper-tungsten-alloy"}, {"bobplates", "angelssmelting"})
-streams.research_material_zinc = material_family("bob-zinc-plate", {"bob-zinc-plate"}, {"bobplates", "angelssmelting"})
-streams.research_material_bronze = material_family("bob-bronze-alloy", {"bob-bronze-alloy"}, {"bobplates", "angelssmelting"})
-streams.research_material_brass = material_family("bob-brass-alloy", {"bob-brass-alloy"}, {"bobplates", "angelssmelting"})
-streams.research_material_gunmetal = material_family("bob-gunmetal-alloy", {"bob-gunmetal-alloy"}, {"bobplates", "angelssmelting"})
-streams.research_material_invar = material_family("bob-invar-alloy", {"bob-invar-alloy"}, {"bobplates", "angelssmelting"})
-streams.research_material_cobalt_steel = material_family("bob-cobalt-steel-alloy", {"bob-cobalt-steel-alloy"}, {"bobplates", "angelssmelting"})
-streams.research_material_nitinol = material_family("bob-nitinol-alloy", {"bob-nitinol-alloy"}, {"bobplates", "angelssmelting"})
+streams.research_material_zinc = material_family("bob-zinc-plate", f200_material_routes({"bob-zinc-plate"}, {"angels-plate-zinc", "angels-plate-zinc-2"}), {"bobplates", "angelssmelting"})
+streams.research_material_bronze = material_family("bob-bronze-alloy", f200_material_routes({"bob-bronze-alloy"}, {"angels-plate-bronze"}), {"bobplates", "angelssmelting"})
+streams.research_material_brass = material_family("bob-brass-alloy", f200_material_routes({"bob-brass-alloy"}, {"angels-plate-brass"}), {"bobplates", "angelssmelting"})
+streams.research_material_gunmetal = material_family("bob-gunmetal-alloy", f200_material_routes({"bob-gunmetal-alloy"}, {"angels-plate-gunmetal"}), {"bobplates", "angelssmelting"})
+streams.research_material_invar = material_family("bob-invar-alloy", f200_material_routes({"bob-invar-alloy"}, {"angels-plate-invar"}), {"bobplates", "angelssmelting"})
+streams.research_material_cobalt_steel = material_family("bob-cobalt-steel-alloy", f200_material_routes({"bob-cobalt-steel-alloy"}, {"angels-plate-cobalt-steel"}), {"bobplates", "angelssmelting"})
+streams.research_material_nitinol = material_family("bob-nitinol-alloy", f200_material_routes({"bob-nitinol-alloy"}, {"angels-plate-nitinol"}), {"bobplates", "angelssmelting"})
 streams.research_material_rare_metals = material_family("kr-rare-metals", {"kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals", "kr-casting-rare-metals"}, {"Krastorio2", "Krastorio2-spaced-out"})
-streams.research_material_imersite = material_family("kr-imersite-crystal", {"kr-imersite-crystal", "kr-imersite-powder"}, {"Krastorio2", "Krastorio2-spaced-out"})
+-- K2SO's native owner retains crystal productivity. MIR owns the admitted
+-- powder route, so present its generated technology as powder while keeping
+-- crystal as the existing availability anchor.
+streams.research_material_imersite = material_family("kr-imersite-crystal", {"kr-imersite-crystal", "kr-imersite-powder"}, {"Krastorio2", "Krastorio2-spaced-out"}, "kr-imersite-powder")
 streams.research_material_silicon = material_family("kr-silicon", {"kr-silicon"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_glass = material_family("kr-glass", {"kr-glass"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_black_paving = material_family("kr-black-reinforced-plate", {"kr-black-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
@@ -867,6 +893,44 @@ streams.research_material_silicon.reviewed_forward_routes = {
 streams.research_material_glass.reviewed_forward_routes = {
   ["kr-glass"] = k2_forward_route("A10-K2-glass-v1","A05-K2-05-locked-current-v1","mir32-a8a1f439",{{type="item",name="kr-sand",amount=16}},{{type="item",name="kr-glass",amount=8}})
 }
+
+-- Nickel and Silver's ordinary Angel plate finals are safe only for this exact
+-- F200 Bob/Angel lock. The shared graph deliberately follows disabled recipes
+-- and therefore sees a possible return path through Bob's disabled silver
+-- recipes. These certificates retain that guard and admit only the final
+-- routes whose locked, finalized facts prove ordinary deterministic IO, clean
+-- risk facts, and Factorio's finite productivity cap. Any added, removed, or
+-- version-changed mod misses this lock and remains guard-rejected.
+local function f200_bob_angel_plate_profile(risk_fingerprint)
+  return {{
+    id="F200-BobAngel-2.0.77-plate-final-v1",
+    mod_locks={base="2.0.77",boblibrary="2.1.0",bobores="2.1.2",bobplates="2.1.1",bobelectronics="2.1.1",bobtech="2.1.0",angelsrefining="2.0.4",angelsrefininggraphics="2.0.0",angelspetrochem="2.0.3",angelspetrochemgraphics="2.0.1",angelssmelting="2.0.5",angelssmeltinggraphics="2.0.0",["more-infinite-research"]="4.2.20000"},
+    observer_mod_locks={['mir-fixture-assert-f200-bob-angel-material-routes-observation']="0.1.0",['mir-fixture-assert-f200-science-researchability-diagnostic']="0.1.0"},
+    canonical_risk_fingerprint=risk_fingerprint
+  }}
+end
+
+local function f200_bob_angel_plate_route(id, risk_fingerprint, ingredient, output)
+  return {
+    id=id,
+    evidence_id="F200-BobAngel-NickelSilver-return-witness-2.0.77-v1",
+    maximum_productivity=3.0,
+    profiles=f200_bob_angel_plate_profile(risk_fingerprint),
+    ingredients={ingredient},
+    results={output}
+  }
+end
+
+if f200_angel_material_routes then
+  streams.research_material_nickel.reviewed_forward_routes = {
+    ["angels-plate-nickel"] = f200_bob_angel_plate_route("F200-BA-nickel-casting-v1", "mir32-b375a73e", {type="fluid",name="angels-liquid-molten-nickel",amount=40}, {type="item",name="bob-nickel-plate",amount=4}),
+    ["angels-plate-nickel-2"] = f200_bob_angel_plate_route("F200-BA-nickel-roll-v1", "mir32-d28043dc", {type="item",name="angels-roll-nickel",amount=1}, {type="item",name="bob-nickel-plate",amount=4})
+  }
+  streams.research_material_silver.reviewed_forward_routes = {
+    ["angels-plate-silver"] = f200_bob_angel_plate_route("F200-BA-silver-casting-v1", "mir32-fae4a0f7", {type="fluid",name="angels-liquid-molten-silver",amount=40}, {type="item",name="bob-silver-plate",amount=4}),
+    ["angels-plate-silver-2"] = f200_bob_angel_plate_route("F200-BA-silver-roll-v1", "mir32-a0f6b276", {type="item",name="angels-roll-silver",amount=1}, {type="item",name="bob-silver-plate",amount=4})
+  }
+end
 
 -- A06-reviewed Bob-only Aluminium route. This certificate is deliberately
 -- narrower than the material family: it binds the one F210 official+Bob

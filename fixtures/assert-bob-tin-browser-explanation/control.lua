@@ -323,6 +323,15 @@ local function assert_native_ui(player, force)
   check(contains(facts.maximum_setting, "ips-max-level-research_material_tin | default=2 | raw-direct=2 | effective=3 | source=mirset1 | changed=true | changed-from-default=true | restart-required=true"), "maximum-setting GUI caption differs")
   check(contains(facts.enabled_setting, "ips-enable-research_material_tin | default=true | raw-direct=true | effective=true | source=mirset1 | changed=false | changed-from-default=false | restart-required=true"), "enable-setting GUI caption differs")
   check(facts.startup_restart == "Startup settings require restart; this browser does not mutate startup settings.", "restart GUI caption differs")
+  check(remote.call("more-infinite-research-browser", "open", player.index, {
+    tab = "settings", search = "research_material_tin"
+  }), "native browser settings did not open")
+  local settings_facts = {}
+  capture_facts(player.gui.screen.mir_research_browser, settings_facts)
+  check(settings_facts.profile_import == "MIRSET1 profile: active | recognized=2 | unknown=0 | invalid=0"
+    .. " | valid imported entries determine effective startup values | restart-required=true",
+    "MIRSET1 profile GUI summary differs")
+  facts.profile_import = settings_facts.profile_import
   return facts
 end
 
