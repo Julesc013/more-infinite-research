@@ -112,7 +112,7 @@ if (-not $out.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase) -or
 }
 $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $out
 
-$inputAuthorityRelative = '.mir/releases/waves/mir4-r0/MIR42-Direct-Predecessor-InputsV1.json'
+$inputAuthorityRelative = '.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json'
 $inputAuthorityPath = Assert-MIR42EngineRunFile -Path (Join-Path $repo $inputAuthorityRelative) -Label 'mir42-predecessor-authority'
 $inputAuthority = Get-Content -Raw -LiteralPath $inputAuthorityPath | ConvertFrom-Json -Depth 100 -DateKind String
 if (-not (Test-MIR4BootstrapRecordHash -Record $inputAuthority) -or
@@ -123,7 +123,7 @@ if (-not (Test-MIR4BootstrapRecordHash -Record $inputAuthority) -or
   throw '[mir42-engine-predecessor-authority-invalid]'
 }
 $checksumRelative = [string]$inputAuthority.public_v410_checksums.path
-if ($checksumRelative -cne '.mir/releases/waves/mir4-r0/MIR42-v410-SHA256SUMS.txt') {
+if ($checksumRelative -cne '.mir/releases/governance/mir4/MIR42-v410-SHA256SUMS.txt') {
   throw '[mir42-engine-published-checksum-path]'
 }
 $checksumPath = Assert-MIR42EngineRunFile -Path (Join-Path $repo $checksumRelative) -Label 'mir42-published-checksums'
