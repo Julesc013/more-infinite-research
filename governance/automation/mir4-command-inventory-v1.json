@@ -3299,9 +3299,9 @@
     {
       "path": "tools/lib/assurance/Domains.ps1",
       "classification": "canonical-internal",
-      "sha256": "2944F1684B1F25CED5DC9FD7968C6BC377C9D972DF5C48BBB223EEB7B90857FF",
+      "sha256": "BF68C70B38324D2FBC84A406F6AC82E4ABDCE2EDAB711C5E5FE206B0F4BAD85F",
       "hash_mode": "canonical-text-v1",
-      "lines": 428,
+      "lines": 486,
       "package_visible": false
     },
     {
@@ -3347,17 +3347,17 @@
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "1A7F7F6B3629ED9850C0C5CB3EA6614C450795CD0973847282581491D8D15A09",
+      "sha256": "A13696BCBDA2F7A3DFA29E8C448B74BE992D6FE02A0E7754032F02DB045524B2",
       "hash_mode": "canonical-text-v1",
-      "lines": 817,
+      "lines": 811,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Plans.ps1",
       "classification": "canonical-internal",
-      "sha256": "21262543014A5DFAD65CE465690F3F43A1B167F93A2546BF66F7F2EBA3CD1E6D",
+      "sha256": "5F2364E4830615E6F2204FDD1BA1CB1CCF60F277901E9A9FEF661BE9439CAB1F",
       "hash_mode": "canonical-text-v1",
-      "lines": 345,
+      "lines": 349,
       "package_visible": false
     },
     {
@@ -3403,9 +3403,9 @@
     {
       "path": "tools/lib/assurance/release/CandidatePlanning.ps1",
       "classification": "canonical-internal",
-      "sha256": "6BE43D71C099BD63C573390753DECB81DB4B19567B4EC02B44B2C3B17178A327",
+      "sha256": "9B8F5488336763C86DE315D6AE5F57110B0477343E98FBB68D26606F546E2F06",
       "hash_mode": "canonical-text-v1",
-      "lines": 416,
+      "lines": 412,
       "package_visible": false
     },
     {
@@ -5810,5 +5810,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:74e3205c893919d144b8e611e4a4cc4f92663262f8ddc8b7d0d1e17c715de220"
+  "digest": "sha256:508609762ca56de0abe27a53ed69956eeacadb6a72f323d8d552c268208e3629"
 }
