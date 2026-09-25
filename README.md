@@ -6,9 +6,28 @@
 
 More Infinite Research (MIR) is a proof-governed Factorio research product line. It adds configurable infinite productivity and bonus research while preserving explicit target identity, safe omission, deterministic packages, and evidence-bound compatibility claims.
 
-## Development research browser
+## MIR 4.0 Whole-Platform Genesis
 
-The 4.2 development packages for Factorio 2.1 and 2.0 bundle an MIR Research Browser. Open it with the MIR button or `/mir-research`. Personal All/Finite/Infinite filters, ID/family search, pages and a native queue mirror leave force research state unchanged. The enqueue button checks current availability and permissions. The same screen groups effective settings by technology; startup values require a restart, and profile export uses the existing MIRSET1 import setting. Exact multiplayer qualification and detailed omitted-route explanations remain open in the [community request ledger](spec/programmes/community-requests.json).
+MIR 4.0 established the shared product line. **[MIR 4.1.0 was published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0)** with four target-specific player packages. It preserves the research and settings model below while separating editable package source, target adapters, repository documentation, and release evidence.
+
+### MIR 4.1: choose the right target
+
+Download the ZIP for your Factorio line. Each published 4.1 package has independent target qualification; F210 and F200 are the primary player targets, with F110 and F100 supplied as supplemental LTS targets.
+
+| Product | Factorio line | Distribution version | Upgrade baseline | Release requirement |
+| --- | --- | --- | --- | --- |
+| F210 | 2.1 experimental | [4.1.21000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.21000.zip) | MIR `4.0.21000` | required / primary |
+| F200 | 2.0 | [4.1.20000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.20000.zip) | MIR `4.0.20000` | required / primary |
+| F110 | 1.1 | [4.1.11000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.11000.zip) | MIR `4.0.11000` | required / supplemental LTS |
+| F100 | 1.0 | [4.1.10000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.10000.zip) | MIR `4.0.10000` | required / supplemental LTS |
+
+`4.1.0` identifies the shared source release. The five-digit distribution suffix identifies the target line; it does not imply identical capabilities on every Factorio generation. F017 through F013 have private 4.2 playtest packages and remain outside the published target set until separately admitted.
+
+The published F210 package was qualified on Factorio 2.1.17; F200, F110, and F100 were qualified on 2.0.77, 1.1.110, and 1.0.0 respectively. Each new candidate needs its own exact-engine evidence before its support claim changes.
+
+## MIR 4.2 research browser
+
+The MIR 4.2 packages for Factorio 2.1 and 2.0 bundle a Research Browser. Open it with the MIR button or `/mir-research`. Personal All/Finite/Infinite filters, ID/family search, pages and a native queue mirror leave force research state unchanged. The enqueue button checks current availability and permissions. The same screen groups effective settings by technology; startup values require a restart, and profile export uses the existing MIRSET1 import setting. Exact multiplayer qualification and detailed omitted-route explanations remain open in the [community request ledger](spec/programmes/community-requests.json).
 
 For the maintained 4.1 release and the integration programme for 4.2, 4.3, and later targets, see the [integration and delivery plan](docs/releases/mir4-integration-and-delivery-plan.md). Planned or preview work does not expand current compatibility claims.
 
@@ -22,7 +41,13 @@ For the maintained 4.1 release and the integration programme for 4.2, 4.3, and l
 
 ## Install and upgrade
 
-Install the target-matching player ZIP from the [Factorio Mod Portal](https://mods.factorio.com/mod/more-infinite-research) or the [GitHub release assets](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0), and leave the ZIP packed in the Factorio mods directory. Do not install developer-preview archives or the automatically generated GitHub source archives as a mod.
+Install the target-matching player ZIP from the [Factorio Mod Portal](https://mods.factorio.com/mod/more-infinite-research) or the [GitHub release assets](https://github.com/Julesc013/more-infinite-research/releases), and leave the ZIP packed in the Factorio mods directory. Do not install developer-preview archives or the automatically generated GitHub source archives as a mod.
+
+- F210 upgrades directly from MIR 4.0.21000 and retains its admitted technology IDs, settings, migrations, and runtime state.
+- F200 upgrades directly from MIR 4.0.20000 under its target-local evidence.
+- F110 and F100 upgrade from MIR 4.0.11000 and 4.0.10000 respectively.
+- Back up the save, select the package for the running Factorio line, and keep startup settings unchanged for the first load.
+- A support request should include an exact [SupportBundleV1](SUPPORT.md), with the package version and target, not only a mod list or screenshot.
 
 For MIR 3 saves, follow [Upgrading from MIR 3 to MIR 4](docs/user/mir3-to-mir4.md) to reach the corresponding 4.0 baseline first. See also [installation](docs/user/installation.md) and the target package README for current steps. MIR 3 and earlier remain immutable historical baselines; their architecture and release records are retained under `docs/releases/` and `.mir/releases/terminal/`.
 
