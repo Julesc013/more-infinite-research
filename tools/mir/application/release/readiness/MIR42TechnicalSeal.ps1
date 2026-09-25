@@ -643,7 +643,7 @@ function Get-MIR42ExactFourTargetCandidate {
     $rowPath = Resolve-MIR42SealContainedArtifactPath -Root $root -RelativePath ([string]$target.target_row_path) -Code 'mir42-seal-candidate-target-row'
     $rowInput = Read-MIR42SealRecord -Path $rowPath -Code 'mir42-seal-target-row'
     $row = $rowInput.record
-    if ([int]$row.schema -ne 1 -or [string]$row.kind -cne 'MIR42FourTargetCandidateTargetRowV1') {
+    if ([int]$row.schema -ne 1 -or [string]$row.kind -cne 'MIR42FourTargetCandidateRowV1') {
       throw "[mir42-seal-candidate-target-row-schema] $([string]$target.target)"
     }
     $expected = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target ([string]$target.target) -SourceVersion '4.2.0'

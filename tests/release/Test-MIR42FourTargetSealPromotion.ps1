@@ -46,7 +46,7 @@ try {
     $inventory = Get-MIR4ArchiveInventory -Path $assetPath
     $asset = [ordered]@{path=$assetRelative;bytes=[int64]$inventory.bytes;sha256=[string]$inventory.archive_sha256}
     $row = [pscustomobject][ordered]@{
-      schema=1;kind='MIR42FourTargetCandidateTargetRowV1';target=$target;distribution_version=[string]$identity.distribution_version
+      schema=1;kind='MIR42FourTargetCandidateRowV1';target=$target;distribution_version=[string]$identity.distribution_version
       asset=$asset;content_sha256=[string]$inventory.content_sha256;entry_count=[int]$inventory.entry_count;build_a_sha256=$asset.sha256;build_b_sha256=$asset.sha256
       deterministic_archive_bytes=$true;package_excluded_surface=$true;record_sha256=''
     }
