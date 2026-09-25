@@ -3023,6 +3023,8 @@
         "contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json",
         "spec/execution/mir4-4.1-development-context-v1.json",
         "spec/schemas/mir4-development-execution-context-v1.schema.json",
+        "spec/execution/mir4-4.2-development-context-v1.json",
+        "spec/schemas/mir4-development-execution-context-v2.schema.json",
         "tools/lib/validation/PackageIdentity.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/mir/application/package/PackageAuthority.ps1",
@@ -7428,5 +7430,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b9e44a61eca7c0622d15e1c385c088436253f4c59902dd5a779c6c00e74738c5"
+  "digest": "sha256:792e6fbb2a6d76d3f96a6036f4006608fb1308867ef7c031c083d9044e06d281"
 }

@@ -263,10 +263,8 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
   # package-excluded execution context permits exact private proof without
   # fabricating release authority.
   if ([string]$Context.verification_profile.execution_context_mode -eq 'development-context') {
-    $authorityRelative = ([string]$Context.verification_profile.execution_context).Replace('\', '/')
-    if ($authorityRelative -cne 'spec/execution/mir4-4.1-development-context-v1.json') {
-      throw "Development approved-delta execution context path is unsafe: $authorityRelative"
-    }
+    $contextSpecification = Get-MIRAssuranceDevelopmentExecutionContextSpecification -ContextPath ([string]$Context.verification_profile.execution_context)
+    $authorityRelative = [string]$contextSpecification.relative_path
     $authorityPath = Join-Path $repo $authorityRelative
     $registryRelative = 'targets/registry.json'
     $registryPath = Join-Path $repo $registryRelative
@@ -283,18 +281,14 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
     })
     if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
         -not (Test-MIR4BootstrapRecordHash -Record $registry) -or
-        [string]$authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
-        [string]$authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or
-        @($authority.allowed) -notcontains 'exact-engine-development-proof' -or
-        @($authority.forbidden) -notcontains 'production-signing' -or
-        @($authority.forbidden) -notcontains 'tagging' -or
-        @($authority.forbidden) -notcontains 'publication' -or
+        -not (Test-MIRAssuranceDevelopmentExecutionContextBoundary -Authority $authority -Specification $contextSpecification) -or
         [string]$registry.kind -ne 'MIR4TargetRegistryV2' -or
         $targetRows.Count -ne 1) {
       throw 'Development approved-delta execution context boundary is invalid.'
     }
     $targetRow = $targetRows[0]
-    if ([string]$targetRow.predecessor -ne $fromVersion -or
+    if (@($contextSpecification.targets) -notcontains [string]$targetRow.target -or
+        [string]$targetRow.predecessor -ne $fromVersion -or
         [string]$Context.verification_profile.upgrade.to_version -ne $toVersion) {
       throw 'Development approved-delta profile does not match the exact target registry row.'
     }

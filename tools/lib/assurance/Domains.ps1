@@ -9,6 +9,67 @@ function Get-MIRAssuranceVerificationProfilePath {
   return Join-Path $repo "validation\profiles\factorio-$Target.json"
 }
 
+function Get-MIRAssuranceDevelopmentExecutionContextSpecification {
+  param([Parameter(Mandatory)][string]$ContextPath)
+
+  $relativePath = $ContextPath.Replace('\', '/')
+  switch ($relativePath) {
+    'spec/execution/mir4-4.1-development-context-v1.json' {
+      return [pscustomobject][ordered]@{
+        relative_path=$relativePath
+        schema_path='spec/schemas/mir4-development-execution-context-v1.schema.json'
+        kind='MIR4DevelopmentExecutionContextV1'
+        status='active-private-mir4.1-qualification-no-release-authority'
+        programme='MIR4-4.1'
+        targets=@('f210','f200','f110','f100')
+        required_allowed=@('repository-development','exact-engine-development-proof','private-candidate-qualification')
+        required_forbidden=@('public-release-authority','source-freeze','production-signing','tagging','sealing','publication')
+      }
+    }
+    'spec/execution/mir4-4.2-development-context-v1.json' {
+      return [pscustomobject][ordered]@{
+        relative_path=$relativePath
+        schema_path='spec/schemas/mir4-development-execution-context-v2.schema.json'
+        kind='MIR4DevelopmentExecutionContextV2'
+        status='active-private-mir4.2-verification-plan-no-release-authority'
+        programme='MIR4-4.2'
+        targets=@('f210','f200')
+        required_allowed=@('repository-development','exact-engine-development-proof','private-candidate-qualification')
+        required_forbidden=@('public-release-authority','source-freeze','production-signing','tagging','sealing','publication')
+      }
+    }
+    default { throw "Development verification profile has no exact execution context: $relativePath" }
+  }
+}
+
+function Test-MIRAssuranceDevelopmentExecutionContextBoundary {
+  param(
+    [Parameter(Mandatory)]$Authority,
+    [Parameter(Mandatory)]$Specification
+  )
+
+  if (-not (Test-MIR4BootstrapRecordHash -Record $Authority) -or
+      [string]$Authority.kind -cne [string]$Specification.kind -or
+      [string]$Authority.status -cne [string]$Specification.status -or
+      [string]$Authority.programme -cne [string]$Specification.programme) {
+    return $false
+  }
+  $authorityTargets = @($Authority.targets | ForEach-Object { [string]$_ })
+  $expectedTargets = @($Specification.targets | ForEach-Object { [string]$_ })
+  if ($authorityTargets.Count -ne $expectedTargets.Count) { return $false }
+  for ($index = 0; $index -lt $expectedTargets.Count; $index++) {
+    if ($authorityTargets[$index] -cne $expectedTargets[$index]) { return $false }
+  }
+  foreach ($required in @($Specification.required_allowed)) {
+    if (@($Authority.allowed) -notcontains [string]$required) { return $false }
+  }
+  foreach ($required in @($Specification.required_forbidden)) {
+    if (@($Authority.forbidden) -notcontains [string]$required) { return $false }
+  }
+  $gates = @($Authority.transition_gate.PSObject.Properties)
+  return $gates.Count -eq 6 -and @($gates | Where-Object { [bool]$_.Value }).Count -eq 0
+}
+
 function Get-MIRAssuranceVerificationProfile {
   param([Parameter(Mandatory)][string]$Target)
   $path = Get-MIRAssuranceVerificationProfilePath -Target $Target
@@ -23,23 +84,20 @@ function Get-MIRAssuranceVerificationProfile {
   $info = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
   $developmentContext = [string]$profile.execution_context_mode -eq 'development-context'
   if ($developmentContext) {
-    $authorityRelative = ([string]$profile.execution_context).Replace('\', '/')
-    if ($authorityRelative -cne 'spec/execution/mir4-4.1-development-context-v1.json') {
-      throw "Development verification profile has no exact execution context: $path"
-    }
+    $contextSpecification = Get-MIRAssuranceDevelopmentExecutionContextSpecification -ContextPath ([string]$profile.execution_context)
+    $authorityRelative = [string]$contextSpecification.relative_path
     $authorityPath = Join-Path $repo $authorityRelative
     if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
       throw "Development execution context is missing: $authorityRelative"
     }
     $authorityRaw = Get-Content -Raw -LiteralPath $authorityPath
-    if (-not ($authorityRaw | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-development-execution-context-v1.schema.json'))) {
+    if (-not ($authorityRaw | Test-Json -SchemaFile (Join-Path $repo ([string]$contextSpecification.schema_path)))) {
       throw "Development execution context schema is invalid: $authorityRelative"
     }
     $authority = $authorityRaw | ConvertFrom-Json -Depth 100 -DateKind String
-    if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
-        @($authority.allowed) -notcontains 'exact-engine-development-proof' -or
-        @($authority.forbidden) -notcontains 'publication' -or
-        @($authority.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+    $targetKey = ConvertTo-MIR4CurrentTargetKey -FactorioVersion $Target
+    if (-not (Test-MIRAssuranceDevelopmentExecutionContextBoundary -Authority $authority -Specification $contextSpecification) -or
+        @($contextSpecification.targets) -notcontains $targetKey) {
       throw "Development execution context boundary is invalid: $authorityRelative"
     }
     $fixturePath = Join-Path $repo ("fixtures/" + [string]$profile.upgrade.fixture)
