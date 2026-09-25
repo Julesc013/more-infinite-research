@@ -221,24 +221,28 @@ Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -Enab
 Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
 $stagedFixture = Join-Path $mods $fixtureModName
 Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
-if ($FixtureName -in @('assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
-    $ToVersion -match '^4[.]2[.](?<code>11000|10000)$') {
+if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-4-0-20000-to-4-1-20000', 'assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
+    $ToVersion -match '^4[.]2[.](?<code>21000|20000|11000|10000)$') {
   $code = [string]$Matches.code
-  if ($FromVersion -cne "4.1.$code") { throw 'F1 upgrade specialization requires its exact 4.1 predecessor.' }
+  $expectedFrom = if ($code -ceq '20000') { "4.0.$code" } else { "4.1.$code" }
+  if ($FromVersion -cne $expectedFrom) { throw 'MIR 4.2 upgrade specialization requires its exact predecessor version.' }
   $fixtureFrom = "4.0.$code"
   $fixtureTo = "4.1.$code"
   $stagedControlPath = Join-Path $stagedFixture 'control.lua'
   $stagedControl = Get-Content -Raw -LiteralPath $stagedControlPath
-  if (-not $stagedControl.Contains("local from_version = `"$fixtureFrom`"") -or
-      -not $stagedControl.Contains("local to_version = `"$fixtureTo`"")) {
-    throw 'F1 upgrade fixture version anchors changed.'
+  $oldSaveName = 'mir-' + $fixtureTo.Replace('.', '') + '-upgraded'
+  $newSaveName = 'mir-' + $ToVersion.Replace('.', '') + '-upgraded'
+  if (-not $stagedControl.Contains($fixtureFrom) -or -not $stagedControl.Contains($fixtureTo) -or
+      -not $stagedControl.Contains($oldSaveName)) {
+    throw 'MIR 4.2 upgrade fixture version or save anchors changed.'
   }
-  $stagedControl = $stagedControl.Replace("local from_version = `"$fixtureFrom`"", "local from_version = `"$FromVersion`"").Replace("local to_version = `"$fixtureTo`"", "local to_version = `"$ToVersion`"")
+  $stagedControl = $stagedControl.Replace($fixtureFrom, '__MIR_UPGRADE_FROM_VERSION__').Replace($fixtureTo, '__MIR_UPGRADE_TO_VERSION__')
+  $stagedControl = $stagedControl.Replace('__MIR_UPGRADE_FROM_VERSION__', $FromVersion).Replace('__MIR_UPGRADE_TO_VERSION__', $ToVersion).Replace($oldSaveName, $newSaveName)
   [IO.File]::WriteAllText($stagedControlPath, $stagedControl, [Text.UTF8Encoding]::new($false))
   $stagedInfoPath = Join-Path $stagedFixture 'info.json'
   $stagedInfo = Get-Content -Raw -LiteralPath $stagedInfoPath
   $dependencyFrom = "more-infinite-research >= $fixtureFrom"
-  if (-not $stagedInfo.Contains($dependencyFrom)) { throw 'F1 upgrade fixture dependency anchor changed.' }
+  if (-not $stagedInfo.Contains($dependencyFrom)) { throw 'MIR 4.2 upgrade fixture dependency anchor changed.' }
   [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo.Replace($dependencyFrom, "more-infinite-research >= $FromVersion"), [Text.UTF8Encoding]::new($false))
 }
 if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
