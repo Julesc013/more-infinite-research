@@ -363,6 +363,9 @@ function Assert-MIR42SealT16AclImmutableAnchorAssessment {
     [Security.AccessControl.FileSystemRights]::DeleteSubdirectoriesAndFiles -bor
     [Security.AccessControl.FileSystemRights]::ChangePermissions -bor
     [Security.AccessControl.FileSystemRights]::TakeOwnership
+  if ([string]$Assessment.owner_sid -in $broad -or [string]$Assessment.owner_sid -notin $approvedMutators) {
+    throw "[$Code-acl-anchor-owner]"
+  }
   foreach ($row in @($Assessment.rows)) {
     if ([string]$row.type -notin @('Allow','Deny')) { throw "[$Code-acl-anchor-row]" }
     if ([string]$row.type -ceq 'Allow' -and (([Security.AccessControl.FileSystemRights]$row.rights -band $mutationRights) -ne 0) -and

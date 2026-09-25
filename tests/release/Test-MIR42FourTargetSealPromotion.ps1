@@ -381,11 +381,17 @@ try {
   New-Item -ItemType Directory -Force -Path $protectedRoot | Out-Null
   foreach ($path in @($immutableAnchor,$protectedRootParent,$protectedRoot)) { Set-MIR42SealTestExactAcl -Path $path -OwnerSid $testAclSid }
   Assert-MIR42SealT16AclRootToImmutableAnchor -ProtectedRootPath $protectedRoot -ImmutableAnchorPath $immutableAnchor -AclContract $testAclContract -Code 'mir42-seal-test-protected-root-anchor-positive'
-  $protectedRootParentAssessment = Get-MIR42SealAclAssessment -Path $protectedRootParent -Code 'mir42-seal-test-protected-root-parent'
-  $protectedRootParentAssessment.rows = @($protectedRootParentAssessment.rows) + @([pscustomobject]@{sid=$unapprovedSid.Value;type='Allow';rights=[Security.AccessControl.FileSystemRights]::Modify;inherited=$false})
+  $unapprovedParentGrant = '*S-1-5-32-545:(M)'
+  & "$env:SystemRoot\System32\icacls.exe" $protectedRootParent '/grant' $unapprovedParentGrant | Out-Null
+  Assert-MIR42SealTest ($LASTEXITCODE -eq 0) 'unapproved-protected-root-parent-ace-created'
   $unapprovedProtectedRootParentRejected = $false
-  try { Assert-MIR42SealT16AclAncestorAssessment -Assessment $protectedRootParentAssessment -AclContract $testAclContract -Code 'mir42-seal-test-protected-root-parent' } catch { $unapprovedProtectedRootParentRejected = $_.Exception.Message -match 'mir42-seal-test-protected-root-parent-acl-ancestor-allow-sid' }
+  try { Assert-MIR42SealT16AclRootToImmutableAnchor -ProtectedRootPath $protectedRoot -ImmutableAnchorPath $immutableAnchor -AclContract $testAclContract -Code 'mir42-seal-test-protected-root-parent' } catch { $unapprovedProtectedRootParentRejected = $_.Exception.Message -match 'mir42-seal-test-protected-root-parent-acl-ancestor-allow-sid' }
   Assert-MIR42SealTest $unapprovedProtectedRootParentRejected 'unapproved-parent-above-protected-root-rejected'
+  $immutableAnchorAssessment = Get-MIR42SealAclAssessment -Path $immutableAnchor -Code 'mir42-seal-test-immutable-anchor'
+  $immutableAnchorAssessment.owner_sid = $unapprovedSid.Value
+  $unapprovedAnchorOwnerRejected = $false
+  try { Assert-MIR42SealT16AclImmutableAnchorAssessment -Assessment $immutableAnchorAssessment -AclContract $testAclContract -Code 'mir42-seal-test-immutable-anchor' } catch { $unapprovedAnchorOwnerRejected = $_.Exception.Message -match 'mir42-seal-test-immutable-anchor-acl-anchor-owner' }
+  Assert-MIR42SealTest $unapprovedAnchorOwnerRejected 'unapproved-immutable-anchor-owner-rejected'
 
   $forgedFreeze = [pscustomobject][ordered]@{
     schema=1;kind='MIR42SourceFreezeAuthorizationV1';status='MIR-4.2-SOURCE-FROZEN-AND-CANDIDATE-ALLOCATED'
