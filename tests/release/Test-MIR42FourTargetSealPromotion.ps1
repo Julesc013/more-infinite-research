@@ -11,6 +11,15 @@ function Assert-MIR42SealTest {
   if (-not $Condition) { throw "[mir42-seal-test] $Code" }
 }
 
+function Set-MIR42SealTestExactAcl {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$OwnerSid)
+  $security = if (Test-Path -LiteralPath $Path -PathType Container) { [Security.AccessControl.DirectorySecurity]::new() } else { [Security.AccessControl.FileSecurity]::new() }
+  $security.SetOwner([Security.Principal.SecurityIdentifier]$OwnerSid)
+  $security.SetAccessRuleProtection($true,$false)
+  $security.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new([Security.Principal.SecurityIdentifier]$OwnerSid,[Security.AccessControl.FileSystemRights]::FullControl,[Security.AccessControl.AccessControlType]::Allow))
+  Set-Acl -LiteralPath $Path -AclObject $security
+}
+
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 $root = Join-Path $RepoRoot ('build/test-results/mir42-four-target-seal-' + [guid]::NewGuid().ToString('N'))
 $externalForgedTrustRoot = ''
@@ -68,7 +77,7 @@ try {
   Assert-MIR42SealTest ($readiness.status -ceq 'MIR-4.2-FOUR-TARGET-TECHNICAL-SEAL-BLOCKED') 'missing-gates-block-seal'
   Assert-MIR42SealTest ([bool]$readiness.checks.candidate -and -not [bool]$readiness.checks.qualification -and -not [bool]$readiness.checks.campaign -and -not [bool]$readiness.checks.reviewer -and -not [bool]$readiness.technical_seal_authorized) 'candidate-only-readiness'
   Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_acl_contract -and (@($readiness.blockers) -match 'mir42-seal-t16-acl-contract-human-input-required').Count -eq 1) 'human-approved-t16-acl-contract-required'
-  Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_trust_root -and (@($readiness.blockers) -match 'mir42-seal-external-t16-trust-root-or-verifier-missing').Count -eq 1) 'external-t16-trust-root-required'
+  Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_trust_root -and (@($readiness.blockers) -match 'mir42-seal-external-t16-trust-root-or-protected-root-or-verifier-missing').Count -eq 1) 'external-t16-trust-root-required'
   Assert-MIR42SealTest (-not [bool]$readiness.checks.programme -and (@($readiness.blockers) -match 'mir42-seal-current-programme-transition-not-authorized').Count -eq 1) 'current-4-2-release-cut-blocks-unapproved-freeze'
   $mislabelledQualification = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetExactCandidateQualificationV1';status='MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED'
@@ -259,7 +268,7 @@ try {
   $forgedRoot.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedRoot
   Write-MIR4BootstrapRecord -Record $forgedRoot -Path $forgedRootPath | Out-Null
   $forgedTrustRejected = $false
-  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $forgedRootPath -OperatorTrustSourcePath $forgedOperatorPath -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $forgedTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-trust-root-repository' }
+  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $forgedRootPath -OperatorTrustSourcePath $forgedOperatorPath -ProtectedRootPath $forgedTrustRoot -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $forgedTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-protected-root-repository' }
   Assert-MIR42SealTest $forgedTrustRejected 'coherent-alternate-t16-chain-in-candidate-rejected'
 
   # Moving the same alternate key chain beside the checkout does not make it
@@ -293,7 +302,7 @@ try {
   $externalRootPath = Join-Path $externalForgedTrustRoot 't16-ledger-trust-root.json'
   Write-MIR4BootstrapRecord -Record $externalRoot -Path $externalRootPath | Out-Null
   $writableExternalTrustRejected = $false
-  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $externalRootPath -OperatorTrustSourcePath $externalOperatorPath -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $writableExternalTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-trust-root-not-protected' }
+  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $externalRootPath -OperatorTrustSourcePath $externalOperatorPath -ProtectedRootPath $externalForgedTrustRoot -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $writableExternalTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-protected-root-not-protected' }
   Assert-MIR42SealTest $writableExternalTrustRejected 'coherent-writable-external-t16-chain-rejected'
 
   $aclProbePath = Join-Path $root 'unapproved-mutation-ace.txt'
@@ -308,6 +317,37 @@ try {
   $unapprovedAceRejected = $false
   try { Assert-MIR42SealT16AclContract -Path $aclProbePath -AclContract $testAclContract -Code 'mir42-seal-test-unapproved-ace' } catch { $unapprovedAceRejected = $_.Exception.Message -match 'mir42-seal-test-unapproved-ace-acl-allow-sid' }
   Assert-MIR42SealTest $unapprovedAceRejected 'unapproved-mutable-sid-ace-rejected'
+
+  $ancestorTrustRoot = Join-Path $root 'ancestor-trust-root'
+  $ancestorTrustParent = Join-Path $ancestorTrustRoot 'trust-parent'
+  $ancestorTrustFile = Join-Path $ancestorTrustParent 'trust.json'
+  New-Item -ItemType Directory -Force -Path $ancestorTrustParent | Out-Null
+  [IO.File]::WriteAllText($ancestorTrustFile, 'trust', [Text.UTF8Encoding]::new($false))
+  foreach ($path in @($ancestorTrustRoot,$ancestorTrustParent,$ancestorTrustFile)) { Set-MIR42SealTestExactAcl -Path $path -OwnerSid $testAclSid }
+  $unapprovedSid = [Security.Principal.SecurityIdentifier]::new('S-1-5-21-777777777-666666666-555555555-444444444')
+  Assert-MIR42SealT16AclProtectedAncestors -ArtifactPath $ancestorTrustFile -ProtectedRootPath $ancestorTrustRoot -AclContract $testAclContract -Code 'mir42-seal-test-trust-parent-positive'
+  $trustParentAssessment = Get-MIR42SealAclAssessment -Path $ancestorTrustParent -Code 'mir42-seal-test-trust-parent'
+  $readOnlyAncestorAssessment = $trustParentAssessment | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20 -DateKind String
+  $readOnlyAncestorAssessment.rows = @($readOnlyAncestorAssessment.rows) + @([pscustomobject]@{sid='S-1-1-0';type='Allow';rights=[Security.AccessControl.FileSystemRights]::ReadAndExecute;inherited=$false})
+  $readOnlyAncestorAccepted = $true
+  try { Assert-MIR42SealT16AclAncestorAssessment -Assessment $readOnlyAncestorAssessment -AclContract $testAclContract -Code 'mir42-seal-test-read-only-parent' } catch { $readOnlyAncestorAccepted = $false }
+  Assert-MIR42SealTest $readOnlyAncestorAccepted 'read-only-parent-ace-allowed'
+  $trustParentAssessment.rows = @($trustParentAssessment.rows) + @([pscustomobject]@{sid=$unapprovedSid.Value;type='Allow';rights=[Security.AccessControl.FileSystemRights]::Modify;inherited=$false})
+  $unapprovedTrustParentRejected = $false
+  try { Assert-MIR42SealT16AclAncestorAssessment -Assessment $trustParentAssessment -AclContract $testAclContract -Code 'mir42-seal-test-trust-parent' } catch { $unapprovedTrustParentRejected = $_.Exception.Message -match 'mir42-seal-test-trust-parent-acl-ancestor-allow-sid' }
+  Assert-MIR42SealTest $unapprovedTrustParentRejected 'unapproved-trust-parent-mutation-ace-rejected'
+
+  $ancestorLedgerRoot = Join-Path $root 'ancestor-ledger-root'
+  $ancestorLedgerParent = Join-Path $ancestorLedgerRoot 'ledger-parent'
+  $ancestorLedgerDirectory = Join-Path $ancestorLedgerParent 'ledger'
+  New-Item -ItemType Directory -Force -Path $ancestorLedgerDirectory | Out-Null
+  foreach ($path in @($ancestorLedgerRoot,$ancestorLedgerParent,$ancestorLedgerDirectory)) { Set-MIR42SealTestExactAcl -Path $path -OwnerSid $testAclSid }
+  Assert-MIR42SealT16AclProtectedAncestors -ArtifactPath $ancestorLedgerDirectory -ProtectedRootPath $ancestorLedgerRoot -AclContract $testAclContract -Code 'mir42-seal-test-ledger-parent-positive'
+  $ledgerParentAssessment = Get-MIR42SealAclAssessment -Path $ancestorLedgerParent -Code 'mir42-seal-test-ledger-parent'
+  $ledgerParentAssessment.rows = @($ledgerParentAssessment.rows) + @([pscustomobject]@{sid=$unapprovedSid.Value;type='Allow';rights=[Security.AccessControl.FileSystemRights]::Modify;inherited=$false})
+  $unapprovedLedgerParentRejected = $false
+  try { Assert-MIR42SealT16AclAncestorAssessment -Assessment $ledgerParentAssessment -AclContract $testAclContract -Code 'mir42-seal-test-ledger-parent' } catch { $unapprovedLedgerParentRejected = $_.Exception.Message -match 'mir42-seal-test-ledger-parent-acl-ancestor-allow-sid' }
+  Assert-MIR42SealTest $unapprovedLedgerParentRejected 'unapproved-ledger-parent-mutation-ace-rejected'
 
   $forgedFreeze = [pscustomobject][ordered]@{
     schema=1;kind='MIR42SourceFreezeAuthorizationV1';status='MIR-4.2-SOURCE-FROZEN-AND-CANDIDATE-ALLOCATED'

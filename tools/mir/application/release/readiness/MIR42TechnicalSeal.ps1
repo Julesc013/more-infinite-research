@@ -238,8 +238,78 @@ function Assert-MIR42SealT16AclContractTree {
   Assert-MIR42SealT16AclContract -Path $Path -AclContract $AclContract -Code $Code
   if (Test-Path -LiteralPath $Path -PathType Container) {
     foreach ($item in @(Get-ChildItem -LiteralPath $Path -Force -Recurse -ErrorAction Stop)) {
+      if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "[$Code-reparse]" }
       Assert-MIR42SealT16AclContract -Path $item.FullName -AclContract $AclContract -Code $Code
     }
+  }
+}
+
+function Assert-MIR42SealT16AclAncestorAssessment {
+  param([Parameter(Mandatory)]$Assessment,[Parameter(Mandatory)]$AclContract,[Parameter(Mandatory)][string]$Code)
+  $record = $AclContract.record
+  $approvedOwner = [string]$record.owner_sid
+  $approvedMutators = @($record.mutation_sids | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  $broad = @($record.broad_principals_forbidden | ForEach-Object { [string]$_ })
+  $mutationRights = [Security.AccessControl.FileSystemRights]::WriteData -bor
+    [Security.AccessControl.FileSystemRights]::AppendData -bor
+    [Security.AccessControl.FileSystemRights]::WriteAttributes -bor
+    [Security.AccessControl.FileSystemRights]::WriteExtendedAttributes -bor
+    [Security.AccessControl.FileSystemRights]::Delete -bor
+    [Security.AccessControl.FileSystemRights]::DeleteSubdirectoriesAndFiles -bor
+    [Security.AccessControl.FileSystemRights]::ChangePermissions -bor
+    [Security.AccessControl.FileSystemRights]::TakeOwnership
+  if (-not [bool]$assessment.inheritance_protected) { throw "[$Code-acl-ancestor-inheritance]" }
+  if ([string]$assessment.owner_sid -cne $approvedOwner -or [string]$assessment.owner_sid -in $broad) { throw "[$Code-acl-ancestor-owner]" }
+  $actualMutationAllowSids = @(
+    $assessment.rows | Where-Object {
+      [string]$_.type -ceq 'Allow' -and
+      (([Security.AccessControl.FileSystemRights]$_.rights -band $mutationRights) -ne 0)
+    } | ForEach-Object { [string]$_.sid } | Sort-Object -Unique
+  )
+  if (($actualMutationAllowSids -join '|') -cne ($approvedMutators -join '|')) { throw "[$Code-acl-ancestor-allow-sid]" }
+  foreach ($row in @($assessment.rows)) {
+    if ([bool]$row.inherited -or [string]$row.type -notin @('Allow','Deny')) { throw "[$Code-acl-ancestor-row]" }
+    $hasMutationRight = (([Security.AccessControl.FileSystemRights]$row.rights -band $mutationRights) -ne 0)
+    if ([string]$row.type -ceq 'Allow' -and $hasMutationRight) {
+      if ([string]$row.sid -in $broad -or [string]$row.sid -notin $approvedMutators -or
+          (([Security.AccessControl.FileSystemRights]$row.rights -band ([Security.AccessControl.FileSystemRights]::Modify -bor [Security.AccessControl.FileSystemRights]::FullControl)) -eq 0)) {
+        throw "[$Code-acl-ancestor-mutation]"
+      }
+    }
+  }
+}
+
+function Assert-MIR42SealT16AclAncestorContract {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$AclContract,[Parameter(Mandatory)][string]$Code)
+  $assessment = Get-MIR42SealAclAssessment -Path $Path -Code $Code
+  Assert-MIR42SealT16AclAncestorAssessment -Assessment $assessment -AclContract $AclContract -Code $Code
+}
+
+function Assert-MIR42SealT16AclProtectedAncestors {
+  param(
+    [Parameter(Mandatory)][string]$ArtifactPath,
+    [Parameter(Mandatory)][string]$ProtectedRootPath,
+    [Parameter(Mandatory)]$AclContract,
+    [Parameter(Mandatory)][string]$Code
+  )
+  $artifact = [IO.Path]::GetFullPath($ArtifactPath)
+  $protectedRootFull = [IO.Path]::GetFullPath($ProtectedRootPath)
+  if ($protectedRootFull -ceq [IO.Path]::GetPathRoot($protectedRootFull)) { throw "[$Code-protected-root-path]" }
+  $protectedRoot = $protectedRootFull.TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar))
+  $relative = [IO.Path]::GetRelativePath($protectedRoot,$artifact)
+  if ([string]::IsNullOrWhiteSpace($relative) -or [IO.Path]::IsPathRooted($relative) -or $relative -eq '..' -or $relative.StartsWith('..' + [IO.Path]::DirectorySeparatorChar,[StringComparison]::Ordinal)) {
+    throw "[$Code-protected-root-containment]"
+  }
+  $cursor = Split-Path -Parent $artifact
+  while ($true) {
+    if ([string]::IsNullOrWhiteSpace($cursor)) { throw "[$Code-protected-root-containment]" }
+    $item = Get-Item -LiteralPath $cursor -Force -ErrorAction Stop
+    if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "[$Code-reparse]" }
+    Assert-MIR42SealT16AclAncestorContract -Path $cursor -AclContract $AclContract -Code $Code
+    if ($cursor -ceq $protectedRoot) { break }
+    $parent = Split-Path -Parent $cursor
+    if ([string]::IsNullOrEmpty($parent) -or $parent -ceq $cursor) { throw "[$Code-protected-root-containment]" }
+    $cursor = $parent
   }
 }
 
@@ -313,18 +383,23 @@ function Get-MIR42ExternalT16LedgerTrustRoot {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$T16TrustRootPath,
     [Parameter(Mandatory)][string]$OperatorTrustSourcePath,
+    [Parameter(Mandatory)][string]$ProtectedRootPath,
     [Parameter(Mandatory)]$AclContract,
     [Parameter(Mandatory)][string]$SshKeygenPath
   )
   if ([string]::IsNullOrWhiteSpace($T16TrustRootPath) -or [string]::IsNullOrWhiteSpace($OperatorTrustSourcePath) -or [string]::IsNullOrWhiteSpace($SshKeygenPath)) {
     throw '[mir42-seal-external-t16-trust-root-required]'
   }
+  $protectedRoot = Resolve-MIR42SealExternalProtectedDirectory -RepoRoot $RepoRoot -Path $ProtectedRootPath -Code 'mir42-seal-external-t16-protected-root'
+  Assert-MIR42SealT16AclContract -Path $protectedRoot -AclContract $AclContract -Code 'mir42-seal-external-t16-protected-root'
   $trustPath = Resolve-MIR42SealExternalProtectedFile -RepoRoot $RepoRoot -Path $T16TrustRootPath -Code 'mir42-seal-external-t16-trust-root'
   $operatorPath = Resolve-MIR42SealExternalProtectedFile -RepoRoot $RepoRoot -Path $OperatorTrustSourcePath -Code 'mir42-seal-external-operator-trust-source'
   $trust = Read-MIR42SealRecord -Path $trustPath -Code 'mir42-seal-external-t16-trust-root'
   $operator = Read-MIR42SealRecord -Path $operatorPath -Code 'mir42-seal-external-operator-trust-source'
   Assert-MIR42SealT16AclContract -Path $trust.path -AclContract $AclContract -Code 'mir42-seal-external-t16-trust-root'
   Assert-MIR42SealT16AclContract -Path $operator.path -AclContract $AclContract -Code 'mir42-seal-external-operator-trust-source'
+  Assert-MIR42SealT16AclProtectedAncestors -ArtifactPath $trust.path -ProtectedRootPath $protectedRoot -AclContract $AclContract -Code 'mir42-seal-external-t16-trust-root'
+  Assert-MIR42SealT16AclProtectedAncestors -ArtifactPath $operator.path -ProtectedRootPath $protectedRoot -AclContract $AclContract -Code 'mir42-seal-external-operator-trust-source'
   $record = $trust.record
   $operatorRecord = $operator.record
   Assert-MIR42SealPropertyNames -Value $operatorRecord -Expected @('schema','kind','status','operator','namespaces','record_sha256') -Code 'mir42-seal-external-operator-trust-source-shape'
@@ -360,6 +435,7 @@ function Get-MIR42ExternalT16LedgerTrustRoot {
   }
   $ledgerPath = Resolve-MIR42SealExternalProtectedDirectory -RepoRoot $RepoRoot -Path ([string]$record.ledger.repository_path) -Code 'mir42-seal-external-t16-ledger'
   Assert-MIR42SealT16AclContractTree -Path $ledgerPath -AclContract $AclContract -Code 'mir42-seal-external-t16-ledger'
+  Assert-MIR42SealT16AclProtectedAncestors -ArtifactPath $ledgerPath -ProtectedRootPath $protectedRoot -AclContract $AclContract -Code 'mir42-seal-external-t16-ledger'
   if ([string]$record.ledger.ref -notmatch '^refs/heads/release-ledger/mir4$' -or
       [string]$record.ledger.commit -notmatch '^[0-9a-f]{40}$' -or [string]$record.ledger.event_path -match '(^|[\\/])\.\.([\\/]|$)' -or
       [IO.Path]::IsPathRooted([string]$record.ledger.event_path) -or [string]$record.ledger.event_sha256 -cne [string]$trust.sha256) {
@@ -375,6 +451,7 @@ function Get-MIR42ExternalT16LedgerTrustRoot {
   Assert-MIR42SealAuthorizedLedgerCommitSignature -RepositoryPath $ledgerPath -Commit ([string]$record.ledger.commit) -AuthorizedSigner $record.authorized_signer -SshKeygenPath $SshKeygenPath
   $signaturePath = Resolve-MIR42SealExternalProtectedFile -RepoRoot $RepoRoot -Path ([string]$record.trust_signature.signature_path) -Code 'mir42-seal-external-t16-trust-signature'
   Assert-MIR42SealT16AclContract -Path $signaturePath -AclContract $AclContract -Code 'mir42-seal-external-t16-trust-signature'
+  Assert-MIR42SealT16AclProtectedAncestors -ArtifactPath $signaturePath -ProtectedRootPath $protectedRoot -AclContract $AclContract -Code 'mir42-seal-external-t16-trust-signature'
   if ((Get-FileHash -LiteralPath $signaturePath -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$record.trust_signature.signature_sha256) {
     throw '[mir42-seal-external-t16-trust-signature-hash]'
   }
@@ -398,7 +475,7 @@ function Get-MIR42ExternalT16LedgerTrustRoot {
   } finally {
     if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
   }
-  return [pscustomobject][ordered]@{path=$trust.path;sha256=$trust.sha256;record=$record;operator=$operator;acl_contract=$AclContract}
+  return [pscustomobject][ordered]@{path=$trust.path;sha256=$trust.sha256;record=$record;operator=$operator;protected_root=$protectedRoot;acl_contract=$AclContract}
 }
 
 function Get-MIR42ExactFourTargetCandidate {
@@ -1196,6 +1273,7 @@ function Get-MIR42FourTargetTechnicalSealReadiness {
     [string]$SigningCeremonyPath='',
     [string]$T16TrustRootPath='',
     [string]$OperatorTrustSourcePath='',
+    [string]$T16ProtectedRootPath='',
     [string]$T16ApprovedOwnerSid='',
     [string[]]$T16ApprovedMutationSids=@(),
     [string]$SourceFreezeAuthorityPath='',
@@ -1212,7 +1290,7 @@ function Get-MIR42FourTargetTechnicalSealReadiness {
   if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($RealEngineCampaignPath)) { try { $state.campaign = Get-MIR42RealEngineCandidateCampaign -RepoRoot $repo -Path $RealEngineCampaignPath -Candidate $state.candidate -Reconciliation $state.qualification; $checks.campaign = $true } catch { $checks.campaign = $false; $blockers.Add($_.Exception.Message) } } else { $checks.campaign = $false; $blockers.Add('[mir42-seal-real-engine-campaign-missing]') }
   if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($IndependentVerificationPath)) { try { $state.independent = Get-MIR42ExactIndependentVerificationReceipt -Path $IndependentVerificationPath -Candidate $state.candidate -Qualification $state.qualification; $checks.independent = $true } catch { $checks.independent = $false; $blockers.Add($_.Exception.Message) } } else { $checks.independent = $false; $blockers.Add('[mir42-seal-independent-missing]') }
   if (-not [string]::IsNullOrWhiteSpace($T16ApprovedOwnerSid) -and @($T16ApprovedMutationSids).Count -gt 0) { try { $state.t16_acl_contract = New-MIR42T16AclContract -ApprovedOwnerSid $T16ApprovedOwnerSid -ApprovedMutationSids $T16ApprovedMutationSids; $checks.t16_acl_contract = $true } catch { $checks.t16_acl_contract = $false; $blockers.Add($_.Exception.Message) } } else { $checks.t16_acl_contract = $false; $blockers.Add('[mir42-seal-t16-acl-contract-human-input-required]') }
-  if ($checks.t16_acl_contract -and -not [string]::IsNullOrWhiteSpace($T16TrustRootPath) -and -not [string]::IsNullOrWhiteSpace($OperatorTrustSourcePath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.t16_trust_root = Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $repo -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -AclContract $state.t16_acl_contract -SshKeygenPath $SshKeygenPath; $checks.t16_trust_root = $true } catch { $checks.t16_trust_root = $false; $blockers.Add($_.Exception.Message) } } else { $checks.t16_trust_root = $false; $blockers.Add('[mir42-seal-external-t16-trust-root-or-verifier-missing]') }
+  if ($checks.t16_acl_contract -and -not [string]::IsNullOrWhiteSpace($T16TrustRootPath) -and -not [string]::IsNullOrWhiteSpace($OperatorTrustSourcePath) -and -not [string]::IsNullOrWhiteSpace($T16ProtectedRootPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.t16_trust_root = Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $repo -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -ProtectedRootPath $T16ProtectedRootPath -AclContract $state.t16_acl_contract -SshKeygenPath $SshKeygenPath; $checks.t16_trust_root = $true } catch { $checks.t16_trust_root = $false; $blockers.Add($_.Exception.Message) } } else { $checks.t16_trust_root = $false; $blockers.Add('[mir42-seal-external-t16-trust-root-or-protected-root-or-verifier-missing]') }
   if ($checks.t16_trust_root -and -not [string]::IsNullOrWhiteSpace($SigningCeremonyPath)) { try { $state.signing = Get-MIR42ProtectedSigningCeremony -RepoRoot $repo -Path $SigningCeremonyPath -T16TrustRoot $state.t16_trust_root; $checks.signing = $true } catch { $checks.signing = $false; $blockers.Add($_.Exception.Message) } } else { $checks.signing = $false; $blockers.Add('[mir42-seal-signing-or-external-t16-trust-root-missing]') }
   if ($checks.candidate -and $checks.signing -and -not [string]::IsNullOrWhiteSpace($SourceFreezeAuthorityPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.freeze = Get-MIR42SourceFreezeAuthority -RepoRoot $repo -Path $SourceFreezeAuthorityPath -Candidate $state.candidate -Signing $state.signing -SshKeygenPath $SshKeygenPath; $checks.freeze = $true } catch { $checks.freeze = $false; $blockers.Add($_.Exception.Message) } } else { $checks.freeze = $false; $blockers.Add('[mir42-seal-freeze-authority-or-verifier-missing]') }
   if ($checks.qualification -and $checks.campaign -and $checks.independent -and $checks.freeze -and -not [string]::IsNullOrWhiteSpace($ReviewerAttestationPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.reviewer = Get-MIR42IndependentReviewerAttestation -RepoRoot $repo -Path $ReviewerAttestationPath -Independent $state.independent -Campaign $state.campaign -Freeze $state.freeze -SshKeygenPath $SshKeygenPath; $checks.reviewer = $true } catch { $checks.reviewer = $false; $blockers.Add($_.Exception.Message) } } else { $checks.reviewer = $false; $blockers.Add('[mir42-seal-independent-reviewer-attestation-missing]') }
@@ -1260,6 +1338,7 @@ function New-MIR42FourTargetTechnicalSeal {
     [AllowEmptyString()][string]$SigningCeremonyPath='',
     [AllowEmptyString()][string]$T16TrustRootPath='',
     [AllowEmptyString()][string]$OperatorTrustSourcePath='',
+    [AllowEmptyString()][string]$T16ProtectedRootPath='',
     [AllowEmptyString()][string]$T16ApprovedOwnerSid='',
     [AllowEmptyCollection()][string[]]$T16ApprovedMutationSids=@(),
     [AllowEmptyString()][string]$SourceFreezeAuthorityPath='',
@@ -1269,7 +1348,7 @@ function New-MIR42FourTargetTechnicalSeal {
   )
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
-    -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
+    -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
     -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-seal-not-authorized] $($readiness.blockers -join '; ')" }
   $state = $readiness._state
@@ -1283,6 +1362,7 @@ function New-MIR42FourTargetTechnicalSeal {
     real_engine_campaign = [ordered]@{sha256=[string]$state.campaign.sha256;record_sha256=[string]$state.campaign.record.record_sha256}
     independent_verification = [ordered]@{sha256=[string]$state.independent.sha256;record_sha256=[string]$state.independent.record.record_sha256}
     t16_acl_contract = [ordered]@{owner_sid=[string]$state.t16_acl_contract.record.owner_sid;mutation_sids=@($state.t16_acl_contract.record.mutation_sids);custodian_sid_set_sha256=[string]$state.t16_acl_contract.custodian_sid_set_sha256}
+    t16_protected_root = [string]$state.t16_trust_root.protected_root
     t16_ledger_trust_root = [ordered]@{path=[string]$state.t16_trust_root.path;sha256=[string]$state.t16_trust_root.sha256;record_sha256=[string]$state.t16_trust_root.record.record_sha256}
     signing_ceremony = [ordered]@{sha256=[string]$state.signing.sha256;record_sha256=[string]$state.signing.record.record_sha256}
     source_freeze_authority = [ordered]@{sha256=[string]$state.freeze.sha256;record_sha256=[string]$state.freeze.record.record_sha256}

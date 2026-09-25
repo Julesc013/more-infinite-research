@@ -275,6 +275,7 @@ function Assert-MIR42ExpectedTechnicalSeal {
     real_engine_campaign = [ordered]@{sha256=[string]$state.campaign.sha256;record_sha256=[string]$state.campaign.record.record_sha256}
     independent_verification = [ordered]@{sha256=[string]$state.independent.sha256;record_sha256=[string]$state.independent.record.record_sha256}
     t16_acl_contract = [ordered]@{owner_sid=[string]$state.t16_acl_contract.record.owner_sid;mutation_sids=@($state.t16_acl_contract.record.mutation_sids);custodian_sid_set_sha256=[string]$state.t16_acl_contract.custodian_sid_set_sha256}
+    t16_protected_root = [string]$state.t16_trust_root.protected_root
     t16_ledger_trust_root = [ordered]@{path=[string]$state.t16_trust_root.path;sha256=[string]$state.t16_trust_root.sha256;record_sha256=[string]$state.t16_trust_root.record.record_sha256}
     signing_ceremony = [ordered]@{sha256=[string]$state.signing.sha256;record_sha256=[string]$state.signing.record.record_sha256}
     source_freeze_authority = [ordered]@{sha256=[string]$state.freeze.sha256;record_sha256=[string]$state.freeze.record.record_sha256}
@@ -304,6 +305,7 @@ function Get-MIR42ProtectedMainPromotionPlan {
     [Parameter(Mandatory)][string]$SigningCeremonyPath,
     [AllowEmptyString()][string]$T16TrustRootPath='',
     [AllowEmptyString()][string]$OperatorTrustSourcePath='',
+    [AllowEmptyString()][string]$T16ProtectedRootPath='',
     [AllowEmptyString()][string]$T16ApprovedOwnerSid='',
     [AllowEmptyCollection()][string[]]$T16ApprovedMutationSids=@(),
     [Parameter(Mandatory)][string]$SourceFreezeAuthorityPath,
@@ -314,7 +316,7 @@ function Get-MIR42ProtectedMainPromotionPlan {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
-    -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
+    -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
     -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-promotion-verified-seal-inputs] $($readiness.blockers -join '; ')" }
   $candidate = $readiness._state.candidate
