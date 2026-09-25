@@ -444,7 +444,7 @@ $removedForces=@(
   [pscustomobject]@{name='foreign-disabled';level=4;enabled=$false;visible_when_disabled=$false},
   [pscustomobject]@{name='below-cap';level=2;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='event-probe';level=4;enabled=$true;visible_when_disabled=$false},
-  [pscustomobject]@{name='reset-probe';level=4;enabled=$false;visible_when_disabled=$true},
+  [pscustomobject]@{name='reset-probe';level=4;enabled=$true;visible_when_disabled=$true},
   [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$true},
   [pscustomobject]@{name='merge-destination';level=4;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='merge-reuse';level=4;enabled=$true;visible_when_disabled=$true}

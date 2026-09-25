@@ -162,10 +162,11 @@ local function expect_removed()
   expect("foreign-disabled", 4, false, false)
   expect("below-cap", 2, true, false)
   expect("event-probe", 4, true, false)
-  -- LuaForce.reset invalidates the old ownership record. The post-reset
-  -- foreign presentation must not be changed back to the pre-reset baseline
-  -- when the cap is later removed.
-  expect("reset-probe", 4, false, true)
+  -- LuaForce.reset invalidates the old ownership record. The next
+  -- configuration transition restores enablement from the prototype, while
+  -- the post-reset foreign presentation must not return to the pre-reset
+  -- visible=false baseline when the cap is removed.
+  expect("reset-probe", 4, true, true)
   -- This force was deliberately changed after its synchronous creation event,
   -- so MIR owns no restoration record for it. Factorio reapplies the prior
   -- data-stage presentation value during the next prototype transition; MIR
