@@ -149,6 +149,43 @@ foreach ($target in $targets) {
   $row = $selected[$target]
   $rowRoot = Join-Path $out $target
   New-Item -ItemType Directory -Force -Path $rowRoot | Out-Null
+  $freshLoads = @(
+    foreach ($scenario in $(if ($target -eq 'f210') { @('package-zip-base','package-zip-space-age') } else { @('package-zip-base') })) {
+      $freshRoot = Join-Path $rowRoot "fresh-$scenario"
+      New-Item -ItemType Directory -Force -Path $freshRoot | Out-Null
+      $summaryPath = Join-Path $freshRoot 'summary.json'
+      $freshStdout = Join-Path $freshRoot 'stdout.txt'
+      $freshStderr = Join-Path $freshRoot 'stderr.txt'
+      $freshArgs = @('-NoProfile','-File',(Join-Path $repo 'scripts/Invoke-MIRValidation.ps1'),
+        '-ScenarioWorker','-Scenario',$scenario,'-FactorioBin',$row.engine,
+        '-UserDataDir',(Join-Path $freshRoot 'work'),'-CandidateZip',$row.candidate,
+        '-MaxParallel','1','-ValidationSummaryPath',$summaryPath)
+      $null = Invoke-MIR42BoundedUpgrade -PowerShell $pwsh -Arguments $freshArgs -StdoutPath $freshStdout -StderrPath $freshStderr -DeadlineSeconds $RowDeadlineSeconds
+      $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json -Depth 100 -DateKind String
+      $candidateRow = @($manifest.targets | Where-Object { [string]$_.target -ceq $target })[0]
+      if ([string]$summary.status -cne 'passed' -or [string]$summary.git_commit -cne $head -or
+          [string]$summary.validation_package_sha256 -cne [string]$candidateRow.asset.sha256 -or
+          [string]$summary.validation_package_content_sha256 -cne [string]$candidateRow.content_sha256 -or
+          @($summary.expected_scenarios).Count -ne 1 -or [string]$summary.expected_scenarios[0] -cne $scenario -or
+          @($summary.scenarios).Count -ne 1 -or [string]$summary.scenarios[0].status -cne 'passed') {
+        throw "[mir42-$target-$scenario-fresh-summary-binding]"
+      }
+      $logPath = Assert-MIR42EngineRunFile -Path (Join-Path $freshRoot 'work/factorio-current.log') -Label "mir42-$target-$scenario-fresh-log"
+      $logText = Get-Content -Raw -LiteralPath $logPath
+      if (-not $logText.Contains("Loading mod more-infinite-research $($row.to)") -or
+          -not $logText.Contains('Factorio initialised') -or -not $logText.Contains('Creating new map')) {
+        throw "[mir42-$target-$scenario-fresh-log-content]"
+      }
+      $processTotal++
+      [pscustomobject][ordered]@{
+        scenario=$scenario
+        receipt=[pscustomobject][ordered]@{path=$summaryPath;sha256=(Get-MIR42EngineRunSha -Path $summaryPath)}
+        log=[pscustomobject][ordered]@{path=$logPath;sha256=(Get-MIR42EngineRunSha -Path $logPath)}
+        stdout=[pscustomobject][ordered]@{path=$freshStdout;sha256=(Get-MIR42EngineRunSha -Path $freshStdout)}
+        stderr=[pscustomobject][ordered]@{path=$freshStderr;sha256=(Get-MIR42EngineRunSha -Path $freshStderr)}
+      }
+    }
+  )
   $receiptPath = Join-Path $rowRoot 'upgrade.json'
   $stdoutPath = Join-Path $rowRoot 'harness-stdout.txt'
   $stderrPath = Join-Path $rowRoot 'harness-stderr.txt'
@@ -187,6 +224,7 @@ foreach ($target in $targets) {
     engine_execution=[pscustomobject][ordered]@{
       executable_path=$row.engine;executable_sha256=$row.engine_sha256;version=$row.engine_version
       predecessor=[pscustomobject][ordered]@{path=$row.predecessor;sha256=$row.predecessor_sha256;version=$row.from}
+      fresh_loads=$freshLoads
       harness_receipt=[pscustomobject][ordered]@{path=$receiptPath;sha256=(Get-MIR42EngineRunSha -Path $receiptPath)}
       harness_exit_code=$exitCode;logs=$logs;fresh_exact_load=$true;predecessor_upgrade=$true;reload_count=2
     }
