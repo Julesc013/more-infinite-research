@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir42-four-target-technical-readiness-v1.schema.json",
+  "title": "MIR 4.2 four-target technical readiness V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "candidate_manifest", "source", "governance_context", "target_qualification", "blockers", "transition_gate", "release_transition_authorized", "production_authorized", "publication_authorized", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR42FourTargetTechnicalReadinessV1"},
+    "status": {"const": "MIR-4.2-FOUR-TARGET-TECHNICAL-READINESS-NOT-READY"},
+    "candidate_manifest": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": "candidate-manifest.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "source": {"$ref": "#/$defs/source"},
+    "governance_context": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "status", "transition_gate"], "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "status": {"const": "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED"}, "transition_gate": {"$ref": "#/$defs/governanceGate"}}},
+    "target_qualification": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["target", "distribution_version", "status"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000)$"}, "status": {"const": "not-run"}}}},
+    "blockers": {"type": "array", "minItems": 8, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "transition_gate": {"$ref": "#/$defs/readinessGate"},
+    "release_transition_authorized": {"const": false},
+    "production_authorized": {"const": false},
+    "publication_authorized": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "source": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "package_source_sha256", "package_authority_record_sha256"], "properties": {"commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"}, "tree": {"type": "string", "pattern": "^[a-f0-9]{40}$"}, "package_source_sha256": {"$ref": "#/$defs/sha256"}, "package_authority_record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "governanceGate": {"type": "object", "additionalProperties": false, "required": ["source_freeze", "candidate_allocation", "production_signing", "promotion_to_main", "tagging", "publication"], "properties": {"source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "promotion_to_main": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}},
+    "readinessGate": {"type": "object", "additionalProperties": false, "required": ["source_freeze", "candidate_allocation", "production_signing", "technical_seal", "promotion_to_main", "human_go", "tagging", "publication"], "properties": {"source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "technical_seal": {"const": false}, "promotion_to_main": {"const": false}, "human_go": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}}
+  }
+}
