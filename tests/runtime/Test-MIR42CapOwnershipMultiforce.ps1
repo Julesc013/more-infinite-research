@@ -392,7 +392,7 @@ Assert-MIR42Data $policyBlockedData '3'
 $policyBlockedState=Read-MIR42State $policyBlockedText 'policy-blocked'
 $policyBlockerRecords=[regex]::Matches($policyBlockedText,'\[late-mir42-policy-binding-blocker\] DATA technology=recipe-prod-research_copper-1 prototype=infinite cap-pre=3 cap-post=4 artifact-identity=stale')
 Assert-MIR42 ($policyBlockerRecords.Count -eq 1) "expected exactly one late policy blocker data receipt; observed $($policyBlockerRecords.Count)."
-$policyConflicts=[regex]::Matches($policyBlockedText,'\[more-infinite-research\] Maximum-level conflict technology=recipe-prod-research_copper-1 selected=3 final-observed=4294967295 binding-operation=emit source=generated-stream reason=maximum_level_policy_fingerprint_invalid setting=ips-max-level-research_copper; runtime queue normalization was refused[.]')
+$policyConflicts=[regex]::Matches($policyBlockedText,'\[more-infinite-research\] Maximum-level conflict technology=recipe-prod-research_copper-1 selected=4 final-observed=4294967295 binding-operation=emit source=generated-stream reason=maximum_level_policy_fingerprint_invalid setting=ips-max-level-research_copper; runtime queue normalization was refused[.]')
 Assert-MIR42 ($policyConflicts.Count -eq 1) "expected exactly one Copper invalid-policy refusal; observed $($policyConflicts.Count)."
 
 $blockedSave=Join-Path $blockedStage.userdata 'saves/mir42-cap-ownership-multiforce-blocked.zip'
@@ -534,7 +534,7 @@ $result=[ordered]@{
   )
   v3_observations=[ordered]@{seed=$seedData;capped=$cappedData;policy_blocked=$policyBlockedData;blocked=$blockedData;removal=$removalData;terminal=$terminalData}
   named_force_state_receipts=[ordered]@{seed=$seedState;capped=$cappedState;event_probe=$eventProbeState;policy_blocked=$policyBlockedState;blocked=$blockedState;removal=$removalState;terminal=$terminalState}
-  policy_conflict=[ordered]@{technology=$technologyName;selected_cap=3;runtime_prototype_max_level=4294967295;reason='maximum_level_policy_fingerprint_invalid';count=$policyConflicts.Count}
+  policy_conflict=[ordered]@{technology=$technologyName;configured_cap=3;forged_policy_cap=4;runtime_reported_selected_cap=4;runtime_prototype_max_level=4294967295;reason='maximum_level_policy_fingerprint_invalid';count=$policyConflicts.Count}
   late_conflict=[ordered]@{technology=$technologyName;selected_cap=3;late_observed_prototype_max_level=5;reason='maximum_level_late_prototype_mutation';count=$lateConflicts.Count}
   save_lineage=$lineage
   logs=[ordered]@{
