@@ -66,6 +66,51 @@ try {
   $mislabelledRejected = $false
   try { Get-MIR42ExactQualificationReceipt -Path $mislabelledQualificationPath -Candidate $readiness._state.candidate | Out-Null } catch { $mislabelledRejected = $_.Exception.Message -match 'mir42-seal-evidence-reconciliation-state' }
   Assert-MIR42SealTest $mislabelledRejected 'mislabelled-reconciliation-cannot-be-release-qualification'
+  $absoluteRoot = [IO.Path]::GetFullPath($root)
+  $fakeRunnerPath = Join-Path $absoluteRoot 'fake-engine-runner.ps1'
+  [IO.File]::WriteAllText($fakeRunnerPath, 'Invoke-MIR42FourTargetEngineRun', [Text.UTF8Encoding]::new($false))
+  $fakeReconciliation = [pscustomobject]@{sha256=('A' * 64);record=[pscustomobject]@{record_sha256=('B' * 64)}}
+  $fakeCampaignTargets = @($readiness._state.candidate.targets | ForEach-Object {
+    [pscustomobject][ordered]@{
+      target=[string]$_.target;distribution_version=[string]$_.distribution_version
+      archive=[pscustomobject]@{sha256=[string]$_.archive_sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count};status='passed'
+      engine_execution=[pscustomobject]@{
+        executable_path=(Join-Path $absoluteRoot 'missing-factorio.exe');executable_sha256=('C' * 64);version='1.0.0.0'
+        predecessor=[pscustomobject]@{path=(Join-Path $absoluteRoot 'missing-predecessor.zip');sha256=('D' * 64);version='4.0.0.0'}
+        harness_receipt=[pscustomobject]@{path=(Join-Path $absoluteRoot 'missing-upgrade.json');sha256=('E' * 64)};harness_exit_code=0
+        logs=@([pscustomobject]@{phase='create';path=(Join-Path $absoluteRoot 'missing-create.txt');sha256=('F' * 64)},[pscustomobject]@{phase='load';path=(Join-Path $absoluteRoot 'missing-load.txt');sha256=('F' * 64)},[pscustomobject]@{phase='reload';path=(Join-Path $absoluteRoot 'missing-reload.txt');sha256=('F' * 64)},[pscustomobject]@{phase='second-reload';path=(Join-Path $absoluteRoot 'missing-second-reload.txt');sha256=('F' * 64)})
+        fresh_loads=@();fresh_exact_load=$true;predecessor_upgrade=$true;reload_count=2
+      }
+    }
+  })
+  $fakeHarnessPath = Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'
+  $fakeEngineRun = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42FourTargetEngineRunV1';status='four-target-base-default-real-engine-probes-passed-private-unqualified'
+    source=$readiness._state.candidate.source
+    candidate_manifest=[pscustomobject]@{path=[IO.Path]::GetFullPath($manifestPath);sha256=(Get-FileHash $manifestPath -Algorithm SHA256).Hash.ToUpperInvariant();record_sha256=$manifest.record_sha256}
+    runner=[pscustomobject]@{path=$fakeRunnerPath;sha256=(Get-FileHash $fakeRunnerPath -Algorithm SHA256).Hash.ToUpperInvariant()}
+    harness=[pscustomobject]@{path=[IO.Path]::GetFullPath($fakeHarnessPath);sha256=(Get-FileHash $fakeHarnessPath -Algorithm SHA256).Hash.ToUpperInvariant()}
+    targets=@($fakeCampaignTargets | ForEach-Object {
+      $campaignTarget = $_
+      $candidateTarget = @($readiness._state.candidate.targets | Where-Object { [string]$_.target -ceq [string]$campaignTarget.target })[0]
+      [pscustomobject][ordered]@{target=[string]$campaignTarget.target;status=[string]$campaignTarget.status;archive=[pscustomobject]@{path=[string]$candidateTarget.archive_path;sha256=[string]$campaignTarget.archive.sha256};engine_execution=$campaignTarget.engine_execution}
+    });factorio_processes=9;release_qualification='not-performed';publication_authorized=$false;record_sha256=''
+  }
+  $fakeEngineRun.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $fakeEngineRun
+  $fakeEngineRunPath = Join-Path $root 'syntactically-valid-fake-engine-run.json'
+  Write-MIR4BootstrapRecord -Record $fakeEngineRun -Path $fakeEngineRunPath | Out-Null
+  $fakeCampaign = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42FourTargetRealEngineCandidateCampaignV1';status='MIR-4.2-FOUR-TARGET-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED';source=$readiness._state.candidate.source
+    candidate_manifest=[pscustomobject]@{sha256=$readiness._state.candidate.identity.sha256;record_sha256=$readiness._state.candidate.identity.record.record_sha256}
+    evidence_reconciliation=[pscustomobject]@{sha256=$fakeReconciliation.sha256;record_sha256=$fakeReconciliation.record.record_sha256};engine_run=[pscustomobject]@{path=[IO.Path]::GetFullPath($fakeEngineRunPath);sha256=(Get-FileHash $fakeEngineRunPath -Algorithm SHA256).Hash.ToUpperInvariant();record_sha256=$fakeEngineRun.record_sha256};runner=[pscustomobject]@{path=$fakeRunnerPath;sha256=(Get-FileHash $fakeRunnerPath -Algorithm SHA256).Hash.ToUpperInvariant()}
+    targets=$fakeCampaignTargets;factorio_processes=4;release_qualification='passed';release_acceptance=@();technical_seal='not-performed';publication_authorized=$false;record_sha256=''
+  }
+  $fakeCampaign.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $fakeCampaign
+  $fakeCampaignPath = Join-Path $root 'syntactically-valid-fake-campaign.json'
+  Write-MIR4BootstrapRecord -Record $fakeCampaign -Path $fakeCampaignPath | Out-Null
+  $fakeCampaignRejected = $false
+  try { Get-MIR42RealEngineCandidateCampaign -RepoRoot $RepoRoot -Path $fakeCampaignPath -Candidate $readiness._state.candidate -Reconciliation $fakeReconciliation | Out-Null } catch { $fakeCampaignRejected = $_.Exception.Message -match 'mir42-seal-real-engine-executable-missing'; if (-not $fakeCampaignRejected) { throw $_ } }
+  Assert-MIR42SealTest $fakeCampaignRejected 'synthetic-engine-campaign-rejected'
   $preparation = Join-Path $RepoRoot '.mir/releases/governance/mir4/signing-ceremony-preparation.json'
   $preparedOnly = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath -SigningCeremonyPath $preparation
   Assert-MIR42SealTest (-not [bool]$preparedOnly.checks.signing -and -not [bool]$preparedOnly.technical_seal_authorized) 'preparation-is-not-approved-signer-and-recovery'
@@ -84,7 +129,7 @@ try {
   $sealPath = Join-Path $root 'technical-seal.json'
   Write-MIR4BootstrapRecord -Record $seal -Path $sealPath | Out-Null
   $promotionRejected = $false
-  try { Get-MIR42ProtectedMainPromotionPlan -RepoRoot $RepoRoot -TechnicalSealPath $sealPath -CandidateManifestPath $manifestPath -QualificationPath (Join-Path $root 'missing-qualification.json') -RealEngineCampaignPath (Join-Path $root 'missing-real-engine.json') -IndependentVerificationPath (Join-Path $root 'missing-independent.json') -SigningCeremonyPath (Join-Path $root 'missing-signing.json') -SourceFreezeAuthorityPath (Join-Path $root 'missing-freeze.json') -ReviewerAttestationPath (Join-Path $root 'missing-reviewer.json') -SshKeygenPath 'C:\Windows\System32\OpenSSH\ssh-keygen.exe' | Out-Null } catch { $promotionRejected = $_.Exception.Message -match 'mir42-promotion-verified-seal-inputs' }
+  try { Get-MIR42ProtectedMainPromotionPlan -RepoRoot $RepoRoot -TechnicalSealPath $sealPath -CandidateManifestPath $manifestPath -QualificationPath (Join-Path $root 'missing-qualification.json') -RealEngineCampaignPath (Join-Path $root 'missing-real-engine.json') -IndependentVerificationPath (Join-Path $root 'missing-independent.json') -SigningCeremonyPath (Join-Path $root 'missing-signing.json') -SourceFreezeAuthorityPath (Join-Path $root 'missing-freeze.json') -ReviewerAttestationPath (Join-Path $root 'missing-reviewer.json') -SshKeygenPath 'C:\Windows\System32\OpenSSH\ssh-keygen.exe' -OfflineRestoreDrillPath (Join-Path $root 'missing-restore-drill.json') | Out-Null } catch { $promotionRejected = $_.Exception.Message -match 'mir42-promotion-verified-seal-inputs' }
   Assert-MIR42SealTest $promotionRejected 'handwritten-seal-cannot-bypass-verified-inputs'
   $promotionText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
   Assert-MIR42SealTest ($promotionText -match 'refs/heads/main' -and $promotionText -match 'refs/heads/dev' -and $promotionText -match 'candidateRef' -and $promotionText -notmatch 'push origin|--force') 'protected-pr-remote-readback-no-push'
@@ -132,6 +177,7 @@ try {
     source=$readiness._state.candidate.source;candidate_manifest=[pscustomobject]@{sha256=$readiness._state.candidate.identity.sha256;record_sha256=$readiness._state.candidate.identity.record.record_sha256}
     frozen_dev=[pscustomobject]@{ref='refs/heads/dev';commit=$readiness._state.candidate.source.commit;tree=$readiness._state.candidate.source.tree}
     promotion_base=[pscustomobject]@{remote='origin';ref='refs/heads/main';commit=('E' * 40)}
+    programme=[pscustomobject]@{path='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json';sha256=('F' * 64);t19_state='completed';t20_state='completed'}
     signing_ceremony=[pscustomobject]@{sha256=('C' * 64);record_sha256=('D' * 64)}
     transition_gate=[pscustomobject]@{source_freeze=$true;candidate_allocation=$true;production_signing=$true;technical_seal=$false}
     independent_reviewer=[pscustomobject]@{identity='independent-reviewer';public_key='ssh-ed25519 AAAA reviewer';fingerprint='SHA256:reviewer'}
