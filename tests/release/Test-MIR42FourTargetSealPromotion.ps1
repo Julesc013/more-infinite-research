@@ -89,6 +89,7 @@ try {
     source=$readiness._state.candidate.source
     candidate_manifest=[pscustomobject]@{path=[IO.Path]::GetFullPath($manifestPath);sha256=(Get-FileHash $manifestPath -Algorithm SHA256).Hash.ToUpperInvariant();record_sha256=$manifest.record_sha256}
     predecessor_authority=[pscustomobject]@{path=(Join-Path $absoluteRoot 'missing-predecessor-authority.json');sha256=('A' * 64);record_sha256=('B' * 64)}
+    public_v410_checksum_asset=[pscustomobject]@{release_id=1;asset_id=1;digest=('sha256:' + ('A' * 64).ToLowerInvariant());bytes=412;download_verified=$true}
     runner=[pscustomobject]@{path=$fakeRunnerPath;sha256=(Get-FileHash $fakeRunnerPath -Algorithm SHA256).Hash.ToUpperInvariant()}
     harness=[pscustomobject]@{path=[IO.Path]::GetFullPath($fakeHarnessPath);sha256=(Get-FileHash $fakeHarnessPath -Algorithm SHA256).Hash.ToUpperInvariant()}
     targets=@($fakeCampaignTargets | ForEach-Object {
@@ -112,6 +113,19 @@ try {
   $fakeCampaignRejected = $false
   try { Get-MIR42RealEngineCandidateCampaign -RepoRoot $RepoRoot -Path $fakeCampaignPath -Candidate $readiness._state.candidate -Reconciliation $fakeReconciliation | Out-Null } catch { $fakeCampaignRejected = $_.Exception.Message -match 'mir42-seal-real-engine-executable-missing'; if (-not $fakeCampaignRejected) { throw $_ } }
   Assert-MIR42SealTest $fakeCampaignRejected 'synthetic-engine-campaign-rejected'
+  $legacyPredecessorAuthority = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42DirectPredecessorInputsV1';status='verified-published-v410-checksum-and-local-custody-private'
+    public_v410_checksums=[pscustomobject]@{tag='v4.1.0';tag_object=('A' * 40);tagged_commit=('B' * 40);path='.mir/releases/waves/mir4-r0/MIR42-v410-SHA256SUMS.txt';sha256=('C' * 64);verified_tag_fingerprint='SHA256:legacy'}
+    targets=@();release_transition_authority=$false;publication_authorized=$false;record_sha256=''
+  }
+  $legacyPredecessorAuthority.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $legacyPredecessorAuthority
+  $legacyPredecessorAuthorityPath = Join-Path $root 'legacy-predecessor-authority.json'
+  Write-MIR4BootstrapRecord -Record $legacyPredecessorAuthority -Path $legacyPredecessorAuthorityPath | Out-Null
+  $legacyPredecessorRejected = $false
+  try {
+    Get-MIR42DirectPredecessorAuthority -RepoRoot $RepoRoot -Reference ([pscustomobject]@{path=[IO.Path]::GetFullPath($legacyPredecessorAuthorityPath);sha256=(Get-FileHash $legacyPredecessorAuthorityPath -Algorithm SHA256).Hash.ToUpperInvariant();record_sha256=$legacyPredecessorAuthority.record_sha256}) | Out-Null
+  } catch { $legacyPredecessorRejected = $_.Exception.Message -match 'mir42-seal-predecessor-checksums-shape'; if (-not $legacyPredecessorRejected) { throw $_ } }
+  Assert-MIR42SealTest $legacyPredecessorRejected 'predecessor-authority-without-live-release-asset-rejected'
   $preparation = Join-Path $RepoRoot '.mir/releases/governance/mir4/signing-ceremony-preparation.json'
   $preparedOnly = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath -SigningCeremonyPath $preparation
   Assert-MIR42SealTest (-not [bool]$preparedOnly.checks.signing -and -not [bool]$preparedOnly.technical_seal_authorized) 'preparation-is-not-approved-signer-and-recovery'
@@ -132,8 +146,21 @@ try {
   $promotionRejected = $false
   try { Get-MIR42ProtectedMainPromotionPlan -RepoRoot $RepoRoot -TechnicalSealPath $sealPath -CandidateManifestPath $manifestPath -QualificationPath (Join-Path $root 'missing-qualification.json') -RealEngineCampaignPath (Join-Path $root 'missing-real-engine.json') -IndependentVerificationPath (Join-Path $root 'missing-independent.json') -SigningCeremonyPath (Join-Path $root 'missing-signing.json') -SourceFreezeAuthorityPath (Join-Path $root 'missing-freeze.json') -ReviewerAttestationPath (Join-Path $root 'missing-reviewer.json') -SshKeygenPath 'C:\Windows\System32\OpenSSH\ssh-keygen.exe' -OfflineRestoreDrillPath (Join-Path $root 'missing-restore-drill.json') | Out-Null } catch { $promotionRejected = $_.Exception.Message -match 'mir42-promotion-verified-seal-inputs' }
   Assert-MIR42SealTest $promotionRejected 'handwritten-seal-cannot-bypass-verified-inputs'
+  $forgedRestore = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42FourTargetOfflineRestoreDrillV1';status='MIR-4.2-FOUR-TARGET-OFFLINE-RESTORE-DRILL-PASSED-PRIVATE-UNSEALED'
+    source=$readiness._state.candidate.source;candidate_manifest=[pscustomobject]@{};technical_seal=[pscustomobject]@{}
+    capsule=[pscustomobject]@{};restored_inventory=@();targets=@();clean_untracked_root=$true;publication_authorized=$false;record_sha256=''
+  }
+  $forgedRestore.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedRestore
+  $forgedRestorePath = Join-Path $root 'forged-selfhashed-offline-restore.json'
+  Write-MIR4BootstrapRecord -Record $forgedRestore -Path $forgedRestorePath | Out-Null
+  $forgedRestoreRejected = $false
+  try {
+    Get-MIR42GovernedOfflineRestoreDrill -RepoRoot $RepoRoot -Path $forgedRestorePath -Candidate $readiness._state.candidate -Seal (Read-MIR42SealRecord -Path $sealPath -Code 'test-seal') -Signing ([pscustomobject]@{sha256=('A' * 64);record=[pscustomobject]@{record_sha256=('B' * 64)}}) -SshKeygenPath 'C:\Windows\System32\OpenSSH\ssh-keygen.exe' | Out-Null
+  } catch { $forgedRestoreRejected = $_.Exception.Message -match 'mir42-promotion-governed-restore-shape'; if (-not $forgedRestoreRejected) { throw $_ } }
+  Assert-MIR42SealTest $forgedRestoreRejected 'selfhashed-same-session-offline-restore-rejected'
   $promotionText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
-  Assert-MIR42SealTest ($promotionText -match 'refs/heads/main' -and $promotionText -match 'refs/heads/dev' -and $promotionText -match 'candidateRef' -and $promotionText -notmatch 'push origin|--force') 'protected-pr-remote-readback-no-push'
+  Assert-MIR42SealTest ($promotionText -match 'refs/heads/main' -and $promotionText -match 'refs/heads/dev' -and $promotionText -match 'candidateRef' -and $promotionText -match 'MIR42FourTargetGovernedOfflineRestoreDrillV1' -and $promotionText -notmatch 'MIR42FourTargetOfflineRestoreDrillV1|push origin|--force') 'protected-pr-remote-readback-no-push'
 
   $sourceDrift = $manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
   $sourceDrift.source.tree = '0' * 40
