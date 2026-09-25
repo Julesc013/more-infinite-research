@@ -367,6 +367,9 @@ $record = [ordered]@{
   publication_authorized=$false
 }
 $recordPath = Join-Path $out 'engine-run.json'
-$null = Write-MIR4BootstrapRecord -Record $record -Path $recordPath
+$normalizedRecord = ConvertTo-MIR4BootstrapCanonicalJson -Value $record | ConvertFrom-Json -Depth 100 -DateKind String
+$null = Write-MIR4BootstrapRecord -Record $normalizedRecord -Path $recordPath
+$writtenRecord = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100 -DateKind String
+if (-not (Test-MIR4BootstrapRecordHash -Record $writtenRecord)) { throw '[mir42-engine-run-record-self-hash]' }
 foreach ($lock in $candidateLocks) { $lock.Dispose() }
 Write-Host "[ok] private four-target engine run: $recordPath"
