@@ -428,20 +428,27 @@ $publishedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\rel
 $terminalRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.9.json") | ConvertFrom-Json
 $currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.11.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
-$mir4Authority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\execution\mir4-4.1-development-context-v1.json") | ConvertFrom-Json
+$mir41Authority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\execution\mir4-4.1-development-context-v1.json") | ConvertFrom-Json
+$mir42Authority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\execution\mir4-4.2-development-context-v1.json") | ConvertFrom-Json
 $mir4Targets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-Target-RegistryV5.json") | ConvertFrom-Json
 $mir4F210 = @($mir4Targets.payload.targets | Where-Object id -eq 'factorio-2.1')
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
 if ($currentReleaseBoundary -ne 'publicly-verified|C35' -or [string]$currentRelease.candidate_floor -ne 'C35' -or
     [string]$currentProfile.execution_context_mode -ne 'development-context' -or
-    [string]$currentProfile.execution_context -ne 'spec/execution/mir4-4.1-development-context-v1.json' -or
-    [string]$mir4Authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
-    [string]$mir4Authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or $mir4F210.Count -ne 1 -or
+    [string]$currentProfile.execution_context -ne 'spec/execution/mir4-4.2-development-context-v1.json' -or
+    [string]$mir41Authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
+    [string]$mir41Authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or
+    [string]$mir42Authority.kind -ne 'MIR4DevelopmentExecutionContextV2' -or
+    [string]$mir42Authority.status -ne 'active-private-mir4.2-verification-plan-no-release-authority' -or
+    @($mir42Authority.targets).Count -ne 2 -or @($mir42Authority.targets) -notcontains 'f210' -or @($mir42Authority.targets) -notcontains 'f200' -or
+    [bool]$mir42Authority.transition_gate.source_freeze -or [bool]$mir42Authority.transition_gate.version_allocation -or
+    [bool]$mir42Authority.transition_gate.tagging -or [bool]$mir42Authority.transition_gate.signing -or
+    [bool]$mir42Authority.transition_gate.sealing -or [bool]$mir42Authority.transition_gate.publication -or $mir4F210.Count -ne 1 -or
     [string]$mir4F210[0].mir3_predecessor -ne [string]$currentProfile.upgrade.from_version -or
     [string]$currentProfile.upgrade.from_version -ne '3.2.11' -or
     [string]$currentProfile.upgrade.to_version -ne '4.0.21000' -or
     [string]$currentProfile.upgrade.fixture -ne 'assert-upgrade-3-2-11-to-4-0-21000') {
-  throw "Factorio 2.1 assurance profile must bind the exact development execution context and 3.2.11 to MIR 4 transition fixture."
+  throw "Factorio 2.1 assurance profile must bind the exact private MIR 4.2 development context, preserve the MIR 4.1 boundary, and retain the 3.2.11 to MIR 4 transition fixture."
 }
 if ([string]$terminalRelease.state -ne "publicly-verified" -or
     [string]$terminalRelease.candidate_id -ne "C33" -or

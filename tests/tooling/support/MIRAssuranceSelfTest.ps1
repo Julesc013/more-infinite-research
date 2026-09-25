@@ -93,7 +93,10 @@ function Invoke-MIRAssuranceSelfTest {
   if ([string]$activeApprovedDeltaFingerprint.state -eq "pending") {
     $developmentContext = [string]$activeApprovedDeltaFingerprint.authority_class -ceq 'development-context-no-release-authority'
     $validBoundary = if ($developmentContext) {
-      [string]$activeApprovedDeltaFingerprint.release_state -ceq 'active-private-mir4.1-qualification-no-release-authority'
+      [string]$activeApprovedDeltaFingerprint.release_state -in @(
+        'active-private-mir4.1-qualification-no-release-authority',
+        'active-private-mir4.2-verification-plan-no-release-authority'
+      )
     } else {
       [string]$activeApprovedDeltaFingerprint.release_state -in @("planned", "source-frozen", "package-built", "authorized-in-progress")
     }
