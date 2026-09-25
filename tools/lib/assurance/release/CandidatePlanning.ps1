@@ -205,10 +205,8 @@ function Get-MIRAssuranceDevelopmentPlanningAuthority {
   if ([string]$Context.verification_profile.execution_context_mode -ne 'development-context') {
     return $null
   }
-  $authorityRelative = ([string]$Context.verification_profile.execution_context).Replace('\', '/')
-  if ($authorityRelative -cne 'spec/execution/mir4-4.1-development-context-v1.json') {
-    throw "Development planning execution context path is unsafe: $authorityRelative"
-  }
+  $contextSpecification = Get-MIRAssuranceDevelopmentExecutionContextSpecification -ContextPath ([string]$Context.verification_profile.execution_context)
+  $authorityRelative = [string]$contextSpecification.relative_path
   $authorityPath = Join-Path $repo $authorityRelative
   $registryRelative = 'targets/registry.json'
   $registryPath = Join-Path $repo $registryRelative
@@ -221,26 +219,13 @@ function Get-MIRAssuranceDevelopmentPlanningAuthority {
   $targetRows = @($registry.targets | Where-Object { [string]$_.factorio_line -eq [string]$Context.target })
   if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
       -not (Test-MIR4BootstrapRecordHash -Record $registry) -or
-      [string]$authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
-      [string]$authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or
-      @($authority.allowed) -notcontains 'repository-development' -or
-      @($authority.allowed) -notcontains 'private-candidate-qualification' -or
-      @($authority.forbidden) -notcontains 'public-release-authority' -or
-      @($authority.forbidden) -notcontains 'production-signing' -or
-      @($authority.forbidden) -notcontains 'tagging' -or
-      @($authority.forbidden) -notcontains 'publication' -or
-      [bool]$authority.transition_gate.source_freeze -or
-      [bool]$authority.transition_gate.version_allocation -or
-      [bool]$authority.transition_gate.tagging -or
-      [bool]$authority.transition_gate.signing -or
-      [bool]$authority.transition_gate.sealing -or
-      [bool]$authority.transition_gate.publication -or
+      -not (Test-MIRAssuranceDevelopmentExecutionContextBoundary -Authority $authority -Specification $contextSpecification) -or
       [string]$registry.kind -ne 'MIR4TargetRegistryV2' -or
       $targetRows.Count -ne 1) {
     throw 'Development planning execution context boundary is invalid.'
   }
   $targetRow = $targetRows[0]
-  if (@($authority.targets) -notcontains [string]$targetRow.target -or
+  if (@($contextSpecification.targets) -notcontains [string]$targetRow.target -or
       [string]$Context.info.version -notmatch '^4[.][0-9]{1,5}[.][0-9]{5}$') {
     throw 'Development planning target or distribution identity is invalid.'
   }
@@ -264,6 +249,17 @@ function Get-MIRAssuranceDevelopmentPlanningAuthority {
 function Get-MIRAssuranceReleasePlanningAuthority {
   param([Parameter(Mandatory)]$Context)
 
+  # The 4.2 context is a closed, F210/F200-only private planning authority.
+  # Resolve it before historical local-playtest lanes, which deliberately
+  # reject ordinary current-package paths when their archived manifests are
+  # absent. V1 contexts retain that historical lane behavior below.
+  if ([string]$Context.verification_profile.execution_context_mode -eq 'development-context') {
+    $contextSpecification = Get-MIRAssuranceDevelopmentExecutionContextSpecification -ContextPath ([string]$Context.verification_profile.execution_context)
+    if ([string]$contextSpecification.kind -eq 'MIR4DevelopmentExecutionContextV2') {
+      $development = Get-MIRAssuranceDevelopmentPlanningAuthority -Context $Context
+      if ($null -ne $development) { return $development }
+    }
+  }
   $localPlaytest = Get-MIRAssuranceLocalPlaytestPlanningAuthority -Context $Context
   if ($null -ne $localPlaytest) { return $localPlaytest }
   $development = Get-MIRAssuranceDevelopmentPlanningAuthority -Context $Context

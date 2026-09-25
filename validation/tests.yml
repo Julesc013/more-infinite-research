@@ -4384,6 +4384,8 @@
         "contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json",
         "spec/execution/mir4-4.1-development-context-v1.json",
         "spec/schemas/mir4-development-execution-context-v1.schema.json",
+        "spec/execution/mir4-4.2-development-context-v1.json",
+        "spec/schemas/mir4-development-execution-context-v2.schema.json",
         "tools/lib/validation/PackageIdentity.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/mir/application/package/PackageAuthority.ps1",

@@ -49,7 +49,11 @@ function Add-MIRAssurancePlanDecisions {
   # deterministic, candidate-bound ledger only when a plan actually selects
   # a runtime matrix.  A plan without one makes no claim that absent runtime
   # propositions are unaffected.
-  if ($affectedTests.Count -eq 0 -and $fullTests.Count -eq 0 -and -not $requiresFull) {
+  # A static-only profile has no runtime selection to prove, even when the
+  # changed-path classifier would require a full runtime matrix for a profile
+  # that selected one. Preserve that signal in impact_selection without
+  # manufacturing a runtime proposition ledger for this focused plan.
+  if ($affectedTests.Count -eq 0 -and $fullTests.Count -eq 0) {
     return $Plan
   }
 
