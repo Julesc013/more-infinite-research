@@ -136,7 +136,24 @@ try {
     source = $source
     package_authority_sha256 = (Get-MIR4CanonicalPackageAuthority -RepoRoot $repo).record_sha256
     package_source_sha256 = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+    target_authority = @(
+      foreach ($summary in $candidateSummaries) {
+        [pscustomobject][ordered]@{
+          target = [string]$summary.target
+          target_id = 'factorio-' + ([string]$summary.target).Substring(1, 1) + '.' + ([string]$summary.target).Substring(2, 1)
+          source_version = '4.2.0'
+          distribution_version = [string]$summary.distribution_version
+        }
+      }
+    )
+    resource_admission = [pscustomobject][ordered]@{ admitted = $true; minimum_free_memory_bytes = [Int64]1; minimum_free_work_bytes = [Int64]1 }
     targets = @($candidateSummaries)
+    failures = @()
+    qualification = 'not-performed'
+    technical_seal = 'not-performed'
+    signing = 'not-performed'
+    tagging = 'not-performed'
+    publication_authorized = $false
     record_sha256 = ''
   }
   $manifestPath = Join-Path $candidateRoot 'candidate-manifest.json'
