@@ -316,15 +316,72 @@ function Assert-MIR42ExactEngineAuthority {
   }
 }
 
+function Get-MIR42DirectPredecessorAuthority {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Reference)
+  Assert-MIR42SealPropertyNames -Value $Reference -Expected @('path','sha256','record_sha256') -Code 'mir42-seal-predecessor-authority-reference-shape'
+  $authorityPath = Resolve-MIR42SealImmutableFile -Path ([string]$Reference.path) -Sha256 ([string]$Reference.sha256) -Code 'mir42-seal-predecessor-authority-reference'
+  $authority = Read-MIR42SealRecord -Path $authorityPath -Code 'mir42-seal-predecessor-authority'
+  $record = $authority.record
+  if ([string]$record.record_sha256 -cne [string]$Reference.record_sha256) { throw '[mir42-seal-predecessor-authority-reference-binding]' }
+  Assert-MIR42SealPropertyNames -Value $record -Expected @('schema','kind','status','public_v410_checksums','targets','release_transition_authority','publication_authorized','record_sha256') -Code 'mir42-seal-predecessor-authority-shape'
+  Assert-MIR42SealPropertyNames -Value $record.public_v410_checksums -Expected @('tag','tag_object','tagged_commit','path','sha256','verified_tag_fingerprint') -Code 'mir42-seal-predecessor-checksums-shape'
+  if ([int]$record.schema -ne 1 -or
+      [string]$record.kind -cne 'MIR42DirectPredecessorInputsV1' -or
+      [string]$record.status -cne 'verified-published-v410-checksum-and-local-custody-private' -or
+      [bool]$record.release_transition_authority -or [bool]$record.publication_authorized) {
+    throw '[mir42-seal-predecessor-authority-state]'
+  }
+  $checksumRelative = [string]$record.public_v410_checksums.path
+  if ($checksumRelative -cne '.mir/releases/waves/mir4-r0/MIR42-v410-SHA256SUMS.txt') { throw '[mir42-seal-predecessor-checksums-path]' }
+  $checksumPath = Resolve-MIR42SealContainedArtifactPath -Root $RepoRoot -RelativePath $checksumRelative -Code 'mir42-seal-predecessor-checksums'
+  if (-not (Test-Path -LiteralPath $checksumPath -PathType Leaf) -or
+      (Get-FileHash -LiteralPath $checksumPath -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$record.public_v410_checksums.sha256) {
+    throw '[mir42-seal-predecessor-checksums-drift]'
+  }
+  $tag = [string]$record.public_v410_checksums.tag
+  $tagObject = (& git -C $RepoRoot rev-parse "${tag}^{object}").Trim()
+  $taggedCommit = (& git -C $RepoRoot rev-parse "${tag}^{commit}").Trim()
+  $tagVerification = @(& git -C $RepoRoot tag --verify $tag 2>&1)
+  if ($LASTEXITCODE -ne 0 -or $tagObject -cne [string]$record.public_v410_checksums.tag_object -or
+      $taggedCommit -cne [string]$record.public_v410_checksums.tagged_commit -or
+      (($tagVerification -join "`n") -notmatch ('Good "git" signature.*key ' + [regex]::Escape([string]$record.public_v410_checksums.verified_tag_fingerprint)))) {
+    throw '[mir42-seal-predecessor-public-tag-binding]'
+  }
+  Assert-MIR42SealTargetSet -Rows @($record.targets) -Code 'mir42-seal-predecessor-authority'
+  foreach ($row in @($record.targets)) {
+    Assert-MIR42SealPropertyNames -Value $row -Expected @('target','predecessor','published_checksum_sha256','engine') -Code 'mir42-seal-predecessor-target-shape'
+    Assert-MIR42SealPropertyNames -Value $row.predecessor -Expected @('version','path','sha256','bytes') -Code 'mir42-seal-predecessor-input-shape'
+    Assert-MIR42SealPropertyNames -Value $row.engine -Expected @('path','file_version','product_version','sha256','channel') -Code 'mir42-seal-predecessor-engine-shape'
+    $predecessorPath = Resolve-MIR42SealImmutableFile -Path ([string]$row.predecessor.path) -Sha256 ([string]$row.predecessor.sha256) -Code 'mir42-seal-predecessor-input'
+    if ([int64](Get-Item -LiteralPath $predecessorPath).Length -ne [int64]$row.predecessor.bytes -or
+        [string]$row.published_checksum_sha256 -cne [string]$row.predecessor.sha256 -or
+        ([IO.Path]::GetFileName($predecessorPath) -cne "more-infinite-research_$([string]$row.predecessor.version).zip") -or
+        @((Get-Content -LiteralPath $checksumPath | Where-Object { $_ -match ('^' + [regex]::Escape([string]$row.predecessor.sha256) + '\s{2}' + [regex]::Escape([IO.Path]::GetFileName($predecessorPath)) + '$') })).Count -ne 1) {
+      throw "[mir42-seal-predecessor-input-binding] $([string]$row.target)"
+    }
+  }
+  return $authority
+}
+
 function Assert-MIR42GovernedPredecessor {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$Execution)
-  $inventoryPath = Join-Path $RepoRoot '.mir/distributions.json'
-  try { $inventory = Get-Content -Raw -LiteralPath $inventoryPath | ConvertFrom-Json -Depth 100 -DateKind String }
-  catch { throw '[mir42-seal-predecessor-custody-inventory]' }
-  $rows = @($inventory.distributions | Where-Object { [string]$_.version -ceq [string]$Execution.predecessor.version })
-  if ($rows.Count -ne 1 -or [string]$rows[0].sha256 -cne [string]$Execution.predecessor.sha256 -or
-      [string]$rows[0].kind -notmatch 'tagged-publicly-verified|tagged-published-public-identities-verified') {
-    throw "[mir42-seal-predecessor-custody-unproven] $([string]$Target.target)"
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$Execution,[Parameter(Mandatory)]$AuthorityReference)
+  $authority = Get-MIR42DirectPredecessorAuthority -RepoRoot $RepoRoot -Reference $AuthorityReference
+  $rows = @($authority.record.targets | Where-Object { [string]$_.target -ceq [string]$Target.target })
+  $authorityPredecessorPath = if ($rows.Count -eq 1) { [IO.Path]::GetFullPath([string]$rows[0].predecessor.path) } else { '' }
+  $executionPredecessorPath = [IO.Path]::GetFullPath([string]$Execution.predecessor.path)
+  $authorityEnginePath = if ($rows.Count -eq 1) { [IO.Path]::GetFullPath([string]$rows[0].engine.path) } else { '' }
+  $executionEnginePath = [IO.Path]::GetFullPath([string]$Execution.executable_path)
+  $productVersion = [string](Get-Item -LiteralPath $executionEnginePath).VersionInfo.ProductVersion
+  if ($productVersion -match '^([0-9]+[.][0-9]+[.][0-9]+)') { $productVersion = [string]$Matches[1] }
+  if ($rows.Count -ne 1 -or
+      [string]$rows[0].predecessor.version -cne [string]$Execution.predecessor.version -or
+      -not $authorityPredecessorPath.Equals($executionPredecessorPath,[StringComparison]::OrdinalIgnoreCase) -or
+      [string]$rows[0].predecessor.sha256 -cne [string]$Execution.predecessor.sha256 -or
+      -not $authorityEnginePath.Equals($executionEnginePath,[StringComparison]::OrdinalIgnoreCase) -or
+      [string]$rows[0].engine.file_version -cne [string]$Execution.version -or
+      [string]$rows[0].engine.product_version -cne $productVersion -or
+      [string]$rows[0].engine.sha256 -cne [string]$Execution.executable_sha256) {
+    throw "[mir42-seal-predecessor-execution-binding] $([string]$Target.target)"
   }
 }
 
@@ -334,7 +391,7 @@ function Get-MIR42BoundEngineRun {
   $runPath = Resolve-MIR42SealImmutableFile -Path ([string]$Reference.path) -Sha256 ([string]$Reference.sha256) -Code 'mir42-seal-engine-run-reference'
   $run = Read-MIR42SealRecord -Path $runPath -Code 'mir42-seal-engine-run'
   if ([string]$run.record.record_sha256 -cne [string]$Reference.record_sha256) { throw '[mir42-seal-engine-run-reference-binding]' }
-  Assert-MIR42SealPropertyNames -Value $run.record -Expected @('schema','kind','status','source','candidate_manifest','runner','harness','targets','factorio_processes','release_qualification','publication_authorized','record_sha256') -Code 'mir42-seal-engine-run-shape'
+  Assert-MIR42SealPropertyNames -Value $run.record -Expected @('schema','kind','status','source','candidate_manifest','predecessor_authority','runner','harness','targets','factorio_processes','release_qualification','publication_authorized','record_sha256') -Code 'mir42-seal-engine-run-shape'
   if ([int]$run.record.schema -ne 1 -or
       [string]$run.record.kind -cne 'MIR42FourTargetEngineRunV1' -or
       [string]$run.record.status -cne 'four-target-base-default-real-engine-probes-passed-private-unqualified' -or
@@ -447,7 +504,7 @@ function Get-MIR42RealEngineCandidateCampaign {
       if (-not $text.Contains($marker)) { throw "[mir42-seal-real-engine-log-marker] $([string]$target.target)/$([string]$log.phase)" }
     }
     Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution
-    Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution
+    Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -AuthorityReference $engineRun.record.predecessor_authority
     Assert-MIR42FreshEngineLoads -Target $target -CandidateTarget $Candidate -Execution $target.engine_execution
   }
   Assert-MIR42JoinedAcceptanceCoverage -RepoRoot $RepoRoot -Receipt $campaign

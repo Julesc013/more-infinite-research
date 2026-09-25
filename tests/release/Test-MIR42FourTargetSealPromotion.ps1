@@ -88,6 +88,7 @@ try {
     schema=1;kind='MIR42FourTargetEngineRunV1';status='four-target-base-default-real-engine-probes-passed-private-unqualified'
     source=$readiness._state.candidate.source
     candidate_manifest=[pscustomobject]@{path=[IO.Path]::GetFullPath($manifestPath);sha256=(Get-FileHash $manifestPath -Algorithm SHA256).Hash.ToUpperInvariant();record_sha256=$manifest.record_sha256}
+    predecessor_authority=[pscustomobject]@{path=(Join-Path $absoluteRoot 'missing-predecessor-authority.json');sha256=('A' * 64);record_sha256=('B' * 64)}
     runner=[pscustomobject]@{path=$fakeRunnerPath;sha256=(Get-FileHash $fakeRunnerPath -Algorithm SHA256).Hash.ToUpperInvariant()}
     harness=[pscustomobject]@{path=[IO.Path]::GetFullPath($fakeHarnessPath);sha256=(Get-FileHash $fakeHarnessPath -Algorithm SHA256).Hash.ToUpperInvariant()}
     targets=@($fakeCampaignTargets | ForEach-Object {
