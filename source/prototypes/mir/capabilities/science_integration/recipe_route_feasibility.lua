@@ -5,6 +5,7 @@
 -- behavior, balance, or ecosystem compatibility.
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
@@ -370,13 +371,19 @@ local function append_boiler_sources(sources, options)
 end
 
 local function offshore_pump_output_fluid(pump)
-  -- Current Factorio offshore pumps take their unfiltered output directly
-  -- from water tiles. Base 2.0/2.1 declares the source offset, but no longer
-  -- supplies the former `fluid` field. Preserve explicit mod declarations;
-  -- only infer water for that built-in source form.
-  local declared = pump and (pump.fluid or (pump.fluid_box and pump.fluid_box.filter))
+  -- Factorio 2.1 base offshore pumps take their unfiltered output directly
+  -- from water tiles. Its source-offset form does not carry the former
+  -- `fluid` field. The F200 profile intentionally retains its established
+  -- explicit-field contract. Its Angel pump `fluid_box.filter` describes a
+  -- machine output shape, and must not become a natural source witness.
+  -- Preserve the legacy explicit `fluid` declaration on every target.
+  local declared = pump and pump.fluid
   if type(declared) == "string" and declared ~= "" then return declared end
-  if pump and pump.fluid_source_offset ~= nil then return "water" end
+  if target_profiles.current_factorio_version == "2.1" then
+    declared = pump and pump.fluid_box and pump.fluid_box.filter
+    if type(declared) == "string" and declared ~= "" then return declared end
+    if pump and pump.fluid_source_offset ~= nil then return "water" end
+  end
   return nil
 end
 
