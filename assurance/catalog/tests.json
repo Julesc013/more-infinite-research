@@ -830,6 +830,9 @@
         "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
         "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v3.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
         "tools/mir/application/release/F210QualificationPolicy.ps1",
         "fixtures/assert-mir42-cap-ownership-multiforce/**",
         "fixtures/late-mir42-cap-binding-blocker/**",
@@ -901,6 +904,9 @@
         "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
         "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v3.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
         "tools/mir/application/release/F210QualificationPolicy.ps1",
         "fixtures/assert-mir42-v2-v3-cap-migration/**",
         "source:source/prototypes/mir/domain/technology/maximum_level_binding.lua",
@@ -3538,10 +3544,13 @@
         ".mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
         ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json",
         "spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json",
         "spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json",
         "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
         "spec/schemas/mir4-f210-current-qualification-policy-succession-v1.schema.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v3.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
         "tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1",
         "tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1",
         "tools/mir/application/release/F210QualificationPolicy.ps1",
@@ -7419,5 +7428,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4f6ce9cd78d18fd2196abdc646a1a9b36cbeaf212e88f9bc6d5c25445386511a"
+  "digest": "sha256:b9e44a61eca7c0622d15e1c385c088436253f4c59902dd5a779c6c00e74738c5"
 }

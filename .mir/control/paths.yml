@@ -702,6 +702,7 @@ paths:
   releases.waves.mir4-r0-f210-qualification-policy-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
   control.mir4-f210-current-qualification-policy: .mir/control/MIR4-F210-Current-Qualification-PolicyV2.json
   control.mir4-f210-current-qualification-policy-succession: .mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json
+  control.mir4-f210-current-engine-cap-harness-admission: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json
   releases.waves.mir4-r0-final-mile-tooling-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-maintainer-final-github-release-authorization: .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
   releases.waves.mir4-r0-final-mile-playtest-candidate-authority: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json

@@ -19,11 +19,8 @@ if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
 }
 
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$qualificationPolicy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
-if(-not [bool]$qualificationPolicy.qualification.current_engine_api_prototype_data_mod_capsule_admitted){
-  throw '[mir42-cap-ownership-multiforce-engine-admission-pending]'
-}
-$engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin -SteamManifest $SteamManifest
+$engineResolution=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo `
+  -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin $FactorioBin -SteamManifest $SteamManifest
 $engine=[string]$engineResolution.engine.path
 $fixtureName='mir-fixture-assert-mir42-cap-ownership-multiforce'
 $blockerName='late-mir42-cap-binding-blocker'

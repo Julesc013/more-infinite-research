@@ -19,11 +19,8 @@ if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
 
 $predecessorCommit='f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e'
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$qualificationPolicy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
-if(-not [bool]$qualificationPolicy.qualification.current_engine_api_prototype_data_mod_capsule_admitted){
-  throw '[mir42-v2-v3-cap-migration-engine-admission-pending]'
-}
-$engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin -SteamManifest $SteamManifest
+$engineResolution=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo `
+  -HarnessId 'runtime.maximum-level-v2-v3-migration-f210' -FactorioBin $FactorioBin -SteamManifest $SteamManifest
 $engine=[string]$engineResolution.engine.path
 $fixtureName='mir-fixture-assert-mir42-v2-v3-cap-migration'
 $technologyName='recipe-prod-research_copper-1'
