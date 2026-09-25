@@ -116,7 +116,7 @@ try {
   Assert-MIR42SealTest $mislabelledRejected 'mislabelled-reconciliation-cannot-be-release-qualification'
   $absoluteRoot = [IO.Path]::GetFullPath($root)
   $fakeRunnerPath = Join-Path $absoluteRoot 'fake-engine-runner.ps1'
-  [IO.File]::WriteAllText($fakeRunnerPath, 'Invoke-MIR42FourTargetEngineRun', [Text.UTF8Encoding]::new($false))
+  [IO.File]::Copy((Join-Path $RepoRoot 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1'), $fakeRunnerPath)
   $fakeReconciliation = [pscustomobject]@{sha256=('A' * 64);record=[pscustomobject]@{record_sha256=('B' * 64)}}
   $fakeCampaignTargets = @($readiness._state.candidate.targets | ForEach-Object {
     [pscustomobject][ordered]@{
@@ -132,6 +132,7 @@ try {
     }
   })
   $fakeHarnessPath = Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'
+  $fakeStagedAssets = Join-Path $root 'staged-assets'
   $fakeEngineRun = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetEngineRunV1';status='four-target-base-default-real-engine-probes-passed-private-unqualified'
     source=$readiness._state.candidate.source
@@ -143,7 +144,11 @@ try {
     targets=@($fakeCampaignTargets | ForEach-Object {
       $campaignTarget = $_
       $candidateTarget = @($readiness._state.candidate.targets | Where-Object { [string]$_.target -ceq [string]$campaignTarget.target })[0]
-      [pscustomobject][ordered]@{target=[string]$campaignTarget.target;status=[string]$campaignTarget.status;archive=[pscustomobject]@{path=[string]$candidateTarget.archive_path;sha256=[string]$campaignTarget.archive.sha256};engine_execution=$campaignTarget.engine_execution}
+      $stagedDirectory = Join-Path $fakeStagedAssets ([string]$candidateTarget.target)
+      New-Item -ItemType Directory -Path $stagedDirectory -Force | Out-Null
+      $stagedPath = Join-Path $stagedDirectory ([IO.Path]::GetFileName([string]$candidateTarget.archive_path))
+      Copy-Item -LiteralPath ([string]$candidateTarget.archive_path) -Destination $stagedPath
+      [pscustomobject][ordered]@{target=[string]$campaignTarget.target;status=[string]$campaignTarget.status;archive=[pscustomobject]@{path=$stagedPath;sha256=[string]$campaignTarget.archive.sha256};engine_execution=$campaignTarget.engine_execution}
     });factorio_processes=9;release_qualification='not-performed';publication_authorized=$false;record_sha256=''
   }
   $fakeEngineRun.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $fakeEngineRun
