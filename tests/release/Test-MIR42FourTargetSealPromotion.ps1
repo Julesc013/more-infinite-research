@@ -73,12 +73,37 @@ try {
   $roundTripSeal = Write-MIR42NormalizedRecord -Record $roundTripProbe -OutputPath $roundTripProbePath -Code 'test-roundtrip'
   Assert-MIR42SealTest (Test-MIR4BootstrapRecordHash -Record $roundTripSeal) 'technical-seal-producer-normalizes-before-hashing'
 
+  $verifierAuthority = [pscustomobject][ordered]@{
+    source = [pscustomobject][ordered]@{commit=$source.commit;tree=$source.tree}
+    dependencies = @($script:MIR42SealVerifierDependencyPaths | ForEach-Object { [pscustomobject][ordered]@{path=[string]$_;sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot $_) -Algorithm SHA256).Hash.ToUpperInvariant()} })
+  }
+  Assert-MIR42SealExternalVerifierAuthority -RepoRoot $RepoRoot -Verifier $verifierAuthority -Code 'mir42-seal-test-verifier-authority'
+  $verifierHashDrift = $verifierAuthority | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20 -DateKind String
+  $verifierHashDrift.dependencies[0].sha256 = '0' * 64
+  $verifierHashRejected = $false
+  try { Assert-MIR42SealExternalVerifierAuthority -RepoRoot $RepoRoot -Verifier $verifierHashDrift -Code 'mir42-seal-test-verifier-authority' } catch { $verifierHashRejected = $_.Exception.Message -match 'mir42-seal-test-verifier-authority-dependency-hash' }
+  Assert-MIR42SealTest $verifierHashRejected 'external-t16-verifier-dependency-hash-required'
+
+  $dirtyVerifierPath = Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1'
+  $dirtyVerifierBytes = [IO.File]::ReadAllBytes($dirtyVerifierPath)
+  $dirtyToolsRejected = $false
+  try {
+    [IO.File]::AppendAllText($dirtyVerifierPath, "`n# MIR42 test-only dirty verifier probe`n", [Text.UTF8Encoding]::new($false))
+    try { Assert-MIR42SealSource -RepoRoot $RepoRoot -Source ([pscustomobject]$source) -Code 'mir42-seal-test-dirty-tools' | Out-Null } catch { $dirtyToolsRejected = $_.Exception.Message -match 'mir42-seal-test-dirty-tools-source-dirty' }
+  } finally {
+    [IO.File]::WriteAllBytes($dirtyVerifierPath,$dirtyVerifierBytes)
+  }
+  Assert-MIR42SealTest $dirtyToolsRejected 'dirty-verifier-tools-rejected'
+
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath
   Assert-MIR42SealTest ($readiness.status -ceq 'MIR-4.2-FOUR-TARGET-TECHNICAL-SEAL-BLOCKED') 'missing-gates-block-seal'
   Assert-MIR42SealTest ([bool]$readiness.checks.candidate -and -not [bool]$readiness.checks.qualification -and -not [bool]$readiness.checks.campaign -and -not [bool]$readiness.checks.reviewer -and -not [bool]$readiness.technical_seal_authorized) 'candidate-only-readiness'
   Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_acl_contract -and (@($readiness.blockers) -match 'mir42-seal-t16-acl-contract-human-input-required').Count -eq 1) 'human-approved-t16-acl-contract-required'
-  Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_trust_root -and (@($readiness.blockers) -match 'mir42-seal-external-t16-trust-root-or-protected-root-or-verifier-missing').Count -eq 1) 'external-t16-trust-root-required'
+  Assert-MIR42SealTest (-not [bool]$readiness.checks.t16_trust_root -and (@($readiness.blockers) -match 'mir42-seal-external-t16-trust-root-or-protected-root-or-immutable-anchor-or-verifier-missing').Count -eq 1) 'external-t16-trust-root-required'
   Assert-MIR42SealTest (-not [bool]$readiness.checks.programme -and (@($readiness.blockers) -match 'mir42-seal-current-programme-transition-not-authorized').Count -eq 1) 'current-4-2-release-cut-blocks-unapproved-freeze'
+  $containingRootRejected = $false
+  try { Resolve-MIR42SealExternalProtectedDirectory -RepoRoot $RepoRoot -Path (Split-Path -Parent $RepoRoot) -Code 'mir42-seal-test-containing-root' | Out-Null } catch { $containingRootRejected = $_.Exception.Message -match 'mir42-seal-test-containing-root-repository' }
+  Assert-MIR42SealTest $containingRootRejected 'protected-root-containing-repository-rejected'
   $mislabelledQualification = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetExactCandidateQualificationV1';status='MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED'
     factorio_processes=4;release_qualification='claimed';independent_verification='not-performed';publication_authorized=$false;record_sha256=''
@@ -253,6 +278,7 @@ try {
     independent_reviewer=[pscustomobject]@{identity='alternate-reviewer';public_key=$forgedOperatorPublic;fingerprint=$forgedOperatorFingerprint}
     recovery=[pscustomobject]@{synthetic='not-accepted'}
     operator_trust=[pscustomobject]@{path=$forgedOperatorPath;sha256=(Get-FileHash -LiteralPath $forgedOperatorPath -Algorithm SHA256).Hash.ToUpperInvariant();record_sha256=$forgedOperator.record_sha256}
+    verifier=$verifierAuthority
     ledger=[pscustomobject]@{repository_path=$RepoRoot;ref='refs/heads/release-ledger/mir4';commit=('0' * 40);event_path='t16-ledger-trust-root.json';event_sha256=('C' * 64)}
     trust_signature=[pscustomobject]@{identity='alternate-operator';namespace='mir4-t16-trust-root';signature_path=$forgedRootSignaturePath;signature_sha256='';payload_sha256=''};record_sha256=''
   }
@@ -268,7 +294,7 @@ try {
   $forgedRoot.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedRoot
   Write-MIR4BootstrapRecord -Record $forgedRoot -Path $forgedRootPath | Out-Null
   $forgedTrustRejected = $false
-  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $forgedRootPath -OperatorTrustSourcePath $forgedOperatorPath -ProtectedRootPath $forgedTrustRoot -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $forgedTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-protected-root-repository' }
+  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $forgedRootPath -OperatorTrustSourcePath $forgedOperatorPath -ProtectedRootPath $forgedTrustRoot -ImmutableAnchorPath ([IO.Path]::GetPathRoot($forgedTrustRoot)) -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $forgedTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-(immutable-anchor-not-protected|protected-root-repository)' }
   Assert-MIR42SealTest $forgedTrustRejected 'coherent-alternate-t16-chain-in-candidate-rejected'
 
   # Moving the same alternate key chain beside the checkout does not make it
@@ -302,7 +328,7 @@ try {
   $externalRootPath = Join-Path $externalForgedTrustRoot 't16-ledger-trust-root.json'
   Write-MIR4BootstrapRecord -Record $externalRoot -Path $externalRootPath | Out-Null
   $writableExternalTrustRejected = $false
-  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $externalRootPath -OperatorTrustSourcePath $externalOperatorPath -ProtectedRootPath $externalForgedTrustRoot -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $writableExternalTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-protected-root-not-protected' }
+  try { Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $RepoRoot -T16TrustRootPath $externalRootPath -OperatorTrustSourcePath $externalOperatorPath -ProtectedRootPath $externalForgedTrustRoot -ImmutableAnchorPath ([IO.Path]::GetPathRoot($externalForgedTrustRoot)) -AclContract $testAclContract -SshKeygenPath $sshKeygen | Out-Null } catch { $writableExternalTrustRejected = $_.Exception.Message -match 'mir42-seal-external-t16-(immutable-anchor-not-protected|protected-root-not-protected)' }
   Assert-MIR42SealTest $writableExternalTrustRejected 'coherent-writable-external-t16-chain-rejected'
 
   $aclProbePath = Join-Path $root 'unapproved-mutation-ace.txt'
@@ -348,6 +374,18 @@ try {
   $unapprovedLedgerParentRejected = $false
   try { Assert-MIR42SealT16AclAncestorAssessment -Assessment $ledgerParentAssessment -AclContract $testAclContract -Code 'mir42-seal-test-ledger-parent' } catch { $unapprovedLedgerParentRejected = $_.Exception.Message -match 'mir42-seal-test-ledger-parent-acl-ancestor-allow-sid' }
   Assert-MIR42SealTest $unapprovedLedgerParentRejected 'unapproved-ledger-parent-mutation-ace-rejected'
+
+  $immutableAnchor = Join-Path $root 'immutable-anchor'
+  $protectedRootParent = Join-Path $immutableAnchor 'protected-root-parent'
+  $protectedRoot = Join-Path $protectedRootParent 'protected-root'
+  New-Item -ItemType Directory -Force -Path $protectedRoot | Out-Null
+  foreach ($path in @($immutableAnchor,$protectedRootParent,$protectedRoot)) { Set-MIR42SealTestExactAcl -Path $path -OwnerSid $testAclSid }
+  Assert-MIR42SealT16AclRootToImmutableAnchor -ProtectedRootPath $protectedRoot -ImmutableAnchorPath $immutableAnchor -AclContract $testAclContract -Code 'mir42-seal-test-protected-root-anchor-positive'
+  $protectedRootParentAssessment = Get-MIR42SealAclAssessment -Path $protectedRootParent -Code 'mir42-seal-test-protected-root-parent'
+  $protectedRootParentAssessment.rows = @($protectedRootParentAssessment.rows) + @([pscustomobject]@{sid=$unapprovedSid.Value;type='Allow';rights=[Security.AccessControl.FileSystemRights]::Modify;inherited=$false})
+  $unapprovedProtectedRootParentRejected = $false
+  try { Assert-MIR42SealT16AclAncestorAssessment -Assessment $protectedRootParentAssessment -AclContract $testAclContract -Code 'mir42-seal-test-protected-root-parent' } catch { $unapprovedProtectedRootParentRejected = $_.Exception.Message -match 'mir42-seal-test-protected-root-parent-acl-ancestor-allow-sid' }
+  Assert-MIR42SealTest $unapprovedProtectedRootParentRejected 'unapproved-parent-above-protected-root-rejected'
 
   $forgedFreeze = [pscustomobject][ordered]@{
     schema=1;kind='MIR42SourceFreezeAuthorizationV1';status='MIR-4.2-SOURCE-FROZEN-AND-CANDIDATE-ALLOCATED'
