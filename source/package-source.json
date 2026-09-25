@@ -6488,7 +6488,12 @@
     {
       "layer": "presentation",
       "target_scope": [
-        "f100"
+        "f100",
+        "f017",
+        "f016",
+        "f015",
+        "f014",
+        "f013"
       ],
       "output_path": "README.md",
       "semantic_class": "package-documentation",
@@ -7360,6 +7365,237 @@
       "source_sha256": "818CD5E786534FCD8F9D346BA71FA937D7542446F941ECD4158AEAE63F6275AE",
       "output_bytes": 952,
       "output_sha256": "818CD5E786534FCD8F9D346BA71FA937D7542446F941ECD4158AEAE63F6275AE"
+    },
+    {
+      "layer": "adapter",
+      "target_scope": [
+        "f017"
+      ],
+      "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "source/adapters/historical/f017/target_profiles.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 3270,
+      "source_sha256": "87C0AF930FDD81732BF40CE329E8B9194160D25D587FC54B6EAF5CAF958CEF62",
+      "output_bytes": 3270,
+      "output_sha256": "87C0AF930FDD81732BF40CE329E8B9194160D25D587FC54B6EAF5CAF958CEF62"
+    },
+    {
+      "layer": "adapter",
+      "target_scope": [
+        "f016",
+        "f015",
+        "f014",
+        "f013"
+      ],
+      "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "source/adapters/historical/legacy-reduced/target_profiles.lua.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 3176,
+      "source_sha256": "DE8E810E907AA9C21632FD351BA736AF76DF44B68DFF035D8CC772D8DCC4E98F",
+      "output_bytes": 3176,
+      "output_sha256": "DE8E810E907AA9C21632FD351BA736AF76DF44B68DFF035D8CC772D8DCC4E98F"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f017"
+      ],
+      "output_path": "info.json",
+      "semantic_class": "generated-metadata",
+      "source_path": "source/presentation/historical/f017/info.json.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 282,
+      "source_sha256": "E48927194C0B4FD75A666680CD97900891745B6B6461BF35A035CCA85A15C355",
+      "output_bytes": 282,
+      "output_sha256": "E48927194C0B4FD75A666680CD97900891745B6B6461BF35A035CCA85A15C355"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f017"
+      ],
+      "output_path": "changelog.txt",
+      "semantic_class": "package-documentation",
+      "source_path": "source/presentation/historical/f017/changelog.txt.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 604,
+      "source_sha256": "ABAC3E798D8643536E1A4BBEEA7ED601CD8690BF1ADEEC8DF4D3EED23D24419F",
+      "output_bytes": 604,
+      "output_sha256": "ABAC3E798D8643536E1A4BBEEA7ED601CD8690BF1ADEEC8DF4D3EED23D24419F"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f016"
+      ],
+      "output_path": "info.json",
+      "semantic_class": "generated-metadata",
+      "source_path": "source/presentation/historical/f016/info.json.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 282,
+      "source_sha256": "DC49439F280BB0A2A5FA3BC1B3DE62763219E411CD44D3E3C95F261D7D9CAC93",
+      "output_bytes": 282,
+      "output_sha256": "DC49439F280BB0A2A5FA3BC1B3DE62763219E411CD44D3E3C95F261D7D9CAC93"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f016"
+      ],
+      "output_path": "changelog.txt",
+      "semantic_class": "package-documentation",
+      "source_path": "source/presentation/historical/f016/changelog.txt.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 616,
+      "source_sha256": "E51A8C8157B1FF8D006E2587CB54B89FB1304C98E3F55F5A0CE67E9607072573",
+      "output_bytes": 616,
+      "output_sha256": "E51A8C8157B1FF8D006E2587CB54B89FB1304C98E3F55F5A0CE67E9607072573"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f015"
+      ],
+      "output_path": "info.json",
+      "semantic_class": "generated-metadata",
+      "source_path": "source/presentation/historical/f015/info.json.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 282,
+      "source_sha256": "742A32CF159AF9935AD07A67252CA03279FF9DC851715E472C10E7DF0A049474",
+      "output_bytes": 282,
+      "output_sha256": "742A32CF159AF9935AD07A67252CA03279FF9DC851715E472C10E7DF0A049474"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f015"
+      ],
+      "output_path": "changelog.txt",
+      "semantic_class": "package-documentation",
+      "source_path": "source/presentation/historical/f015/changelog.txt.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 616,
+      "source_sha256": "8325162CA8448FC2DE6C098E8B26EEBD8425D52F708CB5C25B5487FE1EEE9365",
+      "output_bytes": 616,
+      "output_sha256": "8325162CA8448FC2DE6C098E8B26EEBD8425D52F708CB5C25B5487FE1EEE9365"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f014"
+      ],
+      "output_path": "info.json",
+      "semantic_class": "generated-metadata",
+      "source_path": "source/presentation/historical/f014/info.json.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 285,
+      "source_sha256": "A039B8A6144817A00049005659354829DF80D215B76E777E5125FA53A720B7E2",
+      "output_bytes": 285,
+      "output_sha256": "A039B8A6144817A00049005659354829DF80D215B76E777E5125FA53A720B7E2"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f014"
+      ],
+      "output_path": "changelog.txt",
+      "semantic_class": "package-documentation",
+      "source_path": "source/presentation/historical/f014/changelog.txt.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 639,
+      "source_sha256": "01474EFEC1E406C37DE7BB07DAD02EF59B0BB35FEBA7FBD69AFC405BBA66EA65",
+      "output_bytes": 639,
+      "output_sha256": "01474EFEC1E406C37DE7BB07DAD02EF59B0BB35FEBA7FBD69AFC405BBA66EA65"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f013"
+      ],
+      "output_path": "info.json",
+      "semantic_class": "generated-metadata",
+      "source_path": "source/presentation/historical/f013/info.json.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 285,
+      "source_sha256": "14406ACF88422DC85E9F05CAD0BD5137028662141CA10BD88F5025839585EED5",
+      "output_bytes": 285,
+      "output_sha256": "14406ACF88422DC85E9F05CAD0BD5137028662141CA10BD88F5025839585EED5"
+    },
+    {
+      "layer": "presentation",
+      "target_scope": [
+        "f013"
+      ],
+      "output_path": "changelog.txt",
+      "semantic_class": "package-documentation",
+      "source_path": "source/presentation/historical/f013/changelog.txt.template",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS",
+        "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
+      },
+      "transform": "exact-template-v1",
+      "source_bytes": 639,
+      "source_sha256": "85F193D0E4B8BA4AAD896AA8CA162BF6E15746C0BE4E20781078A13A9B80BDB0",
+      "output_bytes": 639,
+      "output_sha256": "85F193D0E4B8BA4AAD896AA8CA162BF6E15746C0BE4E20781078A13A9B80BDB0"
     }
   ],
   "invariants": {
@@ -7369,5 +7605,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "203EB0D6DE12A89BF439C4DC3C71039FD31AD38CDAE6EAF4C6E6DE8377B6AC94"
+  "record_sha256": "CD42B8E9DABF25C43B84E7FCBD45931341F53EF115147A9F35A023A9EE762715"
 }

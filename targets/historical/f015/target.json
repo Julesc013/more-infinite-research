@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "MIR42HistoricalPlaytestTargetV1",
+  "target": "f015",
+  "maturity": "private-historical-playtest",
+  "base_materializer_target": "f100",
+  "factorio_line": "0.15",
+  "distribution_version": "4.2.01500",
+  "profile": {
+    "support_class": "minimal-native-infinite",
+    "science_family": "legacy-0.15",
+    "asset_policy": "factorio-0.15-icons",
+    "laboratory_productivity": false,
+    "old_science_map": true,
+    "legacy_numeric_research_cost": false
+  },
+  "engine": {
+    "path": "D:/Programs/Factorio/0.15/bin/x64/factorio.exe",
+    "version": "0.15.40",
+    "sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6"
+  },
+  "predecessor": {
+    "version": "1.5.9",
+    "archive": "dist/more-infinite-research_1.5.9.zip",
+    "sha256": "85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E"
+  },
+  "adapter_files": [
+    {"output_path":"info.json","source_path":"source/presentation/historical/f015/info.json.template","source_sha256":"742A32CF159AF9935AD07A67252CA03279FF9DC851715E472C10E7DF0A049474","source_bytes":282},
+    {"output_path":"changelog.txt","source_path":"source/presentation/historical/f015/changelog.txt.template","source_sha256":"8325162CA8448FC2DE6C098E8B26EEBD8425D52F708CB5C25B5487FE1EEE9365","source_bytes":616},
+    {"output_path":"README.md","source_path":"source/presentation/f100/README.md.template","transform":"historical-readme-template-v1","source_sha256":"4CA0F9F3CF491815FF641E8756512F79A89B4091873D7748EE054E94FDEB13B8","source_bytes":4040,"output_sha256":"B67488DDE0762CE33A7BAAD8B088B6FEF0B9AB5898E62D23F440FBCF7B2E293F","output_bytes":4004},
+    {"output_path":"prototypes/mir/platform/factorio/target_profiles.lua","source_path":"source/adapters/historical/legacy-reduced/target_profiles.lua.template","transform":"legacy-target-profile-template-v1","source_sha256":"DE8E810E907AA9C21632FD351BA736AF76DF44B68DFF035D8CC772D8DCC4E98F","source_bytes":3176,"output_sha256":"3E24D5FBFC442C943CB3A439333DB54A3CE9E7319658ACE893C557F8C9DB7EBA","output_bytes":3054}
+  ],
+  "patches": [
+    {"output_path":"prototypes/mir/pipeline/compiler_orchestrator/publication.lua","base_sha256":"C3C52BB260B728172D9786FA34081492F1E9791A0E48A5A4FE26371A3D625293","find":"  [\"1.0\"] = \"omit-unqualified\"","replace":"  [\"1.0\"] = \"omit-unqualified\",\n  [\"0.15\"] = \"omit-unqualified\""}
+  ],
+  "public_output_authorized": false,
+  "publication_authorized": false,
+  "record_sha256": "36976675A1BCEFC928FB421456192F28AEBCCD83D31DA4D8A23C8D6A63201409"
+}

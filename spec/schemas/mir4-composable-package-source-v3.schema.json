@@ -57,7 +57,7 @@
       "required": ["layer", "target_scope", "output_path", "semantic_class", "source_path", "provenance", "transform", "source_bytes", "source_sha256", "output_bytes", "output_sha256"],
       "properties": {
         "layer": {"enum": ["shared", "capability", "compatibility", "adapter", "presentation"]},
-        "target_scope": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["f210", "f200", "f110", "f100"]}},
+        "target_scope": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]}},
         "output_path": {"type": "string", "minLength": 1},
         "semantic_class": {"enum": ["common-semantic-source", "common-asset-locale", "generated-metadata", "generated-lifecycle-entrypoint", "target-overlay", "target-replacement", "target-compatibility-shim", "migration", "package-documentation"]},
         "source_path": {"type": "string", "pattern": "^source/.+"},

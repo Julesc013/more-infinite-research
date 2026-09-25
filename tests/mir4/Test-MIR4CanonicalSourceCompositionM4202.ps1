@@ -56,7 +56,8 @@ Assert-MIR4ComposableSource ([string]$receipt.current.package_source_fingerprint
 Assert-MIR4ComposableSource ([string]$receipt.predecessor_proof.implementation-ceq'tools/mir/application/package/SourceCompositionProof.ps1'-and[string]$receipt.predecessor_proof.schema-ceq'spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json'-and[string]$receipt.predecessor_proof.record_sha256-ceq[string]$predecessorProof.record_sha256) 'mir4-composable-source-predecessor-proof-receipt'
 $migratedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
 $introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
-Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq360-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq360-and$migratedBindings.Count-eq359-and@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-eq359-and$introducedBindings.Count-eq1) 'mir4-composable-source-cardinality'
+$historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
+Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq372-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq372-and$migratedBindings.Count-eq359-and@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-eq359-and$introducedBindings.Count-eq13-and$historicalBindings.Count-eq12-and@($historicalBindings.source_path|Where-Object{$_-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-eq0) 'mir4-composable-source-cardinality'
 
 # publication.lua executes target-line capability decisions after module load.
 # Keep its dependency explicit and prove every target composition closes over the

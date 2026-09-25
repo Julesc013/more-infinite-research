@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------------------------------
+Version: 4.2.01400
+
+  Playtest:
+
+    - Materialized a Factorio 0.14 private historical adapter from current MIR 4.2 source.
+    - Applied the target-native old-science and unsupported-effect dispositions discovered by exact-engine loading.
+    - Kept Factorio-2-only research-cost support output out of this historical target.
+
+  Status:
+
+    - Private historical playtest package. It is not a public compatibility claim or release asset.
+---------------------------------------------------------------------------------------------------
