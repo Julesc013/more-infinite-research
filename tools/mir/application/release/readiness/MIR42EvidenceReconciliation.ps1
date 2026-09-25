@@ -316,7 +316,7 @@ function Get-MIR42QualificationUpgradeReceipt {
   }
 }
 
-function Invoke-MIR42FourTargetExactCandidateQualification {
+function Invoke-MIR42FourTargetEvidenceReconciliation {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$RepoRoot,

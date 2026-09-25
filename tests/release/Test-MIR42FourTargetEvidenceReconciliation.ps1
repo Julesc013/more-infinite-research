@@ -4,7 +4,7 @@ param()
 Set-StrictMode -Version Latest
 
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
-. (Join-Path $repo 'tools/mir/application/release/readiness/MIR42ExactCandidateQualification.ps1')
+. (Join-Path $repo 'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1')
 
 function Assert-MIR42QualificationTest {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Code)
@@ -159,7 +159,7 @@ try {
   $manifestPath = Join-Path $candidateRoot 'candidate-manifest.json'
   Write-MIR4BootstrapRecord -Record $manifest -Path $manifestPath | Out-Null
 
-  $result = Invoke-MIR42FourTargetExactCandidateQualification -RepoRoot $repo -CandidateManifestPath $manifestPath -F210PredecessorZip $predecessors.f210 -F200PredecessorZip $predecessors.f200 -F110PredecessorZip $predecessors.f110 -F100PredecessorZip $predecessors.f100 -F210UpgradeReceipt $receipts.f210 -F200UpgradeReceipt $receipts.f200 -F110UpgradeReceipt $receipts.f110 -F100UpgradeReceipt $receipts.f100 -OutputRoot (Join-Path $testRoot 'qualification')
+  $result = Invoke-MIR42FourTargetEvidenceReconciliation -RepoRoot $repo -CandidateManifestPath $manifestPath -F210PredecessorZip $predecessors.f210 -F200PredecessorZip $predecessors.f200 -F110PredecessorZip $predecessors.f110 -F100PredecessorZip $predecessors.f100 -F210UpgradeReceipt $receipts.f210 -F200UpgradeReceipt $receipts.f200 -F110UpgradeReceipt $receipts.f110 -F100UpgradeReceipt $receipts.f100 -OutputRoot (Join-Path $testRoot 'reconciliation')
   Assert-MIR42QualificationTest ($result.status -ceq 'MIR-4.2-FOUR-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED') 'result-status'
   Assert-MIR42QualificationTest ($result.kind -ceq 'MIR42FourTargetEvidenceReconciliationV1' -and [int]$result.factorio_processes -eq 0 -and $result.release_qualification -ceq 'not-performed') 'evidence-only-boundary'
   Assert-MIR42QualificationTest (Test-MIR4BootstrapRecordHash -Record $result) 'result-self-hash'
@@ -176,7 +176,7 @@ try {
   [IO.File]::WriteAllText($badPath, (($bad | ConvertTo-Json -Depth 100) + [string][char]10), [Text.UTF8Encoding]::new($false))
   $rejected = $false
   try {
-    Invoke-MIR42FourTargetExactCandidateQualification -RepoRoot $repo -CandidateManifestPath $manifestPath -F210PredecessorZip $predecessors.f210 -F200PredecessorZip $predecessors.f200 -F110PredecessorZip $predecessors.f110 -F100PredecessorZip $predecessors.f100 -F210UpgradeReceipt $receipts.f210 -F200UpgradeReceipt $badPath -F110UpgradeReceipt $receipts.f110 -F100UpgradeReceipt $receipts.f100 -OutputRoot $failureRoot | Out-Null
+    Invoke-MIR42FourTargetEvidenceReconciliation -RepoRoot $repo -CandidateManifestPath $manifestPath -F210PredecessorZip $predecessors.f210 -F200PredecessorZip $predecessors.f200 -F110PredecessorZip $predecessors.f110 -F100PredecessorZip $predecessors.f100 -F210UpgradeReceipt $receipts.f210 -F200UpgradeReceipt $badPath -F110UpgradeReceipt $receipts.f110 -F100UpgradeReceipt $receipts.f100 -OutputRoot $failureRoot | Out-Null
   } catch {
     $rejected = $_.Exception.Message -match 'mir42-qualification-upgrade-receipt-binding] f200'
   }

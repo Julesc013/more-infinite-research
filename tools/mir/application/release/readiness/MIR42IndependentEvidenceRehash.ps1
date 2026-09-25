@@ -64,7 +64,7 @@ function Get-MIR42IndependentEngine {
   return [pscustomobject][ordered]@{ path = (Resolve-Path -LiteralPath $path).Path; version = $version; binary_sha256 = $actualHash }
 }
 
-function Invoke-MIR42FourTargetIndependentVerification {
+function Invoke-MIR42FourTargetIndependentEvidenceRehash {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -82,7 +82,7 @@ function Invoke-MIR42FourTargetIndependentVerification {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $evaluatorRelative = 'tools/mir/application/release/readiness/MIR42IndependentVerification.ps1'
+  $evaluatorRelative = 'tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1'
   $evaluatorDirty = @(& git -C $mir42IndependentRoot status --porcelain --untracked-files=no 2>$null)
   if ($LASTEXITCODE -ne 0 -or $evaluatorDirty.Count -ne 0) { throw '[mir42-independent-evaluator-dirty]' }
   $build = [IO.Path]::GetFullPath((Join-Path $repo 'build'))

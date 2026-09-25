@@ -2,6 +2,7 @@
 param(
   [Parameter(Mandatory)][string]$RepoRoot,
   [Parameter(Mandatory)][string]$CandidateManifestPath,
+  [Parameter(Mandatory)][string]$QualificationPath,
   [Parameter(Mandatory)][string]$F210PredecessorZip,
   [Parameter(Mandatory)][string]$F200PredecessorZip,
   [Parameter(Mandatory)][string]$F110PredecessorZip,
@@ -13,9 +14,7 @@ param(
   [Parameter(Mandatory)][string]$OutputRoot
 )
 
-Set-StrictMode -Version Latest
-
+$ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo 'tools/mir/application/release/readiness/MIR42ExactCandidateQualification.ps1')
-
-Invoke-MIR42FourTargetExactCandidateQualification @PSBoundParameters | ConvertTo-Json -Depth 100
+. (Join-Path $repo 'tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1')
+Invoke-MIR42FourTargetIndependentEvidenceRehash @PSBoundParameters | ConvertTo-Json -Depth 100
