@@ -643,6 +643,19 @@ check("F09C", feasibility.source_witness("same").kind == "minable-resource"
   and feasibility.source_witness({type = "fluid", name = "same"}).kind == "offshore-pump",
   "A same-name natural item source is not reused as a fluid source")
 
+-- Current Factorio base offshore pumps expose their water source via a source
+-- offset rather than the former `fluid` field. This still proves the exact
+-- water fluid, never a same-named item identity.
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {}}}
+})
+local base_water_witness = feasibility.source_witness({type = "fluid", name = "water"})
+check("F09C0", base_water_witness and base_water_witness.kind == "offshore-pump"
+  and base_water_witness.product.type == "fluid" and base_water_witness.product.name == "water"
+  and feasibility.source_witness({type = "item", name = "water"}) == nil,
+  "A source-offset offshore pump supplies the exact base water fluid")
+
 -- Natural minable entities are separate from resource prototypes.  Trees are
 -- a real early wood source, so a route consuming wood must not be treated as
 -- an unseeded cycle merely because it is absent from data.raw.resource.

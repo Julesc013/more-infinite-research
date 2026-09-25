@@ -369,6 +369,17 @@ local function append_boiler_sources(sources, options)
   return true
 end
 
+local function offshore_pump_output_fluid(pump)
+  -- Current Factorio offshore pumps take their unfiltered output directly
+  -- from water tiles. Base 2.0/2.1 declares the source offset, but no longer
+  -- supplies the former `fluid` field. Preserve explicit mod declarations;
+  -- only infer water for that built-in source form.
+  local declared = pump and (pump.fluid or (pump.fluid_box and pump.fluid_box.filter))
+  if type(declared) == "string" and declared ~= "" then return declared end
+  if pump and pump.fluid_source_offset ~= nil then return "water" end
+  return nil
+end
+
 local function default_source_catalog(state, options)
   if state.source_catalog then return state.source_catalog end
   local sources = {}
@@ -380,7 +391,7 @@ local function default_source_catalog(state, options)
   if not append_minable_sources(sources, "tree", "minable-entity", options) then return sources end
   for _, pump in pairs(data_raw.prototypes("offshore-pump")) do
     if not diagnostic_visit(options) then return sources end
-    local identity = normalize_identity({type = "fluid", name = pump.fluid})
+    local identity = normalize_identity({type = "fluid", name = offshore_pump_output_fluid(pump)})
     if identity then
       local key = identity_key(identity)
       sources[key] = sources[key] or {}
