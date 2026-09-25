@@ -61,7 +61,8 @@ try {
 }
 $migratedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
 $introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
-if(@($manifest.bindings).Count-ne360-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne360-or$migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or$introducedBindings.Count-ne1-or[string]$introducedBindings[0].provenance.introduction_id-cne'MIR42-SCIENCE-ROUTE-FEASIBILITY'){throw '[mir4-editable-source-binding-uniqueness]'}
+$historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
+if(@($manifest.bindings).Count-ne372-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne372-or$migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or$introducedBindings.Count-ne13-or$historicalBindings.Count-ne12-or@($historicalBindings.source_path|Where-Object{$_-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-ne0-or@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne1){throw '[mir4-editable-source-binding-uniqueness]'}
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
 if(@($targetOutputs|Sort-Object -Unique).Count-ne$targetOutputs.Count){throw '[mir4-editable-source-target-output-uniqueness]'}
 if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or(@($support.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'){throw '[mir4-editable-source-four-target-authority]'}

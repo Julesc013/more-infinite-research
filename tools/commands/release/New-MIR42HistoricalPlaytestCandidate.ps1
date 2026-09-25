@@ -28,10 +28,24 @@ function Get-MIR42HistoricalTargetRecord {
   return [pscustomobject]@{ path = $path; record = $record }
 }
 
+function Get-MIR42HistoricalSourceManifest {
+  return Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
+}
+
 function Get-MIR42HistoricalSourceBytes {
-  param($Adapter)
+  param($Adapter, $Record, $SourceManifest)
   $relative = [string]$Adapter.source_path
   if ($relative -notmatch '^source/') { throw "[mir42-historical-adapter-boundary] $relative" }
+  $bindings = @($SourceManifest.bindings | Where-Object {
+    $Record.target -in @($_.target_scope) -and
+    [string]$_.output_path -ceq [string]$Adapter.output_path -and
+    [string]$_.source_path -ceq $relative
+  })
+  if ($bindings.Count -ne 1 -or
+      [int64]$bindings[0].source_bytes -ne [int64]$Adapter.source_bytes -or
+      [string]$bindings[0].source_sha256 -cne [string]$Adapter.source_sha256) {
+    throw "[mir42-historical-adapter-manifest-binding] $($Record.target):$relative"
+  }
   $full = [IO.Path]::GetFullPath((Join-Path $repo $relative))
   $prefix = $repo.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
   if (-not $full.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase) -or -not (Test-Path -LiteralPath $full -PathType Leaf)) {
@@ -46,8 +60,8 @@ function Get-MIR42HistoricalSourceBytes {
 }
 
 function ConvertTo-MIR42HistoricalAdapterBytes {
-  param($Adapter, $Record)
-  $bytes = Get-MIR42HistoricalSourceBytes -Adapter $Adapter
+  param($Adapter, $Record, $SourceManifest)
+  $bytes = Get-MIR42HistoricalSourceBytes -Adapter $Adapter -Record $Record -SourceManifest $SourceManifest
   $transformField = $Adapter.PSObject.Properties['transform']
   $transform = if ($null -eq $transformField -or [string]::IsNullOrWhiteSpace([string]$transformField.Value)) { 'copy-exact-bytes' } else { [string]$transformField.Value }
   if ($transform -eq 'copy-exact-bytes') { $output = $bytes }
@@ -107,7 +121,7 @@ function ConvertTo-MIR42HistoricalAdapterBytes {
 }
 
 function Copy-MIR42HistoricalAdapter {
-  param([string]$Tree, $Record)
+  param([string]$Tree, $Record, $SourceManifest)
   foreach ($adapter in @($Record.adapter_files)) {
     $output = [string]$adapter.output_path
     Assert-MIR4PortableArchivePath -Path $output
@@ -116,7 +130,7 @@ function Copy-MIR42HistoricalAdapter {
     if (-not $destination.StartsWith($treePrefix, [StringComparison]::OrdinalIgnoreCase) -or -not (Test-Path -LiteralPath $destination -PathType Leaf)) {
       throw "[mir42-historical-adapter-output-missing] $output"
     }
-    [IO.File]::WriteAllBytes($destination, (ConvertTo-MIR42HistoricalAdapterBytes -Adapter $adapter -Record $Record))
+    [IO.File]::WriteAllBytes($destination, (ConvertTo-MIR42HistoricalAdapterBytes -Adapter $adapter -Record $Record -SourceManifest $SourceManifest))
   }
   foreach ($patch in @($Record.patches)) {
     $output = [string]$patch.output_path
@@ -139,6 +153,7 @@ function Copy-MIR42HistoricalAdapter {
 
 $targetState = Get-MIR42HistoricalTargetRecord -TargetId $Target
 $record = $targetState.record
+$sourceManifest = Get-MIR42HistoricalSourceManifest
 $output = if ([IO.Path]::IsPathRooted($OutputRoot)) { [IO.Path]::GetFullPath($OutputRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot)) }
 $buildRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
 $buildPrefix = $buildRoot.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
@@ -156,7 +171,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   New-Item -ItemType Directory -Force -Path $candidateParent | Out-Null
   $tree = Join-Path $candidateParent "more-infinite-research_$([string]$record.distribution_version)"
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
-  Copy-MIR42HistoricalAdapter -Tree $tree -Record $record
+  Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
   $info = Get-Content -Raw -LiteralPath (Join-Path $tree 'info.json') | ConvertFrom-Json -Depth 20
   if ([string]$info.name -cne 'more-infinite-research' -or [string]$info.version -cne [string]$record.distribution_version -or
       [string]$info.factorio_version -cne [string]$record.factorio_line) {
@@ -197,7 +212,7 @@ $manifest = [pscustomobject][ordered]@{
   predecessor = $record.predecessor
   builds = $rows
   distribution = [ordered]@{ path = [IO.Path]::GetRelativePath($repo, $distribution).Replace('\', '/'); sha256 = [string]$rows[0].archive_sha256; content_sha256 = [string]$rows[0].content_sha256; entry_count = [int]$rows[0].entry_count }
-  assertions = @('current-canonical-f100-base-materialization', 'target-specific-profile-adapter', 'target-specific-metadata', 'bounded-research-cost-publication-omission', 'byte-identical-repeated-builds', 'package-path-exclusion')
+  assertions = @('current-canonical-f100-base-materialization', 'source-manifest-authoritative-adapter-selection', 'target-specific-profile-adapter', 'target-specific-metadata', 'bounded-research-cost-publication-omission', 'byte-identical-repeated-builds', 'package-path-exclusion')
   exact_engine_runtime = 'not-run'
   public_output_authorized = $false
   publication_authorized = $false
