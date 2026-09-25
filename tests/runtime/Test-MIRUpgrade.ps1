@@ -225,7 +225,7 @@ Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
 if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-4-0-20000-to-4-1-20000', 'assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
     $ToVersion -match '^4[.]2[.](?<code>21000|20000|11000|10000)$') {
   $code = [string]$Matches.code
-  $expectedFrom = if ($code -ceq '20000') { "4.0.$code" } else { "4.1.$code" }
+  $expectedFrom = "4.1.$code"
   if ($FromVersion -cne $expectedFrom) { throw 'MIR 4.2 upgrade specialization requires its exact predecessor version.' }
   $fixtureFrom = "4.0.$code"
   $fixtureTo = "4.1.$code"
