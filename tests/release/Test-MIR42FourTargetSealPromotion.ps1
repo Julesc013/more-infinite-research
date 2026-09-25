@@ -21,25 +21,31 @@ try {
     tree = (& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim()
   }
   $packageSource = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot
-  $versions = [ordered]@{f210='4.2.21000';f200='4.2.20000';f110='4.2.11000';f100='4.2.10000'}
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
   $targets = [Collections.Generic.List[object]]::new()
   foreach ($target in @('f210','f200','f110','f100')) {
-    $assetRelative = "assets/$target.zip"
+    $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.0'
+    $assetRelative = "assets/$([string]$identity.package_name)"
     $assetPath = Join-Path $root $assetRelative
-    [IO.File]::WriteAllText($assetPath, "synthetic-$target", [Text.UTF8Encoding]::new($false))
-    $asset = [ordered]@{path=$assetRelative;bytes=[int64](Get-Item $assetPath).Length;sha256=(Get-FileHash $assetPath -Algorithm SHA256).Hash.ToUpperInvariant()}
+    $stage = Join-Path $root "staging/$target/$([string]$identity.distribution_root)"
+    New-Item -ItemType Directory -Force -Path $stage | Out-Null
+    [IO.File]::WriteAllText((Join-Path $stage 'info.json'), (([ordered]@{name='more-infinite-research';version=[string]$identity.distribution_version;factorio_version=([string]$identity.target_id -replace '^factorio-','')} | ConvertTo-Json -Compress)), [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $stage 'data.lua'), 'return {}', [Text.UTF8Encoding]::new($false))
+    [IO.Compression.ZipFile]::CreateFromDirectory((Split-Path -Parent $stage), $assetPath, [IO.Compression.CompressionLevel]::Optimal, $false)
+    $inventory = Get-MIR4ArchiveInventory -Path $assetPath
+    $asset = [ordered]@{path=$assetRelative;bytes=[int64]$inventory.bytes;sha256=[string]$inventory.archive_sha256}
     $row = [pscustomobject][ordered]@{
-      schema=1;kind='MIR42FourTargetCandidateTargetRowV1';target=$target;distribution_version=$versions[$target]
-      asset=$asset;content_sha256=('A' * 64);entry_count=1;build_a_sha256=$asset.sha256;build_b_sha256=$asset.sha256
+      schema=1;kind='MIR42FourTargetCandidateTargetRowV1';target=$target;distribution_version=[string]$identity.distribution_version
+      asset=$asset;content_sha256=[string]$inventory.content_sha256;entry_count=[int]$inventory.entry_count;build_a_sha256=$asset.sha256;build_b_sha256=$asset.sha256
       deterministic_archive_bytes=$true;package_excluded_surface=$true;record_sha256=''
     }
     $row.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $row
     $rowRelative = "target-rows/$target.json"
     Write-MIR4BootstrapRecord -Record $row -Path (Join-Path $root $rowRelative) | Out-Null
-    $targets.Add([pscustomobject][ordered]@{target=$target;distribution_version=$versions[$target];target_row_path=$rowRelative;asset=$asset;content_sha256=('A' * 64);entry_count=1})
+    $targets.Add([pscustomobject][ordered]@{target=$target;distribution_version=[string]$identity.distribution_version;target_row_path=$rowRelative;asset=$asset;content_sha256=[string]$inventory.content_sha256;entry_count=[int]$inventory.entry_count})
   }
   $manifest = [pscustomobject][ordered]@{
-    schema=1;kind='MIR42FourTargetCandidateManifestV1';status='private-deterministic-four-target-candidate-built-unqualified';build_complete=$true
+    schema=1;kind='MIR42FourTargetDeterministicCandidateManifestV1';status='private-deterministic-four-target-candidate-built-unqualified';build_complete=$true
     source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource;target_authority=@();resource_admission=@{}
     targets=@($targets);failures=@();qualification='not-performed';technical_seal='not-performed';signing='not-performed';tagging='not-performed';publication_authorized=$false;record_sha256=''
   }
@@ -49,12 +55,22 @@ try {
 
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath
   Assert-MIR42SealTest ($readiness.status -ceq 'MIR-4.2-FOUR-TARGET-TECHNICAL-SEAL-BLOCKED') 'missing-gates-block-seal'
-  Assert-MIR42SealTest ([bool]$readiness.checks.candidate -and -not [bool]$readiness.checks.qualification -and -not [bool]$readiness.technical_seal_authorized) 'candidate-only-readiness'
+  Assert-MIR42SealTest ([bool]$readiness.checks.candidate -and -not [bool]$readiness.checks.qualification -and -not [bool]$readiness.checks.campaign -and -not [bool]$readiness.checks.reviewer -and -not [bool]$readiness.technical_seal_authorized) 'candidate-only-readiness'
+  $mislabelledQualification = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42FourTargetExactCandidateQualificationV1';status='MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED'
+    factorio_processes=4;release_qualification='claimed';independent_verification='not-performed';publication_authorized=$false;record_sha256=''
+  }
+  $mislabelledQualification.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $mislabelledQualification
+  $mislabelledQualificationPath = Join-Path $root 'mislabelled-qualification.json'
+  Write-MIR4BootstrapRecord -Record $mislabelledQualification -Path $mislabelledQualificationPath | Out-Null
+  $mislabelledRejected = $false
+  try { Get-MIR42ExactQualificationReceipt -Path $mislabelledQualificationPath -Candidate $readiness._state.candidate | Out-Null } catch { $mislabelledRejected = $_.Exception.Message -match 'mir42-seal-evidence-reconciliation-state' }
+  Assert-MIR42SealTest $mislabelledRejected 'mislabelled-reconciliation-cannot-be-release-qualification'
   $preparation = Join-Path $RepoRoot '.mir/releases/governance/mir4/signing-ceremony-preparation.json'
   $preparedOnly = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath -SigningCeremonyPath $preparation
   Assert-MIR42SealTest (-not [bool]$preparedOnly.checks.signing -and -not [bool]$preparedOnly.technical_seal_authorized) 'preparation-is-not-approved-signer-and-recovery'
   $rejected = $false
-  try { New-MIR42FourTargetTechnicalSeal -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath -QualificationPath (Join-Path $root 'missing-qualification.json') -IndependentVerificationPath (Join-Path $root 'missing-independent.json') -SigningCeremonyPath (Join-Path $root 'missing-signing.json') -SourceFreezeAuthorityPath (Join-Path $root 'missing-freeze.json') -OutputPath (Join-Path $root 'seal.json') | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-seal-not-authorized'; if (-not $rejected) { throw $_ } }
+  try { New-MIR42FourTargetTechnicalSeal -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath -QualificationPath (Join-Path $root 'missing-qualification.json') -RealEngineCampaignPath (Join-Path $root 'missing-real-engine.json') -IndependentVerificationPath (Join-Path $root 'missing-independent.json') -SigningCeremonyPath (Join-Path $root 'missing-signing.json') -SourceFreezeAuthorityPath (Join-Path $root 'missing-freeze.json') -OutputPath (Join-Path $root 'seal.json') | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-seal-not-authorized'; if (-not $rejected) { throw $_ } }
   Assert-MIR42SealTest $rejected 'seal-cannot-bypass-missing-evidence'
 
   $seal = [pscustomobject][ordered]@{
@@ -67,9 +83,11 @@ try {
   $seal.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $seal
   $sealPath = Join-Path $root 'technical-seal.json'
   Write-MIR4BootstrapRecord -Record $seal -Path $sealPath | Out-Null
-  $plan = Get-MIR42ProtectedMainPromotionPlan -RepoRoot $RepoRoot -TechnicalSealPath $sealPath -CandidateManifestPath $manifestPath
-  Assert-MIR42SealTest ($plan.status -ceq 'MIR-4.2-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -and [bool]$plan.pull_request_required -and [bool]$plan.linear_history_required) 'protected-pr-plan'
-  Assert-MIR42SealTest (($plan.required_status_checks -join '|') -ceq 'branch-policy|verification-gate' -and $plan.bypass_actors_allowed -eq 0 -and -not [bool]$plan.remote_mutation_performed) 'no-bypass-or-remote-effect'
+  $promotionRejected = $false
+  try { Get-MIR42ProtectedMainPromotionPlan -RepoRoot $RepoRoot -TechnicalSealPath $sealPath -CandidateManifestPath $manifestPath -QualificationPath (Join-Path $root 'missing-qualification.json') -RealEngineCampaignPath (Join-Path $root 'missing-real-engine.json') -IndependentVerificationPath (Join-Path $root 'missing-independent.json') -SigningCeremonyPath (Join-Path $root 'missing-signing.json') -SourceFreezeAuthorityPath (Join-Path $root 'missing-freeze.json') -ReviewerAttestationPath (Join-Path $root 'missing-reviewer.json') -SshKeygenPath 'C:\Windows\System32\OpenSSH\ssh-keygen.exe' | Out-Null } catch { $promotionRejected = $_.Exception.Message -match 'mir42-promotion-verified-seal-inputs' }
+  Assert-MIR42SealTest $promotionRejected 'handwritten-seal-cannot-bypass-verified-inputs'
+  $promotionText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
+  Assert-MIR42SealTest ($promotionText -match 'refs/heads/main' -and $promotionText -match 'refs/heads/dev' -and $promotionText -match 'candidateRef' -and $promotionText -notmatch 'push origin|--force') 'protected-pr-remote-readback-no-push'
 
   $sourceDrift = $manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
   $sourceDrift.source.tree = '0' * 40
@@ -81,11 +99,74 @@ try {
   try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $sourceDriftPath | Out-Null } catch { $sourceRejected = $_.Exception.Message -match 'mir42-seal-candidate-source-tree-drift' }
   Assert-MIR42SealTest $sourceRejected 'candidate-tree-drift-rejected'
 
-  [IO.File]::AppendAllText((Join-Path $root 'assets/f210.zip'),'drift',[Text.UTF8Encoding]::new($false))
+  $escape = $manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+  $escape.targets[0].asset.path = '../outside.zip'
+  $escape.record_sha256 = ''
+  $escape.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $escape
+  $escapePath = Join-Path $root 'candidate-escape.json'
+  Write-MIR4BootstrapRecord -Record $escape -Path $escapePath | Out-Null
+  $escapeRejected = $false
+  try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $escapePath | Out-Null } catch { $escapeRejected = $_.Exception.Message -match 'mir42-seal-candidate-asset-path' }
+  Assert-MIR42SealTest $escapeRejected 'candidate-asset-traversal-rejected'
+
+  $plainPath = Join-Path $root 'invalid/more-infinite-research_4.2.21000.zip'
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $plainPath) | Out-Null
+  [IO.File]::WriteAllText($plainPath, 'not-a-zip', [Text.UTF8Encoding]::new($false))
+  $plainAsset = [pscustomobject]@{path='invalid/more-infinite-research_4.2.21000.zip';bytes=[int64](Get-Item $plainPath).Length;sha256=(Get-FileHash $plainPath -Algorithm SHA256).Hash.ToUpperInvariant()}
+  $plainRow = Get-Content -Raw -LiteralPath (Join-Path $root 'target-rows/f210.json') | ConvertFrom-Json -Depth 100 -DateKind String
+  $plainRow.asset = $plainAsset; $plainRow.content_sha256 = ('E' * 64); $plainRow.entry_count = 1; $plainRow.build_a_sha256 = $plainAsset.sha256; $plainRow.build_b_sha256 = $plainAsset.sha256; $plainRow.record_sha256 = ''
+  $plainRow.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $plainRow
+  $plainRowPath = Join-Path $root 'target-rows/f210-invalid.json'
+  Write-MIR4BootstrapRecord -Record $plainRow -Path $plainRowPath | Out-Null
+  $plain = $manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+  $plain.targets[0].asset = $plainAsset; $plain.targets[0].content_sha256 = ('E' * 64); $plain.targets[0].entry_count = 1; $plain.targets[0].target_row_path = 'target-rows/f210-invalid.json'; $plain.record_sha256 = ''
+  $plain.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $plain
+  $plainManifestPath = Join-Path $root 'candidate-plain-zip.json'
+  Write-MIR4BootstrapRecord -Record $plain -Path $plainManifestPath | Out-Null
+  $plainRejected = $false
+  try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $plainManifestPath | Out-Null } catch { $plainRejected = $_.Exception.Message -match 'mir42-seal-candidate-archive-invalid' }
+  Assert-MIR42SealTest $plainRejected 'candidate-plain-text-zip-rejected'
+
+  $forgedFreeze = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42SourceFreezeAuthorizationV1';status='MIR-4.2-SOURCE-FROZEN-AND-CANDIDATE-ALLOCATED'
+    source=$readiness._state.candidate.source;candidate_manifest=[pscustomobject]@{sha256=$readiness._state.candidate.identity.sha256;record_sha256=$readiness._state.candidate.identity.record.record_sha256}
+    frozen_dev=[pscustomobject]@{ref='refs/heads/dev';commit=$readiness._state.candidate.source.commit;tree=$readiness._state.candidate.source.tree}
+    promotion_base=[pscustomobject]@{remote='origin';ref='refs/heads/main';commit=('E' * 40)}
+    signing_ceremony=[pscustomobject]@{sha256=('C' * 64);record_sha256=('D' * 64)}
+    transition_gate=[pscustomobject]@{source_freeze=$true;candidate_allocation=$true;production_signing=$true;technical_seal=$false}
+    independent_reviewer=[pscustomobject]@{identity='independent-reviewer';public_key='ssh-ed25519 AAAA reviewer';fingerprint='SHA256:reviewer'}
+    ledger_signature=[pscustomobject]@{verified=$true;namespace='mir4-ledger'};record_sha256=''
+  }
+  $forgedFreeze.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedFreeze
+  $forgedFreezePath = Join-Path $root 'forged-freeze.json'
+  Write-MIR4BootstrapRecord -Record $forgedFreeze -Path $forgedFreezePath | Out-Null
+  $forgedRejected = $false
+  $fakeSigning = [pscustomobject]@{sha256=('C' * 64);record=[pscustomobject]@{record_sha256=('D' * 64)};ledger_signer=[pscustomobject]@{principal='mir4-release-signing';public_key='ssh-ed25519 AAAA test';fingerprint='SHA256:test'}}
+  try { Get-MIR42SourceFreezeAuthority -RepoRoot $RepoRoot -Path $forgedFreezePath -Candidate $readiness._state.candidate -Signing $fakeSigning -SshKeygenPath 'C:\Windows\System32\OpenSSH\ssh-keygen.exe' | Out-Null } catch { $forgedRejected = $_.Exception.Message -match 'mir42-seal-freeze-ledger-signature-shape'; if (-not $forgedRejected) { throw $_ } }
+  Assert-MIR42SealTest $forgedRejected 'forged-freeze-verified-flag-rejected'
+
+  $fakeIndependent = [pscustomobject]@{sha256=('F' * 64);record=[pscustomobject]@{record_sha256=('A' * 64)}}
+  $fakeCampaign = [pscustomobject]@{sha256=('B' * 64);record=[pscustomobject]@{record_sha256=('C' * 64);release_acceptance=@()}}
+  $fakeFreeze = [pscustomobject]@{sha256=('D' * 64);record=[pscustomobject]@{record_sha256=('E' * 64);independent_reviewer=$forgedFreeze.independent_reviewer}}
+  $forgedReview = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42IndependentReviewerAttestationV1';status='MIR-4.2-INDEPENDENT-REVIEW-ACCEPTED'
+    independent_verification=[pscustomobject]@{sha256=$fakeIndependent.sha256;record_sha256=$fakeIndependent.record.record_sha256}
+    real_engine_campaign=[pscustomobject]@{sha256=$fakeCampaign.sha256;record_sha256=$fakeCampaign.record.record_sha256}
+    source_freeze_authority=[pscustomobject]@{sha256=$fakeFreeze.sha256;record_sha256=$fakeFreeze.record.record_sha256}
+    acceptance_coverage=@();reviewer=$forgedFreeze.independent_reviewer;review_signature=[pscustomobject]@{verified=$true;namespace='mir4-independent-review'};record_sha256=''
+  }
+  $forgedReview.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedReview
+  $forgedReviewPath = Join-Path $root 'forged-review.json'
+  Write-MIR4BootstrapRecord -Record $forgedReview -Path $forgedReviewPath | Out-Null
+  $forgedReviewRejected = $false
+  try { Get-MIR42IndependentReviewerAttestation -RepoRoot $RepoRoot -Path $forgedReviewPath -Independent $fakeIndependent -Campaign $fakeCampaign -Freeze $fakeFreeze -SshKeygenPath 'C:\Windows\System32\OpenSSH\ssh-keygen.exe' | Out-Null } catch { $forgedReviewRejected = $_.Exception.Message -match 'mir42-seal-reviewer-signature-shape'; if (-not $forgedReviewRejected) { throw $_ } }
+  Assert-MIR42SealTest $forgedReviewRejected 'forged-reviewer-verified-flag-rejected'
+
+  [IO.File]::AppendAllText((Join-Path $root ([string]$targets[0].asset.path)),'drift',[Text.UTF8Encoding]::new($false))
   $assetRejected = $false
   try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath | Out-Null } catch { $assetRejected = $_.Exception.Message -match 'mir42-seal-candidate-asset-drift' }
   Assert-MIR42SealTest $assetRejected 'candidate-asset-drift-rejected'
-  Write-Output 'MIR 4.2 four-target seal and protected-main plan passed candidate identity, missing-evidence, no-bypass, and asset-drift checks; no remote mutation occurred.'
+  Write-Output 'MIR 4.2 seal passed exact-archive, path, source, real-engine, forged-freeze, missing-evidence, and no-bypass checks; no remote mutation occurred.'
 } finally {
   if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }
