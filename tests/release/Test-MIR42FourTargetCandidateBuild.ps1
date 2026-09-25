@@ -58,6 +58,7 @@ $partialRoot = $root + '-partial'
 try {
   $complete = New-MIR42FourTargetCandidate -RepoRoot $repo -FinalSourceCommit $commit -BuildId 'STATIC' -OutputRoot $root -MinimumFreeMemoryBytes 1 -MinimumFreeWorkBytes 1
   Assert-MIR42CandidateBuildTest ([bool]$complete.build_complete) 'complete-build-status'
+  Assert-MIR42CandidateBuildTest ($complete.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV1') 'complete-build-manifest-kind'
   Assert-MIR42CandidateBuildTest ($complete.status -ceq 'private-deterministic-four-target-candidate-built-unqualified') 'complete-build-private-status'
   Assert-MIR42CandidateBuildTest (@($complete.targets).Count -eq 4) 'complete-build-target-count'
   Assert-MIR42CandidateBuildTest ($script:mir42CandidateStubCalls.Count -eq 8) 'complete-build-serial-two-per-target'
@@ -77,6 +78,7 @@ try {
   $script:mir42CandidateStubFailureTarget = 'f200'
   $partial = New-MIR42FourTargetCandidate -RepoRoot $repo -FinalSourceCommit $commit -BuildId 'PARTIAL' -OutputRoot $partialRoot -MinimumFreeMemoryBytes 1 -MinimumFreeWorkBytes 1
   Assert-MIR42CandidateBuildTest (-not [bool]$partial.build_complete) 'partial-build-status'
+  Assert-MIR42CandidateBuildTest ($partial.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV1') 'partial-build-manifest-kind'
   Assert-MIR42CandidateBuildTest (@($partial.targets).Count -eq 1 -and [string]$partial.targets[0].target -ceq 'f210') 'partial-build-keeps-prior-target-row'
   Assert-MIR42CandidateBuildTest (@($partial.failures).Count -eq 1 -and [string]$partial.failures[0].target -ceq 'f200') 'partial-build-records-later-failure'
   Assert-MIR42CandidateBuildTest (Test-Path -LiteralPath (Join-Path $partialRoot 'target-rows/f210.json') -PathType Leaf) 'partial-build-persists-prior-row'
