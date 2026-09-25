@@ -472,6 +472,60 @@ function Get-MIR42BoundEngineRun {
   return $run
 }
 
+function New-MIR42FourTargetRealEngineEvidenceBinder {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$CandidateManifestPath,
+    [Parameter(Mandatory)][string]$EvidenceReconciliationPath,
+    [Parameter(Mandatory)][string]$EngineRunPath,
+    [Parameter(Mandatory)][string]$OutputPath
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
+  $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate
+  $engineInput = Read-MIR42SealRecord -Path $EngineRunPath -Code 'mir42-engine-evidence-engine-run'
+  $engineRun = Get-MIR42BoundEngineRun -Reference ([pscustomobject][ordered]@{
+    path = $engineInput.path
+    sha256 = $engineInput.sha256
+    record_sha256 = [string]$engineInput.record.record_sha256
+  }) -Candidate $candidate
+  $targets = [Collections.Generic.List[object]]::new()
+  foreach ($candidateTarget in @($candidate.targets)) {
+    $engineTarget = @($engineRun.record.targets | Where-Object { [string]$_.target -ceq [string]$candidateTarget.target })
+    if ($engineTarget.Count -ne 1) { throw "[mir42-engine-evidence-target-cardinality] $([string]$candidateTarget.target)" }
+    $targets.Add([pscustomobject][ordered]@{
+      target = [string]$candidateTarget.target
+      distribution_version = [string]$candidateTarget.distribution_version
+      status = 'observed-real-engine-private-unqualified'
+      archive = [ordered]@{
+        sha256 = [string]$candidateTarget.archive_sha256
+        content_sha256 = [string]$candidateTarget.content_sha256
+        entry_count = [int]$candidateTarget.entry_count
+      }
+      engine_execution = $engineTarget[0].engine_execution
+    })
+  }
+  $record = [pscustomobject][ordered]@{
+    schema = 1
+    kind = 'MIR42FourTargetRealEngineEvidenceBinderV1'
+    status = 'MIR-4.2-FOUR-TARGET-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'
+    source = $candidate.source
+    candidate_manifest = [ordered]@{sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
+    evidence_reconciliation = [ordered]@{sha256=[string]$reconciliation.sha256;record_sha256=[string]$reconciliation.record.record_sha256}
+    engine_run = [ordered]@{sha256=[string]$engineRun.sha256;record_sha256=[string]$engineRun.record.record_sha256}
+    runner = [ordered]@{sha256=[string]$engineRun.record.runner.sha256}
+    targets = @($targets)
+    factorio_processes = [int]$engineRun.record.factorio_processes
+    release_qualification = 'not-performed'
+    release_acceptance = 'not-performed'
+    technical_seal = 'not-performed'
+    publication_authorized = $false
+    record_sha256 = ''
+  }
+  return (Write-MIR42NormalizedRecord -Record $record -OutputPath $OutputPath -Code 'mir42-engine-evidence-output')
+}
+
 function Get-MIR42RealEngineCandidateCampaign {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Reconciliation)
   $campaign = Read-MIR42SealRecord -Path $Path -Code 'mir42-seal-real-engine'
@@ -841,6 +895,23 @@ function Get-MIR42FourTargetTechnicalSealReadiness {
   }
 }
 
+function Write-MIR42NormalizedRecord {
+  param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)][string]$OutputPath,[Parameter(Mandatory)][string]$Code)
+  # Ordered dictionaries and PSCustomObjects do not always round-trip to the
+  # same canonical representation. Hash the parsed canonical form that will
+  # actually be persisted, then prove the written receipt can be read back.
+  $normalized = (ConvertTo-MIR4BootstrapCanonicalJson -Value $Record | ConvertFrom-Json -Depth 100 -DateKind String)
+  $normalized.record_sha256 = ''
+  $normalized.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $normalized
+  Write-MIR4BootstrapRecord -Record $normalized -Path $OutputPath | Out-Null
+  $readback = Read-MIR42SealRecord -Path $OutputPath -Code $Code
+  if (-not (Test-MIR4BootstrapRecordHash -Record $readback.record) -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $readback.record) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $normalized)) {
+    throw "[$Code-roundtrip]"
+  }
+  return $readback.record
+}
+
 function New-MIR42FourTargetTechnicalSeal {
   [CmdletBinding()]
   param(
@@ -879,7 +950,5 @@ function New-MIR42FourTargetTechnicalSeal {
     publication_authorized = $false
     record_sha256 = ''
   }
-  $seal.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $seal
-  Write-MIR4BootstrapRecord -Record $seal -Path $OutputPath | Out-Null
-  return $seal
+  return (Write-MIR42NormalizedRecord -Record $seal -OutputPath $OutputPath -Code 'mir42-seal-output')
 }

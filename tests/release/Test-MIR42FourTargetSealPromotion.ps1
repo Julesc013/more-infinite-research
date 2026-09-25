@@ -53,6 +53,15 @@ try {
   $manifestPath = Join-Path $root 'candidate-manifest.json'
   Write-MIR4BootstrapRecord -Record $manifest -Path $manifestPath | Out-Null
 
+  $roundTripProbe = [ordered]@{
+    schema=1;kind='MIR42TechnicalSealRoundTripProbeV1'
+    nested=[ordered]@{row=[ordered]@{target='f210';values=@([ordered]@{sha256=('A' * 64);entry_count=1})}}
+    record_sha256=''
+  }
+  $roundTripProbePath = Join-Path $root 'technical-seal-roundtrip.json'
+  $roundTripSeal = Write-MIR42NormalizedRecord -Record $roundTripProbe -OutputPath $roundTripProbePath -Code 'test-roundtrip'
+  Assert-MIR42SealTest (Test-MIR4BootstrapRecordHash -Record $roundTripSeal) 'technical-seal-producer-normalizes-before-hashing'
+
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath
   Assert-MIR42SealTest ($readiness.status -ceq 'MIR-4.2-FOUR-TARGET-TECHNICAL-SEAL-BLOCKED') 'missing-gates-block-seal'
   Assert-MIR42SealTest ([bool]$readiness.checks.candidate -and -not [bool]$readiness.checks.qualification -and -not [bool]$readiness.checks.campaign -and -not [bool]$readiness.checks.reviewer -and -not [bool]$readiness.technical_seal_authorized) 'candidate-only-readiness'

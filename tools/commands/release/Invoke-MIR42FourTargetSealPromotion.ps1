@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [ValidateSet('Readiness','Seal','PromotionPlan')][string]$Mode = 'Readiness',
+  [ValidateSet('Readiness','EngineEvidence','Seal','PromotionPlan')][string]$Mode = 'Readiness',
   [Parameter(Mandatory)][string]$CandidateManifestPath,
   [string]$QualificationPath = '',
   [string]$RealEngineCampaignPath = '',
@@ -9,6 +9,7 @@ param(
   [string]$SourceFreezeAuthorityPath = '',
   [string]$ReviewerAttestationPath = '',
   [string]$SshKeygenPath = '',
+  [string]$EngineRunPath = '',
   [string]$TechnicalSealPath = '',
   [string]$OfflineRestoreDrillPath = '',
   [string]$OutputPath = '',
@@ -26,6 +27,13 @@ switch ($Mode) {
       -SigningCeremonyPath $SigningCeremonyPath -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
     $result.PSObject.Properties.Remove('_state')
     $result | ConvertTo-Json -Depth 30
+  }
+  'EngineEvidence' {
+    if ([string]::IsNullOrWhiteSpace($QualificationPath)) { throw '[mir42-engine-evidence-reconciliation-required]' }
+    if ([string]::IsNullOrWhiteSpace($EngineRunPath)) { throw '[mir42-engine-evidence-run-required]' }
+    if ([string]::IsNullOrWhiteSpace($OutputPath)) { throw '[mir42-engine-evidence-output-required]' }
+    New-MIR42FourTargetRealEngineEvidenceBinder -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
+      -EvidenceReconciliationPath $QualificationPath -EngineRunPath $EngineRunPath -OutputPath $OutputPath | ConvertTo-Json -Depth 30
   }
   'Seal' {
     if ([string]::IsNullOrWhiteSpace($OutputPath)) { throw '[mir42-seal-output-path-required]' }
