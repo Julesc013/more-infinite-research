@@ -77,7 +77,7 @@ try {
     source = [pscustomobject][ordered]@{commit=$source.commit;tree=$source.tree}
     dependencies = @($script:MIR42SealVerifierDependencyPaths | ForEach-Object { [pscustomobject][ordered]@{path=[string]$_;sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot $_) -Algorithm SHA256).Hash.ToUpperInvariant()} })
   }
-  Assert-MIR42SealExternalVerifierAuthority -RepoRoot $RepoRoot -Verifier $verifierAuthority -Code 'mir42-seal-test-verifier-authority'
+  Assert-MIR42SealExternalVerifierAuthority -RepoRoot $RepoRoot -Verifier $verifierAuthority -Code 'mir42-seal-test-verifier-authority' | Out-Null
   $verifierHashDrift = $verifierAuthority | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20 -DateKind String
   $verifierHashDrift.dependencies[0].sha256 = '0' * 64
   $verifierHashRejected = $false
@@ -89,7 +89,7 @@ try {
   $dirtyToolsRejected = $false
   try {
     [IO.File]::AppendAllText($dirtyVerifierPath, "`n# MIR42 test-only dirty verifier probe`n", [Text.UTF8Encoding]::new($false))
-    try { Assert-MIR42SealSource -RepoRoot $RepoRoot -Source ([pscustomobject]$source) -Code 'mir42-seal-test-dirty-tools' | Out-Null } catch { $dirtyToolsRejected = $_.Exception.Message -match 'mir42-seal-test-dirty-tools-source-dirty' }
+    try { Assert-MIR42SealSource -RepoRoot $RepoRoot -Source ([pscustomobject]@{commit=$source.commit;tree=$source.tree;package_source_sha256=$packageSource}) -Code 'mir42-seal-test-dirty-tools' | Out-Null } catch { $dirtyToolsRejected = $_.Exception.Message -match 'mir42-seal-test-dirty-tools-source-dirty' }
   } finally {
     [IO.File]::WriteAllBytes($dirtyVerifierPath,$dirtyVerifierBytes)
   }
