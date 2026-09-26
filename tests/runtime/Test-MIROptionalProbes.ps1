@@ -14,6 +14,20 @@ $fixture=Join-Path $run 'mods/mir-optional-test_1.0.0'
 New-Item -ItemType Directory -Force $fixture | Out-Null
 @{name='mir-optional-test';version='1.0.0';title='MIR package-excluded optional probes';author='MIR';factorio_version=$Target;dependencies=@('base')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/optional_runtime_services.lua') -Destination $fixture
+New-Item -ItemType Directory -Force (Join-Path $fixture 'prototypes/mir/runtime/effects'),(Join-Path $fixture 'prototypes/mir/platform/factorio') | Out-Null
+Copy-Item -LiteralPath (Join-Path $repo 'source/prototypes/mir/runtime/effects/passive_repair.lua') -Destination (Join-Path $fixture 'prototypes/mir/runtime/effects/passive_repair.lua')
+@'
+local M={}
+function M.get(name)
+  return name=="mir-enable-passive-repair" and storage.mir_test_passive_repair_enabled==true
+end
+return M
+'@ | Set-Content -LiteralPath (Join-Path $fixture 'prototypes/mir/runtime/startup_settings.lua') -NoNewline
+@'
+local M={}
+function M.root() return storage end
+return M
+'@ | Set-Content -LiteralPath (Join-Path $fixture 'prototypes/mir/platform/factorio/runtime_state.lua') -NoNewline
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/optional_runtime_probe.lua') -Destination (Join-Path $fixture 'control.lua')
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='mir-optional-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
@@ -42,6 +56,7 @@ $result=Get-Content -Raw $resultPath | ConvertFrom-Json
 if($result.status -ne 'passed') { throw "Optional probe failed: $run" }
 $result | Add-Member engine_sha256 (Get-FileHash $engine).Hash
 $result | Add-Member prototype_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/optional_runtime_services.lua')).Hash
+$result | Add-Member passive_repair_sha256 (Get-FileHash (Join-Path $repo 'source/prototypes/mir/runtime/effects/passive_repair.lua')).Hash
 $result | Add-Member test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/optional_runtime_probe.lua')).Hash
 $result | Add-Member harness_sha256 (Get-FileHash $PSCommandPath).Hash
 $result | Add-Member target $Target

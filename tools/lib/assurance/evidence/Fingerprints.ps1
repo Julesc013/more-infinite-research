@@ -600,13 +600,13 @@ function Get-MIRAssuranceInputFingerprint {
       $isReparse = $null -ne $rootItem -and (($rootItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
       $state = if ($null -eq $rootItem) { "missing" } elseif (-not $isDirectory) { "invalid-file" } `
         elseif ($isReparse) { "invalid-reparse-directory" } else { "directory" }
-      $files = if ($isDirectory -and -not $isReparse) {
+      $files = @(if ($isDirectory -and -not $isReparse) {
         @(Get-ChildItem -LiteralPath $governedRoot -Recurse -File -Force | ForEach-Object {
           Get-MIRAssuranceRepoRelativePath -Path $_.FullName
         })
       } elseif ($null -ne $rootItem -and -not $isDirectory) {
         @(Get-MIRAssuranceRepoRelativePath -Path $rootItem.FullName)
-      } else { @() }
+      } else { @() })
       return [ordered]@{
         kind="mir4-bootstrap-governed-output"
         state=$state

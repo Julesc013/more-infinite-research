@@ -289,6 +289,7 @@ function Get-MIRDeltaProducerFingerprint {
     "fixtures/export-approved-delta/info.json",
     "tools/lib/validation/FactorioProcess.ps1",
     "tools/lib/validation/PackageIdentity.ps1",
+    "tools/lib/mir4/bootstrap-materialization/SafePaths.ps1",
     "tools/lib/validation/ResultAggregation.ps1",
     "tools/lib/validation/ScenarioRegistry.ps1",
     "tools/lib/validation/SettingsOverrides.ps1",

@@ -324,12 +324,50 @@ if (-not $hostedRunnerRejected) { throw "A hosted runner could claim the protect
 $scratchContextId = Get-MIRCPSha256Text -Value ("executor-path-budget/" + [guid]::NewGuid().ToString("N"))
 $scratchState = [pscustomobject][ordered]@{context=[pscustomobject][ordered]@{context_id=$scratchContextId}}
 $scratchCampaign = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/performance-campaign.json") | ConvertFrom-Json
-$scratch = New-MIRCPCompactPerformanceArtifactRoot -State $scratchState -Campaign $scratchCampaign
+$scratch = New-MIRCPCompactPerformanceArtifactRoot -State $scratchState -Campaign $scratchCampaign -RepoRoot $repo
 $compatBudgetPath = Join-Path $scratch.path "medium-ecosystem.factorio-total\measured-25-candidate\compat\runs\u-0123456789ab\mods\mir-validation-settings-overrides\settings-updates.lua"
 $scratchPayload = Join-Path $scratch.path "path-budget-self-test.txt"
 "exact-context-bound-scratch" | Set-Content -LiteralPath $scratchPayload -Encoding UTF8
 $scratchDestination = Join-Path $repo "build/results/control-plane-v5-self-test/performance-artifact-relocation/$scratchContextId"
-$scratchRelocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination
+foreach ($invalidRoot in @(
+  [pscustomobject]@{path=$scratch.path;context_id=("F" * 64);strategy=$scratch.strategy},
+  [pscustomobject]@{path=(Split-Path -Parent $scratch.path);context_id=$scratchContextId;strategy=$scratch.strategy},
+  [pscustomobject]@{path=$scratch.path;context_id=$scratchContextId;strategy='foreign-scratch-strategy'}
+)) {
+  $unsafeRelocationRejected = $false
+  try { $null = Move-MIRCPPerformanceArtifacts -ExecutionRoot $invalidRoot -Destination $scratchDestination -RepoRoot $repo }
+  catch { if ($_.Exception.Message -match "exact project scratch path") { $unsafeRelocationRejected = $true } else { throw } }
+  if (-not $unsafeRelocationRejected -or -not (Test-Path -LiteralPath $scratchPayload) -or (Test-Path -LiteralPath $scratchDestination)) {
+    throw "Performance artifact relocation did not reject an unrelated root before copying or deleting anything."
+  }
+}
+$markerBytes = [IO.File]::ReadAllBytes($scratch.marker_path)
+$forgedMarker = Get-Content -Raw -LiteralPath $scratch.marker_path | ConvertFrom-Json
+$forgedMarker.kind = "unrelated-scratch-root"
+$forgedMarker | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $scratch.marker_path -Encoding UTF8
+try {
+  $forgedMarkerRejected = $false
+  try { $null = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination -RepoRoot $repo }
+  catch { if ($_.Exception.Message -match "marker does not bind") { $forgedMarkerRejected = $true } else { throw } }
+  if (-not $forgedMarkerRejected -or -not (Test-Path -LiteralPath $scratchPayload) -or (Test-Path -LiteralPath $scratchDestination)) {
+    throw "Performance artifact relocation accepted a foreign marker or modified its source/destination."
+  }
+} finally { [IO.File]::WriteAllBytes($scratch.marker_path, $markerBytes) }
+$forgedMarker = Get-Content -Raw -LiteralPath $scratch.marker_path | ConvertFrom-Json
+$forgedMarker.strategy = 'foreign-scratch-strategy'
+$forgedMarker | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $scratch.marker_path -Encoding UTF8
+try {
+  foreach ($strategy in @($scratch.strategy, $forgedMarker.strategy)) {
+    $forgedRoot = [pscustomobject]@{path=$scratch.path;context_id=$scratchContextId;strategy=$strategy}
+    $forgedStrategyRejected = $false
+    try { $null = Move-MIRCPPerformanceArtifacts -ExecutionRoot $forgedRoot -Destination $scratchDestination -RepoRoot $repo }
+    catch { if ($_.Exception.Message -match 'marker does not bind|exact project scratch path') { $forgedStrategyRejected = $true } else { throw } }
+    if (-not $forgedStrategyRejected -or -not (Test-Path -LiteralPath $scratchPayload) -or (Test-Path -LiteralPath $scratchDestination)) {
+      throw 'Performance artifact relocation accepted an unowned strategy or modified its source/destination.'
+    }
+  }
+} finally { [IO.File]::WriteAllBytes($scratch.marker_path, $markerBytes) }
+$scratchRelocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination -RepoRoot $repo
 if ([string]$scratch.strategy -ne "compact-context-scratch-v1" -or
     [int]$scratch.maximum_factorio_path_length -gt [int]$scratch.conservative_path_budget -or
     [int]$scratch.maximum_factorio_path_length -lt $compatBudgetPath.Length -or

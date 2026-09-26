@@ -12,6 +12,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools/lib/mir4/bootstrap-materialization/SafePaths.ps1")
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function Resolve-RepoPath {
@@ -47,6 +48,7 @@ function Get-ApprovedDeltaProducerFingerprint {
     "fixtures/export-approved-delta/info.json",
     "tools/lib/validation/FactorioProcess.ps1",
     "tools/lib/validation/PackageIdentity.ps1",
+    "tools/lib/mir4/bootstrap-materialization/SafePaths.ps1",
     "tools/lib/validation/ResultAggregation.ps1",
     "tools/lib/validation/ScenarioRegistry.ps1",
     "tools/lib/validation/SettingsOverrides.ps1",
@@ -175,31 +177,47 @@ function Invoke-ApprovedDeltaScenario {
     [Parameter(Mandatory)][string]$Scenario,
     [Parameter(Mandatory)][string]$RawOutputPath
   )
-  $tempRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-approved-delta-" + [guid]::NewGuid().ToString("N"))
-  $logPath = Join-Path $tempRoot "factorio-current.log"
-  $summaryPath = Join-Path $tempRoot "validation-summary.json"
-  & (Join-Path $repo "scripts\Invoke-MIRValidation.ps1") `
-    -ScenarioWorker `
-    -FactorioBin $FactorioBin `
-    -CandidateZip $PackagePath `
-    -Scenario $Scenario `
-    -UserDataDir $tempRoot `
-    -FactorioLog $logPath `
-    -ValidationSummaryPath $summaryPath
-  if ($LASTEXITCODE -ne 0) { throw "Approved-delta scenario failed: $Label/$Scenario" }
-  $artifact = Get-ExportFromLog -LogPath $logPath
+  $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $RawOutputPath
+  $scratchParent = Join-Path $repo 'build/tmp'
+  $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $scratchParent
+  New-Item -ItemType Directory -Force -Path $scratchParent | Out-Null
+  $tempRoot = Join-Path $scratchParent ("mir-approved-delta-" + [guid]::NewGuid().ToString("N"))
+  $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $tempRoot
   $rawParent = Split-Path -Parent $RawOutputPath
   New-Item -ItemType Directory -Force -Path $rawParent | Out-Null
-  [pscustomobject][ordered]@{
-    schema = 1
-    kind = "mir-approved-delta-raw-evidence"
-    scenario = $Scenario
-    package_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $PackagePath).Hash
-    producer_sha256 = Get-ApprovedDeltaProducerFingerprint
-    factorio_binary_version = [Diagnostics.FileVersionInfo]::GetVersionInfo($FactorioBin).FileVersion
-    runtime_export = $artifact
-  } | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $RawOutputPath -Encoding UTF8
-  return $artifact
+  $completed = $false
+  try {
+    $logPath = Join-Path $tempRoot "factorio-current.log"
+    $summaryPath = Join-Path $tempRoot "validation-summary.json"
+    & (Join-Path $repo "scripts\Invoke-MIRValidation.ps1") `
+      -ScenarioWorker `
+      -FactorioBin $FactorioBin `
+      -CandidateZip $PackagePath `
+      -Scenario $Scenario `
+      -UserDataDir $tempRoot `
+      -FactorioLog $logPath `
+      -ValidationSummaryPath $summaryPath
+    if ($LASTEXITCODE -ne 0) { throw "Approved-delta scenario failed: $Label/$Scenario" }
+    $artifact = Get-ExportFromLog -LogPath $logPath
+    [pscustomobject][ordered]@{
+      schema = 1
+      kind = "mir-approved-delta-raw-evidence"
+      scenario = $Scenario
+      package_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $PackagePath).Hash
+      producer_sha256 = Get-ApprovedDeltaProducerFingerprint
+      factorio_binary_version = [Diagnostics.FileVersionInfo]::GetVersionInfo($FactorioBin).FileVersion
+      runtime_export = $artifact
+    } | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $RawOutputPath -Encoding UTF8
+    $completed = $true
+    return $artifact
+  } catch {
+    throw "Approved-delta scenario failed: $Label/$Scenario; retained project scratch $tempRoot; $($_.Exception.Message)"
+  } finally {
+    if ($completed -and (Test-Path -LiteralPath $tempRoot)) {
+      $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $tempRoot
+      Remove-MIR4BuildTree -OutputRoot $scratchParent -Path $tempRoot
+    }
+  }
 }
 
 function Get-ObjectProperties {
@@ -581,6 +599,8 @@ $baselinePath = Resolve-RepoPath -Path $BaselinePackage
 $currentPath = Resolve-RepoPath -Path $CurrentPackage
 $outputFile = Resolve-RepoPath -Path $OutputPath
 $evidenceDirectory = Resolve-RepoPath -Path $EvidenceRoot
+$null = Assert-MIR4NoReparseAncestors -Root $repo -Path $outputFile
+$null = Assert-MIR4NoReparseAncestors -Root $repo -Path $evidenceDirectory
 foreach ($required in @($baselinePath, $currentPath)) {
   if (-not (Test-Path -LiteralPath $required -PathType Leaf)) { throw "Package not found: $required" }
 }

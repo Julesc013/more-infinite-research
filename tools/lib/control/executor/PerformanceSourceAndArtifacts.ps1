@@ -225,14 +225,22 @@ function New-MIRCPPerformanceSourceOverlay {
 function New-MIRCPCompactPerformanceArtifactRoot {
   param(
     [Parameter(Mandatory)]$State,
-    [Parameter(Mandatory)]$Campaign
+    [Parameter(Mandatory)]$Campaign,
+    [string]$RepoRoot = ""
   )
   $contextId = [string]$State.context.context_id
   if ($contextId -notmatch '^[0-9A-F]{64}$') {
     throw "Compact performance staging requires an exact context digest."
   }
-  $scratchParent = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
-  $path = Join-Path $scratchParent ("mircp-p-" + $contextId.Substring(0, 24))
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $scratchParent = Join-Path $repo "build/p"
+  foreach ($parent in @((Join-Path $repo "build"), $scratchParent)) {
+    if ((Test-Path -LiteralPath $parent) -and
+        ((Get-Item -LiteralPath $parent -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Performance scratch parent must not be a reparse point: $parent"
+    }
+  }
+  $path = Join-Path $scratchParent ("c" + $contextId.Substring(0, 24))
   if (Test-Path -LiteralPath $path) {
     throw "Compact performance staging already exists and will not be overwritten: $path"
   }
@@ -258,6 +266,7 @@ function New-MIRCPCompactPerformanceArtifactRoot {
   if ($maximumPathLength -gt $pathBudget) {
     throw "Compact performance staging exceeds the conservative Factorio path budget ($maximumPathLength > $pathBudget): $maximumPath"
   }
+  [void](New-Item -ItemType Directory -Force -Path $scratchParent)
   [void](New-Item -ItemType Directory -Path $path)
   $marker = [pscustomobject][ordered]@{
     schema = 1
@@ -282,7 +291,8 @@ function New-MIRCPCompactPerformanceArtifactRoot {
 function Move-MIRCPPerformanceArtifacts {
   param(
     [Parameter(Mandatory)]$ExecutionRoot,
-    [Parameter(Mandatory)][string]$Destination
+    [Parameter(Mandatory)][string]$Destination,
+    [string]$RepoRoot = ""
   )
   if (-not (Test-Path -LiteralPath ([string]$ExecutionRoot.path) -PathType Container)) {
     throw "Compact performance execution root is absent: $($ExecutionRoot.path)"
@@ -290,18 +300,40 @@ function Move-MIRCPPerformanceArtifacts {
   if (Test-Path -LiteralPath $Destination) {
     throw "Performance artifact destination already exists and will not be merged: $Destination"
   }
-  $verified = Copy-MIRPerformanceArtifactsVerified -SourceRoot ([string]$ExecutionRoot.path) -DestinationRoot $Destination
-  Remove-Item -LiteralPath ([string]$ExecutionRoot.path) -Recurse -Force
-  if (Test-Path -LiteralPath ([string]$ExecutionRoot.path)) { throw "Compact performance execution root still exists after verified artifact relocation." }
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  foreach ($parent in @((Join-Path $repo "build"), (Join-Path $repo "build/p"))) {
+    if ((Get-Item -LiteralPath $parent -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) {
+      throw "Performance scratch parent must not be a reparse point: $parent"
+    }
+  }
+  $scratchParent = (Resolve-Path -LiteralPath (Join-Path $repo "build/p")).Path
+  $source = (Resolve-Path -LiteralPath ([string]$ExecutionRoot.path)).Path
+  $contextId = [string]$ExecutionRoot.context_id
+  if ([string]$ExecutionRoot.strategy -cne 'compact-context-scratch-v1' -or
+      $contextId -notmatch '^[0-9A-F]{64}$' -or
+      -not [string]::Equals((Split-Path -Parent $source), $scratchParent, [StringComparison]::OrdinalIgnoreCase) -or
+      (Split-Path -Leaf $source) -cne ("c" + $contextId.Substring(0, 24))) {
+    throw "Refusing to relocate or remove a performance execution root outside its exact project scratch path."
+  }
+  $sourceMarker = Get-Content -Raw -LiteralPath (Join-Path $source "control-plane-execution-root.json") | ConvertFrom-Json
+  if ([int]$sourceMarker.schema -ne 1 -or
+      [string]$sourceMarker.kind -cne "mir-control-plane-performance-execution-root" -or
+      [string]$sourceMarker.context_id -cne $contextId -or
+      [string]$sourceMarker.strategy -cne 'compact-context-scratch-v1') {
+    throw "Performance execution-root marker does not bind the expected source before relocation."
+  }
+  $verified = Copy-MIRPerformanceArtifactsVerified -SourceRoot $source -DestinationRoot $Destination
   $markerPath = Join-Path $Destination "control-plane-execution-root.json"
   if (-not (Test-Path -LiteralPath $markerPath -PathType Leaf)) {
     throw "Relocated performance artifacts lack their execution-root binding marker."
   }
   $marker = Get-Content -Raw -LiteralPath $markerPath | ConvertFrom-Json
   if ([string]$marker.context_id -ne [string]$ExecutionRoot.context_id -or
-      [string]$marker.strategy -ne [string]$ExecutionRoot.strategy) {
+      [string]$marker.strategy -cne 'compact-context-scratch-v1') {
     throw "Relocated performance artifacts do not bind the expected context and staging strategy."
   }
+  Remove-Item -LiteralPath $source -Recurse -Force
+  if (Test-Path -LiteralPath $source) { throw "Compact performance execution root still exists after verified artifact relocation." }
   return [pscustomobject][ordered]@{
     path = $Destination
     strategy = [string]$marker.strategy

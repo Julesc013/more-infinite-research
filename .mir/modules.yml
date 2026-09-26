@@ -1149,6 +1149,7 @@ runtime_boundaries:
       - prototypes/mir/runtime/productivity_family_adoption.lua
       - prototypes/mir/runtime/maximum_level_control.lua
       - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
+      - prototypes/mir/runtime/effects/passive_repair.lua
       - prototypes/mir/runtime/effects/spoilage_preservation.lua
     allowed_globals:
       - script
@@ -1462,6 +1463,7 @@ modules:
     - prototypes/mir/runtime/maximum_level_control.lua
     - prototypes/mir/runtime/state.lua
     - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
+    - prototypes/mir/runtime/effects/passive_repair.lua
     - prototypes/mir/runtime/effects/spoilage_preservation.lua
 
 mutation_commands:

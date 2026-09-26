@@ -156,7 +156,52 @@ function Assert-MIR4RuntimeRegistrationPlan {
     $ordered = @($group.subscribers | Sort-Object ordinal,id | ForEach-Object { [string]$_.id })
     if (($ordered -join '|') -cne ($subscriberIds -join '|')) { throw "[mir4-runtime-subscriber-order] $($group.id)" }
   }
-  if ($Plan.on_load.persistent_mutation -or $Plan.on_tick.registered -or [int]$Plan.on_tick.budget -ne 0) { throw '[mir4-runtime-idle-or-load-mutation]' }
+  $onLoadProperty = $Plan.PSObject.Properties['on_load']
+  if ($null -eq $onLoadProperty -or $null -eq $onLoadProperty.Value) { throw '[mir4-runtime-on-load-registration]' }
+  $onLoad = $onLoadProperty.Value
+  $onLoadDictionary = $onLoad -is [Collections.IDictionary]
+  $registeredProperty = if ($onLoadDictionary) { $null } else { $onLoad.PSObject.Properties['registered'] }
+  $mutationProperty = if ($onLoadDictionary) { $null } else { $onLoad.PSObject.Properties['persistent_mutation'] }
+  $registeredPresent = if ($onLoadDictionary) { $onLoad.Contains('registered') } else { $null -ne $registeredProperty }
+  $mutationPresent = if ($onLoadDictionary) { $onLoad.Contains('persistent_mutation') } else { $null -ne $mutationProperty }
+  $registeredValue = if ($onLoadDictionary) { $onLoad['registered'] } elseif ($registeredPresent) { $registeredProperty.Value } else { $null }
+  $mutationValue = if ($onLoadDictionary) { $onLoad['persistent_mutation'] } elseif ($mutationPresent) { $mutationProperty.Value } else { $null }
+  $handlerPresent = if ($onLoadDictionary) { $onLoad.Contains('handler') } else { $null -ne $onLoad.PSObject.Properties['handler'] }
+  $countPresent = if ($onLoadDictionary) { $onLoad.Contains('registration_count') } else { $null -ne $onLoad.PSObject.Properties['registration_count'] }
+  $readonlyPresent = if ($onLoadDictionary) { $onLoad.Contains('read_only_restoration') } else { $null -ne $onLoad.PSObject.Properties['read_only_restoration'] }
+  if (-not $registeredPresent -or -not $mutationPresent -or $registeredValue -isnot [bool] -or $mutationValue -isnot [bool]) { throw '[mir4-runtime-on-load-registration]' }
+  if ($readonlyPresent -and $onLoad.read_only_restoration -isnot [bool]) { throw '[mir4-runtime-on-load-registration]' }
+  if ([bool]$registeredValue) {
+    $hosts = @($onLoad.hosts)
+    if ([string]$Plan.owner -cne 'prototypes/mir/runtime/scripted_techs.lua' -or
+        [string]$onLoad.handler -cne 'passive_repair.on_load' -or
+        -not [bool]$onLoad.read_only_restoration -or
+        [int]$onLoad.registration_count -ne 1 -or
+        $hosts.Count -ne 2 -or
+        (@($hosts.target | Sort-Object -Unique) -join '|') -cne 'f200|f210' -or
+        @($hosts | Where-Object {
+          [string]$_.approved_handler -cne 'passive_repair.on_load' -or
+          [int]$_.registration_count -ne 1 -or
+          [int]$_.approved_registration_count -ne 1 -or
+          [string]$_.source_identity.dispatcher.path -cne 'prototypes/mir/runtime/scripted_techs.lua' -or
+          [string]$_.source_identity.stage.path -cne 'prototypes/mir/stage/control.lua' -or
+          [string]$_.source_identity.dispatcher.sha256 -cnotmatch '^[0-9a-f]{64}$' -or
+          [string]$_.source_identity.stage.sha256 -cnotmatch '^[0-9a-f]{64}$'
+        }).Count -ne 0) { throw '[mir4-runtime-on-load-registration]' }
+  } else {
+    if (($handlerPresent -and -not [string]::IsNullOrWhiteSpace([string]$onLoad.handler)) -or
+        ($countPresent -and [int]$onLoad.registration_count -ne 0) -or
+        ($readonlyPresent -and [bool]$onLoad.read_only_restoration)) { throw '[mir4-runtime-on-load-registration]' }
+  }
+  $onTickProperty = $Plan.PSObject.Properties['on_tick']
+  if ($null -eq $onTickProperty -or $null -eq $onTickProperty.Value) { throw '[mir4-runtime-idle-or-load-mutation]' }
+  $onTick = $onTickProperty.Value
+  $onTickDictionary = $onTick -is [Collections.IDictionary]
+  $tickRegisteredPresent = if ($onTickDictionary) { $onTick.Contains('registered') } else { $null -ne $onTick.PSObject.Properties['registered'] }
+  $tickBudgetPresent = if ($onTickDictionary) { $onTick.Contains('budget') } else { $null -ne $onTick.PSObject.Properties['budget'] }
+  if (-not $tickRegisteredPresent -or -not $tickBudgetPresent -or $onTick.registered -isnot [bool] -or
+      ($onTick.budget -isnot [int] -and $onTick.budget -isnot [long]) -or $onTick.budget -ne 0 -or
+      $mutationValue -or $onTick.registered) { throw '[mir4-runtime-idle-or-load-mutation]' }
   return $true
 }
 
@@ -190,14 +235,34 @@ function New-MIR4RuntimeRegistrationPlan {
     }
   )
   $combined = $dispatcherText + "`n" + $stageText
+  $onLoadHosts = @(
+    foreach ($hostTarget in @('f210','f200')) {
+      $hostPackage = if ($hostTarget -ceq 'f210') { $targetPackage } else { New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $hostTarget }
+      $hostDispatcherPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $hostPackage -RelativePath 'prototypes/mir/runtime/scripted_techs.lua'
+      $hostStagePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $hostPackage -RelativePath 'prototypes/mir/stage/control.lua'
+      $hostText = (Get-Content -Raw -LiteralPath $hostDispatcherPath) + "`n" + (Get-Content -Raw -LiteralPath $hostStagePath)
+      $hostRegistrations = @([regex]::Matches($hostText, 'script\s*\.\s*on_load\s*\('))
+      $approvedRegistrations = @([regex]::Matches($hostText, 'script\s*\.\s*on_load\s*\(\s*passive_repair\s*\.\s*on_load\s*\)'))
+      if ($hostRegistrations.Count -ne 1 -or $approvedRegistrations.Count -ne 1) { throw '[mir4-runtime-on-load-registration]' }
+      [ordered]@{
+        target=$hostTarget;approved_handler='passive_repair.on_load';registration_count=$hostRegistrations.Count;approved_registration_count=$approvedRegistrations.Count
+        source_identity=[ordered]@{
+          dispatcher=[ordered]@{path='prototypes/mir/runtime/scripted_techs.lua';sha256=(Get-MIR4PlatformInputSha256 $hostDispatcherPath)}
+          stage=[ordered]@{path='prototypes/mir/stage/control.lua';sha256=(Get-MIR4PlatformInputSha256 $hostStagePath)}
+        }
+      }
+    }
+  )
   $plan = [pscustomobject][ordered]@{
     kind='MIR4RuntimeRegistrationPlanV1';schema=1;owner='prototypes/mir/runtime/scripted_techs.lua';owner_sha256=(Get-MIR4PlatformInputSha256 $dispatcherPath);groups=$groups
     ordering='authority-array-preserved-as-explicit-ordinal';filter_before_dispatch=$true;one_registration_per_group=$true
-    on_load=[ordered]@{registered=($combined -match 'script\.on_load');persistent_mutation=$false};on_tick=[ordered]@{registered=($combined -match 'defines\.events\.on_tick');budget=0}
+    on_load=[ordered]@{
+      registered=$true;handler='passive_repair.on_load';read_only_restoration=$true;registration_count=1;hosts=$onLoadHosts
+      persistent_mutation=$false
+    };on_tick=[ordered]@{registered=($combined -match 'defines\.events\.on_tick');budget=0}
     cross_feature_state_mutation=$false;duplicate_rejection=$true;maximum_diagnostics_per_dispatch=64
     law_results=[ordered]@{unique_groups=$true;unique_subscribers=$true;stable_order=$true;filter_before_dispatch=$true;no_on_load_mutation=$true;no_idle_tick=$true;namespace_isolation=$true;bounded_diagnostics=$true;all_passed=$true}
   }
-  if ($plan.on_load.registered) { throw '[mir4-runtime-on-load-registration]' }
   if ($plan.on_tick.registered) { throw '[mir4-runtime-unbudgeted-on-tick]' }
   Assert-MIR4RuntimeRegistrationPlan -Plan $plan | Out-Null
   return $plan

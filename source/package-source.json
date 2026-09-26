@@ -1494,10 +1494,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/settings/catalog.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 20306,
-      "source_sha256": "A359BECC5A431BB48C9478E998B5097775A0015E84781AE56AF993B6187A094F",
-      "output_bytes": 20306,
-      "output_sha256": "A359BECC5A431BB48C9478E998B5097775A0015E84781AE56AF993B6187A094F"
+      "source_bytes": 20743,
+      "source_sha256": "3BA428D383AEBE6A4FC5108FB0D01E023BD8A9888D122EAB2019FD82629F4233",
+      "output_bytes": 20743,
+      "output_sha256": "3BA428D383AEBE6A4FC5108FB0D01E023BD8A9888D122EAB2019FD82629F4233"
     },
     {
       "layer": "shared",
@@ -2085,10 +2085,10 @@
         "predecessor_source_path": "src/mod/families/modern/locale/en/more-infinite-research.cfg"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 47644,
-      "source_sha256": "5AF759E84B48D881B7AA1D83781F368F76CA6A413A998FB930828205961E0E17",
-      "output_bytes": 47644,
-      "output_sha256": "5AF759E84B48D881B7AA1D83781F368F76CA6A413A998FB930828205961E0E17"
+      "source_bytes": 48296,
+      "source_sha256": "16ED0FA8B2D3EE11C39CC8EA8588600AE0CC4068C4C00A6E06EA1173CC5B1442",
+      "output_bytes": 48296,
+      "output_sha256": "16ED0FA8B2D3EE11C39CC8EA8588600AE0CC4068C4C00A6E06EA1173CC5B1442"
     },
     {
       "layer": "capability",
@@ -6425,10 +6425,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/streams/productivity.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 42033,
-      "source_sha256": "D8C6ACD8871FD18B050D78C5FAB7557267B1BE2506D16A9E63E39A788C8F6B7A",
-      "output_bytes": 42033,
-      "output_sha256": "D8C6ACD8871FD18B050D78C5FAB7557267B1BE2506D16A9E63E39A788C8F6B7A"
+      "source_bytes": 43080,
+      "source_sha256": "6E0E5ACE7E2583D65505710B0A0C6EC44AE83E60D52D9F422CB9E409B1410D51",
+      "output_bytes": 43080,
+      "output_sha256": "6E0E5ACE7E2583D65505710B0A0C6EC44AE83E60D52D9F422CB9E409B1410D51"
     },
     {
       "layer": "presentation",
@@ -6794,10 +6794,10 @@
         "predecessor_source_path": "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3274,
-      "source_sha256": "DD5824DFBEA0CEA191441AC514023036A47AB2EDB5CC053A0D8C5B90EE6DDFE4",
-      "output_bytes": 3274,
-      "output_sha256": "DD5824DFBEA0CEA191441AC514023036A47AB2EDB5CC053A0D8C5B90EE6DDFE4"
+      "source_bytes": 3441,
+      "source_sha256": "954AC6E8023AE15EE34D8EC38669B527BAAA4C036F053565BA0AF072D2CFAA43",
+      "output_bytes": 3441,
+      "output_sha256": "954AC6E8023AE15EE34D8EC38669B527BAAA4C036F053565BA0AF072D2CFAA43"
     },
     {
       "layer": "presentation",
@@ -7229,10 +7229,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3397,
-      "source_sha256": "568A6470C91329F27DBA17ECBC8AF9B056D26CA5FDC9CC40B5F176EE68266F48",
-      "output_bytes": 3397,
-      "output_sha256": "568A6470C91329F27DBA17ECBC8AF9B056D26CA5FDC9CC40B5F176EE68266F48"
+      "source_bytes": 3564,
+      "source_sha256": "F7F165A274604871763D2F213F3E6B755CA8FAF6BA89EAE46FCB18B583AE3FC2",
+      "output_bytes": 3564,
+      "output_sha256": "F7F165A274604871763D2F213F3E6B755CA8FAF6BA89EAE46FCB18B583AE3FC2"
     },
     {
       "layer": "presentation",
@@ -7596,6 +7596,26 @@
       "source_sha256": "85F193D0E4B8BA4AAD896AA8CA162BF6E15746C0BE4E20781078A13A9B80BDB0",
       "output_bytes": 639,
       "output_sha256": "85F193D0E4B8BA4AAD896AA8CA162BF6E15746C0BE4E20781078A13A9B80BDB0"
+    },
+    {
+      "layer": "shared",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/runtime/effects/passive_repair.lua",
+      "semantic_class": "common-semantic-source",
+      "source_path": "source/prototypes/mir/runtime/effects/passive_repair.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-REPAIR-02",
+        "reason": "Default-off bounded wall/gate maintenance selected only by F200/F210 native runtime hosts; no new technology or older-target runtime claim."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 8062,
+      "source_sha256": "38178A2F06ABD99E45CB71EAF9770278033AFB544317261DF3173C746D851AB3",
+      "output_bytes": 8062,
+      "output_sha256": "38178A2F06ABD99E45CB71EAF9770278033AFB544317261DF3173C746D851AB3"
     }
   ],
   "invariants": {
@@ -7605,5 +7625,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "1CE919CE26555D24C0F338D7082504D64C67DB81A5C6800AFF8793012B57D40E"
+  "record_sha256": "0E577B6F0FE2BE67F8C08028AF30B85E3CA9897F9F7A7C805A5EB87E73D14BB4"
 }

@@ -1,5 +1,6 @@
 local spoilage = require("prototypes.mir.runtime.effects.spoilage_preservation")
 local agricultural_growth = require("prototypes.mir.runtime.effects.agricultural_growth_speed")
+local passive_repair = require("prototypes.mir.runtime.effects.passive_repair")
 local productivity_family_adoption = require("prototypes.mir.runtime.productivity_family_adoption")
 local maximum_level_control = require("prototypes.mir.runtime.maximum_level_control")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
@@ -13,6 +14,7 @@ M.requires_features = {"scripted_techs", "productivity_family_adoption"}
 local features = {
   spoilage,
   agricultural_growth,
+  passive_repair,
   productivity_family_adoption,
   maximum_level_control,
   research_browser
@@ -72,6 +74,8 @@ end
 
 function M.register()
   research_browser.register()
+  passive_repair.register()
+  script.on_load(passive_repair.on_load)
   script.on_init(function(event)
     run_all("on_init", event)
   end)

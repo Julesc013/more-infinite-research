@@ -263,6 +263,17 @@ function M.global_setting_prototypes()
 
   table.insert(out, {
     type = "bool-setting",
+    name = "mir-enable-passive-repair",
+    setting_type = "startup",
+    default_value = false,
+    order = setting_order.global("advanced", 20),
+    targets = {requires_features = {"scripted_techs"}, required_effect_types = {}},
+    localised_name = {"mod-setting-name.mir-enable-passive-repair"},
+    localised_description = {"mod-setting-description.mir-enable-passive-repair"}
+  })
+
+  table.insert(out, {
+    type = "bool-setting",
     name = "mir-debug-generation-report",
     setting_type = "startup",
     default_value = false,

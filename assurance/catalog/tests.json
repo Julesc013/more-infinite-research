@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 202,
+  "test_count": 204,
   "tests": [
     {
       "id": "docs.check",
@@ -806,6 +806,7 @@
       "requires_factorio": true,
       "inputs": [
         "source:source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+        "source:source/prototypes/streams/productivity.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/compiler/material_routes.lua"
       ],
@@ -993,7 +994,60 @@
       "inputs": [
         "tests/runtime/Test-MIROptionalProbes.ps1",
         "tests/runtime/optional_runtime_probe.lua",
-        "tests/runtime/optional_runtime_services.lua"
+        "tests/runtime/optional_runtime_services.lua",
+        "source:source/prototypes/mir/runtime/effects/passive_repair.lua"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "runtime.passive-repair-default-off",
+      "proposition": "The governed test 'runtime.passive-repair-default-off' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRPassiveRepair.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target>",
+      "canonical_implementation": "tests/runtime/Test-MIRPassiveRepair.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRPassiveRepair.ps1",
+        "tests/runtime/passive_repair_host_probe.lua",
+        "source:source/prototypes/mir/runtime/effects/passive_repair.lua",
+        "source:source/prototypes/mir/settings/catalog.lua",
+        "source:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "source:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "source:source/package-source.json"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "runtime.passive-repair-enabled",
+      "proposition": "The governed test 'runtime.passive-repair-enabled' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRPassiveRepair.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target> -Enabled",
+      "canonical_implementation": "tests/runtime/Test-MIRPassiveRepair.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRPassiveRepair.ps1",
+        "tests/runtime/passive_repair_host_probe.lua",
+        "source:source/prototypes/mir/runtime/effects/passive_repair.lua",
+        "source:source/prototypes/mir/settings/catalog.lua",
+        "source:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "source:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "source:source/package-source.json"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -2164,7 +2218,7 @@
       "requires_factorio": false,
       "inputs": [
         "source:source/prototypes/mir/planner/base_continuations.lua",
-        "source:source/adapters/f210/prototypes/mir/planner/base_continuations/**",
+        "source:source/prototypes/mir/planner/base_continuations/**",
         "source:source/prototypes/mir/planner/base_continuations.lua",
         "source:source/adapters/f200/prototypes/mir/planner/base_continuations/**",
         "source:source/package-source.json",
@@ -6544,7 +6598,7 @@
       "requires_factorio": false,
       "inputs": [
         "source:source/prototypes/mir/planner/stream_compiler.lua",
-        "source:source/adapters/f210/prototypes/mir/planner/stream_compiler/**",
+        "source:source/prototypes/mir/planner/stream_compiler/**",
         "source:source/prototypes/mir/planner/stream_compiler.lua",
         "source:source/adapters/f200/prototypes/mir/planner/stream_compiler/**",
         "source:source/package-source.json",
@@ -7413,11 +7467,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 55,
-      "runtime-upgrade": 46,
+      "runtime-upgrade": 48,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 190,
+    "canonical_test_commands": 192,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7430,5 +7484,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:792e6fbb2a6d76d3f96a6036f4006608fb1308867ef7c031c083d9044e06d281"
+  "digest": "sha256:091dbc8890396c732a8b44cf265ac3f69ec2a19399c7deb679fe4a04ad52df52"
 }

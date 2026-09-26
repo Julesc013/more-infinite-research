@@ -239,4 +239,74 @@ check(#reviewed_routes("smelting",multiple_variant_route,valid_risk_row,valid_ce
 local unknown_field_route=canonical_route("smelting","ore","plate",{results={future_normalized_semantic=true}})
 check(#reviewed_routes("smelting",unknown_field_route,valid_risk_row,certificate("ore","plate",{results={future_normalized_semantic=true}}))==0,"unknown normalized entry fields fail closed")
 
+-- The retained F200 Bob/Angel additions have one exact evidence closure. The
+-- descriptor must keep that closure's selected final routes while leaving
+-- every altered or F210 profile on its established Bob-only declarations.
+local function clone_map(value)
+  local out={}
+  for key, entry in pairs(value) do out[key]=entry end
+  return out
+end
+
+local f200_bob_angel_mods={
+  base="2.0.77", boblibrary="2.1.0", bobores="2.1.2", bobplates="2.1.1",
+  bobelectronics="2.1.1", bobtech="2.1.0", angelsrefining="2.0.4",
+  angelsrefininggraphics="2.0.0", angelspetrochem="2.0.3",
+  angelspetrochemgraphics="2.0.1", angelssmelting="2.0.5",
+  angelssmeltinggraphics="2.0.0", ["more-infinite-research"]="4.2.20000"
+}
+
+local function material_streams_for(profile, active_mods, item_names)
+  local saved_mods,saved_data=mods,data
+  mods=active_mods
+  data={extend=function() end}
+  local overlay={
+    applies_when={mods={"fixture"}},
+    capabilities={
+      ["recipe-productivity"]={exact_recipes={},deny_risk_flags={},stream={id="fixture"}}
+    }
+  }
+  stub("prototypes.mir.compatibility.overlay_loader",{get=function() return overlay end})
+  stub("prototypes.mir.platform.factorio.target_profiles",{current=function() return profile end})
+  stub("prototypes.mir.platform.factorio.prototype_lookup",{item_prototype=function(name) return item_names[name] end})
+  package.loaded["prototypes.streams.productivity"]=nil
+  local streams=require("prototypes.streams.productivity")
+  package.loaded["prototypes.streams.productivity"]=nil
+  mods,data=saved_mods,saved_data
+  return streams
+end
+
+local function recipe_patterns(stream)
+  return table.concat(stream.groups[1].recipe_patterns,"|")
+end
+
+local f200_items={["iron-plate"]={},["angels-wire-platinum"]={}}
+local exact_f200_mods=clone_map(f200_bob_angel_mods)
+exact_f200_mods["mir-fixture-assert-f200-bob-angel-material-routes-observation"]="0.1.0"
+local exact_f200_streams=material_streams_for({factorio_version="2.0"},exact_f200_mods,f200_items)
+check(recipe_patterns(exact_f200_streams.research_material_aluminium)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$","exact F200 lock retains observed Angel aluminium finals")
+check(recipe_patterns(exact_f200_streams.research_material_nickel)=="^bob%-nickel%-plate$|^angels%-plate%-nickel$|^angels%-plate%-nickel%-2$","exact F200 lock retains observed Angel nickel finals")
+check(recipe_patterns(exact_f200_streams.research_material_silver)=="^bob%-silver%-plate$|^angels%-plate%-silver$|^angels%-plate%-silver%-2$","exact F200 lock retains observed Angel silver finals")
+check(recipe_patterns(exact_f200_streams.research_material_gold)=="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$","exact F200 lock retains observed Angel gold finals")
+check(recipe_patterns(exact_f200_streams.research_material_platinum)=="^angels%-wire%-platinum%-2$","exact F200 lock retains observed Angel platinum final")
+check(exact_f200_streams.research_material_nickel.reviewed_forward_routes["angels-plate-nickel"]~=nil and exact_f200_streams.research_material_silver.reviewed_forward_routes["angels-plate-silver"]~=nil,"exact F200 lock retains reviewed return-route certificates")
+check(exact_f200_streams.research_material_imersite.required_items[1]=="kr-imersite-crystal" and exact_f200_streams.research_material_imersite.icon_item=="kr-imersite-powder","F200 route gate preserves Imersite native-owner and MIR-powder identities")
+check(exact_f200_streams.research_material_silicon.reviewed_forward_routes["kr-silicon"]~=nil and exact_f200_streams.research_material_glass.reviewed_forward_routes["kr-glass"]~=nil,"F200 route gate preserves retained K2 silicon and glass certificates")
+
+local changed_f200_mods=clone_map(exact_f200_mods)
+changed_f200_mods.angelssmelting="2.0.6"
+local changed_f200_streams=material_streams_for({factorio_version="2.0"},changed_f200_mods,f200_items)
+check(recipe_patterns(changed_f200_streams.research_material_aluminium)=="^bob%-aluminium%-plate$","changed F200 closure leaves Aluminium on Bob declaration")
+check(recipe_patterns(changed_f200_streams.research_material_nickel)=="^bob%-nickel%-plate$" and changed_f200_streams.research_material_nickel.reviewed_forward_routes==nil,"changed F200 closure withdraws Angel nickel routes and certificate")
+check(recipe_patterns(changed_f200_streams.research_material_silver)=="^bob%-silver%-plate$" and changed_f200_streams.research_material_silver.reviewed_forward_routes==nil,"changed F200 closure withdraws Angel silver routes and certificate")
+check(recipe_patterns(changed_f200_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(changed_f200_streams.research_material_platinum)=="^bob%-platinum%-plate$","changed F200 closure withdraws unproven Angel gold and platinum finals")
+
+local extra_f200_mods=clone_map(exact_f200_mods)
+extra_f200_mods.unqualified="1.0.0"
+local extra_f200_streams=material_streams_for({factorio_version="2.0"},extra_f200_mods,f200_items)
+check(recipe_patterns(extra_f200_streams.research_material_lead)=="^bob%-lead%-plate$|^bob%-lead%-plate%-2$","additional F200 mod withdraws observed Angel additions")
+
+local f210_streams=material_streams_for({factorio_version="2.1"},exact_f200_mods,f200_items)
+check(recipe_patterns(f210_streams.research_material_tin)=="^bob%-tin%-plate$" and f210_streams.research_material_nickel.reviewed_forward_routes==nil,"F210 keeps F200-only Angel additions and certificates unavailable")
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)
