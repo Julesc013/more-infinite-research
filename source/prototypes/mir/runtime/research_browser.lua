@@ -251,14 +251,82 @@ local function settings_rows(player, parent, v)
 end
 
 local render
-local function add_technology_icon(parent, technology)
-  return parent.add{type = "sprite", sprite = "technology/" .. technology.name, tooltip = technology.localised_name}
+local function add_technology_icon(parent, technology, size)
+  local icon = parent.add{type = "sprite", style = "recipe_tooltip_horizontal_image",
+    sprite = "technology/" .. technology.name, resize_to_sprite = false, tooltip = technology.localised_name}
+  icon.style.width = size or 32
+  icon.style.height = size or 32
+  return icon
+end
+local function finite_nonnegative(value)
+  return type(value) == "number" and value == value and value ~= math.huge
+    and value ~= -math.huge and value >= 0
+end
+local function displayed_number(value)
+  if not finite_nonnegative(value) then return nil end
+  local rounded = math.floor(value * 100 + 0.5) / 100
+  local text = string.format("%.2f", rounded)
+  text = string.gsub(text, "0+$", "")
+  return (string.gsub(text, "%.$", ""))
+end
+local function displayed_percent(value)
+  return displayed_number(value * 100)
+end
+local function add_research_cost(parent, technology)
+  local units = displayed_number(technology.research_unit_count)
+  local seconds = displayed_number(technology.research_unit_energy)
+  if units and seconds then fact_label(parent, "research_cost", {"mir-browser.research-cost", units, seconds}) end
 end
 local function add_science_icons(parent, technology)
   local science = parent.add{type = "flow", direction = "horizontal"}
   label(science, {"mir-browser.science"})
   for _, ingredient in ipairs(technology.research_unit_ingredients) do
-    science.add{type = "sprite", sprite = "item/" .. ingredient.name, tooltip = {"item-name." .. ingredient.name}}
+    local amount = displayed_number(ingredient.amount)
+    science.add{
+      type = "sprite",
+      sprite = "item/" .. ingredient.name,
+      tooltip = amount and {"mir-browser.science-ingredient", amount, {"item-name." .. ingredient.name}}
+        or {"item-name." .. ingredient.name}
+    }
+  end
+end
+local function productivity_summary(benefits)
+  if type(benefits) ~= "table" or #benefits == 0 then return nil end
+  local summary = {count = 0}
+  for _, benefit in ipairs(benefits) do
+    local increment = benefit and benefit.effect_change
+    local current = benefit and benefit.current_productivity_bonus
+    local maximum = benefit and benefit.maximum_productivity
+    if not finite_nonnegative(increment) or increment <= 0
+      or not finite_nonnegative(current) or not finite_nonnegative(maximum) or current > maximum then
+      return nil
+    end
+    summary.count = summary.count + 1
+    summary.increment_min = summary.increment_min and math.min(summary.increment_min, increment) or increment
+    summary.increment_max = summary.increment_max and math.max(summary.increment_max, increment) or increment
+    summary.current_min = summary.current_min and math.min(summary.current_min, current) or current
+    summary.current_max = summary.current_max and math.max(summary.current_max, current) or current
+    summary.maximum_min = summary.maximum_min and math.min(summary.maximum_min, maximum) or maximum
+    summary.maximum_max = summary.maximum_max and math.max(summary.maximum_max, maximum) or maximum
+  end
+  return summary
+end
+local function add_productivity_summary(parent, benefits)
+  local summary = productivity_summary(benefits)
+  if not summary then return end
+  local increment_min, increment_max = displayed_percent(summary.increment_min), displayed_percent(summary.increment_max)
+  local current_min, current_max = displayed_percent(summary.current_min), displayed_percent(summary.current_max)
+  local maximum_min, maximum_max = displayed_percent(summary.maximum_min), displayed_percent(summary.maximum_max)
+  if not (increment_min and increment_max and current_min and current_max and maximum_min and maximum_max) then return end
+  if increment_min == increment_max then
+    fact_label(parent, "productivity_increment", {"mir-browser.productivity-increment", increment_min})
+  else
+    fact_label(parent, "productivity_increment", {"mir-browser.productivity-increment-range", increment_min, increment_max})
+  end
+  if current_min == current_max and maximum_min == maximum_max then
+    fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap", current_min, maximum_min})
+  else
+    fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap-range", current_min, current_max, maximum_min, maximum_max})
   end
 end
 local function add_prerequisite_icons(parent, technology)
@@ -284,7 +352,7 @@ local function detail(player, parent, v, c)
   local tech = portable and player.force.technologies[portable.technology.key]
   if not tech then return end
   local heading = parent.add{type = "flow", direction = "horizontal"}
-  add_technology_icon(heading, tech)
+  add_technology_icon(heading, tech, 48)
   label(heading, tech.localised_name)
   label(parent, tech.localised_description)
   local enrichment = portable.enrichment or {}
@@ -295,6 +363,7 @@ local function detail(player, parent, v, c)
   elseif tech.level and tech.level > 1 then
     label(parent, {"mir-browser.level", tech.level})
   end
+  add_research_cost(parent, tech)
   if enrichment.recipe_benefits then
     local count = #enrichment.recipe_benefits
     if enrichment.next_level_has_effective_benefit then
@@ -305,6 +374,7 @@ local function detail(player, parent, v, c)
   elseif portable.technology.family ~= "external" then
     label(parent, {"mir-browser.mir-benefit"})
   end
+  add_productivity_summary(parent, enrichment.recipe_benefits)
   add_science_icons(parent, tech)
   add_prerequisite_icons(parent, tech)
   local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
@@ -381,17 +451,19 @@ render = function(player)
     local page = core.query(c, v, c.enrichment, localized_search(player))
     v.page, pages = page.page, page.pages
     request_visible_translations(player, page, v.selected)
+    detail(player, body, v, c)
     label(body, {"mir-browser.count", page.count})
     for _, row in ipairs(page.rows) do
       local technology = player.force.technologies[row.key]
       if technology then
         local item = body.add{type = "flow", direction = "horizontal"}
         add_technology_icon(item, technology)
-        button(item, "select", technology.localised_name, {technology = row.key})
-        label(item, status_caption(row))
+        local select = button(item, "select", technology.localised_name, {technology = row.key})
+        select.style.width = 300
+        select.tooltip = technology.localised_name
+        label(item, status_caption(row)).style.maximal_width = 220
       end
     end
-    detail(player, body, v, c)
   end
   local nav = frame.add{type = "flow"}
   button(nav, "prev", "<").enabled = v.page > 1

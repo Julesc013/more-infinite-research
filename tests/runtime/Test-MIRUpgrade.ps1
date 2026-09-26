@@ -424,6 +424,10 @@ $assertions = if ($Archetype) {
           "landfill-platform-effects-removed", "platform-owner-transfer-exact",
           "duplicate-owner-forbidden", "startup-settings-retained"
         )
+      } elseif ($FromVersion -ceq '4.1.21000' -and $ToVersion -ceq '4.2.21000' -and $FixtureName -ceq 'assert-upgrade-4-0-21000-to-4-1-21000') {
+        $common + @('space-age-native-owner-retained','all-existing-technology-state-retained',
+          'all-existing-recipe-research-bonuses-retained','full-research-queue-retained',
+          'reported-missing-technologies-retained')
       } elseif ($requiresReloadProof) {
         $common + @("space-age-native-owner-retained")
       } else {

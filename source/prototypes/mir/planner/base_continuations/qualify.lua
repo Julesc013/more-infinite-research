@@ -127,10 +127,11 @@ local function append_pack_prerequisites(prereqs, ingredients)
   for _, name in ipairs(prereqs or {}) do seen[name] = true end
   for _, pair in ipairs(ingredients or {}) do
     local pack_name = pair.name or pair[1]
-    local prereq = science_packs.prereq_tech_for_science_pack(pack_name)
-    if prereq and science_packs.technology_is_researchable(prereq) and not seen[prereq] then
-      seen[prereq] = true
-      table.insert(prereqs, prereq)
+    for _, prereq in ipairs(science_packs.prereq_techs_for_science_pack(pack_name) or {}) do
+      if science_packs.technology_is_researchable(prereq) and not seen[prereq] then
+        seen[prereq] = true
+        table.insert(prereqs, prereq)
+      end
     end
   end
   return prereqs

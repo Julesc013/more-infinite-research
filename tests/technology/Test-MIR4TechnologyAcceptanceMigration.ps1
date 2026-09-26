@@ -33,6 +33,29 @@ Assert-MIR4TechnologyAcceptanceMigrationV1 ([string]$proof.test_id-ceq'static.mi
 Assert-MIR4TechnologyAcceptanceMigrationV1 (Test-MIR4TechnologyAcceptanceCompatibilityForwarderV1 -RepoRoot $repo) 'mir4-technology-acceptance-migration-forwarder'
 Assert-MIR4TechnologyAcceptanceMigrationV1 (Test-MIR4TechnologyAcceptanceDeclaredConsumersV1 -RepoRoot $repo) 'mir4-technology-acceptance-migration-consumers'
 Assert-MIR4TechnologyAcceptanceMigrationV1 ([string](Test-MIR4TechnologyAcceptanceFunctionalParityV1 -RepoRoot $repo).digest-ceq$script:MIR4TechnologyAcceptanceParityDigestV1) 'mir4-technology-acceptance-migration-functional-parity'
+$parityCleanupBase=(Resolve-Path -LiteralPath (Join-Path $repo 'build/tmp')).ProviderPath
+$parityCleanupExpectedLeaf='mir4-technology-acceptance-parity-'+[guid]::NewGuid().ToString('N')
+$parityCleanupWrongLeaf='mir4-technology-acceptance-parity-'+[guid]::NewGuid().ToString('N')
+$parityCleanupExpectedRoot=Join-Path $parityCleanupBase $parityCleanupExpectedLeaf
+$parityCleanupWrongRoot=Join-Path $parityCleanupBase $parityCleanupWrongLeaf
+try{
+  New-Item -ItemType Directory -Path $parityCleanupExpectedRoot|Out-Null
+  New-Item -ItemType Directory -Path $parityCleanupWrongRoot|Out-Null
+  $wrongTargetRejected=$false
+  try{Remove-MIR4TechnologyAcceptanceParityCheckoutV1 -RepoRoot $repo -TemporaryRoot $parityCleanupWrongRoot -ExpectedLeaf $parityCleanupExpectedLeaf}catch{$wrongTargetRejected=$_.Exception.Message-match'^\[mir4-technology-acceptance-parity-cleanup-containment\]'}
+  Assert-MIR4TechnologyAcceptanceMigrationV1 ($wrongTargetRejected-and(Test-Path -LiteralPath $parityCleanupWrongRoot)) 'mir4-technology-acceptance-migration-parity-cleanup-wrong-target'
+  $nestedTarget=Join-Path $parityCleanupWrongRoot $parityCleanupExpectedLeaf
+  New-Item -ItemType Directory -Path $nestedTarget|Out-Null
+  $nestedTargetRejected=$false
+  try{Remove-MIR4TechnologyAcceptanceParityCheckoutV1 -RepoRoot $repo -TemporaryRoot $nestedTarget -ExpectedLeaf $parityCleanupExpectedLeaf}catch{$nestedTargetRejected=$_.Exception.Message-match'^\[mir4-technology-acceptance-parity-cleanup-containment\]'}
+  Assert-MIR4TechnologyAcceptanceMigrationV1 ($nestedTargetRejected-and(Test-Path -LiteralPath $nestedTarget)) 'mir4-technology-acceptance-migration-parity-cleanup-nested-target'
+  Remove-MIR4TechnologyAcceptanceParityCheckoutV1 -RepoRoot $repo -TemporaryRoot $parityCleanupExpectedRoot -ExpectedLeaf $parityCleanupExpectedLeaf
+  Assert-MIR4TechnologyAcceptanceMigrationV1 (-not(Test-Path -LiteralPath $parityCleanupExpectedRoot)) 'mir4-technology-acceptance-migration-parity-cleanup-owned-target'
+}finally{
+  foreach($cleanup in @(@{root=$parityCleanupExpectedRoot;leaf=$parityCleanupExpectedLeaf},@{root=$parityCleanupWrongRoot;leaf=$parityCleanupWrongLeaf})){
+    if(Test-Path -LiteralPath ([string]$cleanup.root)){Remove-MIR4TechnologyAcceptanceParityCheckoutV1 -RepoRoot $repo -TemporaryRoot ([string]$cleanup.root) -ExpectedLeaf ([string]$cleanup.leaf)}
+  }
+}
 
 $assurance=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path '.mir/assurance.json'
 $migrationClass=@($assurance.classes|Where-Object{[string]$_.id-ceq'repository-migration'})
@@ -43,7 +66,10 @@ Assert-MIR4TechnologyAcceptanceMigrationV1 (@($catalog.tests|Where-Object{[strin
 $packageFiles=@(Get-MIRPackageSourceFiles -RepoRoot $repo)
 $migrationPaths=@($authority.path_map|ForEach-Object{[string]$_.final_path})+@($authority.compatibility_entrypoints|ForEach-Object{[string]$_.path})
 foreach($item in @($migrationPaths|Sort-Object -Unique)){Assert-MIR4TechnologyAcceptanceMigrationV1 ($item-notin$packageFiles) 'mir4-technology-acceptance-migration-package-visible' $item}
-Assert-MIR4TechnologyAcceptanceMigrationV1 ([string]$receipt.package_source_sha256-ceq$packageBefore-and@($receipt.package_visible_delta).Count-eq0) 'mir4-technology-acceptance-migration-package-firewall'
+# The immutable migration proves its pinned historical source; the separate
+# before/after check below proves these current tooling checks do not mutate it.
+$receiptSchema=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'contracts/repository/mir4-technology-acceptance-migration-receipt-v1.schema.json'
+Assert-MIR4TechnologyAcceptanceMigrationV1 ([string]$receipt.package_source_sha256-ceq[string]$receiptSchema.properties.package_source_sha256.const-and@($receipt.package_visible_delta).Count-eq0) 'mir4-technology-acceptance-migration-package-firewall'
 
 $prior=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration
 Assert-MIR4TechnologyAcceptanceMigrationV1 ([string]$receipt.predecessor_receipt.path-ceq[string]$prior.prior_receipt_path-and[string]$receipt.predecessor_receipt.sha256-ceq[string]$prior.prior_receipt_sha256) 'mir4-technology-acceptance-migration-predecessor-chain'

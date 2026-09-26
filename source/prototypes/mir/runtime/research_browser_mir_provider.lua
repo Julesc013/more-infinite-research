@@ -152,10 +152,12 @@ local function finite_positive_integer(value)
 end
 
 local function technology_next_level_is_eligible(technology, selected_cap)
-  if not technology or technology.enabled ~= true or technology.researched == true
-    or not finite_positive_integer(selected_cap) then return false end
+  if not technology or technology.enabled ~= true or technology.researched == true then return false end
   local level = tonumber(technology.level)
-  return finite_positive_integer(level) and level <= selected_cap
+  if not finite_positive_integer(level) then return false end
+  if finite_positive_integer(selected_cap) then return level <= selected_cap end
+  local maximum = technology.prototype and technology.prototype.max_level
+  return maximum == "infinite" or finite_positive_integer(maximum) and level <= maximum
 end
 
 local function recipe_has_next_level_headroom(recipe)
@@ -318,22 +320,26 @@ local function detail_for_row(row, recipes, disposition, caps, force)
   if #recipes == 0 then
     return {schema = 1, family = row.stream_id, action = row.action}
   end
-  if not policy or not technology or not technology.valid then return nil end
-  local max_setting = comparison(policy.setting)
-  local enable_setting = comparison("ips-enable-" .. row.stream_id)
-  if not max_setting or not enable_setting or max_setting.effective ~= policy.selected then return nil end
+  if not technology or not technology.valid then return nil end
+  local max_setting, enable_setting = nil, nil
+  if policy then
+    max_setting = comparison(policy.setting)
+    enable_setting = comparison("ips-enable-" .. row.stream_id)
+    if not max_setting or not enable_setting or max_setting.effective ~= policy.selected then return nil end
+  end
   local effects = productivity_effects(technology.prototype)
   local observed_recipes = recipe_ids(effects)
+  local next_level_eligible = technology_next_level_is_eligible(technology, policy and policy.selected)
   local benefits = recipe_benefit_facts(
     force,
     effects,
-    technology_next_level_is_eligible(technology, policy.selected)
+    next_level_eligible
   )
   local ingredients = science_ingredients(technology.prototype)
   if not effects or not benefits or not ingredients or not same_array(observed_recipes, recipes) then return nil end
   local level = tonumber(technology.level)
   if not finite_positive_integer(level) then return nil end
-  return {
+  local detail = {
     schema = 1,
     family = row.stream_id,
     action = row.action,
@@ -357,18 +363,22 @@ local function detail_for_row(row, recipes, disposition, caps, force)
       rationale = "final-technology-prototype-cross-bound-to-public-generation-plan-row",
       ingredients = ingredients
     },
-    effective_cap = policy.selected,
     current_level = level,
     recipe_benefits = benefits,
-    -- Infinite technologies report the current/next level. At level three,
-    -- with two completed levels and cap three, that final level remains
-    -- beneficial only if a targeted recipe has not reached its own maximum.
-    next_level_has_effective_benefit = M.next_level_has_effective_benefit(technology, policy.selected, benefits),
-    settings = {
+    next_level_eligible = next_level_eligible,
+    next_level_has_effective_benefit = M.next_level_has_effective_benefit(technology, policy and policy.selected, benefits)
+  }
+  -- A finite policy is a separate fact from a productive MIR technology. The
+  -- normal zero/unbounded setting has no controller binding, but its live
+  -- recipe benefits remain useful and truthful player information.
+  if policy then
+    detail.effective_cap = policy.selected
+    detail.settings = {
       maximum_level = max_setting,
       enabled = enable_setting
     }
-  }
+  end
+  return detail
 end
 
 function M.snapshot(force)

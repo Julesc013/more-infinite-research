@@ -228,6 +228,8 @@ local function science_pack_production_state()
   local value = {
     recipe_source_epoch = source_epoch,
     entries = {},
+    unlock_progression_keys = {},
+    recipe_progression_keys = {},
     -- This state owns only source-epoch-stable structural observations. It
     -- deliberately cannot retain an acquisition result that depends on an
     -- active science-pack or technology traversal.
@@ -301,7 +303,16 @@ local function bounded_technology_names(root_name, observer)
   return names, complete
 end
 
-local function route_for_unlocker(recipe_name, technology_name, visiting_packs, visiting_technologies, observer)
+local contextual_technology_researchability_reason
+
+local function route_for_unlocker(
+  recipe_name,
+  technology_name,
+  visiting_packs,
+  visiting_technologies,
+  observer,
+  witness_options
+)
   if not diagnostic_visit(observer, 0) then
     return {
       recipe = recipe_name,
@@ -314,12 +325,23 @@ local function route_for_unlocker(recipe_name, technology_name, visiting_packs, 
       provenance = {route_policy = route_policy.policy_id, recipe = recipe_name, unlocker = technology_name}
     }
   end
-  local rejection = technology_researchability_reason(technology_name, {
-    visiting_packs = visiting_packs,
-    visiting_technologies = visiting_technologies or {},
-    unlock_recipe_name = recipe_name,
-    diagnostic_observer = observer
-  })
+  local rejection
+  if witness_options then
+    rejection = contextual_technology_researchability_reason(
+      technology_name,
+      recipe_name,
+      witness_options,
+      visiting_packs,
+      visiting_technologies
+    )
+  else
+    rejection = technology_researchability_reason(technology_name, {
+      visiting_packs = visiting_packs,
+      visiting_technologies = visiting_technologies or {},
+      unlock_recipe_name = recipe_name,
+      diagnostic_observer = observer
+    })
+  end
   local index, technology_names, closure_complete
   if observer then
     technology_names, closure_complete = bounded_technology_names(technology_name, observer)
@@ -376,6 +398,57 @@ local function route_for_unlocker(recipe_name, technology_name, visiting_packs, 
   }
 end
 
+local function progression_key_state(index)
+  local state = science_pack_production_state()
+  -- Retain compact static keys, never another copy of the technology index.
+  -- Recipe-source epochs replace state; graph changes invalidate both maps.
+  if state.unlock_progression_fingerprint ~= index.index_fingerprint then
+    state.unlock_progression_fingerprint = index.index_fingerprint
+    state.unlock_progression_keys = {}
+    state.recipe_progression_keys = {}
+  end
+  return state
+end
+
+local function unlock_progression_key(technology_name, index)
+  local state = progression_key_state(index)
+  local cached = state.unlock_progression_keys[technology_name]
+  if cached then return cached end
+  local names = researchability_index.reachable_names(index, technology_name)
+  local science = {}
+  for _, name in ipairs(names) do
+    local technology = data_raw.technology(name)
+    for _, ingredient in ipairs(((technology and technology.unit) or {}).ingredients or {}) do
+      local pack = ingredient_name(ingredient)
+      if pack then science[pack] = true end
+    end
+  end
+  local science_count = 0
+  for _ in pairs(science) do science_count = science_count + 1 end
+  local key = {index.structural_failures[technology_name] == false and 0 or 1,
+    science_count, #names - 1, index.unlock_depths[technology_name] or math.huge}
+  state.unlock_progression_keys[technology_name] = key
+  return key
+end
+
+local function progression_key_less(left, right)
+  for index = 1, 4 do
+    if left[index] ~= right[index] then return left[index] < right[index] end
+  end
+  return false
+end
+
+local function sort_unlockers(unlockers, observer)
+  if observer then table.sort(unlockers); return end
+  local index, keys = graph_index(), {}
+  for _, name in ipairs(unlockers) do keys[name] = unlock_progression_key(name, index) end
+  table.sort(unlockers, function(left, right)
+    if progression_key_less(keys[left], keys[right]) then return true end
+    if progression_key_less(keys[right], keys[left]) then return false end
+    return left < right
+  end)
+end
+
 local function output_recipe_names(identity, observer)
   if not identity or type(identity.type) ~= "string" or identity.type == ""
     or type(identity.name) ~= "string" or identity.name == "" then
@@ -390,7 +463,38 @@ local function output_recipe_names(identity, observer)
     if not diagnostic_visit(observer, 0) then break end
     table.insert(names, recipe_name)
   end
-  table.sort(names)
+  if observer ~= nil then
+    table.sort(names)
+    return names
+  end
+  -- This orders alternatives; it certifies none of them. Prefer an earlier
+  -- ordinary unlock over an alphabetically earlier planetary recipe. Every
+  -- chosen pair still passes contextual researchability and ingredient proof,
+  -- and later/recycling alternatives remain available after a failed route.
+  local facts = canonical_recipe_facts.index_view().facts or {}
+  local index, keys = graph_index(), {}
+  local state = progression_key_state(index)
+  local unknown = {math.huge, math.huge, math.huge, math.huge}
+  for _, recipe_name in ipairs(names) do
+    local best = state.recipe_progression_keys[recipe_name]
+    if not best then
+      best = unknown
+      for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
+        local key = unlock_progression_key(technology_name, index)
+        if progression_key_less(key, best) then best = key end
+      end
+      state.recipe_progression_keys[recipe_name] = best
+    end
+    keys[recipe_name] = best
+  end
+  table.sort(names, function(left, right)
+    local left_recycling = facts[left] and facts[left].source_class == "recycling" or false
+    local right_recycling = facts[right] and facts[right].source_class == "recycling" or false
+    if left_recycling ~= right_recycling then return not left_recycling end
+    if progression_key_less(keys[left], keys[right]) then return true end
+    if progression_key_less(keys[right], keys[left]) then return false end
+    return left < right
+  end)
   return names
 end
 
@@ -425,7 +529,7 @@ end
 -- decision. The active pack and technology sets remain part of the key, and
 -- diagnostic traversals deliberately bypass the memo so their work budget and
 -- failure trace remain observationally exact.
-local function contextual_technology_researchability_reason(
+contextual_technology_researchability_reason = function(
   technology_name,
   recipe_name,
   options,
@@ -607,7 +711,7 @@ local function research_unlocked_output_witness(identity, options, state, visiti
         if not diagnostic_visit(options.diagnostic_observer, options.diagnostic_depth or 0) then return nil end
         table.insert(unlockers, technology_name)
       end
-      table.sort(unlockers)
+      sort_unlockers(unlockers, options.diagnostic_observer)
       for _, technology_name in ipairs(unlockers) do
         if not diagnostic_visit(options.diagnostic_observer, options.diagnostic_depth or 0) then return nil end
         -- Recipe/unlocker pairs are alternatives. Keep only the active pair's
@@ -717,6 +821,156 @@ local function production_witness_options(visiting_packs, visiting_technologies,
   return options
 end
 
+-- The structural witness retains only the chosen OR branch. Extract its
+-- research-unlocked recipe nodes so the route policy can require every
+-- technology that the chosen branch actually needs, including nested inputs.
+local function selected_research_unlock_pairs(witness)
+  local pairs, seen = {}, {}
+  local function visit(node)
+    if type(node) ~= "table" then return end
+    if node.kind == "research-unlocked-recipe"
+      and type(node.recipe) == "string" and type(node.unlocker) == "string" then
+      local key = node.recipe .. "\0" .. node.unlocker
+      if not seen[key] then
+        seen[key] = true
+        table.insert(pairs, {recipe = node.recipe, unlocker = node.unlocker})
+      end
+      visit(node.recipe_witness)
+    end
+    for _, ingredient in ipairs(node.ingredients or {}) do visit(ingredient) end
+  end
+  visit(witness)
+  table.sort(pairs, function(left, right)
+    if left.recipe ~= right.recipe then return left.recipe < right.recipe end
+    return left.unlocker < right.unlocker
+  end)
+  return pairs
+end
+
+local function append_research_unlock_pair(pairs, seen, recipe_name, technology_name)
+  local key = recipe_name .. "\0" .. technology_name
+  if not seen[key] then
+    seen[key] = true
+    table.insert(pairs, {recipe = recipe_name, unlocker = technology_name})
+  end
+end
+
+local function aggregate_research_route(
+  outer_recipe,
+  unlock_pairs,
+  visiting_packs,
+  excluded_unlocker,
+  visiting_technologies,
+  observer,
+  structural_witness,
+  witness_options
+)
+  local checked_routes = {}
+  for _, pair in ipairs(unlock_pairs or {}) do
+    if pair.unlocker == excluded_unlocker then return nil end
+    local route = route_for_unlocker(
+      pair.recipe,
+      pair.unlocker,
+      visiting_packs,
+      visiting_technologies,
+      observer,
+      witness_options
+    )
+    if route.reachable ~= true then return nil end
+    table.insert(checked_routes, route)
+  end
+  if #checked_routes == 0 then return nil end
+
+  local unlocker_set, direct_prerequisite_sets, prerequisite_set, burden_set = {}, {}, {}, {}
+  local unlock_depth, research_count, research_time = 0, 0, 0
+  for _, route in ipairs(checked_routes) do
+    for _, technology_name in ipairs(route.unlockers or {route.unlocker}) do
+      if technology_name then
+        unlocker_set[technology_name] = true
+        local prerequisites = direct_prerequisite_sets[technology_name] or {}
+        for _, prerequisite_name in ipairs(route.prerequisite_closure or {}) do
+          prerequisites[prerequisite_name] = true
+        end
+        direct_prerequisite_sets[technology_name] = prerequisites
+      end
+    end
+    for _, technology_name in ipairs(route.prerequisite_closure or {}) do
+      prerequisite_set[technology_name] = true
+    end
+    for _, pack_name in ipairs(route.science_burden or {}) do burden_set[pack_name] = true end
+    local key = route.progression_key or {}
+    unlock_depth = math.max(unlock_depth, tonumber(key.unlock_depth) or 0)
+  end
+
+  local unlockers, prerequisite_closure, science_burden = {}, {}, {}
+  for technology_name in pairs(unlocker_set) do table.insert(unlockers, technology_name) end
+  for technology_name in pairs(prerequisite_set) do table.insert(prerequisite_closure, technology_name) end
+  for pack_name in pairs(burden_set) do table.insert(science_burden, pack_name) end
+  table.sort(unlockers)
+  table.sort(prerequisite_closure)
+  table.sort(science_burden)
+
+  -- A direct gate that is already a prerequisite of another selected direct
+  -- gate need not be emitted separately. Keep its closure/provenance: the
+  -- route still proves every actual unlocked recipe. Mutual reachability is
+  -- retained rather than reducing both sides of an invalid cycle.
+  local reduced_unlockers = {}
+  for _, candidate_name in ipairs(unlockers) do
+    local candidate_prerequisites = direct_prerequisite_sets[candidate_name] or {}
+    local implied_by_another_gate = false
+    for _, other_name in ipairs(unlockers) do
+      if other_name ~= candidate_name then
+        local other_prerequisites = direct_prerequisite_sets[other_name] or {}
+        if other_prerequisites[candidate_name] and not candidate_prerequisites[other_name] then
+          implied_by_another_gate = true
+          break
+        end
+      end
+    end
+    if not implied_by_another_gate then table.insert(reduced_unlockers, candidate_name) end
+  end
+  unlockers = reduced_unlockers
+
+  -- Every gate is required. Count the distinct actual technologies once so a
+  -- nested gate that is also a prerequisite is not charged twice.
+  local required_set = {}
+  for _, technology_name in ipairs(unlockers) do required_set[technology_name] = true end
+  for _, technology_name in ipairs(prerequisite_closure) do required_set[technology_name] = true end
+  local required_technologies = {}
+  for technology_name in pairs(required_set) do table.insert(required_technologies, technology_name) end
+  table.sort(required_technologies)
+  for _, technology_name in ipairs(required_technologies) do
+    local unit = (data_raw.technology(technology_name) or {}).unit or {}
+    local count, time = tonumber(unit.count), tonumber(unit.time)
+    if count == nil then research_count = nil elseif research_count ~= nil then research_count = research_count + count end
+    if time == nil then research_time = nil elseif research_time ~= nil then research_time = research_time + time end
+  end
+
+  return {
+    recipe = outer_recipe,
+    initial = false,
+    unlockers = unlockers,
+    unlocker = #unlockers == 1 and unlockers[1] or nil,
+    prerequisite_closure = prerequisite_closure,
+    science_burden = science_burden,
+    reachable = true,
+    reachability = {status = "reachable"},
+    progression_key = {
+      science_burden_count = #science_burden,
+      prerequisite_count = #prerequisite_closure,
+      unlock_depth = unlock_depth,
+      research_count = research_count,
+      research_time = research_time
+    },
+    provenance = {
+      route_policy = route_policy.policy_id,
+      recipe = outer_recipe,
+      structural_route_witness = structural_witness and structural_witness.kind,
+      selected_research_unlock_pairs = deepcopy(unlock_pairs)
+    }
+  }
+end
+
 local function production_routes(
   recipe_status,
   visiting_packs,
@@ -736,9 +990,9 @@ local function production_routes(
     if not diagnostic_visit(observer, 0) then break end
     local recipe = canonical_recipe_facts.view(recipe_name)
     if recipe and recipe.enabled_without_research == true then
-      local witness = route_feasibility.initial_recipe_witness(
+      local initial_witness = route_feasibility.initial_recipe_witness(
         recipe_name, recipe_status.pack_name, witness_options, witness_state)
-      if witness then
+      if initial_witness then
         table.insert(routes, {
           recipe = recipe_name,
           initial = true,
@@ -757,26 +1011,61 @@ local function production_routes(
           provenance = {
             route_policy = route_policy.policy_id,
             recipe = recipe_name,
-            structural_route_witness = witness.kind
+            structural_route_witness = initial_witness.kind
           }
         })
+      else
+        -- The outer recipe is enabled, but one of its inputs may become
+        -- available through research. This is a future route, never an
+        -- initial witness, and its gates come only from the selected inner
+        -- research-unlocked recipes.
+        local future_witness = route_feasibility.recipe_witness(
+          recipe_name, recipe_status.pack_name, witness_options, witness_state)
+        local route = aggregate_research_route(
+          recipe_name,
+          selected_research_unlock_pairs(future_witness),
+          visiting_packs,
+          excluded_unlocker,
+          visiting_technologies,
+          observer,
+          future_witness,
+          witness_options
+        )
+        if route then table.insert(routes, route) end
       end
     else
       local witness = route_feasibility.recipe_witness(
         recipe_name, recipe_status.pack_name, witness_options, witness_state)
       if witness then
+        local inner_pairs = selected_research_unlock_pairs(witness)
+        local unlockers = {}
         for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
+          table.insert(unlockers, technology_name)
+        end
+        table.sort(unlockers)
+        for _, technology_name in ipairs(unlockers) do
           if not diagnostic_visit(observer, 0) then break end
           if technology_name ~= excluded_unlocker then
-            local route = route_for_unlocker(
+            local pairs, seen = {}, {}
+            append_research_unlock_pair(pairs, seen, recipe_name, technology_name)
+            for _, pair in ipairs(inner_pairs) do
+              append_research_unlock_pair(pairs, seen, pair.recipe, pair.unlocker)
+            end
+            table.sort(pairs, function(left, right)
+              if left.recipe ~= right.recipe then return left.recipe < right.recipe end
+              return left.unlocker < right.unlocker
+            end)
+            local route = aggregate_research_route(
               recipe_name,
-              technology_name,
+              pairs,
               visiting_packs,
+              excluded_unlocker,
               visiting_technologies,
-              observer
+              observer,
+              witness,
+              witness_options
             )
-            route.provenance.structural_route_witness = witness.kind
-            table.insert(routes, route)
+            if route then table.insert(routes, route) end
           end
         end
       end
@@ -1043,6 +1332,7 @@ local function observation_context()
     "science.technology_researchability_reason",
     "science.independent_pack_acquisition_witness",
     "science.prereq_tech_for_science_pack",
+    "science.prereq_techs_for_science_pack",
     "science.production_route_for_pack"
   }) do
     local service = parent:service(service_name)
@@ -1281,8 +1571,22 @@ function M.researchable_unlockers_for_recipe(recipe_name)
 end
 
 function M.prereq_tech_for_science_pack(pack_name)
-  local _, prerequisite = M.pack_production_status(pack_name, {})
-  return prerequisite
+  local gates = M.prereq_techs_for_science_pack(pack_name)
+  return #gates == 1 and gates[1] or nil
+end
+
+function M.prereq_techs_for_science_pack(pack_name)
+  local route = M.production_route_for_pack(pack_name)
+  if not route then return {} end
+  local gates, seen = {}, {}
+  for _, technology_name in ipairs(route.unlockers or {}) do
+    if technology_name and not seen[technology_name] then
+      seen[technology_name] = true
+      table.insert(gates, technology_name)
+    end
+  end
+  table.sort(gates)
+  return gates
 end
 
 function M.production_route_for_pack(pack_name)

@@ -11,6 +11,20 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 
+-- Acquisition alternatives remain complete, but ordinary production is tried
+-- before reverse recycling routes. A known forward route should not first
+-- traverse every item whose recycling can return this same ingredient.
+function M.sort_acquisition_producers(names, index)
+  local facts = index and index.facts or {}
+  table.sort(names, function(left, right)
+    local left_recycling = facts[left] and facts[left].source_class == "recycling" or false
+    local right_recycling = facts[right] and facts[right].source_class == "recycling" or false
+    if left_recycling ~= right_recycling then return not left_recycling end
+    return left < right
+  end)
+  return names
+end
+
 local MACHINE_TYPES = {
   "assembling-machine", "furnace", "mining-drill", "rocket-silo", "character"
 }
@@ -509,8 +523,13 @@ local function sorted_producers(index, output_identity, options)
     if not diagnostic_visit(options) then break end
     table.insert(producers, recipe_name)
   end
-  table.sort(producers)
-  return producers
+  -- Rejection projections retain their established lexical branch order and
+  -- bounded-work accounting. The normal search alone prefers forward routes.
+  if options.diagnostic_observer ~= nil then
+    table.sort(producers)
+    return producers
+  end
+  return M.sort_acquisition_producers(producers, index)
 end
 
 local acquisition_witness
@@ -827,6 +846,10 @@ function M.initial_recipe_witness(recipe_name, output, options, state)
   -- later locked-route query without inheriting require_enabled=true.
   local initial_options = copy_options(options)
   initial_options.require_enabled = true
+  -- Initial availability is a strict enabled-only proof. A future
+  -- research-unlocked ingredient may establish a later route, but it must not
+  -- turn an enabled outer recipe into an initial acquisition witness.
+  initial_options.research_unlock_witness = nil
   return M.recipe_witness(recipe_name, output, initial_options, state)
 end
 

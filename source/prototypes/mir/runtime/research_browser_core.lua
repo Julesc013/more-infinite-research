@@ -149,12 +149,12 @@ local function valid_schema2_detail(detail, key, family, cap)
     or detail.family ~= family then return false end
   local allowed = {schema = true, family = true, action = true, owner = true,
     compiler_disposition = true, final_science = true, effective_cap = true,
-    current_level = true, recipe_benefits = true, next_level_has_effective_benefit = true,
+    current_level = true, recipe_benefits = true, next_level_eligible = true, next_level_has_effective_benefit = true,
     settings = true}
   if not only_fields(detail, allowed) then return false end
   local rich = detail.owner ~= nil or detail.compiler_disposition ~= nil or detail.final_science ~= nil
     or detail.effective_cap ~= nil or detail.current_level ~= nil or detail.recipe_benefits ~= nil
-    or detail.next_level_has_effective_benefit ~= nil or detail.settings ~= nil
+    or detail.next_level_eligible ~= nil or detail.next_level_has_effective_benefit ~= nil or detail.settings ~= nil
   if not rich then return true, false end
   if type(detail.owner) ~= "table" or not only_fields(detail.owner, {technology_id = true,
       stream_id = true, action = true, reason = true, affected_recipe_ids = true})
@@ -179,15 +179,30 @@ local function valid_schema2_detail(detail, key, family, cap)
     if type(ingredient) ~= "table" or not only_fields(ingredient, {name = true, amount = true})
       or not bounded_string(ingredient.name) or not finite_positive(ingredient.amount) then return false end
   end
-  if not finite_positive_integer(detail.effective_cap) or detail.effective_cap ~= cap
-    or not finite_positive_integer(detail.current_level)
+  local capped = cap ~= nil
+  if not finite_positive_integer(detail.current_level)
     or type(detail.next_level_has_effective_benefit) ~= "boolean"
     or not dense_array(detail.recipe_benefits) then return false end
-  local settings = detail.settings
-  if type(settings) ~= "table" or not only_fields(settings, {maximum_level = true, enabled = true})
-    or not valid_setting(settings.maximum_level, "ips-max-level-" .. family, "number")
-    or not valid_setting(settings.enabled, "ips-enable-" .. family, "boolean")
-    or settings.maximum_level.effective ~= cap then return false end
+  -- Existing finite-cap schema-2 providers derived this from the cap. The
+  -- explicit field is needed only where an unbounded technology has no cap
+  -- for the portable core to inspect.
+  local next_level_eligible = detail.next_level_eligible
+  if capped and next_level_eligible == nil then
+    next_level_eligible = detail.current_level <= cap
+  elseif type(next_level_eligible) ~= "boolean" then
+    return false
+  end
+  if capped then
+    if next_level_eligible and detail.current_level > cap then return false end
+    local settings = detail.settings
+    if not finite_positive_integer(detail.effective_cap) or detail.effective_cap ~= cap
+      or type(settings) ~= "table" or not only_fields(settings, {maximum_level = true, enabled = true})
+      or not valid_setting(settings.maximum_level, "ips-max-level-" .. family, "number")
+      or not valid_setting(settings.enabled, "ips-enable-" .. family, "boolean")
+      or settings.maximum_level.effective ~= cap then return false end
+  elseif detail.effective_cap ~= nil or detail.settings ~= nil then
+    return false
+  end
   local benefit_ids, any_effective, previous = {}, false, nil
   for index, benefit in ipairs(detail.recipe_benefits) do
     if type(benefit) ~= "table" or not only_fields(benefit, {recipe_id = true, effect_change = true,
@@ -197,7 +212,7 @@ local function valid_schema2_detail(detail, key, family, cap)
       or benefit.current_productivity_bonus > benefit.maximum_productivity
       or type(benefit.next_level_has_effective_benefit) ~= "boolean"
       or (previous and benefit.recipe_id <= previous) then return false end
-    local expected_effective = detail.current_level <= cap
+    local expected_effective = next_level_eligible
       and benefit.current_productivity_bonus < benefit.maximum_productivity - 0.000000001
     if benefit.next_level_has_effective_benefit ~= expected_effective then return false end
     benefit_ids[index], previous = benefit.recipe_id, benefit.recipe_id
