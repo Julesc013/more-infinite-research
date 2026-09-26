@@ -350,6 +350,7 @@ function Read-MIR42HistoricalCandidateConstructionRow {
     throw '[mir42-candidate-historical-construction-distribution-path]'
   }
   $inventory = Get-MIR4ArchiveInventory -Path $assetPath
+  $inventory | Add-Member -NotePropertyName path -NotePropertyValue $assetPath
   $expectedRoot = "more-infinite-research_$([string]$Descriptor.distribution_version)"
   Assert-MIR42FourTargetPackageSurface -Inventory $inventory -ExpectedRoot $expectedRoot -ExpectedVersion ([string]$Descriptor.distribution_version)
   if ([string]$inventory.archive_sha256 -cne [string]$row.asset.sha256 -or

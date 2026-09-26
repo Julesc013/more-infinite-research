@@ -143,6 +143,11 @@ try {
   }
 } finally {
   foreach ($path in @($root, $partialRoot, $historicalRoot, $nineRoot)) {
-    if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Recurse -Force }
+    if (Test-Path -LiteralPath $path) {
+      $resolvedPath = (Resolve-Path -LiteralPath $path).Path
+      $null = Assert-MIR4DescendantPath -Root (Join-Path $repo 'build') -Path $resolvedPath
+      $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $resolvedPath
+      Remove-Item -LiteralPath $resolvedPath -Recurse -Force
+    }
   }
 }
