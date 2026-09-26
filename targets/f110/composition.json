@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 64920,
-      "expected_sha256": "C4B41A4286285E2F7BF8C5729D5FD87E31B7DCE30971A13B270197B4F81AB65B",
+      "expected_bytes": 68267,
+      "expected_sha256": "AE75D39FF13F274F667C87C6903EE6BEB792D29B384BD31B5C59B45BE3FE0744",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 35498,
-      "expected_sha256": "A6B469B53D8FB7A2B710F1550571D73B1634A3C5DA63B9AC61503401CC6ED8E4",
+      "expected_bytes": 36035,
+      "expected_sha256": "945E4956B7B00322B63FB918C130C428AFC0BF0DAD3D2E3A9A52F370F424A3A7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -940,8 +940,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3754,
-      "expected_sha256": "FD29C6DC1D97AE4A21349E0A74C11495969372C3669B183EC3D7A5BA2D41434F",
+      "expected_bytes": 4833,
+      "expected_sha256": "23350CEFC005BF66E71DC1C9C6C91B5FAF56B05622565363C424BF974F6366C3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -1036,8 +1036,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 13973,
-      "expected_sha256": "7CCA818A5C12F2BDBA1C748A86DC2448B585DC968C31E5C5B6C13D0264B3E7E7",
+      "expected_bytes": 18386,
+      "expected_sha256": "69B71D7889E31A340CC801542B5B58D8CB7923EC8995412741B7354B840EC57A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3116,8 +3116,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4188,
-      "expected_sha256": "4B72EA0396147277736FBA2F68CF0E09D19ED1996F129F8086B4DBE951FCB2D9",
+      "expected_bytes": 4205,
+      "expected_sha256": "B10048E18EF0B431C4F2177E61D89AECB962DD33CAC2EB6840DC96E205CFFE10",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "C660C8CC7A854880B406C62F3CE8EBF0488B9DBF70D8FCB7E01DA54AEDF34FD4"
+  "record_sha256": "0FFF10621E562A2586C3FA8FCCB670F574C81144976B6831A050E51A8B851061"
 }

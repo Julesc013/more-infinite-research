@@ -1,21 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://more-infinite-research.invalid/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
-  "title": "MIR 4.2 four-target deterministic private candidate manifest V1",
+  "title": "MIR 4.2 selected-target deterministic private candidate manifest V1",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "kind", "status", "build_complete", "source", "package_authority_sha256", "package_source_sha256", "target_authority", "resource_admission", "targets", "failures", "qualification", "technical_seal", "signing", "tagging", "publication_authorized", "record_sha256"],
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR42FourTargetDeterministicCandidateManifestV1"},
-    "status": {"enum": ["private-deterministic-four-target-candidate-built-unqualified", "private-deterministic-four-target-candidate-partial"]},
+    "status": {"enum": ["private-deterministic-four-target-candidate-built-unqualified", "private-deterministic-four-target-candidate-partial", "private-deterministic-nine-target-candidate-built-unqualified", "private-deterministic-nine-target-candidate-partial"]},
     "build_complete": {"type": "boolean"},
     "source": {"$ref": "#/$defs/source"},
     "package_authority_sha256": {"$ref": "#/$defs/sha256"},
     "package_source_sha256": {"$ref": "#/$defs/sha256"},
-    "target_authority": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/authorityTarget"}},
+    "target_authority": {"type": "array", "minItems": 4, "maxItems": 9, "anyOf": [{"minItems": 4, "maxItems": 4}, {"minItems": 9, "maxItems": 9}], "items": {"$ref": "#/$defs/authorityTarget"}},
     "resource_admission": {"type": "object", "additionalProperties": false, "required": ["admitted", "minimum_free_memory_bytes", "minimum_free_work_bytes"], "properties": {"admitted": {"const": true}, "minimum_free_memory_bytes": {"type": "integer", "minimum": 1}, "minimum_free_work_bytes": {"type": "integer", "minimum": 1}}},
-    "targets": {"type": "array", "maxItems": 4, "items": {"$ref": "#/$defs/target"}},
+    "targets": {"type": "array", "maxItems": 9, "items": {"$ref": "#/$defs/target"}},
     "failures": {"type": "array"},
     "qualification": {"const": "not-performed"},
     "technical_seal": {"const": "not-performed"},
@@ -27,8 +27,8 @@
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
     "source": {"type": "object", "additionalProperties": false, "required": ["commit", "tree"], "properties": {"commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"}, "tree": {"type": "string", "pattern": "^[a-f0-9]{40}$"}}},
-    "authorityTarget": {"type": "object", "additionalProperties": false, "required": ["target", "target_id", "source_version", "distribution_version"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "target_id": {"enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0"]}, "source_version": {"const": "4.2.0"}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000)$"}}},
-    "asset": {"type": "object", "additionalProperties": false, "required": ["path", "bytes", "sha256"], "properties": {"path": {"type": "string", "pattern": "^assets/f(?:210|200|110|100)/more-infinite-research_4[.]2[.](?:21000|20000|11000|10000)[.]zip$"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
-    "target": {"type": "object", "additionalProperties": false, "required": ["target", "distribution_version", "target_row_path", "asset", "content_sha256", "entry_count"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000)$"}, "target_row_path": {"type": "string", "pattern": "^target-rows/f(?:210|200|110|100)[.]json$"}, "asset": {"$ref": "#/$defs/asset"}, "content_sha256": {"$ref": "#/$defs/sha256"}, "entry_count": {"type": "integer", "minimum": 1}}}
+    "authorityTarget": {"type": "object", "additionalProperties": false, "required": ["target", "target_id", "source_version", "distribution_version"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]}, "target_id": {"enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0", "factorio-0.17", "factorio-0.16", "factorio-0.15", "factorio-0.14", "factorio-0.13"]}, "source_version": {"const": "4.2.0"}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000|01700|01600|01500|01400|01300)$"}}},
+    "asset": {"type": "object", "additionalProperties": false, "required": ["path", "bytes", "sha256"], "properties": {"path": {"type": "string", "pattern": "^assets/f(?:210|200|110|100|017|016|015|014|013)/more-infinite-research_4[.]2[.](?:21000|20000|11000|10000|01700|01600|01500|01400|01300)[.]zip$"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "target": {"type": "object", "additionalProperties": false, "required": ["target", "distribution_version", "target_row_path", "asset", "content_sha256", "entry_count"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000|01700|01600|01500|01400|01300)$"}, "target_row_path": {"type": "string", "pattern": "^target-rows/f(?:210|200|110|100|017|016|015|014|013)[.]json$"}, "asset": {"$ref": "#/$defs/asset"}, "content_sha256": {"$ref": "#/$defs/sha256"}, "entry_count": {"type": "integer", "minimum": 1}}}
   }
 }

@@ -214,6 +214,35 @@ check("R03", not registry.science_pack_exists("orphan"),
 check("R04", not registry.science_pack_exists("missing-prototype"),
   "A lab input without a physical item prototype remains excluded")
 
+reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}))
+registry.science_pack_exists("custom-item-pack")
+local exposed_inputs = registry.all_lab_inputs()
+exposed_inputs[1] = "orphan"
+check("R05", registry.science_pack_exists("custom-item-pack")
+    and table.concat(registry.all_lab_inputs(), ",") == "custom-item-pack,custom-tool-pack",
+  "Mutating an exported lab-input list does not alter cached membership or ordering")
+world.item_prototypes["custom-item-pack"] = nil
+check("R06", not registry.science_pack_exists("custom-item-pack"),
+  "Cached lab membership never admits a removed physical prototype")
+world.item_prototypes["custom-item-pack"] = {type = "item"}
+context:replace_epoch("lab_input_index", {"custom-tool-pack"})
+check("R07", not registry.science_pack_exists("custom-item-pack") and registry.science_pack_exists("custom-tool-pack"),
+  "Replacing the lab-input epoch invalidates positive membership")
+context:replace_epoch("lab_input_index", {"custom-item-pack", "custom-tool-pack"})
+check("R08", registry.science_pack_exists("custom-item-pack"),
+  "A later lab-input epoch admits newly restored membership")
+local visits = 0
+local observer = {reserve_visit = function()
+  visits = visits + 1
+  return visits <= 1
+end}
+check("R09", not registry.science_pack_exists("custom-tool-pack", observer) and visits == 2,
+  "A populated normal membership cache does not bypass diagnostic visit exhaustion")
+reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}))
+world.labs.lab.inputs = {"custom-tool-pack"}
+check("R10", not registry.science_pack_exists("custom-item-pack") and registry.science_pack_exists("custom-tool-pack"),
+  "A new compiler context does not inherit the previous context's membership")
+
 local function technology(pack, unlock_recipe)
   local technology = {enabled = true, unit = {count = 1, time = 1, ingredients = {{name = pack, amount = 1}}}}
   if unlock_recipe then technology.effects = {{type = "unlock-recipe", recipe = unlock_recipe}} end
@@ -2090,6 +2119,202 @@ check("U15", cold_root_unresolved and cold_root_status == "initial"
   and cold_reasons[1] == false and cold_reasons[2] == false and cold_reasons[3] == false
   and cold_mechanism_calls == 2,
   "The unresolved root bypasses mechanism sharing; only its subsequent proved-root evaluation may be reused")
+
+reset({
+  item_prototypes = {["memo-pack"] = {type = "item"}, ["out-pack"] = {type = "item"}},
+  labs = {lab = {inputs = {"memo-pack", "out-pack"}}},
+  techs = {MemoUnlock = {enabled = true, unit = {count = 1, time = 1, ingredients = {{"memo-pack", 1}}}}},
+  recipe_prototypes = {ordinary_mid = {name = "ordinary_mid"}, out_recipe = {name = "out_recipe"}, seed_pack = {name = "seed_pack"}},
+  recipe_facts = {ordinary_mid = route_fact("memo-intermediate", {}, {enabled = false}),
+    out_recipe = route_fact("out-pack", {{name = "memo-intermediate", amount = 1}}), seed_pack = route_fact("memo-pack")},
+  producers = {["memo-pack"] = {"seed_pack"}, ["memo-intermediate"] = {"ordinary_mid"}, ["out-pack"] = {"out_recipe"}},
+  unlockers = {ordinary_mid = {"MemoUnlock"}}, resources = {}
+})
+world.techs.MemoUnlock.effects = {{type = "unlock-recipe", recipe = "ordinary_mid"}}
+production.pack_production_status("memo-pack", {})
+local cross_query_calls = 0
+context.services["science.pack_production_status"] = function(...)
+  cross_query_calls = cross_query_calls + 1
+  return production.pack_production_status(...)
+end
+local cross_first = production.independent_pack_acquisition_witness("out-pack", "Other", {}, {})
+local cross_second = production.independent_pack_acquisition_witness("out-pack", "Other", {}, {})
+local shared_mechanism = context:state_view("science_pack_production").technology_mechanism_memo
+check("U16", cross_first and cross_second and cross_first.unlocker == "MemoUnlock"
+  and cross_second.unlocker == "MemoUnlock" and cross_query_calls == 1
+  and shared_mechanism.compiler_context == nil,
+  "Separate route queries reuse a fully root-qualified mechanism without a context-state back-reference"
+    .. "; first=" .. tostring(cross_first and cross_first.unlocker)
+    .. "; second=" .. tostring(cross_second and cross_second.unlocker)
+    .. "; calls=" .. tostring(cross_query_calls)
+    .. "; back-reference=" .. tostring(shared_mechanism.compiler_context ~= nil))
+check("U17", production.independent_pack_acquisition_witness("out-pack", "MemoUnlock", {}, {}) == nil,
+  "Shared mechanism reuse never admits the explicitly excluded unlocker")
+world.recipe_source_epoch = 2
+world.producers["memo-pack"] = {}
+check("U18", production.independent_pack_acquisition_witness("out-pack", "Other", {}, {}) == nil,
+  "An epoch replacement discards shared mechanism success when its independent science root disappears")
+
+reset({
+  item_prototypes = {["free-pack"] = {type = "item"}, ["active-pack"] = {type = "item"}},
+  labs = {lab = {inputs = {"free-pack", "active-pack"}}},
+  techs = {
+    AExternal = {enabled = true, unit = {count = 1, ingredients = {{"free-pack", 1}}}},
+    ZCycle = {enabled = true, unit = {count = 1, ingredients = {{"active-pack", 1}}}},
+    Root = {enabled = true, prerequisites = {"AExternal", "ZCycle"},
+      unit = {count = 1, ingredients = {{"free-pack", 1}}}}
+  },
+  recipe_prototypes = {ordinary = {name = "ordinary"}, self_pack = {name = "self_pack"}},
+  recipe_facts = {ordinary = route_fact("ordinary-item"), self_pack = route_fact("active-pack")},
+  producers = {}, unlockers = {}, resources = {}
+})
+local unrelated_pack_calls, active_pack_calls = 0, 0
+context.services["science.pack_production_status"] = function(name, ...)
+  if name == "free-pack" then unrelated_pack_calls = unrelated_pack_calls + 1; return "initial" end
+  active_pack_calls = active_pack_calls + 1
+  return production.pack_production_status(name, ...)
+end
+local early_visiting_techs = {}
+check("U19", researchability.reason_with_context("Root", {
+  unlock_recipe_name = "ordinary", visiting_packs = {["active-pack"] = true},
+  visiting_technologies = early_visiting_techs}) == "prerequisite-ZCycle-unreachable-science-active-pack"
+  and unrelated_pack_calls == 0 and active_pack_calls == 1 and early_visiting_techs.Root == nil,
+  "A known active science contradiction rejects the AND closure before unrelated pack traversal")
+context.services["science.independent_pack_acquisition_witness"] = function() return {kind = "source"} end
+check("U20", researchability.reason_with_context("Root", {
+  unlock_recipe_name = "self_pack", visiting_packs = {["active-pack"] = true}, visiting_technologies = {}}) == nil
+  and unrelated_pack_calls > 0,
+  "A self-producing recipe bypasses early cycle rejection and retains its independent supply witness")
+local diagnostic_unrelated_calls = 0
+context.services["science.pack_production_status"] = function(name)
+  if name == "free-pack" then diagnostic_unrelated_calls = diagnostic_unrelated_calls + 1 end
+  return "unreachable"
+end
+check("U21", researchability.reason_with_context("Root", {
+  unlock_recipe_name = "ordinary", visiting_packs = {["active-pack"] = true}, visiting_technologies = {},
+  diagnostic_observer = bounded_observer(64)}) == "prerequisite-AExternal-unreachable-science-free-pack"
+  and diagnostic_unrelated_calls == 1,
+  "Bounded diagnostics retain their original ordered failure and measured traversal")
+
+reset({
+  item_prototypes = {["memo-pack"] = {type = "item"}, ["cold-pack"] = {type = "item"}},
+  labs = {lab = {inputs = {"memo-pack", "cold-pack"}}},
+  techs = {
+    Core = {enabled = true, unit = {count = 1, ingredients = {{"memo-pack", 1}}}},
+    ZDependent = {enabled = true, prerequisites = {"Core"},
+      unit = {count = 1, ingredients = {{"cold-pack", 1}}}}
+  },
+  recipe_prototypes = {ordinary_one = {name = "ordinary_one"}, ordinary_two = {name = "ordinary_two"},
+    seed_pack = {name = "seed_pack"}},
+  recipe_facts = {ordinary_one = route_fact("ordinary-one"), ordinary_two = route_fact("ordinary-two"),
+    seed_pack = route_fact("memo-pack")},
+  producers = {["memo-pack"] = {"seed_pack"}}, unlockers = {}, resources = {}
+})
+production.pack_production_status("memo-pack", {})
+local partial_memo, partial_core_calls = {}, 0
+context.services["science.pack_production_status"] = function(name, ...)
+  if name == "memo-pack" then partial_core_calls = partial_core_calls + 1 end
+  return production.pack_production_status(name, ...)
+end
+local partial_first = researchability.reason_with_context("ZDependent", {
+  unlock_recipe_name = "ordinary_one", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = partial_memo})
+local partial_second = researchability.reason_with_context("ZDependent", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = partial_memo})
+check("U22", partial_first == "unreachable-science-cold-pack" and partial_second == partial_first
+  and partial_core_calls == 1 and context:state_view("science_pack_production").entries["cold-pack"] == nil,
+  "A resolved individual mechanism is reused while its enclosing unresolved science query remains exact")
+check("U23", researchability.reason_with_context("ZDependent", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {["memo-pack"] = true},
+  visiting_technologies = {}, mechanism_memo = partial_memo}) == "prerequisite-Core-unreachable-science-memo-pack",
+  "Individual mechanism reuse never crosses an active science contradiction")
+world.recipe_source_epoch = 2
+world.producers["memo-pack"] = {}
+check("U24", researchability.reason_with_context("ZDependent", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = partial_memo})
+    == "prerequisite-Core-unreachable-science-memo-pack",
+  "An epoch replacement invalidates resolved individual mechanisms with a removed seed")
+
+do
+local function contextual_reuse_regressions()
+-- Exact-input reuse must retain cycle boundaries and react to newly learned
+-- structural/root knowledge. These assertions exercise the actual resolver.
+reset({
+  item_prototypes = {P = {type = "item"}, Q = {type = "item"}, Primer = {type = "item"}},
+  labs = {lab = {inputs = {"P", "Q", "Primer"}}},
+  techs = {UnlockP = {enabled = true, unit = {count = 1, time = 1, ingredients = {{"Q", 1}}},
+    effects = {{type = "unlock-recipe", recipe = "make-P"}}}},
+  recipe_prototypes = {["make-P"] = {name = "make-P"}, ["make-Q"] = {name = "make-Q"}},
+  recipe_facts = {["make-P"] = route_fact("P", {}, {enabled = false}),
+    ["make-Q"] = route_fact("Q", {{name = "ore", amount = 1}})},
+  producers = {P = {"make-P"}, Q = {"make-Q"}}, unlockers = {["make-P"] = {"UnlockP"}},
+  resources = {ore = {minable = {result = "ore", count = 1}}}
+})
+production.pack_production_status("Primer", {unrelated = true})
+local contextual_owner = context:state_view("science_pack_production")
+local shared_acquisition = contextual_owner.route_witness_state
+local canonical_facade = require("prototypes.mir.index.recipe_facts")
+local original_index_view = canonical_facade.index_view
+canonical_facade.index_view = function() return context.states.recipe_index end
+shared_acquisition.recipe_index = context.states.recipe_index
+shared_acquisition.visiting = shared_acquisition.visiting or {}
+shared_acquisition.visiting["item\0ore"] = true
+local first_blocked = production.pack_production_status("P", {unrelated = true})
+check("CP01", first_blocked == "unreachable" and contextual_owner.entries.P == nil,
+  "An active typed acquisition boundary rejects the nested science route without creating a root answer")
+local count_recipe_status, contextual_recipe_calls = recipe_unlock_facts.pack_recipe_status, 0
+recipe_unlock_facts.pack_recipe_status = function(...)
+  contextual_recipe_calls = contextual_recipe_calls + 1
+  return count_recipe_status(...)
+end
+local repeated_blocked = production.pack_production_status("P", {unrelated = true})
+recipe_unlock_facts.pack_recipe_status = count_recipe_status
+check("CP02", repeated_blocked == first_blocked and contextual_recipe_calls == 0,
+  "An unchanged completed contextual failure is reused without repeating recipe traversal")
+shared_acquisition.visiting["item\0ore"] = nil
+local unblocked_status, unblocked_gate = production.pack_production_status("P", {unrelated = true})
+check("CP03", unblocked_status == "research" and unblocked_gate == "UnlockP"
+  and contextual_owner.entries.P == nil and contextual_owner.entries.Q == nil,
+  "Removing the acquisition boundary proves a conditional route without pretending either pack is root-qualified")
+shared_acquisition.visiting["item\0ore"] = true
+local learned_status, learned_gate = production.pack_production_status("P", {unrelated = true})
+-- Compare against the same learned world with only contextual answer reuse
+-- removed. Do not remove structural witnesses or change any semantic input.
+contextual_owner.contextual_pack_status_memo = {}
+contextual_owner.contextual_pack_status_count = 0
+local fresh_learned_status, fresh_learned_gate = production.pack_production_status("P", {unrelated = true})
+check("CP04", learned_status == fresh_learned_status and learned_gate == fresh_learned_gate,
+  "Learning structural witnesses cannot leave an earlier same-context answer stale"
+    .. "; reused=" .. tostring(learned_status) .. "; fresh=" .. tostring(fresh_learned_status))
+shared_acquisition.visiting["item\0ore"] = nil
+local rooted_q = production.pack_production_status("Q", {})
+shared_acquisition.visiting["item\0ore"] = true
+local after_root_status, after_root_gate = production.pack_production_status("P", {unrelated = true})
+check("CP05", rooted_q == "initial" and after_root_status == "research" and after_root_gate == "UnlockP",
+  "A newly learned nested root invalidates earlier contextual answers")
+check("CP06", production.pack_production_status("P", {P = true}) == "unreachable",
+  "Same-pack cycle rejection precedes contextual and root reuse")
+check("CP09", production.pack_production_status("P", {unrelated = true}, {UnlockP = true}) == "unreachable",
+  "A changed active technology boundary cannot borrow a successful contextual pack answer")
+check("CP10", production.pack_production_status("P", {Q = true}) == "unreachable",
+  "An active required science pack cannot borrow another pack traversal's success")
+local before_diagnostic_memo = contextual_owner.contextual_pack_status_memo
+local before_diagnostic_count = contextual_owner.contextual_pack_status_count
+local diagnostic_context_status = production.pack_production_status("P", {unrelated = true}, {}, bounded_observer(1))
+check("CP07", diagnostic_context_status == "indeterminate"
+  and contextual_owner.contextual_pack_status_memo == before_diagnostic_memo
+  and contextual_owner.contextual_pack_status_count == before_diagnostic_count,
+  "A diagnostic budget remains indeterminate and never reads or writes contextual answer reuse")
+world.recipe_source_epoch = 2
+world.resources = {}
+data.raw.resource = {}
+local replaced_status = production.pack_production_status("P", {unrelated = true})
+check("CP08", replaced_status == "unreachable" and context:state_view("science_pack_production") ~= contextual_owner,
+  "A source epoch replacement discards contextual, structural and root knowledge")
+
+canonical_facade.index_view = original_index_view
+end
+contextual_reuse_regressions()
+end
 
 -- The bounded status pass needs exactly four visits to establish that this
 -- physical lab input has no recipe. An old trace then repeated the existence

@@ -1,5 +1,6 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
+param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
+  [switch]$CandidateReaderOnly)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -34,8 +35,10 @@ try {
   $packageSource = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot
   Add-Type -AssemblyName System.IO.Compression.FileSystem
   $targets = [Collections.Generic.List[object]]::new()
+  $targetAuthority = [Collections.Generic.List[object]]::new()
   foreach ($target in @('f210','f200','f110','f100')) {
     $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.0'
+    $targetAuthority.Add([pscustomobject][ordered]@{target=[string]$identity.target;target_id=[string]$identity.target_id;source_version=[string]$identity.source_version;distribution_version=[string]$identity.distribution_version})
     $assetRelative = "assets/$([string]$identity.package_name)"
     $assetPath = Join-Path $root $assetRelative
     $stage = Join-Path $root "staging/$target/$([string]$identity.distribution_root)"
@@ -47,6 +50,7 @@ try {
     $asset = [ordered]@{path=$assetRelative;bytes=[int64]$inventory.bytes;sha256=[string]$inventory.archive_sha256}
     $row = [pscustomobject][ordered]@{
       schema=1;kind='MIR42FourTargetCandidateRowV1';target=$target;distribution_version=[string]$identity.distribution_version
+      source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource
       asset=$asset;content_sha256=[string]$inventory.content_sha256;entry_count=[int]$inventory.entry_count;build_a_sha256=$asset.sha256;build_b_sha256=$asset.sha256
       deterministic_archive_bytes=$true;package_excluded_surface=$true;record_sha256=''
     }
@@ -57,12 +61,58 @@ try {
   }
   $manifest = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetDeterministicCandidateManifestV1';status='private-deterministic-four-target-candidate-built-unqualified';build_complete=$true
-    source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource;target_authority=@();resource_admission=@{}
+    source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource;target_authority=@($targetAuthority);resource_admission=@{}
     targets=@($targets);failures=@();qualification='not-performed';technical_seal='not-performed';signing='not-performed';tagging='not-performed';publication_authorized=$false;record_sha256=''
   }
   $manifest.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $manifest
   $manifestPath = Join-Path $root 'candidate-manifest.json'
   Write-MIR4BootstrapRecord -Record $manifest -Path $manifestPath | Out-Null
+
+  Assert-MIR42SealTest ((Get-MIR42SealCandidateTargetScope -Rows @($targets) -Code 'mir42-seal-test-four-scope') -ceq 'four-target') 'candidate-reader-four-target-scope'
+  $nineScopeRows = @($script:MIR42SealNineTargetCandidates | ForEach-Object { [pscustomobject]@{target=[string]$_} })
+  Assert-MIR42SealTest ((Get-MIR42SealCandidateTargetScope -Rows $nineScopeRows -Code 'mir42-seal-test-nine-scope') -ceq 'nine-target') 'candidate-reader-nine-target-scope'
+  $reorderedNineRejected = $false
+  try { Get-MIR42SealCandidateTargetScope -Rows @($nineScopeRows[0],$nineScopeRows[2],$nineScopeRows[1],$nineScopeRows[3..8]) -Code 'mir42-seal-test-reordered-nine-scope' | Out-Null } catch { $reorderedNineRejected = $_.Exception.Message -match 'mir42-seal-test-reordered-nine-scope-target-set' }
+  Assert-MIR42SealTest $reorderedNineRejected 'candidate-reader-nine-target-order-required'
+
+  $syntheticNineTargets = @($script:MIR42SealNineTargetCandidates | ForEach-Object { [pscustomobject][ordered]@{target=[string]$_;distribution_version="test-$([string]$_)";archive_sha256=('A' * 64);content_sha256=('B' * 64);entry_count=1} })
+  $syntheticNineCandidate = [pscustomobject][ordered]@{identity=[pscustomobject]@{sha256=('C' * 64);record=[pscustomobject]@{record_sha256=('D' * 64)}};source=[pscustomobject]@{commit=('e' * 40);tree=('f' * 40);package_source_sha256=('E' * 64)};scope='nine-target';targets=$syntheticNineTargets}
+  $syntheticNineReceipt = [pscustomobject]@{
+    record = [pscustomobject]@{
+      candidate_manifest = [pscustomobject]@{sha256=('C' * 64);record_sha256=('D' * 64)}
+      source = $syntheticNineCandidate.source
+      targets = @(
+        foreach ($syntheticTarget in $syntheticNineTargets) {
+          [pscustomobject]@{target=$syntheticTarget.target;distribution_version=$syntheticTarget.distribution_version;archive=[pscustomobject]@{sha256=$syntheticTarget.archive_sha256;content_sha256=$syntheticTarget.content_sha256;entry_count=$syntheticTarget.entry_count};status='passed'}
+        }
+      )
+    }
+  }
+  Assert-MIR42ReceiptBinding -Receipt $syntheticNineReceipt -Candidate $syntheticNineCandidate -Code 'mir42-seal-test-nine-receipt' | Out-Null
+  $truncatedNineReceipt = $syntheticNineReceipt | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20 -DateKind String
+  $truncatedNineReceipt.record.targets = @($truncatedNineReceipt.record.targets[0..3])
+  $truncatedNineRejected = $false
+  try { Assert-MIR42ReceiptBinding -Receipt $truncatedNineReceipt -Candidate $syntheticNineCandidate -Code 'mir42-seal-test-nine-receipt-truncated' | Out-Null } catch { $truncatedNineRejected = $_.Exception.Message -match 'mir42-seal-test-nine-receipt-truncated-target-set' }
+  Assert-MIR42SealTest $truncatedNineRejected 'receipt-binding-requires-candidate-nine-target-set'
+
+  if ($CandidateReaderOnly) {
+    $verified = Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath
+    Assert-MIR42SealTest ($verified.scope -ceq 'four-target' -and $verified.targets.Count -eq 4) 'candidate-reader-real-four-manifest'
+    $firstRowPath = Join-Path $root ([string]$targets[0].target_row_path)
+    $firstRowBytes = [IO.File]::ReadAllBytes($firstRowPath)
+    foreach ($field in @('package_authority_sha256','package_source_sha256')) {
+      $driftRow = Get-Content -Raw -LiteralPath $firstRowPath | ConvertFrom-Json -Depth 30 -DateKind String
+      $driftRow.$field = '0' * 64
+      Write-MIR4BootstrapRecord -Record $driftRow -Path $firstRowPath | Out-Null
+      $rejected = $false
+      try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath | Out-Null }
+      catch { $rejected = $_.Exception.Message -match 'mir42-seal-candidate-target-row-drift'; if (-not $rejected) { throw $_ } }
+      [IO.File]::WriteAllBytes($firstRowPath,$firstRowBytes)
+      Assert-MIR42SealTest $rejected "candidate-reader-rejects-self-hashed-$field-drift"
+    }
+    Write-Output 'MIR candidate reader passed four-target archives, nine-target scope/order/receipt coverage, and self-hashed source-authority drift rejection; no engines or external custody were created.'
+    return
+  }
 
   $roundTripProbe = [ordered]@{
     schema=1;kind='MIR42TechnicalSealRoundTripProbeV1'
@@ -440,7 +490,13 @@ try {
   Assert-MIR42SealTest $assetRejected 'candidate-asset-drift-rejected'
   Write-Output 'MIR 4.2 seal passed exact-archive, path, source, real-engine, external T16 trust-root, forged-freeze, missing-evidence, and no-bypass checks; no remote mutation occurred.'
 } finally {
-  if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
+  if (Test-Path -LiteralPath $root) {
+    $ownedRoot = (Resolve-Path -LiteralPath $root).Path
+    $testResults = (Resolve-Path -LiteralPath (Join-Path $RepoRoot 'build/test-results')).Path
+    if (-not $ownedRoot.StartsWith($testResults + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-seal-test-cleanup-boundary]' }
+    $null = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path $ownedRoot
+    Remove-Item -LiteralPath $ownedRoot -Recurse -Force
+  }
   if (-not [string]::IsNullOrWhiteSpace($externalForgedTrustRoot) -and (Test-Path -LiteralPath $externalForgedTrustRoot)) {
     $external = (Resolve-Path -LiteralPath $externalForgedTrustRoot).Path
     $temp = (Resolve-Path -LiteralPath ([IO.Path]::GetTempPath())).Path.TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar))

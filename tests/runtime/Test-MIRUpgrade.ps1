@@ -29,6 +29,8 @@ function Invoke-MIRUpgradeServerUntilSaved {
     [Parameter(Mandatory)][string]$LogPath,
     [Parameter(Mandatory)][string]$Marker,
     [Parameter(Mandatory)][string]$SavedMapPath,
+    [switch]$HistoricalSaveLog,
+    [switch]$ReloadOnly,
     [int]$TimeoutMs = 30000
   )
 
@@ -40,13 +42,36 @@ function Invoke-MIRUpgradeServerUntilSaved {
   foreach ($arg in $Arguments) { [void]$processInfo.ArgumentList.Add($arg) }
 
   $process = [System.Diagnostics.Process]::Start($processInfo)
+  try {
   $deadline = [DateTime]::UtcNow.AddMilliseconds($TimeoutMs)
   $ready = $false
   while ([DateTime]::UtcNow -lt $deadline) {
     if ($process.HasExited) { return $process.ExitCode }
     if ((Test-Path -LiteralPath $LogPath) -and (Test-Path -LiteralPath $SavedMapPath -PathType Leaf)) {
-      $text = Get-Content -Raw -LiteralPath $LogPath
-      if ($text.Contains($Marker) -and $text.Contains("Hosting game") -and $text.Contains("Saving finished")) {
+      $text = [string](Get-Content -Raw -LiteralPath $LogPath)
+      if ($null -eq $text) {
+        Start-Sleep -Milliseconds 200
+        continue
+      }
+      if ($ReloadOnly -and $text.Contains($Marker) -and $text.Contains("Hosting game")) {
+        $ready = $true
+        break
+      }
+      $saveComplete = $text.Contains("Saving finished")
+      if (-not $saveComplete -and $HistoricalSaveLog) {
+        # 0.13 through 0.15 log the save request without Saving finished. A
+        # readable ZIP central directory with map data closes that save gate;
+        # both subsequent native reloads still have to verify its saved state.
+        $archive = $null
+        try {
+          $archive = [IO.Compression.ZipFile]::OpenRead($SavedMapPath)
+          $saveComplete = @($archive.Entries | Where-Object {
+            $_.FullName.EndsWith('/level.dat',[StringComparison]::Ordinal) -and $_.Length -gt 0
+          }).Count -eq 1
+        } catch { $saveComplete = $false }
+        finally { if ($null -ne $archive) { $archive.Dispose() } }
+      }
+      if ($text.Contains($Marker) -and $text.Contains("Hosting game") -and $saveComplete) {
         $ready = $true
         break
       }
@@ -54,13 +79,18 @@ function Invoke-MIRUpgradeServerUntilSaved {
     Start-Sleep -Milliseconds 200
   }
   if (-not $ready) {
-    try { $process.Kill($true) } catch { $process.Kill() }
     throw "Factorio did not materialize the governed upgraded save within $TimeoutMs ms."
   }
 
-  try { $process.Kill($true) } catch { $process.Kill() }
-  $process.WaitForExit()
   return 0
+  } finally {
+    # This owned process is the native engine, not an orchestration shell.
+    # Always terminate it even if log/archive inspection throws mid-run.
+    try {
+      if (-not $process.HasExited) { $process.Kill() }
+      if (-not $process.WaitForExit(5000)) { throw 'Owned upgrade engine did not terminate.' }
+    } finally { $process.Dispose() }
+  }
 }
 
 function Resolve-MIRUpgradePath {
@@ -146,7 +176,8 @@ $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
-$isLegacyFactorio = [string]$factorioVersionInfo.ProductVersion -match '^(?:0|1)[.]'
+$isHistoricalTerminalFixture = $FixtureName -eq 'assert-upgrade-historical-terminal-to-mir42'
+$isLegacyFactorio = $isHistoricalTerminalFixture -or ([string]$factorioVersionInfo.ProductVersion -match '^(?:0|1)[.]')
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
 $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
 $fixtureModName = [string]$fixtureInfo.name
@@ -220,7 +251,10 @@ foreach ($sourceFixtureName in $SourceOnlyFixtureNames) {
 $modListPath = Join-Path $mods "mod-list.json"
 Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames $sourceOnlyModNames
 Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
-$stagedFixture = Join-Path $mods $fixtureModName
+$fixtureDirectoryName = if ($isHistoricalTerminalFixture) {
+  $fixtureModName + '_' + [string]$fixtureInfo.version
+} else { $fixtureModName }
+$stagedFixture = Join-Path $mods $fixtureDirectoryName
 Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
 if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-4-0-20000-to-4-1-20000', 'assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
     $ToVersion -match '^4[.]2[.](?<code>21000|20000|11000|10000)$') {
@@ -246,6 +280,40 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   if (-not $stagedInfo.Contains($dependencyFrom)) { throw 'MIR 4.2 upgrade fixture dependency anchor changed.' }
   [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo.Replace($dependencyFrom, "more-infinite-research >= $FromVersion"), [Text.UTF8Encoding]::new($false))
 }
+if ($isHistoricalTerminalFixture) {
+  $historicalTargets = @{
+    '1.7.9' = [ordered]@{ line='0.17'; target='4.2.01700'; infinite_technology='mining-productivity-4' }
+    '1.6.9' = [ordered]@{ line='0.16'; target='4.2.01600'; infinite_technology='mining-productivity-16' }
+    '1.5.9' = [ordered]@{ line='0.15'; target='4.2.01500'; infinite_technology='mining-productivity-16' }
+    '1.4.9' = [ordered]@{ line='0.14'; target='4.2.01400'; infinite_technology='' }
+    '1.3.9' = [ordered]@{ line='0.13'; target='4.2.01300'; infinite_technology='' }
+  }
+  $historical = $historicalTargets[$FromVersion]
+  if ($null -eq $historical -or $ToVersion -cne [string]$historical.target) {
+    throw 'MIR historical upgrade specialization requires an exact terminal predecessor and matching 4.2 target version.'
+  }
+  if ($Archetype -and $Archetype -cne 'base-default') {
+    throw 'MIR historical terminal upgrade fixture only supports the base-default archetype.'
+  }
+  $stagedInfoPath = Join-Path $stagedFixture 'info.json'
+  $stagedInfo = Get-Content -Raw -LiteralPath $stagedInfoPath
+  if (-not $stagedInfo.Contains('@@FACTORIO_LINE@@') -or -not $stagedInfo.Contains('@@MIR_UPGRADE_FROM_VERSION@@')) {
+    throw 'MIR historical upgrade fixture metadata anchors changed.'
+  }
+  $stagedInfo = $stagedInfo.Replace('@@FACTORIO_LINE@@',[string]$historical.line).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$FromVersion)
+  [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo, [Text.UTF8Encoding]::new($false))
+  $stagedControlPath = Join-Path $stagedFixture 'control.lua'
+  $stagedControl = Get-Content -Raw -LiteralPath $stagedControlPath
+  $controlAnchors = @('__MIR_UPGRADE_FROM_VERSION__','__MIR_UPGRADE_TO_VERSION__','__MIR_FACTORIO_LINE__','__MIR_INFINITE_TECHNOLOGY__','__MIR_UPGRADE_SAVE_NAME__')
+  if (@($controlAnchors | Where-Object { -not $stagedControl.Contains($_) }).Count -ne 0) {
+    throw 'MIR historical upgrade fixture control anchors changed.'
+  }
+  $saveName = 'mir-' + $ToVersion.Replace('.','') + '-upgraded'
+  $stagedControl = $stagedControl.Replace('__MIR_UPGRADE_FROM_VERSION__',$FromVersion).Replace('__MIR_UPGRADE_TO_VERSION__',$ToVersion).
+    Replace('__MIR_FACTORIO_LINE__',[string]$historical.line).Replace('__MIR_INFINITE_TECHNOLOGY__',[string]$historical.infinite_technology).
+    Replace('__MIR_UPGRADE_SAVE_NAME__',$saveName)
+  [IO.File]::WriteAllText($stagedControlPath, $stagedControl, [Text.UTF8Encoding]::new($false))
+}
 if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
   # The emergency programme governs three predecessor lanes through one
   # contract fixture. Specialize only the disposable staged copy so the
@@ -266,7 +334,7 @@ if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
   $stagedControlText = $stagedControlText.Replace("mir-3210-upgraded", "mir-$($ToVersion.Replace('.', ''))-upgraded")
   Set-Content -LiteralPath $stagedControlPath -Value $stagedControlText -Encoding UTF8
 }
-if ($Archetype) {
+if ($Archetype -and -not $isHistoricalTerminalFixture) {
   $settingsPath = Join-Path $stagedFixture "settings.lua"
   if (-not (Test-Path -LiteralPath $settingsPath -PathType Leaf)) {
     throw "Upgrade archetype selection requires fixture settings.lua: $settingsPath"
@@ -282,7 +350,10 @@ if ($Archetype) {
 $save = Join-Path $root "source.zip"
 Assert-MIRFactorioPathBudget -Path $save -Context "Upgrade source-save path"
 $log = Join-Path $userdata "factorio-current.log"
-$createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
+$historicalLine = if ($isHistoricalTerminalFixture) { [string]$historical.line } else { '' }
+$nativeBaseArgs = @("--config", $config, "--no-log-rotation", "--mod-directory", $mods)
+if ($historicalLine -notin @('0.13','0.14')) { $nativeBaseArgs += '--disable-audio' }
+$createArgs = $nativeBaseArgs + @("--create", $save)
 $factorioProcesses++
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
 if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $isLegacyFactorio)) {
@@ -290,8 +361,7 @@ if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $is
 }
 $createText = Get-Content -Raw -LiteralPath $log
 if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete$archetypeSuffix")) {
-  $sourceInitArgs = @(
-    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+  $sourceInitArgs = $nativeBaseArgs + @(
     "--start-server", $save, "--until-tick", "1"
   )
   $factorioProcesses++
@@ -333,30 +403,33 @@ $requiresReloadProof = $FixtureName -in @(
   "assert-upgrade-2-5-9-to-4-0-20000",
   "assert-upgrade-1-9-9-to-4-0-11000",
   "assert-upgrade-1-8-9-to-4-0-10000",
-  "assert-upgrade-4-0-21000-to-4-1-21000",
-  "assert-upgrade-4-0-20000-to-4-1-20000",
-  "assert-upgrade-4-0-11000-to-4-1-11000",
-  "assert-upgrade-4-0-10000-to-4-1-10000"
-)
+    "assert-upgrade-4-0-21000-to-4-1-21000",
+    "assert-upgrade-4-0-20000-to-4-1-20000",
+    "assert-upgrade-4-0-11000-to-4-1-11000",
+    "assert-upgrade-4-0-10000-to-4-1-10000",
+    "assert-upgrade-historical-terminal-to-mir42"
+  )
 $governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
 $governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"
 Assert-MIRFactorioPathBudget -Path $governedUpgradedSave -Context "Upgrade governed-save path"
 $governedUpgradeMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
-$loadArgs = if ($requiresReloadProof) {
-  @(
-    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+$loadArgs = if ($requiresReloadProof -and $historicalLine -eq '0.13') {
+  # 0.13 exposes empty-server pause through this CLI option, not the modern
+  # auto_pause server-settings property. Keep the same named save checks.
+  $nativeBaseArgs + @('--start-server', $save, '--no-auto-pause')
+} elseif ($requiresReloadProof) {
+  $nativeBaseArgs + @(
     "--server-settings", $serverSettings, "--start-server", $save
   )
 } else {
-  @(
-    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+  $nativeBaseArgs + @(
     "--benchmark", $save, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
   )
 }
 $loadExitCode = if ($requiresReloadProof) {
   $factorioProcesses++
   Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $loadArgs -LogPath $log `
-    -Marker $governedUpgradeMarker -SavedMapPath $governedUpgradedSave
+    -Marker $governedUpgradeMarker -SavedMapPath $governedUpgradedSave -HistoricalSaveLog:($historicalLine -in @('0.13','0.14','0.15'))
 } else {
   $factorioProcesses++
   Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
@@ -374,23 +447,42 @@ $reloadEvidence = ""
 $secondReloadEvidence = ""
 if ($requiresReloadProof) {
   $upgradedSave = $governedUpgradedSave
-  $reloadArgs = @(
-    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
-    "--benchmark", $upgradedSave, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
-  )
+  # Keep the finite-era save/CLI contract already proved by candidate retention.
+  $benchmarkMap = if ($historicalLine -eq '0.13') { [IO.Path]::GetFileNameWithoutExtension($upgradedSave) } else { $upgradedSave }
+  $reloadArgs = if ($historicalLine -eq '0.16') {
+    # Use the normal headless server path on 0.16. Its graphical benchmark
+    # rejects the saved equipment-grid table before running fixture assertions.
+    $nativeBaseArgs + @('--server-settings',$serverSettings,'--start-server',$upgradedSave)
+  } else {
+    $benchmarkArgs = $nativeBaseArgs + @("--benchmark", $benchmarkMap, "--benchmark-ticks", "1")
+    if (-not $isHistoricalTerminalFixture -or $historicalLine -eq '0.17') { $benchmarkArgs += @('--benchmark-runs','1') }
+    if (-not $isHistoricalTerminalFixture) { $benchmarkArgs += '--benchmark-sanitize' }
+    $benchmarkArgs
+  }
+  $reloadMarker = "[mir-fixture] $ToVersion upgraded save reload proof complete archetype=$Archetype"
+  # The log belongs to this disposable run. Clear it so the marker below proves this reload,
+  # rather than a prior load or reload recorded by the same no-rotation log.
+  [IO.File]::WriteAllText($log, '', [Text.UTF8Encoding]::new($false))
   $factorioProcesses++
-  $reloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
+  $reloadExitCode = if ($historicalLine -eq '0.16') {
+    Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $reloadArgs -LogPath $log `
+      -Marker $reloadMarker -SavedMapPath $upgradedSave -ReloadOnly
+  } else { Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
-  $reloadMarker = "[mir-fixture] $ToVersion upgraded save reload proof complete archetype=$Archetype"
   if (-not $reloadText.Contains($reloadMarker)) {
     throw "MIR $ToVersion upgraded-save reload proof marker is missing: $reloadMarker. Temporary root: $root"
   }
   $reloadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-reload.txt"
   Copy-MIRUpgradeLogEvidence -Source $log -Destination $reloadEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 
+  # Clear the same owned log again; the second reload receipt must be process-specific.
+  [IO.File]::WriteAllText($log, '', [Text.UTF8Encoding]::new($false))
   $factorioProcesses++
-  $secondReloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
+  $secondReloadExitCode = if ($historicalLine -eq '0.16') {
+    Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $reloadArgs -LogPath $log `
+      -Marker $reloadMarker -SavedMapPath $upgradedSave -ReloadOnly
+  } else { Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($secondReloadExitCode -ne 0) {
     throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
   }
@@ -402,7 +494,19 @@ if ($requiresReloadProof) {
   Copy-MIRUpgradeLogEvidence -Source $log -Destination $secondReloadEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 }
 
-$assertions = if ($Archetype) {
+$assertions = if ($isHistoricalTerminalFixture) {
+  @(
+    'historical-terminal-source-state-retained',
+    'historical-terminal-researched-level-retained',
+    'historical-terminal-current-research-retained',
+    'historical-terminal-fractional-progress-retained',
+    'historical-terminal-infinite-bonus-retained-where-supported',
+    'historical-terminal-global-state-retained',
+    'exact-candidate-normal-mod-directory-load',
+    'upgraded-save-reload-passed',
+    'upgraded-save-second-reload-passed'
+  )
+} elseif ($Archetype) {
   $common = @(
     "startup-profile-retained",
     "technology-level-retained",

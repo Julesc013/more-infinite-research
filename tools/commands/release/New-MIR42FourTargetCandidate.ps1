@@ -3,6 +3,7 @@ param(
   [Parameter(Mandatory)][string]$RepoRoot,
   [Parameter(Mandatory)][ValidatePattern('^[0-9a-fA-F]{40}$')][string]$FinalSourceCommit,
   [Parameter(Mandatory)][ValidatePattern('^[A-Z0-9][A-Z0-9.-]{0,47}$')][string]$BuildId,
+  [string[]]$SelectedTargets,
   [string]$OutputRoot,
   [ValidateRange(1, 9223372036854775807)][Int64]$MinimumFreeMemoryBytes = 1GB,
   [ValidateRange(1, 9223372036854775807)][Int64]$MinimumFreeWorkBytes = 2GB

@@ -169,7 +169,9 @@ end
 
 local function reset_state(state, epoch, context, recipe_index)
   state = state or {}
+  local next_stable_generation = (state.stable_acquisition_generation or 0) + 1
   for key in pairs(state) do state[key] = nil end
+  state.stable_acquisition_generation = next_stable_generation
   state.compiler_context = context
   state.recipe_source_epoch = epoch
   state.recipe_index = recipe_index
@@ -208,6 +210,7 @@ local function query_state(state, recipe_index)
       state.visiting = {}
       state.acquisition_memo = {}
       state.stable_acquisition_memo = {}
+      state.stable_acquisition_generation = state.stable_acquisition_generation + 1
       return state
     end
     return reset_state(state, epoch, context, recipe_index)
@@ -742,6 +745,9 @@ local function acquisition_witness_impl(output_identity, options, state)
   local direct = source_witness(output_identity, options, state)
   if direct then
     if may_use_stable and stable_acquisition_witness(direct) then
+      if state.stable_acquisition_memo[key] == nil then
+        state.stable_acquisition_generation = state.stable_acquisition_generation + 1
+      end
       state.stable_acquisition_memo[key] = deepcopy(direct)
     end
     if may_cache then state.acquisition_memo[key] = deepcopy(direct) end
@@ -766,6 +772,9 @@ local function acquisition_witness_impl(output_identity, options, state)
       -- selected branch's explanation.
       diagnostic_rollback(options, acquisition_checkpoint)
       if may_use_stable and stable_acquisition_witness(witness) then
+        if state.stable_acquisition_memo[key] == nil then
+          state.stable_acquisition_generation = state.stable_acquisition_generation + 1
+        end
         state.stable_acquisition_memo[key] = deepcopy(witness)
       end
       if may_cache then state.acquisition_memo[key] = deepcopy(witness) end

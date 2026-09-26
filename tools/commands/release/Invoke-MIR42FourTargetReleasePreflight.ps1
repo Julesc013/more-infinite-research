@@ -4,6 +4,7 @@ param(
   [Parameter(Mandatory)][string]$F200Zip,
   [Parameter(Mandatory)][string]$F110Zip,
   [Parameter(Mandatory)][string]$F100Zip,
+  [hashtable]$HistoricalZips,
   [Parameter(Mandatory)][string]$OutputRoot,
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 )

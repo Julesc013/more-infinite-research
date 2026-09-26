@@ -38,10 +38,10 @@ local function diagnostic_visit(observer)
   return true
 end
 
-function M.all_lab_inputs(diagnostic_observer)
+local function lab_input_index(diagnostic_observer)
   local context = compiler_context.current()
   local lab_inputs_cache = context:state_view("lab_input_index")
-  if lab_inputs_cache then return deepcopy(lab_inputs_cache) end
+  if lab_inputs_cache then return lab_inputs_cache end
   local out, seen = {}, {}
   for _, lab in pairs(data_raw.prototypes("lab")) do
     if not diagnostic_visit(diagnostic_observer) then break end
@@ -55,11 +55,36 @@ function M.all_lab_inputs(diagnostic_observer)
   end
   table.sort(out)
   context:set_state("lab_input_index", out)
-  return deepcopy(out)
+  return out
+end
+
+function M.all_lab_inputs(diagnostic_observer)
+  return deepcopy(lab_input_index(diagnostic_observer))
 end
 
 function M.science_pack_exists(name, diagnostic_observer)
   if not M.research_pack_prototype(name) then return false end
+  if not diagnostic_observer then
+    local inputs = lab_input_index()
+    local context = compiler_context.current()
+    local source_epoch = context:state_epoch("lab_input_index")
+    local membership = context:state_view("lab_input_membership")
+    if not membership or membership.source_epoch ~= source_epoch then
+      local names = {}
+      for _, input in ipairs(inputs) do names[input] = true end
+      local next_membership = {source_epoch = source_epoch, names = names}
+      if membership then
+        context:replace_epoch("lab_input_membership", next_membership)
+      else
+        context:set_state("lab_input_membership", next_membership)
+      end
+      membership = next_membership
+    end
+    -- Repeated root queries need only membership, not a copied sorted list.
+    -- The context and index epoch own this cache. Physical existence above
+    -- and the observer's original visit accounting below remain live checks.
+    return membership.names[name] == true
+  end
   for _, input in ipairs(M.all_lab_inputs(diagnostic_observer)) do
     if not diagnostic_visit(diagnostic_observer) then return false end
     if input == name then return true end

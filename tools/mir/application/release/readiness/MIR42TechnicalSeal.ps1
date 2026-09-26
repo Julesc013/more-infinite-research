@@ -24,6 +24,7 @@ if (-not (Get-Command Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -ErrorActio
 }
 
 $script:MIR42SealTargets = @('f210', 'f200', 'f110', 'f100')
+$script:MIR42SealNineTargetCandidates = @('f210', 'f200', 'f110', 'f100', 'f017', 'f016', 'f015', 'f014', 'f013')
 $script:MIR42SealVerifierDependencyPaths = @(
   'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1',
   'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1',
@@ -88,6 +89,23 @@ function Assert-MIR42SealTargetSet {
   if ($actual.Count -ne 4 -or ($actual -join '|') -cne ($script:MIR42SealTargets -join '|')) {
     throw "[$Code-target-set]"
   }
+}
+
+function Get-MIR42SealCandidateTargetScope {
+  param([Parameter(Mandatory)]$Rows,[Parameter(Mandatory)][string]$Code)
+  $actual = @($Rows | ForEach-Object { [string]$_.target })
+  if (($actual -join '|') -ceq ($script:MIR42SealTargets -join '|')) { return 'four-target' }
+  if (($actual -join '|') -ceq ($script:MIR42SealNineTargetCandidates -join '|')) { return 'nine-target' }
+  throw "[$Code-target-set]"
+}
+
+function Get-MIR42SealCandidateScope {
+  param([Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$Code)
+  $derived = Get-MIR42SealCandidateTargetScope -Rows @($Candidate.targets) -Code $Code
+  if ($Candidate.PSObject.Properties.Name -contains 'scope' -and -not [string]::IsNullOrWhiteSpace([string]$Candidate.scope) -and [string]$Candidate.scope -cne $derived) {
+    throw "[$Code-scope]"
+  }
+  return $derived
 }
 
 function Resolve-MIR42SealContainedArtifactPath {
@@ -620,8 +638,16 @@ function Get-MIR42ExactFourTargetCandidate {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$CandidateManifestPath)
   $candidateInput = Read-MIR42SealRecord -Path $CandidateManifestPath -Code 'mir42-seal-candidate'
   $candidate = $candidateInput.record
+  if ($candidate.PSObject.Properties.Name -notcontains 'target_authority') { throw '[mir42-seal-candidate-target-authority-missing]' }
+  $targetScope = Get-MIR42SealCandidateTargetScope -Rows @($candidate.targets) -Code 'mir42-seal-candidate-targets'
+  $authorityScope = Get-MIR42SealCandidateTargetScope -Rows @($candidate.target_authority) -Code 'mir42-seal-candidate-target-authority'
+  $expectedStatus = if ($targetScope -ceq 'four-target') {
+    'private-deterministic-four-target-candidate-built-unqualified'
+  } else {
+    'private-deterministic-nine-target-candidate-built-unqualified'
+  }
   if ([string]$candidate.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
-      [string]$candidate.status -cne 'private-deterministic-four-target-candidate-built-unqualified' -or
+      $authorityScope -cne $targetScope -or [string]$candidate.status -cne $expectedStatus -or
       -not [bool]$candidate.build_complete -or
       [string]$candidate.qualification -cne 'not-performed' -or
       [bool]$candidate.publication_authorized) {
@@ -633,7 +659,6 @@ function Get-MIR42ExactFourTargetCandidate {
     package_source_sha256 = [string]$candidate.package_source_sha256
   }
   $source = Assert-MIR42SealSource -RepoRoot $RepoRoot -Source $candidateSource -Code 'mir42-seal-candidate'
-  Assert-MIR42SealTargetSet -Rows @($candidate.targets) -Code 'mir42-seal-candidate'
   $root = Split-Path -Parent $candidateInput.path
   $rows = [Collections.Generic.List[object]]::new()
   foreach ($target in @($candidate.targets)) {
@@ -655,7 +680,18 @@ function Get-MIR42ExactFourTargetCandidate {
     if ([int]$row.schema -ne 1 -or [string]$row.kind -cne 'MIR42FourTargetCandidateRowV1') {
       throw "[mir42-seal-candidate-target-row-schema] $([string]$target.target)"
     }
-    $expected = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target ([string]$target.target) -SourceVersion '4.2.0'
+    $expected = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target ([string]$target.target)
+    $authorityRow = @($candidate.target_authority | Where-Object { [string]$_.target -ceq [string]$target.target })
+    if ($authorityRow.Count -ne 1) { throw "[mir42-seal-candidate-target-authority-binding] $([string]$target.target)" }
+    foreach ($field in @('target','target_id','source_version','distribution_version')) {
+      if ($authorityRow[0].PSObject.Properties.Name -notcontains $field) { throw "[mir42-seal-candidate-target-authority-field] $([string]$target.target)/$field" }
+    }
+    if ([string]$authorityRow[0].target -cne [string]$expected.target -or
+        [string]$authorityRow[0].target_id -cne [string]$expected.target_id -or
+        [string]$authorityRow[0].source_version -cne [string]$expected.source_version -or
+        [string]$authorityRow[0].distribution_version -cne [string]$expected.distribution_version) {
+      throw "[mir42-seal-candidate-target-authority-binding] $([string]$target.target)"
+    }
     try { $inventory = Get-MIR4ArchiveInventory -Path $assetPath }
     catch { throw "[mir42-seal-candidate-archive-invalid] $([string]$target.target)" }
     if ([IO.Path]::GetFileName($assetPath) -cne [string]$expected.package_name -or
@@ -673,6 +709,12 @@ function Get-MIR42ExactFourTargetCandidate {
         [string]$info.factorio_version -cne ([string]$expected.target_id -replace '^factorio-', '')) {
       throw "[mir42-seal-candidate-info-identity] $([string]$target.target)"
     }
+    foreach ($field in @('source','package_authority_sha256','package_source_sha256')) {
+      if ($row.PSObject.Properties.Name -notcontains $field) { throw "[mir42-seal-candidate-target-row-field] $([string]$target.target)/$field" }
+    }
+    foreach ($field in @('commit','tree')) {
+      if ($row.source.PSObject.Properties.Name -notcontains $field) { throw "[mir42-seal-candidate-target-row-source-field] $([string]$target.target)/$field" }
+    }
     if ([string]$row.target -cne [string]$target.target -or
         [string]$row.distribution_version -cne [string]$target.distribution_version -or
         [string]$row.asset.sha256 -cne [string]$target.asset.sha256 -or
@@ -680,8 +722,29 @@ function Get-MIR42ExactFourTargetCandidate {
         [int]$row.entry_count -ne [int]$target.entry_count -or
         -not [bool]$row.deterministic_archive_bytes -or -not [bool]$row.package_excluded_surface -or
         [string]$row.build_a_sha256 -cne [string]$target.asset.sha256 -or
-        [string]$row.build_b_sha256 -cne [string]$target.asset.sha256) {
+        [string]$row.build_b_sha256 -cne [string]$target.asset.sha256 -or
+        [string]$row.source.commit -cne [string]$Candidate.source.commit -or
+        [string]$row.source.tree -cne [string]$Candidate.source.tree -or
+        [string]$row.package_authority_sha256 -cne [string]$candidate.package_authority_sha256 -or
+        [string]$row.package_source_sha256 -cne [string]$candidate.package_source_sha256) {
       throw "[mir42-seal-candidate-target-row-drift] $([string]$target.target)"
+    }
+    if ($expected.PSObject.Properties.Name -contains 'target_record_path') {
+      foreach ($field in @('materializer','base_materializer_target','target_record','factorio_line','public_output_authorized','publication_authorized')) {
+        if ($row.PSObject.Properties.Name -notcontains $field) { throw "[mir42-seal-candidate-historical-row-field] $([string]$target.target)/$field" }
+      }
+      Assert-MIR42SealPropertyNames -Value $row.target_record -Expected @('path','sha256') -Code 'mir42-seal-candidate-historical-target-record-shape'
+      $targetRecordPath = Resolve-MIR42SealContainedArtifactPath -Root $RepoRoot -RelativePath ([string]$expected.target_record_path) -Code 'mir42-seal-candidate-historical-target-record'
+      $targetRecord = Read-MIR42SealRecord -Path $targetRecordPath -Code 'mir42-seal-candidate-historical-target-record'
+      if ([string]$row.materializer -cne 'historical-playtest-target' -or [string]$row.base_materializer_target -cne 'f100' -or
+          [string]$row.factorio_line -cne ([string]$expected.target_id -replace '^factorio-', '') -or
+          [bool]$row.public_output_authorized -or [bool]$row.publication_authorized -or
+          [string]$row.target_record.path -cne [string]$expected.target_record_path -or
+          [string]$row.target_record.sha256 -cne [string]$expected.target_record_record_sha256 -or
+          [string]$targetRecord.record.record_sha256 -cne [string]$expected.target_record_record_sha256 -or
+          [string]$targetRecord.sha256 -cne [string]$expected.target_record_file_sha256) {
+        throw "[mir42-seal-candidate-historical-target-record-binding] $([string]$target.target)"
+      }
     }
     $rows.Add([pscustomobject][ordered]@{
       target = [string]$target.target
@@ -692,7 +755,7 @@ function Get-MIR42ExactFourTargetCandidate {
       archive_path = $assetPath
     })
   }
-  return [pscustomobject][ordered]@{identity=$candidateInput;source=$source;targets=@($rows)}
+  return [pscustomobject][ordered]@{identity=$candidateInput;source=$source;scope=$targetScope;targets=@($rows)}
 }
 
 function Assert-MIR42ReceiptBinding {
@@ -705,7 +768,11 @@ function Assert-MIR42ReceiptBinding {
       [string]$record.source.package_source_sha256 -cne [string]$Candidate.source.package_source_sha256) {
     throw "[$Code-candidate-binding]"
   }
-  Assert-MIR42SealTargetSet -Rows @($record.targets) -Code $Code
+  $candidateTargets = @($Candidate.targets | ForEach-Object { [string]$_.target })
+  $receiptTargets = @($record.targets | ForEach-Object { [string]$_.target })
+  if (($receiptTargets -join '|') -cne ($candidateTargets -join '|')) {
+    throw "[$Code-target-set]"
+  }
   foreach ($candidateTarget in @($Candidate.targets)) {
     $row = @($record.targets | Where-Object { [string]$_.target -ceq [string]$candidateTarget.target })
     if ($row.Count -ne 1 -or [string]$row[0].distribution_version -cne [string]$candidateTarget.distribution_version -or
@@ -719,7 +786,7 @@ function Assert-MIR42ReceiptBinding {
 }
 
 function Assert-MIR42JoinedAcceptanceCoverage {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Receipt)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Receipt,[Parameter(Mandatory)]$Candidate)
   $expectedCriteria = @(
     'fresh-exact-loads',
     'settings-profile-continuity',
@@ -731,6 +798,7 @@ function Assert-MIR42JoinedAcceptanceCoverage {
     'package-exclusion',
     'deterministic-reconstruction'
   )
+  $candidateTargets = @($Candidate.targets | ForEach-Object { [string]$_.target })
   $rows = @($Receipt.record.release_acceptance)
   $actualCriteria = @($rows | ForEach-Object { [string]$_.criterion })
   if ($rows.Count -ne $expectedCriteria.Count -or ($actualCriteria -join '|') -cne ($expectedCriteria -join '|')) {
@@ -755,9 +823,9 @@ function Assert-MIR42JoinedAcceptanceCoverage {
     }
     Assert-MIR42SealPropertyNames -Value $row.limits -Expected @('claim','known_limitations') -Code 'mir42-seal-qualification-limits-shape'
     if ([string]$row.status -cne 'passed' -or $observed.Count -eq 0 -or @($row.evidence).Count -eq 0 -or [string]::IsNullOrWhiteSpace([string]$row.limits.claim) -or
-        @($observed + $notApplicableIds).Count -ne $script:MIR42SealTargets.Count -or
-        (@($observed + $notApplicableIds | Sort-Object -Unique).Count -ne $script:MIR42SealTargets.Count) -or
-        ((@($observed + $notApplicableIds | Sort-Object { [array]::IndexOf($script:MIR42SealTargets, [string]$_) }) -join '|') -cne ($script:MIR42SealTargets -join '|')) -or
+        @($observed + $notApplicableIds).Count -ne $candidateTargets.Count -or
+        (@($observed + $notApplicableIds | Sort-Object -Unique).Count -ne $candidateTargets.Count) -or
+        ((@($observed + $notApplicableIds | Sort-Object { [array]::IndexOf($candidateTargets, [string]$_) }) -join '|') -cne ($candidateTargets -join '|')) -or
         @($row.evidence | Where-Object { [string]$_.sha256 -notmatch '^[A-F0-9]{64}$' -or [string]$_.record_sha256 -notmatch '^[A-F0-9]{64}$' }).Count -ne 0) {
       throw "[mir42-seal-qualification-joined-acceptance-binding] $([string]$row.criterion)"
     }
@@ -766,6 +834,7 @@ function Assert-MIR42JoinedAcceptanceCoverage {
 
 function Get-MIR42ExactQualificationReceipt {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate)
+  if ((Get-MIR42SealCandidateScope -Candidate $Candidate -Code 'mir42-seal-qualification-candidate') -cne 'four-target') { throw '[mir42-seal-nine-target-campaign-not-wired]' }
   $receipt = Read-MIR42SealRecord -Path $Path -Code 'mir42-seal-qualification'
   if ([int]$receipt.record.schema -ne 1 -or [string]$receipt.record.kind -cne 'MIR42FourTargetEvidenceReconciliationV1' -or
       [string]$receipt.record.status -cne 'MIR-4.2-FOUR-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED' -or
@@ -1008,6 +1077,7 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
+  if ((Get-MIR42SealCandidateScope -Candidate $candidate -Code 'mir42-engine-evidence-candidate') -cne 'four-target') { throw '[mir42-seal-nine-target-predecessor-campaign-not-wired]' }
   $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate
   $engineInput = Read-MIR42SealRecord -Path $EngineRunPath -Code 'mir42-engine-evidence-engine-run'
   $engineRun = Get-MIR42BoundEngineRun -Reference ([pscustomobject][ordered]@{
@@ -1053,6 +1123,7 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
 
 function Get-MIR42RealEngineCandidateCampaign {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Reconciliation)
+  if ((Get-MIR42SealCandidateScope -Candidate $Candidate -Code 'mir42-seal-real-engine-candidate') -cne 'four-target') { throw '[mir42-seal-nine-target-campaign-not-wired]' }
   $campaign = Read-MIR42SealRecord -Path $Path -Code 'mir42-seal-real-engine'
   $record = $campaign.record
   Assert-MIR42SealPropertyNames -Value $record -Expected @('schema','kind','status','source','candidate_manifest','evidence_reconciliation','engine_run','runner','targets','factorio_processes','release_qualification','release_acceptance','technical_seal','publication_authorized','record_sha256') -Code 'mir42-seal-real-engine-shape'
@@ -1123,7 +1194,7 @@ function Get-MIR42RealEngineCandidateCampaign {
     Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -AuthorityReference $engineRun.record.predecessor_authority -RunAsset $engineRun.record.public_v410_checksum_asset
     Assert-MIR42FreshEngineLoads -Target $target -CandidateTarget $Candidate -Execution $target.engine_execution
   }
-  Assert-MIR42JoinedAcceptanceCoverage -RepoRoot $RepoRoot -Receipt $campaign
+  Assert-MIR42JoinedAcceptanceCoverage -RepoRoot $RepoRoot -Receipt $campaign -Candidate $Candidate
   return $campaign
 }
 

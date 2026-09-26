@@ -8,11 +8,11 @@
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR42FourTargetTechnicalReadinessV1"},
-    "status": {"const": "MIR-4.2-FOUR-TARGET-TECHNICAL-READINESS-NOT-READY"},
+    "status": {"enum": ["MIR-4.2-FOUR-TARGET-TECHNICAL-READINESS-NOT-READY", "MIR-4.2-NINE-TARGET-TECHNICAL-READINESS-NOT-READY"]},
     "candidate_manifest": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": "candidate-manifest.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
     "source": {"$ref": "#/$defs/source"},
     "governance_context": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "status", "transition_gate"], "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "status": {"const": "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED"}, "transition_gate": {"$ref": "#/$defs/governanceGate"}}},
-    "target_qualification": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["target", "distribution_version", "status"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000)$"}, "status": {"const": "not-run"}}}},
+    "target_qualification": {"type": "array", "minItems": 4, "maxItems": 9, "anyOf": [{"minItems": 4, "maxItems": 4}, {"minItems": 9, "maxItems": 9}], "items": {"type": "object", "additionalProperties": false, "required": ["target", "distribution_version", "status"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000|01700|01600|01500|01400|01300)$"}, "status": {"const": "not-run"}}}},
     "blockers": {"type": "array", "minItems": 8, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
     "transition_gate": {"$ref": "#/$defs/readinessGate"},
     "release_transition_authorized": {"const": false},
