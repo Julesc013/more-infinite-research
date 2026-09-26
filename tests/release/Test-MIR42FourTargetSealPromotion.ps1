@@ -1,5 +1,6 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
+param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
+  [switch]$CandidateReaderOnly)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -93,6 +94,25 @@ try {
   $truncatedNineRejected = $false
   try { Assert-MIR42ReceiptBinding -Receipt $truncatedNineReceipt -Candidate $syntheticNineCandidate -Code 'mir42-seal-test-nine-receipt-truncated' | Out-Null } catch { $truncatedNineRejected = $_.Exception.Message -match 'mir42-seal-test-nine-receipt-truncated-target-set' }
   Assert-MIR42SealTest $truncatedNineRejected 'receipt-binding-requires-candidate-nine-target-set'
+
+  if ($CandidateReaderOnly) {
+    $verified = Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath
+    Assert-MIR42SealTest ($verified.scope -ceq 'four-target' -and $verified.targets.Count -eq 4) 'candidate-reader-real-four-manifest'
+    $firstRowPath = Join-Path $root ([string]$targets[0].target_row_path)
+    $firstRowBytes = [IO.File]::ReadAllBytes($firstRowPath)
+    foreach ($field in @('package_authority_sha256','package_source_sha256')) {
+      $driftRow = Get-Content -Raw -LiteralPath $firstRowPath | ConvertFrom-Json -Depth 30 -DateKind String
+      $driftRow.$field = '0' * 64
+      Write-MIR4BootstrapRecord -Record $driftRow -Path $firstRowPath | Out-Null
+      $rejected = $false
+      try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath | Out-Null }
+      catch { $rejected = $_.Exception.Message -match 'mir42-seal-candidate-target-row-drift'; if (-not $rejected) { throw $_ } }
+      [IO.File]::WriteAllBytes($firstRowPath,$firstRowBytes)
+      Assert-MIR42SealTest $rejected "candidate-reader-rejects-self-hashed-$field-drift"
+    }
+    Write-Output 'MIR candidate reader passed four-target archives, nine-target scope/order/receipt coverage, and self-hashed source-authority drift rejection; no engines or external custody were created.'
+    return
+  }
 
   $roundTripProbe = [ordered]@{
     schema=1;kind='MIR42TechnicalSealRoundTripProbeV1'
@@ -470,7 +490,13 @@ try {
   Assert-MIR42SealTest $assetRejected 'candidate-asset-drift-rejected'
   Write-Output 'MIR 4.2 seal passed exact-archive, path, source, real-engine, external T16 trust-root, forged-freeze, missing-evidence, and no-bypass checks; no remote mutation occurred.'
 } finally {
-  if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
+  if (Test-Path -LiteralPath $root) {
+    $ownedRoot = (Resolve-Path -LiteralPath $root).Path
+    $testResults = (Resolve-Path -LiteralPath (Join-Path $RepoRoot 'build/test-results')).Path
+    if (-not $ownedRoot.StartsWith($testResults + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-seal-test-cleanup-boundary]' }
+    Assert-MIR4NoReparsePath -Path $ownedRoot
+    Remove-Item -LiteralPath $ownedRoot -Recurse -Force
+  }
   if (-not [string]::IsNullOrWhiteSpace($externalForgedTrustRoot) -and (Test-Path -LiteralPath $externalForgedTrustRoot)) {
     $external = (Resolve-Path -LiteralPath $externalForgedTrustRoot).Path
     $temp = (Resolve-Path -LiteralPath ([IO.Path]::GetTempPath())).Path.TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar))
