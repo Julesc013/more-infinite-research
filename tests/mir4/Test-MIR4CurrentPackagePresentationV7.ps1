@@ -21,12 +21,21 @@ $migrated=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migra
 $introduced=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
 $scienceIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'})
 $historicalIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
+$repairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
 if([string]$record.predecessor.record_sha256-cne[string]$v6.record_sha256-or
-   [string]$manifest.predecessor_record_sha256-cne[string]$v6.source_manifest.record_sha256-or
-   $migrated.Count-ne359-or$introduced.Count-ne13-or$scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or
-   [string]$scienceIntroduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
-   @($historicalIntroduced|Where-Object{[string]$_.source_path-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-ne0-or
-   (@($historicalIntroduced.target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f013|f014|f015|f016|f017'-or
+  [string]$manifest.predecessor_record_sha256-cne[string]$v6.source_manifest.record_sha256-or
+   @($manifest.bindings).Count-ne373-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne373-or
+   $migrated.Count-ne359-or@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-ne359-or
+   $introduced.Count-ne14-or$scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or
+  [string]$scienceIntroduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
+   [string]$repairIntroduced[0].layer-cne'shared'-or[string]$repairIntroduced[0].semantic_class-cne'common-semantic-source'-or
+   [string]$repairIntroduced[0].source_path-cne'source/prototypes/mir/runtime/effects/passive_repair.lua'-or
+   [string]$repairIntroduced[0].output_path-cne'prototypes/mir/runtime/effects/passive_repair.lua'-or
+   [string]$repairIntroduced[0].transform-cne'copy-exact-bytes'-or
+   (@($repairIntroduced[0].target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f200|f210'-or
+   [string]$repairIntroduced[0].provenance.kind-cne'current-introduction'-or
+  @($historicalIntroduced|Where-Object{[string]$_.source_path-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-ne0-or
+  (@($historicalIntroduced.target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f013|f014|f015|f016|f017'-or
    @($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-ne359){throw '[mir4-package-presentation-v7-source-succession]'}
 
 Assert-MIR4ComposablePackageSourceV3Succession -Current $manifest -Predecessor $predecessorManifest|Out-Null

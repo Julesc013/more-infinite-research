@@ -254,9 +254,16 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
   $assertPropertyNames = ${function:Assert-MIR4A08PropertyNames}
   $expectedFactorioVersion = ${function:Get-MIR4A08ExpectedFactorioVersion}
   $assertExactEngineVersion = ${function:Assert-MIR4A08ExactEngineVersion}
+  # Providers execute after their creator scope has returned.  Load SafePaths
+  # inside the closure so guarded scratch paths never rely on ambient imports.
+  $safePaths = Join-Path $script:MIR4A08ProviderRepoRoot 'tools/lib/mir4/bootstrap-materialization/SafePaths.ps1'
   $scratchRepoRoot = $script:MIR4A08ProviderRepoRoot
   $provider = {
     param([object]$Authority,[object]$Candidate,[string]$Target)
+    . $safePaths
+    if (-not (Get-Command Assert-MIR4NoReparseAncestors -ErrorAction SilentlyContinue)) {
+      throw '[mir4-a08-safe-path-guard]'
+    }
     $producer = $Authority.producer
     $repository = [string]$producer.repository
     if ($repository -cne 'Julesc013/more-infinite-research' -or [string]$producer.run_id -notmatch '^[0-9]+$' -or

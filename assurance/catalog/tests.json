@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 204,
+  "test_count": 205,
   "tests": [
     {
       "id": "docs.check",
@@ -1302,6 +1302,28 @@
         "spec/schemas/upgrade-matrix.schema.json",
         "scenario-harness",
         "settings"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "runtime.vehicle-economy-capabilities",
+      "proposition": "The governed test 'runtime.vehicle-economy-capabilities' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1 -FactorioBin <factorio> -Target <target>",
+      "canonical_implementation": "tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+        "tests/runtime/vehicle_economy_capabilities.lua",
+        "tests/runtime/optional_runtime_services.lua"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7467,11 +7489,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 55,
-      "runtime-upgrade": 48,
+      "runtime-upgrade": 49,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 192,
+    "canonical_test_commands": 193,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7484,5 +7506,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:091dbc8890396c732a8b44cf265ac3f69ec2a19399c7deb679fe4a04ad52df52"
+  "digest": "sha256:ec86218d6c10c42baa638bc9c13c58c964e6c0c68c3193850bc27d37c85c5e66"
 }

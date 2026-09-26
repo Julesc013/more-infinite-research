@@ -3,12 +3,15 @@ Version: 4.2.21000
 
   Changes:
 
-    - Added the embedded research browser with localized search, personal views, and bounded research and settings details.
+    - Added a hideable research-browser shortcut with localized search, personal views, and native research-queue controls.
+    - Show MIR research in progression order with science, cost, prerequisites, and effect details.
     - Added guarded finite ordinary-material productivity research with three +2% levels by default for eligible recipes.
+    - Added optional free wall/gate maintenance, disabled by default: up to 1 HP per second after 10 seconds without damage.
 
   Bugfixes:
 
     - Recognized explicit offshore-pump sources, native water offsets, and actual lab inputs in science selection.
+    - Restored Space Age productivity research lost through science selection while preserving technology identities and order.
     - Preserved a foreign-disabled technology through V2-to-V3 cap migration and subsequent cap relaxation.
     - Preserved native queues and force-owned state through cap transitions while refusing forged cap policies.
 

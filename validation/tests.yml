@@ -5402,6 +5402,18 @@
       ]
     },
     {
+      "id": "runtime.vehicle-economy-capabilities",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1 -FactorioBin <factorio> -Target <target>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+        "tests/runtime/vehicle_economy_capabilities.lua",
+        "tests/runtime/optional_runtime_services.lua"
+      ]
+    },
+    {
       "id": "runtime.optional-probes",
       "kind": "runtime",
       "layer": "F3",

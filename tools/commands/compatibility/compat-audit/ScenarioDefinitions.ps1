@@ -362,7 +362,7 @@ $exclusions = Read-MIRJsonFile -Path $KnownExclusions -Fallback ([pscustomobject
   categories = @("localizations", "internal")
 })
 $manualScenarioPaths = @($ManualScenariosPath)
-if (-not $PSBoundParameters.ContainsKey("ManualScenariosPath")) {
+if (-not $compatAuditManualScenariosExplicit) {
   $lineManifest = if ($FactorioLine -eq "2.0") {
     Join-Path $compatAuditCommandRoot "..\..\..\validation\scenarios\local-2.0.json"
   } else {

@@ -567,7 +567,8 @@ contextual_technology_researchability_reason = function(
   local rejection = technology_researchability_reason(technology_name, {
     visiting_packs = visiting_packs,
     visiting_technologies = visiting_technologies or {},
-    unlock_recipe_name = recipe_name
+    unlock_recipe_name = recipe_name,
+    mechanism_memo = options.technology_mechanism_memo
   })
   memo[key] = rejection or false
   return rejection
@@ -616,6 +617,7 @@ end
 -- root query.
 local RESEARCH_UNLOCK_POSITIVE_MEMO_LIMIT = 8
 local RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT = 64
+local RESEARCH_UNLOCK_NEGATIVE_MEMO_LIMIT = 8192
 
 local function witness_avoids_active_identities(witness, visiting, root_key)
   if type(witness) ~= "table" then return true end
@@ -681,9 +683,23 @@ local function positive_witness_memo_key(identity, visiting_packs, visiting_tech
   }, "\0")
 end
 
+local function negative_witness_memo_key(identity, context, state, visiting_packs, visiting_technologies)
+  -- A failed route is conditional on every active cycle boundary. Unlike a
+  -- positive witness, it cannot be reused across sibling contexts merely
+  -- because the queried output matches. This key belongs to one immutable
+  -- production-route query and includes the source epoch and all active sets.
+  return table.concat({
+    positive_witness_memo_key(identity, visiting_packs, visiting_technologies),
+    tostring(state.recipe_source_epoch),
+    active_set_key(state.visiting),
+    active_set_key(context.pairs),
+    active_set_key(context.technologies)
+  }, "\0")
+end
+
 local function research_unlocked_output_witness(identity, options, state, visiting_packs, visiting_technologies)
   local context = active_unlock_context(options)
-  local memo_key, positive_memo
+  local memo_key, positive_memo, negative_key, negative_memo
   if options.diagnostic_observer == nil then
     positive_memo = options.research_unlock_positive_memo
     if not positive_memo then
@@ -699,6 +715,13 @@ local function research_unlocked_output_witness(identity, options, state, visiti
         return entry.witness
       end
     end
+    negative_memo = options.research_unlock_negative_memo
+    if not negative_memo then
+      negative_memo = {}
+      options.research_unlock_negative_memo = negative_memo
+    end
+    negative_key = negative_witness_memo_key(identity, context, state, visiting_packs, visiting_technologies)
+    if negative_memo[negative_key] then return nil end
   end
   local witness_checkpoint = diagnostic_checkpoint(options)
   for _, recipe_name in ipairs(output_recipe_names(identity, options.diagnostic_observer)) do
@@ -797,6 +820,10 @@ local function research_unlocked_output_witness(identity, options, state, visiti
       end
     end
   end
+  if negative_memo and (options.research_unlock_negative_memo_entries or 0) < RESEARCH_UNLOCK_NEGATIVE_MEMO_LIMIT then
+    negative_memo[negative_key] = true
+    options.research_unlock_negative_memo_entries = (options.research_unlock_negative_memo_entries or 0) + 1
+  end
   return nil
 end
 
@@ -807,6 +834,7 @@ local function production_witness_options(visiting_packs, visiting_technologies,
   local options = {
     active_unlock_context = {pairs = {}, technologies = {}},
     technology_reason_memo = {},
+    technology_mechanism_memo = {},
     diagnostic_observer = diagnostic_observer
   }
   options.research_unlock_witness = function(identity, state)

@@ -62,7 +62,20 @@ try {
 $migratedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
 $introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
 $historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
-if(@($manifest.bindings).Count-ne372-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne372-or$migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or$introducedBindings.Count-ne13-or$historicalBindings.Count-ne12-or@($historicalBindings.source_path|Where-Object{$_-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-ne0-or@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne1){throw '[mir4-editable-source-binding-uniqueness]'}
+$scienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'})
+$repairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
+if(@($manifest.bindings).Count-ne373-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne373-or
+   $migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or
+   $introducedBindings.Count-ne14-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or
+   @($historicalBindings.source_path|Where-Object{$_-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-ne0-or
+   [string]$repairBindings[0].layer-cne'shared'-or[string]$repairBindings[0].semantic_class-cne'common-semantic-source'-or
+   [string]$repairBindings[0].source_path-cne'source/prototypes/mir/runtime/effects/passive_repair.lua'-or
+   [string]$repairBindings[0].output_path-cne'prototypes/mir/runtime/effects/passive_repair.lua'-or
+   [string]$repairBindings[0].transform-cne'copy-exact-bytes'-or
+   (@($repairBindings[0].target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f200|f210'-or
+   [string]$repairBindings[0].provenance.kind-cne'current-introduction'){
+  throw '[mir4-editable-source-binding-uniqueness]'
+}
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
 if(@($targetOutputs|Sort-Object -Unique).Count-ne$targetOutputs.Count){throw '[mir4-editable-source-target-output-uniqueness]'}
 if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or(@($support.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'){throw '[mir4-editable-source-four-target-authority]'}
@@ -139,7 +152,8 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  $expectedDelta=if($target-in@('f210','f200')){34}else{104}
+  # The admitted shared REPAIR-02 module adds one entry only to modern hosts.
+  $expectedDelta=if($target-in@('f210','f200')){35}else{104}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

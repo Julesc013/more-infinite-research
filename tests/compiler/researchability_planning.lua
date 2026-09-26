@@ -1970,6 +1970,127 @@ check("U05", production.pack_production_status("fanout-pack", {}) == "unreachabl
   and contextual_reason_calls == 1,
   "Repeated producer fan-out reuses one exact contextual technology rejection; calls=" .. contextual_reason_calls)
 
+-- A reachable unlocker can still have an impossible ingredient route. Reuse
+-- that completed rejection for identical sibling queries, rather than proving
+-- the same unavailable intermediate once per outer producer.
+local rejected_fanout_world = contextual_reason_fanout_world(24)
+rejected_fanout_world.resources = {}
+reset(rejected_fanout_world)
+local saved_recipe_witness = feasibility.recipe_witness
+local rejected_inner_calls = 0
+feasibility.recipe_witness = function(recipe_name, ...)
+  if recipe_name == "shared-inner-recipe" then rejected_inner_calls = rejected_inner_calls + 1 end
+  return saved_recipe_witness(recipe_name, ...)
+end
+local rejected_fanout_status = production.pack_production_status("fanout-pack", {})
+feasibility.recipe_witness = saved_recipe_witness
+check("U06", rejected_fanout_status == "unreachable" and rejected_inner_calls == 1,
+  "Identical failed unlock/acquisition contexts reuse one completed route rejection; calls=" .. rejected_inner_calls)
+
+-- B first fails while A is active in an enabled cycle. After that branch has
+-- failed, a sibling asks for B without A active and can use A's independent
+-- seed. A name-only negative cache would incorrectly hide this valid route.
+local function negative_context_world(seeded)
+  return {
+    item_prototypes = {["context-pack"] = {type = "item"}},
+    labs = {lab = {inputs = {"context-pack"}}},
+    techs = {UnlockB = {enabled = true, research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = "locked-B"}}}},
+    recipe_prototypes = {
+      ["a-failing-root"] = {name = "a-failing-root"}, ["z-success-root"] = {name = "z-success-root"},
+      ["a-loop-A"] = {name = "a-loop-A"}, ["z-seed-A"] = {name = "z-seed-A"},
+      ["locked-B"] = {name = "locked-B"}
+    },
+    recipe_facts = {
+      ["a-failing-root"] = route_fact("context-pack", {{name = "A", amount = 1}, {name = "missing-root", amount = 1}}),
+      ["z-success-root"] = route_fact("context-pack", {{name = "B", amount = 1}}),
+      ["a-loop-A"] = route_fact("A", {{name = "B", amount = 1}}),
+      ["z-seed-A"] = route_fact("A", {{name = "seed-ore", amount = 1}}),
+      ["locked-B"] = route_fact("B", {{name = "A", amount = 1}}, {enabled = false})
+    },
+    producers = {["context-pack"] = {"a-failing-root", "z-success-root"},
+      A = {"a-loop-A", "z-seed-A"}, B = {"locked-B"}},
+    unlockers = {["locked-B"] = {"UnlockB"}},
+    resources = seeded and {seed = {minable = {result = "seed-ore", count = 1}}} or {}
+  }
+end
+reset(negative_context_world(true))
+check("U07", production.pack_production_status("context-pack", {}) == "research",
+  "A failed active-identity context cannot poison a later independently seeded sibling")
+reset(negative_context_world(false))
+check("U08", production.pack_production_status("context-pack", {}) == "unreachable",
+  "The matching unseeded cycle remains unreachable after negative memoization")
+
+reset({
+  item_prototypes = {["memo-pack"] = {type = "item"}},
+  labs = {lab = {inputs = {"memo-pack"}}},
+  techs = {MemoUnlock = {enabled = true, unit = {count = 1, time = 1, ingredients = {{"memo-pack", 1}}}}},
+  recipe_prototypes = {ordinary_one = {name = "ordinary_one"}, ordinary_two = {name = "ordinary_two"},
+    self_pack = {name = "self_pack"}, seed_pack = {name = "seed_pack"}},
+  recipe_facts = {ordinary_one = route_fact("ordinary-one"), ordinary_two = route_fact("ordinary-two"),
+    self_pack = route_fact("memo-pack", {}, {enabled = false}), seed_pack = route_fact("memo-pack")},
+  producers = {["memo-pack"] = {"seed_pack"}}, unlockers = {}, resources = {}
+})
+check("U09", production.pack_production_status("memo-pack", {}) == "initial",
+  "The mechanism memo fixture starts with a real independently proved pack root")
+local mechanism_memo, mechanism_calls = {}, 0
+context.services["science.pack_production_status"] = function(...)
+  mechanism_calls = mechanism_calls + 1
+  return production.pack_production_status(...)
+end
+local ordinary_one_reason = researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_one", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+local ordinary_two_reason = researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+check("U10", ordinary_one_reason == nil and ordinary_two_reason == nil and mechanism_calls == 1,
+  "Distinct ordinary recipes share one researchability evaluation only after its science roots are proved")
+local independent_calls = 0
+context.services["science.independent_pack_acquisition_witness"] = function()
+  independent_calls = independent_calls + 1
+  return nil
+end
+check("U11", researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "self_pack", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+    == "science-self-lock-memo-pack" and independent_calls == 1,
+  "A self-producing recipe still asks the independent route service and cannot borrow an ordinary recipe's result")
+check("U12", researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {["memo-pack"] = true}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+    == "unreachable-science-memo-pack",
+  "A changed active pack boundary cannot borrow a successful mechanism result")
+check("U13", researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {}, visiting_technologies = {MemoUnlock = true}, mechanism_memo = mechanism_memo})
+    == "technology-cycle",
+  "A changed active technology boundary retains its cycle rejection")
+world.recipe_source_epoch = 2
+world.producers["memo-pack"] = {}
+check("U14", researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_one", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+    == "unreachable-science-memo-pack",
+  "A source epoch change invalidates the old root-qualified mechanism answer")
+
+world.recipe_source_epoch = 1
+world.producers["memo-pack"] = {"seed_pack"}
+reset(world)
+local cold_mechanism_memo, cold_mechanism_calls = {}, 0
+context.services["science.pack_production_status"] = function(...)
+  cold_mechanism_calls = cold_mechanism_calls + 1
+  return production.pack_production_status(...)
+end
+local cold_reasons = {}
+local cold_first_reason = researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_one", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = cold_mechanism_memo})
+local cold_root_unresolved = context:state_view("science_pack_production").entries["memo-pack"] == nil
+local cold_root_status = production.pack_production_status("memo-pack", {})
+cold_reasons[1] = cold_first_reason or false
+for _, recipe_name in ipairs({"ordinary_two", "ordinary_one"}) do
+  cold_reasons[#cold_reasons + 1] = researchability.reason_with_context("MemoUnlock", {
+    unlock_recipe_name = recipe_name, visiting_packs = {}, visiting_technologies = {}, mechanism_memo = cold_mechanism_memo}) or false
+end
+check("U15", cold_root_unresolved and cold_root_status == "initial"
+  and cold_reasons[1] == false and cold_reasons[2] == false and cold_reasons[3] == false
+  and cold_mechanism_calls == 2,
+  "The unresolved root bypasses mechanism sharing; only its subsequent proved-root evaluation may be reused")
+
 -- The bounded status pass needs exactly four visits to establish that this
 -- physical lab input has no recipe. An old trace then repeated the existence
 -- scan, stopped on visit five, and incorrectly called the same pack non-lab.
