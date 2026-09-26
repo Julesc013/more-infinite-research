@@ -238,8 +238,64 @@ local function reason(tech_name, context)
   return nil
 end
 
+local function active_set_key(values)
+  local names = {}
+  for name, active in pairs(values or {}) do if active then names[#names + 1] = name end end
+  table.sort(names)
+  return table.concat(names, "\1")
+end
+
 function M.reason_with_context(tech_name, context)
-  return reason(tech_name, context)
+  local memo = context and context.mechanism_memo
+  if type(memo) ~= "table" or context.diagnostic_observer then return reason(tech_name, context) end
+  local owner = compiler_context.current()
+  local epoch = canonical_recipe_facts.source_epoch()
+  if memo.compiler_context ~= owner or memo.recipe_source_epoch ~= epoch then
+    memo.compiler_context, memo.recipe_source_epoch = owner, epoch
+    memo.recipes, memo.answers = {}, {}
+    memo.root_qualified = {}
+    memo.lab_inputs = pack_registry.all_lab_inputs()
+  end
+  local recipe_name = context.unlock_recipe_name or ""
+  local outputs = memo.recipes[recipe_name]
+  if outputs == nil then
+    local names = {}
+    local recipe = data_raw.prototype("recipe", recipe_name)
+    for _, pack_name in ipairs(memo.lab_inputs) do
+      if recipe and recipe_facts.recipe_outputs_item(recipe, pack_name) then names[#names + 1] = pack_name end
+    end
+    table.sort(names)
+    outputs = table.concat(names, "\1")
+    memo.recipes[recipe_name] = outputs
+  end
+  -- Self-producing recipes need the independent-acquisition query, whose
+  -- current route state is part of its proof. Keep those queries exact.
+  if outputs ~= "" then return reason(tech_name, context) end
+  if not memo.root_qualified[tech_name] then
+    local packs = owner:state_view("science_pack_production")
+    if not packs or packs.recipe_source_epoch ~= epoch then return reason(tech_name, context) end
+    for _, candidate_name in ipairs(researchability_index.reachable_names(graph_index(), tech_name)) do
+      local candidate = data_raw.technology(candidate_name)
+      if candidate and not candidate.research_trigger then
+        for _, ingredient in ipairs(candidate.unit and candidate.unit.ingredients or {}) do
+          local pack_name = lab_compatibility.ingredient_name(ingredient)
+          if pack_name and packs.entries[pack_name] == nil then return reason(tech_name, context) end
+        end
+      end
+    end
+    memo.root_qualified[tech_name] = true
+  end
+  -- With no science output and every science dependency already resolved at
+  -- a root, this evaluator does no contextual acquisition traversal. Ordinary
+  -- recipes then share the exact technology/pack/technology-cycle query.
+  -- Registered replacement services still receive the original recipe.
+  local key = table.concat({tech_name, outputs,
+    active_set_key(context.visiting_packs), active_set_key(context.visiting_technologies)}, "\0")
+  local cached = memo.answers[key]
+  if cached ~= nil then return cached ~= false and cached or nil end
+  local rejection = reason(tech_name, context)
+  memo.answers[key] = rejection or false
+  return rejection
 end
 
 function M.technology_researchability_reason(tech_name)

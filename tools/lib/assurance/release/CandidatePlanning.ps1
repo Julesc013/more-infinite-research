@@ -361,7 +361,8 @@ function Get-MIRAssuranceCommitCandidateIdentity {
   param([Parameter(Mandatory)][string]$Commit)
 
   $resolvedCommit = Resolve-MIRAssuranceCommit -Commit $Commit
-  $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-seal-source-" + [guid]::NewGuid().ToString("N"))
+  $temporaryParent = [IO.Path]::GetFullPath((Join-Path $repo 'build/tmp'))
+  $temporaryRoot = Join-Path $temporaryParent ("mir-seal-source-" + [guid]::NewGuid().ToString("N"))
   $sourceRoot = Join-Path $temporaryRoot "source"
   $sourceArchive = Join-Path $temporaryRoot "source.zip"
   try {
@@ -405,7 +406,13 @@ function Get-MIRAssuranceCommitCandidateIdentity {
     }
   } finally {
     if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
-      Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+      $cleanupRoot = (Resolve-Path -LiteralPath $temporaryRoot).ProviderPath
+      if (-not $cleanupRoot.StartsWith($temporaryParent.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+          (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint -or
+          (Split-Path -Leaf $cleanupRoot) -notlike 'mir-seal-source-*') {
+        throw 'Candidate reconstruction cleanup target is outside owned scratch.'
+      }
+      Remove-Item -LiteralPath $cleanupRoot -Recurse -Force
     }
   }
 }

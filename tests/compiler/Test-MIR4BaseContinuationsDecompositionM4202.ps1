@@ -19,6 +19,7 @@ $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt-hash'
 $currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 $expectedManifestBindings=419
+$currentSourceSuccession=$false
 if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSource){
   $successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json'
   $successorSchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json'
@@ -54,7 +55,8 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
         Assert-MIR4M4202BaseContinuations ($l6Raw|Test-Json -SchemaFile $l6SchemaPath) 'package-source-l6-successor-schema'
         $l6=$l6Raw|ConvertFrom-Json -Depth 100 -DateKind String
         Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $l6) 'package-source-l6-successor-hash'
-        Assert-MIR4M4202BaseContinuations ([string]$l6.predecessor.package_source_sha256-ceq[string]$l5.package_authority.package_source_sha256-and(Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$l6.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource)) 'package-source-l6-successor-chain'
+        $currentSourceSuccession=Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$l6.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource
+        Assert-MIR4M4202BaseContinuations ([string]$l6.predecessor.package_source_sha256-ceq[string]$l5.package_authority.package_source_sha256-and$currentSourceSuccession) 'package-source-l6-successor-chain'
         $expectedManifestBindings=441
       }else{$expectedManifestBindings=437}
     }else{
@@ -67,6 +69,18 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
 
 $expectedManifestBindings=Get-MIR4M4202CurrentManifestBindingExpectation -RepoRoot $repo -Fallback $expectedManifestBindings
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json')|ConvertFrom-Json -Depth 100
+if($currentSourceSuccession){
+  $repairBinding=@($manifest.bindings|Where-Object{
+    [string]$_.provenance.kind-ceq'current-introduction'-and
+    [string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'-and
+    [string]$_.source_path-ceq'source/prototypes/mir/runtime/effects/passive_repair.lua'-and
+    [string]$_.output_path-ceq'prototypes/mir/runtime/effects/passive_repair.lua'
+  })
+  Assert-MIR4M4202BaseContinuations ($repairBinding.Count-eq1-and(@($repairBinding[0].target_scope)-join'|')-ceq'f210|f200'-and[string]$repairBinding[0].source_sha256-ceq[string]$repairBinding[0].output_sha256-and[int]$repairBinding[0].source_bytes-eq[int]$repairBinding[0].output_bytes) 'current-repair-introduction'
+  # The reviewed 917c341f baseline has 372 bindings; this batch admits only
+  # the single wall/gate repair binding checked above.
+  $expectedManifestBindings=372+1
+}
 Assert-MIR4M4202BaseContinuations (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
 Assert-MIR4M4202BaseContinuations (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)|$(@($_.target_scope)-join',')"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-identity-uniqueness'
 
@@ -78,22 +92,35 @@ Assert-MIR4M4202BaseContinuations (@(Get-Content -LiteralPath (Join-Path $repo "
 foreach($responsibility in @('classify','discover')){
   Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath (Join-Path $repo "$sharedSourceRoot/base_continuations/$responsibility.lua") -PathType Leaf) "shared-module-$responsibility"
 }
-foreach($target in @('f210','f200')){
-  $adapterRoot="source/adapters/$target/prototypes/mir/planner"
-  foreach($responsibility in @('qualify','plan')){
-    Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath (Join-Path $repo "$adapterRoot/base_continuations/$responsibility.lua") -PathType Leaf) "adapter-module-$target-$responsibility"
+$targetModuleSources=@{
+  f210=@{
+    qualify='source/prototypes/mir/planner/base_continuations/qualify.lua'
+    plan='source/prototypes/mir/planner/base_continuations/plan.lua'
   }
-  $plan=Get-Content -Raw -LiteralPath (Join-Path $repo "$adapterRoot/base_continuations/plan.lua")
+  f200=@{
+    qualify='source/adapters/f200/prototypes/mir/planner/base_continuations/qualify.lua'
+    plan='source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua'
+  }
+}
+foreach($target in @('f210','f200')){
+  foreach($responsibility in @('qualify','plan')){
+    $sourcePath=[string]$targetModuleSources[$target][$responsibility]
+    Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath (Join-Path $repo $sourcePath) -PathType Leaf) "module-source-$target-$responsibility"
+    $outputPath="prototypes/mir/planner/base_continuations/$responsibility.lua"
+    $binding=@($manifest.bindings|Where-Object{$target-in@($_.target_scope)-and[string]$_.output_path-ceq$outputPath})
+    Assert-MIR4M4202BaseContinuations ($binding.Count-eq1-and[string]$binding[0].source_path-ceq$sourcePath) "module-source-binding-$target-$responsibility"
+  }
+  $plan=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources[$target].plan))
   foreach($owner in @('classify','discover','qualify')){Assert-MIR4M4202BaseContinuations ($plan-match"base_continuations[.]$owner") "plan-import-$target-$owner"}
   foreach($superseded in @('local function rejected_candidate','local function find_equivalent_infinite_extension','local function resolve_science_packs','local function build_prerequisites')){Assert-MIR4M4202BaseContinuations ($plan-notmatch[regex]::Escape($superseded)) "duplicate-responsibility-$target-$superseded"}
-  Assert-MIR4M4202BaseContinuations (@(Get-Content -LiteralPath (Join-Path $repo "$adapterRoot/base_continuations/plan.lua")).Count-le400) "plan-size-$target"
+  Assert-MIR4M4202BaseContinuations (@(Get-Content -LiteralPath (Join-Path $repo ([string]$targetModuleSources[$target].plan))).Count-le400) "plan-size-$target"
   $targetRows=@($manifest.bindings|Where-Object{$target-in@($_.target_scope)-and[string]$_.output_path-in$outputs})
   Assert-MIR4M4202BaseContinuations ($targetRows.Count-eq5) "target-binding-count-$target"
 }
 
-$f210Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/adapters/f210/prototypes/mir/planner/base_continuations/qualify.lua')
-$f200Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/adapters/f200/prototypes/mir/planner/base_continuations/qualify.lua')
-Assert-MIR4M4202BaseContinuations ($f210Qualify-match'planner_science[.]normalize_ingredients'-and$f200Qualify-notmatch'planner_science') 'target-science-policy-preserved'
+$f210Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources.f210.qualify))
+$f200Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources.f200.qualify))
+Assert-MIR4M4202BaseContinuations ($f210Qualify-match'planner_science[.]ingredients_for_selected'-and$f200Qualify-notmatch'planner_science') 'target-science-policy-preserved'
 foreach($shared in @('classify.lua','discover.lua')){
   $sharedOutput="prototypes/mir/planner/base_continuations/$shared"
   $f210Source=[string]@($manifest.bindings|Where-Object{'f210'-in@($_.target_scope)-and[string]$_.output_path-ceq$sharedOutput})[0].source_path

@@ -8,8 +8,9 @@ local codec = require("prototypes.mir.settings.profile_codec")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
 local M = {requires_features = {"settings_profiles"}}
-local ROOT, PREFIX = "mir_research_browser", "mir_browser_"
+local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
 local TRANSLATION_LIMIT = 512
+local VIEW_SCHEMA = 2
 local translations = {}
 
 local function state()
@@ -17,11 +18,40 @@ local function state()
   value.players = value.players or {}
   return value
 end
+local function default_view()
+  return {
+    schema = VIEW_SCHEMA,
+    mode = 1,
+    status = 1,
+    page = 1,
+    search = "",
+    tab = "research",
+    effect_page = 1,
+    family = "mir",
+    sort = "progression"
+  }
+end
+local function has_legacy_default_scope_and_order(value)
+  if type(value) ~= "table" or value.schema ~= nil then return false end
+  return value.family == "all" and value.sort == "name-asc"
+end
 local function view(player)
   local all = state().players
-  local result = all[player.index] or {mode = 1, status = 1, page = 1, search = "", tab = "research", effect_page = 1, family = "all", sort = "name-asc"}
+  local result = all[player.index]
+  if type(result) ~= "table" then result = default_view() end
+  -- 4.2's former scope/order default was all research in alphabetical order.
+  -- Selection, hiding, search, and the other filters remain personal state;
+  -- only that legacy scope/order pair changes.
+  if has_legacy_default_scope_and_order(result) then
+    result.family = "mir"
+    result.sort = "progression"
+  end
+  result.schema = VIEW_SCHEMA
   all[player.index] = result
-  result.sort = result.sort == "name-desc" and "name-desc" or "name-asc"
+  result.sort = result.sort == "name-asc" and "name-asc"
+    or result.sort == "name-desc" and "name-desc"
+    or result.sort == "native" and "native"
+    or "progression"
   return result
 end
 local function catalogue(force)
@@ -80,14 +110,27 @@ local function button(parent, action, caption, tags)
   tags = tags or {}; tags.mir_browser = action
   return parent.add{type = "button", caption = caption, tags = tags}
 end
-local function close(player)
+local function set_shortcut_toggled(player, toggled)
+  if player and player.valid and player.set_shortcut_toggled then
+    player.set_shortcut_toggled(SHORTCUT, toggled == true)
+  end
+end
+local function remove_legacy_top_button(player)
+  local legacy = player and player.gui and player.gui.top and player.gui.top[PREFIX .. "open"]
+  if legacy then legacy.destroy() end
+end
+local function close(player, preserve_shortcut_state)
+  if not player then return end
   local frame = player.gui.screen[ROOT]
   if frame then frame.destroy() end
+  if not preserve_shortcut_state then set_shortcut_toggled(player, false) end
 end
-local function launch_button(player)
-  if not player.gui.top[PREFIX .. "open"] then
-    player.gui.top.add{type = "button", name = PREFIX .. "open", caption = {"mir-browser.title"}, tags = {mir_browser = "open"}}
-  end
+local function family_caption(family)
+  if family == "mir" then return {"mir-browser.scope-mir"} end
+  if family == "all" then return {"mir-browser.scope-all"} end
+  if family == "external" then return {"mir-browser.scope-native"} end
+  local stream = streams.view()[family]
+  return stream and stream.localised_name or {"mir-browser.scope-mir"}
 end
 
 local function same_value(left, right)
@@ -208,89 +251,163 @@ local function settings_rows(player, parent, v)
 end
 
 local render
-local function joined_ingredients(ingredients)
-  local parts = {}
-  for _, ingredient in ipairs(ingredients or {}) do
-    parts[#parts + 1] = ingredient.name .. " x" .. tostring(ingredient.amount)
-  end
-  return table.concat(parts, ", ")
+local function add_technology_icon(parent, technology, size)
+  local icon = parent.add{type = "sprite", style = "recipe_tooltip_horizontal_image",
+    sprite = "technology/" .. technology.name, resize_to_sprite = false, tooltip = technology.localised_name}
+  icon.style.width = size or 32
+  icon.style.height = size or 32
+  return icon
 end
-local function setting_caption(setting)
-  return setting.name
-    .. " | default=" .. tostring(setting.default)
-    .. " | raw-direct=" .. tostring(setting.raw_direct)
-    .. " | effective=" .. tostring(setting.effective)
-    .. " | source=" .. setting.source
-    .. " | changed=" .. tostring(setting.changed)
-    .. " | changed-from-default=" .. tostring(setting.changed_from_default)
-    .. " | restart-required=" .. tostring(setting.restart_required)
+local function finite_nonnegative(value)
+  return type(value) == "number" and value == value and value ~= math.huge
+    and value ~= -math.huge and value >= 0
 end
-local function benefit_caption(recipes)
-  local parts = {}
-  for _, recipe in ipairs(recipes or {}) do
-    parts[#parts + 1] = recipe.recipe_id
-      .. " current-productivity=" .. tostring(recipe.current_productivity_bonus)
-      .. " maximum-productivity=" .. tostring(recipe.maximum_productivity)
-      .. " next-level-effective=" .. tostring(recipe.next_level_has_effective_benefit)
+local function displayed_number(value)
+  if not finite_nonnegative(value) then return nil end
+  local rounded = math.floor(value * 100 + 0.5) / 100
+  local text = string.format("%.2f", rounded)
+  text = string.gsub(text, "0+$", "")
+  return (string.gsub(text, "%.$", ""))
+end
+local function displayed_percent(value)
+  return displayed_number(value * 100)
+end
+local function add_research_cost(parent, technology)
+  local units = displayed_number(technology.research_unit_count)
+  local seconds = displayed_number(technology.research_unit_energy)
+  if units and seconds then fact_label(parent, "research_cost", {"mir-browser.research-cost", units, seconds}) end
+end
+local function add_science_icons(parent, technology)
+  local science = parent.add{type = "flow", direction = "horizontal"}
+  label(science, {"mir-browser.science"})
+  for _, ingredient in ipairs(technology.research_unit_ingredients) do
+    local amount = displayed_number(ingredient.amount)
+    science.add{
+      type = "sprite",
+      sprite = "item/" .. ingredient.name,
+      tooltip = amount and {"mir-browser.science-ingredient", amount, {"item-name." .. ingredient.name}}
+        or {"item-name." .. ingredient.name}
+    }
   end
-  return table.concat(parts, " | ")
+end
+local function productivity_summary(benefits)
+  if type(benefits) ~= "table" or #benefits == 0 then return nil end
+  local summary = {count = 0}
+  for _, benefit in ipairs(benefits) do
+    local increment = benefit and benefit.effect_change
+    local current = benefit and benefit.current_productivity_bonus
+    local maximum = benefit and benefit.maximum_productivity
+    if not finite_nonnegative(increment) or increment <= 0
+      or not finite_nonnegative(current) or not finite_nonnegative(maximum) or current > maximum then
+      return nil
+    end
+    summary.count = summary.count + 1
+    summary.increment_min = summary.increment_min and math.min(summary.increment_min, increment) or increment
+    summary.increment_max = summary.increment_max and math.max(summary.increment_max, increment) or increment
+    summary.current_min = summary.current_min and math.min(summary.current_min, current) or current
+    summary.current_max = summary.current_max and math.max(summary.current_max, current) or current
+    summary.maximum_min = summary.maximum_min and math.min(summary.maximum_min, maximum) or maximum
+    summary.maximum_max = summary.maximum_max and math.max(summary.maximum_max, maximum) or maximum
+  end
+  return summary
+end
+local function add_productivity_summary(parent, benefits)
+  local summary = productivity_summary(benefits)
+  if not summary then return end
+  local increment_min, increment_max = displayed_percent(summary.increment_min), displayed_percent(summary.increment_max)
+  local current_min, current_max = displayed_percent(summary.current_min), displayed_percent(summary.current_max)
+  local maximum_min, maximum_max = displayed_percent(summary.maximum_min), displayed_percent(summary.maximum_max)
+  if not (increment_min and increment_max and current_min and current_max and maximum_min and maximum_max) then return end
+  if increment_min == increment_max then
+    fact_label(parent, "productivity_increment", {"mir-browser.productivity-increment", increment_min})
+  else
+    fact_label(parent, "productivity_increment", {"mir-browser.productivity-increment-range", increment_min, increment_max})
+  end
+  if current_min == current_max and maximum_min == maximum_max then
+    fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap", current_min, maximum_min})
+  else
+    fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap-range", current_min, current_max, maximum_min, maximum_max})
+  end
+end
+local function add_prerequisite_icons(parent, technology)
+  local prerequisites = {}
+  for _, prerequisite in pairs(technology.prerequisites) do prerequisites[#prerequisites + 1] = prerequisite end
+  if #prerequisites == 0 then return end
+  table.sort(prerequisites, function(left, right) return left.name < right.name end)
+  local row = parent.add{type = "flow", direction = "horizontal"}
+  label(row, {"mir-browser.prerequisites"})
+  for index, prerequisite in ipairs(prerequisites) do
+    if index <= 8 then add_technology_icon(row, prerequisite) end
+  end
+  if #prerequisites > 8 then label(row, {"mir-browser.prerequisites-more", #prerequisites - 8}) end
+end
+local function status_caption(technology)
+  if technology.researched then return {"mir-browser.status-complete"} end
+  if technology.queued then return {"mir-browser.status-queued"} end
+  if technology.available then return {"mir-browser.status-ready"} end
+  return {"mir-browser.status-locked"}
 end
 local function detail(player, parent, v, c)
   local portable = v.selected and core.detail(c, v.selected, c.enrichment)
   local tech = portable and player.force.technologies[portable.technology.key]
   if not tech then return end
-  label(parent, {"", tech.localised_name, " (", tech.name, ")"})
+  local heading = parent.add{type = "flow", direction = "horizontal"}
+  add_technology_icon(heading, tech, 48)
+  label(heading, tech.localised_name)
   label(parent, tech.localised_description)
   local enrichment = portable.enrichment or {}
-  label(parent, {"mir-browser.family-owner", portable.technology.family, tech.name, enrichment.action or "external"})
-  if portable.technology.cap then label(parent, {"mir-browser.cap", portable.technology.cap}) end
-  if enrichment.owner and enrichment.compiler_disposition and enrichment.final_science and enrichment.settings then
-    fact_label(parent, "affected_recipes", "Affected recipes: " .. table.concat(enrichment.owner.affected_recipe_ids or {}, ", "))
-    local disposition = enrichment.compiler_disposition
-    fact_label(parent, "compiler_disposition", "Compiler disposition: " .. disposition.inclusion
-      .. " | action=" .. disposition.action .. " | reason=" .. disposition.reason)
-    fact_label(parent, "route_exclusions", "Route exclusions: " .. disposition.route_exclusions.state
-      .. " | exact-recipe-ids=" .. table.concat(disposition.route_exclusions.recipe_ids or {}, ", "))
-    fact_label(parent, "science", "Final science: " .. joined_ingredients(enrichment.final_science.ingredients)
-      .. " | rationale=" .. enrichment.final_science.rationale)
-    fact_label(parent, "next_level", "Next level has effective benefit: "
-      .. tostring(enrichment.next_level_has_effective_benefit)
-      .. " | current-level=" .. tostring(enrichment.current_level)
-      .. " | effective-cap=" .. tostring(enrichment.effective_cap))
-    fact_label(parent, "recipe_benefits", "Affected recipe benefit facts: " .. benefit_caption(enrichment.recipe_benefits))
-    fact_label(parent, "maximum_setting", setting_caption(enrichment.settings.maximum_level))
-    fact_label(parent, "enabled_setting", setting_caption(enrichment.settings.enabled))
-    fact_label(parent, "startup_restart", "Startup settings require restart; this browser does not mutate startup settings.")
-  else
-    local ingredients = parent.add{type = "flow"}
-    for _, ingredient in ipairs(tech.research_unit_ingredients) do
-      ingredients.add{type = "sprite", sprite = "item/" .. ingredient.name, tooltip = {"item-name." .. ingredient.name}}
-    end
+  label(parent, {"mir-browser.family", family_caption(portable.technology.family)})
+  label(parent, status_caption(portable.technology))
+  if portable.technology.cap then
+    label(parent, {"mir-browser.level-cap", tech.level, portable.technology.cap})
+  elseif tech.level and tech.level > 1 then
+    label(parent, {"mir-browser.level", tech.level})
   end
+  add_research_cost(parent, tech)
+  if enrichment.recipe_benefits then
+    local count = #enrichment.recipe_benefits
+    if enrichment.next_level_has_effective_benefit then
+      label(parent, {"mir-browser.next-benefit", count})
+    else
+      label(parent, {"mir-browser.no-next-benefit", count})
+    end
+  elseif portable.technology.family ~= "external" then
+    label(parent, {"mir-browser.mir-benefit"})
+  end
+  add_productivity_summary(parent, enrichment.recipe_benefits)
+  add_science_icons(parent, tech)
+  add_prerequisite_icons(parent, tech)
   local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
   enqueue.enabled = actions.can_enqueue(player, tech, defines.input_action.start_research)
   button(parent, "open-vanilla", {"controls.open-technology-gui"}, {technology = tech.name})
   button(parent, "toggle-hide", v.hidden and v.hidden[tech.name] and {"mir-browser.show"} or {"mir-browser.hide"}, {technology = tech.name})
-  local effects = tech.prototype.effects
-  local pages = math.max(1, math.ceil(#effects / core.page_size))
-  v.effect_page = math.min(v.effect_page or 1, pages)
-  for i = (v.effect_page - 1) * core.page_size + 1, math.min(v.effect_page * core.page_size, #effects) do
-    local effect = effects[i]
-    label(parent, (effect.recipe or effect.ammo_category or effect.type) .. " : " .. tostring(effect.modifier or effect.change or effect.bonus or effect.type))
-  end
-  if pages > 1 then
-    local nav = parent.add{type = "flow"}
-    button(nav, "effects-prev", "<").enabled = v.effect_page > 1
-    label(nav, tostring(v.effect_page) .. " / " .. tostring(pages))
-    button(nav, "effects-next", ">").enabled = v.effect_page < pages
-  end
-  label(parent, {"mir-browser.omission-note"})
+end
+local function filter_dropdown(parent, caption, items, selected_index, action)
+  local field = parent.add{type = "flow", direction = "vertical"}
+  label(field, caption)
+  return field.add{type = "drop-down", items = items, selected_index = selected_index, tags = {mir_browser = action}}
+end
+local function has_family(family_names, family)
+  for _, candidate in ipairs(family_names) do if candidate == family then return true end end
+  return false
 end
 render = function(player)
   local v = view(player)
   local c = catalogue(player.force)
-  close(player)
-  if not c then player.print({"mir-browser.catalogue-limit", core.catalogue_limit}); return end
+  if c and v.family == "mir" and not has_family(c.family_names, "mir") then v.family = "all" end
+  if c and v.family == "mir" and v.selected then
+    local families = c.enrichment and c.enrichment.families
+    if type(families) ~= "table" or type(families[v.selected]) ~= "string" then
+      v.selected, v.effect_page = nil, 1
+    end
+  end
+  remove_legacy_top_button(player)
+  close(player, true)
+  if not c then
+    set_shortcut_toggled(player, false)
+    player.print({"mir-browser.catalogue-limit", core.catalogue_limit})
+    return
+  end
   local frame = player.gui.screen.add{type = "frame", name = ROOT, direction = "vertical", caption = {"mir-browser.title"}}
   frame.auto_center = true
   local scale = player.display_scale or 1
@@ -307,13 +424,16 @@ render = function(player)
   local pages
   if v.tab == "settings" then pages = settings_rows(player, body, v)
   else
-    local filters = body.add{type = "flow"}
-    filters.add{type = "drop-down", items = {{"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, selected_index = v.mode, tags = {mir_browser = "mode"}}
-    filters.add{type = "drop-down", items = {{"mir-browser.all"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, selected_index = v.status, tags = {mir_browser = "status"}}
-    filters.add{type = "drop-down", items = {{"gui-selector.select-min"}, {"gui-selector.select-max"}}, selected_index = v.sort == "name-desc" and 2 or 1, tags = {mir_browser = "sort"}}
+    local filters = body.add{type = "flow", direction = "horizontal"}
+    filter_dropdown(filters, {"mir-browser.filter-level"}, {{"mir-browser.all-levels"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, v.mode, "mode")
+    filter_dropdown(filters, {"mir-browser.filter-status"}, {{"mir-browser.all-status"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, v.status, "status")
+    local sort_index = v.sort == "native" and 2 or v.sort == "name-asc" and 3 or v.sort == "name-desc" and 4 or 1
+    filter_dropdown(filters, {"mir-browser.filter-order"}, {{"mir-browser.order-progression"}, {"mir-browser.order-native"}, {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, sort_index, "sort")
     local family_index = 1
     for i,name in ipairs(c.family_names) do if name == v.family then family_index = i end end
-    filters.add{type = "drop-down", items = c.family_names, selected_index = family_index, tags = {mir_browser = "family"}}
+    local family_items = {}
+    for _, family in ipairs(c.family_names) do family_items[#family_items + 1] = family_caption(family) end
+    filter_dropdown(filters, {"mir-browser.filter-scope"}, family_items, family_index, "family")
     local queue = body.add{type = "flow", direction = "vertical"}
     label(queue, {"mir-browser.queue"})
     for i, tech in ipairs(player.force.research_queue or {}) do
@@ -331,17 +451,26 @@ render = function(player)
     local page = core.query(c, v, c.enrichment, localized_search(player))
     v.page, pages = page.page, page.pages
     request_visible_translations(player, page, v.selected)
+    detail(player, body, v, c)
     label(body, {"mir-browser.count", page.count})
     for _, row in ipairs(page.rows) do
-      button(body, "select", player.force.technologies[row.key].localised_name, {technology = row.key})
+      local technology = player.force.technologies[row.key]
+      if technology then
+        local item = body.add{type = "flow", direction = "horizontal"}
+        add_technology_icon(item, technology)
+        local select = button(item, "select", technology.localised_name, {technology = row.key})
+        select.style.width = 300
+        select.tooltip = technology.localised_name
+        label(item, status_caption(row)).style.maximal_width = 220
+      end
     end
-    detail(player, body, v, c)
   end
   local nav = frame.add{type = "flow"}
   button(nav, "prev", "<").enabled = v.page > 1
   label(nav, tostring(v.page) .. " / " .. tostring(pages))
   button(nav, "next", ">").enabled = v.page < pages
   player.opened = frame
+  set_shortcut_toggled(player, true)
 end
 local function refresh_open(force)
   for _, player in pairs(game.connected_players) do
@@ -432,17 +561,26 @@ local function selection(event)
     local c = catalogue(player.force); if not c then return end
     v.family = c.family_names[event.element.selected_index]
   elseif action == "sort" then
-    v.sort = event.element.selected_index == 2 and "name-desc" or "name-asc"
+    v.sort = ({"progression", "native", "name-asc", "name-desc"})[event.element.selected_index] or "progression"
   else v[action] = event.element.selected_index end
   v.page = 1; render(player)
 end
 function M.on_init()
-  for _, player in pairs(game.players) do launch_button(player) end
+  for _, player in pairs(game.players) do
+    remove_legacy_top_button(player)
+    set_shortcut_toggled(player, false)
+  end
 end
 function M.on_configuration_changed()
   translations = {}
-  for _, player in pairs(game.players) do launch_button(player) end
+  for _, player in pairs(game.players) do
+    view(player)
+    remove_legacy_top_button(player)
+  end
   refresh_open()
+  for _, player in pairs(game.players) do
+    if not player.gui.screen[ROOT] then set_shortcut_toggled(player, false) end
+  end
 end
 function M.on_research_finished(event) refresh_open(event.research.force) end
 M.on_research_reversed = M.on_research_finished
@@ -463,6 +601,12 @@ local function translated(event)
     cache.values[technology] = ""
   end
   if player.gui.screen[ROOT] and view(player).search ~= "" then render(player) end
+end
+local function shortcut(event)
+  if event.prototype_name ~= SHORTCUT then return end
+  local player = event_player(event)
+  if not player then return end
+  if player.gui.screen[ROOT] then close(player) else render(player) end
 end
 function M.register()
   remote.add_interface("more-infinite-research-browser", {
@@ -489,7 +633,15 @@ function M.register()
           v.status = options.status
           reset_page = true
         end
-        if options.sort == "name-asc" or options.sort == "name-desc" then
+        if type(options.family) == "string" then
+          local c = catalogue(player.force)
+          if c and has_family(c.family_names, options.family) then
+            v.family = options.family
+            reset_page = true
+          end
+        end
+        if options.sort == "progression" or options.sort == "native"
+            or options.sort == "name-asc" or options.sort == "name-desc" then
           v.sort = options.sort
           reset_page = true
         end
@@ -516,6 +668,7 @@ function M.register()
   script.on_event(defines.events.on_gui_click, click)
   script.on_event(defines.events.on_gui_selection_state_changed, selection)
   script.on_event(defines.events.on_string_translated, translated)
+  script.on_event(defines.events.on_lua_shortcut, shortcut)
   script.on_event(defines.events.on_gui_confirmed, function(event)
     local player = event_player(event)
     if player and event.element and event.element.valid and event.element.tags.mir_browser == "search" then
@@ -535,7 +688,11 @@ function M.register()
   script.on_event(defines.events.on_gui_closed, function(event)
     if event.element and event.element.valid and event.element.name == ROOT then close(event_player(event)) end
   end)
-  script.on_event(defines.events.on_player_created, function(event) launch_button(event_player(event)) end)
+  script.on_event(defines.events.on_player_created, function(event)
+    local player = event_player(event)
+    remove_legacy_top_button(player)
+    set_shortcut_toggled(player, false)
+  end)
   script.on_event(defines.events.on_player_removed, function(event)
     state().players[event.player_index] = nil
     translations[event.player_index] = nil

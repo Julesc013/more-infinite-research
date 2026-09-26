@@ -776,10 +776,41 @@ local function material_family(item, routes, mod_names, display_item)
   }
 end
 
--- The additional Angel final routes in this batch have an exact F200
--- combined-world observation. Keep F210 on its prior declarations until its
--- own ordering and engine case are qualified.
-local f200_angel_material_routes = target_profiles.current().factorio_version == "2.0"
+-- The additional Angel final routes in this batch have one exact F200
+-- combined-world observation. Keep every other F200 closure, and F210, on
+-- their established declarations until each has its own ordering and engine
+-- case qualified. These are the same product and observer locks that bind the
+-- reviewed Nickel and Silver certificates below.
+local F200_BOB_ANGEL_MATERIAL_LOCK = {
+  base="2.0.77", boblibrary="2.1.0", bobores="2.1.2", bobplates="2.1.1",
+  bobelectronics="2.1.1", bobtech="2.1.0", angelsrefining="2.0.4",
+  angelsrefininggraphics="2.0.0", angelspetrochem="2.0.3",
+  angelspetrochemgraphics="2.0.1", angelssmelting="2.0.5",
+  angelssmeltinggraphics="2.0.0", ["more-infinite-research"]="4.2.20000"
+}
+
+local F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS = {
+  ["mir-fixture-assert-f200-bob-angel-material-routes-observation"]="0.1.0",
+  ["mir-fixture-assert-f200-science-researchability-diagnostic"]="0.1.0"
+}
+
+local function exact_f200_bob_angel_material_lock()
+  if target_profiles.current().factorio_version ~= "2.0" then return false end
+  local active = mods or (script and script.active_mods)
+  if type(active) ~= "table" then return false end
+  for name, version in pairs(F200_BOB_ANGEL_MATERIAL_LOCK) do
+    if active[name] ~= version then return false end
+  end
+  for name, version in pairs(active) do
+    if F200_BOB_ANGEL_MATERIAL_LOCK[name] ~= version
+      and F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS[name] ~= version then
+      return false
+    end
+  end
+  return true
+end
+
+local f200_angel_material_routes = exact_f200_bob_angel_material_lock()
 
 local function f200_material_routes(existing, additions)
   local routes = {}
@@ -809,6 +840,9 @@ end
 
 local function aluminium_material_family()
   if aluminium_mod_active("bobplates") and aluminium_mod_active("angelssmelting") then
+    if not f200_angel_material_routes then
+      return material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates"})
+    end
     return material_family("bob-aluminium-plate", {
       "bob-aluminium-plate",
       "angels-plate-aluminium",
@@ -926,8 +960,8 @@ streams.research_material_glass.reviewed_forward_routes = {
 local function f200_bob_angel_plate_profile(risk_fingerprint)
   return {{
     id="F200-BobAngel-2.0.77-plate-final-v1",
-    mod_locks={base="2.0.77",boblibrary="2.1.0",bobores="2.1.2",bobplates="2.1.1",bobelectronics="2.1.1",bobtech="2.1.0",angelsrefining="2.0.4",angelsrefininggraphics="2.0.0",angelspetrochem="2.0.3",angelspetrochemgraphics="2.0.1",angelssmelting="2.0.5",angelssmeltinggraphics="2.0.0",["more-infinite-research"]="4.2.20000"},
-    observer_mod_locks={['mir-fixture-assert-f200-bob-angel-material-routes-observation']="0.1.0",['mir-fixture-assert-f200-science-researchability-diagnostic']="0.1.0"},
+    mod_locks=F200_BOB_ANGEL_MATERIAL_LOCK,
+    observer_mod_locks=F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS,
     canonical_risk_fingerprint=risk_fingerprint
   }}
 end

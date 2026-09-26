@@ -1,18 +1,25 @@
 -- Controlled module tests, not a package, save, or ecosystem qualification.
 local world, context, active_context, last_created_context
-local registry, recipe_unlock_facts, production, researchability, feasibility
+local registry, recipe_unlock_facts, production, researchability, feasibility, route_policy
 local checks = 0
+local failures = {}
 
 local function stub(name, value) package.loaded[name] = value end
 local function check(id, condition, detail)
   checks = checks + 1
-  if not condition then error("FAILED " .. id .. ": " .. detail) end
+  if not condition then
+    local failure = "FAILED " .. id .. ": " .. detail
+    failures[#failures + 1] = failure
+    print(failure)
+    return
+  end
   print("OBSERVED\t" .. id .. "\t" .. detail)
 end
 
 _G.log = function(_) end
 _G.data = {raw = {}, extend = function() error("Unexpected prototype mutation") end}
 local target_profile = {current_factorio_version = "2.1"}
+target_profile.current = function() return target_profile end
 stub("prototypes.mir.platform.factorio.target_profiles", target_profile)
 stub("prototypes.mir.platform.factorio.prototype_lookup", {
   item_prototype = function(name) return world.item_prototypes[name] end
@@ -86,6 +93,7 @@ local function new_context()
     if name == "science.pack_production_status" then return production.pack_production_status end
     if name == "science.independent_pack_acquisition_witness" then return production.independent_pack_acquisition_witness end
     if name == "science.prereq_tech_for_science_pack" then return production.prereq_tech_for_science_pack end
+    if name == "science.prereq_techs_for_science_pack" then return production.prereq_techs_for_science_pack end
     if name == "science.production_route_for_pack" then return production.production_route_for_pack end
     error("Unexpected service: " .. tostring(name))
   end
@@ -139,6 +147,7 @@ recipe_unlock_facts = require("prototypes.mir.capabilities.science_integration.r
 production = require("prototypes.mir.capabilities.science_integration.pack_production_reachability")
 researchability = require("prototypes.mir.capabilities.science_integration.technology_researchability")
 feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+route_policy = require("prototypes.mir.capabilities.science_integration.production_route_policy")
 
 local function reset(next_world)
   world = next_world
@@ -149,6 +158,13 @@ local function reset(next_world)
     character = world.characters or {player = {crafting_categories = {"crafting"}}},
     resource = world.resources or {},
     tree = world.trees or {},
+    plant = world.plants or {},
+    ["asteroid-chunk"] = world.asteroid_chunks or {},
+    ["unit-spawner"] = world.unit_spawners or {},
+    unit = world.units or {},
+    turret = world.turrets or {},
+    ["assembling-machine"] = world.assembling_machines or {},
+    tile = world.tiles or {},
     ["offshore-pump"] = world.offshore_pumps or {},
     boiler = world.boilers or {},
     surface = world.surfaces or {},
@@ -160,7 +176,7 @@ local function reset(next_world)
   -- The real compiler reaches this diagnostic only after it has captured its
   -- immutable recipe snapshot. The ordinary controlled worlds retain a small
   -- equivalent parent snapshot while their recipe-facts facade remains stubbed;
-  -- D23 below separately exercises the actual recipe-facts module.
+  -- D23 below checks borrowing that controlled parent snapshot.
   context.states.recipe_source = world.recipe_prototypes or {}
   context.epochs.recipe_source = 1
   context.states.recipe_index = {
@@ -466,6 +482,7 @@ local function route_fact(output, ingredients, options)
   options = options or {}
   return {
     enabled_without_research = options.enabled ~= false,
+    source_class = options.source_class,
     result_names = {output},
     variants = options.variants or {{
       name = "default",
@@ -537,6 +554,48 @@ local reusable_options = {require_enabled = false}
 feasibility.initial_recipe_witness("pack-from-ore", "pack", reusable_options)
 check("F09A", reusable_options.require_enabled == false,
   "Initial-route feasibility does not mutate caller options")
+
+-- Structural search prefers a forward producer while retaining every
+-- alternative. This fixture does not certify a non-ordinary science route.
+local producer_order_world = {
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
+  recipe_facts = {
+    ["a-recycling"] = route_fact("component", {{name = "ore", amount = 1}}, {source_class = "recycling"}),
+    ["z-ordinary"] = route_fact("component", {{name = "ore", amount = 1}})
+  },
+  producers = {component = {"a-recycling", "z-ordinary"}},
+  resources = {ore = {minable = {result = "ore", count = 1}}}
+}
+reset(producer_order_world)
+local ordered_acquisition = feasibility.acquisition_witness("component")
+check("RS01", ordered_acquisition and ordered_acquisition.recipe == "z-ordinary",
+  "Normal structural acquisition prefers a viable ordinary producer before a reverse recycling producer")
+local order_observer = {visits = 0, limit = 1000}
+function order_observer:reserve_visit()
+  if self.visits >= self.limit then return false end
+  self.visits = self.visits + 1
+  return true
+end
+function order_observer:is_stopped() return self.visits >= self.limit end
+local diagnostic_acquisition = feasibility.acquisition_witness("component", {diagnostic_observer = order_observer})
+check("RS02", diagnostic_acquisition and diagnostic_acquisition.recipe == "a-recycling"
+  and order_observer.visits > 0 and order_observer.visits <= order_observer.limit,
+  "Bounded structural diagnostics retain their lexical branch order and irreversible visit accounting")
+producer_order_world.recipe_facts["z-ordinary"] = route_fact("component", {{name = "missing", amount = 1}})
+producer_order_world.recipe_facts["a-recycling"] = route_fact("component", {{name = "component", amount = 1}}, {source_class = "recycling"})
+reset(producer_order_world)
+local return_branch_visits = 0
+local rejected_acquisition = feasibility.acquisition_witness("component", {
+  source_witness = function(name)
+    if name == "missing" then return_branch_visits = return_branch_visits + 1 end
+    return nil
+  end,
+  diagnostic_failure = function(failure)
+    if failure.recipe == "a-recycling" then return_branch_visits = return_branch_visits + 1 end
+  end
+})
+check("RS03", rejected_acquisition == nil and return_branch_visits >= 2,
+  "An infeasible forward producer still reaches the retained recycling alternative and rejects its unseeded cycle")
 
 -- A recursive failure is conditional on its parent visitation set. In this
 -- A <-> B graph, A's independent ore route must permit a later root B query;
@@ -650,7 +709,8 @@ check("F09C", feasibility.source_witness("same").kind == "minable-resource"
 -- water fluid, never a same-named item identity.
 reset({
   item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
-  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {}}}
+  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {}}},
+  tiles = {water = {fluid = "water"}}
 })
 local base_water_witness = feasibility.source_witness({type = "fluid", name = "water"})
 check("F09C0", base_water_witness and base_water_witness.kind == "offshore-pump"
@@ -687,6 +747,62 @@ reset({
 check("F09C2", feasibility.source_witness({type = "fluid", name = "water"}) ~= nil,
   "An F200 pump preserves an explicit fluid source declaration")
 target_profile.current_factorio_version = "2.1"
+
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  plants = {yumako = {minable = {results = {{type = "item", name = "yumako", amount = 50}}}}},
+  asteroid_chunks = {oxide = {minable = {result = "oxide-asteroid-chunk", count = 1}}},
+  offshore_pumps = {pump = {fluid_source_offset = {0, -1}, fluid_box = {}}},
+  tiles = {oil_ocean = {fluid = "heavy-oil"}, ammonia_ocean = {fluid = "ammoniacal-solution"}}
+})
+check("F09C3", feasibility.source_witness("yumako").kind == "minable-entity"
+  and feasibility.source_witness("oxide-asteroid-chunk").kind == "minable-entity",
+  "Space Age crops and asteroid chunks retain their declared natural item sources")
+check("F09C4", feasibility.source_witness({type = "fluid", name = "heavy-oil"}) ~= nil
+  and feasibility.source_witness({type = "fluid", name = "ammoniacal-solution"}) ~= nil
+  and feasibility.source_witness({type = "fluid", name = "water"}) == nil,
+  "F210 pumps use declared ocean fluids without inventing water")
+check("F09C5", feasibility.source_witness({type = "fluid", name = "yumako"}) == nil
+  and feasibility.source_witness({type = "item", name = "heavy-oil"}) == nil,
+  "Planetary item and fluid sources preserve exact product identity")
+world.offshore_pumps.pump.fluid_box.filter = "molten-nickel"
+world.recipe_source_epoch = 2
+check("F09C6", feasibility.source_witness({type = "fluid", name = "molten-nickel"}) == nil
+  and feasibility.source_witness({type = "fluid", name = "heavy-oil"}) == nil,
+  "A filtered F210 pump cannot create a fluid absent from tiles or accept a mismatched tile")
+world.offshore_pumps.pump.fluid_box.filter = nil
+world.tiles = {}
+world.recipe_source_epoch = 3
+check("F09C7", feasibility.source_witness({type = "fluid", name = "water"}) == nil,
+  "A source offset without a declared fluid tile is not a natural source")
+
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
+  recipe_facts = {eggs = route_fact("biter-egg", {}, {categories = {"captive-spawner-process"}})},
+  producers = {["biter-egg"] = {"eggs"}},
+  assembling_machines = {captive = {crafting_categories = {"captive-spawner-process"}, fixed_recipe = "eggs"}},
+  unit_spawners = {wild = {loot = {
+    {type = "item", name = "pentapod-egg", amount_min = 0, amount_max = 3},
+    {type = "item", name = "zero-drop", amount = 0},
+    {type = "item", name = "impossible-drop", amount = 3, probability = 0},
+    {type = "fluid", name = "invalid-fluid-loot", amount = 3}
+  }}}
+})
+local egg_source = feasibility.source_witness("pentapod-egg")
+check("F09C8", egg_source and egg_source.kind == "entity-loot"
+  and feasibility.source_witness({type = "fluid", name = "pentapod-egg"}) == nil,
+  "Positive enemy loot supplies its declared item seed without inventing fluid output")
+check("F09C9", feasibility.source_witness("zero-drop") == nil
+  and feasibility.source_witness("impossible-drop") == nil
+  and feasibility.source_witness({type = "fluid", name = "invalid-fluid-loot"}) == nil,
+  "Zero, impossible and non-item loot cannot seed acquisition")
+check("F09C10", feasibility.initial_recipe_witness("eggs", "biter-egg") ~= nil,
+  "A captured spawner supplies its declared recipe category")
+world.assembling_machines = {}
+data.raw["assembling-machine"] = world.assembling_machines
+world.recipe_source_epoch = 2
+check("F09C11", feasibility.initial_recipe_witness("eggs", "biter-egg") == nil,
+  "Captive-spawner recipes remain infeasible without a matching prototype category")
 
 -- Natural minable entities are separate from resource prototypes.  Trees are
 -- a real early wood source, so a route consuming wood must not be treated as
@@ -1055,6 +1171,276 @@ canonical_recipe_facts.recipes_by_output_identity_view = normal_shared_output_lo
 check("U05B", memo_status == "research" and shared_inner_output_lookups == 1,
   "A complete inner unlock witness is reused across sibling routes with unrelated active unlockers")
 
+-- Locked typed-output alternatives use the same normal producer ordering.
+-- Count real technology service evaluations, rather than pre-cache entries.
+local locked_order_world = {
+  item_prototypes = {["order-pack"] = {type = "item"}, component = {type = "item"}},
+  labs = {lab = {inputs = {"order-pack"}}},
+  techs = {
+    RootUnlock = {enabled = true, research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = "order-pack"}}},
+    OrdinaryUnlock = {enabled = true, research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = "z-ordinary"}}},
+    RecyclingUnlock = {enabled = true, research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = "a-recycling"}}}
+  },
+  recipe_prototypes = { ["order-pack"] = {name = "order-pack"},
+    ["z-ordinary"] = {name = "z-ordinary"}, ["a-recycling"] = {name = "a-recycling"}},
+  recipe_facts = {
+    ["order-pack"] = route_fact("order-pack", {{name = "component", amount = 1}}, {enabled = false}),
+    ["z-ordinary"] = route_fact("component", {{name = "ore", amount = 1}}, {enabled = false}),
+    ["a-recycling"] = route_fact("component", {{name = "ore", amount = 1}}, {enabled = false, source_class = "recycling"})
+  },
+  producers = {["order-pack"] = {"order-pack"}, component = {"a-recycling", "z-ordinary"}},
+  unlockers = {}, resources = {ore = {minable = {result = "ore", count = 1}}}
+}
+reset(locked_order_world)
+local unlock_evaluations = {}
+context.services["science.technology_researchability_reason"] = function(name, reason_context)
+  unlock_evaluations[name] = (unlock_evaluations[name] or 0) + 1
+  return researchability.reason_with_context(name, reason_context)
+end
+local locked_order_status = production.pack_production_status("order-pack", {})
+check("RS04", locked_order_status == "research" and unlock_evaluations.OrdinaryUnlock == 1
+  and unlock_evaluations.RecyclingUnlock == nil,
+  "A viable locked ordinary intermediate avoids evaluating the reverse recycling unlocker")
+locked_order_world.recipe_facts["z-ordinary"] = route_fact(
+  "component", {{name = "missing", amount = 1}}, {enabled = false})
+locked_order_world.recipe_facts["a-recycling"] = route_fact(
+  "component", {{name = "component", amount = 1}}, {enabled = false, source_class = "recycling"})
+reset(locked_order_world)
+local fallback_evaluations = {}
+context.services["science.technology_researchability_reason"] = function(name, reason_context)
+  fallback_evaluations[#fallback_evaluations + 1] = name
+  return researchability.reason_with_context(name, reason_context)
+end
+check("RS05", production.pack_production_status("order-pack", {}) == "unreachable"
+  and table.concat(fallback_evaluations, ",") == "OrdinaryUnlock,RecyclingUnlock",
+  "A failed locked forward route retains the recycling unlock alternative and rejects its unseeded cycle")
+
+-- Locked ordinary suppliers prefer earlier progression over lexical names,
+-- without removing later alternatives when the earlier recipe cannot supply
+-- the ingredient. Reuse the real contextual technology service in both cases.
+local progression_order_world = require("prototypes.mir.core.deepcopy")(locked_order_world)
+progression_order_world.recipe_facts["z-ordinary"] = route_fact(
+  "component", {{name = "ore", amount = 1}}, {enabled = false})
+progression_order_world.recipe_facts["a-recycling"] = route_fact(
+  "component", {{name = "ore", amount = 1}}, {enabled = false})
+progression_order_world.techs.RecyclingUnlock.prerequisites = {"OrdinaryUnlock"}
+reset(progression_order_world)
+local early_route = production.production_route_for_pack("order-pack")
+local early_pairs = early_route and early_route.provenance.selected_research_unlock_pairs or {}
+local has_early, has_late = false, false
+for _, pair in ipairs(early_pairs) do
+  has_early = has_early or pair.recipe == "z-ordinary"
+  has_late = has_late or pair.recipe == "a-recycling"
+end
+check("RS06", early_route and has_early and not has_late,
+  "An earlier ordinary unlock wins over an alphabetically earlier later ordinary supplier")
+
+progression_order_world.recipe_facts["z-ordinary"] = route_fact(
+  "component", {{name = "missing", amount = 1}}, {enabled = false})
+reset(progression_order_world)
+local later_route = production.production_route_for_pack("order-pack")
+local later_pairs = later_route and later_route.provenance.selected_research_unlock_pairs or {}
+local retained_late = false
+for _, pair in ipairs(later_pairs) do retained_late = retained_late or pair.recipe == "a-recycling" end
+check("RS07", later_route and retained_late,
+  "A failed earlier supplier retains the seeded later ordinary route")
+
+local multiple_unlocker_world = require("prototypes.mir.core.deepcopy")(progression_order_world)
+multiple_unlocker_world.techs.ZEarlierUnlock = multiple_unlocker_world.techs.OrdinaryUnlock
+multiple_unlocker_world.techs.ZEarlierUnlock.effects = {{type = "unlock-recipe", recipe = "a-recycling"}}
+multiple_unlocker_world.techs.ALaterUnlock = multiple_unlocker_world.techs.RecyclingUnlock
+multiple_unlocker_world.techs.ALaterUnlock.prerequisites = {"ZEarlierUnlock"}
+multiple_unlocker_world.techs.OrdinaryUnlock = nil
+multiple_unlocker_world.techs.RecyclingUnlock = nil
+reset(multiple_unlocker_world)
+local multiple_unlocker_route = production.production_route_for_pack("order-pack")
+local chosen_earlier_unlocker = false
+for _, pair in ipairs(multiple_unlocker_route and multiple_unlocker_route.provenance.selected_research_unlock_pairs or {}) do
+  chosen_earlier_unlocker = chosen_earlier_unlocker or (pair.recipe == "a-recycling" and pair.unlocker == "ZEarlierUnlock")
+end
+check("RS08", multiple_unlocker_route and chosen_earlier_unlocker,
+  "One recipe with alternative unlockers selects the earlier proved technology")
+
+-- An enabled outer recipe is only initial when every selected acquisition is
+-- enabled. Its locked component routes remain actual required gates, rather
+-- than becoming a false initial classification or an arbitrary outer unlock.
+local function enabled_future_gate_world(options)
+  options = options or {}
+  local has_second_gate = options.singleton ~= true
+  local outer_ingredients = {{name = "gate-component-a", amount = 1}}
+  if has_second_gate then table.insert(outer_ingredients, {name = "gate-component-b", amount = 1}) end
+  local techs = {
+    GateOne = technology("starter-pack", "gate-component-a-recipe")
+  }
+  local recipe_prototypes = {
+    ["starter-pack-recipe"] = {name = "starter-pack-recipe"},
+    ["gated-pack-recipe"] = {name = "gated-pack-recipe"},
+    ["gate-component-a-recipe"] = {name = "gate-component-a-recipe"}
+  }
+  local recipe_facts = {
+    ["starter-pack-recipe"] = route_fact("starter-pack", {{name = "gate-ore", amount = 1}}),
+    ["gated-pack-recipe"] = route_fact("gated-pack", outer_ingredients),
+    ["gate-component-a-recipe"] = route_fact(
+      "gate-component-a", {{name = "gate-ore", amount = 1}}, {enabled = false})
+  }
+  local producers = {
+    ["starter-pack"] = {"starter-pack-recipe"},
+    ["gated-pack"] = {"gated-pack-recipe"},
+    ["gate-component-a"] = {"gate-component-a-recipe"}
+  }
+  local unlockers = { ["gate-component-a-recipe"] = {"GateOne"} }
+  local items = {
+    ["starter-pack"] = {type = "item"},
+    ["gated-pack"] = {type = "item"},
+    ["gate-component-a"] = {type = "item"}
+  }
+  if has_second_gate then
+    techs.GateTwo = technology("starter-pack", "gate-component-b-recipe")
+    if options.dependent then techs.GateTwo.prerequisites = {"GateOne"} end
+    if options.invalid then techs.GateTwo.enabled = false end
+    recipe_prototypes["gate-component-b-recipe"] = {name = "gate-component-b-recipe"}
+    recipe_facts["gate-component-b-recipe"] = route_fact(
+      "gate-component-b", {{name = "gate-ore", amount = 1}}, {enabled = false})
+    producers["gate-component-b"] = {"gate-component-b-recipe"}
+    unlockers["gate-component-b-recipe"] = {"GateTwo"}
+    items["gate-component-b"] = {type = "item"}
+  end
+  return {
+    item_prototypes = items,
+    labs = {lab = {inputs = {"starter-pack", "gated-pack"}}},
+    techs = techs,
+    recipe_prototypes = recipe_prototypes,
+    recipe_facts = recipe_facts,
+    producers = producers,
+    unlockers = unlockers,
+    resources = { ["gate-ore"] = {minable = {result = "gate-ore", count = 1}} }
+  }
+end
+
+-- Supply matching raw recipes and normalized fixture facts while exercising
+-- the actual F200 consumer and science facade. The recipe index remains a
+-- controlled input; this case does not qualify its production builder.
+local function enabled_future_gate_consumer_world()
+  local actual = enabled_future_gate_world()
+  actual.recipe_prototypes = {
+    ["starter-pack-recipe"] = {
+      name = "starter-pack-recipe", enabled = true, category = "crafting",
+      ingredients = {{name = "gate-ore", amount = 1}},
+      results = {{type = "item", name = "starter-pack", amount = 1}}
+    },
+    ["gated-pack-recipe"] = {
+      name = "gated-pack-recipe", enabled = true, category = "crafting",
+      ingredients = {{name = "gate-component-a", amount = 1}, {name = "gate-component-b", amount = 1}},
+      results = {{type = "item", name = "gated-pack", amount = 1}}
+    },
+    ["gate-component-a-recipe"] = {
+      name = "gate-component-a-recipe", enabled = false, category = "crafting",
+      ingredients = {{name = "gate-ore", amount = 1}},
+      results = {{type = "item", name = "gate-component-a", amount = 1}}
+    },
+    ["gate-component-b-recipe"] = {
+      name = "gate-component-b-recipe", enabled = false, category = "crafting",
+      ingredients = {{name = "gate-ore", amount = 1}},
+      results = {{type = "item", name = "gate-component-b", amount = 1}}
+    }
+  }
+  return actual
+end
+
+reset(enabled_future_gate_world())
+local multi_gate_status = production.pack_production_status("gated-pack", {})
+local multi_gate_route = production.production_route_for_pack("gated-pack")
+local multi_gate_prereqs = production.prereq_techs_for_science_pack("gated-pack")
+check("MG01", multi_gate_status == "research" and multi_gate_route and multi_gate_route.initial == false
+  and table.concat(multi_gate_route.unlockers, ",") == "GateOne,GateTwo"
+  and table.concat(multi_gate_prereqs, ",") == "GateOne,GateTwo"
+  and production.prereq_tech_for_science_pack("gated-pack") == nil,
+  "An enabled future pack retains every selected inner unlocker through the plural planner gate contract")
+
+reset(enabled_future_gate_world({dependent = true}))
+local dependent_route = production.production_route_for_pack("gated-pack")
+check("MG02", dependent_route and table.concat(dependent_route.unlockers, ",") == "GateTwo"
+  and table.concat(dependent_route.prerequisite_closure, ",") == "GateOne"
+  and #dependent_route.provenance.selected_research_unlock_pairs == 2
+  and table.concat(production.prereq_techs_for_science_pack("gated-pack"), ",") == "GateTwo",
+  "A dependent selected inner unlocker reduces its direct gate while retaining closure and pair proof")
+
+reset(enabled_future_gate_world({singleton = true}))
+check("MG03", table.concat(production.prereq_techs_for_science_pack("gated-pack"), ",") == "GateOne"
+  and production.prereq_tech_for_science_pack("gated-pack") == "GateOne",
+  "The legacy scalar prerequisite remains available for an exact singleton gate")
+
+reset(enabled_future_gate_world({invalid = true}))
+check("MG04", production.pack_production_status("gated-pack", {}) == "unreachable"
+  and #production.prereq_techs_for_science_pack("gated-pack") == 0
+  and production.prereq_tech_for_science_pack("gated-pack") == nil,
+  "A disabled selected inner unlocker rejects the enabled future route")
+
+reset(enabled_future_gate_world({singleton = true}))
+local initial_callback_calls = 0
+local strict_initial = feasibility.initial_recipe_witness("gated-pack-recipe", "gated-pack", {
+  research_unlock_witness = function()
+    initial_callback_calls = initial_callback_calls + 1
+    return {kind = "fixture-research-witness"}
+  end
+})
+local true_initial_callback_calls = 0
+local true_initial = feasibility.initial_recipe_witness("starter-pack-recipe", "starter-pack", {
+  research_unlock_witness = function()
+    true_initial_callback_calls = true_initial_callback_calls + 1
+    return {kind = "fixture-research-witness"}
+  end
+})
+check("MG05", strict_initial == nil and initial_callback_calls == 0
+  and true_initial ~= nil and true_initial_callback_calls == 0,
+  "Strict and truly initial feasibility never invokes a research-unlock callback")
+
+reset(enabled_future_gate_world())
+local plural_first = table.concat(production.prereq_techs_for_science_pack("gated-pack"), ",")
+local route_after_plural = production.production_route_for_pack("gated-pack")
+reset(enabled_future_gate_world())
+local route_first = production.production_route_for_pack("gated-pack")
+local plural_after_route = table.concat(production.prereq_techs_for_science_pack("gated-pack"), ",")
+world.techs.GateTwo.enabled = false
+world.recipe_source_epoch = 2
+check("MG06", plural_first == "GateOne,GateTwo" and route_after_plural
+  and route_first and plural_after_route == plural_first
+  and production.pack_production_status("gated-pack", {}) == "unreachable"
+  and #production.prereq_techs_for_science_pack("gated-pack") == 0,
+  "Plural gates are query-order stable and discard stale entries at the recipe-source epoch boundary")
+
+local function policy_route(recipe, unlockers, prerequisite_closure)
+  return {
+    recipe = recipe,
+    reachable = true,
+    initial = false,
+    unlockers = unlockers,
+    prerequisite_closure = prerequisite_closure or {},
+    science_burden = {},
+    progression_key = {
+      science_burden_count = 0,
+      prerequisite_count = 0,
+      unlock_depth = 0,
+      research_count = 0,
+      research_time = 0
+    }
+  }
+end
+local graph_preferred = route_policy.select({
+  policy_route("one-gate", {"GateOne"}),
+  policy_route("two-gates", {"GateTwo"}, {"GateOne"})
+})
+local deterministic_policy = route_policy.select({
+  policy_route("later", {"GateOne", "GateTwo"}),
+  policy_route("earlier", {"GateOne", "GateThree"})
+})
+check("MG07", graph_preferred and graph_preferred.recipe == "one-gate"
+  and deterministic_policy and deterministic_policy.recipe == "earlier",
+  "Route policy compares the complete required gate set and resolves equal routes by sorted gates")
+
 reset(logistic_trace_world(
   'logistic-science-pack-from-self-cycle',
   route_fact('logistic-science-pack', {{name = 'logistic-science-pack', amount = 1}}, {enabled = false}),
@@ -1064,8 +1450,12 @@ logistic_projection = production.pack_production_rejection_projection('logistic-
 logistic_candidate = only_candidate(logistic_projection, 'logistic-science-pack-from-self-cycle')
 check('D06', logistic_candidate and logistic_candidate.first_failure.kind == 'technology'
   and logistic_candidate.first_failure.technology == 'trace-cycle-unlocker'
-  and logistic_candidate.first_failure.reason == 'science-self-lock-logistic-science-pack',
-  'An unseeded self-cycle remains rejected and selects its concrete self-lock technology')
+  and logistic_candidate.first_failure.reason == 'technology-cycle'
+  and logistic_candidate.structural_route.status == 'rejected'
+  and logistic_candidate.unlockers[1].status == 'not-evaluated'
+  and production.pack_production_status('logistic-science-pack', {}) == 'unreachable',
+  'An unseeded self-cycle stays unreachable with the concrete recursive technology witness: '
+    .. serpent.line(logistic_candidate))
 
 reset(logistic_trace_world(
   'logistic-science-pack-from-ore',
@@ -1149,11 +1539,11 @@ reset({
   }
 })
 logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
-  limits = {candidates = 1, nodes = 32, depth = 8, bytes = 4096}
+  limits = {candidates = 1, nodes = 1024, depth = 32, bytes = 4096}
 })
 check('D09', logistic_projection.candidate_count == 2 and #logistic_projection.candidates == 1
   and projection_truncated(logistic_projection, 'candidates'),
-  'Candidate output is capped deterministically with explicit truncation metadata')
+  'Candidate output is capped deterministically with explicit truncation metadata: ' .. serpent.line(logistic_projection))
 
 reset(logistic_trace_world(
   'logistic-science-pack-from-self-cycle',
@@ -1500,14 +1890,19 @@ reset(same_unlocker_world(true))
 check("U02", production.pack_production_status("A", {}) == "unreachable"
   and production.pack_production_status("B", {}) == "unreachable",
   "A same-unlocker, unseeded A-to-B-to-A cycle remains rejected")
-local unseeded_projection = production.pack_production_rejection_projection("A")
+local unseeded_projection = production.pack_production_rejection_projection("A", {
+  limits = {candidates = 8, nodes = 2048, depth = 32, bytes = 16384}
+})
 check("U02A", unseeded_projection and unseeded_projection.status == "unreachable"
   and #unseeded_projection.candidates == 1
   and unseeded_projection.candidates[1].unlockers[1].technology == "SharedUnlock"
   and unseeded_projection.candidates[1].structural_route.status == "rejected"
-  and unseeded_projection.candidates[1].first_failure.kind == "technology"
-  and unseeded_projection.candidates[1].first_failure.reason == "science-self-lock-A",
-  "The diagnostic projection identifies the same-unlocker unseeded cycle at its self-lock")
+  and unseeded_projection.candidates[1].unlockers[1].status == "not-evaluated"
+  and unseeded_projection.candidates[1].first_failure.kind == "cycle"
+  and unseeded_projection.candidates[1].first_failure.reason == "active-unlock-pair"
+  and unseeded_projection.candidates[1].first_failure.recipe == "B-from-A"
+  and unseeded_projection.candidates[1].first_failure.technology == "SharedUnlock",
+  "The diagnostic projection identifies the active recipe/unlocker pair closing the unseeded cycle: " .. serpent.line(unseeded_projection))
 reset(same_unlocker_world(false))
 local same_unlocker_b_cold = production.pack_production_status("B", {})
 local same_unlocker_a_warm = production.pack_production_status("A", {})
@@ -1546,7 +1941,11 @@ local function contextual_reason_fanout_world(width)
       ["shared-inner"] = {type = "item"}
     },
     labs = {lab = {inputs = {"fanout-pack"}}},
-    techs = {SharedInnerUnlock = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}}},
+    techs = {SharedInnerUnlock = {
+      enabled = true,
+      research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = "shared-inner-recipe"}}
+    }},
     recipe_prototypes = prototypes,
     recipe_facts = facts,
     producers = {
@@ -1569,7 +1968,128 @@ context.services["science.technology_researchability_reason"] = function(_, reas
 end
 check("U05", production.pack_production_status("fanout-pack", {}) == "unreachable"
   and contextual_reason_calls == 1,
-  "Repeated producer fan-out reuses one exact contextual technology rejection")
+  "Repeated producer fan-out reuses one exact contextual technology rejection; calls=" .. contextual_reason_calls)
+
+-- A reachable unlocker can still have an impossible ingredient route. Reuse
+-- that completed rejection for identical sibling queries, rather than proving
+-- the same unavailable intermediate once per outer producer.
+local rejected_fanout_world = contextual_reason_fanout_world(24)
+rejected_fanout_world.resources = {}
+reset(rejected_fanout_world)
+local saved_recipe_witness = feasibility.recipe_witness
+local rejected_inner_calls = 0
+feasibility.recipe_witness = function(recipe_name, ...)
+  if recipe_name == "shared-inner-recipe" then rejected_inner_calls = rejected_inner_calls + 1 end
+  return saved_recipe_witness(recipe_name, ...)
+end
+local rejected_fanout_status = production.pack_production_status("fanout-pack", {})
+feasibility.recipe_witness = saved_recipe_witness
+check("U06", rejected_fanout_status == "unreachable" and rejected_inner_calls == 1,
+  "Identical failed unlock/acquisition contexts reuse one completed route rejection; calls=" .. rejected_inner_calls)
+
+-- B first fails while A is active in an enabled cycle. After that branch has
+-- failed, a sibling asks for B without A active and can use A's independent
+-- seed. A name-only negative cache would incorrectly hide this valid route.
+local function negative_context_world(seeded)
+  return {
+    item_prototypes = {["context-pack"] = {type = "item"}},
+    labs = {lab = {inputs = {"context-pack"}}},
+    techs = {UnlockB = {enabled = true, research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = "locked-B"}}}},
+    recipe_prototypes = {
+      ["a-failing-root"] = {name = "a-failing-root"}, ["z-success-root"] = {name = "z-success-root"},
+      ["a-loop-A"] = {name = "a-loop-A"}, ["z-seed-A"] = {name = "z-seed-A"},
+      ["locked-B"] = {name = "locked-B"}
+    },
+    recipe_facts = {
+      ["a-failing-root"] = route_fact("context-pack", {{name = "A", amount = 1}, {name = "missing-root", amount = 1}}),
+      ["z-success-root"] = route_fact("context-pack", {{name = "B", amount = 1}}),
+      ["a-loop-A"] = route_fact("A", {{name = "B", amount = 1}}),
+      ["z-seed-A"] = route_fact("A", {{name = "seed-ore", amount = 1}}),
+      ["locked-B"] = route_fact("B", {{name = "A", amount = 1}}, {enabled = false})
+    },
+    producers = {["context-pack"] = {"a-failing-root", "z-success-root"},
+      A = {"a-loop-A", "z-seed-A"}, B = {"locked-B"}},
+    unlockers = {["locked-B"] = {"UnlockB"}},
+    resources = seeded and {seed = {minable = {result = "seed-ore", count = 1}}} or {}
+  }
+end
+reset(negative_context_world(true))
+check("U07", production.pack_production_status("context-pack", {}) == "research",
+  "A failed active-identity context cannot poison a later independently seeded sibling")
+reset(negative_context_world(false))
+check("U08", production.pack_production_status("context-pack", {}) == "unreachable",
+  "The matching unseeded cycle remains unreachable after negative memoization")
+
+reset({
+  item_prototypes = {["memo-pack"] = {type = "item"}},
+  labs = {lab = {inputs = {"memo-pack"}}},
+  techs = {MemoUnlock = {enabled = true, unit = {count = 1, time = 1, ingredients = {{"memo-pack", 1}}}}},
+  recipe_prototypes = {ordinary_one = {name = "ordinary_one"}, ordinary_two = {name = "ordinary_two"},
+    self_pack = {name = "self_pack"}, seed_pack = {name = "seed_pack"}},
+  recipe_facts = {ordinary_one = route_fact("ordinary-one"), ordinary_two = route_fact("ordinary-two"),
+    self_pack = route_fact("memo-pack", {}, {enabled = false}), seed_pack = route_fact("memo-pack")},
+  producers = {["memo-pack"] = {"seed_pack"}}, unlockers = {}, resources = {}
+})
+check("U09", production.pack_production_status("memo-pack", {}) == "initial",
+  "The mechanism memo fixture starts with a real independently proved pack root")
+local mechanism_memo, mechanism_calls = {}, 0
+context.services["science.pack_production_status"] = function(...)
+  mechanism_calls = mechanism_calls + 1
+  return production.pack_production_status(...)
+end
+local ordinary_one_reason = researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_one", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+local ordinary_two_reason = researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+check("U10", ordinary_one_reason == nil and ordinary_two_reason == nil and mechanism_calls == 1,
+  "Distinct ordinary recipes share one researchability evaluation only after its science roots are proved")
+local independent_calls = 0
+context.services["science.independent_pack_acquisition_witness"] = function()
+  independent_calls = independent_calls + 1
+  return nil
+end
+check("U11", researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "self_pack", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+    == "science-self-lock-memo-pack" and independent_calls == 1,
+  "A self-producing recipe still asks the independent route service and cannot borrow an ordinary recipe's result")
+check("U12", researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {["memo-pack"] = true}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+    == "unreachable-science-memo-pack",
+  "A changed active pack boundary cannot borrow a successful mechanism result")
+check("U13", researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_two", visiting_packs = {}, visiting_technologies = {MemoUnlock = true}, mechanism_memo = mechanism_memo})
+    == "technology-cycle",
+  "A changed active technology boundary retains its cycle rejection")
+world.recipe_source_epoch = 2
+world.producers["memo-pack"] = {}
+check("U14", researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_one", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = mechanism_memo})
+    == "unreachable-science-memo-pack",
+  "A source epoch change invalidates the old root-qualified mechanism answer")
+
+world.recipe_source_epoch = 1
+world.producers["memo-pack"] = {"seed_pack"}
+reset(world)
+local cold_mechanism_memo, cold_mechanism_calls = {}, 0
+context.services["science.pack_production_status"] = function(...)
+  cold_mechanism_calls = cold_mechanism_calls + 1
+  return production.pack_production_status(...)
+end
+local cold_reasons = {}
+local cold_first_reason = researchability.reason_with_context("MemoUnlock", {
+  unlock_recipe_name = "ordinary_one", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = cold_mechanism_memo})
+local cold_root_unresolved = context:state_view("science_pack_production").entries["memo-pack"] == nil
+local cold_root_status = production.pack_production_status("memo-pack", {})
+cold_reasons[1] = cold_first_reason or false
+for _, recipe_name in ipairs({"ordinary_two", "ordinary_one"}) do
+  cold_reasons[#cold_reasons + 1] = researchability.reason_with_context("MemoUnlock", {
+    unlock_recipe_name = recipe_name, visiting_packs = {}, visiting_technologies = {}, mechanism_memo = cold_mechanism_memo}) or false
+end
+check("U15", cold_root_unresolved and cold_root_status == "initial"
+  and cold_reasons[1] == false and cold_reasons[2] == false and cold_reasons[3] == false
+  and cold_mechanism_calls == 2,
+  "The unresolved root bypasses mechanism sharing; only its subsequent proved-root evaluation may be reused")
 
 -- The bounded status pass needs exactly four visits to establish that this
 -- physical lab input has no recipe. An old trace then repeated the existence
@@ -1647,7 +2167,7 @@ check('D22', not actual_lab_compatibility.valid_research_ingredients({
 }, lab_comparison_observer) and lab_comparison_observer.stopped and lab_comparison_observer.visits <= 11,
   'Actual any_lab_accepts_all/lab_accepts_all input and pack comparisons are bounded')
 
--- Build the real canonical index once in the parent, erase its telemetry, and
+-- Build the controlled parent index once, erase its telemetry, and
 -- run a capped projection. The observation must borrow that exact immutable
 -- snapshot; a missing borrow would rebuild recipe facts in the fresh context
 -- and recreate recipe-index telemetry before the cap can stop traversal.
@@ -1675,8 +2195,8 @@ data.raw = {
 }
 active_context = nil
 context = new_context()
-local actual_recipe_facts = require('prototypes.mir.index.recipe_facts')
-local parent_recipe_index = actual_recipe_facts.index_view()
+local fixture_recipe_facts = require('prototypes.mir.index.recipe_facts')
+local parent_recipe_index = fixture_recipe_facts.index_view()
 local parent_recipe_source = context.states.recipe_source
 local parent_recipe_index_epoch = context.epochs.recipe_index
 local parent_recipe_source_epoch = context.epochs.recipe_source
@@ -1720,4 +2240,27 @@ check('D24', unavailable_projection and unavailable_projection.status == 'indete
   and last_created_context.states.compiler_telemetry == nil,
   'A missing real parent index is explicit indeterminate without index or telemetry construction')
 
+-- Load the exact F200 composition overlay under a test-only module identity.
+-- Its science facade remains real: the controlled enabled-future pack must
+-- emit both independently selected inner gates, once each, to the F200
+-- continuation qualifier.
+reset(enabled_future_gate_consumer_world())
+context.states.recipe_index = nil
+context.epochs.recipe_index = nil
+stub("prototypes.mir.settings.resolver", {base_enabled = function() return true end})
+stub("prototypes.mir.planner.prerequisites", {
+  append_end_game_gate_prerequisite = function(prereqs) return prereqs, nil end
+})
+stub("prototypes.mir.capabilities.science_integration.science_selector", {
+  apply_science_pack_ingredient_policy = function(ingredients) return ingredients end
+})
+stub("prototypes.mir.settings.effective", {get = function() return nil end})
+local f200_qualify = require("fixtures.f200.base_continuations.qualify")
+local f200_prereqs, f200_gate_reason = f200_qualify.append_end_game_prerequisite(
+  {"existing"}, {{"gated-pack", 1}, {"gated-pack", 1}})
+check("MG08", f200_gate_reason == nil and table.concat(f200_prereqs, ",") == "existing,GateOne,GateTwo",
+  "The actual F200 continuation qualifier emits both real plural gates once: "
+    .. table.concat(f200_prereqs or {}, ",") .. "; reason=" .. tostring(f200_gate_reason))
+
+if #failures > 0 then error(table.concat(failures, "\n")) end
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

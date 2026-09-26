@@ -23,11 +23,32 @@ local function strict_subset(left, right)
   return strictly_smaller
 end
 
+local function sorted_gates(route)
+  local gates, seen = {}, {}
+  for _, technology_name in ipairs(route.unlockers or {}) do
+    if technology_name and not seen[technology_name] then
+      seen[technology_name] = true
+      table.insert(gates, technology_name)
+    end
+  end
+  -- Legacy singleton routes remain comparable while the planner consumes the
+  -- plural gate contract.
+  if route.unlocker and not seen[route.unlocker] then
+    seen[route.unlocker] = true
+    table.insert(gates, route.unlocker)
+  end
+  for _, technology_name in ipairs(route.prerequisite_closure or {}) do
+    if technology_name and not seen[technology_name] then
+      seen[technology_name] = true
+      table.insert(gates, technology_name)
+    end
+  end
+  table.sort(gates)
+  return gates
+end
+
 local function graph_precedes(left, right)
-  if not left.unlocker or not right.unlocker then return false end
-  local left_closure = as_set(left.prerequisite_closure)
-  local right_closure = as_set(right.prerequisite_closure)
-  return right_closure[left.unlocker] == true and left_closure[right.unlocker] ~= true
+  return strict_subset(sorted_gates(left), sorted_gates(right))
 end
 
 local function retain_undominated(routes, precedes)
@@ -63,9 +84,9 @@ local function progression_less(left, right)
     local right_value = numeric(right_progression[field])
     if left_value ~= right_value then return left_value < right_value end
   end
-  local left_unlocker = tostring(left.unlocker or "")
-  local right_unlocker = tostring(right.unlocker or "")
-  if left_unlocker ~= right_unlocker then return left_unlocker < right_unlocker end
+  local left_gates = table.concat(sorted_gates(left), "\0")
+  local right_gates = table.concat(sorted_gates(right), "\0")
+  if left_gates ~= right_gates then return left_gates < right_gates end
   return tostring(left.recipe or "") < tostring(right.recipe or "")
 end
 

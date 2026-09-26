@@ -12,17 +12,20 @@ local function stub(name, value) package.loaded[name] = value end
 
 _G.log = function(_) end
 _G.data = {raw = {
-  item = {A = {name = "A", type = "item"}},
-  lab = {lab = {inputs = {"A"}}},
+  item = {A = {name = "A", type = "item"}, B = {name = "B", type = "item"}},
+  lab = {lab = {inputs = {"A", "B"}}},
   character = {player = {crafting_categories = {"crafting"}}},
   resource = {},
   ["offshore-pump"] = {},
   ["space-location"] = {},
   planet = {},
-  technology = {unlock_A = {
-    effects = {{type = "unlock-recipe", recipe = "make-A"}},
-    unit = {ingredients = {{name = "A", amount = 1}}}
-  }},
+  technology = {
+    unlock_A = {
+      effects = {{type = "unlock-recipe", recipe = "make-A"}},
+      unit = {ingredients = {{name = "A", amount = 1}}}
+    },
+    unlock_B = {unit = {ingredients = {{name = "B", amount = 1}}}}
+  },
   recipe = {
     ["make-A"] = {name = "make-A", enabled = true, category = "crafting", energy_required = 1, result = "A"}
   }
@@ -80,15 +83,17 @@ compiler_context.with_active(context, function()
     and production.pack_production_status("A", {}) == "initial",
     "A real source replacement invalidates warm negative status and production caches")
 
-  -- This cache records selections inferred through prereq_tech_for_science_pack,
-  -- whose answer can change with the recipe source. It is not epoch-aware, so
-  -- a source replacement must stop before it can preserve stale progression.
-  context:set_service("science.prereq_tech_for_science_pack", function(pack_name)
-    return pack_name == "A" and "unlock_A" or nil
+  -- This cache records selections inferred through all prerequisite gates,
+  -- whose answers can change with the recipe source. It is not epoch-aware,
+  -- so a source replacement must stop before it can preserve stale progression.
+  context:set_service("science.prereq_techs_for_science_pack", function(pack_name)
+    if pack_name == "A" then return {"unlock_A", "unlock_B"} end
+    return {}
   end)
   local selected = selection_policy.mod_progression_packs_for({"A"})
-  check("R06A", #selected == 1 and selected[1] == "A" and context:has_state("mod_progression_cache"),
-    "The real mod progression cache is warmed through its science prerequisite service")
+  check("R06A", #selected == 2 and selected[1] == "A" and selected[2] == "B"
+    and context:has_state("mod_progression_cache"),
+    "The real mod progression cache traverses every plural science prerequisite gate")
 
   -- The replacement contract intentionally stops before broader immutable
   -- compilation snapshots and recipe-derived cache boundaries. It refreshes

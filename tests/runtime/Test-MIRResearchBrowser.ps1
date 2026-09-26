@@ -18,7 +18,7 @@ if([string]::IsNullOrWhiteSpace($CandidateZip)) {
 } else { $candidate=(Resolve-Path (Join-Path $repo $CandidateZip)).Path }
 $archive=[IO.Compression.ZipFile]::OpenRead($candidate)
 try {
- foreach($name in @('research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')) {
+ foreach($name in @('research_browser.lua','research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')) {
   $entry=@($archive.Entries | Where-Object FullName -Like "*/prototypes/mir/runtime/$name")
   if($entry.Count -ne 1) { throw "Candidate must contain exactly one $name." }
   $stream=$entry[0].Open()
@@ -42,7 +42,9 @@ foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{n
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='more-infinite-research';enabled=$true},@{name='mir-browser-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
-"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n" | Set-Content (Join-Path $run 'config.ini')
+# This fixture exercises research/GUI state, not the player's blueprint library.
+# Keep Steam from copying that library into each isolated acceptance directory.
+"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n[other]`ndisable-blueprint-storage=true`nenable-blueprint-storage-cloud-sync=false`n" | Set-Content (Join-Path $run 'config.ini')
 $save=Join-Path $run 'probe.zip'
 function Invoke-BrowserEngine([string[]]$Arguments) {
  $start=[Diagnostics.ProcessStartInfo]::new($engine)
@@ -70,6 +72,8 @@ if($result.status -ne 'passed') { throw "Browser acceptance failed: $resultPath"
 $result | Add-Member package_sha256 (Get-FileHash $candidate).Hash
 $result | Add-Member engine_sha256 (Get-FileHash $engine).Hash
 $result | Add-Member core_sha256 (Get-FileHash (Join-Path $repo 'source/prototypes/mir/runtime/research_browser_core.lua')).Hash
+$result | Add-Member host_sha256 (Get-FileHash (Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua')).Hash
+$result | Add-Member provider_sha256 (Get-FileHash (Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua')).Hash
 $result | Add-Member catalogue_adapter_sha256 (Get-FileHash (Join-Path $repo 'source/prototypes/mir/runtime/research_browser_factorio_catalogue.lua')).Hash
 $result | Add-Member action_predicate_sha256 (Get-FileHash (Join-Path $repo 'source/prototypes/mir/runtime/research_browser_actions.lua')).Hash
 $result | Add-Member harness_sha256 (Get-FileHash $PSCommandPath).Hash

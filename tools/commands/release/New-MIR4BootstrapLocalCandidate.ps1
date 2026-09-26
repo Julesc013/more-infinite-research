@@ -718,7 +718,9 @@ foreach ($targetPlan in $targets) {
       -SchemaRoot (Join-Path $RepoRoot 'spec/schemas')
   }
 
-  $tempParent = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  $tempParent = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/tmp'))
+  $null = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path $tempParent
+  New-Item -ItemType Directory -Force -Path $tempParent | Out-Null
   $constructionTaskRoot = Join-Path $tempParent ("mir4-bootstrap-" + [guid]::NewGuid().ToString('N'))
   $null = Assert-MIR4DescendantPath -Root $tempParent -Path $constructionTaskRoot
   New-Item -ItemType Directory -Path $constructionTaskRoot | Out-Null

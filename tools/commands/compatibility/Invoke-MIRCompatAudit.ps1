@@ -48,6 +48,9 @@ param(
 )
 
 $compatAuditCommandRoot = $PSScriptRoot
+# Dot-sourced modules have their own automatic parameter metadata. Preserve
+# the caller's explicit manifest choice before loading them.
+$compatAuditManualScenariosExplicit = $PSBoundParameters.ContainsKey('ManualScenariosPath')
 . (Join-Path $compatAuditCommandRoot 'compat-audit/Configuration.ps1')
 . (Join-Path $compatAuditCommandRoot 'compat-audit/InputDiscovery.ps1')
 . (Join-Path $compatAuditCommandRoot 'compat-audit/ScenarioDefinitions.ps1')

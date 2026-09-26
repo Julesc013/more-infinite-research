@@ -258,9 +258,12 @@ function New-MIRPerformanceStagingRoot {
     [Parameter(Mandatory)][string]$FactorioBinarySha256,
     [Parameter(Mandatory)][string]$DurableDestination,
     [ValidateRange(1, 9999)][int]$AttemptOrdinal = 1,
-    [string[]]$ScratchRootCandidates = @("C:\mir-tmp", "C:\tmp", [IO.Path]::GetTempPath())
+    [string[]]$ScratchRootCandidates = @()
   )
 
+  if ($ScratchRootCandidates.Count -eq 0) {
+    throw 'Performance staging requires an explicit scratch root; the qualification command supplies its project-owned default.'
+  }
   foreach ($field in @(
     @{name="PlanFingerprint";value=$PlanFingerprint},
     @{name="CandidateSha256";value=$CandidateSha256},

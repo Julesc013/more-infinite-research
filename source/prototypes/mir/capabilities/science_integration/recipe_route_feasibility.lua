@@ -11,6 +11,20 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 
+-- Acquisition alternatives remain complete, but ordinary production is tried
+-- before reverse recycling routes. A known forward route should not first
+-- traverse every item whose recycling can return this same ingredient.
+function M.sort_acquisition_producers(names, index)
+  local facts = index and index.facts or {}
+  table.sort(names, function(left, right)
+    local left_recycling = facts[left] and facts[left].source_class == "recycling" or false
+    local right_recycling = facts[right] and facts[right].source_class == "recycling" or false
+    if left_recycling ~= right_recycling then return not left_recycling end
+    return left < right
+  end)
+  return names
+end
+
 local MACHINE_TYPES = {
   "assembling-machine", "furnace", "mining-drill", "rocket-silo", "character"
 }
@@ -332,6 +346,30 @@ local function has_unconditional_source(sources, identity)
   return false
 end
 
+local function append_loot_sources(sources, options)
+  -- Enemy drops are concrete acquisition seeds, including the first Gleba
+  -- pentapod egg. The breeding recipe cannot seed itself without that drop.
+  for _, prototype_type in ipairs({"unit-spawner", "unit", "turret"}) do
+    for _, source in pairs(data_raw.prototypes(prototype_type)) do
+      if not diagnostic_visit(options) then return false end
+      for _, result in ipairs(source.loot or {}) do
+        if not diagnostic_visit(options) then return false end
+        local identity = normalize_identity(result)
+        if identity and identity.type == "item" and entry_positive(result) then
+          local key = identity_key(identity)
+          sources[key] = sources[key] or {}
+          table.insert(sources[key], {
+            kind = "entity-loot",
+            product = identity,
+            surface_conditions = deepcopy(source.surface_conditions)
+          })
+        end
+      end
+    end
+  end
+  return true
+end
+
 -- Boilers are prototype-defined fluid conversions rather than recipes. A
 -- boiler whose input fluid already has an unconditional natural source gives
 -- a concrete acquisition route for its declared output fluid. As with recipe
@@ -370,7 +408,7 @@ local function append_boiler_sources(sources, options)
   return true
 end
 
-local function offshore_pump_output_fluid(pump)
+local function offshore_pump_output_fluids(pump, options)
   -- Factorio 2.1 base offshore pumps take their unfiltered output directly
   -- from water tiles. Its source-offset form does not carry the former
   -- `fluid` field. The F200 profile intentionally retains its established
@@ -378,14 +416,26 @@ local function offshore_pump_output_fluid(pump)
   -- machine output shape, and must not become a natural source witness.
   -- Preserve the legacy explicit `fluid` declaration on every target.
   local declared = pump and pump.fluid
-  if type(declared) == "string" and declared ~= "" then return declared end
-  if target_profiles.current_factorio_version == "2.1" then
-    -- A fluid-box filter alone describes a pump's connection contract, not a
-    -- natural source. In particular, modded pumps can filter molten fluids
-    -- that have no independently seeded acquisition route.
-    if pump and pump.fluid_source_offset ~= nil then return "water" end
+  if type(declared) == "string" and declared ~= "" then return {declared} end
+  local fluids, seen = {}, {}
+  if target_profiles.current_factorio_version == "2.1"
+    and pump and pump.fluid_source_offset ~= nil then
+    -- The pump draws the fluid declared by the tile, including Space Age
+    -- oceans. A connection filter constrains that source; it cannot invent
+    -- one. In particular, never assume every unfiltered pump produces water.
+    local filter = pump.fluid_box and pump.fluid_box.filter
+    for _, tile in pairs(data_raw.prototypes("tile")) do
+      if not diagnostic_visit(options) then return fluids end
+      local fluid = tile.fluid
+      if type(fluid) == "string" and fluid ~= "" and not seen[fluid]
+        and (filter == nil or filter == fluid) then
+        seen[fluid] = true
+        table.insert(fluids, fluid)
+      end
+    end
   end
-  return nil
+  table.sort(fluids)
+  return fluids
 end
 
 local function default_source_catalog(state, options)
@@ -397,10 +447,15 @@ local function default_source_catalog(state, options)
   -- in data.raw.resource, so omitting their MinableProperties turns a real
   -- seeded route into a false no-source cycle.
   if not append_minable_sources(sources, "tree", "minable-entity", options) then return sources end
+  -- Space Age crops and collected asteroid chunks have concrete minable
+  -- products in separate prototype namespaces, not resource or tree.
+  if not append_minable_sources(sources, "plant", "minable-entity", options) then return sources end
+  if not append_minable_sources(sources, "asteroid-chunk", "minable-entity", options) then return sources end
+  if not append_loot_sources(sources, options) then return sources end
   for _, pump in pairs(data_raw.prototypes("offshore-pump")) do
     if not diagnostic_visit(options) then return sources end
-    local identity = normalize_identity({type = "fluid", name = offshore_pump_output_fluid(pump)})
-    if identity then
+    for _, fluid in ipairs(offshore_pump_output_fluids(pump, options)) do
+      local identity = normalize_identity({type = "fluid", name = fluid})
       local key = identity_key(identity)
       sources[key] = sources[key] or {}
       table.insert(sources[key], {
@@ -468,8 +523,13 @@ local function sorted_producers(index, output_identity, options)
     if not diagnostic_visit(options) then break end
     table.insert(producers, recipe_name)
   end
-  table.sort(producers)
-  return producers
+  -- Rejection projections retain their established lexical branch order and
+  -- bounded-work accounting. The normal search alone prefers forward routes.
+  if options.diagnostic_observer ~= nil then
+    table.sort(producers)
+    return producers
+  end
+  return M.sort_acquisition_producers(producers, index)
 end
 
 local acquisition_witness
@@ -634,6 +694,7 @@ end
 local STABLE_SOURCE_KINDS = {
   ["minable-resource"] = true,
   ["minable-entity"] = true,
+  ["entity-loot"] = true,
   ["offshore-pump"] = true,
   ["boiler-conversion"] = true
 }
@@ -785,6 +846,10 @@ function M.initial_recipe_witness(recipe_name, output, options, state)
   -- later locked-route query without inheriting require_enabled=true.
   local initial_options = copy_options(options)
   initial_options.require_enabled = true
+  -- Initial availability is a strict enabled-only proof. A future
+  -- research-unlocked ingredient may establish a later route, but it must not
+  -- turn an enabled outer recipe into an initial acquisition witness.
+  initial_options.research_unlock_witness = nil
   return M.recipe_witness(recipe_name, output, initial_options, state)
 end
 

@@ -4,6 +4,9 @@ $mir42SealRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../
 if (-not (Get-Command Test-MIR4BootstrapRecordHash -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir42SealRepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 }
+if (-not (Get-Command Assert-MIR4NoReparseAncestors -ErrorAction SilentlyContinue)) {
+  . (Join-Path $mir42SealRepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
+}
 if (-not (Get-Command Get-MIR4CanonicalPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir42SealRepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 }
@@ -455,12 +458,16 @@ function Assert-MIR42SealExternalVerifierAuthority {
 
 function Assert-MIR42SealAuthorizedLedgerCommitSignature {
   param(
+    [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$RepositoryPath,
     [Parameter(Mandatory)][string]$Commit,
     [Parameter(Mandatory)]$AuthorizedSigner,
     [Parameter(Mandatory)][string]$SshKeygenPath
   )
-  $scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir42-ledger-commit-' + [guid]::NewGuid().ToString('N'))
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $scratchRoot = Assert-MIR4NoReparseAncestors -Root $repo -Path (Join-Path $repo 'build/tmp')
+  if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+  $scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ('mir42-ledger-commit-' + [guid]::NewGuid().ToString('N')))
   try {
     New-Item -ItemType Directory -Force -Path $scratch | Out-Null
     $publicKeyPath = Join-Path $scratch 'ledger.pub'; $allowedSignersPath = Join-Path $scratch 'allowed-signers'
@@ -479,7 +486,7 @@ function Assert-MIR42SealAuthorizedLedgerCommitSignature {
       if ($process.ExitCode -ne 0) { throw "[mir42-seal-external-t16-ledger-commit-signature] $stderr" }
     } finally { $process.Dispose() }
   } finally {
-    if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+    if (Test-Path -LiteralPath $scratch) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch }
   }
 }
 
@@ -577,7 +584,7 @@ function Get-MIR42ExternalT16LedgerTrustRoot {
       $blobSha256 -cne [string]$trust.sha256) {
     throw '[mir42-seal-external-t16-ledger-binding]'
   }
-  Assert-MIR42SealAuthorizedLedgerCommitSignature -RepositoryPath $ledgerPath -Commit ([string]$record.ledger.commit) -AuthorizedSigner $record.authorized_signer -SshKeygenPath $SshKeygenPath
+  Assert-MIR42SealAuthorizedLedgerCommitSignature -RepoRoot $RepoRoot -RepositoryPath $ledgerPath -Commit ([string]$record.ledger.commit) -AuthorizedSigner $record.authorized_signer -SshKeygenPath $SshKeygenPath
   $signaturePath = Resolve-MIR42SealExternalProtectedFile -RepoRoot $RepoRoot -Path ([string]$record.trust_signature.signature_path) -Code 'mir42-seal-external-t16-trust-signature'
   Assert-MIR42SealT16AclContract -Path $signaturePath -AclContract $AclContract -Code 'mir42-seal-external-t16-trust-signature'
   Assert-MIR42SealT16AclProtectedAncestors -ArtifactPath $signaturePath -ProtectedRootPath $protectedRoot -AclContract $AclContract -Code 'mir42-seal-external-t16-trust-signature'
@@ -587,7 +594,9 @@ function Get-MIR42ExternalT16LedgerTrustRoot {
   $payload = ConvertTo-MIR4BootstrapCanonicalJson -Value (Get-MIR42T16TrustRootSignaturePayload -Record $record)
   $payloadSha = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($payload)))
   if ([string]$record.trust_signature.payload_sha256 -cne $payloadSha) { throw '[mir42-seal-external-t16-trust-signature-payload]' }
-  $scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir42-t16-trust-root-' + [guid]::NewGuid().ToString('N'))
+  $scratchRoot = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path (Join-Path $RepoRoot 'build/tmp')
+  if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+  $scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ('mir42-t16-trust-root-' + [guid]::NewGuid().ToString('N')))
   try {
     New-Item -ItemType Directory -Force -Path $scratch | Out-Null
     $publicKeyPath = Join-Path $scratch 'operator.pub'; $authorizedSignerPath = Join-Path $scratch 'authorized-signer.pub'; $reviewerPath = Join-Path $scratch 'reviewer.pub'; $payloadPath = Join-Path $scratch 'trust-root.json'
@@ -602,7 +611,7 @@ function Get-MIR42ExternalT16LedgerTrustRoot {
       throw '[mir42-seal-external-t16-trust-signature-verification]'
     }
   } finally {
-    if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+    if (Test-Path -LiteralPath $scratch) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch }
   }
   return [pscustomobject][ordered]@{path=$trust.path;sha256=$trust.sha256;record=$record;operator=$operator;verifier=$verifier;protected_root=$protectedRoot;immutable_anchor=$immutableAnchor;acl_contract=$AclContract}
 }
@@ -1266,7 +1275,9 @@ function Assert-MIR42SourceFreezeLedgerSignature {
       (Get-FileHash -LiteralPath $signaturePath -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$signature.signature_sha256) {
     throw '[mir42-seal-freeze-ledger-signature-path]'
   }
-  $scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir42-ledger-signature-' + [guid]::NewGuid().ToString('N'))
+  $scratchRoot = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path (Join-Path $RepoRoot 'build/tmp')
+  if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+  $scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ('mir42-ledger-signature-' + [guid]::NewGuid().ToString('N')))
   try {
     New-Item -ItemType Directory -Force -Path $scratch | Out-Null
     $publicKey = Join-Path $scratch 'ledger-signing.pub'
@@ -1277,7 +1288,7 @@ function Assert-MIR42SourceFreezeLedgerSignature {
       throw '[mir42-seal-freeze-ledger-signature-verification]'
     }
   } finally {
-    if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+    if (Test-Path -LiteralPath $scratch) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch }
   }
 }
 
@@ -1377,7 +1388,9 @@ function Get-MIR42IndependentReviewerAttestation {
       (Get-FileHash -LiteralPath $signaturePath -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$record.review_signature.signature_sha256) {
     throw '[mir42-seal-reviewer-signature-path]'
   }
-  $scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir42-review-signature-' + [guid]::NewGuid().ToString('N'))
+  $scratchRoot = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path (Join-Path $RepoRoot 'build/tmp')
+  if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+  $scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ('mir42-review-signature-' + [guid]::NewGuid().ToString('N')))
   try {
     New-Item -ItemType Directory -Force -Path $scratch | Out-Null
     $publicKey = Join-Path $scratch 'reviewer.pub'; $payloadPath = Join-Path $scratch 'review.json'
@@ -1388,7 +1401,7 @@ function Get-MIR42IndependentReviewerAttestation {
       throw '[mir42-seal-reviewer-signature-verification]'
     }
   } finally {
-    if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+    if (Test-Path -LiteralPath $scratch) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch }
   }
   return $attestation
 }

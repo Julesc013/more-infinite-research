@@ -7,8 +7,8 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 
-local function prereq_tech_for_science_pack(...)
-  local service = compiler_context.current():service("science.prereq_tech_for_science_pack")
+local function prereq_techs_for_science_pack(...)
+  local service = compiler_context.current():service("science.prereq_techs_for_science_pack")
   if not service then error("MIR science prerequisite service is not registered in CompilerContext.", 2) end
   return service(...)
 end
@@ -163,7 +163,9 @@ function M.mod_progression_packs_for(selected_packs)
     for _, prerequisite in ipairs(prerequisites) do walk_tech(prerequisite) end
     collect_tech_science(tech)
   end
-  for _, pack in ipairs(selected_packs or {}) do walk_tech(prereq_tech_for_science_pack(pack)) end
+  for _, pack in ipairs(selected_packs or {}) do
+    for _, prerequisite in ipairs(prereq_techs_for_science_pack(pack) or {}) do walk_tech(prerequisite) end
+  end
   for _, pack in ipairs(M.official_progression_packs_for(selected_packs)) do inferred[pack] = true end
   cache[key] = pack_registry.ordered_pack_list_from_set(inferred)
   return deepcopy(cache[key])

@@ -9,11 +9,9 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$policy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
-if(-not [bool]$policy.qualification.current_engine_api_prototype_data_mod_capsule_admitted) {
-  throw '[mir4-researchability-planning-f210-engine-admission-pending]'
-}
-# The resolver is the sole engine-admission path: it binds the current policy,
+# This maintainer-authorized controlled diagnostic uses the exact pre-freeze engine lock.
+# Public ecosystem/API qualification is a separate claim, not its prerequisite.
+# The resolver binds the current policy,
 # exact authorized Steam path/branch/manifest/build, and the 2.1.18+ floor
 # before this harness can create a process.
 $engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin
@@ -36,11 +34,15 @@ $modules=[ordered]@{
   'prototypes.mir.graph.researchability_index'='source/prototypes/mir/graph/researchability_index.lua'
   'prototypes.mir.index.recipe_unlocks'='source/prototypes/mir/index/recipe_unlocks.lua'
   'prototypes.mir.capabilities.science_integration.pack_registry'='source/prototypes/mir/capabilities/science_integration/pack_registry.lua'
+  'prototypes.mir.capabilities.science_integration.lab_compatibility'='source/prototypes/mir/capabilities/science_integration/lab_compatibility.lua'
   'prototypes.mir.capabilities.science_integration.recipe_unlock_facts'='source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua'
-  'prototypes.mir.capabilities.science_integration.recipe_route_feasibility'='source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'
+ 'prototypes.mir.capabilities.science_integration.recipe_route_feasibility'='source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'
  'prototypes.mir.capabilities.science_integration.production_route_policy'='source/prototypes/mir/capabilities/science_integration/production_route_policy.lua'
  'prototypes.mir.capabilities.science_integration.technology_researchability'='source/prototypes/mir/capabilities/science_integration/technology_researchability.lua'
  'prototypes.mir.capabilities.science_integration.pack_production_reachability'='source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
+ 'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
+ 'prototypes.mir.capabilities.science_integration.science_packs'='source/prototypes/mir/capabilities/science_integration/science_packs.lua'
+ 'fixtures.f200.base_continuations.qualify'='source/adapters/f200/prototypes/mir/planner/base_continuations/qualify.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')

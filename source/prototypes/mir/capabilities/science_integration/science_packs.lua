@@ -25,12 +25,22 @@ function S.ensure_services(context)
   if not context:has_service(SERVICE_PREFIX .. "technology_researchability_reason") then
     context:set_service(SERVICE_PREFIX .. "technology_researchability_reason",
       technology_researchability.reason_with_context)
+  end
+  if not context:has_service(SERVICE_PREFIX .. "pack_production_status") then
     context:set_service(SERVICE_PREFIX .. "pack_production_status",
       pack_production_reachability.pack_production_status)
+  end
+  if not context:has_service(SERVICE_PREFIX .. "independent_pack_acquisition_witness") then
     context:set_service(SERVICE_PREFIX .. "independent_pack_acquisition_witness",
       pack_production_reachability.independent_pack_acquisition_witness)
+  end
+  if not context:has_service(SERVICE_PREFIX .. "prereq_tech_for_science_pack") then
     context:set_service(SERVICE_PREFIX .. "prereq_tech_for_science_pack",
       pack_production_reachability.prereq_tech_for_science_pack)
+  end
+  if not context:has_service(SERVICE_PREFIX .. "prereq_techs_for_science_pack") then
+    context:set_service(SERVICE_PREFIX .. "prereq_techs_for_science_pack",
+      pack_production_reachability.prereq_techs_for_science_pack)
   end
   if not context:has_service(SERVICE_PREFIX .. "production_route_for_pack") then
     context:set_service(SERVICE_PREFIX .. "production_route_for_pack",
@@ -65,6 +75,7 @@ S.pack_list_for_extension = science_selection_policy.pack_list_for_extension
 S.pack_production_status = ready(pack_production_reachability.pack_production_status)
 S.researchable_unlockers_for_recipe = ready(pack_production_reachability.researchable_unlockers_for_recipe)
 S.prereq_tech_for_science_pack = ready(pack_production_reachability.prereq_tech_for_science_pack)
+S.prereq_techs_for_science_pack = ready(pack_production_reachability.prereq_techs_for_science_pack)
 S.production_route_for_pack = ready(pack_production_reachability.production_route_for_pack)
 
 S.technology_researchability_reason = ready(technology_researchability.technology_researchability_reason)

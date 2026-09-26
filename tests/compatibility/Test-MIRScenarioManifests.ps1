@@ -278,4 +278,34 @@ foreach ($profileFile in @(Get-ChildItem -LiteralPath (Join-Path $RepoRoot "fixt
   }
 }
 
-Write-Host "[ok] MIR scenario schema 2 manifests and run profiles bind canonical targets, setup, roots, settings, expected plans, timeouts, and claim levels."
+# Exercise the actual facade parameter capture and definition loader without
+# starting Factorio or resolving a mod library. An explicit manifest must not
+# acquire the default line manifest after dot-sourced modules replace metadata.
+$scenarioRoutingRepo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $scenarioRoutingRepo 'tools/lib/mir4/bootstrap-materialization/SafePaths.ps1')
+$scenarioRoutingScratch = Join-Path $scenarioRoutingRepo ('build/tmp/scenario-manifest-routing-' + [guid]::NewGuid().ToString('N'))
+Assert-MIR4NoReparseAncestors -Root (Join-Path $scenarioRoutingRepo 'build/tmp') -Path $scenarioRoutingScratch
+New-Item -ItemType Directory -Path $scenarioRoutingScratch | Out-Null
+try {
+  $scenarioRoutingPrivate = Join-Path $scenarioRoutingScratch 'private.json'
+  $scenarioRoutingSample = (Get-Content -Raw -LiteralPath (Join-Path $scenarioRoutingRepo 'validation/scenarios/local-2.1.json') | ConvertFrom-Json -Depth 40).scenarios[0]
+  $scenarioRoutingSample.name = 'private-manifest-only'
+  @{schema=2;scenarios=@($scenarioRoutingSample)} | ConvertTo-Json -Depth 40 | Set-Content -LiteralPath $scenarioRoutingPrivate -Encoding utf8
+  $scenarioRoutingFacade = Join-Path $scenarioRoutingRepo 'tools/commands/compatibility/Invoke-MIRCompatAudit.ps1'
+  . $scenarioRoutingFacade -FactorioLine '2.1' -Offline -MaxCandidates 0 -ManualScenariosPath $scenarioRoutingPrivate -ModCacheDir (Join-Path $scenarioRoutingScratch 'cache') -OutputDir (Join-Path $scenarioRoutingScratch 'explicit')
+  if (@($manual.scenarios).Count -ne 1 -or $manual.scenarios[0].name -cne 'private-manifest-only' -or
+      [IO.Path]::GetFullPath([string]$manual.scenarios[0]._source_manifest) -cne $scenarioRoutingPrivate) {
+    throw 'Explicit scenario manifest acquired default or line scenarios.'
+  }
+  . $scenarioRoutingFacade -FactorioLine '2.1' -Offline -MaxCandidates 0 -ModCacheDir (Join-Path $scenarioRoutingScratch 'cache') -OutputDir (Join-Path $scenarioRoutingScratch 'default')
+  $scenarioRoutingExpected = @('validation/scenarios/manual.json','validation/scenarios/local-2.1.json' | ForEach-Object {[IO.Path]::GetFullPath((Join-Path $scenarioRoutingRepo $_))} | Sort-Object)
+  $scenarioRoutingActual = @($manual.scenarios | ForEach-Object {[IO.Path]::GetFullPath([string]$_.'_source_manifest')} | Sort-Object -Unique)
+  if (($scenarioRoutingActual -join '|') -cne ($scenarioRoutingExpected -join '|')) {
+    throw 'Default scenario selection did not retain both default and line manifests.'
+  }
+} finally {
+  Assert-MIR4NoReparseAncestors -Root (Join-Path $scenarioRoutingRepo 'build/tmp') -Path $scenarioRoutingScratch
+  if (Test-Path -LiteralPath $scenarioRoutingScratch) {Remove-Item -LiteralPath $scenarioRoutingScratch -Recurse -Force}
+}
+
+Write-Host "[ok] MIR scenario schema 2 manifests and run profiles bind canonical targets, setup, roots, settings, expected plans, timeouts, claim levels, and explicit/default manifest selection."

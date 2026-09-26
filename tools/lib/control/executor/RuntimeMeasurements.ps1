@@ -21,7 +21,7 @@ function Invoke-MIRCPPerformanceMeasurement {
   $overlay = New-MIRCPPerformanceSourceOverlay -State $state -Source $source -Descriptor $descriptor -TargetProfile $profile -RepoRoot $repo
   $outputRoot = Join-Path $repo "build/results/control-plane-v5/performance/$([string]$state.context.context_id)"
   $outputPath = Join-Path $outputRoot "evidence.json"
-  $executionRoot = New-MIRCPCompactPerformanceArtifactRoot -State $state -Campaign $overlay.authority.campaign
+  $executionRoot = New-MIRCPCompactPerformanceArtifactRoot -State $state -Campaign $overlay.authority.campaign -RepoRoot $repo
   $artifactDestination = Join-Path $outputRoot "artifacts"
   $arguments = @{
     RepoRoot = $overlay.path
@@ -46,7 +46,7 @@ function Invoke-MIRCPPerformanceMeasurement {
     $measurementError = $_
   } finally {
     try {
-      $relocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $executionRoot -Destination $artifactDestination
+      $relocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $executionRoot -Destination $artifactDestination -RepoRoot $repo
     } catch {
       $relocationError = $_
     }

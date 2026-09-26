@@ -75,10 +75,64 @@ function Test-MIR4TechnologyAcceptanceDeclaredConsumersV1 {
   return $true
 }
 
+function Remove-MIR4TechnologyAcceptanceParityCheckoutV1 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$TemporaryRoot,
+    [Parameter(Mandatory)][string]$ExpectedLeaf
+  )
+
+  if($ExpectedLeaf-notmatch'^mir4-technology-acceptance-parity-[a-f0-9]{32}$'){
+    throw '[mir4-technology-acceptance-parity-cleanup-name]'
+  }
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $buildRoot=[IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
+  $temporaryBase=[IO.Path]::GetFullPath((Join-Path $buildRoot 'tmp')).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
+  $buildPrefix=$buildRoot+[IO.Path]::DirectorySeparatorChar
+  $temporaryPrefix=$temporaryBase+[IO.Path]::DirectorySeparatorChar
+  if(-not$temporaryBase.StartsWith($buildPrefix,[StringComparison]::OrdinalIgnoreCase)-or-not(Test-Path -LiteralPath $temporaryBase -PathType Container)){
+    throw '[mir4-technology-acceptance-parity-cleanup-base]'
+  }
+  if((Get-Item -LiteralPath $buildRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint-or
+     (Get-Item -LiteralPath $temporaryBase -Force).Attributes -band [IO.FileAttributes]::ReparsePoint){
+    throw '[mir4-technology-acceptance-parity-cleanup-reparse]'
+  }
+  $requestedRoot=[IO.Path]::GetFullPath($TemporaryRoot)
+  if(-not$requestedRoot.StartsWith($temporaryPrefix,[StringComparison]::OrdinalIgnoreCase)-or
+     (Split-Path -Parent $requestedRoot)-ine$temporaryBase-or
+     (Split-Path -Leaf $requestedRoot)-cne$ExpectedLeaf){
+    throw '[mir4-technology-acceptance-parity-cleanup-containment]'
+  }
+  if(-not(Test-Path -LiteralPath $requestedRoot)){return}
+  $item=Get-Item -LiteralPath $requestedRoot -Force
+  $cleanupRoot=(Resolve-Path -LiteralPath $requestedRoot).ProviderPath
+  if(-not$cleanupRoot.StartsWith($temporaryPrefix,[StringComparison]::OrdinalIgnoreCase)-or
+     (Split-Path -Parent $cleanupRoot)-ine$temporaryBase-or
+     $item.Attributes -band [IO.FileAttributes]::ReparsePoint-or
+     (Split-Path -Leaf $cleanupRoot)-cne$ExpectedLeaf){
+    throw '[mir4-technology-acceptance-parity-cleanup-containment]'
+  }
+  Remove-Item -LiteralPath $cleanupRoot -Recurse -Force
+  if(Test-Path -LiteralPath $cleanupRoot){throw '[mir4-technology-acceptance-parity-cleanup-failed]'}
+}
+
 function Get-MIR4TechnologyAcceptanceFunctionalParityV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-  $tempRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir4-technology-acceptance-parity-'+[guid]::NewGuid().ToString('N'))
+  $buildRoot=[IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
+  $temporaryBase=[IO.Path]::GetFullPath((Join-Path $buildRoot 'tmp')).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
+  $buildPrefix=$buildRoot+[IO.Path]::DirectorySeparatorChar
+  if(-not$temporaryBase.StartsWith($buildPrefix,[StringComparison]::OrdinalIgnoreCase)){throw '[mir4-technology-acceptance-parity-temporary-containment]'}
+  if(-not(Test-Path -LiteralPath $temporaryBase)){New-Item -ItemType Directory -Path $temporaryBase -Force|Out-Null}
+  if((Get-Item -LiteralPath $buildRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint-or
+     (Get-Item -LiteralPath $temporaryBase -Force).Attributes -band [IO.FileAttributes]::ReparsePoint){
+    throw '[mir4-technology-acceptance-parity-temporary-reparse]'
+  }
+  $temporaryBase=(Resolve-Path -LiteralPath $temporaryBase).ProviderPath.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
+  if(-not$temporaryBase.StartsWith($buildPrefix,[StringComparison]::OrdinalIgnoreCase)){throw '[mir4-technology-acceptance-parity-temporary-resolution]'}
+  $tempLeaf='mir4-technology-acceptance-parity-'+[guid]::NewGuid().ToString('N')
+  $tempRoot=[IO.Path]::GetFullPath((Join-Path $temporaryBase $tempLeaf))
+  if(-not$tempRoot.StartsWith($temporaryBase+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw '[mir4-technology-acceptance-parity-temporary-containment]'}
   New-Item -ItemType Directory -Path $tempRoot|Out-Null
   try{
     $alternative=[ordered]@{
@@ -111,7 +165,7 @@ function Get-MIR4TechnologyAcceptanceFunctionalParityV1 {
       invalid_ecosystem_message=[string]$invalidMessage
     }
     return [pscustomobject][ordered]@{record=$record;digest=(Get-MIR4CanonicalDigestV1 -Value $record -Domain 'mir4:technology-acceptance-functional-parity:1')}
-  }finally{Remove-Item -LiteralPath $tempRoot -Recurse -Force}
+  }finally{Remove-MIR4TechnologyAcceptanceParityCheckoutV1 -RepoRoot $repo -TemporaryRoot $tempRoot -ExpectedLeaf $tempLeaf}
 }
 
 function Test-MIR4TechnologyAcceptanceFunctionalParityV1 {

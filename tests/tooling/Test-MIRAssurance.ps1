@@ -1396,7 +1396,8 @@ foreach ($generatedOutputExclusion in @('build/results/*', 'build/*', 'build/res
   }
 }
 
-$equivalenceRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-clean-root-equivalence-" + [guid]::NewGuid().ToString("N"))
+$equivalenceParent = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/tmp'))
+$equivalenceRoot = Join-Path $equivalenceParent ("mir-clean-root-equivalence-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
 $plannerRoot = Join-Path $equivalenceRoot "planner"
 $workerRoot = Join-Path $equivalenceRoot "worker"
 $pwshPath = (Get-Process -Id $PID).Path
@@ -1504,7 +1505,15 @@ try {
     throw 'Development-contract assurance-plan reuse was not invalidated by a scripts source change.'
   }
 } finally {
-  if (Test-Path -LiteralPath $equivalenceRoot) { Remove-Item -LiteralPath $equivalenceRoot -Recurse -Force }
+  if (Test-Path -LiteralPath $equivalenceRoot) {
+    $cleanupRoot = (Resolve-Path -LiteralPath $equivalenceRoot).ProviderPath
+    if (-not $cleanupRoot.StartsWith($equivalenceParent.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+        (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint -or
+        (Split-Path -Leaf $cleanupRoot) -notlike 'mir-clean-root-equivalence-*') {
+      throw 'Separate-root cleanup target is outside the owned scratch directory.'
+    }
+    Remove-Item -LiteralPath $cleanupRoot -Recurse -Force
+  }
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."

@@ -47,7 +47,18 @@ local function copy_plain(value, state, depth)
 end
 
 local function copy_row(row)
-  return {key = row.key, available = row.available == true, researched = row.researched == true, queued = row.queued == true, infinite = row.infinite == true}
+  local progression = type(row.progression) == "number" and row.progression == row.progression
+    and row.progression ~= math.huge and row.progression ~= -math.huge
+    and row.progression >= 0 and row.progression == math.floor(row.progression) and row.progression or 0
+  return {
+    key = row.key,
+    available = row.available == true,
+    researched = row.researched == true,
+    queued = row.queued == true,
+    infinite = row.infinite == true,
+    native_order = type(row.native_order) == "string" and string.sub(row.native_order, 1, M.detail_string_limit) or "",
+    progression = progression
+  }
 end
 
 local function bounded_string(value)
@@ -138,12 +149,12 @@ local function valid_schema2_detail(detail, key, family, cap)
     or detail.family ~= family then return false end
   local allowed = {schema = true, family = true, action = true, owner = true,
     compiler_disposition = true, final_science = true, effective_cap = true,
-    current_level = true, recipe_benefits = true, next_level_has_effective_benefit = true,
+    current_level = true, recipe_benefits = true, next_level_eligible = true, next_level_has_effective_benefit = true,
     settings = true}
   if not only_fields(detail, allowed) then return false end
   local rich = detail.owner ~= nil or detail.compiler_disposition ~= nil or detail.final_science ~= nil
     or detail.effective_cap ~= nil or detail.current_level ~= nil or detail.recipe_benefits ~= nil
-    or detail.next_level_has_effective_benefit ~= nil or detail.settings ~= nil
+    or detail.next_level_eligible ~= nil or detail.next_level_has_effective_benefit ~= nil or detail.settings ~= nil
   if not rich then return true, false end
   if type(detail.owner) ~= "table" or not only_fields(detail.owner, {technology_id = true,
       stream_id = true, action = true, reason = true, affected_recipe_ids = true})
@@ -168,15 +179,30 @@ local function valid_schema2_detail(detail, key, family, cap)
     if type(ingredient) ~= "table" or not only_fields(ingredient, {name = true, amount = true})
       or not bounded_string(ingredient.name) or not finite_positive(ingredient.amount) then return false end
   end
-  if not finite_positive_integer(detail.effective_cap) or detail.effective_cap ~= cap
-    or not finite_positive_integer(detail.current_level)
+  local capped = cap ~= nil
+  if not finite_positive_integer(detail.current_level)
     or type(detail.next_level_has_effective_benefit) ~= "boolean"
     or not dense_array(detail.recipe_benefits) then return false end
-  local settings = detail.settings
-  if type(settings) ~= "table" or not only_fields(settings, {maximum_level = true, enabled = true})
-    or not valid_setting(settings.maximum_level, "ips-max-level-" .. family, "number")
-    or not valid_setting(settings.enabled, "ips-enable-" .. family, "boolean")
-    or settings.maximum_level.effective ~= cap then return false end
+  -- Existing finite-cap schema-2 providers derived this from the cap. The
+  -- explicit field is needed only where an unbounded technology has no cap
+  -- for the portable core to inspect.
+  local next_level_eligible = detail.next_level_eligible
+  if capped and next_level_eligible == nil then
+    next_level_eligible = detail.current_level <= cap
+  elseif type(next_level_eligible) ~= "boolean" then
+    return false
+  end
+  if capped then
+    if next_level_eligible and detail.current_level > cap then return false end
+    local settings = detail.settings
+    if not finite_positive_integer(detail.effective_cap) or detail.effective_cap ~= cap
+      or type(settings) ~= "table" or not only_fields(settings, {maximum_level = true, enabled = true})
+      or not valid_setting(settings.maximum_level, "ips-max-level-" .. family, "number")
+      or not valid_setting(settings.enabled, "ips-enable-" .. family, "boolean")
+      or settings.maximum_level.effective ~= cap then return false end
+  elseif detail.effective_cap ~= nil or detail.settings ~= nil then
+    return false
+  end
   local benefit_ids, any_effective, previous = {}, false, nil
   for index, benefit in ipairs(detail.recipe_benefits) do
     if type(benefit) ~= "table" or not only_fields(benefit, {recipe_id = true, effect_change = true,
@@ -186,7 +212,7 @@ local function valid_schema2_detail(detail, key, family, cap)
       or benefit.current_productivity_bonus > benefit.maximum_productivity
       or type(benefit.next_level_has_effective_benefit) ~= "boolean"
       or (previous and benefit.recipe_id <= previous) then return false end
-    local expected_effective = detail.current_level <= cap
+    local expected_effective = next_level_eligible
       and benefit.current_productivity_bonus < benefit.maximum_productivity - 0.000000001
     if benefit.next_level_has_effective_benefit ~= expected_effective then return false end
     benefit_ids[index], previous = benefit.recipe_id, benefit.recipe_id
@@ -253,7 +279,10 @@ local function normalized_view(view)
   local page = math.max(1, math.floor(tonumber(view.page) or 1))
   local search = type(view.search) == "string" and string.sub(view.search, 1, 160) or ""
   local family = type(view.family) == "string" and view.family or "all"
-  local sort = view.sort == "name-desc" and "name-desc" or "name-asc"
+  local sort = view.sort == "name-asc" and "name-asc"
+    or view.sort == "name-desc" and "name-desc"
+    or view.sort == "native" and "native"
+    or "progression"
   return {mode = mode, status = status, page = page, search = string.lower(search), family = family, sort = sort, hidden = type(view.hidden) == "table" and view.hidden or {}}
 end
 
@@ -274,6 +303,23 @@ local function status_matches(row, status)
   return row.queued
 end
 
+local function family_matches(family, selected)
+  return selected == "all" or (selected == "mir" and family ~= "external") or family == selected
+end
+
+local function sort_rows(left, right, sort)
+  if sort == "name-desc" then return left.key > right.key end
+  if sort == "name-asc" then return left.key < right.key end
+  if sort == "native" then
+    if left.native_order ~= right.native_order then return left.native_order < right.native_order end
+    if left.progression ~= right.progression then return left.progression < right.progression end
+  else
+    if left.progression ~= right.progression then return left.progression < right.progression end
+    if left.native_order ~= right.native_order then return left.native_order < right.native_order end
+  end
+  return left.key < right.key
+end
+
 -- Query only accepts copied, plain catalogue DTOs. It returns a fresh plain
 -- page so a consumer cannot retain adapter-owned state.
 function M.query(catalogue, view, enrichment, localized_search)
@@ -290,12 +336,13 @@ function M.query(catalogue, view, enrichment, localized_search)
       local mode_ok = v.mode == 1 or (v.mode == 2 and not row.infinite) or (v.mode == 3 and row.infinite)
       local search = string.lower(row.key .. " " .. family .. " " .. localized_search_text(localized_search, row.key))
       local search_ok = v.search == "" or string.find(search, v.search, 1, true) ~= nil
-      if mode_ok and status_matches(row, v.status) and (v.family == "all" or family == v.family) and not v.hidden[row.key] and search_ok then selected[#selected + 1] = row end
+      if mode_ok and status_matches(row, v.status) and family_matches(family, v.family)
+        and not v.hidden[row.key] and search_ok then selected[#selected + 1] = row end
     end
   end
   table.sort(selected, function(left, right)
     if left.key == right.key then return false end
-    return v.sort == "name-desc" and left.key > right.key or left.key < right.key
+    return sort_rows(left, right, v.sort)
   end)
   local pages = math.max(1, math.ceil(#selected / M.page_size))
   local page = math.min(v.page, pages)
@@ -331,10 +378,13 @@ end
 function M.family_names(enrichment)
   enrichment = M.normalize_enrichment(enrichment)
   local known, names = {all = true, external = true}, {"all", "external"}
+  local extras = {}
   for _, family in pairs((enrichment and enrichment.families) or {}) do
-    if type(family) == "string" and not known[family] then known[family] = true; names[#names + 1] = family end
+    if type(family) == "string" and not known[family] then known[family] = true; extras[#extras + 1] = family end
   end
-  table.sort(names)
+  table.sort(extras)
+  if #extras > 0 then table.insert(names, 1, "mir") end
+  for _, family in ipairs(extras) do names[#names + 1] = family end
   return names
 end
 

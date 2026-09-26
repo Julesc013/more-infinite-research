@@ -1,5 +1,9 @@
 Set-StrictMode -Version Latest
 
+$script:MIR4A08ProviderRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../../..')).Path
+if (-not (Get-Command Assert-MIR4NoReparseAncestors -ErrorAction SilentlyContinue)) {
+  . (Join-Path $script:MIR4A08ProviderRepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
+}
 # A08 models the only permitted topology; it is not a release controller.
 # Every external observation is supplied by a read-only provider.  The sole
 # write-capable transport is explicit rehearsal-only candidate-ref creation.
@@ -50,8 +54,9 @@ function Get-MIR4A08CommitPackageSourceFingerprint {
   if (-not (Get-Command Get-MIRPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
     . (Join-Path $PSScriptRoot '../../validation/PackageIdentity.ps1')
   }
-  $scratchParent=Join-Path $repo 'build/mir4/a08-package-source-fingerprint'
-  $scratch=Join-Path $scratchParent ([guid]::NewGuid().ToString('N'))
+  $scratchParent=Assert-MIR4NoReparseAncestors -Root $repo -Path (Join-Path $repo 'build/tmp/a08-package-source-fingerprint')
+  if (-not (Test-Path -LiteralPath $scratchParent -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchParent | Out-Null }
+  $scratch=Assert-MIR4NoReparseAncestors -Root $scratchParent -Path (Join-Path $scratchParent ([guid]::NewGuid().ToString('N')))
   $archive=Join-Path $scratch 'candidate-source.zip'
   $extract=Join-Path $scratch 'source-tree'
   [IO.Directory]::CreateDirectory($extract)|Out-Null
@@ -68,7 +73,7 @@ function Get-MIR4A08CommitPackageSourceFingerprint {
           $_.Attributes=$_.Attributes -band (-bnot [IO.FileAttributes]::ReadOnly)
         }
       }
-      [IO.Directory]::Delete($scratch,$true)
+      Remove-MIR4BuildTree -OutputRoot $scratchParent -Path $scratch
     }
   }
 }
@@ -249,8 +254,16 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
   $assertPropertyNames = ${function:Assert-MIR4A08PropertyNames}
   $expectedFactorioVersion = ${function:Get-MIR4A08ExpectedFactorioVersion}
   $assertExactEngineVersion = ${function:Assert-MIR4A08ExactEngineVersion}
+  # Providers execute after their creator scope has returned.  Load SafePaths
+  # inside the closure so guarded scratch paths never rely on ambient imports.
+  $safePaths = Join-Path $script:MIR4A08ProviderRepoRoot 'tools/lib/mir4/bootstrap-materialization/SafePaths.ps1'
+  $scratchRepoRoot = $script:MIR4A08ProviderRepoRoot
   $provider = {
     param([object]$Authority,[object]$Candidate,[string]$Target)
+    . $safePaths
+    if (-not (Get-Command Assert-MIR4NoReparseAncestors -ErrorAction SilentlyContinue)) {
+      throw '[mir4-a08-safe-path-guard]'
+    }
     $producer = $Authority.producer
     $repository = [string]$producer.repository
     if ($repository -cne 'Julesc013/more-infinite-research' -or [string]$producer.run_id -notmatch '^[0-9]+$' -or
@@ -294,7 +307,9 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
     if ($null -ne $matches[0].workflow_run -and [int64]$matches[0].workflow_run.id -ne [int64]$run.id) {
       throw '[mir4-a08-qualification-source-artifact]'
     }
-    $scratch = Join-Path ([IO.Path]::GetTempPath()) ("mir4-a08-target-attestation-" + [guid]::NewGuid().ToString('N'))
+    $scratchRoot = Assert-MIR4NoReparseAncestors -Root $scratchRepoRoot -Path (Join-Path $scratchRepoRoot 'build/tmp')
+    if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+    $scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ("mir4-a08-target-attestation-" + [guid]::NewGuid().ToString('N')))
     [IO.Directory]::CreateDirectory($scratch) | Out-Null
     try {
       $download = @(& $GhExecutable run download ([string]$run.id) --repo $repository --name $artifactName --dir $scratch 2>&1 | ForEach-Object { [string]$_ })
@@ -333,7 +348,7 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
       try { & $assertExactEngineVersion -Target $Target -Version ([string]$attestation.engine.version) }
       catch { throw '[mir4-a08-qualification-source-artifact]' }
     } finally {
-      if (Test-Path -LiteralPath $scratch) { [IO.Directory]::Delete($scratch,$true) }
+      if (Test-Path -LiteralPath $scratch) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch }
     }
     return [pscustomobject][ordered]@{
       run_id = [string]$run.id

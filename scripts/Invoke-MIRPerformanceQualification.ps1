@@ -63,7 +63,8 @@ if ($usesGeneratedArtifactRoot) {
   $factorioSha256 = Get-MIRPerformanceRawSha256 -Path $FactorioBin
   $planFingerprint = Get-MIRPerformanceTextSha256 -Value ("$candidateSha256`n$baselineSha256`n$factorioSha256`n$(Get-MIRPerformanceRawSha256 -Path $resolvedCampaignPath)`n$ExpectedSourceCommit")
   $targetCode = "f" + $factorioLine.Replace(".", "")
-  $candidates = if ($ScratchRootCandidates.Count -gt 0) { $ScratchRootCandidates } else { @("C:\mir-tmp", "C:\tmp", [IO.Path]::GetTempPath()) }
+  # Keep this legacy deep-path runner inside the project without exceeding its 240-character budget.
+  $candidates = if ($ScratchRootCandidates.Count -gt 0) { $ScratchRootCandidates } else { @((Join-Path $RepoRoot 'build/p')) }
   $staging = New-MIRPerformanceStagingRoot -Campaign $campaign -TargetCode $targetCode -TestId "performance.qualification" `
     -PlanFingerprint $planFingerprint -CandidateSha256 $candidateSha256 -BaselineSha256 $baselineSha256 -FactorioBinarySha256 $factorioSha256 `
     -DurableDestination ("build/results/performance-custody/" + $planFingerprint.Substring(0, 16)) -AttemptOrdinal $AttemptOrdinal -ScratchRootCandidates $candidates

@@ -112,7 +112,9 @@ else { $input | Add-Member -NotePropertyName recorded_at -NotePropertyValue $Rec
 
 # Canonical records are append-only: an existing byte sequence may only be
 # accepted when the deterministic projection is identical.
-$scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir4-a00-a03-' + [guid]::NewGuid().ToString('N') + '.json')
+$scratchRoot = Assert-MIR4NoReparseAncestors -Root $repo -Path (Join-Path $repo 'build/tmp')
+if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+$scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ('mir4-a00-a03-' + [guid]::NewGuid().ToString('N') + '.json'))
 try {
   $hash = Write-MIR4BootstrapRecord -Record $input -Path $scratch
   if ($hash -cne $hash.ToUpperInvariant()) { throw '[mir4-a00-a03-record-hash-case]' }
@@ -135,4 +137,4 @@ try {
     }
   } finally { if (Test-Path -LiteralPath $ownedTemp) { Remove-Item -LiteralPath $ownedTemp -Force } }
   return $hash
-} finally { if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Force } }
+} finally { if (Test-Path -LiteralPath $scratch) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch } }

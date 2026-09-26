@@ -689,7 +689,9 @@
       "status": "package-excluded-prototype-engine-verified",
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/optional-2.1.json",
-        "spec/programmes/evidence/community-2026-09-06/optional-2.0.json"
+        "spec/programmes/evidence/community-2026-09-06/optional-2.0.json",
+        "spec/programmes/evidence/community-2026-09-26/vehicle-economy-capabilities-f200.json",
+        "spec/programmes/evidence/community-2026-09-26/vehicle-economy-capabilities-f210.json"
       ],
       "remaining_obligations": [
         "No player service admission",
@@ -706,7 +708,7 @@
       "decision": "defer-provider",
       "mechanism": "distinct engine classes",
       "proposed_scope": "Do not infer from Car support",
-      "rationale": "The verified Car setters do not establish the same facility for rolling stock or spider vehicles.",
+      "rationale": "Paired F200 2.0.77 and F210 2.1.20 native probes retain the Car positive control but fail the initial consumption_modifier read on locomotive and spider-vehicle with Entity is not car. An independent effectivity_modifier probe was not performed. The inspected base spider-vehicle also has no burner; other native or owner adapters remain unproved.",
       "implementation": "Seek exact native/owner adapters. Treat polling remaining fuel or grid-energy refunds as a separate measured experiment, not default implementation.",
       "acceptance": [
         "No universal vehicle claim from cars",
@@ -718,8 +720,16 @@
         "S20"
       ],
       "feature_group": "vehicle-economy",
-      "status": "requested-not-qualified",
-      "qualification": []
+      "status": "native-Car-setter-rejected-locomotive-spider",
+      "qualification": [
+        "spec/programmes/evidence/community-2026-09-26/vehicle-economy-capabilities-f200.json",
+        "spec/programmes/evidence/community-2026-09-26/vehicle-economy-capabilities-f210.json"
+      ],
+      "remaining_obligations": [
+        "No rolling-stock or spider service admission follows from this capability probe",
+        "Exact native or owner adapters remain open; this setter failure does not prove every alternative impossible",
+        "Fuel and grid-energy transitions, other owners, force/save lifecycle and multiplayer must be measured before a simulation is admitted"
+      ]
     },
     {
       "id": "FUEL-01",
@@ -1053,15 +1063,20 @@
         "S23"
       ],
       "feature_group": "REPAIR-02",
-      "status": "package-excluded-prototype-engine-verified",
+      "status": "implemented-passive-repair-with-open-qualification",
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/optional-2.1.json",
-        "spec/programmes/evidence/community-2026-09-06/optional-2.0.json"
+        "spec/programmes/evidence/community-2026-09-06/optional-2.0.json",
+        "spec/programmes/evidence/community-2026-09-26/passive-repair-f200-enabled.json",
+        "spec/programmes/evidence/community-2026-09-26/passive-repair-f200-default-off.json",
+        "spec/programmes/evidence/community-2026-09-26/passive-repair-f210-enabled.json",
+        "spec/programmes/evidence/community-2026-09-26/passive-repair-f210-default-off.json"
       ],
       "remaining_obligations": [
-        "No player service admission",
-        "Multiplayer, clone/quality/surface and save lifecycle qualification",
-        "Car probe does not qualify trains, spiders or every modded Car"
+        "F200/F210 default-off wall/gate service is package-admitted; older targets are not admitted",
+        "Final candidate qualification in retained overhaul profiles; current native receipts cover only base profiles",
+        "Two-client multiplayer, cloning, quality and actual surface/ownership-transfer lifecycle qualification",
+        "Current native enabled probes preserve pending and healing state across two reloads; final candidate migration remains open"
       ]
     },
     {

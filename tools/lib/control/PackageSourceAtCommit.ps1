@@ -6,7 +6,7 @@ function Get-MIRCPCommitPackageSourceHashV2 {
 
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
-  $temporaryBase=[IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
+  $temporaryBase=[IO.Path]::GetFullPath((Join-Path $repo 'build/tmp')).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
   $temporaryRoot=[IO.Path]::GetFullPath((Join-Path $temporaryBase ('mir-cp-package-'+[guid]::NewGuid().ToString('N'))))
   if(-not$temporaryRoot.StartsWith($temporaryBase+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){
     throw '[mir-cp-package-source-temporary-containment]'
@@ -31,6 +31,12 @@ function Get-MIRCPCommitPackageSourceHashV2 {
       return Get-MIRStringSha256 -Value ($rows-join"`n")
     }finally{$zip.Dispose()}
   }finally{
+    if(Test-Path -LiteralPath $temporaryRoot){
+      $cleanupRoot=(Resolve-Path -LiteralPath $temporaryRoot).ProviderPath
+      if(-not$cleanupRoot.StartsWith($temporaryBase+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)-or
+         (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint-or
+         (Split-Path -Leaf $cleanupRoot)-notlike'mir-cp-package-*'){throw '[mir-cp-package-source-cleanup-containment]'}
+    }
     if(Test-Path -LiteralPath $archive -PathType Leaf){Remove-Item -LiteralPath $archive -Force}
     if(Test-Path -LiteralPath $temporaryRoot -PathType Container){Remove-Item -LiteralPath $temporaryRoot -Force}
   }

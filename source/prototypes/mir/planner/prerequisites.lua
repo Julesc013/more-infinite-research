@@ -33,15 +33,23 @@ function M.append_end_game_gate_prerequisite(prereqs)
 
   local gate_on = startup_setting("ips-require-space-gate") == true
   if gate_on then
-    local prereq = science.prereq_tech_for_science_pack(science.end_game_science_pack())
-    if not prereq or not lookup.technology_exists(prereq) then
+    local gates = science.prereq_techs_for_science_pack(science.end_game_science_pack()) or {}
+    if #gates == 0 then
       return out, "missing_end_game_gate_prerequisite"
     end
-    if not science.technology_is_researchable(prereq) then
-      return out, "unreachable_end_game_gate_prerequisite"
+    for _, prereq in ipairs(gates) do
+      if not lookup.technology_exists(prereq) then
+        return out, "missing_end_game_gate_prerequisite"
+      end
+      if not science.technology_is_researchable(prereq) then
+        return out, "unreachable_end_game_gate_prerequisite"
+      end
     end
-    if not seen[prereq] then
-      table.insert(out, prereq)
+    for _, prereq in ipairs(gates) do
+      if not seen[prereq] then
+        seen[prereq] = true
+        table.insert(out, prereq)
+      end
     end
   end
 
@@ -64,7 +72,7 @@ function M.build_for(key, ingredients)
   end
   for _, pair in ipairs(packs or {}) do
     local pack_name = pair.name or pair[1]
-    add(science.prereq_tech_for_science_pack(pack_name))
+    for _, prereq in ipairs(science.prereq_techs_for_science_pack(pack_name) or {}) do add(prereq) end
   end
   for _, tech_name in ipairs(spec.required_technologies or {}) do
     add(tech_name)
