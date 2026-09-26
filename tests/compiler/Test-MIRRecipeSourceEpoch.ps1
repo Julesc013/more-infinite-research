@@ -9,13 +9,11 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$policy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
-if(-not [bool]$policy.qualification.current_engine_api_prototype_data_mod_capsule_admitted) {
-  throw '[mir4-recipe-source-epoch-f210-engine-admission-pending]'
-}
+# This maintainer-authorized controlled diagnostic uses the exact pre-freeze engine lock;
+# its receipt does not grant public ecosystem/API qualification.
 # The governed resolver owns the exact Steam path, branch, manifest, build,
 # file-version and 2.1.18+ floor checks. Do not replace it with a loose version
-# regex: this test may launch only an admitted current F210 engine.
+# regex: this test may launch only the exact selected current F210 engine.
 $engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin
 $engine=(Resolve-Path -LiteralPath ([string]$engineResolution.engine.path)).Path
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))

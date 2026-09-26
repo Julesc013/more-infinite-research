@@ -2,17 +2,24 @@
 local world, context, active_context, last_created_context
 local registry, recipe_unlock_facts, production, researchability, feasibility
 local checks = 0
+local failures = {}
 
 local function stub(name, value) package.loaded[name] = value end
 local function check(id, condition, detail)
   checks = checks + 1
-  if not condition then error("FAILED " .. id .. ": " .. detail) end
+  if not condition then
+    local failure = "FAILED " .. id .. ": " .. detail
+    failures[#failures + 1] = failure
+    print(failure)
+    return
+  end
   print("OBSERVED\t" .. id .. "\t" .. detail)
 end
 
 _G.log = function(_) end
 _G.data = {raw = {}, extend = function() error("Unexpected prototype mutation") end}
 local target_profile = {current_factorio_version = "2.1"}
+target_profile.current = function() return target_profile end
 stub("prototypes.mir.platform.factorio.target_profiles", target_profile)
 stub("prototypes.mir.platform.factorio.prototype_lookup", {
   item_prototype = function(name) return world.item_prototypes[name] end
@@ -149,6 +156,13 @@ local function reset(next_world)
     character = world.characters or {player = {crafting_categories = {"crafting"}}},
     resource = world.resources or {},
     tree = world.trees or {},
+    plant = world.plants or {},
+    ["asteroid-chunk"] = world.asteroid_chunks or {},
+    ["unit-spawner"] = world.unit_spawners or {},
+    unit = world.units or {},
+    turret = world.turrets or {},
+    ["assembling-machine"] = world.assembling_machines or {},
+    tile = world.tiles or {},
     ["offshore-pump"] = world.offshore_pumps or {},
     boiler = world.boilers or {},
     surface = world.surfaces or {},
@@ -650,7 +664,8 @@ check("F09C", feasibility.source_witness("same").kind == "minable-resource"
 -- water fluid, never a same-named item identity.
 reset({
   item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
-  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {}}}
+  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {}}},
+  tiles = {water = {fluid = "water"}}
 })
 local base_water_witness = feasibility.source_witness({type = "fluid", name = "water"})
 check("F09C0", base_water_witness and base_water_witness.kind == "offshore-pump"
@@ -687,6 +702,62 @@ reset({
 check("F09C2", feasibility.source_witness({type = "fluid", name = "water"}) ~= nil,
   "An F200 pump preserves an explicit fluid source declaration")
 target_profile.current_factorio_version = "2.1"
+
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  plants = {yumako = {minable = {results = {{type = "item", name = "yumako", amount = 50}}}}},
+  asteroid_chunks = {oxide = {minable = {result = "oxide-asteroid-chunk", count = 1}}},
+  offshore_pumps = {pump = {fluid_source_offset = {0, -1}, fluid_box = {}}},
+  tiles = {oil_ocean = {fluid = "heavy-oil"}, ammonia_ocean = {fluid = "ammoniacal-solution"}}
+})
+check("F09C3", feasibility.source_witness("yumako").kind == "minable-entity"
+  and feasibility.source_witness("oxide-asteroid-chunk").kind == "minable-entity",
+  "Space Age crops and asteroid chunks retain their declared natural item sources")
+check("F09C4", feasibility.source_witness({type = "fluid", name = "heavy-oil"}) ~= nil
+  and feasibility.source_witness({type = "fluid", name = "ammoniacal-solution"}) ~= nil
+  and feasibility.source_witness({type = "fluid", name = "water"}) == nil,
+  "F210 pumps use declared ocean fluids without inventing water")
+check("F09C5", feasibility.source_witness({type = "fluid", name = "yumako"}) == nil
+  and feasibility.source_witness({type = "item", name = "heavy-oil"}) == nil,
+  "Planetary item and fluid sources preserve exact product identity")
+world.offshore_pumps.pump.fluid_box.filter = "molten-nickel"
+world.recipe_source_epoch = 2
+check("F09C6", feasibility.source_witness({type = "fluid", name = "molten-nickel"}) == nil
+  and feasibility.source_witness({type = "fluid", name = "heavy-oil"}) == nil,
+  "A filtered F210 pump cannot create a fluid absent from tiles or accept a mismatched tile")
+world.offshore_pumps.pump.fluid_box.filter = nil
+world.tiles = {}
+world.recipe_source_epoch = 3
+check("F09C7", feasibility.source_witness({type = "fluid", name = "water"}) == nil,
+  "A source offset without a declared fluid tile is not a natural source")
+
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
+  recipe_facts = {eggs = route_fact("biter-egg", {}, {categories = {"captive-spawner-process"}})},
+  producers = {["biter-egg"] = {"eggs"}},
+  assembling_machines = {captive = {crafting_categories = {"captive-spawner-process"}, fixed_recipe = "eggs"}},
+  unit_spawners = {wild = {loot = {
+    {type = "item", name = "pentapod-egg", amount_min = 0, amount_max = 3},
+    {type = "item", name = "zero-drop", amount = 0},
+    {type = "item", name = "impossible-drop", amount = 3, probability = 0},
+    {type = "fluid", name = "invalid-fluid-loot", amount = 3}
+  }}}
+})
+local egg_source = feasibility.source_witness("pentapod-egg")
+check("F09C8", egg_source and egg_source.kind == "entity-loot"
+  and feasibility.source_witness({type = "fluid", name = "pentapod-egg"}) == nil,
+  "Positive enemy loot supplies its declared item seed without inventing fluid output")
+check("F09C9", feasibility.source_witness("zero-drop") == nil
+  and feasibility.source_witness("impossible-drop") == nil
+  and feasibility.source_witness({type = "fluid", name = "invalid-fluid-loot"}) == nil,
+  "Zero, impossible and non-item loot cannot seed acquisition")
+check("F09C10", feasibility.initial_recipe_witness("eggs", "biter-egg") ~= nil,
+  "A captured spawner supplies its declared recipe category")
+world.assembling_machines = {}
+data.raw["assembling-machine"] = world.assembling_machines
+world.recipe_source_epoch = 2
+check("F09C11", feasibility.initial_recipe_witness("eggs", "biter-egg") == nil,
+  "Captive-spawner recipes remain infeasible without a matching prototype category")
 
 -- Natural minable entities are separate from resource prototypes.  Trees are
 -- a real early wood source, so a route consuming wood must not be treated as
@@ -1064,8 +1135,12 @@ logistic_projection = production.pack_production_rejection_projection('logistic-
 logistic_candidate = only_candidate(logistic_projection, 'logistic-science-pack-from-self-cycle')
 check('D06', logistic_candidate and logistic_candidate.first_failure.kind == 'technology'
   and logistic_candidate.first_failure.technology == 'trace-cycle-unlocker'
-  and logistic_candidate.first_failure.reason == 'science-self-lock-logistic-science-pack',
-  'An unseeded self-cycle remains rejected and selects its concrete self-lock technology')
+  and logistic_candidate.first_failure.reason == 'technology-cycle'
+  and logistic_candidate.structural_route.status == 'rejected'
+  and logistic_candidate.unlockers[1].status == 'not-evaluated'
+  and production.pack_production_status('logistic-science-pack', {}) == 'unreachable',
+  'An unseeded self-cycle stays unreachable with the concrete recursive technology witness: '
+    .. serpent.line(logistic_candidate))
 
 reset(logistic_trace_world(
   'logistic-science-pack-from-ore',
@@ -1149,11 +1224,11 @@ reset({
   }
 })
 logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
-  limits = {candidates = 1, nodes = 32, depth = 8, bytes = 4096}
+  limits = {candidates = 1, nodes = 1024, depth = 32, bytes = 4096}
 })
 check('D09', logistic_projection.candidate_count == 2 and #logistic_projection.candidates == 1
   and projection_truncated(logistic_projection, 'candidates'),
-  'Candidate output is capped deterministically with explicit truncation metadata')
+  'Candidate output is capped deterministically with explicit truncation metadata: ' .. serpent.line(logistic_projection))
 
 reset(logistic_trace_world(
   'logistic-science-pack-from-self-cycle',
@@ -1500,14 +1575,19 @@ reset(same_unlocker_world(true))
 check("U02", production.pack_production_status("A", {}) == "unreachable"
   and production.pack_production_status("B", {}) == "unreachable",
   "A same-unlocker, unseeded A-to-B-to-A cycle remains rejected")
-local unseeded_projection = production.pack_production_rejection_projection("A")
+local unseeded_projection = production.pack_production_rejection_projection("A", {
+  limits = {candidates = 8, nodes = 2048, depth = 32, bytes = 16384}
+})
 check("U02A", unseeded_projection and unseeded_projection.status == "unreachable"
   and #unseeded_projection.candidates == 1
   and unseeded_projection.candidates[1].unlockers[1].technology == "SharedUnlock"
   and unseeded_projection.candidates[1].structural_route.status == "rejected"
-  and unseeded_projection.candidates[1].first_failure.kind == "technology"
-  and unseeded_projection.candidates[1].first_failure.reason == "science-self-lock-A",
-  "The diagnostic projection identifies the same-unlocker unseeded cycle at its self-lock")
+  and unseeded_projection.candidates[1].unlockers[1].status == "not-evaluated"
+  and unseeded_projection.candidates[1].first_failure.kind == "cycle"
+  and unseeded_projection.candidates[1].first_failure.reason == "active-unlock-pair"
+  and unseeded_projection.candidates[1].first_failure.recipe == "B-from-A"
+  and unseeded_projection.candidates[1].first_failure.technology == "SharedUnlock",
+  "The diagnostic projection identifies the active recipe/unlocker pair closing the unseeded cycle: " .. serpent.line(unseeded_projection))
 reset(same_unlocker_world(false))
 local same_unlocker_b_cold = production.pack_production_status("B", {})
 local same_unlocker_a_warm = production.pack_production_status("A", {})
@@ -1546,7 +1626,11 @@ local function contextual_reason_fanout_world(width)
       ["shared-inner"] = {type = "item"}
     },
     labs = {lab = {inputs = {"fanout-pack"}}},
-    techs = {SharedInnerUnlock = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}}},
+    techs = {SharedInnerUnlock = {
+      enabled = true,
+      research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = "shared-inner-recipe"}}
+    }},
     recipe_prototypes = prototypes,
     recipe_facts = facts,
     producers = {
@@ -1569,7 +1653,7 @@ context.services["science.technology_researchability_reason"] = function(_, reas
 end
 check("U05", production.pack_production_status("fanout-pack", {}) == "unreachable"
   and contextual_reason_calls == 1,
-  "Repeated producer fan-out reuses one exact contextual technology rejection")
+  "Repeated producer fan-out reuses one exact contextual technology rejection; calls=" .. contextual_reason_calls)
 
 -- The bounded status pass needs exactly four visits to establish that this
 -- physical lab input has no recipe. An old trace then repeated the existence
@@ -1720,4 +1804,5 @@ check('D24', unavailable_projection and unavailable_projection.status == 'indete
   and last_created_context.states.compiler_telemetry == nil,
   'A missing real parent index is explicit indeterminate without index or telemetry construction')
 
+if #failures > 0 then error(table.concat(failures, "\n")) end
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

@@ -589,7 +589,10 @@ local function research_unlocked_output_witness(identity, options, state, visiti
     memo_key = positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
     for _, entry in ipairs(positive_memo[memo_key] or {}) do
       if positive_witness_reusable(entry, context, state, identity_key(identity)) then
-        return deepcopy(entry.witness)
+        -- This memo owns a copied, immutable witness for this route query.
+        -- Callers only inspect it or attach it to another immutable witness;
+        -- cloning its full ingredient tree on every hit repeats proved work.
+        return entry.witness
       end
     end
   end

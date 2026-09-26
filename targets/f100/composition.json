@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 46512,
-      "expected_sha256": "80CA5CA2645974F546B210F2359EAE664FF11F41B65FB576E8406EBC019270ED",
+      "expected_bytes": 47260,
+      "expected_sha256": "4916509C9D9ECE104A57335B482BDF63067C77A0FA0483609155290D6D6A6B0A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 51044,
-      "expected_sha256": "8DA1EB4BF01EF625352FFA2C3D7F566DA4DE36FC041B45AF8E811D4DB95CEFCE",
+      "expected_bytes": 51266,
+      "expected_sha256": "3E96AD8C0D9526CCECF73EE67C12AEBE1BC80C0CBF9BE8B2FDE4FC0EE7DD8B88",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 32358,
-      "expected_sha256": "EFE50EA7BB096A1726AC51C21371583E74713D8868DFCA34B25126B8ED807EB9",
+      "expected_bytes": 34290,
+      "expected_sha256": "B0166C3B9B9C4CF3E990AF5D154F83F3B44818961DBAA79A1396FDB9CED5126B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "ECE92FDE2C9E9647039EBDC4C1E5B3AAD9797446ECE1EF7F91D736C0F061CBB2"
+  "record_sha256": "937A82E999BBDC34528F6C6C9F50838D433F671024F0E59E945A42E800D05673"
 }

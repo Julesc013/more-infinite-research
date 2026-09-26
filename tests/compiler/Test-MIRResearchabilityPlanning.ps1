@@ -9,11 +9,9 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$policy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
-if(-not [bool]$policy.qualification.current_engine_api_prototype_data_mod_capsule_admitted) {
-  throw '[mir4-researchability-planning-f210-engine-admission-pending]'
-}
-# The resolver is the sole engine-admission path: it binds the current policy,
+# This maintainer-authorized controlled diagnostic uses the exact pre-freeze engine lock.
+# Public ecosystem/API qualification is a separate claim, not its prerequisite.
+# The resolver binds the current policy,
 # exact authorized Steam path/branch/manifest/build, and the 2.1.18+ floor
 # before this harness can create a process.
 $engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin
@@ -36,6 +34,7 @@ $modules=[ordered]@{
   'prototypes.mir.graph.researchability_index'='source/prototypes/mir/graph/researchability_index.lua'
   'prototypes.mir.index.recipe_unlocks'='source/prototypes/mir/index/recipe_unlocks.lua'
   'prototypes.mir.capabilities.science_integration.pack_registry'='source/prototypes/mir/capabilities/science_integration/pack_registry.lua'
+  'prototypes.mir.capabilities.science_integration.lab_compatibility'='source/prototypes/mir/capabilities/science_integration/lab_compatibility.lua'
   'prototypes.mir.capabilities.science_integration.recipe_unlock_facts'='source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua'
   'prototypes.mir.capabilities.science_integration.recipe_route_feasibility'='source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'
  'prototypes.mir.capabilities.science_integration.production_route_policy'='source/prototypes/mir/capabilities/science_integration/production_route_policy.lua'

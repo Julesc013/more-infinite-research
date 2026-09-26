@@ -47,7 +47,18 @@ local function copy_plain(value, state, depth)
 end
 
 local function copy_row(row)
-  return {key = row.key, available = row.available == true, researched = row.researched == true, queued = row.queued == true, infinite = row.infinite == true}
+  local progression = type(row.progression) == "number" and row.progression == row.progression
+    and row.progression ~= math.huge and row.progression ~= -math.huge
+    and row.progression >= 0 and row.progression == math.floor(row.progression) and row.progression or 0
+  return {
+    key = row.key,
+    available = row.available == true,
+    researched = row.researched == true,
+    queued = row.queued == true,
+    infinite = row.infinite == true,
+    native_order = type(row.native_order) == "string" and string.sub(row.native_order, 1, M.detail_string_limit) or "",
+    progression = progression
+  }
 end
 
 local function bounded_string(value)
@@ -253,7 +264,10 @@ local function normalized_view(view)
   local page = math.max(1, math.floor(tonumber(view.page) or 1))
   local search = type(view.search) == "string" and string.sub(view.search, 1, 160) or ""
   local family = type(view.family) == "string" and view.family or "all"
-  local sort = view.sort == "name-desc" and "name-desc" or "name-asc"
+  local sort = view.sort == "name-asc" and "name-asc"
+    or view.sort == "name-desc" and "name-desc"
+    or view.sort == "native" and "native"
+    or "progression"
   return {mode = mode, status = status, page = page, search = string.lower(search), family = family, sort = sort, hidden = type(view.hidden) == "table" and view.hidden or {}}
 end
 
@@ -274,6 +288,23 @@ local function status_matches(row, status)
   return row.queued
 end
 
+local function family_matches(family, selected)
+  return selected == "all" or (selected == "mir" and family ~= "external") or family == selected
+end
+
+local function sort_rows(left, right, sort)
+  if sort == "name-desc" then return left.key > right.key end
+  if sort == "name-asc" then return left.key < right.key end
+  if sort == "native" then
+    if left.native_order ~= right.native_order then return left.native_order < right.native_order end
+    if left.progression ~= right.progression then return left.progression < right.progression end
+  else
+    if left.progression ~= right.progression then return left.progression < right.progression end
+    if left.native_order ~= right.native_order then return left.native_order < right.native_order end
+  end
+  return left.key < right.key
+end
+
 -- Query only accepts copied, plain catalogue DTOs. It returns a fresh plain
 -- page so a consumer cannot retain adapter-owned state.
 function M.query(catalogue, view, enrichment, localized_search)
@@ -290,12 +321,13 @@ function M.query(catalogue, view, enrichment, localized_search)
       local mode_ok = v.mode == 1 or (v.mode == 2 and not row.infinite) or (v.mode == 3 and row.infinite)
       local search = string.lower(row.key .. " " .. family .. " " .. localized_search_text(localized_search, row.key))
       local search_ok = v.search == "" or string.find(search, v.search, 1, true) ~= nil
-      if mode_ok and status_matches(row, v.status) and (v.family == "all" or family == v.family) and not v.hidden[row.key] and search_ok then selected[#selected + 1] = row end
+      if mode_ok and status_matches(row, v.status) and family_matches(family, v.family)
+        and not v.hidden[row.key] and search_ok then selected[#selected + 1] = row end
     end
   end
   table.sort(selected, function(left, right)
     if left.key == right.key then return false end
-    return v.sort == "name-desc" and left.key > right.key or left.key < right.key
+    return sort_rows(left, right, v.sort)
   end)
   local pages = math.max(1, math.ceil(#selected / M.page_size))
   local page = math.min(v.page, pages)
@@ -331,10 +363,13 @@ end
 function M.family_names(enrichment)
   enrichment = M.normalize_enrichment(enrichment)
   local known, names = {all = true, external = true}, {"all", "external"}
+  local extras = {}
   for _, family in pairs((enrichment and enrichment.families) or {}) do
-    if type(family) == "string" and not known[family] then known[family] = true; names[#names + 1] = family end
+    if type(family) == "string" and not known[family] then known[family] = true; extras[#extras + 1] = family end
   end
-  table.sort(names)
+  table.sort(extras)
+  if #extras > 0 then table.insert(names, 1, "mir") end
+  for _, family in ipairs(extras) do names[#names + 1] = family end
   return names
 end
 
