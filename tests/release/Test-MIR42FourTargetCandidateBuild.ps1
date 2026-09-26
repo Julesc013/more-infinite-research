@@ -116,6 +116,7 @@ try {
   Assert-MIR42CandidateBuildTest (-not [bool]$historicalRow.public_output_authorized -and -not [bool]$historicalRow.publication_authorized) 'historical-row-private-boundary'
 
   $script:mir42CandidateStubCalls.Clear()
+  $script:mir42CandidateStubFailureTarget = ''
   $nine = New-MIR42FourTargetCandidate -RepoRoot $repo -FinalSourceCommit $commit -BuildId 'NINE' -SelectedTargets @('f210', 'f200', 'f110', 'f100', 'f017', 'f016', 'f015', 'f014', 'f013') -OutputRoot $nineRoot -MinimumFreeMemoryBytes 1 -MinimumFreeWorkBytes 1
   Assert-MIR42CandidateBuildTest ([bool]$nine.build_complete) 'nine-build-status'
   Assert-MIR42CandidateBuildTest ($nine.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV1') 'nine-build-manifest-kind'
