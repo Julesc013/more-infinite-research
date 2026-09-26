@@ -41,6 +41,15 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       ($info.name -notmatch "^mir-fixture-" -and -not $allowedExternalIdentity)) {
       throw "Fixture info.json must declare a mir-fixture-* name or an explicitly mapped upstream identity: $infoPath"
     }
+    $isHistoricalUpgradeTemplate = $fixture.Name -ceq 'assert-upgrade-historical-terminal-to-mir42'
+    if ($isHistoricalUpgradeTemplate -and (
+      [string]$info.name -cne 'mir-fixture-assert-upgrade-historical-terminal-to-mir42' -or
+      [string]$info.version -cne '1.0.0' -or
+      [string]$info.factorio_version -cne '@@FACTORIO_LINE@@' -or
+      (@($info.dependencies) -join '|') -cne 'base|more-infinite-research >= @@MIR_UPGRADE_FROM_VERSION@@' -or
+      -not (Test-Path -LiteralPath (Join-Path $fixture.FullName 'control.lua') -PathType Leaf))) {
+      throw "Historical upgrade fixture must retain its exact staged metadata contract: $infoPath"
+    }
     $mir4TargetNativeFixtures = @{
       "assert-upgrade-1-8-9-to-4-0-10000" = "1.0"
       "assert-upgrade-1-9-9-to-4-0-11000" = "1.1"
@@ -56,7 +65,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     $allowedMIR4TargetNativeFixture = $isFactorio21Line -and
       $mir4TargetNativeFixtures.ContainsKey($fixture.Name) -and
       [string]$info.factorio_version -eq [string]$mir4TargetNativeFixtures[$fixture.Name]
-    if ($info.factorio_version -ne $repoInfo.factorio_version) {
+    if (-not $isHistoricalUpgradeTemplate -and $info.factorio_version -ne $repoInfo.factorio_version) {
       if ($isReducedLegacyLine) { continue }
       if ($allowedMIR4TargetNativeFixture) {
         $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
@@ -69,7 +78,9 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
-    if ($isFactorio017Line) {
+    if ($isHistoricalUpgradeTemplate) {
+      # Its exact base dependency and staged version anchors were checked above.
+    } elseif ($isFactorio017Line) {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.17(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 0.17 base dependency on this branch; found '$fixtureBaseDependency'."
       }

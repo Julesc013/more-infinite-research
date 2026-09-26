@@ -2205,6 +2205,88 @@ check("U24", researchability.reason_with_context("ZDependent", {
     == "prerequisite-Core-unreachable-science-memo-pack",
   "An epoch replacement invalidates resolved individual mechanisms with a removed seed")
 
+do
+local function contextual_reuse_regressions()
+-- Exact-input reuse must retain cycle boundaries and react to newly learned
+-- structural/root knowledge. These assertions exercise the actual resolver.
+reset({
+  item_prototypes = {P = {type = "item"}, Q = {type = "item"}, Primer = {type = "item"}},
+  labs = {lab = {inputs = {"P", "Q", "Primer"}}},
+  techs = {UnlockP = {enabled = true, unit = {count = 1, time = 1, ingredients = {{"Q", 1}}},
+    effects = {{type = "unlock-recipe", recipe = "make-P"}}}},
+  recipe_prototypes = {["make-P"] = {name = "make-P"}, ["make-Q"] = {name = "make-Q"}},
+  recipe_facts = {["make-P"] = route_fact("P", {}, {enabled = false}),
+    ["make-Q"] = route_fact("Q", {{name = "ore", amount = 1}})},
+  producers = {P = {"make-P"}, Q = {"make-Q"}}, unlockers = {["make-P"] = {"UnlockP"}},
+  resources = {ore = {minable = {result = "ore", count = 1}}}
+})
+production.pack_production_status("Primer", {unrelated = true})
+local contextual_owner = context:state_view("science_pack_production")
+local shared_acquisition = contextual_owner.route_witness_state
+local canonical_facade = require("prototypes.mir.index.recipe_facts")
+local original_index_view = canonical_facade.index_view
+canonical_facade.index_view = function() return context.states.recipe_index end
+shared_acquisition.recipe_index = context.states.recipe_index
+shared_acquisition.visiting = shared_acquisition.visiting or {}
+shared_acquisition.visiting["item\0ore"] = true
+local first_blocked = production.pack_production_status("P", {unrelated = true})
+check("CP01", first_blocked == "unreachable" and contextual_owner.entries.P == nil,
+  "An active typed acquisition boundary rejects the nested science route without creating a root answer")
+local count_recipe_status, contextual_recipe_calls = recipe_unlock_facts.pack_recipe_status, 0
+recipe_unlock_facts.pack_recipe_status = function(...)
+  contextual_recipe_calls = contextual_recipe_calls + 1
+  return count_recipe_status(...)
+end
+local repeated_blocked = production.pack_production_status("P", {unrelated = true})
+recipe_unlock_facts.pack_recipe_status = count_recipe_status
+check("CP02", repeated_blocked == first_blocked and contextual_recipe_calls == 0,
+  "An unchanged completed contextual failure is reused without repeating recipe traversal")
+shared_acquisition.visiting["item\0ore"] = nil
+local unblocked_status, unblocked_gate = production.pack_production_status("P", {unrelated = true})
+check("CP03", unblocked_status == "research" and unblocked_gate == "UnlockP"
+  and contextual_owner.entries.P == nil and contextual_owner.entries.Q == nil,
+  "Removing the acquisition boundary proves a conditional route without pretending either pack is root-qualified")
+shared_acquisition.visiting["item\0ore"] = true
+local learned_status, learned_gate = production.pack_production_status("P", {unrelated = true})
+-- Compare against the same learned world with only contextual answer reuse
+-- removed. Do not remove structural witnesses or change any semantic input.
+contextual_owner.contextual_pack_status_memo = {}
+contextual_owner.contextual_pack_status_count = 0
+local fresh_learned_status, fresh_learned_gate = production.pack_production_status("P", {unrelated = true})
+check("CP04", learned_status == fresh_learned_status and learned_gate == fresh_learned_gate,
+  "Learning structural witnesses cannot leave an earlier same-context answer stale"
+    .. "; reused=" .. tostring(learned_status) .. "; fresh=" .. tostring(fresh_learned_status))
+shared_acquisition.visiting["item\0ore"] = nil
+local rooted_q = production.pack_production_status("Q", {})
+shared_acquisition.visiting["item\0ore"] = true
+local after_root_status, after_root_gate = production.pack_production_status("P", {unrelated = true})
+check("CP05", rooted_q == "initial" and after_root_status == "research" and after_root_gate == "UnlockP",
+  "A newly learned nested root invalidates earlier contextual answers")
+check("CP06", production.pack_production_status("P", {P = true}) == "unreachable",
+  "Same-pack cycle rejection precedes contextual and root reuse")
+check("CP09", production.pack_production_status("P", {unrelated = true}, {UnlockP = true}) == "unreachable",
+  "A changed active technology boundary cannot borrow a successful contextual pack answer")
+check("CP10", production.pack_production_status("P", {Q = true}) == "unreachable",
+  "An active required science pack cannot borrow another pack traversal's success")
+local before_diagnostic_memo = contextual_owner.contextual_pack_status_memo
+local before_diagnostic_count = contextual_owner.contextual_pack_status_count
+local diagnostic_context_status = production.pack_production_status("P", {unrelated = true}, {}, bounded_observer(1))
+check("CP07", diagnostic_context_status == "indeterminate"
+  and contextual_owner.contextual_pack_status_memo == before_diagnostic_memo
+  and contextual_owner.contextual_pack_status_count == before_diagnostic_count,
+  "A diagnostic budget remains indeterminate and never reads or writes contextual answer reuse")
+world.recipe_source_epoch = 2
+world.resources = {}
+data.raw.resource = {}
+local replaced_status = production.pack_production_status("P", {unrelated = true})
+check("CP08", replaced_status == "unreachable" and context:state_view("science_pack_production") ~= contextual_owner,
+  "A source epoch replacement discards contextual, structural and root knowledge")
+
+canonical_facade.index_view = original_index_view
+end
+contextual_reuse_regressions()
+end
+
 -- The bounded status pass needs exactly four visits to establish that this
 -- physical lab input has no recipe. An old trace then repeated the existence
 -- scan, stopped on visit five, and incorrectly called the same pack non-lab.

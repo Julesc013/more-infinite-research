@@ -234,6 +234,10 @@ local function science_pack_production_state()
     -- keys retain the active pack/technology guards, and epoch replacement
     -- discards them along with the independent science-root facts.
     technology_mechanism_memo = {},
+    contextual_pack_status_memo = {},
+    contextual_pack_status_count = 0,
+    root_entry_generation = 0,
+    contextual_acquisition_generation = 0,
     -- This state owns only source-epoch-stable structural observations. It
     -- deliberately cannot retain an acquisition result that depends on an
     -- active science-pack or technology traversal.
@@ -249,6 +253,16 @@ end
 
 local function science_pack_resolution_cache()
   return science_pack_production_state().entries
+end
+
+local function remember_root_pack_status(pack_name, entry)
+  local owner = science_pack_production_state()
+  owner.entries[pack_name] = entry
+  -- Any nested root can change the selected route of a contextual query.
+  -- Discard completed contextual answers whenever root knowledge advances.
+  owner.root_entry_generation = owner.root_entry_generation + 1
+  owner.contextual_pack_status_memo = {}
+  owner.contextual_pack_status_count = 0
 end
 
 local function science_pack_route_witness_state()
@@ -1245,20 +1259,52 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
   -- source-epoch-bound witness independent of a later caller's active set.
   -- Reuse it after the same-pack cycle guard above: this avoids recomputing a
   -- proved science route for every ingredient of a contextual unlock check.
-  -- A nonempty traversal still never writes its conditional answer.
+  -- A nonempty traversal still never writes a conditional answer to root entries.
   local root_cache = observer == nil and science_pack_resolution_cache() or nil
   local cached = root_cache and root_cache[pack_name] or nil
   if cached then return cached.status, cached.prerequisite, exists end
 
   local reusable = observer == nil and not has_active_traversal(visiting_packs, visiting_technologies)
-  local cache = reusable and root_cache or nil
 
   -- All normal root and nested queries share only the immutable source and
-  -- machine observations held by recipe-route feasibility. Its contextual
-  -- research-unlock answers remain uncached because their active traversal is
-  -- part of the proof. A bounded diagnostic always gets a fresh state so its
+  -- machine observations held by recipe-route feasibility. Completed contextual pack answers retain every active traversal input and
+  -- are discarded when root or stable acquisition knowledge advances. A bounded diagnostic always gets a fresh state so its
   -- work cap still covers every inspected prototype.
   local witness_state = observer == nil and science_pack_route_witness_state() or nil
+  local contextual_owner, contextual_key, contextual_root_generation, contextual_acquisition_generation
+  if observer == nil and not reusable then
+    -- This entry point takes no parent production options. production_routes
+    -- constructs a fresh unlock-pair/technology context for each invocation.
+    -- The outer typed acquisition ancestry is nevertheless shared and must
+    -- be identical. Length-prefix every component to avoid separator aliasing.
+    contextual_owner = science_pack_production_state()
+    contextual_root_generation = contextual_owner.root_entry_generation
+    contextual_acquisition_generation = witness_state.stable_acquisition_generation or 0
+    if contextual_owner.contextual_acquisition_generation ~= contextual_acquisition_generation then
+      contextual_owner.contextual_pack_status_memo = {}
+      contextual_owner.contextual_pack_status_count = 0
+      contextual_owner.contextual_acquisition_generation = contextual_acquisition_generation
+    end
+    local fields = {pack_name, active_set_key(visiting_packs),
+      active_set_key(visiting_technologies), active_set_key(witness_state.visiting)}
+    for index, value in ipairs(fields) do fields[index] = #value .. ":" .. value end
+    contextual_key = table.concat(fields)
+    local cached_context = contextual_owner.contextual_pack_status_memo[contextual_key]
+    if cached_context then
+      return cached_context.status, cached_context.prerequisite, exists
+    end
+  end
+  local function remember_contextual_status(status, prerequisite)
+    if contextual_owner
+      and contextual_owner.root_entry_generation == contextual_root_generation
+      and (witness_state.stable_acquisition_generation or 0) == contextual_acquisition_generation
+      and contextual_owner.contextual_pack_status_count < 8192
+      and not contextual_owner.contextual_pack_status_memo[contextual_key] then
+      contextual_owner.contextual_pack_status_memo[contextual_key] = {status = status, prerequisite = prerequisite}
+      contextual_owner.contextual_pack_status_count
+        = contextual_owner.contextual_pack_status_count + 1
+    end
+  end
 
   -- A declared direct source is an independent acquisition seed even when a
   -- later recipe for the same pack also exists. A locked self-output
@@ -1269,7 +1315,8 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
     observer and {diagnostic_observer = observer} or nil,
     witness_state
   ) then
-    if reusable then cache[pack_name] = {status = "non-recipe", prerequisite = pack_name} end
+    if reusable then remember_root_pack_status(pack_name, {status = "non-recipe", prerequisite = pack_name}) end
+    remember_contextual_status("non-recipe", pack_name)
     return "non-recipe", pack_name, exists
   end
   if diagnostic_indeterminate(observer) then return "indeterminate", nil, exists end
@@ -1290,14 +1337,17 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
     if diagnostic_indeterminate(observer) then return "indeterminate", nil, exists end
     if selected then
       local status = selected.initial and "initial" or "research"
-      if reusable then cache[pack_name] = {status = status, prerequisite = selected.unlocker, route = selected} end
+      if reusable then remember_root_pack_status(pack_name, {status = status, prerequisite = selected.unlocker, route = selected}) end
+      remember_contextual_status(status, selected.unlocker)
       return status, selected.unlocker, exists
     end
-    if reusable then cache[pack_name] = {status = "unreachable"} end
+    if reusable then remember_root_pack_status(pack_name, {status = "unreachable"}) end
+    remember_contextual_status("unreachable", nil)
     return "unreachable", nil, exists
   end
 
-  if reusable then cache[pack_name] = {status = "unreachable"} end
+  if reusable then remember_root_pack_status(pack_name, {status = "unreachable"}) end
+  remember_contextual_status("unreachable", nil)
   return "unreachable", nil, exists
 end
 

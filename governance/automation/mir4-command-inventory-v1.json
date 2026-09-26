@@ -3043,9 +3043,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
       "classification": "canonical-internal",
-      "sha256": "66B91AF0F50CC54A72A440FDE8D6BD82EBDF1AD2BFEABD21ECF4F3BFD224AC37",
+      "sha256": "3DBB6665D18A74AF82BC633B4F69110A1AF3938249340D8A838215885E6B4EA8",
       "hash_mode": "canonical-text-v1",
-      "lines": 376,
+      "lines": 545,
       "package_visible": false
     },
     {
@@ -4563,9 +4563,9 @@
     {
       "path": "tools/lib/validation/runner/StaticFixtureMods.ps1",
       "classification": "canonical-internal",
-      "sha256": "5F609CE510A16E9DEE47438450911261A2358DD5C11EAA08ACA6D84004B08FBC",
+      "sha256": "CC633B4CBF0C8019E84CDB47906FB31D0AF39B8837242148BD91DBBCFAC1D5B2",
       "hash_mode": "canonical-text-v1",
-      "lines": 137,
+      "lines": 148,
       "package_visible": false
     },
     {
@@ -5211,9 +5211,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
       "classification": "canonical-internal",
-      "sha256": "5AA81414F1DA7C989FFC400A75A54E6B5727441F5966F6B2776F4FF84720357A",
+      "sha256": "255BCB7EA0F7F7823B010A123482DA6AD22EFA147E480BE6C4CE79C81099FC89",
       "hash_mode": "canonical-text-v1",
-      "lines": 671,
+      "lines": 672,
       "package_visible": false
     },
     {
@@ -5251,9 +5251,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
       "classification": "canonical-internal",
-      "sha256": "75E0814DAC59BE078B809160B0E707A793A0FF8581DE79582C7B0FDD61594F44",
+      "sha256": "1841BFFF063073F36D840F6D12404B5170D3327B9DDB5149EB9FF543831BCF38",
       "hash_mode": "canonical-text-v1",
-      "lines": 1526,
+      "lines": 1597,
       "package_visible": false
     },
     {
@@ -5914,5 +5914,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:49c613e4dbcad39d129478d9479ab8af6a51ad537d8c3f4ced5a99970e415979"
+  "digest": "sha256:6a4f2f1d48bc01639388b87f728b4a0e596a38f59d250feba77868ed09e458c8"
 }

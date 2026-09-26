@@ -1,0 +1,2 @@
+-- Runtime continuity fixture. Product prototypes are supplied by the exact
+-- predecessor/candidate archives; this fixture does not mutate them.
