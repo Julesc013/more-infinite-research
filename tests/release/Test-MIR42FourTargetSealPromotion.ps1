@@ -494,7 +494,7 @@ try {
     $ownedRoot = (Resolve-Path -LiteralPath $root).Path
     $testResults = (Resolve-Path -LiteralPath (Join-Path $RepoRoot 'build/test-results')).Path
     if (-not $ownedRoot.StartsWith($testResults + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-seal-test-cleanup-boundary]' }
-    Assert-MIR4NoReparsePath -Path $ownedRoot
+    $null = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path $ownedRoot
     Remove-Item -LiteralPath $ownedRoot -Recurse -Force
   }
   if (-not [string]::IsNullOrWhiteSpace($externalForgedTrustRoot) -and (Test-Path -LiteralPath $externalForgedTrustRoot)) {
