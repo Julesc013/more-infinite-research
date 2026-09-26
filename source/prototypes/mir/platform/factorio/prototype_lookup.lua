@@ -15,6 +15,7 @@ local FALLBACK_ENTITY_TYPES = {
 local ITEM_TYPES = {
   "item",
   "tool",
+  "mining-tool",
   "module",
   "ammo",
   "capsule",

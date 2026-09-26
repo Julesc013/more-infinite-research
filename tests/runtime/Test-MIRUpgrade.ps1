@@ -30,6 +30,7 @@ function Invoke-MIRUpgradeServerUntilSaved {
     [Parameter(Mandatory)][string]$Marker,
     [Parameter(Mandatory)][string]$SavedMapPath,
     [switch]$HistoricalSaveLog,
+    [switch]$ReloadOnly,
     [int]$TimeoutMs = 30000
   )
 
@@ -41,15 +42,24 @@ function Invoke-MIRUpgradeServerUntilSaved {
   foreach ($arg in $Arguments) { [void]$processInfo.ArgumentList.Add($arg) }
 
   $process = [System.Diagnostics.Process]::Start($processInfo)
+  try {
   $deadline = [DateTime]::UtcNow.AddMilliseconds($TimeoutMs)
   $ready = $false
   while ([DateTime]::UtcNow -lt $deadline) {
     if ($process.HasExited) { return $process.ExitCode }
     if ((Test-Path -LiteralPath $LogPath) -and (Test-Path -LiteralPath $SavedMapPath -PathType Leaf)) {
-      $text = Get-Content -Raw -LiteralPath $LogPath
+      $text = [string](Get-Content -Raw -LiteralPath $LogPath)
+      if ($null -eq $text) {
+        Start-Sleep -Milliseconds 200
+        continue
+      }
+      if ($ReloadOnly -and $text.Contains($Marker) -and $text.Contains("Hosting game")) {
+        $ready = $true
+        break
+      }
       $saveComplete = $text.Contains("Saving finished")
       if (-not $saveComplete -and $HistoricalSaveLog) {
-        # 0.13 logs the save request but has no Saving finished message. A
+        # 0.13 through 0.15 log the save request without Saving finished. A
         # readable ZIP central directory with map data closes that save gate;
         # both subsequent native reloads still have to verify its saved state.
         $archive = $null
@@ -69,13 +79,18 @@ function Invoke-MIRUpgradeServerUntilSaved {
     Start-Sleep -Milliseconds 200
   }
   if (-not $ready) {
-    try { $process.Kill($true) } catch { $process.Kill() }
     throw "Factorio did not materialize the governed upgraded save within $TimeoutMs ms."
   }
 
-  try { $process.Kill($true) } catch { $process.Kill() }
-  $process.WaitForExit()
   return 0
+  } finally {
+    # This owned process is the native engine, not an orchestration shell.
+    # Always terminate it even if log/archive inspection throws mid-run.
+    try {
+      if (-not $process.HasExited) { $process.Kill() }
+      if (-not $process.WaitForExit(5000)) { throw 'Owned upgrade engine did not terminate.' }
+    } finally { $process.Dispose() }
+  }
 }
 
 function Resolve-MIRUpgradePath {
@@ -414,7 +429,7 @@ $loadArgs = if ($requiresReloadProof -and $historicalLine -eq '0.13') {
 $loadExitCode = if ($requiresReloadProof) {
   $factorioProcesses++
   Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $loadArgs -LogPath $log `
-    -Marker $governedUpgradeMarker -SavedMapPath $governedUpgradedSave -HistoricalSaveLog:($historicalLine -eq '0.13')
+    -Marker $governedUpgradeMarker -SavedMapPath $governedUpgradedSave -HistoricalSaveLog:($historicalLine -in @('0.13','0.14','0.15'))
 } else {
   $factorioProcesses++
   Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
@@ -434,17 +449,27 @@ if ($requiresReloadProof) {
   $upgradedSave = $governedUpgradedSave
   # Keep the finite-era save/CLI contract already proved by candidate retention.
   $benchmarkMap = if ($historicalLine -eq '0.13') { [IO.Path]::GetFileNameWithoutExtension($upgradedSave) } else { $upgradedSave }
-  $reloadArgs = $nativeBaseArgs + @("--benchmark", $benchmarkMap, "--benchmark-ticks", "1")
-  if (-not $isHistoricalTerminalFixture -or $historicalLine -eq '0.17') { $reloadArgs += @('--benchmark-runs','1') }
-  if (-not $isHistoricalTerminalFixture) { $reloadArgs += '--benchmark-sanitize' }
+  $reloadArgs = if ($historicalLine -eq '0.16') {
+    # Use the normal headless server path on 0.16. Its graphical benchmark
+    # rejects the saved equipment-grid table before running fixture assertions.
+    $nativeBaseArgs + @('--server-settings',$serverSettings,'--start-server',$upgradedSave)
+  } else {
+    $benchmarkArgs = $nativeBaseArgs + @("--benchmark", $benchmarkMap, "--benchmark-ticks", "1")
+    if (-not $isHistoricalTerminalFixture -or $historicalLine -eq '0.17') { $benchmarkArgs += @('--benchmark-runs','1') }
+    if (-not $isHistoricalTerminalFixture) { $benchmarkArgs += '--benchmark-sanitize' }
+    $benchmarkArgs
+  }
+  $reloadMarker = "[mir-fixture] $ToVersion upgraded save reload proof complete archetype=$Archetype"
   # The log belongs to this disposable run. Clear it so the marker below proves this reload,
   # rather than a prior load or reload recorded by the same no-rotation log.
   [IO.File]::WriteAllText($log, '', [Text.UTF8Encoding]::new($false))
   $factorioProcesses++
-  $reloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
+  $reloadExitCode = if ($historicalLine -eq '0.16') {
+    Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $reloadArgs -LogPath $log `
+      -Marker $reloadMarker -SavedMapPath $upgradedSave -ReloadOnly
+  } else { Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
-  $reloadMarker = "[mir-fixture] $ToVersion upgraded save reload proof complete archetype=$Archetype"
   if (-not $reloadText.Contains($reloadMarker)) {
     throw "MIR $ToVersion upgraded-save reload proof marker is missing: $reloadMarker. Temporary root: $root"
   }
@@ -454,7 +479,10 @@ if ($requiresReloadProof) {
   # Clear the same owned log again; the second reload receipt must be process-specific.
   [IO.File]::WriteAllText($log, '', [Text.UTF8Encoding]::new($false))
   $factorioProcesses++
-  $secondReloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
+  $secondReloadExitCode = if ($historicalLine -eq '0.16') {
+    Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $reloadArgs -LogPath $log `
+      -Marker $reloadMarker -SavedMapPath $upgradedSave -ReloadOnly
+  } else { Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($secondReloadExitCode -ne 0) {
     throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
   }

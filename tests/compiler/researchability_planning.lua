@@ -214,6 +214,35 @@ check("R03", not registry.science_pack_exists("orphan"),
 check("R04", not registry.science_pack_exists("missing-prototype"),
   "A lab input without a physical item prototype remains excluded")
 
+reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}))
+registry.science_pack_exists("custom-item-pack")
+local exposed_inputs = registry.all_lab_inputs()
+exposed_inputs[1] = "orphan"
+check("R05", registry.science_pack_exists("custom-item-pack")
+    and table.concat(registry.all_lab_inputs(), ",") == "custom-item-pack,custom-tool-pack",
+  "Mutating an exported lab-input list does not alter cached membership or ordering")
+world.item_prototypes["custom-item-pack"] = nil
+check("R06", not registry.science_pack_exists("custom-item-pack"),
+  "Cached lab membership never admits a removed physical prototype")
+world.item_prototypes["custom-item-pack"] = {type = "item"}
+context:replace_epoch("lab_input_index", {"custom-tool-pack"})
+check("R07", not registry.science_pack_exists("custom-item-pack") and registry.science_pack_exists("custom-tool-pack"),
+  "Replacing the lab-input epoch invalidates positive membership")
+context:replace_epoch("lab_input_index", {"custom-item-pack", "custom-tool-pack"})
+check("R08", registry.science_pack_exists("custom-item-pack"),
+  "A later lab-input epoch admits newly restored membership")
+local visits = 0
+local observer = {reserve_visit = function()
+  visits = visits + 1
+  return visits <= 1
+end}
+check("R09", not registry.science_pack_exists("custom-tool-pack", observer) and visits == 2,
+  "A populated normal membership cache does not bypass diagnostic visit exhaustion")
+reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}))
+world.labs.lab.inputs = {"custom-tool-pack"}
+check("R10", not registry.science_pack_exists("custom-item-pack") and registry.science_pack_exists("custom-tool-pack"),
+  "A new compiler context does not inherit the previous context's membership")
+
 local function technology(pack, unlock_recipe)
   local technology = {enabled = true, unit = {count = 1, time = 1, ingredients = {{name = pack, amount = 1}}}}
   if unlock_recipe then technology.effects = {{type = "unlock-recipe", recipe = unlock_recipe}} end

@@ -118,9 +118,9 @@ function Assert-MIR42HistoricalUpgradeHarness {
   $upgradeHarnessText = Get-Content -Raw -LiteralPath $upgradeHarness
   $reloadLogClear = "[IO.File]::WriteAllText(`$log, '', [Text.UTF8Encoding]::new(`$false))"
   $firstReloadLogClear = $upgradeHarnessText.IndexOf($reloadLogClear,[StringComparison]::Ordinal)
-  $firstReloadProcess = $upgradeHarnessText.IndexOf('$reloadExitCode = Invoke-FactorioProcess',[StringComparison]::Ordinal)
+  $firstReloadProcess = $upgradeHarnessText.IndexOf('$reloadExitCode = ',[StringComparison]::Ordinal)
   $secondReloadLogClear = $upgradeHarnessText.IndexOf($reloadLogClear,$firstReloadProcess,[StringComparison]::Ordinal)
-  $secondReloadProcess = $upgradeHarnessText.IndexOf('$secondReloadExitCode = Invoke-FactorioProcess',[StringComparison]::Ordinal)
+  $secondReloadProcess = $upgradeHarnessText.IndexOf('$secondReloadExitCode = ',[StringComparison]::Ordinal)
   if (-not $info.Contains('@@FACTORIO_LINE@@') -or -not $info.Contains('@@MIR_UPGRADE_FROM_VERSION@@') -or
       -not $controlText.Contains('__MIR_UPGRADE_FROM_VERSION__') -or -not $controlText.Contains('__MIR_UPGRADE_TO_VERSION__') -or
       -not $controlText.Contains('script.on_configuration_changed') -or -not $controlText.Contains('script.on_load') -or
@@ -148,6 +148,7 @@ function Invoke-MIR42BoundedUpgrade {
   $start.RedirectStandardError = $true
   foreach ($argument in $Arguments) { [void]$start.ArgumentList.Add($argument) }
   $process = [Diagnostics.Process]::Start($start)
+  $clock = [Diagnostics.Stopwatch]::StartNew()
   try {
     $stdout = $process.StandardOutput.ReadToEndAsync()
     $stderr = $process.StandardError.ReadToEndAsync()
@@ -155,13 +156,25 @@ function Invoke-MIR42BoundedUpgrade {
     if ($timedOut) {
       try { $process.Kill($true) } catch { $process.Kill() }
     }
-    $process.WaitForExit()
-    [IO.File]::WriteAllText($StdoutPath, $stdout.GetAwaiter().GetResult(), [Text.UTF8Encoding]::new($false))
-    [IO.File]::WriteAllText($StderrPath, $stderr.GetAwaiter().GetResult(), [Text.UTF8Encoding]::new($false))
+    if (-not $process.HasExited -and -not $process.WaitForExit(5000)) {
+      throw '[mir42-engine-row-termination-failed]'
+    }
+    # A child can leave inherited output handles open after the harness exits.
+    # The same deadline covers draining those handles; never await them forever.
+    $remainingMs = [int][Math]::Max(0,($DeadlineSeconds * 1000) - $clock.ElapsedMilliseconds)
+    $outputComplete = [Threading.Tasks.Task]::WaitAll([Threading.Tasks.Task[]]@($stdout,$stderr),$remainingMs)
+    foreach ($capture in @(@{task=$stdout;path=$StdoutPath},@{task=$stderr;path=$StderrPath})) {
+      $content = if ($capture.task.IsCompletedSuccessfully) { $capture.task.GetAwaiter().GetResult() }
+        else { '[output drain incomplete at enforced deadline; native logs retained]' }
+      [IO.File]::WriteAllText($capture.path,$content,[Text.UTF8Encoding]::new($false))
+    }
     if ($timedOut) { throw "[mir42-engine-row-deadline] $DeadlineSeconds seconds; stderr=$StderrPath" }
+    if (-not $outputComplete) { throw "[mir42-engine-output-drain-deadline] $DeadlineSeconds seconds; stderr=$StderrPath" }
     if ($process.ExitCode -ne 0) { throw "[mir42-engine-row-failed] exit=$($process.ExitCode); stderr=$StderrPath" }
     return $process.ExitCode
   } finally {
+    $process.StandardOutput.BaseStream.Dispose()
+    $process.StandardError.BaseStream.Dispose()
     $process.Dispose()
   }
 }

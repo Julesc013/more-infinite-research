@@ -146,9 +146,9 @@ foreach ($needle in @('$isHistoricalTerminalFixture = $FixtureName -eq ''assert-
 }
 $logClear = '[IO.File]::WriteAllText($log, '''', [Text.UTF8Encoding]::new($false))'
 $firstClear = $harness.IndexOf($logClear,[StringComparison]::Ordinal)
-$firstReload = $harness.IndexOf('$reloadExitCode = Invoke-FactorioProcess',[StringComparison]::Ordinal)
+$firstReload = $harness.IndexOf('$reloadExitCode = ',[StringComparison]::Ordinal)
 $secondClear = $harness.IndexOf($logClear,$firstReload,[StringComparison]::Ordinal)
-$secondReload = $harness.IndexOf('$secondReloadExitCode = Invoke-FactorioProcess',[StringComparison]::Ordinal)
+$secondReload = $harness.IndexOf('$secondReloadExitCode = ',[StringComparison]::Ordinal)
 if ($firstClear -lt 0 -or $firstReload -lt 0 -or $secondClear -le $firstReload -or $secondReload -le $secondClear -or
     $runner.Contains('$targetRow.engine.path') -or $runner.Contains('kind=(if ($isNineTargetCandidate)') -or $runner.Contains('status=(if ($isNineTargetCandidate)')) { throw 'historical-runner-shape-or-reload-log-scope' }
 
