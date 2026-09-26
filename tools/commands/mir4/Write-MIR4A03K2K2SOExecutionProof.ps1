@@ -220,11 +220,15 @@ $proof = [pscustomobject][ordered]@{
   record_sha256=''
 }
 
-$scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir4-a03-proof-' + [guid]::NewGuid().ToString('N') + '.json')
+$scratchRoot = Assert-MIR4NoReparseAncestors -Root $repo -Path (Join-Path $repo 'build/tmp')
+
+if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+
+$scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ('mir4-a03-proof-' + [guid]::NewGuid().ToString('N') + '.json'))
 try {
   Write-MIR4BootstrapRecord -Record $proof -Path $scratch | Out-Null
   $projection = Get-Content -Raw -LiteralPath $scratch
   Assert-A03Proof ($projection -notmatch '(?i)(?:[A-Z]:[\\/]|\\\\)') 'mir4-a03-proof-private-path'
   Assert-A03Proof ($projection | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-a03-k2-k2so-execution-proof-v1.schema.json')) 'mir4-a03-proof-schema'
   & (Join-Path $repo 'tools/commands/mir4/Write-MIR4A00A03Evidence.ps1') -Kind A03ExecutionProof -InputPath $scratch -OutputPath (Join-Path $repo $OutputPath) -RecordedAt ([string]$runtime.recorded_at) -RequireLocalEvidence
-} finally { if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Force } }
+} finally { if (Test-Path -LiteralPath $scratch) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch } }

@@ -1,5 +1,7 @@
 . (Join-Path $PSScriptRoot '..\..\domain\canonicalization\CanonicalJsonV1.ps1')
-
+if (-not (Get-Command Assert-MIR4NoReparseAncestors -ErrorAction SilentlyContinue)) {
+  . (Join-Path $PSScriptRoot '..\..\..\lib\mir4\BootstrapMaterialization.ps1')
+}
 $script:MIR4PatchRehearsalDefectPath = 'fixtures/release/m40-01/synthetic-f210-defect.json'
 $script:MIR4PatchRehearsalStableRealizationPath = 'fixtures/release/m40-01/stable-realization.json'
 $script:MIR4PatchRehearsalMainRealizationPath = 'fixtures/release/m40-01/main-forward-port-realization.json'
@@ -110,7 +112,10 @@ function Invoke-MIR4DisposablePatchBranchProbeV1 {
     throw "[mir4-patch-rehearsal-branch-exists] $branchName"
   }
 
-  $scratch = Join-Path ([IO.Path]::GetTempPath()) ("mir4-m40-01-" + [guid]::NewGuid().ToString('N'))
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $scratchRoot = Assert-MIR4NoReparseAncestors -Root $repo -Path (Join-Path $repo 'build/tmp')
+  if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+  $scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ("mir4-m40-01-" + [guid]::NewGuid().ToString('N')))
   $worktreeAdded = $false
   $branchCreated = $false
   try {

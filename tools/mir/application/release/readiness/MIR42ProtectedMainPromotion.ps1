@@ -4,6 +4,9 @@ $mir42PromotionRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '.
 if (-not (Get-Command Get-MIR42ExactFourTargetCandidate -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot 'MIR42TechnicalSeal.ps1')
 }
+if (-not (Get-Command Assert-MIR4NoReparseAncestors -ErrorAction SilentlyContinue)) {
+  . (Join-Path $mir42PromotionRepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
+}
 
 function Get-MIR42PromotionRemoteRef {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Ref,[Parameter(Mandatory)][string]$Code)
@@ -248,7 +251,9 @@ function Get-MIR42GovernedOfflineRestoreDrill {
       [string]$event.payload_sha256 -cne $payloadSha.ToLowerInvariant()) {
     throw '[mir42-promotion-governed-restore-ledger-challenge-binding]'
   }
-  $scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir42-governed-restore-' + [guid]::NewGuid().ToString('N'))
+  $scratchRoot = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path (Join-Path $RepoRoot 'build/tmp')
+  if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+  $scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ('mir42-governed-restore-' + [guid]::NewGuid().ToString('N')))
   try {
     New-Item -ItemType Directory -Force -Path $scratch | Out-Null
     $publicKeyPath = Join-Path $scratch 'ledger-signer.pub'
@@ -257,7 +262,7 @@ function Get-MIR42GovernedOfflineRestoreDrill {
       throw '[mir42-promotion-governed-restore-ledger-signature-verification]'
     }
   } finally {
-    if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+    if (Test-Path -LiteralPath $scratch) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch }
   }
   return $receipt
 }

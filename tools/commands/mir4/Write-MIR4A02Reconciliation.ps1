@@ -336,7 +336,9 @@ $proof = if ($UseExistingProof) {
   Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot (Join-Path $repo 'build/a02-materializer') -ReportPath $proofFull
 }
 $record = New-A02Record -Proof $proof
-$scratch = Join-Path ([IO.Path]::GetTempPath()) ('mir4-a02-' + [guid]::NewGuid().ToString('N') + '.json')
+$scratchRoot = Assert-MIR4NoReparseAncestors -Root $repo -Path (Join-Path $repo 'build/tmp')
+if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null }
+$scratch = Assert-MIR4NoReparseAncestors -Root $scratchRoot -Path (Join-Path $scratchRoot ('mir4-a02-' + [guid]::NewGuid().ToString('N') + '.json'))
 try {
   [void](Write-MIR4BootstrapRecord -Record $record -Path $scratch)
   $projection = [IO.File]::ReadAllText($scratch)
@@ -372,5 +374,5 @@ try {
   }
   return $record
 } finally {
-  if ($null -ne $scratch -and (Test-Path -LiteralPath $scratch)) { Remove-Item -LiteralPath $scratch -Force }
+  if ($null -ne $scratch -and (Test-Path -LiteralPath $scratch)) { Remove-MIR4BuildTree -OutputRoot $scratchRoot -Path $scratch }
 }
