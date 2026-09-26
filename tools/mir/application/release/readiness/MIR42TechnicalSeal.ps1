@@ -725,8 +725,8 @@ function Get-MIR42ExactFourTargetCandidate {
         [string]$row.build_b_sha256 -cne [string]$target.asset.sha256 -or
         [string]$row.source.commit -cne [string]$Candidate.source.commit -or
         [string]$row.source.tree -cne [string]$Candidate.source.tree -or
-        [string]$row.package_authority_sha256 -cne [string]$Candidate.identity.record.package_authority_sha256 -or
-        [string]$row.package_source_sha256 -cne [string]$Candidate.source.package_source_sha256) {
+        [string]$row.package_authority_sha256 -cne [string]$candidate.package_authority_sha256 -or
+        [string]$row.package_source_sha256 -cne [string]$candidate.package_source_sha256) {
       throw "[mir42-seal-candidate-target-row-drift] $([string]$target.target)"
     }
     if ($expected.PSObject.Properties.Name -contains 'target_record_path') {
