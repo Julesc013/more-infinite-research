@@ -315,10 +315,11 @@ function Assert-MIRDevelopmentContractsInputFingerprintRegression {
 
 function Assert-MIRDevelopmentContractsCommandInventorySourceDriftRegression {
   param([Parameter(Mandatory)][string]$RepoRoot)
-  $probeRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir-development-command-inventory-'+[guid]::NewGuid().ToString('N'))
-  $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
-  if(-not[IO.Path]::GetFullPath($probeRoot).StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-development-command-inventory-probe-root]' }
+  $tempRoot=[IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/tmp'))
+  $probeRoot=Join-Path $tempRoot ('mir-development-command-inventory-'+[guid]::NewGuid().ToString('N').Substring(0,16))
+  if(-not[IO.Path]::GetFullPath($probeRoot).StartsWith($tempRoot.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-development-command-inventory-probe-root]' }
   try {
+    New-Item -ItemType Directory -Force -Path $tempRoot | Out-Null
     & git clone --quiet --shared --no-checkout $RepoRoot $probeRoot
     if($LASTEXITCODE-ne0) { throw '[mir4-development-command-inventory-probe-clone]' }
     & git -C $probeRoot checkout --quiet HEAD
@@ -330,7 +331,13 @@ function Assert-MIRDevelopmentContractsCommandInventorySourceDriftRegression {
     try { Update-MIR4CommandInventoryV1 -RepoRoot $probeRoot -Check|Out-Null } catch { $rejected=$_.Exception.Message-match'mir4-command-inventory-stale' }
     if(-not$rejected) { throw '[mir4-development-command-inventory-source-drift]' }
   } finally {
-    if(Test-Path -LiteralPath $probeRoot) { Remove-Item -LiteralPath $probeRoot -Recurse -Force }
+    if(Test-Path -LiteralPath $probeRoot) {
+      $cleanupRoot=(Resolve-Path -LiteralPath $probeRoot).ProviderPath
+      if(-not $cleanupRoot.StartsWith($tempRoot.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -or
+         (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint -or
+         (Split-Path -Leaf $cleanupRoot) -notlike 'mir-development-command-inventory-*') { throw '[mir4-development-command-inventory-cleanup-root]' }
+      Remove-Item -LiteralPath $cleanupRoot -Recurse -Force
+    }
   }
 }
 
