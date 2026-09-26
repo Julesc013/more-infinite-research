@@ -295,7 +295,8 @@ function M.query(catalogue, view, enrichment, localized_search)
   end
   table.sort(selected, function(left, right)
     if left.key == right.key then return false end
-    return v.sort == "name-desc" and left.key > right.key or left.key < right.key
+    if v.sort == "name-desc" then return left.key > right.key end
+    return left.key < right.key
   end)
   local pages = math.max(1, math.ceil(#selected / M.page_size))
   local page = math.min(v.page, pages)

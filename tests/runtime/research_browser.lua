@@ -1,3 +1,77 @@
+-- Pure query regression; accepts the canonical core supplied by the runner.
+local function check_browser_sorting(browser_core)
+  local queries = 0
+  local function ordered(rows, descending)
+    for index = 2, #rows do
+      local previous, current = rows[index - 1].key, rows[index].key
+      assert(descending and previous >= current or not descending and previous <= current,
+        "research browser order is inconsistent")
+    end
+  end
+  local function query(rows, direction, page, hidden)
+    local original = {}
+    for index, row in ipairs(rows) do original[index] = row.key end
+    local result = assert(browser_core.query({schema = 1, rows = rows},
+      {sort = direction, page = page or 1, hidden = hidden}))
+    queries = queries + 1
+    ordered(result.rows, direction == "name-desc")
+    for index, row in ipairs(rows) do
+      assert(row.key == original[index], "query mutated the source catalogue")
+    end
+    return result
+  end
+  local keys = {"alpha", "beta", "gamma", "omega"}
+  local permutations = 0
+  local function permute(index)
+    if index > #keys then
+      permutations = permutations + 1
+      local rows = {}
+      for i, key in ipairs(keys) do rows[i] = {key = key} end
+      for _, direction in ipairs({"name-asc", "name-desc"}) do
+        local result = query(rows, direction)
+        assert(result.count == 4 and #result.rows == 4, "sort lost a technology")
+        local expected = direction == "name-desc" and "omega,gamma,beta,alpha" or "alpha,beta,gamma,omega"
+        local actual = {}; for i, row in ipairs(result.rows) do actual[i] = row.key end
+        assert(table.concat(actual, ",") == expected, "sort depends on input order")
+      end
+      return
+    end
+    for i = index, #keys do
+      keys[index], keys[i] = keys[i], keys[index]
+      permute(index + 1)
+      keys[index], keys[i] = keys[i], keys[index]
+    end
+  end
+  permute(1)
+  for _, direction in ipairs({"name-asc", "name-desc"}) do
+    query({}, direction)
+    query({{key="only"}}, direction)
+    local duplicate = query({{key="b"},{key="a"},{key="b"},{key="a"}}, direction)
+    assert(duplicate.count == 4, "sort lost equal keys")
+    local rows = {}
+    -- Coprime permutation exercises cross-page order without RNG dependence.
+    for i = 1, 61 do rows[i] = {key = string.format("tech-%03d", (i * 17) % 61)} end
+    local seen, previous, count = {}, nil, 0
+    for page = 1, 4 do
+      local result = query(rows, direction, page)
+      assert(result.count == 61 and result.pages == 4, "pagination count changed")
+      for _, row in ipairs(result.rows) do
+        assert(not seen[row.key], "technology repeated between pages")
+        if previous then
+          assert(direction == "name-desc" and previous > row.key
+            or direction == "name-asc" and previous < row.key, "page boundary order changed")
+        end
+        seen[row.key], previous, count = true, row.key, count + 1
+      end
+    end
+    assert(count == 61, "pagination lost a technology")
+    local hidden = query(rows, direction, 1, {["tech-030"] = true})
+    assert(hidden.count == 60, "personal hide count changed")
+    for _, row in ipairs(hidden.rows) do assert(row.key ~= "tech-030", "hidden row retained") end
+  end
+  return {queries = queries, permutations = permutations}
+end
+
 local function snapshot(force)
   local rows = {}
   for name, tech in pairs(force.technologies) do
@@ -33,6 +107,8 @@ script.on_nth_tick(1,function()
     helpers.write_file("browser-reload.json",helpers.table_to_json{status="passed",assertions=count,engine=helpers.game_version,scope="native-single-player-save-reload-with-partial-research"},false)
     script.on_nth_tick(1,nil);return
   end
+  local sorting = check_browser_sorting(browser_core)
+  check(sorting.queries == 64 and sorting.permutations == 24, "sorting regression coverage")
   check(force.add_research("mir-browser-progress"),"initial queue")
   force.research_progress=0.375
   local before=snapshot(force)
