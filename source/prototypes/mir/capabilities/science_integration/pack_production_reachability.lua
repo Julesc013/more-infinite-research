@@ -230,6 +230,10 @@ local function science_pack_production_state()
     entries = {},
     unlock_progression_keys = {},
     recipe_progression_keys = {},
+    -- Only fully root-qualified mechanism answers enter this memo. Their
+    -- keys retain the active pack/technology guards, and epoch replacement
+    -- discards them along with the independent science-root facts.
+    technology_mechanism_memo = {},
     -- This state owns only source-epoch-stable structural observations. It
     -- deliberately cannot retain an acquisition result that depends on an
     -- active science-pack or technology traversal.
@@ -834,7 +838,8 @@ local function production_witness_options(visiting_packs, visiting_technologies,
   local options = {
     active_unlock_context = {pairs = {}, technologies = {}},
     technology_reason_memo = {},
-    technology_mechanism_memo = {},
+    technology_mechanism_memo = diagnostic_observer == nil
+      and science_pack_production_state().technology_mechanism_memo or {},
     diagnostic_observer = diagnostic_observer
   }
   options.research_unlock_witness = function(identity, state)

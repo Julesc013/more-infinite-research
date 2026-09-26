@@ -3067,9 +3067,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42FourTargetReleasePreflight.ps1",
       "classification": "canonical-internal",
-      "sha256": "D26BF38EAC597AE1596410B7856F3C4319E5976A44F8479B37C7A93791E34FD7",
+      "sha256": "A911654BA454B5B133859B5620A140B8D2B7F9FC47B0A7D5A1B9D2913A07F49E",
       "hash_mode": "canonical-text-v1",
-      "lines": 15,
+      "lines": 16,
       "package_visible": false
     },
     {
@@ -3139,17 +3139,17 @@
     {
       "path": "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
       "classification": "canonical-internal",
-      "sha256": "91AAD2079BFA3136FAC20A015A838D715EC2D8A214C580B83749DB2253954915",
+      "sha256": "3B3764AD89FC6176E3B31F5669A1E0B9CCD2C35E7570B2E8BB4FC82A6EFB3879",
       "hash_mode": "canonical-text-v1",
-      "lines": 21,
+      "lines": 22,
       "package_visible": false
     },
     {
       "path": "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
       "classification": "historical",
-      "sha256": "7DD46ED81684BB47BDA93CCF06E01550433C1113190D5D7B73DCD64796C4ACD4",
+      "sha256": "AD85CE91F55A8992713DE774D4A0667448D67230618BA4FE36573320E2CA00EA",
       "hash_mode": "canonical-text-v1",
-      "lines": 232,
+      "lines": 261,
       "package_visible": false
     },
     {
@@ -5211,9 +5211,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
       "classification": "canonical-internal",
-      "sha256": "B564EFCF381AB36BCC5C76DD016EB6BFA6A1902CD5FC27110888A52AD5DFC7F4",
+      "sha256": "5AA81414F1DA7C989FFC400A75A54E6B5727441F5966F6B2776F4FF84720357A",
       "hash_mode": "canonical-text-v1",
-      "lines": 386,
+      "lines": 671,
       "package_visible": false
     },
     {
@@ -5227,9 +5227,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
       "classification": "canonical-internal",
-      "sha256": "FB93CD7DF48E83DC26B464B21C91A9C2ED330682FFC3F5D9B04851D8DDC69A34",
+      "sha256": "5FA0A6120450C8D19D418961E261837AC175C36B8966043DE284F3D934D7E9B2",
       "hash_mode": "canonical-text-v1",
-      "lines": 212,
+      "lines": 271,
       "package_visible": false
     },
     {
@@ -5914,5 +5914,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:276628a3ac373701834b6efc49a0f3035f5824618a8766bbc023b185566b04ae"
+  "digest": "sha256:49c613e4dbcad39d129478d9479ab8af6a51ad537d8c3f4ced5a99970e415979"
 }

@@ -212,6 +212,35 @@ $manifest = [pscustomobject][ordered]@{
   predecessor = $record.predecessor
   builds = $rows
   distribution = [ordered]@{ path = [IO.Path]::GetRelativePath($repo, $distribution).Replace('\', '/'); sha256 = [string]$rows[0].archive_sha256; content_sha256 = [string]$rows[0].content_sha256; entry_count = [int]$rows[0].entry_count }
+  # This row is a construction input for a later combined candidate.  It does
+  # not alter the private historical target authority or grant an admission.
+  candidate_row = [ordered]@{
+    schema = 1
+    kind = 'MIR42HistoricalCandidateRowV1'
+    status = 'deterministic-historical-candidate-construction-input-unqualified'
+    target = $Target
+    source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree }
+    source_version = '4.2.0'
+    distribution_version = [string]$record.distribution_version
+    base_materializer_target = [string]$record.base_materializer_target
+    target_record = [ordered]@{ path = [IO.Path]::GetRelativePath($repo, $targetState.path).Replace('\', '/'); sha256 = [string]$record.record_sha256 }
+    asset = [ordered]@{
+      path = [IO.Path]::GetRelativePath($output, $distribution).Replace('\', '/')
+      bytes = [Int64](Get-Item -LiteralPath $distribution).Length
+      sha256 = [string]$rows[0].archive_sha256
+    }
+    content_sha256 = [string]$rows[0].content_sha256
+    entry_count = [int]$rows[0].entry_count
+    build_a_sha256 = [string]$rows[0].archive_sha256
+    build_b_sha256 = [string]$rows[1].archive_sha256
+    deterministic_archive_bytes = $true
+    package_excluded_surface = $true
+    qualification = 'not-performed-in-this-construction-record'
+    technical_seal = 'not-performed'
+    signing = 'not-performed'
+    public_output_authorized = $false
+    publication_authorized = $false
+  }
   assertions = @('current-canonical-f100-base-materialization', 'source-manifest-authoritative-adapter-selection', 'target-specific-profile-adapter', 'target-specific-metadata', 'bounded-research-cost-publication-omission', 'byte-identical-repeated-builds', 'package-path-exclusion')
   exact_engine_runtime = 'not-run'
   public_output_authorized = $false

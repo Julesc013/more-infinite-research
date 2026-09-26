@@ -8,12 +8,12 @@
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR42FourTargetCandidateManifestV1"},
-    "status": {"const": "MIR-4.2-FOUR-TARGET-CANDIDATE-INPUTS-BOUND-UNQUALIFIED"},
+    "status": {"enum": ["MIR-4.2-FOUR-TARGET-CANDIDATE-INPUTS-BOUND-UNQUALIFIED", "MIR-4.2-NINE-TARGET-CANDIDATE-INPUTS-BOUND-UNQUALIFIED"]},
     "source_version": {"const": "4.2.0"},
     "candidate_id": {"type": "null"},
     "source": {"$ref": "#/$defs/source"},
     "archive_source_provenance": {"const": "unproven-by-zip-inputs"},
-    "targets": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/target"}},
+    "targets": {"type": "array", "minItems": 4, "maxItems": 9, "anyOf": [{"minItems": 4, "maxItems": 4}, {"minItems": 9, "maxItems": 9}], "items": {"$ref": "#/$defs/target"}},
     "package_excluded_surface_checked": {"const": true},
     "release_transition_authorized": {"const": false},
     "publication_authorized": {"const": false},
@@ -23,7 +23,7 @@
     "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
     "source": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "package_source_sha256", "package_authority_record_sha256"], "properties": {"commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"}, "tree": {"type": "string", "pattern": "^[a-f0-9]{40}$"}, "package_source_sha256": {"$ref": "#/$defs/sha256"}, "package_authority_record_sha256": {"$ref": "#/$defs/sha256"}}},
     "archive": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "bytes"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "bytes": {"type": "integer", "minimum": 1}}},
-    "metadata": {"type": "object", "additionalProperties": false, "required": ["name", "version", "factorio_version"], "properties": {"name": {"const": "more-infinite-research"}, "version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000)$"}, "factorio_version": {"enum": ["2.1", "2.0", "1.1", "1.0"]}}},
-    "target": {"type": "object", "additionalProperties": false, "required": ["target", "target_id", "factorio_line", "distribution_version", "package_root", "archive", "content_sha256", "entry_count", "metadata", "package_excluded_entries_absent", "qualification"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "target_id": {"enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0"]}, "factorio_line": {"enum": ["2.1", "2.0", "1.1", "1.0"]}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000)$"}, "package_root": {"type": "string", "pattern": "^more-infinite-research_4[.]2[.](?:21000|20000|11000|10000)$"}, "archive": {"$ref": "#/$defs/archive"}, "content_sha256": {"$ref": "#/$defs/sha256"}, "entry_count": {"type": "integer", "minimum": 1}, "metadata": {"$ref": "#/$defs/metadata"}, "package_excluded_entries_absent": {"const": true}, "qualification": {"const": "not-run"}}}
+    "metadata": {"type": "object", "additionalProperties": false, "required": ["name", "version", "factorio_version"], "properties": {"name": {"const": "more-infinite-research"}, "version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000|01700|01600|01500|01400|01300)$"}, "factorio_version": {"enum": ["2.1", "2.0", "1.1", "1.0", "0.17", "0.16", "0.15", "0.14", "0.13"]}}},
+    "target": {"type": "object", "additionalProperties": false, "required": ["target", "target_id", "factorio_line", "distribution_version", "package_root", "archive", "content_sha256", "entry_count", "metadata", "package_excluded_entries_absent", "qualification"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]}, "target_id": {"enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0", "factorio-0.17", "factorio-0.16", "factorio-0.15", "factorio-0.14", "factorio-0.13"]}, "factorio_line": {"enum": ["2.1", "2.0", "1.1", "1.0", "0.17", "0.16", "0.15", "0.14", "0.13"]}, "distribution_version": {"type": "string", "pattern": "^4[.]2[.](?:21000|20000|11000|10000|01700|01600|01500|01400|01300)$"}, "package_root": {"type": "string", "pattern": "^more-infinite-research_4[.]2[.](?:21000|20000|11000|10000|01700|01600|01500|01400|01300)$"}, "archive": {"$ref": "#/$defs/archive"}, "content_sha256": {"$ref": "#/$defs/sha256"}, "entry_count": {"type": "integer", "minimum": 1}, "metadata": {"$ref": "#/$defs/metadata"}, "package_excluded_entries_absent": {"const": true}, "qualification": {"const": "not-run"}}}
   }
 }

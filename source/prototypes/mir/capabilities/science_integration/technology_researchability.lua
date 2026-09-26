@@ -103,6 +103,13 @@ local function bounded_prerequisite_closure(tech_name, context)
   return rejection, names
 end
 
+local function active_set_key(values)
+  local names = {}
+  for name, active in pairs(values or {}) do if active then names[#names + 1] = name end end
+  table.sort(names)
+  return table.concat(names, "\1")
+end
+
 local function research_mechanism_reason(technology, technology_name, context)
   if technology.research_trigger then return nil end
   local unit = technology.unit
@@ -162,6 +169,64 @@ local function research_mechanism_reason(technology, technology_name, context)
   return nil
 end
 
+local function reusable_research_mechanism_reason(technology, technology_name, context)
+  local memo = context.mechanism_memo
+  if not memo or context.diagnostic_observer then
+    return research_mechanism_reason(technology, technology_name, context)
+  end
+  local packs = compiler_context.current():state_view("science_pack_production")
+  if not packs or packs.recipe_source_epoch ~= canonical_recipe_facts.source_epoch() then
+    return research_mechanism_reason(technology, technology_name, context)
+  end
+  local unlock_recipe = context.unlock_recipe_name
+    and data_raw.prototype("recipe", context.unlock_recipe_name) or nil
+  -- A later prerequisite can still be unresolved while this candidate's own
+  -- packs already have immutable root witnesses. Reuse this individual AND
+  -- term, without claiming a result for the unresolved closure around it.
+  for _, ingredient in ipairs(technology.unit and technology.unit.ingredients or {}) do
+    local pack_name = lab_compatibility.ingredient_name(ingredient)
+    if pack_name and (packs.entries[pack_name] == nil
+      or (unlock_recipe and recipe_facts.recipe_outputs_item(unlock_recipe, pack_name))) then
+      return research_mechanism_reason(technology, technology_name, context)
+    end
+  end
+  local key = table.concat({technology_name, active_set_key(context.visiting_packs),
+    active_set_key(context.visiting_technologies)}, "\0")
+  local cached = memo.mechanisms[key]
+  if cached ~= nil then return cached ~= false and cached or nil end
+  local rejection = research_mechanism_reason(technology, technology_name, context)
+  if memo.mechanism_count < 4096 then
+    memo.mechanisms[key] = rejection or false
+    memo.mechanism_count = memo.mechanism_count + 1
+  end
+  return rejection
+end
+
+-- A prerequisite closure is an AND: one active science dependency already
+-- rejects the entire route. Check that cheap contradiction before recursively
+-- solving unrelated packs. Self-producing recipes still need the independent
+-- acquisition witness and diagnostics retain their original visit order.
+local function active_science_rejection(technology, context)
+  if technology.research_trigger then return nil end
+  local unit = technology.unit
+  if not unit or (unit.count == nil and unit.count_formula == nil) then return nil end
+  local ingredients = unit.ingredients or {}
+  local unlock_recipe = context.unlock_recipe_name
+    and data_raw.prototype("recipe", context.unlock_recipe_name) or nil
+  for _, ingredient in ipairs(ingredients) do
+    local pack_name = lab_compatibility.ingredient_name(ingredient)
+    if pack_name and (context.visiting_packs or {})[pack_name]
+      and not (unlock_recipe and recipe_facts.recipe_outputs_item(unlock_recipe, pack_name))
+      and pack_registry.science_pack_exists(pack_name)
+      and lab_compatibility.valid_research_ingredients(ingredients)
+      and pack_production_status(pack_name, context.visiting_packs,
+        context.visiting_technologies or {}) == "unreachable" then
+      return "unreachable-science-" .. pack_name
+    end
+  end
+  return nil
+end
+
 local function reason(tech_name, context)
   context = context or {}
   if not diagnostic_visit(context) then return "diagnostic-budget-exhausted" end
@@ -216,17 +281,30 @@ local function reason(tech_name, context)
   telemetry.observe_max("technology_prerequisite_closure_max", #candidates)
   telemetry.count("technology_graph_index_queries", 1)
   for _, candidate_name in ipairs(candidates) do
+    local rejection = active_science_rejection(data_raw.technology(candidate_name), {
+      visiting_packs = context.visiting_packs,
+      visiting_technologies = visiting_technologies,
+      unlock_recipe_name = context.unlock_recipe_name
+    })
+    if rejection then
+      visiting_technologies[tech_name] = nil
+      if candidate_name == tech_name then return rejection end
+      return "prerequisite-" .. candidate_name .. "-" .. rejection
+    end
+  end
+  for _, candidate_name in ipairs(candidates) do
     if not diagnostic_visit(context) then
       visiting_technologies[tech_name] = nil
       return "diagnostic-budget-exhausted"
     end
     local candidate = data_raw.technology(candidate_name)
-    local rejection = research_mechanism_reason(candidate, candidate_name, {
+    local rejection = reusable_research_mechanism_reason(candidate, candidate_name, {
       visiting_packs = context.visiting_packs,
       visiting_technologies = visiting_technologies,
       unlock_recipe_name = context.unlock_recipe_name,
       diagnostic_observer = context.diagnostic_observer,
-      diagnostic_depth = context.diagnostic_depth
+      diagnostic_depth = context.diagnostic_depth,
+      mechanism_memo = context.mechanism_memo
     })
     if rejection then
       visiting_technologies[tech_name] = nil
@@ -238,22 +316,23 @@ local function reason(tech_name, context)
   return nil
 end
 
-local function active_set_key(values)
-  local names = {}
-  for name, active in pairs(values or {}) do if active then names[#names + 1] = name end end
-  table.sort(names)
-  return table.concat(names, "\1")
-end
-
 function M.reason_with_context(tech_name, context)
   local memo = context and context.mechanism_memo
   if type(memo) ~= "table" or context.diagnostic_observer then return reason(tech_name, context) end
   local owner = compiler_context.current()
   local epoch = canonical_recipe_facts.source_epoch()
-  if memo.compiler_context ~= owner or memo.recipe_source_epoch ~= epoch then
-    memo.compiler_context, memo.recipe_source_epoch = owner, epoch
+  local production_state = owner:state_view("science_pack_production")
+  local context_owned = production_state and production_state.recipe_source_epoch == epoch
+    and production_state.technology_mechanism_memo == memo
+  if (not context_owned and memo.compiler_context ~= owner) or memo.recipe_source_epoch ~= epoch then
+    -- A context-owned memo already has its owner in the state's lifetime;
+    -- avoid putting a reference back to that owner into the state itself.
+    if context_owned then memo.compiler_context = nil else memo.compiler_context = owner end
+    memo.recipe_source_epoch = epoch
     memo.recipes, memo.answers = {}, {}
     memo.root_qualified = {}
+    memo.answer_count = 0
+    memo.mechanisms, memo.mechanism_count = {}, 0
     memo.lab_inputs = pack_registry.all_lab_inputs()
   end
   local recipe_name = context.unlock_recipe_name or ""
@@ -294,7 +373,12 @@ function M.reason_with_context(tech_name, context)
   local cached = memo.answers[key]
   if cached ~= nil then return cached ~= false and cached or nil end
   local rejection = reason(tech_name, context)
-  memo.answers[key] = rejection or false
+  -- A large ecosystem may present many distinct active contexts. Exhausting
+  -- storage just stops reuse; every uncached query still gets its real answer.
+  if memo.answer_count < 4096 then
+    memo.answers[key] = rejection or false
+    memo.answer_count = memo.answer_count + 1
+  end
   return rejection
 end
 

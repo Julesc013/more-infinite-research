@@ -12,6 +12,35 @@ $script:MIR42FourTargetLines = [ordered]@{
   f200 = '2.0'
   f110 = '1.1'
   f100 = '1.0'
+  f017 = '0.17'
+  f016 = '0.16'
+  f015 = '0.15'
+  f014 = '0.14'
+  f013 = '0.13'
+}
+$script:MIR42HistoricalTargets = @('f017','f016','f015','f014','f013')
+
+function Get-MIR42ReleaseTargetIdentity {
+  param([Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target)
+  if ($Target -in @('f210','f200','f110','f100')) {
+    return Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion '4.2.0'
+  }
+  $relative = "targets/historical/$Target/target.json"
+  $record = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $relative) | ConvertFrom-Json -Depth 100
+  $version = '4.2.' + $Target.Substring(1) + '00'
+  if (-not (Test-MIR4BootstrapRecordHash -Record $record) -or
+      [string]$record.kind -cne 'MIR42HistoricalPlaytestTargetV1' -or [string]$record.target -cne $Target -or
+      [string]$record.factorio_line -cne [string]$script:MIR42FourTargetLines[$Target] -or
+      [string]$record.distribution_version -cne $version -or [string]$record.base_materializer_target -cne 'f100' -or
+      [bool]$record.public_output_authorized -or [bool]$record.publication_authorized) {
+    throw "[mir42-preflight-historical-target-authority] $Target"
+  }
+  return [pscustomobject]@{target=$Target;target_id="factorio-$($record.factorio_line)";
+    source_version='4.2.0';distribution_version=$version;distribution_root="more-infinite-research_$version";
+    package_name="more-infinite-research_$version.zip";target_record_path=$relative;
+    target_record_record_sha256=[string]$record.record_sha256;
+    target_record_file_sha256=Get-MIR4Sha256File -Path (Join-Path $RepoRoot $relative)}
 }
 
 function Assert-MIR42FourTargetOutputRoot {
@@ -57,14 +86,14 @@ function Assert-MIR42FourTargetPackageExcludedSurface {
 function Get-MIR42FourTargetArchiveInput {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
-    [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target,
+    [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
     [Parameter(Mandatory)][string]$Path
   )
 
   if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "[mir42-preflight-archive-missing] $Target" }
   $archive = (Resolve-Path -LiteralPath $Path).Path
   if ([IO.Path]::GetExtension($archive) -cne '.zip') { throw "[mir42-preflight-archive-extension] $Target" }
-  $projection = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion '4.2.0'
+  $projection = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target
   $expectedLine = [string]$script:MIR42FourTargetLines[$Target]
   if ([string]$projection.target_id -cne "factorio-$expectedLine") { throw "[mir42-preflight-target-authority] $Target" }
   $inventory = Get-MIR4ArchiveInventory -Path $archive
@@ -88,6 +117,29 @@ function Get-MIR42FourTargetArchiveInput {
     package_excluded_entries_absent = $true
     qualification = 'not-run'
   }
+}
+
+function Get-MIR42HistoricalZipInputs {
+  <#
+    Validate the optional historical ZIP map before any source-snapshot or
+    output work.  The caller still performs the exact per-archive identity
+    check through Get-MIR42FourTargetArchiveInput.
+  #>
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][hashtable]$HistoricalZips)
+
+  if ($HistoricalZips.Count -ne $script:MIR42HistoricalTargets.Count -or
+      @($HistoricalZips.Keys | Where-Object { $_ -cnotin $script:MIR42HistoricalTargets }).Count -ne 0) {
+    throw '[mir42-preflight-historical-target-set]'
+  }
+  return @(
+    foreach ($target in $script:MIR42HistoricalTargets) {
+      if (-not $HistoricalZips.ContainsKey($target) -or [string]::IsNullOrWhiteSpace([string]$HistoricalZips[$target])) {
+        throw '[mir42-preflight-historical-target-set]'
+      }
+      [pscustomobject][ordered]@{ target = $target; path = [string]$HistoricalZips[$target] }
+    }
+  )
 }
 
 function Get-MIR42FourTargetGovernanceContext {
@@ -134,10 +186,12 @@ function Invoke-MIR42FourTargetReleasePreflight {
     [Parameter(Mandatory)][string]$F200Zip,
     [Parameter(Mandatory)][string]$F110Zip,
     [Parameter(Mandatory)][string]$F100Zip,
+    [hashtable]$HistoricalZips,
     [Parameter(Mandatory)][string]$OutputRoot
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $historicalZipInputs = if ($null -eq $HistoricalZips) { @() } else { @(Get-MIR42HistoricalZipInputs -HistoricalZips $HistoricalZips) }
   $output = Assert-MIR42FourTargetOutputRoot -RepoRoot $repo -OutputRoot $OutputRoot
   $source = Get-MIR42FourTargetSourceIdentity -RepoRoot $repo -FinalSourceCommit $FinalSourceCommit
   $targets = @(
@@ -146,12 +200,17 @@ function Invoke-MIR42FourTargetReleasePreflight {
     Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target f110 -Path $F110Zip
     Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target f100 -Path $F100Zip
   )
+  foreach ($input in $historicalZipInputs) {
+    $targets += Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target ([string]$input.target) -Path ([string]$input.path)
+  }
   $governance = Get-MIR42FourTargetGovernanceContext -RepoRoot $repo
+  $scopeLabel = if ($targets.Count -eq 9) { 'NINE-TARGET' } else { 'FOUR-TARGET' }
+  $scopeName = if ($targets.Count -eq 9) { 'nine-target' } else { 'four-target' }
 
   $candidate = [pscustomobject][ordered]@{
     schema = 1
     kind = 'MIR42FourTargetCandidateManifestV1'
-    status = 'MIR-4.2-FOUR-TARGET-CANDIDATE-INPUTS-BOUND-UNQUALIFIED'
+    status = "MIR-4.2-$scopeLabel-CANDIDATE-INPUTS-BOUND-UNQUALIFIED"
     source_version = '4.2.0'
     candidate_id = $null
     source = $source
@@ -172,14 +231,14 @@ function Invoke-MIR42FourTargetReleasePreflight {
   $readiness = [pscustomobject][ordered]@{
     schema = 1
     kind = 'MIR42FourTargetTechnicalReadinessV1'
-    status = 'MIR-4.2-FOUR-TARGET-TECHNICAL-READINESS-NOT-READY'
+    status = "MIR-4.2-$scopeLabel-TECHNICAL-READINESS-NOT-READY"
     candidate_manifest = [ordered]@{path='candidate-manifest.json';sha256=Get-MIR4Sha256File -Path $candidatePath;record_sha256=[string]$candidate.record_sha256}
     source = $source
     governance_context = $governance
     target_qualification = @($targets | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;status='not-run'} })
     blockers = @(
       'archive-source-provenance-not-supplied',
-      'four-target-exact-qualification-not-run',
+      "$scopeName-exact-qualification-not-run",
       'independent-verification-not-run',
       'source-freeze-not-authorized',
       'protected-production-signing-and-recovery-open',
