@@ -122,7 +122,10 @@ try {
   Assert-MIR42CandidateBuildTest ($nine.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV1') 'nine-build-manifest-kind'
   Assert-MIR42CandidateBuildTest ($nine.status -ceq 'private-deterministic-nine-target-candidate-built-unqualified') 'nine-build-private-status'
   Assert-MIR42CandidateBuildTest ((@($nine.targets | ForEach-Object { [string]$_.target }) -join '|') -ceq 'f210|f200|f110|f100|f017|f016|f015|f014|f013') 'nine-build-target-order'
-  Assert-MIR42CandidateBuildTest ($script:mir42CandidateStubCalls.Count -eq 18) 'nine-build-two-materializations-per-target'
+  # The historical command imports its own materializer in its script scope.
+  # This stub observes only the four modern targets; historical A/B equality
+  # is checked through their construction rows below.
+  Assert-MIR42CandidateBuildTest ($script:mir42CandidateStubCalls.Count -eq 8) 'nine-build-two-modern-materializations-per-target'
   foreach ($target in @('f017', 'f016', 'f015', 'f014', 'f013')) {
     $rowPath = Join-Path $nineRoot "target-rows/$target.json"
     $row = Get-Content -Raw -LiteralPath $rowPath | ConvertFrom-Json -Depth 100 -DateKind String
