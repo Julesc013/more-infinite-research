@@ -85,12 +85,16 @@ local function selected_maximum(setting_name)
   return nil
 end
 
-local function add_runtime_binding(managed, technology_name, setting_name, source, operation)
+local function add_runtime_binding(managed, technology_name, declared_key, setting_name, source, operation)
   if not (prototypes and prototypes.technology and prototypes.technology[technology_name]) then return end
   local selected = selected_maximum(setting_name)
   managed[technology_name] = {
     source = source,
     operation = operation,
+    -- The browser settings bridge must not reconstruct this association from a
+    -- technology or setting name.  These are the exact stream/base keys that
+    -- this controller used while constructing its F200 policy.
+    declared_key = declared_key,
     setting = setting_name,
     selected = selected,
     policy_transport = "settings-derived-v3",
@@ -107,6 +111,7 @@ local function add_generated_runtime_bindings(managed)
     add_runtime_binding(
       managed,
       technology_name,
+      key,
       "ips-max-level-" .. tostring(key),
       "generated-stream",
       "runtime-settings-transport")
@@ -130,6 +135,7 @@ local function add_base_continuation_runtime_bindings(managed)
       add_runtime_binding(
         managed,
         selected_name,
+        key,
         "mir-max-level-" .. tostring(key),
         "base-continuation",
         "runtime-settings-transport")
@@ -197,6 +203,7 @@ local function normalized_v3_binding(binding, policy_blocked_reason)
   end
   local binding_error = v3_binding_admission_error(binding)
   local binding_detail = type(binding.binding) == "table" and binding.binding or {}
+  local semantic = type(binding.semantic) == "table" and binding.semantic or {}
   local setting = type(binding.setting) == "table" and binding.setting or {}
   local cap = type(binding.cap) == "table" and binding.cap or {}
   local blocked_reason
@@ -206,6 +213,11 @@ local function normalized_v3_binding(binding, policy_blocked_reason)
     technology = tostring(binding.technology_id),
     source = binding_detail.source or binding.source,
     operation = binding_detail.operation or binding.operation,
+    -- A V3 fingerprint proves the semantic field is part of the selected
+    -- binding.  Do not attach a declared key from a malformed or blocked
+    -- transport: settings presentation then remains absent rather than
+    -- associating an otherwise-valid cap with an unrelated stream.
+    declared_key = binding_error == nil and semantic.stream_id or nil,
     setting = setting.name or binding.setting_name,
     selected = cap.effective or binding.selected,
     blocked_reason = blocked_reason,
@@ -364,6 +376,68 @@ local function current_policy()
   return validated_policy_cache.managed,
     validated_policy_cache.caps,
     validated_policy_cache.transport_blocked
+end
+
+local function copied_runtime_settings_binding(technology_name, policy, cap)
+  if type(policy) ~= "table" or policy.legacy
+      or not bounded_string(technology_name) or not bounded_string(policy.source)
+      or not bounded_string(policy.policy_transport) or not bounded_string(policy.declared_key)
+      or not bounded_string(policy.setting) then
+    return nil
+  end
+  if policy.source ~= "generated-stream" and policy.source ~= "base-continuation" then
+    return nil
+  end
+
+  local selected = policy.selected
+  local selected_is_finite = finite_positive_integer(selected)
+  local selected_is_infinite = selected == "infinite"
+  if not selected_is_finite and not selected_is_infinite then return nil end
+
+  local blocked_reason = bounded_string(policy.blocked_reason) and policy.blocked_reason or nil
+  local state
+  if blocked_reason then
+    state = "disabled"
+  elseif selected_is_infinite then
+    state = "infinite"
+  elseif cap == selected then
+    state = "finite"
+  else
+    -- A finite setting without the exact accepted cap is not browser evidence.
+    -- Keep controller behaviour unchanged and omit this presentation-only row.
+    return nil
+  end
+
+  return {
+    schema = 1,
+    source = policy.source,
+    policy_transport = policy.policy_transport,
+    binding = {
+      technology_id = technology_name,
+      declared_key = policy.declared_key,
+      setting_name = policy.setting
+    },
+    selected_effective = selected,
+    state = state,
+    blocked_reason = blocked_reason
+  }
+end
+
+-- Read-only presentation bridge for the research browser. It exposes a fresh,
+-- bounded plain copy of the policy that this controller has already admitted;
+-- it does not read a Force, persistent state, queue, or compiler artifact and
+-- cannot change normalization behaviour. The normal lifecycle invalidation
+-- above clears its shared policy source on init/configuration changes.
+function M.runtime_settings_bindings()
+  local managed, caps = current_policy()
+  local out, count = {}, 0
+  for technology_name, policy in pairs(managed) do
+    count = count + 1
+    if count > 30000 then return {} end
+    local binding = copied_runtime_settings_binding(technology_name, policy, caps[technology_name])
+    if binding then out[technology_name] = binding end
+  end
+  return out
 end
 
 local function force_cap_state(force)

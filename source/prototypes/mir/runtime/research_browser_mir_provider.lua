@@ -4,6 +4,7 @@
 local profile_codec = require("prototypes.mir.settings.profile_codec")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
+local maximum_level_control = require("prototypes.mir.runtime.maximum_level_control")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {schema = 2, catalogue_limit = 30000}
@@ -82,8 +83,10 @@ end
 local function comparison(name)
   local prototype = prototypes.mod_setting and prototypes.mod_setting[name]
   local setting = settings and settings.startup and settings.startup[name]
+  local catalog_spec = settings_catalog.spec(name)
   if not prototype or prototype.mod ~= "more-infinite-research"
-    or prototype.setting_type ~= "startup" or not setting or prototype.default_value == nil then
+    or prototype.setting_type ~= "startup" or not setting or prototype.default_value == nil
+    or type(catalog_spec) ~= "table" or catalog_spec.name ~= name then
     return nil
   end
   local raw, source, effective = setting.value, "direct", setting.value
@@ -278,6 +281,7 @@ end
 -- configuration lifecycle, not per row click or completed research. Keep
 -- only their validated plain outcome; recipe/level facts remain live below.
 local validated_policy_caps
+local validated_runtime_settings_bindings
 
 local function current_policy_caps()
   if validated_policy_caps == nil then validated_policy_caps = policy_caps() end
@@ -286,6 +290,140 @@ end
 
 function M.policy_caps_for_test(artifact, prototype_table)
   return policy_caps(artifact, prototype_table)
+end
+
+local runtime_binding_sources = {
+  ["generated-stream"] = true,
+  ["base-continuation"] = true
+}
+
+local runtime_binding_transports = {
+  ["transported-v3"] = true,
+  ["settings-derived-v3"] = true
+}
+
+local function valid_runtime_setting(setting, expected_name)
+  if type(setting) ~= "table" or not only_fields(setting, {name = true, default = true,
+      raw_direct = true, effective = true, source = true, changed = true,
+      changed_from_default = true, restart_required = true})
+      or setting.name ~= expected_name or (setting.source ~= "direct" and setting.source ~= "mirset1")
+      or not finite_nonnegative_integer(setting.default)
+      or not finite_nonnegative_integer(setting.raw_direct)
+      or not finite_nonnegative_integer(setting.effective)
+      or type(setting.changed) ~= "boolean" or type(setting.changed_from_default) ~= "boolean"
+      or setting.changed ~= (not scalar_equal(setting.raw_direct, setting.effective))
+      or setting.changed_from_default ~= (not scalar_equal(setting.default, setting.effective))
+      or setting.restart_required ~= true then
+    return false
+  end
+  local spec = settings_catalog.spec(expected_name)
+  return type(spec) == "table" and spec.name == expected_name and spec.type == "int-setting"
+    and settings_catalog.validate_value(expected_name, setting.default)
+    and settings_catalog.validate_value(expected_name, setting.raw_direct)
+    and settings_catalog.validate_value(expected_name, setting.effective)
+end
+
+local function valid_controller_runtime_binding(technology_id, binding)
+  if type(binding) ~= "table" or not only_fields(binding, {schema = true, source = true,
+      policy_transport = true, binding = true, selected_effective = true, state = true,
+      blocked_reason = true}) or binding.schema ~= 1
+      or not bounded_string(technology_id) or not runtime_binding_sources[binding.source]
+      or not runtime_binding_transports[binding.policy_transport]
+      or type(binding.binding) ~= "table"
+      or not only_fields(binding.binding, {technology_id = true, declared_key = true, setting_name = true})
+      or binding.binding.technology_id ~= technology_id
+      or not bounded_string(binding.binding.declared_key)
+      or not bounded_string(binding.binding.setting_name) then
+    return false
+  end
+  local selected = binding.selected_effective
+  local finite, infinite = finite_nonnegative_integer(selected) and selected > 0, selected == "infinite"
+  if not finite and not infinite then return false end
+  if binding.state == "finite" then
+    return finite and binding.blocked_reason == nil
+  elseif binding.state == "infinite" then
+    return infinite and binding.blocked_reason == nil
+  elseif binding.state == "disabled" then
+    return bounded_string(binding.blocked_reason)
+  end
+  return false
+end
+
+local function copy_runtime_settings_binding(binding, setting)
+  return {
+    schema = 1,
+    source = binding.source,
+    policy_transport = binding.policy_transport,
+    binding = {
+      technology_id = binding.binding.technology_id,
+      declared_key = binding.binding.declared_key,
+      setting_name = binding.binding.setting_name
+    },
+    setting = {
+      name = setting.name,
+      default = setting.default,
+      raw_direct = setting.raw_direct,
+      effective = setting.effective,
+      source = setting.source,
+      changed = setting.changed,
+      changed_from_default = setting.changed_from_default,
+      restart_required = setting.restart_required
+    },
+    selected_effective = binding.selected_effective,
+    state = binding.state,
+    blocked_reason = binding.blocked_reason
+  }
+end
+
+-- Startup settings and validated controller bindings change at the same
+-- lifecycle boundary as the existing policy-cap cache. Cache only copied
+-- scalar facts here; each snapshot below still intersects the result with the
+-- current Force technology table.
+local function current_runtime_settings_bindings()
+  if validated_runtime_settings_bindings ~= nil then
+    return validated_runtime_settings_bindings
+  end
+  local controller_bindings = maximum_level_control.runtime_settings_bindings()
+  local bindings, count = {}, 0
+  if type(controller_bindings) == "table" then
+    for technology_id, binding in pairs(controller_bindings) do
+      count = count + 1
+      if count > M.catalogue_limit then
+        validated_runtime_settings_bindings = {}
+        return validated_runtime_settings_bindings
+      end
+      if valid_controller_runtime_binding(technology_id, binding) then
+        local setting = comparison(binding.binding.setting_name)
+        if valid_runtime_setting(setting, binding.binding.setting_name) then
+          local selected, effective = binding.selected_effective, setting.effective
+          local matches = (binding.state == "finite" and selected == effective)
+            or (binding.state == "infinite" and selected == "infinite" and effective == 0)
+            or (binding.state == "disabled" and ((selected == "infinite" and effective == 0)
+              or (type(selected) == "number" and selected == effective)))
+          if matches then
+            bindings[technology_id] = copy_runtime_settings_binding(binding, setting)
+          end
+        end
+      end
+    end
+  end
+  validated_runtime_settings_bindings = bindings
+  return bindings
+end
+
+local function live_runtime_settings_bindings(force)
+  local out = {}
+  if not force or not force.valid then return out end
+  local count = 0
+  for technology_id, binding in pairs(current_runtime_settings_bindings()) do
+    count = count + 1
+    if count > M.catalogue_limit then return {} end
+    local technology = force.technologies and force.technologies[technology_id]
+    if technology and technology.valid then
+      out[technology_id] = copy_runtime_settings_binding(binding, binding.setting)
+    end
+  end
+  return out
 end
 
 local function valid_public_row(row, allow_absent_technology)
@@ -333,6 +471,7 @@ function M.invalidate_omissions()
   omission_rows = nil
   validated_public_candidates = nil
   validated_policy_caps = nil
+  validated_runtime_settings_bindings = nil
 end
 
 local function omitted_public_rows()
@@ -540,9 +679,11 @@ end
 
 function M.snapshot(force)
   local caps, families, details = {}, {}, {}
+  local runtime_settings_bindings = live_runtime_settings_bindings(force)
   local candidates = current_public_candidates()
   if not candidates then
-    return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
+    return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families,
+      details = details, runtime_settings_bindings = runtime_settings_bindings}
   end
   local policies = current_policy_caps()
   local count = 0
@@ -557,6 +698,7 @@ function M.snapshot(force)
       details[row.technology_id] = detail
     end
   end
-  return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
+  return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families,
+    details = details, runtime_settings_bindings = runtime_settings_bindings}
 end
 return M
