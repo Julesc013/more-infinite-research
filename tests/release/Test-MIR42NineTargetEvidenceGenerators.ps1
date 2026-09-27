@@ -2,6 +2,7 @@
 [CmdletBinding()]
 param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $evidence = Join-Path $repo 'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1'

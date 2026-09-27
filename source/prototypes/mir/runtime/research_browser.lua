@@ -269,7 +269,7 @@ update_translation_index = function(results, cache, v)
   if indicator and indicator.valid then
     indicator.caption = caption
   else
-    fact_label(parent, "translation_index", caption, list and list.style.width - 16 or nil)
+    fact_label(parent, "translation_index", caption, list and list.style.maximal_width - 16 or nil)
   end
 end
 

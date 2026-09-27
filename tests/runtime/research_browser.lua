@@ -344,10 +344,10 @@ script.on_nth_tick(1,function()
     local default_detail=find_browser_element(default_root,"mir_browser_section","research-detail")
     local default_first=find_browser_element(default_root,"mir_browser_first_visible","first")
     local default_selected=find_browser_element(default_root,"mir_browser_selected","selected")
-    check(default_list and default_list.type=="flow" and default_list.style.width>=240 and default_list.style.width<=360
-      and default_detail and default_detail.type=="flow" and default_detail.style.width>=280 and default_detail.style.width<=460,
+    check(default_list and default_list.type=="flow" and default_list.style.maximal_width>=240 and default_list.style.maximal_width<=360
+      and default_detail and default_detail.type=="flow" and default_detail.style.maximal_width>=280 and default_detail.style.maximal_width<=460,
       "Browse fits bounded native list and detail panes to the display")
-    check(browser_labels_fit(default_detail,default_detail.style.width),
+    check(browser_labels_fit(default_detail,default_detail.style.maximal_width),
       "Browse detail labels wrap within their native detail pane")
     check(default_first and default_selected and default_first.tags.technology==default_selected.tags.technology
       and find_browser_element(default_root,"mir_browser","open-vanilla"),
