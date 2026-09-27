@@ -197,7 +197,7 @@ $workflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/vali
 $developmentWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'development-static'
 $releaseWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'verification-gate'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('name: MIR / development-static-gate') -Message 'Development workflow gate has no distinct name.'
-Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('hosted-development-affected') -Message 'Development workflow does not bind the affected-static selection mode.'
+Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('Invoke-MIR4DevelopmentCanonicalCoverage') -Message 'Development workflow does not bind affected-static coverage to the canonical gate.'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('github.event.pull_request.base.sha') -Message 'Pull-request base identity is absent from the development selection.'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('github.event.before') -Message 'Push baseline identity is absent from the development selection.'
 Assert-MIRDevelopmentCISelection -Condition (-not $developmentWorkflowBlock.Contains('name: verification-gate')) -Message 'Development static evaluator reuses the release gate name.'
