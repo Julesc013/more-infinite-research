@@ -141,6 +141,34 @@ try {
   if ($cleanHookOutput.Count -ne 1) { throw '[mir-development-health-clean-partial-output]' }
   $cleanHook = $cleanHookOutput[0] | ConvertFrom-Json -Depth 8
   if (@($cleanHook.PSObject.Properties.Name | Where-Object { $_ -ceq 'decision' -or $_ -ceq 'continue' }).Count -ne 0 -or [string]$cleanHook.systemMessage -notmatch 'No workspace checkpoint action is required') { throw '[mir-development-health-clean-partial-pass]' }
+
+  # An all-ours resolution can leave Git waiting for a merge commit while
+  # porcelain is empty. The advisory must still identify the unfinished work.
+  & git -C $cleanFixture checkout --quiet -b merge-side
+  if($LASTEXITCODE-ne0){throw '[mir-development-health-merge-side-branch]'}
+  [IO.File]::WriteAllText((Join-Path $cleanFixture 'merge-marker.txt'),'side',[Text.UTF8Encoding]::new($false))
+  & git -C $cleanFixture add -- merge-marker.txt
+  & git -C $cleanFixture commit --quiet -m 'fixture: merge side'
+  if($LASTEXITCODE-ne0){throw '[mir-development-health-merge-side-commit]'}
+  & git -C $cleanFixture checkout --quiet main
+  if($LASTEXITCODE-ne0){throw '[mir-development-health-merge-return-main]'}
+  [IO.File]::WriteAllText((Join-Path $cleanFixture 'merge-marker.txt'),'main',[Text.UTF8Encoding]::new($false))
+  & git -C $cleanFixture add -- merge-marker.txt
+  & git -C $cleanFixture commit --quiet -m 'fixture: merge main'
+  if($LASTEXITCODE-ne0){throw '[mir-development-health-merge-main-commit]'}
+  & git -C $cleanFixture merge --no-commit merge-side 2>$null|Out-Null
+  if($LASTEXITCODE-eq0){throw '[mir-development-health-expected-merge-conflict]'}
+  & git -C $cleanFixture checkout --ours -- merge-marker.txt
+  & git -C $cleanFixture add -- merge-marker.txt
+  if($LASTEXITCODE-ne0-or@(& git -C $cleanFixture status --porcelain=v1).Count-ne0){throw '[mir-development-health-expected-clean-merge-index]'}
+  $mergeHealth=(& $checker -RepoRoot $cleanFixture -Mode Hook -AsJson|ConvertFrom-Json -Depth 16)
+  if($mergeHealth.git.dirty.count-ne0-or@($mergeHealth.git.dirty.operations).Count-ne1-or[string]$mergeHealth.git.dirty.operations[0]-cne'merge'-or-not[bool]$mergeHealth.checkpoint_required-or@($mergeHealth.checkpoint_reasons|Where-Object {$_ -ceq 'git-operation:merge'}).Count-ne1){throw '[mir-development-health-clean-merge-operation-missed]'}
+  $mergeHookOutput=@(Invoke-HealthNativeHook -ScriptPath $fixtureHook -CheckerRepoRoot $cleanFixture -Payload @{session_id='pending-merge';hook_event_name='Stop';stop_hook_active=$false})
+  if($mergeHookOutput.Count-ne1-or[string]($mergeHookOutput[0]|ConvertFrom-Json -Depth 8).decision-cne'block'){throw '[mir-development-health-clean-merge-checkpoint]'}
+  & git -C $cleanFixture merge --abort
+  if($LASTEXITCODE-ne0){throw '[mir-development-health-merge-abort]'}
+  $afterMergeHealth=(& $checker -RepoRoot $cleanFixture -Mode Hook -AsJson|ConvertFrom-Json -Depth 16)
+  if(@($afterMergeHealth.git.dirty.operations).Count-ne0-or[bool]$afterMergeHealth.checkpoint_required){throw '[mir-development-health-completed-merge-still-reported]'}
   Invoke-HealthFixtureGit -Arguments @('status','--short') | Out-Null
   Invoke-HealthFixtureGit -Arguments @('branch','--show-current') | Out-Null
   if ([IO.File]::ReadAllText((Join-Path $fixture 'tracked.txt')) -cne $trackedBefore -or [IO.File]::ReadAllText((Join-Path $linked 'linked-uncommitted.txt')) -cne $linkedBefore) { throw '[mir-development-health-hook-mutated-worktree]' }
@@ -149,10 +177,16 @@ try {
   try { & $checker -RepoRoot (Join-Path $fixture 'build') -AsJson | Out-Null } catch { $descendantRejected = $_.Exception.Message -match 'Git worktree root' }
   if (-not $descendantRejected) { throw '[mir-development-health-root-boundary]' }
 
-  [pscustomobject]@{ status='passed'; assertions=36; fixture=$fixture; hook_budget_seconds=[int]$hookReport.scan_limits.max_scan_seconds; mutations='none' } | ConvertTo-Json -Compress
+  [pscustomobject]@{ status='passed'; assertions=40; fixture=$fixture; hook_budget_seconds=[int]$hookReport.scan_limits.max_scan_seconds; mutations='none' } | ConvertTo-Json -Compress
 } finally {
   if ($null -ne $previousAuthorDate) { $env:GIT_AUTHOR_DATE = $previousAuthorDate } else { Remove-Item Env:GIT_AUTHOR_DATE -ErrorAction SilentlyContinue }
   if ($null -ne $previousCommitterDate) { $env:GIT_COMMITTER_DATE = $previousCommitterDate } else { Remove-Item Env:GIT_COMMITTER_DATE -ErrorAction SilentlyContinue }
+  $temporaryRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([IO.Path]::DirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
+  foreach($candidate in @($fixture,$linked,$cleanFixture)){
+    $absolute=[IO.Path]::GetFullPath($candidate)
+    if(-not$absolute.StartsWith($temporaryRoot,[StringComparison]::OrdinalIgnoreCase)-or[IO.Path]::GetFileName($absolute)-notmatch'^mir-development-health(?:-linked|-clean)?-[0-9a-f]{32}$'){throw '[mir-development-health-cleanup-boundary]'}
+    if(Test-Path -LiteralPath $absolute){$item=Get-Item -LiteralPath $absolute -Force;if(($item.Attributes-band[IO.FileAttributes]::ReparsePoint)-ne0){throw '[mir-development-health-cleanup-reparse]'}}
+  }
   if (Test-Path -LiteralPath $linked -PathType Container) { & git -C $fixture worktree remove --force $linked 2>$null }
   if (Test-Path -LiteralPath $fixture -PathType Container) { Remove-Item -LiteralPath $fixture -Force -Recurse }
   if (Test-Path -LiteralPath $linked -PathType Container) { Remove-Item -LiteralPath $linked -Force -Recurse }
