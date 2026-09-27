@@ -410,12 +410,7 @@ local streams = {
     icon_tech = "fish-breeding"
   },
   research_nutrients = {
-    localised_name = {
-      "",
-      {"description.productivity-bonus"},
-      ": ",
-      {"item-name.nutrients"}
-    },
+    localised_name = {"technology-name.more-infinite-research.research_nutrients"},
     ui_visibility = space_age_setting_visibility(),
     required_mods = {"space-age"},
     generation_requirements = {
@@ -438,12 +433,7 @@ local streams = {
     icon_item = "nutrients"
   },
   research_capture_robot_rockets = {
-    localised_name = {
-      "",
-      {"description.productivity-bonus"},
-      ": ",
-      {"item-name.capture-robot-rocket"}
-    },
+    localised_name = {"technology-name.more-infinite-research.research_capture_robot_rockets"},
     ui_visibility = space_age_setting_visibility(),
     required_mods = {"space-age"},
     generation_requirements = {
