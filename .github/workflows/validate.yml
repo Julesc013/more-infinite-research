@@ -348,14 +348,18 @@ jobs:
             build/results/assurance/workflow-status.json
           if-no-files-found: warn
 
-  # Development authoring has a separate static evaluator.  It is deliberately
-  # not named verification-gate: a reduced hosted check cannot satisfy the
-  # release-ready status required on main or release branches.
+  # Development authoring records the affected static selection only after the
+  # canonical gate has covered its exact plan-bound rows.  It remains distinct
+  # from verification-gate and has no release-ready status authority.
   development-static:
     name: MIR / development-static-gate
     if: >-
-      ${{ (github.event_name == 'push' && github.ref == 'refs/heads/dev') ||
-        (github.event_name == 'pull_request' && github.base_ref == 'dev') }}
+      ${{ needs.plan.result == 'success' && needs.verification-gate.result == 'success' &&
+        ((github.event_name == 'push' && github.ref == 'refs/heads/dev') ||
+        (github.event_name == 'pull_request' && github.base_ref == 'dev')) }}
+    needs:
+      - plan
+      - verification-gate
     runs-on: windows-latest
     concurrency:
       # Keep only truly identical event/base/merged-content requests together.
@@ -366,8 +370,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ needs.plan.outputs.plan_artifact }}
+          path: build/results/assurance
       - id: selection
-        name: Select and run affected development static checks
+        name: Select affected development static checks and verify canonical coverage
         shell: pwsh
         run: |
           $baseline = if ('${{ github.event_name }}' -eq 'pull_request') {
@@ -377,12 +385,13 @@ jobs:
           }
           if ($baseline -match '^0{40}$') { $baseline = '' }
           . ./tools/mir/application/assurance/DevelopmentValidation.ps1
-          $result = Invoke-MIR4DevelopmentStaticChecks `
+          $result = Invoke-MIR4DevelopmentCanonicalCoverage `
             -RepoRoot $PWD `
-            -Mode hosted-development-affected `
             -EventName '${{ github.event_name }}' `
             -Baseline $baseline `
             -ExpectedHead '${{ github.sha }}' `
+            -PlanPath build/results/assurance/verification-plan.json `
+            -CanonicalGateResult '${{ needs.verification-gate.result }}' `
             -OutputPath build/results/assurance/development-ci-selection.json
           if ($result.release_qualification -or $result.release_readiness_gate -or $result.reuse_allowed) {
             throw 'Hosted development static selection must not claim release qualification, release readiness, or evidence reuse.'

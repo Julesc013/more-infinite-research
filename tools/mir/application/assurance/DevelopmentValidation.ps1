@@ -26,9 +26,12 @@ function Assert-MIR4DevelopmentHostedCheckoutClean {
 function Get-MIR4DevelopmentSelectorInputHashes {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  if($null -eq (Get-Command Get-MIRAssuranceTextHash -ErrorAction SilentlyContinue)) { . (Join-Path $repo 'tools/lib/assurance/Core.ps1') }
+  if($null -eq (Get-Command Get-MIRAssuranceCanonicalJsonFileHash -ErrorAction SilentlyContinue)) { . (Join-Path $repo 'tools/lib/assurance/Hashing.ps1') }
   $inputs=[ordered]@{
     assurance_policy_sha256=(Get-FileHash -LiteralPath (Join-Path $repo '.mir/assurance.json') -Algorithm SHA256).Hash.ToUpperInvariant()
     test_catalog_sha256=(Get-FileHash -LiteralPath (Join-Path $repo 'validation/tests.yml') -Algorithm SHA256).Hash.ToUpperInvariant()
+    test_catalog_canonical_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path (Join-Path $repo 'validation/tests.yml'))
     development_epoch_sha256=(Get-FileHash -LiteralPath (Join-Path $repo 'governance/repository/development-epoch-v1.json') -Algorithm SHA256).Hash.ToUpperInvariant()
     selector_sha256=(Get-FileHash -LiteralPath (Join-Path $repo 'tools/mir/application/assurance/DevelopmentValidation.ps1') -Algorithm SHA256).Hash.ToUpperInvariant()
     classifier_sha256=(Get-FileHash -LiteralPath (Join-Path $repo 'tools/lib/assurance/Core.ps1') -Algorithm SHA256).Hash.ToUpperInvariant()
@@ -126,6 +129,99 @@ function Get-MIR4DevelopmentCISelection {
   $testIds=@($rows|ForEach-Object {[string]$_.id}|Sort-Object -Unique);if($testIds.Count -eq 0) { throw '[mir4-development-empty-static-selection]' }
   $identity=Get-MIR4DevelopmentSelectionIdentity -Mode $Mode -EventName $EventName -Baseline $(if($baselineState -eq 'resolved'){$baselineValue}else{$baselineState}) -SourceCommit $sourceCommit -SourceTree $sourceTree -PackageSourceSha256 $packageSourceSha256 -InputHashes $inputHashes -Paths @($classification.paths) -TestIds $testIds
   return [ordered]@{schema=1;kind='MIR4DevelopmentCISelectionV1';mode=$Mode;event_name=$EventName;baseline=$baselineValue;baseline_state=$baselineState;source_commit=$sourceCommit;source_tree=$sourceTree;package_source_sha256=$packageSourceSha256;input_hashes=$inputHashes;classification=$classification;tests=$testIds;selection_identity=$identity;evaluator='MIR4-development-static-selector-v1';trust_scope=$(if($Mode -eq 'hosted-development-affected'){'hosted-development-authoring'}else{'local-development-authoring'});release_qualification=$false;release_readiness_gate=$false;reuse_allowed=$false}
+}
+
+function Get-MIR4DevelopmentCanonicalPropertyValue {
+  [OutputType([object])]
+  param([Parameter(Mandatory)]$Value,[Parameter(Mandatory)][string]$Name,[Parameter(Mandatory)][string]$Code)
+  if($Value -is [Collections.IDictionary]) {
+    if(-not $Value.Contains($Name)) { throw $Code }
+    return ,$Value[$Name]
+  }
+  $property=$Value.PSObject.Properties[$Name]
+  if($null -eq $property) { throw $Code }
+  return ,$property.Value
+}
+
+function Assert-MIR4DevelopmentCanonicalPlanCoverage {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)]$Selection,
+    [Parameter(Mandatory)]$Plan,
+    [Parameter(Mandatory)][string]$CanonicalGateResult
+  )
+  if($CanonicalGateResult -cne 'success') { throw '[mir4-development-canonical-gate]' }
+  $selectionValues=[ordered]@{}
+  foreach($name in @('schema','kind','mode','source_commit','source_tree','package_source_sha256','input_hashes','tests','trust_scope','release_qualification','release_readiness_gate','reuse_allowed')) {
+    $selectionValues[$name]=Get-MIR4DevelopmentCanonicalPropertyValue -Value $Selection -Name $name -Code "[mir4-development-canonical-selection-$name]"
+  }
+  if([int]$selectionValues.schema -ne 1 -or [string]$selectionValues.kind -cne 'MIR4DevelopmentCISelectionV1' -or [string]$selectionValues.mode -cne 'hosted-development-affected' -or [string]$selectionValues.trust_scope -cne 'hosted-development-authoring') { throw '[mir4-development-canonical-selection]' }
+  foreach($name in @('release_qualification','release_readiness_gate','reuse_allowed')) {
+    if($selectionValues[$name] -isnot [bool] -or [bool]$selectionValues[$name]) { throw "[mir4-development-canonical-selection-$name]" }
+  }
+  foreach($name in @('source_commit','source_tree')) {
+    if([string]$selectionValues[$name] -cnotmatch '^[0-9a-f]{40}$') { throw "[mir4-development-canonical-selection-$name]" }
+  }
+  if([string]$selectionValues.package_source_sha256 -cnotmatch '^[A-F0-9]{64}$') { throw '[mir4-development-canonical-selection-package-source]' }
+  $selectionRawCatalogHash=Get-MIR4DevelopmentCanonicalPropertyValue -Value $selectionValues.input_hashes -Name 'test_catalog_sha256' -Code '[mir4-development-canonical-selection-catalog]'
+  $selectionCanonicalCatalogHash=Get-MIR4DevelopmentCanonicalPropertyValue -Value $selectionValues.input_hashes -Name 'test_catalog_canonical_sha256' -Code '[mir4-development-canonical-selection-canonical-catalog]'
+  if([string]$selectionRawCatalogHash -cnotmatch '^[A-F0-9]{64}$') { throw '[mir4-development-canonical-selection-catalog]' }
+  if([string]$selectionCanonicalCatalogHash -cnotmatch '^[A-F0-9]{64}$') { throw '[mir4-development-canonical-selection-canonical-catalog]' }
+  $selectedIds=@($selectionValues.tests|ForEach-Object {[string]$_})
+  if($selectedIds.Count -eq 0 -or @($selectedIds|Where-Object {[string]::IsNullOrWhiteSpace($_)}).Count -ne 0 -or @($selectedIds|Sort-Object -Unique).Count -ne $selectedIds.Count) { throw '[mir4-development-canonical-selection-tests]' }
+  $planValues=[ordered]@{}
+  foreach($name in @('schema','profile','source_commit','source_tree','package_source_sha256','test_catalog_sha256','catalog_sha256','expected_test_ids')) {
+    $planValues[$name]=Get-MIR4DevelopmentCanonicalPropertyValue -Value $Plan -Name $name -Code "[mir4-development-canonical-plan-$name]"
+  }
+  if([int]$planValues.schema -ne 4 -or [string]$planValues.profile -cne 'mir4-development') { throw '[mir4-development-canonical-plan-profile]' }
+  foreach($name in @('source_commit','source_tree')) {
+    if([string]$planValues[$name] -cnotmatch '^[0-9a-fA-F]{40}$') { throw "[mir4-development-canonical-plan-$name]" }
+    if([string]$planValues[$name] -cne [string]$selectionValues[$name]) { throw "[mir4-development-canonical-plan-$name]" }
+  }
+  foreach($name in @('package_source_sha256','test_catalog_sha256','catalog_sha256')) {
+    if([string]$planValues[$name] -cnotmatch '^[A-F0-9]{64}$') { throw "[mir4-development-canonical-plan-$name]" }
+  }
+  if([string]$planValues.package_source_sha256 -cne [string]$selectionValues.package_source_sha256) { throw '[mir4-development-canonical-plan-package-source]' }
+  if([string]$planValues.test_catalog_sha256 -cne [string]$selectionCanonicalCatalogHash -or [string]$planValues.catalog_sha256 -cne [string]$selectionCanonicalCatalogHash) { throw '[mir4-development-canonical-plan-catalog]' }
+  $plannedIds=@($planValues.expected_test_ids|ForEach-Object {[string]$_})
+  if($plannedIds.Count -eq 0 -or @($plannedIds|Where-Object {[string]::IsNullOrWhiteSpace($_)}).Count -ne 0 -or @($plannedIds|Sort-Object -Unique).Count -ne $plannedIds.Count) { throw '[mir4-development-canonical-plan-tests]' }
+  $missing=@($selectedIds|Where-Object { $selectedId=$_;@($plannedIds|Where-Object {$_ -ceq $selectedId}).Count -ne 1 })
+  if($missing.Count -ne 0) { throw "[mir4-development-canonical-plan-coverage] $($missing -join ',')" }
+  return [ordered]@{
+    schema=1;kind='MIR4DevelopmentCanonicalPlanCoverageV1';status='covered-by-successful-canonical-verification-gate'
+    canonical_gate_job='verification-gate';canonical_gate_result='success';plan_profile='mir4-development'
+    source_commit=[string]$planValues.source_commit;source_tree=[string]$planValues.source_tree;package_source_sha256=[string]$planValues.package_source_sha256
+    test_catalog_raw_sha256=[string]$selectionRawCatalogHash;test_catalog_canonical_sha256=[string]$planValues.test_catalog_sha256;selected_test_ids=@($selectedIds);planned_test_ids=@($plannedIds)
+    per_test_executions=0;executed_test_ids=@();release_qualification=$false;release_readiness_gate=$false;reuse_allowed=$false
+  }
+}
+
+function Invoke-MIR4DevelopmentCanonicalCoverage {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$EventName,
+    [Parameter(Mandatory)][string]$Baseline,
+    [Parameter(Mandatory)][string]$ExpectedHead,
+    [Parameter(Mandatory)][string]$PlanPath,
+    [Parameter(Mandatory)][string]$CanonicalGateResult,
+    [Parameter(Mandatory)][string]$OutputPath
+  )
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $selection=Get-MIR4DevelopmentCISelection -RepoRoot $repo -Mode hosted-development-affected -EventName $EventName -Baseline $Baseline -ExpectedHead $ExpectedHead
+  $planPath=[IO.Path]::GetFullPath((Join-Path $repo $PlanPath));$buildRoot=(Join-Path $repo 'build')+[IO.Path]::DirectorySeparatorChar
+  if(-not $planPath.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase) -or -not(Test-Path -LiteralPath $planPath -PathType Leaf)) { throw '[mir4-development-canonical-plan-path]' }
+  try { $plan=Get-Content -Raw -LiteralPath $planPath|ConvertFrom-Json } catch { throw '[mir4-development-canonical-plan-json]' }
+  $coverage=Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $selection -Plan $plan -CanonicalGateResult $CanonicalGateResult
+  $result=[ordered]@{};foreach($property in $selection.GetEnumerator()){$result[$property.Key]=$property.Value}
+  $result['status']='covered-by-successful-canonical-verification-gate';$result['canonical_coverage']=$coverage
+  $result['per_test_executions']=0;$result['executed_test_ids']=@();$result['outcomes']=@()
+  $result['release_qualification']=$false;$result['release_readiness_gate']=$false;$result['reuse_allowed']=$false
+  $outputPath=[IO.Path]::GetFullPath((Join-Path $repo $OutputPath))
+  if(-not $outputPath.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-development-output-path]' }
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $outputPath)|Out-Null
+  [IO.File]::WriteAllText($outputPath,(($result|ConvertTo-Json -Depth 20)+"`n"),[Text.UTF8Encoding]::new($false))
+  return [pscustomobject]$result
 }
 
 function Invoke-MIR4DevelopmentStaticChecks {
