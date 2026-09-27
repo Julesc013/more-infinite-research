@@ -1418,6 +1418,24 @@ function M.pack_production_status(pack_name, visiting_packs, visiting_technologi
   return status, prerequisite
 end
 
+-- Complete the deterministic, context-free root pass before a planner fans
+-- into stream-specific prerequisite queries.  The registered service is the
+-- authority for the query: a target-specific registration therefore retains
+-- its exact semantics.  Each call has empty active sets, so the common
+-- resolver may publish only its existing source-epoch-bound root entries.
+-- Contextual answers and independent self-output witnesses remain owned by
+-- their ordinary calls below.
+function M.prime_root_pack_statuses(context)
+  context = context or compiler_context.current()
+  local resolver = context:service("science.pack_production_status")
+  if type(resolver) ~= "function" then
+    error("MIR science pack-production service is not registered in CompilerContext.", 2)
+  end
+  for _, pack_name in ipairs(pack_registry.all_lab_inputs()) do
+    resolver(pack_name, {}, {})
+  end
+end
+
 -- Diagnostic-only explanation of an already rejected root pack query. This
 -- intentionally has no effect on admission: callers must opt in, the normal
 -- status result remains authoritative, and the projection uses no persistent
