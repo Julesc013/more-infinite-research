@@ -1,6 +1,106 @@
 local browser_provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
 local native_startup_settings = require("__more-infinite-research__/prototypes/mir/runtime/startup_settings")
 local native_profile_codec = require("__more-infinite-research__/prototypes/mir/settings/profile_codec")
+local native_settings_catalog = require("__more-infinite-research__/prototypes/mir/settings/catalog")
+
+-- Keep the portable settings witness independent from generated-stream detail:
+-- F200 can legitimately show an owned maximum-level setting without a sealed
+-- F210 generation-plan row, family, compiler action, or ownership claim.
+local function check_runtime_settings_binding_contract(check)
+  local catalogue = {schema = 1, rows = {
+    {key = "runtime-settings-bridge-tech", available = true, researched = false,
+      queued = false, infinite = false, native_order = "", progression = 1}
+  }}
+  local function envelope(state, selected, effective)
+    local changed_from_default = effective ~= 3
+    return {
+      schema = 2,
+      kind = "portable-research-enrichment",
+      caps = {}, families = {}, details = {},
+      runtime_settings_bindings = {
+        ["runtime-settings-bridge-tech"] = {
+          schema = 1,
+          source = "generated-stream",
+          policy_transport = "settings-derived-v3",
+          binding = {
+            technology_id = "runtime-settings-bridge-tech",
+            declared_key = "bridge-stream",
+            setting_name = "ips-max-level-bridge"
+          },
+          setting = {
+            name = "ips-max-level-bridge", default = 3, raw_direct = effective,
+            effective = effective, source = "direct", changed = false,
+            changed_from_default = changed_from_default, restart_required = true
+          },
+          selected_effective = selected,
+          state = state
+        }
+      }
+    }
+  end
+  local function binding_detail(value)
+    return browser_core.detail(catalogue, "runtime-settings-bridge-tech", value)
+  end
+
+  local forged_schema1 = {
+    schema = 1,
+    runtime_settings_bindings = envelope("finite", 3, 3).runtime_settings_bindings
+  }
+  local forged_detail = binding_detail(forged_schema1)
+  check(forged_detail and forged_detail.runtime_settings_binding == nil,
+    "schema-1 enrichment cannot surface a forged runtime settings witness")
+
+  local finite = envelope("finite", 3, 3)
+  local finite_detail = binding_detail(finite)
+  check(finite_detail and finite_detail.runtime_settings_binding
+      and finite_detail.runtime_settings_binding.state == "finite"
+      and finite_detail.runtime_settings_binding.selected_effective == 3
+      and finite_detail.technology.family == "external" and finite_detail.enrichment == nil,
+    "finite runtime settings witness is copied without a family or compiler action")
+  finite_detail.runtime_settings_binding.setting.effective = 99
+  finite_detail.runtime_settings_binding.binding.declared_key = "poisoned"
+  local finite_again = binding_detail(finite)
+  check(finite_again.runtime_settings_binding.setting.effective == 3
+      and finite_again.runtime_settings_binding.binding.declared_key == "bridge-stream",
+    "returned runtime settings witness copy cannot poison its normalized source")
+
+  local infinite = envelope("infinite", "infinite", 0)
+  local infinite_detail = binding_detail(infinite)
+  check(infinite_detail and infinite_detail.runtime_settings_binding
+      and infinite_detail.runtime_settings_binding.state == "infinite"
+      and infinite_detail.runtime_settings_binding.setting.effective == 0
+      and infinite_detail.technology.family == "external" and infinite_detail.enrichment == nil,
+    "infinite runtime settings witness stays separate from productive detail")
+
+  local disabled = envelope("disabled", 3, 3)
+  disabled.runtime_settings_bindings["runtime-settings-bridge-tech"].blocked_reason = "maximum_level_late_prototype_mutation"
+  local disabled_detail = binding_detail(disabled)
+  check(disabled_detail and disabled_detail.runtime_settings_binding
+      and disabled_detail.runtime_settings_binding.state == "disabled"
+      and disabled_detail.runtime_settings_binding.blocked_reason == "maximum_level_late_prototype_mutation"
+      and disabled_detail.technology.cap == nil and disabled_detail.enrichment == nil,
+    "disabled runtime settings witness is not an active cap or compiler detail")
+
+  local wrong_key = envelope("finite", 3, 3)
+  wrong_key.runtime_settings_bindings["other-technology"] = wrong_key.runtime_settings_bindings["runtime-settings-bridge-tech"]
+  wrong_key.runtime_settings_bindings["runtime-settings-bridge-tech"] = nil
+  check(browser_core.normalize_enrichment(wrong_key) == nil,
+    "runtime settings witness rejects a map-key and technology mismatch")
+  local wrong_state = envelope("finite", "infinite", 0)
+  check(browser_core.normalize_enrichment(wrong_state) == nil,
+    "runtime settings witness rejects a state and selected-value mismatch")
+  local wrong_effective = envelope("finite", 3, 4)
+  check(browser_core.normalize_enrichment(wrong_effective) == nil,
+    "runtime settings witness rejects a selected and effective-setting mismatch")
+  local wrong_source = envelope("finite", 3, 3)
+  wrong_source.runtime_settings_bindings["runtime-settings-bridge-tech"].source = "native-owner"
+  check(browser_core.normalize_enrichment(wrong_source) == nil,
+    "runtime settings witness rejects an unapproved policy source")
+  local noninteger = envelope("finite", 3.5, 3.5)
+  check(browser_core.normalize_enrichment(noninteger) == nil,
+    "runtime settings witness rejects a noninteger finite cap")
+end
+
 local function snapshot(force)
   local rows = {}
   for name, tech in pairs(force.technologies) do
@@ -50,6 +150,48 @@ local function browser_labels_fit(element, maximum_width)
   end
   return true
 end
+local function check_research_startup_controls(check, player, enrichment)
+  local catalog = native_settings_catalog
+  local bindings = enrichment.runtime_settings_bindings or {}
+  local names = {}
+  for name in pairs(bindings) do names[#names + 1] = name end
+  table.sort(names)
+  local seen, exercised = {}, 0
+  for _, name in ipairs(names) do
+    local binding = bindings[name]
+    if not seen[binding.source] then
+      local key = binding.binding.declared_key
+      check(remote.call("more-infinite-research-browser", "open", player.index,
+        {tab="research",family="all",mode=1,status=1,sort="progression",search="",selected=name}),
+        "native bound research detail opens independently of compiler family")
+      local root = player.gui.screen.mir_research_browser
+      local pane = find_browser_element(root, "mir_browser_section", "research-detail")
+      local maximum = find_browser_element(pane, "mir_browser_setting", binding.binding.setting_name)
+      check(maximum and maximum.tags.mir_browser_read_only == true
+        and maximum.tags.mir_browser_research_technology == name
+        and maximum.tags.mir_browser == nil,
+        "selected research exposes its exact read-only maximum setting")
+      local enable_name = (binding.source == "generated-stream" and "ips-enable-" or "mir-enable-") .. key
+      local enable = find_browser_element(pane, "mir_browser_setting", enable_name)
+      check(catalog.spec(enable_name) and enable and enable.type == "checkbox"
+        and enable.enabled == false and enable.state == native_startup_settings.get(enable_name)
+        and enable.tags.mir_browser_research_technology == name,
+        "research startup checkbox preserves its exact effective boolean")
+      check(browser_labels_fit(pane, pane.style.maximal_width),
+        "research startup controls fit the bounded independent detail pane")
+      check(find_browser_element(pane,"mir_browser","open-vanilla")
+        and find_browser_element(pane,"mir_browser","enqueue"),
+        "research actions remain available above startup controls")
+      seen[binding.source], exercised = true, exercised + 1
+    end
+  end
+  check(exercised > 0, "native controller supplies at least one registered research startup binding")
+  check(remote.call("more-infinite-research-browser", "open", player.index,
+    {tab="research",family="all",mode=1,status=1,sort="progression",search="",selected="mir-browser-test-finite"}),
+    "ordinary research detail opens without a MIR binding")
+  check(not find_browser_element(player.gui.screen.mir_research_browser,"mir_browser_read_only",true),
+    "ordinary research does not acquire unrelated MIR startup controls")
+end
 local function emitted_productivity_technology(player)
   local names = {}
   for name, technology in pairs(player.force.technologies) do
@@ -74,6 +216,7 @@ end
 script.on_nth_tick(1,function()
   local count=0
   local function check(value,message) assert(value,message); count=count+1 end
+  check_runtime_settings_binding_contract(check)
   local force=game.forces.player
   check(force.technologies["mir-browser-test-finite"].research_unit_energy==60,
     "one-second prototype research unit is sixty runtime energy ticks")
@@ -396,6 +539,7 @@ script.on_nth_tick(1,function()
     check(find_browser_element(default_root,"mir_browser","research") and find_browser_element(default_root,"mir_browser","queue")
       and find_browser_element(default_root,"mir_browser","settings") and find_browser_element(default_root,"mir_browser","availability"),
       "library presents browse, queue, setup and availability navigation")
+    check_research_startup_controls(check, actual, native_enrichment)
     local filtered_request={tab="research",family="all",mode=2,status=1,sort="progression",
       selected="automation",search="mir-browser-test",page=1}
     check(remote.call("more-infinite-research-browser","open",actual.index,filtered_request),

@@ -4599,6 +4599,7 @@
         "spec/programmes/community-requests.json",
         "spec/programmes/evidence/community-2026-09-06/**",
         "source:source/prototypes/mir/runtime/research_browser*.lua",
+        "source:source/prototypes/mir/runtime/maximum_level_control.lua",
         "source:source/prototypes/streams/productivity.lua"
       ]
     },

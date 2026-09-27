@@ -550,6 +550,59 @@ local function status_caption(technology, native_technology)
   if native_technology and native_technology.enabled == false then return {"mir-browser.status-disabled"} end
   return {"mir-browser.status-locked"}
 end
+local function research_setting_specs(portable)
+  -- This independent witness describes the controller's own startup binding,
+  -- not a compiler action or ownership claim. Its declared key came from the
+  -- validated policy construction; native technology names are not decoded.
+  local runtime_binding = portable and portable.runtime_settings_binding
+  local declared = runtime_binding and runtime_binding.binding and runtime_binding.binding.declared_key
+  if runtime_binding and runtime_binding.source == "generated-stream" then
+    local stream = streams.get(declared)
+    if stream and runtime_binding.binding.setting_name == "ips-max-level-" .. declared then
+      return declared, settings_catalog.stream_setting_specs(declared, stream)
+    end
+  elseif runtime_binding and runtime_binding.source == "base-continuation" then
+    for _, spec in ipairs(settings_catalog.base_extension_specs()) do
+      if spec.key == declared and runtime_binding.binding.setting_name == "mir-max-level-" .. declared then
+        return declared, settings_catalog.base_extension_setting_specs(declared)
+      end
+    end
+  end
+end
+local function add_research_startup_settings(parent, portable, maximum_width)
+  local key, specs = research_setting_specs(portable)
+  if not specs then return end
+  local profile_summary = imported_profile_summary()
+  local rows = {}
+  for _, spec in ipairs(specs) do
+    local prototype = prototypes.mod_setting[spec.name]
+    if prototype and prototype.mod == "more-infinite-research" and prototype.setting_type == "startup" then
+      local comparison = startup_comparison(spec.name, prototype, profile_summary)
+      if settings_catalog.validate_value(spec.name, comparison.effective) then
+        rows[#rows + 1] = {name = spec.name, prototype = prototype, comparison = comparison}
+      end
+    end
+  end
+  if #rows == 0 then return end
+  label(parent, {"mir-browser.research-startup-settings"}, maximum_width)
+  label(parent, {"mir-browser.startup-note"}, maximum_width)
+  for _, row in ipairs(rows) do
+    local field
+    if type(row.comparison.effective) == "boolean" then
+      field = parent.add{
+        type = "checkbox", state = row.comparison.effective,
+        caption = setting_field_caption(row.name, key, row.prototype) or ""
+      }
+      field.enabled = false
+    else
+      field = label(parent, startup_setting_caption(row.name, key, row.prototype, row.comparison), maximum_width)
+    end
+    field.tags = {
+      mir_browser_setting = row.name, mir_browser_read_only = true,
+      mir_browser_research_technology = portable.technology.key
+    }
+  end
+end
 local function detail(player, parent, v, c, width)
   local portable = v.selected and core.detail(c, v.selected, c.enrichment)
   local tech = portable and player.force.technologies[portable.technology.key]
@@ -566,8 +619,12 @@ local function detail(player, parent, v, c, width)
   -- are not player-facing research facts in this library surface.
   label(parent, {"mir-browser.family", family_caption(portable.technology.family)}, maximum_width)
   label(parent, status_caption(portable.technology, tech), maximum_width)
-  if portable.technology.cap then
-    label(parent, {"mir-browser.level-cap", tech.level, portable.technology.cap}, maximum_width)
+  local runtime_binding = portable.runtime_settings_binding
+  local registered_binding = runtime_binding and research_setting_specs(portable)
+  local effective_cap = portable.technology.cap
+    or (registered_binding and runtime_binding.state == "finite" and runtime_binding.selected_effective)
+  if effective_cap then
+    label(parent, {"mir-browser.level-cap", tech.level, effective_cap}, maximum_width)
   elseif tech.level and tech.level > 1 then
     label(parent, {"mir-browser.level", tech.level}, maximum_width)
   end
@@ -589,6 +646,7 @@ local function detail(player, parent, v, c, width)
   enqueue.enabled = actions.can_enqueue(player, tech, defines.input_action.start_research)
   button(parent, "open-vanilla", {"controls.open-technology-gui"}, {technology = tech.name})
   button(parent, "toggle-hide", v.hidden and v.hidden[tech.name] and {"mir-browser.show"} or {"mir-browser.hide"}, {technology = tech.name})
+  add_research_startup_settings(parent, portable, maximum_width)
 end
 local function filter_dropdown(parent, caption, items, selected_index, action)
   local field = parent.add{type = "flow", direction = "vertical"}

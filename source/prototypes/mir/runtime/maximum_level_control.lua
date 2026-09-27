@@ -85,7 +85,8 @@ local function selected_maximum(setting_name)
   return nil
 end
 
-local function add_runtime_binding(managed, technology_name, setting_name, source, operation)
+local function add_runtime_binding(managed, runtime_settings_bindings, technology_name,
+    declared_key, setting_name, source, operation)
   if not (prototypes and prototypes.technology and prototypes.technology[technology_name]) then return end
   local selected = selected_maximum(setting_name)
   managed[technology_name] = {
@@ -99,21 +100,31 @@ local function add_runtime_binding(managed, technology_name, setting_name, sourc
       and "maximum_level_runtime_setting_invalid" or nil,
     legacy = false
   }
+  -- The bridge's source key is presentation-only. Keep it in the controller's
+  -- non-persistent policy cache, never in managed_technologies save state.
+  runtime_settings_bindings[technology_name] = {
+    source = source,
+    policy_transport = "settings-derived-v3",
+    declared_key = declared_key,
+    setting = setting_name
+  }
 end
 
-local function add_generated_runtime_bindings(managed)
+local function add_generated_runtime_bindings(managed, runtime_settings_bindings)
   for key, spec in pairs(stream_registry.snapshot()) do
     local technology_name = spec.technology_name or ("recipe-prod-" .. tostring(key) .. "-1")
     add_runtime_binding(
       managed,
+      runtime_settings_bindings,
       technology_name,
+      key,
       "ips-max-level-" .. tostring(key),
       "generated-stream",
       "runtime-settings-transport")
   end
 end
 
-local function add_base_continuation_runtime_bindings(managed)
+local function add_base_continuation_runtime_bindings(managed, runtime_settings_bindings)
   for key, spec in pairs(setting_defaults.base_extensions or {}) do
     local chain_key = spec.chain_key or key
     local generated_key = spec.generated_key or chain_key
@@ -129,7 +140,9 @@ local function add_base_continuation_runtime_bindings(managed)
     if selected_name then
       add_runtime_binding(
         managed,
+        runtime_settings_bindings,
         selected_name,
+        key,
         "mir-max-level-" .. tostring(key),
         "base-continuation",
         "runtime-settings-transport")
@@ -137,9 +150,9 @@ local function add_base_continuation_runtime_bindings(managed)
   end
 end
 
-local function add_runtime_settings_policy(managed)
-  add_generated_runtime_bindings(managed)
-  add_base_continuation_runtime_bindings(managed)
+local function add_runtime_settings_policy(managed, runtime_settings_bindings)
+  add_generated_runtime_bindings(managed, runtime_settings_bindings)
+  add_base_continuation_runtime_bindings(managed, runtime_settings_bindings)
 end
 
 local function v3_binding_admission_error(binding)
@@ -242,11 +255,12 @@ local function transported_policy()
     -- F200 has no mod-data prototype surface, so its V3 controller derives a
     -- structured policy from settings. A modern target that does expose
     -- mod-data must not silently downgrade a missing policy into that path.
-    if target_line.mod_data_supported() then return {}, true end
-    return nil, false
+    if target_line.mod_data_supported() then return {}, true, {} end
+    return nil, false, {}
   end
 
   local managed = {}
+  local runtime_settings_bindings = {}
   if artifact.schema == 3 and artifact.kind == "MIRMaximumLevelPolicyV3" then
     local policy_blocked_reason
     if artifact.finalizer_status ~= "accepted" then
@@ -273,13 +287,27 @@ local function transported_policy()
         and counts[binding.technology_id] ~= nil
         and counts[binding.technology_id] ~= 1
         and "maximum_level_policy_duplicate_binding" or nil
-      local normalized = normalized_v3_binding(
+      local normalized, binding_error = normalized_v3_binding(
         binding, policy_blocked_reason or duplicate_reason)
       if normalized and normalized.technology ~= "" then
         managed[normalized.technology] = normalized
+        local semantic = type(binding) == "table" and binding.semantic or nil
+        local declared_key = type(semantic) == "table" and semantic.stream_id or nil
+        -- The raw semantic ID is copied into the non-persistent presentation
+        -- cache only after the complete V3 binding and outer transport passed.
+        -- A duplicate or blocked artifact cannot nominate browser settings.
+        if not policy_blocked_reason and not duplicate_reason and not binding_error
+            and bounded_string(declared_key) then
+          runtime_settings_bindings[normalized.technology] = {
+            source = normalized.source,
+            policy_transport = normalized.policy_transport,
+            declared_key = declared_key,
+            setting = normalized.setting
+          }
+        end
       end
     end
-    return managed, transport_blocked
+    return managed, transport_blocked, runtime_settings_bindings
   end
 
   -- V2 is a read-only migration bridge for already installed packages. New
@@ -292,12 +320,12 @@ local function transported_policy()
         managed[normalized.technology] = normalized
       end
     end
-    return managed, false
+    return managed, false, runtime_settings_bindings
   end
 
   -- An unrecognized transported policy is deliberately authoritative enough
   -- to disable settings-derived normalization. It is not safe to guess caps.
-  return managed, true
+  return managed, true, runtime_settings_bindings
 end
 
 local function log_policy_refusal(policy, observed)
@@ -323,11 +351,121 @@ local function ownership_key(policy)
   }, "\0")
 end
 
+local RUNTIME_SETTINGS_BINDING_ENTRY_LIMIT = 30000
+local RUNTIME_SETTINGS_BINDING_ALIAS_LIMIT = 60000
+local AMBIGUOUS_RUNTIME_SETTINGS_STREAM_ALIAS = {}
+local AMBIGUOUS_RUNTIME_SETTINGS_BASE_ALIAS = {}
+
+local function new_runtime_settings_registry_index()
+  return {
+    streams = {aliases = {}, direct = {}, ambiguous = AMBIGUOUS_RUNTIME_SETTINGS_STREAM_ALIAS},
+    bases = {aliases = {}, direct = {}, ambiguous = AMBIGUOUS_RUNTIME_SETTINGS_BASE_ALIAS},
+    entry_count = 0,
+    alias_count = 0,
+    over_limit = false
+  }
+end
+
+local function add_runtime_settings_alias(index, section, alias, key)
+  if index.over_limit or not bounded_string(alias) or not bounded_string(key) then return end
+  local prior = section.aliases[alias]
+  if prior == nil then
+    index.alias_count = index.alias_count + 1
+    if index.alias_count > RUNTIME_SETTINGS_BINDING_ALIAS_LIMIT then
+      index.over_limit = true
+      return
+    end
+    section.aliases[alias] = key
+  elseif prior ~= key then
+    section.aliases[alias] = section.ambiguous
+  end
+end
+
+local function add_runtime_settings_registry_entry(index, section, key, spec, base)
+  index.entry_count = index.entry_count + 1
+  if index.entry_count > RUNTIME_SETTINGS_BINDING_ENTRY_LIMIT then
+    index.over_limit = true
+    return
+  end
+  if not bounded_string(key) then return end
+  section.direct[key] = true
+  add_runtime_settings_alias(index, section, key, key)
+  local manifest = type(spec) == "table" and spec.manifest_id or nil
+  if manifest ~= nil then
+    add_runtime_settings_alias(index, section, manifest, key)
+  elseif base then
+    -- This is the compiler's explicit V3 fallback, not a technology-name
+    -- derivation. A configured (even malformed) manifest never gets it.
+    add_runtime_settings_alias(index, section, "base-extension:" .. key, key)
+  end
+end
+
+local function runtime_settings_registry_index()
+  local index = new_runtime_settings_registry_index()
+  local streams = stream_registry.view()
+  if type(streams) ~= "table" then
+    index.over_limit = true
+    return index
+  end
+  for key, spec in pairs(streams) do
+    add_runtime_settings_registry_entry(index, index.streams, key, spec, false)
+    if index.over_limit then return index end
+  end
+  for key, spec in pairs(setting_defaults.base_extensions or {}) do
+    add_runtime_settings_registry_entry(index, index.bases, key, spec, true)
+    if index.over_limit then return index end
+  end
+  return index
+end
+
+local function resolved_runtime_settings_alias(section, declared_key)
+  local resolved = bounded_string(declared_key) and section.aliases[declared_key] or nil
+  return resolved ~= section.ambiguous and resolved or nil
+end
+
+local function expected_runtime_settings_name(source, key)
+  if source == "generated-stream" then return "ips-max-level-" .. key end
+  if source == "base-continuation" then return "mir-max-level-" .. key end
+  return nil
+end
+
+-- Resolve browser-only stream/base keys once per controller cache epoch. The
+-- controller continues to own caps and queues from the admitted policy alone;
+-- an unknown, ambiguous, or oversized source map merely omits presentation.
+local function runtime_settings_registry_keys(runtime_settings_bindings)
+  local index = runtime_settings_registry_index()
+  local resolved_keys, count = {}, 0
+  if index.over_limit or type(runtime_settings_bindings) ~= "table" then return resolved_keys end
+  for technology_name, binding in pairs(runtime_settings_bindings) do
+    count = count + 1
+    if count > RUNTIME_SETTINGS_BINDING_ENTRY_LIMIT then return {} end
+    if bounded_string(technology_name) and type(binding) == "table"
+        and bounded_string(binding.source) and bounded_string(binding.policy_transport)
+        and bounded_string(binding.declared_key) and bounded_string(binding.setting) then
+      local source, declared_key = binding.source, binding.declared_key
+      local section = source == "generated-stream" and index.streams
+        or source == "base-continuation" and index.bases or nil
+      local key
+      if section and binding.policy_transport == "settings-derived-v3"
+          and section.direct[declared_key] then
+        key = declared_key
+      elseif section and binding.policy_transport == "transported-v3" then
+        key = resolved_runtime_settings_alias(section, declared_key)
+      end
+      if key and binding.setting == expected_runtime_settings_name(source, key) then
+        resolved_keys[technology_name] = key
+      end
+    end
+  end
+  return resolved_keys
+end
+
 local function build_validated_policy()
-  local managed, transport_blocked = transported_policy()
+  local managed, transport_blocked, runtime_settings_bindings = transported_policy()
   if not managed then
     managed = {}
-    add_runtime_settings_policy(managed)
+    runtime_settings_bindings = {}
+    add_runtime_settings_policy(managed, runtime_settings_bindings)
     transport_blocked = false
   end
 
@@ -349,7 +487,9 @@ local function build_validated_policy()
   return {
     managed = managed,
     caps = caps,
-    transport_blocked = transport_blocked
+    transport_blocked = transport_blocked,
+    runtime_settings_bindings = runtime_settings_bindings,
+    runtime_settings_registry_keys = runtime_settings_registry_keys(runtime_settings_bindings)
   }
 end
 
@@ -364,6 +504,77 @@ local function current_policy()
   return validated_policy_cache.managed,
     validated_policy_cache.caps,
     validated_policy_cache.transport_blocked
+end
+
+local function copied_runtime_settings_binding(technology_name, policy, cap,
+    runtime_settings_binding, registry_key)
+  if type(policy) ~= "table" or policy.legacy
+      or not bounded_string(technology_name) or not bounded_string(policy.source)
+      or not bounded_string(policy.policy_transport) or not bounded_string(policy.setting)
+      or type(runtime_settings_binding) ~= "table" or not bounded_string(registry_key)
+      or runtime_settings_binding.source ~= policy.source
+      or runtime_settings_binding.policy_transport ~= policy.policy_transport
+      or runtime_settings_binding.setting ~= policy.setting
+      or not bounded_string(runtime_settings_binding.declared_key) then
+    return nil
+  end
+  if policy.source ~= "generated-stream" and policy.source ~= "base-continuation" then
+    return nil
+  end
+
+  local selected = policy.selected
+  local selected_is_finite = finite_positive_integer(selected)
+  local selected_is_infinite = selected == "infinite"
+  if not selected_is_finite and not selected_is_infinite then return nil end
+
+  local blocked_reason = bounded_string(policy.blocked_reason) and policy.blocked_reason or nil
+  local state
+  if blocked_reason then
+    state = "disabled"
+  elseif selected_is_infinite then
+    state = "infinite"
+  elseif cap == selected then
+    state = "finite"
+  else
+    -- A finite setting without the exact accepted cap is not browser evidence.
+    -- Keep controller behaviour unchanged and omit this presentation-only row.
+    return nil
+  end
+
+  return {
+    schema = 1,
+    source = policy.source,
+    policy_transport = policy.policy_transport,
+    binding = {
+      technology_id = technology_name,
+      declared_key = registry_key,
+      setting_name = policy.setting
+    },
+    selected_effective = selected,
+    state = state,
+    blocked_reason = blocked_reason
+  }
+end
+
+-- Read-only presentation bridge for the research browser. It exposes a fresh,
+-- bounded plain copy of the policy that this controller has already admitted;
+-- it does not read a Force, persistent state, queue, or compiler artifact and
+-- cannot change normalization behaviour. The normal lifecycle invalidation
+-- above clears its shared policy source on init/configuration changes.
+function M.runtime_settings_bindings()
+  local managed, caps = current_policy()
+  local policy_cache = validated_policy_cache or {}
+  local binding_inputs = policy_cache.runtime_settings_bindings or {}
+  local registry_keys = policy_cache.runtime_settings_registry_keys or {}
+  local out, count = {}, 0
+  for technology_name, policy in pairs(managed) do
+    count = count + 1
+    if count > 30000 then return {} end
+    local binding = copied_runtime_settings_binding(technology_name, policy, caps[technology_name],
+      binding_inputs[technology_name], registry_keys[technology_name])
+    if binding then out[technology_name] = binding end
+  end
+  return out
 end
 
 local function force_cap_state(force)
