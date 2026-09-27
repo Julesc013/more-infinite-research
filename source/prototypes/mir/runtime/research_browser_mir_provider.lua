@@ -325,11 +325,13 @@ end
 
 -- Omission facts are separate from force technologies: a skipped generation
 -- row cannot become a research/queue action or imply removal from a save.
--- Cache only copied immutable presentation facts, never the prototype/force.
-local omission_rows
+-- The public candidate cache also holds copied immutable facts only; force and
+-- prototype observations remain live in snapshot().
+local omission_rows, validated_public_candidates
 
 function M.invalidate_omissions()
   omission_rows = nil
+  validated_public_candidates = nil
   validated_policy_caps = nil
 end
 
@@ -383,16 +385,24 @@ function M.omissions(force)
   return {schema = 1, kind = "portable-research-omissions", rows = rows}
 end
 
+local function copy_string_array(values)
+  local copy = {}
+  for index, value in ipairs(values) do copy[index] = value end
+  return copy
+end
+
 local function detail_for_row(row, recipes, disposition, caps, force)
   local policy = caps[row.technology_id]
   local technology = force and force.technologies and force.technologies[row.technology_id]
-  -- Keep the original schema-1 family/action surface for non-recipe rows.
-  -- They do not have a recipe-productivity benefit question, so do not turn
-  -- an empty effect set into an exact false benefit claim.
+  -- Enrichment describes live managed research. Omission rows have their own
+  -- DTO and an absent or foreign technology must not create a phantom family.
+  if not technology or not technology.valid then return nil end
+  -- Keep the original schema-1 family/action surface for a live admitted
+  -- non-recipe technology. It has no recipe-productivity benefit question,
+  -- so do not turn an empty effect set into an exact false benefit claim.
   if #recipes == 0 then
     return {schema = 1, family = row.stream_id, action = row.action}
   end
-  if not technology or not technology.valid then return nil end
   local max_setting, enable_setting = nil, nil
   if policy then
     max_setting = comparison(policy.setting)
@@ -420,7 +430,7 @@ local function detail_for_row(row, recipes, disposition, caps, force)
       stream_id = row.stream_id,
       action = row.action,
       reason = row.reason,
-      affected_recipe_ids = recipes
+      affected_recipe_ids = copy_string_array(recipes)
     },
     compiler_disposition = {
       inclusion = disposition.inclusion,
@@ -453,24 +463,57 @@ local function detail_for_row(row, recipes, disposition, caps, force)
   return detail
 end
 
-function M.snapshot(force)
-  local caps, families, details, known = {}, {}, {}, {}
+local function copy_public_candidate(row, recipes, disposition)
+  return {
+    row = {
+      stream_id = row.stream_id,
+      technology_id = row.technology_id,
+      action = row.action,
+      reason = row.reason
+    },
+    recipes = copy_string_array(recipes),
+    disposition = {
+      inclusion = disposition.inclusion,
+      action = disposition.action,
+      reason = disposition.reason,
+      route_exclusions = {
+        state = disposition.route_exclusions.state,
+        recipe_ids = {}
+      }
+    }
+  }
+end
+
+-- The public generation plan is a data-stage artifact. Validate and copy its
+-- admitted candidates once per init/configuration epoch; completed research
+-- and player interaction must still evaluate live Force facts below.
+local function current_public_candidates()
+  if validated_public_candidates ~= nil then
+    return validated_public_candidates ~= false and validated_public_candidates or nil
+  end
   local artifact = mod_data("more-infinite-research-generation-plan")
   if type(artifact) ~= "table" or artifact.schema ~= 1
-    or artifact.kind ~= "mir-generation-plan-public" or type(artifact.rows) ~= "table" then
-    return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
+      or artifact.kind ~= "mir-generation-plan-public" or type(artifact.rows) ~= "table" then
+    validated_public_candidates = false
+    return nil
   end
   local row_count = 0
-  for index, _ in pairs(artifact.rows) do
+  for index in pairs(artifact.rows) do
     if type(index) ~= "number" or index < 1 or index ~= math.floor(index) then
-      return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
+      validated_public_candidates = false
+      return nil
     end
     row_count = row_count + 1
+    if row_count > M.catalogue_limit then
+      validated_public_candidates = false
+      return nil
+    end
   end
-  if #artifact.rows ~= row_count then
-    return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
+  if #artifact.rows ~= row_count or not fingerprint_matches(artifact, "public_fingerprint") then
+    validated_public_candidates = false
+    return nil
   end
-  local policies, candidates, row_counts = current_policy_caps(), {}, {}
+  local candidate_rows, row_counts = {}, {}
   for _, row in ipairs(artifact.rows) do
     -- Count every declared public technology identity before accepting its
     -- optional detail shape: a malformed shadow row cannot evade duplicate
@@ -479,26 +522,41 @@ function M.snapshot(force)
       row_counts[row.technology_id] = (row_counts[row.technology_id] or 0) + 1
     end
     local recipes, disposition = valid_public_row(row)
-    if recipes then
-      candidates[#candidates + 1] = {row = row, recipes = recipes, disposition = disposition}
+    -- Skips are exact omission evidence, never managed research enrichment.
+    -- Their named IDs still count above so a shadow duplicate fails closed.
+    if recipes and (row.action == "emit" or row.action == "adopt") then
+      candidate_rows[#candidate_rows + 1] = {row = row, recipes = recipes, disposition = disposition}
     end
   end
+  local candidates = {}
+  for _, candidate in ipairs(candidate_rows) do
+    if row_counts[candidate.row.technology_id] == 1 then
+      candidates[#candidates + 1] = copy_public_candidate(candidate.row, candidate.recipes, candidate.disposition)
+    end
+  end
+  validated_public_candidates = candidates
+  return candidates
+end
+
+function M.snapshot(force)
+  local caps, families, details = {}, {}, {}
+  local candidates = current_public_candidates()
+  if not candidates then
+    return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
+  end
+  local policies = current_policy_caps()
   local count = 0
   for _, candidate in ipairs(candidates) do
     local row, recipes, disposition = candidate.row, candidate.recipes, candidate.disposition
-    if row_counts[row.technology_id] == 1 and not known[row.technology_id] then
+    local detail = detail_for_row(row, recipes, disposition, policies, force)
+    if detail then
       count = count + 1
       if count > M.catalogue_limit then break end
-      known[row.technology_id] = true
-      local detail = detail_for_row(row, recipes, disposition, policies, force)
-      if detail then
-        if detail.effective_cap then caps[row.technology_id] = detail.effective_cap end
-        families[row.technology_id] = row.stream_id
-        details[row.technology_id] = detail
-      end
+      if detail.effective_cap then caps[row.technology_id] = detail.effective_cap end
+      families[row.technology_id] = row.stream_id
+      details[row.technology_id] = detail
     end
   end
   return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
 end
-
 return M
