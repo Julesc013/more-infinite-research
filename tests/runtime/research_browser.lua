@@ -1,6 +1,7 @@
 local browser_provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
 local native_startup_settings = require("__more-infinite-research__/prototypes/mir/runtime/startup_settings")
 local native_profile_codec = require("__more-infinite-research__/prototypes/mir/settings/profile_codec")
+local native_settings_catalog = require("__more-infinite-research__/prototypes/mir/settings/catalog")
 
 -- Keep the portable settings witness independent from generated-stream detail:
 -- F200 can legitimately show an owned maximum-level setting without a sealed
@@ -150,7 +151,7 @@ local function browser_labels_fit(element, maximum_width)
   return true
 end
 local function check_research_startup_controls(check, player, enrichment)
-  local catalog = require("__more-infinite-research__/prototypes/mir/settings/catalog")
+  local catalog = native_settings_catalog
   local bindings = enrichment.runtime_settings_bindings or {}
   local names = {}
   for name in pairs(bindings) do names[#names + 1] = name end
