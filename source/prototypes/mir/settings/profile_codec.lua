@@ -30,6 +30,11 @@ local function setting_exists(name)
   return settings and settings.startup and settings.startup[name] ~= nil
 end
 
+local function resolved_setting_value(name, value_resolver)
+  if value_resolver then return value_resolver(name) end
+  return setting_value(name)
+end
+
 local function json_escape(value)
   local escape_map = {
     ['"'] = '\\"',
@@ -235,7 +240,7 @@ function M.current_profile(options)
   end
 
   for _, name in ipairs(names) do
-    local value = value_resolver and value_resolver(name) or setting_value(name)
+    local value = resolved_setting_value(name, value_resolver)
     if value ~= nil and (not compact or not settings_catalog.is_default_value(name, value)) then
       profile.settings[name] = value
     end

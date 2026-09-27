@@ -314,24 +314,28 @@ local function assert_native_ui(player, force)
   check(frame and frame.valid, "native browser frame is absent")
   local facts = {}
   capture_facts(frame, facts)
-  check(facts.affected_recipes == "Affected recipes: bob-tin-plate", "affected-recipe GUI caption differs")
-  check(contains(facts.compiler_disposition, "Compiler disposition: included | action=emit | reason=recipe_productivity"), "compiler GUI caption differs")
-  check(contains(facts.route_exclusions, "no-additional-route-exclusions-published-for-current-row"), "route-exclusion GUI caption differs")
-  check(contains(facts.science, "Final science: automation-science-pack x1"), "science GUI caption differs")
-  check(contains(facts.next_level, "Next level has effective benefit: true | current-level=3 | effective-cap=3"), "benefit GUI caption differs")
-  check(contains(facts.recipe_benefits, "bob-tin-plate current-productivity="), "recipe-cap GUI caption differs")
-  check(contains(facts.maximum_setting, "ips-max-level-research_material_tin | default=2 | raw-direct=2 | effective=3 | source=mirset1 | changed=true | changed-from-default=true | restart-required=true"), "maximum-setting GUI caption differs")
-  check(contains(facts.enabled_setting, "ips-enable-research_material_tin | default=true | raw-direct=true | effective=true | source=mirset1 | changed=false | changed-from-default=false | restart-required=true"), "enable-setting GUI caption differs")
-  check(facts.startup_restart == "Startup settings require restart; this browser does not mutate startup settings.", "restart GUI caption differs")
+  check(type(facts.research_cost) == "table" and facts.research_cost[1] == "mir-browser.research-cost"
+    and tonumber(facts.research_cost[2]) and tonumber(facts.research_cost[3]),
+    "research-cost GUI fact is not a localized semantic value")
+  check(type(facts.productivity_increment) == "table" and facts.productivity_increment[1] == "mir-browser.productivity-increment"
+    and tonumber(facts.productivity_increment[2]),
+    "productivity-increment GUI fact is not a localized semantic value")
+  check(type(facts.productivity_current_cap) == "table" and facts.productivity_current_cap[1] == "mir-browser.productivity-current-cap"
+    and tonumber(facts.productivity_current_cap[2]) and tonumber(facts.productivity_current_cap[3]),
+    "productivity-cap GUI fact is not a localized semantic value")
+  check(facts.compiler_disposition == nil and facts.route_exclusions == nil
+    and facts.maximum_setting == nil and facts.enabled_setting == nil,
+    "developer disposition or raw setting provenance leaked into the primary library detail")
   check(remote.call("more-infinite-research-browser", "open", player.index, {
     tab = "settings", search = "research_material_tin"
   }), "native browser settings did not open")
   local settings_facts = {}
   capture_facts(player.gui.screen.mir_research_browser, settings_facts)
-  check(settings_facts.profile_import == "MIRSET1 profile: active | recognized=2 | unknown=0 | invalid=0"
-    .. " | valid imported entries determine effective startup values | restart-required=true",
-    "MIRSET1 profile GUI summary differs")
-  facts.profile_import = settings_facts.profile_import
+  local profile = settings_facts.profile_import
+  check(type(profile) == "table" and profile[1] == "mir-browser.profile-active"
+    and profile[2] == 2 and profile[3] == 0,
+    "MIRSET1 profile GUI state is not the localized compact active profile caption")
+  facts.profile_import = {key = profile[1], recognized = profile[2], invalid = profile[3]}
   return facts
 end
 

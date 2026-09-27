@@ -1,3 +1,6 @@
+local browser_provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
+local native_startup_settings = require("__more-infinite-research__/prototypes/mir/runtime/startup_settings")
+local native_profile_codec = require("__more-infinite-research__/prototypes/mir/settings/profile_codec")
 local function snapshot(force)
   local rows = {}
   for name, tech in pairs(force.technologies) do
@@ -13,6 +16,15 @@ local function find_browser_element(element, tag, value)
   -- values so labelled flows remain transparent to fixture assertions.
   for _, child in pairs(element.children or {}) do
     local found = find_browser_element(child, tag, value)
+    if found then return found end
+  end
+  return nil
+end
+local function find_browser_technology(element, technology)
+  if not (element and element.valid) then return nil end
+  if element.tags and element.tags.mir_browser=="select" and element.tags.technology==technology then return element end
+  for _, child in pairs(element.children or {}) do
+    local found=find_browser_technology(child,technology)
     if found then return found end
   end
   return nil
@@ -55,6 +67,58 @@ script.on_nth_tick(1,function()
   local count=0
   local function check(value,message) assert(value,message); count=count+1 end
   local force=game.forces.player
+  local queue_cache=browser_core.translation_queue.new("en",1)
+  local dispatch_cache=browser_core.translation_queue.new("en",1)
+  browser_core.translation_queue.reset_catalogue(dispatch_cache,{"numeric-id","declined-id"},"dispatch")
+  check(browser_core.translation_queue.dispatch(dispatch_cache,"numeric-id",0,function() return 701 end)
+    and dispatch_cache.outstanding==1 and dispatch_cache.pending_by_id[701].key=="numeric-id"
+    and dispatch_cache.pending_by_key["numeric-id"]==701 and dispatch_cache.values["numeric-id"]==nil,
+    "numeric translation request ID occupies a pending slot")
+  check(not browser_core.translation_queue.dispatch(dispatch_cache,"declined-id",0,function() error("declined") end)
+    and dispatch_cache.outstanding==1 and dispatch_cache.values["declined-id"]=="declined-id",
+    "failed translation dispatch falls back without consuming a slot")
+  local priority_cache=browser_core.translation_queue.new("en",1)
+  browser_core.translation_queue.reset_catalogue(priority_cache,{"catalogue-a","catalogue-b","catalogue-c","catalogue-d"},"priority")
+  check(browser_core.translation_queue.prioritize(priority_cache,{"catalogue-d","catalogue-b","catalogue-d"})
+    and browser_core.translation_queue.pop(priority_cache)=="catalogue-d"
+    and browser_core.translation_queue.requested(priority_cache,"catalogue-d",801,0)
+    and browser_core.translation_queue.pop(priority_cache)=="catalogue-b"
+    and priority_cache.outstanding==1 and priority_cache.pending_by_id[801].key=="catalogue-d",
+    "visible translation priority reorders only unissued work and retains issued accounting")
+  local old_names={}
+  for index=1,16 do old_names[index]=string.format("old-%02d",index) end
+  browser_core.translation_queue.reset_catalogue(queue_cache,old_names,"catalogue-a")
+  for index=1,16 do
+    local key=browser_core.translation_queue.pop(queue_cache)
+    check(key==old_names[index] and browser_core.translation_queue.requested(queue_cache,key,index,0),"translation initial bounded request "..index)
+  end
+  check(queue_cache.outstanding==16 and not browser_core.translation_queue.can_request(queue_cache),"translation window reaches its fixed outstanding limit")
+  queue_cache=helpers.json_to_table(helpers.table_to_json(queue_cache))
+  check(queue_cache.outstanding==16 and queue_cache.pending_by_id[1].key=="old-01"
+    and queue_cache.pending_by_key["old-16"]==16,"serialized queue retains issued IDs and only plain data")
+  browser_core.translation_queue.reset_catalogue(queue_cache,{"catalogue-b-1","catalogue-b-2"},"catalogue-b")
+  browser_core.translation_queue.invalidate_locale(queue_cache,"fr",2)
+  browser_core.translation_queue.reset_catalogue(queue_cache,{"current-1","current-2"},"catalogue-c")
+  check(queue_cache.outstanding==16 and next(queue_cache.pending_by_key)==nil and not browser_core.translation_queue.can_request(queue_cache),"repeated catalogue and locale invalidations retain stale request slots")
+  check(not browser_core.translation_queue.completed(queue_cache,1,"old label must not enter the current locale")
+    and queue_cache.outstanding==15 and queue_cache.values["old-01"]==nil,"stale callback releases a slot without publishing its label")
+  local current_key=browser_core.translation_queue.pop(queue_cache)
+  check(current_key=="current-1" and browser_core.translation_queue.requested(queue_cache,current_key,101,1),"freed stale slot starts current catalogue work")
+  for index=2,16 do browser_core.translation_queue.completed(queue_cache,index,"withheld stale label") end
+  check(queue_cache.outstanding==1 and queue_cache.pending_by_key["current-1"]==101 and queue_cache.values["old-02"]==nil,"old callbacks preserve current key ownership and never enter labels")
+  check(browser_core.translation_queue.completed(queue_cache,101,"Étiquette actuelle") and queue_cache.outstanding==0
+    and queue_cache.values["current-1"]=="Étiquette actuelle","current callback resolves after stale work drains")
+  local timeout_names={}
+  for index=1,16 do timeout_names[index]=string.format("timeout-old-%02d",index) end
+  browser_core.translation_queue.reset_catalogue(queue_cache,timeout_names,"catalogue-timeout-old")
+  for index=1,16 do
+    local key=browser_core.translation_queue.pop(queue_cache)
+    check(browser_core.translation_queue.requested(queue_cache,key,200+index,0),"translation timeout request "..index)
+  end
+  browser_core.translation_queue.reset_catalogue(queue_cache,{"timeout-current"},"catalogue-timeout-current")
+  check(browser_core.translation_queue.expire(queue_cache,browser_core.translation_queue.stale_ticks)==16
+    and queue_cache.outstanding==0 and queue_cache.values["timeout-current"]==nil
+    and #queue_cache.retry_queue==0,"stale timeout releases every superseded slot without retrying into current labels")
   if storage.browser_saved then
     check(snapshot(force)==storage.expected_force,"save/reload retains partial research and queue")
     for _, actual in pairs(game.players) do
@@ -136,6 +200,89 @@ script.on_nth_tick(1,function()
   check(#literal.rows==0,"literal search")
   local localized=browser_core.query(catalogue,{mode=1,status=1,page=1,search="localized finite"},nil,{["mir-browser-test-finite"]="Localized finite technology"})
   check(#localized.rows==1 and localized.rows[1].key=="mir-browser-test-finite","localized search with stable-ID fallback")
+  local localized_ordering={schema=1,rows={
+    {key="label-zebra",available=true,researched=false,queued=false,infinite=false,native_order="",progression=1},
+    {key="label-alpha",available=true,researched=false,queued=false,infinite=false,native_order="",progression=1},
+    {key="label-equal-a",available=true,researched=false,queued=false,infinite=false,native_order="",progression=1},
+    {key="label-equal-b",available=true,researched=false,queued=false,infinite=false,native_order="",progression=1},
+    {key="label-fallback",available=true,researched=false,queued=false,infinite=false,native_order="",progression=1},
+    {key="label-nonlatin",available=true,researched=false,queued=false,infinite=false,native_order="",progression=1}
+  }}
+  local initial_label=browser_core.query(localized_ordering,{mode=1,status=1,page=1,search="translated later",sort="name-asc"})
+  check(#initial_label.rows==0,"untranslated localized search remains incomplete rather than a false match")
+  local labels={
+    ["label-zebra"]="Apple",
+    ["label-alpha"]="Zulu",
+    ["label-equal-a"]="Same label",
+    ["label-equal-b"]="same label",
+    ["label-nonlatin"]="漢字技術"
+  }
+  local held_name_order=browser_core.query(localized_ordering,{
+    mode=1,status=1,page=1,search="",sort="name-asc",name_index_ready=false,fallback_sort="progression"
+  },nil,labels)
+  check(held_name_order.sort=="progression" and held_name_order.requested_sort=="name-asc"
+    and held_name_order.name_index_ready==false and held_name_order.rows[1].key=="label-alpha",
+    "partial labels retain the stable browse order until the name index is complete")
+  local resolved_labels=browser_core.query(localized_ordering,{mode=1,status=1,page=1,search="translated later",sort="name-asc"},nil,{
+    ["label-alpha"]="Translated later"
+  })
+  check(#resolved_labels.rows==1 and resolved_labels.rows[1].key=="label-alpha","late translation updates the stable selected technology ID")
+  local automatic_catalogue={schema=1,rows={
+    {key="automatic-a",available=true,researched=false,queued=false,infinite=false,native_order="a",progression=1},
+    {key="automatic-z",available=true,researched=false,queued=false,infinite=false,native_order="z",progression=2}
+  }}
+  local automatic_cache=browser_core.translation_queue.new("en",1)
+  browser_core.translation_queue.reset_catalogue(automatic_cache,{"automatic-a","automatic-z"},"automatic-catalogue")
+  local automatic_before=browser_core.query(automatic_catalogue,{
+    mode=1,status=1,page=1,search="automatic localized",sort="name-asc",
+    fallback_sort="progression",name_index_ready=false
+  },nil,automatic_cache.values)
+  check(#automatic_before.rows==0,"localized search starts empty until its current labels arrive")
+  check(browser_core.translation_queue.resolve(automatic_cache,"automatic-a","Zulu automatic localized")
+    and browser_core.translation_queue.resolve(automatic_cache,"automatic-z","Alpha automatic localized")
+    and browser_core.translation_queue.complete(automatic_cache) and automatic_cache.refresh_pending,
+    "final localized index schedules an in-place result refresh")
+  local automatic_after=browser_core.query(automatic_catalogue,{
+    mode=1,status=1,page=1,search="automatic localized",sort="name-asc",
+    fallback_sort="progression",name_index_ready=browser_core.translation_queue.complete(automatic_cache)
+  },nil,automatic_cache.values)
+  check(#automatic_after.rows==2 and automatic_after.rows[1].key=="automatic-z"
+    and automatic_after.sort=="name-asc" and automatic_after.requested_sort=="name-asc",
+    "completed localized index updates active search and commits displayed-name order")
+  check(browser_core.translation_queue.consume_refresh(automatic_cache)
+    and not automatic_cache.refresh_pending and automatic_cache.completed_since_refresh==0,
+    "host refresh acknowledgement clears only the delivered current batch")
+  local partial_refresh_cache=browser_core.translation_queue.new("en",1)
+  local partial_names={}
+  for index=1,9 do partial_names[index]=string.format("partial-%02d",index) end
+  browser_core.translation_queue.reset_catalogue(partial_refresh_cache,partial_names,"partial-localized-catalogue")
+  for index=1,8 do browser_core.translation_queue.resolve(partial_refresh_cache,partial_names[index],"Partial localized "..index) end
+  check(partial_refresh_cache.refresh_pending and not browser_core.translation_queue.complete(partial_refresh_cache)
+    and browser_core.translation_queue.consume_refresh(partial_refresh_cache)
+    and partial_refresh_cache.resolved==8 and partial_refresh_cache.values["partial-09"]==nil,
+    "partial localization batches are distinguishable from the one settled result refresh")
+  local named=browser_core.query(localized_ordering,{mode=1,status=1,page=1,search="",sort="name-asc"},nil,labels)
+  check(named.rows[1].key=="label-zebra" and named.rows[1].display_name=="Apple","displayed label rather than ID determines name order")
+  local equal_a,equal_b=nil,nil
+  for index,row in ipairs(named.rows) do
+    if row.key=="label-equal-a" then equal_a=index end
+    if row.key=="label-equal-b" then equal_b=index end
+  end
+  check(equal_a and equal_b and equal_a<equal_b,"equal normalized displayed labels use stable ascending technology-ID ties")
+  local fallback=browser_core.query(localized_ordering,{mode=1,status=1,page=1,search="label-fallback",sort="name-asc"},nil,labels)
+  check(#fallback.rows==1 and fallback.rows[1].display_name=="label-fallback","missing translation keeps the displayed stable-ID fallback")
+  local nonlatin=browser_core.query(localized_ordering,{mode=1,status=1,page=1,search="漢字",sort="name-asc"},nil,labels)
+  check(#nonlatin.rows==1 and nonlatin.rows[1].key=="label-nonlatin","non-Latin localized search preserves UTF-8 text")
+  local deep_rows={}
+  for index=1,600 do
+    local key=string.format("mir-browser-deep-%03d",index)
+    deep_rows[index]={key=key,available=true,researched=false,queued=false,infinite=false,native_order="",progression=index}
+  end
+  local deep_catalogue={schema=1,rows=deep_rows}
+  local deep_page=browser_core.query(deep_catalogue,{mode=1,status=1,page=30,search="",sort="progression"})
+  check(deep_page.count==600 and deep_page.page==30 and #deep_page.rows==20,"deep pages stay bounded beyond 512 catalogue entries")
+  local deep_localized=browser_core.query(deep_catalogue,{mode=1,status=1,page=1,search="off page localized target",sort="name-asc"},nil,{["mir-browser-deep-600"]="Off page localized target"})
+  check(#deep_localized.rows==1 and deep_localized.rows[1].key=="mir-browser-deep-600","off-page localized entry is discoverable beyond 512")
   local descending=browser_core.query(catalogue,{mode=1,status=1,page=1,sort="name-desc",search="mir-browser-test"})
   check(#descending.rows==2 and descending.rows[1].key=="mir-browser-test-infinite","descending deterministic sort")
   local player={valid=true,force=force,permission_group={allows_action=function() return false end}}
@@ -157,16 +304,41 @@ script.on_nth_tick(1,function()
   before=snapshot(force)
   local all=browser_core.query(catalogue,{mode=1,status=1,page=999999,search=""})
   check(#all.rows<=browser_core.page_size and all.page==all.pages,"bounded page clamp")
+  -- LuaGameScript cannot create players. Native GUI checks require a real
+  -- player from a graphical/client run or a player-bearing save. Report the
+  -- zero-player headless scope explicitly instead of claiming GUI coverage.
+  local native_false, native_true
+  for name, setting in pairs(settings.startup) do
+    local prototype=prototypes.mod_setting[name]
+    if prototype and prototype.mod=="more-infinite-research" and type(setting.value)=="boolean" then
+      if setting.value==false then native_false=native_false or name else native_true=native_true or name end
+    end
+  end
+  check(native_false and native_startup_settings.raw(native_false)==false
+    and native_startup_settings.get(native_false)==false,"native direct false remains a setting value")
+  check(native_startup_settings.raw("mir-browser-unregistered-setting")==nil,"absent startup value remains absent")
+  check(native_true,"native fixture provides a true direct setting")
+  local effective_false=native_profile_codec.current_profile{names={native_true},value_resolver=function() return false end}
+  check(effective_false.settings[native_true]==false,"effective false overrides direct true during profile export")
+  local encoded_false=native_profile_codec.encode(effective_false)
+  local decoded_false=encoded_false and native_profile_codec.decode(encoded_false)
+  check(decoded_false and decoded_false.settings[native_true]==false,"false effective export survives MIRSET1 roundtrip")
   local native_players=0
   for _, actual in pairs(game.players) do
     native_players=native_players+1
     check(not actual.gui.top.mir_browser_open,"legacy top launcher absent")
     check(remote.call("more-infinite-research-browser","open",actual.index),"native default MIR browser GUI")
     local default_root=actual.gui.screen.mir_research_browser
+    check(find_browser_element(default_root,"mir_browser","research").toggled
+      and not find_browser_element(default_root,"mir_browser","queue").toggled,
+      "Browse visibly selects its navigation button")
     local default_sort=find_browser_element(default_root,"mir_browser","sort")
     local default_scope=find_browser_element(default_root,"mir_browser","family")
     check(default_sort and default_sort.type=="drop-down" and default_sort.selected_index==1,"new personal view defaults to MIR progression")
     check(default_scope and default_scope.type=="drop-down" and default_scope.selected_index==1,"new personal view defaults to MIR scope")
+    check(find_browser_element(default_root,"mir_browser","research") and find_browser_element(default_root,"mir_browser","queue")
+      and find_browser_element(default_root,"mir_browser","settings") and find_browser_element(default_root,"mir_browser","availability"),
+      "library presents browse, queue, setup and availability navigation")
     check(remote.call("more-infinite-research-browser","open",actual.index,{selected="automation"}),"native MIR scope opens with external selection")
     check(not find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","open-vanilla"),"MIR scope clears stale external selection")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=2,search="mir-browser-test"}),"native finite GUI")
@@ -174,6 +346,25 @@ script.on_nth_tick(1,function()
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search="mir-"}),"native settings GUI")
     check(has_browser_fact(actual.gui.screen.mir_research_browser,"profile_import"),"native settings profile summary")
+    check(find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","settings").toggled,
+      "Setup visibly selects its navigation button")
+    local native_omissions=browser_provider.omissions(actual.force)
+    local has_omission_transport=prototypes.mod_data
+      and prototypes.mod_data["more-infinite-research-generation-plan"]~=nil
+    if has_omission_transport then
+      check(native_omissions and #native_omissions.rows>0,"native generation publishes exact omissions")
+    else
+      check(native_omissions==nil,"absent generation transport supplies no invented omissions")
+    end
+    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="availability"}),"native Availability GUI")
+    local availability_root=actual.gui.screen.mir_research_browser
+    check(find_browser_element(availability_root,"mir_browser","availability").toggled,
+      "Availability visibly selects its navigation button")
+    if has_omission_transport then
+      check(find_browser_element(availability_root,"mir_browser_section","availability"),
+        "known omitted streams use their canonical localized title without an explicit name override")
+    end
+    check(not find_browser_element(availability_root,"mir_browser","enqueue"),"omitted research has no queue action")
     local mir_productivity = emitted_productivity_technology(actual)
     check(mir_productivity,"native fixture supplies an emitted MIR productivity technology")
     -- This opens a technology carrying a live productivity effect inside MIR
@@ -195,6 +386,9 @@ script.on_nth_tick(1,function()
     local root=actual.gui.screen.mir_research_browser
     local sort_control=find_browser_element(root,"mir_browser","sort")
     check(sort_control and sort_control.type=="drop-down","native sort control")
+    local finite_row=find_browser_technology(root,"mir-browser-test-finite")
+    check(finite_row and finite_row.caption=="Finite research fixture",
+      "visible browser rows use the native localized caption before asynchronous indexing completes")
     local vanilla_link=find_browser_element(root,"mir_browser","open-vanilla")
     check(vanilla_link and vanilla_link.type=="button","native technology link")
     check(has_browser_fact(root,"research_cost"),"native current research cost detail")
@@ -206,8 +400,10 @@ script.on_nth_tick(1,function()
     check(preserved_scope and preserved_scope.selected_index==all_scope_index,"invalid family preserves personal scope")
     check(before==snapshot(force),"native GUI force noninterference")
   end
-  helpers.write_file("browser-test.json",helpers.table_to_json{status="passed",assertions=count,scope="exact-package-load-and-controlled-personal-view-model-on-real-force; native-two-client-GUI-not-qualified",native_players=native_players,engine=helpers.game_version},false)
+  local scope=native_players>0 and "exact-package-load-controlled-model-and-native-GUI-objects; rendered-client-and-two-client-GUI-not-qualified"
+    or "exact-package-load-controlled-model; native-GUI-objects-rendered-client-and-two-client-GUI-not-qualified"
+  helpers.write_file("browser-test.json",helpers.table_to_json{status="passed",assertions=count,scope=scope,native_players=native_players,connected_players=#game.connected_players,native_gui_assertions_exercised=native_players>0,engine=helpers.game_version},false)
   storage.browser_saved=true;storage.expected_force=before
-  if native_players>0 then game.auto_save("mir-browser-acceptance") end
+  if #game.connected_players>0 then game.auto_save("mir-browser-acceptance") end
   script.on_nth_tick(1,nil)
 end)

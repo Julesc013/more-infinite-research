@@ -13,6 +13,19 @@ local POLICY_VERSION = 3
 local INFINITE_RUNTIME_MAX_LEVEL = 4294967295
 local MAXIMUM_LEVEL_FINALIZER_ADAPTER = "factorio-data-final-fixes-v1"
 
+-- Policy transport, startup settings, and final technology prototypes are
+-- immutable for one control lifetime.  Keep their fully validated *plain*
+-- result outside persistent state so a dense normal research-event stream
+-- does not repeatedly fingerprint the whole transport (or, on F200, walk
+-- every prototype for each continuation).  Force state, queues, enablement,
+-- and visibility remain deliberately live and are never cached here.
+--
+-- Factorio recreates non-persistent module state across a load, so a nil
+-- cache is rebuilt lazily by the first lifecycle/event normalization.  A
+-- configuration change can replace the package settings/prototypes and must
+-- invalidate before it performs its all-force normalization.
+local validated_policy_cache = nil
+
 local function ensure_state()
   return runtime_state.bucket("maximum_level_control")
 end
@@ -310,7 +323,7 @@ local function ownership_key(policy)
   }, "\0")
 end
 
-local function current_policy()
+local function build_validated_policy()
   local managed, transport_blocked = transported_policy()
   if not managed then
     managed = {}
@@ -333,7 +346,24 @@ local function current_policy()
       end
     end
   end
-  return managed, caps, transport_blocked
+  return {
+    managed = managed,
+    caps = caps,
+    transport_blocked = transport_blocked
+  }
+end
+
+local function invalidate_validated_policy()
+  validated_policy_cache = nil
+end
+
+local function current_policy()
+  if not validated_policy_cache then
+    validated_policy_cache = build_validated_policy()
+  end
+  return validated_policy_cache.managed,
+    validated_policy_cache.caps,
+    validated_policy_cache.transport_blocked
 end
 
 local function force_cap_state(force)
@@ -647,10 +677,12 @@ local function normalize_event_force(event)
 end
 
 function M.on_init()
+  invalidate_validated_policy()
   normalize_all()
 end
 
 function M.on_configuration_changed()
+  invalidate_validated_policy()
   normalize_all()
 end
 

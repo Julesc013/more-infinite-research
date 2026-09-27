@@ -1,0 +1,32 @@
+{
+  "description": "MIR Development: bounded workspace health checks and one checkpoint continuation; Git/GitHub commands remain available.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -Command '$repo = git -C . rev-parse --show-toplevel; & (Join-Path $repo \"tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1\") -Event SessionStart'",
+            "commandWindows": "pwsh.exe -NoProfile -Command \"$repo = git -C . rev-parse --show-toplevel; & (Join-Path $repo 'tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1') -Event SessionStart\"",
+            "timeout": 8,
+            "statusMessage": "Checking MIR Development workspace health"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -Command '$repo = git -C . rev-parse --show-toplevel; & (Join-Path $repo \"tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1\") -Event Stop'",
+            "commandWindows": "pwsh.exe -NoProfile -Command \"$repo = git -C . rev-parse --show-toplevel; & (Join-Path $repo 'tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1') -Event Stop\"",
+            "timeout": 8,
+            "statusMessage": "Checking MIR Development checkpoint"
+          }
+        ]
+      }
+    ]
+  }
+}

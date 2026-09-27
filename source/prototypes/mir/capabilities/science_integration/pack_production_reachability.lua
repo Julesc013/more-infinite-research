@@ -928,6 +928,61 @@ local function aggregate_research_route(
   end
   if #checked_routes == 0 then return nil end
 
+  -- An ingredient's first reachable unlocker can add an avoidable gate even
+  -- when another selected recipe already requires a different unlocker for
+  -- that exact ingredient recipe. Rebind only to a concrete alternative
+  -- already guaranteed by another checked route; then check that alternative
+  -- in the same active traversal. This does not infer recipe unlocks from
+  -- names, or discard the ingredient's acquisition witness.
+  local rebound_pairs
+  for pair_index, pair in ipairs(unlock_pairs) do
+    if not diagnostic_visit(observer, 0) then return nil end
+    local recipe_unlockers = recipe_facts.unlockers_for_recipe(pair.recipe)
+    if #recipe_unlockers > 1 then
+      local guaranteed = {}
+      for other_index, route in ipairs(checked_routes) do
+        if not diagnostic_visit(observer, 0) then return nil end
+        if other_index ~= pair_index then
+          for _, name in ipairs(route.unlockers or {}) do
+            if not diagnostic_visit(observer, 0) then return nil end
+            guaranteed[name] = true
+          end
+          for _, name in ipairs(route.prerequisite_closure or {}) do
+            if not diagnostic_visit(observer, 0) then return nil end
+            guaranteed[name] = true
+          end
+        end
+      end
+      if not guaranteed[pair.unlocker] then
+        local alternatives = {}
+        for _, name in ipairs(recipe_unlockers) do
+          if not diagnostic_visit(observer, 0) then return nil end
+          if name ~= excluded_unlocker and guaranteed[name] then
+            table.insert(alternatives, name)
+          end
+        end
+        table.sort(alternatives)
+        for _, name in ipairs(alternatives) do
+          local alternative = route_for_unlocker(
+            pair.recipe, name, visiting_packs, visiting_technologies,
+            observer, witness_options)
+          local contained = alternative.reachable == true
+          for _, prerequisite in ipairs(alternative.prerequisite_closure or {}) do
+            if not diagnostic_visit(observer, 0) then return nil end
+            if not guaranteed[prerequisite] then contained = false end
+          end
+          if contained then
+            if not rebound_pairs then rebound_pairs = deepcopy(unlock_pairs) end
+            rebound_pairs[pair_index].unlocker = name
+            checked_routes[pair_index] = alternative
+            break
+          end
+        end
+      end
+    end
+  end
+  unlock_pairs = rebound_pairs or unlock_pairs
+
   local unlocker_set, direct_prerequisite_sets, prerequisite_set, burden_set = {}, {}, {}, {}
   local unlock_depth, research_count, research_time = 0, 0, 0
   for _, route in ipairs(checked_routes) do

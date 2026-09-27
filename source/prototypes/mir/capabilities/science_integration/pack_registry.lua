@@ -43,18 +43,22 @@ local function lab_input_index(diagnostic_observer)
   local lab_inputs_cache = context:state_view("lab_input_index")
   if lab_inputs_cache then return lab_inputs_cache end
   local out, seen = {}, {}
+  local complete = true
   for _, lab in pairs(data_raw.prototypes("lab")) do
-    if not diagnostic_visit(diagnostic_observer) then break end
+    if not diagnostic_visit(diagnostic_observer) then complete = false; break end
     for _, input in ipairs(lab.inputs or {}) do
-      if not diagnostic_visit(diagnostic_observer) then break end
+      if not diagnostic_visit(diagnostic_observer) then complete = false; break end
       if not seen[input] and M.research_pack_prototype(input) then
         seen[input] = true
         table.insert(out, input)
       end
     end
+    if not complete then break end
   end
   table.sort(out)
-  context:set_state("lab_input_index", out)
+  -- A stopped diagnostic may return its bounded partial view, but cannot
+  -- publish that view as the complete index consumed by ordinary admission.
+  if complete then context:set_state("lab_input_index", out) end
   return out
 end
 

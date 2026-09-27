@@ -9,6 +9,13 @@ More Infinite Research 4 is a proof-governed Factorio research product line. MIR
 - Creating implementation branches, pushing them to this repository, opening and merging PRs into `dev`, synchronizing the primary checkout with `origin/dev`, and removing completed disposable work branches are standing maintainer-authorized actions. Do not ask for confirmation for this routine dev workflow.
 - Complete required automated checks and obey enforced branch rules without treating them as a requirement for another maintainer approval. Changes to `main` and release publication retain their separate policy requirements.
 
+## MIR Development housekeeping
+
+- Keep Git/GitHub execution available. Development health belongs in bounded observations, checkpoint requirements and the existing guarded cleanup commands; do not use housekeeping as a reason to deny commits, pushes, PRs or corrective Git actions.
+- Before a batch that creates engine stages, package copies, logs or linked worktrees, run `tools/commands/workspace/Test-MIRDevelopmentHealth.ps1`. Resolve observed disk pressure through an eligible storage audit/cleanup or a smaller bounded batch before creating more output. Treat incomplete sizes as lower bounds and reuse exact trusted or matching in-progress evidence instead of producing duplicate runs.
+- Commit and push each completed, reviewable unit with its validation and remaining limitations. Finish its required checks and PR merge into `dev` while later work continues; do not accumulate all completed changes until the end of MIR 4.2.
+- Respond to the development Stop checkpoint with a concrete commit/push, guarded cleanup, or explicit preservation disposition. Preserve dirty worktrees, unique commits, active evidence and delivered packages. Remove completed clean disposable branches/worktrees after remote readback, and retain unique material at a discoverable primary-checkout location. Older or partially scanned material requires review; age alone is never deletion authority.
+
 ## Source layout: maintainer-directed cutover
 
 The maintainer has selected `source/` as the single canonical editable product-source root and authorized replacement of the era-based layout. This supersedes earlier project instructions to preserve `src/`, `src/mod/`, or parallel modern/legacy source families. It does not claim that the physical cutover is already complete.

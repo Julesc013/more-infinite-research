@@ -4,6 +4,9 @@ local compiler_context = require("__more-infinite-research__/prototypes/mir/pipe
 local recipe_facts = require("__more-infinite-research__/prototypes/mir/index/recipe_facts")
 local recipe_risk_facts = require("__more-infinite-research__/prototypes/mir/index/recipe_risk_facts")
 local recipe_matching = require("__more-infinite-research__/prototypes/mir/capabilities/recipe_productivity/recipe_matching")
+local relationships = require("__more-infinite-research__/prototypes/mir/index/relationships")
+local data_raw = require("__more-infinite-research__/prototypes/mir/platform/factorio/data_raw")
+local fingerprint = require("__more-infinite-research__/prototypes/mir/core/fingerprint")
 
 local subjects = {
   {stream = "research_material_aluminium", item = "bob-aluminium-plate", recipes = {"bob-aluminium-plate", "angels-plate-aluminium", "angels-plate-aluminium-2"}},
@@ -81,8 +84,145 @@ local function effect_owners(recipe_name)
   return #owners == 0 and "-" or table.concat(owners, ",")
 end
 
+-- This package-excluded observer mirrors the product's proposed typed
+-- return-cone certificate. It records only the candidate's downstream
+-- consumers and direct finished-output producers, not an all-recipe lock, so
+-- the resulting evidence can distinguish a disconnected QoL addition from a
+-- changed return mechanism. The product consumes the same normalized facts
+-- and MIR32 fingerprint implementation.
+local function typed_identity(entry)
+  if type(entry) ~= "table" or type(entry.type) ~= "string" or entry.type == ""
+    or type(entry.name) ~= "string" or entry.name == "" then return nil end
+  return entry.type .. "\30" .. entry.name
+end
+
+local function sorted_keys(values)
+  local out = {}
+  for key in pairs(values or {}) do out[#out + 1] = key end
+  table.sort(out)
+  return out
+end
+
+local function route_identities(recipe, field)
+  local out = {}
+  for _, variant in ipairs((recipe and recipe.variants) or {}) do
+    for _, entry in ipairs(variant[field] or {}) do
+      local identity = typed_identity(entry)
+      if identity then out[identity] = true end
+    end
+  end
+  return out
+end
+
+local function observed_graph()
+  local graph = {edges = {}, complete = true, edge_count = 0}
+  recipe_facts.for_each(function(_, fact)
+    for _, variant in ipairs(fact.variants or {}) do
+      for _, input in ipairs(variant.ingredients or {}) do
+        local input_identity = typed_identity(input)
+        if input_identity then
+          graph.edges[input_identity] = graph.edges[input_identity] or {}
+          for _, output in ipairs(variant.results or {}) do
+            local output_identity = typed_identity(output)
+            if output_identity and not graph.edges[input_identity][output_identity] then
+              graph.edge_count = graph.edge_count + 1
+              if graph.edge_count > 100000 then graph.complete = false; return end
+              graph.edges[input_identity][output_identity] = true
+            end
+          end
+        end
+      end
+    end
+  end)
+  return graph
+end
+
+local function observed_route_fingerprints(recipe, graph)
+  local outputs, inputs = route_identities(recipe, "results"), route_identities(recipe, "ingredients")
+  if not graph.complete or next(outputs) == nil or next(inputs) == nil then return nil end
+  local queue, reached = {}, {}
+  for _, identity in ipairs(sorted_keys(outputs)) do queue[#queue + 1], reached[identity] = identity, true end
+  local head = 1
+  while head <= #queue do
+    if head > 30000 then return nil end
+    local identity = queue[head]
+    head = head + 1
+    for next_identity in pairs(graph.edges[identity] or {}) do
+      if not reached[next_identity] then reached[next_identity] = true; queue[#queue + 1] = next_identity end
+    end
+  end
+  local index = recipe_facts.index_view()
+  local selected, direct_output_producers = {}, {}
+  for recipe_name, fact in pairs(index.facts or {}) do
+    local consumes_reached = false
+    for _, variant in ipairs(fact.variants or {}) do
+      for _, entry in ipairs(variant.ingredients or {}) do
+        if reached[typed_identity(entry)] then consumes_reached = true; break end
+      end
+      if consumes_reached then break end
+    end
+    if consumes_reached then selected[recipe_name] = true end
+    for _, variant in ipairs(fact.variants or {}) do
+      for _, entry in ipairs(variant.results or {}) do
+        if outputs[typed_identity(entry)] then
+          selected[recipe_name], direct_output_producers[recipe_name] = true, true
+          break
+        end
+      end
+    end
+  end
+  local facts = {}
+  for _, recipe_name in ipairs(sorted_keys(selected)) do facts[#facts + 1] = {name = recipe_name, fact = index.facts[recipe_name]} end
+  local boundary = {
+    schema = 1,
+    route = recipe.name,
+    input_identities = sorted_keys(inputs),
+    output_identities = sorted_keys(outputs),
+    reachable_identities = sorted_keys(reached),
+    direct_output_producers = sorted_keys(direct_output_producers),
+    facts = facts
+  }
+  local relation_index = relationships.view("input")
+  local owners, unlocks = {}, {}
+  for _, owner in ipairs((relation_index.technologies_by_recipe_effect or {})[recipe.name] or {}) do
+    if not string.match(owner, "^recipe%-prod%-") then owners[#owners + 1] = owner end
+  end
+  table.sort(owners)
+  for _, unlock_name in ipairs((relation_index.unlocks_by_recipe or {})[recipe.name] or {}) do
+    local technology = data_raw.technology(unlock_name)
+    local science, prerequisites = {}, {}
+    for _, entry in ipairs((technology and technology.unit and technology.unit.ingredients) or {}) do
+      science[#science + 1] = {name = entry.name or entry[1], amount = tonumber(entry.amount or entry[2])}
+    end
+    table.sort(science, function(left, right) return left.name < right.name end)
+    for _, prerequisite in ipairs((technology and technology.prerequisites) or {}) do prerequisites[#prerequisites + 1] = prerequisite end
+    table.sort(prerequisites)
+    unlocks[#unlocks + 1] = {name = unlock_name, science_ingredients = science, prerequisites = prerequisites}
+  end
+  table.sort(unlocks, function(left, right) return left.name < right.name end)
+  return {
+    return_graph_fingerprint = fingerprint.of(boundary),
+    bindings_fingerprint = fingerprint.of({schema = 1, recipe = recipe.name, productivity_owner_technologies = owners, unlock_technologies = unlocks}),
+    reachable_identity_count = #boundary.reachable_identities,
+    relevant_recipe_count = #boundary.facts,
+    direct_output_producer_count = #boundary.direct_output_producers
+  }
+end
+
 log("[mir-f200-material-routes] PROFILE active_mods=" .. active_mods_line())
 compiler_context.with_active(compiler_context.new(), function()
+  for _, recipe_name in ipairs({"bob-silver-from-lead", "bob-silver-nitrate"}) do
+    local fact = recipe_facts.view(recipe_name)
+    local variant = fact and fact.variants and fact.variants[1] or {}
+    log("[mir-f200-material-routes] RETURN_WITNESS recipe=" .. recipe_name
+      .. " hidden=" .. scalar(fact and fact.hidden)
+      .. " enabled_without_research=" .. scalar(fact and fact.enabled_without_research)
+      .. " source=" .. scalar(fact and fact.source_class)
+      .. " variant_hidden=" .. scalar(variant.hidden)
+      .. " variant_enabled=" .. scalar(variant.enabled)
+      .. " ingredients=" .. entries_line(variant.ingredients)
+      .. " results=" .. entries_line(variant.results))
+  end
   for _, subject in ipairs(subjects) do
     local declared = {}
     for _, recipe_name in ipairs(subject.recipes) do
@@ -152,7 +292,7 @@ end)
 -- from a declaration or from a recipe merely existing in data.raw.
 local expected_effects = {
   aluminium = {"angels-plate-aluminium", "angels-plate-aluminium-2"},
-  gold = {"angels-plate-gold", "angels-plate-gold-2"},
+  gold = {"angels-plate-gold", "angels-plate-gold-2", "angels-wire-gold-2"},
   lead = {"angels-plate-lead", "angels-plate-lead-2"},
   nickel = {"angels-plate-nickel", "angels-plate-nickel-2"},
   platinum = {"angels-wire-platinum-2"},
@@ -166,8 +306,37 @@ local expected_effects = {
   invar = {"angels-plate-invar"},
   cobalt_steel = {"angels-plate-cobalt-steel"},
   nitinol = {"angels-plate-nitinol"},
-  silver = {"angels-plate-silver", "angels-plate-silver-2"}
+  silver = {"angels-plate-silver", "angels-plate-silver-2", "angels-wire-silver-2"}
 }
+
+-- Record one exact typed boundary per emitted final recipe. These values are
+-- observation data only; the enclosing probe is explicitly not a release or
+-- broad-mod-list qualification.
+local observed_route_names, observed_route_seen = {}, {}
+for _, recipes in pairs(expected_effects) do
+  for _, recipe_name in ipairs(recipes) do
+    if not observed_route_seen[recipe_name] then
+      observed_route_seen[recipe_name] = true
+      observed_route_names[#observed_route_names + 1] = recipe_name
+    end
+  end
+end
+table.sort(observed_route_names)
+compiler_context.with_active(compiler_context.new(), function()
+  local graph = observed_graph()
+  if not graph.complete then error("MIR F200 return-graph observation exceeded edge budget") end
+  for _, recipe_name in ipairs(observed_route_names) do
+    local values = observed_route_fingerprints(recipe_facts.view(recipe_name), graph)
+    if not values then error("MIR F200 missing return-graph observation " .. recipe_name) end
+    log("[mir-f200-material-routes] RETURN_GRAPH recipe=" .. recipe_name
+      .. " graph=" .. values.return_graph_fingerprint
+      .. " bindings=" .. values.bindings_fingerprint
+      .. " identities=" .. tostring(values.reachable_identity_count)
+      .. " recipes=" .. tostring(values.relevant_recipe_count)
+      .. " producers=" .. tostring(values.direct_output_producer_count))
+  end
+end)
+
 for key, expected in pairs(expected_effects) do
   local name = "recipe-prod-research_material_" .. key .. "-1"
   local technology = data.raw.technology[name]
@@ -186,6 +355,86 @@ for key, expected in pairs(expected_effects) do
       .. table.concat(expected, ",") .. " actual=" .. table.concat(actual, ","))
   end
 end
+
+-- The two wire finals add no new science stage: they use the same final
+-- unlock already represented by their plate routes. They consume a distinct
+-- coil, rather than a MIR-productive plate, while the direct and coil routes
+-- remain explicitly productivity-disabled and ownerless.
+local wire_final_stages = {
+  {
+    stream = "research_material_gold", recipe = "angels-wire-gold-2",
+    certificate = "F200-BA-gold-wire-final-v1", input = "angels-wire-coil-gold",
+    science = "automation-science-pack:1,chemical-science-pack:1,logistic-science-pack:1,production-science-pack:1",
+    prerequisites = "angels-gold-casting-2,angels-gold-smelting-1,automation-science-pack,chemical-science-pack,logistic-science-pack,production-science-pack"
+  },
+  {
+    stream = "research_material_silver", recipe = "angels-wire-silver-2",
+    certificate = "F200-BA-silver-wire-final-v1", input = "angels-wire-coil-silver",
+    science = "automation-science-pack:1,chemical-science-pack:1,logistic-science-pack:1",
+    prerequisites = "angels-silver-casting-2,angels-silver-smelting-1,automation-science-pack,chemical-science-pack,logistic-science-pack"
+  }
+}
+
+local function technology_science_line(technology)
+  local values = {}
+  for _, entry in ipairs((technology and technology.unit and technology.unit.ingredients) or {}) do
+    values[#values + 1] = tostring(entry.name or entry[1]) .. ":" .. tostring(entry.amount or entry[2])
+  end
+  return names_line(values)
+end
+
+local function technology_prerequisites_line(technology)
+  return names_line((technology and technology.prerequisites) or {})
+end
+
+local nonproductive_wire_routes = {
+  "angels-wire-gold", "angels-wire-coil-gold", "angels-wire-coil-gold-2",
+  "angels-wire-platinum", "angels-wire-coil-platinum", "angels-wire-coil-platinum-2",
+  "angels-wire-silver", "angels-wire-coil-silver", "angels-wire-coil-silver-2"
+}
+
+compiler_context.with_active(compiler_context.new(), function()
+  local productivity_streams = require("__more-infinite-research__/prototypes/streams/productivity")
+  for _, expected in ipairs(wire_final_stages) do
+    local route = recipe_facts.view(expected.recipe)
+    local generic_admission, generic_reason = recipe_matching.material_route_is_acyclic(route)
+    if not generic_admission or generic_reason ~= "no-recipe-return-path" then
+      error("MIR F200 wire final graph guard differs recipe=" .. expected.recipe .. " reason=" .. tostring(generic_reason))
+    end
+    local stream = productivity_streams[expected.stream]
+    local certificate = stream and stream.reviewed_forward_routes and stream.reviewed_forward_routes[expected.recipe]
+    if not certificate or certificate.id ~= expected.certificate or not certificate.require_exact_route_certificate
+      or certificate.relevant_input_contract ~= nil then
+      error("MIR F200 wire final certificate differs recipe=" .. expected.recipe)
+    end
+    local technology = data.raw.technology["recipe-prod-" .. expected.stream .. "-1"]
+    if technology_science_line(technology) ~= expected.science
+      or technology_prerequisites_line(technology) ~= expected.prerequisites then
+      error("MIR F200 wire final changed material research stage stream=" .. expected.stream)
+    end
+    local ingredient = route and route.variants and route.variants[1]
+      and route.variants[1].ingredients and route.variants[1].ingredients[1]
+    if not ingredient or ingredient.type ~= "item" or ingredient.name ~= expected.input
+      or effect_owners(expected.input) ~= "-" then
+      error("MIR F200 wire final plate-to-wire ownership boundary differs recipe=" .. expected.recipe)
+    end
+    if effect_owners(expected.recipe) ~= "recipe-prod-" .. expected.stream .. "-1:0.02" then
+      error("MIR F200 wire final ownership differs recipe=" .. expected.recipe)
+    end
+    log("[mir-f200-material-routes] WIRE_FINAL recipe=" .. expected.recipe
+      .. " certificate=" .. expected.certificate
+      .. " generic=" .. tostring(generic_reason)
+      .. " stage=unchanged"
+      .. " owner=present")
+  end
+  for _, recipe_name in ipairs(nonproductive_wire_routes) do
+    local route = recipe_facts.view(recipe_name)
+    local generic_admission, generic_reason = recipe_matching.material_route_is_acyclic(route)
+    if generic_admission or generic_reason ~= "productivity-not-allowed" or effect_owners(recipe_name) ~= "-" then
+      error("MIR F200 nonproductive wire route changed recipe=" .. recipe_name .. " reason=" .. tostring(generic_reason))
+    end
+  end
+end)
 
 -- The Platinum exception applies only in the final F200 Angel shape where Bob's
 -- Platinum plate is absent. It must retain the graph guard and have exactly one

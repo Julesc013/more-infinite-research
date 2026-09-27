@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-09-22.
+Current-page navigation generated from Markdown front matter as of 2026-09-28.
 
 ## developer
 
@@ -203,6 +203,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-22.
 - [Architecture Decision Records](../../architecture/decisions/README.md)
 - [Archive](../../archive/README.md)
 - [Assets](../../assets/README.md)
+- [Current Factorio 2.1 API Review for MIR 4.2](../../compatibility/factorio-2.1-current-api-review.md)
 - [Diagrams](../../assets/diagrams/README.md)
 - [Frozen MIR 3 Compiler Architecture Matrix](../../architecture/current-architecture-matrix.md)
 - [Generated Documentation Index](../../reference/generated/documentation-index.md)
@@ -216,6 +217,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-22.
 - [MIR 4 maintainer authority map](../../maintainer/mir4-authority-map.md)
 - [MIR 4 R0 Bootstrap](../../architecture/mir4-r0-bootstrap.md)
 - [MIR 4.1.0 Local Delivery Index](../../LATEST-RELEASE.md)
+- [MIR 4.2 Playtest Findings](../../releases/mir42-playtest-findings.md)
 - [More Infinite Research 4 documentation](../../README.md)
 - [Offline Family Rule Synthesis](../../reference/offline-rule-synthesis.md)
 - [Project Continuity](../../PROJECT-CONTINUITY.md)
@@ -231,6 +233,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-22.
 - [MIR 4 Post-4.0 Roadmap](../../releases/mir4-post-4.0-roadmap.md)
 - [MIR 4.0 Whole Platform Programme](../../releases/mir4-4.0-whole-platform-programme.md)
 - [MIR 4.2 community implementation outcomes](../../releases/mir4-community-outcomes-2026-09-06.md)
+- [MIR 4.2 Compatibility Scope and Player Playtest Plan](../../releases/mir42-compatibility-playtest-plan.md)
 - [Portable Return Ledger](../../compatibility/portable-return-ledger.md)
 
 ## modpack-author

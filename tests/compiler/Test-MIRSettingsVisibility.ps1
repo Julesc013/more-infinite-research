@@ -113,6 +113,7 @@ $visibilityText = Read-MIRText -RelativePath "prototypes/mir/settings/visibility
 $builderText = Read-MIRText -RelativePath "prototypes/mir/settings/builder.lua"
 $adapterText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_adapter.lua"
 $profileCodecText = Read-MIRText -RelativePath "prototypes/mir/settings/profile_codec.lua"
+$runtimeStartupSettingsText = Read-MIRText -RelativePath "prototypes/mir/runtime/startup_settings.lua"
 $effectiveSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/effective.lua"
 $runtimeSettingsProfileText = Read-MIRText -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 $testOverridesText = Read-MIRText -RelativePath "prototypes/mir/settings/test_overrides.lua"
@@ -207,6 +208,27 @@ Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text 
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.codec = "canonical-json-deflate-base64"'
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "local function sorted_keys(value)"
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "function M.current_profile(options)"
+Assert-Matches `
+  -RelativePath "prototypes/mir/runtime/startup_settings.lua" `
+  -Text $runtimeStartupSettingsText `
+  -Pattern '(?s)local function raw_setting\(name\).*?if setting ~= nil then\s*return setting\.value\s*end\s*return nil\s*end'
+Assert-NoPattern `
+  -RelativePath "prototypes/mir/runtime/startup_settings.lua" `
+  -Text $runtimeStartupSettingsText `
+  -Pattern 'return setting and setting\.value or nil'
+Assert-Matches `
+  -RelativePath "prototypes/mir/runtime/startup_settings.lua" `
+  -Text $runtimeStartupSettingsText `
+  -Pattern '(?s)function M\.get\(name\).*?local imported = profile\.settings and profile\.settings\[name\].*?if imported ~= nil and settings_catalog\.validate_value\(name, imported\) then\s*return imported'
+Assert-Matches `
+  -RelativePath "prototypes/mir/settings/profile_codec.lua" `
+  -Text $profileCodecText `
+  -Pattern '(?s)local function resolved_setting_value\(name, value_resolver\)\s*if value_resolver then\s*return value_resolver\(name\)\s*end\s*return setting_value\(name\)\s*end'
+Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "local value = resolved_setting_value(name, value_resolver)"
+Assert-NoPattern `
+  -RelativePath "prototypes/mir/settings/profile_codec.lua" `
+  -Text $profileCodecText `
+  -Pattern 'local value = value_resolver and value_resolver\(name\) or setting_value\(name\)'
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "function M.get(name, context)"
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "settings_catalog.validate_value(name, imported)"
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-export"'

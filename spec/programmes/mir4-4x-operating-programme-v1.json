@@ -779,7 +779,7 @@
       },
       {
         "id": "A16",
-        "title": "Bundled localized research, explanation and profile browser",
+        "title": "Intuitive localized research encyclopedia, organization and setup viewer",
         "programme_mapping": [
           "M43-00"
         ],
@@ -802,7 +802,11 @@
           "Bound catalogue and page work; no idle polling",
           "Validate enqueue against current force and permissions",
           "Compare and preview effective MIRSET1 values, defaults and sources in-surface; startup changes remain explicitly restart-required",
-          "Two-player, save/reload, queue, target and removal evidence"
+          "Two-player, save/reload, queue, target and removal evidence",
+          "Resolve maintainer playtest findings PF-02 and PF-03 with immediately native-localized visible rows and stable indexing; preserve the accepted shortcut",
+          "Provide first-glance Browse, Queue and Research setup tasks without solving usability through additional explanatory text",
+          "Expose verified not-added rows and distinguish disabled, personally hidden and removed research without inventing availability or omission evidence",
+          "Coalesce research-event refreshes for open surfaces and preserve focus, scroll and player-local organization"
         ],
         "state": "active",
         "evidence": [
@@ -986,6 +990,40 @@
         ],
         "state": "active",
         "evidence": []
+      },
+      {
+        "id": "A22",
+        "title": "Eliminate repeated mass-research work and measure startup, command and save performance",
+        "programme_mapping": ["M43-00"],
+        "depends_on": ["A01", "A02"],
+        "owner_domain": "runtime-performance",
+        "requests": [],
+        "acceptance": [
+          "Resolve maintainer finding PF-01 using exact 4.1 and 4.2 package, engine and mod/settings bindings",
+          "Measure first and repeated research_all_technologies with the browser closed and open; distinguish static diagnosis from measured cause",
+          "Validate policy once per applicable lifecycle and bound/coalesce presentation work while preserving cap ownership, queues, reset, merge and reload semantics",
+          "Measure startup and save loading with narrow changed-input checks; do not repeat unaffected ecosystem campaigns",
+          "Reuse evidence only for its exact trusted fingerprint and reserve player compatibility walkthroughs for a converged preview"
+        ],
+        "state": "active",
+        "evidence": ["docs/releases/mir42-playtest-findings.md"]
+      },
+      {
+        "id": "A23",
+        "title": "Review current 2.1 engine/API changes and adopt applicable capabilities",
+        "programme_mapping": ["M43-00"],
+        "depends_on": ["A01"],
+        "owner_domain": "engine-capabilities",
+        "requests": [],
+        "acceptance": [
+          "Reobserve the installed current Steam engine, runtime API, prototype API and changelog hashes",
+          "Review every 2.1.7 through current observed patch against official versioned APIs and changelog",
+          "Record applicable changes, existing adoption, explicit non-applicability and concrete remaining implementation tasks",
+          "Use narrowly scoped target adapters and preserve supported older engine contracts; do not force irrelevant new features into product behavior",
+          "Feed future identity changes into the existing engine-channel review obligation rather than a parallel authority"
+        ],
+        "state": "active",
+        "evidence": ["docs/releases/mir42-playtest-findings.md", "docs/compatibility/factorio-2.1-current-api-review.md"]
       }
     ]
   }

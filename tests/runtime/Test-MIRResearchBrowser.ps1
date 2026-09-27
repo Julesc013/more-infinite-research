@@ -15,9 +15,19 @@ if([string]::IsNullOrWhiteSpace($CandidateZip)) {
  $version=if($Target -eq '2.0') {'4.2.20000'} else {'4.2.21000'}
  $package=New-MIR4TargetPackage -RepoRoot $repo -Target $targetKey -CandidateId ('BROWSER-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion $version -OutputRoot 'build/browser-packages'
  $candidate=[string]$package.archive_path
-} else { $candidate=(Resolve-Path (Join-Path $repo $CandidateZip)).Path }
+} else {
+ $candidateInput=if([IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
+ $candidate=(Resolve-Path -LiteralPath $candidateInput).Path
+}
 $archive=[IO.Compression.ZipFile]::OpenRead($candidate)
 try {
+ $infoEntries=@($archive.Entries | Where-Object FullName -Like '*/info.json')
+ if($infoEntries.Count -ne 1) { throw 'Browser candidate requires one mod identity.' }
+ $infoReader=[IO.StreamReader]::new($infoEntries[0].Open())
+ try { $info=$infoReader.ReadToEnd() | ConvertFrom-Json } finally { $infoReader.Dispose() }
+ if([string]$info.name -cne 'more-infinite-research' -or [string]$info.factorio_version -cne $Target) {
+  throw "Browser candidate target mismatch: requested $Target, archive declares $($info.factorio_version)."
+ }
  foreach($name in @('research_browser.lua','research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')) {
   $entry=@($archive.Entries | Where-Object FullName -Like "*/prototypes/mir/runtime/$name")
   if($entry.Count -ne 1) { throw "Candidate must contain exactly one $name." }
@@ -26,6 +36,26 @@ try {
   if($moduleHash -cne (Get-FileHash (Join-Path $repo "source/prototypes/mir/runtime/$name")).Hash) { throw "Candidate $name differs from the controlled source under test." }
  }
 } finally { $archive.Dispose() }
+$versionStart=[Diagnostics.ProcessStartInfo]::new($engine)
+$versionStart.UseShellExecute=$false; $versionStart.CreateNoWindow=$true; $versionStart.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
+$versionStart.RedirectStandardOutput=$true; $versionStart.RedirectStandardError=$true
+$versionStart.Environment['SteamAppId']='427520'; $versionStart.Environment['SteamGameId']='427520'
+$versionStart.ArgumentList.Add('--version')
+$versionProcess=[Diagnostics.Process]::Start($versionStart)
+try {
+ $versionOutput=$versionProcess.StandardOutput.ReadToEndAsync(); $versionError=$versionProcess.StandardError.ReadToEndAsync()
+ if(-not $versionProcess.WaitForExit(10000)) { $versionProcess.Kill($true); $versionProcess.WaitForExit(); throw 'Browser engine version query timed out.' }
+ $engineVersionText=$versionOutput.GetAwaiter().GetResult()
+ $versionError.GetAwaiter().GetResult() | Out-Null
+ $versionExitCode=$versionProcess.ExitCode
+} finally { $versionProcess.Dispose() }
+if($versionExitCode -ne 0 -or $engineVersionText -notmatch '(?m)^Version:\s*(?<version>[0-9]+\.[0-9]+\.[0-9]+)') {
+ throw 'Browser test cannot identify the selected engine version.'
+}
+$selectedEngineVersion=[string]$Matches.version
+if(-not $selectedEngineVersion.StartsWith($Target + '.', [StringComparison]::Ordinal)) {
+ throw "Browser engine target mismatch: requested $Target, selected engine is $selectedEngineVersion."
+}
 $run=Join-Path $repo ('build/browser-tests/'+[guid]::NewGuid().ToString('N').Substring(0,8))
 $fixture=Join-Path $run 'mods/mir-browser-test_1.0.0'
 New-Item -ItemType Directory -Force $fixture | Out-Null
@@ -38,7 +68,17 @@ foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{n
  [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo "source/prototypes/mir/runtime/$($module.path)")))
  [void]$lua.AppendLine('end)()')
 }
-[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser.lua')))
+[void]$lua.AppendLine('local browser_omission_prototypes={mod_data={}}')
+[void]$lua.AppendLine('local browser_omission_fingerprint=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/core/fingerprint.lua')))
+[void]$lua.AppendLine('end)()')
+[void]$lua.AppendLine('local browser_omission_provider=(function() local prototypes=browser_omission_prototypes; local require=function(name) if name=="prototypes.mir.core.fingerprint" then return browser_omission_fingerprint end return {} end')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua')))
+[void]$lua.AppendLine('end)()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_omissions.lua')))
+$browserTestText=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser.lua'))
+if(([regex]::Matches($browserTestText,[regex]::Escape('local force=game.forces.player'))).Count -ne 1) { throw 'Browser omission checks require one unambiguous controlled force entry.' }
+[void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player', 'check_omissions(check); local force=game.forces.player'))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='more-infinite-research';enabled=$true},@{name='mir-browser-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
@@ -69,6 +109,7 @@ if(-not (Test-Path $resultPath)) { throw "No browser acceptance result: $run" }
 $result=Get-Content -Raw $resultPath | ConvertFrom-Json
 if($Graphics -and $result.native_players -lt 1) { throw "Graphics test did not exercise a native player: $run" }
 if($result.status -ne 'passed') { throw "Browser acceptance failed: $resultPath" }
+if([string]$result.engine -cne $selectedEngineVersion) { throw 'Browser native result does not match the selected engine.' }
 $result | Add-Member package_sha256 (Get-FileHash $candidate).Hash
 $result | Add-Member engine_sha256 (Get-FileHash $engine).Hash
 $result | Add-Member core_sha256 (Get-FileHash (Join-Path $repo 'source/prototypes/mir/runtime/research_browser_core.lua')).Hash
@@ -79,6 +120,7 @@ $result | Add-Member action_predicate_sha256 (Get-FileHash (Join-Path $repo 'sou
 $result | Add-Member harness_sha256 (Get-FileHash $PSCommandPath).Hash
 $result | Add-Member fixture_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/browser_fixture_data.lua')).Hash
 $result | Add-Member test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser.lua')).Hash
+$result | Add-Member omission_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_omissions.lua')).Hash
 if($Graphics) {
  $saved=Join-Path $run 'userdata/saves/_autosave-mir-browser-acceptance.zip'
  if(-not (Test-Path $saved)) { throw "Native browser save capture missing: $saved" }

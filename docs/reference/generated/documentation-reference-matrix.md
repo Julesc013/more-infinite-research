@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation reference matrix
 
-Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-09-22.
+Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-09-28.
 
 | Authority ID | Document | Status |
 | --- | --- | --- |
@@ -327,6 +327,9 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-w09-manual-playtest-checklist | [MIR 4 W09 Manual Playtest Handoff](../../maintainer/mir4-w09-manual-playtest.md) | current |
 | mir4-worktree-and-run-state-retention | [MIR 4 Local Artifact Retention And Storage](../../maintainer/artifact-retention.md) | current |
 | mir410-local-delivery-index | [MIR 4.1.0 Local Delivery Index](../../LATEST-RELEASE.md) | current |
+| mir42-current-engine-api-review | [Current Factorio 2.1 API Review for MIR 4.2](../../compatibility/factorio-2.1-current-api-review.md) | current |
+| mir42-current-playtest-findings | [MIR 4.2 Playtest Findings](../../releases/mir42-playtest-findings.md) | current |
+| mir42-player-compatibility-playtest-plan | [MIR 4.2 Compatibility Scope and Player Playtest Plan](../../releases/mir42-compatibility-playtest-plan.md) | current |
 | mod-interaction-graph-command | [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md) | current |
 | modpack-campaign-evidence-contract | [Modpack Campaigns](../../maintainer/modpack-campaigns.md) | current |
 | module-boundaries | [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md) | current |

@@ -1,7 +1,9 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [string]$CandidateZip='build/mir4/m4c02-target-products/packages/more-infinite-research_4.0.21000.zip'
+  # The static contract exports an unqualified template by default. A supplied
+  # private candidate is inspected separately by the existing bundle contract.
+  [string]$CandidateZip=''
 )
 
 $ErrorActionPreference='Stop'
@@ -19,8 +21,8 @@ if(@($runtimeA.runtime_feature_specs).Count-ne 7-or@($runtimeA.state_specs).Coun
 foreach($feature in @($runtimeA.runtime_feature_specs)){if([string]$feature.source_sha256-cne(Get-MIR4PlatformInputSha256 (Resolve-MIR4RuntimeProgrammePath -RepoRoot $RepoRoot -RelativePath ([string]$feature.source)))){throw "[mir4-w04-runtime-source-canonical-hash] $($feature.id)"}}
 if([string]$runtimeA.registration_plan.owner_sha256-cne(Get-MIR4PlatformInputSha256 (Resolve-MIR4RuntimeProgrammePath -RepoRoot $RepoRoot -RelativePath ([string]$runtimeA.registration_plan.owner)))){throw '[mir4-w04-runtime-owner-canonical-hash]'}
 $onLoad=$runtimeA.registration_plan.on_load;$onLoadHosts=@($onLoad.hosts)
-if(-not$runtimeA.registration_plan.law_results.all_passed-or-not$onLoad.registered-or[string]$onLoad.handler-cne'passive_repair.on_load'-or-not[bool]$onLoad.read_only_restoration-or[int]$onLoad.registration_count-ne1-or$onLoad.persistent_mutation-or$runtimeA.registration_plan.on_tick.registered-or-not$runtimeA.registration_plan.filter_before_dispatch-or$onLoadHosts.Count-ne2-or(@($onLoadHosts.target|Sort-Object)-join'|')-cne'f200|f210'){throw '[mir4-w04-dispatcher-laws]'}
-foreach($target in @('f210','f200')){$host=@($onLoadHosts|Where-Object target -eq $target)[0];$context=New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target;$dispatcher=Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath 'prototypes/mir/runtime/scripted_techs.lua';$stage=Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath 'prototypes/mir/stage/control.lua';if([string]$host.approved_handler-cne'passive_repair.on_load'-or[int]$host.registration_count-ne1-or[int]$host.approved_registration_count-ne1-or[string]$host.source_identity.dispatcher.path-cne'prototypes/mir/runtime/scripted_techs.lua'-or[string]$host.source_identity.dispatcher.sha256-cne(Get-MIR4PlatformInputSha256 $dispatcher)-or[string]$host.source_identity.stage.path-cne'prototypes/mir/stage/control.lua'-or[string]$host.source_identity.stage.sha256-cne(Get-MIR4PlatformInputSha256 $stage)){throw "[mir4-w04-on-load-host-identity] $target"}}
+$approvedOnLoadCallbacks=@('passive_repair.on_load','research_browser.on_load');$onLoadCallbacks=@($onLoad.callbacks|ForEach-Object{[string]$_});if(-not$runtimeA.registration_plan.law_results.all_passed-or-not$onLoad.registered-or[string]$onLoad.handler-cne'anonymous-coordinator'-or$onLoadCallbacks.Count-ne$approvedOnLoadCallbacks.Count-or($onLoadCallbacks-join'|')-cne($approvedOnLoadCallbacks-join'|')-or-not[bool]$onLoad.read_only_restoration-or[int]$onLoad.registration_count-ne1-or$onLoad.persistent_mutation-or$runtimeA.registration_plan.on_tick.registered-or-not$runtimeA.registration_plan.filter_before_dispatch-or$onLoadHosts.Count-ne2-or(@($onLoadHosts.target|Sort-Object)-join'|')-cne'f200|f210'){throw '[mir4-w04-dispatcher-laws]'}
+foreach($target in @('f210','f200')){$hostEntry=@($onLoadHosts|Where-Object target -eq $target)[0];$context=New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target;$dispatcher=Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath 'prototypes/mir/runtime/scripted_techs.lua';$stage=Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath 'prototypes/mir/stage/control.lua';$hostCallbacks=@($hostEntry.approved_callbacks|ForEach-Object{[string]$_});if([string]$hostEntry.approved_handler-cne'anonymous-coordinator'-or$hostCallbacks.Count-ne$approvedOnLoadCallbacks.Count-or($hostCallbacks-join'|')-cne($approvedOnLoadCallbacks-join'|')-or[int]$hostEntry.registration_count-ne1-or[int]$hostEntry.approved_registration_count-ne1-or[string]$hostEntry.source_identity.dispatcher.path-cne'prototypes/mir/runtime/scripted_techs.lua'-or[string]$hostEntry.source_identity.dispatcher.sha256-cne(Get-MIR4PlatformInputSha256 $dispatcher)-or[string]$hostEntry.source_identity.stage.path-cne'prototypes/mir/stage/control.lua'-or[string]$hostEntry.source_identity.stage.sha256-cne(Get-MIR4PlatformInputSha256 $stage)){throw "[mir4-w04-on-load-host-identity] $target"}}
 $f210=@($runtimeA.targets|Where-Object { $_.target -eq 'f210' })[0]
 $f110=@($runtimeA.targets|Where-Object { $_.target -eq 'f110' })[0]
 $f014=@($runtimeA.targets|Where-Object { $_.target -eq 'f014' })[0]
@@ -35,13 +37,21 @@ $tampered=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $tampered.groups=@($tampered.groups)+@($tampered.groups[0])
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $tampered|Out-Null;throw '[mir4-w04-duplicate-registration-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-duplicate-registration-group]')){throw}}
 $unknownOnLoad=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
-$unknownOnLoad.on_load.handler='unknown.on_load'
+$unknownOnLoad.on_load.handler='unknown-coordinator'
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $unknownOnLoad|Out-Null;throw '[mir4-w04-unknown-on-load-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}
+foreach($callbackForm in @(
+  @{name='swapped';callbacks=@('research_browser.on_load','passive_repair.on_load')},
+  @{name='missing';callbacks=@('passive_repair.on_load')},
+  @{name='extra';callbacks=@('passive_repair.on_load','research_browser.on_load','unknown.on_load')}
+)){$invalidCallbacks=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json;$invalidCallbacks.on_load.callbacks=@($callbackForm.callbacks);try{Assert-MIR4RuntimeRegistrationPlan -Plan $invalidCallbacks|Out-Null;throw "[mir4-w04-$($callbackForm.name)-on-load-callbacks-accepted]"}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}}
+$invalidHostCallbacks=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
+$invalidHostCallbacks.on_load.hosts[0].approved_callbacks=@('research_browser.on_load','passive_repair.on_load')
+try{Assert-MIR4RuntimeRegistrationPlan -Plan $invalidHostCallbacks|Out-Null;throw '[mir4-w04-swapped-host-on-load-callbacks-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}
 $duplicateOnLoad=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $duplicateOnLoad.on_load.registration_count=2
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $duplicateOnLoad|Out-Null;throw '[mir4-w04-duplicate-on-load-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}
 $unregisteredOnLoad=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
-$unregisteredOnLoad.owner='test/unregistered-runtime-owner.lua';$unregisteredOnLoad.on_load.registered=$false;$unregisteredOnLoad.on_load.handler=$null;$unregisteredOnLoad.on_load.read_only_restoration=$false;$unregisteredOnLoad.on_load.registration_count=0
+$unregisteredOnLoad.owner='test/unregistered-runtime-owner.lua';$unregisteredOnLoad.on_load.registered=$false;$unregisteredOnLoad.on_load.handler=$null;$unregisteredOnLoad.on_load.callbacks=@();$unregisteredOnLoad.on_load.read_only_restoration=$false;$unregisteredOnLoad.on_load.registration_count=0
 Assert-MIR4RuntimeRegistrationPlan -Plan $unregisteredOnLoad|Out-Null
 $legacyUnregistered=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $legacyUnregistered.owner='test/legacy-runtime-owner.lua';$legacyUnregistered.on_load=[pscustomobject]@{registered=$false;persistent_mutation=$false}
@@ -55,7 +65,7 @@ try{Assert-MIR4RuntimeRegistrationPlan -Plan $missingOnTick|Out-Null;throw '[mir
 $textReadonly=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $textReadonly.on_load.read_only_restoration='false'
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $textReadonly|Out-Null;throw '[mir4-w04-text-readonly-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}
-foreach($inverse in @(@{name='handler';value='unknown.on_load'},@{name='registration_count';value=1},@{name='read_only_restoration';value=$true})){$invalid=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json;$invalid.on_load.registered=$false;$invalid.on_load.($inverse.name)=$inverse.value;try{Assert-MIR4RuntimeRegistrationPlan -Plan $invalid|Out-Null;throw "[mir4-w04-unregistered-$($inverse.name)-accepted]"}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}}
+foreach($inverse in @(@{name='handler';value='unknown-coordinator'},@{name='registration_count';value=1},@{name='read_only_restoration';value=$true})){$invalid=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json;$invalid.on_load.registered=$false;$invalid.on_load.callbacks=@();$invalid.on_load.($inverse.name)=$inverse.value;try{Assert-MIR4RuntimeRegistrationPlan -Plan $invalid|Out-Null;throw "[mir4-w04-unregistered-$($inverse.name)-accepted]"}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}}
 $invalidHost=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $invalidHost.on_load.hosts[0].target='f100'
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $invalidHost|Out-Null;throw '[mir4-w04-invalid-on-load-host-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}

@@ -786,7 +786,7 @@ local F200_BOB_ANGEL_MATERIAL_LOCK = {
   bobelectronics="2.1.1", bobtech="2.1.0", angelsrefining="2.0.4",
   angelsrefininggraphics="2.0.0", angelspetrochem="2.0.3",
   angelspetrochemgraphics="2.0.1", angelssmelting="2.0.5",
-  angelssmeltinggraphics="2.0.0", ["more-infinite-research"]="4.2.20000"
+  angelssmeltinggraphics="2.0.0"
 }
 
 local F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS = {
@@ -794,28 +794,30 @@ local F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS = {
   ["mir-fixture-assert-f200-science-researchability-diagnostic"]="0.1.0"
 }
 
-local function exact_f200_bob_angel_material_lock()
+-- This profile chooses the observed F200 final-route declarations.  An
+-- extension is allowed through declaration only; each route must still match
+-- its own complete typed return graph and ownership/unlock boundary below.
+-- That admits a disconnected QoL recipe while preserving the closed outcome
+-- for every connected recipe or progression change.
+local function f200_bob_angel_relevant_return_graph_profile()
   if target_profiles.current().factorio_version ~= "2.0" then return false end
   local active = mods or (script and script.active_mods)
   if type(active) ~= "table" then return false end
   for name, version in pairs(F200_BOB_ANGEL_MATERIAL_LOCK) do
     if active[name] ~= version then return false end
   end
-  for name, version in pairs(active) do
-    if F200_BOB_ANGEL_MATERIAL_LOCK[name] ~= version
-      and F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS[name] ~= version then
-      return false
-    end
+  for name, version in pairs(F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS) do
+    if active[name] ~= nil and active[name] ~= version then return false end
   end
   return true
 end
 
-local f200_angel_material_routes = exact_f200_bob_angel_material_lock()
+local f200_bob_angel_relevant_return_graph_routes = f200_bob_angel_relevant_return_graph_profile()
 
 local function f200_material_routes(existing, additions)
   local routes = {}
   for _, recipe in ipairs(existing) do routes[#routes + 1] = recipe end
-  if f200_angel_material_routes then
+  if f200_bob_angel_relevant_return_graph_routes then
     for _, recipe in ipairs(additions) do routes[#routes + 1] = recipe end
   end
   return routes
@@ -840,7 +842,7 @@ end
 
 local function aluminium_material_family()
   if aluminium_mod_active("bobplates") and aluminium_mod_active("angelssmelting") then
-    if not f200_angel_material_routes then
+    if not f200_bob_angel_relevant_return_graph_routes then
       return material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates"})
     end
     return material_family("bob-aluminium-plate", {
@@ -875,18 +877,24 @@ local function bob_or_angel_wire_material_family(material)
   -- keeps the established Bob selection, and direct-wire and coil routes
   -- remain outside the declaration and the material-family graph guard.
   if material == "platinum"
-    and f200_angel_material_routes
+    and f200_bob_angel_relevant_return_graph_routes
     and aluminium_mod_active("angelssmelting")
     and data_stage_item_prototype("bob-platinum-plate") == nil
     and data_stage_item_prototype("angels-wire-platinum") ~= nil then
     return material_family("angels-wire-platinum", {"angels-wire-platinum-2"}, {"bobplates", "angelssmelting"})
   end
   local routes = {"bob-" .. material .. "-plate"}
-  if (material == "gold" or material == "silver") and f200_angel_material_routes then
+  if (material == "gold" or material == "silver")
+    and f200_bob_angel_relevant_return_graph_routes then
     -- The finalized combined Bob/Angel profile makes Bob's plate through
     -- these ordinary Angel recipes; its Bob recipe is hidden in that profile.
+    -- The exact, productivity-permitted wire final uses a distinct molten-wire
+    -- coil input and the same unlock already represented by the plate finals.
+    -- It therefore neither moves this stable material stream's stage nor
+    -- applies a second effect to a plate-to-wire chain.
     routes[#routes + 1] = "angels-plate-" .. material
     routes[#routes + 1] = "angels-plate-" .. material .. "-2"
+    routes[#routes + 1] = "angels-wire-" .. material .. "-2"
   end
   return material_family("bob-" .. material .. "-plate", routes, {"bobplates", "angelssmelting"})
 end
@@ -895,7 +903,9 @@ end
 streams.research_material_aluminium = aluminium_material_family()
 streams.research_material_gold = bob_or_angel_wire_material_family("gold")
 streams.research_material_lead = material_family("bob-lead-plate", f200_material_routes({"bob-lead-plate", "bob-lead-plate-2"}, {"angels-plate-lead", "angels-plate-lead-2"}), {"bobplates", "angelssmelting"})
-streams.research_material_nickel = material_family("bob-nickel-plate", f200_material_routes({"bob-nickel-plate"}, {"angels-plate-nickel", "angels-plate-nickel-2"}), {"bobplates", "angelssmelting"})
+streams.research_material_nickel = material_family("bob-nickel-plate", f200_bob_angel_relevant_return_graph_routes
+  and {"bob-nickel-plate", "angels-plate-nickel", "angels-plate-nickel-2"}
+  or f200_material_routes({"bob-nickel-plate"}, {"angels-plate-nickel", "angels-plate-nickel-2"}), {"bobplates", "angelssmelting"})
 streams.research_material_platinum = bob_or_angel_wire_material_family("platinum")
 streams.research_material_silver = bob_or_angel_wire_material_family("silver")
 streams.research_material_tin = material_family("bob-tin-plate", f200_material_routes({"bob-tin-plate"}, {"angels-plate-tin", "angels-plate-tin-2"}), {"bobplates", "angelssmelting"})
@@ -950,41 +960,139 @@ streams.research_material_glass.reviewed_forward_routes = {
   ["kr-glass"] = k2_forward_route("A10-K2-glass-v1","A05-K2-05-locked-current-v1","mir32-a8a1f439",{{type="item",name="kr-sand",amount=16}},{{type="item",name="kr-glass",amount=8}})
 }
 
--- Nickel and Silver's ordinary Angel plate finals are safe only for this exact
--- F200 Bob/Angel lock. The shared graph deliberately follows disabled recipes
--- and therefore sees a possible return path through Bob's disabled silver
--- recipes. These certificates retain that guard and admit only the final
--- routes whose locked, finalized facts prove ordinary deterministic IO, clean
--- risk facts, and Factorio's finite productivity cap. Any added, removed, or
--- version-changed mod misses this lock and remains guard-rejected.
-local function f200_bob_angel_plate_profile(risk_fingerprint)
+-- Each ordinary final below is bound to its complete typed forward return
+-- cone, direct finished-output producers, external owners, and unlock/science
+-- facts observed in F200 2.0.77.  The certificate is intentionally required
+-- even when the ordinary graph has no return path: that makes the declaration
+-- safe to retain for a disconnected addition without treating a same-output
+-- producer or a changed progression boundary as equivalent.
+local function f200_bob_angel_return_graph_profile(risk_fingerprint)
   return {{
-    id="F200-BobAngel-2.0.77-plate-final-v1",
+    id="F200-BobAngel-2.0.77-return-graph-final-v1",
     mod_locks=F200_BOB_ANGEL_MATERIAL_LOCK,
     observer_mod_locks=F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS,
+    mod_lock_scope="relevant-return-graph",
     canonical_risk_fingerprint=risk_fingerprint
   }}
 end
 
-local function f200_bob_angel_plate_route(id, risk_fingerprint, ingredient, output)
+local F200_BOB_ANGEL_BLOCKED_RETURN_WITNESSES = {
+  {
+    name="bob-silver-from-lead", hidden=true, enabled_without_research=false, source_class="hidden-internal",
+    variants={{hidden=true, enabled=false,
+      ingredients={{type="item",name="angels-solid-carbon",amount=3,probability=1,independent_probability=1},{type="item",name="bob-lead-oxide",amount=7,probability=1,independent_probability=1},{type="item",name="bob-nickel-plate",amount=1,probability=1,independent_probability=1}},
+      results={{type="item",name="bob-lead-plate",amount_min=7,amount_max=11,probability=1,independent_probability=1},{type="item",name="bob-silver-ore",amount_min=1,amount_max=3,probability=1,independent_probability=1}}
+    }}
+  },
+  {
+    name="bob-silver-nitrate", hidden=true, enabled_without_research=false, source_class="hidden-internal",
+    variants={{hidden=true, enabled=false,
+      ingredients={{type="fluid",name="angels-gas-nitrogen-dioxide",amount=10,probability=1,independent_probability=1},{type="item",name="bob-silver-plate",amount=1,probability=1,independent_probability=1}},
+      results={{type="item",name="bob-silver-nitrate",amount=1,probability=1,independent_probability=1}}
+    }}
+  }
+}
+
+local function f200_entry(kind, name, amount)
+  return {type=kind, name=name, amount=amount}
+end
+
+-- The values are not a hand-derived recipe list.  They are the exact route,
+-- typed return-graph, and progression fingerprints logged by the preserved
+-- F200 final-data probe.  Counts keep a fingerprint-schema implementation
+-- change from silently broadening the witness.
+local F200_BOB_ANGEL_RETURN_GRAPH_ROUTES = {
+  ["angels-plate-aluminium"]={risk="mir32-28583fe9",graph="mir32-1fde3ffa",bindings="mir32-bf1d1b0e",identities=72,recipes=74,producers=3,ingredients={f200_entry("fluid","angels-liquid-molten-aluminium",40)},results={f200_entry("item","bob-aluminium-plate",4)}},
+  ["angels-plate-aluminium-2"]={risk="mir32-6ae1add6",graph="mir32-37eba2f4",bindings="mir32-d51a65ae",identities=72,recipes=74,producers=3,ingredients={f200_entry("item","angels-roll-aluminium",1)},results={f200_entry("item","bob-aluminium-plate",4)}},
+  ["angels-plate-gold"]={risk="mir32-82b81bf5",graph="mir32-780bbbfa",bindings="mir32-d4567136",identities=70,recipes=75,producers=3,ingredients={f200_entry("fluid","angels-liquid-molten-gold",40)},results={f200_entry("item","bob-gold-plate",4)}},
+  ["angels-plate-gold-2"]={risk="mir32-a5ba136b",graph="mir32-dec602a0",bindings="mir32-2f72d9cd",identities=70,recipes=75,producers=3,ingredients={f200_entry("item","angels-roll-gold",1)},results={f200_entry("item","bob-gold-plate",4)}},
+  ["angels-wire-gold-2"]={id="F200-BA-gold-wire-final-v1",risk="mir32-f4af2099",graph="mir32-c4953ea9",bindings="mir32-f029b315",identities=68,recipes=72,producers=3,ingredients={f200_entry("item","angels-wire-coil-gold",4)},results={f200_entry("item","bob-gilded-copper-cable",16)}},
+  ["angels-plate-lead"]={risk="mir32-c79c9256",graph="mir32-102b5dd2",bindings="mir32-d7313ff6",identities=198,recipes=207,producers=5,ingredients={f200_entry("fluid","angels-liquid-molten-lead",40)},results={f200_entry("item","bob-lead-plate",4)}},
+  ["angels-plate-lead-2"]={risk="mir32-5ca75851",graph="mir32-f73c4d86",bindings="mir32-6b4b78ff",identities=198,recipes=207,producers=5,ingredients={f200_entry("item","angels-roll-lead",1)},results={f200_entry("item","bob-lead-plate",4)}},
+  ["angels-plate-nickel"]={id="F200-BA-nickel-casting-v1",risk="mir32-b375a73e",graph="mir32-a27ea44e",bindings="mir32-ccf3ca93",identities=950,recipes=1488,producers=3,ingredients={f200_entry("fluid","angels-liquid-molten-nickel",40)},results={f200_entry("item","bob-nickel-plate",4)}},
+  ["angels-plate-nickel-2"]={id="F200-BA-nickel-roll-v1",risk="mir32-d28043dc",graph="mir32-5f046c4a",bindings="mir32-3040c5f9",identities=950,recipes=1488,producers=3,ingredients={f200_entry("item","angels-roll-nickel",1)},results={f200_entry("item","bob-nickel-plate",4)}},
+  ["angels-wire-platinum-2"]={risk="mir32-2f271ec9",graph="mir32-3869a68c",bindings="mir32-3e84abce",identities=27,recipes=28,producers=2,ingredients={f200_entry("item","angels-wire-coil-platinum",4)},results={f200_entry("item","angels-wire-platinum",16)}},
+  ["angels-plate-tin"]={risk="mir32-42e8ee87",graph="mir32-0905b4fe",bindings="mir32-1a2afdfa",identities=207,recipes=214,producers=3,ingredients={f200_entry("fluid","angels-liquid-molten-tin",40)},results={f200_entry("item","bob-tin-plate",4)}},
+  ["angels-plate-tin-2"]={risk="mir32-beddbea4",graph="mir32-3710fb19",bindings="mir32-2fbc823d",identities=207,recipes=214,producers=3,ingredients={f200_entry("item","angels-roll-tin",1)},results={f200_entry("item","bob-tin-plate",4)}},
+  ["angels-plate-titanium"]={risk="mir32-b51c3afe",graph="mir32-2e5eac57",bindings="mir32-d8eb8681",identities=56,recipes=58,producers=3,ingredients={f200_entry("fluid","angels-liquid-molten-titanium",40)},results={f200_entry("item","bob-titanium-plate",4)}},
+  ["angels-plate-titanium-2"]={risk="mir32-2addeacf",graph="mir32-84064d32",bindings="mir32-6a2e39c1",identities=56,recipes=58,producers=3,ingredients={f200_entry("item","angels-roll-titanium",1)},results={f200_entry("item","bob-titanium-plate",4)}},
+  ["bob-copper-tungsten-alloy"]={risk="mir32-d92d266f",graph="mir32-cbb41f04",bindings="mir32-6951a533",identities=1,recipes=1,producers=1,ingredients={f200_entry("item","angels-powder-copper",10),f200_entry("item","bob-powdered-tungsten",15)},results={f200_entry("item","bob-copper-tungsten-alloy",25)}},
+  ["angels-plate-zinc"]={risk="mir32-9a178c6f",graph="mir32-07cff5a5",bindings="mir32-8938e3e3",identities=43,recipes=45,producers=3,ingredients={f200_entry("fluid","angels-liquid-molten-zinc",40)},results={f200_entry("item","bob-zinc-plate",4)}},
+  ["angels-plate-zinc-2"]={risk="mir32-d58ba53b",graph="mir32-39c69db5",bindings="mir32-be12e0f1",identities=43,recipes=45,producers=3,ingredients={f200_entry("item","angels-roll-zinc",1)},results={f200_entry("item","bob-zinc-plate",4)}},
+  ["angels-plate-bronze"]={risk="mir32-fa8cecb5",graph="mir32-221a57b3",bindings="mir32-e5f8a5f0",identities=46,recipes=47,producers=2,ingredients={f200_entry("fluid","angels-liquid-molten-bronze",40)},results={f200_entry("item","bob-bronze-alloy",4)}},
+  ["angels-plate-brass"]={risk="mir32-cbfc7d0e",graph="mir32-b0d7b6ab",bindings="mir32-3057c5da",identities=38,recipes=39,producers=2,ingredients={f200_entry("fluid","angels-liquid-molten-brass",40)},results={f200_entry("item","bob-brass-alloy",4)}},
+  ["angels-plate-gunmetal"]={risk="mir32-df72e755",graph="mir32-989f026e",bindings="mir32-f5b0b17f",identities=1,recipes=2,producers=2,ingredients={f200_entry("fluid","angels-liquid-molten-gunmetal",40)},results={f200_entry("item","bob-gunmetal-alloy",4)}},
+  ["angels-plate-invar"]={risk="mir32-85ae1247",graph="mir32-3790f90d",bindings="mir32-f6107c3a",identities=1,recipes=2,producers=2,ingredients={f200_entry("fluid","angels-liquid-molten-invar",40)},results={f200_entry("item","bob-invar-alloy",4)}},
+  ["angels-plate-cobalt-steel"]={risk="mir32-b2a6ca58",graph="mir32-fb0f9f31",bindings="mir32-c79936f7",identities=38,recipes=39,producers=2,ingredients={f200_entry("fluid","angels-liquid-molten-cobalt-steel",40)},results={f200_entry("item","bob-cobalt-steel-alloy",4)}},
+  ["angels-plate-nitinol"]={risk="mir32-e0fea025",graph="mir32-eba2f6d8",bindings="mir32-147c5076",identities=5,recipes=6,producers=2,ingredients={f200_entry("fluid","angels-liquid-molten-nitinol",40)},results={f200_entry("item","bob-nitinol-alloy",4)}},
+  ["angels-plate-silver"]={id="F200-BA-silver-casting-v1",risk="mir32-fae4a0f7",graph="mir32-a77805c2",bindings="mir32-231b4067",identities=950,recipes=1488,producers=3,ingredients={f200_entry("fluid","angels-liquid-molten-silver",40)},results={f200_entry("item","bob-silver-plate",4)}},
+  ["angels-plate-silver-2"]={id="F200-BA-silver-roll-v1",risk="mir32-a0f6b276",graph="mir32-f098b32a",bindings="mir32-c11b2eb5",identities=950,recipes=1488,producers=3,ingredients={f200_entry("item","angels-roll-silver",1)},results={f200_entry("item","bob-silver-plate",4)}},
+  ["angels-wire-silver-2"]={id="F200-BA-silver-wire-final-v1",risk="mir32-ce67b188",graph="mir32-99c58542",bindings="mir32-53f936f8",identities=130,recipes=134,producers=2,ingredients={f200_entry("item","angels-wire-coil-silver",4)},results={f200_entry("item","angels-wire-silver",16)}}
+}
+
+local function f200_bob_angel_return_graph_route(recipe_name, relevant_input_contract)
+  local observed = F200_BOB_ANGEL_RETURN_GRAPH_ROUTES[recipe_name]
+  if not observed then error("MIR F200 missing return-graph observation " .. recipe_name) end
   return {
-    id=id,
-    evidence_id="F200-BobAngel-NickelSilver-return-witness-2.0.77-v1",
+    id=observed.id or ("F200-BA-return-graph-" .. recipe_name .. "-v1"),
+    evidence_id="F200-BobAngel-16Material-return-graph-2.0.77-v1",
+    require_exact_route_certificate=true,
     maximum_productivity=3.0,
-    profiles=f200_bob_angel_plate_profile(risk_fingerprint),
-    ingredients={ingredient},
-    results={output}
+    profiles=f200_bob_angel_return_graph_profile(observed.risk),
+    ingredients=observed.ingredients,
+    results=observed.results,
+    relevant_input_contract=relevant_input_contract,
+    relevant_return_graph_contract={
+      schema=1,
+      return_graph_fingerprint=observed.graph,
+      bindings_fingerprint=observed.bindings,
+      reachable_identity_count=observed.identities,
+      relevant_recipe_count=observed.recipes,
+      direct_output_producer_count=observed.producers
+    }
   }
 end
 
-if f200_angel_material_routes then
+local function f200_nickel_silver_input_contract(return_path, unlock_name, science_ingredients, prerequisites)
+  return {
+    productivity_owner_technologies={},
+    return_path=return_path,
+    return_witnesses=F200_BOB_ANGEL_BLOCKED_RETURN_WITNESSES,
+    unlock_technologies={{name=unlock_name, science_ingredients=science_ingredients, prerequisites=prerequisites}}
+  }
+end
+
+local function attach_f200_return_graph_routes(stream, recipes)
+  local certificates = {}
+  for _, recipe_name in ipairs(recipes) do
+    certificates[recipe_name] = f200_bob_angel_return_graph_route(recipe_name)
+  end
+  stream.reviewed_forward_routes = certificates
+end
+
+if f200_bob_angel_relevant_return_graph_routes then
+  attach_f200_return_graph_routes(streams.research_material_aluminium, {"angels-plate-aluminium", "angels-plate-aluminium-2"})
+  attach_f200_return_graph_routes(streams.research_material_gold, {"angels-plate-gold", "angels-plate-gold-2", "angels-wire-gold-2"})
+  attach_f200_return_graph_routes(streams.research_material_lead, {"angels-plate-lead", "angels-plate-lead-2"})
+  attach_f200_return_graph_routes(streams.research_material_platinum, {"angels-wire-platinum-2"})
+  attach_f200_return_graph_routes(streams.research_material_tin, {"angels-plate-tin", "angels-plate-tin-2"})
+  attach_f200_return_graph_routes(streams.research_material_titanium, {"angels-plate-titanium", "angels-plate-titanium-2"})
+  attach_f200_return_graph_routes(streams.research_material_copper_tungsten, {"bob-copper-tungsten-alloy"})
+  attach_f200_return_graph_routes(streams.research_material_zinc, {"angels-plate-zinc", "angels-plate-zinc-2"})
+  attach_f200_return_graph_routes(streams.research_material_bronze, {"angels-plate-bronze"})
+  attach_f200_return_graph_routes(streams.research_material_brass, {"angels-plate-brass"})
+  attach_f200_return_graph_routes(streams.research_material_gunmetal, {"angels-plate-gunmetal"})
+  attach_f200_return_graph_routes(streams.research_material_invar, {"angels-plate-invar"})
+  attach_f200_return_graph_routes(streams.research_material_cobalt_steel, {"angels-plate-cobalt-steel"})
+  attach_f200_return_graph_routes(streams.research_material_nitinol, {"angels-plate-nitinol"})
   streams.research_material_nickel.reviewed_forward_routes = {
-    ["angels-plate-nickel"] = f200_bob_angel_plate_route("F200-BA-nickel-casting-v1", "mir32-b375a73e", {type="fluid",name="angels-liquid-molten-nickel",amount=40}, {type="item",name="bob-nickel-plate",amount=4}),
-    ["angels-plate-nickel-2"] = f200_bob_angel_plate_route("F200-BA-nickel-roll-v1", "mir32-d28043dc", {type="item",name="angels-roll-nickel",amount=1}, {type="item",name="bob-nickel-plate",amount=4})
+    ["angels-plate-nickel"] = f200_bob_angel_return_graph_route("angels-plate-nickel", f200_nickel_silver_input_contract("angels-liquid-molten-nickel", "angels-nickel-smelting-1", {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}, {"angels-metallurgy-2","angels-basic-chemistry-2"})),
+    ["angels-plate-nickel-2"] = f200_bob_angel_return_graph_route("angels-plate-nickel-2", f200_nickel_silver_input_contract("angels-roll-nickel", "angels-nickel-casting-2", {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="chemical-science-pack",amount=1}}, {"angels-strand-casting-2","angels-nickel-smelting-1"}))
   }
   streams.research_material_silver.reviewed_forward_routes = {
-    ["angels-plate-silver"] = f200_bob_angel_plate_route("F200-BA-silver-casting-v1", "mir32-fae4a0f7", {type="fluid",name="angels-liquid-molten-silver",amount=40}, {type="item",name="bob-silver-plate",amount=4}),
-    ["angels-plate-silver-2"] = f200_bob_angel_plate_route("F200-BA-silver-roll-v1", "mir32-a0f6b276", {type="item",name="angels-roll-silver",amount=1}, {type="item",name="bob-silver-plate",amount=4})
+    ["angels-plate-silver"] = f200_bob_angel_return_graph_route("angels-plate-silver", f200_nickel_silver_input_contract("angels-liquid-molten-silver", "angels-silver-smelting-1", {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}, {"angels-ore-floatation","angels-metallurgy-2"})),
+    ["angels-plate-silver-2"] = f200_bob_angel_return_graph_route("angels-plate-silver-2", f200_nickel_silver_input_contract("angels-roll-silver", "angels-silver-casting-2", {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="chemical-science-pack",amount=1}}, {"angels-strand-casting-2","angels-silver-smelting-1","angels-copper-casting-2"})),
+    ["angels-wire-silver-2"] = f200_bob_angel_return_graph_route("angels-wire-silver-2")
   }
 end
 

@@ -1,17 +1,38 @@
 local records, cached, builds, risks = {}, {}, 0, {}
+local productivity_owners, recipe_unlocks, technologies = {}, {}, {}
 local function stub(name, value) package.loaded[name] = value or {} end
 for _, name in ipairs{"platform.factorio.prototype_lookup","index.item_prototype_facts","core.deepcopy","core.fingerprint","platform.factorio.target_profiles","report.compiler_telemetry","settings.automatic_compiler_policy"} do stub("prototypes.mir." .. name) end
-stub("prototypes.mir.core.fingerprint", {of=function() return "test-fingerprint" end})
+local function fingerprint_text(value)
+  local kind=type(value)
+  if kind=="nil" or kind=="boolean" or kind=="number" or kind=="string" then return kind..":"..tostring(value) end
+  local keys={};for key in pairs(value) do keys[#keys+1]=key end
+  table.sort(keys,function(left,right) return type(left)==type(right) and tostring(left)<tostring(right) or type(left)<type(right) end)
+  local fields={}
+  for _,key in ipairs(keys) do fields[#fields+1]=fingerprint_text(key).."="..fingerprint_text(value[key]) end
+  return "{"..table.concat(fields,",").."}"
+end
+local function test_fingerprint(value)
+  local hash=2166136261
+  for index=1,#fingerprint_text(value) do hash=(hash*65599+string.byte(fingerprint_text(value),index))%4294967291 end
+  return "mir32-"..string.format("%08x",hash)
+end
+stub("prototypes.mir.core.fingerprint", {of=test_fingerprint})
 stub("prototypes.mir.platform.factorio.target_profiles", {current=function() return {} end})
 stub("prototypes.mir.report.compiler_telemetry", {count=function() end,observe_max=function() end})
 stub("prototypes.mir.settings.automatic_compiler_policy", {current=function() return {apply_changes=true} end})
 stub("prototypes.mir.index.recipe_risk_facts", {view=function(name) return risks[name] end})
+stub("prototypes.mir.index.relationships", {view=function() return {
+  technologies_by_recipe_effect=productivity_owners,
+  unlocks_by_recipe=recipe_unlocks
+} end})
+stub("prototypes.mir.platform.factorio.data_raw", {technology=function(name) return technologies[name] end})
 stub("prototypes.mir.index.recipe_facts", {
   for_each=function(callback)
     builds=builds+1
     for name, fact in pairs(records) do callback(name, fact) end
   end,
   view=function(name) return records[name] end,
+  index_view=function() return {facts=records} end,
   candidate_names=function()
     local names = {}
     for name in pairs(records) do names[#names+1] = name end
@@ -28,7 +49,10 @@ local function check(value,message) assert(value,message); count=count+1 end
 local function recipe(input,output)
  return {allow_productivity=true,variants={{ingredients={{name=input}},results={{name=output,amount=1}}}}}
 end
-local function environment(value) records=value; cached={}; builds=0 end
+local function environment(value)
+  records=value; cached={}; builds=0
+  productivity_owners, recipe_unlocks, technologies = {}, {}, {}
+end
 local forward=recipe("ore","plate")
 environment{smelting=forward,gears=recipe("plate","gear")}
 check(matcher.material_route_is_acyclic(forward),"ordinary acyclic manufacturing")
@@ -110,10 +134,16 @@ local function certificate(input, output, changes)
   }
 end
 
-local function reviewed_routes(subject, route, risk, route_certificate, active_mods)
+local function reviewed_routes(subject, route, risk, route_certificate, active_mods, relevant_inputs)
   environment({[subject]=route,reclaim=canonical_route("reclaim", "plate", "ore")})
   risks={[subject]=risk,reclaim=risk_row("reclaim")}
   mods=active_mods or {Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13"}
+  if relevant_inputs then
+    productivity_owners[subject]=relevant_inputs.owners or {}
+    recipe_unlocks[subject]=relevant_inputs.unlocks or {}
+    technologies=relevant_inputs.technologies or {}
+    for name, witness in pairs(relevant_inputs.witnesses or {}) do records[name]=witness end
+  end
   local buckets=matcher.recipes_for_stream({
     items={"plate"},
     require_acyclic_process=true,
@@ -188,6 +218,199 @@ check(#reviewed_routes("smelting",valid_route,valid_risk_row,valid_certificate,{
 check(#reviewed_routes("smelting",valid_route,valid_risk_row,valid_certificate,{Krastorio2="2.1.2"})==0,"missing locked mod rejects reviewed route")
 check(#reviewed_routes("smelting",valid_route,valid_risk_row,valid_certificate,{Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13",extra="1.0.0"})==0,"extra active mod rejects reviewed route")
 check(#reviewed_routes("smelting",valid_route,valid_risk_row,valid_certificate,{Krastorio2="2.1.2",["Krastorio2-spaced-out"]="9.9.9"})==0,"wrong locked mod version rejects reviewed route")
+
+-- A named-provider certificate retains MIR package-version bookkeeping only
+-- when its direct facts and disabled return witnesses still match. An
+-- arbitrary extra mod has no complete graph-boundary certificate and remains
+-- withheld even if its declared purpose is QoL.
+local function blocked_witness(name, input, output)
+  return {
+    name=name,
+    source_class="hidden-internal",
+    hidden=true,
+    enabled_without_research=false,
+    variants={{
+      enabled=false,
+      hidden=true,
+      ingredients={entry(input, 2)},
+      results={entry(output, 1)}
+    }}
+  }
+end
+
+local function relevant_certificate()
+  local value=certificate("ore","plate")
+  value.profiles[1].mod_lock_scope="named-relevant-providers"
+  value.relevant_input_contract={
+    productivity_owner_technologies={},
+    return_path="ore",
+    return_witnesses={{
+      name="return-witness",
+      source_class="hidden-internal",
+      hidden=true,
+      enabled_without_research=false,
+      variants={{
+        enabled=false,
+        hidden=true,
+        ingredients={entry("intermediate", 2)},
+        results={entry("ore", 1)}
+      }}
+    }},
+    unlock_technologies={{
+      name="plate-unlock",
+      science_ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}},
+      prerequisites={"precedent"}
+    }}
+  }
+  return value
+end
+local function relevant_world(changes)
+  local value={
+    owners={},
+    unlocks={"plate-unlock"},
+    technologies={
+      ["plate-unlock"]={
+        unit={ingredients={{"automation-science-pack",1},{"logistic-science-pack",1}}},
+        prerequisites={"precedent"}
+      }
+    },
+    witnesses={
+      ["return-witness"]=blocked_witness("return-witness", "intermediate", "ore")
+    }
+  }
+  for field, change in pairs(changes or {}) do value[field]=change end
+  return value
+end
+local relevant_certificate_value=relevant_certificate()
+local relevant_mods={Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13",["more-infinite-research"]="4.2.20001"}
+check(table.concat(reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,relevant_mods,relevant_world()),",")=="smelting","relevant-input certificate retains an unchanged route with MIR package-version bookkeeping")
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,{Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13",["more-infinite-research"]="4.2.20001",qol="1.0.0"},relevant_world())==0,"unlisted QoL addition remains withheld without a complete return-graph boundary")
+local changed_io_route=canonical_route("smelting","ore","plate")
+changed_io_route.variants[1].results[1].amount=6
+check(#reviewed_routes("smelting",changed_io_route,valid_risk_row,relevant_certificate_value,relevant_mods,relevant_world())==0,"relevant-input certificate rejects producer output drift")
+local changed_permission_route=canonical_route("smelting","ore","plate")
+changed_permission_route.declared_allow_productivity=false
+changed_permission_route.variants[1].declared_allow_productivity=false
+check(#reviewed_routes("smelting",changed_permission_route,valid_risk_row,relevant_certificate_value,relevant_mods,relevant_world())==0,"relevant-input certificate rejects productivity permission drift")
+local changed_cap_route=canonical_route("smelting","ore","plate")
+changed_cap_route.effective_maximum_productivity=3.01
+changed_cap_route.variants[1].effective_maximum_productivity=3.01
+check(#reviewed_routes("smelting",changed_cap_route,valid_risk_row,relevant_certificate_value,relevant_mods,relevant_world())==0,"relevant-input certificate rejects domain-cap drift")
+check(#reviewed_routes("smelting",valid_route,risk_row("smelting",{review_flags={"cleaning_or_recovery_loop"}}),relevant_certificate_value,relevant_mods,relevant_world())==0,"relevant-input certificate rejects canonical-risk drift")
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,relevant_mods,relevant_world({owners={"external-productivity"}}))==0,"relevant-input certificate rejects productivity-owner drift")
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,relevant_mods,relevant_world({unlocks={"other-unlock"}}))==0,"relevant-input certificate rejects unlock-boundary drift")
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,relevant_mods,relevant_world({technologies={
+  ["plate-unlock"]={unit={ingredients={{"automation-science-pack",1},{"chemical-science-pack",1}}},prerequisites={"precedent"}}
+}}))==0,"relevant-input certificate rejects unlock-science drift")
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,relevant_mods,relevant_world({technologies={
+  ["plate-unlock"]={unit={ingredients={{"automation-science-pack",1},{"logistic-science-pack",1}}},prerequisites={"other-precedent"}}
+}}))==0,"relevant-input certificate rejects unlock-prerequisite drift")
+local changed_return_certificate=relevant_certificate()
+changed_return_certificate.relevant_input_contract.return_path="other-input"
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,changed_return_certificate,relevant_mods,relevant_world())==0,"relevant-input certificate rejects return-endpoint drift")
+local revealed_witness=relevant_world()
+revealed_witness.witnesses["return-witness"].hidden=false
+revealed_witness.witnesses["return-witness"].variants[1].hidden=false
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,relevant_mods,revealed_witness)==0,"relevant-input certificate rejects an unhidden return witness")
+local enabled_witness=relevant_world()
+enabled_witness.witnesses["return-witness"].enabled_without_research=true
+enabled_witness.witnesses["return-witness"].variants[1].enabled=true
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,relevant_mods,enabled_witness)==0,"relevant-input certificate rejects an enabled return witness")
+local altered_witness=relevant_world()
+altered_witness.witnesses["return-witness"].variants[1].results[1].amount=2
+check(#reviewed_routes("smelting",valid_route,valid_risk_row,relevant_certificate_value,relevant_mods,altered_witness)==0,"relevant-input certificate rejects same-endpoint return-witness I/O drift")
+
+-- A complete typed return-cone certificate admits an added mod only when its
+-- recipe changes are disconnected from this material route.  It includes the
+-- direct finished-output producers so a reverse-only alternative cannot hide
+-- outside the directed cone.
+local function graph_world()
+  return {
+    smelting=canonical_route("smelting","ore","plate"),
+    downstream=canonical_route("downstream","plate","gear")
+  }
+end
+local graph_mods={Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13",qol="1.0.0"}
+local function graph_certificate_for(world, bindings)
+  environment(world)
+  risks={smelting=risk_row("smelting")}
+  mods=graph_mods
+  productivity_owners=(bindings and bindings.owners) or {}
+  recipe_unlocks=(bindings and bindings.unlocks) or {}
+  technologies=(bindings and bindings.technologies) or {}
+  local facts=assert(matcher.relevant_route_fingerprints(world.smelting))
+  local value=certificate("ore","plate")
+  value.require_exact_route_certificate=true
+  value.profiles[1].mod_lock_scope="relevant-return-graph"
+  value.relevant_return_graph_contract=facts
+  return value
+end
+local function graph_routes(world, route_certificate, bindings)
+  environment(world)
+  risks={smelting=risk_row("smelting")}
+  mods=graph_mods
+  productivity_owners=(bindings and bindings.owners) or {}
+  recipe_unlocks=(bindings and bindings.unlocks) or {}
+  technologies=(bindings and bindings.technologies) or {}
+  local buckets=matcher.recipes_for_stream({
+    items={},
+    recipe_patterns={"^smelting$"},
+    require_acyclic_process=true,
+    reviewed_forward_routes={smelting=route_certificate}
+  },0.02)
+  return buckets[1].recipes
+end
+local graph_certificate_value=graph_certificate_for(graph_world())
+check(table.concat(graph_routes(graph_world(),graph_certificate_value),",")=="smelting","complete return-graph certificate admits disconnected QoL addition")
+local disconnected_world=graph_world()
+disconnected_world.qol_utility=canonical_route("qol_utility","coal","ash")
+check(table.concat(graph_routes(disconnected_world,graph_certificate_value),",")=="smelting","disconnected added producer remains qualified")
+local connected_return_world=graph_world()
+connected_return_world.qol_return=canonical_route("qol_return","plate","ore")
+check(#graph_routes(connected_return_world,graph_certificate_value)==0,"connected return edge rejects the affected route")
+local same_endpoint_world=graph_world()
+same_endpoint_world.qol_step=canonical_route("qol_step","plate","qol-intermediate")
+same_endpoint_world.qol_same_endpoint=canonical_route("qol_same_endpoint","qol-intermediate","ore")
+check(#graph_routes(same_endpoint_world,graph_certificate_value)==0,"same-endpoint alternative return path rejects the affected route")
+local producer_world=graph_world()
+producer_world.qol_plate=canonical_route("qol_plate","scrap","plate")
+check(#graph_routes(producer_world,graph_certificate_value)==0,"connected finished-output producer rejects the affected route")
+local hidden_world=graph_world()
+hidden_world.downstream.hidden=true
+check(#graph_routes(hidden_world,graph_certificate_value)==0,"hidden-state change inside return cone rejects the affected route")
+local enabled_world=graph_world()
+enabled_world.downstream.enabled_without_research=false
+check(#graph_routes(enabled_world,graph_certificate_value)==0,"enabled-state change inside return cone rejects the affected route")
+local cap_world=graph_world()
+cap_world.smelting.effective_maximum_productivity=3.01
+cap_world.smelting.variants[1].effective_maximum_productivity=3.01
+check(#graph_routes(cap_world,graph_certificate_value)==0,"higher productivity cap rejects the affected route")
+local owner_world=graph_world()
+check(#graph_routes(owner_world,graph_certificate_value,{owners={smelting={"external-productivity"}}})==0,"owner change rejects the affected route")
+local unlocked_world=graph_world()
+local unlock_bindings={
+  unlocks={smelting={"plate-unlock"}},
+  technologies={ ["plate-unlock"]={unit={ingredients={{"automation-science-pack",1},{"logistic-science-pack",1}}},prerequisites={"precedent"}} }
+}
+environment(unlocked_world)
+risks={smelting=risk_row("smelting")}
+mods=graph_mods
+productivity_owners=unlock_bindings.owners or {}
+recipe_unlocks=unlock_bindings.unlocks
+technologies=unlock_bindings.technologies
+local unlocked_graph_certificate=graph_certificate_for(unlocked_world,unlock_bindings)
+check(table.concat(graph_routes(unlocked_world,unlocked_graph_certificate,unlock_bindings),",")=="smelting","exact unlock binding remains qualified")
+local changed_unlock_bindings={
+  unlocks={smelting={"plate-unlock"}},
+  technologies={ ["plate-unlock"]={unit={ingredients={{"automation-science-pack",1},{"chemical-science-pack",1}}},prerequisites={"precedent"}} }
+}
+check(#graph_routes(graph_world(),unlocked_graph_certificate,changed_unlock_bindings)==0,"science change rejects the affected route")
+local changed_unlock_set={
+  unlocks={smelting={"other-unlock"}},
+  technologies={ ["other-unlock"]={unit={ingredients={{"automation-science-pack",1}}},prerequisites={"precedent"}} }
+}
+check(#graph_routes(graph_world(),unlocked_graph_certificate,changed_unlock_set)==0,"unlock change rejects the affected route")
+
 local denied_route=canonical_route("smelting","ore","plate")
 denied_route.declared_allow_productivity=false
 check(#reviewed_routes("smelting",denied_route,valid_risk_row,valid_certificate)==0,"certificate cannot override declared productivity denial")
@@ -239,9 +462,10 @@ check(#reviewed_routes("smelting",multiple_variant_route,valid_risk_row,valid_ce
 local unknown_field_route=canonical_route("smelting","ore","plate",{results={future_normalized_semantic=true}})
 check(#reviewed_routes("smelting",unknown_field_route,valid_risk_row,certificate("ore","plate",{results={future_normalized_semantic=true}}))==0,"unknown normalized entry fields fail closed")
 
--- The retained F200 Bob/Angel additions have one exact evidence closure. The
--- descriptor must keep that closure's selected final routes while leaving
--- every altered or F210 profile on its established Bob-only declarations.
+-- The retained F200 Bob/Angel additions have a typed route boundary. The
+-- descriptor may retain that declaration with an unrelated extra mod, but
+-- each selected final must carry a required boundary certificate; altered
+-- locked providers and F210 still fall back to their established declarations.
 local function clone_map(value)
   local out={}
   for key, entry in pairs(value) do out[key]=entry end
@@ -286,10 +510,45 @@ exact_f200_mods["mir-fixture-assert-f200-bob-angel-material-routes-observation"]
 local exact_f200_streams=material_streams_for({factorio_version="2.0"},exact_f200_mods,f200_items)
 check(recipe_patterns(exact_f200_streams.research_material_aluminium)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$","exact F200 lock retains observed Angel aluminium finals")
 check(recipe_patterns(exact_f200_streams.research_material_nickel)=="^bob%-nickel%-plate$|^angels%-plate%-nickel$|^angels%-plate%-nickel%-2$","exact F200 lock retains observed Angel nickel finals")
-check(recipe_patterns(exact_f200_streams.research_material_silver)=="^bob%-silver%-plate$|^angels%-plate%-silver$|^angels%-plate%-silver%-2$","exact F200 lock retains observed Angel silver finals")
-check(recipe_patterns(exact_f200_streams.research_material_gold)=="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$","exact F200 lock retains observed Angel gold finals")
+check(recipe_patterns(exact_f200_streams.research_material_silver)=="^bob%-silver%-plate$|^angels%-plate%-silver$|^angels%-plate%-silver%-2$|^angels%-wire%-silver%-2$","exact F200 lock retains observed Angel silver plate and final-wire routes")
+check(recipe_patterns(exact_f200_streams.research_material_gold)=="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$|^angels%-wire%-gold%-2$","exact F200 lock retains observed Angel gold plate and final-wire routes")
 check(recipe_patterns(exact_f200_streams.research_material_platinum)=="^angels%-wire%-platinum%-2$","exact F200 lock retains observed Angel platinum final")
 check(exact_f200_streams.research_material_nickel.reviewed_forward_routes["angels-plate-nickel"]~=nil and exact_f200_streams.research_material_silver.reviewed_forward_routes["angels-plate-silver"]~=nil,"exact F200 lock retains reviewed return-route certificates")
+local f200_nickel_cast_contract=exact_f200_streams.research_material_nickel.reviewed_forward_routes["angels-plate-nickel"].relevant_input_contract
+local f200_silver_roll_contract=exact_f200_streams.research_material_silver.reviewed_forward_routes["angels-plate-silver-2"].relevant_input_contract
+local f200_nickel_graph_contract=exact_f200_streams.research_material_nickel.reviewed_forward_routes["angels-plate-nickel"].relevant_return_graph_contract
+local f200_gold_wire_certificate=exact_f200_streams.research_material_gold.reviewed_forward_routes["angels-wire-gold-2"]
+local f200_silver_wire_certificate=exact_f200_streams.research_material_silver.reviewed_forward_routes["angels-wire-silver-2"]
+check(f200_nickel_cast_contract.return_path=="angels-liquid-molten-nickel" and #f200_nickel_cast_contract.productivity_owner_technologies==0 and f200_nickel_cast_contract.unlock_technologies[1].name=="angels-nickel-smelting-1" and #f200_nickel_cast_contract.return_witnesses==2 and f200_nickel_cast_contract.return_witnesses[1].name=="bob-silver-from-lead","Nickel certificate binds its observed owner and blocked casting-return witnesses")
+check(f200_silver_roll_contract.return_path=="angels-roll-silver" and f200_silver_roll_contract.unlock_technologies[1].name=="angels-silver-casting-2" and #f200_silver_roll_contract.unlock_technologies[1].science_ingredients==3,"Silver certificate binds its observed roll unlock and science boundary")
+check(f200_nickel_graph_contract.return_graph_fingerprint=="mir32-a27ea44e" and f200_nickel_graph_contract.bindings_fingerprint=="mir32-ccf3ca93" and f200_nickel_graph_contract.relevant_recipe_count==1488 and exact_f200_streams.research_material_nickel.reviewed_forward_routes["angels-plate-nickel"].require_exact_route_certificate,"Nickel certificate requires its full typed return-graph boundary")
+check(f200_gold_wire_certificate and f200_gold_wire_certificate.id=="F200-BA-gold-wire-final-v1" and f200_gold_wire_certificate.require_exact_route_certificate and f200_gold_wire_certificate.relevant_input_contract==nil and f200_gold_wire_certificate.relevant_return_graph_contract.return_graph_fingerprint=="mir32-c4953ea9" and f200_gold_wire_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-f029b315","Gold wire final requires its observed acyclic return-cone certificate without a fabricated blocked-return witness")
+check(f200_silver_wire_certificate and f200_silver_wire_certificate.id=="F200-BA-silver-wire-final-v1" and f200_silver_wire_certificate.require_exact_route_certificate and f200_silver_wire_certificate.relevant_input_contract==nil and f200_silver_wire_certificate.relevant_return_graph_contract.return_graph_fingerprint=="mir32-99c58542" and f200_silver_wire_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-53f936f8","Silver wire final requires its observed acyclic return-cone certificate without a fabricated blocked-return witness")
+local f200_complete_certificate_routes={
+  research_material_aluminium={"angels-plate-aluminium","angels-plate-aluminium-2"},
+  research_material_gold={"angels-plate-gold","angels-plate-gold-2","angels-wire-gold-2"},
+  research_material_lead={"angels-plate-lead","angels-plate-lead-2"},
+  research_material_nickel={"angels-plate-nickel","angels-plate-nickel-2"},
+  research_material_platinum={"angels-wire-platinum-2"},
+  research_material_silver={"angels-plate-silver","angels-plate-silver-2","angels-wire-silver-2"},
+  research_material_tin={"angels-plate-tin","angels-plate-tin-2"},
+  research_material_titanium={"angels-plate-titanium","angels-plate-titanium-2"},
+  research_material_copper_tungsten={"bob-copper-tungsten-alloy"},
+  research_material_zinc={"angels-plate-zinc","angels-plate-zinc-2"},
+  research_material_bronze={"angels-plate-bronze"}, research_material_brass={"angels-plate-brass"},
+  research_material_gunmetal={"angels-plate-gunmetal"}, research_material_invar={"angels-plate-invar"},
+  research_material_cobalt_steel={"angels-plate-cobalt-steel"}, research_material_nitinol={"angels-plate-nitinol"}
+}
+local f200_complete_certificate_count=0
+for stream_name, recipes in pairs(f200_complete_certificate_routes) do
+  local certificates=exact_f200_streams[stream_name].reviewed_forward_routes
+  for _, recipe_name in ipairs(recipes) do
+    local certificate=certificates and certificates[recipe_name]
+    check(certificate and certificate.require_exact_route_certificate and certificate.relevant_return_graph_contract and certificate.relevant_return_graph_contract.schema==1,"exact F200 route has a required typed boundary certificate "..recipe_name)
+    f200_complete_certificate_count=f200_complete_certificate_count+1
+  end
+end
+check(f200_complete_certificate_count==26,"all 26 emitted F200 final routes across the sixteen materials retain typed boundary certificates")
 check(exact_f200_streams.research_material_imersite.required_items[1]=="kr-imersite-crystal" and exact_f200_streams.research_material_imersite.icon_item=="kr-imersite-powder","F200 route gate preserves Imersite native-owner and MIR-powder identities")
 check(exact_f200_streams.research_material_silicon.reviewed_forward_routes["kr-silicon"]~=nil and exact_f200_streams.research_material_glass.reviewed_forward_routes["kr-glass"]~=nil,"F200 route gate preserves retained K2 silicon and glass certificates")
 
@@ -302,11 +561,21 @@ check(recipe_patterns(changed_f200_streams.research_material_silver)=="^bob%-sil
 check(recipe_patterns(changed_f200_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(changed_f200_streams.research_material_platinum)=="^bob%-platinum%-plate$","changed F200 closure withdraws unproven Angel gold and platinum finals")
 
 local extra_f200_mods=clone_map(exact_f200_mods)
-extra_f200_mods.unqualified="1.0.0"
+extra_f200_mods.qol="1.0.0"
 local extra_f200_streams=material_streams_for({factorio_version="2.0"},extra_f200_mods,f200_items)
-check(recipe_patterns(extra_f200_streams.research_material_lead)=="^bob%-lead%-plate$|^bob%-lead%-plate%-2$","additional F200 mod withdraws observed Angel additions")
+check(recipe_patterns(extra_f200_streams.research_material_lead)=="^bob%-lead%-plate$|^bob%-lead%-plate%-2$|^angels%-plate%-lead$|^angels%-plate%-lead%-2$","disconnected QoL mod retains the F200 Angel lead declaration behind certificates")
+check(recipe_patterns(extra_f200_streams.research_material_nickel)=="^bob%-nickel%-plate$|^angels%-plate%-nickel$|^angels%-plate%-nickel%-2$" and extra_f200_streams.research_material_nickel.reviewed_forward_routes["angels-plate-nickel"].require_exact_route_certificate,"disconnected QoL mod retains Nickel only with its complete return-graph certificate")
+check(recipe_patterns(extra_f200_streams.research_material_gold)=="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$|^angels%-wire%-gold%-2$" and extra_f200_streams.research_material_gold.reviewed_forward_routes["angels-wire-gold-2"].require_exact_route_certificate,"disconnected QoL mod retains Gold wire only with its complete return-graph certificate")
+check(recipe_patterns(extra_f200_streams.research_material_silver)=="^bob%-silver%-plate$|^angels%-plate%-silver$|^angels%-plate%-silver%-2$|^angels%-wire%-silver%-2$" and extra_f200_streams.research_material_silver.reviewed_forward_routes["angels-wire-silver-2"].require_exact_route_certificate,"disconnected QoL mod retains Silver wire only with its complete return-graph certificate")
+
+local changed_mir_version_mods=clone_map(exact_f200_mods)
+changed_mir_version_mods["more-infinite-research"]="4.2.20001"
+local changed_mir_version_streams=material_streams_for({factorio_version="2.0"},changed_mir_version_mods,f200_items)
+check(recipe_patterns(changed_mir_version_streams.research_material_nickel)=="^bob%-nickel%-plate$|^angels%-plate%-nickel$|^angels%-plate%-nickel%-2$" and changed_mir_version_streams.research_material_nickel.reviewed_forward_routes["angels-plate-nickel"]~=nil,"MIR package-version bookkeeping retains the exact Nickel relevant-input routes")
+check(recipe_patterns(changed_mir_version_streams.research_material_gold)=="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$|^angels%-wire%-gold%-2$" and changed_mir_version_streams.research_material_gold.reviewed_forward_routes["angels-wire-gold-2"]~=nil,"MIR package-version bookkeeping retains the Gold wire route under its graph certificate")
+check(recipe_patterns(changed_mir_version_streams.research_material_silver)=="^bob%-silver%-plate$|^angels%-plate%-silver$|^angels%-plate%-silver%-2$|^angels%-wire%-silver%-2$" and changed_mir_version_streams.research_material_silver.reviewed_forward_routes["angels-wire-silver-2"]~=nil,"MIR package-version bookkeeping retains the Silver wire route under its graph certificate")
 
 local f210_streams=material_streams_for({factorio_version="2.1"},exact_f200_mods,f200_items)
-check(recipe_patterns(f210_streams.research_material_tin)=="^bob%-tin%-plate$" and f210_streams.research_material_nickel.reviewed_forward_routes==nil,"F210 keeps F200-only Angel additions and certificates unavailable")
+check(recipe_patterns(f210_streams.research_material_tin)=="^bob%-tin%-plate$" and recipe_patterns(f210_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(f210_streams.research_material_silver)=="^bob%-silver%-plate$" and f210_streams.research_material_nickel.reviewed_forward_routes==nil,"F210 keeps F200-only Angel additions and certificates unavailable")
 
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

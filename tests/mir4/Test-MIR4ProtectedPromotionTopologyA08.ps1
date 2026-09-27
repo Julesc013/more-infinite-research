@@ -86,6 +86,46 @@ function New-A08Qualification {
   $record.record_sha256=Get-MIR4A08SelfSha256 $record 'record_sha256'
   return $record
 }
+function New-A08NineTargetPromotionPlan {
+  param($Plan)
+  $targets=@('f210','f200','f110','f100','f017','f016','f015','f014','f013')
+  $identity={ [pscustomobject][ordered]@{sha256=('A'*64);record_sha256=('B'*64)} }
+  return [pscustomobject][ordered]@{
+    schema=1
+    kind='MIR42NineTargetProtectedMainPromotionPlanV1'
+    status='MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY'
+    scope='nine-target'
+    source=[pscustomobject][ordered]@{commit=[string]$Plan.source.commit;tree=[string]$Plan.source.tree;package_source_sha256=('C'*64)}
+    technical_seal=& $identity
+    governed_offline_restore_drill=& $identity
+    main_before=[string]$Plan.main_before.commit
+    frozen_dev=[pscustomobject][ordered]@{ref='refs/heads/dev';commit=[string]$Plan.source.commit;tree=[string]$Plan.source.tree}
+    candidate=[pscustomobject][ordered]@{ref=[string]$Plan.candidate.ref;base_ref='refs/heads/main';base_commit=[string]$Plan.main_before.commit;parent_count=1;exact_tree=[string]$Plan.source.tree;source_commit_trailer=("MIR4-Frozen-Dev-Commit: " + [string]$Plan.source.commit);create_only=$true;remote_ref_must_be_absent=$true}
+    target='main'
+    merge_method='squash'
+    pull_request_required=$true
+    linear_history_required=$true
+    required_status_checks=@('branch-policy','verification-gate')
+    bypass_actors_allowed=0
+    force_push=$false
+    ruleset_mutation=$false
+    remote_mutation_performed=$false
+    governed_offline_restore_drill_required_after_technical_seal=$true
+    governed_offline_restore_drill_completed=$true
+    human_go_required_after_main_readback=$true
+    tagging_authorized=$false
+    publication_authorized=$false
+    candidate_manifest=& $identity
+    current_programme=[pscustomobject][ordered]@{path='synthetic://programme';sha256=('A'*64);record_sha256=('B'*64)}
+    direct_predecessors=@($targets|ForEach-Object{[pscustomobject][ordered]@{target=$_}})
+    target_assets=@($targets|ForEach-Object{[pscustomobject][ordered]@{target=$_;distribution_version=('4.2.'+$_);archive_sha256=('D'*64);content_sha256=('E'*64);entry_count=1}})
+    proofs=[pscustomobject][ordered]@{
+      qualification=& $identity;real_engine_campaign=& $identity;independent_verification=& $identity;t16_ledger_trust_root=& $identity
+      signing_ceremony=& $identity;source_freeze_authority=& $identity;independent_reviewer_attestation=& $identity
+    }
+    protected_main_promotion_authorized=$false
+  }
+}
 
 $authorityPath=Join-Path $repo 'spec/releases/mir4-protected-main-promotion-topology-v1.json';$authoritySchema=Join-Path $repo 'spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json';$qualificationSchema=Join-Path $repo 'spec/schemas/mir4-protected-main-qualification-v1.schema.json'
 if (-not((Get-Content -Raw -LiteralPath $authorityPath)|Test-Json -SchemaFile $authoritySchema)){throw '[mir4-a08-authority-schema]'}
@@ -113,7 +153,7 @@ foreach ($url in @(
     throw "[mir4-a08-canonical-remote-rejected] $url"
   }
 }
-$testRoot=Join-Path $repo ('build/tests/protected-promotion-a08/'+[guid]::NewGuid().ToString('N'));$remoteRoot=Join-Path $testRoot 'protected-remote.git';$packageRoot=Join-Path $testRoot 'qualified-packages';$stateRoot=Join-Path $testRoot 'state';New-Item -ItemType Directory -Force -Path $testRoot,$packageRoot,$stateRoot|Out-Null
+$testRoot=Join-Path $repo ('build/tests/protected-promotion-a08/'+[guid]::NewGuid().ToString('N'));$remoteRoot=Join-Path $testRoot 'protected-remote.git';$packageRoot=Join-Path $testRoot 'qualified-packages';$stateRoot=Join-Path $testRoot 'state';$transportStateRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir4-a08-nine-transport-'+[guid]::NewGuid().ToString('N'));New-Item -ItemType Directory -Force -Path $testRoot,$packageRoot,$stateRoot,$transportStateRoot|Out-Null
 try {
   $queuedProgramme=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/programmes/mir4-4x-operating-programme-v1.json')|ConvertFrom-Json -Depth 100
   $queuedA08=@($queuedProgramme.synthesis.tasks|Where-Object{[string]$_.id-ceq'A08'})[0];$queuedA08.state='queued';$queuedA08.evidence=@()
@@ -129,21 +169,26 @@ try {
 @echo off
 setlocal EnableExtensions
 if not "%~1"=="api" exit /b 12
-if "%~2"=="repos/Julesc013/more-infinite-research" (
+if not "%~2"=="--hostname" exit /b 12
+if not "%~3"=="github.com" exit /b 12
+if "%~4"=="repos/Julesc013/more-infinite-research" (
   echo {"full_name":"Julesc013/more-infinite-research","default_branch":"main","clone_url":"https://github.com/Julesc013/more-infinite-research.git","allow_squash_merge":true}
   exit /b 0
 )
-if "%~2"=="repos/Julesc013/more-infinite-research/rules/branches/main" (
+if "%~4"=="repos/Julesc013/more-infinite-research/rules/branches/main" (
   echo [{"type":"deletion","ruleset_source_type":"Repository","ruleset_source":"Julesc013/more-infinite-research","ruleset_id":20833408},{"type":"non_fast_forward","ruleset_source_type":"Repository","ruleset_source":"Julesc013/more-infinite-research","ruleset_id":20833408},{"type":"required_status_checks","parameters":{"required_status_checks":[{"context":"branch-policy"},{"context":"verification-gate"}]},"ruleset_source_type":"Repository","ruleset_source":"Julesc013/more-infinite-research","ruleset_id":20833408},{"type":"pull_request","ruleset_source_type":"Repository","ruleset_source":"Julesc013/more-infinite-research","ruleset_id":20833408},{"type":"required_linear_history","ruleset_source_type":"Repository","ruleset_source":"Julesc013/more-infinite-research","ruleset_id":20833408}]
   exit /b 0
 )
-if "%~2"=="repos/Julesc013/more-infinite-research/rulesets/20833408" (
+if "%~4"=="repos/Julesc013/more-infinite-research/rulesets/20833408" (
   echo {"id":20833408,"enforcement":"active","bypass_actors":[]}
   exit /b 0
 )
 exit /b 13
 '@
   [IO.File]::WriteAllText($fakePolicyGh,$fakePolicyGhBody,[Text.UTF8Encoding]::new($false));$restPolicyProvider=New-MIR4A08GitHubRestPolicyProvider -GhExecutable $fakePolicyGh;$restPolicy=& $restPolicyProvider 'Julesc013/more-infinite-research' 'main';if([int]$restPolicy.ruleset.id-ne20833408-or(@($restPolicy.ruleset.required_status_checks|Sort-Object)-join'|')-cne'branch-policy|verification-gate'){throw '[mir4-a08-live-ruleset-id-observation]'}
+  function A08NonApplicationCommand { throw 'must-not-run' }
+  try { Expect-A08Failure {New-MIR4A08GitHubRestPolicyProvider -GhExecutable A08NonApplicationCommand} '[mir4-a08-policy-gh-application]' }
+  finally { Remove-Item Function:A08NonApplicationCommand -ErrorAction SilentlyContinue }
   $null=Invoke-A08Git $testRoot @('init','-q','--initial-branch=main');$null=Invoke-A08Git $testRoot @('config','user.name','MIR A08 Rehearsal');$null=Invoke-A08Git $testRoot @('config','user.email','mir-a08@example.invalid')
   New-A08Zip -Path (Join-Path $packageRoot 'F200.zip') -Target F200
   New-A08Zip -Path (Join-Path $packageRoot 'F210.zip') -Target F210
@@ -185,6 +230,29 @@ exit /b 13
   foreach ($field in @('main_mutation_authority','tag_creation_authority','release_authority','publication_authority')){$forged=$plan|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$forged.$field=$true;$forged.plan_sha256=Get-MIR4A08PlanSha256 $forged;Expect-A08Failure {Assert-MIR4A08Plan $forged} '[mir4-a08-plan-invalid]'}
   $forged=$plan|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$forged.promotion.deletion_authorized=$true;$forged.plan_sha256=Get-MIR4A08PlanSha256 $forged;Expect-A08Failure {Assert-MIR4A08Plan $forged} '[mir4-a08-plan-invalid]';$script:policyState=New-A08Policy -Enabled:$false;Expect-A08Failure {New-MIR4ProtectedPromotionTopologyPlan -RepoRoot $testRoot -MainRef refs/heads/main -SourceRef refs/heads/dev -CandidateRef refs/heads/candidate/mir42-a08-policy -PolicyProvider $policyProvider -Rehearsal} '[mir4-a08-policy-incompatible]';$script:policyState=New-A08Policy
   Expect-A08Failure {New-MIR4ProtectedMainCandidate -RepoRoot $testRoot -Plan $plan} '[mir4-a08-external-effect-not-authorized]';if($null-ne(Get-MIR4A08OptionalRef -RepoRoot $testRoot -Ref $candidateRef)){throw '[mir4-a08-production-candidate-allocation]'};$candidate=New-MIR4ProtectedMainCandidate -RepoRoot $testRoot -Plan $plan -Rehearsal;$adopted=New-MIR4ProtectedMainCandidate -RepoRoot $testRoot -Plan $plan;if (-not[bool]$candidate.created-or[bool]$adopted.created-or[string]$candidate.commit-cne[string]$adopted.commit){throw '[mir4-a08-candidate-recovery]'}
+  # Nine-target transport is deliberately separate from the immutable two-target
+  # qualification producer.  These records are synthetic carrier fixtures only:
+  # the root main-readback code must re-observe the protected PR and the current
+  # nine-target plan before it can use the returned candidate binding.
+  $nineCandidateRef='refs/heads/release/mir-4.2-candidate-'+$source.Substring(0,12)
+  $ninePlan=New-MIR4ProtectedPromotionTopologyPlan -RepoRoot $testRoot -MainRef refs/heads/main -SourceRef refs/heads/dev -CandidateRef $nineCandidateRef -PolicyProvider $policyProvider -Scope nine-target -Rehearsal
+  $nineCandidate=New-MIR4ProtectedMainCandidate -RepoRoot $testRoot -Plan $ninePlan -Scope nine-target -Rehearsal
+  if((Get-MIR4A08CandidateMessage $ninePlan)-notmatch('(?m)^MIR4-Frozen-Dev-Commit: '+[regex]::Escape($source)+'$')-or(Get-MIR4A08CandidateMessage $ninePlan)-match'(?m)^MIR-Source-Commit:'){throw '[mir4-a08-nine-candidate-trailer]'}
+  $ninePromotionPlan=New-A08NineTargetPromotionPlan $ninePlan
+  $nineWriter=New-MIR4A08NineTargetPromotionTransportIntention -RepoRoot $testRoot -Plan $ninePlan -Candidate $nineCandidate -PromotionPlan $ninePromotionPlan -RemoteName synthetic -RemoteSourceRef refs/heads/dev -StateRoot $transportStateRoot -Rehearsal
+  if([bool]$nineWriter.publication_authorized-or[bool]$nineWriter.main_mutation_performed-or-not(Test-Path -LiteralPath $nineWriter.path)){throw '[mir4-a08-nine-transport-writer]'}
+  $nineRehearsal=Get-Content -Raw -LiteralPath $nineWriter.path|ConvertFrom-Json -Depth 100 -DateKind String
+  $nineRehearsalRequest=[pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainPromotionRequestV3';intention_sha256=[string]$nineRehearsal.intention_sha256;pre_merge_policy_sha256=[string]$nineRehearsal.plan.policy.policy_sha256;remote=[pscustomobject][ordered]@{canonical_remote_url=[string]$nineRehearsal.remote.canonical_remote_url;candidate_ref=[string]$nineRehearsal.remote.candidate_ref;candidate_commit=[string]$nineRehearsal.candidate.commit;main_ref='refs/heads/main';main_before=[string]$nineRehearsal.plan.main_before.commit};protected_pull_request=[pscustomobject][ordered]@{required=$true;merge_method='squash';required_status_checks=@('branch-policy','verification-gate');expected_commit_message=(Get-MIR4A08PromotionMessage $nineRehearsal);external_execution_required=$true};main_mutation_performed=$false;tag_created=$false;publication_performed=$false;request_sha256=''};$nineRehearsalRequest.request_sha256=Get-MIR4A08SelfSha256 $nineRehearsalRequest 'request_sha256';$nineRehearsalRequestPath=Join-Path $transportStateRoot 'synthetic-rehearsal-request.json';Write-A08Json $nineRehearsalRequestPath $nineRehearsalRequest
+  Expect-A08Failure {Read-MIR4A08NineTargetPromotionTransport -IntentionPath $nineWriter.path -PromotionRequestPath $nineRehearsalRequestPath -PromotionPlan $ninePromotionPlan} '[mir4-a08-nine-transport-mode]'
+  $nineIntention=$nineRehearsal|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$nineIntention.rehearsal=$false;$nineIntention.intention_sha256=Get-MIR4A08SelfSha256 $nineIntention 'intention_sha256';$nineIntentionPath=Join-Path $transportStateRoot 'synthetic-nonrehearsal-intention.json';Write-A08Json $nineIntentionPath $nineIntention
+  $nineRequest=[pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainPromotionRequestV3';intention_sha256=[string]$nineIntention.intention_sha256;pre_merge_policy_sha256=[string]$nineIntention.plan.policy.policy_sha256;remote=[pscustomobject][ordered]@{canonical_remote_url=[string]$nineIntention.remote.canonical_remote_url;candidate_ref=[string]$nineIntention.remote.candidate_ref;candidate_commit=[string]$nineIntention.candidate.commit;main_ref='refs/heads/main';main_before=[string]$nineIntention.plan.main_before.commit};protected_pull_request=[pscustomobject][ordered]@{required=$true;merge_method='squash';required_status_checks=@('branch-policy','verification-gate');expected_commit_message=(Get-MIR4A08PromotionMessage $nineIntention);external_execution_required=$true};main_mutation_performed=$false;tag_created=$false;publication_performed=$false;request_sha256=''};$nineRequest.request_sha256=Get-MIR4A08SelfSha256 $nineRequest 'request_sha256';$nineRequestPath=Join-Path $transportStateRoot 'synthetic-nonrehearsal-request.json';Write-A08Json $nineRequestPath $nineRequest
+  $nineTransport=Read-MIR4A08NineTargetPromotionTransport -IntentionPath $nineIntentionPath -PromotionRequestPath $nineRequestPath -PromotionPlan $ninePromotionPlan
+  if([string]$nineTransport.scope-cne'nine-target'-or[string]$nineTransport.candidate.commit-cne[string]$nineCandidate.commit-or[string]$nineTransport.candidate.expected_commit_message-cne(Get-MIR4A08CandidateMessage $ninePlan)-or[string]$nineTransport.request.expected_commit_message-cne(Get-MIR4A08PromotionMessage $nineIntention)-or[string]$nineTransport.policy.policy_sha256-cne[string]$ninePlan.policy.policy_sha256-or$nineTransport.request.expected_commit_message-notmatch'(?m)^MIR4-Frozen-Dev-Commit:'){throw '[mir4-a08-nine-transport-readback]'}
+  $wrongNinth=$ninePromotionPlan|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$wrongNinth.target_assets[8].archive_sha256=('F'*64);Expect-A08Failure {Assert-MIR4A08NineTargetTransportBinding -Binding $nineIntention.qualification -PromotionPlan $wrongNinth} '[mir4-a08-nine-transport-binding]'
+  $wrongSource=$ninePromotionPlan|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$wrongSource.source.commit=('0'*40);Expect-A08Failure {Assert-MIR4A08NineTargetTransportBinding -Binding $nineIntention.qualification -PromotionPlan $wrongSource} '[mir4-a08-nine-transport-plan]'
+  $wrongScope=$nineIntention|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$wrongScope.plan.qualification.expected_targets=@('F200','F210');$wrongScope.plan.plan_sha256=Get-MIR4A08PlanSha256 $wrongScope.plan;$wrongScope.intention_sha256=Get-MIR4A08SelfSha256 $wrongScope 'intention_sha256';$wrongScopePath=Join-Path $transportStateRoot 'synthetic-wrong-scope.json';Write-A08Json $wrongScopePath $wrongScope;Expect-A08Failure {Read-MIR4A08NineTargetPromotionTransport -IntentionPath $wrongScopePath -PromotionRequestPath $nineRequestPath -PromotionPlan $ninePromotionPlan} '[mir4-a08-plan-invalid]'
+  $wrongHead=$nineRequest|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$wrongHead.remote.candidate_commit=('0'*40);$wrongHead.request_sha256=Get-MIR4A08SelfSha256 $wrongHead 'request_sha256';$wrongHeadPath=Join-Path $transportStateRoot 'synthetic-wrong-head-request.json';Write-A08Json $wrongHeadPath $wrongHead;Expect-A08Failure {Read-MIR4A08NineTargetPromotionTransport -IntentionPath $nineIntentionPath -PromotionRequestPath $wrongHeadPath -PromotionPlan $ninePromotionPlan} '[mir4-a08-pr-request-invalid]'
+  Expect-A08Failure {Read-MIR4A08QualificationRecord -RepoRoot $testRoot -Plan $ninePlan -Candidate $nineCandidate -RecordPath (Join-Path $testRoot 'no-nine-qualification.json') -PackageRoot $packageRoot -Scope nine-target -Rehearsal} '[mir4-a08-nine-target-qualification-delegated]'
   $qualification=New-A08Qualification -Root $packageRoot -Candidate $candidate;$qualificationPath=Join-Path $testRoot 'qualification.json';Write-A08Json $qualificationPath $qualification;if (-not((Get-Content -Raw -LiteralPath $qualificationPath)|Test-Json -SchemaFile $qualificationSchema)){throw '[mir4-a08-qualification-schema]'}
   $closedPresentationFields=@(
     [pscustomobject]@{container='authority_invariants';field='candidate_allocation_authorized'},
@@ -335,5 +403,9 @@ echo %A08_RUN_JSON%
     if ($null -ne $cleanupFailure -and (Test-Path -LiteralPath $testRoot)) {
       throw "[mir4-a08-test-cleanup] $($cleanupFailure.Exception.Message)"
     }
+  }
+  if (Test-Path -LiteralPath $transportStateRoot) {
+    try { [IO.Directory]::Delete($transportStateRoot, $true) }
+    catch { throw "[mir4-a08-nine-transport-cleanup] $($_.Exception.Message)" }
   }
 }
