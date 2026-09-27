@@ -13,6 +13,7 @@ local M = {requires_features = {"settings_profiles"}}
 local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
 local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 460
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
+local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 56, 32
 -- Translation IDs are asynchronous and per-player.  Keep the work window
 -- small so a large catalogue neither monopolizes a tick nor stops after an
 -- arbitrary lifetime number of successful translations.
@@ -55,6 +56,15 @@ local function research_pane_widths(player)
     list_width = total - detail_width
   end
   return list_width, detail_width
+end
+
+local function research_panes_height(results)
+  -- GuiStyle.height is write-only. The bounded maximum is readable and stays
+  -- on the retained results flow when a settled localized index replaces its
+  -- child panes.
+  local height = results and results.valid and results.style.maximal_height
+  if type(height) ~= "number" or height <= 0 then return RESEARCH_PANES_MIN_HEIGHT end
+  return math.max(RESEARCH_PANES_MIN_HEIGHT, height)
 end
 
 -- The one-tick coalescer is installed only while an open force has pending
@@ -253,7 +263,7 @@ end
 update_translation_index = function(results, cache, v)
   -- The index belongs to the retained list column.  Translation callbacks can
   -- therefore update this one small label without replacing the list, detail,
-  -- search field, or the surrounding scroll pane.
+  -- search field, or fixed Browse controls.
   local list = results and results[PREFIX .. "research_list"]
   local parent = list and list.valid and list or results
   if not (parent and parent.valid) then return end
@@ -722,7 +732,7 @@ local function availability_rows(force, parent, v)
 end
 
 -- This is the only part of Browse that translation callbacks may rebuild.
--- The surrounding scroll pane, filters, navigation and search text field are
+-- The surrounding frame, fixed filters, navigation and search text field are
 -- intentionally retained, so localized discovery can finish in place.
 update_research_results = function(player, results, v, c, cache)
   results.clear()
@@ -732,18 +742,27 @@ update_research_results = function(player, results, v, c, cache)
   prioritize_visible_translations(cache, page, v.selected)
   pump_translation_requests(player, cache)
   local list_width, detail_width = research_pane_widths(player)
+  local panes_height = research_panes_height(results)
   local list = results.add{
-    type = "flow", name = PREFIX .. "research_list", direction = "vertical",
+    type = "scroll-pane", name = PREFIX .. "research_list", direction = "vertical",
     tags = {mir_browser_section = "research-list"}
   }
   list.style.width = list_width
   list.style.maximal_width = list_width
+  list.style.height = panes_height
+  list.style.maximal_height = panes_height
+  list.horizontal_scroll_policy = "never"
+  list.vertical_scroll_policy = "auto"
   local detail_pane = results.add{
-    type = "flow", name = PREFIX .. "research_detail", direction = "vertical",
+    type = "scroll-pane", name = PREFIX .. "research_detail", direction = "vertical",
     tags = {mir_browser_section = "research-detail"}
   }
   detail_pane.style.width = detail_width
   detail_pane.style.maximal_width = detail_width
+  detail_pane.style.height = panes_height
+  detail_pane.style.maximal_height = panes_height
+  detail_pane.horizontal_scroll_policy = "never"
+  detail_pane.vertical_scroll_policy = "auto"
   detail(player, detail_pane, v, c, detail_width)
   update_translation_index(results, cache, v)
   label(list, {"mir-browser.count", page.count}, list_width - 16)
@@ -816,8 +835,17 @@ render = function(player)
     local field = search.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
     field.style.width = detail_width
   end
-  local body = frame.add{type = "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
-  body.style.maximal_height = math.max(140, frame.style.maximal_height - 140)
+  local body_height = math.max(140, frame.style.maximal_height - 140)
+  -- Browse keeps its controls stationary.  The two sibling panes below carry
+  -- their own bounded native scrolling, so reading one never moves the other.
+  local browsing = v.tab == "research"
+  local body = frame.add{type = browsing and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
+  if browsing then
+    body.style.height = body_height
+    body.style.maximal_height = body_height
+  else
+    body.style.maximal_height = body_height
+  end
   local pages
   if v.tab == "settings" then
     pages = settings_rows(player, body, v)
@@ -845,6 +873,11 @@ render = function(player)
       button(recovery, "show-hidden", {"mir-browser.show-hidden"})
     end
     local results = body.add{type = "flow", name = PREFIX .. "research_results", direction = "horizontal"}
+    local reserved_height = RESEARCH_FILTERS_HEIGHT
+      + (has_hidden and RESEARCH_HIDDEN_RECOVERY_HEIGHT or 0)
+    local results_height = math.max(RESEARCH_PANES_MIN_HEIGHT, body_height - reserved_height)
+    results.style.height = results_height
+    results.style.maximal_height = results_height
     pages = update_research_results(player, results, v, c, cache)
   end
   local nav = frame.add{type = "flow", name = PREFIX .. "navigation"}

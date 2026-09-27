@@ -40,20 +40,31 @@ local function fixture_force_facts(force)
   return {technologies=technologies,current_research=force.current_research and force.current_research.name or "<nil>",research_progress=force.research_progress,research_queue=queue}
 end
 local function frame_for(player) local frame=player.gui.screen[ROOT]; check(frame and frame.valid,"native browser frame missing for player "..player.index); return frame end
-local function result_body(frame)
-  local found=nil; for _,child in pairs(frame.children) do if child.valid and child.type=="scroll-pane" then check(found==nil,"browser frame has multiple direct result scroll panes"); found=child end end
-  check(found~=nil,"browser frame has no direct result scroll pane"); return found
-end
-local function direct_result_row_present(body,name)
-  for _,child in pairs(body.children) do if child.valid and child.tags and child.tags.mir_browser=="select" and child.tags.technology==name then return true end end; return false
-end
-local function direct_result_names(body)
-  local names={}; for _,child in pairs(body.children) do if child.valid and child.tags and child.tags.mir_browser=="select" and type(child.tags.technology)=="string" then names[#names+1]=child.tags.technology end end; table.sort(names); return table.concat(names,"\30")
-end
 local function find_tagged(element,action,name)
   if element.valid and element.tags and element.tags.mir_browser==action and (name==nil or element.tags.technology==name) then return element end
   for _,child in pairs(element.children) do local found=find_tagged(child,action,name); if found then return found end end
   return nil
+end
+local function result_body(frame)
+  local body=frame["mir_browser_body"]
+  check(body and body.valid and body.type=="flow","browser Browse body is not the fixed flow")
+  local results=body["mir_browser_research_results"]
+  check(results and results.valid and results.type=="flow","browser Browse results flow is missing")
+  local list=results["mir_browser_research_list"]
+  check(list and list.valid and list.type=="scroll-pane","browser Browse list pane is missing")
+  return list
+end
+local function direct_result_row_present(body,name)
+  return find_tagged(body,"select",name)~=nil
+end
+local function direct_result_names(body)
+  local names={}
+  local function collect(element)
+    if not (element and element.valid) then return end
+    if element.tags and element.tags.mir_browser=="select" and type(element.tags.technology)=="string" then names[#names+1]=element.tags.technology end
+    for _,child in pairs(element.children) do collect(child) end
+  end
+  collect(body); table.sort(names); return table.concat(names,"\30")
 end
 local function locale_key(value) check(type(value)=="table" and #value==1 and type(value[1])=="string","GUI caption is not an exact one-key LocalisedString"); return value[1] end
 local function browser_facts(player)

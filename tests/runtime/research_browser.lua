@@ -346,14 +346,28 @@ script.on_nth_tick(1,function()
     local default_detail=find_browser_element(default_root,"mir_browser_section","research-detail")
     local default_first=find_browser_element(default_root,"mir_browser_first_visible","first")
     local default_selected=find_browser_element(default_root,"mir_browser_selected","selected")
-    check(default_list and default_list.type=="flow" and default_list.style.maximal_width>=240 and default_list.style.maximal_width<=360
-      and default_detail and default_detail.type=="flow" and default_detail.style.maximal_width>=280 and default_detail.style.maximal_width<=460,
-      "Browse fits bounded native list and detail panes to the display")
+    local default_body=default_root["mir_browser_body"]
+    local default_results=default_body and default_body["mir_browser_research_results"]
+    local default_search=find_browser_element(default_root,"mir_browser_section","search")
+    local default_navigation=default_root["mir_browser_navigation"]
+    check(default_body and default_body.type=="flow" and default_body.parent==default_root
+      and default_results and default_results.type=="flow" and default_results.parent==default_body and default_results.style.maximal_height>=80
+      and default_list and default_list.type=="scroll-pane" and default_list.style.maximal_width>=240 and default_list.style.maximal_width<=360
+      and default_list.parent==default_results and default_list.style.maximal_height>=80 and default_list.horizontal_scroll_policy=="never" and default_list.vertical_scroll_policy=="auto"
+      and default_detail and default_detail.type=="scroll-pane" and default_detail.style.maximal_width>=280 and default_detail.style.maximal_width<=460
+      and default_detail.parent==default_results and default_detail.style.maximal_height>=80 and default_detail.horizontal_scroll_policy=="never" and default_detail.vertical_scroll_policy=="auto"
+      and default_search and default_search.parent==default_root and default_navigation and default_navigation.parent==default_root,
+      "Browse keeps bounded list and detail scroll panes beneath fixed controls")
     check(browser_labels_fit(default_detail,default_detail.style.maximal_width),
       "Browse detail labels wrap within their native detail pane")
     check(default_first and default_selected and default_first.tags.technology==default_selected.tags.technology
       and find_browser_element(default_root,"mir_browser","open-vanilla"),
       "initial Browse selection opens detail for the first visible research")
+    local selected_technology=default_selected and default_selected.tags.technology
+    default_list.scroll_to_bottom()
+    check(default_detail.valid and default_selected.valid and default_selected.tags.technology==selected_technology
+      and find_browser_element(default_detail,"mir_browser","open-vanilla"),
+      "list scrolling retains the selected detail in its independent pane")
     local default_sort=find_browser_element(default_root,"mir_browser","sort")
     local default_scope=find_browser_element(default_root,"mir_browser","family")
     check(default_sort and default_sort.type=="drop-down" and default_sort.selected_index==1,"new personal view defaults to MIR progression")
