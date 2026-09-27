@@ -3804,8 +3804,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 50141,
-      "expected_sha256": "BE891BA7B6DB41EC35ABC7A33D0D52F1792D46A90260D467EBE559397A327C9F",
+      "expected_bytes": 50149,
+      "expected_sha256": "1E2BCA65933A245B777E7008B0AB1244DBD5BF5C565C16A19D969DDDC6C8B1C4",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "112C8F8D3298F1153C7DC45C1BF465D197B00E32E4A4606BFA23FCAB5B190413"
+  "record_sha256": "5DEF280D0AA16B6480E3AE3075CA9D5950F4EC3473968A821DA6EA1BCF27D453"
 }

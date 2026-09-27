@@ -33,7 +33,7 @@ end
 
 -- The one-tick coalescer is installed only while an open force has pending
 -- work. This reader is deliberately separate from state(): on_load may
--- rebind an existing subscription but must never create or repair storage.
+-- rebind an existing subscription but must never create or repair persisted state.
 local function saved_pending_force_refresh()
   local root = factorio_runtime_state.root()
   local namespace = type(root) == "table" and root.mir
