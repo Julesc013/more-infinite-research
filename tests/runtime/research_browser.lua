@@ -42,6 +42,14 @@ local function has_numeric_browser_fact(element, fact, captions)
   end
   return true
 end
+local function browser_labels_fit(element, maximum_width)
+  if not (element and element.valid) then return false end
+  if element.type=="label" and element.style.maximal_width>maximum_width then return false end
+  for _, child in pairs(element.children or {}) do
+    if not browser_labels_fit(child,maximum_width) then return false end
+  end
+  return true
+end
 local function emitted_productivity_technology(player)
   local names = {}
   for name, technology in pairs(player.force.technologies) do
@@ -332,6 +340,18 @@ script.on_nth_tick(1,function()
     check(find_browser_element(default_root,"mir_browser","research").toggled
       and not find_browser_element(default_root,"mir_browser","queue").toggled,
       "Browse visibly selects its navigation button")
+    local default_list=find_browser_element(default_root,"mir_browser_section","research-list")
+    local default_detail=find_browser_element(default_root,"mir_browser_section","research-detail")
+    local default_first=find_browser_element(default_root,"mir_browser_first_visible","first")
+    local default_selected=find_browser_element(default_root,"mir_browser_selected","selected")
+    check(default_list and default_list.type=="flow" and default_list.style.width>=240 and default_list.style.width<=360
+      and default_detail and default_detail.type=="flow" and default_detail.style.width>=280 and default_detail.style.width<=460,
+      "Browse fits bounded native list and detail panes to the display")
+    check(browser_labels_fit(default_detail,default_detail.style.width),
+      "Browse detail labels wrap within their native detail pane")
+    check(default_first and default_selected and default_first.tags.technology==default_selected.tags.technology
+      and find_browser_element(default_root,"mir_browser","open-vanilla"),
+      "initial Browse selection opens detail for the first visible research")
     local default_sort=find_browser_element(default_root,"mir_browser","sort")
     local default_scope=find_browser_element(default_root,"mir_browser","family")
     check(default_sort and default_sort.type=="drop-down" and default_sort.selected_index==1,"new personal view defaults to MIR progression")
@@ -340,7 +360,9 @@ script.on_nth_tick(1,function()
       and find_browser_element(default_root,"mir_browser","settings") and find_browser_element(default_root,"mir_browser","availability"),
       "library presents browse, queue, setup and availability navigation")
     check(remote.call("more-infinite-research-browser","open",actual.index,{selected="automation"}),"native MIR scope opens with external selection")
-    check(not find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","open-vanilla"),"MIR scope clears stale external selection")
+    local replacement_detail=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","open-vanilla")
+    check(replacement_detail and replacement_detail.tags.technology~="automation",
+      "MIR scope replaces stale external selection with its first visible research")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=2,search="mir-browser-test"}),"native finite GUI")
     check(actual.gui.screen.mir_research_browser.valid,"native frame valid")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
