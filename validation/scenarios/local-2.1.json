@@ -766,6 +766,68 @@
       "timeout_seconds": 900,
       "claim_level": "loads",
       "notes": "Local Xander scenario without Space Age because the mod declares a Space Age incompatibility."
+    },
+    {
+      "name": "local-2-1-krastorio-spaced-out-213",
+      "targets": [
+        "2.1"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": true,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "Krastorio2-spaced-out",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "settings": {
+        "debug_generation": true
+      },
+      "runtime_fixtures": [
+        "fixtures/assert-k2-213-science-progressed-reload"
+      ],
+      "required_reload_count": 2,
+      "max_reload_duration_seconds": 90,
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0,
+        "required_stream_science": {
+          "research_advanced_circuit": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "electromagnetic-science-pack"
+          ],
+          "research_belts": [
+            "production-science-pack",
+            "space-science-pack"
+          ]
+        },
+        "forbidden_stream_science": {
+          "research_advanced_circuit": [
+            "kr-basic-tech-card"
+          ],
+          "research_belts": [
+            "kr-basic-tech-card",
+            "automation-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "chemical-science-pack"
+          ]
+        },
+        "required_reload_log_fragments": [
+          "[MIR4_K2_213_PROGRESS] stage=reload technology=recipe-prod-research_advanced_circuit-1 progress=0.42"
+        ]
+      },
+      "timeout_seconds": 90,
+      "claim_level": "loads",
+      "notes": "Planned exact Factorio2.1.20 / K2 2.1.3 / K2SO2.0.13 current successor, with two bounded progressed-save reloads. Unqualified implementation; every archive, source, package, engine and setting must receive fresh exact custody. Historical2.1.2 A04 remains unchanged and grants no current evidence reuse."
     }
   ]
 }

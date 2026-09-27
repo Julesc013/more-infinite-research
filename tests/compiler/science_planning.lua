@@ -73,6 +73,34 @@ local again=k2.normalize(norm,active_mods)
 check('K07',names(norm)==names(again),'Phase normalization is idempotent on fixture')
 local nochange=k2.normalize(advanced,{Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.17'})
 check('K08',names(nochange)==names(advanced) and nochange~=advanced,'Out-of-envelope normalization returns copied unchanged input')
+local active_mods_v3={base='2.1.20',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}
+check('V301',k2.policy_id=='K2SciencePhasePolicyV1' and k2.applicability.Krastorio2=='2.1.2'
+  and k2.applies(active_mods_v3),'V3 admits only exact base 2.1.20 plus K2 2.1.3 and K2SO 2.0.13 without changing V1 identity')
+check('V302',not k2.applies({base='2.1.20',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.13'})
+  and not k2.applies({base='2.1.20',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.14'}),'V3 does not admit adjacent K2 or K2SO versions')
+check('V303',not k2.applies({base='2.1.14',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}) and not k2.applies({base='2.1.19',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'})
+  and not k2.applies({base='2.1.21',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'})
+  and not k2.applies({Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}),'V3 rejects adjacent or missing base versions')
+local v3_original={
+ {name='automation-science-pack',amount=2},
+ {name='space-science-pack',amount=3},
+ {name='kr-matter-tech-card',amount=7}
+}
+local v3_normalized,v3_decision=k2.normalize(v3_original,active_mods_v3)
+check('V304',v3_decision.policy_id=='K2SciencePhasePolicyV3' and v3_decision.applicable
+  and v3_decision.exact_versions.base=='2.1.20' and v3_decision.exact_versions.Krastorio2=='2.1.3'
+  and v3_decision.exact_versions['Krastorio2-spaced-out']=='2.0.13','V3 records its selected exact tuple')
+check('V305',#v3_normalized==2 and v3_normalized[1].name=='space-science-pack' and v3_normalized[1].amount==3
+  and v3_normalized[2].name=='kr-matter-tech-card' and v3_normalized[2].amount==7,'V3 preserves retained ingredient order and amounts')
+check('V306',#v3_original==3 and v3_original[1].name=='automation-science-pack' and v3_original[1].amount==2,'V3 normalization does not mutate named input')
+check('V307',table.concat(v3_decision.required_any_packs,',')=='kr-matter-tech-card,space-science-pack'
+  and v3_decision.status=='normalized','V3 retains sorted late trigger witnesses for lab selection')
+local v3_again,v3_again_decision=k2.normalize(v3_normalized,active_mods_v3)
+check('V308',names(v3_again)==names(v3_normalized) and v3_again[1].amount==3 and v3_again[2].amount==7
+  and v3_again_decision.status=='already-normalized','V3 normalization is idempotent with retained amounts')
+local v3_phase_one,v3_phase_one_decision=k2.normalize({{'kr-basic-tech-card',1},{'production-science-pack',4}},active_mods_v3)
+check('V309',#v3_phase_one==1 and v3_phase_one[1][1]=='production-science-pack' and v3_phase_one[1][2]==4
+  and v3_phase_one_decision.status=='normalized','V3 phase-one normalization retains a nonempty late-compatible result')
 roles={{role='exclude',pack='automation-science-pack'}}
 local spec={science_packs={'automation-science-pack','utility-science-pack'}}
 local selected=selector.pick_science_for_stream(spec,'audit_stream')
@@ -181,4 +209,9 @@ result,status,phase=planner.ingredients_for_stream('research_science_pack_produc
 check('P13',result and #result==2 and status=='full' and has(result,'space-science-pack')
   and not has(result,'automation-science-pack') and #phase.retained_required_packs==2,
  'Explicit K2 retirement preserves only the intended retained late requirements: '..names(result))
+active_mods=active_mods_v3
+result,status,phase=planner.ingredients_for_stream('research_science_pack_productivity',mixed)
+check('V310',result and #result==2 and status=='full' and has(result,'space-science-pack')
+  and phase.policy_id=='K2SciencePhasePolicyV3' and #phase.retained_required_packs==2,
+  'Planner applies only the exact V3 tuple before its normal lab selection: '..names(result))
 print('MIR-SCIENCE-PLANNING-PASS '..checks)

@@ -91,6 +91,43 @@ science_phase_policies:
       - local-2-1-krastorio-spaced-out
     admission_status: qualified-current-f210-exact-campaign-a04
     public_claim: development-evidence-only-no-public-release-claim-authorized
+  - id: K2SciencePhasePolicyV3
+    implementation: source/prototypes/mir/compatibility/policies/k2_science_phase.lua
+    package_source_authority: targets/f210/composition.json
+    profiles:
+      - id: factorio-2.1.20-k2so-213
+        target: f210
+        mod_ids: [base, Krastorio2, Krastorio2-spaced-out]
+        version_ranges:
+          base: "=2.1.20"
+          Krastorio2: "=2.1.3"
+          Krastorio2-spaced-out: "=2.0.13"
+        proof_roots: []
+    capability_fingerprint:
+      source: exact-current-f210-policy-applicability
+      exact_active_mod_versions:
+        base: "2.1.20"
+        Krastorio2: "2.1.3"
+        Krastorio2-spaced-out: "2.0.13"
+    scope: MIR-owned generated stream and base-continuation technologies only
+    application_stage: normalize-before-lab-selection
+    behavior:
+      production_or_utility: remove-kr-basic-tech-card
+      advanced_space_matter_or_singularity: remove-basic-automation-logistic-military-chemical
+    invariants:
+      - only the exact current engine and K2/K2SO tuple selects V3
+      - historical V1 pair and fixture behavior remain unchanged
+      - one shared pure normalization implementation
+      - phase trigger witnesses survive through required_any_packs
+      - active lab graph validates the normalized output
+      - preserve stable technology IDs ingredient order shapes and amounts
+      - idempotent nonempty normalization without mutating input
+      - no recipe or technology prototype mutation by compatibility policy
+    fixture: fixtures/assert-k2-213-science-progressed-reload
+    exact_real_campaigns: []
+    planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213
+    admission_status: implemented-exact-current-tuple-unqualified
+    public_claim: development-implementation-only-no-public-release-claim-authorized
   - id: K2SciencePhasePolicyV2RootPreview
     implementation: prototypes/mir/compatibility/policies/k2_science_phase.lua
     disposition: package-excluded-root-preview
