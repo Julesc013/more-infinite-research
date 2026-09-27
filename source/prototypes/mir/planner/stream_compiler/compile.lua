@@ -15,6 +15,7 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local discover = require("prototypes.mir.planner.stream_compiler.discover")
 local ownership = require("prototypes.mir.planner.stream_compiler.ownership")
 local qualify = require("prototypes.mir.planner.stream_compiler.qualify")
+local pack_production = require("prototypes.mir.capabilities.science_integration.pack_production_reachability")
 
 local M = {}
 
@@ -22,6 +23,7 @@ local function compile_active(context, return_view)
   discover.ensure_services(context)
   local cached = context:state_view("generation_plan")
   if cached then return return_view and cached or deepcopy(cached) end
+  pack_production.prime_root_pack_statuses(context)
   local streams, native_owner_inputs = discover.source_snapshot()
   telemetry.start_phase("stream_compiler")
   local plan = generation_plan.new({

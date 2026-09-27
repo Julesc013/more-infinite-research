@@ -2192,6 +2192,151 @@ world.producers["memo-pack"] = {}
 check("U18", production.independent_pack_acquisition_witness("out-pack", "Other", {}, {}) == nil,
   "An epoch replacement discards shared mechanism success when its independent science root disappears")
 
+-- Prime every root before stream fanout.  The pass may only establish the
+-- already-authorized empty-context entries: cold, sorted-prime, and reverse
+-- root order must retain the same diamond route, while cycles and self-output
+-- routes remain rejected.  The final workload models repeated ordinary stream
+-- qualification and checks a measured reduction without encoding a K2 count.
+local ROOT_PRIME_PACKS = {"Alpha", "Beta", "CycleA", "CycleB", "Gamma", "Seed", "Self"}
+local function root_prime_technology(ingredients, unlock_recipe)
+  return {
+    enabled = true,
+    unit = {count = 1, time = 1, ingredients = ingredients},
+    effects = {{type = "unlock-recipe", recipe = unlock_recipe}}
+  }
+end
+
+local function root_prime_diamond_world()
+  return {
+    item_prototypes = {
+      Seed = {type = "item"}, Alpha = {type = "item"}, Beta = {type = "item"},
+      Gamma = {type = "item"}, Self = {type = "item"}, CycleA = {type = "item"}, CycleB = {type = "item"}
+    },
+    labs = {lab = {inputs = {"Self", "Gamma", "CycleB", "Seed", "Alpha", "CycleA", "Beta"}}},
+    techs = {
+      UnlockAlpha = root_prime_technology({{"Seed", 1}}, "make-alpha"),
+      UnlockBeta = root_prime_technology({{"Seed", 1}}, "make-beta"),
+      UnlockGamma = root_prime_technology({{"Alpha", 1}, {"Beta", 1}}, "make-gamma"),
+      UnlockSelf = root_prime_technology({{"Self", 1}}, "make-self"),
+      UnlockCycleA = root_prime_technology({{"CycleB", 1}}, "make-cycle-a"),
+      UnlockCycleB = root_prime_technology({{"CycleA", 1}}, "make-cycle-b")
+    },
+    recipe_prototypes = {
+      ["make-seed"] = {name = "make-seed"}, ["make-alpha"] = {name = "make-alpha"},
+      ["make-beta"] = {name = "make-beta"}, ["make-gamma"] = {name = "make-gamma"},
+      ["make-self"] = {name = "make-self"}, ["make-cycle-a"] = {name = "make-cycle-a"},
+      ["make-cycle-b"] = {name = "make-cycle-b"}, ["ordinary-one"] = {name = "ordinary-one"},
+      ["ordinary-two"] = {name = "ordinary-two"}
+    },
+    recipe_facts = {
+      ["make-seed"] = route_fact("Seed"),
+      ["make-alpha"] = route_fact("Alpha", {}, {enabled = false}),
+      ["make-beta"] = route_fact("Beta", {}, {enabled = false}),
+      ["make-gamma"] = route_fact("Gamma", {}, {enabled = false}),
+      ["make-self"] = route_fact("Self", {}, {enabled = false}),
+      ["make-cycle-a"] = route_fact("CycleA", {}, {enabled = false}),
+      ["make-cycle-b"] = route_fact("CycleB", {}, {enabled = false}),
+      ["ordinary-one"] = route_fact("ordinary-one-output"),
+      ["ordinary-two"] = route_fact("ordinary-two-output")
+    },
+    producers = {
+      Seed = {"make-seed"}, Alpha = {"make-alpha"}, Beta = {"make-beta"}, Gamma = {"make-gamma"},
+      Self = {"make-self"}, CycleA = {"make-cycle-a"}, CycleB = {"make-cycle-b"}
+    },
+    unlockers = {
+      ["make-alpha"] = {"UnlockAlpha"}, ["make-beta"] = {"UnlockBeta"},
+      ["make-gamma"] = {"UnlockGamma"}, ["make-self"] = {"UnlockSelf"},
+      ["make-cycle-a"] = {"UnlockCycleA"}, ["make-cycle-b"] = {"UnlockCycleB"}
+    }
+  }
+end
+
+local function root_prime_summary()
+  local rows = {}
+  for _, pack_name in ipairs(ROOT_PRIME_PACKS) do
+    local status, gate = production.pack_production_status(pack_name, {}, {})
+    rows[#rows + 1] = table.concat({pack_name, status or "", gate or ""}, "\0")
+  end
+  local gamma_gates = production.prereq_techs_for_science_pack("Gamma")
+  return table.concat(rows, "\n"), table.concat(gamma_gates, ",")
+end
+
+reset(root_prime_diamond_world())
+local cold_prime_summary, cold_gamma_gates = root_prime_summary()
+
+reset(root_prime_diamond_world())
+for index = #ROOT_PRIME_PACKS, 1, -1 do
+  production.pack_production_status(ROOT_PRIME_PACKS[index], {}, {})
+end
+local reverse_prime_summary, reverse_gamma_gates = root_prime_summary()
+
+reset(root_prime_diamond_world())
+local prime_service_calls, prime_empty_context_order = 0, {}
+local normal_prime_service = context:service("science.pack_production_status")
+context.services["science.pack_production_status"] = function(pack_name, visiting_packs, visiting_technologies, ...)
+  prime_service_calls = prime_service_calls + 1
+  if next(visiting_packs or {}) == nil and next(visiting_technologies or {}) == nil then
+    prime_empty_context_order[#prime_empty_context_order + 1] = pack_name
+  end
+  return normal_prime_service(pack_name, visiting_packs, visiting_technologies, ...)
+end
+production.prime_root_pack_statuses(context)
+local primed_owner = context:state_view("science_pack_production")
+local primed_summary, primed_gamma_gates = root_prime_summary()
+check("RP01", cold_prime_summary == primed_summary and reverse_prime_summary == primed_summary
+  and cold_gamma_gates == "UnlockGamma" and reverse_gamma_gates == cold_gamma_gates
+  and primed_gamma_gates == cold_gamma_gates,
+  "Cold, reverse-root, and deterministic root-prime passes select the same diamond statuses and Gamma gate")
+check("RP02", table.concat(prime_empty_context_order, ",") == table.concat(ROOT_PRIME_PACKS, ",")
+  and prime_service_calls >= #ROOT_PRIME_PACKS and primed_owner.entries.Seed.status == "initial"
+  and primed_owner.entries.Alpha.status == "research" and primed_owner.entries.Beta.status == "research"
+  and primed_owner.entries.Gamma.status == "research",
+  "Root priming uses the registered service in canonical lab-input order and publishes only normal root entries")
+check("RP03", production.pack_production_status("CycleA", {}, {}) == "unreachable"
+  and production.pack_production_status("CycleB", {}, {}) == "unreachable"
+  and production.pack_production_status("Gamma", {Gamma = true}, {}) == "unreachable"
+  and researchability.reason_with_context("UnlockSelf", {
+    unlock_recipe_name = "make-self", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = {}}
+  ) == "science-self-lock-Self",
+  "Primed roots retain unseeded cycle rejection, same-pack guards, and independent self-output proof")
+
+local function ordinary_gamma_workload(prime)
+  reset(root_prime_diamond_world())
+  local calls = 0
+  local normal_service = context:service("science.pack_production_status")
+  context.services["science.pack_production_status"] = function(...)
+    calls = calls + 1
+    return normal_service(...)
+  end
+  if prime then
+    production.prime_root_pack_statuses(context)
+    calls = 0
+  end
+  local memo = {}
+  local first = researchability.reason_with_context("UnlockGamma", {
+    unlock_recipe_name = "ordinary-one", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = memo})
+  local second = researchability.reason_with_context("UnlockGamma", {
+    unlock_recipe_name = "ordinary-two", visiting_packs = {}, visiting_technologies = {}, mechanism_memo = memo})
+  return first, second, calls
+end
+
+local cold_first, cold_second, cold_work = ordinary_gamma_workload(false)
+local warm_first, warm_second, warm_work = ordinary_gamma_workload(true)
+check("RP04", cold_first == nil and cold_second == nil and warm_first == nil and warm_second == nil
+  and cold_work > warm_work,
+  "A primed root set reduces repeated ordinary Gamma science checks without changing their result; cold="
+    .. tostring(cold_work) .. "; warm=" .. tostring(warm_work))
+
+reset(root_prime_diamond_world())
+production.prime_root_pack_statuses(context)
+local before_prime_epoch = context:state_view("science_pack_production")
+world.recipe_source_epoch = 2
+world.recipe_facts["make-seed"] = nil
+world.producers.Seed = {}
+check("RP05", production.pack_production_status("Gamma", {}, {}) == "unreachable"
+  and context:state_view("science_pack_production") ~= before_prime_epoch,
+  "A recipe-source epoch replacement discards primed root knowledge")
+
 reset({
   item_prototypes = {["free-pack"] = {type = "item"}, ["active-pack"] = {type = "item"}},
   labs = {lab = {inputs = {"free-pack", "active-pack"}}},
