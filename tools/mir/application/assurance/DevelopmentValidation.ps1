@@ -198,6 +198,27 @@ function Assert-MIR4DevelopmentCanonicalPlanCoverage {
   }
 }
 
+function Assert-MIR4DevelopmentWhitespace {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceCommit,
+    [AllowEmptyString()][string]$Baseline=''
+  )
+  if([string]::IsNullOrWhiteSpace($Baseline)) {
+    # Without a baseline, retain only the original working-tree check. Do not
+    # describe it as coverage of committed changes or the entire source tree.
+    & git -C $RepoRoot diff --check --
+    $scope='working-tree-only-baseline-unavailable'
+  } else {
+    if($Baseline -cnotmatch '^[0-9a-f]{40}$') { throw '[mir4-development-baseline-shape]' }
+    & git -C $RepoRoot diff --check ($Baseline+'...'+$SourceCommit) --
+    $scope='baseline-merge-base-to-source-commit'
+  }
+  if($LASTEXITCODE -ne 0) { throw '[mir4-development-whitespace]' }
+  return [ordered]@{status='passed';scope=$scope;baseline=$Baseline;source_commit=$SourceCommit;per_test_executions=0}
+}
+
 function Invoke-MIR4DevelopmentCanonicalCoverage {
   [CmdletBinding()]
   param(
@@ -215,8 +236,10 @@ function Invoke-MIR4DevelopmentCanonicalCoverage {
   if(-not $planPath.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase) -or -not(Test-Path -LiteralPath $planPath -PathType Leaf)) { throw '[mir4-development-canonical-plan-path]' }
   try { $plan=Get-Content -Raw -LiteralPath $planPath|ConvertFrom-Json } catch { throw '[mir4-development-canonical-plan-json]' }
   $coverage=Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $selection -Plan $plan -CanonicalGateResult $CanonicalGateResult
+  $whitespace=Assert-MIR4DevelopmentWhitespace -RepoRoot $repo -SourceCommit $selection.source_commit -Baseline $selection.baseline
   $result=[ordered]@{};foreach($property in $selection.GetEnumerator()){$result[$property.Key]=$property.Value}
   $result['status']='covered-by-successful-canonical-verification-gate';$result['canonical_coverage']=$coverage
+  $result['whitespace']=$whitespace
   $result['per_test_executions']=0;$result['executed_test_ids']=@();$result['outcomes']=@()
   $result['release_qualification']=$false;$result['release_readiness_gate']=$false;$result['reuse_allowed']=$false
   $outputPath=[IO.Path]::GetFullPath((Join-Path $repo $OutputPath))

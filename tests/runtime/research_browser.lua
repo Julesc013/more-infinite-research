@@ -75,6 +75,8 @@ script.on_nth_tick(1,function()
   local count=0
   local function check(value,message) assert(value,message); count=count+1 end
   local force=game.forces.player
+  check(force.technologies["mir-browser-test-finite"].research_unit_energy==60,
+    "one-second prototype research unit is sixty runtime energy ticks")
   local queue_cache=browser_core.translation_queue.new("en",1)
   local dispatch_cache=browser_core.translation_queue.new("en",1)
   browser_core.translation_queue.reset_catalogue(dispatch_cache,{"numeric-id","declined-id"},"dispatch")
@@ -368,6 +370,10 @@ script.on_nth_tick(1,function()
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search="mir-"}),"native settings GUI")
     check(has_browser_fact(actual.gui.screen.mir_research_browser,"profile_import"),"native settings profile summary")
+    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search=native_false}),"native false startup setting GUI")
+    local false_field=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser_setting",native_false)
+    check(false_field and false_field.type=="checkbox" and false_field.state==false and false_field.enabled==false,
+      "false startup setting has an unchecked read-only native control")
     check(find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","settings").toggled,
       "Setup visibly selects its navigation button")
     local native_omissions=browser_provider.omissions(actual.force)
@@ -413,7 +419,10 @@ script.on_nth_tick(1,function()
       "visible browser rows use the native localized caption before asynchronous indexing completes")
     local vanilla_link=find_browser_element(root,"mir_browser","open-vanilla")
     check(vanilla_link and vanilla_link.type=="button","native technology link")
-    check(has_browser_fact(root,"research_cost"),"native current research cost detail")
+    local research_cost=find_browser_element(root,"mir_browser_fact","research_cost")
+    check(research_cost and research_cost.caption[1]=="mir-browser.research-cost"
+      and research_cost.caption[2]=="1" and research_cost.caption[3]=="1",
+      "native research cost converts the fixture's sixty runtime ticks into one second")
     local all_scope=find_browser_element(root,"mir_browser","family")
     check(all_scope and all_scope.type=="drop-down","native all-research scope control")
     local all_scope_index=all_scope.selected_index

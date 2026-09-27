@@ -180,6 +180,23 @@ try {
   [IO.File]::WriteAllText((Join-Path $temporaryRepo 'tracked.txt'),"clean`n",[Text.UTF8Encoding]::new($false))
   & git -C $temporaryRepo add tracked.txt
   & git -C $temporaryRepo commit -qm 'fixture'
+  $cleanCommit=(& git -C $temporaryRepo rev-parse HEAD).Trim()
+  [IO.File]::WriteAllText((Join-Path $temporaryRepo 'tracked.txt'),"trailing `n",[Text.UTF8Encoding]::new($false))
+  & git -C $temporaryRepo add tracked.txt
+  & git -C $temporaryRepo commit -qm 'committed whitespace fixture'
+  $whitespaceCommit=(& git -C $temporaryRepo rev-parse HEAD).Trim()
+  Assert-MIR4DevelopmentHostedCheckoutClean -RepoRoot $temporaryRepo
+  Assert-MIRDevelopmentCanonicalCoverageRejected -Action {
+    Assert-MIR4DevelopmentWhitespace -RepoRoot $temporaryRepo -SourceCommit $whitespaceCommit -Baseline $cleanCommit
+  } -Code '[mir4-development-whitespace]' -Message 'Committed whitespace was accepted because the worktree was clean.'
+  [IO.File]::WriteAllText((Join-Path $temporaryRepo 'tracked.txt'),"corrected`n",[Text.UTF8Encoding]::new($false))
+  & git -C $temporaryRepo add tracked.txt
+  & git -C $temporaryRepo commit -qm 'corrected whitespace fixture'
+  $correctedCommit=(& git -C $temporaryRepo rev-parse HEAD).Trim()
+  $whitespace=Assert-MIR4DevelopmentWhitespace -RepoRoot $temporaryRepo -SourceCommit $correctedCommit -Baseline $whitespaceCommit
+  Assert-MIRDevelopmentCISelection -Condition ($whitespace.status -eq 'passed' -and $whitespace.scope -eq 'baseline-merge-base-to-source-commit' -and $whitespace.per_test_executions -eq 0) -Message 'Corrected committed range failed the cheap whitespace check.'
+  $withoutBaseline=Assert-MIR4DevelopmentWhitespace -RepoRoot $temporaryRepo -SourceCommit $correctedCommit -Baseline ''
+  Assert-MIRDevelopmentCISelection -Condition ($withoutBaseline.scope -eq 'working-tree-only-baseline-unavailable') -Message 'Missing baseline gained committed-range whitespace coverage.'
   [IO.File]::WriteAllText((Join-Path $temporaryRepo 'dirty.txt'),"dirty`n",[Text.UTF8Encoding]::new($false))
   $dirtyRejected=$false
   try { Assert-MIR4DevelopmentHostedCheckoutClean -RepoRoot $temporaryRepo } catch { $dirtyRejected=$_.Exception.Message -eq '[mir4-development-hosted-dirty-checkout]' }
