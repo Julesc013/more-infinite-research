@@ -48,6 +48,9 @@ function Invoke-HealthNativeHook {
 try {
   if (-not (Test-Path -LiteralPath $checker -PathType Leaf)) { throw '[mir-development-health-checker-missing]' }
   if (-not (Test-Path -LiteralPath $hook -PathType Leaf)) { throw '[mir-development-health-hook-missing]' }
+  $sourceRoot = (Resolve-Path -LiteralPath $repo).Path.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
+  $defaultHookReport = (& $checker -Mode Hook -AsJson | ConvertFrom-Json -Depth 16)
+  if ([string]$defaultHookReport.repository -cne $sourceRoot -or [string]$defaultHookReport.mode -cne 'hook' -or [string]$defaultHookReport.side_effects -cne 'none-report-only') { throw '[mir-development-health-default-root-hook]' }
   New-Item -ItemType Directory -Path $fixture -Force | Out-Null
   Invoke-HealthFixtureGit -Arguments @('init','--quiet')
   Invoke-HealthFixtureGit -Arguments @('config','user.email','mir-health@example.invalid')
@@ -146,7 +149,7 @@ try {
   try { & $checker -RepoRoot (Join-Path $fixture 'build') -AsJson | Out-Null } catch { $descendantRejected = $_.Exception.Message -match 'Git worktree root' }
   if (-not $descendantRejected) { throw '[mir-development-health-root-boundary]' }
 
-  [pscustomobject]@{ status='passed'; assertions=33; fixture=$fixture; hook_budget_seconds=[int]$hookReport.scan_limits.max_scan_seconds; mutations='none' } | ConvertTo-Json -Compress
+  [pscustomobject]@{ status='passed'; assertions=36; fixture=$fixture; hook_budget_seconds=[int]$hookReport.scan_limits.max_scan_seconds; mutations='none' } | ConvertTo-Json -Compress
 } finally {
   if ($null -ne $previousAuthorDate) { $env:GIT_AUTHOR_DATE = $previousAuthorDate } else { Remove-Item Env:GIT_AUTHOR_DATE -ErrorAction SilentlyContinue }
   if ($null -ne $previousCommitterDate) { $env:GIT_COMMITTER_DATE = $previousCommitterDate } else { Remove-Item Env:GIT_COMMITTER_DATE -ErrorAction SilentlyContinue }

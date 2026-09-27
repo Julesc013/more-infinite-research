@@ -21,7 +21,7 @@ Set-StrictMode -Version Latest
 $comparison = [StringComparison]::OrdinalIgnoreCase
 
 function Resolve-MIRDevelopmentHealthRepoRoot {
-  param([Parameter(Mandatory)][string]$Candidate)
+  param([Parameter(Mandatory)][AllowEmptyString()][string]$Candidate)
   if ([string]::IsNullOrWhiteSpace($Candidate)) { $Candidate = Join-Path $PSScriptRoot '../../..' }
   if (-not (Test-Path -LiteralPath $Candidate -PathType Container)) { throw "Repository root is absent: $Candidate" }
   $resolved = (Resolve-Path -LiteralPath $Candidate).Path.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
