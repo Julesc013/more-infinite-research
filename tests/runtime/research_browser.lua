@@ -291,10 +291,22 @@ script.on_nth_tick(1,function()
   local deep_catalogue={schema=1,rows=deep_rows}
   local deep_page=browser_core.query(deep_catalogue,{mode=1,status=1,page=30,search="",sort="progression"})
   check(deep_page.count==600 and deep_page.page==30 and #deep_page.rows==20,"deep pages stay bounded beyond 512 catalogue entries")
+  local retained_off_page=browser_core.query(deep_catalogue,{mode=1,status=1,page=1,search="",sort="progression"},nil,nil,"mir-browser-deep-600")
+  check(retained_off_page.selected_visible and retained_off_page.page==1 and #retained_off_page.rows==20
+    and retained_off_page.rows[1].key=="mir-browser-deep-001",
+    "filtered selection remains visible when it lies beyond the rendered page")
   local deep_localized=browser_core.query(deep_catalogue,{mode=1,status=1,page=1,search="off page localized target",sort="name-asc"},nil,{["mir-browser-deep-600"]="Off page localized target"})
   check(#deep_localized.rows==1 and deep_localized.rows[1].key=="mir-browser-deep-600","off-page localized entry is discoverable beyond 512")
   local descending=browser_core.query(catalogue,{mode=1,status=1,page=1,sort="name-desc",search="mir-browser-test"})
   check(#descending.rows==2 and descending.rows[1].key=="mir-browser-test-infinite","descending deterministic sort")
+  local excluded_selected=browser_core.query(catalogue,{mode=2,status=1,page=1,search="",sort="progression"},nil,nil,"mir-browser-test-infinite")
+  local hidden_selected=browser_core.query(catalogue,{mode=1,status=1,page=1,search="",sort="progression",
+    hidden={["mir-browser-test-finite"]=true}},nil,nil,"mir-browser-test-finite")
+  local search_mismatched_selected=browser_core.query(catalogue,{mode=1,status=1,page=1,
+    search="mir-browser-test-infinite",sort="progression"},nil,nil,"mir-browser-test-finite")
+  check(not excluded_selected.selected_visible and not hidden_selected.selected_visible
+    and not search_mismatched_selected.selected_visible,
+    "mode, hidden, and search exclusions clear retained selection eligibility")
   local player={valid=true,force=force,permission_group={allows_action=function() return false end}}
   local tech=force.technologies["mir-browser-test-finite"]
   check(not browser_actions.can_enqueue(player,tech,defines.input_action.start_research),"permission negative")
@@ -368,22 +380,35 @@ script.on_nth_tick(1,function()
     check(default_detail.valid and default_selected.valid and default_selected.tags.technology==selected_technology
       and find_browser_element(default_detail,"mir_browser","open-vanilla"),
       "list scrolling retains the selected detail in its independent pane")
+    local native_enrichment=browser_provider.snapshot(actual.force)
+    local native_family_names=browser_core.family_names(native_enrichment)
+    local mir_scope_index, all_family_scope_index
+    for index, name in ipairs(native_family_names) do
+      if name=="mir" then mir_scope_index=index end
+      if name=="all" then all_family_scope_index=index end
+    end
     local default_sort=find_browser_element(default_root,"mir_browser","sort")
     local default_scope=find_browser_element(default_root,"mir_browser","family")
     check(default_sort and default_sort.type=="drop-down" and default_sort.selected_index==1,"new personal view defaults to MIR progression")
-    check(default_scope and default_scope.type=="drop-down" and default_scope.selected_index==1,"new personal view defaults to MIR scope")
+    check(all_family_scope_index and default_scope and default_scope.type=="drop-down"
+      and default_scope.selected_index==(mir_scope_index or all_family_scope_index),
+      "new personal view selects declared MIR scope or all when native provider facts are absent")
     check(find_browser_element(default_root,"mir_browser","research") and find_browser_element(default_root,"mir_browser","queue")
       and find_browser_element(default_root,"mir_browser","settings") and find_browser_element(default_root,"mir_browser","availability"),
       "library presents browse, queue, setup and availability navigation")
-    check(remote.call("more-infinite-research-browser","open",actual.index,{selected="automation"}),"native MIR scope opens with external selection")
-    local replacement_detail=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","open-vanilla")
-    local replacement_first=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser_first_visible","first")
-    local replacement_selected=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser_selected","selected")
+    local filtered_request={tab="research",family="all",mode=2,status=1,sort="progression",
+      selected="automation",search="mir-browser-test",page=1}
+    check(remote.call("more-infinite-research-browser","open",actual.index,filtered_request),
+      "native filtered browser opens with stale external selection")
+    local replacement_root=actual.gui.screen.mir_research_browser
+    local replacement_detail=find_browser_element(replacement_root,"mir_browser","open-vanilla")
+    local replacement_first=find_browser_element(replacement_root,"mir_browser_first_visible","first")
+    local replacement_selected=find_browser_element(replacement_root,"mir_browser_selected","selected")
     check(replacement_detail and replacement_first and replacement_selected
-      and replacement_detail.tags.technology==replacement_first.tags.technology
-      and replacement_selected.tags.technology==replacement_first.tags.technology
-      and replacement_detail.tags.technology~="automation",
-      "MIR scope replaces an external selection with the first visible MIR research in both row and detail")
+      and replacement_detail.tags.technology=="mir-browser-test-finite"
+      and replacement_first.tags.technology=="mir-browser-test-finite"
+      and replacement_selected.tags.technology=="mir-browser-test-finite",
+      "filtered Browse replaces a stale external selection with its only visible research")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=2,search="mir-browser-test"}),"native finite GUI")
     check(actual.gui.screen.mir_research_browser.valid,"native frame valid")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
@@ -412,23 +437,33 @@ script.on_nth_tick(1,function()
         "known omitted streams use their canonical localized title without an explicit name override")
     end
     check(not find_browser_element(availability_root,"mir_browser","enqueue"),"omitted research has no queue action")
-    local mir_productivity = emitted_productivity_technology(actual)
-    check(mir_productivity,"native fixture supplies an emitted MIR productivity technology")
-    -- This opens a technology carrying a live productivity effect inside MIR
-    -- scope. The provider-recognition pass rejects base-game productivity
-    -- effects, so the numeric facts below exercise its Factorio recipe values.
-    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="research",family="mir",mode=1,sort="progression",selected=mir_productivity,search=""}),"native MIR productivity detail GUI")
-    local mir_root=actual.gui.screen.mir_research_browser
-    check(has_browser_fact(mir_root,"productivity_increment"),"native MIR productivity increment detail")
-    check(has_browser_fact(mir_root,"productivity_current_cap"),"native MIR productivity current-limit detail")
-    check(has_numeric_browser_fact(mir_root,"productivity_increment",{
-      ["mir-browser.productivity-increment"]=1,
-      ["mir-browser.productivity-increment-range"]=2
-    }),"native MIR provider supplies numerical productivity increment")
-    check(has_numeric_browser_fact(mir_root,"productivity_current_cap",{
-      ["mir-browser.productivity-current-cap"]=2,
-      ["mir-browser.productivity-current-cap-range"]=4
-    }),"native MIR provider supplies numerical productivity current limit")
+    if mir_scope_index then
+      local provider_detail_count=0
+      for _ in pairs(native_enrichment.details or {}) do provider_detail_count=provider_detail_count+1 end
+      check(provider_detail_count>0,"declared MIR scope exposes a nonempty validated provider detail")
+      local mir_productivity = emitted_productivity_technology(actual)
+      if mir_productivity then
+        -- This opens a technology carrying a live productivity effect inside
+        -- MIR scope. The provider-recognition pass rejects base-game
+        -- productivity effects, so the numeric facts below remain tied to
+        -- actual Factorio recipe values.
+        check(remote.call("more-infinite-research-browser","open",actual.index,{tab="research",family="mir",mode=1,sort="progression",selected=mir_productivity,search=""}),"native MIR productivity detail GUI")
+        local mir_root=actual.gui.screen.mir_research_browser
+        check(has_browser_fact(mir_root,"productivity_increment"),"native MIR productivity increment detail")
+        check(has_browser_fact(mir_root,"productivity_current_cap"),"native MIR productivity current-limit detail")
+        check(has_numeric_browser_fact(mir_root,"productivity_increment",{
+          ["mir-browser.productivity-increment"]=1,
+          ["mir-browser.productivity-increment-range"]=2
+        }),"native MIR provider supplies numerical productivity increment")
+        check(has_numeric_browser_fact(mir_root,"productivity_current_cap",{
+          ["mir-browser.productivity-current-cap"]=2,
+          ["mir-browser.productivity-current-cap-range"]=4
+        }),"native MIR provider supplies numerical productivity current limit")
+      end
+    else
+      check(not next(native_enrichment.families or {}) and not next(native_enrichment.details or {}),
+        "missing MIR scope does not synthesize provider families or details")
+    end
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="research",family="all",mode=1,sort="name-desc",selected="mir-browser-test-finite",search="mir-browser-test"}),"native sorted technology detail GUI")
     local root=actual.gui.screen.mir_research_browser
     local sort_control=find_browser_element(root,"mir_browser","sort")

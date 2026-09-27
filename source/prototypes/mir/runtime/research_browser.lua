@@ -620,15 +620,12 @@ local function prioritize_visible_translations(cache, page, selected)
   end
 end
 
--- The catalogue snapshot is already bounded and query() has supplied the
--- visible page in its chosen order.  Do not run another ordering pass merely
--- to make Browse useful on its first opening.
+-- The catalogue snapshot is already bounded and query() records whether the
+-- current selection remains in the full filtered result before it slices one
+-- page. Do not run another ordering pass merely to retain Browse detail.
 local function selected_subject_is_visible(player, page, selected)
-  if type(selected) ~= "string" or not player.force.technologies[selected] then return false end
-  for _, row in ipairs(page.rows or {}) do
-    if row.key == selected then return true end
-  end
-  return false
+  return type(selected) == "string" and player.force.technologies[selected]
+    and page and page.selected_visible == true
 end
 
 local function select_first_visible_subject(player, v, page)
@@ -736,7 +733,7 @@ end
 -- intentionally retained, so localized discovery can finish in place.
 update_research_results = function(player, results, v, c, cache)
   results.clear()
-  local page = core.query(c, query_view(v, cache), c.enrichment, cache.values)
+  local page = core.query(c, query_view(v, cache), c.enrichment, cache.values, v.selected)
   v.page = page.page
   select_first_visible_subject(player, v, page)
   prioritize_visible_translations(cache, page, v.selected)

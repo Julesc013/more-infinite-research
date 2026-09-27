@@ -386,13 +386,15 @@ end
 local function detail_for_row(row, recipes, disposition, caps, force)
   local policy = caps[row.technology_id]
   local technology = force and force.technologies and force.technologies[row.technology_id]
-  -- Keep the original schema-1 family/action surface for non-recipe rows.
-  -- They do not have a recipe-productivity benefit question, so do not turn
-  -- an empty effect set into an exact false benefit claim.
+  -- Enrichment describes live managed research. Omission rows have their own
+  -- DTO and an absent or foreign technology must not create a phantom family.
+  if not technology or not technology.valid then return nil end
+  -- Keep the original schema-1 family/action surface for a live admitted
+  -- non-recipe technology. It has no recipe-productivity benefit question,
+  -- so do not turn an empty effect set into an exact false benefit claim.
   if #recipes == 0 then
     return {schema = 1, family = row.stream_id, action = row.action}
   end
-  if not technology or not technology.valid then return nil end
   local max_setting, enable_setting = nil, nil
   if policy then
     max_setting = comparison(policy.setting)
@@ -461,13 +463,16 @@ function M.snapshot(force)
     return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
   end
   local row_count = 0
-  for index, _ in pairs(artifact.rows) do
+  for index in pairs(artifact.rows) do
     if type(index) ~= "number" or index < 1 or index ~= math.floor(index) then
       return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
     end
     row_count = row_count + 1
+    if row_count > M.catalogue_limit then
+      return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
+    end
   end
-  if #artifact.rows ~= row_count then
+  if #artifact.rows ~= row_count or not fingerprint_matches(artifact, "public_fingerprint") then
     return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
   end
   local policies, candidates, row_counts = current_policy_caps(), {}, {}
@@ -479,7 +484,9 @@ function M.snapshot(force)
       row_counts[row.technology_id] = (row_counts[row.technology_id] or 0) + 1
     end
     local recipes, disposition = valid_public_row(row)
-    if recipes then
+    -- Skips are exact omission evidence, never managed research enrichment.
+    -- Their named IDs still count above so a shadow duplicate fails closed.
+    if recipes and (row.action == "emit" or row.action == "adopt") then
       candidates[#candidates + 1] = {row = row, recipes = recipes, disposition = disposition}
     end
   end
@@ -487,11 +494,11 @@ function M.snapshot(force)
   for _, candidate in ipairs(candidates) do
     local row, recipes, disposition = candidate.row, candidate.recipes, candidate.disposition
     if row_counts[row.technology_id] == 1 and not known[row.technology_id] then
-      count = count + 1
-      if count > M.catalogue_limit then break end
       known[row.technology_id] = true
       local detail = detail_for_row(row, recipes, disposition, policies, force)
       if detail then
+        count = count + 1
+        if count > M.catalogue_limit then break end
         if detail.effective_cap then caps[row.technology_id] = detail.effective_cap end
         families[row.technology_id] = row.stream_id
         details[row.technology_id] = detail

@@ -582,11 +582,12 @@ end
 
 -- Query only accepts copied, plain catalogue DTOs. It returns a fresh plain
 -- page so a consumer cannot retain adapter-owned state.
-function M.query(catalogue, view, enrichment, localized_search)
+function M.query(catalogue, view, enrichment, localized_search, selected_key)
   if type(catalogue) ~= "table" or catalogue.schema ~= M.schema or type(catalogue.rows) ~= "table" then return nil, "invalid-catalogue" end
   if #catalogue.rows > M.catalogue_limit then return nil, "catalogue-limit" end
   enrichment = M.normalize_enrichment(enrichment)
-  local selected, v = {}, normalized_view(view)
+  local selected, selected_visible, v = {}, false, normalized_view(view)
+  selected_key = type(selected_key) == "string" and selected_key or nil
   for _, source in ipairs(catalogue.rows) do
     if type(source) == "table" and type(source.key) == "string" then
       local row = copy_row(source)
@@ -599,7 +600,10 @@ function M.query(catalogue, view, enrichment, localized_search)
       local search = ascii_casefold(row.key .. " " .. family .. " " .. row.display_name)
       local search_ok = v.search == "" or string.find(search, v.search, 1, true) ~= nil
       if mode_ok and status_matches(row, v.status) and family_matches(family, v.family)
-        and not v.hidden[row.key] and search_ok then selected[#selected + 1] = row end
+        and not v.hidden[row.key] and search_ok then
+        selected[#selected + 1] = row
+        if row.key == selected_key then selected_visible = true end
+      end
     end
   end
   table.sort(selected, function(left, right)
@@ -618,7 +622,7 @@ function M.query(catalogue, view, enrichment, localized_search)
   return {
     schema = M.schema, rows = rows, count = #selected, pages = pages, page = page,
     page_size = M.page_size, sort = v.sort, requested_sort = v.requested_sort,
-    name_index_ready = v.name_index_ready
+    name_index_ready = v.name_index_ready, selected_visible = selected_visible
   }
 end
 
