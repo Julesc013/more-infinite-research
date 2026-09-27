@@ -119,6 +119,48 @@ function Get-MIR4A08PolicySha256 {
 }
 function Test-MIR4A08CanonicalGitHubRemote { param([Parameter(Mandatory)][string]$Url,[Parameter(Mandatory)][string]$Repository) return (($Url.Trim().TrimEnd('/')-replace'\.git$','')-ceq"https://github.com/$Repository") }
 
+function Get-MIR4A08PromotionScopeContract {
+  param([Parameter(Mandatory)][ValidateSet('two-target','nine-target')][string]$Scope)
+  if ($Scope -ceq 'two-target') {
+    return [pscustomobject][ordered]@{
+      scope = 'two-target'
+      targets = @('F200','F210')
+      candidate_ref_pattern = '^refs/heads/candidate/[a-z0-9][a-z0-9._-]{2,80}$'
+      current_nine_transport_required = $false
+    }
+  }
+  return [pscustomobject][ordered]@{
+    scope = 'nine-target'
+    targets = @('F210','F200','F110','F100','F017','F016','F015','F014','F013')
+    candidate_ref_pattern = '^refs/heads/release/mir-4[.]2-candidate-[0-9a-f]{12}$'
+    current_nine_transport_required = $true
+  }
+}
+
+function Assert-MIR4A08PromotionTargetSet {
+  param(
+    [Parameter(Mandatory)]$Targets,
+    [Parameter(Mandatory)][ValidateSet('two-target','nine-target')][string]$Scope,
+    [Parameter(Mandatory)][string]$Code
+  )
+  $expected = @((Get-MIR4A08PromotionScopeContract -Scope $Scope).targets)
+  $actual = @($Targets | ForEach-Object { [string]$_ })
+  if ($actual.Count -ne $expected.Count -or ($actual -join '|') -cne ($expected -join '|')) { throw $Code }
+}
+
+function Get-MIR4A08PromotionScopeFromTargets {
+  param([Parameter(Mandatory)]$Targets,[Parameter(Mandatory)][string]$Code)
+  foreach ($scope in @('two-target','nine-target')) {
+    try {
+      Assert-MIR4A08PromotionTargetSet -Targets $Targets -Scope $scope -Code $Code
+      return $scope
+    } catch {
+      if ($_.Exception.Message -cne $Code) { throw }
+    }
+  }
+  throw $Code
+}
+
 function Assert-MIR4A08PolicyObservation {
   param([Parameter(Mandatory)]$Observation,[Parameter(Mandatory)][string]$CanonicalRepository,[switch]$Rehearsal)
   Assert-MIR4A08PropertyNames $Observation @('schema','kind','observation_source','repository','canonical_remote_url','main_ref','observed_at','ruleset','protection','policy_sha256') '[mir4-a08-policy-observation]'
@@ -157,6 +199,13 @@ function Get-MIR4A08EffectiveRule {
 function New-MIR4A08GitHubRestPolicyProvider {
   [CmdletBinding()]
   param([string]$GhExecutable = 'gh')
+  try {
+    # Resolve an application once while constructing the closure.  Do not
+    # dispatch a function, alias, or caller-supplied command name when reading
+    # the public policy boundary.
+    $ghApplication=(Get-Command -Name $GhExecutable -CommandType Application -ErrorAction Stop).Source
+  } catch { throw '[mir4-a08-policy-gh-application]' }
+  if ([string]::IsNullOrWhiteSpace([string]$ghApplication)) { throw '[mir4-a08-policy-gh-application]' }
   $invokeRest = ${function:Invoke-MIR4A08GitHubRestJson}
   $canonicalRemote = ${function:Test-MIR4A08CanonicalGitHubRemote}
   $effectiveRule = ${function:Get-MIR4A08EffectiveRule}
@@ -164,9 +213,9 @@ function New-MIR4A08GitHubRestPolicyProvider {
   $provider = {
     param([string]$Repository,[string]$Branch)
     if ($Branch -cne 'main') { throw '[mir4-a08-policy-branch]' }
-    $repositoryRecord = & $invokeRest -GhExecutable $GhExecutable -Arguments @('api',"repos/$Repository") -Code '[mir4-a08-policy-repository]'
+    $repositoryRecord = & $invokeRest -GhExecutable $ghApplication -Arguments @('api','--hostname','github.com',"repos/$Repository") -Code '[mir4-a08-policy-repository]'
     if ([string]$repositoryRecord.full_name -cne $Repository -or [string]$repositoryRecord.default_branch -cne 'main' -or -not (& $canonicalRemote -Url ([string]$repositoryRecord.clone_url) -Repository $Repository)) { throw '[mir4-a08-policy-repository]' }
-    $effective = @(& $invokeRest -GhExecutable $GhExecutable -Arguments @('api',"repos/$Repository/rules/branches/main") -Code '[mir4-a08-policy-effective-rules]')
+    $effective = @(& $invokeRest -GhExecutable $ghApplication -Arguments @('api','--hostname','github.com',"repos/$Repository/rules/branches/main") -Code '[mir4-a08-policy-effective-rules]')
     if ($effective.Count -eq 0) { throw '[mir4-a08-policy-effective-rules]' }
     # The effective branch-rules endpoint exposes the owning ruleset as
     # `ruleset_id`; it does not return the ruleset-detail object's `id` under
@@ -179,7 +228,7 @@ function New-MIR4A08GitHubRestPolicyProvider {
     if ($sourceIds.Count -ne 1) { throw '[mir4-a08-policy-ruleset-source]' }
     $rulesets = @(
       foreach ($sourceId in $sourceIds) {
-        & $invokeRest -GhExecutable $GhExecutable -Arguments @('api',"repos/$Repository/rulesets/$sourceId") -Code '[mir4-a08-policy-ruleset-detail]'
+        & $invokeRest -GhExecutable $ghApplication -Arguments @('api','--hostname','github.com',"repos/$Repository/rulesets/$sourceId") -Code '[mir4-a08-policy-ruleset-detail]'
       }
     )
     if (@($rulesets | Where-Object { [string]$_.enforcement -cne 'active' }).Count -ne 0) { throw '[mir4-a08-policy-incompatible]' }
@@ -404,30 +453,43 @@ function Get-MIR4A08ProtectedPromotionPreflight {
 
 function Get-MIR4A08PlanSha256 { param([Parameter(Mandatory)]$Plan) return Get-MIR4A08SelfSha256 -Value $Plan -Property 'plan_sha256' }
 function Assert-MIR4A08Plan {
-  param([Parameter(Mandatory)]$Plan)
+  param([Parameter(Mandatory)]$Plan,[ValidateSet('two-target','nine-target')][string]$Scope='two-target')
+  $scopeContract=Get-MIR4A08PromotionScopeContract -Scope $Scope
   Assert-MIR4A08PropertyNames $Plan @('schema','kind','strategy','policy','main_before','source','reconciliation','candidate','qualification','promotion','readback','tag_creation_authority','main_mutation_authority','release_authority','publication_authority','plan_sha256') '[mir4-a08-plan-invalid]'
   Assert-MIR4A08PropertyNames $Plan.policy @('repository','canonical_remote_url','main_ref','observation_source','policy_sha256') '[mir4-a08-plan-invalid]';Assert-MIR4A08PropertyNames $Plan.main_before @('ref','commit','tree') '[mir4-a08-plan-invalid]';Assert-MIR4A08PropertyNames $Plan.source @('ref','commit','tree') '[mir4-a08-plan-invalid]';Assert-MIR4A08PropertyNames $Plan.reconciliation @('merge_base','main_unique_commit_count','patch_equivalent_main_commit_count','all_main_changes_integrated') '[mir4-a08-plan-invalid]';Assert-MIR4A08PropertyNames $Plan.candidate @('ref','parent_commit','source_commit','tree','construction','created') '[mir4-a08-plan-invalid]'
   Assert-MIR4A08PropertyNames $Plan.qualification @('expected_targets','exact_candidate_commit_required','exact_candidate_tree_required','exact_package_bytes_required','qualified_materializer_required','exact_package_presentation_required','exact_source_manifest_identity_required','exact_package_authority_identity_required','qualification_before_promotion','independent_governed_evidence_required') '[mir4-a08-plan-invalid]';Assert-MIR4A08PropertyNames $Plan.promotion @('branch','merge_method','pull_request_required','required_status_checks','linear_history_required','ruleset_mutation_authorized','force_push_authorized','deletion_authorized') '[mir4-a08-plan-invalid]';Assert-MIR4A08PropertyNames $Plan.readback @('final_commit_may_differ','exact_tree_required','exact_package_bytes_required','main_base_ancestry_required','source_ref_unchanged_required','fresh_remote_ref_readback_required','direct_main_child_required','commit_message_binding_required','actual_pr_observation_required','commit_rebinding_receipt_required') '[mir4-a08-plan-invalid]'
-  if ([int]$Plan.schema-ne1-or[string]$Plan.kind-cne'MIR42ProtectedMainPromotionTopologyPlanV1'-or[string]$Plan.strategy-cne'main-based-tree-transplant-protected-pr'-or[string]$Plan.policy.repository-cne'Julesc013/more-infinite-research'-or[string]$Plan.policy.main_ref-cne'refs/heads/main'-or[string]$Plan.policy.policy_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$Plan.main_before.ref-cnotmatch'^refs/'-or[string]$Plan.source.ref-cnotmatch'^refs/'-or[string]$Plan.candidate.ref-cnotmatch'^refs/heads/candidate/[a-z0-9][a-z0-9._-]{2,80}$'-or[string]$Plan.promotion.branch-cne'main'-or[string]$Plan.promotion.merge_method-cne'squash'-or[string]$Plan.candidate.construction-cne'single-parent commit carrying the exact frozen dev tree'){throw '[mir4-a08-plan-invalid]'}
+  if ([int]$Plan.schema-ne1-or[string]$Plan.kind-cne'MIR42ProtectedMainPromotionTopologyPlanV1'-or[string]$Plan.strategy-cne'main-based-tree-transplant-protected-pr'-or[string]$Plan.policy.repository-cne'Julesc013/more-infinite-research'-or[string]$Plan.policy.main_ref-cne'refs/heads/main'-or[string]$Plan.policy.policy_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$Plan.main_before.ref-cnotmatch'^refs/'-or[string]$Plan.source.ref-cnotmatch'^refs/'-or[string]$Plan.candidate.ref-cnotmatch$scopeContract.candidate_ref_pattern-or[string]$Plan.promotion.branch-cne'main'-or[string]$Plan.promotion.merge_method-cne'squash'-or[string]$Plan.candidate.construction-cne'single-parent commit carrying the exact frozen dev tree'){throw '[mir4-a08-plan-invalid]'}
   foreach ($commit in @([string]$Plan.main_before.commit,[string]$Plan.source.commit,[string]$Plan.reconciliation.merge_base,[string]$Plan.candidate.parent_commit,[string]$Plan.candidate.source_commit)){if ($commit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-a08-plan-invalid]'}};foreach ($tree in @([string]$Plan.main_before.tree,[string]$Plan.source.tree,[string]$Plan.candidate.tree)){if ($tree-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-a08-plan-invalid]'}}
-  if ((@($Plan.qualification.expected_targets|Sort-Object)-join'|')-cne'F200|F210'-or@($Plan.qualification.expected_targets|Sort-Object -Unique).Count-ne2-or(@($Plan.promotion.required_status_checks|Sort-Object -Unique)-join'|')-cne'branch-policy|verification-gate'){throw '[mir4-a08-plan-invalid]'}
+  Assert-MIR4A08PromotionTargetSet -Targets @($Plan.qualification.expected_targets) -Scope $Scope -Code '[mir4-a08-plan-invalid]'
+  if (($Scope-ceq'nine-target'-and[string]$Plan.candidate.ref-cne('refs/heads/release/mir-4.2-candidate-'+([string]$Plan.source.commit).Substring(0,12)))-or(@($Plan.promotion.required_status_checks|Sort-Object -Unique)-join'|')-cne'branch-policy|verification-gate'){throw '[mir4-a08-plan-invalid]'}
   foreach ($assertion in @(@($Plan.reconciliation.all_main_changes_integrated,$true),@($Plan.candidate.created,$false),@($Plan.qualification.exact_candidate_commit_required,$true),@($Plan.qualification.exact_candidate_tree_required,$true),@($Plan.qualification.exact_package_bytes_required,$true),@($Plan.qualification.qualified_materializer_required,$true),@($Plan.qualification.exact_package_presentation_required,$true),@($Plan.qualification.exact_source_manifest_identity_required,$true),@($Plan.qualification.exact_package_authority_identity_required,$true),@($Plan.qualification.qualification_before_promotion,$true),@($Plan.qualification.independent_governed_evidence_required,$true),@($Plan.promotion.pull_request_required,$true),@($Plan.promotion.linear_history_required,$true),@($Plan.promotion.ruleset_mutation_authorized,$false),@($Plan.promotion.force_push_authorized,$false),@($Plan.promotion.deletion_authorized,$false),@($Plan.readback.final_commit_may_differ,$true),@($Plan.readback.exact_tree_required,$true),@($Plan.readback.exact_package_bytes_required,$true),@($Plan.readback.main_base_ancestry_required,$true),@($Plan.readback.source_ref_unchanged_required,$true),@($Plan.readback.fresh_remote_ref_readback_required,$true),@($Plan.readback.direct_main_child_required,$true),@($Plan.readback.commit_message_binding_required,$true),@($Plan.readback.actual_pr_observation_required,$true),@($Plan.readback.commit_rebinding_receipt_required,$true),@($Plan.tag_creation_authority,$false),@($Plan.main_mutation_authority,$false),@($Plan.release_authority,$false),@($Plan.publication_authority,$false))){Assert-MIR4A08Boolean -Value $assertion[0] -Expected $assertion[1] -Code '[mir4-a08-plan-invalid]'}
   if ([int]$Plan.reconciliation.main_unique_commit_count-lt0-or[int]$Plan.reconciliation.patch_equivalent_main_commit_count-lt0-or[string]$Plan.plan_sha256-cne(Get-MIR4A08PlanSha256 $Plan)){throw '[mir4-a08-plan-invalid]'};return $Plan
 }
-function Get-MIR4A08CandidateMessage { param([Parameter(Mandatory)]$Plan) return "MIR 4.2 protected candidate`n`nMIR-Source-Commit: $($Plan.source.commit)`nMIR-Source-Tree: $($Plan.source.tree)`nMIR-Main-Base: $($Plan.main_before.commit)`nMIR-Policy-SHA256: $($Plan.policy.policy_sha256)`nMIR-Promotion-Plan: $($Plan.plan_sha256)" }
+function Get-MIR4A08CandidateMessage {
+  param([Parameter(Mandatory)]$Plan)
+  $scope=Get-MIR4A08PromotionScopeFromTargets -Targets @($Plan.qualification.expected_targets) -Code '[mir4-a08-candidate-message]'
+  # The original A08 carrier has a frozen two-target message.  The nine-target
+  # carrier names the frozen development commit with the exact trailer that the
+  # current nine-target promotion plan requires; it does not reinterpret it as
+  # a new source authority.
+  $sourceTrailer=if($scope-ceq'nine-target'){"MIR4-Frozen-Dev-Commit: $($Plan.source.commit)"}else{"MIR-Source-Commit: $($Plan.source.commit)"}
+  return "MIR 4.2 protected candidate`n`n$sourceTrailer`nMIR-Source-Tree: $($Plan.source.tree)`nMIR-Main-Base: $($Plan.main_before.commit)`nMIR-Policy-SHA256: $($Plan.policy.policy_sha256)`nMIR-Promotion-Plan: $($Plan.plan_sha256)"
+}
 function Assert-MIR4A08CandidateAgainstPlan {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Plan,[Parameter(Mandatory)][string]$CandidateRef,[Parameter(Mandatory)][string]$CandidateCommit)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Plan,[Parameter(Mandatory)][string]$CandidateRef,[Parameter(Mandatory)][string]$CandidateCommit,[ValidateSet('two-target','nine-target')][string]$Scope='two-target')
+  $null=Assert-MIR4A08Plan -Plan $Plan -Scope $Scope
   if ($CandidateRef-cne[string]$Plan.candidate.ref){throw '[mir4-a08-candidate-ref-conflict]'};$tree=Resolve-MIR4A08Tree -RepoRoot $RepoRoot -Commit $CandidateCommit;$parents=@(((Invoke-MIR4A08Git -RepoRoot $RepoRoot -Arguments @('show','-s','--format=%P',$CandidateCommit))-join'').Trim()-split'\s+'|Where-Object{$_});$message=((Invoke-MIR4A08Git -RepoRoot $RepoRoot -Arguments @('show','-s','--format=%B',$CandidateCommit))-join"`n").TrimEnd();if ($tree-cne[string]$Plan.source.tree-or$parents.Count-ne1-or$parents[0]-cne[string]$Plan.main_before.commit-or$message-cne(Get-MIR4A08CandidateMessage $Plan)){throw '[mir4-a08-candidate-ref-conflict]'};return [pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainCandidateV1';ref=$CandidateRef;commit=$CandidateCommit;tree=$tree;parent_commit=$parents[0];source_commit=[string]$Plan.source.commit;plan_sha256=[string]$Plan.plan_sha256;candidate_message_sha256=Get-MIR4A08Sha256 $message}
 }
 
 function New-MIR4ProtectedPromotionTopologyPlan {
-  [CmdletBinding()]param([Parameter(Mandatory)][string]$RepoRoot,[string]$MainRef='refs/remotes/origin/main',[string]$SourceRef='refs/remotes/origin/dev',[Parameter(Mandatory)][string]$CandidateRef,[Parameter(Mandatory)][scriptblock]$PolicyProvider,[string]$CanonicalRepository='Julesc013/more-infinite-research',[switch]$Rehearsal)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$expectedMainRef=if($Rehearsal){'refs/heads/main'}else{'refs/remotes/origin/main'};$expectedSourceRef=if($Rehearsal){'refs/heads/dev'}else{'refs/remotes/origin/dev'};if($MainRef-cne$expectedMainRef-or$SourceRef-cne$expectedSourceRef){throw '[mir4-a08-source-ref-authority]'};if ($CandidateRef-cnotmatch'^refs/heads/candidate/[a-z0-9][a-z0-9._-]{2,80}$'){throw '[mir4-a08-candidate-ref]'};$policy=Get-MIR4A08PolicyObservation -CanonicalRepository $CanonicalRepository -PolicyProvider $PolicyProvider -Rehearsal:$Rehearsal;$mainCommit=Resolve-MIR4A08Commit -RepoRoot $repo -Revision $MainRef;$sourceCommit=Resolve-MIR4A08Commit -RepoRoot $repo -Revision $SourceRef;$sourceTree=Resolve-MIR4A08Tree -RepoRoot $repo -Commit $sourceCommit;$mainTree=Resolve-MIR4A08Tree -RepoRoot $repo -Commit $mainCommit;$mergeBase=((Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('merge-base',$mainCommit,$sourceCommit))-join'').Trim();$cherry=@(Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('cherry',$sourceCommit,$mainCommit));if (@($cherry|Where-Object{$_-match'^\+\s+[0-9a-f]{40}$'}).Count-ne0){throw '[mir4-a08-main-change-not-integrated]'};$mainUniqueCount=[int](((Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('rev-list','--count',"$mergeBase..$mainCommit"))-join'').Trim());if ($cherry.Count-ne$mainUniqueCount){throw '[mir4-a08-main-history-not-linear-patch-set]'}
-  $plan=[pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainPromotionTopologyPlanV1';strategy='main-based-tree-transplant-protected-pr';policy=[pscustomobject][ordered]@{repository=$CanonicalRepository;canonical_remote_url=[string]$policy.canonical_remote_url;main_ref='refs/heads/main';observation_source=[string]$policy.observation_source;policy_sha256=[string]$policy.policy_sha256};main_before=[pscustomobject][ordered]@{ref=$MainRef;commit=$mainCommit;tree=$mainTree};source=[pscustomobject][ordered]@{ref=$SourceRef;commit=$sourceCommit;tree=$sourceTree};reconciliation=[pscustomobject][ordered]@{merge_base=$mergeBase;main_unique_commit_count=$mainUniqueCount;patch_equivalent_main_commit_count=@($cherry|Where-Object{$_-match'^-\s+[0-9a-f]{40}$'}).Count;all_main_changes_integrated=$true};candidate=[pscustomobject][ordered]@{ref=$CandidateRef;parent_commit=$mainCommit;source_commit=$sourceCommit;tree=$sourceTree;construction='single-parent commit carrying the exact frozen dev tree';created=$false};qualification=[pscustomobject][ordered]@{expected_targets=@('F200','F210');exact_candidate_commit_required=$true;exact_candidate_tree_required=$true;exact_package_bytes_required=$true;qualified_materializer_required=$true;exact_package_presentation_required=$true;exact_source_manifest_identity_required=$true;exact_package_authority_identity_required=$true;qualification_before_promotion=$true;independent_governed_evidence_required=$true};promotion=[pscustomobject][ordered]@{branch='main';merge_method='squash';pull_request_required=$true;required_status_checks=@('branch-policy','verification-gate');linear_history_required=$true;ruleset_mutation_authorized=$false;force_push_authorized=$false;deletion_authorized=$false};readback=[pscustomobject][ordered]@{final_commit_may_differ=$true;exact_tree_required=$true;exact_package_bytes_required=$true;main_base_ancestry_required=$true;source_ref_unchanged_required=$true;fresh_remote_ref_readback_required=$true;direct_main_child_required=$true;commit_message_binding_required=$true;actual_pr_observation_required=$true;commit_rebinding_receipt_required=$true};tag_creation_authority=$false;main_mutation_authority=$false;release_authority=$false;publication_authority=$false;plan_sha256=''};$plan.plan_sha256=Get-MIR4A08PlanSha256 $plan;return Assert-MIR4A08Plan $plan
+  [CmdletBinding()]param([Parameter(Mandatory)][string]$RepoRoot,[string]$MainRef='refs/remotes/origin/main',[string]$SourceRef='refs/remotes/origin/dev',[Parameter(Mandatory)][string]$CandidateRef,[Parameter(Mandatory)][scriptblock]$PolicyProvider,[string]$CanonicalRepository='Julesc013/more-infinite-research',[ValidateSet('two-target','nine-target')][string]$Scope='two-target',[switch]$Rehearsal)
+  $scopeContract=Get-MIR4A08PromotionScopeContract -Scope $Scope
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$expectedMainRef=if($Rehearsal){'refs/heads/main'}else{'refs/remotes/origin/main'};$expectedSourceRef=if($Rehearsal){'refs/heads/dev'}else{'refs/remotes/origin/dev'};if($MainRef-cne$expectedMainRef-or$SourceRef-cne$expectedSourceRef){throw '[mir4-a08-source-ref-authority]'};if ($CandidateRef-cnotmatch$scopeContract.candidate_ref_pattern){throw '[mir4-a08-candidate-ref]'};$policy=Get-MIR4A08PolicyObservation -CanonicalRepository $CanonicalRepository -PolicyProvider $PolicyProvider -Rehearsal:$Rehearsal;$mainCommit=Resolve-MIR4A08Commit -RepoRoot $repo -Revision $MainRef;$sourceCommit=Resolve-MIR4A08Commit -RepoRoot $repo -Revision $SourceRef;$sourceTree=Resolve-MIR4A08Tree -RepoRoot $repo -Commit $sourceCommit;$mainTree=Resolve-MIR4A08Tree -RepoRoot $repo -Commit $mainCommit;if($Scope-ceq'nine-target'-and$CandidateRef-cne('refs/heads/release/mir-4.2-candidate-'+$sourceCommit.Substring(0,12))){throw '[mir4-a08-candidate-ref]'};$mergeBase=((Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('merge-base',$mainCommit,$sourceCommit))-join'').Trim();$cherry=@(Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('cherry',$sourceCommit,$mainCommit));if (@($cherry|Where-Object{$_-match'^\+\s+[0-9a-f]{40}$'}).Count-ne0){throw '[mir4-a08-main-change-not-integrated]'};$mainUniqueCount=[int](((Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('rev-list','--count',"$mergeBase..$mainCommit"))-join'').Trim());if ($cherry.Count-ne$mainUniqueCount){throw '[mir4-a08-main-history-not-linear-patch-set]'}
+  $plan=[pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainPromotionTopologyPlanV1';strategy='main-based-tree-transplant-protected-pr';policy=[pscustomobject][ordered]@{repository=$CanonicalRepository;canonical_remote_url=[string]$policy.canonical_remote_url;main_ref='refs/heads/main';observation_source=[string]$policy.observation_source;policy_sha256=[string]$policy.policy_sha256};main_before=[pscustomobject][ordered]@{ref=$MainRef;commit=$mainCommit;tree=$mainTree};source=[pscustomobject][ordered]@{ref=$SourceRef;commit=$sourceCommit;tree=$sourceTree};reconciliation=[pscustomobject][ordered]@{merge_base=$mergeBase;main_unique_commit_count=$mainUniqueCount;patch_equivalent_main_commit_count=@($cherry|Where-Object{$_-match'^-\s+[0-9a-f]{40}$'}).Count;all_main_changes_integrated=$true};candidate=[pscustomobject][ordered]@{ref=$CandidateRef;parent_commit=$mainCommit;source_commit=$sourceCommit;tree=$sourceTree;construction='single-parent commit carrying the exact frozen dev tree';created=$false};qualification=[pscustomobject][ordered]@{expected_targets=@($scopeContract.targets);exact_candidate_commit_required=$true;exact_candidate_tree_required=$true;exact_package_bytes_required=$true;qualified_materializer_required=$true;exact_package_presentation_required=$true;exact_source_manifest_identity_required=$true;exact_package_authority_identity_required=$true;qualification_before_promotion=$true;independent_governed_evidence_required=$true};promotion=[pscustomobject][ordered]@{branch='main';merge_method='squash';pull_request_required=$true;required_status_checks=@('branch-policy','verification-gate');linear_history_required=$true;ruleset_mutation_authorized=$false;force_push_authorized=$false;deletion_authorized=$false};readback=[pscustomobject][ordered]@{final_commit_may_differ=$true;exact_tree_required=$true;exact_package_bytes_required=$true;main_base_ancestry_required=$true;source_ref_unchanged_required=$true;fresh_remote_ref_readback_required=$true;direct_main_child_required=$true;commit_message_binding_required=$true;actual_pr_observation_required=$true;commit_rebinding_receipt_required=$true};tag_creation_authority=$false;main_mutation_authority=$false;release_authority=$false;publication_authority=$false;plan_sha256=''};$plan.plan_sha256=Get-MIR4A08PlanSha256 $plan;return Assert-MIR4A08Plan -Plan $plan -Scope $Scope
 }
 function New-MIR4ProtectedMainCandidate {
-  [CmdletBinding()]param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Plan,[switch]$Rehearsal)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$null=Assert-MIR4A08Plan $Plan;if ((Resolve-MIR4A08Commit -RepoRoot $repo -Revision ([string]$Plan.main_before.ref))-cne[string]$Plan.main_before.commit){throw '[mir4-a08-main-ref-drift]'};if ((Resolve-MIR4A08Commit -RepoRoot $repo -Revision ([string]$Plan.source.ref))-cne[string]$Plan.source.commit){throw '[mir4-a08-source-ref-drift]'};$candidateRef=[string]$Plan.candidate.ref;$candidateCommit=Get-MIR4A08OptionalRef -RepoRoot $repo -Ref $candidateRef;$created=$false;if ($null-eq$candidateCommit){if(-not$Rehearsal){throw '[mir4-a08-external-effect-not-authorized]'};$candidateCommit=((Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('commit-tree',[string]$Plan.source.tree,'-p',[string]$Plan.main_before.commit,'-m',(Get-MIR4A08CandidateMessage $Plan)))-join'').Trim();if ($candidateCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-a08-candidate-commit]'};$null=Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('update-ref',$candidateRef,$candidateCommit,('0'*40));$created=$true};$candidate=Assert-MIR4A08CandidateAgainstPlan -RepoRoot $repo -Plan $Plan -CandidateRef $candidateRef -CandidateCommit $candidateCommit;$candidate|Add-Member created $created;$candidate|Add-Member remote_push_performed $false;$candidate|Add-Member main_mutation_performed $false;$candidate|Add-Member tag_created $false;$candidate|Add-Member publication_authorized $false;return $candidate
+  [CmdletBinding()]param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Plan,[ValidateSet('two-target','nine-target')][string]$Scope='two-target',[switch]$Rehearsal)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$null=Assert-MIR4A08Plan -Plan $Plan -Scope $Scope;if ((Resolve-MIR4A08Commit -RepoRoot $repo -Revision ([string]$Plan.main_before.ref))-cne[string]$Plan.main_before.commit){throw '[mir4-a08-main-ref-drift]'};if ((Resolve-MIR4A08Commit -RepoRoot $repo -Revision ([string]$Plan.source.ref))-cne[string]$Plan.source.commit){throw '[mir4-a08-source-ref-drift]'};$candidateRef=[string]$Plan.candidate.ref;$candidateCommit=Get-MIR4A08OptionalRef -RepoRoot $repo -Ref $candidateRef;$created=$false;if ($null-eq$candidateCommit){if(-not$Rehearsal){throw '[mir4-a08-external-effect-not-authorized]'};$candidateCommit=((Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('commit-tree',[string]$Plan.source.tree,'-p',[string]$Plan.main_before.commit,'-m',(Get-MIR4A08CandidateMessage $Plan)))-join'').Trim();if ($candidateCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-a08-candidate-commit]'};$null=Invoke-MIR4A08Git -RepoRoot $repo -Arguments @('update-ref',$candidateRef,$candidateCommit,('0'*40));$created=$true};$candidate=Assert-MIR4A08CandidateAgainstPlan -RepoRoot $repo -Plan $Plan -CandidateRef $candidateRef -CandidateCommit $candidateCommit -Scope $Scope;$candidate|Add-Member created $created;$candidate|Add-Member remote_push_performed $false;$candidate|Add-Member main_mutation_performed $false;$candidate|Add-Member tag_created $false;$candidate|Add-Member publication_authorized $false;return $candidate
 }
 
 function Assert-MIR4A08QualifiedEngine {
@@ -457,6 +519,13 @@ function Get-MIR4A08ExpectedFactorioVersion {
   switch ($Target) {
     'F200' { return '2.0' }
     'F210' { return '2.1' }
+    'F110' { return '1.1' }
+    'F100' { return '1.0' }
+    'F017' { return '0.17' }
+    'F016' { return '0.16' }
+    'F015' { return '0.15' }
+    'F014' { return '0.14' }
+    'F013' { return '0.13' }
     default { throw '[mir4-a08-package-target]' }
   }
 }
@@ -476,8 +545,9 @@ function Get-MIR4A08PackageObservation {
   try{$archive=[IO.Compression.ZipFile]::OpenRead($PackagePath)}catch{throw '[mir4-a08-package-archive]'};try{$entries=@($archive.Entries|Where-Object{-not[string]::IsNullOrEmpty($_.Name)}|Sort-Object -Property FullName -CaseSensitive);$roots=@($entries|ForEach-Object{([string]$_.FullName).Split('/')[0]}|Sort-Object -Unique);if ($entries.Count-eq0-or$roots.Count-ne1-or@($entries.FullName|Sort-Object -Unique).Count-ne$entries.Count){throw '[mir4-a08-package-archive]'};$info=@($entries|Where-Object{[string]$_.FullName-ceq"$($roots[0])/info.json"});if ($info.Count-ne1){throw '[mir4-a08-package-target-identity]'};try{$reader=[IO.StreamReader]::new($info[0].Open(),[Text.UTF8Encoding]::new($false),$true);try{$metadata=$reader.ReadToEnd()|ConvertFrom-Json -Depth 30 -DateKind String}finally{$reader.Dispose()}}catch{throw '[mir4-a08-package-target-identity]'};$expectedVersion=Get-MIR4A08ExpectedFactorioVersion $Target;if ([string]$metadata.factorio_version-cne$expectedVersion-or[string]::IsNullOrWhiteSpace([string]$metadata.name)){throw '[mir4-a08-package-target-identity]'};$content=[Text.StringBuilder]::new();foreach ($entry in $entries){$stream=$entry.Open();$hash=[Security.Cryptography.SHA256]::Create();try{$entrySha=[Convert]::ToHexString($hash.ComputeHash($stream))}finally{$hash.Dispose();$stream.Dispose()};[void]$content.Append($entry.FullName).Append([char]0).Append([string]$entry.Length).Append([char]0).Append($entrySha).Append("`n")};$contentSha=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($content.ToString())));return [pscustomobject][ordered]@{target=$Target;relative_path=$RelativePath;archive_sha256=(Get-MIR4A08FileSha256 $PackagePath);content_sha256=$contentSha;bytes=[long](Get-Item -LiteralPath $PackagePath).Length;entry_count=$entries.Count;root=[string]$roots[0];factorio_version=[string]$metadata.factorio_version}}finally{$archive.Dispose()}
 }
 function Get-MIR4A08PackageSetSha256 {
-  param([Parameter(Mandatory)][object[]]$Packages)
-  $normalized=@(foreach ($package in @($Packages|Sort-Object{[string]$_.target})){[pscustomobject][ordered]@{target=[string]$package.target;archive_sha256=[string]$package.archive_sha256;content_sha256=[string]$package.content_sha256;bytes=[long]$package.bytes;entry_count=[int]$package.entry_count;root=[string]$package.root;factorio_version=[string]$package.factorio_version}});if ($normalized.Count-ne2-or(@($normalized.target|Sort-Object)-join'|')-cne'F200|F210'){throw '[mir4-a08-package-set]'};foreach ($package in $normalized){Assert-MIR4A08Sha $package.archive_sha256 '[mir4-a08-package-set]';Assert-MIR4A08Sha $package.content_sha256 '[mir4-a08-package-set]';if ($package.bytes-lt1-or$package.entry_count-lt1){throw '[mir4-a08-package-set]'}};return Get-MIR4A08Sha256 $normalized
+  param([Parameter(Mandatory)][object[]]$Packages,[ValidateSet('two-target','nine-target')][string]$Scope='two-target')
+  $expected=@((Get-MIR4A08PromotionScopeContract -Scope $Scope).targets|Sort-Object)
+  $normalized=@(foreach ($package in @($Packages|Sort-Object{[string]$_.target})){[pscustomobject][ordered]@{target=[string]$package.target;archive_sha256=[string]$package.archive_sha256;content_sha256=[string]$package.content_sha256;bytes=[long]$package.bytes;entry_count=[int]$package.entry_count;root=[string]$package.root;factorio_version=[string]$package.factorio_version}});if ($normalized.Count-ne$expected.Count-or(@($normalized.target|Sort-Object)-join'|')-cne($expected-join'|')){throw '[mir4-a08-package-set]'};foreach ($package in $normalized){Assert-MIR4A08Sha $package.archive_sha256 '[mir4-a08-package-set]';Assert-MIR4A08Sha $package.content_sha256 '[mir4-a08-package-set]';if ($package.bytes-lt1-or$package.entry_count-lt1){throw '[mir4-a08-package-set]'}};return Get-MIR4A08Sha256 $normalized
 }
 
 function Assert-MIR4A08PresentationBinding {
@@ -587,7 +657,9 @@ function Assert-MIR4A08TargetQualificationProof {
   }
 }
 function Read-MIR4A08QualificationRecord {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Plan,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$RecordPath,[Parameter(Mandatory)][string]$PackageRoot,[scriptblock]$QualificationAuthorityProvider=$null,[switch]$Rehearsal)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Plan,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$RecordPath,[Parameter(Mandatory)][string]$PackageRoot,[scriptblock]$QualificationAuthorityProvider=$null,[ValidateSet('two-target','nine-target')][string]$Scope='two-target',[switch]$Rehearsal)
+  $null=Assert-MIR4A08Plan -Plan $Plan -Scope $Scope
+  if ($Scope -ceq 'nine-target') { throw '[mir4-a08-nine-target-qualification-delegated]' }
   $recordFullPath=(Resolve-Path -LiteralPath $RecordPath).Path
   try {
     $record=Get-Content -Raw -LiteralPath $recordFullPath|ConvertFrom-Json -Depth 100 -DateKind String
@@ -651,9 +723,162 @@ function Assert-MIR4A08ConfiguredRemote {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RemoteName,[Parameter(Mandatory)]$Plan,[switch]$Rehearsal)
   if ($RemoteName-cnotmatch'^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$'){throw '[mir4-a08-remote-identity]'};$url=((Invoke-MIR4A08Git -RepoRoot $RepoRoot -Arguments @('remote','get-url',$RemoteName))-join'').Trim();if (-not$Rehearsal-and-not(Test-MIR4A08CanonicalGitHubRemote -Url $url -Repository ([string]$Plan.policy.repository))){throw '[mir4-a08-remote-identity]'};return $url
 }
+
+function Get-MIR4A08NineTargetPromotionPlanProjection {
+  param([Parameter(Mandatory)]$PromotionPlan)
+  $targets=@('f210','f200','f110','f100','f017','f016','f015','f014','f013')
+  $proofNames=@('qualification','real_engine_campaign','independent_verification','t16_ledger_trust_root','signing_ceremony','source_freeze_authority','independent_reviewer_attestation')
+  if ($null-eq$PromotionPlan.source-or$null-eq$PromotionPlan.technical_seal-or$null-eq$PromotionPlan.governed_offline_restore_drill-or$null-eq$PromotionPlan.candidate-or$null-eq$PromotionPlan.current_programme-or$null-eq$PromotionPlan.proofs) { throw '[mir4-a08-nine-transport-plan]' }
+  Assert-MIR4A08PropertyNames $PromotionPlan.source @('commit','tree','package_source_sha256') '[mir4-a08-nine-transport-plan]'
+  Assert-MIR4A08PropertyNames $PromotionPlan.technical_seal @('sha256','record_sha256') '[mir4-a08-nine-transport-plan]'
+  Assert-MIR4A08PropertyNames $PromotionPlan.governed_offline_restore_drill @('sha256','record_sha256') '[mir4-a08-nine-transport-plan]'
+  Assert-MIR4A08PropertyNames $PromotionPlan.frozen_dev @('ref','commit','tree') '[mir4-a08-nine-transport-plan]'
+  Assert-MIR4A08PropertyNames $PromotionPlan.candidate @('ref','base_ref','base_commit','parent_count','exact_tree','source_commit_trailer','create_only','remote_ref_must_be_absent') '[mir4-a08-nine-transport-plan]'
+  Assert-MIR4A08PropertyNames $PromotionPlan.candidate_manifest @('sha256','record_sha256') '[mir4-a08-nine-transport-plan]'
+  Assert-MIR4A08PropertyNames $PromotionPlan.current_programme @('path','sha256','record_sha256') '[mir4-a08-nine-transport-plan]'
+  Assert-MIR4A08PropertyNames $PromotionPlan.proofs $proofNames '[mir4-a08-nine-transport-plan]'
+  if ([int]$PromotionPlan.schema-ne1-or[string]$PromotionPlan.kind-cne'MIR42NineTargetProtectedMainPromotionPlanV1'-or
+      [string]$PromotionPlan.status-cne'MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY'-or[string]$PromotionPlan.scope-cne'nine-target'-or
+      [string]$PromotionPlan.source.commit-cnotmatch'^[0-9a-f]{40}$'-or[string]$PromotionPlan.source.tree-cnotmatch'^[0-9a-f]{40}$'-or[string]$PromotionPlan.source.package_source_sha256-cnotmatch'^[A-F0-9]{64}$'-or
+      [string]$PromotionPlan.main_before-cnotmatch'^[0-9a-f]{40}$'-or[string]$PromotionPlan.frozen_dev.ref-cne'refs/heads/dev'-or[string]$PromotionPlan.frozen_dev.commit-cne[string]$PromotionPlan.source.commit-or[string]$PromotionPlan.frozen_dev.tree-cne[string]$PromotionPlan.source.tree-or
+      [string]$PromotionPlan.candidate.ref-cne('refs/heads/release/mir-4.2-candidate-'+([string]$PromotionPlan.source.commit).Substring(0,12))-or[string]$PromotionPlan.candidate.base_ref-cne'refs/heads/main'-or[string]$PromotionPlan.candidate.base_commit-cne[string]$PromotionPlan.main_before-or[int]$PromotionPlan.candidate.parent_count-ne1-or[string]$PromotionPlan.candidate.exact_tree-cne[string]$PromotionPlan.source.tree-or[string]$PromotionPlan.candidate.source_commit_trailer-cne("MIR4-Frozen-Dev-Commit: $([string]$PromotionPlan.source.commit)")-or
+      $PromotionPlan.candidate.create_only-isnot[bool]-or-not[bool]$PromotionPlan.candidate.create_only-or$PromotionPlan.candidate.remote_ref_must_be_absent-isnot[bool]-or-not[bool]$PromotionPlan.candidate.remote_ref_must_be_absent-or
+      [string]$PromotionPlan.target-cne'main'-or[string]$PromotionPlan.merge_method-cne'squash'-or$PromotionPlan.pull_request_required-isnot[bool]-or-not[bool]$PromotionPlan.pull_request_required-or$PromotionPlan.linear_history_required-isnot[bool]-or-not[bool]$PromotionPlan.linear_history_required-or
+      (@($PromotionPlan.required_status_checks)-join'|')-cne'branch-policy|verification-gate'-or[int]$PromotionPlan.bypass_actors_allowed-ne0-or$PromotionPlan.force_push-isnot[bool]-or[bool]$PromotionPlan.force_push-or$PromotionPlan.ruleset_mutation-isnot[bool]-or[bool]$PromotionPlan.ruleset_mutation-or
+      $PromotionPlan.remote_mutation_performed-isnot[bool]-or[bool]$PromotionPlan.remote_mutation_performed-or$PromotionPlan.protected_main_promotion_authorized-isnot[bool]-or[bool]$PromotionPlan.protected_main_promotion_authorized-or$PromotionPlan.human_go_required_after_main_readback-isnot[bool]-or-not[bool]$PromotionPlan.human_go_required_after_main_readback-or$PromotionPlan.tagging_authorized-isnot[bool]-or[bool]$PromotionPlan.tagging_authorized-or$PromotionPlan.publication_authorized-isnot[bool]-or[bool]$PromotionPlan.publication_authorized) { throw '[mir4-a08-nine-transport-plan]' }
+  $assetTargets=@($PromotionPlan.target_assets|ForEach-Object{[string]$_.target})
+  if ($assetTargets.Count-ne$targets.Count-or($assetTargets-join'|')-cne($targets-join'|')-or@($PromotionPlan.direct_predecessors|ForEach-Object{[string]$_.target}).Count-ne$targets.Count-or(@($PromotionPlan.direct_predecessors|ForEach-Object{[string]$_.target})-join'|')-cne($targets-join'|')) { throw '[mir4-a08-nine-transport-plan]' }
+  foreach($asset in @($PromotionPlan.target_assets)) {
+    Assert-MIR4A08PropertyNames $asset @('target','distribution_version','archive_sha256','content_sha256','entry_count') '[mir4-a08-nine-transport-plan]'
+    if([string]::IsNullOrWhiteSpace([string]$asset.distribution_version)-or[string]$asset.archive_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$asset.content_sha256-cnotmatch'^[A-F0-9]{64}$'-or[int]$asset.entry_count-le0){throw '[mir4-a08-nine-transport-plan]'}
+  }
+  foreach($identity in @($PromotionPlan.technical_seal,$PromotionPlan.governed_offline_restore_drill,$PromotionPlan.candidate_manifest,$PromotionPlan.current_programme)+@($proofNames|ForEach-Object{$PromotionPlan.proofs.$_})) {
+    if([string]$identity.sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$identity.record_sha256-cnotmatch'^[A-F0-9]{64}$'){throw '[mir4-a08-nine-transport-plan]'}
+  }
+  return [pscustomobject][ordered]@{
+    kind=[string]$PromotionPlan.kind;status=[string]$PromotionPlan.status;scope='nine-target';source=$PromotionPlan.source
+    technical_seal=$PromotionPlan.technical_seal;governed_offline_restore_drill=$PromotionPlan.governed_offline_restore_drill
+    main_before=[string]$PromotionPlan.main_before;frozen_dev=$PromotionPlan.frozen_dev;candidate=$PromotionPlan.candidate
+    candidate_manifest=$PromotionPlan.candidate_manifest;current_programme=$PromotionPlan.current_programme;direct_predecessors=@($PromotionPlan.direct_predecessors)
+    target_assets=@($PromotionPlan.target_assets);proofs=$PromotionPlan.proofs
+  }
+}
+
+function New-MIR4A08NineTargetTransportBinding {
+  param([Parameter(Mandatory)]$PromotionPlan)
+  $projection=Get-MIR4A08NineTargetPromotionPlanProjection -PromotionPlan $PromotionPlan
+  $binding=[pscustomobject][ordered]@{kind='MIR42NineTargetSealedPromotionTransportBindingV1';scope='nine-target';promotion_plan=$projection;promotion_plan_sha256=(Get-MIR4A08Sha256 $projection);binding_sha256=''}
+  $binding.binding_sha256=Get-MIR4A08SelfSha256 $binding 'binding_sha256'
+  return $binding
+}
+
+function Assert-MIR4A08NineTargetTransportBinding {
+  param([Parameter(Mandatory)]$Binding,[Parameter(Mandatory)]$PromotionPlan)
+  Assert-MIR4A08PropertyNames $Binding @('kind','scope','promotion_plan','promotion_plan_sha256','binding_sha256') '[mir4-a08-nine-transport-binding]'
+  $expected=New-MIR4A08NineTargetTransportBinding -PromotionPlan $PromotionPlan
+  if([string]$Binding.kind-cne'MIR42NineTargetSealedPromotionTransportBindingV1'-or[string]$Binding.scope-cne'nine-target'-or[string]$Binding.promotion_plan_sha256-cne(Get-MIR4A08Sha256 $Binding.promotion_plan)-or[string]$Binding.binding_sha256-cne(Get-MIR4A08SelfSha256 $Binding 'binding_sha256')-or(Get-MIR4A08CanonicalJson $Binding)-cne(Get-MIR4A08CanonicalJson $expected)){throw '[mir4-a08-nine-transport-binding]'}
+  return $expected
+}
+
+function Assert-MIR4A08NineTargetTransportIntention {
+  param([Parameter(Mandatory)]$Intention,[Parameter(Mandatory)]$PromotionPlan)
+  if($Intention.rehearsal-isnot[bool]-or[bool]$Intention.rehearsal){throw '[mir4-a08-nine-transport-mode]'}
+  $null=Assert-MIR4A08Plan -Plan $Intention.plan -Scope 'nine-target'
+  Assert-MIR4A08PropertyNames $Intention.candidate @('schema','kind','ref','commit','tree','parent_commit','source_commit','plan_sha256','candidate_message_sha256') '[mir4-a08-nine-transport-intention]'
+  $binding=Assert-MIR4A08NineTargetTransportBinding -Binding $Intention.qualification -PromotionPlan $PromotionPlan
+  if([string]$Intention.candidate.ref-cne[string]$Intention.plan.candidate.ref-or[string]$Intention.candidate.tree-cne[string]$Intention.plan.source.tree-or[string]$Intention.candidate.parent_commit-cne[string]$Intention.plan.main_before.commit-or[string]$Intention.candidate.source_commit-cne[string]$Intention.plan.source.commit-or[string]$Intention.candidate.plan_sha256-cne[string]$Intention.plan.plan_sha256-or[string]$Intention.plan.source.commit-cne[string]$binding.promotion_plan.source.commit-or[string]$Intention.plan.source.tree-cne[string]$binding.promotion_plan.source.tree-or[string]$Intention.plan.main_before.commit-cne[string]$binding.promotion_plan.main_before-or[string]$Intention.plan.candidate.ref-cne[string]$binding.promotion_plan.candidate.ref){throw '[mir4-a08-nine-transport-intention]'}
+  return $binding
+}
+
+function Assert-MIR4A08ExternalStateRoot {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path)
+  if([string]::IsNullOrWhiteSpace($Path)-or-not[IO.Path]::IsPathRooted($Path)){throw '[mir4-a08-nine-transport-state-path]'}
+  $repo=[IO.Path]::GetFullPath($RepoRoot).TrimEnd('\','/')
+  $state=[IO.Path]::GetFullPath($Path).TrimEnd('\','/')
+  if($state-ceq$repo-or$state.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw '[mir4-a08-nine-transport-state-repository]'}
+  # The BootstrapMaterialization helper intentionally admits only descendants of
+  # a repository output root.  This carrier is required to live outside that
+  # root, so check the existing ancestry directly instead of weakening that
+  # helper's containment contract.
+  $probe=$state
+  while(-not(Test-Path -LiteralPath $probe)){
+    $parent=[IO.Directory]::GetParent($probe)
+    if($null-eq$parent){throw '[mir4-a08-nine-transport-state-path]'}
+    $probe=$parent.FullName.TrimEnd('\','/')
+  }
+  while($true){
+    try{$item=Get-Item -LiteralPath $probe -Force}catch{throw '[mir4-a08-nine-transport-state-path]'}
+    if(($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw '[mir4-a08-nine-transport-state-reparse]'}
+    $parent=[IO.Directory]::GetParent($probe)
+    if($null-eq$parent-or$parent.FullName-ceq$probe){break}
+    # Preserve a volume root's trailing separator: trimming it changes C:\ to
+    # drive-relative C:, whose parent resolves back to C:\ indefinitely.
+    $probe=$parent.FullName
+  }
+  return $state
+}
+
+function New-MIR4A08NineTargetPromotionTransportIntention {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Plan,
+    [Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)]$PromotionPlan,
+    [Parameter(Mandatory)][string]$RemoteName,
+    [Parameter(Mandatory)][string]$RemoteSourceRef,
+    [Parameter(Mandatory)][string]$StateRoot,
+    [switch]$Rehearsal
+  )
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $null=Assert-MIR4A08Plan -Plan $Plan -Scope 'nine-target'
+  $binding=New-MIR4A08NineTargetTransportBinding -PromotionPlan $PromotionPlan
+  $localCandidate=Assert-MIR4A08CandidateAgainstPlan -RepoRoot $repo -Plan $Plan -CandidateRef ([string]$Candidate.ref) -CandidateCommit ([string]$Candidate.commit) -Scope 'nine-target'
+  if([string]$Candidate.tree-cne[string]$localCandidate.tree-or[string]$Candidate.parent_commit-cne[string]$localCandidate.parent_commit){throw '[mir4-a08-candidate-caller-forged]'}
+  if($RemoteSourceRef-cne'refs/heads/dev'){throw '[mir4-a08-source-ref-authority]'}
+  $null=Assert-MIR4A08ConfiguredRemote -RepoRoot $repo -RemoteName $RemoteName -Plan $Plan -Rehearsal:$Rehearsal
+  if((Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName $RemoteName -Ref 'refs/heads/main')-cne[string]$Plan.main_before.commit){throw '[mir4-a08-remote-main-ref-drift]'}
+  if((Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName $RemoteName -Ref $RemoteSourceRef)-cne[string]$Plan.source.commit){throw '[mir4-a08-remote-source-ref-drift]'}
+  $state=Assert-MIR4A08ExternalStateRoot -RepoRoot $repo -Path $StateRoot
+  $intention=[pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainPromotionIntentionV3';rehearsal=[bool]$Rehearsal;plan=$Plan;candidate=$localCandidate;qualification=$binding;remote=[pscustomobject][ordered]@{name=$RemoteName;canonical_remote_url=[string]$Plan.policy.canonical_remote_url;main_ref='refs/heads/main';source_ref=$RemoteSourceRef;candidate_ref=[string]$localCandidate.ref};intention_sha256=''}
+  $intention.intention_sha256=Get-MIR4A08SelfSha256 $intention 'intention_sha256'
+  $path=Join-Path $state ("$($intention.intention_sha256.ToLowerInvariant()).promotion-intention.json")
+  $null=Write-MIR4A08ImmutableJson -Path $path -Value $intention -Code '[mir4-a08-intention-conflict]'
+  return [pscustomobject][ordered]@{path=$path;intention_sha256=$intention.intention_sha256;candidate_commit=$localCandidate.commit;transport_binding_sha256=$binding.binding_sha256;remote_push_performed=$false;main_mutation_performed=$false;tag_created=$false;publication_authorized=$false}
+}
+
+function Read-MIR4A08NineTargetPromotionTransport {
+  param([Parameter(Mandatory)][string]$IntentionPath,[Parameter(Mandatory)][string]$PromotionRequestPath,[Parameter(Mandatory)]$PromotionPlan)
+  $intention=Read-MIR4A08Intention -Path $IntentionPath -Scope 'nine-target'
+  $binding=Assert-MIR4A08NineTargetTransportIntention -Intention $intention -PromotionPlan $PromotionPlan
+  $request=Read-MIR4A08PromotionRequest -Path $PromotionRequestPath -Intention $intention -Scope 'nine-target'
+  if([string]$request.remote.candidate_ref-cne[string]$intention.candidate.ref-or[string]$request.remote.candidate_commit-cne[string]$intention.candidate.commit-or[string]$request.remote.main_before-cne[string]$intention.plan.main_before.commit-or[string]$request.protected_pull_request.expected_commit_message-cne(Get-MIR4A08PromotionMessage $intention)){throw '[mir4-a08-nine-transport-request]'}
+  $intentionFull=(Resolve-Path -LiteralPath $IntentionPath).Path;$requestFull=(Resolve-Path -LiteralPath $PromotionRequestPath).Path
+  return [pscustomobject][ordered]@{
+    scope='nine-target'
+    binding_sha256=[string]$binding.binding_sha256
+    promotion_plan_sha256=[string]$binding.promotion_plan_sha256
+    policy=[pscustomobject][ordered]@{
+      repository=[string]$intention.plan.policy.repository
+      canonical_remote_url=[string]$intention.plan.policy.canonical_remote_url
+      main_ref=[string]$intention.plan.policy.main_ref
+      policy_sha256=[string]$intention.plan.policy.policy_sha256
+    }
+    candidate=[pscustomobject][ordered]@{
+      ref=[string]$intention.candidate.ref
+      commit=[string]$intention.candidate.commit
+      tree=[string]$intention.candidate.tree
+      parent_commit=[string]$intention.candidate.parent_commit
+      expected_commit_message=(Get-MIR4A08CandidateMessage $intention.plan)
+    }
+    intention=[pscustomobject][ordered]@{path=$intentionFull;sha256=(Get-MIR4A08FileSha256 $intentionFull);intention_sha256=[string]$intention.intention_sha256}
+    request=[pscustomobject][ordered]@{path=$requestFull;sha256=(Get-MIR4A08FileSha256 $requestFull);request_sha256=[string]$request.request_sha256;expected_commit_message=[string]$request.protected_pull_request.expected_commit_message}
+  }
+}
+
 function Read-MIR4A08Intention {
-  param([Parameter(Mandatory)][string]$Path)
-  try{$value=Get-Content -Raw -LiteralPath $Path|ConvertFrom-Json -Depth 100 -DateKind String}catch{throw '[mir4-a08-intention-invalid]'};Assert-MIR4A08PropertyNames $value @('schema','kind','rehearsal','plan','candidate','qualification','remote','intention_sha256') '[mir4-a08-intention-invalid]';Assert-MIR4A08PropertyNames $value.remote @('name','canonical_remote_url','main_ref','source_ref','candidate_ref') '[mir4-a08-intention-invalid]';if ([int]$value.schema-ne1-or[string]$value.kind-cne'MIR42ProtectedMainPromotionIntentionV3'-or$value.rehearsal-isnot[bool]-or[string]$value.intention_sha256-cne(Get-MIR4A08SelfSha256 $value 'intention_sha256')){throw '[mir4-a08-intention-invalid]'};$null=Assert-MIR4A08Plan $value.plan;if ([string]$value.remote.canonical_remote_url-cne[string]$value.plan.policy.canonical_remote_url-or[string]$value.remote.candidate_ref-cne[string]$value.plan.candidate.ref-or[string]$value.remote.main_ref-cne'refs/heads/main'-or[string]$value.remote.source_ref-cnotmatch'^refs/heads/'){throw '[mir4-a08-intention-invalid]'};return $value
+  param([Parameter(Mandatory)][string]$Path,[ValidateSet('two-target','nine-target')][string]$Scope='two-target')
+  try{$value=Get-Content -Raw -LiteralPath $Path|ConvertFrom-Json -Depth 100 -DateKind String}catch{throw '[mir4-a08-intention-invalid]'};Assert-MIR4A08PropertyNames $value @('schema','kind','rehearsal','plan','candidate','qualification','remote','intention_sha256') '[mir4-a08-intention-invalid]';Assert-MIR4A08PropertyNames $value.remote @('name','canonical_remote_url','main_ref','source_ref','candidate_ref') '[mir4-a08-intention-invalid]';if ([int]$value.schema-ne1-or[string]$value.kind-cne'MIR42ProtectedMainPromotionIntentionV3'-or$value.rehearsal-isnot[bool]-or[string]$value.intention_sha256-cne(Get-MIR4A08SelfSha256 $value 'intention_sha256')){throw '[mir4-a08-intention-invalid]'};$null=Assert-MIR4A08Plan -Plan $value.plan -Scope $Scope;if ([string]$value.remote.canonical_remote_url-cne[string]$value.plan.policy.canonical_remote_url-or[string]$value.remote.candidate_ref-cne[string]$value.plan.candidate.ref-or[string]$value.remote.main_ref-cne'refs/heads/main'-or[string]$value.remote.source_ref-cnotmatch'^refs/heads/'){throw '[mir4-a08-intention-invalid]'};return $value
 }
 function New-MIR4A08PromotionIntention {
   [CmdletBinding()]param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Plan,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$QualificationRecordPath,[Parameter(Mandatory)][string]$PackageRoot,[Parameter(Mandatory)][string]$RemoteName,[Parameter(Mandatory)][string]$RemoteSourceRef,[Parameter(Mandatory)][string]$StateRoot,[switch]$Rehearsal)
@@ -663,13 +888,23 @@ function Invoke-MIR4A08CreateOnlyCandidatePush {
   [CmdletBinding()]param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$IntentionPath,[Parameter(Mandatory)][string]$StateRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$intention=Read-MIR4A08Intention $IntentionPath;if (-not[bool]$intention.rehearsal){throw '[mir4-a08-external-effect-not-authorized]'};$candidate=Assert-MIR4A08CandidateAgainstPlan -RepoRoot $repo -Plan $intention.plan -CandidateRef ([string]$intention.candidate.ref) -CandidateCommit ([string]$intention.candidate.commit);if ((Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName ([string]$intention.remote.name) -Ref ([string]$intention.remote.main_ref))-cne[string]$intention.plan.main_before.commit){throw '[mir4-a08-remote-main-ref-drift]'};if ((Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName ([string]$intention.remote.name) -Ref ([string]$intention.remote.source_ref))-cne[string]$intention.plan.source.commit){throw '[mir4-a08-remote-source-ref-drift]'};$remoteCandidate=Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName ([string]$intention.remote.name) -Ref ([string]$intention.remote.candidate_ref);$created=$false;if ($null-eq$remoteCandidate){$output=@(&git -C $repo push --porcelain "--force-with-lease=$($intention.remote.candidate_ref):" ([string]$intention.remote.name) "$($intention.candidate.ref):$($intention.remote.candidate_ref)" 2>&1);if ($LASTEXITCODE-ne0){throw "[mir4-a08-create-only-push] $($output-join' ')"};$created=$true}elseif($remoteCandidate-cne[string]$candidate.commit){throw '[mir4-a08-remote-candidate-conflict]'};$remoteAfter=Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName ([string]$intention.remote.name) -Ref ([string]$intention.remote.candidate_ref);if ($remoteAfter-cne[string]$candidate.commit){throw '[mir4-a08-remote-candidate-readback]'};$receipt=[pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainCandidatePushReceiptV2';intention_sha256=[string]$intention.intention_sha256;candidate_ref=[string]$candidate.ref;candidate_commit=[string]$candidate.commit;remote_candidate_ref=[string]$intention.remote.candidate_ref;remote_candidate_commit=$remoteAfter;create_only_verified=$true;rehearsal=$true;main_mutation_performed=$false;tag_created=$false;publication_performed=$false};$path=Join-Path ([IO.Path]::GetFullPath($StateRoot))("$($intention.intention_sha256.ToLowerInvariant()).candidate-push-receipt.json");$null=Write-MIR4A08ImmutableJson -Path $path -Value $receipt -Code '[mir4-a08-candidate-push-receipt-conflict]';return [pscustomobject][ordered]@{path=$path;created=$created;candidate_commit=$candidate.commit;remote_candidate_commit=$remoteAfter;main_mutation_performed=$false;tag_created=$false;publication_authorized=$false}
 }
-function Get-MIR4A08PromotionMessage { param([Parameter(Mandatory)]$Intention) return "MIR 4.2 protected promotion`n`nMIR-Candidate-Commit: $($Intention.candidate.commit)`nMIR-Candidate-Tree: $($Intention.candidate.tree)`nMIR-Source-Commit: $($Intention.plan.source.commit)`nMIR-Source-Tree: $($Intention.plan.source.tree)`nMIR-Main-Base: $($Intention.plan.main_before.commit)`nMIR-Policy-SHA256: $($Intention.plan.policy.policy_sha256)`nMIR-Qualification-Binding-SHA256: $($Intention.qualification.record_binding_sha256)`nMIR-Qualification-Package-Set-SHA256: $($Intention.qualification.package_set_sha256)`nMIR-Promotion-Intention-SHA256: $($Intention.intention_sha256)" }
+function Get-MIR4A08PromotionMessage {
+  param([Parameter(Mandatory)]$Intention)
+  $scope=Get-MIR4A08PromotionScopeFromTargets -Targets @($Intention.plan.qualification.expected_targets) -Code '[mir4-a08-promotion-message]'
+  $sourceTrailer=if($scope-ceq'nine-target'){"MIR4-Frozen-Dev-Commit: $($Intention.plan.source.commit)"}else{"MIR-Source-Commit: $($Intention.plan.source.commit)"}
+  $prefix="MIR 4.2 protected promotion`n`nMIR-Candidate-Commit: $($Intention.candidate.commit)`nMIR-Candidate-Tree: $($Intention.candidate.tree)`n$sourceTrailer`nMIR-Source-Tree: $($Intention.plan.source.tree)`nMIR-Main-Base: $($Intention.plan.main_before.commit)`nMIR-Policy-SHA256: $($Intention.plan.policy.policy_sha256)"
+  if($scope-ceq'nine-target'){
+    return "$prefix`nMIR-Nine-Target-Transport-Binding-SHA256: $($Intention.qualification.binding_sha256)`nMIR-Nine-Target-Promotion-Plan-SHA256: $($Intention.qualification.promotion_plan_sha256)`nMIR-Promotion-Intention-SHA256: $($Intention.intention_sha256)"
+  }
+  return "$prefix`nMIR-Qualification-Binding-SHA256: $($Intention.qualification.record_binding_sha256)`nMIR-Qualification-Package-Set-SHA256: $($Intention.qualification.package_set_sha256)`nMIR-Promotion-Intention-SHA256: $($Intention.intention_sha256)"
+}
 function New-MIR4A08ProtectedPromotionRequest {
-  [CmdletBinding()]param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$IntentionPath,[Parameter(Mandatory)][string]$StateRoot,[Parameter(Mandatory)][scriptblock]$PolicyProvider)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$intention=Read-MIR4A08Intention $IntentionPath;$policy=Get-MIR4A08PolicyObservation -CanonicalRepository ([string]$intention.plan.policy.repository) -PolicyProvider $PolicyProvider -Rehearsal:$intention.rehearsal;if ([string]$policy.policy_sha256-cne[string]$intention.plan.policy.policy_sha256-or[string]$policy.canonical_remote_url-cne[string]$intention.remote.canonical_remote_url){throw '[mir4-a08-policy-drift-before-merge]'};if ((Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName ([string]$intention.remote.name) -Ref ([string]$intention.remote.candidate_ref))-cne[string]$intention.candidate.commit){throw '[mir4-a08-remote-candidate-readback]'};if ((Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName ([string]$intention.remote.name) -Ref ([string]$intention.remote.main_ref))-cne[string]$intention.plan.main_before.commit){throw '[mir4-a08-remote-main-ref-drift]'};$request=[pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainPromotionRequestV3';intention_sha256=[string]$intention.intention_sha256;pre_merge_policy_sha256=[string]$policy.policy_sha256;remote=[pscustomobject][ordered]@{canonical_remote_url=[string]$intention.remote.canonical_remote_url;candidate_ref=[string]$intention.remote.candidate_ref;candidate_commit=[string]$intention.candidate.commit;main_ref=[string]$intention.remote.main_ref;main_before=[string]$intention.plan.main_before.commit};protected_pull_request=[pscustomobject][ordered]@{required=$true;merge_method='squash';required_status_checks=@($intention.plan.promotion.required_status_checks);expected_commit_message=(Get-MIR4A08PromotionMessage $intention);external_execution_required=$true};main_mutation_performed=$false;tag_created=$false;publication_performed=$false;request_sha256=''};$request.request_sha256=Get-MIR4A08SelfSha256 $request 'request_sha256';$path=Join-Path ([IO.Path]::GetFullPath($StateRoot))("$($intention.intention_sha256.ToLowerInvariant()).protected-pr-request.json");$null=Write-MIR4A08ImmutableJson -Path $path -Value $request -Code '[mir4-a08-pr-request-conflict]';return [pscustomobject][ordered]@{path=$path;request_sha256=$request.request_sha256;candidate_commit=$intention.candidate.commit;protected_pr_required=$true;main_mutation_performed=$false;tag_created=$false;publication_authorized=$false}
+  [CmdletBinding()]param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$IntentionPath,[Parameter(Mandatory)][string]$StateRoot,[Parameter(Mandatory)][scriptblock]$PolicyProvider,[ValidateSet('two-target','nine-target')][string]$Scope='two-target')
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$intention=Read-MIR4A08Intention -Path $IntentionPath -Scope $Scope;$policy=Get-MIR4A08PolicyObservation -CanonicalRepository ([string]$intention.plan.policy.repository) -PolicyProvider $PolicyProvider -Rehearsal:$intention.rehearsal;if ([string]$policy.policy_sha256-cne[string]$intention.plan.policy.policy_sha256-or[string]$policy.canonical_remote_url-cne[string]$intention.remote.canonical_remote_url){throw '[mir4-a08-policy-drift-before-merge]'};if ((Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName ([string]$intention.remote.name) -Ref ([string]$intention.remote.candidate_ref))-cne[string]$intention.candidate.commit){throw '[mir4-a08-remote-candidate-readback]'};if ((Get-MIR4A08RemoteRef -RepoRoot $repo -RemoteName ([string]$intention.remote.name) -Ref ([string]$intention.remote.main_ref))-cne[string]$intention.plan.main_before.commit){throw '[mir4-a08-remote-main-ref-drift]'};$request=[pscustomobject][ordered]@{schema=1;kind='MIR42ProtectedMainPromotionRequestV3';intention_sha256=[string]$intention.intention_sha256;pre_merge_policy_sha256=[string]$policy.policy_sha256;remote=[pscustomobject][ordered]@{canonical_remote_url=[string]$intention.remote.canonical_remote_url;candidate_ref=[string]$intention.remote.candidate_ref;candidate_commit=[string]$intention.candidate.commit;main_ref=[string]$intention.remote.main_ref;main_before=[string]$intention.plan.main_before.commit};protected_pull_request=[pscustomobject][ordered]@{required=$true;merge_method='squash';required_status_checks=@($intention.plan.promotion.required_status_checks);expected_commit_message=(Get-MIR4A08PromotionMessage $intention);external_execution_required=$true};main_mutation_performed=$false;tag_created=$false;publication_performed=$false;request_sha256=''};$request.request_sha256=Get-MIR4A08SelfSha256 $request 'request_sha256';$path=Join-Path ([IO.Path]::GetFullPath($StateRoot))("$($intention.intention_sha256.ToLowerInvariant()).protected-pr-request.json");$null=Write-MIR4A08ImmutableJson -Path $path -Value $request -Code '[mir4-a08-pr-request-conflict]';return [pscustomobject][ordered]@{path=$path;request_sha256=$request.request_sha256;candidate_commit=$intention.candidate.commit;protected_pr_required=$true;main_mutation_performed=$false;tag_created=$false;publication_authorized=$false}
 }
 function Read-MIR4A08PromotionRequest {
-  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Intention)
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Intention,[ValidateSet('two-target','nine-target')][string]$Scope='two-target')
+  $null=Assert-MIR4A08Plan -Plan $Intention.plan -Scope $Scope
   try{$request=Get-Content -Raw -LiteralPath $Path|ConvertFrom-Json -Depth 100 -DateKind String}catch{throw '[mir4-a08-pr-request-invalid]'};Assert-MIR4A08PropertyNames $request @('schema','kind','intention_sha256','pre_merge_policy_sha256','remote','protected_pull_request','main_mutation_performed','tag_created','publication_performed','request_sha256') '[mir4-a08-pr-request-invalid]';Assert-MIR4A08PropertyNames $request.remote @('canonical_remote_url','candidate_ref','candidate_commit','main_ref','main_before') '[mir4-a08-pr-request-invalid]';Assert-MIR4A08PropertyNames $request.protected_pull_request @('required','merge_method','required_status_checks','expected_commit_message','external_execution_required') '[mir4-a08-pr-request-invalid]';if ([int]$request.schema-ne1-or[string]$request.kind-cne'MIR42ProtectedMainPromotionRequestV3'-or[string]$request.intention_sha256-cne[string]$Intention.intention_sha256-or[string]$request.request_sha256-cne(Get-MIR4A08SelfSha256 $request 'request_sha256')-or[string]$request.pre_merge_policy_sha256-cne[string]$Intention.plan.policy.policy_sha256-or[string]$request.remote.canonical_remote_url-cne[string]$Intention.remote.canonical_remote_url-or[string]$request.remote.candidate_ref-cne[string]$Intention.remote.candidate_ref-or[string]$request.remote.candidate_commit-cne[string]$Intention.candidate.commit-or[string]$request.remote.main_ref-cne[string]$Intention.remote.main_ref-or[string]$request.remote.main_before-cne[string]$Intention.plan.main_before.commit-or[string]$request.protected_pull_request.merge_method-cne'squash'-or[string]$request.protected_pull_request.expected_commit_message-cne(Get-MIR4A08PromotionMessage $Intention)){throw '[mir4-a08-pr-request-invalid]'};Assert-MIR4A08Boolean $request.protected_pull_request.required $true '[mir4-a08-pr-request-invalid]';Assert-MIR4A08Boolean $request.protected_pull_request.external_execution_required $true '[mir4-a08-pr-request-invalid]';Assert-MIR4A08Boolean $request.main_mutation_performed $false '[mir4-a08-pr-request-invalid]';Assert-MIR4A08Boolean $request.tag_created $false '[mir4-a08-pr-request-invalid]';Assert-MIR4A08Boolean $request.publication_performed $false '[mir4-a08-pr-request-invalid]';if ((@($request.protected_pull_request.required_status_checks|Sort-Object -Unique)-join'|')-cne'branch-policy|verification-gate'){throw '[mir4-a08-pr-request-invalid]'};return $request
 }
 function Get-MIR4A08PullRequestObservation {

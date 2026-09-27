@@ -10,14 +10,55 @@ if (-not (Get-Command Get-MIR4CanonicalPackageAuthority -ErrorAction SilentlyCon
 if (-not (Get-Command Get-MIR4FixedFactorioEngineLock -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir42QualificationRoot 'tools/lib/validation/FactorioVersionPolicy.ps1')
 }
+if (-not (Get-Command Get-MIR42ReleaseTargetIdentity -ErrorAction SilentlyContinue)) {
+  . (Join-Path $mir42QualificationRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
+}
 
 $script:MIR42QualificationTargets = @('f210', 'f200', 'f110', 'f100')
-$script:MIR42QualificationLines = [ordered]@{ f210 = '2.1'; f200 = '2.0'; f110 = '1.1'; f100 = '1.0' }
+$script:MIR42QualificationHistoricalTargets = @('f017', 'f016', 'f015', 'f014', 'f013')
+$script:MIR42QualificationNineTargets = @($script:MIR42QualificationTargets + $script:MIR42QualificationHistoricalTargets)
+$script:MIR42QualificationLines = [ordered]@{ f210 = '2.1'; f200 = '2.0'; f110 = '1.1'; f100 = '1.0'; f017 = '0.17'; f016 = '0.16'; f015 = '0.15'; f014 = '0.14'; f013 = '0.13' }
 $script:MIR42QualificationAssertions = @(
   'exact-candidate-normal-mod-directory-load',
   'upgraded-save-reload-passed',
   'upgraded-save-second-reload-passed'
 )
+$script:MIR42QualificationHistoricalAssertions = @(
+  'historical-terminal-source-state-retained',
+  'historical-terminal-researched-level-retained',
+  'historical-terminal-current-research-retained',
+  'historical-terminal-fractional-progress-retained',
+  'historical-terminal-infinite-bonus-retained-where-supported',
+  'historical-terminal-global-state-retained'
+)
+
+function Get-MIR42QualificationTargetScope {
+  param([Parameter(Mandatory)]$Rows,[Parameter(Mandatory)][string]$Code)
+  $actual = @($Rows | ForEach-Object { [string]$_.target })
+  if (($actual -join '|') -ceq ($script:MIR42QualificationTargets -join '|')) { return 'four-target' }
+  if (($actual -join '|') -ceq ($script:MIR42QualificationNineTargets -join '|')) { return 'nine-target' }
+  throw "[$Code-target-set]"
+}
+
+function Get-MIR42QualificationScopeContract {
+  param([Parameter(Mandatory)][ValidateSet('four-target','nine-target')][string]$Scope)
+  if ($Scope -ceq 'four-target') {
+    return [pscustomobject][ordered]@{
+      targets = @($script:MIR42QualificationTargets)
+      candidate_status = 'private-deterministic-four-target-candidate-built-unqualified'
+      kind = 'MIR42FourTargetEvidenceReconciliationV1'
+      status = 'MIR-4.2-FOUR-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'
+      target_requirement = 'all_four_targets_required'
+    }
+  }
+  return [pscustomobject][ordered]@{
+    targets = @($script:MIR42QualificationNineTargets)
+    candidate_status = 'private-deterministic-nine-target-candidate-built-unqualified'
+    kind = 'MIR42NineTargetEvidenceReconciliationV1'
+    status = 'MIR-4.2-NINE-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'
+    target_requirement = 'all_nine_targets_required'
+  }
+}
 
 function Assert-MIR42QualificationOutputRoot {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$OutputRoot)
@@ -79,6 +120,45 @@ function Resolve-MIR42QualificationChildPath {
   catch { throw "[$Code-path]" }
 }
 
+function Get-MIR42QualificationHistoricalAuthority {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target)
+  $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target
+  if ($identity.PSObject.Properties.Name -notcontains 'target_record_path' -or
+      [IO.Path]::IsPathRooted([string]$identity.target_record_path) -or [string]$identity.target_record_path -match '(^|[\\/])[.][.]([\\/]|$)') {
+    throw "[mir42-qualification-historical-target-record-path] $Target"
+  }
+  $recordPath = Join-Path $RepoRoot ([string]$identity.target_record_path)
+  $record = Read-MIR42QualificationBootstrapRecord -Path $recordPath -Code "mir42-qualification-historical-target-record-$Target"
+  if ((Get-MIR4Sha256File -Path $recordPath) -cne [string]$identity.target_record_file_sha256 -or
+      [string]$record.record_sha256 -cne [string]$identity.target_record_record_sha256 -or
+      [int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42HistoricalPlaytestTargetV1' -or
+      [string]$record.target -cne $Target -or [string]$record.maturity -cne 'private-historical-playtest' -or
+      [string]$record.base_materializer_target -cne 'f100' -or [string]$record.factorio_line -cne [string]$script:MIR42QualificationLines[$Target] -or
+      [string]$record.distribution_version -cne [string]$identity.distribution_version -or
+      [bool]$record.public_output_authorized -or [bool]$record.publication_authorized) {
+    throw "[mir42-qualification-historical-target-record-state] $Target"
+  }
+  $sealRelative = '.mir/releases/terminal/seals/' + [string]$record.predecessor.version + '.json'
+  $sealPath = Join-Path $RepoRoot $sealRelative
+  $seal = Read-MIR42QualificationBootstrapRecord -Path $sealPath -Code "mir42-qualification-historical-terminal-seal-$Target"
+  if ([int]$seal.schema -ne 1 -or [string]$seal.kind -cne 'Mir3TerminalTargetSealV1' -or [string]$seal.status -cne 'sealed' -or
+      [string]$seal.release -cne [string]$record.predecessor.version -or [string]$seal.target -cne [string]$record.factorio_line -or
+      [string]$seal.archive_sha256 -cne [string]$record.predecessor.sha256 -or [string]$seal.engine.version -cne [string]$record.engine.version -or
+      [string]$seal.engine.binary_sha256 -cne [string]$record.engine.sha256) {
+    throw "[mir42-qualification-historical-terminal-seal-binding] $Target"
+  }
+  if ([IO.Path]::IsPathRooted([string]$record.predecessor.archive) -or [string]$record.predecessor.archive -match '(^|[\\/])[.][.]([\\/]|$)') {
+    throw "[mir42-qualification-historical-predecessor-path] $Target"
+  }
+  $predecessorPath = Join-Path $RepoRoot ([string]$record.predecessor.archive)
+  $inventory = Get-MIR4ArchiveInventory -Path $predecessorPath
+  if ([string]$inventory.archive_sha256 -cne [string]$seal.archive_sha256 -or [int64]$inventory.bytes -ne [int64]$seal.bytes -or
+      [string]$inventory.content_sha256 -cne [string]$seal.content_sha256 -or [int]$inventory.entry_count -ne [int]$seal.entries) {
+    throw "[mir42-qualification-historical-predecessor-binding] $Target"
+  }
+  return [pscustomobject][ordered]@{identity=$identity;record=$record;record_path=$recordPath;seal=$seal;seal_path=$sealPath;predecessor_path=$predecessorPath;inventory=$inventory}
+}
+
 function Get-MIR42QualificationCandidateRows {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -92,8 +172,11 @@ function Get-MIR42QualificationCandidateRows {
   if (-not (Get-Content -Raw -LiteralPath $manifestPath | Test-Json -SchemaFile $schema)) {
     throw '[mir42-qualification-candidate-manifest-schema]'
   }
+  $targets = @($manifest.targets)
+  $scope = Get-MIR42QualificationTargetScope -Rows $targets -Code 'mir42-qualification-candidate'
+  $contract = Get-MIR42QualificationScopeContract -Scope $scope
   if ([string]$manifest.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
-      [string]$manifest.status -cne 'private-deterministic-four-target-candidate-built-unqualified' -or
+      [string]$manifest.status -cne [string]$contract.candidate_status -or
       -not [bool]$manifest.build_complete) {
     throw '[mir42-qualification-candidate-manifest-status]'
   }
@@ -109,13 +192,13 @@ function Get-MIR42QualificationCandidateRows {
   if ([string]$manifest.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot)) {
     throw '[mir42-qualification-candidate-source-drift]'
   }
-  $targets = @($manifest.targets)
-  if ($targets.Count -ne 4 -or (@($targets.target) -join '|') -cne ($script:MIR42QualificationTargets -join '|')) {
+  $targetAuthorities = @($manifest.target_authority)
+  if ((Get-MIR42QualificationTargetScope -Rows $targetAuthorities -Code 'mir42-qualification-candidate-authority') -cne $scope) {
     throw '[mir42-qualification-candidate-target-set]'
   }
 
   $rows = [Collections.Generic.List[object]]::new()
-  foreach ($target in $script:MIR42QualificationTargets) {
+  foreach ($target in @($contract.targets)) {
     $summary = @($targets | Where-Object { [string]$_.target -ceq $target })
     if ($summary.Count -ne 1) { throw "[mir42-qualification-candidate-target] $target" }
     $rowPath = Resolve-MIR42QualificationChildPath -Root $root -RelativePath ([string]$summary[0].target_row_path) -Code "mir42-qualification-target-row-$target"
@@ -131,9 +214,12 @@ function Get-MIR42QualificationCandidateRows {
       throw "[mir42-qualification-target-row-binding] $target"
     }
 
-    $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.0'
+    $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $target
+    $targetAuthority = @($targetAuthorities | Where-Object { [string]$_.target -ceq $target })
     if ([string]$row.distribution_version -cne [string]$identity.distribution_version -or
-        [string]$summary[0].distribution_version -cne [string]$identity.distribution_version) {
+        [string]$summary[0].distribution_version -cne [string]$identity.distribution_version -or
+        $targetAuthority.Count -ne 1 -or [string]$targetAuthority[0].target_id -cne [string]$identity.target_id -or
+        [string]$targetAuthority[0].distribution_version -cne [string]$identity.distribution_version) {
       throw "[mir42-qualification-target-version] $target"
     }
     $assetPath = Resolve-MIR42QualificationChildPath -Root $root -RelativePath ([string]$row.asset.path) -Code "mir42-qualification-candidate-asset-$target"
@@ -159,8 +245,24 @@ function Get-MIR42QualificationCandidateRows {
         [string]$info.factorio_version -cne [string]$script:MIR42QualificationLines[$target]) {
       throw "[mir42-qualification-candidate-metadata] $target"
     }
+    $historical = $null
+    if ($target -in $script:MIR42QualificationHistoricalTargets) {
+      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $target
+      foreach ($field in @('materializer','base_materializer_target','target_record','factorio_line','engine','predecessor','public_output_authorized','publication_authorized')) {
+        if ($row.PSObject.Properties.Name -notcontains $field) { throw "[mir42-qualification-historical-target-row-field] $target/$field" }
+      }
+      if ([string]$row.materializer -cne 'historical-playtest-target' -or [string]$row.base_materializer_target -cne 'f100' -or
+          [string]$row.target_record.path -cne [string]$historical.identity.target_record_path -or [string]$row.target_record.sha256 -cne [string]$historical.record.record_sha256 -or
+          [string]$row.factorio_line -cne [string]$historical.record.factorio_line -or [string]$row.engine.version -cne [string]$historical.record.engine.version -or
+          [string]$row.engine.sha256 -cne [string]$historical.record.engine.sha256 -or [string]$row.predecessor.version -cne [string]$historical.record.predecessor.version -or
+          [string]$row.predecessor.archive -cne [string]$historical.record.predecessor.archive -or [string]$row.predecessor.sha256 -cne [string]$historical.record.predecessor.sha256 -or
+          [bool]$row.public_output_authorized -or [bool]$row.publication_authorized) {
+        throw "[mir42-qualification-historical-target-row-binding] $target"
+      }
+    }
     $rows.Add([pscustomobject][ordered]@{
       target = $target
+      scope = $scope
       identity = $identity
       source = $row.source
       package_source_sha256 = [string]$manifest.package_source_sha256
@@ -181,6 +283,7 @@ function Get-MIR42QualificationCandidateRows {
         content_sha256 = [string]$inventory.content_sha256
         entry_count = [int]$inventory.entry_count
       }
+      historical = $historical
     })
   }
   return @($rows)
@@ -223,7 +326,25 @@ function Get-MIR42QualificationEnvironment {
 
   $receiptVersion = [string]$Receipt.factorio_binary_version
   $receiptSha = [string]$Receipt.factorio_binary_sha256
-  if ($receiptVersion -notmatch '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' -or $receiptSha -notmatch '^[A-F0-9]{64}$') {
+  if ($receiptSha -notmatch '^[A-F0-9]{64}$') {
+    throw "[mir42-qualification-environment-identity] $Target"
+  }
+  if ($Target -in $script:MIR42QualificationHistoricalTargets) {
+    $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $Target
+    if ([string]$receiptVersion -cne [string]$historical.record.engine.version -or [string]$receiptSha -cne [string]$historical.record.engine.sha256) {
+      throw "[mir42-qualification-environment-historical] $Target"
+    }
+    return [pscustomobject][ordered]@{
+      factorio_line = [string]$historical.record.factorio_line
+      version = $receiptVersion
+      binary_sha256 = $receiptSha
+      policy = [pscustomobject][ordered]@{
+        target_record = [pscustomobject][ordered]@{path=[string]$historical.identity.target_record_path;sha256=[string]$historical.record.record_sha256}
+        terminal_seal = [pscustomobject][ordered]@{path=('.mir/releases/terminal/seals/' + [string]$historical.record.predecessor.version + '.json');sha256=[string]$historical.seal.record_sha256}
+      }
+    }
+  }
+  if ($receiptVersion -notmatch '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$') {
     throw "[mir42-qualification-environment-identity] $Target"
   }
   if ($Target -ceq 'f210') {
@@ -281,7 +402,9 @@ function Get-MIR42QualificationUpgradeReceipt {
     throw "[mir42-qualification-upgrade-receipt-binding] $Target"
   }
   $assertions = @($receipt.assertions | ForEach-Object { [string]$_ })
-  foreach ($required in $script:MIR42QualificationAssertions) {
+  $requiredAssertions = @($script:MIR42QualificationAssertions)
+  if ($Target -in $script:MIR42QualificationHistoricalTargets) { $requiredAssertions += @($script:MIR42QualificationHistoricalAssertions) }
+  foreach ($required in $requiredAssertions) {
     if ($required -notin $assertions) { throw "[mir42-qualification-upgrade-assertion] $Target/$required" }
   }
   $receiptRoot = Split-Path -Parent $receiptPath
@@ -316,49 +439,48 @@ function Get-MIR42QualificationUpgradeReceipt {
   }
 }
 
-function Invoke-MIR42FourTargetEvidenceReconciliation {
+function Invoke-MIR42EvidenceReconciliationShared {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$CandidateManifestPath,
-    [Parameter(Mandatory)][string]$F210PredecessorZip,
-    [Parameter(Mandatory)][string]$F200PredecessorZip,
-    [Parameter(Mandatory)][string]$F110PredecessorZip,
-    [Parameter(Mandatory)][string]$F100PredecessorZip,
-    [Parameter(Mandatory)][string]$F210UpgradeReceipt,
-    [Parameter(Mandatory)][string]$F200UpgradeReceipt,
-    [Parameter(Mandatory)][string]$F110UpgradeReceipt,
-    [Parameter(Mandatory)][string]$F100UpgradeReceipt,
-    [Parameter(Mandatory)][string]$OutputRoot
+    [Parameter(Mandatory)][hashtable]$PredecessorZips,
+    [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
+    [Parameter(Mandatory)][string]$OutputRoot,
+    [ValidateSet('four-target','nine-target')][string]$RequiredScope
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $output = Assert-MIR42QualificationOutputRoot -RepoRoot $repo -OutputRoot $OutputRoot
   $currentSource = Get-MIR42QualificationCurrentSource -RepoRoot $repo
   $candidates = Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$currentSource.commit -cne [string]$candidates[0].source.commit -or
       [string]$currentSource.tree -cne [string]$candidates[0].source.tree) {
     throw '[mir42-reconciliation-current-source-mismatch]'
   }
-  $predecessors = [ordered]@{
-    f210 = $F210PredecessorZip
-    f200 = $F200PredecessorZip
-    f110 = $F110PredecessorZip
-    f100 = $F100PredecessorZip
+  $scope = [string]$candidates[0].scope
+  if ($RequiredScope -and $scope -cne $RequiredScope) {
+    throw '[mir42-reconciliation-entrypoint-target-scope]'
   }
-  $receipts = [ordered]@{
-    f210 = $F210UpgradeReceipt
-    f200 = $F200UpgradeReceipt
-    f110 = $F110UpgradeReceipt
-    f100 = $F100UpgradeReceipt
+  $contract = Get-MIR42QualificationScopeContract -Scope $scope
+  if ($PredecessorZips.Count -ne $contract.targets.Count -or $UpgradeReceipts.Count -ne $contract.targets.Count -or
+      @($PredecessorZips.Keys | Where-Object { $_ -cnotin $contract.targets }).Count -ne 0 -or
+      @($UpgradeReceipts.Keys | Where-Object { $_ -cnotin $contract.targets }).Count -ne 0) {
+    throw '[mir42-reconciliation-input-target-set]'
   }
+  $output = Assert-MIR42QualificationOutputRoot -RepoRoot $repo -OutputRoot $OutputRoot
 
   $rows = [Collections.Generic.List[object]]::new()
   foreach ($candidate in $candidates) {
     $target = [string]$candidate.target
-    $upgrade = Get-MIR42QualificationUpgradeReceipt -RepoRoot $repo -Target $target -Path ([string]$receipts[$target]) -Candidate $candidate
-    $predecessor = Get-MIR42QualificationPredecessor -Target $target -Path ([string]$predecessors[$target]) -Receipt $upgrade.receipt_object
-    $rows.Add([pscustomobject][ordered]@{
+    $upgrade = Get-MIR42QualificationUpgradeReceipt -RepoRoot $repo -Target $target -Path ([string]$UpgradeReceipts[$target]) -Candidate $candidate
+    if ($target -in $script:MIR42QualificationHistoricalTargets) {
+      $providedPredecessor = (Resolve-Path -LiteralPath ([string]$PredecessorZips[$target])).Path
+      if (-not $providedPredecessor.Equals([string]$candidate.historical.predecessor_path,[StringComparison]::OrdinalIgnoreCase)) {
+        throw "[mir42-reconciliation-historical-predecessor-path] $target"
+      }
+    }
+    $predecessor = Get-MIR42QualificationPredecessor -Target $target -Path ([string]$PredecessorZips[$target]) -Receipt $upgrade.receipt_object
+    $reconciledRow = [ordered]@{
       target = $target
       target_id = [string]$candidate.identity.target_id
       distribution_version = [string]$candidate.identity.distribution_version
@@ -382,14 +504,25 @@ function Invoke-MIR42FourTargetEvidenceReconciliation {
       independent_verification = 'not-performed'
       technical_seal = 'not-performed'
       publication_authorized = $false
-    })
+    }
+    if ($target -in $script:MIR42QualificationHistoricalTargets) {
+      $reconciledRow.historical = [ordered]@{
+        target_record = [ordered]@{path=[string]$candidate.historical.identity.target_record_path;sha256=[string]$candidate.historical.record.record_sha256}
+        terminal_seal = [ordered]@{path=('.mir/releases/terminal/seals/' + [string]$candidate.historical.record.predecessor.version + '.json');sha256=[string]$candidate.historical.seal.record_sha256}
+        engine = [ordered]@{path=[string]$candidate.historical.record.engine.path;version=[string]$candidate.historical.record.engine.version;sha256=[string]$candidate.historical.record.engine.sha256}
+        predecessor = [ordered]@{path=[string]$candidate.historical.record.predecessor.archive;version=[string]$candidate.historical.record.predecessor.version;sha256=[string]$candidate.historical.record.predecessor.sha256;bytes=[int64]$candidate.historical.seal.bytes;content_sha256=[string]$candidate.historical.seal.content_sha256;entry_count=[int]$candidate.historical.seal.entries}
+        public_output_authorized = $false
+        publication_authorized = $false
+      }
+    }
+    $rows.Add([pscustomobject]$reconciledRow)
   }
 
   $result = [pscustomobject][ordered]@{
     schema = 1
-    kind = 'MIR42FourTargetEvidenceReconciliationV1'
-    status = 'MIR-4.2-FOUR-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'
-    reconciliation_scope = 'The four supplied upgrade receipts and logs match the exact candidate ZIP bytes and supplied predecessor archives; this command does not execute Factorio or establish governed predecessor custody.'
+    kind = [string]$contract.kind
+    status = [string]$contract.status
+    reconciliation_scope = if ($scope -ceq 'four-target') { 'The four supplied upgrade receipts and logs match the exact candidate ZIP bytes and supplied predecessor archives; this command does not execute Factorio or establish governed predecessor custody.' } else { 'The nine supplied upgrade receipts and logs match the exact candidate ZIP bytes, modern predecessor archives, and historical terminal-seal predecessor chains; this command does not execute Factorio or establish release qualification.' }
     source = [pscustomobject][ordered]@{
       commit = [string]$candidates[0].source.commit
       tree = [string]$candidates[0].source.tree
@@ -397,7 +530,6 @@ function Invoke-MIR42FourTargetEvidenceReconciliation {
     }
     candidate_manifest = $candidates[0].candidate_manifest
     targets = @($rows)
-    all_four_targets_required = $true
     cross_target_substitution = $false
     factorio_processes = 0
     release_qualification = 'not-performed'
@@ -415,7 +547,46 @@ function Invoke-MIR42FourTargetEvidenceReconciliation {
     )
     record_sha256 = ''
   }
+  $result | Add-Member -NotePropertyName ([string]$contract.target_requirement) -NotePropertyValue $true
   $path = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath 'evidence-reconciliation.json'
   Write-MIR4BootstrapRecord -Record $result -Path $path | Out-Null
   return $result
+}
+
+function Invoke-MIR42FourTargetEvidenceReconciliation {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$CandidateManifestPath,
+    [Parameter(Mandatory)][string]$F210PredecessorZip,
+    [Parameter(Mandatory)][string]$F200PredecessorZip,
+    [Parameter(Mandatory)][string]$F110PredecessorZip,
+    [Parameter(Mandatory)][string]$F100PredecessorZip,
+    [Parameter(Mandatory)][string]$F210UpgradeReceipt,
+    [Parameter(Mandatory)][string]$F200UpgradeReceipt,
+    [Parameter(Mandatory)][string]$F110UpgradeReceipt,
+    [Parameter(Mandatory)][string]$F100UpgradeReceipt,
+    [Parameter(Mandatory)][string]$OutputRoot
+  )
+  return Invoke-MIR42EvidenceReconciliationShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -PredecessorZips @{
+    f210=$F210PredecessorZip;f200=$F200PredecessorZip;f110=$F110PredecessorZip;f100=$F100PredecessorZip
+  } -UpgradeReceipts @{
+    f210=$F210UpgradeReceipt;f200=$F200UpgradeReceipt;f110=$F110UpgradeReceipt;f100=$F100UpgradeReceipt
+  } -OutputRoot $OutputRoot
+}
+
+function Invoke-MIR42NineTargetEvidenceReconciliation {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$CandidateManifestPath,
+    [Parameter(Mandatory)][hashtable]$PredecessorZips,
+    [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
+    [Parameter(Mandatory)][string]$OutputRoot
+  )
+  $manifest = Read-MIR42QualificationBootstrapRecord -Path $CandidateManifestPath -Code 'mir42-reconciliation-entrypoint-candidate'
+  if ((Get-MIR42QualificationTargetScope -Rows @($manifest.targets) -Code 'mir42-reconciliation-entrypoint') -cne 'nine-target') {
+    throw '[mir42-reconciliation-entrypoint-target-scope]'
+  }
+  return Invoke-MIR42EvidenceReconciliationShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -RequiredScope 'nine-target'
 }

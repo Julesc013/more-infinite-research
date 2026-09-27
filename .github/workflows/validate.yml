@@ -347,3 +347,50 @@ jobs:
             build/results/assurance/evidence-bundle.json
             build/results/assurance/workflow-status.json
           if-no-files-found: warn
+
+  # Development authoring has a separate static evaluator.  It is deliberately
+  # not named verification-gate: a reduced hosted check cannot satisfy the
+  # release-ready status required on main or release branches.
+  development-static:
+    name: MIR / development-static-gate
+    if: >-
+      ${{ (github.event_name == 'push' && github.ref == 'refs/heads/dev') ||
+        (github.event_name == 'pull_request' && github.base_ref == 'dev') }}
+    runs-on: windows-latest
+    concurrency:
+      # Keep only truly identical event/base/merged-content requests together.
+      # A different pull-request merge tree is distinct evidence and must run.
+      group: mir-development-static-${{ github.event_name }}-${{ github.event.pull_request.base.sha || github.event.before }}-${{ github.sha }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - id: selection
+        name: Select and run affected development static checks
+        shell: pwsh
+        run: |
+          $baseline = if ('${{ github.event_name }}' -eq 'pull_request') {
+            '${{ github.event.pull_request.base.sha }}'
+          } else {
+            '${{ github.event.before }}'
+          }
+          if ($baseline -match '^0{40}$') { $baseline = '' }
+          . ./tools/mir/application/assurance/DevelopmentValidation.ps1
+          $result = Invoke-MIR4DevelopmentStaticChecks `
+            -RepoRoot $PWD `
+            -Mode hosted-development-affected `
+            -EventName '${{ github.event_name }}' `
+            -Baseline $baseline `
+            -ExpectedHead '${{ github.sha }}' `
+            -OutputPath build/results/assurance/development-ci-selection.json
+          if ($result.release_qualification -or $result.release_readiness_gate -or $result.reuse_allowed) {
+            throw 'Hosted development static selection must not claim release qualification, release readiness, or evidence reuse.'
+          }
+          "selection_identity=$($result.selection_identity)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: mir-development-static-selection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/results/assurance/development-ci-selection.json
+          if-no-files-found: error
