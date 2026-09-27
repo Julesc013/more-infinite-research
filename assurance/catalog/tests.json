@@ -4266,6 +4266,7 @@
         "spec/programmes/community-requests.json",
         "spec/programmes/evidence/community-2026-09-06/**",
         "source:source/prototypes/mir/runtime/research_browser*.lua",
+        "source:source/prototypes/mir/runtime/maximum_level_control.lua",
         "source:source/prototypes/streams/productivity.lua"
       ],
       "captured_artifacts": [],
@@ -7759,5 +7760,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f99dfb82b64c64e91cb2f06e9ebca398f27a0fd5fc929f853035ec459d91525d"
+  "digest": "sha256:a0486e2dfe623559999d4c6d3f326c45103c1aadeaec7a56db38896926496491"
 }
