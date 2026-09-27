@@ -3353,6 +3353,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1",
+      "classification": "canonical-internal",
+      "sha256": "3C9D435EA1A592570AFB2A609705D54747D76FF127FCE05FBE43E10D1A9E21E2",
+      "hash_mode": "canonical-text-v1",
+      "lines": 66,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/workspace/Invoke-MIRLayoutCheck.ps1",
       "classification": "canonical-internal",
       "sha256": "EE2F6922B265FED4A0DAEF2E25042B77373B583CB0102B4EF340DE42C002708E",
@@ -3382,6 +3390,14 @@
       "sha256": "2F70D5FE064B20EA82180FD36D5D5B0FFB2F8D7D591CBEB5838061E5EB90DDAE",
       "hash_mode": "canonical-text-v1",
       "lines": 24,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+      "classification": "canonical-internal",
+      "sha256": "E8241EBF5EFF87D3E9F649C68FDC2464DB88293BB0673B4ACBE4BE993FCB7C7E",
+      "hash_mode": "canonical-text-v1",
+      "lines": 205,
       "package_visible": false
     },
     {
@@ -5955,7 +5971,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 410,
+    "canonical_internal": 412,
     "compatibility_wrapper": 168,
     "migration_only": 59,
     "historical": 18,
@@ -5970,5 +5986,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7c9e8dff186c5c886deb2581d0d1d7951db9110aab886ab46bb7bb33d0cc6c84"
+  "digest": "sha256:eecb6a08081415128b10f67f6108262152121129a867afb4e89116ccd69dedd7"
 }

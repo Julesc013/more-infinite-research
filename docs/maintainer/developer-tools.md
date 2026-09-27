@@ -55,6 +55,33 @@ Common overrides:
 
 `storage audit` reports protected, recent, and cleanup-eligible artifact roots without deleting anything. `storage clean` is also a preview unless `--apply` is explicit. See [local artifact retention and storage](artifact-retention.md) for the protected storage classes, seven-day default, immediate post-run cleanup, hardlink accounting, and deletion safeguards.
 
+## MIR Development
+
+MIR Development combines ordinary Git/GitHub access with workspace health and checkpoint checks. On the current native Windows Codex client, use Full access as the execution policy; a custom permission profile cannot inherit it. The local configuration layer is selected with `codex --profile mir-development`. Its presentation name is MIR Development; the native approval dropdown continues to label the execution policy Full access. Keep operating permissions separate from housekeeping so commits, pushes, PRs and corrective cleanup remain available. See the official [permissions](https://learn.chatgpt.com/docs/permissions) and [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference).
+
+The user-local `~/.codex/mir-development.config.toml` layer contains:
+
+```toml
+# MIR Development
+approval_policy = "never"
+default_permissions = ":danger-full-access"
+
+[features]
+hooks = true
+network_proxy = false
+```
+
+The repository's `.codex/hooks.json` runs bounded health checks at session start and Stop. Enable hooks in a trusted checkout, then review and trust the exact definition through `/hooks`; changing that definition requires renewed trust. A first actionable Stop requests one checkpoint turn for uncommitted work, unpushed commits or observed disk pressure. A repeated Stop passes through. The hooks do not intercept Git/GitHub commands, delete files, remove worktrees or change branches. See the official [hook trust and Stop contract](https://learn.chatgpt.com/docs/hooks).
+
+Run a fuller local observation before a batch that creates packages, engine stages or worktrees:
+
+```powershell
+.\tools\commands\workspace\Test-MIRDevelopmentHealth.ps1 -AsJson
+.\tools\mir.ps1 storage audit --all-worktrees --older-than-days 7
+```
+
+Default observations flag build output above 16 GiB, distribution output above 4 GiB, or free space below 20 GiB. Hooks sample at most 512 entries per output root; incomplete totals are lower bounds, never proof that the complete directory is within budget. Older linked worktrees and branches are review items. Preserve dirty worktrees, unique commits, current evidence and delivered packages; complete accepted work through focused commits, required checks, PR merge into `dev`, remote readback and removal of clean disposable branches/worktrees. After reviewing an eligible storage audit, use `storage clean --all-worktrees --older-than-days 7 --apply` for the existing guarded cleanup implementation. These checks enforce a checkpoint workflow rather than an operating-system disk quota.
+
 `release docs-only` and `release docs-refresh` are aliases for the fast post-gate documentation path. Use them only after the current release candidate has already passed the full release gate and the remaining edits are docs, release notes, changelog text, or the release archive. The command rebuilds the package, runs static/package validation, checks whitespace, and rejects non-doc/package changes so code, prototype, script, fixture, or locale edits still require the full release gate.
 
 `report observations` summarizes `compat-observations.csv` rows produced by the audit converter. Use it to see diagnostics-only planner rows and recipe-cap warnings without treating them as failures or profile candidates.

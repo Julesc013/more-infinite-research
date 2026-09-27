@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 213,
+  "test_count": 214,
   "tests": [
     {
       "id": "docs.check",
@@ -1656,6 +1656,37 @@
         ".mir/modules.yml",
         "validation/tests.yml",
         "governance/automation/mir4-command-inventory-v1.json"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.mir-development-health",
+      "proposition": "The governed test 'static.mir-development-health' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRDevelopmentHealth.ps1",
+      "canonical_implementation": "tests/tooling/Test-MIRDevelopmentHealth.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        ".codex/hooks.json",
+        ".codex/config.toml",
+        "tests/tooling/Test-MIRDevelopmentHealth.ps1",
+        "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+        "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1",
+        "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
+        "tools/mir.ps1",
+        ".mir/assurance.json",
+        ".mir/control/paths.yml",
+        ".mir/modules.yml",
+        "validation/tests.yml",
+        "assurance/catalog/tests.json"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7706,12 +7737,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 69,
-      "tooling-release": 63,
+      "tooling-release": 64,
       "runtime-upgrade": 49,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 201,
+    "canonical_test_commands": 202,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7724,5 +7755,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1c15e0b867eb611c8865837298f9113196b3cd1fa70186c7a4ca9ba9943296f3"
+  "digest": "sha256:dc7945e4cbd56cb5c4d860f62e6513b2185abaab22b5b6068fbb496212c7709f"
 }

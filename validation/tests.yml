@@ -34,6 +34,27 @@
       ]
     },
     {
+      "id": "static.mir-development-health",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRDevelopmentHealth.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".codex/hooks.json",
+        ".codex/config.toml",
+        "tests/tooling/Test-MIRDevelopmentHealth.ps1",
+        "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+        "tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1",
+        "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
+        "tools/mir.ps1",
+        ".mir/assurance.json",
+        ".mir/control/paths.yml",
+        ".mir/modules.yml",
+        "validation/tests.yml",
+        "assurance/catalog/tests.json"
+      ]
+    },
+    {
       "id": "static.mir42-nine-target-release-assets",
       "kind": "static",
       "layer": "F0",
