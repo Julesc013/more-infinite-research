@@ -4731,9 +4731,9 @@
     {
       "path": "tools/mir/application/assurance/DevelopmentValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "FD632E47DB09633B0ABD2AF809EE8383E122E4E378B8F0D66E42C2D1700A77C8",
+      "sha256": "06596B0FDCAC6FB1B286420BE7EC66099DF562A8A5D8424BF228A1318111E83D",
       "hash_mode": "canonical-text-v1",
-      "lines": 162,
+      "lines": 260,
       "package_visible": false
     },
     {
@@ -5986,5 +5986,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d6ca35ac2d174a3019aad3f20d35c8286117401d4fef78a7cf3b8ef31ce0eae8"
+  "digest": "sha256:ba2dc7357442ef202218b0faf2567712927a229ee4b23dbcbaef698fae1ebaa4"
 }

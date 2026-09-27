@@ -11,6 +11,8 @@ local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
 local M = {requires_features = {"settings_profiles"}}
 local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
+local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 460
+local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
 -- Translation IDs are asynchronous and per-player.  Keep the work window
 -- small so a large catalogue neither monopolizes a tick nor stops after an
 -- arbitrary lifetime number of successful translations.
@@ -29,6 +31,30 @@ local function state()
   value.players = value.players or {}
   value.pending_force_refresh = type(value.pending_force_refresh) == "table" and value.pending_force_refresh or {}
   return value
+end
+
+local function research_pane_widths(player)
+  local resolution = player and player.display_resolution
+  local scale = player and player.display_scale
+  local width = resolution and resolution.width
+  if type(width) ~= "number" or width <= 0 or type(scale) ~= "number" or scale <= 0 then
+    return RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH
+  end
+  -- Leave room for the frame edge, its scrollbar, and Factorio's native chrome.
+  -- At a normal desktop width this keeps the intended 360/460 split; narrower
+  -- displays reduce both columns proportionally down to readable lower bounds.
+  local normal_width = RESEARCH_LIST_WIDTH + RESEARCH_DETAIL_WIDTH
+  local minimum_width = RESEARCH_LIST_MIN_WIDTH + RESEARCH_DETAIL_MIN_WIDTH
+  local available = math.floor(width / scale) - 96
+  local total = math.max(minimum_width, math.min(normal_width, available))
+  local list_width = math.floor(total * RESEARCH_LIST_WIDTH / normal_width)
+  list_width = math.max(RESEARCH_LIST_MIN_WIDTH, math.min(RESEARCH_LIST_WIDTH, list_width))
+  local detail_width = total - list_width
+  if detail_width < RESEARCH_DETAIL_MIN_WIDTH then
+    detail_width = RESEARCH_DETAIL_MIN_WIDTH
+    list_width = total - detail_width
+  end
+  return list_width, detail_width
 end
 
 -- The one-tick coalescer is installed only while an open force has pending
@@ -206,13 +232,13 @@ local function refresh_translated_view(player, cache)
   local pages = update_research_results(player, results, v, c, cache)
   update_navigation(frame, v, pages)
 end
-local function label(parent, caption)
+local function label(parent, caption, maximum_width)
   local element = parent.add{type = "label", caption = caption}
   element.style.single_line = false
-  element.style.maximal_width = 720
+  element.style.maximal_width = maximum_width or 720
   return element
 end
-local function fact_label(parent, key, caption)
+local function fact_label(parent, key, caption, maximum_width)
   local element = parent.add{
     type = "label",
     name = PREFIX .. "fact_" .. key,
@@ -220,12 +246,18 @@ local function fact_label(parent, key, caption)
     tags = {mir_browser_fact = key}
   }
   element.style.single_line = false
-  element.style.maximal_width = 720
+  element.style.maximal_width = maximum_width or 720
   return element
 end
 
 update_translation_index = function(results, cache, v)
-  local indicator = results[PREFIX .. "fact_translation_index"]
+  -- The index belongs to the retained list column.  Translation callbacks can
+  -- therefore update this one small label without replacing the list, detail,
+  -- search field, or the surrounding scroll pane.
+  local list = results and results[PREFIX .. "research_list"]
+  local parent = list and list.valid and list or results
+  if not (parent and parent.valid) then return end
+  local indicator = parent[PREFIX .. "fact_translation_index"]
   local unresolved = unresolved_translations(cache)
   if unresolved <= 0 then
     if indicator and indicator.valid then indicator.destroy() end
@@ -237,7 +269,7 @@ update_translation_index = function(results, cache, v)
   if indicator and indicator.valid then
     indicator.caption = caption
   else
-    fact_label(results, "translation_index", caption)
+    fact_label(parent, "translation_index", caption, list and list.style.maximal_width - 16 or nil)
   end
 end
 
@@ -400,14 +432,14 @@ end
 local function displayed_percent(value)
   return displayed_number(value * 100)
 end
-local function add_research_cost(parent, technology)
+local function add_research_cost(parent, technology, maximum_width)
   local units = displayed_number(technology.research_unit_count)
   local seconds = displayed_number(technology.research_unit_energy)
-  if units and seconds then fact_label(parent, "research_cost", {"mir-browser.research-cost", units, seconds}) end
+  if units and seconds then fact_label(parent, "research_cost", {"mir-browser.research-cost", units, seconds}, maximum_width) end
 end
-local function add_science_icons(parent, technology)
-  local science = parent.add{type = "flow", direction = "horizontal"}
-  label(science, {"mir-browser.science"})
+local function add_science_icons(parent, technology, maximum_width)
+  label(parent, {"mir-browser.science"}, maximum_width)
+  local science = parent.add{type = "table", column_count = math.max(1, math.min(8, math.floor((maximum_width or 720) / 40)))}
   for _, ingredient in ipairs(technology.research_unit_ingredients) do
     local amount = displayed_number(ingredient.amount)
     science.add{
@@ -439,7 +471,7 @@ local function productivity_summary(benefits)
   end
   return summary
 end
-local function add_productivity_summary(parent, benefits)
+local function add_productivity_summary(parent, benefits, maximum_width)
   local summary = productivity_summary(benefits)
   if not summary then return end
   local increment_min, increment_max = displayed_percent(summary.increment_min), displayed_percent(summary.increment_max)
@@ -447,27 +479,27 @@ local function add_productivity_summary(parent, benefits)
   local maximum_min, maximum_max = displayed_percent(summary.maximum_min), displayed_percent(summary.maximum_max)
   if not (increment_min and increment_max and current_min and current_max and maximum_min and maximum_max) then return end
   if increment_min == increment_max then
-    fact_label(parent, "productivity_increment", {"mir-browser.productivity-increment", increment_min})
+    fact_label(parent, "productivity_increment", {"mir-browser.productivity-increment", increment_min}, maximum_width)
   else
-    fact_label(parent, "productivity_increment", {"mir-browser.productivity-increment-range", increment_min, increment_max})
+    fact_label(parent, "productivity_increment", {"mir-browser.productivity-increment-range", increment_min, increment_max}, maximum_width)
   end
   if current_min == current_max and maximum_min == maximum_max then
-    fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap", current_min, maximum_min})
+    fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap", current_min, maximum_min}, maximum_width)
   else
-    fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap-range", current_min, current_max, maximum_min, maximum_max})
+    fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap-range", current_min, current_max, maximum_min, maximum_max}, maximum_width)
   end
 end
-local function add_prerequisite_icons(parent, technology)
+local function add_prerequisite_icons(parent, technology, maximum_width)
   local prerequisites = {}
   for _, prerequisite in pairs(technology.prerequisites) do prerequisites[#prerequisites + 1] = prerequisite end
   if #prerequisites == 0 then return end
   table.sort(prerequisites, function(left, right) return left.name < right.name end)
-  local row = parent.add{type = "flow", direction = "horizontal"}
-  label(row, {"mir-browser.prerequisites"})
+  label(parent, {"mir-browser.prerequisites"}, maximum_width)
+  local row = parent.add{type = "table", column_count = math.max(1, math.min(8, math.floor((maximum_width or 720) / 40)))}
   for index, prerequisite in ipairs(prerequisites) do
     if index <= 8 then add_technology_icon(row, prerequisite) end
   end
-  if #prerequisites > 8 then label(row, {"mir-browser.prerequisites-more", #prerequisites - 8}) end
+  if #prerequisites > 8 then label(parent, {"mir-browser.prerequisites-more", #prerequisites - 8}, maximum_width) end
 end
 local function status_caption(technology, native_technology)
   if technology.researched then return {"mir-browser.status-complete"} end
@@ -476,39 +508,41 @@ local function status_caption(technology, native_technology)
   if native_technology and native_technology.enabled == false then return {"mir-browser.status-disabled"} end
   return {"mir-browser.status-locked"}
 end
-local function detail(player, parent, v, c)
+local function detail(player, parent, v, c, width)
   local portable = v.selected and core.detail(c, v.selected, c.enrichment)
   local tech = portable and player.force.technologies[portable.technology.key]
   if not tech then return end
+  local maximum_width = math.max(120, width - 16)
+  local heading_width = math.max(120, maximum_width - 56)
   local heading = parent.add{type = "flow", direction = "horizontal"}
   add_technology_icon(heading, tech, 48)
-  label(heading, tech.localised_name)
-  label(parent, tech.localised_description)
+  label(heading, tech.localised_name, heading_width)
+  label(parent, tech.localised_description, maximum_width)
   local enrichment = portable.enrichment or {}
   -- Provider ownership, compiler disposition, route sentinels, and raw
   -- setting provenance remain in the copied DTO for governed consumers. They
   -- are not player-facing research facts in this library surface.
-  label(parent, {"mir-browser.family", family_caption(portable.technology.family)})
-  label(parent, status_caption(portable.technology, tech))
+  label(parent, {"mir-browser.family", family_caption(portable.technology.family)}, maximum_width)
+  label(parent, status_caption(portable.technology, tech), maximum_width)
   if portable.technology.cap then
-    label(parent, {"mir-browser.level-cap", tech.level, portable.technology.cap})
+    label(parent, {"mir-browser.level-cap", tech.level, portable.technology.cap}, maximum_width)
   elseif tech.level and tech.level > 1 then
-    label(parent, {"mir-browser.level", tech.level})
+    label(parent, {"mir-browser.level", tech.level}, maximum_width)
   end
-  add_research_cost(parent, tech)
+  add_research_cost(parent, tech, maximum_width)
   if enrichment.recipe_benefits then
     local count = #enrichment.recipe_benefits
     if enrichment.next_level_has_effective_benefit then
-      label(parent, {"mir-browser.next-benefit", count})
+      label(parent, {"mir-browser.next-benefit", count}, maximum_width)
     else
-      label(parent, {"mir-browser.no-next-benefit", count})
+      label(parent, {"mir-browser.no-next-benefit", count}, maximum_width)
     end
   elseif portable.technology.family ~= "external" then
-    label(parent, {"mir-browser.mir-benefit"})
+    label(parent, {"mir-browser.mir-benefit"}, maximum_width)
   end
-  add_productivity_summary(parent, enrichment.recipe_benefits)
-  add_science_icons(parent, tech)
-  add_prerequisite_icons(parent, tech)
+  add_productivity_summary(parent, enrichment.recipe_benefits, maximum_width)
+  add_science_icons(parent, tech, maximum_width)
+  add_prerequisite_icons(parent, tech, maximum_width)
   local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
   enqueue.enabled = actions.can_enqueue(player, tech, defines.input_action.start_research)
   button(parent, "open-vanilla", {"controls.open-technology-gui"}, {technology = tech.name})
@@ -541,6 +575,28 @@ local function prioritize_visible_translations(cache, page, selected)
   if cache.priority_token ~= token then
     translation_queue.prioritize(cache, keys)
     cache.priority_token = token
+  end
+end
+
+-- The catalogue snapshot is already bounded and query() has supplied the
+-- visible page in its chosen order.  Do not run another ordering pass merely
+-- to make Browse useful on its first opening.
+local function selected_subject_is_valid(player, catalogue_snapshot, selected)
+  if type(selected) ~= "string" or not player.force.technologies[selected] then return false end
+  for _, row in ipairs(catalogue_snapshot.rows or {}) do
+    if row.key == selected then return true end
+  end
+  return false
+end
+
+local function select_first_visible_subject(player, v, catalogue_snapshot, page)
+  if selected_subject_is_valid(player, catalogue_snapshot, v.selected) then return end
+  v.selected, v.effect_page = nil, 1
+  for _, row in ipairs(page.rows or {}) do
+    if type(row.key) == "string" and player.force.technologies[row.key] then
+      v.selected = row.key
+      return
+    end
   end
 end
 
@@ -640,19 +696,41 @@ update_research_results = function(player, results, v, c, cache)
   results.clear()
   local page = core.query(c, query_view(v, cache), c.enrichment, cache.values)
   v.page = page.page
+  select_first_visible_subject(player, v, c, page)
   prioritize_visible_translations(cache, page, v.selected)
   pump_translation_requests(player, cache)
-  detail(player, results, v, c)
+  local list_width, detail_width = research_pane_widths(player)
+  local list = results.add{
+    type = "flow", name = PREFIX .. "research_list", direction = "vertical",
+    tags = {mir_browser_section = "research-list"}
+  }
+  list.style.width = list_width
+  list.style.maximal_width = list_width
+  local detail_pane = results.add{
+    type = "flow", name = PREFIX .. "research_detail", direction = "vertical",
+    tags = {mir_browser_section = "research-detail"}
+  }
+  detail_pane.style.width = detail_width
+  detail_pane.style.maximal_width = detail_width
+  detail(player, detail_pane, v, c, detail_width)
   update_translation_index(results, cache, v)
-  label(results, {"mir-browser.count", page.count})
-  for _, row in ipairs(page.rows) do
+  label(list, {"mir-browser.count", page.count}, list_width - 16)
+  for index, row in ipairs(page.rows) do
     local technology = player.force.technologies[row.key]
     if technology then
-      local item = results.add{type = "flow", direction = "horizontal"}
-      add_technology_icon(item, technology)
-      local select = button(item, "select", technology.localised_name, {technology = row.key})
-      select.style.width = 300
-      label(item, status_caption(row, technology)).style.maximal_width = 220
+      local item = list.add{type = "flow", direction = "vertical"}
+      local heading = item.add{type = "flow", direction = "horizontal"}
+      add_technology_icon(heading, technology)
+      local selected = v.selected == row.key
+      local select = button(heading, "select", technology.localised_name, {
+        technology = row.key,
+        mir_browser_selected = selected and "selected" or "not-selected",
+        mir_browser_first_visible = index == 1 and "first" or "not-first"
+      })
+      select.toggled = selected
+      select.style.width = list_width - 44
+      local status = label(item, status_caption(row, technology))
+      status.style.maximal_width = list_width - 44
     end
   end
   return page.pages
@@ -691,6 +769,8 @@ render = function(player)
   frame.auto_center = true
   local scale = player.display_scale or 1
   frame.style.maximal_height = math.max(240, math.floor(player.display_resolution.height / scale) - 80)
+  local list_width, detail_width = research_pane_widths(player)
+  frame.style.maximal_width = list_width + detail_width + 36
   local bar = frame.add{type = "flow"}
   button(bar, "research", {"mir-browser.browse"}).toggled = v.tab == "research"
   button(bar, "queue", {"mir-browser.queue-tab"}).toggled = v.tab == "queue"
@@ -699,7 +779,10 @@ render = function(player)
   button(bar, "refresh", {"mir-browser.refresh"})
   button(bar, "close", {"mir-browser.close"})
   if v.tab == "research" or v.tab == "settings" then
-    frame.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
+    local search = frame.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "search"}}
+    label(search, {"mir-browser.search"}, math.max(160, list_width - 40))
+    local field = search.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
+    field.style.width = detail_width
   end
   local body = frame.add{type = "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
   body.style.maximal_height = math.max(140, frame.style.maximal_height - 140)
@@ -729,7 +812,7 @@ render = function(player)
       local recovery = body.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "hidden-recovery"}}
       button(recovery, "show-hidden", {"mir-browser.show-hidden"})
     end
-    local results = body.add{type = "flow", name = PREFIX .. "research_results", direction = "vertical"}
+    local results = body.add{type = "flow", name = PREFIX .. "research_results", direction = "horizontal"}
     pages = update_research_results(player, results, v, c, cache)
   end
   local nav = frame.add{type = "flow", name = PREFIX .. "navigation"}

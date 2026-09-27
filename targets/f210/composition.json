@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 49058,
-      "expected_sha256": "BD5CC3B595B7A16AFCFF61885459BE46DD22246EBC1F9BB55AA5CFC8D946ACBD",
+      "expected_bytes": 49209,
+      "expected_sha256": "8660624DD49BB101EA7D725386C5C8953B320BA866A4E5B344F0F3E978B45A30",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3772,8 +3772,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 55755,
-      "expected_sha256": "A19F6AC0633123FB723698F857551E8C9811992BAE40CB7B4FD0961B634C0886",
+      "expected_bytes": 55676,
+      "expected_sha256": "493AFDA97FE5E70F2B205118EC97E53F1B1F1F94761583761D8C007EAF3AA258",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3804,8 +3804,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 50322,
-      "expected_sha256": "A29B1AE0B823CC9B87B70A54E953C40686DA9671B1F5BDC69772923FF8E3FD76",
+      "expected_bytes": 55057,
+      "expected_sha256": "D9FEA15ABC0279EE38589638EBC23C07B19227B6FA594699089D88B726F1EB25",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "9A933C1E0BEAEA2D3FBDE8A48D7D2325D09226AEF9D2766D53F0E2FF423788BA"
+  "record_sha256": "C9B59C197C0587D1381E1A927BEA16A5B0F10E8E48DF7345A8E9CBF3C398ABE5"
 }

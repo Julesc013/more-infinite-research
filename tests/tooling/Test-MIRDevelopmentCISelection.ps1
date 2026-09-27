@@ -26,9 +26,38 @@ function Get-MIRDevelopmentCIWorkflowJobBlock {
 function New-MIRDevelopmentIdentityInputHashes {
   param([string]$Marker='D')
   return [ordered]@{
-    assurance_policy_sha256=($Marker*64);test_catalog_sha256=('C'*64);development_epoch_sha256=('E'*64)
+    assurance_policy_sha256=($Marker*64);test_catalog_sha256=('C'*64);test_catalog_canonical_sha256=('A'*64);development_epoch_sha256=('E'*64)
     selector_sha256=('F'*64);classifier_sha256=('1'*64);package_authority_sha256=('2'*64)
   }
+}
+
+function New-MIRDevelopmentCanonicalCoverageSelection {
+  return [pscustomobject][ordered]@{
+    schema=1;kind='MIR4DevelopmentCISelectionV1';mode='hosted-development-affected';event_name='pull_request'
+    baseline=('a'*40);baseline_state='resolved';source_commit=('b'*40);source_tree=('c'*40);package_source_sha256=('D'*64)
+    input_hashes=(New-MIRDevelopmentIdentityInputHashes);classification=[pscustomobject]@{paths=@('source/prototypes/example.lua');classes=@('compiler-data-stage');tests=@('static.compiler');unknown_paths=@();escalated=$false}
+    tests=@('static.compiler','static.package');selection_identity=('E'*64);evaluator='MIR4-development-static-selector-v1';trust_scope='hosted-development-authoring'
+    release_qualification=$false;release_readiness_gate=$false;reuse_allowed=$false
+  }
+}
+
+function New-MIRDevelopmentCanonicalCoveragePlan {
+  return [pscustomobject][ordered]@{
+    schema=4;profile='mir4-development';source_commit=('b'*40);source_tree=('c'*40);package_source_sha256=('D'*64)
+    test_catalog_sha256=('A'*64);catalog_sha256=('A'*64);expected_test_ids=@('static.compiler','static.package','static.unrelated')
+  }
+}
+
+function Copy-MIRDevelopmentCanonicalCoverageFixture {
+  param([Parameter(Mandatory)]$Value)
+  return ($Value|ConvertTo-Json -Depth 20|ConvertFrom-Json)
+}
+
+function Assert-MIRDevelopmentCanonicalCoverageRejected {
+  param([Parameter(Mandatory)][scriptblock]$Action,[Parameter(Mandatory)][string]$Code,[Parameter(Mandatory)][string]$Message)
+  $rejected=$false
+  try { & $Action } catch { $rejected=$_.Exception.Message.StartsWith($Code,[StringComparison]::Ordinal) }
+  Assert-MIRDevelopmentCISelection -Condition $rejected -Message $Message
 }
 
 $profileIds=@('static.contracts','static.compiler','static.package','static.historical','static.docs')
@@ -110,6 +139,37 @@ Assert-MIRDevelopmentCISelection -Condition ($identityA -cne $identityDifferentB
 Assert-MIRDevelopmentCISelection -Condition ($identityA -cne $identityLocalMode) -Message 'Selection mode was omitted from development selection identity.'
 Assert-MIRDevelopmentCISelection -Condition ($identityA -cne $identityDifferentCatalog) -Message 'Catalog or policy input identity was omitted from development selection identity.'
 
+$coverageSelection=New-MIRDevelopmentCanonicalCoverageSelection
+$coveragePlan=New-MIRDevelopmentCanonicalCoveragePlan
+$coverage=Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $coveragePlan -CanonicalGateResult 'success'
+Assert-MIRDevelopmentCISelection -Condition ($coverage.status -ceq 'covered-by-successful-canonical-verification-gate' -and $coverage.canonical_gate_job -ceq 'verification-gate' -and $coverage.canonical_gate_result -ceq 'success') -Message 'Development coverage did not record the successful canonical gate disposition.'
+Assert-MIRDevelopmentCISelection -Condition ($coverage.per_test_executions -eq 0 -and @($coverage.executed_test_ids).Count -eq 0) -Message 'Development coverage claimed per-test execution outside the canonical gate.'
+Assert-MIRDevelopmentCISelection -Condition (-not $coverage.release_qualification -and -not $coverage.release_readiness_gate -and -not $coverage.reuse_allowed) -Message 'Development coverage gained release, readiness, or reuse authority.'
+Assert-MIRDevelopmentCISelection -Condition ($coverage.test_catalog_raw_sha256 -cne $coverage.test_catalog_canonical_sha256 -and $coverage.test_catalog_canonical_sha256 -ceq ('A'*64)) -Message 'Canonical plan coverage did not preserve distinct raw and canonical catalogue identities.'
+$rawOrderedSelection=[ordered]@{
+  schema=1;kind='MIR4DevelopmentCISelectionV1';mode='hosted-development-affected';event_name='pull_request'
+  baseline=('a'*40);baseline_state='resolved';source_commit=('b'*40);source_tree=('c'*40);package_source_sha256=('D'*64)
+  input_hashes=[ordered]@{assurance_policy_sha256=('D'*64);test_catalog_sha256=('C'*64);test_catalog_canonical_sha256=('A'*64);development_epoch_sha256=('E'*64);selector_sha256=('F'*64);classifier_sha256=('1'*64);package_authority_sha256=('2'*64)}
+  classification=[ordered]@{paths=@('source/prototypes/example.lua');classes=@('compiler-data-stage');tests=@('static.compiler');unknown_paths=@();escalated=$false}
+  tests=@('static.compiler','static.package');selection_identity=('E'*64);evaluator='MIR4-development-static-selector-v1';trust_scope='hosted-development-authoring'
+  release_qualification=$false;release_readiness_gate=$false;reuse_allowed=$false
+}
+$rawOrderedCoverage=Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $rawOrderedSelection -Plan $coveragePlan -CanonicalGateResult 'success'
+Assert-MIRDevelopmentCISelection -Condition ($rawOrderedCoverage.status -ceq 'covered-by-successful-canonical-verification-gate' -and $rawOrderedCoverage.per_test_executions -eq 0) -Message 'Canonical coverage did not accept the raw ordered selector shape returned by production.'
+$wrongSourcePlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$wrongSourcePlan.source_commit=('d'*40)
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $wrongSourcePlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-source_commit]' -Message 'Canonical coverage accepted a plan with another source commit.'
+$wrongPackagePlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$wrongPackagePlan.package_source_sha256=('F'*64)
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $wrongPackagePlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-package-source]' -Message 'Canonical coverage accepted another package-source hash.'
+$wrongCatalogPlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$wrongCatalogPlan.test_catalog_sha256=('F'*64);$wrongCatalogPlan.catalog_sha256=('F'*64)
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $wrongCatalogPlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-catalog]' -Message 'Canonical coverage accepted another test catalogue.'
+$wrongProfilePlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$wrongProfilePlan.profile='fast'
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $wrongProfilePlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-profile]' -Message 'Canonical coverage accepted a non-development profile.'
+$missingSelectedPlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$missingSelectedPlan.expected_test_ids=@('static.compiler')
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $missingSelectedPlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-coverage]' -Message 'Canonical coverage accepted a missing selected static test.'
+$caseMismatchedPlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$caseMismatchedPlan.expected_test_ids=@('static.Compiler','static.package')
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $caseMismatchedPlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-coverage]' -Message 'Canonical coverage accepted a case-mismatched selected static test.'
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $coveragePlan -CanonicalGateResult 'failure' } -Code '[mir4-development-canonical-gate]' -Message 'Development coverage accepted an unsuccessful canonical gate.'
+
 $temporaryRepo=Join-Path ([IO.Path]::GetTempPath()) ('mir-development-ci-selection-'+[guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $temporaryRepo|Out-Null
 try {
@@ -137,10 +197,16 @@ $workflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/vali
 $developmentWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'development-static'
 $releaseWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'verification-gate'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('name: MIR / development-static-gate') -Message 'Development workflow gate has no distinct name.'
-Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('hosted-development-affected') -Message 'Development workflow does not bind the affected-static selection mode.'
+Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('Invoke-MIR4DevelopmentCanonicalCoverage') -Message 'Development workflow does not bind affected-static coverage to the canonical gate.'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('github.event.pull_request.base.sha') -Message 'Pull-request base identity is absent from the development selection.'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('github.event.before') -Message 'Push baseline identity is absent from the development selection.'
 Assert-MIRDevelopmentCISelection -Condition (-not $developmentWorkflowBlock.Contains('name: verification-gate')) -Message 'Development static evaluator reuses the release gate name.'
+Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('needs:') -Message 'Development coverage does not depend on the canonical plan and gate.'
+Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('needs.verification-gate.result == ''success''') -Message 'Development coverage can run without a successful canonical verification gate.'
+Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('needs.plan.outputs.plan_artifact') -Message 'Development coverage does not consume the exact canonical plan artifact.'
+Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('Invoke-MIR4DevelopmentCanonicalCoverage') -Message 'Development workflow does not use the canonical coverage evaluator.'
+Assert-MIRDevelopmentCISelection -Condition (-not $developmentWorkflowBlock.Contains('Invoke-MIR4DevelopmentStaticChecks')) -Message 'Development workflow independently re-executes canonical static checks.'
+Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('-CanonicalGateResult ''${{ needs.verification-gate.result }}''') -Message 'Development coverage does not bind the canonical gate result.'
 Assert-MIRDevelopmentCISelection -Condition $releaseWorkflowBlock.Contains('name: verification-gate') -Message 'Main/release verification gate name changed.'
 Assert-MIRDevelopmentCISelection -Condition $releaseWorkflowBlock.Contains('needs:') -Message 'Main/release verification gate no longer consumes the original plan and worker jobs.'
 Assert-MIRDevelopmentCISelection -Condition (-not $releaseWorkflowBlock.Contains('refs/heads/dev')) -Message 'Required verification gate excludes development events while the current protection policy still requires it.'
@@ -151,4 +217,4 @@ Assert-MIRDevelopmentCISelection -Condition ($localSelection.trust_scope -ceq 'l
 Assert-MIRDevelopmentCISelection -Condition (-not $localSelection.release_qualification -and -not $localSelection.release_readiness_gate -and -not $localSelection.reuse_allowed) -Message 'Local selection gained release or reusable authority.'
 & (Join-Path $repo 'tools/mir.ps1') mir4 tooling workflows-check | Out-Null
 if($LASTEXITCODE -ne 0) { throw 'Generated workflow-purpose authority does not match the workflow.' }
-Write-Host '[ok] development CI selects affected static checks by exact baseline/event/tree/mode identity, escalates unknown paths within development scope, and keeps its gate distinct from release readiness.'
+Write-Host '[ok] development CI selects affected static checks by exact baseline/event/tree/mode identity, requires successful canonical plan coverage without per-test replay, escalates unknown paths within development scope, and keeps its gate distinct from release readiness.'
