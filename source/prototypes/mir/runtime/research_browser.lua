@@ -623,16 +623,16 @@ end
 -- The catalogue snapshot is already bounded and query() has supplied the
 -- visible page in its chosen order.  Do not run another ordering pass merely
 -- to make Browse useful on its first opening.
-local function selected_subject_is_valid(player, catalogue_snapshot, selected)
+local function selected_subject_is_visible(player, page, selected)
   if type(selected) ~= "string" or not player.force.technologies[selected] then return false end
-  for _, row in ipairs(catalogue_snapshot.rows or {}) do
+  for _, row in ipairs(page.rows or {}) do
     if row.key == selected then return true end
   end
   return false
 end
 
-local function select_first_visible_subject(player, v, catalogue_snapshot, page)
-  if selected_subject_is_valid(player, catalogue_snapshot, v.selected) then return end
+local function select_first_visible_subject(player, v, page)
+  if selected_subject_is_visible(player, page, v.selected) then return end
   v.selected, v.effect_page = nil, 1
   for _, row in ipairs(page.rows or {}) do
     if type(row.key) == "string" and player.force.technologies[row.key] then
@@ -738,7 +738,7 @@ update_research_results = function(player, results, v, c, cache)
   results.clear()
   local page = core.query(c, query_view(v, cache), c.enrichment, cache.values)
   v.page = page.page
-  select_first_visible_subject(player, v, c, page)
+  select_first_visible_subject(player, v, page)
   prioritize_visible_translations(cache, page, v.selected)
   pump_translation_requests(player, cache)
   local list_width, detail_width = research_pane_widths(player)

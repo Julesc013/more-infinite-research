@@ -377,8 +377,13 @@ script.on_nth_tick(1,function()
       "library presents browse, queue, setup and availability navigation")
     check(remote.call("more-infinite-research-browser","open",actual.index,{selected="automation"}),"native MIR scope opens with external selection")
     local replacement_detail=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","open-vanilla")
-    check(replacement_detail and replacement_detail.tags.technology~="automation",
-      "MIR scope replaces stale external selection with its first visible research")
+    local replacement_first=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser_first_visible","first")
+    local replacement_selected=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser_selected","selected")
+    check(replacement_detail and replacement_first and replacement_selected
+      and replacement_detail.tags.technology==replacement_first.tags.technology
+      and replacement_selected.tags.technology==replacement_first.tags.technology
+      and replacement_detail.tags.technology~="automation",
+      "MIR scope replaces an external selection with the first visible MIR research in both row and detail")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=2,search="mir-browser-test"}),"native finite GUI")
     check(actual.gui.screen.mir_research_browser.valid,"native frame valid")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
