@@ -607,12 +607,15 @@ local function availability_rows(force, parent, v)
     end
     local identity = row.stream_id .. "\0" .. (row.technology_id or "")
     local stream = stream_definitions[row.stream_id]
-    if seen[identity] or not stream or stream.localised_name == nil then
+    if seen[identity] or not stream then
       label(parent, {"mir-browser.availability-empty"})
       return 1
     end
     seen[identity] = true
-    rows[#rows + 1] = {stream = stream, reason = row.reason}
+    rows[#rows + 1] = {
+      caption = stream.localised_name or {"technology-name.more-infinite-research." .. row.stream_id},
+      reason = row.reason
+    }
   end
   if #rows == 0 then
     label(parent, {"mir-browser.availability-empty"})
@@ -623,7 +626,7 @@ local function availability_rows(force, parent, v)
   for index = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #rows) do
     local row = rows[index]
     local item = parent.add{type = "flow", direction = "vertical", tags = {mir_browser_section = "availability"}}
-    label(item, row.stream.localised_name)
+    label(item, row.caption)
     label(item, {"mir-browser.not-added"})
     label(item, {"mir-browser." .. (omission_reasons[row.reason] or "not-added-generic")})
   end
@@ -689,10 +692,10 @@ render = function(player)
   local scale = player.display_scale or 1
   frame.style.maximal_height = math.max(240, math.floor(player.display_resolution.height / scale) - 80)
   local bar = frame.add{type = "flow"}
-  button(bar, "research", {"mir-browser.browse"})
-  button(bar, "queue", {"mir-browser.queue-tab"})
-  button(bar, "settings", {"mir-browser.settings"})
-  button(bar, "availability", {"mir-browser.availability"})
+  button(bar, "research", {"mir-browser.browse"}).toggled = v.tab == "research"
+  button(bar, "queue", {"mir-browser.queue-tab"}).toggled = v.tab == "queue"
+  button(bar, "settings", {"mir-browser.settings"}).toggled = v.tab == "settings"
+  button(bar, "availability", {"mir-browser.availability"}).toggled = v.tab == "availability"
   button(bar, "refresh", {"mir-browser.refresh"})
   button(bar, "close", {"mir-browser.close"})
   if v.tab == "research" or v.tab == "settings" then

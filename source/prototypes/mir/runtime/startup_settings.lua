@@ -5,7 +5,8 @@ local M = {}
 
 local function raw_setting(name)
   local setting = settings and settings.startup and settings.startup[name]
-  return setting and setting.value or nil
+  if setting ~= nil then return setting.value end
+  return nil
 end
 
 local function imported_profile()

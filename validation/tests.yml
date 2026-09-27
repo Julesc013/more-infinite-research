@@ -377,6 +377,7 @@
       "command": "./tests/compiler/Test-MIRSettingsVisibility.ps1",
       "requires_factorio": false,
       "inputs": [
+        "package:prototypes/mir/runtime/startup_settings.lua",
         "package:settings.lua",
         "package:prototypes/mir/settings/**",
         "package:prototypes/streams/**",
@@ -5036,6 +5037,8 @@
       "command": "./tests/runtime/Test-MIRResearchBrowser.ps1",
       "requires_factorio": true,
       "inputs": [
+        "source:source/prototypes/mir/runtime/startup_settings.lua",
+        "source:source/prototypes/mir/settings/profile_codec.lua",
         "tests/runtime/Test-MIRResearchBrowser.ps1",
         "tests/runtime/research_browser.lua",
         "tests/runtime/research_browser_omissions.lua",

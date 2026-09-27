@@ -1172,6 +1172,8 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": true,
       "inputs": [
+        "source:source/prototypes/mir/runtime/startup_settings.lua",
+        "source:source/prototypes/mir/settings/profile_codec.lua",
         "tests/runtime/Test-MIRResearchBrowser.ps1",
         "tests/runtime/research_browser.lua",
         "tests/runtime/research_browser_omissions.lua",
@@ -7672,6 +7674,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        "package:prototypes/mir/runtime/startup_settings.lua",
         "package:settings.lua",
         "package:prototypes/mir/settings/**",
         "package:prototypes/streams/**",
@@ -7755,5 +7758,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:dc7945e4cbd56cb5c4d860f62e6513b2185abaab22b5b6068fbb496212c7709f"
+  "digest": "sha256:e9c47086ea2b2bd7ed9cf0afed7a25cfb6206184aa2e8fda8172a1667e4ed84f"
 }

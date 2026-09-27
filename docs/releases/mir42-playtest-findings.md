@@ -5,7 +5,7 @@ applies_to: "4.2.0 development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-09-27
+last_reviewed: 2026-09-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -51,3 +51,17 @@ These are single observations rather than a statistical benchmark or a general s
 The primary checkout's `build/tmp/mir42-integration/preview3-performance-terminal-readback.json` binds exact packages, engine, native logs and retained failed wrappers. This private evidence is intentionally excluded from Git and player ZIPs. The 4.1 and early 4.2 harness failures remain failed even though their native timer/counter facts were independently verified. The optimized benchmark exited naturally with code zero. Its earlier create wrapper also remains failed after a temporary-file enumeration race; the successfully created exact save was retained for the one remaining benchmark. Existing saves, startup loading, caps/configuration lifecycles and an open browser remain separate acceptance work.
 
 The updated F210 and F200 development packages are in the primary checkout's `dist/mir42-preview-performance-20260927`, with their source, narrow browser checks and this performance record bound in the playtest manifest. The local `dist/LATEST-MIR42-PREVIEW.md` instructions identify the current Steam package and the deferred compatibility checklist. These delivery files are intentionally excluded from Git. This delivery grants no release qualification or publication authority.
+
+## Native graphical follow-up
+
+On 28 September, a private base-only PREVIEW3 load on Factorio 2.1.20 produced five engine-rendered screenshots with one connected player. The first capture still showed the game's load-consistency overlay; it does not prove the first usable browser frame. The settled Browse screenshot showed localized technology captions. Setup displayed `nil` for false-valued startup settings, Availability displayed no omissions, and the navigation buttons did not identify the selected view. The freeplay cutscene was still active, so focus, Escape handling and ordinary player interaction remain unqualified.
+
+The graphical attempt and image review are retained in `build/private-probes/mir42-f210-preview3-graphical-v2`. Its predecessor stopped before private-profile loading when Steam requested a restart and remains a failed attempt. The successor used the official Steamworks development AppID hint in its private working directory; installed Steam files were unchanged. After all capture stages, the wrapper closed its own process as planned. Native exit `-1` is recorded as that forced closure, not natural engine success.
+
+A separate two-tick native headless diagnosis of the unchanged PREVIEW3 ZIP found 98 sealed generation rows and 51 valid omissions with a matching public fingerprint. The provider supplied those omissions correctly. The UI discarded the whole view when a known stream used its ordinary canonical localized title rather than an explicit name override. The corrected view uses that established title for known streams and retains rejection of malformed or unknown identities.
+
+The runtime startup reader also collapsed a present `false` into `nil`, and effective-profile export could replace a resolver's `false` with the direct setting's `true`. Both paths now preserve false values. Navigation buttons use the engine's native toggled state. The existing browser fixture tests native false-value/profile behavior and records connected-player count and whether native GUI assertions actually ran. Factorio cannot create a player through LuaGameScript; a discarded fixture attempt using that nonexistent API remains a failed check. Zero-player headless checks do not establish native GUI coverage, rendered-client usability, actual localization timing, save/reload or two-client acceptance.
+
+The exact PREVIEW4 F210 ZIP passed 98 canonical controlled headless assertions on 2.1.20 with zero players. A separate one-launch graphical observation, retained in `build/private-probes/mir42-f210-preview4-graphical`, exited its private freeplay cutscene through the documented player API. Its five capture stages had one connected player and an opened browser frame. Native assertions checked all four tab states, ten false-valued startup settings and the canonical localized omission-title path. Image review confirmed highlighted navigation, `false` values in Setup and visible not-added rows. Closure was again planned and forced; these observations do not grant release qualification, Escape/input or two-client acceptance.
+
+The new images also retain unresolved presentation defects: Browse has no initial benefit/detail subject, Setup repeats long setting titles and unrounded decimal values, and an omitted Space Age capture-robot stream references an item locale unavailable in base-only play. These remain browser work, not accepted usability or localization outcomes. The existing PREVIEW3 command timings belong to its earlier bytes and are not rebound to PREVIEW4.

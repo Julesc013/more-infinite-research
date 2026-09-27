@@ -1,3 +1,6 @@
+local browser_provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
+local native_startup_settings = require("__more-infinite-research__/prototypes/mir/runtime/startup_settings")
+local native_profile_codec = require("__more-infinite-research__/prototypes/mir/settings/profile_codec")
 local function snapshot(force)
   local rows = {}
   for name, tech in pairs(force.technologies) do
@@ -301,12 +304,34 @@ script.on_nth_tick(1,function()
   before=snapshot(force)
   local all=browser_core.query(catalogue,{mode=1,status=1,page=999999,search=""})
   check(#all.rows<=browser_core.page_size and all.page==all.pages,"bounded page clamp")
+  -- LuaGameScript cannot create players. Native GUI checks require a real
+  -- player from a graphical/client run or a player-bearing save. Report the
+  -- zero-player headless scope explicitly instead of claiming GUI coverage.
+  local native_false, native_true
+  for name, setting in pairs(settings.startup) do
+    local prototype=prototypes.mod_setting[name]
+    if prototype and prototype.mod=="more-infinite-research" and type(setting.value)=="boolean" then
+      if setting.value==false then native_false=native_false or name else native_true=native_true or name end
+    end
+  end
+  check(native_false and native_startup_settings.raw(native_false)==false
+    and native_startup_settings.get(native_false)==false,"native direct false remains a setting value")
+  check(native_startup_settings.raw("mir-browser-unregistered-setting")==nil,"absent startup value remains absent")
+  check(native_true,"native fixture provides a true direct setting")
+  local effective_false=native_profile_codec.current_profile{names={native_true},value_resolver=function() return false end}
+  check(effective_false.settings[native_true]==false,"effective false overrides direct true during profile export")
+  local encoded_false=native_profile_codec.encode(effective_false)
+  local decoded_false=encoded_false and native_profile_codec.decode(encoded_false)
+  check(decoded_false and decoded_false.settings[native_true]==false,"false effective export survives MIRSET1 roundtrip")
   local native_players=0
   for _, actual in pairs(game.players) do
     native_players=native_players+1
     check(not actual.gui.top.mir_browser_open,"legacy top launcher absent")
     check(remote.call("more-infinite-research-browser","open",actual.index),"native default MIR browser GUI")
     local default_root=actual.gui.screen.mir_research_browser
+    check(find_browser_element(default_root,"mir_browser","research").toggled
+      and not find_browser_element(default_root,"mir_browser","queue").toggled,
+      "Browse visibly selects its navigation button")
     local default_sort=find_browser_element(default_root,"mir_browser","sort")
     local default_scope=find_browser_element(default_root,"mir_browser","family")
     check(default_sort and default_sort.type=="drop-down" and default_sort.selected_index==1,"new personal view defaults to MIR progression")
@@ -321,6 +346,25 @@ script.on_nth_tick(1,function()
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search="mir-"}),"native settings GUI")
     check(has_browser_fact(actual.gui.screen.mir_research_browser,"profile_import"),"native settings profile summary")
+    check(find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","settings").toggled,
+      "Setup visibly selects its navigation button")
+    local native_omissions=browser_provider.omissions(actual.force)
+    local has_omission_transport=prototypes.mod_data
+      and prototypes.mod_data["more-infinite-research-generation-plan"]~=nil
+    if has_omission_transport then
+      check(native_omissions and #native_omissions.rows>0,"native generation publishes exact omissions")
+    else
+      check(native_omissions==nil,"absent generation transport supplies no invented omissions")
+    end
+    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="availability"}),"native Availability GUI")
+    local availability_root=actual.gui.screen.mir_research_browser
+    check(find_browser_element(availability_root,"mir_browser","availability").toggled,
+      "Availability visibly selects its navigation button")
+    if has_omission_transport then
+      check(find_browser_element(availability_root,"mir_browser_section","availability"),
+        "known omitted streams use their canonical localized title without an explicit name override")
+    end
+    check(not find_browser_element(availability_root,"mir_browser","enqueue"),"omitted research has no queue action")
     local mir_productivity = emitted_productivity_technology(actual)
     check(mir_productivity,"native fixture supplies an emitted MIR productivity technology")
     -- This opens a technology carrying a live productivity effect inside MIR
@@ -356,8 +400,10 @@ script.on_nth_tick(1,function()
     check(preserved_scope and preserved_scope.selected_index==all_scope_index,"invalid family preserves personal scope")
     check(before==snapshot(force),"native GUI force noninterference")
   end
-  helpers.write_file("browser-test.json",helpers.table_to_json{status="passed",assertions=count,scope="exact-package-load-and-controlled-personal-view-model-on-real-force; native-two-client-GUI-not-qualified",native_players=native_players,engine=helpers.game_version},false)
+  local scope=native_players>0 and "exact-package-load-controlled-model-and-native-GUI-objects; rendered-client-and-two-client-GUI-not-qualified"
+    or "exact-package-load-controlled-model; native-GUI-objects-rendered-client-and-two-client-GUI-not-qualified"
+  helpers.write_file("browser-test.json",helpers.table_to_json{status="passed",assertions=count,scope=scope,native_players=native_players,connected_players=#game.connected_players,native_gui_assertions_exercised=native_players>0,engine=helpers.game_version},false)
   storage.browser_saved=true;storage.expected_force=before
-  if native_players>0 then game.auto_save("mir-browser-acceptance") end
+  if #game.connected_players>0 then game.auto_save("mir-browser-acceptance") end
   script.on_nth_tick(1,nil)
 end)

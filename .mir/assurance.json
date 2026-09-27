@@ -21,6 +21,7 @@
     "mir42-nine-target-evidence": ["static.mir4-protected-promotion-topology-a08", "static.mir42-nine-target-evidence-generators", "static.mir42-nine-target-entrypoint-scope", "static.mir42-nine-target-seal-readers", "static.mir42-nine-target-release-authority", "static.mir42-nine-target-promotion", "static.mir42-nine-target-release-assets", "static.mir42-protected-main-checks"],
     "mir4-development-ci-selection": ["static.mir4-development-ci-selection"],
     "mir42-preview-browser": ["runtime.research-browser"],
+      "mir42-preview-native-boundaries": ["static.settings", "static.mir4-runtime-continuity-w04", "static.mir4-platform-preview", "runtime.research-browser"],
     "mir42-preview-feedback": ["runtime.research-browser", "static.mir4-integration-programme", "static.mir4-development-ci-selection"],
     "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.release-history", "static.package"],
     "auto": [],
