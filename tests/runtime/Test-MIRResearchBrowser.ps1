@@ -72,6 +72,7 @@ foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{n
 [void]$lua.AppendLine('local browser_omission_controller_bindings={}')
 [void]$lua.AppendLine('local browser_omission_controller={runtime_settings_bindings=function() return browser_omission_controller_bindings end}')
 [void]$lua.AppendLine('local browser_omission_runtime_settings={startup={}}')
+[void]$lua.AppendLine('local browser_omission_registered_settings={["ips-max-level-bridge"]={name="ips-max-level-bridge",type="int-setting"}}')
 [void]$lua.AppendLine('local browser_omission_fingerprint=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/core/fingerprint.lua')))
 [void]$lua.AppendLine('end)()')
@@ -83,8 +84,9 @@ local browser_omission_provider=(function()
     if name=="prototypes.mir.core.fingerprint" then return browser_omission_fingerprint
     elseif name=="prototypes.mir.runtime.maximum_level_control" then return browser_omission_controller
     elseif name=="prototypes.mir.settings.catalog" then return {
-      spec=function(setting_name) return {name=setting_name,type="int-setting"} end,
-      validate_value=function(_,value) return type(value)=="number" and value==value
+      spec=function(setting_name) return browser_omission_registered_settings[setting_name] end,
+      validate_value=function(setting_name,value) return browser_omission_registered_settings[setting_name]~=nil
+        and type(value)=="number" and value==value
         and value~=math.huge and value~=-math.huge and value>=0 and value==math.floor(value) end
     }
     elseif name=="prototypes.mir.runtime.startup_settings" then return {

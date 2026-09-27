@@ -210,6 +210,22 @@ local function check_omissions(check)
     "registered controller binding publishes the matching owned maximum setting")
   check(not next(browser_omission_provider.snapshot({valid = true, technologies = {}}).runtime_settings_bindings),
     "controller binding remains absent when its live force technology is absent")
+  local unregistered = "ips-max-level-unregistered-bridge"
+  browser_omission_prototypes.mod_setting[unregistered] = {
+    mod = "more-infinite-research", setting_type = "startup", default_value = 3
+  }
+  browser_omission_runtime_settings.startup[unregistered] = {value = 3}
+  browser_omission_controller_bindings[technology_name].binding.setting_name = unregistered
+  browser_omission_provider.invalidate_omissions()
+  check(not next(browser_omission_provider.snapshot(runtime_force).runtime_settings_bindings),
+    "unregistered maximum setting cannot become a browser binding despite matching startup bytes")
+  browser_omission_controller_bindings[technology_name].binding.setting_name = setting_name
+  browser_omission_prototypes.mod_setting[setting_name].mod = "foreign-mod"
+  browser_omission_provider.invalidate_omissions()
+  check(not next(browser_omission_provider.snapshot(runtime_force).runtime_settings_bindings),
+    "foreign setting ownership cannot become a browser binding")
+  browser_omission_prototypes.mod_setting[setting_name].mod = "more-infinite-research"
+  browser_omission_provider.invalidate_omissions()
   runtime_binding.setting.effective = 99
   runtime_binding.binding.declared_key = "poisoned"
   local runtime_copy = browser_omission_provider.snapshot(runtime_force).runtime_settings_bindings[technology_name]
