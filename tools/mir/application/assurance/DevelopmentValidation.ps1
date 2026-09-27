@@ -27,7 +27,9 @@ function Get-MIR4DevelopmentSelectorInputHashes {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   if($null -eq (Get-Command Get-MIRAssuranceTextHash -ErrorAction SilentlyContinue)) { . (Join-Path $repo 'tools/lib/assurance/Core.ps1') }
-  if($null -eq (Get-Command Get-MIRAssuranceCanonicalJsonFileHash -ErrorAction SilentlyContinue)) { . (Join-Path $repo 'tools/lib/assurance/Hashing.ps1') }
+  # Rebind hashing in this script scope as well as its digest-policy constants.
+  # A command imported by another module can exist while these constants do not.
+  . (Join-Path $repo 'tools/lib/assurance/Hashing.ps1')
   $inputs=[ordered]@{
     assurance_policy_sha256=(Get-FileHash -LiteralPath (Join-Path $repo '.mir/assurance.json') -Algorithm SHA256).Hash.ToUpperInvariant()
     test_catalog_sha256=(Get-FileHash -LiteralPath (Join-Path $repo 'validation/tests.yml') -Algorithm SHA256).Hash.ToUpperInvariant()
