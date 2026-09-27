@@ -18,6 +18,35 @@ function Assert-NineAuthorityReject {
   Assert-NineAuthority $rejected $Code
 }
 
+function Get-MIR42NineAuthorityHistoricalFixture {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target)
+
+  $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target
+  $targetRecordPath = Join-Path $RepoRoot ([string]$identity.target_record_path)
+  $targetRecord = Read-MIR42SealRecord -Path $targetRecordPath -Code "mir42-nine-authority-fixture-target-record-$Target"
+  $record = $targetRecord.record
+  if ([string]$targetRecord.sha256 -cne [string]$identity.target_record_file_sha256 -or
+      [string]$record.record_sha256 -cne [string]$identity.target_record_record_sha256 -or
+      [int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42HistoricalPlaytestTargetV1' -or
+      [string]$record.target -cne $Target -or [string]$record.maturity -cne 'private-historical-playtest' -or
+      [string]$record.base_materializer_target -cne 'f100' -or [string]$record.factorio_line -cne ([string]$identity.target_id -replace '^factorio-', '') -or
+      [string]$record.distribution_version -cne [string]$identity.distribution_version -or
+      [bool]$record.public_output_authorized -or [bool]$record.publication_authorized) {
+    throw "[mir42-nine-authority-fixture-target-record] $Target"
+  }
+  $sealRelative = '.mir/releases/terminal/seals/' + [string]$record.predecessor.version + '.json'
+  $terminalSeal = Read-MIR42SealRecord -Path (Join-Path $RepoRoot $sealRelative) -Code "mir42-nine-authority-fixture-terminal-seal-$Target"
+  if ([int]$terminalSeal.record.schema -ne 1 -or [string]$terminalSeal.record.kind -cne 'Mir3TerminalTargetSealV1' -or
+      [string]$terminalSeal.record.status -cne 'sealed' -or [string]$terminalSeal.record.release -cne [string]$record.predecessor.version -or
+      [string]$terminalSeal.record.target -cne [string]$record.factorio_line -or [string]$terminalSeal.record.archive_sha256 -cne [string]$record.predecessor.sha256 -or
+      [string]$terminalSeal.record.engine.version -cne [string]$record.engine.version -or [string]$terminalSeal.record.engine.binary_sha256 -cne [string]$record.engine.sha256) {
+    throw "[mir42-nine-authority-fixture-terminal-seal] $Target"
+  }
+  return [pscustomobject][ordered]@{
+    fixture_scope='committed-target-record-and-terminal-seal-only';identity=$identity;target_record=$targetRecord;terminal_seal=$terminalSeal
+  }
+}
+
 $four = Get-MIR42SealScopeContract -Scope 'four-target'
 $nine = Get-MIR42SealScopeContract -Scope 'nine-target'
 Assert-NineAuthority ($nine.programme_path -cne $four.programme_path -and $nine.trust_root_kind -cne $four.trust_root_kind) 'separate-current-authority'
@@ -68,7 +97,14 @@ try {
   $oldHash = (Get-FileHash -LiteralPath $oldPath -Algorithm SHA256).Hash
   $modernFixture = Read-MIR42SealRecord -Path (Join-Path $repo '.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json') -Code 'mir42-nine-authority-test-modern-fixture'
   $historicalFixtures = @{}
-  foreach ($target in $script:MIR42SealHistoricalTargets) { $historicalFixtures[$target] = Get-MIR42HistoricalTerminalAuthority -RepoRoot $repo -Target $target }
+  foreach ($target in $script:MIR42SealHistoricalTargets) {
+    $fixture = Get-MIR42NineAuthorityHistoricalFixture -RepoRoot $repo -Target $target
+    Assert-NineAuthority ([string]$fixture.fixture_scope -ceq 'committed-target-record-and-terminal-seal-only' -and
+      [string]$fixture.identity.target -ceq $target -and [string]$fixture.target_record.record.target -ceq $target) "historical-identity-$target"
+    Assert-NineAuthority ([string]$fixture.terminal_seal.record.release -ceq [string]$fixture.target_record.record.predecessor.version -and
+      [string]$fixture.terminal_seal.record.archive_sha256 -ceq [string]$fixture.target_record.record.predecessor.sha256) "historical-terminal-binding-$target"
+    $historicalFixtures[$target] = $fixture
+  }
   Set-Item Function:Get-MIR42DirectPredecessorAuthority -Value { param($RepoRoot,$Reference) return $modernFixture }
   Set-Item Function:Get-MIR42HistoricalTerminalAuthority -Value { param($RepoRoot,$Target) return $historicalFixtures[$Target] }
   $programmePath = Join-Path $scratch $nine.programme_path

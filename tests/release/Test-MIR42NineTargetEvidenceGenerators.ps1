@@ -15,6 +15,62 @@ function Assert-MIR42NineGeneratorTest {
   if (-not $Condition) { throw "[mir42-nine-generator-test-$Code]" }
 }
 
+function Get-MIR42NineGeneratorHistoricalFixture {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target)
+
+  $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target
+  $recordPath = Join-Path $RepoRoot ([string]$identity.target_record_path)
+  $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4BootstrapRecordHash -Record $record) -or
+      (Get-MIR4Sha256File -Path $recordPath) -cne [string]$identity.target_record_file_sha256 -or
+      [string]$record.record_sha256 -cne [string]$identity.target_record_record_sha256 -or
+      [string]$record.target -cne $Target -or [string]$record.maturity -cne 'private-historical-playtest' -or
+      [string]$record.base_materializer_target -cne 'f100' -or [bool]$record.public_output_authorized -or [bool]$record.publication_authorized) {
+    throw "[mir42-nine-generator-fixture-target-record] $Target"
+  }
+  $sealRelative = '.mir/releases/terminal/seals/' + [string]$record.predecessor.version + '.json'
+  $sealPath = Join-Path $RepoRoot $sealRelative
+  $seal = Get-Content -Raw -LiteralPath $sealPath | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4BootstrapRecordHash -Record $seal) -or [int]$seal.schema -ne 1 -or
+      [string]$seal.kind -cne 'Mir3TerminalTargetSealV1' -or [string]$seal.status -cne 'sealed' -or
+      [string]$seal.release -cne [string]$record.predecessor.version -or [string]$seal.target -cne [string]$record.factorio_line -or
+      [string]$seal.archive_sha256 -cne [string]$record.predecessor.sha256 -or
+      [string]$seal.engine.version -cne [string]$record.engine.version -or [string]$seal.engine.binary_sha256 -cne [string]$record.engine.sha256) {
+    throw "[mir42-nine-generator-fixture-terminal-seal] $Target"
+  }
+  return [pscustomobject][ordered]@{
+    fixture_scope='committed-target-record-and-terminal-seal-only';identity=$identity;record=$record;record_path=$recordPath;seal=$seal;seal_path=$sealPath
+  }
+}
+
+function Assert-MIR42NineGeneratorHistoricalArchiveRequired {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target)
+
+  $fixtureRoot = Join-Path $RepoRoot ('build/test-results/mir42-nine-generator-missing-archive-' + [guid]::NewGuid().ToString('N'))
+  try {
+    $fixture = Get-MIR42NineGeneratorHistoricalFixture -RepoRoot $RepoRoot -Target $Target
+    $recordRelative = [string]$fixture.identity.target_record_path
+    $sealRelative = '.mir/releases/terminal/seals/' + [string]$fixture.record.predecessor.version + '.json'
+    foreach ($relative in @($recordRelative,$sealRelative)) {
+      $destination = Join-Path $fixtureRoot $relative
+      New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+      Copy-Item -LiteralPath (Join-Path $RepoRoot $relative) -Destination $destination
+    }
+    $expectedPredecessorPath = [IO.Path]::GetFullPath((Join-Path $fixtureRoot ([string]$fixture.record.predecessor.archive)))
+    $failure = $null
+    try { Get-MIR42QualificationHistoricalAuthority -RepoRoot $fixtureRoot -Target $Target | Out-Null }
+    catch { $failure = $_ }
+    $missingExpectedPredecessor = $null -ne $failure -and
+      [string]$failure.Exception.Message -like ('*' + $expectedPredecessorPath + '*') -and
+      (([string]$failure.FullyQualifiedErrorId -match 'PathNotFound') -or
+       ([string]$failure.CategoryInfo.Category -ceq 'ObjectNotFound'))
+    Assert-MIR42NineGeneratorTest -Condition $missingExpectedPredecessor -Code "missing-archive-rejected-$Target"
+  } finally {
+    $buildRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build'))
+    if (-not [IO.Path]::GetFullPath($fixtureRoot).StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-nine-generator-fixture-containment]' }
+    if (Test-Path -LiteralPath $fixtureRoot) { Remove-Item -LiteralPath $fixtureRoot -Recurse -Force }
+  }
+}
 function Get-MIR42NineGeneratorFunctionParameters {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Name,[string]$SourceText)
   $errors = $null
@@ -41,13 +97,13 @@ try { $null = Get-MIR42QualificationTargetScope -Rows @($modernRows + [pscustomo
 Assert-MIR42NineGeneratorTest -Condition $rejected -Code 'mixed-scope-rejected'
 
 foreach ($target in $script:MIR42QualificationHistoricalTargets) {
-  $authority = Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target $target
-  Assert-MIR42NineGeneratorTest -Condition ([string]$authority.identity.target -ceq $target -and [string]$authority.record.target -ceq $target) -Code "identity-$target"
-  Assert-MIR42NineGeneratorTest -Condition ([string]$authority.seal.release -ceq [string]$authority.record.predecessor.version -and [string]$authority.inventory.archive_sha256 -ceq [string]$authority.record.predecessor.sha256) -Code "terminal-$target"
+  $authority = Get-MIR42NineGeneratorHistoricalFixture -RepoRoot $repo -Target $target
+  Assert-MIR42NineGeneratorTest -Condition ([string]$authority.fixture_scope -ceq 'committed-target-record-and-terminal-seal-only' -and [string]$authority.identity.target -ceq $target -and [string]$authority.record.target -ceq $target) -Code "identity-$target"
+  Assert-MIR42NineGeneratorTest -Condition ([string]$authority.seal.release -ceq [string]$authority.record.predecessor.version -and [string]$authority.seal.archive_sha256 -ceq [string]$authority.record.predecessor.sha256) -Code "terminal-$target"
   Assert-MIR42NineGeneratorTest -Condition (-not [bool]$authority.record.public_output_authorized -and -not [bool]$authority.record.publication_authorized) -Code "private-$target"
-  $engine = Get-MIR42IndependentEngine -RepoRoot $repo -Target $target -Qualified ([pscustomobject][ordered]@{environment=[pscustomobject][ordered]@{binary_sha256=[string]$authority.record.engine.sha256;version=[string]$authority.record.engine.version}})
-  Assert-MIR42NineGeneratorTest -Condition ([string]$engine.version -ceq [string]$authority.record.engine.version -and [string]$engine.binary_sha256 -ceq [string]$authority.record.engine.sha256) -Code "engine-$target"
+  Assert-MIR42NineGeneratorTest -Condition ([string]$authority.seal.engine.version -ceq [string]$authority.record.engine.version -and [string]$authority.seal.engine.binary_sha256 -ceq [string]$authority.record.engine.sha256) -Code "engine-binding-$target"
 }
+Assert-MIR42NineGeneratorHistoricalArchiveRequired -RepoRoot $repo -Target 'f017'
 
 $fourCommand = Get-Command Invoke-MIR42FourTargetEvidenceReconciliation -CommandType Function
 $nineCommand = Get-Command Invoke-MIR42NineTargetEvidenceReconciliation -CommandType Function

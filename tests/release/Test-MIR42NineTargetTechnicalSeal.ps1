@@ -12,6 +12,62 @@ function Assert-MIR42NineSealTest {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Code)
   if (-not $Condition) { throw "[mir42-nine-seal-test-$Code]" }
 }
+function Get-MIR42NineSealCommittedHistoricalFixture {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target)
+
+  $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target
+  $targetRecordPath = Join-Path $RepoRoot ([string]$identity.target_record_path)
+  $targetRecord = Read-MIR42SealRecord -Path $targetRecordPath -Code "mir42-nine-seal-fixture-target-record-$Target"
+  $record = $targetRecord.record
+  if ([string]$targetRecord.sha256 -cne [string]$identity.target_record_file_sha256 -or
+      [string]$record.record_sha256 -cne [string]$identity.target_record_record_sha256 -or
+      [int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42HistoricalPlaytestTargetV1' -or
+      [string]$record.target -cne $Target -or [string]$record.maturity -cne 'private-historical-playtest' -or
+      [string]$record.base_materializer_target -cne 'f100' -or [string]$record.factorio_line -cne ([string]$identity.target_id -replace '^factorio-', '') -or
+      [string]$record.distribution_version -cne [string]$identity.distribution_version -or
+      [bool]$record.public_output_authorized -or [bool]$record.publication_authorized) {
+    throw "[mir42-nine-seal-fixture-target-record] $Target"
+  }
+  $sealRelative = '.mir/releases/terminal/seals/' + [string]$record.predecessor.version + '.json'
+  $seal = Read-MIR42SealRecord -Path (Join-Path $RepoRoot $sealRelative) -Code "mir42-nine-seal-fixture-terminal-seal-$Target"
+  if ([int]$seal.record.schema -ne 1 -or [string]$seal.record.kind -cne 'Mir3TerminalTargetSealV1' -or
+      [string]$seal.record.status -cne 'sealed' -or [string]$seal.record.release -cne [string]$record.predecessor.version -or
+      [string]$seal.record.target -cne [string]$record.factorio_line -or [string]$seal.record.archive_sha256 -cne [string]$record.predecessor.sha256 -or
+      [string]$seal.record.engine.version -cne [string]$record.engine.version -or [string]$seal.record.engine.binary_sha256 -cne [string]$record.engine.sha256) {
+    throw "[mir42-nine-seal-fixture-terminal-seal] $Target"
+  }
+  return [pscustomobject][ordered]@{
+    fixture_scope='committed-target-record-and-terminal-seal-only';identity=$identity;target_record=$targetRecord;terminal_seal=$seal
+  }
+}
+function New-MIR42NineSealSyntheticHistoricalFixture {
+  param([Parameter(Mandatory)][string]$FixtureRoot,[Parameter(Mandatory)][string]$Target)
+
+  $line = '0.' + $Target.Substring(1)
+  $enginePath = Join-Path $FixtureRoot ("engine-$Target.bin")
+  $predecessorPath = Join-Path $FixtureRoot ("predecessor-$Target.zip")
+  [IO.File]::WriteAllText($enginePath,"synthetic historical engine $Target",[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($predecessorPath,"synthetic historical predecessor $Target",[Text.UTF8Encoding]::new($false))
+  $engineHash = (Get-FileHash -LiteralPath $enginePath -Algorithm SHA256).Hash.ToUpperInvariant()
+  $predecessorHash = (Get-FileHash -LiteralPath $predecessorPath -Algorithm SHA256).Hash.ToUpperInvariant()
+  $predecessorVersion = "fixture-$Target"
+  $predecessorArchive = ('tests/synthetic/' + [IO.Path]::GetFileName($predecessorPath))
+  $record = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42HistoricalPlaytestTargetV1';target=$Target;maturity='structural-fixture';base_materializer_target='f100';factorio_line=$line
+    distribution_version=('4.2.' + $Target.Substring(1) + '00');engine=[pscustomobject][ordered]@{path=$enginePath;version="fixture-$Target";sha256=$engineHash}
+    predecessor=[pscustomobject][ordered]@{version=$predecessorVersion;archive=$predecessorArchive;sha256=$predecessorHash};public_output_authorized=$false;publication_authorized=$false;record_sha256=$engineHash
+  }
+  $sealRecord = [pscustomobject][ordered]@{
+    schema=1;kind='Mir3TerminalTargetSealV1';status='sealed';release=$predecessorVersion;target=$line;archive_sha256=$predecessorHash
+    bytes=[int64](Get-Item -LiteralPath $predecessorPath).Length;content_sha256=$predecessorHash;entries=1
+    engine=[pscustomobject][ordered]@{version="fixture-$Target";binary_sha256=$engineHash};record_sha256=$predecessorHash
+  }
+  return [pscustomobject][ordered]@{
+    fixture_scope='synthetic-structural-reader-only';identity=[pscustomobject][ordered]@{target=$Target;target_record_path=('tests/synthetic/target-' + $Target + '.json')}
+    target_record=[pscustomobject][ordered]@{sha256=$engineHash;record=$record};terminal_seal=[pscustomobject][ordered]@{sha256=$predecessorHash;record=$sealRecord};predecessor_path=$predecessorPath
+  }
+}
+
 
 $modern = [pscustomobject][ordered]@{
   targets = @($script:MIR42SealTargets | ForEach-Object { [pscustomobject][ordered]@{target=$_} })
@@ -34,31 +90,54 @@ try { Assert-MIR42SealCandidateScopeMatch -Rows @($modern.targets) -Candidate $n
 Assert-MIR42NineSealTest -Condition $rejected -Code 'mixed-scope-rejected'
 
 foreach ($target in $script:MIR42SealHistoricalTargets) {
-  $authority = Get-MIR42HistoricalTerminalAuthority -RepoRoot $repo -Target $target
-  $record = $authority.target_record.record
-  $seal = $authority.terminal_seal.record
-  Assert-MIR42NineSealTest -Condition ([string]$authority.identity.target -ceq $target) -Code "identity-$target"
-  Assert-MIR42NineSealTest -Condition ([string]$record.target -ceq $target -and -not [bool]$record.public_output_authorized -and -not [bool]$record.publication_authorized) -Code "record-$target"
-  Assert-MIR42NineSealTest -Condition ([string]$seal.release -ceq [string]$record.predecessor.version -and [string]$seal.archive_sha256 -ceq [string]$record.predecessor.sha256) -Code "terminal-$target"
-  $runAuthority = [pscustomobject][ordered]@{
-    target_record = [pscustomobject][ordered]@{path=[string]$authority.identity.target_record_path;sha256=[string]$authority.target_record.sha256;record_sha256=[string]$record.record_sha256}
-    terminal_seal = [pscustomobject][ordered]@{path=('.mir/releases/terminal/seals/' + [string]$record.predecessor.version + '.json');sha256=[string]$authority.terminal_seal.sha256;record_sha256=[string]$seal.record_sha256;target=[string]$record.factorio_line;release=[string]$record.predecessor.version}
-    engine = [pscustomobject][ordered]@{path=[string]$record.engine.path;version=[string]$record.engine.version;sha256=[string]$record.engine.sha256}
-    predecessor = [pscustomobject][ordered]@{path=[string]$record.predecessor.archive;version=[string]$record.predecessor.version;sha256=[string]$record.predecessor.sha256;bytes=[int64]$seal.bytes;content_sha256=[string]$seal.content_sha256;entry_count=[int]$seal.entries}
+  $committed = Get-MIR42NineSealCommittedHistoricalFixture -RepoRoot $repo -Target $target
+  $record = $committed.target_record.record
+  $seal = $committed.terminal_seal.record
+  Assert-MIR42NineSealTest -Condition ([string]$committed.fixture_scope -ceq 'committed-target-record-and-terminal-seal-only' -and
+    [string]$committed.identity.target -ceq $target -and [string]$record.target -ceq $target) -Code "committed-identity-$target"
+  Assert-MIR42NineSealTest -Condition ([string]$seal.release -ceq [string]$record.predecessor.version -and
+    [string]$seal.archive_sha256 -ceq [string]$record.predecessor.sha256 -and
+    [string]$seal.engine.binary_sha256 -ceq [string]$record.engine.sha256) -Code "committed-binding-$target"
+}
+$terminalFixtureRoot = Join-Path $repo ('build/test-results/mir42-nine-terminal-reader-' + [guid]::NewGuid().ToString('N'))
+$historicalReader = (Get-Item Function:Get-MIR42HistoricalTerminalAuthority).ScriptBlock
+try {
+  New-Item -ItemType Directory -Force -Path $terminalFixtureRoot | Out-Null
+  $historicalFixtures = @{}
+  foreach ($target in $script:MIR42SealHistoricalTargets) { $historicalFixtures[$target] = New-MIR42NineSealSyntheticHistoricalFixture -FixtureRoot $terminalFixtureRoot -Target $target }
+  Set-Item Function:Get-MIR42HistoricalTerminalAuthority -Value { param($RepoRoot,$Target) return $historicalFixtures[$Target] }
+  foreach ($target in $script:MIR42SealHistoricalTargets) {
+    $authority = $historicalFixtures[$target]
+    $record = $authority.target_record.record
+    $seal = $authority.terminal_seal.record
+    Assert-MIR42NineSealTest -Condition ([string]$authority.fixture_scope -ceq 'synthetic-structural-reader-only' -and [string]$authority.identity.target -ceq $target) -Code "identity-$target"
+    Assert-MIR42NineSealTest -Condition ([string]$record.target -ceq $target -and -not [bool]$record.public_output_authorized -and -not [bool]$record.publication_authorized) -Code "record-$target"
+    Assert-MIR42NineSealTest -Condition ([string]$seal.release -ceq [string]$record.predecessor.version -and [string]$seal.archive_sha256 -ceq [string]$record.predecessor.sha256) -Code "terminal-$target"
+    $runAuthority = [pscustomobject][ordered]@{
+      target_record = [pscustomobject][ordered]@{path=[string]$authority.identity.target_record_path;sha256=[string]$authority.target_record.sha256;record_sha256=[string]$record.record_sha256}
+      terminal_seal = [pscustomobject][ordered]@{path=('.mir/releases/terminal/seals/' + [string]$record.predecessor.version + '.json');sha256=[string]$authority.terminal_seal.sha256;record_sha256=[string]$seal.record_sha256;target=[string]$record.factorio_line;release=[string]$record.predecessor.version}
+      engine = [pscustomobject][ordered]@{path=[string]$record.engine.path;version=[string]$record.engine.version;sha256=[string]$record.engine.sha256}
+      predecessor = [pscustomobject][ordered]@{path=[string]$record.predecessor.archive;version=[string]$record.predecessor.version;sha256=[string]$record.predecessor.sha256;bytes=[int64]$seal.bytes;content_sha256=[string]$seal.content_sha256;entry_count=[int]$seal.entries}
+    }
+    $execution = [pscustomobject][ordered]@{
+      executable_path=[string]$record.engine.path;executable_sha256=[string]$record.engine.sha256;version=[string]$record.engine.version
+      predecessor=[pscustomobject][ordered]@{path=[string]$authority.predecessor_path;sha256=[string]$record.predecessor.sha256;version=[string]$record.predecessor.version}
+      harness_receipt=[pscustomobject][ordered]@{path=$reader;sha256=(Get-FileHash -LiteralPath $reader -Algorithm SHA256).Hash.ToUpperInvariant()};harness_exit_code=0
+      logs=@();fresh_loads=@();fresh_exact_load=$true;predecessor_upgrade=$true;reload_count=2;historical_terminal_authority=$runAuthority
+    }
+    Assert-MIR42HistoricalTerminalExecution -RepoRoot $repo -Target ([pscustomobject][ordered]@{target=$target}) -Execution $execution -HistoricalAuthorities @([pscustomobject][ordered]@{target=$target;authority=$runAuthority})
+    $tamperedAuthority = $runAuthority | Select-Object *
+    $tamperedAuthority.predecessor = $runAuthority.predecessor | Select-Object *
+    $tamperedAuthority.predecessor.sha256 = '0' * 64
+    $tampered = $false
+    try { Assert-MIR42HistoricalTerminalExecution -RepoRoot $repo -Target ([pscustomobject][ordered]@{target=$target}) -Execution $execution -HistoricalAuthorities @([pscustomobject][ordered]@{target=$target;authority=$tamperedAuthority}) } catch { $tampered = $_.Exception.Message -match '^\[mir42-seal-historical-authority-binding\]' }
+    Assert-MIR42NineSealTest -Condition $tampered -Code "terminal-tamper-$target"
   }
-  $execution = [pscustomobject][ordered]@{
-    executable_path=[string]$record.engine.path;executable_sha256=[string]$record.engine.sha256;version=[string]$record.engine.version
-    predecessor=[pscustomobject][ordered]@{path=(Join-Path $repo ([string]$record.predecessor.archive));sha256=[string]$record.predecessor.sha256;version=[string]$record.predecessor.version}
-    harness_receipt=[pscustomobject][ordered]@{path=$reader;sha256=(Get-FileHash -LiteralPath $reader -Algorithm SHA256).Hash.ToUpperInvariant()};harness_exit_code=0
-    logs=@();fresh_loads=@();fresh_exact_load=$true;predecessor_upgrade=$true;reload_count=2;historical_terminal_authority=$runAuthority
-  }
-  Assert-MIR42HistoricalTerminalExecution -RepoRoot $repo -Target ([pscustomobject][ordered]@{target=$target}) -Execution $execution -HistoricalAuthorities @([pscustomobject][ordered]@{target=$target;authority=$runAuthority})
-  $tamperedAuthority = $runAuthority | Select-Object *
-  $tamperedAuthority.predecessor = $runAuthority.predecessor | Select-Object *
-  $tamperedAuthority.predecessor.sha256 = '0' * 64
-  $tampered = $false
-  try { Assert-MIR42HistoricalTerminalExecution -RepoRoot $repo -Target ([pscustomobject][ordered]@{target=$target}) -Execution $execution -HistoricalAuthorities @([pscustomobject][ordered]@{target=$target;authority=$tamperedAuthority}) } catch { $tampered = $_.Exception.Message -match '^\[mir42-seal-historical-authority-binding\]' }
-  Assert-MIR42NineSealTest -Condition $tampered -Code "terminal-tamper-$target"
+} finally {
+  Set-Item Function:Get-MIR42HistoricalTerminalAuthority -Value $historicalReader
+  $buildRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
+  if (-not [IO.Path]::GetFullPath($terminalFixtureRoot).StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-nine-terminal-fixture-containment]' }
+  if (Test-Path -LiteralPath $terminalFixtureRoot) { Remove-Item -LiteralPath $terminalFixtureRoot -Recurse -Force }
 }
 
 $readerFixtureRoot = Join-Path $repo ('build/test-results/mir42-nine-seal-reader-' + [guid]::NewGuid().ToString('N'))
