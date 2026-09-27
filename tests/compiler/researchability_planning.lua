@@ -243,6 +243,19 @@ world.labs.lab.inputs = {"custom-tool-pack"}
 check("R10", not registry.science_pack_exists("custom-item-pack") and registry.science_pack_exists("custom-tool-pack"),
   "A new compiler context does not inherit the previous context's membership")
 
+reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}))
+visits = 0
+local cold_observer = {reserve_visit = function()
+  visits = visits + 1
+  return visits <= 2
+end}
+local partial_inputs = registry.all_lab_inputs(cold_observer)
+check("R11", #partial_inputs == 1 and context:state_view("lab_input_index") == nil,
+  "A diagnostic stopped during a cold index never caches its incomplete lab inputs")
+check("R12", registry.science_pack_exists("custom-item-pack") and registry.science_pack_exists("custom-tool-pack")
+    and #registry.all_lab_inputs() == 2,
+  "Ordinary membership after a stopped cold diagnostic reconstructs the complete lab index")
+
 local function technology(pack, unlock_recipe)
   local technology = {enabled = true, unit = {count = 1, time = 1, ingredients = {{name = pack, amount = 1}}}}
   if unlock_recipe then technology.effects = {{type = "unlock-recipe", recipe = unlock_recipe}} end
@@ -1401,6 +1414,30 @@ reset(enabled_future_gate_world({singleton = true}))
 check("MG03", table.concat(production.prereq_techs_for_science_pack("gated-pack"), ",") == "GateOne"
   and production.prereq_tech_for_science_pack("gated-pack") == "GateOne",
   "The legacy scalar prerequisite remains available for an exact singleton gate")
+
+local alternative_gate_world = enabled_future_gate_world()
+alternative_gate_world.techs.RequiredAlternative = technology("starter-pack", "gate-component-a-recipe")
+alternative_gate_world.techs.GateTwo.prerequisites = {"RequiredAlternative"}
+alternative_gate_world.unlockers["gate-component-a-recipe"] = {"GateOne", "RequiredAlternative"}
+reset(alternative_gate_world)
+local alternative_gate_route = production.production_route_for_pack("gated-pack")
+local selected_alternative = false
+for _, pair in ipairs(alternative_gate_route and alternative_gate_route.provenance.selected_research_unlock_pairs or {}) do
+  selected_alternative = selected_alternative
+    or (pair.recipe == "gate-component-a-recipe" and pair.unlocker == "RequiredAlternative")
+end
+check("MG09", alternative_gate_route and selected_alternative
+  and table.concat(alternative_gate_route.unlockers, ",") == "GateTwo"
+  and table.concat(alternative_gate_route.prerequisite_closure, ",") == "RequiredAlternative",
+  "An exact alternative recipe unlock already required by another selected gate avoids an unrelated extra gate")
+
+alternative_gate_world.unlockers["gate-component-a-recipe"] = {"GateOne"}
+alternative_gate_world.techs.RequiredAlternative.effects = {}
+reset(alternative_gate_world)
+local unrelated_gate_route = production.production_route_for_pack("gated-pack")
+check("MG10", unrelated_gate_route
+  and table.concat(unrelated_gate_route.unlockers, ",") == "GateOne,GateTwo",
+  "An already required technology that does not unlock the exact recipe cannot replace its acquisition gate")
 
 reset(enabled_future_gate_world({invalid = true}))
 check("MG04", production.pack_production_status("gated-pack", {}) == "unreachable"

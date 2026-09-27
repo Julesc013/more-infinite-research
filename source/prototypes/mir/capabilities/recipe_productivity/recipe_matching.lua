@@ -8,6 +8,8 @@ local target_profiles = require("prototypes.mir.platform.factorio.target_profile
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
+local relationships = require("prototypes.mir.index.relationships")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
 local R = {}
 
@@ -99,23 +101,177 @@ end
 -- final route is an ordinary, deterministic, non-recovery process.
 local function material_graph()
   return compiler_context.current():state_view("material_route_graph", function()
-    local graph = {edges = {}, complete = true, edge_count = 0}
+    local graph = {edges = {}, typed_edges = {}, complete = true, edge_count = 0}
     recipe_facts.for_each(function(_, fact)
       for _, variant in ipairs(fact.variants or {}) do
         for _, input in ipairs(variant.ingredients or {}) do
           graph.edges[input.name] = graph.edges[input.name] or {}
+          local input_identity = type(input.type) == "string" and input.type ~= ""
+            and type(input.name) == "string" and input.name ~= ""
+            and input.type .. "\30" .. input.name or nil
+          if input_identity then graph.typed_edges[input_identity] = graph.typed_edges[input_identity] or {} end
           for _, output in ipairs(variant.results or {}) do
             if not graph.edges[input.name][output.name] then
               graph.edge_count = graph.edge_count + 1
               if graph.edge_count > 100000 then graph.complete = false; return end
               graph.edges[input.name][output.name] = true
             end
+            local output_identity = type(output.type) == "string" and output.type ~= ""
+              and type(output.name) == "string" and output.name ~= ""
+              and output.type .. "\30" .. output.name or nil
+            if input_identity and output_identity then graph.typed_edges[input_identity][output_identity] = true end
           end
         end
       end
     end)
     return graph
   end)
+end
+
+local function typed_identity(entry)
+  if type(entry) ~= "table" or type(entry.type) ~= "string" or entry.type == ""
+    or type(entry.name) ~= "string" or entry.name == "" then
+    return nil
+  end
+  return entry.type .. "\30" .. entry.name
+end
+
+local function sorted_keys(set)
+  local out = {}
+  for key in pairs(set or {}) do out[#out + 1] = key end
+  table.sort(out)
+  return out
+end
+
+local function route_identities(recipe, field)
+  local out = {}
+  for _, variant in ipairs((recipe and recipe.variants) or {}) do
+    for _, entry in ipairs(variant[field] or {}) do
+      local identity = typed_identity(entry)
+      if identity then out[identity] = true end
+    end
+  end
+  return out
+end
+
+-- Build the exact typed return cone for one productivity route.  It includes
+-- every recipe which consumes a value reachable from the route's result, plus
+-- every direct producer of that result.  Therefore a disconnected extension
+-- is outside the certificate, while an added return edge, a changed hidden
+-- witness, or another producer of the finished result changes it.  The cone
+-- uses the canonical recipe-fact index and shares the ordinary material graph
+-- budget; an incomplete graph never grants a profile exception.
+local function relevant_return_graph(recipe)
+  if type(recipe) ~= "table" or type(recipe.name) ~= "string" or recipe.name == ""
+    or type(recipe.variants) ~= "table" or #recipe.variants == 0 then
+    return nil, "route"
+  end
+  local graph = material_graph()
+  if not graph.complete then return nil, "process-graph-budget" end
+  local outputs, inputs = route_identities(recipe, "results"), route_identities(recipe, "ingredients")
+  if next(outputs) == nil or next(inputs) == nil then return nil, "route-identities" end
+
+  local queue, reached = {}, {}
+  for _, identity in ipairs(sorted_keys(outputs)) do queue[#queue + 1], reached[identity] = identity, true end
+  local head = 1
+  while head <= #queue do
+    if head > 30000 then return nil, "process-search-budget" end
+    local identity = queue[head]
+    head = head + 1
+    for next_identity in pairs(graph.typed_edges[identity] or {}) do
+      if not reached[next_identity] then
+        reached[next_identity] = true
+        queue[#queue + 1] = next_identity
+      end
+    end
+  end
+
+  local index = recipe_facts.index_view()
+  if type(index) ~= "table" or type(index.facts) ~= "table" then return nil, "recipe-index" end
+  local selected, direct_output_producers = {}, {}
+  for recipe_name, fact in pairs(index.facts) do
+    local consumes_reached = false
+    for _, variant in ipairs(fact.variants or {}) do
+      for _, entry in ipairs(variant.ingredients or {}) do
+        if reached[typed_identity(entry)] then consumes_reached = true; break end
+      end
+      if consumes_reached then break end
+    end
+    if consumes_reached then selected[recipe_name] = true end
+    for _, variant in ipairs(fact.variants or {}) do
+      for _, entry in ipairs(variant.results or {}) do
+        if outputs[typed_identity(entry)] then
+          selected[recipe_name] = true
+          direct_output_producers[recipe_name] = true
+          break
+        end
+      end
+    end
+  end
+  local facts = {}
+  for _, recipe_name in ipairs(sorted_keys(selected)) do
+    facts[#facts + 1] = {name = recipe_name, fact = index.facts[recipe_name]}
+  end
+  return {
+    schema = 1,
+    route = recipe.name,
+    input_identities = sorted_keys(inputs),
+    output_identities = sorted_keys(outputs),
+    reachable_identities = sorted_keys(reached),
+    direct_output_producers = sorted_keys(direct_output_producers),
+    facts = facts
+  }
+end
+
+local function relevant_route_bindings(recipe_name)
+  local index = relationships.view("input")
+  if type(index) ~= "table" then return nil, "relationship-index" end
+  local owners = {}
+  for _, name in ipairs((index.technologies_by_recipe_effect or {})[recipe_name] or {}) do
+    -- The certificate observes ownership external to the MIR technology it is
+    -- currently generating.  Its own stable recipe-prod-* row can exist in a
+    -- later final-data observer, whereas a foreign owner remains material.
+    if not string.match(name, "^recipe%-prod%-") then owners[#owners + 1] = name end
+  end
+  table.sort(owners)
+  local unlocks = {}
+  for _, name in ipairs((index.unlocks_by_recipe or {})[recipe_name] or {}) do
+    local technology = data_raw.technology(name)
+    if type(technology) ~= "table" or type(technology.unit) ~= "table" then return nil, "unlock" end
+    local science, prerequisites = {}, {}
+    for _, entry in ipairs(technology.unit.ingredients or {}) do
+      local pack, amount = entry.name or entry[1], tonumber(entry.amount or entry[2])
+      if type(pack) ~= "string" or pack == "" or amount == nil or amount <= 0 then return nil, "unlock-science" end
+      science[#science + 1] = {name = pack, amount = amount}
+    end
+    table.sort(science, function(left, right) return left.name < right.name end)
+    for _, prerequisite in ipairs(technology.prerequisites or {}) do
+      if type(prerequisite) ~= "string" or prerequisite == "" then return nil, "unlock-prerequisite" end
+      prerequisites[#prerequisites + 1] = prerequisite
+    end
+    table.sort(prerequisites)
+    unlocks[#unlocks + 1] = {name = name, science_ingredients = science, prerequisites = prerequisites}
+  end
+  table.sort(unlocks, function(left, right) return left.name < right.name end)
+  return {schema = 1, recipe = recipe_name, productivity_owner_technologies = owners, unlock_technologies = unlocks}
+end
+
+-- Read-only certificate facts for package-excluded observers and reviewed
+-- route matching.  They intentionally exclude unrelated recipes so a
+-- disconnected QoL extension remains admissible under the exact provider lock.
+function R.relevant_route_fingerprints(recipe)
+  local boundary, boundary_reason = relevant_return_graph(recipe)
+  if not boundary then return nil, boundary_reason end
+  local bindings, bindings_reason = relevant_route_bindings(recipe.name)
+  if not bindings then return nil, bindings_reason end
+  return {
+    schema = 1,
+    return_graph_fingerprint = fingerprint.of(boundary),
+    bindings_fingerprint = fingerprint.of(bindings),
+    reachable_identity_count = #boundary.reachable_identities,
+    relevant_recipe_count = #boundary.facts,
+    direct_output_producer_count = #boundary.direct_output_producers
+  }
 end
 
 function R.material_route_is_acyclic(recipe)
@@ -228,8 +384,10 @@ local function exact_entries(entries, expected)
   return true
 end
 
-local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks)
+local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks, scope)
   if type(mod_locks) ~= "table" or type(runtime_mods) ~= "table" then return false end
+  scope = scope or "closed"
+  if scope ~= "closed" and scope ~= "named-relevant-providers" and scope ~= "relevant-return-graph" then return false end
   local count = 0
   for name, expected in pairs(mod_locks) do
     count = count + 1
@@ -238,9 +396,23 @@ local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks)
   if count == 0 then return false end
   observer_mod_locks = observer_mod_locks or {}
   if type(observer_mod_locks) ~= "table" then return false end
+  for name, expected in pairs(observer_mod_locks) do
+    if type(name) ~= "string" or name == "" or type(expected) ~= "string" or expected == "" then return false end
+    if runtime_mods[name] ~= nil and runtime_mods[name] ~= expected then return false end
+  end
   for name, actual in pairs(runtime_mods) do
     local expected = mod_locks[name] or observer_mod_locks[name]
-    if type(name) ~= "string" or type(actual) ~= "string" or expected ~= actual then return false end
+    -- The named relevant-provider policy leaves only MIR's package version
+    -- outside the external provider fingerprint.  It is deliberately not a
+    -- general unlisted-mod allowance: an unknown extension can alter a
+    -- return graph outside the direct recipe certificate.  The separate
+    -- relevant-return-graph scope admits an unknown extension only after its
+    -- exact typed boundary and route bindings have matched below.
+    local mir_bookkeeping = scope == "named-relevant-providers"
+      and name == "more-infinite-research" and mod_locks[name] == nil
+      and observer_mod_locks[name] == nil
+    if type(name) ~= "string" or type(actual) ~= "string" or actual == ""
+      or (scope ~= "relevant-return-graph" and not mir_bookkeeping and expected ~= actual) then return false end
   end
   return true
 end
@@ -264,12 +436,168 @@ local function empty_dense_array(value)
   return dense_array(value) and #value == 0
 end
 
+local function exact_string_list(actual, expected)
+  if type(actual) ~= "table" or type(expected) ~= "table"
+    or not dense_array(actual) or not dense_array(expected) or #actual ~= #expected then return false end
+  local actual_seen, expected_seen = {}, {}
+  for _, value in ipairs(actual) do
+    if type(value) ~= "string" or value == "" or actual_seen[value] then return false end
+    actual_seen[value] = true
+  end
+  for _, value in ipairs(expected) do
+    if type(value) ~= "string" or value == "" or expected_seen[value] or not actual_seen[value] then return false end
+    expected_seen[value] = true
+  end
+  return true
+end
+
+local function exact_science_ingredients(actual, expected)
+  if type(actual) ~= "table" or type(expected) ~= "table"
+    or not dense_array(actual) or not dense_array(expected) or #actual ~= #expected then return false end
+  local function normalized(entries)
+    local out, seen = {}, {}
+    for _, entry in ipairs(entries) do
+      if type(entry) ~= "table" then return nil end
+      local name = entry.name or entry[1]
+      local amount = tonumber(entry.amount or entry[2])
+      if type(name) ~= "string" or name == "" or amount == nil or amount <= 0 or seen[name] then return nil end
+      seen[name] = true
+      out[name] = amount
+    end
+    return out
+  end
+  local actual_entries, expected_entries = normalized(actual), normalized(expected)
+  if not actual_entries or not expected_entries then return false end
+  for name, amount in pairs(expected_entries) do
+    if actual_entries[name] ~= amount then return false end
+  end
+  return true
+end
+
+-- A blocked return witness can have ranged results, so it cannot use the
+-- ordinary deterministic final-route predicate.  Its normalized I/O must
+-- nevertheless match exactly; otherwise a changed disabled recipe could
+-- silently become a different graph witness under a named-provider route.
+local function exact_witness_entry(actual, expected)
+  if not has_only_reviewed_entry_fields(actual) or not has_only_reviewed_entry_fields(expected) then return false end
+  for _, field in ipairs(REVIEWED_ENTRY_FIELDS) do
+    if reviewed_entry_value(actual, field) ~= reviewed_entry_value(expected, field) then return false end
+  end
+  return type(actual.type) == "string" and actual.type ~= ""
+    and type(actual.name) == "string" and actual.name ~= ""
+    and type(expected.type) == "string" and expected.type ~= ""
+    and type(expected.name) == "string" and expected.name ~= ""
+end
+
+local function exact_witness_entries(entries, expected)
+  if type(entries) ~= "table" or type(expected) ~= "table" or #entries ~= #expected then return false end
+  for index, actual in ipairs(entries) do
+    if not exact_witness_entry(actual, expected[index]) then return false end
+  end
+  return true
+end
+
+local function relevant_input_contract_matches(recipe_name, contract)
+  if type(contract) ~= "table" or type(contract.productivity_owner_technologies) ~= "table"
+    or type(contract.unlock_technologies) ~= "table" or type(contract.return_path) ~= "string"
+    or contract.return_path == "" or type(contract.return_witnesses) ~= "table"
+    or not dense_array(contract.unlock_technologies) or not dense_array(contract.return_witnesses)
+    or #contract.return_witnesses == 0 then
+    return false, "contract"
+  end
+  local index = relationships.view("input")
+  if type(index) ~= "table" then return false, "contract" end
+  local owners = (index.technologies_by_recipe_effect or {})[recipe_name] or {}
+  if not exact_string_list(owners, contract.productivity_owner_technologies) then return false, "owner" end
+
+  local unlock_names, seen = {}, {}
+  for _, expected in ipairs(contract.unlock_technologies) do
+    if type(expected) ~= "table" or type(expected.name) ~= "string" or expected.name == ""
+      or seen[expected.name] or type(expected.science_ingredients) ~= "table"
+      or type(expected.prerequisites) ~= "table" then
+      return false, "contract"
+    end
+    seen[expected.name] = true
+    unlock_names[#unlock_names + 1] = expected.name
+  end
+  local actual_unlocks = (index.unlocks_by_recipe or {})[recipe_name] or {}
+  if not exact_string_list(actual_unlocks, unlock_names) then return false, "unlock" end
+  for _, expected in ipairs(contract.unlock_technologies) do
+    local technology = data_raw.technology(expected.name)
+    if type(technology) ~= "table" or type(technology.unit) ~= "table"
+      or not exact_science_ingredients(technology.unit.ingredients, expected.science_ingredients)
+      or not exact_string_list(technology.prerequisites, expected.prerequisites) then
+      return false, "unlock-science-or-prerequisite"
+    end
+  end
+  local witness_seen = {}
+  for _, expected in ipairs(contract.return_witnesses) do
+    if type(expected) ~= "table" or type(expected.name) ~= "string" or expected.name == ""
+      or witness_seen[expected.name] or expected.hidden ~= true
+      or expected.enabled_without_research ~= false or expected.source_class ~= "hidden-internal"
+      or type(expected.variants) ~= "table" or not dense_array(expected.variants)
+      or #expected.variants == 0 then
+      return false, "return-witness-contract"
+    end
+    witness_seen[expected.name] = true
+    local fact = recipe_facts.view(expected.name)
+    if type(fact) ~= "table" or fact.name ~= expected.name or fact.hidden ~= true
+      or fact.enabled_without_research ~= false or fact.source_class ~= "hidden-internal"
+      or type(fact.variants) ~= "table" or #fact.variants ~= #expected.variants then
+      return false, "return-witness"
+    end
+    for index, expected_variant in ipairs(expected.variants) do
+      local variant = fact.variants[index]
+      if type(expected_variant) ~= "table" or expected_variant.hidden ~= true
+        or expected_variant.enabled ~= false or type(expected_variant.ingredients) ~= "table"
+        or type(expected_variant.results) ~= "table" or type(variant) ~= "table"
+        or variant.hidden ~= true or variant.enabled ~= false
+        or not exact_witness_entries(variant.ingredients, expected_variant.ingredients)
+        or not exact_witness_entries(variant.results, expected_variant.results) then
+        return false, "return-witness"
+      end
+    end
+  end
+  return true, "accepted"
+end
+
+local function relevant_return_graph_contract_matches(recipe, contract)
+  if type(contract) ~= "table" or contract.schema ~= 1
+    or not valid_mir32_fingerprint(contract.return_graph_fingerprint)
+    or not valid_mir32_fingerprint(contract.bindings_fingerprint)
+    or type(contract.reachable_identity_count) ~= "number" or contract.reachable_identity_count < 1
+    or contract.reachable_identity_count ~= math.floor(contract.reachable_identity_count)
+    or type(contract.relevant_recipe_count) ~= "number" or contract.relevant_recipe_count < 1
+    or contract.relevant_recipe_count ~= math.floor(contract.relevant_recipe_count)
+    or type(contract.direct_output_producer_count) ~= "number" or contract.direct_output_producer_count < 1
+    or contract.direct_output_producer_count ~= math.floor(contract.direct_output_producer_count) then
+    return false, "return-graph-contract"
+  end
+  for field in pairs(contract) do
+    if field ~= "schema" and field ~= "return_graph_fingerprint" and field ~= "bindings_fingerprint"
+      and field ~= "reachable_identity_count" and field ~= "relevant_recipe_count"
+      and field ~= "direct_output_producer_count" then
+      return false, "return-graph-contract"
+    end
+  end
+  local actual, reason = R.relevant_route_fingerprints(recipe)
+  if not actual then return false, "return-graph-" .. reason end
+  if actual.return_graph_fingerprint ~= contract.return_graph_fingerprint
+    or actual.bindings_fingerprint ~= contract.bindings_fingerprint
+    or actual.reachable_identity_count ~= contract.reachable_identity_count
+    or actual.relevant_recipe_count ~= contract.relevant_recipe_count
+    or actual.direct_output_producer_count ~= contract.direct_output_producer_count then
+    return false, "return-graph"
+  end
+  return true, "accepted"
+end
+
 local function matching_profile(profiles, runtime_mods)
   if type(profiles) ~= "table" or #profiles == 0 then return nil, "profile-missing" end
   for _, profile in ipairs(profiles) do
     if type(profile) == "table" and type(profile.id) == "string" and profile.id ~= ""
       and valid_mir32_fingerprint(profile.canonical_risk_fingerprint)
-      and exact_mod_lock(profile.mod_locks, runtime_mods, profile.observer_mod_locks) then
+      and exact_mod_lock(profile.mod_locks, runtime_mods, profile.observer_mod_locks, profile.mod_lock_scope) then
       return profile, "matched"
     end
   end
@@ -278,7 +606,7 @@ end
 
 local reviewed_forward_routes = {}
 
-function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, runtime_mods)
+function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, runtime_mods, return_reason)
   if type(certificate) ~= "table" or type(certificate.id) ~= "string" or certificate.id == ""
     or type(certificate.evidence_id) ~= "string" or certificate.evidence_id == ""
     or tonumber(certificate.maximum_productivity) ~= 3.0 then
@@ -304,6 +632,25 @@ function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, ru
   if profile.canonical_risk_fingerprint ~= risk.risk_fingerprint then
     return false, "canonical-risk"
   end
+  if profile.mod_lock_scope == "named-relevant-providers" then
+    local relevant, relevant_reason = relevant_input_contract_matches(recipe_name, certificate.relevant_input_contract)
+    if not relevant then return false, "relevant-" .. relevant_reason end
+    if return_reason and return_reason ~= "potential-return-path:" .. certificate.relevant_input_contract.return_path then
+      return false, "return-path"
+    end
+  elseif profile.mod_lock_scope == "relevant-return-graph" then
+    local relevant, relevant_reason = relevant_return_graph_contract_matches(fact, certificate.relevant_return_graph_contract)
+    if not relevant then return false, "relevant-" .. relevant_reason end
+    if certificate.relevant_input_contract then
+      local input_matches, input_reason = relevant_input_contract_matches(recipe_name, certificate.relevant_input_contract)
+      if not input_matches then return false, "relevant-" .. input_reason end
+      if return_reason and return_reason ~= "potential-return-path:" .. certificate.relevant_input_contract.return_path then
+        return false, "return-path"
+      end
+    elseif return_reason then
+      return false, "return-path-unwitnessed"
+    end
+  end
   if #(fact.variants or {}) ~= 1 then return false, "variant-count" end
   local variant = fact.variants[1]
   if variant.effective_allow_productivity ~= true or variant.declared_allow_productivity ~= true
@@ -320,6 +667,7 @@ end
 local function should_skip_recipe(recipe_name, recipe, options)
   local certificate = options.reviewed_forward_routes and options.reviewed_forward_routes[recipe_name]
   local certificate_required = options.require_exact_route_certificate == true
+    or (type(certificate) == "table" and certificate.require_exact_route_certificate == true)
   local certificate_admitted, certificate_reason = false, "certificate-not-required"
   if certificate_required then
     certificate_admitted, certificate_reason = reviewed_forward_routes.admits(
@@ -336,9 +684,10 @@ local function should_skip_recipe(recipe_name, recipe, options)
       certificate_reason = "certificate-not-applicable"
       if string.sub(reason, 1, 22) == "potential-return-path:" and certificate then
         if certificate_required then
-          certified = certificate_admitted
+          certified, certificate_reason = reviewed_forward_routes.admits(
+            recipe_name, recipe, recipe_risk_facts.view(recipe_name), certificate, mods, reason)
         else
-          certified, certificate_reason = reviewed_forward_routes.admits(recipe_name, recipe, recipe_risk_facts.view(recipe_name), certificate, mods)
+          certified, certificate_reason = reviewed_forward_routes.admits(recipe_name, recipe, recipe_risk_facts.view(recipe_name), certificate, mods, reason)
         end
       end
       if not certified then

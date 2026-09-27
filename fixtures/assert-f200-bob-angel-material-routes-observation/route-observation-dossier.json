@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4F200BobAngelMaterialRouteObservationV1",
-  "scope": "F200 Bob plus Angel final-data observation and assertion for the sixteen ordinary material stream candidates. This fixture records normalized route and risk facts, active-mod versions, graph decisions, and emitted MIR effect ownership. It asserts sixteen exact emitted effect sets without changing product prototypes.",
+  "scope": "F200 Bob plus Angel final-data observation and assertion for the sixteen ordinary material stream candidates. This fixture records normalized route and risk facts, active-mod versions, graph decisions, and emitted MIR effect ownership. It asserts sixteen exact emitted effect sets and twenty-six exact final-route certificates without changing product prototypes.",
   "streams": [
     "research_material_aluminium",
     "research_material_gold",
@@ -38,10 +38,16 @@
       "more-infinite-research": "4.2.20000"
     },
     "routes": {
-      "nickel": ["angels-plate-nickel", "angels-plate-nickel-2"],
-      "silver": ["angels-plate-silver", "angels-plate-silver-2"]
+      "nickel": [
+        "angels-plate-nickel",
+        "angels-plate-nickel-2"
+      ],
+      "silver": [
+        "angels-plate-silver",
+        "angels-plate-silver-2"
+      ]
     },
-    "guard_observation": "The name-only material graph reaches each route input only through Bob recipes that Angel disables and hides in this exact profile: bob-silver-from-lead and bob-silver-nitrate. The profile lock and exact route/risk certificates retain the guard outside this observed lock."
+    "guard_observation": "The name-only material graph reaches each Nickel and Silver route input through Bob recipes that Angel disables and hides in this exact profile: bob-silver-from-lead and bob-silver-nitrate. The complete typed boundary now additionally binds those witnesses, every forward fact, direct finished-output producer, owner, unlock, science ingredients, and prerequisite for the F200 2.0.77 observed route."
   },
   "ordinary_graph_guard_observation": {
     "platinum": {
@@ -49,14 +55,273 @@
       "final_shape": "F200 with Angel smelting active and no bob-platinum-plate item",
       "admission_reason": "no-recipe-return-path",
       "expected_owner": "recipe-prod-research_material_platinum-1:0.02",
-      "excluded_routes": ["bob-platinum-plate", "angels-wire-platinum", "angels-wire-coil-platinum", "angels-wire-coil-platinum-2", "angels-plate-platinum", "angels-plate-platinum-2"],
+      "excluded_routes": [
+        "bob-platinum-plate",
+        "angels-wire-platinum",
+        "angels-wire-coil-platinum",
+        "angels-wire-coil-platinum-2",
+        "angels-plate-platinum",
+        "angels-plate-platinum-2"
+      ],
       "certificate_status": "ordinary material-family graph guard; no reviewed-forward certificate"
+    },
+    "gold_final_wire": {
+      "route": "angels-wire-gold-2",
+      "final_shape": "F200 Bob plus Angel exact provider lock",
+      "admission_reason": "no-recipe-return-path with required exact typed return-cone certificate",
+      "expected_owner": "recipe-prod-research_material_gold-1:0.02",
+      "same_stage_as_existing_plate_routes": true,
+      "coil_input": "angels-wire-coil-gold",
+      "nonproductive_exclusions": [
+        "angels-wire-gold",
+        "angels-wire-coil-gold",
+        "angels-wire-coil-gold-2"
+      ]
+    },
+    "silver_final_wire": {
+      "route": "angels-wire-silver-2",
+      "final_shape": "F200 Bob plus Angel exact provider lock",
+      "admission_reason": "no-recipe-return-path with required exact typed return-cone certificate",
+      "expected_owner": "recipe-prod-research_material_silver-1:0.02",
+      "same_stage_as_existing_plate_routes": true,
+      "coil_input": "angels-wire-coil-silver",
+      "nonproductive_exclusions": [
+        "angels-wire-silver",
+        "angels-wire-coil-silver",
+        "angels-wire-coil-silver-2"
+      ]
     }
-  },  "explicit_non_claims": [
-    "route admission under other mod locks",
-    "route admission under a different Bob/Angel mod lock",
+  },
+  "explicit_non_claims": [
+    "route admission under a different Bob/Angel provider lock",
+    "route admission when a connected recipe, producer, visibility, owner, unlock, science, or cap fact differs from the exact boundary",
+    "clean-source qualification",
     "science reachability",
     "technology ownership mutation",
     "release qualification"
-  ]
+  ],
+  "complete_return_graph_certificates": {
+    "evidence_id": "F200-BobAngel-16Material-return-graph-2.0.77-v1",
+    "route_count": 26,
+    "observation": {
+      "engine_version": "2.0.77",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "package_sha256": "98264A36DC4579CC6B35DE51D20E8C014959E3BD0CC9F3AA2DAEE9844CB53499",
+      "log_sha256": "6CEF7B80193530D7C54794F1039F39D91C3EA41E55A2DA563FA3A666A6A885EB",
+      "run": "build/tmp/mir42-integration/f200-return-graph-observation-51ef3930ed81473eaa88a90871f9be78",
+      "outcome": "Factorio final-data completed; raw log recovery recorded after postprocess wildcard failure; no engine rerun",
+      "scope": "private-preserved-package-F200-final-data-return-boundary-observation-not-clean-source-or-release-qualification"
+    },
+    "contract": "Each route requires schema 1 exact graph and bindings fingerprints plus all three observed counts. Direct final recipe I/O, ordinary visibility, productivity permission and the 3.0 effective cap are rechecked by the certificate evaluator.",
+    "routes": {
+      "angels-plate-aluminium": {
+        "return_graph_fingerprint": "mir32-1fde3ffa",
+        "bindings_fingerprint": "mir32-bf1d1b0e",
+        "reachable_identity_count": 72,
+        "relevant_recipe_count": 74,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-28583fe9"
+      },
+      "angels-plate-aluminium-2": {
+        "return_graph_fingerprint": "mir32-37eba2f4",
+        "bindings_fingerprint": "mir32-d51a65ae",
+        "reachable_identity_count": 72,
+        "relevant_recipe_count": 74,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-6ae1add6"
+      },
+      "angels-plate-brass": {
+        "return_graph_fingerprint": "mir32-b0d7b6ab",
+        "bindings_fingerprint": "mir32-3057c5da",
+        "reachable_identity_count": 38,
+        "relevant_recipe_count": 39,
+        "direct_output_producer_count": 2,
+        "risk_fingerprint": "mir32-cbfc7d0e"
+      },
+      "angels-plate-bronze": {
+        "return_graph_fingerprint": "mir32-221a57b3",
+        "bindings_fingerprint": "mir32-e5f8a5f0",
+        "reachable_identity_count": 46,
+        "relevant_recipe_count": 47,
+        "direct_output_producer_count": 2,
+        "risk_fingerprint": "mir32-fa8cecb5"
+      },
+      "angels-plate-cobalt-steel": {
+        "return_graph_fingerprint": "mir32-fb0f9f31",
+        "bindings_fingerprint": "mir32-c79936f7",
+        "reachable_identity_count": 38,
+        "relevant_recipe_count": 39,
+        "direct_output_producer_count": 2,
+        "risk_fingerprint": "mir32-b2a6ca58"
+      },
+      "angels-plate-gold": {
+        "return_graph_fingerprint": "mir32-780bbbfa",
+        "bindings_fingerprint": "mir32-d4567136",
+        "reachable_identity_count": 70,
+        "relevant_recipe_count": 75,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-82b81bf5"
+      },
+      "angels-plate-gold-2": {
+        "return_graph_fingerprint": "mir32-dec602a0",
+        "bindings_fingerprint": "mir32-2f72d9cd",
+        "reachable_identity_count": 70,
+        "relevant_recipe_count": 75,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-a5ba136b"
+      },
+      "angels-wire-gold-2": {
+        "return_graph_fingerprint": "mir32-c4953ea9",
+        "bindings_fingerprint": "mir32-f029b315",
+        "reachable_identity_count": 68,
+        "relevant_recipe_count": 72,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-f4af2099"
+      },
+      "angels-plate-gunmetal": {
+        "return_graph_fingerprint": "mir32-989f026e",
+        "bindings_fingerprint": "mir32-f5b0b17f",
+        "reachable_identity_count": 1,
+        "relevant_recipe_count": 2,
+        "direct_output_producer_count": 2,
+        "risk_fingerprint": "mir32-df72e755"
+      },
+      "angels-plate-invar": {
+        "return_graph_fingerprint": "mir32-3790f90d",
+        "bindings_fingerprint": "mir32-f6107c3a",
+        "reachable_identity_count": 1,
+        "relevant_recipe_count": 2,
+        "direct_output_producer_count": 2,
+        "risk_fingerprint": "mir32-85ae1247"
+      },
+      "angels-plate-lead": {
+        "return_graph_fingerprint": "mir32-102b5dd2",
+        "bindings_fingerprint": "mir32-d7313ff6",
+        "reachable_identity_count": 198,
+        "relevant_recipe_count": 207,
+        "direct_output_producer_count": 5,
+        "risk_fingerprint": "mir32-c79c9256"
+      },
+      "angels-plate-lead-2": {
+        "return_graph_fingerprint": "mir32-f73c4d86",
+        "bindings_fingerprint": "mir32-6b4b78ff",
+        "reachable_identity_count": 198,
+        "relevant_recipe_count": 207,
+        "direct_output_producer_count": 5,
+        "risk_fingerprint": "mir32-5ca75851"
+      },
+      "angels-plate-nickel": {
+        "return_graph_fingerprint": "mir32-a27ea44e",
+        "bindings_fingerprint": "mir32-ccf3ca93",
+        "reachable_identity_count": 950,
+        "relevant_recipe_count": 1488,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-b375a73e"
+      },
+      "angels-plate-nickel-2": {
+        "return_graph_fingerprint": "mir32-5f046c4a",
+        "bindings_fingerprint": "mir32-3040c5f9",
+        "reachable_identity_count": 950,
+        "relevant_recipe_count": 1488,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-d28043dc"
+      },
+      "angels-plate-nitinol": {
+        "return_graph_fingerprint": "mir32-eba2f6d8",
+        "bindings_fingerprint": "mir32-147c5076",
+        "reachable_identity_count": 5,
+        "relevant_recipe_count": 6,
+        "direct_output_producer_count": 2,
+        "risk_fingerprint": "mir32-e0fea025"
+      },
+      "angels-plate-silver": {
+        "return_graph_fingerprint": "mir32-a77805c2",
+        "bindings_fingerprint": "mir32-231b4067",
+        "reachable_identity_count": 950,
+        "relevant_recipe_count": 1488,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-fae4a0f7"
+      },
+      "angels-plate-silver-2": {
+        "return_graph_fingerprint": "mir32-f098b32a",
+        "bindings_fingerprint": "mir32-c11b2eb5",
+        "reachable_identity_count": 950,
+        "relevant_recipe_count": 1488,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-a0f6b276"
+      },
+      "angels-wire-silver-2": {
+        "return_graph_fingerprint": "mir32-99c58542",
+        "bindings_fingerprint": "mir32-53f936f8",
+        "reachable_identity_count": 130,
+        "relevant_recipe_count": 134,
+        "direct_output_producer_count": 2,
+        "risk_fingerprint": "mir32-ce67b188"
+      },
+      "angels-plate-tin": {
+        "return_graph_fingerprint": "mir32-0905b4fe",
+        "bindings_fingerprint": "mir32-1a2afdfa",
+        "reachable_identity_count": 207,
+        "relevant_recipe_count": 214,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-42e8ee87"
+      },
+      "angels-plate-tin-2": {
+        "return_graph_fingerprint": "mir32-3710fb19",
+        "bindings_fingerprint": "mir32-2fbc823d",
+        "reachable_identity_count": 207,
+        "relevant_recipe_count": 214,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-beddbea4"
+      },
+      "angels-plate-titanium": {
+        "return_graph_fingerprint": "mir32-2e5eac57",
+        "bindings_fingerprint": "mir32-d8eb8681",
+        "reachable_identity_count": 56,
+        "relevant_recipe_count": 58,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-b51c3afe"
+      },
+      "angels-plate-titanium-2": {
+        "return_graph_fingerprint": "mir32-84064d32",
+        "bindings_fingerprint": "mir32-6a2e39c1",
+        "reachable_identity_count": 56,
+        "relevant_recipe_count": 58,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-2addeacf"
+      },
+      "angels-plate-zinc": {
+        "return_graph_fingerprint": "mir32-07cff5a5",
+        "bindings_fingerprint": "mir32-8938e3e3",
+        "reachable_identity_count": 43,
+        "relevant_recipe_count": 45,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-9a178c6f"
+      },
+      "angels-plate-zinc-2": {
+        "return_graph_fingerprint": "mir32-39c69db5",
+        "bindings_fingerprint": "mir32-be12e0f1",
+        "reachable_identity_count": 43,
+        "relevant_recipe_count": 45,
+        "direct_output_producer_count": 3,
+        "risk_fingerprint": "mir32-d58ba53b"
+      },
+      "angels-wire-platinum-2": {
+        "return_graph_fingerprint": "mir32-3869a68c",
+        "bindings_fingerprint": "mir32-3e84abce",
+        "reachable_identity_count": 27,
+        "relevant_recipe_count": 28,
+        "direct_output_producer_count": 2,
+        "risk_fingerprint": "mir32-2f271ec9"
+      },
+      "bob-copper-tungsten-alloy": {
+        "return_graph_fingerprint": "mir32-cbb41f04",
+        "bindings_fingerprint": "mir32-6951a533",
+        "reachable_identity_count": 1,
+        "relevant_recipe_count": 1,
+        "direct_output_producer_count": 1,
+        "risk_fingerprint": "mir32-d92d266f"
+      }
+    }
+  }
 }
