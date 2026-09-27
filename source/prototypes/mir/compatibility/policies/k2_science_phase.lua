@@ -1,9 +1,19 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 
 local M = {
+  -- Retain the historical 2.1.2 contract verbatim. Its frozen witnesses bind
+  -- this public identity and exact version tuple.
   policy_id = "K2SciencePhasePolicyV1",
   applicability = {
     Krastorio2 = "2.1.2",
+    ["Krastorio2-spaced-out"] = "2.0.13"
+  },
+  -- This is a distinct, exact successor admission. It deliberately is not a
+  -- range: an upstream version must be separately observed and admitted.
+  v3_policy_id = "K2SciencePhasePolicyV3",
+  v3_applicability = {
+    base = "2.1.20",
+    Krastorio2 = "2.1.3",
     ["Krastorio2-spaced-out"] = "2.0.13"
   }
 }
@@ -34,23 +44,42 @@ local function ingredient_name(ingredient)
   return type(ingredient) == "table" and (ingredient.name or ingredient[1]) or nil
 end
 
-function M.applies(active_mods)
+local function matches_exact_tuple(active_mods, exact_versions)
   active_mods = active_mods or {}
-  return active_mods.Krastorio2 == M.applicability.Krastorio2
-    and active_mods["Krastorio2-spaced-out"] == M.applicability["Krastorio2-spaced-out"]
+  for name, version in pairs(exact_versions) do
+    if active_mods[name] ~= version then return false end
+  end
+  return true
+end
+
+local function matching_policy(active_mods)
+  if matches_exact_tuple(active_mods, M.applicability) then
+    return M.policy_id, M.applicability
+  end
+  if matches_exact_tuple(active_mods, M.v3_applicability) then
+    return M.v3_policy_id, M.v3_applicability
+  end
+  return nil, nil
+end
+
+function M.applies(active_mods)
+  local policy_id = matching_policy(active_mods)
+  return policy_id ~= nil
 end
 
 function M.normalize(ingredients, active_mods)
   local original = deepcopy(ingredients or {})
+  local matched_policy_id, matched_versions = matching_policy(active_mods)
   local decision = {
-    policy_id = M.policy_id,
+    -- Preserve unmatched and legacy decision identity/shape for old callers.
+    policy_id = matched_policy_id or M.policy_id,
     status = "not-applicable",
     applicable = false,
     changed = false,
-    exact_versions = deepcopy(M.applicability),
+    exact_versions = deepcopy(matched_versions or M.applicability),
     removed_packs = {}
   }
-  if not M.applies(active_mods) then return original, decision end
+  if not matched_policy_id then return original, decision end
 
   decision.applicable = true
   local present, phase_one, phase_two = {}, false, false

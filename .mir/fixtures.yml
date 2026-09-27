@@ -536,6 +536,27 @@ fixtures:
       - queue-and-storage-survive-each-bounded-reload
       - source-save-remains-byte-identical
 
+  k2-213-science-progressed-reload:
+    requires_features: []
+    path: fixtures/assert-k2-213-science-progressed-reload
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213
+    exact_version_envelope:
+      base: "2.1.20"
+      Krastorio2: "2.1.3"
+      Krastorio2-spaced-out: "2.0.13"
+      more-infinite-research: "4.2.21000"
+    implementation_policy: K2SciencePhasePolicyV3
+    qualification_status: unqualified
+    validates:
+      - exact-current-engine-k2-k2so-and-mir-tuple
+      - representative-early-and-late-final-emission-science
+      - fractional-current-research-at-42-percent
+      - queue-and-storage-survive-two-bounded-reloads
+      - source-save-remains-byte-identical
+      - historical-a04-fixture-and-proof-remain-distinct
+
   k2-03-imersite-bounded:
     requires_features: []
     path: fixtures/assert-k2-03-imersite
