@@ -2197,6 +2197,7 @@ check("U18", production.independent_pack_acquisition_witness("out-pack", "Other"
 -- root order must retain the same diamond route, while cycles and self-output
 -- routes remain rejected.  The final workload models repeated ordinary stream
 -- qualification and checks a measured reduction without encoding a K2 count.
+do
 local ROOT_PRIME_PACKS = {"Alpha", "Beta", "CycleA", "CycleB", "Gamma", "Seed", "Self"}
 local function root_prime_technology(ingredients, unlock_recipe)
   return {
@@ -2336,6 +2337,7 @@ world.producers.Seed = {}
 check("RP05", production.pack_production_status("Gamma", {}, {}) == "unreachable"
   and context:state_view("science_pack_production") ~= before_prime_epoch,
   "A recipe-source epoch replacement discards primed root knowledge")
+end
 
 reset({
   item_prototypes = {["free-pack"] = {type = "item"}, ["active-pack"] = {type = "item"}},
