@@ -167,6 +167,11 @@ function Assert-MIR4RuntimeRegistrationPlan {
   $registeredValue = if ($onLoadDictionary) { $onLoad['registered'] } elseif ($registeredPresent) { $registeredProperty.Value } else { $null }
   $mutationValue = if ($onLoadDictionary) { $onLoad['persistent_mutation'] } elseif ($mutationPresent) { $mutationProperty.Value } else { $null }
   $handlerPresent = if ($onLoadDictionary) { $onLoad.Contains('handler') } else { $null -ne $onLoad.PSObject.Properties['handler'] }
+  $callbacksPresent = if ($onLoadDictionary) { $onLoad.Contains('callbacks') } else { $null -ne $onLoad.PSObject.Properties['callbacks'] }
+  $callbackIds = @(
+    if ($callbacksPresent) { $onLoad.callbacks | ForEach-Object { [string]$_ } }
+  )
+  $approvedCallbackIds = @('passive_repair.on_load','research_browser.on_load')
   $countPresent = if ($onLoadDictionary) { $onLoad.Contains('registration_count') } else { $null -ne $onLoad.PSObject.Properties['registration_count'] }
   $readonlyPresent = if ($onLoadDictionary) { $onLoad.Contains('read_only_restoration') } else { $null -ne $onLoad.PSObject.Properties['read_only_restoration'] }
   if (-not $registeredPresent -or -not $mutationPresent -or $registeredValue -isnot [bool] -or $mutationValue -isnot [bool]) { throw '[mir4-runtime-on-load-registration]' }
@@ -174,22 +179,29 @@ function Assert-MIR4RuntimeRegistrationPlan {
   if ([bool]$registeredValue) {
     $hosts = @($onLoad.hosts)
     if ([string]$Plan.owner -cne 'prototypes/mir/runtime/scripted_techs.lua' -or
-        [string]$onLoad.handler -cne 'passive_repair.on_load' -or
+        [string]$onLoad.handler -cne 'anonymous-coordinator' -or
+        -not $callbacksPresent -or
+        $callbackIds.Count -ne $approvedCallbackIds.Count -or
+        ($callbackIds -join '|') -cne ($approvedCallbackIds -join '|') -or
         -not [bool]$onLoad.read_only_restoration -or
         [int]$onLoad.registration_count -ne 1 -or
         $hosts.Count -ne 2 -or
-        (@($hosts.target | Sort-Object -Unique) -join '|') -cne 'f200|f210' -or
-        @($hosts | Where-Object {
-          [string]$_.approved_handler -cne 'passive_repair.on_load' -or
-          [int]$_.registration_count -ne 1 -or
-          [int]$_.approved_registration_count -ne 1 -or
-          [string]$_.source_identity.dispatcher.path -cne 'prototypes/mir/runtime/scripted_techs.lua' -or
-          [string]$_.source_identity.stage.path -cne 'prototypes/mir/stage/control.lua' -or
-          [string]$_.source_identity.dispatcher.sha256 -cnotmatch '^[0-9a-f]{64}$' -or
-          [string]$_.source_identity.stage.sha256 -cnotmatch '^[0-9a-f]{64}$'
-        }).Count -ne 0) { throw '[mir4-runtime-on-load-registration]' }
+        (@($hosts.target | Sort-Object -Unique) -join '|') -cne 'f200|f210') { throw '[mir4-runtime-on-load-registration]' }
+    foreach ($hostEntry in $hosts) {
+      $hostCallbackIds = @($hostEntry.approved_callbacks | ForEach-Object { [string]$_ })
+      if ([string]$hostEntry.approved_handler -cne 'anonymous-coordinator' -or
+          $hostCallbackIds.Count -ne $approvedCallbackIds.Count -or
+          ($hostCallbackIds -join '|') -cne ($approvedCallbackIds -join '|') -or
+          [int]$hostEntry.registration_count -ne 1 -or
+          [int]$hostEntry.approved_registration_count -ne 1 -or
+          [string]$hostEntry.source_identity.dispatcher.path -cne 'prototypes/mir/runtime/scripted_techs.lua' -or
+          [string]$hostEntry.source_identity.stage.path -cne 'prototypes/mir/stage/control.lua' -or
+          [string]$hostEntry.source_identity.dispatcher.sha256 -cnotmatch '^[0-9a-f]{64}$' -or
+          [string]$hostEntry.source_identity.stage.sha256 -cnotmatch '^[0-9a-f]{64}$') { throw '[mir4-runtime-on-load-registration]' }
+    }
   } else {
     if (($handlerPresent -and -not [string]::IsNullOrWhiteSpace([string]$onLoad.handler)) -or
+        ($callbacksPresent -and $callbackIds.Count -ne 0) -or
         ($countPresent -and [int]$onLoad.registration_count -ne 0) -or
         ($readonlyPresent -and [bool]$onLoad.read_only_restoration)) { throw '[mir4-runtime-on-load-registration]' }
   }
@@ -242,10 +254,10 @@ function New-MIR4RuntimeRegistrationPlan {
       $hostStagePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $hostPackage -RelativePath 'prototypes/mir/stage/control.lua'
       $hostText = (Get-Content -Raw -LiteralPath $hostDispatcherPath) + "`n" + (Get-Content -Raw -LiteralPath $hostStagePath)
       $hostRegistrations = @([regex]::Matches($hostText, 'script\s*\.\s*on_load\s*\('))
-      $approvedRegistrations = @([regex]::Matches($hostText, 'script\s*\.\s*on_load\s*\(\s*passive_repair\s*\.\s*on_load\s*\)'))
+      $approvedRegistrations = @([regex]::Matches($hostText, 'script\s*\.\s*on_load\s*\(\s*function\s*\(\s*\)\s*passive_repair\s*\.\s*on_load\s*\(\s*\)\s*research_browser\s*\.\s*on_load\s*\(\s*\)\s*end\s*\)'))
       if ($hostRegistrations.Count -ne 1 -or $approvedRegistrations.Count -ne 1) { throw '[mir4-runtime-on-load-registration]' }
       [ordered]@{
-        target=$hostTarget;approved_handler='passive_repair.on_load';registration_count=$hostRegistrations.Count;approved_registration_count=$approvedRegistrations.Count
+        target=$hostTarget;approved_handler='anonymous-coordinator';approved_callbacks=@('passive_repair.on_load','research_browser.on_load');registration_count=$hostRegistrations.Count;approved_registration_count=$approvedRegistrations.Count
         source_identity=[ordered]@{
           dispatcher=[ordered]@{path='prototypes/mir/runtime/scripted_techs.lua';sha256=(Get-MIR4PlatformInputSha256 $hostDispatcherPath)}
           stage=[ordered]@{path='prototypes/mir/stage/control.lua';sha256=(Get-MIR4PlatformInputSha256 $hostStagePath)}
@@ -257,7 +269,7 @@ function New-MIR4RuntimeRegistrationPlan {
     kind='MIR4RuntimeRegistrationPlanV1';schema=1;owner='prototypes/mir/runtime/scripted_techs.lua';owner_sha256=(Get-MIR4PlatformInputSha256 $dispatcherPath);groups=$groups
     ordering='authority-array-preserved-as-explicit-ordinal';filter_before_dispatch=$true;one_registration_per_group=$true
     on_load=[ordered]@{
-      registered=$true;handler='passive_repair.on_load';read_only_restoration=$true;registration_count=1;hosts=$onLoadHosts
+      registered=$true;handler='anonymous-coordinator';callbacks=@('passive_repair.on_load','research_browser.on_load');read_only_restoration=$true;registration_count=1;hosts=$onLoadHosts
       persistent_mutation=$false
     };on_tick=[ordered]@{registered=($combined -match 'defines\.events\.on_tick');budget=0}
     cross_feature_state_mutation=$false;duplicate_rejection=$true;maximum_diagnostics_per_dispatch=64
