@@ -305,6 +305,10 @@ local function same_value(left, right)
 end
 
 local function shown_value(value)
+  if type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge then
+    local compact = string.format("%.6g", value)
+    return tonumber(compact) == value and compact or "≈ " .. compact
+  end
   local shown = tostring(value)
   if #shown > 120 then return string.sub(shown, 1, 117) .. "..." end
   return shown
@@ -351,8 +355,21 @@ local function startup_comparison(name, prototype, profile_summary)
   return {default = prototype.default_value, raw_direct = raw_direct, effective = effective, source = source}
 end
 
-local function startup_setting_caption(prototype, comparison)
-  return {"", prototype.localised_name, ": ", {"mir-browser.effective-value", shown_value(comparison.effective)}}
+local function setting_field_caption(name, key, prototype)
+  -- The group already names the research. Only its six standard controls can
+  -- use a shorter field name; other settings retain their authored identity.
+  for _, field in ipairs({"enable", "cost-base", "cost-linear-increment", "cost-growth", "max-level", "research-time"}) do
+    if name == "ips-" .. field .. "-" .. key or name == "mir-" .. field .. "-" .. key then
+      return {"mir-browser.setting-" .. field}
+    end
+  end
+  if name ~= key then return prototype.localised_name end
+end
+
+local function startup_setting_caption(name, key, prototype, comparison)
+  local caption = setting_field_caption(name, key, prototype)
+  local value = shown_value(comparison.effective)
+  return caption and {"", caption, ": ", value} or value
 end
 
 local function settings_rows(player, parent, v)
@@ -387,10 +404,12 @@ local function settings_rows(player, parent, v)
   fact_label(parent, "profile_import", profile_summary_caption(profile_summary))
   button(parent, "export", {"mir-browser.export"})
   local rows = parent.add{type = "table", column_count = 2}
+  local title_width, value_width = research_pane_widths(player)
   for i = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #groups) do
     local g = groups[i]
-    local title = label(rows, g.title)
+    label(rows, g.title, title_width - 16)
     local values_column = rows.add{type = "flow", direction = "vertical"}
+    values_column.style.maximal_width = value_width - 16
     for _, name in ipairs(g.names) do
       local prototype = prototypes.mod_setting[name]
       local scope = prototype.setting_type
@@ -398,13 +417,23 @@ local function settings_rows(player, parent, v)
       local value = scope == "startup" and startup_settings.get(name) or values[name].value
       local caption = {"", prototype.localised_name, " (", scope, "): "}
       if scope == "startup" then
-        local field = label(values_column, startup_setting_caption(
-          prototype, startup_comparison(name, prototype, profile_summary)))
+        local comparison = startup_comparison(name, prototype, profile_summary)
+        if type(comparison.effective) == "boolean" then
+          local field = values_column.add{
+            type = "checkbox", state = comparison.effective,
+            caption = setting_field_caption(name, g.key, prototype) or "",
+            tags = {mir_browser_setting = name, mir_browser_read_only = true}
+          }
+          field.enabled = false
+        else
+          local field = label(values_column, startup_setting_caption(name, g.key, prototype, comparison), value_width - 16)
+          field.tags = {mir_browser_setting = name, mir_browser_read_only = true}
+        end
       elseif type(value) == "boolean" and (scope ~= "runtime-global" or player.admin) then
         values_column.add{type = "checkbox", state = value, caption = caption, tags = {mir_browser = "setting", setting = name}}
       else
         caption[#caption + 1] = shown_value(value)
-        label(values_column, caption)
+        label(values_column, caption, value_width - 16)
       end
     end
   end
@@ -434,7 +463,10 @@ local function displayed_percent(value)
 end
 local function add_research_cost(parent, technology, maximum_width)
   local units = displayed_number(technology.research_unit_count)
-  local seconds = displayed_number(technology.research_unit_energy)
+  -- Runtime research energy uses ticks; prototype unit.time uses seconds.
+  -- Keep this as the unmodified unit duration, independent of lab speed/UPS.
+  local ticks = technology.research_unit_energy
+  local seconds = finite_nonnegative(ticks) and displayed_number(ticks / 60)
   if units and seconds then fact_label(parent, "research_cost", {"mir-browser.research-cost", units, seconds}, maximum_width) end
 end
 local function add_science_icons(parent, technology, maximum_width)
