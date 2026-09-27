@@ -38,7 +38,17 @@ foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{n
  [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo "source/prototypes/mir/runtime/$($module.path)")))
  [void]$lua.AppendLine('end)()')
 }
-[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser.lua')))
+[void]$lua.AppendLine('local browser_omission_prototypes={mod_data={}}')
+[void]$lua.AppendLine('local browser_omission_fingerprint=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/core/fingerprint.lua')))
+[void]$lua.AppendLine('end)()')
+[void]$lua.AppendLine('local browser_omission_provider=(function() local prototypes=browser_omission_prototypes; local require=function(name) if name=="prototypes.mir.core.fingerprint" then return browser_omission_fingerprint end return {} end')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua')))
+[void]$lua.AppendLine('end)()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_omissions.lua')))
+$browserTestText=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser.lua'))
+if(([regex]::Matches($browserTestText,[regex]::Escape('local force=game.forces.player'))).Count -ne 1) { throw 'Browser omission checks require one unambiguous controlled force entry.' }
+[void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player', 'check_omissions(check); local force=game.forces.player'))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='more-infinite-research';enabled=$true},@{name='mir-browser-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
@@ -79,6 +89,7 @@ $result | Add-Member action_predicate_sha256 (Get-FileHash (Join-Path $repo 'sou
 $result | Add-Member harness_sha256 (Get-FileHash $PSCommandPath).Hash
 $result | Add-Member fixture_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/browser_fixture_data.lua')).Hash
 $result | Add-Member test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser.lua')).Hash
+$result | Add-Member omission_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_omissions.lua')).Hash
 if($Graphics) {
  $saved=Join-Path $run 'userdata/saves/_autosave-mir-browser-acceptance.zip'
  if(-not (Test-Path $saved)) { throw "Native browser save capture missing: $saved" }

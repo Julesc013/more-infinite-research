@@ -274,17 +274,29 @@ local function policy_caps(artifact, prototype_table)
   return values
 end
 
+-- Startup settings, policy transports and final prototypes change at the
+-- configuration lifecycle, not per row click or completed research. Keep
+-- only their validated plain outcome; recipe/level facts remain live below.
+local validated_policy_caps
+
+local function current_policy_caps()
+  if validated_policy_caps == nil then validated_policy_caps = policy_caps() end
+  return validated_policy_caps
+end
+
 function M.policy_caps_for_test(artifact, prototype_table)
   return policy_caps(artifact, prototype_table)
 end
 
-local function valid_public_row(row)
+local function valid_public_row(row, allow_absent_technology)
   if type(row) ~= "table" or row.schema ~= 1
     or not only_fields(row, {schema = true, stream_id = true, action = true, reason = true,
       technology_id = true, effect_count = true, effect_identities = true, affected_recipe_ids = true,
       disposition = true, subject_fingerprint = true, qualification_fingerprint = true,
       decision_fingerprint = true})
-    or not bounded_string(row.stream_id) or not bounded_string(row.technology_id)
+    or not bounded_string(row.stream_id)
+    or (not bounded_string(row.technology_id)
+      and not (allow_absent_technology and row.action == "skip" and row.technology_id == nil))
     or (row.action ~= "emit" and row.action ~= "adopt" and row.action ~= "skip")
     or not bounded_string(row.reason)
     or not finite_nonnegative_integer(row.effect_count)
@@ -309,6 +321,66 @@ local function valid_public_row(row)
     return nil
   end
   return recipes, disposition
+end
+
+-- Omission facts are separate from force technologies: a skipped generation
+-- row cannot become a research/queue action or imply removal from a save.
+-- Cache only copied immutable presentation facts, never the prototype/force.
+local omission_rows
+
+function M.invalidate_omissions()
+  omission_rows = nil
+  validated_policy_caps = nil
+end
+
+local function omitted_public_rows()
+  local artifact = mod_data("more-infinite-research-generation-plan")
+  if type(artifact) ~= "table" or artifact.schema ~= 1
+    or artifact.kind ~= "mir-generation-plan-public" or not dense_array(artifact.rows)
+    or #artifact.rows > M.catalogue_limit then return nil end
+  local rows, known = {}, {}
+  for _, row in ipairs(artifact.rows) do
+    local recipes, disposition = valid_public_row(row, true)
+    if not recipes or not bounded_string(row.decision_fingerprint) then return nil end
+    local key = row.stream_id .. "\0" .. (row.technology_id or "")
+    if known[key] then return nil end
+    known[key] = true
+    if row.action == "skip" and disposition.inclusion == "excluded" then
+      rows[#rows + 1] = {
+        stream_id = row.stream_id,
+        technology_id = row.technology_id,
+        reason = row.reason,
+        decision_fingerprint = row.decision_fingerprint,
+        status = "not-added"
+      }
+    end
+  end
+  if not fingerprint_matches(artifact, "public_fingerprint") then return nil end
+  table.sort(rows, function(left, right)
+    if left.stream_id ~= right.stream_id then return left.stream_id < right.stream_id end
+    return (left.technology_id or "") < (right.technology_id or "")
+  end)
+  return rows
+end
+
+function M.omissions(force)
+  if not force or not force.valid then return nil end
+  if omission_rows == nil then omission_rows = omitted_public_rows() or false end
+  if omission_rows == false then return nil end
+  local rows = {}
+  for _, row in ipairs(omission_rows) do
+    -- A skip with an existing technology is not evidence of an absent one.
+    if not row.technology_id or not force.technologies[row.technology_id] then
+      rows[#rows + 1] = {
+        stream_id = row.stream_id,
+        technology_id = row.technology_id,
+        reason = row.reason,
+        decision_fingerprint = row.decision_fingerprint,
+        status = row.status
+      }
+    end
+  end
+  return {schema = 1, kind = "portable-research-omissions", rows = rows}
 end
 
 local function detail_for_row(row, recipes, disposition, caps, force)
@@ -398,7 +470,7 @@ function M.snapshot(force)
   if #artifact.rows ~= row_count then
     return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families, details = details}
   end
-  local policies, candidates, row_counts = policy_caps(), {}, {}
+  local policies, candidates, row_counts = current_policy_caps(), {}, {}
   for _, row in ipairs(artifact.rows) do
     -- Count every declared public technology identity before accepting its
     -- optional detail shape: a malformed shadow row cannot evade duplicate

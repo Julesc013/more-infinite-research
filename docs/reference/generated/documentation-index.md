@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 447 pages as of 2026-09-22.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 450 pages as of 2026-09-27.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -128,6 +128,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/compatibility/campaigns/README.md | Compatibility Campaigns | current | release-manager | release-plan | mir-maintainers | 2026-07-07 |
 | docs/compatibility/claim-levels.md | Compatibility Claims | current | modpack-author | explanation | mir-maintainers | 2026-07-23 |
 | docs/compatibility/compatibility-matrix.md | MIR Compatibility Matrix | current | modpack-author | explanation | mir-maintainers | 2026-07-07 |
+| docs/compatibility/factorio-2.1-current-api-review.md | Current Factorio 2.1 API Review for MIR 4.2 | current | maintainer | reference | mir-maintainers | 2026-09-27 |
 | docs/compatibility/mir4-release-canaries.md | MIR 4 Exact Release Compatibility Canaries | current | maintainer | reference | mir-maintainers | 2026-08-28 |
 | docs/compatibility/policy-overlays.md | Policy Overlays | current | modpack-author | explanation | mir-maintainers | 2026-07-07 |
 | docs/compatibility/portable-return-ledger.md | Portable Return Ledger | current | maintainer | release-plan | mir-maintainers | 2026-07-13 |
@@ -388,6 +389,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-community-outcomes-2026-09-06.md | MIR 4.2 community implementation outcomes | current | maintainer | release-plan | mir-maintainers | 2026-09-11 |
 | docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-15 |
 | docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-07 |
+| docs/releases/mir42-compatibility-playtest-plan.md | MIR 4.2 Compatibility Scope and Player Playtest Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-27 |
+| docs/releases/mir42-playtest-findings.md | MIR 4.2 Playtest Findings | current | maintainer | reference | mir-maintainers | 2026-09-27 |
 | docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/README.md | Release Notes | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/release-notes-0.10.0.md | More Infinite Research 0.10.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |

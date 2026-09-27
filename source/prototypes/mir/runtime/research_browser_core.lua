@@ -13,6 +13,235 @@ local M = {
   enrichment_kind = "portable-research-enrichment"
 }
 
+-- Player-local asynchronous translation window. It owns only presentation
+-- labels; research IDs and policy remain in the browser core. Superseded
+-- catalogue/locale generations deliberately retain their issued IDs until a
+-- callback or timeout releases the shared outstanding window.
+local translation_queue = {
+  outstanding_limit = 16,
+  request_work_limit = 16,
+  refresh_batch = 8,
+  retry_limit = 2,
+  stale_ticks = 60 * 30
+}
+
+function translation_queue.new(locale, locale_generation)
+  return {
+    locale = locale,
+    locale_generation = locale_generation,
+    catalogue_generation = 0,
+    values = {},
+    pending_by_id = {},
+    pending_by_key = {},
+    retry_count = {},
+    retry_queue = {},
+    retry_scheduled = {},
+    queue = {},
+    cursor = 1,
+    outstanding = 0,
+    resolved = 0,
+    catalogue_count = 0,
+    completed_since_refresh = 0,
+    refresh_pending = false,
+    priority_token = nil
+  }
+end
+
+-- Do not clear pending_by_id or outstanding here. Factorio cannot cancel an
+-- issued request, so replacing those maps would allow every rapid catalogue
+-- or locale change to open a new 16-request window before old callbacks end.
+function translation_queue.reset_catalogue(cache, names, token)
+  cache.catalogue_generation = cache.catalogue_generation + 1
+  cache.catalogue_token = token
+  cache.values = {}
+  cache.pending_by_key = {}
+  cache.retry_count = {}
+  cache.retry_queue = {}
+  cache.retry_scheduled = {}
+  cache.queue = names
+  cache.cursor = 1
+  cache.resolved = 0
+  cache.catalogue_count = #names
+  cache.completed_since_refresh = 0
+  cache.refresh_pending = false
+  cache.priority_token = nil
+end
+
+function translation_queue.invalidate_locale(cache, locale, locale_generation)
+  cache.locale = locale
+  cache.locale_generation = locale_generation
+  translation_queue.reset_catalogue(cache, {}, nil)
+end
+
+function translation_queue.resolve(cache, key, value)
+  if cache.values[key] ~= nil then return false end
+  cache.values[key] = value
+  cache.resolved = cache.resolved + 1
+  cache.completed_since_refresh = cache.completed_since_refresh + 1
+  if cache.completed_since_refresh >= translation_queue.refresh_batch
+      or cache.resolved >= cache.catalogue_count then
+    cache.refresh_pending = true
+  end
+  return true
+end
+
+-- The host consumes this marker after it has patched its existing results
+-- container.  Keeping the acknowledgement with the queue makes each bounded
+-- batch observable without asking a callback to recreate the whole browser.
+function translation_queue.consume_refresh(cache)
+  if type(cache) ~= "table" or cache.refresh_pending ~= true then return false end
+  cache.refresh_pending = false
+  cache.completed_since_refresh = 0
+  return true
+end
+
+function translation_queue.schedule_retry(cache, key)
+  local retries = (cache.retry_count[key] or 0) + 1
+  cache.retry_count[key] = retries
+  if retries >= translation_queue.retry_limit then
+    translation_queue.resolve(cache, key, key)
+  elseif not cache.retry_scheduled[key] then
+    cache.retry_scheduled[key] = true
+    cache.retry_queue[#cache.retry_queue + 1] = key
+  end
+end
+
+function translation_queue.pop(cache)
+  while cache.cursor <= #cache.queue do
+    local key = cache.queue[cache.cursor]
+    cache.cursor = cache.cursor + 1
+    if cache.values[key] == nil and cache.pending_by_key[key] == nil then return key end
+  end
+  while #cache.retry_queue > 0 do
+    local key = table.remove(cache.retry_queue, 1)
+    cache.retry_scheduled[key] = nil
+    if cache.values[key] == nil and cache.pending_by_key[key] == nil then return key end
+  end
+  return nil
+end
+
+-- Keep the bounded request window and every issued ID intact while allowing
+-- the open library's selected and visible rows to enter the unissued portion
+-- of a catalogue first.  This only reorders entries at or after cursor; it
+-- never revives resolved/pending work or changes the catalogue membership.
+function translation_queue.prioritize(cache, keys)
+  if type(cache) ~= "table" or type(cache.queue) ~= "table" or type(keys) ~= "table" then return false end
+  local start = math.max(1, math.floor(tonumber(cache.cursor) or 1))
+  if start > #cache.queue then return false end
+  local front, selected_indexes = {}, {}
+  for _, key in ipairs(keys) do
+    if type(key) == "string" then
+      for index = start, #cache.queue do
+        local candidate = cache.queue[index]
+        if not selected_indexes[index] and candidate == key and cache.values[candidate] == nil
+            and cache.pending_by_key[candidate] == nil then
+          selected_indexes[index] = true
+          front[#front + 1] = candidate
+          break
+        end
+      end
+    end
+  end
+  if #front == 0 then return false end
+  local reordered = {}
+  for index = 1, start - 1 do reordered[index] = cache.queue[index] end
+  for _, key in ipairs(front) do reordered[#reordered + 1] = key end
+  for index = start, #cache.queue do
+    local key = cache.queue[index]
+    if not selected_indexes[index] then reordered[#reordered + 1] = key end
+  end
+  for index = start, #cache.queue do
+    if reordered[index] ~= cache.queue[index] then
+      cache.queue = reordered
+      return true
+    end
+  end
+  return false
+end
+
+function translation_queue.can_request(cache)
+  return cache.outstanding < translation_queue.outstanding_limit
+end
+
+function translation_queue.requested(cache, key, id, tick)
+  if not translation_queue.can_request(cache) or type(id) ~= "number" then return false end
+  local request = {
+    key = key,
+    locale_generation = cache.locale_generation,
+    catalogue_generation = cache.catalogue_generation,
+    requested_tick = tick
+  }
+  cache.pending_by_id[id] = request
+  cache.pending_by_key[key] = id
+  cache.outstanding = cache.outstanding + 1
+  return true
+end
+
+function translation_queue.request_declined(cache, key)
+  return translation_queue.resolve(cache, key, key)
+end
+
+-- Keep protected request dispatch here so host callers cannot accidentally
+-- collapse pcall's success and translation-ID returns through an `and`
+-- expression. A numeric Factorio request ID must occupy a pending slot;
+-- declined/failed requests resolve immediately to the stable-ID fallback.
+function translation_queue.dispatch(cache, key, tick, request)
+  local ok, id = pcall(request)
+  if ok and translation_queue.requested(cache, key, id, tick) then return true end
+  translation_queue.request_declined(cache, key)
+  return false
+end
+
+-- Returns true only when the result belongs to the current locale/catalogue
+-- generation. In every case a known request ID releases its pending slot.
+function translation_queue.completed(cache, id, value)
+  local request = cache.pending_by_id[id]
+  if not request then return false end
+  cache.pending_by_id[id] = nil
+  if cache.pending_by_key[request.key] == id then cache.pending_by_key[request.key] = nil end
+  cache.outstanding = math.max(0, cache.outstanding - 1)
+  if request.locale_generation ~= cache.locale_generation
+      or request.catalogue_generation ~= cache.catalogue_generation then
+    return false
+  end
+  translation_queue.resolve(cache, request.key, type(value) == "string" and value ~= "" and value or request.key)
+  return true
+end
+
+-- Expired current requests get one retry then a stable-ID fallback. Expired
+-- old-generation requests only release their pending slot; they must never
+-- re-enter the current catalogue queue.
+function translation_queue.expire(cache, tick)
+  local expired = 0
+  for id, request in pairs(cache.pending_by_id) do
+    if tick - request.requested_tick >= translation_queue.stale_ticks then
+      cache.pending_by_id[id] = nil
+      if cache.pending_by_key[request.key] == id then cache.pending_by_key[request.key] = nil end
+      cache.outstanding = math.max(0, cache.outstanding - 1)
+      expired = expired + 1
+      if request.locale_generation == cache.locale_generation
+          and request.catalogue_generation == cache.catalogue_generation then
+        translation_queue.schedule_retry(cache, request.key)
+      end
+    end
+  end
+  return expired
+end
+
+function translation_queue.unresolved(cache)
+  return math.max(0, cache.catalogue_count - cache.resolved)
+end
+
+-- A name order may be applied only after the current catalogue generation has
+-- a settled label or stable-ID fallback for every row. Pending old-generation
+-- IDs deliberately do not delay this current-generation presentation state.
+function translation_queue.complete(cache)
+  return type(cache) == "table" and type(cache.catalogue_count) == "number"
+    and type(cache.resolved) == "number" and cache.resolved >= cache.catalogue_count
+end
+
+M.translation_queue = translation_queue
+
 -- Detail payloads are copied only as bounded plain data. Count every emitted
 -- table, field key, and scalar so a wide provider value fails closed.
 local function copy_plain(value, state, depth)
@@ -270,6 +499,15 @@ local function family_for(enrichment, key)
   return type(family) == "string" and family or "external"
 end
 
+local function ascii_casefold(value)
+  -- Displayed-name ordering deliberately has a small, portable contract:
+  -- ASCII A-Z folds to a-z and the remaining UTF-8 bytes compare directly.
+  -- It does not claim Unicode normalization or locale-aware collation.
+  return (string.gsub(value, "%u", function(letter)
+    return string.char(string.byte(letter) + 32)
+  end))
+end
+
 local function normalized_view(view)
   view = type(view) == "table" and view or {}
   local mode = tonumber(view.mode) or 1
@@ -283,7 +521,15 @@ local function normalized_view(view)
     or view.sort == "name-desc" and "name-desc"
     or view.sort == "native" and "native"
     or "progression"
-  return {mode = mode, status = status, page = page, search = string.lower(search), family = family, sort = sort, hidden = type(view.hidden) == "table" and view.hidden or {}}
+  local fallback_sort = view.fallback_sort == "native" and "native" or "progression"
+  local requested_sort = sort
+  local name_index_ready = view.name_index_ready ~= false
+  if not name_index_ready and (sort == "name-asc" or sort == "name-desc") then sort = fallback_sort end
+  return {
+    mode = mode, status = status, page = page, search = ascii_casefold(search), family = family,
+    sort = sort, requested_sort = requested_sort, name_index_ready = name_index_ready,
+    hidden = type(view.hidden) == "table" and view.hidden or {}
+  }
 end
 
 -- Translation belongs to a host because it is player- and locale-specific.
@@ -294,6 +540,15 @@ local function localized_search_text(index, key)
   local value = index[key]
   if type(value) ~= "string" or #value > M.detail_string_limit then return "" end
   return value
+end
+
+-- The host resolves each row label asynchronously. Until it has a result,
+-- the stable technology ID is both the visible fallback and the query/sort
+-- value. This prevents a label that arrives later from changing which ID an
+-- existing row action addresses.
+local function displayed_label(index, key)
+  local value = localized_search_text(index, key)
+  return value ~= "" and value or key
 end
 
 local function status_matches(row, status)
@@ -308,8 +563,13 @@ local function family_matches(family, selected)
 end
 
 local function sort_rows(left, right, sort)
-  if sort == "name-desc" then return left.key > right.key end
-  if sort == "name-asc" then return left.key < right.key end
+  if sort == "name-desc" or sort == "name-asc" then
+    if left.display_sort ~= right.display_sort then
+      return sort == "name-desc" and left.display_sort > right.display_sort
+        or left.display_sort < right.display_sort
+    end
+    return left.key < right.key
+  end
   if sort == "native" then
     if left.native_order ~= right.native_order then return left.native_order < right.native_order end
     if left.progression ~= right.progression then return left.progression < right.progression end
@@ -334,7 +594,9 @@ function M.query(catalogue, view, enrichment, localized_search)
       row.cap, row.family = cap, family
       row.infinite = row.infinite and not cap
       local mode_ok = v.mode == 1 or (v.mode == 2 and not row.infinite) or (v.mode == 3 and row.infinite)
-      local search = string.lower(row.key .. " " .. family .. " " .. localized_search_text(localized_search, row.key))
+      row.display_name = displayed_label(localized_search, row.key)
+      row.display_sort = ascii_casefold(row.display_name)
+      local search = ascii_casefold(row.key .. " " .. family .. " " .. row.display_name)
       local search_ok = v.search == "" or string.find(search, v.search, 1, true) ~= nil
       if mode_ok and status_matches(row, v.status) and family_matches(family, v.family)
         and not v.hidden[row.key] and search_ok then selected[#selected + 1] = row end
@@ -350,9 +612,14 @@ function M.query(catalogue, view, enrichment, localized_search)
   for index = first, last do
     local row = copy_row(selected[index])
     row.family, row.cap, row.infinite = selected[index].family, selected[index].cap, selected[index].infinite
+    row.display_name = selected[index].display_name
     rows[#rows + 1] = row
   end
-  return {schema = M.schema, rows = rows, count = #selected, pages = pages, page = page, page_size = M.page_size, sort = v.sort}
+  return {
+    schema = M.schema, rows = rows, count = #selected, pages = pages, page = page,
+    page_size = M.page_size, sort = v.sort, requested_sort = v.requested_sort,
+    name_index_ready = v.name_index_ready
+  }
 end
 
 function M.detail(catalogue, key, enrichment)

@@ -17,6 +17,7 @@ if ([string]::IsNullOrWhiteSpace($PolicyPath)) {
 
 Import-Module (Join-Path $repo "tools\lib\localization\MIRLocalization.psm1") -Force
 $policy = Read-MIRLocalePolicy -Path $PolicyPath
+$SelectedLocale = @($SelectedLocale | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
 $supportedLocaleCodes = @($policy.supported_factorio_locales | ForEach-Object { [string]$_.code })
 if ($SelectedLocale.Count -gt 0) {
   $unknownLocales = @($SelectedLocale | Where-Object { $_ -notin $supportedLocaleCodes })

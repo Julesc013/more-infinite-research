@@ -379,7 +379,7 @@
         "S32"
       ],
       "feature_group": "research-browser",
-      "status": "implemented-browser-with-open-multiplayer-qualification",
+      "status": "implemented-browser-reopened-by-player-usability-and-performance-findings",
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
@@ -387,7 +387,10 @@
       "remaining_obligations": [
         "Two-client personal-view and queue interaction",
         "Configuration change, mod removal and conflict capture",
-        "Full route omission explanations remain in Inspector; native browser detail shows actual ingredients and effects"
+        "Resolve PF-02 localization churn and PF-03 intuitive encyclopedia, organization and research setup usability",
+    "Expose verified omission reasons in the player viewer with bounded copied presentation data",
+    "Coalesce open-browser mass-research refreshes and preserve focus, scroll and stable ordering",
+    "Two-client and first-use player acceptance follow a converged preview; prior controlled browser evidence does not prove usability"
       ]
     },
     {
@@ -412,7 +415,7 @@
         "S33"
       ],
       "feature_group": "research-browser",
-      "status": "implemented-browser-with-open-multiplayer-qualification",
+      "status": "implemented-browser-reopened-by-player-usability-and-performance-findings",
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
@@ -420,7 +423,10 @@
       "remaining_obligations": [
         "Two-client personal-view and queue interaction",
         "Configuration change, mod removal and conflict capture",
-        "Full route omission explanations remain in Inspector; native browser detail shows actual ingredients and effects"
+        "Resolve PF-02 localization churn and PF-03 intuitive encyclopedia, organization and research setup usability",
+    "Expose verified omission reasons in the player viewer with bounded copied presentation data",
+    "Coalesce open-browser mass-research refreshes and preserve focus, scroll and stable ordering",
+    "Two-client and first-use player acceptance follow a converged preview; prior controlled browser evidence does not prove usability"
       ]
     },
     {
@@ -446,7 +452,7 @@
         "S32"
       ],
       "feature_group": "research-browser",
-      "status": "implemented-browser-with-open-multiplayer-qualification",
+      "status": "implemented-browser-reopened-by-player-usability-and-performance-findings",
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
@@ -454,7 +460,10 @@
       "remaining_obligations": [
         "Two-client personal-view and queue interaction",
         "Configuration change, mod removal and conflict capture",
-        "Full route omission explanations remain in Inspector; native browser detail shows actual ingredients and effects"
+        "Resolve PF-02 localization churn and PF-03 intuitive encyclopedia, organization and research setup usability",
+    "Expose verified omission reasons in the player viewer with bounded copied presentation data",
+    "Coalesce open-browser mass-research refreshes and preserve focus, scroll and stable ordering",
+    "Two-client and first-use player acceptance follow a converged preview; prior controlled browser evidence does not prove usability"
       ]
     },
     {
@@ -480,7 +489,7 @@
         "S6"
       ],
       "feature_group": "research-browser",
-      "status": "implemented-browser-with-open-multiplayer-qualification",
+      "status": "implemented-browser-reopened-by-player-usability-and-performance-findings",
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
@@ -488,7 +497,10 @@
       "remaining_obligations": [
         "Two-client personal-view and queue interaction",
         "Configuration change, mod removal and conflict capture",
-        "Full route omission explanations remain in Inspector; native browser detail shows actual ingredients and effects"
+        "Resolve PF-02 localization churn and PF-03 intuitive encyclopedia, organization and research setup usability",
+    "Expose verified omission reasons in the player viewer with bounded copied presentation data",
+    "Coalesce open-browser mass-research refreshes and preserve focus, scroll and stable ordering",
+    "Two-client and first-use player acceptance follow a converged preview; prior controlled browser evidence does not prove usability"
       ]
     },
     {

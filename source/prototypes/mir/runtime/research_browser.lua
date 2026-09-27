@@ -1,22 +1,71 @@
 local core = require("prototypes.mir.runtime.research_browser_core")
+local translation_queue = core.translation_queue
 local factorio_catalogue = require("prototypes.mir.runtime.research_browser_factorio_catalogue")
 local mir_provider = require("prototypes.mir.runtime.research_browser_mir_provider")
 local actions = require("prototypes.mir.runtime.research_browser_actions")
 local runtime_state = require("prototypes.mir.runtime.state")
+local factorio_runtime_state = require("prototypes.mir.platform.factorio.runtime_state")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local codec = require("prototypes.mir.settings.profile_codec")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
 local M = {requires_features = {"settings_profiles"}}
 local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
-local TRANSLATION_LIMIT = 512
+-- Translation IDs are asynchronous and per-player.  Keep the work window
+-- small so a large catalogue neither monopolizes a tick nor stops after an
+-- arbitrary lifetime number of successful translations.
+-- Do not share passive repair's 60-tick registration; Factorio has one
+-- handler per interval within this mod.
+local TRANSLATION_MAINTENANCE_TICKS = 61
 local VIEW_SCHEMA = 2
-local translations = {}
+local render
+local refresh_scheduled_forces
+local update_research_results
+local update_navigation
+local update_translation_index
 
 local function state()
   local value = runtime_state.bucket("research_browser")
   value.players = value.players or {}
+  value.pending_force_refresh = type(value.pending_force_refresh) == "table" and value.pending_force_refresh or {}
   return value
+end
+
+-- The one-tick coalescer is installed only while an open force has pending
+-- work. This reader is deliberately separate from state(): on_load may
+-- rebind an existing subscription but must never create or repair storage.
+local function saved_pending_force_refresh()
+  local root = factorio_runtime_state.root()
+  local namespace = type(root) == "table" and root.mir
+  local browser = type(namespace) == "table" and namespace.research_browser
+  local pending = type(browser) == "table" and browser.pending_force_refresh
+  return type(pending) == "table" and pending or nil
+end
+
+local function set_force_refresh_subscription(active)
+  script.on_nth_tick(1, active and refresh_scheduled_forces or nil)
+end
+
+-- Factorio can deliver a translation callback after a save/load or a
+-- configuration change. Retain only plain records in the established runtime
+-- bucket so those issued IDs still occupy their shared bounded window; no
+-- LuaObject is retained in this cache.
+local function translation_state()
+  local value = state()
+  value.translations = type(value.translations) == "table" and value.translations or {}
+  value.translation_locale_generations = type(value.translation_locale_generations) == "table"
+    and value.translation_locale_generations or {}
+  return value.translations, value.translation_locale_generations
+end
+
+local function next_locale_generation(generations, cache, player_index)
+  local previous = generations[player_index]
+  if type(previous) ~= "number" or previous < 0 or previous ~= math.floor(previous) then
+    previous = type(cache) == "table" and cache.locale_generation or 0
+  end
+  previous = math.max(0, previous) + 1
+  generations[player_index] = previous
+  return previous
 end
 local function default_view()
   return {
@@ -28,7 +77,8 @@ local function default_view()
     tab = "research",
     effect_page = 1,
     family = "mir",
-    sort = "progression"
+    sort = "progression",
+    stable_sort = "progression"
   }
 end
 local function has_legacy_default_scope_and_order(value)
@@ -52,6 +102,12 @@ local function view(player)
     or result.sort == "name-desc" and "name-desc"
     or result.sort == "native" and "native"
     or "progression"
+  result.stable_sort = result.stable_sort == "native" and "native" or "progression"
+  if result.sort == "native" or result.sort == "progression" then result.stable_sort = result.sort end
+  result.tab = result.tab == "settings" and "settings"
+    or result.tab == "queue" and "queue"
+    or result.tab == "availability" and "availability"
+    or "research"
   return result
 end
 local function catalogue(force)
@@ -63,31 +119,92 @@ local function catalogue(force)
   result.family_names = core.family_names(result.enrichment)
   return result
 end
+
 local function translation_cache(player)
+  local translations, locale_generations = translation_state()
   local cache = translations[player.index]
-  if not cache or cache.locale ~= player.locale then
-    cache = {locale = player.locale, values = {}, requested = {}, requests = 0}
+  if type(cache) ~= "table" then
+    cache = translation_queue.new(player.locale, next_locale_generation(locale_generations, nil, player.index))
     translations[player.index] = cache
+  elseif cache.locale ~= player.locale then
+    translation_queue.invalidate_locale(cache, player.locale,
+      next_locale_generation(locale_generations, cache, player.index))
   end
   return cache
 end
-local function localized_search(player)
-  return translation_cache(player).values
+
+local function catalogue_translation_token(catalogue_snapshot)
+  local names = {}
+  for _, row in ipairs(catalogue_snapshot.rows or {}) do names[#names + 1] = row.key end
+  -- The Factorio adapter already sorts the bounded technology-ID list.  Keep
+  -- this exact token only in the player-local host cache: it is never source
+  -- of research policy or shared game state.
+  return names, table.concat(names, "\30")
 end
-local function request_visible_translations(player, page, selected)
+
+local function ensure_translation_catalogue(player, catalogue_snapshot)
   local cache = translation_cache(player)
-  local function request(technology)
-    if not technology or cache.requests >= TRANSLATION_LIMIT
-      or cache.values[technology.name] ~= nil or cache.requested[technology.name] then return end
-    local id = player.request_translation(technology.localised_name)
-    if type(id) == "number" then
-      cache.requested[technology.name] = id
-      cache.requested[id] = technology.name
-      cache.requests = cache.requests + 1
+  local names, token = catalogue_translation_token(catalogue_snapshot)
+  if cache.catalogue_token ~= token then translation_queue.reset_catalogue(cache, names, token) end
+  return cache
+end
+
+local function pump_translation_requests(player, cache)
+  if not (player and player.valid and player.connected) then return end
+  local work = 0
+  while translation_queue.can_request(cache) and work < translation_queue.request_work_limit do
+    local key = translation_queue.pop(cache)
+    if not key then break end
+    work = work + 1
+    local technology = player.force.technologies[key]
+    if technology then
+      translation_queue.dispatch(cache, key, game.tick, function()
+        return player.request_translation(technology.localised_name)
+      end)
+    else
+      -- request_translation may decline malformed data without issuing an ID;
+      -- it never consumes a pending slot in that case.
+      translation_queue.request_declined(cache, key)
     end
   end
-  for _, row in ipairs(page.rows) do request(player.force.technologies[row.key]) end
-  request(selected and player.force.technologies[selected])
+end
+
+local function unresolved_translations(cache)
+  return translation_queue.unresolved(cache)
+end
+
+local function refresh_translated_view(player, cache)
+  if not translation_queue.consume_refresh(cache) then return end
+  local frame = player and player.valid and player.gui.screen[ROOT]
+  if not (frame and frame.valid) then return end
+  local v = view(player)
+  if v.tab ~= "research" then return end
+  local body = frame[PREFIX .. "body"]
+  local results = body and body[PREFIX .. "research_results"]
+  if not (body and body.valid and results and results.valid) then return end
+  -- A partial index only changes lookup metadata. Native captions already
+  -- show through Factorio immediately, so do not rescan the force catalogue
+  -- or rebuild detail/rows for every eight completed translations.
+  if not translation_queue.complete(cache) then
+    update_translation_index(results, cache, v)
+    return
+  end
+  if v.search == "" and v.sort ~= "name-asc" and v.sort ~= "name-desc" then
+    update_translation_index(results, cache, v)
+    return
+  end
+  -- An active search may depend on the localized index and Name ordering has
+  -- deliberately waited for this settled generation. Rebuild once now, while
+  -- retaining the frame, fields, filters and scroll pane.
+  local c = catalogue(player.force)
+  if not c or ensure_translation_catalogue(player, c) ~= cache then return end
+  if not translation_queue.complete(cache) then
+    pump_translation_requests(player, cache)
+    update_translation_index(results, cache, v)
+    return
+  end
+  local pages = update_research_results(player, results, v, c, cache)
+  update_navigation(frame, v, pages)
 end
 local function label(parent, caption)
   local element = parent.add{type = "label", caption = caption}
@@ -106,6 +223,24 @@ local function fact_label(parent, key, caption)
   element.style.maximal_width = 720
   return element
 end
+
+update_translation_index = function(results, cache, v)
+  local indicator = results[PREFIX .. "fact_translation_index"]
+  local unresolved = unresolved_translations(cache)
+  if unresolved <= 0 then
+    if indicator and indicator.valid then indicator.destroy() end
+    return
+  end
+  local name_order = v.sort == "name-asc" or v.sort == "name-desc"
+  local caption = name_order and {"mir-browser.indexing-name", unresolved}
+    or {"mir-browser.indexing", unresolved}
+  if indicator and indicator.valid then
+    indicator.caption = caption
+  else
+    fact_label(results, "translation_index", caption)
+  end
+end
+
 local function button(parent, action, caption, tags)
   tags = tags or {}; tags.mir_browser = action
   return parent.add{type = "button", caption = caption, tags = tags}
@@ -163,15 +298,12 @@ end
 
 local function profile_summary_caption(summary)
   if summary.state == "active" then
-    return "MIRSET1 profile: active | recognized=" .. tostring(summary.recognized)
-      .. " | unknown=" .. tostring(summary.unknown) .. " | invalid=" .. tostring(summary.invalid)
-      .. " | valid imported entries determine effective startup values | restart-required=true"
+    return {"mir-browser.profile-active", summary.recognized, summary.invalid}
   end
   if summary.state == "invalid" then
-    return "MIRSET1 profile: invalid and ignored | error=" .. shown_value(summary.error)
-      .. " | effective startup values use raw direct settings | restart-required=true"
+    return {"mir-browser.profile-invalid"}
   end
-  return "MIRSET1 profile: not configured | effective startup values use raw direct settings | restart-required=true"
+  return {"mir-browser.profile-none"}
 end
 
 local function startup_comparison(name, prototype, profile_summary)
@@ -188,9 +320,7 @@ local function startup_comparison(name, prototype, profile_summary)
 end
 
 local function startup_setting_caption(prototype, comparison)
-  return {"", prototype.localised_name, " (startup): default=", shown_value(comparison.default),
-    " | raw-direct=", shown_value(comparison.raw_direct), " | effective=", shown_value(comparison.effective),
-    " | source=", comparison.source, " | restart-required=true"}
+  return {"", prototype.localised_name, ": ", {"mir-browser.effective-value", shown_value(comparison.effective)}}
 end
 
 local function settings_rows(player, parent, v)
@@ -227,7 +357,7 @@ local function settings_rows(player, parent, v)
   local rows = parent.add{type = "table", column_count = 2}
   for i = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #groups) do
     local g = groups[i]
-    local title = label(rows, g.title); title.tooltip = g.key
+    local title = label(rows, g.title)
     local values_column = rows.add{type = "flow", direction = "vertical"}
     for _, name in ipairs(g.names) do
       local prototype = prototypes.mod_setting[name]
@@ -238,19 +368,17 @@ local function settings_rows(player, parent, v)
       if scope == "startup" then
         local field = label(values_column, startup_setting_caption(
           prototype, startup_comparison(name, prototype, profile_summary)))
-        field.tooltip = prototype.localised_description
       elseif type(value) == "boolean" and (scope ~= "runtime-global" or player.admin) then
         values_column.add{type = "checkbox", state = value, caption = caption, tags = {mir_browser = "setting", setting = name}}
       else
         caption[#caption + 1] = shown_value(value)
-        local field = label(values_column, caption); field.tooltip = prototype.localised_description
+        label(values_column, caption)
       end
     end
   end
   return pages
 end
 
-local render
 local function add_technology_icon(parent, technology, size)
   local icon = parent.add{type = "sprite", style = "recipe_tooltip_horizontal_image",
     sprite = "technology/" .. technology.name, resize_to_sprite = false, tooltip = technology.localised_name}
@@ -341,10 +469,11 @@ local function add_prerequisite_icons(parent, technology)
   end
   if #prerequisites > 8 then label(row, {"mir-browser.prerequisites-more", #prerequisites - 8}) end
 end
-local function status_caption(technology)
+local function status_caption(technology, native_technology)
   if technology.researched then return {"mir-browser.status-complete"} end
   if technology.queued then return {"mir-browser.status-queued"} end
   if technology.available then return {"mir-browser.status-ready"} end
+  if native_technology and native_technology.enabled == false then return {"mir-browser.status-disabled"} end
   return {"mir-browser.status-locked"}
 end
 local function detail(player, parent, v, c)
@@ -356,8 +485,11 @@ local function detail(player, parent, v, c)
   label(heading, tech.localised_name)
   label(parent, tech.localised_description)
   local enrichment = portable.enrichment or {}
+  -- Provider ownership, compiler disposition, route sentinels, and raw
+  -- setting provenance remain in the copied DTO for governed consumers. They
+  -- are not player-facing research facts in this library surface.
   label(parent, {"mir-browser.family", family_caption(portable.technology.family)})
-  label(parent, status_caption(portable.technology))
+  label(parent, status_caption(portable.technology, tech))
   if portable.technology.cap then
     label(parent, {"mir-browser.level-cap", tech.level, portable.technology.cap})
   elseif tech.level and tech.level > 1 then
@@ -391,9 +523,153 @@ local function has_family(family_names, family)
   for _, candidate in ipairs(family_names) do if candidate == family then return true end end
   return false
 end
+
+local function query_view(v, cache)
+  return {
+    mode = v.mode, status = v.status, page = v.page, search = v.search,
+    family = v.family, sort = v.sort, hidden = v.hidden,
+    fallback_sort = v.stable_sort,
+    name_index_ready = translation_queue.complete(cache)
+  }
+end
+
+local function prioritize_visible_translations(cache, page, selected)
+  local keys = {}
+  if type(selected) == "string" then keys[#keys + 1] = selected end
+  for _, row in ipairs(page.rows or {}) do keys[#keys + 1] = row.key end
+  local token = table.concat(keys, "\30")
+  if cache.priority_token ~= token then
+    translation_queue.prioritize(cache, keys)
+    cache.priority_token = token
+  end
+end
+
+local function queue_rows(player, queue, v)
+  local entries = player.force.research_queue or {}
+  if #entries == 0 then
+    label(queue, {"mir-browser.queue-empty"})
+    return 1
+  end
+  local pages = math.max(1, math.ceil(#entries / core.page_size))
+  v.page = math.min(v.page, pages)
+  for index = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #entries) do
+    local technology = entries[index]
+    if technology then
+      button(queue, "select", technology.localised_name, {technology = technology.name})
+    end
+  end
+  return pages
+end
+
+local omission_reasons = {
+  covered_by_existing_infinite_native_modifier = "not-added-provided",
+  covered_by_planned_stream = "not-added-grouped",
+  no_valid_effect_targets = "not-added-no-effect",
+  automatic_family_not_reviewed = "not-added-review"
+}
+
+local function bounded_string(value)
+  return type(value) == "string" and value ~= "" and #value <= core.detail_string_limit
+end
+
+-- This display is deliberately a terminal viewer. Its provider envelope is
+-- validated again at the UI edge and omitted rows have no technology action,
+-- queue action, or deep link. A malformed row yields no player claim.
+local function availability_rows(force, parent, v)
+  local envelope = mir_provider.omissions(force)
+  if type(envelope) ~= "table" or envelope.schema ~= 1
+      or envelope.kind ~= "portable-research-omissions" or type(envelope.rows) ~= "table"
+      or #envelope.rows > core.catalogue_limit then
+    label(parent, {"mir-browser.availability-empty"})
+    return 1
+  end
+  local row_count = 0
+  for index in pairs(envelope.rows) do
+    if type(index) ~= "number" or index < 1 or index ~= math.floor(index) then
+      label(parent, {"mir-browser.availability-empty"})
+      return 1
+    end
+    row_count = row_count + 1
+  end
+  if row_count ~= #envelope.rows then
+    label(parent, {"mir-browser.availability-empty"})
+    return 1
+  end
+  local rows, seen, stream_definitions = {}, {}, streams.view()
+  for index = 1, #envelope.rows do
+    local row = envelope.rows[index]
+    if type(row) ~= "table"
+        or not bounded_string(row.stream_id) or not bounded_string(row.reason)
+        or not bounded_string(row.decision_fingerprint) or row.status ~= "not-added"
+        or (row.technology_id ~= nil and not bounded_string(row.technology_id)) then
+      label(parent, {"mir-browser.availability-empty"})
+      return 1
+    end
+    local identity = row.stream_id .. "\0" .. (row.technology_id or "")
+    local stream = stream_definitions[row.stream_id]
+    if seen[identity] or not stream or stream.localised_name == nil then
+      label(parent, {"mir-browser.availability-empty"})
+      return 1
+    end
+    seen[identity] = true
+    rows[#rows + 1] = {stream = stream, reason = row.reason}
+  end
+  if #rows == 0 then
+    label(parent, {"mir-browser.availability-empty"})
+    return 1
+  end
+  local pages = math.max(1, math.ceil(#rows / core.page_size))
+  v.page = math.min(v.page, pages)
+  for index = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #rows) do
+    local row = rows[index]
+    local item = parent.add{type = "flow", direction = "vertical", tags = {mir_browser_section = "availability"}}
+    label(item, row.stream.localised_name)
+    label(item, {"mir-browser.not-added"})
+    label(item, {"mir-browser." .. (omission_reasons[row.reason] or "not-added-generic")})
+  end
+  return pages
+end
+
+-- This is the only part of Browse that translation callbacks may rebuild.
+-- The surrounding scroll pane, filters, navigation and search text field are
+-- intentionally retained, so localized discovery can finish in place.
+update_research_results = function(player, results, v, c, cache)
+  results.clear()
+  local page = core.query(c, query_view(v, cache), c.enrichment, cache.values)
+  v.page = page.page
+  prioritize_visible_translations(cache, page, v.selected)
+  pump_translation_requests(player, cache)
+  detail(player, results, v, c)
+  update_translation_index(results, cache, v)
+  label(results, {"mir-browser.count", page.count})
+  for _, row in ipairs(page.rows) do
+    local technology = player.force.technologies[row.key]
+    if technology then
+      local item = results.add{type = "flow", direction = "horizontal"}
+      add_technology_icon(item, technology)
+      local select = button(item, "select", technology.localised_name, {technology = row.key})
+      select.style.width = 300
+      label(item, status_caption(row, technology)).style.maximal_width = 220
+    end
+  end
+  return page.pages
+end
+
+update_navigation = function(frame, v, pages)
+  local navigation = frame and frame[PREFIX .. "navigation"]
+  if not (navigation and navigation.valid) then return end
+  local previous = navigation[PREFIX .. "prev"]
+  local current = navigation[PREFIX .. "page"]
+  local following = navigation[PREFIX .. "next"]
+  if previous then previous.enabled = v.page > 1 end
+  if current then current.caption = tostring(v.page) .. " / " .. tostring(pages) end
+  if following then following.enabled = v.page < pages end
+end
+
 render = function(player)
   local v = view(player)
   local c = catalogue(player.force)
+  local cache = c and ensure_translation_catalogue(player, c)
   if c and v.family == "mir" and not has_family(c.family_names, "mir") then v.family = "all" end
   if c and v.family == "mir" and v.selected then
     local families = c.enrichment and c.enrichment.families
@@ -413,62 +689,51 @@ render = function(player)
   local scale = player.display_scale or 1
   frame.style.maximal_height = math.max(240, math.floor(player.display_resolution.height / scale) - 80)
   local bar = frame.add{type = "flow"}
-  button(bar, "research", {"mir-browser.research"})
+  button(bar, "research", {"mir-browser.browse"})
+  button(bar, "queue", {"mir-browser.queue-tab"})
   button(bar, "settings", {"mir-browser.settings"})
+  button(bar, "availability", {"mir-browser.availability"})
   button(bar, "refresh", {"mir-browser.refresh"})
   button(bar, "close", {"mir-browser.close"})
-  local search = frame.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
-  search.tooltip = {"mir-browser.search"}
-  local body = frame.add{type = "scroll-pane", direction = "vertical"}
+  if v.tab == "research" or v.tab == "settings" then
+    frame.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
+  end
+  local body = frame.add{type = "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
   body.style.maximal_height = math.max(140, frame.style.maximal_height - 140)
   local pages
-  if v.tab == "settings" then pages = settings_rows(player, body, v)
+  if v.tab == "settings" then
+    pages = settings_rows(player, body, v)
+  elseif v.tab == "queue" then
+    pages = queue_rows(player, body, v)
+  elseif v.tab == "availability" then
+    pages = availability_rows(player.force, body, v)
   else
     local filters = body.add{type = "flow", direction = "horizontal"}
-    filter_dropdown(filters, {"mir-browser.filter-level"}, {{"mir-browser.all-levels"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, v.mode, "mode")
-    filter_dropdown(filters, {"mir-browser.filter-status"}, {{"mir-browser.all-status"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, v.status, "status")
-    local sort_index = v.sort == "native" and 2 or v.sort == "name-asc" and 3 or v.sort == "name-desc" and 4 or 1
-    filter_dropdown(filters, {"mir-browser.filter-order"}, {{"mir-browser.order-progression"}, {"mir-browser.order-native"}, {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, sort_index, "sort")
     local family_index = 1
     for i,name in ipairs(c.family_names) do if name == v.family then family_index = i end end
     local family_items = {}
     for _, family in ipairs(c.family_names) do family_items[#family_items + 1] = family_caption(family) end
     filter_dropdown(filters, {"mir-browser.filter-scope"}, family_items, family_index, "family")
-    local queue = body.add{type = "flow", direction = "vertical"}
-    label(queue, {"mir-browser.queue"})
-    for i, tech in ipairs(player.force.research_queue or {}) do
-      if i <= 10 then button(queue, "select", tech.localised_name, {technology = tech.name}) end
-    end
-    if #(player.force.research_queue or {}) > 10 then label(queue, {"mir-browser.queue-more", #(player.force.research_queue or {}) - 10}) end
+    filter_dropdown(filters, {"mir-browser.filter-status"}, {{"mir-browser.all-status"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, v.status, "status")
+    filter_dropdown(filters, {"mir-browser.filter-level"}, {{"mir-browser.all-levels"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, v.mode, "mode")
+    local sort_index = v.sort == "native" and 2 or v.sort == "name-asc" and 3 or v.sort == "name-desc" and 4 or 1
+    filter_dropdown(filters, {"mir-browser.filter-order"}, {{"mir-browser.order-progression"}, {"mir-browser.order-native"}, {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, sort_index, "sort")
     local has_hidden = false
     for name, is_hidden in pairs(v.hidden or {}) do
-      if is_hidden == true and player.force.technologies[name] then has_hidden = true; break end
+      if is_hidden == true and player.force.technologies[name] then has_hidden = true end
     end
     if has_hidden then
       local recovery = body.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "hidden-recovery"}}
       button(recovery, "show-hidden", {"mir-browser.show-hidden"})
     end
-    local page = core.query(c, v, c.enrichment, localized_search(player))
-    v.page, pages = page.page, page.pages
-    request_visible_translations(player, page, v.selected)
-    detail(player, body, v, c)
-    label(body, {"mir-browser.count", page.count})
-    for _, row in ipairs(page.rows) do
-      local technology = player.force.technologies[row.key]
-      if technology then
-        local item = body.add{type = "flow", direction = "horizontal"}
-        add_technology_icon(item, technology)
-        local select = button(item, "select", technology.localised_name, {technology = row.key})
-        select.style.width = 300
-        select.tooltip = technology.localised_name
-        label(item, status_caption(row)).style.maximal_width = 220
-      end
-    end
+    local results = body.add{type = "flow", name = PREFIX .. "research_results", direction = "vertical"}
+    pages = update_research_results(player, results, v, c, cache)
   end
-  local nav = frame.add{type = "flow"}
-  button(nav, "prev", "<").enabled = v.page > 1
-  label(nav, tostring(v.page) .. " / " .. tostring(pages))
-  button(nav, "next", ">").enabled = v.page < pages
+  local nav = frame.add{type = "flow", name = PREFIX .. "navigation"}
+  nav.add{type = "button", name = PREFIX .. "prev", caption = "<", tags = {mir_browser = "prev"}}
+  nav.add{type = "label", name = PREFIX .. "page"}
+  nav.add{type = "button", name = PREFIX .. "next", caption = ">", tags = {mir_browser = "next"}}
+  update_navigation(frame, v, pages)
   player.opened = frame
   set_shortcut_toggled(player, true)
 end
@@ -525,7 +790,9 @@ local function click(event)
   if not action then return end
   if action == "close" then close(player); return end
   local v = view(player)
-  if action == "select" then v.selected = tags.technology; v.effect_page = 1
+  if action == "select" then
+    v.selected, v.effect_page = tags.technology, 1
+    if v.tab == "queue" then v.tab, v.page = "research", 1 end
   elseif action == "enqueue" then
     local tech = player.force.technologies[tags.technology]
     if actions.can_enqueue(player, tech, defines.input_action.start_research) then
@@ -546,9 +813,15 @@ local function click(event)
   elseif action == "next" then v.page = v.page + 1
   elseif action == "effects-prev" then v.effect_page = math.max(1, v.effect_page - 1)
   elseif action == "effects-next" then v.effect_page = v.effect_page + 1
-  elseif action == "settings" or action == "research" then v.tab = action; v.page = 1
+  elseif action == "settings" or action == "research" or action == "queue" or action == "availability" then
+    v.tab, v.page = action, 1
+    if action ~= "research" then v.search = "" end
   elseif action == "export" then export(player)
-  elseif action == "refresh" then end
+  elseif action == "refresh" then
+    local translations = translation_state()
+    local cache = translations[player.index]
+    if cache then cache.priority_token = nil end
+  end
   render(player)
 end
 local function selection(event)
@@ -562,17 +835,36 @@ local function selection(event)
     v.family = c.family_names[event.element.selected_index]
   elseif action == "sort" then
     v.sort = ({"progression", "native", "name-asc", "name-desc"})[event.element.selected_index] or "progression"
+    if v.sort == "progression" or v.sort == "native" then v.stable_sort = v.sort end
   else v[action] = event.element.selected_index end
   v.page = 1; render(player)
 end
 function M.on_init()
+  mir_provider.invalidate_omissions()
+  set_force_refresh_subscription(false)
   for _, player in pairs(game.players) do
     remove_legacy_top_button(player)
     set_shortcut_toggled(player, false)
   end
 end
 function M.on_configuration_changed()
-  translations = {}
+  mir_provider.invalidate_omissions()
+  state().pending_force_refresh = {}
+  set_force_refresh_subscription(false)
+  local translations, locale_generations = translation_state()
+  for player_index, cache in pairs(translations) do
+    local player = game.get_player(player_index)
+    if player and player.valid and type(cache) == "table" then
+      -- New prototype/configuration facts need a new catalogue generation,
+      -- but Factorio cannot cancel the old IDs. Keep them until callback or
+      -- timeout so configuration reload cannot create an unbounded window.
+      translation_queue.invalidate_locale(cache, player.locale,
+        next_locale_generation(locale_generations, cache, player_index))
+    else
+      translations[player_index] = nil
+      locale_generations[player_index] = nil
+    end
+  end
   for _, player in pairs(game.players) do
     view(player)
     remove_legacy_top_button(player)
@@ -582,7 +874,21 @@ function M.on_configuration_changed()
     if not player.gui.screen[ROOT] then set_shortcut_toggled(player, false) end
   end
 end
-function M.on_research_finished(event) refresh_open(event.research.force) end
+
+local function schedule_open_force_refresh(force)
+  if not force then return end
+  for _, player in pairs(game.connected_players) do
+    if player.force.index == force.index and player.gui.screen[ROOT] then
+      local pending = state().pending_force_refresh
+      local was_empty = next(pending) == nil
+      pending[force.name] = true
+      if was_empty then set_force_refresh_subscription(true) end
+      return
+    end
+  end
+end
+
+function M.on_research_finished(event) schedule_open_force_refresh(event.research and event.research.force) end
 M.on_research_reversed = M.on_research_finished
 M.on_research_queued = M.on_research_finished
 function M.on_technology_effects_reset() refresh_open() end
@@ -590,18 +896,68 @@ function M.on_force_reset(event) refresh_open(event and event.force) end
 function M.on_forces_merged() refresh_open() end
 local function translated(event)
   local player = event_player(event)
+  local translations, locale_generations = translation_state()
   local cache = player and translations[player.index]
-  if not cache or cache.locale ~= player.locale or type(event.id) ~= "number" then return end
-  local technology = cache.requested[event.id]
-  if not technology then return end
-  cache.requested[event.id] = nil
-  if event.translated and type(event.result) == "string" then
-    cache.values[technology] = string.sub(event.result, 1, core.detail_string_limit)
-  else
-    cache.values[technology] = ""
+  if not cache or type(event.id) ~= "number" then return end
+  -- Event ordering around a locale change is not a proof boundary.  If a
+  -- pre-change callback arrives before its locale event, retire its generation
+  -- here so it frees the slot without publishing an old-locale label.
+  if cache.locale ~= player.locale then
+    translation_queue.invalidate_locale(cache, player.locale,
+      next_locale_generation(locale_generations, cache, player.index))
   end
-  if player.gui.screen[ROOT] and view(player).search ~= "" then render(player) end
+  local result = event.translated and type(event.result) == "string"
+    and string.sub(event.result, 1, core.detail_string_limit) or nil
+  -- A stale callback still releases its retained pending slot, but its label
+  -- cannot enter the current locale/catalogue index.
+  local current_generation = translation_queue.completed(cache, event.id, result)
+  if player.gui.screen[ROOT] then
+    pump_translation_requests(player, cache)
+    if current_generation then refresh_translated_view(player, cache) end
+  end
 end
+
+local function maintain_translations(event)
+  local translations, locale_generations = translation_state()
+  for player_index, cache in pairs(translations) do
+    local player = game.get_player(player_index)
+    if not (player and player.valid) then
+      translations[player_index] = nil
+      locale_generations[player_index] = nil
+    else
+      translation_queue.expire(cache, event.tick)
+      -- Work continues only while the player has this surface open. A close
+      -- keeps already requested results but does not spend translation work.
+      if player.gui.screen[ROOT] then
+        pump_translation_requests(player, cache)
+        refresh_translated_view(player, cache)
+      end
+    end
+  end
+end
+
+-- Research completion can arrive in a burst. Build the force catalogue once
+-- on the next tick only when an affected player is actually viewing it; a
+-- closed library has no catalogue work to coalesce.
+refresh_scheduled_forces = function()
+  local pending = state().pending_force_refresh
+  for force_name in pairs(pending) do
+    pending[force_name] = nil
+    local force = game.forces[force_name]
+    if force then refresh_open(force) end
+  end
+  set_force_refresh_subscription(false)
+end
+
+function M.on_load()
+  local pending = saved_pending_force_refresh()
+  local active = false
+  for force_name, scheduled in pairs(pending or {}) do
+    if type(force_name) == "string" and scheduled == true then active = true; break end
+  end
+  set_force_refresh_subscription(active)
+end
+
 local function shortcut(event)
   if event.prototype_name ~= SHORTCUT then return end
   local player = event_player(event)
@@ -625,7 +981,8 @@ function M.register()
           v.search = string.sub(options.search, 1, 160)
           reset_page = true
         end
-        if options.tab == "settings" or options.tab == "research" then
+        if options.tab == "settings" or options.tab == "research"
+            or options.tab == "queue" or options.tab == "availability" then
           v.tab = options.tab
           reset_page = true
         end
@@ -643,6 +1000,7 @@ function M.register()
         if options.sort == "progression" or options.sort == "native"
             or options.sort == "name-asc" or options.sort == "name-desc" then
           v.sort = options.sort
+          if v.sort == "progression" or v.sort == "native" then v.stable_sort = v.sort end
           reset_page = true
         end
         if type(options.selected) == "string" and player.force.technologies[options.selected] then
@@ -668,6 +1026,7 @@ function M.register()
   script.on_event(defines.events.on_gui_click, click)
   script.on_event(defines.events.on_gui_selection_state_changed, selection)
   script.on_event(defines.events.on_string_translated, translated)
+  script.on_nth_tick(TRANSLATION_MAINTENANCE_TICKS, maintain_translations)
   script.on_event(defines.events.on_lua_shortcut, shortcut)
   script.on_event(defines.events.on_gui_confirmed, function(event)
     local player = event_player(event)
@@ -695,14 +1054,35 @@ function M.register()
   end)
   script.on_event(defines.events.on_player_removed, function(event)
     state().players[event.player_index] = nil
+    local translations, locale_generations = translation_state()
     translations[event.player_index] = nil
+    locale_generations[event.player_index] = nil
   end)
   script.on_event(defines.events.on_player_locale_changed, function(event)
-    translations[event.player_index] = nil
-    local player = event_player(event); if player and player.gui.screen[ROOT] then render(player) end
+    local player = event_player(event)
+    if player then
+      local translations, locale_generations = translation_state()
+      local cache = translations[event.player_index]
+      if cache then
+        translation_queue.invalidate_locale(cache, player.locale,
+          next_locale_generation(locale_generations, cache, event.player_index))
+      end
+      if player.gui.screen[ROOT] then render(player) end
+    end
   end)
   script.on_event(defines.events.on_player_changed_force, function(event)
-    local player = event_player(event); if player.gui.screen[ROOT] then render(player) end
+    local player = event_player(event)
+    if player then
+      local translations = translation_state()
+      local cache = translations[event.player_index]
+      if cache then
+        -- A force change can replace the catalogue under the same locale.
+        -- Keep issued IDs and their window accounting; render will install
+        -- the new catalogue generation.
+        translation_queue.reset_catalogue(cache, {}, nil)
+      end
+      if player.gui.screen[ROOT] then render(player) end
+    end
   end)
   for _, id in ipairs{defines.events.on_player_display_resolution_changed, defines.events.on_player_display_scale_changed} do
     script.on_event(id, function(event)
@@ -710,7 +1090,9 @@ function M.register()
     end)
   end
   for _, id in ipairs{defines.events.on_research_started, defines.events.on_research_cancelled} do
-    script.on_event(id, function() refresh_open() end)
+    script.on_event(id, function(event)
+      schedule_open_force_refresh(event.research and event.research.force or event.force)
+    end)
   end
 end
 return M
