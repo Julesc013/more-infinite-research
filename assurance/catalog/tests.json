@@ -1163,7 +1163,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1",
+      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target>",
       "canonical_implementation": "tests/runtime/Test-MIRResearchBrowser.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -1172,6 +1172,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": true,
       "inputs": [
+        "candidate",
         "source:source/prototypes/mir/runtime/startup_settings.lua",
         "source:source/prototypes/mir/settings/profile_codec.lua",
         "tests/runtime/Test-MIRResearchBrowser.ps1",
@@ -7758,5 +7759,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e9c47086ea2b2bd7ed9cf0afed7a25cfb6206184aa2e8fda8172a1667e4ed84f"
+  "digest": "sha256:f99dfb82b64c64e91cb2f06e9ebca398f27a0fd5fc929f853035ec459d91525d"
 }

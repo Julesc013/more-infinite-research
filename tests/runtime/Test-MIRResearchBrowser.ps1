@@ -15,9 +15,19 @@ if([string]::IsNullOrWhiteSpace($CandidateZip)) {
  $version=if($Target -eq '2.0') {'4.2.20000'} else {'4.2.21000'}
  $package=New-MIR4TargetPackage -RepoRoot $repo -Target $targetKey -CandidateId ('BROWSER-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion $version -OutputRoot 'build/browser-packages'
  $candidate=[string]$package.archive_path
-} else { $candidate=(Resolve-Path (Join-Path $repo $CandidateZip)).Path }
+} else {
+ $candidateInput=if([IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
+ $candidate=(Resolve-Path -LiteralPath $candidateInput).Path
+}
 $archive=[IO.Compression.ZipFile]::OpenRead($candidate)
 try {
+ $infoEntries=@($archive.Entries | Where-Object FullName -Like '*/info.json')
+ if($infoEntries.Count -ne 1) { throw 'Browser candidate requires one mod identity.' }
+ $infoReader=[IO.StreamReader]::new($infoEntries[0].Open())
+ try { $info=$infoReader.ReadToEnd() | ConvertFrom-Json } finally { $infoReader.Dispose() }
+ if([string]$info.name -cne 'more-infinite-research' -or [string]$info.factorio_version -cne $Target) {
+  throw "Browser candidate target mismatch: requested $Target, archive declares $($info.factorio_version)."
+ }
  foreach($name in @('research_browser.lua','research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')) {
   $entry=@($archive.Entries | Where-Object FullName -Like "*/prototypes/mir/runtime/$name")
   if($entry.Count -ne 1) { throw "Candidate must contain exactly one $name." }
@@ -26,6 +36,26 @@ try {
   if($moduleHash -cne (Get-FileHash (Join-Path $repo "source/prototypes/mir/runtime/$name")).Hash) { throw "Candidate $name differs from the controlled source under test." }
  }
 } finally { $archive.Dispose() }
+$versionStart=[Diagnostics.ProcessStartInfo]::new($engine)
+$versionStart.UseShellExecute=$false; $versionStart.CreateNoWindow=$true; $versionStart.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
+$versionStart.RedirectStandardOutput=$true; $versionStart.RedirectStandardError=$true
+$versionStart.Environment['SteamAppId']='427520'; $versionStart.Environment['SteamGameId']='427520'
+$versionStart.ArgumentList.Add('--version')
+$versionProcess=[Diagnostics.Process]::Start($versionStart)
+try {
+ $versionOutput=$versionProcess.StandardOutput.ReadToEndAsync(); $versionError=$versionProcess.StandardError.ReadToEndAsync()
+ if(-not $versionProcess.WaitForExit(10000)) { $versionProcess.Kill($true); $versionProcess.WaitForExit(); throw 'Browser engine version query timed out.' }
+ $engineVersionText=$versionOutput.GetAwaiter().GetResult()
+ $versionError.GetAwaiter().GetResult() | Out-Null
+ $versionExitCode=$versionProcess.ExitCode
+} finally { $versionProcess.Dispose() }
+if($versionExitCode -ne 0 -or $engineVersionText -notmatch '(?m)^Version:\s*(?<version>[0-9]+\.[0-9]+\.[0-9]+)') {
+ throw 'Browser test cannot identify the selected engine version.'
+}
+$selectedEngineVersion=[string]$Matches.version
+if(-not $selectedEngineVersion.StartsWith($Target + '.', [StringComparison]::Ordinal)) {
+ throw "Browser engine target mismatch: requested $Target, selected engine is $selectedEngineVersion."
+}
 $run=Join-Path $repo ('build/browser-tests/'+[guid]::NewGuid().ToString('N').Substring(0,8))
 $fixture=Join-Path $run 'mods/mir-browser-test_1.0.0'
 New-Item -ItemType Directory -Force $fixture | Out-Null
@@ -79,6 +109,7 @@ if(-not (Test-Path $resultPath)) { throw "No browser acceptance result: $run" }
 $result=Get-Content -Raw $resultPath | ConvertFrom-Json
 if($Graphics -and $result.native_players -lt 1) { throw "Graphics test did not exercise a native player: $run" }
 if($result.status -ne 'passed') { throw "Browser acceptance failed: $resultPath" }
+if([string]$result.engine -cne $selectedEngineVersion) { throw 'Browser native result does not match the selected engine.' }
 $result | Add-Member package_sha256 (Get-FileHash $candidate).Hash
 $result | Add-Member engine_sha256 (Get-FileHash $engine).Hash
 $result | Add-Member core_sha256 (Get-FileHash (Join-Path $repo 'source/prototypes/mir/runtime/research_browser_core.lua')).Hash

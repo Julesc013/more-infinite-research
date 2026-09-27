@@ -5034,9 +5034,11 @@
       "id": "runtime.research-browser",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1",
+      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target>",
       "requires_factorio": true,
+      "requires_candidate": true,
       "inputs": [
+        "candidate",
         "source:source/prototypes/mir/runtime/startup_settings.lua",
         "source:source/prototypes/mir/settings/profile_codec.lua",
         "tests/runtime/Test-MIRResearchBrowser.ps1",
