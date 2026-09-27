@@ -308,6 +308,10 @@ local function finite_nonnegative(value)
     and value ~= -math.huge and value >= 0
 end
 
+local function finite_nonnegative_integer(value)
+  return finite_nonnegative(value) and value == math.floor(value)
+end
+
 local function same_scalar(left, right)
   return type(left) == type(right) and left == right
 end
@@ -360,6 +364,62 @@ local function valid_setting(value, expected_name, expected_type)
     and value.changed == (not same_scalar(value.raw_direct, value.effective))
     and value.changed_from_default == (not same_scalar(value.default, value.effective))
     and value.restart_required == true
+end
+
+-- This setting shape deliberately differs from valid_setting(): maximum-level
+-- zero is the declared unbounded selection, while ordinary positive settings
+-- remain validated by the richer generated-stream detail contract above.
+local function valid_runtime_maximum_setting(value, expected_name)
+  local values_are_valid = type(value) == "table"
+    and finite_nonnegative_integer(value.default)
+    and finite_nonnegative_integer(value.raw_direct)
+    and finite_nonnegative_integer(value.effective)
+  return values_are_valid
+    and only_fields(value, {name = true, default = true, raw_direct = true, effective = true,
+      source = true, changed = true, changed_from_default = true, restart_required = true})
+    and value.name == expected_name and (value.source == "direct" or value.source == "mirset1")
+    and type(value.changed) == "boolean" and type(value.changed_from_default) == "boolean"
+    and value.changed == (not same_scalar(value.raw_direct, value.effective))
+    and value.changed_from_default == (not same_scalar(value.default, value.effective))
+    and value.restart_required == true
+end
+
+local runtime_binding_sources = {
+  ["generated-stream"] = true,
+  ["base-continuation"] = true
+}
+
+local runtime_binding_transports = {
+  ["transported-v3"] = true,
+  ["settings-derived-v3"] = true
+}
+
+local function valid_runtime_settings_binding(value, key)
+  if type(value) ~= "table" or value.schema ~= 1
+      or not only_fields(value, {schema = true, source = true, policy_transport = true,
+        binding = true, setting = true, selected_effective = true, state = true, blocked_reason = true})
+      or not runtime_binding_sources[value.source]
+      or not runtime_binding_transports[value.policy_transport]
+      or type(value.binding) ~= "table"
+      or not only_fields(value.binding, {technology_id = true, declared_key = true, setting_name = true})
+      or value.binding.technology_id ~= key
+      or not bounded_string(value.binding.declared_key)
+      or not bounded_string(value.binding.setting_name)
+      or not valid_runtime_maximum_setting(value.setting, value.binding.setting_name) then
+    return false
+  end
+  local selected = value.selected_effective
+  local finite, infinite = finite_positive_integer(selected), selected == "infinite"
+  if value.state == "finite" then
+    return finite and value.blocked_reason == nil and value.setting.effective == selected
+  elseif value.state == "infinite" then
+    return infinite and value.blocked_reason == nil and value.setting.effective == 0
+  elseif value.state == "disabled" then
+    return (finite or infinite) and bounded_string(value.blocked_reason)
+      and ((finite and value.setting.effective == selected)
+        or (infinite and value.setting.effective == 0))
+  end
+  return false
 end
 
 local function exact_map_keys(left, right)
@@ -459,12 +519,16 @@ function M.normalize_enrichment(enrichment)
   if enrichment == nil then return nil end
   if type(enrichment) ~= "table" then return nil end
   if enrichment.schema == 1 then return enrichment end
-  if not only_fields(enrichment, {schema = true, kind = true, caps = true, families = true, details = true})
+  if not only_fields(enrichment, {schema = true, kind = true, caps = true, families = true, details = true,
+      runtime_settings_bindings = true})
     or enrichment.schema ~= M.enrichment_schema or enrichment.kind ~= M.enrichment_kind
     or type(enrichment.caps) ~= "table" or type(enrichment.families) ~= "table"
     or type(enrichment.details) ~= "table" then
     return nil
   end
+  local runtime_settings_bindings = enrichment.runtime_settings_bindings
+  if runtime_settings_bindings == nil then runtime_settings_bindings = {} end
+  if type(runtime_settings_bindings) ~= "table" then return nil end
   if not exact_map_keys(enrichment.families, enrichment.details) then return nil end
   local count = 0
   for key, cap in pairs(enrichment.caps) do
@@ -484,6 +548,12 @@ function M.normalize_enrichment(enrichment)
       or (enrichment.caps[key] ~= nil and not rich) then return nil end
   end
   for key, _ in pairs(enrichment.caps) do if enrichment.details[key] == nil then return nil end end
+  local runtime_count = 0
+  for key, binding in pairs(runtime_settings_bindings) do
+    runtime_count = runtime_count + 1
+    if runtime_count > M.catalogue_limit or not bounded_string(key)
+      or not valid_runtime_settings_binding(binding, key) then return nil end
+  end
   return enrichment
 end
 
@@ -635,12 +705,23 @@ function M.detail(catalogue, key, enrichment)
       row.cap, row.family = positive_cap(enrichment, key), family_for(enrichment, key)
       row.infinite = row.infinite and not row.cap
       local details = enrichment and enrichment.details and enrichment.details[key]
-      local copied, reason
+      local copied, runtime_settings_binding, reason
       if type(details) == "table" then
         copied, reason = copy_plain(details, {nodes = 0}, 0)
         if reason then return nil, reason end
       end
-      return {schema = M.schema, technology = row, enrichment = copied}
+      -- Schema-1 is a historical generic envelope. It has no validated
+      -- runtime-settings witness, even if an untrusted caller appends a field
+      -- named like the schema-2 bridge.
+      local binding = enrichment and enrichment.schema == M.enrichment_schema
+        and enrichment.kind == M.enrichment_kind and enrichment.runtime_settings_bindings
+        and enrichment.runtime_settings_bindings[key]
+      if type(binding) == "table" then
+        runtime_settings_binding, reason = copy_plain(binding, {nodes = 0}, 0)
+        if reason then return nil, reason end
+      end
+      return {schema = M.schema, technology = row, enrichment = copied,
+        runtime_settings_binding = runtime_settings_binding}
     end
   end
   return nil, "unknown-technology"

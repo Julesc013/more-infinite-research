@@ -68,11 +68,40 @@ foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{n
  [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo "source/prototypes/mir/runtime/$($module.path)")))
  [void]$lua.AppendLine('end)()')
 }
-[void]$lua.AppendLine('local browser_omission_prototypes={mod_data={}}')
+[void]$lua.AppendLine('local browser_omission_prototypes={mod_data={},mod_setting={}}')
+[void]$lua.AppendLine('local browser_omission_controller_bindings={}')
+[void]$lua.AppendLine('local browser_omission_controller={runtime_settings_bindings=function() return browser_omission_controller_bindings end}')
+[void]$lua.AppendLine('local browser_omission_runtime_settings={startup={}}')
+[void]$lua.AppendLine('local browser_omission_registered_settings={["ips-max-level-bridge"]={name="ips-max-level-bridge",type="int-setting"}}')
 [void]$lua.AppendLine('local browser_omission_fingerprint=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/core/fingerprint.lua')))
 [void]$lua.AppendLine('end)()')
-[void]$lua.AppendLine('local browser_omission_provider=(function() local prototypes=browser_omission_prototypes; local require=function(name) if name=="prototypes.mir.core.fingerprint" then return browser_omission_fingerprint end return {} end')
+[void]$lua.AppendLine(@'
+local browser_omission_provider=(function()
+  local prototypes=browser_omission_prototypes
+  local settings=browser_omission_runtime_settings
+  local require=function(name)
+    if name=="prototypes.mir.core.fingerprint" then return browser_omission_fingerprint
+    elseif name=="prototypes.mir.runtime.maximum_level_control" then return browser_omission_controller
+    elseif name=="prototypes.mir.settings.catalog" then return {
+      spec=function(setting_name) return browser_omission_registered_settings[setting_name] end,
+      validate_value=function(setting_name,value) return browser_omission_registered_settings[setting_name]~=nil
+        and type(value)=="number" and value==value
+        and value~=math.huge and value~=-math.huge and value>=0 and value==math.floor(value) end
+    }
+    elseif name=="prototypes.mir.runtime.startup_settings" then return {
+      get=function(setting_name)
+        local entry=browser_omission_runtime_settings.startup[setting_name]
+        return entry and entry.value
+      end
+    }
+    elseif name=="prototypes.mir.settings.profile_codec" then return {
+      import_setting_name="mir-profile-import",decode=function() return nil end
+    }
+    end
+    return {}
+  end
+'@)
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua')))
 [void]$lua.AppendLine('end)()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_omissions.lua')))
