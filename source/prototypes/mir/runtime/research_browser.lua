@@ -178,6 +178,10 @@ local function view(player)
   result.settings_scope = result.settings_scope == "options" and "options" or "research"
   return result
 end
+
+local function needs_name_index(v)
+  return v.tab == "research" and (v.search ~= "" or v.sort == "name-asc" or v.sort == "name-desc")
+end
 local function catalogue(force)
   local result = factorio_catalogue.snapshot(force)
   if not result then return nil end
@@ -267,7 +271,7 @@ local function refresh_translated_view(player, cache)
   local c = catalogue(player.force)
   if not c or ensure_translation_catalogue(player, c) ~= cache then return end
   if not translation_queue.complete(cache) then
-    pump_translation_requests(player, cache)
+    if needs_name_index(v) then pump_translation_requests(player, cache) end
     update_translation_index(results, cache, v)
     return
   end
@@ -301,7 +305,7 @@ update_translation_index = function(results, cache, v)
   if not (parent and parent.valid) then return end
   local indicator = parent[PREFIX .. "fact_translation_index"]
   local unresolved = unresolved_translations(cache)
-  if unresolved <= 0 then
+  if unresolved <= 0 or not needs_name_index(v) then
     if indicator and indicator.valid then indicator.destroy() end
     return
   end
@@ -955,8 +959,10 @@ update_research_results = function(player, results, v, c, cache)
   local page = core.query(c, query_view(v, cache), c.enrichment, cache.values, v.selected)
   v.page = page.page
   select_first_visible_subject(player, v, page)
-  prioritize_visible_translations(cache, page, v.selected)
-  pump_translation_requests(player, cache)
+  if needs_name_index(v) then
+    prioritize_visible_translations(cache, page, v.selected)
+    pump_translation_requests(player, cache)
+  end
   local list_width, detail_width = research_pane_widths(player)
   local panes_height = research_panes_height(results)
   local list = results.add{
@@ -1330,7 +1336,7 @@ local function translated(event)
   -- cannot enter the current locale/catalogue index.
   local current_generation = translation_queue.completed(cache, event.id, result)
   if player.gui.screen[ROOT] then
-    pump_translation_requests(player, cache)
+    if needs_name_index(view(player)) then pump_translation_requests(player, cache) end
     if current_generation then refresh_translated_view(player, cache) end
   end
 end
@@ -1347,7 +1353,7 @@ local function maintain_translations(event)
       -- Work continues only while the player has this surface open. A close
       -- keeps already requested results but does not spend translation work.
       if player.gui.screen[ROOT] then
-        pump_translation_requests(player, cache)
+        if needs_name_index(view(player)) then pump_translation_requests(player, cache) end
         refresh_translated_view(player, cache)
       end
     end
