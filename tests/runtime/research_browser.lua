@@ -548,13 +548,17 @@ script.on_nth_tick(1,function()
     local default_search=find_browser_element(default_root,"mir_browser_section","search")
     local default_navigation=default_root["mir_browser_navigation"]
     check(default_body and default_body.type=="flow" and default_body.parent==default_root
-      and default_results and default_results.type=="flow" and default_results.parent==default_body and default_results.style.maximal_height>=80
+      and default_body.style.maximal_height<=420 and (default_body.style.minimal_height or 0)<default_body.style.maximal_height
+      and default_results and default_results.type=="flow" and default_results.parent==default_body
+      and default_results.style.maximal_height>=80 and (default_results.style.minimal_height or 0)<default_results.style.maximal_height
       and default_list and default_list.type=="scroll-pane" and default_list.style.maximal_width>=240 and default_list.style.maximal_width<=360
-      and default_list.parent==default_results and default_list.style.maximal_height>=80 and default_list.horizontal_scroll_policy=="never" and default_list.vertical_scroll_policy=="auto"
+      and default_list.parent==default_results and default_list.style.maximal_height>=80 and (default_list.style.minimal_height or 0)<default_list.style.maximal_height
+      and default_list.horizontal_scroll_policy=="never" and default_list.vertical_scroll_policy=="auto"
       and default_detail and default_detail.type=="scroll-pane" and default_detail.style.maximal_width>=280 and default_detail.style.maximal_width<=460
-      and default_detail.parent==default_results and default_detail.style.maximal_height>=80 and default_detail.horizontal_scroll_policy=="never" and default_detail.vertical_scroll_policy=="auto"
+      and default_detail.parent==default_results and default_detail.style.maximal_height>=80 and (default_detail.style.minimal_height or 0)<default_detail.style.maximal_height
+      and default_detail.horizontal_scroll_policy=="never" and default_detail.vertical_scroll_policy=="auto"
       and default_search and default_search.parent==default_root and default_navigation and default_navigation.parent==default_root,
-      "Browse keeps bounded list and detail scroll panes beneath fixed controls")
+      "Browse fits bounded list and detail scroll panes beneath fixed controls")
     check(browser_labels_fit(default_detail,default_detail.style.maximal_width),
       "Browse detail labels wrap within their native detail pane")
     check(default_first and default_selected and default_first.tags.technology==default_selected.tags.technology
