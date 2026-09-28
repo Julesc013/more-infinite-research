@@ -46,8 +46,22 @@ function Get-MIRDevelopmentHealthAgeDays {
 function Get-MIRDevelopmentHealthDirtyState {
   param([Parameter(Mandatory)][string]$Repository,[ValidateRange(1,256)][int]$ExampleLimit=12)
   $status = Invoke-MIRDevelopmentHealthGit -Repository $Repository -Arguments @('status','--porcelain=v1','--untracked-files=normal')
-  if (-not $status.succeeded) { return [pscustomobject]@{ readable=$false; count=$null; examples=@() } }
-  return [pscustomobject]@{ readable=$true; count=@($status.lines).Count; examples=@($status.lines | Select-Object -First $ExampleLimit) }
+  if (-not $status.succeeded) { return [pscustomobject]@{ readable=$false; count=$null; examples=@(); operations=@() } }
+  # An index may be byte-clean while Git still waits for a merge/rebase/cherry-pick
+  # commit. Check the per-worktree Git directory instead of guessing from porcelain.
+  $gitPath=Invoke-MIRDevelopmentHealthGit -Repository $Repository -Arguments @('rev-parse','--git-path','MERGE_HEAD')
+  $operations=@()
+  if($gitPath.succeeded-and$gitPath.lines.Count-eq1){
+    $mergePath=if([IO.Path]::IsPathRooted([string]$gitPath.lines[0])){[string]$gitPath.lines[0]}else{Join-Path $Repository ([string]$gitPath.lines[0])}
+    $gitStateRoot=Split-Path -Parent ([IO.Path]::GetFullPath($mergePath))
+    foreach($name in @('MERGE_HEAD','CHERRY_PICK_HEAD','REVERT_HEAD','BISECT_LOG')){
+      if(Test-Path -LiteralPath (Join-Path $gitStateRoot $name) -PathType Leaf){$operations+=switch($name){'MERGE_HEAD'{'merge'}'CHERRY_PICK_HEAD'{'cherry-pick'}'REVERT_HEAD'{'revert'}'BISECT_LOG'{'bisect'}}}
+    }
+    foreach($name in @('rebase-merge','rebase-apply')){
+      if(Test-Path -LiteralPath (Join-Path $gitStateRoot $name) -PathType Container){$operations+='rebase'}
+    }
+  }else{$operations+='git-state-unreadable'}
+  return [pscustomobject]@{ readable=$true; count=@($status.lines).Count; examples=@($status.lines | Select-Object -First $ExampleLimit); operations=@($operations|Sort-Object -Unique) }
 }
 
 function Get-MIRDevelopmentHealthBoundedDirectorySize {
@@ -106,7 +120,7 @@ function Get-MIRDevelopmentHealthWorktrees {
     $exists=Test-Path -LiteralPath $record.path -PathType Container
     $resolvedPath=if($exists){(Resolve-Path -LiteralPath $record.path).Path.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)}else{$record.path}
     $isCurrent=$exists-and$resolvedPath.Equals($CurrentRoot,$comparison)
-    $dirty=if($exists){Get-MIRDevelopmentHealthDirtyState -Repository $resolvedPath}else{[pscustomobject]@{readable=$false;count=$null;examples=@()}}
+    $dirty=if($exists){Get-MIRDevelopmentHealthDirtyState -Repository $resolvedPath}else{[pscustomobject]@{readable=$false;count=$null;examples=@();operations=@()}}
     $lastCommit=if($exists){Invoke-MIRDevelopmentHealthGit -Repository $resolvedPath -Arguments @('log','-1','--format=%ct')}else{$null}
     $commitSeconds=if($null-ne$lastCommit-and$lastCommit.succeeded-and$lastCommit.lines.Count-eq1-and$lastCommit.lines[0]-match'^\d+$'){[long]$lastCommit.lines[0]}else{$null}
     $ageDays=if($null-ne$commitSeconds){Get-MIRDevelopmentHealthAgeDays -UnixSeconds $commitSeconds -Now $Now}else{$null}
@@ -114,8 +128,8 @@ function Get-MIRDevelopmentHealthWorktrees {
     $uniqueCount=if($null-ne$unique-and$unique.succeeded-and$unique.lines.Count-eq1-and$unique.lines[0]-match'^\d+$'){[int]$unique.lines[0]}else{$null}
     $rows.Add([pscustomobject][ordered]@{
       path=$record.path;current=$isCurrent;exists=$exists;head=$record.head;branch=$record.branch;detached=[bool]$record.detached;prunable=[bool]$record.prunable;dirty=$dirty;last_commit_age_days=$ageDays;unique_commit_count=$uniqueCount
-      review_needed=(-not$isCurrent)-and((-not$exists)-or(-not$dirty.readable)-or[bool]$record.prunable-or($null-ne$ageDays-and$ageDays-ge$OldDays))
-      preservation=if((-not$exists)-or(-not$dirty.readable)){'preserve-unreadable-worktree'}elseif($dirty.count-gt0){'preserve-dirty-worktree'}elseif($null-ne$uniqueCount-and$uniqueCount-gt0){'preserve-unique-commits'}elseif(-not$IncludeUniqueCommitCounts){'unique-commits-not-scanned'}else{'review-before-any-removal'}
+      review_needed=(-not$isCurrent)-and((-not$exists)-or(-not$dirty.readable)-or[bool]$record.prunable-or@($dirty.operations).Count-gt0-or($null-ne$ageDays-and$ageDays-ge$OldDays))
+      preservation=if((-not$exists)-or(-not$dirty.readable)){'preserve-unreadable-worktree'}elseif(@($dirty.operations).Count-gt0){'preserve-in-progress-git-operation'}elseif($dirty.count-gt0){'preserve-dirty-worktree'}elseif($null-ne$uniqueCount-and$uniqueCount-gt0){'preserve-unique-commits'}elseif(-not$IncludeUniqueCommitCounts){'unique-commits-not-scanned'}else{'review-before-any-removal'}
     })
   }
   return [pscustomobject]@{readable=$true;truncated=$truncated;rows=@($rows)}
@@ -175,6 +189,7 @@ $dist=Get-MIRDevelopmentHealthBoundedDirectorySize -Root (Join-Path $repo 'dist'
 $drive=[IO.DriveInfo]::new([IO.Path]::GetPathRoot($repo));$freeMiB=[int][Math]::Floor($drive.AvailableFreeSpace/1MB);$buildMiB=[int][Math]::Ceiling($build.bytes/1MB);$distMiB=[int][Math]::Ceiling($dist.bytes/1MB)
 $oldWorktrees=@($worktrees.rows|Where-Object review_needed);$oldBranches=@($branches.rows|Where-Object review_needed);$attention=@()
 if($dirty.readable-and$dirty.count-gt0){$attention+="dirty:$($dirty.count)"}
+if(@($dirty.operations).Count-gt0){$attention+='git-operation:'+(@($dirty.operations)-join ',')}
 if(-not$upstream.configured){$attention+='upstream:missing'}elseif(($null-ne$upstream.ahead-and$upstream.ahead-gt0)-or($null-ne$upstream.behind-and$upstream.behind-gt0)){$attention+="upstream:ahead=$($upstream.ahead),behind=$($upstream.behind)"}
 $buildBudgetObservation=if($buildMiB-gt$BuildBudgetMiB){if($build.complete){'over-budget'}else{'over-budget-lower-bound'}}elseif($build.complete){'within-budget'}else{'incomplete-lower-bound'}
 $distBudgetObservation=if($distMiB-gt$DistBudgetMiB){if($dist.complete){'over-budget'}else{'over-budget-lower-bound'}}elseif($dist.complete){'within-budget'}else{'incomplete-lower-bound'}
@@ -184,13 +199,14 @@ if($freeMiB-lt$MinimumFreeMiB){$attention+="free:$freeMiB-MiB-below-$MinimumFree
 if($oldWorktrees.Count-gt0){$attention+="worktrees:review-$($oldWorktrees.Count)"};if($oldBranches.Count-gt0){$attention+="branches:review-$($oldBranches.Count)"};if($worktrees.truncated){$attention+='worktrees:truncated'};if($branches.truncated){$attention+='branches:truncated'}
 $checkpointReasons = @()
 if($dirty.readable-and$dirty.count-gt0){$checkpointReasons+="dirty:$($dirty.count)"}
+if(@($dirty.operations).Count-gt0){$checkpointReasons+='git-operation:'+(@($dirty.operations)-join ',')}
 if($upstream.configured-and$null-ne$upstream.ahead-and$upstream.ahead-gt0){$checkpointReasons+="upstream-ahead:$($upstream.ahead)"}
 if($freeMiB-lt$MinimumFreeMiB){$checkpointReasons+="free:$freeMiB-MiB-below-$MinimumFreeMiB"}
 if($buildMiB-gt$BuildBudgetMiB){$checkpointReasons+="build:$buildMiB-MiB-over-$BuildBudgetMiB"}
 if($distMiB-gt$DistBudgetMiB){$checkpointReasons+="dist:$distMiB-MiB-over-$DistBudgetMiB"}
 $buildDisplay="$buildMiB-MiB" + $(if($build.bytes_is_lower_bound){'+'}else{''})
 $distDisplay="$distMiB-MiB" + $(if($dist.bytes_is_lower_bound){'+'}else{''})
-$summaryParts=@("branch=$currentBranch","dirty=$($dirty.count)","build=$buildDisplay","dist=$distDisplay","free=$freeMiB-MiB")
+$summaryParts=@("branch=$currentBranch","dirty=$($dirty.count)","git-operation="+$(if(@($dirty.operations).Count-gt0){@($dirty.operations)-join ','}else{'none'}),"build=$buildDisplay","dist=$distDisplay","free=$freeMiB-MiB")
 if($attention.Count-gt0){$summaryParts+=('attention='+($attention-join','))}else{$summaryParts+='attention=none'}
 $hookMessage='MIR development health (advisory; no files changed): '+($summaryParts-join'; ');if($hookMessage.Length-gt900){$hookMessage=$hookMessage.Substring(0,897)+'...'}
 $report=[pscustomobject][ordered]@{
