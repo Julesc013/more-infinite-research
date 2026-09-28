@@ -747,20 +747,38 @@ end
 
 local omission_reasons = {
   covered_by_existing_infinite_native_modifier = "not-added-provided",
+  covered_by_existing_infinite_recipe_productivity = "not-added-provided",
   covered_by_planned_stream = "not-added-grouped",
+  covered_by_planned_operation = "not-added-grouped",
   no_valid_effect_targets = "not-added-no-effect",
-  automatic_family_not_reviewed = "not-added-review"
+  no_available_direct_effects = "not-added-no-effect",
+  no_useful_native_effect_increment = "not-added-no-effect",
+  automatic_family_not_reviewed = "not-added-review",
+  disabled = "not-added-disabled",
+  no_matching_recipes = "not-added-no-recipe",
+  no_lab_compatible_science = "not-added-no-science",
+  recipe_productivity_unsupported = "not-added-unsupported"
 }
 
 local function bounded_string(value)
   return type(value) == "string" and value ~= "" and #value <= core.detail_string_limit
 end
 
+local function omission_reason_caption(reason)
+  local key = omission_reasons[reason]
+  if key then return {"mir-browser." .. key} end
+  for _, requirement in ipairs{{"mod", "not-added-needs-mod"}, {"item", "not-added-needs-item"}, {"fluid", "not-added-needs-fluid"}} do
+    local identity = reason:match("^missing required " .. requirement[1] .. " ([%w_%-%.]+)$")
+    if identity then return {"mir-browser." .. requirement[2], identity} end
+  end
+  return {"mir-browser.not-added-generic"}
+end
+
 -- This display is deliberately a terminal viewer. Its provider envelope is
 -- validated again at the UI edge and omitted rows have no technology action,
 -- queue action, or deep link. A malformed row yields no player claim.
-local function availability_rows(force, parent, v)
-  local envelope = mir_provider.omissions(force)
+local function availability_rows(player, parent, v)
+  local envelope = mir_provider.omissions(player.force)
   if type(envelope) ~= "table" or envelope.schema ~= 1
       or envelope.kind ~= "portable-research-omissions" or type(envelope.rows) ~= "table"
       or #envelope.rows > core.catalogue_limit then
@@ -796,8 +814,18 @@ local function availability_rows(force, parent, v)
       return 1
     end
     seen[identity] = true
+    -- Omitted streams may describe items supplied only by an absent mod. Their
+    -- authored name then contains an item-name key that this player cannot
+    -- translate; keep the authored name when valid and show a readable stable
+    -- identity otherwise.
+    local required_item = type(stream.required_items) == "table" and stream.required_items[1]
+    local fallback_name = type(required_item) == "string" and required_item or row.stream_id
+    fallback_name = fallback_name:gsub("[-_]", " "):gsub("^%l", string.upper)
+    local fallback_caption = type(required_item) == "string"
+      and {"", {"description.productivity-bonus"}, ": ", fallback_name}
+      or fallback_name
     rows[#rows + 1] = {
-      caption = stream.localised_name or {"technology-name.more-infinite-research." .. row.stream_id},
+      caption = {"?", stream.localised_name or {"technology-name.more-infinite-research." .. row.stream_id}, fallback_caption},
       reason = row.reason
     }
   end
@@ -807,12 +835,14 @@ local function availability_rows(force, parent, v)
   end
   local pages = math.max(1, math.ceil(#rows / core.page_size))
   v.page = math.min(v.page, pages)
+  local list_width, detail_width = research_pane_widths(player)
+  local table_rows = parent.add{type = "table", column_count = 2}
   for index = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #rows) do
     local row = rows[index]
-    local item = parent.add{type = "flow", direction = "vertical", tags = {mir_browser_section = "availability"}}
-    label(item, row.caption)
-    label(item, {"mir-browser.not-added"})
-    label(item, {"mir-browser." .. (omission_reasons[row.reason] or "not-added-generic")})
+    local name = label(table_rows, row.caption, list_width - 16)
+    name.style.minimal_width = list_width - 16
+    name.tags = {mir_browser_section = "availability"}
+    label(table_rows, omission_reason_caption(row.reason), detail_width - 16)
   end
   return pages
 end
@@ -912,7 +942,7 @@ render = function(player)
   button(bar, "research", {"mir-browser.browse"}).toggled = v.tab == "research"
   button(bar, "queue", {"mir-browser.queue-tab"}).toggled = v.tab == "queue"
   button(bar, "settings", {"mir-browser.settings"}).toggled = v.tab == "settings"
-  button(bar, "availability", {"mir-browser.availability"}).toggled = v.tab == "availability"
+  button(bar, "availability", {"mir-browser.not-added"}).toggled = v.tab == "availability"
   button(bar, "refresh", {"mir-browser.refresh"})
   button(bar, "close", {"mir-browser.close"})
   if v.tab == "research" or v.tab == "settings" then
@@ -930,6 +960,7 @@ render = function(player)
     body.style.height = body_height
     body.style.maximal_height = body_height
   else
+    body.style.minimal_width = list_width + detail_width
     body.style.maximal_height = body_height
   end
   local pages
@@ -938,7 +969,7 @@ render = function(player)
   elseif v.tab == "queue" then
     pages = queue_rows(player, body, v)
   elseif v.tab == "availability" then
-    pages = availability_rows(player.force, body, v)
+    pages = availability_rows(player, body, v)
   else
     local filters = body.add{type = "flow", direction = "horizontal"}
     local family_index = 1
