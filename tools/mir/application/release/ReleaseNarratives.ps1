@@ -18,16 +18,30 @@ if (-not (Get-Command Get-MIR4CanonicalDigestV1 -ErrorAction SilentlyContinue)) 
 
 function Get-MIR4ReleaseNarrativeMaterialV1 {
   param([Parameter(Mandatory)][string]$RepoRoot, [Parameter(Mandatory)][string]$PlanPath)
-  $plan = Read-MIR4NarrativeJsonV1 -RepoRoot $RepoRoot -Path $PlanPath -SchemaPath 'contracts/release/mir4-release-narrative-plan-v1.schema.json'
-  if ([string]$plan.renderer_abi -cne (Get-MIR4NarrativeAbiV1) -or -not [bool]$plan.shadow_only -or [bool]$plan.publication_authorized) { throw '[mir4-release-narrative-plan-firewall]' }
+  $planRaw = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $PlanPath) | ConvertFrom-Json -Depth 100 -DateKind String
+  $planVersion = [int]$planRaw.schema
+  if ($planVersion -notin @(1, 2)) { throw '[mir4-release-narrative-plan-version]' }
+  $plan = Read-MIR4NarrativeJsonV1 -RepoRoot $RepoRoot -Path $PlanPath -SchemaPath "contracts/release/mir4-release-narrative-plan-v$planVersion.schema.json"
+  $abi = if ($planVersion -eq 2) { Get-MIR4NarrativeAbiV2 } else { Get-MIR4NarrativeAbiV1 }
+  $targetSet = if ($planVersion -eq 2) { @(Get-MIR4NarrativeTargetsV2) } else { @(Get-MIR4NarrativeTargetsV1) }
+  if ([string]$plan.renderer_abi -cne $abi -or -not [bool]$plan.shadow_only -or [bool]$plan.publication_authorized) { throw '[mir4-release-narrative-plan-firewall]' }
   if (@($plan.targets.target | Sort-Object -Unique).Count -ne @($plan.targets).Count) { throw '[mir4-release-narrative-duplicate-plan-target]' }
+  if ($planVersion -eq 2) {
+    $lines = @('2.1', '2.0', '1.1', '1.0', '0.17', '0.16', '0.15', '0.14', '0.13')
+    for ($index = 0; $index -lt $targetSet.Count; $index++) {
+      if ([string]$plan.targets[$index].target -cne $targetSet[$index] -or [string]$plan.targets[$index].factorio_line -cne $lines[$index]) {
+        throw '[mir4-release-narrative-nine-target-order]'
+      }
+    }
+  }
 
   $fragments = [Collections.Generic.List[object]]::new()
   $identities = [Collections.Generic.List[object]]::new()
   $ids = @{}
   foreach ($path in @($plan.change_fragments)) {
-    $fragment = Read-MIR4NarrativeJsonV1 -RepoRoot $RepoRoot -Path ([string]$path) -SchemaPath 'contracts/release/mir4-change-fragment-v2.schema.json'
-    Assert-MIR4NarrativeFragmentV1 -Fragment $fragment
+    $fragmentSchema = if ($planVersion -eq 2) { 'contracts/release/mir4-change-fragment-v3.schema.json' } else { 'contracts/release/mir4-change-fragment-v2.schema.json' }
+    $fragment = Read-MIR4NarrativeJsonV1 -RepoRoot $RepoRoot -Path ([string]$path) -SchemaPath $fragmentSchema
+    Assert-MIR4NarrativeFragmentV1 -Fragment $fragment -TargetSet $targetSet
     if ($ids.ContainsKey([string]$fragment.change_id)) { throw "[mir4-release-narrative-duplicate-change] $($fragment.change_id)" }
     $ids[[string]$fragment.change_id] = $true
     $fragments.Add($fragment)
@@ -74,7 +88,8 @@ function Get-MIR4ReleaseNarrativeResultDigestV1 {
   param([Parameter(Mandatory)]$Record)
   $copy = $Record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
   $copy.result_digest = ''
-  return Get-MIR4CanonicalDigestV1 -Value $copy -Domain 'mir4:release-narrative-result:1'
+  $version = if ([int]$copy.schema -eq 2) { 2 } else { 1 }
+  return Get-MIR4CanonicalDigestV1 -Value $copy -Domain "mir4:release-narrative-result:$version"
 }
 
 function Invoke-MIR4ReleaseNarrativesV1 {
@@ -84,6 +99,7 @@ function Invoke-MIR4ReleaseNarrativesV1 {
   $packageBefore = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   $first = Get-MIR4ReleaseNarrativeMaterialV1 -RepoRoot $repo -PlanPath $PlanPath
   $second = Get-MIR4ReleaseNarrativeMaterialV1 -RepoRoot $repo -PlanPath $PlanPath
+  $recordVersion = [int]$first.plan.schema
   foreach ($key in $first.outputs.Keys) {
     if (-not $second.outputs.Contains($key) -or [string]$first.outputs[$key].text -cne [string]$second.outputs[$key].text) { throw "[mir4-release-narrative-determinism] $key" }
   }
@@ -105,14 +121,14 @@ function Invoke-MIR4ReleaseNarrativesV1 {
   }
   if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -cne $packageBefore) { throw '[mir4-release-narrative-package-source-mutation]' }
   $record = [ordered]@{
-    schema=1;kind='MIR4ReleaseNarrativeResultV1';plan_id=[string]$first.plan.plan_id;renderer_abi=(Get-MIR4NarrativeAbiV1)
+    schema=$recordVersion;kind="MIR4ReleaseNarrativeResultV$recordVersion";plan_id=[string]$first.plan.plan_id;renderer_abi=[string]$first.plan.renderer_abi
     plan=$first.plan_identity;accepted_changes=@($first.fragment_identities);outputs=@($descriptors)
     checks=[ordered]@{authority='passed';determinism='passed';target_filtering='passed';public_copy='passed';factorio_format='passed';package_non_interference='passed';unknown_dispositions=0}
     package_source_sha256=$packageBefore;package_visible_delta=@();transition_gate=[ordered]@{merge=$false;tagging=$false;signing=$false;sealing=$false;version_allocation=$false;publication=$false};result_digest=''
   }
   $record.result_digest = Get-MIR4ReleaseNarrativeResultDigestV1 -Record ([pscustomobject]$record)
   $resultJson = (($record | ConvertTo-Json -Depth 100).Replace("`r`n","`n") + "`n")
-  if (-not ($resultJson | Test-Json -SchemaFile (Join-Path $repo 'contracts/release/mir4-release-narrative-result-v1.schema.json'))) { throw '[mir4-release-narrative-result-schema]' }
+  if (-not ($resultJson | Test-Json -SchemaFile (Join-Path $repo "contracts/release/mir4-release-narrative-result-v$recordVersion.schema.json"))) { throw '[mir4-release-narrative-result-schema]' }
   $resultPath = Join-Path $root 'rendering-result.json'
   if ($Command -ceq 'check') {
     if (-not (Test-Path -LiteralPath $resultPath -PathType Leaf) -or [IO.File]::ReadAllText($resultPath) -cne $resultJson) { throw '[mir4-release-narrative-result-drift]' }

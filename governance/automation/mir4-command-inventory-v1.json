@@ -5419,17 +5419,17 @@
     {
       "path": "tools/mir/application/release/ReleaseNarrativeModel.ps1",
       "classification": "canonical-internal",
-      "sha256": "BB33F4B1F33AACE52E734AF6AC70F2C2A6DCE878396052CB0D44A5A48D24C793",
+      "sha256": "AB45E36BDBF05D239A99BB725DD7DFFC24B207F2FD5D00748E9D76C38EB59F26",
       "hash_mode": "canonical-text-v1",
-      "lines": 107,
+      "lines": 108,
       "package_visible": false
     },
     {
       "path": "tools/mir/application/release/ReleaseNarratives.ps1",
       "classification": "canonical-internal",
-      "sha256": "E1B4F06B37F1EC18064604ECA46BF0A0A525A0A5E1CE09B01608CF0351B758D0",
+      "sha256": "7C2157039EC0B79B0C60C04C8310FF9CB31B2A1D786001E532ABA99407B0752D",
       "hash_mode": "canonical-text-v1",
-      "lines": 158,
+      "lines": 174,
       "package_visible": false
     },
     {
@@ -6010,5 +6010,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d6499de81317f2fe8db1caef726fd27b1c8d06a4f03b90fbcb074b397cff1443"
+  "digest": "sha256:4c710410858cd8cad7d62a5166c5cf375d4c1a61a9fbc91892b05e87e4857df3"
 }

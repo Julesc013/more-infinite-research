@@ -1,0 +1,38 @@
+{
+  "schema": 2,
+  "kind": "MIR4ReleaseNarrativePlanV2",
+  "plan_id": "MIR4-SYN-4.2.0-NINE",
+  "renderer_abi": "mir4-release-narratives/2",
+  "release": {"source_version": "4.2.0", "title": "MIR 4.2.0", "tag": "v4.2.0", "date": "2026-09-29", "release_kind": "minor", "stability": "stable"},
+  "targets": [
+    {"target": "F210", "factorio_line": "2.1", "distribution_version": "4.2.21000", "asset_name": "more-infinite-research_4.2.21000.zip", "package_action": "build"},
+    {"target": "F200", "factorio_line": "2.0", "distribution_version": "4.2.20000", "asset_name": "more-infinite-research_4.2.20000.zip", "package_action": "build"},
+    {"target": "F110", "factorio_line": "1.1", "distribution_version": "4.2.11000", "asset_name": "more-infinite-research_4.2.11000.zip", "package_action": "build"},
+    {"target": "F100", "factorio_line": "1.0", "distribution_version": "4.2.10000", "asset_name": "more-infinite-research_4.2.10000.zip", "package_action": "build"},
+    {"target": "F017", "factorio_line": "0.17", "distribution_version": "4.2.01700", "asset_name": "more-infinite-research_4.2.01700.zip", "package_action": "build"},
+    {"target": "F016", "factorio_line": "0.16", "distribution_version": "4.2.01600", "asset_name": "more-infinite-research_4.2.01600.zip", "package_action": "build"},
+    {"target": "F015", "factorio_line": "0.15", "distribution_version": "4.2.01500", "asset_name": "more-infinite-research_4.2.01500.zip", "package_action": "build"},
+    {"target": "F014", "factorio_line": "0.14", "distribution_version": "4.2.01400", "asset_name": "more-infinite-research_4.2.01400.zip", "package_action": "build"},
+    {"target": "F013", "factorio_line": "0.13", "distribution_version": "4.2.01300", "asset_name": "more-infinite-research_4.2.01300.zip", "package_action": "build"}
+  ],
+  "change_fragments": ["fixtures/release/m42-nine-narratives/changes/synthetic-nine-target.json"],
+  "copy": {
+    "outcome": "This synthetic release plan proves bounded changelog and upload-copy generation for all nine MIR 4.2 targets. It exists solely as an offline test of the release narrative renderer and does not name a qualified player candidate.",
+    "upgrade": [
+      "Back up the save before trying any separately qualified package for its matching Factorio line. This synthetic plan does not supply a playable archive or approve an upgrade.",
+      "Check the installed Factorio version before selecting a target-coded archive. The version in each synthetic row is fixture input for formatting and filtering only.",
+      "Review the target changelog and the exact qualification evidence before moving an existing save to a future released package. This fixture creates neither of those approvals.",
+      "Keep the earlier playable package until the upgrade and reload have been checked on the exact engine. A rendered release note alone cannot establish save compatibility."
+    ],
+    "compatibility": [
+      "Each synthetic package row is selected only for its matching Factorio engine line. No cross-line install or compatibility claim follows from this narrative test.",
+      "All nine historical and current lines are represented to prove complete target accounting. The fixture does not test an engine, overhaul, modpack, item, recipe, or technology.",
+      "Target dispositions come from the accepted typed fragment and remain explicit. The renderer must reject an unknown disposition rather than infer support from a package name.",
+      "The result lists hashes for generated text only and leaves package-source bytes unchanged. Separate build and runtime evidence is required before any public support statement."
+    ],
+    "known_issues": ["This offline synthetic example has no candidate archives, gameplay proof, human acceptance, or publication authority. Its generated text is retained only as a development fixture."],
+    "details_links": [{"label": "MIR repository", "url": "https://github.com/Julesc013/more-infinite-research"}]
+  },
+  "shadow_only": true,
+  "publication_authorized": false
+}
