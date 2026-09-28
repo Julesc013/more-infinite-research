@@ -113,14 +113,15 @@ if(([regex]::Matches($browserTestText,[regex]::Escape('local force=game.forces.p
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
 # This fixture exercises research/GUI state, not the player's blueprint library.
 # Keep Steam from copying that library into each isolated acceptance directory.
-"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n[other]`ndisable-blueprint-storage=true`nenable-blueprint-storage-cloud-sync=false`n" | Set-Content (Join-Path $run 'config.ini')
+"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n[other]`ndisable-blueprint-storage=true`nenable-blueprint-storage-cloud-sync=false`n[graphics]`nfull-screen=false`ncache-sprite-atlas=false`n" | Set-Content (Join-Path $run 'config.ini')
 $save=Join-Path $run 'probe.zip'
 function Invoke-BrowserEngine([string[]]$Arguments) {
  $start=[Diagnostics.ProcessStartInfo]::new($engine)
  $start.UseShellExecute=$false; $start.CreateNoWindow=$true; $start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
  $start.Environment["SteamAppId"]="427520"; $start.Environment["SteamGameId"]="427520"
  $start.RedirectStandardOutput=$true; $start.RedirectStandardError=$true
- foreach($arg in @('--config',(Join-Path $run 'config.ini'),'--mod-directory',(Join-Path $run 'mods'))+$Arguments) { $start.ArgumentList.Add($arg) }
+ $graphicsArguments=if($Arguments -contains '--benchmark-graphics') { @('--force-graphics-preset','low','--video-memory-usage','low') } else { @() }
+ foreach($arg in @('--config',(Join-Path $run 'config.ini'),'--mod-directory',(Join-Path $run 'mods'))+$graphicsArguments+$Arguments) { $start.ArgumentList.Add($arg) }
  $process=[Diagnostics.Process]::Start($start)
  $stdout=$process.StandardOutput.ReadToEndAsync(); $stderr=$process.StandardError.ReadToEndAsync()
  try {
