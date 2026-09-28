@@ -81,7 +81,7 @@ try {
   $distPath = Join-Path $fixture 'dist/preview.bin'
   New-Item -ItemType Directory -Path (Split-Path -Parent $distPath) -Force | Out-Null
   [IO.File]::WriteAllText($distPath,'preview',[Text.UTF8Encoding]::new($false))
-  Invoke-HealthFixtureGit -Arguments @('worktree','add','--quiet','-b','health-linked',$linked,'main')
+  Invoke-HealthFixtureGit -Arguments @('worktree','add','--quiet','-b','health-linked',$linked,'health-old')
   [IO.File]::WriteAllText((Join-Path $linked 'linked-uncommitted.txt'),'preserve me',[Text.UTF8Encoding]::new($false))
   $fixtureToolRoot = Join-Path $fixture 'tools/commands/workspace'
   New-Item -ItemType Directory -Path $fixtureToolRoot -Force | Out-Null
@@ -113,6 +113,7 @@ try {
   $linkedIdentity = (Resolve-Path -LiteralPath $linked).Path.Replace('\','/').TrimEnd('/')
   $linkedRow = @($report.git.worktrees.rows | Where-Object { ([string]$_.path).Replace('\','/').TrimEnd('/') -ceq $linkedIdentity })
   if ($linkedRow.Count -ne 1 -or $linkedRow[0].dirty.count -lt 1 -or [string]$linkedRow[0].preservation -cne 'preserve-dirty-worktree') { throw '[mir-development-health-linked-preservation]' }
+  if ($linkedRow[0].last_commit_age_days -lt 7 -or $linkedRow[0].worktree_age_days -ge 7 -or [bool]$linkedRow[0].review_needed) { throw '[mir-development-health-fresh-worktree-old-commit]' }
   $oldBranch = @($report.git.branches.rows | Where-Object name -ceq 'health-old')
   if ($oldBranch.Count -ne 1 -or -not [bool]$oldBranch[0].review_needed -or [string]$oldBranch[0].preservation -cne 'preserve-unique-commits') { throw '[mir-development-health-old-branch]' }
   if (@($report.checkpoint_reasons | Where-Object { $_ -match '^branches:review-' }).Count -ne 1) { throw '[mir-development-health-old-branch-checkpoint]' }
@@ -196,7 +197,7 @@ try {
   try { & $checker -RepoRoot (Join-Path $fixture 'build') -AsJson | Out-Null } catch { $descendantRejected = $_.Exception.Message -match 'Git worktree root' }
   if (-not $descendantRejected) { throw '[mir-development-health-root-boundary]' }
 
-  [pscustomobject]@{ status='passed'; assertions=40; fixture=$fixture; hook_budget_seconds=[int]$hookReport.scan_limits.max_scan_seconds; mutations='none' } | ConvertTo-Json -Compress
+  [pscustomobject]@{ status='passed'; assertions=41; fixture=$fixture; hook_budget_seconds=[int]$hookReport.scan_limits.max_scan_seconds; mutations='none' } | ConvertTo-Json -Compress
 } finally {
   if ($null -ne $previousAuthorDate) { $env:GIT_AUTHOR_DATE = $previousAuthorDate } else { Remove-Item Env:GIT_AUTHOR_DATE -ErrorAction SilentlyContinue }
   if ($null -ne $previousCommitterDate) { $env:GIT_COMMITTER_DATE = $previousCommitterDate } else { Remove-Item Env:GIT_COMMITTER_DATE -ErrorAction SilentlyContinue }

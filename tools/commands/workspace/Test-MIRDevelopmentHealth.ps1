@@ -96,7 +96,12 @@ function Get-MIRDevelopmentHealthBoundedDirectorySize {
     } catch {$errors++}
     if(-not[string]::IsNullOrWhiteSpace($limit)){break}
   }
-  return [pscustomobject]@{ path=$rootItem.FullName; exists=$true; bytes=$bytes; bytes_is_lower_bound=(-not[string]::IsNullOrWhiteSpace($limit)); entries=$entries; complete=[string]::IsNullOrWhiteSpace($limit); limit=if([string]::IsNullOrWhiteSpace($limit)){'none'}else{$limit}; reparse_points_skipped=$reparsePoints; errors=$errors }
+  # Unreadable or disappearing entries make the sum incomplete even when the
+  # time and entry budgets were not exhausted. Never report that lower bound
+  # as proof that the directory is within its disk budget.
+  if([string]::IsNullOrWhiteSpace($limit)-and$errors-gt0){$limit='read-errors'}
+  $complete=[string]::IsNullOrWhiteSpace($limit)
+  return [pscustomobject]@{ path=$rootItem.FullName; exists=$true; bytes=$bytes; bytes_is_lower_bound=(-not$complete); entries=$entries; complete=$complete; limit=if($complete){'none'}else{$limit}; reparse_points_skipped=$reparsePoints; errors=$errors }
 }
 
 function Get-MIRDevelopmentHealthWorktrees {
@@ -124,11 +129,16 @@ function Get-MIRDevelopmentHealthWorktrees {
     $lastCommit=if($exists){Invoke-MIRDevelopmentHealthGit -Repository $resolvedPath -Arguments @('log','-1','--format=%ct')}else{$null}
     $commitSeconds=if($null-ne$lastCommit-and$lastCommit.succeeded-and$lastCommit.lines.Count-eq1-and$lastCommit.lines[0]-match'^\d+$'){[long]$lastCommit.lines[0]}else{$null}
     $ageDays=if($null-ne$commitSeconds){Get-MIRDevelopmentHealthAgeDays -UnixSeconds $commitSeconds -Now $Now}else{$null}
+    # A fresh worktree can be checked out at an old commit. Its per-worktree
+    # .git file is created by `git worktree add`, so use that age for cleanup
+    # review instead of treating the commit date as the worktree's age.
+    $worktreeGit=if($exists){Get-Item -LiteralPath (Join-Path $resolvedPath '.git') -Force -ErrorAction SilentlyContinue}else{$null}
+    $worktreeAgeDays=if($null-ne$worktreeGit){[Math]::Max(0,[int][Math]::Floor(($Now.ToUniversalTime()-$worktreeGit.CreationTimeUtc).TotalDays))}else{$null}
     $unique=if($exists-and$IncludeUniqueCommitCounts){Invoke-MIRDevelopmentHealthGit -Repository $resolvedPath -Arguments @('rev-list','--count','HEAD','--not','--remotes')}else{$null}
     $uniqueCount=if($null-ne$unique-and$unique.succeeded-and$unique.lines.Count-eq1-and$unique.lines[0]-match'^\d+$'){[int]$unique.lines[0]}else{$null}
     $rows.Add([pscustomobject][ordered]@{
-      path=$record.path;current=$isCurrent;exists=$exists;head=$record.head;branch=$record.branch;detached=[bool]$record.detached;prunable=[bool]$record.prunable;dirty=$dirty;last_commit_age_days=$ageDays;unique_commit_count=$uniqueCount
-      review_needed=(-not$isCurrent)-and((-not$exists)-or(-not$dirty.readable)-or[bool]$record.prunable-or@($dirty.operations).Count-gt0-or($null-ne$ageDays-and$ageDays-ge$OldDays))
+      path=$record.path;current=$isCurrent;exists=$exists;head=$record.head;branch=$record.branch;detached=[bool]$record.detached;prunable=[bool]$record.prunable;dirty=$dirty;last_commit_age_days=$ageDays;worktree_age_days=$worktreeAgeDays;unique_commit_count=$uniqueCount
+      review_needed=(-not$isCurrent)-and((-not$exists)-or(-not$dirty.readable)-or[bool]$record.prunable-or@($dirty.operations).Count-gt0-or($null-ne$worktreeAgeDays-and$worktreeAgeDays-ge$OldDays))
       preservation=if((-not$exists)-or(-not$dirty.readable)){'preserve-unreadable-worktree'}elseif(@($dirty.operations).Count-gt0){'preserve-in-progress-git-operation'}elseif($dirty.count-gt0){'preserve-dirty-worktree'}elseif($null-ne$uniqueCount-and$uniqueCount-gt0){'preserve-unique-commits'}elseif(-not$IncludeUniqueCommitCounts){'unique-commits-not-scanned'}else{'review-before-any-removal'}
     })
   }
