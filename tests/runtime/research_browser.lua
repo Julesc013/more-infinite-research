@@ -653,6 +653,11 @@ script.on_nth_tick(1,function()
           ["mir-browser.productivity-current-cap"]=2,
           ["mir-browser.productivity-current-cap-range"]=4
         }),"native MIR provider supplies numerical productivity current limit")
+        local benefit = native_enrichment.details[mir_productivity].recipe_benefits[1]
+        local icon = benefit and find_browser_element(mir_root,"mir_browser_recipe",benefit.recipe_id)
+        check(icon and icon.type=="sprite" and icon.sprite=="recipe/"..benefit.recipe_id
+          and icon.tags.mir_browser_recipe_effective==benefit.next_level_has_effective_benefit,
+          "MIR productivity detail shows the active improved recipe as a native icon")
       end
     else
       check(not next(native_enrichment.families or {}) and not next(native_enrichment.details or {}),

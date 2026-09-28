@@ -16,6 +16,7 @@ local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
 local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 56, 32
 local RESEARCH_BODY_MAX_HEIGHT = 596
 local SETTINGS_PAGE_SIZE = 12
+local RECIPE_BENEFIT_PAGE_SIZE = 12
 -- Translation IDs are asynchronous and per-player.  Keep the work window
 -- small so a large catalogue neither monopolizes a tick nor stops after an
 -- arbitrary lifetime number of successful translations.
@@ -611,6 +612,42 @@ local function add_productivity_summary(parent, benefits, maximum_width)
     fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap-range", current_min, current_max, maximum_min, maximum_max}, maximum_width)
   end
 end
+local function add_benefit_recipe_icons(player, parent, benefits, v, maximum_width)
+  if type(benefits) ~= "table" or #benefits == 0 then return end
+  local pages = math.max(1, math.ceil(#benefits / RECIPE_BENEFIT_PAGE_SIZE))
+  v.effect_page = math.max(1, math.min(pages, math.floor(tonumber(v.effect_page) or 1)))
+  if pages > 1 then
+    local navigation = parent.add{type = "flow", direction = "horizontal"}
+    button(navigation, "effects-prev", "<").enabled = v.effect_page > 1
+    label(navigation, tostring(v.effect_page) .. " / " .. tostring(pages))
+    button(navigation, "effects-next", ">").enabled = v.effect_page < pages
+  end
+  local icons = parent.add{type = "table", column_count = math.max(1, math.min(8, math.floor(maximum_width / 40)))}
+  local first = (v.effect_page - 1) * RECIPE_BENEFIT_PAGE_SIZE + 1
+  for index = first, math.min(first + RECIPE_BENEFIT_PAGE_SIZE - 1, #benefits) do
+    local benefit = benefits[index]
+    local recipe_id = benefit and benefit.recipe_id
+    local recipe = type(recipe_id) == "string" and player.force.recipes[recipe_id]
+    local increment = benefit and displayed_percent(benefit.effect_change)
+    local current = benefit and displayed_percent(benefit.current_productivity_bonus)
+    local maximum = benefit and displayed_percent(benefit.maximum_productivity)
+    if recipe and recipe.valid and recipe.prototype and increment and current and maximum then
+      local icon = icons.add{
+        type = "sprite", style = "recipe_tooltip_horizontal_image",
+        sprite = "recipe/" .. recipe_id, resize_to_sprite = false,
+        tooltip = {"", recipe.prototype.localised_name or {"recipe-name." .. recipe_id}, "\n",
+          {"mir-browser.productivity-increment", increment}, "\n",
+          {"mir-browser.productivity-current-cap", current, maximum},
+          benefit.next_level_has_effective_benefit and "" or "\n",
+          benefit.next_level_has_effective_benefit and "" or {"mir-browser.no-next-benefit", 1}},
+        tags = {mir_browser_recipe = recipe_id, mir_browser_recipe_effective = benefit.next_level_has_effective_benefit == true}
+      }
+      icon.style.width = 32
+      icon.style.height = 32
+      icon.enabled = benefit.next_level_has_effective_benefit == true
+    end
+  end
+end
 local function add_prerequisite_icons(parent, technology, maximum_width)
   local prerequisites = {}
   for _, prerequisite in pairs(technology.prerequisites) do prerequisites[#prerequisites + 1] = prerequisite end
@@ -720,6 +757,7 @@ local function detail(player, parent, v, c, width)
     label(parent, {"mir-browser.mir-benefit"}, maximum_width)
   end
   add_productivity_summary(parent, enrichment.recipe_benefits, maximum_width)
+  add_benefit_recipe_icons(player, parent, enrichment.recipe_benefits, v, maximum_width)
   add_science_icons(parent, tech, maximum_width)
   add_prerequisite_icons(parent, tech, maximum_width)
   local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
