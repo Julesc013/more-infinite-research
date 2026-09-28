@@ -1424,14 +1424,16 @@ end
 -- its exact semantics.  Each call has empty active sets, so the common
 -- resolver may publish only its existing source-epoch-bound root entries.
 -- Contextual answers and independent self-output witnesses remain owned by
--- their ordinary calls below.
+-- their ordinary calls below. Prime in the registry's official progression
+-- order, then lexical extras: earlier pack routes can warm the same root memo
+-- before late-game routes such as cryogenic science inspect their unlocks.
 function M.prime_root_pack_statuses(context)
   context = context or compiler_context.current()
   local resolver = context:service("science.pack_production_status")
   if type(resolver) ~= "function" then
     error("MIR science pack-production service is not registered in CompilerContext.", 2)
   end
-  for _, pack_name in ipairs(pack_registry.all_lab_inputs()) do
+  for _, pack_name in ipairs(pack_registry.pack_list_all()) do
     resolver(pack_name, {}, {})
   end
 end
