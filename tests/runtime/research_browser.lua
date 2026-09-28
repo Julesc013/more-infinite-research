@@ -330,6 +330,10 @@ script.on_nth_tick(1,function()
   check(unbounded_detail and unbounded_detail.enrichment and unbounded_detail.enrichment.effective_cap==nil
     and unbounded_detail.enrichment.next_level_eligible==true
     and unbounded_detail.enrichment.recipe_benefits[1].maximum_productivity==3,"unbounded MIR productivity detail remains provider-visible")
+  local recipe_search=browser_core.query(catalogue,{mode=1,status=1,page=1,
+    search="browser recipe"},unbounded_productivity)
+  check(recipe_search.count==1 and recipe_search.rows[1].key=="mir-browser-test-finite",
+    "affected recipe ID discovers its productive research")
   local capped_productivity=helpers.json_to_table(helpers.table_to_json(unbounded_productivity))
   local capped_detail=capped_productivity.details["mir-browser-test-finite"]
   capped_productivity.caps["mir-browser-test-finite"]=3
@@ -360,6 +364,9 @@ script.on_nth_tick(1,function()
   local capped=browser_core.query(catalogue,finite,{schema=1,caps={["mir-browser-test-infinite"]=3}})
   check(#capped.rows==2,"effective MIR cap classification")
   local literal=browser_core.query(catalogue,{mode=1,status=1,page=1,search="%["})
+  local spaced_id=browser_core.query(catalogue,{mode=1,status=1,page=1,search=" MIR browser test finite "})
+  check(spaced_id.count==1 and spaced_id.rows[1].key=="mir-browser-test-finite",
+    "search matches words in stable IDs while localized names are pending")
   check(#literal.rows==0,"literal search")
   local localized=browser_core.query(catalogue,{mode=1,status=1,page=1,search="localized finite"},nil,{["mir-browser-test-finite"]="Localized finite technology"})
   check(#localized.rows==1 and localized.rows[1].key=="mir-browser-test-finite","localized search with stable-ID fallback")

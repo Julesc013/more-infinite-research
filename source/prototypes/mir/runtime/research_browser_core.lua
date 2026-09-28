@@ -578,6 +578,19 @@ local function ascii_casefold(value)
   end))
 end
 
+local function searchable_text(value)
+  -- Stable IDs are useful while localized names are still arriving. Treat
+  -- their separators like spaces so a player can type a displayed phrase.
+  local folded = ascii_casefold(value)
+  return (string.gsub(folded, "[%s_-]+", " "))
+end
+
+local function matches_search(value, search, spaced_search)
+  local folded = ascii_casefold(value)
+  if string.find(folded, search, 1, true) then return true end
+  return spaced_search and string.find(string.gsub(folded, "[%s_-]+", " "), search, 1, true) ~= nil
+end
+
 local function normalized_view(view)
   view = type(view) == "table" and view or {}
   local mode = tonumber(view.mode) or 1
@@ -595,8 +608,10 @@ local function normalized_view(view)
   local requested_sort = sort
   local name_index_ready = view.name_index_ready ~= false
   if not name_index_ready and (sort == "name-asc" or sort == "name-desc") then sort = fallback_sort end
+  search = searchable_text(search):gsub("^ ", ""):gsub(" $", "")
   return {
-    mode = mode, status = status, page = page, search = ascii_casefold(search), family = family,
+    mode = mode, status = status, page = page, search = search, family = family,
+    spaced_search = string.find(search, " ", 1, true) ~= nil,
     sort = sort, requested_sort = requested_sort, name_index_ready = name_index_ready,
     hidden = type(view.hidden) == "table" and view.hidden or {}
   }
@@ -667,8 +682,17 @@ function M.query(catalogue, view, enrichment, localized_search, selected_key)
       if mode_ok and status_matches(source, v.status) and family_matches(family, v.family)
         and not v.hidden[key] then
         local display_name = displayed_label(localized_search, key)
-        local search_ok = v.search == "" or string.find(
-          ascii_casefold(key .. " " .. family .. " " .. display_name), v.search, 1, true) ~= nil
+        local search_ok = v.search == "" or matches_search(
+          key .. " " .. family .. " " .. display_name, v.search, v.spaced_search)
+        if not search_ok and enrichment and enrichment.schema == M.enrichment_schema then
+          local detail = enrichment.details[key]
+          for _, benefit in ipairs(detail and detail.recipe_benefits or {}) do
+            if matches_search(benefit.recipe_id, v.search, v.spaced_search) then
+              search_ok = true
+              break
+            end
+          end
+        end
         if search_ok then
           local row = copy_row(source)
           row.cap, row.family, row.infinite = cap, family, infinite
