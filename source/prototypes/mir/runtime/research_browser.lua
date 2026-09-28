@@ -14,6 +14,7 @@ local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-rese
 local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 460
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
 local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 56, 32
+local SETTINGS_PAGE_SIZE = 12
 -- Translation IDs are asynchronous and per-player.  Keep the work window
 -- small so a large catalogue neither monopolizes a tick nor stops after an
 -- arbitrary lifetime number of successful translations.
@@ -451,10 +452,10 @@ local function settings_rows(player, parent, v)
   for _, g in ipairs(groups) do if g.scope == v.settings_scope then visible[#visible + 1] = g end end
   groups = visible
   table.sort(groups, function(a,b) return a.key < b.key end)
-  local pages = math.max(1, math.ceil(#groups / core.page_size))
+  local pages = math.max(1, math.ceil(#groups / SETTINGS_PAGE_SIZE))
   v.page = math.min(v.page, pages)
-  local first = (v.page - 1) * core.page_size + 1
-  local last = math.min(v.page * core.page_size, #groups)
+  local first = (v.page - 1) * SETTINGS_PAGE_SIZE + 1
+  local last = math.min(v.page * SETTINGS_PAGE_SIZE, #groups)
   local selected
   for i = first, last do if groups[i].key == v.setting_selection then selected = groups[i] end end
   if not selected then selected = groups[first] end
@@ -466,30 +467,35 @@ local function settings_rows(player, parent, v)
   label(toolbar, {"mir-browser.settings-count", #groups}, 140)
   button(toolbar, "export", {"mir-browser.export"})
   local pane_height = math.max(RESEARCH_PANES_MIN_HEIGHT, research_panes_height(parent) - 40)
-  local panes = parent.add{type = "flow", direction = "horizontal"}
+  local total_width = list_width + detail_width
+  local panes = parent.add{type = "flow", direction = "vertical"}
   local list = panes.add{type = "scroll-pane", direction = "vertical", tags = {mir_browser_section = "settings-list"}}
-  list.style.width, list.style.maximal_width = list_width, list_width
+  list.style.width, list.style.maximal_width = total_width, total_width
   list.style.maximal_height = pane_height
-  if #groups == 0 then label(list, {"mir-browser.settings-empty"}, list_width - 16) end
+  if #groups == 0 then label(list, {"mir-browser.settings-empty"}, total_width - 16) end
+  local entries = list.add{type = "table", column_count = 2}
   for i = first, last do
     local g = groups[i]
-    local control = button(list, "setting-select", g.title, {setting_key = g.key})
-    control.style.width, control.style.maximal_width = list_width - 24, list_width - 24
+    local control = button(entries, "setting-select", g.title, {setting_key = g.key})
+    local entry_width = math.floor((total_width - 32) / 2)
+    control.style.width, control.style.maximal_width = entry_width, entry_width
     control.toggled = g.key == v.setting_selection
   end
   local detail = panes.add{type = "scroll-pane", direction = "vertical", tags = {mir_browser_section = "settings-detail"}}
-  detail.style.width, detail.style.maximal_width = detail_width, detail_width
+  detail.style.width, detail.style.maximal_width = total_width, total_width
   detail.style.maximal_height = pane_height
   if selected then
-    label(detail, selected.title, detail_width - 16)
-    fact_label(detail, "profile_import", profile_summary_caption(profile_summary), detail_width - 16)
+    label(detail, selected.title, total_width - 16)
+    fact_label(detail, "profile_import", profile_summary_caption(profile_summary), total_width - 16)
     local has_startup = false
     for _, name in ipairs(selected.names) do
       if prototypes.mod_setting[name].setting_type == "startup" then has_startup = true; break end
     end
-    if has_startup then label(detail, {"mir-browser.startup-note"}, detail_width - 16) end
-    local fields = detail.add{type = "table", column_count = 2}
-    local field_width, value_width = math.floor((detail_width - 24) / 2), math.ceil((detail_width - 24) / 2)
+    if has_startup then label(detail, {"mir-browser.startup-note"}, total_width - 16) end
+    local fields = detail.add{type = "table", column_count = 4}
+    fields.style.horizontal_spacing = 8
+    local field_width = math.floor((total_width - 64) / 4)
+    local value_width = field_width
     for _, name in ipairs(selected.names) do
       local prototype = prototypes.mod_setting[name]
       local scope = prototype.setting_type
@@ -991,7 +997,12 @@ render = function(player)
   frame.auto_center = true
   local scale = player.display_scale or 1
   frame.style.maximal_height = math.max(240, math.floor(player.display_resolution.height / scale) - 80)
-  local list_width, detail_width = v.tab == "settings" and settings_pane_widths(player) or research_pane_widths(player)
+  local list_width, detail_width
+  if v.tab == "settings" then
+    list_width, detail_width = settings_pane_widths(player)
+  else
+    list_width, detail_width = research_pane_widths(player)
+  end
   frame.style.maximal_width = list_width + detail_width + 36
   local bar = frame.add{type = "flow"}
   button(bar, "research", {"mir-browser.browse"}).toggled = v.tab == "research"
@@ -1004,13 +1015,12 @@ render = function(player)
     local search = frame.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "search"}}
     label(search, {"mir-browser." .. (v.tab == "settings" and "search-settings" or "search")}, math.max(160, list_width - 40))
     local field = search.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
-    field.style.width = detail_width
+    field.style.width = v.tab == "settings" and list_width + detail_width - 140 or detail_width
   end
   local body_height = math.max(140, frame.style.maximal_height - 140)
-  -- Research keeps its controls stationary. Setup lets its sibling panes
-  -- determine the natural window height, bounded by the display height.
-  local browsing = v.tab == "research" or v.tab == "settings"
-  local body = frame.add{type = browsing and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
+  -- Research keeps its controls stationary. Setup follows its content and
+  -- gains outer scrolling if a small display cannot fit both sections.
+  local body = frame.add{type = v.tab == "research" and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
   if v.tab == "research" then
     body.style.height = body_height
     body.style.maximal_height = body_height
@@ -1363,6 +1373,11 @@ function M.register()
         if options.tab == "settings" or options.tab == "research"
             or options.tab == "queue" or options.tab == "availability" then
           v.tab = options.tab
+          reset_page = true
+        end
+        if options.settings_scope == "research" or options.settings_scope == "options" then
+          v.settings_scope = options.settings_scope
+          v.setting_selection = nil
           reset_page = true
         end
         if type(options.status) == "number" and options.status >= 1 and options.status <= 4 and options.status == math.floor(options.status) then

@@ -603,10 +603,15 @@ script.on_nth_tick(1,function()
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search="mir-"}),"native settings GUI")
     check(has_browser_fact(actual.gui.screen.mir_research_browser,"profile_import"),"native settings profile summary")
-    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search=native_false}),"native false startup setting GUI")
+    check(remote.call("more-infinite-research-browser","open",actual.index,
+      {tab="settings",settings_scope="options",search=native_false}),"native false startup setting GUI")
     local false_field=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser_setting",native_false)
-    check(false_field and false_field.type=="checkbox" and false_field.state==false and false_field.enabled==false,
-      "false startup setting has an unchecked read-only native control")
+    local false_caption=false_field and false_field.caption
+    local effective_caption=type(false_caption)=="table" and false_caption[1]=="mir-browser.setting-with-default"
+      and false_caption[2] or false_caption
+    check(false_field and false_field.type=="label" and false_field.tags.mir_browser_read_only==true
+      and type(effective_caption)=="table" and effective_caption[1]=="mir-browser.setting-off",
+      "false startup setting has an explicit read-only Off value")
     check(find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","settings").toggled,
       "Setup visibly selects its navigation button")
     local native_omissions=browser_provider.omissions(actual.force)
