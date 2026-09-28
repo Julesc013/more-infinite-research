@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-09-16
+last_reviewed: 2026-09-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -33,6 +33,14 @@ Protected signing/recovery acceptance records the approved signer identity, publ
 7. Present the maintainer playtest against the sealed F210/F200 packages already represented by read-back `main`. Until explicit `GO`, do not create, push, or publish a tag; a `NO-GO` appends rejection evidence and publishes nothing. It never force-resets `main`; a correction creates a new candidate.
 8. On explicit `GO`, prepare and push the signed annotated tag against the verified `main` commit, create the GitHub release with `--verify-tag`, attach only sealed assets, publish, and redownload every public byte. No build, test, qualification, or source rewrite occurs in this window.
 9. Upload the identical target package and prepared target copy to the Mod Portal through the maintainer account, then record its public-byte identity.
+
+For MIR 4.2, prepare the separate crash-report download from the frozen source commit before freezing the release asset inventory:
+
+```powershell
+.\tools\commands\release\New-MIR42SupportCollectorBundle.ps1 -SourceCommit <frozen-source-commit> -OutputPath <asset-root>\MIR42-Offline-Support-Collector.zip
+```
+
+The bundle contains only `Collect-MIRPlayerReport.cmd` and `Collect-MIRPlayerReport.ps1`. Players extract both files together and double-click the `.cmd` file; it can collect a local, redacted support ZIP from Factorio logs and mod-list evidence even when MIR never reaches its own UI. The release asset inventory verifies the bundle against those two blobs at the frozen source commit, includes its exact hash in the release manifest, and requires public-byte readback. This support download is separate from every player mod ZIP. The operator prepares it before seal and never rebuilds it after the accepted asset set is frozen.
 
 An outage pauses at the current event. Resume with the same event identity and bytes. A defect after seal creates a new candidate; it never modifies the seal. [MIR 4.1 release readiness](mir4-4.1-release-readiness.md) is a dated historical procedure, not a current operator contract.
 

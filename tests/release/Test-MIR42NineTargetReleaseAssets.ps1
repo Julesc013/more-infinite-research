@@ -54,7 +54,9 @@ try {
   $candidateRoot = Join-Path $root 'candidate'
   $assetRoot = Join-Path $root 'release-assets'
   New-Item -ItemType Directory -Force -Path $candidateRoot,$assetRoot | Out-Null
-  $source = [pscustomobject][ordered]@{commit=('a' * 40);tree=('b' * 40);package_source_sha256=('C' * 64)}
+  $sourceCommit = (& git -C $repo rev-parse HEAD).Trim()
+  if ($LASTEXITCODE -ne 0) { throw '[mir42-release-assets-test-source-commit]' }
+  $source = [pscustomobject][ordered]@{commit=$sourceCommit;tree=('b' * 40);package_source_sha256=('C' * 64)}
   $targets = [Collections.Generic.List[object]]::new()
   $lineByTarget = [ordered]@{f210='2.1';f200='2.0';f110='1.1';f100='1.0';f017='0.17';f016='0.16';f015='0.15';f014='0.14';f013='0.13'}
   foreach ($target in $script:MIR42ReleaseAssetTargets) {
@@ -74,6 +76,33 @@ try {
   [IO.File]::WriteAllText((Join-Path $assetRoot 'SHA256SUMS.txt'), $expectedChecksums, [Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllBytes((Join-Path $assetRoot 'SHA256SUMS.txt.sig'), [byte[]](7,42,99,18))
   [IO.File]::WriteAllText((Join-Path $assetRoot 'release-notes.md'), "# Structural nine-target fixture`n", [Text.UTF8Encoding]::new($false))
+  $collectorPath = Join-Path $assetRoot $script:MIR42SupportCollectorAssetName
+  $collector = New-MIR42SupportCollectorBundle -RepoRoot $repo -SourceCommit $sourceCommit -OutputPath $collectorPath
+  $secondCollectorPath = Join-Path $root ('second-bundle/' + $script:MIR42SupportCollectorAssetName)
+  $secondCollector = & (Join-Path $repo 'tools/commands/release/New-MIR42SupportCollectorBundle.ps1') -RepoRoot $repo -SourceCommit $sourceCommit -OutputPath $secondCollectorPath | ConvertFrom-Json -Depth 10
+  Assert-MIR42ReleaseAssetsTest -Condition ([string]$collector.sha256 -ceq [string]$secondCollector.sha256) -Code 'collector-bundle-deterministic'
+  $overwriteRejected = $false
+  try { New-MIR42SupportCollectorBundle -RepoRoot $repo -SourceCommit $sourceCommit -OutputPath $collectorPath | Out-Null }
+  catch { $overwriteRejected = $_.Exception.Message -match '^\[mir42-support-collector-output-exists\]' }
+  Assert-MIR42ReleaseAssetsTest -Condition $overwriteRejected -Code 'collector-bundle-frozen-output'
+  $tamperedCollectorPath = Join-Path $root ('tampered-bundle/' + $script:MIR42SupportCollectorAssetName)
+  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $tamperedCollectorPath))
+  $tamperedStream = [IO.File]::Create($tamperedCollectorPath)
+  try {
+    $tamperedArchive = [IO.Compression.ZipArchive]::new($tamperedStream, [IO.Compression.ZipArchiveMode]::Create, $true)
+    try {
+      foreach ($name in $script:MIR42SupportCollectorScripts) {
+        $bytes = Read-MIR42SupportCollectorSourceBlob -RepoRoot $repo -SourceCommit $sourceCommit -Name $name
+        if ($name -ceq 'Collect-MIRPlayerReport.ps1') { $bytes = [byte[]]($bytes + [Text.Encoding]::UTF8.GetBytes("`n# tampered`n")) }
+        $entryStream = $tamperedArchive.CreateEntry($name).Open()
+        try { $entryStream.Write($bytes, 0, $bytes.Length) } finally { $entryStream.Dispose() }
+      }
+    } finally { $tamperedArchive.Dispose() }
+  } finally { $tamperedStream.Dispose() }
+  $tamperedRejected = $false
+  try { Assert-MIR42SupportCollectorBundle -RepoRoot $repo -SourceCommit $sourceCommit -Path $tamperedCollectorPath | Out-Null }
+  catch { $tamperedRejected = $_.Exception.Message -match '^\[mir42-support-collector-bundle-source-drift\]' }
+  Assert-MIR42ReleaseAssetsTest -Condition $tamperedRejected -Code 'collector-bundle-source-drift-rejected'
   foreach ($target in $script:MIR42ReleaseAssetTargets) {
     $path = Join-Path $assetRoot ('upload-text/' + $target + '.md')
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $path) | Out-Null
@@ -123,6 +152,7 @@ try {
   foreach ($support in @(
     [pscustomobject][ordered]@{name='SHA256SUMS.txt';role='checksum';target='';sha256=(Get-FileHash -LiteralPath (Join-Path $assetRoot 'SHA256SUMS.txt') -Algorithm SHA256).Hash.ToUpperInvariant();bytes=[int64](Get-Item -LiteralPath (Join-Path $assetRoot 'SHA256SUMS.txt')).Length},
     [pscustomobject][ordered]@{name='SHA256SUMS.txt.sig';role='signature';target='';sha256=(Get-FileHash -LiteralPath (Join-Path $assetRoot 'SHA256SUMS.txt.sig') -Algorithm SHA256).Hash.ToUpperInvariant();bytes=[int64](Get-Item -LiteralPath (Join-Path $assetRoot 'SHA256SUMS.txt.sig')).Length},
+    [pscustomobject][ordered]@{name=$script:MIR42SupportCollectorAssetName;role='support-collector';target='';sha256=[string]$collector.sha256;bytes=[int64]$collector.bytes},
     [pscustomobject][ordered]@{name='mir-4.2.0.qualification.json';role='qualification';target='';sha256=(Get-FileHash -LiteralPath $qualificationPath -Algorithm SHA256).Hash.ToUpperInvariant();bytes=[int64](Get-Item -LiteralPath $qualificationPath).Length},
     [pscustomobject][ordered]@{name='mir-4.2.0.provenance.json';role='provenance';target='';sha256=(Get-FileHash -LiteralPath $provenancePath -Algorithm SHA256).Hash.ToUpperInvariant();bytes=[int64](Get-Item -LiteralPath $provenancePath).Length},
     [pscustomobject][ordered]@{name='mir-4.2.0.components.json';role='components';target='';sha256=(Get-FileHash -LiteralPath $componentsPath -Algorithm SHA256).Hash.ToUpperInvariant();bytes=[int64](Get-Item -LiteralPath $componentsPath).Length}
@@ -145,7 +175,7 @@ try {
 
   $inventoryPath = Join-Path $root 'frozen-inventory.json'
   $inventory = Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $promotionPlan -SourceVersion '4.2.0' -ReleaseTag 'v4.2.0' -AssetRoot $assetRoot -OutputPath $inventoryPath
-  Assert-MIR42ReleaseAssetsTest -Condition ([string]$inventory.record.kind -ceq 'MIR42NineTargetReleaseAssetInventoryV1' -and @($inventory.record.package_assets).Count -eq 9 -and @($inventory.record.github_assets).Count -eq 15 -and @($inventory.record.mod_portal_upload_texts).Count -eq 9 -and -not [bool]$inventory.record.signature.signature_verified -and -not [bool]$inventory.record.publication_authorized) -Code 'nine-asset-inventory-frozen-nonpublic'
+  Assert-MIR42ReleaseAssetsTest -Condition ([string]$inventory.record.kind -ceq 'MIR42NineTargetReleaseAssetInventoryV1' -and @($inventory.record.package_assets).Count -eq 9 -and @($inventory.record.github_assets).Count -eq 16 -and @($inventory.record.mod_portal_upload_texts).Count -eq 9 -and -not [bool]$inventory.record.signature.signature_verified -and -not [bool]$inventory.record.publication_authorized) -Code 'nine-asset-inventory-frozen-nonpublic'
   $readInventory = Read-MIR42NineTargetReleaseAssetInventory -Path $inventoryPath
   Assert-MIR42ReleaseAssetsTest -Condition ([string]$readInventory.sha256 -ceq [string]$inventory.sha256) -Code 'frozen-inventory-self-hash-reader'
 
@@ -269,4 +299,4 @@ try {
   if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }
 
-Write-Output 'MIR42-NINE-TARGET-RELEASE-ASSETS-PASSED assets=15 uploads=9 targets=9 processes=0 network=0 public-claims=0'
+Write-Output 'MIR42-NINE-TARGET-RELEASE-ASSETS-PASSED assets=16 uploads=9 targets=9 network=0 public-claims=0'
