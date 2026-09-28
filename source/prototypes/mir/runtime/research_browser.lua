@@ -20,9 +20,11 @@ local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVE
 -- Do not share passive repair's 60-tick registration; Factorio has one
 -- handler per interval within this mod.
 local TRANSLATION_MAINTENANCE_TICKS = 61
+local SEARCH_REFRESH_TICKS, SEARCH_SETTLE_TICKS = 7, 12
 local VIEW_SCHEMA = 2
 local render
 local refresh_scheduled_forces
+local refresh_scheduled_searches
 local update_research_results
 local update_navigation
 local update_translation_index
@@ -31,6 +33,7 @@ local function state()
   local value = runtime_state.bucket("research_browser")
   value.players = value.players or {}
   value.pending_force_refresh = type(value.pending_force_refresh) == "table" and value.pending_force_refresh or {}
+  value.pending_search_refresh = type(value.pending_search_refresh) == "table" and value.pending_search_refresh or {}
   return value
 end
 
@@ -80,6 +83,18 @@ end
 
 local function set_force_refresh_subscription(active)
   script.on_nth_tick(1, active and refresh_scheduled_forces or nil)
+end
+
+local function saved_pending_search_refresh()
+  local root = factorio_runtime_state.root()
+  local namespace = type(root) == "table" and root.mir
+  local browser = type(namespace) == "table" and namespace.research_browser
+  local pending = type(browser) == "table" and browser.pending_search_refresh
+  return type(pending) == "table" and pending or nil
+end
+
+local function set_search_refresh_subscription(active)
+  script.on_nth_tick(SEARCH_REFRESH_TICKS, active and refresh_scheduled_searches or nil)
 end
 
 -- Factorio can deliver a translation callback after a save/load or a
@@ -298,6 +313,9 @@ local function remove_legacy_top_button(player)
 end
 local function close(player, preserve_shortcut_state)
   if not player then return end
+  local pending = state().pending_search_refresh
+  pending[player.index] = nil
+  if next(pending) == nil then set_search_refresh_subscription(false) end
   local frame = player.gui.screen[ROOT]
   if frame then frame.destroy() end
   if not preserve_shortcut_state then set_shortcut_toggled(player, false) end
@@ -956,6 +974,42 @@ render = function(player)
   player.opened = frame
   set_shortcut_toggled(player, true)
 end
+
+local function refresh_search_results(player)
+  local frame = player.gui.screen[ROOT]
+  if not (frame and frame.valid) then return end
+  local v = view(player)
+  local body = frame[PREFIX .. "body"]
+  if not (body and body.valid) then return end
+  local pages
+  if v.tab == "settings" then
+    body.clear()
+    pages = settings_rows(player, body, v)
+  elseif v.tab == "research" then
+    local results = body[PREFIX .. "research_results"]
+    local c = catalogue(player.force)
+    if not (results and results.valid and c) then return end
+    local cache = ensure_translation_catalogue(player, c)
+    pages = update_research_results(player, results, v, c, cache)
+  else
+    return
+  end
+  update_navigation(frame, v, pages)
+end
+
+refresh_scheduled_searches = function(event)
+  local pending = state().pending_search_refresh
+  for player_index, due_tick in pairs(pending) do
+    if type(player_index) ~= "number" or player_index < 1 or player_index ~= math.floor(player_index)
+        or type(due_tick) ~= "number" or due_tick <= event.tick then
+      pending[player_index] = nil
+      local player = type(player_index) == "number" and player_index >= 1
+        and player_index == math.floor(player_index) and game.get_player(player_index)
+      if player and player.valid then refresh_search_results(player) end
+    end
+  end
+  if next(pending) == nil then set_search_refresh_subscription(false) end
+end
 local function refresh_open(force)
   for _, player in pairs(game.connected_players) do
     if (not force or player.force.index == force.index) and player.gui.screen[ROOT] then render(player) end
@@ -1064,6 +1118,7 @@ end
 function M.on_init()
   mir_provider.invalidate_omissions()
   set_force_refresh_subscription(false)
+  set_search_refresh_subscription(false)
   for _, player in pairs(game.players) do
     remove_legacy_top_button(player)
     set_shortcut_toggled(player, false)
@@ -1073,6 +1128,8 @@ function M.on_configuration_changed()
   mir_provider.invalidate_omissions()
   state().pending_force_refresh = {}
   set_force_refresh_subscription(false)
+  state().pending_search_refresh = {}
+  set_search_refresh_subscription(false)
   local translations, locale_generations = translation_state()
   for player_index, cache in pairs(translations) do
     local player = game.get_player(player_index)
@@ -1178,6 +1235,12 @@ function M.on_load()
     if type(force_name) == "string" and scheduled == true then active = true; break end
   end
   set_force_refresh_subscription(active)
+  local search_pending = saved_pending_search_refresh()
+  local search_active = false
+  for player_index, due_tick in pairs(search_pending or {}) do
+    if type(player_index) == "number" and type(due_tick) == "number" then search_active = true; break end
+  end
+  set_search_refresh_subscription(search_active)
 end
 
 local function shortcut(event)
@@ -1247,13 +1310,33 @@ function M.register()
   end)
   script.on_event(defines.events.on_gui_click, click)
   script.on_event(defines.events.on_gui_selection_state_changed, selection)
+  script.on_event(defines.events.on_gui_text_changed, function(event)
+    local player = event_player(event)
+    local element = event.element
+    if not (player and element and element.valid and element.tags.mir_browser == "search") then return end
+    local v = view(player)
+    if v.tab ~= "research" and v.tab ~= "settings" then return end
+    local search = type(event.text) == "string" and event.text or element.text
+    search = string.sub(search, 1, 160)
+    if v.search == search then return end
+    v.search, v.page = search, 1
+    local pending = state().pending_search_refresh
+    local was_empty = next(pending) == nil
+    pending[player.index] = event.tick + SEARCH_SETTLE_TICKS
+    if was_empty then set_search_refresh_subscription(true) end
+  end)
   script.on_event(defines.events.on_string_translated, translated)
   script.on_nth_tick(TRANSLATION_MAINTENANCE_TICKS, maintain_translations)
   script.on_event(defines.events.on_lua_shortcut, shortcut)
   script.on_event(defines.events.on_gui_confirmed, function(event)
     local player = event_player(event)
     if player and event.element and event.element.valid and event.element.tags.mir_browser == "search" then
-      local v = view(player); v.search = string.sub(event.element.text, 1, 160); v.page = 1; render(player)
+      local v = view(player)
+      v.search, v.page = string.sub(event.element.text, 1, 160), 1
+      local pending = state().pending_search_refresh
+      pending[player.index] = nil
+      if next(pending) == nil then set_search_refresh_subscription(false) end
+      refresh_search_results(player)
     end
   end)
   script.on_event(defines.events.on_gui_checked_state_changed, function(event)
@@ -1276,6 +1359,8 @@ function M.register()
   end)
   script.on_event(defines.events.on_player_removed, function(event)
     state().players[event.player_index] = nil
+    state().pending_search_refresh[event.player_index] = nil
+    if next(state().pending_search_refresh) == nil then set_search_refresh_subscription(false) end
     local translations, locale_generations = translation_state()
     translations[event.player_index] = nil
     locale_generations[event.player_index] = nil
