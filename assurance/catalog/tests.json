@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 214,
+  "test_count": 215,
   "tests": [
     {
       "id": "docs.check",
@@ -7507,6 +7507,36 @@
       "matrix": null
     },
     {
+      "id": "static.mir42-nine-target-release-narratives",
+      "proposition": "The governed test 'static.mir42-nine-target-release-narratives' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR42NineTargetReleaseNarratives.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR42NineTargetReleaseNarratives.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "contracts/release/mir4-change-fragment-v3.schema.json",
+        "contracts/release/mir4-release-narrative-plan-v2.schema.json",
+        "contracts/release/mir4-release-narrative-result-v2.schema.json",
+        "fixtures/release/m42-nine-narratives/**",
+        "tools/mir/application/release/*Renderer.ps1",
+        "tools/mir/application/release/ReleaseNarrativeModel.ps1",
+        "tools/mir/application/release/ReleaseNarratives.ps1",
+        "tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1",
+        "tools/mir.ps1",
+        "tests/mir4/Test-MIR42NineTargetReleaseNarratives.ps1",
+        "package-source"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.mir42-nine-target-seal-readers",
       "proposition": "The governed test 'static.mir42-nine-target-seal-readers' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -7746,12 +7776,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 69,
-      "tooling-release": 64,
+      "tooling-release": 65,
       "runtime-upgrade": 49,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 202,
+    "canonical_test_commands": 203,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7764,5 +7794,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:9339a29fced731a7a79adbe641cdccd1bde3f2b4d38be4fd2ce877847b72289c"
+  "digest": "sha256:9508982b7efb433bc337ebbd2826967a70a4b5a2e19c4927c8193f264dc31cbf"
 }

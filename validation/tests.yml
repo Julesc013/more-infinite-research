@@ -3353,6 +3353,26 @@
       ]
     },
     {
+      "id": "static.mir42-nine-target-release-narratives",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR42NineTargetReleaseNarratives.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "contracts/release/mir4-change-fragment-v3.schema.json",
+        "contracts/release/mir4-release-narrative-plan-v2.schema.json",
+        "contracts/release/mir4-release-narrative-result-v2.schema.json",
+        "fixtures/release/m42-nine-narratives/**",
+        "tools/mir/application/release/*Renderer.ps1",
+        "tools/mir/application/release/ReleaseNarrativeModel.ps1",
+        "tools/mir/application/release/ReleaseNarratives.ps1",
+        "tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1",
+        "tools/mir.ps1",
+        "tests/mir4/Test-MIR42NineTargetReleaseNarratives.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "static.mir4-repository-characterization-m42-00a",
       "kind": "static",
       "layer": "F0",
