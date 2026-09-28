@@ -943,6 +943,17 @@ package_excluded_modules:
     test: tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1
     boundary: accepted typed changes render deterministic package-excluded narrative views and the generated root source-family changelog; renderers do not discover changes, infer target support, write player packages, allocate versions, or grant merge, signing, sealing, tagging, or publication authority
     stability: stable-package-excluded-change-and-narrative-authority-v1
+  mir42_support_collector_release_asset_v1:
+    source_launcher: scripts/Collect-MIRPlayerReport.cmd
+    source_collector: scripts/Collect-MIRPlayerReport.ps1
+    bundle_builder: tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1
+    bundle_command: tools/commands/release/New-MIR42SupportCollectorBundle.ps1
+    release_inventory: tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1
+    documentation: docs/maintainer/mir4-release-operations.md
+    test: tests/release/Test-MIR42NineTargetReleaseAssets.ps1
+    boundary: deterministic separate support download from frozen source blobs; the collector cannot create player packages, qualify targets, sign, seal, promote, tag, publish, or grant support claims
+    stability: nine-target-development-release-asset-pre-freeze
+
   mir4_full_platform_closeout_v1:
     implementation: tools/lib/mir4/FullPlatformCloseout.ps1
     exporter: tools/commands/mir4/Export-MIR4FullPlatform24HRecords.ps1

@@ -62,7 +62,11 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
+        "scripts/Collect-MIRPlayerReport.cmd",
+        "scripts/Collect-MIRPlayerReport.ps1",
+        "tools/commands/release/New-MIR42SupportCollectorBundle.ps1",
         "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
+        "tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1",
         "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
         "tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1",

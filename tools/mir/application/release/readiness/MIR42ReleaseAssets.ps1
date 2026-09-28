@@ -13,11 +13,15 @@ if (-not (Get-Command Get-MIR42ExactFourTargetCandidate -ErrorAction SilentlyCon
 if (-not (Get-Command Get-MIR42NineTargetProtectedMainPromotionPlan -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir42ReleaseAssetsRepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
 }
+if (-not (Get-Command Assert-MIR42SupportCollectorBundle -ErrorAction SilentlyContinue)) {
+  . (Join-Path $mir42ReleaseAssetsRepoRoot 'tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1')
+}
 
 $script:MIR42ReleaseAssetTargets = @('f210', 'f200', 'f110', 'f100', 'f017', 'f016', 'f015', 'f014', 'f013')
 $script:MIR42ReleaseAssetPublicSupportPaths = @(
   'SHA256SUMS.txt', 'SHA256SUMS.txt.sig', 'mir-4.2.0.qualification.json',
-  'mir-4.2.0.provenance.json', 'mir-4.2.0.components.json', 'mir-4.2.0.release.json'
+  'mir-4.2.0.provenance.json', 'mir-4.2.0.components.json', 'mir-4.2.0.release.json',
+  'MIR42-Offline-Support-Collector.zip'
 )
 $script:MIR42ReleaseAssetLocalPaths = @('release-notes.md')
 
@@ -348,6 +352,11 @@ function Get-MIR42NineTargetReleaseAssetInventory {
   }
   $signature = Get-MIR42ReleaseAssetFile -Map $assetMap -Path 'SHA256SUMS.txt.sig' -Code 'mir42-release-assets-signature'
   $notes = Get-MIR42ReleaseAssetFile -Map $assetMap -Path 'release-notes.md' -Code 'mir42-release-assets-notes'
+  $collectorFile = Get-MIR42ReleaseAssetFile -Map $assetMap -Path $script:MIR42SupportCollectorAssetName -Code 'mir42-release-assets-collector'
+  $collector = Assert-MIR42SupportCollectorBundle -RepoRoot $RepoRoot -SourceCommit ([string]$candidate.source.commit) -Path $collectorFile.full_path
+  if ([string]$collector.sha256 -cne [string]$collectorFile.sha256 -or [int64]$collector.bytes -ne [int64]$collectorFile.bytes) {
+    throw '[mir42-release-assets-collector-identity]'
+  }
   if ([int64]$signature.bytes -le 0 -or [int64]$notes.bytes -le 0) { throw '[mir42-release-assets-support-empty]' }
   $uploadTexts = @(
     foreach ($target in $script:MIR42ReleaseAssetTargets) {
@@ -363,7 +372,8 @@ function Get-MIR42NineTargetReleaseAssetInventory {
   }
   foreach ($support in @(
     [pscustomobject][ordered]@{name='SHA256SUMS.txt';role='checksum';target='';sha256=[string]$checksum.sha256;bytes=[int64]$checksum.bytes},
-    [pscustomobject][ordered]@{name='SHA256SUMS.txt.sig';role='signature';target='';sha256=[string]$signature.sha256;bytes=[int64]$signature.bytes}
+    [pscustomobject][ordered]@{name='SHA256SUMS.txt.sig';role='signature';target='';sha256=[string]$signature.sha256;bytes=[int64]$signature.bytes},
+    [pscustomobject][ordered]@{name=$script:MIR42SupportCollectorAssetName;role='support-collector';target='';sha256=[string]$collector.sha256;bytes=[int64]$collector.bytes}
   )) { $preManifestGithubAssets.Add($support) }
   $qualificationAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path 'mir-4.2.0.qualification.json' -Code 'mir42-release-assets-qualification'
   $provenanceAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path 'mir-4.2.0.provenance.json' -Code 'mir42-release-assets-provenance'
@@ -385,7 +395,7 @@ function Get-MIR42NineTargetReleaseAssetInventory {
   if (@($names | Sort-Object -Unique).Count -ne $names.Count) { throw '[mir42-release-assets-public-name-collision]' }
 
   $allAssets = @($packageAssets) + @([pscustomobject][ordered]@{path=[string]$checksum.path;sha256=[string]$checksum.sha256;bytes=[int64]$checksum.bytes}) +
-    @([pscustomobject][ordered]@{path=[string]$signature.path;sha256=[string]$signature.sha256;bytes=[int64]$signature.bytes}) +
+    @([pscustomobject][ordered]@{path=[string]$signature.path;sha256=[string]$signature.sha256;bytes=[int64]$signature.bytes}) + @($collector) +
     @($qualification) + @($provenance) + @($components) + @($releaseManifest) +
     @([pscustomobject][ordered]@{path=[string]$notes.path;sha256=[string]$notes.sha256;bytes=[int64]$notes.bytes}) + @($uploadTexts)
   $inventory = [pscustomobject][ordered]@{
@@ -451,7 +461,7 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
   Assert-MIR42SealTargetSet -Rows @($Record.package_assets) -Scope 'nine-target' -Code 'mir42-release-assets-inventory-package'
   Assert-MIR42SealTargetSet -Rows @($Record.mod_portal_upload_texts) -Scope 'nine-target' -Code 'mir42-release-assets-inventory-upload-text'
   $public = @($Record.github_assets)
-  if ($public.Count -ne 15) { throw '[mir42-release-assets-inventory-github-count]' }
+  if ($public.Count -ne 16) { throw '[mir42-release-assets-inventory-github-count]' }
   $expectedNames = [Collections.Generic.List[string]]::new()
   for ($index = 0; $index -lt $script:MIR42ReleaseAssetTargets.Count; $index++) {
     $package = $Record.package_assets[$index]
@@ -469,6 +479,7 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
   $support = @(
     @('SHA256SUMS.txt','checksum',$Record.checksum),
     @('SHA256SUMS.txt.sig','signature',$Record.signature),
+    @($script:MIR42SupportCollectorAssetName,'support-collector',$public[11]),
     @('mir-4.2.0.qualification.json','qualification',$Record.qualification),
     @('mir-4.2.0.provenance.json','provenance',$Record.provenance),
     @('mir-4.2.0.components.json','components',$Record.components),
@@ -478,7 +489,8 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
     $publicAsset = $public[$script:MIR42ReleaseAssetTargets.Count + $index]
     $name = [string]$support[$index][0]; $role = [string]$support[$index][1]; $asset = $support[$index][2]
     if ([string]$publicAsset.name -cne $name -or [string]$publicAsset.role -cne $role -or -not [string]::IsNullOrEmpty([string]$publicAsset.target) -or
-        [string]$publicAsset.sha256 -cne [string]$asset.sha256 -or [int64]$publicAsset.bytes -ne [int64]$asset.bytes) { throw "[mir42-release-assets-inventory-github-support] $name" }
+        [string]$publicAsset.sha256 -cne [string]$asset.sha256 -or [string]$publicAsset.sha256 -cnotmatch '^[A-F0-9]{64}$' -or
+        [int64]$publicAsset.bytes -ne [int64]$asset.bytes -or [int64]$publicAsset.bytes -le 0) { throw "[mir42-release-assets-inventory-github-support] $name" }
     $expectedNames.Add($name)
   }
   if (@($expectedNames | Sort-Object -Unique).Count -ne $expectedNames.Count) { throw '[mir42-release-assets-inventory-github-name-collision]' }
@@ -501,7 +513,8 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
       [int64]$Record.checksum.bytes -le 0 -or [int64]$Record.signature.bytes -le 0 -or [int64]$Record.release_notes.bytes -le 0) {
     throw '[mir42-release-assets-inventory-support-binding]'
   }
-  $allAssets = @($Record.package_assets) + @($Record.checksum) + @($Record.signature) + @($Record.qualification) + @($Record.provenance) + @($Record.components) + @($Record.release_manifest) + @($Record.release_notes) + @($Record.mod_portal_upload_texts)
+  $collectorAsset = [pscustomobject][ordered]@{path=$script:MIR42SupportCollectorAssetName;sha256=[string]$public[11].sha256;bytes=[int64]$public[11].bytes}
+  $allAssets = @($Record.package_assets) + @($Record.checksum) + @($Record.signature) + @($collectorAsset) + @($Record.qualification) + @($Record.provenance) + @($Record.components) + @($Record.release_manifest) + @($Record.release_notes) + @($Record.mod_portal_upload_texts)
   if ([string]$Record.asset_root_file_set_sha256 -cne (Get-MIR42ReleaseAssetSetSha256 -Assets $allAssets)) { throw '[mir42-release-assets-inventory-file-set]' }
 }
 
