@@ -21,7 +21,7 @@ local SETTINGS_PAGE_SIZE = 12
 -- Do not share passive repair's 60-tick registration; Factorio has one
 -- handler per interval within this mod.
 local TRANSLATION_MAINTENANCE_TICKS = 61
-local SEARCH_REFRESH_TICKS, SEARCH_SETTLE_TICKS = 7, 12
+local SEARCH_REFRESH_TICKS, SEARCH_SETTLE_TICKS = 3, 6
 local VIEW_SCHEMA = 2
 local render
 local refresh_scheduled_forces
