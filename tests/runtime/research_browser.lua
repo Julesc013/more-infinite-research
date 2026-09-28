@@ -536,6 +536,8 @@ script.on_nth_tick(1,function()
     check(not actual.gui.top.mir_browser_open,"legacy top launcher absent")
     check(remote.call("more-infinite-research-browser","open",actual.index),"native default MIR browser GUI")
     local default_root=actual.gui.screen.mir_research_browser
+    check(not has_browser_fact(default_root,"translation_index"),
+      "default Browse shows native localized captions without an indexing countdown")
     check(find_browser_element(default_root,"mir_browser","research").toggled
       and not find_browser_element(default_root,"mir_browser","queue").toggled,
       "Browse visibly selects its navigation button")
@@ -601,6 +603,8 @@ script.on_nth_tick(1,function()
     check(remote.call("more-infinite-research-browser","open",actual.index,filtered_request),
       "native filtered browser opens with stale external selection")
     local replacement_root=actual.gui.screen.mir_research_browser
+    check(has_browser_fact(replacement_root,"translation_index"),
+      "localized search shows indexing while its catalogue is incomplete")
     local replacement_detail=find_browser_element(replacement_root,"mir_browser","open-vanilla")
     local replacement_first=find_browser_element(replacement_root,"mir_browser_first_visible","first")
     local replacement_selected=find_browser_element(replacement_root,"mir_browser_selected","selected")
