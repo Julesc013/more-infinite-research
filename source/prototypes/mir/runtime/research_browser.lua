@@ -126,6 +126,8 @@ local function default_view()
     page = 1,
     search = "",
     tab = "research",
+    setting_selection = nil,
+    settings_scope = "research",
     effect_page = 1,
     family = "mir",
     sort = "progression",
@@ -159,6 +161,10 @@ local function view(player)
     or result.tab == "queue" and "queue"
     or result.tab == "availability" and "availability"
     or "research"
+  if type(result.setting_selection) ~= "string" or #result.setting_selection > core.detail_string_limit then
+    result.setting_selection = nil
+  end
+  result.settings_scope = result.settings_scope == "options" and "options" or "research"
   return result
 end
 local function catalogue(force)
@@ -396,72 +402,113 @@ end
 
 local function startup_setting_caption(name, key, prototype, comparison)
   local caption = setting_field_caption(name, key, prototype)
-  local value = shown_value(comparison.effective)
+  local value = name:find("%-max%-level%-", 1) and comparison.effective == 0
+    and {"mir-browser.setting-unlimited"} or shown_value(comparison.effective)
   return caption and {"", caption, ": ", value} or value
 end
 
 local function settings_rows(player, parent, v)
   local groups, assigned = {}, {}
   local profile_summary = imported_profile_summary()
-  local search = string.lower(v.search or "")
-  local function group(key, title, specs)
-    local names, matches = {}, search == "" or string.find(string.lower(key), search, 1, true)
+  local function search_text(value)
+    return string.lower(value):gsub("[-_]", " "):gsub("%s+", " ")
+  end
+  local search = search_text(v.search or "")
+  local function group(key, title, specs, scope)
+    local names, matches = {}, search == "" or string.find(search_text(key), search, 1, true)
     for _, spec in ipairs(specs) do
       local prototype = prototypes.mod_setting[spec.name]
       if prototype and prototype.mod == "more-infinite-research" then
         names[#names + 1] = spec.name
         assigned[spec.name] = true
-        if string.find(string.lower(spec.name), search, 1, true) then matches = true end
+        if string.find(search_text(spec.name), search, 1, true) then matches = true end
       end
     end
-    if matches and #names > 0 then groups[#groups + 1] = {key = key, title = title, names = names} end
+    if matches and #names > 0 then groups[#groups + 1] = {key = key, title = title, names = names, scope = scope} end
   end
   for key, stream in pairs(streams.view()) do
-    group(key, stream.localised_name or {"technology-name.more-infinite-research." .. key}, settings_catalog.stream_setting_specs(key, stream))
+    local required_item = type(stream.required_items) == "table" and stream.required_items[1]
+    local fallback = type(required_item) == "string" and required_item or key
+    fallback = fallback:gsub("[-_]", " "):gsub("^%l", string.upper)
+    group(key, {"?", stream.localised_name or {"technology-name.more-infinite-research." .. key}, fallback},
+      settings_catalog.stream_setting_specs(key, stream), "research")
   end
   for _, spec in ipairs(settings_catalog.base_extension_specs()) do
-    group(spec.key, {"technology-name." .. (spec.locale_key or spec.key)}, settings_catalog.base_extension_setting_specs(spec.key))
+    group(spec.key, {"technology-name." .. (spec.locale_key or spec.key)}, settings_catalog.base_extension_setting_specs(spec.key), "research")
   end
   for name, prototype in pairs(prototypes.mod_setting) do
-    if prototype.mod == "more-infinite-research" and not assigned[name] then group(name, prototype.localised_name, {{name = name}}) end
+    if prototype.mod == "more-infinite-research" and not assigned[name] then group(name, prototype.localised_name, {{name = name}}, "options") end
   end
+  local visible = {}
+  for _, g in ipairs(groups) do if g.scope == v.settings_scope then visible[#visible + 1] = g end end
+  groups = visible
   table.sort(groups, function(a,b) return a.key < b.key end)
   local pages = math.max(1, math.ceil(#groups / core.page_size))
   v.page = math.min(v.page, pages)
-  label(parent, {"mir-browser.startup-note"})
-  fact_label(parent, "profile_import", profile_summary_caption(profile_summary))
-  button(parent, "export", {"mir-browser.export"})
-  local rows = parent.add{type = "table", column_count = 2}
-  local title_width, value_width = research_pane_widths(player)
-  for i = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #groups) do
+  local first = (v.page - 1) * core.page_size + 1
+  local last = math.min(v.page * core.page_size, #groups)
+  local selected
+  for i = first, last do if groups[i].key == v.setting_selection then selected = groups[i] end end
+  if not selected then selected = groups[first] end
+  v.setting_selection = selected and selected.key or nil
+  local list_width, detail_width = research_pane_widths(player)
+  local toolbar = parent.add{type = "flow", direction = "horizontal"}
+  button(toolbar, "settings-research", {"mir-browser.settings-scope-research"}).toggled = v.settings_scope == "research"
+  button(toolbar, "settings-options", {"mir-browser.settings-scope-options"}).toggled = v.settings_scope == "options"
+  label(toolbar, {"mir-browser.settings-count", #groups}, 140)
+  button(toolbar, "export", {"mir-browser.export"})
+  local pane_height = math.max(RESEARCH_PANES_MIN_HEIGHT, research_panes_height(parent) - 40)
+  local panes = parent.add{type = "flow", direction = "horizontal"}
+  local list = panes.add{type = "scroll-pane", direction = "vertical", tags = {mir_browser_section = "settings-list"}}
+  list.style.width, list.style.maximal_width = list_width, list_width
+  list.style.height, list.style.maximal_height = pane_height, pane_height
+  if #groups == 0 then label(list, {"mir-browser.settings-empty"}, list_width - 16) end
+  for i = first, last do
     local g = groups[i]
-    label(rows, g.title, title_width - 16)
-    local values_column = rows.add{type = "flow", direction = "vertical"}
-    values_column.style.maximal_width = value_width - 16
-    for _, name in ipairs(g.names) do
+    local control = button(list, "setting-select", g.title, {setting_key = g.key})
+    control.style.width, control.style.maximal_width = list_width - 24, list_width - 24
+    control.toggled = g.key == v.setting_selection
+  end
+  local detail = panes.add{type = "scroll-pane", direction = "vertical", tags = {mir_browser_section = "settings-detail"}}
+  detail.style.width, detail.style.maximal_width = detail_width, detail_width
+  detail.style.height, detail.style.maximal_height = pane_height, pane_height
+  if selected then
+    label(detail, selected.title, detail_width - 16)
+    fact_label(detail, "profile_import", profile_summary_caption(profile_summary), detail_width - 16)
+    local has_startup = false
+    for _, name in ipairs(selected.names) do
+      if prototypes.mod_setting[name].setting_type == "startup" then has_startup = true; break end
+    end
+    if has_startup then label(detail, {"mir-browser.startup-note"}, detail_width - 16) end
+    local fields = detail.add{type = "table", column_count = 2}
+    local field_width, value_width = math.floor((detail_width - 24) / 2), math.ceil((detail_width - 24) / 2)
+    for _, name in ipairs(selected.names) do
       local prototype = prototypes.mod_setting[name]
       local scope = prototype.setting_type
       local values = scope == "runtime-global" and settings.global or scope == "runtime-per-user" and settings.get_player_settings(player) or settings.startup
-      local value = scope == "startup" and startup_settings.get(name) or values[name].value
-      local caption = {"", prototype.localised_name, " (", scope, "): "}
+      local value = values and values[name] and values[name].value
+      local field_caption = setting_field_caption(name, selected.key, prototype) or prototype.localised_name
+      label(fields, field_caption, field_width)
       if scope == "startup" then
         local comparison = startup_comparison(name, prototype, profile_summary)
-        if type(comparison.effective) == "boolean" then
-          local field = values_column.add{
-            type = "checkbox", state = comparison.effective,
-            caption = setting_field_caption(name, g.key, prototype) or "",
-            tags = {mir_browser_setting = name, mir_browser_read_only = true}
-          }
-          field.enabled = false
-        else
-          local field = label(values_column, startup_setting_caption(name, g.key, prototype, comparison), value_width - 16)
-          field.tags = {mir_browser_setting = name, mir_browser_read_only = true}
+        local effective = comparison.effective
+        local display = type(effective) == "boolean"
+          and {"mir-browser.setting-" .. (effective and "on" or "off")}
+          or (name:find("%-max%-level%-", 1) and effective == 0
+            and {"mir-browser.setting-unlimited"} or shown_value(effective))
+        if not same_value(effective, comparison.default) then
+          local default = type(comparison.default) == "boolean"
+            and {"mir-browser.setting-" .. (comparison.default and "on" or "off")}
+            or (name:find("%-max%-level%-", 1) and comparison.default == 0
+              and {"mir-browser.setting-unlimited"} or shown_value(comparison.default))
+          display = {"mir-browser.setting-with-default", display, default}
         end
+        local field = label(fields, display, value_width)
+        field.tags = {mir_browser_setting = name, mir_browser_read_only = true}
       elseif type(value) == "boolean" and (scope ~= "runtime-global" or player.admin) then
-        values_column.add{type = "checkbox", state = value, caption = caption, tags = {mir_browser = "setting", setting = name}}
+        fields.add{type = "checkbox", state = value, caption = "", tags = {mir_browser = "setting", setting = name}}
       else
-        caption[#caption + 1] = shown_value(value)
-        label(values_column, caption, value_width - 16)
+        label(fields, shown_value(value), value_width)
       end
     end
   end
@@ -947,14 +994,14 @@ render = function(player)
   button(bar, "close", {"mir-browser.close"})
   if v.tab == "research" or v.tab == "settings" then
     local search = frame.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "search"}}
-    label(search, {"mir-browser.search"}, math.max(160, list_width - 40))
+    label(search, {"mir-browser." .. (v.tab == "settings" and "search-settings" or "search")}, math.max(160, list_width - 40))
     local field = search.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
     field.style.width = detail_width
   end
   local body_height = math.max(140, frame.style.maximal_height - 140)
   -- Browse keeps its controls stationary.  The two sibling panes below carry
   -- their own bounded native scrolling, so reading one never moves the other.
-  local browsing = v.tab == "research"
+  local browsing = v.tab == "research" or v.tab == "settings"
   local body = frame.add{type = browsing and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
   if browsing then
     body.style.height = body_height
@@ -1097,6 +1144,12 @@ local function click(event)
   if action == "select" then
     v.selected, v.effect_page = tags.technology, 1
     if v.tab == "queue" then v.tab, v.page = "research", 1 end
+  elseif action == "setting-select" then
+    if v.tab == "settings" and type(tags.setting_key) == "string" then v.setting_selection = tags.setting_key end
+  elseif action == "settings-research" or action == "settings-options" then
+    if v.tab == "settings" then
+      v.settings_scope, v.page, v.setting_selection = action == "settings-options" and "options" or "research", 1, nil
+    end
   elseif action == "queue-up" or action == "queue-down" then
     actions.move(player, tags.index, action == "queue-up" and -1 or 1,
       tags.technology, tags.adjacent, defines.input_action.move_research)
