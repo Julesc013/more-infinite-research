@@ -623,9 +623,9 @@ end
 
 local function status_matches(row, status)
   if status == 1 then return true end
-  if status == 2 then return row.available end
-  if status == 3 then return not row.available and not row.researched end
-  return row.queued
+  if status == 2 then return row.available == true end
+  if status == 3 then return row.available ~= true and row.researched ~= true end
+  return row.queued == true
 end
 
 local function family_matches(family, selected)
@@ -660,19 +660,23 @@ function M.query(catalogue, view, enrichment, localized_search, selected_key)
   selected_key = type(selected_key) == "string" and selected_key or nil
   for _, source in ipairs(catalogue.rows) do
     if type(source) == "table" and type(source.key) == "string" then
-      local row = copy_row(source)
-      local cap, family = positive_cap(enrichment, row.key), family_for(enrichment, row.key)
-      row.cap, row.family = cap, family
-      row.infinite = row.infinite and not cap
-      local mode_ok = v.mode == 1 or (v.mode == 2 and not row.infinite) or (v.mode == 3 and row.infinite)
-      row.display_name = displayed_label(localized_search, row.key)
-      row.display_sort = ascii_casefold(row.display_name)
-      local search = ascii_casefold(row.key .. " " .. family .. " " .. row.display_name)
-      local search_ok = v.search == "" or string.find(search, v.search, 1, true) ~= nil
-      if mode_ok and status_matches(row, v.status) and family_matches(family, v.family)
-        and not v.hidden[row.key] and search_ok then
-        selected[#selected + 1] = row
-        if row.key == selected_key then selected_visible = true end
+      local key = source.key
+      local cap, family = positive_cap(enrichment, key), family_for(enrichment, key)
+      local infinite = source.infinite == true and not cap
+      local mode_ok = v.mode == 1 or (v.mode == 2 and not infinite) or (v.mode == 3 and infinite)
+      if mode_ok and status_matches(source, v.status) and family_matches(family, v.family)
+        and not v.hidden[key] then
+        local display_name = displayed_label(localized_search, key)
+        local search_ok = v.search == "" or string.find(
+          ascii_casefold(key .. " " .. family .. " " .. display_name), v.search, 1, true) ~= nil
+        if search_ok then
+          local row = copy_row(source)
+          row.cap, row.family, row.infinite = cap, family, infinite
+          row.display_name = display_name
+          row.display_sort = ascii_casefold(display_name)
+          selected[#selected + 1] = row
+          if key == selected_key then selected_visible = true end
+        end
       end
     end
   end
