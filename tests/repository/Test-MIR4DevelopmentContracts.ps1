@@ -336,7 +336,16 @@ function Assert-MIRDevelopmentContractsCommandInventorySourceDriftRegression {
       if(-not $cleanupRoot.StartsWith($tempRoot.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -or
          (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint -or
          (Split-Path -Leaf $cleanupRoot) -notlike 'mir-development-command-inventory-*') { throw '[mir4-development-command-inventory-cleanup-root]' }
-      Remove-Item -LiteralPath $cleanupRoot -Recurse -Force
+      # Windows scanners can briefly hold a file from the fresh clone after
+      # Git exits. Retry this verified fixture root instead of leaving a large
+      # failed probe behind or weakening the path/reparse safeguards above.
+      for($attempt=1;$attempt-le5;$attempt++) {
+        try { Remove-Item -LiteralPath $cleanupRoot -Recurse -Force -ErrorAction Stop; break }
+        catch {
+          if($attempt-eq5){throw}
+          Start-Sleep -Milliseconds (200*$attempt)
+        }
+      }
     }
   }
 }

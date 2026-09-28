@@ -3395,9 +3395,9 @@
     {
       "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
       "classification": "canonical-internal",
-      "sha256": "C286FFB609F1C26EDC4210F84D9B0F933DF72CFA4BE5C81E0135C00F0C829A48",
+      "sha256": "09970FB856523DB9E9BE2C5CD8D6BE427A00D1C74773B10F248A0414285B897F",
       "hash_mode": "canonical-text-v1",
-      "lines": 222,
+      "lines": 226,
       "package_visible": false
     },
     {
@@ -5986,5 +5986,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f13c84670ea069ef849b4788bd29b8695c53430cb30018445936ee89063a49a6"
+  "digest": "sha256:67a46b352909caac9b06ddc449f337d2fdbbe7dd42abd14ef5bb8fb6fd3a01a9"
 }
