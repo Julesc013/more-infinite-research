@@ -1788,10 +1788,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/stage/data.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 912,
-      "source_sha256": "A5AFDC09FB8742255B8A48112F92655FD13FFACC04C110B41C4E9F72A23243EC",
-      "output_bytes": 912,
-      "output_sha256": "A5AFDC09FB8742255B8A48112F92655FD13FFACC04C110B41C4E9F72A23243EC"
+      "source_bytes": 1258,
+      "source_sha256": "641FCE47EC02BE470E7B1B130432988839BD12B5062FC32B3C7A34B43A9CA881",
+      "output_bytes": 1258,
+      "output_sha256": "641FCE47EC02BE470E7B1B130432988839BD12B5062FC32B3C7A34B43A9CA881"
     },
     {
       "layer": "shared",
@@ -7625,5 +7625,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "1155B485CB9AD773012702F1D0CFC3F7DFA8BD3423C18AFCDE41335714C3A368"
+  "record_sha256": "09FBD1B7EB09C129B9B6FE5725500315F23ED7EF1BD6E53A1C052B8E357247DA"
 }
