@@ -61,6 +61,14 @@ local function research_pane_widths(player)
   return list_width, detail_width
 end
 
+local function settings_pane_widths(player)
+  local list_width, detail_width = research_pane_widths(player)
+  -- The settings catalogue has shorter rows than technology details. Keep
+  -- its natural two-column width without growing to the research-pane maximum.
+  if list_width + detail_width > 700 then return 340, 360 end
+  return list_width, detail_width
+end
+
 local function research_panes_height(results)
   -- GuiStyle.height is write-only. The bounded maximum is readable and stays
   -- on the retained results flow when a settled localized index replaces its
@@ -451,7 +459,7 @@ local function settings_rows(player, parent, v)
   for i = first, last do if groups[i].key == v.setting_selection then selected = groups[i] end end
   if not selected then selected = groups[first] end
   v.setting_selection = selected and selected.key or nil
-  local list_width, detail_width = research_pane_widths(player)
+  local list_width, detail_width = settings_pane_widths(player)
   local toolbar = parent.add{type = "flow", direction = "horizontal"}
   button(toolbar, "settings-research", {"mir-browser.settings-scope-research"}).toggled = v.settings_scope == "research"
   button(toolbar, "settings-options", {"mir-browser.settings-scope-options"}).toggled = v.settings_scope == "options"
@@ -461,7 +469,7 @@ local function settings_rows(player, parent, v)
   local panes = parent.add{type = "flow", direction = "horizontal"}
   local list = panes.add{type = "scroll-pane", direction = "vertical", tags = {mir_browser_section = "settings-list"}}
   list.style.width, list.style.maximal_width = list_width, list_width
-  list.style.height, list.style.maximal_height = pane_height, pane_height
+  list.style.maximal_height = pane_height
   if #groups == 0 then label(list, {"mir-browser.settings-empty"}, list_width - 16) end
   for i = first, last do
     local g = groups[i]
@@ -471,7 +479,7 @@ local function settings_rows(player, parent, v)
   end
   local detail = panes.add{type = "scroll-pane", direction = "vertical", tags = {mir_browser_section = "settings-detail"}}
   detail.style.width, detail.style.maximal_width = detail_width, detail_width
-  detail.style.height, detail.style.maximal_height = pane_height, pane_height
+  detail.style.maximal_height = pane_height
   if selected then
     label(detail, selected.title, detail_width - 16)
     fact_label(detail, "profile_import", profile_summary_caption(profile_summary), detail_width - 16)
@@ -983,7 +991,7 @@ render = function(player)
   frame.auto_center = true
   local scale = player.display_scale or 1
   frame.style.maximal_height = math.max(240, math.floor(player.display_resolution.height / scale) - 80)
-  local list_width, detail_width = research_pane_widths(player)
+  local list_width, detail_width = v.tab == "settings" and settings_pane_widths(player) or research_pane_widths(player)
   frame.style.maximal_width = list_width + detail_width + 36
   local bar = frame.add{type = "flow"}
   button(bar, "research", {"mir-browser.browse"}).toggled = v.tab == "research"
@@ -999,12 +1007,14 @@ render = function(player)
     field.style.width = detail_width
   end
   local body_height = math.max(140, frame.style.maximal_height - 140)
-  -- Browse keeps its controls stationary.  The two sibling panes below carry
-  -- their own bounded native scrolling, so reading one never moves the other.
+  -- Research keeps its controls stationary. Setup lets its sibling panes
+  -- determine the natural window height, bounded by the display height.
   local browsing = v.tab == "research" or v.tab == "settings"
   local body = frame.add{type = browsing and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
-  if browsing then
+  if v.tab == "research" then
     body.style.height = body_height
+    body.style.maximal_height = body_height
+  elseif v.tab == "settings" then
     body.style.maximal_height = body_height
   else
     body.style.minimal_width = list_width + detail_width

@@ -7266,10 +7266,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 71586,
-      "source_sha256": "581E1A515F2F6AD761F8D05B0DD8EE03863FDC7212175AD7483E22643814D770",
-      "output_bytes": 71586,
-      "output_sha256": "581E1A515F2F6AD761F8D05B0DD8EE03863FDC7212175AD7483E22643814D770"
+      "source_bytes": 72019,
+      "source_sha256": "485CED197D46D114083B988C1A6D307D1F8F219C74DF16E809ABAA72ECD17082",
+      "output_bytes": 72019,
+      "output_sha256": "485CED197D46D114083B988C1A6D307D1F8F219C74DF16E809ABAA72ECD17082"
     },
     {
       "layer": "capability",
@@ -7625,5 +7625,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "14BDBDFE1C974F2D2DBD76CF73CB10A7C885349E28B18872AB7E8D9B2A9BEB6E"
+  "record_sha256": "905DF552FDE594B99D6798A139C751FAA4B97F470C8529DB89D71D7A3912F2BC"
 }
