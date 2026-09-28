@@ -128,18 +128,18 @@ function translation_queue.prioritize(cache, keys)
   if type(cache) ~= "table" or type(cache.queue) ~= "table" or type(keys) ~= "table" then return false end
   local start = math.max(1, math.floor(tonumber(cache.cursor) or 1))
   if start > #cache.queue then return false end
-  local front, selected_indexes = {}, {}
+  local front, selected_indexes, available_indexes = {}, {}, {}
+  for index = start, #cache.queue do
+    local key = cache.queue[index]
+    if available_indexes[key] == nil and cache.values[key] == nil and cache.pending_by_key[key] == nil then
+      available_indexes[key] = index
+    end
+  end
   for _, key in ipairs(keys) do
-    if type(key) == "string" then
-      for index = start, #cache.queue do
-        local candidate = cache.queue[index]
-        if not selected_indexes[index] and candidate == key and cache.values[candidate] == nil
-            and cache.pending_by_key[candidate] == nil then
-          selected_indexes[index] = true
-          front[#front + 1] = candidate
-          break
-        end
-      end
+    local index = type(key) == "string" and available_indexes[key]
+    if index and not selected_indexes[index] then
+      selected_indexes[index] = true
+      front[#front + 1] = key
     end
   end
   if #front == 0 then return false end
