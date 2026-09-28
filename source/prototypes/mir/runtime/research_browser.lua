@@ -703,12 +703,25 @@ local function queue_rows(player, queue, v)
     label(queue, {"mir-browser.queue-empty"})
     return 1
   end
+  label(queue, {"mir-browser.queue"})
   local pages = math.max(1, math.ceil(#entries / core.page_size))
   v.page = math.min(v.page, pages)
   for index = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #entries) do
     local technology = entries[index]
     if technology then
-      button(queue, "select", technology.localised_name, {technology = technology.name})
+      local row = queue.add{type = "flow", direction = "horizontal"}
+      label(row, tostring(index) .. ".")
+      button(row, "select", technology.localised_name, {technology = technology.name})
+      for _, direction in ipairs{-1, 1} do
+        local adjacent = entries[index + direction]
+        local action = direction == -1 and "queue-up" or "queue-down"
+        local control = button(row, action, direction == -1 and "↑" or "↓", {
+          index = index, technology = technology.name,
+          adjacent = adjacent and adjacent.name or ""
+        })
+        control.enabled = actions.can_move(player, entries, index, direction, defines.input_action.move_research)
+        control.tooltip = direction == -1 and {"controls.move-up"} or {"controls.move-down"}
+      end
     end
   end
   return pages
@@ -999,6 +1012,9 @@ local function click(event)
   if action == "select" then
     v.selected, v.effect_page = tags.technology, 1
     if v.tab == "queue" then v.tab, v.page = "research", 1 end
+  elseif action == "queue-up" or action == "queue-down" then
+    actions.move(player, tags.index, action == "queue-up" and -1 or 1,
+      tags.technology, tags.adjacent, defines.input_action.move_research)
   elseif action == "enqueue" then
     local tech = player.force.technologies[tags.technology]
     if actions.can_enqueue(player, tech, defines.input_action.start_research) then
@@ -1300,5 +1316,8 @@ function M.register()
       schedule_open_force_refresh(event.research and event.research.force or event.force)
     end)
   end
+  script.on_event(defines.events.on_research_moved, function(event)
+    schedule_open_force_refresh(event.force)
+  end)
 end
 return M
