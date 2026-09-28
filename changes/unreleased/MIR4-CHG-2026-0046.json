@@ -7,6 +7,7 @@
   "summary": "Add a personal research/settings browser with a portable copied-data core and guarded finite material research to modern development targets.",
   "details": [
     "Browse All/Finite/Infinite research, ingredients, bounded native-icon pages of improved recipes, effect ownership and grouped settings; enqueue through the native permission-checked force API.",
+    "Search stable research IDs as readable words and find MIR productivity research by its validated affected recipe IDs while localized names index.",
     "Split the browser into one Factorio-neutral copied-data core, a bounded generic Factorio catalogue adapter, MIR-only copied enrichment and a separate native queue permission predicate; a base-only F210 fixture proves provider absence removes enrichment only, without a stable public API claim.",
     "Export effective startup settings through the existing validated MIRSET1 restart-required profile path.",
     "Declare all 22 requested materials using exact recipe identities and the existing emitter; default to three 2% tiers and reject explicit productivity denial or recipe return paths.",
