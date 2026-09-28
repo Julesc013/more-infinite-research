@@ -11,9 +11,10 @@ local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
 local M = {requires_features = {"settings_profiles"}}
 local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
-local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 460
+local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 400
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
 local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 56, 32
+local RESEARCH_BODY_MAX_HEIGHT = 596
 local SETTINGS_PAGE_SIZE = 12
 -- Translation IDs are asynchronous and per-player.  Keep the work window
 -- small so a large catalogue neither monopolizes a tick nor stops after an
@@ -1017,7 +1018,7 @@ render = function(player)
     local field = search.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
     field.style.width = v.tab == "settings" and list_width + detail_width - 140 or detail_width
   end
-  local body_height = math.max(140, frame.style.maximal_height - 140)
+  local body_height = math.min(RESEARCH_BODY_MAX_HEIGHT, math.max(140, frame.style.maximal_height - 140))
   -- Research keeps its controls stationary. Setup follows its content and
   -- gains outer scrolling if a small display cannot fit both sections.
   local body = frame.add{type = v.tab == "research" and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
