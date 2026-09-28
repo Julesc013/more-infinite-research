@@ -3804,8 +3804,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 61232,
-      "expected_sha256": "B74428521FDB665345E69CD33D9294F5FF35966196E6577FE3FE341EB7657E5A",
+      "expected_bytes": 62288,
+      "expected_sha256": "A1AE757A695D52DA20274E332866E34E8863D454C6EE0FEA6D99D1443FC9E274",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3884,8 +3884,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the separate native queue permission predicate for F210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 952,
-      "expected_sha256": "818CD5E786534FCD8F9D346BA71FA937D7542446F941ECD4158AEAE63F6275AE",
+      "expected_bytes": 4828,
+      "expected_sha256": "6DF6106DA647220A709B69E46803531E1B5BFC0FF9B4A84840070CD794B7F558",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "permission-checked-native-queue",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "95389FB208B9EC78A021F3C4D9EDA7F59563DBA19A37CEFE870EC5277505225B"
+  "record_sha256": "8E2E2A539FCD650BB54AD5788DD149BF051CCBD4D20FE86237620D5887189349"
 }
