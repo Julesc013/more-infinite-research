@@ -71,7 +71,7 @@ hooks = true
 network_proxy = false
 ```
 
-The repository's `.codex/hooks.json` runs bounded health checks at session start and Stop. Enable hooks in a trusted checkout, then review and trust the exact definition through `/hooks`; changing that definition requires renewed trust. A first actionable Stop requests one checkpoint turn for uncommitted work, unpushed commits or observed disk pressure. A repeated Stop passes through. The hooks do not intercept Git/GitHub commands, delete files, remove worktrees or change branches. See the official [hook trust and Stop contract](https://learn.chatgpt.com/docs/hooks).
+The repository's `.codex/hooks.json` runs bounded health checks at session start and Stop. Enable hooks in a trusted checkout, then review and trust the exact definition through `/hooks`; changing that definition requires renewed trust. A first actionable Stop requests one checkpoint turn for uncommitted work, unpushed commits, observed disk pressure, or stale worktrees and branches needing a disposition. A new branch without an upstream has a seven-day grace period; older branches use the thirty-day default. A repeated Stop passes through. The hooks do not intercept Git/GitHub commands, delete files, remove worktrees or change branches. See the official [hook trust and Stop contract](https://learn.chatgpt.com/docs/hooks).
 
 Run a fuller local observation before a batch that creates packages, engine stages or worktrees:
 

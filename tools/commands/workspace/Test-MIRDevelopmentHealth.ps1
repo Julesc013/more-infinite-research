@@ -152,7 +152,9 @@ function Get-MIRDevelopmentHealthBranches {
     $isCurrent=(-not[string]::IsNullOrWhiteSpace($CurrentBranch))-and$name-ceq$CurrentBranch
     $rows.Add([pscustomobject][ordered]@{
       name=$name;current=$isCurrent;upstream=$upstream;last_commit_age_days=$ageDays;unique_commit_count=$uniqueCount
-      review_needed=(-not$isCurrent)-and(($null-ne$ageDays-and$ageDays-ge$OldDays)-or[string]::IsNullOrWhiteSpace($upstream))
+      # A new task branch normally has no upstream until its first push. Give
+      # it a short grace period, then require an explicit cleanup disposition.
+      review_needed=(-not$isCurrent)-and($null-ne$ageDays)-and(($ageDays-ge$OldDays)-or([string]::IsNullOrWhiteSpace($upstream)-and$ageDays-ge7))
       preservation=if($null-ne$uniqueCount-and$uniqueCount-gt0){'preserve-unique-commits'}elseif(-not$IncludeUniqueCommitCounts){'unique-commits-not-scanned'}else{'review-before-any-deletion'}
     })
   }
@@ -204,6 +206,8 @@ if($upstream.configured-and$null-ne$upstream.ahead-and$upstream.ahead-gt0){$chec
 if($freeMiB-lt$MinimumFreeMiB){$checkpointReasons+="free:$freeMiB-MiB-below-$MinimumFreeMiB"}
 if($buildMiB-gt$BuildBudgetMiB){$checkpointReasons+="build:$buildMiB-MiB-over-$BuildBudgetMiB"}
 if($distMiB-gt$DistBudgetMiB){$checkpointReasons+="dist:$distMiB-MiB-over-$DistBudgetMiB"}
+if($oldWorktrees.Count-gt0){$checkpointReasons+="worktrees:review-$($oldWorktrees.Count)"}
+if($oldBranches.Count-gt0){$checkpointReasons+="branches:review-$($oldBranches.Count)"}
 $buildDisplay="$buildMiB-MiB" + $(if($build.bytes_is_lower_bound){'+'}else{''})
 $distDisplay="$distMiB-MiB" + $(if($dist.bytes_is_lower_bound){'+'}else{''})
 $summaryParts=@("branch=$currentBranch","dirty=$($dirty.count)","git-operation="+$(if(@($dirty.operations).Count-gt0){@($dirty.operations)-join ','}else{'none'}),"build=$buildDisplay","dist=$distDisplay","free=$freeMiB-MiB")
@@ -215,7 +219,7 @@ $report=[pscustomobject][ordered]@{
   disk=[ordered]@{free_mib=$freeMiB;minimum_free_mib=$MinimumFreeMiB;build_budget_mib=$BuildBudgetMiB;dist_budget_mib=$DistBudgetMiB;build_budget_observation=$buildBudgetObservation;dist_budget_observation=$distBudgetObservation;build=$build;dist=$dist}
   git=[ordered]@{current_branch=$currentBranch;dirty=$dirty;upstream=$upstream;worktrees=$worktrees;branches=$branches};attention=@($attention)
   checkpoint_required=($checkpointReasons.Count-gt0);checkpoint_reasons=@($checkpointReasons)
-  actions=@([pscustomobject]@{kind='checkpoint';command='git status --short';automatic=$false},[pscustomobject]@{kind='safe-storage-audit';command='.\\tools\\mir.ps1 storage audit --all-worktrees --older-than-days 7';automatic=$false},[pscustomobject]@{kind='safe-storage-clean-after-audit';command='.\\tools\\mir.ps1 storage clean --all-worktrees --older-than-days 7 --apply';automatic=$false})
+  actions=@([pscustomobject]@{kind='checkpoint';command='git status --short';automatic=$false},[pscustomobject]@{kind='worktree-review';command='git worktree list --porcelain';automatic=$false},[pscustomobject]@{kind='branch-review';command='git branch -vv';automatic=$false},[pscustomobject]@{kind='safe-storage-audit';command='.\\tools\\mir.ps1 storage audit --all-worktrees --older-than-days 7';automatic=$false},[pscustomobject]@{kind='safe-storage-clean-after-audit';command='.\\tools\\mir.ps1 storage clean --all-worktrees --older-than-days 7 --apply';automatic=$false})
   hook_message=$hookMessage
 }
 if($AsJson){$report|ConvertTo-Json -Depth 12 -Compress}else{Write-Output $hookMessage;Write-Output 'Suggested next step: run the named storage audit before any cleanup; review dirty or unique worktrees and branches before any Git removal.'}

@@ -115,6 +115,9 @@ try {
   if ($linkedRow.Count -ne 1 -or $linkedRow[0].dirty.count -lt 1 -or [string]$linkedRow[0].preservation -cne 'preserve-dirty-worktree') { throw '[mir-development-health-linked-preservation]' }
   $oldBranch = @($report.git.branches.rows | Where-Object name -ceq 'health-old')
   if ($oldBranch.Count -ne 1 -or -not [bool]$oldBranch[0].review_needed -or [string]$oldBranch[0].preservation -cne 'preserve-unique-commits') { throw '[mir-development-health-old-branch]' }
+  if (@($report.checkpoint_reasons | Where-Object { $_ -match '^branches:review-' }).Count -ne 1) { throw '[mir-development-health-old-branch-checkpoint]' }
+  $futureWorktree = (& $checker -RepoRoot $fixture -Mode Hook -AsJson -OldWorktreeDays 7 -NowUtc ([datetime]'2026-11-27T00:00:00Z') | ConvertFrom-Json -Depth 16)
+  if (@($futureWorktree.git.worktrees.rows | Where-Object { -not $_.current -and $_.review_needed }).Count -ne 1 -or @($futureWorktree.checkpoint_reasons | Where-Object { $_ -match '^worktrees:review-' }).Count -ne 1) { throw '[mir-development-health-old-worktree-checkpoint]' }
   if (@($report.actions | Where-Object { $_.command -match 'Remove-Item|git clean|worktree remove|branch -D' }).Count -ne 0) { throw '[mir-development-health-unsafe-action]' }
   if (@($report.actions | Where-Object kind -ceq 'safe-storage-audit').Count -ne 1) { throw '[mir-development-health-named-cleanup-authority]' }
   $cleanAction = @($report.actions | Where-Object kind -ceq 'safe-storage-clean-after-audit')
@@ -169,6 +172,22 @@ try {
   if($LASTEXITCODE-ne0){throw '[mir-development-health-merge-abort]'}
   $afterMergeHealth=(& $checker -RepoRoot $cleanFixture -Mode Hook -AsJson|ConvertFrom-Json -Depth 16)
   if(@($afterMergeHealth.git.dirty.operations).Count-ne0-or[bool]$afterMergeHealth.checkpoint_required){throw '[mir-development-health-completed-merge-still-reported]'}
+  $env:GIT_AUTHOR_DATE='2024-01-01T00:00:00Z'
+  $env:GIT_COMMITTER_DATE='2024-01-01T00:00:00Z'
+  & git -C $cleanFixture checkout --quiet -b stale-unpushed
+  [IO.File]::WriteAllText((Join-Path $cleanFixture 'stale.txt'),'preserve unique commit',[Text.UTF8Encoding]::new($false))
+  & git -C $cleanFixture add -- stale.txt
+  & git -C $cleanFixture commit --quiet -m 'fixture: stale unique branch'
+  if($LASTEXITCODE-ne0){throw '[mir-development-health-stale-branch-commit]'}
+  Remove-Item Env:GIT_AUTHOR_DATE
+  Remove-Item Env:GIT_COMMITTER_DATE
+  & git -C $cleanFixture checkout --quiet main
+  if($LASTEXITCODE-ne0){throw '[mir-development-health-stale-branch-return]'}
+  $staleHealth=(& $checker -RepoRoot $cleanFixture -Mode Hook -AsJson|ConvertFrom-Json -Depth 16)
+  $staleRow=@($staleHealth.git.branches.rows|Where-Object name -ceq 'stale-unpushed')
+  if($staleRow.Count-ne1-or-not[bool]$staleRow[0].review_needed-or-not[bool]$staleHealth.checkpoint_required-or@($staleHealth.checkpoint_reasons|Where-Object{$_ -match '^branches:review-'}).Count-ne1){throw '[mir-development-health-stale-only-checkpoint]'}
+  $staleHookOutput=@(Invoke-HealthNativeHook -ScriptPath $fixtureHook -CheckerRepoRoot $cleanFixture -Payload @{session_id='stale';hook_event_name='Stop';stop_hook_active=$false})
+  if($staleHookOutput.Count-ne1-or[string]($staleHookOutput[0]|ConvertFrom-Json -Depth 8).decision-cne'block'){throw '[mir-development-health-stale-only-stop]'}
   Invoke-HealthFixtureGit -Arguments @('status','--short') | Out-Null
   Invoke-HealthFixtureGit -Arguments @('branch','--show-current') | Out-Null
   if ([IO.File]::ReadAllText((Join-Path $fixture 'tracked.txt')) -cne $trackedBefore -or [IO.File]::ReadAllText((Join-Path $linked 'linked-uncommitted.txt')) -cne $linkedBefore) { throw '[mir-development-health-hook-mutated-worktree]' }
