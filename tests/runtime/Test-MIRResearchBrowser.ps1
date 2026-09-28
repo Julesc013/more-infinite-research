@@ -126,8 +126,10 @@ function Invoke-BrowserEngine([string[]]$Arguments) {
  try {
   if(-not $process.WaitForExit(120000)) { $process.Kill($true); throw "Browser test timeout: $run" }
   $result=$stdout.GetAwaiter().GetResult()+$stderr.GetAwaiter().GetResult()
-  $result | Set-Content (Join-Path $run ('engine-'+[guid]::NewGuid().ToString('N').Substring(0,6)+'.log'))
-  if($process.ExitCode -ne 0) { throw "Browser engine failed: $run`n$($result.Substring([Math]::Max(0,$result.Length-2500)))" }
+  $engineLog=Join-Path $run ('engine-'+[guid]::NewGuid().ToString('N').Substring(0,6)+'.log')
+  $result | Set-Content $engineLog
+  $exitCode=$process.ExitCode
+  if($exitCode -ne 0) { throw "Browser engine failed: phase=$($Arguments[0]); exit_code=$exitCode; log=$engineLog`n$($result.Substring([Math]::Max(0,$result.Length-2500)))" }
  } finally { $process.Dispose() }
 }
 Invoke-BrowserEngine @('--create',$save)
