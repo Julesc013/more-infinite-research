@@ -5339,9 +5339,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1",
       "classification": "canonical-internal",
-      "sha256": "1580D3EA1BC07F641ED8469D3BD351D9A343E233E81CF05AE3A6D51D0CB5AF8E",
+      "sha256": "E11125D66977181FE3980B09C93B656B4A9B60BCEA4FD4619F74BA44E33827F1",
       "hash_mode": "canonical-text-v1",
-      "lines": 87,
+      "lines": 99,
       "package_visible": false
     },
     {
@@ -6010,5 +6010,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c347da44785955e0bfa7210ab74261658e40d3089a1c3d478b72f2d8d0fe9073"
+  "digest": "sha256:d6499de81317f2fe8db1caef726fd27b1c8d06a4f03b90fbcb074b397cff1443"
 }
