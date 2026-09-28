@@ -85,6 +85,11 @@ try {
   try { New-MIR42SupportCollectorBundle -RepoRoot $repo -SourceCommit $sourceCommit -OutputPath $collectorPath | Out-Null }
   catch { $overwriteRejected = $_.Exception.Message -match '^\[mir42-support-collector-output-exists\]' }
   Assert-MIR42ReleaseAssetsTest -Condition $overwriteRejected -Code 'collector-bundle-frozen-output'
+  $mistypedOutput = Join-Path $root ('mistyped-source/' + $script:MIR42SupportCollectorAssetName)
+  $mistypedRejected = $false
+  try { New-MIR42SupportCollectorBundle -RepoRoot $repo -SourceCommit ('0' * 40) -OutputPath $mistypedOutput | Out-Null }
+  catch { $mistypedRejected = $_.Exception.Message -match '^\[mir42-support-collector-source-blob\]' }
+  Assert-MIR42ReleaseAssetsTest -Condition ($mistypedRejected -and -not (Test-Path -LiteralPath $mistypedOutput)) -Code 'collector-bundle-bad-source-leaves-no-output'
   $tamperedCollectorPath = Join-Path $root ('tampered-bundle/' + $script:MIR42SupportCollectorAssetName)
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $tamperedCollectorPath))
   $tamperedStream = [IO.File]::Create($tamperedCollectorPath)

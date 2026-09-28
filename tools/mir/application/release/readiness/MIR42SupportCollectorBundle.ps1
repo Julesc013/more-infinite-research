@@ -64,23 +64,35 @@ function Assert-MIR42SupportCollectorBundle {
 function New-MIR42SupportCollectorBundle {
   param([Parameter(Mandatory)][string]$RepoRoot, [Parameter(Mandatory)][string]$SourceCommit, [Parameter(Mandatory)][string]$OutputPath)
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  if ([IO.Path]::GetFileName($OutputPath) -cne $script:MIR42SupportCollectorAssetName) { throw '[mir42-support-collector-output-name]' }
-  if (Test-Path -LiteralPath $OutputPath) { throw '[mir42-support-collector-output-exists]' }
-  $parent = Split-Path -Parent $OutputPath
+  $output = [IO.Path]::GetFullPath($OutputPath)
+  if ([IO.Path]::GetFileName($output) -cne $script:MIR42SupportCollectorAssetName) { throw '[mir42-support-collector-output-name]' }
+  if (Test-Path -LiteralPath $output) { throw '[mir42-support-collector-output-exists]' }
+  $payloads = @(
+    foreach ($name in $script:MIR42SupportCollectorScripts) {
+      [pscustomobject]@{name=$name;bytes=(Read-MIR42SupportCollectorSourceBlob -RepoRoot $repo -SourceCommit $SourceCommit -Name $name)}
+    }
+  )
+  $parent = Split-Path -Parent $output
   if (-not (Test-Path -LiteralPath $parent -PathType Container)) { [void](New-Item -ItemType Directory -Force -Path $parent) }
   Add-Type -AssemblyName System.IO.Compression
-  $stream = [IO.File]::Open($OutputPath, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+  $temporary = Join-Path $parent ('.mir42-collector-' + [guid]::NewGuid().ToString('N') + '.zip')
   try {
-    $archive = [IO.Compression.ZipArchive]::new($stream, [IO.Compression.ZipArchiveMode]::Create, $true)
+    $stream = [IO.File]::Open($temporary, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
     try {
-      foreach ($name in $script:MIR42SupportCollectorScripts) {
-        $bytes = Read-MIR42SupportCollectorSourceBlob -RepoRoot $repo -SourceCommit $SourceCommit -Name $name
-        $entry = $archive.CreateEntry($name, [IO.Compression.CompressionLevel]::Optimal)
-        $entry.LastWriteTime = [DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
-        $entryStream = $entry.Open()
-        try { $entryStream.Write($bytes, 0, $bytes.Length) } finally { $entryStream.Dispose() }
-      }
-    } finally { $archive.Dispose() }
-  } finally { $stream.Dispose() }
-  return Assert-MIR42SupportCollectorBundle -RepoRoot $repo -SourceCommit $SourceCommit -Path $OutputPath
+      $archive = [IO.Compression.ZipArchive]::new($stream, [IO.Compression.ZipArchiveMode]::Create, $true)
+      try {
+        foreach ($payload in $payloads) {
+          $entry = $archive.CreateEntry([string]$payload.name, [IO.Compression.CompressionLevel]::Optimal)
+          $entry.LastWriteTime = [DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
+          $entryStream = $entry.Open()
+          try { $entryStream.Write($payload.bytes, 0, $payload.bytes.Length) } finally { $entryStream.Dispose() }
+        }
+      } finally { $archive.Dispose() }
+    } finally { $stream.Dispose() }
+    [void](Assert-MIR42SupportCollectorBundle -RepoRoot $repo -SourceCommit $SourceCommit -Path $temporary)
+    [IO.File]::Move($temporary, $output)
+    return Assert-MIR42SupportCollectorBundle -RepoRoot $repo -SourceCommit $SourceCommit -Path $output
+  } finally {
+    if ([IO.File]::Exists($temporary)) { [IO.File]::Delete($temporary) }
+  }
 }
