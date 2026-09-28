@@ -98,10 +98,18 @@ try {
     mir_archives = @()
     notes = @()
   }
+  $logsFound = 0
   foreach ($name in @('factorio-current.log', 'factorio-previous.log')) {
     $path = Join-Path $userData $name
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
-    $read = Read-MIRBoundedFile -Path $path -Limit $maxLogBytes -Tail
+    $logsFound++
+    $read = $null
+    try {
+      $read = Read-MIRBoundedFile -Path $path -Limit $maxLogBytes -Tail
+    } catch {
+      $manifest.notes += "$name could not be read; close Factorio and collect another report."
+    }
+    if ($null -eq $read) { continue }
     $safe = Protect-MIRLogText -Value $read.text
     Add-MIRZipText -Archive $archive -Name "logs/$name" -Value $safe
     $manifest.logs += [ordered]@{
@@ -111,33 +119,57 @@ try {
       captured_sha256 = Get-MIRTextHash -Value $safe
     }
   }
-  if ($manifest.logs.Count -eq 0) { $manifest.notes += 'No Factorio current or previous log was found.' }
+  if ($logsFound -eq 0) { $manifest.notes += 'No Factorio current or previous log was found.' }
 
   $modsDir = Join-Path $userData 'mods'
   $modListPath = Join-Path $modsDir 'mod-list.json'
   if (Test-Path -LiteralPath $modListPath -PathType Leaf) {
-    $read = Read-MIRBoundedFile -Path $modListPath -Limit $maxModListBytes
-    if ($null -ne $read.text) {
-      Add-MIRZipText -Archive $archive -Name 'mods/mod-list.json' -Value $read.text
-      $manifest.mod_list = [ordered]@{ bytes = $read.bytes; captured_sha256 = Get-MIRTextHash -Value $read.text }
-    } else {
-      $manifest.notes += 'mod-list.json exceeded 2 MiB and was omitted.'
+    $read = $null
+    try {
+      $read = Read-MIRBoundedFile -Path $modListPath -Limit $maxModListBytes
+    } catch {
+      $manifest.notes += 'mod-list.json could not be read; close Factorio and collect another report.'
+    }
+    if ($null -ne $read) {
+      if ($null -ne $read.text) {
+        Add-MIRZipText -Archive $archive -Name 'mods/mod-list.json' -Value $read.text
+        $manifest.mod_list = [ordered]@{ bytes = $read.bytes; captured_sha256 = Get-MIRTextHash -Value $read.text }
+      } else {
+        $manifest.notes += 'mod-list.json exceeded 2 MiB and was omitted.'
+      }
     }
   }
   $modSettingsPath = Join-Path $modsDir 'mod-settings.dat'
   if (Test-Path -LiteralPath $modSettingsPath -PathType Leaf) {
-    $manifest.mod_settings = [ordered]@{
-      name = 'mod-settings.dat'
-      sha256 = Get-MIRFileHash -Path $modSettingsPath
-      included = $false
+    try {
+      $manifest.mod_settings = [ordered]@{
+        name = 'mod-settings.dat'
+        sha256 = Get-MIRFileHash -Path $modSettingsPath
+        included = $false
+      }
+    } catch {
+      $manifest.notes += 'mod-settings.dat could not be hashed; close Factorio and collect another report.'
     }
   }
+  $mirArchiveCount = 0
+  $mirListOk = $true
   if (Test-Path -LiteralPath $modsDir -PathType Container) {
-    foreach ($file in @(Get-ChildItem -LiteralPath $modsDir -File -Filter 'more-infinite-research_*.zip' | Sort-Object Name)) {
-      $manifest.mir_archives += [ordered]@{ name = $file.Name; bytes = $file.Length; sha256 = Get-MIRFileHash -Path $file.FullName }
+    try {
+      $mirFiles = @(Get-ChildItem -LiteralPath $modsDir -File -Filter 'more-infinite-research_*.zip' | Sort-Object Name)
+      $mirArchiveCount = $mirFiles.Count
+      foreach ($file in $mirFiles) {
+        try {
+          $manifest.mir_archives += [ordered]@{ name = $file.Name; bytes = $file.Length; sha256 = Get-MIRFileHash -Path $file.FullName }
+        } catch {
+          $manifest.notes += "$($file.Name) could not be hashed; close Factorio and collect another report."
+        }
+      }
+    } catch {
+      $mirListOk = $false
+      $manifest.notes += 'The mods directory could not be listed; close Factorio and collect another report.'
     }
   }
-  if ($manifest.mir_archives.Count -eq 0) { $manifest.notes += 'No MIR ZIP was found in the selected mods directory.' }
+  if ($mirListOk -and $mirArchiveCount -eq 0) { $manifest.notes += 'No MIR ZIP was found in the selected mods directory.' }
 
   Add-MIRZipText -Archive $archive -Name 'README.txt' -Value @'
 MIR startup support report

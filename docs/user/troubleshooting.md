@@ -12,7 +12,7 @@ superseded_by: []
 
 # Troubleshooting
 
-If Factorio stops while loading mods and the MIR Research Library never opens, run the standalone `Collect-MIRPlayerReport.cmd` supplied beside a MIR development preview. It collects the current and previous Factorio logs, active mod list, and MIR package hashes into a local ZIP without loading the game. Review that ZIP before attaching it to a report. If your Factorio user data is not under `%APPDATA%\Factorio`, run `Collect-MIRPlayerReport.ps1 -FactorioUserData <directory>` in PowerShell instead. The collector does not include saves, full mod archives, or the binary startup-settings file.
+If Factorio stops while loading mods and the MIR Research Library never opens, run the standalone `Collect-MIRPlayerReport.cmd` supplied beside a MIR development preview. It collects the current and previous Factorio logs, active mod list, and MIR package hashes into a local ZIP without loading the game. If a file is still locked, the report includes available evidence and names the omitted file; close Factorio and run the collector again for a fuller report. Review that ZIP before attaching it to a report. If your Factorio user data is not under `%APPDATA%\Factorio`, run `Collect-MIRPlayerReport.ps1 -FactorioUserData <directory>` in PowerShell instead. The collector does not include saves, full mod archives, or the binary startup-settings file.
 
 If a technology is missing:
 
