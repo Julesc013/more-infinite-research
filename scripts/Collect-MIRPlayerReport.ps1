@@ -1,7 +1,8 @@
 param(
   [string]$FactorioUserData = '',
   [string]$OutputDirectory = '',
-  [switch]$CopyPath
+  [switch]$CopyPath,
+  [switch]$ShowInExplorer
 )
 
 $ErrorActionPreference = 'Stop'
@@ -194,4 +195,11 @@ Write-Output "MIR support report: $outputPath"
 if ($CopyPath) {
   try { Set-Clipboard -Value $outputPath; Write-Output 'Report path copied to clipboard.' }
   catch { Write-Output 'Clipboard unavailable; use the report path printed above.' }
+}
+if ($ShowInExplorer) {
+  try {
+    Start-Process -FilePath 'explorer.exe' -ArgumentList ('/select,"{0}"' -f $outputPath) -WindowStyle Normal
+  } catch {
+    Write-Output 'Could not open the report folder; use the report path printed above.'
+  }
 }
