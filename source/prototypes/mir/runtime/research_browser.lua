@@ -14,7 +14,7 @@ local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-rese
 local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 400
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
 local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 56, 32
-local RESEARCH_BODY_MAX_HEIGHT = 596
+local RESEARCH_BODY_MAX_HEIGHT = 420
 local SETTINGS_PAGE_SIZE = 12
 local RECIPE_BENEFIT_PAGE_SIZE = 12
 -- Translation IDs are asynchronous and per-player.  Keep the work window
@@ -965,7 +965,6 @@ update_research_results = function(player, results, v, c, cache)
   }
   list.style.width = list_width
   list.style.maximal_width = list_width
-  list.style.height = panes_height
   list.style.maximal_height = panes_height
   list.horizontal_scroll_policy = "never"
   list.vertical_scroll_policy = "auto"
@@ -975,7 +974,6 @@ update_research_results = function(player, results, v, c, cache)
   }
   detail_pane.style.width = detail_width
   detail_pane.style.maximal_width = detail_width
-  detail_pane.style.height = panes_height
   detail_pane.style.maximal_height = panes_height
   detail_pane.horizontal_scroll_policy = "never"
   detail_pane.vertical_scroll_policy = "auto"
@@ -1057,11 +1055,10 @@ render = function(player)
     field.style.width = v.tab == "settings" and list_width + detail_width - 140 or detail_width
   end
   local body_height = math.min(RESEARCH_BODY_MAX_HEIGHT, math.max(140, frame.style.maximal_height - 140))
-  -- Research keeps its controls stationary. Setup follows its content and
-  -- gains outer scrolling if a small display cannot fit both sections.
+  -- Browse keeps its controls stationary while its panes follow their content
+  -- up to a screen-bounded limit. Setup gains outer scrolling on small displays.
   local body = frame.add{type = v.tab == "research" and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
   if v.tab == "research" then
-    body.style.height = body_height
     body.style.maximal_height = body_height
   elseif v.tab == "settings" then
     body.style.maximal_height = body_height
@@ -1099,7 +1096,6 @@ render = function(player)
     local reserved_height = RESEARCH_FILTERS_HEIGHT
       + (has_hidden and RESEARCH_HIDDEN_RECOVERY_HEIGHT or 0)
     local results_height = math.max(RESEARCH_PANES_MIN_HEIGHT, body_height - reserved_height)
-    results.style.height = results_height
     results.style.maximal_height = results_height
     pages = update_research_results(player, results, v, c, cache)
   end
