@@ -129,6 +129,16 @@ local function find_browser_technology(element, technology)
   end
   return nil
 end
+local function find_browser_queue_control(element, index, action)
+  if not (element and element.valid) then return nil end
+  local tags = element.tags
+  if tags and tags.mir_browser == action and tags.index == index then return element end
+  for _, child in pairs(element.children or {}) do
+    local found = find_browser_queue_control(child, index, action)
+    if found then return found end
+  end
+  return nil
+end
 local function has_browser_fact(element, fact)
   return find_browser_element(element, "mir_browser_fact", fact) ~= nil
 end
@@ -466,6 +476,31 @@ script.on_nth_tick(1,function()
   local refreshed_catalogue=browser_catalogue.snapshot(force)
   local queued_after=browser_core.query(refreshed_catalogue,{mode=1,status=4,page=1,search="mir-browser-test-finite"})
   check(#queued_after.rows==1 and queued_after.rows[1].queued,"second snapshot exposes queued research")
+  check(force.add_research("mir-browser-queue-later"),"second pending research")
+  local queue_before=force.research_queue
+  local progress_before=force.research_progress
+  player.permission_group={allows_action=function() return false end}
+  check(not browser_actions.can_move(player,queue_before,2,1,defines.input_action.move_research),
+    "queue movement respects native permission")
+  player.permission_group=nil
+  check(not browser_actions.can_move(player,queue_before,2,-1,defines.input_action.move_research)
+    and browser_actions.can_move(player,queue_before,2,1,defines.input_action.move_research),
+    "active research stays fixed while pending research can move")
+  local unchanged_queue=snapshot(force)
+  check(not browser_actions.move(player,2,1,"stale-technology","mir-browser-queue-later",defines.input_action.move_research)
+    and snapshot(force)==unchanged_queue,"stale queue control cannot move another player's new order")
+  check(browser_actions.move(player,2,1,"mir-browser-test-finite","mir-browser-queue-later",defines.input_action.move_research),
+    "native queue accepts guarded pending swap")
+  local moved_queue=force.research_queue
+  check(#moved_queue==3 and moved_queue[1].name=="mir-browser-progress"
+    and moved_queue[2].name=="mir-browser-queue-later" and moved_queue[3].name=="mir-browser-test-finite"
+    and force.current_research.name=="mir-browser-progress" and force.research_progress==progress_before,
+    "pending reorder preserves active research and exact progress")
+  local prerequisite={valid=true,force=force,name="prerequisite",researched=false,prerequisites={}}
+  local dependent={valid=true,force=force,name="dependent",researched=false,prerequisites={prerequisite}}
+  check(not browser_actions.can_move(player,{moved_queue[1],prerequisite,dependent},2,1,defines.input_action.move_research)
+    and not browser_actions.can_move(player,{moved_queue[1],prerequisite,dependent},3,-1,defines.input_action.move_research),
+    "queue controls reject prerequisite reversal before native mutation")
   before=snapshot(force)
   local all=browser_core.query(catalogue,{mode=1,status=1,page=999999,search=""})
   check(#all.rows<=browser_core.page_size and all.page==all.pages,"bounded page clamp")
@@ -539,6 +574,16 @@ script.on_nth_tick(1,function()
     check(find_browser_element(default_root,"mir_browser","research") and find_browser_element(default_root,"mir_browser","queue")
       and find_browser_element(default_root,"mir_browser","settings") and find_browser_element(default_root,"mir_browser","availability"),
       "library presents browse, queue, setup and availability navigation")
+    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="queue"}),
+      "native queue tab opens for the connected player")
+    local queue_root=actual.gui.screen.mir_research_browser
+    local active_down=find_browser_queue_control(queue_root,1,"queue-down")
+    local pending_down=find_browser_queue_control(queue_root,2,"queue-down")
+    local last_up=find_browser_queue_control(queue_root,3,"queue-up")
+    check(active_down and not active_down.enabled and pending_down and pending_down.enabled
+      and last_up and last_up.enabled and pending_down.tags.technology=="mir-browser-queue-later"
+      and last_up.tags.adjacent=="mir-browser-queue-later",
+      "native queue shows guarded up/down controls for pending entries")
     check_research_startup_controls(check, actual, native_enrichment)
     local filtered_request={tab="research",family="all",mode=2,status=1,sort="progression",
       selected="automation",search="mir-browser-test",page=1}
