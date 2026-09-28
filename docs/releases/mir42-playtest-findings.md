@@ -5,7 +5,7 @@ applies_to: "4.2.0 development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-09-28
+last_reviewed: 2026-09-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -21,6 +21,7 @@ These are direct maintainer findings from 27 September 2026. They reopen player 
 | PF-02: Browser labels initially lacked localization and then visibly resolved in sequence after pressing a button. | Provide localized discovery before page visits and a stable first usable view, with smooth bounded background indexing. | Display labels through native localization where appropriate; avoid visible identifier-to-label churn and translation-driven reordering of the open list. Search updates without resubmission, remains honest while indexing, and keeps actions bound to technology IDs. Exercise first opening, locale changes, late/missing callbacks and save/reload. |
 | PF-03: Playtesters cannot identify the purpose or operate the browser; it does not help them organize research or view startup settings and absent research. | Make the existing surface an intuitive research encyclopedia and viewer with useful sorting, organization, explicit research-queue ordering, per-research startup settings, and clear views of generated, hidden, not-added and removed research. | A player can locate research, inspect benefits/science/settings, distinguish personal hiding from game availability and absent generation, and organize or explicitly reorder research through clear controls. Filtering alone never changes the force queue. Evaluate first-use tasks with players; extra explanatory label or tooltip text is not the remedy. |
 | PF-04: Review engine and API additions from 2.1.7 through the latest available patch. | Adopt applicable capabilities and efficiency improvements through the existing engine-channel review, with narrowly scoped platform adapters. | Bind local engine/runtime API/prototype API/changelog identities; review each intervening official patch and record implemented, applicable pending and irrelevant changes. Preserve older engine contracts. |
+| PF-05: The Research Library shortcut should use Space Age's final research-productivity technology art when available; searching and filtering should remain readable and fast, and a player must be able to collect useful diagnostics even when startup fails before the mod loads. | Select the official icon with a base-game fallback, tune search response within bounded work, and deliver a companion collector outside player ZIPs. | Verify icon paths with Space Age active and installed-DLC-art opt-in/fallback; exercise search and filters on exact packages; collect redacted current/previous logs, active mod list and MIR package identities without starting Factorio. |
 
 The maintainer accepted the replacement shortcut button. Preserve it. Preserve the native research window and existing stable technology/settings identities. Startup settings remain restart-required; viewing or exporting them must not claim live prototype editing. Absent rows require named catalogue/generation evidence, and the interface must not invent technologies or omission reasons.
 
