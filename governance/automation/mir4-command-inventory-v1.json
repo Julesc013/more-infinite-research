@@ -721,6 +721,14 @@
       "package_visible": false
     },
     {
+      "path": "scripts/Collect-MIRPlayerReport.ps1",
+      "classification": "canonical-internal",
+      "sha256": "C02929A6FBBB77008A8AECC747F2022DFC5120C4EC7E34DA7A6A0A66992A338C",
+      "hash_mode": "canonical-text-v1",
+      "lines": 166,
+      "package_visible": false
+    },
+    {
       "path": "scripts/Compare-MIRPlannerReports.ps1",
       "classification": "compatibility-wrapper",
       "sha256": "622E5AB4C85351BCC5FAE78367E6532CDBA05F28E013F3F7561646CEF3E425E3",
@@ -5971,7 +5979,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 412,
+    "canonical_internal": 413,
     "compatibility_wrapper": 168,
     "migration_only": 59,
     "historical": 18,
@@ -5986,5 +5994,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:aaf06d9a96d12106a28956d7cc0df90b3ae05ac3cce56fa0fb93f48d59d6821e"
+  "digest": "sha256:e88afa2746c33041a003f45af73513b14169b613f106c2b85a53e834af311e32"
 }
