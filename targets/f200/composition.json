@@ -2076,8 +2076,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize shared material progression declarations for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 7383,
-      "expected_sha256": "C0071E5C535BB3BB3A31143AE21B8CA93C0858B482FE2484B35919A67C5F016E",
+      "expected_bytes": 9321,
+      "expected_sha256": "A0D0AD4F3DD47DDE81905ED82E08941D8CE8FF66ACB2884C44BC2B8399A2160E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3915,5 +3915,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "C7B43534B40AAB4C88EAA5CFEB7CFF97020D123808821EA09F73985D618046F9"
+  "record_sha256": "59BC062443065051759255F2419AFEC99703FBDACF2E1E2C528CF90E00559995"
 }

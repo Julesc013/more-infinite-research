@@ -2076,8 +2076,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize shared material progression declarations for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 7383,
-      "expected_sha256": "C0071E5C535BB3BB3A31143AE21B8CA93C0858B482FE2484B35919A67C5F016E",
+      "expected_bytes": 9321,
+      "expected_sha256": "A0D0AD4F3DD47DDE81905ED82E08941D8CE8FF66ACB2884C44BC2B8399A2160E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3851,5 +3851,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "8AE843DD8E7D88B15F1DD2CFD586E32B847A6495196D0EF7EA40BC707165206B"
+  "record_sha256": "0CDC6F2DCA8452EE774B632F85482CC47619908B9D0F681FB00D533CA3B4EBBB"
 }

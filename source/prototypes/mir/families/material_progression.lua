@@ -184,4 +184,44 @@ function M.attach(key, spec)
   return spec
 end
 
+local function finite_nonnegative(value)
+  return type(value) == "number" and value == value and value >= 0
+    and value ~= math.huge
+end
+
+-- The bound is over research productivity, not machine/module productivity.
+-- A family remains useful through the last level that still changes at least
+-- one qualified recipe. A configured cap is an absolute technology level.
+function M.highest_useful_level(effects, recipe_lookup, configured_cap)
+  if type(effects) ~= "table" or type(recipe_lookup) ~= "function" then
+    return nil, "invalid-material-effect-domain"
+  end
+  if configured_cap ~= "infinite" and (not finite_nonnegative(configured_cap)
+      or configured_cap < 1 or configured_cap ~= math.floor(configured_cap)) then
+    return nil, "invalid-material-configured-cap"
+  end
+
+  local maximum, count = 0, 0
+  for _, effect in ipairs(effects) do
+    if type(effect) ~= "table" or effect.type ~= "change-recipe-productivity"
+        or type(effect.recipe) ~= "string" or effect.recipe == ""
+        or not finite_nonnegative(effect.change) or effect.change <= 0 then
+      return nil, "invalid-material-effect"
+    end
+    local recipe = recipe_lookup(effect.recipe)
+    if type(recipe) ~= "table" then return nil, "material-recipe-unavailable" end
+    local limit = recipe.maximum_productivity
+    if limit == nil then limit = 3.0 end -- Factorio RecipePrototype default.
+    if not finite_nonnegative(limit) then return nil, "invalid-material-recipe-cap" end
+    local highest = math.ceil(limit / effect.change - 0.000000001)
+    if highest > 2147483647 then return nil, "material-level-domain-exceeded" end
+    maximum = math.max(maximum, highest)
+    count = count + 1
+  end
+  if count == 0 then return nil, "no-material-effects" end
+  if configured_cap ~= "infinite" then maximum = math.min(maximum, configured_cap) end
+  if maximum <= M.legacy_last_level then return nil, "no-continuation-headroom" end
+  return maximum
+end
+
 return M
