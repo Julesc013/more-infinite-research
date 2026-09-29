@@ -64,9 +64,17 @@ $introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind
 $historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
 $scienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'})
 $repairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
-if(@($manifest.bindings).Count-ne373-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne373-or
+$progressionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
+$progressionPlannerBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
+if(@($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne375-or
    $migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or
-   $introducedBindings.Count-ne14-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or
+   $introducedBindings.Count-ne16-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or$progressionBindings.Count-ne1-or$progressionPlannerBindings.Count-ne1-or
+   [string]$progressionBindings[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
+   [string]$progressionBindings[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
+   (@($progressionBindings[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
+   [string]$progressionPlannerBindings[0].source_path-cne'source/prototypes/mir/planner/stream_compiler/material_continuation.lua'-or
+   [string]$progressionPlannerBindings[0].output_path-cne'prototypes/mir/planner/stream_compiler/material_continuation.lua'-or
+   (@($progressionPlannerBindings[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
    @($historicalBindings.source_path|Where-Object{$_-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-ne0-or
    [string]$repairBindings[0].layer-cne'shared'-or[string]$repairBindings[0].semantic_class-cne'common-semantic-source'-or
    [string]$repairBindings[0].source_path-cne'source/prototypes/mir/runtime/effects/passive_repair.lua'-or
@@ -152,8 +160,9 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  # The admitted shared REPAIR-02 module adds one entry only to modern hosts.
-  $expectedDelta=if($target-in@('f210','f200')){35}else{104}
+  # The staged material declaration and its shared continuation planner add
+  # two entries to every current target.
+  $expectedDelta=if($target-in@('f210','f200')){37}else{106}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or
