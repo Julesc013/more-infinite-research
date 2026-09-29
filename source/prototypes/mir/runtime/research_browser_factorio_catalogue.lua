@@ -2,6 +2,9 @@
 -- browser-surface module that reads force technologies or prototype fields.
 local M = {schema = 1, catalogue_limit = 30000}
 local progression_depth_limit = 128
+-- These are prototype-derived facts. Keep them outside saved state and rebuild
+-- after a script reload; each snapshot still reads force-local research state.
+local static_by_force = {}
 
 local function available(technology)
   if not technology.enabled or technology.researched or technology.prototype.research_trigger then return false end
@@ -41,12 +44,11 @@ local function native_order(technology)
   return type(order) == "string" and string.sub(order, 1, 1024) or ""
 end
 
--- The returned value contains plain scalar copies only. MIR facts are not
--- read here and can be omitted entirely by a non-MIR consumer.
-function M.snapshot(force)
-  if not force or not force.valid then return nil, "invalid-force" end
-  local names, queued = {}, {}
-  for _, technology in ipairs(force.research_queue or {}) do queued[technology.name] = true end
+local function static_catalogue(force)
+  local index = force.index
+  local cached = type(index) == "number" and static_by_force[index] or nil
+  if cached and cached.force_name == force.name then return cached end
+  local names = {}
   for name in pairs(force.technologies) do
     names[#names + 1] = name
     if #names > M.catalogue_limit then return nil, "catalogue-limit" end
@@ -62,12 +64,36 @@ function M.snapshot(force)
     if technology then
       rows[#rows + 1] = {
         key = name,
-        available = available(technology),
-        researched = technology.researched == true,
-        queued = queued[name] == true,
         infinite = infinite(technology),
         native_order = native_order(technology),
         progression = progression[name]
+      }
+    end
+  end
+  local result = {force_name = force.name, rows = rows}
+  if type(index) == "number" then static_by_force[index] = result end
+  return result
+end
+
+-- The returned value contains plain scalar copies only. MIR facts are not
+-- read here and can be omitted entirely by a non-MIR consumer.
+function M.snapshot(force)
+  if not force or not force.valid then return nil, "invalid-force" end
+  local static, reason = static_catalogue(force)
+  if not static then return nil, reason end
+  local queued, rows = {}, {}
+  for _, technology in ipairs(force.research_queue or {}) do queued[technology.name] = true end
+  for _, fact in ipairs(static.rows) do
+    local technology = force.technologies[fact.key]
+    if technology then
+      rows[#rows + 1] = {
+        key = fact.key,
+        available = available(technology),
+        researched = technology.researched == true,
+        queued = queued[fact.key] == true,
+        infinite = fact.infinite,
+        native_order = fact.native_order,
+        progression = fact.progression
       }
     end
   end

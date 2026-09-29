@@ -7323,10 +7323,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_factorio_catalogue.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3008,
-      "source_sha256": "C785C588EB411EFE49D246A2638D32236B70FC47DDF50BEB1ACFC4956D05384D",
-      "output_bytes": 3008,
-      "output_sha256": "C785C588EB411EFE49D246A2638D32236B70FC47DDF50BEB1ACFC4956D05384D"
+      "source_bytes": 3972,
+      "source_sha256": "3BBD5A0CD1CEA954CA88A00A41E1A15B165F6C0A6C514A7FA2129324FDC6F138",
+      "output_bytes": 3972,
+      "output_sha256": "3BBD5A0CD1CEA954CA88A00A41E1A15B165F6C0A6C514A7FA2129324FDC6F138"
     },
     {
       "layer": "capability",
@@ -7625,5 +7625,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "A41BD8CE325CFD11DAC7F175B09795C7EC877F9FE094364879D183191CBF51C2"
+  "record_sha256": "C5906C83EE7FA4825ED539194B7EFE4D174FFF0D2B1860A08015999F82F37E71"
 }
