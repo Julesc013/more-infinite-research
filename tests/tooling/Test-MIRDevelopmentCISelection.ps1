@@ -43,8 +43,10 @@ function New-MIRDevelopmentCanonicalCoverageSelection {
 
 function New-MIRDevelopmentCanonicalCoveragePlan {
   return [pscustomobject][ordered]@{
-    schema=4;profile='mir4-development';source_commit=('b'*40);source_tree=('c'*40);package_source_sha256=('D'*64)
-    test_catalog_sha256=('A'*64);catalog_sha256=('A'*64);expected_test_ids=@('static.compiler','static.package','static.unrelated')
+    schema=4;profile='mir4-development';baseline=('a'*40);source_commit=('b'*40);source_tree=('c'*40);package_source_sha256=('D'*64)
+    test_catalog_sha256=('A'*64);catalog_sha256=('A'*64)
+    classification=[pscustomobject]@{paths=@('source/prototypes/example.lua');classes=@('compiler-data-stage');tests=@('static.compiler');unknown_paths=@();escalated=$false}
+    expected_test_ids=@('static.compiler','static.package','static.unrelated')
   }
 }
 
@@ -141,8 +143,25 @@ Assert-MIRDevelopmentCISelection -Condition ($identityA -cne $identityDifferentC
 
 $coverageSelection=New-MIRDevelopmentCanonicalCoverageSelection
 $coveragePlan=New-MIRDevelopmentCanonicalCoveragePlan
+$affectedSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $coverageSelection
+$affectedSelection.classification.tests=@('static.compiler','static.package')
+$initialAffectedPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $affectedSelection
+Assert-MIRDevelopmentCISelection -Condition ($initialAffectedPlan.profile -ceq 'auto' -and $initialAffectedPlan.use_baseline -and $initialAffectedPlan.use_affected_selection -and $initialAffectedPlan.selection_rows_covered_by_auto) -Message 'Known baseline-bound development selection did not reduce to its automatic affected plan.'
+$uncoveredStaticSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $affectedSelection
+$uncoveredStaticSelection.tests=@('static.compiler','static.package','static.unrelated')
+$uncoveredStaticPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $uncoveredStaticSelection
+Assert-MIRDevelopmentCISelection -Condition ($uncoveredStaticPlan.profile -ceq 'mir4-development' -and -not $uncoveredStaticPlan.use_affected_selection -and -not $uncoveredStaticPlan.selection_rows_covered_by_auto) -Message 'Development planning accepted an automatic plan that omitted a selected static row.'
+$escalatedSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $affectedSelection
+$escalatedSelection.classification.escalated=$true
+$escalatedPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $escalatedSelection
+Assert-MIRDevelopmentCISelection -Condition ($escalatedPlan.profile -ceq 'mir4-development' -and -not $escalatedPlan.use_affected_selection) -Message 'Escalated development selection was reduced to an affected plan.'
+$unavailableBaselineSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $affectedSelection
+$unavailableBaselineSelection.baseline='';$unavailableBaselineSelection.baseline_state='unavailable'
+$unavailableBaselinePlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $unavailableBaselineSelection
+Assert-MIRDevelopmentCISelection -Condition ($unavailableBaselinePlan.profile -ceq 'mir4-development' -and -not $unavailableBaselinePlan.use_baseline -and -not $unavailableBaselinePlan.use_affected_selection) -Message 'Development planning accepted an unavailable baseline for affected selection.'
 $coverage=Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $coveragePlan -CanonicalGateResult 'success'
 Assert-MIRDevelopmentCISelection -Condition ($coverage.status -ceq 'covered-by-successful-canonical-verification-gate' -and $coverage.canonical_gate_job -ceq 'verification-gate' -and $coverage.canonical_gate_result -ceq 'success') -Message 'Development coverage did not record the successful canonical gate disposition.'
+Assert-MIRDevelopmentCISelection -Condition ($coverage.plan_profile -ceq 'mir4-development') -Message 'Full development coverage did not preserve its plan profile.'
 Assert-MIRDevelopmentCISelection -Condition ($coverage.per_test_executions -eq 0 -and @($coverage.executed_test_ids).Count -eq 0) -Message 'Development coverage claimed per-test execution outside the canonical gate.'
 Assert-MIRDevelopmentCISelection -Condition (-not $coverage.release_qualification -and -not $coverage.release_readiness_gate -and -not $coverage.reuse_allowed) -Message 'Development coverage gained release, readiness, or reuse authority.'
 Assert-MIRDevelopmentCISelection -Condition ($coverage.test_catalog_raw_sha256 -cne $coverage.test_catalog_canonical_sha256 -and $coverage.test_catalog_canonical_sha256 -ceq ('A'*64)) -Message 'Canonical plan coverage did not preserve distinct raw and canonical catalogue identities.'
@@ -156,6 +175,20 @@ $rawOrderedSelection=[ordered]@{
 }
 $rawOrderedCoverage=Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $rawOrderedSelection -Plan $coveragePlan -CanonicalGateResult 'success'
 Assert-MIRDevelopmentCISelection -Condition ($rawOrderedCoverage.status -ceq 'covered-by-successful-canonical-verification-gate' -and $rawOrderedCoverage.per_test_executions -eq 0) -Message 'Canonical coverage did not accept the raw ordered selector shape returned by production.'
+$autoCoveragePlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan
+$autoCoveragePlan.profile='auto'
+$autoCoveragePlan.classification.tests=@('static.compiler','static.package')
+$autoCoverage=Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $affectedSelection -Plan $autoCoveragePlan -CanonicalGateResult 'success'
+Assert-MIRDevelopmentCISelection -Condition ($autoCoverage.plan_profile -ceq 'auto' -and $autoCoverage.selected_test_ids.Count -eq 2) -Message 'Affected automatic coverage did not retain the exact selected static rows.'
+$autoMissingClassificationPlan=Copy-MIRDevelopmentCanonicalCoverageFixture $autoCoveragePlan
+$autoMissingClassificationPlan.classification.paths=@('source/prototypes/other.lua')
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $affectedSelection -Plan $autoMissingClassificationPlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-classification-paths]' -Message 'Affected automatic coverage accepted another classified change set.'
+$autoWrongBaselinePlan=Copy-MIRDevelopmentCanonicalCoverageFixture $autoCoveragePlan
+$autoWrongBaselinePlan.baseline=('f'*40)
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $affectedSelection -Plan $autoWrongBaselinePlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-baseline]' -Message 'Affected automatic coverage accepted another baseline.'
+$autoEscalatedPlan=Copy-MIRDevelopmentCanonicalCoverageFixture $autoCoveragePlan
+$autoEscalatedPlan.classification.escalated=$true
+Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $affectedSelection -Plan $autoEscalatedPlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-classification-escalated]' -Message 'Affected automatic coverage accepted an escalated classification.'
 $wrongSourcePlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$wrongSourcePlan.source_commit=('d'*40)
 Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $wrongSourcePlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-source_commit]' -Message 'Canonical coverage accepted a plan with another source commit.'
 $wrongPackagePlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$wrongPackagePlan.package_source_sha256=('F'*64)
@@ -211,8 +244,13 @@ try {
 }
 
 $workflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/validate.yml')
+$planWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'plan'
 $developmentWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'development-static'
 $releaseWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'verification-gate'
+Assert-MIRDevelopmentCISelection -Condition $planWorkflowBlock.Contains('Get-MIR4DevelopmentCISelection') -Message 'Development affected selection is not evaluated before verification-plan materialization.'
+Assert-MIRDevelopmentCISelection -Condition $planWorkflowBlock.Contains('--profile'', $profile, ''--baseline'', $baseline') -Message 'Development affected verification plans do not bind their exact baseline.'
+Assert-MIRDevelopmentCISelection -Condition $planWorkflowBlock.Contains('Get-MIR4DevelopmentInitialPlanProfile') -Message 'Development planning does not use the bounded affected-plan selector.'
+Assert-MIRDevelopmentCISelection -Condition $planWorkflowBlock.Contains('[bool]$planning.use_baseline') -Message 'Development planning does not retain full-profile fallback for an unavailable baseline.'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('name: MIR / development-static-gate') -Message 'Development workflow gate has no distinct name.'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('Invoke-MIR4DevelopmentCanonicalCoverage') -Message 'Development workflow does not bind affected-static coverage to the canonical gate.'
 Assert-MIRDevelopmentCISelection -Condition $developmentWorkflowBlock.Contains('github.event.pull_request.base.sha') -Message 'Pull-request base identity is absent from the development selection.'
@@ -234,4 +272,4 @@ Assert-MIRDevelopmentCISelection -Condition ($localSelection.trust_scope -ceq 'l
 Assert-MIRDevelopmentCISelection -Condition (-not $localSelection.release_qualification -and -not $localSelection.release_readiness_gate -and -not $localSelection.reuse_allowed) -Message 'Local selection gained release or reusable authority.'
 & (Join-Path $repo 'tools/mir.ps1') mir4 tooling workflows-check | Out-Null
 if($LASTEXITCODE -ne 0) { throw 'Generated workflow-purpose authority does not match the workflow.' }
-Write-Host '[ok] development CI selects affected static checks by exact baseline/event/tree/mode identity, requires successful canonical plan coverage without per-test replay, escalates unknown paths within development scope, and keeps its gate distinct from release readiness.'
+Write-Host '[ok] development CI selects affected static checks before planning by exact baseline/event/tree/mode identity, uses automatic planning only when it covers every selected static row, retains full escalation and canonical coverage without per-test replay, and keeps its gate distinct from release readiness.'
