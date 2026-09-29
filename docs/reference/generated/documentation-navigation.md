@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-09-29.
+Current-page navigation generated from Markdown front matter as of 2026-09-30.
 
 ## developer
 
@@ -381,6 +381,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-29.
 - [MIR 4 Spark To Sol Handoff And Completion Plan](../../maintainer/mir4-spark-sol-handoff.md)
 - [MIR 4.0 Candidate Programme](../../releases/mir4-4.0-candidate-programme.md)
 - [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md)
+- [MIR 4.2 Nine-Target Candidate and Playtest Matrix](../../releases/mir42-nine-target-candidate-playtest-matrix.md)
 - [MIR Lower-Wave 0.17 To 0.6 Release Synthesis](../../releases/lower-wave-0.17-to-0.6-synthesis.md)
 - [More Infinite Research 3.0.0 Release Notes](../../releases/notes/release-notes-3.0.0.md)
 - [Releases](../../releases/README.md)
