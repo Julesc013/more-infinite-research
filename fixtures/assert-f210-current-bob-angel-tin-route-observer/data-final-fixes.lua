@@ -58,6 +58,63 @@ local function entries_line(entries)
   return #values == 0 and "-" or table.concat(values, "|")
 end
 
+local function expected_productivity_effects(technology_name)
+  local technology = data.raw.technology[technology_name]
+  if type(technology) ~= "table" then
+    error("MIR F210 current Bob/Angel Tin route observation missing generated technology " .. technology_name)
+  end
+  local expected, seen = {
+    ["angels-plate-tin"] = true,
+    ["angels-plate-tin-2"] = true
+  }, {}
+  for _, effect in ipairs(technology.effects or {}) do
+    if effect.type == "change-recipe-productivity" and expected[effect.recipe] then
+      if effect.change ~= 0.02 or seen[effect.recipe] then
+        error("MIR F210 current Bob/Angel Tin route observation has invalid generated effect " .. technology_name .. ":" .. tostring(effect.recipe))
+      end
+      seen[effect.recipe] = true
+    elseif effect.type == "change-recipe-productivity" then
+      error("MIR F210 current Bob/Angel Tin route observation has unexpected generated effect " .. technology_name .. ":" .. tostring(effect.recipe))
+    end
+  end
+  if not seen["angels-plate-tin"] or not seen["angels-plate-tin-2"] then
+    error("MIR F210 current Bob/Angel Tin route observation lacks one generated Angel Tin effect for " .. technology_name)
+  end
+  return technology
+end
+
+local function generated_tin_stage_observation()
+  local early_name = "recipe-prod-research_material_tin-1"
+  local continuation_name = "recipe-prod-research_material_tin-4"
+  local early = expected_productivity_effects(early_name)
+  local continuation = expected_productivity_effects(continuation_name)
+  if early.max_level ~= 3 then
+    error("MIR F210 current Bob/Angel Tin route observation early stage must end at level 3")
+  end
+  if continuation.max_level ~= "infinite" then
+    error("MIR F210 current Bob/Angel Tin route observation continuation must retain its script-managed prototype level domain")
+  end
+  for _, recipe_name in ipairs({"angels-plate-tin", "angels-plate-tin-2"}) do
+    local owners = {}
+    for owner_name, technology in pairs(data.raw.technology or {}) do
+      for _, effect in ipairs(technology.effects or {}) do
+        if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+          owners[#owners + 1] = owner_name .. ":" .. tostring(effect.change)
+        end
+      end
+    end
+    table.sort(owners)
+    local expected = early_name .. ":0.02," .. continuation_name .. ":0.02"
+    if table.concat(owners, ",") ~= expected then
+      error("MIR F210 current Bob/Angel Tin route observation owner set differs for " .. recipe_name .. ": " .. table.concat(owners, ","))
+    end
+  end
+  log("[mir-f210-current-ba-tin-observer] GENERATED"
+    .. " early=" .. early_name .. ":" .. tostring(early.max_level)
+    .. " continuation=" .. continuation_name .. ":" .. tostring(continuation.max_level)
+    .. " recipes=angels-plate-tin,angels-plate-tin-2")
+end
+
 log("[mir-f210-current-ba-tin-observer] ACTIVE_MODS " .. active_mods_line())
 compiler_context.with_active(compiler_context.new(), function()
   local input = relationships.view("input")
@@ -112,6 +169,7 @@ compiler_context.with_active(compiler_context.new(), function()
     .. " variant_enabled=" .. scalar(variant.enabled)
     .. " inputs=" .. entries_line(variant.ingredients)
     .. " results=" .. entries_line(variant.results))
+  generated_tin_stage_observation()
 end)
 
 log("[mir-f210-current-ba-tin-observer] DATA PASS read-only-finalized-contract-capture")
