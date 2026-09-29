@@ -13,7 +13,7 @@ local M = {requires_features = {"settings_profiles"}}
 local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
 local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 400
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
-local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 56, 32
+local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 124, 32
 local RESEARCH_BODY_MAX_HEIGHT = 420
 local SETTINGS_PAGE_SIZE = 12
 local RECIPE_BENEFIT_PAGE_SIZE = 12
@@ -775,10 +775,12 @@ local function detail(player, parent, v, c, width)
   button(parent, "toggle-hide", v.hidden and v.hidden[tech.name] and {"mir-browser.show"} or {"mir-browser.hide"}, {technology = tech.name})
   add_research_startup_settings(parent, portable, maximum_width)
 end
-local function filter_dropdown(parent, caption, items, selected_index, action)
+local function filter_dropdown(parent, caption, items, selected_index, action, width)
   local field = parent.add{type = "flow", direction = "vertical"}
-  label(field, caption)
-  return field.add{type = "drop-down", items = items, selected_index = selected_index, tags = {mir_browser = action}}
+  label(field, caption, width)
+  local dropdown = field.add{type = "drop-down", items = items, selected_index = selected_index, tags = {mir_browser = action}}
+  dropdown.style.width = width
+  return dropdown
 end
 local function has_family(family_names, family)
   for _, candidate in ipairs(family_names) do if candidate == family then return true end end
@@ -1081,16 +1083,19 @@ render = function(player)
   elseif v.tab == "availability" then
     pages = availability_rows(player, body, v)
   else
-    local filters = body.add{type = "flow", direction = "horizontal"}
+    local filters = body.add{type = "table", column_count = 2}
+    filters.style.horizontal_spacing = 12
+    filters.style.vertical_spacing = 8
+    local filter_width = math.max(220, math.floor((list_width + detail_width - 32) / 2))
     local family_index = 1
     for i,name in ipairs(c.family_names) do if name == v.family then family_index = i end end
     local family_items = {}
     for _, family in ipairs(c.family_names) do family_items[#family_items + 1] = family_caption(family) end
-    filter_dropdown(filters, {"mir-browser.filter-scope"}, family_items, family_index, "family")
-    filter_dropdown(filters, {"mir-browser.filter-status"}, {{"mir-browser.all-status"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, v.status, "status")
-    filter_dropdown(filters, {"mir-browser.filter-level"}, {{"mir-browser.all-levels"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, v.mode, "mode")
+    filter_dropdown(filters, {"mir-browser.filter-scope"}, family_items, family_index, "family", filter_width)
+    filter_dropdown(filters, {"mir-browser.filter-status"}, {{"mir-browser.all-status"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, v.status, "status", filter_width)
+    filter_dropdown(filters, {"mir-browser.filter-level"}, {{"mir-browser.all-levels"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, v.mode, "mode", filter_width)
     local sort_index = v.sort == "native" and 2 or v.sort == "name-asc" and 3 or v.sort == "name-desc" and 4 or 1
-    filter_dropdown(filters, {"mir-browser.filter-order"}, {{"mir-browser.order-progression"}, {"mir-browser.order-native"}, {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, sort_index, "sort")
+    filter_dropdown(filters, {"mir-browser.filter-order"}, {{"mir-browser.order-progression"}, {"mir-browser.order-native"}, {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, sort_index, "sort", filter_width)
     local has_hidden = false
     for name, is_hidden in pairs(v.hidden or {}) do
       if is_hidden == true and player.force.technologies[name] then has_hidden = true end
