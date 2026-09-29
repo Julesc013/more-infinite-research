@@ -94,7 +94,7 @@ jobs:
           }
           if ($baseline -match '^0{40}$') { $baseline = '' }
           $profile = if ($development) { 'mir4-development' } elseif ($postRelease) { 'mir4-post-release' } elseif ('${{ steps.mode.outputs.mir4_bootstrap }}' -eq 'true') { 'mir4-bootstrap' } else { 'fast' }
-          $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--candidate', $env:MIR_DEVELOPMENT_CANDIDATE, '--output', 'build/results/assurance/verification-plan.json')
+          $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--output', 'build/results/assurance/verification-plan.json')
           if ($development -and $developmentEvent) {
             . ./tools/mir/application/assurance/DevelopmentValidation.ps1
             $selection = Get-MIR4DevelopmentCISelection `
@@ -106,10 +106,10 @@ jobs:
             $planning = Get-MIR4DevelopmentInitialPlanProfile -Selection $selection
             $profile = [string]$planning.profile
             if ([bool]$planning.use_baseline) {
-              $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--baseline', $baseline, '--candidate', $env:MIR_DEVELOPMENT_CANDIDATE, '--output', 'build/results/assurance/verification-plan.json')
+              $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--baseline', $baseline, '--output', 'build/results/assurance/verification-plan.json')
             }
           }
-          ./tools/mir.ps1 verify plan @planArguments
+          ./tools/mir.ps1 verify plan --candidate $env:MIR_DEVELOPMENT_CANDIDATE @planArguments
       - id: matrix
         name: Export required work
         shell: pwsh
