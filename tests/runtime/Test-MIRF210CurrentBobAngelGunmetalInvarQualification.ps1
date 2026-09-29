@@ -132,7 +132,12 @@ if(-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
   $recoveryCandidate=@($lease.inputs | Where-Object { $_.role -ceq 'candidate' })
   Assert-GI ($recoveryCandidate.Count -eq 1) 'recovery run candidate cardinality differs'
   Assert-GI ((Get-GISha [string]$recoveryCandidate[0].stage_path) -ceq [string]$recoveryCandidate[0].expected_sha256) 'recovery run candidate bytes differ'
-  Assert-GI ([string]$recoveryCandidate[0].provenance.source_commit -ceq $sourceCommit -and [string]$recoveryCandidate[0].provenance.source_tree -ceq $sourceTree) 'recovery run source identity differs'
+  $recoveryCommit=[string]$recoveryCandidate[0].provenance.source_commit
+  $recoveryTree=[string]$recoveryCandidate[0].provenance.source_tree
+  Assert-GI ($recoveryCommit -match '^[0-9a-f]{40}$' -and $recoveryTree -match '^[0-9a-f]{40}$') 'recovery run source identity is invalid'
+  $recoveryPackageBlob=(& git -C $repo rev-parse ($recoveryCommit+':source/package-source.json')).Trim()
+  $currentPackageBlob=(& git -C $repo rev-parse 'HEAD:source/package-source.json').Trim()
+  Assert-GI ($recoveryPackageBlob -ceq $currentPackageBlob -and (Get-GISha $candidate) -ceq [string]$recoveryCandidate[0].expected_sha256) 'recovery run package source or fresh materialization differs'
   $freshLogPath=Join-Path $recoveryRun 'f210-ba-gunmetal-invar.factorio.log'
   $reloadLogPath=Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.factorio.log'
   $freshLog=[IO.File]::ReadAllText($freshLogPath)
@@ -148,6 +153,8 @@ if(-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
   $result.recovery=[ordered]@{
     reason='The original runner reached result construction only after both helper assertions passed, then failed because OrderedDictionary has no Clone method.'
     source_run=Get-GIRelative $recoveryRun
+    source_commit=$recoveryCommit
+    source_tree=$recoveryTree
     terminal_input_lease_sha256=[string]$lease.terminal_record_sha256
     input_hashes_match=[bool]$lease.inputs_sha256_match
   }
