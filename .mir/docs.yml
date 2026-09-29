@@ -2943,6 +2943,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir42-nine-target-candidate-playtest-matrix
+  - path: docs/releases/MIR42-nine-target-rehearsal-input-gap-2026-09-30.md
+    title: "MIR 4.2 nine-target rehearsal input gap"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir42-nine-target-rehearsal-input-gap
   - path: docs/releases/mir42-playtest-findings.md
     title: "MIR 4.2 Playtest Findings"
     status: current

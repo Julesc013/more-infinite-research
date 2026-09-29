@@ -1,5 +1,15 @@
 ---
 title: MIR 4.2 nine-target rehearsal input gap
+status: current
+applies_to: "MIR 4.2 pre-freeze rehearsal"
+audience: release-manager
+doc_type: reference
+owner: mir-maintainers
+last_reviewed: 2026-09-30
+supersedes: []
+superseded_by: []
+source_of_truth_for:
+  - mir42-nine-target-rehearsal-input-gap
 description: Candidate-bound inputs required before an executable nine-target release rehearsal.
 ---
 
