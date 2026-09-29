@@ -9,6 +9,10 @@ local M = {
   detail_node_limit = 256,
   detail_string_limit = 1024,
   detail_key_length = 160,
+  detail_summary_recipe_limit = 12,
+  detail_summary_science_ingredient_limit = 16,
+  detail_summary_owner_recipe_limit = 12,
+  detail_recipe_benefit_window_limit = 64,
   enrichment_schema = 2,
   enrichment_kind = "portable-research-enrichment"
 }
@@ -370,6 +374,24 @@ local function valid_setting(value, expected_name, expected_type)
     and value.restart_required == true
 end
 
+-- Maximum-level settings use zero to mean an unbounded configured value.
+-- A rich finite detail still needs a strictly positive effective cap, but its
+-- default and directly configured values must retain that valid zero value.
+local function valid_maximum_level_setting(value, expected_name)
+  local values_are_valid = type(value) == "table"
+    and finite_nonnegative_integer(value.default)
+    and finite_nonnegative_integer(value.raw_direct)
+    and finite_positive_integer(value.effective)
+  return values_are_valid
+    and only_fields(value, {name = true, default = true, raw_direct = true, effective = true,
+      source = true, changed = true, changed_from_default = true, restart_required = true})
+    and value.name == expected_name and (value.source == "direct" or value.source == "mirset1")
+    and type(value.changed) == "boolean" and type(value.changed_from_default) == "boolean"
+    and value.changed == (not same_scalar(value.raw_direct, value.effective))
+    and value.changed_from_default == (not same_scalar(value.default, value.effective))
+    and value.restart_required == true
+end
+
 -- This setting shape deliberately differs from valid_setting(): maximum-level
 -- zero is the declared unbounded selection, while ordinary positive settings
 -- remain validated by the richer generated-stream detail contract above.
@@ -490,7 +512,7 @@ local function valid_schema2_detail(detail, key, family, cap)
     local settings = detail.settings
     if not finite_positive_integer(detail.effective_cap) or detail.effective_cap ~= cap
       or type(settings) ~= "table" or not only_fields(settings, {maximum_level = true, enabled = true})
-      or not valid_setting(settings.maximum_level, "ips-max-level-" .. family, "number")
+      or not valid_maximum_level_setting(settings.maximum_level, "ips-max-level-" .. family)
       or not valid_setting(settings.enabled, "ips-enable-" .. family, "boolean")
       or settings.maximum_level.effective ~= cap then return false end
   elseif detail.effective_cap ~= nil or detail.settings ~= nil then
@@ -669,9 +691,11 @@ local function sort_rows(left, right, sort)
   return left.key < right.key
 end
 
--- Query only accepts copied, plain catalogue DTOs. It returns a fresh plain
--- page so a consumer cannot retain adapter-owned state.
-function M.query(catalogue, view, enrichment, localized_search, selected_key)
+-- Select and sort once, then let the public query shapes decide whether to
+-- expose a bounded legacy page or a lightweight continuous-list record set.
+-- Neither shape contains provider detail; rich data remains selected-subject
+-- work so a long catalogue cannot turn a filter update into detail copying.
+local function selected_rows(catalogue, view, enrichment, localized_search, selected_key)
   if type(catalogue) ~= "table" or catalogue.schema ~= M.schema or type(catalogue.rows) ~= "table" then return nil, "invalid-catalogue" end
   if #catalogue.rows > M.catalogue_limit then return nil, "catalogue-limit" end
   enrichment = M.normalize_enrichment(enrichment)
@@ -717,9 +741,11 @@ function M.query(catalogue, view, enrichment, localized_search, selected_key)
     if left.key == right.key then return false end
     return sort_rows(left, right, v.sort)
   end)
-  local pages = math.max(1, math.ceil(#selected / M.page_size))
-  local page = math.min(v.page, pages)
-  local rows, first, last = {}, (page - 1) * M.page_size + 1, math.min(page * M.page_size, #selected)
+  return selected, selected_visible, v
+end
+
+local function copied_rows(selected, first, last, localized_search)
+  local rows = {}
   for index = first, last do
     local chosen = selected[index]
     local row = copy_row(chosen.source)
@@ -727,42 +753,260 @@ function M.query(catalogue, view, enrichment, localized_search, selected_key)
     row.display_name = chosen.display_name or displayed_label(localized_search, row.key)
     rows[#rows + 1] = row
   end
+  return rows
+end
+
+-- Query only accepts copied, plain catalogue DTOs. It retains the historical
+-- fixed-size page contract for developer callers.
+function M.query(catalogue, view, enrichment, localized_search, selected_key)
+  local selected, selected_visible, v = selected_rows(catalogue, view, enrichment, localized_search, selected_key)
+  if not selected then return nil, selected_visible end
+  local pages = math.max(1, math.ceil(#selected / M.page_size))
+  local page = math.min(v.page, pages)
+  local first, last = (page - 1) * M.page_size + 1, math.min(page * M.page_size, #selected)
   return {
-    schema = M.schema, rows = rows, count = #selected, pages = pages, page = page,
+    schema = M.schema, rows = copied_rows(selected, first, last, localized_search), count = #selected, pages = pages, page = page,
     page_size = M.page_size, sort = v.sort, requested_sort = v.requested_sort,
     name_index_ready = v.name_index_ready, selected_visible = selected_visible
   }
 end
 
-function M.detail(catalogue, key, enrichment)
-  if type(catalogue) ~= "table" or catalogue.schema ~= M.schema or type(key) ~= "string" then return nil, "invalid-detail-request" end
-  enrichment = M.normalize_enrichment(enrichment)
+-- Continuous player views need one ordered lightweight record collection,
+-- not a disguised enormous page size. The host remains responsible for its
+-- actual widget budget and can retain or incrementally present these rows.
+-- This function deliberately omits pages and page_size so callers do not
+-- mistake the returned collection for the legacy paginator contract.
+function M.query_all(catalogue, view, enrichment, localized_search, selected_key)
+  local selected, selected_visible, v = selected_rows(catalogue, view, enrichment, localized_search, selected_key)
+  if not selected then return nil, selected_visible end
+  return {
+    schema = M.schema, rows = copied_rows(selected, 1, #selected, localized_search), count = #selected,
+    sort = v.sort, requested_sort = v.requested_sort,
+    name_index_ready = v.name_index_ready, selected_visible = selected_visible
+  }
+end
+
+local function copy_recipe_benefit(benefit)
+  return {
+    recipe_id = benefit.recipe_id,
+    effect_change = benefit.effect_change,
+    current_productivity_bonus = benefit.current_productivity_bonus,
+    maximum_productivity = benefit.maximum_productivity,
+    next_level_has_effective_benefit = benefit.next_level_has_effective_benefit
+  }
+end
+
+local function copy_science_ingredient(ingredient)
+  return {name = ingredient.name, amount = ingredient.amount}
+end
+
+local function copied_prefix(values, limit, copier)
+  local result = {}
+  for index = 1, math.min(#values, limit) do result[index] = copier(values[index]) end
+  return result
+end
+
+local function copy_string(value)
+  return value
+end
+
+local function copy_setting(value)
+  return {
+    name = value.name,
+    default = value.default,
+    raw_direct = value.raw_direct,
+    effective = value.effective,
+    source = value.source,
+    changed = value.changed,
+    changed_from_default = value.changed_from_default,
+    restart_required = value.restart_required
+  }
+end
+
+-- A schema-2 provider can legitimately describe a research that affects far
+-- more rows than the generic copied-detail budget. Return a bounded summary
+-- in that case and make every omitted collection explicit. The exact recipe
+-- facts remain available through detail_recipe_benefits() below; a valid
+-- broad research must never make its entire detail panel disappear.
+local function copy_schema2_detail_summary(detail)
+  if type(detail.owner) ~= "table" then
+    return copy_plain(detail, {nodes = 0}, 0)
+  end
+  local owner_ids = detail.owner.affected_recipe_ids
+  local benefits = detail.recipe_benefits
+  local ingredients = detail.final_science.ingredients
+  local result = {
+    schema = detail.schema,
+    family = detail.family,
+    action = detail.action,
+    owner = {
+      technology_id = detail.owner.technology_id,
+      stream_id = detail.owner.stream_id,
+      action = detail.owner.action,
+      reason = detail.owner.reason,
+      affected_recipe_ids = copied_prefix(owner_ids, M.detail_summary_owner_recipe_limit, copy_string),
+      affected_recipe_count = #owner_ids,
+      affected_recipe_ids_complete = #owner_ids <= M.detail_summary_owner_recipe_limit
+    },
+    compiler_disposition = {
+      inclusion = detail.compiler_disposition.inclusion,
+      action = detail.compiler_disposition.action,
+      reason = detail.compiler_disposition.reason,
+      route_exclusions = {
+        state = detail.compiler_disposition.route_exclusions.state,
+        recipe_ids = {}
+      }
+    },
+    final_science = {
+      rationale = detail.final_science.rationale,
+      ingredients = copied_prefix(ingredients, M.detail_summary_science_ingredient_limit, copy_science_ingredient),
+      ingredient_count = #ingredients,
+      ingredients_complete = #ingredients <= M.detail_summary_science_ingredient_limit
+    },
+    current_level = detail.current_level,
+    recipe_benefits = copied_prefix(benefits, M.detail_summary_recipe_limit, copy_recipe_benefit),
+    recipe_benefit_count = #benefits,
+    recipe_benefits_complete = #benefits <= M.detail_summary_recipe_limit,
+    next_level_eligible = detail.next_level_eligible,
+    next_level_has_effective_benefit = detail.next_level_has_effective_benefit
+  }
+  if detail.effective_cap ~= nil then result.effective_cap = detail.effective_cap end
+  if detail.settings ~= nil then
+    result.settings = {
+      maximum_level = copy_setting(detail.settings.maximum_level),
+      enabled = copy_setting(detail.settings.enabled)
+    }
+  end
+  return result
+end
+
+local function find_catalogue_row(catalogue, key)
+  if type(catalogue) ~= "table" or catalogue.schema ~= M.schema or type(key) ~= "string" then
+    return nil, "invalid-detail-request"
+  end
   for _, source in ipairs(catalogue.rows or {}) do
-    if type(source) == "table" and source.key == key then
-      local row = copy_row(source)
-      row.cap, row.family = positive_cap(enrichment, key), family_for(enrichment, key)
-      row.infinite = row.infinite and not row.cap
-      local details = enrichment and enrichment.details and enrichment.details[key]
-      local copied, runtime_settings_binding, reason
-      if type(details) == "table" then
-        copied, reason = copy_plain(details, {nodes = 0}, 0)
-        if reason then return nil, reason end
-      end
-      -- Schema-1 is a historical generic envelope. It has no validated
-      -- runtime-settings witness, even if an untrusted caller appends a field
-      -- named like the schema-2 bridge.
-      local binding = enrichment and enrichment.schema == M.enrichment_schema
-        and enrichment.kind == M.enrichment_kind and enrichment.runtime_settings_bindings
-        and enrichment.runtime_settings_bindings[key]
-      if type(binding) == "table" then
-        runtime_settings_binding, reason = copy_plain(binding, {nodes = 0}, 0)
-        if reason then return nil, reason end
-      end
-      return {schema = M.schema, technology = row, enrichment = copied,
-        runtime_settings_binding = runtime_settings_binding}
-    end
+    if type(source) == "table" and source.key == key then return source end
   end
   return nil, "unknown-technology"
+end
+
+-- Resolve a schema-2 recipe collection only after the provider envelope has
+-- passed its full validation. Keeping this lookup private means the public
+-- collection helpers never hand an adapter a provider-owned table.
+local function validated_recipe_benefits(catalogue, key, enrichment)
+  local source, source_reason = find_catalogue_row(catalogue, key)
+  if not source then return nil, nil, source_reason end
+  local normalized = M.normalize_enrichment(enrichment)
+  local detail = normalized and normalized.schema == M.enrichment_schema
+    and normalized.kind == M.enrichment_kind and normalized.details and normalized.details[key]
+  local benefits = type(detail) == "table" and detail.recipe_benefits or nil
+  return source, type(benefits) == "table" and benefits or nil
+end
+
+local function include_summary_range(summary, minimum, maximum, value)
+  if summary[minimum] == nil or value < summary[minimum] then summary[minimum] = value end
+  if summary[maximum] == nil or value > summary[maximum] then summary[maximum] = value end
+end
+
+-- Return the complete lightweight recipe index for one selected research.
+-- Native list controls can use the stable IDs as captions (or look up their
+-- localized recipe names) without constructing a rich widget tree for every
+-- recipe. This is deliberately one validated access per selected detail;
+-- callers should not drain detail_recipe_benefits() merely to build a list.
+-- The summary lets a detail pane describe the whole collection without
+-- inspecting every rich recipe record again.
+function M.detail_recipe_index(catalogue, key, enrichment)
+  local source, benefits, source_reason = validated_recipe_benefits(catalogue, key, enrichment)
+  if not source then return nil, source_reason end
+  local ids = {}
+  local summary = {
+    count = 0,
+    effective_recipe_count = 0,
+    effect_change_min = nil,
+    effect_change_max = nil,
+    current_productivity_bonus_min = nil,
+    current_productivity_bonus_max = nil,
+    maximum_productivity_min = nil,
+    maximum_productivity_max = nil
+  }
+  for index, benefit in ipairs(benefits or {}) do
+    ids[index] = benefit.recipe_id
+    summary.count = summary.count + 1
+    if benefit.next_level_has_effective_benefit then
+      summary.effective_recipe_count = summary.effective_recipe_count + 1
+    end
+    include_summary_range(summary, "effect_change_min", "effect_change_max", benefit.effect_change)
+    include_summary_range(summary, "current_productivity_bonus_min", "current_productivity_bonus_max",
+      benefit.current_productivity_bonus)
+    include_summary_range(summary, "maximum_productivity_min", "maximum_productivity_max",
+      benefit.maximum_productivity)
+  end
+  return {schema = M.schema, technology = source.key, ids = ids, summary = summary}
+end
+
+-- Return a bounded, explicitly resumable collection of validated recipe facts.
+-- offset is one-based and limit is clamped to the fixed internal work budget.
+-- This is a data-access cursor, not a player-facing paginator: hosts may
+-- present it in any continuous scrolling form their target can support.
+function M.detail_recipe_benefits(catalogue, key, enrichment, offset, limit)
+  local source, benefits, source_reason = validated_recipe_benefits(catalogue, key, enrichment)
+  if not source then return nil, source_reason end
+  if type(benefits) ~= "table" then
+    return {schema = M.schema, technology = source.key, count = 0, offset = 1, rows = {}, complete = true}
+  end
+  local requested_offset = tonumber(offset)
+  local start = finite_nonnegative_integer(requested_offset) and requested_offset or 1
+  start = math.max(1, math.min(start, #benefits + 1))
+  local requested_limit = tonumber(limit)
+  local requested = finite_positive_integer(requested_limit) and requested_limit
+    or M.detail_recipe_benefit_window_limit
+  requested = math.min(requested, M.detail_recipe_benefit_window_limit)
+  local last = math.min(#benefits, start + requested - 1)
+  local rows = {}
+  for index = start, last do rows[#rows + 1] = copy_recipe_benefit(benefits[index]) end
+  local complete = last >= #benefits
+  local next_offset = nil
+  if not complete then next_offset = last + 1 end
+  return {
+    schema = M.schema,
+    technology = source.key,
+    count = #benefits,
+    offset = start,
+    rows = rows,
+    complete = complete,
+    next_offset = next_offset
+  }
+end
+
+function M.detail(catalogue, key, enrichment)
+  local source, source_reason = find_catalogue_row(catalogue, key)
+  if not source then return nil, source_reason end
+  enrichment = M.normalize_enrichment(enrichment)
+  local row = copy_row(source)
+  row.cap, row.family = positive_cap(enrichment, key), family_for(enrichment, key)
+  row.infinite = row.infinite and not row.cap
+  local details = enrichment and enrichment.details and enrichment.details[key]
+  local copied, runtime_settings_binding, reason
+  if type(details) == "table" then
+    if enrichment.schema == M.enrichment_schema and enrichment.kind == M.enrichment_kind then
+      copied, reason = copy_schema2_detail_summary(details)
+    else
+      copied, reason = copy_plain(details, {nodes = 0}, 0)
+    end
+    if reason then return nil, reason end
+  end
+  -- Schema-1 is a historical generic envelope. It has no validated
+  -- runtime-settings witness, even if an untrusted caller appends a field
+  -- named like the schema-2 bridge.
+  local binding = enrichment and enrichment.schema == M.enrichment_schema
+    and enrichment.kind == M.enrichment_kind and enrichment.runtime_settings_bindings
+    and enrichment.runtime_settings_bindings[key]
+  if type(binding) == "table" then
+    runtime_settings_binding, reason = copy_plain(binding, {nodes = 0}, 0)
+    if reason then return nil, reason end
+  end
+  return {schema = M.schema, technology = row, enrichment = copied,
+    runtime_settings_binding = runtime_settings_binding}
 end
 
 function M.family_names(enrichment)
