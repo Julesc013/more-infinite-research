@@ -120,7 +120,7 @@ function Invoke-BrowserEngine([string[]]$Arguments) {
  $start.UseShellExecute=$false; $start.CreateNoWindow=$true; $start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
  $start.Environment["SteamAppId"]="427520"; $start.Environment["SteamGameId"]="427520"
  $start.RedirectStandardOutput=$true; $start.RedirectStandardError=$true
- $graphicsArguments=if($Arguments -contains '--benchmark-graphics') { @('--force-graphics-preset','low','--video-memory-usage','low') } else { @() }
+ $graphicsArguments=if($Arguments -contains '--benchmark-graphics') { @('--force-graphics-preset','low','--video-memory-usage','low','--single-thread-loading') } else { @() }
  foreach($arg in @('--config',(Join-Path $run 'config.ini'),'--mod-directory',(Join-Path $run 'mods'))+$graphicsArguments+$Arguments) { $start.ArgumentList.Add($arg) }
  $process=[Diagnostics.Process]::Start($start)
  $stdout=$process.StandardOutput.ReadToEndAsync(); $stderr=$process.StandardError.ReadToEndAsync()
