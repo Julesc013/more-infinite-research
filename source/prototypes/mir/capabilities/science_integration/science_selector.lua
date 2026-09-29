@@ -3,6 +3,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
+local recipe_unlock_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
 local effective_settings = require("prototypes.mir.settings.effective")
 local compatibility_policy = require("prototypes.mir.compatibility.policy_authority")
 
@@ -122,7 +123,18 @@ end
 local function science_from_unlocks(key, spec)
   local out, seen = {}, {}
   for _, recipe_name in ipairs(stream_recipe_names(key, spec)) do
-    for _, tech_name in ipairs(science.researchable_unlockers_for_recipe(recipe_name)) do
+    -- A derived stream also derives the prerequisite technology below.  It is
+    -- safe to use the ordinary fallback only when a recipe was available from
+    -- the start.  Treating a recipe with no *researchable* unlocker as an
+    -- early recipe would otherwise let a generated technology bypass an
+    -- unreachable external science or prerequisite cycle.  That occurs in
+    -- content-heavy packs often enough that this must remain a generic
+    -- provenance rule rather than a set of mod-name exceptions.
+    local unlockers = science.researchable_unlockers_for_recipe(recipe_name)
+    if not recipe_unlock_facts.recipe_enabled_without_research(recipe_name) and #unlockers == 0 then
+      return {}, "research-locked-recipe-has-no-researchable-unlocker"
+    end
+    for _, tech_name in ipairs(unlockers) do
       local tech = data_raw.technology(tech_name)
       for _, ingredient in ipairs(((tech and tech.unit) and tech.unit.ingredients) or {}) do
         append_ingredient(out, seen, ingredient_name(ingredient), ingredient_amount(ingredient))
@@ -188,7 +200,15 @@ function M.pick_science_for_stream(spec, key)
   if desired == "all" then
     for _, p in ipairs(science.pack_list_all()) do add_if_science_pack_exists(packs, p) end
   elseif desired == "derive-from-unlocks" then
-    for _, ingredient in ipairs(science_from_unlocks(key, spec)) do
+    local derived, reason = science_from_unlocks(key, spec)
+    if reason then
+      -- Do not let an overlay, a hard-coded default, or an ingredient
+      -- expansion turn an unavailable unlock chain into a research gate that
+      -- looks valid. The compiler will retain its existing no-compatible-set
+      -- failure path for this stream.
+      return {}
+    end
+    for _, ingredient in ipairs(derived) do
       add_if_science_pack_exists(packs, ingredient_name(ingredient))
     end
   elseif type(desired) == "table" then

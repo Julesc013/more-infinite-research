@@ -6,6 +6,10 @@ local values = {
 }
 local roles = {}
 local unreachable = {}
+local derived_buckets = {}
+local initially_available_recipes = {}
+local derived_unlockers = {}
+local native_owner_rejections = {}
 local active_mods = {Krastorio2='2.1.2', ['Krastorio2-spaced-out']='2.0.13'}
 local known = {'automation-science-pack','logistic-science-pack','military-science-pack',
   'chemical-science-pack','production-science-pack','utility-science-pack','space-science-pack',
@@ -26,7 +30,10 @@ stub('prototypes.mir.platform.factorio.prototype_lookup', {is_space_age=function
 local registry = {science_pack_exists=function(n) return exists[n]==true end}
 stub('prototypes.mir.capabilities.science_integration.pack_registry',registry)
 stub('prototypes.mir.streams.registry',{shared={per_level_default=0.1}})
-stub('prototypes.mir.capabilities.recipe_productivity.recipe_matching',{buckets_view=function() return {} end})
+stub('prototypes.mir.capabilities.recipe_productivity.recipe_matching',{buckets_view=function(key) return derived_buckets[key] or {} end})
+stub('prototypes.mir.capabilities.science_integration.recipe_unlock_facts',{
+ recipe_enabled_without_research=function(recipe_name) return initially_available_recipes[recipe_name] == true end
+})
 stub('prototypes.mir.compatibility.policy_authority',{science_roles_for_stream=function(_) return roles end})
 stub('prototypes.mir.platform.factorio.mods',{snapshot=function() return active_mods end})
 local lab = require('prototypes.mir.capabilities.science_integration.lab_compatibility')
@@ -40,6 +47,8 @@ local science = {
   local out={}; for _, n in ipairs(known) do if not n:match('^kr%-') then out[#out+1]=n end end; return out
  end,
  is_official_science_pack=function(n) return not n:match('^kr%-') end,
+ researchable_unlockers_for_recipe=function(recipe_name) return derived_unlockers[recipe_name] or {} end,
+ technology_researchability_reason=function(technology_name) return native_owner_rejections[technology_name] end,
  best_lab_compatible_ingredients=lab.best_lab_compatible_ingredients,
  valid_research_ingredients=lab.valid_research_ingredients
 }
@@ -116,6 +125,104 @@ values['mir-science-pack-ingredient-policy']='configured'
 selected=selector.pick_science_for_stream({science_packs={'space-science-pack'}},'research_ice')
 check('S04',has(selected,'cryogenic-science-pack'),'Declared hard-required cryogenic pack defeats exclusion')
 roles={}
+-- Derivation must not recast a research-locked external recipe with no
+-- researchable unlocker as an early base-science technology. This is a
+-- controlled provenance law for dense overhauls, not a claim about any one
+-- external modpack.
+derived_buckets={derived_blocked={{recipes={'blocked-external-route'}}}}
+initially_available_recipes={}
+derived_unlockers={['blocked-external-route']={}}
+selected=selector.pick_science_for_stream({science_packs='derive-from-unlocks'},'derived_blocked')
+check('S05',#selected==0,'Unreachable derived unlock blocks instead of falling back to early science')
+-- The previous fallback still applies to a recipe genuinely available at game
+-- start. That case has no unlocker by design and is not an unavailable route.
+derived_buckets={derived_initial={{recipes={'initial-route'}}}}
+initially_available_recipes={['initial-route']=true}
+derived_unlockers={['initial-route']={}}
+selected=selector.pick_science_for_stream({science_packs='derive-from-unlocks'},'derived_initial')
+check('S06',has(selected,'automation-science-pack') and has(selected,'chemical-science-pack'),
+  'Initially available derived route retains the ordinary early-science fallback')
+-- A valid external unlock keeps its exact science ingredient rather than the
+-- fallback. The fact is synthetic; the rule is shared across integrations.
+exists['overhaul-science-pack']=true
+data.raw.technology['derived-external-unlock']={unit={ingredients={{'overhaul-science-pack',1}}}}
+derived_buckets={derived_reachable={{recipes={'reachable-external-route'}}}}
+initially_available_recipes={}
+derived_unlockers={['reachable-external-route']={'derived-external-unlock'}}
+selected=selector.pick_science_for_stream({science_packs='derive-from-unlocks'},'derived_reachable')
+check('S07',#selected==1 and has(selected,'overhaul-science-pack'),
+  'Reachable derived unlock retains its external science provenance')
+derived_buckets={}
+initially_available_recipes={}
+derived_unlockers={}
+
+-- Native-owner adoption modifies an external technology. It must reject a
+-- present owner whose full research route has become unavailable, then leave
+-- eligible recipes for ordinary MIR generation. The reason values stand in
+-- for the shared technology-researchability service's disabled, cyclic and
+-- unreachable-science answers; this is a controlled adapter regression, not
+-- a claim about a particular overhaul's final technology graph.
+stub('prototypes.mir.index.productivity_owners',{
+ recipe_productivity_effects=function(owner) return owner.effects or {} end,
+ recipe_outputs_any_product=function(_, _) return true end,
+ has_recipe_productivity_effect=function(owner, recipe_name)
+  for _, effect in ipairs(owner.effects or {}) do
+   if effect.type=='change-recipe-productivity' and effect.recipe==recipe_name then return true end
+  end
+  return false
+ end,
+ recipe_allows_productivity=function(_) return true end
+})
+stub('prototypes.mir.settings.catalog',{is_default_value=function(_, _) return true end})
+stub('prototypes.mir.settings.effect_contracts',{stream_setting_name=function(key) return 'ips-effect-per-level-'..key end,
+ stream_descriptor=function(_) return {display_multiplier=1} end})
+stub('prototypes.mir.domain.native_owner.cost_model',{
+ classify=function(_, _, _) return {research_cost_model='controlled'} end,
+ configure=function(model, _) return {count=1,count_formula='1',model=model.research_cost_model}, nil end
+})
+stub('prototypes.mir.domain.native_owner.contract',{
+ snapshot=function(owner) return {name=owner.name,max_level=owner.max_level,prerequisites=owner.prerequisites,unit=owner.unit,effects=owner.effects} end,
+ fingerprint=function(_) return 'controlled' end
+})
+stub('prototypes.mir.platform.factorio.target_line',{feature_enabled=function(name)
+ return name=='scripted_techs' or name=='productivity_family_adoption'
+end})
+values['ips-cost-base-native_owner_probe']=8000
+values['ips-cost-linear-increment-native_owner_probe']=0
+values['ips-cost-growth-native_owner_probe']=2
+values['ips-max-level-native_owner_probe']=0
+values['ips-research-time-native_owner_probe']=60
+values['ips-effect-per-level-native_owner_probe']=0.1
+local native_owner_binding=require('prototypes.mir.planner.native_owner_binding')
+data.raw.technology['native-owner-probe']={
+ name='native-owner-probe', max_level='infinite', unit={count=1,ingredients={{'automation-science-pack',1}}},
+ effects={{type='change-recipe-productivity',recipe='already-owned-route',change=0.1}}
+}
+local native_owner_spec={native_owner_binding={
+ owner='native-owner-probe', eligibility={require_infinite=true,require_existing_recipe_productivity_effects=true},
+ effect_scope={type='change-recipe-productivity',products={'native-product'}}, cost_model={}
+}}
+local native_owner_buckets={{change=0.1,recipes={'new-native-route'}}}
+native_owner_rejections={}
+local _,native_effects,native_blocked,native_owner_name,native_plan,native_reason=
+ native_owner_binding.plan('native_owner_probe',native_owner_spec,native_owner_buckets)
+check('N01',native_plan and native_plan.operation=='adopt_native_owner_effects'
+ and native_owner_name=='native-owner-probe' and #native_effects==1 and #native_blocked==0 and native_reason==nil,
+ 'Reachable native owner can adopt its eligible route')
+for _, case in ipairs({
+ {id='N02',rejection='disabled'},
+ {id='N03',rejection='unreachable-prerequisite'},
+ {id='N04',rejection='unreachable-science-overhaul-pack'}
+}) do
+ native_owner_rejections={['native-owner-probe']=case.rejection}
+ local fallback, effects, blocked, owner_name, plan, reason=
+  native_owner_binding.plan('native_owner_probe',native_owner_spec,native_owner_buckets)
+ check(case.id,plan==nil and owner_name==nil and #effects==0 and #fallback==1
+  and fallback[1].recipes[1]=='new-native-route' and #blocked==1
+  and blocked[1].owner=='native-owner-probe' and reason=='owner_'..case.rejection,
+  'Unreachable native owner ('..case.rejection..') falls back without adoption')
+end
+native_owner_rejections={}
 data.raw.lab={
  early={inputs={'automation-science-pack','logistic-science-pack','military-science-pack','chemical-science-pack'}},
  late={inputs={'space-science-pack','kr-matter-tech-card'}}
