@@ -49,7 +49,7 @@ end
 local function expect_mass_research(enabled, visible)
   local technology = technology_for(game.forces["mass-research"])
   if technology.level < 4 or technology.enabled ~= enabled
-      or technology.visible_when_disabled ~= visible then
+      or (visible ~= nil and technology.visible_when_disabled ~= visible) then
     fail("mass-research cap state differs"
       .. " level=" .. tostring(technology.level)
       .. " enabled=" .. tostring(technology.enabled)
@@ -119,7 +119,9 @@ script.on_event(defines.events.on_tick, function()
     -- only MIR's visibility write and leave its enablement disabled.
     expect("owned", true, false)
     expect("foreign-disabled", false, false)
-    expect_mass_research(true, false)
+    -- Research-all may independently change Factorio's visibility value;
+    -- relaxing MIR's cap owns enablement here, not that engine value.
+    expect_mass_research(true, nil)
     state.phase = "relaxed"
     save("relaxed", "mir42-f200-settings-cap-transition-relaxed")
   end
