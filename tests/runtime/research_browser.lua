@@ -618,6 +618,10 @@ script.on_nth_tick(1,function()
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="queue"}),
       "native queue tab opens for the connected player")
     local queue_root=actual.gui.screen.mir_research_browser
+    local queue_body=queue_root and queue_root["mir_browser_body"]
+    check(queue_root and queue_root.style.maximal_width<=620 and queue_body
+      and (queue_body.style.minimal_width or 0)==0,
+      "Queue no longer reserves the two-pane research width")
     local active_down=find_browser_queue_control(queue_root,1,"queue-down")
     local pending_down=find_browser_queue_control(queue_root,2,"queue-down")
     local last_up=find_browser_queue_control(queue_root,3,"queue-up")
@@ -667,6 +671,10 @@ script.on_nth_tick(1,function()
     end
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="availability"}),"native Availability GUI")
     local availability_root=actual.gui.screen.mir_research_browser
+    local availability_body=availability_root and availability_root["mir_browser_body"]
+    check(availability_root and availability_root.style.maximal_width<=656 and availability_body
+      and (availability_body.style.minimal_width or 0)==0,
+      "Availability uses compact columns without a full-width empty body")
     check(find_browser_element(availability_root,"mir_browser","availability").toggled,
       "Availability visibly selects its navigation button")
     if has_omission_transport then
