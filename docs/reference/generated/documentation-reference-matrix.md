@@ -330,6 +330,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir42-current-engine-api-review | [Current Factorio 2.1 API Review for MIR 4.2](../../compatibility/factorio-2.1-current-api-review.md) | current |
 | mir42-current-playtest-findings | [MIR 4.2 Playtest Findings](../../releases/mir42-playtest-findings.md) | current |
 | mir42-nine-target-candidate-playtest-matrix | [MIR 4.2 Nine-Target Candidate and Playtest Matrix](../../releases/mir42-nine-target-candidate-playtest-matrix.md) | current |
+| mir42-nine-target-rehearsal-input-gap | [MIR 4.2 nine-target rehearsal input gap](../../releases/MIR42-nine-target-rehearsal-input-gap-2026-09-30.md) | current |
 | mir42-player-compatibility-playtest-plan | [MIR 4.2 Compatibility Scope and Player Playtest Plan](../../releases/mir42-compatibility-playtest-plan.md) | current |
 | mod-interaction-graph-command | [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md) | current |
 | modpack-campaign-evidence-contract | [Modpack Campaigns](../../maintainer/modpack-campaigns.md) | current |

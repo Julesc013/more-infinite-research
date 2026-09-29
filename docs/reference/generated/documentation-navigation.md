@@ -367,6 +367,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-30.
 - [MIR 3 Terminal .5 Baseline Capture](../../releases/mir-3-terminal-dot5-baseline-capture.md)
 - [MIR 3 Terminal Release and MIR 4 Handoff Guide](../../releases/mir3-terminal-release-and-mir4-handoff.md)
 - [MIR 3.2.2 To 3.2.3 Repository Change Report](../../releases/3.2.2-to-3.2.3-repository-change-report.md)
+- [MIR 4.2 nine-target rehearsal input gap](../../releases/MIR42-nine-target-rehearsal-input-gap-2026-09-30.md)
 - [MIR Control Plane Dashboard](../../releases/control-plane-dashboard.md)
 - [Release Archive](../../releases/archive/README.md)
 - [Release Plan Template](../../templates/release-plan-template.md)
