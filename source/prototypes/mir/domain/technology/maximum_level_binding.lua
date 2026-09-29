@@ -81,7 +81,8 @@ end
 
 local function new_binding(input, options)
   local cap = effective_cap(input.requested_cap)
-  local strategy = strategies(cap, options.scripted_techs_supported == true)
+  local strategy = strategies(cap,
+    options.scripted_techs_supported == true and input.native_finite_stage ~= true)
   local scope = input.scope
   local binding = {
     schema = SCHEMA,
@@ -112,7 +113,7 @@ local function new_binding(input, options)
     presentation_strategy = strategy.presentation,
     target_requirements = {
       target_profile = options.target_profile or "unknown",
-      scripted_techs = finite_cap(cap) ~= nil,
+      scripted_techs = strategy.runtime.mode == "absolute-cap-controller",
       scripted_techs_supported = options.scripted_techs_supported == true,
       mod_data_transport_supported = options.mod_data_supported == true,
       finalizer_adapter = KNOWN_FINALIZER_ADAPTER
@@ -165,8 +166,10 @@ local function candidate_rows(plan, options)
         stream_id = row.manifest_id or row.stream_key,
         family_id = row.family_id or row.stream_key,
         manifest_id = row.manifest_id,
-        setting_name = "ips-max-level-" .. tostring(row.stream_key),
+        setting_name = "ips-max-level-" .. tostring(row.configured_stream_key or row.stream_key),
         requested_cap = row.planned_max_level,
+        native_finite_stage = row.spec and row.spec.staged_progression
+          and row.stage_kind ~= "material-continuation",
         source = "generated-stream",
         scope = "exact-stream",
         operation = "emit"

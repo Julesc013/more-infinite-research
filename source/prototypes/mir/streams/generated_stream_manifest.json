@@ -1414,6 +1414,246 @@
       "targets": [
         "stream:research_material_white_paving"
       ]
+    },
+    "recipe-prod-research_material_aluminium-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_aluminium",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_aluminium-4",
+      "stream_key": "research_material_aluminium__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_aluminium"
+      ]
+    },
+    "recipe-prod-research_material_gold-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_gold",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_gold-4",
+      "stream_key": "research_material_gold__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_gold"
+      ]
+    },
+    "recipe-prod-research_material_lead-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_lead",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_lead-4",
+      "stream_key": "research_material_lead__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_lead"
+      ]
+    },
+    "recipe-prod-research_material_nickel-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_nickel",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_nickel-4",
+      "stream_key": "research_material_nickel__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_nickel"
+      ]
+    },
+    "recipe-prod-research_material_platinum-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_platinum",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_platinum-4",
+      "stream_key": "research_material_platinum__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_platinum"
+      ]
+    },
+    "recipe-prod-research_material_silver-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_silver",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_silver-4",
+      "stream_key": "research_material_silver__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_silver"
+      ]
+    },
+    "recipe-prod-research_material_tin-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_tin",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_tin-4",
+      "stream_key": "research_material_tin__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_tin"
+      ]
+    },
+    "recipe-prod-research_material_titanium-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_titanium",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_titanium-4",
+      "stream_key": "research_material_titanium__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_titanium"
+      ]
+    },
+    "recipe-prod-research_material_copper_tungsten-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_copper_tungsten",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_copper_tungsten-4",
+      "stream_key": "research_material_copper_tungsten__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_copper_tungsten"
+      ]
+    },
+    "recipe-prod-research_material_zinc-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_zinc",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_zinc-4",
+      "stream_key": "research_material_zinc__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_zinc"
+      ]
+    },
+    "recipe-prod-research_material_bronze-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_bronze",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_bronze-4",
+      "stream_key": "research_material_bronze__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_bronze"
+      ]
+    },
+    "recipe-prod-research_material_brass-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_brass",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_brass-4",
+      "stream_key": "research_material_brass__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_brass"
+      ]
+    },
+    "recipe-prod-research_material_gunmetal-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_gunmetal",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_gunmetal-4",
+      "stream_key": "research_material_gunmetal__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_gunmetal"
+      ]
+    },
+    "recipe-prod-research_material_invar-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_invar",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_invar-4",
+      "stream_key": "research_material_invar__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_invar"
+      ]
+    },
+    "recipe-prod-research_material_cobalt_steel-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_cobalt_steel",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_cobalt_steel-4",
+      "stream_key": "research_material_cobalt_steel__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_cobalt_steel"
+      ]
+    },
+    "recipe-prod-research_material_nitinol-4": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_nitinol",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_nitinol-4",
+      "stream_key": "research_material_nitinol__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_nitinol"
+      ]
     }
   }
 }

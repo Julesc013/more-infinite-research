@@ -1343,6 +1343,7 @@ modules:
   families:
     - prototypes/mir/families/rules.lua
     - prototypes/mir/families/registry.lua
+    - prototypes/mir/families/material_progression.lua
     - prototypes/mir/families/operator_dsl.lua
     - prototypes/mir/families/resolver.lua
   providers:
@@ -1391,6 +1392,7 @@ modules:
     - prototypes/mir/planner/stream_compiler/discover.lua
     - prototypes/mir/planner/stream_compiler/ownership.lua
     - prototypes/mir/planner/stream_compiler/qualify.lua
+    - prototypes/mir/planner/stream_compiler/material_continuation.lua
     - prototypes/mir/planner/generation_plan.lua
     - prototypes/mir/planner/output_validator.lua
     - prototypes/mir/planner/costs.lua

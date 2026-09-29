@@ -127,6 +127,16 @@ function M.validate(key, progression)
   return true
 end
 
+function M.legacy_max_level(key, spec, configured)
+  if not spec.staged_progression then return configured end
+  local valid, reason = M.validate(key, spec.staged_progression)
+  if not valid then error("Invalid material continuation " .. key .. ": " .. reason, 2) end
+  if type(configured) == "number" then
+    return math.min(configured, spec.staged_progression.legacy.last_level)
+  end
+  return spec.staged_progression.legacy.last_level
+end
+
 function M.attach(key, spec)
   if not MATERIAL_STREAM_KEY_SET[key] then
     error("Material staged progression does not support stream " .. tostring(key) .. ".", 2)
