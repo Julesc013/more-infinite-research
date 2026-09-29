@@ -6113,10 +6113,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 40745,
-      "source_sha256": "A9CA5CC854335966EB791C5AF82C819A33957FA1D48BDD9731A7C2D1C2AC0B7F",
-      "output_bytes": 40745,
-      "output_sha256": "A9CA5CC854335966EB791C5AF82C819A33957FA1D48BDD9731A7C2D1C2AC0B7F"
+      "source_bytes": 42072,
+      "source_sha256": "C145FEE420E24CFA946B7E80EDD2E96C8FBA63C2B1CD3948D6E150843D56F2C6",
+      "output_bytes": 42072,
+      "output_sha256": "C145FEE420E24CFA946B7E80EDD2E96C8FBA63C2B1CD3948D6E150843D56F2C6"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "302F94B622D6906E496C30EB1458BA066FA25BD7E5CB2A22473C4B4A28953D3B"
+  "record_sha256": "B4337207811B27060A2F65F27CB0FB1A2CE3D8FE6FFD69F09BB5D29C0DBC5823"
 }

@@ -85,6 +85,26 @@ local function selected_maximum(setting_name)
   return nil
 end
 
+local function native_finite_material_legacy(declared_key, technology_name, selected)
+  -- F200 cannot carry the finalizer's V3 mod-data binding. Its material
+  -- declaration and the observed native prototype together establish the
+  -- intentionally finite early stage. The ordinary settings-derived bridge
+  -- must not mistake that stage for an external late prototype mutation.
+  if target_line.mod_data_supported() or type(selected) ~= "number"
+      or not bounded_string(declared_key) then return false end
+  local spec = stream_registry.get(declared_key)
+  local staged = spec and spec.staged_progression
+  local legacy = staged and staged.legacy
+  if type(staged) ~= "table" or staged.schema ~= 1
+      or staged.kind ~= "material-recipe-productivity-staged-continuation"
+      or type(legacy) ~= "table" or legacy.technology_name ~= technology_name
+      or legacy.technology_name ~= "recipe-prod-" .. declared_key .. "-1"
+      or not finite_positive_integer(legacy.last_level)
+      or spec.max_level ~= legacy.last_level
+      or legacy.preserve_identity ~= true then return false end
+  return observed_max_level(technology_name) == math.min(selected, legacy.last_level)
+end
+
 local function add_runtime_binding(managed, runtime_settings_bindings, technology_name,
     declared_key, setting_name, source, operation)
   if not (prototypes and prototypes.technology and prototypes.technology[technology_name]) then return end
@@ -96,6 +116,8 @@ local function add_runtime_binding(managed, runtime_settings_bindings, technolog
     selected = selected,
     policy_transport = "settings-derived-v3",
     ownership_kind = "settings-derived-v3",
+    native_finite_stage = source == "generated-stream"
+      and native_finite_material_legacy(declared_key, technology_name, selected),
     blocked_reason = selected == nil
       and "maximum_level_runtime_setting_invalid" or nil,
     legacy = false
