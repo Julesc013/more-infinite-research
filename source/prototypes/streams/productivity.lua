@@ -785,6 +785,23 @@ local F200_BOB_ANGEL_MATERIAL_OBSERVER_LOCKS = {
   ["mir-fixture-assert-f200-science-researchability-diagnostic"]="0.1.0"
 }
 
+-- F210's current Bob/Angel set is a different recipe graph from the retained
+-- F200 closure. Only Tin has an exact current-engine return witness so far;
+-- keep every other F210 material on its existing declaration until its own
+-- graph, binding, and unlock boundary is observed.
+local F210_BOB_ANGEL_TIN_LOCK = {
+  base="2.1.20", ["elevated-rails"]="2.1.20", quality="2.1.20",
+  recycler="2.1.20", ["space-age"]="2.1.20", boblibrary="3.0.1",
+  bobores="3.0.0", bobplates="3.0.2", bobelectronics="3.0.1",
+  bobtech="3.0.0", angelsrefining="2.1.2", angelsrefininggraphics="2.1.0",
+  angelspetrochem="2.1.3", angelspetrochemgraphics="2.1.0",
+  angelssmelting="2.1.1", angelssmeltinggraphics="2.1.1"
+}
+
+local F210_BOB_ANGEL_TIN_OBSERVER_LOCKS = {
+  ["mir-fixture-assert-f210-current-bob-angel-tin-route-observer"]="0.1.0"
+}
+
 -- This profile chooses the observed F200 final-route declarations.  An
 -- extension is allowed through declaration only; each route must still match
 -- its own complete typed return graph and ownership/unlock boundary below.
@@ -805,6 +822,21 @@ end
 
 local f200_bob_angel_relevant_return_graph_routes = f200_bob_angel_relevant_return_graph_profile()
 
+local function f210_bob_angel_tin_return_graph_profile()
+  if target_profiles.current().factorio_version ~= "2.1" then return false end
+  local active = mods or (script and script.active_mods)
+  if type(active) ~= "table" then return false end
+  for name, version in pairs(F210_BOB_ANGEL_TIN_LOCK) do
+    if active[name] ~= version then return false end
+  end
+  for name, version in pairs(F210_BOB_ANGEL_TIN_OBSERVER_LOCKS) do
+    if active[name] ~= nil and active[name] ~= version then return false end
+  end
+  return true
+end
+
+local f210_bob_angel_tin_return_graph_routes = f210_bob_angel_tin_return_graph_profile()
+
 local function f200_material_routes(existing, additions)
   local routes = {}
   for _, recipe in ipairs(existing) do routes[#routes + 1] = recipe end
@@ -812,6 +844,16 @@ local function f200_material_routes(existing, additions)
     for _, recipe in ipairs(additions) do routes[#routes + 1] = recipe end
   end
   return routes
+end
+
+local function tin_material_routes()
+  -- Bob's Tin recipe is hidden in this exact F210 profile. Declaring it
+  -- alongside the two observed Angel finals would make the stream describe a
+  -- non-player route, so select only the final routes proven below.
+  if f210_bob_angel_tin_return_graph_routes then
+    return {"angels-plate-tin", "angels-plate-tin-2"}
+  end
+  return f200_material_routes({"bob-tin-plate"}, {"angels-plate-tin", "angels-plate-tin-2"})
 end
 
 -- Aluminium uses one stable technology identity, but the eligible final
@@ -899,7 +941,7 @@ streams.research_material_nickel = material_family("bob-nickel-plate", f200_bob_
   or f200_material_routes({"bob-nickel-plate"}, {"angels-plate-nickel", "angels-plate-nickel-2"}), {"bobplates", "angelssmelting"})
 streams.research_material_platinum = bob_or_angel_wire_material_family("platinum")
 streams.research_material_silver = bob_or_angel_wire_material_family("silver")
-streams.research_material_tin = material_family("bob-tin-plate", f200_material_routes({"bob-tin-plate"}, {"angels-plate-tin", "angels-plate-tin-2"}), {"bobplates", "angelssmelting"})
+streams.research_material_tin = material_family("bob-tin-plate", tin_material_routes(), {"bobplates", "angelssmelting"})
 streams.research_material_titanium = material_family("bob-titanium-plate", f200_material_routes({"bob-titanium-plate"}, {"angels-plate-titanium", "angels-plate-titanium-2"}), {"bobplates", "angelssmelting"})
 streams.research_material_copper_tungsten = material_family("bob-copper-tungsten-alloy", {"bob-copper-tungsten-alloy"}, {"bobplates", "angelssmelting"})
 streams.research_material_zinc = material_family("bob-zinc-plate", f200_material_routes({"bob-zinc-plate"}, {"angels-plate-zinc", "angels-plate-zinc-2"}), {"bobplates", "angelssmelting"})
@@ -1092,6 +1134,89 @@ if f200_bob_angel_relevant_return_graph_routes then
     ["angels-plate-silver"] = f200_bob_angel_return_graph_route("angels-plate-silver", f200_nickel_silver_input_contract("angels-liquid-molten-silver", "angels-silver-smelting-1", {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}, {"angels-ore-floatation","angels-metallurgy-2"})),
     ["angels-plate-silver-2"] = f200_bob_angel_return_graph_route("angels-plate-silver-2", f200_nickel_silver_input_contract("angels-roll-silver", "angels-silver-casting-2", {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="chemical-science-pack",amount=1}}, {"angels-strand-casting-2","angels-silver-smelting-1","angels-copper-casting-2"})),
     ["angels-wire-silver-2"] = f200_bob_angel_return_graph_route("angels-wire-silver-2")
+  }
+end
+
+-- The exact 2.1.20 combined world has two visible Tin finals. Both graph
+-- guards encounter a blocked return through the hidden Bronze recipe, so the
+-- return endpoint, inactive variant, unlock science, and prerequisites are
+-- bound as well as the typed graph fingerprint. This is intentionally
+-- F210-Tin-only: it neither widens Bob-only/F200 behavior nor claims the
+-- remaining Angel material families.
+local F210_BOB_ANGEL_TIN_BLOCKED_RETURN_WITNESS = {
+  {
+    name="bob-bronze-alloy", hidden=true, enabled_without_research=false,
+    source_class="hidden-internal",
+    variants={{hidden=true, enabled=false,
+      ingredients={f200_entry("item","copper-plate",3),f200_entry("item","bob-tin-plate",2)},
+      results={f200_entry("item","bob-bronze-alloy",5)}
+    }}
+  }
+}
+
+local F210_BOB_ANGEL_TIN_RETURN_GRAPH_ROUTES = {
+  ["angels-plate-tin"]={
+    id="F210-BA-tin-casting-final-v1", risk="mir32-42e8ee87",
+    graph="mir32-60b04faf", bindings="mir32-1a2afdfa", identities=1039,
+    recipes=2543, producers=8,
+    ingredients={f200_entry("fluid","angels-liquid-molten-tin",40)},
+    results={f200_entry("item","bob-tin-plate",4)},
+    return_path="angels-liquid-molten-tin",
+    unlock={name="angels-tin-smelting-1", science_ingredients={{name="automation-science-pack",amount=1}}, prerequisites={"angels-metallurgy-1"}}
+  },
+  ["angels-plate-tin-2"]={
+    id="F210-BA-tin-roll-final-v1", risk="mir32-beddbea4",
+    graph="mir32-5fc52628", bindings="mir32-2fbc823d", identities=1039,
+    recipes=2543, producers=8,
+    ingredients={f200_entry("item","angels-roll-tin",1)},
+    results={f200_entry("item","bob-tin-plate",4)},
+    return_path="angels-roll-tin",
+    unlock={name="angels-tin-casting-2", science_ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}, prerequisites={"angels-copper-casting-2","angels-strand-casting-1","angels-tin-smelting-1"}}
+  }
+}
+
+local function f210_bob_angel_tin_return_graph_profile(risk_fingerprint)
+  return {{
+    id="F210-BobAngel-2.1.20-Tin-return-graph-final-v1",
+    mod_locks=F210_BOB_ANGEL_TIN_LOCK,
+    observer_mod_locks=F210_BOB_ANGEL_TIN_OBSERVER_LOCKS,
+    mod_lock_scope="relevant-return-graph",
+    canonical_risk_fingerprint=risk_fingerprint
+  }}
+end
+
+local function f210_bob_angel_tin_return_graph_route(recipe_name)
+  local observed = F210_BOB_ANGEL_TIN_RETURN_GRAPH_ROUTES[recipe_name]
+  if not observed then error("MIR F210 missing Tin return-graph observation " .. recipe_name) end
+  return {
+    id=observed.id,
+    evidence_id="F210-BobAngel-Tin-return-graph-2.1.20-v1",
+    require_exact_route_certificate=true,
+    maximum_productivity=3.0,
+    profiles=f210_bob_angel_tin_return_graph_profile(observed.risk),
+    ingredients=observed.ingredients,
+    results=observed.results,
+    relevant_input_contract={
+      productivity_owner_technologies={},
+      return_path=observed.return_path,
+      return_witnesses=F210_BOB_ANGEL_TIN_BLOCKED_RETURN_WITNESS,
+      unlock_technologies={observed.unlock}
+    },
+    relevant_return_graph_contract={
+      schema=1,
+      return_graph_fingerprint=observed.graph,
+      bindings_fingerprint=observed.bindings,
+      reachable_identity_count=observed.identities,
+      relevant_recipe_count=observed.recipes,
+      direct_output_producer_count=observed.producers
+    }
+  }
+end
+
+if f210_bob_angel_tin_return_graph_routes then
+  streams.research_material_tin.reviewed_forward_routes = {
+    ["angels-plate-tin"] = f210_bob_angel_tin_return_graph_route("angels-plate-tin"),
+    ["angels-plate-tin-2"] = f210_bob_angel_tin_return_graph_route("angels-plate-tin-2")
   }
 end
 

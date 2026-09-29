@@ -19,7 +19,7 @@ function Get-ObserverArtifact([string]$Path) {
   [ordered]@{path=$item.FullName;bytes=[int64]$item.Length;sha256=Get-ObserverSha $item.FullName}
 }
 function Parse-ObserverRoute([string]$Line) {
-  $match=[regex]::Match($Line,'ROUTE recipe=(?<recipe>[^ ]+) generic=(?<generic>true|false) reason=(?<reason>[^ ]+) source=(?<source>[^ ]+) hidden=(?<hidden>true|false) declared_productivity=(?<declared>true|false) effective_productivity=(?<effective>true|false) maximum_productivity=(?<maximum>[^ ]+) risk=(?<risk>mir32-[0-9a-f]{8}) graph=(?<graph>mir32-[0-9a-f]{8}) bindings=(?<bindings>mir32-[0-9a-f]{8}) identities=(?<identities>[0-9]+) recipes=(?<recipes>[0-9]+) producers=(?<producers>[0-9]+) inputs=(?<inputs>[^ ]+) results=(?<results>[^ ]+)')
+  $match=[regex]::Match($Line,'ROUTE recipe=(?<recipe>[^\s]+) generic=(?<generic>true|false) reason=(?<reason>[^\s]+) source=(?<source>[^\s]+) hidden=(?<hidden>true|false) declared_productivity=(?<declared>true|false) effective_productivity=(?<effective>true|false) maximum_productivity=(?<maximum>[^\s]+) risk=(?<risk>mir32-[0-9a-f]{8}) graph=(?<graph>mir32-[0-9a-f]{8}) bindings=(?<bindings>mir32-[0-9a-f]{8}) identities=(?<identities>[0-9]+) recipes=(?<recipes>[0-9]+) producers=(?<producers>[0-9]+) inputs=(?<inputs>[^\s]+) results=(?<results>[^\s]+)')
   Assert-Observer $match.Success "malformed ROUTE observation: $Line"
   [ordered]@{
     recipe=$match.Groups['recipe'].Value;generic=($match.Groups['generic'].Value -ceq 'true');reason=$match.Groups['reason'].Value

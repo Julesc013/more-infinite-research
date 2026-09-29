@@ -27,6 +27,7 @@ if($LASTEXITCODE -ne 0 -or $version -notmatch ('Version: '+[regex]::Escape($Expe
 if(-not [string]::IsNullOrWhiteSpace($ExpectedEngineSha256) -and $engineSha256 -cne $ExpectedEngineSha256) { throw "This material-route regression requires exact engine SHA-256 $ExpectedEngineSha256." }
 $modules=[ordered]@{
  'prototypes.mir.capabilities.recipe_productivity.recipe_matching'='source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua'
+ 'prototypes.mir.families.material_progression'='source/prototypes/mir/families/material_progression.lua'
  'prototypes.streams.productivity'='source/prototypes/streams/productivity.lua'
 }
 $lua=[Text.StringBuilder]::new()

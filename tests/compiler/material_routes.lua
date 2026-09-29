@@ -575,7 +575,34 @@ check(recipe_patterns(changed_mir_version_streams.research_material_nickel)=="^b
 check(recipe_patterns(changed_mir_version_streams.research_material_gold)=="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$|^angels%-wire%-gold%-2$" and changed_mir_version_streams.research_material_gold.reviewed_forward_routes["angels-wire-gold-2"]~=nil,"MIR package-version bookkeeping retains the Gold wire route under its graph certificate")
 check(recipe_patterns(changed_mir_version_streams.research_material_silver)=="^bob%-silver%-plate$|^angels%-plate%-silver$|^angels%-plate%-silver%-2$|^angels%-wire%-silver%-2$" and changed_mir_version_streams.research_material_silver.reviewed_forward_routes["angels-wire-silver-2"]~=nil,"MIR package-version bookkeeping retains the Silver wire route under its graph certificate")
 
+local f210_bob_angel_tin_mods={
+  base="2.1.20", ["elevated-rails"]="2.1.20", quality="2.1.20", recycler="2.1.20", ["space-age"]="2.1.20",
+  boblibrary="3.0.1", bobores="3.0.0", bobplates="3.0.2", bobelectronics="3.0.1", bobtech="3.0.0",
+  angelsrefining="2.1.2", angelsrefininggraphics="2.1.0", angelspetrochem="2.1.3", angelspetrochemgraphics="2.1.0",
+  angelssmelting="2.1.1", angelssmeltinggraphics="2.1.1", ["more-infinite-research"]="4.2.21000",
+  ["mir-fixture-assert-f210-current-bob-angel-tin-route-observer"]="0.1.0"
+}
+local exact_f210_tin_streams=material_streams_for({factorio_version="2.1"},f210_bob_angel_tin_mods,f200_items)
+local exact_f210_tin_certificate=exact_f210_tin_streams.research_material_tin.reviewed_forward_routes
+  and exact_f210_tin_streams.research_material_tin.reviewed_forward_routes["angels-plate-tin"]
+local exact_f210_tin_roll_certificate=exact_f210_tin_streams.research_material_tin.reviewed_forward_routes
+  and exact_f210_tin_streams.research_material_tin.reviewed_forward_routes["angels-plate-tin-2"]
+check(recipe_patterns(exact_f210_tin_streams.research_material_tin)=="^angels%-plate%-tin$|^angels%-plate%-tin%-2$","exact current F210 Bob/Angel profile selects only visible Angel Tin finals")
+check(exact_f210_tin_certificate and exact_f210_tin_roll_certificate and exact_f210_tin_certificate.require_exact_route_certificate and exact_f210_tin_roll_certificate.require_exact_route_certificate,"exact current F210 Tin finals require reviewed certificates")
+check(exact_f210_tin_certificate.id=="F210-BA-tin-casting-final-v1" and exact_f210_tin_certificate.relevant_return_graph_contract.return_graph_fingerprint=="mir32-60b04faf" and exact_f210_tin_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-1a2afdfa" and exact_f210_tin_certificate.relevant_input_contract.return_witnesses[1].name=="bob-bronze-alloy" and exact_f210_tin_certificate.relevant_input_contract.unlock_technologies[1].name=="angels-tin-smelting-1","exact current F210 Tin casting certificate binds graph, witness, and unlock")
+check(exact_f210_tin_roll_certificate.id=="F210-BA-tin-roll-final-v1" and exact_f210_tin_roll_certificate.relevant_return_graph_contract.return_graph_fingerprint=="mir32-5fc52628" and exact_f210_tin_roll_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-2fbc823d" and #exact_f210_tin_roll_certificate.relevant_input_contract.unlock_technologies[1].science_ingredients==2,"exact current F210 Tin rolling certificate binds graph and two-science unlock")
+
+local changed_f210_tin_mods=clone_map(f210_bob_angel_tin_mods)
+changed_f210_tin_mods.bobplates="3.0.3"
+local changed_f210_tin_streams=material_streams_for({factorio_version="2.1"},changed_f210_tin_mods,f200_items)
+check(recipe_patterns(changed_f210_tin_streams.research_material_tin)=="^bob%-tin%-plate$" and changed_f210_tin_streams.research_material_tin.reviewed_forward_routes==nil,"changed F210 Bob provider withdraws Tin finals and certificates")
+
+local missing_f210_tin_mods=clone_map(f210_bob_angel_tin_mods)
+missing_f210_tin_mods.angelspetrochem=nil
+local missing_f210_tin_streams=material_streams_for({factorio_version="2.1"},missing_f210_tin_mods,f200_items)
+check(recipe_patterns(missing_f210_tin_streams.research_material_tin)=="^bob%-tin%-plate$" and missing_f210_tin_streams.research_material_tin.reviewed_forward_routes==nil,"missing F210 Angel provider withdraws Tin finals and certificates")
+
 local f210_streams=material_streams_for({factorio_version="2.1"},exact_f200_mods,f200_items)
-check(recipe_patterns(f210_streams.research_material_tin)=="^bob%-tin%-plate$" and recipe_patterns(f210_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(f210_streams.research_material_silver)=="^bob%-silver%-plate$" and f210_streams.research_material_nickel.reviewed_forward_routes==nil,"F210 keeps F200-only Angel additions and certificates unavailable")
+check(recipe_patterns(f210_streams.research_material_tin)=="^bob%-tin%-plate$" and recipe_patterns(f210_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(f210_streams.research_material_silver)=="^bob%-silver%-plate$" and f210_streams.research_material_nickel.reviewed_forward_routes==nil,"F210 retains F200-only Angel additions outside the exact current Tin certificate")
 
 print("MIR-MATERIAL-ROUTES-PASS " .. count)
