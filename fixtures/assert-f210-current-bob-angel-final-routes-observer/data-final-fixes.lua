@@ -7,6 +7,8 @@ local recipe_facts = require("__more-infinite-research__/prototypes/mir/index/re
 local recipe_risk_facts = require("__more-infinite-research__/prototypes/mir/index/recipe_risk_facts")
 local recipe_matching = require("__more-infinite-research__/prototypes/mir/capabilities/recipe_productivity/recipe_matching")
 local relationships = require("__more-infinite-research__/prototypes/mir/index/relationships")
+local science = require("__more-infinite-research__/prototypes/mir/capabilities/science_integration/science_packs")
+local production_reachability = require("__more-infinite-research__/prototypes/mir/capabilities/science_integration/pack_production_reachability")
 
 -- These are candidates from the separately retained F200 closure, not an
 -- assertion that the F210 graph is equivalent or that any route is admissible.
@@ -43,6 +45,21 @@ local ENTRY_FIELDS = {
   "minimum_temperature", "maximum_temperature", "fluidbox_index",
   "percent_spoiled", "always_fresh", "reset_freshness_on_craft",
   "quality_min", "quality_max", "quality_change", "affected_by_quality"
+}
+
+-- Tin is the admitted early boundary. Aluminium is the next visible ordinary
+-- family in the current route batch. A missing generated technology is an
+-- observation, not a permission to synthesize an early science set.
+local FRONTIER_EARLY_TECHNOLOGIES = {
+  {family="tin", name="recipe-prod-research_material_tin-1"},
+  {family="aluminium", name="recipe-prod-research_material_aluminium-1"}
+}
+
+local REQUIRED_FRONTIER_PACKS = {
+  "chemical-science-pack",
+  "production-science-pack",
+  "utility-science-pack",
+  "space-science-pack"
 }
 
 local function scalar(value)
@@ -142,6 +159,102 @@ local function collect_output_targets(fact, route, output_targets)
   end
 end
 
+local function unit_ingredients_line(ingredients)
+  local values = {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    values[#values + 1] = tostring(ingredient.name or ingredient[1])
+      .. ":" .. tostring(ingredient.amount or ingredient[2] or 1)
+  end
+  return names_line(values)
+end
+
+local function observe_early_science_technology(subject)
+  local technology = data_raw.technology(subject.name)
+  if type(technology) ~= "table" or type(technology.unit) ~= "table" then
+    log("[mir-f210-current-ba-final-observer] EARLY_TECH family=" .. subject.family
+      .. " technology=" .. subject.name .. " status=missing")
+    return nil
+  end
+  local ingredients = technology.unit.ingredients or {}
+  log("[mir-f210-current-ba-final-observer] EARLY_TECH family=" .. subject.family
+    .. " technology=" .. subject.name .. " status=present"
+    .. " unit_ingredients=" .. unit_ingredients_line(ingredients)
+    .. " lab_accepts_unit=" .. scalar(science.valid_research_ingredients(ingredients)))
+  return ingredients
+end
+
+local function route_reason_line(route)
+  if type(route) ~= "table" then return "-" end
+  local reachability = route.reachability or {}
+  return "recipe=" .. scalar(route.recipe)
+    .. ";unlocker=" .. scalar(route.unlocker)
+    .. ";reachable=" .. scalar(route.reachable)
+    .. ";status=" .. scalar(reachability.status)
+    .. ";reason=" .. scalar(reachability.reason)
+end
+
+local function projection_reason_line(pack)
+  local projection = production_reachability.pack_production_rejection_projection(pack, {
+    limits = {candidates = 4, nodes = 64, depth = 16, bytes = 8192},
+    subject = {stream = "research_material_tin", generated_technology = "recipe-prod-research_material_tin-4"}
+  })
+  if type(projection) ~= "table" then return "-" end
+  local failure = projection.first_failure or {}
+  return "status=" .. scalar(projection.status)
+    .. ";prerequisite=" .. scalar(projection.prerequisite)
+    .. ";kind=" .. scalar(failure.kind)
+    .. ";reason=" .. scalar(failure.reason)
+    .. ";candidates=" .. scalar(projection.candidate_count)
+    .. ";truncated=" .. names_line((projection.truncation or {}).truncated)
+end
+
+local function observe_science_frontier()
+  local early = {}
+  for _, subject in ipairs(FRONTIER_EARLY_TECHNOLOGIES) do
+    local ingredients = observe_early_science_technology(subject)
+    if ingredients then early[#early + 1] = {family = subject.family, ingredients = ingredients} end
+  end
+
+  local selected, seen, required = {}, {}, {}
+  for _, pack in ipairs(REQUIRED_FRONTIER_PACKS) do
+    selected[#selected + 1] = pack
+    seen[pack] = true
+    required[pack] = true
+  end
+  for _, pack in ipairs(science.pack_list_all()) do
+    if not seen[pack] then selected[#selected + 1] = pack; seen[pack] = true end
+  end
+  table.sort(selected)
+
+  for _, pack in ipairs(selected) do
+    local exists = science.science_pack_exists(pack)
+    local recipe_status = science.recipe_unlock_facts.pack_recipe_status(pack) or {}
+    local status, prerequisite = science.pack_production_status(pack, {}, {})
+    local route = science.production_route_for_pack(pack)
+    local rejection = status == "unreachable" and projection_reason_line(pack) or "-"
+    log("[mir-f210-current-ba-final-observer] SCIENCE_PACK pack=" .. pack
+      .. " required_frontier=" .. scalar(required[pack] == true)
+      .. " official=" .. scalar(science.is_official_science_pack(pack))
+      .. " mod_progression=" .. scalar(not science.is_official_science_pack(pack))
+      .. " item_and_lab_input=" .. scalar(exists)
+      .. " has_recipe=" .. scalar(recipe_status.has_recipe)
+      .. " initially_available=" .. scalar(recipe_status.initially_available)
+      .. " recipes=" .. names_line(recipe_status.recipes)
+      .. " production_status=" .. scalar(status)
+      .. " prerequisite=" .. scalar(prerequisite)
+      .. " route=" .. route_reason_line(route)
+      .. " rejection=" .. rejection)
+  end
+
+  for _, subject in ipairs(early) do
+    log("[mir-f210-current-ba-final-observer] EARLY_LAB family=" .. subject.family
+      .. " unit_ingredients=" .. unit_ingredients_line(subject.ingredients)
+      .. " accepts=" .. scalar(science.valid_research_ingredients(subject.ingredients)))
+  end
+  log("[mir-f210-current-ba-final-observer] SCIENCE_FRONTIER PASS packs=" .. tostring(#selected)
+    .. " early_present=" .. tostring(#early))
+end
+
 local function observe_hidden_output_consumers(output_targets, index)
   local count_by_output = {}
   for output in pairs(output_targets) do count_by_output[output] = 0 end
@@ -218,6 +331,7 @@ compiler_context.with_active(compiler_context.new(), function()
     end
   end
   observe_hidden_output_consumers(output_targets, index)
+  observe_science_frontier()
   log("[mir-f210-current-ba-final-observer] DATA PASS read-only-finalized-contract-capture"
     .. " candidates=" .. tostring(#CANDIDATES)
     .. " observed=" .. tostring(observed)
