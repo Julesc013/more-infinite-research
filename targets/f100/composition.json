@@ -1100,8 +1100,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4769,
-      "expected_sha256": "4173A6BD90966972DE041EDA10DD1975D4DC440013FE91690A70BF6A0ABEF2F3",
+      "expected_bytes": 4754,
+      "expected_sha256": "F117A85DDE4ED12DBD4D1E6A0BCE243095F693A34403D94C73FFC836999734C3",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2066,6 +2066,22 @@
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
         "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/families/material_progression.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/families/material_progression.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize shared material progression declarations for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7383,
+      "expected_sha256": "C0071E5C535BB3BB3A31143AE21B8CA93C0858B482FE2484B35919A67C5F016E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3804,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 55676,
-      "expected_sha256": "493AFDA97FE5E70F2B205118EC97E53F1B1F1F94761583761D8C007EAF3AA258",
+      "expected_bytes": 56081,
+      "expected_sha256": "D90EB08B34416738DB239CD2D588F8D6942602B72BCB6A85C96C0EE870E45B7D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3851,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "890A87891B7D8DB674C5F3B6AF8019268DA704CD781E62DD6CD68FF370DB120A"
+  "record_sha256": "01A43ADBD3AB2A5CD009DB8B526708AF4E66EE1135354105B898F983DF64048E"
 }

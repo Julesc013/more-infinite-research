@@ -1,0 +1,187 @@
+-- Shared declaration contract for the reviewed Bob/Angel material families.
+--
+-- A Factorio technology has one science-ingredient set for every level.  The
+-- released `-1` material technologies consequently retain their three early
+-- levels, while a later technology can be planned separately from level four.
+-- This module is declaration and validation authority only; the stream
+-- compiler owns deciding whether the observed recipes, owners, laboratories,
+-- and productivity caps qualify that continuation for emission.
+local M = {}
+
+M.schema = 1
+M.kind = "material-recipe-productivity-staged-continuation"
+M.legacy_first_level = 1
+M.legacy_last_level = 3
+M.continuation_first_level = M.legacy_last_level + 1
+
+local MATERIAL_STREAM_KEYS = {
+  "research_material_aluminium",
+  "research_material_gold",
+  "research_material_lead",
+  "research_material_nickel",
+  "research_material_platinum",
+  "research_material_silver",
+  "research_material_tin",
+  "research_material_titanium",
+  "research_material_copper_tungsten",
+  "research_material_zinc",
+  "research_material_bronze",
+  "research_material_brass",
+  "research_material_gunmetal",
+  "research_material_invar",
+  "research_material_cobalt_steel",
+  "research_material_nitinol"
+}
+
+local MATERIAL_STREAM_KEY_SET = {}
+for _, key in ipairs(MATERIAL_STREAM_KEYS) do MATERIAL_STREAM_KEY_SET[key] = true end
+
+local function only_fields(value, allowed)
+  for key in pairs(value or {}) do
+    if not allowed[key] then return false end
+  end
+  return true
+end
+
+local function technology_name(key, first_level)
+  return "recipe-prod-" .. key .. "-" .. tostring(first_level)
+end
+
+function M.material_stream_keys()
+  local out = {}
+  for index, key in ipairs(MATERIAL_STREAM_KEYS) do out[index] = key end
+  return out
+end
+
+function M.legacy_technology_name(key)
+  return technology_name(key, M.legacy_first_level)
+end
+
+function M.continuation_technology_name(key)
+  return technology_name(key, M.continuation_first_level)
+end
+
+local legacy_allowed = {
+  technology_name = true,
+  first_level = true,
+  last_level = true,
+  preserve_identity = true,
+  preserve_completed_levels = true,
+  preserve_active_research = true,
+  preserve_queue = true,
+  preserve_fractional_progress = true
+}
+
+local continuation_allowed = {
+  technology_name = true,
+  first_level = true,
+  prerequisite_technology = true,
+  effect_domain = true,
+  effect_change = true,
+  science_policy = true,
+  laboratory_policy = true,
+  research_cost_policy = true,
+  maximum_level_policy = true,
+  maximum_level_scope = true,
+  maximum_level_setting = true,
+  maximum_level_default = true,
+  native_owner_policy = true,
+  no_headroom_policy = true
+}
+
+function M.validate(key, progression)
+  if not MATERIAL_STREAM_KEY_SET[key] then return false, "unsupported-material-stream" end
+  if type(progression) ~= "table" or progression.schema ~= M.schema or progression.kind ~= M.kind
+      or not only_fields(progression, {schema = true, kind = true, legacy = true, continuation = true}) then
+    return false, "invalid-staged-progression-schema"
+  end
+
+  local legacy = progression.legacy
+  if type(legacy) ~= "table" or not only_fields(legacy, legacy_allowed)
+      or legacy.technology_name ~= M.legacy_technology_name(key)
+      or legacy.first_level ~= M.legacy_first_level or legacy.last_level ~= M.legacy_last_level
+      or legacy.preserve_identity ~= true or legacy.preserve_completed_levels ~= true
+      or legacy.preserve_active_research ~= true or legacy.preserve_queue ~= true
+      or legacy.preserve_fractional_progress ~= true then
+    return false, "invalid-legacy-stage"
+  end
+
+  local continuation = progression.continuation
+  if type(continuation) ~= "table" or not only_fields(continuation, continuation_allowed)
+      or continuation.technology_name ~= M.continuation_technology_name(key)
+      or continuation.first_level ~= M.continuation_first_level
+      or continuation.prerequisite_technology ~= legacy.technology_name
+      or continuation.effect_domain ~= "same-qualified-recipes"
+      or continuation.effect_change ~= "same-qualified-change"
+      or continuation.science_policy ~= "derive-qualified-route-late-frontier"
+      or continuation.laboratory_policy ~= "require-reachable-late-frontier-lab"
+      or continuation.research_cost_policy ~= "anchor-at-continuation-first-level"
+      or continuation.maximum_level_policy ~= "finite-highest-useful-recipe-level"
+      or continuation.maximum_level_scope ~= "absolute-combined-stage-level"
+      or continuation.maximum_level_setting ~= "ips-max-level-" .. key
+      or continuation.maximum_level_default ~= 0
+      or continuation.native_owner_policy ~= "require-mir-generated-legacy-owner"
+      or continuation.no_headroom_policy ~= "withhold-continuation" then
+    return false, "invalid-continuation-stage"
+  end
+  return true
+end
+
+function M.attach(key, spec)
+  if not MATERIAL_STREAM_KEY_SET[key] then
+    error("Material staged progression does not support stream " .. tostring(key) .. ".", 2)
+  end
+  if type(spec) ~= "table" then
+    error("Material staged progression requires a stream declaration table.", 2)
+  end
+  if spec.staged_progression ~= nil then
+    error("Material staged progression already exists for " .. key .. ".", 2)
+  end
+  if spec.max_level ~= M.legacy_last_level then
+    error("Material staged progression requires legacy max_level " .. tostring(M.legacy_last_level)
+      .. " for " .. key .. ".", 2)
+  end
+
+  spec.staged_progression = {
+    schema = M.schema,
+    kind = M.kind,
+    legacy = {
+      technology_name = M.legacy_technology_name(key),
+      first_level = M.legacy_first_level,
+      last_level = M.legacy_last_level,
+      preserve_identity = true,
+      preserve_completed_levels = true,
+      preserve_active_research = true,
+      preserve_queue = true,
+      preserve_fractional_progress = true
+    },
+    continuation = {
+      technology_name = M.continuation_technology_name(key),
+      first_level = M.continuation_first_level,
+      prerequisite_technology = M.legacy_technology_name(key),
+      effect_domain = "same-qualified-recipes",
+      effect_change = "same-qualified-change",
+      science_policy = "derive-qualified-route-late-frontier",
+      laboratory_policy = "require-reachable-late-frontier-lab",
+      research_cost_policy = "anchor-at-continuation-first-level",
+      -- Recipe productivity has a finite per-recipe maximum.  The compiler
+      -- may emit later levels only through the highest observed useful level;
+      -- this declaration deliberately never claims an unbounded effect.
+      maximum_level_policy = "finite-highest-useful-recipe-level",
+      maximum_level_scope = "absolute-combined-stage-level",
+      maximum_level_setting = "ips-max-level-" .. key,
+      -- Zero is the established settings representation of an unbounded
+      -- configured cap. The recipe-headroom policy still supplies a finite
+      -- effective maximum, while an existing explicit finite setting stays
+      -- an absolute cap over both stages.
+      maximum_level_default = 0,
+      native_owner_policy = "require-mir-generated-legacy-owner",
+      no_headroom_policy = "withhold-continuation"
+    }
+  }
+  local valid, reason = M.validate(key, spec.staged_progression)
+  if not valid then error("Material staged progression is invalid for " .. key .. ": " .. reason .. ".", 2) end
+  return spec
+end
+
+return M

@@ -1343,6 +1343,7 @@ modules:
   families:
     - prototypes/mir/families/rules.lua
     - prototypes/mir/families/registry.lua
+    - prototypes/mir/families/material_progression.lua
     - prototypes/mir/families/operator_dsl.lua
     - prototypes/mir/families/resolver.lua
   providers:
