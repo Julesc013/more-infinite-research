@@ -190,8 +190,8 @@ local function check_research_startup_controls(check, player, enrichment)
       check(browser_labels_fit(pane, pane.style.maximal_width),
         "research startup controls fit the bounded independent detail pane")
       check(find_browser_element(pane,"mir_browser","open-vanilla")
-        and find_browser_element(pane,"mir_browser","enqueue"),
-        "research actions remain available above startup controls")
+        and not find_browser_element(pane,"mir_browser","enqueue"),
+        "native research handoff remains available without unqualified queue mutation")
       seen[binding.source], exercised = true, exercised + 1
     end
   end
@@ -572,189 +572,58 @@ script.on_nth_tick(1,function()
   for _, actual in pairs(game.players) do
     native_players=native_players+1
     check(not actual.gui.top.mir_browser_open,"legacy top launcher absent")
-    check(remote.call("more-infinite-research-browser","open",actual.index),"native default MIR browser GUI")
-    local default_root=actual.gui.screen.mir_research_browser
-    check(not has_browser_fact(default_root,"translation_index"),
-      "default Browse shows native localized captions without an indexing countdown")
-    check(find_browser_element(default_root,"mir_browser","research").toggled
-      and not find_browser_element(default_root,"mir_browser","queue").toggled,
-      "Browse visibly selects its navigation button")
-    local default_list=find_browser_element(default_root,"mir_browser_section","research-list")
-    local default_detail=find_browser_element(default_root,"mir_browser_section","research-detail")
-    local default_first=find_browser_element(default_root,"mir_browser_first_visible","first")
-    local default_selected=find_browser_element(default_root,"mir_browser_selected","selected")
-    local default_body=default_root["mir_browser_body"]
-    local default_results=default_body and default_body["mir_browser_research_results"]
-    local default_search=find_browser_element(default_root,"mir_browser_section","search")
-    local default_navigation=default_root["mir_browser_navigation"]
-    check(default_body and default_body.type=="flow" and default_body.parent==default_root
-      and default_body.style.maximal_height<=420 and (default_body.style.minimal_height or 0)<default_body.style.maximal_height
-      and default_results and default_results.type=="flow" and default_results.parent==default_body
-      and default_results.style.maximal_height>=80 and (default_results.style.minimal_height or 0)<default_results.style.maximal_height
-      and default_list and default_list.type=="scroll-pane" and default_list.style.maximal_width>=240 and default_list.style.maximal_width<=360
-      and default_list.parent==default_results and default_list.style.maximal_height>=80 and (default_list.style.minimal_height or 0)<default_list.style.maximal_height
-      and default_list.horizontal_scroll_policy=="never" and default_list.vertical_scroll_policy=="auto"
-      and default_detail and default_detail.type=="scroll-pane" and default_detail.style.maximal_width>=280 and default_detail.style.maximal_width<=320
-      and default_detail.parent==default_results and default_detail.style.maximal_height>=80 and (default_detail.style.minimal_height or 0)<default_detail.style.maximal_height
-      and default_detail.horizontal_scroll_policy=="never" and default_detail.vertical_scroll_policy=="auto"
-      and default_search and default_search.parent==default_root and default_navigation and default_navigation.parent==default_root,
-      "Browse fits bounded list and detail scroll panes beneath fixed controls")
-    check(browser_labels_fit(default_detail,default_detail.style.maximal_width),
-      "Browse detail labels wrap within their native detail pane")
-    check(default_first and default_selected and default_first.tags.technology==default_selected.tags.technology
-      and find_browser_element(default_root,"mir_browser","open-vanilla"),
-      "initial Browse selection opens detail for the first visible research")
-    local selected_technology=default_selected and default_selected.tags.technology
-    default_list.scroll_to_bottom()
-    check(default_detail.valid and default_selected.valid and default_selected.tags.technology==selected_technology
-      and find_browser_element(default_detail,"mir_browser","open-vanilla"),
-      "list scrolling retains the selected detail in its independent pane")
+    local function open(options)
+      check(remote.call("more-infinite-research-browser","open",actual.index,options),"native library opens")
+      return actual.gui.screen.mir_research_browser
+    end
+    local root=open{tab="research",family="all",mode=1,status=1,search="",hidden={}}
+    local tabs=root.mir_browser_tabs
+    local width,height=root.style.maximal_width,root.style.maximal_height
+    check(tabs and tabs.type=="tabbed-pane" and #tabs.tabs==4,"four native tabs")
+    check(not root.mir_browser_navigation,"no page footer")
+    local search=tabs.mir_browser_research_content.mir_browser_search
+    local list=find_browser_element(root,"mir_browser_section","research-list")
+    local detail=find_browser_element(root,"mir_browser_section","research-detail")
+    check(search and search.type=="textfield" and list and list.type=="list-box", "retained search and native continuous list")
+    check(#list.items>browser_core.page_size,"native list exposes more than one former page")
+    check(detail and detail.type=="flow","detail owns separate facts and recipe collections")
+    for _,name in ipairs{"family","mode","status","sort","visibility"} do
+      local control=find_browser_element(root,"mir_browser",name)
+      check(control and control.type=="drop-down","native filter exists: "..name)
+    end
+    check(not find_browser_element(root,"mir_browser","prev") and not find_browser_element(root,"mir_browser","effects-next"),"no primary or recipe pagination")
+    open{tab="queue"}
+    check(root.valid and root==actual.gui.screen.mir_research_browser and tabs.selected_tab_index==2,"Queue retains root")
+    check(root.style.maximal_width==width and root.style.maximal_height==height,"Queue preserves window dimensions")
+    check(not find_browser_element(tabs.mir_browser_queue_content,"mir_browser","queue-down"),"unqualified queue mutation unavailable")
+    open{tab="research",search="mir-browser-test",selected="automation"}
+    check(search.valid and search==tabs.mir_browser_research_content.mir_browser_search,"search field identity retained")
+    check(search.text=="mir-browser-test","Research search retained")
     local native_enrichment=browser_provider.snapshot(actual.force)
-    local native_family_names=browser_core.family_names(native_enrichment)
-    local mir_scope_index, all_family_scope_index
-    for index, name in ipairs(native_family_names) do
-      if name=="mir" then mir_scope_index=index end
-      if name=="all" then all_family_scope_index=index end
-    end
-    local default_sort=find_browser_element(default_root,"mir_browser","sort")
-    local default_scope=find_browser_element(default_root,"mir_browser","family")
-    local filter_grid=default_scope and default_scope.parent and default_scope.parent.parent
-    local search_field=default_search and default_search["mir_browser_search"]
-    check(filter_grid and filter_grid.type=="table" and filter_grid.column_count==2
-      and default_scope.style.maximal_width>=220 and default_sort and default_sort.style.maximal_width>=220
-      and search_field and search_field.type=="textfield"
-      and search_field.style.maximal_width>=280,
-      "two readable filter columns and a full-width search field")
-    check(default_sort and default_sort.type=="drop-down" and default_sort.selected_index==1,"new personal view defaults to MIR progression")
-    check(all_family_scope_index and default_scope and default_scope.type=="drop-down"
-      and default_scope.selected_index==(mir_scope_index or all_family_scope_index),
-      "new personal view selects declared MIR scope or all when native provider facts are absent")
-    check(find_browser_element(default_root,"mir_browser","research") and find_browser_element(default_root,"mir_browser","queue")
-      and find_browser_element(default_root,"mir_browser","settings") and find_browser_element(default_root,"mir_browser","availability"),
-      "library presents browse, queue, setup and availability navigation")
-    local refresh_button=find_browser_element(default_root,"mir_browser","refresh")
-    local close_button=find_browser_element(default_root,"mir_browser","close")
-    check(refresh_button and refresh_button.type=="sprite-button" and refresh_button.sprite=="utility/refresh"
-      and close_button and close_button.type=="sprite-button" and close_button.sprite=="utility/close",
-      "compact native actions keep Refresh and Close visible beside the navigation tabs")
-    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="queue"}),
-      "native queue tab opens for the connected player")
-    local queue_root=actual.gui.screen.mir_research_browser
-    local queue_body=queue_root and queue_root["mir_browser_body"]
-    check(queue_root and queue_root.style.maximal_width<=620 and queue_body
-      and (queue_body.style.minimal_width or 0)==0,
-      "Queue no longer reserves the two-pane research width")
-    local active_down=find_browser_queue_control(queue_root,1,"queue-down")
-    local pending_down=find_browser_queue_control(queue_root,2,"queue-down")
-    local last_up=find_browser_queue_control(queue_root,3,"queue-up")
-    check(active_down and not active_down.enabled and pending_down and pending_down.enabled
-      and last_up and last_up.enabled and pending_down.tags.technology=="mir-browser-queue-later"
-      and last_up.tags.adjacent=="mir-browser-queue-later",
-      "native queue shows guarded up/down controls for pending entries")
-    check_research_startup_controls(check, actual, native_enrichment)
-    local filtered_request={tab="research",family="all",mode=2,status=1,sort="progression",
-      selected="automation",search="mir-browser-test",page=1}
-    check(remote.call("more-infinite-research-browser","open",actual.index,filtered_request),
-      "native filtered browser opens with stale external selection")
-    local replacement_root=actual.gui.screen.mir_research_browser
-    check(has_browser_fact(replacement_root,"translation_index"),
-      "localized search shows indexing while its catalogue is incomplete")
-    local replacement_detail=find_browser_element(replacement_root,"mir_browser","open-vanilla")
-    local replacement_first=find_browser_element(replacement_root,"mir_browser_first_visible","first")
-    local replacement_selected=find_browser_element(replacement_root,"mir_browser_selected","selected")
-    check(replacement_detail and replacement_first and replacement_selected
-      and replacement_detail.tags.technology=="mir-browser-test-finite"
-      and replacement_first.tags.technology=="mir-browser-test-finite"
-      and replacement_selected.tags.technology=="mir-browser-test-finite",
-      "filtered Browse replaces a stale external selection with its only visible research")
-    check(remote.call("more-infinite-research-browser","open",actual.index,{mode=2,search="mir-browser-test"}),"native finite GUI")
-    check(actual.gui.screen.mir_research_browser.valid,"native frame valid")
-    check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
-    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search="mir-"}),"native settings GUI")
-    check(has_browser_fact(actual.gui.screen.mir_research_browser,"profile_import"),"native settings profile summary")
-    check(remote.call("more-infinite-research-browser","open",actual.index,
-      {tab="settings",settings_scope="options",search=native_false}),"native false startup setting GUI")
-    local false_field=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser_setting",native_false)
-    local false_caption=false_field and false_field.caption
-    local effective_caption=type(false_caption)=="table" and false_caption[1]=="mir-browser.setting-with-default"
-      and false_caption[2] or false_caption
-    check(false_field and false_field.type=="label" and false_field.tags.mir_browser_read_only==true
-      and type(effective_caption)=="table" and effective_caption[1]=="mir-browser.setting-off",
-      "false startup setting has an explicit read-only Off value")
-    check(find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","settings").toggled,
-      "Setup visibly selects its navigation button")
-    local native_omissions=browser_provider.omissions(actual.force)
-    local has_omission_transport=prototypes.mod_data
-      and prototypes.mod_data["more-infinite-research-generation-plan"]~=nil
-    if has_omission_transport then
-      check(native_omissions and #native_omissions.rows>0,"native generation publishes exact omissions")
-    else
-      check(native_omissions==nil,"absent generation transport supplies no invented omissions")
-    end
-    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="availability"}),"native Availability GUI")
-    local availability_root=actual.gui.screen.mir_research_browser
-    local availability_body=availability_root and availability_root["mir_browser_body"]
-    check(availability_root and availability_root.style.maximal_width<=656 and availability_body
-      and (availability_body.style.minimal_width or 0)==0,
-      "Availability uses compact columns without a full-width empty body")
-    check(find_browser_element(availability_root,"mir_browser","availability").toggled,
-      "Availability visibly selects its navigation button")
-    if has_omission_transport then
-      check(find_browser_element(availability_root,"mir_browser_section","availability"),
-        "known omitted streams use their canonical localized title without an explicit name override")
-    end
-    check(not find_browser_element(availability_root,"mir_browser","enqueue"),"omitted research has no queue action")
-    if mir_scope_index then
-      local provider_detail_count=0
-      for _ in pairs(native_enrichment.details or {}) do provider_detail_count=provider_detail_count+1 end
-      check(provider_detail_count>0,"declared MIR scope exposes a nonempty validated provider detail")
-      local mir_productivity = emitted_productivity_technology(actual)
-      if mir_productivity then
-        -- This opens a technology carrying a live productivity effect inside
-        -- MIR scope. The provider-recognition pass rejects base-game
-        -- productivity effects, so the numeric facts below remain tied to
-        -- actual Factorio recipe values.
-        check(remote.call("more-infinite-research-browser","open",actual.index,{tab="research",family="mir",mode=1,sort="progression",selected=mir_productivity,search=""}),"native MIR productivity detail GUI")
-        local mir_root=actual.gui.screen.mir_research_browser
-        check(has_browser_fact(mir_root,"productivity_increment"),"native MIR productivity increment detail")
-        check(has_browser_fact(mir_root,"productivity_current_cap"),"native MIR productivity current-limit detail")
-        check(has_numeric_browser_fact(mir_root,"productivity_increment",{
-          ["mir-browser.productivity-increment"]=1,
-          ["mir-browser.productivity-increment-range"]=2
-        }),"native MIR provider supplies numerical productivity increment")
-        check(has_numeric_browser_fact(mir_root,"productivity_current_cap",{
-          ["mir-browser.productivity-current-cap"]=2,
-          ["mir-browser.productivity-current-cap-range"]=4
-        }),"native MIR provider supplies numerical productivity current limit")
-        local benefit = native_enrichment.details[mir_productivity].recipe_benefits[1]
-        local icon = benefit and find_browser_element(mir_root,"mir_browser_recipe",benefit.recipe_id)
-        check(icon and icon.type=="sprite" and icon.sprite=="recipe/"..benefit.recipe_id
-          and icon.tags.mir_browser_recipe_effective==benefit.next_level_has_effective_benefit,
-          "MIR productivity detail shows the active improved recipe as a native icon")
-      end
-    else
-      check(not next(native_enrichment.families or {}) and not next(native_enrichment.details or {}),
-        "missing MIR scope does not synthesize provider families or details")
-    end
-    check(remote.call("more-infinite-research-browser","open",actual.index,{tab="research",family="all",mode=1,sort="name-desc",selected="mir-browser-test-finite",search="mir-browser-test"}),"native sorted technology detail GUI")
-    local root=actual.gui.screen.mir_research_browser
-    local sort_control=find_browser_element(root,"mir_browser","sort")
-    check(sort_control and sort_control.type=="drop-down","native sort control")
-    local finite_row=find_browser_technology(root,"mir-browser-test-finite")
-    check(finite_row and finite_row.caption=="Finite research fixture",
-      "visible browser rows use the native localized caption before asynchronous indexing completes")
-    local vanilla_link=find_browser_element(root,"mir_browser","open-vanilla")
-    check(vanilla_link and vanilla_link.type=="button","native technology link")
-    local research_cost=find_browser_element(root,"mir_browser_fact","research_cost")
-    check(research_cost and research_cost.caption[1]=="mir-browser.research-cost"
-      and research_cost.caption[2]=="1" and research_cost.caption[3]=="1",
-      "native research cost converts the fixture's sixty runtime ticks into one second")
-    local all_scope=find_browser_element(root,"mir_browser","family")
-    check(all_scope and all_scope.type=="drop-down","native all-research scope control")
-    local all_scope_index=all_scope.selected_index
-    check(remote.call("more-infinite-research-browser","open",actual.index,{family="not-a-browser-family"}),"invalid family request leaves browser open")
-    local preserved_scope=find_browser_element(actual.gui.screen.mir_research_browser,"mir_browser","family")
-    check(preserved_scope and preserved_scope.selected_index==all_scope_index,"invalid family preserves personal scope")
+    check_research_startup_controls(check,actual,native_enrichment)
+    open{tab="research",family="all",mode=1,status=1,search="mir-browser-test",selected="mir-browser-test-finite"}
+    local cost=find_browser_element(root,"mir_browser_fact","research_cost")
+    check(cost and cost.caption[1]=="mir-browser.research-cost" and cost.caption[2]=="1" and cost.caption[3]=="1","research unit time is sixty ticks per second")
+    open{tab="settings",settings_scope="options",search=native_false}
+    check(root.valid and tabs.selected_tab_index==3,"Settings retains root")
+    check(root.style.maximal_width==width and root.style.maximal_height==height,"Settings preserves window dimensions")
+    local settings_search=tabs.mir_browser_settings_content.mir_browser_search
+    local false_field=find_browser_element(tabs.mir_browser_settings_content,"mir_browser_setting",native_false)
+    local caption=false_field and false_field.caption
+    local effective=type(caption)=="table" and caption[1]=="mir-browser.setting-with-default" and caption[2] or caption
+    check(false_field and false_field.tags.mir_browser_read_only==true and type(effective)=="table" and effective[1]=="mir-browser.setting-off","false startup value remains read-only Off")
+    check(has_browser_fact(tabs.mir_browser_settings_content,"profile_import"),"Settings reports profile source")
+    open{tab="help"}
+    check(root.valid and tabs.selected_tab_index==4,"Help retains root")
+    check(root.style.maximal_width==width and root.style.maximal_height==height,"Help preserves window dimensions")
+    check(find_browser_element(tabs.mir_browser_help_content,"mir_browser","report-export"),"diagnostic export distinguished from profile")
+    open{tab="research"}
+    check(search.valid and search.text=="mir-browser-test" and settings_search.valid and settings_search.text==native_false,"tab searches are independent")
+    open{tab="availability"}
+    check(root.valid and tabs.selected_tab_index==1,"legacy availability request maps into Research")
+    check(root.style.maximal_width==width and root.style.maximal_height==height,"omissions preserve window dimensions")
+    check(not find_browser_element(root,"mir_browser","enqueue"),"inspection cannot enqueue")
+    open{tab="research",family="all",mode=1,status=1,search="",selected="mir-browser-test-finite"}
     check(before==snapshot(force),"native GUI force noninterference")
   end
   local scope=native_players>0 and "exact-package-load-controlled-model-and-native-GUI-objects; rendered-client-and-two-client-GUI-not-qualified"

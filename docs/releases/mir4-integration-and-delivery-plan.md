@@ -5,7 +5,7 @@ applies_to: "MIR 4.1 maintenance and 4.2+ development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-15
+last_reviewed: 2026-09-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -161,7 +161,7 @@ The layers are:
 | Factorio catalogue adapter | Current force/player technology facts, stable IDs, research status, prerequisites, ingredients and native deep links | MIR-specific policy or third-party GUI internals |
 | MIR provider adapter | Generated family, route, owner, science rationale, permission provenance, cap, exclusion and profile facts | UI layout or a second emitter |
 | Translation service | Per-player asynchronous requests, language-scoped cache, fallback and bounded invalidation | Gameplay decisions based on translated text |
-| UI host | Window lifetime, controls, pagination, selected row, personal hidden set, pins/history and accessibility | Prototype hiding, automation, queue reordering or another mod's private state |
+| UI host | Retained window lifetime, native tabs and controls, continuous finite collections, selected row, personal hidden set, pins/history and accessibility | Prototype hiding, automation, unqualified queue reordering or another mod's private state |
 | Optional companion adapter | Public capability handshake and copied-data exchange with a maintained host | Source fork, private GUI traversal, hidden hard dependency or duplicate visible host |
 
 The initial read-only contract is capability-first and bounded. It returns schema/version, available features, stable technology keys, page tokens, localized-display candidates, status/family/material facets and detail/explanation DTOs. Results are deep-copied plain data with explicit maximum rows, string lengths and unknown-field behavior. It does not expose compiler objects, Lua callbacks, GUI references or write access. The only actions are separately permission-checked navigation and native queue requests; another queue mod remains owner of its queue. Stable API/SDK status requires an independent production consumer, compatibility tests and a migration/deprecation policy. The 4.2 Developer Kit may expose the contract as preview before that graduation.

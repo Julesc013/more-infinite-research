@@ -105,9 +105,28 @@ local browser_omission_provider=(function()
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua')))
 [void]$lua.AppendLine('end)()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_omissions.lua')))
+[void]$lua.AppendLine('local check_browser_core_regressions=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_core_regressions.lua')))
+[void]$lua.AppendLine('end)()')
 $browserTestText=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser.lua'))
+$hostTestSource=[IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua')).Replace("`r`n","`n")
+if($hostTestSource.Contains(']====]')) { throw 'Host fixture source collides with its Lua string delimiter.' }
+[void]$lua.AppendLine('local browser_host_test_source=[====[')
+[void]$lua.AppendLine($hostTestSource)
+[void]$lua.AppendLine(']====]')
+[void]$lua.AppendLine('local check_browser_handler_regressions=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_handler_regressions.lua')))
+[void]$lua.AppendLine('end)()')
 if(([regex]::Matches($browserTestText,[regex]::Escape('local force=game.forces.player'))).Count -ne 1) { throw 'Browser omission checks require one unambiguous controlled force entry.' }
-[void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player', 'check_omissions(check); local force=game.forces.player'))
+$coreTestSource=[IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser_core.lua')).Replace("`r`n","`n")
+$capAnchor="and finite_nonnegative_integer(value.default)`n    and finite_nonnegative_integer(value.raw_direct)`n    and finite_positive_integer(value.effective)"
+if(([regex]::Matches($coreTestSource,[regex]::Escape($capAnchor))).Count -ne 1) { throw 'Finite-cap negative control lost its precise mutation anchor.' }
+$capMutant=$coreTestSource.Replace($capAnchor,$capAnchor.Replace('finite_nonnegative_integer','finite_positive_integer'))
+[void]$lua.AppendLine('local browser_core_positive_default_mutant=(function()')
+[void]$lua.AppendLine($capMutant)
+[void]$lua.AppendLine('end)()')
+$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
+[void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player',$coreChecks))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='more-infinite-research';enabled=$true},@{name='mir-browser-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
@@ -153,6 +172,8 @@ $result | Add-Member harness_sha256 (Get-FileHash $PSCommandPath).Hash
 $result | Add-Member fixture_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/browser_fixture_data.lua')).Hash
 $result | Add-Member test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser.lua')).Hash
 $result | Add-Member omission_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_omissions.lua')).Hash
+$result | Add-Member core_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_core_regressions.lua')).Hash
+$result | Add-Member handler_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_handler_regressions.lua')).Hash
 if($Graphics) {
  $saved=Join-Path $run 'userdata/saves/_autosave-mir-browser-acceptance.zip'
  if(-not (Test-Path $saved)) { throw "Native browser save capture missing: $saved" }

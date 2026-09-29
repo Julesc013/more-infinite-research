@@ -2,7 +2,6 @@ local core = require("prototypes.mir.runtime.research_browser_core")
 local translation_queue = core.translation_queue
 local factorio_catalogue = require("prototypes.mir.runtime.research_browser_factorio_catalogue")
 local mir_provider = require("prototypes.mir.runtime.research_browser_mir_provider")
-local actions = require("prototypes.mir.runtime.research_browser_actions")
 local runtime_state = require("prototypes.mir.runtime.state")
 local factorio_runtime_state = require("prototypes.mir.platform.factorio.runtime_state")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
@@ -15,8 +14,6 @@ local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 320
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
 local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 124, 32
 local RESEARCH_BODY_MAX_HEIGHT = 420
-local SETTINGS_PAGE_SIZE = 12
-local RECIPE_BENEFIT_PAGE_SIZE = 12
 -- Translation IDs are asynchronous and per-player.  Keep the work window
 -- small so a large catalogue neither monopolizes a tick nor stops after an
 -- arbitrary lifetime number of successful translations.
@@ -24,7 +21,7 @@ local RECIPE_BENEFIT_PAGE_SIZE = 12
 -- handler per interval within this mod.
 local TRANSLATION_MAINTENANCE_TICKS = 61
 local SEARCH_REFRESH_TICKS, SEARCH_SETTLE_TICKS = 3, 6
-local VIEW_SCHEMA = 2
+local VIEW_SCHEMA = 3
 local render
 local refresh_scheduled_forces
 local refresh_scheduled_searches
@@ -40,39 +37,33 @@ local function state()
   return value
 end
 
+local TAB_NAMES = {"research", "queue", "settings", "help"}
+local function dimensions(player)
+  local resolution, scale = player.display_resolution, player.display_scale
+  scale = type(scale) == "number" and scale > 0 and scale or 1
+  local screen_width = math.floor((resolution and resolution.width or 1920) / scale)
+  local screen_height = math.floor((resolution and resolution.height or 1080) / scale)
+  local saved = state().players[player.index]
+  local geometry = saved and saved.geometry or {}
+  local width = math.min(screen_width - 24, geometry.width or math.max(640, math.floor(screen_width * 0.5)))
+  local height = math.min(screen_height - 24, geometry.height or math.max(400, math.floor(screen_height * 0.75)))
+  return math.max(240, width), math.max(220, height)
+end
 local function research_pane_widths(player)
-  local resolution = player and player.display_resolution
-  local scale = player and player.display_scale
-  local width = resolution and resolution.width
-  if type(width) ~= "number" or width <= 0 or type(scale) ~= "number" or scale <= 0 then
-    return RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH
-  end
-  -- Leave room for the frame edge, its scrollbar, and Factorio's native chrome.
-  -- At a normal desktop width this keeps the intended 360/320 split; narrower
-  -- displays reduce both columns proportionally down to readable lower bounds.
-  local normal_width = RESEARCH_LIST_WIDTH + RESEARCH_DETAIL_WIDTH
-  local minimum_width = RESEARCH_LIST_MIN_WIDTH + RESEARCH_DETAIL_MIN_WIDTH
-  local available = math.floor(width / scale) - 96
-  local total = math.max(minimum_width, math.min(normal_width, available))
-  local list_width = math.floor(total * RESEARCH_LIST_WIDTH / normal_width)
-  list_width = math.max(RESEARCH_LIST_MIN_WIDTH, math.min(RESEARCH_LIST_WIDTH, list_width))
-  local detail_width = total - list_width
-  if detail_width < RESEARCH_DETAIL_MIN_WIDTH then
-    detail_width = RESEARCH_DETAIL_MIN_WIDTH
-    list_width = total - detail_width
-  end
-  return list_width, detail_width
+  local width = dimensions(player) - 64
+  if width < 400 then return width, width, true end
+  local list = math.floor((width - 12) * 0.40)
+  return list, width - 12 - list, false
 end
-
-local function settings_pane_widths(player)
-  return research_pane_widths(player)
+local function settings_pane_widths(player) return research_pane_widths(player) end
+local function tab_content(frame, tab)
+  local tabs = frame and frame[PREFIX .. "tabs"]
+  return tabs and tabs[PREFIX .. tab .. "_content"]
 end
-
-local function availability_pane_widths(player)
-  local list_width, detail_width = research_pane_widths(player)
-  return math.min(list_width, 280), math.min(detail_width, 340)
+local function active_body(player, tab)
+  local content = tab_content(player.gui.screen[ROOT], tab)
+  return content and content[PREFIX .. "body"]
 end
-
 local function research_panes_height(results)
   -- GuiStyle.height is write-only. The bounded maximum is readable and stays
   -- on the retained results flow when a settled localized index replaces its
@@ -143,7 +134,9 @@ local function default_view()
     effect_page = 1,
     family = "mir",
     sort = "progression",
-    stable_sort = "progression"
+    stable_sort = "progression",
+    settings_search = "",
+    visibility = 1
   }
 end
 local function has_legacy_default_scope_and_order(value)
@@ -161,6 +154,8 @@ local function view(player)
     result.family = "mir"
     result.sort = "progression"
   end
+  result.settings_search = type(result.settings_search) == "string" and result.settings_search or ""
+  result.visibility = result.visibility == 2 and 2 or result.visibility == 3 and 3 or 1
   result.schema = VIEW_SCHEMA
   all[player.index] = result
   result.sort = result.sort == "name-asc" and "name-asc"
@@ -171,7 +166,7 @@ local function view(player)
   if result.sort == "native" or result.sort == "progression" then result.stable_sort = result.sort end
   result.tab = result.tab == "settings" and "settings"
     or result.tab == "queue" and "queue"
-    or result.tab == "availability" and "availability"
+    or result.tab == "help" and "help"
     or "research"
   if type(result.setting_selection) ~= "string" or #result.setting_selection > core.detail_string_limit then
     result.setting_selection = nil
@@ -183,13 +178,17 @@ end
 local function needs_name_index(v)
   return v.tab == "research" and (v.search ~= "" or v.sort == "name-asc" or v.sort == "name-desc")
 end
+local catalogue_cache = {}
 local function catalogue(force)
+  local cached = catalogue_cache[force.index]
+  if cached and cached.tick == game.tick then return cached.value end
   local result = factorio_catalogue.snapshot(force)
   if not result then return nil end
   -- Dynamic cap/level facts must be refreshed with the copied Force snapshot.
   -- Only the pure core is cache-safe; provider state is never retained here.
   result.enrichment = mir_provider.snapshot(force)
   result.family_names = core.family_names(result.enrichment)
+  catalogue_cache[force.index] = {tick = game.tick, value = result}
   return result
 end
 
@@ -252,7 +251,7 @@ local function refresh_translated_view(player, cache)
   if not (frame and frame.valid) then return end
   local v = view(player)
   if v.tab ~= "research" then return end
-  local body = frame[PREFIX .. "body"]
+  local body = active_body(player, "research")
   local results = body and body[PREFIX .. "research_results"]
   if not (body and body.valid and results and results.valid) then return end
   -- A partial index only changes lookup metadata. Native captions already
@@ -296,28 +295,35 @@ local function fact_label(parent, key, caption, maximum_width)
   element.style.maximal_width = maximum_width or 720
   return element
 end
+local function section(parent, caption, width)
+  local divider = parent.add{type = "line", direction = "horizontal"}
+  divider.style.width = width
+  divider.style.top_margin, divider.style.bottom_margin = 10, 4
+  local heading = label(parent, caption, width)
+  heading.style.font = "default-bold"
+  heading.style.bottom_margin = 4
+  return heading
+end
 
 update_translation_index = function(results, cache, v)
-  -- The index belongs to the retained list column.  Translation callbacks can
-  -- therefore update this one small label without replacing the list, detail,
-  -- search field, or fixed Browse controls.
+  -- Share the fixed count row instead of adding another child below a short
+  -- list. Localization progress must not enlarge the retained result region.
   local list = results and results[PREFIX .. "research_list"]
-  local parent = list and list.valid and list or results
-  if not (parent and parent.valid) then return end
-  local indicator = parent[PREFIX .. "fact_translation_index"]
+  local indicator = list and list.valid and list[PREFIX .. "result_count"]
+  if not (indicator and indicator.valid) then return end
+  local count = indicator.tags.mir_browser_count or 0
   local unresolved = unresolved_translations(cache)
   if unresolved <= 0 or not needs_name_index(v) then
-    if indicator and indicator.valid then indicator.destroy() end
+    indicator.caption, indicator.tooltip = {"mir-browser.count", count}, nil
+    indicator.tags = {mir_browser_count = count}
     return
   end
   local name_order = v.sort == "name-asc" or v.sort == "name-desc"
   local caption = name_order and {"mir-browser.indexing-name", unresolved}
     or {"mir-browser.indexing", unresolved}
-  if indicator and indicator.valid then
-    indicator.caption = caption
-  else
-    fact_label(parent, "translation_index", caption, list and list.style.maximal_width - 16 or nil)
-  end
+  indicator.caption = {"", {"mir-browser.count", count}, " · ", caption}
+  indicator.tooltip = caption
+  indicator.tags = {mir_browser_count = count, mir_browser_fact = "translation_index"}
 end
 
 local function button(parent, action, caption, tags)
@@ -348,7 +354,10 @@ local function close(player, preserve_shortcut_state)
   pending[player.index] = nil
   if next(pending) == nil then set_search_refresh_subscription(false) end
   local frame = player.gui.screen[ROOT]
-  if frame then frame.destroy() end
+  if frame then
+    view(player).location = frame.location
+    frame.destroy()
+  end
   if not preserve_shortcut_state then set_shortcut_toggled(player, false) end
 end
 local function family_caption(family)
@@ -356,7 +365,8 @@ local function family_caption(family)
   if family == "all" then return {"mir-browser.scope-all"} end
   if family == "external" then return {"mir-browser.scope-native"} end
   local stream = streams.view()[family]
-  return stream and stream.localised_name or {"mir-browser.scope-mir"}
+  local fallback = tostring(family):gsub("[-_]", " "):gsub("^%l", string.upper)
+  return stream and {"?", stream.localised_name or {"technology-name.more-infinite-research." .. family}, fallback} or fallback
 end
 
 local function same_value(left, right)
@@ -415,6 +425,11 @@ local function startup_comparison(name, prototype, profile_summary)
 end
 
 local function setting_field_caption(name, key, prototype)
+  if name == "ips-effect-per-level-" .. key or name == "mir-effect-per-level-" .. key then
+    local stream = streams.view()[key]
+    local effect = stream and stream.descriptor and stream.descriptor.effect
+    return {"mir-browser.setting-effect-per-level" .. (effect and effect.unit == "percent" and "-percent" or "")}
+  end
   -- The group already names the research. Only its six standard controls can
   -- use a shorter field name; other settings retain their authored identity.
   for _, field in ipairs({"enable", "cost-base", "cost-linear-increment", "cost-growth", "max-level", "research-time"}) do
@@ -438,7 +453,7 @@ local function settings_rows(player, parent, v)
   local function search_text(value)
     return string.lower(value):gsub("[-_]", " "):gsub("%s+", " ")
   end
-  local search = search_text(v.search or "")
+  local search = search_text(v.settings_search or "")
   local function group(key, title, specs, scope)
     local names, matches = {}, search == "" or string.find(search_text(key), search, 1, true)
     for _, spec in ipairs(specs) do
@@ -468,57 +483,60 @@ local function settings_rows(player, parent, v)
   for _, g in ipairs(groups) do if g.scope == v.settings_scope then visible[#visible + 1] = g end end
   groups = visible
   table.sort(groups, function(a,b) return a.key < b.key end)
-  local pages = math.max(1, math.ceil(#groups / SETTINGS_PAGE_SIZE))
-  v.page = math.min(v.page, pages)
-  local first = (v.page - 1) * SETTINGS_PAGE_SIZE + 1
-  local last = math.min(v.page * SETTINGS_PAGE_SIZE, #groups)
   local selected
-  for i = first, last do if groups[i].key == v.setting_selection then selected = groups[i] end end
-  if not selected then selected = groups[first] end
+  for _, g in ipairs(groups) do if g.key == v.setting_selection then selected = g end end
+  selected = selected or groups[1]
   v.setting_selection = selected and selected.key or nil
-  local list_width, detail_width = settings_pane_widths(player)
-  local toolbar = parent.add{type = "flow", direction = "horizontal"}
-  button(toolbar, "settings-research", {"mir-browser.settings-scope-research"}).toggled = v.settings_scope == "research"
-  button(toolbar, "settings-options", {"mir-browser.settings-scope-options"}).toggled = v.settings_scope == "options"
-  label(toolbar, {"mir-browser.settings-count", #groups}, 140)
-  button(toolbar, "export", {"mir-browser.export"})
-  local pane_height = math.max(RESEARCH_PANES_MIN_HEIGHT, research_panes_height(parent) - 40)
-  local total_width = list_width + detail_width
-  local panes = parent.add{type = "flow", direction = "vertical"}
-  local list = panes.add{type = "scroll-pane", direction = "vertical", tags = {mir_browser_section = "settings-list"}}
-  list.style.width, list.style.maximal_width = total_width, total_width
-  list.style.maximal_height = pane_height
-  if #groups == 0 then label(list, {"mir-browser.settings-empty"}, total_width - 16) end
-  local entries = list.add{type = "table", column_count = 2}
-  for i = first, last do
-    local g = groups[i]
-    local control = button(entries, "setting-select", g.title, {setting_key = g.key})
-    local entry_width = math.floor((total_width - 32) / 2)
-    control.style.width, control.style.maximal_width = entry_width, entry_width
-    control.toggled = g.key == v.setting_selection
+  local list_width, detail_width, stacked = settings_pane_widths(player)
+  local toolbar = parent[PREFIX .. "settings_toolbar"]
+  if not toolbar then
+    toolbar = parent.add{type = "flow", name = PREFIX .. "settings_toolbar"}
+    button(toolbar, "settings-research", {"mir-browser.settings-scope-research"})
+    button(toolbar, "settings-options", {"mir-browser.settings-scope-options"})
   end
-  local detail = panes.add{type = "scroll-pane", direction = "vertical", tags = {mir_browser_section = "settings-detail"}}
-  detail.style.width, detail.style.maximal_width = total_width, total_width
-  detail.style.maximal_height = pane_height
+  local panes = parent[PREFIX .. "settings_panes"]
+  if not panes then panes = parent.add{type = "flow", name = PREFIX .. "settings_panes", direction = stacked and "vertical" or "horizontal"} end
+  local list = panes[PREFIX .. "settings_list"]
+  if not list then list = panes.add{type = "list-box", name = PREFIX .. "settings_list", items = {}, tags = {mir_browser = "setting-list", mir_browser_section = "settings-list"}} end
+  local items, keys, selected_index = {}, {}, 0
+  for i,g in ipairs(groups) do
+    items[i], keys[i] = g.title, g.key
+    if selected and selected.key == g.key then selected_index = i end
+  end
+  local token = table.concat(keys, "\30")
+  if v.settings_list_token ~= token or #list.items ~= #items then list.items = items; v.settings_list_token = token end
+  v.setting_keys = keys
+  list.selected_index = selected_index
+  local pane_height = math.max(80, research_panes_height(parent) - 44)
+  list.style.width, list.style.height = list_width, stacked and math.floor(pane_height * 0.32) or pane_height
+  local detail = panes[PREFIX .. "settings_detail"]
+  if not detail then detail = panes.add{type = "scroll-pane", name = PREFIX .. "settings_detail", direction = "vertical", tags = {mir_browser_section = "settings-detail"}} end
+  detail.horizontal_scroll_policy = "never"
+  detail.style.width, detail.style.height = detail_width, stacked and math.floor(pane_height * 0.65) or pane_height
+  local detail_token = (selected and selected.key or "") .. ":" .. v.settings_scope
+  if #detail.children > 0 and v.settings_detail_token == detail_token then return end
+  v.settings_detail_token = detail_token
+  detail.clear()
+  if #groups == 0 then label(detail, {"mir-browser.settings-empty"}, detail_width - 24) end
   if selected then
-    label(detail, selected.title, total_width - 16)
-    fact_label(detail, "profile_import", profile_summary_caption(profile_summary), total_width - 16)
-    local has_startup = false
-    for _, name in ipairs(selected.names) do
-      if prototypes.mod_setting[name].setting_type == "startup" then has_startup = true; break end
-    end
-    if has_startup then label(detail, {"mir-browser.startup-note"}, total_width - 16) end
-    local fields = detail.add{type = "table", column_count = 4}
-    fields.style.horizontal_spacing = 8
-    local field_width = math.floor((total_width - 64) / 4)
-    local value_width = field_width
+    label(detail, selected.title, detail_width - 24).style.font = "default-large-bold"
+    label(detail, {"mir-browser.scope-startup"}, detail_width - 24)
+    section(detail, {"mir-browser.effective-values"}, detail_width - 24)
+    local fields = detail.add{type = "table", column_count = 2}
+    fields.style.horizontal_spacing = 12
+    fields.style.vertical_spacing = 10
+    local field_width = math.floor((detail_width - 40) * 0.55)
+    local value_width = detail_width - 40 - field_width
     for _, name in ipairs(selected.names) do
       local prototype = prototypes.mod_setting[name]
       local scope = prototype.setting_type
       local values = scope == "runtime-global" and settings.global or scope == "runtime-per-user" and settings.get_player_settings(player) or settings.startup
       local value = values and values[name] and values[name].value
-      local field_caption = setting_field_caption(name, selected.key, prototype) or prototype.localised_name
-      label(fields, field_caption, field_width)
+      local field_caption = name == selected.key and {"mir-browser.value"}
+        or setting_field_caption(name, selected.key, prototype) or prototype.localised_name
+      local caption = label(fields, field_caption, field_width)
+      caption.style.font = "default-semibold"
+      caption.tooltip = prototype.localised_description
       if scope == "startup" then
         local comparison = startup_comparison(name, prototype, profile_summary)
         local effective = comparison.effective
@@ -535,14 +553,22 @@ local function settings_rows(player, parent, v)
         end
         local field = label(fields, display, value_width)
         field.tags = {mir_browser_setting = name, mir_browser_read_only = true}
+        field.tooltip = {"mir-browser.setting-provenance", shown_value(comparison.raw_direct),
+          shown_value(comparison.default), {"mir-browser.source-" .. comparison.source}}
+        if comparison.source == "mirset1" then
+          label(fields, {"mir-browser.profile-override"}, field_width)
+          label(fields, {"mir-browser.source-mirset1"}, value_width)
+        end
       elseif type(value) == "boolean" and (scope ~= "runtime-global" or player.admin) then
         fields.add{type = "checkbox", state = value, caption = "", tags = {mir_browser = "setting", setting = name}}
       else
         label(fields, shown_value(value), value_width)
       end
     end
+    section(detail, {"mir-browser.configuration-source"}, detail_width - 24)
+    fact_label(detail, "profile_import", profile_summary_caption(profile_summary), detail_width - 24)
   end
-  return pages
+  return 1
 end
 
 local function add_technology_icon(parent, technology, size)
@@ -567,6 +593,7 @@ local function displayed_percent(value)
   return displayed_number(value * 100)
 end
 local function add_research_cost(parent, technology, maximum_width)
+  if #technology.research_unit_ingredients == 0 then return end
   local units = displayed_number(technology.research_unit_count)
   -- Runtime research energy uses ticks; prototype unit.time uses seconds.
   -- Keep this as the unmodified unit duration, independent of lab speed/UPS.
@@ -575,6 +602,7 @@ local function add_research_cost(parent, technology, maximum_width)
   if units and seconds then fact_label(parent, "research_cost", {"mir-browser.research-cost", units, seconds}, maximum_width) end
 end
 local function add_science_icons(parent, technology, maximum_width)
+  if #technology.research_unit_ingredients == 0 then return end
   label(parent, {"mir-browser.science"}, maximum_width)
   local science = parent.add{type = "table", column_count = math.max(1, math.min(8, math.floor((maximum_width or 720) / 40)))}
   for _, ingredient in ipairs(technology.research_unit_ingredients) do
@@ -626,42 +654,6 @@ local function add_productivity_summary(parent, benefits, maximum_width)
     fact_label(parent, "productivity_current_cap", {"mir-browser.productivity-current-cap-range", current_min, current_max, maximum_min, maximum_max}, maximum_width)
   end
 end
-local function add_benefit_recipe_icons(player, parent, benefits, v, maximum_width)
-  if type(benefits) ~= "table" or #benefits == 0 then return end
-  local pages = math.max(1, math.ceil(#benefits / RECIPE_BENEFIT_PAGE_SIZE))
-  v.effect_page = math.max(1, math.min(pages, math.floor(tonumber(v.effect_page) or 1)))
-  if pages > 1 then
-    local navigation = parent.add{type = "flow", direction = "horizontal"}
-    button(navigation, "effects-prev", "<").enabled = v.effect_page > 1
-    label(navigation, tostring(v.effect_page) .. " / " .. tostring(pages))
-    button(navigation, "effects-next", ">").enabled = v.effect_page < pages
-  end
-  local icons = parent.add{type = "table", column_count = math.max(1, math.min(8, math.floor(maximum_width / 40)))}
-  local first = (v.effect_page - 1) * RECIPE_BENEFIT_PAGE_SIZE + 1
-  for index = first, math.min(first + RECIPE_BENEFIT_PAGE_SIZE - 1, #benefits) do
-    local benefit = benefits[index]
-    local recipe_id = benefit and benefit.recipe_id
-    local recipe = type(recipe_id) == "string" and player.force.recipes[recipe_id]
-    local increment = benefit and displayed_percent(benefit.effect_change)
-    local current = benefit and displayed_percent(benefit.current_productivity_bonus)
-    local maximum = benefit and displayed_percent(benefit.maximum_productivity)
-    if recipe and recipe.valid and recipe.prototype and increment and current and maximum then
-      local icon = icons.add{
-        type = "sprite", style = "recipe_tooltip_horizontal_image",
-        sprite = "recipe/" .. recipe_id, resize_to_sprite = false,
-        tooltip = {"", recipe.prototype.localised_name or {"recipe-name." .. recipe_id}, "\n",
-          {"mir-browser.productivity-increment", increment}, "\n",
-          {"mir-browser.productivity-current-cap", current, maximum},
-          benefit.next_level_has_effective_benefit and "" or "\n",
-          benefit.next_level_has_effective_benefit and "" or {"mir-browser.no-next-benefit", 1}},
-        tags = {mir_browser_recipe = recipe_id, mir_browser_recipe_effective = benefit.next_level_has_effective_benefit == true}
-      }
-      icon.style.width = 32
-      icon.style.height = 32
-      icon.enabled = benefit.next_level_has_effective_benefit == true
-    end
-  end
-end
 local function add_prerequisite_icons(parent, technology, maximum_width)
   local prerequisites = {}
   for _, prerequisite in pairs(technology.prerequisites) do prerequisites[#prerequisites + 1] = prerequisite end
@@ -670,9 +662,9 @@ local function add_prerequisite_icons(parent, technology, maximum_width)
   label(parent, {"mir-browser.prerequisites"}, maximum_width)
   local row = parent.add{type = "table", column_count = math.max(1, math.min(8, math.floor((maximum_width or 720) / 40)))}
   for index, prerequisite in ipairs(prerequisites) do
-    if index <= 8 then add_technology_icon(row, prerequisite) end
+    add_technology_icon(row, prerequisite)
   end
-  if #prerequisites > 8 then label(parent, {"mir-browser.prerequisites-more", #prerequisites - 8}, maximum_width) end
+
 end
 local function status_caption(technology, native_technology)
   if technology.researched then return {"mir-browser.status-complete"} end
@@ -715,8 +707,8 @@ local function add_research_startup_settings(parent, portable, maximum_width)
     end
   end
   if #rows == 0 then return end
-  label(parent, {"mir-browser.research-startup-settings"}, maximum_width)
-  label(parent, {"mir-browser.startup-note"}, maximum_width)
+  section(parent, {"mir-browser.research-startup-settings"}, maximum_width)
+  label(parent, {"mir-browser.scope-startup"}, maximum_width)
   for _, row in ipairs(rows) do
     local field
     if type(row.comparison.effective) == "boolean" then
@@ -735,55 +727,88 @@ local function add_research_startup_settings(parent, portable, maximum_width)
   end
 end
 local function detail(player, parent, v, c, width)
-  local portable = v.selected and core.detail(c, v.selected, c.enrichment)
+  if not v.selected then label(parent, {"mir-browser.no-results"}, width - 24); return end
+  local portable, reason = core.detail(c, v.selected, c.enrichment)
   local tech = portable and player.force.technologies[portable.technology.key]
-  if not tech then return end
+  if not tech then
+    label(parent, {"mir-browser.detail-unavailable", reason or "no-selection"}, width - 24)
+    return
+  end
+  local container = parent
+  local pane_height = parent.style.maximal_height
+  local recipe_index = core.detail_recipe_index(c, tech.name, c.enrichment)
+  local has_recipes = recipe_index and #recipe_index.ids > 0
+  local compact_detail = pane_height < 200
+  local recipe_height = has_recipes and math.min(#recipe_index.ids * 28 + 8, math.max(32, math.floor(pane_height * 0.28))) or 0
+  parent = container.add{type = "scroll-pane", name = PREFIX .. "research_facts", direction = "vertical"}
+  parent.horizontal_scroll_policy = "never"
+  parent.style.width = width
+  parent.style.height = has_recipes and not compact_detail and math.max(60, pane_height - recipe_height - 70) or pane_height
   local maximum_width = math.max(120, width - 16)
   local heading_width = math.max(120, maximum_width - 56)
   local heading = parent.add{type = "flow", direction = "horizontal"}
   add_technology_icon(heading, tech, 48)
-  label(heading, tech.localised_name, heading_width)
-  label(parent, tech.localised_description, maximum_width)
+  label(heading, tech.localised_name, heading_width).style.font = "default-large-bold"
   local enrichment = portable.enrichment or {}
   -- Provider ownership, compiler disposition, route sentinels, and raw
   -- setting provenance remain in the copied DTO for governed consumers. They
   -- are not player-facing research facts in this library surface.
-  label(parent, {"mir-browser.family", family_caption(portable.technology.family)}, maximum_width)
-  label(parent, status_caption(portable.technology, tech), maximum_width)
+  section(parent, {"mir-browser.benefits"}, maximum_width)
+  if not has_recipes then label(parent, {"?", tech.localised_description, ""}, maximum_width) end
   local runtime_binding = portable.runtime_settings_binding
   local registered_binding = runtime_binding and research_setting_specs(portable)
   local effective_cap = portable.technology.cap
     or (registered_binding and runtime_binding.state == "finite" and runtime_binding.selected_effective)
-  if effective_cap then
-    label(parent, {"mir-browser.level-cap", tech.level, effective_cap}, maximum_width)
-  elseif tech.level and tech.level > 1 then
-    label(parent, {"mir-browser.level", tech.level}, maximum_width)
-  end
-  add_research_cost(parent, tech, maximum_width)
   if enrichment.recipe_benefits then
-    local count = #enrichment.recipe_benefits
-    if enrichment.next_level_has_effective_benefit then
-      label(parent, {"mir-browser.next-benefit", count}, maximum_width)
-    else
+    local count = enrichment.recipe_benefit_count or #enrichment.recipe_benefits
+    if not enrichment.next_level_has_effective_benefit then
       label(parent, {"mir-browser.no-next-benefit", count}, maximum_width)
     end
-  elseif portable.technology.family ~= "external" then
-    label(parent, {"mir-browser.mir-benefit"}, maximum_width)
   end
-  add_productivity_summary(parent, enrichment.recipe_benefits, maximum_width)
-  add_benefit_recipe_icons(player, parent, enrichment.recipe_benefits, v, maximum_width)
+  local summary = recipe_index and recipe_index.summary
+  if summary and summary.count > 0 then
+    local low, high = displayed_percent(summary.effect_change_min), displayed_percent(summary.effect_change_max)
+    fact_label(parent, "productivity_increment", low == high and {"mir-browser.productivity-increment", low}
+      or {"mir-browser.productivity-increment-range", low, high}, maximum_width)
+    local current_low, current_high = displayed_percent(summary.current_productivity_bonus_min), displayed_percent(summary.current_productivity_bonus_max)
+    local maximum_low, maximum_high = displayed_percent(summary.maximum_productivity_min), displayed_percent(summary.maximum_productivity_max)
+    fact_label(parent, "productivity_current_cap", current_low == current_high and maximum_low == maximum_high
+      and {"mir-browser.productivity-current-cap", current_low, maximum_low}
+      or {"mir-browser.productivity-current-cap-range", current_low, current_high, maximum_low, maximum_high}, maximum_width)
+  end
+  section(parent, {"mir-browser.research-requirements"}, maximum_width)
+  label(parent, status_caption(portable.technology, tech), maximum_width)
+  if effective_cap then
+    label(parent, {"mir-browser.level-cap", tech.level, effective_cap}, maximum_width)
+  elseif tech.level and tech.level > 1 then label(parent, {"mir-browser.level", tech.level}, maximum_width) end
+  add_research_cost(parent, tech, maximum_width)
   add_science_icons(parent, tech, maximum_width)
   add_prerequisite_icons(parent, tech, maximum_width)
-  local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
-  enqueue.enabled = actions.can_enqueue(player, tech, defines.input_action.start_research)
-  button(parent, "open-vanilla", {"controls.open-technology-gui"}, {technology = tech.name})
-  button(parent, "toggle-hide", v.hidden and v.hidden[tech.name] and {"mir-browser.show"} or {"mir-browser.hide"}, {technology = tech.name})
+  section(parent, {"mir-browser.actions"}, maximum_width)
+  button(parent, "open-vanilla", {"mir-browser.open-research"}, {technology = tech.name}).tooltip = {"mir-browser.native-queue-guidance"}
+  button(parent, "toggle-hide", v.hidden and v.hidden[tech.name] and {"mir-browser.show"} or {"mir-browser.hide"}, {technology = tech.name}).tooltip = {"mir-browser.hide-tooltip"}
+  button(parent, "inspect-settings", {"mir-browser.inspect-settings"}, {technology = tech.name}).enabled = registered_binding ~= nil or portable.technology.family ~= "external"
   add_research_startup_settings(parent, portable, maximum_width)
+  if has_recipes then
+    local recipe_parent = compact_detail and parent or container
+    label(recipe_parent, {"mir-browser.affected-recipes"}, width - 24).style.font = "default-bold"
+    local items = {}
+    for i,id in ipairs(recipe_index.ids) do
+      local recipe = player.force.recipes[id]
+      items[i] = {"", "[img=recipe/" .. id .. "] ", recipe and recipe.prototype.localised_name or id}
+    end
+    v.recipe_ids = recipe_index.ids
+    local list = recipe_parent.add{type = compact_detail and "drop-down" or "list-box", name = PREFIX .. "recipe_entries", items = items, tags = {mir_browser = "recipe-list", mir_browser_section = "recipe-list"}}
+    list.style.width = compact_detail and width - 24 or width
+    if not compact_detail then list.style.height = recipe_height end
+    list.tooltip = {"mir-browser.recipe-select-hint"}
+    if not compact_detail then label(container, {"mir-browser.recipe-select-hint"}, width - 24) end
+  end
 end
 local function filter_dropdown(parent, caption, items, selected_index, action, width)
   local field = parent.add{type = "flow", direction = "vertical"}
-  label(field, caption, width)
-  local dropdown = field.add{type = "drop-down", items = items, selected_index = selected_index, tags = {mir_browser = action}}
+  if parent.tags.compact ~= true then label(field, caption, width) end
+  local dropdown = field.add{type = "drop-down", items = items, selected_index = selected_index, tags = {mir_browser = action}, tooltip = caption}
   dropdown.style.width = width
   return dropdown
 end
@@ -833,32 +858,28 @@ end
 
 local function queue_rows(player, queue, v)
   local entries = player.force.research_queue or {}
-  if #entries == 0 then
-    label(queue, {"mir-browser.queue-empty"})
-    return 1
+  local maximum_width = dimensions(player) - 96
+  local list = queue[PREFIX .. "queue_list"]
+  if not list then
+    label(queue, {"mir-browser.native-queue-guidance"}, maximum_width)
+    button(queue, "open-vanilla", {"controls.open-technology-gui"})
+    label(queue, {"mir-browser.queue"})
+    list = queue.add{type = "list-box", name = PREFIX .. "queue_list", items = {}, tags = {mir_browser = "queue-list"}}
+    list.style.width = maximum_width
+    list.style.height = math.max(48, queue.style.maximal_height - 130)
+    local empty = label(queue, {"mir-browser.queue-empty"}, maximum_width)
+    empty.name = PREFIX .. "queue_empty"
   end
-  label(queue, {"mir-browser.queue"})
-  local pages = math.max(1, math.ceil(#entries / core.page_size))
-  v.page = math.min(v.page, pages)
-  for index = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #entries) do
-    local technology = entries[index]
-    if technology then
-      local row = queue.add{type = "flow", direction = "horizontal"}
-      label(row, tostring(index) .. ".")
-      button(row, "select", technology.localised_name, {technology = technology.name})
-      for _, direction in ipairs{-1, 1} do
-        local adjacent = entries[index + direction]
-        local action = direction == -1 and "queue-up" or "queue-down"
-        local control = button(row, action, direction == -1 and "↑" or "↓", {
-          index = index, technology = technology.name,
-          adjacent = adjacent and adjacent.name or ""
-        })
-        control.enabled = actions.can_move(player, entries, index, direction, defines.input_action.move_research)
-        control.tooltip = direction == -1 and {"controls.move-up"} or {"controls.move-down"}
-      end
-    end
+  local items, keys, token = {}, {}, {}
+  for index, technology in ipairs(entries) do
+    items[index] = {"", tostring(index) .. ". ", technology.localised_name}
+    keys[index], token[index] = technology.name, technology.name .. ":" .. technology.level
   end
-  return pages
+  token = table.concat(token, "\30")
+  if v.queue_token ~= token or #list.items ~= #items then list.items = items; v.queue_token = token end
+  v.queue_keys = keys
+  queue[PREFIX .. "queue_empty"].visible = #items == 0
+  return 1
 end
 
 local omission_reasons = {
@@ -898,19 +919,19 @@ local function availability_rows(player, parent, v)
   if type(envelope) ~= "table" or envelope.schema ~= 1
       or envelope.kind ~= "portable-research-omissions" or type(envelope.rows) ~= "table"
       or #envelope.rows > core.catalogue_limit then
-    label(parent, {"mir-browser.availability-empty"})
+    label(parent, {"mir-browser.availability-unavailable"})
     return 1
   end
   local row_count = 0
   for index in pairs(envelope.rows) do
     if type(index) ~= "number" or index < 1 or index ~= math.floor(index) then
-      label(parent, {"mir-browser.availability-empty"})
+      label(parent, {"mir-browser.availability-unavailable"})
       return 1
     end
     row_count = row_count + 1
   end
   if row_count ~= #envelope.rows then
-    label(parent, {"mir-browser.availability-empty"})
+    label(parent, {"mir-browser.availability-unavailable"})
     return 1
   end
   local rows, seen, stream_definitions = {}, {}, streams.view()
@@ -920,13 +941,13 @@ local function availability_rows(player, parent, v)
         or not bounded_string(row.stream_id) or not bounded_string(row.reason)
         or not bounded_string(row.decision_fingerprint) or row.status ~= "not-added"
         or (row.technology_id ~= nil and not bounded_string(row.technology_id)) then
-      label(parent, {"mir-browser.availability-empty"})
+      label(parent, {"mir-browser.availability-unavailable"})
       return 1
     end
     local identity = row.stream_id .. "\0" .. (row.technology_id or "")
     local stream = stream_definitions[row.stream_id]
     if seen[identity] or not stream then
-      label(parent, {"mir-browser.availability-empty"})
+      label(parent, {"mir-browser.availability-unavailable"})
       return 1
     end
     seen[identity] = true
@@ -949,204 +970,277 @@ local function availability_rows(player, parent, v)
     label(parent, {"mir-browser.availability-empty"})
     return 1
   end
-  local pages = math.max(1, math.ceil(#rows / core.page_size))
-  v.page = math.min(v.page, pages)
-  local list_width, detail_width = availability_pane_widths(player)
-  local table_rows = parent.add{type = "table", column_count = 2}
-  for index = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #rows) do
-    local row = rows[index]
-    local name = label(table_rows, row.caption, list_width - 16)
-    name.style.minimal_width = list_width - 16
-    name.tags = {mir_browser_section = "availability"}
-    label(table_rows, omission_reason_caption(row.reason), detail_width - 16)
-  end
-  return pages
+
+  local width = dimensions(player) - 96
+  local items = {}
+  for index, row in ipairs(rows) do items[index] = row.caption end
+  local selected = math.min(#items, math.max(1, v.omission_selection or 1))
+  local list = parent.add{type = "list-box", items = items, selected_index = selected,
+    tags = {mir_browser = "omission-list", mir_browser_section = "availability"}}
+  list.style.width = width
+  list.style.height = math.max(32, parent.style.maximal_height - 104)
+  local explanation = label(parent, omission_reason_caption(rows[selected].reason), width)
+  explanation.name = PREFIX .. "omission_reason"
+  explanation.style.font = "default-semibold"
+  return 1
 end
 
 -- This is the only part of Browse that translation callbacks may rebuild.
 -- The surrounding frame, fixed filters, navigation and search text field are
 -- intentionally retained, so localized discovery can finish in place.
 update_research_results = function(player, results, v, c, cache)
-  results.clear()
-  local page = core.query(c, query_view(v, cache), c.enrichment, cache.values, v.selected)
-  v.page = page.page
-  select_first_visible_subject(player, v, page)
-  if needs_name_index(v) then
-    prioritize_visible_translations(cache, page, v.selected)
-    pump_translation_requests(player, cache)
-  end
-  local list_width, detail_width = research_pane_widths(player)
+  local list_width, detail_width, stacked = research_pane_widths(player)
   local panes_height = research_panes_height(results)
-  local list = results.add{
-    type = "scroll-pane", name = PREFIX .. "research_list", direction = "vertical",
-    tags = {mir_browser_section = "research-list"}
-  }
-  list.style.width = list_width
-  list.style.maximal_width = list_width
-  list.style.maximal_height = panes_height
-  list.horizontal_scroll_policy = "never"
-  list.vertical_scroll_policy = "auto"
-  local detail_pane = results.add{
-    type = "scroll-pane", name = PREFIX .. "research_detail", direction = "vertical",
-    tags = {mir_browser_section = "research-detail"}
-  }
-  detail_pane.style.width = detail_width
-  detail_pane.style.maximal_width = detail_width
-  detail_pane.style.maximal_height = panes_height
-  detail_pane.horizontal_scroll_policy = "never"
-  detail_pane.vertical_scroll_policy = "auto"
-  detail(player, detail_pane, v, c, detail_width)
-  update_translation_index(results, cache, v)
-  label(list, {"mir-browser.count", page.count}, list_width - 16)
-  for index, row in ipairs(page.rows) do
-    local technology = player.force.technologies[row.key]
-    if technology then
-      local item = list.add{type = "flow", direction = "vertical"}
-      local heading = item.add{type = "flow", direction = "horizontal"}
-      add_technology_icon(heading, technology)
-      local selected = v.selected == row.key
-      local select = button(heading, "select", technology.localised_name, {
-        technology = row.key,
-        mir_browser_selected = selected and "selected" or "not-selected",
-        mir_browser_first_visible = index == 1 and "first" or "not-first"
-      })
-      select.toggled = selected
-      select.style.width = list_width - 44
-      local status = label(item, status_caption(row, technology))
-      status.style.maximal_width = list_width - 44
-    end
+  local list_column = results[PREFIX .. "research_list"]
+  if not list_column then
+    list_column = results.add{type = "flow", name = PREFIX .. "research_list", direction = "vertical"}
+    list_column.add{type = "label", name = PREFIX .. "result_count"}
+    list_column.add{type = "list-box", name = PREFIX .. "research_entries", items = {}, tags = {mir_browser = "research-list", mir_browser_section = "research-list"}}
   end
-  return page.pages
+  local list = list_column[PREFIX .. "research_entries"]
+  local detail_pane = results[PREFIX .. "research_detail"]
+  if not detail_pane then
+    detail_pane = results.add{type = "flow", name = PREFIX .. "research_detail", direction = "vertical", tags = {mir_browser_section = "research-detail"}}
+  end
+  list_column.style.width = list_width
+  list.style.width, list.style.height = list_width, stacked and math.floor(panes_height * 0.30) or math.max(28, panes_height - 28)
+  detail_pane.style.width, detail_pane.style.height = detail_width, stacked and math.floor(panes_height * 0.62) or panes_height
+  local query = query_view(v, cache)
+  if v.visibility == 2 then query.hidden = nil end
+  local found = core.query_all(c, query, c.enrichment, cache.values, v.selected)
+  if v.visibility == 2 then
+    local hidden = {}
+    for _, row in ipairs(found.rows) do if v.hidden and v.hidden[row.key] then hidden[#hidden + 1] = row end end
+    found.rows, found.count, found.selected_visible = hidden, #hidden, false
+    for _, row in ipairs(hidden) do if row.key == v.selected then found.selected_visible = true end end
+  end
+  select_first_visible_subject(player, v, found)
+  local items, keys, token, selected_index = {}, {}, {}, 0
+  for i,row in ipairs(found.rows) do
+    local tech = player.force.technologies[row.key]
+    items[i] = {"", "[img=technology/" .. row.key .. "] ", tech.localised_name}
+    keys[i], token[i] = row.key, row.key .. ":" .. tostring(tech.level)
+    if row.key == v.selected then selected_index = i end
+  end
+  token = table.concat(token, "\30")
+  if v.result_token ~= token or #list.items ~= #items then list.items = items; v.result_token = token end
+  v.result_keys = keys
+  list.selected_index = selected_index
+  local count_label = list_column[PREFIX .. "result_count"]
+  count_label.caption, count_label.tags = {"mir-browser.count", found.count}, {mir_browser_count = found.count}
+  count_label.style.width, count_label.style.height = list_width, 24
+  local technology = v.selected and player.force.technologies[v.selected]
+  local detail_token = table.concat({v.selected or "", tostring(v.visibility), tostring(player.force.index),
+    tostring(technology and technology.level), tostring(technology and technology.researched),
+    tostring(v.hidden and v.hidden[v.selected]), player.locale}, ":")
+  local replace_detail = #detail_pane.children == 0 or v.detail_token ~= detail_token
+  if replace_detail then detail_pane.clear(); v.detail_token = detail_token end
+  if v.visibility == 3 then
+    list_column.visible = false
+    detail_pane.style.width = dimensions(player) - 64
+    detail_pane.style.height = panes_height
+    if replace_detail then
+    local omissions = detail_pane.add{type = "flow", direction = "vertical"}
+    omissions.style.width, omissions.style.height = detail_pane.style.maximal_width, detail_pane.style.maximal_height
+    availability_rows(player, omissions, v)
+    end
+  else
+    list_column.visible = true
+    if replace_detail then detail(player, detail_pane, v, c, detail_width) end
+  end
+  if needs_name_index(v) then prioritize_visible_translations(cache, found, v.selected); pump_translation_requests(player, cache) end
+  update_translation_index(results, cache, v)
+  return 1
 end
 
-update_navigation = function(frame, v, pages)
-  local navigation = frame and frame[PREFIX .. "navigation"]
-  if not (navigation and navigation.valid) then return end
-  local previous = navigation[PREFIX .. "prev"]
-  local current = navigation[PREFIX .. "page"]
-  local following = navigation[PREFIX .. "next"]
-  if previous then previous.enabled = v.page > 1 end
-  if current then current.caption = tostring(v.page) .. " / " .. tostring(pages) end
-  if following then following.enabled = v.page < pages end
+update_navigation = function() end -- Developer query paging is independent of player navigation.
+
+local function report_text(player)
+  local v = view(player)
+  local lines = {"MIR Research Library", "Factorio: " .. tostring(script.active_mods.base),
+    "MIR: " .. tostring(script.active_mods["more-infinite-research"]),
+    "Selected research: " .. tostring(v.selected or "none"),
+    "", "ACTIVE MODS"}
+  local names = {}
+  for name in pairs(script.active_mods) do names[#names + 1] = name end
+  table.sort(names)
+  for _, name in ipairs(names) do lines[#lines + 1] = name .. " " .. script.active_mods[name] end
+  if v.report_settings then
+    lines[#lines + 1] = "\nEFFECTIVE MIR STARTUP SETTINGS"
+    local settings_names = {}
+    for name, prototype in pairs(prototypes.mod_setting) do
+      if prototype.mod == "more-infinite-research" and prototype.setting_type == "startup"
+          and name ~= codec.import_setting_name then settings_names[#settings_names + 1] = name end
+    end
+    table.sort(settings_names)
+    for _, name in ipairs(settings_names) do lines[#lines + 1] = name .. " = " .. tostring(startup_settings.get(name)) end
+  end
+  if v.report_omissions then
+    local envelope = mir_provider.omissions(player.force)
+    lines[#lines + 1] = "\nGENERATION DECISIONS"
+    if envelope and envelope.rows then
+      lines[#lines + 1] = "Omitted research: " .. #envelope.rows
+      for i = 1, math.min(250, #envelope.rows) do
+        local row = envelope.rows[i]
+        lines[#lines + 1] = row.stream_id .. ": " .. row.reason
+      end
+      if #envelope.rows > 250 then lines[#lines + 1] = "Summary limited to first 250 decisions." end
+    else lines[#lines + 1] = "Omission explanations unavailable or invalid." end
+  end
+  return table.concat(lines, "\n")
+end
+local function debug_rows(player, body, v, width)
+  if #body.children > 0 then return end
+  local left_width, right_width, stacked = research_pane_widths(player)
+  local height = body.style.maximal_height
+  local panes = body.add{type = "flow", direction = stacked and "vertical" or "horizontal"}
+  local tools = panes.add{type = "scroll-pane", direction = "vertical"}
+  tools.horizontal_scroll_policy = "never"
+  tools.style.width, tools.style.height = left_width, stacked and math.floor(height * 0.45) or height
+  local text_width = left_width - 20
+  section(tools, {"mir-browser.debug-installation"}, text_width)
+  label(tools, {"mir-browser.debug-versions", script.active_mods.base, script.active_mods["more-infinite-research"]}, text_width)
+  button(tools, "debug-refresh", {"mir-browser.debug-refresh"}).tooltip = {"mir-browser.debug-refresh-tooltip"}
+  section(tools, {"mir-browser.report-options"}, text_width)
+  for _, option in ipairs{{"report_settings", "report-settings"}, {"report_omissions", "report-omissions"}} do
+    local checkbox = tools.add{type = "checkbox", state = v[option[1]] == true, caption = {"mir-browser." .. option[2]}, tags = {mir_browser = option[1]}}
+    checkbox.style.maximal_width = text_width
+  end
+  section(tools, {"mir-browser.configuration"}, text_width)
+  label(tools, {"mir-browser.profile-purpose"}, text_width)
+  button(tools, "export", {"mir-browser.export"})
+  section(tools, {"mir-browser.layout"}, text_width)
+  button(tools, "layout-reset", {"mir-browser.reset-layout"})
+  section(tools, {"mir-browser.startup-crash"}, text_width)
+  label(tools, {"mir-browser.startup-report"}, text_width)
+  local preview = panes.add{type = "flow", name = PREFIX .. "report_panel", direction = "vertical"}
+  preview.style.width = right_width
+  local preview_height = stacked and math.floor(height * 0.50) or height
+  section(preview, {"mir-browser.report-preview"}, right_width - 8)
+  local text = preview.add{type = "text-box", name = PREFIX .. "report", text = report_text(player)}
+  text.read_only, text.word_wrap = true, true
+  text.style.width, text.style.height = right_width, math.max(40, preview_height - 144)
+  button(preview, "report-select", {"mir-browser.report-select"})
+  button(preview, "report-export", {"mir-browser.report-export"})
+  local status = label(preview, v.report_status or {"mir-browser.report-local"}, right_width - 8)
+  status.name = PREFIX .. "report_status"
+  status.tooltip = v.report_destination
+end
+local function debug_preview(player)
+  local body = active_body(player, "help")
+  local panes = body and body.children[1]
+  return panes and panes[PREFIX .. "report_panel"]
 end
 
 render = function(player)
   local v = view(player)
-  local c = catalogue(player.force)
-  local cache = c and ensure_translation_catalogue(player, c)
-  if c and v.family == "mir" and not has_family(c.family_names, "mir") then v.family = "all" end
-  if c and v.family == "mir" and v.selected then
-    local families = c.enrichment and c.enrichment.families
-    if type(families) ~= "table" or type(families[v.selected]) ~= "string" then
-      v.selected, v.effect_page = nil, 1
+  local width, height = dimensions(player)
+  local frame = player.gui.screen[ROOT]
+  if frame and not frame[PREFIX .. "tabs"] then close(player, true); frame = nil end
+  if not frame then
+    frame = player.gui.screen.add{type = "frame", name = ROOT, direction = "vertical"}
+    local title = frame.add{type = "flow", name = PREFIX .. "title"}
+    title.add{type = "label", caption = {"mir-browser.title"}, style = "frame_title"}
+    local drag = title.add{type = "empty-widget", style = "draggable_space_header"}
+    drag.style.horizontally_stretchable = true
+    drag.style.height = 24
+    drag.drag_target = frame
+    icon_button(title, "layout-smaller", "utility/left_arrow", {"mir-browser.layout-smaller"})
+    icon_button(title, "layout-larger", "utility/right_arrow", {"mir-browser.layout-larger"})
+    icon_button(title, "layout-reset", "utility/reset", {"mir-browser.layout-reset"})
+    icon_button(title, "close", "utility/close", {"mir-browser.close"})
+    local tabs = frame.add{type = "tabbed-pane", name = PREFIX .. "tabs", tags = {mir_browser = "tabs"}}
+    local captions = {"research", "queue-tab", "settings", "help"}
+    for i,name in ipairs(TAB_NAMES) do
+      local tab = tabs.add{type = "tab", caption = {"mir-browser." .. captions[i]}}
+      local content = tabs.add{type = "flow", name = PREFIX .. name .. "_content", direction = "vertical"}
+      tabs.add_tab(tab, content)
     end
+    if v.location then frame.location = v.location else frame.force_auto_center() end
+    v.result_token, v.settings_list_token = nil, nil
   end
-  remove_legacy_top_button(player)
-  close(player, true)
-  if not c then
-    set_shortcut_toggled(player, false)
-    player.print({"mir-browser.catalogue-limit", core.catalogue_limit})
-    return
+  frame.style.width, frame.style.height = width, height
+  local tabs = frame[PREFIX .. "tabs"]
+  local layout_token = tostring(width) .. ":" .. tostring(height)
+  if v.layout_token ~= layout_token then
+    for _, name in ipairs(TAB_NAMES) do tabs[PREFIX .. name .. "_content"].clear() end
+    v.result_token, v.settings_list_token = nil, nil
+    v.layout_token = layout_token
+    if v.location then
+      local scale = player.display_scale
+      frame.location = {x = math.max(0, math.min(v.location.x, player.display_resolution.width - width * scale)),
+        y = math.max(0, math.min(v.location.y, player.display_resolution.height - height * scale))}
+    else frame.force_auto_center() end
   end
-  local frame = player.gui.screen.add{type = "frame", name = ROOT, direction = "vertical", caption = {"mir-browser.title"}}
-  frame.auto_center = true
-  local scale = player.display_scale or 1
-  frame.style.maximal_height = math.max(240, math.floor(player.display_resolution.height / scale) - 80)
-  local list_width, detail_width
-  if v.tab == "settings" then
-    list_width, detail_width = settings_pane_widths(player)
-  elseif v.tab == "availability" then
-    list_width, detail_width = availability_pane_widths(player)
-  else
-    list_width, detail_width = research_pane_widths(player)
+  tabs.style.width, tabs.style.height = width - 24, height - 62
+  for i,name in ipairs(TAB_NAMES) do if name == v.tab then tabs.selected_tab_index = i end end
+  local content = tab_content(frame, v.tab)
+  content.style.width, content.style.height = width - 48, height - 112
+  local body = content[PREFIX .. "body"]
+  if not body then
+    if v.tab == "research" or v.tab == "settings" then
+      label(content, {"mir-browser." .. (v.tab == "settings" and "search-settings-label" or "search-label")}, width - 64).style.font = "default-semibold"
+      local search = content.add{type = "textfield", name = PREFIX .. "search", text = v.tab == "settings" and v.settings_search or v.search,
+        tags = {mir_browser = "search", mir_browser_tab = v.tab}, tooltip = {"mir-browser." .. (v.tab == "settings" and "search-settings" or "search")}}
+      search.style.width = width - 64
+    end
+    body = content.add{type = "flow", name = PREFIX .. "body", direction = "vertical"}
   end
-  frame.style.maximal_width = v.tab == "queue" and math.min(620, list_width + detail_width + 36)
-    or list_width + detail_width + 36
-  local bar = frame.add{type = "flow"}
-  button(bar, "research", {"mir-browser.browse"}).toggled = v.tab == "research"
-  button(bar, "queue", {"mir-browser.queue-tab"}).toggled = v.tab == "queue"
-  button(bar, "settings", {"mir-browser.settings"}).toggled = v.tab == "settings"
-  button(bar, "availability", {"mir-browser.not-added"}).toggled = v.tab == "availability"
-  icon_button(bar, "refresh", "utility/refresh", {"mir-browser.refresh"})
-  icon_button(bar, "close", "utility/close", {"mir-browser.close"})
+  body.style.width, body.style.height = width - 64, height - ((v.tab == "research" or v.tab == "settings") and 170 or 136)
   if v.tab == "research" or v.tab == "settings" then
-    local search = frame.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "search"}}
-    label(search, {"mir-browser." .. (v.tab == "settings" and "search-settings" or "search")}, math.max(160, list_width - 40))
-    local field = search.add{type = "textfield", name = PREFIX .. "search", text = v.search, tags = {mir_browser = "search"}}
-    field.style.width = v.tab == "settings" and list_width + detail_width - 140 or detail_width
+    local search = content[PREFIX .. "search"]
+    search.style.width = width - 64
+    local text = v.tab == "settings" and v.settings_search or v.search
+    if search.text ~= text then search.text = text end
   end
-  local body_height = math.min(RESEARCH_BODY_MAX_HEIGHT, math.max(140, frame.style.maximal_height - 140))
-  -- Browse keeps its controls stationary while its panes follow their content
-  -- up to a screen-bounded limit. Setup gains outer scrolling on small displays.
-  local body = frame.add{type = v.tab == "research" and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
-  body.style.maximal_height = body_height
-  local pages
-  if v.tab == "settings" then
-    pages = settings_rows(player, body, v)
+  if v.tab == "research" then
+    local c = catalogue(player.force)
+    if not c then label(body, {"mir-browser.catalogue-limit", core.catalogue_limit}); return end
+    local cache = ensure_translation_catalogue(player, c)
+    if not has_family(c.family_names, v.family) then v.family = "all" end
+    local filters = body[PREFIX .. "filters"]
+    if not filters then
+      filters = body.add{type = "table", name = PREFIX .. "filters", column_count = 2, tags = {compact = height < 600}}
+      filters.style.horizontal_spacing = 12
+      local field_width = math.floor((width - 80) / 2)
+      local family_items = {}
+      for _, family in ipairs(c.family_names) do family_items[#family_items + 1] = family_caption(family) end
+      v.family_names = c.family_names
+      local family_index = 1
+      for i,family in ipairs(c.family_names) do if family == v.family then family_index = i end end
+      filter_dropdown(filters, {"mir-browser.filter-scope"}, family_items, family_index, "family", field_width)
+      filter_dropdown(filters, {"mir-browser.filter-status"}, {{"mir-browser.all-status"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, v.status, "status", field_width)
+      filter_dropdown(filters, {"mir-browser.filter-level"}, {{"mir-browser.all-levels"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, v.mode, "mode", field_width)
+      filter_dropdown(filters, {"mir-browser.filter-order"}, {{"mir-browser.order-progression"}, {"mir-browser.order-native"}, {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, v.sort == "native" and 2 or v.sort == "name-asc" and 3 or v.sort == "name-desc" and 4 or 1, "sort", field_width)
+      filter_dropdown(filters, {"mir-browser.visibility"}, {{"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"}, {"mir-browser.not-added"}}, v.visibility, "visibility", field_width)
+    end
+    local indices = {mode = v.mode, status = v.status, visibility = v.visibility,
+      sort = v.sort == "native" and 2 or v.sort == "name-asc" and 3 or v.sort == "name-desc" and 4 or 1}
+    for i,family in ipairs(v.family_names or {}) do if family == v.family then indices.family = i end end
+    for _,field in pairs(filters.children) do
+      for _,control in pairs(field.children) do
+        if control.type == "drop-down" then
+          local selected = indices[control.tags.mir_browser] or 1
+          if control.selected_index ~= selected then control.selected_index = selected end
+        end
+      end
+    end
+    local results = body[PREFIX .. "research_results"]
+    local _,_,stacked = research_pane_widths(player)
+    if not results then results = body.add{type = "flow", name = PREFIX .. "research_results", direction = stacked and "vertical" or "horizontal"} end
+    results.style.height = math.max(48, body.style.maximal_height - (height < 600 and 110 or 190))
+    update_research_results(player, results, v, c, cache)
+  elseif v.tab == "settings" then settings_rows(player, body, v)
   elseif v.tab == "queue" then
-    pages = queue_rows(player, body, v)
-  elseif v.tab == "availability" then
-    pages = availability_rows(player, body, v)
-  else
-    local filters = body.add{type = "table", column_count = 2}
-    filters.style.horizontal_spacing = 12
-    filters.style.vertical_spacing = 8
-    local filter_width = math.max(220, math.floor((list_width + detail_width - 32) / 2))
-    local family_index = 1
-    for i,name in ipairs(c.family_names) do if name == v.family then family_index = i end end
-    local family_items = {}
-    for _, family in ipairs(c.family_names) do family_items[#family_items + 1] = family_caption(family) end
-    filter_dropdown(filters, {"mir-browser.filter-scope"}, family_items, family_index, "family", filter_width)
-    filter_dropdown(filters, {"mir-browser.filter-status"}, {{"mir-browser.all-status"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, v.status, "status", filter_width)
-    filter_dropdown(filters, {"mir-browser.filter-level"}, {{"mir-browser.all-levels"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, v.mode, "mode", filter_width)
-    local sort_index = v.sort == "native" and 2 or v.sort == "name-asc" and 3 or v.sort == "name-desc" and 4 or 1
-    filter_dropdown(filters, {"mir-browser.filter-order"}, {{"mir-browser.order-progression"}, {"mir-browser.order-native"}, {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, sort_index, "sort", filter_width)
-    local has_hidden = false
-    for name, is_hidden in pairs(v.hidden or {}) do
-      if is_hidden == true and player.force.technologies[name] then has_hidden = true end
-    end
-    if has_hidden then
-      local recovery = body.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "hidden-recovery"}}
-      button(recovery, "show-hidden", {"mir-browser.show-hidden"})
-    end
-    local results = body.add{type = "flow", name = PREFIX .. "research_results", direction = "horizontal"}
-    local reserved_height = RESEARCH_FILTERS_HEIGHT
-      + (has_hidden and RESEARCH_HIDDEN_RECOVERY_HEIGHT or 0)
-    local results_height = math.max(RESEARCH_PANES_MIN_HEIGHT, body_height - reserved_height)
-    results.style.maximal_height = results_height
-    pages = update_research_results(player, results, v, c, cache)
-  end
-  local nav = frame.add{type = "flow", name = PREFIX .. "navigation"}
-  nav.add{type = "button", name = PREFIX .. "prev", caption = "<", tags = {mir_browser = "prev"}}
-  nav.add{type = "label", name = PREFIX .. "page"}
-  nav.add{type = "button", name = PREFIX .. "next", caption = ">", tags = {mir_browser = "next"}}
-  update_navigation(frame, v, pages)
-  player.opened = frame
+    queue_rows(player, body, v)
+  else debug_rows(player, body, v, width) end
+  if not player.opened or player.opened ~= frame then player.opened = frame end
   set_shortcut_toggled(player, true)
 end
 
 local function refresh_search_results(player)
-  local frame = player.gui.screen[ROOT]
-  if not (frame and frame.valid) then return end
-  local v = view(player)
-  local body = frame[PREFIX .. "body"]
-  if not (body and body.valid) then return end
-  local pages
-  if v.tab == "settings" then
-    body.clear()
-    pages = settings_rows(player, body, v)
-  elseif v.tab == "research" then
-    local results = body[PREFIX .. "research_results"]
-    local c = catalogue(player.force)
-    if not (results and results.valid and c) then return end
-    local cache = ensure_translation_catalogue(player, c)
-    pages = update_research_results(player, results, v, c, cache)
-  else
-    return
-  end
-  update_navigation(frame, v, pages)
+  if player.gui.screen[ROOT] then render(player) end
 end
-
 refresh_scheduled_searches = function(event)
   local pending = state().pending_search_refresh
   for player_index, due_tick in pairs(pending) do
@@ -1161,8 +1255,12 @@ refresh_scheduled_searches = function(event)
   if next(pending) == nil then set_search_refresh_subscription(false) end
 end
 local function refresh_open(force)
+  if force then catalogue_cache[force.index] = nil else catalogue_cache = {} end
   for _, player in pairs(game.connected_players) do
-    if (not force or player.force.index == force.index) and player.gui.screen[ROOT] then render(player) end
+    if (not force or player.force.index == force.index) and player.gui.screen[ROOT] then
+      view(player).detail_token = nil
+      render(player)
+    end
   end
 end
 local function export(player)
@@ -1177,6 +1275,15 @@ local function export(player)
 end
 local function event_player(event)
   return event.player_index and game.get_player(event.player_index)
+end
+local function owned_element(player, element)
+  if not (player and element and element.valid) then return false end
+  local root = player.gui.screen[ROOT]
+  while element and element.valid do
+    if element == root then return true end
+    element = element.parent
+  end
+  return false
 end
 local function set_hidden(v, force, values)
   if type(values) ~= "table" then return false end
@@ -1207,10 +1314,10 @@ end
 local function click(event)
   local player = event_player(event)
   local element = event.element
-  if not (player and element and element.valid) then return end
+  if not owned_element(player, element) then return end
   local tags = element.tags
   local action = tags.mir_browser
-  if not action then return end
+  if not action or (element.type ~= "button" and element.type ~= "sprite-button") then return end
   if action == "close" then close(player); return end
   local v = view(player)
   if action == "select" then
@@ -1222,49 +1329,104 @@ local function click(event)
     if v.tab == "settings" then
       v.settings_scope, v.page, v.setting_selection = action == "settings-options" and "options" or "research", 1, nil
     end
-  elseif action == "queue-up" or action == "queue-down" then
-    actions.move(player, tags.index, action == "queue-up" and -1 or 1,
-      tags.technology, tags.adjacent, defines.input_action.move_research)
-  elseif action == "enqueue" then
-    local tech = player.force.technologies[tags.technology]
-    if actions.can_enqueue(player, tech, defines.input_action.start_research) then
-      if not player.force.add_research(tech) then player.print({"mir-browser.enqueue-failed"}) end
-    else player.print({"mir-browser.enqueue-failed"}) end
+  elseif action == "queue-up" or action == "queue-down" or action == "enqueue" then
+    -- Old saved controls and delayed events cannot bypass the prototype's native handoff.
+    player.print({"mir-browser.native-queue-guidance"})
+    return
   elseif action == "open-vanilla" then
-    local tech = player.force.technologies[tags.technology]
-    if tech and tech.valid then
-      close(player)
-      player.open_technology_gui(tech)
-      return
-    end
+    local tech = tags.technology and player.force.technologies[tags.technology]
+    close(player)
+    player.open_technology_gui(tech and tech.valid and tech or nil)
+    return
   elseif action == "toggle-hide" then
     toggle_hidden(v, player.force, tags.technology)
+  elseif action == "inspect-settings" then
+    local c = catalogue(player.force)
+    local portable = c and core.detail(c, tags.technology, c.enrichment)
+    local key = portable and research_setting_specs(portable)
+    if not key and portable then key = portable.technology.family end
+    if key then v.tab, v.settings_scope, v.settings_search, v.setting_selection = "settings", "research", "", key end
   elseif action == "show-hidden" then
     if set_hidden(v, player.force, {}) then v.page = 1 end
-  elseif action == "prev" then v.page = math.max(1, v.page - 1)
-  elseif action == "next" then v.page = v.page + 1
-  elseif action == "effects-prev" then v.effect_page = math.max(1, v.effect_page - 1)
-  elseif action == "effects-next" then v.effect_page = v.effect_page + 1
-  elseif action == "settings" or action == "research" or action == "queue" or action == "availability" then
-    v.tab, v.page = action, 1
-    if action ~= "research" then v.search = "" end
+  elseif action == "layout-smaller" or action == "layout-larger" or action == "layout-reset" then
+    local width, height = dimensions(player)
+    local delta = action == "layout-larger" and 64 or -64
+    if action == "layout-reset" then
+      v.geometry, v.location = nil, nil
+      player.gui.screen[ROOT].force_auto_center()
+    else v.geometry = {width = math.max(360, width + delta), height = math.max(360, height + delta)} end
+    v.layout_token = nil
+    -- A deliberate layout operation may rebuild pane internals; the root remains alive.
+    local tabs = player.gui.screen[ROOT][PREFIX .. "tabs"]
+    for _, name in ipairs(TAB_NAMES) do tabs[PREFIX .. name .. "_content"].clear() end
+    v.result_token, v.settings_list_token = nil, nil
+  elseif action == "report-export" then
+    local path = "more-infinite-research/reports/browser-" .. player.index .. "-" .. game.tick .. ".txt"
+    helpers.write_file(path, report_text(player) .. "\n", false, player.index)
+    player.print({"mir-browser.report-written", "script-output/" .. path})
+    v.report_status = {"mir-browser.report-saved", "browser-" .. player.index .. "-" .. game.tick .. ".txt"}
+    v.report_destination = "script-output/" .. path
+    local status = debug_preview(player)[PREFIX .. "report_status"]
+    status.caption, status.tooltip = v.report_status, v.report_destination
+  elseif action == "report-select" then
+    local field = debug_preview(player)[PREFIX .. "report"]
+    field.focus(); field.select_all(); return
+  elseif action == "debug-refresh" then
+    catalogue_cache[player.force.index] = nil
+    v.detail_token = nil
+    debug_preview(player)[PREFIX .. "report"].text = report_text(player)
+    return
   elseif action == "export" then export(player)
   elseif action == "refresh" then
     local translations = translation_state()
     local cache = translations[player.index]
     if cache then cache.priority_token = nil end
-  end
+  else return end
   render(player)
 end
 local function selection(event)
   local player = event_player(event)
-  if not (player and event.element and event.element.valid) then return end
+  if not owned_element(player, event.element) then return end
   local action = event.element.tags.mir_browser
-  if action ~= "mode" and action ~= "status" and action ~= "family" and action ~= "sort" then return end
+  if action == "queue-list" then
+    local v = view(player)
+    local technology = (v.queue_keys or {})[event.element.selected_index]
+    if technology and player.force.technologies[technology] then
+      v.selected, v.tab, v.visibility = technology, "research", 1
+      v.search, v.family, v.status, v.mode = "", "all", 1, 1
+      render(player)
+    end
+    return
+  end
+  if action == "omission-list" then
+    local v = view(player)
+    local index = event.element.selected_index
+    local envelope = mir_provider.omissions(player.force)
+    local row = envelope and envelope.rows and envelope.rows[index]
+    if row and bounded_string(row.reason) then
+      v.omission_selection = index
+      event.element.parent[PREFIX .. "omission_reason"].caption = omission_reason_caption(row.reason)
+    end
+    return
+  end
+  if action == "recipe-list" then
+    local v = view(player)
+    local id = (v.recipe_ids or {})[event.element.selected_index]
+    if id and prototypes.recipe[id] then player.open_factoriopedia_gui(prototypes.recipe[id]) end
+    return
+  end
+  if action == "research-list" or action == "setting-list" then
+    local v = view(player)
+    local index = event.element.selected_index
+    if action == "research-list" then v.selected = (v.result_keys or {})[index]
+    else v.setting_selection = (v.setting_keys or {})[index] end
+    render(player); return
+  end
+  if action ~= "mode" and action ~= "status" and action ~= "family" and action ~= "sort" and action ~= "visibility" then return end
   local v = view(player)
   if action == "family" then
     local c = catalogue(player.force); if not c then return end
-    v.family = c.family_names[event.element.selected_index]
+    v.family = (v.family_names or c.family_names)[event.element.selected_index]
   elseif action == "sort" then
     v.sort = ({"progression", "native", "name-asc", "name-desc"})[event.element.selected_index] or "progression"
     if v.sort == "progression" or v.sort == "native" then v.stable_sort = v.sort end
@@ -1281,6 +1443,7 @@ function M.on_init()
   end
 end
 function M.on_configuration_changed()
+  catalogue_cache = {}
   mir_provider.invalidate_omissions()
   state().pending_force_refresh = {}
   set_force_refresh_subscription(false)
@@ -1301,7 +1464,8 @@ function M.on_configuration_changed()
     end
   end
   for _, player in pairs(game.players) do
-    view(player)
+    local v = view(player)
+    v.layout_token, v.settings_detail_token, v.detail_token = nil, nil, nil
     remove_legacy_top_button(player)
   end
   refresh_open()
@@ -1312,6 +1476,7 @@ end
 
 local function schedule_open_force_refresh(force)
   if not force then return end
+  catalogue_cache[force.index] = nil
   for _, player in pairs(game.connected_players) do
     if player.force.index == force.index and player.gui.screen[ROOT] then
       local pending = state().pending_force_refresh
@@ -1419,12 +1584,13 @@ function M.register()
           reset_page = true
         end
         if type(options.search) == "string" then
-          v.search = string.sub(options.search, 1, 160)
+          v[(options.tab or v.tab) == "settings" and "settings_search" or "search"] = string.sub(options.search, 1, 160)
           reset_page = true
         end
         if options.tab == "settings" or options.tab == "research"
-            or options.tab == "queue" or options.tab == "availability" then
-          v.tab = options.tab
+            or options.tab == "queue" or options.tab == "availability" or options.tab == "help" then
+          v.tab = options.tab == "availability" and "research" or options.tab
+          if options.tab == "availability" then v.visibility = 3 else v.visibility = 1 end
           reset_page = true
         end
         if options.settings_scope == "research" or options.settings_scope == "options" then
@@ -1469,18 +1635,31 @@ function M.register()
   commands.add_command("mir-research", {"mir-browser.command"}, function(event)
     local player = event_player(event); if player then render(player) end
   end)
+  script.on_event(defines.events.on_gui_selected_tab_changed, function(event)
+    local player, element = event_player(event), event.element
+    if not (owned_element(player, element) and element.tags.mir_browser == "tabs") then return end
+    view(player).tab = TAB_NAMES[element.selected_tab_index] or "research"
+    render(player)
+  end)
+  script.on_event(defines.events.on_gui_location_changed, function(event)
+    if event.element and event.element.valid and event.element.name == ROOT then
+      local player = event_player(event)
+      if player then view(player).location = event.element.location end
+    end
+  end)
   script.on_event(defines.events.on_gui_click, click)
   script.on_event(defines.events.on_gui_selection_state_changed, selection)
   script.on_event(defines.events.on_gui_text_changed, function(event)
     local player = event_player(event)
     local element = event.element
-    if not (player and element and element.valid and element.tags.mir_browser == "search") then return end
+    if not (owned_element(player, element) and element.tags.mir_browser == "search") then return end
     local v = view(player)
     if v.tab ~= "research" and v.tab ~= "settings" then return end
     local search = type(event.text) == "string" and event.text or element.text
     search = string.sub(search, 1, 160)
-    if v.search == search then return end
-    v.search, v.page = search, 1
+    local key = v.tab == "settings" and "settings_search" or "search"
+    if v[key] == search then return end
+    v[key], v.page = search, 1
     local pending = state().pending_search_refresh
     local was_empty = next(pending) == nil
     pending[player.index] = event.tick + SEARCH_SETTLE_TICKS
@@ -1491,9 +1670,10 @@ function M.register()
   script.on_event(defines.events.on_lua_shortcut, shortcut)
   script.on_event(defines.events.on_gui_confirmed, function(event)
     local player = event_player(event)
-    if player and event.element and event.element.valid and event.element.tags.mir_browser == "search" then
+    if owned_element(player, event.element) and event.element.tags.mir_browser == "search" then
       local v = view(player)
-      v.search, v.page = string.sub(event.element.text, 1, 160), 1
+      local key = v.tab == "settings" and "settings_search" or "search"
+      v[key], v.page = string.sub(event.element.text, 1, 160), 1
       local pending = state().pending_search_refresh
       pending[player.index] = nil
       if next(pending) == nil then set_search_refresh_subscription(false) end
@@ -1502,7 +1682,15 @@ function M.register()
   end)
   script.on_event(defines.events.on_gui_checked_state_changed, function(event)
     local player = event_player(event); local element = event.element
-    if not (player and element and element.valid and element.tags.mir_browser == "setting") then return end
+    if not owned_element(player, element) then return end
+    local action = element.tags.mir_browser
+    if action == "report_settings" or action == "report_omissions" then
+      view(player)[action] = element.state
+      local preview = debug_preview(player)
+      if preview then preview[PREFIX .. "report"].text = report_text(player) end
+      return
+    end
+    if action ~= "setting" then return end
     local name = element.tags.setting; local prototype = prototypes.mod_setting[name]
     if not prototype or prototype.mod ~= "more-infinite-research" then return end
     local scope = prototype.setting_type
