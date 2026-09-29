@@ -878,11 +878,17 @@ local function force_from_event(event)
   return nil
 end
 
-local function normalize_event_force(event)
+local function normalize_event_force(event, research_only)
   local force = force_from_event(event)
   if not force then return end
   local prior_managed = ensure_state().managed_technologies or {}
   local managed, caps, transport_blocked = current_policy()
+  if research_only then
+    local name = event and event.research and event.research.name
+    -- An unrelated research event changes no MIR-managed level or cap. Its
+    -- queue transition preserves the cap validity checked when queued.
+    if not name or (not managed[name] and not prior_managed[name]) then return end
+  end
   normalize_force(force, managed, caps, transport_blocked, prior_managed)
   remember_managed(managed)
 end
@@ -897,9 +903,9 @@ function M.on_configuration_changed()
   normalize_all()
 end
 
-function M.on_research_finished(event) normalize_event_force(event) end
-function M.on_research_reversed(event) normalize_event_force(event) end
-function M.on_research_queued(event) normalize_event_force(event) end
+function M.on_research_finished(event) normalize_event_force(event, true) end
+function M.on_research_reversed(event) normalize_event_force(event, true) end
+function M.on_research_queued(event) normalize_event_force(event, true) end
 function M.on_technology_effects_reset(event) normalize_event_force(event) end
 function M.on_force_created(event)
   clear_force_state(event and event.force)
