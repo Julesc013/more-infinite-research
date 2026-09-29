@@ -1148,7 +1148,10 @@ local F210_BOB_ANGEL_TIN_BLOCKED_RETURN_WITNESS = {
     name="bob-bronze-alloy", hidden=true, enabled_without_research=false,
     source_class="hidden-internal",
     variants={{hidden=true, enabled=false,
-      ingredients={f200_entry("item","copper-plate",3),f200_entry("item","bob-tin-plate",2)},
+      -- recipe_facts normalizes and sorts entries by type/name before the
+      -- reviewed witness comparison, so bind that finalized order rather
+      -- than Bobplates' source declaration order.
+      ingredients={f200_entry("item","bob-tin-plate",2),f200_entry("item","copper-plate",3)},
       results={f200_entry("item","bob-bronze-alloy",5)}
     }}
   }
