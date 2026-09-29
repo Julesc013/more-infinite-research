@@ -444,10 +444,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3316,
-      "source_sha256": "98204236FA78CBBA6A2CBF470A749FCE74D8B442C64F2BA5314415C83CC5D793",
-      "output_bytes": 3316,
-      "output_sha256": "98204236FA78CBBA6A2CBF470A749FCE74D8B442C64F2BA5314415C83CC5D793"
+      "source_bytes": 4096,
+      "source_sha256": "597D084EE9A9C0BB21C2D47000B8075B4D90EC71D0D42BB428952BE5823F17E3",
+      "output_bytes": 4096,
+      "output_sha256": "597D084EE9A9C0BB21C2D47000B8075B4D90EC71D0D42BB428952BE5823F17E3"
     },
     {
       "layer": "shared",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "6296ECDACB7F868599E5BD8CB82504B83A74980483B3B962E7C4CE9CF551AEC8"
+  "record_sha256": "58A34CF904E8063655C570845FD45AE03DEA69693A0018E7FFE9064DDD61C636"
 }
