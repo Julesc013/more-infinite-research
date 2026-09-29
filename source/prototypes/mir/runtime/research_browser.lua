@@ -1118,12 +1118,13 @@ local function debug_rows(player, body, v, width)
   local preview_height = stacked and math.floor(height * 0.50) or height
   section(preview, {"mir-browser.report-preview"}, right_width - 8)
   local text = preview.add{type = "text-box", name = PREFIX .. "report", text = report_text(player)}
-  text.read_only = true
+  text.read_only, text.word_wrap = true, true
   text.style.width, text.style.height = right_width, math.max(40, preview_height - 144)
   button(preview, "report-select", {"mir-browser.report-select"})
   button(preview, "report-export", {"mir-browser.report-export"})
   local status = label(preview, v.report_status or {"mir-browser.report-local"}, right_width - 8)
   status.name = PREFIX .. "report_status"
+  status.tooltip = v.report_destination
 end
 local function debug_preview(player)
   local body = active_body(player, "help")
@@ -1363,8 +1364,10 @@ local function click(event)
     local path = "more-infinite-research/reports/browser-" .. player.index .. "-" .. game.tick .. ".txt"
     helpers.write_file(path, report_text(player) .. "\n", false, player.index)
     player.print({"mir-browser.report-written", "script-output/" .. path})
-    v.report_status = {"mir-browser.report-written", "script-output/" .. path}
-    debug_preview(player)[PREFIX .. "report_status"].caption = v.report_status
+    v.report_status = {"mir-browser.report-saved", "browser-" .. player.index .. "-" .. game.tick .. ".txt"}
+    v.report_destination = "script-output/" .. path
+    local status = debug_preview(player)[PREFIX .. "report_status"]
+    status.caption, status.tooltip = v.report_status, v.report_destination
   elseif action == "report-select" then
     local field = debug_preview(player)[PREFIX .. "report"]
     field.focus(); field.select_all(); return
