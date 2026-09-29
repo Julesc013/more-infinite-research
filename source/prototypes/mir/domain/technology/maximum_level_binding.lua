@@ -169,7 +169,8 @@ local function candidate_rows(plan, options)
         setting_name = "ips-max-level-" .. tostring(row.configured_stream_key or row.stream_key),
         requested_cap = row.planned_max_level,
         native_finite_stage = row.spec and row.spec.staged_progression
-          and row.stage_kind ~= "material-continuation",
+          and (row.stage_kind ~= "material-continuation"
+            or options.mod_data_supported ~= true),
         source = "generated-stream",
         scope = "exact-stream",
         operation = "emit"

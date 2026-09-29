@@ -6,10 +6,13 @@ package.loaded["prototypes.mir.platform.factorio.data_raw"] = {
   end
 }
 local late_available = true
+local unreachable_packs = {}
 package.loaded["prototypes.mir.capabilities.science_integration.science_packs"] = {
   end_game_science_pack = function() return "promethium-science-pack" end,
   science_pack_exists = function() return late_available end,
-  pack_production_status = function() return "research" end
+  pack_production_status = function(name)
+    return unreachable_packs[name] and "unreachable" or "research"
+  end
 }
 package.loaded["prototypes.mir.planner.costs"] = {
   max_level_for = function() return "infinite" end,
@@ -24,8 +27,10 @@ package.loaded["prototypes.mir.planner.science"] = {
   end
 }
 local scripted = true
+local mod_data_supported = true
 package.loaded["prototypes.mir.platform.factorio.target_line"] = {
-  feature_enabled = function(name) return name == "scripted_techs" and scripted end
+  feature_enabled = function(name) return name == "scripted_techs" and scripted end,
+  mod_data_supported = function() return mod_data_supported end
 }
 package.loaded["prototypes.mir.domain.research_cost.model"] = {
   evaluate = function() return 400 end,
@@ -91,7 +96,7 @@ legacy.planned_max_level = 3
 legacy.manifest_id = "research_material_tin"
 local bindings = require("prototypes.mir.domain.technology.maximum_level_binding").from_plan(
   {stream_plan = {rows = {legacy, stage}}, fingerprint = "controlled-stage"},
-  {scripted_techs_supported = true}
+  {scripted_techs_supported = true, mod_data_supported = true}
 )
 local by_name = {}
 for _, binding in ipairs(bindings.bindings) do by_name[binding.technology_id] = binding end
@@ -102,6 +107,42 @@ check(by_name[stage.technology_name].prototype_strategy.max_level == "infinite"
     and by_name[stage.technology_name].cap.effective == 150,
   "the later stage retains a lossless 2.1 prototype with a finite effective cap")
 
+mod_data_supported = false
+local f200_stage = continuation.plan(legacy)
+check(f200_stage.fields.max_level == 150,
+  "2.0 uses a native finite later stage without a mod-data policy transport")
+local f200_bindings = require("prototypes.mir.domain.technology.maximum_level_binding").from_plan(
+  {stream_plan = {rows = {legacy, f200_stage}}, fingerprint = "controlled-f200-stage"},
+  {scripted_techs_supported = true, mod_data_supported = false}
+)
+local f200_by_name = {}
+for _, binding in ipairs(f200_bindings.bindings) do
+  f200_by_name[binding.technology_id] = binding
+end
+check(f200_by_name[f200_stage.technology_name].prototype_strategy.max_level == 150
+    and f200_by_name[f200_stage.technology_name].runtime_strategy.mode == "prototype-cap",
+  "2.0 binds the later stage to the native finite prototype maximum")
+unreachable_packs["space-science-pack"] = true
+unreachable_packs["utility-science-pack"] = true
+unreachable_packs["promethium-science-pack"] = true
+local established_frontier = {
+  action = legacy.action,
+  stream_key = legacy.stream_key,
+  technology_name = legacy.technology_name,
+  spec = legacy.spec,
+  fields = {}
+}
+for key, value in pairs(legacy.fields) do established_frontier.fields[key] = value end
+established_frontier.fields.ingredients = {
+  {"automation-science-pack", 1}, {"production-science-pack", 1}
+}
+local same_frontier_stage = continuation.plan(established_frontier)
+check(same_frontier_stage.action == "emit"
+    and #same_frontier_stage.fields.ingredients == 2
+    and same_frontier_stage.fields.ingredients[2][1] == "production-science-pack",
+  "an established highest reachable science tier may carry useful later levels")
+unreachable_packs = {}
+mod_data_supported = true
 scripted = false
 check(continuation.plan(legacy).fields.max_level == 150,
   "older targets materialize a native finite cap")

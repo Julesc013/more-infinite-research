@@ -44,6 +44,22 @@ local function late_science_for(key, early_ingredients)
       end
     end
   end
+  -- A material that already needs the highest reachable pack still has
+  -- useful recipe headroom. Keep that proven tier for its next stage when no
+  -- additional science pack can be reached in this overhaul profile.
+  for _, late in ipairs(candidates) do
+    if late and contains_ingredient(early_ingredients, late)
+        and science_packs.science_pack_exists(late) then
+      local status = science_packs.pack_production_status(late)
+      if status == "initial" or status == "research" or status == "non-recipe" then
+        local ingredients, lab_status, decision = planner_science.ingredients_for_selected(
+          key, deepcopy(early_ingredients))
+        if ingredients and contains_ingredient(ingredients, late) then
+          return ingredients, lab_status, decision, late
+        end
+      end
+    end
+  end
   return nil
 end
 
@@ -106,7 +122,8 @@ function M.plan(legacy_row)
   fields.ingredients = ingredients
   fields.count_formula = continuation_cost.count_formula
   fields.cost_model = continuation_cost
-  fields.max_level = target_line.feature_enabled("scripted_techs") and "infinite" or maximum
+  fields.max_level = target_line.feature_enabled("scripted_techs")
+    and target_line.mod_data_supported() and "infinite" or maximum
   fields.level = staged.continuation.first_level
   return plan_row(stage_key, stage_spec, "emit", "material_continuation",
     D.stream_fields(stage_key, stage_spec, "generated", "recipe_productivity", ingredients,

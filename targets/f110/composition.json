@@ -3852,8 +3852,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the shared material continuation planner for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5720,
-      "expected_sha256": "3275E78E585E94B920DD67B8FDBC7EE4162E3485DD01AB627BBB3C925F907099",
+      "expected_bytes": 6586,
+      "expected_sha256": "91EAEB417ADB8F7E3F81970129753F48B2CB617649F3DC8457CFB3522222024E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "91BC0E3D93E1D6146F624F3456151E322C82EDB497785EA85DB381E2C7366849"
+  "record_sha256": "B49AF87CC75972DA5073FD19B733C6D8718DD5D115890DB6D874267CF66C74D8"
 }

@@ -59,7 +59,7 @@ local function plan_stream(key, raw_spec)
   local cost_model = costs.model_for(key, spec, first_level)
   local max_level = material_progression.legacy_max_level(key, spec, costs.max_level_for(key, spec))
   local prototype_max_level = target_line.feature_enabled("scripted_techs")
-    and "infinite" or max_level
+    and not spec.staged_progression and "infinite" or max_level
   local count_formula = cost_model.count_formula
   local research_time = costs.research_time_for(key, spec)
 

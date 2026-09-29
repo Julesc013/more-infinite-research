@@ -2572,8 +2572,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed maximum-level policy capability for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 12083,
-      "expected_sha256": "2A7B07678AF864003834FD7A366CD39664B920E99B01E54DB8AF95AA783AA2FE",
+      "expected_bytes": 12135,
+      "expected_sha256": "86CBA50A6952F79C0C7839463FCE159D08EB9761CAFACAC90B1BD2E795E7ED60",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3916,8 +3916,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the shared material continuation planner for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5720,
-      "expected_sha256": "3275E78E585E94B920DD67B8FDBC7EE4162E3485DD01AB627BBB3C925F907099",
+      "expected_bytes": 6586,
+      "expected_sha256": "91EAEB417ADB8F7E3F81970129753F48B2CB617649F3DC8457CFB3522222024E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "D4F5B062CB8A33917D91740509B4F355904B3F9B42FC1F970F77B014C47A8242"
+  "record_sha256": "CDB49457DB589720EF20E154EA3A78D62B08212DFF4AD04F4C644884F99C09C0"
 }
