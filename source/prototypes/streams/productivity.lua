@@ -1,6 +1,7 @@
 local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local material_progression = require("prototypes.mir.families.material_progression")
 
 local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
 local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
@@ -908,6 +909,14 @@ streams.research_material_gunmetal = material_family("bob-gunmetal-alloy", f200_
 streams.research_material_invar = material_family("bob-invar-alloy", f200_material_routes({"bob-invar-alloy"}, {"angels-plate-invar"}), {"bobplates", "angelssmelting"})
 streams.research_material_cobalt_steel = material_family("bob-cobalt-steel-alloy", f200_material_routes({"bob-cobalt-steel-alloy"}, {"angels-plate-cobalt-steel"}), {"bobplates", "angelssmelting"})
 streams.research_material_nitinol = material_family("bob-nitinol-alloy", f200_material_routes({"bob-nitinol-alloy"}, {"angels-plate-nitinol"}), {"bobplates", "angelssmelting"})
+
+-- These sixteen ordinary Bob/Angel families share one staged declaration.
+-- K2 material families remain outside this mechanism until their separate
+-- cap and continuation evidence is admitted.
+for _, key in ipairs(material_progression.material_stream_keys()) do
+  material_progression.attach(key, streams[key])
+end
+
 streams.research_material_rare_metals = material_family("kr-rare-metals", {"kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals", "kr-casting-rare-metals"}, {"Krastorio2", "Krastorio2-spaced-out"})
 -- K2SO's native owner retains crystal productivity. MIR owns the admitted
 -- powder route, so present its generated technology as powder while keeping

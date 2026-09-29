@@ -2069,6 +2069,22 @@
       ]
     },
     {
+      "path": "prototypes/mir/families/material_progression.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/families/material_progression.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize shared material progression declarations for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7383,
+      "expected_sha256": "C0071E5C535BB3BB3A31143AE21B8CA93C0858B482FE2484B35919A67C5F016E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
       "path": "prototypes/mir/families/registry.lua",
       "operation": "add",
       "semantic_class": "target-overlay",
@@ -3772,8 +3788,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 55676,
-      "expected_sha256": "493AFDA97FE5E70F2B205118EC97E53F1B1F1F94761583761D8C007EAF3AA258",
+      "expected_bytes": 56081,
+      "expected_sha256": "D90EB08B34416738DB239CD2D588F8D6942602B72BCB6A85C96C0EE870E45B7D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3899,5 +3915,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "53729ECD4FA01BD9944F87B3F3EB0DD96831CA2E0EC9C1E70688345B9660BA4B"
+  "record_sha256": "C7B43534B40AAB4C88EAA5CFEB7CFF97020D123808821EA09F73985D618046F9"
 }
