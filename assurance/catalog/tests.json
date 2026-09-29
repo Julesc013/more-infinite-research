@@ -1178,6 +1178,8 @@
         "tests/runtime/Test-MIRResearchBrowser.ps1",
         "tests/runtime/research_browser.lua",
         "tests/runtime/research_browser_omissions.lua",
+        "tests/runtime/research_browser_core_regressions.lua",
+        "tests/runtime/research_browser_handler_regressions.lua",
         "tests/runtime/browser_fixture_data.lua",
         "source:source/prototypes/mir/core/fingerprint.lua",
         "source:source/prototypes/mir/runtime/research_browser*.lua",
@@ -7794,5 +7796,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:9508982b7efb433bc337ebbd2826967a70a4b5a2e19c4927c8193f264dc31cbf"
+  "digest": "sha256:ede92802fceee9876100d6cda99857afacd1f0bab47529de142583d04bfb8b7c"
 }

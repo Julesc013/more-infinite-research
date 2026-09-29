@@ -51,7 +51,7 @@ local function dimensions(player)
 end
 local function research_pane_widths(player)
   local width = dimensions(player) - 64
-  if width < 560 then return width, width, true end
+  if width < 400 then return width, width, true end
   local list = math.floor((width - 12) * 0.40)
   return list, width - 12 - list, false
 end
@@ -740,11 +740,12 @@ local function detail(player, parent, v, c, width)
   local pane_height = parent.style.maximal_height
   local recipe_index = core.detail_recipe_index(c, tech.name, c.enrichment)
   local has_recipes = recipe_index and #recipe_index.ids > 0
+  local compact_detail = pane_height < 200
   local recipe_height = has_recipes and math.min(#recipe_index.ids * 28 + 8, math.max(32, math.floor(pane_height * 0.28))) or 0
   parent = container.add{type = "scroll-pane", name = PREFIX .. "research_facts", direction = "vertical"}
   parent.horizontal_scroll_policy = "never"
   parent.style.width = width
-  parent.style.height = has_recipes and math.max(60, pane_height - recipe_height - 70) or pane_height
+  parent.style.height = has_recipes and not compact_detail and math.max(60, pane_height - recipe_height - 70) or pane_height
   local maximum_width = math.max(120, width - 16)
   local heading_width = math.max(120, maximum_width - 56)
   local heading = parent.add{type = "flow", direction = "horizontal"}
@@ -791,22 +792,25 @@ local function detail(player, parent, v, c, width)
   button(parent, "inspect-settings", {"mir-browser.inspect-settings"}, {technology = tech.name}).enabled = registered_binding ~= nil or portable.technology.family ~= "external"
   add_research_startup_settings(parent, portable, maximum_width)
   if has_recipes then
-    label(container, {"mir-browser.affected-recipes"}, width - 24).style.font = "default-bold"
+    local recipe_parent = compact_detail and parent or container
+    label(recipe_parent, {"mir-browser.affected-recipes"}, width - 24).style.font = "default-bold"
     local items = {}
     for i,id in ipairs(recipe_index.ids) do
       local recipe = player.force.recipes[id]
       items[i] = {"", "[img=recipe/" .. id .. "] ", recipe and recipe.prototype.localised_name or id}
     end
     v.recipe_ids = recipe_index.ids
-    local list = container.add{type = "list-box", name = PREFIX .. "recipe_entries", items = items, tags = {mir_browser = "recipe-list", mir_browser_section = "recipe-list"}}
-    list.style.width, list.style.height = width, recipe_height
-    label(container, {"mir-browser.recipe-select-hint"}, width - 24)
+    local list = recipe_parent.add{type = compact_detail and "drop-down" or "list-box", name = PREFIX .. "recipe_entries", items = items, tags = {mir_browser = "recipe-list", mir_browser_section = "recipe-list"}}
+    list.style.width = compact_detail and width - 24 or width
+    if not compact_detail then list.style.height = recipe_height end
+    list.tooltip = {"mir-browser.recipe-select-hint"}
+    if not compact_detail then label(container, {"mir-browser.recipe-select-hint"}, width - 24) end
   end
 end
 local function filter_dropdown(parent, caption, items, selected_index, action, width)
   local field = parent.add{type = "flow", direction = "vertical"}
-  label(field, caption, width)
-  local dropdown = field.add{type = "drop-down", items = items, selected_index = selected_index, tags = {mir_browser = action}}
+  if parent.tags.compact ~= true then label(field, caption, width) end
+  local dropdown = field.add{type = "drop-down", items = items, selected_index = selected_index, tags = {mir_browser = action}, tooltip = caption}
   dropdown.style.width = width
   return dropdown
 end
@@ -1001,7 +1005,7 @@ update_research_results = function(player, results, v, c, cache)
     detail_pane = results.add{type = "flow", name = PREFIX .. "research_detail", direction = "vertical", tags = {mir_browser_section = "research-detail"}}
   end
   list_column.style.width = list_width
-  list.style.width, list.style.height = list_width, stacked and math.floor(panes_height * 0.30) or panes_height - 48
+  list.style.width, list.style.height = list_width, stacked and math.floor(panes_height * 0.30) or math.max(28, panes_height - 28)
   detail_pane.style.width, detail_pane.style.height = detail_width, stacked and math.floor(panes_height * 0.62) or panes_height
   local query = query_view(v, cache)
   if v.visibility == 2 then query.hidden = nil end
@@ -1097,6 +1101,11 @@ local function debug_rows(player, body, v, width)
   section(tools, {"mir-browser.debug-installation"}, text_width)
   label(tools, {"mir-browser.debug-versions", script.active_mods.base, script.active_mods["more-infinite-research"]}, text_width)
   button(tools, "debug-refresh", {"mir-browser.debug-refresh"}).tooltip = {"mir-browser.debug-refresh-tooltip"}
+  section(tools, {"mir-browser.report-options"}, text_width)
+  for _, option in ipairs{{"report_settings", "report-settings"}, {"report_omissions", "report-omissions"}} do
+    local checkbox = tools.add{type = "checkbox", state = v[option[1]] == true, caption = {"mir-browser." .. option[2]}, tags = {mir_browser = option[1]}}
+    checkbox.style.maximal_width = text_width
+  end
   section(tools, {"mir-browser.configuration"}, text_width)
   label(tools, {"mir-browser.profile-purpose"}, text_width)
   button(tools, "export", {"mir-browser.export"})
@@ -1108,12 +1117,9 @@ local function debug_rows(player, body, v, width)
   preview.style.width = right_width
   local preview_height = stacked and math.floor(height * 0.50) or height
   section(preview, {"mir-browser.report-preview"}, right_width - 8)
-  for _, option in ipairs{{"report_settings", "report-settings"}, {"report_omissions", "report-omissions"}} do
-    preview.add{type = "checkbox", state = v[option[1]] == true, caption = {"mir-browser." .. option[2]}, tags = {mir_browser = option[1]}}
-  end
   local text = preview.add{type = "text-box", name = PREFIX .. "report", text = report_text(player)}
   text.read_only = true
-  text.style.width, text.style.height = right_width, math.max(40, preview_height - 182)
+  text.style.width, text.style.height = right_width, math.max(40, preview_height - 144)
   button(preview, "report-select", {"mir-browser.report-select"})
   button(preview, "report-export", {"mir-browser.report-export"})
   local status = label(preview, v.report_status or {"mir-browser.report-local"}, right_width - 8)
@@ -1193,7 +1199,7 @@ render = function(player)
     if not has_family(c.family_names, v.family) then v.family = "all" end
     local filters = body[PREFIX .. "filters"]
     if not filters then
-      filters = body.add{type = "table", name = PREFIX .. "filters", column_count = 2}
+      filters = body.add{type = "table", name = PREFIX .. "filters", column_count = 2, tags = {compact = height < 600}}
       filters.style.horizontal_spacing = 12
       local field_width = math.floor((width - 80) / 2)
       local family_items = {}
@@ -1221,7 +1227,7 @@ render = function(player)
     local results = body[PREFIX .. "research_results"]
     local _,_,stacked = research_pane_widths(player)
     if not results then results = body.add{type = "flow", name = PREFIX .. "research_results", direction = stacked and "vertical" or "horizontal"} end
-    results.style.height = math.max(80, body.style.maximal_height - 190)
+    results.style.height = math.max(48, body.style.maximal_height - (height < 600 and 110 or 190))
     update_research_results(player, results, v, c, cache)
   elseif v.tab == "settings" then settings_rows(player, body, v)
   elseif v.tab == "queue" then
