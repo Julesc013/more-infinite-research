@@ -2935,6 +2935,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir42-player-compatibility-playtest-plan
+  - path: docs/releases/mir42-nine-target-candidate-playtest-matrix.md
+    title: "MIR 4.2 Nine-Target Candidate and Playtest Matrix"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir42-nine-target-candidate-playtest-matrix
   - path: docs/releases/mir42-playtest-findings.md
     title: "MIR 4.2 Playtest Findings"
     status: current

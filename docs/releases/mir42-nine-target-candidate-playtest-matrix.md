@@ -1,0 +1,68 @@
+---
+title: "MIR 4.2 Nine-Target Candidate and Playtest Matrix"
+status: current
+applies_to: "MIR 4.2 pre-freeze preparation"
+audience: release-manager
+doc_type: release-plan
+owner: mir-maintainers
+last_reviewed: 2026-09-30
+supersedes: []
+superseded_by: []
+source_of_truth_for:
+  - mir42-nine-target-candidate-playtest-matrix
+---
+
+# MIR 4.2 nine-target candidate and playtest matrix
+
+This page turns the current nine-target release-cut selection into a reviewable preparation matrix. It does not allocate a candidate, freeze a source, authorize support, change viewer behavior, or authorize a release transition. The [release runbook](../RELEASE-RUNBOOK.md) and the [nine-target release-cut programme](../../.mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json) remain the controlling authorities.
+
+## Observed preparation identity
+
+At preparation time, `dev` is `8a3b190d987bc55897f54e3c6e0643128fd90a9c`. That is an observation only: the programme records `candidate.state` as `unallocated`, requires an exact candidate, and leaves every source-freeze, allocation, signing, seal, promotion, tagging, and publication transition false. There is no MIR 4.2 nine-target candidate identity, frozen package-source fingerprint, sealed ZIP inventory, or release tag to reuse.
+
+The current development viewer handoff is preserved at `dist/mir42-viewer-interaction-20260929`, whose manifest SHA-256 is `FF7586FC41A0CD3E8678AFC19A8FBC5C0F67BDD08144D478882913295989B37A`. It binds `dev` readback `8a3b190d987bc55897f54e3c6e0643128fd90a9c` and is explicitly a bounded single-client interaction prototype. Its own limitations, including no two-client acceptance, Unicode-search completion, or release authority, continue to apply. This preparation work does not revise its viewer or its evidence.
+
+The exact K2 V3 development observation is also retained. At source `f7a355f5018577ff43094280fa7620116fc924ab`, the unmodified Factorio 2.1.20, K2 2.1.3, and K2SO 2.0.13 candidate passed initial creation and two loads of the unchanged progressed save with its 42 percent queue/progress state. The three phase receipts are `C482441ABFD3EABE2431E86EF14D55F15E4AF0F323CE1EAA61558B36C8E50D5C`, `B8DC4B04304834FB3435A507B8554547DD39E8AB29F003C84BD8C122C6D46E8F`, and `00DD9F2F4CF20ED9DDD9F183F6B20F3E4B038F9D346578D86AE64A920C6F343A`. The compatibility and fixture authorities still label that tuple unqualified because a future release must bind fresh candidate, external-archive, engine, and package custody. The retained result neither widens K2 support nor substitutes for release qualification.
+
+## Exact target matrix
+
+All predecessor archives and installed executables below were rehashed during preparation and matched the rows in [MIR42 direct predecessor inputs](../../.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json) or the named historical target record. “Available” means only that the exact input exists locally and matches its recorded hash; it is not an upgrade, reload, or candidate-qualification result. F210 must be observed again immediately before its candidate lane because its Steam channel is moving.
+
+| Target | Candidate composition and expected version | Exact local engine and predecessor input | Current position | Candidate-bound work still required |
+| --- | --- | --- | --- | --- |
+| F210 | `targets/f210/composition.json`; `4.2.21000` | Factorio 2.1.20, Steam current channel; published `4.1.21000` predecessor | Current, mandatory | Freeze and build A/B, fresh load, direct predecessor upgrade and repeated reload, affected runtime and player checks, independent verification, seal, main readback, and human GO. |
+| F200 | `targets/f200/composition.json`; `4.2.20000` | Factorio 2.0.77; published `4.1.20000` predecessor | Maintained, mandatory | Freeze and build A/B, fresh load, direct predecessor upgrade and repeated reload, affected runtime and player checks, independent verification, seal, main readback, and human GO. |
+| F110 | `targets/f110/composition.json`; `4.2.11000` | Factorio 1.1.110; published `4.1.11000` predecessor | Supplemental LTS | Freeze and build A/B, fresh load, direct predecessor upgrade and repeated reload, target-specific qualification and independent verification. |
+| F100 | `targets/f100/composition.json`; `4.2.10000` | Factorio 1.0.0; published `4.1.10000` predecessor | Supplemental LTS | Freeze and build A/B, fresh load, direct predecessor upgrade and repeated reload, target-specific qualification and independent verification. |
+| F017 | `targets/historical/f017/target.json` over the F100 materializer; `4.2.01700` | Factorio 0.17.79; `1.7.9` terminal predecessor | Private historical playtest; target record forbids public output and publication | Current candidate mapping, fresh exact-engine load, predecessor upgrade and reload evidence, then explicit release-scope reconciliation before any sealed-asset or support claim. |
+| F016 | `targets/historical/f016/target.json` over the F100 materializer; `4.2.01600` | Factorio 0.16.51; `1.6.9` terminal predecessor | Private historical playtest; target record forbids public output and publication | Current candidate mapping, fresh exact-engine load, predecessor upgrade and reload evidence, then explicit release-scope reconciliation before any sealed-asset or support claim. |
+| F015 | `targets/historical/f015/target.json` over the F100 materializer; `4.2.01500` | Factorio 0.15.40; `1.5.9` terminal predecessor | Private historical playtest; target record forbids public output and publication | Current candidate mapping, fresh exact-engine load, predecessor upgrade and reload evidence, then explicit release-scope reconciliation before any sealed-asset or support claim. |
+| F014 | `targets/historical/f014/target.json` over the F100 materializer; `4.2.01400` | Factorio 0.14.23; `1.4.9` terminal predecessor | Private historical playtest; target record forbids public output and publication | Current candidate mapping, fresh exact-engine load, predecessor upgrade and reload evidence, then explicit release-scope reconciliation before any sealed-asset or support claim. |
+| F013 | `targets/historical/f013/target.json` over the F100 materializer; `4.2.01300` | Factorio 0.13.20; `1.3.9` terminal predecessor | Private historical playtest; target record forbids public output and publication | Current candidate mapping, fresh exact-engine load, predecessor upgrade and reload evidence, then explicit release-scope reconciliation before any sealed-asset or support claim. |
+
+The ordinary target support policy currently names only F210 as current, F200 as maintained, and F110/F100 as supplemental LTS. The five historical target records are deliberately narrower: their `public_output_authorized` and `publication_authorized` values are false. Selecting all nine in a future candidate therefore does not convert the historical rows into public support. A candidate must preserve those facts or obtain a separately authorized successor before its inventory can say more.
+
+## Preconditions and execution order
+
+The programme records these open gates: exact candidate allocation, joined real-engine campaign, independent acceptance, protected signing and recovery, source-freeze ledger authorization, governed offline restore, and human GO after main readback. None may be filled from a preview, a passed controlled test, an installed engine, or a predecessor archive.
+
+When the release manager has explicit freeze authority, the smallest executable sequence is:
+
+1. Reconcile the programme, protections, and clean source; observe `main` and freeze one exact `dev` commit/tree.
+2. Allocate one create-only candidate and build the ordered nine targets twice, serially. The existing candidate builder accepts the exact nine-target selection through `New-MIR42FourTargetCandidate.ps1 -SelectedTargets f210,f200,f110,f100,f017,f016,f015,f014,f013`; its legacy filename does not reduce the selected scope.
+3. Run each target’s fresh exact-engine, predecessor-upgrade, and repeated-reload qualifications against only the accepted candidate ZIPs. Re-observe the F210 Steam executable immediately before its lane.
+4. Reconcile candidate-bound predecessor/upgrade evidence with `Invoke-MIR42NineTargetEvidenceReconciliation.ps1`, independently rehash the accepted evidence, create the technical seal, and complete the governed offline restore.
+5. Promote only through `Invoke-MIR42NineTargetSealPromotion.ps1`, read back protected `main`, and bind the release asset inventory through `Invoke-MIR42NineTargetReleaseAssets.ps1`. The support collector is prepared from the frozen source before that inventory freezes.
+6. Present only the sealed, main-readback F210/F200 packages for the human playtest. An actual GO is still required before tag, GitHub release, Mod Portal upload, or public-byte readback.
+
+The command names above are preparation pointers, not authorization to execute them now. The release manager must materialize the exact candidate verification plan before any engine campaign and must preserve all failed or superseded attempts with their original identities.
+
+## Support wording and changelog draft
+
+The final support list must be generated from the candidate-qualified matrix and its exact package manifests. Until then, the only accurate development wording is that MIR 4.2 has current and historical target preparation records, not that all nine targets are released or supported. Do not describe private historical playtest rows as public packages, and do not carry K2 V3, browser, performance, one-player, or preview evidence into an unqualified candidate.
+
+The following is a draft input for a later candidate-bound narrative. It is not a change fragment, player ZIP changelog, Mod Portal description, or approval record.
+
+> MIR 4.2 is being prepared as a nine-target release cut. The candidate will preserve the current Research Library, including its native Research, Queue, Settings, and Debug views, while package and target support remain limited to the exact qualification matrix. The candidate will list only material routes, external profiles, upgrades, localization coverage, browser interaction, multiplayer behavior, and performance results that its own sealed evidence proves. Historical Factorio targets remain private playtest outputs unless a later authority explicitly changes that status.
+
+The narrative must omit claims of universal overhaul compatibility, completed two-client acceptance, human first-use acceptance, non-English fit, general performance improvement, predecessor qualification, public availability, tagging, and publication until their named candidate evidence and human decisions exist.
