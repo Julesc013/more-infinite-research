@@ -608,6 +608,13 @@ script.on_nth_tick(1,function()
     end
     local default_sort=find_browser_element(default_root,"mir_browser","sort")
     local default_scope=find_browser_element(default_root,"mir_browser","family")
+    local filter_grid=default_scope and default_scope.parent and default_scope.parent.parent
+    local search_field=default_search and default_search["mir_browser_search"]
+    check(filter_grid and filter_grid.type=="table" and filter_grid.column_count==2
+      and default_scope.style.maximal_width>=220 and default_sort and default_sort.style.maximal_width>=220
+      and search_field and search_field.type=="textfield"
+      and search_field.style.maximal_width>=280,
+      "two readable filter columns and a full-width search field")
     check(default_sort and default_sort.type=="drop-down" and default_sort.selected_index==1,"new personal view defaults to MIR progression")
     check(all_family_scope_index and default_scope and default_scope.type=="drop-down"
       and default_scope.selected_index==(mir_scope_index or all_family_scope_index),
