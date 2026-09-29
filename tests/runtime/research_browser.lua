@@ -468,19 +468,23 @@ script.on_nth_tick(1,function()
   local nonlatin=browser_core.query(localized_ordering,{mode=1,status=1,page=1,search="漢字",sort="name-asc"},nil,labels)
   check(#nonlatin.rows==1 and nonlatin.rows[1].key=="label-nonlatin","non-Latin localized search preserves UTF-8 text")
   local deep_rows={}
-  for index=1,600 do
-    local key=string.format("mir-browser-deep-%03d",index)
+  for index=1,1000 do
+    local key=string.format("mir-browser-deep-%04d",index)
     deep_rows[index]={key=key,available=true,researched=false,queued=false,infinite=false,native_order="",progression=index}
   end
   local deep_catalogue={schema=1,rows=deep_rows}
   local deep_page=browser_core.query(deep_catalogue,{mode=1,status=1,page=30,search="",sort="progression"})
-  check(deep_page.count==600 and deep_page.page==30 and #deep_page.rows==20,"deep pages stay bounded beyond 512 catalogue entries")
-  local retained_off_page=browser_core.query(deep_catalogue,{mode=1,status=1,page=1,search="",sort="progression"},nil,nil,"mir-browser-deep-600")
+  check(deep_page.count==1000 and deep_page.page==30 and #deep_page.rows==20,"deep pages stay bounded beyond 512 catalogue entries")
+  local descending_deep=browser_core.query(deep_catalogue,{mode=1,status=1,page=1,search="",sort="name-desc"})
+  check(descending_deep.count==1000 and descending_deep.rows[1].key=="mir-browser-deep-1000"
+    and descending_deep.rows[20].key=="mir-browser-deep-0981",
+    "descending name order remains a strict sort across a deep catalogue")
+  local retained_off_page=browser_core.query(deep_catalogue,{mode=1,status=1,page=1,search="",sort="progression"},nil,nil,"mir-browser-deep-0600")
   check(retained_off_page.selected_visible and retained_off_page.page==1 and #retained_off_page.rows==20
-    and retained_off_page.rows[1].key=="mir-browser-deep-001",
+    and retained_off_page.rows[1].key=="mir-browser-deep-0001",
     "filtered selection remains visible when it lies beyond the rendered page")
-  local deep_localized=browser_core.query(deep_catalogue,{mode=1,status=1,page=1,search="off page localized target",sort="name-asc"},nil,{["mir-browser-deep-600"]="Off page localized target"})
-  check(#deep_localized.rows==1 and deep_localized.rows[1].key=="mir-browser-deep-600","off-page localized entry is discoverable beyond 512")
+  local deep_localized=browser_core.query(deep_catalogue,{mode=1,status=1,page=1,search="off page localized target",sort="name-asc"},nil,{["mir-browser-deep-0600"]="Off page localized target"})
+  check(#deep_localized.rows==1 and deep_localized.rows[1].key=="mir-browser-deep-0600","off-page localized entry is discoverable beyond 512")
   local descending=browser_core.query(catalogue,{mode=1,status=1,page=1,sort="name-desc",search="mir-browser-test"})
   check(#descending.rows==2 and descending.rows[1].key=="mir-browser-test-infinite","descending deterministic sort")
   local excluded_selected=browser_core.query(catalogue,{mode=2,status=1,page=1,search="",sort="progression"},nil,nil,"mir-browser-test-infinite")

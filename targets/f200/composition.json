@@ -3836,8 +3836,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical copied-data research query core for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 34815,
-      "expected_sha256": "AB455318C0DBCB8EE1F2F07B5B25C1B8C7CEF0D04BA92A28E76AD00819F0D1B4",
+      "expected_bytes": 34825,
+      "expected_sha256": "578ED9C6B293BD2E3D8B3B68A0FC060E2E1A50D105429CB447ECA94310D7B37A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "package-excluded-no-mir-core-fixture",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "B834812033E3FED529701BE0CF9A4A69020A4E6C825105B694D3DB3DF53EE452"
+  "record_sha256": "F1FDFF85BAD6E6474FD5DECFCE0BFAE1FFC167FDCD16BF055E80330A81F41023"
 }
