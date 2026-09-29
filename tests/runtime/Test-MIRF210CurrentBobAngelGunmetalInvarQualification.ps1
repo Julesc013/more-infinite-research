@@ -131,7 +131,8 @@ if(-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
   Assert-GI ([string]$lease.state -ceq 'completed' -and [string]$lease.outcome -ceq 'passed' -and [bool]$lease.inputs_sha256_match) 'recovery run immutable input lease is not terminal and clean'
   $recoveryCandidate=@($lease.inputs | Where-Object { $_.role -ceq 'candidate' })
   Assert-GI ($recoveryCandidate.Count -eq 1) 'recovery run candidate cardinality differs'
-  Assert-GI ((Get-GISha [string]$recoveryCandidate[0].stage_path) -ceq [string]$recoveryCandidate[0].expected_sha256) 'recovery run candidate bytes differ'
+  $recoveryCandidateStage=[string]$recoveryCandidate[0].stage_path
+  Assert-GI ((Get-GISha $recoveryCandidateStage) -ceq [string]$recoveryCandidate[0].expected_sha256) 'recovery run candidate bytes differ'
   $recoveryCommit=[string]$recoveryCandidate[0].provenance.source_commit
   $recoveryTree=[string]$recoveryCandidate[0].provenance.source_tree
   Assert-GI ($recoveryCommit -match '^[0-9a-f]{40}$' -and $recoveryTree -match '^[0-9a-f]{40}$') 'recovery run source identity is invalid'
@@ -160,7 +161,7 @@ if(-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
   }
   $result.fresh_create=[ordered]@{passed=$true;save=Get-GIArtifact (Join-Path $recoveryRun 'saves/f210-ba-gunmetal-invar.zip');stdout=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.stdout.log');stderr=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.stderr.log');factorio_log=Get-GIArtifact $freshLogPath}
   $result.reloads=@([ordered]@{ordinal=1;passed=$true;reload_log_contract_passed=$true;required_log_assertions=@([ordered]@{fragment=$reloadMarker;passed=$true});stdout=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.stdout.log');stderr=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.stderr.log');factorio_log=Get-GIArtifact $reloadLogPath})
-  $result.mod_closure=[ordered]@{candidate=Get-GIArtifact ([string]$recoveryCandidate[0].stage_path);fixture=Get-GIArtifact (Join-Path $recoveryRun 'mods' ($fixtureName+'_'+$fixtureVersion+'.zip'));mod_list=Get-GIArtifact (Join-Path $recoveryRun 'mods/mod-list.json');input_staging=$lease}
+  $result.mod_closure=[ordered]@{candidate=Get-GIArtifact $recoveryCandidateStage;fixture=Get-GIArtifact (Join-Path $recoveryRun 'mods' ($fixtureName+'_'+$fixtureVersion+'.zip'));mod_list=Get-GIArtifact (Join-Path $recoveryRun 'mods/mod-list.json');input_staging=$lease}
   $resultPath=Join-Path $recoveryRun 'result.json'
   [IO.File]::WriteAllText($resultPath,(ConvertTo-Json $result -Depth 100),[Text.UTF8Encoding]::new($false))
   Write-Output "[MIR-F210-BA-GUNMETAL-INVAR-RECOVERED] $(Get-GIRelative $resultPath)"
