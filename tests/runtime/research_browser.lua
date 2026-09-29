@@ -295,6 +295,30 @@ script.on_nth_tick(1,function()
   force.research_progress=0.375
   local before=snapshot(force)
   local catalogue=browser_catalogue.snapshot(force)
+  local static_reads=0
+  local cache_prototype=setmetatable({}, {__index=function(_,key)
+    if key=="max_level" or key=="order" then static_reads=static_reads+1 end
+    if key=="max_level" then return "infinite" end
+    if key=="order" then return "cache-order" end
+  end})
+  local cache_technology={name="catalogue-cache-probe",enabled=true,researched=false,
+    prototype=cache_prototype,prerequisites={}}
+  local cache_force={valid=true,index=937,name="catalogue-cache-force",
+    technologies={[cache_technology.name]=cache_technology},research_queue={}}
+  local cache_first=browser_catalogue.snapshot(cache_force)
+  check(cache_first.rows[1].available and not cache_first.rows[1].researched
+    and not cache_first.rows[1].queued and static_reads==2,
+    "catalogue cache builds prototype facts once")
+  cache_technology.researched=true
+  cache_force.research_queue={cache_technology}
+  local cache_second=browser_catalogue.snapshot(cache_force)
+  check(not cache_second.rows[1].available and cache_second.rows[1].researched
+    and cache_second.rows[1].queued and static_reads==2,
+    "catalogue cache retains static facts while live force state changes")
+  cache_force.name="catalogue-cache-reused-index"
+  local cache_reused=browser_catalogue.snapshot(cache_force)
+  check(cache_reused.rows[1].researched and static_reads==4,
+    "catalogue cache rebuilds when a force index is reused")
   local shortcut=prototypes.shortcut["mir-research-browser"]
   check(shortcut and shortcut.action=="lua" and shortcut.toggleable,"toggleable native browser shortcut")
   local ordering={schema=1,rows={
