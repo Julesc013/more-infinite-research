@@ -602,6 +602,38 @@ missing_f210_tin_mods.angelspetrochem=nil
 local missing_f210_tin_streams=material_streams_for({factorio_version="2.1"},missing_f210_tin_mods,f200_items)
 check(recipe_patterns(missing_f210_tin_streams.research_material_tin)=="^bob%-tin%-plate$" and missing_f210_tin_streams.research_material_tin.reviewed_forward_routes==nil,"missing F210 Angel provider withdraws Tin finals and certificates")
 
+local f210_bob_angel_gunmetal_invar_mods={
+  base="2.1.20",["elevated-rails"]="2.1.20",quality="2.1.20",recycler="2.1.20",["space-age"]="2.1.20",
+  boblibrary="3.0.1",bobores="3.0.0",bobplates="3.0.2",bobelectronics="3.0.1",bobtech="3.0.0",
+  angelsrefining="2.1.2",angelsrefininggraphics="2.1.0",angelspetrochem="2.1.3",angelspetrochemgraphics="2.1.0",
+  angelssmelting="2.1.1",angelssmeltinggraphics="2.1.1",["more-infinite-research"]="4.2.21000",
+  ["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]="0.1.0"
+}
+local exact_f210_gunmetal_invar_streams=material_streams_for({factorio_version="2.1"},f210_bob_angel_gunmetal_invar_mods,f200_items)
+local exact_f210_gunmetal_certificate=exact_f210_gunmetal_invar_streams.research_material_gunmetal.reviewed_forward_routes
+  and exact_f210_gunmetal_invar_streams.research_material_gunmetal.reviewed_forward_routes["angels-plate-gunmetal"]
+local exact_f210_invar_certificate=exact_f210_gunmetal_invar_streams.research_material_invar.reviewed_forward_routes
+  and exact_f210_gunmetal_invar_streams.research_material_invar.reviewed_forward_routes["angels-plate-invar"]
+check(recipe_patterns(exact_f210_gunmetal_invar_streams.research_material_gunmetal)=="^angels%-plate%-gunmetal$" and recipe_patterns(exact_f210_gunmetal_invar_streams.research_material_invar)=="^angels%-plate%-invar$","exact current F210 Bob/Angel profile selects only visible Gunmetal and Invar finals")
+check(exact_f210_gunmetal_certificate and exact_f210_invar_certificate and exact_f210_gunmetal_certificate.require_exact_route_certificate and exact_f210_invar_certificate.require_exact_route_certificate,"exact current F210 Gunmetal and Invar finals require reviewed certificates")
+check(exact_f210_gunmetal_certificate.id=="F210-BA-gunmetal-final-v1" and exact_f210_gunmetal_certificate.ingredients[1].name=="angels-liquid-molten-gunmetal" and exact_f210_gunmetal_certificate.results[1].name=="bob-gunmetal-alloy" and exact_f210_gunmetal_certificate.relevant_input_contract==nil and exact_f210_gunmetal_certificate.relevant_return_graph_contract.return_graph_fingerprint=="mir32-d075395b" and exact_f210_gunmetal_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-f5b0b17f" and exact_f210_gunmetal_certificate.relevant_return_graph_contract.relevant_recipe_count==3,"exact current F210 Gunmetal certificate binds its IO and no-return owner/unlock boundary")
+check(exact_f210_invar_certificate.id=="F210-BA-invar-final-v1" and exact_f210_invar_certificate.ingredients[1].name=="angels-liquid-molten-invar" and exact_f210_invar_certificate.results[1].name=="bob-invar-alloy" and exact_f210_invar_certificate.relevant_input_contract==nil and exact_f210_invar_certificate.relevant_return_graph_contract.return_graph_fingerprint=="mir32-7cafb4f4" and exact_f210_invar_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-f6107c3a" and exact_f210_invar_certificate.relevant_return_graph_contract.relevant_recipe_count==3,"exact current F210 Invar certificate binds its IO and no-return owner/unlock boundary")
+
+local no_observer_f210_gunmetal_invar_mods=clone_map(f210_bob_angel_gunmetal_invar_mods)
+no_observer_f210_gunmetal_invar_mods["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]=nil
+local no_observer_f210_gunmetal_invar_streams=material_streams_for({factorio_version="2.1"},no_observer_f210_gunmetal_invar_mods,f200_items)
+check(recipe_patterns(no_observer_f210_gunmetal_invar_streams.research_material_gunmetal)=="^angels%-plate%-gunmetal$" and no_observer_f210_gunmetal_invar_streams.research_material_invar.reviewed_forward_routes["angels-plate-invar"]~=nil,"F210 Gunmetal/Invar route declarations do not require the package-excluded observer")
+
+local changed_f210_gunmetal_invar_mods=clone_map(f210_bob_angel_gunmetal_invar_mods)
+changed_f210_gunmetal_invar_mods.bobplates="3.0.3"
+local changed_f210_gunmetal_invar_streams=material_streams_for({factorio_version="2.1"},changed_f210_gunmetal_invar_mods,f200_items)
+check(recipe_patterns(changed_f210_gunmetal_invar_streams.research_material_gunmetal)=="^bob%-gunmetal%-alloy$" and recipe_patterns(changed_f210_gunmetal_invar_streams.research_material_invar)=="^bob%-invar%-alloy$" and changed_f210_gunmetal_invar_streams.research_material_gunmetal.reviewed_forward_routes==nil and changed_f210_gunmetal_invar_streams.research_material_invar.reviewed_forward_routes==nil,"changed F210 Bob provider withdraws Gunmetal/Invar finals and certificates")
+
+local changed_f210_gunmetal_invar_observer_mods=clone_map(f210_bob_angel_gunmetal_invar_mods)
+changed_f210_gunmetal_invar_observer_mods["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]="0.1.1"
+local changed_f210_gunmetal_invar_observer_streams=material_streams_for({factorio_version="2.1"},changed_f210_gunmetal_invar_observer_mods,f200_items)
+check(recipe_patterns(changed_f210_gunmetal_invar_observer_streams.research_material_gunmetal)=="^bob%-gunmetal%-alloy$" and changed_f210_gunmetal_invar_observer_streams.research_material_invar.reviewed_forward_routes==nil,"changed F210 observer identity withdraws Gunmetal/Invar finals and certificates")
+
 local f210_streams=material_streams_for({factorio_version="2.1"},exact_f200_mods,f200_items)
 check(recipe_patterns(f210_streams.research_material_tin)=="^bob%-tin%-plate$" and recipe_patterns(f210_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(f210_streams.research_material_silver)=="^bob%-silver%-plate$" and f210_streams.research_material_nickel.reviewed_forward_routes==nil,"F210 retains F200-only Angel additions outside the exact current Tin certificate")
 
