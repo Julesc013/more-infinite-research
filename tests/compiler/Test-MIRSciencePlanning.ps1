@@ -23,6 +23,7 @@ $modules=[ordered]@{
  'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
  'prototypes.mir.capabilities.science_integration.science_selector'='source/prototypes/mir/capabilities/science_integration/science_selector.lua'
  'prototypes.mir.compatibility.policies.k2_science_phase'='source/prototypes/mir/compatibility/policies/k2_science_phase.lua'
+ 'prototypes.mir.planner.native_owner_binding'='source/prototypes/mir/planner/native_owner_binding.lua'
  'prototypes.mir.planner.science'='source/prototypes/mir/planner/science.lua'
 }
 $lua=[Text.StringBuilder]::new()

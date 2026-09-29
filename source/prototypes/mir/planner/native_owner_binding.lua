@@ -1,6 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
+local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local effective_settings = require("prototypes.mir.settings.effective")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local effect_contracts = require("prototypes.mir.settings.effect_contracts")
@@ -54,6 +55,13 @@ local function owner_is_reachable(owner)
   for _, prerequisite in ipairs(owner.prerequisites or {}) do
     if not data_raw.technology(prerequisite) then return false, "owner_prerequisite_missing" end
   end
+  -- Adoption changes an external technology instead of creating a separate
+  -- MIR research. A structurally present owner is not enough: it must remain
+  -- reachable through its complete prerequisite and science closure. Without
+  -- this guard, a disabled or otherwise unreachable native owner can absorb
+  -- eligible recipes and leave them attached to research a player cannot use.
+  local rejection = science.technology_researchability_reason(owner.name)
+  if rejection then return false, "owner_" .. rejection end
   return true
 end
 
