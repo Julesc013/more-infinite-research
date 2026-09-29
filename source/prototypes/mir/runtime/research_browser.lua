@@ -306,26 +306,24 @@ local function section(parent, caption, width)
 end
 
 update_translation_index = function(results, cache, v)
-  -- The index belongs to the retained list column.  Translation callbacks can
-  -- therefore update this one small label without replacing the list, detail,
-  -- search field, or fixed Browse controls.
+  -- Share the fixed count row instead of adding another child below a short
+  -- list. Localization progress must not enlarge the retained result region.
   local list = results and results[PREFIX .. "research_list"]
-  local parent = list and list.valid and list or results
-  if not (parent and parent.valid) then return end
-  local indicator = parent[PREFIX .. "fact_translation_index"]
+  local indicator = list and list.valid and list[PREFIX .. "result_count"]
+  if not (indicator and indicator.valid) then return end
+  local count = indicator.tags.mir_browser_count or 0
   local unresolved = unresolved_translations(cache)
   if unresolved <= 0 or not needs_name_index(v) then
-    if indicator and indicator.valid then indicator.destroy() end
+    indicator.caption, indicator.tooltip = {"mir-browser.count", count}, nil
+    indicator.tags = {mir_browser_count = count}
     return
   end
   local name_order = v.sort == "name-asc" or v.sort == "name-desc"
   local caption = name_order and {"mir-browser.indexing-name", unresolved}
     or {"mir-browser.indexing", unresolved}
-  if indicator and indicator.valid then
-    indicator.caption = caption
-  else
-    fact_label(parent, "translation_index", caption, list and list.style.maximal_width - 16 or nil)
-  end
+  indicator.caption = {"", {"mir-browser.count", count}, " · ", caption}
+  indicator.tooltip = caption
+  indicator.tags = {mir_browser_count = count, mir_browser_fact = "translation_index"}
 end
 
 local function button(parent, action, caption, tags)
@@ -1028,7 +1026,9 @@ update_research_results = function(player, results, v, c, cache)
   if v.result_token ~= token or #list.items ~= #items then list.items = items; v.result_token = token end
   v.result_keys = keys
   list.selected_index = selected_index
-  list_column[PREFIX .. "result_count"].caption = {"mir-browser.count", found.count}
+  local count_label = list_column[PREFIX .. "result_count"]
+  count_label.caption, count_label.tags = {"mir-browser.count", found.count}, {mir_browser_count = found.count}
+  count_label.style.width, count_label.style.height = list_width, 24
   local technology = v.selected and player.force.technologies[v.selected]
   local detail_token = table.concat({v.selected or "", tostring(v.visibility), tostring(player.force.index),
     tostring(technology and technology.level), tostring(technology and technology.researched),
