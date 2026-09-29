@@ -6,6 +6,9 @@ local values = {
 }
 local roles = {}
 local unreachable = {}
+local derived_buckets = {}
+local initially_available_recipes = {}
+local derived_unlockers = {}
 local active_mods = {Krastorio2='2.1.2', ['Krastorio2-spaced-out']='2.0.13'}
 local known = {'automation-science-pack','logistic-science-pack','military-science-pack',
   'chemical-science-pack','production-science-pack','utility-science-pack','space-science-pack',
@@ -26,7 +29,10 @@ stub('prototypes.mir.platform.factorio.prototype_lookup', {is_space_age=function
 local registry = {science_pack_exists=function(n) return exists[n]==true end}
 stub('prototypes.mir.capabilities.science_integration.pack_registry',registry)
 stub('prototypes.mir.streams.registry',{shared={per_level_default=0.1}})
-stub('prototypes.mir.capabilities.recipe_productivity.recipe_matching',{buckets_view=function() return {} end})
+stub('prototypes.mir.capabilities.recipe_productivity.recipe_matching',{buckets_view=function(key) return derived_buckets[key] or {} end})
+stub('prototypes.mir.capabilities.science_integration.recipe_unlock_facts',{
+ recipe_enabled_without_research=function(recipe_name) return initially_available_recipes[recipe_name] == true end
+})
 stub('prototypes.mir.compatibility.policy_authority',{science_roles_for_stream=function(_) return roles end})
 stub('prototypes.mir.platform.factorio.mods',{snapshot=function() return active_mods end})
 local lab = require('prototypes.mir.capabilities.science_integration.lab_compatibility')
@@ -40,6 +46,7 @@ local science = {
   local out={}; for _, n in ipairs(known) do if not n:match('^kr%-') then out[#out+1]=n end end; return out
  end,
  is_official_science_pack=function(n) return not n:match('^kr%-') end,
+ researchable_unlockers_for_recipe=function(recipe_name) return derived_unlockers[recipe_name] or {} end,
  best_lab_compatible_ingredients=lab.best_lab_compatible_ingredients,
  valid_research_ingredients=lab.valid_research_ingredients
 }
@@ -116,6 +123,36 @@ values['mir-science-pack-ingredient-policy']='configured'
 selected=selector.pick_science_for_stream({science_packs={'space-science-pack'}},'research_ice')
 check('S04',has(selected,'cryogenic-science-pack'),'Declared hard-required cryogenic pack defeats exclusion')
 roles={}
+-- Derivation must not recast a research-locked external recipe with no
+-- researchable unlocker as an early base-science technology. This is a
+-- controlled provenance law for dense overhauls, not a claim about any one
+-- external modpack.
+derived_buckets={derived_blocked={{recipes={'blocked-external-route'}}}}
+initially_available_recipes={}
+derived_unlockers={['blocked-external-route']={}}
+selected=selector.pick_science_for_stream({science_packs='derive-from-unlocks'},'derived_blocked')
+check('S05',#selected==0,'Unreachable derived unlock blocks instead of falling back to early science')
+-- The previous fallback still applies to a recipe genuinely available at game
+-- start. That case has no unlocker by design and is not an unavailable route.
+derived_buckets={derived_initial={{recipes={'initial-route'}}}}
+initially_available_recipes={['initial-route']=true}
+derived_unlockers={['initial-route']={}}
+selected=selector.pick_science_for_stream({science_packs='derive-from-unlocks'},'derived_initial')
+check('S06',has(selected,'automation-science-pack') and has(selected,'chemical-science-pack'),
+  'Initially available derived route retains the ordinary early-science fallback')
+-- A valid external unlock keeps its exact science ingredient rather than the
+-- fallback. The fact is synthetic; the rule is shared across integrations.
+exists['overhaul-science-pack']=true
+data.raw.technology['derived-external-unlock']={unit={ingredients={{'overhaul-science-pack',1}}}}
+derived_buckets={derived_reachable={{recipes={'reachable-external-route'}}}}
+initially_available_recipes={}
+derived_unlockers={['reachable-external-route']={'derived-external-unlock'}}
+selected=selector.pick_science_for_stream({science_packs='derive-from-unlocks'},'derived_reachable')
+check('S07',#selected==1 and has(selected,'overhaul-science-pack'),
+  'Reachable derived unlock retains its external science provenance')
+derived_buckets={}
+initially_available_recipes={}
+derived_unlockers={}
 data.raw.lab={
  early={inputs={'automation-science-pack','logistic-science-pack','military-science-pack','chemical-science-pack'}},
  late={inputs={'space-science-pack','kr-matter-tech-card'}}
