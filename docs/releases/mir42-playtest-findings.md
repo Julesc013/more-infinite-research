@@ -5,7 +5,7 @@ applies_to: "4.2.0 development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-09-29
+last_reviewed: 2026-09-30
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,7 +13,7 @@ source_of_truth_for:
 ---
 # MIR 4.2 playtest findings
 
-These are direct maintainer findings from 27–29 September 2026. They reopen player acceptance and define required 4.2 work; they are not controlled performance measurements or release qualification. The broader MIR 4.2 goal remains paused while the September 29 viewer repair is developed and demonstrated. Retain every original community request identity and decision.
+These are direct maintainer findings from 27–29 September 2026. They reopen player acceptance and define required 4.2 work; the original reports are not controlled performance measurements or release qualification. The maintainer accepted the repaired viewer appearance on 30 September and resumed the wider MIR 4.2 goal. Retain every original community request identity and decision.
 
 | Finding | Required outcome | Acceptance |
 | --- | --- | --- |
@@ -232,4 +232,10 @@ MIR's direct queue mutation controls are withheld in this interaction prototype.
 
 The new core and actual registered-handler regressions run inside the existing browser fixture. The handler negative control reintroduces unknown-click render fall-through and must be detected. The former tests that required Queue and Availability to shrink have been replaced with retained-root, consistent-geometry, independent-search and no-pagination checks. Native-object checks remain separately labelled from actual mouse/keyboard interaction and two-client evidence.
 
-Outstanding qualification includes a complete product-to-research-to-recipe/settings journey, truthful installed-content omission filtering and links, full localized product/recipe/setting discovery and Unicode case folding, older-target capability composition, practical drag-resize feasibility, multiple resolution/scale and language combinations, genuine two-client authority/lifecycle behavior, and measured mass-research plus deferred UI work. The wider material/progression, ecosystem and release programme remains paused; the preserved K2 science/two-load result is not reopened by this UI change. PREVIEW23 remains preserved as historical delivery evidence and must not be presented as satisfying this amended contract.
+Outstanding qualification includes a complete product-to-research-to-recipe/settings journey, truthful installed-content omission filtering and links, full localized product/recipe/setting discovery and Unicode case folding, older-target capability composition, practical drag-resize feasibility, multiple resolution/scale and language combinations, and genuine two-client authority/lifecycle behavior. The wider material/progression, ecosystem and release programme has resumed; the preserved K2 science/two-load result is not reopened by this UI change. PREVIEW23 remains preserved as historical delivery evidence and must not be presented as satisfying this amended contract.
+
+## Controlled mass-research follow-up
+
+On 30 September, the exact user autosave copied for a controlled comparison was SHA-256 `C4C8D2AD38C4669A02DC8CF73B06EC0014773F468EF9CC0CEB4B213223F1822C`, with base, Elevated Rails, Quality, Recycler, Space Age and MIR active. Factorio 2.1.20 executed the same two mass-research commands against published F210 4.1 ZIP SHA-256 `6E77FC9A2DEF9C3B58A2D85A4A113F9F3DE19A5712EB1EB6BBF93C14A238E0D1` and joined 4.2 development ZIP SHA-256 `FC0EF150BEE060A7455E6296AA85BBDB47C000690A22B291DB7A2288BFB621C0` while the library was closed. The first/second commands measured 257.861/63.157 ms on 4.1 and 27.790/22.657 ms on 4.2; the next four updates measured 331.203 and 52.607 ms respectively. The exact plans, logs and results remain under `build/tests/wed-mass-research-20260930`. These measurements do not reproduce the maintainer's reported lag in their earlier session or prove a general modpack speedup.
+
+With the 4.2 Research Library open on the same copied save, the frame opened in 92.801 ms, the two commands measured 35.505 and 21.966 ms, and eight following updates measured 190.453 ms inclusive. The distinct open-view result and log remain under `build/tests/wed-mass-research-open-20260930`, with log SHA-256 `1B351BE9D8BEDE310D699EC96AA47452A6D3D003821BC3EAF5766FFFB617D9C9`. PF-01 remains open for the exact slow save/mod/settings profile and for candidate-bound lifecycle and multi-client work; these figures must not be rebound to later package bytes.
