@@ -275,10 +275,14 @@ local function copy_plain(value, state, depth)
   return result
 end
 
-local function copy_row(row)
+local function row_progression(row)
   local progression = type(row.progression) == "number" and row.progression == row.progression
     and row.progression ~= math.huge and row.progression ~= -math.huge
     and row.progression >= 0 and row.progression == math.floor(row.progression) and row.progression or 0
+  return progression
+end
+
+local function copy_row(row)
   return {
     key = row.key,
     available = row.available == true,
@@ -286,7 +290,7 @@ local function copy_row(row)
     queued = row.queued == true,
     infinite = row.infinite == true,
     native_order = type(row.native_order) == "string" and string.sub(row.native_order, 1, M.detail_string_limit) or "",
-    progression = progression
+    progression = row_progression(row)
   }
 end
 
@@ -672,6 +676,7 @@ function M.query(catalogue, view, enrichment, localized_search, selected_key)
   if #catalogue.rows > M.catalogue_limit then return nil, "catalogue-limit" end
   enrichment = M.normalize_enrichment(enrichment)
   local selected, selected_visible, v = {}, false, normalized_view(view)
+  local sort_by_name = v.sort == "name-asc" or v.sort == "name-desc"
   selected_key = type(selected_key) == "string" and selected_key or nil
   for _, source in ipairs(catalogue.rows) do
     if type(source) == "table" and type(source.key) == "string" then
@@ -681,7 +686,7 @@ function M.query(catalogue, view, enrichment, localized_search, selected_key)
       local mode_ok = v.mode == 1 or (v.mode == 2 and not infinite) or (v.mode == 3 and infinite)
       if mode_ok and status_matches(source, v.status) and family_matches(family, v.family)
         and not v.hidden[key] then
-        local display_name = displayed_label(localized_search, key)
+        local display_name = (sort_by_name or v.search ~= "") and displayed_label(localized_search, key) or nil
         local search_ok = v.search == "" or matches_search(
           key .. " " .. family .. " " .. display_name, v.search, v.spaced_search)
         if not search_ok and enrichment and enrichment.schema == M.enrichment_schema then
@@ -694,10 +699,14 @@ function M.query(catalogue, view, enrichment, localized_search, selected_key)
           end
         end
         if search_ok then
-          local row = copy_row(source)
-          row.cap, row.family, row.infinite = cap, family, infinite
+          local row = {source = source, key = key, cap = cap, family = family, infinite = infinite}
+          if not sort_by_name then
+            row.progression = row_progression(source)
+            row.native_order = type(source.native_order) == "string"
+              and string.sub(source.native_order, 1, M.detail_string_limit) or ""
+          end
           row.display_name = display_name
-          row.display_sort = ascii_casefold(display_name)
+          if sort_by_name then row.display_sort = ascii_casefold(display_name) end
           selected[#selected + 1] = row
           if key == selected_key then selected_visible = true end
         end
@@ -712,9 +721,10 @@ function M.query(catalogue, view, enrichment, localized_search, selected_key)
   local page = math.min(v.page, pages)
   local rows, first, last = {}, (page - 1) * M.page_size + 1, math.min(page * M.page_size, #selected)
   for index = first, last do
-    local row = copy_row(selected[index])
-    row.family, row.cap, row.infinite = selected[index].family, selected[index].cap, selected[index].infinite
-    row.display_name = selected[index].display_name
+    local chosen = selected[index]
+    local row = copy_row(chosen.source)
+    row.family, row.cap, row.infinite = chosen.family, chosen.cap, chosen.infinite
+    row.display_name = chosen.display_name or displayed_label(localized_search, row.key)
     rows[#rows + 1] = row
   end
   return {
