@@ -582,6 +582,26 @@ fixtures:
       - current-k2so-fresh-load-owner-and-route-parity-only
       - no-infinite-broad-k2-or-release-authority
 
+  ric-marine-carbonisation:
+    requires_features: []
+    path: fixtures/assert-ric-marine-carbonisation
+    shipped: false
+    external_mod_identity: real-industrial-chemistry
+    exact_version_envelopes:
+      current:
+        base: "2.1.20"
+        real-industrial-chemistry: "0.36.1"
+        more-infinite-research: "4.2.21000"
+    validates:
+      - space-age-progression-mode-is-explicitly-locked
+      - marine-mode-exact-carbonisation-route-and-unique-productivity-owner
+      - effective-productivity-permission-and-final-input-output-shape
+      - two-percent-force-recipe-bonus-after-level-one
+      - researched-level-and-earned-bonus-survive-save-reload
+      - no-other-recipe-in-the-generated-technology-effect-domain
+      - sixteen-productivity-allowed-return-path-routes-stay-withheld
+      - continental-mode-withholds-marine-only-technology
+
   k2-materials-bounded:
     requires_features: []
     path: fixtures/assert-k2-materials

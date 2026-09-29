@@ -31,9 +31,9 @@ $sourceManifest = Get-Content -Raw -LiteralPath $sourceManifestPath | ConvertFro
 $authorityText = Get-Content -Raw -LiteralPath $authorityPath
 $sourceRows = @($sourceManifest.streams.PSObject.Properties)
 $authorityRows = @([regex]::Matches($authorityText, '(?m)^    ([A-Za-z0-9._-]+):\s*$') | ForEach-Object { $_.Groups[1].Value })
-Assert-MIR4MaterialStreamAuthority ($sourceRows.Count -eq 98) '[mir4-m42-stream-authority-source-count]'
-Assert-MIR4MaterialStreamAuthority ($authorityRows.Count -eq 98) '[mir4-m42-stream-authority-canonical-count]'
-Assert-MIR4MaterialStreamAuthority (@($authorityRows | Sort-Object -Unique).Count -eq 98) '[mir4-m42-stream-authority-canonical-duplicate]'
+Assert-MIR4MaterialStreamAuthority ($sourceRows.Count -eq 115) '[mir4-m42-stream-authority-source-count]'
+Assert-MIR4MaterialStreamAuthority ($authorityRows.Count -eq 115) '[mir4-m42-stream-authority-canonical-count]'
+Assert-MIR4MaterialStreamAuthority (@($authorityRows | Sort-Object -Unique).Count -eq 115) '[mir4-m42-stream-authority-canonical-duplicate]'
 
 foreach ($sourceRow in $sourceRows) {
   $id = [string]$sourceRow.Name
@@ -48,7 +48,7 @@ foreach ($sourceRow in $sourceRows) {
 }
 
 $materialRows = @($sourceRows | Where-Object { [string]$_.Name -like 'recipe-prod-research_material_*' })
-Assert-MIR4MaterialStreamAuthority ($materialRows.Count -eq 22) '[mir4-m42-stream-authority-material-count]'
+Assert-MIR4MaterialStreamAuthority ($materialRows.Count -eq 39) '[mir4-m42-stream-authority-material-count]'
 foreach ($sourceRow in $materialRows) {
   $id = [string]$sourceRow.Name
   $source = $sourceRow.Value
@@ -62,8 +62,13 @@ foreach ($sourceRow in $materialRows) {
 
 $acyclic = @($materialRows | Where-Object { [string]$_.Value.policy -ceq 'exact-acyclic-material-manufacturing' })
 $reviewedForward = @($materialRows | Where-Object { [string]$_.Value.policy -ceq 'exact-reviewed-forward-material-manufacturing' })
-Assert-MIR4MaterialStreamAuthority ($acyclic.Count -eq 17) '[mir4-m42-stream-authority-acyclic-count]'
+Assert-MIR4MaterialStreamAuthority ($acyclic.Count -eq 18) '[mir4-m42-stream-authority-acyclic-count]'
 Assert-MIR4MaterialStreamAuthority ((@($reviewedForward.Value.stream_key | Sort-Object) -join '|') -ceq 'research_material_glass|research_material_nickel|research_material_rare_metals|research_material_silicon|research_material_silver') '[mir4-m42-stream-authority-reviewed-forward-set]'
+
+$ric = Get-MIR4StreamRecordBlock -Text $authorityText -Id 'recipe-prod-research_material_ric_coke-1'
+Assert-MIR4MaterialStreamAuthority ($ric -match '(?m)^      source: ric-marine-carbonisation-route\s*$') '[mir4-m42-ric-source]'
+Assert-MIR4MaterialStreamAuthority ($ric -match '(?m)^      policy: exact-acyclic-material-manufacturing\s*$') '[mir4-m42-ric-policy]'
+Assert-MIR4MaterialStreamAuthority ($ric -match '(?m)^          - fixtures/assert-ric-marine-carbonisation\s*$') '[mir4-m42-ric-fixture]'
 
 foreach ($stream in @('recipe-prod-research_material_nickel-1', 'recipe-prod-research_material_silver-1')) {
   $record = Get-MIR4StreamRecordBlock -Text $authorityText -Id $stream
@@ -76,4 +81,4 @@ Assert-MIR4MaterialStreamAuthority ($profile -match 'current_factorio_line' -and
 Assert-MIR4MaterialStreamAuthority ($profile -match '(?ms)local function reduced_profile\(.*?features\s*=\s*\{.*?recipe_productivity\s*=\s*false') '[mir4-m42-stream-authority-f1-capability]'
 Assert-MIR4MaterialStreamAuthority ($profile -match '\["1\.1"\]\s*=\s*reduced_profile\("1\.1"' -and $profile -match '\["1\.0"\]\s*=\s*reduced_profile\("1\.0"') '[mir4-m42-stream-authority-f1-profile-use]'
 
-Write-Host '[ok] MIR 4.2 material stream authority reconciles all 98 emitted streams and explicitly omits the 22 recipe-productivity rows on F110/F100.'
+Write-Host '[ok] MIR 4.2 material stream authority reconciles all 115 stream rows and explicitly omits the 39 recipe-productivity rows on F110/F100.'
