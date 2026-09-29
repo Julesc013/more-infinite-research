@@ -5,7 +5,8 @@ param(
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot='C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-ba-20260930',
   [string]$OutputRoot='build/tests/ba-gi',
-  [switch]$PrepareOnly
+  [switch]$PrepareOnly,
+  [string]$RecoverRun=''
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
@@ -20,6 +21,7 @@ function Get-GISha([string]$Path) {
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $stage=(Resolve-Path -LiteralPath $ExactStageRoot).Path
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
+$outputPrefix=$output.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
 $buildPrefix=[IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
 Assert-GI ($output.StartsWith($buildPrefix,[StringComparison]::OrdinalIgnoreCase)) 'output root must be inside build'
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
@@ -51,6 +53,11 @@ function New-GIInput([string]$Path,[string]$Role,[object]$Identity,[object]$Prov
 }
 function Assert-GIPath([string]$Path,[string]$Context) {
   Assert-MIRFactorioPathBudget -Path $Path -Context $Context -MaximumLength 240
+}
+function Copy-GIPreparedRecord($Record) {
+  $copy=[ordered]@{}
+  foreach($entry in $Record.GetEnumerator()) { $copy[$entry.Key]=$entry.Value }
+  return $copy
 }
 
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') | Out-Host
@@ -116,6 +123,43 @@ $prepared=[ordered]@{
 }
 if($PrepareOnly) { $prepared | ConvertTo-Json -Depth 20; return }
 
+if(-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
+  $recoveryRun=(Resolve-Path -LiteralPath $RecoverRun).Path
+  Assert-GI ($recoveryRun.StartsWith($outputPrefix,[StringComparison]::OrdinalIgnoreCase)) 'recovery run escapes output root'
+  $leasePath=Join-Path $recoveryRun 'mir-immutable-input-lease.json'
+  $lease=Get-Content -Raw -LiteralPath $leasePath | ConvertFrom-Json -ErrorAction Stop
+  Assert-GI ([string]$lease.state -ceq 'completed' -and [string]$lease.outcome -ceq 'passed' -and [bool]$lease.inputs_sha256_match) 'recovery run immutable input lease is not terminal and clean'
+  $recoveryCandidate=@($lease.inputs | Where-Object { $_.role -ceq 'candidate' })
+  Assert-GI ($recoveryCandidate.Count -eq 1) 'recovery run candidate cardinality differs'
+  Assert-GI ((Get-GISha [string]$recoveryCandidate[0].stage_path) -ceq [string]$recoveryCandidate[0].expected_sha256) 'recovery run candidate bytes differ'
+  Assert-GI ([string]$recoveryCandidate[0].provenance.source_commit -ceq $sourceCommit -and [string]$recoveryCandidate[0].provenance.source_tree -ceq $sourceTree) 'recovery run source identity differs'
+  $freshLogPath=Join-Path $recoveryRun 'f210-ba-gunmetal-invar.factorio.log'
+  $reloadLogPath=Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.factorio.log'
+  $freshLog=[IO.File]::ReadAllText($freshLogPath)
+  $reloadLog=[IO.File]::ReadAllText($reloadLogPath)
+  $dataMarker='[mir-f210-current-ba-gunmetal-invar] DATA PASS gunmetal=recipe-prod-research_material_gunmetal-1:angels-plate-gunmetal:0.02 invar=recipe-prod-research_material_invar-1:angels-plate-invar:0.02 unique-owners=true'
+  $runtimeMarker='[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS stage=create technologies=researched'
+  $reloadMarker='[mir-f210-current-ba-gunmetal-invar] RELOAD PASS technologies=researched save-state=preserved'
+  Assert-GI ($freshLog.Contains($dataMarker,[StringComparison]::Ordinal) -and $freshLog.Contains($runtimeMarker,[StringComparison]::Ordinal)) 'recovery run fresh markers differ'
+  Assert-GI ($reloadLog.Contains($dataMarker,[StringComparison]::Ordinal) -and $reloadLog.Contains($reloadMarker,[StringComparison]::Ordinal)) 'recovery run reload markers differ'
+  foreach($log in @($freshLog,$reloadLog)) { Assert-GI (-not $log.Contains('Error while running event',[StringComparison]::Ordinal) -and $log.Contains('Goodbye',[StringComparison]::Ordinal)) 'recovery run Factorio lifecycle differs' }
+  $result=Copy-GIPreparedRecord $prepared
+  $result.status='passed-recovered'
+  $result.recovery=[ordered]@{
+    reason='The original runner reached result construction only after both helper assertions passed, then failed because OrderedDictionary has no Clone method.'
+    source_run=Get-GIRelative $recoveryRun
+    terminal_input_lease_sha256=[string]$lease.terminal_record_sha256
+    input_hashes_match=[bool]$lease.inputs_sha256_match
+  }
+  $result.fresh_create=[ordered]@{passed=$true;save=Get-GIArtifact (Join-Path $recoveryRun 'saves/f210-ba-gunmetal-invar.zip');stdout=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.stdout.log');stderr=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.stderr.log');factorio_log=Get-GIArtifact $freshLogPath}
+  $result.reloads=@([ordered]@{ordinal=1;passed=$true;reload_log_contract_passed=$true;required_log_assertions=@([ordered]@{fragment=$reloadMarker;passed=$true});stdout=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.stdout.log');stderr=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.stderr.log');factorio_log=Get-GIArtifact $reloadLogPath})
+  $result.mod_closure=[ordered]@{candidate=Get-GIArtifact ([string]$recoveryCandidate[0].stage_path);fixture=Get-GIArtifact (Join-Path $recoveryRun 'mods' ($fixtureName+'_'+$fixtureVersion+'.zip'));mod_list=Get-GIArtifact (Join-Path $recoveryRun 'mods/mod-list.json');input_staging=$lease}
+  $resultPath=Join-Path $recoveryRun 'result.json'
+  [IO.File]::WriteAllText($resultPath,(ConvertTo-Json $result -Depth 100),[Text.UTF8Encoding]::new($false))
+  Write-Output "[MIR-F210-BA-GUNMETAL-INVAR-RECOVERED] $(Get-GIRelative $resultPath)"
+  return
+}
+
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 Assert-GI ((Get-GISha $engine) -ceq $expectedEngineSha) 'Factorio executable differs from the exact stage'
 $version=(& $engine --version | Out-String)
@@ -123,7 +167,7 @@ Assert-GI ($LASTEXITCODE -eq 0 -and $version -match 'Version:\s+2[.]1[.]20') 're
 
 $runName='g-'+[guid]::NewGuid().ToString('N').Substring(0,12)
 $run=Join-Path $output $runName
-$runPrefix=$output.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
+$runPrefix=$outputPrefix
 Assert-GI ($run.StartsWith($runPrefix,[StringComparison]::OrdinalIgnoreCase)) 'run root escapes output root'
 Assert-GIPath $run 'F210 Gunmetal/Invar run root'
 $inputLease=$null
@@ -178,7 +222,7 @@ try {
       stdout=Get-GIArtifact $_.stdout;stderr=Get-GIArtifact $_.stderr;factorio_log=Get-GIArtifact $_.factorio_log
     }
   })
-  $result=$prepared.Clone()
+  $result=Copy-GIPreparedRecord $prepared
   $result.status='passed'
   $result.engine=[ordered]@{version=([regex]::Match($version,'Version:\s+[^\r\n]+').Value).Trim();executable_sha256=Get-GISha $engine}
   $result.run_root=Get-GIRelative $run
