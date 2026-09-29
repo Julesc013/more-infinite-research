@@ -87,12 +87,14 @@ local function generated_tin_stage_observation()
   local early_name = "recipe-prod-research_material_tin-1"
   local continuation_name = "recipe-prod-research_material_tin-4"
   local early = expected_productivity_effects(early_name)
-  local continuation = expected_productivity_effects(continuation_name)
   if early.max_level ~= 3 then
     error("MIR F210 current Bob/Angel Tin route observation early stage must end at level 3")
   end
-  if continuation.max_level ~= "infinite" then
-    error("MIR F210 current Bob/Angel Tin route observation continuation must retain its script-managed prototype level domain")
+  -- This exact profile has no reachable late-science frontier. The compiler
+  -- must withhold the later stage rather than present a misleading extension
+  -- of an unavailable progression path.
+  if data.raw.technology[continuation_name] ~= nil then
+    error("MIR F210 current Bob/Angel Tin route observation unexpectedly emitted a no-frontier continuation")
   end
   for _, recipe_name in ipairs({"angels-plate-tin", "angels-plate-tin-2"}) do
     local owners = {}
@@ -104,14 +106,14 @@ local function generated_tin_stage_observation()
       end
     end
     table.sort(owners)
-    local expected = early_name .. ":0.02," .. continuation_name .. ":0.02"
+    local expected = early_name .. ":0.02"
     if table.concat(owners, ",") ~= expected then
       error("MIR F210 current Bob/Angel Tin route observation owner set differs for " .. recipe_name .. ": " .. table.concat(owners, ","))
     end
   end
   log("[mir-f210-current-ba-tin-observer] GENERATED"
     .. " early=" .. early_name .. ":" .. tostring(early.max_level)
-    .. " continuation=" .. continuation_name .. ":" .. tostring(continuation.max_level)
+    .. " continuation=withheld:no_reachable_late_science_frontier"
     .. " recipes=angels-plate-tin,angels-plate-tin-2")
 end
 
