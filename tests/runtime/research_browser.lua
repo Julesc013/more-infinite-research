@@ -328,6 +328,10 @@ script.on_nth_tick(1,function()
   local progression=browser_core.query(ordering,{mode=1,status=1,page=1,search="",sort="progression"})
   local native=browser_core.query(ordering,{mode=1,status=1,page=1,search="",sort="native"})
   check(progression.rows[1].key=="earlier" and native.rows[1].key=="later","progression and native ordering")
+  progression.rows[1].progression=999
+  check(ordering.rows[2].progression==1
+    and browser_core.query(ordering,{mode=1,status=1,page=1,search="",sort="progression"}).rows[1].key=="earlier",
+    "query pages stay detached from catalogue rows")
   local mir_focus=browser_core.query(catalogue,{mode=1,status=1,page=1,search="mir-browser-test",family="mir"},{schema=1,families={ ["mir-browser-test-finite"]="productivity"}})
   check(#mir_focus.rows==1 and mir_focus.rows[1].key=="mir-browser-test-finite","MIR-focused default family contract")
   local without_mir=browser_core.family_names(nil)
@@ -411,6 +415,12 @@ script.on_nth_tick(1,function()
     ["label-equal-b"]="same label",
     ["label-nonlatin"]="漢字技術"
   }
+  local default_labeled=browser_core.query(localized_ordering,
+    {mode=1,status=1,page=1,search="",sort="progression"},nil,labels)
+  check(default_labeled.rows[1].key=="label-alpha" and default_labeled.rows[1].display_name=="Zulu"
+    and default_labeled.rows[4].key=="label-fallback"
+    and default_labeled.rows[4].display_name=="label-fallback",
+    "default browse preserves localized page labels and stable-ID fallback")
   local held_name_order=browser_core.query(localized_ordering,{
     mode=1,status=1,page=1,search="",sort="name-asc",name_index_ready=false,fallback_sort="progression"
   },nil,labels)
