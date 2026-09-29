@@ -72,6 +72,11 @@ local function settings_pane_widths(player)
   return list_width, detail_width
 end
 
+local function availability_pane_widths(player)
+  local list_width, detail_width = research_pane_widths(player)
+  return math.min(list_width, 280), math.min(detail_width, 340)
+end
+
 local function research_panes_height(results)
   -- GuiStyle.height is write-only. The bounded maximum is readable and stays
   -- on the retained results flow when a settled localized index replaces its
@@ -939,7 +944,7 @@ local function availability_rows(player, parent, v)
   end
   local pages = math.max(1, math.ceil(#rows / core.page_size))
   v.page = math.min(v.page, pages)
-  local list_width, detail_width = research_pane_widths(player)
+  local list_width, detail_width = availability_pane_widths(player)
   local table_rows = parent.add{type = "table", column_count = 2}
   for index = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #rows) do
     local row = rows[index]
@@ -1043,10 +1048,13 @@ render = function(player)
   local list_width, detail_width
   if v.tab == "settings" then
     list_width, detail_width = settings_pane_widths(player)
+  elseif v.tab == "availability" then
+    list_width, detail_width = availability_pane_widths(player)
   else
     list_width, detail_width = research_pane_widths(player)
   end
-  frame.style.maximal_width = list_width + detail_width + 36
+  frame.style.maximal_width = v.tab == "queue" and math.min(620, list_width + detail_width + 36)
+    or list_width + detail_width + 36
   local bar = frame.add{type = "flow"}
   button(bar, "research", {"mir-browser.browse"}).toggled = v.tab == "research"
   button(bar, "queue", {"mir-browser.queue-tab"}).toggled = v.tab == "queue"
@@ -1064,14 +1072,7 @@ render = function(player)
   -- Browse keeps its controls stationary while its panes follow their content
   -- up to a screen-bounded limit. Setup gains outer scrolling on small displays.
   local body = frame.add{type = v.tab == "research" and "flow" or "scroll-pane", name = PREFIX .. "body", direction = "vertical"}
-  if v.tab == "research" then
-    body.style.maximal_height = body_height
-  elseif v.tab == "settings" then
-    body.style.maximal_height = body_height
-  else
-    body.style.minimal_width = list_width + detail_width
-    body.style.maximal_height = body_height
-  end
+  body.style.maximal_height = body_height
   local pages
   if v.tab == "settings" then
     pages = settings_rows(player, body, v)
