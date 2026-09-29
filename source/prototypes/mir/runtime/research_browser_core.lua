@@ -650,8 +650,8 @@ end
 local function sort_rows(left, right, sort)
   if sort == "name-desc" or sort == "name-asc" then
     if left.display_sort ~= right.display_sort then
-      return sort == "name-desc" and left.display_sort > right.display_sort
-        or left.display_sort < right.display_sort
+      if sort == "name-desc" then return left.display_sort > right.display_sort end
+      return left.display_sort < right.display_sort
     end
     return left.key < right.key
   end
