@@ -4430,6 +4430,28 @@
         "f110",
         "f100"
       ],
+      "output_path": "prototypes/mir/families/material_progression.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/families/material_progression.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR42-MATERIAL-CONTINUATION",
+        "reason": "Shared staged material progression declaration for reviewed Bob/Angel streams."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 7383,
+      "source_sha256": "C0071E5C535BB3BB3A31143AE21B8CA93C0858B482FE2484B35919A67C5F016E",
+      "output_bytes": 7383,
+      "output_sha256": "C0071E5C535BB3BB3A31143AE21B8CA93C0858B482FE2484B35919A67C5F016E"
+    },
+    {
+      "layer": "capability",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
       "output_path": "prototypes/mir/families/registry.lua",
       "semantic_class": "target-overlay",
       "source_path": "source/prototypes/mir/families/registry.lua",
@@ -6425,10 +6447,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/streams/productivity.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 55676,
-      "source_sha256": "493AFDA97FE5E70F2B205118EC97E53F1B1F1F94761583761D8C007EAF3AA258",
-      "output_bytes": 55676,
-      "output_sha256": "493AFDA97FE5E70F2B205118EC97E53F1B1F1F94761583761D8C007EAF3AA258"
+      "source_bytes": 56081,
+      "source_sha256": "D90EB08B34416738DB239CD2D588F8D6942602B72BCB6A85C96C0EE870E45B7D",
+      "output_bytes": 56081,
+      "output_sha256": "D90EB08B34416738DB239CD2D588F8D6942602B72BCB6A85C96C0EE870E45B7D"
     },
     {
       "layer": "presentation",
