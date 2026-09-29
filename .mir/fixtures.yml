@@ -1773,6 +1773,7 @@ fixtures:
       - F200-no-mod-data-policy-transport-uses-settings-derived-V3-controller-records
       - F200-finite-cap-three-disables-MIR-owned-and-preserves-foreign-disabled-enablement
       - F200-cap-zero-restores-only-settings-derived-V3-MIR-owned-enablement-and-visibility
+      - F200-research-all-keeps-MIR-cap-ownership-through-unrelated-completion-events
       - F200-settings-derived-V3-is-distinct-from-read-only-V2-transport-migration
     non_claims:
       - F200-V2-to-V3-transported-ownership-migration-qualification

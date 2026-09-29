@@ -46,6 +46,17 @@ local function expect(force_name, enabled, visible)
   end
 end
 
+local function expect_mass_research(enabled, visible)
+  local technology = technology_for(game.forces["mass-research"])
+  if technology.level < 4 or technology.enabled ~= enabled
+      or technology.visible_when_disabled ~= visible then
+    fail("mass-research cap state differs"
+      .. " level=" .. tostring(technology.level)
+      .. " enabled=" .. tostring(technology.enabled)
+      .. " visible=" .. tostring(technology.visible_when_disabled))
+  end
+end
+
 local function bool(value) return value and "true" or "false" end
 
 local function state_json(stage)
@@ -94,6 +105,11 @@ script.on_event(defines.events.on_tick, function()
     if state.configuration_changed_events < 1 then fail("finite stage did not observe configuration change") end
     expect("owned", false, true)
     expect("foreign-disabled", false, true)
+    if game.forces["mass-research"] then fail("mass-research force already exists") end
+    local mass = game.create_force("mass-research")
+    configure(mass, true)
+    mass.research_all_technologies()
+    expect_mass_research(false, true)
     state.phase = "capped"
     save("capped", "mir42-f200-settings-cap-transition-capped")
   elseif state.phase == "capped" and selected_cap() == 0 then
@@ -103,6 +119,7 @@ script.on_event(defines.events.on_tick, function()
     -- only MIR's visibility write and leave its enablement disabled.
     expect("owned", true, false)
     expect("foreign-disabled", false, false)
+    expect_mass_research(true, false)
     state.phase = "relaxed"
     save("relaxed", "mir42-f200-settings-cap-transition-relaxed")
   end
