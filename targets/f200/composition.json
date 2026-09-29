@@ -3916,8 +3916,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the shared material continuation planner for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6586,
-      "expected_sha256": "91EAEB417ADB8F7E3F81970129753F48B2CB617649F3DC8457CFB3522222024E",
+      "expected_bytes": 6585,
+      "expected_sha256": "81B546583C52E337DF8CEE305BAC8BF44CF4F56F4892D4538010E00D4A9BBB19",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "F03CF276B34410127D37629908341808E6DAB2ABE9BF4916FEF80CC444CA0037"
+  "record_sha256": "764440EDDEED7B7D6422E3DB925F9279F209DFD3DC71E188CAEDB0D7EF74E53C"
 }
