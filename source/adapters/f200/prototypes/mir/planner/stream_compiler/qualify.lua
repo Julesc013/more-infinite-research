@@ -1,4 +1,5 @@
 local D = require("prototypes.mir.report.diagnostics_sink")
+local material_progression = require("prototypes.mir.families.material_progression")
 local native_owner_binding = require("prototypes.mir.planner.native_owner_binding")
 local costs = require("prototypes.mir.planner.costs")
 local icon_builder = require("prototypes.mir.presentation.icon_builder")
@@ -56,9 +57,9 @@ local function plan_stream(key, raw_spec)
   local technology_name = spec.technology_name or ("recipe-prod-" .. key .. "-1")
   local first_level = research_cost_classification.anchor_level(technology_name, 1)
   local cost_model = costs.model_for(key, spec, first_level)
-  local max_level = costs.max_level_for(key, spec)
+  local max_level = material_progression.legacy_max_level(key, spec, costs.max_level_for(key, spec))
   local prototype_max_level = target_line.feature_enabled("scripted_techs")
-    and "infinite" or max_level
+    and not spec.staged_progression and "infinite" or max_level
   local count_formula = cost_model.count_formula
   local research_time = costs.research_time_for(key, spec)
 

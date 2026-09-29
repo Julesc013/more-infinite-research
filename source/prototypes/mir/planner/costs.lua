@@ -98,6 +98,11 @@ function M.max_level_for(key, spec)
     if setting_value <= 0 then return "infinite" end
     return math.floor(setting_value)
   end
+  if spec and spec.staged_progression
+      and spec.staged_progression.continuation
+      and spec.staged_progression.continuation.maximum_level_default == 0 then
+    return "infinite"
+  end
   local from_spec = coerce_max_level(lookup_default(key, "max_level", spec, nil))
   if from_spec ~= nil then return from_spec end
   return "infinite"

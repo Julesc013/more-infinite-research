@@ -51,6 +51,11 @@ function M.apply(context)
         technology.localised_description = append_cap_description(
           technology, binding.binding.source, maximum)
         table.insert(applied, binding.technology_id .. "=" .. tostring(maximum))
+      elseif binding.prototype_strategy.mode == "native-finite-prototype"
+          and tonumber(observed) == maximum then
+        -- The first material stage ends at level three in the prototype.
+        -- Its native maximum is already the truthful player presentation.
+        table.insert(applied, binding.technology_id .. "=" .. tostring(maximum))
       else
         table.insert(blocked, binding.technology_id)
         log("[more-infinite-research] Maximum-level presentation refused"

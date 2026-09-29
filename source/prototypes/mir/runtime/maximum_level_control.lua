@@ -85,6 +85,26 @@ local function selected_maximum(setting_name)
   return nil
 end
 
+local function native_finite_material_legacy(declared_key, technology_name, selected)
+  -- F200 cannot carry the finalizer's V3 mod-data binding. Its material
+  -- declaration and the observed native prototype together establish the
+  -- intentionally finite early stage. The ordinary settings-derived bridge
+  -- must not mistake that stage for an external late prototype mutation.
+  if target_line.mod_data_supported() or type(selected) ~= "number"
+      or not bounded_string(declared_key) then return false end
+  local spec = stream_registry.get(declared_key)
+  local staged = spec and spec.staged_progression
+  local legacy = staged and staged.legacy
+  if type(staged) ~= "table" or staged.schema ~= 1
+      or staged.kind ~= "material-recipe-productivity-staged-continuation"
+      or type(legacy) ~= "table" or legacy.technology_name ~= technology_name
+      or legacy.technology_name ~= "recipe-prod-" .. declared_key .. "-1"
+      or not finite_positive_integer(legacy.last_level)
+      or spec.max_level ~= legacy.last_level
+      or legacy.preserve_identity ~= true then return false end
+  return observed_max_level(technology_name) == math.min(selected, legacy.last_level)
+end
+
 local function add_runtime_binding(managed, runtime_settings_bindings, technology_name,
     declared_key, setting_name, source, operation)
   if not (prototypes and prototypes.technology and prototypes.technology[technology_name]) then return end
@@ -96,6 +116,8 @@ local function add_runtime_binding(managed, runtime_settings_bindings, technolog
     selected = selected,
     policy_transport = "settings-derived-v3",
     ownership_kind = "settings-derived-v3",
+    native_finite_stage = source == "generated-stream"
+      and native_finite_material_legacy(declared_key, technology_name, selected),
     blocked_reason = selected == nil
       and "maximum_level_runtime_setting_invalid" or nil,
     legacy = false
@@ -169,6 +191,21 @@ local function v3_binding_admission_error(binding)
   local cap = type(binding.cap) == "table" and binding.cap.effective or nil
   local finite = finite_positive_integer(cap)
   local unbounded = cap == "infinite"
+  local native_material_stage = false
+  local material_key = type(binding.technology_id) == "string"
+    and binding.technology_id:match("^recipe%-prod%-(research_material_[a-z_]+)%-1$")
+  local material_spec = material_key and stream_registry.get(material_key)
+  local legacy_stage = material_spec and material_spec.staged_progression
+    and material_spec.staged_progression.legacy
+  if finite and legacy_stage and cap <= legacy_stage.last_level
+      and type(binding.setting) == "table"
+      and type(binding.binding) == "table"
+      and binding.binding.source == "generated-stream"
+      and binding.binding.operation == "emit"
+      and legacy_stage.technology_name == binding.technology_id
+      and binding.setting.name == "ips-max-level-" .. material_key then
+    native_material_stage = true
+  end
   if not bounded_string(binding.binding_fingerprint) then
     return "maximum_level_binding_fingerprint_missing"
   elseif not fingerprint_matches(binding, "binding_fingerprint") then
@@ -185,20 +222,28 @@ local function v3_binding_admission_error(binding)
       or type(binding.target_requirements) ~= "table"
       or type(binding.finalizer_observation) ~= "table" then
     return "maximum_level_binding_strategy_shape_invalid"
-  elseif prototype_strategy.mode ~= "lossless-infinite-prototype"
-      or prototype_strategy.max_level ~= "infinite" then
+  elseif not ((prototype_strategy.mode == "lossless-infinite-prototype"
+        and prototype_strategy.max_level == "infinite")
+      or (native_material_stage
+        and prototype_strategy.mode == "native-finite-prototype"
+        and prototype_strategy.max_level == cap)) then
     return "maximum_level_prototype_strategy_mismatch"
-  elseif (finite and strategy.mode ~= "absolute-cap-controller")
+  elseif (finite and not native_material_stage
+      and strategy.mode ~= "absolute-cap-controller")
+      or (native_material_stage and strategy.mode ~= "prototype-cap")
       or (unbounded and strategy.mode ~= "unbounded") then
     return "maximum_level_runtime_strategy_mismatch"
-  elseif requirements.scripted_techs ~= finite
+  elseif requirements.scripted_techs ~= (finite and not native_material_stage)
       or requirements.scripted_techs_supported ~= true
       or requirements.mod_data_transport_supported ~= true
       or requirements.finalizer_adapter ~= MAXIMUM_LEVEL_FINALIZER_ADAPTER then
     return "maximum_level_target_requirements_mismatch"
   elseif finalizer.status ~= "accepted"
       or finalizer.adapter ~= MAXIMUM_LEVEL_FINALIZER_ADAPTER
-      or finalizer.observed_prototype_max_level ~= "infinite" then
+      or (native_material_stage
+        and tonumber(finalizer.observed_prototype_max_level) ~= cap)
+      or (not native_material_stage
+        and finalizer.observed_prototype_max_level ~= "infinite") then
     return "maximum_level_finalizer_observation_invalid"
   end
   return nil
@@ -221,6 +266,9 @@ local function normalized_v3_binding(binding, policy_blocked_reason)
     operation = binding_detail.operation or binding.operation,
     setting = setting.name or binding.setting_name,
     selected = cap.effective or binding.selected,
+    native_finite_stage = binding_error == nil
+      and type(binding.prototype_strategy) == "table"
+      and binding.prototype_strategy.mode == "native-finite-prototype",
     blocked_reason = blocked_reason,
     binding_fingerprint = binding.binding_fingerprint,
     policy_transport = "transported-v3",
@@ -398,6 +446,12 @@ local function add_runtime_settings_registry_entry(index, section, key, spec, ba
     -- derivation. A configured (even malformed) manifest never gets it.
     add_runtime_settings_alias(index, section, "base-extension:" .. key, key)
   end
+  if not base and type(spec) == "table" and type(spec.staged_progression) == "table" then
+    local continuation = spec.staged_progression.continuation
+    if type(continuation) == "table" then
+      add_runtime_settings_alias(index, section, continuation.technology_name, key)
+    end
+  end
 end
 
 local function runtime_settings_registry_index()
@@ -474,7 +528,7 @@ local function build_validated_policy()
     local cap = finite_cap(policy.selected)
     if policy.blocked_reason then
       log_policy_refusal(policy, observed_max_level(name))
-    elseif cap then
+    elseif cap and not policy.native_finite_stage then
       local observed = observed_max_level(name)
       if prototype_is_infinite(observed) then
         caps[name] = cap

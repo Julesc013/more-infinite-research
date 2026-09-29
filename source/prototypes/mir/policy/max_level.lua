@@ -11,10 +11,18 @@ local function plan_max_level(key, spec)
   if not tech then return end
 
   local max_level = costs.max_level_for(key, spec)
+  local legacy = spec.staged_progression and spec.staged_progression.legacy
+  if legacy then
+    if legacy.technology_name ~= tech_name or legacy.last_level ~= 3 then
+      error("Invalid early material stage for " .. key, 2)
+    end
+    max_level = type(max_level) == "number"
+      and math.min(max_level, legacy.last_level) or legacy.last_level
+  end
   local scripted_techs = target_line.feature_enabled("scripted_techs")
   return {
     technology = tech_name,
-    max_level = scripted_techs and "infinite" or max_level,
+    max_level = scripted_techs and not spec.staged_progression and "infinite" or max_level,
     planned_max_level = max_level
   }
 end

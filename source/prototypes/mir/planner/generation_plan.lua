@@ -161,6 +161,10 @@ local function row_fingerprint_material(row)
       output_fingerprint = adoption.output_fingerprint
     } or nil,
     planned_max_level = row.planned_max_level,
+    stage_kind = row.stage_kind,
+    staged_parent_technology = row.staged_parent_technology,
+    staged_parent_stream_key = row.staged_parent_stream_key,
+    configured_stream_key = row.configured_stream_key,
     technology_design = row.technology_design and {
       schema = design.schema,
       candidate_id = design.candidate_id,
@@ -178,6 +182,17 @@ local function rows_fingerprint_material(rows)
   local out = {}
   for index, row in ipairs(rows) do out[index] = row_fingerprint_material(row) end
   return out
+end
+
+local function same_qualified_material_stage(previous, row, previous_effect, effect)
+  return previous and previous.action == "emit"
+    and row.action == "emit"
+    and row.stage_kind == "material-continuation"
+    and row.staged_parent_technology == previous.technology_name
+    and row.staged_parent_stream_key == previous.stream_key
+    and row.configured_stream_key == previous.stream_key
+    and row.technology_name ~= previous.technology_name
+    and effect_signature(previous_effect) == effect_signature(effect)
 end
 
 function Plan:add_derived(row)
@@ -230,10 +245,12 @@ function Plan:finalize()
       for _, effect in ipairs(row.fields.effects or {}) do
         local identity = effect_identity(effect)
         if identity ~= "" then
-          if materialized_effects[identity] then
+          local previous = materialized_effects[identity]
+          if previous and not same_qualified_material_stage(
+              previous.row, row, previous.effect, effect) then
             error("GenerationPlan contains duplicate materialized effect identity: " .. identity, 2)
           end
-          materialized_effects[identity] = row.technology_name
+          materialized_effects[identity] = {row = row, effect = effect}
         end
       end
     elseif row.action == "adopt" then
@@ -252,7 +269,7 @@ function Plan:finalize()
           if materialized_effects[effect_key] then
             error("GenerationPlan contains duplicate materialized effect identity: " .. effect_key, 2)
           end
-          materialized_effects[effect_key] = row.adoption.owner
+          materialized_effects[effect_key] = {row = row, effect = effect}
         end
       end
     end

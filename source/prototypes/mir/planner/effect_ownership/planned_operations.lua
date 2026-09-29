@@ -1,9 +1,25 @@
 local facts = require("prototypes.mir.planner.effect_ownership.facts")
+local generation_plan = require("prototypes.mir.planner.generation_plan")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
+
+local function material_stage_pair(claims)
+  if #claims ~= 2 then return false end
+  local left, right = claims[1], claims[2]
+  local stage = left.operation.stage_kind == "material-continuation" and left or
+    right.operation.stage_kind == "material-continuation" and right or nil
+  if not stage then return false end
+  local parent = stage == left and right or left
+  return parent.operation.operation == "emit_stream"
+    and stage.operation.operation == "emit_stream"
+    and stage.operation.staged_parent_technology == parent.operation.technology_name
+    and stage.operation.staged_parent_stream_key == parent.operation.stream_key
+    and generation_plan.effect_signature(stage.effect)
+      == generation_plan.effect_signature(parent.effect)
+end
 
 local function refresh_base_operation(operation)
   operation.technology_design = technology_design.from_base_extension_operation(operation)
@@ -50,7 +66,16 @@ function M.resolve(raw_operations)
       end
       if facts.retained_overlap(claim.operation, identity) then retain = true end
     end
-    if operation_count > 1 and retain then
+    local has_material_stage = false
+    for _, claim in ipairs(claims) do
+      if claim.operation.stage_kind == "material-continuation" then has_material_stage = true end
+    end
+    if has_material_stage and operation_count > 1 then
+      if not material_stage_pair(claims) then
+        error("Combined CompilationPlan has unqualified material stage overlap: " .. identity, 2)
+      end
+      retained_overlap_count = retained_overlap_count + 1
+    elseif operation_count > 1 and retain then
       retained_overlap_count = retained_overlap_count + 1
     elseif operation_count > 1 then
       table.sort(claims, facts.operation_claim_less)

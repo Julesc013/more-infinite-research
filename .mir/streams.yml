@@ -1343,6 +1343,26 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
 
+    recipe-prod-research_material_aluminium-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_aluminium-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_aluminium
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_aluminium-4
+      stream_key: research_material_aluminium__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_aluminium
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_black_paving-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_black_paving-1
       introduced_in: "4.2.0"
@@ -1383,6 +1403,26 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
 
+    recipe-prod-research_material_brass-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_brass-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_brass
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_brass-4
+      stream_key: research_material_brass__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_brass
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_bronze-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_bronze-1
       introduced_in: "4.2.0"
@@ -1402,6 +1442,26 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_bronze-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_bronze-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_bronze
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_bronze-4
+      stream_key: research_material_bronze__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_bronze
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
 
     recipe-prod-research_material_cobalt_steel-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_cobalt_steel-1
@@ -1423,6 +1483,26 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
 
+    recipe-prod-research_material_cobalt_steel-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_cobalt_steel-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_cobalt_steel
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_cobalt_steel-4
+      stream_key: research_material_cobalt_steel__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_cobalt_steel
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_copper_tungsten-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_copper_tungsten-1
       introduced_in: "4.2.0"
@@ -1442,6 +1522,26 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_copper_tungsten-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_copper_tungsten-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_copper_tungsten
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_copper_tungsten-4
+      stream_key: research_material_copper_tungsten__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_copper_tungsten
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
 
     recipe-prod-research_material_glass-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_glass-1
@@ -1484,6 +1584,26 @@ streams:
           - fixtures/assert-generation-integrity
           - fixtures/assert-community-manufacturing-intake
 
+    recipe-prod-research_material_gold-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_gold-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_gold
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_gold-4
+      stream_key: research_material_gold__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_gold
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_gunmetal-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_gunmetal-1
       introduced_in: "4.2.0"
@@ -1503,6 +1623,26 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_gunmetal-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_gunmetal-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_gunmetal
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_gunmetal-4
+      stream_key: research_material_gunmetal__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_gunmetal
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
 
     recipe-prod-research_material_imersite-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_imersite-1
@@ -1544,6 +1684,26 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
 
+    recipe-prod-research_material_invar-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_invar-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_invar
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_invar-4
+      stream_key: research_material_invar__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_invar
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_lead-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_lead-1
       introduced_in: "4.2.0"
@@ -1563,6 +1723,26 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_lead-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_lead-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_lead
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_lead-4
+      stream_key: research_material_lead__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_lead
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
 
     recipe-prod-research_material_nickel-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_nickel-1
@@ -1585,6 +1765,26 @@ streams:
           - fixtures/assert-generation-integrity
           - fixtures/assert-f200-bob-angel-material-routes-observation
 
+    recipe-prod-research_material_nickel-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_nickel-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_nickel
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_nickel-4
+      stream_key: research_material_nickel__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_nickel
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_nitinol-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_nitinol-1
       introduced_in: "4.2.0"
@@ -1604,6 +1804,26 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_nitinol-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_nitinol-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_nitinol
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_nitinol-4
+      stream_key: research_material_nitinol__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_nitinol
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
 
     recipe-prod-research_material_platinum-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_platinum-1
@@ -1625,6 +1845,26 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
           - fixtures/assert-community-manufacturing-intake
+
+    recipe-prod-research_material_platinum-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_platinum-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_platinum
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_platinum-4
+      stream_key: research_material_platinum__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_platinum
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
 
     recipe-prod-research_material_rare_metals-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_rare_metals-1
@@ -1688,6 +1928,26 @@ streams:
           - fixtures/assert-community-manufacturing-intake
           - fixtures/assert-f200-bob-angel-material-routes-observation
 
+    recipe-prod-research_material_silver-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_silver-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_silver
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_silver-4
+      stream_key: research_material_silver__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_silver
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_tin-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_tin-1
       introduced_in: "4.2.0"
@@ -1708,6 +1968,26 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
 
+    recipe-prod-research_material_tin-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_tin-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_tin
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_tin-4
+      stream_key: research_material_tin__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_tin
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_titanium-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_titanium-1
       introduced_in: "4.2.0"
@@ -1727,6 +2007,26 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_titanium-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_titanium-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_titanium
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_titanium-4
+      stream_key: research_material_titanium__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_titanium
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua
 
     recipe-prod-research_material_white_paving-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_white_paving-1
@@ -1767,3 +2067,22 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+    recipe-prod-research_material_zinc-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_zinc-4
+      introduced_in: "4.2.0"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_zinc
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_zinc-4
+      stream_key: research_material_zinc__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_zinc
+      evidence:
+        tests:
+          - tests/compiler/material_continuation.lua

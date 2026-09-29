@@ -127,6 +127,13 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
   for _, row in ipairs(rows) do
     if row.action == "emit" then
       local rejection = graph_summary.rejected[row.technology_name]
+      if not rejection and row.staged_parent_technology
+          and graph_summary.rejected[row.staged_parent_technology] then
+        rejection = {
+          code = "material_continuation_parent_rejected",
+          evidence = {"material-continuation:legacy-parent-graph-rejected"}
+        }
+      end
       if rejection then
         row.action = "skip"
         row.reason = rejection.code
@@ -276,7 +283,10 @@ local function materialized_stream_operations(artifact, options)
         technology_design = options.include_design == false and nil or design,
         technology = virtual_technology
           or technology_design.prototype_shape(design, {validated = true}),
-        registry = {kind = "stream", key = row.stream_key}
+        registry = {kind = "stream", key = row.stream_key},
+        stage_kind = row.stage_kind,
+        staged_parent_technology = row.staged_parent_technology,
+        staged_parent_stream_key = row.staged_parent_stream_key
       })
     elseif row.action == "adopt" then
       if options.virtual_projection then

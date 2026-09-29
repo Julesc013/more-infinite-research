@@ -9,6 +9,9 @@ function M.operation(operation)
       stream_key = operation.stream_key,
       manifest_id = operation.manifest_id,
       technology_name = operation.technology_name,
+      stage_kind = operation.stage_kind,
+      staged_parent_technology = operation.staged_parent_technology,
+      staged_parent_stream_key = operation.staged_parent_stream_key,
       design_fingerprint = operation.technology_design.design_fingerprint,
       prototype_fingerprint = operation.technology_design.prototype_fingerprint,
       registry = operation.registry

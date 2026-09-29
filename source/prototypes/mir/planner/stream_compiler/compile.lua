@@ -15,6 +15,7 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local discover = require("prototypes.mir.planner.stream_compiler.discover")
 local ownership = require("prototypes.mir.planner.stream_compiler.ownership")
 local qualify = require("prototypes.mir.planner.stream_compiler.qualify")
+local material_continuation = require("prototypes.mir.planner.stream_compiler.material_continuation")
 local pack_production = require("prototypes.mir.capabilities.science_integration.pack_production_reachability")
 
 local M = {}
@@ -43,6 +44,15 @@ local function compile_active(context, return_view)
     table.insert(rows, qualify.plan(key, streams[key]))
   end
   rows = ownership.resolve(rows)
+  local staged_rows = {}
+  for _, row in ipairs(rows) do
+    table.insert(staged_rows, row)
+    -- Reuse only the effects that won the ordinary owner reconciliation.
+    -- A native or competing owner cannot be extended by an MIR continuation.
+    local continuation = material_continuation.plan(row)
+    if continuation then table.insert(staged_rows, continuation) end
+  end
+  rows = staged_rows
   for _, row in ipairs(rows) do
     row.technology_design = technology_design.from_generation_row(row)
     plan:add_owned_derived(row)

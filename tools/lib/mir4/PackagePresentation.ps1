@@ -955,12 +955,16 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   $historicalIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
   $repairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
   $progressionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
+  $progressionPlannerIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
   if([string]$Current.predecessor_record_sha256-cne[string]$Predecessor.record_sha256-or
-     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne15-or
-     $scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or$progressionIntroduced.Count-ne1-or
+     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne16-or
+     $scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or$progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or
      [string]$progressionIntroduced[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
      [string]$progressionIntroduced[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
      (@($progressionIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
+     [string]$progressionPlannerIntroduced[0].source_path-cne'source/prototypes/mir/planner/stream_compiler/material_continuation.lua'-or
+     [string]$progressionPlannerIntroduced[0].output_path-cne'prototypes/mir/planner/stream_compiler/material_continuation.lua'-or
+     (@($progressionPlannerIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
      [string]$scienceIntroduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
      [string]$scienceIntroduced[0].output_path-cne'prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
      (@($scienceIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or

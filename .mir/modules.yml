@@ -1392,6 +1392,7 @@ modules:
     - prototypes/mir/planner/stream_compiler/discover.lua
     - prototypes/mir/planner/stream_compiler/ownership.lua
     - prototypes/mir/planner/stream_compiler/qualify.lua
+    - prototypes/mir/planner/stream_compiler/material_continuation.lua
     - prototypes/mir/planner/generation_plan.lua
     - prototypes/mir/planner/output_validator.lua
     - prototypes/mir/planner/costs.lua

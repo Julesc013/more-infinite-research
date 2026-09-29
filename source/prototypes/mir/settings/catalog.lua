@@ -70,6 +70,12 @@ local function default_linear_increment(key, stream)
 end
 
 local function default_max_level_setting(key, stream)
+  local staged = stream and stream.staged_progression
+  if staged and staged.continuation and staged.continuation.maximum_level_default == 0 then
+    -- The released -1 technology still ends at level three. Zero governs the
+    -- combined staged family; the compiler supplies a finite useful cap.
+    return 0
+  end
   local ml = lookup_default(key, "max_level", stream, 0)
   if ml == nil or ml == "infinite" then return 0 end
   local num = tonumber(ml)

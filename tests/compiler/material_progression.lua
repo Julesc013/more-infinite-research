@@ -122,4 +122,31 @@ end
 check(streams.research_material_rare_metals.staged_progression == nil,
   "K2 material declaration stays outside the unqualified continuation mechanism")
 
+local function effect(recipe, change)
+  return {type = "change-recipe-productivity", recipe = recipe, change = change}
+end
+local recipe_caps = {
+  normal = {}, -- Engine default is +300% when maximum_productivity is absent.
+  narrow = {maximum_productivity = 0.06},
+  broad = {maximum_productivity = 5.0}
+}
+local function recipe(name) return recipe_caps[name] end
+local normal_level = progression.highest_useful_level({effect("normal", 0.02)}, recipe, "infinite")
+check(normal_level == 150, "the default recipe cap admits a finite last useful +2% level")
+local broad_level = progression.highest_useful_level({effect("broad", 0.02)}, recipe, "infinite")
+check(broad_level == 250, "an observed raised recipe cap permits later useful levels")
+local mixed_level = progression.highest_useful_level({effect("normal", 0.02), effect("narrow", 0.02)}, recipe, "infinite")
+check(mixed_level == 150, "the family continues while at least one qualified recipe benefits")
+local configured_level = progression.highest_useful_level({effect("normal", 0.02)}, recipe, 8)
+check(configured_level == 8, "a finite startup setting is an absolute cap across both stages")
+local no_headroom, no_headroom_reason = progression.highest_useful_level({effect("narrow", 0.02)}, recipe, "infinite")
+check(no_headroom == nil and no_headroom_reason == "no-continuation-headroom",
+  "a family whose recipes saturate within levels one to three gets no paid continuation")
+local absent, absent_reason = progression.highest_useful_level({effect("missing", 0.02)}, recipe, "infinite")
+check(absent == nil and absent_reason == "material-recipe-unavailable",
+  "an unknown recipe fails closed rather than borrowing the engine default cap")
+local invalid, invalid_reason = progression.highest_useful_level({effect("normal", 0)}, recipe, "infinite")
+check(invalid == nil and invalid_reason == "invalid-material-effect",
+  "a non-positive productivity effect cannot create continuation levels")
+
 print("MIR-MATERIAL-PROGRESSION-PASS " .. assertions)
