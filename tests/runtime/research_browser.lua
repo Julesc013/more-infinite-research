@@ -594,7 +594,7 @@ script.on_nth_tick(1,function()
       and default_list and default_list.type=="scroll-pane" and default_list.style.maximal_width>=240 and default_list.style.maximal_width<=360
       and default_list.parent==default_results and default_list.style.maximal_height>=80 and (default_list.style.minimal_height or 0)<default_list.style.maximal_height
       and default_list.horizontal_scroll_policy=="never" and default_list.vertical_scroll_policy=="auto"
-      and default_detail and default_detail.type=="scroll-pane" and default_detail.style.maximal_width>=280 and default_detail.style.maximal_width<=460
+      and default_detail and default_detail.type=="scroll-pane" and default_detail.style.maximal_width>=280 and default_detail.style.maximal_width<=320
       and default_detail.parent==default_results and default_detail.style.maximal_height>=80 and (default_detail.style.minimal_height or 0)<default_detail.style.maximal_height
       and default_detail.horizontal_scroll_policy=="never" and default_detail.vertical_scroll_policy=="auto"
       and default_search and default_search.parent==default_root and default_navigation and default_navigation.parent==default_root,
@@ -632,6 +632,11 @@ script.on_nth_tick(1,function()
     check(find_browser_element(default_root,"mir_browser","research") and find_browser_element(default_root,"mir_browser","queue")
       and find_browser_element(default_root,"mir_browser","settings") and find_browser_element(default_root,"mir_browser","availability"),
       "library presents browse, queue, setup and availability navigation")
+    local refresh_button=find_browser_element(default_root,"mir_browser","refresh")
+    local close_button=find_browser_element(default_root,"mir_browser","close")
+    check(refresh_button and refresh_button.type=="sprite-button" and refresh_button.sprite=="utility/refresh"
+      and close_button and close_button.type=="sprite-button" and close_button.sprite=="utility/close",
+      "compact native actions keep Refresh and Close visible beside the navigation tabs")
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="queue"}),
       "native queue tab opens for the connected player")
     local queue_root=actual.gui.screen.mir_research_browser

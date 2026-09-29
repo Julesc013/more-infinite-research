@@ -11,7 +11,7 @@ local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
 local M = {requires_features = {"settings_profiles"}}
 local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
-local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 400
+local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 320
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
 local RESEARCH_PANES_MIN_HEIGHT, RESEARCH_FILTERS_HEIGHT, RESEARCH_HIDDEN_RECOVERY_HEIGHT = 80, 124, 32
 local RESEARCH_BODY_MAX_HEIGHT = 420
@@ -48,7 +48,7 @@ local function research_pane_widths(player)
     return RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH
   end
   -- Leave room for the frame edge, its scrollbar, and Factorio's native chrome.
-  -- At a normal desktop width this keeps the intended 360/460 split; narrower
+  -- At a normal desktop width this keeps the intended 360/320 split; narrower
   -- displays reduce both columns proportionally down to readable lower bounds.
   local normal_width = RESEARCH_LIST_WIDTH + RESEARCH_DETAIL_WIDTH
   local minimum_width = RESEARCH_LIST_MIN_WIDTH + RESEARCH_DETAIL_MIN_WIDTH
@@ -65,11 +65,7 @@ local function research_pane_widths(player)
 end
 
 local function settings_pane_widths(player)
-  local list_width, detail_width = research_pane_widths(player)
-  -- The settings catalogue has shorter rows than technology details. Keep
-  -- its natural two-column width without growing to the research-pane maximum.
-  if list_width + detail_width > 700 then return 340, 360 end
-  return list_width, detail_width
+  return research_pane_widths(player)
 end
 
 local function availability_pane_widths(player)
@@ -327,6 +323,15 @@ end
 local function button(parent, action, caption, tags)
   tags = tags or {}; tags.mir_browser = action
   return parent.add{type = "button", caption = caption, tags = tags}
+end
+
+local function icon_button(parent, action, sprite, tooltip)
+  local control = parent.add{
+    type = "sprite-button", style = "tool_button", sprite = sprite,
+    tooltip = tooltip, tags = {mir_browser = action}
+  }
+  control.style.width, control.style.height = 32, 32
+  return control
 end
 local function set_shortcut_toggled(player, toggled)
   if player and player.valid and player.set_shortcut_toggled then
@@ -1062,8 +1067,8 @@ render = function(player)
   button(bar, "queue", {"mir-browser.queue-tab"}).toggled = v.tab == "queue"
   button(bar, "settings", {"mir-browser.settings"}).toggled = v.tab == "settings"
   button(bar, "availability", {"mir-browser.not-added"}).toggled = v.tab == "availability"
-  button(bar, "refresh", {"mir-browser.refresh"})
-  button(bar, "close", {"mir-browser.close"})
+  icon_button(bar, "refresh", "utility/refresh", {"mir-browser.refresh"})
+  icon_button(bar, "close", "utility/close", {"mir-browser.close"})
   if v.tab == "research" or v.tab == "settings" then
     local search = frame.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "search"}}
     label(search, {"mir-browser." .. (v.tab == "settings" and "search-settings" or "search")}, math.max(160, list_width - 40))
