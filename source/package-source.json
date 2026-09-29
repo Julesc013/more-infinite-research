@@ -3112,10 +3112,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_selector.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 11760,
-      "source_sha256": "BEF922C17BD782E683FD578515E4EBCBC07EE5EABB739D9F3A397293A94F76C8",
-      "output_bytes": 11760,
-      "output_sha256": "BEF922C17BD782E683FD578515E4EBCBC07EE5EABB739D9F3A397293A94F76C8"
+      "source_bytes": 12942,
+      "source_sha256": "6552B91FAE4D50B938715244E4DA1E2DB4B2FD5939E532969B1B407A28ED8C2B",
+      "output_bytes": 12942,
+      "output_sha256": "6552B91FAE4D50B938715244E4DA1E2DB4B2FD5939E532969B1B407A28ED8C2B"
     },
     {
       "layer": "capability",
@@ -7625,5 +7625,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "3397C0FCC631DF4C7E7E817EDF84C70B49755229BD9E291DA4F8A44E4635A7B3"
+  "record_sha256": "B3C3F5987D4B405F24A5BF14F181B05362F628AE7A929D70E0D169A5DFA02345"
 }
