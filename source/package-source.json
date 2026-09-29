@@ -6910,10 +6910,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4769,
-      "source_sha256": "4173A6BD90966972DE041EDA10DD1975D4DC440013FE91690A70BF6A0ABEF2F3",
-      "output_bytes": 4769,
-      "output_sha256": "4173A6BD90966972DE041EDA10DD1975D4DC440013FE91690A70BF6A0ABEF2F3"
+      "source_bytes": 4754,
+      "source_sha256": "F117A85DDE4ED12DBD4D1E6A0BCE243095F693A34403D94C73FFC836999734C3",
+      "output_bytes": 4754,
+      "output_sha256": "F117A85DDE4ED12DBD4D1E6A0BCE243095F693A34403D94C73FFC836999734C3"
     },
     {
       "layer": "shared",
@@ -7647,5 +7647,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "F6E606040A28817FE9020E5187B822874D605942B32156BAB8DFA265440231A4"
+  "record_sha256": "0097B503DFB6EFF23A45151368583E5605B04462B1C1B40DAAFB3FAEF03AA699"
 }
