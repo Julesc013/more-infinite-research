@@ -10,6 +10,8 @@ local derived_buckets = {}
 local initially_available_recipes = {}
 local derived_unlockers = {}
 local native_owner_rejections = {}
+local external_owner_records = {}
+local owner_diagnostics = {}
 local active_mods = {Krastorio2='2.1.2', ['Krastorio2-spaced-out']='2.0.13'}
 local known = {'automation-science-pack','logistic-science-pack','military-science-pack',
   'chemical-science-pack','production-science-pack','utility-science-pack','space-science-pack',
@@ -71,6 +73,7 @@ end
 check('K01', k2.applies(active_mods), 'V1 admits exactly K2 2.1.2 plus K2SO 2.0.13')
 check('K02', not k2.applies({Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.17'}), 'V1 does not admit K2SO 2.0.17')
 check('K03', not k2.applies({['Krastorio2-spaced-out']='1.6.21'}), 'V1 does not admit standalone K2SO 1.6.21')
+check('K04', k2.applies({base='2.1.20',Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.13'}) and not k2.applies({base='2.1.19',Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.13'}), 'V4 admits the observed 2.1.20 K2/K2SO tuple and rejects an adjacent engine')
 local original={{'kr-basic-tech-card',1},{'automation-science-pack',1},{'production-science-pack',1}}
 local norm,decision=k2.normalize(original,active_mods)
 check('K04',not has(norm,'kr-basic-tech-card') and has(norm,'automation-science-pack'),'Phase one removes basic card but retains automation')
@@ -171,8 +174,32 @@ stub('prototypes.mir.index.productivity_owners',{
   end
   return false
  end,
- recipe_allows_productivity=function(_) return true end
+ recipe_allows_productivity=function(_) return true end,
+ blocking_recipe_productivity_owner_records=function(recipe_name, options)
+  local records = {}
+  for _, record in ipairs(external_owner_records[recipe_name] or {}) do
+   if record.action ~= 'replace'
+     and not (options and options.ignore_owner and options.ignore_owner(record.tech) == true) then
+    records[#records+1]=record
+   end
+  end
+  return records
+ end,
+ owner_names=function(records)
+  local names={}; for _, record in ipairs(records or {}) do names[#names+1]=record.tech end
+  table.sort(names); return table.concat(names, ',')
+ end,
+ owner_kinds=function(records)
+  local names={}; for _, record in ipairs(records or {}) do names[#names+1]=record.kind end
+  table.sort(names); return table.concat(names, ',')
+ end,
+ owner_actions=function(records)
+  local names={}; for _, record in ipairs(records or {}) do names[#names+1]=record.action end
+  table.sort(names); return table.concat(names, ',')
+ end
 })
+stub('prototypes.mir.report.diagnostics_sink',{recipe_owner=function(row) owner_diagnostics[#owner_diagnostics+1]=row end})
+stub('prototypes.mir.policy.competing_productivity',{ignores_existing_owner=function() return false end})
 stub('prototypes.mir.settings.catalog',{is_default_value=function(_, _) return true end})
 stub('prototypes.mir.settings.effect_contracts',{stream_setting_name=function(key) return 'ips-effect-per-level-'..key end,
  stream_descriptor=function(_) return {display_multiplier=1} end})
@@ -223,6 +250,43 @@ for _, case in ipairs({
   'Unreachable native owner ('..case.rejection..') falls back without adoption')
 end
 native_owner_rejections={}
+
+-- Existing external productivity must cooperate with MIR only while it is a
+-- usable research route.  The production K2/K2SO fixture keeps its reachable
+-- kr-imersite-productivity owner; these controlled cases exercise the shared
+-- negative paths without claiming a changed K2 final graph.
+local owner_policy=require('prototypes.mir.policy.owner_policy')
+local external_owner_bucket={{change=0.1,recipes={'ordinary-k2-material-route'}}}
+external_owner_records={['ordinary-k2-material-route']={{
+ tech='kr-imersite-productivity',kind='unknown_external',action='skip'
+}}}
+native_owner_rejections={}
+owner_diagnostics={}
+local filtered, covered=owner_policy.filter_existing_recipe_productivity(
+ 'research_material_imersite',{},external_owner_bucket)
+check('O01',#filtered==0 and #covered==1 and covered[1].owners=='kr-imersite-productivity' and #owner_diagnostics==1
+  and owner_diagnostics[1].reason=='covered_by_existing_infinite_recipe_productivity',
+  'Reachable external owner remains the sole material-route owner')
+for _, case in ipairs({
+ {id='O02',rejection='disabled'},
+ {id='O03',rejection='technology-cycle'},
+ {id='O04',rejection='unreachable-science-overhaul-pack'}
+}) do
+ native_owner_rejections={['kr-imersite-productivity']=case.rejection}
+ owner_diagnostics={}
+ local eligible, skipped=owner_policy.filter_existing_recipe_productivity(
+  'research_material_imersite',{},external_owner_bucket)
+ check(case.id,#eligible==1 and eligible[1].recipes[1]=='ordinary-k2-material-route' and #skipped==0
+   and #owner_diagnostics==1 and owner_diagnostics[1].status=='not_blocking'
+   and owner_diagnostics[1].reason=='existing_infinite_recipe_productivity_owner_unresearchable'
+   and owner_diagnostics[1].owners=='kr-imersite-productivity'
+   and owner_diagnostics[1].owner_rejection==case.rejection,
+   'Unresearchable external owner ('..case.rejection..') cannot suppress an ordinary MIR route')
+end
+native_owner_rejections={}
+external_owner_records={}
+owner_diagnostics={}
+
 data.raw.lab={
  early={inputs={'automation-science-pack','logistic-science-pack','military-science-pack','chemical-science-pack'}},
  late={inputs={'space-science-pack','kr-matter-tech-card'}}
