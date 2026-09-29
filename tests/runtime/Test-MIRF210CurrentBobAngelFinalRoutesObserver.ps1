@@ -4,7 +4,7 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot='C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-ba-20260930',
-  [string]$OutputRoot='f210-ba-final-routes-observer',
+  [string]$OutputRoot='ba-final',
   [switch]$PrepareOnly
 )
 $ErrorActionPreference='Stop'
