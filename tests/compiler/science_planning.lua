@@ -73,6 +73,7 @@ end
 check('K01', k2.applies(active_mods), 'V1 admits exactly K2 2.1.2 plus K2SO 2.0.13')
 check('K02', not k2.applies({Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.17'}), 'V1 does not admit K2SO 2.0.17')
 check('K03', not k2.applies({['Krastorio2-spaced-out']='1.6.21'}), 'V1 does not admit standalone K2SO 1.6.21')
+check('K04', k2.applies({base='2.1.20',Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.13'}) and not k2.applies({base='2.1.19',Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.13'}), 'V4 admits the observed 2.1.20 K2/K2SO tuple and rejects an adjacent engine')
 local original={{'kr-basic-tech-card',1},{'automation-science-pack',1},{'production-science-pack',1}}
 local norm,decision=k2.normalize(original,active_mods)
 check('K04',not has(norm,'kr-basic-tech-card') and has(norm,'automation-science-pack'),'Phase one removes basic card but retains automation')

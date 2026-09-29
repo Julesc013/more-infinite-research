@@ -11,6 +11,12 @@ local M = {
   -- This is a distinct, exact successor admission. It deliberately is not a
   -- range: an upstream version must be separately observed and admitted.
   v3_policy_id = "K2SciencePhasePolicyV3",
+  v4_policy_id = "K2SciencePhasePolicyV4",
+  v4_applicability = {
+    base = "2.1.20",
+    Krastorio2 = "2.1.2",
+    ["Krastorio2-spaced-out"] = "2.0.13"
+  },
   v3_applicability = {
     base = "2.1.20",
     Krastorio2 = "2.1.3",
@@ -53,6 +59,14 @@ local function matches_exact_tuple(active_mods, exact_versions)
 end
 
 local function matching_policy(active_mods)
+  -- Current-engine profiles expose base. Do not apply the historical V1
+  -- tuple to a different engine merely because its two named mods match.
+  if matches_exact_tuple(active_mods, M.v4_applicability) then
+    return M.v4_policy_id, M.v4_applicability
+  end
+  if active_mods and active_mods.base ~= nil and matches_exact_tuple(active_mods, M.applicability) then
+    return nil, nil
+  end
   if matches_exact_tuple(active_mods, M.applicability) then
     return M.policy_id, M.applicability
   end
