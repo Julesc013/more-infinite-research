@@ -72,7 +72,26 @@ try {
   } finally {
     foreach ($lock in $locks) { $lock.Dispose() }
   }
-  Write-Output 'MIR player startup report: passed (offline crash, redaction, settings exclusion, locked-file partial report)'
+
+  if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
+    $wrapperDir = Join-Path $run 'wrapper'
+    New-Item -ItemType Directory -Force -Path $wrapperDir | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repo 'scripts/Collect-MIRPlayerReport.cmd') -Destination $wrapperDir
+    [IO.File]::WriteAllText((Join-Path $wrapperDir 'Collect-MIRPlayerReport.ps1'), @'
+param([string]$OutputDirectory, [switch]$CopyPath, [switch]$ShowInExplorer)
+@{ output = $OutputDirectory; copy = $CopyPath.IsPresent; explorer = $ShowInExplorer.IsPresent } |
+  ConvertTo-Json -Compress | Set-Content -LiteralPath (Join-Path $PSScriptRoot 'arguments.json')
+'@, [Text.UTF8Encoding]::new($false))
+    '' | & $env:ComSpec /c (Join-Path $wrapperDir 'Collect-MIRPlayerReport.cmd') | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'The double-click wrapper did not launch Windows PowerShell.' }
+    $arguments = Get-Content -Raw -LiteralPath (Join-Path $wrapperDir 'arguments.json') | ConvertFrom-Json
+    if ([IO.Path]::GetFullPath([string]$arguments.output).TrimEnd('\') -cne
+        [IO.Path]::GetFullPath($wrapperDir).TrimEnd('\') -or
+        $arguments.copy -ne $true -or $arguments.explorer -ne $true) {
+      throw 'The double-click wrapper did not pass its output, clipboard and Explorer options correctly.'
+    }
+  }
+  Write-Output 'MIR player startup report: passed (offline crash, redaction, settings exclusion, locked-file partial report, wrapper arguments)'
 } finally {
   $absoluteRun = [IO.Path]::GetFullPath($run)
   if (-not $absoluteRun.StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
