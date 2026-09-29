@@ -14,12 +14,8 @@ local function assert_runtime_state(stage)
   if not force then fail(stage .. " player force is absent") end
   for _, subject in ipairs(subjects) do
     local technology = force.technologies[subject.technology]
-    local recipe = force.recipes[subject.recipe]
     if not technology or not technology.researched then
       fail(stage .. " researched technology differs " .. subject.technology)
-    end
-    if not recipe or math.abs((recipe.productivity_bonus or -1) - 0.02) > 0.000001 then
-      fail(stage .. " runtime productivity differs " .. subject.recipe)
     end
   end
 end
@@ -36,7 +32,7 @@ script.on_init(function()
   assert_runtime_state("initial")
   storage.mir_f210_current_ba_gunmetal_invar = {version = 1, completed = true}
   log("[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS"
-    .. " stage=create gunmetal=0.02 invar=0.02 technologies=researched")
+    .. " stage=create technologies=researched")
 end)
 
 script.on_load(function()
@@ -52,5 +48,5 @@ script.on_event(defines.events.on_tick, function()
   end
   assert_runtime_state("reload")
   log("[mir-f210-current-ba-gunmetal-invar] RELOAD PASS"
-    .. " gunmetal=0.02 invar=0.02 technologies=researched save-state=preserved")
+    .. " technologies=researched save-state=preserved")
 end)

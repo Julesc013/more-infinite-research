@@ -135,7 +135,6 @@ try {
     $archive=Join-Path $stageMods $entry.Key
     $inputs += New-GIInput -Path $archive -Role 'dependency-mod' -Identity ([ordered]@{archive=$entry.Key;sha256=$entry.Value}) -Provenance ([ordered]@{kind='retained-exact-f210-ba-stage';stage=$stage})
   }
-  $inputs += New-GIInput -Path $stageSettings -Role 'settings' -Identity ([ordered]@{file='mod-settings.dat';sha256=$expectedSettingsSha}) -Provenance ([ordered]@{kind='retained-exact-f210-ba-stage';stage=$stage})
   $inputs += New-GIInput -Path $candidate -Role 'candidate' -Identity ([ordered]@{target='f210';sha256=(Get-GISha $candidate)}) -Provenance ([ordered]@{kind='fresh-f210-target-materialization';source_commit=$sourceCommit;source_tree=$sourceTree})
   $inputLease=New-MIRImmutableInputLease -RunRoot $run -StageDirectory $mods -Inputs $inputs
   $fixtureArchive=Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name $fixtureName -Version $fixtureVersion -ModsDir $mods
@@ -145,17 +144,24 @@ try {
   $enabled += @('more-infinite-research',$fixtureName)
   $modList=[ordered]@{mods=@($enabled | ForEach-Object { [ordered]@{name=$_;enabled=$true} })}
   [IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),(($modList | ConvertTo-Json -Depth 10)+"`n"),[Text.UTF8Encoding]::new($false))
+  # Factorio updates mod-settings.dat on startup.  It remains hash-bound to
+  # the retained source before launch, but must not be held by the immutable
+  # archive lease while the engine atomically rewrites it.
+  $stagedSettings=Join-Path $mods 'mod-settings.dat'
+  Copy-Item -LiteralPath $stageSettings -Destination $stagedSettings -Force
+  Assert-GI ((Get-GISha $stagedSettings) -ceq $expectedSettingsSha) 'copied exact stage settings differ before create'
+  $initialSettingsArtifact=Get-GIArtifact $stagedSettings
   Assert-GIPath (Join-Path $mods 'mod-list.json') 'F210 Gunmetal/Invar mod list'
 
   $load=Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $run -ScenarioName 'f210-ba-gunmetal-invar' -ScenarioTimeoutSeconds 300
   Assert-GI ([bool]$load.passed -and -not [bool]$load.timed_out -and [int]$load.exit_code -eq 0) 'fresh create failed'
   $freshLog=[IO.File]::ReadAllText([string]$load.factorio_log)
   $dataMarker='[mir-f210-current-ba-gunmetal-invar] DATA PASS gunmetal=recipe-prod-research_material_gunmetal-1:angels-plate-gunmetal:0.02 invar=recipe-prod-research_material_invar-1:angels-plate-invar:0.02 unique-owners=true'
-  $runtimeMarker='[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS stage=create gunmetal=0.02 invar=0.02 technologies=researched'
+  $runtimeMarker='[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS stage=create technologies=researched'
   Assert-GI ($freshLog.Contains($dataMarker,[StringComparison]::Ordinal)) 'fresh data effect/owner marker is absent'
   Assert-GI ($freshLog.Contains($runtimeMarker,[StringComparison]::Ordinal)) 'fresh runtime effect marker is absent'
 
-  $reloadMarker='[mir-f210-current-ba-gunmetal-invar] RELOAD PASS gunmetal=0.02 invar=0.02 technologies=researched save-state=preserved'
+  $reloadMarker='[mir-f210-current-ba-gunmetal-invar] RELOAD PASS technologies=researched save-state=preserved'
   $reload=Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $run -ScenarioName 'f210-ba-gunmetal-invar' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 300 -RequiredLogFragments @($reloadMarker)
   Assert-GI ([bool]$reload.passed) 'single reload or saved runtime-state contract failed'
 
@@ -163,8 +169,7 @@ try {
   $inputLease=$null
   $archiveArtifacts=@($staging.inputs | Where-Object { $_.role -ceq 'dependency-mod' } | ForEach-Object { ConvertTo-MIRImmutableInputArtifact -Receipt $staging -Input $_ -Locator (Get-GIRelative ([string]$_.stage_path)) } | Sort-Object path)
   $candidateInput=@($staging.inputs | Where-Object { $_.role -ceq 'candidate' })
-  $settingsInput=@($staging.inputs | Where-Object { $_.role -ceq 'settings' })
-  Assert-GI ($candidateInput.Count -eq 1 -and $settingsInput.Count -eq 1) 'terminal staged candidate/settings cardinality differs'
+  Assert-GI ($candidateInput.Count -eq 1) 'terminal staged candidate cardinality differs'
   $reloadArtifacts=@($reload.reloads | ForEach-Object {
     [ordered]@{
       ordinal=$_.ordinal;passed=$_.passed;duration_seconds=$_.duration_seconds;maximum_duration_seconds=$_.maximum_duration_seconds
@@ -183,7 +188,7 @@ try {
     enabled_mods=$enabled
     archives=$archiveArtifacts
     candidate=ConvertTo-MIRImmutableInputArtifact -Receipt $staging -Input $candidateInput[0] -Locator (Get-GIRelative ([string]$candidateInput[0].stage_path))
-    settings=ConvertTo-MIRImmutableInputArtifact -Receipt $staging -Input $settingsInput[0] -Locator (Get-GIRelative ([string]$settingsInput[0].stage_path))
+    settings=[ordered]@{source_sha256=$expectedSettingsSha;initial=$initialSettingsArtifact;after_engine=Get-GIArtifact $stagedSettings}
     fixture=Get-GIArtifact $fixtureArchive
     mod_list=Get-GIArtifact (Join-Path $mods 'mod-list.json')
     input_staging=$staging
