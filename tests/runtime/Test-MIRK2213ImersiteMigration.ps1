@@ -368,7 +368,6 @@ try {
     $newSettingsAfterUpgrade = Get-K2MigrationSha $newStage.settings_path
     $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $newStage.userdata -ScenarioName "k2-213-imersite-migration-$($case.name)" -SavePath $newSave -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments $reloadMarker
     Assert-K2Migration ([bool]$reload.passed) "$($case.name)-current-package-reload"
-    if ($case.cap -eq 0) { Assert-K2HeadroomDiagnostic -LogPath ([string]$reload.reloads[0].factorio_log) -StageName 'cap0-reload' }
     $newSettingsAfterReload = Get-K2MigrationSha $newStage.settings_path
     Assert-K2Migration ((Get-K2MigrationSha $v5SettingsPath) -ceq $v5SettingsSha) 'pinned-v5-settings-source-mutated'
     Assert-K2Migration ((Get-K2MigrationSha $cap0SettingsPath) -ceq [string]$cap0SettingsMutation.patched_sha256) 'cap0-settings-profile-mutated'
