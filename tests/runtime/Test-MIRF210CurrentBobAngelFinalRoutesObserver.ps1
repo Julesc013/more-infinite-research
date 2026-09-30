@@ -137,8 +137,8 @@ $version=(& $engine --version | Out-String)
 Assert-Observer ($LASTEXITCODE -eq 0 -and $version -match 'Version:\s+2[.]1[.]20') 'requires Factorio 2.1.20.'
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 $run=Join-Path $output ([guid]::NewGuid().ToString('N'));$mods=Join-Path $run 'mods';$userdata=Join-Path $run 'userdata';New-Item -ItemType Directory -Force -Path $mods,$userdata|Out-Null
-Copy-Item -LiteralPath $candidateZip -Destination $mods
-foreach($archiveName in $expectedArchives.Keys){Copy-Item -LiteralPath (Join-Path $stage (Join-Path 'mods' $archiveName)) -Destination $mods}
+Copy-MIRFileWithHardlinkFallback -Source $candidateZip -Destination (Join-Path $mods ([IO.Path]::GetFileName($candidateZip)))
+foreach($archiveName in $expectedArchives.Keys){Copy-MIRFileWithHardlinkFallback -Source (Join-Path $stage (Join-Path 'mods' $archiveName)) -Destination (Join-Path $mods $archiveName)}
 Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-fixture-assert-f210-current-bob-angel-final-routes-observer' -Version '0.1.0' -ModsDir $mods|Out-Null
 @{mods=@($modNames|ForEach-Object{[ordered]@{name=$_;enabled=$true}})}|ConvertTo-Json -Depth 5|Set-Content -LiteralPath (Join-Path $mods 'mod-list.json') -Encoding utf8
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
