@@ -221,6 +221,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-30.
 - [More Infinite Research 4 documentation](../../README.md)
 - [Offline Family Rule Synthesis](../../reference/offline-rule-synthesis.md)
 - [Project Continuity](../../PROJECT-CONTINUITY.md)
+- [RIC Marine Carbonisation Development Observation](../../compatibility/targets/ric-marine-carbonisation-observation.md)
 - [Screenshots](../../assets/screenshots/README.md)
 - [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md)
 - [Technology Quality And Promotion Inventory](../../reference/generated/technology-quality-and-promotion.md)

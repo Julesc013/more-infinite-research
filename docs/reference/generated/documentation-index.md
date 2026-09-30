@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 452 pages as of 2026-09-30.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-09-30.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -127,7 +127,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/compatibility/campaigns/factorio-2.1-lane.md | Factorio 2.1 Lane | current | release-manager | release-plan | mir-maintainers | 2026-09-01 |
 | docs/compatibility/campaigns/README.md | Compatibility Campaigns | current | release-manager | release-plan | mir-maintainers | 2026-07-07 |
 | docs/compatibility/claim-levels.md | Compatibility Claims | current | modpack-author | explanation | mir-maintainers | 2026-07-23 |
-| docs/compatibility/compatibility-matrix.md | MIR Compatibility Matrix | current | modpack-author | explanation | mir-maintainers | 2026-07-07 |
+| docs/compatibility/compatibility-matrix.md | MIR Compatibility Matrix | current | modpack-author | explanation | mir-maintainers | 2026-09-30 |
 | docs/compatibility/factorio-2.1-current-api-review.md | Current Factorio 2.1 API Review for MIR 4.2 | current | maintainer | reference | mir-maintainers | 2026-09-27 |
 | docs/compatibility/mir4-release-canaries.md | MIR 4 Exact Release Compatibility Canaries | current | maintainer | reference | mir-maintainers | 2026-08-28 |
 | docs/compatibility/policy-overlays.md | Policy Overlays | current | modpack-author | explanation | mir-maintainers | 2026-07-07 |
@@ -151,6 +151,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/compatibility/targets/modules-t4.md | Tier 4 Modules Compatibility | current | modpack-author | reference | mir-maintainers | 2026-07-11 |
 | docs/compatibility/targets/README.md | Compatibility Targets | current | modpack-author | reference | mir-maintainers | 2026-07-07 |
 | docs/compatibility/targets/recycler-progression.md | Recycler Progression Compatibility | current | modpack-author | reference | mir-maintainers | 2026-08-21 |
+| docs/compatibility/targets/ric-marine-carbonisation-observation.md | RIC Marine Carbonisation Development Observation | current | maintainer | reference | mir-maintainers | 2026-09-30 |
 | docs/compatibility/targets/robot-attrition.md | Robot Attrition Compatibility | current | modpack-author | reference | mir-maintainers | 2026-07-07 |
 | docs/developer/api-versioning.md | MIR 4 API Versioning | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/developer/canonicalization.md | MIR Canonical JSON V1 | current | developer | reference | mir-maintainers | 2026-08-26 |
