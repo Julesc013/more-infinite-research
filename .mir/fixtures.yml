@@ -593,11 +593,12 @@ fixtures:
       more-infinite-research: "4.2.21000"
     qualification_status: unqualified
     validates:
-      - pinned-pre-continuation-package-seeds-legacy-imersite-levels-one-through-three
-      - legacy-powder-productivity-plus-0.06-and-native-crystal-plus-0.10
-      - PR-411-package-adds-level-four-continuation-without-replacing-legacy-identity
-      - stable-copper-level-three-current-research-queue-and-42-percent-progress-survive-upgrade
-      - upgraded-save-reloads-with-effects-continuation-and-queue-preserved
+      - pinned-cap-three-profile-preserves-legacy-levels-one-through-three-and-powder-plus-0.06
+      - pinned-cap-three-profile-preserves-native-crystal-plus-0.10-and-withholds-continuation-at-absolute-cap
+      - controlled-cap-zero-copy-is-one-field-patched-and-bounded-by-finite-recipe-headroom
+      - cap-zero-profile-adds-PR-411-level-four-continuation-without-replacing-legacy-identity
+      - both-cap-profiles-preserve-stable-copper-level-three-queue-and-42-percent-progress-through-upgrade-and-reload
+      - original-V5-settings-source-remains-byte-identical-and-profile-hashes-are-recorded
       - predecessor-and-current-candidate-archive-identities-are-pinned
       - no-broad-k2-support-release-signing-or-publication-authority
 
