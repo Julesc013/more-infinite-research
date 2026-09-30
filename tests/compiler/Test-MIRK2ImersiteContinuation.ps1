@@ -17,7 +17,7 @@ if(-not $output.StartsWith((Join-Path $repo 'build')+[IO.Path]::DirectorySeparat
 }
 $version=(& $engine --version | Out-String)
 $engineSha256=(Get-FileHash -LiteralPath $engine -Algorithm SHA256).Hash
-if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version: 2[.]1[.]20[.]') {
+if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version:\s*2[.]1[.]20(?:\s|$)') {
   throw 'The K2 Imersite continuation compiler regression requires Factorio 2.1.20.'
 }
 if(-not [string]::IsNullOrWhiteSpace($ExpectedEngineSha256) -and $engineSha256 -cne $ExpectedEngineSha256) {
