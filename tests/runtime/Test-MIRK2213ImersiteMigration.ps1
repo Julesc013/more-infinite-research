@@ -187,7 +187,8 @@ function Invoke-K2MigrationServerUpgrade($Stage,[string]$InputSave,[string]$Expe
         try {
           $stream = [IO.File]::Open($logPath,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
           try { $reader = [IO.StreamReader]::new($stream); try { $text = $reader.ReadToEnd() } finally { $reader.Dispose() } } finally { $stream.Dispose() }
-          if ($text.Contains($ExpectedMarker,[StringComparison]::Ordinal) -and $text.Contains('Saving finished',[StringComparison]::Ordinal)) { $ready=$true; break }
+          if ((Test-Path -LiteralPath $ExpectedSave -PathType Leaf) -and (Get-Item -LiteralPath $ExpectedSave).Length -gt 0 -and
+              $text.Contains($ExpectedMarker,[StringComparison]::Ordinal) -and $text.Contains('Saving finished',[StringComparison]::Ordinal)) { $ready=$true; break }
         } catch [IO.IOException] {
           # Factorio may hold its active log with sharing that blocks readers.
           # Fall back to a stable save file, then verify the copied log after stop.
