@@ -2,7 +2,6 @@ local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local material_progression = require("prototypes.mir.families.material_progression")
-local k2_science_phase = require("prototypes.mir.compatibility.policies.k2_science_phase")
 
 local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
 local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
@@ -997,6 +996,8 @@ local function current_k2_213_material_profile()
   if target_profiles.current().factorio_version ~= "2.1" then return false end
   local active = mods or (script and script.active_mods)
   if type(active) ~= "table" then return false end
+  -- Older target packages intentionally omit this 2.1-only policy.
+  local k2_science_phase = require("prototypes.mir.compatibility.policies.k2_science_phase")
   for name, version in pairs(k2_science_phase.v3_applicability) do
     if active[name] ~= version then return false end
   end
