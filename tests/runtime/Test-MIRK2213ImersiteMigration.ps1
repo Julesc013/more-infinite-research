@@ -98,8 +98,8 @@ function Publish-K2MigrationFixture([string]$Version,[string]$ModsDir,[string]$R
   Publish-MIRModDirectoryArchive -Source $source -Name $fixtureName -Version $Version -ModsDir $ModsDir
 }
 function Initialize-K2MigrationStage([string]$Name,[string]$Version,[string]$StageDirectory,[string]$RunRoot) {
-  $mods = Join-Path $StageDirectory 'mods'
   $userdata = Join-Path $StageDirectory 'userdata'
+  $mods = Join-Path $userdata 'mods'
   [IO.Directory]::CreateDirectory($mods) | Out-Null
   [IO.Directory]::CreateDirectory((Join-Path $userdata 'saves')) | Out-Null
   $candidateName = 'more-infinite-research_4.2.21000.zip'
@@ -110,14 +110,12 @@ function Initialize-K2MigrationStage([string]$Name,[string]$Version,[string]$Sta
     $entry = $dependency[0]
     $inputList += [ordered]@{source_path=[string]$entry.source_path;file_name=$fileName;expected_sha256=[string]$entry.sha256;role='dependency-mod';identity=[ordered]@{name=$expectedDependencies[$fileName][0];version=$expectedDependencies[$fileName][1]};provenance=[ordered]@{kind='pinned-k2-213-v5-observation-dependency-lock';v5_result_sha256=$v5ResultSha};immutable=$true}
   }
+  $inputList += [ordered]@{source_path=$v5SettingsPath;file_name='mod-settings.dat';expected_sha256=$v5SettingsSha;role='startup-settings';identity=[ordered]@{profile='exact-k2-213-v5-observation-profile'};provenance=[ordered]@{kind='pinned-k2-213-v5-observation-settings';v5_result_sha256=$v5ResultSha};immutable=$true}
   $candidatePath = if ($Name -ceq 'predecessor') { $oldCandidate } else { $newCandidate }
   $candidateHash = if ($Name -ceq 'predecessor') { $oldCandidateSha } else { $newCandidateSha }
   $inputList += [ordered]@{source_path=$candidatePath;file_name=$candidateName;expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21000';role=$Name};provenance=[ordered]@{kind='pinned-K2-Imersite-migration-candidate';sha256=$candidateHash};immutable=$true}
   $lease = New-MIRImmutableInputLease -RunRoot $StageDirectory -StageDirectory $mods -Inputs $inputList
   $null = Publish-K2MigrationFixture -Version $Version -ModsDir $mods -RunRoot $RunRoot
-  Initialize-MIRSettingsOverrideMod -ModsDir $mods -FactorioVersion '2.1'
-  Set-CopiedStartupSettingDefaults -ModsDir $mods -Overrides @{'ips-enable-research_copper'=$true;'ips-max-level-research_copper'=0}
-  Complete-MIRSettingsOverrideMod -ModsDir $mods
   $enabled = @('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','xy-k2so-enhancements-nulls-fork','mir-validation-settings-overrides','more-infinite-research',$fixtureName)
   Write-MIRModList -ModsDir $mods -EnabledMods $enabled
   $config = Join-Path $userdata 'mir-k2-migration-config.ini'
@@ -183,6 +181,10 @@ try {
   $v5SavePath = [string]$v5.native.save.path
   Assert-K2Migration (Test-Path -LiteralPath $v5SavePath -PathType Leaf) 'v5-observation-save-missing'
   Assert-K2Migration ((Get-K2MigrationSha $v5SavePath) -ceq $v5SaveSha -and [string]$v5.native.save.sha256 -ceq $v5SaveSha) 'v5-observation-save-sha256'
+  $v5SettingsPath = Join-Path (Join-Path (Split-Path -Parent $v5Path) 'mods') 'mod-settings.dat'
+  $v5SettingsSha = '12E25E98BD5133CC19CC8E59B0B1FE6A2BDBF097F9468BCD2A9FF290F4C17356'
+  Assert-K2Migration (Test-Path -LiteralPath $v5SettingsPath -PathType Leaf) 'v5-mod-settings-missing'
+  Assert-K2Migration ((Get-K2MigrationSha $v5SettingsPath) -ceq $v5SettingsSha) 'v5-mod-settings-sha256'
   $dependencyInputs = @()
   foreach ($fileName in $expectedDependencies.Keys) {
     $matches = @($v5.staged_inputs | Where-Object { [IO.Path]::GetFileName([string]$_.source_path) -ceq $fileName })
@@ -198,7 +200,7 @@ try {
   foreach ($name in @('info.json','control.lua')) { Assert-K2Migration (Test-Path -LiteralPath (Join-Path $fixtureRoot $name) -PathType Leaf) "fixture-file:$name" }
   $fixtureInfo = Read-K2MigrationJson (Join-Path $fixtureRoot 'info.json') 'fixture-info'
   Assert-K2Migration ([string]$fixtureInfo.name -ceq $fixtureName -and [string]$fixtureInfo.version -ceq '0.1.0') 'fixture-identity'
-  $planned = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/predecessor/mods/' + $fixtureName + '_0.1.0.zip')
+  $planned = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/predecessor/userdata/mods/' + $fixtureName + '_0.1.0.zip')
   Assert-MIRFactorioPathBudget -Path $planned -Context 'K2 predecessor migration fixture archive path'
   $plannedSave = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/current/userdata/saves/k2-213-imersite-migration-upgraded.zip')
   Assert-MIRFactorioPathBudget -Path $plannedSave -Context 'K2 migration successor save path'

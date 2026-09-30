@@ -127,7 +127,8 @@ script.on_configuration_changed(function()
 end)
 
 script.on_load(function()
-  pending_reload_assertion = true
+  local state = storage.mir_k2_213_imersite_migration
+  pending_reload_assertion = state and state.phase == "upgraded" or false
 end)
 
 script.on_nth_tick(1, function()
