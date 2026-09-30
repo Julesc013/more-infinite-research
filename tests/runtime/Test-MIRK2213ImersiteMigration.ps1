@@ -276,7 +276,6 @@ try {
       Assert-MIRFactorioPathBudget -Path (Join-Path $stageFixture[0].mods "$fixtureName`_$($stageFixture[1]).zip") -Context "K2 $($case.name) fixture archive path"
     }
 
-    $oldSave = Join-Path $oldStage.userdata 'saves/k2-213-imersite-migration-predecessor.zip'
     $oldLoad = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $oldStage.userdata -ScenarioName "k2-213-imersite-migration-$($case.name)-predecessor" -ScenarioTimeoutSeconds $CreateTimeoutSeconds
     if (-not ([bool]$oldLoad.passed -and [int]$oldLoad.exit_code -eq 0 -and -not [bool]$oldLoad.timed_out)) {
       $errorLines = @(Select-String -LiteralPath ([string]$oldLoad.stdout) -Pattern 'validation failed:', 'Error while running event', '^Error:' |
@@ -284,6 +283,7 @@ try {
       Fail-K2Migration ("$($case.name)-predecessor-create exit=$($oldLoad.exit_code) timed_out=$($oldLoad.timed_out) stdout=$($oldLoad.stdout) details=$($errorLines -join ' | ')")
     }
     Assert-K2Migration ([string]$oldLoad.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') "$($case.name)-predecessor-create-stderr"
+    $oldSave = [string]$oldLoad.save
     $oldMarker = "[MIR42_K2_213_IMERSITE_MIGRATION] stage=predecessor;cap=$($case.cap);legacy=1-3;powder=0.06;crystal=0.10;stable=copper-3;progress=0.42"
     $oldLogText = [IO.File]::ReadAllText([string]$oldLoad.factorio_log)
     Assert-K2Migration ($oldLogText.Contains($oldMarker,[StringComparison]::Ordinal)) "$($case.name)-predecessor-marker"
