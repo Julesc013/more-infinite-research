@@ -6447,10 +6447,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/streams/productivity.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 67414,
-      "source_sha256": "4B2F282A37B94A7554F6F45DEC4326335571589F7E65C31EEF48DDD69EDDE4DF",
-      "output_bytes": 67414,
-      "output_sha256": "4B2F282A37B94A7554F6F45DEC4326335571589F7E65C31EEF48DDD69EDDE4DF"
+      "source_bytes": 67484,
+      "source_sha256": "1B7E795D324A0F6FCCAB3F5B7BBF13CE27170C7B2D2A73ACE49B1050656F2BE8",
+      "output_bytes": 67484,
+      "output_sha256": "1B7E795D324A0F6FCCAB3F5B7BBF13CE27170C7B2D2A73ACE49B1050656F2BE8"
     },
     {
       "layer": "presentation",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "768537C2BFB48F71805AFD0AC0AE0A150027065258A457B79568DE9F79BDE59B"
+  "record_sha256": "AA3B5C0AFF8C9344430E885A98E5FB7EB2928E97348A8ACDB8EBC78E421A7804"
 }
