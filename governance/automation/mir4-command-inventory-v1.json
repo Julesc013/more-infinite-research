@@ -3483,9 +3483,9 @@
     {
       "path": "tools/lib/assurance/evidence/Plans.ps1",
       "classification": "canonical-internal",
-      "sha256": "5F2364E4830615E6F2204FDD1BA1CB1CCF60F277901E9A9FEF661BE9439CAB1F",
+      "sha256": "E0B5B9B9841409CF98FD72BFAD34D99D2AF216DB3FCCB4BEC30620E86FBE86C4",
       "hash_mode": "canonical-text-v1",
-      "lines": 349,
+      "lines": 357,
       "package_visible": false
     },
     {
@@ -6010,5 +6010,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:76767e29215fb824442949be83588eac2a957276cb341e26b80ed5522a5ba7a8"
+  "digest": "sha256:b023ce2b474d6cf90d887fa47632081578b3ef9bcbf79050af67a17af01ade01"
 }
