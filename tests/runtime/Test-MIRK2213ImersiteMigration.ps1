@@ -97,7 +97,43 @@ function Publish-K2MigrationFixture([string]$Version,[string]$ModsDir,[string]$R
   [IO.File]::WriteAllText($infoPath,(($info | ConvertTo-Json -Depth 10)+"`n"),[Text.UTF8Encoding]::new($false))
   Publish-MIRModDirectoryArchive -Source $source -Name $fixtureName -Version $Version -ModsDir $ModsDir
 }
-function Initialize-K2MigrationStage([string]$Name,[string]$Version,[string]$StageDirectory,[string]$RunRoot) {
+function Get-K2Cap0SettingsMutation([string]$SourcePath,[string]$ExpectedSourceSha,[string]$OutputPath='') {
+  Assert-K2Migration ((Get-K2MigrationSha $SourcePath) -ceq $ExpectedSourceSha) 'pinned-settings-source-sha256'
+  $bytes = [IO.File]::ReadAllBytes($SourcePath)
+  $key = [Text.Encoding]::UTF8.GetBytes('ips-max-level-research_material_imersite')
+  $metadata = [byte[]](0x05,0x00,0x01,0x00,0x00,0x00,0x00,0x05,0x76,0x61,0x6C,0x75,0x65,0x06,0x00)
+  $positions = @()
+  for ($index=0; $index -le $bytes.Length-$key.Length; $index++) {
+    $matches = $true
+    for ($offset=0; $offset -lt $key.Length; $offset++) {
+      if ($bytes[$index+$offset] -ne $key[$offset]) { $matches=$false; break }
+    }
+    if ($matches) { $positions += $index }
+  }
+  Assert-K2Migration ($positions.Count -eq 1) 'imersite-cap-key-occurrence-count'
+  $keyOffset = [int]$positions[0]
+  $metadataOffset = $keyOffset + $key.Length
+  for ($offset=0; $offset -lt $metadata.Length; $offset++) {
+    Assert-K2Migration ($bytes[$metadataOffset+$offset] -eq $metadata[$offset]) 'imersite-cap-record-layout'
+  }
+  $valueOffset = $metadataOffset + $metadata.Length
+  Assert-K2Migration ([BitConverter]::ToInt64($bytes,$valueOffset) -eq 3) 'imersite-cap-source-value-not-three'
+  Assert-K2Migration ($bytes[$valueOffset+8] -eq 0) 'imersite-cap-record-terminator'
+  $mutated = [byte[]]$bytes.Clone()
+  [Array]::Copy([BitConverter]::GetBytes([long]0),0,$mutated,$valueOffset,8)
+  $changed = @()
+  for ($index=0; $index -lt $bytes.Length; $index++) { if ($bytes[$index] -ne $mutated[$index]) { $changed += $index } }
+  Assert-K2Migration ($changed.Count -eq 1 -and $changed[0] -eq $valueOffset) 'cap-patch-changed-unexpected-bytes'
+  Assert-K2Migration ([BitConverter]::ToInt64($mutated,$valueOffset) -eq 0) 'imersite-cap-patch-result-not-zero'
+  $newSha = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($mutated))
+  if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
+    [IO.File]::WriteAllBytes($OutputPath,$mutated)
+    Assert-K2Migration ((Get-K2MigrationSha $OutputPath) -ceq $newSha) 'cap-patch-output-sha256'
+    Assert-K2Migration ((Get-K2MigrationSha $SourcePath) -ceq $ExpectedSourceSha) 'pinned-settings-source-mutated'
+  }
+  [pscustomobject][ordered]@{key='ips-max-level-research_material_imersite';byte_offset=$valueOffset;record_key_offset=$keyOffset;before_int64=3;after_int64=0;changed_byte_offsets=$changed;source_sha256=$ExpectedSourceSha;patched_sha256=$newSha;output_path=$OutputPath}
+}
+function Initialize-K2MigrationStage([string]$Name,[string]$Role,[string]$Version,[int]$ExpectedCap,[string]$SettingsSourcePath,[string]$SettingsExpectedSha,[string]$StageDirectory,[string]$RunRoot) {
   $userdata = Join-Path $StageDirectory 'userdata'
   $mods = Join-Path $userdata 'mods'
   [IO.Directory]::CreateDirectory($mods) | Out-Null
@@ -110,16 +146,16 @@ function Initialize-K2MigrationStage([string]$Name,[string]$Version,[string]$Sta
     $entry = $dependency[0]
     $inputList += [ordered]@{source_path=[string]$entry.source_path;file_name=$fileName;expected_sha256=[string]$entry.sha256;role='dependency-mod';identity=[ordered]@{name=$expectedDependencies[$fileName][0];version=$expectedDependencies[$fileName][1]};provenance=[ordered]@{kind='pinned-k2-213-v5-observation-dependency-lock';v5_result_sha256=$v5ResultSha};immutable=$true}
   }
-  $candidatePath = if ($Name -ceq 'predecessor') { $oldCandidate } else { $newCandidate }
-  $candidateHash = if ($Name -ceq 'predecessor') { $oldCandidateSha } else { $newCandidateSha }
-  $inputList += [ordered]@{source_path=$candidatePath;file_name=$candidateName;expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21000';role=$Name};provenance=[ordered]@{kind='pinned-K2-Imersite-migration-candidate';sha256=$candidateHash};immutable=$true}
+  $candidatePath = if ($Role -ceq 'predecessor') { $oldCandidate } else { $newCandidate }
+  $candidateHash = if ($Role -ceq 'predecessor') { $oldCandidateSha } else { $newCandidateSha }
+  $inputList += [ordered]@{source_path=$candidatePath;file_name=$candidateName;expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21000';role=$Role};provenance=[ordered]@{kind='pinned-K2-Imersite-migration-candidate';sha256=$candidateHash};immutable=$true}
   $lease = New-MIRImmutableInputLease -RunRoot $StageDirectory -StageDirectory $mods -Inputs $inputList
   # Factorio writes mod-settings.dat during load. Copy the pinned initial
   # profile as writable stage state; never hardlink or mark it immutable.
   $stagedSettings = Join-Path $mods 'mod-settings.dat'
-  Copy-Item -LiteralPath $v5SettingsPath -Destination $stagedSettings
+  Copy-Item -LiteralPath $SettingsSourcePath -Destination $stagedSettings
   (Get-Item -LiteralPath $stagedSettings).IsReadOnly = $false
-  Assert-K2Migration ((Get-K2MigrationSha $stagedSettings) -ceq $v5SettingsSha) "staged-mod-settings-sha256:$Name"
+  Assert-K2Migration ((Get-K2MigrationSha $stagedSettings) -ceq $SettingsExpectedSha) "staged-mod-settings-sha256:$Name"
   $null = Publish-K2MigrationFixture -Version $Version -ModsDir $mods -RunRoot $RunRoot
   $enabled = @('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','xy-k2so-enhancements-nulls-fork','mir-validation-settings-overrides','more-infinite-research',$fixtureName)
   Write-MIRModList -ModsDir $mods -EnabledMods $enabled
@@ -130,7 +166,7 @@ function Initialize-K2MigrationStage([string]$Name,[string]$Version,[string]$Sta
   $server = Join-Path $StageDirectory 'server-settings.json'
   $serverData = [ordered]@{name='MIR K2 Imersite migration';description='';tags=@();max_players=1;visibility=[ordered]@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false}
   [IO.File]::WriteAllText($server,(($serverData | ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
-  [pscustomobject]@{name=$Name;version=$Version;root=$StageDirectory;mods=$mods;userdata=$userdata;config=$config;server=$server;candidate_name=$candidateName;candidate_path=(Join-Path $mods $candidateName);lease=$lease}
+  [pscustomobject]@{name=$Name;role=$Role;version=$Version;configured_cap=$ExpectedCap;settings_path=$stagedSettings;settings_initial_sha256=$SettingsExpectedSha;root=$StageDirectory;mods=$mods;userdata=$userdata;config=$config;server=$server;candidate_name=$candidateName;candidate_path=(Join-Path $mods $candidateName);lease=$lease}
 }
 function Invoke-K2MigrationServerUpgrade($Stage,[string]$InputSave,[string]$ExpectedSave,[string]$ExpectedMarker) {
   $logPath = Join-Path $Stage.userdata 'factorio-current.log'
@@ -162,8 +198,7 @@ function Invoke-K2MigrationServerUpgrade($Stage,[string]$InputSave,[string]$Expe
 }
 
 $runRoot = ''
-$oldStage = $null
-$newStage = $null
+$activeStages = @()
 try {
   $engine = (Resolve-Path -LiteralPath $FactorioBin).Path
   $oldCandidate = (Resolve-Path -LiteralPath $OldCandidateZip).Path
@@ -190,6 +225,7 @@ try {
   $v5SettingsSha = '12E25E98BD5133CC19CC8E59B0B1FE6A2BDBF097F9468BCD2A9FF290F4C17356'
   Assert-K2Migration (Test-Path -LiteralPath $v5SettingsPath -PathType Leaf) 'v5-mod-settings-missing'
   Assert-K2Migration ((Get-K2MigrationSha $v5SettingsPath) -ceq $v5SettingsSha) 'v5-mod-settings-sha256'
+  $cap0SettingsPreview = Get-K2Cap0SettingsMutation -SourcePath $v5SettingsPath -ExpectedSourceSha $v5SettingsSha
   $dependencyInputs = @()
   foreach ($fileName in $expectedDependencies.Keys) {
     $matches = @($v5.staged_inputs | Where-Object { [IO.Path]::GetFileName([string]$_.source_path) -ceq $fileName })
@@ -205,72 +241,115 @@ try {
   foreach ($name in @('info.json','control.lua')) { Assert-K2Migration (Test-Path -LiteralPath (Join-Path $fixtureRoot $name) -PathType Leaf) "fixture-file:$name" }
   $fixtureInfo = Read-K2MigrationJson (Join-Path $fixtureRoot 'info.json') 'fixture-info'
   Assert-K2Migration ([string]$fixtureInfo.name -ceq $fixtureName -and [string]$fixtureInfo.version -ceq '0.1.0') 'fixture-identity'
-  $planned = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/predecessor/userdata/mods/' + $fixtureName + '_0.1.0.zip')
+  $planned = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/cap-3/predecessor/userdata/mods/' + $fixtureName + '_0.1.0.zip')
   Assert-MIRFactorioPathBudget -Path $planned -Context 'K2 predecessor migration fixture archive path'
-  $plannedSave = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/current/userdata/saves/k2-213-imersite-migration-upgraded.zip')
+  $plannedSave = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/cap-0/current/userdata/saves/k2-213-imersite-migration-upgraded.zip')
   Assert-MIRFactorioPathBudget -Path $plannedSave -Context 'K2 migration successor save path'
 
   if ($PreflightOnly) {
-    [pscustomobject][ordered]@{status='passed-preflight-only';scope='exact-K2-2.1.3-Imersite-powder-predecessor-upgrade-to-PR411';old_candidate_sha256=$oldCandidateSha;new_candidate_sha256=$newCandidateSha;v5_result_sha256=$v5ResultSha;v5_observation_save_sha256=$v5SaveSha;engine_sha256=$engineSha;runtime_api_sha256=$runtimeApiSha;dependency_count=$dependencyInputs.Count;fixture_path=$fixtureRelative;execution_started=$false} | ConvertTo-Json -Depth 20
+    [pscustomobject][ordered]@{status='passed-preflight-only';scope='exact-K2-2.1.3-Imersite-powder-predecessor-upgrade-to-PR411-under-cap-three-and-headroom-bounded-cap-zero';old_candidate_sha256=$oldCandidateSha;new_candidate_sha256=$newCandidateSha;v5_result_sha256=$v5ResultSha;v5_observation_save_sha256=$v5SaveSha;v5_settings_sha256=$v5SettingsSha;cap3=$([ordered]@{configured=3;settings_sha256=$v5SettingsSha;source_value=3});cap0=$cap0SettingsPreview;engine_sha256=$engineSha;runtime_api_sha256=$runtimeApiSha;dependency_count=$dependencyInputs.Count;fixture_path=$fixtureRelative;execution_started=$false} | ConvertTo-Json -Depth 20
     return
   }
 
   [IO.Directory]::CreateDirectory($outputRootFull) | Out-Null
   $runRoot = Join-Path $outputRootFull ('run-' + [guid]::NewGuid().ToString('N'))
   [IO.Directory]::CreateDirectory($runRoot) | Out-Null
-  $oldRoot = Join-Path $runRoot 'predecessor'
-  $newRoot = Join-Path $runRoot 'current'
-  [IO.Directory]::CreateDirectory($oldRoot) | Out-Null
-  [IO.Directory]::CreateDirectory($newRoot) | Out-Null
-  $oldStage = Initialize-K2MigrationStage -Name 'predecessor' -Version '0.1.0' -StageDirectory $oldRoot -RunRoot $runRoot
-  $newStage = Initialize-K2MigrationStage -Name 'current' -Version '0.1.1' -StageDirectory $newRoot -RunRoot $runRoot
-  $oldFixtureArchive = Join-Path $oldStage.mods "$fixtureName`_0.1.0.zip"
-  $newFixtureArchive = Join-Path $newStage.mods "$fixtureName`_0.1.1.zip"
-  Assert-MIRFactorioPathBudget -Path $oldFixtureArchive -Context 'K2 predecessor migration fixture archive path'
-  Assert-MIRFactorioPathBudget -Path $newFixtureArchive -Context 'K2 current migration fixture archive path'
+  $settingsDirectory = Join-Path $runRoot 'settings-profiles'
+  [IO.Directory]::CreateDirectory($settingsDirectory) | Out-Null
+  $cap0SettingsPath = Join-Path $settingsDirectory 'mod-settings-cap0.dat'
+  $cap0SettingsMutation = Get-K2Cap0SettingsMutation -SourcePath $v5SettingsPath -ExpectedSourceSha $v5SettingsSha -OutputPath $cap0SettingsPath
+  $settingsCases = @(
+    [pscustomobject]@{name='cap3-pinned';cap=3;settings_path=$v5SettingsPath;settings_sha=$v5SettingsSha;old_version='0.1.0';current_version='0.1.1'},
+    [pscustomobject]@{name='cap0-headroom';cap=0;settings_path=$cap0SettingsPath;settings_sha=[string]$cap0SettingsMutation.patched_sha256;old_version='0.1.0';current_version='0.1.2'}
+  )
+  $caseResults = @()
+  foreach ($case in $settingsCases) {
+    $caseRoot = Join-Path $runRoot $case.name
+    $oldRoot = Join-Path $caseRoot 'predecessor'
+    $newRoot = Join-Path $caseRoot 'current'
+    [IO.Directory]::CreateDirectory($oldRoot) | Out-Null
+    [IO.Directory]::CreateDirectory($newRoot) | Out-Null
+    $oldStage = Initialize-K2MigrationStage -Name "$($case.name)-predecessor" -Role 'predecessor' -Version $case.old_version -ExpectedCap $case.cap -SettingsSourcePath $case.settings_path -SettingsExpectedSha $case.settings_sha -StageDirectory $oldRoot -RunRoot $oldRoot
+    $newStage = Initialize-K2MigrationStage -Name "$($case.name)-current" -Role 'current' -Version $case.current_version -ExpectedCap $case.cap -SettingsSourcePath $case.settings_path -SettingsExpectedSha $case.settings_sha -StageDirectory $newRoot -RunRoot $newRoot
+    $activeStages += @($oldStage,$newStage)
+    foreach ($stageFixture in @(@($oldStage,$case.old_version),@($newStage,$case.current_version))) {
+      Assert-MIRFactorioPathBudget -Path (Join-Path $stageFixture[0].mods "$fixtureName`_$($stageFixture[1]).zip") -Context "K2 $($case.name) fixture archive path"
+    }
 
-  $oldSave = Join-Path $oldStage.userdata 'saves/k2-213-imersite-migration-predecessor.zip'
-  $oldLoad = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $oldStage.userdata -ScenarioName 'k2-213-imersite-migration-predecessor' -ScenarioTimeoutSeconds $CreateTimeoutSeconds
-  Assert-K2Migration ([bool]$oldLoad.passed -and [int]$oldLoad.exit_code -eq 0 -and -not [bool]$oldLoad.timed_out) 'predecessor-create'
-  Assert-K2Migration ([string]$oldLoad.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') 'predecessor-create-stderr'
-  $oldLogText = [IO.File]::ReadAllText([string]$oldLoad.factorio_log)
-  Assert-K2Migration ($oldLogText.Contains('[MIR42_K2_213_IMERSITE_MIGRATION] stage=predecessor;legacy=1-3;powder=0.06;crystal=0.10;stable=copper-3;progress=0.42',[StringComparison]::Ordinal)) 'predecessor-initial-marker'
-  Assert-K2Migration (Test-Path -LiteralPath $oldSave -PathType Leaf) 'predecessor-save-missing'
-  $oldSaveShaBefore = Get-K2MigrationSha $oldSave
+    $oldSave = Join-Path $oldStage.userdata 'saves/k2-213-imersite-migration-predecessor.zip'
+    $oldLoad = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $oldStage.userdata -ScenarioName "k2-213-imersite-migration-$($case.name)-predecessor" -ScenarioTimeoutSeconds $CreateTimeoutSeconds
+    if (-not ([bool]$oldLoad.passed -and [int]$oldLoad.exit_code -eq 0 -and -not [bool]$oldLoad.timed_out)) {
+      $errorLines = @(Select-String -LiteralPath ([string]$oldLoad.stdout) -Pattern 'validation failed:', 'Error while running event', '^Error:' |
+        Select-Object -Last 3 | ForEach-Object { $_.Line.Trim() })
+      Fail-K2Migration ("$($case.name)-predecessor-create exit=$($oldLoad.exit_code) timed_out=$($oldLoad.timed_out) stdout=$($oldLoad.stdout) details=$($errorLines -join ' | ')")
+    }
+    Assert-K2Migration ([string]$oldLoad.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') "$($case.name)-predecessor-create-stderr"
+    $oldMarker = "[MIR42_K2_213_IMERSITE_MIGRATION] stage=predecessor;cap=$($case.cap);legacy=1-3;powder=0.06;crystal=0.10;stable=copper-3;progress=0.42"
+    $oldLogText = [IO.File]::ReadAllText([string]$oldLoad.factorio_log)
+    Assert-K2Migration ($oldLogText.Contains($oldMarker,[StringComparison]::Ordinal)) "$($case.name)-predecessor-marker"
+    Assert-K2Migration (Test-Path -LiteralPath $oldSave -PathType Leaf) "$($case.name)-predecessor-save-missing"
+    $oldSaveShaBefore = Get-K2MigrationSha $oldSave
+    $oldSettingsAfterCreate = Get-K2MigrationSha $oldStage.settings_path
 
-  $newSave = Join-Path $newStage.userdata 'saves/k2-213-imersite-migration-upgraded.zip'
-  $upgradeMarker = '[MIR42_K2_213_IMERSITE_MIGRATION] stage=upgrade-save;legacy=1-3;powder=0.06;crystal=0.10;continuation_level=4;stable=copper-3;progress=0.42'
-  $upgradeLog = Invoke-K2MigrationServerUpgrade -Stage $newStage -InputSave $oldSave -ExpectedSave $newSave -ExpectedMarker $upgradeMarker
-  Assert-K2Migration ((Get-K2MigrationSha $oldSave) -ceq $oldSaveShaBefore) 'predecessor-save-mutated'
-  $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $newStage.userdata -ScenarioName 'k2-213-imersite-migration' -SavePath $newSave -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments '[MIR42_K2_213_IMERSITE_MIGRATION] stage=reload;legacy=1-3;powder=0.06;crystal=0.10;continuation_level=4;stable=copper-3;progress=0.42'
-  Assert-K2Migration ([bool]$reload.passed) 'current-package-reload'
-  $oldTerminal = Complete-MIRImmutableInputLease -Lease $oldStage.lease
-  $oldStage.lease = $null
-  $newTerminal = Complete-MIRImmutableInputLease -Lease $newStage.lease
-  $newStage.lease = $null
-  $null = Assert-MIRImmutableInputTerminalReceipt -Receipt $oldTerminal -Context 'K2 predecessor migration immutable inputs'
-  $null = Assert-MIRImmutableInputTerminalReceipt -Receipt $newTerminal -Context 'K2 current migration immutable inputs'
+    $newSave = Join-Path $newStage.userdata 'saves/k2-213-imersite-migration-upgraded.zip'
+    if ($case.cap -eq 3) {
+      $upgradeMarker = '[MIR42_K2_213_IMERSITE_MIGRATION] stage=upgrade-save;cap=3;legacy=1-3;powder=0.06;crystal=0.10;continuation=withheld;stable=copper-3;progress=0.42'
+      $reloadMarker = '[MIR42_K2_213_IMERSITE_MIGRATION] stage=reload;cap=3;legacy=1-3;powder=0.06;crystal=0.10;continuation=withheld;stable=copper-3;progress=0.42'
+    } else {
+      $upgradeMarker = '[MIR42_K2_213_IMERSITE_MIGRATION] stage=upgrade-save;cap=0;legacy=1-3;powder=0.06;crystal=0.10;continuation_level=4;stable=copper-3;progress=0.42'
+      $reloadMarker = '[MIR42_K2_213_IMERSITE_MIGRATION] stage=reload;cap=0;legacy=1-3;powder=0.06;crystal=0.10;continuation_level=4;stable=copper-3;progress=0.42'
+    }
+    $upgradeLog = Invoke-K2MigrationServerUpgrade -Stage $newStage -InputSave $oldSave -ExpectedSave $newSave -ExpectedMarker $upgradeMarker
+    Assert-K2Migration ((Get-K2MigrationSha $oldSave) -ceq $oldSaveShaBefore) "$($case.name)-predecessor-save-mutated"
+    $newSettingsAfterUpgrade = Get-K2MigrationSha $newStage.settings_path
+    $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $newStage.userdata -ScenarioName "k2-213-imersite-migration-$($case.name)" -SavePath $newSave -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments $reloadMarker
+    Assert-K2Migration ([bool]$reload.passed) "$($case.name)-current-package-reload"
+    $newSettingsAfterReload = Get-K2MigrationSha $newStage.settings_path
+    Assert-K2Migration ((Get-K2MigrationSha $v5SettingsPath) -ceq $v5SettingsSha) 'pinned-v5-settings-source-mutated'
+    Assert-K2Migration ((Get-K2MigrationSha $cap0SettingsPath) -ceq [string]$cap0SettingsMutation.patched_sha256) 'cap0-settings-profile-mutated'
+
+    $oldTerminal = Complete-MIRImmutableInputLease -Lease $oldStage.lease
+    $oldStage.lease = $null
+    $newTerminal = Complete-MIRImmutableInputLease -Lease $newStage.lease
+    $newStage.lease = $null
+    $null = Assert-MIRImmutableInputTerminalReceipt -Receipt $oldTerminal -Context "$($case.name) predecessor immutable inputs"
+    $null = Assert-MIRImmutableInputTerminalReceipt -Receipt $newTerminal -Context "$($case.name) current immutable inputs"
+    $oldLogArtifact = Get-K2MigrationArtifact ([string]$oldLoad.factorio_log)
+    $reloadLogArtifact = Get-K2MigrationArtifact ([string]$reload.reloads[0].factorio_log)
+    $caseResults += [ordered]@{
+      name=$case.name;configured_cap=[int]$case.cap
+      settings_profile=[ordered]@{source=Get-K2MigrationArtifact ([string]$case.settings_path) -External:$([string]$case.settings_path -ceq $v5SettingsPath);initial_sha256=[string]$case.settings_sha;predecessor_stage=[ordered]@{before_engine=$oldStage.settings_initial_sha256;after_create=$oldSettingsAfterCreate};current_stage=[ordered]@{before_engine=$newStage.settings_initial_sha256;after_upgrade=$newSettingsAfterUpgrade;after_reload=$newSettingsAfterReload}}
+      predecessor_candidate=Get-K2MigrationArtifact $oldCandidate -External;current_candidate=Get-K2MigrationArtifact $newCandidate -External
+      predecessor_save=[ordered]@{artifact=Get-K2MigrationArtifact $oldSave;sha256_before_upgrade=$oldSaveShaBefore;sha256_after_upgrade=Get-K2MigrationSha $oldSave};upgraded_save=Get-K2MigrationArtifact $newSave
+      predecessor_create_log=$oldLogArtifact;upgrade_log=Get-K2MigrationArtifact $upgradeLog;reload_log=$reloadLogArtifact
+      predecessor_input_lease=$oldTerminal;current_input_lease=$newTerminal;reload=$reload
+      expected_outcome=if($case.cap -eq 3){'continuation-withheld-by-absolute-cap'}else{'level-four-continuation-available-through-recipe-headroom'}
+      earned_effects=[ordered]@{legacy_levels='1-3';powder_productivity_bonus=0.06;native_crystal_productivity_bonus=0.10;stable_research='recipe-prod-research_copper-1';stable_level=3;fractional_progress=0.42}
+      continuation=[ordered]@{identity='recipe-prod-research_material_imersite-4';available=($case.cap -eq 0);starting_level=if($case.cap -eq 0){4}else{$null}}
+    }
+    $activeStages = @($activeStages | Where-Object { $null -ne $_.lease })
+  }
+  Assert-K2Migration ((Get-K2MigrationSha $v5SettingsPath) -ceq $v5SettingsSha) 'pinned-v5-settings-source-mutated-after-campaign'
+  Assert-K2Migration ((Get-K2MigrationSha $cap0SettingsPath) -ceq [string]$cap0SettingsMutation.patched_sha256) 'cap0-settings-source-mutated-after-campaign'
   $result = [ordered]@{
     schema=1;kind='MIR42K2213ImersitePredecessorMigrationResultV1';status='passed';generated_at=(Get-Date).ToUniversalTime().ToString('o')
-    scope='exact-K2-2.1.3-K2SO-2.0.13-old-F210-package-to-PR411-Imersite-powder-continuation-save-migration'
+    scope='exact-K2-2.1.3-K2SO-2.0.13-old-F210-package-to-PR411-migration-at-pinned-cap-three-and-controlled-cap-zero'
     qualification=$false;support_claim=$false;release_authority=$false;publication=$false
     candidates=[ordered]@{predecessor=Get-K2MigrationArtifact $oldCandidate -External;current=Get-K2MigrationArtifact $newCandidate -External;predecessor_expected_sha256=$oldCandidateSha;current_expected_sha256=$newCandidateSha}
     v5_observation=[ordered]@{result=Get-K2MigrationArtifact $v5Path -External;result_sha256=$v5ResultSha;old_candidate_sha256=[string]$v5.candidate.sha256;observation_save=Get-K2MigrationArtifact $v5SavePath -External;observation_save_sha256=$v5SaveSha;role='exact-engine-and-dependency-lock-only-not-progressed-save'}
     engine=[ordered]@{path=(Get-K2MigrationIdentity $engine -External).path;path_kind='external-input-file';product_version='2.1.20';sha256=$engineSha;runtime_api_sha256=$runtimeApiSha}
-    fixture=[ordered]@{path=$fixtureRelative;info=Get-K2MigrationArtifact (Join-Path $fixtureRoot 'info.json');control=Get-K2MigrationArtifact (Join-Path $fixtureRoot 'control.lua');source_version='0.1.0';upgrade_version='0.1.1'}
-    dependency_count=$dependencyInputs.Count;startup_settings=[ordered]@{source=Get-K2MigrationArtifact $v5SettingsPath;initial_sha256=$v5SettingsSha;staged_as_writable=$true};predecessor_input_lease=$oldTerminal;current_input_lease=$newTerminal
-    oracle=[ordered]@{legacy_levels='1-3-complete';powder_productivity_bonus=0.06;native_crystal_productivity_bonus=0.10;continuation_identity='recipe-prod-research_material_imersite-4';continuation_level=4;continuation_available=$true;stable_research='recipe-prod-research_copper-1';stable_level=3;fractional_progress=0.42;source_save_byte_identical_after_upgrade=$true;current_candidate_reload_passed=$true}
-    saves=[ordered]@{predecessor=[ordered]@{artifact=Get-K2MigrationArtifact $oldSave;sha256_before_upgrade=$oldSaveShaBefore;sha256_after_upgrade=Get-K2MigrationSha $oldSave};upgraded=Get-K2MigrationArtifact $newSave}
-    logs=[ordered]@{predecessor_create=Get-K2MigrationArtifact ([string]$oldLoad.factorio_log);upgrade=Get-K2MigrationArtifact $upgradeLog}
-    reload=$reload
-    non_claims=@('The V5 forward-path observation save is not used as the migration predecessor.','This exact predecessor-to-current transition is not broad K2 support or ecosystem qualification.','No release, signing, or publication authority.')
+    fixture=[ordered]@{path=$fixtureRelative;info=Get-K2MigrationArtifact (Join-Path $fixtureRoot 'info.json');control=Get-K2MigrationArtifact (Join-Path $fixtureRoot 'control.lua');predecessor_version='0.1.0';current_versions=@('0.1.1','0.1.2')}
+    dependency_count=$dependencyInputs.Count
+    startup_settings=[ordered]@{pinned_cap_three=[ordered]@{source=Get-K2MigrationArtifact $v5SettingsPath -External;configured_cap=3;initial_sha256=$v5SettingsSha};controlled_cap_zero=$cap0SettingsMutation;pinned_source_unchanged=$true;cap0_profile_source_unchanged=$true}
+    cases=$caseResults
+    non_claims=@('The V5 forward-path observation save is not used as a progressed predecessor.','Cap zero is configured unbounded only within the material recipe-headroom maximum.','The exact two-setting-case transition is not broad K2 support or ecosystem qualification.','No release, signing, or publication authority.')
   }
   $resultPath = Join-Path $runRoot 'result.json'
   [IO.File]::WriteAllText($resultPath,(($result | ConvertTo-Json -Depth 100 -Compress)+"`n"),[Text.UTF8Encoding]::new($false))
   Write-Host "[MIR42_K2_213_IMERSITE_MIGRATION_RUNTIME] $((Get-K2MigrationIdentity $resultPath).path)"
 } catch {
   $failure = $_.Exception.Message
-  foreach ($stage in @($oldStage,$newStage)) {
+  foreach ($stage in @($activeStages)) {
     if ($null -ne $stage -and $null -ne $stage.lease -and -not [bool]$stage.lease.closed) {
       try { $null = Complete-MIRImmutableInputLease -Lease $stage.lease -Outcome failed } catch {}
     }

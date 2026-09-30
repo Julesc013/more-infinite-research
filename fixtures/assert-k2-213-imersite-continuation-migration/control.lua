@@ -3,6 +3,7 @@ local continuation_name = "recipe-prod-research_material_imersite-4"
 local stable_name = "recipe-prod-research_copper-1"
 local powder_recipe = "kr-imersite-powder"
 local crystal_recipe = "kr-imersite-crystal"
+local cap_setting = "ips-max-level-research_material_imersite"
 local expected_progress = 0.42
 local pending_upgrade_save = false
 local pending_reload_assertion = false
@@ -27,6 +28,13 @@ local function assert_profile()
   for name, version in pairs(expected) do
     if script.active_mods[name] ~= version then fail("exact profile differs for " .. name) end
   end
+end
+
+local function configured_cap()
+  local setting = settings.startup[cap_setting]
+  local value = setting and tonumber(setting.value) or nil
+  if value ~= 0 and value ~= 3 then fail("fixture requires configured Imersite cap zero or three") end
+  return value
 end
 
 local function queue_names(force)
@@ -79,9 +87,9 @@ local function assert_continuation(stage)
   local legacy = force.technologies[legacy_name]
   local continuation = force.technologies[continuation_name]
   if not legacy or not continuation then fail("legacy or continuation technology is absent after " .. stage) end
-  if continuation.prototype.max_level < 4294967295 or continuation.level ~= 4
+  if continuation.prototype.max_level < 4 or continuation.prototype.max_level >= 4294967295 or continuation.level ~= 4
       or continuation.researched or not continuation.enabled then
-    fail("level-four continuation is not the available next technology after " .. stage)
+    fail("finite recipe-headroom level-four continuation is not the available next technology after " .. stage)
   end
   local follows_legacy = false
   for _, prerequisite in pairs(continuation.prerequisites) do
@@ -93,13 +101,22 @@ end
 
 local function assert_upgraded(stage)
   assert_profile()
-  assert_upgraded_earned_effects()
-  assert_continuation(stage)
-  assert_stable_queue(stage)
   local state = storage.mir_k2_213_imersite_migration
+  if not state or configured_cap() ~= state.cap then fail("configured cap differs after " .. stage) end
+  assert_upgraded_earned_effects()
+  assert_stable_queue(stage)
   if not state or state.progress ~= expected_progress then fail("persisted migration fixture state differs") end
-  log("[MIR42_K2_213_IMERSITE_MIGRATION] stage=" .. stage
-    .. ";legacy=1-3;powder=0.06;crystal=0.10;continuation_level=4;stable=copper-3;progress=0.42")
+  if state.cap == 3 then
+    if game.forces.player.technologies[continuation_name] then
+      fail("finite configured level-three cap unexpectedly emitted the continuation")
+    end
+    log("[MIR42_K2_213_IMERSITE_MIGRATION] stage=" .. stage
+      .. ";cap=3;legacy=1-3;powder=0.06;crystal=0.10;continuation=withheld;stable=copper-3;progress=0.42")
+  else
+    assert_continuation(stage)
+    log("[MIR42_K2_213_IMERSITE_MIGRATION] stage=" .. stage
+      .. ";cap=0;legacy=1-3;powder=0.06;crystal=0.10;continuation_level=4;stable=copper-3;progress=0.42")
+  end
 end
 
 local function establish_stable_level_three_queue()
@@ -107,11 +124,25 @@ local function establish_stable_level_three_queue()
   local technology = force.technologies[stable_name]
   if not technology then fail("stable copper technology is absent") end
   if force.current_research then force.cancel_current_research() end
-  -- Copper is only a stable queue sentinel. Set its exact current level
-  -- directly so this fixture need not simulate unrelated production history.
+  -- Complete each missing level through Factorio's normal levelled-research
+  -- transition. Assigning researched=false after a direct level write can
+  -- reset the current level, so use the existing V2/V3 migration pattern.
   technology.enabled = true
-  technology.level = 3
-  technology.researched = false
+  if technology.level > 3 then fail("stable copper already exceeds level three") end
+  while technology.level < 3 do
+    local before = technology.level
+    if not force.add_research(technology)
+        or not force.current_research or force.current_research.name ~= stable_name then
+      fail("could not establish stable copper level " .. tostring(before))
+    end
+    force.research_queue = nil
+    force.cancel_current_research()
+    technology.researched = true
+    if technology.level ~= before + 1 then
+      fail("stable copper completion did not advance from " .. tostring(before)
+        .. " to " .. tostring(before + 1) .. "; actual=" .. tostring(technology.level))
+    end
+  end
   if not force.add_research(technology)
       or not force.current_research or force.current_research.name ~= stable_name then
     fail("could not queue stable copper at level three")
@@ -132,10 +163,12 @@ script.on_init(function()
   force.reset_technology_effects()
   assert_predecessor_effects()
   establish_stable_level_three_queue()
-  storage.mir_k2_213_imersite_migration = {phase = "predecessor", progress = expected_progress}
+  local cap = configured_cap()
+  storage.mir_k2_213_imersite_migration = {phase = "predecessor", progress = expected_progress, cap = cap}
   assert_stable_queue("predecessor")
   if force.technologies[continuation_name] then fail("predecessor already contains the MIR continuation") end
-  log("[MIR42_K2_213_IMERSITE_MIGRATION] stage=predecessor;legacy=1-3;powder=0.06;crystal=0.10;stable=copper-3;progress=0.42")
+  log("[MIR42_K2_213_IMERSITE_MIGRATION] stage=predecessor;cap=" .. tostring(cap)
+    .. ";legacy=1-3;powder=0.06;crystal=0.10;stable=copper-3;progress=0.42")
 end)
 
 script.on_configuration_changed(function()
