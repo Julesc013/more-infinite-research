@@ -138,6 +138,11 @@ try {
   foreach ($dependency in @('base >= 2.1.20','Krastorio2 = 2.1.3','Krastorio2-spaced-out = 2.0.13','more-infinite-research = 4.2.21000')) {
     Assert-K2213 ($fixtureDependencies -contains $dependency) "fixture-dependency:$dependency"
   }
+  # Every run directory uses the same 32-character GUID width. Reject an
+  # overlong fixture path before copying the immutable dependency archives.
+  $plannedFixtureArchive = Join-Path $outputRootFull ('run-' + ('0' * 32))
+  $plannedFixtureArchive = Join-Path $plannedFixtureArchive ('mods/' + [string]$fixtureInfo.name + '_' + [string]$fixtureInfo.version + '.zip')
+  Assert-MIRFactorioPathBudget -Path $plannedFixtureArchive -Context 'K2 continuation fixture archive path'
 
   $materialization = Read-K2213Json -Path $materializationPath -Code 'materialization'
   Assert-K2213 ([int]$materialization.schema -eq 1 -and [string]$materialization.kind -ceq 'MIR4PackageCompositionResultV1') 'materialization-schema'
