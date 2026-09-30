@@ -279,18 +279,37 @@ try {
   foreach ($name in @('info.json','control.lua')) { Assert-K2Migration (Test-Path -LiteralPath (Join-Path $fixtureRoot $name) -PathType Leaf) "fixture-file:$name" }
   $fixtureInfo = Read-K2MigrationJson (Join-Path $fixtureRoot 'info.json') 'fixture-info'
   Assert-K2Migration ([string]$fixtureInfo.name -ceq $fixtureName -and [string]$fixtureInfo.version -ceq '0.1.0') 'fixture-identity'
-  $planned = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/cap-3/predecessor/userdata/mods/' + $fixtureName + '_0.1.0.zip')
-  Assert-MIRFactorioPathBudget -Path $planned -Context 'K2 predecessor migration fixture archive path'
-  $plannedSave = Join-Path $outputRootFull ('run-' + ('0' * 32) + '/cap-0/current/userdata/saves/k2-213-imersite-migration-upgraded.zip')
-  Assert-MIRFactorioPathBudget -Path $plannedSave -Context 'K2 migration successor save path'
+  $plannedRunRoot = Join-Path $outputRootFull ('r-' + ('0' * 20))
+  $plannedRuntimePaths = @()
+  $plannedCases = @(
+    [pscustomobject]@{name='cap3-pinned';old_version='0.1.0';current_version='0.1.1'},
+    [pscustomobject]@{name='cap0-headroom';old_version='0.1.0';current_version='0.1.2'}
+  )
+  foreach ($plannedCase in $plannedCases) {
+    $plannedPredecessorUserdata = Join-Path $plannedRunRoot "$($plannedCase.name)/predecessor/userdata"
+    $plannedCurrentUserdata = Join-Path $plannedRunRoot "$($plannedCase.name)/current/userdata"
+    $plannedRuntimePaths += Join-Path (Join-Path $plannedPredecessorUserdata 'mods') "$fixtureName`_$($plannedCase.old_version).zip"
+    $plannedRuntimePaths += Join-Path (Join-Path $plannedCurrentUserdata 'mods') "$fixtureName`_$($plannedCase.current_version).zip"
+    $scenario = "k2-213-imersite-migration-$($plannedCase.name)-predecessor"
+    $plannedRuntimePaths += Join-Path (Join-Path $plannedPredecessorUserdata 'saves') "$scenario.zip"
+    $plannedRuntimePaths += Join-Path (Join-Path $plannedCurrentUserdata 'saves') 'k2-213-imersite-migration-upgraded.zip'
+    $plannedRuntimePaths += Join-Path $plannedCurrentUserdata "k2-213-imersite-migration-$($plannedCase.name).reload-01.factorio.log"
+  }
+  foreach ($plannedPath in $plannedRuntimePaths) {
+    Assert-MIRFactorioPathBudget -Path $plannedPath -Context 'K2 migration runtime output path'
+  }
+  $longestPlannedPath = $plannedRuntimePaths | Sort-Object { $_.Length } -Descending | Select-Object -First 1
 
   if ($PreflightOnly) {
-    [pscustomobject][ordered]@{status='passed-preflight-only';scope='exact-K2-2.1.3-Imersite-powder-predecessor-upgrade-to-PR411-under-cap-three-and-headroom-bounded-cap-zero';old_candidate_sha256=$oldCandidateSha;new_candidate_sha256=$newCandidateSha;v5_result_sha256=$v5ResultSha;v5_observation_save_sha256=$v5SaveSha;v5_settings_sha256=$v5SettingsSha;cap3=$([ordered]@{configured=3;settings_sha256=$v5SettingsSha;source_value=3});cap0=$cap0SettingsPreview;engine_sha256=$engineSha;runtime_api_sha256=$runtimeApiSha;dependency_count=$dependencyInputs.Count;fixture_path=$fixtureRelative;execution_started=$false} | ConvertTo-Json -Depth 20
+    [pscustomobject][ordered]@{status='passed-preflight-only';scope='exact-K2-2.1.3-Imersite-powder-predecessor-upgrade-to-PR411-under-cap-three-and-headroom-bounded-cap-zero';old_candidate_sha256=$oldCandidateSha;new_candidate_sha256=$newCandidateSha;v5_result_sha256=$v5ResultSha;v5_observation_save_sha256=$v5SaveSha;v5_settings_sha256=$v5SettingsSha;cap3=$([ordered]@{configured=3;settings_sha256=$v5SettingsSha;source_value=3});cap0=$cap0SettingsPreview;engine_sha256=$engineSha;runtime_api_sha256=$runtimeApiSha;dependency_count=$dependencyInputs.Count;fixture_path=$fixtureRelative;path_budget=[ordered]@{limit_chars=240;maximum_chars=$longestPlannedPath.Length;headroom_chars=(240-$longestPlannedPath.Length);maximum_path=$longestPlannedPath};execution_started=$false} | ConvertTo-Json -Depth 20
     return
   }
 
   [IO.Directory]::CreateDirectory($outputRootFull) | Out-Null
-  $runRoot = Join-Path $outputRootFull ('run-' + [guid]::NewGuid().ToString('N'))
+  do {
+    $runRootName = 'r-' + [guid]::NewGuid().ToString('N').Substring(0,20)
+    $runRoot = Join-Path $outputRootFull $runRootName
+  } while (Test-Path -LiteralPath $runRoot)
   [IO.Directory]::CreateDirectory($runRoot) | Out-Null
   $settingsDirectory = Join-Path $runRoot 'settings-profiles'
   [IO.Directory]::CreateDirectory($settingsDirectory) | Out-Null
