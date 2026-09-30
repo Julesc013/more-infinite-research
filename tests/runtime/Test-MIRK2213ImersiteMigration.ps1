@@ -14,7 +14,7 @@ param(
   [Parameter(Mandatory)][string]$NewCandidateZip,
   [Parameter(Mandatory)][string]$V5ObservationResultPath,
   [string]$RepoRoot = '',
-  [string]$OutputRoot = 'build/k2mig',
+  [string]$OutputRoot = 'build/m',
   [switch]$PreflightOnly,
   [ValidateRange(1,180)][int]$CreateTimeoutSeconds = 90,
   [ValidateRange(1,180)][int]$UpgradeTimeoutSeconds = 90,
