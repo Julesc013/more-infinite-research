@@ -36,16 +36,24 @@ function Get-K2213Property { param($Object,[string]$Name,$Default=$null)
   if ($null -eq $property) { return $Default }
   return $property.Value
 }
-function Get-K2213Relative { param([Parameter(Mandatory)][string]$Path)
+function Get-K2213PathIdentity {
+  param([Parameter(Mandatory)][string]$Path,[switch]$AllowExternalInput)
   $full = [IO.Path]::GetFullPath($Path)
   $root = $RepoRoot.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-  Assert-K2213 ($full.StartsWith($root,[StringComparison]::OrdinalIgnoreCase)) "artifact-outside-repository:$full"
-  return $full.Substring($root.Length).Replace('\','/')
+  if ($full.StartsWith($root,[StringComparison]::OrdinalIgnoreCase)) {
+    return [pscustomobject][ordered]@{path=$full.Substring($root.Length).Replace('\','/');path_kind='repository-relative'}
+  }
+  Assert-K2213 ([bool]$AllowExternalInput) "artifact-outside-repository:$full"
+  return [pscustomobject][ordered]@{path=$full;path_kind='external-input-file'}
 }
-function Get-K2213Artifact { param([Parameter(Mandatory)][string]$Path)
+function Get-K2213Relative { param([Parameter(Mandatory)][string]$Path)
+  return (Get-K2213PathIdentity -Path $Path).path
+}
+function Get-K2213Artifact { param([Parameter(Mandatory)][string]$Path,[switch]$AllowExternalInput)
   $item = Get-Item -LiteralPath $Path -Force
   Assert-K2213 (-not (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)) "artifact-reparse:$Path"
-  [pscustomobject][ordered]@{path=Get-K2213Relative $item.FullName;bytes=[long]$item.Length;raw_sha256=Get-K2213Sha256 $item.FullName}
+  $identity = Get-K2213PathIdentity -Path $item.FullName -AllowExternalInput:$AllowExternalInput
+  [pscustomobject][ordered]@{path=$identity.path;path_kind=$identity.path_kind;bytes=[long]$item.Length;raw_sha256=Get-K2213Sha256 $item.FullName}
 }
 function Read-K2213Json { param([Parameter(Mandatory)][string]$Path,[string]$Code)
   Assert-K2213 (Test-Path -LiteralPath $Path -PathType Leaf) "$Code-missing"
@@ -244,8 +252,8 @@ try {
     scope='exact-current-f210-k2-k2so-imersite-powder-continuation-create-and-single-reload';
     qualification=$false;support_claim=$false;release_authority=$false;publication=$false;
     candidate=[ordered]@{archive=$candidateArtifact;materialization=Get-K2213Artifact $materializationPath;materialization_record_sha256=[string]$materialization.record_sha256;package_source_sha256=[string]$materialization.package_source_sha256};
-    predecessor_observation_lock=[ordered]@{result=Get-K2213Artifact $v5Path;kind=[string]$v5.kind;status=[string]$v5.status;role='exact-engine-and-dependency-archive-lock-only';old_candidate_sha256=[string]$v5.candidate.sha256};
-    engine=[ordered]@{path=Get-K2213Relative $engine;product_version='2.1.20';executable_sha256=$engineHash;bundled_runtime_api_sha256=Get-K2213Sha256 $runtimeApi};
+    predecessor_observation_lock=[ordered]@{result=Get-K2213Artifact $v5Path -AllowExternalInput;kind=[string]$v5.kind;status=[string]$v5.status;role='exact-engine-and-dependency-archive-lock-only';old_candidate_sha256=[string]$v5.candidate.sha256};
+    engine=[ordered]@{path=Get-K2213PathIdentity $engine -AllowExternalInput;product_version='2.1.20';executable_sha256=$engineHash;bundled_runtime_api_sha256=Get-K2213Sha256 $runtimeApi};
     fixture=[ordered]@{registration=$fixtureRegistry;files=@(Get-K2213Artifact $fixtureInfoPath;Get-K2213Artifact $fixtureDataPath;Get-K2213Artifact $fixtureControlPath);archive=Get-K2213Artifact $fixtureArchive};
     input_staging=$terminal;dependency_archives=@($dependencyArtifacts | Sort-Object path);mod_list=Get-K2213Artifact $modListPath;startup_settings='candidate-defaults-no-unbound-mod-settings';
     create=[ordered]@{duration_seconds=$load.duration_seconds;save=Get-K2213Artifact $load.save;stdout=Get-K2213Artifact $load.stdout;stderr=Get-K2213Artifact $load.stderr;factorio_log=Get-K2213Artifact $load.factorio_log};
