@@ -449,9 +449,10 @@ if ($requiresReloadProof) {
   $upgradedSave = $governedUpgradedSave
   # Keep the finite-era save/CLI contract already proved by candidate retention.
   $benchmarkMap = if ($historicalLine -eq '0.13') { [IO.Path]::GetFileNameWithoutExtension($upgradedSave) } else { $upgradedSave }
-  $reloadArgs = if ($historicalLine -eq '0.16') {
-    # Use the normal headless server path on 0.16. Its graphical benchmark
-    # rejects the saved equipment-grid table before running fixture assertions.
+  $serverReload = $isHistoricalTerminalFixture -and $historicalLine -in @('0.15','0.16')
+  $reloadArgs = if ($serverReload) {
+    # The 0.15 and 0.16 graphical benchmark paths reject the saved equipment-grid
+    # table before fixture assertions. Load each save through the normal server path.
     $nativeBaseArgs + @('--server-settings',$serverSettings,'--start-server',$upgradedSave)
   } else {
     $benchmarkArgs = $nativeBaseArgs + @("--benchmark", $benchmarkMap, "--benchmark-ticks", "1")
@@ -464,7 +465,7 @@ if ($requiresReloadProof) {
   # rather than a prior load or reload recorded by the same no-rotation log.
   [IO.File]::WriteAllText($log, '', [Text.UTF8Encoding]::new($false))
   $factorioProcesses++
-  $reloadExitCode = if ($historicalLine -eq '0.16') {
+  $reloadExitCode = if ($serverReload) {
     Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $reloadArgs -LogPath $log `
       -Marker $reloadMarker -SavedMapPath $upgradedSave -ReloadOnly
   } else { Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs }
@@ -479,7 +480,7 @@ if ($requiresReloadProof) {
   # Clear the same owned log again; the second reload receipt must be process-specific.
   [IO.File]::WriteAllText($log, '', [Text.UTF8Encoding]::new($false))
   $factorioProcesses++
-  $secondReloadExitCode = if ($historicalLine -eq '0.16') {
+  $secondReloadExitCode = if ($serverReload) {
     Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $reloadArgs -LogPath $log `
       -Marker $reloadMarker -SavedMapPath $upgradedSave -ReloadOnly
   } else { Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs }
