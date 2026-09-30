@@ -87,9 +87,9 @@ local function assert_continuation(stage)
   local legacy = force.technologies[legacy_name]
   local continuation = force.technologies[continuation_name]
   if not legacy or not continuation then fail("legacy or continuation technology is absent after " .. stage) end
-  if continuation.prototype.max_level < 4 or continuation.prototype.max_level >= 4294967295 or continuation.level ~= 4
+  if continuation.prototype.max_level ~= 4294967295 or continuation.level ~= 4
       or continuation.researched or not continuation.enabled then
-    fail("finite recipe-headroom level-four continuation is not the available next technology after " .. stage)
+    fail("infinite recipe-headroom level-four continuation is not the available next technology after " .. stage)
   end
   local follows_legacy = false
   for _, prerequisite in pairs(continuation.prerequisites) do

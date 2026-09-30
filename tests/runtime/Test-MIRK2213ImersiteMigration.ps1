@@ -54,6 +54,12 @@ if (-not $outputRootFull.StartsWith($buildPrefix,[StringComparison]::OrdinalIgno
 
 function Fail-K2Migration([string]$Code) { throw "[mir42-k2-213-imersite-migration] $Code" }
 function Assert-K2Migration([bool]$Condition,[string]$Code) { if (-not $Condition) { Fail-K2Migration $Code } }
+function Assert-K2HeadroomDiagnostic([string]$LogPath,[string]$StageName) {
+  Assert-K2Migration (Test-Path -LiteralPath $LogPath -PathType Leaf) "$StageName-headroom-log-missing"
+  $fragment = '[more-infinite-research] Maximum-level state force=player technology=recipe-prod-research_material_imersite-4 selected-cap=150 effective-cap=150 prototype-max=4294967295 current-or-next-level=4 next-level-valid=true enabled=true'
+  $matches = @(Select-String -LiteralPath $LogPath -SimpleMatch -Pattern $fragment)
+  Assert-K2Migration ($matches.Count -ge 1) "$StageName-finite-recipe-headroom-diagnostic"
+}
 function Get-K2MigrationSha([string]$Path) { (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
 function Get-K2MigrationIdentity([string]$Path,[switch]$External) {
   $full = [IO.Path]::GetFullPath($Path)
@@ -357,10 +363,12 @@ try {
       $reloadMarker = '[MIR42_K2_213_IMERSITE_MIGRATION] stage=reload;cap=0;legacy=1-3;powder=0.06;crystal=0.10;continuation_level=4;stable=copper-3;progress=0.42'
     }
     $upgradeLog = Invoke-K2MigrationServerUpgrade -Stage $newStage -InputSave $oldSave -ExpectedSave $newSave -ExpectedMarker $upgradeMarker
+    if ($case.cap -eq 0) { Assert-K2HeadroomDiagnostic -LogPath $upgradeLog -StageName 'cap0-upgrade' }
     Assert-K2Migration ((Get-K2MigrationSha $oldSave) -ceq $oldSaveShaBefore) "$($case.name)-predecessor-save-mutated"
     $newSettingsAfterUpgrade = Get-K2MigrationSha $newStage.settings_path
     $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $newStage.userdata -ScenarioName "k2-213-imersite-migration-$($case.name)" -SavePath $newSave -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments $reloadMarker
     Assert-K2Migration ([bool]$reload.passed) "$($case.name)-current-package-reload"
+    if ($case.cap -eq 0) { Assert-K2HeadroomDiagnostic -LogPath ([string]$reload.reloads[0].factorio_log) -StageName 'cap0-reload' }
     $newSettingsAfterReload = Get-K2MigrationSha $newStage.settings_path
     Assert-K2Migration ((Get-K2MigrationSha $v5SettingsPath) -ceq $v5SettingsSha) 'pinned-v5-settings-source-mutated'
     Assert-K2Migration ((Get-K2MigrationSha $cap0SettingsPath) -ceq [string]$cap0SettingsMutation.patched_sha256) 'cap0-settings-profile-mutated'
