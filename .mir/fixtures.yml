@@ -579,6 +579,29 @@ fixtures:
       - historical-a05-k2-imersite-proof-remains-distinct
       - no-broad-k2-support-release-signing-or-publication-authority
 
+  k2-213-imersite-continuation-migration:
+    requires_features: []
+    path: fixtures/assert-k2-213-imersite-continuation-migration
+    harness: tests/runtime/Test-MIRK2213ImersiteMigration.ps1
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213-imersite-continuation
+    exact_version_envelope:
+      base: "2.1.20"
+      Krastorio2: "2.1.3"
+      Krastorio2-spaced-out: "2.0.13"
+      more-infinite-research: "4.2.21000"
+    qualification_status: unqualified
+    validates:
+      - pinned-cap-three-profile-preserves-legacy-levels-one-through-three-and-powder-plus-0.06
+      - pinned-cap-three-profile-preserves-native-crystal-plus-0.10-and-withholds-continuation-at-absolute-cap
+      - controlled-cap-zero-copy-is-one-field-patched-and-bounded-by-finite-recipe-headroom
+      - cap-zero-profile-adds-PR-411-level-four-continuation-without-replacing-legacy-identity
+      - both-cap-profiles-preserve-stable-copper-level-three-queue-and-42-percent-progress-through-upgrade-and-reload
+      - original-V5-settings-source-remains-byte-identical-and-profile-hashes-are-recorded
+      - predecessor-and-current-candidate-archive-identities-are-pinned
+      - no-broad-k2-support-release-signing-or-publication-authority
+
   k2-03-imersite-bounded:
     requires_features: []
     path: fixtures/assert-k2-03-imersite
