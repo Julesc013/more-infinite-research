@@ -18,6 +18,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
 
 $script:MIR42ModernEngineTargets = @('f210','f200','f110','f100')
 $script:MIR42HistoricalEngineTargets = @('f017','f016','f015','f014','f013')
@@ -176,6 +177,105 @@ function Invoke-MIR42BoundedUpgrade {
     $process.StandardOutput.BaseStream.Dispose()
     $process.StandardError.BaseStream.Dispose()
     $process.Dispose()
+  }
+}
+
+function Invoke-MIR42HistoricalFreshLoad {
+  param(
+    [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
+    [Parameter(Mandatory)][string]$FactorioLine,
+    [Parameter(Mandatory)][string]$Engine,
+    [Parameter(Mandatory)][string]$EngineSha256,
+    [Parameter(Mandatory)][string]$Candidate,
+    [Parameter(Mandatory)][string]$CandidateSha256,
+    [Parameter(Mandatory)][string]$Version,
+    [Parameter(Mandatory)][string]$FreshRoot,
+    [Parameter(Mandatory)][string]$SourceCommit,
+    [Parameter(Mandatory)][int]$DeadlineSeconds
+  )
+  if ($FactorioLine -cne ('0.' + $Target.Substring(2)) -or
+      $Version -cne ('4.2.' + $Target.Substring(1) + '00')) {
+    throw "[mir42-$Target-historical-fresh-target-binding]"
+  }
+  $work = Join-Path $FreshRoot 'work'
+  $userData = Join-Path $work 'user'
+  $mods = Join-Path $userData 'mods'
+  New-Item -ItemType Directory -Force -Path $mods | Out-Null
+  $staged = Join-Path $mods ([IO.Path]::GetFileName($Candidate))
+  $save = Join-Path $work 'fresh.zip'
+  $config = Join-Path $work 'config.ini'
+  $log = Join-Path $userData 'factorio-current.log'
+  $stdout = Join-Path $FreshRoot 'stdout.txt'
+  $stderr = Join-Path $FreshRoot 'stderr.txt'
+  $receipt = Join-Path $FreshRoot 'summary.json'
+  Assert-MIRFactorioPathBudget -Path $staged -Context "Historical $Target candidate archive path"
+  Assert-MIRFactorioPathBudget -Path $save -Context "Historical $Target fresh-save path"
+  if ((Get-MIR42EngineRunSha -Path $Engine) -cne $EngineSha256 -or
+      (Get-MIR42EngineRunSha -Path $Candidate) -cne $CandidateSha256) {
+    throw "[mir42-$Target-historical-fresh-input-drift]"
+  }
+  $engineRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Engine))
+  $readData = Join-Path $engineRoot 'data'
+  if (-not (Test-Path -LiteralPath (Join-Path $readData 'base') -PathType Container)) {
+    throw "[mir42-$Target-historical-fresh-base-data]"
+  }
+  [IO.File]::WriteAllLines($config, @(
+    '[path]',
+    "read-data=$($readData.Replace('\','/'))",
+    "write-data=$($userData.Replace('\','/'))",
+    '[other]',
+    'check-updates=false'
+  ), [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),
+    (@{mods=@(@{name='base';enabled=$true},@{name='more-infinite-research';enabled=$true})} | ConvertTo-Json -Depth 5),
+    [Text.UTF8Encoding]::new($false))
+  Copy-Item -LiteralPath $Candidate -Destination $staged
+  if ((Get-MIR42EngineRunSha -Path $staged) -cne $CandidateSha256) {
+    throw "[mir42-$Target-historical-fresh-stage-drift]"
+  }
+  $arguments = @('--config',$config,'--no-log-rotation')
+  if ($FactorioLine -notin @('0.13','0.14')) { $arguments += '--disable-audio' }
+  $arguments += @('--mod-directory',$mods,'--create',$save)
+  $null = Invoke-MIR42BoundedUpgrade -PowerShell $Engine -Arguments $arguments -StdoutPath $stdout -StderrPath $stderr -DeadlineSeconds $DeadlineSeconds
+  if (-not (Test-Path -LiteralPath $save -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $log -PathType Leaf)) {
+    throw "[mir42-$Target-historical-fresh-output-missing]"
+  }
+  $logText = Get-Content -Raw -LiteralPath $log
+  $displayVersion = (($Version -split '\.') | ForEach-Object { [int]$_ }) -join '.'
+  if ($logText -match '(?im)(^|\s)(Error|Failed to load mods|Failed to load mod|Invalid Mod|Couldn.t load|stack traceback)' -or
+      -not $logText.Contains("Loading mod more-infinite-research $displayVersion") -or
+      -not $logText.Contains('Factorio initialised') -or
+      -not $logText.Contains('Creating new map') -or
+      -not $logText.Contains('Map version ')) {
+    throw "[mir42-$Target-historical-fresh-log-content] $log"
+  }
+  if ((Get-MIR42EngineRunSha -Path $Engine) -cne $EngineSha256 -or
+      (Get-MIR42EngineRunSha -Path $staged) -cne $CandidateSha256) {
+    throw "[mir42-$Target-historical-fresh-output-drift]"
+  }
+  $record = [ordered]@{
+    schema=1;kind='MIR42HistoricalFreshLoadV1';status='passed';target=$Target
+    source_commit=$SourceCommit;factorio_line=$FactorioLine
+    engine=[ordered]@{path=$Engine;sha256=$EngineSha256}
+    candidate=[ordered]@{path=$Candidate;sha256=$CandidateSha256;version=$Version}
+    staged_candidate_sha256=(Get-MIR42EngineRunSha -Path $staged)
+    config_sha256=(Get-MIR42EngineRunSha -Path $config)
+    mod_list_sha256=(Get-MIR42EngineRunSha -Path (Join-Path $mods 'mod-list.json'))
+    save=[ordered]@{path=$save;sha256=(Get-MIR42EngineRunSha -Path $save)}
+    log=[ordered]@{path=$log;sha256=(Get-MIR42EngineRunSha -Path $log)}
+    assertions=@('exact-engine','exact-candidate','fresh-save-created','exact-mod-loaded','map-created','healthy-log')
+  }
+  $normalized = ConvertTo-MIR4BootstrapCanonicalJson -Value $record | ConvertFrom-Json -Depth 100 -DateKind String
+  $null = Write-MIR4BootstrapRecord -Record $normalized -Path $receipt
+  $written = Get-Content -Raw -LiteralPath $receipt | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4BootstrapRecordHash -Record $written)) { throw "[mir42-$Target-historical-fresh-receipt-hash]" }
+  return [pscustomobject][ordered]@{
+    scenario='package-zip-base'
+    receipt=[pscustomobject][ordered]@{path=$receipt;sha256=(Get-MIR42EngineRunSha -Path $receipt)}
+    log=[pscustomobject][ordered]@{path=$log;sha256=(Get-MIR42EngineRunSha -Path $log)}
+    stdout=[pscustomobject][ordered]@{path=$stdout;sha256=(Get-MIR42EngineRunSha -Path $stdout)}
+    stderr=[pscustomobject][ordered]@{path=$stderr;sha256=(Get-MIR42EngineRunSha -Path $stderr)}
   }
 }
 
@@ -416,7 +516,15 @@ foreach ($target in $targets) {
   $isHistoricalTarget = $target -in $script:MIR42HistoricalEngineTargets
   $rowRoot = Join-Path $out $target
   New-Item -ItemType Directory -Force -Path $rowRoot | Out-Null
-  $freshLoads = @(
+  if ($isHistoricalTarget) {
+    $freshRoot = Join-Path $rowRoot 'fresh-package-zip-base'
+    New-Item -ItemType Directory -Force -Path $freshRoot | Out-Null
+    $freshLoads = @(Invoke-MIR42HistoricalFreshLoad -Target $target -FactorioLine ([string]$row.historical.terminal_seal.target) `
+      -Engine $row.engine -EngineSha256 $row.engine_sha256 -Candidate $row.candidate -CandidateSha256 $row.candidate_sha256 `
+      -Version $row.to -FreshRoot $freshRoot -SourceCommit $head -DeadlineSeconds $RowDeadlineSeconds)
+    $processTotal++
+  } else {
+    $freshLoads = @(
     foreach ($scenario in $(if ($target -eq 'f210') { @('package-zip-base','package-zip-space-age') } else { @('package-zip-base') })) {
       $freshRoot = Join-Path $rowRoot "fresh-$scenario"
       New-Item -ItemType Directory -Force -Path $freshRoot | Out-Null
@@ -465,7 +573,8 @@ foreach ($target in $targets) {
         stderr=[pscustomobject][ordered]@{path=$freshStderr;sha256=(Get-MIR42EngineRunSha -Path $freshStderr)}
       }
     }
-  )
+    )
+  }
   $receiptPath = Join-Path $rowRoot 'upgrade.json'
   $stdoutPath = Join-Path $rowRoot 'harness-stdout.txt'
   $stderrPath = Join-Path $rowRoot 'harness-stderr.txt'
