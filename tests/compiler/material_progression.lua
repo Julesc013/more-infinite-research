@@ -37,6 +37,9 @@ end
 
 check(same_array(progression.material_stream_keys(), expected_keys),
   "the staged material family key set remains the reviewed sixteen Bob/Angel streams")
+check(same_array(progression.k2_213_continuation_stream_keys(), {
+  "research_material_imersite"
+}), "the current K2 continuation set contains only the reviewed MIR powder stream")
 
 for _, key in ipairs(expected_keys) do
   local declaration = progression.attach(key, {max_level = 3})
@@ -88,6 +91,25 @@ local foreign_ok = pcall(function()
 end)
 check(not foreign_ok, "unreviewed K2 material families cannot enter the Bob/Angel continuation mechanism")
 
+local k2_generic_ok = pcall(function()
+  progression.attach("research_material_imersite", {max_level = 3})
+end)
+check(not k2_generic_ok, "the K2 Imersite continuation cannot enter through the Bob/Angel attachment API")
+
+local k2_unreviewed_ok = pcall(function()
+  progression.attach_k2_213_continuation("research_material_rare_metals", {max_level = 3})
+end)
+check(not k2_unreviewed_ok, "the exact K2 continuation attachment refuses witnessed withheld routes")
+
+local imersite = progression.attach_k2_213_continuation("research_material_imersite", {max_level = 3})
+local imersite_valid, imersite_reason = progression.validate(
+  "research_material_imersite", imersite.staged_progression)
+check(imersite_valid, "the exact K2 Imersite continuation uses the shared valid declaration: " .. tostring(imersite_reason))
+check(imersite.staged_progression.continuation.maximum_level_default == 0
+    and progression.legacy_max_level("research_material_imersite", imersite, "infinite") == 3
+    and progression.legacy_max_level("research_material_imersite", imersite, 2) == 2,
+  "the K2 continuation keeps legacy levels finite while zero config delegates a finite effective cap to recipe headroom")
+
 -- Load the actual source declaration with its minimal data-stage dependencies
 -- stubbed. This proves each reviewed material family attaches the shared
 -- contract; it does not simulate emission or Factorio runtime behavior.
@@ -121,6 +143,8 @@ for _, key in ipairs(expected_keys) do
 end
 check(streams.research_material_rare_metals.staged_progression == nil,
   "K2 material declaration stays outside the unqualified continuation mechanism")
+check(streams.research_material_imersite.staged_progression == nil,
+  "Imersite stays unattached until the exact current K2 tuple guard selects its continuation")
 
 local function effect(recipe, change)
   return {type = "change-recipe-productivity", recipe = recipe, change = change}
