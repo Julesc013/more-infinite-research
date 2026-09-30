@@ -141,6 +141,11 @@ foreach ($target in $expected.Keys) {
 }
 
 $harness = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1')
+if (-not $harness.Contains("`$serverReload = `$isHistoricalTerminalFixture -and `$historicalLine -in @('0.15','0.16')") -or
+    -not $harness.Contains('$reloadExitCode = if ($serverReload)') -or
+    -not $harness.Contains('$secondReloadExitCode = if ($serverReload)')) {
+  throw 'historical-015-016-reloads-must-use-server-path'
+}
 $historicalFreshCall = $runner.IndexOf('$freshLoads = @(Invoke-MIR42HistoricalFreshLoad -Target $target',[StringComparison]::Ordinal)
 $historicalFreshBranch = if ($historicalFreshCall -ge 0) { $runner.LastIndexOf('if ($isHistoricalTarget) {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
 $modernFreshCall = $runner.IndexOf("`$freshArgs = @('-NoProfile'",[StringComparison]::Ordinal)
