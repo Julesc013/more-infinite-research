@@ -177,13 +177,31 @@ function Invoke-K2MigrationServerUpgrade($Stage,[string]$InputSave,[string]$Expe
   foreach ($argument in @('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods,'--server-settings',$Stage.server,'--start-server',$InputSave)) { [void]$start.ArgumentList.Add($argument) }
   $process = [Diagnostics.Process]::Start($start)
   $ready = $false
+  $lastSaveLength = -1L
+  $saveStableSince = $null
   try {
     $deadline = [DateTime]::UtcNow.AddSeconds($UpgradeTimeoutSeconds)
     while ([DateTime]::UtcNow -lt $deadline) {
       if ($process.HasExited) { throw "Factorio server exited before migration save with code $($process.ExitCode)." }
-      if ((Test-Path -LiteralPath $logPath -PathType Leaf) -and (Test-Path -LiteralPath $ExpectedSave -PathType Leaf)) {
-        $text = [IO.File]::ReadAllText($logPath)
-        if ($text.Contains($ExpectedMarker,[StringComparison]::Ordinal) -and $text.Contains('Saving finished',[StringComparison]::Ordinal)) { $ready=$true; break }
+      if (Test-Path -LiteralPath $logPath -PathType Leaf) {
+        try {
+          $stream = [IO.File]::Open($logPath,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+          try { $reader = [IO.StreamReader]::new($stream); try { $text = $reader.ReadToEnd() } finally { $reader.Dispose() } } finally { $stream.Dispose() }
+          if ($text.Contains($ExpectedMarker,[StringComparison]::Ordinal) -and $text.Contains('Saving finished',[StringComparison]::Ordinal)) { $ready=$true; break }
+        } catch [IO.IOException] {
+          # Factorio may hold its active log with sharing that blocks readers.
+          # Fall back to a stable save file, then verify the copied log after stop.
+        }
+      }
+      if (Test-Path -LiteralPath $ExpectedSave -PathType Leaf) {
+        $saveLength = (Get-Item -LiteralPath $ExpectedSave).Length
+        if ($saveLength -gt 0 -and $saveLength -eq $lastSaveLength) {
+          if ($null -eq $saveStableSince) { $saveStableSince = [DateTime]::UtcNow }
+          elseif (([DateTime]::UtcNow - $saveStableSince).TotalSeconds -ge 2) { $ready=$true; break }
+        } else {
+          $lastSaveLength = $saveLength
+          $saveStableSince = $null
+        }
       }
       Start-Sleep -Milliseconds 200
     }
@@ -194,6 +212,10 @@ function Invoke-K2MigrationServerUpgrade($Stage,[string]$InputSave,[string]$Expe
   }
   $copy = Join-Path $Stage.root 'factorio-upgrade.log'
   Copy-Item -LiteralPath $logPath -Destination $copy
+  $completedLog = [IO.File]::ReadAllText($copy)
+  if (-not $completedLog.Contains($ExpectedMarker,[StringComparison]::Ordinal) -or -not $completedLog.Contains('Saving finished',[StringComparison]::Ordinal)) {
+    throw 'Factorio migration save log lacks the required marker or completed-save record.'
+  }
   return $copy
 }
 
