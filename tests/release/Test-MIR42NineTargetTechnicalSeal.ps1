@@ -147,20 +147,24 @@ try {
   # the leading zero in the archive version when logging the loaded mod.
   $freshLog = Join-Path $readerFixtureRoot 'historical-fresh.log'
   $freshSave = Join-Path $readerFixtureRoot 'historical-fresh.zip'
+  $freshEnginePath = Join-Path $readerFixtureRoot 'historical-engine.bin'
+  $freshCandidatePath = Join-Path $readerFixtureRoot 'historical-candidate.zip'
   $freshStdout = Join-Path $readerFixtureRoot 'historical-fresh.stdout'
   $freshStderr = Join-Path $readerFixtureRoot 'historical-fresh.stderr'
   [IO.File]::WriteAllText($freshLog,"Loading mod more-infinite-research 4.2.1700 (data.lua)`nFactorio initialised`nCreating new map",[Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllText($freshSave,'synthetic historical save',[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($freshEnginePath,'synthetic historical engine',[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($freshCandidatePath,'synthetic historical candidate',[Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllText($freshStdout,'synthetic stdout',[Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllText($freshStderr,'',[Text.UTF8Encoding]::new($false))
   $freshLogHash = (Get-FileHash -LiteralPath $freshLog -Algorithm SHA256).Hash.ToUpperInvariant()
   $freshSource = 'a' * 40
-  $freshArchive = 'D' * 64
-  $freshEngine = 'E' * 64
+  $freshArchive = (Get-FileHash -LiteralPath $freshCandidatePath -Algorithm SHA256).Hash.ToUpperInvariant()
+  $freshEngine = (Get-FileHash -LiteralPath $freshEnginePath -Algorithm SHA256).Hash.ToUpperInvariant()
   $freshRecord = [pscustomobject][ordered]@{
     schema=1;kind='MIR42HistoricalFreshLoadV1';status='passed';target='f017';source_commit=$freshSource;factorio_line='0.17'
-    engine=[pscustomobject][ordered]@{sha256=$freshEngine}
-    candidate=[pscustomobject][ordered]@{sha256=$freshArchive;version='4.2.01700'}
+    engine=[pscustomobject][ordered]@{path=$freshEnginePath;sha256=$freshEngine}
+    candidate=[pscustomobject][ordered]@{path=$freshCandidatePath;sha256=$freshArchive;version='4.2.01700'}
     staged_candidate_sha256=$freshArchive
     save=[pscustomobject][ordered]@{path=$freshSave;sha256=(Get-FileHash -LiteralPath $freshSave -Algorithm SHA256).Hash.ToUpperInvariant()}
     log=[pscustomobject][ordered]@{path=$freshLog;sha256=$freshLogHash}
@@ -178,7 +182,7 @@ try {
   }
   $freshTarget = [pscustomobject][ordered]@{target='f017';target_id='factorio-0.17';distribution_version='4.2.01700';archive=[pscustomobject][ordered]@{sha256=$freshArchive}}
   $freshCandidate = [pscustomobject][ordered]@{source=[pscustomobject][ordered]@{commit=$freshSource}}
-  $freshExecution = [pscustomobject][ordered]@{executable_sha256=$freshEngine;version='0.17.79';fresh_loads=@($freshRefs)}
+  $freshExecution = [pscustomobject][ordered]@{executable_path=$freshEnginePath;executable_sha256=$freshEngine;version='0.17.79';fresh_loads=@($freshRefs)}
   Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution
   $freshRecord.source_commit = 'b' * 40
   $freshRecord.record_sha256 = ''

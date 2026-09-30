@@ -971,6 +971,7 @@ function Assert-MIR42FreshEngineLoads {
           [string]$summary.status -cne 'passed' -or [string]$summary.target -cne $targetId -or
           [string]$summary.source_commit -cne [string]$CandidateTarget.source.commit -or
           [string]$summary.factorio_line -cne ([string]$Target.target_id -replace '^factorio-', '') -or
+          [string]$summary.engine.path -cne [string]$Execution.executable_path -or
           [string]$summary.engine.sha256 -cne [string]$Execution.executable_sha256 -or
           [string]$summary.candidate.sha256 -cne [string]$Target.archive.sha256 -or
           [string]$summary.candidate.version -cne [string]$Target.distribution_version -or
@@ -983,6 +984,7 @@ function Assert-MIR42FreshEngineLoads {
         throw "[mir42-seal-real-engine-fresh-load-binding] $targetId/$([string]$fresh.scenario)"
       }
       $null = Resolve-MIR42SealImmutableFile -Path ([string]$summary.save.path) -Sha256 ([string]$summary.save.sha256) -Code 'mir42-seal-historical-fresh-save'
+      $null = Resolve-MIR42SealImmutableFile -Path ([string]$summary.candidate.path) -Sha256 ([string]$summary.candidate.sha256) -Code 'mir42-seal-historical-fresh-candidate'
     } else {
       $scenarioRows = @($summary.scenarios)
       if ([int]$summary.schema -ne 2 -or
