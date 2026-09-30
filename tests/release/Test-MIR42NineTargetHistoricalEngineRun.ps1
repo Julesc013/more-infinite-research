@@ -141,6 +141,15 @@ foreach ($target in $expected.Keys) {
 }
 
 $harness = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1')
+$historicalFreshCall = $runner.IndexOf('$freshLoads = @(Invoke-MIR42HistoricalFreshLoad -Target $target',[StringComparison]::Ordinal)
+$historicalFreshBranch = if ($historicalFreshCall -ge 0) { $runner.LastIndexOf('if ($isHistoricalTarget) {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
+$modernFreshCall = $runner.IndexOf("`$freshArgs = @('-NoProfile'",[StringComparison]::Ordinal)
+$modernFreshElse = if ($historicalFreshCall -ge 0) { $runner.IndexOf('} else {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
+if ($historicalFreshBranch -lt 0 -or $historicalFreshCall -le $historicalFreshBranch -or
+    $modernFreshElse -le $historicalFreshCall -or $modernFreshCall -le $modernFreshElse -or
+    -not $runner.Contains("[mir42-`$Target-historical-fresh-log-content]")) {
+  throw 'historical-fresh-load-must-bypass-modern-scenario-worker'
+}
 foreach ($needle in @('$isHistoricalTerminalFixture = $FixtureName -eq ''assert-upgrade-historical-terminal-to-mir42''','$isLegacyFactorio = $isHistoricalTerminalFixture -or','MIR historical upgrade specialization requires an exact terminal predecessor','historical-terminal-source-state-retained','historical-terminal-infinite-bonus-retained-where-supported','$historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo','$historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target','$runKind = if ($isNineTargetCandidate)','kind=$runKind','status=$runStatus')) {
   if (-not ($runner.Contains($needle) -or $harness.Contains($needle))) { throw "historical-runtime-contract $needle" }
 }
