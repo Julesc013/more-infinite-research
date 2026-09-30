@@ -471,6 +471,11 @@
       "tests": ["static.mir4-a05-k2-materials-closure"]
     },
     {
+      "id": "k2-213-imersite-continuation-compiler",
+      "patterns": ["^fixtures/assert-k2-213-imersite-continuation/", "^tests/compiler/Test-MIRK2ImersiteContinuation[.]ps1$", "^tests/compiler/material_(?:continuation|progression)[.]lua$", "^source/prototypes/mir/compatibility/policies/k2_science_phase[.]lua$", "^source/prototypes/mir/families/material_progression[.]lua$", "^source/prototypes/mir/planner/stream_compiler/material_continuation[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml|test-impact[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.k2-213-imersite-continuation-compiler"]
+    },
+    {
       "id": "test-harness",
       "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)", "^tests/(?!tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)\\.ps1$)(?!release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection))\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/(?!validate\\.yml$)(?!assurance-(?:targeted|scheduled)\\.yml$)", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]

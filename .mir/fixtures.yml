@@ -557,6 +557,28 @@ fixtures:
       - source-save-remains-byte-identical
       - historical-a04-fixture-and-proof-remain-distinct
 
+  k2-213-imersite-continuation:
+    requires_features: []
+    path: fixtures/assert-k2-213-imersite-continuation
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213-imersite-continuation
+    exact_version_envelope:
+      base: "2.1.20"
+      Krastorio2: "2.1.3"
+      Krastorio2-spaced-out: "2.0.13"
+      more-infinite-research: "4.2.21000"
+    qualification_status: unqualified
+    validates:
+      - exact-current-engine-k2-k2so-and-mir-tuple
+      - only-generated-mir-imersite-powder-continuation-from-level-four
+      - native-imersite-crystal-owner-and-effect-remain-outside-mir-domain
+      - legacy-level-three-current-research-queue-and-42-percent-progress-preserved
+      - one-fresh-create-and-single-bounded-reload
+      - witnessed-k2-return-paths-and-other-material-families-remain-withheld
+      - historical-a05-k2-imersite-proof-remains-distinct
+      - no-broad-k2-support-release-signing-or-publication-authority
+
   k2-03-imersite-bounded:
     requires_features: []
     path: fixtures/assert-k2-03-imersite

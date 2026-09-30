@@ -33,8 +33,28 @@ local MATERIAL_STREAM_KEYS = {
   "research_material_nitinol"
 }
 
+-- This is deliberately separate from the reviewed Bob/Angel family.  The
+-- current K2/K2SO evidence admits only the MIR-owned powder route; its
+-- caller must still apply the exact current tuple guard before attaching the
+-- declaration to the stream.  In particular, the native crystal owner and
+-- the witnessed withheld K2 routes never enter this set.
+local K2_213_CONTINUATION_STREAM_KEYS = {
+  "research_material_imersite"
+}
+
 local MATERIAL_STREAM_KEY_SET = {}
 for _, key in ipairs(MATERIAL_STREAM_KEYS) do MATERIAL_STREAM_KEY_SET[key] = true end
+
+local K2_213_CONTINUATION_STREAM_KEY_SET = {}
+for _, key in ipairs(K2_213_CONTINUATION_STREAM_KEYS) do
+  K2_213_CONTINUATION_STREAM_KEY_SET[key] = true
+end
+
+local STAGED_MATERIAL_STREAM_KEY_SET = {}
+for key in pairs(MATERIAL_STREAM_KEY_SET) do STAGED_MATERIAL_STREAM_KEY_SET[key] = true end
+for key in pairs(K2_213_CONTINUATION_STREAM_KEY_SET) do
+  STAGED_MATERIAL_STREAM_KEY_SET[key] = true
+end
 
 local function only_fields(value, allowed)
   for key in pairs(value or {}) do
@@ -50,6 +70,12 @@ end
 function M.material_stream_keys()
   local out = {}
   for index, key in ipairs(MATERIAL_STREAM_KEYS) do out[index] = key end
+  return out
+end
+
+function M.k2_213_continuation_stream_keys()
+  local out = {}
+  for index, key in ipairs(K2_213_CONTINUATION_STREAM_KEYS) do out[index] = key end
   return out
 end
 
@@ -90,7 +116,7 @@ local continuation_allowed = {
 }
 
 function M.validate(key, progression)
-  if not MATERIAL_STREAM_KEY_SET[key] then return false, "unsupported-material-stream" end
+  if not STAGED_MATERIAL_STREAM_KEY_SET[key] then return false, "unsupported-material-stream" end
   if type(progression) ~= "table" or progression.schema ~= M.schema or progression.kind ~= M.kind
       or not only_fields(progression, {schema = true, kind = true, legacy = true, continuation = true}) then
     return false, "invalid-staged-progression-schema"
@@ -137,10 +163,7 @@ function M.legacy_max_level(key, spec, configured)
   return spec.staged_progression.legacy.last_level
 end
 
-function M.attach(key, spec)
-  if not MATERIAL_STREAM_KEY_SET[key] then
-    error("Material staged progression does not support stream " .. tostring(key) .. ".", 2)
-  end
+local function attach(key, spec)
   if type(spec) ~= "table" then
     error("Material staged progression requires a stream declaration table.", 2)
   end
@@ -192,6 +215,23 @@ function M.attach(key, spec)
   local valid, reason = M.validate(key, spec.staged_progression)
   if not valid then error("Material staged progression is invalid for " .. key .. ": " .. reason .. ".", 2) end
   return spec
+end
+
+function M.attach(key, spec)
+  if not MATERIAL_STREAM_KEY_SET[key] then
+    error("Material staged progression does not support stream " .. tostring(key) .. ".", 2)
+  end
+  return attach(key, spec)
+end
+
+-- The declaration is intentionally opt-in.  Productivity stream assembly
+-- supplies the exact base/K2/K2SO tuple guard; this module only prevents a
+-- different K2 stream from inheriting Imersite's reviewed continuation.
+function M.attach_k2_213_continuation(key, spec)
+  if not K2_213_CONTINUATION_STREAM_KEY_SET[key] then
+    error("K2 2.1.3 material continuation does not support stream " .. tostring(key) .. ".", 2)
+  end
+  return attach(key, spec)
 end
 
 local function finite_nonnegative(value)

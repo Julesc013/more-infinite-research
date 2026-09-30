@@ -5561,6 +5561,25 @@
       ]
     },
     {
+      "id": "runtime.k2-213-imersite-continuation-compiler",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRK2ImersiteContinuation.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "tests/compiler/Test-MIRK2ImersiteContinuation.ps1",
+        "tests/compiler/material_progression.lua",
+        "tests/compiler/material_continuation.lua",
+        "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "source:source/prototypes/mir/families/material_progression.lua",
+        "source:source/prototypes/mir/domain/technology/maximum_level_binding.lua",
+        "source:source/prototypes/mir/planner/stream_compiler/material_continuation.lua",
+        "source:source/prototypes/mir/policy/max_level.lua",
+        "source:source/prototypes/streams/productivity.lua"
+      ]
+    },
+    {
       "id": "runtime.passive-repair-enabled",
       "kind": "runtime",
       "layer": "F3",

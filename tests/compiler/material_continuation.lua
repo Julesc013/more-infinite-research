@@ -2,7 +2,7 @@
 package.loaded["prototypes.mir.platform.factorio.data_raw"] = {
   prototype = function(kind, name)
     assert(kind == "recipe")
-    if name == "plate" then return {} end
+    if name == "plate" or name == "kr-imersite-powder" then return {} end
   end
 }
 local late_available = true
@@ -91,6 +91,31 @@ check(stage.fields.cost_model.input.anchor_level == 4
 check(stage.fields.effects[1].recipe == legacy.fields.effects[1].recipe
     and stage.fields.effects[1].change == legacy.fields.effects[1].change,
   "the continuation retains the exact qualified effect")
+
+local imersite_spec = progression.attach_k2_213_continuation("research_material_imersite", {max_level = 3})
+local imersite_legacy = {
+  action = "emit",
+  stream_key = "research_material_imersite",
+  technology_name = "recipe-prod-research_material_imersite-1",
+  spec = imersite_spec,
+  fields = {
+    effects = {{type = "change-recipe-productivity", recipe = "kr-imersite-powder", change = 0.02}},
+    ingredients = {{"automation-science-pack", 1}},
+    cost_model = {base = 100}
+  }
+}
+local imersite_stage = continuation.plan(imersite_legacy)
+check(imersite_stage.action == "emit"
+    and imersite_stage.technology_name == "recipe-prod-research_material_imersite-4"
+    and imersite_stage.staged_parent_technology == imersite_legacy.technology_name,
+  "the reviewed K2 powder route may continue only from its generated MIR legacy technology")
+check(#imersite_stage.fields.effects == 1
+    and imersite_stage.fields.effects[1].recipe == "kr-imersite-powder"
+    and imersite_stage.fields.effects[1].change == 0.02,
+  "the K2 continuation retains only the MIR-owned powder effect")
+local imersite_native = {action = "adopt", spec = imersite_spec}
+check(continuation.plan(imersite_native) == nil,
+  "a K2 native-owner adoption cannot gain the Imersite continuation")
 
 legacy.planned_max_level = 3
 legacy.manifest_id = "research_material_tin"

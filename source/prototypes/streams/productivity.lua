@@ -2,6 +2,7 @@ local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local material_progression = require("prototypes.mir.families.material_progression")
+local k2_science_phase = require("prototypes.mir.compatibility.policies.k2_science_phase")
 
 local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
 local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
@@ -988,10 +989,18 @@ streams.research_material_cobalt_steel = material_family("bob-cobalt-steel-alloy
 streams.research_material_nitinol = material_family("bob-nitinol-alloy", f200_material_routes({"bob-nitinol-alloy"}, {"angels-plate-nitinol"}), {"bobplates", "angelssmelting"})
 
 -- These sixteen ordinary Bob/Angel families share one staged declaration.
--- K2 material families remain outside this mechanism until their separate
--- cap and continuation evidence is admitted.
 for _, key in ipairs(material_progression.material_stream_keys()) do
   material_progression.attach(key, streams[key])
+end
+
+local function current_k2_213_material_profile()
+  if target_profiles.current().factorio_version ~= "2.1" then return false end
+  local active = mods or (script and script.active_mods)
+  if type(active) ~= "table" then return false end
+  for name, version in pairs(k2_science_phase.v3_applicability) do
+    if active[name] ~= version then return false end
+  end
+  return true
 end
 
 -- RIC 0.36.1 Marine carbonisation is the one observed productivity-permitted
@@ -1006,6 +1015,11 @@ streams.research_material_rare_metals = material_family("kr-rare-metals", {"kr-r
 -- powder route, so present its generated technology as powder while keeping
 -- crystal as the existing availability anchor.
 streams.research_material_imersite = material_family("kr-imersite-crystal", {"kr-imersite-crystal", "kr-imersite-powder"}, {"Krastorio2", "Krastorio2-spaced-out"}, "kr-imersite-powder")
+-- Only the current exact K2/K2SO tuple receives the MIR-owned powder
+-- continuation. The separate native crystal owner remains untouched.
+if current_k2_213_material_profile() then
+  material_progression.attach_k2_213_continuation("research_material_imersite", streams.research_material_imersite)
+end
 streams.research_material_silicon = material_family("kr-silicon", {"kr-silicon"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_glass = material_family("kr-glass", {"kr-glass"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_black_paving = material_family("kr-black-reinforced-plate", {"kr-black-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
