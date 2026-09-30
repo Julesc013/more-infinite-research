@@ -81,8 +81,35 @@ jobs:
         run: |
           $postRelease = Test-Path -LiteralPath spec/programmes/mir4-4x-operating-programme-v1.json -PathType Leaf
           $development = Test-Path -LiteralPath governance/repository/development-epoch-v1.json -PathType Leaf
+          $developmentEvent = (
+            ('${{ github.event_name }}' -eq 'push' -and '${{ github.ref }}' -eq 'refs/heads/dev') -or
+            ('${{ github.event_name }}' -eq 'pull_request' -and '${{ github.base_ref }}' -eq 'dev')
+          )
+          $baseline = if ('${{ github.event_name }}' -eq 'pull_request') {
+            '${{ github.event.pull_request.base.sha }}'
+          } elseif ('${{ github.event_name }}' -eq 'push') {
+            '${{ github.event.before }}'
+          } else {
+            ''
+          }
+          if ($baseline -match '^0{40}$') { $baseline = '' }
           $profile = if ($development) { 'mir4-development' } elseif ($postRelease) { 'mir4-post-release' } elseif ('${{ steps.mode.outputs.mir4_bootstrap }}' -eq 'true') { 'mir4-bootstrap' } else { 'fast' }
-          ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile $profile --candidate $env:MIR_DEVELOPMENT_CANDIDATE --output build/results/assurance/verification-plan.json
+          $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--output', 'build/results/assurance/verification-plan.json')
+          if ($development -and $developmentEvent) {
+            . ./tools/mir/application/assurance/DevelopmentValidation.ps1
+            $selection = Get-MIR4DevelopmentCISelection `
+              -RepoRoot $PWD `
+              -Mode hosted-development-affected `
+              -EventName '${{ github.event_name }}' `
+              -Baseline $baseline `
+              -ExpectedHead '${{ github.sha }}'
+            $planning = Get-MIR4DevelopmentInitialPlanProfile -Selection $selection
+            $profile = [string]$planning.profile
+            if ([bool]$planning.use_baseline) {
+              $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--baseline', $baseline, '--output', 'build/results/assurance/verification-plan.json')
+            }
+          }
+          ./tools/mir.ps1 verify plan --candidate $env:MIR_DEVELOPMENT_CANDIDATE @planArguments
       - id: matrix
         name: Export required work
         shell: pwsh
@@ -348,9 +375,9 @@ jobs:
             build/results/assurance/workflow-status.json
           if-no-files-found: warn
 
-  # Development authoring records the affected static selection only after the
-  # canonical gate has covered its exact plan-bound rows.  It remains distinct
-  # from verification-gate and has no release-ready status authority.
+  # The plan job selects affected development rows before workers start. This
+  # authoring record follows the canonical gate to bind that exact plan result;
+  # it remains distinct from verification-gate and has no release authority.
   development-static:
     name: MIR / development-static-gate
     if: >-

@@ -145,6 +145,54 @@ function Get-MIR4DevelopmentCanonicalPropertyValue {
   return ,$property.Value
 }
 
+function Get-MIR4DevelopmentInitialPlanProfile {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)]$Selection)
+  $baseline=Get-MIR4DevelopmentCanonicalPropertyValue -Value $Selection -Name 'baseline' -Code '[mir4-development-plan-selection-baseline]'
+  $baselineState=Get-MIR4DevelopmentCanonicalPropertyValue -Value $Selection -Name 'baseline_state' -Code '[mir4-development-plan-selection-baseline-state]'
+  $classification=Get-MIR4DevelopmentCanonicalPropertyValue -Value $Selection -Name 'classification' -Code '[mir4-development-plan-selection-classification]'
+  $selectionTests=@(Get-MIR4DevelopmentCanonicalPropertyValue -Value $Selection -Name 'tests' -Code '[mir4-development-plan-selection-tests]' | ForEach-Object {[string]$_})
+  $classificationPaths=@(Get-MIR4DevelopmentCanonicalPropertyValue -Value $classification -Name 'paths' -Code '[mir4-development-plan-selection-classification-paths]' | ForEach-Object {[string]$_})
+  $classificationTests=@(Get-MIR4DevelopmentCanonicalPropertyValue -Value $classification -Name 'tests' -Code '[mir4-development-plan-selection-classification-tests]' | ForEach-Object {[string]$_})
+  $escalated=Get-MIR4DevelopmentCanonicalPropertyValue -Value $classification -Name 'escalated' -Code '[mir4-development-plan-selection-classification-escalated]'
+  if([string]$baselineState -notin @('resolved','unavailable')) { throw '[mir4-development-plan-selection-baseline-state]' }
+  if($escalated -isnot [bool]) { throw '[mir4-development-plan-selection-classification-escalated]' }
+  foreach($values in @($selectionTests,$classificationPaths,$classificationTests)) {
+    if(@($values|Where-Object {[string]::IsNullOrWhiteSpace($_)}).Count -ne 0 -or @($values|Sort-Object -Unique).Count -ne $values.Count) { throw '[mir4-development-plan-selection-values]' }
+  }
+  $baselineAvailable=([string]$baselineState -ceq 'resolved' -and [string]$baseline -cmatch '^[0-9a-f]{40}$')
+  $autoCoversSelection=@($selectionTests|Where-Object {$_ -notin $classificationTests}).Count -eq 0
+  $useAffectedSelection=($baselineAvailable -and -not [bool]$escalated -and $classificationPaths.Count -gt 0 -and $classificationTests.Count -gt 0 -and $selectionTests.Count -gt 0 -and $autoCoversSelection)
+  return [ordered]@{
+    profile=$(if($useAffectedSelection){'auto'}else{'mir4-development'})
+    baseline=$(if($baselineAvailable){[string]$baseline}else{''})
+    use_baseline=$baselineAvailable
+    use_affected_selection=$useAffectedSelection
+    selection_rows_covered_by_auto=$autoCoversSelection
+  }
+}
+
+function Assert-MIR4DevelopmentExactStringArray {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][AllowEmptyCollection()]$Actual,
+    [Parameter(Mandatory)][AllowEmptyCollection()]$Expected,
+    [Parameter(Mandatory)][string]$Code
+  )
+  $actualValues=@($Actual|ForEach-Object {[string]$_})
+  $expectedValues=@($Expected|ForEach-Object {[string]$_})
+  if(@($actualValues|Where-Object {[string]::IsNullOrWhiteSpace($_)}).Count -ne 0 -or
+     @($expectedValues|Where-Object {[string]::IsNullOrWhiteSpace($_)}).Count -ne 0 -or
+     @($actualValues|Sort-Object -Unique).Count -ne $actualValues.Count -or
+     @($expectedValues|Sort-Object -Unique).Count -ne $expectedValues.Count) { throw $Code }
+  $actualOrdered=@($actualValues|Sort-Object)
+  $expectedOrdered=@($expectedValues|Sort-Object)
+  if($actualOrdered.Count -ne $expectedOrdered.Count) { throw $Code }
+  for($index=0;$index-lt$actualOrdered.Count;$index++) {
+    if($actualOrdered[$index] -cne $expectedOrdered[$index]) { throw $Code }
+  }
+}
+
 function Assert-MIR4DevelopmentCanonicalPlanCoverage {
   [CmdletBinding()]
   param(
@@ -154,7 +202,7 @@ function Assert-MIR4DevelopmentCanonicalPlanCoverage {
   )
   if($CanonicalGateResult -cne 'success') { throw '[mir4-development-canonical-gate]' }
   $selectionValues=[ordered]@{}
-  foreach($name in @('schema','kind','mode','source_commit','source_tree','package_source_sha256','input_hashes','tests','trust_scope','release_qualification','release_readiness_gate','reuse_allowed')) {
+  foreach($name in @('schema','kind','mode','baseline','baseline_state','source_commit','source_tree','package_source_sha256','input_hashes','classification','tests','trust_scope','release_qualification','release_readiness_gate','reuse_allowed')) {
     $selectionValues[$name]=Get-MIR4DevelopmentCanonicalPropertyValue -Value $Selection -Name $name -Code "[mir4-development-canonical-selection-$name]"
   }
   if([int]$selectionValues.schema -ne 1 -or [string]$selectionValues.kind -cne 'MIR4DevelopmentCISelectionV1' -or [string]$selectionValues.mode -cne 'hosted-development-affected' -or [string]$selectionValues.trust_scope -cne 'hosted-development-authoring') { throw '[mir4-development-canonical-selection]' }
@@ -172,10 +220,10 @@ function Assert-MIR4DevelopmentCanonicalPlanCoverage {
   $selectedIds=@($selectionValues.tests|ForEach-Object {[string]$_})
   if($selectedIds.Count -eq 0 -or @($selectedIds|Where-Object {[string]::IsNullOrWhiteSpace($_)}).Count -ne 0 -or @($selectedIds|Sort-Object -Unique).Count -ne $selectedIds.Count) { throw '[mir4-development-canonical-selection-tests]' }
   $planValues=[ordered]@{}
-  foreach($name in @('schema','profile','source_commit','source_tree','package_source_sha256','test_catalog_sha256','catalog_sha256','expected_test_ids')) {
+  foreach($name in @('schema','profile','baseline','source_commit','source_tree','package_source_sha256','test_catalog_sha256','catalog_sha256','classification','expected_test_ids')) {
     $planValues[$name]=Get-MIR4DevelopmentCanonicalPropertyValue -Value $Plan -Name $name -Code "[mir4-development-canonical-plan-$name]"
   }
-  if([int]$planValues.schema -ne 4 -or [string]$planValues.profile -cne 'mir4-development') { throw '[mir4-development-canonical-plan-profile]' }
+  if([int]$planValues.schema -ne 4 -or [string]$planValues.profile -notin @('mir4-development','auto')) { throw '[mir4-development-canonical-plan-profile]' }
   foreach($name in @('source_commit','source_tree')) {
     if([string]$planValues[$name] -cnotmatch '^[0-9a-fA-F]{40}$') { throw "[mir4-development-canonical-plan-$name]" }
     if([string]$planValues[$name] -cne [string]$selectionValues[$name]) { throw "[mir4-development-canonical-plan-$name]" }
@@ -189,9 +237,22 @@ function Assert-MIR4DevelopmentCanonicalPlanCoverage {
   if($plannedIds.Count -eq 0 -or @($plannedIds|Where-Object {[string]::IsNullOrWhiteSpace($_)}).Count -ne 0 -or @($plannedIds|Sort-Object -Unique).Count -ne $plannedIds.Count) { throw '[mir4-development-canonical-plan-tests]' }
   $missing=@($selectedIds|Where-Object { $selectedId=$_;@($plannedIds|Where-Object {$_ -ceq $selectedId}).Count -ne 1 })
   if($missing.Count -ne 0) { throw "[mir4-development-canonical-plan-coverage] $($missing -join ',')" }
+  if([string]$planValues.profile -ceq 'auto') {
+    if([string]$selectionValues.baseline_state -cne 'resolved' -or [string]$selectionValues.baseline -cnotmatch '^[0-9a-f]{40}$' -or [string]$planValues.baseline -cne [string]$selectionValues.baseline) { throw '[mir4-development-canonical-plan-baseline]' }
+    $selectionClassification=$selectionValues.classification
+    $planClassification=$planValues.classification
+    foreach($name in @('paths','classes','tests','unknown_paths')) {
+      $selectionValue=Get-MIR4DevelopmentCanonicalPropertyValue -Value $selectionClassification -Name $name -Code "[mir4-development-canonical-selection-classification-$name]"
+      $planValue=Get-MIR4DevelopmentCanonicalPropertyValue -Value $planClassification -Name $name -Code "[mir4-development-canonical-plan-classification-$name]"
+      Assert-MIR4DevelopmentExactStringArray -Actual $planValue -Expected $selectionValue -Code "[mir4-development-canonical-plan-classification-$name]"
+    }
+    $selectionEscalated=Get-MIR4DevelopmentCanonicalPropertyValue -Value $selectionClassification -Name 'escalated' -Code '[mir4-development-canonical-selection-classification-escalated]'
+    $planEscalated=Get-MIR4DevelopmentCanonicalPropertyValue -Value $planClassification -Name 'escalated' -Code '[mir4-development-canonical-plan-classification-escalated]'
+    if($selectionEscalated -isnot [bool] -or $planEscalated -isnot [bool] -or [bool]$selectionEscalated -or [bool]$planEscalated) { throw '[mir4-development-canonical-plan-classification-escalated]' }
+  }
   return [ordered]@{
     schema=1;kind='MIR4DevelopmentCanonicalPlanCoverageV1';status='covered-by-successful-canonical-verification-gate'
-    canonical_gate_job='verification-gate';canonical_gate_result='success';plan_profile='mir4-development'
+    canonical_gate_job='verification-gate';canonical_gate_result='success';plan_profile=[string]$planValues.profile
     source_commit=[string]$planValues.source_commit;source_tree=[string]$planValues.source_tree;package_source_sha256=[string]$planValues.package_source_sha256
     test_catalog_raw_sha256=[string]$selectionRawCatalogHash;test_catalog_canonical_sha256=[string]$planValues.test_catalog_sha256;selected_test_ids=@($selectedIds);planned_test_ids=@($plannedIds)
     per_test_executions=0;executed_test_ids=@();release_qualification=$false;release_readiness_gate=$false;reuse_allowed=$false
