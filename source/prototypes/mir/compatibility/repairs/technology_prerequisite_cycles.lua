@@ -27,6 +27,21 @@ local function all_mods_active(active_mods, required)
   return true
 end
 
+-- Planned operations are a transport for this module's declared repair, never
+-- authority to mutate a caller-selected technology or prerequisite edge.
+local function declared_repair_for_operation(operation)
+  if type(operation) ~= "table" then return nil end
+  for _, repair in ipairs(REPAIRS) do
+    if operation.id == repair.id
+      and operation.technology == repair.technology
+      and operation.remove_prerequisite == repair.remove_prerequisite
+      and operation.evidence == table.concat(repair.required_mods, "+") .. ":mutual-prerequisite-path" then
+      return repair
+    end
+  end
+  return nil
+end
+
 local function reaches(technologies, start_name, target_name)
   local pending, visited = {start_name}, {}
   while #pending > 0 do
@@ -65,12 +80,15 @@ end
 
 function M.apply_plan(operations, technologies)
   for _, operation in ipairs(operations or {}) do
-    local technology = technologies[operation.technology]
-    local prerequisites = {}
-    for _, prerequisite in ipairs((technology and technology.prerequisites) or {}) do
-      if prerequisite ~= operation.remove_prerequisite then table.insert(prerequisites, prerequisite) end
+    local repair = declared_repair_for_operation(operation)
+    local technology = repair and technologies[operation.technology] or nil
+    if technology and has_prerequisite(technology, operation.remove_prerequisite) then
+      local prerequisites = {}
+      for _, prerequisite in ipairs(technology.prerequisites or {}) do
+        if prerequisite ~= operation.remove_prerequisite then table.insert(prerequisites, prerequisite) end
+      end
+      technology.prerequisites = #prerequisites > 0 and prerequisites or nil
     end
-    technology.prerequisites = #prerequisites > 0 and prerequisites or nil
   end
 end
 
