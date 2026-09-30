@@ -994,6 +994,13 @@ for _, key in ipairs(material_progression.material_stream_keys()) do
   material_progression.attach(key, streams[key])
 end
 
+-- RIC 0.36.1 Marine carbonisation is the one observed productivity-permitted
+-- route without a recipe return path. The normal material graph and final
+-- recipe permission still decide admission; Continental mode has no route.
+streams.research_material_ric_coke = material_family("ric-coke", {"ric-carbonise-marine-biomass"}, {"real-industrial-chemistry"})
+streams.research_material_ric_coke.localised_name = {"", {"description.productivity-bonus"}, ": ", {"recipe-name.ric-carbonise-marine-biomass"}}
+streams.research_material_ric_coke.generation_requirements = {require_any_recipe = {"ric-carbonise-marine-biomass"}}
+
 streams.research_material_rare_metals = material_family("kr-rare-metals", {"kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals", "kr-casting-rare-metals"}, {"Krastorio2", "Krastorio2-spaced-out"})
 -- K2SO's native owner retains crystal productivity. MIR owns the admitted
 -- powder route, so present its generated technology as powder while keeping
