@@ -127,7 +127,7 @@ Ages are measured against the newest governed review date, 2026-09-30, so checko
 | docs/compatibility/campaigns/factorio-2.1-lane.md | current | 2026-09-01 | 29 | current-window |
 | docs/compatibility/campaigns/README.md | current | 2026-07-07 | 85 | current-window |
 | docs/compatibility/claim-levels.md | current | 2026-07-23 | 69 | current-window |
-| docs/compatibility/compatibility-matrix.md | current | 2026-07-07 | 85 | current-window |
+| docs/compatibility/compatibility-matrix.md | current | 2026-09-30 | 0 | current-window |
 | docs/compatibility/factorio-2.1-current-api-review.md | current | 2026-09-27 | 3 | current-window |
 | docs/compatibility/mir4-release-canaries.md | current | 2026-08-28 | 33 | current-window |
 | docs/compatibility/policy-overlays.md | current | 2026-07-07 | 85 | current-window |
@@ -151,6 +151,7 @@ Ages are measured against the newest governed review date, 2026-09-30, so checko
 | docs/compatibility/targets/modules-t4.md | current | 2026-07-11 | 81 | current-window |
 | docs/compatibility/targets/README.md | current | 2026-07-07 | 85 | current-window |
 | docs/compatibility/targets/recycler-progression.md | current | 2026-08-21 | 40 | current-window |
+| docs/compatibility/targets/ric-marine-carbonisation-observation.md | current | 2026-09-30 | 0 | current-window |
 | docs/compatibility/targets/robot-attrition.md | current | 2026-07-07 | 85 | current-window |
 | docs/developer/api-versioning.md | current | 2026-08-26 | 35 | current-window |
 | docs/developer/canonicalization.md | current | 2026-08-26 | 35 | current-window |

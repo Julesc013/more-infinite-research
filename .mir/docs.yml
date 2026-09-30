@@ -1058,6 +1058,13 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/compatibility/targets/ric-marine-carbonisation-observation.md
+    title: "RIC Marine Carbonisation Development Observation"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/compatibility/targets/robot-attrition.md
     title: "Robot Attrition Compatibility"
     status: current
