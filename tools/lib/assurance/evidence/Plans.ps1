@@ -60,8 +60,16 @@ function Add-MIRAssurancePlanDecisions {
   . (Join-Path $repo "tools\lib\validation\ScenarioRegistry.ps1")
   $registry = Import-MIRScenarioRegistry -Path $scenarioRegistryPath -TargetProfile ([string]$Plan.target)
   $records = @($registry.records | Where-Object kind -ne "gate" | Sort-Object name)
+  # A smoke matrix may claim a scenario before runtime.full expands it. The
+  # expander keeps that first template when it deduplicates scenario IDs, so
+  # full coverage must count every selected scenario regardless of template.
+  $scenarioTests = if ($fullTests.Count -gt 0) {
+    @($decorated | Where-Object {
+      [string](Get-MIRAssuranceOptionalObjectValue -Object $_ -Name 'kind') -eq 'factorio-scenario'
+    })
+  } else { @($affectedTests + $fullTests) }
   $actualNames = @(
-    @($affectedTests + $fullTests) |
+    $scenarioTests |
       ForEach-Object { [string](Get-MIRAssuranceOptionalObjectValue -Object (Get-MIRAssuranceOptionalObjectValue -Object $_ -Name 'scenario') -Name 'name') } |
       Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
       Sort-Object -Unique

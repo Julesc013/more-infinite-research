@@ -834,6 +834,13 @@ if ([string]$a13FullPlan.impact_proposition_ledger.selection_mode -ne 'full-esca
     @($a13FullPlan.impact_proposition_ledger.omitted_unaffected).Count -ne 0) {
   throw 'A13 full escalation incorrectly made a scoped unaffected-omission claim.'
 }
+$a13MixedFull = & $a13NewPlan -Impact $a13FullImpact -Records $a13Records -TemplateId 'runtime.full'
+$a13MixedFull.tests[0].template_id = 'runtime.exact-zip'
+$null = Add-MIRAssurancePlanDecisions -Plan $a13MixedFull -Context $a13Context
+if ([string]$a13MixedFull.impact_proposition_ledger.selection_mode -ne 'full-escalation' -or
+    @($a13MixedFull.impact_proposition_ledger.selected).Count -ne $a13Records.Count) {
+  throw 'A13 full escalation lost a scenario deduplicated under an earlier smoke template.'
+}
 $a13FullProfilePlan = & $a13NewPlan -Impact $a13Impact -Records $a13Records -TemplateId 'runtime.full'
 $null = Add-MIRAssurancePlanDecisions -Plan $a13FullProfilePlan -Context $a13Context
 if ([string]$a13FullProfilePlan.impact_proposition_ledger.selection_mode -ne 'full-profile' -or
