@@ -749,10 +749,6 @@ end
 
 local function preserve_valid_queue(force, caps)
   local next_level = {}
-  for technology_name, _ in pairs(caps) do
-    local technology = force.technologies[technology_name]
-    if technology then next_level[technology_name] = technology.level end
-  end
 
   local prior_current = force.current_research
   local prior_current_name = prior_current and prior_current.name or nil
@@ -761,6 +757,10 @@ local function preserve_valid_queue(force, caps)
   for _, technology in ipairs(force.research_queue or {}) do
     local cap = caps[technology.name]
     local level = next_level[technology.name]
+    if cap and not level then
+      local current = force.technologies[technology.name]
+      level = current and current.level or nil
+    end
     if not cap or not level or level <= cap then
       table.insert(filtered, technology)
       if level then next_level[technology.name] = level + 1 end
@@ -802,15 +802,23 @@ local function restore_unowned_disable_continuity(technology, unowned_disabled_b
   end
 end
 
-local function normalize_force(force, managed, caps, transport_blocked, prior_managed)
+local function normalize_force(force, managed, caps, transport_blocked, prior_managed,
+    research_name)
   if not (force and force.valid) then return end
   local disabled_by_cap, visibility_by_cap, unowned_disabled_by_cap = force_cap_state(force)
   preserve_valid_queue(force, caps)
 
   local all_managed = {}
-  for technology_name, _ in pairs(managed) do all_managed[technology_name] = true end
-  for technology_name, _ in pairs(prior_managed or {}) do
-    all_managed[technology_name] = true
+  if research_name then
+    -- A research event changes this technology's level and the force queue.
+    -- Init, configuration, and force lifecycle events still reconcile every
+    -- current and formerly managed binding.
+    all_managed[research_name] = true
+  else
+    for technology_name, _ in pairs(managed) do all_managed[technology_name] = true end
+    for technology_name, _ in pairs(prior_managed or {}) do
+      all_managed[technology_name] = true
+    end
   end
   for technology_name, _ in pairs(all_managed) do
     local technology = force.technologies[technology_name]
@@ -937,13 +945,15 @@ local function normalize_event_force(event, research_only)
   if not force then return end
   local prior_managed = ensure_state().managed_technologies or {}
   local managed, caps, transport_blocked = current_policy()
+  local research_name
   if research_only then
-    local name = event and event.research and event.research.name
+    research_name = event and event.research and event.research.name
     -- An unrelated research event changes no MIR-managed level or cap. Its
     -- queue transition preserves the cap validity checked when queued.
-    if not name or (not managed[name] and not prior_managed[name]) then return end
+    if not research_name or (not managed[research_name]
+        and not prior_managed[research_name]) then return end
   end
-  normalize_force(force, managed, caps, transport_blocked, prior_managed)
+  normalize_force(force, managed, caps, transport_blocked, prior_managed, research_name)
   remember_managed(managed)
 end
 
