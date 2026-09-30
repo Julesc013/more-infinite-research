@@ -4439,10 +4439,10 @@
         "reason": "Shared staged material progression declaration for reviewed Bob/Angel streams."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 9765,
-      "source_sha256": "F7F3A6A51C8D00DF35E7DBF6B2201638C6C42EB599EC99E9533FB86DF0028EAF",
-      "output_bytes": 9765,
-      "output_sha256": "F7F3A6A51C8D00DF35E7DBF6B2201638C6C42EB599EC99E9533FB86DF0028EAF"
+      "source_bytes": 11291,
+      "source_sha256": "C599BF3C408DDF4F8BB202904C612CB1958E4C910BABD5F1C6944B8ECCDF8A34",
+      "output_bytes": 11291,
+      "output_sha256": "C599BF3C408DDF4F8BB202904C612CB1958E4C910BABD5F1C6944B8ECCDF8A34"
     },
     {
       "layer": "capability",
@@ -6447,10 +6447,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/streams/productivity.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 66761,
-      "source_sha256": "380BF4A13256521B02E17E80C00F8115458941A8A82EDAE5667191513E0AE04B",
-      "output_bytes": 66761,
-      "output_sha256": "380BF4A13256521B02E17E80C00F8115458941A8A82EDAE5667191513E0AE04B"
+      "source_bytes": 67414,
+      "source_sha256": "4B2F282A37B94A7554F6F45DEC4326335571589F7E65C31EEF48DDD69EDDE4DF",
+      "output_bytes": 67414,
+      "output_sha256": "4B2F282A37B94A7554F6F45DEC4326335571589F7E65C31EEF48DDD69EDDE4DF"
     },
     {
       "layer": "presentation",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "58A34CF904E8063655C570845FD45AE03DEA69693A0018E7FFE9064DDD61C636"
+  "record_sha256": "6A26BB7398085A67FCCEBFBBAC482A6CAC0E3AB992DE99C149E9D649DAB75ABD"
 }
