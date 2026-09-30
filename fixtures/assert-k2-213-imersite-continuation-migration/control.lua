@@ -35,17 +35,31 @@ local function queue_names(force)
   return names
 end
 
-local function assert_earned_effects()
+local function assert_recipe_effects()
   local force = game.forces.player
-  local legacy = force.technologies[legacy_name]
-  if not legacy or legacy.prototype.max_level ~= 3 or not legacy.researched then
-    fail("legacy Imersite levels 1-3 are not complete")
-  end
   local powder = force.recipes[powder_recipe]
   local crystal = force.recipes[crystal_recipe]
   if not powder or not crystal then fail("native K2 Imersite recipes are absent") end
   assert_close("legacy powder productivity", powder.productivity_bonus, 0.06)
   assert_close("native crystal productivity", crystal.productivity_bonus, 0.10)
+end
+
+local function assert_predecessor_effects()
+  local legacy = game.forces.player.technologies[legacy_name]
+  -- The pinned predecessor has an infinite prototype with a runtime cap of
+  -- three. Level four is its next (capped) level after three earned effects.
+  if not legacy or legacy.prototype.max_level < 4294967295 or legacy.level ~= 4 then
+    fail("predecessor Imersite levels 1-3 are not complete")
+  end
+  assert_recipe_effects()
+end
+
+local function assert_upgraded_earned_effects()
+  local legacy = game.forces.player.technologies[legacy_name]
+  if not legacy or legacy.prototype.max_level ~= 3 or not legacy.researched then
+    fail("finite legacy Imersite levels 1-3 were not retained")
+  end
+  assert_recipe_effects()
 end
 
 local function assert_stable_queue(stage)
@@ -74,12 +88,12 @@ local function assert_continuation(stage)
     if prerequisite.name == legacy_name then follows_legacy = true end
   end
   if not follows_legacy then fail("level-four continuation no longer follows the legacy technology") end
-  assert_earned_effects()
+  assert_upgraded_earned_effects()
 end
 
 local function assert_upgraded(stage)
   assert_profile()
-  assert_earned_effects()
+  assert_upgraded_earned_effects()
   assert_continuation(stage)
   assert_stable_queue(stage)
   local state = storage.mir_k2_213_imersite_migration
@@ -110,7 +124,13 @@ script.on_init(function()
   assert_profile()
   local force = game.forces.player
   force.research_all_technologies()
-  assert_earned_effects()
+  local legacy = force.technologies[legacy_name]
+  if not legacy or legacy.prototype.max_level < 4294967295 or legacy.level ~= 2 then
+    fail("predecessor initial Imersite level differs")
+  end
+  legacy.level = 4
+  force.reset_technology_effects()
+  assert_predecessor_effects()
   establish_stable_level_three_queue()
   storage.mir_k2_213_imersite_migration = {phase = "predecessor", progress = expected_progress}
   assert_stable_queue("predecessor")

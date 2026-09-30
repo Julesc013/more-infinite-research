@@ -110,11 +110,16 @@ function Initialize-K2MigrationStage([string]$Name,[string]$Version,[string]$Sta
     $entry = $dependency[0]
     $inputList += [ordered]@{source_path=[string]$entry.source_path;file_name=$fileName;expected_sha256=[string]$entry.sha256;role='dependency-mod';identity=[ordered]@{name=$expectedDependencies[$fileName][0];version=$expectedDependencies[$fileName][1]};provenance=[ordered]@{kind='pinned-k2-213-v5-observation-dependency-lock';v5_result_sha256=$v5ResultSha};immutable=$true}
   }
-  $inputList += [ordered]@{source_path=$v5SettingsPath;file_name='mod-settings.dat';expected_sha256=$v5SettingsSha;role='startup-settings';identity=[ordered]@{profile='exact-k2-213-v5-observation-profile'};provenance=[ordered]@{kind='pinned-k2-213-v5-observation-settings';v5_result_sha256=$v5ResultSha};immutable=$true}
   $candidatePath = if ($Name -ceq 'predecessor') { $oldCandidate } else { $newCandidate }
   $candidateHash = if ($Name -ceq 'predecessor') { $oldCandidateSha } else { $newCandidateSha }
   $inputList += [ordered]@{source_path=$candidatePath;file_name=$candidateName;expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21000';role=$Name};provenance=[ordered]@{kind='pinned-K2-Imersite-migration-candidate';sha256=$candidateHash};immutable=$true}
   $lease = New-MIRImmutableInputLease -RunRoot $StageDirectory -StageDirectory $mods -Inputs $inputList
+  # Factorio writes mod-settings.dat during load. Copy the pinned initial
+  # profile as writable stage state; never hardlink or mark it immutable.
+  $stagedSettings = Join-Path $mods 'mod-settings.dat'
+  Copy-Item -LiteralPath $v5SettingsPath -Destination $stagedSettings
+  (Get-Item -LiteralPath $stagedSettings).IsReadOnly = $false
+  Assert-K2Migration ((Get-K2MigrationSha $stagedSettings) -ceq $v5SettingsSha) "staged-mod-settings-sha256:$Name"
   $null = Publish-K2MigrationFixture -Version $Version -ModsDir $mods -RunRoot $RunRoot
   $enabled = @('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','xy-k2so-enhancements-nulls-fork','mir-validation-settings-overrides','more-infinite-research',$fixtureName)
   Write-MIRModList -ModsDir $mods -EnabledMods $enabled
@@ -253,7 +258,7 @@ try {
     v5_observation=[ordered]@{result=Get-K2MigrationArtifact $v5Path -External;result_sha256=$v5ResultSha;old_candidate_sha256=[string]$v5.candidate.sha256;observation_save=Get-K2MigrationArtifact $v5SavePath -External;observation_save_sha256=$v5SaveSha;role='exact-engine-and-dependency-lock-only-not-progressed-save'}
     engine=[ordered]@{path=(Get-K2MigrationIdentity $engine -External).path;path_kind='external-input-file';product_version='2.1.20';sha256=$engineSha;runtime_api_sha256=$runtimeApiSha}
     fixture=[ordered]@{path=$fixtureRelative;info=Get-K2MigrationArtifact (Join-Path $fixtureRoot 'info.json');control=Get-K2MigrationArtifact (Join-Path $fixtureRoot 'control.lua');source_version='0.1.0';upgrade_version='0.1.1'}
-    dependency_count=$dependencyInputs.Count;predecessor_input_lease=$oldTerminal;current_input_lease=$newTerminal
+    dependency_count=$dependencyInputs.Count;startup_settings=[ordered]@{source=Get-K2MigrationArtifact $v5SettingsPath;initial_sha256=$v5SettingsSha;staged_as_writable=$true};predecessor_input_lease=$oldTerminal;current_input_lease=$newTerminal
     oracle=[ordered]@{legacy_levels='1-3-complete';powder_productivity_bonus=0.06;native_crystal_productivity_bonus=0.10;continuation_identity='recipe-prod-research_material_imersite-4';continuation_level=4;continuation_available=$true;stable_research='recipe-prod-research_copper-1';stable_level=3;fractional_progress=0.42;source_save_byte_identical_after_upgrade=$true;current_candidate_reload_passed=$true}
     saves=[ordered]@{predecessor=[ordered]@{artifact=Get-K2MigrationArtifact $oldSave;sha256_before_upgrade=$oldSaveShaBefore;sha256_after_upgrade=Get-K2MigrationSha $oldSave};upgraded=Get-K2MigrationArtifact $newSave}
     logs=[ordered]@{predecessor_create=Get-K2MigrationArtifact ([string]$oldLoad.factorio_log);upgrade=Get-K2MigrationArtifact $upgradeLog}
