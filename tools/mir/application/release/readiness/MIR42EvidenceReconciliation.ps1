@@ -321,6 +321,15 @@ function Get-MIR42QualificationPredecessor {
   }
 }
 
+function Test-MIR42QualificationHistoricalFileVersion {
+  param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$AuthorityVersion,[AllowEmptyString()][string]$ObservedVersion)
+  if ($AuthorityVersion -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') { return $false }
+  # The pinned 0.13 executable has no Windows FileVersion resource. Its exact
+  # binary hash remains mandatory; later engines expose a four-part version.
+  if ($Target -ceq 'f013') { return $ObservedVersion -ceq '' }
+  return $ObservedVersion -cmatch ('^' + [regex]::Escape($AuthorityVersion) + '\.[0-9]+$')
+}
+
 function Get-MIR42QualificationEnvironment {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)]$Receipt)
 
@@ -331,12 +340,15 @@ function Get-MIR42QualificationEnvironment {
   }
   if ($Target -in $script:MIR42QualificationHistoricalTargets) {
     $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $Target
-    if ([string]$receiptVersion -cne [string]$historical.record.engine.version -or [string]$receiptSha -cne [string]$historical.record.engine.sha256) {
+    if (-not (Test-MIR42QualificationHistoricalFileVersion -Target $Target -AuthorityVersion ([string]$historical.record.engine.version) -ObservedVersion $receiptVersion) -or
+        [string]$receiptSha -cne [string]$historical.record.engine.sha256) {
       throw "[mir42-qualification-environment-historical] $Target"
     }
     return [pscustomobject][ordered]@{
       factorio_line = [string]$historical.record.factorio_line
-      version = $receiptVersion
+      version = [string]$historical.record.engine.version
+      observed_file_version = $receiptVersion
+      version_authority = 'historical-target-record'
       binary_sha256 = $receiptSha
       policy = [pscustomobject][ordered]@{
         target_record = [pscustomobject][ordered]@{path=[string]$historical.identity.target_record_path;sha256=[string]$historical.record.record_sha256}

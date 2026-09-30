@@ -89,7 +89,10 @@ function Get-MIR42IndependentEngine {
     $path = [string]$historical.record.engine.path
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir42-independent-engine-missing] $Target" }
     $actualHash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()
+    $observedFileVersion = [string][Diagnostics.FileVersionInfo]::GetVersionInfo($path).FileVersion
     if ([string]$Qualified.environment.binary_sha256 -cne $actualHash -or [string]$Qualified.environment.version -cne [string]$historical.record.engine.version -or
+        [string]$Qualified.environment.observed_file_version -cne $observedFileVersion -or
+        [string]$Qualified.environment.version_authority -cne 'historical-target-record' -or
         $actualHash -cne [string]$historical.record.engine.sha256) {
       throw "[mir42-independent-engine-identity] $Target"
     }

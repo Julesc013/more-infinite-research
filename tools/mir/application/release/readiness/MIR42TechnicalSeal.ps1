@@ -965,8 +965,29 @@ function Assert-MIR42FreshEngineLoads {
     }
     try { $summary = Get-Content -Raw -LiteralPath ([string]$fresh.receipt.path) | ConvertFrom-Json -Depth 100 -DateKind String }
     catch { throw "[mir42-seal-real-engine-fresh-load-receipt-json] $targetId/$([string]$fresh.scenario)" }
-    $scenarioRows = @($summary.scenarios)
-    if ([int]$summary.schema -ne 2 -or
+    if ($targetId -in $script:MIR42SealHistoricalTargets) {
+      $required = @('exact-engine','exact-candidate','fresh-save-created','exact-mod-loaded','map-created','healthy-log')
+      if ([int]$summary.schema -ne 1 -or [string]$summary.kind -cne 'MIR42HistoricalFreshLoadV1' -or
+          [string]$summary.status -cne 'passed' -or [string]$summary.target -cne $targetId -or
+          [string]$summary.source_commit -cne [string]$CandidateTarget.source.commit -or
+          [string]$summary.factorio_line -cne ([string]$Target.target_id -replace '^factorio-', '') -or
+          [string]$summary.engine.path -cne [string]$Execution.executable_path -or
+          [string]$summary.engine.sha256 -cne [string]$Execution.executable_sha256 -or
+          [string]$summary.candidate.sha256 -cne [string]$Target.archive.sha256 -or
+          [string]$summary.candidate.version -cne [string]$Target.distribution_version -or
+          [string]$summary.staged_candidate_sha256 -cne [string]$Target.archive.sha256 -or
+          [string]$summary.log.sha256 -cne [string]$fresh.log.sha256 -or
+          [string]$summary.log.path -cne [string]$fresh.log.path -or
+          @($summary.assertions).Count -ne $required.Count -or
+          (@($summary.assertions | ForEach-Object { [string]$_ }) -join '|') -cne ($required -join '|') -or
+          -not (Test-MIR4BootstrapRecordHash -Record $summary)) {
+        throw "[mir42-seal-real-engine-fresh-load-binding] $targetId/$([string]$fresh.scenario)"
+      }
+      $null = Resolve-MIR42SealImmutableFile -Path ([string]$summary.save.path) -Sha256 ([string]$summary.save.sha256) -Code 'mir42-seal-historical-fresh-save'
+      $null = Resolve-MIR42SealImmutableFile -Path ([string]$summary.candidate.path) -Sha256 ([string]$summary.candidate.sha256) -Code 'mir42-seal-historical-fresh-candidate'
+    } else {
+      $scenarioRows = @($summary.scenarios)
+      if ([int]$summary.schema -ne 2 -or
         [string]$summary.status -cne 'passed' -or
         [string]$summary.git_commit -cne [string]$CandidateTarget.source.commit -or
         [string]$summary.validation_package_sha256 -cne [string]$Target.archive.sha256 -or
@@ -978,10 +999,16 @@ function Assert-MIR42FreshEngineLoads {
         [string]$scenarioRows[0].name -cne [string]$fresh.scenario -or
         [string]$scenarioRows[0].status -cne 'passed' -or
         [int]$scenarioRows[0].assertions_executed -le 0) {
-      throw "[mir42-seal-real-engine-fresh-load-binding] $targetId/$([string]$fresh.scenario)"
+        throw "[mir42-seal-real-engine-fresh-load-binding] $targetId/$([string]$fresh.scenario)"
+      }
     }
     $logText = Get-Content -Raw -LiteralPath ([string]$fresh.log.path)
-    if (-not $logText.Contains("Loading mod more-infinite-research $([string]$Target.distribution_version)") -or
+    $logModVersion = [string]$Target.distribution_version
+    if ($targetId -in $script:MIR42SealHistoricalTargets) {
+      if ($logModVersion -notmatch '^4[.]2[.]([0-9]+)$') { throw "[mir42-seal-historical-distribution-version] $targetId" }
+      $logModVersion = '4.2.' + [int]$Matches[1]
+    }
+    if (-not $logText.Contains("Loading mod more-infinite-research $logModVersion ") -or
         -not $logText.Contains('Factorio initialised') -or -not $logText.Contains('Creating new map')) {
       throw "[mir42-seal-real-engine-fresh-load-log-marker] $targetId/$([string]$fresh.scenario)"
     }

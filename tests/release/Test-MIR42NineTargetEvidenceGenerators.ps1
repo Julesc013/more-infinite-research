@@ -104,6 +104,11 @@ foreach ($target in $script:MIR42QualificationHistoricalTargets) {
   Assert-MIR42NineGeneratorTest -Condition (-not [bool]$authority.record.public_output_authorized -and -not [bool]$authority.record.publication_authorized) -Code "private-$target"
   Assert-MIR42NineGeneratorTest -Condition ([string]$authority.seal.engine.version -ceq [string]$authority.record.engine.version -and [string]$authority.seal.engine.binary_sha256 -ceq [string]$authority.record.engine.sha256) -Code "engine-binding-$target"
 }
+Assert-MIR42NineGeneratorTest -Condition (Test-MIR42QualificationHistoricalFileVersion -Target f017 -AuthorityVersion '0.17.79' -ObservedVersion '0.17.79.47865') -Code 'historical-four-part-file-version'
+Assert-MIR42NineGeneratorTest -Condition (Test-MIR42QualificationHistoricalFileVersion -Target f013 -AuthorityVersion '0.13.20' -ObservedVersion '') -Code 'historical-013-absent-file-version'
+Assert-MIR42NineGeneratorTest -Condition (-not (Test-MIR42QualificationHistoricalFileVersion -Target f017 -AuthorityVersion '0.17.79' -ObservedVersion '0.17.80.47865')) -Code 'historical-different-release-rejected'
+Assert-MIR42NineGeneratorTest -Condition (-not (Test-MIR42QualificationHistoricalFileVersion -Target f017 -AuthorityVersion '0.17.79' -ObservedVersion '')) -Code 'historical-unexpected-missing-file-version-rejected'
+Assert-MIR42NineGeneratorTest -Condition (-not (Test-MIR42QualificationHistoricalFileVersion -Target f013 -AuthorityVersion '0.13.20' -ObservedVersion '0.13.20.1')) -Code 'historical-013-unexpected-file-version-rejected'
 Assert-MIR42NineGeneratorHistoricalArchiveRequired -RepoRoot $repo -Target 'f017'
 
 $fourCommand = Get-Command Invoke-MIR42FourTargetEvidenceReconciliation -CommandType Function
