@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-k2-213-forward-path-observation",
+  "version": "0.1.1",
+  "title": "Private MIR K2 2.1.3 forward path observation",
+  "author": "MIR",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.20",
+    "Krastorio2 = 2.1.3",
+    "Krastorio2-spaced-out = 2.0.13",
+    "more-infinite-research = 4.2.21000"
+  ]
+}
