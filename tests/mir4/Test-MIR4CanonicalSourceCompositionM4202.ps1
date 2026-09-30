@@ -57,7 +57,14 @@ Assert-MIR4ComposableSource ([string]$receipt.predecessor_proof.implementation-c
 $migratedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
 $introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
 $historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
-Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq372-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq372-and$migratedBindings.Count-eq359-and@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-eq359-and$introducedBindings.Count-eq13-and$historicalBindings.Count-eq12-and@($historicalBindings.source_path|Where-Object{$_-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-eq0) 'mir4-composable-source-cardinality'
+$currentIntroductions=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-cne'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'}|ForEach-Object source_path|Sort-Object -Unique)
+$expectedCurrentIntroductions=@(
+  'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'
+  'source/prototypes/mir/families/material_progression.lua'
+  'source/prototypes/mir/planner/stream_compiler/material_continuation.lua'
+  'source/prototypes/mir/runtime/effects/passive_repair.lua'
+)
+Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq375-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq375-and$migratedBindings.Count-eq359-and@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-eq359-and$introducedBindings.Count-eq16-and$historicalBindings.Count-eq12-and@($historicalBindings.source_path|Where-Object{$_-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-eq0-and($currentIntroductions-join"`n")-ceq($expectedCurrentIntroductions-join"`n")) 'mir4-composable-source-cardinality'
 
 # publication.lua executes target-line capability decisions after module load.
 # Keep its dependency explicit and prove every target composition closes over the
@@ -115,5 +122,12 @@ Assert-MIR4ComposableSource ([string]$convergence.status-ceq'passed-static-sourc
 $proof=Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/composable-source-layout-current.json'
 Assert-MIR4ComposableSource (@($proof.targets).Count-eq4-and@($proof.targets|Where-Object{-not[bool]$_.deterministic_archive_bytes}).Count-eq0) 'mir4-composable-source-current-determinism'
 $currentPresentation=Read-MIR4ComposableSourceJson 'spec/distribution/mir4-current-package-presentation-v7.json'
-foreach($target in @('f210','f200','f110','f100')){$row=@($proof.targets|Where-Object target -ceq $target);$expected=@($currentPresentation.target_content_identities|Where-Object target -ceq $target);Assert-MIR4ComposableSource ($row.Count-eq1-and$expected.Count-eq1-and[string]$row[0].content_sha256-ceq[string]$expected[0].content_sha256-and[int]$row[0].entry_count-eq[int]$expected[0].entry_count) 'mir4-composable-source-reviewed-semantic-identity'}
+Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $currentPresentation) 'mir4-composable-source-historical-presentation-self-hash'
+foreach($target in @('f210','f200','f110','f100')){
+  $row=@($proof.targets|Where-Object target -ceq $target)
+  $historical=@($currentPresentation.target_content_identities|Where-Object target -ceq $target)
+  # V7 is a pinned September 21 presentation, not an assertion that later
+  # development packages retain those bytes after reviewed product changes.
+  Assert-MIR4ComposableSource ($row.Count-eq1-and$historical.Count-eq1-and[string]$historical[0].content_sha256-match'^[0-9A-F]{64}$'-and[int]$historical[0].entry_count-gt0-and[string]$row[0].content_sha256-match'^[0-9A-F]{64}$'-and[int]$row[0].entry_count-gt0) 'mir4-composable-source-historical-and-current-identities'
+}
 [pscustomobject][ordered]@{status='passed';test_id='static.mir4-composable-source-layout-v1';bindings=@($manifest.bindings).Count;physical_sources=$physical.Count;deduplicated_bindings=(@($manifest.bindings).Count-$physical.Count);targets=@($proof.targets).Count;factorio_1_historical_pairs=[int]$convergence.historical_characterization.factorio_one_pair_count;factorio_1_exact_engine_proof_required=$true;release_authority=$false}|ConvertTo-Json -Depth 10
