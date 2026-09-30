@@ -5,6 +5,7 @@ param(
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot='C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-ba-20260930',
   [string]$OutputRoot='ba-final',
+  [string]$RecoverRunRoot='',
   [switch]$PrepareOnly
 )
 $ErrorActionPreference='Stop'
@@ -136,6 +137,7 @@ Assert-Observer ((Get-ObserverSha $engine) -ceq [string]$stageReceipt.engine_sha
 $version=(& $engine --version | Out-String)
 Assert-Observer ($LASTEXITCODE -eq 0 -and $version -match 'Version:\s+2[.]1[.]20') 'requires Factorio 2.1.20.'
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
+if(-not $RecoverRunRoot){
 $run=Join-Path $output ([guid]::NewGuid().ToString('N'));$mods=Join-Path $run 'mods';$userdata=Join-Path $run 'userdata';New-Item -ItemType Directory -Force -Path $mods,$userdata|Out-Null
 Copy-MIRFileWithHardlinkFallback -Source $candidateZip -Destination (Join-Path $mods ([IO.Path]::GetFileName($candidateZip)))
 foreach($archiveName in $expectedArchives.Keys){Copy-MIRFileWithHardlinkFallback -Source (Join-Path $stage (Join-Path 'mods' $archiveName)) -Destination (Join-Path $mods $archiveName)}
@@ -147,6 +149,18 @@ $start=[Diagnostics.ProcessStartInfo]::new($engine);$start.UseShellExecute=$fals
 foreach($argument in @('--config',(Join-Path $run 'config.ini'),'--no-log-rotation','--disable-audio','--mod-directory',$mods,'--create',(Join-Path $run 'observer.zip'))){[void]$start.ArgumentList.Add($argument)}
 $process=[Diagnostics.Process]::Start($start)
 try{$stdout=$process.StandardOutput.ReadToEndAsync();$stderr=$process.StandardError.ReadToEndAsync();if(-not $process.WaitForExit(180000)){$process.Kill($true);throw "observer engine timed out: $run"};$engineText=$stdout.GetAwaiter().GetResult()+$stderr.GetAwaiter().GetResult();[IO.File]::WriteAllText((Join-Path $run 'engine.log'),$engineText,[Text.UTF8Encoding]::new($false));if($process.ExitCode -ne 0){throw "observer engine failed: $run`n$($engineText.Substring([Math]::Max(0,$engineText.Length-2500)))"}}finally{$process.Dispose()}
+}else{
+  $run=(Resolve-Path -LiteralPath $RecoverRunRoot).Path
+  Assert-Observer $run.StartsWith($output+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) 'recovery run must remain under the selected output root.'
+  Assert-Observer (-not ((Get-Item -LiteralPath $run -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) 'recovery run may not be a reparse point.'
+  $mods=Join-Path $run 'mods';$userdata=Join-Path $run 'userdata'
+  $stagedCandidate=Join-Path $mods ([IO.Path]::GetFileName($candidateZip))
+  Assert-Observer ((Test-Path -LiteralPath $stagedCandidate -PathType Leaf) -and (Get-ObserverSha $stagedCandidate) -ceq $prepared.candidate.sha256) 'recovery candidate does not match current source materialization.'
+  foreach($archiveName in $expectedArchives.Keys){$path=Join-Path $mods $archiveName;Assert-Observer ((Test-Path -LiteralPath $path -PathType Leaf) -and (Get-ObserverSha $path) -ceq $expectedArchives[$archiveName]) "recovery dependency differs: $archiveName"}
+  Assert-Observer (Test-Path -LiteralPath (Join-Path $run 'observer.zip') -PathType Leaf) 'recovery save is absent.'
+  Assert-Observer (Test-Path -LiteralPath (Join-Path $run 'engine.log') -PathType Leaf) 'recovery engine log is absent.'
+  $prepared.candidate=Get-ObserverArtifact $stagedCandidate
+}
 $factorioLog=Join-Path $userdata 'factorio-current.log';Assert-Observer (Test-Path -LiteralPath $factorioLog -PathType Leaf) 'Factorio log absent.'
 $logText=Get-Content -LiteralPath $factorioLog -Raw
 Assert-Observer ($logText.Contains('[mir-f210-current-ba-final-observer] RUNTIME PASS observer-has-no-gameplay-mutation')) 'runtime completion marker absent.'
@@ -165,4 +179,4 @@ foreach($match in [regex]::Matches($logText,'\[mir-f210-current-ba-final-observe
 for($index=0;$index -lt $goldEdges.Count;$index++){$edge=$goldEdges[$index];Assert-Observer ($edge.step -eq ($index+1) -and $edge.count -eq $goldEdges.Count) 'Gold return-path step sequence differs.';if($index -gt 0){Assert-Observer ($goldEdges[$index-1].to -ceq $edge.from) 'Gold return-path edge identities are disconnected.'};Assert-Observer $goldBindings.ContainsKey([string]$edge.recipe) "Gold path recipe binding absent: $($edge.recipe)";$edge['owners']=$goldBindings[[string]$edge.recipe].owners;$edge['unlocks']=$goldBindings[[string]$edge.recipe].unlocks}
 $routes=@([regex]::Matches($logText,'\[mir-f210-current-ba-final-observer\] ROUTE recipe=(?<recipe>[^\s]+) .* status=(?<status>present|missing)')|ForEach-Object{[ordered]@{recipe=$_.Groups['recipe'].Value;status=$_.Groups['status'].Value}})
 Assert-Observer ($routes.Count -eq 22) "expected 22 candidate route records; got $($routes.Count)."
-$result=$prepared.Clone();$result.status='observed';$result.engine=[ordered]@{version=([regex]::Match($version,'Version:\s+[^\r\n]+').Value).Trim();executable_sha256=Get-ObserverSha $engine};$result.run_root=$run;$result.route_records=$routes;$result.gold_return_path=[ordered]@{target='angels-liquid-molten-gold';start='item:bob-gold-plate';edge_count=$goldEdges.Count;edges=$goldEdges};$result.summary=[ordered]@{observed=[int]$summary.Groups['observed'].Value;missing=[int]$summary.Groups['missing'].Value;science_frontier_packs=[int]$frontier.Groups['packs'].Value;science_frontier_early_present=[int]$frontier.Groups['early'].Value};$result.logs=[ordered]@{engine=Get-ObserverArtifact (Join-Path $run 'engine.log');factorio=Get-ObserverArtifact $factorioLog};$result|ConvertTo-Json -Depth 16|Set-Content -LiteralPath (Join-Path $run 'result.json') -Encoding utf8;$result|ConvertTo-Json -Depth 16;Write-Output "Evidence: $run"
+$result=[ordered]@{};foreach($key in $prepared.Keys){$result[$key]=$prepared[$key]};$result.status='observed';$result.engine=[ordered]@{version=([regex]::Match($version,'Version:\s+[^\r\n]+').Value).Trim();executable_sha256=Get-ObserverSha $engine};$result.run_root=$run;$result.recovered_from_completed_engine_run=[bool]$RecoverRunRoot;$result.route_records=$routes;$result.gold_return_path=[ordered]@{target='angels-liquid-molten-gold';start='item:bob-gold-plate';edge_count=$goldEdges.Count;edges=$goldEdges};$result.summary=[ordered]@{observed=[int]$summary.Groups['observed'].Value;missing=[int]$summary.Groups['missing'].Value;science_frontier_packs=[int]$frontier.Groups['packs'].Value;science_frontier_early_present=[int]$frontier.Groups['early'].Value};$result.logs=[ordered]@{engine=Get-ObserverArtifact (Join-Path $run 'engine.log');factorio=Get-ObserverArtifact $factorioLog};$result|ConvertTo-Json -Depth 16|Set-Content -LiteralPath (Join-Path $run 'result.json') -Encoding utf8;$result|ConvertTo-Json -Depth 16;Write-Output "Evidence: $run"
