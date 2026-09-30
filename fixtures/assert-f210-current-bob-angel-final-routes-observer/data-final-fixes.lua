@@ -290,6 +290,119 @@ local function observe_hidden_output_consumers(output_targets, index)
   end
 end
 
+-- The ordinary route guard intentionally reports only the first returned
+-- ingredient name. Capture a deterministic recipe-by-recipe witness for the
+-- current Gold candidate so a later review can distinguish a playable route
+-- from a path that exists only through disabled or recovery recipes. This
+-- mirrors material_graph's name-edge semantics and its bounded search.
+local function observe_gold_return_path(index, input)
+  local start_name, target_name = "bob-gold-plate", "angels-liquid-molten-gold"
+  local adjacency, unique_name_edges, edge_count = {}, {}, 0
+  local gold_route = recipe_facts.view("angels-plate-gold")
+  local admitted, reason = recipe_matching.material_route_is_acyclic(gold_route)
+  if admitted or reason ~= "potential-return-path:" .. target_name then
+    error("Gold route safety endpoint changed: " .. tostring(reason))
+  end
+  local recipe_names = {}
+  for name in pairs(index.facts or {}) do recipe_names[#recipe_names + 1] = name end
+  table.sort(recipe_names)
+
+  for _, recipe_name in ipairs(recipe_names) do
+    local fact = index.facts[recipe_name]
+    for variant_index, variant in ipairs(fact.variants or {}) do
+      for input_index, ingredient in ipairs(variant.ingredients or {}) do
+        if type(ingredient.name) == "string" and ingredient.name ~= "" then
+          adjacency[ingredient.name] = adjacency[ingredient.name] or {}
+          for result_index, result in ipairs(variant.results or {}) do
+            if type(result.name) == "string" and result.name ~= "" then
+              local pair_key = ingredient.name .. "\30" .. result.name
+              if not unique_name_edges[pair_key] then
+                unique_name_edges[pair_key] = true
+                edge_count = edge_count + 1
+                if edge_count > 100000 then error("Gold return-path witness exceeded material graph edge budget") end
+              end
+              adjacency[ingredient.name][#adjacency[ingredient.name] + 1] = {
+                from_name = ingredient.name,
+                to_name = result.name,
+                recipe_name = recipe_name,
+                variant_index = variant_index,
+                input_index = input_index,
+                result_index = result_index,
+                ingredient = ingredient,
+                result = result,
+                fact = fact,
+                variant = variant
+              }
+            end
+          end
+        end
+      end
+    end
+  end
+
+  -- material_graph() bounds the distinct untyped name edges, while retaining
+  -- every edge in the witness adjacency so provenance stays deterministic.
+  local function edge_key(edge)
+    return table.concat({edge.recipe_name, tostring(edge.variant_index), edge.from_name,
+      tostring(edge.ingredient.type or ""), edge.to_name, tostring(edge.result.type or ""),
+      tostring(edge.input_index), tostring(edge.result_index)}, "\30")
+  end
+  for _, edges in pairs(adjacency) do
+    table.sort(edges, function(left, right) return edge_key(left) < edge_key(right) end)
+  end
+
+  local queue, head, visited, predecessor = {start_name}, 1, {[start_name] = true}, {}
+  while head <= #queue and not visited[target_name] do
+    if head > 30000 then error("Gold return-path witness exceeded material search budget") end
+    local current = queue[head]
+    head = head + 1
+    for _, edge in ipairs(adjacency[current] or {}) do
+      if not visited[edge.to_name] then
+        visited[edge.to_name] = true
+        predecessor[edge.to_name] = edge
+        queue[#queue + 1] = edge.to_name
+      end
+    end
+  end
+  if not visited[target_name] then
+    error("Gold return-path witness no longer reaches " .. target_name .. " from " .. start_name)
+  end
+
+  local path, cursor = {}, target_name
+  while cursor ~= start_name do
+    local edge = predecessor[cursor]
+    if not edge then error("Gold return-path witness predecessor chain is incomplete") end
+    path[#path + 1] = edge
+    cursor = edge.from_name
+    if #path > 30000 then error("Gold return-path witness reconstruction exceeded search budget") end
+  end
+  local ordered = {}
+  for index_in_path = #path, 1, -1 do ordered[#ordered + 1] = path[index_in_path] end
+
+  log("[mir-f210-current-ba-final-observer] RETURN_PATH target=" .. target_name
+    .. " start=item:" .. start_name .. " status=witnessed edges=" .. tostring(#ordered))
+  for ordinal, edge in ipairs(ordered) do
+    local fact, variant = edge.fact, edge.variant
+    log("[mir-f210-current-ba-final-observer] RETURN_PATH_EDGE target=" .. target_name
+      .. " step=" .. tostring(ordinal) .. "/" .. tostring(#ordered)
+      .. " from=" .. identity(edge.ingredient)
+      .. " to=" .. identity(edge.result)
+      .. " recipe=" .. edge.recipe_name
+      .. " variant=" .. tostring(edge.variant_index)
+      .. " source=" .. scalar(fact.source_class)
+      .. " hidden=" .. scalar(fact.hidden)
+      .. " enabled_without_research=" .. scalar(fact.enabled_without_research)
+      .. " variant_hidden=" .. scalar(variant.hidden)
+      .. " variant_enabled=" .. scalar(variant.enabled)
+      .. " productivity=" .. scalar(fact.effective_allow_productivity)
+      .. " declared_productivity=" .. scalar(fact.declared_allow_productivity)
+      .. " variant_productivity=" .. scalar(variant.effective_allow_productivity)
+      .. " inputs=" .. entry_line(variant.ingredients)
+      .. " results=" .. entry_line(variant.results))
+    observe_bindings(edge.recipe_name, input)
+  end
+end
+
 log("[mir-f210-current-ba-final-observer] ACTIVE_MODS " .. active_mods_line())
 compiler_context.with_active(compiler_context.new(), function()
   local index = recipe_facts.index_view()
@@ -331,6 +444,7 @@ compiler_context.with_active(compiler_context.new(), function()
     end
   end
   observe_hidden_output_consumers(output_targets, index)
+  observe_gold_return_path(index, input)
   observe_science_frontier()
   log("[mir-f210-current-ba-final-observer] DATA PASS read-only-finalized-contract-capture"
     .. " candidates=" .. tostring(#CANDIDATES)
