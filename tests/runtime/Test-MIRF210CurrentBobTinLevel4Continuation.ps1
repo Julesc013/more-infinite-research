@@ -5,7 +5,8 @@ param(
   [string]$FactorioBin = 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot = 'C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-bob-20260930',
   [string]$OutputRoot = 'build/tests/f210-bob-tin-level4',
-  [switch]$PrepareOnly
+  [switch]$PrepareOnly,
+  [string]$RecoverRun = ''
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -162,6 +163,84 @@ foreach ($entry in $expectedArchives.GetEnumerator()) {
 $stageSettings = Join-Path $stageMods 'mod-settings.dat'
 Assert-Tin (Test-Path -LiteralPath $stageSettings -PathType Leaf) 'retained Bob settings are absent'
 Assert-Tin ((Get-TinSha $stageSettings) -ceq $expectedSettingsSha) 'retained Bob settings bytes differ'
+
+if (-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
+  $run = (Resolve-Path -LiteralPath $RecoverRun).Path
+  $outputPrefix = $output.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  Assert-Tin ($run.StartsWith($outputPrefix, [StringComparison]::OrdinalIgnoreCase)) 'recovery run escapes output root'
+  $leasePath = Join-Path $run 'mir-immutable-input-lease.json'
+  $lease = Get-Content -Raw -LiteralPath $leasePath | ConvertFrom-Json -ErrorAction Stop
+  Assert-Tin ([string]$lease.state -ceq 'completed' -and [string]$lease.outcome -ceq 'passed' -and [bool]$lease.inputs_sha256_match) 'recovery run immutable inputs are not terminal and clean'
+  $candidateInput = @($lease.inputs | Where-Object { $_.role -ceq 'candidate' })
+  Assert-Tin ($candidateInput.Count -eq 1) 'recovery candidate cardinality differs'
+  $candidatePath = [string]$candidateInput[0].stage_path
+  Assert-Tin (Test-Path -LiteralPath $candidatePath -PathType Leaf) 'recovery candidate archive is absent'
+  Assert-Tin ((Get-TinSha $candidatePath) -ceq [string]$candidateInput[0].expected_sha256) 'recovery candidate archive bytes differ'
+  $sourceCommit = [string]$candidateInput[0].provenance.source_commit
+  $sourceTree = [string]$candidateInput[0].provenance.source_tree
+  Assert-Tin ($sourceCommit -match '^[0-9a-f]{40}$' -and $sourceTree -match '^[0-9a-f]{40}$') 'recovery source identity is invalid'
+  $freshLogPath = Join-Path $run 'f210-current-bob-tin-level4.factorio.log'
+  $reloadLogPath = Join-Path $run 'f210-current-bob-tin-level4.reload.factorio.log'
+  $freshLog = [IO.File]::ReadAllText($freshLogPath)
+  $reloadLog = [IO.File]::ReadAllText($reloadLogPath)
+  $dataMarker = '[mir-f210-current-bob-tin-level4] DATA PASS early=recipe-prod-research_material_tin-1:1:3 continuation=recipe-prod-research_material_tin-4:4:infinite prerequisite=true'
+  $createMarker = '[mir-f210-current-bob-tin-level4] CREATE PASS legacy-levels=3 continuation-start=4 continuation-next=5 bonus-before=0.06 bonus-after=0.08 research-action=add_research-to-level-and-finite-researched science-lab=accepted'
+  $reloadMarker = '[mir-f210-current-bob-tin-level4] RELOAD PASS continuation-next=5 output=108 bonus=0.08 continuity=true'
+  Assert-Tin ($freshLog.Contains($dataMarker, [StringComparison]::Ordinal) -and $freshLog.Contains($createMarker, [StringComparison]::Ordinal)) 'recovery fresh create markers differ'
+  Assert-Tin ($reloadLog.Contains($dataMarker, [StringComparison]::Ordinal) -and $reloadLog.Contains($reloadMarker, [StringComparison]::Ordinal)) 'recovery reload markers differ'
+  foreach ($log in @($freshLog, $reloadLog)) {
+    Assert-Tin (-not $log.Contains('Error while running event', [StringComparison]::Ordinal) -and $log.Contains('Goodbye', [StringComparison]::Ordinal)) 'recovery Factorio lifecycle differs'
+  }
+  $save = Join-Path $run 'saves/f210-current-bob-tin-level4.zip'
+  Assert-Tin (Test-Path -LiteralPath $save -PathType Leaf) 'recovery create save is absent'
+  $saveSha = Get-TinSha $save
+  $fixtureArchive = Join-Path $run ('mods/' + $fixtureName + '_' + $fixtureVersion + '.zip')
+  $result = [ordered]@{
+    schema = 1
+    kind = 'MIR4F210CurrentBobTinLevelFourContinuationV1'
+    status = 'passed-recovered'
+    scope = [string]$dossier.scope
+    source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree; candidate_sha256 = [string]$candidateInput[0].expected_sha256 }
+    exact_stage = [ordered]@{ path = $stage; engine_sha256 = $expectedEngineSha; settings_sha256 = $expectedSettingsSha; archives = $expectedArchives }
+    recovery = [ordered]@{
+      reason = 'The immutable input lease completed after the engine passed, but the initiating terminal session returned before result.json was constructed.'
+      run_root = Get-TinRelative $repo $run
+      lease_terminal_record_sha256 = [string]$lease.terminal_record_sha256
+      inputs_sha256_match = [bool]$lease.inputs_sha256_match
+    }
+    candidate = Get-TinArtifact $repo $candidatePath
+    fixture_archive = Get-TinArtifact $repo $fixtureArchive
+    fresh_create = [ordered]@{
+      passed = $true
+      save = Get-TinArtifact $repo $save
+      factorio_log = Get-TinArtifact $repo $freshLogPath
+      stdout = Get-TinArtifact $repo (Join-Path $run 'f210-current-bob-tin-level4.stdout.log')
+      stderr = Get-TinArtifact $repo (Join-Path $run 'f210-current-bob-tin-level4.stderr.log')
+    }
+    reload = [ordered]@{
+      passed = $true
+      benchmark_ticks = 30000
+      input_save_sha256 = $saveSha
+      save_sha256 = $saveSha
+      save_byte_identical = $true
+      factorio_log = Get-TinArtifact $repo $reloadLogPath
+      stdout = Get-TinArtifact $repo (Join-Path $run 'f210-current-bob-tin-level4.reload.stdout.log')
+      stderr = Get-TinArtifact $repo (Join-Path $run 'f210-current-bob-tin-level4.reload.stderr.log')
+    }
+    fixture = @('info.json', 'continuation-dossier.json', 'data-final-fixes.lua', 'control.lua' | ForEach-Object { Get-TinArtifact $repo (Join-Path $fixtureRoot $_) })
+    recovery_harness = Get-TinArtifact $repo $PSCommandPath
+    mod_closure = [ordered]@{
+      enabled_mods = @((Get-Content -Raw -LiteralPath (Join-Path $run 'mods/mod-list.json') | ConvertFrom-Json).mods | Where-Object { $_.enabled } | ForEach-Object { $_.name })
+      settings_after_engine = Get-TinArtifact $repo (Join-Path $run 'mods/mod-settings.dat')
+      input_staging = $lease
+    }
+    non_claims = @($dossier.explicit_non_claims)
+  }
+  $resultPath = Join-Path $run 'result.json'
+  [IO.File]::WriteAllText($resultPath, (ConvertTo-Json $result -Depth 100), [Text.UTF8Encoding]::new($false))
+  Write-Output "[MIR-F210-CURRENT-BOB-TIN-LEVEL4-RECOVERED] $(Get-TinRelative $repo $resultPath)"
+  return
+}
 
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') | Out-Host
 $changes = @(& git -C $repo status --porcelain --untracked-files=all)
