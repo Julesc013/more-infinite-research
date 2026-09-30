@@ -62,7 +62,9 @@ script.on_init(function()
     fail("could not queue the level-five continuation target")
   end
   force.research_progress = 0.42
-  storage.mir42_k2_213_imersite_continuation = {initial_logged = false}
+  storage.mir42_k2_213_imersite_continuation = {}
+  assert_state(stage)
+  log("[MIR42_K2_213_IMERSITE_CONTINUATION] stage=initial;completed_level=4;next_level=5;bonus=0.08;progress=0.42")
 end)
 
 script.on_load(function()
@@ -72,15 +74,10 @@ end)
 script.on_event(defines.events.on_tick, function()
   local state = storage.mir42_k2_213_imersite_continuation
   if not state then return end
+  if not loaded_from_save then return end
   local stage = game.forces.player.technologies[continuation_name]
   assert_profile()
-  if not state.initial_logged then
-    assert_state(stage)
-    state.initial_logged = true
-    log("[MIR42_K2_213_IMERSITE_CONTINUATION] stage=initial;completed_level=4;next_level=5;bonus=0.08;progress=0.42")
-  elseif loaded_from_save then
-    assert_state(stage)
-    storage.mir42_k2_213_imersite_continuation = nil
-    log("[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42")
-  end
+  assert_state(stage)
+  storage.mir42_k2_213_imersite_continuation = nil
+  log("[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42")
 end)
