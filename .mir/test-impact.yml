@@ -584,6 +584,41 @@
     {
       "pattern": "tools/lib/validation/**",
       "tags": ["smoke"]
+    },
+    {
+      "pattern": "source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "groups": ["base-load"],
+      "scenarios": ["compiler-contracts"]
+    },
+    {
+      "pattern": "source/prototypes/mir/families/material_progression.lua",
+      "groups": ["base-load"],
+      "scenarios": ["compiler-contracts"]
+    },
+    {
+      "pattern": "source/prototypes/mir/planner/stream_compiler/material_continuation.lua",
+      "groups": ["base-load"],
+      "scenarios": ["compiler-contracts"]
+    },
+    {
+      "pattern": "source/prototypes/streams/productivity.lua",
+      "groups": ["base-load"],
+      "scenarios": ["compiler-contracts"]
+    },
+    {
+      "pattern": "tests/compiler/Test-MIRK2ImersiteContinuation.ps1",
+      "groups": ["base-load"],
+      "scenarios": ["compiler-contracts"]
+    },
+    {
+      "pattern": "tests/compiler/material_continuation.lua",
+      "groups": ["base-load"],
+      "scenarios": ["compiler-contracts"]
+    },
+    {
+      "pattern": "tests/compiler/material_progression.lua",
+      "groups": ["base-load"],
+      "scenarios": ["compiler-contracts"]
     }
   ]
 }

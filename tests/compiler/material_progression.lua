@@ -146,6 +146,37 @@ check(streams.research_material_rare_metals.staged_progression == nil,
 check(streams.research_material_imersite.staged_progression == nil,
   "Imersite stays unattached until the exact current K2 tuple guard selects its continuation")
 
+-- Exercise the policy at the stream assembly boundary: the exact witnessed
+-- K2 tuple opts into the powder continuation, while the neighboring K2
+-- release stays outside it even on the same Factorio line.
+local prior_mods = mods
+local function load_streams_for(active_mods)
+  mods = active_mods
+  package.loaded["prototypes.streams.productivity"] = nil
+  return require("prototypes.streams.productivity")
+end
+
+local neighboring_streams = load_streams_for({
+  base = "2.1.20",
+  Krastorio2 = "2.1.2",
+  ["Krastorio2-spaced-out"] = "2.0.13"
+})
+check(neighboring_streams.research_material_imersite.staged_progression == nil,
+  "a neighboring K2 tuple remains outside the admitted Imersite continuation")
+
+local exact_streams = load_streams_for({
+  base = "2.1.20",
+  Krastorio2 = "2.1.3",
+  ["Krastorio2-spaced-out"] = "2.0.13"
+})
+local exact_imersite = exact_streams.research_material_imersite.staged_progression
+local exact_valid, exact_reason = progression.validate("research_material_imersite", exact_imersite)
+check(exact_valid, "the exact current K2 tuple attaches valid Imersite continuation: " .. tostring(exact_reason))
+check(exact_imersite.continuation.technology_name == "recipe-prod-research_material_imersite-4"
+    and exact_imersite.legacy.last_level == 3,
+  "the exact K2 tuple preserves the finite legacy stage and adds only the separate level-four identity")
+mods = prior_mods
+
 local function effect(recipe, change)
   return {type = "change-recipe-productivity", recipe = recipe, change = change}
 end
