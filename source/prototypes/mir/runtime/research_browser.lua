@@ -894,6 +894,8 @@ local omission_reasons = {
   disabled = "not-added-disabled",
   no_matching_recipes = "not-added-no-recipe",
   no_lab_compatible_science = "not-added-no-science",
+  ["configured-material-cap-before-continuation"] = "not-added-material-cap",
+  ["no-continuation-headroom"] = "not-added-material-headroom",
   recipe_productivity_unsupported = "not-added-unsupported"
 }
 

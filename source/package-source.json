@@ -2085,10 +2085,10 @@
         "predecessor_source_path": "src/mod/families/modern/locale/en/more-infinite-research.cfg"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 52813,
-      "source_sha256": "8E49E16A8033390440145CD4157894D01230F4F76D79CAC7721A389EA5E91B20",
-      "output_bytes": 52813,
-      "output_sha256": "8E49E16A8033390440145CD4157894D01230F4F76D79CAC7721A389EA5E91B20"
+      "source_bytes": 53134,
+      "source_sha256": "FD9DA9CA02CAB3A676E7E395D3E2C8DD044F2FF0610A5A4304462DD6F810B777",
+      "output_bytes": 53134,
+      "output_sha256": "FD9DA9CA02CAB3A676E7E395D3E2C8DD044F2FF0610A5A4304462DD6F810B777"
     },
     {
       "layer": "capability",
@@ -4439,10 +4439,10 @@
         "reason": "Shared staged material progression declaration for reviewed Bob/Angel streams."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 11291,
-      "source_sha256": "C599BF3C408DDF4F8BB202904C612CB1958E4C910BABD5F1C6944B8ECCDF8A34",
-      "output_bytes": 11291,
-      "output_sha256": "C599BF3C408DDF4F8BB202904C612CB1958E4C910BABD5F1C6944B8ECCDF8A34"
+      "source_bytes": 11440,
+      "source_sha256": "736AF56F9F38A0597EB4BF4B500520EA30633A4A039F7F593FCB5045FD69AA80",
+      "output_bytes": 11440,
+      "output_sha256": "736AF56F9F38A0597EB4BF4B500520EA30633A4A039F7F593FCB5045FD69AA80"
     },
     {
       "layer": "capability",
@@ -7288,10 +7288,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 88828,
-      "source_sha256": "9CB1D722098D683638F9C30FE527F77CD5DCE6DEBAF8371FE2E5469DCC13EEB5",
-      "output_bytes": 88828,
-      "output_sha256": "9CB1D722098D683638F9C30FE527F77CD5DCE6DEBAF8371FE2E5469DCC13EEB5"
+      "source_bytes": 88970,
+      "source_sha256": "7F83B99AA7ED73C2570ADF2CDB7800EA14EB2EFCC9607AD442402716A59AA4CB",
+      "output_bytes": 88970,
+      "output_sha256": "7F83B99AA7ED73C2570ADF2CDB7800EA14EB2EFCC9607AD442402716A59AA4CB"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "6A26BB7398085A67FCCEBFBBAC482A6CAC0E3AB992DE99C149E9D649DAB75ABD"
+  "record_sha256": "768537C2BFB48F71805AFD0AC0AE0A150027065258A457B79568DE9F79BDE59B"
 }

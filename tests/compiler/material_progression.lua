@@ -194,6 +194,10 @@ local mixed_level = progression.highest_useful_level({effect("normal", 0.02), ef
 check(mixed_level == 150, "the family continues while at least one qualified recipe benefits")
 local configured_level = progression.highest_useful_level({effect("normal", 0.02)}, recipe, 8)
 check(configured_level == 8, "a finite startup setting is an absolute cap across both stages")
+local configured_stop, configured_reason = progression.highest_useful_level(
+  {effect("normal", 0.02)}, recipe, 3)
+check(configured_stop == nil and configured_reason == "configured-material-cap-before-continuation",
+  "an explicit cap at the legacy boundary explains why continuation is withheld")
 local no_headroom, no_headroom_reason = progression.highest_useful_level({effect("narrow", 0.02)}, recipe, "infinite")
 check(no_headroom == nil and no_headroom_reason == "no-continuation-headroom",
   "a family whose recipes saturate within levels one to three gets no paid continuation")

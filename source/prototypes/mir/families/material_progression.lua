@@ -269,8 +269,11 @@ function M.highest_useful_level(effects, recipe_lookup, configured_cap)
     count = count + 1
   end
   if count == 0 then return nil, "no-material-effects" end
-  if configured_cap ~= "infinite" then maximum = math.min(maximum, configured_cap) end
   if maximum <= M.legacy_last_level then return nil, "no-continuation-headroom" end
+  if configured_cap ~= "infinite" and configured_cap <= M.legacy_last_level then
+    return nil, "configured-material-cap-before-continuation"
+  end
+  if configured_cap ~= "infinite" then maximum = math.min(maximum, configured_cap) end
   return maximum
 end
 
