@@ -8,6 +8,8 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `4.2.x`** targets **Factorio `2.1`** and requires `base >= 2.1.18`.
 
+F210 is the qualified experimental Factorio `2.1` target only when its release manifest binds the exact engine executable; this development template does not claim final-candidate qualification.
+
 **MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 
 **MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.

@@ -525,6 +525,215 @@ function Read-MIR42NineTargetReleaseAssetInventory {
   return $identity
 }
 
+function Read-MIR42NineTargetWrittenReleaseAuthorization {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$Path)
+
+  $authorizationPath = (Resolve-Path -LiteralPath $Path).Path
+  $schemaPath = Join-Path $mir42ReleaseAssetsRepoRoot 'spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json'
+  if (-not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) { throw '[mir42-release-go-schema-missing]' }
+  $schemaValid = $false
+  try {
+    $schemaValid = [bool](Get-Content -Raw -LiteralPath $authorizationPath | Test-Json -SchemaFile $schemaPath)
+  } catch {
+    throw '[mir42-release-go-schema]'
+  }
+  if (-not $schemaValid) {
+    throw '[mir42-release-go-schema]'
+  }
+  $identity = Read-MIR42SealRecord -Path $authorizationPath -Code 'mir42-release-go'
+  $record = $identity.record
+  Assert-MIR42ReleaseAssetProperties -Value $record -Expected @(
+    'schema','kind','status','recorded_from_user_turn_date','timezone','release','written_authorizations','maintainer_decisions',
+    'nonnegotiable_constraints','current_controller_state','required_external_inputs_before_technical_seal','known_operator_inputs',
+    'final_byte_binding','secret_values_present','warning','record_sha256'
+  ) -Code 'mir42-release-go-shape'
+  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42MaintainerWrittenReleaseAuthorizationHandoffV1' -or
+      [string]$record.status -cne 'written-maintainer-authorization-recorded-awaiting-exact-candidate-and-technical-proof' -or
+      [string]$record.recorded_from_user_turn_date -notmatch '^20[0-9]{2}-[0-9]{2}-[0-9]{2}$' -or
+      [string]::IsNullOrWhiteSpace([string]$record.timezone) -or [bool]$record.secret_values_present) {
+    throw '[mir42-release-go-state]'
+  }
+  Assert-MIR42ReleaseAssetProperties -Value $record.release -Expected @('source_version','tag','selected_targets') -Code 'mir42-release-go-release-shape'
+  if ([string]$record.release.source_version -cne '4.2.0' -or [string]$record.release.tag -cne 'v4.2.0') { throw '[mir42-release-go-release]' }
+  Assert-MIR42SealTargetSet -Rows @($record.release.selected_targets | ForEach-Object { [pscustomobject]@{ target = [string]$_ } }) -Scope 'nine-target' -Code 'mir42-release-go-targets'
+  Assert-MIR42ReleaseAssetProperties -Value $record.written_authorizations -Expected @('complete_mir_4_2','protected_main_promotion','required_distribution_tags','github_publication','nine_target_github_zip_assets','mod_portal_upload') -Code 'mir42-release-go-authorizations-shape'
+  $authorizationStates = [ordered]@{
+    complete_mir_4_2 = 'authorized-subject-to-required-technical-checks'
+    protected_main_promotion = 'authorized-after-accepted-technical-seal-and-governed-restore'
+    required_distribution_tags = 'authorized-after-protected-main-readback-and-candidate-bound-go'
+    github_publication = 'authorized-after-final-byte-acceptance-and-tag-verification'
+    nine_target_github_zip_assets = 'authorized-after-final-byte-acceptance'
+    # The written GO is for GitHub release assets.  Portal disposition remains
+    # under its separately governed operator record.
+    mod_portal_upload = 'not-claimed-by-this-github-release-authorization'
+  }
+  foreach ($field in $authorizationStates.Keys) {
+    if ([string]$record.written_authorizations.$field -cne [string]$authorizationStates[$field]) { throw "[mir42-release-go-authorization] $field" }
+  }
+  Assert-MIR42ReleaseAssetProperties -Value $record.maintainer_decisions -Expected @('current_balance_direction','current_visual_direction','disclosed_limitations','additional_playtest_prompt','experimental_f210','f210_f200_playtest_receipt','technical_acceptance','candidate_binding','final_byte_hashes') -Code 'mir42-release-go-decision-shape'
+  $decisionStates = [ordered]@{
+    current_balance_direction = 'accepted'; current_visual_direction = 'accepted'; disclosed_limitations = 'accepted'
+    additional_playtest_prompt = 'waived-for-this-release-decision'; experimental_f210 = 'qualified-experimental-consent-recorded'
+    f210_f200_playtest_receipt = 'not-claimed-and-not-materialized'; technical_acceptance = 'not-established'
+    candidate_binding = 'deferred-until-one-exact-accepted-candidate'; final_byte_hashes = 'not-yet-available'
+  }
+  foreach ($field in $decisionStates.Keys) {
+    if ([string]$record.maintainer_decisions.$field -cne [string]$decisionStates[$field]) { throw "[mir42-release-go-decision] $field" }
+  }
+  Assert-MIR42ReleaseAssetProperties -Value $record.current_controller_state -Expected @('programme_path','programme_status','source_freeze','candidate_allocation','production_signing','technical_seal','promotion','tagging','publication') -Code 'mir42-release-go-controller-shape'
+  if ([string]$record.current_controller_state.programme_path -cne '.mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json' -or
+      [string]$record.current_controller_state.programme_status -cne 'active-current-4.2-release-cut-pre-freeze-no-transition-authority' -or
+      @($record.current_controller_state.PSObject.Properties | Where-Object { $_.Name -notin @('programme_path','programme_status') -and $_.Value -isnot [bool] }).Count -ne 0 -or
+      @($record.current_controller_state.PSObject.Properties | Where-Object { $_.Name -notin @('programme_path','programme_status') -and [bool]$_.Value }).Count -ne 0) {
+    throw '[mir42-release-go-controller-state]'
+  }
+  Assert-MIR42ReleaseAssetProperties -Value $record.final_byte_binding -Expected @('candidate_manifest_path','technical_seal_path','frozen_inventory_path','required_binding') -Code 'mir42-release-go-binding-shape'
+  if ([string]$record.final_byte_binding.candidate_manifest_path -cne 'deferred' -or
+      [string]$record.final_byte_binding.technical_seal_path -cne 'deferred' -or
+      [string]$record.final_byte_binding.frozen_inventory_path -cne 'deferred' -or
+      [string]::IsNullOrWhiteSpace([string]$record.final_byte_binding.required_binding)) {
+    throw '[mir42-release-go-binding-state]'
+  }
+  return $identity
+}
+
+function Read-MIR42NineTargetProtectedMainReadbackForPublication {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$Path)
+
+  $identity = Read-MIR42SealRecord -Path $Path -Code 'mir42-release-go-main-readback'
+  $record = $identity.record
+  Assert-MIR42ReleaseAssetProperties -Value $record -Expected @(
+    'schema','kind','status','scope','source','primary_main','protected_pull_request','promotion_transport','source_rebinding',
+    'candidate_manifest','technical_seal','current_programme','direct_predecessors','governed_offline_restore_drill','targets',
+    'target_assets','proofs','main_readback_verified','remote_mutation_performed','protected_main_promotion_authorized',
+    'human_go_required_after_main_readback','tagging_authorized','publication_authorized','record_sha256'
+  ) -Code 'mir42-release-go-main-readback-shape'
+  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42NineTargetProtectedMainReadbackV1' -or
+      [string]$record.status -cne 'MIR-4.2-NINE-TARGET-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST' -or [string]$record.scope -cne 'nine-target' -or
+      $record.main_readback_verified -isnot [bool] -or -not [bool]$record.main_readback_verified -or
+      $record.remote_mutation_performed -isnot [bool] -or [bool]$record.remote_mutation_performed -or
+      $record.protected_main_promotion_authorized -isnot [bool] -or [bool]$record.protected_main_promotion_authorized -or
+      $record.human_go_required_after_main_readback -isnot [bool] -or -not [bool]$record.human_go_required_after_main_readback -or
+      $record.tagging_authorized -isnot [bool] -or [bool]$record.tagging_authorized -or
+      $record.publication_authorized -isnot [bool] -or [bool]$record.publication_authorized) {
+    throw '[mir42-release-go-main-readback-state]'
+  }
+  foreach ($field in @('commit','tree','package_source_sha256')) {
+    if ([string]$record.source.$field -cnotmatch '^[A-Fa-f0-9]{40,64}$' -or [string]$record.primary_main.$field -cnotmatch '^[A-Fa-f0-9]{40,64}$') { throw "[mir42-release-go-main-readback-source] $field" }
+  }
+  Assert-MIR42ReleaseAssetProperties -Value $record.candidate_manifest -Expected @('sha256','record_sha256') -Code 'mir42-release-go-main-readback-candidate-shape'
+  Assert-MIR42ReleaseAssetProperties -Value $record.technical_seal -Expected @('sha256','record_sha256') -Code 'mir42-release-go-main-readback-seal-shape'
+  foreach ($hash in @([string]$record.candidate_manifest.sha256,[string]$record.candidate_manifest.record_sha256,[string]$record.technical_seal.sha256,[string]$record.technical_seal.record_sha256)) {
+    if ($hash -cnotmatch '^[A-F0-9]{64}$') { throw '[mir42-release-go-main-readback-binding]' }
+  }
+  if ([string]$record.source_rebinding.qualified_tree -cne [string]$record.source.tree -or
+      [string]$record.source_rebinding.promoted_main_tree -cne [string]$record.primary_main.tree -or
+      [string]$record.source_rebinding.package_source_sha256 -cne [string]$record.source.package_source_sha256 -or
+      -not [bool]$record.source_rebinding.package_bytes_preserved -or -not [bool]$record.source_rebinding.explicit_commit_rebinding) {
+    throw '[mir42-release-go-main-readback-rebinding]'
+  }
+  Assert-MIR42SealTargetSet -Rows @($record.target_assets) -Scope 'nine-target' -Code 'mir42-release-go-main-readback-targets'
+  if ((@($record.targets | ForEach-Object { [string]$_ }) -join '|') -cne ($script:MIR42ReleaseAssetTargets -join '|')) { throw '[mir42-release-go-main-readback-target-list]' }
+  return $identity
+}
+
+function Write-MIR42NineTargetPublicationAuthorization {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)][string]$PrimaryRepoRoot,[Parameter(Mandatory)][string]$OutputPath)
+
+  if (-not (Test-MIR4BootstrapRecordHash -Record $Record)) { throw '[mir42-release-go-output-record]' }
+  $primary = (Resolve-Path -LiteralPath $PrimaryRepoRoot).Path
+  $outputRoot = Join-Path $primary 'build/release-authorization'
+  try {
+    $output = Assert-MIR4DescendantPath -Root $outputRoot -Path $OutputPath
+    $null = Assert-MIR4NoReparseAncestors -Root $primary -Path $output
+  } catch { throw '[mir42-release-go-output-containment]' }
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-MIR4BootstrapCanonicalJson -Value $Record) + "`n")
+  if (Test-Path -LiteralPath $output -PathType Leaf) {
+    if ([Convert]::ToHexString([IO.File]::ReadAllBytes($output)) -ne [Convert]::ToHexString($bytes)) { throw '[mir42-release-go-output-existing-authority-preserved]' }
+  } else {
+    $parent = Split-Path -Parent $output
+    if (-not (Test-Path -LiteralPath $parent -PathType Container)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+    $stream = [IO.File]::Open($output,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+    try { $stream.Write($bytes,0,$bytes.Length) } finally { $stream.Dispose() }
+  }
+  return Read-MIR42SealRecord -Path $output -Code 'mir42-release-go-output'
+}
+
+function New-MIR42NineTargetPublicationAuthorization {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$PrimaryRepoRoot,
+    [Parameter(Mandatory)][string]$MaintainerAuthorizationPath,
+    [Parameter(Mandatory)][string]$MainReadbackPath,
+    [Parameter(Mandatory)][string]$FrozenInventoryPath,
+    [Parameter(Mandatory)][string]$OutputPath
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $authorization = Read-MIR42NineTargetWrittenReleaseAuthorization -Path $MaintainerAuthorizationPath
+  $mainReadback = Read-MIR42NineTargetProtectedMainReadbackForPublication -Path $MainReadbackPath
+  $inventory = Read-MIR42NineTargetReleaseAssetInventory -Path $FrozenInventoryPath
+  $liveMain = Get-MIR42PrimaryMainSnapshot -PrimaryRepoRoot $PrimaryRepoRoot
+  $record = $mainReadback.record
+  foreach ($field in @('commit','tree','package_source_sha256','remote_commit')) {
+    if ([string]$liveMain.$field -cne [string]$record.primary_main.$field) { throw "[mir42-release-go-live-main-binding] $field" }
+  }
+  if ([string]$liveMain.branch -cne 'main' -or -not [bool]$liveMain.working_tree_clean -or
+      [string]$liveMain.remote -cne 'origin' -or [string]$liveMain.ref -cne 'refs/heads/main') { throw '[mir42-release-go-live-main-state]' }
+  foreach ($field in @('commit','tree','package_source_sha256')) {
+    if ([string]$inventory.record.source.$field -cne [string]$record.source.$field) { throw "[mir42-release-go-inventory-source] $field" }
+  }
+  foreach ($binding in @('candidate_manifest','technical_seal')) {
+    foreach ($field in @('sha256','record_sha256')) {
+      if ([string]$inventory.record.$binding.$field -cne [string]$record.$binding.$field) { throw "[mir42-release-go-inventory-binding] $binding/$field" }
+    }
+  }
+  Assert-MIR42SealTargetSet -Rows @($inventory.record.package_assets) -Scope 'nine-target' -Code 'mir42-release-go-inventory-targets'
+  for ($index = 0; $index -lt $script:MIR42ReleaseAssetTargets.Count; $index++) {
+    $fromMain = $record.target_assets[$index]
+    $fromInventory = $inventory.record.package_assets[$index]
+    foreach ($field in @('target','distribution_version','content_sha256','entry_count')) {
+      if ([string]$fromMain.$field -cne [string]$fromInventory.$field) { throw "[mir42-release-go-inventory-target] $field/$index" }
+    }
+    if ([string]$fromMain.archive_sha256 -cne [string]$fromInventory.sha256) { throw "[mir42-release-go-inventory-target] archive_sha256/$index" }
+  }
+  $output = [pscustomobject][ordered]@{
+    schema = 1
+    kind = 'MIR42NineTargetPublicationAuthorizationV1'
+    status = 'MIR-4.2-NINE-TARGET-WRITTEN-GO-BOUND-TO-MAIN-AND-FROZEN-ASSETS'
+    release = [ordered]@{source_version='4.2.0';tag='v4.2.0'}
+    written_maintainer_authorization = [ordered]@{
+      path=(Resolve-Path -LiteralPath $MaintainerAuthorizationPath).Path;sha256=[string]$authorization.sha256;record_sha256=[string]$authorization.record.record_sha256
+      recorded_from_user_turn_date=[string]$authorization.record.recorded_from_user_turn_date
+      acceptance_type='written-conditional-go-with-playtest-waiver'
+      gameplay_receipt_claimed=$false
+      additional_playtest_prompt_waived=$true
+      experimental_f210_consent='qualified-experimental-consent-recorded'
+    }
+    source = $record.source
+    primary_main = [ordered]@{commit=[string]$liveMain.commit;tree=[string]$liveMain.tree;package_source_sha256=[string]$liveMain.package_source_sha256;remote='origin';ref='refs/heads/main'}
+    main_readback = [ordered]@{path=(Resolve-Path -LiteralPath $MainReadbackPath).Path;sha256=[string]$mainReadback.sha256;record_sha256=[string]$record.record_sha256}
+    candidate_manifest = $record.candidate_manifest
+    technical_seal = $record.technical_seal
+    frozen_release_asset_inventory = [ordered]@{path=(Resolve-Path -LiteralPath $FrozenInventoryPath).Path;sha256=[string]$inventory.sha256;record_sha256=[string]$inventory.record.record_sha256;asset_root_file_set_sha256=[string]$inventory.record.asset_root_file_set_sha256}
+    target_assets = @($inventory.record.package_assets | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;archive_sha256=[string]$_.sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count} })
+    tagging_authorized = $true
+    publication_scope = 'github-release-only'
+    github_publication_authorized = $true
+    mod_portal_upload_authorized = $false
+    mod_portal_upload_disposition = 'not-claimed-by-this-github-release-authorization'
+    publication_authorized = $true
+    public_readback_required_after_publication = $true
+    record_sha256 = ''
+  }
+  $output.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $output
+  return Write-MIR42NineTargetPublicationAuthorization -Record $output -PrimaryRepoRoot $PrimaryRepoRoot -OutputPath $OutputPath
+}
+
 function Assert-MIR42NineTargetDownloadedReleaseBytes {
   [CmdletBinding()]
   param(

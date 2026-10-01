@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [ValidateSet('Inventory','VerifyBytes','PublicReadback')][string]$Mode = 'Inventory',
+  [ValidateSet('Inventory','VerifyBytes','PublicReadback','AuthorizePublication')][string]$Mode = 'Inventory',
   [string]$CandidateManifestPath = '',
   [string]$TechnicalSealPath = '',
   [string]$QualificationPath = '',
@@ -23,6 +23,9 @@ param(
   [string]$OutputPath = '',
   [string]$FrozenInventoryPath = '',
   [string]$DownloadedAssetRoot = '',
+  [string]$PrimaryRepoRoot = '',
+  [string]$MaintainerAuthorizationPath = '',
+  [string]$MainReadbackPath = '',
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 )
 
@@ -50,5 +53,13 @@ switch ($Mode) {
   'PublicReadback' {
     if ([string]::IsNullOrWhiteSpace($FrozenInventoryPath) -or [string]::IsNullOrWhiteSpace($DownloadedAssetRoot)) { throw '[mir42-nine-release-assets-download-inputs-required]' }
     Get-MIR42NineTargetPublicDownloadedReleaseReadback -FrozenInventoryPath $FrozenInventoryPath -DownloadedAssetRoot $DownloadedAssetRoot | ConvertTo-Json -Depth 30
+  }
+  'AuthorizePublication' {
+    foreach ($path in @($PrimaryRepoRoot,$MaintainerAuthorizationPath,$MainReadbackPath,$FrozenInventoryPath,$OutputPath)) {
+      if ([string]::IsNullOrWhiteSpace($path)) { throw '[mir42-nine-release-assets-publication-authorization-inputs-required]' }
+    }
+    New-MIR42NineTargetPublicationAuthorization -RepoRoot $RepoRoot -PrimaryRepoRoot $PrimaryRepoRoot `
+      -MaintainerAuthorizationPath $MaintainerAuthorizationPath -MainReadbackPath $MainReadbackPath `
+      -FrozenInventoryPath $FrozenInventoryPath -OutputPath $OutputPath | ConvertTo-Json -Depth 50
   }
 }
