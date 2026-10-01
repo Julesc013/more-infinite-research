@@ -6384,10 +6384,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 62885,
-      "source_sha256": "CDF50FBCF490A6100FF5E1C7884D912F4328E36E461C7F15EC22802761A4080B",
-      "output_bytes": 62885,
-      "output_sha256": "CDF50FBCF490A6100FF5E1C7884D912F4328E36E461C7F15EC22802761A4080B"
+      "source_bytes": 63493,
+      "source_sha256": "3C4D12F96C630102255CD1FD8A7EFD01A543B752F4A5450B83F7E1DDF0C0454A",
+      "output_bytes": 63493,
+      "output_sha256": "3C4D12F96C630102255CD1FD8A7EFD01A543B752F4A5450B83F7E1DDF0C0454A"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "55B77869A13F7D4DBC895CF6EC32AE4115C233BEE04904FE81D324D95D56A7CA"
+  "record_sha256": "AA7BF19A60C0416EE2F1363C80E1C767F643CE62067AFB3EE0D2152ABB81DA17"
 }
