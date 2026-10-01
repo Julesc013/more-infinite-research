@@ -20,6 +20,9 @@ function New-FactorioConfig([string]$p,[string]$d){$d=$d.Replace('\','/');Write-
 [path]
 read-data=__PATH__system-read-data__
 write-data=$d
+
+[other]
+enable-steam-networking=false
 "@}
 function Write-PlayerData([string]$d,[string]$i){Write-Json(Join-Path $d 'player-data.json')([ordered]@{'service-username'=$i;'service-token'=''})}
 function New-FreeLoopbackPort{$l=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0);try{$l.Start();return([Net.IPEndPoint]$l.LocalEndpoint).Port}finally{$l.Stop()}}
