@@ -7269,10 +7269,10 @@
         "predecessor_source_path": "targets/f210/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 75914,
-      "source_sha256": "5441DC25BFE2FC3880EE7FDA45E373F13010EB4872B22DA3642FD9F909D15895",
-      "output_bytes": 75914,
-      "output_sha256": "5441DC25BFE2FC3880EE7FDA45E373F13010EB4872B22DA3642FD9F909D15895"
+      "source_bytes": 76110,
+      "source_sha256": "3316CB2992D8FEEAE9C90FFD6EAC40B89652597F552A3364250DA222EFA943F3",
+      "output_bytes": 76110,
+      "output_sha256": "3316CB2992D8FEEAE9C90FFD6EAC40B89652597F552A3364250DA222EFA943F3"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "AA7BF19A60C0416EE2F1363C80E1C767F643CE62067AFB3EE0D2152ABB81DA17"
+  "record_sha256": "9057B422C0DA996D6478543FDD4CF044F6B30F33B87605239C65D1DD41F67932"
 }
