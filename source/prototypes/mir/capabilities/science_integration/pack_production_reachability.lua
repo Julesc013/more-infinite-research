@@ -269,6 +269,13 @@ local function science_pack_route_witness_state()
   return science_pack_production_state().route_witness_state
 end
 
+local function route_witness_state_for_query(observer)
+  if observer == nil then return science_pack_route_witness_state() end
+  -- A rejection projection may borrow only a completed source catalogue into
+  -- its own CompilerContext. Never borrow the parent's acquisition memos.
+  return compiler_context.current():state_view("science_pack_diagnostic_source_state")
+end
+
 local function graph_index()
   return compiler_context.current():state_view("technology_researchability_index", researchability_index.build)
 end
@@ -1325,7 +1332,7 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
   -- machine observations held by recipe-route feasibility. Completed contextual pack answers retain every active traversal input and
   -- are discarded when root or stable acquisition knowledge advances. A bounded diagnostic always gets a fresh state so its
   -- work cap still covers every inspected prototype.
-  local witness_state = observer == nil and science_pack_route_witness_state() or nil
+  local witness_state = route_witness_state_for_query(observer)
   local contextual_owner, contextual_key, contextual_root_generation, contextual_acquisition_generation
   if observer == nil and not reusable then
     -- This entry point takes no parent production options. production_routes
@@ -1456,13 +1463,23 @@ local function observation_recipe_snapshot(parent)
   local index_epoch = parent:state_epoch("recipe_index")
   local source_epoch = parent:state_epoch("recipe_source")
   if type(index_epoch) ~= "number" or type(source_epoch) ~= "number" then return nil end
-  return {
+  local snapshot = {
     parent = parent,
     recipe_index = recipe_index,
     recipe_source = recipe_source,
     recipe_index_epoch = index_epoch,
     recipe_source_epoch = source_epoch
   }
+  local production = parent:state_view("science_pack_production")
+  local witness = production and production.route_witness_state
+  if type(production) == "table" and production.recipe_source_epoch == source_epoch
+    and type(witness) == "table" and witness.compiler_context == parent
+    and witness.recipe_source_epoch == source_epoch and type(witness.source_catalog) == "table" then
+    snapshot.production_state = production
+    snapshot.witness_state = witness
+    snapshot.source_catalog = witness.source_catalog
+  end
+  return snapshot
 end
 
 local function observation_recipe_snapshot_is_current(snapshot)
@@ -1471,6 +1488,13 @@ local function observation_recipe_snapshot_is_current(snapshot)
     and snapshot.parent:state_view("recipe_source") == snapshot.recipe_source
     and snapshot.parent:state_epoch("recipe_index") == snapshot.recipe_index_epoch
     and snapshot.parent:state_epoch("recipe_source") == snapshot.recipe_source_epoch
+    and (snapshot.source_catalog == nil or (
+      snapshot.parent:state_view("science_pack_production") == snapshot.production_state
+      and snapshot.production_state.route_witness_state == snapshot.witness_state
+      and snapshot.witness_state.compiler_context == snapshot.parent
+      and snapshot.witness_state.recipe_source_epoch == snapshot.recipe_source_epoch
+      and snapshot.witness_state.source_catalog == snapshot.source_catalog
+    ))
 end
 
 local function observation_context()
@@ -1485,6 +1509,19 @@ local function observation_context()
   if recipe_snapshot then
     observation:set_state("recipe_source", recipe_snapshot.recipe_source)
     observation:set_state("recipe_index", recipe_snapshot.recipe_index)
+    if recipe_snapshot.source_catalog then
+      -- The completed catalogue is read-only and every selected witness is
+      -- copied out. All mutable traversal and acquisition state starts fresh.
+      observation:set_state("science_pack_diagnostic_source_state", {
+        compiler_context = observation,
+        -- set_state gives the copied source a fresh child epoch. The parent
+        -- epoch remains separately bound by observation_recipe_snapshot.
+        recipe_source_epoch = observation:state_epoch("recipe_source"),
+        source_catalog = recipe_snapshot.source_catalog,
+        visiting = {}, acquisition_memo = {}, stable_acquisition_memo = {},
+        stable_acquisition_generation = 1, surface_results = {}
+      })
+    end
   end
   for _, service_name in ipairs({
     "science.technology_researchability_reason",
@@ -1692,7 +1729,7 @@ function M.independent_pack_acquisition_witness(
   local direct_source = route_feasibility.source_witness(
     pack_name,
     observer and {diagnostic_observer = observer} or nil,
-    observer == nil and science_pack_route_witness_state() or nil
+    route_witness_state_for_query(observer)
   )
   if direct_source then return direct_source end
   local recipe_status = recipe_facts.pack_recipe_status(pack_name, observer)
@@ -1707,7 +1744,7 @@ function M.independent_pack_acquisition_witness(
     excluded_unlocker,
     visiting_technologies,
     observer,
-    observer == nil and science_pack_route_witness_state() or nil
+    route_witness_state_for_query(observer)
   ))
   witness_visiting[pack_name] = nil
   return selected and deepcopy(selected) or nil

@@ -2651,6 +2651,41 @@ check('D23', real_source_projection and real_source_projection.status == 'indete
   and context.states.compiler_telemetry == nil,
   'A capped diagnostic reuses the real parent recipe snapshot without a fresh full index or telemetry')
 
+-- A completed source catalogue is immutable during this context's recipe
+-- snapshot. Reusing only that catalogue lets a bounded rejection inspect the
+-- actual recipe even when a large unrelated resource namespace exists.
+for index = 1, 180 do
+  data.raw.resource['diagnostic-filler-' .. index] = {
+    type = 'resource', minable = {result = 'diagnostic-filler-' .. index}
+  }
+end
+context = new_context()
+active_context = nil
+fixture_recipe_facts.replace_source(data.raw.recipe)
+check('D23A0', context:state_epoch('recipe_source') == 2,
+  'The parent recipe-source epoch advances before the catalogue is borrowed')
+fixture_recipe_facts.index_view()
+production.pack_production_status('logistic-science-pack')
+world.parent_source_owner = context.states.science_pack_production
+world.completed_source_catalog = world.parent_source_owner
+  and world.parent_source_owner.route_witness_state.source_catalog
+check('D23A', type(world.completed_source_catalog) == 'table',
+  'The parent completed a source catalogue before the isolated diagnostic')
+world.catalog_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 128, depth = 32, bytes = 4096}
+})
+check('D23B', world.catalog_projection and world.catalog_projection.status == 'unreachable'
+  and world.catalog_projection.first_failure.reason ~= 'diagnostic-work-budget-exhausted',
+  'The isolated rejection borrows only the completed source catalogue and reaches its recipe')
+world.parent_source_owner.route_witness_state.source_catalog = nil
+world.uncatalogued_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 128, depth = 32, bytes = 4096}
+})
+check('D23C', world.uncatalogued_projection and world.uncatalogued_projection.status == 'indeterminate'
+  and world.uncatalogued_projection.first_failure.reason == 'diagnostic-work-budget-exhausted',
+  'Without a complete catalogue the same diagnostic retains its hard work cap')
+world.parent_source_owner.route_witness_state.source_catalog = world.completed_source_catalog
+
 -- A parent that has not built recipe facts is also safe: diagnostics refuse the
 -- query explicitly rather than asking the fresh context to construct the full
 -- canonical index before its observer can apply a cap.
