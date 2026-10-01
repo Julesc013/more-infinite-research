@@ -47,26 +47,36 @@ using System.Runtime.InteropServices;
 public static class MIRNativeBrowserInput {
  [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left,Top,Right,Bottom; }
  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+ [DllImport("user32.dll")] public static extern bool BringWindowToTop(IntPtr hWnd);
+ [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd,int nCmdShow);
+ [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+ [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd,out uint processId);
+ [DllImport("user32.dll")] public static extern bool AttachThreadInput(uint idAttach,uint idAttachTo,bool fAttach);
+ [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
  [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd,out RECT rect);
  [DllImport("user32.dll")] public static extern bool SetCursorPos(int x,int y);
  [DllImport("user32.dll")] public static extern void mouse_event(uint flags,uint dx,uint dy,uint data,UIntPtr extra);
 }
 '@;Add-Type -AssemblyName System.Windows.Forms}
+function Set-NativeInputForeground([IntPtr]$Handle,[string]$Role){
+ $current=[MIRNativeBrowserInput]::GetCurrentThreadId();$before=[MIRNativeBrowserInput]::GetForegroundWindow();[uint32]$ignored=0;$targetThread=[MIRNativeBrowserInput]::GetWindowThreadProcessId($Handle,[ref]$ignored);$foregroundThread=if($before -eq [IntPtr]::Zero){[uint32]0}else{[MIRNativeBrowserInput]::GetWindowThreadProcessId($before,[ref]$ignored)};$attached=[Collections.Generic.List[uint32]]::new()
+ try{foreach($thread in @($foregroundThread,$targetThread)|Select-Object -Unique){if($thread -ne 0 -and $thread -ne $current -and [MIRNativeBrowserInput]::AttachThreadInput($current,$thread,$true)){$attached.Add($thread)|Out-Null}};[MIRNativeBrowserInput]::BringWindowToTop($Handle)|Out-Null;[MIRNativeBrowserInput]::ShowWindow($Handle,5)|Out-Null;$set=[MIRNativeBrowserInput]::SetForegroundWindow($Handle);Start-Sleep -Milliseconds 150;$after=[MIRNativeBrowserInput]::GetForegroundWindow();Assert-True($set -or $after -eq $Handle)"client $Role cannot receive foreground native input";return [ordered]@{before_window_handle=$before.ToInt64();foreground_window_handle=$after.ToInt64();set_foreground_result=$set;attached_input_threads=@($attached)}}finally{for($index=$attached.Count-1;$index -ge 0;$index--){[MIRNativeBrowserInput]::AttachThreadInput($current,$attached[$index],$false)|Out-Null}}
+}
 function Invoke-NativeBrowserInput([object]$Client,[object]$Geometry,[string]$Text){
  $deadline=[DateTime]::UtcNow.AddSeconds($TimeoutSeconds);$handle=[IntPtr]::Zero
  while([DateTime]::UtcNow -lt $deadline){$Client.process.Refresh();$handle=$Client.process.MainWindowHandle;if($handle -ne [IntPtr]::Zero){break};Start-Sleep -Milliseconds 250}
  Assert-True($handle -ne [IntPtr]::Zero)"client $($Client.role) has no native window handle"
- $rect=New-Object MIRNativeBrowserInput+RECT;Assert-True([MIRNativeBrowserInput]::GetWindowRect($handle,[ref]$rect))"client $($Client.role) window geometry unavailable";Assert-True([MIRNativeBrowserInput]::SetForegroundWindow($handle))"client $($Client.role) cannot receive foreground native input"
+ $rect=New-Object MIRNativeBrowserInput+RECT;Assert-True([MIRNativeBrowserInput]::GetWindowRect($handle,[ref]$rect))"client $($Client.role) window geometry unavailable";$focus=Set-NativeInputForeground $handle $Client.role
  $location=$Geometry.location;$width=[int]$Geometry.width;$x=[int]$rect.Left+[int]$location.x+$width-78;$y=[int]$rect.Top+[int]$location.y+18
  [MIRNativeBrowserInput]::SetCursorPos($x,$y)|Out-Null;[MIRNativeBrowserInput]::mouse_event(2,0,0,0,[UIntPtr]::Zero);[MIRNativeBrowserInput]::mouse_event(4,0,0,0,[UIntPtr]::Zero);Start-Sleep -Milliseconds 250
  $x=[int]$rect.Left+[int]$location.x+32;$y=[int]$rect.Top+[int]$location.y+98;[MIRNativeBrowserInput]::SetCursorPos($x,$y)|Out-Null;[MIRNativeBrowserInput]::mouse_event(2,0,0,0,[UIntPtr]::Zero);[MIRNativeBrowserInput]::mouse_event(4,0,0,0,[UIntPtr]::Zero);Start-Sleep -Milliseconds 100;[Windows.Forms.SendKeys]::SendWait($Text)
- return [ordered]@{pid=$Client.pid;window_handle=$handle.ToInt64();mouse_layout_larger=@($width-78,18);mouse_search=@(32,98);keyboard_text=$Text}
+ return [ordered]@{pid=$Client.pid;window_handle=$handle.ToInt64();focus=$focus;mouse_layout_larger=@($width-78,18);mouse_search=@(32,98);keyboard_text=$Text}
 }
 function Wait-SuccessorSave([string]$p,[string]$log,[int]$offset,[object[]]$i){Wait-Until{Test-Path -LiteralPath $p -PathType Leaf}"successor autosave $p" $i;Wait-Until{$t=Get-LogText $log;if($t.Length -le $offset){return $false};return $t.Substring($offset) -match '(?m)Saving finished'}'Saving finished after fixture result' $i}
 function Start-Stage([string]$stage,[string]$save,[int]$port,[string]$serverConfig,[string]$aConfig,[string]$bConfig,[string]$mods,[string]$serverData,[string]$clientAData,[string]$clientBData,[string]$dir){
  $sl=Join-Path $serverData 'factorio-current.log';$al=Join-Path $clientAData 'factorio-current.log';$bl=Join-Path $clientBData 'factorio-current.log';foreach($p in @($sl,$al,$bl)){if(Test-Path -LiteralPath $p -PathType Leaf){Remove-Item -LiteralPath $p -Force}}
  $server=Start-Owned $stage 'server' 3 @('--start-server',$save,'--bind',"127.0.0.1:$port",'--server-settings',(Join-Path $dir 'server-settings.json'),'--config',$serverConfig,'--mod-directory',$mods,'--no-log-rotation','--disable-audio');Wait-NewServerReady $sl $server
- $common=@('--mp-connect',"127.0.0.1:$port",'--mod-directory',$mods,'--no-log-rotation','--disable-audio','--fullscreen','--window-size','1024x768','--graphics-quality','medium','--video-memory-usage','low')
+ $common=@('--mp-connect',"127.0.0.1:$port",'--mod-directory',$mods,'--no-log-rotation','--disable-audio','--window-size','1024x768','--graphics-quality','medium','--video-memory-usage','low')
  $a=Start-Owned $stage 'client-a' 1 (@('--config',$aConfig)+$common);$b=Start-Owned $stage 'client-b' 2 (@('--config',$bConfig)+$common)
  return [pscustomobject]@{server=$server;client_a=$a;client_b=$b;server_log=$sl;client_a_log=$al;client_b_log=$bl}
 }
