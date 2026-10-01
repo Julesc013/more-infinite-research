@@ -269,7 +269,7 @@ local function observe_chemical_science(input)
     .. " enabled_without_research=" .. scalar(fact.enabled_without_research))
   observe_variants(name, fact)
   observe_bindings(name, input)
-  for _, ingredient_name in ipairs({"bob-sodium-hydroxide", "angels-solid-sodium-hydroxide"}) do
+  for _, ingredient_name in ipairs({"bob-sodium-hydroxide", "angels-solid-sodium-hydroxide", "bob-salt"}) do
     local prototype = data_raw.prototype("item", ingredient_name)
     local producers = recipe_facts.recipes_by_output_identity_view("item", ingredient_name)
     log("[mir-f210-current-ba-final-observer] SCIENCE_INGREDIENT item=" .. ingredient_name
@@ -285,6 +285,7 @@ local function observe_chemical_science(input)
         .. " source=" .. scalar(producer and producer.source_class)
         .. " hidden=" .. scalar(producer and producer.hidden)
         .. " enabled_without_research=" .. scalar(producer and producer.enabled_without_research))
+      if producer then observe_variants(producer_name, producer) end
       observe_bindings(producer_name, input)
     end
   end
@@ -312,6 +313,62 @@ local function observe_chemical_science(input)
       .. " failure_kind=" .. scalar(candidate_failure.kind)
       .. " failure_reason=" .. scalar(candidate_failure.reason))
   end
+end
+
+-- Follow the real compiler decisions in an isolated ordinary context. The
+-- capped rejection projector remains unchanged; its exhaustion is UNKNOWN.
+-- These wrappers retain at most 64 distinct returned rejections, never alter
+-- a result, and do not borrow or mutate the parent's acquisition/status memos.
+local function observe_normal_science_decisions()
+  local parent = compiler_context.current()
+  local parent_states = {}
+  for _, state_name in ipairs({"recipe_source", "recipe_index", "science_pack_production",
+    "science_pack_recipe_status", "technology_researchability_index", "compiler_telemetry"}) do
+    parent_states[state_name] = {value = parent:state_view(state_name), epoch = parent:state_epoch(state_name)}
+  end
+  local observation = compiler_context.new({execution_mode = parent:execution_mode()})
+  for _, state_name in ipairs({"recipe_source", "recipe_index"}) do
+    observation:set_state(state_name, assert(parent:state_view(state_name)))
+  end
+  local failures, seen = {}, {}
+  for _, service_name in ipairs({
+    "science.independent_pack_acquisition_witness",
+    "science.prereq_tech_for_science_pack", "science.prereq_techs_for_science_pack",
+    "science.production_route_for_pack"
+  }) do
+    observation:set_service(service_name, assert(parent:service(service_name)))
+  end
+  local reason_service = assert(parent:service("science.technology_researchability_reason"))
+  observation:set_service("science.technology_researchability_reason", function(name, options)
+    local reason = reason_service(name, options)
+    local recipe = options and options.unlock_recipe_name or "-"
+    local key = name .. "\0" .. recipe .. "\0" .. tostring(reason)
+    if reason and not seen[key] and #failures < 64 then
+      seen[key] = true
+      failures[#failures + 1] = {technology = name, recipe = recipe, reason = reason}
+    end
+    return reason
+  end)
+  observation:set_service("science.pack_production_status", production_reachability.pack_production_status)
+  observation:freeze_services()
+  compiler_context.with_active(observation, function()
+    for _, pack in ipairs({"logistic-science-pack", "chemical-science-pack"}) do
+      local status, prerequisite = production_reachability.pack_production_status(pack, {}, {})
+      log("[mir-f210-current-ba-final-observer] NORMAL_SCIENCE pack=" .. pack
+        .. " status=" .. scalar(status) .. " prerequisite=" .. scalar(prerequisite))
+    end
+  end)
+  for _, failure in ipairs(failures) do
+    log("[mir-f210-current-ba-final-observer] NORMAL_REJECTION technology=" .. failure.technology
+      .. " recipe=" .. failure.recipe .. " reason=" .. failure.reason)
+  end
+  assert(compiler_context.current() == parent, "normal observation did not restore parent context")
+  for state_name, before in pairs(parent_states) do
+    assert(parent:state_view(state_name) == before.value and parent:state_epoch(state_name) == before.epoch,
+      "normal observation changed parent state " .. state_name)
+  end
+  log("[mir-f210-current-ba-final-observer] NORMAL_OBSERVATION PASS parent_state_unchanged=true"
+    .. " retained_rejections=" .. tostring(#failures))
 end
 
 local function observe_hidden_output_consumers(output_targets, index)
@@ -596,6 +653,7 @@ compiler_context.with_active(compiler_context.new(), function()
   observe_visible_return_paths(index)
   observe_science_frontier()
   observe_chemical_science(input)
+  observe_normal_science_decisions()
   log("[mir-f210-current-ba-final-observer] DATA PASS read-only-finalized-contract-capture"
     .. " candidates=" .. tostring(#CANDIDATES)
     .. " observed=" .. tostring(observed)
