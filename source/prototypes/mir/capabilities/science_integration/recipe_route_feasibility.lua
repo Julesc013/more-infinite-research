@@ -411,7 +411,21 @@ local function append_boiler_sources(sources, options)
   return true
 end
 
-local function offshore_pump_output_fluids(pump, options)
+local function tile_source_fluids(options)
+  local fluids, seen = {}, {}
+  for _, tile in pairs(data_raw.prototypes("tile")) do
+    if not diagnostic_visit(options) then return fluids, false end
+    local fluid = tile.fluid
+    if type(fluid) == "string" and fluid ~= "" and not seen[fluid] then
+      seen[fluid] = true
+      table.insert(fluids, fluid)
+    end
+  end
+  table.sort(fluids)
+  return fluids, true
+end
+
+local function offshore_pump_output_fluids(pump, options, tile_fluids)
   -- Factorio 2.1 base offshore pumps take their unfiltered output directly
   -- from water tiles. Its source-offset form does not carry the former
   -- `fluid` field. The F200 profile intentionally retains its established
@@ -419,26 +433,22 @@ local function offshore_pump_output_fluids(pump, options)
   -- machine output shape, and must not become a natural source witness.
   -- Preserve the legacy explicit `fluid` declaration on every target.
   local declared = pump and pump.fluid
-  if type(declared) == "string" and declared ~= "" then return {declared} end
-  local fluids, seen = {}, {}
+  if type(declared) == "string" and declared ~= "" then return {declared}, true end
+  local fluids = {}
   if target_profiles.current_factorio_version == "2.1"
     and pump and pump.fluid_source_offset ~= nil then
     -- The pump draws the fluid declared by the tile, including Space Age
     -- oceans. A connection filter constrains that source; it cannot invent
     -- one. In particular, never assume every unfiltered pump produces water.
     local filter = pump.fluid_box and pump.fluid_box.filter
-    for _, tile in pairs(data_raw.prototypes("tile")) do
-      if not diagnostic_visit(options) then return fluids end
-      local fluid = tile.fluid
-      if type(fluid) == "string" and fluid ~= "" and not seen[fluid]
-        and (filter == nil or filter == fluid) then
-        seen[fluid] = true
+    for _, fluid in ipairs(tile_fluids or {}) do
+      if not diagnostic_visit(options) then return fluids, false end
+      if filter == nil or filter == fluid then
         table.insert(fluids, fluid)
       end
     end
   end
-  table.sort(fluids)
-  return fluids
+  return fluids, true
 end
 
 local function default_source_catalog(state, options)
@@ -455,9 +465,20 @@ local function default_source_catalog(state, options)
   if not append_minable_sources(sources, "plant", "minable-entity", options) then return sources end
   if not append_minable_sources(sources, "asteroid-chunk", "minable-entity", options) then return sources end
   if not append_loot_sources(sources, options) then return sources end
+  local tile_fluids
   for _, pump in pairs(data_raw.prototypes("offshore-pump")) do
     if not diagnostic_visit(options) then return sources end
-    for _, fluid in ipairs(offshore_pump_output_fluids(pump, options)) do
+    if target_profiles.current_factorio_version == "2.1"
+      and pump.fluid_source_offset ~= nil
+      and (type(pump.fluid) ~= "string" or pump.fluid == "")
+      and not tile_fluids then
+      local complete
+      tile_fluids, complete = tile_source_fluids(options)
+      if not complete then return sources end
+    end
+    local output_fluids, complete = offshore_pump_output_fluids(pump, options, tile_fluids)
+    if not complete then return sources end
+    for _, fluid in ipairs(output_fluids) do
       local identity = normalize_identity({type = "fluid", name = fluid})
       local key = identity_key(identity)
       sources[key] = sources[key] or {}
