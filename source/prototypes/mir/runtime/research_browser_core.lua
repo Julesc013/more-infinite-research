@@ -448,12 +448,6 @@ local function valid_runtime_settings_binding(value, key)
   return false
 end
 
-local function exact_map_keys(left, right)
-  for key, _ in pairs(left) do if right[key] == nil then return false end end
-  for key, _ in pairs(right) do if left[key] == nil then return false end end
-  return true
-end
-
 -- Schema-2 is the provider contract. It admits the small generic family/action
 -- detail or the declared recipe-productivity detail shape, never arbitrary
 -- copied fields from an untrusted provider envelope.
@@ -546,6 +540,7 @@ function M.normalize_enrichment(enrichment)
   if type(enrichment) ~= "table" then return nil end
   if enrichment.schema == 1 then return enrichment end
   if not only_fields(enrichment, {schema = true, kind = true, caps = true, families = true, details = true,
+      recipe_ids = true,
       runtime_settings_bindings = true})
     or enrichment.schema ~= M.enrichment_schema or enrichment.kind ~= M.enrichment_kind
     or type(enrichment.caps) ~= "table" or type(enrichment.families) ~= "table"
@@ -555,12 +550,16 @@ function M.normalize_enrichment(enrichment)
   local runtime_settings_bindings = enrichment.runtime_settings_bindings
   if runtime_settings_bindings == nil then runtime_settings_bindings = {} end
   if type(runtime_settings_bindings) ~= "table" then return nil end
-  if not exact_map_keys(enrichment.families, enrichment.details) then return nil end
+  -- Rich details may be populated for only the selected subject. List facts
+  -- stay complete, and every supplied detail must still belong to a family.
+  local recipe_ids = enrichment.recipe_ids
+  if recipe_ids == nil then recipe_ids = {} end
+  if type(recipe_ids) ~= "table" then return nil end
   local count = 0
   for key, cap in pairs(enrichment.caps) do
     count = count + 1
     if count > M.catalogue_limit or not bounded_string(key)
-      or not finite_positive_integer(cap) then return nil end
+      or not finite_positive_integer(cap) or enrichment.families[key] == nil then return nil end
   end
   for key, family in pairs(enrichment.families) do
     count = count + 1
@@ -570,10 +569,20 @@ function M.normalize_enrichment(enrichment)
   for key, detail in pairs(enrichment.details) do
     count = count + 1
     local valid, rich = valid_schema2_detail(detail, key, enrichment.families[key], enrichment.caps[key])
-    if count > M.catalogue_limit * 3 or not bounded_string(key) or not valid
+    if count > M.catalogue_limit * 3 or not bounded_string(key)
+      or enrichment.families[key] == nil or not valid
       or (enrichment.caps[key] ~= nil and not rich) then return nil end
   end
-  for key, _ in pairs(enrichment.caps) do if enrichment.details[key] == nil then return nil end end
+  local recipe_count = 0
+  for key, ids in pairs(recipe_ids) do
+    if enrichment.families[key] == nil or not bounded_string(key)
+      or not sorted_unique_strings(ids) then return nil end
+    recipe_count = recipe_count + #ids
+    if recipe_count > M.catalogue_limit * 10 then return nil end
+    local detail = enrichment.details[key]
+    if detail and detail.owner and not same_array(ids, detail.owner.affected_recipe_ids) then return nil end
+    if detail and not detail.owner and #ids ~= 0 then return nil end
+  end
   local runtime_count = 0
   for key, binding in pairs(runtime_settings_bindings) do
     runtime_count = runtime_count + 1
@@ -715,10 +724,17 @@ local function selected_rows(catalogue, view, enrichment, localized_search, sele
           key .. " " .. family .. " " .. display_name, v.search, v.spaced_search)
         if not search_ok and enrichment and enrichment.schema == M.enrichment_schema then
           local detail = enrichment.details[key]
-          for _, benefit in ipairs(detail and detail.recipe_benefits or {}) do
-            if matches_search(benefit.recipe_id, v.search, v.spaced_search) then
-              search_ok = true
-              break
+          local ids = enrichment.recipe_ids and enrichment.recipe_ids[key]
+          if ids then
+            for _, recipe_id in ipairs(ids) do
+              if matches_search(recipe_id, v.search, v.spaced_search) then search_ok = true; break end
+            end
+          else
+            for _, benefit in ipairs(detail and detail.recipe_benefits or {}) do
+              if matches_search(benefit.recipe_id, v.search, v.spaced_search) then
+                search_ok = true
+                break
+              end
             end
           end
         end
@@ -986,6 +1002,8 @@ function M.detail(catalogue, key, enrichment)
   row.cap, row.family = positive_cap(enrichment, key), family_for(enrichment, key)
   row.infinite = row.infinite and not row.cap
   local details = enrichment and enrichment.details and enrichment.details[key]
+  if enrichment and enrichment.schema == M.enrichment_schema
+      and enrichment.families[key] and details == nil then return nil, "detail-deferred" end
   local copied, runtime_settings_binding, reason
   if type(details) == "table" then
     if enrichment.schema == M.enrichment_schema and enrichment.kind == M.enrichment_kind then
