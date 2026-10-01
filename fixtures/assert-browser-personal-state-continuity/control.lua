@@ -81,8 +81,37 @@ local function assert_shared_force(s,a,b,active)
   if active then check(active_force_snapshot(a.force)==s.expected_active_force,"full active force technology/current/progress/queue snapshot changed") end
 end
 local function write_result(stage,body) body.schema=1; body.stage=stage; body.fixture_technology_names={finite=FINITE,infinite=INFINITE,queued=INFINITE}; helpers.write_file(OUTPUT.."/"..stage..".json",helpers.table_to_json(body),false) end
-local function arm_save(s,next_phase,save_name) s.phase=next_phase.."-save-pending"; s.next_phase=next_phase; s.save_name=save_name; s.save_after_tick=game.tick+SAVE_DELAY_TICKS end
 local function run_open(player,options) check(remote.call(INTERFACE,"open",player.index,options)==true,"production browser host rejected options for player "..player.index) end
+local initial_action
+local function is_browser_child(element)
+  local cursor=element
+  while cursor and cursor.valid do
+    if cursor.name==ROOT then return true end
+    cursor=cursor.parent
+  end
+  return false
+end
+local function native_input_ready(s,a,b)
+  run_open(a,{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={},page=1})
+  run_open(b,{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={},page=1})
+  local function geometry(player)
+    local frame=frame_for(player)
+    return {location=frame.location,resolution=player.display_resolution,scale=player.display_scale,width=math.floor(player.display_resolution.width/player.display_scale*.5),height=math.floor(player.display_resolution.height/player.display_scale*.75)}
+  end
+  s.native_input={clicks={},texts={}}
+  helpers.write_file(OUTPUT.."/native-input-ready.json",helpers.table_to_json({schema=1,player_a={index=a.index,geometry=geometry(a)},player_b={index=b.index,geometry=geometry(b)}}),false)
+  s.phase="await-native-input"
+end
+local function native_input_complete(s,a,b)
+  local clicks,texts=s.native_input.clicks,s.native_input.texts
+  if not (clicks[a.index] and clicks[b.index] and texts[a.index] and texts[b.index]) then return false end
+  assert_shared_force(s,a,b,true)
+  check(a.force.technologies[FINITE].enabled and not a.force.technologies[FINITE].researched,"available fixture research selection authority changed")
+  write_result("native-input",{player_a=browser_facts(a),player_b=browser_facts(b),same_force=true,fixture_owned_force_queue_unchanged=true,active_full_force_snapshot_unchanged=true,available_research=FINITE,native_input={clicks=clicks,texts=texts},fixture_force=fixture_force_facts(a.force)})
+  initial_action(s,a,b)
+  return true
+end
+local function arm_save(s,next_phase,save_name) s.phase=next_phase.."-save-pending"; s.next_phase=next_phase; s.save_name=save_name; s.save_after_tick=game.tick+SAVE_DELAY_TICKS end
 local function malformed_hidden_negatives(s,a,b)
   local before=browser_facts(a); run_open(a,{hidden={[2]=INFINITE}}); local sparse=browser_facts(a); run_open(a,{hidden={INFINITE,INFINITE}}); local duplicate=browser_facts(a); run_open(a,{hidden={"no-such-technology"}}); local unknown=browser_facts(a)
   for label,facts in pairs({sparse=sparse,duplicate=duplicate,unknown=unknown}) do check(facts.main_row_present==before.main_row_present and facts.toggle_caption_key==before.toggle_caption_key,"malformed hidden input mutated prior view: "..label) end
@@ -125,7 +154,7 @@ local function unqueued_hidden_recovery(s,a,b)
   assert_shared_force(s,a,b,true)
   return {hidden_technology=hidden_name,selected_technology=selected_name,hidden_technology_is_queued=false,direct_row_present_while_hidden=false,recovery_action_present_after_navigation=true,recovery_caption_key=caption_key,direct_row_present_after_clear=true}
 end
-local function initial_action(s,a,b)
+initial_action=function(s,a,b)
   run_open(a,{tab="research",search=INFINITE,mode=1,status=1,selected=INFINITE,hidden={INFINITE}}); local ah=browser_facts(a); expected_view(ah,1,false,"mir-browser.show","player A hidden view"); assert_shared_force(s,a,b,true)
   local malformed=malformed_hidden_negatives(s,a,b)
   local invalid_page=invalid_hidden_page_negative(s,a,b)
@@ -160,14 +189,29 @@ script.on_configuration_changed(function(event)
   elseif s.phase=="await-removal" and mir and mir.old_version~=nil and mir.new_version==nil then s.phase="removal-ready"
   elseif s.phase=="await-readd" and mir and mir.old_version==nil and mir.new_version~=nil then s.phase="readd-ready" end
 end)
+script.on_event(defines.events.on_gui_click,function(event)
+  local s=storage.browser_personal_state
+  if s and s.phase=="await-native-input" and event.player_index and event.element and event.element.valid and is_browser_child(event.element) then
+    s.native_input.clicks[event.player_index]={name=event.element.name or "",type=event.element.type,tick=event.tick}
+  end
+end)
+script.on_event(defines.events.on_gui_text_changed,function(event)
+  local s=storage.browser_personal_state
+  if s and s.phase=="await-native-input" and event.player_index and event.element and event.element.valid and event.element.tags and event.element.tags.mir_browser=="search" then
+    local expected="native-input-player-"..(event.player_index==s.player_a_index and "a" or event.player_index==s.player_b_index and "b" or "unknown")
+    local text=event.text or event.element.text
+    if text==expected then s.native_input.texts[event.player_index]={text=text,tick=event.tick} end
+  end
+end)
 script.on_event(defines.events.on_tick,function()
   if session_complete then return end; local s=storage.browser_personal_state; if not s or s.phase=="complete" then return end
   if s.save_after_tick and game.tick>=s.save_after_tick then local next_phase,save_name=s.next_phase,s.save_name; s.save_after_tick,s.next_phase,s.save_name=nil,nil,nil; s.phase=next_phase; game.auto_save(save_name); session_complete=true; return end
   if s.phase=="await-initial" then
-    if #game.connected_players~=2 then return end; local players={}; for _,player in ipairs(game.connected_players) do players[#players+1]=player end; table.sort(players,function(left,right) return left.index<right.index end); check(players[1].name~=players[2].name,"client usernames are not distinct"); s.player_a_index,s.player_b_index=players[1].index,players[2].index; s.player_a_username,s.player_b_username=players[1].name,players[2].name; initial_action(s,players[1],players[2]); return
+    if #game.connected_players~=2 then return end; local players={}; for _,player in ipairs(game.connected_players) do players[#players+1]=player end; table.sort(players,function(left,right) return left.index<right.index end); check(players[1].name~=players[2].name,"client usernames are not distinct"); s.player_a_index,s.player_b_index=players[1].index,players[2].index; s.player_a_username,s.player_b_username=players[1].name,players[2].name; native_input_ready(s,players[1],players[2]); return
   end
   local a,b=game.get_player(s.player_a_index),game.get_player(s.player_b_index); if not (a and a.connected and b and b.connected) then return end; a,b=players_from_state(s)
-  if s.phase=="await-save-reload" then persistent_action(s,"save-reload",a,b); arm_save(s,"await-configuration-change","mir-browser-personal-state-continuity-configuration")
+  if s.phase=="await-native-input" then native_input_complete(s,a,b)
+  elseif s.phase=="await-save-reload" then persistent_action(s,"save-reload",a,b); arm_save(s,"await-configuration-change","mir-browser-personal-state-continuity-configuration")
   elseif s.phase=="configuration-change-ready" then persistent_action(s,"configuration-change",a,b); arm_save(s,"await-removal","mir-browser-personal-state-continuity-removal")
   elseif s.phase=="removal-ready" then removal_action(s,a,b)
   elseif s.phase=="readd-ready" then readd_action(s,a,b) end
