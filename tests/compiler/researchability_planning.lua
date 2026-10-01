@@ -819,6 +819,27 @@ check("F09C7", feasibility.source_witness({type = "fluid", name = "water"}) == n
   "A source offset without a declared fluid tile is not a natural source")
 
 reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  offshore_pumps = {
+    water_pump = {fluid_source_offset = {0, -1}, fluid_box = {filter = "water"}},
+    oil_pump = {fluid_source_offset = {0, -1}, fluid_box = {filter = "heavy-oil"}}
+  },
+  tiles = setmetatable({
+    water = {fluid = "water"}, oil_ocean = {fluid = "heavy-oil"},
+    duplicate_water = {fluid = "water"}
+  }, {__pairs = function(values)
+    world.tile_scans = (world.tile_scans or 0) + 1
+    return next, values, nil
+  end})
+})
+world.shared_source_state = {}
+check("F09C8", feasibility.source_witness({type = "fluid", name = "water"}, nil, world.shared_source_state) ~= nil
+  and feasibility.source_witness({type = "fluid", name = "heavy-oil"}, nil, world.shared_source_state) ~= nil
+  and feasibility.source_witness({type = "fluid", name = "molten-nickel"}, nil, world.shared_source_state) == nil
+  and world.tile_scans == 1,
+  "F210 source-offset pumps share one tile scan while retaining exact fluid filters")
+
+reset({
   item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
   recipe_facts = {eggs = route_fact("biter-egg", {}, {categories = {"captive-spawner-process"}})},
   producers = {["biter-egg"] = {"eggs"}},
