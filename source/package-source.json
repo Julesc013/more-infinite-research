@@ -2901,10 +2901,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 42093,
-      "source_sha256": "016C393A79B037AE234BD4D3EB1688CA8275B9EB952052427372437EA7175465",
-      "output_bytes": 42093,
-      "output_sha256": "016C393A79B037AE234BD4D3EB1688CA8275B9EB952052427372437EA7175465"
+      "source_bytes": 42362,
+      "source_sha256": "EEB8BD25E053DB336D15F19DCD3DE1B0F0E9364984BF23EE7CDE70D7D6645345",
+      "output_bytes": 42362,
+      "output_sha256": "EEB8BD25E053DB336D15F19DCD3DE1B0F0E9364984BF23EE7CDE70D7D6645345"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "AA7BF19A60C0416EE2F1363C80E1C767F643CE62067AFB3EE0D2152ABB81DA17"
+  "record_sha256": "D4B046CE54DA0FE109F0856ACF916D2862D8373896FBA8ED7B76689084C24543"
 }

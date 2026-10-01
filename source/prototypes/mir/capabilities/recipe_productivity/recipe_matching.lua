@@ -72,14 +72,27 @@ local function recipe_uses_blocked_ingredient(rec, patterns)
   return false
 end
 
+local function typed_identity(entry)
+  if type(entry) ~= "table" or type(entry.type) ~= "string" or entry.type == ""
+    or type(entry.name) ~= "string" or entry.name == "" then
+    return nil
+  end
+  return entry.type .. "\30" .. entry.name
+end
+
 local function has_productive_shared_input_output(recipe)
   for _, variant in ipairs(recipe.variants or {}) do
     local ingredients = {}
-    for _, entry in ipairs(variant.ingredients or {}) do ingredients[entry.name] = true end
+    for _, entry in ipairs(variant.ingredients or {}) do
+      local identity = typed_identity(entry)
+      if not identity then return true end
+      ingredients[identity] = true
+    end
     for _, entry in ipairs(variant.results or {}) do
       local maximum = tonumber(entry.amount_max or entry.amount or entry.amount_min) or 1
       local ignored = tonumber(entry.ignored_by_productivity or 0) or 0
-      if ingredients[entry.name] and maximum - ignored > 0 then return true end
+      local identity = typed_identity(entry)
+      if not identity or (ingredients[identity] and maximum - ignored > 0) then return true end
     end
   end
   return false
@@ -101,39 +114,33 @@ end
 -- final route is an ordinary, deterministic, non-recovery process.
 local function material_graph()
   return compiler_context.current():state_view("material_route_graph", function()
-    local graph = {edges = {}, typed_edges = {}, complete = true, edge_count = 0}
+    local graph = {typed_edges = {}, complete = true, edge_count = 0}
     recipe_facts.for_each(function(_, fact)
       for _, variant in ipairs(fact.variants or {}) do
         for _, input in ipairs(variant.ingredients or {}) do
-          graph.edges[input.name] = graph.edges[input.name] or {}
-          local input_identity = type(input.type) == "string" and input.type ~= ""
-            and type(input.name) == "string" and input.name ~= ""
-            and input.type .. "\30" .. input.name or nil
-          if input_identity then graph.typed_edges[input_identity] = graph.typed_edges[input_identity] or {} end
+          local input_identity = typed_identity(input)
+          if not input_identity then
+            graph.complete, graph.reason = false, "process-graph-identity"
+            return
+          end
+          graph.typed_edges[input_identity] = graph.typed_edges[input_identity] or {}
           for _, output in ipairs(variant.results or {}) do
-            if not graph.edges[input.name][output.name] then
+            local output_identity = typed_identity(output)
+            if not output_identity then
+              graph.complete, graph.reason = false, "process-graph-identity"
+              return
+            end
+            if not graph.typed_edges[input_identity][output_identity] then
               graph.edge_count = graph.edge_count + 1
               if graph.edge_count > 100000 then graph.complete = false; return end
-              graph.edges[input.name][output.name] = true
+              graph.typed_edges[input_identity][output_identity] = true
             end
-            local output_identity = type(output.type) == "string" and output.type ~= ""
-              and type(output.name) == "string" and output.name ~= ""
-              and output.type .. "\30" .. output.name or nil
-            if input_identity and output_identity then graph.typed_edges[input_identity][output_identity] = true end
           end
         end
       end
     end)
     return graph
   end)
-end
-
-local function typed_identity(entry)
-  if type(entry) ~= "table" or type(entry.type) ~= "string" or entry.type == ""
-    or type(entry.name) ~= "string" or entry.name == "" then
-    return nil
-  end
-  return entry.type .. "\30" .. entry.name
 end
 
 local function sorted_keys(set)
@@ -167,7 +174,7 @@ local function relevant_return_graph(recipe)
     return nil, "route"
   end
   local graph = material_graph()
-  if not graph.complete then return nil, "process-graph-budget" end
+  if not graph.complete then return nil, graph.reason or "process-graph-budget" end
   local outputs, inputs = route_identities(recipe, "results"), route_identities(recipe, "ingredients")
   if next(outputs) == nil or next(inputs) == nil then return nil, "route-identities" end
 
@@ -278,20 +285,26 @@ function R.material_route_is_acyclic(recipe)
   if not recipe or recipe.allow_productivity ~= true then return false, "productivity-not-allowed" end
   if type(recipe.variants) ~= "table" or #recipe.variants == 0 then return false, "missing-process-variants" end
   local graph = material_graph()
-  if not graph.complete then return false, "process-graph-budget" end
+  if not graph.complete then return false, graph.reason or "process-graph-budget" end
   for _, variant in ipairs(recipe.variants or {}) do
     local inputs, queue, visited = {}, {}, {}
-    for _, input in ipairs(variant.ingredients or {}) do inputs[input.name] = true end
+    for _, input in ipairs(variant.ingredients or {}) do
+      local identity = typed_identity(input)
+      if not identity then return false, "missing-process-identity" end
+      inputs[identity] = input.name
+    end
     for _, output in ipairs(variant.results or {}) do
-      if not visited[output.name] then queue[#queue + 1] = output.name; visited[output.name] = true end
+      local identity = typed_identity(output)
+      if not identity then return false, "missing-process-identity" end
+      if not visited[identity] then queue[#queue + 1] = identity; visited[identity] = true end
     end
     local head = 1
     while head <= #queue do
       if head > 30000 then return false, "process-search-budget" end
-      local name = queue[head]; head = head + 1
-      if inputs[name] then return false, "potential-return-path:" .. name end
-      for next_name in pairs(graph.edges[name] or {}) do
-        if not visited[next_name] then visited[next_name] = true; queue[#queue + 1] = next_name end
+      local identity = queue[head]; head = head + 1
+      if inputs[identity] then return false, "potential-return-path:" .. inputs[identity] end
+      for next_identity in pairs(graph.typed_edges[identity] or {}) do
+        if not visited[next_identity] then visited[next_identity] = true; queue[#queue + 1] = next_identity end
       end
     end
   end
