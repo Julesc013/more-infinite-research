@@ -255,6 +255,46 @@ local function observe_science_frontier()
     .. " early_present=" .. tostring(#early))
 end
 
+-- Chemical science is the first observed frontier missing in the combined
+-- world. Inspect its exact final recipe and use the existing bounded
+-- rejection projector once at its maximum documented work limit. A budget
+-- result is still indeterminate evidence, never an admission override.
+local function observe_chemical_science(input)
+  local name = "chemical-science-pack"
+  local fact = recipe_facts.view(name)
+  if not fact then error("chemical science final recipe is missing") end
+  log("[mir-f210-current-ba-final-observer] SCIENCE_RECIPE recipe=" .. name
+    .. " source=" .. scalar(fact.source_class)
+    .. " hidden=" .. scalar(fact.hidden)
+    .. " enabled_without_research=" .. scalar(fact.enabled_without_research))
+  observe_variants(name, fact)
+  observe_bindings(name, input)
+  local projection = production_reachability.pack_production_rejection_projection(name, {
+    limits = {candidates = 16, nodes = 1024, depth = 128, bytes = 262144},
+    subject = {stream = "research_material_aluminium",
+      generated_technology = "recipe-prod-research_material_aluminium-1"}
+  })
+  local failure = projection and projection.first_failure or {}
+  local truncation = projection and projection.truncation or {}
+  local usage = truncation.usage or {}
+  log("[mir-f210-current-ba-final-observer] SCIENCE_DIAGNOSTIC pack=" .. name
+    .. " status=" .. scalar(projection and projection.status)
+    .. " failure_kind=" .. scalar(failure.kind)
+    .. " failure_reason=" .. scalar(failure.reason)
+    .. " failure_recipe=" .. scalar(failure.recipe)
+    .. " failure_technology=" .. scalar(failure.technology)
+    .. " visits=" .. scalar(usage.visits)
+    .. " max_depth=" .. scalar(usage.maximum_depth)
+    .. " truncated=" .. names_line(truncation.truncated))
+  for _, candidate in ipairs(projection and projection.candidates or {}) do
+    local candidate_failure = candidate.first_failure or {}
+    log("[mir-f210-current-ba-final-observer] SCIENCE_CANDIDATE recipe=" .. scalar(candidate.recipe)
+      .. " structural=" .. scalar(candidate.structural_route and candidate.structural_route.status)
+      .. " failure_kind=" .. scalar(candidate_failure.kind)
+      .. " failure_reason=" .. scalar(candidate_failure.reason))
+  end
+end
+
 local function observe_hidden_output_consumers(output_targets, index)
   local count_by_output = {}
   for output in pairs(output_targets) do count_by_output[output] = 0 end
@@ -403,6 +443,95 @@ local function observe_gold_return_path(index, input)
   end
 end
 
+-- Separate ordinary visible recipe cycles from paths through hidden recipes.
+-- Factorio's recycler can use generated hidden recycling recipes, so an
+-- "absent" result here is not a player-safety proof. A "reachable" result is
+-- useful counterevidence; neither outcome automatically admits a route.
+local function observe_visible_return_paths(index)
+  local adjacency, edges = {}, 0
+  local recipe_names = {}
+  for name in pairs(index.facts or {}) do recipe_names[#recipe_names + 1] = name end
+  table.sort(recipe_names)
+  for _, name in ipairs(recipe_names) do
+    local fact = index.facts[name]
+    if fact.source_class == "ordinary" and fact.hidden == false then
+      for _, variant in ipairs(fact.variants or {}) do
+        if variant.hidden == false then
+          for _, ingredient in ipairs(variant.ingredients or {}) do
+            if type(ingredient.name) == "string" and ingredient.name ~= "" then
+              local next_edges = adjacency[ingredient.name]
+              if not next_edges then next_edges = {}; adjacency[ingredient.name] = next_edges end
+              for _, result in ipairs(variant.results or {}) do
+                if type(result.name) == "string" and result.name ~= "" then
+                  edges = edges + 1
+                  if edges > 100000 then error("visible return observation exceeded edge budget") end
+                  next_edges[#next_edges + 1] = {name = result.name, recipe = name}
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  for _, next_edges in pairs(adjacency) do
+    table.sort(next_edges, function(left, right)
+      if left.name == right.name then return left.recipe < right.recipe end
+      return left.name < right.name
+    end)
+  end
+  for _, candidate in ipairs(CANDIDATES) do
+    local fact = recipe_facts.view(candidate.name)
+    if fact then
+      local inputs, queue, visited, predecessor = {}, {}, {}, {}
+      for _, variant in ipairs(fact.variants or {}) do
+        for _, ingredient in ipairs(variant.ingredients or {}) do inputs[ingredient.name] = true end
+        for _, result in ipairs(variant.results or {}) do
+          if not visited[result.name] then
+            visited[result.name] = true
+            queue[#queue + 1] = result.name
+          end
+        end
+      end
+      local head, target = 1, nil
+      while head <= #queue and not target do
+        if head > 30000 then error("visible return observation exceeded search budget") end
+        local current = queue[head]
+        head = head + 1
+        if inputs[current] then
+          target = current
+        else
+          for _, edge in ipairs(adjacency[current] or {}) do
+            if not visited[edge.name] then
+              visited[edge.name] = true
+              predecessor[edge.name] = {previous = current, recipe = edge.recipe}
+              queue[#queue + 1] = edge.name
+            end
+          end
+        end
+      end
+      local path = {}
+      if target then
+        local cursor = target
+        while predecessor[cursor] do
+          local edge = predecessor[cursor]
+          path[#path + 1] = edge.recipe
+          cursor = edge.previous
+          if #path > 30000 then error("visible return observation exceeded path budget") end
+        end
+        local ordered = {}
+        for i = #path, 1, -1 do ordered[#ordered + 1] = path[i] end
+        path = ordered
+      end
+      log("[mir-f210-current-ba-final-observer] VISIBLE_RETURN recipe=" .. candidate.name
+        .. " status=" .. (target and "reachable" or "absent")
+        .. " target=" .. scalar(target)
+        .. " steps=" .. tostring(#path)
+        .. " path=" .. (#path == 0 and "-" or table.concat(path, ">")))
+    end
+  end
+end
+
 log("[mir-f210-current-ba-final-observer] ACTIVE_MODS " .. active_mods_line())
 compiler_context.with_active(compiler_context.new(), function()
   local index = recipe_facts.index_view()
@@ -445,7 +574,9 @@ compiler_context.with_active(compiler_context.new(), function()
   end
   observe_hidden_output_consumers(output_targets, index)
   observe_gold_return_path(index, input)
+  observe_visible_return_paths(index)
   observe_science_frontier()
+  observe_chemical_science(input)
   log("[mir-f210-current-ba-final-observer] DATA PASS read-only-finalized-contract-capture"
     .. " candidates=" .. tostring(#CANDIDATES)
     .. " observed=" .. tostring(observed)
