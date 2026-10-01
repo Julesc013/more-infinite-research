@@ -186,10 +186,22 @@ local function catalogue(force)
   if not result then return nil end
   -- Dynamic cap/level facts must be refreshed with the copied Force snapshot.
   -- Only the pure core is cache-safe; provider state is never retained here.
-  result.enrichment = mir_provider.snapshot(force)
+  result.enrichment = mir_provider.list_snapshot(force)
   result.family_names = core.family_names(result.enrichment)
   catalogue_cache[force.index] = {tick = game.tick, value = result}
   return result
+end
+
+local function resolved_detail(force, catalogue_snapshot, technology_id)
+  if not catalogue_snapshot then return nil, "invalid-catalogue" end
+  local enrichment = catalogue_snapshot.enrichment
+  if type(technology_id) == "string" and enrichment and enrichment.families[technology_id]
+      and not enrichment.details[technology_id] then
+    local selected = mir_provider.selected_detail(force, technology_id)
+    if selected then enrichment.details[technology_id] = selected
+    else return nil, {"mir-browser.live-detail-unavailable"} end
+  end
+  return core.detail(catalogue_snapshot, technology_id, enrichment)
 end
 
 local function translation_cache(player)
@@ -728,7 +740,7 @@ local function add_research_startup_settings(parent, portable, maximum_width)
 end
 local function detail(player, parent, v, c, width)
   if not v.selected then label(parent, {"mir-browser.no-results"}, width - 24); return end
-  local portable, reason = core.detail(c, v.selected, c.enrichment)
+  local portable, reason = resolved_detail(player.force, c, v.selected)
   local tech = portable and player.force.technologies[portable.technology.key]
   if not tech then
     label(parent, {"mir-browser.detail-unavailable", reason or "no-selection"}, width - 24)
@@ -1344,7 +1356,7 @@ local function click(event)
     toggle_hidden(v, player.force, tags.technology)
   elseif action == "inspect-settings" then
     local c = catalogue(player.force)
-    local portable = c and core.detail(c, tags.technology, c.enrichment)
+    local portable = resolved_detail(player.force, c, tags.technology)
     local key = portable and research_setting_specs(portable)
     if not key and portable then key = portable.technology.family end
     if key then v.tab, v.settings_scope, v.settings_search, v.setting_selection = "settings", "research", "", key end

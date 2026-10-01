@@ -115,6 +115,25 @@ return function(browser_core, check)
       and browser_core.detail(catalogue, technology, direct).technology.cap == 10,
     "zero default remains valid when a direct setting selects a finite cap")
 
+  local sparse = envelope(0, 0, 10, "mirset1", 3)
+  local rich = sparse.details[technology]
+  sparse.details = {}
+  sparse.recipe_ids = {[technology] = rich.owner.affected_recipe_ids}
+  local deferred, deferred_reason = browser_core.detail(catalogue, technology, sparse)
+  local by_recipe = browser_core.query_all(catalogue,
+    {mode = 1, status = 1, family = family, search = "core-regression-recipe-002"}, sparse)
+  check(browser_core.normalize_enrichment(sparse) ~= nil and not deferred
+      and deferred_reason == "detail-deferred" and by_recipe.count == 1
+      and by_recipe.rows[1].key == technology,
+    "sparse catalogue preserves managed family, finite cap and recipe search without claiming rich detail")
+  sparse.details[technology] = rich
+  local selected = browser_core.detail(catalogue, technology, sparse)
+  check(selected and selected.technology.cap == 10 and selected.enrichment.recipe_benefit_count == 3,
+    "selected rich detail can be attached without rebuilding the list envelope")
+  sparse.recipe_ids[technology] = {"wrong-recipe"}
+  check(browser_core.normalize_enrichment(sparse) == nil,
+    "selected detail cannot contradict searchable recipe identities")
+
   local negative_default = envelope(-1, 10, 10, "direct")
   check(browser_core.normalize_enrichment(negative_default) == nil,
     "negative maximum defaults remain rejected")

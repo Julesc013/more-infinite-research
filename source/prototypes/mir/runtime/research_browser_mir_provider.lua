@@ -602,6 +602,26 @@ local function detail_for_row(row, recipes, disposition, caps, force)
   return detail
 end
 
+-- The catalogue needs stable ownership and recipe identifiers, but only the
+-- selected entry needs live productivity values. Keep the same prototype,
+-- policy and science cross-checks used by the rich detail path.
+local function list_facts_for_row(row, recipes, caps, force)
+  local technology = force and force.technologies and force.technologies[row.technology_id]
+  if not technology or not technology.valid then return nil end
+  if #recipes == 0 then return {recipe_ids = recipes} end
+  local policy = caps[row.technology_id]
+  if policy then
+    local maximum = comparison(policy.setting)
+    local enabled = comparison("ips-enable-" .. row.stream_id)
+    if not maximum or not enabled or maximum.effective ~= policy.selected then return nil end
+  end
+  if not finite_positive_integer(tonumber(technology.level)) then return nil end
+  local effects = productivity_effects(technology.prototype)
+  if not effects or not science_ingredients(technology.prototype)
+    or not same_array(recipe_ids(effects), recipes) then return nil end
+  return {cap = policy and policy.selected or nil, recipe_ids = recipes}
+end
+
 local function copy_public_candidate(row, recipes, disposition)
   return {
     row = {
@@ -700,5 +720,46 @@ function M.snapshot(force)
   end
   return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families,
     details = details, runtime_settings_bindings = runtime_settings_bindings}
+end
+
+-- A refresh of the research list never traverses live Force recipe bonuses.
+-- Rich detail is retrieved through selected_detail() only when requested.
+function M.list_snapshot(force)
+  local caps, families, recipe_ids_by_technology = {}, {}, {}
+  local runtime_settings_bindings = live_runtime_settings_bindings(force)
+  local candidates = current_public_candidates()
+  if candidates then
+    local policies = current_policy_caps()
+    local count = 0
+    for _, candidate in ipairs(candidates) do
+      local row = candidate.row
+      local facts = list_facts_for_row(row, candidate.recipes, policies, force)
+      if facts then
+        count = count + 1
+        if count > M.catalogue_limit then break end
+        families[row.technology_id] = row.stream_id
+        if facts.cap then caps[row.technology_id] = facts.cap end
+        recipe_ids_by_technology[row.technology_id] = copy_string_array(facts.recipe_ids)
+      end
+    end
+  end
+  return {schema = M.schema, kind = "portable-research-enrichment", caps = caps,
+    families = families, recipe_ids = recipe_ids_by_technology, details = {},
+    runtime_settings_bindings = runtime_settings_bindings}
+end
+
+function M.selected_detail(force, technology_id)
+  if not bounded_string(technology_id) then return nil, "invalid-technology" end
+  local candidates = current_public_candidates()
+  if not candidates then return nil, "public-plan-unavailable" end
+  local policies = current_policy_caps()
+  for _, candidate in ipairs(candidates) do
+    if candidate.row.technology_id == technology_id then
+      local detail = detail_for_row(candidate.row, candidate.recipes, candidate.disposition, policies, force)
+      if not detail then return nil, "live-detail-unavailable" end
+      return detail
+    end
+  end
+  return nil, "unknown-technology"
 end
 return M

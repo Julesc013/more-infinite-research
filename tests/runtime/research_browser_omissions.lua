@@ -143,6 +143,24 @@ local function check_omissions(check)
     and changed_productive.details["productive-live"].owner.affected_recipe_ids[1] == "productive-recipe"
     and browser_omission_fingerprint.metrics().fingerprint_calls == productive_validation_calls,
     "cached candidates recompute live level and productivity facts without exposing cache arrays")
+  local forbidden_recipe_reads = {valid = true, technologies = productive_force.technologies,
+    recipes = setmetatable({}, {__index = function() error("eager recipe read") end})}
+  local list_ok, list_only = pcall(browser_omission_provider.list_snapshot, forbidden_recipe_reads)
+  check(list_ok and list_only.families["productive-live"] == "research_productive_live"
+    and list_only.recipe_ids["productive-live"][1] == "productive-recipe"
+    and not next(list_only.details),
+    "lightweight provider list does not inspect live recipe productivity")
+  local selected_productive = browser_omission_provider.selected_detail(productive_force, "productive-live")
+  check(selected_productive and selected_productive.recipe_benefits[1].current_productivity_bonus == 3,
+    "selected provider detail refreshes live recipe productivity")
+  local original_recipe = productive_force.recipes["productive-recipe"]
+  productive_force.recipes["productive-recipe"] = nil
+  local unavailable_list = browser_omission_provider.list_snapshot(productive_force)
+  local unavailable_detail, unavailable_reason = browser_omission_provider.selected_detail(productive_force, "productive-live")
+  check(unavailable_list.families["productive-live"] == "research_productive_live"
+    and unavailable_detail == nil and unavailable_reason == "live-detail-unavailable",
+    "known research remains discoverable but reports unavailable detail when live recipe facts disappear")
+  productive_force.recipes["productive-recipe"] = original_recipe
 
   local unsealed = set_artifact({
     admitted("emit", "research_emit_unsealed", "emit-live"),

@@ -295,6 +295,33 @@ script.on_nth_tick(1,function()
   force.research_progress=0.375
   local before=snapshot(force)
   local catalogue=browser_catalogue.snapshot(force)
+  local full_enrichment=browser_provider.snapshot(force)
+  local list_enrichment=browser_provider.list_snapshot(force)
+  check(browser_core.normalize_enrichment(list_enrichment)~=nil and next(list_enrichment.details)==nil,
+    "native list validates without eager rich research detail")
+  local list_count=0
+  for key,family in pairs(list_enrichment.families) do
+    list_count=list_count+1
+    local rich=full_enrichment.details[key]
+    local selected=browser_provider.selected_detail(force,key)
+    local ids=list_enrichment.recipe_ids[key]
+    check(rich and selected and family==full_enrichment.families[key]
+      and list_enrichment.caps[key]==full_enrichment.caps[key]
+      and type(ids)=="table" and #ids==(rich.owner and #rich.owner.affected_recipe_ids or 0),
+      "native list and selected detail agree on managed research: "..key)
+    for index,id in ipairs(ids) do
+      check(rich.owner and rich.owner.affected_recipe_ids[index]==id
+        and selected.owner and selected.owner.affected_recipe_ids[index]==id,
+        "native list recipe identity matches selected detail: "..key)
+    end
+  end
+  local rich_count=0
+  for _ in pairs(full_enrichment.details) do rich_count=rich_count+1 end
+  check(list_count==rich_count,
+    "native lightweight list admits the same managed catalogue as rich snapshot: list="..list_count.." rich="..rich_count)
+  if string.sub(helpers.game_version,1,3)=="2.1" then
+    check(list_count>0,"F210 provider parity exercises a nonempty managed catalogue")
+  end
   local static_reads=0
   local cache_prototype=setmetatable({}, {__index=function(_,key)
     if key=="max_level" or key=="order" then static_reads=static_reads+1 end
