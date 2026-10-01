@@ -269,6 +269,25 @@ local function observe_chemical_science(input)
     .. " enabled_without_research=" .. scalar(fact.enabled_without_research))
   observe_variants(name, fact)
   observe_bindings(name, input)
+  for _, ingredient_name in ipairs({"bob-sodium-hydroxide", "angels-solid-sodium-hydroxide"}) do
+    local prototype = data_raw.prototype("item", ingredient_name)
+    local producers = recipe_facts.recipes_by_output_identity_view("item", ingredient_name)
+    log("[mir-f210-current-ba-final-observer] SCIENCE_INGREDIENT item=" .. ingredient_name
+      .. " prototype=" .. scalar(prototype ~= nil)
+      .. " hidden=" .. scalar(prototype and prototype.hidden)
+      .. " producers=" .. names_line(producers)
+      .. " producer_count=" .. tostring(#producers))
+    for index, producer_name in ipairs(producers) do
+      if index > 12 then break end
+      local producer = recipe_facts.view(producer_name)
+      log("[mir-f210-current-ba-final-observer] SCIENCE_PRODUCER item=" .. ingredient_name
+        .. " recipe=" .. producer_name
+        .. " source=" .. scalar(producer and producer.source_class)
+        .. " hidden=" .. scalar(producer and producer.hidden)
+        .. " enabled_without_research=" .. scalar(producer and producer.enabled_without_research))
+      observe_bindings(producer_name, input)
+    end
+  end
   local projection = production_reachability.pack_production_rejection_projection(name, {
     limits = {candidates = 16, nodes = 1024, depth = 128, bytes = 262144},
     subject = {stream = "research_material_aluminium",
