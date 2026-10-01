@@ -44,7 +44,7 @@ try {
     written_authorizations=[ordered]@{
       complete_mir_4_2='authorized-subject-to-required-technical-checks';protected_main_promotion='authorized-after-accepted-technical-seal-and-governed-restore'
       required_distribution_tags='authorized-after-protected-main-readback-and-candidate-bound-go';github_publication='authorized-after-final-byte-acceptance-and-tag-verification'
-      nine_target_github_zip_assets='authorized-after-final-byte-acceptance';mod_portal_upload='authorized-after-final-byte-acceptance-using-identical-sealed-zips'
+      nine_target_github_zip_assets='authorized-after-final-byte-acceptance';mod_portal_upload='not-claimed-by-this-github-release-authorization'
     }
     maintainer_decisions=[ordered]@{
       current_balance_direction='accepted';current_visual_direction='accepted';disclosed_limitations='accepted';additional_playtest_prompt='waived-for-this-release-decision'
@@ -62,6 +62,12 @@ try {
   Write-MIR4BootstrapRecord -Record $authorization -Path $authorizationPath | Out-Null
   $authorizationIdentity = Read-MIR42NineTargetWrittenReleaseAuthorization -Path $authorizationPath
   Assert-MIR42WrittenGoTest -Condition ([string]$authorizationIdentity.record.maintainer_decisions.f210_f200_playtest_receipt -ceq 'not-claimed-and-not-materialized') -Code 'written-waiver-does-not-claim-gameplay-receipt'
+  $authorization.written_authorizations.mod_portal_upload = 'authorized-after-final-byte-acceptance-using-identical-sealed-zips'
+  $authorization.record_sha256 = ''
+  $oldPortalScopePath = Join-Path $root 'old-portal-scope-authorization.json'
+  Write-MIR4BootstrapRecord -Record $authorization -Path $oldPortalScopePath | Out-Null
+  Assert-MIR42WrittenGoReject -Action { Read-MIR42NineTargetWrittenReleaseAuthorization -Path $oldPortalScopePath } -Pattern '\[mir42-release-go-schema\]' -Code 'portal-authority-not-in-github-go'
+  $authorization.written_authorizations.mod_portal_upload = 'not-claimed-by-this-github-release-authorization'
 
   $mainReadback = [pscustomobject][ordered]@{
     schema=1;kind='MIR42NineTargetProtectedMainReadbackV1';status='MIR-4.2-NINE-TARGET-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST';scope='nine-target';source=$source
@@ -88,7 +94,7 @@ try {
   New-Item -ItemType Directory -Force -Path $primary | Out-Null
   $output = Join-Path $primary 'build/release-authorization/written-go.json'
   $bound = New-MIR42NineTargetPublicationAuthorization -RepoRoot $repo -PrimaryRepoRoot $primary -MaintainerAuthorizationPath $authorizationPath -MainReadbackPath $mainReadbackPath -FrozenInventoryPath (Join-Path $root 'frozen-inventory.json') -OutputPath $output
-  Assert-MIR42WrittenGoTest -Condition ([bool]$bound.record.tagging_authorized -and [bool]$bound.record.github_publication_authorized -and [bool]$bound.record.mod_portal_upload_authorized -and -not [bool]$bound.record.written_maintainer_authorization.gameplay_receipt_claimed) -Code 'post-main-authorizes-without-synthetic-gameplay'
+  Assert-MIR42WrittenGoTest -Condition ([bool]$bound.record.tagging_authorized -and [bool]$bound.record.github_publication_authorized -and -not [bool]$bound.record.mod_portal_upload_authorized -and [string]$bound.record.publication_scope -ceq 'github-release-only' -and [string]$bound.record.mod_portal_upload_disposition -ceq 'not-claimed-by-this-github-release-authorization' -and -not [bool]$bound.record.written_maintainer_authorization.gameplay_receipt_claimed) -Code 'post-main-authorizes-github-only-without-synthetic-gameplay'
   $repeat = New-MIR42NineTargetPublicationAuthorization -RepoRoot $repo -PrimaryRepoRoot $primary -MaintainerAuthorizationPath $authorizationPath -MainReadbackPath $mainReadbackPath -FrozenInventoryPath (Join-Path $root 'frozen-inventory.json') -OutputPath $output
   Assert-MIR42WrittenGoTest -Condition ([string]$repeat.sha256 -ceq [string]$bound.sha256) -Code 'create-only-output-idempotent'
 

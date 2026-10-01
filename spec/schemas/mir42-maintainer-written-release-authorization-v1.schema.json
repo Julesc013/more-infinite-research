@@ -29,7 +29,7 @@
         "required_distribution_tags": {"const": "authorized-after-protected-main-readback-and-candidate-bound-go"},
         "github_publication": {"const": "authorized-after-final-byte-acceptance-and-tag-verification"},
         "nine_target_github_zip_assets": {"const": "authorized-after-final-byte-acceptance"},
-        "mod_portal_upload": {"const": "authorized-after-final-byte-acceptance-using-identical-sealed-zips"}
+        "mod_portal_upload": {"const": "not-claimed-by-this-github-release-authorization"}
       }
     },
     "maintainer_decisions": {

@@ -564,7 +564,9 @@ function Read-MIR42NineTargetWrittenReleaseAuthorization {
     required_distribution_tags = 'authorized-after-protected-main-readback-and-candidate-bound-go'
     github_publication = 'authorized-after-final-byte-acceptance-and-tag-verification'
     nine_target_github_zip_assets = 'authorized-after-final-byte-acceptance'
-    mod_portal_upload = 'authorized-after-final-byte-acceptance-using-identical-sealed-zips'
+    # The written GO is for GitHub release assets.  Portal disposition remains
+    # under its separately governed operator record.
+    mod_portal_upload = 'not-claimed-by-this-github-release-authorization'
   }
   foreach ($field in $authorizationStates.Keys) {
     if ([string]$record.written_authorizations.$field -cne [string]$authorizationStates[$field]) { throw "[mir42-release-go-authorization] $field" }
@@ -720,8 +722,10 @@ function New-MIR42NineTargetPublicationAuthorization {
     frozen_release_asset_inventory = [ordered]@{path=(Resolve-Path -LiteralPath $FrozenInventoryPath).Path;sha256=[string]$inventory.sha256;record_sha256=[string]$inventory.record.record_sha256;asset_root_file_set_sha256=[string]$inventory.record.asset_root_file_set_sha256}
     target_assets = @($inventory.record.package_assets | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;archive_sha256=[string]$_.sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count} })
     tagging_authorized = $true
+    publication_scope = 'github-release-only'
     github_publication_authorized = $true
-    mod_portal_upload_authorized = $true
+    mod_portal_upload_authorized = $false
+    mod_portal_upload_disposition = 'not-claimed-by-this-github-release-authorization'
     publication_authorized = $true
     public_readback_required_after_publication = $true
     record_sha256 = ''
