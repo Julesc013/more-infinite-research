@@ -5196,7 +5196,7 @@
       "id": "runtime.browser-personal-state-continuity",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F210 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
@@ -5207,6 +5207,24 @@
         "targets/f210/composition.json",
         "targets/package-authority.json",
         "source:source/presentation/f210/README.md.template",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
+      "id": "runtime.f200-browser-personal-state-continuity",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+        "fixtures/assert-browser-personal-state-continuity/**",
+        "source:source/prototypes/mir/runtime/research_browser.lua",
+        "source:source/locale/en/more-infinite-research.cfg",
+        "source:source/package-source.json",
+        "targets/f200/composition.json",
+        "targets/package-authority.json",
+        "source:source/presentation/f200/README.md.template",
         ".mir/fixtures.yml"
       ]
     },

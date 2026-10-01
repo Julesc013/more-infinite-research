@@ -1481,7 +1481,7 @@ fixtures:
     harness: tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1
     exact_target:
       factorio_line: "2.1"
-      factorio_version: "2.1.17"
+      factorio_version: "2.1.20"
       mod_lock: base-only
     validates:
       - F210-exact-localhost-two-client-browser-personal-state-isolation
@@ -1496,7 +1496,31 @@ fixtures:
       - remote-wide-network-behavior-beyond-observed-two-local-clients
       - native-vanilla-technology-tree-mutation-or-injection
       - queue-ownership-or-reorder
-      - physical-mouse-click-synthesis
+      - F210-two-client-native-input-execution-not-established-under-single-Steam-identity
+      - full-PLAT-UI-01-A16-or-X11-closure
+      - release-readiness
+
+  f200-browser-personal-state-continuity:
+    requires_features: [scripted_techs, settings_profiles]
+    path: fixtures/assert-browser-personal-state-continuity
+    harness: tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: base-only
+    validates:
+      - F200-exact-localhost-two-client-browser-personal-state-isolation-with-native-input
+      - bounded-native-unqueued-hidden-technology-recovery-action-present-and-invalid-input-page-preservation
+      - hidden-queued-technology-remains-on-identical-shared-force-queue
+      - exact-save-reload-and-two-client-reconnect-personal-view-continuity
+      - inert-configuration-change-personal-view-and-full-active-force-continuity
+      - literal-MIR-removal-and-readd-fail-closed-before-after-disposition
+    non_claims:
+      - F210
+      - Angel-or-combined-Bob-Angel-route-coverage
+      - remote-wide-network-behavior-beyond-observed-two-local-clients
+      - native-vanilla-technology-tree-mutation-or-injection
+      - queue-ownership-or-reorder
       - full-PLAT-UI-01-A16-or-X11-closure
       - release-readiness
 

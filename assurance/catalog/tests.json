@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 216,
+  "test_count": 217,
   "tests": [
     {
       "id": "docs.check",
@@ -605,7 +605,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F210 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
       "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -725,6 +725,34 @@
         "source:source/prototypes/mir/streams/generated_stream_manifest.json",
         "source:source/package-source.json",
         "targets/f200/composition.json",
+        ".mir/fixtures.yml"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "runtime.f200-browser-personal-state-continuity",
+      "proposition": "The governed test 'runtime.f200-browser-personal-state-continuity' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+        "fixtures/assert-browser-personal-state-continuity/**",
+        "source:source/prototypes/mir/runtime/research_browser.lua",
+        "source:source/locale/en/more-infinite-research.cfg",
+        "source:source/package-source.json",
+        "targets/f200/composition.json",
+        "targets/package-authority.json",
+        "source:source/presentation/f200/README.md.template",
         ".mir/fixtures.yml"
       ],
       "captured_artifacts": [],
@@ -7808,11 +7836,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 65,
-      "runtime-upgrade": 50,
+      "runtime-upgrade": 51,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 204,
+    "canonical_test_commands": 205,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7825,5 +7853,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d047bd07d2ce4e970d5c82d127d33a608dcbc0cb57d8318252a8f29361911eea"
+  "digest": "sha256:f97d1d655c2be4cf625ec0e32f535e8d593f6f0210b31cb384db6546846d260d"
 }
