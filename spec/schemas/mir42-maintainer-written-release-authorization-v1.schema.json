@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
+  "title": "MIR 4.2 maintainer written release authorization V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_from_user_turn_date", "timezone", "release", "written_authorizations", "maintainer_decisions", "nonnegotiable_constraints", "current_controller_state", "required_external_inputs_before_technical_seal", "known_operator_inputs", "final_byte_binding", "secret_values_present", "warning", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR42MaintainerWrittenReleaseAuthorizationHandoffV1"},
+    "status": {"const": "written-maintainer-authorization-recorded-awaiting-exact-candidate-and-technical-proof"},
+    "recorded_from_user_turn_date": {"type": "string", "format": "date"},
+    "timezone": {"type": "string", "minLength": 1},
+    "release": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_version", "tag", "selected_targets"],
+      "properties": {
+        "source_version": {"const": "4.2.0"},
+        "tag": {"const": "v4.2.0"},
+        "selected_targets": {"const": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]}
+      }
+    },
+    "written_authorizations": {
+      "type": "object", "additionalProperties": false,
+      "required": ["complete_mir_4_2", "protected_main_promotion", "required_distribution_tags", "github_publication", "nine_target_github_zip_assets", "mod_portal_upload"],
+      "properties": {
+        "complete_mir_4_2": {"const": "authorized-subject-to-required-technical-checks"},
+        "protected_main_promotion": {"const": "authorized-after-accepted-technical-seal-and-governed-restore"},
+        "required_distribution_tags": {"const": "authorized-after-protected-main-readback-and-candidate-bound-go"},
+        "github_publication": {"const": "authorized-after-final-byte-acceptance-and-tag-verification"},
+        "nine_target_github_zip_assets": {"const": "authorized-after-final-byte-acceptance"},
+        "mod_portal_upload": {"const": "authorized-after-final-byte-acceptance-using-identical-sealed-zips"}
+      }
+    },
+    "maintainer_decisions": {
+      "type": "object", "additionalProperties": false,
+      "required": ["current_balance_direction", "current_visual_direction", "disclosed_limitations", "additional_playtest_prompt", "experimental_f210", "f210_f200_playtest_receipt", "technical_acceptance", "candidate_binding", "final_byte_hashes"],
+      "properties": {
+        "current_balance_direction": {"const": "accepted"},
+        "current_visual_direction": {"const": "accepted"},
+        "disclosed_limitations": {"const": "accepted"},
+        "additional_playtest_prompt": {"const": "waived-for-this-release-decision"},
+        "experimental_f210": {"const": "qualified-experimental-consent-recorded"},
+        "f210_f200_playtest_receipt": {"const": "not-claimed-and-not-materialized"},
+        "technical_acceptance": {"const": "not-established"},
+        "candidate_binding": {"const": "deferred-until-one-exact-accepted-candidate"},
+        "final_byte_hashes": {"const": "not-yet-available"}
+      }
+    },
+    "nonnegotiable_constraints": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "current_controller_state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["programme_path", "programme_status", "source_freeze", "candidate_allocation", "production_signing", "technical_seal", "promotion", "tagging", "publication"],
+      "properties": {
+        "programme_path": {"const": ".mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json"},
+        "programme_status": {"const": "active-current-4.2-release-cut-pre-freeze-no-transition-authority"},
+        "source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "technical_seal": {"const": false}, "promotion": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}
+      }
+    },
+    "required_external_inputs_before_technical_seal": {
+      "type": "array", "minItems": 1,
+      "items": {"type": "object", "additionalProperties": false, "required": ["name", "required_path", "state"], "properties": {"name": {"type": "string", "minLength": 1}, "required_path": {"type": "string", "minLength": 1}, "state": {"const": "absent"}}}
+    },
+    "known_operator_inputs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ssh_keygen_path", "existing_signer_public_fingerprint", "signer_continuity_policy", "signer_probe_disposition", "rejection_record"],
+      "properties": {
+        "ssh_keygen_path": {"type": "string", "minLength": 1},
+        "existing_signer_public_fingerprint": {"pattern": "^SHA256:[A-Za-z0-9+/]+={0,2}$"},
+        "signer_continuity_policy": {"const": "existing-MIR-dedicated-signer-continuity"},
+        "signer_probe_disposition": {"const": "automatic-review-rejected-no-retry-or-workaround"},
+        "rejection_record": {"const": "AUTOMATIC-REVIEW-REJECTION.txt"}
+      }
+    },
+    "final_byte_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["candidate_manifest_path", "technical_seal_path", "frozen_inventory_path", "required_binding"],
+      "properties": {
+        "candidate_manifest_path": {"const": "deferred"}, "technical_seal_path": {"const": "deferred"}, "frozen_inventory_path": {"const": "deferred"}, "required_binding": {"type": "string", "minLength": 1}
+      }
+    },
+    "secret_values_present": {"const": false},
+    "warning": {"type": "string", "minLength": 1},
+    "record_sha256": {"pattern": "^[A-F0-9]{64}$"}
+  }
+}
