@@ -824,12 +824,35 @@ if techs["recipe-prod-research_steel-1"] then
     assert_tech_uses_technology_icon("recipe-prod-research_steel-1", "steel-processing")
   end
 end
-if techs["research-productivity"] then
-  assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "research-productivity")
-elseif use_installed_space_age_icons then
-  assert_tech_uses_icon_path("recipe-prod-research_science_pack_productivity-1", "__space-age__/graphics/technology/research-productivity.png")
+if techs["recipe-prod-research_science_pack_productivity-1"] then
+  if techs["research-productivity"] then
+    assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "research-productivity")
+  elseif use_installed_space_age_icons then
+    assert_tech_uses_icon_path("recipe-prod-research_science_pack_productivity-1", "__space-age__/graphics/technology/research-productivity.png")
+  else
+    assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "space-science-pack")
+  end
 else
-  assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "space-science-pack")
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan-internal"]
+  local science_row
+  for _, row in ipairs(prototype and prototype.data and prototype.data.rows or {}) do
+    if row.stream_key == "research_science_pack_productivity" then
+      if science_row then fail("duplicate science-pack productivity GenerationPlan row") end
+      science_row = row
+    end
+  end
+  if not science_row or science_row.action ~= "skip"
+    or science_row.reason ~= "no_lab_compatible_science"
+    or not science_row.diagnostics or science_row.diagnostics.lab_status ~= "required-unreachable" then
+    fail("science-pack productivity is absent without its required-unreachable admission decision")
+  end
+  for _, name in ipairs({"science_compatible", "lab_compatible"}) do
+    local gate = science_row.gates and science_row.gates[name]
+    if not gate or gate.passed ~= false or gate.status ~= "failed"
+      or gate.reason ~= "no_lab_compatible_science" then
+      fail("science-pack productivity omission lacks its failed " .. name .. " gate")
+    end
+  end
 end
 if mods and mods["elevated-rails"] then
   assert_tech_uses_technology_icon("recipe-prod-research_rails-1", "elevated-rail")
