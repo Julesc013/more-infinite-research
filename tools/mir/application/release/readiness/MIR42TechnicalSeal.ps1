@@ -26,6 +26,11 @@ if (-not (Get-Command Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -ErrorActio
 $script:MIR42SealTargets = @('f210', 'f200', 'f110', 'f100')
 $script:MIR42SealNineTargetCandidates = @('f210', 'f200', 'f110', 'f100', 'f017', 'f016', 'f015', 'f014', 'f013')
 $script:MIR42SealHistoricalTargets = @('f017', 'f016', 'f015', 'f014', 'f013')
+$script:MIR42SealReleaseAcceptanceCriteria = @(
+  'fresh-exact-loads', 'settings-profile-continuity', 'research-progression', 'migrations-two-reload',
+  'compatibility-canaries', 'target-omissions', 'performance-telemetry', 'package-exclusion',
+  'deterministic-reconstruction'
+)
 $script:MIR42SealVerifierDependencyPaths = @(
   'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1',
   'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1',
@@ -879,18 +884,9 @@ function Assert-MIR42ReceiptBinding {
 
 function Assert-MIR42JoinedAcceptanceCoverage {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Receipt,[Parameter(Mandatory)]$Candidate)
-  $expectedCriteria = @(
-    'fresh-exact-loads',
-    'settings-profile-continuity',
-    'research-progression',
-    'migrations-two-reload',
-    'compatibility-canaries',
-    'target-omissions',
-    'performance-telemetry',
-    'package-exclusion',
-    'deterministic-reconstruction'
-  )
+  $expectedCriteria = @($script:MIR42SealReleaseAcceptanceCriteria)
   $candidateTargets = @($Candidate.targets | ForEach-Object { [string]$_.target })
+  $requiresNineTargetCriterionRecords = ($candidateTargets -join '|') -ceq ($script:MIR42SealNineTargetCandidates -join '|')
   $rows = @($Receipt.record.release_acceptance)
   $actualCriteria = @($rows | ForEach-Object { [string]$_.criterion })
   if ($rows.Count -ne $expectedCriteria.Count -or ($actualCriteria -join '|') -cne ($expectedCriteria -join '|')) {
@@ -912,6 +908,14 @@ function Assert-MIR42JoinedAcceptanceCoverage {
       $evidencePath = Resolve-MIR42SealImmutableFile -Path ([string]$evidence.path) -Sha256 ([string]$evidence.sha256) -Code 'mir42-seal-qualification-evidence'
       $evidenceRecord = Read-MIR42SealRecord -Path $evidencePath -Code 'mir42-seal-qualification-evidence'
       if ([string]$evidenceRecord.record.record_sha256 -cne [string]$evidence.record_sha256) { throw '[mir42-seal-qualification-evidence-record-binding]' }
+      if ($requiresNineTargetCriterionRecords) {
+        $criterionEvidence = Get-MIR42NineTargetCriterionEvidenceRecord -Path $evidencePath -Candidate $Candidate
+        $expectedRow = $criterionEvidence.record | Select-Object criterion,status,observed_targets,not_applicable_targets,evidence,limits
+        if ([string]$criterionEvidence.record.criterion -cne [string]$row.criterion -or
+            (ConvertTo-MIR4BootstrapCanonicalJson -Value $expectedRow) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $row)) {
+          throw '[mir42-seal-qualification-evidence-criterion-binding]'
+        }
+      }
     }
     Assert-MIR42SealPropertyNames -Value $row.limits -Expected @('claim','known_limitations') -Code 'mir42-seal-qualification-limits-shape'
     if ([string]$row.status -cne 'passed' -or $observed.Count -eq 0 -or @($row.evidence).Count -eq 0 -or [string]::IsNullOrWhiteSpace([string]$row.limits.claim) -or
@@ -1351,6 +1355,99 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
     record_sha256 = ''
   }
   return (Write-MIR42NormalizedRecord -Record $record -OutputPath $OutputPath -Code 'mir42-engine-evidence-output')
+}
+
+function Get-MIR42NineTargetCriterionEvidenceRecord {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate)
+
+  $identity = Read-MIR42SealRecord -Path $Path -Code 'mir42-joined-campaign-criterion'
+  $record = $identity.record
+  Assert-MIR42SealPropertyNames -Value $record -Expected @('schema','kind','status','criterion','source','candidate_manifest','observed_targets','not_applicable_targets','evidence','limits','record_sha256') -Code 'mir42-joined-campaign-criterion-shape'
+  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42NineTargetReleaseAcceptanceCriterionEvidenceV1' -or
+      [string]$record.status -cne 'passed' -or [string]$record.criterion -notin $script:MIR42SealReleaseAcceptanceCriteria -or
+      [string]$record.source.commit -cne [string]$Candidate.source.commit -or
+      [string]$record.source.tree -cne [string]$Candidate.source.tree -or
+      [string]$record.source.package_source_sha256 -cne [string]$Candidate.source.package_source_sha256 -or
+      [string]$record.candidate_manifest.sha256 -cne [string]$Candidate.identity.sha256 -or
+      [string]$record.candidate_manifest.record_sha256 -cne [string]$Candidate.identity.record.record_sha256) {
+    throw '[mir42-joined-campaign-criterion-binding]'
+  }
+  return $identity
+}
+
+function New-MIR42NineTargetJoinedRealEngineCampaign {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$CandidateManifestPath,
+    [Parameter(Mandatory)][string]$EvidenceReconciliationPath,
+    [Parameter(Mandatory)][string]$EngineEvidencePath,
+    [Parameter(Mandatory)][string[]]$CriterionEvidencePaths,
+    [Parameter(Mandatory)][string]$OutputPath
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
+  Assert-MIR42SealTargetSet -Rows @($candidate.targets) -Scope 'nine-target' -Code 'mir42-joined-campaign-candidate'
+  $contract = Get-MIR42SealScopeContract -Scope 'nine-target'
+  $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate
+  $binder = Read-MIR42SealRecord -Path $EngineEvidencePath -Code 'mir42-joined-campaign-engine-evidence'
+  Assert-MIR42SealPropertyNames -Value $binder.record -Expected @('schema','kind','status','source','candidate_manifest','evidence_reconciliation','engine_run','runner','targets','factorio_processes','release_qualification','release_acceptance','technical_seal','publication_authorized','record_sha256') -Code 'mir42-joined-campaign-engine-evidence-shape'
+  if ([int]$binder.record.schema -ne 1 -or [string]$binder.record.kind -cne [string]$contract.binder_kind -or
+      [string]$binder.record.status -cne [string]$contract.binder_status -or
+      [string]$binder.record.evidence_reconciliation.sha256 -cne [string]$reconciliation.sha256 -or
+      [string]$binder.record.evidence_reconciliation.record_sha256 -cne [string]$reconciliation.record.record_sha256 -or
+      [string]$binder.record.release_qualification -cne 'not-performed' -or [string]$binder.record.release_acceptance -cne 'not-performed' -or
+      [string]$binder.record.technical_seal -cne 'not-performed' -or [bool]$binder.record.publication_authorized) {
+    throw '[mir42-joined-campaign-engine-evidence-binding]'
+  }
+  Assert-MIR42ReceiptBinding -Receipt $binder -Candidate $candidate -Code 'mir42-joined-campaign-engine-evidence' -ExpectedTargetStatus 'observed-real-engine-private-unqualified'
+  $engineRun = Get-MIR42BoundEngineRun -Reference $binder.record.engine_run -Candidate $candidate
+  if ([int]$binder.record.factorio_processes -ne [int]$engineRun.record.factorio_processes -or
+      [string]$binder.record.runner.sha256 -cne [string]$engineRun.record.runner.sha256) {
+    throw '[mir42-joined-campaign-engine-evidence-run-binding]'
+  }
+  if ($CriterionEvidencePaths.Count -ne $script:MIR42SealReleaseAcceptanceCriteria.Count) { throw '[mir42-joined-campaign-criterion-count]' }
+  $criteriaByName = @{}
+  foreach ($path in $CriterionEvidencePaths) {
+    $criterion = Get-MIR42NineTargetCriterionEvidenceRecord -Path $path -Candidate $candidate
+    $name = [string]$criterion.record.criterion
+    if ($criteriaByName.ContainsKey($name)) { throw "[mir42-joined-campaign-criterion-duplicate] $name" }
+    $criteriaByName[$name] = $criterion
+  }
+  if ((@($criteriaByName.Keys | Sort-Object { [array]::IndexOf($script:MIR42SealReleaseAcceptanceCriteria, [string]$_) }) -join '|') -cne ($script:MIR42SealReleaseAcceptanceCriteria -join '|')) {
+    throw '[mir42-joined-campaign-criterion-set]'
+  }
+  $acceptance = @(
+    foreach ($name in $script:MIR42SealReleaseAcceptanceCriteria) {
+      $criteriaByName[$name].record | Select-Object criterion,status,observed_targets,not_applicable_targets,evidence,limits
+    }
+  )
+  $provisional = [pscustomobject][ordered]@{record=[pscustomobject][ordered]@{release_acceptance=$acceptance}}
+  Assert-MIR42JoinedAcceptanceCoverage -RepoRoot $repo -Receipt $provisional -Candidate $candidate
+  $record = [pscustomobject][ordered]@{
+    schema = 1
+    kind = [string]$contract.campaign_kind
+    status = [string]$contract.campaign_status
+    source = $candidate.source
+    candidate_manifest = [ordered]@{sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
+    evidence_reconciliation = [ordered]@{sha256=[string]$reconciliation.sha256;record_sha256=[string]$reconciliation.record.record_sha256}
+    engine_run = [ordered]@{sha256=[string]$engineRun.sha256;record_sha256=[string]$engineRun.record.record_sha256}
+    runner = $engineRun.record.runner
+    targets = $binder.record.targets
+    factorio_processes = [int]$engineRun.record.factorio_processes
+    release_qualification = 'passed'
+    release_acceptance = $acceptance
+    technical_seal = 'not-performed'
+    publication_authorized = $false
+    record_sha256 = ''
+  }
+  $written = Write-MIR42NormalizedRecord -Record $record -OutputPath $OutputPath -Code 'mir42-joined-campaign-output'
+  $readback = Get-MIR42RealEngineCandidateCampaign -RepoRoot $repo -Path $OutputPath -Candidate $candidate -Reconciliation $reconciliation
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $written) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $readback.record)) {
+    throw '[mir42-joined-campaign-output-readback]'
+  }
+  return $readback.record
 }
 
 function Get-MIR42RealEngineCandidateCampaign {

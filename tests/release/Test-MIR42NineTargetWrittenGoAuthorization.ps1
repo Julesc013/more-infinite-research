@@ -110,7 +110,8 @@ try {
 }
 
 $manualWaiverTest = Join-Path $repo 'tests/release/Test-MIRManualReleaseReview.ps1'
-& $manualWaiverTest -RepoRoot $repo -SelfTest
-Assert-MIR42WrittenGoTest -Condition ($LASTEXITCODE -eq 0) -Code 'manual-written-waiver-negative-contract'
+$manualWaiverFailure = $null
+try { & $manualWaiverTest -RepoRoot $repo -SelfTest } catch { $manualWaiverFailure = $_ }
+Assert-MIR42WrittenGoTest -Condition ($null -eq $manualWaiverFailure) -Code 'manual-written-waiver-negative-contract'
 
 Write-Output 'MIR42-NINE-TARGET-WRITTEN-GO-AUTHORIZATION-PASSED structural-only engines=0 signing=0 publication=0'

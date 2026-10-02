@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [ValidateSet('Readiness','EngineEvidence','Seal','PromotionPlan','MainReadback')][string]$Mode = 'Readiness',
+  [ValidateSet('Readiness','EngineEvidence','JoinedCampaign','Seal','PromotionPlan','MainReadback')][string]$Mode = 'Readiness',
   [Parameter(Mandatory)][string]$CandidateManifestPath,
   [string]$QualificationPath = '',
   [string]$RealEngineCampaignPath = '',
@@ -16,6 +16,8 @@ param(
   [string]$ReviewerAttestationPath = '',
   [string]$SshKeygenPath = '',
   [string]$EngineRunPath = '',
+  [string]$EngineEvidencePath = '',
+  [string[]]$CriterionEvidencePaths = @(),
   [string]$TechnicalSealPath = '',
   [string]$OfflineRestoreDrillPath = '',
   [string]$PrimaryRepoRoot = '',
@@ -45,6 +47,15 @@ switch ($Mode) {
     if ([string]::IsNullOrWhiteSpace($OutputPath)) { throw '[mir42-engine-evidence-output-required]' }
     New-MIR42NineTargetRealEngineEvidenceBinder -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
       -EvidenceReconciliationPath $QualificationPath -EngineRunPath $EngineRunPath -OutputPath $OutputPath | ConvertTo-Json -Depth 30
+  }
+  'JoinedCampaign' {
+    if ([string]::IsNullOrWhiteSpace($QualificationPath) -or [string]::IsNullOrWhiteSpace($EngineEvidencePath) -or [string]::IsNullOrWhiteSpace($OutputPath)) {
+      throw '[mir42-joined-campaign-inputs-required]'
+    }
+    if ($CriterionEvidencePaths.Count -eq 0) { throw '[mir42-joined-campaign-criterion-inputs-required]' }
+    New-MIR42NineTargetJoinedRealEngineCampaign -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
+      -EvidenceReconciliationPath $QualificationPath -EngineEvidencePath $EngineEvidencePath `
+      -CriterionEvidencePaths $CriterionEvidencePaths -OutputPath $OutputPath | ConvertTo-Json -Depth 30
   }
   'Seal' {
     if ([string]::IsNullOrWhiteSpace($OutputPath)) { throw '[mir42-seal-output-path-required]' }
