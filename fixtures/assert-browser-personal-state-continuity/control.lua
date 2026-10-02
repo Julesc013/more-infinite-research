@@ -110,7 +110,7 @@ initial_action=function(s,a,b)
   run_open(a,{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={INFINITE}}); local af=browser_facts(a); expected_view(af,1,false,"<absent>","player A restored hidden view")
   run_open(b,{tab="research",search="",mode=3,status=4,selected=INFINITE,hidden={}}); local bf=browser_facts(b); expected_view(bf,3,true,"mir-browser.hide","player B visible view"); assert_shared_force(s,a,b,true)
   write_result("initial",{player_a=af,player_b=bf,same_force=true,malformed_hidden=malformed,valid_replacement_show_roundtrip=true,active_full_force_snapshot_unchanged=true,fixture_owned_force_queue_unchanged=true,fixture_force=fixture_force_facts(a.force)})
-  arm_save(s,"await-save-reload","mir-browser-personal-state-continuity")
+  arm_save(s,"await-save-reload","mps-r")
 end
 local function persistent_action(s,stage,a,b)
   run_open(a,nil); run_open(b,nil); local af,bf=browser_facts(a),browser_facts(b); expected_view(af,1,false,"<absent>","player A persisted view"); expected_view(bf,3,true,"mir-browser.hide","player B persisted view"); assert_shared_force(s,a,b,true)
@@ -119,7 +119,7 @@ end
 local function removal_action(s,a,b)
   assert_shared_force(s,a,b,false); check(remote.interfaces[INTERFACE]==nil,"removed MIR interface remains callable"); local af,bf=a.gui.screen[ROOT],b.gui.screen[ROOT]
   write_result("removal",{player_a={index=a.index,username=a.name,force_index=a.force.index,frame_still_present=af and af.valid or false},player_b={index=b.index,username=b.name,force_index=b.force.index,frame_still_present=bf and bf.valid or false},same_force=true,browser_interface_present=false,personal_state_readability="unavailable-removed-owner-no-interface",removal_disposition="before-after-recorded-no-arbitrary-rollback-claim",fixture_owned_force_queue_unchanged_during_removal=true,fixture_force=fixture_force_facts(a.force)})
-  arm_save(s,"await-readd","mir-browser-personal-state-continuity-readd")
+  arm_save(s,"await-readd","mps-a")
 end
 local function readd_action(s,a,b)
   check(remote.interfaces[INTERFACE]~=nil,"re-added MIR interface is absent"); run_open(a,{tab="research",selected=INFINITE}); run_open(b,{tab="research",selected=INFINITE}); local af,bf=browser_facts(a),browser_facts(b); assert_shared_force(s,a,b,false)
@@ -166,8 +166,8 @@ script.on_event(defines.events.on_tick,function()
   end
   local a,b=game.get_player(s.player_a_index),game.get_player(s.player_b_index); if not (a and a.connected and b and b.connected) then return end; a,b=players_from_state(s)
   if s.phase=="await-native-input" then native_input_complete(s,a,b)
-  elseif s.phase=="await-save-reload" then persistent_action(s,"save-reload",a,b); arm_save(s,"await-configuration-change","mir-browser-personal-state-continuity-configuration")
-  elseif s.phase=="configuration-change-ready" then persistent_action(s,"configuration-change",a,b); arm_save(s,"await-removal","mir-browser-personal-state-continuity-removal")
+  elseif s.phase=="await-save-reload" then persistent_action(s,"save-reload",a,b); arm_save(s,"await-configuration-change","mps-c")
+  elseif s.phase=="configuration-change-ready" then persistent_action(s,"configuration-change",a,b); arm_save(s,"await-removal","mps-m")
   elseif s.phase=="removal-ready" then removal_action(s,a,b)
   elseif s.phase=="readd-ready" then readd_action(s,a,b) end
 end)
