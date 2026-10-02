@@ -248,7 +248,7 @@ if external_owner then
     },
     {
       name = "mir-fixture-zero-stack-inserter-owner",
-      effect = {type = "stack-inserter-capacity-bonus"},
+      effect = {type = "bulk-inserter-capacity-bonus"},
       reason = "effect_identity_nonpositive_or_non_numeric"
     },
     {

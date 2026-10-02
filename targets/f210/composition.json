@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 73872,
-      "expected_sha256": "FEF0A6E4DFBB9D7D4429BFBCADEABD3E4EF1BAC543D7BDBAEFF8EBDD7EB84461",
+      "expected_bytes": 73927,
+      "expected_sha256": "0D3E2D15F4E43D19F60634EDF80C2763DFF8D6196A003E0DB0EF1F03963747FF",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 36764,
-      "expected_sha256": "2FC5A319CD7E81317671EE4E056C309165E10AD2B08FF59A3B4C853EB151CB2E",
+      "expected_bytes": 37275,
+      "expected_sha256": "AEDF6FDC8AB6DF7609D4873B269D670C3AC85BBEA4F6945D90539333335011E9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "B6ABF7EE3F6880D84946E8341ACEDD441A8E53D44D53AC0B459C78F7FA37F005"
+  "record_sha256": "A71140E6C26FCFB18E65340EC34E526F911EA0AC6FFEA71C960127052241D2F0"
 }

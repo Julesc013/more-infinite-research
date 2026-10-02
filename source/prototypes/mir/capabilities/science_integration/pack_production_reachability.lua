@@ -1473,7 +1473,7 @@ local function observation_recipe_snapshot(parent)
   local production = parent:state_view("science_pack_production")
   local witness = production and production.route_witness_state
   if type(production) == "table" and production.recipe_source_epoch == source_epoch
-    and type(witness) == "table" and witness.compiler_context == parent
+    and type(witness) == "table" and route_feasibility.state_context_matches(witness, parent)
     and witness.recipe_source_epoch == source_epoch and type(witness.source_catalog) == "table" then
     snapshot.production_state = production
     snapshot.witness_state = witness
@@ -1491,7 +1491,7 @@ local function observation_recipe_snapshot_is_current(snapshot)
     and (snapshot.source_catalog == nil or (
       snapshot.parent:state_view("science_pack_production") == snapshot.production_state
       and snapshot.production_state.route_witness_state == snapshot.witness_state
-      and snapshot.witness_state.compiler_context == snapshot.parent
+      and route_feasibility.state_context_matches(snapshot.witness_state, snapshot.parent)
       and snapshot.witness_state.recipe_source_epoch == snapshot.recipe_source_epoch
       and snapshot.witness_state.source_catalog == snapshot.source_catalog
     ))
@@ -1512,15 +1512,14 @@ local function observation_context()
     if recipe_snapshot.source_catalog then
       -- The completed catalogue is read-only and every selected witness is
       -- copied out. All mutable traversal and acquisition state starts fresh.
-      observation:set_state("science_pack_diagnostic_source_state", {
-        compiler_context = observation,
+      observation:set_state("science_pack_diagnostic_source_state", route_feasibility.bind_state_context({
         -- set_state gives the copied source a fresh child epoch. The parent
         -- epoch remains separately bound by observation_recipe_snapshot.
         recipe_source_epoch = observation:state_epoch("recipe_source"),
         source_catalog = recipe_snapshot.source_catalog,
         visiting = {}, acquisition_memo = {}, stable_acquisition_memo = {},
         stable_acquisition_generation = 1, surface_results = {}
-      })
+      }, observation))
     end
   end
   for _, service_name in ipairs({

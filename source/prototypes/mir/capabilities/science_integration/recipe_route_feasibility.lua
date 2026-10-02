@@ -10,6 +10,19 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
+-- Live CompilerContext ownership is private identity, not serializable cache
+-- data. Weak keys keep query-local states collectible without retaining a
+-- context/service back-reference inside public state snapshots.
+local state_contexts = setmetatable({}, {__mode = "k"})
+
+function M.bind_state_context(state, context)
+  state_contexts[state] = context
+  return state
+end
+
+function M.state_context_matches(state, context)
+  return state ~= nil and state_contexts[state] == context
+end
 
 -- Acquisition alternatives remain complete, but ordinary production is tried
 -- before reverse recycling routes. A known forward route should not first
@@ -172,7 +185,7 @@ local function reset_state(state, epoch, context, recipe_index)
   local next_stable_generation = (state.stable_acquisition_generation or 0) + 1
   for key in pairs(state) do state[key] = nil end
   state.stable_acquisition_generation = next_stable_generation
-  state.compiler_context = context
+  M.bind_state_context(state, context)
   state.recipe_source_epoch = epoch
   state.recipe_index = recipe_index
   state.visiting = {}
@@ -196,7 +209,7 @@ end
 local function query_state(state, recipe_index)
   local epoch = recipe_source_epoch()
   local context = compiler_context.current()
-  if not state or state.recipe_source_epoch ~= epoch or state.compiler_context ~= context then
+  if not state or state.recipe_source_epoch ~= epoch or not M.state_context_matches(state, context) then
     return reset_state(state, epoch, context, recipe_index)
   end
   if state.recipe_index ~= recipe_index then
@@ -225,7 +238,7 @@ end
 local function source_query_state(state)
   local epoch = recipe_source_epoch()
   local context = compiler_context.current()
-  if not state or state.recipe_source_epoch ~= epoch or state.compiler_context ~= context then
+  if not state or state.recipe_source_epoch ~= epoch or not M.state_context_matches(state, context) then
     return reset_state(state, epoch, context, nil)
   end
   return state

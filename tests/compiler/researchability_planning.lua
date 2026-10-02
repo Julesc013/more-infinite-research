@@ -2457,6 +2457,13 @@ reset({
 production.pack_production_status("Primer", {unrelated = true})
 local contextual_owner = context:state_view("science_pack_production")
 local shared_acquisition = contextual_owner.route_witness_state
+local acquisition_snapshot_ok = pcall(function()
+  require("prototypes.mir.core.fingerprint").of(shared_acquisition)
+end)
+check("CP00", acquisition_snapshot_ok and shared_acquisition.compiler_context == nil
+  and feasibility.state_context_matches(shared_acquisition, context)
+  and not feasibility.state_context_matches(shared_acquisition, {}),
+  "Owned acquisition cache snapshots contain data while private context identity remains exact")
 local canonical_facade = require("prototypes.mir.index.recipe_facts")
 local original_index_view = canonical_facade.index_view
 canonical_facade.index_view = function() return context.states.recipe_index end

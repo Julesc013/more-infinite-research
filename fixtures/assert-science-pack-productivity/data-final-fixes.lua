@@ -35,7 +35,7 @@ else
 
   local required = science_row and science_row.diagnostics and science_row.diagnostics.science_phase_required_packs
   local custom_pack_required = type(required) == "string"
-    and ("," .. required .. ","):find(",mir-custom%-only%-science%-pack,", 1, false) ~= nil
+    and ("," .. required .. ","):find(",mir-custom-only-science-pack,", 1, true) ~= nil
 
   if not science_row or science_row.action ~= "skip"
     or science_row.reason ~= "no_lab_compatible_science"
