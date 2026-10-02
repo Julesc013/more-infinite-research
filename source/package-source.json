@@ -3238,10 +3238,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/core/fingerprint.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 9946,
-      "source_sha256": "0882BB99830E923255140A2AE4B2D57F434E7A4868EC1DBF8F0F30B5C05994DF",
-      "output_bytes": 9946,
-      "output_sha256": "0882BB99830E923255140A2AE4B2D57F434E7A4868EC1DBF8F0F30B5C05994DF"
+      "source_bytes": 10387,
+      "source_sha256": "B70EED9B8832948E4AA0264C6AFEBAB53C449C2EB6F8C6D279E460490A0E54AB",
+      "output_bytes": 10387,
+      "output_sha256": "B70EED9B8832948E4AA0264C6AFEBAB53C449C2EB6F8C6D279E460490A0E54AB"
     },
     {
       "layer": "capability",
@@ -3963,10 +3963,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/domain/technology/technology_design.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 52274,
-      "source_sha256": "8BED9810A8282BE0B6BF172018E0852328FE246917CEE2FC0AD735270C1A8471",
-      "output_bytes": 52274,
-      "output_sha256": "8BED9810A8282BE0B6BF172018E0852328FE246917CEE2FC0AD735270C1A8471"
+      "source_bytes": 52269,
+      "source_sha256": "2FE7AD2F150F1EB90004C35161F96AC6B8747F76CB132B763DFF68AE99574A01",
+      "output_bytes": 52269,
+      "output_sha256": "2FE7AD2F150F1EB90004C35161F96AC6B8747F76CB132B763DFF68AE99574A01"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "CE4486ACAD03EE30FE7019F0F4A0D4073FBC2924986F0A41922D9AF56FD96ABF"
+  "record_sha256": "A1DA8FB3A16625C35787B603C9CBFF789E26ECB10C226571C93554A28D4A69CA"
 }

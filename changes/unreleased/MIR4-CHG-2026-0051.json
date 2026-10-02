@@ -12,6 +12,7 @@
     "Science-route cache ownership keeps live context identity outside serialized state, retaining exact context and recipe-epoch invalidation while allowing defensive compiler snapshots.",
     "Engines without mod-data retain one budget-checked compiler evidence log and avoid constructing public artifacts they cannot emit.",
     "A bounded cache reuses digests only for exact immutable canonical strings; mutable inputs are still serialized and validated, and MIR32 digest identity is unchanged.",
+    "Canonical serialization uses one output buffer, and effect-target subject sorting reuses the exact canonical identities already computed for deduplication; byte ordering, quoting and validation remain unchanged.",
     "Controlled characterization and static checks cover these changes; final engine, performance and release qualification remain required. No measured performance improvement is claimed here."
   ],
   "semantic_domains": ["compiler", "ownership", "performance"],
