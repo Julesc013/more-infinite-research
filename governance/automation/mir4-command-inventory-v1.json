@@ -3659,9 +3659,9 @@
     {
       "path": "tools/lib/compatibility/FactorioRunner.ps1",
       "classification": "canonical-internal",
-      "sha256": "7F03E6922DB40D084C37747DFF49B51CD039377A43DAB30CF4A53084344A4B37",
+      "sha256": "8EDE7E78F6A54367FAC8593FAAAD5FB08629C0A7A2FB72864EF5460E785C1A6A",
       "hash_mode": "canonical-text-v1",
-      "lines": 303,
+      "lines": 317,
       "package_visible": false
     },
     {
@@ -5379,9 +5379,9 @@
     {
       "path": "tools/mir/application/release/readiness/ResourceGovernor.ps1",
       "classification": "canonical-internal",
-      "sha256": "70CB20B0625BCA9E6AD9951BC587E28C92D1EC5481A57099138AC8019A1C2BD7",
+      "sha256": "E6009A51713FF64E8E2D472A4F4D7D66D21155A18162820706E404EF22B0A5F2",
       "hash_mode": "canonical-text-v1",
-      "lines": 86,
+      "lines": 179,
       "package_visible": false
     },
     {
@@ -5539,9 +5539,9 @@
     {
       "path": "tools/mir/application/tooling/CommandInventory.ps1",
       "classification": "canonical-internal",
-      "sha256": "7D9809A0E6BE8ACCC641D6F1B55F328E6E5DC5ED5AE62833B47B4CDBF95E1E7E",
+      "sha256": "2AF2FB4F3752193171E3250B3D5766FD30F294AEF05042EEF581ED6169975262",
       "hash_mode": "canonical-text-v1",
-      "lines": 137,
+      "lines": 175,
       "package_visible": false
     },
     {
@@ -6010,5 +6010,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:242a91e7889043b7fdc7ce4c9bfa4a89120c125eaf8e9a8bf6d4d002f18a5c8e"
+  "digest": "sha256:03ec191ff4f8a51ed807e165d225aa92bc4fa5f6fa72c2cd3d7226c5f291708b"
 }
