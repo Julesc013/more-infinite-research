@@ -63,6 +63,11 @@ if ($SelfTest) {
     $validWaiverBytes = [IO.File]::ReadAllBytes($waiverPath)
     $validated = Test-MIRManualReleaseAttestation -RepoRoot $RepoRoot -Path $waiverPath -Candidate $candidate -FactorioBin $factorio -ExpectedSourceCommit ('a' * 40) -ExpectedFactorioVersion '2.1'
     Assert-MIRManualReleaseReviewTest -Condition ([string]$written.status -eq 'waived' -and [string]$validated.status -eq 'waived' -and [string]$validated.disposition -eq 'written-maintainer-playtest-waiver' -and -not [bool]$validated.manual_review_performed -and -not [bool]$validated.gameplay_receipt_claimed) -Code 'valid-written-waiver'
+    [IO.File]::WriteAllText((Join-Path $candidateContent 'info.json'), '{"name":"mir-fixture","version":"4.3.21000","factorio_version":"2.1"}', [Text.UTF8Encoding]::new($false))
+    $otherReleaseCandidate = Join-Path $root 'candidate-other-release.zip'
+    [IO.Compression.ZipFile]::CreateFromDirectory($candidateSource, $otherReleaseCandidate)
+    Assert-MIRManualReleaseReviewReject -Action { New-MIRManualReleaseWrittenWaiverAttestation -RepoRoot $RepoRoot -Candidate $otherReleaseCandidate -FactorioBin $factorio -ExpectedSourceCommit ('a' * 40) -ExpectedFactorioVersion '2.1' -MaintainerAuthorizationPath $authorizationPath -Path (Join-Path $root 'other-release-waiver.json') } -Pattern '\[mir-manual-review-waiver-candidate-version\]' -Code 'other-release-candidate-rejected'
+    [IO.File]::WriteAllText((Join-Path $candidateContent 'info.json'), '{"name":"mir-fixture","version":"4.2.21000","factorio_version":"2.1"}', [Text.UTF8Encoding]::new($false))
     $waiver = Get-Content -Raw -LiteralPath $waiverPath | ConvertFrom-Json
     $waiver.gameplay_receipt_claimed = $true
     $waiverMap = ConvertTo-MIRReleaseOrderedMap -Object $waiver
