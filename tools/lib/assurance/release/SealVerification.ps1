@@ -191,17 +191,16 @@ function Invoke-MIRAssuranceCheckSeal {
     $checks.manual_review_attestation_sha256=((Get-MIRAssuranceSha256 -Path $manualReviewPath) -eq [string]$seal.manual_review_attestation_sha256)
     if ($checks.manual_review_attestation_sha256) {
       try {
-        $manualReview = Get-Content -Raw -LiteralPath $manualReviewPath | ConvertFrom-Json
-        $manualMaterial = ConvertTo-MIRReleaseOrderedMap -Object $manualReview
-        $manualMaterial.Remove("attestation_sha256")
-        $manualSelfHash = Get-MIRReleaseTextSha256 -Text ($manualMaterial | ConvertTo-Json -Depth 40 -Compress)
+        $manualReview = Test-MIRManualReleaseAttestation `
+          -RepoRoot $repo `
+          -Path $manualReviewPath `
+          -Candidate $candidate `
+          -FactorioBin $Context.factorio `
+          -ExpectedSourceCommit ([string]$seal.package_source_commit) `
+          -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
         $checks.manual_review_status=(
-          [string]$seal.manual_review_status -eq "passed" -and
-          [string]$manualReview.status -eq "passed" -and
-          [string]$manualReview.candidate_sha256 -eq [string]$seal.candidate_sha256 -and
-          [string]$manualReview.candidate_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
-          [string]$manualReview.source_commit -eq [string]$seal.package_source_commit -and
-          [string]$manualReview.attestation_sha256 -eq $manualSelfHash
+          [string]$seal.manual_review_status -eq [string]$manualReview.status -and
+          [string]$manualReview.status -in @('passed', 'waived')
         )
       } catch {}
     }

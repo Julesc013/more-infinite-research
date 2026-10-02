@@ -386,12 +386,31 @@ function Get-MIRAssuranceInputFingerprint {
       if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
         throw "Manual-review attestation is absent: $relativePath"
       }
-      return [ordered]@{
+      $material = [ordered]@{
         kind="manual-review-attestation"
         version=[string]$Context.info.version
         path=$relativePath
         sha256=(Get-MIRAssuranceSha256 -Path $path)
       }
+      try {
+        $attestation = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
+        if ([string]$attestation.checklist_version -eq 'mir-manual-release-review-written-waiver-v1') {
+          $reference = $attestation.written_release_authorization
+          if ($null -eq $reference -or [string]::IsNullOrWhiteSpace([string]$reference.path)) {
+            throw '[mir-assurance-manual-waiver-authorization-reference]'
+          }
+          $authorizationPath = [string]$reference.path
+          $material.written_release_authorization = [ordered]@{
+            path = $authorizationPath
+            expected_sha256 = [string]$reference.sha256
+            expected_record_sha256 = [string]$reference.record_sha256
+            observed = Get-MIRAssuranceExternalFileFingerprint -Path $authorizationPath -MissingLabel 'manual-written-waiver-authorization'
+          }
+        }
+      } catch {
+        throw "[mir-assurance-manual-waiver-input] $($_.Exception.Message)"
+      }
+      return $material
     }
     "package-source" {
       $files = @(Get-MIRAssurancePackageFiles)

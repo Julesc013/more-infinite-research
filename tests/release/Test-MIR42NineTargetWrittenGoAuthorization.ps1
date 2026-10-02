@@ -109,4 +109,8 @@ try {
   if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }
 
+$manualWaiverTest = Join-Path $repo 'tests/release/Test-MIRManualReleaseReview.ps1'
+& $manualWaiverTest -RepoRoot $repo -SelfTest
+Assert-MIR42WrittenGoTest -Condition ($LASTEXITCODE -eq 0) -Code 'manual-written-waiver-negative-contract'
+
 Write-Output 'MIR42-NINE-TARGET-WRITTEN-GO-AUTHORIZATION-PASSED structural-only engines=0 signing=0 publication=0'
