@@ -36,8 +36,32 @@ local function category_set(categories)
   return out
 end
 
+local function risk_identity(entry)
+  if type(entry) ~= "table" or type(entry.type) ~= "string" or entry.type == ""
+    or type(entry.name) ~= "string" or entry.name == "" then
+    error("recipe_risk_facts requires canonical typed identities", 3)
+  end
+  return entry.type .. "\30" .. entry.name
+end
+
 local function productive_intersection(fact)
   local ingredients, out = {}, {}
+  -- Canonical facts already retain type/name identities. Keep the public
+  -- evidence names and fingerprints unchanged for actual shared identities,
+  -- while avoiding an item/fluid name collision in the risk disposition.
+  if type(fact.ingredient_identities) == "table" and type(fact.productive_result_identities) == "table" then
+    local shared = {}
+    for _, entry in ipairs(fact.ingredient_identities) do
+      ingredients[risk_identity(entry)] = true
+    end
+    for _, entry in ipairs(fact.productive_result_identities) do
+      if ingredients[risk_identity(entry)] then shared[entry.name] = true end
+    end
+    for name in pairs(shared) do out[#out + 1] = name end
+    table.sort(out)
+    return out
+  end
+  -- Historical name-only callers retain their conservative disposition.
   for _, name in ipairs(fact.ingredient_names or {}) do ingredients[name] = true end
   for _, name in ipairs(fact.productive_result_names or {}) do
     if ingredients[name] then table.insert(out, name) end
