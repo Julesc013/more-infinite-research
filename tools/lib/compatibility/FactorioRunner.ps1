@@ -200,12 +200,26 @@ function Assert-MIRManualScenarioRuntimeContract {
 function Get-MIRCompatFileSha256 {param([string]$Path);if([string]::IsNullOrWhiteSpace($Path)-or-not(Test-Path -LiteralPath $Path -PathType Leaf)){return ''};(Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToUpperInvariant()}
 function Copy-MIRCompatFactorioCurrentLog {param([string]$UserDataDir,[string]$Destination);$source=Join-Path $UserDataDir 'factorio-current.log';if(-not(Test-Path -LiteralPath $source -PathType Leaf)){return ''};Copy-Item -LiteralPath $source -Destination $Destination -Force;return $Destination}
 function Invoke-MIRCompatFactorioProcess {
-  param([string]$FactorioBin,[object[]]$ArgumentList,[string]$StdoutPath,[string]$StderrPath,[int]$TimeoutSeconds)
-  $timer=[Diagnostics.Stopwatch]::StartNew();$parameters=@{FilePath=$FactorioBin;ArgumentList=$ArgumentList;PassThru=$true;RedirectStandardOutput=$StdoutPath;RedirectStandardError=$StderrPath}
-  if([Environment]::OSVersion.Platform-eq[PlatformID]::Win32NT){$parameters.WindowStyle='Hidden'}else{$parameters.NoNewWindow=$true}
-  $process=Start-Process @parameters;$timedOut=$false
-  try{if(-not$process.WaitForExit([Math]::Max(1,$TimeoutSeconds)*1000)){$timedOut=$true;try{Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue;$null=$process.WaitForExit(5000)}catch{}};$exitCode=if($timedOut){-1}else{$process.ExitCode}}finally{$timer.Stop();$process.Dispose()}
-  [pscustomobject]@{exit_code=$exitCode;timed_out=$timedOut;duration_seconds=[Math]::Round($timer.Elapsed.TotalSeconds,6);passed=(-not$timedOut)-and$exitCode-eq 0}
+  param([string]$FactorioBin,[object[]]$ArgumentList,[string]$StdoutPath,[string]$StderrPath,[int]$TimeoutSeconds,
+    [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0)
+  . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/Common.ps1')
+  . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
+  $work=Resolve-MIR441RecoveryScratchPath -Path (Split-Path -Parent $StdoutPath)
+  foreach($flag in @('--config','--mod-directory','--create','--log-file')){
+    if(@($ArgumentList|Where-Object {$_-ceq$flag}).Count-gt1){throw '[mir441-resource-factorio-duplicate-output-argument]'}
+    $index=[Array]::IndexOf($ArgumentList,$flag)
+    if($index-ge0){if($index+1-ge$ArgumentList.Count){throw '[mir441-resource-factorio-output-argument]'};$null=Resolve-MIR441RecoveryScratchPath -Path ([string]$ArgumentList[$index+1])}
+  }
+  $configIndex=[Array]::IndexOf($ArgumentList,'--config')
+  if($configIndex-lt0){throw '[mir441-resource-factorio-config-required]'}
+  $config=Get-Content -LiteralPath ([string]$ArgumentList[$configIndex+1]) -Raw
+  $writeData=[regex]::Matches($config,'(?m)^\s*write-data\s*=\s*(.+?)\s*$')
+  if($writeData.Count-ne1){throw '[mir441-resource-factorio-write-data-required]'}
+  $null=Resolve-MIR441RecoveryScratchPath -Path $writeData[0].Groups[1].Value
+  Invoke-MIR441MonitoredProcess -FilePath $FactorioBin -Arguments ([string[]]$ArgumentList) -WorkRoot $work `
+    -LedgerPath ($StdoutPath+'.resources.jsonl') -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) `
+    -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes `
+    -StdoutPath $StdoutPath -StderrPath $StderrPath -TimeoutSeconds $TimeoutSeconds -AllowNonZeroExit
 }
 function Invoke-MIRFactorioLoadCheck {
   param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[int]$ScenarioTimeoutSeconds=900)

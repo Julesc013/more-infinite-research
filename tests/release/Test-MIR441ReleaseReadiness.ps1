@@ -1,8 +1,82 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
+param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,[switch]$ResourceRecoveryOnly)
 
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+function Test-MIR441ResourceRecovery {
+  . (Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+  $actual=Get-MIR441ResourceSnapshot -WorkRoot (Join-Path $repo 'build/tmp')
+  if($actual.memory.commit_limit_bytes-le0-or$actual.memory.committed_bytes-le0-or$actual.memory.free_bytes-le0){throw 'Native physical/commit readings unavailable'}
+  $root=Join-Path $repo ('build/tmp/mir441-recovery-fixture-'+[guid]::NewGuid().ToString('N'))
+  $policy=[pscustomobject]@{minimum_free_ram_gib=4}
+  $script:RecoveryFault='';$script:RecoveryChildPid=Join-Path $root 'child.pid'
+  function Get-MIR441ResourceSnapshot {
+    param([string]$WorkRoot)
+    if($script:RecoveryFault-eq'monitor'-and(Test-Path -LiteralPath $script:RecoveryChildPid)){throw 'simulated-monitor-failure'}
+    $snapshot=[pscustomobject]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');memory=[pscustomobject]@{total_bytes=16GB;free_bytes=12GB;committed_bytes=4GB;commit_limit_bytes=20GB};system_volume=[pscustomobject]@{free_bytes=100GB};work_volume=[pscustomobject]@{free_bytes=100GB}}
+    switch($script:RecoveryFault){'physical'{$snapshot.memory.free_bytes=4GB};'commit'{$snapshot.memory.committed_bytes=16GB};'disk'{$snapshot.system_volume.free_bytes=20GB};'work'{$snapshot.work_volume.free_bytes=20GB};'runtime-commit'{if(Test-Path -LiteralPath $script:RecoveryChildPid){$snapshot.memory.committed_bytes=19GB}}}
+    return $snapshot
+  }
+  function Write-MIR441Json {
+    param($Value,[string]$Path,[switch]$Append)
+    [IO.File]::AppendAllText($Path,($Value|ConvertTo-Json -Depth 8 -Compress)+[Environment]::NewLine)
+  }
+  function Refuses([scriptblock]$Action,[string]$Expected){
+    $caught='';try{&$Action|Out-Null}catch{$caught=$_.Exception.Message}
+    if($caught-notmatch[regex]::Escape($Expected)){throw "Expected $Expected, got $caught"}
+  }
+  foreach($case in @(@('physical','memory'),@('commit','commit'),@('disk','system-disk'),@('work','work-disk'))){
+    $script:RecoveryFault=$case[0]
+    Refuses {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $root -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1MB} ('resource-admission-'+$case[1])
+    if(Test-Path -LiteralPath $root){throw 'Admission allocated output before refusing'}
+  }
+  $script:RecoveryFault=''
+  Refuses {Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo 'build/tmp-other/escape')} 'resource-output-root'
+  Refuses {Resolve-MIR441RecoveryScratchPath -Path 'D:\MIR-RECOVERY-OUTSIDE'} 'resource-output-root'
+  Refuses {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $root -EstimatedPeakBytes 3GB} 'resource-staging-budget'
+  $pwsh=(Get-Command pwsh).Source
+  $invoke=@{FilePath=$pwsh;Arguments=@('-NoProfile','-Command','Write-Output $env:TEMP');WorkRoot=$root;LedgerPath=(Join-Path $root 'ledger.jsonl');Policy=$policy;EstimatedPeakBytes=1MB;ExpectedPeakMemoryBytes=1GB;TimeoutSeconds=12;StdoutPath=(Join-Path $root 'stdout.txt');StderrPath=(Join-Path $root 'stderr.txt')}
+  Refuses {Invoke-MIR441MonitoredProcess -FilePath $pwsh -Arguments @('-NoProfile','-Command','exit') -WorkRoot $root -LedgerPath $invoke.LedgerPath -Policy $policy} 'resource-peak-budget-required'
+  New-Item -ItemType Directory -Path $root|Out-Null
+  $originalTemp=$env:TEMP;$originalTmp=$env:TMP
+  try{
+    $lockPath=Join-Path $repo 'build/tmp/mir-heavy.lock'
+    $held=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+    try{Refuses {Invoke-MIR441MonitoredProcess @invoke} 'resource-heavy-job-active'}finally{$held.Dispose()}
+    $passed=Invoke-MIR441MonitoredProcess @invoke
+    $jobTemp=[IO.File]::ReadAllText($invoke.StdoutPath).Trim()
+    if(-not$passed.passed-or-not$jobTemp.StartsWith($root+'\')-or(Test-Path -LiteralPath $jobTemp)){throw 'Per-job temp isolation or post-run cleanup failed'}
+    if($env:TEMP-cne$originalTemp-or$env:TMP-cne$originalTmp){throw 'Global temp environment changed'}
+    $parent=Join-Path $root 'parent.ps1'
+    $parentText=@'
+$child=Start-Process -FilePath (Get-Process -Id $PID).Path -ArgumentList @('-NoProfile','-Command','Start-Sleep -Seconds 20') -WindowStyle Hidden -PassThru
+[IO.File]::WriteAllText('__CHILD_PID__',[string]$child.Id)
+Start-Sleep -Seconds 20
+'@
+    [IO.File]::WriteAllText($parent,$parentText.Replace('__CHILD_PID__',$script:RecoveryChildPid))
+    $invoke.Arguments=@('-NoProfile','-File',$parent)
+    foreach($fault in @('runtime-commit','monitor')){
+      Remove-Item -LiteralPath $script:RecoveryChildPid -Force -ErrorAction SilentlyContinue
+      $script:RecoveryFault=$fault
+      $expected=if($fault-eq'monitor'){'simulated-monitor-failure'}else{'resource-admission-commit'}
+      Refuses {Invoke-MIR441MonitoredProcess @invoke} $expected
+      $childId=[int][IO.File]::ReadAllText($script:RecoveryChildPid)
+      if(Get-Process -Id $childId -ErrorAction SilentlyContinue){throw 'Owned child survived cancellation'}
+      if(@(Get-ChildItem -LiteralPath $root -Directory -Filter 'temp-*').Count){throw 'Cancelled job left temporary output'}
+      $last=Get-Content -LiteralPath $invoke.LedgerPath -Tail 1|ConvertFrom-Json
+      if($last.phase-cne'interrupted'){throw 'Interrupted job was not recorded as interrupted'}
+    }
+    $script:RecoveryFault=''
+    $link=Join-Path $root 'outside-link'
+    New-Item -ItemType Junction -Path $link -Target $repo|Out-Null
+    try{Refuses {Resolve-MIR441RecoveryScratchPath -Path (Join-Path $link 'README.md')} 'resource-output-reparse'}finally{Remove-Item -LiteralPath $link -Force}
+  }finally{
+    $null=Resolve-MIR441RecoveryScratchPath -Path $root
+    Remove-Item -LiteralPath $root -Recurse -Force
+  }
+  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;out_of_root=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
+}
+if($ResourceRecoveryOnly){Test-MIR441ResourceRecovery;return}
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $repo 'tools/mir/application/release/MIR441ReleaseReadiness.ps1')
 
@@ -41,7 +115,7 @@ $acceptedChangePaths=@(Get-ChildItem -LiteralPath (Join-Path $repo 'changes/unre
   $record=Get-Content -Raw -LiteralPath $_.FullName|ConvertFrom-Json -Depth 100
   if([string]$record.status-ceq'accepted'){[IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/')}
 }|Sort-Object)
-Assert-MIR441Test ($resourceText-match'EnumerateFiles'-and$resourceText-match'Write-MIR441Json'-and$resourceText-match'resource-hard-stop'-and$commonText-match'AppendAllText'-and$commonText-match'Assert-MIR441CleanTrackedSource') 'mir441-streaming-resource-governor'
+Assert-MIR441Test ($resourceText-match'EnumerateFileSystemInfos'-and$resourceText-match'Write-MIR441Json'-and$resourceText-match'commit_limit_bytes'-and$commonText-match'AppendAllText'-and$commonText-match'Assert-MIR441CleanTrackedSource') 'mir441-streaming-resource-governor'
 Assert-MIR441Test ($buildText-notmatch'ForEach-Object\s+-Parallel|Start-Job|Start-ThreadJob'-and$buildText-match'foreach\(\$target') 'mir441-serial-materializer'
 Assert-MIR441Test ($commonText-match'merge-base --is-ancestor'-and$buildText-match'Assert-MIR441MainAncestor') 'mir441-main-ancestry-before-candidate-build'
 Assert-MIR441Test ($buildText-match"-SourceVersion '4[.]1[.]0'"-and$materializerText-match'\$info[.]version\s*=\s*\[string\]\$identity[.]distribution_version') 'mir441-candidate-version-materialized-from-intent'
@@ -113,4 +187,5 @@ $cli=& (Join-Path $repo 'tools/mir.ps1') mir4 release-engine readiness-check 2>&
 Assert-MIR441Test ($cli-match'MIR-4.1-RELEASE-READINESS-HISTORICAL-SUCCESSOR-PASSED') 'mir441-public-cli'
 Assert-MIR441Test ((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir441-test-package-noninterference'
 
+Test-MIR441ResourceRecovery|Out-Null
 [pscustomobject][ordered]@{status='MIR-4.1-RELEASE-READINESS-STATIC-PROOF-PASSED';module_count=$modules.Count;targets=4;publisher_can_build=$false;package_source_sha256=$packageBefore}
