@@ -3,27 +3,32 @@
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
-  [string]$OutputRoot='build/tests/technology-design-characterization'
+  [string]$OutputRoot='build/tmp/technology-design-characterization',
+  [ValidateRange(0,2048)][int]$ExpectedPeakMemoryMiB=0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+$outputPath=if([IO.Path]::IsPathRooted($OutputRoot)){$OutputRoot}else{Join-Path $repo $OutputRoot}
+$output=Resolve-MIR441RecoveryScratchPath -Path $outputPath
+if($ExpectedPeakMemoryMiB-le0){throw '[mir441-resource-peak-budget-required] Declare the characterization peak memory budget.'}
+$policy=[pscustomobject]@{minimum_free_ram_gib=4}
+$peakBytes=[int64]$ExpectedPeakMemoryMiB*1MB
+$writeBytes=[int64]$MaxNewOutputMiB*1MB
+# Refuse before staging or even a version probe allocates process/output state.
+$null=Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $output -EstimatedPeakBytes $writeBytes -ExpectedPeakMemoryBytes $peakBytes
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
-$output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
-$buildRoot=(Join-Path $repo 'build')+[IO.Path]::DirectorySeparatorChar
-if(-not$output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)) {
-  throw 'Test outputs must be under build.'
-}
-$os=Get-CimInstance Win32_OperatingSystem
-$availableBytes=[int64]$os.FreePhysicalMemory*1KB
-if($availableBytes-lt4GB) {
-  throw ('TechnologyDesign engine characterization requires at least 4 GiB free RAM; observed {0:N2} GiB.' -f ($availableBytes/1GB))
-}
+. (Join-Path $repo 'tools/mir/application/release/readiness/Common.ps1')
+. (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 $run=Join-Path $output ([guid]::NewGuid().ToString('N'))
 $mod=Join-Path $run 'mods/mir-technology-design-characterization_1.0.0'
 New-Item -ItemType Directory -Force -Path $mod,(Join-Path $run 'userdata')|Out-Null
-$version=(& $engine --version|Out-String)
-if($LASTEXITCODE-ne0-or$version-notmatch'Version: 2[.]1[.]') {
+$ledger=Join-Path $run 'resource-ledger.jsonl'
+$versionRun=Invoke-MIR441MonitoredProcess -FilePath $engine -Arguments @('--version') -WorkRoot $run -LedgerPath $ledger -Policy $policy -EstimatedPeakBytes $writeBytes -ExpectedPeakMemoryBytes $peakBytes -TimeoutSeconds 15 -StdoutPath (Join-Path $run 'version.stdout.txt') -StderrPath (Join-Path $run 'version.stderr.txt') -AllowNonZeroExit
+$version=[IO.File]::ReadAllText((Join-Path $run 'version.stdout.txt'))
+if(-not$versionRun.passed-or$version-notmatch'Version: 2[.]1[.]') {
   throw 'TechnologyDesign characterization requires an exact Factorio 2.1 engine.'
 }
 $modules=[ordered]@{
@@ -58,27 +63,11 @@ $info='{"name":"mir-technology-design-characterization","version":"1.0.0","title
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
 $config="[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n"
 [IO.File]::WriteAllText((Join-Path $run 'config.ini'),$config,[Text.UTF8Encoding]::new($false))
-$start=[Diagnostics.ProcessStartInfo]::new($engine)
-$start.UseShellExecute=$false
-$start.CreateNoWindow=$true
-$start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
-foreach($argument in @('--config',(Join-Path $run 'config.ini'),'--mod-directory',(Join-Path $run 'mods'),'--create',(Join-Path $run 'probe.zip'))) {
-  $start.ArgumentList.Add($argument)
-}
-$process=[Diagnostics.Process]::Start($start)
-try {
-  if(-not$process.WaitForExit(60000)) {
-    $process.Kill($true)
-    throw "TechnologyDesign characterization timed out: $run"
-  }
-  $exitCode=$process.ExitCode
-} finally {
-  $process.Dispose()
-}
+$arguments=@('--config',(Join-Path $run 'config.ini'),'--mod-directory',(Join-Path $run 'mods'),'--create',(Join-Path $run 'probe.zip'))
+$process=Invoke-MIRCompatFactorioProcess -FactorioBin $engine -ArgumentList $arguments -StdoutPath (Join-Path $run 'stdout.txt') -StderrPath (Join-Path $run 'stderr.txt') -TimeoutSeconds 60 -EstimatedPeakBytes $writeBytes -ExpectedPeakMemoryBytes $peakBytes
 $nativeLog=Join-Path $run 'userdata/factorio-current.log'
 $log=Get-Content -Raw -LiteralPath $nativeLog
-[IO.File]::WriteAllText((Join-Path $run 'stdout.txt'),$log,[Text.UTF8Encoding]::new($false))
-if($exitCode-ne0-or$log-notmatch'MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS ([0-9]+)') {
+if($process.exit_code-ne0-or$log-notmatch'MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS ([0-9]+)') {
   throw "TechnologyDesign characterization failed: $nativeLog"
 }
 $assertionCount=[int]$Matches[1]
@@ -93,7 +82,12 @@ $receipt=[ordered]@{
   engine_sha256=(Get-FileHash -LiteralPath $engine -Algorithm SHA256).Hash
   test_sha256=(Get-FileHash -LiteralPath $testPath -Algorithm SHA256).Hash
   modules=$identities
-  log_sha256=(Get-FileHash -LiteralPath (Join-Path $run 'stdout.txt') -Algorithm SHA256).Hash
+  log_sha256=(Get-FileHash -LiteralPath $nativeLog -Algorithm SHA256).Hash
+  version_process=$versionRun
+  characterization_process=$process
+  memory_enforcement='sampled-watchdog-not-hard-cap'
+  expected_peak_memory_bytes=$peakBytes
+  maximum_additional_output_bytes=$writeBytes
 }
 $receipt|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $run 'result.json') -Encoding utf8
 $receipt|ConvertTo-Json -Depth 6
