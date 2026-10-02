@@ -84,6 +84,34 @@ Assert-MIR42NineSealTest -Condition ([string]$nineContract.engine_run_kind -ceq 
 Assert-MIR42NineSealTest -Condition ([string]$nineContract.binder_status -ceq 'MIR-4.2-NINE-TARGET-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED') -Code 'nine-binder-contract'
 Assert-MIR42NineSealTest -Condition ([string]$nineContract.campaign_status -ceq 'MIR-4.2-NINE-TARGET-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED') -Code 'nine-campaign-contract'
 
+function Test-MIR42NineCriterionEvidenceReader {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $root = Join-Path $RepoRoot ('build/test-results/mir42-nine-criterion-reader-' + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Force -Path $root | Out-Null
+  $source = [pscustomobject][ordered]@{commit=('a' * 40);tree=('b' * 40);package_source_sha256=('C' * 64)}
+  $candidate = [pscustomobject][ordered]@{
+    source=$source
+    identity=[pscustomobject][ordered]@{sha256=('D' * 64);record=[pscustomobject][ordered]@{record_sha256=('E' * 64)}}
+  }
+  $path = Join-Path $root 'criterion.json'
+  $record = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42NineTargetReleaseAcceptanceCriterionEvidenceV1';status='passed';criterion='settings-profile-continuity'
+    source=$source;candidate_manifest=[pscustomobject][ordered]@{sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
+    observed_targets=@($script:MIR42SealNineTargetCandidates);not_applicable_targets=@();evidence=@();limits=[pscustomobject][ordered]@{claim='structural fixture';known_limitations='reader only'};record_sha256=''
+  }
+  Write-MIR4BootstrapRecord -Record $record -Path $path | Out-Null
+  $accepted = Get-MIR42NineTargetCriterionEvidenceRecord -Path $path -Candidate $candidate
+  Assert-MIR42NineSealTest -Condition ([string]$accepted.record.criterion -ceq 'settings-profile-continuity') -Code 'criterion-reader-accepted'
+  $record.criterion='outside-authorized-criterion-set'
+  Write-MIR4BootstrapRecord -Record $record -Path $path | Out-Null
+  $rejected=$false
+  try { Get-MIR42NineTargetCriterionEvidenceRecord -Path $path -Candidate $candidate | Out-Null } catch { $rejected=$_.Exception.Message -match '^\[mir42-joined-campaign-criterion-binding\]' }
+  Assert-MIR42NineSealTest -Condition $rejected -Code 'criterion-reader-unrecognized-rejected'
+}
+
+Test-MIR42NineCriterionEvidenceReader -RepoRoot $repo
+
 Assert-MIR42SealCandidateScopeMatch -Rows @($nine.targets) -Candidate $nine -Code 'mir42-nine-seal-match'
 $rejected = $false
 try { Assert-MIR42SealCandidateScopeMatch -Rows @($modern.targets) -Candidate $nine -Code 'mir42-nine-seal-opposing' } catch { $rejected = $_.Exception.Message -match '^\[mir42-nine-seal-opposing-target-set\]' }
