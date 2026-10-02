@@ -347,6 +347,27 @@ function Read-MIRManualReleaseWrittenWaiverAuthorization {
   }
 }
 
+function Assert-MIRManualReleaseWrittenWaiverCandidateVersion {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$CandidateVersion,
+    [Parameter(Mandatory)]$Authorization
+  )
+
+  $targets = @($Authorization.record.release.selected_targets | ForEach-Object { [string]$_ })
+  if ($targets.Count -ne 9 -or ($targets -join '|') -cne 'f210|f200|f110|f100|f017|f016|f015|f014|f013') {
+    throw '[mir-manual-review-waiver-authorization-target-scope]'
+  }
+  $authorizedVersions = @(
+    foreach ($target in $targets) {
+      try { [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $target).distribution_version }
+      catch { throw "[mir-manual-review-waiver-authorization-target] $target" }
+    }
+  )
+  if ([string]$CandidateVersion -cnotin $authorizedVersions) {
+    throw '[mir-manual-review-waiver-candidate-version]'
+  }
+}
 function Write-MIRManualReleaseWrittenWaiverAttestation {
   param(
     [Parameter(Mandatory)]$Record,
@@ -390,6 +411,7 @@ function New-MIRManualReleaseWrittenWaiverAttestation {
   $factorioVersion = Get-MIRReleaseFactorioVersion -Path $FactorioBin
   if (-not ([string]$factorioVersion).StartsWith($ExpectedFactorioVersion)) { throw '[mir-manual-review-waiver-factorio-version]' }
   $authorization = Read-MIRManualReleaseWrittenWaiverAuthorization -RepoRoot $repo -Path $MaintainerAuthorizationPath
+  Assert-MIRManualReleaseWrittenWaiverCandidateVersion -RepoRoot $repo -CandidateVersion ([string]$candidateInfo.version) -Authorization $authorization
   $outputPath = if ([string]::IsNullOrWhiteSpace($Path)) {
     Resolve-MIRReleasePath -RepoRoot $repo -Path ".mir/evidence/$($candidateInfo.version)-manual-review-attestation.json"
   } else {

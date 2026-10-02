@@ -1,14 +1,38 @@
 [CmdletBinding()]
 param(
+  [ValidateSet('Reconcile','Criterion')][string]$Mode = 'Reconcile',
   [Parameter(Mandatory)][string]$RepoRoot,
   [Parameter(Mandatory)][string]$CandidateManifestPath,
-  [Parameter(Mandatory)][hashtable]$PredecessorZips,
-  [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
-  [Parameter(Mandatory)][string]$OutputRoot
+  [hashtable]$PredecessorZips = @{},
+  [hashtable]$UpgradeReceipts = @{},
+  [string]$OutputRoot = '',
+  [ValidateSet('fresh-exact-loads','settings-profile-continuity','research-progression','migrations-two-reload','compatibility-canaries','target-omissions','performance-telemetry','package-exclusion','deterministic-reconstruction')][string]$Criterion = '',
+  [string[]]$ObservationPaths = @(),
+  [string[]]$ObservedTargets = @(),
+  [hashtable]$NotApplicableTargetReasons = @{},
+  [string]$Claim = '',
+  [string]$KnownLimitations = '',
+  [string]$OutputPath = ''
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1')
-Invoke-MIR42NineTargetEvidenceReconciliation @PSBoundParameters | ConvertTo-Json -Depth 100
+switch ($Mode) {
+  'Reconcile' {
+    if ($PredecessorZips.Count -eq 0 -or $UpgradeReceipts.Count -eq 0 -or [string]::IsNullOrWhiteSpace($OutputRoot)) {
+      throw '[mir42-nine-reconciliation-inputs-required]'
+    }
+    Invoke-MIR42NineTargetEvidenceReconciliation -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot | ConvertTo-Json -Depth 100
+  }
+  'Criterion' {
+    foreach ($value in @($Criterion,$Claim,$KnownLimitations,$OutputPath)) {
+      if ([string]::IsNullOrWhiteSpace([string]$value)) { throw '[mir42-nine-criterion-inputs-required]' }
+    }
+    if ($ObservationPaths.Count -eq 0 -or $ObservedTargets.Count -eq 0) { throw '[mir42-nine-criterion-observations-required]' }
+    New-MIR42NineTargetCriterionEvidence -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath -Criterion $Criterion `
+      -ObservationPaths $ObservationPaths -ObservedTargets $ObservedTargets -NotApplicableTargetReasons $NotApplicableTargetReasons `
+      -Claim $Claim -KnownLimitations $KnownLimitations -OutputPath $OutputPath | ConvertTo-Json -Depth 100
+  }
+}

@@ -602,3 +602,131 @@ function Invoke-MIR42NineTargetEvidenceReconciliation {
   }
   return Invoke-MIR42EvidenceReconciliationShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -RequiredScope 'nine-target'
 }
+
+$script:MIR42ReleaseAcceptanceCriteria = @(
+  'fresh-exact-loads', 'settings-profile-continuity', 'research-progression', 'migrations-two-reload',
+  'compatibility-canaries', 'target-omissions', 'performance-telemetry', 'package-exclusion',
+  'deterministic-reconstruction'
+)
+
+function Resolve-MIR42CriterionEvidenceOutputPath {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $build = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
+  $output = if ([IO.Path]::IsPathRooted($Path)) { [IO.Path]::GetFullPath($Path) } else { [IO.Path]::GetFullPath((Join-Path $repo $Path)) }
+  try {
+    $null = Assert-MIR4DescendantPath -Root $build -Path $output
+    $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $output
+  } catch { throw '[mir42-criterion-evidence-output-containment]' }
+  if (Test-Path -LiteralPath $output) { throw '[mir42-criterion-evidence-output-existing]' }
+  $parent = Split-Path -Parent $output
+  if (-not (Test-Path -LiteralPath $parent -PathType Container)) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
+  return $output
+}
+
+function Get-MIR42CriterionEvidenceObservation {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$Criterion,
+    [Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)][string]$Code
+  )
+  $record = Read-MIR42QualificationBootstrapRecord -Path $Path -Code $Code
+  $candidateManifest = $Candidate.candidate_manifest
+  $source = $Candidate.source
+  $candidateBound = $record.PSObject.Properties.Name -contains 'source' -and
+    $record.PSObject.Properties.Name -contains 'candidate_manifest' -and
+    [string]$record.source.commit -ceq [string]$source.commit -and
+    [string]$record.source.tree -ceq [string]$source.tree -and
+    [string]$record.source.package_source_sha256 -ceq [string]$source.package_source_sha256 -and
+    [string]$record.candidate_manifest.sha256 -ceq [string]$candidateManifest.sha256 -and
+    [string]$record.candidate_manifest.record_sha256 -ceq [string]$candidateManifest.record_sha256
+  $candidateConstruction = [string]$record.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV1' -and
+    [string]$record.record_sha256 -ceq [string]$candidateManifest.record_sha256
+  $kindAndStateValid = switch ($Criterion) {
+    'fresh-exact-loads' {
+      $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetRealEngineEvidenceBinderV1' -and
+        [string]$record.status -ceq 'MIR-4.2-NINE-TARGET-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED' -and
+        [string]$record.release_qualification -ceq 'not-performed' -and [string]$record.release_acceptance -ceq 'not-performed'
+    }
+    'target-omissions' {
+      $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetEvidenceReconciliationV1' -and
+        [string]$record.status -ceq 'MIR-4.2-NINE-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED' -and
+        [string]$record.release_qualification -ceq 'not-performed'
+    }
+    'package-exclusion' { $candidateConstruction -and [bool]$record.build_complete }
+    'deterministic-reconstruction' { $candidateConstruction -and [bool]$record.build_complete }
+    'performance-telemetry' {
+      $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetCriterionObservationV1' -and
+        [string]$record.status -ceq 'passed' -and [string]$record.criterion -ceq $Criterion -and
+        [string]$record.telemetry_scope -ceq 'bounded-candidate-load-and-upgrade-resource-observation'
+    }
+    default {
+      $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetCriterionObservationV1' -and
+        [string]$record.status -ceq 'passed' -and [string]$record.criterion -ceq $Criterion
+    }
+  }
+  if (-not $kindAndStateValid) { throw "[$Code-binding] $Criterion" }
+  return [pscustomobject][ordered]@{
+    path = (Resolve-Path -LiteralPath $Path).Path
+    sha256 = Get-MIR4Sha256File -Path $Path
+    record_sha256 = [string]$record.record_sha256
+  }
+}
+
+function New-MIR42NineTargetCriterionEvidence {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$CandidateManifestPath,
+    [Parameter(Mandatory)][ValidateSet('fresh-exact-loads','settings-profile-continuity','research-progression','migrations-two-reload','compatibility-canaries','target-omissions','performance-telemetry','package-exclusion','deterministic-reconstruction')][string]$Criterion,
+    [Parameter(Mandatory)][string[]]$ObservationPaths,
+    [Parameter(Mandatory)][string[]]$ObservedTargets,
+    [hashtable]$NotApplicableTargetReasons = @{},
+    [Parameter(Mandatory)][string]$Claim,
+    [Parameter(Mandatory)][string]$KnownLimitations,
+    [Parameter(Mandatory)][string]$OutputPath
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $candidateRows = Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
+  if ([string]$candidateRows[0].scope -cne 'nine-target') { throw '[mir42-criterion-evidence-candidate-scope]' }
+  $candidate = [pscustomobject][ordered]@{
+    source = $candidateRows[0].source
+    candidate_manifest = $candidateRows[0].candidate_manifest
+    targets = @($candidateRows | ForEach-Object { [string]$_.target })
+  }
+  $observed = @($ObservedTargets | ForEach-Object { [string]$_ })
+  $notApplicable = @(
+    foreach ($target in $candidate.targets) {
+      if ($NotApplicableTargetReasons.ContainsKey($target)) { [ordered]@{target=$target;reason=[string]$NotApplicableTargetReasons[$target]} }
+    }
+  )
+  $notApplicableTargets = @($notApplicable | ForEach-Object { [string]$_.target })
+  if ($observed.Count -eq 0 -or @($observed | Sort-Object -Unique).Count -ne $observed.Count -or
+      @($notApplicableTargets | Sort-Object -Unique).Count -ne $notApplicableTargets.Count -or
+      @($observed + $notApplicableTargets).Count -ne $candidate.targets.Count -or
+      (@($observed + $notApplicableTargets | Sort-Object { [array]::IndexOf($candidate.targets, [string]$_) }) -join '|') -cne ($candidate.targets -join '|') -or
+      @($notApplicable | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.reason) }).Count -ne 0) {
+    throw '[mir42-criterion-evidence-target-coverage]'
+  }
+  if ($ObservationPaths.Count -eq 0) { throw '[mir42-criterion-evidence-observations-required]' }
+  $evidence = @(
+    foreach ($path in $ObservationPaths) {
+      Get-MIR42CriterionEvidenceObservation -Path $path -Criterion $Criterion -Candidate $candidate -Code 'mir42-criterion-evidence-observation'
+    }
+  )
+  if (@($evidence.path | Sort-Object -Unique).Count -ne $evidence.Count -or [string]::IsNullOrWhiteSpace($Claim) -or [string]::IsNullOrWhiteSpace($KnownLimitations)) {
+    throw '[mir42-criterion-evidence-input-shape]'
+  }
+  $output = Resolve-MIR42CriterionEvidenceOutputPath -RepoRoot $repo -Path $OutputPath
+  $record = [pscustomobject][ordered]@{
+    schema = 1;kind = 'MIR42NineTargetReleaseAcceptanceCriterionEvidenceV1';status = 'passed';criterion = $Criterion
+    source = $candidate.source;candidate_manifest = $candidate.candidate_manifest;observed_targets = $observed;not_applicable_targets = $notApplicable
+    evidence = $evidence;limits = [ordered]@{claim=$Claim;known_limitations=$KnownLimitations};record_sha256 = ''
+  }
+  $record.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $record
+  Write-MIR4BootstrapRecord -Record $record -Path $output | Out-Null
+  $readback = Read-MIR42QualificationBootstrapRecord -Path $output -Code 'mir42-criterion-evidence-output'
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $readback) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $record)) { throw '[mir42-criterion-evidence-output-roundtrip]' }
+  return $readback
+}
