@@ -4,7 +4,6 @@
 local probe = require("probe")
 rawset(_G, "__mir_performance_instrument_probe", probe)
 local original_require = require
-local main_hook
 local attached = setmetatable({}, {__mode = "k"})
 local snapshot_recorded = false
 local paths = {
@@ -13,10 +12,6 @@ local paths = {
   ["prototypes.mir.planner.compilation_plan"] = "planning",
   ["prototypes.mir.emit.technology_graph_safety"] = "graph",
   ["prototypes.mir.pipeline.commands"] = "postconditions"
-}
-local stages = {
-  ["prototypes.mir.stage.data"] = true,
-  ["prototypes.mir.stage.data_final_fixes"] = true
 }
 
 local function attach(module, phase)
@@ -54,38 +49,12 @@ local function attach(module, phase)
   end
 end
 
-local function instrument_require(name)
+require = function(name)
   local caller = debug.getinfo(2, "S")
   local from_mir = caller and string.find(caller.source, "__more-infinite-research__", 1, true)
   local relative = string.gsub(name, "^__more%-infinite%-research__%.", "")
   local phase = paths[relative]
   local module = original_require(name)
   if phase and (from_mir or relative ~= name) then attach(module, phase) end
-  if stages[relative] and from_mir and not attached[module] then
-    attached[module] = true
-    local original_run = module.run
-    module.run = function(...)
-      local result = table.pack(pcall(original_run, ...))
-      debug.sethook(main_hook, "c")
-      if not result[1] then error(result[2], 2) end
-      return table.unpack(result, 2, result.n)
-    end
-  end
   return module
 end
-
--- The engine also restores its require binding for each top-level file.
--- Reinstall the observer at the MIR entry, then remove the debug hook for
--- the entire measured pass. Restore the entry hook only after stage.run.
-main_hook = function()
-  local info = debug.getinfo(2, "S")
-  if info and info.what == "main" and (
-    info.source == "@__more-infinite-research__/data.lua"
-    or info.source == "@__more-infinite-research__/data-final-fixes.lua"
-  ) then
-    original_require = require
-    require = instrument_require
-    debug.sethook()
-  end
-end
-debug.sethook(main_hook, "c")
