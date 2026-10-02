@@ -1,4 +1,4 @@
-local probe = require("probe")
+local probe = rawget(_G, "__mir_performance_instrument_probe") or require("probe")
 local prototype = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-compiler-evidence"]
 local evidence = prototype and prototype.data or nil

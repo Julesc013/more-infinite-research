@@ -1,5 +1,4 @@
 local probe = require("probe")
-local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local mir_version = mods and mods["more-infinite-research"] or nil
 local compilation_module
 if mir_version == "3.1.9" then
@@ -24,6 +23,11 @@ elseif mir_version == "3.2.0"
 else
   error("performance probe does not govern MIR version " .. tostring(mir_version))
 end
+-- Instrument mode attaches to each actual MIR module load. Factorio 2.0
+-- resets its module cache between top-level data files, so passive hooks
+-- installed here do not survive into MIR's data-final-fixes compilation.
+if rawget(_G, "__mir_performance_instrument_probe") then return end
+local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local compilation_plan = require(compilation_module)
 local graph_safety = require("__more-infinite-research__.prototypes.mir.emit.technology_graph_safety")
 local commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")

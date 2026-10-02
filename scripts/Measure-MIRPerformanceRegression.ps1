@@ -272,6 +272,9 @@ disable-blueprint-storage=true
     "--mod-directory", $modsDir,
     "--create", $savePath
   )
+  if ($RequireProbeTelemetry -and [string]$campaign.factorio_line -eq "2.0") {
+    $arguments += @("--instrument-mod", "mir-fixture-performance-regression-probe")
+  }
   $timer = [Diagnostics.Stopwatch]::StartNew()
   $process = Start-Process -FilePath $script:FactorioPath -ArgumentList $arguments -PassThru -WindowStyle Hidden `
     -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
