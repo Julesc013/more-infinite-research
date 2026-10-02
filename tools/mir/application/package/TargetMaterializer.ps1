@@ -382,10 +382,42 @@ function Update-MIR4CurrentSourceBindings {
   $authority.source_manifest.record_sha256=[string]$manifest.record_sha256
   $authority.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $authority
   $records['targets/package-authority.json']=@{record=$authority;schema='mir4-canonical-package-authority-v2.schema.json'}
+  # Historical construction uses the same admitted f100 bytes before applying
+  # each target's explicit patches. Refresh their base pins without changing
+  # patch text, adapters, engines, predecessors, or publication authority.
+  foreach($target in @('f017','f016','f015','f014','f013')) {
+    $path="targets/historical/$target/target.json"
+    $historical=Get-Content -Raw -LiteralPath (Join-Path $repo $path) | ConvertFrom-Json -Depth 100
+    if([int]$historical.schema -ne 1 -or [string]$historical.kind -cne 'MIR42HistoricalPlaytestTargetV1' -or
+       [string]$historical.target -cne $target -or [string]$historical.base_materializer_target -cne 'f100' -or
+       [bool]$historical.public_output_authorized -or [bool]$historical.publication_authorized -or
+       -not(Test-MIR4BootstrapRecordHash -Record $historical)) { throw "[mir4-source-refresh-historical-record] $target" }
+    $historicalChanged=$false
+    foreach($patch in @($historical.patches)) {
+      $rows=@($manifest.bindings | Where-Object { [string]$_.output_path -ceq [string]$patch.output_path -and 'f100' -in @($_.target_scope) })
+      if($rows.Count -ne 1 -or [string]$rows[0].transform -cne 'copy-exact-bytes' -or
+         @($historical.adapter_files | Where-Object { [string]$_.output_path -ceq [string]$patch.output_path }).Count -ne 0) {
+        throw "[mir4-source-refresh-historical-patch-binding] $target/$($patch.output_path)"
+      }
+      $text=[Text.UTF8Encoding]::new($false,$true).GetString([IO.File]::ReadAllBytes((Join-Path $repo ([string]$rows[0].source_path))))
+      if([string]::IsNullOrEmpty([string]$patch.find) -or
+         [regex]::Matches($text,[regex]::Escape([string]$patch.find)).Count -ne 1) {
+        throw "[mir4-source-refresh-historical-patch-anchor] $target/$($patch.output_path)"
+      }
+      if([string]$patch.base_sha256 -cne [string]$rows[0].output_sha256) {
+        $patch.base_sha256=[string]$rows[0].output_sha256
+        $historicalChanged=$true
+      }
+    }
+    if($historicalChanged) {
+      $historical.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $historical
+      $records[$path]=@{record=$historical;schema=''}
+    }
+  }
   $writes=[ordered]@{}
   foreach($entry in $records.GetEnumerator()) {
     $json=($entry.Value.record | ConvertTo-Json -Depth 100).Replace("`r`n","`n")+"`n"
-    if(-not($json | Test-Json -SchemaFile (Join-Path $repo "spec/schemas/$($entry.Value.schema)"))) { throw "[mir4-source-refresh-schema] $($entry.Key)" }
+    if($entry.Value.schema -and -not($json | Test-Json -SchemaFile (Join-Path $repo "spec/schemas/$($entry.Value.schema)"))) { throw "[mir4-source-refresh-schema] $($entry.Key)" }
     if([IO.File]::ReadAllText((Join-Path $repo $entry.Key)).Replace("`r`n","`n") -cne $json) { $writes[$entry.Key]=$json }
   }
   if($Check -and $writes.Count -gt 0) { throw "[mir4-source-refresh-stale] $($writes.Keys -join ', ')" }
