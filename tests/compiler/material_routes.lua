@@ -46,8 +46,8 @@ stub("prototypes.mir.pipeline.compiler_context", {current=function() return {
 local matcher=require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 local count=0
 local function check(value,message) assert(value,message); count=count+1 end
-local function recipe(input,output)
- return {allow_productivity=true,variants={{ingredients={{name=input}},results={{name=output,amount=1}}}}}
+local function recipe(input,output,input_type,output_type)
+ return {allow_productivity=true,variants={{ingredients={{type=input_type or "item",name=input}},results={{type=output_type or "item",name=output,amount=1}}}}}
 end
 local function environment(value)
   records=value; cached={}; builds=0
@@ -75,6 +75,19 @@ check(not matcher.material_route_is_acyclic(denied),"no upstream eligibility ove
 check(not matcher.material_route_is_acyclic({allow_productivity=true}),"missing variants fail closed")
 cached.material_route_graph={complete=false}
 check(not matcher.material_route_is_acyclic(forward),"graph budget fails closed")
+
+local typed_forward=recipe("ore","brine","item","fluid")
+environment{smelting=typed_forward,unrelated=recipe("brine","ore","item","item")}
+check(matcher.material_route_is_acyclic(typed_forward),"same-named item cannot consume a fluid output")
+environment{conversion=recipe("salt","salt","item","fluid")}
+check(matcher.material_route_is_acyclic(records.conversion),"same-named item and fluid are distinct process identities")
+environment{smelting=typed_forward,return_fluid=recipe("brine","ore","fluid","item")}
+check(not matcher.material_route_is_acyclic(typed_forward),"actual fluid-to-item return remains rejected")
+environment{smelting=typed_forward,first=recipe("brine","component","fluid","item"),second=recipe("component","ore")}
+check(not matcher.material_route_is_acyclic(typed_forward),"indirect typed return remains rejected")
+environment{smelting=typed_forward,malformed=recipe("brine","ore","fluid","item")}
+records.malformed.variants[1].ingredients[1].type=nil
+check(not matcher.material_route_is_acyclic(typed_forward),"incomplete process identities cannot hide a return edge")
 
 local function entry(name, amount, changes)
   local value = {type="item", name=name, amount=amount, probability=1, independent_probability=1}
@@ -190,13 +203,13 @@ check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_c
 check(#certificate_required_routes("smelting",valid_route,valid_risk_row,certificate("ore","gear"))==0,"certificate-required route rejects output mismatch")
 check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,{complete=false})==0,"certificate-required route cannot override graph budget")
 local search_edges={}
-local previous="plate"
+local previous="item\30plate"
 for index=1,30001 do
-  local next_name="search-node-"..index
+  local next_name="item\30search-node-"..index
   search_edges[previous]={[next_name]=true}
   previous=next_name
 end
-check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,{complete=true,edges=search_edges})==0,"certificate-required route cannot override search budget")
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,{complete=true,typed_edges=search_edges})==0,"certificate-required route cannot override search budget")
 check(table.concat(certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,nil,true),",")=="smelting","certificate-required reviewed return accepts exact certificate")
 check(#certificate_required_routes("smelting",valid_route,valid_risk_row,certificate("ore","gear"),nil,nil,true)==0,"certificate-required reviewed return rejects invalid certificate")
 local certificate_denied_route=canonical_route("smelting","ore","plate")
