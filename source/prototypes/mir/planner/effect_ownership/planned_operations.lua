@@ -34,7 +34,8 @@ end
 -- boundary, where base continuations join those rows for the first time.
 -- Same-operation duplicates deliberately remain untouched so the final
 -- CompilationPlan validator continues to fail closed.
-function M.resolve(raw_operations)
+function M.resolve(raw_operations, options)
+  options = options or {}
   local operations, claims_by_identity = {}, {}
   for operation_index, source in ipairs(raw_operations or {}) do
     local operation = facts.copy_operation_preserving_authority(source)
@@ -55,7 +56,7 @@ function M.resolve(raw_operations)
     end
   end
 
-  local winners, decisions = {}, {}
+  local winners, decisions, retained_overlaps = {}, {}, {}
   local conflict_count, retained_overlap_count = 0, 0
   for identity, claims in pairs(claims_by_identity) do
     local operation_indexes, operation_count, retain = {}, 0, false
@@ -65,6 +66,21 @@ function M.resolve(raw_operations)
         operation_count = operation_count + 1
       end
       if facts.retained_overlap(claim.operation, identity) then retain = true end
+    end
+    if options.weapon_overlap_mode == "off" and #claims == 2
+      and facts.weapon_speed_overlap_pair(claims[1].operation, claims[2].operation,
+        claims[1].effect, claims[2].effect)
+    then
+      local base = claims[1].operation.operation == "emit_base_extension"
+        and claims[1].operation or claims[2].operation
+      base.planned_overlap_identities = base.planned_overlap_identities or {}
+      base.planned_overlap_identities[identity] = true
+      retain = true
+      local owners = {claims[1].owner, claims[2].owner}
+      table.sort(owners)
+      table.insert(retained_overlaps, {
+        identity = identity, owners = owners, policy = "weapon-speed-overlap-off"
+      })
     end
     local has_material_stage = false
     for _, claim in ipairs(claims) do
@@ -111,6 +127,7 @@ function M.resolve(raw_operations)
     end
   end
   table.sort(decisions, function(left, right) return left.identity < right.identity end)
+  table.sort(retained_overlaps, function(left, right) return left.identity < right.identity end)
 
   local resolved, omitted = {}, {}
   for operation_index, operation in ipairs(operations) do
@@ -192,6 +209,7 @@ function M.resolve(raw_operations)
     conflict_count = conflict_count,
     omitted_operation_count = #omitted,
     retained_overlap_count = retained_overlap_count,
+    retained_overlaps = retained_overlaps,
     decisions = decisions,
     omitted_operations = omitted_projection
   }
@@ -200,6 +218,7 @@ function M.resolve(raw_operations)
     conflict_count = summary.conflict_count,
     omitted_operation_count = summary.omitted_operation_count,
     retained_overlap_count = summary.retained_overlap_count,
+    retained_overlaps = summary.retained_overlaps,
     decisions = summary.decisions,
     omitted_operations = summary.omitted_operations
   })

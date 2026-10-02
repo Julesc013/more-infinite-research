@@ -444,7 +444,9 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     end
   end
   local combined_ownership, ownership_omissions
-  operations, combined_ownership, ownership_omissions = effect_ownership.resolve_operations(operations)
+  operations, combined_ownership, ownership_omissions = effect_ownership.resolve_operations(operations, {
+    weapon_overlap_mode = exact_input.policy_snapshot.weapon_overlap_mode
+  })
   normalized_base = {}
   for _, operation in ipairs(operations) do
     if operation.operation == "emit_base_extension" then table.insert(normalized_base, operation) end

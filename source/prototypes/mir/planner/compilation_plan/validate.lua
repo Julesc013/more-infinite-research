@@ -3,6 +3,7 @@ local technology_effects = require("prototypes.mir.integrity.technology_effects"
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
+local ownership_facts = require("prototypes.mir.planner.effect_ownership.facts")
 
 local M = {}
 
@@ -39,6 +40,7 @@ function M.operations(operations)
   local technology_names, manifest_ids, effects, effect_values = {}, {}, {}, {}
   local planned_overlaps = {}
   local material_stage_overlaps = {}
+  local weapon_speed_overlaps = {}
   for _, operation in ipairs(operations) do
     if operation.operation == "emit_stream" or operation.operation == "emit_base_extension" then
       if technology_names[operation.technology_name] then
@@ -75,8 +77,12 @@ function M.operations(operations)
               owners = {effects[identity].technology_name, operation.technology_name},
               policy = "material-stage-same-qualified-recipe"
             })
-          elseif (operation.planned_overlap_identities or {})[identity] == true
-            or (effects[identity].planned_overlap_identities or {})[identity] == true then
+          elseif not weapon_speed_overlaps[identity]
+            and ownership_facts.weapon_speed_overlap_pair(
+              effects[identity], operation, effect_values[identity], effect)
+            and (ownership_facts.retained_overlap(operation, identity)
+              or ownership_facts.retained_overlap(effects[identity], identity)) then
+            weapon_speed_overlaps[identity] = true
             table.insert(planned_overlaps, {
               identity = identity,
               owners = {effects[identity].technology_name, operation.technology_name},
