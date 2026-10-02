@@ -1,6 +1,7 @@
 local ROOT="mir_research_browser"
 local INTERFACE="more-infinite-research-browser"
 local MARKER="mir-fixture-browser-personal-continuity-config-marker"
+local SCRIPTED_INPUT_MARKER="mir-fixture-browser-personal-continuity-scripted-input-marker"
 local FINITE="mir-browser-personal-finite"
 local INFINITE="mir-browser-personal-infinite"
 local OUTPUT="browser-personal-state"
@@ -111,6 +112,12 @@ local function native_input_complete(s,a,b)
   initial_action(s,a,b)
   return true
 end
+local function scripted_fixture_input_complete(s,a,b)
+  assert_shared_force(s,a,b,true)
+  check(a.force.technologies[FINITE].enabled and not a.force.technologies[FINITE].researched,"available fixture research selection authority changed")
+  write_result("scripted-input",{input_mode="scripted-fixture",input_disposition="scripted-fixture-remote-open-only-no-native-mouse-or-keyboard-claim",player_a=browser_facts(a),player_b=browser_facts(b),same_force=true,fixture_owned_force_queue_unchanged=true,active_full_force_snapshot_unchanged=true,available_research=FINITE,fixture_force=fixture_force_facts(a.force)})
+  initial_action(s,a,b)
+end
 local function arm_save(s,next_phase,save_name) s.phase=next_phase.."-save-pending"; s.next_phase=next_phase; s.save_name=save_name; s.save_after_tick=game.tick+SAVE_DELAY_TICKS end
 local function malformed_hidden_negatives(s,a,b)
   local before=browser_facts(a); run_open(a,{hidden={[2]=INFINITE}}); local sparse=browser_facts(a); run_open(a,{hidden={INFINITE,INFINITE}}); local duplicate=browser_facts(a); run_open(a,{hidden={"no-such-technology"}}); local unknown=browser_facts(a)
@@ -207,7 +214,15 @@ script.on_event(defines.events.on_tick,function()
   if session_complete then return end; local s=storage.browser_personal_state; if not s or s.phase=="complete" then return end
   if s.save_after_tick and game.tick>=s.save_after_tick then local next_phase,save_name=s.next_phase,s.save_name; s.save_after_tick,s.next_phase,s.save_name=nil,nil,nil; s.phase=next_phase; game.auto_save(save_name); session_complete=true; return end
   if s.phase=="await-initial" then
-    if #game.connected_players~=2 then return end; local players={}; for _,player in ipairs(game.connected_players) do players[#players+1]=player end; table.sort(players,function(left,right) return left.index<right.index end); check(players[1].name~=players[2].name,"client usernames are not distinct"); s.player_a_index,s.player_b_index=players[1].index,players[2].index; s.player_a_username,s.player_b_username=players[1].name,players[2].name; native_input_ready(s,players[1],players[2]); return
+    if #game.connected_players~=2 then return end; local players={}; for _,player in ipairs(game.connected_players) do players[#players+1]=player end; table.sort(players,function(left,right) return left.index<right.index end); check(players[1].name~=players[2].name,"client usernames are not distinct"); s.player_a_index,s.player_b_index=players[1].index,players[2].index; s.player_a_username,s.player_b_username=players[1].name,players[2].name
+    if script.active_mods[SCRIPTED_INPUT_MARKER] then
+      run_open(players[1],{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={},page=1})
+      run_open(players[2],{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={},page=1})
+      scripted_fixture_input_complete(s,players[1],players[2])
+    else
+      native_input_ready(s,players[1],players[2])
+    end
+    return
   end
   local a,b=game.get_player(s.player_a_index),game.get_player(s.player_b_index); if not (a and a.connected and b and b.connected) then return end; a,b=players_from_state(s)
   if s.phase=="await-native-input" then native_input_complete(s,a,b)

@@ -1485,7 +1485,7 @@ fixtures:
       mod_lock: base-only
     validates:
       - F210-exact-localhost-two-client-browser-personal-state-isolation
-      - bounded-native-unqueued-hidden-technology-recovery-action-present-and-invalid-input-page-preservation
+      - bounded-browser-unqueued-hidden-technology-recovery-action-present-and-invalid-input-page-preservation
       - hidden-queued-technology-remains-on-identical-shared-force-queue
       - exact-save-reload-and-two-client-reconnect-personal-view-continuity
       - inert-configuration-change-personal-view-and-full-active-force-continuity
@@ -1509,8 +1509,8 @@ fixtures:
       factorio_version: "2.0.77"
       mod_lock: base-only
     validates:
-      - F200-exact-localhost-two-client-browser-personal-state-isolation-with-native-input
-      - bounded-native-unqueued-hidden-technology-recovery-action-present-and-invalid-input-page-preservation
+      - F200-exact-localhost-two-client-browser-personal-state-isolation-through-scripted-fixture-interaction
+      - bounded-browser-unqueued-hidden-technology-recovery-action-present-and-invalid-input-page-preservation
       - hidden-queued-technology-remains-on-identical-shared-force-queue
       - exact-save-reload-and-two-client-reconnect-personal-view-continuity
       - inert-configuration-change-personal-view-and-full-active-force-continuity
@@ -1521,6 +1521,7 @@ fixtures:
       - remote-wide-network-behavior-beyond-observed-two-local-clients
       - native-vanilla-technology-tree-mutation-or-injection
       - queue-ownership-or-reorder
+      - F200-two-client-native-input-execution-not-established-under-current-Windows-foreground-policy
       - full-PLAT-UI-01-A16-or-X11-closure
       - release-readiness
 

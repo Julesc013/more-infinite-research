@@ -94,6 +94,23 @@
       ]
     },
     {
+      "id": "static.mir42-nine-target-written-go-authorization",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+        "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
+        "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
+        "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1",
+        "tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json"
+      ]
+    },
+    {
       "id": "static.mir42-nine-target-promotion",
       "kind": "static",
       "layer": "F0",
@@ -976,7 +993,13 @@
         "factorio",
         "manual-review-attestation",
         "spec/schemas/manual-release-attestation.schema.json",
+        "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
         "tests/release/Test-MIRManualReleaseReview.ps1",
+        "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
+        "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1",
+        "tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/validation/ReleaseAttestations.ps1",
         "tools/lib/validation/PackageIdentity.ps1"
       ]
@@ -5214,7 +5237,7 @@
       "id": "runtime.f200-browser-personal-state-continuity",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -FactorioExe <factorio> -CandidateArchive <candidate> -InputMode ScriptedFixture -TimeoutSeconds 240",
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
