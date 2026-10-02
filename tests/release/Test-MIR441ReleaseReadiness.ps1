@@ -67,6 +67,11 @@ Start-Sleep -Seconds 20
       if($last.phase-cne'interrupted'){throw 'Interrupted job was not recorded as interrupted'}
     }
     $script:RecoveryFault=''
+    . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
+    $config=Join-Path $root 'factorio.ini'
+    [IO.File]::WriteAllText($config,"[path]`nwrite-data=D:\MIR-RECOVERY-OUTSIDE`n")
+    Refuses {Invoke-MIRCompatFactorioProcess -FactorioBin $pwsh -ArgumentList @('--config',$config) -StdoutPath $invoke.StdoutPath -StderrPath $invoke.StderrPath -TimeoutSeconds 12 -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1GB} 'resource-output-root'
+    Refuses {Invoke-MIRCompatFactorioProcess -FactorioBin $pwsh -ArgumentList @('--config',$config,'--config',$config) -StdoutPath $invoke.StdoutPath -StderrPath $invoke.StderrPath -TimeoutSeconds 12 -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1GB} 'resource-factorio-duplicate-output-argument'
     $link=Join-Path $root 'outside-link'
     New-Item -ItemType Junction -Path $link -Target $repo|Out-Null
     try{Refuses {Resolve-MIR441RecoveryScratchPath -Path (Join-Path $link 'README.md')} 'resource-output-reparse'}finally{Remove-Item -LiteralPath $link -Force}
