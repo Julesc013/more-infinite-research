@@ -156,7 +156,14 @@ try {
   Assert-MIR42SealTest $containingRootRejected 'protected-root-containing-repository-rejected'
   $mislabelledQualification = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetExactCandidateQualificationV1';status='MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED'
-    factorio_processes=4;release_qualification='claimed';independent_verification='not-performed';publication_authorized=$false;record_sha256=''
+    reconciliation_scope='four-target';source=$readiness._state.candidate.source
+    candidate_manifest=[pscustomobject][ordered]@{sha256=[string]$readiness._state.candidate.identity.sha256;record_sha256=[string]$readiness._state.candidate.identity.record.record_sha256}
+    targets=@($readiness._state.candidate.targets | ForEach-Object { [pscustomobject][ordered]@{
+      target=[string]$_.target;distribution_version=[string]$_.distribution_version;status='reconciled'
+      archive=[pscustomobject][ordered]@{sha256=[string]$_.archive_sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count}
+    }})
+    all_four_targets_required=$true;cross_target_substitution=$false;factorio_processes=0;release_qualification='claimed';independent_verification='not-performed';technical_seal='not-performed'
+    source_freeze_authorized=$false;signing_authorized=$false;tagging_authorized=$false;publication_authorized=$false;nonclaims=@('fixture');record_sha256=''
   }
   $mislabelledQualification.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $mislabelledQualification
   $mislabelledQualificationPath = Join-Path $root 'mislabelled-qualification.json'
@@ -263,7 +270,7 @@ try {
   } catch { $forgedRestoreRejected = $_.Exception.Message -match 'mir42-promotion-governed-restore-shape'; if (-not $forgedRestoreRejected) { throw $_ } }
   Assert-MIR42SealTest $forgedRestoreRejected 'selfhashed-same-session-offline-restore-rejected'
   $promotionText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
-  Assert-MIR42SealTest ($promotionText -match 'refs/heads/main' -and $promotionText -match 'refs/heads/dev' -and $promotionText -match 'candidateRef' -and $promotionText -match 'MIR42FourTargetGovernedOfflineRestoreDrillV1' -and $promotionText -notmatch 'MIR42FourTargetOfflineRestoreDrillV1|push origin|--force') 'protected-pr-remote-readback-no-push'
+  Assert-MIR42SealTest ($promotionText -match 'refs/heads/main' -and $promotionText -match 'refs/heads/dev' -and $promotionText -match 'candidateRef' -and $promotionText -match 'Get-MIR42SealScopeContract' -and $promotionText -match 'Get-MIR42GovernedOfflineRestoreDrill' -and $promotionText -notmatch 'MIR42FourTargetOfflineRestoreDrillV1|push origin|--force') 'protected-pr-remote-readback-no-push'
 
   $sourceDrift = $manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
   $sourceDrift.source.tree = '0' * 40
