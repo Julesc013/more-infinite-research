@@ -153,7 +153,7 @@ if ($selectionActive -and -not $checkpointActive) {
         } elseif ($declaration.name -eq "space-age-generation-integrity-inserter-enabled") {
           Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity with inserter enabled scenario"
         } elseif ($declaration.name -eq "space-age-native-owner-settings-max-level-late-conflict") {
-          Assert-LogContains -Expected "Maximum-level conflict technology=processing-unit-productivity selected=5 planned=5 final-observed=9 binding-operation=configure_native_owner source=native-owner reason=late_prototype_mutation" -Context $declaration.name
+          Assert-LogContains -Expected "Maximum-level conflict technology=processing-unit-productivity selected=5 final-observed=9 binding-operation=configure_native_owner source=native-owner reason=maximum_level_late_prototype_mutation setting=ips-max-level-research_processing_unit; runtime queue normalization was refused." -Context $declaration.name
         }
       } elseif ($declaration.kind -eq "configuration-change") {
         switch ($declaration.name) {

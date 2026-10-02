@@ -209,4 +209,39 @@ check(continuation.materialization.kind == "continuation"
 check(technology_design.save_identity_projection(continuation).technology_id
   == "mir-fixture-continuation", "save identity projection")
 
+-- Compare cold and warm digests against the pre-cache scalar recurrence,
+-- including byte-block boundaries, binary text and the cache's size cutoff.
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local function scalar_digest(text)
+  local hash = 2166136261.0
+  for index = 1, #text do
+    hash = (hash * 65599.0 + string.byte(text, index)) % 4294967291.0
+  end
+  return "mir32-" .. string.format("%08x", hash)
+end
+for _, length in ipairs({0, 1, 7, 8, 15, 16, 17, 65536, 65537}) do
+  local text = string.sub(string.rep("\000\255cache\n\"", math.ceil(length / 9)), 1, length)
+  local expected = scalar_digest(text)
+  check(fingerprint.of_canonical(text) == expected, "cold scalar digest parity " .. length)
+  check(fingerprint.of_canonical(text) == expected, "warm scalar digest parity " .. length)
+end
+for index = 1, 4100 do fingerprint.of_canonical("fifo-eviction-" .. index) end
+local cache_metrics = fingerprint.metrics()
+check(cache_metrics.hash_cache_entries <= 4096 and cache_metrics.hash_cache_bytes <= 2 * 1024 * 1024,
+  "canonical digest cache residency is bounded")
+check(fingerprint.of_canonical("fifo-eviction-1") == scalar_digest("fifo-eviction-1"),
+  "eviction preserves digest identity")
+local oversized = string.rep("oversized", 8000)
+local before = fingerprint.metrics().hash_computations
+fingerprint.of_canonical(oversized)
+fingerprint.of_canonical(oversized)
+check(fingerprint.metrics().hash_computations == before + 2, "oversized inputs are not retained")
+local mutable = {nested = {value = 1}}
+local previous_digest = fingerprint.of(mutable)
+mutable.nested.value = 2
+check(fingerprint.of(mutable) ~= previous_digest, "mutable input is reserialized before cache lookup")
+local cyclic = {}; cyclic.self = cyclic
+expect_error(function() fingerprint.of(cyclic) end, "cyclic table")
+expect_error(function() fingerprint.of({[{}] = "invalid key"}) end, "map keys")
+
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)

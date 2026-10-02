@@ -126,6 +126,25 @@ function M.retained_overlap(operation, identity)
     and operation.planned_overlap_identities[identity] == true
 end
 
+-- The off setting preserves one generic/dedicated gun-speed pair. It never
+-- permits native bindings, arbitrary effect kinds, or same-operation repeats.
+function M.weapon_speed_overlap_pair(left, right, left_effect, right_effect)
+  local base = left.operation == "emit_base_extension" and left or
+    right.operation == "emit_base_extension" and right or nil
+  if not base then return false end
+  local stream = base == left and right or left
+  return base.key == "weapon-shooting-speed"
+    and base.planned_policy == "weapon-speed-native-owner-preserved"
+    and stream.operation == "emit_stream"
+    and not stream.stage_kind
+    and left_effect.type == "gun-speed" and right_effect.type == "gun-speed"
+    and tonumber(left_effect.modifier or left_effect.change)
+    and tonumber(left_effect.modifier or left_effect.change) > 0
+    and tonumber(right_effect.modifier or right_effect.change)
+    and tonumber(right_effect.modifier or right_effect.change) > 0
+    and M.effect_identity(left_effect) == M.effect_identity(right_effect)
+end
+
 function M.effect_identity(effect)
   return generation_plan.effect_identity(effect)
 end

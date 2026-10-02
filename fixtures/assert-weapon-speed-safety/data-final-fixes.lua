@@ -131,6 +131,19 @@ for _, row in ipairs((plan and plan.rows) or {}) do
 end
 local evidence_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
 local evidence = evidence_prototype and evidence_prototype.data
+local function rejected_base_continuation(key, reason)
+  for _, candidate in ipairs((evidence and evidence.compiler_result
+    and evidence.compiler_result.base_continuations) or {}) do
+    if candidate.candidate_id == "base-continuation/" .. key
+      and candidate.key == key
+      and candidate.action == "reject"
+      and candidate.reason == reason
+    then
+      return true
+    end
+  end
+  return false
+end
 for _, candidate in ipairs((evidence and evidence.compiler_result
   and evidence.compiler_result.base_continuations) or {}) do
   if candidate.action == "create" and candidate.technology_name
@@ -174,9 +187,6 @@ for _, name in ipairs(generated_names) do
     end
   end
 end
-if generated_count == 0 then
-  fail("generated weapon shooting speed continuation was not found")
-end
 
 local expected_prerequisites = {
   ["recipe-prod-research_rocket_shooting_speed-1"] = {{"rocketry"}},
@@ -204,6 +214,7 @@ for tech_name, prerequisite_groups in pairs(expected_prerequisites) do
 end
 
 local external_owner = techs["mir-fixture-external-weapon-speed-owner"]
+local zero_continuation_permitted = false
 if external_owner then
   if prefer_mir then fail("external-owner scenario did not disable MIR ownership preference") end
   if techs[dedicated_names.rocket] or techs[dedicated_names["cannon-shell"]] then
@@ -237,7 +248,7 @@ if external_owner then
     },
     {
       name = "mir-fixture-zero-stack-inserter-owner",
-      effect = {type = "stack-inserter-capacity-bonus"},
+      effect = {type = "bulk-inserter-capacity-bonus"},
       reason = "effect_identity_nonpositive_or_non_numeric"
     },
     {
@@ -260,6 +271,13 @@ if external_owner then
     fail("pre-compilation external numbered continuation was not present with exact positive owners")
   end
 
+  if generated_count == 0 then
+    if not rejected_base_continuation("weapon-shooting-speed", "already_infinite") then
+      fail("external-owner continuation absence lacked exact already_infinite base-plan rejection")
+    end
+    zero_continuation_permitted = true
+  end
+
   if artifacts_visible then
     -- The continuation existed before compilation. Re-run the cleanup after
     -- compiling: a broad numbered-name scan would mutate it; registry-scoped
@@ -280,4 +298,8 @@ if external_owner then
   -- Factorio forbids a numbered level following an infinite continuation, so
   -- remove the counterexample before final prototype validation.
   techs["weapon-shooting-speed-99"] = nil
+end
+
+if generated_count == 0 and not zero_continuation_permitted then
+  fail("generated weapon shooting speed continuation was not found")
 end

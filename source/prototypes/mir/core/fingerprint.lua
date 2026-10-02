@@ -3,12 +3,19 @@ local ONE_MIB = 1024 * 1024
 local MAXIMUM_QUOTED_STRING_CACHE_ENTRIES = 4096
 local quoted_string_cache = {}
 local quoted_string_cache_entries = 0
+local MAXIMUM_HASH_CACHE_ENTRIES = 4096
+local MAXIMUM_HASH_CACHE_BYTES = 2 * ONE_MIB
+local MAXIMUM_HASH_CACHE_TEXT_BYTES = 64 * 1024
+local hash_cache, hash_cache_order = {}, {}
+local hash_cache_first, hash_cache_entries, hash_cache_bytes = 1, 0, 0
 local encode
 local diagnose
 local metrics = {
   canonical_calls = 0,
   canonical_bytes = 0,
   fingerprint_calls = 0,
+  hash_cache_hits = 0,
+  hash_computations = 0,
   serializations_over_one_mib = 0,
   maximum_canonical_bytes = 0
 }
@@ -163,6 +170,15 @@ function M.canonical(value)
 end
 
 local function hash_canonical(text)
+  -- Canonical strings are immutable. Reuse only an exact string's digest;
+  -- callers still serialize current values and perform their normal checks.
+  -- Never memoize a mutable table's identity or its verification result.
+  local cached = hash_cache[text]
+  if cached then
+    metrics.hash_cache_hits = metrics.hash_cache_hits + 1
+    return cached
+  end
+  metrics.hash_computations = metrics.hash_computations + 1
   local hash = 2166136261
   local index = 1
   local length = #text
@@ -206,7 +222,24 @@ local function hash_canonical(text)
     hash = (hash * 65599 + string.byte(text, index)) % 4294967291
     index = index + 1
   end
-  return "mir32-" .. string.format("%08x", hash)
+  local result = "mir32-" .. string.format("%08x", hash)
+  if length <= MAXIMUM_HASH_CACHE_TEXT_BYTES then
+    while hash_cache_entries >= MAXIMUM_HASH_CACHE_ENTRIES
+      or hash_cache_bytes + length > MAXIMUM_HASH_CACHE_BYTES do
+      local oldest = hash_cache_order[hash_cache_first]
+      hash_cache[oldest] = nil
+      hash_cache_order[hash_cache_first] = nil
+      hash_cache_bytes = hash_cache_bytes - #oldest
+      hash_cache_first = hash_cache_first % MAXIMUM_HASH_CACHE_ENTRIES + 1
+      hash_cache_entries = hash_cache_entries - 1
+    end
+    local slot = (hash_cache_first + hash_cache_entries - 1) % MAXIMUM_HASH_CACHE_ENTRIES + 1
+    hash_cache_order[slot] = text
+    hash_cache[text] = result
+    hash_cache_entries = hash_cache_entries + 1
+    hash_cache_bytes = hash_cache_bytes + length
+  end
+  return result
 end
 
 function M.of(value)
@@ -226,6 +259,10 @@ function M.metrics()
     canonical_calls = metrics.canonical_calls,
     canonical_bytes = metrics.canonical_bytes,
     fingerprint_calls = metrics.fingerprint_calls,
+    hash_cache_hits = metrics.hash_cache_hits,
+    hash_computations = metrics.hash_computations,
+    hash_cache_entries = hash_cache_entries,
+    hash_cache_bytes = hash_cache_bytes,
     serializations_over_one_mib = metrics.serializations_over_one_mib,
     maximum_canonical_bytes = metrics.maximum_canonical_bytes
   }

@@ -75,7 +75,7 @@ disabled_native_owner.enabled = false
 
 local zero_native_owner = table.deepcopy(owner)
 zero_native_owner.name = "mir-fixture-zero-stack-inserter-owner"
-zero_native_owner.effects = {{type = "stack-inserter-capacity-bonus", modifier = 0}}
+zero_native_owner.effects = {{type = "bulk-inserter-capacity-bonus", modifier = 0}}
 
 data:extend({
   owner, numbered_continuation, unreachable_pack, unreachable_recipe, unreachable_owner,

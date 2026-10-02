@@ -342,23 +342,18 @@ local function owner_list_contains_non_continuation(owner_list)
 end
 
 -- The direct-stream qualifier has already established whether each category
--- has a positive, exact owner.  This projection removes only categories that
--- a dedicated emitted stream or a different native owner owns.  It never uses
--- the setting's "always" value to create a paid no-op by stripping a base
+-- has a positive, exact owner. This projection removes categories owned by a
+-- different native owner. Dedicated emitted streams are reconciled by the
+-- combined ownership pass, retaining its conflict and omission evidence.
+-- It never uses the setting's "always" value to create a paid no-op by stripping a base
 -- category without such an owner.
-local function apply_weapon_overlap_policy(operation, stream_operations, stream_rows, mode)
+local function apply_weapon_overlap_policy(operation, stream_rows, mode)
   if operation.key ~= "weapon-shooting-speed" then return operation end
   if mode == "off" then
     operation.planned_policy = "weapon-speed-native-owner-preserved"
     return operation
   end
   local strip = {}
-  for _, stream_operation in ipairs(stream_operations) do
-    for _, effect in ipairs((stream_operation.technology and stream_operation.technology.effects) or {}) do
-      local category = gun_speed_category(effect)
-      if category then strip[category] = true end
-    end
-  end
   -- A non-continuation native owner suppresses a direct stream.  It can still
   -- own the category that the generic continuation would otherwise emit, so
   -- keep that skip decision in the same single-emitter projection.
@@ -381,14 +376,15 @@ local function apply_weapon_overlap_policy(operation, stream_operations, stream_
       end
     end
   end
+  local original = operation.technology.effects or {}
   local filtered = {}
-  for _, effect in ipairs(operation.technology.effects or {}) do
+  for _, effect in ipairs(original) do
     if not (gun_speed_category(effect) and strip[effect.ammo_category]) then table.insert(filtered, effect) end
   end
   operation.technology.effects = filtered
   operation.planned_policy = next(strip) and "weapon-speed-overlap-resolved"
     or "weapon-speed-native-owner-preserved"
-  return operation
+  return operation, #original > 0 and #filtered == 0
 end
 
 function M.finalize(stream_plan, base_plan, compiler_inputs)
@@ -417,17 +413,40 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   -- emission authorization. Pending graph gates remain explicit proposals.
   local operations = materialized_stream_operations(
     stream_artifact, {include_design = false, virtual_projection = true})
-  local stream_operations = {}
-  for index, operation in ipairs(operations) do stream_operations[index] = operation end
   local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan, target_inventory)
   for _, operation in ipairs(normalized_base) do
-    local normalized = apply_weapon_overlap_policy(
-      operation, stream_operations, stream_artifact.rows, exact_input.policy_snapshot.weapon_overlap_mode)
+    local normalized, covered_by_native = apply_weapon_overlap_policy(
+      operation, stream_artifact.rows, exact_input.policy_snapshot.weapon_overlap_mode)
     normalized = model.normalized_base_operation(normalized)
-    table.insert(operations, model.copy_operation_with_design_view(normalized))
+    if covered_by_native then
+      local reason = "covered_by_existing_infinite_native_modifier"
+      normalized.gates.effect_valid = gate_contract.failed(
+        "native-effect-coverage", reason, {"native-effect-coverage:all-base-effects-covered"})
+      normalized.technology_design = technology_design.from_base_extension_operation(normalized)
+      base_effect_integrity.skipped_base_extension_count =
+        base_effect_integrity.skipped_base_extension_count + 1
+      table.insert(base_effect_integrity.rejected_candidates, {
+        schema = 1,
+        candidate_id = "base-continuation/" .. tostring(normalized.key),
+        key = normalized.key,
+        technology_name = normalized.technology_name,
+        manifest_id = normalized.manifest_id,
+        action = "reject",
+        reason = reason,
+        gates = normalized.gates,
+        technology_design = normalized.technology_design,
+        design_fingerprint = normalized.technology_design.design_fingerprint,
+        candidate_fingerprint = fingerprint.of({key = normalized.key, reason = reason,
+          gates = normalized.gates})
+      })
+    else
+      table.insert(operations, model.copy_operation_with_design_view(normalized))
+    end
   end
   local combined_ownership, ownership_omissions
-  operations, combined_ownership, ownership_omissions = effect_ownership.resolve_operations(operations)
+  operations, combined_ownership, ownership_omissions = effect_ownership.resolve_operations(operations, {
+    weapon_overlap_mode = exact_input.policy_snapshot.weapon_overlap_mode
+  })
   normalized_base = {}
   for _, operation in ipairs(operations) do
     if operation.operation == "emit_base_extension" then table.insert(normalized_base, operation) end
