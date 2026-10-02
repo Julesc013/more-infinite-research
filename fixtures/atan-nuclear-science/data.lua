@@ -20,6 +20,19 @@ end
 data:extend({
   science_pack,
   {
+    -- The assertion covers every active lab input. Base 2.1 obtains space
+    -- science from a rocket launch, outside this fixture's recipe graph.
+    -- Supply an explicit production witness for this controlled scenario.
+    type = "recipe",
+    name = "mir-fixture-atan-space-science-access",
+    categories = {"crafting"},
+    enabled = true,
+    energy_required = 1,
+    ingredients = {{type = "item", name = "iron-plate", amount = 1}},
+    results = {{type = "item", name = "space-science-pack", amount = 1}},
+    allow_productivity = false
+  },
+  {
     type = "item",
     name = "atan-atom-forge",
     icon = "__base__/graphics/icons/assembling-machine-3.png",

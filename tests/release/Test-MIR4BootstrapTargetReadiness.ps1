@@ -34,6 +34,15 @@ $readinessSchemaPath = Join-Path $RepoRoot "spec/schemas/mir4-bootstrap-target-r
 
 $engineRecord = Get-JsonRecord $engineRelativePath
 $readinessRecord = Get-JsonRecord $readinessRelativePath
+# V1 imports the target authority as exact historical bytes. Later MIR4
+# releases can add streams without changing this retained observation.
+$historicalTargetProfilesCommit = '5a927582a183fef6950bf52697dde0be1f729061'
+$historicalTargetProfilesText = (@(& git -C $RepoRoot show "${historicalTargetProfilesCommit}:.mir/targets.json") -join "`n") + "`n"
+if ($LASTEXITCODE -ne 0) { throw 'Could not read the historical canonical target profile authority.' }
+$targetProfileImports = @($readinessRecord.Value.imports | Where-Object { [string]$_.path -ceq '.mir/targets.json' })
+Assert-True ($targetProfileImports.Count -eq 1 -and
+  (Get-MIR4Sha256String -Value $historicalTargetProfilesText) -ceq [string]$targetProfileImports[0].sha256) 'Historical canonical target profiles do not match the V1 imported bytes.'
+$historicalTargetProfiles = $historicalTargetProfilesText | ConvertFrom-Json -DateKind String
 $planRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
 $entryGateRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json"
 $registryRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json"
@@ -161,8 +170,8 @@ foreach ($targetKey in $expectedTargetKeys) {
     $readiness.transition.candidate_bound_evidence_present -eq $false -and
     $readiness.transition.historical_evidence_substitution_allowed -eq $false) "Readiness falsely claims transition evidence for $targetKey."
 
-  $currentProfile = $targetProfilesRecord.Value.profiles.PSObject.Properties[[string]$readiness.factorio_line].Value
-  Assert-True ([int]$currentProfile.expected_stream_count -eq [int]$readiness.capability.canonical_expected_stream_count) "Current target profile stream count drifted for $targetKey."
+  $historicalProfile = $historicalTargetProfiles.profiles.PSObject.Properties[[string]$readiness.factorio_line].Value
+  Assert-True ([int]$historicalProfile.expected_stream_count -eq [int]$readiness.capability.canonical_expected_stream_count) "Historical canonical target profile stream count drifted for $targetKey."
 
   $terminalTargetsText = (& git -C $RepoRoot show "$($plan.source.candidate_commit):.mir/targets.json") -join "`n"
   if ($LASTEXITCODE -ne 0) { throw "Could not read terminal target profile authority for $targetKey." }

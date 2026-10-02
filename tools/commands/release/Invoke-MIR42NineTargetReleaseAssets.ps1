@@ -16,6 +16,7 @@ param(
   [string]$SourceFreezeAuthorityPath = '',
   [string]$ReviewerAttestationPath = '',
   [string]$SshKeygenPath = '',
+  [string]$ProgrammePath = '',
   [string]$OfflineRestoreDrillPath = '',
   [string]$SourceVersion = '4.2.0',
   [string]$ReleaseTag = 'v4.2.0',
@@ -42,7 +43,7 @@ switch ($Mode) {
       -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
       -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath `
       -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath
+      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath -ProgrammePath $ProgrammePath
     Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -TechnicalSealPath $TechnicalSealPath `
       -PromotionPlan $promotion -SourceVersion $SourceVersion -ReleaseTag $ReleaseTag -AssetRoot $AssetRoot -OutputPath $OutputPath | ConvertTo-Json -Depth 50
   }

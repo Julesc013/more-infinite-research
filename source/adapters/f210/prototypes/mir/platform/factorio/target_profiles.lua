@@ -52,7 +52,7 @@ local M = {
         "scripted-effect"
       },
       asset_policy = "modern-optional-dlc",
-      expected_stream_count = 76,
+      expected_stream_count = 99,
       features = {
         compatibility_repairs = true,
         pipeline_extent = true,
@@ -136,7 +136,7 @@ local M = {
         "scripted-effect"
       },
       asset_policy = "factorio-2.0-dlc",
-      expected_stream_count = 74,
+      expected_stream_count = 97,
       features = {
         compatibility_repairs = true,
         pipeline_extent = true,

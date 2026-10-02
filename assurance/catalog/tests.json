@@ -4023,6 +4023,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json",
         ".mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json",
@@ -4282,6 +4283,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
         ".mir/compatibility.yml",
         ".mir/streams.yml",
         ".mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json",
@@ -5037,6 +5039,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
         "mir.toml",
         "mir.lock",
         "spec/platform/mir4-preview-v0/**",
@@ -6460,6 +6463,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
         ".mir/targets.json",
         "spec/schemas/mir4-runtime-state-matrix-v1.schema.json",
@@ -7013,6 +7017,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
         ".mir/targets.json",
@@ -7041,6 +7046,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
         ".mir/targets.json",
@@ -7892,5 +7898,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:60a7d60b5b58b83709198f9d84096c713f5e2898d2dd459d7c9281513d3172a4"
+  "digest": "sha256:602b5fbdefadfe13ef7ef2ae221824b20a31cf059d21a7c98471e2da423df2eb"
 }

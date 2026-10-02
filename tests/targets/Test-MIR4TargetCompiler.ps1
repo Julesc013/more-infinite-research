@@ -18,6 +18,12 @@ $laws=Test-MIR4TargetProviderLaws -RepoRoot $repo
 
 Assert-MIR4TargetCompilerV1 ([string]$authority.kind-ceq'MIR4TargetCompilerProgrammeV1') 'mir4-target-compiler-authority'
 Assert-MIR4TargetCompilerV1 (@($contracts.targets).Count-eq17) 'mir4-target-compiler-target-count'
+$currentProfileSha256=Get-MIR4PlatformFileSha256 (Join-Path $repo '.mir/targets.json')
+foreach($contract in $contracts.targets){
+  $profileProvenance=@($contract.provider_spec.provenance|Where-Object role -eq 'target-profile')
+  Assert-MIR4TargetCompilerV1 ($profileProvenance.Count-eq1-and[string]$profileProvenance[0].path-ceq'.mir/targets.json'-and[string]$profileProvenance[0].sha256-ceq$currentProfileSha256) 'mir4-target-compiler-current-profile-provenance' ([string]$contract.target)
+}
+
 Assert-MIR4TargetCompilerV1 ([bool]$laws.passed-and@($laws.targets).Count-eq17) 'mir4-target-compiler-laws'
 Assert-MIR4TargetCompilerV1 (@($contracts.targets|Where-Object{$_.target-in@('f210','f200')-and$_.maturity-ne'stable'}).Count-eq0) 'mir4-target-compiler-stable-targets'
 Assert-MIR4TargetCompilerV1 (@($contracts.targets|Where-Object{$_.target-in@('f012','f011','f010','f009','f008','f007','f006')-and$_.inputs.status-ne'BLOCKED_WITH_EVIDENCE'}).Count-eq0) 'mir4-target-compiler-museum-boundary'
