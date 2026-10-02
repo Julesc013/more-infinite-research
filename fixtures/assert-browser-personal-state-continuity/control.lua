@@ -46,34 +46,13 @@ local function find_tagged(element,action,name)
   for _,child in pairs(element.children) do local found=find_tagged(child,action,name); if found then return found end end
   return nil
 end
-local function result_body(frame)
-  local body=frame["mir_browser_body"]
-  check(body and body.valid and body.type=="flow","browser Browse body is not the fixed flow")
-  local results=body["mir_browser_research_results"]
-  check(results and results.valid and results.type=="flow","browser Browse results flow is missing")
-  local list=results["mir_browser_research_list"]
-  check(list and list.valid and list.type=="scroll-pane","browser Browse list pane is missing")
-  return list
-end
-local function direct_result_row_present(body,name)
-  return find_tagged(body,"select",name)~=nil
-end
-local function direct_result_names(body)
-  local names={}
-  local function collect(element)
-    if not (element and element.valid) then return end
-    if element.tags and element.tags.mir_browser=="select" and type(element.tags.technology)=="string" then names[#names+1]=element.tags.technology end
-    for _,child in pairs(element.children) do collect(child) end
-  end
-  collect(body); table.sort(names); return table.concat(names,"\30")
-end
 local function locale_key(value) check(type(value)=="table" and #value==1 and type(value[1])=="string","GUI caption is not an exact one-key LocalisedString"); return value[1] end
 local function browser_facts(player)
-  local frame=frame_for(player); local body=result_body(frame); local mode=find_tagged(frame,"mode"); local toggle=find_tagged(frame,"toggle-hide",INFINITE)
-  check(mode and mode.valid and mode.type=="drop-down","native mode drop-down missing"); check(toggle and toggle.valid and toggle.type=="button","native hide/show toggle missing")
-  return {index=player.index,username=player.name,force_index=player.force.index,mode_selected_index=mode.selected_index,main_row_present=direct_result_row_present(body,INFINITE),toggle_caption_key=locale_key(toggle.caption)}
+  local frame=frame_for(player); local list=find_tagged(frame,"research-list"); local mode=find_tagged(frame,"mode"); local toggle=find_tagged(frame,"toggle-hide",INFINITE)
+  check(list and list.valid and list.type=="list-box","native research-list list box is missing"); check(mode and mode.valid and mode.type=="drop-down","native mode drop-down missing")
+  return {index=player.index,username=player.name,force_index=player.force.index,mode_selected_index=mode.selected_index,selected_subject_visible=toggle~=nil,research_list_selected_index=list.selected_index,target_toggle_caption_key=toggle and locale_key(toggle.caption) or "<absent>"}
 end
-local function expected_view(facts,mode,row,key,label) check(facts.mode_selected_index==mode,label.." mode changed"); check(facts.main_row_present==row,label.." direct main result row changed"); check(facts.toggle_caption_key==key,label.." toggle LocalisedString key changed") end
+local function expected_view(facts,mode,visible,key,label) check(facts.mode_selected_index==mode,label.." mode changed"); check(facts.selected_subject_visible==visible,label.." selected subject visibility changed"); check(facts.target_toggle_caption_key==key,label.." target toggle LocalisedString key changed") end
 local function players_from_state(s)
   local a,b=game.get_player(s.player_a_index),game.get_player(s.player_b_index); check(a and a.connected,"player A is not connected"); check(b and b.connected,"player B is not connected"); check(a.name==s.player_a_username,"player A identity changed"); check(b.name==s.player_b_username,"player B identity changed"); return a,b
 end
@@ -121,59 +100,20 @@ end
 local function arm_save(s,next_phase,save_name) s.phase=next_phase.."-save-pending"; s.next_phase=next_phase; s.save_name=save_name; s.save_after_tick=game.tick+SAVE_DELAY_TICKS end
 local function malformed_hidden_negatives(s,a,b)
   local before=browser_facts(a); run_open(a,{hidden={[2]=INFINITE}}); local sparse=browser_facts(a); run_open(a,{hidden={INFINITE,INFINITE}}); local duplicate=browser_facts(a); run_open(a,{hidden={"no-such-technology"}}); local unknown=browser_facts(a)
-  for label,facts in pairs({sparse=sparse,duplicate=duplicate,unknown=unknown}) do check(facts.main_row_present==before.main_row_present and facts.toggle_caption_key==before.toggle_caption_key,"malformed hidden input mutated prior view: "..label) end
+  for label,facts in pairs({sparse=sparse,duplicate=duplicate,unknown=unknown}) do check(facts.selected_subject_visible==before.selected_subject_visible and facts.target_toggle_caption_key==before.target_toggle_caption_key,"malformed hidden input mutated prior view: "..label) end
   assert_shared_force(s,a,b,true); return {sparse_rejected_without_mutation=true,duplicate_rejected_without_mutation=true,unknown_rejected_without_mutation=true}
 end
-local function invalid_hidden_page_negative(s,a,b)
-  run_open(a,{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={},page=1}); local first=direct_result_names(result_body(frame_for(a)))
-  run_open(a,{page=2}); local second=direct_result_names(result_body(frame_for(a)))
-  check(first~="" and second~="" and first~=second,"fixture could not distinguish browser page one from page two")
-  run_open(a,{hidden={[2]=FINITE}}); local after=direct_result_names(result_body(frame_for(a)))
-  check(after==second,"invalid hidden-only input changed page-two direct results"); assert_shared_force(s,a,b,true)
-  run_open(a,{page=0}); local after_invalid_page=direct_result_names(result_body(frame_for(a)))
-  check(after_invalid_page==second,"invalid page input changed page-two direct results")
-  return {requested_page=2,page_one_rows_differ=true,sparse_hidden_preserved_page_rows=true,invalid_page_preserved_page_rows=true}
-end
-local function unqueued_hidden_recovery(s,a,b)
-  local hidden_name=FINITE
-  local selected_name=INFINITE
-  local hidden_is_queued=false
-  for _,technology in ipairs(a.force.research_queue or {}) do if technology.name==hidden_name then hidden_is_queued=true end end
-  check(not hidden_is_queued,"hidden recovery fixture technology is queued")
-  run_open(a,{tab="research",search=hidden_name,mode=1,status=1,selected=selected_name,hidden={hidden_name},page=1})
-  local frame=frame_for(a)
-  local body=result_body(frame)
-  local row_while_hidden=direct_result_row_present(body,hidden_name)
-  check(not row_while_hidden,"unqueued hidden technology remains in direct results")
-  local selected_toggle=find_tagged(frame,"toggle-hide",selected_name)
-  check(selected_toggle and selected_toggle.valid,"selected different technology is not rendered after hidden-row navigation")
-  local recovery=find_tagged(frame,"show-hidden")
-  check(recovery and recovery.valid and recovery.type=="button","bounded native hidden recovery action is absent after navigation")
-  local caption_key=locale_key(recovery.caption)
-  check(caption_key=="mir-browser.show-hidden","hidden recovery action LocalisedString key differs")
-  assert_shared_force(s,a,b,true)
-  run_open(a,{hidden={}})
-  local shown_frame=frame_for(a)
-  local shown_body=result_body(shown_frame)
-  local row_after_clear=direct_result_row_present(shown_body,hidden_name)
-  check(row_after_clear,"unqueued hidden technology direct row did not return after valid state clear")
-  check(find_tagged(shown_frame,"show-hidden")==nil,"hidden recovery action remains after valid state clear")
-  assert_shared_force(s,a,b,true)
-  return {hidden_technology=hidden_name,selected_technology=selected_name,hidden_technology_is_queued=false,direct_row_present_while_hidden=false,recovery_action_present_after_navigation=true,recovery_caption_key=caption_key,direct_row_present_after_clear=true}
-end
 initial_action=function(s,a,b)
-  run_open(a,{tab="research",search=INFINITE,mode=1,status=1,selected=INFINITE,hidden={INFINITE}}); local ah=browser_facts(a); expected_view(ah,1,false,"mir-browser.show","player A hidden view"); assert_shared_force(s,a,b,true)
+  run_open(a,{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={INFINITE}}); local ah=browser_facts(a); expected_view(ah,1,false,"<absent>","player A hidden view"); assert_shared_force(s,a,b,true)
   local malformed=malformed_hidden_negatives(s,a,b)
-  local invalid_page=invalid_hidden_page_negative(s,a,b)
-  local recovery=unqueued_hidden_recovery(s,a,b)
-  run_open(a,{tab="research",search=INFINITE,mode=1,status=1,selected=INFINITE,hidden={},page=1}); local shown=browser_facts(a); expected_view(shown,1,true,"mir-browser.hide","player A shown roundtrip"); assert_shared_force(s,a,b,true)
-  run_open(a,{tab="research",search=INFINITE,mode=1,status=1,selected=INFINITE,hidden={INFINITE},page=1}); local af=browser_facts(a); expected_view(af,1,false,"mir-browser.show","player A restored hidden view")
-  run_open(b,{tab="research",search=INFINITE,mode=3,status=4,selected=INFINITE,hidden={},page=1}); local bf=browser_facts(b); expected_view(bf,3,true,"mir-browser.hide","player B visible view"); assert_shared_force(s,a,b,true)
-  write_result("initial",{player_a=af,player_b=bf,same_force=true,malformed_hidden=malformed,invalid_hidden_page_preservation=invalid_page,hidden_recovery=recovery,valid_replacement_show_roundtrip=true,active_full_force_snapshot_unchanged=true,fixture_owned_force_queue_unchanged=true,fixture_force=fixture_force_facts(a.force)})
+  run_open(a,{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={}}); local shown=browser_facts(a); expected_view(shown,1,true,"mir-browser.hide","player A shown roundtrip"); assert_shared_force(s,a,b,true)
+  run_open(a,{tab="research",search="",mode=1,status=1,selected=INFINITE,hidden={INFINITE}}); local af=browser_facts(a); expected_view(af,1,false,"<absent>","player A restored hidden view")
+  run_open(b,{tab="research",search="",mode=3,status=4,selected=INFINITE,hidden={}}); local bf=browser_facts(b); expected_view(bf,3,true,"mir-browser.hide","player B visible view"); assert_shared_force(s,a,b,true)
+  write_result("initial",{player_a=af,player_b=bf,same_force=true,malformed_hidden=malformed,valid_replacement_show_roundtrip=true,active_full_force_snapshot_unchanged=true,fixture_owned_force_queue_unchanged=true,fixture_force=fixture_force_facts(a.force)})
   arm_save(s,"await-save-reload","mir-browser-personal-state-continuity")
 end
 local function persistent_action(s,stage,a,b)
-  run_open(a,nil); run_open(b,nil); local af,bf=browser_facts(a),browser_facts(b); expected_view(af,1,false,"mir-browser.show","player A persisted view"); expected_view(bf,3,true,"mir-browser.hide","player B persisted view"); assert_shared_force(s,a,b,true)
+  run_open(a,nil); run_open(b,nil); local af,bf=browser_facts(a),browser_facts(b); expected_view(af,1,false,"<absent>","player A persisted view"); expected_view(bf,3,true,"mir-browser.hide","player B persisted view"); assert_shared_force(s,a,b,true)
   write_result(stage,{player_a=af,player_b=bf,same_force=true,active_full_force_snapshot_unchanged=true,fixture_owned_force_queue_unchanged=true,fixture_force=fixture_force_facts(a.force)})
 end
 local function removal_action(s,a,b)

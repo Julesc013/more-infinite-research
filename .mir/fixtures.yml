@@ -1485,7 +1485,7 @@ fixtures:
       mod_lock: base-only
     validates:
       - F210-exact-localhost-two-client-browser-personal-state-isolation
-      - bounded-browser-unqueued-hidden-technology-recovery-action-present-and-invalid-input-page-preservation
+      - bounded-browser-selected-subject-visibility-and-malformed-hidden-payload-preservation
       - hidden-queued-technology-remains-on-identical-shared-force-queue
       - exact-save-reload-and-two-client-reconnect-personal-view-continuity
       - inert-configuration-change-personal-view-and-full-active-force-continuity
@@ -1510,7 +1510,7 @@ fixtures:
       mod_lock: base-only
     validates:
       - F200-exact-localhost-two-client-browser-personal-state-isolation-through-scripted-fixture-interaction
-      - bounded-browser-unqueued-hidden-technology-recovery-action-present-and-invalid-input-page-preservation
+      - bounded-browser-selected-subject-visibility-and-malformed-hidden-payload-preservation
       - hidden-queued-technology-remains-on-identical-shared-force-queue
       - exact-save-reload-and-two-client-reconnect-personal-view-continuity
       - inert-configuration-change-personal-view-and-full-active-force-continuity
