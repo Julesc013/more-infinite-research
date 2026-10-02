@@ -20,9 +20,10 @@
     "transition_gate": {"type": "object", "additionalProperties": false, "required": ["source_freeze", "candidate_allocation", "production_signing", "technical_seal", "promotion", "tagging", "publication"], "properties": {"source_freeze": {"type": "boolean"}, "candidate_allocation": {"type": "boolean"}, "production_signing": {"type": "boolean"}, "technical_seal": {"const": false}, "promotion": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}},
     "written_transition_authorization": {
       "type": "object", "additionalProperties": false,
-      "required": ["mode", "maintainer_authorization", "candidate_manifest", "source", "selected_targets", "authorized_transition"],
+      "required": ["mode", "baseline_programme", "maintainer_authorization", "candidate_manifest", "source", "selected_targets", "authorized_transition"],
       "properties": {
         "mode": {"const": "written-conditional-maintainer-go"},
+        "baseline_programme": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": ".mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json"}, "sha256": {"pattern": "^[A-F0-9]{64}$"}, "record_sha256": {"pattern": "^[A-F0-9]{64}$"}}},
         "maintainer_authorization": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256", "recorded_from_user_turn_date"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"pattern": "^[A-F0-9]{64}$"}, "record_sha256": {"pattern": "^[A-F0-9]{64}$"}, "recorded_from_user_turn_date": {"type": "string", "format": "date"}}},
         "candidate_manifest": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"pattern": "^[A-F0-9]{64}$"}, "record_sha256": {"pattern": "^[A-F0-9]{64}$"}}},
         "source": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "package_source_sha256"], "properties": {"commit": {"pattern": "^[a-f0-9]{40}$"}, "tree": {"pattern": "^[a-f0-9]{40}$"}, "package_source_sha256": {"pattern": "^[A-F0-9]{64}$"}}},

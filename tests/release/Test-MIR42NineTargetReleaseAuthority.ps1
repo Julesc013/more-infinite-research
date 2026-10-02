@@ -169,6 +169,7 @@ try {
   $programme = New-MIR42NineTargetReleaseCutProgramme -RepoRoot $repo -OutputPath $programmePath
   $authorizationPath = Join-Path $scratch 'written-maintainer-authorization.json'
   $candidatePath = Join-Path $scratch 'candidate-manifest.json'
+  $transitionPath = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json'
   [IO.File]::WriteAllText($authorizationPath, '{}')
   [IO.File]::WriteAllText($candidatePath, '{}')
   $authorizationFixture = [pscustomobject][ordered]@{
@@ -184,18 +185,23 @@ try {
   Set-Item Function:Get-MIR42ExactFourTargetCandidate -Value { param($RepoRoot,$CandidateManifestPath) if((Resolve-Path -LiteralPath $CandidateManifestPath).Path -cne $candidatePath){throw '[mir42-nine-test-written-go-candidate-path]'};return $advanceCandidate }
   $oldProgrammeSha = (Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash
   $checkpointRoot = Join-Path $scratch 'build/release-programme-checkpoints'
-  $advanced = Advance-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $programmePath -MaintainerAuthorizationPath $authorizationPath -CandidateManifestPath $candidatePath -CheckpointRoot $checkpointRoot
+  Assert-NineAuthorityReject { Advance-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $programmePath -MaintainerAuthorizationPath $authorizationPath -CandidateManifestPath $candidatePath -CheckpointRoot $checkpointRoot } 'mir42-nine-programme-external-path-containment' 'tracked-programme-cannot-be-advanced'
+  Assert-NineAuthority ((Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash -ceq $oldProgrammeSha) 'tracked-programme-bytes-preserved-after-rejected-advance'
+  $advanced = Advance-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $transitionPath -MaintainerAuthorizationPath $authorizationPath -CandidateManifestPath $candidatePath -CheckpointRoot $checkpointRoot
   Assert-NineAuthority ([bool]$advanced.advanced -and (Test-Path -LiteralPath $advanced.checkpoint_path -PathType Leaf) -and [string]$advanced.checkpoint_sha256 -ceq $oldProgrammeSha -and
     (Get-FileHash -LiteralPath $advanced.checkpoint_path -Algorithm SHA256).Hash -ceq $oldProgrammeSha -and
     [bool]$advanced.record.transition_gate.source_freeze -and [bool]$advanced.record.transition_gate.candidate_allocation -and [bool]$advanced.record.transition_gate.production_signing -and
     -not [bool]$advanced.record.transition_gate.technical_seal -and -not [bool]$advanced.record.transition_gate.promotion -and -not [bool]$advanced.record.transition_gate.tagging -and -not [bool]$advanced.record.transition_gate.publication -and
     -not [bool]$advanced.record.release_transition_authority -and -not [bool]$advanced.record.publication_authorized) 'written-go-advance-is-procedural-only'
-  $advancedReadback = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target'
-  Assert-NineAuthority ([string]$advancedReadback.record.written_transition_authorization.maintainer_authorization.record_sha256 -ceq ('B' * 64) -and [string]$advancedReadback.record.written_transition_authorization.candidate_manifest.record_sha256 -ceq ('D' * 64)) 'written-go-reference-reread'
-  $repeatAdvance = Advance-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $programmePath -MaintainerAuthorizationPath $authorizationPath -CandidateManifestPath $candidatePath -CheckpointRoot $checkpointRoot
+  $advancedReadback = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $transitionPath
+  Assert-NineAuthority ([string]$advancedReadback.record.written_transition_authorization.maintainer_authorization.record_sha256 -ceq ('B' * 64) -and [string]$advancedReadback.record.written_transition_authorization.candidate_manifest.record_sha256 -ceq ('D' * 64) -and
+    [string]$advancedReadback.record.written_transition_authorization.baseline_programme.sha256 -ceq $oldProgrammeSha -and
+    [string]$advancedReadback.path -ceq 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json' -and
+    (Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash -ceq $oldProgrammeSha) 'written-go-reference-reread'
+  $repeatAdvance = Advance-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $transitionPath -MaintainerAuthorizationPath $authorizationPath -CandidateManifestPath $candidatePath -CheckpointRoot $checkpointRoot
   Assert-NineAuthority (-not [bool]$repeatAdvance.advanced -and [string]$repeatAdvance.record.record_sha256 -ceq [string]$advanced.record.record_sha256) 'written-go-advance-idempotent'
   $advanceCandidate.identity.sha256 = ('F' * 64)
-  Assert-NineAuthorityReject { Advance-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $programmePath -MaintainerAuthorizationPath $authorizationPath -CandidateManifestPath $candidatePath -CheckpointRoot $checkpointRoot } 'mir42-nine-programme-transition-candidate-binding' 'written-go-candidate-substitution-rejected'
+  Assert-NineAuthorityReject { Advance-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $transitionPath -MaintainerAuthorizationPath $authorizationPath -CandidateManifestPath $candidatePath -CheckpointRoot $checkpointRoot } 'mir42-nine-programme-transition-candidate-binding' 'written-go-candidate-substitution-rejected'
   $advanceCandidate.identity.sha256 = ('C' * 64)
   Set-Item Function:Read-MIR42NineTargetProgrammeWrittenAuthorization -Value $programmeAuthorizationReader
   Set-Item Function:Get-MIR42ExactFourTargetCandidate -Value $candidateReader
