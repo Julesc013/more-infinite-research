@@ -332,13 +332,16 @@ function Read-MIRManualReleaseWrittenWaiverAuthorization {
   }
   $readerPath = Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1'
   $technicalSealPath = Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1'
-  if (-not (Test-Path -LiteralPath $readerPath -PathType Leaf) -or -not (Test-Path -LiteralPath $technicalSealPath -PathType Leaf)) {
+  $preflightPath = Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1'
+  if (-not (Test-Path -LiteralPath $readerPath -PathType Leaf) -or -not (Test-Path -LiteralPath $technicalSealPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $preflightPath -PathType Leaf)) {
     throw '[mir-manual-review-waiver-authorization-reader]'
   }
   try {
-    # These release scripts intentionally keep their candidate contracts in
-    # script scope.  Load both in this reader scope so a pre-existing caller
-    # function cannot supply an uninitialised sibling script scope.
+    # These release scripts intentionally keep their target contracts in
+    # script scope.  Load the target identity before its consumers in this
+    # reader scope, so a caller cannot supply an uninitialised sibling scope.
+    . $preflightPath
     . $technicalSealPath
     . $readerPath
     return Read-MIR42NineTargetWrittenReleaseAuthorization -Path $Path
