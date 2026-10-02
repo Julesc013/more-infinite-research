@@ -115,10 +115,26 @@ function Get-MIR4M4202CurrentManifestBindingExpectation {
     $raw=Get-Content -Raw -LiteralPath $receiptPath
     if(-not($raw|Test-Json -SchemaFile $schemaPath)){return $Fallback}
     $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
-    if(-not(Test-MIR4BootstrapRecordHash -Record $receipt)-or
-       [string]$receipt.current.package_source_fingerprint_sha256-cne(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot)){return $Fallback}
-    return [int]$receipt.relocation.binding_count
+    if(-not(Test-MIR4BootstrapRecordHash -Record $receipt)){return $Fallback}
+    if([string]$receipt.current.package_source_fingerprint_sha256-ceq(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot)){
+      return [int]$receipt.relocation.binding_count
+    }
   }catch{return $Fallback}
+
+  # Authored semantic refreshes preserve admitted V3 membership without
+  # preserving the frozen relocation's package bytes. Authenticate the
+  # predecessor and exact introductions instead of reverting to V2 counts.
+  . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
+  . (Join-Path $RepoRoot 'tools/mir/application/package/TargetMaterializer.ps1')
+  $current=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot
+  $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $RepoRoot -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
+  $predecessor=Get-MIR4ComposablePackageSourceV2Predecessor -RepoRoot $RepoRoot
+  $succession=Assert-MIR4ComposablePackageSourceV3Succession -Current $manifest -Predecessor $predecessor
+  $contract=Assert-MIR4CurrentPackageContract -RepoRoot $RepoRoot -RequiredPackageSourceSha256 $current
+  if((@($contract.targets|ForEach-Object{[string]$_.target})-join'|')-cne'f210|f200|f110|f100'){
+    throw '[mir4-m42-02-current-composition-targets]'
+  }
+  return @($succession.migrated).Count + @($succession.introduced).Count
 }
 
 function Get-MIR4M4202ReadinessSuccessionV1 {

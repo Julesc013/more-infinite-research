@@ -1148,8 +1148,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8269,
-      "expected_sha256": "06AD153D035E80504448DA7B7140C6B4C9DA10A7F1419B62A7CE6B3F3C2A5CD8",
+      "expected_bytes": 9946,
+      "expected_sha256": "0882BB99830E923255140A2AE4B2D57F434E7A4868EC1DBF8F0F30B5C05994DF",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2508,8 +2508,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 7401,
-      "expected_sha256": "C3C52BB260B728172D9786FA34081492F1E9791A0E48A5A4FE26371A3D625293",
+      "expected_bytes": 7818,
+      "expected_sha256": "8A28E7E1F9CE5363B244624AE9A31DADC33E542266FB2F8DB47B2336950C6E68",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2684,8 +2684,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 33311,
-      "expected_sha256": "2B60BD18CFADB29A28058BC227A28CF0BDF327ECB0AA8AED914C921DE119F12D",
+      "expected_bytes": 34171,
+      "expected_sha256": "57B3CBFF2F2C559EE71BF6F61B64A8AE0E524BFAE68C52E2EC41D131956661C9",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "225191E185C80B43C094601DC873ED2ADF6EABC27D2AFBAA3DF006854C205DF8"
+  "record_sha256": "9353BE6FC8E359BE91CE15E77437CD53486F4CCD4C73FBA19ADB7492BD923278"
 }
