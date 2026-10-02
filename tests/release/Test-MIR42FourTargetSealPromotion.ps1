@@ -270,7 +270,7 @@ try {
   } catch { $forgedRestoreRejected = $_.Exception.Message -match 'mir42-promotion-governed-restore-shape'; if (-not $forgedRestoreRejected) { throw $_ } }
   Assert-MIR42SealTest $forgedRestoreRejected 'selfhashed-same-session-offline-restore-rejected'
   $promotionText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
-  Assert-MIR42SealTest ($promotionText -match 'refs/heads/main' -and $promotionText -match 'refs/heads/dev' -and $promotionText -match 'candidateRef' -and $promotionText -match 'MIR42FourTargetGovernedOfflineRestoreDrillV1' -and $promotionText -notmatch 'MIR42FourTargetOfflineRestoreDrillV1|push origin|--force') 'protected-pr-remote-readback-no-push'
+  Assert-MIR42SealTest ($promotionText -match 'refs/heads/main' -and $promotionText -match 'refs/heads/dev' -and $promotionText -match 'candidateRef' -and $promotionText -match 'Get-MIR42SealScopeContract' -and $promotionText -match 'Get-MIR42GovernedOfflineRestoreDrill' -and $promotionText -notmatch 'MIR42FourTargetOfflineRestoreDrillV1|push origin|--force') 'protected-pr-remote-readback-no-push'
 
   $sourceDrift = $manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
   $sourceDrift.source.tree = '0' * 40
