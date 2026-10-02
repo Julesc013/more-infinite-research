@@ -29,6 +29,8 @@ $modules=[ordered]@{
  'prototypes.mir.capabilities.recipe_productivity.recipe_matching'='source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua'
  'prototypes.mir.families.material_progression'='source/prototypes/mir/families/material_progression.lua'
  'prototypes.mir.compatibility.policies.k2_science_phase'='source/prototypes/mir/compatibility/policies/k2_science_phase.lua'
+ 'prototypes.mir.index.recipe_risk_facts'='source/prototypes/mir/index/recipe_risk_facts.lua'
+ 'prototypes.mir.core.deepcopy'='source/prototypes/mir/core/deepcopy.lua'
  'prototypes.streams.productivity'='source/prototypes/streams/productivity.lua'
 }
 $lua=[Text.StringBuilder]::new()

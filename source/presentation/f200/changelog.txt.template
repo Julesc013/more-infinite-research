@@ -10,7 +10,8 @@ Version: 4.2.20000
 
   Bugfixes:
 
-    - Repaired chemical-science reachability in the locked Bob/Angel profile while retaining military-only weapon frontiers.
+    - Preserved safe science exclusions when the locked Bob/Angel profile disables ordinary salt production.
+    - Kept item and fluid identities distinct in material-route and self-return checks.
     - Recognized explicit offshore-pump fluid sources and actual lab inputs when selecting science for generated research.
     - Corrected settings-derived maximum-level transitions while preserving completed research and MIR-owned cap state.
 

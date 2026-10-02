@@ -619,6 +619,30 @@
       "pattern": "tests/compiler/material_progression.lua",
       "groups": ["base-load"],
       "scenarios": ["compiler-contracts"]
+    },
+    {
+      "pattern": "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
     }
   ]
 }

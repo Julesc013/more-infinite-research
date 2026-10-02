@@ -650,4 +650,39 @@ check(recipe_patterns(changed_f210_gunmetal_invar_observer_streams.research_mate
 local f210_streams=material_streams_for({factorio_version="2.1"},exact_f200_mods,f200_items)
 check(recipe_patterns(f210_streams.research_material_tin)=="^bob%-tin%-plate$" and recipe_patterns(f210_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(f210_streams.research_material_silver)=="^bob%-silver%-plate$" and f210_streams.research_material_nickel.reviewed_forward_routes==nil,"F210 retains F200-only Angel additions outside the exact current Tin certificate")
 
+-- Exercise the actual canonical classifier as well as the graph guard. The
+-- matcher retains the stub whose per-recipe rows can be populated by this
+-- classifier, so the admission check consumes its real returned hard flags.
+package.loaded["prototypes.mir.index.recipe_risk_facts"]=nil
+package.loaded["prototypes.mir.core.deepcopy"]=nil
+local canonical_risks=require("prototypes.mir.index.recipe_risk_facts")
+local function classified_route(input_type,output_type)
+  local route=canonical_route("smelting","salt","salt")
+  route.variants[1].ingredients[1].type=input_type
+  route.variants[1].results[1].type=output_type
+  route.ingredient_names={"salt"}
+  route.ingredient_identities={{type=input_type,name="salt"}}
+  route.productive_result_names={"salt"}
+  route.productive_result_identities={{type=output_type,name="salt"}}
+  local index=canonical_risks.index_facts({names={"smelting"},facts={smelting=route}},{items={}})
+  return route,index.facts.smelting
+end
+local distinct_route,distinct_risk=classified_route("item","fluid")
+check(#distinct_risk.shared_input_output==0 and not canonical_risks.has_hard_flag(distinct_risk,"catalyst_or_self_return"),"canonical classifier keeps same-named item and fluid separate")
+environment{smelting=distinct_route};risks={smelting=distinct_risk};mods={}
+local distinct_buckets=matcher.recipes_for_stream({items={"salt"},require_acyclic_process=true},0.02)
+check(table.concat(distinct_buckets[1].recipes,",")=="smelting","typed ordinary route survives both canonical risk and graph admission")
+for _,identity_type in ipairs({"item","fluid"}) do
+  local _,actual_risk=classified_route(identity_type,identity_type)
+  check(actual_risk.shared_input_output[1]=="salt" and canonical_risks.has_hard_flag(actual_risk,"catalyst_or_self_return"),"actual typed self-return remains a canonical hard rejection")
+end
+local historical_route=canonical_route("smelting","salt","salt")
+historical_route.ingredient_names={"salt"};historical_route.productive_result_names={"salt"}
+local historical_risk=canonical_risks.index_facts({names={"smelting"},facts={smelting=historical_route}},{items={}}).facts.smelting
+local _,typed_item_risk=classified_route("item","item")
+check(historical_risk.risk_fingerprint==typed_item_risk.risk_fingerprint,"actual name-only self-return retains its reviewed risk fingerprint")
+distinct_route.ingredient_identities[1].type=nil
+local malformed_ok,malformed_error=pcall(canonical_risks.index_facts,{names={"smelting"},facts={smelting=distinct_route}},{items={}})
+check(not malformed_ok and string.find(tostring(malformed_error),"canonical typed identities",1,true),"malformed canonical identity input is rejected explicitly before risk admission")
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

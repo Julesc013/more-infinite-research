@@ -541,9 +541,12 @@ if ($ProbeSmokeOnly) {
   if ($null -eq $lane) { throw "Performance campaign phase-source lane is absent." }
   $baselineProbe = Invoke-MIRCampaignLaneRun -Lane $lane -PackageLabel baseline -Phase "probe-smoke" -Index 1
   $candidateProbe = Invoke-MIRCampaignLaneRun -Lane $lane -PackageLabel candidate -Phase "probe-smoke" -Index 1
-  if ($null -eq $baselineProbe.probe -or $null -eq $candidateProbe.probe -or
-      $null -eq $candidateProbe.probe.telemetry -or
-      [string]$candidateProbe.probe.telemetry.evidence_sha256 -notmatch '^[0-9A-Fa-f]{64}$') {
+  if ($null -eq $baselineProbe.probe -or $null -eq $candidateProbe.probe) {
+    throw "Exact-archive performance probe smoke did not capture paired compiler phases."
+  }
+  if ($script:RequiresArtifactVolume -and
+      ($null -eq $candidateProbe.probe.telemetry -or
+       [string]$candidateProbe.probe.telemetry.evidence_sha256 -notmatch '^[0-9A-Fa-f]{64}$')) {
     throw "Exact-archive performance probe smoke did not capture candidate telemetry."
   }
   $smoke = [ordered]@{
