@@ -85,12 +85,14 @@ local function table_shape(value, path, diagnostic, root)
   return false, map_keys(value, path, diagnostic, root)
 end
 
-encode = function(value, seen, path, diagnostic, root)
+-- Append into one canonical buffer. Nested records must keep their complete
+-- traversal and validation, but need no intermediate serialized strings.
+encode = function(value, seen, path, diagnostic, root, out)
   local kind = type(value)
-  if kind == "nil" then return "null" end
-  if kind == "boolean" then return value and "true" or "false" end
-  if kind == "number" then return string.format("%.17g", value) end
-  if kind == "string" then return quoted_string(value) end
+  if kind == "nil" then out[#out + 1] = "null"; return end
+  if kind == "boolean" then out[#out + 1] = value and "true" or "false"; return end
+  if kind == "number" then out[#out + 1] = string.format("%.17g", value); return end
+  if kind == "string" then out[#out + 1] = quoted_string(value); return end
   if kind ~= "table" then
     if not diagnostic then return diagnose(root) end
     error("Cannot fingerprint value of type " .. kind .. " at " .. path, 3)
@@ -101,10 +103,11 @@ encode = function(value, seen, path, diagnostic, root)
   end
   seen[value] = diagnostic and path or true
 
-  local out = {}
   local array, keys, string_keys = table_shape(value, path, diagnostic, root)
   if array then
+    out[#out + 1] = "["
     for index = 1, #value do
+      if index > 1 then out[#out + 1] = "," end
       local child = value[index]
       local child_kind = type(child)
       local child_path = path
@@ -113,15 +116,18 @@ encode = function(value, seen, path, diagnostic, root)
           and child_kind ~= "number" and child_kind ~= "string")) then
         child_path = path .. "[" .. index .. "]"
       end
-      out[index] = encode(child, seen, child_path, diagnostic, root)
+      encode(child, seen, child_path, diagnostic, root, out)
     end
     seen[value] = nil
-    return "[" .. table.concat(out, ",") .. "]"
+    out[#out + 1] = "]"
+    return
   end
 
+  out[#out + 1] = "{"
   if string_keys then
     table.sort(keys)
-    for _, key in ipairs(keys) do
+    for index, key in ipairs(keys) do
+      if index > 1 then out[#out + 1] = "," end
       local child = value[key]
       local child_kind = type(child)
       local child_path = path
@@ -130,14 +136,18 @@ encode = function(value, seen, path, diagnostic, root)
           and child_kind ~= "number" and child_kind ~= "string")) then
         child_path = path .. "." .. key
       end
-      out[#out + 1] = quoted_string(key) .. ":" .. encode(child, seen, child_path, diagnostic, root)
+      out[#out + 1] = quoted_string(key)
+      out[#out + 1] = ":"
+      encode(child, seen, child_path, diagnostic, root, out)
     end
     seen[value] = nil
-    return "{" .. table.concat(out, ",") .. "}"
+    out[#out + 1] = "}"
+    return
   end
 
   table.sort(keys, function(left, right) return left.sort_key < right.sort_key end)
-  for _, row in ipairs(keys) do
+  for index, row in ipairs(keys) do
+    if index > 1 then out[#out + 1] = "," end
     local child = value[row.key]
     local child_kind = type(child)
     local child_path = path
@@ -146,19 +156,23 @@ encode = function(value, seen, path, diagnostic, root)
         and child_kind ~= "number" and child_kind ~= "string")) then
       child_path = path .. row.path
     end
-    out[#out + 1] = row.encoded .. ":" .. encode(child, seen, child_path, diagnostic, root)
+    out[#out + 1] = row.encoded
+    out[#out + 1] = ":"
+    encode(child, seen, child_path, diagnostic, root, out)
   end
   seen[value] = nil
-  return "{" .. table.concat(out, ",") .. "}"
+  out[#out + 1] = "}"
 end
 
 diagnose = function(root)
-  encode(root, {}, "$", true, root)
+  encode(root, {}, "$", true, root, {})
   error("Fingerprint diagnostic traversal did not reproduce invalid input.", 3)
 end
 
 function M.canonical(value)
-  local text = encode(value, {}, "$", false, value)
+  local out = {}
+  encode(value, {}, "$", false, value, out)
+  local text = table.concat(out)
   local bytes = #text
   metrics.canonical_calls = metrics.canonical_calls + 1
   metrics.canonical_bytes = metrics.canonical_bytes + bytes

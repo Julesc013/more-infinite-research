@@ -76,6 +76,17 @@ check(technology_design.validate(design), "trusted record remains deeply valid")
 check(design.schema == 2 and design.technology_id == source_row.technology_name, "canonical identity")
 check(design.subjects.recipes[1] == "iron-plate" and design.subjects.items[1] == "iron-plate",
   "canonical subjects")
+local multiple_targets = technology_design.from_generation_row(row({fields = {effects = {
+  {type = "gun-speed", ammo_category = "rocket", modifier = 0.1},
+  {type = "gun-speed", ammo_category = "bullet", modifier = 0.1},
+  {type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.1},
+  {type = "gun-speed", ammo_category = "bullet", modifier = 0.2}
+}}}))
+check(#multiple_targets.subjects.effect_targets == 3
+  and multiple_targets.subjects.effect_targets[1].name == "bullet"
+  and multiple_targets.subjects.effect_targets[2].name == "cannon-shell"
+  and multiple_targets.subjects.effect_targets[3].name == "rocket",
+  "effect-target subjects retain canonical ordering and deduplication")
 
 local equivalent = technology_design.from_generation_row(row())
 check(design.subject_fingerprint == equivalent.subject_fingerprint, "stable subject fingerprint")
@@ -212,6 +223,25 @@ check(technology_design.save_identity_projection(continuation).technology_id
 -- Compare cold and warm digests against the pre-cache scalar recurrence,
 -- including byte-block boundaries, binary text and the cache's size cutoff.
 local fingerprint = require("prototypes.mir.core.fingerprint")
+check(fingerprint.canonical(nil) == "null" and fingerprint.canonical(false) == "false"
+  and fingerprint.canonical(2) == "2", "scalar canonical bytes")
+check(fingerprint.canonical({z = {false, true}, a = {b = "value"}})
+  == '{"a":{"b":"value"},"z":[false,true]}', "nested map and array canonical bytes")
+check(fingerprint.canonical({[0] = "zero", [10] = "ten", a = {}})
+  == '{[0]:"zero",[10]:"ten","a":[]}', "mixed-key canonical ordering")
+check(fingerprint.canonical({[1] = "one", [3] = "three"})
+  == '{[1]:"one",[3]:"three"}', "sparse arrays remain maps")
+local shared = {v = 2}
+check(fingerprint.canonical({shared, shared}) == '[{"v":2},{"v":2}]',
+  "shared branches are serialized at each occurrence")
+local escaped = "quote\"\n\000\\"
+check(fingerprint.canonical({escaped}) == '[' .. string.format("%q", escaped) .. ']',
+  "quoted string bytes remain engine compatible")
+local repeated = {}
+for index = 1, 1024 do repeated[index] = {a = "value", z = {false, true}} end
+check(fingerprint.canonical(repeated) == '['
+  .. string.rep('{"a":"value","z":[false,true]},', 1023)
+  .. '{"a":"value","z":[false,true]}]', "large nested canonical buffer bytes")
 local function scalar_digest(text)
   local hash = 2166136261.0
   for index = 1, #text do
@@ -241,7 +271,8 @@ local previous_digest = fingerprint.of(mutable)
 mutable.nested.value = 2
 check(fingerprint.of(mutable) ~= previous_digest, "mutable input is reserialized before cache lookup")
 local cyclic = {}; cyclic.self = cyclic
-expect_error(function() fingerprint.of(cyclic) end, "cyclic table")
-expect_error(function() fingerprint.of({[{}] = "invalid key"}) end, "map keys")
+expect_error(function() fingerprint.of({nested = cyclic}) end, "cyclic table at $.nested.self")
+expect_error(function() fingerprint.of({outer = {[{}] = "invalid key"}}) end,
+  "map keys must be strings or numbers at $.outer")
 
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)

@@ -120,15 +120,16 @@ local function sorted_unique(values)
 end
 
 local function sorted_records(values)
-  local by_identity, out = {}, {}
+  local by_identity, identities, out = {}, {}, {}
   for _, value in ipairs(values or {}) do
     local identity = fingerprint.canonical(value)
-    if not by_identity[identity] then by_identity[identity] = deepcopy(value) end
+    if not by_identity[identity] then
+      by_identity[identity] = deepcopy(value)
+      identities[#identities + 1] = identity
+    end
   end
-  for _, value in pairs(by_identity) do table.insert(out, value) end
-  table.sort(out, function(left, right)
-    return fingerprint.canonical(left) < fingerprint.canonical(right)
-  end)
+  table.sort(identities)
+  for _, identity in ipairs(identities) do out[#out + 1] = by_identity[identity] end
   return out
 end
 
