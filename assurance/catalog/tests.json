@@ -59,6 +59,9 @@
         "tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1",
         "tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/assurance/evidence/Fingerprints.ps1",
+        "spec/schemas/seal.schema.json",
+        "tools/lib/assurance/release/SealVerification.ps1",
         "tools/lib/validation/ReleaseAttestations.ps1",
         "tools/lib/validation/PackageIdentity.ps1"
       ],
@@ -7642,12 +7645,15 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+        "tests/release/Test-MIRManualReleaseReview.ps1",
         "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
         "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
         "tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1",
         "tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/validation/ReleaseAttestations.ps1",
+        "spec/schemas/manual-release-attestation.schema.json",
         "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json"
       ],
       "captured_artifacts": [],
@@ -7886,5 +7892,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d3e9753a65cdbd17fecd2664213f2ccabb6466871a93de690a3667f6ed6524aa"
+  "digest": "sha256:60a7d60b5b58b83709198f9d84096c713f5e2898d2dd459d7c9281513d3172a4"
 }
