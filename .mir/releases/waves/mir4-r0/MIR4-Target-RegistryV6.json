@@ -11,7 +11,7 @@
   },
   "profile_authority": {
     "path": ".mir/targets.json",
-    "sha256": "f728e6fb455ec1b7442d92fc94e8cc1508de546589fb8006bb62542017eed6d2"
+    "sha256": "ba8bca730845d4479b672c6cc71300320c3281959b5c94e5827d0a4b6cfc58be"
   },
   "identities": [
     {"target":"f210","target_id":"factorio-2.1","factorio_line":"2.1","distribution_target_code":"210","distribution_version":"4.0.21000","mir3_predecessor":"3.2.11"},
