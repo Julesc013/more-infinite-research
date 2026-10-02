@@ -37,6 +37,10 @@ function Test-MIR441ResourceRecovery {
   $pwsh=(Get-Command pwsh).Source
   $invoke=@{FilePath=$pwsh;Arguments=@('-NoProfile','-Command','Write-Output $env:TEMP');WorkRoot=$root;LedgerPath=(Join-Path $root 'ledger.jsonl');Policy=$policy;EstimatedPeakBytes=1MB;ExpectedPeakMemoryBytes=1GB;TimeoutSeconds=12;StdoutPath=(Join-Path $root 'stdout.txt');StderrPath=(Join-Path $root 'stderr.txt')}
   Refuses {Invoke-MIR441MonitoredProcess -FilePath $pwsh -Arguments @('-NoProfile','-Command','exit') -WorkRoot $root -LedgerPath $invoke.LedgerPath -Policy $policy} 'resource-peak-budget-required'
+  $characterization=Join-Path $repo 'tests/compiler/Test-MIRTechnologyDesignCharacterization.ps1'
+  Refuses {& $characterization -RepoRoot $repo -FactorioBin $pwsh -OutputRoot $root} 'resource-peak-budget-required'
+  Refuses {& $characterization -RepoRoot $repo -FactorioBin $pwsh -OutputRoot 'D:\MIR-RECOVERY-OUTSIDE' -ExpectedPeakMemoryMiB 512} 'resource-output-root'
+  if(Test-Path -LiteralPath $root){throw 'Characterization refused after allocating output'}
   New-Item -ItemType Directory -Path $root|Out-Null
   $originalTemp=$env:TEMP;$originalTmp=$env:TMP
   try{
@@ -79,7 +83,7 @@ Start-Sleep -Seconds 20
     $null=Resolve-MIR441RecoveryScratchPath -Path $root
     Remove-Item -LiteralPath $root -Recurse -Force
   }
-  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;out_of_root=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
+  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;out_of_root=$true;characterization_admission=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
 }
 if($ResourceRecoveryOnly){Test-MIR441ResourceRecovery;return}
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
