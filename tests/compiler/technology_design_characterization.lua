@@ -274,5 +274,18 @@ local cyclic = {}; cyclic.self = cyclic
 expect_error(function() fingerprint.of({nested = cyclic}) end, "cyclic table at $.nested.self")
 expect_error(function() fingerprint.of({outer = {[{}] = "invalid key"}}) end,
   "map keys must be strings or numbers at $.outer")
+check(fingerprint.canonical({{}, {a = {}}, {}, {b = {false, {}, true}}})
+  == '[[],{"a":[]},[],{"b":[false,[],true]}]',
+  "buffer cursor follows empty and populated sibling branches")
+check(fingerprint.canonical({nested = {{[0] = "zero", [2] = "two"}, {}}})
+  == '{"nested":[{[0]:"zero",[2]:"two"},[]]}',
+  "buffer cursor crosses nested mixed-key maps and arrays")
+expect_error(function() fingerprint.canonical({1, {deep = function() end}}) end,
+  "Cannot fingerprint value of type function at $[2].deep")
+local mixed_cycle = {}; mixed_cycle[0] = {back = mixed_cycle}
+expect_error(function() fingerprint.canonical(mixed_cycle) end,
+  "cyclic table at $[0].back")
+check(fingerprint.canonical({true, {}, false}) == '[true,[],false]',
+  "a diagnostic failure cannot retain another call's buffer cursor")
 
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)
