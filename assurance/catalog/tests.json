@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 216,
+  "test_count": 218,
   "tests": [
     {
       "id": "docs.check",
@@ -52,7 +52,16 @@
         "factorio",
         "manual-review-attestation",
         "spec/schemas/manual-release-attestation.schema.json",
+        "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
         "tests/release/Test-MIRManualReleaseReview.ps1",
+        "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
+        "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1",
+        "tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/assurance/evidence/Fingerprints.ps1",
+        "spec/schemas/seal.schema.json",
+        "tools/lib/assurance/release/SealVerification.ps1",
         "tools/lib/validation/ReleaseAttestations.ps1",
         "tools/lib/validation/PackageIdentity.ps1"
       ],
@@ -605,7 +614,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F210 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
       "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -725,6 +734,34 @@
         "source:source/prototypes/mir/streams/generated_stream_manifest.json",
         "source:source/package-source.json",
         "targets/f200/composition.json",
+        ".mir/fixtures.yml"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "runtime.f200-browser-personal-state-continuity",
+      "proposition": "The governed test 'runtime.f200-browser-personal-state-continuity' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -FactorioExe <factorio> -CandidateArchive <candidate> -InputMode ScriptedFixture -TimeoutSeconds 240",
+      "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+        "fixtures/assert-browser-personal-state-continuity/**",
+        "source:source/prototypes/mir/runtime/research_browser.lua",
+        "source:source/locale/en/more-infinite-research.cfg",
+        "source:source/package-source.json",
+        "targets/f200/composition.json",
+        "targets/package-authority.json",
+        "source:source/presentation/f200/README.md.template",
         ".mir/fixtures.yml"
       ],
       "captured_artifacts": [],
@@ -7593,6 +7630,36 @@
       "matrix": null
     },
     {
+      "id": "static.mir42-nine-target-written-go-authorization",
+      "proposition": "The governed test 'static.mir42-nine-target-written-go-authorization' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+      "canonical_implementation": "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+        "tests/release/Test-MIRManualReleaseReview.ps1",
+        "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
+        "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
+        "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1",
+        "tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/validation/ReleaseAttestations.ps1",
+        "spec/schemas/manual-release-attestation.schema.json",
+        "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.mir42-protected-main-checks",
       "proposition": "The governed test 'static.mir42-protected-main-checks' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -7807,12 +7874,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 69,
-      "tooling-release": 65,
-      "runtime-upgrade": 50,
+      "tooling-release": 66,
+      "runtime-upgrade": 51,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 204,
+    "canonical_test_commands": 206,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7825,5 +7892,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d047bd07d2ce4e970d5c82d127d33a608dcbc0cb57d8318252a8f29361911eea"
+  "digest": "sha256:60a7d60b5b58b83709198f9d84096c713f5e2898d2dd459d7c9281513d3172a4"
 }
