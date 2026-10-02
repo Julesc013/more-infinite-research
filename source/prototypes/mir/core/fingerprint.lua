@@ -85,14 +85,15 @@ local function table_shape(value, path, diagnostic, root)
   return false, map_keys(value, path, diagnostic, root)
 end
 
--- Append into one canonical buffer. Nested records must keep their complete
--- traversal and validation, but need no intermediate serialized strings.
-encode = function(value, seen, path, diagnostic, root, out)
+-- Append into one canonical buffer using a cursor. Recomputing #out for
+-- every token searches the growing array boundary on older Lua engines.
+-- Nested records retain their complete traversal and validation.
+encode = function(value, seen, path, diagnostic, root, out, count)
   local kind = type(value)
-  if kind == "nil" then out[#out + 1] = "null"; return end
-  if kind == "boolean" then out[#out + 1] = value and "true" or "false"; return end
-  if kind == "number" then out[#out + 1] = string.format("%.17g", value); return end
-  if kind == "string" then out[#out + 1] = quoted_string(value); return end
+  if kind == "nil" then out[count + 1] = "null"; return count + 1 end
+  if kind == "boolean" then out[count + 1] = value and "true" or "false"; return count + 1 end
+  if kind == "number" then out[count + 1] = string.format("%.17g", value); return count + 1 end
+  if kind == "string" then out[count + 1] = quoted_string(value); return count + 1 end
   if kind ~= "table" then
     if not diagnostic then return diagnose(root) end
     error("Cannot fingerprint value of type " .. kind .. " at " .. path, 3)
@@ -105,73 +106,79 @@ encode = function(value, seen, path, diagnostic, root, out)
 
   local array, keys, string_keys = table_shape(value, path, diagnostic, root)
   if array then
-    out[#out + 1] = "["
+    count = count + 1
+    out[count] = "["
     for index = 1, #value do
-      if index > 1 then out[#out + 1] = "," end
+      if index > 1 then count = count + 1; out[count] = "," end
       local child = value[index]
-      local child_kind = type(child)
       local child_path = path
-      if diagnostic and (child_kind == "table"
-        or (child_kind ~= "nil" and child_kind ~= "boolean"
-          and child_kind ~= "number" and child_kind ~= "string")) then
-        child_path = path .. "[" .. index .. "]"
+      if diagnostic then
+        local child_kind = type(child)
+        if child_kind == "table" or (child_kind ~= "nil" and child_kind ~= "boolean"
+          and child_kind ~= "number" and child_kind ~= "string") then
+          child_path = path .. "[" .. index .. "]"
+        end
       end
-      encode(child, seen, child_path, diagnostic, root, out)
+      count = encode(child, seen, child_path, diagnostic, root, out, count)
     end
     seen[value] = nil
-    out[#out + 1] = "]"
-    return
+    out[count + 1] = "]"
+    return count + 1
   end
 
-  out[#out + 1] = "{"
+  count = count + 1
+  out[count] = "{"
   if string_keys then
     table.sort(keys)
     for index, key in ipairs(keys) do
-      if index > 1 then out[#out + 1] = "," end
+      if index > 1 then count = count + 1; out[count] = "," end
       local child = value[key]
-      local child_kind = type(child)
       local child_path = path
-      if diagnostic and (child_kind == "table"
-        or (child_kind ~= "nil" and child_kind ~= "boolean"
-          and child_kind ~= "number" and child_kind ~= "string")) then
-        child_path = path .. "." .. key
+      if diagnostic then
+        local child_kind = type(child)
+        if child_kind == "table" or (child_kind ~= "nil" and child_kind ~= "boolean"
+          and child_kind ~= "number" and child_kind ~= "string") then
+          child_path = path .. "." .. key
+        end
       end
-      out[#out + 1] = quoted_string(key)
-      out[#out + 1] = ":"
-      encode(child, seen, child_path, diagnostic, root, out)
+      out[count + 1] = quoted_string(key)
+      out[count + 2] = ":"
+      count = encode(child, seen, child_path, diagnostic, root, out, count + 2)
     end
     seen[value] = nil
-    out[#out + 1] = "}"
-    return
+    out[count + 1] = "}"
+    return count + 1
   end
 
   table.sort(keys, function(left, right) return left.sort_key < right.sort_key end)
   for index, row in ipairs(keys) do
-    if index > 1 then out[#out + 1] = "," end
+    if index > 1 then count = count + 1; out[count] = "," end
     local child = value[row.key]
-    local child_kind = type(child)
     local child_path = path
-    if diagnostic and (child_kind == "table"
-      or (child_kind ~= "nil" and child_kind ~= "boolean"
-        and child_kind ~= "number" and child_kind ~= "string")) then
-      child_path = path .. row.path
+    if diagnostic then
+      local child_kind = type(child)
+      if child_kind == "table" or (child_kind ~= "nil" and child_kind ~= "boolean"
+        and child_kind ~= "number" and child_kind ~= "string") then
+        child_path = path .. row.path
+      end
     end
-    out[#out + 1] = row.encoded
-    out[#out + 1] = ":"
-    encode(child, seen, child_path, diagnostic, root, out)
+    out[count + 1] = row.encoded
+    out[count + 2] = ":"
+    count = encode(child, seen, child_path, diagnostic, root, out, count + 2)
   end
   seen[value] = nil
-  out[#out + 1] = "}"
+  out[count + 1] = "}"
+  return count + 1
 end
 
 diagnose = function(root)
-  encode(root, {}, "$", true, root, {})
+  encode(root, {}, "$", true, root, {}, 0)
   error("Fingerprint diagnostic traversal did not reproduce invalid input.", 3)
 end
 
 function M.canonical(value)
   local out = {}
-  encode(value, {}, "$", false, value, out)
+  encode(value, {}, "$", false, value, out, 0)
   local text = table.concat(out)
   local bytes = #text
   metrics.canonical_calls = metrics.canonical_calls + 1

@@ -71,8 +71,8 @@ if($process.exit_code-ne0-or$log-notmatch'MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION
   throw "TechnologyDesign characterization failed: $nativeLog"
 }
 $assertionCount=[int]$Matches[1]
-if($assertionCount-ne74) {
-  throw "TechnologyDesign characterization expected 74 assertions, observed $assertionCount`: $nativeLog"
+if($assertionCount-ne79) {
+  throw "TechnologyDesign characterization expected 79 assertions, observed $assertionCount`: $nativeLog"
 }
 $receipt=[ordered]@{
   status='passed'
