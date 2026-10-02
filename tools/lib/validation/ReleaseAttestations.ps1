@@ -411,7 +411,8 @@ function New-MIRManualReleaseWrittenWaiverAttestation {
   $factorioVersion = Get-MIRReleaseFactorioVersion -Path $FactorioBin
   if (-not ([string]$factorioVersion).StartsWith($ExpectedFactorioVersion)) { throw '[mir-manual-review-waiver-factorio-version]' }
   $authorization = Read-MIRManualReleaseWrittenWaiverAuthorization -RepoRoot $repo -Path $MaintainerAuthorizationPath
-  Assert-MIRManualReleaseWrittenWaiverCandidateVersion -RepoRoot $repo -CandidateVersion ([string]$candidateInfo.version) -Authorization $authorization`n  $outputPath = if ([string]::IsNullOrWhiteSpace($Path)) {
+  Assert-MIRManualReleaseWrittenWaiverCandidateVersion -RepoRoot $repo -CandidateVersion ([string]$candidateInfo.version) -Authorization $authorization
+  $outputPath = if ([string]::IsNullOrWhiteSpace($Path)) {
     Resolve-MIRReleasePath -RepoRoot $repo -Path ".mir/evidence/$($candidateInfo.version)-manual-review-attestation.json"
   } else {
     Resolve-MIRReleasePath -RepoRoot $repo -Path $Path
