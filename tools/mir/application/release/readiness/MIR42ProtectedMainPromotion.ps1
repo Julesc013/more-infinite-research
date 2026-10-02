@@ -384,7 +384,8 @@ function Get-MIR42PromotionTechnicalSealReadiness {
     [AllowEmptyCollection()][string[]]$T16ApprovedMutationSids=@(),
     [Parameter(Mandatory)][string]$SourceFreezeAuthorityPath,
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
-    [Parameter(Mandatory)][string]$SshKeygenPath
+    [Parameter(Mandatory)][string]$SshKeygenPath,
+    [AllowEmptyString()][string]$ProgrammePath=''
   )
   $arguments = @{
     RepoRoot=$RepoRoot;CandidateManifestPath=$CandidateManifestPath;QualificationPath=$QualificationPath
@@ -396,6 +397,7 @@ function Get-MIR42PromotionTechnicalSealReadiness {
     ReviewerAttestationPath=$ReviewerAttestationPath;SshKeygenPath=$SshKeygenPath
   }
   if ($RequiredScope -ceq 'nine-target') {
+    if (-not [string]::IsNullOrWhiteSpace($ProgrammePath)) { $arguments.ProgrammePath = $ProgrammePath }
     return Get-MIR42NineTargetTechnicalSealReadiness @arguments
   }
   return Get-MIR42FourTargetTechnicalSealReadiness @arguments
@@ -422,14 +424,15 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
     [Parameter(Mandatory)][string]$SourceFreezeAuthorityPath,
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
-    [Parameter(Mandatory)][string]$OfflineRestoreDrillPath
+    [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
+    [AllowEmptyString()][string]$ProgrammePath=''
   )
   if ($PostPromotionReadback -and $RequiredScope -cne 'nine-target') { throw '[mir42-main-readback-nine-scope-required]' }
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $readiness = Get-MIR42PromotionTechnicalSealReadiness -RequiredScope $RequiredScope -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
     -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
+    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-promotion-verified-seal-inputs] $($readiness.blockers -join '; ')" }
   $contract = Assert-MIR42PromotionReadinessScope -Readiness $readiness -RequiredScope $RequiredScope
   $candidate = $readiness._state.candidate
@@ -591,7 +594,8 @@ function Get-MIR42NineTargetProtectedMainPromotionPlan {
     [Parameter(Mandatory)][string]$SourceFreezeAuthorityPath,
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
-    [Parameter(Mandatory)][string]$OfflineRestoreDrillPath
+    [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
+    [AllowEmptyString()][string]$ProgrammePath=''
   )
   return Get-MIR42ProtectedMainPromotionPlanShared -RequiredScope 'nine-target' @PSBoundParameters
 }
@@ -702,7 +706,8 @@ function Get-MIR42NineTargetProtectedMainReadback {
     [Parameter(Mandatory)][string]$SourceFreezeAuthorityPath,
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
-    [Parameter(Mandatory)][string]$OfflineRestoreDrillPath
+    [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
+    [AllowEmptyString()][string]$ProgrammePath=''
   )
   # RepoRoot is the clean, pinned qualification checkout. PrimaryRepoRoot is
   # the completed-work handoff on actual main. Reconstruct all accepted proof

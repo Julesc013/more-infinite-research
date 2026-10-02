@@ -1677,15 +1677,35 @@ function Read-MIR42NineTargetProgrammeWrittenAuthorization {
   return Read-MIR42NineTargetWrittenReleaseAuthorization -Path $Path
 }
 
+function Resolve-MIR42NineTargetProgrammePath {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$ProgrammePath
+  )
+  $repo = [IO.Path]::GetFullPath($RepoRoot).TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar))
+  $build = [IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar))
+  $path = if ([IO.Path]::IsPathRooted($ProgrammePath)) { [IO.Path]::GetFullPath($ProgrammePath) } else { [IO.Path]::GetFullPath((Join-Path $repo $ProgrammePath)) }
+  if (-not $path.StartsWith($build + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) {
+    throw '[mir42-nine-programme-external-path-containment]'
+  }
+  $relative = [IO.Path]::GetRelativePath($repo,$path).Replace('\','/')
+  if ($relative -match '(^|/)\.\.(/|$)') { throw '[mir42-nine-programme-external-path-containment]' }
+  return [pscustomobject][ordered]@{path=$path;relative_path=$relative}
+}
+
 function Assert-MIR42NineTargetProgrammeTransitionReference {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Reference)
-  Assert-MIR42SealPropertyNames -Value $Reference -Expected @('mode','maintainer_authorization','candidate_manifest','source','selected_targets','authorized_transition') -Code 'mir42-nine-programme-transition-reference-shape'
+  Assert-MIR42SealPropertyNames -Value $Reference -Expected @('mode','baseline_programme','maintainer_authorization','candidate_manifest','source','selected_targets','authorized_transition') -Code 'mir42-nine-programme-transition-reference-shape'
+  Assert-MIR42SealPropertyNames -Value $Reference.baseline_programme -Expected @('path','sha256','record_sha256') -Code 'mir42-nine-programme-transition-baseline-shape'
   Assert-MIR42SealPropertyNames -Value $Reference.maintainer_authorization -Expected @('path','sha256','record_sha256','recorded_from_user_turn_date') -Code 'mir42-nine-programme-transition-authorization-shape'
   Assert-MIR42SealPropertyNames -Value $Reference.candidate_manifest -Expected @('path','sha256','record_sha256') -Code 'mir42-nine-programme-transition-candidate-shape'
   Assert-MIR42SealPropertyNames -Value $Reference.source -Expected @('commit','tree','package_source_sha256') -Code 'mir42-nine-programme-transition-source-shape'
   Assert-MIR42SealPropertyNames -Value $Reference.authorized_transition -Expected @('source_freeze','candidate_allocation','production_signing','technical_seal','promotion','tagging','publication') -Code 'mir42-nine-programme-transition-gate-shape'
   if ([string]$Reference.mode -cne 'written-conditional-maintainer-go' -or
       ($Reference.selected_targets -join '|') -cne ($script:MIR42SealNineTargetCandidates -join '|') -or
+      [string]$Reference.baseline_programme.path -cne (Get-MIR42SealScopeContract -Scope 'nine-target').programme_path -or
+      [string]$Reference.baseline_programme.sha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$Reference.baseline_programme.record_sha256 -notmatch '^[A-F0-9]{64}$' -or
       [string]$Reference.maintainer_authorization.sha256 -notmatch '^[A-F0-9]{64}$' -or
       [string]$Reference.maintainer_authorization.record_sha256 -notmatch '^[A-F0-9]{64}$' -or
       [string]$Reference.candidate_manifest.sha256 -notmatch '^[A-F0-9]{64}$' -or
@@ -1695,6 +1715,12 @@ function Assert-MIR42NineTargetProgrammeTransitionReference {
       -not [bool]$Reference.authorized_transition.production_signing -or [bool]$Reference.authorized_transition.technical_seal -or
       [bool]$Reference.authorized_transition.promotion -or [bool]$Reference.authorized_transition.tagging -or [bool]$Reference.authorized_transition.publication) {
     throw '[mir42-nine-programme-transition-reference-state]'
+  }
+  $baseline = Get-MIR42LiveProgrammeTransition -RepoRoot $RepoRoot -Scope 'nine-target' -AllowPendingTransition
+  if ($baseline.record.PSObject.Properties.Name -contains 'written_transition_authorization' -or
+      [string]$baseline.sha256 -cne [string]$Reference.baseline_programme.sha256 -or
+      [string]$baseline.record.record_sha256 -cne [string]$Reference.baseline_programme.record_sha256) {
+    throw '[mir42-nine-programme-transition-baseline-binding]'
   }
   $authorization = Read-MIR42NineTargetProgrammeWrittenAuthorization -Path ([string]$Reference.maintainer_authorization.path)
   if ([string]$authorization.sha256 -cne [string]$Reference.maintainer_authorization.sha256 -or
@@ -1729,23 +1755,33 @@ function Write-MIR42NineTargetProgrammeAdvance {
   param(
     [Parameter(Mandatory)]$Record,
     [Parameter(Mandatory)][string]$OutputPath,
+    [Parameter(Mandatory)][string]$BaselinePath,
     [Parameter(Mandatory)][string]$CheckpointRoot
   )
   $output = [IO.Path]::GetFullPath($OutputPath)
+  $baseline = [IO.Path]::GetFullPath($BaselinePath)
   $checkpointRoot = [IO.Path]::GetFullPath($CheckpointRoot)
-  if (-not (Test-Path -LiteralPath $output -PathType Leaf)) { throw '[mir42-nine-programme-advance-existing-required]' }
-  $oldSha = (Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash.ToUpperInvariant()
+  if (-not (Test-Path -LiteralPath $baseline -PathType Leaf)) { throw '[mir42-nine-programme-advance-baseline-required]' }
+  if (-not (Test-Path -LiteralPath (Split-Path -Parent $output) -PathType Container)) { New-Item -ItemType Directory -Force -Path (Split-Path -Parent $output) | Out-Null }
+  $oldPath = if (Test-Path -LiteralPath $output -PathType Leaf) { $output } else { $baseline }
+  $oldSha = (Get-FileHash -LiteralPath $oldPath -Algorithm SHA256).Hash.ToUpperInvariant()
+  $baselineSha = (Get-FileHash -LiteralPath $baseline -Algorithm SHA256).Hash.ToUpperInvariant()
+  if ($oldSha -cne $baselineSha) { throw '[mir42-nine-programme-advance-output-state]' }
   $checkpoint = Join-Path $checkpointRoot (([IO.Path]::GetFileNameWithoutExtension($output)) + '-before-written-go-' + $oldSha + '.json')
   if (-not (Test-Path -LiteralPath $checkpoint -PathType Leaf)) {
     New-Item -ItemType Directory -Force -Path $checkpointRoot | Out-Null
-    [IO.File]::Copy($output,$checkpoint,$false)
+    [IO.File]::Copy($oldPath,$checkpoint,$false)
   }
   if ((Get-FileHash -LiteralPath $checkpoint -Algorithm SHA256).Hash.ToUpperInvariant() -cne $oldSha) { throw '[mir42-nine-programme-advance-checkpoint-hash]' }
   $temporary = Join-Path (Split-Path -Parent $output) (([IO.Path]::GetFileName($output)) + '.' + [guid]::NewGuid().ToString('N') + '.tmp')
   $backup = $temporary + '.bak'
   try {
     Write-MIR42NormalizedRecord -Record $Record -OutputPath $temporary -Code 'mir42-nine-programme-advance-output' | Out-Null
-    [IO.File]::Replace($temporary,$output,$backup)
+    if (Test-Path -LiteralPath $output -PathType Leaf) {
+      [IO.File]::Replace($temporary,$output,$backup)
+    } else {
+      [IO.File]::Move($temporary,$output)
+    }
   } finally {
     if (Test-Path -LiteralPath $temporary -PathType Leaf) { Remove-Item -LiteralPath $temporary -Force }
     if (Test-Path -LiteralPath $backup -PathType Leaf) { Remove-Item -LiteralPath $backup -Force }
@@ -1765,9 +1801,13 @@ function Advance-MIR42NineTargetReleaseCutProgramme {
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $buildRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
+  $output = Resolve-MIR42NineTargetProgrammePath -RepoRoot $repo -ProgrammePath $OutputPath
   $checkpoint = [IO.Path]::GetFullPath($CheckpointRoot)
   if (-not $checkpoint.StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-nine-programme-advance-checkpoint-containment]' }
-  $current = Get-MIR42LiveProgrammeTransition -RepoRoot $repo -Scope 'nine-target' -AllowPendingTransition
+  $baseline = Get-MIR42LiveProgrammeTransition -RepoRoot $repo -Scope 'nine-target' -AllowPendingTransition
+  $current = if (Test-Path -LiteralPath $output.path -PathType Leaf) {
+    Get-MIR42LiveProgrammeTransition -RepoRoot $repo -Scope 'nine-target' -ProgrammePath $output.path -AllowPendingTransition
+  } else { $baseline }
   $authorization = Read-MIR42NineTargetProgrammeWrittenAuthorization -Path $MaintainerAuthorizationPath
   $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$candidate.scope -cne 'nine-target') { throw '[mir42-nine-programme-advance-candidate-scope]' }
@@ -1791,14 +1831,15 @@ function Advance-MIR42NineTargetReleaseCutProgramme {
   $programme.transition_gate.production_signing = $true
   $programme | Add-Member -NotePropertyName written_transition_authorization -NotePropertyValue ([pscustomobject][ordered]@{
     mode = 'written-conditional-maintainer-go'
+    baseline_programme = [ordered]@{path=[string](Get-MIR42SealScopeContract -Scope 'nine-target').programme_path;sha256=[string]$baseline.sha256;record_sha256=[string]$baseline.record.record_sha256}
     maintainer_authorization = [ordered]@{path=(Resolve-Path -LiteralPath $MaintainerAuthorizationPath).Path;sha256=[string]$authorization.sha256;record_sha256=[string]$authorization.record.record_sha256;recorded_from_user_turn_date=[string]$authorization.record.recorded_from_user_turn_date}
     candidate_manifest = [ordered]@{path=(Resolve-Path -LiteralPath $CandidateManifestPath).Path;sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
     source = $candidate.source
     selected_targets = @($candidate.targets | ForEach-Object { [string]$_.target })
     authorized_transition = [ordered]@{source_freeze=$true;candidate_allocation=$true;production_signing=$true;technical_seal=$false;promotion=$false;tagging=$false;publication=$false}
   })
-  $written = Write-MIR42NineTargetProgrammeAdvance -Record $programme -OutputPath $OutputPath -CheckpointRoot $checkpoint
-  $verified = Get-MIR42LiveProgrammeTransition -RepoRoot $repo -Scope 'nine-target'
+  $written = Write-MIR42NineTargetProgrammeAdvance -Record $programme -OutputPath $output.path -BaselinePath (Join-Path $repo (Get-MIR42SealScopeContract -Scope 'nine-target').programme_path) -CheckpointRoot $checkpoint
+  $verified = Get-MIR42LiveProgrammeTransition -RepoRoot $repo -Scope 'nine-target' -ProgrammePath $output.path
   Assert-MIR42NineTargetProgrammeCandidateBinding -Programme $verified -Candidate $candidate
   return [pscustomobject][ordered]@{record=$verified.record;path=$verified.path;advanced=$true;checkpoint_path=$written.checkpoint_path;checkpoint_sha256=$written.checkpoint_sha256}
 }
@@ -1807,11 +1848,18 @@ function Get-MIR42LiveProgrammeTransition {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [ValidateSet('four-target','nine-target')][string]$Scope = 'four-target',
+    [AllowEmptyString()][string]$ProgrammePath='',
     [switch]$AllowPendingTransition
   )
   $contract = Get-MIR42SealScopeContract -Scope $Scope
   $relative = [string]$contract.programme_path
   $path = Join-Path $RepoRoot $relative
+  if (-not [string]::IsNullOrWhiteSpace($ProgrammePath)) {
+    if ($Scope -cne 'nine-target') { throw '[mir42-nine-programme-external-scope]' }
+    $external = Resolve-MIR42NineTargetProgrammePath -RepoRoot $RepoRoot -ProgrammePath $ProgrammePath
+    $path = $external.path
+    $relative = $external.relative_path
+  }
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw '[mir42-seal-current-programme-missing]' }
   if ($Scope -ceq 'nine-target') {
     $schemaPath = Join-Path $RepoRoot 'spec/schemas/mir42-nine-target-release-cut-programme-v1.schema.json'
@@ -1992,7 +2040,7 @@ function Assert-MIR42SourceFreezeLedgerSignature {
 }
 
 function Get-MIR42SourceFreezeAuthority {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Signing,[Parameter(Mandatory)][string]$SshKeygenPath)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Signing,[Parameter(Mandatory)][string]$SshKeygenPath,[AllowEmptyString()][string]$ProgrammePath='')
   $authority = Read-MIR42SealRecord -Path $Path -Code 'mir42-seal-freeze'
   $record = $authority.record
   $null = Get-MIR42SourceFreezeLedgerPayload -Record $record
@@ -2026,7 +2074,9 @@ function Get-MIR42SourceFreezeAuthority {
   }
   Assert-MIR42SourceFreezeLedgerSignature -RepoRoot $RepoRoot -Authority $authority -Signing $Signing -SshKeygenPath $SshKeygenPath
   $scope = Get-MIR42SealCandidateScope -Candidate $Candidate -Code 'mir42-seal-freeze-candidate'
-  $programme = Get-MIR42LiveProgrammeTransition -RepoRoot $RepoRoot -Scope $scope
+  $programmeArguments = @{RepoRoot=$RepoRoot;Scope=$scope}
+  if (-not [string]::IsNullOrWhiteSpace($ProgrammePath)) { $programmeArguments.ProgrammePath = $ProgrammePath }
+  $programme = Get-MIR42LiveProgrammeTransition @programmeArguments
   if ($scope -ceq 'nine-target') { Assert-MIR42NineTargetProgrammeCandidateBinding -Programme $programme -Candidate $Candidate }
   if ([string]$record.programme.path -cne [string]$programme.path -or [string]$record.programme.sha256 -cne [string]$programme.sha256 -or
       [string]$record.programme.source_freeze_state -cne [string]$programme.source_freeze_state -or [string]$record.programme.candidate_allocation_state -cne [string]$programme.candidate_allocation_state) {
@@ -2125,7 +2175,8 @@ function Get-MIR42TechnicalSealReadinessForScope {
     [string[]]$T16ApprovedMutationSids=@(),
     [string]$SourceFreezeAuthorityPath='',
     [string]$ReviewerAttestationPath='',
-    [string]$SshKeygenPath=''
+    [string]$SshKeygenPath='',
+    [string]$ProgrammePath=''
   )
   $contract = Get-MIR42SealScopeContract -Scope $RequiredScope
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -2137,14 +2188,14 @@ function Get-MIR42TechnicalSealReadinessForScope {
     Assert-MIR42SealTargetSet -Rows @($state.candidate.targets) -Code ("mir42-" + $RequiredScope + '-seal-candidate') -Scope $RequiredScope
     $checks.candidate = $true
   } catch { $checks.candidate = $false; $blockers.Add($_.Exception.Message) }
-  if ($checks.candidate) { try { $state.programme = Get-MIR42LiveProgrammeTransition -RepoRoot $repo -Scope $RequiredScope; if ($RequiredScope -ceq 'nine-target') { Assert-MIR42NineTargetProgrammeCandidateBinding -Programme $state.programme -Candidate $state.candidate }; $checks.programme = $true } catch { $checks.programme = $false; $blockers.Add($_.Exception.Message) } } else { $checks.programme = $false; $blockers.Add('[mir42-seal-programme-unavailable]') }
+  if ($checks.candidate) { try { $programmeArguments=@{RepoRoot=$repo;Scope=$RequiredScope};if(-not [string]::IsNullOrWhiteSpace($ProgrammePath)){$programmeArguments.ProgrammePath=$ProgrammePath};$state.programme = Get-MIR42LiveProgrammeTransition @programmeArguments; if ($RequiredScope -ceq 'nine-target') { Assert-MIR42NineTargetProgrammeCandidateBinding -Programme $state.programme -Candidate $state.candidate }; $checks.programme = $true } catch { $checks.programme = $false; $blockers.Add($_.Exception.Message) } } else { $checks.programme = $false; $blockers.Add('[mir42-seal-programme-unavailable]') }
   if ($checks.candidate -and -not [string]::IsNullOrWhiteSpace($QualificationPath)) { try { $state.qualification = Get-MIR42ExactQualificationReceipt -Path $QualificationPath -Candidate $state.candidate; $checks.qualification = $true } catch { $checks.qualification = $false; $blockers.Add($_.Exception.Message) } } else { $checks.qualification = $false; $blockers.Add('[mir42-seal-qualification-missing]') }
   if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($RealEngineCampaignPath)) { try { $state.campaign = Get-MIR42RealEngineCandidateCampaign -RepoRoot $repo -Path $RealEngineCampaignPath -Candidate $state.candidate -Reconciliation $state.qualification; $checks.campaign = $true } catch { $checks.campaign = $false; $blockers.Add($_.Exception.Message) } } else { $checks.campaign = $false; $blockers.Add('[mir42-seal-real-engine-campaign-missing]') }
   if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($IndependentVerificationPath)) { try { $state.independent = Get-MIR42ExactIndependentVerificationReceipt -Path $IndependentVerificationPath -Candidate $state.candidate -Qualification $state.qualification; $checks.independent = $true } catch { $checks.independent = $false; $blockers.Add($_.Exception.Message) } } else { $checks.independent = $false; $blockers.Add('[mir42-seal-independent-missing]') }
   if (-not [string]::IsNullOrWhiteSpace($T16ApprovedOwnerSid) -and @($T16ApprovedMutationSids).Count -gt 0) { try { $state.t16_acl_contract = New-MIR42T16AclContract -ApprovedOwnerSid $T16ApprovedOwnerSid -ApprovedMutationSids $T16ApprovedMutationSids; $checks.t16_acl_contract = $true } catch { $checks.t16_acl_contract = $false; $blockers.Add($_.Exception.Message) } } else { $checks.t16_acl_contract = $false; $blockers.Add('[mir42-seal-t16-acl-contract-human-input-required]') }
   if ($checks.t16_acl_contract -and -not [string]::IsNullOrWhiteSpace($T16TrustRootPath) -and -not [string]::IsNullOrWhiteSpace($OperatorTrustSourcePath) -and -not [string]::IsNullOrWhiteSpace($T16ProtectedRootPath) -and -not [string]::IsNullOrWhiteSpace($T16ImmutableAnchorPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.t16_trust_root = Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $repo -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -ProtectedRootPath $T16ProtectedRootPath -ImmutableAnchorPath $T16ImmutableAnchorPath -AclContract $state.t16_acl_contract -SshKeygenPath $SshKeygenPath -Scope $RequiredScope; $checks.t16_trust_root = $true } catch { $checks.t16_trust_root = $false; $blockers.Add($_.Exception.Message) } } else { $checks.t16_trust_root = $false; $blockers.Add('[mir42-seal-external-t16-trust-root-or-protected-root-or-immutable-anchor-or-verifier-missing]') }
   if ($checks.t16_trust_root -and -not [string]::IsNullOrWhiteSpace($SigningCeremonyPath)) { try { $state.signing = Get-MIR42ProtectedSigningCeremony -RepoRoot $repo -Path $SigningCeremonyPath -T16TrustRoot $state.t16_trust_root; $checks.signing = $true } catch { $checks.signing = $false; $blockers.Add($_.Exception.Message) } } else { $checks.signing = $false; $blockers.Add('[mir42-seal-signing-or-external-t16-trust-root-missing]') }
-  if ($checks.candidate -and $checks.signing -and -not [string]::IsNullOrWhiteSpace($SourceFreezeAuthorityPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.freeze = Get-MIR42SourceFreezeAuthority -RepoRoot $repo -Path $SourceFreezeAuthorityPath -Candidate $state.candidate -Signing $state.signing -SshKeygenPath $SshKeygenPath; $checks.freeze = $true } catch { $checks.freeze = $false; $blockers.Add($_.Exception.Message) } } else { $checks.freeze = $false; $blockers.Add('[mir42-seal-freeze-authority-or-verifier-missing]') }
+  if ($checks.candidate -and $checks.signing -and -not [string]::IsNullOrWhiteSpace($SourceFreezeAuthorityPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $freezeArguments=@{RepoRoot=$repo;Path=$SourceFreezeAuthorityPath;Candidate=$state.candidate;Signing=$state.signing;SshKeygenPath=$SshKeygenPath};if(-not [string]::IsNullOrWhiteSpace($ProgrammePath)){$freezeArguments.ProgrammePath=$ProgrammePath};$state.freeze = Get-MIR42SourceFreezeAuthority @freezeArguments; $checks.freeze = $true } catch { $checks.freeze = $false; $blockers.Add($_.Exception.Message) } } else { $checks.freeze = $false; $blockers.Add('[mir42-seal-freeze-authority-or-verifier-missing]') }
   if ($checks.qualification -and $checks.campaign -and $checks.independent -and $checks.freeze -and -not [string]::IsNullOrWhiteSpace($ReviewerAttestationPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.reviewer = Get-MIR42IndependentReviewerAttestation -RepoRoot $repo -Path $ReviewerAttestationPath -Independent $state.independent -Campaign $state.campaign -Freeze $state.freeze -SshKeygenPath $SshKeygenPath; $checks.reviewer = $true } catch { $checks.reviewer = $false; $blockers.Add($_.Exception.Message) } } else { $checks.reviewer = $false; $blockers.Add('[mir42-seal-independent-reviewer-attestation-missing]') }
   $ready = @($checks.GetEnumerator() | Where-Object { -not [bool]$_.Value }).Count -eq 0
   return [pscustomobject][ordered]@{
@@ -2218,7 +2269,8 @@ function Get-MIR42NineTargetTechnicalSealReadiness {
     [string[]]$T16ApprovedMutationSids=@(),
     [string]$SourceFreezeAuthorityPath='',
     [string]$ReviewerAttestationPath='',
-    [string]$SshKeygenPath=''
+    [string]$SshKeygenPath='',
+    [string]$ProgrammePath=''
   )
   Get-MIR42TechnicalSealReadinessForScope @PSBoundParameters -RequiredScope 'nine-target'
 }
@@ -2264,6 +2316,7 @@ function New-MIR42NineTargetTechnicalSeal {
     [AllowEmptyString()][string]$SourceFreezeAuthorityPath='',
     [AllowEmptyString()][string]$ReviewerAttestationPath='',
     [AllowEmptyString()][string]$SshKeygenPath='',
+    [AllowEmptyString()][string]$ProgrammePath='',
     [Parameter(Mandatory)][string]$OutputPath
   )
   New-MIR42TechnicalSealForScope @PSBoundParameters -RequiredScope 'nine-target'
@@ -2302,13 +2355,14 @@ function New-MIR42TechnicalSealForScope {
     [AllowEmptyString()][string]$SourceFreezeAuthorityPath='',
     [AllowEmptyString()][string]$ReviewerAttestationPath='',
     [AllowEmptyString()][string]$SshKeygenPath='',
+    [AllowEmptyString()][string]$ProgrammePath='',
     [Parameter(Mandatory)][string]$OutputPath
   )
   $contract = Get-MIR42SealScopeContract -Scope $RequiredScope
   $readiness = Get-MIR42TechnicalSealReadinessForScope -RequiredScope $RequiredScope -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
     -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath
+    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-seal-not-authorized] $($readiness.blockers -join '; ')" }
   $state = $readiness._state
   $seal = [pscustomobject][ordered]@{
