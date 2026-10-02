@@ -10,6 +10,7 @@ Version: 4.2.21000
 
   Bugfixes:
 
+    - Kept item and fluid identities distinct in material-route and self-return checks.
     - Recognized explicit offshore-pump sources, native water offsets, and actual lab inputs in science selection.
     - Restored Space Age productivity research lost through science selection while preserving technology identities and order.
     - Preserved a foreign-disabled technology through V2-to-V3 cap migration and subsequent cap relaxation.
