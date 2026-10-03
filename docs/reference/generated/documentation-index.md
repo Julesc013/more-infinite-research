@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-09-30.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-03.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -394,7 +394,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | MIR 4.2 Nine-Target Candidate and Playtest Matrix | current | release-manager | release-plan | mir-maintainers | 2026-09-30 |
 | docs/releases/MIR42-nine-target-rehearsal-input-gap-2026-09-30.md | MIR 4.2 nine-target rehearsal input gap | current | release-manager | reference | mir-maintainers | 2026-09-30 |
 | docs/releases/mir42-playtest-findings.md | MIR 4.2 Playtest Findings | current | maintainer | reference | mir-maintainers | 2026-09-30 |
-| docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |
+| docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-10-03 |
 | docs/releases/notes/README.md | Release Notes | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/release-notes-0.10.0.md | More Infinite Research 0.10.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |
 | docs/releases/notes/release-notes-0.11.0.md | More Infinite Research 0.11.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |
