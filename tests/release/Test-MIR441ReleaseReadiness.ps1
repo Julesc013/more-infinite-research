@@ -41,6 +41,16 @@ function Test-MIR441ResourceRecovery {
   Refuses {& $characterization -RepoRoot $repo -FactorioBin $pwsh -OutputRoot $root} 'resource-peak-budget-required'
   Refuses {& $characterization -RepoRoot $repo -FactorioBin $pwsh -OutputRoot 'D:\MIR-RECOVERY-OUTSIDE' -ExpectedPeakMemoryMiB 512} 'resource-output-root'
   if(Test-Path -LiteralPath $root){throw 'Characterization refused after allocating output'}
+  $upgrade=Join-Path $repo 'tests/runtime/Test-MIRUpgrade.ps1'
+  $upgradeArguments=@{RepoRoot=$repo;FactorioBin=$pwsh;FromZip='absent-predecessor.zip';ToZip='absent-candidate.zip';WorkRoot=$root;OutputPath=(Join-Path $root 'proof.json')}
+  Refuses {& $upgrade @upgradeArguments} 'resource-peak-budget-required'
+  $upgradeArguments.WorkRoot=Join-Path $repo 'build/tmp-other/escape'
+  Refuses {& $upgrade @upgradeArguments -ExpectedPeakMemoryMiB 512} 'resource-output-root'
+  if(Test-Path -LiteralPath $root){throw 'Upgrade refused after allocating output'}
+  $matrix=Join-Path $repo 'tests/runtime/Test-MIRUpgradeMatrix.ps1'
+  $upgradeArguments.WorkRoot=$root
+  Refuses {& $matrix @upgradeArguments -FromVersion '4.2.21000' -ToVersion '4.2.21001'} 'resource-peak-budget-required'
+  if(Test-Path -LiteralPath $root){throw 'Upgrade matrix refused after allocating output'}
   New-Item -ItemType Directory -Path $root|Out-Null
   $originalTemp=$env:TEMP;$originalTmp=$env:TMP
   try{
@@ -49,7 +59,7 @@ function Test-MIR441ResourceRecovery {
     try{Refuses {Invoke-MIR441MonitoredProcess @invoke} 'resource-heavy-job-active'}finally{$held.Dispose()}
     $passed=Invoke-MIR441MonitoredProcess @invoke
     $jobTemp=[IO.File]::ReadAllText($invoke.StdoutPath).Trim()
-    if(-not$passed.passed-or-not$jobTemp.StartsWith($root+'\')-or(Test-Path -LiteralPath $jobTemp)){throw 'Per-job temp isolation or post-run cleanup failed'}
+    if(-not$passed.passed-or$passed.completion_predicate_observed-or-not$jobTemp.StartsWith($root+'\')-or(Test-Path -LiteralPath $jobTemp)){throw 'Per-job temp isolation or post-run cleanup failed'}
     if($env:TEMP-cne$originalTemp-or$env:TMP-cne$originalTmp){throw 'Global temp environment changed'}
     $parent=Join-Path $root 'parent.ps1'
     $parentText=@'
@@ -59,6 +69,29 @@ Start-Sleep -Seconds 20
 '@
     [IO.File]::WriteAllText($parent,$parentText.Replace('__CHILD_PID__',$script:RecoveryChildPid))
     $invoke.Arguments=@('-NoProfile','-File',$parent)
+    $completion={Test-Path -LiteralPath $script:RecoveryChildPid -PathType Leaf}
+    $completed=Invoke-MIR441MonitoredProcess @invoke -CompletionPredicate $completion
+    $childId=[int][IO.File]::ReadAllText($script:RecoveryChildPid)
+    if(-not$completed.passed-or-not$completed.completion_predicate_observed-or(Get-Process -Id $childId -ErrorAction SilentlyContinue)){throw 'Completion predicate failed to retire the owned server tree'}
+    $last=Get-Content -LiteralPath $invoke.LedgerPath -Tail 1|ConvertFrom-Json
+    if($last.phase-cne'completed'-or-not$last.completion_predicate_observed){throw 'Observed completion was not recorded'}
+    foreach($predicateCase in @('missing','invalid','throws')){
+      Remove-Item -LiteralPath $script:RecoveryChildPid -Force
+      $predicate=switch($predicateCase){
+        'missing' { {$false} }
+        'invalid' { {if(Test-Path -LiteralPath $script:RecoveryChildPid){return 'true'};return $false} }
+        'throws' { {if(Test-Path -LiteralPath $script:RecoveryChildPid){throw 'simulated-completion-failure'};return $false} }
+      }
+      $expected=switch($predicateCase){'missing'{'process-timeout'};'invalid'{'process-completion-predicate-invalid'};'throws'{'simulated-completion-failure'}}
+      $invoke.TimeoutSeconds=3
+      Refuses {Invoke-MIR441MonitoredProcess @invoke -CompletionPredicate $predicate} $expected
+      $childId=[int][IO.File]::ReadAllText($script:RecoveryChildPid)
+      if(Get-Process -Id $childId -ErrorAction SilentlyContinue){throw 'Predicate failure left an owned child alive'}
+      if(@(Get-ChildItem -LiteralPath $root -Directory -Filter 'temp-*').Count){throw 'Predicate failure left temporary output'}
+      $last=Get-Content -LiteralPath $invoke.LedgerPath -Tail 1|ConvertFrom-Json
+      if($last.phase-cne'interrupted'){throw 'Predicate failure was not recorded as interrupted'}
+    }
+    $invoke.TimeoutSeconds=12
     foreach($fault in @('runtime-commit','monitor')){
       Remove-Item -LiteralPath $script:RecoveryChildPid -Force -ErrorAction SilentlyContinue
       $script:RecoveryFault=$fault
@@ -71,6 +104,48 @@ Start-Sleep -Seconds 20
       if($last.phase-cne'interrupted'){throw 'Interrupted job was not recorded as interrupted'}
     }
     $script:RecoveryFault=''
+    # Evaluate the real save/reload predicate against controlled log/map bytes;
+    # this is an oracle regression, separate from the real child tests above.
+    & {
+      $tokens=$null;$errors=$null
+      $ast=[Management.Automation.Language.Parser]::ParseFile($upgrade,[ref]$tokens,[ref]$errors)
+      if($errors.Count){throw 'Upgrade harness syntax error'}
+      foreach($name in @('Invoke-MIRUpgradeMonitoredProcess','Invoke-MIRUpgradeFactorioProcess')){
+        $function=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq $name},$true))
+        if($function.Count-ne1){throw "Upgrade process adapter missing or ambiguous: $name"}
+        . ([scriptblock]::Create($function[0].Extent.Text))
+      }
+      $upgradePolicy=$policy;$upgradeWriteBytes=1MB;$upgradePeakBytes=1GB
+      $script:upgradeProcessIndex=0;$script:upgradeResourceRuns=@()
+      if((Invoke-MIRUpgradeFactorioProcess -FilePath $pwsh -Arguments @('-NoProfile','-Command','exit 0'))-ne0){throw 'Upgrade process adapter lost the exit code'}
+      if($script:upgradeResourceRuns.Count-ne1-or-not(Test-Path $script:upgradeResourceRuns[0].ledger)-or$script:upgradeResourceRuns[0].completion_predicate_observed){throw 'Upgrade process adapter lost resource evidence'}
+      $upgradeWriteBytes=1
+      Refuses {Invoke-MIRUpgradeFactorioProcess -FilePath $pwsh -Arguments @('-NoProfile','-Command','exit 0')} 'resource-output-budget'
+      $server=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Invoke-MIRUpgradeServerUntilSaved'},$true))
+      if($server.Count-ne1){throw 'Upgrade save oracle missing or ambiguous'}
+      . ([scriptblock]::Create($server[0].Extent.Text))
+      function Invoke-MIRUpgradeMonitoredProcess {
+        param($FilePath,$Arguments,$TimeoutMs,[scriptblock]$CompletionPredicate)
+        return [pscustomobject]@{completion_predicate_observed=(& $CompletionPredicate);exit_code=0}
+      }
+      $save=Join-Path $root 'controlled-save.zip';$log=Join-Path $root 'controlled-factorio.log'
+      $serverArguments=@{FilePath=$pwsh;Arguments=@('--controlled');LogPath=$log;Marker='proof-complete';SavedMapPath=$save}
+      [IO.File]::WriteAllText($log,'proof-complete Hosting game Saving finished')
+      Refuses {Invoke-MIRUpgradeServerUntilSaved @serverArguments} 'exited before'
+      [IO.File]::WriteAllText($save,'not-a-save')
+      [IO.File]::WriteAllText($log,'proof-complete Hosting game')
+      Refuses {Invoke-MIRUpgradeServerUntilSaved @serverArguments} 'exited before'
+      Refuses {Invoke-MIRUpgradeServerUntilSaved @serverArguments -HistoricalSaveLog} 'exited before'
+      if((Invoke-MIRUpgradeServerUntilSaved @serverArguments -ReloadOnly)-ne0){throw 'Reload oracle lost its log/map gate'}
+      Remove-Item -LiteralPath $save
+      $archive=[IO.Compression.ZipFile]::Open($save,[IO.Compression.ZipArchiveMode]::Create)
+      try{$writer=[IO.StreamWriter]::new($archive.CreateEntry('controlled/level.dat').Open());try{$writer.Write('map-bytes')}finally{$writer.Dispose()}}finally{$archive.Dispose()}
+      if((Invoke-MIRUpgradeServerUntilSaved @serverArguments -HistoricalSaveLog)-ne0){throw 'Historical save oracle lost its ZIP map gate'}
+      [IO.File]::WriteAllText($log,'Hosting game Saving finished')
+      Refuses {Invoke-MIRUpgradeServerUntilSaved @serverArguments} 'exited before'
+      [IO.File]::WriteAllText($log,'proof-complete Hosting game Saving finished')
+      if((Invoke-MIRUpgradeServerUntilSaved @serverArguments)-ne0){throw 'Modern save oracle lost its completion gate'}
+    }
     . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
     $config=Join-Path $root 'factorio.ini'
     [IO.File]::WriteAllText($config,"[path]`nwrite-data=D:\MIR-RECOVERY-OUTSIDE`n")
@@ -83,7 +158,7 @@ Start-Sleep -Seconds 20
     $null=Resolve-MIR441RecoveryScratchPath -Path $root
     Remove-Item -LiteralPath $root -Recurse -Force
   }
-  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;out_of_root=$true;characterization_admission=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
+  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;out_of_root=$true;characterization_admission=$true;upgrade_admission=$true;upgrade_process_adapter=$true;save_reload_oracle=$true;completion_predicate=$true;predicate_failure_cancellation=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
 }
 if($ResourceRecoveryOnly){Test-MIR441ResourceRecovery;return}
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')

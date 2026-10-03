@@ -3327,7 +3327,7 @@
       "id": "runtime.upgrade",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./tests/runtime/Test-MIRUpgradeMatrix.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -OutputPath build/results/assurance/<upgrade-to>-upgrade-proof.json",
+      "command": "./tests/runtime/Test-MIRUpgradeMatrix.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120 -OutputPath build/results/assurance/<upgrade-to>-upgrade-proof.json",
       "requires_factorio": true,
       "inputs": [
         "candidate",
@@ -3337,6 +3337,8 @@
         "fixtures/upgrade-modset-source/**",
         "tests/runtime/Test-MIRUpgradeMatrix.ps1",
         "spec/schemas/upgrade-matrix.schema.json",
+        "tools/mir/application/release/readiness/Common.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "scenario-harness",
         "settings"
       ]

@@ -127,8 +127,10 @@ if (-not $settingsOverrides.Contains('function Complete-MIRSettingsOverrideMod {
 
 $upgradeHarness = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tests\runtime\Test-MIRUpgrade.ps1")
 foreach ($requiredPolicy in @(
-  '$generatedUpgradeRoot = Join-Path $RepoRoot "build\validation-upgrades"',
-  '$resolvedUpgradeRoot.StartsWith($resolvedRepoRoot, [StringComparison]::OrdinalIgnoreCase)',
+  "Join-Path `$RepoRoot 'build/p/validation-upgrades'",
+  '$resolvedUpgradeRoot=Resolve-MIR441RecoveryScratchPath -Path $generatedUpgradeRoot',
+  '$null=Assert-MIR441ResourceAdmission -Policy $upgradePolicy',
+  'Invoke-MIR441MonitoredProcess -FilePath $FilePath',
   '$root = Join-Path $resolvedUpgradeRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))',
   'Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log")',
   '$save = Join-Path $root "source.zip"',

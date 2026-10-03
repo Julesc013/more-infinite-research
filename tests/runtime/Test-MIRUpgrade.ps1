@@ -14,6 +14,8 @@ param(
   [string[]]$SourceOnlyFixtureNames = @(),
   [string]$OutputPath = "",
   [string]$WorkRoot = "",
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
   [ValidateSet('OnFailure','Always','Never')][string]$Retention = 'Always'
 )
 # Canonical validation scripts live three levels below the repository root.
@@ -23,21 +25,21 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/Common.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
 
 function Resolve-MIRUpgradeManifestVersion {
   param([Parameter(Mandatory)][string]$ManifestPath,[Parameter(Mandatory)][string]$CandidatePath,[string]$Target='')
   $manifest=Get-Content -Raw -LiteralPath $ManifestPath | ConvertFrom-Json -Depth 100
-  if ($manifest.kind -cne 'MIR42FinalReleaseManifestV1' -or $manifest.source_tag -notmatch '^v4[.](?<minor>[0-9]+)[.](?<patch>[0-9]{1,2})$') {
-    throw '[mir-upgrade-manifest-source] Expected a selected MIR release manifest.'
-  }
-  $minor=[int]$Matches.minor; $patch=[int]$Matches.patch
+  . (Join-Path $RepoRoot 'tools/lib/validation/MIR4DistributionIdentity.ps1')
+  $sourceVersion=Get-MIR4FinalManifestSourceVersion -Manifest $manifest
+  $parts=$sourceVersion.Split('.');$minor=[int]$parts[1];$patch=[int]$parts[2]
   $filename=Split-Path -Leaf $CandidatePath
   $rows=@($manifest.targets | Where-Object { $_.filename -ceq $filename -and (-not $Target -or $_.target -ceq $Target) })
   if ($rows.Count -ne 1) { throw '[mir-upgrade-manifest-target] Candidate must match exactly one selected target.' }
   $row=$rows[0]
   if ($row.target -notmatch '^f(?<code>210|200|110|100|017|016|015|014|013)$') { throw '[mir-upgrade-manifest-target]' }
   $code=[string]$Matches.code
-  . (Join-Path $RepoRoot 'tools/lib/validation/MIR4DistributionIdentity.ps1')
   $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $minor -SourcePatch $patch -DistributionVersion ([string]$row.distribution_version)
   if ($identity.package_name -cne $filename -or (Get-FileHash -LiteralPath $CandidatePath -Algorithm SHA256).Hash -cne $row.sha256) {
     throw '[mir-upgrade-manifest-package-hash] Candidate identity or hash differs from the selected manifest.'
@@ -55,6 +57,28 @@ function Resolve-MIRUpgradeManifestVersion {
   return [string]$identity.distribution_version
 }
 
+function Invoke-MIRUpgradeMonitoredProcess {
+  param([string]$FilePath,[string[]]$Arguments,[int]$TimeoutMs=300000,[scriptblock]$CompletionPredicate=$null)
+  $script:upgradeProcessIndex++
+  $prefix=Join-Path $root ('process-'+$script:upgradeProcessIndex)
+  $usage=Get-MIR441TreeUsage -Path $root
+  if (-not $usage.complete) { throw '[mir441-resource-output-scan-incomplete]' }
+  $remaining=$upgradeWriteBytes-[int64]$usage.bytes
+  if ($remaining -le 0) { throw '[mir441-resource-output-budget]' }
+  $run=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $root `
+    -LedgerPath ($prefix+'.resources.jsonl') -Policy $upgradePolicy -EstimatedPeakBytes $remaining `
+    -ExpectedPeakMemoryBytes $upgradePeakBytes -TimeoutSeconds ([int][Math]::Ceiling($TimeoutMs/1000)) `
+    -StdoutPath ($prefix+'.stdout.txt') -StderrPath ($prefix+'.stderr.txt') -AllowNonZeroExit `
+    -CompletionPredicate $CompletionPredicate
+  $script:upgradeResourceRuns+=@([ordered]@{index=$script:upgradeProcessIndex;ledger=($prefix+'.resources.jsonl');exit_code=$run.exit_code;completion_predicate_observed=$run.completion_predicate_observed;peak_working_set_bytes=$run.peak_working_set_bytes;duration_seconds=$run.duration_seconds})
+  return $run
+}
+
+function Invoke-MIRUpgradeFactorioProcess {
+  param([string]$FilePath,[string[]]$Arguments,[int]$TimeoutMs=300000)
+  return (Invoke-MIRUpgradeMonitoredProcess -FilePath $FilePath -Arguments $Arguments -TimeoutMs $TimeoutMs).exit_code
+}
+
 function Invoke-MIRUpgradeServerUntilSaved {
   param(
     [Parameter(Mandatory)][string]$FilePath,
@@ -67,28 +91,13 @@ function Invoke-MIRUpgradeServerUntilSaved {
     [int]$TimeoutMs = 30000
   )
 
-  $processInfo = [System.Diagnostics.ProcessStartInfo]::new()
-  $processInfo.FileName = $FilePath
-  $processInfo.UseShellExecute = $false
-  $processInfo.CreateNoWindow = $true
-  $processInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-  foreach ($arg in $Arguments) { [void]$processInfo.ArgumentList.Add($arg) }
-
-  $process = [System.Diagnostics.Process]::Start($processInfo)
-  try {
-  $deadline = [DateTime]::UtcNow.AddMilliseconds($TimeoutMs)
-  $ready = $false
-  while ([DateTime]::UtcNow -lt $deadline) {
-    if ($process.HasExited) { return $process.ExitCode }
+  # Keep the native save oracle; the shared runner owns admission, deadline,
+  # resource sampling, child cancellation and isolated temporary output.
+  $completion = {
     if ((Test-Path -LiteralPath $LogPath) -and (Test-Path -LiteralPath $SavedMapPath -PathType Leaf)) {
       $text = [string](Get-Content -Raw -LiteralPath $LogPath)
-      if ($null -eq $text) {
-        Start-Sleep -Milliseconds 200
-        continue
-      }
       if ($ReloadOnly -and $text.Contains($Marker) -and $text.Contains("Hosting game")) {
-        $ready = $true
-        break
+        return $true
       }
       $saveComplete = $text.Contains("Saving finished")
       if (-not $saveComplete -and $HistoricalSaveLog) {
@@ -105,25 +114,16 @@ function Invoke-MIRUpgradeServerUntilSaved {
         finally { if ($null -ne $archive) { $archive.Dispose() } }
       }
       if ($text.Contains($Marker) -and $text.Contains("Hosting game") -and $saveComplete) {
-        $ready = $true
-        break
+        return $true
       }
     }
-    Start-Sleep -Milliseconds 200
+    return $false
+  }.GetNewClosure()
+  $run=Invoke-MIRUpgradeMonitoredProcess -FilePath $FilePath -Arguments $Arguments -TimeoutMs $TimeoutMs -CompletionPredicate $completion
+  if (-not $run.completion_predicate_observed) {
+    throw "Factorio exited before the governed upgraded save/reload completed (exit $($run.exit_code))."
   }
-  if (-not $ready) {
-    throw "Factorio did not materialize the governed upgraded save within $TimeoutMs ms."
-  }
-
   return 0
-  } finally {
-    # This owned process is the native engine, not an orchestration shell.
-    # Always terminate it even if log/archive inspection throws mid-run.
-    try {
-      if (-not $process.HasExited) { $process.Kill() }
-      if (-not $process.WaitForExit(5000)) { throw 'Owned upgrade engine did not terminate.' }
-    } finally { $process.Dispose() }
-  }
 }
 
 function Resolve-MIRUpgradePath {
@@ -205,6 +205,21 @@ function Write-MIRUpgradeModList {
     Set-Content -LiteralPath $Path -Encoding UTF8
 }
 
+$generatedUpgradeRoot = if ([string]::IsNullOrWhiteSpace($WorkRoot)) {
+  Join-Path $RepoRoot 'build/p/validation-upgrades'
+} else {
+  if (-not [IO.Path]::IsPathRooted($WorkRoot)) { throw 'Upgrade -WorkRoot must be an absolute controlled path.' }
+  [IO.Path]::GetFullPath($WorkRoot)
+}
+$resolvedUpgradeRoot=Resolve-MIR441RecoveryScratchPath -Path $generatedUpgradeRoot
+if ($ExpectedPeakMemoryMiB -le 0) { throw '[mir441-resource-peak-budget-required] Declare the upgrade peak memory budget.' }
+$upgradePolicy=[pscustomobject]@{minimum_free_ram_gib=4}
+$upgradePeakBytes=[int64]$ExpectedPeakMemoryMiB*1MB
+$upgradeWriteBytes=[int64]$MaxNewOutputMiB*1MB
+# Refuse before source resolution, staging, evidence allocation or any engine.
+$null=Assert-MIR441ResourceAdmission -Policy $upgradePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
+$script:upgradeProcessIndex=0
+$script:upgradeResourceRuns=@()
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
@@ -229,20 +244,6 @@ $output = if ([System.IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else 
 $outputParent = Split-Path -Parent $output
 if (-not (Test-Path -LiteralPath $outputParent)) { New-Item -ItemType Directory -Force -Path $outputParent | Out-Null }
 
-$generatedUpgradeRoot = if ([string]::IsNullOrWhiteSpace($WorkRoot)) {
-  Join-Path $RepoRoot "build\validation-upgrades"
-} else {
-  if (-not [IO.Path]::IsPathRooted($WorkRoot)) { throw 'Upgrade -WorkRoot must be an absolute controlled path.' }
-  [IO.Path]::GetFullPath($WorkRoot)
-}
-New-Item -ItemType Directory -Force -Path $generatedUpgradeRoot | Out-Null
-$resolvedUpgradeRoot = (Resolve-Path -LiteralPath $generatedUpgradeRoot).Path
-if ([string]::IsNullOrWhiteSpace($WorkRoot)) {
-  $resolvedRepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path.TrimEnd("\") + "\"
-  if (-not $resolvedUpgradeRoot.StartsWith($resolvedRepoRoot, [StringComparison]::OrdinalIgnoreCase)) {
-    throw "Generated upgrade root escapes the repository: $resolvedUpgradeRoot"
-  }
-}
 $root = Join-Path $resolvedUpgradeRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
 $resolvedRoot = [IO.Path]::GetFullPath($root)
 $containmentPrefix = $resolvedUpgradeRoot.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
@@ -400,7 +401,7 @@ $nativeBaseArgs = @("--config", $config, "--no-log-rotation", "--mod-directory",
 if ($historicalLine -notin @('0.13','0.14')) { $nativeBaseArgs += '--disable-audio' }
 $createArgs = $nativeBaseArgs + @("--create", $save)
 $factorioProcesses++
-$createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
+$createExitCode = Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $createArgs
 if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $isLegacyFactorio)) {
   throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode. Temporary root: $root"
 }
@@ -410,7 +411,7 @@ if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion
     "--start-server", $save, "--until-tick", "1"
   )
   $factorioProcesses++
-  $sourceInitExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
+  $sourceInitExitCode = Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
   if ($sourceInitExitCode -ne 0) {
     throw "MIR $FromVersion legacy source-save initialization failed with exit code $sourceInitExitCode. Temporary root: $root"
   }
@@ -477,7 +478,7 @@ $loadExitCode = if ($requiresReloadProof) {
     -Marker $governedUpgradeMarker -SavedMapPath $governedUpgradedSave -HistoricalSaveLog:($historicalLine -in @('0.13','0.14','0.15'))
 } else {
   $factorioProcesses++
-  Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
+  Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $loadArgs
 }
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
 $loadText = Get-Content -Raw -LiteralPath $log
@@ -513,7 +514,7 @@ if ($requiresReloadProof) {
   $reloadExitCode = if ($serverReload) {
     Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $reloadArgs -LogPath $log `
       -Marker $reloadMarker -SavedMapPath $upgradedSave -ReloadOnly
-  } else { Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs }
+  } else { Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
   if (-not $reloadText.Contains($reloadMarker)) {
@@ -528,7 +529,7 @@ if ($requiresReloadProof) {
   $secondReloadExitCode = if ($serverReload) {
     Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $reloadArgs -LogPath $log `
       -Marker $reloadMarker -SavedMapPath $upgradedSave -ReloadOnly
-  } else { Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs }
+  } else { Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($secondReloadExitCode -ne 0) {
     throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
   }
@@ -618,6 +619,11 @@ $assertions = if ($isHistoricalTerminalFixture) {
   )
 }
 
+$resourceEvidence=@(foreach ($resourceRun in $script:upgradeResourceRuns) {
+  $resourcePath=Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-process-$($resourceRun.index).resources.jsonl"
+  Copy-Item -LiteralPath $resourceRun.ledger -Destination $resourcePath
+  [ordered]@{filename=(Split-Path -Leaf $resourcePath);sha256=(Get-FileHash -LiteralPath $resourcePath -Algorithm SHA256).Hash;exit_code=$resourceRun.exit_code;completion_predicate_observed=$resourceRun.completion_predicate_observed;peak_working_set_bytes=$resourceRun.peak_working_set_bytes;duration_seconds=$resourceRun.duration_seconds}
+})
 $result = [ordered]@{
   schema = 2
   status = "passed"
@@ -627,6 +633,8 @@ $result = [ordered]@{
   factorio_binary_version = $factorioVersionInfo.FileVersion
   factorio_binary_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $factorio).Hash
   factorio_processes = $factorioProcesses
+  resource_policy = [ordered]@{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'}
+  resource_ledgers = $resourceEvidence
   from = [ordered]@{ version = $FromVersion; path = (Split-Path -Leaf $from); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = (Split-Path -Leaf $to); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
   source_only_fixtures = @($SourceOnlyFixtureNames)
