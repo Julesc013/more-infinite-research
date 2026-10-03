@@ -2076,8 +2076,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize shared material progression declarations for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11440,
-      "expected_sha256": "736AF56F9F38A0597EB4BF4B500520EA30633A4A039F7F593FCB5045FD69AA80",
+      "expected_bytes": 11773,
+      "expected_sha256": "56E61CD8A5104EB0DA10B48F944C93DA4F0C7A058DECFF1518BC6D2C8561FAB7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "BD08DFFD4966136D25A425918D1154E88BCF5764242863B24CDCAC289D8996D2"
+  "record_sha256": "BF3329942A7930C6D9C3362F6FA76D56A8053F90F035F48B74097C8E805AE4CE"
 }

@@ -3273,6 +3273,7 @@
         "tests/tooling/Test-MIRDevelopmentCISelection.ps1",
         "tools/mir/application/assurance/DevelopmentValidation.ps1",
         "tools/lib/assurance/Core.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/assurance/release/SealCreation.ps1",
         "tools/mir/application/package/PackageAuthority.ps1",
         ".github/workflows/validate.yml",
@@ -7920,5 +7921,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:570ab00ade7def3c785e27345244dba59c1eff8e571f332b5d524243fbacd6f6"
+  "digest": "sha256:bf854050cf6ebfd88ad8d2738131109a6a751e1d7bc8f1e2ac3c68a7373cda40"
 }

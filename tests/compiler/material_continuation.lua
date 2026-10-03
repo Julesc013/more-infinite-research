@@ -1,8 +1,9 @@
 -- Exercises the shared continuation planner without starting Factorio.
+local recipe_prototypes = {plate = {}, ["kr-imersite-powder"] = {}}
 package.loaded["prototypes.mir.platform.factorio.data_raw"] = {
   prototype = function(kind, name)
     assert(kind == "recipe")
-    if name == "plate" or name == "kr-imersite-powder" then return {} end
+    return recipe_prototypes[name]
   end
 }
 local late_available = true
@@ -14,8 +15,9 @@ package.loaded["prototypes.mir.capabilities.science_integration.science_packs"] 
     return unreachable_packs[name] and "unreachable" or "research"
   end
 }
+local configured_maximum = "infinite"
 package.loaded["prototypes.mir.planner.costs"] = {
-  max_level_for = function() return "infinite" end,
+  max_level_for = function() return configured_maximum end,
   base_cost_for = function() return 100 end
 }
 package.loaded["prototypes.mir.planner.prerequisites"] = {
@@ -91,6 +93,36 @@ check(stage.fields.cost_model.input.anchor_level == 4
 check(stage.fields.effects[1].recipe == legacy.fields.effects[1].recipe
     and stage.fields.effects[1].change == legacy.fields.effects[1].change,
   "the continuation retains the exact qualified effect")
+
+-- A small positive effect and large upstream cap may imply more levels than
+-- the engine can represent. An explicit finite cap still permits useful work.
+recipe_prototypes.plate.maximum_productivity = 1000000
+legacy.fields.effects[1].change = 0.0001
+configured_maximum = 8
+local bounded_stage = continuation.plan(legacy)
+check(bounded_stage.action == "emit" and bounded_stage.planned_max_level == 8
+    and bounded_stage.fields.level == 4 and bounded_stage.fields.max_level == "infinite",
+  "the planner emits a bounded level-four stage despite oversized upstream headroom")
+check(bounded_stage.technology_name == stage.technology_name
+    and bounded_stage.fields.effects[1].change == 0.0001
+    and bounded_stage.fields.effects[1].recipe == "plate",
+  "bounding headroom preserves identity and the exact qualified effect")
+mod_data_supported = false
+check(continuation.plan(legacy).fields.max_level == 8,
+  "the bounded continuation remains natively finite without mod-data transport")
+mod_data_supported = true
+configured_maximum = "infinite"
+local oversized_stage = continuation.plan(legacy)
+check(oversized_stage.action == "skip" and oversized_stage.reason == "material-level-domain-exceeded",
+  "the planner withholds an unbounded oversized continuation")
+configured_maximum = 3
+local legacy_only_stage = continuation.plan(legacy)
+check(legacy_only_stage.action == "skip"
+    and legacy_only_stage.reason == "configured-material-cap-before-continuation",
+  "the planner retains the explicit legacy-only setting disposition")
+configured_maximum = "infinite"
+legacy.fields.effects[1].change = 0.02
+recipe_prototypes.plate.maximum_productivity = nil
 
 local imersite_spec = progression.attach_k2_213_continuation("research_material_imersite", {max_level = 3})
 local imersite_legacy = {

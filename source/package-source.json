@@ -4439,10 +4439,10 @@
         "reason": "Shared staged material progression declaration for reviewed Bob/Angel streams."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 11440,
-      "source_sha256": "736AF56F9F38A0597EB4BF4B500520EA30633A4A039F7F593FCB5045FD69AA80",
-      "output_bytes": 11440,
-      "output_sha256": "736AF56F9F38A0597EB4BF4B500520EA30633A4A039F7F593FCB5045FD69AA80"
+      "source_bytes": 11773,
+      "source_sha256": "56E61CD8A5104EB0DA10B48F944C93DA4F0C7A058DECFF1518BC6D2C8561FAB7",
+      "output_bytes": 11773,
+      "output_sha256": "56E61CD8A5104EB0DA10B48F944C93DA4F0C7A058DECFF1518BC6D2C8561FAB7"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "EE5E85E6708DBF7FBF5AEE6A58DA02973E238910979A60A1C87EEF11B330094B"
+  "record_sha256": "C09F32A7B5100BEC99ECA88733FE5C18A2734B3BA2DE085A38E95650E87BBC7B"
 }

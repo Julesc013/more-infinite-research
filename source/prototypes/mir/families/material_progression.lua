@@ -264,7 +264,12 @@ function M.highest_useful_level(effects, recipe_lookup, configured_cap)
     if limit == nil then limit = 3.0 end -- Factorio RecipePrototype default.
     if not finite_nonnegative(limit) then return nil, "invalid-material-recipe-cap" end
     local highest = math.ceil(limit / effect.change - 0.000000001)
-    if highest > 2147483647 then return nil, "material-level-domain-exceeded" end
+    -- Only the emitted effective cap needs to fit the level domain. A finite
+    -- configured cap can bound recipe headroom beyond that domain without
+    -- granting an oversized or unbounded continuation.
+    local effective_highest = configured_cap ~= "infinite"
+      and math.min(highest, configured_cap) or highest
+    if effective_highest > 2147483647 then return nil, "material-level-domain-exceeded" end
     maximum = math.max(maximum, highest)
     count = count + 1
   end
