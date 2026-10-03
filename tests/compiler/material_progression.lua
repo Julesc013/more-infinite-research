@@ -194,6 +194,30 @@ local mixed_level = progression.highest_useful_level({effect("normal", 0.02), ef
 check(mixed_level == 150, "the family continues while at least one qualified recipe benefits")
 local configured_level = progression.highest_useful_level({effect("normal", 0.02)}, recipe, 8)
 check(configured_level == 8, "a finite startup setting is an absolute cap across both stages")
+recipe_caps.very_broad = {maximum_productivity = 1000000}
+local bounded_extreme, bounded_extreme_reason = progression.highest_useful_level(
+  {effect("very_broad", 0.0001)}, recipe, 8)
+check(bounded_extreme == 8,
+  "a representable configured cap bounds oversized positive recipe headroom: " .. tostring(bounded_extreme_reason))
+local unbounded_extreme, unbounded_extreme_reason = progression.highest_useful_level(
+  {effect("very_broad", 0.0001)}, recipe, "infinite")
+check(unbounded_extreme == nil and unbounded_extreme_reason == "material-level-domain-exceeded",
+  "unbounded oversized headroom still fails the technology level domain")
+local domain_edge = progression.highest_useful_level(
+  {effect("very_broad", 0.0001)}, recipe, 2147483647)
+check(domain_edge == 2147483647, "the exact finite level-domain boundary remains representable")
+local domain_overflow, domain_overflow_reason = progression.highest_useful_level(
+  {effect("very_broad", 0.0001)}, recipe, 2147483648)
+check(domain_overflow == nil and domain_overflow_reason == "material-level-domain-exceeded",
+  "a configured cap beyond the technology level domain cannot admit oversized headroom")
+local bounded_legacy, bounded_legacy_reason = progression.highest_useful_level(
+  {effect("very_broad", 0.0001)}, recipe, 3)
+check(bounded_legacy == nil and bounded_legacy_reason == "configured-material-cap-before-continuation",
+  "bounding oversized headroom at level three preserves the explicit legacy-only disposition")
+local bounded_missing, bounded_missing_reason = progression.highest_useful_level(
+  {effect("very_broad", 0.0001), effect("missing", 0.0001)}, recipe, 8)
+check(bounded_missing == nil and bounded_missing_reason == "material-recipe-unavailable",
+  "a finite configured cap cannot excuse an unavailable effect recipe")
 local configured_stop, configured_reason = progression.highest_useful_level(
   {effect("normal", 0.02)}, recipe, 3)
 check(configured_stop == nil and configured_reason == "configured-material-cap-before-continuation",
