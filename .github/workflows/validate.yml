@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 env:
   MIR_VALIDATION_TARGET: ${{ (github.ref == 'refs/heads/tmp/2.0' || github.head_ref == 'tmp/2.0' || github.base_ref == 'tmp/2.0') && '2.0' || '2.1' }}
@@ -324,6 +325,21 @@ jobs:
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
+      - name: Resolve worker artifact download directory
+        id: worker-download-path
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          script: |
+            const root = 'build/results/assurance/worker-evidence';
+            const prefix = `mir-evidence-${context.runId}-`;
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              ...context.repo, run_id: context.runId, per_page: 100
+            });
+            const workers = artifacts.filter(artifact => artifact.name.startsWith(prefix));
+            if (workers.some(artifact => !/^[A-Za-z0-9._-]+$/.test(artifact.name))) {
+              throw new Error('Unsafe worker artifact name');
+            }
+            core.setOutput('path', workers.length === 1 ? `${root}/${workers[0].name}` : root);
       - name: Download isolated worker evidence
         id: download-workers
         continue-on-error: true
@@ -334,7 +350,7 @@ jobs:
           # trust lineage and artifact attempt before selecting the latest
           # contribution for each row; do not discard attempt-1 successes here.
           pattern: mir-evidence-${{ github.run_id }}-*
-          path: build/results/assurance/worker-evidence
+          path: ${{ steps.worker-download-path.outputs.path }}
       - name: Record artifact transport classification
         shell: pwsh
         run: |
