@@ -24,6 +24,7 @@
         "tests/tooling/Test-MIRDevelopmentCISelection.ps1",
         "tools/mir/application/assurance/DevelopmentValidation.ps1",
         "tools/lib/assurance/Core.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/assurance/release/SealCreation.ps1",
         "tools/mir/application/package/PackageAuthority.ps1",
         ".github/workflows/validate.yml",

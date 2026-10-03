@@ -13,8 +13,10 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
 if($NativeProbeOnly) { & (Join-Path $RepoRoot 'tests/tooling/Test-MIRNativeProbeResources.ps1') -RepoRoot $RepoRoot;return }
 
-$tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([IO.Path]::DirectorySeparatorChar)
-$fixtureRoot = Join-Path $tempRoot ("mir-immutable-input-staging-{0}" -f [guid]::NewGuid().ToString('N'))
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+$tempRoot = Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot 'build/tmp')
+$fixtureRoot = Resolve-MIR441RecoveryScratchPath -Path (Join-Path $tempRoot ("mir-immutable-input-staging-{0}" -f [guid]::NewGuid().ToString('N')))
+$expectedFixtureRoot = $fixtureRoot
 $firstLease = $null
 $secondLease = $null
 try {
@@ -350,10 +352,11 @@ try {
     try { Complete-MIRImmutableInputLease -Lease $secondLease -Outcome failed | Out-Null } catch {}
   }
   if (Test-Path -LiteralPath $fixtureRoot) {
-    $resolved = [IO.Path]::GetFullPath($fixtureRoot)
-    $prefix = $tempRoot + [IO.Path]::DirectorySeparatorChar
-    if (-not $resolved.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
-      throw "Immutable input fixture escaped the system temporary directory: $resolved"
+    $resolved = Resolve-MIR441RecoveryScratchPath -Path $fixtureRoot
+    if (-not $resolved.Equals($expectedFixtureRoot, [StringComparison]::OrdinalIgnoreCase) -or
+      -not (Split-Path -Parent $resolved).Equals($tempRoot, [StringComparison]::OrdinalIgnoreCase) -or
+      (Split-Path -Leaf $resolved) -cnotmatch '^mir-immutable-input-staging-[0-9a-f]{32}$') {
+      throw "Immutable input fixture does not match its allocated project scratch path: $resolved"
     }
     Remove-Item -LiteralPath $resolved -Recurse -Force
   }

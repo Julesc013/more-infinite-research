@@ -213,7 +213,10 @@ if($PureSelectionOnly) {
   [pscustomobject]@{status='passed';assertions=$selectionAssertions;scope='Pure classifier, selector identity and canonical coverage fixtures';native_factorio=$false;checkout_fixture_created=$false}
   return
 }
-$temporaryRepo=Join-Path ([IO.Path]::GetTempPath()) ('mir-development-ci-selection-'+[guid]::NewGuid().ToString('N'))
+. (Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+$temporaryRoot=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo 'build/tmp')
+$temporaryRepo=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $temporaryRoot ('mir-development-ci-selection-'+[guid]::NewGuid().ToString('N')))
+$expectedTemporaryRepo=$temporaryRepo
 New-Item -ItemType Directory -Force -Path $temporaryRepo|Out-Null
 try {
   & git -C $temporaryRepo init -q
@@ -246,9 +249,12 @@ try {
   Assert-MIRDevelopmentCISelection -Condition $dirtyRejected -Message 'Hosted selection accepted a dirty checkout as HEAD-bound input.'
 } finally {
   if(Test-Path -LiteralPath $temporaryRepo) {
-    $resolvedTemporaryRepo=(Resolve-Path -LiteralPath $temporaryRepo).Path
-    $temporaryRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
-    if(-not $resolvedTemporaryRepo.StartsWith($temporaryRoot,[StringComparison]::OrdinalIgnoreCase)) { throw 'Temporary dirty-checkout fixture escaped the system temporary directory.' }
+    $resolvedTemporaryRepo=Resolve-MIR441RecoveryScratchPath -Path $temporaryRepo
+    if(-not $resolvedTemporaryRepo.Equals($expectedTemporaryRepo,[StringComparison]::OrdinalIgnoreCase) -or
+      -not (Split-Path -Parent $resolvedTemporaryRepo).Equals($temporaryRoot,[StringComparison]::OrdinalIgnoreCase) -or
+      (Split-Path -Leaf $resolvedTemporaryRepo) -cnotmatch '^mir-development-ci-selection-[0-9a-f]{32}$') {
+      throw 'Dirty-checkout fixture does not match its allocated project scratch path.'
+    }
     Remove-Item -LiteralPath $resolvedTemporaryRepo -Recurse -Force
   }
 }
