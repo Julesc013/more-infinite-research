@@ -5,6 +5,34 @@ Set-StrictMode -Version Latest
 
 # These adapters retain the existing governor and lease authorities. They own
 # one probe's total new-output budget, not a second scheduler or package writer.
+function Resolve-MIRNativeProbeDependencyInputs {
+  param(
+    [Parameter(Mandatory)][string]$StageRoot,
+    [Parameter(Mandatory)][Collections.IDictionary]$ExpectedArchives,
+    [string[]]$LocalModLibraryDirs=@()
+  )
+  if($ExpectedArchives.Count -lt 1 -or $ExpectedArchives.Count -gt 32 -or $LocalModLibraryDirs.Count -gt 8){throw '[mir-native-probe-dependency-input-budget]'}
+  $rows=[ordered]@{}
+  foreach($entry in $ExpectedArchives.GetEnumerator()){
+    $name=[string]$entry.Key;$expected=[string]$entry.Value
+    if($name -cnotmatch '^[A-Za-z0-9][A-Za-z0-9._-]*[.]zip$' -or $expected -cnotmatch '^[0-9A-F]{64}$'){throw '[mir-native-probe-dependency-identity]'}
+    $path=Join-Path $StageRoot (Join-Path 'mods' $name);$kind='exact-preserved-stage'
+    if(-not (Test-Path -LiteralPath $path -PathType Leaf)){
+      $path='';$kind='verified-local-dependency-library'
+      foreach($directory in $LocalModLibraryDirs){
+        $candidate=Join-Path $directory $name
+        if(Test-Path -LiteralPath $candidate -PathType Leaf){$path=$candidate;break}
+      }
+    }
+    if(-not $path){throw "[mir-native-probe-dependency-missing] $name"}
+    $file=Get-Item -LiteralPath $path -Force
+    Assert-MIRImmutableInputDirectory -Path $file.DirectoryName -Context 'Native probe immutable source directory'
+    if(($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -or (Get-MIRImmutableInputSha256 -Path $file.FullName) -cne $expected){throw "[mir-native-probe-dependency-hash] $name"}
+    $rows[$name]=[ordered]@{source_path=$file.FullName;file_name=$name;expected_sha256=$expected;provenance_kind=$kind}
+  }
+  return $rows
+}
+
 function New-MIRNativeProbeResourceContext {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,

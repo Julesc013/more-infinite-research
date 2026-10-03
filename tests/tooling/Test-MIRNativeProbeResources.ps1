@@ -51,6 +51,17 @@ try {
   $source=Join-Path $fixture 'dependency.zip'
   [IO.File]::WriteAllBytes($source,[byte[]]::new(128KB))
   $archiveInput=[ordered]@{source_path=$source;file_name='dependency.zip';expected_sha256=Get-MIRImmutableInputSha256 $source;role='dependency-mod';identity=@{name='controlled'};provenance=@{kind='tiny-controlled-fixture'};immutable=$true}
+  $emptyStage=Join-Path $fixture 'empty-preserved-stage'
+  $lookup=Resolve-MIRNativeProbeDependencyInputs -StageRoot $emptyStage -ExpectedArchives @{'dependency.zip'=$archiveInput.expected_sha256} -LocalModLibraryDirs @($fixture)
+  Assert-Probe ($lookup['dependency.zip'].source_path -ceq $source -and $lookup['dependency.zip'].provenance_kind -ceq 'verified-local-dependency-library' -and -not (Test-Path -LiteralPath $emptyStage)) 'missing-stage lookup failed or restored a staging copy.'
+  Refuses-Probe {Resolve-MIRNativeProbeDependencyInputs -StageRoot $emptyStage -ExpectedArchives @{'dependency.zip'=$archiveInput.expected_sha256}} 'dependency-missing'
+  $lookupStage=Join-Path $fixture 'lookup-stage';New-Item -ItemType Directory -Path (Join-Path $lookupStage 'mods')|Out-Null
+  $stageArchive=Join-Path $lookupStage 'mods/dependency.zip';[IO.File]::Copy($source,$stageArchive)
+  $lookup=Resolve-MIRNativeProbeDependencyInputs -StageRoot $lookupStage -ExpectedArchives @{'dependency.zip'=$archiveInput.expected_sha256} -LocalModLibraryDirs @($fixture)
+  Assert-Probe ($lookup['dependency.zip'].source_path -ceq $stageArchive -and $lookup['dependency.zip'].provenance_kind -ceq 'exact-preserved-stage') 'verified original stage did not retain priority.'
+  [IO.File]::WriteAllText($stageArchive,'controlled wrong stage bytes')
+  Refuses-Probe {Resolve-MIRNativeProbeDependencyInputs -StageRoot $lookupStage -ExpectedArchives @{'dependency.zip'=$archiveInput.expected_sha256} -LocalModLibraryDirs @($fixture)} 'dependency-hash'
+  Refuses-Probe {Resolve-MIRNativeProbeDependencyInputs -StageRoot $emptyStage -ExpectedArchives @{'../dependency.zip'=$archiveInput.expected_sha256} -LocalModLibraryDirs @($fixture)} 'dependency-identity'
   $leaseRoot=Join-Path $context.root 'stage';New-Item -ItemType Directory -Path $leaseRoot | Out-Null
   Refuses-Probe {New-MIRImmutableInputLease -RunRoot $leaseRoot -StageDirectory (Join-Path $leaseRoot 'mods') -Inputs @($archiveInput) -RequireHardLinks -ForceCopy} 'cannot request copy mode'
   $lease=New-MIRImmutableInputLease -RunRoot $leaseRoot -StageDirectory (Join-Path $leaseRoot 'mods') -Inputs @($archiveInput) -RequireHardLinks

@@ -4,6 +4,7 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot='C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-ba-20260930',
+  [string[]]$LocalModLibraryDirs=@('C:\Projects\Factorio\testmods\2.1'),
   [string]$OutputRoot='build/p/f210-ba-final-observer',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
@@ -203,7 +204,7 @@ Assert-MIR441CleanTrackedSource -RepoRoot $repo
 $stage=(Resolve-Path -LiteralPath $ExactStageRoot).Path
 $projectBuild=Join-Path $repo 'build'
 $fixture=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-final-routes-observer'
-foreach($path in @($fixture,(Join-Path $fixture 'info.json'),(Join-Path $fixture 'data-final-fixes.lua'),(Join-Path $fixture 'control.lua'))){Assert-Observer (Test-Path -LiteralPath $path) "fixture path absent: $path"}
+foreach($name in @('info.json','data-final-fixes.lua','control.lua','material-outcome-inventory.lua')){Assert-Observer (Test-Path -LiteralPath (Join-Path $fixture $name) -PathType Leaf) "fixture file absent: $name"}
 $stageReceiptPath=Join-Path $stage 'result.json'
 $stageReceipt=Get-Content -LiteralPath $stageReceiptPath -Raw | ConvertFrom-Json
 Assert-Observer ([string]$stageReceipt.engine_sha256 -ceq 'E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92') 'exact stage engine hash differs.'
@@ -224,12 +225,8 @@ $stageArchives=@{};foreach($row in @($stageReceipt.mods)){$stageArchives[[string
 Assert-Observer ($stageArchives.Count -eq $expectedArchives.Count) 'exact stage archive count differs.'
 foreach($entry in $expectedArchives.GetEnumerator()){
   Assert-Observer ($stageArchives.ContainsKey($entry.Key) -and $stageArchives[$entry.Key] -ceq $entry.Value) "stage receipt archive differs: $($entry.Key)"
-  $archive=Join-Path $stage (Join-Path 'mods' $entry.Key)
-  if(-not $RecoverRunRoot){
-    Assert-Observer (Test-Path -LiteralPath $archive -PathType Leaf) "stage archive absent: $($entry.Key)"
-    Assert-Observer ((Get-ObserverSha $archive) -ceq $entry.Value) "stage archive bytes differ: $($entry.Key)"
-  }
 }
+$dependencyInputs=if(-not $RecoverRunRoot){Resolve-MIRNativeProbeDependencyInputs -StageRoot $stage -ExpectedArchives $expectedArchives -LocalModLibraryDirs $LocalModLibraryDirs}else{$null}
 
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 $source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-ObserverSha (Join-Path $repo 'source/package-source.json');source_version='4.2.1';distribution_version='4.2.21001'}
@@ -254,7 +251,7 @@ Assert-Observer ([string]$fixtureInfo.factorio_version -ceq '2.1') 'fixture fact
 $modNames=@('base','elevated-rails','quality','recycler','space-age','more-infinite-research')+@($expectedArchives.Keys|ForEach-Object {$_ -replace '_[0-9]+(?:[.][0-9]+)*[.]zip$',''})+@('mir-fixture-assert-f210-current-bob-angel-final-routes-observer')
 Assert-Observer ((@($modNames|Sort-Object -Unique)).Count -eq $modNames.Count) 'mod list contains duplicate names.'
 $plannedMods=Join-Path $run 'stage/mods'
-$archives=@($candidateZip)+@($expectedArchives.Keys|ForEach-Object {Join-Path $stage (Join-Path 'mods' $_)})
+$archives=@($candidateZip)+@($dependencyInputs.Values|ForEach-Object {$_.source_path})
 $archiveMetadata=@();$longestPath=0
 foreach($archive in $archives){
   $metadata=Get-ObserverZipInfo $archive
@@ -270,6 +267,7 @@ $prepared=[ordered]@{
   source=$source
   exact_stage=[ordered]@{path=$stage;receipt_sha256=Get-ObserverSha $stageReceiptPath;engine_sha256=[string]$stageReceipt.engine_sha256;candidate_sha256=[string]$stageReceipt.candidate_sha256;save_sha256=[string]$stageReceipt.save_sha256;archives=$expectedArchives}
   candidate=Get-ObserverArtifact $candidateZip
+  dependency_inputs=@($dependencyInputs.Values|ForEach-Object{[ordered]@{archive=$_.file_name;source=Get-ObserverArtifact $_.source_path;provenance_kind=$_.provenance_kind}})
   fixture=@('info.json','data-final-fixes.lua','control.lua','material-outcome-inventory.lua'|ForEach-Object{Get-ObserverArtifact (Join-Path $fixture $_)})
   harness=Get-ObserverArtifact $PSCommandPath
   expected_candidate_count=22
@@ -290,7 +288,8 @@ $leaseRoot=Join-Path $run 'stage';$mods=Join-Path $leaseRoot 'mods';$userdata=Jo
 New-Item -ItemType Directory -Path $leaseRoot,$userdata|Out-Null
 $inputs=@([ordered]@{source_path=$candidateZip;file_name=[IO.Path]::GetFileName($candidateZip);expected_sha256=Get-ObserverSha $candidateZip;role='candidate';identity=[ordered]@{target='f210';source_version='4.2.1';distribution_version='4.2.21001'};provenance=[ordered]@{kind='canonical-materializer';source_commit=$sourceCommit;source_tree=$sourceTree};immutable=$true})
 foreach($archiveName in $expectedArchives.Keys){
-  $inputs+=@([ordered]@{source_path=Join-Path $stage (Join-Path 'mods' $archiveName);file_name=$archiveName;expected_sha256=$expectedArchives[$archiveName];role='dependency-mod';identity=[ordered]@{archive=$archiveName;sha256=$expectedArchives[$archiveName]};provenance=[ordered]@{kind='exact-preserved-stage';receipt_sha256=Get-ObserverSha $stageReceiptPath};immutable=$true})
+  $selected=$dependencyInputs[$archiveName]
+  $inputs+=@([ordered]@{source_path=$selected.source_path;file_name=$archiveName;expected_sha256=$expectedArchives[$archiveName];role='dependency-mod';identity=[ordered]@{archive=$archiveName;sha256=$expectedArchives[$archiveName]};provenance=[ordered]@{kind=$selected.provenance_kind;receipt_sha256=Get-ObserverSha $stageReceiptPath};immutable=$true})
 }
 $lease=New-MIRImmutableInputLease -RunRoot $leaseRoot -StageDirectory $mods -Inputs $inputs -RequireHardLinks
 Add-MIRNativeProbeImmutableLease -Context $resources -Lease $lease
