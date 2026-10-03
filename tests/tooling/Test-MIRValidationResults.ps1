@@ -239,3 +239,4 @@ try {
 }
 
 Write-Host "[ok] MIR validation result aggregation tests passed."
+& (Join-Path $RepoRoot 'tests/tooling/Test-MIRUpgradeManifest.ps1') -RepoRoot $RepoRoot
