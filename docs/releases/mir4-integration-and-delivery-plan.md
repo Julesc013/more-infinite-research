@@ -34,6 +34,18 @@ Live GitHub readback on 7 September found no open issues; the five visible repos
 
 ## Release outcomes and sequencing
 
+### Maintainer release boundary, 3 October 2026
+
+The maintainer selects all working functionality on `dev` at `75d66c5effc15ae5a3114a4dc3e4ad81d1ecda80` for the first final MIR 4.2 release. The remaining full programme no longer blocks that scope. This includes the ownership, weapon-overlap `off`, science-snapshot, and canonical serialization corrections merged after RC1. Unfinished integrations and accepted noncritical limitations remain disclosed; final-channel publication does not establish missing gameplay, multiplayer, performance, signing, or restore evidence.
+
+Preserve immutable `v4.2.0-rc.1` and its `4.2.NNN00` packages. The maintainer explicitly retains source tag `v4.2.0` for the corrected final build. Allocate distribution revision `01` with the existing numeric codec, and record the source-to-distribution revision exception in the release manifest. The next source release is `4.2.1`; its packages use revision `02` or higher, because revision `01` has been consumed. No existing public identity may receive changed bytes.
+
+Publish the complete accepted nine-target set on GitHub before any Mod Portal upload. The maintainer uploads identical ZIPs in order F210, F200, F110, F100, F017, F016, F015, F014, F013, with six-hour elapsed gaps. Anchor persisted UTC due times to the actual first upload; eight gaps make a 48-hour rollout. Before every upload reconcile actual Portal state, target/version/hash, any newer same-target correction, and new blocking reports. Pause affected targets for serious defects, and skip superseded pending uploads. A successful newer-engine upload is not qualification for an older engine.
+
+`4.2.1` immediately owns work absent from this selected source and new regressions. Target publication is Friday **9 October 2026, Melbourne local time (AEDT)**. Admit selected features by Wednesday 7 October and reserve Thursday 8 October for joined checks and preparation. Prioritize crashes, lost state, broken upgrades and unusable research, then wrong effects, ownership, science and progression, followed by responsiveness and unfinished integrations. Publish serious corrections as soon as ready rather than waiting for Friday; advance both source and distribution identities when a hotfix consumes a revision. Friday is a maintenance objective, not a guarantee that every remaining feature will be finished.
+
+Reports must bind package version/hash, exact Factorio version, mod set, settings and first failing step, and corrections add concrete reproducers to the existing tests. The local final-candidate handoff is `dist/LATEST-MIR42-FINAL-CANDIDATE.txt`; RC1's published handoff remains `dist/LATEST-MIR42-PUBLISHED.txt` until final public byte readback succeeds. Keep original evidence at its original candidate identity. A native check prevented by the resource guard remains unperformed; no result is converted to passed because of the release deadline.
+
 | Line | Outcome and completion gate |
 | --- | --- |
 | 4.1.x | A reproduced compatible stable correction; no patch allocation merely for a module witness or repository tooling change |
