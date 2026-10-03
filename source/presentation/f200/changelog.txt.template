@@ -10,6 +10,10 @@ Version: 4.2.20000
 
   Bugfixes:
 
+    - Keep breeding research controls visible for eligible recipes without Space Age; existing setting values are retained.
+    - Exclude retired space science from MIR research when Space Is Fake is active.
+    - Cover AAI industrial furnace, SE solar-panel and accumulator tiers, Solar Matrix, and Accumulator V2 manufacturing in the existing research families.
+
     - Preserved safe science exclusions when the locked Bob/Angel profile disables ordinary salt production.
     - Kept item and fluid identities distinct in material-route and self-return checks.
     - Recognized explicit offshore-pump fluid sources and actual lab inputs when selecting science for generated research.

@@ -3196,10 +3196,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/compatibility/policy_authority.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 2204,
-      "source_sha256": "A4F62FE429E64D2DAD2F01580D2B6BFC88E2129D682FD64C1E1A564854FD5FF5",
-      "output_bytes": 2204,
-      "output_sha256": "A4F62FE429E64D2DAD2F01580D2B6BFC88E2129D682FD64C1E1A564854FD5FF5"
+      "source_bytes": 2861,
+      "source_sha256": "7B7A77ED7775D42AD8FD9D7F5772F3BAD5AD6A2455B946B87CF51497A65F7191",
+      "output_bytes": 2861,
+      "output_sha256": "7B7A77ED7775D42AD8FD9D7F5772F3BAD5AD6A2455B946B87CF51497A65F7191"
     },
     {
       "layer": "capability",
@@ -6447,10 +6447,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/streams/productivity.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 67484,
-      "source_sha256": "1B7E795D324A0F6FCCAB3F5B7BBF13CE27170C7B2D2A73ACE49B1050656F2BE8",
-      "output_bytes": 67484,
-      "output_sha256": "1B7E795D324A0F6FCCAB3F5B7BBF13CE27170C7B2D2A73ACE49B1050656F2BE8"
+      "source_bytes": 67815,
+      "source_sha256": "386BF9C08A2CD6ECA32FF2691F7BEF384ED8EACFDB380E9276164D7FE29FD8A5",
+      "output_bytes": 67815,
+      "output_sha256": "386BF9C08A2CD6ECA32FF2691F7BEF384ED8EACFDB380E9276164D7FE29FD8A5"
     },
     {
       "layer": "presentation",
@@ -6597,10 +6597,10 @@
         "predecessor_source_path": "targets/f200/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 78619,
-      "source_sha256": "2F9B7BF24CE9C0C7A92503BBBCDF5092E2AB489F6FCE981B71FC90B52032ECB2",
-      "output_bytes": 78619,
-      "output_sha256": "2F9B7BF24CE9C0C7A92503BBBCDF5092E2AB489F6FCE981B71FC90B52032ECB2"
+      "source_bytes": 78984,
+      "source_sha256": "3F47EF57F3921DB83C50A56DE56D61830BAA68DF29BE18262F0DC4EE22DE1364",
+      "output_bytes": 78984,
+      "output_sha256": "3F47EF57F3921DB83C50A56DE56D61830BAA68DF29BE18262F0DC4EE22DE1364"
     },
     {
       "layer": "presentation",
@@ -6852,10 +6852,10 @@
         "predecessor_source_path": "targets/f210/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 80508,
-      "source_sha256": "CB7246F8C34CCED81108D780ACB55C43412115029544DB021DEACF680F3FAA38",
-      "output_bytes": 80508,
-      "output_sha256": "CB7246F8C34CCED81108D780ACB55C43412115029544DB021DEACF680F3FAA38"
+      "source_bytes": 80873,
+      "source_sha256": "5610FA653CAF748C436C79807EE1856ED420EC49226FE9CBA97A0761C91BE246",
+      "output_bytes": 80873,
+      "output_sha256": "5610FA653CAF748C436C79807EE1856ED420EC49226FE9CBA97A0761C91BE246"
     },
     {
       "layer": "presentation",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "64EBA36A33E7AE1D695BBDE9152E05E85CF44CF20A5F61AFC0631CB2432416F8"
+  "record_sha256": "D2BB06BB8BEAC1FD16D9AE3EF4042B21D7D66DFA790FA0110B03DCBF48D2F808"
 }

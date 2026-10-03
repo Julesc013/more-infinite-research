@@ -20,6 +20,7 @@ end
 local stream_setting_patterns = {
   "ips-enable-%s",
   "ips-cost-base-%s",
+  "ips-cost-linear-increment-%s",
   "ips-cost-growth-%s",
   "ips-max-level-%s",
   "ips-research-time-%s",
@@ -58,7 +59,6 @@ for _, stream_key in ipairs({
   "research_artificial_soil",
   "research_bacteria_cultivation",
   "research_bioflux",
-  "research_breeding",
   "research_capture_robot_rockets",
   "research_carbon",
   "research_carbon_fiber",
@@ -80,6 +80,9 @@ for _, stream_key in ipairs({
 }) do
   assert_stream_hidden(stream_key, not space_age_active)
 end
+
+assert_stream_hidden("research_breeding", false)
+assert_stream_enabled_by_default("research_breeding")
 
 
 for _, stream_key in ipairs({
