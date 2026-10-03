@@ -97,7 +97,8 @@ function New-MIR4DistributionIdentityProjection {
   param(
     [Parameter(Mandatory)][string]$DistributionTargetCode,
     [Parameter(Mandatory)][int]$SourceMinor,
-    [Parameter(Mandatory)][int]$SourcePatch
+    [Parameter(Mandatory)][int]$SourcePatch,
+    [string]$DistributionVersion
   )
 
   if ($SourceMinor -lt 0 -or $SourceMinor -gt 65535) {
@@ -108,7 +109,10 @@ function New-MIR4DistributionIdentityProjection {
     -DistributionTargetCode $DistributionTargetCode `
     -SourcePatch $SourcePatch
   $sourceVersion = "4.$SourceMinor.$SourcePatch"
-  $distributionVersion = "4.$SourceMinor.$($component.encoded_component_text)"
+  $projectedVersion = "4.$SourceMinor.$($component.encoded_component_text)"
+  if (-not [string]::IsNullOrWhiteSpace($DistributionVersion) -and $DistributionVersion -cne $projectedVersion) {
+    throw '[mir4-distribution-source-patch] Distribution version must encode the exact source patch.'
+  }
   return [pscustomobject][ordered]@{
     distribution_target_code = $DistributionTargetCode
     source_minor = $SourceMinor
@@ -118,9 +122,9 @@ function New-MIR4DistributionIdentityProjection {
     source_tag = "v$sourceVersion"
     encoded_component = [int]$component.encoded_component
     encoded_component_text = [string]$component.encoded_component_text
-    distribution_version = $distributionVersion
-    distribution_tag = "dist/f$DistributionTargetCode/v$distributionVersion"
-    package_name = "more-infinite-research_$distributionVersion.zip"
+    distribution_version = $projectedVersion
+    distribution_tag = "dist/f$DistributionTargetCode/v$projectedVersion"
+    package_name = "more-infinite-research_$projectedVersion.zip"
   }
 }
 

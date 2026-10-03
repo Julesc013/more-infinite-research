@@ -12,8 +12,12 @@ Version: 4.2.21000
 
     - Keep breeding research controls visible for eligible recipes without Space Age; existing setting values are retained.
     - Exclude retired space science from MIR research when Space Is Fake is active.
-    - Cover AAI industrial furnace, SE solar-panel and accumulator tiers, Solar Matrix, and Accumulator V2 manufacturing in the existing research families.
-
+    - Cover AAI industrial furnace, SE solar-panel and accumulator tiers in existing manufacturing-productivity research.
+    - Cover Solar Matrix and Accumulator V2 manufacturing without changing upstream power, capacity, or unlocks.
+    - Preserve continuation effects when an existing native research owner overlaps MIR research.
+    - Preserve generic weapon-speed effects when weapon-overlap handling is set to off.
+    - Store science-route snapshots without copying live compiler service functions.
+    - Retain canonical serialization corrections without claiming an unmeasured overall speedup.
     - Kept item and fluid identities distinct in material-route and self-return checks.
     - Recognized explicit offshore-pump sources, native water offsets, and actual lab inputs in science selection.
     - Restored Space Age productivity research lost through science selection while preserving technology identities and order.

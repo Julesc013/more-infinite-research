@@ -12,8 +12,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 80873,
-      "expected_sha256": "5610FA653CAF748C436C79807EE1856ED420EC49226FE9CBA97A0761C91BE246",
+      "expected_bytes": 81319,
+      "expected_sha256": "5F5EEF321D1BAF6E0C22AC1D946D08F6D25721B5A5687DE5CDA5BECC948CEB35",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "15FACEB3445AAB393EF8318FB8995AF697AF3B7076F704A28CD654C181C3CB8C"
+  "record_sha256": "FAED2544B48C94071AD84B3CAC673C81F1A7A94214E807CA2F628E883C3CC6E2"
 }
