@@ -2,7 +2,8 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [string]$AuditLinePath=''
+  [string]$AuditLinePath='',
+  [string]$InventoryLogPath=''
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
@@ -57,4 +58,44 @@ foreach($change in @(
 }
 $missing=$row | Select-Object * -ExcludeProperty 'phase'
 Assert-ReaderReject @($missing) 'missing input field phase'
-Write-Host "[ok] material input observation reader passed $assertions assertions; no native engine or route admission."
+$inventoryAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1'),[ref]$tokens,[ref]$parseErrors)
+if($parseErrors.Count) { throw 'Final-routes observer has PowerShell parse errors.' }
+foreach($name in @('Assert-Observer','Get-ObserverMaterialOutcomeInventory')) {
+  $functions=@($inventoryAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+  if($functions.Count -ne 1) { throw "Expected one actual final-routes observer function: $name" }
+  . ([scriptblock]::Create($functions[0].Extent.Text))
+}
+$expectedSubjects=@('aluminium/plate','gold/plate','lead/plate','nickel/plate','platinum/plate','silver/plate','tin/plate','titanium/plate','copper-tungsten/alloy','zinc/plate','bronze/alloy','brass/alloy','gunmetal/alloy','invar/alloy','cobalt-steel/alloy','nitinol/alloy','platinum/wire')
+$emptyInventory=(@($expectedSubjects|ForEach-Object {"[mir-material-outcome-inventory] SUBJECT id=$_ status=prototype-absent items=0 producers=0"})+@('[mir-material-outcome-inventory] PASS complete=true phase=finalized-raw-prototypes subjects=17 recipes=0 results=0 gaps=0 acquisition=false admission=false')) -join "`n"
+$inventory=Get-ObserverMaterialOutcomeInventory $emptyInventory
+Assert-Reader ($inventory.subjects.Count -eq 17 -and -not $inventory.acquisition_proved -and -not $inventory.admission_granted) 'independent denominator preserves sixteen outcomes plus separate wire and no admission.'
+$wrongShape=$emptyInventory.Replace('id=platinum/plate status=prototype-absent items=0 producers=0','id=platinum/plate status=no-observed-producer items=1 producers=0')+"`n"+'[mir-material-outcome-inventory] ITEM subject=platinum/plate name=angels-wire-platinum hidden=false'
+foreach($badInventory in @(
+  $emptyInventory.Replace('id=platinum/plate','id=platinum/wire'),
+  $emptyInventory.Replace('subjects=17','subjects=16'),
+  $emptyInventory.Replace('gaps=0','gaps=1'),
+  $emptyInventory.Replace('acquisition=false','acquisition=true'),
+  $emptyInventory.Replace('admission=false','admission=true'),
+  $emptyInventory.Replace('status=prototype-absent items=0','status=observed items=0'),
+  $wrongShape,
+  ($emptyInventory+"`n"+$emptyInventory)
+)) {
+  $rejected=$false
+  try {$null=Get-ObserverMaterialOutcomeInventory $badInventory} catch {$rejected=$true}
+  Assert-Reader $rejected 'malformed, duplicated, incomplete or admission-bearing inventory was accepted.'
+}
+if($InventoryLogPath){
+  $capturedText=Get-Content -Raw -LiteralPath $InventoryLogPath
+  $capture=Get-ObserverMaterialOutcomeInventory $capturedText
+  $plate=@($capture.subjects|Where-Object id -CEQ 'platinum/plate')[0]
+  $wire=@($capture.subjects|Where-Object id -CEQ 'platinum/wire')[0]
+  Assert-Reader ($plate.producers[0].recipe -ceq 'unselected-casting' -and $wire.producers[0].recipe -ceq 'wire-only') 'actual formatter conflated plate and wire.'
+  Assert-Reader (@($capture.observation_gaps|Where-Object recipe -CEQ 'unselected-casting').Count -eq 1) 'actual formatter omitted the independent casting gap.'
+  Assert-Reader (@(@($capture.subjects|Where-Object id -CEQ 'tin/plate')[0].producers|Where-Object recipe -CEQ 'named route%one').Count -eq 1) 'escaped producer identity did not round-trip.'
+  $maskedGap=$capturedText.Replace('[mir-material-outcome-inventory] GAP subject=platinum/plate recipe=unselected-casting','').Replace('gaps=4','gaps=3')
+  Assert-Reader ($maskedGap -cne $capturedText) 'casting gap negative control did not change the fixture.'
+  $rejected=$false
+  try {$null=Get-ObserverMaterialOutcomeInventory $maskedGap} catch {$rejected=$true}
+  Assert-Reader $rejected 'a deleted casting gap was hidden by matching the completion count.'
+}
+Write-Host "[ok] material input/inventory observation readers passed $assertions assertions; no native engine or route admission."

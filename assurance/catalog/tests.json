@@ -1546,6 +1546,9 @@
         "fixtures/assert-compiler-contracts/**",
         "tests/compiler/Test-MIRCompiler.ps1",
         "tests/compiler/Test-MIRMaterialRouteObservationReader.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1",
+        "fixtures/assert-f210-current-bob-angel-final-routes-observer/material-outcome-inventory.lua",
+        "tests/compiler/material_outcome_inventory.lua",
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tools/lib/compatibility/DiagnosticsParser.ps1",
         "tests/compiler/Test-MIRResearchCostModels.ps1",
@@ -7921,5 +7924,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:bf854050cf6ebfd88ad8d2738131109a6a751e1d7bc8f1e2ac3c68a7373cda40"
+  "digest": "sha256:6a3cc000043bcb4b0580cb7c2a9f3a241027147de8ed46007f42b6140b54bb7d"
 }

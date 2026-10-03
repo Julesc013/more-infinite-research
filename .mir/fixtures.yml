@@ -493,6 +493,20 @@ fixtures:
       - exact-f200-nickel-silver-reviewed-forward-route-guards
       - finalized-route-observations-remain-package-excluded
 
+  f210-current-bob-angel-material-outcome-inventory:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-f210-current-bob-angel-final-routes-observer
+    notes:
+      - independent-finalized-raw-prototype-denominator-for-sixteen-requested-plate-and-alloy-outcomes
+      - supplementary-platinum-wire-cannot-satisfy-the-platinum-plate-request
+      - producer-and-observation-gap-records-do-not-prove-acquisition-admission-or-earned-benefit
+      - exact-native-capture-and-package-qualification-remain-pending
+    validates:
+      - omitted-casting-route-is-detectable-without-consuming-mir-selected-family-sets
+      - hidden-research-locked-and-productivity-denied-producers-remain-observable
+      - prototype-absence-and-no-observed-producer-are-distinct
+      - bounded-read-only-inventory-and-staging-free-log-replay
+
   k2-science-phase-policy:
     requires_features: []
     assertion_path: fixtures/assert-k2-science-phase-policy
