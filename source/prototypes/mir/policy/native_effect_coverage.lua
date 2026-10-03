@@ -90,8 +90,7 @@ end
 -- is deliberately not: it retains a native technology identity and remains a
 -- candidate native owner while deciding whether a dedicated stream is useful.
 function M.is_mir_generated_stream(name)
-  local entry = generated_registry.get(name)
-  return entry ~= nil and entry.kind == "stream"
+  return generated_registry.is_stream(name)
 end
 
 function M.exact_owner_names(expected_effect, options)
