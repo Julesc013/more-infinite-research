@@ -10,7 +10,25 @@ More Infinite Research (MIR) is a proof-governed Factorio research product line.
 
 MIR 4.0 established the shared product line. **[MIR 4.1.0 was published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0)** with four target-specific player packages. It preserves the research and settings model below while separating editable package source, target adapters, repository documentation, and release evidence.
 
-### MIR 4.1: choose the right target
+### MIR 4.2: choose the right target
+
+**[MIR 4.2.0 is published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0)** from source `75d66c5e`, including the ownership, weapon-overlap `off`, science-snapshot and serialization corrections implemented after RC1. Download the ZIP for your Factorio line. This final release has maintainer-accepted validation gaps: native checks of these exact final archives, full client/multiplayer qualification and the latest native performance comparison remain outstanding. It does not claim complete overhaul compatibility or completion of the remaining programme.
+
+| Product | Factorio line | Distribution version |
+| --- | --- | --- |
+| F210 | 2.1 experimental | [4.2.21001](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.21001.zip) |
+| F200 | 2.0 | [4.2.20001](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.20001.zip) |
+| F110 | 1.1 | [4.2.11001](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.11001.zip) |
+| F100 | 1.0 | [4.2.10001](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.10001.zip) |
+| F017 | 0.17 | [4.2.01701](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.01701.zip) |
+| F016 | 0.16 | [4.2.01601](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.01601.zip) |
+| F015 | 0.15 | [4.2.01501](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.01501.zip) |
+| F014 | 0.14 | [4.2.01401](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.01401.zip) |
+| F013 | 0.13 | [4.2.01301](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0/more-infinite-research_4.2.01301.zip) |
+
+Source `v4.2.0` deliberately uses distribution revision `01`: public RC1 already consumed `4.2.NNN00`. Its immutable release and ZIPs are preserved. The release manifest records this version exception; the next maintenance packages require revision `02` or higher. Tags are unsigned. Back up saves, choose the same target line and keep startup settings unchanged for the first load. See the release notes for exact upgrade cautions, evidence and limitations. GitHub has the complete package set; Mod Portal availability follows a staggered rollout of these identical ZIPs.
+
+### MIR 4.1: previous qualified release
 
 Download the ZIP for your Factorio line. Each published 4.1 package has independent target qualification; F210 and F200 are the primary player targets, with F110 and F100 supplied as supplemental LTS targets.
 
@@ -21,15 +39,15 @@ Download the ZIP for your Factorio line. Each published 4.1 package has independ
 | F110 | 1.1 | [4.1.11000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.11000.zip) | MIR `4.0.11000` | required / supplemental LTS |
 | F100 | 1.0 | [4.1.10000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.10000.zip) | MIR `4.0.10000` | required / supplemental LTS |
 
-`4.1.0` identifies the shared source release. The five-digit distribution suffix identifies the target line; it does not imply identical capabilities on every Factorio generation. F017 through F013 have private 4.2 playtest packages and remain outside the published target set until separately admitted.
+`4.1.0` identifies the shared source release. The five-digit distribution suffix identifies the target line; it does not imply identical capabilities on every Factorio generation. F017 through F013 are absent from the historical 4.1 release; their current 4.2 packages and validation limits are listed above.
 
 The published F210 package was qualified on Factorio 2.1.17; F200, F110, and F100 were qualified on 2.0.77, 1.1.110, and 1.0.0 respectively. Each new candidate needs its own exact-engine evidence before its support claim changes.
 
 ## MIR 4.2 research browser
 
-The MIR 4.2 development packages for Factorio 2.1 and 2.0 bundle a research library. Open it with the MIR shortcut or `/mir-research`. **Research** searches, sorts and filters technologies, shows selected benefits and requirements, and can display verified research not added in the current configuration. **Queue** shows the force's current queue. **Settings** groups effective values and their sources. **Debug** previews a local diagnostic report and provides startup-profile export and layout recovery. Personal search, filters and hiding leave force research unchanged. The library currently hands research selection and queue changes to Factorio's native research screen; its own queue mutation controls are withheld pending authority and lifecycle qualification. Startup values require a restart, and profile export uses the existing MIRSET1 import setting. Player usability, multiplayer, save/reload and non-English translation qualification remain open in the [community request ledger](spec/programmes/community-requests.json) and [current playtest findings](docs/releases/mir42-playtest-findings.md).
+The MIR 4.2 packages for Factorio 2.1 and 2.0 bundle a research library. Open it with the MIR shortcut or `/mir-research`. **Research** searches, sorts and filters technologies, shows selected benefits and requirements, and can display verified research not added in the current configuration. **Queue** shows the force's current queue. **Settings** groups effective values and their sources. **Debug** previews a local diagnostic report and provides startup-profile export and layout recovery. Personal search, filters and hiding leave force research unchanged. The library currently hands research selection and queue changes to Factorio's native research screen; its own queue mutation controls are withheld pending authority and lifecycle qualification. Startup values require a restart, and profile export uses the existing MIRSET1 import setting. Player usability, multiplayer, save/reload and non-English translation qualification remain open in the [community request ledger](spec/programmes/community-requests.json) and [current playtest findings](docs/releases/mir42-playtest-findings.md).
 
-For the maintained 4.1 release and the integration programme for 4.2, 4.3, and later targets, see the [integration and delivery plan](docs/releases/mir4-integration-and-delivery-plan.md). Planned or preview work does not expand current compatibility claims.
+For 4.2 maintenance and the integration programme for 4.3 and later targets, see the [integration and delivery plan](docs/releases/mir4-integration-and-delivery-plan.md). Planned or preview work does not expand current compatibility claims.
 
 ## Player behavior
 

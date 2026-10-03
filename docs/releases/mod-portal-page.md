@@ -5,7 +5,7 @@ applies_to: "all supported More Infinite Research editions"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-10-03
 supersedes: [docs/releases/archive/mod-portal-page-old.md]
 superseded_by: []
 source_of_truth_for:
@@ -19,6 +19,16 @@ Adds fully customizable repeatable late-game research for productivity, speed, l
 More Infinite Research is for players who want useful long-term scaling in megabases, long-running saves, Space Age factories, and modded playthroughs without turning the mod into a full content overhaul.
 
 The Mod Portal automatically offers an archive compatible with your Factorio version. Modern editions provide the complete compatibility-compiler feature set; historical-engine editions intentionally provide smaller target-appropriate sets. Install the newest compatible download shown by Factorio rather than copying an archive between engine generations.
+
+## MIR 4.2.0 release
+
+[MIR 4.2.0 is available on GitHub](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0) for Factorio 2.1, 2.0, 1.1, 1.0 and 0.17 through 0.13. Mod Portal uploads follow a staggered rollout of those same ZIPs. Choose the package for your Factorio generation; the 2.1 package requires the selected experimental Factorio 2.1 engine.
+
+This build includes the native-owner overlap, weapon-overlap `off`, science-snapshot and serialization corrections implemented after RC1. The 2.1/2.0 packages include the research library; its own research-queue mutation controls remain unavailable. Historical editions retain their engine-specific limits.
+
+Back up your save and keep startup settings unchanged for the first load. The corrected packages use `4.2.NNN01`, while source release `v4.2.0` retains its project version. RC1's `4.2.NNN00` packages remain preserved. Exact ZIP hashes and download links are in the release assets.
+
+The maintainer accepted this final release with disclosed validation gaps. Native requalification of these exact final ZIPs, full client/multiplayer checks and the latest native performance result remain outstanding. Tags are unsigned. Unfinished integrations remain unfinished; comprehensive overhaul support and an overall performance improvement are not claimed. Remaining work and new regressions continue in 4.2.1, targeting Friday 9 October 2026 without guaranteeing completion of every feature.
 
 ## At a glance
 

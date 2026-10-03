@@ -1278,7 +1278,11 @@ foreach ($fanInCase in @(
   $fanInWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $fanInCase.Path)
   foreach ($requiredFanInSnippet in @(
     'path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}',
-    'path: build/results/assurance/worker-evidence',
+    'path: ${{ steps.worker-download-path.outputs.path }}',
+    'id: worker-download-path',
+    'github.rest.actions.listWorkflowRunArtifacts',
+    'workers.length === 1 ? `${root}/${workers[0].name}` : root',
+    'actions: read',
     'verify import-workers',
     ('name: ' + $fanInCase.Prefix + '${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}'),
     ('pattern: ' + $fanInCase.Prefix + '${{ github.run_id }}-*'),
