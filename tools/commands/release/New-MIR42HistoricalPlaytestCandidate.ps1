@@ -4,6 +4,7 @@ param(
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
+  [switch]$RefreshSourceBindings,
   [switch]$Check
 )
 
@@ -91,16 +92,15 @@ function ConvertTo-MIR42HistoricalAdapterBytes {
     $lf = [string][char]10
     $replacements = @(
       @{ from = '`base >= 1.0`'; to = ('`base >= ' + $line + '`') },
-      @{ from = 'It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.'; to = 'It is a private target-specific projection from the current MIR 4.2 source. An exact fresh load establishes only that this package loads on the named engine; emitted streams and progression remain target-state dependent.' },
+      @{ from = 'It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.'; to = 'It is a reduced target-specific projection from the current MIR 4.2 source. Emitted streams and progression depend on the actual engine and prototype capabilities.' },
       @{ from = 'MIR emits eleven stable, manifest-backed infinite research streams when their target effects are available:'; to = 'MIR presents the following manifest-backed research catalog when the target has the required effects, science packs, and prerequisites. A fresh-load receipt does not assert that every catalog entry emits on every historical line:' },
       @{ from = 'MIR also extends supported Factorio 1.0 base infinite technology families for braking force, research speed, worker robot storage, weapon shooting speed, and laser turret shooting speed. Target-aware science selection uses Factorio 1.0 `tool` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission.'; to = "MIR may create qualified continuations for supported Factorio $line base infinite technology families when target-state gates pass. Target-aware science selection uses Factorio $line ``tool`` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission." },
-      @{ from = 'Fresh installations default to `only-when-dedicated-tech-enabled`. MIR removes rocket and cannon-shell speed effects from its generated vanilla continuation only when a valid dedicated MIR or preferred exact external infinite owner exists. `off` and `always` remain available, and explicit values are preserved during the 1.8.1 to 1.8.2 upgrade.'; to = "Fresh installations default to ``only-when-dedicated-tech-enabled``. The historic $predecessorVersion predecessor is retained as the candidate continuity input; this private package does not yet claim an upgrade result." },
-      @{ from = 'The current claim is limited to a fresh exact-package load on Factorio 1.0.0. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.'; to = "The current claim is limited to a recorded private exact-package fresh load on Factorio $engineVersion. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections." },
-      @{ from = 'The exact published 1.8.1 archive remains a historical predecessor record. This 4.2 playtest package does not claim save-upgrade qualification beyond its fresh exact-package load.'; to = "The exact published $predecessorVersion archive remains the historical predecessor record. This private 4.2 playtest package does not claim save-upgrade qualification beyond its fresh exact-package load." },
+      @{ from = 'Fresh installations default to `only-when-dedicated-tech-enabled`. MIR removes rocket and cannon-shell speed effects from its generated vanilla continuation only when a valid dedicated MIR or preferred exact external infinite owner exists. `off` and `always` remain available, and explicit values are preserved during the 1.8.1 to 1.8.2 upgrade.'; to = "Fresh installations default to ``only-when-dedicated-tech-enabled``. The historical $predecessorVersion predecessor remains a continuity input; upgrade qualification of this exact hotfix package is NOT RUN." },
+      @{ from = 'Earlier fresh-load evidence remains bound to its original package and Factorio 1.0.0. Native qualification of this exact hotfix package is NOT RUN. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.'; to = "Earlier fresh-load evidence remains bound to its original package and Factorio $engineVersion. Native qualification of this exact hotfix package is NOT RUN. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections." },
+      @{ from = 'The exact published 1.8.1 archive remains a historical predecessor record. Save-upgrade qualification of this exact 4.2 hotfix package is NOT RUN.'; to = "The exact published $predecessorVersion archive remains a historical predecessor record. Save-upgrade qualification of this exact 4.2 hotfix package is NOT RUN." },
       @{ from = ('- `docs/releases/1.8.2.md`' + $lf + '- `.mir/backport-source-lock.json`' + $lf + '- `.mir/evidence/1.8.2-qualification.json`' + $lf + '- `.mir/evidence/candidate-seals/mir-1.8.2-factorio-1.0.json`'); to = ('- `targets/historical/' + $Record.target + '/target.json`' + $lf + '- the private historical candidate manifest' + $lf + '- the exact-engine fresh-load receipt' + $lf + '- the published ' + $predecessorVersion + ' predecessor archive identity') },
       @{ from = '4.2.10000'; to = $version },
-      @{ from = 'Factorio 1.0'; to = "Factorio $line" },
-      @{ from = '1.0.0'; to = $engineVersion }
+      @{ from = 'Factorio 1.0'; to = "Factorio $line" }
     )
     foreach ($replacement in $replacements) {
       if ([regex]::Matches($text, [regex]::Escape([string]$replacement.from)).Count -lt 1) {
@@ -154,6 +154,31 @@ function Copy-MIR42HistoricalAdapter {
 $targetState = Get-MIR42HistoricalTargetRecord -TargetId $Target
 $record = $targetState.record
 $sourceManifest = Get-MIR42HistoricalSourceManifest
+if ($RefreshSourceBindings) {
+  if ($Check) { throw '[mir42-historical-refresh-check-conflict]' }
+  foreach ($adapter in @($record.adapter_files)) {
+    $bindings = @($sourceManifest.bindings | Where-Object {
+      $record.target -in @($_.target_scope) -and [string]$_.output_path -ceq [string]$adapter.output_path -and
+      [string]$_.source_path -ceq [string]$adapter.source_path
+    })
+    if ($bindings.Count -ne 1) { throw "[mir42-historical-refresh-binding] $($adapter.output_path)" }
+    $adapter.source_bytes = [int64]$bindings[0].source_bytes
+    $adapter.source_sha256 = [string]$bindings[0].source_sha256
+    # Recompute prospective output pins using the same guarded transform as the
+    # builder. Normal construction still checks both input and output pins.
+    $prospective = $adapter | ConvertTo-Json -Depth 30 | ConvertFrom-Json
+    $prospective.PSObject.Properties.Remove('output_bytes')
+    $prospective.PSObject.Properties.Remove('output_sha256')
+    $bytes = ConvertTo-MIR42HistoricalAdapterBytes -Adapter $prospective -Record $record -SourceManifest $sourceManifest
+    $adapter | Add-Member -NotePropertyName output_bytes -NotePropertyValue ([int64]$bytes.Length) -Force
+    $adapter | Add-Member -NotePropertyName output_sha256 -NotePropertyValue (Get-MIR4Sha256Bytes -Bytes $bytes) -Force
+  }
+  $record.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $record
+  $json = ($record | ConvertTo-Json -Depth 100).Replace("`r`n", "`n") + "`n"
+  [IO.File]::WriteAllText($targetState.path, $json, [Text.UTF8Encoding]::new($false))
+  [pscustomobject]@{status='source-bindings-refreshed';target=$Target;build_performed=$false;record_sha256=$record.record_sha256} | ConvertTo-Json
+  return
+}
 $output = if ([IO.Path]::IsPathRooted($OutputRoot)) { [IO.Path]::GetFullPath($OutputRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot)) }
 $buildRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
 $buildPrefix = $buildRoot.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
