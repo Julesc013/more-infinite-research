@@ -106,7 +106,10 @@ function Write-MIRNativeProbeResult {
 }
 
 function New-MIRNativeProbeTargetPackage {
-  param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$RepoRoot)
+  param(
+    [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$RepoRoot,
+    [ValidateSet('F210-TIN-OBS','F210-CURRENT-BA-FINAL-ROUTES-OBSERVER')][string]$CandidatePrefix='F210-TIN-OBS'
+  )
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   $driver=Join-Path $Context.root 'materialize.ps1'
   $receipt=Join-Path $Context.root 'materialized-package.json'
@@ -121,7 +124,7 @@ $record=New-MIR4TargetPackage -RepoRoot $RepoRoot -Target f210 -CandidateId $Can
   $output=[IO.Path]::GetRelativePath($RepoRoot,(Join-Path $Context.root 'packages')).Replace('\','/')
   $run=Invoke-MIRNativeProbeProcess -Context $Context -FilePath (Get-Command pwsh).Source -TimeoutSeconds 180 `
     -Arguments @('-NoProfile','-File',$driver,'-RepoRoot',$RepoRoot,'-OutputRoot',$output,
-      '-CandidateId',('F210-TIN-OBS-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()),'-ReceiptPath',$receipt)
+      '-CandidateId',($CandidatePrefix+'-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()),'-ReceiptPath',$receipt)
   if(-not (Test-Path -LiteralPath $receipt -PathType Leaf)) { throw '[mir-native-probe-package-receipt]' }
   return Get-Content -LiteralPath $receipt -Raw | ConvertFrom-Json -Depth 30
 }

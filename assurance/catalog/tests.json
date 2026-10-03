@@ -1651,6 +1651,11 @@
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1",
+        "fixtures/assert-f210-current-bob-angel-final-routes-observer/info.json",
+        "fixtures/assert-f210-current-bob-angel-final-routes-observer/data-final-fixes.lua",
+        "fixtures/assert-f210-current-bob-angel-final-routes-observer/control.lua",
+        "fixtures/assert-f210-current-bob-angel-final-routes-observer/material-outcome-inventory.lua",
         "tests/runtime/Test-MIRF200BobTinProductionGain.ps1",
         "tests/runtime/Test-MIRA06BobLeadQualification.ps1",
         "tests/runtime/Test-MIRA06BobGoldQualification.ps1",
@@ -7924,5 +7929,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:6a3cc000043bcb4b0580cb7c2a9f3a241027147de8ed46007f42b6140b54bb7d"
+  "digest": "sha256:f5716f91730635431adc6704ba7248ed4c39c6bf1b46af705f5fb84e91ed94b2"
 }
