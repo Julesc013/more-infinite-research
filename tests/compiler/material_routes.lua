@@ -1,6 +1,8 @@
 local records, cached, builds, risks = {}, {}, 0, {}
 local productivity_owners, recipe_unlocks, technologies = {}, {}, {}
 local generated_owners = {}
+local observation_enabled, observation_rows = false, {}
+local planning_input_available = true
 local function stub(name, value) package.loaded[name] = value or {} end
 for _, name in ipairs{"platform.factorio.prototype_lookup","index.item_prototype_facts","core.deepcopy","core.fingerprint","platform.factorio.target_profiles","report.compiler_telemetry","settings.automatic_compiler_policy"} do stub("prototypes.mir." .. name) end
 local function fingerprint_text(value)
@@ -21,13 +23,20 @@ stub("prototypes.mir.core.fingerprint", {of=test_fingerprint})
 stub("prototypes.mir.platform.factorio.target_profiles", {current=function() return {} end})
 stub("prototypes.mir.report.compiler_telemetry", {count=function() end,observe_max=function() end})
 stub("prototypes.mir.settings.automatic_compiler_policy", {current=function() return {apply_changes=true} end})
+stub("prototypes.mir.report.diagnostics_sink", {
+  enabled=function() return observation_enabled end,
+  material_route_certificate=function(row) observation_rows[#observation_rows+1]=row end
+})
 stub("prototypes.mir.index.recipe_risk_facts", {view=function(name) return risks[name] end})
 stub("prototypes.mir.index.relationships", {view=function() return {
   technologies_by_recipe_effect=productivity_owners,
   unlocks_by_recipe=recipe_unlocks
 } end})
 stub("prototypes.mir.platform.factorio.data_raw", {technology=function(name) return technologies[name] end})
-stub("prototypes.mir.domain.facts.generated_technology_registry", {contains=function(name) return generated_owners[name] == true end})
+stub("prototypes.mir.domain.facts.generated_technology_registry", {
+  contains=function(name) return generated_owners[name] ~= nil end,
+  is_stream=function(name) return generated_owners[name]==true or generated_owners[name]=="stream" end
+})
 stub("prototypes.mir.index.recipe_facts", {
   for_each=function(callback)
     builds=builds+1
@@ -43,7 +52,8 @@ stub("prototypes.mir.index.recipe_facts", {
   end
 })
 stub("prototypes.mir.pipeline.compiler_context", {current=function() return {
-  state_view=function(_,name,builder) if not cached[name] then cached[name]=builder() end; return cached[name] end
+  state_view=function(_,name,builder) if not cached[name] and builder then cached[name]=builder() end; return cached[name] end,
+  command_status=function(_,id) return planning_input_available and id=="sanitize-input-technology-effects" and "applied" or nil end
 } end})
 local matcher=require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 local count=0
@@ -447,6 +457,10 @@ local prefix_owner_bindings={
 check(#graph_routes(graph_world(),graph_certificate_value,prefix_owner_bindings)==0,"MIR-like name cannot hide an unregistered indirect owner")
 generated_owners["recipe-prod-foreign-owner"]=true
 check(table.concat(graph_routes(graph_world(),graph_certificate_value,prefix_owner_bindings),",")=="smelting","context-registered generated owner is excluded from the external boundary")
+generated_owners["recipe-prod-foreign-owner"]="base-continuation"
+check(#graph_routes(graph_world(),graph_certificate_value,prefix_owner_bindings)==0,"registered native base continuation remains in the external ownership boundary")
+generated_owners["recipe-prod-foreign-owner"]="base_extension"
+check(#graph_routes(graph_world(),graph_certificate_value,prefix_owner_bindings)==0,"registered native extension remains in the external ownership boundary")
 generated_owners={}
 
 local function indirect_bindings(change, science)
@@ -513,6 +527,33 @@ check(table.concat(graph_routes(graph_world(),legacy_graph_certificate),",")=="s
 check(matcher.relevant_route_fingerprints(records.smelting).schema==1,"existing observer default preserves historical direct-route hash semantics")
 graph_mods.qol="1.0.0"
 check(matcher.relevant_route_fingerprints(records.smelting,99)==nil,"unknown binding schema fails closed")
+
+check(#observation_rows==0,"disabled diagnostics allocate no material contract observations")
+observation_enabled=true
+planning_input_available=false
+graph_routes(graph_world(),legacy_graph_certificate)
+check(#observation_rows==0 and cached.material_route_contract_observations==nil,"fresh observer context cannot manufacture an input-phase record")
+planning_input_available=true
+check(#graph_routes(graph_world(),legacy_graph_certificate)==0,"input observation cannot admit a legacy certificate with an additional mod")
+local observation=observation_rows[1]
+check(#observation_rows==1 and observation.phase=="input" and observation.binding_schema==2 and observation.status=="observed","matching captures an explicitly labelled schema-2 input observation")
+local observed_facts=assert(matcher.relevant_route_fingerprints(records.smelting,2))
+check(observation.bindings_fingerprint==observed_facts.bindings_fingerprint and observation.return_graph_fingerprint==observed_facts.return_graph_fingerprint,"input observation binds the actual active recipe and owner facts")
+records.downstream.variants[1].ingredients[1].amount=11
+local changed_observed_facts=assert(matcher.relevant_route_fingerprints(records.smelting,2))
+check(observation.return_graph_fingerprint~=changed_observed_facts.return_graph_fingerprint,"captured scalar input facts do not drift with later prototype changes")
+matcher.recipes_for_stream({items={"plate"},require_acyclic_process=true,reviewed_forward_routes={smelting=legacy_graph_certificate}},0.02)
+check(#observation_rows==1,"a repeated match captures its input contract once per compiler context")
+cached.material_route_contract_observations={count=255,recipes={},budget_reported=false}
+matcher.recipes_for_stream({items={"plate"},require_acyclic_process=true,reviewed_forward_routes={smelting=legacy_graph_certificate}},0.02)
+check(#observation_rows==2 and observation_rows[2].status=="incomplete" and observation_rows[2].reason=="observation-row-budget","bounded capture reports incomplete observation instead of implying completeness")
+matcher.recipes_for_stream({items={"plate"},require_acyclic_process=true,reviewed_forward_routes={smelting=legacy_graph_certificate}},0.02)
+check(#observation_rows==2,"observation budget marker is emitted only once")
+cached.material_route_contract_observations=nil
+cached.mutation_journal={}
+matcher.recipes_for_stream({items={"plate"},require_acyclic_process=true,reviewed_forward_routes={smelting=legacy_graph_certificate}},0.02)
+check(#observation_rows==2 and cached.material_route_contract_observations==nil,"emission-started context cannot capture a late input-phase record")
+observation_enabled=false
 
 local denied_route=canonical_route("smelting","ore","plate")
 denied_route.declared_allow_productivity=false
@@ -774,5 +815,38 @@ check(historical_risk.risk_fingerprint==typed_item_risk.risk_fingerprint,"actual
 distinct_route.ingredient_identities[1].type=nil
 local malformed_ok,malformed_error=pcall(canonical_risks.index_facts,{names={"smelting"},facts={smelting=distinct_route}},{items={}})
 check(not malformed_ok and string.find(tostring(malformed_error),"canonical typed identities",1,true),"malformed canonical identity input is rejected explicitly before risk admission")
+
+-- Consume a real audit row from the production diagnostics formatter. This
+-- exercises the capture/serialization handoff without retaining a context or
+-- treating diagnostic observation as native execution or route admission.
+package.loaded["prototypes.mir.report.diagnostics_sink"]=nil
+stub("prototypes.mir.emit.icon_builder",{})
+stub("prototypes.mir.core.schema",{})
+stub("prototypes.mir.settings.effective",{get=function(name) return name=="mir-debug-generation-report" and observation_enabled end})
+stub("prototypes.mir.domain.decisions.decision_record",{})
+local audit_lines={}
+log=function(line) audit_lines[#audit_lines+1]=line end
+local actual_diagnostics=require("prototypes.mir.report.diagnostics_sink")
+observation_enabled=true
+actual_diagnostics.material_route_certificate(observation)
+actual_diagnostics.flush()
+local contract_audit
+for _,line in ipairs(audit_lines) do
+  if string.find(line,"[more-infinite-research] audit schema=1 kind=material_route_certificate",1,true) then contract_audit=line end
+end
+check(contract_audit and string.find(contract_audit,"binding_schema=2",1,true) and string.find(contract_audit,"phase=input",1,true),"real diagnostics preserve input phase and binding schema in their audit protocol")
+check(string.find(contract_audit,"bindings_fingerprint="..observation.bindings_fingerprint,1,true) and string.find(contract_audit,"return_graph_fingerprint="..observation.return_graph_fingerprint,1,true),"real diagnostics preserve the exact captured fingerprints")
+print("MIR-CONTROLLED-MATERIAL-AUDIT "..contract_audit)
+
+package.loaded["prototypes.mir.domain.facts.generated_technology_registry"]=nil
+local actual_generated_registry=require("prototypes.mir.domain.facts.generated_technology_registry")
+check(not actual_generated_registry.is_stream("missing"),"unregistered owner has no stream authority")
+for _,kind in ipairs({"stream","base-continuation","base_extension"}) do
+  actual_generated_registry.register("controlled-"..kind,{kind=kind})
+  check(actual_generated_registry.contains("controlled-"..kind),"actual registry retains "..kind)
+  check(actual_generated_registry.is_stream("controlled-"..kind)==(kind=="stream"),"actual registry distinguishes "..kind.." ownership")
+end
+actual_generated_registry.register("controlled-unclassified")
+check(not actual_generated_registry.is_stream("controlled-unclassified"),"registration alone has no stream authority")
 
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

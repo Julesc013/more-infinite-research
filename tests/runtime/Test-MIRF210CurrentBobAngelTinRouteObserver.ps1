@@ -5,7 +5,9 @@ param(
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot='C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-ba-20260930',
   [string]$OutputRoot='build/tests/f210-ba-tin-observer',
-  [switch]$PrepareOnly
+  [switch]$PrepareOnly,
+  [string]$AuditLogPath='',
+  [string[]]$ExpectedInputRecipes=@('angels-plate-tin','angels-plate-tin-2')
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
@@ -17,6 +19,31 @@ function Get-ObserverSha([string]$Path) { (Get-FileHash -LiteralPath $Path -Algo
 function Get-ObserverArtifact([string]$Path) {
   $item=Get-Item -LiteralPath $Path -ErrorAction Stop
   [ordered]@{path=$item.FullName;bytes=[int64]$item.Length;sha256=Get-ObserverSha $item.FullName}
+}
+function Get-ObserverInputContracts {
+  param([AllowEmptyCollection()][object[]]$AuditRows,[string[]]$ExpectedRecipes)
+  Assert-Observer ($ExpectedRecipes.Count -gt 0 -and @($ExpectedRecipes | Sort-Object -Unique).Count -eq $ExpectedRecipes.Count) 'expected input recipes must be nonempty and unique.'
+  $rows=@($AuditRows | Where-Object { $_.PSObject.Properties['kind'] -and $_.kind -ceq 'material_route_certificate' })
+  Assert-Observer (@($rows | Where-Object { $_.PSObject.Properties['status'] -and $_.status -ceq 'incomplete' }).Count -eq 0) 'input capture is incomplete.'
+  foreach($recipe in $ExpectedRecipes | Sort-Object) {
+    $matches=@($rows | Where-Object { $_.PSObject.Properties['recipe'] -and $_.recipe -ceq $recipe })
+    Assert-Observer ($matches.Count -eq 1) "expected one input contract for $recipe; got $($matches.Count)."
+    $row=$matches[0]
+    foreach($field in @('schema','binding_schema','phase','status','canonical_risk_fingerprint','return_graph_fingerprint','bindings_fingerprint','reachable_identity_count','relevant_recipe_count','direct_output_producer_count')) {
+      Assert-Observer ($null -ne $row.PSObject.Properties[$field]) "missing input field $field for $recipe."
+    }
+    Assert-Observer ($row.schema -ceq '1' -and $row.binding_schema -ceq '2' -and $row.phase -ceq 'input' -and $row.status -ceq 'observed') "wrong input phase, binding schema or status for $recipe."
+    foreach($field in @('canonical_risk_fingerprint','return_graph_fingerprint','bindings_fingerprint')) {
+      Assert-Observer ([string]$row.$field -cmatch '^mir32-[0-9a-f]{8}$') "invalid input fingerprint $field for $recipe."
+    }
+    $counts=@{}
+    foreach($field in @('reachable_identity_count','relevant_recipe_count','direct_output_producer_count')) {
+      $number=0
+      Assert-Observer ([int]::TryParse([string]$row.$field,[ref]$number) -and $number -gt 0) "invalid input count $field for $recipe."
+      $counts[$field]=$number
+    }
+    [pscustomobject][ordered]@{schema=2;recipe=$recipe;phase='input';canonical_risk_fingerprint=[string]$row.canonical_risk_fingerprint;return_graph_fingerprint=[string]$row.return_graph_fingerprint;bindings_fingerprint=[string]$row.bindings_fingerprint;reachable_identity_count=$counts.reachable_identity_count;relevant_recipe_count=$counts.relevant_recipe_count;direct_output_producer_count=$counts.direct_output_producer_count}
+  }
 }
 function Parse-ObserverRoute([string]$Line) {
   $match=[regex]::Match($Line,'recipe=(?<recipe>[^\s]+) generic=(?<generic>true|false) reason=(?<reason>[^\s]+) source=(?<source>[^\s]+) hidden=(?<hidden>true|false) declared_productivity=(?<declared>true|false) effective_productivity=(?<effective>true|false) maximum_productivity=(?<maximum>[^\s]+) risk=(?<risk>mir32-[0-9a-f]{8}) graph=(?<graph>mir32-[0-9a-f]{8}) bindings=(?<bindings>mir32-[0-9a-f]{8}) identities=(?<identities>[0-9]+) recipes=(?<recipes>[0-9]+) producers=(?<producers>[0-9]+) inputs=(?<inputs>[^\s]+) results=(?<results>[^\s]+)')
@@ -33,6 +60,13 @@ function Parse-ObserverRoute([string]$Line) {
 }
 
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/compatibility/DiagnosticsParser.ps1')
+if($AuditLogPath) {
+  $auditPath=(Resolve-Path -LiteralPath $AuditLogPath).Path
+  $contracts=@(Get-ObserverInputContracts -AuditRows @(Read-MIRAuditLog -Path $auditPath) -ExpectedRecipes $ExpectedInputRecipes)
+  [ordered]@{schema=1;kind='MIR4MaterialRouteInputObservationReadbackV1';status='observed';scope='Diagnostic input-record readback only; no route admission or native qualification.';audit=Get-ObserverArtifact $auditPath;input_contracts=$contracts} | ConvertTo-Json -Depth 8
+  return
+}
 $stage=(Resolve-Path -LiteralPath $ExactStageRoot).Path
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
 Assert-Observer $output.StartsWith((Join-Path $repo 'build')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) 'output root must be inside build.'
@@ -40,7 +74,7 @@ Assert-Observer $output.StartsWith((Join-Path $repo 'build')+[IO.Path]::Director
 $sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- source)
 Assert-Observer ($sourceChanges.Count -eq 0) "refuses changed package source: $($sourceChanges -join '; ')"
 $fixture=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-tin-route-observer'
-foreach($path in @($fixture,(Join-Path $fixture 'info.json'),(Join-Path $fixture 'data-final-fixes.lua'),(Join-Path $fixture 'control.lua'))) { Assert-Observer (Test-Path -LiteralPath $path) "fixture path absent: $path" }
+foreach($path in @($fixture,(Join-Path $fixture 'info.json'),(Join-Path $fixture 'settings-updates.lua'),(Join-Path $fixture 'data-final-fixes.lua'),(Join-Path $fixture 'control.lua'))) { Assert-Observer (Test-Path -LiteralPath $path) "fixture path absent: $path" }
 $receiptPath=Join-Path $stage 'result.json'
 $receipt=Get-Content -LiteralPath $receiptPath -Raw | ConvertFrom-Json
 Assert-Observer ([string]$receipt.engine_sha256 -ceq 'E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92') 'exact stage engine hash differs.'
@@ -67,10 +101,10 @@ foreach($entry in $expectedArchives.GetEnumerator()) {
 }
 
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
-$candidate=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('F210-CURRENT-BA-TIN-OBSERVER-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/tests/mir42-f210-current-ba-tin-route-observer/packages'
+$candidate=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('F210-CURRENT-BA-TIN-OBSERVER-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.1' -DistributionVersion '4.2.21001' -OutputRoot 'build/tests/mir42-f210-current-ba-tin-route-observer/packages'
 $candidateZip=(Resolve-Path -LiteralPath ([string]$candidate.archive_path)).Path
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
-$prepared=[ordered]@{schema=1;kind='MIR4F210CurrentBobAngelTinRouteObservationV1';status='prepared';scope='Read-only current 2.1.20 exact Bob/Angel Tin return-graph contract capture; no route admission or gameplay mutation.';source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-ObserverSha (Join-Path $repo 'source/package-source.json')};exact_stage=[ordered]@{path=$stage;engine_sha256=[string]$receipt.engine_sha256;candidate_sha256=[string]$receipt.candidate_sha256;save_sha256=[string]$receipt.save_sha256;archives=$expectedArchives};candidate=Get-ObserverArtifact $candidateZip;fixture=@('info.json','data-final-fixes.lua','control.lua'|ForEach-Object{Get-ObserverArtifact (Join-Path $fixture $_)});harness=Get-ObserverArtifact $PSCommandPath;non_claims=@('No productivity route is admitted by this observer.','No progression, balance, compatibility or release claim is made.','The prior 2.1.17 combined-Tin diagnostic remains a separate lock.')}
+$prepared=[ordered]@{schema=1;kind='MIR4F210CurrentBobAngelTinRouteObservationV1';status='prepared';scope='Current 2.1.20 exact Bob/Angel Tin contract capture with diagnostic setting enabled; no route admission or gameplay mutation.';source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-ObserverSha (Join-Path $repo 'source/package-source.json')};exact_stage=[ordered]@{path=$stage;engine_sha256=[string]$receipt.engine_sha256;candidate_sha256=[string]$receipt.candidate_sha256;save_sha256=[string]$receipt.save_sha256;archives=$expectedArchives};candidate=Get-ObserverArtifact $candidateZip;fixture=@('info.json','settings-updates.lua','data-final-fixes.lua','control.lua'|ForEach-Object{Get-ObserverArtifact (Join-Path $fixture $_)});harness=Get-ObserverArtifact $PSCommandPath;non_claims=@('No productivity route is admitted by this observer.','No progression, balance, compatibility or release claim is made.','The prior 2.1.17 combined-Tin diagnostic remains a separate lock.')}
 if($PrepareOnly) {$prepared|ConvertTo-Json -Depth 12;return}
 
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
@@ -92,6 +126,7 @@ $process=[Diagnostics.Process]::Start($start)
 try {$stdout=$process.StandardOutput.ReadToEndAsync();$stderr=$process.StandardError.ReadToEndAsync();if(-not $process.WaitForExit(120000)){$process.Kill($true);throw "observer engine timed out: $run"};$engineText=$stdout.GetAwaiter().GetResult()+$stderr.GetAwaiter().GetResult();[IO.File]::WriteAllText((Join-Path $run 'engine.log'),$engineText,[Text.UTF8Encoding]::new($false));if($process.ExitCode -ne 0){throw "observer engine failed: $run`n$($engineText.Substring([Math]::Max(0,$engineText.Length-2500)))"}}finally{$process.Dispose()}
 $factorioLog=Join-Path $userdata 'factorio-current.log';Assert-Observer (Test-Path -LiteralPath $factorioLog -PathType Leaf) 'Factorio log absent.'
 $logText=Get-Content -LiteralPath $factorioLog -Raw
+$prepared['input_contracts']=@(Get-ObserverInputContracts -AuditRows @(Read-MIRAuditLog -Path $factorioLog) -ExpectedRecipes $ExpectedInputRecipes)
 Assert-Observer ($logText.Contains('[mir-f210-current-ba-tin-observer] DATA PASS read-only-finalized-contract-capture')) 'data completion marker absent.'
 Assert-Observer ($logText.Contains('[mir-f210-current-ba-tin-observer] RUNTIME PASS observer-has-no-gameplay-mutation')) 'runtime completion marker absent.'
 $active=@([regex]::Matches($logText,'\[mir-f210-current-ba-tin-observer\] ACTIVE_MODS (?<mods>[^\r\n]+)'))

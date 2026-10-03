@@ -24,7 +24,7 @@
     {"name":"compatibility","prefix":"prototypes/mir/compatibility/"}
   ],
   "allowed_edges": [
-    "capabilities->compatibility","capabilities->core","capabilities->families","capabilities->graph","capabilities->index","capabilities->pipeline","capabilities->platform","capabilities->policy","capabilities->report","capabilities->settings","capabilities->streams",
+    "capabilities->compatibility","capabilities->core","capabilities->domain","capabilities->families","capabilities->graph","capabilities->index","capabilities->pipeline","capabilities->platform","capabilities->policy","capabilities->report","capabilities->settings","capabilities->streams",
     "compatibility->core","compatibility->domain","compatibility->index","compatibility->pipeline","compatibility->platform","compatibility->report",
     "domain->core","domain->index","domain->integrity","domain->pipeline",
     "emit->core","emit->domain","emit->graph","emit->integrity","emit->pipeline","emit->planner","emit->platform","emit->presentation","emit->report",

@@ -874,6 +874,7 @@
         "source:source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
         "source:source/prototypes/streams/productivity.lua",
         "source:source/prototypes/mir/domain/facts/generated_technology_registry.lua",
+        "source:source/prototypes/mir/report/diagnostics_sink.lua",
         "source:source/prototypes/mir/families/material_progression.lua",
         "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/prototypes/mir/index/recipe_risk_facts.lua",
@@ -1540,6 +1541,9 @@
         ".mir/research-cost-contract-3.2.5.json",
         "fixtures/assert-compiler-contracts/**",
         "tests/compiler/Test-MIRCompiler.ps1",
+        "tests/compiler/Test-MIRMaterialRouteObservationReader.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
+        "tools/lib/compatibility/DiagnosticsParser.ps1",
         "tests/compiler/Test-MIRResearchCostModels.ps1",
         "tests/architecture/Test-MIRModuleDependencies.ps1",
         "tests/compiler/Test-MIRCompilerContractCoverage.ps1",
@@ -7905,5 +7909,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e46038ec447181fc8bc01f8c2db944ab9c2e11852a51f44a30b998f3c0101057"
+  "digest": "sha256:8189a5827b2b0439588972dcffac0f619ee8bfd39b6640097126aa04f5c8841c"
 }

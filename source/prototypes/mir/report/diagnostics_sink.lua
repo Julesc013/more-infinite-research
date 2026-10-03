@@ -87,6 +87,10 @@ function D.recipe_cap(row)
   append("recipe_cap", row)
 end
 
+function D.material_route_certificate(row)
+  append("material_route_certificate", row)
+end
+
 function D.fact_registry(row)
   append("fact_registry", row)
 end

@@ -21,6 +21,13 @@ function M.get(name)
   return entries()[name]
 end
 
+-- Native continuations and base extensions retain native ownership even when
+-- MIR registers their emission. Only a dedicated stream is a MIR replacement.
+function M.is_stream(name)
+  local entry = M.get(name)
+  return entry ~= nil and entry.kind == "stream"
+end
+
 function M.sorted_names(options)
   options = options or {}
   local out = {}

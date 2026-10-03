@@ -11,6 +11,7 @@ local automatic_compiler_policy = require("prototypes.mir.settings.automatic_com
 local relationships = require("prototypes.mir.index.relationships")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
+local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 
 local R = {}
 
@@ -277,7 +278,7 @@ local function relevant_cone_bindings(recipe, boundary)
     local owners, unlocks = {}, {}
     for _, name in ipairs((index.technologies_by_recipe_effect or {})[recipe_name] or {}) do
       if type(name) ~= "string" or name == "" then return nil, "owner-identity" end
-      if not generated_registry.contains(name) then
+      if not generated_registry.is_stream(name) then
         local technology = data_raw.technology(name)
         if type(technology) ~= "table" then return nil, "owner" end
         local changes = {}
@@ -356,6 +357,44 @@ function R.relevant_route_fingerprints(recipe, schema)
     relevant_recipe_count = #boundary.facts,
     direct_output_producer_count = #boundary.direct_output_producers
   }
+end
+
+-- Capture while matching still reads the real compiler input. Observers must
+-- not reconstruct this phase from post-emission prototypes or retained contexts.
+-- Scalar-only audit rows use the existing opt-in diagnostics channel.
+local function observe_route_contract(recipe)
+  if not diagnostics.enabled() then return end
+  local context = compiler_context.current()
+  -- A fresh finalized observer context cannot manufacture input-phase proof.
+  -- Pipeline input sanitation precedes selection; the journal starts emission.
+  if context:command_status("sanitize-input-technology-effects") ~= "applied"
+    or context:state_view("mutation_journal") ~= nil then return end
+  local observations = context:state_view("material_route_contract_observations", function()
+    return {count = 0, recipes = {}, budget_reported = false}
+  end)
+  if observations.recipes[recipe.name] then return end
+  -- Reserve one row for an explicit incomplete-capture marker.
+  if observations.count >= 255 then
+    if not observations.budget_reported then
+      diagnostics.material_route_certificate({phase = "input", binding_schema = 2,
+        status = "incomplete", reason = "observation-row-budget", observed_route_count = observations.count})
+      observations.budget_reported = true
+    end
+    return
+  end
+  local contract, reason = R.relevant_route_fingerprints(recipe, 2)
+  local row = {recipe = recipe.name, phase = "input", binding_schema = 2,
+    status = contract and "observed" or "unavailable", reason = reason}
+  if contract then
+    for field, value in pairs(contract) do
+      if field ~= "schema" then row[field] = value end
+    end
+    local risk = recipe_risk_facts.view(recipe.name)
+    row.canonical_risk_fingerprint = risk and risk.risk_fingerprint
+  end
+  observations.recipes[recipe.name] = true
+  observations.count = observations.count + 1
+  diagnostics.material_route_certificate(row)
 end
 
 function R.material_route_is_acyclic(recipe)
@@ -764,6 +803,7 @@ function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, ru
 end
 local function should_skip_recipe(recipe_name, recipe, options)
   local certificate = options.reviewed_forward_routes and options.reviewed_forward_routes[recipe_name]
+  if type(certificate) == "table" then observe_route_contract(recipe) end
   local certificate_required = options.require_exact_route_certificate == true
     or (type(certificate) == "table" and certificate.require_exact_route_certificate == true)
   local certificate_admitted, certificate_reason = false, "certificate-not-required"
