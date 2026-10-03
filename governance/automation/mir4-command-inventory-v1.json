@@ -3259,9 +3259,9 @@
     {
       "path": "tools/commands/release/Test-MIRGitHubAdministration.ps1",
       "classification": "canonical-internal",
-      "sha256": "4DA855E82F7F4F94B3BA79532E3CE9618A7F7C650557627CB5931F69939B3DB1",
+      "sha256": "01C4E8214F219253B1E16F4F815C6329E2FC556186746D8387D71FDCF417390A",
       "hash_mode": "canonical-text-v1",
-      "lines": 191,
+      "lines": 214,
       "package_visible": false
     },
     {
@@ -4459,9 +4459,9 @@
     {
       "path": "tools/lib/validation/MIR4DistributionIdentity.ps1",
       "classification": "canonical-internal",
-      "sha256": "53C281ADFF67445D0CB73C3F6F773689962E37768BAD2F9A2C4209B79327BBFA",
+      "sha256": "BF546156C8D52A3F8C35ABBF7E10FA6D4ACE4C83C8C5FBFC49916066DA31846C",
       "hash_mode": "canonical-text-v1",
-      "lines": 355,
+      "lines": 383,
       "package_visible": false
     },
     {
@@ -6010,5 +6010,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7cced2225659cf3dbb83f3ab0e3402fe7c2760d3d7af1ad47ae5cb58e6d9e417"
+  "digest": "sha256:c0eda9a85b8d2d0d52fd31c6b640b9390051ded9c9569409d356d25095fea709"
 }

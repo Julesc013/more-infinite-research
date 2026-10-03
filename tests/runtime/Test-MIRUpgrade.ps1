@@ -27,17 +27,15 @@ $ErrorActionPreference = "Stop"
 function Resolve-MIRUpgradeManifestVersion {
   param([Parameter(Mandatory)][string]$ManifestPath,[Parameter(Mandatory)][string]$CandidatePath,[string]$Target='')
   $manifest=Get-Content -Raw -LiteralPath $ManifestPath | ConvertFrom-Json -Depth 100
-  if ($manifest.kind -cne 'MIR42FinalReleaseManifestV1' -or $manifest.source_tag -notmatch '^v4[.](?<minor>[0-9]+)[.](?<patch>[0-9]{1,2})$') {
-    throw '[mir-upgrade-manifest-source] Expected a selected MIR release manifest.'
-  }
-  $minor=[int]$Matches.minor; $patch=[int]$Matches.patch
+  . (Join-Path $RepoRoot 'tools/lib/validation/MIR4DistributionIdentity.ps1')
+  $sourceVersion=Get-MIR4FinalManifestSourceVersion -Manifest $manifest
+  $parts=$sourceVersion.Split('.');$minor=[int]$parts[1];$patch=[int]$parts[2]
   $filename=Split-Path -Leaf $CandidatePath
   $rows=@($manifest.targets | Where-Object { $_.filename -ceq $filename -and (-not $Target -or $_.target -ceq $Target) })
   if ($rows.Count -ne 1) { throw '[mir-upgrade-manifest-target] Candidate must match exactly one selected target.' }
   $row=$rows[0]
   if ($row.target -notmatch '^f(?<code>210|200|110|100|017|016|015|014|013)$') { throw '[mir-upgrade-manifest-target]' }
   $code=[string]$Matches.code
-  . (Join-Path $RepoRoot 'tools/lib/validation/MIR4DistributionIdentity.ps1')
   $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $minor -SourcePatch $patch -DistributionVersion ([string]$row.distribution_version)
   if ($identity.package_name -cne $filename -or (Get-FileHash -LiteralPath $CandidatePath -Algorithm SHA256).Hash -cne $row.sha256) {
     throw '[mir-upgrade-manifest-package-hash] Candidate identity or hash differs from the selected manifest.'

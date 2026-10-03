@@ -12,21 +12,21 @@ MIR 4.0 established the shared product line. **[MIR 4.1.0 was published](https:/
 
 ### MIR 4.2: choose the right target
 
-**The corrected MIR 4.2.0 community hotfix is prepared; GitHub publication is blocked.** GitHub rejected recreating `v4.2.0` after the earlier immutable final release was withdrawn. The corrected source includes the ownership, weapon-overlap `off`, science-snapshot and serialization repairs implemented after RC1, plus Space Is Fake science retirement, visible breeding controls without Space Age, and the requested AAI/SE/SolarMatrix/Accumulator-V2 equipment-manufacturing coverage. The exact source, ZIPs, checksums and Portal copy are delivered through `dist/LATEST-MIR42-FINAL-CANDIDATE.txt`. Native final-package, save-upgrade, full client/multiplayer and performance checks remain NOT RUN. Complete overhaul compatibility and completion of the remaining programme are not claimed.
+**[MIR 4.2.0 is published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0-stable)** as a final, mutable release under the one-time authorized tag `v4.2.0-stable`. All twelve assets passed anonymous SHA-256 verification. The corrected source includes the ownership, weapon-overlap `off`, science-snapshot and serialization repairs implemented after RC1, plus Space Is Fake science retirement, visible breeding controls without Space Age, and the requested AAI/SE/SolarMatrix/Accumulator-V2 equipment-manufacturing coverage. The exact source, ZIPs, checksums and Portal copy are delivered through `dist/LATEST-MIR42-PUBLISHED.txt`. Native final-package, save-upgrade, full client/multiplayer and performance checks remain NOT RUN. Complete overhaul compatibility and completion of the remaining programme are not claimed.
 
 | Product | Factorio line | Distribution version |
 | --- | --- | --- |
-| F210 | 2.1 experimental | `4.2.21000` — local handoff; publication pending |
-| F200 | 2.0 | `4.2.20000` — local handoff; publication pending |
-| F110 | 1.1 | `4.2.11000` — local handoff; publication pending |
-| F100 | 1.0 | `4.2.10000` — local handoff; publication pending |
-| F017 | 0.17 | `4.2.01700` — local handoff; publication pending |
-| F016 | 0.16 | `4.2.01600` — local handoff; publication pending |
-| F015 | 0.15 | `4.2.01500` — local handoff; publication pending |
-| F014 | 0.14 | `4.2.01400` — local handoff; publication pending |
-| F013 | 0.13 | `4.2.01300` — local handoff; publication pending |
+| F210 | 2.1 experimental | [4.2.21000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.21000.zip) |
+| F200 | 2.0 | [4.2.20000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.20000.zip) |
+| F110 | 1.1 | [4.2.11000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.11000.zip) |
+| F100 | 1.0 | [4.2.10000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.10000.zip) |
+| F017 | 0.17 | [4.2.01700](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01700.zip) |
+| F016 | 0.16 | [4.2.01600](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01600.zip) |
+| F015 | 0.15 | [4.2.01500](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01500.zip) |
+| F014 | 0.14 | [4.2.01400](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01400.zip) |
+| F013 | 0.13 | [4.2.01300](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01300.zip) |
 
-The version contract is `100 × target code + source patch`, padded to five digits: source `v4.2.0` uses `4.2.CCC00`; source `v4.2.1` uses `4.2.CCC01`. The earlier source/distribution exception is withdrawn. RC1 remains historical; its same-version installations need manual ZIP replacement using the corrected checksum. Withdrawn `CCC01` installations also need explicit manual replacement; no automatic downgrade is promised. Preserve original saves, select the same Factorio line and keep startup settings unchanged for the first load. Same-version replacement does not guarantee that version-gated migrations rerun. Tags are unsigned. After verified GitHub publication, the maintainer will upload these identical ZIPs from F210 through F013 at six-hour elapsed intervals.
+The version contract is `100 × target code + source patch`, padded to five digits: source `v4.2.0` uses `4.2.CCC00`; source `v4.2.1` uses `4.2.CCC01`. The earlier source/distribution exception is withdrawn. Only this publication uses `v4.2.0-stable`; source version remains 4.2.0, and future final tags return to `vMAJOR.MINOR.PATCH`. Release immutability remains disabled. RC1 remains historical; its same-version installations need manual ZIP replacement using the corrected checksum. Withdrawn `CCC01` installations also need explicit manual replacement; no automatic downgrade is promised. Preserve original saves, select the same Factorio line and keep startup settings unchanged for the first load. Same-version replacement does not guarantee that version-gated migrations rerun. Tags are unsigned. The maintainer will upload these identical ZIPs from F210 through F013 at six-hour elapsed intervals.
 
 ### MIR 4.1: previous qualified release
 

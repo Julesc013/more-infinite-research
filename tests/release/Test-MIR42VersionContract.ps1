@@ -30,4 +30,28 @@ foreach ($code in @('210','200','110','100','017','016','015','014','013')) {
     $assertions++
   }
 }
-[pscustomobject]@{status='passed';targets=9;assertions=$assertions;source_4_2_0_suffix='00';source_4_2_1_suffix='01';mismatched_source_patch_rejected=$true;historical_leading_zero_retained=$true} | ConvertTo-Json
+foreach ($tag in @('v4.2.0','v4.2.1')) {
+  $manifest=[pscustomobject]@{kind='MIR42FinalReleaseManifestV1';source_tag=$tag}
+  if ((Get-MIR4FinalManifestSourceVersion $manifest) -cne $tag.Substring(1)) { throw '[mir42-canonical-source-tag]' }
+  $assertions++
+}
+$stableJson='{"kind":"MIR42FinalReleaseManifestV1","source_tag":"v4.2.0-stable","canonical_source_tag":"v4.2.0","source":{"commit":"6d19c874ea7d026d297865b96aa1b2b0916e9e61"},"source_tag_exception":{"tag":"v4.2.0-stable","scope":"this 4.2.0 publication only","changes_numeric_version":false},"version_contract":{"source_version":"4.2.0","source_patch":0}}'
+$stable=$stableJson|ConvertFrom-Json
+if ((Get-MIR4FinalManifestSourceVersion $stable) -cne '4.2.0') { throw '[mir42-stable-tag-numeric-version]' }
+$assertions++
+foreach ($case in @('different-source','different-patch','numeric-exception','future-stable-tag','rc-final-tag','noncanonical-patch')) {
+  $probe=$stableJson|ConvertFrom-Json
+  switch ($case) {
+    'different-source' {$probe.source.commit='0'*40}
+    'different-patch' {$probe.version_contract.source_patch=1}
+    'numeric-exception' {$probe.source_tag_exception.changes_numeric_version=$true}
+    'future-stable-tag' {$probe.source_tag='v4.2.1-stable'}
+    'rc-final-tag' {$probe.source_tag='v4.2.0-rc.1'}
+    'noncanonical-patch' {$probe.source_tag='v4.2.00'}
+  }
+  $rejected=$false
+  try {Get-MIR4FinalManifestSourceVersion $probe|Out-Null} catch {$rejected=$_.Exception.Message.StartsWith('[mir4-release-source-version]')}
+  if (-not $rejected) { throw "[mir42-stable-tag-exception-widened] $case" }
+  $assertions++
+}
+[pscustomobject]@{status='passed';targets=9;assertions=$assertions;source_4_2_0_suffix='00';source_4_2_1_suffix='01';mismatched_source_patch_rejected=$true;historical_leading_zero_retained=$true;one_time_source_tag_bound=$true} | ConvertTo-Json

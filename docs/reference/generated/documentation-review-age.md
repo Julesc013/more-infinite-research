@@ -285,7 +285,7 @@ Ages are measured against the newest governed review date, 2026-10-04, so checko
 | docs/reference/schemas/technology-lifecycle.md | current | 2026-08-03 | 62 | current-window |
 | docs/reference/settings-reference.md | archived | 2026-07-07 | 89 | current-window |
 | docs/reference/settings.md | current | 2026-08-03 | 62 | current-window |
-| docs/RELEASE-RUNBOOK.md | current | 2026-09-16 | 18 | current-window |
+| docs/RELEASE-RUNBOOK.md | current | 2026-10-04 | 0 | current-window |
 | docs/releases/0.x-factorio-version-metadata-correction.md | current | 2026-07-16 | 80 | current-window |
 | docs/releases/3.2.1-emergency-build-trigger.md | historical-checkpoint | 2026-07-26 | 70 | current-window |
 | docs/releases/3.2.2-to-3.2.3-repository-change-report.md | current | 2026-07-31 | 65 | current-window |
