@@ -6,24 +6,28 @@ param(
   [ValidateSet('2.0','2.1')]
   [string]$ExpectedFactorioLine='2.1',
   [string]$ExpectedEngineSha256='',
-  [string]$OutputRoot='build/tests/material-routes'
+  [string]$OutputRoot='build/p/material-routes',
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
+$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $gitHeadAtStart=(& git -C $repo rev-parse HEAD).Trim()
 if($LASTEXITCODE -ne 0){throw 'Unable to resolve the tested Git head.'}
 $trackedStatusAtStart=@(& git -C $repo status --short --untracked-files=no)
 if($LASTEXITCODE -ne 0){throw 'Unable to inspect tracked inputs before the material-route regression.'}
-$output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
-if(-not $output.StartsWith((Join-Path $repo 'build')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw 'Test outputs must be under build.' }
-$run=Join-Path $output ([guid]::NewGuid().ToString('N'))
+$run=$resources.root
 $mod=Join-Path $run 'mods/mir-material-routes-test_1.0.0'
 New-Item -ItemType Directory -Force -Path $mod,(Join-Path $run 'userdata') | Out-Null
-$version=(& $engine --version | Out-String)
+$versionRun=Invoke-MIRNativeProbeProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 30
+$version=Get-Content -LiteralPath $versionRun.stdout -Raw
 $engineSha256=(Get-FileHash -LiteralPath $engine -Algorithm SHA256).Hash
-if($LASTEXITCODE -ne 0 -or $version -notmatch ('Version: '+[regex]::Escape($ExpectedFactorioLine)+'[.]')) { throw "This material-route regression requires a Factorio $ExpectedFactorioLine engine." }
+if($version -notmatch ('Version: '+[regex]::Escape($ExpectedFactorioLine)+'[.]')) { throw "This material-route regression requires a Factorio $ExpectedFactorioLine engine." }
 if(-not [string]::IsNullOrWhiteSpace($ExpectedEngineSha256) -and $engineSha256 -cne $ExpectedEngineSha256) { throw "This material-route regression requires exact engine SHA-256 $ExpectedEngineSha256." }
 $modules=[ordered]@{
  'prototypes.mir.capabilities.recipe_productivity.recipe_matching'='source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua'
@@ -56,25 +60,17 @@ $testPath=Join-Path $repo 'tests/compiler/material_routes.lua'
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
 $config="[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n"
 [IO.File]::WriteAllText((Join-Path $run 'config.ini'),$config,[Text.UTF8Encoding]::new($false))
-$start=[Diagnostics.ProcessStartInfo]::new($engine)
-$start.UseShellExecute=$false
-$start.CreateNoWindow=$true
-$start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
-foreach($argument in @('--config',(Join-Path $run 'config.ini'),'--mod-directory',(Join-Path $run 'mods'),'--create',(Join-Path $run 'probe.zip'))) { $start.ArgumentList.Add($argument) }
-$process=[Diagnostics.Process]::Start($start)
-try {
- if(-not $process.WaitForExit(60000)) { $process.Kill($true); throw "Material route regression timed out: $run" }
- $exitCode=$process.ExitCode
-} finally { $process.Dispose() }
+$engineRun=Invoke-MIRNativeProbeProcess -Context $resources -FilePath $engine -TimeoutSeconds 120 `
+ -Arguments @('--config',(Join-Path $run 'config.ini'),'--no-log-rotation','--disable-audio','--mod-directory',(Join-Path $run 'mods'),'--create',(Join-Path $run 'probe.zip'))
 $nativeLog=Join-Path $run 'userdata/factorio-current.log'
 $log=Get-Content -Raw -LiteralPath $nativeLog
-[IO.File]::WriteAllText((Join-Path $run 'stdout.txt'),$log,[Text.UTF8Encoding]::new($false))
-if($exitCode -ne 0 -or $log -notmatch 'MIR-MATERIAL-ROUTES-PASS ([0-9]+)') { throw "Material route regression failed: $nativeLog" }
+$completion=[regex]::Match($log,'MIR-MATERIAL-ROUTES-PASS ([0-9]+)')
+if(-not $completion.Success) { throw "Material route regression failed: $nativeLog" }
 $gitHeadAtEnd=(& git -C $repo rev-parse HEAD).Trim()
 if($LASTEXITCODE -ne 0){throw 'Unable to resolve the tested Git head after the material-route regression.'}
 $trackedStatusAtEnd=@(& git -C $repo status --short --untracked-files=no)
 if($LASTEXITCODE -ne 0){throw 'Unable to inspect tracked inputs after the material-route regression.'}
 $trackedInputsClean=($trackedStatusAtStart.Count -eq 0 -and $trackedStatusAtEnd.Count -eq 0 -and $gitHeadAtStart -ceq $gitHeadAtEnd)
-$receipt=[ordered]@{status='passed';scope='controlled-material-process-guard-not-whole-ecosystem-proof';assertions=[int]$Matches[1];engine_line=$ExpectedFactorioLine;engine_version=$version.Trim();engine_sha256=$engineSha256;harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash;test_sha256=(Get-FileHash -LiteralPath $testPath -Algorithm SHA256).Hash;modules=$identities;log_sha256=(Get-FileHash -LiteralPath (Join-Path $run 'stdout.txt') -Algorithm SHA256).Hash;evidence_binding=[ordered]@{git_head=$gitHeadAtEnd;tracked_inputs_clean=$trackedInputsClean;reusable_for_exact_head=$trackedInputsClean}}
-$receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $run 'result.json') -Encoding utf8
+$receipt=[ordered]@{status='passed';scope='controlled-material-process-guard-not-whole-ecosystem-proof';assertions=[int]$completion.Groups[1].Value;engine_line=$ExpectedFactorioLine;engine_version=$version.Trim();engine_sha256=$engineSha256;harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash;test_sha256=(Get-FileHash -LiteralPath $testPath -Algorithm SHA256).Hash;modules=$identities;log_sha256=(Get-FileHash -LiteralPath $nativeLog -Algorithm SHA256).Hash;resource_runs=$resources.runs.ToArray();resource_policy=[ordered]@{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'};evidence_binding=[ordered]@{git_head=$gitHeadAtEnd;tracked_inputs_clean=$trackedInputsClean;reusable_for_exact_head=$trackedInputsClean}}
+Write-MIRNativeProbeResult -Context $resources -Record $receipt
 $receipt | ConvertTo-Json -Depth 6

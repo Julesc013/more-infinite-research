@@ -240,9 +240,11 @@ function New-MIRImmutableInputLease {
     [Parameter(Mandatory)][string]$StageDirectory,
     [Parameter(Mandatory)][object[]]$Inputs,
     [ValidateRange(0, [long]::MaxValue)][long]$CopyReserveBytes = 536870912,
-    [switch]$ForceCopy
+    [switch]$ForceCopy,
+    [switch]$RequireHardLinks
   )
 
+  if ($RequireHardLinks -and $ForceCopy) { throw 'Strict immutable staging cannot request copy mode.' }
   $runRoot = (Resolve-Path -LiteralPath $RunRoot).Path
   Assert-MIRImmutableInputDirectory -Path $runRoot -Context 'Immutable input run root'
   $stageDirectory = Assert-MIRImmutableInputPathWithin -Path $StageDirectory -Root $runRoot -Context 'Immutable input stage directory'
@@ -273,6 +275,7 @@ function New-MIRImmutableInputLease {
     copy_reserve_bytes = $CopyReserveBytes
     inputs = @()
   }
+  if ($RequireHardLinks) { $record.require_hard_links = $true }
   $lease = [pscustomobject]@{
     record = $record
     record_path = $recordPath
@@ -294,6 +297,7 @@ function New-MIRImmutableInputLease {
       $identity = Get-MIRImmutableInputProperty -InputObject $input -Name 'identity'
       $provenance = Get-MIRImmutableInputProperty -InputObject $input -Name 'provenance'
       $immutable = [bool](Get-MIRImmutableInputProperty -InputObject $input -Name 'immutable' -Default $false)
+      if ($RequireHardLinks -and -not $immutable) { throw 'Strict immutable staging requires immutable input declarations.' }
       if ([string]::IsNullOrWhiteSpace([string]$source) -or -not (Test-Path -LiteralPath $source -PathType Leaf)) {
         throw "Immutable input source is absent: $source"
       }
@@ -347,6 +351,7 @@ function New-MIRImmutableInputLease {
         $linkError = 'copy mode was explicitly selected'
       }
       if ($mode -ne 'hardlink') {
+        if ($RequireHardLinks) { throw "Strict immutable staging requires a verified hard link for ${fileName}: $linkError" }
         Assert-MIRImmutableInputCopyCapacity -DestinationDirectory $stageDirectory -RequiredBytes $sourceItem.Length -ReserveBytes $CopyReserveBytes
         Copy-Item -LiteralPath $sourceFull -Destination $destination -ErrorAction Stop
       }

@@ -1,5 +1,5 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot = '')
+param([string]$RepoRoot = '',[switch]$NativeProbeOnly)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -11,6 +11,7 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+if($NativeProbeOnly) { & (Join-Path $RepoRoot 'tests/tooling/Test-MIRNativeProbeResources.ps1') -RepoRoot $RepoRoot;return }
 
 $tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([IO.Path]::DirectorySeparatorChar)
 $fixtureRoot = Join-Path $tempRoot ("mir-immutable-input-staging-{0}" -f [guid]::NewGuid().ToString('N'))
@@ -359,3 +360,4 @@ try {
 }
 
 Write-Host '[ok] immutable input staging proves hard-link identity, no-write lease liveness, copy fallback, exact hashes, and failure retention.'
+& (Join-Path $RepoRoot 'tests/tooling/Test-MIRNativeProbeResources.ps1') -RepoRoot $RepoRoot

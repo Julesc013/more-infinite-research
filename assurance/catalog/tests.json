@@ -862,7 +862,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/compiler/Test-MIRMaterialRoutes.ps1",
+      "command": "./tests/compiler/Test-MIRMaterialRoutes.ps1 -FactorioBin <factorio> -ExpectedFactorioLine <target> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/compiler/Test-MIRMaterialRoutes.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -880,6 +880,10 @@
         "source:source/prototypes/mir/index/recipe_risk_facts.lua",
         "source:source/prototypes/mir/core/deepcopy.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/Common.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/compiler/material_routes.lua"
       ],
       "captured_artifacts": [],
@@ -1636,7 +1640,14 @@
       "requires_factorio": false,
       "inputs": [
         "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/assurance/evidence/CommandExecution.ps1",
+        "tools/mir/application/release/readiness/Common.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
+        "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/compiler/Test-MIRMaterialRoutes.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tests/runtime/Test-MIRF200BobTinProductionGain.ps1",
         "tests/runtime/Test-MIRA06BobLeadQualification.ps1",
         "tests/runtime/Test-MIRA06BobGoldQualification.ps1",
@@ -7909,5 +7920,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8189a5827b2b0439588972dcffac0f619ee8bfd39b6640097126aa04f5c8841c"
+  "digest": "sha256:570ab00ade7def3c785e27345244dba59c1eff8e571f332b5d524243fbacd6f6"
 }
