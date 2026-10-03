@@ -299,6 +299,11 @@ if (-not $isReducedLegacyLine) {
 Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle 'automatic_family.creation_maturity == "experimental"'
 Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle 'hidden_reason = "experimental-family-hidden-until-reviewed"'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "generation_requirements = {"
+$breedingBlock = [regex]::Match($productivityText, '(?s)research_breeding\s*=\s*\{(.*?)\r?\n\s*research_nutrients\s*=').Groups[1].Value
+if ([string]::IsNullOrWhiteSpace($breedingBlock)) { throw 'Breeding stream declaration was not found.' }
+Assert-NoPattern -RelativePath "prototypes/streams/productivity.lua" -Text $breedingBlock -Pattern 'space_age_setting_visibility|mods_any\s*=\s*\{"space-age"\}|required_mods\s*=\s*\{"space-age"\}'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle 'assert_stream_hidden("research_breeding", false)'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle '"ips-cost-linear-increment-%s"'
 Assert-Matches `
   -RelativePath "prototypes/streams/productivity.lua" `
   -Text $productivityText `

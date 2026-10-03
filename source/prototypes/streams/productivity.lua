@@ -395,7 +395,9 @@ local streams = {
   } },
   research_breeding = {
     allow_shared_input_output = true,
-    ui_visibility = space_age_setting_visibility(),
+    -- Eligible breeding recipes may come from other mods without Space Age.
+    -- Keep the existing controls visible; data-stage eligibility still owns
+    -- whether research can be emitted on the target.
     generation_requirements = {
       require_any_item = {"raw-fish", "biter-egg", "pentapod-egg"}
     },
@@ -539,7 +541,7 @@ local streams = {
     { change = 0.20, items = { "stone-furnace" } },
     { change = 0.10, items = { "steel-furnace" } },
     { change = 0.05, items = { "electric-furnace" } },
-    { change = 0.02, items = { "foundry" }, item_patterns = { "^foundry$" } }
+    { change = 0.02, items = { "foundry", "industrial-furnace" }, item_patterns = { "^foundry$" } }
   } },
 
   research_mining_drill = { icon_tech = "electric-mining", icon_item = "electric-mining-drill", groups = {
@@ -556,9 +558,9 @@ local streams = {
 
   research_electric_energy = { icon_tech="electric-energy-accumulators", groups = {
     { change=0.10, items={"solar-panel","accumulator"} },
-    { change=0.05, items={"advanced-solar","advanced-accumulator"} },
-    { change=0.02, items={"elite-solar","elite-accumulator"} },
-    { change=0.01, items={"ultimate-solar","ultimate-accumulator"} }
+    { change=0.05, items={"advanced-solar","advanced-accumulator","se-space-solar-panel","se-space-accumulator","solar-matrix","accumulator-v2"} },
+    { change=0.02, items={"elite-solar","elite-accumulator","se-space-solar-panel-2","se-space-accumulator-2"} },
+    { change=0.01, items={"ultimate-solar","ultimate-accumulator","se-space-solar-panel-3"} }
   } },
 
   research_bullets = { icon_tech="military", groups = {

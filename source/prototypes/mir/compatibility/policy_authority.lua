@@ -4,6 +4,7 @@ local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 local claim_registry = require("prototypes.mir.compatibility.claim_registry")
 local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local factorio_mods = require("prototypes.mir.platform.factorio.mods")
 
 local M = {}
 
@@ -54,7 +55,20 @@ function M.authorizes_family_stream(stream_key, family)
 end
 
 function M.science_roles_for_stream(stream_key)
-  return compatibility_packs.science_roles_for_stream(stream_key, build().active_packs)
+  local roles = compatibility_packs.science_roles_for_stream(stream_key, build().active_packs)
+  -- Space Is Fake deliberately retires space science, while retaining its
+  -- item and laboratory input. Prototype membership is not playable supply.
+  -- Express this through the existing science policy, before generic pack
+  -- expansion and prerequisite planning, without changing upstream prototypes.
+  if factorio_mods.snapshot()["space-is-fake"] then
+    roles[#roles + 1] = {
+      pack = "space-science-pack",
+      role = "exclude",
+      source = "builtin-space-is-fake-retirement",
+      reason = "space-is-fake-retired-space-progression"
+    }
+  end
+  return roles
 end
 
 function M.active_known_competing_productivity_profiles()
