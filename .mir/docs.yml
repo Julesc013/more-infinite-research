@@ -540,6 +540,7 @@ docs:
       - module-boundaries
       - authority-projection-command-boundaries
       - science-pack-production-route-authority
+      - material-route-certificate-boundary
   - path: docs/architecture/native-owner-binding.md
     title: "Native Owner Binding"
     status: current

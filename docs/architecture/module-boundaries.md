@@ -5,17 +5,18 @@ applies_to: "4.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-09-22
+last_reviewed: 2026-10-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
   - module-boundaries
   - authority-projection-command-boundaries
   - science-pack-production-route-authority
+  - material-route-certificate-boundary
 ---
 # MIR 4 Repository and Module Boundaries
 
-Updated: 2026-09-22
+Updated: 2026-10-04
 
 This page records current MIR 4 authority and package boundaries while retaining explicitly labelled historical transitions that explain them.
 
@@ -24,6 +25,12 @@ This page records current MIR 4 authority and package boundaries while retaining
 `source/` is the sole editable player-source authority. `source/package-source.json`, `targets/package-authority.json`, `targets/registry.json`, and `targets/support-policy.json` define the source-to-target contract; target composition selects shared components and narrow platform adapters, not a second editable mod tree. `tools/mir/application/package/TargetMaterializer.ps1` is the sole current package writer and writes to the caller's explicit output root; current development and qualification runners keep their generated packages beneath ignored `build/` roots. The repository-root Factorio-shaped projection remains historical reconstruction material and cannot be reactivated as package source.
 
 The package-excluded operational plane consists of documentation, fixtures, tests, tools, contracts, governance, `build`, `dist`, and `.mir` authorities. `.mir/control/paths.yml` owns their current logical paths, `.mir/modules.yml` assigns module ownership, and Markdown front matter owns editable document metadata. `tools/commands/docs/Update-MIRDocumentationIndex.ps1` is the writer for `.mir/docs.yml` and generated documentation views; never hand-edit those projections. A preview, shadow, compatibility reader, or historical reconstruction does not gain player mutation, package, release, signing, promotion, tagging, or publication authority merely by existing.
+
+Material-route certificates belong to `source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua`. Their typed return cone includes downstream consumers and alternate producers of the finished output. Binding schema 1 records ownership names and unlock science only for the starting recipe. Its existing native hashes remain readable with `relevant_route_fingerprints(recipe, 1)`, and the default observer call retains that historical schema. Schema-1 certificates now admit only their recorded provider versions, optional exact observers, and MIR package-version bookkeeping. They cannot certify additional mods whose indirect ownership or science changes were never observed.
+
+Binding schema 2 is explicitly selected with `relevant_route_fingerprints(recipe, 2)`. It binds productivity owner names and effect values for every recipe in the cone, each recipe's unlocks, and the recursive technology frontier's research units or triggers, prerequisites, level bounds, enabled/hidden state and cost-multiplier policy. The technology search is bounded to 10,000 entries and fails closed on missing frontier or owner facts. Only owners registered in the active compiler context's existing generated-technology registry are excluded; a MIR-like name alone grants no exclusion. Unrelated recipes and technologies remain outside this boundary. An observer must retain the actual compiler input and generated-owner context when collecting schema-2 admission facts; a fresh post-emission snapshot containing MIR's own effects is a different observation.
+
+The controlled material-route fixture proves schema-2 invalidation and disconnected-input behavior. It does not upgrade the existing F200/F210 certificates, prove profitable-loop feasibility, or provide native whole-ecosystem qualification. The preserved Bob/Angel declarations and level-four continuation remain subject to their current admission gates. Additional-mod admission requires native schema-2 recapture and reviewed certificate updates before it can be claimed again; their old hashes must never be reinterpreted as cone-wide ownership proof.
 
 ## Change and release narrative boundary
 

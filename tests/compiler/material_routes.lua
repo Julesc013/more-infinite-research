@@ -1,5 +1,6 @@
 local records, cached, builds, risks = {}, {}, 0, {}
 local productivity_owners, recipe_unlocks, technologies = {}, {}, {}
+local generated_owners = {}
 local function stub(name, value) package.loaded[name] = value or {} end
 for _, name in ipairs{"platform.factorio.prototype_lookup","index.item_prototype_facts","core.deepcopy","core.fingerprint","platform.factorio.target_profiles","report.compiler_telemetry","settings.automatic_compiler_policy"} do stub("prototypes.mir." .. name) end
 local function fingerprint_text(value)
@@ -26,6 +27,7 @@ stub("prototypes.mir.index.relationships", {view=function() return {
   unlocks_by_recipe=recipe_unlocks
 } end})
 stub("prototypes.mir.platform.factorio.data_raw", {technology=function(name) return technologies[name] end})
+stub("prototypes.mir.domain.facts.generated_technology_registry", {contains=function(name) return generated_owners[name] == true end})
 stub("prototypes.mir.index.recipe_facts", {
   for_each=function(callback)
     builds=builds+1
@@ -351,7 +353,7 @@ local function graph_certificate_for(world, bindings)
   productivity_owners=(bindings and bindings.owners) or {}
   recipe_unlocks=(bindings and bindings.unlocks) or {}
   technologies=(bindings and bindings.technologies) or {}
-  local facts=assert(matcher.relevant_route_fingerprints(world.smelting))
+  local facts=assert(matcher.relevant_route_fingerprints(world.smelting,2))
   local value=certificate("ore","plate")
   value.require_exact_route_certificate=true
   value.profiles[1].mod_lock_scope="relevant-return-graph"
@@ -403,7 +405,10 @@ check(#graph_routes(owner_world,graph_certificate_value,{owners={smelting={"exte
 local unlocked_world=graph_world()
 local unlock_bindings={
   unlocks={smelting={"plate-unlock"}},
-  technologies={ ["plate-unlock"]={unit={ingredients={{"automation-science-pack",1},{"logistic-science-pack",1}}},prerequisites={"precedent"}} }
+  technologies={
+    ["plate-unlock"]={unit={ingredients={{"automation-science-pack",1},{"logistic-science-pack",1}}},prerequisites={"precedent"}},
+    precedent={unit={ingredients={{"automation-science-pack",1}}},prerequisites={}}
+  }
 }
 environment(unlocked_world)
 risks={smelting=risk_row("smelting")}
@@ -423,6 +428,91 @@ local changed_unlock_set={
   technologies={ ["other-unlock"]={unit={ingredients={{"automation-science-pack",1}}},prerequisites={"precedent"}} }
 }
 check(#graph_routes(graph_world(),unlocked_graph_certificate,changed_unlock_set)==0,"unlock change rejects the affected route")
+
+local indirect_owner_bindings={
+  owners={downstream={"return-productivity"}},
+  technologies={ ["return-productivity"]={
+    effects={{type="change-recipe-productivity",recipe="downstream",change=0.1}},
+    unit={ingredients={{"automation-science-pack",1}}},prerequisites={}
+  } }
+}
+check(#graph_routes(graph_world(),graph_certificate_value,indirect_owner_bindings)==0,"indirect productivity owner invalidates the affected return-cone certificate")
+local prefix_owner_bindings={
+  owners={downstream={"recipe-prod-foreign-owner"}},
+  technologies={ ["recipe-prod-foreign-owner"]={
+    effects={{type="change-recipe-productivity",recipe="downstream",change=0.1}},
+    unit={ingredients={{"automation-science-pack",1}}},prerequisites={}
+  } }
+}
+check(#graph_routes(graph_world(),graph_certificate_value,prefix_owner_bindings)==0,"MIR-like name cannot hide an unregistered indirect owner")
+generated_owners["recipe-prod-foreign-owner"]=true
+check(table.concat(graph_routes(graph_world(),graph_certificate_value,prefix_owner_bindings),",")=="smelting","context-registered generated owner is excluded from the external boundary")
+generated_owners={}
+
+local function indirect_bindings(change, science)
+  return {
+    owners={downstream={"return-productivity"}},
+    unlocks={downstream={"return-unlock"}},
+    technologies={
+      ["return-productivity"]={
+        effects={{type="change-recipe-productivity",recipe="downstream",change=change or 0.1}},
+        max_level="infinite",unit={ingredients={{"automation-science-pack",1}}},prerequisites={}
+      },
+      ["return-unlock"]={unit={ingredients={{"automation-science-pack",1}}},prerequisites={"return-frontier"}},
+      ["return-frontier"]={unit={ingredients={{science or "logistic-science-pack",1}}},prerequisites={}}
+    }
+  }
+end
+local indirect_certificate=graph_certificate_for(graph_world(),indirect_bindings())
+check(indirect_certificate.relevant_return_graph_contract.schema==2,"new observation uses cone-wide binding schema")
+check(table.concat(graph_routes(graph_world(),indirect_certificate,indirect_bindings()),",")=="smelting","exact indirect ownership and science frontier remain qualified")
+check(#graph_routes(graph_world(),indirect_certificate,indirect_bindings(0.2))==0,"same-named indirect owner's changed bonus invalidates the affected certificate")
+check(#graph_routes(graph_world(),indirect_certificate,indirect_bindings(nil,"chemical-science-pack"))==0,"indirect unlock ancestor's science change invalidates the affected certificate")
+local unrelated_bindings=indirect_bindings()
+unrelated_bindings.technologies.qol_unlock={unit={ingredients={{"chemical-science-pack",1}}},prerequisites={}}
+check(table.concat(graph_routes(graph_world(),indirect_certificate,unrelated_bindings),",")=="smelting","disconnected science technology remains outside the affected boundary")
+local missing_frontier=indirect_bindings()
+missing_frontier.technologies["return-frontier"]=nil
+check(#graph_routes(graph_world(),indirect_certificate,missing_frontier)==0,"missing indirect science frontier fails closed")
+local saturated_owner=indirect_bindings()
+saturated_owner.technologies["return-productivity"].max_level=1
+check(#graph_routes(graph_world(),indirect_certificate,saturated_owner)==0,"indirect owner's effective level boundary invalidates the certificate")
+local triggered_bindings=indirect_bindings()
+triggered_bindings.technologies["return-frontier"]={research_trigger={type="craft-item",item="gear",count=10},prerequisites={}}
+local triggered_certificate=graph_certificate_for(graph_world(),triggered_bindings)
+check(table.concat(graph_routes(graph_world(),triggered_certificate,triggered_bindings),",")=="smelting","trigger-based indirect science frontier is bound without inventing a research unit")
+triggered_bindings.technologies["return-frontier"].research_trigger.count=20
+check(#graph_routes(graph_world(),triggered_certificate,triggered_bindings)==0,"changed indirect research trigger invalidates the certificate")
+local frontier_budget_bindings=indirect_bindings()
+frontier_budget_bindings.technologies["return-frontier"].prerequisites={"budget-1"}
+for index=1,10001 do
+  frontier_budget_bindings.technologies["budget-"..index]={
+    unit={ingredients={{"automation-science-pack",1}}},
+    prerequisites=index==10001 and {} or {"budget-"..(index+1)}
+  }
+end
+check(#graph_routes(graph_world(),indirect_certificate,frontier_budget_bindings)==0,"indirect science frontier respects its bounded traversal")
+local bounded_frontier,bounded_frontier_reason=matcher.relevant_route_fingerprints(records.smelting,2)
+check(bounded_frontier==nil and bounded_frontier_reason=="science-frontier-budget","frontier traversal stops at its explicit budget rather than merely mismatching a hash")
+local alternate_world=graph_world()
+alternate_world.alternate=canonical_route("alternate","scrap","plate")
+local alternate_certificate=graph_certificate_for(alternate_world)
+check(#graph_routes(alternate_world,alternate_certificate,{unlocks={alternate={"alternate-unlock"}},technologies={
+  ["alternate-unlock"]={unit={ingredients={{"automation-science-pack",1}}},prerequisites={}}
+}})==0,"alternate finished-output producer's unlock invalidates the affected certificate")
+
+-- Old recorded hashes remain readable but cannot certify an unlisted mod.
+environment(graph_world());mods=graph_mods
+local legacy_graph_certificate=certificate("ore","plate")
+legacy_graph_certificate.require_exact_route_certificate=true
+legacy_graph_certificate.profiles[1].mod_lock_scope="relevant-return-graph"
+legacy_graph_certificate.relevant_return_graph_contract=assert(matcher.relevant_route_fingerprints(records.smelting,1))
+check(#graph_routes(graph_world(),legacy_graph_certificate)==0,"direct-route legacy bindings cannot authorize an additional mod")
+graph_mods.qol=nil
+check(table.concat(graph_routes(graph_world(),legacy_graph_certificate),",")=="smelting","exact recorded provider set retains legacy certificate behavior")
+check(matcher.relevant_route_fingerprints(records.smelting).schema==1,"existing observer default preserves historical direct-route hash semantics")
+graph_mods.qol="1.0.0"
+check(matcher.relevant_route_fingerprints(records.smelting,99)==nil,"unknown binding schema fails closed")
 
 local denied_route=canonical_route("smelting","ore","plate")
 denied_route.declared_allow_productivity=false

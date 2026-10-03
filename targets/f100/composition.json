@@ -860,8 +860,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 42362,
-      "expected_sha256": "EEB8BD25E053DB336D15F19DCD3DE1B0F0E9364984BF23EE7CDE70D7D6645345",
+      "expected_bytes": 46822,
+      "expected_sha256": "3EAFC8E004546579C2F9ECC1E2FCF928F40D06FA2DC80688FE7B61AA8EA1D075",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 67815,
-      "expected_sha256": "386BF9C08A2CD6ECA32FF2691F7BEF384ED8EACFDB380E9276164D7FE29FD8A5",
+      "expected_bytes": 67913,
+      "expected_sha256": "9FACA0D6D22DC3783401367B00350FE3A67D710C4F19AF7592FC854AFEA633AC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "F91ED23C90FC89233A262248F5763A1F1328A43C4311B11ACE78310F88386C84"
+  "record_sha256": "2058E8810D11EAC935D3BD35E606D6E855D902956A95521C34D63A7EA10AC5C3"
 }

@@ -807,8 +807,9 @@ local F210_BOB_ANGEL_TIN_OBSERVER_LOCKS = {
 -- This profile chooses the observed F200 final-route declarations.  An
 -- extension is allowed through declaration only; each route must still match
 -- its own complete typed return graph and ownership/unlock boundary below.
--- That admits a disconnected QoL recipe while preserving the closed outcome
--- for every connected recipe or progression change.
+-- Schema-1 certificates retain their recorded provider set. Additional mods
+-- require recaptured schema-2 cone-wide bindings, even if the added recipes
+-- are disconnected; declaration alone does not authorize their emission.
 local function f200_bob_angel_relevant_return_graph_profile()
   if target_profiles.current().factorio_version ~= "2.0" then return false end
   local active = mods or (script and script.active_mods)

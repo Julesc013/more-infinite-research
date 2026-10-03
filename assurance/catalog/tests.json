@@ -873,6 +873,11 @@
       "inputs": [
         "source:source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
         "source:source/prototypes/streams/productivity.lua",
+        "source:source/prototypes/mir/domain/facts/generated_technology_registry.lua",
+        "source:source/prototypes/mir/families/material_progression.lua",
+        "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "source:source/prototypes/mir/index/recipe_risk_facts.lua",
+        "source:source/prototypes/mir/core/deepcopy.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/compiler/material_routes.lua"
       ],
@@ -7900,5 +7905,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e9f71b915eb782396e1eba6d21e61e9330e476f47fa21c541dac58d9cb8073b3"
+  "digest": "sha256:e46038ec447181fc8bc01f8c2db944ab9c2e11852a51f44a30b998f3c0101057"
 }

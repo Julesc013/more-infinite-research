@@ -10,6 +10,7 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
 local relationships = require("prototypes.mir.index.relationships")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 
 local R = {}
 
@@ -263,16 +264,92 @@ local function relevant_route_bindings(recipe_name)
   return {schema = 1, recipe = recipe_name, productivity_owner_technologies = owners, unlock_technologies = unlocks}
 end
 
--- Read-only certificate facts for package-excluded observers and reviewed
--- route matching.  They intentionally exclude unrelated recipes so a
--- disconnected QoL extension remains admissible under the exact provider lock.
-function R.relevant_route_fingerprints(recipe)
+-- Schema 2 binds ownership, bonus values and the recursive science frontier
+-- for every recipe in the cone, including alternate finished-output producers.
+-- Schema 1 observed only the starting recipe and cannot authorize extensions.
+local function relevant_cone_bindings(recipe, boundary)
+  local index = relationships.view("input")
+  if type(index) ~= "table" then return nil, "relationship-index" end
+  local recipe_names = {[recipe.name] = true}
+  for _, row in ipairs(boundary.facts) do recipe_names[row.name] = true end
+  local rows, frontier_names = {}, {}
+  for _, recipe_name in ipairs(sorted_keys(recipe_names)) do
+    local owners, unlocks = {}, {}
+    for _, name in ipairs((index.technologies_by_recipe_effect or {})[recipe_name] or {}) do
+      if type(name) ~= "string" or name == "" then return nil, "owner-identity" end
+      if not generated_registry.contains(name) then
+        local technology = data_raw.technology(name)
+        if type(technology) ~= "table" then return nil, "owner" end
+        local changes = {}
+        for _, effect in ipairs(technology.effects or {}) do
+          if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+            local change = effect.change
+            if type(change) ~= "number" or change ~= change or change == math.huge or change == -math.huge then
+              return nil, "owner-effect"
+            end
+            changes[#changes + 1] = change
+          end
+        end
+        if #changes == 0 then return nil, "owner-effect" end
+        table.sort(changes)
+        owners[#owners + 1] = {name = name, changes = changes}
+        frontier_names[name] = true
+      end
+    end
+    table.sort(owners, function(left, right) return left.name < right.name end)
+    for _, name in ipairs((index.unlocks_by_recipe or {})[recipe_name] or {}) do
+      if type(name) ~= "string" or name == "" then return nil, "unlock-identity" end
+      unlocks[#unlocks + 1], frontier_names[name] = name, true
+    end
+    table.sort(unlocks)
+    rows[#rows + 1] = {recipe = recipe_name, productivity_owners = owners, unlock_technologies = unlocks}
+  end
+  local queue, frontier = sorted_keys(frontier_names), {}
+  local head = 1
+  while head <= #queue do
+    if head > 10000 then return nil, "science-frontier-budget" end
+    local name = queue[head]
+    head = head + 1
+    local technology = data_raw.technology(name)
+    if type(technology) ~= "table" or
+      (type(technology.unit) ~= "table" and type(technology.research_trigger) ~= "table") then
+      return nil, "science-frontier"
+    end
+    local prerequisites = {}
+    for _, prerequisite in ipairs(technology.prerequisites or {}) do
+      if type(prerequisite) ~= "string" or prerequisite == "" then return nil, "science-frontier-identity" end
+      prerequisites[#prerequisites + 1] = prerequisite
+      if not frontier_names[prerequisite] then
+        frontier_names[prerequisite] = true
+        queue[#queue + 1] = prerequisite
+      end
+    end
+    table.sort(prerequisites)
+    frontier[#frontier + 1] = {
+      name = name, prerequisites = prerequisites, unit = technology.unit,
+      research_trigger = technology.research_trigger, max_level = technology.max_level,
+      enabled = technology.enabled, hidden = technology.hidden,
+      ignore_tech_cost_multiplier = technology.ignore_tech_cost_multiplier
+    }
+  end
+  table.sort(frontier, function(left, right) return left.name < right.name end)
+  return {schema = 2, route = recipe.name, recipes = rows, science_frontier = frontier}
+end
+
+-- Read-only facts for observers and matching. Unrelated recipes and
+-- technologies remain outside this boundary. Keep schema-1 readback explicit
+-- so historical receipts retain their original meaning and byte identity.
+function R.relevant_route_fingerprints(recipe, schema)
+  schema = schema or 1
+  if schema ~= 1 and schema ~= 2 then return nil, "bindings-schema" end
   local boundary, boundary_reason = relevant_return_graph(recipe)
   if not boundary then return nil, boundary_reason end
-  local bindings, bindings_reason = relevant_route_bindings(recipe.name)
+  local bindings, bindings_reason
+  if schema == 1 then bindings, bindings_reason = relevant_route_bindings(recipe.name)
+  else bindings, bindings_reason = relevant_cone_bindings(recipe, boundary) end
   if not bindings then return nil, bindings_reason end
   return {
-    schema = 1,
+    schema = schema,
     return_graph_fingerprint = fingerprint.of(boundary),
     bindings_fingerprint = fingerprint.of(bindings),
     reachable_identity_count = #boundary.reachable_identities,
@@ -575,7 +652,7 @@ local function relevant_input_contract_matches(recipe_name, contract)
 end
 
 local function relevant_return_graph_contract_matches(recipe, contract)
-  if type(contract) ~= "table" or contract.schema ~= 1
+  if type(contract) ~= "table" or (contract.schema ~= 1 and contract.schema ~= 2)
     or not valid_mir32_fingerprint(contract.return_graph_fingerprint)
     or not valid_mir32_fingerprint(contract.bindings_fingerprint)
     or type(contract.reachable_identity_count) ~= "number" or contract.reachable_identity_count < 1
@@ -593,7 +670,7 @@ local function relevant_return_graph_contract_matches(recipe, contract)
       return false, "return-graph-contract"
     end
   end
-  local actual, reason = R.relevant_route_fingerprints(recipe)
+  local actual, reason = R.relevant_route_fingerprints(recipe, contract.schema)
   if not actual then return false, "return-graph-" .. reason end
   if actual.return_graph_fingerprint ~= contract.return_graph_fingerprint
     or actual.bindings_fingerprint ~= contract.bindings_fingerprint
@@ -652,6 +729,14 @@ function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, ru
       return false, "return-path"
     end
   elseif profile.mod_lock_scope == "relevant-return-graph" then
+    -- An old direct-route binding cannot certify ownership/progression changes
+    -- made by an unlisted extension. Preserve the exact observed provider set
+    -- (and MIR version bookkeeping); broader admission requires schema 2.
+    local contract = certificate.relevant_return_graph_contract
+    if type(contract) == "table" and contract.schema == 1
+      and not exact_mod_lock(profile.mod_locks, runtime_mods, profile.observer_mod_locks, "named-relevant-providers") then
+      return false, "return-graph-bindings-upgrade-required"
+    end
     local relevant, relevant_reason = relevant_return_graph_contract_matches(fact, certificate.relevant_return_graph_contract)
     if not relevant then return false, "relevant-" .. relevant_reason end
     if certificate.relevant_input_contract then

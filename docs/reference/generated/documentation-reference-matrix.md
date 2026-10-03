@@ -93,6 +93,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | localization-projection-command | [Localization Governance](../../maintainer/localization.md) | current |
 | maintainer-handoff | [Maintainer Handoff](../../MAINTAINER-HANDOFF.md) | current |
 | manual-release-review-attestation | [Manual Test Plan](../../maintainer/manual-test-plan.md) | current |
+| material-route-certificate-boundary | [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md) | current |
 | maximum-level-contract | [MIR 3 Post-Terminal Emergency Hotfix](../../releases/mir3-post-terminal-emergency-hotfix.md) | current |
 | mir-0.10.0-release-notes | [More Infinite Research 0.10.0 Release Notes](../../releases/notes/release-notes-0.10.0.md) | current |
 | mir-0.11.0-release-notes | [More Infinite Research 0.11.0 Release Notes](../../releases/notes/release-notes-0.11.0.md) | current |
