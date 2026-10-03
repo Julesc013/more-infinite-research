@@ -8,7 +8,15 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `4.2.x`** targets **Factorio `2.1`** and requires `base >= 2.1.18`.
 
-F210 is the qualified experimental Factorio `2.1` target only when its release manifest binds the exact engine executable; this development template does not claim final-candidate qualification.
+F210 targets experimental Factorio `2.1`. The external release manifest identifies the exact source, package checksum and validation limits; this hotfix does not claim final-package native qualification.
+
+### MIR 4.2.0 community hotfix
+
+This package includes the existing ownership, weapon-overlap `off`, science-snapshot and serialization repairs. It also excludes retired space science with Space Is Fake, exposes existing breeding controls without requiring Space Age, and extends existing furnace/electricity manufacturing research to the requested AAI industrial furnace, SE panel/accumulator tiers, SolarMatrix and Accumulator-V2. These bonuses affect equipment crafting, preserving upstream power, capacity and unlocks.
+
+Source `v4.2.0` uses target packages ending `00`; `v4.2.1` uses `01`. Earlier RC/withdrawn final downloads are superseded by the corrected ZIPs. Same-version RC users must replace the ZIP manually and verify its new checksum. Withdrawn `01` installations also require explicit manual replacement; automatic downgrade to `00` is not promised. Preserve original saves, keep startup values unchanged for the first load, and retain the checksum for support. Same-version replacement does not itself rerun version-gated migrations or reset earned research.
+
+Focused controlled source/package checks passed. Native final-package, save-upgrade, client/multiplayer and performance qualification remains NOT RUN. Broader compatibility and unfinished integrations continue in maintenance work; no overall speedup is claimed.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 

@@ -8,6 +8,14 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **This MIR `4.2.x` package** targets **Factorio `2.0`** and requires `base >= 2.0.77`.
 
+### MIR 4.2.0 community hotfix
+
+This package includes the existing ownership, weapon-overlap `off`, science-snapshot and serialization repairs. It also excludes retired space science with Space Is Fake, exposes existing breeding controls without requiring Space Age, and extends existing furnace/electricity manufacturing research to the requested AAI industrial furnace, SE panel/accumulator tiers, SolarMatrix and Accumulator-V2 where the target and installed providers permit them. These bonuses affect equipment crafting, preserving upstream power, capacity and unlocks.
+
+Source `v4.2.0` uses target packages ending `00`; `v4.2.1` uses `01`. Earlier RC/withdrawn final downloads are superseded by the corrected ZIPs. Same-version RC users must replace the ZIP manually and verify its new checksum. Withdrawn `01` installations also require explicit manual replacement; automatic downgrade to `00` is not promised. Preserve original saves, keep startup values unchanged for the first load, and retain the checksum for support. Same-version replacement does not itself rerun version-gated migrations or reset earned research.
+
+Focused controlled source/package checks passed. Native final-package, save-upgrade, client/multiplayer and performance qualification remains NOT RUN. Broader compatibility and unfinished integrations continue in maintenance work; no overall speedup is claimed.
+
 **MIR `2.x.x`** was the Factorio `2.0` predecessor line; its later releases required `base >= 2.0.77`.
 
 Historically, MIR `2.5.9` preserved the MIR 3.2.5 research-cost contract and added deterministic earliest-safe selection across alternate science-pack production routes. The current Factorio 2.0 package retains the target capability profile: science packs remain `tool` prototypes, unsupported `mod-data` emission and productivity-family adoption are compiled out, bounded research-cost support is reported through the target log adapter, and Factorio 2.1-only modifiers are omitted.
