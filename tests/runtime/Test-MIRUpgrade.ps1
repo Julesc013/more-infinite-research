@@ -4,6 +4,8 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$FromZip,
   [Parameter(Mandatory)][string]$ToZip,
+  [string]$SelectedReleaseManifest = '',
+  [string]$SelectedTarget = '',
   [string]$FromVersion = "3.0.5",
   [string]$ToVersion = "3.1.0",
   [string]$FixtureName = "assert-upgrade-3-0-5-to-3-1-0",
@@ -21,6 +23,37 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
+
+function Resolve-MIRUpgradeManifestVersion {
+  param([Parameter(Mandatory)][string]$ManifestPath,[Parameter(Mandatory)][string]$CandidatePath,[string]$Target='')
+  $manifest=Get-Content -Raw -LiteralPath $ManifestPath | ConvertFrom-Json -Depth 100
+  if ($manifest.kind -cne 'MIR42FinalReleaseManifestV1' -or $manifest.source_tag -notmatch '^v4[.](?<minor>[0-9]+)[.](?<patch>[0-9]{1,2})$') {
+    throw '[mir-upgrade-manifest-source] Expected a selected MIR release manifest.'
+  }
+  $minor=[int]$Matches.minor; $patch=[int]$Matches.patch
+  $filename=Split-Path -Leaf $CandidatePath
+  $rows=@($manifest.targets | Where-Object { $_.filename -ceq $filename -and (-not $Target -or $_.target -ceq $Target) })
+  if ($rows.Count -ne 1) { throw '[mir-upgrade-manifest-target] Candidate must match exactly one selected target.' }
+  $row=$rows[0]
+  if ($row.target -notmatch '^f(?<code>210|200|110|100|017|016|015|014|013)$') { throw '[mir-upgrade-manifest-target]' }
+  $code=[string]$Matches.code
+  . (Join-Path $RepoRoot 'tools/lib/validation/MIR4DistributionIdentity.ps1')
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $minor -SourcePatch $patch -DistributionVersion ([string]$row.distribution_version)
+  if ($identity.package_name -cne $filename -or (Get-FileHash -LiteralPath $CandidatePath -Algorithm SHA256).Hash -cne $row.sha256) {
+    throw '[mir-upgrade-manifest-package-hash] Candidate identity or hash differs from the selected manifest.'
+  }
+  $archive=[IO.Compression.ZipFile]::OpenRead($CandidatePath)
+  try {
+    $expectedRoot='more-infinite-research_'+$identity.distribution_version+'/'
+    $entries=@($archive.Entries | Where-Object FullName -ceq ($expectedRoot+'info.json'))
+    if ($entries.Count -ne 1) { throw '[mir-upgrade-manifest-package-info]' }
+    $reader=[IO.StreamReader]::new($entries[0].Open())
+    try { $info=$reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
+    $lines=@{'210'='2.1';'200'='2.0';'110'='1.1';'100'='1.0';'017'='0.17';'016'='0.16';'015'='0.15';'014'='0.14';'013'='0.13'}
+    if ($info.name -cne 'more-infinite-research' -or $info.version -cne $identity.distribution_version -or $info.factorio_version -cne $lines[$code]) { throw '[mir-upgrade-manifest-package-info]' }
+  } finally { $archive.Dispose() }
+  return [string]$identity.distribution_version
+}
 
 function Invoke-MIRUpgradeServerUntilSaved {
   param(
@@ -175,6 +208,11 @@ function Write-MIRUpgradeModList {
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
+if ($SelectedReleaseManifest) {
+  $selectedVersion=Resolve-MIRUpgradeManifestVersion -ManifestPath (Resolve-MIRUpgradePath -Path $SelectedReleaseManifest) -CandidatePath $to -Target $SelectedTarget
+  if ($PSBoundParameters.ContainsKey('ToVersion') -and $ToVersion -cne $selectedVersion) { throw '[mir-upgrade-manifest-explicit-version] ToVersion disagrees with the selected package.' }
+  $ToVersion=$selectedVersion
+} elseif ($SelectedTarget) { throw '[mir-upgrade-manifest-required] SelectedTarget requires its release manifest.' }
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
 $isHistoricalTerminalFixture = $FixtureName -eq 'assert-upgrade-historical-terminal-to-mir42'
 $isLegacyFactorio = $isHistoricalTerminalFixture -or ([string]$factorioVersionInfo.ProductVersion -match '^(?:0|1)[.]')
@@ -256,11 +294,17 @@ $fixtureDirectoryName = if ($isHistoricalTerminalFixture) {
 } else { $fixtureModName }
 $stagedFixture = Join-Path $mods $fixtureDirectoryName
 Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
+$mir42UpgradeSpecialized=$false
 if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-4-0-20000-to-4-1-20000', 'assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
-    $ToVersion -match '^4[.]2[.](?<code>21000|20000|11000|10000)$') {
-  $code = [string]$Matches.code
+    $ToVersion -match '^4[.]2[.](?<target>210|200|110|100)(?<patch>[0-9]{2})$') {
+  $targetCode=[string]$Matches.target
+  $toPatch=[int]$Matches.patch
+  $code = $targetCode+'00'
   $expectedFrom = "4.1.$code"
-  if ($FromVersion -cne $expectedFrom) { throw 'MIR 4.2 upgrade specialization requires its exact predecessor version.' }
+  $maintenancePredecessor=$FromVersion -match ('^4[.]2[.]'+$targetCode+'(?<patch>[0-9]{2})$')
+  $earlierPatch=$maintenancePredecessor -and [int]$Matches.patch -lt $toPatch
+  if ($FromVersion -cne $expectedFrom -and -not $earlierPatch) { throw 'MIR 4.2 upgrade specialization requires its exact baseline or an earlier same-target maintenance version.' }
+  $mir42UpgradeSpecialized=$true
   $fixtureFrom = "4.0.$code"
   $fixtureTo = "4.1.$code"
   $stagedControlPath = Join-Path $stagedFixture 'control.lua'
@@ -289,7 +333,8 @@ if ($isHistoricalTerminalFixture) {
     '1.3.9' = [ordered]@{ line='0.13'; target='4.2.01300'; infinite_technology='' }
   }
   $historical = $historicalTargets[$FromVersion]
-  if ($null -eq $historical -or $ToVersion -cne [string]$historical.target) {
+  $sameHistoricalTarget=$null -ne $historical -and $ToVersion -match ('^4[.]2[.]'+([string]$historical.target).Substring(4,3)+'[0-9]{2}$')
+  if (-not $sameHistoricalTarget) {
     throw 'MIR historical upgrade specialization requires an exact terminal predecessor and matching 4.2 target version.'
   }
   if ($Archetype -and $Archetype -cne 'base-default') {
@@ -529,7 +574,7 @@ $assertions = if ($isHistoricalTerminalFixture) {
           "landfill-platform-effects-removed", "platform-owner-transfer-exact",
           "duplicate-owner-forbidden", "startup-settings-retained"
         )
-      } elseif ($FromVersion -ceq '4.1.21000' -and $ToVersion -ceq '4.2.21000' -and $FixtureName -ceq 'assert-upgrade-4-0-21000-to-4-1-21000') {
+      } elseif ($mir42UpgradeSpecialized -and $FixtureName -ceq 'assert-upgrade-4-0-21000-to-4-1-21000') {
         $common + @('space-age-native-owner-retained','all-existing-technology-state-retained',
           'all-existing-recipe-research-bonuses-retained','full-research-queue-retained',
           'reported-missing-technologies-retained')
