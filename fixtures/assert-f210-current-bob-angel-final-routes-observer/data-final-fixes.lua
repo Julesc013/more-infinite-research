@@ -9,6 +9,7 @@ local recipe_matching = require("__more-infinite-research__/prototypes/mir/capab
 local relationships = require("__more-infinite-research__/prototypes/mir/index/relationships")
 local science = require("__more-infinite-research__/prototypes/mir/capabilities/science_integration/science_packs")
 local production_reachability = require("__more-infinite-research__/prototypes/mir/capabilities/science_integration/pack_production_reachability")
+local material_inventory = require("__mir-fixture-assert-f210-current-bob-angel-final-routes-observer__/material-outcome-inventory")
 
 -- These are candidates from the separately retained F200 closure, not an
 -- assertion that the F210 graph is equivalent or that any route is admissible.
@@ -648,6 +649,9 @@ compiler_context.with_active(compiler_context.new(), function()
       collect_output_targets(fact, candidate.name, output_targets)
     end
   end
+  local observed_routes = {}
+  for _, candidate in ipairs(CANDIDATES) do observed_routes[#observed_routes + 1] = candidate.name end
+  for _, line in ipairs(material_inventory.lines(material_inventory.collect(data.raw), observed_routes)) do log(line) end
   observe_hidden_output_consumers(output_targets, index)
   observe_gold_return_path(index, input)
   observe_visible_return_paths(index)
