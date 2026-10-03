@@ -2101,6 +2101,7 @@ validation_tooling:
     scenario_groups: tools/lib/validation/ScenarioGroups.ps1
     structured_evidence: tools/lib/validation/ResultAggregation.ps1
     factorio_process: tools/lib/validation/FactorioProcess.ps1
+    native_probe_resource_adapters: tools/lib/validation/NativeProbeResources.ps1
     settings_overrides: tools/lib/validation/SettingsOverrides.ps1
     scenario_registry: tools/lib/validation/ScenarioRegistry.ps1
     golden_plans: tests/tooling/Test-MIRGoldenPlans.ps1

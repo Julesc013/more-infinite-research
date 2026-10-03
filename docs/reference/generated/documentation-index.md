@@ -178,7 +178,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/adding-a-family-rule.md | Adding A Family Rule | current | developer | how-to | mir-maintainers | 2026-07-12 |
 | docs/maintainer/adding-a-generated-stream.md | Adding A Generated Stream | current | developer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/adding-a-policy-overlay.md | Adding A Policy Overlay | current | developer | how-to | mir-maintainers | 2026-07-07 |
-| docs/maintainer/artifact-retention.md | MIR 4 Local Artifact Retention And Storage | current | maintainer | how-to | mir-maintainers | 2026-09-16 |
+| docs/maintainer/artifact-retention.md | MIR 4 Local Artifact Retention And Storage | current | maintainer | how-to | mir-maintainers | 2026-10-04 |
 | docs/maintainer/backport-reconstruction.md | Deterministic Backport Reconstruction | current | maintainer | how-to | mir-maintainers | 2026-08-08 |
 | docs/maintainer/backporting.md | Target-Line Versioning And Backports | current | maintainer | how-to | mir-maintainers | 2026-08-17 |
 | docs/maintainer/build-and-package.md | Build And Package | current | maintainer | how-to | mir-maintainers | 2026-07-20 |

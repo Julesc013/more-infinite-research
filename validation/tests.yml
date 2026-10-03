@@ -319,7 +319,14 @@
       "requires_factorio": false,
       "inputs": [
         "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/assurance/evidence/CommandExecution.ps1",
+        "tools/mir/application/release/readiness/Common.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
+        "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/compiler/Test-MIRMaterialRoutes.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tests/runtime/Test-MIRF200BobTinProductionGain.ps1",
         "tests/runtime/Test-MIRA06BobLeadQualification.ps1",
         "tests/runtime/Test-MIRA06BobGoldQualification.ps1",
@@ -5609,7 +5616,7 @@
       "id": "runtime.material-route-guard",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/compiler/Test-MIRMaterialRoutes.ps1",
+      "command": "./tests/compiler/Test-MIRMaterialRoutes.ps1 -FactorioBin <factorio> -ExpectedFactorioLine <target> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "requires_factorio": true,
       "inputs": [
         "source:source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
@@ -5621,6 +5628,10 @@
         "source:source/prototypes/mir/index/recipe_risk_facts.lua",
         "source:source/prototypes/mir/core/deepcopy.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/Common.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/compiler/material_routes.lua"
       ]
     },

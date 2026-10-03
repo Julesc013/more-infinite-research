@@ -357,6 +357,11 @@
       "tests": ["static.immutable-input-staging", "runtime.k2-k2so-f210-intake", "static.mir4-a05-k2-03-imersite-closure", "static.mir4-a05-k2-materials-closure"]
     },
     {
+      "id": "native-probe-resources",
+      "patterns": ["^tools/lib/validation/NativeProbeResources[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$"],
+      "tests": ["static.immutable-input-staging", "runtime.material-route-guard"]
+    },
+    {
       "id": "artifact-storage-optimization",
       "patterns": ["^tools/commands/workspace/Optimize-MIRArtifactStorage[.]ps1$", "^tests/tooling/Test-MIRArtifactStorageOptimization[.]ps1$", "^tools/mir/cli/(?:Invoke-MIRCommandRouter|router/RepositoryCommands)[.]ps1$"],
       "tests": ["static.mir-artifact-storage-optimization", "tooling.self-test"]

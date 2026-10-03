@@ -4451,9 +4451,9 @@
     {
       "path": "tools/lib/validation/ImmutableInputStaging.ps1",
       "classification": "canonical-internal",
-      "sha256": "08DBE12A763F1AC67B20004CB78C58A530B3F2B0C193AA4015DEB8E7CCF15D96",
+      "sha256": "2CCD5FDA0FB3363C9BBD85D1405B525B8BEC73C74AC192E77448CE64C72A4144",
       "hash_mode": "canonical-text-v1",
-      "lines": 542,
+      "lines": 547,
       "package_visible": false
     },
     {
@@ -4462,6 +4462,14 @@
       "sha256": "BF546156C8D52A3F8C35ABBF7E10FA6D4ACE4C83C8C5FBFC49916066DA31846C",
       "hash_mode": "canonical-text-v1",
       "lines": 383,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "classification": "canonical-internal",
+      "sha256": "6F36845163339630797934BE07A65ADCF5A64BEB00069C6309581F75B0A86AE2",
+      "hash_mode": "canonical-text-v1",
+      "lines": 128,
       "package_visible": false
     },
     {
@@ -5995,7 +6003,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 415,
+    "canonical_internal": 416,
     "compatibility_wrapper": 168,
     "migration_only": 59,
     "historical": 18,
@@ -6010,5 +6018,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d02c47e1296be8f4aa85bcc99bab80cb377e292e20aa67e1f86918199981d1a4"
+  "digest": "sha256:f0e2cc22049998137090667984fa416e5aff59a1ee7ae43ab05ce1cfcb6c5087"
 }

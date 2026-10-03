@@ -1,14 +1,16 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 [CmdletBinding()]
-param([string]$RepoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path)
+param([string]$RepoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path,[switch]$PureSelectionOnly)
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/assurance/Core.ps1')
 . (Join-Path $repo 'tools/mir/application/assurance/DevelopmentValidation.ps1')
+$selectionAssertions=0
 
 function Assert-MIRDevelopmentCISelection {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Message)
   if(-not $Condition) { throw $Message }
+  $script:selectionAssertions++
 }
 
 function New-MIRDevelopmentSelectionRow {
@@ -120,6 +122,10 @@ $unknownWorkflowProjectionClassification=Get-MIRAssuranceClassification -Paths @
 Assert-MIRDevelopmentCISelection -Condition $unknownWorkflowProjectionClassification.escalated -Message 'The exact workflow projection mapping admitted an unrelated authority.'
 
 $unknownPaths=@('unowned/new-authority.txt')
+$nativeProbeClassification=Get-MIRAssuranceClassification -Paths @('tools/lib/validation/NativeProbeResources.ps1','tests/tooling/Test-MIRNativeProbeResources.ps1') -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition (-not $nativeProbeClassification.escalated -and 'static.immutable-input-staging' -in $nativeProbeClassification.tests -and 'runtime.material-route-guard' -in $nativeProbeClassification.tests) -Message 'Native probe adapters lack exact static and native test ownership.'
+$unknownProbeClassification=Get-MIRAssuranceClassification -Paths @('tools/lib/validation/UnownedNativeProbeResources.ps1') -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition $unknownProbeClassification.escalated -Message 'Native probe classification admitted an unrelated helper.'
 $unknownClassification=Get-MIRAssuranceClassification -Paths $unknownPaths -Config $assurance
 Assert-MIRDevelopmentCISelection -Condition $unknownClassification.escalated -Message 'Unknown path did not escalate.'
 $unknownRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $unknownClassification -Catalog $catalog -Assurance $assurance -Profile 'mir4-development')
@@ -203,6 +209,10 @@ $caseMismatchedPlan=Copy-MIRDevelopmentCanonicalCoverageFixture $coveragePlan;$c
 Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $caseMismatchedPlan -CanonicalGateResult 'success' } -Code '[mir4-development-canonical-plan-coverage]' -Message 'Canonical coverage accepted a case-mismatched selected static test.'
 Assert-MIRDevelopmentCanonicalCoverageRejected -Action { Assert-MIR4DevelopmentCanonicalPlanCoverage -Selection $coverageSelection -Plan $coveragePlan -CanonicalGateResult 'failure' } -Code '[mir4-development-canonical-gate]' -Message 'Development coverage accepted an unsuccessful canonical gate.'
 
+if($PureSelectionOnly) {
+  [pscustomobject]@{status='passed';assertions=$selectionAssertions;scope='Pure classifier, selector identity and canonical coverage fixtures';native_factorio=$false;checkout_fixture_created=$false}
+  return
+}
 $temporaryRepo=Join-Path ([IO.Path]::GetTempPath()) ('mir-development-ci-selection-'+[guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $temporaryRepo|Out-Null
 try {
