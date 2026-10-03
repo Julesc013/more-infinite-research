@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-09-22
+last_reviewed: 2026-10-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -182,6 +182,8 @@ The campaign uses the non-shipped `fixtures/performance-regression-probe` symmet
 The manual attestation must be schema 2, passed, self-hashed, tied to the exact candidate bytes, package-content hash, immutable package-source commit, and qualified Factorio binary, and contain reviewer, time, notes, and portable hashed artifacts for every package checklist item. The package-source commit must be an ancestor of the qualification commit and package-visible roots must remain identical; binding the attestation to the package source avoids the impossible requirement for a committed attestation to predict its containing commit. After reviewing and committing the exact candidate and qualification record, create and verify the seal:
 
 `runtime.upgrade` is one F4 matrix result with five mandatory, independently hashed rows: base/default, Space Age native owner, automatic family creation, base continuation, and mod-set configuration change. The configuration-change row removes its source-only compatibility fixture before loading the candidate and proves current research, fractional progress, generated lifecycle state, and removal of only the dangling recipe target.
+
+Upgrade execution uses the existing resource governor for every native process. Direct harness and matrix calls require an explicit `-ExpectedPeakMemoryMiB`; the registered matrix command declares a 2048 MiB watchdog ceiling and a 120 MiB output budget for each independently staged row. These are admission and cancellation budgets, not measurements of native peak use or qualification evidence. Scratch defaults to `build/p/validation-upgrades`; explicit scratch must stay under the primary project's `build/tmp` or `build/p`, with reparse paths rejected. Admission precedes staging and retains the disk, physical-memory and system-commit reserves. Successful save and reload predicates stop the owned server tree through the same monitored runner; absent, invalid or failing predicates cannot become passing save evidence. The result retains independently hashed resource ledgers before successful staging is retired. Monitoring remains sampled, without a hard process-memory cap.
 
 Ecosystem evidence is candidate-bound: the release-targeted gate must pass the exact candidate ZIP through every local repair and representative scenario and must not rebuild distribution bytes during verification. The composed `runtime.ecosystem` lane skips the release-gate clean-tree check because source authority is independently enforced by approved-delta, manual-attestation, and protected sealing gates. Ecosystem evidence is also bounded by `.mir/sanitation-budgets.json`. Manifest scenarios resolve through the `campaigns` scope, while target-qualified release repair smokes resolve through `local_mod_zips`. A scenario passes only when its observed external prunes exactly include every reviewed prune and contain no more than the declared maximum unreviewed prunes. Release budgets use zero; a missing budget or mismatch is `REVIEW_REQUIRED`, never a compatibility pass.
 

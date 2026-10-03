@@ -206,7 +206,7 @@ Ages are measured against the newest governed review date, 2026-10-04, so checko
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | current | 2026-08-03 | 62 | current-window |
 | docs/maintainer/playtest-intake.md | current | 2026-07-21 | 75 | current-window |
 | docs/maintainer/README.md | current | 2026-08-31 | 34 | current-window |
-| docs/maintainer/release-assurance.md | current | 2026-09-22 | 12 | current-window |
+| docs/maintainer/release-assurance.md | current | 2026-10-04 | 0 | current-window |
 | docs/maintainer/release-process.md | current | 2026-08-14 | 51 | current-window |
 | docs/maintainer/report-diffing.md | current | 2026-08-03 | 62 | current-window |
 | docs/maintainer/settings-governance.md | current | 2026-07-12 | 84 | current-window |

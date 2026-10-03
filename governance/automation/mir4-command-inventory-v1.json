@@ -3475,9 +3475,9 @@
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "5D674DDD95A339635B919C92E759C80B8872A6C2DE2B4D57FC65B8EF713856C9",
+      "sha256": "6811F57397FD6A318B8CFA65A9AD5C689C9EE702D707BDB71B3463413DF7EA06",
       "hash_mode": "canonical-text-v1",
-      "lines": 830,
+      "lines": 832,
       "package_visible": false
     },
     {
@@ -5379,9 +5379,9 @@
     {
       "path": "tools/mir/application/release/readiness/ResourceGovernor.ps1",
       "classification": "canonical-internal",
-      "sha256": "E6009A51713FF64E8E2D472A4F4D7D66D21155A18162820706E404EF22B0A5F2",
+      "sha256": "55DEFB6A3797A55B01A1EB7AF02E675FC1A1D0C80FA997C3EED77BF2788EE6D4",
       "hash_mode": "canonical-text-v1",
-      "lines": 179,
+      "lines": 186,
       "package_visible": false
     },
     {
@@ -6010,5 +6010,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c0eda9a85b8d2d0d52fd31c6b640b9390051ded9c9569409d356d25095fea709"
+  "digest": "sha256:d02c47e1296be8f4aa85bcc99bab80cb377e292e20aa67e1f86918199981d1a4"
 }
