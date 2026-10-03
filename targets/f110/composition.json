@@ -3836,8 +3836,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4031,
-      "expected_sha256": "3A52878507230276EB2FC7010F86D097AE8FFA7580239255DE3471EDB30C164D",
+      "expected_bytes": 4567,
+      "expected_sha256": "3F3C6C003FE1CF76EB6442BA831CB735461219777F67E9902B6E923A66381D23",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "8AD5781C5660FCC52BB607BCFB71109AC932E2D2D60714DD696ACDF13A70F1FB"
+  "record_sha256": "EEA83A38935F90CEE3E397AC7D7D2D70F4C954C9162C77BDD562041865D20B3B"
 }

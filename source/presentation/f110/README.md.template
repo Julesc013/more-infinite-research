@@ -1,6 +1,6 @@
 # More Infinite Research 4.2.11000
 
-More Infinite Research 4.2.11000 is a Factorio 1.1 legacy-target playtest package.
+More Infinite Research 4.2.11000 is a Factorio 1.1 legacy-target hotfix package.
 
 It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.1 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.
 
@@ -48,11 +48,13 @@ For maximum-level settings, `0` means the retained stream remains infinite. For 
 
 ## Compatibility Scope
 
-The current claim is limited to a fresh exact-package load on Factorio 1.1.110. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.
+Earlier fresh-load evidence remains bound to its original package and Factorio 1.1.110. Native qualification of this exact hotfix package is NOT RUN. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.
 
 ## Upgrade
 
-The exact published 1.9.3 archive remains a historical predecessor record. This 4.2 playtest package does not claim save-upgrade qualification beyond its fresh exact-package load.
+The exact published 1.9.3 archive remains a historical predecessor record. Save-upgrade qualification of this exact 4.2 hotfix package is NOT RUN.
+
+Source `v4.2.0` maps to target packages ending `00`; source `v4.2.1` maps to `01`. Earlier RC/withdrawn final ZIPs are superseded by the corrected ZIPs. Same-version RC installations require manual replacement and new-checksum verification. Withdrawn `01` installations also require explicit manual replacement; automatic downgrade is not promised. Preserve original saves and existing startup values. Do not assume same-version replacement reruns version-gated migrations or resets earned research.
 
 ## Installation
 

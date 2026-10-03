@@ -5,7 +5,7 @@ applies_to: "all supported More Infinite Research editions"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-03
+last_reviewed: 2026-10-04
 supersedes: [docs/releases/archive/mod-portal-page-old.md]
 superseded_by: []
 source_of_truth_for:
@@ -22,13 +22,13 @@ The Mod Portal automatically offers an archive compatible with your Factorio ver
 
 ## MIR 4.2.0 release
 
-[MIR 4.2.0 is available on GitHub](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0) for Factorio 2.1, 2.0, 1.1, 1.0 and 0.17 through 0.13. Mod Portal uploads follow a staggered rollout of those same ZIPs. Choose the package for your Factorio generation; the 2.1 package requires the selected experimental Factorio 2.1 engine.
+The corrected MIR 4.2.0 packages are prepared for Factorio 2.1, 2.0, 1.1, 1.0 and 0.17 through 0.13. GitHub rejected reuse of the withdrawn immutable `v4.2.0` tag, so publication and the Mod Portal rollout remain pending. The local handoff contains the exact packages and checksums. Choose the package for your Factorio generation; the 2.1 package requires the selected experimental Factorio 2.1 engine.
 
-This build includes the native-owner overlap, weapon-overlap `off`, science-snapshot and serialization corrections implemented after RC1. The 2.1/2.0 packages include the research library; its own research-queue mutation controls remain unavailable. Historical editions retain their engine-specific limits.
+This build includes the native-owner overlap, weapon-overlap `off`, science-snapshot and serialization corrections implemented after RC1. The modern packages also exclude retired space science with Space Is Fake, expose existing breeding controls without Space Age, and include the requested AAI industrial furnace, SE panel/accumulator tiers, SolarMatrix and Accumulator-V2 manufacturing recipes. These are crafting-productivity bonuses; upstream electrical output, capacity and unlocks are preserved. The 2.1/2.0 packages include the research library; its own research-queue mutation controls remain unavailable. Historical editions retain their engine-specific limits.
 
-Back up your save and keep startup settings unchanged for the first load. The corrected packages use `4.2.NNN01`, while source release `v4.2.0` retains its project version. RC1's `4.2.NNN00` packages remain preserved. Exact ZIP hashes and download links are in the release assets.
+Preserve original saves and keep startup settings unchanged for the first load. Source `v4.2.0` maps strictly to `4.2.CCC00`; `v4.2.1` maps to `4.2.CCC01`. Earlier RC/withdrawn final downloads are superseded by the corrected ZIPs in the handoff. Same-version RC users must manually replace their ZIP and verify its new checksum. Withdrawn `CCC01` users require explicit manual replacement; automatic downgrade to `CCC00` is not promised. Same-version replacement does not itself rerun version-gated migrations.
 
-The maintainer accepted this final release with disclosed validation gaps. Native requalification of these exact final ZIPs, full client/multiplayer checks and the latest native performance result remain outstanding. Tags are unsigned. Unfinished integrations remain unfinished; comprehensive overhaul support and an overall performance improvement are not claimed. Remaining work and new regressions continue in 4.2.1, targeting Friday 9 October 2026 without guaranteeing completion of every feature.
+The maintainer accepts reduced assurance for this hotfix. Focused controlled source/package and upstream-file tests passed; native final-package, save-upgrade, client/multiplayer and performance qualification remains NOT RUN. Tags are unsigned. Unfinished integrations remain unfinished; comprehensive overhaul support and an overall performance improvement are not claimed. Remaining work and reported defects continue in 4.2.1, targeting Friday 9 October 2026 in Melbourne (AEDT) without guaranteeing completion of every feature.
 
 ## At a glance
 
