@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-09-16
+last_reviewed: 2026-10-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -27,6 +27,16 @@ Its ten phase adapters are source freeze, target build, target qualification, pr
 Use the [active operating programme](../spec/programmes/mir4-4x-operating-programme-v1.json), [branch authority](../.mir/branches.yml), and [current integration and delivery plan](releases/mir4-integration-and-delivery-plan.md#recoverable-release-and-local-delivery) for the candidate being prepared. Their accepted target commitments, qualification and human-acceptance requirements govern execution. This entry point does not allocate a release, select a new promotion topology, or authorize publication.
 
 Resolve and rehearse promotion topology and effective rules before freeze. A routine release does not suspend or edit protections. A historical finalizer or past one-use exception is not a controller or authorization for a new candidate.
+
+## Release identity and mutable publication
+
+Source `MAJOR.MINOR.PATCH` and registered target `CCC` produce a five-digit third component using `100 * integer(CCC) + PATCH`. Source 4.2.0 therefore uses `4.2.CCC00`; source 4.2.1 uses `4.2.CCC01`. A prerelease label, build retry or changed evidence never changes the numeric patch. Keep the ZIP root, `info.json`, packaged changelog, filename, manifest, distribution tags and download copy consistent; run the registered strict version regression before publication.
+
+Keep GitHub release immutability disabled and do not restore removed rulesets. The existing `Test-MIRGitHubAdministration.ps1` separately probes `immutable-releases` and rejects enabled, owner-enforced or unrecognized state. Publication requires a final readback of that setting and of the release's `immutable=false` flag. Preserve recorded byte identities through repository governance and SHA-256 receipts. Never assume that deleting an immutable release frees its tag name: GitHub permanently reserves it.
+
+[MIR 4.2.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0-stable) uses the one-time authorized source tag `v4.2.0-stable`, frozen commit `6d19c874ea7d026d297865b96aa1b2b0916e9e61`, with nine CCC00 packages and three supporting assets. The manifest records this tag-name exception, with no numeric version exception. Future final tags return to canonical `vMAJOR.MINOR.PATCH`. This release is unsigned and mutable; its focused checks do not establish the disclosed NOT RUN native, save, client/multiplayer or performance qualification.
+
+Stage every accepted asset before publication; verify exact tag/source, filenames, sizes and hashes in one draft. Reconcile interrupted operations by actual release ID and server state before retrying. Publish the existing draft as final, then stream anonymous downloads and check their SHA-256. Record the receipt and primary-checkout handoff before starting the maintainer-managed six-hour Portal rollout. Documentation maintenance never rebuilds the published packages.
 
 ## Readiness order
 

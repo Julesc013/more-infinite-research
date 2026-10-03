@@ -1357,7 +1357,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./tests/runtime/Test-MIRUpgradeMatrix.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -OutputPath build/results/assurance/<upgrade-to>-upgrade-proof.json",
+      "command": "./tests/runtime/Test-MIRUpgradeMatrix.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120 -OutputPath build/results/assurance/<upgrade-to>-upgrade-proof.json",
       "canonical_implementation": "tests/runtime/Test-MIRUpgradeMatrix.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -1373,6 +1373,8 @@
         "fixtures/upgrade-modset-source/**",
         "tests/runtime/Test-MIRUpgradeMatrix.ps1",
         "spec/schemas/upgrade-matrix.schema.json",
+        "tools/mir/application/release/readiness/Common.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "scenario-harness",
         "settings"
       ],
@@ -7898,5 +7900,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:602b5fbdefadfe13ef7ef2ae221824b20a31cf059d21a7c98471e2da423df2eb"
+  "digest": "sha256:e9f71b915eb782396e1eba6d21e61e9330e476f47fa21c541dac58d9cb8073b3"
 }

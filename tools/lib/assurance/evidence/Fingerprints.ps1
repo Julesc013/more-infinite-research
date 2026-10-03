@@ -609,6 +609,8 @@ function Get-MIRAssuranceInputFingerprint {
         "fixtures/upgrade-modset-source/**",
         "tests/runtime/Test-MIRUpgrade.ps1",
         "tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "tools/mir/application/release/readiness/Common.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "spec/schemas/upgrade-matrix.schema.json"
       )
     }

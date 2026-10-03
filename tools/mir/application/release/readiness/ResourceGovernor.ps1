@@ -113,7 +113,8 @@ function Invoke-MIR441MonitoredProcess {
     [Parameter(Mandatory)][string]$WorkRoot,[Parameter(Mandatory)][string]$LedgerPath,[Parameter(Mandatory)]$Policy,
     [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0,
     [ValidateRange(1,5)][int]$SampleSeconds=1,[ValidateRange(1,86400)][int]$TimeoutSeconds=900,
-    [string]$StdoutPath='',[string]$StderrPath='',[switch]$AllowNonZeroExit
+    [string]$StdoutPath='',[string]$StderrPath='',[switch]$AllowNonZeroExit,
+    [scriptblock]$CompletionPredicate=$null
   )
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
@@ -127,7 +128,7 @@ function Invoke-MIR441MonitoredProcess {
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
   try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
-  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$started=[DateTime]::UtcNow;$timer=[Diagnostics.Stopwatch]::StartNew();$timedOut=$false
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$started=[DateTime]::UtcNow;$timer=[Diagnostics.Stopwatch]::StartNew();$timedOut=$false;$completionObserved=$false
   try{
     # Check again under the lock, before any job output or worker is allocated.
     $null=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
@@ -151,15 +152,21 @@ function Invoke-MIR441MonitoredProcess {
       Write-MIR441Json -Value $sample -Path $ledger -Append
       if($process.HasExited){break}
       if($timer.Elapsed.TotalSeconds-ge$TimeoutSeconds){$timedOut=$true;throw '[mir441-process-timeout]'}
+      if($null-ne$CompletionPredicate){
+        $decision=@(& $CompletionPredicate)
+        if($decision.Count-ne1-or$decision[0]-isnot[bool]){throw '[mir441-process-completion-predicate-invalid]'}
+        if($decision[0]){$completionObserved=$true;break}
+      }
       [void]$process.WaitForExit($SampleSeconds*1000)
     }
     Stop-MIR441OwnedProcess -Process $process -Children $children
     foreach($copy in $copies){$null=$copy.GetAwaiter().GetResult()}
     $process.Refresh();$peak=[Math]::Max($peak,[int64]$process.PeakWorkingSet64)
-    if($process.ExitCode-ne0-and-not$AllowNonZeroExit){throw "[mir441-process-exit] $($process.ExitCode)"}
-    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak}) -Path $ledger -Append
+    if($process.ExitCode-ne0-and-not$AllowNonZeroExit-and-not$completionObserved){throw "[mir441-process-exit] $($process.ExitCode)"}
+    $passed=$completionObserved-or$process.ExitCode-eq0
+    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;completion_predicate_observed=$completionObserved}) -Path $ledger -Append
     # Native process timestamps keep watchdog sampling overhead out of engine timing.
-    return [pscustomobject][ordered]@{status=$(if($process.ExitCode-eq0){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=($process.ExitCode-eq0);duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;admission=$admission}
+    return [pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;admission=$admission}
   }catch{
     $failure=$_
     if($null-ne$process){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children)}catch{}}

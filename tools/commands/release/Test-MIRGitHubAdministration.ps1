@@ -69,11 +69,13 @@ $failure = $null
 $login = $null
 $permissions = $null
 $rulesets = @()
+$releaseImmutability = $null
 $probes = [ordered]@{
   auth_status = "pending"
   authenticated_login = "pending"
   repository_permissions = "pending"
   repository_rulesets = "pending"
+  release_immutability = "pending"
 }
 
 $auth = Invoke-MIRGitHubCli -Operation "auth-status" -CommandArguments @("auth", "status", "-h", "github.com")
@@ -146,6 +148,26 @@ if ($null -eq $failure) {
   }
 }
 
+if ($null -eq $failure) {
+  $immutableProbe = Invoke-MIRGitHubCli -Operation 'release-immutability' -CommandArguments @('api',"repos/$Repository/immutable-releases")
+  if ($immutableProbe.exit_code -ne 0) {
+    $failure = New-MIRGitHubFailure -Response $immutableProbe
+  } else {
+    try {
+      $releaseImmutability = $immutableProbe.text | ConvertFrom-Json
+      if ($releaseImmutability.enabled -isnot [bool] -or $releaseImmutability.enforced_by_owner -isnot [bool]) {
+        throw 'Unrecognized release immutability response.'
+      }
+      if ($releaseImmutability.enabled -or $releaseImmutability.enforced_by_owner) {
+        $failure = [ordered]@{operation='release-immutability';exit_code=1;http_status=$null;classification='release-policy-immutable'}
+      }
+    } catch {
+      $failure = [ordered]@{operation='release-immutability';exit_code=1;http_status=$null;classification='invalid-response'}
+    }
+  }
+  $probes.release_immutability = if ($null -eq $failure) { 'passed' } else { 'failed' }
+}
+
 $receipt = [ordered]@{
   schema = 1
   kind = "MIRGitHubAdministrationPreflightReceiptV1"
@@ -172,6 +194,7 @@ $receipt = [ordered]@{
     items = @($rulesets)
   }
   failure = $failure
+  release_immutability = $releaseImmutability
 }
 
 $json = $receipt | ConvertTo-Json -Depth 10

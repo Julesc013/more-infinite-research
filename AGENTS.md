@@ -9,6 +9,13 @@ More Infinite Research 4 is a proof-governed Factorio research product line. MIR
 - Creating implementation branches, pushing them to this repository, opening and merging PRs into `dev`, synchronizing the primary checkout with `origin/dev`, and removing completed disposable work branches are standing maintainer-authorized actions. Do not ask for confirmation for this routine dev workflow.
 - Complete required automated checks and obey enforced branch rules without treating them as a requirement for another maintainer approval. Changes to `main` and release publication retain their separate policy requirements.
 
+## Release identity and publication
+
+- The numeric distribution codec is `100 * integer(CCC) + SOURCE_PATCH`, padded to five digits. The final two digits are never an RC counter, build number or packaging retry: source 4.2.0 uses CCC00 and source 4.2.1 uses CCC01. Validate the ZIP root, info.json, changelog, manifest, filename, tags and download copy together.
+- Keep GitHub releases mutable. Do not enable repository or organization release immutability, restore removed rulesets, or infer permission to change external controls. Run the existing GitHub administration preflight and require the separate release-immutability probe to pass before publication. Repository governance, exact-source review, checksums and readback enforce the release contract.
+- `v4.2.0-stable` is a one-time maintainer-authorized tag exception for source `6d19c874ea7d026d297865b96aa1b2b0916e9e61`, because GitHub permanently reserved the former immutable `v4.2.0` name. It changes no numeric version. Future final source tags use canonical `vMAJOR.MINOR.PATCH`; never infer another suffix exception.
+- Freeze the exact committed source and accepted assets before tagging. Stage the complete asset inventory in one draft, reconcile lost responses by release ID, verify names and hashes, publish, then verify anonymous downloads. Preserve historical receipts and reconcile existing remote objects before replacing anything.
+
 ## MIR Development housekeeping
 
 - Keep Git/GitHub execution available. Development health belongs in bounded observations, checkpoint requirements and the existing guarded cleanup commands; do not use housekeeping as a reason to deny commits, pushes, PRs or corrective Git actions.
