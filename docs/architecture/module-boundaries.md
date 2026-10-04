@@ -1033,6 +1033,14 @@ Rejection retains the candidate and sanitation accounting without emitting a pai
 
 `effect_ownership/facts.lua` owns the material-stage pair predicate shared by planned ownership and compilation validation. It binds two generated stream operations, their parent technology and stream identities, and equal effect signatures; planned ownership also requires exactly two claims. The resolver retains its 220-line bound and the facts module its 160-line bound. Sharing this predicate grants no new material-route or native qualification authority.
 
+## Historical tooling checks and current source
+
+The historical, release and assurance/custody migration readers validate current consumer paths through the existing CLI router and shared library modules. Historical receipts keep their original path and source bindings. Moved assurance test paths resolve by their stable test identities through the current catalogue, with exact historical binding and current command checks. Their package fingerprints and policy hashes are authenticated as historical facts; current tests separately check that live policy and player source remain unchanged during execution.
+
+Historical probes return their actual current record and digest, plus `comparison_digest`. The comparison restores only the declared product fingerprint or `info.json` source binding in a copy. Every other field must match the unchanged frozen digest, while the current record digest and binding are checked separately. The historical `info.json` comparison retains the original CRLF identity from the accepted presentation baseline; current source uses its actual declared bytes.
+
+`Test-MIR4FinalMileHistoricalBindingsV1` checks the frozen final-mile binding closure through the existing pre-freeze state reader. The following recorded phase authenticates the predecessor bytes. Empty, duplicate and missing requested paths are rejected. This historical closure grants no current source freeze or release transition. Current consumer, functional, policy and source-mutation checks remain separate. Reconstruction fixtures follow their existing LF checkout contract and preserve committed content; no frozen receipt is regenerated.
+
 ## Native braking effect boundary
 
 `domain/effects/metadata.lua` recognizes the native `train-braking-force-bonus` modifier as a percentage. The existing settings scaler consumes that descriptor, so an explicit nondefault braking selection applies to the final chain's effects. The published `mir-effect-per-level-braking-force` identity and 15% default remain unchanged; the default preserves a modded chain's values. The existing logical `braking-force` alias remains recognized.

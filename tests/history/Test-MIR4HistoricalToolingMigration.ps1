@@ -8,6 +8,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 function Assert-MIR4HistoricalToolingMigrationV1([bool]$Condition,[string]$Code,[string]$Detail=''){if(-not$Condition){throw "[$Code] $Detail"}}
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
+$compatibilityBefore=(Get-FileHash -LiteralPath (Join-Path $repo '.mir/compatibility.yml') -Algorithm SHA256).Hash
 $packageHashes=[ordered]@{};foreach($path in @(Get-MIRPackageSourceFiles -RepoRoot $repo)){$packageHashes[[string]$path]=(Get-FileHash -LiteralPath (Join-Path $repo ([string]$path)) -Algorithm SHA256).Hash}
 Assert-MIR4HistoricalToolingMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo $script:MIR4HistoricalToolingPredecessorReceiptPath) -Algorithm SHA256).Hash-ceq$script:MIR4HistoricalToolingPredecessorReceiptSha256) 'mir4-historical-tooling-migration-predecessor-immutable'
 Assert-MIR4HistoricalToolingMigrationV1 ((Get-Item -LiteralPath (Join-Path $repo $script:MIR4HistoricalToolingPredecessorReceiptPath)).Length-eq53137) 'mir4-historical-tooling-migration-predecessor-bytes'
@@ -25,7 +26,7 @@ Assert-MIR4HistoricalToolingMigrationV1 (@($authority.writers).Count-eq1-and@($a
 Assert-MIR4HistoricalToolingMigrationV1 ([string]$proof.test_id-ceq'static.mir4-historical-tooling-migration-v1'-and@($proof.required_checks).Count-eq30-and[string]$proof.pre_cutover_archive_content_sha256-ceq$script:MIR4HistoricalToolingArchiveContentSha256V1) 'mir4-historical-tooling-migration-proof'
 Assert-MIR4HistoricalToolingMigrationV1 (Test-MIR4HistoricalToolingForwardersV1 -RepoRoot $repo) 'mir4-historical-tooling-migration-forwarders'
 Assert-MIR4HistoricalToolingMigrationV1 (Test-MIR4HistoricalToolingDeclaredConsumersV1 -RepoRoot $repo) 'mir4-historical-tooling-migration-consumers'
-Assert-MIR4HistoricalToolingMigrationV1 ([string](Test-MIR4HistoricalToolingFunctionalParityV1 -RepoRoot $repo).digest-ceq$script:MIR4HistoricalToolingParityDigestV1) 'mir4-historical-tooling-migration-functional-parity'
+Assert-MIR4HistoricalToolingMigrationV1 ([string](Test-MIR4HistoricalToolingFunctionalParityV1 -RepoRoot $repo).comparison_digest-ceq$script:MIR4HistoricalToolingParityDigestV1) 'mir4-historical-tooling-migration-functional-parity'
 
 $catalog=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'validation/tests.yml'
 Assert-MIR4HistoricalToolingMigrationV1 (@($catalog.tests|Where-Object{[string]$_.id-ceq'static.mir4-historical-tooling-v1'-and[string]$_.command-ceq'./tests/history/Test-MIR4HistoricalTooling.ps1'}).Count-eq1) 'mir4-historical-tooling-migration-functional-registration'
@@ -35,8 +36,11 @@ $migrationClass=@($assurance.classes|Where-Object{[string]$_.id-ceq'historical-t
 Assert-MIR4HistoricalToolingMigrationV1 ($migrationClass.Count-eq1-and@($migrationClass[0].tests)-contains[string]$proof.test_id) 'mir4-historical-tooling-migration-assurance-registration'
 foreach($testId in @('static.mir4-historical-tooling-v1','static.mir4-historical-tooling-migration-v1')){Assert-MIR4HistoricalToolingMigrationV1 ($testId-in@($assurance.profiles.'mir4-bootstrap')) 'mir4-historical-tooling-migration-bootstrap-profile' $testId}
 foreach($path in @('tools/mir/application/history/HistoricalToolingMigration.ps1','tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1')){Assert-MIR4HistoricalToolingMigrationV1 (@($receipt.components|Where-Object{[string]$_.path-ceq$path}).Count-eq1-and@($receipt.current_authorities|Where-Object{[string]$_.path-ceq$path}).Count-eq1) 'mir4-historical-tooling-migration-receipt-writer-binding' $path}
-Assert-MIR4HistoricalToolingMigrationV1 ($packageBefore-ceq[string]$authority.package_source_sha256-and[string]$receipt.package_source_sha256-ceq$packageBefore-and@($receipt.package_visible_delta).Count-eq0) 'mir4-historical-tooling-migration-package-firewall'
-Assert-MIR4HistoricalToolingMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo '.mir/compatibility.yml') -Algorithm SHA256).Hash-ceq$script:MIR4HistoricalToolingCompatibilityPolicySha256) 'mir4-historical-tooling-migration-compatibility-policy'
+Assert-MIR4HistoricalToolingMigrationV1 ([string]$receipt.package_source_sha256-ceq[string]$authority.package_source_sha256-and@($receipt.package_visible_delta).Count-eq0) 'mir4-historical-tooling-migration-package-firewall'
+$frozenPolicyReceipt=Invoke-MIR4AssuranceOfflineCustodyMigrationProjectionV1 -RepoRoot $repo -Check
+$frozenPolicy=@($frozenPolicyReceipt.components|Where-Object{[string]$_.path-ceq'.mir/compatibility.yml'})
+Assert-MIR4HistoricalToolingMigrationV1 ($frozenPolicy.Count-eq1-and[string]$frozenPolicy[0].sha256-ceq$script:MIR4HistoricalToolingCompatibilityPolicySha256) 'mir4-historical-tooling-migration-historical-policy-binding'
+Assert-MIR4HistoricalToolingMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo '.mir/compatibility.yml') -Algorithm SHA256).Hash-ceq$compatibilityBefore) 'mir4-historical-tooling-migration-compatibility-policy'
 Assert-MIR4HistoricalToolingMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json') -Algorithm SHA256).Hash-ceq$script:MIR4HistoricalToolingT14ReceiptSha256) 'mir4-historical-tooling-migration-t14'
 Assert-MIR4HistoricalToolingMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo 'tools/mir/application/release/ReleaseDag.ps1') -Algorithm SHA256).Hash-ceq$script:MIR4HistoricalToolingReleaseDagSha256) 'mir4-historical-tooling-migration-release-dag'
 
@@ -50,7 +54,7 @@ Test-MIR4PreFreezeAuthorities -RepoRoot $repo|Out-Null
 $latest=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration -IncludeHistoricalToolingMigration
 Assert-MIR4HistoricalToolingMigrationV1 ([string]$latest.prior_receipt_path-ceq$script:MIR4HistoricalToolingMigrationReceiptPath) 'mir4-historical-tooling-migration-prefreeze-chain'
 $releaseHistoryOutput=(& pwsh -NoProfile -File (Join-Path $repo 'tests/release/Test-MIRPublishedSnapshotIntegrity.ps1') 2>&1|Out-String).Trim()
-Assert-MIR4HistoricalToolingMigrationV1 ($LASTEXITCODE-eq0-and$releaseHistoryOutput-match'append-only-release-tooling-successor') 'mir4-historical-tooling-migration-release-history-successor' $releaseHistoryOutput
+Assert-MIR4HistoricalToolingMigrationV1 ($LASTEXITCODE-eq0-and$releaseHistoryOutput-match'Published source-lock integrity passed for [0-9]+ compact source locks\.') 'mir4-historical-tooling-migration-release-history-successor' $releaseHistoryOutput
 
 function Invoke-MIR4HistoricalToolingMigrationCommandProbeV1([string]$Command){$output=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1') -Command $Command -RepoRoot $repo 2>&1|Out-String).Trim();if($LASTEXITCODE-ne0){throw "[mir4-historical-tooling-migration-cli] $Command $output"};return $output|ConvertFrom-Json -Depth 100}
 $checkResult=Invoke-MIR4HistoricalToolingMigrationCommandProbeV1 check;$showResult=Invoke-MIR4HistoricalToolingMigrationCommandProbeV1 show

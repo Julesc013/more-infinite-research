@@ -7,6 +7,32 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 
 function Assert-MIR4AssuranceOfflineCustodyMigrationV1([bool]$Condition,[string]$Code,[string]$Detail=''){if(-not$Condition){throw "[$Code] $Detail"}}
 
+function Resolve-MIR4AssuranceOfflineCustodyConsumerPathV1([string]$Path,$Catalog,$Receipt,[string]$RepositoryRoot){
+  # Frozen receipt paths retain their original identities; current commands come from the test catalogue.
+  $historicalTestIds=@{
+    'validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1'='static.mir4-assurance-scale-w08'
+    'validation/tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1'='static.mir4-environment-evidence-t10'
+    'validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1'='static.mir4-offline-custody'
+    'validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1'='static.release-history'
+    'validation/tests/tooling/Test-MIRAssurance.ps1'='tooling.self-test'
+  }
+  if(-not$historicalTestIds.ContainsKey($Path)){
+    Assert-MIR4AssuranceOfflineCustodyMigrationV1 (-not$Path.StartsWith('validation/tests/')) 'mir4-assurance-offline-custody-migration-unmapped-historical-test' $Path
+    return $Path
+  }
+  $binding=@($Receipt.components|Where-Object{[string]$_.path-ceq$Path})
+  Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($binding.Count-eq1) 'mir4-assurance-offline-custody-migration-historical-test-binding' $Path
+  $testId=[string]$historicalTestIds[$Path]
+  $entry=@($Catalog.tests|Where-Object{[string]$_.id-ceq$testId})
+  Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($entry.Count-eq1) 'mir4-assurance-offline-custody-migration-current-test-identity' $testId
+  $command=[string]$entry[0].command
+  Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($command-match'^\./(tests/[^\s]+\.ps1)(?:\s|$)') 'mir4-assurance-offline-custody-migration-current-test-command' $testId
+  $currentPath=[string]$Matches[1]
+  Assert-MIR4AssuranceOfflineCustodyMigrationV1 ([IO.Path]::GetFileName($currentPath)-ceq[IO.Path]::GetFileName($Path)) 'mir4-assurance-offline-custody-migration-current-test-filename' $testId
+  Assert-MIR4AssuranceOfflineCustodyMigrationV1 (Test-Path -LiteralPath (Join-Path $RepositoryRoot $currentPath) -PathType Leaf) 'mir4-assurance-offline-custody-migration-current-test-missing' $currentPath
+  return $currentPath
+}
+
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $compatibilityBefore=(Get-FileHash -LiteralPath (Join-Path $repo '.mir/compatibility.yml') -Algorithm SHA256).Hash
 $packageHashes=[ordered]@{};foreach($path in @(Get-MIRPackageSourceFiles -RepoRoot $repo)){$packageHashes[[string]$path]=(Get-FileHash -LiteralPath (Join-Path $repo ([string]$path)) -Algorithm SHA256).Hash}
@@ -33,16 +59,22 @@ Assert-MIR4AssuranceOfflineCustodyMigrationV1 (-not[bool]$inventory.deletion_aut
 Assert-MIR4AssuranceOfflineCustodyMigrationV1 ([string]$proof.test_id-ceq'static.mir4-assurance-offline-custody-migration-v1'-and@($proof.required_checks).Count-eq32-and[string]$proof.pre_cutover_functional_digest-ceq$script:MIR4AssuranceOfflineCustodyPreCutoverDigestV1) 'mir4-assurance-offline-custody-migration-proof'
 Assert-MIR4AssuranceOfflineCustodyMigrationV1 (Test-MIR4AssuranceOfflineCustodyForwardersV1 -RepoRoot $repo) 'mir4-assurance-offline-custody-migration-forwarders'
 Assert-MIR4AssuranceOfflineCustodyMigrationV1 (Test-MIR4AssuranceOfflineCustodyDeclaredConsumersV1 -RepoRoot $repo) 'mir4-assurance-offline-custody-migration-consumers'
-Assert-MIR4AssuranceOfflineCustodyMigrationV1 ([string](Test-MIR4AssuranceOfflineCustodyFunctionalParityV1 -RepoRoot $repo).digest-ceq$script:MIR4AssuranceOfflineCustodyParityDigestV1) 'mir4-assurance-offline-custody-migration-functional-parity'
+Assert-MIR4AssuranceOfflineCustodyMigrationV1 ([string](Test-MIR4AssuranceOfflineCustodyFunctionalParityV1 -RepoRoot $repo).comparison_digest-ceq$script:MIR4AssuranceOfflineCustodyParityDigestV1) 'mir4-assurance-offline-custody-migration-functional-parity'
 
 $catalog=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'validation/tests.yml'
 Assert-MIR4AssuranceOfflineCustodyMigrationV1 (@($catalog.tests|Where-Object{[string]$_.id-ceq'static.mir4-assurance-offline-custody-v1'-and[string]$_.command-ceq'./tests/assurance/Test-MIR4AssuranceOfflineCustody.ps1'}).Count-eq1) 'mir4-assurance-offline-custody-migration-functional-registration'
 Assert-MIR4AssuranceOfflineCustodyMigrationV1 (@($catalog.tests|Where-Object{[string]$_.id-ceq[string]$proof.test_id-and[string]$_.command-ceq'./tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1'}).Count-eq1) 'mir4-assurance-offline-custody-migration-test-registration'
 $migrationClass=@((Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path '.mir/assurance.json').classes|Where-Object{[string]$_.id-ceq'assurance-offline-custody-migration'})
 Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($migrationClass.Count-eq1-and@($migrationClass[0].tests)-contains[string]$proof.test_id) 'mir4-assurance-offline-custody-migration-assurance-registration'
-foreach($item in @(@($authority.path_map.final_path)+@($authority.compatibility_entrypoints.path)|Sort-Object -Unique)){Assert-MIR4AssuranceOfflineCustodyMigrationV1 (@($migrationClass[0].patterns|Where-Object{$item-match[string]$_}).Count-gt0) 'mir4-assurance-offline-custody-migration-assurance-path' $item;Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($item-notin@(Get-MIRPackageSourceFiles -RepoRoot $repo)) 'mir4-assurance-offline-custody-migration-package-visible' $item}
-Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($packageBefore-ceq[string]$authority.package_source_sha256-and[string]$receipt.package_source_sha256-ceq$packageBefore-and@($receipt.package_visible_delta).Count-eq0) 'mir4-assurance-offline-custody-migration-package-firewall'
-Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($compatibilityBefore-ceq$script:MIR4AssuranceOfflineCustodyCompatibilityPolicySha256-and(Get-FileHash -LiteralPath (Join-Path $repo '.mir/compatibility.yml') -Algorithm SHA256).Hash-ceq$compatibilityBefore) 'mir4-assurance-offline-custody-migration-compatibility-policy'
+foreach($item in @(@($authority.path_map.final_path)+@($authority.compatibility_entrypoints.path)|Sort-Object -Unique)){
+  $currentPath=Resolve-MIR4AssuranceOfflineCustodyConsumerPathV1 -Path $item -Catalog $catalog -Receipt $receipt -RepositoryRoot $repo
+  Assert-MIR4AssuranceOfflineCustodyMigrationV1 (@($migrationClass[0].patterns|Where-Object{$currentPath-match[string]$_}).Count-gt0) 'mir4-assurance-offline-custody-migration-assurance-path' $currentPath
+  Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($item-notin@(Get-MIRPackageSourceFiles -RepoRoot $repo)-and$currentPath-notin@(Get-MIRPackageSourceFiles -RepoRoot $repo)) 'mir4-assurance-offline-custody-migration-package-visible' $currentPath
+}
+Assert-MIR4AssuranceOfflineCustodyMigrationV1 ([string]$receipt.package_source_sha256-ceq[string]$authority.package_source_sha256-and@($receipt.package_visible_delta).Count-eq0) 'mir4-assurance-offline-custody-migration-package-firewall'
+$frozenPolicy=@($receipt.components|Where-Object{[string]$_.path-ceq'.mir/compatibility.yml'})
+Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($frozenPolicy.Count-eq1-and[string]$frozenPolicy[0].sha256-ceq$script:MIR4AssuranceOfflineCustodyCompatibilityPolicySha256) 'mir4-assurance-offline-custody-migration-historical-policy-binding'
+Assert-MIR4AssuranceOfflineCustodyMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo '.mir/compatibility.yml') -Algorithm SHA256).Hash-ceq$compatibilityBefore) 'mir4-assurance-offline-custody-migration-compatibility-policy'
 Assert-MIR4AssuranceOfflineCustodyMigrationV1 (Test-MIR4AssuranceV4PreservationOrFinalMileSuccessorV1 -RepoRoot $repo) 'mir4-assurance-offline-custody-migration-assurance-v4'
 foreach($item in $historicalHashes.Keys){Assert-MIR4AssuranceOfflineCustodyMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo $item) -Algorithm SHA256).Hash-ceq[string]$historicalHashes[$item]) 'mir4-assurance-offline-custody-migration-historical-evidence' $item}
 
@@ -55,7 +87,7 @@ Test-MIR4PreFreezeAuthorities -RepoRoot $repo|Out-Null
 $latest=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration
 Assert-MIR4AssuranceOfflineCustodyMigrationV1 ([string]$latest.prior_receipt_path-ceq$script:MIR4AssuranceOfflineCustodyMigrationReceiptPath) 'mir4-assurance-offline-custody-migration-prefreeze-chain'
 $releaseHistoryOutput=(& pwsh -NoProfile -File (Join-Path $repo 'tests/release/Test-MIRPublishedSnapshotIntegrity.ps1') 2>&1|Out-String).Trim()
-Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($LASTEXITCODE-eq0-and$releaseHistoryOutput-match'append-only-release-tooling-successor') 'mir4-assurance-offline-custody-migration-release-history-successor' $releaseHistoryOutput
+Assert-MIR4AssuranceOfflineCustodyMigrationV1 ($LASTEXITCODE-eq0-and$releaseHistoryOutput-match'Published source-lock integrity passed for [0-9]+ compact source locks\.') 'mir4-assurance-offline-custody-migration-release-history-successor' $releaseHistoryOutput
 
 function Invoke-MIR4AssuranceOfflineCustodyMigrationCommandProbeV1([string]$Command){$output=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir/cli/Invoke-MIR4AssuranceOfflineCustodyMigration.ps1') -Command $Command -RepoRoot $repo 2>&1|Out-String).Trim();if($LASTEXITCODE-ne0){throw "[mir4-assurance-offline-custody-migration-cli] $Command $output"};return $output|ConvertFrom-Json -Depth 100}
 $checkResult=Invoke-MIR4AssuranceOfflineCustodyMigrationCommandProbeV1 check;$showResult=Invoke-MIR4AssuranceOfflineCustodyMigrationCommandProbeV1 show
