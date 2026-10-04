@@ -99,6 +99,17 @@ Assert-MIRDevelopmentCISelection -Condition ($historicalIds -contains 'static.pa
 
 $actualCatalog=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')|ConvertFrom-Json
 $actualAssurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json
+foreach ($constructionPath in @(
+  'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1',
+  'tools/mir/application/package/TargetMaterializer.ps1',
+  'spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json',
+  'source/package-source.json',
+  'targets/package-authority.json'
+)) {
+  $constructionClassification=Get-MIRAssuranceClassification -Paths @($constructionPath) -Config $actualAssurance
+  $constructionRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $constructionClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+  Assert-MIRDevelopmentCISelection -Condition ((@($constructionRows|ForEach-Object id)) -contains 'static.mir42-candidate-construction') -Message "Candidate construction change omitted its executable development check: $constructionPath"
+}
 $nineTargetPaths=@('tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
 $nineTargetClassification=Get-MIRAssuranceClassification -Paths $nineTargetPaths -Config $actualAssurance
 $nineTargetRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $nineTargetClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')

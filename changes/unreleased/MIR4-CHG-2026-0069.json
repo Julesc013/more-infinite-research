@@ -1,0 +1,36 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0069",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Construct private MIR 4.2.1 packages with all nine source-patch identities through the existing materializers.",
+  "details": [
+    "The source-version selector projects CCC01 for source 4.2.1. Its combined constructor defaults to all nine ordered targets and refuses an incomplete four-target selection, while historical 4.2.0 defaults and v1 schema bytes remain intact.",
+    "Historical target records continue to authenticate their frozen CCC00 baseline, adapters, engines and predecessors. Requested patch output identities are projected separately without granting publication authority.",
+    "Private materialized metadata binds info.json, the current changelog entry and README notice to the requested patch, preserving authored prose and historical entries. A second metadata write is byte-identical; invalid version or target identity is refused before writes.",
+    "The v2 manifest requires all nine authority identities and refuses mismatched versions, paths, omitted or duplicate targets and unsupported acceptance claims. The existing executable construction test is consumed by development CI.",
+    "Deterministic construction remains unqualified. This change supplies no native evidence, support expansion, source freeze, signing, technical seal, promotion, tag or publication acceptance."
+  ],
+  "semantic_domains": ["tooling", "packaging", "documentation"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; player implementation is unchanged."},
+    {"target":"F200","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; player implementation is unchanged."},
+    {"target":"F110","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; player implementation is unchanged."},
+    {"target":"F100","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; player implementation is unchanged."},
+    {"target":"F017","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; frozen historical bindings remain intact."},
+    {"target":"F016","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; frozen historical bindings remain intact."},
+    {"target":"F015","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; frozen historical bindings remain intact."},
+    {"target":"F014","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; frozen historical bindings remain intact."},
+    {"target":"F013","disposition":"affected","reason":"Explicit source 4.2.1 construction uses CCC01 metadata; frozen historical bindings remain intact."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/release/Test-MIR42FourTargetCandidateBuild.ps1"},
+    {"kind":"document","value":"docs/releases/mir42-nine-target-candidate-playtest-matrix.md"}
+  ]
+}

@@ -22,9 +22,10 @@ $script:MIR42HistoricalTargets = @('f017','f016','f015','f014','f013')
 
 function Get-MIR42ReleaseTargetIdentity {
   param([Parameter(Mandatory)][string]$RepoRoot,
-    [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target)
+    [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
+    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0')
   if ($Target -in @('f210','f200','f110','f100')) {
-    return Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion '4.2.0'
+    return Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
   }
   $relative = "targets/historical/$Target/target.json"
   $record = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $relative) | ConvertFrom-Json -Depth 100
@@ -36,8 +37,13 @@ function Get-MIR42ReleaseTargetIdentity {
       [bool]$record.public_output_authorized -or [bool]$record.publication_authorized) {
     throw "[mir42-preflight-historical-target-authority] $Target"
   }
+  # The unchanged target record authenticates the historical baseline. A
+  # requested patch has a separately projected output identity; it cannot
+  # rewrite that record or inherit publication authority from it.
+  $identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch ([int]($SourceVersion.Split('.')[2]))
+  $version = [string]$identity.distribution_version
   return [pscustomobject]@{target=$Target;target_id="factorio-$($record.factorio_line)";
-    source_version='4.2.0';distribution_version=$version;distribution_root="more-infinite-research_$version";
+    source_version=$SourceVersion;distribution_version=$version;distribution_root="more-infinite-research_$version";
     package_name="more-infinite-research_$version.zip";target_record_path=$relative;
     target_record_record_sha256=[string]$record.record_sha256;
     target_record_file_sha256=Get-MIR4Sha256File -Path (Join-Path $RepoRoot $relative)}

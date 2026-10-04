@@ -2,6 +2,26 @@
   "schema": 2,
   "tests": [
     {
+      "id": "static.mir42-candidate-construction",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+        "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
+        "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json",
+        "source:source/package-source.json",
+        "targets/package-authority.json",
+        "targets/historical/**"
+      ]
+    },
+    {
       "id": "static.mir42-protected-main-checks",
       "kind": "static",
       "layer": "F0",
