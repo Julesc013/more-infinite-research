@@ -35,12 +35,16 @@ try {
   Refuses-Probe {New-MIRNativeProbeResourceContext @arguments} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'missing-budget refusal allocated staging.'
   Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot 'D:\outside-native-probe' -ExpectedPeakMemoryMiB 1024} 'resource-output-root'
-  foreach($script in @('tests/compiler/Test-MIRMaterialRoutes.ps1','tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1')) {
-    Refuses-Probe {& (Join-Path $repo $script) -RepoRoot $repo -FactorioBin 'absent-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  foreach($script in @('tests/compiler/Test-MIRMaterialRoutes.ps1','tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1','tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1')) {
+    $probeArguments=@{RepoRoot=$repo;FactorioBin='absent-engine';OutputRoot=$fixture}
+    if($script.StartsWith('tests/runtime/')) {$probeArguments.ExactStageRoot=Join-Path $fixture 'absent-stage'}
+    Refuses-Probe {& (Join-Path $repo $script) @probeArguments} 'resource-peak-budget-required'
     Assert-Probe (-not (Test-Path -LiteralPath $fixture)) "$script allocated staging before refusal."
   }
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1') -RepoRoot $repo -PrepareOnly -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'PrepareOnly bypassed allocation admission.'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1') -RepoRoot $repo -PrepareOnly -ExactStageRoot (Join-Path $fixture 'absent-stage') -OutputRoot $fixture} 'resource-peak-budget-required'
+  Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Final observer PrepareOnly bypassed allocation admission.'
   $context=New-MIRNativeProbeResourceContext @arguments -ExpectedPeakMemoryMiB 1024
   Assert-Probe (-not (Test-Path -LiteralPath $context.root)) 'successful admission allocated before caller initialization.'
   New-Item -ItemType Directory -Path $context.root | Out-Null
@@ -88,8 +92,10 @@ function New-MIR4TargetPackage {
   $package=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo
   Assert-Probe ($package.source_version -ceq '4.2.1' -and $package.distribution_version -ceq '4.2.21001' -and $package.target -ceq 'f210') 'driver lost the required patch/target identity.'
   Assert-Probe ($package.output -ceq (Join-Path $context.root 'packages') -and -not $package.actual_package) 'driver output escaped its row or fixture became a real materializer.'
+  $finalPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -CandidatePrefix 'F210-CURRENT-BA-FINAL-ROUTES-OBSERVER'
+  Assert-Probe ($finalPackage.candidate_id -cmatch '^F210-CURRENT-BA-FINAL-ROUTES-OBSERVER-[0-9A-F]{8}$' -and $finalPackage.distribution_version -ceq '4.2.21001' -and -not $finalPackage.actual_package) 'final observer driver lost its candidate or patch identity.'
   Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$context.runs.Count}
-  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 3) 'reserved result did not preserve actual actor inventory.'
+  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 4) 'reserved result did not preserve actual actor inventory.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'
@@ -99,6 +105,79 @@ function New-MIR4TargetPackage {
   Remove-Item -LiteralPath $context.aliases[0].stage_path
   Refuses-Probe {Get-MIRNativeProbeRemainingOutputBytes -Context $context} 'shared-alias-identity'
   Assert-Probe ((Get-MIRImmutableInputSha256 $source) -ceq $archiveInput.expected_sha256) 'alias retirement changed its canonical archive.'
+
+  # Test the actual completed-row custody reader with synthetic archives,
+  # three tiny pwsh actors and a dummy log/save. This is not a native oracle.
+  $parseTokens=$null;$parseErrors=$null
+  $observerPath=Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1'
+  $observerAst=[Management.Automation.Language.Parser]::ParseFile($observerPath,[ref]$parseTokens,[ref]$parseErrors)
+  Assert-Probe ($parseErrors.Count -eq 0) 'final observer syntax differs.'
+  foreach($name in @('Assert-Observer','Get-ObserverSha','Get-ObserverArtifact','Get-ObserverZipInfo','Get-ObserverCompletedRecovery')) {
+    $definitions=@($observerAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+    Assert-Probe ($definitions.Count -eq 1) "expected one actual recovery function: $name"
+    . ([scriptblock]::Create($definitions[0].Extent.Text))
+  }
+  $recoveryContext=New-MIRNativeProbeResourceContext @arguments -ExpectedPeakMemoryMiB 1024
+  $recoveryRoot=$recoveryContext.root
+  New-Item -ItemType Directory -Path (Join-Path $recoveryRoot 'packages'),(Join-Path $recoveryRoot 'userdata'),(Join-Path $recoveryRoot 'stage')|Out-Null
+  $syntheticCandidate=Join-Path $recoveryRoot 'packages/more-infinite-research_4.2.21001.zip'
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $zip=[IO.Compression.ZipFile]::Open($syntheticCandidate,[IO.Compression.ZipArchiveMode]::Create)
+  try {$entry=$zip.CreateEntry('more-infinite-research_4.2.21001/info.json');$writer=[IO.StreamWriter]::new($entry.Open());try {$writer.Write('{"name":"more-infinite-research","version":"4.2.21001","factorio_version":"2.1"}')}finally{$writer.Dispose()}}finally{$zip.Dispose()}
+  $candidateInput=[ordered]@{source_path=$syntheticCandidate;file_name=[IO.Path]::GetFileName($syntheticCandidate);expected_sha256=Get-MIRImmutableInputSha256 $syntheticCandidate;role='candidate';identity=@{fixture='synthetic-archive-only'};provenance=@{kind='controlled-parser-fixture'};immutable=$true}
+  $lease=New-MIRImmutableInputLease -RunRoot (Join-Path $recoveryRoot 'stage') -StageDirectory (Join-Path $recoveryRoot 'stage/mods') -Inputs @($candidateInput,$archiveInput) -RequireHardLinks
+  Add-MIRNativeProbeImmutableLease -Context $recoveryContext -Lease $lease
+  foreach($number in 1..3){$null=Invoke-MIRNativeProbeProcess -Context $recoveryContext -FilePath $pwsh -Arguments @('-NoProfile','-Command','Write-Output controlled-recovery-parser-actor') -TimeoutSeconds 20}
+  $terminal=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed;$lease=$null
+  # A serialized custody control with significant trailing timestamp zeros
+  # must retain its exact strings through the reader's JSON round trip.
+  foreach($name in @('started_utc','receipt_captured_utc','completed_utc')) {$terminal.$name='2026-10-04T00:00:00.1200000Z'}
+  $terminal.terminal_record_sha256=Get-MIRImmutableInputRecordSha256 -Record $terminal
+  $dummyLog=Join-Path $recoveryRoot 'userdata/factorio-current.log';[IO.File]::WriteAllText($dummyLog,'controlled custody fixture; no native engine or final oracle')
+  $dummySave=Join-Path $recoveryRoot 'observer.zip';[IO.File]::WriteAllText($dummySave,'controlled custody fixture; not a Factorio save')
+  $recoverySource=[ordered]@{commit='controlled-source';tree='controlled-tree';package_source_sha256=$archiveInput.expected_sha256;source_version='4.2.1';distribution_version='4.2.21001'}
+  $fixtureDirectory=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-final-routes-observer'
+  $lastActor=$recoveryContext.runs[2]
+  $controlledRecord=[ordered]@{
+    schema=2;kind='MIR4F210CurrentBobAngelFinalRoutesObservationV1';status='observed';run_root=$recoveryRoot;source=$recoverySource
+    harness=Get-ObserverArtifact $observerPath;exact_stage=@{receipt_sha256=Get-ObserverSha $source;engine_sha256=Get-ObserverSha $pwsh}
+    engine=@{executable_sha256=Get-ObserverSha $pwsh;version='Version: 2.1.20 controlled-parser-fixture'}
+    fixture=@('info.json','data-final-fixes.lua','control.lua','material-outcome-inventory.lua'|ForEach-Object{Get-ObserverArtifact (Join-Path $fixtureDirectory $_)})
+    candidate=Get-ObserverArtifact $syntheticCandidate;input_lease=$terminal;resource_runs=$recoveryContext.runs.ToArray()
+    logs=@{stdout=Get-ObserverArtifact $lastActor.stdout;stderr=Get-ObserverArtifact $lastActor.stderr;factorio=Get-ObserverArtifact $dummyLog};save=Get-ObserverArtifact $dummySave
+  }
+  $recoveryArguments=@{RunRoot=$recoveryRoot;OutputRoot=$fixture;Source=$recoverySource;Fixture=$fixtureDirectory;HarnessPath=$observerPath;StageReceiptPath=$source;ExpectedArchives=@{'dependency.zip'=$archiveInput.expected_sha256};Engine=$pwsh}
+  Write-MIRNativeProbeResult -Context $recoveryContext -Record $controlledRecord
+  $rowPath=Join-Path $recoveryRoot 'result.json';$rowHash=Get-ObserverSha $rowPath
+  $recovered=Get-ObserverCompletedRecovery @recoveryArguments
+  Assert-Probe ($recovered.source.distribution_version -ceq '4.2.21001' -and (Get-ObserverSha $rowPath) -ceq $rowHash) 'completed custody replay wrote its historical receipt.'
+  Assert-Probe ($recovered.input_lease.started_utc -is [string] -and $recovered.input_lease.started_utc -ceq '2026-10-04T00:00:00.1200000Z') 'recovery normalized a timestamp covered by its custody hash.'
+  $fallbackRecovered=& {
+    function Get-Command {
+      param([string]$Name)
+      if($Name -ceq 'ConvertFrom-Json'){return [pscustomobject]@{Parameters=@{}}}
+      Microsoft.PowerShell.Core\Get-Command $Name
+    }
+    Get-ObserverCompletedRecovery @recoveryArguments
+  }
+  Assert-Probe ($fallbackRecovered.input_lease.started_utc -ceq '2026-10-04T00:00:00.1200000Z' -and (Get-ObserverSha $rowPath) -ceq $rowHash) 'older-PowerShell recovery fallback altered timestamp custody or wrote the receipt.'
+  foreach($case in @(
+    @{change={$args[0].schema=1};error='completed governed observation'},
+    @{change={$args[0].source.distribution_version='4.2.21002'};error='source fingerprint differs'},
+    @{change={$args[0].harness.sha256=('A'*64)};error='harness fingerprint differs'},
+    @{change={$args[0].fixture=$args[0].fixture[0..2]};error='fixture inventory differs'},
+    @{change={$args[0].input_lease.outcome='failed'};error='completed passed immutable-input receipt'},
+    @{change={$args[0].resource_runs[2].index=2};error='duplicated identity'},
+    @{change={$args[0].logs.factorio.sha256=('A'*64)};error='log custody differs'},
+    @{change={$args[0].save.sha256=('A'*64)};error='save custody differs'}
+  )) {
+    $changed=($controlledRecord|ConvertTo-Json -Depth 30)|ConvertFrom-Json -AsHashtable -Depth 30
+    foreach($name in @('started_utc','receipt_captured_utc','completed_utc')) {$changed.input_lease[$name]=$terminal.$name}
+    & $case.change $changed
+    Write-MIRNativeProbeResult -Context $recoveryContext -Record $changed
+    Refuses-Probe {Get-ObserverCompletedRecovery @recoveryArguments} $case.error
+  }
+  Assert-Probe ((Get-MIRImmutableInputSha256 $source) -ceq $archiveInput.expected_sha256) 'controlled recovery changed a canonical input.'
 
   $failedRoot=Join-Path $fixture 'link-failure';New-Item -ItemType Directory -Path $failedRoot | Out-Null
   $copies=0
@@ -117,4 +196,4 @@ function New-MIR4TargetPackage {
     Remove-Item -LiteralPath $resolved -Recurse -Force
   }
 }
-[pscustomobject]@{status='passed';assertions=$assertions;native_factorio=$false;actual_materialization=$false;scope='Controlled lease, row budget, preallocation and owned small-process adapter proof';memory_enforcement='sampled-watchdog-not-hard-cap'}
+[pscustomobject]@{status='passed';assertions=$assertions;native_factorio=$false;actual_materialization=$false;scope='Controlled lease, row budget, preallocation, owned small actors and completed-row custody parser; no native oracle';memory_enforcement='sampled-watchdog-not-hard-cap'}

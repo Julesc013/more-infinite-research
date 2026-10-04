@@ -4,7 +4,9 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot='C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-ba-20260930',
-  [string]$OutputRoot='ba-final',
+  [string]$OutputRoot='build/p/f210-ba-final-observer',
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
   [string]$RecoverRunRoot='',
   [string]$AuditLogPath='',
   [switch]$PrepareOnly
@@ -90,7 +92,7 @@ function Get-ObserverZipInfo([string]$Archive){
     try {$text=$reader.ReadToEnd()} finally {$reader.Dispose()}
     $info=$text|ConvertFrom-Json
     Assert-Observer ([string]$info.factorio_version -ceq '2.1') "archive factorio_version differs from 2.1: $Archive"
-    [ordered]@{name=[string]$info.name;entry=$entries[0].FullName;entry_count=$zip.Entries.Count}
+    [ordered]@{name=[string]$info.name;version=[string]$info.version;entry=$entries[0].FullName;entry_count=$zip.Entries.Count}
   } finally {$zip.Dispose()}
 }
 function Assert-ObserverArchivePaths([string]$Archive,[string]$ModsDirectory){
@@ -116,6 +118,71 @@ function Assert-ObserverFixturePaths([string]$Fixture,[string]$ModsDirectory){
   $longest
 }
 
+function Get-ObserverCompletedRecovery {
+  param([string]$RunRoot,[string]$OutputRoot,$Source,[string]$Fixture,[string]$HarnessPath,[string]$StageReceiptPath,$ExpectedArchives,[string]$Engine)
+  $run=Resolve-MIR441RecoveryScratchPath -Path ([IO.Path]::GetFullPath($RunRoot))
+  $output=Resolve-MIR441RecoveryScratchPath -Path ([IO.Path]::GetFullPath($OutputRoot))
+  Assert-Observer (Test-MIR441PathContained -Root $output -Path $run) 'recovery run must remain under the selected output root.'
+  $receiptPath=Join-Path $run 'result.json'
+  $receiptFile=Get-Item -LiteralPath $receiptPath -ErrorAction Stop
+  Assert-Observer ($receiptFile.Length -le 32MB) 'recovery receipt exceeds 32 MiB.'
+  $json=Get-Content -LiteralPath $receiptPath -Raw
+  $jsonArguments=@{AsHashtable=$true;Depth=30}
+  $preservesDateStrings=(Get-Command ConvertFrom-Json).Parameters.ContainsKey('DateKind')
+  if($preservesDateStrings){$jsonArguments.DateKind='String'}
+  $record=$json|ConvertFrom-Json @jsonArguments
+  Assert-Observer ($record.schema -eq 2 -and $record.kind -ceq 'MIR4F210CurrentBobAngelFinalRoutesObservationV1' -and $record.status -ceq 'observed') 'recovery requires a completed governed observation; historical and incomplete rows remain preserved.'
+  foreach($name in @('commit','tree','package_source_sha256','source_version','distribution_version')) {Assert-Observer ($record.source[$name] -ceq $Source[$name]) "recovery source fingerprint differs: $name"}
+  Assert-Observer ($record.run_root -ceq $run -and $record.harness.sha256 -ceq (Get-ObserverSha $HarnessPath)) 'recovery run or harness fingerprint differs.'
+  Assert-Observer ($record.exact_stage.receipt_sha256 -ceq (Get-ObserverSha $StageReceiptPath) -and $record.exact_stage.engine_sha256 -ceq (Get-ObserverSha $Engine)) 'recovery stage or engine fingerprint differs.'
+  Assert-Observer ($record.engine.executable_sha256 -ceq $record.exact_stage.engine_sha256 -and $record.engine.version -match '^Version:\s+2[.]1[.]20(?:\s|$)') 'recovery engine identity differs.'
+  Assert-Observer ($record.fixture.Count -eq 4) 'recovery fixture inventory differs.'
+  foreach($name in @('info.json','data-final-fixes.lua','control.lua','material-outcome-inventory.lua')) {
+    $path=Join-Path $Fixture $name;$rows=@($record.fixture|Where-Object {$_.path -ceq $path})
+    Assert-Observer ($rows.Count -eq 1 -and $rows[0].sha256 -ceq (Get-ObserverSha $path)) "recovery fixture differs: $name"
+  }
+  if(-not $preservesDateStrings){
+    # Older PowerShell parses ISO date strings as DateTime and can trim their
+    # trailing zeros. Restore the three canonical lease timestamps exactly.
+    $document=[Text.Json.JsonDocument]::Parse($json)
+    try{foreach($name in @('started_utc','receipt_captured_utc','completed_utc')){$record.input_lease[$name]=$document.RootElement.GetProperty('input_lease').GetProperty($name).GetString()}}finally{$document.Dispose()}
+  }
+  $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $record.input_lease
+  Assert-Observer ($record.input_lease.require_hard_links -and $record.input_lease.inputs.Count -eq ($ExpectedArchives.Count+1)) 'recovery requires complete strict input custody.'
+  Assert-Observer (Test-MIR441PathContained -Root $run -Path $record.candidate.path) 'recovery candidate escaped its run.'
+  $expected=[ordered]@{};foreach($entry in $ExpectedArchives.GetEnumerator()) {$expected[$entry.Key]=$entry.Value}
+  $expected[[IO.Path]::GetFileName($record.candidate.path)]=$record.candidate.sha256
+  foreach($entry in $expected.GetEnumerator()) {
+    $rows=@($record.input_lease.inputs|Where-Object {$_.file_name -ceq $entry.Key})
+    Assert-Observer ($rows.Count -eq 1 -and $rows[0].expected_sha256 -ceq $entry.Value -and $rows[0].staging_mode -ceq 'hardlink') "recovery leased input differs: $($entry.Key)"
+    $row=$rows[0];$staged=Resolve-MIR441RecoveryScratchPath -Path $row.stage_path
+    Assert-Observer ($staged -ceq (Join-Path $run (Join-Path 'stage/mods' $entry.Key))) 'recovery staged input escaped its exact mod directory.'
+    if($entry.Key -ceq [IO.Path]::GetFileName($record.candidate.path)){Assert-Observer ($row.source_path -ceq $record.candidate.path) 'recovery candidate differs from its leased source.'}
+    Assert-Observer ((Get-ObserverSha $row.source_path) -ceq $entry.Value -and (Get-ObserverSha $staged) -ceq $entry.Value -and (Get-MIRImmutableInputFileIdentity $row.source_path) -ceq (Get-MIRImmutableInputFileIdentity $staged)) "recovery input custody changed: $($entry.Key)"
+  }
+  $candidateInfo=Get-ObserverZipInfo $record.candidate.path
+  Assert-Observer ($candidateInfo.name -ceq 'more-infinite-research' -and $candidateInfo.version -ceq '4.2.21001') 'recovery candidate version differs.'
+  Assert-Observer ($record.resource_runs.Count -eq 3) 'recovery process inventory differs.'
+  $index=0
+  foreach($actor in $record.resource_runs) {
+    $index++
+    Assert-Observer ($actor.index -eq $index -and $actor.status -ceq 'passed' -and $actor.result.passed -and $actor.result.exit_code -eq 0) 'recovery process did not complete successfully or has a duplicated identity.'
+    $suffixes=@{ledger='.resources.jsonl';stdout='.stdout.txt';stderr='.stderr.txt'}
+    foreach($name in @('ledger','stdout','stderr')) {
+      $path=Resolve-MIR441RecoveryScratchPath -Path $actor[$name]
+      Assert-Observer ($path -ceq (Join-Path $run ("process-$index"+$suffixes[$name])) -and (Test-Path -LiteralPath $path -PathType Leaf)) 'recovery process evidence is absent or escaped its run.'
+    }
+  }
+  Assert-Observer ($record.logs.Count -eq 3 -and $record.logs.factorio.path -ceq (Join-Path $run 'userdata/factorio-current.log') -and $record.logs.stdout.path -ceq $record.resource_runs[2].stdout -and $record.logs.stderr.path -ceq $record.resource_runs[2].stderr) 'recovery log inventory differs.'
+  foreach($log in $record.logs.Values) {
+    $path=Resolve-MIR441RecoveryScratchPath -Path $log.path
+    Assert-Observer ((Test-MIR441PathContained -Root $run -Path $path) -and (Get-Item -LiteralPath $path).Length -eq $log.bytes -and $log.bytes -le 32MB -and (Get-ObserverSha $path) -ceq $log.sha256) 'recovery log custody differs or exceeds its budget.'
+  }
+  $save=$record.save
+  Assert-Observer ($save.path -ceq (Join-Path $run 'observer.zip') -and (Get-Item -LiteralPath $save.path).Length -eq $save.bytes -and (Get-ObserverSha $save.path) -ceq $save.sha256) 'recovery save custody differs.'
+  return $record
+}
+
 if(-not [string]::IsNullOrWhiteSpace($AuditLogPath)){
   $audit=Get-Item -LiteralPath $AuditLogPath -ErrorAction Stop
   Assert-Observer ($audit.Length -le 33554432) 'inventory audit file exceeds 32 MiB.'
@@ -124,17 +191,21 @@ if(-not [string]::IsNullOrWhiteSpace($AuditLogPath)){
   return
 }
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+$output=if([IO.Path]::IsPathRooted($OutputRoot)){[IO.Path]::GetFullPath($OutputRoot)}else{[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))}
+$resources=$null;$lease=$null
+if(-not $RecoverRunRoot){
+  & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
+  # This precedes stage resolution, materialization and all engine calls.
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+}
+Assert-MIR441CleanTrackedSource -RepoRoot $repo
 $stage=(Resolve-Path -LiteralPath $ExactStageRoot).Path
-$project=Get-ObserverProjectRoot $repo
-$projectBuild=Join-Path $project 'build'
-$output=if([IO.Path]::IsPathRooted($OutputRoot)){[IO.Path]::GetFullPath($OutputRoot)}else{[IO.Path]::GetFullPath((Join-Path (Join-Path $projectBuild 'tests') $OutputRoot))}
-Assert-Observer $output.StartsWith($projectBuild+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) 'output root must be inside the primary project build tree.'
-& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') | Out-Host
-$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- source)
-Assert-Observer ($sourceChanges.Count -eq 0) "refuses changed package source: $($sourceChanges -join '; ')"
+$projectBuild=Join-Path $repo 'build'
 $fixture=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-final-routes-observer'
 foreach($path in @($fixture,(Join-Path $fixture 'info.json'),(Join-Path $fixture 'data-final-fixes.lua'),(Join-Path $fixture 'control.lua'))){Assert-Observer (Test-Path -LiteralPath $path) "fixture path absent: $path"}
-$stageReceipt=Get-Content -LiteralPath (Join-Path $stage 'result.json') -Raw | ConvertFrom-Json
+$stageReceiptPath=Join-Path $stage 'result.json'
+$stageReceipt=Get-Content -LiteralPath $stageReceiptPath -Raw | ConvertFrom-Json
 Assert-Observer ([string]$stageReceipt.engine_sha256 -ceq 'E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92') 'exact stage engine hash differs.'
 $expectedArchives=[ordered]@{
   'boblibrary_3.0.1.zip'='3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B'
@@ -154,15 +225,26 @@ Assert-Observer ($stageArchives.Count -eq $expectedArchives.Count) 'exact stage 
 foreach($entry in $expectedArchives.GetEnumerator()){
   Assert-Observer ($stageArchives.ContainsKey($entry.Key) -and $stageArchives[$entry.Key] -ceq $entry.Value) "stage receipt archive differs: $($entry.Key)"
   $archive=Join-Path $stage (Join-Path 'mods' $entry.Key)
-  Assert-Observer (Test-Path -LiteralPath $archive -PathType Leaf) "stage archive absent: $($entry.Key)"
-  Assert-Observer ((Get-ObserverSha $archive) -ceq $entry.Value) "stage archive bytes differ: $($entry.Key)"
+  if(-not $RecoverRunRoot){
+    Assert-Observer (Test-Path -LiteralPath $archive -PathType Leaf) "stage archive absent: $($entry.Key)"
+    Assert-Observer ((Get-ObserverSha $archive) -ceq $entry.Value) "stage archive bytes differ: $($entry.Key)"
+  }
 }
 
-. (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
-$candidateOutput=Join-Path $projectBuild 'tests/mir42-f210-current-ba-final-routes-observer/packages'
-$candidate=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('F210-CURRENT-BA-FINAL-ROUTES-OBSERVER-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot $candidateOutput
-$candidateZip=(Resolve-Path -LiteralPath ([string]$candidate.archive_path)).Path
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
+$source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-ObserverSha (Join-Path $repo 'source/package-source.json');source_version='4.2.1';distribution_version='4.2.21001'}
+try {
+if($RecoverRunRoot){
+  Assert-Observer (-not $PrepareOnly) 'recovery and PrepareOnly are mutually exclusive.'
+  $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
+  $prepared=Get-ObserverCompletedRecovery -RunRoot $RecoverRunRoot -OutputRoot $output -Source $source -Fixture $fixture -HarnessPath $PSCommandPath -StageReceiptPath $stageReceiptPath -ExpectedArchives $expectedArchives -Engine $engine
+  $run=$prepared.run_root;$candidateZip=$prepared.candidate.path;$version=$prepared.engine.version
+  $factorioLog=$prepared.logs.factorio.path
+}else{
+  $run=$resources.root
+  New-Item -ItemType Directory -Path $run | Out-Null
+  $candidate=New-MIRNativeProbeTargetPackage -Context $resources -RepoRoot $repo -CandidatePrefix 'F210-CURRENT-BA-FINAL-ROUTES-OBSERVER'
+  $candidateZip=(Resolve-Path -LiteralPath ([string]$candidate.archive_path)).Path
 $fixtureText=Get-Content -LiteralPath (Join-Path $fixture 'data-final-fixes.lua') -Raw
 Assert-Observer $fixtureText.Contains('[mir-f210-current-ba-final-observer] DATA PASS read-only-finalized-contract-capture') 'fixture data marker differs.'
 Assert-Observer $fixtureText.Contains('RETURN_PATH_EDGE target=') 'fixture Gold return-path witness is absent.'
@@ -171,7 +253,7 @@ $fixtureInfo=Get-Content -LiteralPath (Join-Path $fixture 'info.json') -Raw | Co
 Assert-Observer ([string]$fixtureInfo.factorio_version -ceq '2.1') 'fixture factorio_version differs from 2.1.'
 $modNames=@('base','elevated-rails','quality','recycler','space-age','more-infinite-research')+@($expectedArchives.Keys|ForEach-Object {$_ -replace '_[0-9]+(?:[.][0-9]+)*[.]zip$',''})+@('mir-fixture-assert-f210-current-bob-angel-final-routes-observer')
 Assert-Observer ((@($modNames|Sort-Object -Unique)).Count -eq $modNames.Count) 'mod list contains duplicate names.'
-$plannedMods=Join-Path (Join-Path $output ('path-check-'+('0'*32))) 'mods'
+$plannedMods=Join-Path $run 'stage/mods'
 $archives=@($candidateZip)+@($expectedArchives.Keys|ForEach-Object {Join-Path $stage (Join-Path 'mods' $_)})
 $archiveMetadata=@();$longestPath=0
 foreach($archive in $archives){
@@ -183,10 +265,10 @@ foreach($archive in $archives){
 Assert-Observer ($archiveMetadata.Count -eq ($expectedArchives.Count+1)) 'staged archive count differs.'
 $longestPath=[Math]::Max($longestPath,(Assert-ObserverFixturePaths $fixture $plannedMods))
 $prepared=[ordered]@{
-  schema=1;kind='MIR4F210CurrentBobAngelFinalRoutesObservationV1';status='prepared'
+  schema=2;kind='MIR4F210CurrentBobAngelFinalRoutesObservationV1';status='prepared'
   scope='Read-only current 2.1.20 Bob/Angel evidence capture for 22 candidate Angel finals. The visible-ordinary return view excludes player-usable generated recycling recipes and cannot establish route safety.'
-  source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-ObserverSha (Join-Path $repo 'source/package-source.json')}
-  exact_stage=[ordered]@{path=$stage;engine_sha256=[string]$stageReceipt.engine_sha256;candidate_sha256=[string]$stageReceipt.candidate_sha256;save_sha256=[string]$stageReceipt.save_sha256;archives=$expectedArchives}
+  source=$source
+  exact_stage=[ordered]@{path=$stage;receipt_sha256=Get-ObserverSha $stageReceiptPath;engine_sha256=[string]$stageReceipt.engine_sha256;candidate_sha256=[string]$stageReceipt.candidate_sha256;save_sha256=[string]$stageReceipt.save_sha256;archives=$expectedArchives}
   candidate=Get-ObserverArtifact $candidateZip
   fixture=@('info.json','data-final-fixes.lua','control.lua','material-outcome-inventory.lua'|ForEach-Object{Get-ObserverArtifact (Join-Path $fixture $_)})
   harness=Get-ObserverArtifact $PSCommandPath
@@ -194,38 +276,33 @@ $prepared=[ordered]@{
   staging_preflight=[ordered]@{project_build=$projectBuild;planned_mods=$plannedMods;archive_count=$archiveMetadata.Count;longest_staged_path=$longestPath;max_path_exclusive=240;factorio_version='2.1';fixture_marker='DATA PASS read-only-finalized-contract-capture';mod_list=$modNames}
   non_claims=@('No productivity route is admitted by this observer.','Visible ordinary return absence does not establish safety: player-usable generated recycling recipes are excluded from that view.','No progression, balance, compatibility, or release claim is made.','Every candidate remains withheld until an exact reviewed certificate is separately implemented.')
 }
-if($PrepareOnly){$prepared|ConvertTo-Json -Depth 12;return}
+Assert-Observer ($archiveMetadata[0].name -ceq 'more-infinite-research' -and $archiveMetadata[0].version -ceq '4.2.21001') 'candidate distribution version differs.'
+$prepared['resource_policy']=[ordered]@{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'}
+if($PrepareOnly){$prepared['resource_runs']=$resources.runs.ToArray();Write-MIRNativeProbeResult -Context $resources -Record $prepared;$prepared|ConvertTo-Json -Depth 16;return}
 
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 Assert-Observer ((Get-ObserverSha $engine) -ceq [string]$stageReceipt.engine_sha256) 'engine bytes differ from exact stage receipt.'
-$version=(& $engine --version | Out-String)
-Assert-Observer ($LASTEXITCODE -eq 0 -and $version -match 'Version:\s+2[.]1[.]20') 'requires Factorio 2.1.20.'
+$versionRun=Invoke-MIRNativeProbeProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 30
+$version=Get-Content -LiteralPath $versionRun.stdout -Raw
+Assert-Observer ($version -match 'Version:\s+2[.]1[.]20') 'requires Factorio 2.1.20.'
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
-if(-not $RecoverRunRoot){
-$run=Join-Path $output ([guid]::NewGuid().ToString('N'));$mods=Join-Path $run 'mods';$userdata=Join-Path $run 'userdata';New-Item -ItemType Directory -Force -Path $mods,$userdata|Out-Null
-Copy-MIRFileWithHardlinkFallback -Source $candidateZip -Destination (Join-Path $mods ([IO.Path]::GetFileName($candidateZip)))
-foreach($archiveName in $expectedArchives.Keys){Copy-MIRFileWithHardlinkFallback -Source (Join-Path $stage (Join-Path 'mods' $archiveName)) -Destination (Join-Path $mods $archiveName)}
+$leaseRoot=Join-Path $run 'stage';$mods=Join-Path $leaseRoot 'mods';$userdata=Join-Path $run 'userdata'
+New-Item -ItemType Directory -Path $leaseRoot,$userdata|Out-Null
+$inputs=@([ordered]@{source_path=$candidateZip;file_name=[IO.Path]::GetFileName($candidateZip);expected_sha256=Get-ObserverSha $candidateZip;role='candidate';identity=[ordered]@{target='f210';source_version='4.2.1';distribution_version='4.2.21001'};provenance=[ordered]@{kind='canonical-materializer';source_commit=$sourceCommit;source_tree=$sourceTree};immutable=$true})
+foreach($archiveName in $expectedArchives.Keys){
+  $inputs+=@([ordered]@{source_path=Join-Path $stage (Join-Path 'mods' $archiveName);file_name=$archiveName;expected_sha256=$expectedArchives[$archiveName];role='dependency-mod';identity=[ordered]@{archive=$archiveName;sha256=$expectedArchives[$archiveName]};provenance=[ordered]@{kind='exact-preserved-stage';receipt_sha256=Get-ObserverSha $stageReceiptPath};immutable=$true})
+}
+$lease=New-MIRImmutableInputLease -RunRoot $leaseRoot -StageDirectory $mods -Inputs $inputs -RequireHardLinks
+Add-MIRNativeProbeImmutableLease -Context $resources -Lease $lease
 Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-fixture-assert-f210-current-bob-angel-final-routes-observer' -Version '0.1.0' -ModsDir $mods|Out-Null
 @{mods=@($modNames|ForEach-Object{[ordered]@{name=$_;enabled=$true}})}|ConvertTo-Json -Depth 5|Set-Content -LiteralPath (Join-Path $mods 'mod-list.json') -Encoding utf8
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
 [IO.File]::WriteAllText((Join-Path $run 'config.ini'),"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($userdata.Replace('\','/'))`n",[Text.UTF8Encoding]::new($false))
-$start=[Diagnostics.ProcessStartInfo]::new($engine);$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
-foreach($argument in @('--config',(Join-Path $run 'config.ini'),'--no-log-rotation','--disable-audio','--mod-directory',$mods,'--create',(Join-Path $run 'observer.zip'))){[void]$start.ArgumentList.Add($argument)}
-$process=[Diagnostics.Process]::Start($start)
-try{$stdout=$process.StandardOutput.ReadToEndAsync();$stderr=$process.StandardError.ReadToEndAsync();if(-not $process.WaitForExit(180000)){$process.Kill($true);throw "observer engine timed out: $run"};$engineText=$stdout.GetAwaiter().GetResult()+$stderr.GetAwaiter().GetResult();[IO.File]::WriteAllText((Join-Path $run 'engine.log'),$engineText,[Text.UTF8Encoding]::new($false));if($process.ExitCode -ne 0){throw "observer engine failed: $run`n$($engineText.Substring([Math]::Max(0,$engineText.Length-2500)))"}}finally{$process.Dispose()}
-}else{
-  $run=(Resolve-Path -LiteralPath $RecoverRunRoot).Path
-  Assert-Observer $run.StartsWith($output+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) 'recovery run must remain under the selected output root.'
-  Assert-Observer (-not ((Get-Item -LiteralPath $run -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) 'recovery run may not be a reparse point.'
-  $mods=Join-Path $run 'mods';$userdata=Join-Path $run 'userdata'
-  $stagedCandidate=Join-Path $mods ([IO.Path]::GetFileName($candidateZip))
-  Assert-Observer ((Test-Path -LiteralPath $stagedCandidate -PathType Leaf) -and (Get-ObserverSha $stagedCandidate) -ceq $prepared.candidate.sha256) 'recovery candidate does not match current source materialization.'
-  foreach($archiveName in $expectedArchives.Keys){$path=Join-Path $mods $archiveName;Assert-Observer ((Test-Path -LiteralPath $path -PathType Leaf) -and (Get-ObserverSha $path) -ceq $expectedArchives[$archiveName]) "recovery dependency differs: $archiveName"}
-  Assert-Observer (Test-Path -LiteralPath (Join-Path $run 'observer.zip') -PathType Leaf) 'recovery save is absent.'
-  Assert-Observer (Test-Path -LiteralPath (Join-Path $run 'engine.log') -PathType Leaf) 'recovery engine log is absent.'
-  $prepared.candidate=Get-ObserverArtifact $stagedCandidate
+$engineRun=Invoke-MIRNativeProbeProcess -Context $resources -FilePath $engine -TimeoutSeconds 180 -Arguments @('--config',(Join-Path $run 'config.ini'),'--no-log-rotation','--disable-audio','--mod-directory',$mods,'--create',(Join-Path $run 'observer.zip'))
+$factorioLog=Join-Path $userdata 'factorio-current.log'
 }
-$factorioLog=Join-Path $userdata 'factorio-current.log';Assert-Observer (Test-Path -LiteralPath $factorioLog -PathType Leaf) 'Factorio log absent.'
+Assert-Observer (Test-Path -LiteralPath $factorioLog -PathType Leaf) 'Factorio log absent.'
+Assert-Observer ((Get-Item -LiteralPath $factorioLog).Length -le 32MB) 'Factorio log exceeds the observation budget.'
 $logText=Get-Content -LiteralPath $factorioLog -Raw
 Assert-Observer ($logText.Contains('[mir-f210-current-ba-final-observer] RUNTIME PASS observer-has-no-gameplay-mutation')) 'runtime completion marker absent.'
 $summary=[regex]::Match($logText,'\[mir-f210-current-ba-final-observer\] DATA PASS read-only-finalized-contract-capture candidates=(?<candidates>[0-9]+) observed=(?<observed>[0-9]+) missing=(?<missing>[0-9]+)')
@@ -255,4 +332,23 @@ $normalRejections=@([regex]::Matches($logText,'\[mir-f210-current-ba-final-obser
 $normalCompletion=[regex]::Match($logText,'\[mir-f210-current-ba-final-observer\] NORMAL_OBSERVATION PASS parent_state_unchanged=true retained_rejections=(?<count>[0-9]+)')
 Assert-Observer ($normalCompletion.Success -and $normalRejections.Count -le 64 -and $normalRejections.Count -eq [int]$normalCompletion.Groups['count'].Value) 'ordinary science observation did not preserve parent state or rejection bounds.'
 $prepared['material_outcomes']=Get-ObserverMaterialOutcomeInventory $logText
-$result=[ordered]@{};foreach($key in $prepared.Keys){$result[$key]=$prepared[$key]};$result.status='observed';$result.engine=[ordered]@{version=([regex]::Match($version,'Version:\s+[^\r\n]+').Value).Trim();executable_sha256=Get-ObserverSha $engine};$result.run_root=$run;$result.recovered_from_completed_engine_run=[bool]$RecoverRunRoot;$result.route_records=$routes;$result.visible_return_records=$visibleReturns;$result.science_ingredient_records=$scienceIngredients;$result.science_producer_records=$scienceProducers;$result.normal_science_records=$normalScience;$result.normal_science_rejections=$normalRejections;$result.normal_observation_parent_state_unchanged=$true;$result.gold_return_path=[ordered]@{target='angels-liquid-molten-gold';start='item:bob-gold-plate';edge_count=$goldEdges.Count;edges=$goldEdges};$result.summary=[ordered]@{observed=[int]$summary.Groups['observed'].Value;missing=[int]$summary.Groups['missing'].Value;science_frontier_packs=[int]$frontier.Groups['packs'].Value;science_frontier_early_present=[int]$frontier.Groups['early'].Value;visible_return_reachable=@($visibleReturns|Where-Object{$_.status -ceq 'reachable'}).Count};$result.logs=[ordered]@{engine=Get-ObserverArtifact (Join-Path $run 'engine.log');factorio=Get-ObserverArtifact $factorioLog};$result|ConvertTo-Json -Depth 16|Set-Content -LiteralPath (Join-Path $run 'result.json') -Encoding utf8;$result|ConvertTo-Json -Depth 16;Write-Output "Evidence: $run"
+$result=[ordered]@{};foreach($key in $prepared.Keys){$result[$key]=$prepared[$key]};$result.status='observed';$result.engine=[ordered]@{version=([regex]::Match($version,'Version:\s+[^\r\n]+').Value).Trim();executable_sha256=Get-ObserverSha $engine};$result.run_root=$run;$result.recovered_from_completed_engine_run=[bool]$RecoverRunRoot;$result.route_records=$routes;$result.visible_return_records=$visibleReturns;$result.science_ingredient_records=$scienceIngredients;$result.science_producer_records=$scienceProducers;$result.normal_science_records=$normalScience;$result.normal_science_rejections=$normalRejections;$result.normal_observation_parent_state_unchanged=$true;$result.gold_return_path=[ordered]@{target='angels-liquid-molten-gold';start='item:bob-gold-plate';edge_count=$goldEdges.Count;edges=$goldEdges};$result.summary=[ordered]@{observed=[int]$summary.Groups['observed'].Value;missing=[int]$summary.Groups['missing'].Value;science_frontier_packs=[int]$frontier.Groups['packs'].Value;science_frontier_early_present=[int]$frontier.Groups['early'].Value;visible_return_reachable=@($visibleReturns|Where-Object{$_.status -ceq 'reachable'}).Count};$result.native_engine_executed_this_invocation=(-not [bool]$RecoverRunRoot)
+if(-not $RecoverRunRoot){
+  $result.logs=[ordered]@{stdout=Get-ObserverArtifact $engineRun.stdout;stderr=Get-ObserverArtifact $engineRun.stderr;factorio=Get-ObserverArtifact $factorioLog}
+  $result.resource_runs=$resources.runs.ToArray()
+  $result.save=Get-ObserverArtifact (Join-Path $run 'observer.zip')
+  $result.input_lease=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed
+  $lease=$null
+  Write-MIRNativeProbeResult -Context $resources -Record $result
+}
+$result|ConvertTo-Json -Depth 30
+Write-Output "Evidence: $run"
+}catch{
+  $failure=$_
+  if($null -ne $resources -and (Test-Path -LiteralPath $resources.root)){
+    try{Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{status='failed';scope='Final Bob/Angel observation; no route admission';source=$source;error=$failure.Exception.Message;resource_runs=$resources.runs.ToArray()})}catch{Write-Warning "Failed observation result exceeded its output budget; owned ledgers remain in $($resources.root)."}
+  }
+  throw $failure
+}finally{
+  if($null -ne $lease -and -not $lease.closed){$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}
+}
