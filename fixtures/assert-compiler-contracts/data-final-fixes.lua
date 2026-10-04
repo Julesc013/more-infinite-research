@@ -1328,6 +1328,27 @@ end)
 end)()
 end
 
+-- MIR native braking effect descriptor contract.
+do
+(function()
+  local settings_effects = require("__more-infinite-research__.prototypes.mir.settings.effect_contracts")
+  local native_braking = {type = "train-braking-force-bonus", modifier = 0.15}
+  local descriptor = settings_effects.numeric_effect_descriptor(native_braking)
+  local chain_descriptor = settings_effects.descriptor_from_effects({native_braking})
+  if not descriptor or descriptor.field ~= "modifier" or descriptor.unit ~= "percent"
+    or descriptor.display_multiplier ~= 100 or descriptor.value ~= 0.15
+    or not chain_descriptor or chain_descriptor.canonical_anchor ~= 0.15 then
+    fail("native braking-force effects must retain their typed percentage descriptor")
+  end
+  local setting = settings_effects.base_setting_spec("braking-force")
+  if not setting or setting.name ~= "mir-effect-per-level-braking-force"
+    or setting.default_value ~= 15 or native_braking.type ~= "train-braking-force-bonus"
+    or native_braking.modifier ~= 0.15 then
+    fail("native braking-force descriptor correction must preserve setting identity, default and source effects")
+  end
+end)()
+end
+
 local partial_sanitation_row = emitted_row(
   "partial-effect-sanitation-stream",
   "partial-effect-sanitation-tech",

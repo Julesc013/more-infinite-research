@@ -1033,6 +1033,12 @@ Rejection retains the candidate and sanitation accounting without emitting a pai
 
 `effect_ownership/facts.lua` owns the material-stage pair predicate shared by planned ownership and compilation validation. It binds two generated stream operations, their parent technology and stream identities, and equal effect signatures; planned ownership also requires exactly two claims. The resolver retains its 220-line bound and the facts module its 160-line bound. Sharing this predicate grants no new material-route or native qualification authority.
 
+## Native braking effect boundary
+
+`domain/effects/metadata.lua` recognizes the native `train-braking-force-bonus` modifier as a percentage. The existing settings scaler consumes that descriptor, so an explicit nondefault braking selection applies to the final chain's effects. The published `mir-effect-per-level-braking-force` identity and 15% default remain unchanged; the default preserves a modded chain's values. The existing logical `braking-force` alias remains recognized.
+
+The icon builder maps that native effect to the existing braking-force badge. Source icons, explicit overlay overrides and each adapter's overlay policy remain unchanged. Consumed compiler and generation fixtures check the native descriptor and badge expectation. Controlled source execution covers scaling, source isolation and old-predicate detection; it does not qualify native settings-profile helpers, rendered assets, rewards, saved-state upgrades, multiplayer or performance. Exact package and native qualification remain required.
+
 ## MIR 4 current-product bridge-retirement boundary
 
 `governance/repository/migrations/current-product-bridge-retirement-v1.json` is the sole current bridge-disposition authority. `tools/mir/application/repository/BridgeRetirement.ps1` constructs and validates it, while the two governed writers own its authority and append-only receipt. The accepted state has zero current-product, dual-write, package-authority, release/current-state, runtime/state/migration, public-claim, unowned, or unbounded bridges.
