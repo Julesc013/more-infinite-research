@@ -240,7 +240,7 @@ Ages are measured against the newest governed review date, 2026-10-04, so checko
 | docs/reference/maximum-level-binding.md | current | 2026-09-22 | 12 | current-window |
 | docs/reference/mir4-api-sdk-v0-stability.md | deprecated | 2026-08-24 | 41 | current-window |
 | docs/reference/mir4-canonical-json-v1.md | current | 2026-08-26 | 39 | current-window |
-| docs/reference/mir4-environment-evidence.md | current | 2026-08-26 | 39 | current-window |
+| docs/reference/mir4-environment-evidence.md | current | 2026-10-04 | 0 | current-window |
 | docs/reference/mir4-f210-mep-discovery.md | current | 2026-08-26 | 39 | current-window |
 | docs/reference/mir4-first-extension.md | current | 2026-08-26 | 39 | current-window |
 | docs/reference/mir4-mep-v0.md | deprecated | 2026-08-24 | 41 | current-window |

@@ -7,6 +7,23 @@ $script:MIR4EnvironmentPrivateFields = @(
   'user','username'
 )
 
+# Shared text grammar for conversion and both support-export validators.
+# Quoted values are one value, including spaces and escaped quote characters.
+$script:MIR4SupportCredentialTextPattern = '(?i)(?<prefix>\b(?:access[_-]?token|token|secret|password|api[_-]?key)["'']?\s*[=:]\s*)(?<value>"(?:\\.|[^"\\])*"|''(?:\\.|[^''\\])*''|[^\s,;]+)'
+
+function Test-MIR4SupportSensitiveTextV1 {
+  param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
+  if ($Text -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/[^/\s]+|\b(?:proxy-)?authorization\s*:\s*(?:bearer|basic)\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+|\bbearer\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b') { return $true }
+  foreach ($match in [regex]::Matches($Text, $script:MIR4SupportCredentialTextPattern)) {
+    $value=$match.Groups['value'].Value
+    if ($value.Length -ge 2 -and ($value[0] -ceq [char]34 -or $value[0] -ceq [char]39) -and $value[0] -ceq $value[$value.Length-1]) {
+      $value=$value.Substring(1,$value.Length-2)
+    }
+    if ($value.Length -gt 0 -and $value -cne '<redacted>') { return $true }
+  }
+  return $false
+}
+
 function Get-MIR4EnvironmentDigest {
   param([Parameter(Mandatory)]$Value)
   Get-MIR4CanonicalDigestV1 -Value $Value -Domain (Get-MIR4RecordDigestDomainV1 -Value $Value) -OmitTopLevelDigest
@@ -43,7 +60,7 @@ function Test-MIR4EnvironmentPrivateValue {
       Test-MIR4EnvironmentPrivateValue -Value $item -Location "$Location[$index]" | Out-Null
       $index++
     }
-  } elseif ($Value -is [string] -and ($Value -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]' -or $Value -match '(?i)/(?:home|Users)/[^/\s]+' -or $Value -match '(?i)\b(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\b(?:proxy-)?authorization\s*:\s*bearer\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\bbearer\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b')) {
+  } elseif ($Value -is [string] -and (Test-MIR4SupportSensitiveTextV1 -Text $Value)) {
     throw "[mir4-environment-private-value] $Location"
   }
   $true
@@ -235,7 +252,7 @@ function Test-MIR4SupportDiagnosticV1 {
   if ($Diagnostic.code -isnot [string] -or [string]$Diagnostic.code -cnotmatch '^[a-z][a-z0-9-]{0,63}$') { throw '[mir4-support-diagnostic-code]' }
   if ($Diagnostic.severity -isnot [string] -or [string]$Diagnostic.severity -cnotin @('error','warning','info')) { throw '[mir4-support-diagnostic-severity]' }
   if ($Diagnostic.message -isnot [string] -or ([string]$Diagnostic.message).Length -gt 4096) { throw '[mir4-support-diagnostic-message]' }
-  if ([string]$Diagnostic.message -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/[^/\s]+|(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>(?=$|[\s,;]))|(?:proxy-)?authorization\s*:\s*bearer\s+(?!<redacted>(?=$|[\s,;]))|\bbearer\s+(?!<redacted>(?=$|[\s,;]))|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b') { throw '[mir4-support-bundle-redaction]' }
+  if (Test-MIR4SupportSensitiveTextV1 -Text ([string]$Diagnostic.message)) { throw '[mir4-support-bundle-redaction]' }
   $true
 }
 
@@ -251,8 +268,16 @@ function ConvertTo-MIR4RedactedDiagnosticV1 {
   $message = [string]$rawMessage
   $message = [regex]::Replace($message,'(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s]+','<user-home>')
   $message = [regex]::Replace($message,'(?i)/(?:home|Users)/[^/\s]+','<user-home>')
-  $message = [regex]::Replace($message,'(?i)\b(token|secret|password|api[_-]?key)\s*[=:]\s*[^\s,;]+','$1=<redacted>')
-  $message = [regex]::Replace($message,'(?i)\b((?:proxy-)?authorization)\s*:\s*bearer\s+[^\s,;]+','$1: Bearer <redacted>')
+  $message = [regex]::Replace($message,$script:MIR4SupportCredentialTextPattern,[Text.RegularExpressions.MatchEvaluator]{
+    param($match)
+    $value=$match.Groups['value'].Value
+    $replacement='<redacted>'
+    if ($value.Length -ge 2 -and ($value[0] -ceq [char]34 -or $value[0] -ceq [char]39) -and $value[0] -ceq $value[$value.Length-1]) {
+      $replacement=[string]$value[0]+'<redacted>'+[string]$value[0]
+    }
+    return $match.Groups['prefix'].Value+$replacement
+  })
+  $message = [regex]::Replace($message,'(?i)\b((?:proxy-)?authorization)\s*:\s*(bearer|basic)\s+[^\s,;]+','$1: $2 <redacted>')
   $message = [regex]::Replace($message,'(?i)\bbearer\s+[^\s,;]+','Bearer <redacted>')
   $message = [regex]::Replace($message,'(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b','<email-redacted>')
   $record = [ordered]@{code=[string]$code;severity=[string]$severity;message=$message}

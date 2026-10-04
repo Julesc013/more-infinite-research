@@ -1,0 +1,34 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0058",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Redact quoted credentials and Basic authorization in developer support exports.",
+  "details": [
+    "The diagnostic converter and both private-value validators share one credential grammar. Quoted token, access-token, secret, password and API-key values are consumed whole, including spaces and escaped quotes; Basic headers join existing Bearer handling.",
+    "Quoted replacements remain quoted, the exact placeholder is stable on repeated conversion, and a private suffix after the placeholder is rejected. The input record is preserved.",
+    "The consumed A14 exporter test passes 75 new synthetic assertions and its existing bundle, schema, minimization and rejection controls. Candidate-bound export and standalone startup-crash collection retain separate qualification requirements."
+  ],
+  "semantic_domains": ["tooling", "documentation"],
+  "audiences": ["mod-authors", "contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Developer text export uses the shared converter; player packages exclude the exporter."},
+    {"target":"F200","disposition":"affected","reason":"Developer text export uses the shared converter; player packages exclude the exporter."},
+    {"target":"F110","disposition":"affected","reason":"The generic developer bundle accepts this target identity and uses the same text converter; no native support claim is added."},
+    {"target":"F100","disposition":"affected","reason":"The generic developer bundle accepts this target identity and uses the same text converter; no native support claim is added."},
+    {"target":"F017","disposition":"affected","reason":"The generic developer bundle accepts this target identity and uses the same text converter; no native support claim is added."},
+    {"target":"F016","disposition":"affected","reason":"The generic developer bundle accepts this target identity and uses the same text converter; no native support claim is added."},
+    {"target":"F015","disposition":"affected","reason":"The generic developer bundle accepts this target identity and uses the same text converter; no native support claim is added."},
+    {"target":"F014","disposition":"affected","reason":"The generic developer bundle accepts this target identity and uses the same text converter; no native support claim is added."},
+    {"target":"F013","disposition":"affected","reason":"The generic developer bundle accepts this target identity and uses the same text converter; no native support claim is added."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/mir4/Test-MIR42SupportExportA14.ps1: consumed synthetic credential controls"},
+    {"kind":"document","value":"docs/reference/mir4-environment-evidence.md"}
+  ]
+}
