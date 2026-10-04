@@ -34,6 +34,10 @@ function S.ensure_services(context)
     context:set_service(SERVICE_PREFIX .. "independent_pack_acquisition_witness",
       pack_production_reachability.independent_pack_acquisition_witness)
   end
+  if not context:has_service(SERVICE_PREFIX .. "item_acquisition_witness") then
+    context:set_service(SERVICE_PREFIX .. "item_acquisition_witness",
+      pack_production_reachability.item_acquisition_witness)
+  end
   if not context:has_service(SERVICE_PREFIX .. "prereq_tech_for_science_pack") then
     context:set_service(SERVICE_PREFIX .. "prereq_tech_for_science_pack",
       pack_production_reachability.prereq_tech_for_science_pack)
@@ -62,8 +66,8 @@ S.pack_list_all = pack_registry.pack_list_all
 S.pack_list_official = pack_registry.pack_list_official
 S.is_official_science_pack = pack_registry.is_official_science_pack
 
-S.any_lab_accepts_all = lab_compatibility.any_lab_accepts_all
-S.valid_research_ingredients = lab_compatibility.valid_research_ingredients
+S.any_lab_accepts_all = ready(lab_compatibility.any_lab_accepts_all)
+S.valid_research_ingredients = ready(lab_compatibility.valid_research_ingredients)
 S.best_lab_compatible_ingredients = ready(lab_compatibility.best_lab_compatible_ingredients)
 
 S.space_age_progression_packs_for = science_selection_policy.space_age_progression_packs_for

@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local effective_settings = require("prototypes.mir.settings.effective")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
@@ -51,23 +52,56 @@ local function lab_accepts_all(lab, packs, diagnostic_observer)
   return true
 end
 
-function M.any_lab_accepts_all(packs, diagnostic_observer)
+local function lab_acquisition_witness(lab_name, diagnostic_observer, reachability_context)
+  local context = reachability_context or {}
+  local service = compiler_context.current():service("science.item_acquisition_witness")
+  if not service then error("MIR item-acquisition service is not registered in CompilerContext.", 2) end
+  local items = {}
+  if diagnostic_observer then
+    -- A cold diagnostic must reserve each raw visit rather than construct the
+    -- normal comprehensive item index outside its work budget.
+    for _, item_type in ipairs(prototype_lookup.item_types()) do
+      if not diagnostic_visit(diagnostic_observer) then return nil end
+      for name, item in pairs(data_raw.prototypes(item_type)) do
+        if not diagnostic_visit(diagnostic_observer) then return nil end
+        if item.place_result == lab_name then items[#items + 1] = name end
+      end
+    end
+    table.sort(items)
+  else
+    local item_facts = require("prototypes.mir.index.item_prototype_facts")
+    for _, name in ipairs(item_facts.placeable_items_for_entity_types({"lab"})) do
+      local item = prototype_lookup.item_prototype(name)
+      if item and item.place_result == lab_name then items[#items + 1] = name end
+    end
+  end
+  for _, name in ipairs(items) do
+    if not diagnostic_visit(diagnostic_observer) then return nil end
+    local witness = service(name, context.visiting_packs or {},
+      context.visiting_technologies or {}, diagnostic_observer)
+    if witness then return witness end
+  end
+  return nil
+end
+
+function M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
   if not packs or #packs == 0 then return false end
-  for _, lab in pairs(data_raw.prototypes("lab")) do
+  for name, lab in pairs(data_raw.prototypes("lab")) do
     if not diagnostic_visit(diagnostic_observer) then return false end
-    if lab_accepts_all(lab, packs, diagnostic_observer) then return true end
+    if lab_accepts_all(lab, packs, diagnostic_observer)
+      and lab_acquisition_witness(name, diagnostic_observer, reachability_context) then return true end
   end
   return false
 end
 
-function M.valid_research_ingredients(ingredients, diagnostic_observer)
+function M.valid_research_ingredients(ingredients, diagnostic_observer, reachability_context)
   local packs = {}
   for _, ingredient in ipairs(ingredients or {}) do
     if not diagnostic_visit(diagnostic_observer) then return false end
     local name = M.ingredient_name(ingredient)
     if name then table.insert(packs, name) end
   end
-  return M.any_lab_accepts_all(packs, diagnostic_observer)
+  return M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
 end
 
 local function required_set(required_packs)
@@ -161,7 +195,7 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
     end
     local candidate_has_required = contains_required(candidate, required)
     if candidate_has_required and contains_phase_trigger(candidate, required_any_packs)
-      and #candidate > 0 and M.valid_research_ingredients(candidate)
+      and #candidate > 0 and lab_acquisition_witness(entry.name)
       and (not best or #candidate > #best) then
       best, best_lab = candidate, entry.name
     end

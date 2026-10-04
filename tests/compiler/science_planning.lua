@@ -24,11 +24,20 @@ local function stub(name, value) package.loaded[name] = value end
 stub('prototypes.mir.settings.effective', {get=function(n) return values[n] end})
 stub('prototypes.mir.pipeline.compiler_context', {current=function() return {
  service=function(_, name)
+  if name == 'science.item_acquisition_witness' then
+   return function() return {kind='fixture-lab-source'} end -- fixture assumption, not lab acquisition evidence
+  end
   assert(name == 'science.pack_production_status', 'Unexpected service: '..name)
   return function(name) return unreachable[name] and 'unreachable' or 'reachable' end -- fixture assumption, not engine evidence
  end
 } end})
-stub('prototypes.mir.platform.factorio.prototype_lookup', {is_space_age=function() return true end})
+stub('prototypes.mir.platform.factorio.prototype_lookup', {
+ is_space_age=function() return true end,
+ item_prototype=function(name) return {place_result=name} end
+})
+stub('prototypes.mir.index.item_prototype_facts', {placeable_items_for_entity_types=function()
+ local out={}; for name in pairs(data.raw.lab) do out[#out+1]=name end; table.sort(out); return out
+end})
 local registry = {science_pack_exists=function(n) return exists[n]==true end}
 stub('prototypes.mir.capabilities.science_integration.pack_registry',registry)
 stub('prototypes.mir.streams.registry',{shared={per_level_default=0.1}})

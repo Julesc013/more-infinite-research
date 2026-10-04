@@ -24,7 +24,14 @@ local target_profile = {current_factorio_version = "2.1", prototype_shapes = {
 target_profile.current = function() return target_profile end
 stub("prototypes.mir.platform.factorio.target_profiles", target_profile)
 stub("prototypes.mir.platform.factorio.prototype_lookup", {
-  item_prototype = function(name) return world.item_prototypes[name] end
+  item_prototype = function(name) return world.item_prototypes[name] end,
+  item_types = function() return {"item"} end,
+  each_item_prototype = function(callback)
+    for name, prototype in pairs(world.item_prototypes) do callback(name, prototype, prototype.type or "item") end
+  end,
+  each_entity_prototype = function(callback)
+    for name, prototype in pairs(data.raw.lab or {}) do callback(name, prototype, "lab") end
+  end
 })
 stub("prototypes.mir.capabilities.science_integration.lab_compatibility", {
   ingredient_name = function(ingredient) return ingredient.name or ingredient[1] end,
@@ -89,11 +96,15 @@ local function new_context()
   function next_context:freeze_services()
     self.services_frozen = true
   end
+  function next_context:freeze_state(name)
+    if self.states[name] == nil then error("fixture missing state to freeze: " .. name) end
+  end
   function next_context:service(name)
     if self.services[name] then return self.services[name] end
     if name == "science.technology_researchability_reason" then return researchability.reason_with_context end
     if name == "science.pack_production_status" then return production.pack_production_status end
     if name == "science.independent_pack_acquisition_witness" then return production.independent_pack_acquisition_witness end
+    if name == "science.item_acquisition_witness" then return production.item_acquisition_witness end
     if name == "science.prereq_tech_for_science_pack" then return production.prereq_tech_for_science_pack end
     if name == "science.prereq_techs_for_science_pack" then return production.prereq_techs_for_science_pack end
     if name == "science.production_route_for_pack" then return production.production_route_for_pack end
@@ -2719,6 +2730,12 @@ check('D24', unavailable_projection and unavailable_projection.status == 'indete
 -- emit both independently selected inner gates, once each, to the F200
 -- continuation qualifier.
 reset(enabled_future_gate_consumer_world())
+-- A controlled natural source supplies this fixture's placement item. The
+-- actual lab solver remains active; plural-gate proof does not assume that
+-- prototype presence alone acquires the lab.
+world.item_prototypes['fixture-lab-kit'] = {type = 'item', place_result = 'lab'}
+data.raw.item = world.item_prototypes
+data.raw.tree['fixture-lab-source'] = {minable = {result = 'fixture-lab-kit', count = 1}}
 context.states.recipe_index = nil
 context.epochs.recipe_index = nil
 stub("prototypes.mir.settings.resolver", {base_enabled = function() return true end})
