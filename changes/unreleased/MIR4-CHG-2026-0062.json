@@ -1,0 +1,34 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0062",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Bind Research Library close and position events to the player's current frame.",
+  "details": [
+    "Close and location callbacks require the player's actual current screen frame. A foreign, replaced or nested same-named element cannot close the retained library or overwrite its saved position; valid current-frame events retain their existing behavior.",
+    "Consumed real-source handler controls cover inert unrelated events, actual close and position changes, and preservation of another player's view and pending search. Separate negative controls detect name-only guards for each callback.",
+    "Controlled host execution preserves the accepted layout and native research-screen handoff. Native GUI input, save/load and two-client multiplayer qualification remain required; these controls do not close those obligations."
+  ],
+  "semantic_domains": ["presentation", "runtime", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The enabled Research Library consumes the shared host callbacks."},
+    {"target":"F200","disposition":"affected","reason":"The enabled Research Library consumes the shared host callbacks."},
+    {"target":"F110","disposition":"omitted-by-capability","reason":"The target profile disables the required settings_profiles feature."},
+    {"target":"F100","disposition":"omitted-by-capability","reason":"The target profile disables the required settings_profiles feature."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"The historical target does not expose this Research Library host."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"The historical target does not expose this Research Library host."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"The historical target does not expose this Research Library host."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"The historical target does not expose this Research Library host."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"The historical target does not expose this Research Library host."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"compatible","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/runtime/research_browser_handler_regressions.lua: actual registered host callbacks and independent ownership negative controls"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

@@ -12,7 +12,7 @@ end
 local function make_host_factory(host_source)
   local function make_environment()
     local events, buckets = {}, {}
-    local metrics = {render_calls = 0, gameplay_mutations = 0}
+    local metrics = {render_calls = 0, gameplay_mutations = 0, destroy_calls = 0, shortcut_calls = 0}
     local player
     local event_names = {
       "on_gui_selected_tab_changed", "on_gui_location_changed", "on_gui_click",
@@ -69,7 +69,7 @@ local function make_host_factory(host_source)
     setmetatable(env, {__index = function(_, key)
       error("unexpected host global access: " .. tostring(key))
     end})
-    return env, events, metrics, function(value) player = value end
+    return env, events, metrics, buckets, function(value) player = value end
   end
 
   return function(options)
@@ -83,22 +83,60 @@ local function make_host_factory(host_source)
         "render = function(player) error('__handler_render_sentinel__')", 1)
       if count ~= 1 then error("render sentinel anchor not found") end
     end
-    local env, events, metrics, set_player = make_environment()
+    if options and options.mutate_name_only_location then
+      local count
+      source, count = string.gsub(source,
+        "if owned_root%(player, event.element%) then view%(player%).location = event.element.location end",
+        "if player and event.element and event.element.valid and event.element.name == ROOT then view(player).location = event.element.location end", 1)
+      if count ~= 1 then error("location ownership mutation anchor not found") end
+    end
+    if options and options.mutate_name_only_close then
+      local count
+      source, count = string.gsub(source, "if owned_root%(player, event.element%) then close%(player%) end",
+        "if event.element and event.element.valid and event.element.name == ROOT then close(player) end", 1)
+      if count ~= 1 then error("close ownership mutation anchor not found") end
+    end
+    local env, events, metrics, buckets, set_player = make_environment()
     local chunk, load_error = load(source, "research_browser_handler_fixture", "t", env)
     if not chunk then error(load_error) end
     local host = chunk()
     host.register()
-    local root = {valid = true, name = "mir_research_browser"}
+    local root = {valid = true, name = "mir_research_browser", location = {x = 10, y = 20}}
     local dropdown = {valid = true, type = "drop-down", tags = {mir_browser = "status"}, parent = root}
     local textfield = {valid = true, type = "textfield", tags = {mir_browser = "search"}, parent = root}
     local unknown_button = {valid = true, type = "button", tags = {mir_browser = "unknown-action"}, parent = root}
     -- The foreign control advertises a destructive MIR action but does not
     -- belong to the player's root, so ownership must reject it first.
     local foreign_button = {valid = true, type = "button", tags = {mir_browser = "close"}}
-    local fixture_player = {index = 1, gui = {screen = {mir_research_browser = root}}}
+    local fixture_player = {valid = true, index = 1, gui = {screen = {mir_research_browser = root}}}
+    fixture_player.force = setmetatable({}, {
+      __index = function() error("lifecycle fixture must not read force gameplay") end,
+      __newindex = function()
+        metrics.gameplay_mutations = metrics.gameplay_mutations + 1
+        error("lifecycle fixture must not write force gameplay")
+      end
+    })
+    fixture_player.set_shortcut_toggled = function(_, toggled)
+      metrics.shortcut_calls = metrics.shortcut_calls + 1
+      metrics.shortcut_toggled = toggled
+    end
+    root.destroy = function()
+      metrics.destroy_calls = metrics.destroy_calls + 1
+      root.valid = false
+      fixture_player.gui.screen.mir_research_browser = nil
+    end
+    -- A second player's pending search and saved view share this namespace.
+    -- Lifecycle callbacks for player 1 must leave that peer's state intact.
+    local peer_view = {location = {x = 30, y = 40}, search = "peer search"}
+    buckets.research_browser = {
+      players = {[1] = {location = root.location}, [2] = peer_view},
+      pending_search_refresh = {[1] = 10, [2] = 20}
+    }
     set_player(fixture_player)
     return {
       on_gui_click = events.on_gui_click,
+      on_gui_closed = events.on_gui_closed,
+      on_gui_location_changed = events.on_gui_location_changed,
       player = fixture_player,
       root = root,
       elements = {
@@ -107,7 +145,9 @@ local function make_host_factory(host_source)
         unknown_button = unknown_button,
         foreign_button = foreign_button
       },
-      metrics = metrics
+      metrics = metrics,
+      state = buckets.research_browser,
+      peer_view = peer_view
     }
   end
 end
@@ -165,6 +205,59 @@ return function(host_source_string, check)
   invoke_and_assert_inert(fixture, "textfield", check)
   invoke_and_assert_inert(fixture, "unknown_button", check)
   invoke_and_assert_inert(fixture, "foreign_button", check)
+
+  -- A foreign or replaced element can use the same name as the browser root.
+  -- Names do not prove that a lifecycle event belongs to the retained frame.
+  expect(check, type(fixture.on_gui_location_changed) == "function"
+    and type(fixture.on_gui_closed) == "function", "real host registers lifecycle callbacks")
+  local foreign_root = {valid = true, name = fixture.root.name, location = {x = 900, y = 800}}
+  local stale_root = {valid = true, name = fixture.root.name, location = {x = 700, y = 600}}
+  local named_child = {valid = true, name = fixture.root.name, parent = fixture.root, location = {x = 500, y = 400}}
+  for _, element in ipairs{foreign_root, stale_root, named_child} do
+    fixture.on_gui_location_changed{player_index = 1, element = element}
+    expect(check, fixture.state.players[1].location == fixture.root.location,
+      "a same-named foreign or replaced frame cannot overwrite the browser location")
+    fixture.on_gui_closed{player_index = 1, element = element}
+    expect(check, fixture.root.valid and fixture.metrics.destroy_calls == 0
+      and fixture.metrics.shortcut_calls == 0 and fixture.state.pending_search_refresh[1] == 10,
+      "a same-named foreign or replaced frame cannot close the retained browser")
+  end
+  for _, element in ipairs{{valid = false, name = fixture.root.name}, {valid = true, name = "another-frame"}} do
+    fixture.on_gui_location_changed{player_index = 1, element = element}
+    fixture.on_gui_closed{player_index = 1, element = element}
+  end
+  fixture.on_gui_location_changed{player_index = 99, element = fixture.root}
+  fixture.on_gui_closed{player_index = 99, element = fixture.root}
+  fixture.on_gui_location_changed{player_index = 1}
+  fixture.on_gui_closed{player_index = 1}
+  expect(check, fixture.root.valid and fixture.metrics.destroy_calls == 0
+    and fixture.state.players[1].location == fixture.root.location,
+    "invalid, unrelated, missing-element and missing-player lifecycle events are inert")
+  fixture.root.location = {x = 50, y = 60}
+  fixture.on_gui_location_changed{player_index = 1, element = fixture.root}
+  expect(check, fixture.state.players[1].location == fixture.root.location,
+    "the retained root can persist its actual position")
+  fixture.on_gui_closed{player_index = 1, element = fixture.root}
+  expect(check, not fixture.root.valid and fixture.metrics.destroy_calls == 1
+    and fixture.metrics.shortcut_calls == 1 and fixture.metrics.shortcut_toggled == false
+    and fixture.state.pending_search_refresh[1] == nil
+    and fixture.state.players[1].location == fixture.root.location,
+    "closing the retained root saves its position, clears its search and updates its shortcut")
+  expect(check, fixture.state.players[2] == fixture.peer_view
+    and fixture.peer_view.location.x == 30 and fixture.peer_view.location.y == 40
+    and fixture.peer_view.search == "peer search" and fixture.state.pending_search_refresh[2] == 20,
+    "one player's lifecycle events preserve the peer's saved view and pending search")
+  expect(check, fixture.metrics.gameplay_mutations == 0,
+    "browser lifecycle events do not change force gameplay")
+
+  local name_only_location = fixture_from(host_factory, {mutate_name_only_location = true}, check)
+  name_only_location.on_gui_location_changed{player_index = 1, element = foreign_root}
+  expect(check, name_only_location.state.players[1].location == foreign_root.location,
+    "negative control independently detects a name-only location guard")
+  local name_only_close = fixture_from(host_factory, {mutate_name_only_close = true}, check)
+  name_only_close.on_gui_closed{player_index = 1, element = foreign_root}
+  expect(check, not name_only_close.root.valid and name_only_close.metrics.destroy_calls == 1,
+    "negative control independently detects a name-only close guard")
 
   local negative = fixture_from(host_factory, {mutate_unconditional_click_render = true}, check)
   local before_render = metric(negative, "render_calls", check)

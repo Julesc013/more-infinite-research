@@ -72,6 +72,11 @@
   },
   "classes": [
     {
+      "id": "mir42-browser-consumed-regressions",
+      "patterns": ["^source/prototypes/mir/runtime/research_browser(?:_core)?[.]lua$", "^tests/runtime/(?:Test-MIRResearchBrowser[.]ps1|research_browser(?:_core_regressions|_handler_regressions)?[.]lua)$"],
+      "tests": ["runtime.research-browser"]
+    },
+    {
       "id": "mir42-support-collector-release-asset",
       "patterns": ["^scripts/Collect-MIRPlayerReport\\.(?:cmd|ps1)$", "^tools/commands/release/New-MIR42SupportCollectorBundle\\.ps1$", "^tools/mir/application/release/readiness/MIR42SupportCollectorBundle\\.ps1$", "^tests/release/Test-MIR42NineTargetReleaseAssets\\.ps1$", "^tests/support/MIR42StartupCollectorControls\\.ps1$", "^docs/maintainer/mir4-release-operations\\.md$"],
       "tests": ["static.mir42-nine-target-release-assets"]

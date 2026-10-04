@@ -1021,6 +1021,10 @@ The split binds the characterized 1,104-line implementation and preserves all 28
 
 This PS11 split is package-excluded and changes no inventory semantics, package, gameplay, save, setting, migration, compatibility claim, or release behavior. It grants no version allocation, production signing, sealing, promotion, tagging, publication, or package cutover authority.
 
+## Research Library lifecycle boundary
+
+The Research Library's close and location callbacks in `source/prototypes/mir/runtime/research_browser.lua` accept only the player's current screen frame by object identity. A foreign, replaced or nested element with the same name cannot close that frame or overwrite its saved position. The consumed handler fixture loads the actual registered callbacks, checks peer-state preservation and independently detects restored name-only guards. These controlled checks do not qualify native GUI input, saved-state serialization or two-client multiplayer; the existing native browser and continuity lanes retain those obligations.
+
 ## MIR 4 current-product bridge-retirement boundary
 
 `governance/repository/migrations/current-product-bridge-retirement-v1.json` is the sole current bridge-disposition authority. `tools/mir/application/repository/BridgeRetirement.ps1` constructs and validates it, while the two governed writers own its authority and append-only receipt. The accepted state has zero current-product, dual-write, package-authority, release/current-state, runtime/state/migration, public-claim, unowned, or unbounded bridges.
