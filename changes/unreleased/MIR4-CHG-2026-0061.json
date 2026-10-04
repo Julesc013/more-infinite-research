@@ -1,0 +1,34 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0061",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Redact quoted credentials and authorization in standalone startup reports.",
+  "details": [
+    "The standalone collector handles quoted credentials, Basic/Bearer authorization, home paths and email text while preserving prior unquoted suffix-key handling. Mod-list text uses the same local redactor; hashes describe captured redacted bytes and the manifest records mod-list changes.",
+    "Consumed release-asset controls execute the actual script under PowerShell 7 and Windows PowerShell 5.1 on Windows. Synthetic cases cover preserved diagnostics and inputs, valid quoted JSON, tail and mod-list limits, excluded payloads and repeated redaction.",
+    "The self-contained two-file collector and frozen-source bundle identity remain separate from player packages. These controls do not prove universal privacy or native Factorio behavior; actual candidate qualification, release readback and review before sharing remain required."
+  ],
+  "semantic_domains": ["tooling", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The separate target-neutral support collector can gather existing startup logs; player package bytes are unchanged."},
+    {"target":"F200","disposition":"affected","reason":"The separate target-neutral support collector can gather existing startup logs; player package bytes are unchanged."},
+    {"target":"F110","disposition":"affected","reason":"The collector reads existing local logs independently of the Factorio engine."},
+    {"target":"F100","disposition":"affected","reason":"The collector reads existing local logs independently of the Factorio engine."},
+    {"target":"F017","disposition":"affected","reason":"The collector reads existing local logs independently of the Factorio engine."},
+    {"target":"F016","disposition":"affected","reason":"The collector reads existing local logs independently of the Factorio engine."},
+    {"target":"F015","disposition":"affected","reason":"The collector reads existing local logs independently of the Factorio engine."},
+    {"target":"F014","disposition":"affected","reason":"The collector reads existing local logs independently of the Factorio engine."},
+    {"target":"F013","disposition":"affected","reason":"The collector reads existing local logs independently of the Factorio engine."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/support/MIR42StartupCollectorControls.ps1: actual standalone-script controls consumed by the release-asset test"},
+    {"kind":"document","value":"docs/reference/mir4-environment-evidence.md"}
+  ]
+}

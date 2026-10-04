@@ -8,6 +8,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $module = Join-Path $repo 'tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1'
 if (-not (Test-Path -LiteralPath $module -PathType Leaf)) { throw "[mir42-release-assets-test-module-missing] $module" }
 . $module
+. (Join-Path $repo 'tests/support/MIR42StartupCollectorControls.ps1')
 
 function Assert-MIR42ReleaseAssetsTest {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Code)
@@ -48,9 +49,10 @@ function Copy-MIR42ReleaseAssetsFixtureTree {
   }
 }
 
-$root = Join-Path $repo ('build/test-results/mir42-release-assets-' + [guid]::NewGuid().ToString('N'))
+$root = Join-Path $repo ('build/tmp/mir42-release-assets-' + [guid]::NewGuid().ToString('N'))
 $candidateReader = (Get-Item Function:Get-MIR42ExactFourTargetCandidate).ScriptBlock
 try {
+  $collectorControls=Invoke-MIR42StartupCollectorControls -RepoRoot $repo -Root (Join-Path $root 'collector-controls')
   $candidateRoot = Join-Path $root 'candidate'
   $assetRoot = Join-Path $root 'release-assets'
   New-Item -ItemType Directory -Force -Path $candidateRoot,$assetRoot | Out-Null
@@ -304,4 +306,4 @@ try {
   if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }
 
-Write-Output 'MIR42-NINE-TARGET-RELEASE-ASSETS-PASSED assets=16 uploads=9 targets=9 network=0 public-claims=0'
+Write-Output "MIR42-NINE-TARGET-RELEASE-ASSETS-PASSED assets=16 uploads=9 targets=9 network=0 public-claims=0 collector-controls=$($collectorControls.assertions) collector-hosts=$($collectorControls.hosts) host-versions=$($collectorControls.host_versions -join ',')"

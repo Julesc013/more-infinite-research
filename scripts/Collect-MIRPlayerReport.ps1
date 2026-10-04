@@ -71,8 +71,24 @@ function Protect-MIRLogText {
       $protected = [regex]::Replace($protected, [regex]::Escape($privatePath.Replace('\', '/')), '<FACTORIO_USER_PATH>', 'IgnoreCase')
     }
   }
-  $protected = [regex]::Replace($protected, '(?i)\b[A-Z]:[\\/]Users[\\/][^\\/\s]+', '<USER_PROFILE>')
-  $protected = [regex]::Replace($protected, '(?i)(password|secret|api[_-]?key|access[_-]?token|token)\s*[:=]\s*[^\s,;]+', '$1=<REDACTED>')
+  $protected = [regex]::Replace($protected, '(?i)\b[A-Z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s]+', '<USER_PROFILE>')
+  $protected = [regex]::Replace($protected, '(?i)/(?:home|Users)/[^/\s]+', '<USER_PROFILE>')
+  # Keep this standalone Windows PowerShell entry point self-contained. The
+  # quoted-value grammar follows the developer support-export consumer;
+  # suffix keys retain the collector's existing unquoted redaction behavior.
+  $credentialPattern = '(?i)(?<prefix>(?:access[_-]?token|token|secret|password|api[_-]?key)["'']?\s*[=:]\s*)(?<value>"(?:\\.|[^"\\])*"|''(?:\\.|[^''\\])*''|[^\s,;]+)'
+  $protected = [regex]::Replace($protected, $credentialPattern, [Text.RegularExpressions.MatchEvaluator]{
+    param($match)
+    $value = $match.Groups['value'].Value
+    $replacement = '<REDACTED>'
+    if ($value.Length -ge 2 -and ($value[0] -ceq [char]34 -or $value[0] -ceq [char]39) -and $value[0] -ceq $value[$value.Length - 1]) {
+      $replacement = [string]$value[0] + '<REDACTED>' + [string]$value[0]
+    }
+    return $match.Groups['prefix'].Value + $replacement
+  }, [Text.RegularExpressions.RegexOptions]::None, [TimeSpan]::FromSeconds(2))
+  $protected = [regex]::Replace($protected, '(?i)\b((?:proxy-)?authorization)\s*:\s*(bearer|basic)\s+[^\s,;]+', '$1: $2 <REDACTED>')
+  $protected = [regex]::Replace($protected, '(?i)\bbearer\s+[^\s,;]+', 'Bearer <REDACTED>')
+  $protected = [regex]::Replace($protected, '(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b', '<EMAIL_REDACTED>')
   return $protected
 }
 
@@ -133,8 +149,9 @@ try {
     }
     if ($null -ne $read) {
       if ($null -ne $read.text) {
-        Add-MIRZipText -Archive $archive -Name 'mods/mod-list.json' -Value $read.text
-        $manifest.mod_list = [ordered]@{ bytes = $read.bytes; captured_sha256 = Get-MIRTextHash -Value $read.text }
+        $safeModList = Protect-MIRLogText -Value $read.text
+        Add-MIRZipText -Archive $archive -Name 'mods/mod-list.json' -Value $safeModList
+        $manifest.mod_list = [ordered]@{ bytes = $read.bytes; captured_sha256 = Get-MIRTextHash -Value $safeModList; redacted = $safeModList -cne $read.text }
       } else {
         $manifest.notes += 'mod-list.json exceeded 2 MiB and was omitted.'
       }
@@ -177,8 +194,10 @@ MIR startup support report
 
 This archive works even when MIR or Factorio stops during startup. It contains
 the available current and previous Factorio logs, the active mod list, and
-MIR package identities. Long logs include their last 8 MiB. User paths and
-common password/token assignments are redacted from captured logs.
+MIR package identities. Long logs include their last 8 MiB. User paths, email
+addresses, authorization headers and common quoted password/token assignments
+are redacted from captured logs and mod-list text. The manifest hashes the
+captured redacted bytes and records whether mod-list text changed.
 
 The binary mod-settings.dat is NOT included; its hash is recorded for identity.
 No saves, crash dumps, full mod packages, or unrelated personal files are
