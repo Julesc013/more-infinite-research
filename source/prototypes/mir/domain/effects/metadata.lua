@@ -5,6 +5,7 @@ local IDENTITY_FIELDS = {"type", "recipe", "ammo_category", "turret_id", "fluid"
 
 local PERCENTAGE_EFFECTS = {
   ["braking-force"] = true,
+  ["train-braking-force-bonus"] = true,
   ["character-crafting-speed"] = true,
   ["character-mining-speed"] = true,
   ["character-running-speed"] = true,

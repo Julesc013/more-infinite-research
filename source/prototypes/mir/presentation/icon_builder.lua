@@ -242,7 +242,7 @@ local function overlay_for_stream(stream)
     if t == "cargo-landing-pad-count" then return "count" end
     if t == "character-crafting-speed" then return "crafting-speed" end
     if t == "gun-speed" then return "speed" end
-    if t == "braking-force" then return "braking-force" end
+    if t == "train-braking-force-bonus" or t == "braking-force" then return "braking-force" end
     if t == "ammo-damage" or t == "turret-attack" then return "damage" end
   end
 

@@ -644,7 +644,7 @@ local function expected_icon_badge(tech)
       return "range"
     elseif effect_type == "cargo-landing-pad-count" then
       return "count"
-    elseif effect_type == "braking-force" then
+    elseif effect_type == "train-braking-force-bonus" or effect_type == "braking-force" then
       return "braking-force"
     elseif effect_type == "ammo-damage" or effect_type == "turret-attack" then
       return "damage"

@@ -10,6 +10,12 @@ function Assert-MIR4InspectorCompatibilityV1 {
 }
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
+$policyPath=Join-Path $repo '.mir/compatibility.yml'
+$policyBefore=(Get-FileHash -LiteralPath $policyPath -Algorithm SHA256).Hash
+# Authenticate the frozen migration binding separately from today's policy.
+$historicalReceipt=Get-MIR4InspectorCompatibilityMigrationReceiptV1 -RepoRoot $repo
+$historicalPolicy=@($historicalReceipt.components|Where-Object{[string]$_.path-ceq'.mir/compatibility.yml'})
+Assert-MIR4InspectorCompatibilityV1 ($historicalPolicy.Count-eq1-and[string]$historicalPolicy[0].sha256-ceq$script:MIR4InspectorCompatibilityPolicySha256) 'mir4-inspector-compatibility-historical-policy-binding'
 $authority=Get-MIR4InspectorCompatibilityAuthority -RepoRoot $repo
 foreach($flag in @('semantic_authority','terminal_compatibility_policy_authority','terminal_claim_authority','player_package_mutation_authorized','prototype_write_authorized','runtime_state_mutation_authorized','migration_execution_authorized','planner_or_emitter_admission_authorized','safety_kernel_override_authorized','arbitrary_code_generation_authorized','network_or_upload_authorized','public_support_authorized','signing_or_sealing_authorized','publication_authorized')){Assert-MIR4InspectorCompatibilityV1 (-not[bool]$authority.$flag) 'mir4-inspector-compatibility-authority-firewall' $flag}
 $parity=Test-MIR4InspectorCompatibilityFunctionalParityV1 -RepoRoot $repo
@@ -19,6 +25,6 @@ Assert-MIR4InspectorCompatibilityV1 (@($parity.record.subjects|Where-Object{$_.i
 Assert-MIR4InspectorCompatibilityV1 (@($parity.record.plan|Where-Object{$_.disposition-notin@('Preserve','RequestReview','RequireExtension')}).Count-eq0) 'mir4-inspector-compatibility-safe-dispositions'
 $reference=Test-MIR4T13Reference -RepoRoot $repo
 Assert-MIR4InspectorCompatibilityV1 ([string]$reference.status-ceq'passed'-and[int]$reference.canary_count-eq8-and[int]$reference.capture_count-eq11-and-not[bool]$reference.package_visible) 'mir4-inspector-compatibility-t13-reference'
-Assert-MIR4InspectorCompatibilityV1 ((Get-FileHash -LiteralPath (Join-Path $repo '.mir/compatibility.yml') -Algorithm SHA256).Hash-ceq$script:MIR4InspectorCompatibilityPolicySha256) 'mir4-inspector-compatibility-policy-read-only'
+Assert-MIR4InspectorCompatibilityV1 ((Get-FileHash -LiteralPath $policyPath -Algorithm SHA256).Hash-ceq$policyBefore) 'mir4-inspector-compatibility-policy-read-only'
 Assert-MIR4InspectorCompatibilityV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-inspector-compatibility-package-mutation'
 [pscustomobject][ordered]@{status='accepted';functional_parity_digest=[string]$parity.digest;subject_count=10;section_count=11;canary_count=8;capture_count=11;package_source_sha256=$packageBefore;package_visible=$false;public_support_authorized=$false;release_transition_authority=$false}
