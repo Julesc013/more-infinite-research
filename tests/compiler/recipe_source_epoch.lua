@@ -141,4 +141,50 @@ end)
   profile_module.current = old_current
 end)()
 
+-- The composed Factorio-1 targets share this adapter. Generation must retain
+-- the live base-version selector and its data/runtime disagreement checks.
+;(function()
+  local alias="fixtures.recipe_source_epoch.shared_base_profiles"
+  local authority=require("fixtures.recipe_source_epoch.target_profiles")
+  local previous_mods,previous_script,previous_module=mods,script,package.loaded[alias]
+  local function equal(left,right)
+    if type(left)~=type(right) then return false end
+    if type(left)~="table" then return left==right end
+    for key,value in pairs(left) do if not equal(value,right[key]) then return false end end
+    for key in pairs(right) do if left[key]==nil then return false end end
+    return true
+  end
+  local function load(data_mods,runtime_mods)
+    _G.mods=data_mods
+    _G.script=runtime_mods and {active_mods=runtime_mods} or nil
+    package.loaded[alias]=nil
+    return require(alias)
+  end
+  for _,line in ipairs({"1.1","1.0"}) do
+    for _,phase in ipairs({"data","runtime"}) do
+      local active={base=line..".0"}
+      local adapter=phase=="data" and load(active,nil) or load(nil,active)
+      check("BP"..line.."/"..phase,adapter.current_factorio_version==line
+        and adapter.current()==adapter.profiles[line],"Shared adapter selects the live base line")
+      local count=0
+      for selected in pairs(adapter.profiles) do
+        assert(selected=="1.1" or selected=="1.0","Shared adapter copied an unrelated profile")
+        count=count+1
+      end
+      check("BPS"..line.."/"..phase,count==2,"Shared adapter contains only its two reduced contracts")
+      local agrees=true
+      for key,value in pairs(adapter.current()) do
+        if not equal(value,authority.profiles[line][key]) then agrees=false end
+      end
+      check("BPA"..line.."/"..phase,agrees,"Every represented profile fact matches the authority")
+    end
+  end
+  local matched=load({base="1.1.110"},{base="1.1.110"})
+  check("BPM",matched.current_factorio_version=="1.1","Matching data/runtime authorities are accepted")
+  check("BPD",not pcall(load,{base="1.1.110"},{base="1.0.0"}),"Conflicting base authorities remain rejected")
+  check("BPU",not pcall(load,{base="2.1.20"},nil),"An unrelated engine line remains rejected")
+  check("BPN",not pcall(load,nil,nil),"Missing base authority remains rejected")
+  _G.mods,_G.script,package.loaded[alias]=previous_mods,previous_script,previous_module
+end)()
+
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)

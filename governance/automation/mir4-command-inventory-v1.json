@@ -3291,9 +3291,9 @@
     {
       "path": "tools/commands/targets/Sync-MIRTargetProfiles.ps1",
       "classification": "canonical-internal",
-      "sha256": "64D896CCEEFA12D5E8A5BAE33E860F7F2C4451D24385A4C81EC374B0AFB11742",
+      "sha256": "0CFD82E38638A3B285F8783393CD21D5AB3E858D8140C9B0A514FA9099A47223",
       "hash_mode": "canonical-text-v1",
-      "lines": 95,
+      "lines": 134,
       "package_visible": false
     },
     {
@@ -4707,9 +4707,9 @@
     {
       "path": "tools/lib/validation/TargetProfiles.ps1",
       "classification": "canonical-internal",
-      "sha256": "E6D0AF9AEB5CDE9B1CCAE50CFDBDC4EA69742FC466E12CE8F686FCDFF7A20DE9",
+      "sha256": "9FB5AB89A9773FF26BB4CB42235596E4EC5F3CEF35B26CF918AE287D9FD75323",
       "hash_mode": "canonical-text-v1",
-      "lines": 129,
+      "lines": 139,
       "package_visible": false
     },
     {
@@ -6018,5 +6018,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ef08f44dde0a0ddbe0c51d30977244bac8753ee3d1752530e508b5d2f04cdd72"
+  "digest": "sha256:596d7d43e80626341635411bca7a64acdc0c0fbc32a2714fe729026f14339225"
 }

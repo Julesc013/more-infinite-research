@@ -30,6 +30,19 @@ function M.maximum_base_result_amount(entry)
   return math.max(minimum, maximum)
 end
 
+function M.productivity_excluded_amount(entry, profile)
+  if type(entry) ~= "table" then return 0 end
+  if entry.ignored_by_productivity ~= nil then
+    return tonumber(entry.ignored_by_productivity) or 0
+  end
+  local shapes = profile and profile.prototype_shapes or {}
+  local product_defaults = shapes.product_property_defaults or {}
+  if product_defaults.ignored_by_productivity == "ignored_by_stats" then
+    return tonumber(entry.ignored_by_stats) or 0
+  end
+  return 0
+end
+
 function M.resolve(recipe, definition, profile)
   recipe = recipe or {}
   definition = definition or recipe

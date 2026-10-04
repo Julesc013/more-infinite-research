@@ -27,80 +27,150 @@ local function current_factorio_line()
   return line
 end
 
-local function reduced_profile(line, technology_overlay_policy)
-  return {
-    factorio_version = line,
-    support_class = "reduced-compatibility-port",
-    validation_status = "validated-historical-release",
-    runtime_state_backend = "global",
-    science_family = "modern-pre-space-age",
-    reduced_legacy = true,
-    legacy_factorio_2_0 = false,
-    supports_space_age = false,
-    weapon_overlap_default = "only-when-dedicated-tech-enabled",
-    technology_overlay_policy = technology_overlay_policy,
-    profile_schema = 2,
-    prototype_shapes = {
-      recipe_category = "category",
-      science_pack_prototype_kinds = {"tool"},
-      product_probability_fields = {"probability", "catalyst_amount"},
-      technology_formula = true,
-      quality = false,
-      surface_conditions = false,
-      mod_data = false
-    },
-    emitter_families = {"technology"},
-    asset_policy = "legacy-modern-icons",
-    expected_stream_count = 11,
-    features = {
-      compatibility_repairs = false,
-      pipeline_extent = false,
-      prototype_limits = false,
-      module_permissions = false,
-      recipe_productivity = false,
-      settings_profiles = false,
-      scripted_techs = false,
-      technology_constant_overlays = false,
-      productivity_family_adoption = false
-    },
-    supported_required_mods = {},
-    supported_effect_types = {
-      "character-build-distance",
-      "character-crafting-speed",
-      "character-inventory-slots-bonus",
-      "character-item-drop-distance",
-      "character-logistic-trash-slots",
-      "character-mining-speed",
-      "character-reach-distance",
-      "character-resource-reach-distance",
-      "character-running-speed",
-      "gun-speed",
-      "laboratory-productivity",
-      "worker-robot-battery"
-    },
-    required_validation_groups = {
-      "static",
-      "package",
-      "base-load",
-      "science-prerequisites",
-      "direct-effects",
-      "weapon-overlap",
-      "reduced-settings-surface",
-      "runtime-state",
-      "exact-dist"
-    }
-  }
-end
-
 local M = {
   schema = 2,
   current_factorio_version = current_factorio_line(),
   profiles = {
-    ["1.1"] = reduced_profile("1.1", "legacy-1.1"),
-    ["1.0"] = reduced_profile("1.0", "none")
+    ["1.1"] = {
+      factorio_version = "1.1",
+      support_class = "reduced-compatibility-port",
+      validation_status = "validated-historical-release",
+      runtime_state_backend = "global",
+      science_family = "modern-pre-space-age",
+      reduced_legacy = true,
+      legacy_factorio_2_0 = false,
+      supports_space_age = false,
+      weapon_overlap_default = "only-when-dedicated-tech-enabled",
+      technology_overlay_policy = "legacy-1.1",
+      profile_schema = 2,
+      prototype_shapes = {
+        recipe_category = "category",
+        science_pack_prototype_kinds = {
+          "tool"
+        },
+        product_probability_fields = {
+          "probability",
+          "catalyst_amount"
+        },
+        technology_formula = true,
+        quality = false,
+        surface_conditions = false,
+        mod_data = false
+      },
+      emitter_families = {
+        "technology"
+      },
+      asset_policy = "legacy-modern-icons",
+      expected_stream_count = 11,
+      features = {
+        compatibility_repairs = false,
+        pipeline_extent = false,
+        prototype_limits = false,
+        module_permissions = false,
+        recipe_productivity = false,
+        settings_profiles = false,
+        scripted_techs = false,
+        technology_constant_overlays = false,
+        productivity_family_adoption = false
+      },
+      supported_required_mods = {},
+      supported_effect_types = {
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
+      },
+      required_validation_groups = {
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      }
+    },
+    ["1.0"] = {
+      factorio_version = "1.0",
+      support_class = "reduced-compatibility-port",
+      validation_status = "validated-historical-release",
+      runtime_state_backend = "global",
+      science_family = "modern-pre-space-age",
+      reduced_legacy = true,
+      legacy_factorio_2_0 = false,
+      supports_space_age = false,
+      weapon_overlap_default = "only-when-dedicated-tech-enabled",
+      technology_overlay_policy = "none",
+      profile_schema = 2,
+      prototype_shapes = {
+        recipe_category = "category",
+        science_pack_prototype_kinds = {
+          "tool"
+        },
+        product_probability_fields = {
+          "probability",
+          "catalyst_amount"
+        },
+        technology_formula = true,
+        quality = false,
+        surface_conditions = false,
+        mod_data = false
+      },
+      emitter_families = {
+        "technology"
+      },
+      asset_policy = "legacy-modern-icons",
+      expected_stream_count = 11,
+      features = {
+        compatibility_repairs = false,
+        pipeline_extent = false,
+        prototype_limits = false,
+        module_permissions = false,
+        recipe_productivity = false,
+        settings_profiles = false,
+        scripted_techs = false,
+        technology_constant_overlays = false,
+        productivity_family_adoption = false
+      },
+      supported_required_mods = {},
+      supported_effect_types = {
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
+      },
+      required_validation_groups = {
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      }
+    }
   }
 }
-
 function M.current()
   local profile = M.profiles[M.current_factorio_version]
   if not profile then

@@ -1,0 +1,33 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0057",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Preserve shared Factorio-1 version selection during target-profile generation.",
+  "details": [
+    "Syncing F110 or F100 no longer replaces their shared adapter with a complete modern profile catalogue and a fixed target version.",
+    "Both operations generate the same two reduced contracts while preserving the authored data/runtime base-version selector and its rejection behavior. Existing represented profile values match the committed baseline exactly.",
+    "The consumed recipe-source fixture passes 46 controlled assertions, including 16 shared-adapter controls. Both target checks converge; native legacy package and save qualification remains pending."
+  ],
+  "semantic_domains": ["compiler"],
+  "audiences": ["maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"This target retains its existing dedicated generated profile representation."},
+    {"target":"F200","disposition":"unaffected","reason":"This target retains its existing dedicated generated profile representation."},
+    {"target":"F110","disposition":"affected","reason":"Its shared adapter retains live base 1.1 selection during generation."},
+    {"target":"F100","disposition":"affected","reason":"Its shared adapter retains live base 1.0 selection during generation."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"This target does not select the shared Factorio-1 adapter."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"This target does not select the shared Factorio-1 adapter."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"This target does not select the shared Factorio-1 adapter."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"This target does not select the shared Factorio-1 adapter."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"This target does not select the shared Factorio-1 adapter."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"compatible","settings":"compatible","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/recipe_source_epoch.lua: BP/BPS/BPA/BPM/BPD/BPU/BPN shared adapter controls"}
+  ]
+}

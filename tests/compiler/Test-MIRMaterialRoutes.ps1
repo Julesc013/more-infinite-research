@@ -36,6 +36,7 @@ $modules=[ordered]@{
  'prototypes.mir.index.recipe_risk_facts'='source/prototypes/mir/index/recipe_risk_facts.lua'
  'prototypes.mir.index.recipe_facts'='source/prototypes/mir/index/recipe_facts.lua'
  'prototypes.mir.domain.facts.recipe_semantics'='source/prototypes/mir/domain/facts/recipe_semantics.lua'
+ 'fixtures.material_routes.target_profiles'='source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua'
  'prototypes.mir.domain.facts.generated_technology_registry'='source/prototypes/mir/domain/facts/generated_technology_registry.lua'
  'prototypes.mir.report.diagnostics_sink'='source/prototypes/mir/report/diagnostics_sink.lua'
  'prototypes.mir.core.deepcopy'='source/prototypes/mir/core/deepcopy.lua'

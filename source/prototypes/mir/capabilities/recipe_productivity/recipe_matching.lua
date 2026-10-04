@@ -93,9 +93,14 @@ local function has_productive_shared_input_output(recipe)
     end
     for _, entry in ipairs(variant.results or {}) do
       local maximum = recipe_semantics.maximum_base_result_amount(entry)
-      local ignored = tonumber(entry.ignored_by_productivity or 0) or 0
+      local ignored = recipe_semantics.productivity_excluded_amount(entry, target_profiles.current())
       local identity = typed_identity(entry)
-      if not identity or (ingredients[identity] and maximum - ignored > 0) then return true end
+      local extra = tonumber(entry.extra_count_fraction or 0)
+      -- A base-quantity exclusion does not certify extra item bonus rolls.
+      -- Withhold that return, including malformed rolls, until separately
+      -- qualified; this guard is not a numeric profitable-loop proof.
+      local extra_return = entry.type == "item" and (extra == nil or extra ~= 0)
+      if not identity or (ingredients[identity] and (maximum - ignored > 0 or extra_return)) then return true end
     end
   end
   return false
