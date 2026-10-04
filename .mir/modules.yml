@@ -1019,6 +1019,7 @@ package_excluded_modules:
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
     implementation_modules: tools/lib/mir4/pre-freeze-release
+    current_authority_succession_validation: tools/lib/mir4/pre-freeze-release/AuthoritySuccessionValidation.ps1
     protected_main_promotion_topology: spec/releases/mir4-protected-main-promotion-topology-v1.json
     protected_main_promotion_topology_schema: spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json
     protected_main_qualification_schema: spec/schemas/mir4-protected-main-qualification-v1.schema.json

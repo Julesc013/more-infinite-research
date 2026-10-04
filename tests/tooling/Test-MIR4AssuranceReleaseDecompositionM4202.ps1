@@ -24,6 +24,7 @@ $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202AssuranceRelease ($raw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-release-schema'
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202AssuranceRelease (Test-MIR4BootstrapRecordHash -Record $receipt) 'mir4-m42-02-assurance-release-record'
+$historicalContract=Get-MIR4M4202HistoricalDecompositionFunctionContract -RepoRoot $repo -ReceiptPath 'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json' -Receipt $receipt
 $predecessorPath=Join-Path $repo ([string]$receipt.predecessor.receipt)
 $predecessor=Get-Content -Raw -LiteralPath $predecessorPath|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202AssuranceRelease ((Get-FileHash -LiteralPath $predecessorPath -Algorithm SHA256).Hash-ceq[string]$receipt.predecessor.receipt_sha256-and[string]$predecessor.record_sha256-ceq[string]$receipt.predecessor.record_sha256) 'mir4-m42-02-assurance-release-predecessor'
@@ -78,27 +79,31 @@ if(Test-Path -LiteralPath $successorPath -PathType Leaf){
 }
 
 Assert-MIR4M4202AssuranceRelease (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedModuleSha) 'mir4-m42-02-assurance-release-module-bridge-retirement-successor'
+Assert-MIR4M4202AssuranceRelease (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $expectedModuleSha) 'mir4-m42-02-assurance-release-module-git-fixed-point'
 $functionNames=[Collections.Generic.List[string]]::new()
 Assert-MIR4M4202AssuranceRelease (@($receipt.decomposition.modules).Count-eq4-and@($receipt.decomposition.modules|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'mir4-m42-02-assurance-release-module-count'
 foreach($module in @($receipt.decomposition.modules)){
   $path=Join-Path $repo ([string]$module.path);$tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors)
-  Assert-MIR4M4202AssuranceRelease (@($errors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$expectedModuleSha[[string]$module.path]-and[int]$module.lines-le400) 'mir4-m42-02-assurance-release-module' ([string]$module.path)
+  Assert-MIR4M4202AssuranceRelease (@($errors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$expectedModuleSha[[string]$module.path]-and[IO.File]::ReadAllLines($path).Length-le400) 'mir4-m42-02-assurance-release-module' ([string]$module.path)
   foreach($function in @($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true))){[void]$functionNames.Add($function.Name)}
 }
 $selfTestPath=Join-Path $repo ([string]$receipt.decomposition.self_test.path);$selfTokens=$null;$selfErrors=$null
 $selfAst=[Management.Automation.Language.Parser]::ParseFile($selfTestPath,[ref]$selfTokens,[ref]$selfErrors)
 $expectedSelfTestSha=@{([string]$receipt.decomposition.self_test.path)=[string]$receipt.decomposition.self_test.sha256}
 Assert-MIR4M4202AssuranceRelease (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedSelfTestSha) 'mir4-m42-02-assurance-release-self-test-bridge-retirement-successor'
+Assert-MIR4M4202AssuranceRelease (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $expectedSelfTestSha) 'mir4-m42-02-assurance-release-self-test-git-fixed-point'
 Assert-MIR4M4202AssuranceRelease (@($selfErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $selfTestPath)-ceq[string]$expectedSelfTestSha[[string]$receipt.decomposition.self_test.path]-and@($selfAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq1) 'mir4-m42-02-assurance-release-self-test'
 foreach($function in @($selfAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true))){[void]$functionNames.Add($function.Name)}
 $projectionSha=Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $functionNames.ToArray())
-Assert-MIR4M4202AssuranceRelease ($functionNames.Count-eq11-and$projectionSha-ceq[string]$receipt.public_contract.previous_sha256-and$projectionSha-ceq[string]$receipt.public_contract.current_sha256-and[bool]$receipt.public_contract.unchanged) 'mir4-m42-02-assurance-release-public-contract'
+$expectedCurrentNames=@(@($historicalContract.function_names)+@('Get-MIRAssuranceDevelopmentPlanningAuthority')|Sort-Object)
+$currentNames=@($functionNames.ToArray()|Sort-Object)
+Assert-MIR4M4202AssuranceRelease ($functionNames.Count-eq12-and@($currentNames|Sort-Object -Unique).Count-eq12-and($currentNames-join'|')-ceq($expectedCurrentNames-join'|')) 'mir4-m42-02-assurance-release-public-contract'
 
 $facadePath=Join-Path $repo ([string]$receipt.decomposition.facade.path);$facadeTokens=$null;$facadeErrors=$null
 $facadeAst=[Management.Automation.Language.Parser]::ParseFile($facadePath,[ref]$facadeTokens,[ref]$facadeErrors)
 $facadeSource=Get-Content -Raw -LiteralPath $facadePath
-Assert-MIR4M4202AssuranceRelease (@($facadeErrors).Count-eq0-and@($facadeAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq0-and[int]$receipt.decomposition.facade.current_lines-le20) 'mir4-m42-02-assurance-release-facade'
+Assert-MIR4M4202AssuranceRelease (@($facadeErrors).Count-eq0-and@($facadeAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq0-and[IO.File]::ReadAllLines($facadePath).Length-le20) 'mir4-m42-02-assurance-release-facade'
 Assert-MIR4M4202AssuranceRelease (-not$facadeSource.Contains('function Invoke-MIRAssuranceSelfTest')) 'mir4-m42-02-assurance-release-production-boundary'
 $entrypointSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'scripts/Invoke-MIRAssurance.ps1')
 Assert-MIR4M4202AssuranceRelease ($entrypointSource.Contains('if ($command -ceq "self-test")')-and$entrypointSource.Contains('tests/tooling/support/MIRAssuranceSelfTest.ps1')) 'mir4-m42-02-assurance-release-self-test-route'
@@ -137,10 +142,11 @@ Assert-MIR4M4202AssuranceRelease ((Test-MIR4M4202PackageSourceSuccession -RepoRo
   status='M42-02-PS6-ASSURANCE-RELEASE-DECOMPOSITION-PASSED'
   facade_lines=[int]$receipt.decomposition.facade.current_lines
   production_modules=@($receipt.decomposition.modules).Count
-  maximum_module_lines=(@($receipt.decomposition.modules|Measure-Object lines -Maximum).Maximum)
-  production_functions=[int]$receipt.public_contract.production_function_count
+  maximum_module_lines=(@($receipt.decomposition.modules|ForEach-Object{[IO.File]::ReadAllLines((Join-Path $repo $_.path)).Length}|Measure-Object -Maximum).Maximum)
+  production_functions=$functionNames.Count-1
   self_test_authority=[string]$receipt.decomposition.self_test.authority
-  public_contract_sha256=$projectionSha
+  public_contract_sha256=[string]$historicalContract.digest
+  current_function_projection_sha256=$projectionSha
   package_source_sha256=$packageBefore
   package_visible=$false
   release_transition_authority=$false

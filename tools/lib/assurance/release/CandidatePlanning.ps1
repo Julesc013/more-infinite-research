@@ -1,22 +1,3 @@
-function Get-MIRAssuranceCandidateArchiveIdentity {
-  param([Parameter(Mandatory)][string]$Path)
-
-  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Candidate does not exist: $Path" }
-  Add-Type -AssemblyName System.IO.Compression.FileSystem
-  $archive = [IO.Compression.ZipFile]::OpenRead($Path)
-  try {
-    $entryCount = @($archive.Entries | Where-Object { -not $_.FullName.EndsWith("/") }).Count
-  } finally {
-    $archive.Dispose()
-  }
-  return [pscustomobject]@{
-    bytes = (Get-Item -LiteralPath $Path).Length
-    entries = $entryCount
-    sha256 = Get-MIRAssuranceSha256 -Path $Path
-    content_sha256 = Get-MIRAssuranceZipContentHash -Path $Path
-  }
-}
-
 function Test-MIRAssuranceReleaseCandidateId {
   param([Parameter(Mandatory)][string]$CandidateId)
   return $CandidateId -match '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$'
