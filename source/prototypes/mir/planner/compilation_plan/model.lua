@@ -126,7 +126,7 @@ function M.sanitize_base_operations(base_plan, target_inventory)
     )
     removed_count = removed_count + #removed
     if operation.technology then operation.technology.effects = kept end
-    if #kept > 0 then
+    if #kept > 0 and technology_effects.has_possible_research_effects(kept) then
       operation.gates.effect_valid = gate_contract.passed(
         "effect-contracts",
         {#removed > 0 and "effect-contracts:sanitized" or "effect-contracts:all-targets-exist"}
@@ -138,6 +138,10 @@ function M.sanitize_base_operations(base_plan, target_inventory)
       local reason = #removed > 0 and "no_valid_effect_targets" or "no_base_extension_effects"
       local evidence = #removed > 0 and "effect-contracts:all-targets-missing"
         or "effect-contracts:no-base-effects"
+      if #kept > 0 then
+        reason = "zero_base_extension_effects"
+        evidence = "effect-contracts:zero-base-effect-changes"
+      end
       operation.gates.effect_valid = gate_contract.failed(
         "effect-contracts", reason, {evidence})
       operation.technology_design = technology_design.from_base_extension_operation(operation)

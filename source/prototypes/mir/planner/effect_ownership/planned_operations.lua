@@ -1,25 +1,10 @@
 local facts = require("prototypes.mir.planner.effect_ownership.facts")
-local generation_plan = require("prototypes.mir.planner.generation_plan")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local technology_effects = require("prototypes.mir.integrity.technology_effects")
 
 local M = {}
-
-local function material_stage_pair(claims)
-  if #claims ~= 2 then return false end
-  local left, right = claims[1], claims[2]
-  local stage = left.operation.stage_kind == "material-continuation" and left or
-    right.operation.stage_kind == "material-continuation" and right or nil
-  if not stage then return false end
-  local parent = stage == left and right or left
-  return parent.operation.operation == "emit_stream"
-    and stage.operation.operation == "emit_stream"
-    and stage.operation.staged_parent_technology == parent.operation.technology_name
-    and stage.operation.staged_parent_stream_key == parent.operation.stream_key
-    and generation_plan.effect_signature(stage.effect)
-      == generation_plan.effect_signature(parent.effect)
-end
 
 local function refresh_base_operation(operation)
   operation.technology_design = technology_design.from_base_extension_operation(operation)
@@ -87,7 +72,8 @@ function M.resolve(raw_operations, options)
       if claim.operation.stage_kind == "material-continuation" then has_material_stage = true end
     end
     if has_material_stage and operation_count > 1 then
-      if not material_stage_pair(claims) then
+      if #claims ~= 2 or not facts.material_stage_pair(
+        claims[1].operation, claims[2].operation, claims[1].effect, claims[2].effect) then
         error("Combined CompilationPlan has unqualified material stage overlap: " .. identity, 2)
       end
       retained_overlap_count = retained_overlap_count + 1
@@ -170,7 +156,7 @@ function M.resolve(raw_operations, options)
           .. tostring(operation.technology_name), 2)
       end
       operation.technology.effects = kept
-      if #kept == 0 and #original > 0 then
+      if not technology_effects.has_possible_research_effects(kept) and #original > 0 then
         operation.gates = facts.non_materializing_gates(lost[1].identity)
         refresh_base_operation(operation)
         table.insert(omitted, operation)

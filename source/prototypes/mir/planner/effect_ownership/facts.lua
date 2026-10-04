@@ -126,6 +126,17 @@ function M.retained_overlap(operation, identity)
     and operation.planned_overlap_identities[identity] == true
 end
 
+function M.material_stage_pair(left, right, left_effect, right_effect)
+  local stage = left.stage_kind == "material-continuation" and left or
+    right.stage_kind == "material-continuation" and right or nil
+  if not stage then return false end
+  local parent = stage == left and right or left
+  return stage.operation == "emit_stream" and parent.operation == "emit_stream"
+    and stage.staged_parent_technology == parent.technology_name
+    and stage.staged_parent_stream_key == parent.stream_key
+    and generation_plan.effect_signature(left_effect) == generation_plan.effect_signature(right_effect)
+end
+
 -- The off setting preserves one generic/dedicated gun-speed pair. It never
 -- permits native bindings, arbitrary effect kinds, or same-operation repeats.
 function M.weapon_speed_overlap_pair(left, right, left_effect, right_effect)
@@ -145,8 +156,5 @@ function M.weapon_speed_overlap_pair(left, right, left_effect, right_effect)
     and M.effect_identity(left_effect) == M.effect_identity(right_effect)
 end
 
-function M.effect_identity(effect)
-  return generation_plan.effect_identity(effect)
-end
-
+M.effect_identity = generation_plan.effect_identity
 return M

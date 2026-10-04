@@ -56,9 +56,12 @@ Assert-MIR4M4202EffectOwnership (@(Get-Content -LiteralPath (Join-Path $repo "$s
 Assert-MIR4M4202EffectOwnership (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/effect_ownership/resolution.lua")).Count-le140) 'resolution-size'
 Assert-MIR4M4202EffectOwnership (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/effect_ownership/planned_operations.lua")).Count-le220) 'planned-operations-size'
 $ownershipRows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq'capability'-and[string]$_.output_path-in$outputs})
-Assert-MIR4M4202EffectOwnership ($ownershipRows.Count-eq4-and@($ownershipRows|Where-Object{@($_.target_scope)-join'|'-cne'f210|f200'}).Count-eq0) 'package-bindings'
+# Current shared ownership serves the four selected compiler compositions.
+# The exact older target proofs below remain bound to the historical receipt.
+Assert-MIR4M4202EffectOwnership ($ownershipRows.Count-eq4-and@($ownershipRows|Where-Object{(@($_.target_scope)-join'|')-cne'f210|f200|f110|f100'}).Count-eq0) 'package-bindings'
 foreach($row in $ownershipRows){
   $source=Join-Path $repo ([string]$row.source_path)
+  Assert-MIR4M4202EffectOwnership ([string]$row.source_path-ceq("source/"+[string]$row.output_path)-and[string]$row.source_sha256-ceq[string]$row.output_sha256-and[int]$row.source_bytes-eq[int]$row.output_bytes) "current-shared-source-$([string]$row.output_path)"
   Assert-MIR4M4202EffectOwnership ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash-ceq[string]$row.source_sha256) "source-hash-$([string]$row.output_path)"
 }
 foreach($target in @('f210','f200','f110','f100')){
