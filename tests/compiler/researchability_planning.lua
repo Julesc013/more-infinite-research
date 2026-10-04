@@ -2734,5 +2734,55 @@ check("MG08", f200_gate_reason == nil and table.concat(f200_prereqs, ",") == "ex
   "The actual F200 continuation qualifier emits both real plural gates once: "
     .. table.concat(f200_prereqs or {}, ",") .. "; reason=" .. tostring(f200_gate_reason))
 
+-- Factorio 2.1.20 ProductPrototypeBase uses an independent roll and a shared
+-- half-open min/max interval. ItemProductPrototype also permits an extra item
+-- fraction and clamps amount_max upward to amount_min. These tests exercise
+-- the actual acquisition predicate; they grant no productivity/loop admission.
+do
+(function()
+local function product_acquisition_witness(product)
+  product.name = "declared-product"
+  reset({
+    item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
+    recipe_facts = {source = route_fact("declared-product", {}, {results = {product}})},
+    producers = { ["declared-product"] = {"source"} }
+  })
+  return feasibility.initial_recipe_witness("source", {
+    type = product.type or "item", name = "declared-product"
+  })
+end
+local product_cases = {
+  {{amount = 1, probability = 0}, false, "Legacy zero probability cannot yield a product"},
+  {{amount = 1, probability = 0.5}, true, "Positive legacy probability remains usable"},
+  {{amount = 1, independent_probability = 0}, false, "Independent zero probability cannot yield a product"},
+  {{amount = 1, independent_probability = 0.5, shared_probability = {min = 0.25, max = 0.75}}, true, "Both positive rolls permit acquisition"},
+  {{amount = 1, shared_probability = {min = 0.5, max = 0.5}}, false, "Equal shared endpoints yield no product"},
+  {{amount = 1, shared_probability = {min = 1, max = 1}}, false, "The shared roll excludes its upper endpoint"},
+  {{amount = 1, shared_probability = {min = 0, max = 0}}, false, "Zero-width shared range cannot seed acquisition"},
+  {{amount = 1, shared_probability = {min = 0, max = 1}}, true, "The full shared interval remains usable"},
+  {{amount = 0, extra_count_fraction = 0.5, shared_probability = {min = 0.25, max = 0.75}}, true, "A fractional extra item can seed acquisition"},
+  {{amount = 0, extra_count_fraction = 0}, false, "Zero base and extra count yield no product"},
+  {{amount = 0, extra_count_fraction = 0.5, independent_probability = 0}, false, "Extra item chance cannot bypass an independent failed roll"},
+  {{amount = 0, extra_count_fraction = 0.5, shared_probability = {min = 0.5, max = 0.5}}, false, "Extra item chance cannot bypass a shared failed roll"},
+  {{amount_min = 1, amount_max = 0}, true, "The engine clamps the maximum to a positive minimum"},
+  {{amount_min = 0, amount_max = 0, extra_count_fraction = 0.25}, true, "Zero ranged quantity can yield an extra item"},
+  {{type = "fluid", amount = 0, extra_count_fraction = 0.5}, false, "Extra item count does not create a fluid product"},
+  {{type = "fluid", amount = 0.25, shared_probability = {min = 0.2, max = 0.6}}, true, "Positive fluid amount with a shared interval remains usable"},
+  {{amount = 1, shared_probability = {min = 0.2}}, false, "Missing required shared maximum is withheld"},
+  {{amount = 1, shared_probability = {max = 0.8}}, false, "Missing required shared minimum is withheld"},
+  {{amount = 1, shared_probability = {min = 0.9, max = 0.1}}, false, "Reversed shared range is withheld"},
+  {{amount = 1, shared_probability = {min = -0.1, max = 0.5}}, false, "Negative shared endpoint is withheld"},
+  {{amount = 1, shared_probability = {min = 0.5, max = 1.1}}, false, "Shared endpoint outside the documented domain is withheld"},
+  {{amount = 1, shared_probability = "unknown"}, false, "Unknown shared representation is withheld"},
+  {{amount = 1, shared_probability = {min = 0/0, max = 1}}, false, "Non-finite shared range is withheld"},
+  {{amount = 0, extra_count_fraction = math.huge}, false, "Non-finite extra item count is withheld"},
+  {{amount = -1, extra_count_fraction = 0.5}, false, "Extra item count cannot repair an invalid negative base amount"}
+}
+for index, case in ipairs(product_cases) do
+  check("YP" .. index, (product_acquisition_witness(case[1]) ~= nil) == case[2], case[3])
+end
+end)()
+end
+
 if #failures > 0 then error(table.concat(failures, "\n")) end
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

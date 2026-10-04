@@ -151,6 +151,8 @@ Presentation construction lives in `prototypes/mir/presentation/icon_builder.lua
 
 The science-integration decomposition also includes `prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua`, which owns typed structural recipe and natural-source feasibility without granting gameplay-support authority.
 
+Its product predicate requires a positive independent roll and a nonempty, valid shared probability interval when one is declared. Ranged quantities follow the native minimum/maximum clamp, and finite extra item fractions may establish possible baseline acquisition even at zero base quantity. This is a product-existence check. Productivity admission continues to withhold shared and fractional routes, and it still requires its separate permissions, ownership and return-cone proof. The retained Factorio 2.1.20 prototype API and the 25 product cases in `tests/compiler/researchability_planning.lua` define this boundary; the controlled module fixture does not prove native machine acquisition, throughput or a complete ecosystem outcome. [Product probability API](https://lua-api.factorio.com/latest/types/ProductPrototypeBase.html), [item product API](https://lua-api.factorio.com/latest/types/ItemProductPrototype.html).
+
 ### Technology Catalog Construction Ownership
 
 `prototypes/mir/domain/technology/technology_risk.lua` is the shared technology-risk authority for startup-setting order, compiler classification, and automatic localized tooltip warnings. Its risk class and reason remain independent of the enable default: a risky technology can default on without falling out of the first attention bucket or losing its warning.

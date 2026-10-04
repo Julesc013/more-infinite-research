@@ -46,6 +46,10 @@ local function finite_positive(value)
   return type(value) == "number" and value == value and value > 0 and value < math.huge
 end
 
+local function finite_nonnegative(value)
+  return type(value) == "number" and value == value and value >= 0 and value < math.huge
+end
+
 -- Factorio recipe names alone are not a product identity. A string public
 -- argument keeps the established item-default convenience, while callers that
 -- reason about fluids must provide {type="fluid", name="..."}.
@@ -76,9 +80,34 @@ local diagnostic_visit
 
 local function entry_positive(entry)
   if type(entry) ~= "table" then return false end
-  local amount = tonumber(entry.amount or entry.amount_max or entry[2] or entry.amount_min or 1) or 0
+  local amount = entry.amount or entry[2]
+  if amount == nil then
+    if entry.amount_min ~= nil or entry.amount_max ~= nil then
+      local minimum, maximum = tonumber(entry.amount_min), tonumber(entry.amount_max)
+      if not finite_nonnegative(minimum) or not finite_nonnegative(maximum) then return false end
+      -- Native item/fluid products clamp a reversed maximum to the minimum.
+      amount = math.max(minimum, maximum)
+    else
+      amount = 1
+    end
+  end
+  amount = tonumber(amount)
+  if not finite_nonnegative(amount) then return false end
   local probability = tonumber(entry.independent_probability or entry.probability or 1) or 0
-  return finite_positive(amount) and finite_positive(probability) and probability <= 1
+  if not finite_positive(probability) or probability > 1 then return false end
+  local shared = entry.shared_probability
+  if shared ~= nil then
+    if type(shared) ~= "table" or not finite_nonnegative(shared.min)
+      or not finite_nonnegative(shared.max) or shared.max > 1
+      or shared.min >= shared.max then return false end
+  end
+  local extra = 0
+  if (entry.type or "item") == "item" then
+    extra = tonumber(entry.extra_count_fraction or 0)
+    if not finite_nonnegative(extra) then return false end
+  end
+  -- This is possible baseline acquisition, not a productivity or loop proof.
+  return amount > 0 or extra > 0
 end
 
 local function results_include_positive(results, output_identity, options)
