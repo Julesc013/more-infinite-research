@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0075",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Admit the versioned nine-target 4.2.1 manifest to the existing native campaign runner.",
+  "details": [
+    "The native runner previously selected only the v1 manifest schema and CCC00 destinations, refusing complete v2 candidates before execution.",
+    "Reuse the construction version descriptor and distribution codec for v1 and v2 envelopes and all nine requested destinations, preserving exact source, archive, engine, older predecessor and resource guards.",
+    "Source-only controls cover valid and invalid envelopes and unchanged historical custody. Immediate published 4.2.0 predecessor admission, native upgrades and reloads remain pending."
+  ],
+  "semantic_domains": ["tooling", "packaging", "documentation"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The repository campaign runner projects the requested CCC01 destination."},
+    {"target":"F200","disposition":"affected","reason":"The repository campaign runner projects the requested CCC01 destination."},
+    {"target":"F110","disposition":"affected","reason":"The repository campaign runner projects the requested CCC01 destination."},
+    {"target":"F100","disposition":"affected","reason":"The repository campaign runner projects the requested CCC01 destination."},
+    {"target":"F017","disposition":"affected","reason":"The repository campaign descriptor retains terminal custody and projects CCC01."},
+    {"target":"F016","disposition":"affected","reason":"The repository campaign descriptor retains terminal custody and projects CCC01."},
+    {"target":"F015","disposition":"affected","reason":"The repository campaign descriptor retains terminal custody and projects CCC01."},
+    {"target":"F014","disposition":"affected","reason":"The repository campaign descriptor retains terminal custody and projects CCC01."},
+    {"target":"F013","disposition":"affected","reason":"The repository campaign descriptor retains terminal custody and projects CCC01."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/release/Test-MIR42FourTargetCandidateBuild.ps1"},
+    {"kind":"finding","value":"tests/release/Test-MIR42NineTargetHistoricalEngineRun.ps1"},
+    {"kind":"document","value":"docs/releases/mir42-nine-target-candidate-playtest-matrix.md"}
+  ]
+}

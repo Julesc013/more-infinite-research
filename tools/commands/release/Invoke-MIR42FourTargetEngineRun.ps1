@@ -18,6 +18,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
 
 $script:MIR42ModernEngineTargets = @('f210','f200','f110','f100')
@@ -56,10 +57,40 @@ function Get-MIR42EngineRunArchiveVersion {
   } finally { $archive.Dispose() }
 }
 
+function Get-MIR42EngineCandidateVersionContract {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$ManifestPath)
+  $path = Assert-MIR42EngineRunFile -Path $ManifestPath -Label 'mir42-candidate-manifest'
+  $raw = Get-Content -Raw -LiteralPath $path
+  $manifest = $raw | ConvertFrom-Json -Depth 100 -DateKind String
+  $version = Get-MIR42CandidateConstructionVersionContract -RepoRoot $RepoRoot -Manifest $manifest
+  if (-not (Test-Path -LiteralPath $version.schema_path -PathType Leaf) -or
+      -not ($raw | Test-Json -SchemaFile $version.schema_path -ErrorAction SilentlyContinue)) {
+    throw '[mir42-engine-candidate-manifest-schema]'
+  }
+  $targets = @($manifest.targets | ForEach-Object { [string]$_.target })
+  $nine = (($targets -join '|') -ceq ($script:MIR42NineTargetEngineTargets -join '|'))
+  $four = (($targets -join '|') -ceq ($script:MIR42ModernEngineTargets -join '|'))
+  $status = if ($nine) { 'private-deterministic-nine-target-candidate-built-unqualified' }
+    elseif ($four) { 'private-deterministic-four-target-candidate-built-unqualified' } else { '' }
+  if ([string]::IsNullOrWhiteSpace($status) -or [string]$manifest.status -cne $status -or
+      ([bool]$version.requires_nine_targets -and -not $nine) -or
+      -not [bool]$manifest.build_complete -or -not (Test-MIR4BootstrapRecordHash -Record $manifest)) {
+    throw '[mir42-engine-candidate-manifest-invalid]'
+  }
+  # This validates the versioned envelope only. The caller still authenticates
+  # the clean source snapshot, package authority, every archive and engine,
+  # published predecessor custody and resource admission before execution.
+  return [pscustomobject][ordered]@{
+    path=$path;manifest=$manifest;source_version=[string]$version.source_version
+    nine_targets=$nine;four_targets=$four;targets=$targets
+  }
+}
+
 function Get-MIR42HistoricalEngineDescriptor {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
-    [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target
+    [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
+    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0'
   )
   $expected = $script:MIR42HistoricalTerminalInputs[$Target]
   $recordPath = Assert-MIR42EngineRunFile -Path (Join-Path $RepoRoot ([string]$expected.target_record)) -Label "mir42-$Target-target-record"
@@ -99,7 +130,7 @@ function Get-MIR42HistoricalEngineDescriptor {
     engine = $recordEngine
     predecessor = [IO.Path]::GetFullPath((Join-Path $RepoRoot $predecessorRelative))
     from = [string]$record.predecessor.version
-    to = [string]$record.distribution_version
+    to = [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion).distribution_version
     historical = [ordered]@{
       target_record = [ordered]@{path=[string]$expected.target_record;sha256=(Get-MIR42EngineRunSha -Path $recordPath);record_sha256=[string]$record.record_sha256}
       terminal_seal = [ordered]@{path=[string]$expected.terminal_seal;sha256=(Get-MIR42EngineRunSha -Path $sealPath);record_sha256=[string]$seal.record_sha256;target=[string]$seal.target;release=[string]$seal.release}
@@ -280,30 +311,12 @@ function Invoke-MIR42HistoricalFreshLoad {
 }
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$manifestPath = Assert-MIR42EngineRunFile -Path $CandidateManifestPath -Label 'mir42-candidate-manifest'
-$manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100 -DateKind String
-$manifestSchema = Join-Path $repo 'spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json'
-if (-not (Test-Path -LiteralPath $manifestSchema -PathType Leaf) -or
-    -not ((Get-Content -Raw -LiteralPath $manifestPath) | Test-Json -SchemaFile $manifestSchema -ErrorAction SilentlyContinue)) {
-  throw '[mir42-engine-candidate-manifest-schema]'
-}
-$manifestTargets = @($manifest.targets | ForEach-Object { [string]$_.target })
-$isNineTargetCandidate = (($manifestTargets -join '|') -ceq ($script:MIR42NineTargetEngineTargets -join '|'))
-$isFourTargetCandidate = (($manifestTargets -join '|') -ceq ($script:MIR42ModernEngineTargets -join '|'))
-$expectedCandidateStatus = if ($isNineTargetCandidate) {
-  'private-deterministic-nine-target-candidate-built-unqualified'
-} elseif ($isFourTargetCandidate) {
-  'private-deterministic-four-target-candidate-built-unqualified'
-} else {
-  ''
-}
-if ([int]$manifest.schema -ne 1 -or
-    [string]$manifest.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
-    [string]::IsNullOrWhiteSpace($expectedCandidateStatus) -or [string]$manifest.status -cne $expectedCandidateStatus -or
-    -not [bool]$manifest.build_complete -or
-    -not (Test-MIR4BootstrapRecordHash -Record $manifest)) {
-  throw '[mir42-engine-candidate-manifest-invalid]'
-}
+$candidateVersion = Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $CandidateManifestPath
+$manifestPath = [string]$candidateVersion.path
+$manifest = $candidateVersion.manifest
+$sourceVersion = [string]$candidateVersion.source_version
+$isNineTargetCandidate = [bool]$candidateVersion.nine_targets
+$isFourTargetCandidate = [bool]$candidateVersion.four_targets
 $packageAuthority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
 $packageSourceSha = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 if ([string]$manifest.package_authority_sha256 -cne [string]$packageAuthority.record_sha256 -or
@@ -383,6 +396,9 @@ $selected = [ordered]@{
   f110 = [ordered]@{ engine=$F110Engine; predecessor=$F110Predecessor; from='4.1.11000'; to='4.2.11000'; fixture='assert-upgrade-4-0-11000-to-4-1-11000'; engine_major='1.1' }
   f100 = [ordered]@{ engine=$F100Engine; predecessor=$F100Predecessor; from='4.1.10000'; to='4.2.10000'; fixture='assert-upgrade-4-0-10000-to-4-1-10000'; engine_major='1.0' }
 }
+foreach ($target in $script:MIR42ModernEngineTargets) {
+  $selected[$target].to = [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion $sourceVersion).distribution_version
+}
 $targets = if ($isNineTargetCandidate) { @($script:MIR42NineTargetEngineTargets) } else { @($script:MIR42ModernEngineTargets) }
 if ((@($inputAuthority.targets | ForEach-Object { [string]$_.target }) -join '|') -cne ($script:MIR42ModernEngineTargets -join '|')) {
   throw '[mir42-engine-candidate-target-set]'
@@ -390,7 +406,7 @@ if ((@($inputAuthority.targets | ForEach-Object { [string]$_.target }) -join '|'
 if ($isNineTargetCandidate) {
   $historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo
   foreach ($target in $script:MIR42HistoricalEngineTargets) {
-    $historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target
+    $historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target -SourceVersion $sourceVersion
     $historical.fixture = 'assert-upgrade-historical-terminal-to-mir42'
     $selected[$target] = $historical
   }

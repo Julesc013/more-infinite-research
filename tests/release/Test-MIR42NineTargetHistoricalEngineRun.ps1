@@ -5,6 +5,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
 
 $expected = [ordered]@{
   f017 = [ordered]@{line='0.17';version='1.7.9';candidate='4.2.01700';archive='B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C';engine='E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06';infinite='mining-productivity-4'}
@@ -64,6 +65,13 @@ try {
         [string]$descriptor.historical.target_record.path -cne "targets/historical/$target/target.json" -or
         [string]$descriptor.historical.predecessor.sha256 -cne [string]$row.archive -or
         [string]$descriptor.historical.engine.sha256 -cne [string]$row.engine) { throw "descriptor-binding $target" }
+    $patchDescriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.1'
+    $patchIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch 1
+    if([string]$patchDescriptor.to-cne[string]$patchIdentity.distribution_version-or
+       [string]$patchDescriptor.from-cne[string]$descriptor.from-or
+       [string]$patchDescriptor.historical.predecessor.sha256-cne[string]$descriptor.historical.predecessor.sha256-or
+       [string]$patchDescriptor.historical.engine.sha256-cne[string]$descriptor.historical.engine.sha256-or
+       [string]$patchDescriptor.historical.target_record.record_sha256-cne[string]$descriptor.historical.target_record.record_sha256){throw "patch-descriptor-binding $target"}
 
     $recordRelative = "targets/historical/$target/target.json"
     $sealRelative = '.mir/releases/terminal/seals/' + $row.version + '.json'
@@ -166,4 +174,4 @@ $secondReload = $harness.IndexOf('$secondReloadExitCode = ',[StringComparison]::
 if ($firstClear -lt 0 -or $firstReload -lt 0 -or $secondClear -le $firstReload -or $secondReload -le $secondClear -or
     $runner.Contains('$targetRow.engine.path') -or $runner.Contains('kind=(if ($isNineTargetCandidate)') -or $runner.Contains('status=(if ($isNineTargetCandidate)')) { throw 'historical-runner-shape-or-reload-log-scope' }
 
-Write-Output 'MIR42-NINE-TARGET-HISTORICAL-ENGINE-RUN-PRECHECK-PASSED targets=5 engines=0'
+Write-Output 'MIR42-NINE-TARGET-HISTORICAL-ENGINE-RUN-PRECHECK-PASSED targets=5 source_versions=2 engines=0'
