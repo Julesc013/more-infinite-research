@@ -2,6 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
+  [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
@@ -154,7 +155,10 @@ function Copy-MIR42HistoricalAdapter {
 $targetState = Get-MIR42HistoricalTargetRecord -TargetId $Target
 $record = $targetState.record
 $sourceManifest = Get-MIR42HistoricalSourceManifest
+$identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch ([int]($SourceVersion.Split('.')[2]))
+$distributionVersion = [string]$identity.distribution_version
 if ($RefreshSourceBindings) {
+  if ($SourceVersion -cne '4.2.0') { throw '[mir42-historical-refresh-source-version]' }
   if ($Check) { throw '[mir42-historical-refresh-check-conflict]' }
   foreach ($adapter in @($record.adapter_files)) {
     $bindings = @($sourceManifest.bindings | Where-Object {
@@ -194,15 +198,18 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   $candidateParent = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "$Target/$CandidateId/$letter"
   Remove-MIR4BuildTree -OutputRoot $output -Path $candidateParent
   New-Item -ItemType Directory -Force -Path $candidateParent | Out-Null
-  $tree = Join-Path $candidateParent "more-infinite-research_$([string]$record.distribution_version)"
+  $tree = Join-Path $candidateParent "more-infinite-research_$distributionVersion"
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
+  if ($SourceVersion -ceq '4.2.1') {
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $distributionVersion
+  }
   $info = Get-Content -Raw -LiteralPath (Join-Path $tree 'info.json') | ConvertFrom-Json -Depth 20
-  if ([string]$info.name -cne 'more-infinite-research' -or [string]$info.version -cne [string]$record.distribution_version -or
+  if ([string]$info.name -cne 'more-infinite-research' -or [string]$info.version -cne $distributionVersion -or
       [string]$info.factorio_version -cne [string]$record.factorio_line) {
     throw "[mir42-historical-info-identity] $Target"
   }
-  $archive = Join-Path $candidateParent "more-infinite-research_$([string]$record.distribution_version).zip"
+  $archive = Join-Path $candidateParent "more-infinite-research_$distributionVersion.zip"
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot (Split-Path -Leaf $tree) -OutputPath $archive -ContainmentRoot $output
   $inventory = Get-MIR4ArchiveInventory -Path $archive
   $forbidden = @($inventory.entries | Where-Object { $_.path -match '^(?:\.mir|\.codex|\.github|build|dist|docs|tests|tools|scripts)/' })
@@ -218,7 +225,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
 if (@($rows.archive_sha256 | Sort-Object -Unique).Count -ne 1 -or @($rows.content_sha256 | Sort-Object -Unique).Count -ne 1) {
   throw "[mir42-historical-nondeterministic] $Target"
 }
-$distribution = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "distributions/more-infinite-research_$([string]$record.distribution_version).zip"
+$distribution = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "distributions/more-infinite-research_$distributionVersion.zip"
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $distribution) | Out-Null
 Copy-Item -LiteralPath (Join-Path $repo ([string]$rows[0].archive_path)) -Destination $distribution -Force
 if ((Get-FileHash -Algorithm SHA256 -LiteralPath $distribution).Hash -cne [string]$rows[0].archive_sha256) { throw "[mir42-historical-distribution-copy] $Target" }
@@ -232,7 +239,7 @@ $manifest = [pscustomobject][ordered]@{
   source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree; canonical_base_target = [string]$record.base_materializer_target }
   target_record = [ordered]@{ path = [IO.Path]::GetRelativePath($repo, $targetState.path).Replace('\', '/'); sha256 = [string]$record.record_sha256 }
   factorio_line = [string]$record.factorio_line
-  distribution_version = [string]$record.distribution_version
+  distribution_version = $distributionVersion
   engine = $record.engine
   predecessor = $record.predecessor
   builds = $rows
@@ -245,8 +252,8 @@ $manifest = [pscustomobject][ordered]@{
     status = 'deterministic-historical-candidate-construction-input-unqualified'
     target = $Target
     source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree }
-    source_version = '4.2.0'
-    distribution_version = [string]$record.distribution_version
+    source_version = $SourceVersion
+    distribution_version = $distributionVersion
     base_materializer_target = [string]$record.base_materializer_target
     target_record = [ordered]@{ path = [IO.Path]::GetRelativePath($repo, $targetState.path).Replace('\', '/'); sha256 = [string]$record.record_sha256 }
     asset = [ordered]@{

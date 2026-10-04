@@ -123,6 +123,48 @@ function Get-MIR4TargetMaterializationBindings {
   }
 }
 
+function Write-MIR4PrivatePatchPackageIdentity {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$Tree,
+    [Parameter(Mandatory)][string]$DistributionVersion
+  )
+
+  if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+  $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
+  if ([int]$decoded.source_patch -ne 1) { throw '[mir4-private-patch-package-source-patch]' }
+  $targetLines = @{ '210'='2.1'; '200'='2.0'; '110'='1.1'; '100'='1.0'; '017'='0.17'; '016'='0.16'; '015'='0.15'; '014'='0.14'; '013'='0.13' }
+  $targetCode = [string]$decoded.distribution_target_code
+  if (-not $targetLines.ContainsKey($targetCode)) { throw '[mir4-private-patch-package-target]' }
+  $baseline = New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetCode -SourceMinor 2 -SourcePatch 0
+  $infoPath = Join-Path $Tree 'info.json'
+  $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json -Depth 20 -DateKind String
+  if ([string]$info.name -cne 'more-infinite-research' -or
+      [string]$info.version -notin @([string]$baseline.distribution_version, $DistributionVersion) -or
+      [string]$info.factorio_version -cne [string]$targetLines[$targetCode]) {
+    throw '[mir4-private-patch-package-input-identity]'
+  }
+  # Read every authored input before changing this private materialized copy.
+  $changelogPath = Join-Path $Tree 'changelog.txt'
+  $changelog = [IO.File]::ReadAllText($changelogPath).Replace("`r`n", "`n")
+  $readmePath = Join-Path $Tree 'README.md'
+  $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllText($readmePath).Replace("`r`n", "`n") } else { $null }
+  $utf8 = [Text.UTF8Encoding]::new($false)
+  $info.version = $DistributionVersion
+  [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
+  $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
+  if (-not $firstVersion.Success -or $firstVersion.Groups[1].Value -cne $DistributionVersion) {
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Private construction from source 4.2.1; qualification and publication are not performed by this build.`n"
+    [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
+  }
+  if ($null -ne $readme) {
+    $heading = "MIR $DistributionVersion, source 4.2.1. This private construction requires qualification before release.`n`n"
+    if (-not $readme.StartsWith($heading, [StringComparison]::Ordinal)) {
+      [IO.File]::WriteAllText($readmePath, $heading + $readme, $utf8)
+    }
+  }
+}
+
 function New-MIR4TargetPackage {
   [CmdletBinding()]
   param(
@@ -163,6 +205,9 @@ function New-MIR4TargetPackage {
     $info.version = [string]$identity.distribution_version
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
+  }
+  if ([string]$identity.source_version -ceq '4.2.1') {
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version)
   }
   $archive = Join-Path $candidateRoot ([string]$identity.package_name)
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output

@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 218,
+  "test_count": 219,
   "tests": [
     {
       "id": "docs.check",
@@ -7474,6 +7474,36 @@
       "matrix": null
     },
     {
+      "id": "static.mir42-candidate-construction",
+      "proposition": "The governed test 'static.mir42-candidate-construction' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+      "canonical_implementation": "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+        "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
+        "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json",
+        "source/package-source.json",
+        "targets/package-authority.json",
+        "targets/historical/**"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.mir42-nine-target-entrypoint-scope",
       "proposition": "The governed test 'static.mir42-nine-target-entrypoint-scope' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -7916,12 +7946,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 69,
-      "tooling-release": 66,
+      "tooling-release": 67,
       "runtime-upgrade": 51,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 206,
+    "canonical_test_commands": 207,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7934,5 +7964,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:182414107b262e1b4693e5752233cdcd627080195ad425d1dcadc41e0d9cf9a6"
+  "digest": "sha256:494d1cd66e3c1f174d4f078046ba085b0634fcd428036b5e25995e723c7bf5c1"
 }

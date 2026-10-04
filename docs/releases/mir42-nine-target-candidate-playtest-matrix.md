@@ -1,11 +1,11 @@
 ---
 title: "MIR 4.2 Nine-Target Candidate and Playtest Matrix"
 status: current
-applies_to: "MIR 4.2 pre-freeze preparation"
+applies_to: "MIR 4.2.1 construction and historical MIR 4.2.0 preparation"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-30
+last_reviewed: 2026-10-05
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,17 @@ source_of_truth_for:
 
 This page turns the current nine-target release-cut selection into a reviewable preparation matrix. It does not allocate a candidate, freeze a source, authorize support, change viewer behavior, or authorize a release transition. The [release runbook](../RELEASE-RUNBOOK.md) and the [nine-target release-cut programme](../../.mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json) remain the controlling authorities.
 
-## Observed preparation identity
+## MIR 4.2.1 private construction
+
+The existing constructor accepts `-SourceVersion 4.2.1` and selects the ordered nine targets by default. An explicit four-target selection is rejected for that source version. Use `tools/commands/release/New-MIR42FourTargetCandidate.ps1 -RepoRoot <primary-checkout> -FinalSourceCommit <exact-clean-commit> -BuildId <unique-id> -SourceVersion 4.2.1 -OutputRoot <approved-build-path>` after checking actual resource capacity. The constructor builds serial A/B copies through the existing materializers, records deterministic archive/content equality and custody, and writes `MIR42FourTargetDeterministicCandidateManifestV2`. It does not run native qualification, sign, seal, tag, promote or publish.
+
+The expected distribution versions, in target order, are `4.2.21001`, `4.2.20001`, `4.2.11001`, `4.2.10001`, `4.2.01701`, `4.2.01601`, `4.2.01501`, `4.2.01401` and `4.2.01301`. The final two digits encode source patch 1. Historical target records and adapter bindings retain their frozen `4.2.0` baseline identities; the codec projects the requested output separately. Only generated private package metadata receives the current version, an unqualified construction entry in its changelog and a README notice, preserving authored prose and historical changelog entries. The default `4.2.0` constructor and v1 schema remain available for historical reconstruction.
+
+The acceptance test is registered as `static.mir42-candidate-construction` in the development and nine-target evidence profiles. Its schema fixtures and modern materializer stubs test contracts; actual package and native qualification evidence must bind the real nine ZIPs from the exact accepted source. Downstream evidence, signing, promotion and publication consumers need their own explicit current-version acceptance before a constructed v2 manifest can pass those transitions.
+
+## Historical 30 September 2026 preparation identity
+
+The following observations and CCC00 matrix describe the retained 4.2.0 preparation checkpoint. They do not describe current 4.2.1 acceptance or establish permission to reuse its later emergency testing waivers. The published 4.2.0 source and assets remain under the one-time `v4.2.0-stable` tag exception; the eventual accepted 4.2.1 source uses canonical `v4.2.1`.
 
 At preparation time, `dev` is `8a3b190d987bc55897f54e3c6e0643128fd90a9c`. That is an observation only: the programme records `candidate.state` as `unallocated`, requires an exact candidate, and leaves every source-freeze, release-candidate allocation, signing, seal, promotion, tagging, and publication transition false. A private nine-target development package set now exists at `build/mir42-nine-target-candidates/M42-DEV-20260930-E37C8AF7`, bound to source `e37c8af784465199fde2d473013fca7935ff1f04` / tree `cc05d4e231d61498756ff1fcd0c908c3cf8cec95`. Its manifest marks it `private-deterministic-nine-target-candidate-built-unqualified`; qualification, seal, signing, tagging, and publication are not performed. It is not an allocated or frozen release candidate and does not establish target support or release qualification.
 
