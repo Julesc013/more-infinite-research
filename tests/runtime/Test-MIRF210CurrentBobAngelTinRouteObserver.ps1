@@ -4,6 +4,7 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot='C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-ba-20260930',
+  [string[]]$LocalModLibraryDirs=@('C:\Projects\Factorio\testmods\2.1'),
   [string]$OutputRoot='build/p/f210-ba-tin-observer',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
@@ -98,10 +99,8 @@ $stageArchives=@{};foreach($row in @($receipt.mods)) { $stageArchives[[string]$r
 Assert-Observer ($stageArchives.Count -eq $expectedArchives.Count) 'exact stage archive count differs.'
 foreach($entry in $expectedArchives.GetEnumerator()) {
   Assert-Observer ($stageArchives.ContainsKey($entry.Key) -and $stageArchives[$entry.Key] -ceq $entry.Value) "stage receipt archive differs: $($entry.Key)"
-  $archive=Join-Path $stage (Join-Path 'mods' $entry.Key)
-  Assert-Observer (Test-Path -LiteralPath $archive -PathType Leaf) "stage archive absent: $($entry.Key)"
-  Assert-Observer ((Get-ObserverSha $archive) -ceq $entry.Value) "stage archive bytes differ: $($entry.Key)"
 }
+$dependencyInputs=Resolve-MIRNativeProbeDependencyInputs -StageRoot $stage -ExpectedArchives $expectedArchives -LocalModLibraryDirs $LocalModLibraryDirs
 
 $run=$resources.root
 New-Item -ItemType Directory -Path $run | Out-Null
@@ -109,6 +108,7 @@ $candidate=New-MIRNativeProbeTargetPackage -Context $resources -RepoRoot $repo
 $candidateZip=(Resolve-Path -LiteralPath ([string]$candidate.archive_path)).Path
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 $prepared=[ordered]@{schema=1;kind='MIR4F210CurrentBobAngelTinRouteObservationV1';status='prepared';scope='Current 2.1.20 exact Bob/Angel Tin contract capture with diagnostic setting enabled; no route admission or gameplay mutation.';source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-ObserverSha (Join-Path $repo 'source/package-source.json')};exact_stage=[ordered]@{path=$stage;engine_sha256=[string]$receipt.engine_sha256;candidate_sha256=[string]$receipt.candidate_sha256;save_sha256=[string]$receipt.save_sha256;archives=$expectedArchives};candidate=Get-ObserverArtifact $candidateZip;fixture=@('info.json','settings-updates.lua','data-final-fixes.lua','control.lua'|ForEach-Object{Get-ObserverArtifact (Join-Path $fixture $_)});harness=Get-ObserverArtifact $PSCommandPath;non_claims=@('No productivity route is admitted by this observer.','No progression, balance, compatibility or release claim is made.','The prior 2.1.17 combined-Tin diagnostic remains a separate lock.')}
+$prepared['dependency_inputs']=@($dependencyInputs.Values|ForEach-Object{[ordered]@{archive=$_.file_name;source=Get-ObserverArtifact $_.source_path;provenance_kind=$_.provenance_kind}})
 $prepared['resource_policy']=[ordered]@{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'}
 if($PrepareOnly) {$prepared['resource_runs']=$resources.runs.ToArray();Write-MIRNativeProbeResult -Context $resources -Record $prepared;$prepared|ConvertTo-Json -Depth 16;return}
 
@@ -121,7 +121,8 @@ Assert-Observer ($version -match 'Version:\s+2[.]1[.]20') 'requires Factorio 2.1
 $leaseRoot=Join-Path $run 'stage';$mods=Join-Path $leaseRoot 'mods';$userdata=Join-Path $run 'userdata';New-Item -ItemType Directory -Path $leaseRoot,$userdata|Out-Null
 $inputs=@([ordered]@{source_path=$candidateZip;file_name=[IO.Path]::GetFileName($candidateZip);expected_sha256=Get-ObserverSha $candidateZip;role='candidate';identity=[ordered]@{target='f210';source_version='4.2.1';distribution_version='4.2.21001'};provenance=[ordered]@{kind='canonical-materializer';source_commit=$sourceCommit;source_tree=$sourceTree};immutable=$true})
 foreach($archiveName in $expectedArchives.Keys) {
-  $inputs+=@([ordered]@{source_path=Join-Path $stage (Join-Path 'mods' $archiveName);file_name=$archiveName;expected_sha256=$expectedArchives[$archiveName];role='dependency-mod';identity=[ordered]@{archive=$archiveName;sha256=$expectedArchives[$archiveName]};provenance=[ordered]@{kind='exact-preserved-stage';receipt_sha256=Get-ObserverSha $receiptPath};immutable=$true})
+  $selected=$dependencyInputs[$archiveName]
+  $inputs+=@([ordered]@{source_path=$selected.source_path;file_name=$archiveName;expected_sha256=$expectedArchives[$archiveName];role='dependency-mod';identity=[ordered]@{archive=$archiveName;sha256=$expectedArchives[$archiveName]};provenance=[ordered]@{kind=$selected.provenance_kind;receipt_sha256=Get-ObserverSha $receiptPath};immutable=$true})
 }
 $lease=$null
 try {
