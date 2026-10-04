@@ -72,6 +72,109 @@ function Get-MIR42CandidateConstructionVersionContract {
   }
 }
 
+function Read-MIR42PublishedMaintenancePredecessorManifest {
+  param([Parameter(Mandatory)][string]$ManifestPath)
+  $path = [IO.Path]::GetFullPath($ManifestPath)
+  $expectedSha = 'E5F658F253F4E3E22C38A9B08394CE8554CECD20C4583BC5D23AA72D027E93A9'
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or [int64](Get-Item -LiteralPath $path).Length -ne 6355) {
+    throw '[mir42-maintenance-predecessor-frozen-manifest]'
+  }
+  $bytes = [IO.File]::ReadAllBytes($path)
+  if ($bytes.Length -ne 6355 -or [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)) -cne $expectedSha) {
+    throw '[mir42-maintenance-predecessor-frozen-manifest]'
+  }
+  # Pin the actual immutable receipt bytes, including their honest NOT RUN
+  # qualification fields. No 4.2.0 waiver or unsigned publication becomes a
+  # signature, native pass or acceptance grant for the new candidate.
+  $manifest = [Text.UTF8Encoding]::new($false,$true).GetString($bytes) | ConvertFrom-Json -Depth 100 -DateKind String
+  return [pscustomobject][ordered]@{path=$path;sha256=$expectedSha;bytes=6355;manifest=$manifest}
+}
+
+function Assert-MIR42PublishedMaintenancePredecessorMetadata {
+  param([Parameter(Mandatory)]$PinnedManifest,[Parameter(Mandatory)]$ReleaseMetadata)
+  $manifest = $PinnedManifest.manifest
+  if ([int64]$ReleaseMetadata.id -ne 402577876 -or
+      [string]$ReleaseMetadata.tag_name -cne 'v4.2.0-stable' -or
+      [bool]$ReleaseMetadata.draft -or [bool]$ReleaseMetadata.prerelease -or [bool]$ReleaseMetadata.immutable -or
+      @($ReleaseMetadata.assets).Count -ne 12 -or
+      @($ReleaseMetadata.assets | Group-Object name | Where-Object Count -ne 1).Count -ne 0 -or
+      @($ReleaseMetadata.assets | Group-Object id | Where-Object Count -ne 1).Count -ne 0 -or
+      [string]$manifest.source_tag -cne 'v4.2.0-stable' -or
+      [string]$manifest.source.commit -cne '6d19c874ea7d026d297865b96aa1b2b0916e9e61' -or
+      [string]$manifest.source.tree -cne 'e7f3cdf2170e25f0a89b94cb7706256cde28035e' -or [bool]$manifest.signed -or
+      [string]$manifest.version_contract.source_version -cne '4.2.0' -or
+      (@($manifest.targets.target) -join '|') -cne (@($script:MIR42FourTargetLines.Keys) -join '|')) {
+    throw '[mir42-maintenance-predecessor-release-metadata]'
+  }
+  $manifestAsset = @($ReleaseMetadata.assets | Where-Object { [string]$_.name -ceq 'mir-4.2.0.release.json' })
+  if ($manifestAsset.Count -ne 1 -or [int64]$manifestAsset[0].id -le 0 -or
+      [string]$manifestAsset[0].state -cne 'uploaded' -or [int64]$manifestAsset[0].size -ne [int64]$PinnedManifest.bytes -or
+      [string]$manifestAsset[0].digest -cne ('sha256:' + [string]$PinnedManifest.sha256).ToLowerInvariant()) {
+    throw '[mir42-maintenance-predecessor-published-manifest]'
+  }
+  $rows = @(
+    foreach ($target in $manifest.targets) {
+      $identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$target.target).Substring(1) -SourceMinor 2 -SourcePatch 0
+      if ([string]$target.distribution_version -cne [string]$identity.distribution_version -or
+          [string]$target.filename -cne ('more-infinite-research_' + [string]$identity.distribution_version + '.zip')) {
+        throw '[mir42-maintenance-predecessor-target-identity]'
+      }
+      $asset = @($ReleaseMetadata.assets | Where-Object { [string]$_.name -ceq [string]$target.filename })
+      if ($asset.Count -ne 1 -or [int64]$asset[0].id -le 0 -or [string]$asset[0].state -cne 'uploaded' -or
+          [int64]$asset[0].size -ne [int64]$target.bytes -or
+          [string]$asset[0].digest -cne ('sha256:' + [string]$target.sha256).ToLowerInvariant()) {
+        throw ('[mir42-maintenance-predecessor-published-asset] ' + [string]$target.target)
+      }
+      [pscustomobject][ordered]@{target=[string]$target.target;version=[string]$target.distribution_version;
+        filename=[string]$target.filename;bytes=[int64]$target.bytes;sha256=[string]$target.sha256;
+        content_sha256=[string]$target.content_sha256;entry_count=[int]$target.entry_count;
+        github_asset_id=[int64]$asset[0].id;github_digest=[string]$asset[0].digest}
+    }
+  )
+  return $rows
+}
+
+function Get-MIR42PublishedMaintenancePredecessorInputs {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$ManifestPath,
+    [Parameter(Mandatory)]$ReleaseMetadata)
+  $pinned = Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $ManifestPath
+  $published = @(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $pinned -ReleaseMetadata $ReleaseMetadata)
+  $sourceCommit = (& git -C $RepoRoot rev-parse 'refs/tags/v4.2.0-stable^{}').Trim()
+  if ($LASTEXITCODE -ne 0 -or $sourceCommit -cne [string]$pinned.manifest.source.commit) {
+    throw '[mir42-maintenance-predecessor-source-tag]'
+  }
+  $sourceTree = (& git -C $RepoRoot rev-parse 'refs/tags/v4.2.0-stable^{tree}').Trim()
+  if ($LASTEXITCODE -ne 0 -or $sourceTree -cne [string]$pinned.manifest.source.tree) {
+    throw '[mir42-maintenance-predecessor-source-tree]'
+  }
+  $tagObject = (& git -C $RepoRoot rev-parse 'refs/tags/v4.2.0-stable').Trim()
+  if ($LASTEXITCODE -ne 0) { throw '[mir42-maintenance-predecessor-tag-object]' }
+  $remoteRefs = @(& git -C $RepoRoot ls-remote origin 'refs/tags/v4.2.0-stable' 'refs/tags/v4.2.0-stable^{}')
+  if ($LASTEXITCODE -ne 0 -or $remoteRefs.Count -ne 2 -or
+      -not ($remoteRefs -ccontains ($tagObject + "`trefs/tags/v4.2.0-stable")) -or
+      -not ($remoteRefs -ccontains ($sourceCommit + "`trefs/tags/v4.2.0-stable^{}"))) {
+    throw '[mir42-maintenance-predecessor-remote-source-tag]'
+  }
+  $root = Split-Path -Parent $pinned.path
+  $rows = @(
+    foreach ($row in $published) {
+      $path = Join-Path $root $row.filename
+      $input = Get-MIR42FourTargetArchiveInput -RepoRoot $RepoRoot -Target $row.target -Path $path
+      if ([string]$input.archive.sha256 -cne $row.sha256 -or [int64]$input.archive.bytes -ne $row.bytes -or
+          [string]$input.content_sha256 -cne $row.content_sha256 -or [int]$input.entry_count -ne $row.entry_count) {
+        throw ('[mir42-maintenance-predecessor-local-custody] ' + $row.target)
+      }
+      [pscustomobject][ordered]@{target=$row.target;version=$row.version;path=[string]$input.archive.path;
+        sha256=$row.sha256;bytes=$row.bytes;content_sha256=$row.content_sha256;entry_count=$row.entry_count;
+        github_asset_id=$row.github_asset_id;github_digest=$row.github_digest}
+    }
+  )
+  return [pscustomobject][ordered]@{release_id=[int64]$ReleaseMetadata.id;source_tag='v4.2.0-stable';
+    source=$pinned.manifest.source;tag_object=$tagObject;remote_tag_readback=$true;
+    manifest=[ordered]@{path=$pinned.path;sha256=$pinned.sha256;bytes=$pinned.bytes};
+    signed=$false;targets=$rows;native_qualification='not-performed';release_qualification='not-performed'}
+}
+
 function Assert-MIR42FourTargetOutputRoot {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$OutputRoot)
 

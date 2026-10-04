@@ -11,6 +11,7 @@ param(
   [Parameter(Mandatory)][string]$F110Predecessor,
   [Parameter(Mandatory)][string]$F100Predecessor,
   [Parameter(Mandatory)][string]$OutputRoot,
+  [string]$PublishedMaintenancePredecessorManifestPath = '',
   [ValidateRange(60,900)][int]$RowDeadlineSeconds = 180
 )
 
@@ -414,6 +415,27 @@ if ($isNineTargetCandidate) {
   $historicalHarness = $null
 }
 
+$maintenanceInputs = $null
+if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
+  if ($sourceVersion -cne '4.2.1' -or -not $isNineTargetCandidate) {
+    throw '[mir42-engine-maintenance-predecessor-candidate-scope]'
+  }
+  $releaseText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+  if ($LASTEXITCODE -ne 0) { throw '[mir42-engine-maintenance-predecessor-release-readback]' }
+  $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
+    -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($releaseText | ConvertFrom-Json -Depth 100 -DateKind String)
+  foreach ($input in $maintenanceInputs.targets) {
+    $target = [string]$input.target
+    if ($target -in $script:MIR42ModernEngineTargets -and
+        -not [IO.Path]::GetFullPath([string]$selected[$target].predecessor).Equals([string]$input.path,[StringComparison]::OrdinalIgnoreCase)) {
+      throw ('[mir42-engine-maintenance-predecessor-explicit-input] ' + $target)
+    }
+    $selected[$target].predecessor = [string]$input.path
+    $selected[$target].from = [string]$input.version
+    $selected[$target].maintenance_predecessor = $input
+  }
+}
+
 # Admit every input before starting the first Factorio process.
 foreach ($target in $targets) {
   $row = $selected[$target]
@@ -426,22 +448,39 @@ foreach ($target in $targets) {
   if ($isHistoricalTarget) {
     $historical = $row.historical
     if (-not $row.engine.Equals([IO.Path]::GetFullPath([string]$historical.engine.path),[StringComparison]::OrdinalIgnoreCase) -or
-        -not $row.predecessor.Equals([IO.Path]::GetFullPath((Join-Path $repo ([string]$historical.predecessor.path))),[StringComparison]::OrdinalIgnoreCase) -or
-        $row.engine_sha256 -cne [string]$historical.engine.sha256 -or
-        $row.predecessor_sha256 -cne [string]$historical.predecessor.sha256 -or
-        [int64](Get-Item -LiteralPath $row.predecessor).Length -ne [int64]$historical.predecessor.bytes -or
-        [string]$historical.predecessor.version -cne $row.from) {
+        $row.engine_sha256 -cne [string]$historical.engine.sha256) {
       throw "[mir42-$target-historical-input-lock]"
     }
-  } elseif (-not $row.engine.Equals([IO.Path]::GetFullPath([string]$lock.engine.path),[StringComparison]::OrdinalIgnoreCase) -or
+    if ($null -eq $maintenanceInputs -and (
+        -not $row.predecessor.Equals([IO.Path]::GetFullPath((Join-Path $repo ([string]$historical.predecessor.path))),[StringComparison]::OrdinalIgnoreCase) -or
+        $row.predecessor_sha256 -cne [string]$historical.predecessor.sha256 -or
+        [int64](Get-Item -LiteralPath $row.predecessor).Length -ne [int64]$historical.predecessor.bytes -or
+        [string]$historical.predecessor.version -cne $row.from)) {
+      throw "[mir42-$target-historical-input-lock]"
+    }
+  } else {
+    if (-not $row.engine.Equals([IO.Path]::GetFullPath([string]$lock.engine.path),[StringComparison]::OrdinalIgnoreCase) -or
+        $row.engine_sha256 -cne [string]$lock.engine.sha256) {
+      throw "[mir42-$target-input-lock]"
+    }
+    if ($null -eq $maintenanceInputs -and (
       -not $row.predecessor.Equals([IO.Path]::GetFullPath([string]$lock.predecessor.path),[StringComparison]::OrdinalIgnoreCase) -or
-      $row.engine_sha256 -cne [string]$lock.engine.sha256 -or
       $row.predecessor_sha256 -cne [string]$lock.predecessor.sha256 -or
       [int64](Get-Item -LiteralPath $row.predecessor).Length -ne [int64]$lock.predecessor.bytes -or
       [string]$lock.predecessor.version -cne $row.from -or
       [string]$lock.published_checksum_sha256 -cne $row.predecessor_sha256 -or
-      -not (Get-Content -LiteralPath $checksumPath | Where-Object { $_ -ceq "$($row.predecessor_sha256)  $([IO.Path]::GetFileName($row.predecessor))" })) {
-    throw "[mir42-$target-input-lock]"
+      -not (Get-Content -LiteralPath $checksumPath | Where-Object { $_ -ceq "$($row.predecessor_sha256)  $([IO.Path]::GetFileName($row.predecessor))" }))) {
+      throw "[mir42-$target-input-lock]"
+    }
+  }
+  if ($null -ne $maintenanceInputs) {
+    $predecessorLock = $row.maintenance_predecessor
+    if (-not $row.predecessor.Equals([string]$predecessorLock.path,[StringComparison]::OrdinalIgnoreCase) -or
+        $row.predecessor_sha256 -cne [string]$predecessorLock.sha256 -or
+        [int64](Get-Item -LiteralPath $row.predecessor).Length -ne [int64]$predecessorLock.bytes -or
+        $row.from -cne [string]$predecessorLock.version) {
+      throw "[mir42-$target-maintenance-input-lock]"
+    }
   }
   if ((Get-MIR42EngineRunArchiveVersion -Path $row.predecessor) -cne $row.from) {
     throw "[mir42-$target-predecessor-version]"
@@ -524,6 +563,8 @@ foreach ($target in $targets) {
   if ((Get-MIR42EngineRunSha -Path $staged) -cne $row.candidate_sha256) { throw "[mir42-$target-staged-candidate-hash]" }
   $row.candidate = $staged
   $candidateLocks.Add([IO.File]::Open($staged,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read))
+  $candidateLocks.Add([IO.File]::Open($row.predecessor,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read))
+  if ((Get-MIR42EngineRunSha -Path $row.predecessor) -cne $row.predecessor_sha256) { throw "[mir42-$target-locked-predecessor-hash]" }
 }
 $results = [Collections.Generic.List[object]]::new()
 $processTotal = 0
@@ -639,6 +680,7 @@ foreach ($target in $targets) {
     harness_exit_code=$exitCode;logs=$logs;fresh_exact_load=$true;predecessor_upgrade=$true;reload_count=2
   }
   if ($isHistoricalTarget) { $execution.historical_terminal_authority = $row.historical }
+  if ($null -ne $maintenanceInputs) { $execution.published_maintenance_predecessor = $row.maintenance_predecessor }
   $results.Add([pscustomobject][ordered]@{
     target=$target
     status='passed'
@@ -647,8 +689,8 @@ foreach ($target in $targets) {
   })
   Write-Host "[ok] $target engine upgrade and two reloads: $receiptPath"
 }
-$runKind = if ($isNineTargetCandidate) { 'MIR42NineTargetEngineRunV1' } else { 'MIR42FourTargetEngineRunV1' }
-$runStatus = if ($isNineTargetCandidate) { 'nine-target-base-default-real-engine-probes-passed-private-unqualified' } else { 'four-target-base-default-real-engine-probes-passed-private-unqualified' }
+$runKind = if ($null -ne $maintenanceInputs) { 'MIR42NineTargetMaintenanceEngineRunV1' } elseif ($isNineTargetCandidate) { 'MIR42NineTargetEngineRunV1' } else { 'MIR42FourTargetEngineRunV1' }
+$runStatus = if ($null -ne $maintenanceInputs) { 'nine-target-maintenance-base-default-real-engine-probes-passed-private-unqualified' } elseif ($isNineTargetCandidate) { 'nine-target-base-default-real-engine-probes-passed-private-unqualified' } else { 'four-target-base-default-real-engine-probes-passed-private-unqualified' }
 $runLabel = if ($isNineTargetCandidate) { 'nine-target' } else { 'four-target' }
 $record = [ordered]@{
   schema=1
@@ -667,11 +709,17 @@ $record = [ordered]@{
 }
 if ($isNineTargetCandidate) {
   $record.historical_upgrade_harness = $historicalHarness
-  $record.historical_terminal_predecessors = @(
+  $historicalAuthorities = @(
     foreach ($target in $script:MIR42HistoricalEngineTargets) {
       [pscustomobject][ordered]@{target=$target;authority=$selected[$target].historical}
     }
   )
+  if ($null -ne $maintenanceInputs) {
+    $record.historical_target_authorities = $historicalAuthorities
+    $record.published_maintenance_predecessor = $maintenanceInputs
+  } else {
+    $record.historical_terminal_predecessors = $historicalAuthorities
+  }
 }
 $recordPath = Join-Path $out 'engine-run.json'
 $normalizedRecord = ConvertTo-MIR4BootstrapCanonicalJson -Value $record | ConvertFrom-Json -Depth 100 -DateKind String
