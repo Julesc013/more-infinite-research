@@ -5323,9 +5323,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1",
       "classification": "canonical-internal",
-      "sha256": "67900901611F2039367C7FE54AB324858064B7420FA69969EA9AA71203B5B81B",
+      "sha256": "82A727B7363B0F67F6CDAACDC7FDBA514E114DCC3BD903700188BB014EE93112",
       "hash_mode": "canonical-text-v1",
-      "lines": 383,
+      "lines": 388,
       "package_visible": false
     },
     {
@@ -6026,5 +6026,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ff0cde253e84ae0ac8d063c3a22133578ac6e2f40739f1d879a8996a3832fe76"
+  "digest": "sha256:225268f13519ed47c2121f76158176c6bb251a4ddba9228b0af506c828dbabd2"
 }

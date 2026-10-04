@@ -7495,6 +7495,7 @@
         "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
         "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
+        "tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json",
         "source:source/package-source.json",
@@ -7966,5 +7967,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4485a3eb15d62724863919ea660a20baa7c0f50278036d02f05987ddcf09ba14"
+  "digest": "sha256:f034a658b75b51a40d32a13ca80fc5144dbcf798dc9fa010278e6ca60499b41c"
 }

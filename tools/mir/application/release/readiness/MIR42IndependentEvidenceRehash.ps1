@@ -144,7 +144,8 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
   $builderPath = (Resolve-Path -LiteralPath $CandidateManifestPath).Path
   $builderRoot = Split-Path -Parent $builderPath
   $builder = Read-MIR42IndependentRecord -Path $builderPath -Code 'mir42-independent-builder'
-  $builderSchema = Join-Path $mir42IndependentRoot 'spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json'
+  $versionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $mir42IndependentRoot -Manifest $builder
+  $builderSchema = [string]$versionContract.schema_path
   if (-not (Get-Content -Raw -LiteralPath $builderPath | Test-Json -SchemaFile $builderSchema)) {
     throw '[mir42-independent-builder-schema]'
   }
@@ -158,7 +159,7 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
   }
   $qualificationPathResolved = (Resolve-Path -LiteralPath $QualificationPath).Path
   $qualification = Read-MIR42IndependentRecord -Path $qualificationPathResolved -Code 'mir42-independent-qualification'
-  if ([string]$builder.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
+  if ([string]$builder.kind -cne [string]$versionContract.manifest_kind -or
       [string]$builder.status -cne [string]$contract.candidate_status -or
       -not [bool]$builder.build_complete -or @($builder.failures).Count -ne 0 -or
       [string]$qualification.kind -cne [string]$contract.reconciliation_kind -or
@@ -200,11 +201,13 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     $row = Read-MIR42IndependentRecord -Path $rowPath -Code "mir42-independent-row-$target"
     $assetPath = Resolve-MIR42IndependentChild -Root $builderRoot -Relative ([string]$summary.asset.path) -Code "mir42-independent-asset-$target"
     $archive = Get-MIR4ArchiveInventory -Path $assetPath
-    $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target
+    $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion ([string]$versionContract.source_version)
     $targetAuthority = @($builder.target_authority | Where-Object { [string]$_.target -ceq $target })
     $forbidden = @($archive.entries | Where-Object { ([string]$_.path).Replace('\','/') -match '^(?:[.]mir|[.]codex|[.]github|build|dist|docs|fixtures|scripts|tests)(?:/|$)|^AGENTS[.]md$' })
     if ($forbidden.Count -ne 0) { throw "[mir42-independent-package-surface] $target" }
-    if ([string]$row.target -cne $target -or [string]$row.source.commit -cne $commit -or
+    if ([int]$row.schema -ne 1 -or [string]$row.kind -cne 'MIR42FourTargetCandidateRowV1' -or
+        [string]$row.source_version -cne [string]$versionContract.source_version -or
+        [string]$row.target -cne $target -or [string]$row.source.commit -cne $commit -or
         [string]$row.source.tree -cne $tree -or -not [bool]$row.deterministic_archive_bytes -or
         [string]$row.package_source_sha256 -cne $packageSource -or
         [string]$row.build_a_sha256 -cne [string]$row.build_b_sha256 -or
@@ -215,7 +218,9 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
         [string]$row.distribution_version -cne [string]$identity.distribution_version -or
         [string]$archive.root -cne [string]$identity.distribution_root -or
         $targetAuthority.Count -ne 1 -or [string]$targetAuthority[0].target_id -cne [string]$identity.target_id -or
+        [string]$targetAuthority[0].source_version -cne [string]$versionContract.source_version -or
         [string]$targetAuthority[0].distribution_version -cne [string]$identity.distribution_version -or
+        [string]$qualified.distribution_version -cne [string]$identity.distribution_version -or
         [string]$qualified.candidate.sha256 -cne [string]$archive.archive_sha256 -or
         [string]$qualified.candidate.content_sha256 -cne [string]$archive.content_sha256 -or
         [int]$qualified.candidate.entry_count -ne [int]$archive.entry_count -or
@@ -226,7 +231,7 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     }
     $historical = $null
     if ($target -in $script:MIR42IndependentHistoricalTargets) {
-      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target $target
+      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target $target -SourceVersion ([string]$versionContract.source_version)
       foreach ($field in @('materializer','base_materializer_target','target_record','factorio_line','engine','predecessor','public_output_authorized','publication_authorized')) {
         if ($row.PSObject.Properties.Name -notcontains $field) { throw "[mir42-independent-historical-row-field] $target/$field" }
       }
