@@ -121,8 +121,10 @@ function Resolve-MIR42QualificationChildPath {
 }
 
 function Get-MIR42QualificationHistoricalAuthority {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target)
-  $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
+    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0')
+  $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
+  $baselineIdentity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch 0
   if ($identity.PSObject.Properties.Name -notcontains 'target_record_path' -or
       [IO.Path]::IsPathRooted([string]$identity.target_record_path) -or [string]$identity.target_record_path -match '(^|[\\/])[.][.]([\\/]|$)') {
     throw "[mir42-qualification-historical-target-record-path] $Target"
@@ -134,7 +136,7 @@ function Get-MIR42QualificationHistoricalAuthority {
       [int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42HistoricalPlaytestTargetV1' -or
       [string]$record.target -cne $Target -or [string]$record.maturity -cne 'private-historical-playtest' -or
       [string]$record.base_materializer_target -cne 'f100' -or [string]$record.factorio_line -cne [string]$script:MIR42QualificationLines[$Target] -or
-      [string]$record.distribution_version -cne [string]$identity.distribution_version -or
+      [string]$record.distribution_version -cne [string]$baselineIdentity.distribution_version -or
       [bool]$record.public_output_authorized -or [bool]$record.publication_authorized) {
     throw "[mir42-qualification-historical-target-record-state] $Target"
   }
@@ -168,14 +170,15 @@ function Get-MIR42QualificationCandidateRows {
   $manifestPath = (Resolve-Path -LiteralPath $CandidateManifestPath).Path
   $root = Split-Path -Parent $manifestPath
   $manifest = Read-MIR42QualificationBootstrapRecord -Path $manifestPath -Code 'mir42-qualification-candidate-manifest'
-  $schema = Join-Path $mir42QualificationRoot 'spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json'
+  $versionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $RepoRoot -Manifest $manifest
+  $schema = [string]$versionContract.schema_path
   if (-not (Get-Content -Raw -LiteralPath $manifestPath | Test-Json -SchemaFile $schema)) {
     throw '[mir42-qualification-candidate-manifest-schema]'
   }
   $targets = @($manifest.targets)
   $scope = Get-MIR42QualificationTargetScope -Rows $targets -Code 'mir42-qualification-candidate'
   $contract = Get-MIR42QualificationScopeContract -Scope $scope
-  if ([string]$manifest.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
+  if ([string]$manifest.kind -cne [string]$versionContract.manifest_kind -or
       [string]$manifest.status -cne [string]$contract.candidate_status -or
       -not [bool]$manifest.build_complete) {
     throw '[mir42-qualification-candidate-manifest-status]'
@@ -203,18 +206,19 @@ function Get-MIR42QualificationCandidateRows {
     if ($summary.Count -ne 1) { throw "[mir42-qualification-candidate-target] $target" }
     $rowPath = Resolve-MIR42QualificationChildPath -Root $root -RelativePath ([string]$summary[0].target_row_path) -Code "mir42-qualification-target-row-$target"
     $row = Read-MIR42QualificationBootstrapRecord -Path $rowPath -Code "mir42-qualification-target-row-$target"
-    if ([string]$row.kind -cne 'MIR42FourTargetCandidateRowV1' -or
+    if ([int]$row.schema -ne 1 -or [string]$row.kind -cne 'MIR42FourTargetCandidateRowV1' -or
         [string]$row.status -cne 'accepted-private-deterministic-unqualified' -or
         [string]$row.target -cne $target -or
         [string]$row.source.commit -cne [string]$manifest.source.commit -or
         [string]$row.source.tree -cne [string]$manifest.source.tree -or
+        [string]$row.source_version -cne [string]$versionContract.source_version -or
         [string]$row.package_source_sha256 -cne [string]$manifest.package_source_sha256 -or
         -not [bool]$row.deterministic_archive_bytes -or
         -not [bool]$row.package_excluded_surface) {
       throw "[mir42-qualification-target-row-binding] $target"
     }
 
-    $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $target
+    $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $target -SourceVersion ([string]$versionContract.source_version)
     $targetAuthority = @($targetAuthorities | Where-Object { [string]$_.target -ceq $target })
     if ([string]$row.distribution_version -cne [string]$identity.distribution_version -or
         [string]$summary[0].distribution_version -cne [string]$identity.distribution_version -or
@@ -247,7 +251,7 @@ function Get-MIR42QualificationCandidateRows {
     }
     $historical = $null
     if ($target -in $script:MIR42QualificationHistoricalTargets) {
-      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $target
+      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $target -SourceVersion ([string]$versionContract.source_version)
       foreach ($field in @('materializer','base_materializer_target','target_record','factorio_line','engine','predecessor','public_output_authorized','publication_authorized')) {
         if ($row.PSObject.Properties.Name -notcontains $field) { throw "[mir42-qualification-historical-target-row-field] $target/$field" }
       }

@@ -49,6 +49,29 @@ function Get-MIR42ReleaseTargetIdentity {
     target_record_file_sha256=Get-MIR4Sha256File -Path (Join-Path $RepoRoot $relative)}
 }
 
+function Get-MIR42CandidateConstructionVersionContract {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Manifest)
+
+  $schemaVersion = [int]$Manifest.schema
+  $sourceVersion = switch ($schemaVersion) {
+    1 { '4.2.0' }
+    2 { '4.2.1' }
+    default { throw '[mir42-candidate-construction-version-contract]' }
+  }
+  $kind = "MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"
+  if ([string]$Manifest.kind -cne $kind) { throw '[mir42-candidate-construction-version-contract]' }
+  # Consumers still validate the selected schema, record hash, source, rows and
+  # asset custody. This descriptor supplies no qualification or release grant.
+  return [pscustomobject][ordered]@{
+    schema_version = $schemaVersion
+    manifest_kind = $kind
+    source_version = $sourceVersion
+    schema_path = Join-Path $RepoRoot "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v$schemaVersion.schema.json"
+    requires_nine_targets = $schemaVersion -eq 2
+  }
+}
+
 function Assert-MIR42FourTargetOutputRoot {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$OutputRoot)
 
