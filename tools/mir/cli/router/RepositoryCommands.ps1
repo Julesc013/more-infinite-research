@@ -71,6 +71,8 @@ function Invoke-MIRRepositoryCommandGroup {
           $params = @{RepoRoot=$repo.Path;OlderThanDays=$olderThanDays}
           $libraryRoot = Get-MIRArgValue -Items $Args -Name '--library-root'
           if ($libraryRoot) { $params.LibraryRoot = @($libraryRoot) }
+          $testRunRoot = Get-MIRArgValue -Items $Args -Name '--test-run-root'
+          if ($testRunRoot) { $params.TestRunRoot = $testRunRoot }
           if (Test-MIRArgSwitch -Items $Args -Name '--apply') { $params.Apply = $true }
           & (Join-Path $repo 'tools/commands/workspace/Optimize-MIRArtifactStorage.ps1') @params
           return

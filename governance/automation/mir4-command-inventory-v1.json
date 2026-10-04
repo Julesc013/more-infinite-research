@@ -664,7 +664,7 @@
     },
     {
       "key": "storage optimize",
-      "public_syntax": ".\\tools\\mir.ps1 storage optimize [--library-root <path>] [--older-than-days <days>] [--apply]",
+      "public_syntax": ".\\tools\\mir.ps1 storage optimize [--library-root <path>] [--test-run-root <build/tests/.../GUID>] [--older-than-days <days>] [--apply]",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -3387,9 +3387,9 @@
     {
       "path": "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
       "classification": "canonical-internal",
-      "sha256": "074072242BB089CC4DE0C3352DAB2E9EB7FD33804794F475AF3008F98D788214",
+      "sha256": "368E44A1E3588D581F3A8D4D007320C8F28459E5A3807532E9A37DB572A80BFB",
       "hash_mode": "canonical-text-v1",
-      "lines": 301,
+      "lines": 336,
       "package_visible": false
     },
     {
@@ -5843,7 +5843,7 @@
     {
       "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-internal",
-      "sha256": "C7DB2E7874A0D6721B85EE639977036525B1F09B8353E1E0F355410EC9284850",
+      "sha256": "9694FE3BCEC408151101FD306976744DDEE511BDA630116831E0F1722F966745",
       "hash_mode": "canonical-text-v1",
       "lines": 139,
       "package_visible": false
@@ -5931,9 +5931,9 @@
     {
       "path": "tools/mir/cli/router/RepositoryCommands.ps1",
       "classification": "canonical-internal",
-      "sha256": "595A676613A27E7D7261DF609D29BC555E4B9E1FB7037F216167D8A955EFBA94",
+      "sha256": "1B1D67C5DEEE368F02A5FD61C69F86EF1F5FE028B8D5BDFEFDE0EE782F663E27",
       "hash_mode": "canonical-text-v1",
-      "lines": 154,
+      "lines": 156,
       "package_visible": false
     },
     {
@@ -6018,5 +6018,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:70fbcec66b34b20a05d0992b88efa2a937893196c6f5ef2780acd9c6b9cb6467"
+  "digest": "sha256:e6efe4d5ed48443e494342abf82659dc7d8969c3c47333b19e34d1577a744cfe"
 }

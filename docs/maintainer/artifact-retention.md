@@ -91,6 +91,20 @@ The scanner holds only pending directory paths, not an entire copied mod library
 
 The retired `.work/` path is forbidden and its reappearance fails the layout gate. Existing ignored `artifacts/`, `out/`, and root `tmp/` content is a read-only legacy quarantine until an explicit governed retirement records its disposition; ordinary commands must not write there, and routine cleanup does not delete it.
 
+## Immutable Archive Optimization
+
+`storage optimize` replaces a duplicate immutable mod ZIP with a verified same-volume hardlink to its exact existing library archive. It preserves the archive bytes and run evidence. The default discovery still scans `build/tests`; select one completed run to bound discovery to its direct `mods` archive files and avoid traversing copied checkouts, saves, userdata or child directories:
+
+```powershell
+# Preview one existing completed run; replace the example GUID with its exact identity.
+.\tools\mir.ps1 storage optimize --test-run-root build/tests/suite/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+# Apply only after reviewing that same scope.
+.\tools\mir.ps1 storage optimize --test-run-root build/tests/suite/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --apply
+```
+
+The selector must be repository-relative under `build/tests` and end in a canonical 32-lowercase-hex GUID. The run must be stale under the selected age cutoff, have a terminal result, and have no immutable-input lease or reparse path. Application rechecks those conditions, the selected run boundary, source and target hashes, and exact file identities. Open handles prevent source mutation during replacement; failed replacement verification restores the original target. Recent, running, leased and ambiguous runs remain ineligible. Direct script callers can retain small `MaxScannedEntries`, `MaxPendingDirectories` and `MaxScanSeconds` budgets. Existing hardlinks yield no new optimization; preview counts and logical archive sizes are not measurements of physical space reclaimed. This command neither deletes a run nor changes native resource admission limits.
+
 ## Run Finalization
 
 When a run finishes, retain its compact summary, failure packet, or authority-bound evidence in the governed destination, verify that the retained record identifies the exact source, candidate, verifier, target, and input/evidence identity where applicable, then remove the bulky run directory. A reused immutable input is not an independent cold construction or qualification observation. Do not retain copied Factorio installations, scenario mod directories, decompressed caches, duplicate candidate archives, or raw performance campaigns merely because they may be useful later. `Invoke-MIRPerformanceQualification.ps1` enforces this by keeping raw performance directories on failure and removing them after compact evidence validates successfully; pass `-KeepArtifacts` only for a deliberate diagnostic investigation.
@@ -103,4 +117,4 @@ Both current Bob/Angel observers retain the original exact archive names and has
 
 Each probe's write budget includes cumulative new output and a reserved result allowance. Only verified same-file aliases registered from a strict lease are excluded from logical tree totals; every budget check revalidates their file identities and lengths, including terminal result writing. The generated candidate's original bytes, fixtures, logs, saves and receipts remain counted. This accounting does not measure reclaimed physical space or change the existing free-volume, RAM and system-commit admission limits. Memory enforcement remains a sampled watchdog, and declared budgets must be compared with measured peaks before qualification claims. The selected material-route command forwards the actual target engine and line, with a declared 2048 MiB memory cap and 120 MiB new-output budget; those declarations are not peak measurements. Focused resource fixtures use tiny owned processes and synthetic archive/driver inputs; they do not launch Factorio or construct a real player package and cannot substitute for native evidence.
 
-Use a different output drive for deliberately long campaigns when practical. The retention rules still apply to that output root, but the repository cleanup command intentionally operates only on worktrees registered to the current Git common directory and does not roam arbitrary disks.
+Keep current campaign scratch in the approved primary-checkout paths and admit a bounded batch only after measuring capacity. Preserve original inputs and delivered packages; inspect eligible owned staging when capacity is insufficient. The repository cleanup command operates only on worktrees registered to the current Git common directory and does not roam arbitrary disks.
