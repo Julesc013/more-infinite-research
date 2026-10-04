@@ -7496,7 +7496,7 @@
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json",
-        "source/package-source.json",
+        "source:source/package-source.json",
         "targets/package-authority.json",
         "targets/historical/**"
       ],
@@ -7964,5 +7964,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:494d1cd66e3c1f174d4f078046ba085b0634fcd428036b5e25995e723c7bf5c1"
+  "digest": "sha256:a7f3b7947bbcc4ce8a94de31f52ef1c71e574b0670ada102b31ad8c19a0331cb"
 }

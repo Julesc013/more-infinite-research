@@ -16,7 +16,7 @@
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json",
-        "source/package-source.json",
+        "source:source/package-source.json",
         "targets/package-authority.json",
         "targets/historical/**"
       ]

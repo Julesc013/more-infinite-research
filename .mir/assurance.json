@@ -79,7 +79,9 @@
         "^tools/mir/application/package/TargetMaterializer[.]ps1$",
         "^tools/mir/application/release/readiness/MIR42(?:CandidateBuild|FourTargetPreflight)[.]ps1$",
         "^spec/schemas/mir42-four-target-deterministic-candidate-manifest-v[12][.]schema[.]json$",
-        "^targets/historical/"
+        "^targets/historical/",
+        "^source/package-source[.]json$",
+        "^targets/package-authority[.]json$"
       ],
       "tests": ["static.mir42-candidate-construction"]
     },

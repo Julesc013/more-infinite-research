@@ -102,7 +102,9 @@ $actualAssurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.
 foreach ($constructionPath in @(
   'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1',
   'tools/mir/application/package/TargetMaterializer.ps1',
-  'spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json'
+  'spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json',
+  'source/package-source.json',
+  'targets/package-authority.json'
 )) {
   $constructionClassification=Get-MIRAssuranceClassification -Paths @($constructionPath) -Config $actualAssurance
   $constructionRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $constructionClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
