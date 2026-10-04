@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-10-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -138,6 +138,8 @@ The contract:
 - runtime commands may export or validate profiles but must not attempt to rewrite startup setting values.
 
 Profile serialization and reduced-target visibility are separate contracts. `settings-profile-roundtrip` runs only where the profile codec is shipped and checks canonical encoding, compact export, and strict import validation. `reduced-settings-surface` runs on reduced lines where profiles are omitted and checks that supported settings remain available while modern-only settings are absent. A locally constructed placeholder string is not profile-codec evidence.
+
+The startup reader reuses one decoded import while its text and helper codec identities remain unchanged, including an unsuccessful decode. Each read still checks current registration and catalog value validation. Empty or absent imports release the retained decode. The round-trip fixture checks repeated reads and changed text using the native codec; the controlled `tests/compiler/startup_settings_decode_reuse.lua` fixture also checks helper replacement and availability. Controlled call counts are not native performance measurements, and MIR 4.2.1 package qualification remains pending.
 
 Do not narrow an existing string setting's `allowed_values` on a backport line unless there is no safe data-stage fallback. Prefer accepting the value and mapping unsupported choices to a documented safe behavior.
 

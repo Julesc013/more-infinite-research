@@ -1963,6 +1963,8 @@ fixtures:
       - settings-catalog-copy-isolation
       - automatic-controls-profile-roundtrip
       - hidden-legacy-automatic-mode-profile-roundtrip
+      - imported-startup-profile-decode-reuse
+      - changed-import-text-invalidates-decoded-profile
 
   reduced-settings-surface:
     requires_features: []

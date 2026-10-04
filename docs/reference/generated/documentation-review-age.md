@@ -209,7 +209,7 @@ Ages are measured against the newest governed review date, 2026-10-04, so checko
 | docs/maintainer/release-assurance.md | current | 2026-10-04 | 0 | current-window |
 | docs/maintainer/release-process.md | current | 2026-08-14 | 51 | current-window |
 | docs/maintainer/report-diffing.md | current | 2026-08-03 | 62 | current-window |
-| docs/maintainer/settings-governance.md | current | 2026-07-12 | 84 | current-window |
+| docs/maintainer/settings-governance.md | current | 2026-10-04 | 0 | current-window |
 | docs/maintainer/testing.md | current | 2026-08-03 | 62 | current-window |
 | docs/maintainer/triage-playbook.md | current | 2026-07-07 | 89 | current-window |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | archived | 2026-08-08 | 57 | current-window |
