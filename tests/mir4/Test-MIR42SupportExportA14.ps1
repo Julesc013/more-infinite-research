@@ -51,6 +51,57 @@ if([string]$bundle.target-cne'f210'-or[string]$bundle.maturity-cne'developer-pre
 foreach($flag in @('claim_eligible','arbitrary_code','executable_content','network_access_authorized','package_visible','player_mutation_authorized','prototype_write_authorized','public_support_authorized','release_authority')){
   if([bool]$bundle.$flag){throw "[mir42-a14-boundary] $flag"}
 }
+
+# MIR421-CREDENTIAL-CONTROLS-BEGIN
+# Synthetic text exercises the consumed converter and both validation paths.
+$credentialControls=@(
+  @{id='basic';text='Authorization: Basic MIR421_SYNTHETIC_BASIC';secret='MIR421_SYNTHETIC_BASIC'},
+  @{id='proxy-basic';text='Proxy-Authorization: Basic MIR421_SYNTHETIC_PROXY';secret='MIR421_SYNTHETIC_PROXY'},
+  @{id='json-token';text='{"token": "MIR421_SYNTHETIC_TOKEN"}';secret='MIR421_SYNTHETIC_TOKEN'},
+  @{id='json-api-key';text='{"api_key": "MIR421_SYNTHETIC_API"}';secret='MIR421_SYNTHETIC_API'},
+  @{id='json-access-token';text='{"access_token": "MIR421_SYNTHETIC_ACCESS"}';secret='MIR421_SYNTHETIC_ACCESS'},
+  @{id='quoted-password';text='password="MIR421 synthetic password"';secret='synthetic password'},
+  @{id='single-quoted-secret';text="secret='MIR421 synthetic secret'";secret='synthetic secret'},
+  @{id='escaped-quoted-token';text='{"token": "MIR421 synthetic\"token"}';secret='MIR421 synthetic'},
+  @{id='redacted-prefix-suffix';text='{"token": "<redacted>MIR421_SYNTHETIC_SUFFIX"}';secret='MIR421_SYNTHETIC_SUFFIX'}
+)
+$credentialAssertions=0
+foreach($control in $credentialControls){
+  $diagnostic=[pscustomobject][ordered]@{code='mir421-credential-control';severity='info';message=$control.text}
+  $converted=ConvertTo-MIR4RedactedDiagnosticV1 -Diagnostic $diagnostic
+  if($converted.message.Contains($control.secret)){throw "[mir42-a14-credential-retained] $($control.id)"}
+  $credentialAssertions++
+  Test-MIR4SupportDiagnosticV1 $converted | Out-Null
+  Test-MIR4EnvironmentPrivateValue -Value $converted.message | Out-Null
+  $credentialAssertions+=2
+  foreach($validator in @('diagnostic','private-value')){
+    $rejected=$false
+    try {
+      if($validator -eq 'diagnostic'){Test-MIR4SupportDiagnosticV1 $diagnostic | Out-Null}
+      else {Test-MIR4EnvironmentPrivateValue -Value $control.text | Out-Null}
+    } catch {
+      $expected=if($validator -eq 'diagnostic'){'[mir4-support-bundle-redaction]'}else{'[mir4-environment-private-value]'}
+      if(-not $_.Exception.Message.StartsWith($expected)){throw}
+      $rejected=$true
+    }
+    if(-not $rejected){throw "[mir42-a14-raw-credential-accepted] $($control.id)/$validator"}
+    $credentialAssertions++
+  }
+  $again=ConvertTo-MIR4RedactedDiagnosticV1 -Diagnostic $converted
+  if($again.message -cne $converted.message){throw "[mir42-a14-credential-idempotence] $($control.id)"}
+  if($diagnostic.message -cne $control.text){throw "[mir42-a14-credential-input-mutated] $($control.id)"}
+  $credentialAssertions+=2
+}
+foreach($safe in @('No private text here.','token=<redacted>','{"token": "<redacted>"}','Authorization: Basic <redacted>')){
+  $diagnostic=[pscustomobject]@{code='mir421-safe-control';severity='info';message=$safe}
+  Test-MIR4SupportDiagnosticV1 $diagnostic | Out-Null
+  Test-MIR4EnvironmentPrivateValue -Value $safe | Out-Null
+  if((ConvertTo-MIR4RedactedDiagnosticV1 $diagnostic).message -cne $safe){throw '[mir42-a14-safe-text-changed]'}
+  $credentialAssertions+=3
+}
+Write-Host "[ok] MIR421 support credential controls passed $credentialAssertions assertions."
+# MIR421-CREDENTIAL-CONTROLS-END
+
 $minimized=Minimize-MIR4SupportBundleV1 $bundle
 Test-MIR4SupportBundleV1 $minimized|Out-Null
 if(-not[bool]$minimized.minimized-or[string]$minimized.source_bundle_digest-cne[string]$bundle.digest-or

@@ -240,7 +240,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/maximum-level-binding.md | Maximum-Level Binding Contract | current | developer | reference | mir-maintainers | 2026-09-22 |
 | docs/reference/mir4-api-sdk-v0-stability.md | MIR 4 API and SDK V0 Stability Policy | deprecated | developer | reference | mir-maintainers | 2026-08-24 |
 | docs/reference/mir4-canonical-json-v1.md | MIR Canonical JSON V1 | current | developer | reference | mir-maintainers | 2026-08-26 |
-| docs/reference/mir4-environment-evidence.md | MIR 4 Environment Evidence V1 | current | developer | reference | mir-maintainers | 2026-08-26 |
+| docs/reference/mir4-environment-evidence.md | MIR 4 Environment Evidence V1 | current | developer | reference | mir-maintainers | 2026-10-04 |
 | docs/reference/mir4-f210-mep-discovery.md | MIR 4 F210 Read-Only MEP Discovery | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/reference/mir4-first-extension.md | Your First MIR 4 Extension | current | developer | tutorial | mir-maintainers | 2026-08-26 |
 | docs/reference/mir4-mep-v0.md | MIR Extension Protocol V0 Preview | deprecated | developer | reference | mir-maintainers | 2026-08-24 |
