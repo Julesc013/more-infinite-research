@@ -116,7 +116,7 @@ local function research_mechanism_reason(technology, technology_name, context)
   local ingredients = unit and unit.ingredients or nil
   if not unit or not ingredients or #ingredients == 0 then return "missing-research-mechanism" end
   if unit.count == nil and unit.count_formula == nil then return "missing-research-count" end
-  if not lab_compatibility.valid_research_ingredients(ingredients, context.diagnostic_observer) then
+  if not lab_compatibility.valid_research_ingredients(ingredients, context.diagnostic_observer, context) then
     return "no-accepting-lab"
   end
 
@@ -218,7 +218,7 @@ local function active_science_rejection(technology, context)
     if pack_name and (context.visiting_packs or {})[pack_name]
       and not (unlock_recipe and recipe_facts.recipe_outputs_item(unlock_recipe, pack_name))
       and pack_registry.science_pack_exists(pack_name)
-      and lab_compatibility.valid_research_ingredients(ingredients)
+      and lab_compatibility.valid_research_ingredients(ingredients, nil, context)
       and pack_production_status(pack_name, context.visiting_packs,
         context.visiting_technologies or {}) == "unreachable" then
       return "unreachable-science-" .. pack_name

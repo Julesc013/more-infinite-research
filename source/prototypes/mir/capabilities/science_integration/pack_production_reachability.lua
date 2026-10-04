@@ -1525,6 +1525,7 @@ local function observation_context()
   for _, service_name in ipairs({
     "science.technology_researchability_reason",
     "science.independent_pack_acquisition_witness",
+    "science.item_acquisition_witness",
     "science.prereq_tech_for_science_pack",
     "science.prereq_techs_for_science_pack",
     "science.production_route_for_pack"
@@ -1714,6 +1715,17 @@ end
 -- proves an alternative concrete production route while retaining every other
 -- active traversal guard. It is deliberately uncached: the excluded unlocker
 -- and inherited traversal make it a contextual witness, not a global fact.
+-- Labs consume this same contextual acquisition solver for their concrete
+-- placement items. No second reachability graph or item-as-science admission
+-- is introduced. Machine categories remain prototype witnesses, as documented
+-- by recipe_route_feasibility; this does not certify power or placement.
+function M.item_acquisition_witness(item_name, visiting_packs, visiting_technologies, observer)
+  if type(item_name) ~= "string" or item_name == "" then return nil end
+  return route_feasibility.acquisition_witness({type = "item", name = item_name},
+    production_witness_options(visiting_packs or {}, visiting_technologies or {}, observer),
+    route_witness_state_for_query(observer))
+end
+
 function M.independent_pack_acquisition_witness(
   pack_name,
   excluded_unlocker,
