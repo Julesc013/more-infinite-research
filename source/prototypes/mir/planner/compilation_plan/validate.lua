@@ -7,17 +7,6 @@ local ownership_facts = require("prototypes.mir.planner.effect_ownership.facts")
 
 local M = {}
 
-local function material_stage_pair(left, right, left_effect, right_effect)
-  local stage = left.stage_kind == "material-continuation" and left or
-    right.stage_kind == "material-continuation" and right or nil
-  if not stage then return false end
-  local parent = stage == left and right or left
-  return stage.operation == "emit_stream" and parent.operation == "emit_stream"
-    and stage.staged_parent_technology == parent.technology_name
-    and stage.staged_parent_stream_key == parent.stream_key
-    and generation_plan.effect_signature(left_effect) == generation_plan.effect_signature(right_effect)
-end
-
 function M.admit_stream_artifact(stream_artifact)
   for _, row in ipairs(stream_artifact.rows or {}) do
     hard_gate_authority.assert_total(row.gates)
@@ -69,7 +58,7 @@ function M.operations(operations)
       local identity = generation_plan.effect_identity(effect)
       if identity ~= "" then
         if effects[identity] then
-          if not material_stage_overlaps[identity] and material_stage_pair(
+          if not material_stage_overlaps[identity] and ownership_facts.material_stage_pair(
               effects[identity], operation, effect_values[identity], effect) then
             material_stage_overlaps[identity] = true
             table.insert(planned_overlaps, {

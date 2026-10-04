@@ -8,6 +8,23 @@ local M = {}
 M.assert_effect_allowed = effect_safety_policy.assert_effect_allowed
 M.assert_effects_allowed = effect_safety_policy.assert_effects_allowed
 
+-- Zero is an exact no-change value for native additive modifiers. Other
+-- effect forms retain their existing contracts and runtime qualification;
+-- this predicate is not a native usefulness or saturation proof.
+function M.has_possible_research_effects(effects)
+  for _, effect in ipairs(effects or {}) do
+    -- Numeric-looking extra fields do not define these effects' semantics.
+    if effect.type == "nothing" or effect.type == "give-item"
+      or (type(effect.type) == "string" and effect.type:sub(1, 7) == "unlock-") then
+      return true
+    end
+    local value = effect.modifier
+    if effect.type == "change-recipe-productivity" then value = effect.change end
+    if type(value) ~= "number" or value ~= 0 then return true end
+  end
+  return false
+end
+
 function M.sanitize_effects(effects, context, owner, target_inventory, observer)
   local kept, removed, retained_order, retained_identities = {}, {}, {}, {}
   for index, effect in ipairs(effects or {}) do
