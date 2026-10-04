@@ -8,6 +8,9 @@ if($errors.Count -ne 0){throw 'Upgrade harness syntax error'}
 $functions=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Resolve-MIRUpgradeManifestVersion'},$true))
 if($functions.Count -ne 1){throw 'Manifest resolver missing or ambiguous'}
 . ([scriptblock]::Create($functions[0].Extent.Text))
+$historicalFunctions=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Resolve-MIRHistoricalUpgradeTransition'},$true))
+if($historicalFunctions.Count -ne 1){throw 'Historical transition resolver missing or ambiguous'}
+. ([scriptblock]::Create($historicalFunctions[0].Extent.Text))
 $testRoot=Join-Path $RepoRoot ('build/handoff/mir421-upgrade-manifest/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $testRoot|Out-Null
 $manifestPath=$SelectedManifestPath
@@ -62,5 +65,43 @@ Assert-UpgradeManifestRejected '[mir-upgrade-manifest-package-hash]'
 $fixture.targets[0].sha256=(Get-FileHash -LiteralPath $futureZip).Hash
 $fixture.targets+=@($fixture.targets[0]);Write-UpgradeManifestFixture
 Assert-UpgradeManifestRejected '[mir-upgrade-manifest-target]'
+$historicalAssertions=0
+$historicalCases=@(
+  @{code='017';line='0.17';terminal='1.7.9';infinite='mining-productivity-4'},
+  @{code='016';line='0.16';terminal='1.6.9';infinite='mining-productivity-16'},
+  @{code='015';line='0.15';terminal='1.5.9';infinite='mining-productivity-16'},
+  @{code='014';line='0.14';terminal='1.4.9';infinite=''},
+  @{code='013';line='0.13';terminal='1.3.9';infinite=''}
+)
+foreach($case in $historicalCases){
+  $baseline='4.2.'+$case.code+'00';$maintenance='4.2.'+$case.code+'01'
+  foreach($transition in @(
+    @{from=$case.terminal;to=$baseline;kind='historical-terminal'},
+    @{from=$case.terminal;to=$maintenance;kind='historical-terminal'},
+    @{from=$baseline;to=$maintenance;kind='same-target-maintenance'}
+  )){
+    $resolved=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion $transition.from -ToVersion $transition.to
+    if($resolved.line -cne $case.line -or $resolved.target -cne $transition.to -or $resolved.infinite_technology -cne $case.infinite -or $resolved.predecessor_kind -cne $transition.kind){throw 'Historical transition binding differs'}
+    $historicalAssertions++
+  }
+  $other=@($historicalCases | Where-Object code -cne $case.code)[0]
+  foreach($transition in @(
+    @{from=$baseline;to=$baseline},
+    @{from=$maintenance;to=$baseline},
+    @{from=$maintenance;to=$maintenance},
+    @{from=('4.2.'+$other.code+'00');to=$maintenance},
+    @{from=$other.terminal;to=$maintenance},
+    @{from=$baseline;to=('4.2.'+$other.code+'01')},
+    @{from=$case.terminal;to=('4.2.'+$case.code+'1')},
+    @{from=('4.2.'+$case.code+'0');to=$maintenance},
+    @{from=$baseline;to='4.2.21001'},
+    @{from=$baseline;to=('4.1.'+$case.code+'01')}
+  )){
+    $rejected=$false
+    try{$null=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion $transition.from -ToVersion $transition.to}catch{$rejected=$_.Exception.Message.StartsWith('MIR historical upgrade specialization requires an exact terminal predecessor')}
+    if(-not $rejected){throw "Historical invalid transition accepted: $($transition.from) -> $($transition.to)"}
+    $historicalAssertions++
+  }
+}
 # This metadata-only ZIP is controlled test input, never a release package.
-[pscustomobject]@{status='passed';assertions=$assertions;selected_targets=9;actual_hotfix_archives=[bool]$SelectedManifestPath;future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+[pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;selected_targets=9;actual_hotfix_archives=[bool]$SelectedManifestPath;future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

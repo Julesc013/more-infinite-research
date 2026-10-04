@@ -393,8 +393,8 @@ Ages are measured against the newest governed review date, 2026-10-05, so checko
 | docs/releases/mir42-compatibility-playtest-plan.md | current | 2026-09-27 | 8 | current-window |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | current | 2026-10-05 | 0 | current-window |
 | docs/releases/MIR42-nine-target-rehearsal-input-gap-2026-09-30.md | current | 2026-09-30 | 5 | current-window |
-| docs/releases/mir42-playtest-findings.md | current | 2026-09-30 | 5 | current-window |
-| docs/releases/mod-portal-page.md | current | 2026-10-04 | 1 | current-window |
+| docs/releases/mir42-playtest-findings.md | current | 2026-10-05 | 0 | current-window |
+| docs/releases/mod-portal-page.md | current | 2026-10-05 | 0 | current-window |
 | docs/releases/notes/README.md | current | 2026-08-08 | 58 | current-window |
 | docs/releases/notes/release-notes-0.10.0.md | current | 2026-07-16 | 81 | current-window |
 | docs/releases/notes/release-notes-0.11.0.md | current | 2026-07-16 | 81 | current-window |

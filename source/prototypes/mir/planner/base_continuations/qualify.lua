@@ -138,7 +138,7 @@ local function append_pack_prerequisites(prereqs, ingredients)
 end
 
 function M.resolve_ingredients(spec, base_unit, key)
-  local selected = science_selector.apply_science_pack_ingredient_policy(resolve_science_packs(spec, base_unit, key))
+  local selected = science_selector.apply_science_pack_ingredient_policy(resolve_science_packs(spec, base_unit, key), key)
   return planner_science.ingredients_for_selected(key, selected)
 end
 

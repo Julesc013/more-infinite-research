@@ -137,7 +137,7 @@ local function append_pack_prerequisites(prereqs, ingredients)
 end
 
 function M.resolve_ingredients(spec, base_unit, key)
-  local selected = science_selector.apply_science_pack_ingredient_policy(resolve_science_packs(spec, base_unit, key))
+  local selected = science_selector.apply_science_pack_ingredient_policy(resolve_science_packs(spec, base_unit, key), key)
   local resolved, lab_status = science_packs.best_lab_compatible_ingredients(selected, key)
   return resolved, lab_status or "full", nil
 end

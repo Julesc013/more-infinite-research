@@ -690,11 +690,12 @@
           "A06"
         ],
         "owner_domain": "ecosystem-admission",
-        "requests": [],
+        "requests": ["SIF-01"],
         "acceptance": [
           "Scouting can start after A00; these dependencies concern reuse/integration",
           "AAI/BZ/IR/SE/Py/planets/held-out corpus kept visible",
           "Exact locks and scoped claims",
+          "SIF-01: qualify both level-7 continuations on exact F210/F200 packages, including native final emission, published predecessor upgrade and reload; retained controlled assertions are not native acceptance",
           "No invalid mega-mod combination",
           "Every deferment has actual blocker/next proof"
         ],

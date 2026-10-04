@@ -393,8 +393,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir42-compatibility-playtest-plan.md | MIR 4.2 Compatibility Scope and Player Playtest Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-27 |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | MIR 4.2 Nine-Target Candidate and Playtest Matrix | current | release-manager | release-plan | mir-maintainers | 2026-10-05 |
 | docs/releases/MIR42-nine-target-rehearsal-input-gap-2026-09-30.md | MIR 4.2 nine-target rehearsal input gap | current | release-manager | reference | mir-maintainers | 2026-09-30 |
-| docs/releases/mir42-playtest-findings.md | MIR 4.2 Playtest Findings | current | maintainer | reference | mir-maintainers | 2026-09-30 |
-| docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-10-04 |
+| docs/releases/mir42-playtest-findings.md | MIR 4.2 Playtest Findings | current | maintainer | reference | mir-maintainers | 2026-10-05 |
+| docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-10-05 |
 | docs/releases/notes/README.md | Release Notes | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/release-notes-0.10.0.md | More Infinite Research 0.10.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |
 | docs/releases/notes/release-notes-0.11.0.md | More Infinite Research 0.11.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |

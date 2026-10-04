@@ -19,7 +19,9 @@ $originalExpected=@(1..7 | ForEach-Object { 'K2-{0:D2}' -f $_ })+@(1..16 | ForEa
 $integrationExpected=@(1..6 | ForEach-Object { 'OAB-{0:D2}' -f $_ })+@(1..8 | ForEach-Object { 'RIC-{0:D2}' -f $_ })
 $platformExpected=@('PLAT-UI-01')
 $expected=@($requests.requests.id)
-if($requests.request_count -ne 81 -or $expected.Count -ne 81 -or @($expected | Sort-Object -Unique).Count -ne 81) { throw '[community-exact-81-requests]' }
+if($requests.request_count -ne $expected.Count -or $expected.Count -lt 81 -or
+   @($expected | Sort-Object -Unique).Count -ne $expected.Count -or
+   @($expected | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -ne 0) { throw '[community-request-count-or-identity]' }
 if(@($originalExpected | Where-Object { $_ -notin $expected }).Count -ne 0) { throw '[community-original-requests-lost]' }
 if(@($integrationExpected+$platformExpected | Where-Object { $_ -notin $expected }).Count -ne 0) { throw '[community-expanded-requests-lost]' }
 foreach($request in @($requests.requests | Where-Object id -in $originalExpected)) {
@@ -61,6 +63,12 @@ while($done.Count -lt $tasks.Count) {
  if($done.Count -eq $before) { throw '[synthesis-dependency-cycle]' }
 }
 if(@(Compare-Object ($expected | Sort-Object) @($tasks.requests | Sort-Object -Unique)).Count -ne 0) { throw '[synthesis-unowned-request]' }
+$sif=@($requests.requests | Where-Object id -eq 'SIF-01')
+$sifSource=@($requests.intake.source_register.sources | Where-Object id -eq 'P5')
+$sifTask=@($tasks | Where-Object { 'SIF-01' -in @($_.requests) })
+if($sif.Count-ne1-or$sifSource.Count-ne1-or$sifTask.Count-ne1-or
+   [string]$sif[0].status-cne'requested-not-qualified'-or@($sif[0].qualification).Count-ne0-or
+   'P5'-notin@($sif[0].source_ids)-or[string]$sifTask[0].state-ceq'complete') { throw '[community-sif-followup-native-acceptance-pending]' }
 if($p.synthesis.objectives_measured -or $p.synthesis.heavy_engine_concurrency -ne 1) { throw '[synthesis-unmeasured-capacity]' }
 if($p.synthesis.release_baseline.source -cne '3562377b520cccb071b97b3968946eae7024c950' -or $p.synthesis.release_baseline.human_acceptance.f210 -cne 'release-specific-direct-playtest-waiver') { throw '[synthesis-release-history]' }
 if(@($p.work_packages | Where-Object { $_.id -eq 'M41-08' -and $_.state -eq 'complete' }).Count -ne 1 -or @($p.work_packages | Where-Object { $_.id -eq 'M43-00' -and $_.state -eq 'active' }).Count -ne 1) { throw '[synthesis-current-state]' }
@@ -101,7 +109,7 @@ foreach($capability in @($m44Allocation.consumed_by_4_2)){
 $m44Reserved=@('generalized-selection-and-reuse-policy','evidence-revocation-and-lifecycle','cross-task-partial-run-recovery','nondeterminism-classification','offline-operation-and-preservation','measured-release-lane-calibration')
 if(@($m44Allocation.reserved_for_4_3).Count-ne$m44Reserved.Count-or@(Compare-Object ($m44Reserved|Sort-Object) @($m44Allocation.reserved_for_4_3.id|Sort-Object)).Count-ne0-or
    @($m44Allocation.reserved_for_4_3|Where-Object{[string]$_.delivery_boundary-cne'4.3.0'-or[string]$_.outcome.Length-lt20}).Count-ne0){throw '[synthesis-m44-reserved-allocation]'}
-Write-Output 'Synthesis input integrity, complete 81-request/component coverage, dependency graph, and truthful completion boundaries passed.'
+Write-Output ("Synthesis input integrity, $($expected.Count)-request/component accounting, dependency graph, and truthful completion boundaries passed.")
 
 # Preserve the authored calendar date across AEST and UTC runners.
 . (Join-Path $RepoRoot 'tools/lib/control/Core.ps1')

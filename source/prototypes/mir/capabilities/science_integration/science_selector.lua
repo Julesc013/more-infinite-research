@@ -144,12 +144,26 @@ local function science_from_unlocks(key, spec)
   return out
 end
 
-function M.apply_science_pack_ingredient_policy(ingredients)
+local function apply_science_exclusions(ingredients, key)
+  if not key then return ingredients end
+  local required, denied = {}, {}
+  for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do required[pack] = true end
+  for _, role in ipairs(compatibility_policy.science_roles_for_stream(key)) do
+    if role.role == "exclude" and not required[role.pack] then denied[role.pack] = true end
+  end
+  local out = {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    if not denied[ingredient_name(ingredient)] then out[#out + 1] = ingredient end
+  end
+  return out
+end
+
+function M.apply_science_pack_ingredient_policy(ingredients, key)
   local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
   if policy == "configured" then
-    -- Neutral/bypass option: preserve the stream's configured ingredients
-    -- without loading any of the optional ingredient expansion policies.
-    return deepcopy(ingredients or {})
+    -- Preserve configured ingredients inside the compatibility contract,
+    -- without loading optional ingredient expansion policies.
+    return apply_science_exclusions(deepcopy(ingredients or {}), key)
   end
 
   local out, seen = {}, {}
@@ -191,7 +205,7 @@ function M.apply_science_pack_ingredient_policy(ingredients)
     end
   end
 
-  return out
+  return apply_science_exclusions(out, key)
 end
 
 function M.pick_science_for_stream(spec, key)
@@ -254,12 +268,7 @@ function M.pick_science_for_stream(spec, key)
   end
   -- Expansion is a preference inside the compatibility contract. Reapply
   -- exclusions to added packs; hard progression requirements still win.
-  local selected = {}
-  for _, ingredient in ipairs(M.apply_science_pack_ingredient_policy(out)) do
-    if not denied[ingredient_name(ingredient)] then
-      selected[#selected + 1] = ingredient
-    end
-  end
+  local selected = M.apply_science_pack_ingredient_policy(out, key)
   local selected_names = {}
   for _, ingredient in ipairs(selected or {}) do
     selected_names[ingredient_name(ingredient)] = true
