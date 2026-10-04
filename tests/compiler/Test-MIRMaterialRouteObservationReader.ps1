@@ -69,6 +69,8 @@ $expectedSubjects=@('aluminium/plate','gold/plate','lead/plate','nickel/plate','
 $emptyInventory=(@($expectedSubjects|ForEach-Object {"[mir-material-outcome-inventory] SUBJECT id=$_ status=prototype-absent items=0 producers=0"})+@('[mir-material-outcome-inventory] PASS complete=true phase=finalized-raw-prototypes subjects=17 recipes=0 results=0 gaps=0 acquisition=false admission=false')) -join "`n"
 $inventory=Get-ObserverMaterialOutcomeInventory $emptyInventory
 Assert-Reader ($inventory.subjects.Count -eq 17 -and -not $inventory.acquisition_proved -and -not $inventory.admission_granted) 'independent denominator preserves sixteen outcomes plus separate wire and no admission.'
+$prefixedInventory=($emptyInventory -split "`n"|ForEach-Object {"0.123 Script @fixture/data-final-fixes.lua:1: $_"}) -join "`r`n"
+Assert-Reader ((Get-ObserverMaterialOutcomeInventory $prefixedInventory).subjects.Count -eq 17) 'native log prefixes and CRLF must preserve complete records.'
 $wrongShape=$emptyInventory.Replace('id=platinum/plate status=prototype-absent items=0 producers=0','id=platinum/plate status=no-observed-producer items=1 producers=0')+"`n"+'[mir-material-outcome-inventory] ITEM subject=platinum/plate name=angels-wire-platinum hidden=false'
 foreach($badInventory in @(
   $emptyInventory.Replace('id=platinum/plate','id=platinum/wire'),
@@ -78,12 +80,26 @@ foreach($badInventory in @(
   $emptyInventory.Replace('admission=false','admission=true'),
   $emptyInventory.Replace('status=prototype-absent items=0','status=observed items=0'),
   $wrongShape,
+  $emptyInventory.Replace('admission=false','admission=falseXYZ'),
+  $emptyInventory.Replace('items=0 producers=0','items=0 producers=0 trailing=true'),
+  ($emptyInventory+"`n"+'[mir-material-outcome-inventory] PASS complete=false phase=finalized-raw-prototypes'),
+  ($emptyInventory+"`n"+'[mir-material-outcome-inventory] UNKNOWN admission=true'),
+  ($emptyInventory+"`n"+'[mir-material-outcome-inventory]PASS complete=true'),
   ($emptyInventory+"`n"+$emptyInventory)
 )) {
   $rejected=$false
   try {$null=Get-ObserverMaterialOutcomeInventory $badInventory} catch {$rejected=$true}
   Assert-Reader $rejected 'malformed, duplicated, incomplete or admission-bearing inventory was accepted.'
 }
+$caseDistinctInventory=$emptyInventory.Replace('id=tin/plate status=prototype-absent items=0 producers=0','id=tin/plate status=observed items=1 producers=2').Replace('recipes=0 results=0 gaps=0','recipes=2 results=2 gaps=2')+"`n"+(@(
+  '[mir-material-outcome-inventory] ITEM subject=tin/plate name=bob-tin-plate hidden=false',
+  '[mir-material-outcome-inventory] PRODUCER subject=tin/plate recipe=TinCasting hidden=false enabled=true productivity=true',
+  '[mir-material-outcome-inventory] PRODUCER subject=tin/plate recipe=tincasting hidden=false enabled=true productivity=true',
+  '[mir-material-outcome-inventory] GAP subject=tin/plate recipe=TinCasting',
+  '[mir-material-outcome-inventory] GAP subject=tin/plate recipe=tincasting'
+) -join "`n")
+$caseDistinct=Get-ObserverMaterialOutcomeInventory $caseDistinctInventory
+Assert-Reader (@($caseDistinct.subjects|Where-Object id -CEQ 'tin/plate')[0].producers.Count -eq 2) 'case-distinct prototype identities were conflated.'
 if($InventoryLogPath){
   $capturedText=Get-Content -Raw -LiteralPath $InventoryLogPath
   $capture=Get-ObserverMaterialOutcomeInventory $capturedText

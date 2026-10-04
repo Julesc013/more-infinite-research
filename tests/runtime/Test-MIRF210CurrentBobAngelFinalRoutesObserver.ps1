@@ -19,15 +19,18 @@ function Get-ObserverSha([string]$Path){(Get-FileHash -LiteralPath $Path -Algori
 function Get-ObserverMaterialOutcomeInventory([string]$LogText){
   Assert-Observer ($LogText.Length -le 33554432) 'inventory log exceeds the 32 MiB text budget.'
   $prefix='(?m)\[mir-material-outcome-inventory\] '
-  $endings=@([regex]::Matches($LogText,$prefix+'PASS complete=true phase=finalized-raw-prototypes subjects=17 recipes=(?<recipes>[0-9]+) results=(?<results>[0-9]+) gaps=(?<gaps>[0-9]+) acquisition=false admission=false'))
+  $lineEnd='(?=\r?$)'
+  $endings=@([regex]::Matches($LogText,$prefix+'PASS complete=true phase=finalized-raw-prototypes subjects=17 recipes=(?<recipes>[0-9]+) results=(?<results>[0-9]+) gaps=(?<gaps>[0-9]+) acquisition=false admission=false'+$lineEnd))
   Assert-Observer ($endings.Count -eq 1) 'inventory needs one complete finalized marker without admission.'
-  $subjects=@([regex]::Matches($LogText,$prefix+'SUBJECT id=(?<id>[^\s]+) status=(?<status>prototype-absent|no-observed-producer|observed) items=(?<items>[0-9]+) producers=(?<producers>[0-9]+)'))
+  $subjects=@([regex]::Matches($LogText,$prefix+'SUBJECT id=(?<id>[^\s]+) status=(?<status>prototype-absent|no-observed-producer|observed) items=(?<items>[0-9]+) producers=(?<producers>[0-9]+)'+$lineEnd))
   $expected=@('aluminium/plate','gold/plate','lead/plate','nickel/plate','platinum/plate','silver/plate','tin/plate','titanium/plate','copper-tungsten/alloy','zinc/plate','bronze/alloy','brass/alloy','gunmetal/alloy','invar/alloy','cobalt-steel/alloy','nitinol/alloy','platinum/wire')
   Assert-Observer ($subjects.Count -eq $expected.Count) 'independent subject inventory is incomplete or duplicated.'
-  $items=@([regex]::Matches($LogText,$prefix+'ITEM subject=(?<subject>[^\s]+) name=(?<name>[^\s]+) hidden=(?<hidden>true|false)'))
-  $producers=@([regex]::Matches($LogText,$prefix+'PRODUCER subject=(?<subject>[^\s]+) recipe=(?<recipe>[^\s]+) hidden=(?<hidden>true|false) enabled=(?<enabled>true|false) productivity=(?<productivity>unspecified|true|false)'))
-  $gaps=@([regex]::Matches($LogText,$prefix+'GAP subject=(?<subject>[^\s]+) recipe=(?<recipe>[^\s]+)'))
+  $items=@([regex]::Matches($LogText,$prefix+'ITEM subject=(?<subject>[^\s]+) name=(?<name>[^\s]+) hidden=(?<hidden>true|false)'+$lineEnd))
+  $producers=@([regex]::Matches($LogText,$prefix+'PRODUCER subject=(?<subject>[^\s]+) recipe=(?<recipe>[^\s]+) hidden=(?<hidden>true|false) enabled=(?<enabled>true|false) productivity=(?<productivity>unspecified|true|false)'+$lineEnd))
+  $gaps=@([regex]::Matches($LogText,$prefix+'GAP subject=(?<subject>[^\s]+) recipe=(?<recipe>[^\s]+)'+$lineEnd))
   Assert-Observer ($items.Count -le 34 -and $producers.Count -le 60000 -and $gaps.Count -le 60000) 'inventory row budget exceeded.'
+  $protocolCount=[regex]::Matches($LogText,'\[mir-material-outcome-inventory\]').Count
+  Assert-Observer ($protocolCount -eq ($endings.Count+$subjects.Count+$items.Count+$producers.Count+$gaps.Count)) 'inventory contains an unrecognized or malformed protocol record.'
   $records=[Collections.Generic.List[object]]::new()
   foreach($id in $expected){
     $matches=@($subjects|Where-Object {$_.Groups['id'].Value -ceq $id})
@@ -39,7 +42,10 @@ function Get-ObserverMaterialOutcomeInventory([string]$LogText){
     $family,$shape=$id.Split('/')
     $aliases=if($shape -ceq 'wire'){@('angels-wire-platinum')}elseif($shape -ceq 'plate'){@("bob-$family-plate","angels-plate-$family")}elseif($family -ceq 'copper-tungsten'){@('bob-copper-tungsten-alloy')}else{@("bob-$family-alloy","angels-plate-$family")}
     foreach($itemName in $itemNames){Assert-Observer ($itemName -cin $aliases) "wrong output shape or alias for $id."}
-    Assert-Observer (@($itemNames|Sort-Object -Unique).Count -eq $itemNames.Count -and @($recipeNames|Sort-Object -Unique).Count -eq $recipeNames.Count) "duplicate inventory identities for $id."
+    $uniqueItems=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $uniqueRecipes=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach($itemName in $itemNames){Assert-Observer ($uniqueItems.Add($itemName)) "duplicate inventory identities for $id."}
+    foreach($recipeName in $recipeNames){Assert-Observer ($uniqueRecipes.Add($recipeName)) "duplicate inventory identities for $id."}
     $status=$subject.Groups['status'].Value
     $expectedStatus=if($itemRows.Count -eq 0){'prototype-absent'}elseif($producerRows.Count -eq 0){'no-observed-producer'}else{'observed'}
     Assert-Observer ($status -ceq $expectedStatus) "inventory status differs for $id."
