@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0071",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Select versioned MIR 4.2.1 construction inputs in the independent evidence rehasher.",
+  "details": [
+    "The existing independent rehasher selects v1/4.2.0 or v2/4.2.1 schemas and output identities, authenticating frozen historical CCC00 records separately from requested CCC01 output.",
+    "Independent row validation binds schema, kind, source version, authority source version and reconciled distribution version. Existing source, archive, metadata, receipt, engine, predecessor and log checks remain required.",
+    "Portable controls use constructed candidate rows and ZIPs with an explicit engine-lookup fixture. Both versions reach an intentional predecessor refusal; malformed rows with rebound upstream hashes are rejected before engine lookup. No accepted rehash output or native execution is produced.",
+    "Actual candidate-bound independent rehash, native qualification, engine and later release consumer acceptance remain outstanding. This input-contract change grants no support, signing, promotion, tagging or publication acceptance."
+  ],
+  "semantic_domains": ["tooling", "packaging", "documentation"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Independent patch input validation uses the current identity."},
+    {"target":"F200","disposition":"affected","reason":"Independent patch input validation uses the current identity."},
+    {"target":"F110","disposition":"affected","reason":"Independent patch input validation uses the current identity."},
+    {"target":"F100","disposition":"affected","reason":"Independent patch input validation uses the current identity."},
+    {"target":"F017","disposition":"affected","reason":"Independent patch input validation retains frozen historical custody separately from output identity."},
+    {"target":"F016","disposition":"affected","reason":"Independent patch input validation retains frozen historical custody separately from output identity."},
+    {"target":"F015","disposition":"affected","reason":"Independent patch input validation retains frozen historical custody separately from output identity."},
+    {"target":"F014","disposition":"affected","reason":"Independent patch input validation retains frozen historical custody separately from output identity."},
+    {"target":"F013","disposition":"affected","reason":"Independent patch input validation retains frozen historical custody separately from output identity."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/release/Test-MIR42FourTargetCandidateBuild.ps1"},
+    {"kind":"document","value":"docs/releases/mir42-nine-target-candidate-playtest-matrix.md"}
+  ]
+}

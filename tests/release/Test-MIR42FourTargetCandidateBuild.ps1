@@ -55,6 +55,69 @@ function New-MIR4TargetPackage {
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1')
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1')
+. (Join-Path $repo 'tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1')
+
+function Test-MIR42IndependentConstructionInput {
+  param([Parameter(Mandatory)][string]$CandidateRoot,[Parameter(Mandatory)][object[]]$Inputs)
+  # Exercise real construction rows and archives, but stop at an intentionally
+  # mismatched predecessor. The engine lookup is a counted fixture, never native.
+  $manifestPath = Join-Path $CandidateRoot 'candidate-manifest.json'
+  $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100
+  $reference = $Inputs[0].candidate_manifest
+  $qualification = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42NineTargetEvidenceReconciliationV1';status='MIR-4.2-NINE-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'
+    source=$manifest.source;candidate_manifest=$reference;all_nine_targets_required=$true;cross_target_substitution=$false
+    factorio_processes=0;release_qualification='not-performed';independent_verification='not-performed';publication_authorized=$false
+    targets=@(foreach($inputRow in $Inputs){[pscustomobject][ordered]@{
+      target=$inputRow.target;distribution_version=$inputRow.identity.distribution_version;status='reconciled';qualification='not-performed'
+      candidate=$inputRow.archive;candidate_manifest=$reference;candidate_target_row=$inputRow.target_row
+      predecessor=[pscustomobject]@{archive=[pscustomobject]@{sha256=('0' * 64)}}
+    }})
+    record_sha256=''
+  }
+  $qualificationPath=Join-Path $CandidateRoot 'independent-input-fixture.json'
+  Write-MIR4BootstrapRecord -Record $qualification -Path $qualificationPath | Out-Null
+  $maps=@{}
+  foreach($inputRow in $Inputs){$maps[$inputRow.target]=Join-Path $CandidateRoot $inputRow.archive.path}
+  $output=Join-Path $CandidateRoot 'independent-refusal'
+  $arguments=@{RepoRoot=$repo;CandidateManifestPath=$manifestPath;QualificationPath=$qualificationPath;PredecessorZips=$maps;UpgradeReceipts=$maps;OutputRoot=$output}
+  $originalEngine=(Get-Item Function:Get-MIR42IndependentEngine).ScriptBlock
+  $script:mir42IndependentEngineFixtureCalls=0
+  $rowPath=Join-Path $CandidateRoot $Inputs[0].target_row.path
+  $originalRow=[IO.File]::ReadAllBytes($rowPath)
+  $originalQualification=[IO.File]::ReadAllBytes($qualificationPath)
+  try {
+    Set-Item Function:Get-MIR42IndependentEngine -Value {
+      param($RepoRoot,$Target,$Qualified)
+      $script:mir42IndependentEngineFixtureCalls++
+      return [pscustomobject]@{path='fixture-only';version='fixture-only';binary_sha256=('A' * 64)}
+    }
+    $rejected=$false
+    try { Invoke-MIR42NineTargetIndependentEvidenceRehash @arguments | Out-Null } catch {$rejected=$_.Exception.Message -ceq '[mir42-independent-predecessor] f210'}
+    Assert-MIR42CandidateBuildTest ($rejected -and $script:mir42IndependentEngineFixtureCalls -eq 1 -and -not (Test-Path -LiteralPath $output)) 'independent-version-input-reaches-required-predecessor-refusal-without-output'
+    foreach($tamper in @('source-version','row-schema','row-kind')){
+      $badRow=[Text.UTF8Encoding]::new($false).GetString($originalRow) | ConvertFrom-Json -Depth 100
+      switch($tamper){
+        'source-version' {$badRow.source_version=if($Inputs[0].identity.source_version -ceq '4.2.1'){'4.2.0'}else{'4.2.1'}}
+        'row-schema' {$badRow.schema=2}
+        'row-kind' {$badRow.kind='MIR42FourTargetCandidateRowV2'}
+      }
+      Write-MIR4BootstrapRecord -Record $badRow -Path $rowPath | Out-Null
+      # Rebind the supplied upstream row hash, so a raw-hash mismatch cannot
+      # substitute for the independent row identity check under test.
+      $qualification.targets[0].candidate_target_row.sha256=Get-MIR4Sha256File -Path $rowPath
+      Write-MIR4BootstrapRecord -Record $qualification -Path $qualificationPath | Out-Null
+      $script:mir42IndependentEngineFixtureCalls=0;$rejected=$false
+      try { Invoke-MIR42NineTargetIndependentEvidenceRehash @arguments | Out-Null } catch {$rejected=$_.Exception.Message -ceq '[mir42-independent-candidate-binding] f210'}
+      Assert-MIR42CandidateBuildTest ($rejected -and $script:mir42IndependentEngineFixtureCalls -eq 0 -and -not (Test-Path -LiteralPath $output)) "independent-refuses-rebound-$tamper-before-engine-lookup"
+      [IO.File]::WriteAllBytes($rowPath,$originalRow)
+    }
+  } finally {
+    [IO.File]::WriteAllBytes($rowPath,$originalRow)
+    [IO.File]::WriteAllBytes($qualificationPath,$originalQualification)
+    Set-Item Function:Get-MIR42IndependentEngine -Value $originalEngine
+  }
+}
 
 $commit = (& git -C $repo rev-parse HEAD).Trim()
 $root = Join-Path $repo ('build/test-results/mir42-four-target-candidate-' + [guid]::NewGuid().ToString('N'))
@@ -311,6 +374,8 @@ try {
   } finally {
     Set-Item Function:Get-MIR4ArchiveInventory -Value $originalArchiveInventory
   }
+  Test-MIR42IndependentConstructionInput -CandidateRoot $nineRoot -Inputs $legacyInputs
+  Test-MIR42IndependentConstructionInput -CandidateRoot $patchRoot -Inputs $patchInputs
   foreach ($target in @('f017','f016','f015','f014','f013')) {
     $row = Get-Content -Raw -LiteralPath (Join-Path $patchRoot "target-rows/$target.json") | ConvertFrom-Json -Depth 100
     Assert-MIR42CandidateBuildTest ([string]$row.distribution_version -ceq "4.2.$($target.Substring(1))01" -and [bool]$row.deterministic_archive_bytes -and -not [bool]$row.publication_authorized) "patch-historical-row-identity-and-private-boundary-$target"
@@ -326,6 +391,7 @@ try {
     historical_target_rows = 5
     patch_target_rows = 9
     predecessor_inventory_control = 'terminal-seal-fixture-only'
+    independent_input_controls = 'v1-v2-first-row-and-required-predecessor-refusals-engine-lookup-fixture-only'
     engine_runs = 0
   }
 } finally {
