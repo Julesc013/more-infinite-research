@@ -2,6 +2,10 @@
 param(
   [string]$RepoRoot = '',
   [string[]]$LibraryRoot = @(),
+  # Select one existing completed run, never another artifact authority.
+  # This scope scans only its direct mods archives; unrelated frozen sources
+  # and userdata cannot exhaust discovery before a small recovery can act.
+  [string]$TestRunRoot = '',
   [ValidateRange(0, 3650)]
   [int]$OlderThanDays = 7,
   [ValidateRange(1, 100000)]
@@ -137,11 +141,36 @@ function Get-MIRStorageDefaultLibraryRoots {
 
 $buildRoot = Join-Path $RepoRoot 'build/tests'
 if (-not (Test-Path -LiteralPath $buildRoot -PathType Container)) {
+  if ($TestRunRoot.Length -gt 0) { throw 'TestRunRoot cannot be selected when build/tests is absent.' }
   if ($PassThru) { return @() }
   Write-Host '[storage] build/tests is absent; nothing to optimize.'
   return
 }
 $buildRoot = Assert-MIRStoragePlainDirectory -Path $buildRoot -Name 'MIR test artifact root'
+$cutoff = [DateTime]::UtcNow.AddDays(-$OlderThanDays)
+$scopedRun = $null
+$scanRoot = $buildRoot
+if ($TestRunRoot.Length -gt 0) {
+  $relativeRun = $TestRunRoot.Replace('\', '/')
+  if ($relativeRun -cnotmatch '^build/tests/(?:[A-Za-z0-9][A-Za-z0-9._-]*/)+[0-9a-f]{32}$') {
+    throw 'TestRunRoot must name one repository-relative completed GUID run under build/tests.'
+  }
+  $scopedRun = [IO.Path]::GetFullPath((Join-Path $RepoRoot $relativeRun))
+  if (-not (Test-MIRStoragePathWithin -Path $scopedRun -Root $buildRoot) -or
+      -not (Test-MIRStoragePlainPathChain -Path $scopedRun -Root $buildRoot) -or
+      -not (Test-MIRStorageCompletedRun -RunRoot $scopedRun -Cutoff $cutoff)) {
+    throw 'TestRunRoot must be a plain, stale, terminal run without an immutable-input lease.'
+  }
+  $scanRoot = Join-Path $scopedRun 'mods'
+  if (-not (Test-Path -LiteralPath $scanRoot -PathType Container)) {
+    if ($PassThru) { return @() }
+    Write-Host '[storage] selected completed run has no mods directory; nothing to optimize.'
+    return
+  }
+  if (-not (Test-MIRStoragePlainPathChain -Path $scanRoot -Root $buildRoot)) {
+    throw 'TestRunRoot mods directory must have a plain contained path chain.'
+  }
+}
 
 if ($LibraryRoot.Count -eq 0) {
   $LibraryRoot = @(Get-MIRStorageDefaultLibraryRoots -RepositoryRoot $RepoRoot)
@@ -154,7 +183,6 @@ foreach ($root in $LibraryRoot) {
 }
 if ($resolvedLibraries.Count -eq 0) { throw 'At least one immutable mod library is required.' }
 
-$cutoff = [DateTime]::UtcNow.AddDays(-$OlderThanDays)
 $scanState = [pscustomobject]@{
   scanned_entries = [long]0
   max_scanned_entries = [long]$MaxScannedEntries
@@ -165,7 +193,7 @@ $libraryIndex = Get-MIRStorageLibraryIndex -Roots $resolvedLibraries.ToArray() -
 $libraryHashes = @{}
 $plan = [Collections.Generic.List[object]]::new()
 $pendingDirectories = [Collections.Generic.Stack[string]]::new()
-$pendingDirectories.Push($buildRoot)
+$pendingDirectories.Push($scanRoot)
 while ($pendingDirectories.Count -gt 0) {
   Assert-MIRStorageScanBudget -State $scanState
   $directory = $pendingDirectories.Pop()
@@ -174,6 +202,7 @@ while ($pendingDirectories.Count -gt 0) {
     $entry = Get-Item -LiteralPath $path -Force
     if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
     if ($entry.PSIsContainer) {
+      if ($null -ne $scopedRun) { continue }
       if ($pendingDirectories.Count -ge $MaxPendingDirectories) { throw "Storage optimization exceeded its bounded $MaxPendingDirectories-directory pending scan; nothing was changed." }
       $pendingDirectories.Push($entry.FullName)
       continue
@@ -188,6 +217,7 @@ while ($pendingDirectories.Count -gt 0) {
   $runRoot = Split-Path -Parent $modsRoot
   if (-not (Test-MIRStorageCompletedRun -RunRoot $runRoot -Cutoff $cutoff) -or
       -not (Test-MIRStoragePlainPathChain -Path $item.FullName -Root $buildRoot)) { continue }
+  if ($null -ne $scopedRun -and -not [string]::Equals($runRoot, $scopedRun, [StringComparison]::OrdinalIgnoreCase)) { continue }
   if (-not (Test-MIRStoragePathWithin -Path $item.FullName -Root $buildRoot)) { throw "Artifact escaped build/tests: $($item.FullName)" }
 
   $key = $item.Name.ToLowerInvariant() + '|' + $item.Length
@@ -233,6 +263,11 @@ foreach ($row in $plan) {
   $sourceLibraries = @($resolvedLibraries | Where-Object { Test-MIRStoragePathWithin -Path $source -Root $_ })
   if (-not (Test-MIRStoragePathWithin -Path $target -Root $buildRoot) -or $sourceLibraries.Count -ne 1) {
     throw "Storage optimization boundary changed: $target"
+  }
+  if ($null -ne $scopedRun -and
+      (-not [string]::Equals([string]$row.run, $scopedRun, [StringComparison]::OrdinalIgnoreCase) -or
+       -not (Test-MIRStoragePathWithin -Path $target -Root $scopedRun))) {
+    throw "Storage optimization run scope changed: $target"
   }
   if (-not (Test-MIRStorageCompletedRun -RunRoot ([string]$row.run) -Cutoff $cutoff) -or
       -not (Test-MIRStoragePlainPathChain -Path $target -Root $buildRoot) -or

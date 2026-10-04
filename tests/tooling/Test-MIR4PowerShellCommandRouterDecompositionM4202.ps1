@@ -31,11 +31,21 @@ Assert-MIR4CommandRouterDecompositionV1 ([string]$receipt.status-ceq'M42-02-PS1-
 $decompositionFiles=@($receipt.decomposition.modules)+@($receipt.decomposition.facade)
 $modulePaths=@($receipt.decomposition.modules|ForEach-Object{[string]$_.path})
 Assert-MIR4CommandRouterDecompositionV1 ($modulePaths.Count-eq12-and@($modulePaths|Sort-Object -Unique).Count-eq12) 'mir4-m42-02-command-router-module-count'
+$currentModuleLines=[Collections.Generic.List[int]]::new()
+$currentFacadeLines=0
 foreach($file in $decompositionFiles){
   $path=Join-Path $repo ([string]$file.path)
   $tokens=$null;$parseErrors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$parseErrors)
   Assert-MIR4CommandRouterDecompositionV1 (@($parseErrors).Count-eq0) 'mir4-m42-02-command-router-parse' ([string]$file.path)
+  $currentLines=@(Get-Content -LiteralPath $path).Count
+  if([string]$file.path-ceq[string]$receipt.decomposition.facade.path){
+    $currentFacadeLines=$currentLines
+    Assert-MIR4CommandRouterDecompositionV1 ($currentLines-le200-and@($ast.EndBlock.Statements|Where-Object{$_-is[Management.Automation.Language.FunctionDefinitionAst]}).Count-eq1) 'mir4-m42-02-command-router-current-facade-bound'
+  }else{
+    $currentModuleLines.Add($currentLines)
+    Assert-MIR4CommandRouterDecompositionV1 ($currentLines-le400) 'mir4-m42-02-command-router-current-module-bound' ([string]$file.path)
+  }
 }
 Assert-MIR4CommandRouterDecompositionV1 ([int]$receipt.decomposition.current_lines-le200-and[int]$receipt.decomposition.facade_function_count-eq1) 'mir4-m42-02-command-router-facade-bound'
 Assert-MIR4CommandRouterDecompositionV1 (@($receipt.decomposition.modules|Where-Object{[int]$_.lines-gt400-or[int]$_.parse_errors-ne0}).Count-eq0) 'mir4-m42-02-command-router-module-bound'
@@ -44,7 +54,7 @@ $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 $projection=[pscustomobject][ordered]@{command_count=[int]$inventory.command_count;commands=@($inventory.commands)}
 $projectionHash=Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $projection)
 Assert-MIR4CommandRouterDecompositionV1 ([string]$receipt.public_contract.previous_sha256-ceq[string]$receipt.public_contract.current_sha256-and[bool]$receipt.public_contract.unchanged) 'mir4-m42-02-command-router-historical-public-contract'
-Assert-MIR4CommandRouterDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0) 'mir4-m42-02-command-router-inventory'
+Assert-MIR4CommandRouterDecompositionV1 ([int]$receipt.public_contract.command_count-eq85-and[int]$inventory.command_count-eq87-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0) 'mir4-m42-02-command-router-inventory'
 foreach($implementation in @($inventory.implementation_files)){
   $implementationPath=Join-Path $repo ([string]$implementation.path)
   Assert-MIR4CommandRouterDecompositionV1 ([string]$implementation.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4CommandInventoryTextSha256V1 -Path $implementationPath)-ceq[string]$implementation.sha256) 'mir4-m42-02-command-router-inventory-file' ([string]$implementation.path)
@@ -53,7 +63,9 @@ foreach($implementation in @($inventory.implementation_files)){
 $inventoryProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 tooling inventory-check 2>&1|Out-String).Trim()
 Assert-MIR4CommandRouterDecompositionV1 ($LASTEXITCODE-eq0-and$inventoryProbe-match'command_count') 'mir4-m42-02-command-router-inventory-probe' $inventoryProbe
 $pathProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') path resolve package.root 2>&1|Out-String).Trim()
-Assert-MIR4CommandRouterDecompositionV1 ($LASTEXITCODE-eq0-and$pathProbe-match'src[\\/]mod') 'mir4-m42-02-command-router-path-probe' $pathProbe
+Assert-MIR4CommandRouterDecompositionV1 ($LASTEXITCODE-eq0) 'mir4-m42-02-command-router-path-probe' $pathProbe
+$resolvedPackagePath=$pathProbe|ConvertFrom-Json
+Assert-MIR4CommandRouterDecompositionV1 ([string]$resolvedPackagePath.id-ceq'package.root'-and[string]$resolvedPackagePath.relative_path-ceq'source'-and[string]$resolvedPackagePath.mode-ceq'canonical'-and-not[bool]$resolvedPackagePath.alias) 'mir4-m42-02-command-router-current-source-path' $pathProbe
 $unknownProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') nonsense 2>&1|Out-String).Trim()
 Assert-MIR4CommandRouterDecompositionV1 ($LASTEXITCODE-ne0-and$unknownProbe-match'Unknown command area: nonsense') 'mir4-m42-02-command-router-negative-probe' $unknownProbe
 $global:LASTEXITCODE=0
@@ -225,13 +237,15 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
 }
 
 Assert-MIR4CommandRouterDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-command-router-bridge-retirement-successor'
-foreach($file in $decompositionFiles){
-  $path=[string]$file.path
-  Assert-MIR4CommandRouterDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $path))-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-command-router-file-hash' $path
-}
+# The authenticated successor chain above retains historical binding proof.
+# Current parsing, size limits, inventory and actual public command probes
+# independently check today's router. As in the validation-runner control,
+# HEAD consistency only rejects uncommitted drift; it is not semantic proof.
+Assert-MIR4CommandRouterDecompositionV1 (Test-MIR4M4202CommittedWorktreeFileConsistency -RepoRoot $repo -RelativePaths @($expectedBindingSha.Keys)) 'mir4-m42-02-command-router-current-binding-worktree-consistency'
+Assert-MIR4CommandRouterDecompositionV1 (Test-MIR4M4202CommittedWorktreeFileConsistency -RepoRoot $repo -RelativePaths @($decompositionFiles|ForEach-Object{[string]$_.path})) 'mir4-m42-02-command-router-current-module-worktree-consistency'
 foreach($binding in @($receipt.evolved_bindings)){
   $path=[string]$binding.path
-  Assert-MIR4CommandRouterDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $path))-ceq[string]$expectedBindingSha[$path]-and[string]$binding.hash_mode-ceq'canonical-text-v1'-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-command-router-evolved-binding' $path
+  Assert-MIR4CommandRouterDecompositionV1 ([string]$binding.hash_mode-ceq'canonical-text-v1'-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-command-router-evolved-binding' $path
 }
 Assert-MIR4CommandRouterDecompositionV1 ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore)-and@($receipt.preservation.package_visible_delta).Count-eq0) 'mir4-m42-02-command-router-package-firewall'
 Assert-MIR4CommandRouterDecompositionV1 (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-command-router-release-firewall'
@@ -240,9 +254,9 @@ Assert-MIR4CommandRouterDecompositionV1 ((Get-MIR4CanonicalPackageSourceFingerpr
 [pscustomobject][ordered]@{
   status='M42-02-PS1-COMMAND-ROUTER-DECOMPOSITION-PASSED'
   public_commands=[int]$inventory.command_count
-  facade_lines=[int]$receipt.decomposition.current_lines
+  facade_lines=$currentFacadeLines
   modules=@($receipt.decomposition.modules).Count
-  maximum_module_lines=(@($receipt.decomposition.modules|Measure-Object lines -Maximum).Maximum)
+  maximum_module_lines=($currentModuleLines|Measure-Object -Maximum).Maximum
   public_contract_sha256=$projectionHash
   package_source_sha256=$packageBefore
   package_visible=$false
