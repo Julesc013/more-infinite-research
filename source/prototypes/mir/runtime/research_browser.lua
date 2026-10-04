@@ -1299,6 +1299,9 @@ local function owned_element(player, element)
   end
   return false
 end
+local function owned_root(player, element)
+  return player and element and element.valid and element == player.gui.screen[ROOT]
+end
 local function set_hidden(v, force, values)
   if type(values) ~= "table" then return false end
   local count, hidden = 0, {}
@@ -1656,10 +1659,8 @@ function M.register()
     render(player)
   end)
   script.on_event(defines.events.on_gui_location_changed, function(event)
-    if event.element and event.element.valid and event.element.name == ROOT then
-      local player = event_player(event)
-      if player then view(player).location = event.element.location end
-    end
+    local player = event_player(event)
+    if owned_root(player, event.element) then view(player).location = event.element.location end
   end)
   script.on_event(defines.events.on_gui_click, click)
   script.on_event(defines.events.on_gui_selection_state_changed, selection)
@@ -1713,7 +1714,8 @@ function M.register()
     if values[name] and type(values[name].value) == "boolean" then values[name] = {value = element.state} end
   end)
   script.on_event(defines.events.on_gui_closed, function(event)
-    if event.element and event.element.valid and event.element.name == ROOT then close(event_player(event)) end
+    local player = event_player(event)
+    if owned_root(player, event.element) then close(player) end
   end)
   script.on_event(defines.events.on_player_created, function(event)
     local player = event_player(event)
