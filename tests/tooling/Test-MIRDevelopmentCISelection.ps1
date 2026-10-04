@@ -126,6 +126,10 @@ $nativeProbeClassification=Get-MIRAssuranceClassification -Paths @('tools/lib/va
 Assert-MIRDevelopmentCISelection -Condition (-not $nativeProbeClassification.escalated -and 'static.immutable-input-staging' -in $nativeProbeClassification.tests -and 'runtime.material-route-guard' -in $nativeProbeClassification.tests) -Message 'Native probe adapters lack exact static and native test ownership.'
 $unknownProbeClassification=Get-MIRAssuranceClassification -Paths @('tools/lib/validation/UnownedNativeProbeResources.ps1') -Config $actualAssurance
 Assert-MIRDevelopmentCISelection -Condition $unknownProbeClassification.escalated -Message 'Native probe classification admitted an unrelated helper.'
+$targetProfileClassification=Get-MIRAssuranceClassification -Paths @('tools/lib/validation/TargetProfiles.ps1') -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition (-not $targetProfileClassification.escalated -and 'static.compiler' -in $targetProfileClassification.tests -and 'runtime.affected' -in $targetProfileClassification.tests) -Message 'Target-profile authority reader lacks exact compiler and native impact ownership.'
+$unknownTargetProfileClassification=Get-MIRAssuranceClassification -Paths @('tools/lib/validation/UnownedTargetProfiles.ps1') -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition $unknownTargetProfileClassification.escalated -Message 'Target-profile ownership admitted an unrelated helper.'
 $unknownClassification=Get-MIRAssuranceClassification -Paths $unknownPaths -Config $assurance
 Assert-MIRDevelopmentCISelection -Condition $unknownClassification.escalated -Message 'Unknown path did not escalate.'
 $unknownRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $unknownClassification -Catalog $catalog -Assurance $assurance -Profile 'mir4-development')

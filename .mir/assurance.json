@@ -313,7 +313,7 @@
     },
     {
       "id": "compiler-data-stage",
-      "patterns": ["^source/generation/lifecycle/data(?:-updates|-final-fixes)?\\.lua\\.template$", "^source/prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
+      "patterns": ["^source/generation/lifecycle/data(?:-updates|-final-fixes)?\\.lua\\.template$", "^source/prototypes/", "^tools/lib/validation/TargetProfiles[.]ps1$", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
       "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
     },
     {
