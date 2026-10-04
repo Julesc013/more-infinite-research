@@ -76,49 +76,6 @@ local function sanitize_stream_artifact(stream_artifact, target_inventory)
   }
 end
 
-local function sanitize_base_operations(base_plan, target_inventory)
-  local operations, removed_count, skipped_count, rejected_candidates = {}, 0, 0, {}
-  for _, source_operation in ipairs(base_plan or {}) do
-    local operation = model.normalized_base_operation(source_operation)
-    local kept, removed = technology_effects.sanitize_effects(
-      (operation.technology and operation.technology.effects) or {},
-      "CompilationPlan " .. tostring(operation.technology_name),
-      "generated",
-      target_inventory
-    )
-    removed_count = removed_count + #removed
-    if operation.technology then operation.technology.effects = kept end
-    if #kept > 0 or #removed == 0 then
-      operation.gates.effect_valid = gate_contract.passed(
-        "effect-contracts",
-        {#removed > 0 and "effect-contracts:sanitized" or "effect-contracts:all-targets-exist"}
-      )
-      operation.technology_design = technology_design.from_base_extension_operation(operation)
-      table.insert(operations, operation)
-    else
-      skipped_count = skipped_count + 1
-      operation.gates.effect_valid = gate_contract.failed(
-        "effect-contracts", "no_valid_effect_targets", {"effect-contracts:all-targets-missing"})
-      operation.technology_design = technology_design.from_base_extension_operation(operation)
-      table.insert(rejected_candidates, {
-        candidate_id = "base-continuation/" .. tostring(operation.key),
-        key = operation.key,
-        action = "reject",
-        reason = "no_valid_effect_targets",
-        gates = operation.gates,
-        technology_design = operation.technology_design,
-        candidate_fingerprint = fingerprint.of({key = operation.key, reason = "no_valid_effect_targets",
-          gates = operation.gates})
-      })
-    end
-  end
-  return operations, {
-    removed_effect_count = removed_count,
-    skipped_base_extension_count = skipped_count,
-    rejected_candidates = rejected_candidates
-  }
-end
-
 local function apply_graph_decisions(stream_artifact, graph_summary)
   -- Sanitation already produced a transient row projection with independently
   -- owned top-level, gate, and fields tables. Complete immutable child values
@@ -413,7 +370,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   -- emission authorization. Pending graph gates remain explicit proposals.
   local operations = materialized_stream_operations(
     stream_artifact, {include_design = false, virtual_projection = true})
-  local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan, target_inventory)
+  local normalized_base, base_effect_integrity = model.sanitize_base_operations(base_plan, target_inventory)
   for _, operation in ipairs(normalized_base) do
     local normalized, covered_by_native = apply_weapon_overlap_policy(
       operation, stream_artifact.rows, exact_input.policy_snapshot.weapon_overlap_mode)

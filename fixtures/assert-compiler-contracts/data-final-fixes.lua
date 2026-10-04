@@ -1169,7 +1169,7 @@ expect_error("CompilationPlan cross collision", "technology-name collision", fun
     operation = "emit_base_extension",
     key = "collision-base",
     technology_name = "collision-tech",
-    technology = {name = "collision-tech", effects = {}, prerequisites = {}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
+    technology = {name = "collision-tech", effects = {{type = "laboratory-speed", modifier = 0.1}}, prerequisites = {}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
   }})
 end)
 
@@ -1247,6 +1247,20 @@ if #combined_empty_plan.operations ~= 1
   or combined_empty_plan.validation_summary.effect_ownership.omitted_operation_count ~= 1
   or combined_empty_plan.validation_summary.effect_ownership.conflict_count ~= 1 then
   fail("combined-plan ownership did not cleanly omit an emptied base continuation")
+end
+
+local authored_empty_source = combined_base_operation("mir-authored-empty-base-control", {})
+authored_empty_source.key = "braking-force"
+local authored_empty_plan = focused_contracts.finalize_compilation(
+  generation_plan.new():finalize(), {authored_empty_source})
+local authored_empty_rejections = authored_empty_plan.compiler_result.rejected_candidates
+if #authored_empty_plan.operations ~= 0
+  or authored_empty_plan.validation_summary.effect_integrity.base_extensions.skipped_base_extension_count ~= 1
+  or #authored_empty_rejections ~= 1
+  or authored_empty_rejections[1].reason ~= "no_base_extension_effects"
+  or authored_empty_plan.validation_summary.effect_integrity.base_extensions.rejected_candidates[1].gates.effect_valid.status ~= "failed"
+  or next(authored_empty_source.technology.effects) ~= nil then
+  fail("an originally empty base continuation must retain a failed-effect candidate without a paid technology or source mutation")
 end
 
 expect_error("strict combined duplicate validator", "duplicate direct-effect identity", function()
