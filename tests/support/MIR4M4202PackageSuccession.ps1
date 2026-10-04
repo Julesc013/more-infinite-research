@@ -360,6 +360,51 @@ function Test-MIR4M4202HistoricalValidationRunnerDecomposition {
   }
 }
 
+function Get-MIR4M4202HistoricalDecompositionFunctionContract {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$ReceiptPath,[Parameter(Mandatory)][object]$Receipt)
+
+  if(-not(Test-MIR4BootstrapRecordHash -Record $Receipt)){throw '[mir4-m42-02-historical-decomposition-record]'}
+  $epoch=[string]$Receipt.starting_dev.commit
+  if($epoch-cnotmatch'^[a-f0-9]{40}$'-or[string]((& git -C $RepoRoot rev-parse "$epoch`^{tree}").Trim())-cne[string]$Receipt.starting_dev.tree){throw '[mir4-m42-02-historical-decomposition-epoch]'}
+  $source=Get-MIR4M4202GitBlobCanonicalText -RepoRoot $RepoRoot -Object "$epoch`:$([string]$Receipt.characterization.path)"
+  $epochSourceSha=[string]$Receipt.characterization.sha256
+  if($null-ne$Receipt.PSObject.Properties['current_source']){$epochSourceSha=[string]$Receipt.current_source.sha256}
+  if((Get-MIR4Sha256String -Value $source)-cne$epochSourceSha){throw '[mir4-m42-02-historical-decomposition-source]'}
+  $characterization=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$Receipt.characterization.receipt))|ConvertFrom-Json -Depth 100 -DateKind String
+  if(-not(Test-MIR4BootstrapRecordHash -Record $characterization)-or[string]$characterization.record_sha256-cne[string]$Receipt.characterization.record_sha256){throw '[mir4-m42-02-historical-decomposition-characterization]'}
+  $null=Find-MIR4M4202HistoricalTextByCanonicalSha256 -RepoRoot $RepoRoot -EpochCommit ([string]$characterization.starting_dev.commit) -Path ([string]$Receipt.characterization.path) -Sha256 ([string]$Receipt.characterization.sha256) -ReceiptPath ([string]$Receipt.characterization.receipt)
+
+  # Find the introduction of this exact immutable receipt, following its
+  # recorded repository moves. Authenticate it before reading frozen modules.
+  $introduced=@(& git -C $RepoRoot log -1 --follow --diff-filter=A --format=%H --name-only -- $ReceiptPath|Where-Object{-not[string]::IsNullOrWhiteSpace([string]$_)})
+  if($LASTEXITCODE-ne0-or$introduced.Count-ne2-or[string]$introduced[0]-cnotmatch'^[a-f0-9]{40}$'){throw '[mir4-m42-02-historical-decomposition-introduction]'}
+  $commit=[string]$introduced[0];$introducedPath=[string]$introduced[1]
+  $introducedText=Get-MIR4M4202GitBlobCanonicalText -RepoRoot $RepoRoot -Object "$commit`:$introducedPath"
+  if((Get-MIR4Sha256String -Value $introducedText)-cne(Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot $ReceiptPath))){throw '[mir4-m42-02-historical-decomposition-receipt-binding]'}
+  $introducedReceipt=$introducedText|ConvertFrom-Json -Depth 100 -DateKind String
+  if(-not(Test-MIR4BootstrapRecordHash -Record $introducedReceipt)-or[string]$introducedReceipt.record_sha256-cne[string]$Receipt.record_sha256){throw '[mir4-m42-02-historical-decomposition-receipt-binding]'}
+
+  $components=@($Receipt.decomposition.modules)
+  if($null-ne$Receipt.decomposition.PSObject.Properties['self_test']){$components+=@($Receipt.decomposition.self_test)}
+  if($components.Count-eq0-or@($components|Group-Object path|Where-Object{$_.Count-ne1}).Count){throw '[mir4-m42-02-historical-decomposition-components]'}
+  $names=[Collections.Generic.List[string]]::new()
+  foreach($component in $components){
+    $text=Get-MIR4M4202GitBlobCanonicalText -RepoRoot $RepoRoot -Object "$commit`:$([string]$component.path)"
+    if((Get-MIR4Sha256String -Value $text)-cne[string]$component.sha256-or[regex]::Matches($text,"`n").Count-ne[int]$component.lines){throw "[mir4-m42-02-historical-decomposition-module] $([string]$component.path)"}
+    $tokens=$null;$errors=$null
+    $ast=[Management.Automation.Language.Parser]::ParseInput($text,[ref]$tokens,[ref]$errors)
+    $functions=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true))
+    if(@($errors).Count-ne0-or$functions.Count-ne[int]$component.function_count){throw '[mir4-m42-02-historical-decomposition-functions]'}
+    foreach($function in $functions){[void]$names.Add($function.Name)}
+  }
+  $digest=Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $names.ToArray())
+  if([string]$Receipt.public_contract.projection_algorithm-cne'ordered-powershell-function-name-list-v1'-or
+     -not[bool]$Receipt.public_contract.unchanged-or$names.Count-ne[int]$Receipt.public_contract.function_count-or
+     $digest-cne[string]$Receipt.public_contract.previous_sha256-or$digest-cne[string]$Receipt.public_contract.current_sha256){throw '[mir4-m42-02-historical-decomposition-public-contract]'}
+  return [pscustomobject]@{epoch_commit=$epoch;introduction_commit=$commit;introduced_receipt_path=$introducedPath;function_names=$names.ToArray();digest=$digest}
+}
+
 function Test-MIR4M4202HistoricalAssuranceEvidencePublicContract {
   [CmdletBinding()]
   [OutputType([bool])]

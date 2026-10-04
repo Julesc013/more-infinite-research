@@ -16,6 +16,9 @@ $script:MIR4AssuranceOfflineCustodyPredecessorReceiptPath='releases/migrations/M
 $script:MIR4AssuranceOfflineCustodyPredecessorReceiptSha256='BD60E60AB7E5B12711CC7B11274FBA92EE202708790B84863B4FCB54B8195B81'
 $script:MIR4AssuranceOfflineCustodyPreCutoverDigestV1='sha256:96d98127324aadfba99f876cb4c72587135c7b6a04f1f6653bfcddc9494eaacd'
 $script:MIR4AssuranceOfflineCustodyParityDigestV1='sha256:96d98127324aadfba99f876cb4c72587135c7b6a04f1f6653bfcddc9494eaacd'
+# Frozen probe's CRLF info.json bytes at the accepted presentation baseline
+# 50186ebc90b13a27125df4e1af7806c673f89e5a; comparison only, never a current binding.
+$script:MIR4AssuranceOfflineCustodyHistoricalInfoSha256V1='27C7249808F6347CC7AA2E10758912E0A7238991FC242469816A3D0768C9A8A3'
 $script:MIR4AssuranceOfflineCustodyCompatibilityPolicySha256='54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2'
 $script:MIR4AssuranceOfflineCustodyT10ReceiptSha256='7407D577451932536EA6DDF568CF58929D982E10CEE092A8963319A50809E40F'
 $script:MIR4AssuranceOfflineCustodyT15ReceiptSha256='294A1E2001F3BA8E6813329E3C8BC609B0D07413AC365A0AFEF525A1188D76F0'
@@ -51,36 +54,39 @@ function Get-MIR4AssuranceV4PreservationDigestV1 {
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes(($rows-join"`n"))))
 }
 
-function Test-MIR4AssuranceV4PreservationOrFinalMileSuccessorV1 {
-  param([Parameter(Mandatory)][string]$RepoRoot)
+function Test-MIR4FinalMileHistoricalBindingsV1 {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256,[Parameter(Mandatory)][AllowEmptyCollection()][string[]]$Paths)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-  if((Get-MIR4AssuranceV4PreservationDigestV1 -RepoRoot $repo)-ceq$script:MIR4AssuranceV4PreservationDigestV1){return $true}
-
+  if($Paths.Count-eq0-or@($Paths|Sort-Object -Unique).Count-ne$Paths.Count){return $false}
   $receiptPath='.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json'
-  $state=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo `
-    -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration `
-    -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration `
-    -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration `
-    -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration `
-    -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration `
-    -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration `
-    -IncludeHistoricalToolingMigration -IncludeReleaseToolingMigration `
-    -IncludeF210QualificationPolicyEvolution -IncludeFinalMileToolingEvolution
+  $arguments=@{RepoRoot=$repo;IncludeT17MachinePreparation=$true;IncludeRepositoryMigration=$true;IncludeCanonicalizationMigration=$true;IncludeDiagnosticsMigration=$true;IncludeTargetKeyMigration=$true;IncludeWholePlatformMigration=$true;IncludeTechnologyAcceptanceMigration=$true;IncludeTargetCompilerMigration=$true;IncludeSemanticCompilerPolicyMigration=$true;IncludeRuntimeContinuityMigration=$true;IncludeModuleSdkMepMigration=$true;IncludeProcessIRExactMigration=$true;IncludeInspectorCompatibilityMigration=$true;IncludeAssuranceOfflineCustodyMigration=$true;IncludeHistoricalToolingMigration=$true;IncludeReleaseToolingMigration=$true;IncludeF210QualificationPolicyEvolution=$true;IncludeFinalMileToolingEvolution=$true}
+  $state=Get-MIR4PreFreezeAuthorityState @arguments
   if([string]$state.prior_receipt_path-cne$receiptPath){return $false}
+  # The next recorded phase authenticates this predecessor's exact bytes.
+  # Neither historical phase is a current-source freeze or release grant.
+  $closure=Get-MIR4PreFreezeAuthorityState @arguments -IncludeFinalReleaseClosureEvolution
+  if([string]$closure.prior_receipt_path-cne'.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json'){return $false}
   $receipt=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $receiptPath
   if([string]$receipt.kind-cne'MIR4FinalMileToolingAuthorityEvolutionReceiptV1'-or
      [string]$receipt.change_id-cne'MIR4-FINAL-MILE-TOOLING-2026-08-29'-or
      @($receipt.package_visible_delta).Count-ne0-or
-     [string]$receipt.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+     [string]$receipt.player_package_source_sha256-cne$PackageSourceSha256-or
      @($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){return $false}
 
-  $paths=@('scripts/Invoke-MIRAssurance.ps1','tools/lib/assurance/Core.ps1','tools/lib/assurance/Domains.ps1','tools/lib/assurance/Hashing.ps1','tools/lib/assurance/Release.ps1')
-  foreach($path in $paths){
+  foreach($path in $Paths){
     if(-not$state.authority_hashes.ContainsKey($path)){return $false}
-    $mode=if($state.authority_hash_modes.ContainsKey($path)){[string]$state.authority_hash_modes[$path]}else{'raw-bytes'}
-    if((Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $path) -Mode $mode)-cne[string]$state.authority_hashes[$path]){return $false}
+    $bindings=@(@($receipt.evolved_bindings|Where-Object{[string]$_.path-ceq$path}|ForEach-Object{[string]$_.current_sha256})+@($receipt.current_authorities|Where-Object{[string]$_.path-ceq$path}|ForEach-Object{[string]$_.sha256}))
+    if($bindings.Count-ne1-or$bindings[0]-cne[string]$state.authority_hashes[$path]){return $false}
   }
   return $true
+}
+
+function Test-MIR4AssuranceV4PreservationOrFinalMileSuccessorV1 {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  if((Get-MIR4AssuranceV4PreservationDigestV1 -RepoRoot $repo)-ceq$script:MIR4AssuranceV4PreservationDigestV1){return $true}
+  $receipt=Invoke-MIR4AssuranceOfflineCustodyMigrationProjectionV1 -RepoRoot $repo -Check
+  return Test-MIR4FinalMileHistoricalBindingsV1 -RepoRoot $repo -PackageSourceSha256 ([string]$receipt.package_source_sha256) -Paths @('scripts/Invoke-MIRAssurance.ps1','tools/lib/assurance/Core.ps1','tools/lib/assurance/Domains.ps1','tools/lib/assurance/Hashing.ps1','tools/lib/assurance/Release.ps1')
 }
 
 function Test-MIR4AssuranceOfflineCustodyForwardersV1 {
@@ -107,18 +113,24 @@ function Test-MIR4AssuranceOfflineCustodyDeclaredConsumersV1 {
     'tools/mir/application/inspection/CompatibilityFactory.ps1'=@('../assurance/EnvironmentEvidence.ps1')
     'tools/mir/application/processir/ExactProcessIR.ps1'=@('../assurance/EnvironmentEvidence.ps1')
     'tools/lib/mir4/PlatformPreview.ps1'=@('tools/mir/application/assurance/EnvironmentEvidence.ps1',$environmentCli)
-    'tools/lib/mir4/PreFreezeRelease.ps1'=@('tools/mir/application/assurance/AssuranceScale.ps1')
+    'tools/lib/mir4/PreFreezeRelease.ps1'=@('pre-freeze-release/ReleaseDoctor.ps1')
+    'tools/lib/mir4/pre-freeze-release/ReleaseDoctor.ps1'=@('tools/mir/application/assurance/AssuranceScale.ps1')
     'tools/lib/mir4/SupplyChainAttestation.ps1'=@('../../mir/application/custody/OfflineCandidateCustody.ps1')
     'tools/lib/mir4/SigningCeremonyPreparation.ps1'=@('../../mir/application/custody/OfflineCandidateCustody.ps1')
-    'validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1'=@('tools/mir/application/assurance/AssuranceScale.ps1','tools/mir/application/assurance/ReleaseBudget.ps1','tools/mir/application/assurance/OfflineDrill.ps1',$exporter)
-    'validation/tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1'=@('tools/mir/application/assurance/EnvironmentEvidence.ps1',$environmentCli)
-    'validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1'=@($custody)
+    'tests/mir4/Test-MIR4AssuranceScaleW08.ps1'=@('tools/mir/application/assurance/AssuranceScale.ps1','tools/mir/application/assurance/ReleaseBudget.ps1','tools/mir/application/assurance/OfflineDrill.ps1',$exporter)
+    'tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1'=@('tools/mir/application/assurance/EnvironmentEvidence.ps1',$environmentCli)
+    'tests/release/Test-MIR4OfflineCandidateCustody.ps1'=@($custody)
     'validation/tests.yml'=@('tools/mir/application/assurance/AssuranceScale.ps1','tools/mir/application/assurance/EnvironmentEvidence.ps1',$custody,$exporter,$environmentCli)
     '.mir/control/paths.yml'=@('tools/mir/application/assurance/AssuranceScale.ps1','tools/mir/application/assurance/EnvironmentEvidence.ps1',$custody,$exporter,$environmentCli)
     '.mir/modules.yml'=@('tools/mir/application/assurance/AssuranceScale.ps1','tools/mir/application/assurance/EnvironmentEvidence.ps1',$custody,$exporter,$environmentCli)
     '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json'=@('tools/mir/application/assurance/AssuranceScale.ps1','tools/mir/application/assurance/EnvironmentEvidence.ps1',$custody)
     '.mir/releases/governance/mir4/supply-chain.json'=@($custody)
-    'tools/mir.ps1'=@($environmentCli,$exporter,'tools/mir/cli/Invoke-MIR4AssuranceOfflineCustodyMigration.ps1')
+    'tools/mir.ps1'=@('tools/mir/cli/Invoke-MIRCommandRouter.ps1')
+    'tools/mir/cli/Invoke-MIRCommandRouter.ps1'=@('tools/mir/cli/router/CommandDispatcher.ps1','tools/mir/cli/router/MIR4CommandDispatcher.ps1','tools/mir/cli/router/MIR4MigrationCommands.ps1','tools/mir/cli/router/MIR4ApplicationCommands.ps1')
+    'tools/mir/cli/router/CommandDispatcher.ps1'=@('Invoke-MIR4CommandDispatch')
+    'tools/mir/cli/router/MIR4CommandDispatcher.ps1'=@('environment-evidence','assurance-scale','assurance-offline-custody-migration','Invoke-MIR4MigrationCommandGroup','Invoke-MIR4ApplicationCommandGroup')
+    'tools/mir/cli/router/MIR4MigrationCommands.ps1'=@('tools/mir/cli/Invoke-MIR4AssuranceOfflineCustodyMigration.ps1')
+    'tools/mir/cli/router/MIR4ApplicationCommands.ps1'=@($environmentCli,$exporter)
     'docs/architecture/module-boundaries.md'=@('tools/mir/application/assurance','tools/mir/application/custody')
   }
   foreach($entry in $requirements.GetEnumerator()){$text=[IO.File]::ReadAllText((Join-Path $repo ([string]$entry.Key))).Replace('\','/');foreach($required in @($entry.Value)){if($text-cnotmatch[regex]::Escape([string]$required)){throw "[mir4-assurance-offline-custody-consumer-final-path] $($entry.Key) -> $required"}}}
@@ -150,9 +162,21 @@ function Get-MIR4AssuranceOfflineCustodyFunctionalParityV1 {
 
 function Test-MIR4AssuranceOfflineCustodyFunctionalParityV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
+  . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
   $result=Get-MIR4AssuranceOfflineCustodyFunctionalParityV1 -RepoRoot $RepoRoot;$record=$result.record
+  $currentDigest='sha256:'+(Get-MIRStringSha256 -Value (ConvertTo-MIR4CanonicalJsonV1 $record)).ToLowerInvariant()
+  if([string]$result.digest-cne$currentDigest){throw '[mir4-assurance-offline-custody-current-probe-digest]'}
   if([int]$record.w08.critical_path.seconds-ne10-or@($record.w08.proof_cover.uncovered).Count-or@($record.w08.recovery.reusable).Count-ne1-or-not[bool]$record.custody.descendant-or[bool]$record.custody.sibling-or[bool]$record.authority.release_transition){throw '[mir4-assurance-offline-custody-functional-shape-parity]'}
-  if([string]$result.digest-cne$script:MIR4AssuranceOfflineCustodyParityDigestV1){throw "[mir4-assurance-offline-custody-functional-parity] $([string]$result.digest)"}
+  $currentPackage=New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f210
+  $currentInfo=Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'info.json'
+  if([string]$record.custody.binding.file_sha256-cne(Get-MIR4Sha256File -Path $currentInfo)){throw '[mir4-assurance-offline-custody-current-info-binding]'}
+  # Only the declared current info source changed. Authenticate all remaining
+  # behavior against the unchanged frozen digest; return the actual record.
+  $comparison=$record|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  $comparison.custody.binding.file_sha256=$script:MIR4AssuranceOfflineCustodyHistoricalInfoSha256V1
+  $comparisonDigest='sha256:'+(Get-MIRStringSha256 -Value (ConvertTo-MIR4CanonicalJsonV1 $comparison)).ToLowerInvariant()
+  if($comparisonDigest-cne$script:MIR4AssuranceOfflineCustodyParityDigestV1){throw "[mir4-assurance-offline-custody-functional-parity] $([string]$result.digest)"}
+  $result|Add-Member -NotePropertyName comparison_digest -NotePropertyValue $comparisonDigest
   return $result
 }
 

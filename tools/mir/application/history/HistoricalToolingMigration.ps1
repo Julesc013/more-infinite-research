@@ -60,13 +60,17 @@ function Test-MIR4HistoricalToolingDeclaredConsumersV1 {
   $history='tools/mir/application/history/HistoricalSuccession.ps1';$successorHost='tools/mir/application/history/SuccessorHost.ps1';$exporter='tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1'
   $requirements=[ordered]@{
     'tools/lib/mir4/PlatformPreview.ps1'=@($history,$successorHost)
-    'validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1'=@($history,$successorHost,$exporter)
+    'tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1'=@($history,$successorHost,$exporter)
     'validation/tests.yml'=@($history,$successorHost,$exporter,'tests/history/Test-MIR4HistoricalTooling.ps1','tests/history/Test-MIR4HistoricalToolingMigration.ps1')
     '.mir/control/paths.yml'=@($history,$successorHost,$exporter,'tools/mir/application/history/HistoricalToolingMigration.ps1','tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1')
     '.mir/modules.yml'=@($history,$successorHost,$exporter)
     '.mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json'=@($history,$successorHost,$exporter,$script:MIR4HistoricalToolingMigrationReceiptPath)
     '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json'=@($history,$successorHost)
-    'tools/mir.ps1'=@($exporter,'tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1')
+    'tools/mir.ps1'=@('tools/mir/cli/Invoke-MIRCommandRouter.ps1')
+    'tools/mir/cli/Invoke-MIRCommandRouter.ps1'=@('tools/mir/cli/router/CommandDispatcher.ps1','tools/mir/cli/router/MIR4CommandDispatcher.ps1','tools/mir/cli/router/MIR4MigrationCommands.ps1')
+    'tools/mir/cli/router/CommandDispatcher.ps1'=@('Invoke-MIR4CommandDispatch')
+    'tools/mir/cli/router/MIR4CommandDispatcher.ps1'=@('historical-succession','historical-tooling-migration','Invoke-MIR4MigrationCommandGroup')
+    'tools/mir/cli/router/MIR4MigrationCommands.ps1'=@($exporter,'tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1')
     'docs/architecture/mir4-historical-succession.md'=@('tools/mir/application/history','tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1')
     'docs/architecture/module-boundaries.md'=@('tools/mir/application/history')
   }
@@ -104,7 +108,17 @@ function Get-MIR4HistoricalToolingFunctionalParityV1 {
 function Test-MIR4HistoricalToolingFunctionalParityV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $result=Get-MIR4HistoricalToolingFunctionalParityV1 -RepoRoot $RepoRoot
-  if([string]$result.digest-cne$script:MIR4HistoricalToolingParityDigestV1-or[int]$result.record.authority.historical_target_count-ne6-or[int]$result.record.authority.museum_target_count-ne7-or-not[bool]$result.record.sensitive.positive-or[bool]$result.record.sensitive.negative){throw "[mir4-historical-tooling-functional-parity] $([string]$result.digest)"}
+  $currentDigest='sha256:'+(Get-MIRStringSha256 -Value (ConvertTo-MIR4PlatformCanonicalJson $result.record)).ToLowerInvariant()
+  if([string]$result.digest-cne$currentDigest){throw '[mir4-historical-tooling-current-probe-digest]'}
+  if([string]$result.record.source_identity.package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)){throw '[mir4-historical-tooling-current-source-binding]'}
+  $receipt=Invoke-MIR4HistoricalToolingMigrationProjectionV1 -RepoRoot $RepoRoot -Check
+  # Compare behavior to the frozen probe with only its declared source identity
+  # restored in a copy. The returned record and digest retain today's identity.
+  $comparison=$result.record|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  $comparison.source_identity.package_source_sha256=[string]$receipt.package_source_sha256
+  $comparisonDigest='sha256:'+(Get-MIRStringSha256 -Value (ConvertTo-MIR4PlatformCanonicalJson $comparison)).ToLowerInvariant()
+  if($comparisonDigest-cne$script:MIR4HistoricalToolingParityDigestV1-or[int]$result.record.authority.historical_target_count-ne6-or[int]$result.record.authority.museum_target_count-ne7-or-not[bool]$result.record.sensitive.positive-or[bool]$result.record.sensitive.negative){throw "[mir4-historical-tooling-functional-parity] $([string]$result.digest)"}
+  $result|Add-Member -NotePropertyName comparison_digest -NotePropertyValue $comparisonDigest
   return $result
 }
 
