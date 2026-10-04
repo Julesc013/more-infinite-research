@@ -191,7 +191,7 @@ $supplyChainDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-C
 if(Test-Path -LiteralPath $supplyChainDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $supplyChainDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
 $expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4PreFreezeReleaseDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-pre-freeze-release-inventory'
+Assert-MIR4PreFreezeReleaseDecompositionV1 ($null-ne$expectedInventoryDigest-and[int]$inventory.command_count-gt0-and[int]$inventory.command_count-eq@($inventory.commands).Count-and@($inventory.commands|Group-Object key|Where-Object Count -gt 1).Count-eq0-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-pre-freeze-release-inventory'
 $controlExecutorSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
 if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
   $controlExecutorSuccessorRaw=Get-Content -Raw -LiteralPath $controlExecutorSuccessorPath
