@@ -349,12 +349,19 @@
           "basis": "Current portal and public source inspection found a maintained MIT custom research GUI and queue owner, but only a queue-read remote interface and no supported presentation-extension contract. Integration requires an upstream hook or another stable public contract, not private GUI mutation.",
           "id": "S35",
           "observed_on": "2026-09-07"
+        },
+        {
+          "title": "Jouven's Space Is Fake science-retirement follow-up",
+          "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ab6af245dc9150e0f1459aa",
+          "basis": "Maintainer-pasted player report and reply: most research was fixed, but Weapon shooting speed 7 and Lab research speed 7 still require space science. Relative comment ages are not absolute dates; exact installed package and profile remain unconfirmed.",
+          "id": "P5",
+          "observed_on": "2026-10-05"
         }
       ]
     },
     "document_authority": "Proposed brief accepted as task scope; technical assertions require exact independent evidence."
   },
-  "request_count": 81,
+  "request_count": 82,
   "requests": [
     {
       "id": "UI-01",
@@ -3841,6 +3848,26 @@
       ],
       "source_ids": ["P4", "S3", "S4", "S25", "S33", "S34", "S35"],
       "feature_group": "portable-player-surfaces",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "SIF-01",
+      "title": "Retire Space Is Fake science from base research continuations",
+      "requesters": ["jouven", "Julesc013"],
+      "decision": "commit-4.2.1",
+      "mechanism": "shared science exclusion policy with existing target continuation adapters",
+      "proposed_scope": "Weapon shooting speed 7 and Lab research speed 7, inherited science and configured or expanded science selection",
+      "rationale": "The initial retirement fix covered generated streams but base continuations bypassed the exclusion role, leaving unreachable space-science requirements.",
+      "implementation": "Pass the stable continuation key through the existing shared ingredient policy on F210 and F200; preserve upstream units, ingredient amounts, finite anchors, hard progression gates and the sole emitter. The source regression passes controlled tests; native package and upgrade qualification remains pending.",
+      "acceptance": [
+        "Both actual level-7 continuations omit retired space science and its prerequisite with Space Is Fake under every science expansion setting",
+        "Reachable remaining science, finite prerequisites, inherited amounts and stable manifest identities are retained",
+        "Ordinary space-science requirements without Space Is Fake and mandatory progression packs remain intact",
+        "Exact F210 and F200 packages pass native final-emission, predecessor upgrade and reload checks without lost research progress"
+      ],
+      "source_ids": ["P5"],
+      "feature_group": "science-retirement",
       "status": "requested-not-qualified",
       "qualification": []
     }

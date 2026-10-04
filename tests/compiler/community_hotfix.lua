@@ -1,5 +1,6 @@
 -- Controlled current-source regressions. No native engine or ecosystem claim.
-mods = {base = "2.1.20"}
+local base_version = rawget(_G, "MIR_COMMUNITY_TEST_BASE_VERSION") or "2.1.20"
+mods = {base = base_version}
 settings = {startup = {}}
 log = function() end
 data = {raw = {recipe = {}, item = {}, technology = {}, lab = {}}}
@@ -21,6 +22,11 @@ local function has(rows, name)
     if (type(row) == "table" and (row.name or row[1]) or row) == name then return true end
   end
   return false
+end
+local function amount(rows, name)
+  for _, row in ipairs(rows or {}) do
+    if type(row) == "table" and (row.name or row[1]) == name then return row.amount or row[2] end
+  end
 end
 local streams = require("prototypes.streams.productivity")
 local registry = require("prototypes.mir.streams.registry")
@@ -129,6 +135,8 @@ local selector = require("prototypes.mir.capabilities.science_integration.scienc
 local science_planner = require("prototypes.mir.planner.science")
 local prerequisites = require("prototypes.mir.planner.prerequisites")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+local continuation_qualifier = require("prototypes.mir.planner.base_continuations.qualify")
+local defaults = require("prototypes.mir.settings.defaults")
 local packs = {"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","military-science-pack","utility-science-pack","space-science-pack"}
 for _, pack in ipairs(packs) do
   data.raw.item[pack] = {type="item",name=pack,stack_size=200}
@@ -136,16 +144,32 @@ for _, pack in ipairs(packs) do
   data.raw.recipe[pack] = {type="recipe",name=pack,enabled=true,ingredients={},results={{type="item",name=pack,amount=1}},categories={"crafting"}}
 end
 data.raw.lab.lab = {type="lab",name="lab",inputs=packs}
+data.raw.item["lab-kit"] = {type="item",name="lab-kit",place_result="lab",stack_size=50}
+data.raw.recipe["lab-kit"] = {type="recipe",name="lab-kit",enabled=true,category="crafting",ingredients={},results={{type="item",name="lab-kit",amount=1}}}
 data.raw.character = {character={type="character",name="character",crafting_categories={"crafting"}}}
-mods["space-is-fake"] = "1.0.76"
-mods["space-age"] = "2.1.20"
-data.raw.item["space-science-pack"].hidden = true
-data.raw.recipe["space-science-pack"].hidden = true
+mods["space-is-fake"] = rawget(_G, "MIR_COMMUNITY_TEST_SIF_VERSION") or "1.0.76"
+mods["space-age"] = base_version
+-- A retained pack can still look craftable to generic supply/lab inference.
+-- The explicit retirement role must win even in this opposing case.
+data.raw.item["space-science-pack"].hidden = false
+data.raw.recipe["space-science-pack"].hidden = false
 data.raw.technology["space-science-pack"].enabled = false
 data.raw.technology["space-science-pack"].hidden = true
 settings.startup["ips-require-space-gate"] = {value=false}
 settings.startup["mir-lab-incompatibility-policy"] = {value="reduce"}
 local modes = {"configured","space","space-and-promethium","space-age-progression","official-progression","all-official","all"}
+data.raw["ammo-category"] = {bullet={type="ammo-category",name="bullet"}}
+for _, key in ipairs({"weapon-shooting-speed", "research-speed"}) do
+  for level = 5, 6 do
+    data.raw.technology[key .. "-" .. level] = {
+      type="technology",name=key .. "-" .. level,enabled=true,
+      icon="__base__/graphics/technology/research-speed.png",icon_size=256,
+      effects={key == "research-speed" and {type="laboratory-speed",modifier=0.4} or {type="gun-speed",ammo_category="bullet",modifier=0.4}},
+      prerequisites={},unit={count=1000*level,time=30,ingredients={{"automation-science-pack",2},{"utility-science-pack",3},{"space-science-pack",1}}}
+    }
+  end
+end
+local continuations = require("prototypes.mir.planner.base_continuations.plan")
 for _, mode in ipairs(modes) do
   settings.startup["mir-science-pack-ingredient-policy"] = {value=mode}
   context.with_active(context.new(), function()
@@ -161,8 +185,44 @@ for _, mode in ipairs(modes) do
       local reqs, reason = prerequisites.build_for(key, final)
       check(not reason and not has(reqs,"space-science-pack"), "No retired prerequisite: " .. key .. " " .. mode)
     end
+    for _, key in ipairs({"weapon-shooting-speed", "research-speed"}) do
+      local inherited = {ingredients={{"automation-science-pack",2},{name="utility-science-pack",amount=3},{"space-science-pack",1}}}
+      local final, status = continuation_qualifier.resolve_ingredients(defaults.base_extensions[key], inherited, key)
+      check(final and #final > 0 and not has(final,"space-science-pack"), "No retired continuation science: " .. key .. " " .. mode .. " " .. tostring(status))
+      check(amount(final,"automation-science-pack") == 2 and amount(final,"utility-science-pack") == 3, "Continuation preserves inherited science amounts: " .. key .. " " .. mode)
+      check(inherited.ingredients[1][2] == 2 and inherited.ingredients[2].amount == 3 and #inherited.ingredients == 3 and inherited.ingredients[3][1] == "space-science-pack", "Continuation science leaves upstream unit untouched: " .. key .. " " .. mode)
+      local reqs, reason = continuation_qualifier.append_end_game_prerequisite({key .. "-6"}, final)
+      check(not reason and has(reqs,key .. "-6") and not has(reqs,"space-science-pack"), "Continuation retains its finite anchor without retired prerequisite: " .. key .. " " .. mode)
+    end
+    local planned = {}
+    for _, operation in ipairs(continuations.plan_all()) do planned[operation.technology_name] = operation end
+    for _, key in ipairs({"weapon-shooting-speed", "research-speed"}) do
+      local operation = planned[key .. "-7"]
+      check(operation and operation.manifest_id == "base-continuation/" .. key, "Actual level-7 continuation remains planned with its stable identity: " .. key .. " " .. mode)
+      check(#operation.technology.unit.ingredients > 0 and not has(operation.technology.unit.ingredients,"space-science-pack"), "Actual level-7 technology has no retired science: " .. key .. " " .. mode)
+      check(amount(operation.technology.unit.ingredients,"automation-science-pack") == 2 and amount(operation.technology.unit.ingredients,"utility-science-pack") == 3, "Actual level-7 technology preserves inherited science amounts: " .. key .. " " .. mode)
+      check(has(operation.technology.prerequisites,key .. "-6") and not has(operation.technology.prerequisites,"space-science-pack"), "Actual level-7 technology retains its finite anchor: " .. key .. " " .. mode)
+      check(data.raw.technology[key .. "-7"] == nil, "Science planning leaves prototype emission to the existing emitter: " .. key .. " " .. mode)
+    end
   end)
 end
+-- Compatibility exclusions cannot retire the compiler's mandatory gates.
+local policy_authority = require("prototypes.mir.compatibility.policy_authority")
+local original_roles = policy_authority.science_roles_for_stream
+policy_authority.science_roles_for_stream = function(key)
+  local roles = original_roles(key)
+  roles[#roles + 1] = {role="exclude",pack="cryogenic-science-pack"}
+  return roles
+end
+settings.startup["mir-science-pack-ingredient-policy"] = {value="configured"}
+context.with_active(context.new(), function()
+  for _, key in ipairs({"research_ice", "research_platform"}) do
+    local selected = selector.apply_science_pack_ingredient_policy({{"cryogenic-science-pack",2},{"space-science-pack",1}}, key)
+    check(has(selected,"cryogenic-science-pack"), "Mandatory progression gate survives an opposing exclusion: " .. key)
+    check(not has(selected,"space-science-pack"), "Retired optional science still excluded beside mandatory gate: " .. key)
+  end
+end)
+policy_authority.science_roles_for_stream = original_roles
 mods["space-is-fake"] = nil
 data.raw.item["space-science-pack"].hidden = false
 data.raw.recipe["space-science-pack"].hidden = false
@@ -171,5 +231,9 @@ settings.startup["mir-science-pack-ingredient-policy"] = {value="configured"}
 context.with_active(context.new(), function()
   local selected = selector.pick_science_for_stream(streams.research_concrete, "research_concrete")
   check(has(selected,"space-science-pack"), "Ordinary space-science preference remains intact without Space Is Fake")
+  for _, key in ipairs({"weapon-shooting-speed", "research-speed"}) do
+    local final = continuation_qualifier.resolve_ingredients(defaults.base_extensions[key], {ingredients={{"automation-science-pack",2},{"utility-science-pack",3}}}, key)
+    check(final and has(final,"space-science-pack"), "Ordinary continuation space science remains without Space Is Fake: " .. key)
+  end
 end)
 print("MIR-COMMUNITY-HOTFIX-PASS " .. assertions)

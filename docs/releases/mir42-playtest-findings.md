@@ -1,11 +1,11 @@
 ---
 title: "MIR 4.2 Playtest Findings"
 status: current
-applies_to: "4.2.0 development"
+applies_to: "4.2.0 and 4.2.1 development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-09-30
+last_reviewed: 2026-10-05
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -28,6 +28,14 @@ The maintainer accepted the replacement shortcut button. Preserve it. Preserve t
 The nine early development ZIPs are preserved at `dist/mir42-current-development-20260927`. Exact package/engine/profile identity for the reported session still needs confirmation; the existence of that delivery alone does not establish which bytes or other mods were active. Future tested previews must have an obvious latest-preview entry in primary `dist`, exact hashes and visible validation limits. Older playtest packages and their receipts remain immutable.
 
 The maintainer has not yet playtested external mods or compatibility and will do that closer to completion. Do not ask for the complete ecosystem matrix now. Automated checks select changed propositions and unresolved risks, reuse only exact matching trusted evidence, and avoid repeating unaffected load campaigns. The converged preview must include a short human checklist, exact compatible profile locks and the support scope actually proved for each recipe family. The maintainer authorized closing the current Steam session for unattended checks; it had already exited when closure was attempted, so no process was stopped.
+
+## Space Is Fake continuation follow-up
+
+Request `SIF-01` retains jouven's [Mod Portal report](https://mods.factorio.com/mod/more-infinite-research/discussion/6ab6af245dc9150e0f1459aa), pasted by the maintainer on 5 October. The initial fix removed retired space science from generated streams, but the player still reports it on Weapon shooting speed 7 and Lab research speed 7. Relative comment ages do not establish absolute dates; the exact installed MIR package, engine, settings and companion versions remain unconfirmed.
+
+The source defect is the missing continuation key at the shared ingredient-policy call. Both the shared continuation qualifier and the existing F200 adapter now pass that key, applying the same compatibility exclusions after configured or expanded science selection. Upstream units and amounts, finite prerequisites, stable manifest identities and mandatory progression packs are preserved. Planning remains separate from the existing emitter.
+
+The controlled regression in `tests/compiler/community_hotfix.lua` exercises both actual planned level-7 technologies under all seven science-expansion settings. Its retained space pack deliberately has a discoverable production route, while its science technology is retired, so generic reachability cannot accidentally hide the exclusion defect. The lab has its own acquisition recipe. Opposing cases retain ordinary space science without Space Is Fake and retain mandatory cryogenic gates even when an exclusion requests their removal. Host execution of this controlled test is source evidence only; exact F210/F200 final emission, published-predecessor upgrade and reload remain required under the existing programme. Request `SIF-01` remains unqualified.
 
 ## Current development changes
 
