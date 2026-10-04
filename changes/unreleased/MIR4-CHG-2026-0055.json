@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0055",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Preserve native-clamped product quantities in manufacturing carrier guards.",
+  "details": [
+    "The canonical productive-output index and manufacturing matcher now share the native maximum base product quantity rule: a fixed amount wins over range fields, and a reversed maximum is clamped to the minimum.",
+    "A productive carrier return can no longer disappear because its authored ranged maximum is lower than its minimum. Covered carrier quantities still retain their existing productivity exclusion.",
+    "The consumed material-route fixture adds 56 assertions through the actual recipe normalizer, canonical risk classifier and manufacturing matcher for item and fluid products. All 258 controlled assertions pass.",
+    "This does not admit new material routes or establish extra-roll semantics, machine availability, profitable-loop behavior or native package qualification. Exact native proof remains pending."
+  ],
+  "semantic_domains": ["progression", "compiler"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Recipe-productivity matching and productive-output facts use the shared native quantity rule."},
+    {"target":"F200","disposition":"affected","reason":"Recipe-productivity matching and productive-output facts use the native fixed/ranged quantity rule."},
+    {"target":"F110","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."},
+    {"target":"F100","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"compatible","settings":"compatible","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/material_routes.lua: 14 item/fluid quantity cases, 56 assertions"},
+    {"kind":"finding","value":"Factorio 2.1.20 prototype-api.json SHA-256 5D2AAB6483F33D1582D2FDFD661B4B9F6FF6A1F97548311524D062ECC32F200B"}
+  ]
+}

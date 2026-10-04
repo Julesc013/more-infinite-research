@@ -17,6 +17,19 @@ local function declared(recipe, definition, field)
   return nil
 end
 
+-- Maximum base quantity, before probability, extra item rolls or productivity
+-- exclusions. Native products ignore ranges when amount is declared and clamp
+-- a reversed ranged maximum to its minimum. Both the fact index and carrier
+-- guard must retain that possible return quantity.
+function M.maximum_base_result_amount(entry)
+  if type(entry) ~= "table" then return 1 end
+  local amount = entry.amount or entry[2]
+  if amount ~= nil then return tonumber(amount) or 1 end
+  local maximum = tonumber(entry.amount_max) or tonumber(entry.amount_min) or 1
+  local minimum = tonumber(entry.amount_min) or maximum
+  return math.max(minimum, maximum)
+end
+
 function M.resolve(recipe, definition, profile)
   recipe = recipe or {}
   definition = definition or recipe

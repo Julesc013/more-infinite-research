@@ -46,6 +46,10 @@ local function finite_positive(value)
   return type(value) == "number" and value == value and value > 0 and value < math.huge
 end
 
+local function finite_nonnegative(value)
+  return type(value) == "number" and value == value and value >= 0 and value < math.huge
+end
+
 -- Factorio recipe names alone are not a product identity. A string public
 -- argument keeps the established item-default convenience, while callers that
 -- reason about fluids must provide {type="fluid", name="..."}.
@@ -74,17 +78,64 @@ end
 -- every nested result/category/source iterator charge the same work budget.
 local diagnostic_visit
 
-local function entry_positive(entry)
-  if type(entry) ~= "table" then return false end
-  local amount = tonumber(entry.amount or entry.amount_max or entry[2] or entry.amount_min or 1) or 0
-  local probability = tonumber(entry.independent_probability or entry.probability or 1) or 0
-  return finite_positive(amount) and finite_positive(probability) and probability <= 1
+local function supported_product_field(name)
+  local profile = target_profiles.current()
+  local fields = profile and profile.prototype_shapes and profile.prototype_shapes.product_probability_fields
+  for _, field in ipairs(fields or {}) do
+    if field == name then return true end
+  end
+  return false
 end
 
-local function results_include_positive(results, output_identity, options)
+local function entry_positive(entry, canonical_recipe_product)
+  if type(entry) ~= "table" then return false end
+  local declared_independent = entry.independent_probability
+  if canonical_recipe_product then
+    -- Schema-2 recipe facts synthesize an effective independent probability
+    -- even on legacy targets. Only the retained authored declaration may
+    -- invoke the foreign-field gate; do not change those canonical bytes.
+    declared_independent = entry.declared_independent_probability
+  end
+  -- Foreign modern fields cannot create an acquisition witness on a target
+  -- whose native product contract does not declare them.
+  if declared_independent ~= nil and not supported_product_field("independent_probability")
+    or entry.shared_probability ~= nil and not supported_product_field("shared_probability")
+    or entry.extra_count_fraction ~= nil and not supported_product_field("extra_count_fraction") then return false end
+  local amount = entry.amount or entry[2]
+  if amount == nil then
+    if entry.amount_min ~= nil or entry.amount_max ~= nil then
+      local minimum, maximum = tonumber(entry.amount_min), tonumber(entry.amount_max)
+      if not finite_nonnegative(minimum) or not finite_nonnegative(maximum) then return false end
+      -- Native item/fluid products clamp a reversed maximum to the minimum.
+      amount = math.max(minimum, maximum)
+    else
+      amount = 1
+    end
+  end
+  amount = tonumber(amount)
+  if not finite_nonnegative(amount) then return false end
+  local probability = tonumber(entry.independent_probability or entry.probability or 1) or 0
+  if not finite_positive(probability) or probability > 1 then return false end
+  local shared = entry.shared_probability
+  if shared ~= nil then
+    if type(shared) ~= "table" or not finite_nonnegative(shared.min)
+      or not finite_nonnegative(shared.max) or shared.max > 1
+      or shared.min >= shared.max then return false end
+  end
+  local extra = 0
+  if (entry.type or "item") == "item" then
+    extra = tonumber(entry.extra_count_fraction or 0)
+    if not finite_nonnegative(extra) then return false end
+  end
+  -- This is possible baseline acquisition, not a productivity or loop proof.
+  return amount > 0 or extra > 0
+end
+
+local function results_include_positive(results, output_identity, options, canonical_recipe_product)
   for _, result in ipairs(results or {}) do
     if not diagnostic_visit(options) then return false end
-    if same_identity(normalize_identity(result), output_identity) and entry_positive(result) then return true end
+    if same_identity(normalize_identity(result), output_identity)
+      and entry_positive(result, canonical_recipe_product) then return true end
   end
   return false
 end
@@ -619,7 +670,7 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
     else
       local results = normalized_results(variant, options)
       if not diagnostic_visit(options) then return nil
-      elseif not results_include_positive(results, output_identity, options) then
+      elseif not results_include_positive(results, output_identity, options, fact.schema == 2) then
         record_diagnostic_failure(options, {
           kind = "identity",
           recipe = recipe_name,

@@ -860,8 +860,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 48869,
-      "expected_sha256": "3854C5128EB7AA4F096ABD586C222843E09018D03B072E975A6E1FA16892A143",
+      "expected_bytes": 48933,
+      "expected_sha256": "D409B638441E54F648BC56A40459FDC6FFC4BB1FCE9518294FA51C158C38D26B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 37275,
-      "expected_sha256": "AEDF6FDC8AB6DF7609D4873B269D670C3AC85BBEA4F6945D90539333335011E9",
+      "expected_bytes": 39651,
+      "expected_sha256": "B96F7E4D77357F98448EFF953D8CF651AF3920F483D2817EA6AAF0C783D2AC91",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2300,8 +2300,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 22414,
-      "expected_sha256": "500A853204A338C2FE6FC58D219CEF9AE0DD754E72C621783B81CF02A185C573",
+      "expected_bytes": 22385,
+      "expected_sha256": "3B2A20278093AD4C5D176AD0CEE3386B588937179070E935CE330851430DF59A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "E4894B9035B8B3CFB694AD41EAB500CDACAE8C5A16D53675CB5E3388ED8EE845"
+  "record_sha256": "09834C2295021A178B76122E081DCC15D997D1F356959B26E7ACD4B24F42FE4C"
 }

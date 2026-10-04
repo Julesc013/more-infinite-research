@@ -1,5 +1,6 @@
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
 local item_prototype_facts = require("prototypes.mir.index.item_prototype_facts")
 local deepcopy = require("prototypes.mir.core.deepcopy")
@@ -91,7 +92,7 @@ local function has_productive_shared_input_output(recipe)
       ingredients[identity] = true
     end
     for _, entry in ipairs(variant.results or {}) do
-      local maximum = tonumber(entry.amount_max or entry.amount or entry.amount_min) or 1
+      local maximum = recipe_semantics.maximum_base_result_amount(entry)
       local ignored = tonumber(entry.ignored_by_productivity or 0) or 0
       local identity = typed_identity(entry)
       if not identity or (ingredients[identity] and maximum - ignored > 0) then return true end

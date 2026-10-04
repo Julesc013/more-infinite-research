@@ -26,6 +26,7 @@ $modules=[ordered]@{
   'prototypes.mir.core.fingerprint'='source/prototypes/mir/core/fingerprint.lua'
   'prototypes.mir.domain.compiler.execution_mode'='source/prototypes/mir/domain/compiler/execution_mode.lua'
   'prototypes.mir.domain.facts.recipe_semantics'='source/prototypes/mir/domain/facts/recipe_semantics.lua'
+  'fixtures.recipe_source_epoch.target_profiles'='source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua'
   'prototypes.mir.platform.factorio.data_raw'='source/prototypes/mir/platform/factorio/data_raw.lua'
   'prototypes.mir.pipeline.compiler_context'='source/prototypes/mir/pipeline/compiler_context.lua'
   'prototypes.mir.report.compiler_telemetry'='source/prototypes/mir/report/compiler_telemetry.lua'
