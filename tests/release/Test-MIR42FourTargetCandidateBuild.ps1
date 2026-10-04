@@ -5,6 +5,19 @@ Set-StrictMode -Version Latest
 
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+$engineRunnerPath = Join-Path $repo 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1'
+$engineTokens=$null;$engineErrors=$null
+$engineAst=[Management.Automation.Language.Parser]::ParseFile($engineRunnerPath,[ref]$engineTokens,[ref]$engineErrors)
+if(@($engineErrors).Count-ne0){throw '[mir42-candidate-engine-reader-parse]'}
+foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineCandidateVersionContract')){
+  $definitions=@($engineAst.FindAll({param($node) $node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$true))
+  if($definitions.Count-ne1){throw ('[mir42-candidate-engine-reader-definition] '+$name)}
+  . ([scriptblock]::Create($definitions[0].Extent.Text))
+}
+$script:MIR42ModernEngineTargets=@('f210','f200','f110','f100')
+$script:MIR42NineTargetEngineTargets=@($script:MIR42ModernEngineTargets+@('f017','f016','f015','f014','f013'))
+$engineEnvelopeAssertions=0
+$engineDestinationAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 
@@ -235,8 +248,23 @@ try {
   New-Item -ItemType Directory -Force -Path $schemaRoot | Out-Null
   $schemaComplete = Write-MIR42FourTargetManifest -OutputRoot $schemaRoot -Preflight $schemaPreflight -Rows $schemaRows -Failures @()
   Assert-MIR42CandidateBuildTest ($schemaComplete.schema -eq 2 -and $schemaComplete.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV2' -and (Test-MIR4BootstrapRecordHash -Record $schemaComplete)) 'patch-v2-manifest-writer-and-record-hash'
+  $engineFixturePath=Join-Path $schemaRoot 'candidate-manifest.json'
+  $engineVersion=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath
+  Assert-MIR42CandidateBuildTest ($engineVersion.source_version-ceq'4.2.1'-and$engineVersion.nine_targets-and-not$engineVersion.four_targets-and@($engineVersion.targets).Count-eq9) 'native-runner-reads-v2-nine-target-envelope-without-execution'
+  $engineEnvelopeAssertions++
+  $badHash=$schemaComplete|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  $badHash.record_sha256='0'*64
+  [IO.File]::WriteAllText($engineFixturePath,($badHash|ConvertTo-Json -Depth 100),$utf8)
+  $rejected=$false
+  try{Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath|Out-Null}catch{$rejected=$_.Exception.Message-eq'[mir42-engine-candidate-manifest-invalid]'}
+  Assert-MIR42CandidateBuildTest $rejected 'native-runner-refuses-valid-schema-with-invalid-record-hash'
+  $engineEnvelopeAssertions++
   $schemaPartial = Write-MIR42FourTargetManifest -OutputRoot $schemaRoot -Preflight $schemaPreflight -Rows @($schemaRows[0]) -Failures @([ordered]@{target='f200';message='schema-fixture-only'})
   Assert-MIR42CandidateBuildTest (-not $schemaPartial.build_complete -and $schemaPartial.status -ceq 'private-deterministic-nine-target-candidate-partial') 'patch-partial-manifest-preserves-complete-authority'
+  $rejected=$false
+  try{Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath|Out-Null}catch{$rejected=$_.Exception.Message-eq'[mir42-engine-candidate-manifest-invalid]'}
+  Assert-MIR42CandidateBuildTest $rejected 'native-runner-refuses-schema-valid-partial-envelope'
+  $engineEnvelopeAssertions++
   $schemaMutations = [ordered]@{
     'authority-source-zero' = { param($m) $m.target_authority[0].source_version='4.2.0' }
     'authority-wrong-target-version' = { param($m) $m.target_authority[0].distribution_version='4.2.20001' }
@@ -259,6 +287,13 @@ try {
     & $case.Value $invalid
     $valid = $invalid | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $schemaPath -ErrorAction SilentlyContinue
     Assert-MIR42CandidateBuildTest (-not $valid) "patch-schema-refuses-$($case.Key)"
+    $invalid.record_sha256=''
+    $invalid.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $invalid
+    [IO.File]::WriteAllText($engineFixturePath,($invalid|ConvertTo-Json -Depth 100),$utf8)
+    $rejected=$false
+    try{Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath|Out-Null}catch{$rejected=$_.Exception.Message-eq'[mir42-engine-candidate-manifest-schema]'}
+    Assert-MIR42CandidateBuildTest $rejected "native-runner-refuses-self-hashed-$($case.Key)"
+    $engineEnvelopeAssertions++
   }
   $invalidPartial = $schemaPartial | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
   $duplicatePartialRow = $invalidPartial.targets[0] | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
@@ -266,8 +301,43 @@ try {
   $invalidPartial.targets=@($invalidPartial.targets[0],$duplicatePartialRow)
   $valid = $invalidPartial | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $schemaPath -ErrorAction SilentlyContinue
   Assert-MIR42CandidateBuildTest (-not $valid) 'patch-schema-refuses-partial-same-target-different-row'
+  foreach($legacyCount in @(4,9)){
+    $legacyDescriptors=@($nineDescriptors|Select-Object -First $legacyCount)
+    $legacyPreflight=$schemaPreflight|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+    $legacyPreflight.target_authority=@($legacyDescriptors|Select-Object target,target_id,source_version,distribution_version)
+    $legacyRows=@(foreach($descriptor in $legacyDescriptors){
+      [pscustomobject]@{target=[string]$descriptor.target;distribution_version=[string]$descriptor.distribution_version
+        asset=[ordered]@{path="assets/$($descriptor.target)/more-infinite-research_$($descriptor.distribution_version).zip";bytes=1;sha256=('A'*64)}
+        content_sha256=('B'*64);entry_count=1}
+    })
+    $legacyFixture=Write-MIR42FourTargetManifest -OutputRoot $schemaRoot -Preflight $legacyPreflight -Rows $legacyRows -Failures @()
+    $legacyEngine=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath
+    Assert-MIR42CandidateBuildTest ($legacyFixture.schema-eq1-and$legacyEngine.source_version-ceq'4.2.0'-and
+      $legacyEngine.four_targets-eq($legacyCount-eq4)-and$legacyEngine.nine_targets-eq($legacyCount-eq9)) "native-runner-preserves-v1-$legacyCount-target-envelope"
+    $engineEnvelopeAssertions++
+  }
+  # Exercise the runner's actual selection statements without its native CLI.
+  $engineStatements=@($engineAst.EndBlock.Statements)
+  $selectionIndex=[array]::FindIndex($engineStatements,[Predicate[object]]{param($node) $node.Extent.Text.StartsWith('$selected = ')})
+  Assert-MIR42CandidateBuildTest ($selectionIndex-ge0-and$engineStatements[$selectionIndex+1]-is[Management.Automation.Language.ForEachStatementAst]) 'native-runner-selection-region'
+  $selectionBlock=[scriptblock]::Create(($engineStatements[$selectionIndex..($selectionIndex+1)].Extent.Text-join"`n"))
+  foreach($sourceVersion in @('4.2.0','4.2.1')){
+    foreach($prefix in @('F210','F200','F110','F100')){
+      Set-Variable -Name ($prefix+'Engine') -Value 'selection-fixture-no-engine'
+      Set-Variable -Name ($prefix+'Predecessor') -Value 'selection-fixture-no-archive'
+    }
+    . $selectionBlock
+    $descriptors=if($sourceVersion-ceq'4.2.0'){$nineDescriptors}else{$patchDescriptors}
+    foreach($descriptor in @($descriptors|Select-Object -First 4)){
+      $target=[string]$descriptor.target
+      Assert-MIR42CandidateBuildTest ($selected[$target].to-ceq[string]$descriptor.distribution_version-and
+        $selected[$target].from-ceq('4.1.'+$target.Substring(1)+'00')-and
+        $selected[$target].engine-ceq'selection-fixture-no-engine'-and$selected[$target].predecessor-ceq'selection-fixture-no-archive') "native-runner-modern-destination-$sourceVersion-$target"
+      $engineDestinationAssertions++
+    }
+  }
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 
