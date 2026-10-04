@@ -363,8 +363,8 @@
     },
     {
       "id": "native-probe-resources",
-      "patterns": ["^tools/lib/validation/NativeProbeResources[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$"],
-      "tests": ["static.immutable-input-staging", "runtime.material-route-guard"]
+      "patterns": ["^tools/lib/validation/NativeProbeResources[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/Test-MIRResearchBrowser[.]ps1$"],
+      "tests": ["static.immutable-input-staging", "runtime.material-route-guard", "runtime.research-browser"]
     },
     {
       "id": "artifact-storage-optimization",

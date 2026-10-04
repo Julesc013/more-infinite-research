@@ -2,6 +2,7 @@ Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/Common.ps1')
 . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
 . (Join-Path $PSScriptRoot 'ImmutableInputStaging.ps1')
+. (Join-Path $PSScriptRoot 'MIR4DistributionIdentity.ps1')
 
 # These adapters retain the existing governor and lease authorities. They own
 # one probe's total new-output budget, not a second scheduler or package writer.
@@ -133,26 +134,60 @@ function Write-MIRNativeProbeResult {
   [IO.File]::WriteAllBytes((Join-Path $Context.root 'result.json'),$bytes)
 }
 
+function Invoke-MIRNativeProbeFactorioProcess {
+  param(
+    [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$FilePath,
+    [Parameter(Mandatory)][string[]]$Arguments,
+    [ValidateRange(1,3600)][int]$TimeoutSeconds=120
+  )
+  if($Arguments.Count -lt 1 -or $Arguments.Count -gt 128){throw '[mir-native-probe-argument-budget]'}
+  $payload=[Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-Json -InputObject $Arguments -Compress))
+  if($payload.Length -gt 16KB){throw '[mir-native-probe-argument-budget]'}
+  $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
+  $driver=Join-Path $Context.root 'factorio-driver.ps1'
+  # Steam identifiers exist only in this owned child. The shared governor
+  # measures/cancels the complete PowerShell plus native-engine process tree.
+  # Arguments cross this boundary as data, never interpolated shell commands.
+  $driverText=@'
+param([Parameter(Mandatory)][string]$NativeExecutable,[Parameter(Mandatory)][string]$ArgumentsBase64)
+$ErrorActionPreference='Stop'
+$nativeArguments=[string[]]([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($ArgumentsBase64)) | ConvertFrom-Json)
+$env:SteamAppId='427520';$env:SteamGameId='427520'
+[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
+& $NativeExecutable @nativeArguments
+exit $LASTEXITCODE
+'@
+  [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
+  return Invoke-MIRNativeProbeProcess -Context $Context -FilePath (Get-Command pwsh).Source -TimeoutSeconds $TimeoutSeconds `
+    -Arguments @('-NoProfile','-File',$driver,'-NativeExecutable',$FilePath,'-ArgumentsBase64',[Convert]::ToBase64String($payload))
+}
+
 function New-MIRNativeProbeTargetPackage {
   param(
     [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$RepoRoot,
-    [ValidateSet('F210-TIN-OBS','F210-CURRENT-BA-FINAL-ROUTES-OBSERVER')][string]$CandidatePrefix='F210-TIN-OBS'
+    [ValidateSet('F210-TIN-OBS','F210-CURRENT-BA-FINAL-ROUTES-OBSERVER','BROWSER')][string]$CandidatePrefix='F210-TIN-OBS',
+    [ValidateSet('f210','f200')][string]$Target='f210'
   )
+  $targetKey=$Target.ToLowerInvariant()
+  if($CandidatePrefix -cne 'BROWSER' -and $targetKey -cne 'f210'){throw '[mir-native-probe-observer-target]'}
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch 1
+  $prefix=if($CandidatePrefix -ceq 'BROWSER'){$targetKey.ToUpperInvariant()+'-BROWSER'}else{$CandidatePrefix}
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   $driver=Join-Path $Context.root 'materialize.ps1'
   $receipt=Join-Path $Context.root 'materialized-package.json'
   $driverText=@'
-param([string]$RepoRoot,[string]$OutputRoot,[string]$CandidateId,[string]$ReceiptPath)
+param([string]$RepoRoot,[string]$OutputRoot,[string]$CandidateId,[string]$ReceiptPath,[string]$Target,[string]$DistributionVersion)
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/package/TargetMaterializer.ps1')
-$record=New-MIR4TargetPackage -RepoRoot $RepoRoot -Target f210 -CandidateId $CandidateId -SourceVersion '4.2.1' -DistributionVersion '4.2.21001' -OutputRoot $OutputRoot
+$record=New-MIR4TargetPackage -RepoRoot $RepoRoot -Target $Target -CandidateId $CandidateId -SourceVersion '4.2.1' -DistributionVersion $DistributionVersion -OutputRoot $OutputRoot
 [IO.File]::WriteAllText($ReceiptPath,($record | ConvertTo-Json -Depth 30),[Text.UTF8Encoding]::new($false))
 '@
   [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
   $output=[IO.Path]::GetRelativePath($RepoRoot,(Join-Path $Context.root 'packages')).Replace('\','/')
   $run=Invoke-MIRNativeProbeProcess -Context $Context -FilePath (Get-Command pwsh).Source -TimeoutSeconds 180 `
     -Arguments @('-NoProfile','-File',$driver,'-RepoRoot',$RepoRoot,'-OutputRoot',$output,
-      '-CandidateId',($CandidatePrefix+'-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()),'-ReceiptPath',$receipt)
+      '-CandidateId',($prefix+'-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()),'-ReceiptPath',$receipt,
+      '-Target',$targetKey,'-DistributionVersion',[string]$identity.distribution_version)
   if(-not (Test-Path -LiteralPath $receipt -PathType Leaf)) { throw '[mir-native-probe-package-receipt]' }
   return Get-Content -LiteralPath $receipt -Raw | ConvertFrom-Json -Depth 30
 }

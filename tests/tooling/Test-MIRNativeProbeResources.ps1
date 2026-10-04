@@ -30,6 +30,9 @@ try {
     $engine=if($line -ceq '2.0') { 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' } else { 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' }
     $resolved=Resolve-MIRAssuranceCommandText -Command $command -Context ([pscustomobject]@{factorio=$engine;target=$line}) -Plan ([pscustomobject]@{})
     Assert-Probe ($resolved.Contains("-FactorioBin '$engine'") -and $resolved.Contains("-ExpectedFactorioLine '$line'") -and $resolved.Contains('-ExpectedPeakMemoryMiB 2048') -and $resolved.Contains('-MaxNewOutputMiB 120')) "selected $line command lost its engine, line or explicit resource budgets."
+    $browserCommand=[string](@($catalog.tests | Where-Object id -CEQ 'runtime.research-browser')[0].command)
+    $browserResolved=Resolve-MIRAssuranceCommandText -Command $browserCommand -Context ([pscustomobject]@{factorio=$engine;target=$line;candidate='controlled-candidate.zip'}) -Plan ([pscustomobject]@{})
+    Assert-Probe ($browserResolved.Contains("-FactorioBin '$engine'") -and $browserResolved.Contains("-Target '$line'") -and $browserResolved.Contains('-ExpectedPeakMemoryMiB 2048') -and $browserResolved.Contains('-MaxNewOutputMiB 120')) "selected browser $line command lost its actual engine, target or resource budgets."
   }
   $arguments=@{RepoRoot=$repo;OutputRoot=$fixture;MaxNewOutputMiB=1}
   Refuses-Probe {New-MIRNativeProbeResourceContext @arguments} 'resource-peak-budget-required'
@@ -45,9 +48,89 @@ try {
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'PrepareOnly bypassed allocation admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1') -RepoRoot $repo -PrepareOnly -ExactStageRoot (Join-Path $fixture 'absent-stage') -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Final observer PrepareOnly bypassed allocation admission.'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRResearchBrowser.ps1') -RepoRoot $repo -FactorioBin 'absent-browser-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Browser harness allocated before peak-budget admission.'
   $context=New-MIRNativeProbeResourceContext @arguments -ExpectedPeakMemoryMiB 1024
   Assert-Probe (-not (Test-Path -LiteralPath $context.root)) 'successful admission allocated before caller initialization.'
   New-Item -ItemType Directory -Path $context.root | Out-Null
+  # Extract the consumed harness functions, rather than a second validator.
+  # These tiny ZIPs contain only identity/module controls, not player packages.
+  $browserTokens=$null;$browserErrors=$null
+  $browserAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRResearchBrowser.ps1'),[ref]$browserTokens,[ref]$browserErrors)
+  Assert-Probe ($browserErrors.Count -eq 0) 'browser harness syntax differs.'
+  foreach($name in @('Resolve-BrowserEnginePath','Test-BrowserCandidate')) {
+    $definitions=@($browserAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+    Assert-Probe ($definitions.Count -eq 1) "expected one actual browser admission function: $name"
+    . ([scriptblock]::Create($definitions[0].Extent.Text))
+  }
+  $historical='D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
+  $current='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.0' -Requested '') -ceq $historical) '2.0 default used another engine authority.'
+  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.1' -Requested '') -ceq $current) '2.1 default used another engine authority.'
+  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.0' -Requested $historical) -ceq $historical) 'explicit historical engine was refused.'
+  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.0' -Requested $current} 'engine-location'
+  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.1' -Requested $historical} 'engine-location'
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  function New-ControlledBrowserArchive([string]$Line,$Identity,[string]$Variant='valid') {
+    $directory=Join-Path $fixture ('browser-inputs/'+[guid]::NewGuid().ToString('N'))
+    $null=New-Item -ItemType Directory -Path $directory
+    $fileName=if($Variant -ceq 'filename'){'wrong-name.zip'}else{$Identity.package_name}
+    $path=Join-Path $directory $fileName
+    $root='more-infinite-research_'+$Identity.distribution_version
+    $info=[ordered]@{name='more-infinite-research';version=$Identity.distribution_version;factorio_version=$Line}
+    if($Variant -ceq 'patch-zero'){$info.version=$info.version.Substring(0,$info.version.Length-2)+'00'}
+    if($Variant -ceq 'patch-two'){$info.version=$info.version.Substring(0,$info.version.Length-2)+'02'}
+    if($Variant -ceq 'wrong-target'){$info.factorio_version=if($Line -ceq '2.1'){'2.0'}else{'2.1'}}
+    if($Variant -ceq 'root'){$root='wrong-root'}
+    $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
+    try {
+      $infoText=ConvertTo-Json -InputObject $info -Compress
+      if($Variant -ceq 'info-budget'){$infoText+=' '*64KB}
+      $entry=$zip.CreateEntry($root+'/info.json');$writer=[IO.StreamWriter]::new($entry.Open())
+      try{$writer.Write($infoText)}finally{$writer.Dispose()}
+      if($Variant -ceq 'duplicate-info'){$null=$zip.CreateEntry($root+'/info.json')}
+      $modules=@('research_browser.lua','research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')
+      foreach($module in $modules) {
+        if($Variant -ceq 'missing-module' -and $module -ceq $modules[0]){continue}
+        $entryName=$root+'/prototypes/mir/runtime/'+$module
+        if($Variant -ceq 'nested-module' -and $module -ceq $modules[0]){$entryName=$root+'/nested/prototypes/mir/runtime/'+$module}
+        $bytes=[IO.File]::ReadAllBytes((Join-Path $repo ('source/prototypes/mir/runtime/'+$module)))
+        if($Variant -ceq 'changed-module' -and $module -ceq $modules[0]){$bytes[0]=$bytes[0] -bxor 1}
+        $entry=$zip.CreateEntry($entryName);$stream=$entry.Open()
+        try{$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}
+        if($Variant -ceq 'duplicate-module' -and $module -ceq $modules[0]){$null=$zip.CreateEntry($entryName)}
+      }
+      $extra=switch -CaseSensitive ($Variant) {
+        'outside' {'outside/extra.lua'}
+        'root-case' {$root.ToUpperInvariant()+'/extra.lua'}
+        'traversal' {$root+'/../outside.lua'}
+        'backslash' {$root+'/nested\extra.lua'}
+        default {''}
+      }
+      if($extra){$null=$zip.CreateEntry($extra)}
+    }finally{$zip.Dispose()}
+    return $path
+  }
+  foreach($line in @('2.1','2.0')) {
+    $code=if($line -ceq '2.1'){'210'}else{'200'}
+    $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor 2 -SourcePatch 1
+    $valid=New-ControlledBrowserArchive -Line $line -Identity $identity
+    $checked=Test-BrowserCandidate -Candidate $valid -Line $line -Identity $identity -Repository $repo
+    Assert-Probe ($checked.info.version -ceq $identity.distribution_version -and $checked.sha256 -ceq (Get-FileHash -LiteralPath $valid).Hash) "actual browser $line validator lost exact patch-one identity or input hash."
+    foreach($case in @(
+      @{variant='patch-zero';error='candidate-identity'},@{variant='patch-two';error='candidate-identity'},
+      @{variant='wrong-target';error='target mismatch'},@{variant='filename';error='candidate-identity'},
+      @{variant='root';error='candidate-identity'},@{variant='outside';error='candidate-identity'},
+      @{variant='root-case';error='candidate-identity'},@{variant='traversal';error='candidate-identity'},
+      @{variant='backslash';error='candidate-identity'},@{variant='duplicate-info';error='one mod identity'},
+      @{variant='info-budget';error='info-budget'},@{variant='missing-module';error='exactly one'},
+      @{variant='nested-module';error='exactly one'},@{variant='duplicate-module';error='exactly one'},
+      @{variant='changed-module';error='differs from the controlled source'}
+    )) {
+      $invalid=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant $case.variant
+      Refuses-Probe {Test-BrowserCandidate -Candidate $invalid -Line $line -Identity $identity -Repository $repo} $case.error
+    }
+  }
   $source=Join-Path $fixture 'dependency.zip'
   [IO.File]::WriteAllBytes($source,[byte[]]::new(128KB))
   $archiveInput=[ordered]@{source_path=$source;file_name='dependency.zip';expected_sha256=Get-MIRImmutableInputSha256 $source;role='dependency-mod';identity=@{name='controlled'};provenance=@{kind='tiny-controlled-fixture'};immutable=$true}
@@ -105,8 +188,29 @@ function New-MIR4TargetPackage {
   Assert-Probe ($package.output -ceq (Join-Path $context.root 'packages') -and -not $package.actual_package) 'driver output escaped its row or fixture became a real materializer.'
   $finalPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -CandidatePrefix 'F210-CURRENT-BA-FINAL-ROUTES-OBSERVER'
   Assert-Probe ($finalPackage.candidate_id -cmatch '^F210-CURRENT-BA-FINAL-ROUTES-OBSERVER-[0-9A-F]{8}$' -and $finalPackage.distribution_version -ceq '4.2.21001' -and -not $finalPackage.actual_package) 'final observer driver lost its candidate or patch identity.'
+  Refuses-Probe {New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -Target f200} 'observer-target'
+  foreach($target in @('f210','f200')) {
+    $browserPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -Target $target -CandidatePrefix BROWSER
+    $browserIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch 1
+    Assert-Probe ($browserPackage.target -ceq $target -and $browserPackage.source_version -ceq '4.2.1' -and $browserPackage.distribution_version -ceq $browserIdentity.distribution_version -and $browserPackage.candidate_id.StartsWith($target.ToUpperInvariant()+'-BROWSER-') -and -not $browserPackage.actual_package) "browser driver lost the exact $target source-patch or target identity."
+  }
+  $echo=Join-Path $context.root 'argv-echo.ps1'
+  [IO.File]::WriteAllText($echo,@'
+param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
+[ordered]@{values=@($Values);steam_app=$env:SteamAppId;steam_game=$env:SteamGameId;temp=$env:TEMP} | ConvertTo-Json -Compress
+'@,[Text.UTF8Encoding]::new($false))
+  $parentApp=[Environment]::GetEnvironmentVariable('SteamAppId');$parentGame=[Environment]::GetEnvironmentVariable('SteamGameId')
+  $literalValues=@('path with spaces','literal $(Get-Process) ; "quote" & marker','Unicode: π')
+  $nativeActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $pwsh -Arguments (@('-NoProfile','-File',$echo)+$literalValues) -TimeoutSeconds 30
+  $echoed=Get-Content -LiteralPath $nativeActor.stdout -Raw | ConvertFrom-Json
+  Assert-Probe (($echoed.values | ConvertTo-Json -Compress) -ceq ($literalValues | ConvertTo-Json -Compress)) 'native wrapper changed literal argument data.'
+  Assert-Probe ($echoed.steam_app -ceq '427520' -and $echoed.steam_game -ceq '427520' -and [Environment]::GetEnvironmentVariable('SteamAppId') -ceq $parentApp -and [Environment]::GetEnvironmentVariable('SteamGameId') -ceq $parentGame) 'Steam launch identifiers escaped the owned child.'
+  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $echoed.temp) -and -not (Test-Path -LiteralPath $echoed.temp) -and (Test-Path -LiteralPath $nativeActor.ledger)) 'native wrapper bypassed the private-temp or resource ledger authority.'
+  $priorIndex=$context.process_index
+  Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $pwsh -Arguments @('x'*20KB)} 'argument-budget'
+  Assert-Probe ($context.process_index -eq $priorIndex) 'oversized argument data launched an actor.'
   Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$context.runs.Count}
-  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 4) 'reserved result did not preserve actual actor inventory.'
+  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 7) 'reserved result did not preserve actual actor inventory.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'
@@ -207,4 +311,4 @@ function New-MIR4TargetPackage {
     Remove-Item -LiteralPath $resolved -Recurse -Force
   }
 }
-[pscustomobject]@{status='passed';assertions=$assertions;native_factorio=$false;actual_materialization=$false;scope='Controlled lease, row budget, preallocation, owned small actors and completed-row custody parser; no native oracle';memory_enforcement='sampled-watchdog-not-hard-cap'}
+[pscustomobject]@{status='passed';assertions=$assertions;native_factorio=$false;actual_materialization=$false;scope='Controlled lease, row budget, preallocation, browser engine/archive admission, owned small actors and completed-row custody parser; no native oracle';memory_enforcement='sampled-watchdog-not-hard-cap'}

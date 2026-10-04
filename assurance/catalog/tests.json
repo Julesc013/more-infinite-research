@@ -1239,7 +1239,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target>",
+      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/runtime/Test-MIRResearchBrowser.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -1252,6 +1252,11 @@
         "source:source/prototypes/mir/runtime/startup_settings.lua",
         "source:source/prototypes/mir/settings/profile_codec.lua",
         "tests/runtime/Test-MIRResearchBrowser.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/validation/MIR4DistributionIdentity.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
         "tests/runtime/research_browser.lua",
         "tests/runtime/research_browser_omissions.lua",
         "tests/runtime/research_browser_core_regressions.lua",
@@ -7929,5 +7934,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f5716f91730635431adc6704ba7248ed4c39c6bf1b46af705f5fb84e91ed94b2"
+  "digest": "sha256:182414107b262e1b4693e5752233cdcd627080195ad425d1dcadc41e0d9cf9a6"
 }
