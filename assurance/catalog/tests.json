@@ -7494,11 +7494,13 @@
         "tools/mir/application/package/TargetMaterializer.ps1",
         "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json",
         "source:source/package-source.json",
         "targets/package-authority.json",
-        "targets/historical/**"
+        "targets/historical/**",
+        ".mir/releases/terminal/seals/**"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7964,5 +7966,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a7f3b7947bbcc4ce8a94de31f52ef1c71e574b0670ada102b31ad8c19a0331cb"
+  "digest": "sha256:4485a3eb15d62724863919ea660a20baa7c0f50278036d02f05987ddcf09ba14"
 }

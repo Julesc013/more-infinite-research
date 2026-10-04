@@ -32,7 +32,8 @@ function New-MIR4TargetPackage {
   $candidateRoot = Join-Path $OutputRoot "$Target/$CandidateId"
   $tree = Join-Path $candidateRoot ([string]$identity.distribution_root)
   New-Item -ItemType Directory -Force -Path $tree | Out-Null
-  [IO.File]::WriteAllText((Join-Path $tree 'info.json'), ('{"name":"more-infinite-research","version":"' + [string]$identity.distribution_version + '"}' + [Environment]::NewLine), [Text.UTF8Encoding]::new($false))
+  $stubInfo = [ordered]@{name='more-infinite-research';version=[string]$identity.distribution_version;factorio_version=([string]$identity.target_id).Substring('factorio-'.Length)}
+  [IO.File]::WriteAllText((Join-Path $tree 'info.json'), (($stubInfo | ConvertTo-Json -Compress) + [Environment]::NewLine), [Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllText((Join-Path $tree 'data.lua'), ('return {}' + [Environment]::NewLine), [Text.UTF8Encoding]::new($false))
   $archive = Join-Path $candidateRoot ([string]$identity.package_name)
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $OutputRoot
@@ -53,6 +54,7 @@ function New-MIR4TargetPackage {
 
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1')
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
+. (Join-Path $repo 'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1')
 
 $commit = (& git -C $repo rev-parse HEAD).Trim()
 $root = Join-Path $repo ('build/test-results/mir42-four-target-candidate-' + [guid]::NewGuid().ToString('N'))
@@ -89,6 +91,19 @@ try {
   $unsupportedSourceRejected=$false
   try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2'|Out-Null}catch{$unsupportedSourceRejected=$true}
   Assert-MIR42CandidateBuildTest $unsupportedSourceRejected 'unsupported-source-version-rejected'
+  foreach ($schemaVersion in @(1,2)) {
+    $versionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $repo -Manifest ([pscustomobject]@{schema=$schemaVersion;kind="MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"})
+    $expectedSource = if ($schemaVersion -eq 1) { '4.2.0' } else { '4.2.1' }
+    Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -eq 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
+  }
+  foreach ($badContract in @(
+    [pscustomobject]@{schema=3;kind='MIR42FourTargetDeterministicCandidateManifestV3'},
+    [pscustomobject]@{schema=2;kind='MIR42FourTargetDeterministicCandidateManifestV1'}
+  )) {
+    $rejected = $false
+    try { Get-MIR42CandidateConstructionVersionContract -RepoRoot $repo -Manifest $badContract | Out-Null } catch { $rejected=$_.Exception.Message -match 'mir42-candidate-construction-version-contract' }
+    Assert-MIR42CandidateBuildTest $rejected 'construction-version-contract-refuses-unsupported-or-mixed-kind'
+  }
   $duplicateRejected = $false
   try { Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SelectedTargets @('f210', 'f200', 'f110', 'f100', 'f017', 'f017', 'f016', 'f015', 'f014', 'f013') | Out-Null } catch { $duplicateRejected = $_.Exception.Message -match 'mir42-candidate-target-selection-duplicate' }
   Assert-MIR42CandidateBuildTest $duplicateRejected 'nine-target-descriptor-duplicate-rejected'
@@ -259,6 +274,43 @@ try {
   Assert-MIR42CandidateBuildTest (($patch.targets.distribution_version -join '|') -ceq ($patchVersions -join '|')) 'patch-nine-build-actual-row-identities'
   Assert-MIR42CandidateBuildTest ($script:mir42CandidateStubCalls.Count -eq 8) 'patch-nine-build-two-modern-materializations-per-target'
   Assert-MIR42CandidateBuildTest (Test-MIR4BootstrapRecordHash -Record $patch) 'patch-nine-build-manifest-hash'
+  # Portable input-contract control. CI has no delivered terminal ZIPs. Only
+  # their inventory lookup uses seal fixtures; all candidate ZIPs are rehashed.
+  # This does not execute predecessor custody, upgrades or native qualification.
+  $originalArchiveInventory = (Get-Item Function:Get-MIR4ArchiveInventory).ScriptBlock
+  $terminalInventoryFixtures = @{}
+  foreach ($target in @('f017','f016','f015','f014','f013')) {
+    $record = Get-Content -Raw -LiteralPath (Join-Path $repo "targets/historical/$target/target.json") | ConvertFrom-Json -Depth 100
+    $seal = Get-Content -Raw -LiteralPath (Join-Path $repo ('.mir/releases/terminal/seals/' + $record.predecessor.version + '.json')) | ConvertFrom-Json -Depth 100
+    $terminalInventoryFixtures[[IO.Path]::GetFullPath((Join-Path $repo $record.predecessor.archive))] = [pscustomobject]@{
+      archive_sha256=$seal.archive_sha256;bytes=$seal.bytes;content_sha256=$seal.content_sha256;entry_count=$seal.entries
+    }
+  }
+  try {
+    Set-Item Function:Get-MIR4ArchiveInventory -Value {
+      param([Parameter(Mandatory)][string]$Path)
+      $fullPath = [IO.Path]::GetFullPath($Path)
+      if ($terminalInventoryFixtures.ContainsKey($fullPath)) { return $terminalInventoryFixtures[$fullPath] }
+      return & $originalArchiveInventory -Path $Path
+    }
+    $patchInputs = @(Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath (Join-Path $patchRoot 'candidate-manifest.json'))
+    $legacyInputs = @(Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath (Join-Path $nineRoot 'candidate-manifest.json'))
+    Assert-MIR42CandidateBuildTest ($patchInputs.Count -eq 9 -and @($patchInputs | Where-Object { $_.identity.source_version -cne '4.2.1' }).Count -eq 0) 'patch-nine-input-reader-uses-current-source-version'
+    Assert-MIR42CandidateBuildTest ($legacyInputs.Count -eq 9 -and @($legacyInputs | Where-Object { $_.identity.source_version -cne '4.2.0' }).Count -eq 0) 'legacy-nine-input-reader-default-preserved'
+    $tamperedRowPath = Join-Path $patchRoot 'target-rows/f210.json'
+    $originalRowBytes = [IO.File]::ReadAllBytes($tamperedRowPath)
+    foreach ($tamper in @('source-version','row-schema')) {
+      $badRow = [Text.UTF8Encoding]::new($false).GetString($originalRowBytes) | ConvertFrom-Json -Depth 100
+      if ($tamper -ceq 'source-version') { $badRow.source_version='4.2.0' } else { $badRow.schema=2 }
+      Write-MIR4BootstrapRecord -Record $badRow -Path $tamperedRowPath | Out-Null
+      $rejected = $false
+      try { Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath (Join-Path $patchRoot 'candidate-manifest.json') | Out-Null } catch { $rejected=$_.Exception.Message -match 'mir42-qualification-target-row-binding' }
+      Assert-MIR42CandidateBuildTest $rejected "patch-input-reader-refuses-self-hashed-$tamper"
+      [IO.File]::WriteAllBytes($tamperedRowPath, $originalRowBytes)
+    }
+  } finally {
+    Set-Item Function:Get-MIR4ArchiveInventory -Value $originalArchiveInventory
+  }
   foreach ($target in @('f017','f016','f015','f014','f013')) {
     $row = Get-Content -Raw -LiteralPath (Join-Path $patchRoot "target-rows/$target.json") | ConvertFrom-Json -Depth 100
     Assert-MIR42CandidateBuildTest ([string]$row.distribution_version -ceq "4.2.$($target.Substring(1))01" -and [bool]$row.deterministic_archive_bytes -and -not [bool]$row.publication_authorized) "patch-historical-row-identity-and-private-boundary-$target"
@@ -273,6 +325,7 @@ try {
     partial_successful_targets = @($partial.targets).Count
     historical_target_rows = 5
     patch_target_rows = 9
+    predecessor_inventory_control = 'terminal-seal-fixture-only'
     engine_runs = 0
   }
 } finally {
