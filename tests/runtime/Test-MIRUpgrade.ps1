@@ -57,6 +57,44 @@ function Resolve-MIRUpgradeManifestVersion {
   return [string]$identity.distribution_version
 }
 
+function Resolve-MIRHistoricalUpgradeTransition {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$FromVersion,
+    [Parameter(Mandatory)][string]$ToVersion
+  )
+  $targets = @{
+    '017' = [ordered]@{ line='0.17'; terminal='1.7.9'; infinite_technology='mining-productivity-4' }
+    '016' = [ordered]@{ line='0.16'; terminal='1.6.9'; infinite_technology='mining-productivity-16' }
+    '015' = [ordered]@{ line='0.15'; terminal='1.5.9'; infinite_technology='mining-productivity-16' }
+    '014' = [ordered]@{ line='0.14'; terminal='1.4.9'; infinite_technology='' }
+    '013' = [ordered]@{ line='0.13'; terminal='1.3.9'; infinite_technology='' }
+  }
+  $failure = 'MIR historical upgrade specialization requires an exact terminal predecessor or an earlier same-target maintenance version and matching 4.2 target version.'
+  if ($ToVersion -cnotmatch '^4[.]2[.](?<target>017|016|015|014|013)(?<patch>[0-9]{2})$') { throw $failure }
+  $code = [string]$Matches.target
+  $toPatch = [int]$Matches.patch
+  $target = $targets[$code]
+  . (Join-Path $RepoRoot 'tools/lib/validation/MIR4DistributionIdentity.ps1')
+  $null = New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor 2 -SourcePatch $toPatch -DistributionVersion $ToVersion
+  $predecessorKind = 'historical-terminal'
+  if ($FromVersion -cne [string]$target.terminal) {
+    if ($FromVersion -cnotmatch ('^4[.]2[.]' + $code + '(?<patch>[0-9]{2})$')) { throw $failure }
+    $fromPatch = [int]$Matches.patch
+    if ($fromPatch -ge $toPatch) { throw $failure }
+    $null = New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor 2 -SourcePatch $fromPatch -DistributionVersion $FromVersion
+    $predecessorKind = 'same-target-maintenance'
+  }
+  # Fixture specialization selects an engine line and continuity oracle. The
+  # caller still authenticates actual archives and published predecessor custody.
+  return [ordered]@{
+    line = [string]$target.line
+    target = $ToVersion
+    infinite_technology = [string]$target.infinite_technology
+    predecessor_kind = $predecessorKind
+  }
+}
+
 function Invoke-MIRUpgradeMonitoredProcess {
   param([string]$FilePath,[string[]]$Arguments,[int]$TimeoutMs=300000,[scriptblock]$CompletionPredicate=$null)
   $script:upgradeProcessIndex++
@@ -326,18 +364,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo.Replace($dependencyFrom, "more-infinite-research >= $FromVersion"), [Text.UTF8Encoding]::new($false))
 }
 if ($isHistoricalTerminalFixture) {
-  $historicalTargets = @{
-    '1.7.9' = [ordered]@{ line='0.17'; target='4.2.01700'; infinite_technology='mining-productivity-4' }
-    '1.6.9' = [ordered]@{ line='0.16'; target='4.2.01600'; infinite_technology='mining-productivity-16' }
-    '1.5.9' = [ordered]@{ line='0.15'; target='4.2.01500'; infinite_technology='mining-productivity-16' }
-    '1.4.9' = [ordered]@{ line='0.14'; target='4.2.01400'; infinite_technology='' }
-    '1.3.9' = [ordered]@{ line='0.13'; target='4.2.01300'; infinite_technology='' }
-  }
-  $historical = $historicalTargets[$FromVersion]
-  $sameHistoricalTarget=$null -ne $historical -and $ToVersion -match ('^4[.]2[.]'+([string]$historical.target).Substring(4,3)+'[0-9]{2}$')
-  if (-not $sameHistoricalTarget) {
-    throw 'MIR historical upgrade specialization requires an exact terminal predecessor and matching 4.2 target version.'
-  }
+  $historical = Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion $FromVersion -ToVersion $ToVersion
   if ($Archetype -and $Archetype -cne 'base-default') {
     throw 'MIR historical terminal upgrade fixture only supports the base-default archetype.'
   }
