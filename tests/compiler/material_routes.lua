@@ -3,7 +3,14 @@ local productivity_owners, recipe_unlocks, technologies = {}, {}, {}
 local generated_owners = {}
 local observation_enabled, observation_rows = false, {}
 local planning_input_available = true
-local function stub(name, value) package.loaded[name] = value or {} end
+local function stub(name, value)
+  -- Keep the profile provider identity shared by already-loaded consumers.
+  if name == "prototypes.mir.platform.factorio.target_profiles" and value and package.loaded[name] then
+    package.loaded[name].current = value.current
+  else
+    package.loaded[name] = value or {}
+  end
+end
 for _, name in ipairs{"platform.factorio.prototype_lookup","index.item_prototype_facts","core.deepcopy","core.fingerprint","platform.factorio.target_profiles","report.compiler_telemetry","settings.automatic_compiler_policy"} do stub("prototypes.mir." .. name) end
 local function fingerprint_text(value)
   local kind=type(value)
@@ -887,6 +894,79 @@ check(not actual_generated_registry.is_stream("controlled-unclassified"),"regist
       check(test_fingerprint(raw)==source_before, id .. " input immutability")
     end
   end
+end)()
+
+-- Modern native products inherit the productivity exclusion from statistics
+-- only when no explicit productivity exclusion was declared. Test both
+-- consumers through actual profiles, preserving explicit zero and denial.
+;(function()
+  local profiles=require("fixtures.material_routes.target_profiles")
+  local profile_module=package.loaded["prototypes.mir.platform.factorio.target_profiles"]
+  local previous_current=profile_module.current
+  local actual_facts=require("prototypes.mir.index.recipe_facts")
+  local function observe(kind,fields,productive,id)
+    local product={type=kind,name="carrier"}
+    for key,value in pairs(fields) do product[key]=value end
+    local raw={name="manufacture",allow_productivity=true,
+      ingredients={{type=kind,name="carrier",amount=1}},
+      results={product,{type="item",name="component",amount=1}}}
+    local before=test_fingerprint(raw)
+    local facts=actual_facts.index_prototypes({manufacture=raw})
+    local risk=canonical_risks.index_facts(facts,{items={}}).facts.manufacture
+    local names={}
+    for _,name in ipairs(facts.facts.manufacture.productive_result_names) do names[name]=true end
+    check((names.carrier==true)==productive,id.." canonical productive output")
+    check(canonical_risks.has_hard_flag(risk,"catalyst_or_self_return")==productive,id.." carrier risk")
+    environment{manufacture=facts.facts.manufacture}; risks={manufacture=risk}
+    local buckets=matcher.recipes_for_stream({items={"component"},reject_explicit_productivity_denial=true},0.02)
+    check((#buckets[1].recipes==0)==productive,id.." manufacturing guard")
+    check(test_fingerprint(raw)==before,id.." input immutability")
+  end
+  local cases={
+    {fields={amount=1,ignored_by_stats=1},productive=false},
+    {fields={amount=2,ignored_by_stats=1},productive=true},
+    {fields={amount=1,ignored_by_stats=1,ignored_by_productivity=0},productive=true},
+    {fields={amount=1,ignored_by_stats=0,ignored_by_productivity=1},productive=false},
+    {fields={amount_min=2,amount_max=0,ignored_by_stats=2},productive=false},
+    {fields={amount=1,ignored_by_stats=0},productive=true}
+  }
+  for _,version in ipairs({"2.1","2.0","1.1","1.0"}) do
+    local selected=assert(profiles.profiles[version])
+    profile_module.current=function() return selected end
+    for _,kind in ipairs({"item","fluid"}) do
+      if version=="2.1" or version=="2.0" then
+        for index,case in ipairs(cases) do
+          observe(kind,case.fields,case.productive,"exclusion "..version.." "..kind.." "..index)
+        end
+        local denied={name="denied",allow_productivity=false,
+          ingredients={{type=kind,name="carrier",amount=1}},
+          results={{type=kind,name="carrier",amount=1,ignored_by_stats=1},
+            {type="item",name="component",amount=1}}}
+        local facts=actual_facts.index_prototypes({denied=denied})
+        local risk=canonical_risks.index_facts(facts,{items={}}).facts.denied
+        check(canonical_risks.has_hard_flag(risk,"productivity_disabled"),"covered carrier retains author denial")
+        environment{denied=facts.facts.denied}; risks={denied=risk}
+        local buckets=matcher.recipes_for_stream({items={"component"},reject_explicit_productivity_denial=true},0.02)
+        check(#buckets[1].recipes==0,"covered carrier cannot override author denial")
+        if kind=="item" then
+          for _,ignored in ipairs({1,2}) do
+            local fractional={name="fractional",allow_productivity=true,
+              ingredients={{type="item",name="carrier",amount=1}},
+              results={{type="item",name="carrier",amount=1,ignored_by_stats=ignored,extra_count_fraction=0.5},
+                {type="item",name="component",amount=1}}}
+            local facts=actual_facts.index_prototypes({fractional=fractional})
+            environment{fractional=facts.facts.fractional}
+            risks={fractional=canonical_risks.index_facts(facts,{items={}}).facts.fractional}
+            local buckets=matcher.recipes_for_stream({items={"component"}},0.02)
+            check(#buckets[1].recipes==0,"base exclusion cannot certify a fractional carrier return")
+          end
+        end
+      else
+        observe(kind,{amount=1,ignored_by_stats=1},true,"undeclared exclusion default "..version.." "..kind)
+      end
+    end
+  end
+  profile_module.current=previous_current
 end)()
 
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

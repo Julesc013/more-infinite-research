@@ -35,6 +35,9 @@ local M = {
           "quality_change",
           "affected_by_quality"
         },
+        product_property_defaults = {
+          ignored_by_productivity = "ignored_by_stats"
+        },
         recipe_property_defaults = {
           allow_productivity = false,
           allow_quality = true,
@@ -119,6 +122,9 @@ local M = {
           "extra_count_fraction",
           "ignored_by_productivity",
           "ignored_by_stats"
+        },
+        product_property_defaults = {
+          ignored_by_productivity = "ignored_by_stats"
         },
         recipe_property_defaults = {
           allow_productivity = false,
