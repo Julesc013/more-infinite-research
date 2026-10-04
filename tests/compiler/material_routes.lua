@@ -849,4 +849,44 @@ end
 actual_generated_registry.register("controlled-unclassified")
 check(not actual_generated_registry.is_stream("controlled-unclassified"),"registration alone has no stream authority")
 
+-- Consume raw products through the real fact index, canonical risk classifier
+-- and ordinary manufacturing matcher. A native-clamped carrier return must
+-- not disappear from either guard just because its authored maximum is lower.
+;(function()
+  package.loaded["prototypes.mir.index.recipe_facts"] = nil
+  local actual_facts = require("prototypes.mir.index.recipe_facts")
+  local cases = {
+    {amount_min=2, amount_max=0, ignored_by_productivity=1, productive=true},
+    {amount_min=2, amount_max=0, ignored_by_productivity=2, productive=false},
+    {amount_min=0, amount_max=2, ignored_by_productivity=1, productive=true},
+    {amount_min=2, amount_max=2, ignored_by_productivity=2, productive=false},
+    {amount=2, amount_min=0, amount_max=0, ignored_by_productivity=1, productive=true},
+    {amount=0, amount_min=2, amount_max=99, ignored_by_productivity=0, productive=false},
+    {amount=2, amount_min=10, amount_max=99, ignored_by_productivity=2, productive=false}
+  }
+  for _, kind in ipairs({"item", "fluid"}) do
+    for index, values in ipairs(cases) do
+      local product = {type=kind, name="carrier"}
+      for field, value in pairs(values) do if field ~= "productive" then product[field]=value end end
+      local raw = {name="manufacture", allow_productivity=true,
+        ingredients={{type=kind,name="carrier",amount=1}},
+        results={product,{type="item",name="component",amount=1}}}
+      local source_before = test_fingerprint(raw)
+      local facts = actual_facts.index_prototypes({manufacture=raw})
+      local fact = facts.facts.manufacture
+      local risk = canonical_risks.index_facts(facts,{items={}}).facts.manufacture
+      local names = {}
+      for _, name in ipairs(fact.productive_result_names) do names[name]=true end
+      local id = "quantity " .. kind .. " " .. index
+      check((names.carrier==true)==values.productive, id .. " canonical productive output")
+      check(canonical_risks.has_hard_flag(risk,"catalyst_or_self_return")==values.productive,
+        id .. " canonical carrier risk")
+      environment{manufacture=fact}; risks={manufacture=risk}
+      local buckets = matcher.recipes_for_stream({items={"component"}},0.02)
+      check((#buckets[1].recipes==0)==values.productive, id .. " ordinary manufacturing guard")
+      check(test_fingerprint(raw)==source_before, id .. " input immutability")
+    end
+  end
+end)()
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

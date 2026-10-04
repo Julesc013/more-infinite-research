@@ -108,4 +108,37 @@ compiler_context.with_active(context, function()
     "replace_source rejects warm progression cache mutation without advancing the recipe epoch")
 end)
 
+-- Exercise the real schema-2 normalizer under actual selected target contracts.
+-- Its effective independent probability is not an authored modern field; an
+-- explicit unsupported declaration must nevertheless remain withheld.
+;(function()
+  local target_contracts = require("fixtures.recipe_source_epoch.target_profiles")
+  local profile_module = package.loaded["prototypes.mir.platform.factorio.target_profiles"]
+  local old_current = profile_module.current
+  local routes = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+  for _, version in ipairs({"2.1", "2.0", "1.1", "1.0"}) do
+    local selected_profile = assert(target_contracts.profiles[version])
+    profile_module.current = function() return selected_profile end
+    local cases = {
+      {fields={amount=1}, expected=true},
+      {fields={amount=1,independent_probability=0.5}, expected=version=="2.1"},
+      {fields={amount=1,shared_probability={min=0,max=1}}, expected=version=="2.1"},
+      {fields={amount=0,extra_count_fraction=0.5}, expected=version=="2.1" or version=="2.0"},
+      {fields={amount=1,probability=0}, expected=false}
+    }
+    for index, case in ipairs(cases) do
+      local product = {type="item",name="A"}
+      for key, value in pairs(case.fields) do product[key]=value end
+      local canonical = recipe_facts.index_prototypes({["make-A"]={enabled=true,category="crafting",
+        energy_required=1,ingredients={},results={product}}})
+      local acquired = compiler_context.with_active(compiler_context.new(), function()
+        return routes.initial_recipe_witness("make-A","A",{recipe_index=canonical})~=nil
+      end)
+      check("CP" .. version .. "/" .. index, acquired==case.expected,
+        "Canonical product acquisition obeys the actual " .. version .. " field contract")
+    end
+  end
+  profile_module.current = old_current
+end)()
+
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)

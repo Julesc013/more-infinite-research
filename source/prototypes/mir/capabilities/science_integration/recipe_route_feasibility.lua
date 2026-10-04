@@ -87,11 +87,18 @@ local function supported_product_field(name)
   return false
 end
 
-local function entry_positive(entry)
+local function entry_positive(entry, canonical_recipe_product)
   if type(entry) ~= "table" then return false end
+  local declared_independent = entry.independent_probability
+  if canonical_recipe_product then
+    -- Schema-2 recipe facts synthesize an effective independent probability
+    -- even on legacy targets. Only the retained authored declaration may
+    -- invoke the foreign-field gate; do not change those canonical bytes.
+    declared_independent = entry.declared_independent_probability
+  end
   -- Foreign modern fields cannot create an acquisition witness on a target
   -- whose native product contract does not declare them.
-  if entry.independent_probability ~= nil and not supported_product_field("independent_probability")
+  if declared_independent ~= nil and not supported_product_field("independent_probability")
     or entry.shared_probability ~= nil and not supported_product_field("shared_probability")
     or entry.extra_count_fraction ~= nil and not supported_product_field("extra_count_fraction") then return false end
   local amount = entry.amount or entry[2]
@@ -124,10 +131,11 @@ local function entry_positive(entry)
   return amount > 0 or extra > 0
 end
 
-local function results_include_positive(results, output_identity, options)
+local function results_include_positive(results, output_identity, options, canonical_recipe_product)
   for _, result in ipairs(results or {}) do
     if not diagnostic_visit(options) then return false end
-    if same_identity(normalize_identity(result), output_identity) and entry_positive(result) then return true end
+    if same_identity(normalize_identity(result), output_identity)
+      and entry_positive(result, canonical_recipe_product) then return true end
   end
   return false
 end
@@ -662,7 +670,7 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
     else
       local results = normalized_results(variant, options)
       if not diagnostic_visit(options) then return nil
-      elseif not results_include_positive(results, output_identity, options) then
+      elseif not results_include_positive(results, output_identity, options, fact.schema == 2) then
         record_diagnostic_failure(options, {
           kind = "identity",
           recipe = recipe_name,

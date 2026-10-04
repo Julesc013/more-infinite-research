@@ -10,7 +10,8 @@
     "Possible baseline item output includes finite extra item fractions at zero base quantity and the native clamp of a ranged maximum to its minimum. Extra item counts do not establish fluid output.",
     "This corrects structural acquisition only. Productivity permissions, ownership and return-cone admission retain their separate guards; shared and fractional routes remain withheld from productivity admission.",
     "Modern product fields are checked against the selected platform's declared native contract; an undeclared fractional field cannot create a legacy acquisition witness.",
-    "The existing consumed researchability fixture adds 31 product cases. All 204 controlled module assertions pass; native package, machine, save and ecosystem qualification remains pending."
+    "Schema-2 canonical recipe facts retain a synthesized effective probability on older targets. Capability gating checks their authored declaration separately, preserving ordinary legacy acquisition and rejecting genuinely foreign fields without changing canonical fact bytes.",
+    "The consumed researchability fixture passes 204 assertions, including 31 product cases. The real recipe-source fixture passes 30 assertions, including 20 canonical product cases against actual F210/F200/F110/F100 target contracts. Native package, machine, save and ecosystem qualification remains pending."
   ],
   "semantic_domains": ["science", "compiler"],
   "audiences": ["players", "maintainers"],
@@ -31,6 +32,7 @@
   "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
   "references": [
     {"kind":"finding","value":"tests/compiler/researchability_planning.lua: YP1..YP31 product acquisition cases"},
+    {"kind":"finding","value":"tests/compiler/recipe_source_epoch.lua: CP2.1/1..5, CP2.0/1..5, CP1.1/1..5 and CP1.0/1..5 canonical product cases"},
     {"kind":"finding","value":"Factorio 2.1.20 prototype-api.json SHA-256 5D2AAB6483F33D1582D2FDFD661B4B9F6FF6A1F97548311524D062ECC32F200B"}
   ]
 }

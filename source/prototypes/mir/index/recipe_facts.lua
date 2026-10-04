@@ -54,7 +54,7 @@ end
 
 local function productive_amount(entry)
   if type(entry) ~= "table" then return 1 end
-  local maximum = tonumber(entry.amount_max or entry.amount or entry[2] or entry.amount_min) or 1
+  local maximum = recipe_semantics.maximum_base_result_amount(entry)
   local ignored = tonumber(entry.ignored_by_productivity or 0) or 0
   local probability = tonumber(entry.independent_probability)
   if probability == nil then probability = tonumber(entry.probability) end
