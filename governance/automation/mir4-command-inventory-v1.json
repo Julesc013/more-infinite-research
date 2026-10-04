@@ -723,9 +723,9 @@
     {
       "path": "scripts/Collect-MIRPlayerReport.ps1",
       "classification": "canonical-internal",
-      "sha256": "A64F6A5242556AB8DFBD566D0C1518C51DDD61BDBDE362B321BA364FEE84BCE2",
+      "sha256": "1F27786222E6C3D1EF1A8DFD65DF08BDE410BC5A7F9066D9A7D5F767293610FF",
       "hash_mode": "canonical-text-v1",
-      "lines": 206,
+      "lines": 225,
       "package_visible": false
     },
     {
@@ -6018,5 +6018,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e6efe4d5ed48443e494342abf82659dc7d8969c3c47333b19e34d1577a744cfe"
+  "digest": "sha256:276f55b3fc400b10ba537772f121f2e880c02898ae68c6e73179f60b305e484b"
 }
