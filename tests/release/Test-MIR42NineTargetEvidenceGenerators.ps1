@@ -94,15 +94,18 @@ Assert-MIR42NineGeneratorTest -Condition ([string]$nineContract.kind -ceq 'MIR42
 Assert-MIR42NineGeneratorTest -Condition ([string]$nineIndependentContract.rehash_kind -ceq 'MIR42NineTargetIndependentEvidenceRehashV1' -and [string]$nineIndependentContract.target_requirement -ceq 'all_nine_targets_required') -Code 'nine-independent-contract'
 
 function Test-MIR42NineCriterionEvidenceWriter {
-  param([Parameter(Mandatory)][string]$RepoRoot)
+  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet(1,2)][int]$SchemaVersion=1)
 
   $root = Join-Path $RepoRoot ('build/test-results/mir42-nine-criterion-evidence-' + [guid]::NewGuid().ToString('N'))
   New-Item -ItemType Directory -Force -Path $root | Out-Null
   $source = [pscustomobject][ordered]@{commit=('a' * 40);tree=('b' * 40);package_source_sha256=('C' * 64)}
+  # Match real constructor rows: commit/tree are in source; the fingerprint
+  # is a separately validated row field supplied by the input reader.
+  $constructionSource = [pscustomobject][ordered]@{commit=$source.commit;tree=$source.tree}
   $candidatePath = Join-Path $root 'candidate-manifest.json'
   $candidateRecord = [pscustomobject][ordered]@{
-    schema=1;kind='MIR42FourTargetDeterministicCandidateManifestV1';status='private-deterministic-nine-target-candidate-built-unqualified'
-    source=$source;build_complete=$true;record_sha256=''
+    schema=$SchemaVersion;kind="MIR42FourTargetDeterministicCandidateManifestV$SchemaVersion";status='private-deterministic-nine-target-candidate-built-unqualified'
+    source=$constructionSource;package_source_sha256=$source.package_source_sha256;build_complete=$true;record_sha256=''
   }
   Write-MIR4BootstrapRecord -Record $candidateRecord -Path $candidatePath | Out-Null
   $candidateReference = [pscustomobject][ordered]@{
@@ -110,7 +113,7 @@ function Test-MIR42NineCriterionEvidenceWriter {
   }
   $candidateRows = @(
     foreach ($target in $script:MIR42QualificationNineTargets) {
-      [pscustomobject][ordered]@{target=$target;scope='nine-target';source=$source;candidate_manifest=$candidateReference}
+      [pscustomobject][ordered]@{target=$target;scope='nine-target';source=$constructionSource;package_source_sha256=$source.package_source_sha256;candidate_manifest=$candidateReference}
     }
   )
   $originalCandidateRows = (Get-Item Function:Get-MIR42QualificationCandidateRows).ScriptBlock
@@ -146,6 +149,7 @@ function Test-MIR42NineCriterionEvidenceWriter {
         -KnownLimitations 'structural writer fixture only; no release qualification claimed' -OutputPath $output
       Assert-MIR42NineGeneratorTest -Condition ([string]$criterionRecords[$criterion].status -ceq 'passed' -and
         [string]$criterionRecords[$criterion].criterion -ceq $criterion -and
+        [string]$criterionRecords[$criterion].source.package_source_sha256 -ceq [string]$source.package_source_sha256 -and
         [string]$criterionRecords[$criterion].candidate_manifest.record_sha256 -ceq [string]$candidateReference.record_sha256) -Code ('criterion-writer-' + $criterion)
     }
     $badObservation = [pscustomobject][ordered]@{
@@ -161,12 +165,26 @@ function Test-MIR42NineCriterionEvidenceWriter {
         -KnownLimitations 'bad fixture' -OutputPath (Join-Path $root 'bad-performance-criterion.json') | Out-Null
     } catch { $rejected = $_.Exception.Message -match '^\[mir42-criterion-evidence-observation-binding\] performance-telemetry$' }
     Assert-MIR42NineGeneratorTest -Condition $rejected -Code 'criterion-performance-general-fps-rejected'
+    $reformattedPath = Join-Path $root 'reformatted-construction.json'
+    [IO.File]::WriteAllText($reformattedPath, ((Get-Content -Raw -LiteralPath $candidatePath) + [string][char]10), [Text.UTF8Encoding]::new($false))
+    $reformatted = Read-MIR42QualificationBootstrapRecord -Path $reformattedPath -Code 'mir42-criterion-reformatted-fixture'
+    Assert-MIR42NineGeneratorTest -Condition ([string]$reformatted.record_sha256 -ceq [string]$candidateReference.record_sha256 -and (Get-MIR4Sha256File -Path $reformattedPath) -cne [string]$candidateReference.sha256) -Code 'criterion-same-record-different-raw-bytes-control'
+    $rejected = $false
+    try {
+      New-MIR42NineTargetCriterionEvidence -RepoRoot $RepoRoot -CandidateManifestPath $candidatePath -Criterion 'package-exclusion' `
+        -ObservationPaths @($reformattedPath) -ObservedTargets @($script:MIR42QualificationNineTargets) -Claim 'bad fixture' `
+        -KnownLimitations 'bad fixture' -OutputPath (Join-Path $root 'reformatted-criterion.json') | Out-Null
+    } catch { $rejected = $_.Exception.Message -ceq '[mir42-criterion-evidence-observation-binding] package-exclusion' }
+    Assert-MIR42NineGeneratorTest -Condition ($rejected -and -not (Test-Path -LiteralPath (Join-Path $root 'reformatted-criterion.json'))) -Code 'criterion-reformatted-construction-refused-without-output'
   } finally {
     Set-Item Function:Get-MIR42QualificationCandidateRows -Value $originalCandidateRows
+    $null = Assert-MIR4DescendantPath -Root (Join-Path $RepoRoot 'build') -Path $root
+    $null = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path $root
+    if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
   }
 }
 
-Test-MIR42NineCriterionEvidenceWriter -RepoRoot $repo
+foreach($schemaVersion in @(1,2)){Test-MIR42NineCriterionEvidenceWriter -RepoRoot $repo -SchemaVersion $schemaVersion}
 
 $rejected = $false
 try { $null = Get-MIR42QualificationTargetScope -Rows @($modernRows + [pscustomobject][ordered]@{target='f017'}) -Code 'mir42-nine-generator-opposing' } catch { $rejected = $_.Exception.Message -match '^\[mir42-nine-generator-opposing-target-set\]' }

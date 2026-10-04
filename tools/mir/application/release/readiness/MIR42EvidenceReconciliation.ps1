@@ -645,8 +645,12 @@ function Get-MIR42CriterionEvidenceObservation {
     [string]$record.source.package_source_sha256 -ceq [string]$source.package_source_sha256 -and
     [string]$record.candidate_manifest.sha256 -ceq [string]$candidateManifest.sha256 -and
     [string]$record.candidate_manifest.record_sha256 -ceq [string]$candidateManifest.record_sha256
-  $candidateConstruction = [string]$record.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV1' -and
-    [string]$record.record_sha256 -ceq [string]$candidateManifest.record_sha256
+  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2') -and
+    [string]$record.record_sha256 -ceq [string]$candidateManifest.record_sha256 -and
+    (Get-MIR4Sha256File -Path $Path) -ceq [string]$candidateManifest.sha256
+  if ($candidateConstruction) {
+    $null = Get-MIR42CandidateConstructionVersionContract -RepoRoot $mir42QualificationRoot -Manifest $record
+  }
   $kindAndStateValid = switch ($Criterion) {
     'fresh-exact-loads' {
       $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetRealEngineEvidenceBinderV1' -and
@@ -695,7 +699,11 @@ function New-MIR42NineTargetCriterionEvidence {
   $candidateRows = Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$candidateRows[0].scope -cne 'nine-target') { throw '[mir42-criterion-evidence-candidate-scope]' }
   $candidate = [pscustomobject][ordered]@{
-    source = $candidateRows[0].source
+    source = [pscustomobject][ordered]@{
+      commit = [string]$candidateRows[0].source.commit
+      tree = [string]$candidateRows[0].source.tree
+      package_source_sha256 = [string]$candidateRows[0].package_source_sha256
+    }
     candidate_manifest = $candidateRows[0].candidate_manifest
     targets = @($candidateRows | ForEach-Object { [string]$_.target })
   }
