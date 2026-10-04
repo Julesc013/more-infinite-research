@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local technology_effects = require("prototypes.mir.integrity.technology_effects")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
@@ -111,6 +112,52 @@ function M.normalized_base_operation(operation)
   out.technology = technology_design.prototype_projection(out.technology_design, {validated = true})
   out.technology.type = "technology"
   return out
+end
+
+function M.sanitize_base_operations(base_plan, target_inventory)
+  local operations, removed_count, skipped_count, rejected_candidates = {}, 0, 0, {}
+  for _, source_operation in ipairs(base_plan or {}) do
+    local operation = M.normalized_base_operation(source_operation)
+    local kept, removed = technology_effects.sanitize_effects(
+      (operation.technology and operation.technology.effects) or {},
+      "CompilationPlan " .. tostring(operation.technology_name),
+      "generated",
+      target_inventory
+    )
+    removed_count = removed_count + #removed
+    if operation.technology then operation.technology.effects = kept end
+    if #kept > 0 then
+      operation.gates.effect_valid = gate_contract.passed(
+        "effect-contracts",
+        {#removed > 0 and "effect-contracts:sanitized" or "effect-contracts:all-targets-exist"}
+      )
+      operation.technology_design = technology_design.from_base_extension_operation(operation)
+      table.insert(operations, operation)
+    else
+      skipped_count = skipped_count + 1
+      local reason = #removed > 0 and "no_valid_effect_targets" or "no_base_extension_effects"
+      local evidence = #removed > 0 and "effect-contracts:all-targets-missing"
+        or "effect-contracts:no-base-effects"
+      operation.gates.effect_valid = gate_contract.failed(
+        "effect-contracts", reason, {evidence})
+      operation.technology_design = technology_design.from_base_extension_operation(operation)
+      table.insert(rejected_candidates, {
+        candidate_id = "base-continuation/" .. tostring(operation.key),
+        key = operation.key,
+        action = "reject",
+        reason = reason,
+        gates = operation.gates,
+        technology_design = operation.technology_design,
+        candidate_fingerprint = fingerprint.of({key = operation.key, reason = reason,
+          gates = operation.gates})
+      })
+    end
+  end
+  return operations, {
+    removed_effect_count = removed_count,
+    skipped_base_extension_count = skipped_count,
+    rejected_candidates = rejected_candidates
+  }
 end
 
 return M

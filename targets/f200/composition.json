@@ -2684,8 +2684,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compilation-plan model responsibility for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5461,
-      "expected_sha256": "86AA8D0509BA5BE80E536569077A8E478FC0662B45717C2FA7E2123C334059D6",
+      "expected_bytes": 7601,
+      "expected_sha256": "A2DE1CBF191643A44896038F4703D507EBFC3868CBFDF4E6077B7A7E4720EBE9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2700,8 +2700,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compilation-plan build responsibility for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 34252,
-      "expected_sha256": "68AD91C0F94F490DE1B26226A39CC859377AA22E085652A8B5BA95DAF3A03582",
+      "expected_bytes": 32308,
+      "expected_sha256": "41D35180C1DB3035A71F3563D69F2FB3B08113FC34580092F877F796D0E57763",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "9CE977E8DDDB05256D658902006CFA8FC9C8DB2140521F3C028531E3ED6BD4B2"
+  "record_sha256": "0F78CBCDF0E39D3292915373725C1B32EA758FD736FEAD214CD1A70F801E6FDD"
 }
