@@ -18,7 +18,9 @@ end
 
 _G.log = function(_) end
 _G.data = {raw = {}, extend = function() error("Unexpected prototype mutation") end}
-local target_profile = {current_factorio_version = "2.1"}
+local target_profile = {current_factorio_version = "2.1", prototype_shapes = {
+  product_probability_fields = {"independent_probability", "shared_probability", "extra_count_fraction"}
+}}
 target_profile.current = function() return target_profile end
 stub("prototypes.mir.platform.factorio.target_profiles", target_profile)
 stub("prototypes.mir.platform.factorio.prototype_lookup", {
@@ -2781,6 +2783,22 @@ local product_cases = {
 for index, case in ipairs(product_cases) do
   check("YP" .. index, (product_acquisition_witness(case[1]) ~= nil) == case[2], case[3])
 end
+local modern_fields = target_profile.prototype_shapes.product_probability_fields
+target_profile.prototype_shapes.product_probability_fields = {"probability", "catalyst_amount"}
+check("YP26", product_acquisition_witness({amount = 1, probability = 0.5}) ~= nil,
+  "The declared legacy probability contract remains usable")
+check("YP27", product_acquisition_witness({amount = 0, extra_count_fraction = 0.5}) == nil,
+  "An undeclared fractional field cannot seed a legacy target")
+check("YP28", product_acquisition_witness({amount = 1, shared_probability = {min = 0, max = 1}}) == nil,
+  "An undeclared shared field is withheld on a legacy target")
+check("YP29", product_acquisition_witness({amount = 1, independent_probability = 0.5}) == nil,
+  "An undeclared independent field is withheld on a legacy target")
+target_profile.prototype_shapes.product_probability_fields = {"probability", "extra_count_fraction"}
+check("YP30", product_acquisition_witness({amount = 0, probability = 0.5, extra_count_fraction = 0.5}) ~= nil,
+  "The F200 declared fractional and legacy probability combination remains usable")
+check("YP31", product_acquisition_witness({amount = 1, shared_probability = {min = 0, max = 1}}) == nil,
+  "The F200 contract does not acquire a shared-roll capability")
+target_profile.prototype_shapes.product_probability_fields = modern_fields
 end)()
 end
 

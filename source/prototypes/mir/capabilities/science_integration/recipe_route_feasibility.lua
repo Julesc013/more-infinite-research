@@ -78,8 +78,22 @@ end
 -- every nested result/category/source iterator charge the same work budget.
 local diagnostic_visit
 
+local function supported_product_field(name)
+  local profile = target_profiles.current()
+  local fields = profile and profile.prototype_shapes and profile.prototype_shapes.product_probability_fields
+  for _, field in ipairs(fields or {}) do
+    if field == name then return true end
+  end
+  return false
+end
+
 local function entry_positive(entry)
   if type(entry) ~= "table" then return false end
+  -- Foreign modern fields cannot create an acquisition witness on a target
+  -- whose native product contract does not declare them.
+  if entry.independent_probability ~= nil and not supported_product_field("independent_probability")
+    or entry.shared_probability ~= nil and not supported_product_field("shared_probability")
+    or entry.extra_count_fraction ~= nil and not supported_product_field("extra_count_fraction") then return false end
   local amount = entry.amount or entry[2]
   if amount == nil then
     if entry.amount_min ~= nil or entry.amount_max ~= nil then
