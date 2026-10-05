@@ -1086,7 +1086,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRPassiveRepair.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target>",
+      "command": "./tests/runtime/Test-MIRPassiveRepair.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/runtime/Test-MIRPassiveRepair.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -1097,6 +1097,8 @@
       "inputs": [
         "tests/runtime/Test-MIRPassiveRepair.ps1",
         "tests/runtime/passive_repair_host_probe.lua",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         "source:source/prototypes/mir/runtime/effects/passive_repair.lua",
         "source:source/prototypes/mir/settings/catalog.lua",
         "source:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
@@ -1112,7 +1114,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRPassiveRepair.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target> -Enabled",
+      "command": "./tests/runtime/Test-MIRPassiveRepair.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target> -Enabled -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/runtime/Test-MIRPassiveRepair.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -1123,6 +1125,8 @@
       "inputs": [
         "tests/runtime/Test-MIRPassiveRepair.ps1",
         "tests/runtime/passive_repair_host_probe.lua",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         "source:source/prototypes/mir/runtime/effects/passive_repair.lua",
         "source:source/prototypes/mir/settings/catalog.lua",
         "source:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
@@ -7974,5 +7978,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d1e01fdae168abbd8f999afeb9b034abd5a845551bfc2d053deb03f7aa6d6305"
+  "digest": "sha256:623279a7352a31bd3b0dffe3f652fdcf68485c474713330ed1f8a1a1f7fc983b"
 }

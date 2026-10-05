@@ -21,7 +21,8 @@ function Assert-MIRKnownStagingImpactRouting {
     'tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1',
     'tests/runtime/Test-MIRBobAngelTinFinalStateAudit.ps1',
     'tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1',
-    'tests/runtime/Test-MIRA06AluminiumFinalState.ps1'
+    'tests/runtime/Test-MIRA06AluminiumFinalState.ps1',
+    'tests/runtime/Test-MIRPassiveRepair.ps1'
   )
   $expected=@($manifest.baseline_scenarios|Sort-Object)-join'|'
   foreach($path in $paths){
@@ -38,7 +39,7 @@ function Assert-MIRKnownStagingImpactRouting {
   if(-not$selection.requires_full-or$unknown-notin$selection.unmapped_runtime_paths){throw 'Known staging rules masked unknown runtime behavior.'}
   $player=Get-MIRAssuranceClassification -Paths @('source/prototypes/mir/runtime/future_behavior.lua') -Config $policy
   if('runtime.full'-notin$player.tests){throw 'Player runtime source lost its broader checks.'}
-  Write-Host '[ok] seven known staging paths retain baseline impact and immutable-input checks; unknown and mixed runtime changes escalate.'
+  Write-Host '[ok] eight known staging paths retain baseline impact and immutable-input checks; unknown and mixed runtime changes escalate.'
 }
 Assert-MIRKnownStagingImpactRouting
 if($ImpactRoutingOnly){return}
