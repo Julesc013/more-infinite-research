@@ -5,6 +5,7 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/BrowserContinuityInputs.ps1')
+. (Join-Path $repo 'tests/support/MIRMaterialAuditInputs.ps1')
 $fixture=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo ('build/tmp/native-probe-fixture-'+[guid]::NewGuid().ToString('N')))
 $assertions=0;$lease=$null;$completed=$false
 function Assert-Probe([bool]$Condition,[string]$Message) {
@@ -200,6 +201,20 @@ try {
   $source=Join-Path $fixture 'dependency.zip'
   [IO.File]::WriteAllBytes($source,[byte[]]::new(128KB))
   $archiveInput=[ordered]@{source_path=$source;file_name='dependency.zip';expected_sha256=Get-MIRImmutableInputSha256 $source;role='dependency-mod';identity=@{name='controlled'};provenance=@{kind='tiny-controlled-fixture'};immutable=$true}
+  $auditCandidate=Join-Path $fixture 'more-infinite-research_4.2.21000.zip';[IO.File]::WriteAllBytes($auditCandidate,[byte[]]::new(64))
+  $auditRun=Join-Path $fixture 'material-audit';New-Item -ItemType Directory -Path $auditRun|Out-Null
+  $auditLease=New-MIRMaterialAuditInputLease -RunRoot $auditRun -ModsDirectory (Join-Path $auditRun 'mods') -CandidateArchive $auditCandidate -DependencyDirectory $fixture -ExpectedArchives ([ordered]@{'dependency.zip'=$archiveInput.expected_sha256})
+  try{
+    Assert-Probe ($auditLease.record.require_hard_links-and$auditLease.record.inputs.Count-eq 2) 'material audit did not require strict candidate/dependency inputs.'
+    foreach($input in $auditLease.record.inputs){Assert-Probe ((Get-MIRImmutableInputFileIdentity $input.source_path)-ceq(Get-MIRImmutableInputFileIdentity $input.stage_path)) 'material audit copied an archive.'}
+    $auditTerminal=Complete-MIRImmutableInputLease -Lease $auditLease
+    $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $auditTerminal
+    Assert-Probe (($auditTerminal.inputs.role-join'|')-ceq'candidate|dependency-mod') 'material audit lost candidate/dependency roles.'
+  }finally{if(-not$auditLease.closed){$null=Complete-MIRImmutableInputLease -Lease $auditLease -Outcome failed}}
+  $badRun=Join-Path $fixture 'material-audit-invalid'
+  Refuses-Probe {New-MIRMaterialAuditInputLease -RunRoot $badRun -ModsDirectory (Join-Path $badRun 'mods') -CandidateArchive $auditCandidate -DependencyDirectory $fixture -ExpectedArchives ([ordered]@{'dependency.zip'=('0'*64)})} 'dependency-hash'
+  Assert-Probe (-not(Test-Path -LiteralPath $badRun)) 'material audit allocated before exact dependency validation.'
+  Refuses-Probe {New-MIRMaterialAuditInputLease -RunRoot $badRun -ModsDirectory (Join-Path $badRun 'mods') -CandidateArchive $auditCandidate -DependencyDirectory $fixture -ExpectedArchives ([ordered]@{'absent.zip'=$archiveInput.expected_sha256})} 'dependency-missing'
   . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
   $compatMods=Join-Path $fixture 'compat-mods';New-Item -ItemType Directory -Path $compatMods | Out-Null
   $compatEntry=[pscustomobject]@{file_name='dependency.zip';source_path=$source;sha256=$archiveInput.expected_sha256}

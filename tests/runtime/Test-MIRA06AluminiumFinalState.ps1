@@ -11,6 +11,12 @@ param(
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tests/support/MIRMaterialAuditInputs.ps1')
+$inputLease=$null
+trap {
+  if($null-ne$inputLease-and-not$inputLease.closed){try{$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed}catch{Write-Warning $_.Exception.Message}}
+  throw $_
+}
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $modsRoot=(Resolve-Path -LiteralPath $ModsDir).Path
 $locks=[ordered]@{
@@ -53,8 +59,10 @@ $candidateZip=(Resolve-Path -LiteralPath $CandidateZip).Path
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip=[IO.Compression.ZipFile]::OpenRead($candidateZip);try{$forbidden=@($zip.Entries|Where-Object{$_.FullName -match '(^|/)(fixtures|tests|docs|[.]mir|build|dist)(/|$)'});if($forbidden.Count -ne 0){throw "candidate contains package-excluded path $($forbidden[0].FullName)"}}finally{$zip.Dispose()}
 $run=Join-Path $output ([guid]::NewGuid().ToString('N'));$mods=Join-Path $run 'mods';New-Item -ItemType Directory -Force -Path $mods,(Join-Path $run 'userdata')|Out-Null
-Copy-Item -LiteralPath $candidateZip -Destination (Join-Path $mods ([IO.Path]::GetFileName($candidateZip)))
-$archiveArtifacts=@();foreach($name in @($spec.archives)){$source=Join-Path $modsRoot $name;Assert-A06 (Test-Path -LiteralPath $source -PathType Leaf) "missing $Profile lock $source";Assert-A06 ((Get-A06Sha $source) -ceq $locks[$name]) "$Profile lock hash differs $name";Copy-Item -LiteralPath $source -Destination $mods;$archiveArtifacts+=Get-A06Artifact (Join-Path $mods $name)}
+
+$selectedArchives=[ordered]@{};foreach($name in @($spec.archives)){$selectedArchives[$name]=$locks[$name]}
+$inputLease=New-MIRMaterialAuditInputLease -RunRoot $run -ModsDirectory $mods -CandidateArchive $candidateZip -DependencyDirectory $modsRoot -ExpectedArchives $selectedArchives
+$archiveArtifacts=@();foreach($name in @($spec.archives)){$source=Join-Path $modsRoot $name;Assert-A06 (Test-Path -LiteralPath $source -PathType Leaf) "missing $Profile lock $source";Assert-A06 ((Get-A06Sha $source) -ceq $locks[$name]) "$Profile lock hash differs $name";$archiveArtifacts+=Get-A06Artifact (Join-Path $mods $name)}
 $fixture=Join-Path $repo 'fixtures/assert-a06-aluminium-final-state';Assert-A06 (Test-Path -LiteralPath $fixture -PathType Container) 'Aluminium observer fixture is absent.';Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-fixture-assert-a06-aluminium-final-state' -Version '0.1.0' -ModsDir $mods|Out-Null
 Initialize-MIRSettingsOverrideMod -ModsDir $mods -FactorioVersion '2.1';Set-CopiedStartupSettingDefaults -ModsDir $mods -Overrides @{'mir-debug-generation-report'=$true;'ips-enable-research_material_aluminium'=$true};Set-CopiedMIRSettingsProfileDefault -ModsDir $mods -Settings @{'ips-enable-research_material_aluminium'=$true};Complete-MIRSettingsOverrideMod -ModsDir $mods
 $officialMods=@('base','elevated-rails','quality','recycler','space-age');$modNames=@($officialMods+@('more-infinite-research')+@($spec.mods)+@('mir-fixture-assert-a06-aluminium-final-state','mir-validation-settings-overrides'));$modList=[ordered]@{mods=@($modNames|ForEach-Object{[ordered]@{name=$_;enabled=($_ -in @($spec.official) -or $_ -notin $officialMods)}})}
@@ -94,5 +102,6 @@ $resultStatus=if($Profile -eq 'combined'){'withheld-by-acyclic-guard'}else{'pass
 $dirtyAliasSource=$null;$dirtyAliasSourceSha=$null;$refreshedSourceManifest=$null;$refreshedSourceManifestSha=$null
 if($boundedDirtyAliasSources){$dirtyAliasSource=$allowedAliasSources[0];$dirtyAliasSourceSha=$aliasSourceSha;$refreshedSourceManifest=$allowedAliasSources[1];$refreshedSourceManifestSha=$sourceManifestSha}
 $sourceRecord=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-A06Sha (Join-Path $repo 'source/package-source.json');package_source_roots_clean=$sourceRootClean;source_mode=$sourceMode;bounded_dirty_alias_source=$dirtyAliasSource;bounded_dirty_alias_source_sha256=$dirtyAliasSourceSha;refreshed_source_manifest=$refreshedSourceManifest;refreshed_source_manifest_sha256=$refreshedSourceManifestSha}
-$result=[ordered]@{schema=1;kind='MIR4A06AluminiumFinalStateProbeResultV1';status=$resultStatus;profile=$Profile;engine=[ordered]@{version=$engineVersion;executable_sha256=Get-A06Sha $engine};source=$sourceRecord;candidate=Get-A06Artifact $candidateZip;mod_archives=$archiveArtifacts;mod_list=Get-A06Artifact (Join-Path $mods 'mod-list.json');fixture=[ordered]@{path='fixtures/assert-a06-aluminium-final-state';files=@($fixtureFiles|ForEach-Object{Get-A06Artifact (Join-Path $fixture $_)})};harness=Get-A06Artifact $PSCommandPath;settings_override=Get-A06Artifact (Join-Path $mods 'mir-validation-settings-overrides_0.1.0.zip');save=Get-A06Artifact $save;logs=[ordered]@{engine=Get-A06Artifact (Join-Path $run 'engine.log');factorio=Get-A06Artifact $factorioEvidence};observation=Get-A06Artifact $observationPath;non_claims=@($observation.non_claims)}
+$inputStaging=Complete-MIRImmutableInputLease -Lease $inputLease
+$result=[ordered]@{input_staging=$inputStaging;schema=1;kind='MIR4A06AluminiumFinalStateProbeResultV1';status=$resultStatus;profile=$Profile;engine=[ordered]@{version=$engineVersion;executable_sha256=Get-A06Sha $engine};source=$sourceRecord;candidate=Get-A06Artifact $candidateZip;mod_archives=$archiveArtifacts;mod_list=Get-A06Artifact (Join-Path $mods 'mod-list.json');fixture=[ordered]@{path='fixtures/assert-a06-aluminium-final-state';files=@($fixtureFiles|ForEach-Object{Get-A06Artifact (Join-Path $fixture $_)})};harness=Get-A06Artifact $PSCommandPath;settings_override=Get-A06Artifact (Join-Path $mods 'mir-validation-settings-overrides_0.1.0.zip');save=Get-A06Artifact $save;logs=[ordered]@{engine=Get-A06Artifact (Join-Path $run 'engine.log');factorio=Get-A06Artifact $factorioEvidence};observation=Get-A06Artifact $observationPath;non_claims=@($observation.non_claims)}
 $resultPath=Join-Path $run 'result.json';[IO.File]::WriteAllText($resultPath,(($result|ConvertTo-Json -Depth 20)+"`n"),[Text.UTF8Encoding]::new($false));$result|ConvertTo-Json -Depth 20;Write-Output "Evidence: $run"

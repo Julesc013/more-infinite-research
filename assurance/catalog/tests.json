@@ -614,7 +614,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F210 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F210 -SourceVersion 4.2.1 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240 -ExpectedPeakMemoryMiB 3072 -MaxNewOutputMiB 240",
       "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -624,6 +624,8 @@
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+        "tools/lib/validation/BrowserContinuityInputs.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
         "fixtures/assert-browser-personal-state-continuity/**",
         "source:source/prototypes/mir/runtime/research_browser.lua",
         "source:source/locale/en/more-infinite-research.cfg",
@@ -745,7 +747,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -FactorioExe <factorio> -CandidateArchive <candidate> -InputMode ScriptedFixture -TimeoutSeconds 240",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -SourceVersion 4.2.1 -FactorioExe <factorio> -CandidateArchive <candidate> -InputMode ScriptedFixture -TimeoutSeconds 240 -ExpectedPeakMemoryMiB 3072 -MaxNewOutputMiB 240",
       "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -755,6 +757,8 @@
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+        "tools/lib/validation/BrowserContinuityInputs.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
         "fixtures/assert-browser-personal-state-continuity/**",
         "source:source/prototypes/mir/runtime/research_browser.lua",
         "source:source/locale/en/more-infinite-research.cfg",
@@ -1649,6 +1653,9 @@
       "inputs": [
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/BrowserContinuityInputs.ps1",
+        "tests/support/MIRMaterialAuditInputs.ps1",
+        "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
         "tools/lib/assurance/evidence/CommandExecution.ps1",
         "tools/mir/application/release/readiness/Common.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
@@ -7967,5 +7974,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f034a658b75b51a40d32a13ca80fc5144dbcf798dc9fa010278e6ca60499b41c"
+  "digest": "sha256:d1e01fdae168abbd8f999afeb9b034abd5a845551bfc2d053deb03f7aa6d6305"
 }
