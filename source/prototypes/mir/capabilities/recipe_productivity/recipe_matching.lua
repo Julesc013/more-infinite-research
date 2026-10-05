@@ -925,6 +925,17 @@ local function gather_by_items(items, patterns, options)
   for _, rname in ipairs(recipe_facts.candidate_names(want, candidate_categories, candidate_patterns)) do
     local r = recipe_facts.view(rname)
     if not should_skip_recipe(rname, r, options) then
+      local required_output = options.required_productive_outputs == nil
+      if type(options.required_productive_outputs) == "table" then
+        for _, wanted in ipairs(options.required_productive_outputs) do
+          local identity = typed_identity(wanted)
+          if identity then
+            for _, actual in ipairs(r.productive_result_identities or {}) do
+              if typed_identity(actual) == identity then required_output = true; break end
+            end
+          end
+        end
+      end
       local outs = {}
       for _, output_name in ipairs(r.productive_result_names or {}) do outs[output_name] = true end
       local match = false
@@ -942,7 +953,7 @@ local function gather_by_items(items, patterns, options)
       if not match and options.recipe_patterns and name_matches(rname, options.recipe_patterns) then
         match = true
       end
-      if match and not seen[rname] then
+      if match and required_output and not seen[rname] then
         seen[rname] = true
         table.insert(list, rname)
       end
@@ -959,8 +970,11 @@ local function recipes_for_stream_uncached(spec, per_level_default)
     for _, g in ipairs(spec.groups) do
       local list = {}
       if not g.structural_fallback or automatic_policy.apply_changes then
+        local required_outputs = g.required_productive_outputs
+        if required_outputs == nil then required_outputs = spec.required_productive_outputs end
         list = gather_by_items(g.items, g.item_patterns, {
           fluids = g.fluids,
+          required_productive_outputs = required_outputs,
           fluid_patterns = merge_lists(spec.fluid_patterns, g.fluid_patterns),
           extra_outputs = g.extra_outputs,
           recipe_patterns = merge_lists(spec.recipe_patterns, g.recipe_patterns),
@@ -1006,6 +1020,7 @@ local function recipes_for_stream_uncached(spec, per_level_default)
   end
   local list = gather_by_items(spec.items, spec.item_patterns, {
     fluids = spec.fluids,
+    required_productive_outputs = spec.required_productive_outputs,
     fluid_patterns = spec.fluid_patterns,
     extra_outputs = spec.extra_outputs,
     recipe_patterns = spec.recipe_patterns,

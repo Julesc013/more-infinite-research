@@ -1066,4 +1066,64 @@ end)()
   effective.get=previous_get
 end)()
 
+-- A retained producer name must still produce the chemical as a productive
+-- fluid. These source controls do not qualify a final Angel recipe graph.
+do
+  local subject = "angels-liquid-nitric-acid"
+  local function chemical_route(output_type, output_name)
+    local fact = canonical_route(subject, "feed", output_name or subject)
+    fact.variants[1].results[1].type = output_type
+    fact.productive_result_identities = {{type = output_type, name = output_name or subject}}
+    return fact
+  end
+  local function selected(fact, changes, other_recipes, grouped)
+    local available = {[subject] = fact}
+    for name, route in pairs(other_recipes or {}) do available[name] = route end
+    environment(available)
+    risks = {}
+    local options = {
+      recipe_patterns = {"^angels%-liquid%-nitric%-acid$"},
+      required_productive_outputs = {{type = "fluid", name = subject}},
+      reject_explicit_productivity_denial = true
+    }
+    for field, value in pairs(changes or {}) do options[field] = value end
+    local spec = {require_acyclic_process = true}
+    if grouped ~= false then options.change = 0.02; spec.groups = {options}
+    else for field, value in pairs(options) do spec[field] = value end end
+    local buckets = matcher.recipes_for_stream(spec, 0.02)
+    local names = {}
+    for _, bucket in ipairs(buckets) do for _, name in ipairs(bucket.recipes) do names[#names + 1] = name end end
+    return names
+  end
+  check(#selected(chemical_route("fluid")) == 1, "named productive chemical fluid is selected")
+  check(#selected(chemical_route("fluid"), nil, nil, false) == 1,
+    "typed output requirement is also consumed for a non-group declaration")
+  check(#selected(chemical_route("item")) == 0, "same-named item cannot satisfy a chemical fluid")
+  check(#selected(chemical_route("fluid", "changed-fluid")) == 0,
+    "the retained recipe name cannot qualify a changed output")
+  local excluded = chemical_route("fluid")
+  excluded.productive_result_identities = {}
+  check(#selected(excluded) == 0, "nonproductive chemical result does not receive a bonus")
+  check(#selected(chemical_route("fluid"), {required_productive_outputs = {}}) == 0,
+    "empty typed output requirements withhold a route")
+  check(#selected(chemical_route("fluid"), {required_productive_outputs = false}) == 0,
+    "malformed typed output requirements withhold a route")
+  check(#selected(chemical_route("fluid"), {required_productive_outputs = {{name = subject}}}) == 0,
+    "untyped output requirements withhold a route")
+  local denied = chemical_route("fluid")
+  denied.allow_productivity = false
+  denied.variants[1].allow_productivity = false
+  check(#selected(denied) == 0, "typed chemical matching cannot override an explicit productivity ban")
+  check(#selected(chemical_route("fluid"), nil, {reclaim = recipe(subject, "feed", "fluid", "item")}) == 0,
+    "typed chemical matching cannot bypass a real return cycle")
+  local coproduct = chemical_route("fluid")
+  coproduct.variants[1].results[2] = entry("salt", 1)
+  coproduct.productive_result_identities[2] = {type = "item", name = "salt"}
+  check(#selected(coproduct) == 1, "an ordinary acyclic coproduct does not erase the useful chemical")
+  check(#selected(coproduct, nil, {reclaim = recipe("salt", "feed")}) == 0,
+    "a return through a coproduct still withholds the chemical route")
+  check(#selected(chemical_route("fluid"), nil, {["angels-liquid-nitric-acid-void"] = recipe(subject, "waste", "fluid", "item")}) == 1,
+    "a separate void route cannot enter the exact producer selection")
+end
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

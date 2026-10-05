@@ -1,13 +1,14 @@
 {
   "schema": 3,
   "kind": "MIR4ChangeFragmentV3",
-  "change_id": "MIR4-CHG-2026-0098",
+  "change_id": "MIR4-CHG-2026-0100",
   "status": "draft",
   "change_type": "added",
-  "summary": "Extend admitted K2 material research through a separate level-four stage.",
+  "summary": "Add conditional Angel nitric, hydrochloric, hydrofluoric acid and glycerol productivity research.",
   "details": [
-    "Rare Metals, Silicon, Glass and black/white paving now declare the existing staged continuation. Their early IDs still end at three; later levels retain admitted recipes, increments and cost controls. The combined configured cap defaults to zero while useful recipe headroom supplies a finite effective limit.",
-    "Explicit cap three, native owners, withheld early rows, saturation and unavailable science prevent continuation. The five new stable IDs do not widen route permissions, certificates or the retained Imersite guard. Current-package K2/K2SO production, save and profile qualification remain outstanding."
+    "Four retained Angel Petrochem fluids now declare the shared material stages: three early levels at +2% per level and a separate useful continuation from level four. Exact observed producer names must still contain the requested productive fluid output.",
+    "Final recipe permission, complete process safety, ownership, unlocks, reachable science and laboratory checks retain authority. These declarations grant no permission or route-certificate exception.",
+    "Void routes, changed outputs and same-named items do not qualify. Actual current-package route admission, production, catalogue and save qualification remain outstanding."
   ],
   "semantic_domains": [
     "progression",
@@ -24,12 +25,12 @@
     {
       "target": "F210",
       "disposition": "affected",
-      "reason": "Adds conditional staged material progression and a zero combined-cap default; current native acceptance is pending."
+      "reason": "Adds conditional fluid research and staged settings on recipe-productivity targets; current native acceptance is pending."
     },
     {
       "target": "F200",
       "disposition": "affected",
-      "reason": "Adds conditional staged material progression and a zero combined-cap default; current native acceptance is pending."
+      "reason": "Adds conditional fluid research and staged settings on recipe-productivity targets; current native acceptance is pending."
     },
     {
       "target": "F110",
@@ -88,11 +89,11 @@
   "references": [
     {
       "kind": "finding",
-      "value": "source/prototypes/mir/families/material_progression.lua"
+      "value": "fixtures/assert-community-manufacturing-intake/expected-vs-observed-vs-realized.json"
     },
     {
       "kind": "finding",
-      "value": "tests/compiler/material_continuation.lua"
+      "value": "tests/compiler/material_routes.lua"
     },
     {
       "kind": "document",

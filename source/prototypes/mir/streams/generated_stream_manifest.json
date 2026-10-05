@@ -1759,6 +1759,126 @@
       "targets": [
         "stream:research_material_nitinol"
       ]
+    },
+    "recipe-prod-research_material_glycerol-1": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_glycerol",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_glycerol-1",
+      "stream_key": "research_material_glycerol",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_glycerol"
+      ]
+    },
+    "recipe-prod-research_material_glycerol-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_glycerol",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_glycerol-4",
+      "stream_key": "research_material_glycerol__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_glycerol"
+      ]
+    },
+    "recipe-prod-research_material_hydrochloric_acid-1": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_hydrochloric_acid",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_hydrochloric_acid-1",
+      "stream_key": "research_material_hydrochloric_acid",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_hydrochloric_acid"
+      ]
+    },
+    "recipe-prod-research_material_hydrochloric_acid-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_hydrochloric_acid",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_hydrochloric_acid-4",
+      "stream_key": "research_material_hydrochloric_acid__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_hydrochloric_acid"
+      ]
+    },
+    "recipe-prod-research_material_hydrofluoric_acid-1": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_hydrofluoric_acid",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_hydrofluoric_acid-1",
+      "stream_key": "research_material_hydrofluoric_acid",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_hydrofluoric_acid"
+      ]
+    },
+    "recipe-prod-research_material_hydrofluoric_acid-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_hydrofluoric_acid",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_hydrofluoric_acid-4",
+      "stream_key": "research_material_hydrofluoric_acid__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_hydrofluoric_acid"
+      ]
+    },
+    "recipe-prod-research_material_nitric_acid-1": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_nitric_acid",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_nitric_acid-1",
+      "stream_key": "research_material_nitric_acid",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_nitric_acid"
+      ]
+    },
+    "recipe-prod-research_material_nitric_acid-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_nitric_acid",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_nitric_acid-4",
+      "stream_key": "research_material_nitric_acid__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_nitric_acid"
+      ]
     }
   }
 }

@@ -339,11 +339,17 @@ for _, subject in ipairs({
   {"research_material_silicon", "kr-silicon"},
   {"research_material_glass", "kr-glass"},
   {"research_material_black_paving", "kr-black-reinforced-plate"},
-  {"research_material_white_paving", "kr-white-reinforced-plate"}
+  {"research_material_white_paving", "kr-white-reinforced-plate"},
+  {"research_material_nitric_acid", "angels-liquid-nitric-acid", "angel"},
+  {"research_material_hydrochloric_acid", "angels-liquid-hydrochloric-acid", "angel"},
+  {"research_material_hydrofluoric_acid", "angels-liquid-hydrofluoric-acid", "angel"},
+  {"research_material_glycerol", "angels-liquid-glycerol", "angel"}
 }) do
   local key, recipe_name = subject[1], subject[2]
   recipe_prototypes[recipe_name] = {maximum_productivity = 3}
-  local family = progression.attach_k2_material_continuation(key, {max_level = 3})
+  local attach = subject[3] == "angel" and progression.attach_angel_petrochem_continuation
+    or progression.attach_k2_material_continuation
+  local family = attach(key, {max_level = 3})
   local early = {
     action = "emit", stream_key = key, technology_name = "recipe-prod-" .. key .. "-1", spec = family,
     planned_max_level = 3,

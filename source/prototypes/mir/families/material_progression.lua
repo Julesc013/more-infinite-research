@@ -53,6 +53,13 @@ local K2_MATERIAL_CONTINUATION_STREAM_KEYS = {
   "research_material_white_paving"
 }
 
+local ANGEL_PETROCHEM_STREAM_KEYS = {
+  "research_material_nitric_acid",
+  "research_material_hydrochloric_acid",
+  "research_material_hydrofluoric_acid",
+  "research_material_glycerol"
+}
+
 local MATERIAL_STREAM_KEY_SET = {}
 for _, key in ipairs(MATERIAL_STREAM_KEYS) do MATERIAL_STREAM_KEY_SET[key] = true end
 
@@ -67,11 +74,16 @@ for _, key in ipairs(K2_MATERIAL_CONTINUATION_STREAM_KEYS) do
 end
 
 local STAGED_MATERIAL_STREAM_KEY_SET = {}
+local ANGEL_PETROCHEM_STREAM_KEY_SET = {}
 for key in pairs(MATERIAL_STREAM_KEY_SET) do STAGED_MATERIAL_STREAM_KEY_SET[key] = true end
 for key in pairs(K2_213_CONTINUATION_STREAM_KEY_SET) do
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
 end
 for key in pairs(K2_MATERIAL_CONTINUATION_STREAM_KEY_SET) do
+  STAGED_MATERIAL_STREAM_KEY_SET[key] = true
+end
+for _, key in ipairs(ANGEL_PETROCHEM_STREAM_KEYS) do
+  ANGEL_PETROCHEM_STREAM_KEY_SET[key] = true
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
 end
 
@@ -101,6 +113,12 @@ end
 function M.k2_material_stream_keys()
   local out = {}
   for index, key in ipairs(K2_MATERIAL_CONTINUATION_STREAM_KEYS) do out[index] = key end
+  return out
+end
+
+function M.angel_petrochem_stream_keys()
+  local out = {}
+  for index, key in ipairs(ANGEL_PETROCHEM_STREAM_KEYS) do out[index] = key end
   return out
 end
 
@@ -262,6 +280,13 @@ end
 function M.attach_k2_material_continuation(key, spec)
   if not K2_MATERIAL_CONTINUATION_STREAM_KEY_SET[key] then
     error("K2 material continuation does not support stream " .. tostring(key) .. ".", 2)
+  end
+  return attach(key, spec)
+end
+
+function M.attach_angel_petrochem_continuation(key, spec)
+  if not ANGEL_PETROCHEM_STREAM_KEY_SET[key] then
+    error("Angel petrochem continuation does not support stream " .. tostring(key) .. ".", 2)
   end
   return attach(key, spec)
 end

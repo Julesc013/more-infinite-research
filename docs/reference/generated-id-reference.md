@@ -14,6 +14,8 @@ source_of_truth_for:
 
 # Generated ID Reference
 
+MIR 4.2.1 development also predeclares early `-1` and continuation `-4` identities for `research_material_nitric_acid`, `research_material_hydrochloric_acid`, `research_material_hydrofluoric_acid` and `research_material_glycerol`. These four Angel fluid families select only the retained named producers with the requested productive fluid result. The existing process, permission, ownership and progression gates still decide emission. Current native route admission, earned production, catalogue and save qualification remain pending.
+
 ## Predeclared Automatic Family IDs
 
 MIR 3.1.0 predeclares `mir-auto-prod-manufacturing-assembling-machine-1` and `mir-auto-prod-manufacturing-lab-1`. These IDs derive from stable semantic family names, never from mod or recipe names. Both are experimental in 3.1.5: they remain absent in the default attachment-only policy and in reviewed-data creation mode. The explicit broad opt-in policy may emit them after whole-plan validation. Predeclaration stabilizes identity; it does not assert that balance, grouping, or progression is accepted.
