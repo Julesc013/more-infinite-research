@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -31,6 +31,10 @@ Resolve and rehearse promotion topology and effective rules before freeze. A rou
 ## Release identity and mutable publication
 
 Source `MAJOR.MINOR.PATCH` and registered target `CCC` produce a five-digit third component using `100 * integer(CCC) + PATCH`. Source 4.2.0 therefore uses `4.2.CCC00`; source 4.2.1 uses `4.2.CCC01`. A prerelease label, build retry or changed evidence never changes the numeric patch. Keep the ZIP root, `info.json`, packaged changelog, filename, manifest, distribution tags and download copy consistent; run the registered strict version regression before publication.
+
+For the nine-target 4.2.1 maintenance cut, `Invoke-MIR42NineTargetReleaseAssets.ps1 -Mode Inventory` takes `-SourceVersion 4.2.1 -ReleaseTag v4.2.1 -PublishedMaintenancePredecessorManifestPath <published-420-manifest>`, alongside the accepted candidate, technical seal, campaign, independent verification, signing, review and restore inputs. It reconstructs the existing promotion plan before freezing the asset inventory. The support records use `mir-4.2.1.{qualification,provenance,components,release}.json` and maintenance record kinds. All four records, the seal, promotion plan and frozen inventory must carry the same published `v4.2.0-stable` predecessor custody. VerifyBytes and PublicReadback consume that inventory; copied local bytes alone do not establish public delivery.
+
+The 4.2.1 conditional authorization contract is `spec/schemas/mir421-maintainer-written-release-authorization-v1.schema.json`. It records the maintainer's authorization to execute and publish after actual technical acceptance, with Portal uploads remaining maintainer-managed. It establishes no technical pass, signature, review or final-byte acceptance. The publication consumer binds it to the exact frozen inventory, protected-main readback and clean current main checkout, including predecessor custody. The separate 4.2.0 authorization and its emergency playtest waiver cannot authorize 4.2.1. Structural release-reader tests establish neither native qualification nor publication.
 
 Keep GitHub release immutability disabled and do not restore removed rulesets. The existing `Test-MIRGitHubAdministration.ps1` separately probes `immutable-releases` and rejects enabled, owner-enforced or unrecognized state. Publication requires a final readback of that setting and of the release's `immutable=false` flag. Preserve recorded byte identities through repository governance and SHA-256 receipts. Never assume that deleting an immutable release frees its tag name: GitHub permanently reserves it.
 

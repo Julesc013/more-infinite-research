@@ -1,6 +1,6 @@
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
-  [string]$OutputRoot='build/mir4/t12-exact-processir',
+  [string]$OutputRoot='build/tmp/t12-exact-processir',
   [string]$ReferenceRoot='sdk/preview/mir4/reference/t12',
   [string]$F210Engine='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$F200Engine='D:\Programs\Factorio\2.0\bin\x64\factorio.exe',
@@ -8,6 +8,8 @@ param(
   [string[]]$CaptureId=@(),
   [ValidateRange(1,4)][int]$Repetitions=2,
   [switch]$PublishReference,
+  [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB=2048,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=240,
   [switch]$Check
 )
 $ErrorActionPreference='Stop'
@@ -25,8 +27,11 @@ function Resolve-T12Output([string]$Relative,[string]$AllowedRoot){
   $full
 }
 function Write-T12Json([string]$Path,$Value){
+  $bytes=[Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-MIR4ProcessIRCanonicalJson $Value)+"`n")
+  if($null-ne$resources-and$bytes.Length-ge(Get-MIRNativeProbeRemainingOutputBytes -Context $resources)){throw '[mir441-resource-output-budget]'}
   $parent=Split-Path -Parent $Path;if(-not(Test-Path -LiteralPath $parent)){New-Item -ItemType Directory -Path $parent -Force|Out-Null}
-  [IO.File]::WriteAllText($Path,(ConvertTo-MIR4ProcessIRCanonicalJson $Value)+"`n",[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllBytes($Path,$bytes)
+  if($null-ne$resources){$null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources}
 }
 function Test-T12Reference([string]$Root){
   $manifestPath=Join-Path $Root 'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json'
@@ -45,16 +50,24 @@ function Test-T12Reference([string]$Root){
   [pscustomobject][ordered]@{status='passed';capture_count=[int]$receipt.capture_count;reference_root=$Root;package_visible=$false}
 }
 
-$output=Resolve-T12Output -Relative $OutputRoot -AllowedRoot 'build/mir4'
+$output=Resolve-T12Output -Relative $OutputRoot -AllowedRoot 'build/tmp'
 $reference=Resolve-T12Output -Relative $ReferenceRoot -AllowedRoot 'sdk/preview/mir4/reference'
 if($Check){Test-T12Reference -Root $reference|ConvertTo-Json -Depth 10;exit 0}
-
+if($CaptureId.Count -eq 0){throw '[mir4-t12-explicit-capture-selection-required]'}
+if($PublishReference-and(Test-Path -LiteralPath $reference)-and((Test-Path -LiteralPath $reference -PathType Leaf)-or@(Get-ChildItem -LiteralPath $reference -Force).Count)){throw '[mir4-t12-existing-reference-preserved]'}
 $trackedDirty=@(&git -C $repo status --porcelain --untracked-files=no)
 if($trackedDirty.Count){throw '[mir4-t12-source-dirty] Commit tracked implementation before exact engine capture.'}
 $authority=Get-MIR4T12Authority -RepoRoot $repo
-$selected=@($authority.captures)
-if($CaptureId.Count){$wanted=@{};foreach($id in $CaptureId){$wanted[$id]=$true};$selected=@($selected|Where-Object{$wanted.ContainsKey([string]$_.id)});if($selected.Count-ne$wanted.Count){throw '[mir4-t12-capture-selection]'}}
-if(Test-Path -LiteralPath $output){Remove-Item -LiteralPath $output -Recurse -Force}
+$wanted=@{};foreach($id in $CaptureId){$wanted[$id]=$true}
+$selected=@($authority.captures|Where-Object{$wanted.ContainsKey([string]$_.id)})
+if($selected.Count-ne$wanted.Count){throw '[mir4-t12-capture-selection]'}
+if($PublishReference-and($selected.Count-ne$authority.captures.Count-or$Repetitions-lt[int]$authority.required_repetitions)){throw '[mir4-t12-partial-reference-refused]'}
+# Admit the whole selected operation before engine lookup or any output. The
+# existing context counts private writes and verifies shared archive aliases.
+& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -RepoRoot $repo -AsJson -MaxScanSeconds 3 -MaxEntriesPerRoot 2000 | Out-Null
+$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+$output=[string]$resources.root
+
 New-Item -ItemType Directory -Path $output -Force|Out-Null
 $source=[ordered]@{commit=(&git -C $repo rev-parse HEAD).Trim();tree=(&git -C $repo rev-parse 'HEAD^{tree}').Trim();work_package='T12'}
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
@@ -62,7 +75,7 @@ $sets=@();$blockers=@()
 foreach($capture in $selected){
   Write-Host "[mir4-t12] capture $($capture.id) repetitions=$Repetitions"
   $engine=if([string]$capture.target-ceq'f210'){$F210Engine}else{$F200Engine}
-  try{$set=Invoke-MIR4T12ExactCapture -RepoRoot $repo -Authority $authority -Capture $capture -EnginePath $engine -OutputRoot $output -ArchiveSearchRoots $ArchiveSearchRoots -SourceIdentity $source -Repetitions $Repetitions}
+  try{$set=Invoke-MIR4T12ExactCapture -RepoRoot $repo -Authority $authority -Capture $capture -EnginePath $engine -OutputRoot $output -ArchiveSearchRoots $ArchiveSearchRoots -SourceIdentity $source -Repetitions $Repetitions -ResourceContext $resources}
   catch{
     if(-not$_.Exception.Message.StartsWith('[mir4-t12-exact-archive-missing]')){throw}
     $blocker=[pscustomobject][ordered]@{schema=1;kind='MIR4T12CustodyBlockerV1';work_package='T12';capture_id=[string]$capture.id;target=[string]$capture.target;scenario_id=[string]$capture.scenario_id;status='blocked-exact-archive-custody';reason=$_.Exception.Message;evidence_ref=[string]$capture.evidence;lock_ref=[string]$capture.lock;fabricated_substitute=$false;package_visible=$false;digest=''}
@@ -74,6 +87,8 @@ foreach($capture in $selected){
   $sets+=$set
   Write-T12Json -Path (Join-Path $output "snapshots/$($capture.id).json") -Value $set.snapshot
   Write-T12Json -Path (Join-Path $output "locks/$($capture.id).json") -Value $set.environment_lock
+  Write-T12Json -Path (Join-Path $output "inputs/$($capture.id).json") -Value $set.immutable_input_receipts
+  $null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources
 }
 $snapshots=@($sets.snapshot)
 $byId=@{};foreach($snapshot in $snapshots){$byId[[string]$snapshot.capture_id]=$snapshot}
@@ -116,14 +131,17 @@ Add-MIR4T12RecordDigest -Value $receipt -Domain 'mir4:t12-receipt:1'|Out-Null
 if(-not$receipt.package_source_unchanged-or-not$receipt.all_deterministic){throw '[mir4-t12-exit-gate]'}
 Write-T12Json -Path (Join-Path $output 'MIR4_T12_RECEIPT.json') -Value $receipt
 
-$files=@(Get-ChildItem -LiteralPath $output -Recurse -File -Filter '*.json'|Where-Object{$_.Name-cne'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json'}|Sort-Object FullName|ForEach-Object{[ordered]@{path=[IO.Path]::GetRelativePath($output,$_.FullName).Replace('\','/');bytes=$_.Length;sha256='sha256:'+(Get-MIR4T12FileSha256 $_.FullName)}})
+$files=@(Get-ChildItem -LiteralPath $output -Recurse -File -Filter '*.json'|Where-Object{$_.Name-cne'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json'-and[IO.Path]::GetRelativePath($output,$_.FullName)-cnotmatch'^runtime[\\/]'}|Sort-Object FullName|ForEach-Object{[ordered]@{path=[IO.Path]::GetRelativePath($output,$_.FullName).Replace('\','/');bytes=$_.Length;sha256='sha256:'+(Get-MIR4T12FileSha256 $_.FullName)}})
 $manifest=[pscustomobject][ordered]@{schema=1;kind='MIR4T12ExactProcessIRManifestV1';source_identity=$source;capture_count=$snapshots.Count;blocker_count=$blockers.Count;comparison_count=$comparisons.Count;inspector_bundle_count=$inspectorBundles.Count;files=$files;complete=(($snapshots.Count+$blockers.Count)-eq$authority.captures.Count);package_visible=$false;digest=''}
 Add-MIR4T12RecordDigest -Value $manifest -Domain 'mir4:t12-manifest:1'|Out-Null
 Write-T12Json -Path (Join-Path $output 'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json') -Value $manifest
 
 if($PublishReference){
-  if(Test-Path -LiteralPath $reference){Remove-Item -LiteralPath $reference -Recurse -Force}
+  if(Test-Path -LiteralPath $reference){if(@(Get-ChildItem -LiteralPath $reference -Force).Count){throw '[mir4-t12-existing-reference-preserved]'}}
+  $null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources
+  $referenceBytes=[int64]($files|Measure-Object bytes -Sum).Sum+[int64](Get-Item -LiteralPath (Join-Path $output 'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json')).Length
+  if($referenceBytes-ge(Get-MIRNativeProbeRemainingOutputBytes -Context $resources)){throw '[mir441-resource-output-budget]'}
   New-Item -ItemType Directory -Path $reference -Force|Out-Null
-  foreach($file in Get-ChildItem -LiteralPath $output -Recurse -File -Filter '*.json'){$relative=[IO.Path]::GetRelativePath($output,$file.FullName);$destination=Join-Path $reference $relative;$parent=Split-Path -Parent $destination;if(-not(Test-Path -LiteralPath $parent)){New-Item -ItemType Directory -Path $parent -Force|Out-Null};Copy-Item -LiteralPath $file.FullName -Destination $destination -Force}
+  foreach($relative in @($files.path)+@('MIR4_T12_EXACT_PROCESSIR_MANIFEST.json')){$destination=Join-Path $reference $relative;$parent=Split-Path -Parent $destination;if(-not(Test-Path -LiteralPath $parent)){New-Item -ItemType Directory -Path $parent -Force|Out-Null};$stream=[IO.File]::Open($destination,[IO.FileMode]::CreateNew);try{$bytes=[IO.File]::ReadAllBytes((Join-Path $output $relative));$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}}
 }
 [pscustomobject][ordered]@{status='passed';source_identity=$source;output=$output;reference=$(if($PublishReference){$reference}else{$null});capture_count=$snapshots.Count;comparison_count=$comparisons.Count;receipt_digest=$receipt.digest;package_source_unchanged=$receipt.package_source_unchanged;package_visible=$false;publication_authorized=$false}|ConvertTo-Json -Depth 20

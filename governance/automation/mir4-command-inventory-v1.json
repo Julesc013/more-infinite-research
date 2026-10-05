@@ -2259,9 +2259,9 @@
     {
       "path": "tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1",
       "classification": "canonical-internal",
-      "sha256": "B30AD86F639F9881613C7DCDD4CC5B3E2B102854BB289F5177E0FDBD41EAE963",
+      "sha256": "4977114EA9080297FCF9CB036B2D8F2D212F1DB06FE48C7492C0F977ECF2CB6E",
       "hash_mode": "canonical-text-v1",
-      "lines": 14,
+      "lines": 16,
       "package_visible": false
     },
     {
@@ -2483,9 +2483,9 @@
     {
       "path": "tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1",
       "classification": "canonical-internal",
-      "sha256": "7A936BF362B769274260B7AF1CAFB358E8D64B658DF6FF1E1959EA19879C2E65",
+      "sha256": "5F29CE16591581AE57A76FADFB235E65DB82B2E0F1C058D66D834B8661509391",
       "hash_mode": "canonical-text-v1",
-      "lines": 99,
+      "lines": 184,
       "package_visible": false
     },
     {
@@ -3107,9 +3107,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
       "classification": "canonical-internal",
-      "sha256": "2716684B8EB51DBEC1F19FE78438BA287627EBF8144227FABA4C2448829974F3",
+      "sha256": "4AD957D0884134261B04D1E9646DE539441653238408F79693D265536DA4FD82",
       "hash_mode": "canonical-text-v1",
-      "lines": 67,
+      "lines": 70,
       "package_visible": false
     },
     {
@@ -5179,9 +5179,9 @@
     {
       "path": "tools/mir/application/processir/ExactProcessIR.ps1",
       "classification": "canonical-internal",
-      "sha256": "B52EC5EFF10409B39477E5ADCBBCDC4832F11FD57254DA1170CE327A57AB8DDC",
+      "sha256": "5E27130E60CA719EB61E4EA7F457B1B2AA2E998E785CF844C457865C4F90B386",
       "hash_mode": "canonical-text-v1",
-      "lines": 345,
+      "lines": 375,
       "package_visible": false
     },
     {
@@ -5347,9 +5347,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
       "classification": "canonical-internal",
-      "sha256": "52898B2DD77A351CD171C9B88EF83E75E08BF2170AFEE34FED4ABAAA53A173BB",
+      "sha256": "6DF71351CD98933B4E1A46AD8B0416F08AFFF6B9E4B21AB4F9041AF41F6E3CF6",
       "hash_mode": "canonical-text-v1",
-      "lines": 847,
+      "lines": 939,
       "package_visible": false
     },
     {
@@ -5595,9 +5595,9 @@
     {
       "path": "tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1",
       "classification": "canonical-internal",
-      "sha256": "668CF90F78AB5291E64425CBA13DE660D6AF9110FC1C5D98E0B7B51B6DDF75EA",
+      "sha256": "2410406B0F0D0CAB697F825C09B5921398EF15DB2F1C301F975F29098B96F9C9",
       "hash_mode": "canonical-text-v1",
-      "lines": 130,
+      "lines": 148,
       "package_visible": false
     },
     {
@@ -6026,5 +6026,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f29d30c25b0d4cc3f0411347fd1034b83cbcd759f4a39cee84dd34751a6a6140"
+  "digest": "sha256:e8737f81c525fb62ac51ece9a6638af9a259ee0c5998fcdbba9be627109de243"
 }
