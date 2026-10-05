@@ -34,6 +34,16 @@ $ErrorActionPreference = "Stop"
 function Resolve-MIRUpgradeManifestVersion {
   param([Parameter(Mandatory)][string]$ManifestPath,[Parameter(Mandatory)][string]$CandidatePath,[string]$Target='')
   $manifest=Get-Content -Raw -LiteralPath $ManifestPath | ConvertFrom-Json -Depth 100
+  if ($manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2')) {
+    . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+    $candidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $ManifestPath
+    $rows=@($candidate.targets | Where-Object {
+      [IO.Path]::GetFullPath([string]$_.archive_path) -ceq [IO.Path]::GetFullPath($CandidatePath) -and
+      (-not $Target -or $_.target -ceq $Target)
+    })
+    if ($rows.Count -ne 1) { throw '[mir-upgrade-manifest-target] Candidate must match exactly one frozen construction target.' }
+    return [string]$rows[0].distribution_version
+  }
   . (Join-Path $RepoRoot 'tools/lib/validation/MIR4DistributionIdentity.ps1')
   $sourceVersion=Get-MIR4FinalManifestSourceVersion -Manifest $manifest
   $parts=$sourceVersion.Split('.');$minor=[int]$parts[1];$patch=[int]$parts[2]
