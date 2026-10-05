@@ -23,6 +23,30 @@ function Get-MIR441ResourceSnapshot {
   [pscustomobject]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');memory=[pscustomobject]@{total_bytes=16GB;free_bytes=12GB;committed_bytes=4GB;commit_limit_bytes=20GB};system_volume=[pscustomobject]@{free_bytes=100GB};work_volume=[pscustomobject]@{free_bytes=100GB}}
 }
 try {
+  . (Join-Path $repo 'tests/support/MIR421SpaceFakeUpgrade.ps1')
+  foreach ($target in @('f210','f200')) {
+    $code=$target.Substring(1)
+    $sifArguments=@{Target=$target;FromVersion="4.2.${code}00";ToVersion="4.2.${code}01";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype=$(if($target -ceq 'f210'){'base-continuations'}else{'base-default'})}
+    $descriptor=Get-MIR421SpaceFakeUpgradeDescriptor @sifArguments
+    Assert-Probe ($descriptor.inputs.Count -eq 2 -and ($descriptor.mod_names -join '|') -ceq 'space-is-fake|cr-commons' -and $descriptor.request -ceq 'SIF-01') "exact $target native dependency profile lost its inputs."
+    $bad=$sifArguments.Clone();$bad.ToVersion="4.2.${code}02"
+    Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor @bad} 'sif-transition'
+    $bad=$sifArguments.Clone();$bad.FromVersion="4.1.${code}00"
+    Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor @bad} 'sif-transition'
+    $bad=$sifArguments.Clone();$bad.Archetype='space-age-native-owner'
+    Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor @bad} 'sif-transition'
+    $control=Get-Content -Raw -LiteralPath (Join-Path $repo ('fixtures/'+$sifArguments.FixtureName+'/control.lua'))
+    $specialized=Add-MIR421SpaceFakeUpgradeOracle -ControlText $control
+    Assert-Probe ($specialized.Contains('sif.capture()') -and $specialized.Contains('sif.verify("upgrade")') -and $specialized.Contains('sif.verify("reload")') -and $specialized.Contains('force.research_progress=expected_progress')) "actual $target staged fixture lost the original research oracle."
+    Refuses-Probe {Add-MIR421SpaceFakeUpgradeOracle -ControlText $specialized} 'sif-fixture-anchor'
+  }
+  Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor -Target f110} 'sif-target'
+  Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor -Target F210} 'sif-target'
+  foreach($stage in @('source','upgrade','reload')) {
+    Assert-MIR421SpaceFakeUpgradeMarker -Text "[mir-fixture] SIF-01 native continuations verified stage=$stage" -Stage $stage
+    Refuses-Probe {Assert-MIR421SpaceFakeUpgradeMarker -Text 'generic load passed' -Stage $stage} "sif-$stage-marker"
+    Refuses-Probe {Assert-MIR421SpaceFakeUpgradeMarker -Text "[mir-fixture] SIF-01 native continuations verified stage=$stage-incomplete" -Stage $stage} "sif-$stage-marker"
+  }
   . (Join-Path $repo 'tools/lib/assurance/evidence/CommandExecution.ps1')
   $catalog=Get-Content -LiteralPath (Join-Path $repo 'validation/tests.yml') -Raw | ConvertFrom-Json
   $command=[string](@($catalog.tests | Where-Object id -CEQ 'runtime.material-route-guard')[0].command)
@@ -134,6 +158,13 @@ try {
   $source=Join-Path $fixture 'dependency.zip'
   [IO.File]::WriteAllBytes($source,[byte[]]::new(128KB))
   $archiveInput=[ordered]@{source_path=$source;file_name='dependency.zip';expected_sha256=Get-MIRImmutableInputSha256 $source;role='dependency-mod';identity=@{name='controlled'};provenance=@{kind='tiny-controlled-fixture'};immutable=$true}
+  $sharedLibraryArchive=Join-Path $fixture 'dependency_1.zip'
+  New-Item -ItemType HardLink -Path $sharedLibraryArchive -Target $source | Out-Null
+  $controlledDescriptor=[pscustomobject]@{line='controlled';target='controlled';inputs=@([pscustomobject]@{name='dependency';version='1';sha256=$archiveInput.expected_sha256})}
+  $configuredInputs=@(Resolve-MIR421SpaceFakeUpgradeInputs -RepoRoot $fixture -Descriptor $controlledDescriptor -LocalModLibraryDirs @((Join-Path $fixture 'absent-library'),$fixture))
+  Assert-Probe ($configuredInputs.Count -eq 1 -and $configuredInputs[0].source_path -ceq $sharedLibraryArchive) 'SIF inputs did not resolve the retained shared library.'
+  Assert-Probe (-not (Test-Path -LiteralPath (Join-Path $fixture 'build/tmp/mir421-sif-input-lookup-controlled'))) 'SIF library lookup created a profile.'
+  Refuses-Probe {Resolve-MIR421SpaceFakeUpgradeInputs -RepoRoot $fixture -Descriptor $controlledDescriptor -LocalModLibraryDirs @((Join-Path $fixture 'absent-library'))} 'dependency-missing'
   $emptyStage=Join-Path $fixture 'empty-preserved-stage'
   $lookup=Resolve-MIRNativeProbeDependencyInputs -StageRoot $emptyStage -ExpectedArchives @{'dependency.zip'=$archiveInput.expected_sha256} -LocalModLibraryDirs @($fixture)
   Assert-Probe ($lookup['dependency.zip'].source_path -ceq $source -and $lookup['dependency.zip'].provenance_kind -ceq 'verified-local-dependency-library' -and -not (Test-Path -LiteralPath $emptyStage)) 'missing-stage lookup failed or restored a staging copy.'
@@ -148,6 +179,7 @@ try {
   $leaseRoot=Join-Path $context.root 'stage';New-Item -ItemType Directory -Path $leaseRoot | Out-Null
   Refuses-Probe {New-MIRImmutableInputLease -RunRoot $leaseRoot -StageDirectory (Join-Path $leaseRoot 'mods') -Inputs @($archiveInput) -RequireHardLinks -ForceCopy} 'cannot request copy mode'
   $lease=New-MIRImmutableInputLease -RunRoot $leaseRoot -StageDirectory (Join-Path $leaseRoot 'mods') -Inputs @($archiveInput) -RequireHardLinks
+  Assert-Probe ((Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $lease) -eq 128KB) 'SIF byte allowance was not backed by the actual strict hardlink lease.'
   Add-MIRNativeProbeImmutableLease -Context $context -Lease $lease
   Assert-Probe ($context.shared_alias_bytes -eq 128KB) 'strict leased alias bytes were not identified.'
   Refuses-Probe {Add-MIRNativeProbeImmutableLease -Context $context -Lease $lease} 'shared-alias-identity'
@@ -169,6 +201,42 @@ try {
   $terminal=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed
   $lease=$null
   Assert-Probe ($terminal.state -ceq 'completed' -and $terminal.inputs_sha256_match) 'strict lease did not retain verified terminal custody.'
+
+  # Two upgrade phases share dependency/archive bytes and keep distinct custody.
+  # These tiny text inputs exercise staging; they are not Factorio packages.
+  $sourceProfileLease=$null;$candidateProfileLease=$null
+  try {
+    $sourceArchive=Join-Path $fixture 'more-infinite-research_4.2.20000.zip'
+    $candidateArchive=Join-Path $fixture 'more-infinite-research_4.2.20001.zip'
+    [IO.File]::WriteAllText($sourceArchive,'controlled predecessor')
+    [IO.File]::WriteAllText($candidateArchive,'controlled candidate')
+    $sourceProfileLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $context.root 'source-profile') -Dependencies @($archiveInput) -Archive $sourceArchive -ExpectedSha256 (Get-MIRImmutableInputSha256 $sourceArchive) -Version '4.2.20000' -Role source
+    $sourceBytes=Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $sourceProfileLease
+    $null=Complete-MIRImmutableInputLease -Lease $sourceProfileLease -Outcome passed
+    Assert-Probe ((Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $sourceProfileLease) -eq $sourceBytes) 'completed source-profile aliases lost their verified byte accounting.'
+    $candidateProfileLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $context.root 'candidate-profile') -Dependencies @($archiveInput) -Archive $candidateArchive -ExpectedSha256 (Get-MIRImmutableInputSha256 $candidateArchive) -Version '4.2.20001' -Role candidate
+    Assert-Probe (@($candidateProfileLease.record.inputs | Where-Object staging_mode -CNE 'hardlink').Count -eq 0) 'candidate profile copied an archive.'
+    Assert-Probe (-not (Test-Path -LiteralPath (Join-Path $candidateProfileLease.record.stage_directory 'more-infinite-research_4.2.20000.zip'))) 'candidate profile retained the obsolete MIR version.'
+    $sourceMods=$sourceProfileLease.record.stage_directory;$targetMods=$candidateProfileLease.record.stage_directory
+    New-Item -ItemType Directory -Path (Join-Path $sourceMods 'controlled-fixture') | Out-Null
+    [IO.File]::WriteAllText((Join-Path $sourceMods 'controlled-fixture/control.lua'),'controlled fixture')
+    $settingsPath=Join-Path $sourceMods 'mod-settings.dat'
+    [IO.File]::WriteAllBytes($settingsPath,[byte[]](1,2,3,4))
+    $settingsHash=Get-MIRImmutableInputSha256 $settingsPath
+    Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'
+    Assert-Probe ((Get-MIRImmutableInputSha256 (Join-Path $targetMods 'mod-settings.dat')) -ceq $settingsHash -and -not (Test-Path -LiteralPath $settingsPath)) 'profile switch lost or duplicated writable settings.'
+    Assert-Probe (Test-Path -LiteralPath (Join-Path $targetMods 'controlled-fixture/control.lua')) 'profile switch lost the specialized fixture.'
+    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName '../outside'} 'move-boundary'
+    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $fixture -FixtureName 'controlled-fixture'} 'move-boundary'
+    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'} 'state-collision'
+    $null=Complete-MIRImmutableInputLease -Lease $candidateProfileLease -Outcome passed
+    $sourceProfileLease.record.outcome='failed'
+    Refuses-Probe {Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $sourceProfileLease} 'completed passed'
+  } finally {
+    foreach ($profileLease in @($sourceProfileLease,$candidateProfileLease)) {
+      if ($null -ne $profileLease -and -not $profileLease.closed) { Close-MIRImmutableInputLeaseHandles -Lease $profileLease }
+    }
+  }
 
   # Exercise the production driver and process adapter with a tiny fake
   # materializer dependency. There is no Git clone or actual player package.
