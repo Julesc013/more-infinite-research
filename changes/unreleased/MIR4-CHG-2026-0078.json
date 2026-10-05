@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0078",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Consume authenticated maintenance predecessor inputs in the independent rehasher.",
+  "details": [
+    "The explicit nine-target source 4.2.1 maintenance lane authenticates the published 4.2.0 release/tag and local archive inventory again, then requires the reconciler's recorded custody and each rehashed predecessor to match.",
+    "Existing exact candidate, installed-engine, upgrade-receipt, continuity and log checks remain. A distinct private maintenance rehash record retains actual CCC00 inputs separately from historical baseline provenance.",
+    "Controlled refusal tests and actual published-package input checks establish source behavior only. Candidate-bound independent verification, real-engine evidence consumption and full 4.2.1 acceptance remain pending."
+  ],
+  "semantic_domains": ["tooling", "packaging", "documentation"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Independent maintenance verification binds its authenticated published CCC00 predecessor."},
+    {"target":"F200","disposition":"affected","reason":"Independent maintenance verification binds its authenticated published CCC00 predecessor."},
+    {"target":"F110","disposition":"affected","reason":"Independent maintenance verification binds its authenticated published CCC00 predecessor."},
+    {"target":"F100","disposition":"affected","reason":"Independent maintenance verification binds its authenticated published CCC00 predecessor."},
+    {"target":"F017","disposition":"affected","reason":"Independent published custody is separate from retained terminal provenance."},
+    {"target":"F016","disposition":"affected","reason":"Independent published custody is separate from retained terminal provenance."},
+    {"target":"F015","disposition":"affected","reason":"Independent published custody is separate from retained terminal provenance."},
+    {"target":"F014","disposition":"affected","reason":"Independent published custody is separate from retained terminal provenance."},
+    {"target":"F013","disposition":"affected","reason":"Independent published custody is separate from retained terminal provenance."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"v4.2.0-stable release 402577876; frozen manifest E5F658F253F4E3E22C38A9B08394CE8554CECD20C4583BC5D23AA72D027E93A9"},
+    {"kind":"finding","value":"tests/release/Test-MIR42FourTargetCandidateBuild.ps1"},
+    {"kind":"document","value":"docs/releases/mir42-nine-target-candidate-playtest-matrix.md"}
+  ]
+}

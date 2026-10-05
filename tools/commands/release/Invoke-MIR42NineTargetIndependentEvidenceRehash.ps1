@@ -5,7 +5,8 @@ param(
   [Parameter(Mandatory)][string]$QualificationPath,
   [Parameter(Mandatory)][hashtable]$PredecessorZips,
   [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
-  [Parameter(Mandatory)][string]$OutputRoot
+  [Parameter(Mandatory)][string]$OutputRoot,
+  [string]$PublishedMaintenancePredecessorManifestPath = ''
 )
 
 $ErrorActionPreference = 'Stop'

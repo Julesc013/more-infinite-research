@@ -41,7 +41,19 @@ function Resolve-MIR42IndependentChild {
 }
 
 function Get-MIR42IndependentScopeContract {
-  param([Parameter(Mandatory)][ValidateSet('four-target','nine-target')][string]$Scope)
+  param([Parameter(Mandatory)][ValidateSet('four-target','nine-target')][string]$Scope,[switch]$PublishedMaintenance)
+  if ($PublishedMaintenance) {
+    if ($Scope -cne 'nine-target') { throw '[mir42-independent-maintenance-candidate-scope]' }
+    return [pscustomobject][ordered]@{
+      targets=@($script:MIR42IndependentNineTargets)
+      candidate_status='private-deterministic-nine-target-candidate-built-unqualified'
+      reconciliation_kind='MIR42NineTargetMaintenanceEvidenceReconciliationV1'
+      reconciliation_status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'
+      rehash_kind='MIR42NineTargetMaintenanceIndependentEvidenceRehashV1'
+      rehash_status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED'
+      target_requirement='all_nine_targets_required'
+    }
+  }
   if ($Scope -ceq 'four-target') {
     return [pscustomobject][ordered]@{
       targets=@($script:MIR42IndependentTargets)
@@ -119,6 +131,41 @@ function Get-MIR42IndependentEngine {
   return [pscustomobject][ordered]@{ path = (Resolve-Path -LiteralPath $path).Path; version = $version; binary_sha256 = $actualHash }
 }
 
+function Assert-MIR42IndependentMaintenanceScope {
+  param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][string]$SourceVersion)
+  if ($Scope -cne 'nine-target' -or $SourceVersion -cne '4.2.1') {
+    throw '[mir42-independent-maintenance-candidate-scope]'
+  }
+}
+
+function Assert-MIR42IndependentMaintenanceCustody {
+  param([Parameter(Mandatory)]$Recorded,[Parameter(Mandatory)]$Current)
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $Recorded) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $Current)) {
+    throw '[mir42-independent-maintenance-custody-binding]'
+  }
+}
+
+function Assert-MIR42IndependentMaintenancePredecessor {
+  param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)]$Inventory,[Parameter(Mandatory)]$Qualified,[Parameter(Mandatory)]$PublishedInput)
+  if ([string]$PublishedInput.target -cne $Target -or
+      -not $Path.Equals([string]$PublishedInput.path,[StringComparison]::OrdinalIgnoreCase) -or
+      [string]$Inventory.archive_sha256 -cne [string]$PublishedInput.sha256 -or
+      [int64]$Inventory.bytes -ne [int64]$PublishedInput.bytes -or
+      [string]$Inventory.content_sha256 -cne [string]$PublishedInput.content_sha256 -or
+      [int]$Inventory.entry_count -ne [int]$PublishedInput.entry_count -or
+      $Qualified.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor' -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $Qualified.published_maintenance_predecessor) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $PublishedInput) -or
+      [string]$Qualified.predecessor.version -cne [string]$PublishedInput.version -or
+      [string]$Qualified.predecessor.archive.path -cne [IO.Path]::GetFileName($Path) -or
+      [string]$Qualified.predecessor.archive.sha256 -cne [string]$Inventory.archive_sha256 -or
+      [int64]$Qualified.predecessor.archive.bytes -ne [int64]$Inventory.bytes -or
+      [string]$Qualified.predecessor.archive.content_sha256 -cne [string]$Inventory.content_sha256 -or
+      [int]$Qualified.predecessor.archive.entry_count -ne [int]$Inventory.entry_count) {
+    throw "[mir42-independent-maintenance-predecessor-binding] $Target"
+  }
+}
+
 function Invoke-MIR42IndependentEvidenceRehashShared {
   [CmdletBinding()]
   param(
@@ -128,7 +175,8 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     [Parameter(Mandatory)][hashtable]$PredecessorZips,
     [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
     [Parameter(Mandatory)][string]$OutputRoot,
-    [ValidateSet('four-target','nine-target')][string]$RequiredScope
+    [ValidateSet('four-target','nine-target')][string]$RequiredScope,
+    [string]$PublishedMaintenancePredecessorManifestPath = ''
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -153,7 +201,11 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
   if ($RequiredScope -and $scope -cne $RequiredScope) {
     throw '[mir42-independent-entrypoint-target-scope]'
   }
-  $contract = Get-MIR42IndependentScopeContract -Scope $scope
+  $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
+  if ($maintenanceRequested) {
+    Assert-MIR42IndependentMaintenanceScope -Scope $scope -SourceVersion ([string]$versionContract.source_version)
+  }
+  $contract = Get-MIR42IndependentScopeContract -Scope $scope -PublishedMaintenance:$maintenanceRequested
   if ((Get-MIR42IndependentTargetScope -Rows @($builder.target_authority) -Code 'mir42-independent-builder-authority') -cne $scope) {
     throw '[mir42-independent-builder-authority-targets]'
   }
@@ -189,6 +241,17 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
       @($PredecessorZips.Keys | Where-Object { $_ -cnotin $contract.targets }).Count -ne 0 -or
       @($UpgradeReceipts.Keys | Where-Object { $_ -cnotin $contract.targets }).Count -ne 0) {
     throw '[mir42-independent-input-target-set]'
+  }
+  $maintenanceInputs = $null
+  if ($maintenanceRequested) {
+    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    if ($LASTEXITCODE -ne 0) { throw '[mir42-independent-maintenance-release-readback]' }
+    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+    if ($qualification.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor') {
+      throw '[mir42-independent-maintenance-custody-missing]'
+    }
+    Assert-MIR42IndependentMaintenanceCustody -Recorded $qualification.published_maintenance_predecessor -Current $maintenanceInputs
   }
   $rows = [Collections.Generic.List[object]]::new()
   foreach ($target in @($contract.targets)) {
@@ -271,7 +334,11 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     $predecessorPath = (Resolve-Path -LiteralPath ([string]$PredecessorZips[$target])).Path
     $predecessor = Get-MIR4ArchiveInventory -Path $predecessorPath
     if ([string]$predecessor.archive_sha256 -cne [string]$qualified.predecessor.archive.sha256) { throw "[mir42-independent-predecessor] $target" }
-    if ($null -ne $historical -and (-not $predecessorPath.Equals([string]$historical.predecessor_path,[StringComparison]::OrdinalIgnoreCase) -or
+    $publishedInput = if ($null -ne $maintenanceInputs) { @($maintenanceInputs.targets | Where-Object { [string]$_.target -ceq $target })[0] } else { $null }
+    if ($null -ne $publishedInput) {
+      Assert-MIR42IndependentMaintenancePredecessor -Target $target -Path $predecessorPath -Inventory $predecessor -Qualified $qualified -PublishedInput $publishedInput
+    }
+    if ($null -eq $maintenanceInputs -and $null -ne $historical -and (-not $predecessorPath.Equals([string]$historical.predecessor_path,[StringComparison]::OrdinalIgnoreCase) -or
         [string]$predecessor.archive_sha256 -cne [string]$historical.record.predecessor.sha256)) {
       throw "[mir42-independent-historical-predecessor-binding] $target"
     }
@@ -281,6 +348,9 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     if ([string]$receipt.status -cne 'passed' -or [string]$receipt.to.sha256 -cne [string]$archive.archive_sha256 -or
         [string]$receipt.from.sha256 -cne [string]$predecessor.archive_sha256 -or
         [string]$receipt.factorio_binary_sha256 -cne [string]$engine.binary_sha256) { throw "[mir42-independent-upgrade-binding] $target" }
+    if ($null -ne $publishedInput -and [string]$receipt.from.version -cne [string]$publishedInput.version) {
+      throw "[mir42-independent-maintenance-upgrade-version] $target"
+    }
     if ([bool]$qualified.harness.source_commit_matches_candidate -ne ([string]$receipt.git_commit -ceq $commit)) {
       throw "[mir42-independent-receipt-source-report] $target"
     }
@@ -305,6 +375,7 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
       status = 'reconciled'
       verification_scope = 'independent-rehash-of-supplied-candidate-and-upgrade-evidence-only'
     }
+    if ($null -ne $publishedInput) { $rehashRow.published_maintenance_predecessor = $publishedInput }
     if ($null -ne $historical) {
       $rehashRow.historical = [ordered]@{
         target_record = [ordered]@{path=[string]$historical.identity.target_record_path;sha256=[string]$historical.record.record_sha256}
@@ -338,6 +409,9 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     signing_authorized = $false
     publication_authorized = $false
     record_sha256 = ''
+  }
+  if ($null -ne $maintenanceInputs) {
+    $result | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $maintenanceInputs
   }
   $result | Add-Member -NotePropertyName ([string]$contract.target_requirement) -NotePropertyValue $true
   New-Item -ItemType Directory -Force -Path $output | Out-Null
@@ -377,11 +451,12 @@ function Invoke-MIR42NineTargetIndependentEvidenceRehash {
     [Parameter(Mandatory)][string]$QualificationPath,
     [Parameter(Mandatory)][hashtable]$PredecessorZips,
     [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
-    [Parameter(Mandatory)][string]$OutputRoot
+    [Parameter(Mandatory)][string]$OutputRoot,
+    [string]$PublishedMaintenancePredecessorManifestPath = ''
   )
   $manifest = Read-MIR42IndependentRecord -Path $CandidateManifestPath -Code 'mir42-independent-entrypoint-candidate'
   if ((Get-MIR42IndependentTargetScope -Rows @($manifest.targets) -Code 'mir42-independent-entrypoint') -cne 'nine-target') {
     throw '[mir42-independent-entrypoint-target-scope]'
   }
-  return Invoke-MIR42IndependentEvidenceRehashShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -QualificationPath $QualificationPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -RequiredScope 'nine-target'
+  return Invoke-MIR42IndependentEvidenceRehashShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -QualificationPath $QualificationPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -RequiredScope 'nine-target' -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
 }
