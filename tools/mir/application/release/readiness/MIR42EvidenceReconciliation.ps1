@@ -297,7 +297,8 @@ function Get-MIR42QualificationPredecessor {
   param(
     [Parameter(Mandatory)][string]$Path,
     [Parameter(Mandatory)][string]$Target,
-    [Parameter(Mandatory)]$Receipt
+    [Parameter(Mandatory)]$Receipt,
+    $PublishedMaintenanceInput = $null
   )
 
   if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "[mir42-qualification-predecessor-missing] $Target" }
@@ -312,6 +313,16 @@ function Get-MIR42QualificationPredecessor {
       [string]$info.version -cne [string]$Receipt.from.version -or
       [string]$info.factorio_version -cne [string]$script:MIR42QualificationLines[$Target]) {
     throw "[mir42-qualification-predecessor-metadata] $Target"
+  }
+  if ($null -ne $PublishedMaintenanceInput -and (
+      [string]$PublishedMaintenanceInput.target -cne $Target -or
+      -not $archive.Equals([string]$PublishedMaintenanceInput.path,[StringComparison]::OrdinalIgnoreCase) -or
+      [string]$Receipt.from.version -cne [string]$PublishedMaintenanceInput.version -or
+      [string]$inventory.archive_sha256 -cne [string]$PublishedMaintenanceInput.sha256 -or
+      [int64]$inventory.bytes -ne [int64]$PublishedMaintenanceInput.bytes -or
+      [string]$inventory.content_sha256 -cne [string]$PublishedMaintenanceInput.content_sha256 -or
+      [int]$inventory.entry_count -ne [int]$PublishedMaintenanceInput.entry_count)) {
+    throw "[mir42-qualification-published-maintenance-predecessor-binding] $Target"
   }
   return [pscustomobject][ordered]@{
     version = [string]$Receipt.from.version
@@ -455,6 +466,14 @@ function Get-MIR42QualificationUpgradeReceipt {
   }
 }
 
+function Assert-MIR42MaintenanceReconciliationScope {
+  param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][object[]]$Candidates)
+  if ($Scope -cne 'nine-target' -or $Candidates.Count -ne 9 -or
+      @($Candidates | Where-Object { [string]$_.identity.source_version -cne '4.2.1' }).Count -ne 0) {
+    throw '[mir42-reconciliation-maintenance-candidate-scope]'
+  }
+}
+
 function Invoke-MIR42EvidenceReconciliationShared {
   [CmdletBinding()]
   param(
@@ -463,7 +482,8 @@ function Invoke-MIR42EvidenceReconciliationShared {
     [Parameter(Mandatory)][hashtable]$PredecessorZips,
     [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
     [Parameter(Mandatory)][string]$OutputRoot,
-    [ValidateSet('four-target','nine-target')][string]$RequiredScope
+    [ValidateSet('four-target','nine-target')][string]$RequiredScope,
+    [string]$PublishedMaintenancePredecessorManifestPath = ''
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -483,19 +503,28 @@ function Invoke-MIR42EvidenceReconciliationShared {
       @($UpgradeReceipts.Keys | Where-Object { $_ -cnotin $contract.targets }).Count -ne 0) {
     throw '[mir42-reconciliation-input-target-set]'
   }
+  $maintenanceInputs = $null
+  if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
+    Assert-MIR42MaintenanceReconciliationScope -Scope $scope -Candidates $candidates
+    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    if ($LASTEXITCODE -ne 0) { throw '[mir42-reconciliation-maintenance-release-readback]' }
+    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+  }
   $output = Assert-MIR42QualificationOutputRoot -RepoRoot $repo -OutputRoot $OutputRoot
 
   $rows = [Collections.Generic.List[object]]::new()
   foreach ($candidate in $candidates) {
     $target = [string]$candidate.target
     $upgrade = Get-MIR42QualificationUpgradeReceipt -RepoRoot $repo -Target $target -Path ([string]$UpgradeReceipts[$target]) -Candidate $candidate
-    if ($target -in $script:MIR42QualificationHistoricalTargets) {
+    if ($null -eq $maintenanceInputs -and $target -in $script:MIR42QualificationHistoricalTargets) {
       $providedPredecessor = (Resolve-Path -LiteralPath ([string]$PredecessorZips[$target])).Path
       if (-not $providedPredecessor.Equals([string]$candidate.historical.predecessor_path,[StringComparison]::OrdinalIgnoreCase)) {
         throw "[mir42-reconciliation-historical-predecessor-path] $target"
       }
     }
-    $predecessor = Get-MIR42QualificationPredecessor -Target $target -Path ([string]$PredecessorZips[$target]) -Receipt $upgrade.receipt_object
+    $publishedInput = if ($null -ne $maintenanceInputs) { @($maintenanceInputs.targets | Where-Object { [string]$_.target -ceq $target })[0] } else { $null }
+    $predecessor = Get-MIR42QualificationPredecessor -Target $target -Path ([string]$PredecessorZips[$target]) -Receipt $upgrade.receipt_object -PublishedMaintenanceInput $publishedInput
     $reconciledRow = [ordered]@{
       target = $target
       target_id = [string]$candidate.identity.target_id
@@ -521,6 +550,7 @@ function Invoke-MIR42EvidenceReconciliationShared {
       technical_seal = 'not-performed'
       publication_authorized = $false
     }
+    if ($null -ne $publishedInput) { $reconciledRow.published_maintenance_predecessor = $publishedInput }
     if ($target -in $script:MIR42QualificationHistoricalTargets) {
       $reconciledRow.historical = [ordered]@{
         target_record = [ordered]@{path=[string]$candidate.historical.identity.target_record_path;sha256=[string]$candidate.historical.record.record_sha256}
@@ -536,9 +566,9 @@ function Invoke-MIR42EvidenceReconciliationShared {
 
   $result = [pscustomobject][ordered]@{
     schema = 1
-    kind = [string]$contract.kind
-    status = [string]$contract.status
-    reconciliation_scope = if ($scope -ceq 'four-target') { 'The four supplied upgrade receipts and logs match the exact candidate ZIP bytes and supplied predecessor archives; this command does not execute Factorio or establish governed predecessor custody.' } else { 'The nine supplied upgrade receipts and logs match the exact candidate ZIP bytes, modern predecessor archives, and historical terminal-seal predecessor chains; this command does not execute Factorio or establish release qualification.' }
+    kind = if ($null -ne $maintenanceInputs) { 'MIR42NineTargetMaintenanceEvidenceReconciliationV1' } else { [string]$contract.kind }
+    status = if ($null -ne $maintenanceInputs) { 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED' } else { [string]$contract.status }
+    reconciliation_scope = if ($null -ne $maintenanceInputs) { 'The nine supplied upgrade receipts and logs match the exact candidate ZIP bytes and authenticated published 4.2.0 predecessor archives; historical terminal records retain baseline provenance only. This command does not execute Factorio or establish release qualification.' } elseif ($scope -ceq 'four-target') { 'The four supplied upgrade receipts and logs match the exact candidate ZIP bytes and supplied predecessor archives; this command does not execute Factorio or establish governed predecessor custody.' } else { 'The nine supplied upgrade receipts and logs match the exact candidate ZIP bytes, modern predecessor archives, and historical terminal-seal predecessor chains; this command does not execute Factorio or establish release qualification.' }
     source = [pscustomobject][ordered]@{
       commit = [string]$candidates[0].source.commit
       tree = [string]$candidates[0].source.tree
@@ -562,6 +592,11 @@ function Invoke-MIR42EvidenceReconciliationShared {
       'The supplied predecessor archives have no governed direct-predecessor custody assertion in this record.'
     )
     record_sha256 = ''
+  }
+  if ($null -ne $maintenanceInputs) {
+    $result | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $maintenanceInputs
+    $result.nonclaims = @($result.nonclaims | Where-Object { $_ -cne 'The supplied predecessor archives have no governed direct-predecessor custody assertion in this record.' })
+    $result.nonclaims += 'Published predecessor custody is authenticated separately; its unsigned source and historical NOT RUN fields grant no new candidate qualification.'
   }
   $result | Add-Member -NotePropertyName ([string]$contract.target_requirement) -NotePropertyValue $true
   $path = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath 'evidence-reconciliation.json'
@@ -598,13 +633,14 @@ function Invoke-MIR42NineTargetEvidenceReconciliation {
     [Parameter(Mandatory)][string]$CandidateManifestPath,
     [Parameter(Mandatory)][hashtable]$PredecessorZips,
     [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
-    [Parameter(Mandatory)][string]$OutputRoot
+    [Parameter(Mandatory)][string]$OutputRoot,
+    [string]$PublishedMaintenancePredecessorManifestPath = ''
   )
   $manifest = Read-MIR42QualificationBootstrapRecord -Path $CandidateManifestPath -Code 'mir42-reconciliation-entrypoint-candidate'
   if ((Get-MIR42QualificationTargetScope -Rows @($manifest.targets) -Code 'mir42-reconciliation-entrypoint') -cne 'nine-target') {
     throw '[mir42-reconciliation-entrypoint-target-scope]'
   }
-  return Invoke-MIR42EvidenceReconciliationShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -RequiredScope 'nine-target'
+  return Invoke-MIR42EvidenceReconciliationShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -RequiredScope 'nine-target' -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
 }
 
 $script:MIR42ReleaseAcceptanceCriteria = @(

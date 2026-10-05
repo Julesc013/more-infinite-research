@@ -12,7 +12,8 @@ param(
   [hashtable]$NotApplicableTargetReasons = @{},
   [string]$Claim = '',
   [string]$KnownLimitations = '',
-  [string]$OutputPath = ''
+  [string]$OutputPath = '',
+  [string]$PublishedMaintenancePredecessorManifestPath = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -24,7 +25,7 @@ switch ($Mode) {
     if ($PredecessorZips.Count -eq 0 -or $UpgradeReceipts.Count -eq 0 -or [string]::IsNullOrWhiteSpace($OutputRoot)) {
       throw '[mir42-nine-reconciliation-inputs-required]'
     }
-    Invoke-MIR42NineTargetEvidenceReconciliation -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot | ConvertTo-Json -Depth 100
+    Invoke-MIR42NineTargetEvidenceReconciliation -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath | ConvertTo-Json -Depth 100
   }
   'Criterion' {
     foreach ($value in @($Criterion,$Claim,$KnownLimitations,$OutputPath)) {
