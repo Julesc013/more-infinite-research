@@ -158,6 +158,27 @@ try {
   $source=Join-Path $fixture 'dependency.zip'
   [IO.File]::WriteAllBytes($source,[byte[]]::new(128KB))
   $archiveInput=[ordered]@{source_path=$source;file_name='dependency.zip';expected_sha256=Get-MIRImmutableInputSha256 $source;role='dependency-mod';identity=@{name='controlled'};provenance=@{kind='tiny-controlled-fixture'};immutable=$true}
+  . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
+  $compatMods=Join-Path $fixture 'compat-mods';New-Item -ItemType Directory -Path $compatMods | Out-Null
+  $compatEntry=[pscustomobject]@{file_name='dependency.zip';source_path=$source;sha256=$archiveInput.expected_sha256}
+  Copy-MIRCachedModZips -CacheDir $fixture -ModsDir $compatMods -LockEntries @($compatEntry)
+  Assert-Probe ((Get-MIRImmutableInputFileIdentity (Join-Path $compatMods 'dependency.zip')) -ceq (Get-MIRImmutableInputFileIdentity $source)) 'compatibility staging copied a shared archive.'
+  Copy-MIRCachedModZips -CacheDir $fixture -ModsDir $compatMods -LockEntries @($compatEntry)
+  Assert-Probe ((Get-MIRImmutableInputSha256 $source) -ceq $compatEntry.sha256) 'matching alias reuse changed canonical bytes.'
+  Refuses-Probe {Copy-MIRCachedModZips -CacheDir $fixture -ModsDir $compatMods -LockEntries @($compatEntry) -LinkMode Copy} 'Hardlink'
+  Refuses-Probe {Copy-MIRModUnderTest -RepoRoot $repo -ModsDir $compatMods} 'package-required'
+  $badEntry=[pscustomobject]@{file_name='../outside.zip';source_path=$source}
+  Refuses-Probe {Copy-MIRCachedModZips -CacheDir $fixture -ModsDir $compatMods -LockEntries @($badEntry)} 'archive-name'
+  $badEntry=[pscustomobject]@{file_name='missing.zip';source_path=(Join-Path $fixture 'missing.zip')}
+  Refuses-Probe {Copy-MIRCachedModZips -CacheDir $fixture -ModsDir $compatMods -LockEntries @($badEntry)} 'archive-missing'
+  $badEntry=[pscustomobject]@{file_name='wrong-hash.zip';source_path=$source;sha256=('0'*64)}
+  Refuses-Probe {Copy-MIRCachedModZips -CacheDir $fixture -ModsDir $compatMods -LockEntries @($badEntry)} 'archive-hash'
+  [IO.File]::WriteAllBytes((Join-Path $compatMods 'unrelated.zip'),[byte[]]::new(16))
+  $badEntry=[pscustomobject]@{file_name='unrelated.zip';source_path=$source}
+  Refuses-Probe {Copy-MIRCachedModZips -CacheDir $fixture -ModsDir $compatMods -LockEntries @($badEntry)} 'archive-alias'
+  $packageMods=Join-Path $fixture 'compat-package';New-Item -ItemType Directory -Path $packageMods | Out-Null
+  $linkedPackage=Copy-MIRModUnderTest -RepoRoot $repo -ModsDir $packageMods -ZipPath $source
+  Assert-Probe ((Get-MIRImmutableInputFileIdentity $linkedPackage) -ceq (Get-MIRImmutableInputFileIdentity $source)) 'mod-under-test ZIP was copied.'
   $sharedLibraryArchive=Join-Path $fixture 'dependency_1.zip'
   New-Item -ItemType HardLink -Path $sharedLibraryArchive -Target $source | Out-Null
   $controlledDescriptor=[pscustomobject]@{line='controlled';target='controlled';inputs=@([pscustomobject]@{name='dependency';version='1';sha256=$archiveInput.expected_sha256})}
@@ -179,7 +200,7 @@ try {
   $leaseRoot=Join-Path $context.root 'stage';New-Item -ItemType Directory -Path $leaseRoot | Out-Null
   Refuses-Probe {New-MIRImmutableInputLease -RunRoot $leaseRoot -StageDirectory (Join-Path $leaseRoot 'mods') -Inputs @($archiveInput) -RequireHardLinks -ForceCopy} 'cannot request copy mode'
   $lease=New-MIRImmutableInputLease -RunRoot $leaseRoot -StageDirectory (Join-Path $leaseRoot 'mods') -Inputs @($archiveInput) -RequireHardLinks
-  Assert-Probe ((Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $lease) -eq 128KB) 'SIF byte allowance was not backed by the actual strict hardlink lease.'
+  Assert-Probe ((Get-MIRUpgradeLinkedArchiveBytes -Lease $lease) -eq 128KB) 'SIF byte allowance was not backed by the actual strict hardlink lease.'
   Add-MIRNativeProbeImmutableLease -Context $context -Lease $lease
   Assert-Probe ($context.shared_alias_bytes -eq 128KB) 'strict leased alias bytes were not identified.'
   Refuses-Probe {Add-MIRNativeProbeImmutableLease -Context $context -Lease $lease} 'shared-alias-identity'
@@ -204,17 +225,17 @@ try {
 
   # Two upgrade phases share dependency/archive bytes and keep distinct custody.
   # These tiny text inputs exercise staging; they are not Factorio packages.
-  $sourceProfileLease=$null;$candidateProfileLease=$null
+  $sourceProfileLease=$null;$candidateProfileLease=$null;$plainProfileLease=$null
   try {
     $sourceArchive=Join-Path $fixture 'more-infinite-research_4.2.20000.zip'
     $candidateArchive=Join-Path $fixture 'more-infinite-research_4.2.20001.zip'
     [IO.File]::WriteAllText($sourceArchive,'controlled predecessor')
     [IO.File]::WriteAllText($candidateArchive,'controlled candidate')
-    $sourceProfileLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $context.root 'source-profile') -Dependencies @($archiveInput) -Archive $sourceArchive -ExpectedSha256 (Get-MIRImmutableInputSha256 $sourceArchive) -Version '4.2.20000' -Role source
-    $sourceBytes=Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $sourceProfileLease
+    $sourceProfileLease=New-MIRUpgradeLinkedProfile -RunRoot (Join-Path $context.root 'source-profile') -Dependencies @($archiveInput) -Archive $sourceArchive -ExpectedSha256 (Get-MIRImmutableInputSha256 $sourceArchive) -Version '4.2.20000' -Role source
+    $sourceBytes=Get-MIRUpgradeLinkedArchiveBytes -Lease $sourceProfileLease
     $null=Complete-MIRImmutableInputLease -Lease $sourceProfileLease -Outcome passed
-    Assert-Probe ((Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $sourceProfileLease) -eq $sourceBytes) 'completed source-profile aliases lost their verified byte accounting.'
-    $candidateProfileLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $context.root 'candidate-profile') -Dependencies @($archiveInput) -Archive $candidateArchive -ExpectedSha256 (Get-MIRImmutableInputSha256 $candidateArchive) -Version '4.2.20001' -Role candidate
+    Assert-Probe ((Get-MIRUpgradeLinkedArchiveBytes -Lease $sourceProfileLease) -eq $sourceBytes) 'completed source-profile aliases lost their verified byte accounting.'
+    $candidateProfileLease=New-MIRUpgradeLinkedProfile -RunRoot (Join-Path $context.root 'candidate-profile') -Dependencies @($archiveInput) -Archive $candidateArchive -ExpectedSha256 (Get-MIRImmutableInputSha256 $candidateArchive) -Version '4.2.20001' -Role candidate
     Assert-Probe (@($candidateProfileLease.record.inputs | Where-Object staging_mode -CNE 'hardlink').Count -eq 0) 'candidate profile copied an archive.'
     Assert-Probe (-not (Test-Path -LiteralPath (Join-Path $candidateProfileLease.record.stage_directory 'more-infinite-research_4.2.20000.zip'))) 'candidate profile retained the obsolete MIR version.'
     $sourceMods=$sourceProfileLease.record.stage_directory;$targetMods=$candidateProfileLease.record.stage_directory
@@ -223,17 +244,30 @@ try {
     $settingsPath=Join-Path $sourceMods 'mod-settings.dat'
     [IO.File]::WriteAllBytes($settingsPath,[byte[]](1,2,3,4))
     $settingsHash=Get-MIRImmutableInputSha256 $settingsPath
-    Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'
+    Move-MIRUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'
     Assert-Probe ((Get-MIRImmutableInputSha256 (Join-Path $targetMods 'mod-settings.dat')) -ceq $settingsHash -and -not (Test-Path -LiteralPath $settingsPath)) 'profile switch lost or duplicated writable settings.'
     Assert-Probe (Test-Path -LiteralPath (Join-Path $targetMods 'controlled-fixture/control.lua')) 'profile switch lost the specialized fixture.'
-    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName '../outside'} 'move-boundary'
-    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $fixture -FixtureName 'controlled-fixture'} 'move-boundary'
-    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'} 'state-collision'
+    Refuses-Probe {Move-MIRUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName '../outside'} 'move-boundary'
+    Refuses-Probe {Move-MIRUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $fixture -FixtureName 'controlled-fixture'} 'move-boundary'
+    Refuses-Probe {Move-MIRUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'} 'fixture-missing'
+    New-Item -ItemType Directory -Path (Join-Path $sourceMods 'controlled-fixture') | Out-Null
+    Refuses-Probe {Move-MIRUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'} 'state-collision'
+    New-Item -ItemType Directory -Path (Join-Path $sourceMods 'settings-collision-fixture') | Out-Null
+    [IO.File]::WriteAllBytes($settingsPath,[byte[]](5,6,7,8))
+    Refuses-Probe {Move-MIRUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'settings-collision-fixture'} 'state-collision'
+    Assert-Probe (Test-Path -LiteralPath (Join-Path $sourceMods 'settings-collision-fixture')) 'settings collision partially moved the fixture.'
     $null=Complete-MIRImmutableInputLease -Lease $candidateProfileLease -Outcome passed
+    $plainProfileLease=New-MIRUpgradeLinkedProfile -RunRoot (Join-Path $context.root 'plain-profile') -Dependencies @() -Archive $candidateArchive -ExpectedSha256 (Get-MIRImmutableInputSha256 $candidateArchive) -Version '4.2.20001' -Role candidate
+    Assert-Probe ($plainProfileLease.record.inputs.Count -eq 1 -and $plainProfileLease.record.inputs[0].staging_mode -ceq 'hardlink') 'base-only upgrade copied its archive or required a mod-set profile.'
+    $plainMods=$plainProfileLease.record.stage_directory
+    New-Item -ItemType Directory -Path (Join-Path $plainMods 'controlled-fixture_1.0.0') | Out-Null
+    Move-MIRUpgradeProfileState -RunRoot $context.root -SourceMods $plainMods -TargetMods $targetMods -FixtureName 'controlled-fixture_1.0.0'
+    Assert-Probe (Test-Path -LiteralPath (Join-Path $targetMods 'controlled-fixture_1.0.0')) 'versioned historical fixture directory did not survive a profile switch.'
+    $null=Complete-MIRImmutableInputLease -Lease $plainProfileLease -Outcome passed
     $sourceProfileLease.record.outcome='failed'
-    Refuses-Probe {Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $sourceProfileLease} 'completed passed'
+    Refuses-Probe {Get-MIRUpgradeLinkedArchiveBytes -Lease $sourceProfileLease} 'completed passed'
   } finally {
-    foreach ($profileLease in @($sourceProfileLease,$candidateProfileLease)) {
+    foreach ($profileLease in @($sourceProfileLease,$candidateProfileLease,$plainProfileLease)) {
       if ($null -ne $profileLease -and -not $profileLease.closed) { Close-MIRImmutableInputLeaseHandles -Lease $profileLease }
     }
   }
@@ -371,6 +405,8 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   }
   function Copy-Item { $script:copies++;throw 'copy fallback was invoked' }
   Refuses-Probe {New-MIRImmutableInputLease -RunRoot $failedRoot -StageDirectory (Join-Path $failedRoot 'mods') -Inputs @($archiveInput) -RequireHardLinks} 'requires a verified hard link'
+  Refuses-Probe {Copy-MIRCachedModZips -CacheDir $fixture -ModsDir $failedRoot -LockEntries @($compatEntry)} 'controlled-link-failure'
+  Refuses-Probe {Copy-MIRModUnderTest -RepoRoot $repo -ModsDir $failedRoot -ZipPath $source} 'controlled-link-failure'
   Assert-Probe ($copies -eq 0 -and (Get-MIRImmutableInputSha256 $source) -ceq $archiveInput.expected_sha256) 'strict link failure copied or modified the canonical input.'
 } finally {
   if($null -ne $lease -and -not $lease.closed) { $null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed }

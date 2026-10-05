@@ -134,7 +134,7 @@ function Invoke-A05Case { param([string]$CaseId,[string]$K2SOPath,[string]$K2SOH
     }
     $candidateHash = '99C020CBA2800179FF2D76EE35F58B27A97CF2A7D89993CFFE06403DC140090E'
     $inputRecords += [ordered]@{source_path=$candidate;file_name=(Split-Path -Leaf $candidate);expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{target='f210';sha256=$candidateHash};provenance=[ordered]@{kind='locked-development-contract-candidate';path=$expectedCandidate};immutable=$true}
-    $inputLease = New-MIRImmutableInputLease -RunRoot $caseRoot -StageDirectory $mods -Inputs $inputRecords
+    $inputLease = New-MIRImmutableInputLease -RunRoot $caseRoot -StageDirectory $mods -Inputs $inputRecords -RequireHardLinks
     $fixtureArchive = Publish-MIRModDirectoryArchive -Source (Join-Path $RepoRoot 'fixtures/assert-k2-03-imersite') -Name 'mir-fixture-assert-k2-03-imersite' -Version '0.1.0' -ModsDir $mods
     $enabled = @('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','mir-validation-settings-overrides','more-infinite-research')
     if ($IncludeXy) { $enabled += 'xy-k2so-enhancements-nulls-fork' }

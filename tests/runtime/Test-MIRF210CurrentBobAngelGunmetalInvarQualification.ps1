@@ -188,7 +188,7 @@ try {
     $inputs += New-GIInput -Path $archive -Role 'dependency-mod' -Identity ([ordered]@{archive=$entry.Key;sha256=$entry.Value}) -Provenance ([ordered]@{kind='retained-exact-f210-ba-stage';stage=$stage})
   }
   $inputs += New-GIInput -Path $candidate -Role 'candidate' -Identity ([ordered]@{target='f210';sha256=(Get-GISha $candidate)}) -Provenance ([ordered]@{kind='fresh-f210-target-materialization';source_commit=$sourceCommit;source_tree=$sourceTree})
-  $inputLease=New-MIRImmutableInputLease -RunRoot $run -StageDirectory $mods -Inputs $inputs
+  $inputLease=New-MIRImmutableInputLease -RunRoot $run -StageDirectory $mods -Inputs $inputs -RequireHardLinks
   $fixtureArchive=Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name $fixtureName -Version $fixtureVersion -ModsDir $mods
   Assert-GIPath $fixtureArchive 'F210 Gunmetal/Invar fixture archive'
   $enabled=@('base','elevated-rails','quality','recycler','space-age')

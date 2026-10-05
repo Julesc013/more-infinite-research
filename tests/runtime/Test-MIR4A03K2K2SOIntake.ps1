@@ -183,7 +183,7 @@ $inputRecords += [ordered]@{
   provenance = [ordered]@{ kind = 'locked-development-contract-candidate'; path = $expectedCandidate }
   immutable = $true
 }
-$inputLease = New-MIRImmutableInputLease -RunRoot $root -StageDirectory $mods -Inputs $inputRecords
+$inputLease = New-MIRImmutableInputLease -RunRoot $root -StageDirectory $mods -Inputs $inputRecords -RequireHardLinks
 $governedObserverArchive = Publish-MIRModDirectoryArchive -Source $governedObserverSource -Name 'mir4-a03-k2-intake-observer' -Version '0.1.0' -ModsDir $mods
 Assert-A03Equal -Actual (Get-A03Sha256 -Path $governedObserverArchive) -Expected '8031F2310B30E7B66A33EDD125AA86137B9ABA0B9DBFF1E23CD3C31435BE8D31' -Code '[mir4-a03-governed-observer-archive-sha256]'
 

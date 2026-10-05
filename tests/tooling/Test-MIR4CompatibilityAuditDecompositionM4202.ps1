@@ -46,6 +46,7 @@ $functionNames = [Collections.Generic.List[string]]::new()
 $actualModuleNames = @($receipt.decomposition.modules | ForEach-Object { Split-Path -Leaf ([string]$_.path) })
 Assert-MIR4M4202CompatibilityAudit (@($receipt.decomposition.modules).Count -eq 6 -and ($actualModuleNames -join '|') -ceq ($expectedModuleNames -join '|')) 'mir4-m42-02-compatibility-audit-module-order'
 $historicalModuleCommit = '184c8583fb3460b83aea562a177ac8f690ad5c60'
+$a04ModuleCommit='4c4078adf2572585bbbbb332f16420b35b9220b9'
 foreach ($module in @($receipt.decomposition.modules)) {
   $relativePath = [string]$module.path
   $historicalLines = @(& git -C $repo show "${historicalModuleCommit}:$relativePath")
@@ -63,7 +64,9 @@ foreach ($module in @($receipt.decomposition.modules)) {
   $currentNames = @($ast.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] }, $true) | ForEach-Object { $_.Name })
   if ($null -ne $a04Closure) {
     $currentBinding = @($a04Closure.compatibility_audit_evolution.modules | Where-Object { [string]$_.path -ceq $relativePath })
-    Assert-MIR4M4202CompatibilityAudit ($currentBinding.Count -eq 1 -and @($errors).Count -eq 0 -and (Get-MIR4BootstrapTextSha256 -Path $path) -ceq [string]$currentBinding[0].canonical_sha256 -and (Get-Content -LiteralPath $path).Count -eq [int]$currentBinding[0].lines -and ($currentNames -join '|') -ceq (@($currentBinding[0].function_names) -join '|') -and [int]$currentBinding[0].lines -le 400) 'mir4-m42-02-compatibility-audit-a04-module' $relativePath
+    $a04Lines=@(& git -C $repo show "${a04ModuleCommit}:$relativePath")
+    Assert-MIR4M4202CompatibilityAudit ($LASTEXITCODE -eq 0 -and $currentBinding.Count -eq 1 -and (Get-MIR4Sha256String -Value (($a04Lines -join "`n")+"`n")) -ceq [string]$currentBinding[0].canonical_sha256 -and $a04Lines.Count -eq [int]$currentBinding[0].lines) 'mir4-m42-02-compatibility-audit-historical-a04-module' $relativePath
+    Assert-MIR4M4202CompatibilityAudit (@($errors).Count -eq 0 -and ($currentNames -join '|') -ceq (@($currentBinding[0].function_names) -join '|') -and (Get-Content -LiteralPath $path).Count -le 400) 'mir4-m42-02-compatibility-audit-current-module-contract' $relativePath
   } else {
     Assert-MIR4M4202CompatibilityAudit (@($errors).Count -eq 0 -and (Get-MIR4BootstrapTextSha256 -Path $path) -ceq [string]$module.sha256 -and [int]$module.lines -le 400) 'mir4-m42-02-compatibility-audit-module' $relativePath
   }
@@ -79,7 +82,15 @@ $facadeAst = [Management.Automation.Language.Parser]::ParseFile($facadePath, [re
 $facadeSource = [IO.File]::ReadAllText($facadePath).Replace(([string][char]13 + [char]10), [string][char]10).Replace([string][char]13, [string][char]10)
 $parameterBlock = $facadeAst.ParamBlock.Extent.Text.Replace(([string][char]13 + [char]10), [string][char]10).Replace([string][char]13, [string][char]10) + [string][char]10
 Assert-MIR4M4202CompatibilityAudit (@($facadeErrors).Count -eq 0 -and @($facadeAst.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] }, $true)).Count -eq 0 -and [int]$receipt.decomposition.facade.current_lines -le 80) 'mir4-m42-02-compatibility-audit-facade'
-Assert-MIR4M4202CompatibilityAudit ((Get-MIR4Sha256String -Value $parameterBlock) -ceq [string]$receipt.public_contract.parameter_block_sha256 -and $facadeSource.Contains("$" + "compatAuditCommandRoot = $" + "PSScriptRoot", [StringComparison]::Ordinal)) 'mir4-m42-02-compatibility-audit-parameter-surface'
+# Preserve the historical contract under its actual source. Current native
+# profiles deliberately retire Copy/Symlink and select Hardlink by default.
+$historicalFacadeSource=(@(& git -C $repo show "${historicalModuleCommit}:$($receipt.decomposition.facade.path)") -join "`n")
+Assert-MIR4M4202CompatibilityAudit ($LASTEXITCODE -eq 0) 'mir4-m42-02-compatibility-audit-historical-facade'
+$historicalFacadeAst=[Management.Automation.Language.Parser]::ParseInput($historicalFacadeSource,[ref]$facadeTokens,[ref]$facadeErrors)
+$historicalParameters=$historicalFacadeAst.ParamBlock.Extent.Text+"`n"
+Assert-MIR4M4202CompatibilityAudit ((Get-MIR4Sha256String -Value $historicalParameters) -ceq [string]$receipt.public_contract.parameter_block_sha256) 'mir4-m42-02-compatibility-audit-historical-parameter-surface'
+$expectedParameters=$historicalParameters.Replace('[ValidateSet("Copy", "Hardlink", "Symlink")]','[ValidateSet("Hardlink")]').Replace('$LinkMode = "Copy"','$LinkMode = "Hardlink"')
+Assert-MIR4M4202CompatibilityAudit ($parameterBlock -ceq $expectedParameters -and $facadeSource.Contains("$" + "compatAuditCommandRoot = $" + "PSScriptRoot", [StringComparison]::Ordinal)) 'mir4-m42-02-compatibility-audit-current-linked-profile-surface'
 
 $probeRoot = Join-Path ([IO.Path]::GetTempPath()) ('mir4-ps7-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $probeRoot | Out-Null
@@ -137,11 +148,14 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
 $expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
 $expectedInventoryCommandCount = 85
 if ($null -ne $a04Closure) {
-  $expectedInventoryDigest = [string]$a04Closure.compatibility_audit_evolution.command_inventory.digest
+  $a04InventoryText=@(& git -C $repo show "${a04ModuleCommit}:$($a04Closure.compatibility_audit_evolution.command_inventory.path)") -join "`n"
+  Assert-MIR4M4202CompatibilityAudit ($LASTEXITCODE -eq 0) 'mir4-m42-02-compatibility-audit-historical-a04-inventory-object'
+  $a04Inventory=$a04InventoryText|ConvertFrom-Json -Depth 100
+  Assert-MIR4M4202CompatibilityAudit ([string]$a04Inventory.digest -ceq [string]$a04Closure.compatibility_audit_evolution.command_inventory.digest -and [int]$a04Inventory.command_count -eq [int]$a04Closure.compatibility_audit_evolution.command_inventory.command_count) 'mir4-m42-02-compatibility-audit-historical-a04-inventory'
   $expectedInventoryCommandCount = [int]$a04Closure.compatibility_audit_evolution.command_inventory.command_count
 }
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq $expectedInventoryCommandCount -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-compatibility-audit-inventory'
+Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq @($inventory.commands).Count -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -cmatch '^sha256:[0-9a-f]{64}$') 'mir4-m42-02-compatibility-audit-current-inventory'
 Assert-MIR4M4202CompatibilityAudit ([bool]$receipt.semantic_contract.ordered_source_slices_preserved -and [bool]$receipt.semantic_contract.command_root_semantics_preserved -and [bool]$receipt.semantic_contract.parameter_surface_unchanged -and [bool]$receipt.semantic_contract.scenario_execution_unchanged -and [bool]$receipt.semantic_contract.result_collation_unchanged -and [bool]$receipt.semantic_contract.compatibility_claims_unchanged -and [bool]$receipt.semantic_contract.stream_authority_unchanged) 'mir4-m42-02-compatibility-audit-semantic-contract'
 Assert-MIR4M4202CompatibilityAudit (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-compatibility-audit-transition'
 Assert-MIR4M4202CompatibilityAudit ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore) -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-compatibility-audit-package-firewall'

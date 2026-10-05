@@ -105,7 +105,7 @@ function Invoke-MIRUpgradeMonitoredProcess {
   $usage=Get-MIR441TreeUsage -Path $root
   if (-not $usage.complete) { throw '[mir441-resource-output-scan-incomplete]' }
   [int64]$aliasBytes=0
-  foreach ($lease in $script:sifLeases) { $aliasBytes+=Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $lease }
+  foreach ($lease in $script:sifLeases) { $aliasBytes+=Get-MIRUpgradeLinkedArchiveBytes -Lease $lease }
   $remaining=$upgradeWriteBytes-([int64]$usage.bytes-$aliasBytes)
   if ($remaining -le 0) { throw '[mir441-resource-output-budget]' }
   $run=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $root `
@@ -328,11 +328,11 @@ $mods = Join-Path $root "mods"
 $userdata = Join-Path $root "userdata"
 $saves = Join-Path $userdata "saves"
 New-Item -ItemType Directory -Force -Path $mods, $userdata, $saves | Out-Null
-if ($SpaceIsFake) {
-  $script:sifLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $root 'source-profile') -Dependencies $sifInputs -Archive $from -ExpectedSha256 $sifPredecessor[0].sha256 -Version $FromVersion -Role source
-  $script:sifLeases+=,$script:sifLease
-  $mods=$script:sifLease.record.stage_directory
-}
+$upgradeRequest=if($SpaceIsFake){'SIF-01'}else{'native-upgrade'}
+$sourceHash=if($SpaceIsFake){$sifPredecessor[0].sha256}else{(Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash}
+$script:sifLease=New-MIRUpgradeLinkedProfile -RunRoot (Join-Path $root 'source-profile') -Dependencies $sifInputs -Archive $from -ExpectedSha256 $sourceHash -Version $FromVersion -Role source -Request $upgradeRequest
+$script:sifLeases+=,$script:sifLease
+$mods=$script:sifLease.record.stage_directory
 $config = Join-Path $root "config.ini"
 @(
   "[path]",
@@ -366,7 +366,6 @@ foreach ($sourceFixtureName in $SourceOnlyFixtureNames) {
 
 $modListPath = Join-Path $mods "mod-list.json"
 Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames @($sourceOnlyModNames+$persistentModNames)
-if (-not $SpaceIsFake) { Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from)) }
 $fixtureDirectoryName = if ($isHistoricalTerminalFixture) {
   $fixtureModName + '_' + [string]$fixtureInfo.version
 } else { $fixtureModName }
@@ -498,27 +497,15 @@ if (-not $createText.Contains($sourceMarker)) {
 $createEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-create.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 
-if ($SpaceIsFake) {
-  $sifSourceTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
-  $script:sifLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $root 'candidate-profile') -Dependencies $sifInputs -Archive $to -ExpectedSha256 $sifTarget[0].archive_sha256 -Version $ToVersion -Role candidate
-  $script:sifLeases+=,$script:sifLease
-  $sourceMods=$mods
-  $mods=$script:sifLease.record.stage_directory
-  Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $root -SourceMods $sourceMods -TargetMods $mods -FixtureName $fixtureDirectoryName
-  $stagedFixture=Join-Path $mods $fixtureDirectoryName
-  $modListPath=Join-Path $mods 'mod-list.json'
-} else {
-  Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
-  Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
-  foreach ($sourceModName in $sourceOnlyModNames) {
-    $sourcePath = Join-Path $mods $sourceModName
-    $resolvedSourcePath = (Resolve-Path -LiteralPath $sourcePath).Path
-    if (-not $resolvedSourcePath.StartsWith($mods, [StringComparison]::OrdinalIgnoreCase)) {
-      throw "Refusing to remove source-only fixture outside temporary mod directory: $resolvedSourcePath"
-    }
-    Remove-Item -LiteralPath $resolvedSourcePath -Recurse -Force
-  }
-}
+$sifSourceTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
+$candidateHash=if($SpaceIsFake){$sifTarget[0].archive_sha256}else{(Get-FileHash -LiteralPath $to -Algorithm SHA256).Hash}
+$script:sifLease=New-MIRUpgradeLinkedProfile -RunRoot (Join-Path $root 'candidate-profile') -Dependencies $sifInputs -Archive $to -ExpectedSha256 $candidateHash -Version $ToVersion -Role candidate -Request $upgradeRequest
+$script:sifLeases+=,$script:sifLease
+$sourceMods=$mods
+$mods=$script:sifLease.record.stage_directory
+Move-MIRUpgradeProfileState -RunRoot $root -SourceMods $sourceMods -TargetMods $mods -FixtureName $fixtureDirectoryName
+$stagedFixture=Join-Path $mods $fixtureDirectoryName
+$modListPath=Join-Path $mods 'mod-list.json'
 Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames $persistentModNames
 $nativeBaseArgs=@('--config',$config,'--no-log-rotation','--mod-directory',$mods)
 
@@ -715,9 +702,9 @@ $resourceEvidence=@(foreach ($resourceRun in $script:upgradeResourceRuns) {
 })
 if ($SpaceIsFake) {
   if (-not $requiresReloadProof -or -not $reloadEvidence -or -not $secondReloadEvidence) { throw '[mir421-sif-two-reloads-required]' }
-  $sifTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
   $assertions=@($assertions | Where-Object { $_ -cne 'base-only-mod-set-retained' }) + @('space-is-fake-mod-set-retained','SIF-01-final-level-seven-science-and-finite-anchors','SIF-01-earned-levels-and-native-rewards-retained')
 }
+$sifTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
 $result = [ordered]@{
   schema = 2
   status = "passed"
@@ -750,9 +737,10 @@ if ($SpaceIsFake) {
   $result.native_scenario='SIF-01-published-4.2.0-to-4.2.1'
   $result.published_maintenance_predecessor=$sifPublishedInputs
   $result.dependency_inputs=$sifTerminal
-  $result.source_inputs=$sifSourceTerminal
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Algorithm SHA256).Hash
 }
+$result.archive_inputs=$sifTerminal
+$result.source_inputs=$sifSourceTerminal
 $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 
 $runSucceeded = $true

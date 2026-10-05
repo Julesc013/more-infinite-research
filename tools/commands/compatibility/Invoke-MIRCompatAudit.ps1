@@ -34,8 +34,8 @@ param(
   [switch]$GenerateLocalPairwiseScenarios,
   [int]$GeneratedLocalPairwiseLimit = 40,
   [switch]$IncludeRecommendedDependencies,
-  [ValidateSet("Copy", "Hardlink", "Symlink")]
-  [string]$LinkMode = "Copy",
+  [ValidateSet("Hardlink")]
+  [string]$LinkMode = "Hardlink",
   [switch]$Offline,
   [string[]]$ScenarioNames = @(),
   [int]$ScenarioTimeoutSeconds = 900,

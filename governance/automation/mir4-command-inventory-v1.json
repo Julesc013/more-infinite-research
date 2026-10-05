@@ -2075,7 +2075,7 @@
     {
       "path": "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
       "classification": "canonical-internal",
-      "sha256": "039223F51295F6F58020094F54B58511358FD6F2ABB864795ECD61F45F4C5D7D",
+      "sha256": "DA8DCCA2AAE31C309BBCD6421E2991B9CEF7163448BF8BEDE3E2174D92650483",
       "hash_mode": "canonical-text-v1",
       "lines": 60,
       "package_visible": false
@@ -3659,9 +3659,9 @@
     {
       "path": "tools/lib/compatibility/FactorioRunner.ps1",
       "classification": "canonical-internal",
-      "sha256": "8EDE7E78F6A54367FAC8593FAAAD5FB08629C0A7A2FB72864EF5460E785C1A6A",
+      "sha256": "D847E017D5944CECCDB5014513E257FCA09A28F1057C099B85E95D900F022762",
       "hash_mode": "canonical-text-v1",
-      "lines": 317,
+      "lines": 266,
       "package_visible": false
     },
     {
@@ -6026,5 +6026,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c6a8e57f8f7b1ad2230fc4d656f82ae6588ecbda3a13ff0acf808b6ba4742e31"
+  "digest": "sha256:f29d30c25b0d4cc3f0411347fd1034b83cbcd759f4a39cee84dd34751a6a6140"
 }

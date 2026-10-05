@@ -284,7 +284,7 @@ try {
     $inputs += New-TinInput $archivePath 'dependency-mod' ([ordered]@{ archive = $entry.Key; sha256 = $entry.Value.sha256 }) ([ordered]@{ kind = 'retained-exact-f210-bob-stage'; stage = $stage })
   }
   $inputs += New-TinInput $candidate 'candidate' ([ordered]@{ target = 'f210'; sha256 = Get-TinSha $candidate }) ([ordered]@{ kind = 'fresh-f210-target-materialization'; source_commit = $sourceCommit; source_tree = $sourceTree })
-  $inputLease = New-MIRImmutableInputLease -RunRoot $run -StageDirectory $mods -Inputs $inputs
+  $inputLease = New-MIRImmutableInputLease -RunRoot $run -StageDirectory $mods -Inputs $inputs -RequireHardLinks
   $fixtureArchive = Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name $fixtureName -Version $fixtureVersion -ModsDir $mods
   Assert-TinPath $fixtureArchive 'F210 Bob Tin level-four fixture archive'
   $enabled = @('base', 'elevated-rails', 'quality', 'recycler', 'space-age')
