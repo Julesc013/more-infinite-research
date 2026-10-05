@@ -72,6 +72,11 @@
   },
   "classes": [
     {
+      "id": "material-audit-input-staging",
+      "patterns": ["^tests/support/MIRMaterialAuditInputs[.]ps1$", "^tests/runtime/Test-MIR(?:AngelTinFinalStateAudit|BobAngelTinFinalStateAudit|BobAngelTinRouteSafety|A06AluminiumFinalState)[.]ps1$"],
+      "tests": ["static.immutable-input-staging"]
+    },
+    {
       "id": "mir42-candidate-construction",
       "patterns": [
         "^tests/release/Test-MIR42FourTargetCandidateBuild[.]ps1$",

@@ -1,5 +1,5 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot = "")
+param([string]$RepoRoot = "",[switch]$ImpactRoutingOnly)
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.
 $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path
@@ -8,6 +8,40 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path }
 . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+
+function Assert-MIRKnownStagingImpactRouting {
+  . (Join-Path $RepoRoot 'tools/lib/assurance/Core.ps1')
+  $impactPath=Join-Path $RepoRoot '.mir/test-impact.yml'
+  $policy=Get-Content -LiteralPath (Join-Path $RepoRoot '.mir/assurance.json') -Raw|ConvertFrom-Json
+  $manifest=Get-Content -LiteralPath $impactPath -Raw|ConvertFrom-Json
+  $paths=@(
+    'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1',
+    'tests/runtime/Test-MIRResearchBrowser.ps1',
+    'tests/support/MIRMaterialAuditInputs.ps1',
+    'tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1',
+    'tests/runtime/Test-MIRBobAngelTinFinalStateAudit.ps1',
+    'tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1',
+    'tests/runtime/Test-MIRA06AluminiumFinalState.ps1'
+  )
+  $expected=@($manifest.baseline_scenarios|Sort-Object)-join'|'
+  foreach($path in $paths){
+    $selection=Get-MIRAssuranceImpactSelection -Paths @($path) -Config $policy
+    if($selection.requires_full-or$selection.unmapped_runtime_paths.Count-or
+      (@($selection.scenarios|Sort-Object)-join'|')-cne$expected){throw "Known staging path expanded unrelated runtime scenarios: $path"}
+    $classification=Get-MIRAssuranceClassification -Paths @($path) -Config $policy
+    if($classification.escalated-or'static.immutable-input-staging'-notin$classification.tests){throw "Known staging path lost its immutable-input check: $path"}
+  }
+  $unknown='tests/runtime/Test-MIRFutureBehavior.ps1'
+  $selection=Get-MIRAssuranceImpactSelection -Paths @($unknown) -Config $policy
+  if(-not$selection.requires_full-or$unknown-notin$selection.unmapped_runtime_paths){throw 'Unknown runtime behavior lost full escalation.'}
+  $selection=Get-MIRAssuranceImpactSelection -Paths @($paths+$unknown) -Config $policy
+  if(-not$selection.requires_full-or$unknown-notin$selection.unmapped_runtime_paths){throw 'Known staging rules masked unknown runtime behavior.'}
+  $player=Get-MIRAssuranceClassification -Paths @('source/prototypes/mir/runtime/future_behavior.lua') -Config $policy
+  if('runtime.full'-notin$player.tests){throw 'Player runtime source lost its broader checks.'}
+  Write-Host '[ok] seven known staging paths retain baseline impact and immutable-input checks; unknown and mixed runtime changes escalate.'
+}
+Assert-MIRKnownStagingImpactRouting
+if($ImpactRoutingOnly){return}
 
 & (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1") self-test
 if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
