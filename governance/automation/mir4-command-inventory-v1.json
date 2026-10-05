@@ -3099,9 +3099,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42NineTargetIndependentEvidenceRehash.ps1",
       "classification": "canonical-internal",
-      "sha256": "70F88BBA0FC9A9CBBB3E6F6C3C65059E613617BD49873BC02594BB40AF36539A",
+      "sha256": "5798FB561FCCE869A7EDCC62EFE08E5CA2A73070197223D51602ABB49FBB650A",
       "hash_mode": "canonical-text-v1",
-      "lines": 16,
+      "lines": 17,
       "package_visible": false
     },
     {
@@ -5323,9 +5323,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1",
       "classification": "canonical-internal",
-      "sha256": "82A727B7363B0F67F6CDAACDC7FDBA514E114DCC3BD903700188BB014EE93112",
+      "sha256": "9367FFB80B18AB4B5457099902D610575D2BBB95C953C03899CBA1B5CDF75DAC",
       "hash_mode": "canonical-text-v1",
-      "lines": 388,
+      "lines": 463,
       "package_visible": false
     },
     {
@@ -6026,5 +6026,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e5c136ed538092a60380cb954d445ea5f5583e0f696c6e4b7875dd1a587fe7cb"
+  "digest": "sha256:8d802cf6438f91370a1028b08e1ad5476d01086e3e7f7da532e58023c23c9674"
 }

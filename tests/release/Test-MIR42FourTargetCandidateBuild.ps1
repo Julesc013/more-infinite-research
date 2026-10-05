@@ -20,6 +20,7 @@ $engineEnvelopeAssertions=0
 $engineDestinationAssertions=0
 $maintenanceCustodyAssertions=0
 $maintenanceEvidenceAssertions=0
+$maintenanceIndependentAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 
@@ -401,6 +402,34 @@ try {
     Assert-MIR42CandidateBuildTest $rejected 'maintenance-reconciliation-refuses-wrong-scope-version-or-count'
     $maintenanceEvidenceAssertions++
   }
+  Assert-MIR42IndependentMaintenanceScope -Scope 'nine-target' -SourceVersion '4.2.1'
+  $maintenanceIndependentAssertions++
+  foreach($case in @(@{scope='four-target';source='4.2.1'},@{scope='nine-target';source='4.2.0'})){
+    $rejected=$false
+    try{Assert-MIR42IndependentMaintenanceScope -Scope $case.scope -SourceVersion $case.source}catch{$rejected=$_.Exception.Message-ceq'[mir42-independent-maintenance-candidate-scope]'}
+    Assert-MIR42CandidateBuildTest $rejected 'independent-maintenance-refuses-other-source-or-scope'
+    $maintenanceIndependentAssertions++
+  }
+  $maintenanceContract=Get-MIR42IndependentScopeContract -Scope 'nine-target' -PublishedMaintenance
+  Assert-MIR42CandidateBuildTest ($maintenanceContract.reconciliation_kind-ceq'MIR42NineTargetMaintenanceEvidenceReconciliationV1'-and$maintenanceContract.rehash_kind-ceq'MIR42NineTargetMaintenanceIndependentEvidenceRehashV1'-and$maintenanceContract.target_requirement-ceq'all_nine_targets_required') 'independent-maintenance-selects-distinct-nine-target-contract'
+  $maintenanceIndependentAssertions++
+  $rejected=$false
+  try{Get-MIR42IndependentScopeContract -Scope 'four-target' -PublishedMaintenance|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-independent-maintenance-candidate-scope]'}
+  Assert-MIR42CandidateBuildTest $rejected 'independent-maintenance-contract-refuses-four-target'
+  $maintenanceIndependentAssertions++
+  # Untrusted custody fields in memory only, not an authenticated input receipt.
+  $custodyFields=[pscustomobject]@{metadata_fixture_only=$true;source=$publishedPin.manifest.source;manifest_sha256=$publishedPin.sha256}
+  $recordedFields=$custodyFields|ConvertTo-Json -Depth 40|ConvertFrom-Json -Depth 40 -DateKind String
+  Assert-MIR42IndependentMaintenanceCustody -Recorded $recordedFields -Current $custodyFields
+  $maintenanceIndependentAssertions++
+  foreach($field in @('source','manifest')){
+    $invalid=$custodyFields|ConvertTo-Json -Depth 40|ConvertFrom-Json -Depth 40 -DateKind String
+    if($field-ceq'source'){$invalid.source.commit='f'*40}else{$invalid.manifest_sha256='0'*64}
+    $rejected=$false
+    try{Assert-MIR42IndependentMaintenanceCustody -Recorded $invalid -Current $custodyFields}catch{$rejected=$_.Exception.Message-ceq'[mir42-independent-maintenance-custody-binding]'}
+    Assert-MIR42CandidateBuildTest $rejected ('independent-maintenance-refuses-changed-custody-'+$field)
+    $maintenanceIndependentAssertions++
+  }
   # Tiny archive/receipt-field controls only; no authenticated public custody
   # or upgrade receipt is fabricated by these fixtures.
   for($i=0;$i-lt9;$i++){
@@ -428,9 +457,31 @@ try {
       Assert-MIR42CandidateBuildTest $rejected ('maintenance-binding-refuses-'+$field+'-'+$target)
       $maintenanceEvidenceAssertions++
     }
+    $independentBinding=$binding|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+    $independentBinding|Add-Member -NotePropertyName github_asset_id -NotePropertyValue 1
+    $independentFields=[pscustomobject]@{predecessor=$maintenance;published_maintenance_predecessor=$independentBinding}
+    Assert-MIR42IndependentMaintenancePredecessor -Target $target -Path $fixtureArchive -Inventory $inventory -Qualified $independentFields -PublishedInput $independentBinding
+    $maintenanceIndependentAssertions++
+    foreach($case in @('path','inventory-hash','version','content','asset-id','missing-custody')){
+      $invalid=$independentFields|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+      $observed=$inventory|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+      $observedPath=$fixtureArchive
+      switch($case){
+        'path'{$observedPath=$fixtureArchive+'.wrong'}
+        'inventory-hash'{$observed.archive_sha256='0'*64}
+        'version'{$invalid.predecessor.version='4.2.'+$target.Substring(1)+'01'}
+        'content'{$invalid.predecessor.archive.content_sha256='0'*64}
+        'asset-id'{$invalid.published_maintenance_predecessor.github_asset_id=2}
+        'missing-custody'{$invalid.PSObject.Properties.Remove('published_maintenance_predecessor')}
+      }
+      $rejected=$false
+      try{Assert-MIR42IndependentMaintenancePredecessor -Target $target -Path $observedPath -Inventory $observed -Qualified $invalid -PublishedInput $independentBinding}catch{$rejected=$_.Exception.Message-ceq('[mir42-independent-maintenance-predecessor-binding] '+$target)}
+      Assert-MIR42CandidateBuildTest $rejected ('independent-maintenance-refuses-'+$case+'-'+$target)
+      $maintenanceIndependentAssertions++
+    }
   }
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 
