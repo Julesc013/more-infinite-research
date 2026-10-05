@@ -128,7 +128,9 @@ local function parse_recipe(recipe)
   return {
     valid = true,
     ingredients = ingredients,
-    results = results
+    results = results,
+    cap_owned_by_recycling = recipe_semantics.has_recipe_category(recipe, "recycling"),
+    effective_maximum_productivity = recipe_semantics.resolve(recipe, all[1], target_profiles.current()).effective_maximum_productivity
   }
 end
 
@@ -166,6 +168,8 @@ function M.build()
             recipe = recipe,
             input = input,
             results = parsed.results,
+            cap_owned_by_recycling = parsed.cap_owned_by_recycling,
+            effective_maximum_productivity = parsed.effective_maximum_productivity,
             exact_identity = #parsed.results == 1 and parsed.results[1].name == input.name
           })
         end

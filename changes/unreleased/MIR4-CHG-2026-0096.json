@@ -7,7 +7,7 @@
   "summary": "Correct probabilistic self-recycling productivity caps.",
   "details": [
     "When the self-recycling-only cap scope is active, cap calculations subtract catalyst exclusions before probability, respect declared quantities and target exclusion defaults, and keep positive productive returns finite. Invalid or overflowing shapes cannot authorize elevated caps.",
-    "Nonzero or malformed extra rolls remain withheld. The existing material-route fixture covers the actual index, policy and applied recipe caps; standalone Lua source controls do not qualify native packages or saves."
+    "Recycling-category recipes retain their existing caps; admission uses their native caps rather than assuming they were lowered. Nonzero or malformed extra rolls remain withheld. The fixture consumes the actual index, policy and recipe-cap mutation; standalone Lua controls do not qualify native packages or saves."
   ],
   "semantic_domains": [
     "recipe-productivity",

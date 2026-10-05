@@ -1003,6 +1003,12 @@ end)()
     {id="independent zero wins",input=2,fields={amount=2,independent_probability=0,probability=1},cap=math.huge},
     {id="shared and independent rolls",input=4,fields={amount=4,independent_probability=0.5,probability=0.99,shared_probability={min=0.2,max=0.7},ignored_by_productivity=1},cap=4},
     {id="unit return",input=1,fields={amount=1},cap=0},
+    {id="owned recycling cap remains unsafe",input=1,fields={amount=1,probability=0.5},cap=1,category="recycling",recipe_cap=3,owned=true,admitted=false},
+    {id="owned recycling cap is safe",input=1,fields={amount=1,probability=0.5},cap=1,category="recycling",recipe_cap=1,owned=true},
+    {id="plural recycling ownership",input=1,fields={amount=1,probability=0.5},cap=1,categories={"crafting","recycling"},recipe_cap=3,owned=true,admitted=false},
+    {id="plural category wins",input=1,fields={amount=1,probability=0.5},cap=1,category="recycling",categories={"crafting"},recipe_cap=3},
+    {id="unsafe native default cap",input=1,fields={amount=1,probability=0.5},cap=1,category="recycling",omit_recipe_cap=true,owned=true,admitted=false},
+    {id="native default differs from fallback",input=1,fields={amount=1,probability=0.25},cap=3,category="recycling",omit_recipe_cap=true,owned=true,fallback=4},
     {id="explicit zero extra roll",input=2,fields={amount=1,extra_count_fraction=0},cap=1},
     {id="extra roll withheld",input=2,fields={amount=1,extra_count_fraction=0.5}},
     {id="malformed extra roll",input=2,fields={amount=1,extra_count_fraction="invalid"}},
@@ -1021,19 +1027,21 @@ end)()
       for key,value in pairs(case.fields) do result[key]=value end
       recipes={
         manufacture={name="manufacture",ingredients={{"ore",1}},results={{"component",1}}},
-        reclaim={name="reclaim",ingredients={{"component",case.input}},results={result},maximum_productivity=100}
+        reclaim={name="reclaim",ingredients={{"component",case.input}},results={result},maximum_productivity=case.recipe_cap or 100,category=case.category,categories=case.categories}
       }
+      if case.omit_recipe_cap then recipes.reclaim.maximum_productivity=nil end
+      local declared_cap=recipes.reclaim.maximum_productivity
       -- Snapshot equality includes malformed values without requiring the
       -- ordinary fingerprint formatter to support NaN or infinity.
       local before_amount=result.amount
       local before_probability=result.probability
-      local classifier=scope.build(3)
+      local classifier=scope.build(case.fallback or 3)
       local expected=version=="1.1" and case.legacy_cap or case.cap
       local actual=classifier.maximum_safe_productivity("reclaim")
       local id="recycling cap "..version.." "..case.id
       check(actual==expected or (actual and expected and math.abs(actual-expected)<=0.000001),id)
       local accepted,_,witness=classifier.approve(recipes.manufacture)
-      check(accepted==(expected~=nil),id.." forward admission")
+      check(accepted==(expected~=nil and case.admitted~=false),id.." forward admission")
       if accepted then
         check(witness.maximum_loop_gain<=1.000001,id.." loop gain")
         check(witness.maximum_safe_recycling_productivity==actual,id.." consumed cap")
@@ -1044,10 +1052,12 @@ end)()
         -- The real admitted prototype-limit pipeline must consume the cap,
         -- using its authored percentage decoder and scoped startup control.
         local changed=limits.apply()
-        local reclaim_cap=expected and math.min(3,expected) or 3
+        local reclaim_cap
+        if case.owned then reclaim_cap=declared_cap
+        else reclaim_cap=expected and math.min(3,expected) or 3 end
         check(recipes.reclaim.maximum_productivity==reclaim_cap,id.." applied return cap")
         check(recipes.manufacture.maximum_productivity==(accepted and 100 or 3),id.." applied forward cap")
-        check(changed.productivity==2,id.." consumed mutation count")
+        check(changed.productivity==(case.owned and 1 or 2),id.." consumed mutation count")
       end
     end
   end
