@@ -8,7 +8,7 @@ Set-StrictMode -Version Latest
 # one probe's total new-output budget, not a second scheduler or package writer.
 function Resolve-MIRNativeProbeDependencyInputs {
   param(
-    [Parameter(Mandatory)][string]$StageRoot,
+    [AllowEmptyString()][string]$StageRoot='',
     [Parameter(Mandatory)][Collections.IDictionary]$ExpectedArchives,
     [string[]]$LocalModLibraryDirs=@()
   )
@@ -17,8 +17,8 @@ function Resolve-MIRNativeProbeDependencyInputs {
   foreach($entry in $ExpectedArchives.GetEnumerator()){
     $name=[string]$entry.Key;$expected=[string]$entry.Value
     if($name -cnotmatch '^[A-Za-z0-9][A-Za-z0-9._-]*[.]zip$' -or $expected -cnotmatch '^[0-9A-F]{64}$'){throw '[mir-native-probe-dependency-identity]'}
-    $path=Join-Path $StageRoot (Join-Path 'mods' $name);$kind='exact-preserved-stage'
-    if(-not (Test-Path -LiteralPath $path -PathType Leaf)){
+    $path=if($StageRoot){Join-Path $StageRoot (Join-Path 'mods' $name)}else{''};$kind='exact-preserved-stage'
+    if(-not $path -or -not (Test-Path -LiteralPath $path -PathType Leaf)){
       $path='';$kind='verified-local-dependency-library'
       foreach($directory in $LocalModLibraryDirs){
         $candidate=Join-Path $directory $name
@@ -34,6 +34,53 @@ function Resolve-MIRNativeProbeDependencyInputs {
   return $rows
 }
 
+# Current F210 candidates are read against the existing package/materializer
+# authorities. This validates supplied bytes without writing another package.
+function Assert-MIRNativeProbeF210Candidate([bool]$Condition,[string]$Message) {
+  if(-not $Condition){throw "[mir-native-probe-f210-candidate] $Message"}
+}
+function Read-MIRNativeProbeF210CurrentCandidate([string]$Repository, [string]$Archive, [string]$ReceiptPath) {
+  Assert-MIRNativeProbeF210Candidate (-not [string]::IsNullOrWhiteSpace($Archive) -and -not [string]::IsNullOrWhiteSpace($ReceiptPath)) 'supply candidate and canonical materialization receipt'
+  $candidate = (Resolve-Path -LiteralPath $Archive).Path
+  $receipt = Get-Content -LiteralPath $ReceiptPath -Raw | ConvertFrom-Json -Depth 30 -DateKind String
+  Assert-MIRNativeProbeF210Candidate (($receipt | ConvertTo-Json -Depth 30) | Test-Json -SchemaFile (Join-Path $Repository 'spec/schemas/mir4-package-composition-result-v1.schema.json')) 'candidate materialization schema differs'
+  Assert-MIRNativeProbeF210Candidate (Test-MIR4BootstrapRecordHash -Record $receipt) 'candidate materialization record hash differs'
+  $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $Repository -Target f210 -SourceVersion '4.2.1'
+  Assert-MIRNativeProbeF210Candidate ($receipt.status -ceq 'passed-canonical-package-authority-materialization' -and $receipt.target -ceq 'f210' -and $receipt.source_version -ceq $identity.source_version -and $receipt.distribution_version -ceq $identity.distribution_version) 'candidate materialization identity differs'
+  Assert-MIRNativeProbeF210Candidate ($receipt.package_source_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $Repository)) 'candidate source fingerprint differs'
+  Assert-MIRNativeProbeF210Candidate ((Resolve-Path -LiteralPath $receipt.archive_path).Path -ceq $candidate -and [IO.Path]::GetFileName($candidate) -ceq $identity.package_name) 'candidate archive path or filename differs'
+  foreach ($invariant in @('all_source_hashes_verified','all_output_hashes_verified','version_identity_verified','canonical_package_authority')) {
+    Assert-MIRNativeProbeF210Candidate ([bool]$receipt.invariants.$invariant) "candidate invariant differs: $invariant"
+  }
+  $inventory = Get-MIR4ArchiveInventory -Path $candidate
+  Assert-MIRNativeProbeF210Candidate ($inventory.archive_sha256 -ceq $receipt.archive_sha256 -and $inventory.content_sha256 -ceq $receipt.content_sha256 -and $inventory.entry_count -eq $receipt.entry_count) 'candidate archive inventory differs'
+  $zip = [IO.Compression.ZipFile]::OpenRead($candidate)
+  try {
+    Assert-MIRNativeProbeF210Candidate (@($zip.Entries | Where-Object {-not $_.FullName.StartsWith($identity.distribution_root+'/',[StringComparison]::Ordinal) -or $_.FullName -match '/(?:tests|fixtures|docs|[.]mir|[.]codex|[.]github|build|dist)/'}).Count -eq 0) 'candidate root or exclusions differ'
+    $entry = $zip.GetEntry($identity.distribution_root+'/info.json')
+    Assert-MIRNativeProbeF210Candidate ($null -ne $entry -and $entry.Length -le 64KB) 'candidate info differs'
+    $reader = [IO.StreamReader]::new($entry.Open())
+    try {$info = $reader.ReadToEnd() | ConvertFrom-Json} finally {$reader.Dispose()}
+    Assert-MIRNativeProbeF210Candidate ($info.name -ceq 'more-infinite-research' -and $info.version -ceq $identity.distribution_version -and $info.factorio_version -ceq '2.1') 'candidate metadata differs'
+    $state = Get-MIR4TargetMaterializerState -RepoRoot $Repository -Target f210
+    $selection = Get-MIR4TargetMaterializationBindings -State $state
+    Assert-MIRNativeProbeF210Candidate ($receipt.source_manifest_sha256 -ceq $state.manifest.record_sha256 -and $receipt.target_overlay_sha256 -ceq $state.composition.record_sha256) 'candidate composition authority differs'
+    Assert-MIRNativeProbeF210Candidate ($zip.Entries.Count -eq $selection.bindings.Count) 'candidate package membership differs'
+    foreach ($binding in $selection.bindings) {
+      $member = @($zip.Entries | Where-Object FullName -CEQ ($identity.distribution_root+'/'+$binding.output_path))
+      Assert-MIRNativeProbeF210Candidate ($member.Count -eq 1) "candidate binding missing or duplicated: $($binding.output_path)"
+      # Metadata is checked above; these authored presentation files are
+      # rewritten by the existing patch-identity writer. Runtime bytes retain
+      # their exact current materializer binding, without building another ZIP.
+      if ($binding.output_path -in @('info.json','changelog.txt','README.md')) {continue}
+      Assert-MIRNativeProbeF210Candidate ($member[0].Length -eq $binding.output_bytes) "candidate binding size differs: $($binding.output_path)"
+      $stream = $member[0].Open()
+      try {$hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))} finally {$stream.Dispose()}
+      Assert-MIRNativeProbeF210Candidate ($hash -ceq $binding.output_sha256) "candidate binding hash differs: $($binding.output_path)"
+    }
+  } finally {$zip.Dispose()}
+  return [pscustomobject]@{path=$candidate;receipt=$receipt}
+}
 function New-MIRNativeProbeResourceContext {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,

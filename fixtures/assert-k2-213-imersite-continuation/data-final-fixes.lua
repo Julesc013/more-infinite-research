@@ -6,7 +6,7 @@ local expected = {
   base = "2.1.20",
   Krastorio2 = "2.1.3",
   ["Krastorio2-spaced-out"] = "2.0.13",
-  ["more-infinite-research"] = "4.2.21000"
+  ["more-infinite-research"] = "4.2.21001"
 }
 for name, version in pairs(expected) do
   if mods[name] ~= version then fail("unexpected exact profile " .. name) end
