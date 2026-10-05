@@ -1701,11 +1701,12 @@ function Assert-MIR42RealEngineCampaignExecution {
 }
 
 function Get-MIR42ExactIndependentVerificationReceipt {
-  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Qualification)
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Qualification,$PublishedMaintenanceInputs = $null)
   $scope = Get-MIR42SealCandidateScope -Candidate $Candidate -Code 'mir42-seal-independent-candidate'
-  $contract = Get-MIR42SealScopeContract -Scope $scope
+  $contract = Get-MIR42SealIndependentInputContract -Candidate $Candidate -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs)
   $receipt = Read-MIR42SealRecord -Path $Path -Code 'mir42-seal-independent'
   $properties = @('schema','kind','status','source','evaluator','candidate_manifest','qualification','targets',$contract.independent_target_requirement,'factorio_processes','release_qualification','independent_release_acceptance','technical_seal','signing_authorized','publication_authorized','record_sha256')
+  if ($null -ne $PublishedMaintenanceInputs) { $properties += 'published_maintenance_predecessor' }
   Assert-MIR42SealPropertyNames -Value $receipt.record -Expected $properties -Code 'mir42-seal-independent-shape'
   if ([int]$receipt.record.schema -ne 1 -or [string]$receipt.record.kind -cne [string]$contract.independent_kind -or
       [string]$receipt.record.status -cne [string]$contract.independent_status -or
@@ -1720,7 +1721,34 @@ function Get-MIR42ExactIndependentVerificationReceipt {
     throw '[mir42-seal-independent-evidence-reconciliation-state]'
   }
   Assert-MIR42ReceiptBinding -Receipt $receipt -Candidate $Candidate -Code 'mir42-seal-independent' -ExpectedTargetStatus 'reconciled'
+  if ($null -ne $PublishedMaintenanceInputs) { Assert-MIR42SealIndependentMaintenanceCustody -Record $receipt.record -PublishedInputs $PublishedMaintenanceInputs }
   return $receipt
+}
+
+function Get-MIR42SealIndependentInputContract {
+  param([Parameter(Mandatory)]$Candidate,[switch]$PublishedMaintenance)
+  $contract = Get-MIR42JoinedCampaignInputContract -Candidate $Candidate -PublishedMaintenance:$PublishedMaintenance
+  if ($PublishedMaintenance) {
+    $contract.independent_kind = 'MIR42NineTargetMaintenanceIndependentEvidenceRehashV1'
+    $contract.independent_status = 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED'
+  }
+  return $contract
+}
+
+function Assert-MIR42SealIndependentMaintenanceCustody {
+  param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)]$PublishedInputs)
+  Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $Record.published_maintenance_predecessor -Current $PublishedInputs -Code 'mir42-seal-independent-maintenance-custody-binding'
+  $actual = @($Record.targets | ForEach-Object { [string]$_.target })
+  if ($actual.Count -ne $script:MIR42SealNineTargetCandidates.Count -or ($actual -join '|') -cne ($script:MIR42SealNineTargetCandidates -join '|')) {
+    throw '[mir42-seal-independent-maintenance-target-set]'
+  }
+  foreach ($row in $Record.targets) {
+    $inputs = @($PublishedInputs.targets | Where-Object { [string]$_.target -ceq [string]$row.target })
+    if ($inputs.Count -ne 1 -or [string]$row.predecessor_sha256 -cne [string]$inputs[0].sha256) {
+      throw '[mir42-seal-independent-maintenance-predecessor-binding]'
+    }
+    Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $row.published_maintenance_predecessor -Current $inputs[0] -Code ('mir42-seal-independent-maintenance-row-custody-binding-' + [string]$row.target)
+  }
 }
 
 function Get-MIR42ProtectedSigningCeremony {
@@ -2336,8 +2364,12 @@ function Get-MIR42TechnicalSealReadinessForScope {
     [string]$SourceFreezeAuthorityPath='',
     [string]$ReviewerAttestationPath='',
     [string]$SshKeygenPath='',
-    [string]$ProgrammePath=''
+    [string]$ProgrammePath='',
+    [string]$PublishedMaintenancePredecessorManifestPath=''
   )
+  $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
+  if ($maintenanceRequested -and $RequiredScope -cne 'nine-target') { throw '[mir42-maintenance-readiness-candidate-scope]' }
+  $maintenanceInputs = $null
   $contract = Get-MIR42SealScopeContract -Scope $RequiredScope
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $checks = [ordered]@{}
@@ -2346,12 +2378,29 @@ function Get-MIR42TechnicalSealReadinessForScope {
   try {
     $state.candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
     Assert-MIR42SealTargetSet -Rows @($state.candidate.targets) -Code ("mir42-" + $RequiredScope + '-seal-candidate') -Scope $RequiredScope
+    if ($maintenanceRequested) { $null = Get-MIR42SealIndependentInputContract -Candidate $state.candidate -PublishedMaintenance }
     $checks.candidate = $true
   } catch { $checks.candidate = $false; $blockers.Add($_.Exception.Message) }
+  if ($maintenanceRequested) {
+    if ($checks.candidate) {
+      try {
+        $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+        if ($LASTEXITCODE -ne 0) { throw '[mir42-maintenance-readiness-release-readback]' }
+        $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+        $state.maintenance_inputs = $maintenanceInputs
+        $checks.maintenance_predecessor = $true
+      } catch { $checks.maintenance_predecessor = $false; $blockers.Add($_.Exception.Message) }
+    } else { $checks.maintenance_predecessor = $false; $blockers.Add('[mir42-maintenance-readiness-predecessor-unavailable]') }
+    # This operation admits evidence readers only. The sealing writer and its
+    # downstream consumers still require a separately completed contract.
+    $checks.maintenance_seal_consumer = $false
+    $blockers.Add('[mir42-maintenance-seal-consumer-pending]')
+  }
   if ($checks.candidate) { try { $programmeArguments=@{RepoRoot=$repo;Scope=$RequiredScope};if(-not [string]::IsNullOrWhiteSpace($ProgrammePath)){$programmeArguments.ProgrammePath=$ProgrammePath};$state.programme = Get-MIR42LiveProgrammeTransition @programmeArguments; if ($RequiredScope -ceq 'nine-target') { Assert-MIR42NineTargetProgrammeCandidateBinding -Programme $state.programme -Candidate $state.candidate }; $checks.programme = $true } catch { $checks.programme = $false; $blockers.Add($_.Exception.Message) } } else { $checks.programme = $false; $blockers.Add('[mir42-seal-programme-unavailable]') }
-  if ($checks.candidate -and -not [string]::IsNullOrWhiteSpace($QualificationPath)) { try { $state.qualification = Get-MIR42ExactQualificationReceipt -Path $QualificationPath -Candidate $state.candidate; $checks.qualification = $true } catch { $checks.qualification = $false; $blockers.Add($_.Exception.Message) } } else { $checks.qualification = $false; $blockers.Add('[mir42-seal-qualification-missing]') }
-  if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($RealEngineCampaignPath)) { try { $state.campaign = Get-MIR42RealEngineCandidateCampaign -RepoRoot $repo -Path $RealEngineCampaignPath -Candidate $state.candidate -Reconciliation $state.qualification; $checks.campaign = $true } catch { $checks.campaign = $false; $blockers.Add($_.Exception.Message) } } else { $checks.campaign = $false; $blockers.Add('[mir42-seal-real-engine-campaign-missing]') }
-  if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($IndependentVerificationPath)) { try { $state.independent = Get-MIR42ExactIndependentVerificationReceipt -Path $IndependentVerificationPath -Candidate $state.candidate -Qualification $state.qualification; $checks.independent = $true } catch { $checks.independent = $false; $blockers.Add($_.Exception.Message) } } else { $checks.independent = $false; $blockers.Add('[mir42-seal-independent-missing]') }
+  $candidateInputsReady = $checks.candidate -and (-not $maintenanceRequested -or $checks.maintenance_predecessor)
+  if ($candidateInputsReady -and -not [string]::IsNullOrWhiteSpace($QualificationPath)) { try { $state.qualification = Get-MIR42ExactQualificationReceipt -Path $QualificationPath -Candidate $state.candidate -PublishedMaintenanceInputs $maintenanceInputs; $checks.qualification = $true } catch { $checks.qualification = $false; $blockers.Add($_.Exception.Message) } } else { $checks.qualification = $false; $blockers.Add('[mir42-seal-qualification-missing]') }
+  if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($RealEngineCampaignPath)) { try { $state.campaign = Get-MIR42RealEngineCandidateCampaign -RepoRoot $repo -Path $RealEngineCampaignPath -Candidate $state.candidate -Reconciliation $state.qualification -PublishedMaintenanceInputs $maintenanceInputs; $checks.campaign = $true } catch { $checks.campaign = $false; $blockers.Add($_.Exception.Message) } } else { $checks.campaign = $false; $blockers.Add('[mir42-seal-real-engine-campaign-missing]') }
+  if ($checks.qualification -and -not [string]::IsNullOrWhiteSpace($IndependentVerificationPath)) { try { $state.independent = Get-MIR42ExactIndependentVerificationReceipt -Path $IndependentVerificationPath -Candidate $state.candidate -Qualification $state.qualification -PublishedMaintenanceInputs $maintenanceInputs; $checks.independent = $true } catch { $checks.independent = $false; $blockers.Add($_.Exception.Message) } } else { $checks.independent = $false; $blockers.Add('[mir42-seal-independent-missing]') }
   if (-not [string]::IsNullOrWhiteSpace($T16ApprovedOwnerSid) -and @($T16ApprovedMutationSids).Count -gt 0) { try { $state.t16_acl_contract = New-MIR42T16AclContract -ApprovedOwnerSid $T16ApprovedOwnerSid -ApprovedMutationSids $T16ApprovedMutationSids; $checks.t16_acl_contract = $true } catch { $checks.t16_acl_contract = $false; $blockers.Add($_.Exception.Message) } } else { $checks.t16_acl_contract = $false; $blockers.Add('[mir42-seal-t16-acl-contract-human-input-required]') }
   if ($checks.t16_acl_contract -and -not [string]::IsNullOrWhiteSpace($T16TrustRootPath) -and -not [string]::IsNullOrWhiteSpace($OperatorTrustSourcePath) -and -not [string]::IsNullOrWhiteSpace($T16ProtectedRootPath) -and -not [string]::IsNullOrWhiteSpace($T16ImmutableAnchorPath) -and -not [string]::IsNullOrWhiteSpace($SshKeygenPath)) { try { $state.t16_trust_root = Get-MIR42ExternalT16LedgerTrustRoot -RepoRoot $repo -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -ProtectedRootPath $T16ProtectedRootPath -ImmutableAnchorPath $T16ImmutableAnchorPath -AclContract $state.t16_acl_contract -SshKeygenPath $SshKeygenPath -Scope $RequiredScope; $checks.t16_trust_root = $true } catch { $checks.t16_trust_root = $false; $blockers.Add($_.Exception.Message) } } else { $checks.t16_trust_root = $false; $blockers.Add('[mir42-seal-external-t16-trust-root-or-protected-root-or-immutable-anchor-or-verifier-missing]') }
   if ($checks.t16_trust_root -and -not [string]::IsNullOrWhiteSpace($SigningCeremonyPath)) { try { $state.signing = Get-MIR42ProtectedSigningCeremony -RepoRoot $repo -Path $SigningCeremonyPath -T16TrustRoot $state.t16_trust_root; $checks.signing = $true } catch { $checks.signing = $false; $blockers.Add($_.Exception.Message) } } else { $checks.signing = $false; $blockers.Add('[mir42-seal-signing-or-external-t16-trust-root-missing]') }
@@ -2430,7 +2479,8 @@ function Get-MIR42NineTargetTechnicalSealReadiness {
     [string]$SourceFreezeAuthorityPath='',
     [string]$ReviewerAttestationPath='',
     [string]$SshKeygenPath='',
-    [string]$ProgrammePath=''
+    [string]$ProgrammePath='',
+    [string]$PublishedMaintenancePredecessorManifestPath=''
   )
   Get-MIR42TechnicalSealReadinessForScope @PSBoundParameters -RequiredScope 'nine-target'
 }

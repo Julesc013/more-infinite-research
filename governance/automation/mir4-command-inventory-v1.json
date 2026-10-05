@@ -3115,9 +3115,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1",
       "classification": "canonical-internal",
-      "sha256": "449366AAC13BC9BC45ED9B0683E9ED4A3CFF95C5FD6C219725180168609B264C",
+      "sha256": "9998A41C71153EA5297CCBC54DE7182F0CCDC6FAC86AAEBA499769FBD9C0C4EE",
       "hash_mode": "canonical-text-v1",
-      "lines": 98,
+      "lines": 99,
       "package_visible": false
     },
     {
@@ -5363,9 +5363,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
       "classification": "canonical-internal",
-      "sha256": "9D1212EC8884E4E3AB32B5F3063C4255EAE2705DFC487CBFE08C26CF693E69A5",
+      "sha256": "1BEAD3B2365AA39B6BFE05D3EBD8712A72B93802C5D590CB7ACFA243FCF3D158",
       "hash_mode": "canonical-text-v1",
-      "lines": 2554,
+      "lines": 2604,
       "package_visible": false
     },
     {
@@ -6026,5 +6026,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:75818c2e4b5a22b48c9b26f85bfbffaaf1a11844c9c757823ddd1da92c150ad7"
+  "digest": "sha256:807165071959324db488d3cf35de22556566dce40661ffc293a636de0fe35dbc"
 }
