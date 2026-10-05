@@ -19,6 +19,7 @@ $script:MIR42NineTargetEngineTargets=@($script:MIR42ModernEngineTargets+@('f017'
 $engineEnvelopeAssertions=0
 $engineDestinationAssertions=0
 $maintenanceCustodyAssertions=0
+$maintenanceEvidenceAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 
@@ -387,8 +388,49 @@ try {
   try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $invalidPinPath|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
   Assert-MIR42CandidateBuildTest $rejected 'published-predecessor-refuses-same-size-changed-manifest-by-raw-hash'
   $maintenanceCustodyAssertions++
+  $scopeCandidates=@($patchDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})
+  Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $scopeCandidates
+  $maintenanceEvidenceAssertions++
+  foreach($case in @(
+    @{scope='four-target';rows=@($scopeCandidates|Select-Object -First 4)},
+    @{scope='nine-target';rows=@($nineDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})},
+    @{scope='nine-target';rows=@($scopeCandidates|Select-Object -First 8)}
+  )){
+    $rejected=$false
+    try{Assert-MIR42MaintenanceReconciliationScope -Scope $case.scope -Candidates $case.rows}catch{$rejected=$_.Exception.Message-ceq'[mir42-reconciliation-maintenance-candidate-scope]'}
+    Assert-MIR42CandidateBuildTest $rejected 'maintenance-reconciliation-refuses-wrong-scope-version-or-count'
+    $maintenanceEvidenceAssertions++
+  }
+  # Tiny archive/receipt-field controls only; no authenticated public custody
+  # or upgrade receipt is fabricated by these fixtures.
+  for($i=0;$i-lt9;$i++){
+    $descriptor=$nineDescriptors[$i];$target=[string]$descriptor.target
+    $fixtureRoot=Join-Path $identityRoot ('predecessor-binding/'+$target)
+    $fixtureTree=Join-Path $fixtureRoot ('more-infinite-research_'+$descriptor.distribution_version)
+    New-Item -ItemType Directory -Force -Path $fixtureTree|Out-Null
+    $info=[ordered]@{name='more-infinite-research';version=[string]$descriptor.distribution_version;factorio_version=$lines[$i]}
+    [IO.File]::WriteAllText((Join-Path $fixtureTree 'info.json'),($info|ConvertTo-Json -Compress),$utf8)
+    $fixtureArchive=Join-Path $fixtureRoot ('more-infinite-research_'+$descriptor.distribution_version+'.zip')
+    Write-MIR4DeterministicRawTreeArchive -SourceRoot $fixtureTree -EntryRoot (Split-Path -Leaf $fixtureTree) -OutputPath $fixtureArchive -ContainmentRoot $identityRoot
+    $inventory=Get-MIR4ArchiveInventory -Path $fixtureArchive
+    $binding=[pscustomobject]@{target=$target;path=$fixtureArchive;version=[string]$descriptor.distribution_version;
+      sha256=$inventory.archive_sha256;bytes=$inventory.bytes;content_sha256=$inventory.content_sha256;entry_count=$inventory.entry_count}
+    $receiptFields=[pscustomobject]@{from=[pscustomobject]@{version=$binding.version;sha256=$binding.sha256}}
+    $legacy=Get-MIR42QualificationPredecessor -Target $target -Path $fixtureArchive -Receipt $receiptFields
+    $maintenance=Get-MIR42QualificationPredecessor -Target $target -Path $fixtureArchive -Receipt $receiptFields -PublishedMaintenanceInput $binding
+    Assert-MIR42CandidateBuildTest (($legacy|ConvertTo-Json -Depth 20 -Compress)-ceq($maintenance|ConvertTo-Json -Depth 20 -Compress)) ('maintenance-binding-preserves-return-contract-'+$target)
+    $maintenanceEvidenceAssertions++
+    foreach($field in @('target','path','version','sha256','bytes','content_sha256','entry_count')){
+      $invalid=$binding|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+      if($field-in@('bytes','entry_count')){$invalid.$field++}else{$invalid.$field='wrong-binding'}
+      $rejected=$false
+      try{Get-MIR42QualificationPredecessor -Target $target -Path $fixtureArchive -Receipt $receiptFields -PublishedMaintenanceInput $invalid|Out-Null}catch{$rejected=$_.Exception.Message-ceq('[mir42-qualification-published-maintenance-predecessor-binding] '+$target)}
+      Assert-MIR42CandidateBuildTest $rejected ('maintenance-binding-refuses-'+$field+'-'+$target)
+      $maintenanceEvidenceAssertions++
+    }
+  }
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 
