@@ -7,7 +7,7 @@
   "summary": "Prevent material continuations from adding a downward science frontier.",
   "details": [
     "When early material research already needs space, planetary or a concretely gated late mod science, continuation reuses the shared progression policy instead of adding a lower ordinary pack. The established space-first preference for earlier research and the pre-final useful continuation policy remain intact.",
-    "Inherited ingredients and amounts, stable IDs, admitted effects, finite useful caps, settings and next-level cost anchors are preserved. Joint-lab and production checks still govern science; the final-pack escape remains when no ordinary or inherited late frontier is usable. Current native save, progression and performance acceptance remain outstanding."
+    "Inherited ingredients, amounts, IDs, admitted effects, caps, settings and cost anchors are preserved. Joint-lab and production checks still govern science. The final-pack escape remains when no ordinary or inherited late frontier is usable. Native save, progression and performance acceptance remain outstanding."
   ],
   "semantic_domains": [
     "progression",
@@ -70,7 +70,7 @@
   "package_visibility": "player-package",
   "impacts": {
     "save": "unknown",
-    "settings": "unchanged",
+    "settings": "none",
     "migration": "unknown",
     "compatibility": "changed",
     "public_contract": "compatible",
