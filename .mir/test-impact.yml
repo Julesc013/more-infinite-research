@@ -685,6 +685,12 @@
       "tags": [],
       "groups": [],
       "pattern": "tests/runtime/Test-MIRA06AluminiumFinalState.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/runtime/Test-MIRPassiveRepair.ps1"
     }
   ]
 }

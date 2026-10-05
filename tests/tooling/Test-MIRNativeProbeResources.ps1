@@ -75,6 +75,8 @@ try {
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Final observer PrepareOnly bypassed allocation admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRResearchBrowser.ps1') -RepoRoot $repo -FactorioBin 'absent-browser-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Browser harness allocated before peak-budget admission.'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRPassiveRepair.ps1') -RepoRoot $repo -CandidateZip 'absent-passive-candidate' -FactorioBin 'absent-passive-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Passive repair allocated or probed an engine before peak-budget admission.'
   $context=New-MIRNativeProbeResourceContext @arguments -ExpectedPeakMemoryMiB 1024
   Assert-Probe (-not (Test-Path -LiteralPath $context.root)) 'successful admission allocated before caller initialization.'
   New-Item -ItemType Directory -Path $context.root | Out-Null
@@ -202,6 +204,43 @@ try {
   [IO.File]::WriteAllBytes($source,[byte[]]::new(128KB))
   $archiveInput=[ordered]@{source_path=$source;file_name='dependency.zip';expected_sha256=Get-MIRImmutableInputSha256 $source;role='dependency-mod';identity=@{name='controlled'};provenance=@{kind='tiny-controlled-fixture'};immutable=$true}
   $auditCandidate=Join-Path $fixture 'more-infinite-research_4.2.21000.zip';[IO.File]::WriteAllBytes($auditCandidate,[byte[]]::new(64))
+  & {
+    # Consume the actual passive-repair input and engine adapters. The tiny
+    # archive and mocked engine output prove staging/forwarding, not gameplay.
+    $tokens=$null;$errors=$null
+    $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRPassiveRepair.ps1'),[ref]$tokens,[ref]$errors)
+    Assert-Probe ($errors.Count-eq0) 'passive repair harness parse failed.'
+    foreach($name in @('New-PassiveRepairInputLease','Invoke-ProbeEngine')){
+      $functions=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
+      Assert-Probe ($functions.Count-eq1) "passive repair adapter missing: $name"
+      . ([scriptblock]::Create($functions[0].Extent.Text))
+    }
+    $run=Join-Path $fixture 'passive-repair';$mods=Join-Path $run 'mods'
+    New-Item -ItemType Directory -Path $run | Out-Null
+    $inputLease=New-PassiveRepairInputLease -Candidate $auditCandidate -ExpectedSha256 (Get-MIRImmutableInputSha256 $auditCandidate) -RunRoot $run -ModsDirectory $mods
+    try{
+      Assert-Probe ($inputLease.record.require_hard_links-and$inputLease.record.inputs.Count-eq1) 'passive repair did not require one strict archive input.'
+      Assert-Probe ((Get-MIRImmutableInputFileIdentity $auditCandidate)-ceq(Get-MIRImmutableInputFileIdentity (Join-Path $mods ([IO.Path]::GetFileName($auditCandidate))))) 'passive repair copied its candidate.'
+      $terminal=Complete-MIRImmutableInputLease -Lease $inputLease
+      $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal
+      Assert-Probe ($terminal.inputs[0].role-ceq'candidate') 'passive repair lost candidate custody.'
+    }finally{if(-not$inputLease.closed){$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed}}
+    $resources=[pscustomobject]@{controlled=$true};$engine='controlled-native-engine';$calls=[Collections.Generic.List[object]]::new()
+    $stdout=Join-Path $run 'stdout.txt';$stderr=Join-Path $run 'stderr.txt'
+    [IO.File]::WriteAllText($stdout,'controlled healthy output');[IO.File]::WriteAllText($stderr,'')
+    function Invoke-MIRNativeProbeFactorioProcess {
+      param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds)
+      $calls.Add([pscustomobject]@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds})
+      [pscustomobject]@{stdout=$stdout;stderr=$stderr}
+    }
+    Invoke-ProbeEngine -Label controlled -Arguments @('--benchmark','owned-save.zip')
+    Assert-Probe ($calls.Count-eq1-and$calls[0].context.controlled-and$calls[0].path-ceq$engine-and$calls[0].timeout-eq60) 'passive repair bypassed the governed actor.'
+    $expected=@('--config',(Join-Path $run 'config.ini'),'--mod-directory',$mods,'--benchmark','owned-save.zip')
+    Assert-Probe (($calls[0].arguments-join'|')-ceq($expected-join'|')) 'passive repair changed engine arguments.'
+    [IO.File]::WriteAllText($stdout,'Exception at tick controlled')
+    Refuses-Probe {Invoke-ProbeEngine -Label controlled-error -Arguments @('--create','owned-save.zip')} 'Passive repair controlled-error failed'
+    Assert-Probe ((Get-Content -Raw (Join-Path $run 'controlled-error.log'))-ceq'Exception at tick controlled') 'passive repair discarded its failed log.'
+  }
   $auditRun=Join-Path $fixture 'material-audit';New-Item -ItemType Directory -Path $auditRun|Out-Null
   $auditLease=New-MIRMaterialAuditInputLease -RunRoot $auditRun -ModsDirectory (Join-Path $auditRun 'mods') -CandidateArchive $auditCandidate -DependencyDirectory $fixture -ExpectedArchives ([ordered]@{'dependency.zip'=$archiveInput.expected_sha256})
   try{
