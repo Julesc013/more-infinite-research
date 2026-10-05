@@ -123,6 +123,19 @@ function Get-MIR4TargetMaterializationBindings {
   }
 }
 
+function Get-MIR4PrivatePatchPackageReadmeBytes {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][byte[]]$ReadmeBytes,[Parameter(Mandatory)][string]$DistributionVersion)
+  if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+  $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
+  if ([int]$decoded.source_patch -ne 1) { throw '[mir4-private-patch-package-source-patch]' }
+  $utf8 = [Text.UTF8Encoding]::new($false)
+  $readme = $utf8.GetString($ReadmeBytes).Replace("`r`n", "`n")
+  $heading = "MIR $DistributionVersion, source 4.2.1. This private construction requires qualification before release.`n`n"
+  if (-not $readme.StartsWith($heading, [StringComparison]::Ordinal)) { $readme = $heading + $readme }
+  return ,$utf8.GetBytes($readme)
+}
+
 function Write-MIR4PrivatePatchPackageIdentity {
   [CmdletBinding()]
   param(
@@ -148,7 +161,7 @@ function Write-MIR4PrivatePatchPackageIdentity {
   $changelogPath = Join-Path $Tree 'changelog.txt'
   $changelog = [IO.File]::ReadAllText($changelogPath).Replace("`r`n", "`n")
   $readmePath = Join-Path $Tree 'README.md'
-  $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllText($readmePath).Replace("`r`n", "`n") } else { $null }
+  $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllBytes($readmePath) } else { $null }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $info.version = $DistributionVersion
   [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
@@ -158,10 +171,7 @@ function Write-MIR4PrivatePatchPackageIdentity {
     [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
   }
   if ($null -ne $readme) {
-    $heading = "MIR $DistributionVersion, source 4.2.1. This private construction requires qualification before release.`n`n"
-    if (-not $readme.StartsWith($heading, [StringComparison]::Ordinal)) {
-      [IO.File]::WriteAllText($readmePath, $heading + $readme, $utf8)
-    }
+    [IO.File]::WriteAllBytes($readmePath, (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion))
   }
 }
 
