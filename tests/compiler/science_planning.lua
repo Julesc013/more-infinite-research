@@ -35,8 +35,8 @@ stub('prototypes.mir.platform.factorio.prototype_lookup', {
  is_space_age=function() return true end,
  item_prototype=function(name) return {place_result=name} end
 })
-stub('prototypes.mir.index.item_prototype_facts', {placeable_items_for_entity_types=function()
- local out={}; for name in pairs(data.raw.lab) do out[#out+1]=name end; table.sort(out); return out
+stub('prototypes.mir.index.item_prototype_facts', {placeable_items_for_entity=function(name)
+ return data.raw.lab[name] and {name} or {}
 end})
 local registry = {science_pack_exists=function(n) return exists[n]==true end}
 stub('prototypes.mir.capabilities.science_integration.pack_registry',registry)

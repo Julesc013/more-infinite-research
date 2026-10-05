@@ -28,6 +28,7 @@ local function build()
   end)
 
   local placeable_items_by_entity_type = {}
+  local placeable_items_by_entity_name = {}
   local module_items_by_tier = {}
   local item_rows, placeable_rows, module_rows = 0, 0, 0
   lookup.each_item_prototype(function(name, prototype, item_type)
@@ -38,6 +39,7 @@ local function build()
       or nil
     if entity_type then
       append(placeable_items_by_entity_type, entity_type, name)
+      append(placeable_items_by_entity_name, prototype.place_result, name)
       placeable_rows = placeable_rows + 1
     end
     if item_type == "module" then
@@ -50,12 +52,14 @@ local function build()
   end)
 
   for _, names in pairs(placeable_items_by_entity_type) do table.sort(names) end
+  for _, names in pairs(placeable_items_by_entity_name) do table.sort(names) end
   for _, names in pairs(module_items_by_tier) do table.sort(names) end
 
   local canonical = {
     schema = SCHEMA,
     entity_type_by_name = entity_type_by_name,
     placeable_items_by_entity_type = placeable_items_by_entity_type,
+    placeable_items_by_entity_name = placeable_items_by_entity_name,
     module_items_by_tier = module_items_by_tier,
     metrics = {
       entity_rows = entity_rows,
@@ -88,6 +92,15 @@ function M.placeable_items_for_entity_types(entity_types)
     end
   end
   table.sort(out)
+  return out
+end
+
+function M.placeable_items_for_entity(name)
+  telemetry.count("placeable_item_index_lookups", 1)
+  local out = {}
+  for _, item_name in ipairs(build().placeable_items_by_entity_name[name] or {}) do
+    out[#out + 1] = item_name
+  end
   return out
 end
 
