@@ -1,5 +1,9 @@
 /.gitattributes text eol=lf
 
+# This fixture is an exact raw-hash copy of the published 4.2.0 manifest.
+# Retain its CRLF bytes and the ordinary trailing-space/blank-line checks.
+fixtures/release-inputs/mir421-published-420-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
 .mir/evidence/**/*.md text eol=lf
 .mir/evidence/**/*.txt text eol=lf
 .mir/evidence/**/*-attestation.json text eol=lf
