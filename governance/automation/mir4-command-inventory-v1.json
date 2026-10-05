@@ -4433,6 +4433,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/lib/validation/BrowserContinuityInputs.ps1",
+      "classification": "canonical-internal",
+      "sha256": "2825D95B7DF7ED06D4154DE4926827CE723302411D1A30CF9AAAFF967B1B1FB1",
+      "hash_mode": "canonical-text-v1",
+      "lines": 126,
+      "package_visible": false
+    },
+    {
       "path": "tools/lib/validation/CurrentTargetPackage.ps1",
       "classification": "canonical-internal",
       "sha256": "2B3CEB4642119751531BEDFF11262B3ED63AD177EAD806133BE447E6EB3A8D86",
@@ -5155,9 +5163,9 @@
     {
       "path": "tools/mir/application/package/TargetMaterializer.ps1",
       "classification": "canonical-internal",
-      "sha256": "EAEE7E0E9D35727864C74D6A1E332611F4D029F04AD1C5B488F47F9E37BCF822",
+      "sha256": "0AC043E173F61752937B00035BE5B0DBA570D43719025AEDB3E18384576A61A8",
       "hash_mode": "canonical-text-v1",
-      "lines": 482,
+      "lines": 492,
       "package_visible": false
     },
     {
@@ -6011,7 +6019,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 417,
+    "canonical_internal": 418,
     "compatibility_wrapper": 168,
     "migration_only": 59,
     "historical": 18,
@@ -6026,5 +6034,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e8737f81c525fb62ac51ece9a6638af9a259ee0c5998fcdbba9be627109de243"
+  "digest": "sha256:54416ae638d0aaac448c8be692bd4faae13f848e674d64d9f056768f4a366b7f"
 }

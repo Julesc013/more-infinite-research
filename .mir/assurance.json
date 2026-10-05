@@ -377,7 +377,7 @@
     },
     {
       "id": "native-probe-resources",
-      "patterns": ["^tools/lib/validation/NativeProbeResources[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/Test-MIRResearchBrowser[.]ps1$"],
+      "patterns": ["^tools/lib/validation/(?:NativeProbeResources|BrowserContinuityInputs)[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/Test-MIR(?:ResearchBrowser|BrowserPersonalStateContinuity)[.]ps1$"],
       "tests": ["static.immutable-input-staging", "runtime.material-route-guard", "runtime.research-browser"]
     },
     {
