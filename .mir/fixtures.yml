@@ -499,6 +499,7 @@ fixtures:
     notes:
       - independent-finalized-raw-prototype-denominator-for-sixteen-requested-plate-and-alloy-outcomes
       - supplementary-platinum-wire-cannot-satisfy-the-platinum-plate-request
+      - four-angel-petrochem-fluid-subjects-use-a-separate-typed-denominator
       - producer-and-observation-gap-records-do-not-prove-acquisition-admission-or-earned-benefit
       - exact-native-capture-and-package-qualification-remain-pending
     validates:
@@ -506,6 +507,9 @@ fixtures:
       - hidden-research-locked-and-productivity-denied-producers-remain-observable
       - prototype-absence-and-no-observed-producer-are-distinct
       - bounded-read-only-inventory-and-staging-free-log-replay
+      - fluid-prototype-and-producer-identities-cannot-be-satisfied-by-same-named-items
+      - missing-candidate-status-cannot-close-an-independent-producer-gap
+      - canonical-package-fingerprint-and-raw-source-manifest-custody-remain-distinct
 
   k2-science-phase-policy:
     requires_features: []

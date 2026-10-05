@@ -560,7 +560,9 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $terminal.terminal_record_sha256=Get-MIRImmutableInputRecordSha256 -Record $terminal
   $dummyLog=Join-Path $recoveryRoot 'userdata/factorio-current.log';[IO.File]::WriteAllText($dummyLog,'controlled custody fixture; no native engine or final oracle')
   $dummySave=Join-Path $recoveryRoot 'observer.zip';[IO.File]::WriteAllText($dummySave,'controlled custody fixture; not a Factorio save')
-  $recoverySource=[ordered]@{commit='controlled-source';tree='controlled-tree';package_source_sha256=$archiveInput.expected_sha256;source_version='4.2.1';distribution_version='4.2.21001'}
+  $syntheticSourceManifest=Join-Path $recoveryRoot 'controlled-source-manifest.json'
+  [IO.File]::WriteAllText($syntheticSourceManifest,'{"controlled_parser_fixture":true,"native_proof":false}')
+  $recoverySource=[ordered]@{commit='controlled-source';tree='controlled-tree';package_source_sha256=$archiveInput.expected_sha256;source_manifest_sha256=Get-ObserverSha $syntheticSourceManifest;source_version='4.2.1';distribution_version='4.2.21001'}
   $fixtureDirectory=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-final-routes-observer'
   $lastActor=$recoveryContext.runs[2]
   $controlledRecord=[ordered]@{
@@ -576,6 +578,7 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $rowPath=Join-Path $recoveryRoot 'result.json';$rowHash=Get-ObserverSha $rowPath
   $recovered=Get-ObserverCompletedRecovery @recoveryArguments
   Assert-Probe ($recovered.source.distribution_version -ceq '4.2.21001' -and (Get-ObserverSha $rowPath) -ceq $rowHash) 'completed custody replay wrote its historical receipt.'
+  Assert-Probe ($recovered.source.source_manifest_sha256 -ceq (Get-ObserverSha $syntheticSourceManifest) -and $recovered.source.source_manifest_sha256 -cne $recovered.source.package_source_sha256) 'controlled recovery conflated manifest custody with its package fingerprint.'
   Assert-Probe ($recovered.input_lease.started_utc -is [string] -and $recovered.input_lease.started_utc -ceq '2026-10-04T00:00:00.1200000Z') 'recovery normalized a timestamp covered by its custody hash.'
   $fallbackRecovered=& {
     function Get-Command {
@@ -589,6 +592,8 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   foreach($case in @(
     @{change={$args[0].schema=1};error='completed governed observation'},
     @{change={$args[0].source.distribution_version='4.2.21002'};error='source fingerprint differs'},
+    @{change={$args[0].source.package_source_sha256=('A'*64)};error='source fingerprint differs'},
+    @{change={$args[0].source.source_manifest_sha256=('A'*64)};error='source fingerprint differs'},
     @{change={$args[0].harness.sha256=('A'*64)};error='harness fingerprint differs'},
     @{change={$args[0].fixture=$args[0].fixture[0..2]};error='fixture inventory differs'},
     @{change={$args[0].input_lease.outcome='failed'};error='completed passed immutable-input receipt'},

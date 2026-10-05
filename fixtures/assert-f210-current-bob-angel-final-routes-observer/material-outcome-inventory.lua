@@ -23,6 +23,15 @@ local SUBJECTS = {
   {"platinum", "wire", {"angels-wire-platinum"}}
 }
 
+-- Keep the original item denominator and its log protocol unchanged. Fluid
+-- outcomes are captured separately through the same bounded raw traversal.
+local PETROCHEM_SUBJECTS = {
+  {"nitric-acid", "fluid", {"angels-liquid-nitric-acid"}},
+  {"hydrochloric-acid", "fluid", {"angels-liquid-hydrochloric-acid"}},
+  {"hydrofluoric-acid", "fluid", {"angels-liquid-hydrofluoric-acid"}},
+  {"glycerol", "fluid", {"angels-liquid-glycerol"}}
+}
+
 local function positive(value)
   return type(value) == "number" and value == value and value > 0 and value < math.huge
 end
@@ -38,7 +47,7 @@ local function ordered_keys(values, maximum, label)
   return keys
 end
 
-function M.collect(raw, limits)
+local function collect(raw, limits, subjects, product_type, kind)
   assert(type(raw) == "table", "Finalized raw prototypes required")
   limits = limits or {}
   local recipe_limit = limits.recipes or 10000
@@ -47,16 +56,18 @@ function M.collect(raw, limits)
     and recipe_limit <= 10000, "Invalid material inventory recipe budget")
   assert(positive(result_limit) and result_limit == math.floor(result_limit)
     and result_limit <= 60000, "Invalid material inventory result budget")
-  local rows, by_item = {}, {}
-  for _, subject in ipairs(SUBJECTS) do
+  local present_field = product_type == "fluid" and "present_fluids" or "present_items"
+  local rows, by_output = {}, {}
+  for _, subject in ipairs(subjects) do
     local row = {id = subject[1] .. "/" .. subject[2], family = subject[1], shape = subject[2],
-      aliases = {}, present_items = {}, producers = {}}
+      aliases = {}, producers = {}}
+    row[present_field] = {}
     for _, name in ipairs(subject[3]) do
       row.aliases[#row.aliases + 1] = name
-      by_item[name] = row
-      local prototype = raw.item and raw.item[name]
+      by_output[name] = row
+      local prototype = raw[product_type] and raw[product_type][name]
       if prototype then
-        row.present_items[#row.present_items + 1] = {name = name, hidden = prototype.hidden == true}
+        row[present_field][#row[present_field] + 1] = {name = name, hidden = prototype.hidden == true}
       end
     end
     rows[#rows + 1] = row
@@ -75,11 +86,11 @@ function M.collect(raw, limits)
       if visited_results > result_limit then error("Material inventory result budget exceeded") end
       assert(type(result) == "table", "Invalid raw recipe product")
       local item = result.name or result[1]
-      local row = by_item[item]
+      local row = by_output[item]
       local amount = result.amount or result.amount_max or result.amount_min or result[2]
       local probability = result.independent_probability or result.probability
       if probability == nil then probability = 1 end
-      if row and (result.type == nil or result.type == "item") and positive(amount)
+      if row and (result.type or "item") == product_type and positive(amount)
         and positive(probability) and probability <= 1 then
         matched[row.id] = row
       end
@@ -91,12 +102,20 @@ function M.collect(raw, limits)
     end
   end
   for _, row in ipairs(rows) do
-    row.status = #row.present_items == 0 and "prototype-absent"
+    row.status = #row[present_field] == 0 and "prototype-absent"
       or (#row.producers == 0 and "no-observed-producer" or "observed")
   end
-  return {schema = 1, kind = "MIRMaterialOutcomeInventoryV1", complete = true,
+  return {schema = 1, kind = kind, complete = true,
     phase = "finalized-raw-prototypes", rows = rows, recipe_count = #recipe_names,
     result_count = visited_results, acquisition_proved = false, admission_granted = false}
+end
+
+function M.collect(raw, limits)
+  return collect(raw, limits, SUBJECTS, "item", "MIRMaterialOutcomeInventoryV1")
+end
+
+function M.collect_petrochem(raw, limits)
+  return collect(raw, limits, PETROCHEM_SUBJECTS, "fluid", "MIRFluidMaterialOutcomeInventoryV1")
 end
 
 function M.route_gaps(inventory, observed_routes)
@@ -124,13 +143,17 @@ local function token(value)
 end
 
 function M.lines(inventory, observed_routes)
-  local prefix = "[mir-material-outcome-inventory] "
+  local fluid = inventory.kind == "MIRFluidMaterialOutcomeInventoryV1"
+  local prefix = fluid and "[mir-fluid-material-outcome-inventory] " or "[mir-material-outcome-inventory] "
+  local present_field = fluid and "present_fluids" or "present_items"
+  local count_field = fluid and " fluids=" or " items="
+  local record_type = fluid and "FLUID" or "ITEM"
   local lines, gaps = {}, M.route_gaps(inventory, observed_routes)
   for _, row in ipairs(inventory.rows) do
     lines[#lines + 1] = prefix .. "SUBJECT id=" .. token(row.id) .. " status=" .. row.status
-      .. " items=" .. #row.present_items .. " producers=" .. #row.producers
-    for _, item in ipairs(row.present_items) do
-      lines[#lines + 1] = prefix .. "ITEM subject=" .. token(row.id) .. " name=" .. token(item.name)
+      .. count_field .. #row[present_field] .. " producers=" .. #row.producers
+    for _, item in ipairs(row[present_field]) do
+      lines[#lines + 1] = prefix .. record_type .. " subject=" .. token(row.id) .. " name=" .. token(item.name)
         .. " hidden=" .. tostring(item.hidden)
     end
     for _, producer in ipairs(row.producers) do

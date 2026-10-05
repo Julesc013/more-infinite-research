@@ -19,20 +19,37 @@ function Assert-Observer([bool]$Condition,[string]$Message) {
   if(-not $Condition){throw "F210 current Bob/Angel final-routes observer: $Message"}
 }
 function Get-ObserverSha([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
-function Get-ObserverMaterialOutcomeInventory([string]$LogText){
+function Get-ObserverCurrentSourceRecord([string]$Repository){
+  $commit=(& git -C $Repository rev-parse HEAD).Trim()
+  Assert-Observer ($LASTEXITCODE -eq 0 -and $commit -cmatch '^[0-9a-f]{40}$') 'current source commit differs.'
+  $tree=(& git -C $Repository rev-parse 'HEAD^{tree}').Trim()
+  Assert-Observer ($LASTEXITCODE -eq 0 -and $tree -cmatch '^[0-9a-f]{40}$') 'current source tree differs.'
+  $fingerprint=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $Repository
+  Assert-Observer ($fingerprint -cmatch '^[A-F0-9]{64}$') 'canonical package-source fingerprint differs.'
+  [ordered]@{commit=$commit;tree=$tree;package_source_sha256=$fingerprint;
+    source_manifest_sha256=Get-ObserverSha (Join-Path $Repository 'source/package-source.json');
+    source_version='4.2.1';distribution_version='4.2.21001'}
+}
+function Get-ObserverMaterialOutcomeInventory([string]$LogText,[switch]$Petrochem){
   Assert-Observer ($LogText.Length -le 33554432) 'inventory log exceeds the 32 MiB text budget.'
-  $prefix='(?m)\[mir-material-outcome-inventory\] '
+  $protocol=if($Petrochem){'[mir-fluid-material-outcome-inventory]'}else{'[mir-material-outcome-inventory]'}
+  $prefix='(?m)'+[regex]::Escape($protocol)+' '
+  $presentField=if($Petrochem){'fluids'}else{'items'}
+  $recordType=if($Petrochem){'FLUID'}else{'ITEM'}
+  $subjectCount=if($Petrochem){4}else{17}
+  $inventoryKind=if($Petrochem){'MIRFluidMaterialOutcomeInventoryObservationV1'}else{'MIRMaterialOutcomeInventoryObservationV1'}
   $lineEnd='(?=\r?$)'
-  $endings=@([regex]::Matches($LogText,$prefix+'PASS complete=true phase=finalized-raw-prototypes subjects=17 recipes=(?<recipes>[0-9]+) results=(?<results>[0-9]+) gaps=(?<gaps>[0-9]+) acquisition=false admission=false'+$lineEnd))
+  $endings=@([regex]::Matches($LogText,$prefix+'PASS complete=true phase=finalized-raw-prototypes subjects='+$subjectCount+' recipes=(?<recipes>[0-9]+) results=(?<results>[0-9]+) gaps=(?<gaps>[0-9]+) acquisition=false admission=false'+$lineEnd))
   Assert-Observer ($endings.Count -eq 1) 'inventory needs one complete finalized marker without admission.'
-  $subjects=@([regex]::Matches($LogText,$prefix+'SUBJECT id=(?<id>[^\s]+) status=(?<status>prototype-absent|no-observed-producer|observed) items=(?<items>[0-9]+) producers=(?<producers>[0-9]+)'+$lineEnd))
-  $expected=@('aluminium/plate','gold/plate','lead/plate','nickel/plate','platinum/plate','silver/plate','tin/plate','titanium/plate','copper-tungsten/alloy','zinc/plate','bronze/alloy','brass/alloy','gunmetal/alloy','invar/alloy','cobalt-steel/alloy','nitinol/alloy','platinum/wire')
+  $subjects=@([regex]::Matches($LogText,$prefix+'SUBJECT id=(?<id>[^\s]+) status=(?<status>prototype-absent|no-observed-producer|observed) '+$presentField+'=(?<items>[0-9]+) producers=(?<producers>[0-9]+)'+$lineEnd))
+  $expected=if($Petrochem){@('nitric-acid/fluid','hydrochloric-acid/fluid','hydrofluoric-acid/fluid','glycerol/fluid')}else{@('aluminium/plate','gold/plate','lead/plate','nickel/plate','platinum/plate','silver/plate','tin/plate','titanium/plate','copper-tungsten/alloy','zinc/plate','bronze/alloy','brass/alloy','gunmetal/alloy','invar/alloy','cobalt-steel/alloy','nitinol/alloy','platinum/wire')}
   Assert-Observer ($subjects.Count -eq $expected.Count) 'independent subject inventory is incomplete or duplicated.'
-  $items=@([regex]::Matches($LogText,$prefix+'ITEM subject=(?<subject>[^\s]+) name=(?<name>[^\s]+) hidden=(?<hidden>true|false)'+$lineEnd))
+  $items=@([regex]::Matches($LogText,$prefix+$recordType+' subject=(?<subject>[^\s]+) name=(?<name>[^\s]+) hidden=(?<hidden>true|false)'+$lineEnd))
   $producers=@([regex]::Matches($LogText,$prefix+'PRODUCER subject=(?<subject>[^\s]+) recipe=(?<recipe>[^\s]+) hidden=(?<hidden>true|false) enabled=(?<enabled>true|false) productivity=(?<productivity>unspecified|true|false)'+$lineEnd))
   $gaps=@([regex]::Matches($LogText,$prefix+'GAP subject=(?<subject>[^\s]+) recipe=(?<recipe>[^\s]+)'+$lineEnd))
-  Assert-Observer ($items.Count -le 34 -and $producers.Count -le 60000 -and $gaps.Count -le 60000) 'inventory row budget exceeded.'
-  $protocolCount=[regex]::Matches($LogText,'\[mir-material-outcome-inventory\]').Count
+  $prototypeLimit=if($Petrochem){4}else{34}
+  Assert-Observer ($items.Count -le $prototypeLimit -and $producers.Count -le 60000 -and $gaps.Count -le 60000) 'inventory row budget exceeded.'
+  $protocolCount=[regex]::Matches($LogText,[regex]::Escape($protocol)).Count
   Assert-Observer ($protocolCount -eq ($endings.Count+$subjects.Count+$items.Count+$producers.Count+$gaps.Count)) 'inventory contains an unrecognized or malformed protocol record.'
   $records=[Collections.Generic.List[object]]::new()
   foreach($id in $expected){
@@ -43,7 +60,7 @@ function Get-ObserverMaterialOutcomeInventory([string]$LogText){
     $itemNames=@($itemRows|ForEach-Object {[Uri]::UnescapeDataString($_.Groups['name'].Value)})
     $recipeNames=@($producerRows|ForEach-Object {[Uri]::UnescapeDataString($_.Groups['recipe'].Value)})
     $family,$shape=$id.Split('/')
-    $aliases=if($shape -ceq 'wire'){@('angels-wire-platinum')}elseif($shape -ceq 'plate'){@("bob-$family-plate","angels-plate-$family")}elseif($family -ceq 'copper-tungsten'){@('bob-copper-tungsten-alloy')}else{@("bob-$family-alloy","angels-plate-$family")}
+    $aliases=if($Petrochem){@("angels-liquid-$family")}elseif($shape -ceq 'wire'){@('angels-wire-platinum')}elseif($shape -ceq 'plate'){@("bob-$family-plate","angels-plate-$family")}elseif($family -ceq 'copper-tungsten'){@('bob-copper-tungsten-alloy')}else{@("bob-$family-alloy","angels-plate-$family")}
     foreach($itemName in $itemNames){Assert-Observer ($itemName -cin $aliases) "wrong output shape or alias for $id."}
     $uniqueItems=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     $uniqueRecipes=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -52,7 +69,7 @@ function Get-ObserverMaterialOutcomeInventory([string]$LogText){
     $status=$subject.Groups['status'].Value
     $expectedStatus=if($itemRows.Count -eq 0){'prototype-absent'}elseif($producerRows.Count -eq 0){'no-observed-producer'}else{'observed'}
     Assert-Observer ($status -ceq $expectedStatus) "inventory status differs for $id."
-    $records.Add([ordered]@{id=$id;status=$status;items=@($itemRows|ForEach-Object {[ordered]@{name=[Uri]::UnescapeDataString($_.Groups['name'].Value);hidden=$_.Groups['hidden'].Value -ceq 'true'}});producers=@($producerRows|ForEach-Object {[ordered]@{recipe=[Uri]::UnescapeDataString($_.Groups['recipe'].Value);hidden=$_.Groups['hidden'].Value -ceq 'true';enabled_without_research=$_.Groups['enabled'].Value -ceq 'true';declared_productivity=$_.Groups['productivity'].Value}})})
+    $records.Add([ordered]@{id=$id;status=$status;$presentField=@($itemRows|ForEach-Object {[ordered]@{name=[Uri]::UnescapeDataString($_.Groups['name'].Value);hidden=$_.Groups['hidden'].Value -ceq 'true'}});producers=@($producerRows|ForEach-Object {[ordered]@{recipe=[Uri]::UnescapeDataString($_.Groups['recipe'].Value);hidden=$_.Groups['hidden'].Value -ceq 'true';enabled_without_research=$_.Groups['enabled'].Value -ceq 'true';declared_productivity=$_.Groups['productivity'].Value}})})
   }
   foreach($entry in @($items)+@($producers)+@($gaps)){Assert-Observer ($entry.Groups['subject'].Value -cin $expected) 'inventory row names an unknown subject.'}
   $producerIdentities=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -64,7 +81,7 @@ function Get-ObserverMaterialOutcomeInventory([string]$LogText){
     Assert-Observer ($producerIdentities.Contains($id+"`0"+$recipe)) 'gap recipe is outside the independent denominator.'
   }
   $observedRoutes=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-  foreach($route in [regex]::Matches($LogText,'\[mir-f210-current-ba-final-observer\] ROUTE recipe=(?<recipe>[^\s]+) ')){
+  foreach($route in [regex]::Matches($LogText,'(?m)\[mir-f210-current-ba-final-observer\] ROUTE recipe=(?<recipe>[^\s]+) family=[^\s]+ shape=[^\s]+ status=present(?=\s|$)')){
     Assert-Observer ($observedRoutes.Add($route.Groups['recipe'].Value)) 'duplicate finalized route observation.'
   }
   foreach($record in $records){foreach($producer in $record.producers){
@@ -72,7 +89,7 @@ function Get-ObserverMaterialOutcomeInventory([string]$LogText){
     Assert-Observer ($isGap -eq (-not $observedRoutes.Contains($producer.recipe))) 'observation gap does not match the independent producer denominator.'
   }}
   Assert-Observer ($gaps.Count -eq [int]$endings[0].Groups['gaps'].Value -and [int]$endings[0].Groups['recipes'].Value -le 10000 -and [int]$endings[0].Groups['results'].Value -le 60000) 'inventory completion totals differ or exceed their budget.'
-  [ordered]@{schema=1;kind='MIRMaterialOutcomeInventoryObservationV1';status='observed';phase='finalized-raw-prototypes';complete=$true;subjects=$records.ToArray();observation_gaps=@($gaps|ForEach-Object {[ordered]@{subject=$_.Groups['subject'].Value;recipe=[Uri]::UnescapeDataString($_.Groups['recipe'].Value)}});acquisition_proved=$false;admission_granted=$false}
+  [ordered]@{schema=1;kind=$inventoryKind;status='observed';phase='finalized-raw-prototypes';complete=$true;subjects=$records.ToArray();observation_gaps=@($gaps|ForEach-Object {[ordered]@{subject=$_.Groups['subject'].Value;recipe=[Uri]::UnescapeDataString($_.Groups['recipe'].Value)}});acquisition_proved=$false;admission_granted=$false}
 }
 function Get-ObserverArtifact([string]$Path){
   $item=Get-Item -LiteralPath $Path -ErrorAction Stop
@@ -133,7 +150,7 @@ function Get-ObserverCompletedRecovery {
   if($preservesDateStrings){$jsonArguments.DateKind='String'}
   $record=$json|ConvertFrom-Json @jsonArguments
   Assert-Observer ($record.schema -eq 2 -and $record.kind -ceq 'MIR4F210CurrentBobAngelFinalRoutesObservationV1' -and $record.status -ceq 'observed') 'recovery requires a completed governed observation; historical and incomplete rows remain preserved.'
-  foreach($name in @('commit','tree','package_source_sha256','source_version','distribution_version')) {Assert-Observer ($record.source[$name] -ceq $Source[$name]) "recovery source fingerprint differs: $name"}
+  foreach($name in @('commit','tree','package_source_sha256','source_manifest_sha256','source_version','distribution_version')) {Assert-Observer ($record.source[$name] -ceq $Source[$name]) "recovery source fingerprint differs: $name"}
   Assert-Observer ($record.run_root -ceq $run -and $record.harness.sha256 -ceq (Get-ObserverSha $HarnessPath)) 'recovery run or harness fingerprint differs.'
   Assert-Observer ($record.exact_stage.receipt_sha256 -ceq (Get-ObserverSha $StageReceiptPath) -and $record.exact_stage.engine_sha256 -ceq (Get-ObserverSha $Engine)) 'recovery stage or engine fingerprint differs.'
   Assert-Observer ($record.engine.executable_sha256 -ceq $record.exact_stage.engine_sha256 -and $record.engine.version -match '^Version:\s+2[.]1[.]20(?:\s|$)') 'recovery engine identity differs.'
@@ -193,6 +210,7 @@ if(-not [string]::IsNullOrWhiteSpace($AuditLogPath)){
 }
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+. (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 $output=if([IO.Path]::IsPathRooted($OutputRoot)){[IO.Path]::GetFullPath($OutputRoot)}else{[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))}
 $resources=$null;$lease=$null
 if(-not $RecoverRunRoot){
@@ -228,8 +246,7 @@ foreach($entry in $expectedArchives.GetEnumerator()){
 }
 $dependencyInputs=if(-not $RecoverRunRoot){Resolve-MIRNativeProbeDependencyInputs -StageRoot $stage -ExpectedArchives $expectedArchives -LocalModLibraryDirs $LocalModLibraryDirs}else{$null}
 
-$sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
-$source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-ObserverSha (Join-Path $repo 'source/package-source.json');source_version='4.2.1';distribution_version='4.2.21001'}
+$source=Get-ObserverCurrentSourceRecord $repo
 try {
 if($RecoverRunRoot){
   Assert-Observer (-not $PrepareOnly) 'recovery and PrepareOnly are mutually exclusive.'
@@ -306,7 +323,7 @@ $logText=Get-Content -LiteralPath $factorioLog -Raw
 Assert-Observer ($logText.Contains('[mir-f210-current-ba-final-observer] RUNTIME PASS observer-has-no-gameplay-mutation')) 'runtime completion marker absent.'
 $summary=[regex]::Match($logText,'\[mir-f210-current-ba-final-observer\] DATA PASS read-only-finalized-contract-capture candidates=(?<candidates>[0-9]+) observed=(?<observed>[0-9]+) missing=(?<missing>[0-9]+)')
 Assert-Observer $summary.Success 'data completion marker absent.'
-Assert-Observer ([int]$summary.Groups['candidates'].Value -eq 22) 'candidate count differs.'
+Assert-Observer ([int]$summary.Groups['candidates'].Value -eq 28) 'candidate count differs.'
 $frontier=[regex]::Match($logText,'\[mir-f210-current-ba-final-observer\] SCIENCE_FRONTIER PASS packs=(?<packs>[0-9]+) early_present=(?<early>[0-9]+)')
 Assert-Observer $frontier.Success 'science-frontier completion marker absent.'
 $goldPath=[regex]::Match($logText,'\[mir-f210-current-ba-final-observer\] RETURN_PATH target=angels-liquid-molten-gold start=item:bob-gold-plate status=witnessed edges=(?<edges>[0-9]+)')
@@ -331,6 +348,7 @@ $normalRejections=@([regex]::Matches($logText,'\[mir-f210-current-ba-final-obser
 $normalCompletion=[regex]::Match($logText,'\[mir-f210-current-ba-final-observer\] NORMAL_OBSERVATION PASS parent_state_unchanged=true retained_rejections=(?<count>[0-9]+)')
 Assert-Observer ($normalCompletion.Success -and $normalRejections.Count -le 64 -and $normalRejections.Count -eq [int]$normalCompletion.Groups['count'].Value) 'ordinary science observation did not preserve parent state or rejection bounds.'
 $prepared['material_outcomes']=Get-ObserverMaterialOutcomeInventory $logText
+$prepared['petrochem_material_outcomes']=Get-ObserverMaterialOutcomeInventory $logText -Petrochem
 $result=[ordered]@{};foreach($key in $prepared.Keys){$result[$key]=$prepared[$key]};$result.status='observed';$result.engine=[ordered]@{version=([regex]::Match($version,'Version:\s+[^\r\n]+').Value).Trim();executable_sha256=Get-ObserverSha $engine};$result.run_root=$run;$result.recovered_from_completed_engine_run=[bool]$RecoverRunRoot;$result.route_records=$routes;$result.visible_return_records=$visibleReturns;$result.science_ingredient_records=$scienceIngredients;$result.science_producer_records=$scienceProducers;$result.normal_science_records=$normalScience;$result.normal_science_rejections=$normalRejections;$result.normal_observation_parent_state_unchanged=$true;$result.gold_return_path=[ordered]@{target='angels-liquid-molten-gold';start='item:bob-gold-plate';edge_count=$goldEdges.Count;edges=$goldEdges};$result.summary=[ordered]@{observed=[int]$summary.Groups['observed'].Value;missing=[int]$summary.Groups['missing'].Value;science_frontier_packs=[int]$frontier.Groups['packs'].Value;science_frontier_early_present=[int]$frontier.Groups['early'].Value;visible_return_reachable=@($visibleReturns|Where-Object{$_.status -ceq 'reachable'}).Count};$result.native_engine_executed_this_invocation=(-not [bool]$RecoverRunRoot)
 if(-not $RecoverRunRoot){
   $result.logs=[ordered]@{stdout=Get-ObserverArtifact $engineRun.stdout;stderr=Get-ObserverArtifact $engineRun.stderr;factorio=Get-ObserverArtifact $factorioLog}

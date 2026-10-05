@@ -71,4 +71,58 @@ raw.recipe["named route%one"] = {results = {{name = "bob-tin-plate", amount = 1}
 local encoded = table.concat(inventory.lines(inventory.collect(raw), {}), "\n")
 check(encoded:find("recipe=named%20route%25one", 1, true), "identity tokens escape whitespace and literal percent")
 print(encoded)
+
+local fluid_start_assertions = assertions
+local fluid_raw = {
+  item = {["angels-liquid-glycerol"] = {}},
+  fluid = {["angels-liquid-nitric-acid"] = {}, ["angels-liquid-hydrochloric-acid"] = {hidden = true},
+    ["angels-liquid-hydrofluoric-acid"] = {}},
+  recipe = {
+    ["named-acid"] = {results = {{type = "fluid", name = "angels-liquid-nitric-acid", amount = 50}}},
+    ["unselected-synthesis"] = {hidden = true, enabled = false, allow_productivity = false,
+      results = {{type = "fluid", name = "angels-liquid-hydrochloric-acid", amount = 70},
+        {type = "item", name = "salt", amount = 3}}},
+    ["fluid-item-collision"] = {results = {{type = "item", name = "angels-liquid-hydrofluoric-acid", amount = 50}}},
+    ["untyped-collision"] = {results = {{name = "angels-liquid-hydrofluoric-acid", amount = 50}}},
+    ["zero-fluid"] = {results = {{type = "fluid", name = "angels-liquid-hydrofluoric-acid", amount = 0}}},
+    ["zero-fluid-probability"] = {results = {{type = "fluid", name = "angels-liquid-hydrofluoric-acid", amount = 50, probability = 0}}},
+    ["zero-independent-fluid"] = {results = {{type = "fluid", name = "angels-liquid-hydrofluoric-acid", amount = 50, probability = 1, independent_probability = 0}}}
+  }
+}
+local fluids = inventory.collect_petrochem(fluid_raw)
+check(#fluids.rows == 4 and fluids.kind == "MIRFluidMaterialOutcomeInventoryV1",
+  "four chemical fluids have a separate typed inventory")
+check(fluids.complete and not fluids.acquisition_proved and not fluids.admission_granted,
+  "a fluid inventory grants no acquisition or admission")
+check(row(fluids, "nitric-acid/fluid").producers[1].name == "named-acid",
+  "a finalized typed fluid producer is observed")
+check(row(fluids, "hydrochloric-acid/fluid").present_fluids[1].hidden
+    and row(fluids, "hydrochloric-acid/fluid").producers[1].declared_allow_productivity == false,
+  "hidden fluids and denied coproduct routes remain visible as observations")
+check(row(fluids, "hydrofluoric-acid/fluid").status == "no-observed-producer",
+  "same-named items, untyped results, zero quantity and zero probabilities do not qualify as fluid producers")
+check(row(fluids, "glycerol/fluid").status == "prototype-absent",
+  "a same-named item cannot supply the required fluid prototype")
+local fluid_gaps = inventory.route_gaps(fluids, {"named-acid"})
+check(#fluid_gaps == 1 and fluid_gaps[1].subject == "hydrochloric-acid/fluid"
+    and fluid_gaps[1].recipe == "unselected-synthesis",
+  "the denominator detects a producer outside named MIR selectors")
+check(#inventory.route_gaps(fluids, {"named-acid", "unselected-synthesis"}) == 0,
+  "observation coverage closes only after the second producer is captured")
+check(not pcall(inventory.collect_petrochem, fluid_raw, {recipes = 1})
+    and not pcall(inventory.collect_petrochem, fluid_raw, {results = 1}),
+  "fluid traversal consumes the existing recipe and result budgets")
+check(#inventory.collect(fluid_raw).rows == 17
+    and row(inventory.collect(fluid_raw), "tin/plate").status == "prototype-absent",
+  "the original item denominator remains independent of chemical observations")
+check(fluid_raw.recipe["unselected-synthesis"].allow_productivity == false
+    and fluid_raw.recipe["unselected-synthesis"].results[2].amount == 3,
+  "fluid observations preserve upstream permission and coproduct quantities")
+local fluid_lines = inventory.lines(fluids, {"named-acid"})
+check(fluid_lines[#fluid_lines]:find("subjects=4", 1, true)
+    and fluid_lines[#fluid_lines]:find("gaps=1 acquisition=false admission=false", 1, true),
+  "the fluid protocol retains a complete denominator and one real coverage gap")
+print(table.concat(fluid_lines, "\n"))
+print("[mir-f210-current-ba-final-observer] ROUTE recipe=named-acid family=nitric-acid shape=fluid status=present")
+print("MIR-FLUID-MATERIAL-OUTCOME-INVENTORY-PASS " .. (assertions - fluid_start_assertions))
 print("MIR-MATERIAL-OUTCOME-INVENTORY-PASS " .. assertions)
