@@ -18,6 +18,7 @@ $script:MIR42ModernEngineTargets=@('f210','f200','f110','f100')
 $script:MIR42NineTargetEngineTargets=@($script:MIR42ModernEngineTargets+@('f017','f016','f015','f014','f013'))
 $engineEnvelopeAssertions=0
 $engineDestinationAssertions=0
+$maintenanceCustodyAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 
@@ -336,8 +337,58 @@ try {
       $engineDestinationAssertions++
     }
   }
+  # Exact published receipt fixture; metadata mutations are controls only.
+  # No delivered ZIP, signature, engine or new-candidate acceptance is implied.
+  $publishedPin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $repo 'fixtures/release-inputs/mir421-published-420-manifest.json')
+  $metadataAssets=@(for($i=0;$i-lt9;$i++){
+    $row=$publishedPin.manifest.targets[$i]
+    [pscustomobject]@{id=$i+1;name=$row.filename;size=$row.bytes;digest=('sha256:'+[string]$row.sha256).ToLowerInvariant();state='uploaded'}
+  })
+  $metadataAssets+=@(
+    [pscustomobject]@{id=10;name='mir-4.2.0.release.json';size=$publishedPin.bytes;digest=('sha256:'+$publishedPin.sha256).ToLowerInvariant();state='uploaded'},
+    [pscustomobject]@{id=11;name='SHA256SUMS.txt';size=1;digest=('sha256:'+('a'*64));state='uploaded'},
+    [pscustomobject]@{id=12;name='release-notes.md';size=1;digest=('sha256:'+('b'*64));state='uploaded'}
+  )
+  $metadataFixture=[pscustomobject]@{id=402577876;tag_name='v4.2.0-stable';draft=$false;prerelease=$false;immutable=$false;assets=$metadataAssets}
+  $publishedRows=@(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $publishedPin -ReleaseMetadata $metadataFixture)
+  Assert-MIR42CandidateBuildTest ($publishedRows.Count-eq9-and-not$publishedPin.manifest.signed-and
+    $publishedPin.manifest.qualification.native_final_package-ceq'NOT RUN'-and$publishedPin.manifest.qualification.save_upgrade-ceq'NOT RUN') 'published-unsigned-predecessor-custody-does-not-upgrade-qualification'
+  $maintenanceCustodyAssertions++
+  $metadataMutations=[ordered]@{
+    'release-id'={param($m) $m.id=402577877}
+    'canonical-reserved-tag'={param($m) $m.tag_name='v4.2.0'}
+    'draft'={param($m) $m.draft=$true}
+    'prerelease'={param($m) $m.prerelease=$true}
+    'immutable'={param($m) $m.immutable=$true}
+    'missing-target'={param($m) $m.assets=@($m.assets|Select-Object -Skip 1)}
+    'duplicate-name'={param($m) $m.assets[1].name=$m.assets[0].name}
+    'duplicate-asset-id'={param($m) $m.assets[1].id=$m.assets[0].id}
+    'missing-manifest'={param($m) $m.assets[9].name='another-manifest.json'}
+    'manifest-digest'={param($m) $m.assets[9].digest='sha256:'+('0'*64)}
+    'manifest-size'={param($m) $m.assets[9].size++}
+    'target-digest'={param($m) $m.assets[0].digest='sha256:'+('0'*64)}
+    'target-size'={param($m) $m.assets[0].size++}
+    'target-state'={param($m) $m.assets[0].state='new'}
+    'target-id'={param($m) $m.assets[0].id=0}
+  }
+  foreach($case in $metadataMutations.GetEnumerator()){
+    $invalid=$metadataFixture|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+    & $case.Value $invalid
+    $rejected=$false
+    try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $publishedPin -ReleaseMetadata $invalid|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir42-maintenance-predecessor-')}
+    Assert-MIR42CandidateBuildTest $rejected ('published-predecessor-refuses-'+$case.Key)
+    $maintenanceCustodyAssertions++
+  }
+  $invalidPinPath=Join-Path $identityRoot 'changed-published-manifest.json'
+  $pinBytes=[IO.File]::ReadAllBytes($publishedPin.path)
+  $pinBytes[100]=$pinBytes[100]-bxor1
+  [IO.File]::WriteAllBytes($invalidPinPath,$pinBytes)
+  $rejected=$false
+  try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $invalidPinPath|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+  Assert-MIR42CandidateBuildTest $rejected 'published-predecessor-refuses-same-size-changed-manifest-by-raw-hash'
+  $maintenanceCustodyAssertions++
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 

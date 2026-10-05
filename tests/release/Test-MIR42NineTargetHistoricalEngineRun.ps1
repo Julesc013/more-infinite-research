@@ -163,8 +163,26 @@ if ($historicalFreshBranch -lt 0 -or $historicalFreshCall -le $historicalFreshBr
     -not $runner.Contains("[mir42-`$Target-historical-fresh-log-content]")) {
   throw 'historical-fresh-load-must-bypass-modern-scenario-worker'
 }
-foreach ($needle in @('$isHistoricalTerminalFixture = $FixtureName -eq ''assert-upgrade-historical-terminal-to-mir42''','$isLegacyFactorio = $isHistoricalTerminalFixture -or','MIR historical upgrade specialization requires an exact terminal predecessor','historical-terminal-source-state-retained','historical-terminal-infinite-bonus-retained-where-supported','$historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo','$historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target','$runKind = if ($isNineTargetCandidate)','kind=$runKind','status=$runStatus')) {
+foreach ($needle in @('$isHistoricalTerminalFixture = $FixtureName -eq ''assert-upgrade-historical-terminal-to-mir42''','$isLegacyFactorio = $isHistoricalTerminalFixture -or','MIR historical upgrade specialization requires an exact terminal predecessor','historical-terminal-source-state-retained','historical-terminal-infinite-bonus-retained-where-supported','$historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo','$historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target','kind=$runKind','status=$runStatus')) {
   if (-not ($runner.Contains($needle) -or $harness.Contains($needle))) { throw "historical-runtime-contract $needle" }
+}
+$tokens=$null;$errors=$null
+$runnerAst=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$tokens,[ref]$errors)
+if(@($errors).Count-ne0){throw 'historical-record-selector-parse'}
+$recordSelectors=@(foreach($prefix in @('$runKind = ','$runStatus = ')){
+  $nodes=@($runnerAst.EndBlock.Statements|Where-Object {$_.Extent.Text.StartsWith($prefix)})
+  if($nodes.Count-ne1){throw 'historical-record-selector-definition'}
+  $nodes[0].Extent.Text
+})
+$recordSelector=[scriptblock]::Create(($recordSelectors-join"`n"))
+foreach($case in @(
+  @{nine=$false;maintenance=$null;kind='MIR42FourTargetEngineRunV1';status='four-target-base-default-real-engine-probes-passed-private-unqualified'},
+  @{nine=$true;maintenance=$null;kind='MIR42NineTargetEngineRunV1';status='nine-target-base-default-real-engine-probes-passed-private-unqualified'},
+  @{nine=$true;maintenance=[pscustomobject]@{fixture=$true};kind='MIR42NineTargetMaintenanceEngineRunV1';status='nine-target-maintenance-base-default-real-engine-probes-passed-private-unqualified'}
+)){
+  $isNineTargetCandidate=$case.nine;$maintenanceInputs=$case.maintenance
+  . $recordSelector
+  if($runKind-cne$case.kind-or$runStatus-cne$case.status){throw 'historical-record-selector-contract'}
 }
 $logClear = '[IO.File]::WriteAllText($log, '''', [Text.UTF8Encoding]::new($false))'
 $firstClear = $harness.IndexOf($logClear,[StringComparison]::Ordinal)
@@ -174,4 +192,4 @@ $secondReload = $harness.IndexOf('$secondReloadExitCode = ',[StringComparison]::
 if ($firstClear -lt 0 -or $firstReload -lt 0 -or $secondClear -le $firstReload -or $secondReload -le $secondClear -or
     $runner.Contains('$targetRow.engine.path') -or $runner.Contains('kind=(if ($isNineTargetCandidate)') -or $runner.Contains('status=(if ($isNineTargetCandidate)')) { throw 'historical-runner-shape-or-reload-log-scope' }
 
-Write-Output 'MIR42-NINE-TARGET-HISTORICAL-ENGINE-RUN-PRECHECK-PASSED targets=5 source_versions=2 engines=0'
+Write-Output 'MIR42-NINE-TARGET-HISTORICAL-ENGINE-RUN-PRECHECK-PASSED targets=5 source_versions=2 record_selectors=3 engines=0'
