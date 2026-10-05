@@ -1,0 +1,93 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0083",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Consume published maintenance inputs in the joined native campaign.",
+  "details": [
+    "Joined campaign mode authenticates current 4.2.0 release, tag and archive custody and binds the maintenance reconciliation, binder and engine run to it.",
+    "Installed-engine and baseline authority checks remain separate from the actual published CCC00 predecessor. Exact candidate receipts, continuity assertions, four hashed logs, fresh loads and repeated reloads remain required.",
+    "The writer validates native execution before emitting its distinct private maintenance campaign and repeats the checks on readback. Source input controls grant no native pass, signature, release acceptance or publication authority."
+  ],
+  "semantic_domains": [
+    "tooling",
+    "packaging",
+    "documentation"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "The joined campaign binds actual published maintenance predecessors while retaining engine and baseline provenance checks."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/release/Test-MIR42NineTargetTechnicalSeal.ps1"
+    }
+  ]
+}

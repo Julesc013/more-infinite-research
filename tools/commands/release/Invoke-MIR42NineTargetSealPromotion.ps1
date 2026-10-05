@@ -31,7 +31,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath) -and $Mode -cne 'EngineEvidence') {
+if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath) -and $Mode -cnotin @('EngineEvidence','JoinedCampaign')) {
   throw '[mir42-maintenance-binder-mode-only]'
 }
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
@@ -61,7 +61,8 @@ switch ($Mode) {
     if ($CriterionEvidencePaths.Count -eq 0) { throw '[mir42-joined-campaign-criterion-inputs-required]' }
     New-MIR42NineTargetJoinedRealEngineCampaign -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
       -EvidenceReconciliationPath $QualificationPath -EngineEvidencePath $EngineEvidencePath `
-      -CriterionEvidencePaths $CriterionEvidencePaths -OutputPath $OutputPath | ConvertTo-Json -Depth 30
+      -CriterionEvidencePaths $CriterionEvidencePaths -OutputPath $OutputPath `
+      -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath | ConvertTo-Json -Depth 30
   }
   'Seal' {
     if ([string]::IsNullOrWhiteSpace($OutputPath)) { throw '[mir42-seal-output-path-required]' }

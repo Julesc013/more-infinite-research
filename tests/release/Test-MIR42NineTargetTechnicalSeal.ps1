@@ -22,6 +22,14 @@ function Test-MIR42ConsumedEngineRunReferences {
   $root = Join-Path $RepoRoot ('build/test-results/mir42-engine-reference-' + [guid]::NewGuid().ToString('N'))
   $assertions = 0
   try {
+    $campaignWriter = @($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'New-MIR42NineTargetJoinedRealEngineCampaign'},$true))[0]
+    $commands = @($campaignWriter.Body.FindAll({param($node) $node -is [Management.Automation.Language.CommandAst]},$true))
+    $guards = @($commands | Where-Object {$_.GetCommandName() -ceq 'Assert-MIR42RealEngineCampaignExecution'})
+    $writes = @($commands | Where-Object {$_.GetCommandName() -ceq 'Write-MIR42NormalizedRecord'})
+    Assert-MIR42NineSealTest -Condition ($guards.Count -eq 1 -and $writes.Count -eq 1) -Code 'campaign-prewrite-native-guard-cardinality'
+    $assertions++
+    Assert-MIR42NineSealTest -Condition ($guards[0].Extent.StartOffset -lt $writes[0].Extent.StartOffset) -Code 'campaign-native-guard-precedes-qualified-artifact-write'
+    $assertions++
     New-Item -ItemType Directory -Path $root | Out-Null
     $path = Join-Path $root 'unqualified-reference-probe.json'
     # This hash-valid, deliberately incomplete record has no native status,

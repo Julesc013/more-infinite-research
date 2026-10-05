@@ -196,6 +196,31 @@ function Assert-MIR42EngineEvidenceMaintenanceCustody {
   }
 }
 
+function Get-MIR42JoinedCampaignInputContract {
+  param([Parameter(Mandatory)]$Candidate,[switch]$PublishedMaintenance)
+  $contract = Get-MIR42EngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance:$PublishedMaintenance
+  if ($PublishedMaintenance) {
+    $contract.campaign_kind = 'MIR42NineTargetMaintenanceRealEngineCandidateCampaignV1'
+    $contract.campaign_status = 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED'
+  }
+  return $contract
+}
+
+function Assert-MIR42MaintenanceCampaignCustody {
+  param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)]$PublishedInputs)
+  Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $Record.published_maintenance_predecessor -Current $PublishedInputs -Code 'mir42-maintenance-campaign-custody-binding'
+  $expected = $script:MIR42SealNineTargetCandidates
+  $actual = @($Record.targets | ForEach-Object { [string]$_.target })
+  if ($actual.Count -ne $expected.Count -or ($actual -join '|') -cne ($expected -join '|')) {
+    throw '[mir42-maintenance-campaign-target-set]'
+  }
+  foreach ($row in $Record.targets) {
+    $inputs = @($PublishedInputs.targets | Where-Object { [string]$_.target -ceq [string]$row.target })
+    if ($inputs.Count -ne 1) { throw '[mir42-maintenance-campaign-predecessor-cardinality]' }
+    Assert-MIR42EngineEvidenceMaintenanceExecution -Target ([string]$row.target) -Execution $row.engine_execution -PublishedInput $inputs[0]
+  }
+}
+
 function Assert-MIR42EngineEvidenceMaintenanceExecution {
   param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)]$Execution,[Parameter(Mandatory)]$PublishedInput)
   if ($Execution.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor' -or
@@ -1191,20 +1216,24 @@ function Assert-MIR42PublishedV410ChecksumAsset {
 }
 
 function Assert-MIR42GovernedPredecessor {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$Execution,[Parameter(Mandatory)]$AuthorityReference,[Parameter(Mandatory)]$RunAsset)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$Execution,[Parameter(Mandatory)]$AuthorityReference,[Parameter(Mandatory)]$RunAsset,$PublishedMaintenanceInput = $null)
   $authority = Get-MIR42DirectPredecessorAuthority -RepoRoot $RepoRoot -Reference $AuthorityReference
   Assert-MIR42PublishedV410ChecksumAsset -Authority $authority -RunAsset $RunAsset
   $rows = @($authority.record.targets | Where-Object { [string]$_.target -ceq [string]$Target.target })
-  $authorityPredecessorPath = if ($rows.Count -eq 1) { [IO.Path]::GetFullPath([string]$rows[0].predecessor.path) } else { '' }
+  $expectedPredecessor = if ($null -ne $PublishedMaintenanceInput) { $PublishedMaintenanceInput } elseif ($rows.Count -eq 1) { $rows[0].predecessor } else { $null }
+  if ($null -ne $PublishedMaintenanceInput) {
+    Assert-MIR42EngineEvidenceMaintenanceExecution -Target ([string]$Target.target) -Execution $Execution -PublishedInput $PublishedMaintenanceInput
+  }
+  $authorityPredecessorPath = if ($null -ne $expectedPredecessor) { [IO.Path]::GetFullPath([string]$expectedPredecessor.path) } else { '' }
   $executionPredecessorPath = [IO.Path]::GetFullPath([string]$Execution.predecessor.path)
   $authorityEnginePath = if ($rows.Count -eq 1) { [IO.Path]::GetFullPath([string]$rows[0].engine.path) } else { '' }
   $executionEnginePath = [IO.Path]::GetFullPath([string]$Execution.executable_path)
   $productVersion = [string](Get-Item -LiteralPath $executionEnginePath).VersionInfo.ProductVersion
   if ($productVersion -match '^([0-9]+[.][0-9]+[.][0-9]+)') { $productVersion = [string]$Matches[1] }
   if ($rows.Count -ne 1 -or
-      [string]$rows[0].predecessor.version -cne [string]$Execution.predecessor.version -or
+      [string]$expectedPredecessor.version -cne [string]$Execution.predecessor.version -or
       -not $authorityPredecessorPath.Equals($executionPredecessorPath,[StringComparison]::OrdinalIgnoreCase) -or
-      [string]$rows[0].predecessor.sha256 -cne [string]$Execution.predecessor.sha256 -or
+      [string]$expectedPredecessor.sha256 -cne [string]$Execution.predecessor.sha256 -or
       -not $authorityEnginePath.Equals($executionEnginePath,[StringComparison]::OrdinalIgnoreCase) -or
       [string]$rows[0].engine.file_version -cne [string]$Execution.version -or
       [string]$rows[0].engine.product_version -cne $productVersion -or
@@ -1254,7 +1283,8 @@ function Assert-MIR42HistoricalTerminalExecution {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)]$Target,
     [Parameter(Mandatory)]$Execution,
-    [Parameter(Mandatory)]$HistoricalAuthorities
+    [Parameter(Mandatory)]$HistoricalAuthorities,
+    $PublishedMaintenanceInput = $null
   )
   $targetId = [string]$Target.target
   $expected = Get-MIR42HistoricalTerminalAuthority -RepoRoot $RepoRoot -Target $targetId
@@ -1284,16 +1314,27 @@ function Assert-MIR42HistoricalTerminalExecution {
       [string]$authority.predecessor.content_sha256 -cne [string]$expectedTerminalSeal.content_sha256 -or [int]$authority.predecessor.entry_count -ne [int]$expectedTerminalSeal.entries) {
     throw "[mir42-seal-historical-authority-binding] $targetId"
   }
-  Assert-MIR42SealPropertyNames -Value $Execution -Expected @('executable_path','executable_sha256','version','predecessor','harness_receipt','harness_exit_code','logs','fresh_loads','fresh_exact_load','predecessor_upgrade','reload_count','historical_terminal_authority') -Code 'mir42-seal-historical-execution-shape'
+  $executionProperties = @('executable_path','executable_sha256','version','predecessor','harness_receipt','harness_exit_code','logs','fresh_loads','fresh_exact_load','predecessor_upgrade','reload_count','historical_terminal_authority')
+  if ($null -ne $PublishedMaintenanceInput) { $executionProperties += 'published_maintenance_predecessor' }
+  Assert-MIR42SealPropertyNames -Value $Execution -Expected $executionProperties -Code 'mir42-seal-historical-execution-shape'
   if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $Execution.historical_terminal_authority) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $authority)) {
     throw "[mir42-seal-historical-execution-authority-binding] $targetId"
   }
   $enginePath = Resolve-MIR42SealImmutableFile -Path ([string]$Execution.executable_path) -Sha256 ([string]$Execution.executable_sha256) -Code 'mir42-seal-historical-engine'
   $predecessorPath = Resolve-MIR42SealImmutableFile -Path ([string]$Execution.predecessor.path) -Sha256 ([string]$Execution.predecessor.sha256) -Code 'mir42-seal-historical-predecessor'
+  $expectedPredecessorPath = $expected.predecessor_path
+  $expectedPredecessorSha = [string]$expectedTerminalSeal.archive_sha256
+  $expectedPredecessorVersion = [string]$expectedTargetRecord.predecessor.version
+  if ($null -ne $PublishedMaintenanceInput) {
+    Assert-MIR42EngineEvidenceMaintenanceExecution -Target $targetId -Execution $Execution -PublishedInput $PublishedMaintenanceInput
+    $expectedPredecessorPath = [IO.Path]::GetFullPath([string]$PublishedMaintenanceInput.path)
+    $expectedPredecessorSha = [string]$PublishedMaintenanceInput.sha256
+    $expectedPredecessorVersion = [string]$PublishedMaintenanceInput.version
+  }
   if (-not $enginePath.Equals([IO.Path]::GetFullPath([string]$expectedTargetRecord.engine.path),[StringComparison]::OrdinalIgnoreCase) -or
       [string]$Execution.executable_sha256 -cne [string]$expectedTargetRecord.engine.sha256 -or [string]$Execution.version -cne [string]$expectedTargetRecord.engine.version -or
-      -not $predecessorPath.Equals($expected.predecessor_path,[StringComparison]::OrdinalIgnoreCase) -or
-      [string]$Execution.predecessor.sha256 -cne [string]$expectedTerminalSeal.archive_sha256 -or [string]$Execution.predecessor.version -cne [string]$expectedTargetRecord.predecessor.version) {
+      -not $predecessorPath.Equals($expectedPredecessorPath,[StringComparison]::OrdinalIgnoreCase) -or
+      [string]$Execution.predecessor.sha256 -cne $expectedPredecessorSha -or [string]$Execution.predecessor.version -cne $expectedPredecessorVersion) {
     throw "[mir42-seal-historical-execution-binding] $targetId"
   }
 }
@@ -1471,16 +1512,27 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
     [Parameter(Mandatory)][string]$EvidenceReconciliationPath,
     [Parameter(Mandatory)][string]$EngineEvidencePath,
     [Parameter(Mandatory)][string[]]$CriterionEvidencePaths,
-    [Parameter(Mandatory)][string]$OutputPath
+    [Parameter(Mandatory)][string]$OutputPath,
+    [string]$PublishedMaintenancePredecessorManifestPath = ''
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   Assert-MIR42SealTargetSet -Rows @($candidate.targets) -Scope 'nine-target' -Code 'mir42-joined-campaign-candidate'
-  $contract = Get-MIR42SealScopeContract -Scope 'nine-target'
-  $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate
+  $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
+  $contract = Get-MIR42JoinedCampaignInputContract -Candidate $candidate -PublishedMaintenance:$maintenanceRequested
+  $maintenanceInputs = $null
+  if ($maintenanceRequested) {
+    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    if ($LASTEXITCODE -ne 0) { throw '[mir42-joined-campaign-maintenance-release-readback]' }
+    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+  }
+  $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate -PublishedMaintenanceInputs $maintenanceInputs
   $binder = Read-MIR42SealRecord -Path $EngineEvidencePath -Code 'mir42-joined-campaign-engine-evidence'
-  Assert-MIR42SealPropertyNames -Value $binder.record -Expected @('schema','kind','status','source','candidate_manifest','evidence_reconciliation','engine_run','runner','targets','factorio_processes','release_qualification','release_acceptance','technical_seal','publication_authorized','record_sha256') -Code 'mir42-joined-campaign-engine-evidence-shape'
+  $binderProperties = @('schema','kind','status','source','candidate_manifest','evidence_reconciliation','engine_run','runner','targets','factorio_processes','release_qualification','release_acceptance','technical_seal','publication_authorized','record_sha256')
+  if ($maintenanceRequested) { $binderProperties += 'published_maintenance_predecessor' }
+  Assert-MIR42SealPropertyNames -Value $binder.record -Expected $binderProperties -Code 'mir42-joined-campaign-engine-evidence-shape'
   if ([int]$binder.record.schema -ne 1 -or [string]$binder.record.kind -cne [string]$contract.binder_kind -or
       [string]$binder.record.status -cne [string]$contract.binder_status -or
       [string]$binder.record.evidence_reconciliation.sha256 -cne [string]$reconciliation.sha256 -or
@@ -1490,7 +1542,8 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
     throw '[mir42-joined-campaign-engine-evidence-binding]'
   }
   Assert-MIR42ReceiptBinding -Receipt $binder -Candidate $candidate -Code 'mir42-joined-campaign-engine-evidence' -ExpectedTargetStatus 'observed-real-engine-private-unqualified'
-  $engineRun = Get-MIR42BoundEngineRun -Reference $binder.record.engine_run -Candidate $candidate
+  if ($maintenanceRequested) { Assert-MIR42MaintenanceCampaignCustody -Record $binder.record -PublishedInputs $maintenanceInputs }
+  $engineRun = Get-MIR42BoundEngineRun -Reference $binder.record.engine_run -Candidate $candidate -PublishedMaintenanceInputs $maintenanceInputs
   if ([int]$binder.record.factorio_processes -ne [int]$engineRun.record.factorio_processes -or
       [string]$binder.record.runner.sha256 -cne [string]$engineRun.record.runner.sha256) {
     throw '[mir42-joined-campaign-engine-evidence-run-binding]'
@@ -1530,8 +1583,13 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
     publication_authorized = $false
     record_sha256 = ''
   }
+  if ($maintenanceRequested) { $record | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $maintenanceInputs }
+  # Validate the assembled campaign before writing an artifact that claims a
+  # native pass. The output readback repeats the same checks on its exact bytes.
+  $provisionalCampaign = [pscustomobject]@{record=$record}
+  Assert-MIR42RealEngineCampaignExecution -RepoRoot $repo -Campaign $provisionalCampaign -Candidate $candidate -EngineRun $engineRun -PublishedMaintenanceInputs $maintenanceInputs
   $written = Write-MIR42NormalizedRecord -Record $record -OutputPath $OutputPath -Code 'mir42-joined-campaign-output'
-  $readback = Get-MIR42RealEngineCandidateCampaign -RepoRoot $repo -Path $OutputPath -Candidate $candidate -Reconciliation $reconciliation
+  $readback = Get-MIR42RealEngineCandidateCampaign -RepoRoot $repo -Path $OutputPath -Candidate $candidate -Reconciliation $reconciliation -PublishedMaintenanceInputs $maintenanceInputs
   if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $written) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $readback.record)) {
     throw '[mir42-joined-campaign-output-readback]'
   }
@@ -1539,12 +1597,14 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
 }
 
 function Get-MIR42RealEngineCandidateCampaign {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Reconciliation)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Reconciliation,$PublishedMaintenanceInputs = $null)
   $scope = Get-MIR42SealCandidateScope -Candidate $Candidate -Code 'mir42-seal-real-engine-candidate'
-  $contract = Get-MIR42SealScopeContract -Scope $scope
+  $contract = Get-MIR42JoinedCampaignInputContract -Candidate $Candidate -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs)
   $campaign = Read-MIR42SealRecord -Path $Path -Code 'mir42-seal-real-engine'
   $record = $campaign.record
-  Assert-MIR42SealPropertyNames -Value $record -Expected @('schema','kind','status','source','candidate_manifest','evidence_reconciliation','engine_run','runner','targets','factorio_processes','release_qualification','release_acceptance','technical_seal','publication_authorized','record_sha256') -Code 'mir42-seal-real-engine-shape'
+  $campaignProperties = @('schema','kind','status','source','candidate_manifest','evidence_reconciliation','engine_run','runner','targets','factorio_processes','release_qualification','release_acceptance','technical_seal','publication_authorized','record_sha256')
+  if ($null -ne $PublishedMaintenanceInputs) { $campaignProperties += 'published_maintenance_predecessor' }
+  Assert-MIR42SealPropertyNames -Value $record -Expected $campaignProperties -Code 'mir42-seal-real-engine-shape'
   if ([int]$record.schema -ne 1 -or [string]$record.kind -cne [string]$contract.campaign_kind -or
       [string]$record.status -cne [string]$contract.campaign_status -or
       [string]$record.evidence_reconciliation.sha256 -cne [string]$Reconciliation.sha256 -or
@@ -1559,8 +1619,18 @@ function Get-MIR42RealEngineCandidateCampaign {
   $runnerPath = Resolve-MIR42SealImmutableFile -Path ([string]$record.runner.path) -Sha256 ([string]$record.runner.sha256) -Code 'mir42-seal-real-engine-runner'
   if ((Get-Content -Raw -LiteralPath $runnerPath) -notmatch 'Invoke-MIR42FourTargetEngineRun|Test-MIRUpgrade') { throw '[mir42-seal-real-engine-runner-content]' }
   Assert-MIR42ReceiptBinding -Receipt $campaign -Candidate $Candidate -Code 'mir42-seal-real-engine'
-  $engineRun = Get-MIR42BoundEngineRun -Reference $record.engine_run -Candidate $Candidate
+  if ($null -ne $PublishedMaintenanceInputs) { Assert-MIR42MaintenanceCampaignCustody -Record $record -PublishedInputs $PublishedMaintenanceInputs }
+  $engineRun = Get-MIR42BoundEngineRun -Reference $record.engine_run -Candidate $Candidate -PublishedMaintenanceInputs $PublishedMaintenanceInputs
   if ([string]$record.runner.sha256 -cne [string]$engineRun.record.runner.sha256) { throw '[mir42-seal-real-engine-runner-binding]' }
+  Assert-MIR42RealEngineCampaignExecution -RepoRoot $RepoRoot -Campaign $campaign -Candidate $Candidate -EngineRun $engineRun -PublishedMaintenanceInputs $PublishedMaintenanceInputs
+  return $campaign
+}
+
+function Assert-MIR42RealEngineCampaignExecution {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Campaign,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$EngineRun,$PublishedMaintenanceInputs = $null)
+  $record = $Campaign.record
+  if ([int]$record.factorio_processes -ne [int]$engineRun.record.factorio_processes) { throw '[mir42-seal-real-engine-process-count-binding]' }
+  if ($null -ne $PublishedMaintenanceInputs) { Assert-MIR42MaintenanceCampaignCustody -Record $record -PublishedInputs $PublishedMaintenanceInputs }
   foreach ($target in @($record.targets)) {
     $candidateTarget = @($Candidate.targets | Where-Object { [string]$_.target -ceq [string]$target.target })[0]
     $engineRunTarget = @($engineRun.record.targets | Where-Object { [string]$_.target -ceq [string]$target.target })[0]
@@ -1569,6 +1639,7 @@ function Get-MIR42RealEngineCandidateCampaign {
     }
     $executionProperties = @('executable_path','executable_sha256','version','predecessor','harness_receipt','harness_exit_code','logs','fresh_loads','fresh_exact_load','predecessor_upgrade','reload_count')
     if ([string]$target.target -in $script:MIR42SealHistoricalTargets) { $executionProperties += 'historical_terminal_authority' }
+    if ($null -ne $PublishedMaintenanceInputs) { $executionProperties += 'published_maintenance_predecessor' }
     Assert-MIR42SealPropertyNames -Value $target.engine_execution -Expected $executionProperties -Code 'mir42-seal-real-engine-target-shape'
     Assert-MIR42SealPropertyNames -Value $target.engine_execution.predecessor -Expected @('path','sha256','version') -Code 'mir42-seal-real-engine-predecessor-shape'
     Assert-MIR42SealPropertyNames -Value $target.engine_execution.harness_receipt -Expected @('path','sha256') -Code 'mir42-seal-real-engine-receipt-shape'
@@ -1615,16 +1686,18 @@ function Get-MIR42RealEngineCandidateCampaign {
       }
       if (-not $text.Contains($marker)) { throw "[mir42-seal-real-engine-log-marker] $([string]$target.target)/$([string]$log.phase)" }
     }
+    $publishedInput = $null
+    if ($null -ne $PublishedMaintenanceInputs) { $publishedInput = @($PublishedMaintenanceInputs.targets | Where-Object { [string]$_.target -ceq [string]$target.target })[0] }
     if ([string]$target.target -in $script:MIR42SealHistoricalTargets) {
-      Assert-MIR42HistoricalTerminalExecution -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -HistoricalAuthorities $engineRun.record.historical_terminal_predecessors
+      $historicalProperty = if ($null -ne $PublishedMaintenanceInputs) { 'historical_target_authorities' } else { 'historical_terminal_predecessors' }
+      Assert-MIR42HistoricalTerminalExecution -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -HistoricalAuthorities $engineRun.record.$historicalProperty -PublishedMaintenanceInput $publishedInput
     } else {
       Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution
-      Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -AuthorityReference $engineRun.record.predecessor_authority -RunAsset $engineRun.record.public_v410_checksum_asset
+      Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -AuthorityReference $engineRun.record.predecessor_authority -RunAsset $engineRun.record.public_v410_checksum_asset -PublishedMaintenanceInput $publishedInput
     }
     Assert-MIR42FreshEngineLoads -Target $target -CandidateTarget $Candidate -Execution $target.engine_execution
   }
-  Assert-MIR42JoinedAcceptanceCoverage -RepoRoot $RepoRoot -Receipt $campaign -Candidate $Candidate
-  return $campaign
+  Assert-MIR42JoinedAcceptanceCoverage -RepoRoot $RepoRoot -Receipt $Campaign -Candidate $Candidate
 }
 
 function Get-MIR42ExactIndependentVerificationReceipt {
