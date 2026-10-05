@@ -3,18 +3,25 @@ local recycling = require("prototypes.mir.index.recycling")
 local M = {}
 local EPSILON = 0.000001
 
+local function expected_return(result)
+  local base = result.amount * result.probability
+  -- Exclusions apply to each successful bonus craft, before the output roll.
+  local productive = math.max(0, result.amount - result.ignored_by_productivity) * result.probability
+  return base, productive
+end
+
 local function safe_productivity_cap(path)
   local result = path and path.results and path.results[1]
   if not result then return nil end
   local input_amount = tonumber(path.input and path.input.amount)
-  local result_amount = tonumber(result.amount) and (result.amount * result.probability) or nil
+  local result_amount, productive_amount = expected_return(result)
   if not input_amount or input_amount <= 0 or not result_amount then return nil end
-  local productive_amount = math.max(0, result_amount - result.ignored_by_productivity)
-  if productive_amount <= EPSILON then
+  if productive_amount == 0 then
     if result_amount <= input_amount + EPSILON then return math.huge end
     return nil
   end
   local cap = (input_amount - result_amount) / productive_amount
+  if cap ~= cap or cap == math.huge or cap == -math.huge then return nil end
   if cap < -EPSILON then return nil end
   return math.max(0, cap)
 end
@@ -64,16 +71,28 @@ function M.build(fallback_recycling_cap)
     if result.probability < 0 or result.probability > 1 then
       return false, "unsupported-product-shape"
     end
-    local recycling_cap = tonumber(path.recipe.maximum_productivity)
-    if recycling_cap == nil then recycling_cap = tonumber(fallback_recycling_cap) or 3.0 end
     local path_cap = safe_productivity_cap(path)
     if path_cap == nil then return false, "recycling-loop-gain-above-one" end
-    recycling_cap = math.min(recycling_cap, path_cap)
-    if recycling_cap < 0 then return false, "unsupported-product-shape" end
+    local recycling_cap
+    if path.cap_owned_by_recycling then
+      -- The prototype-limit mutation skips these recipes. Admission must use
+      -- their actual native cap, never assume that this policy lowers it.
+      recycling_cap = tonumber(path.effective_maximum_productivity)
+    else
+      recycling_cap = tonumber(path.recipe.maximum_productivity)
+      if recycling_cap == nil then recycling_cap = tonumber(fallback_recycling_cap) or 3.0 end
+    end
+    if not recycling_cap or recycling_cap ~= recycling_cap or recycling_cap == math.huge or recycling_cap == -math.huge or recycling_cap < 0 then
+      return false, "unsupported-product-shape"
+    end
+    if path.cap_owned_by_recycling then
+      if recycling_cap > path_cap + EPSILON then return false, "owned-recycling-cap-above-safe-return" end
+    else
+      recycling_cap = math.min(recycling_cap, path_cap)
+    end
 
     local input_amount = path.input.amount
-    local result_amount = result.amount * result.probability
-    local productive_amount = math.max(0, result_amount - result.ignored_by_productivity)
+    local result_amount, productive_amount = expected_return(result)
     local gain = (result_amount + productive_amount * recycling_cap) / input_amount
     if gain > 1 + EPSILON then return false, "recycling-loop-gain-above-one" end
 

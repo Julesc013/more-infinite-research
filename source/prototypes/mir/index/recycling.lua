@@ -1,4 +1,6 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 
 -- Immutable recipe/recycling facts. Safety decisions live in policy so the
 -- final recipe graph is indexed once even on very large mod packs.
@@ -22,9 +24,28 @@ local function type_of(entry)
   return type(entry) == "table" and (entry.type or "item") or nil
 end
 
+local function finite_number(value)
+  local number = tonumber(value)
+  if not number or number ~= number or number == math.huge or number == -math.huge then return nil end
+  return number
+end
+
+local function nonnegative_or_absent(value)
+  if value == nil then return true end
+  local number = finite_number(value)
+  return number ~= nil and number >= 0
+end
+
 local function max_amount_of(entry)
   if type(entry) ~= "table" then return nil end
-  return tonumber(entry.amount_max or entry.amount or entry[2] or entry.amount_min)
+  local declared = entry.amount or entry[2]
+  if declared ~= nil then
+    if not finite_number(declared) then return nil end
+  else
+    if entry.amount_min ~= nil and not finite_number(entry.amount_min) then return nil end
+    if entry.amount_max ~= nil and not finite_number(entry.amount_max) then return nil end
+  end
+  return recipe_semantics.maximum_base_result_amount(entry)
 end
 
 local function probability_of(entry)
@@ -32,12 +53,18 @@ local function probability_of(entry)
   local independent = entry.independent_probability
   if independent == nil then independent = entry.probability end
   if independent == nil then independent = 1 end
+  independent = finite_number(independent)
+  if not independent or independent < 0 or independent > 1 then return nil end
   local shared = entry.shared_probability
   local shared_width = 1
-  if type(shared) == "table" then
-    shared_width = (tonumber(shared.max) or 1) - (tonumber(shared.min) or 0)
+  if shared ~= nil then
+    if type(shared) ~= "table" then return nil end
+    local minimum = shared.min == nil and 0 or finite_number(shared.min)
+    local maximum = shared.max == nil and 1 or finite_number(shared.max)
+    if not minimum or not maximum or minimum < 0 or maximum > 1 or maximum < minimum then return nil end
+    shared_width = maximum - minimum
   end
-  return tonumber(independent) * shared_width
+  return independent * shared_width
 end
 
 local function list_for(variant, field)
@@ -65,11 +92,23 @@ local function item_entries(variant, field)
     if not amount or amount <= 0 or not probability or probability < 0 or probability > 1 then
       return nil, "unsupported-product-shape"
     end
+    local ignored = 0
+    if field == "results" then
+      -- A base exclusion does not describe the additional bonus-craft roll.
+      -- Withhold those shapes until their return semantics are qualified.
+      if entry.extra_count_fraction ~= nil and finite_number(entry.extra_count_fraction) ~= 0 then
+        return nil, "unsupported-product-shape"
+      end
+      if not nonnegative_or_absent(entry.ignored_by_productivity) or not nonnegative_or_absent(entry.ignored_by_stats) then
+        return nil, "unsupported-product-shape"
+      end
+      ignored = recipe_semantics.productivity_excluded_amount(entry, target_profiles.current())
+    end
     table.insert(out, {
       name = name,
       amount = amount,
       probability = probability,
-      ignored_by_productivity = tonumber(entry.ignored_by_productivity or 0) or 0
+      ignored_by_productivity = ignored
     })
   end
   return out
@@ -89,7 +128,9 @@ local function parse_recipe(recipe)
   return {
     valid = true,
     ingredients = ingredients,
-    results = results
+    results = results,
+    cap_owned_by_recycling = recipe_semantics.has_recipe_category(recipe, "recycling"),
+    effective_maximum_productivity = recipe_semantics.resolve(recipe, all[1], target_profiles.current()).effective_maximum_productivity
   }
 end
 
@@ -127,6 +168,8 @@ function M.build()
             recipe = recipe,
             input = input,
             results = parsed.results,
+            cap_owned_by_recycling = parsed.cap_owned_by_recycling,
+            effective_maximum_productivity = parsed.effective_maximum_productivity,
             exact_identity = #parsed.results == 1 and parsed.results[1].name == input.name
           })
         end

@@ -549,10 +549,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/domain/facts/recipe_semantics.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 2734,
-      "source_sha256": "B69D15DE65950443D79053AA0062F2746B5298C11960F9CB4E7B536D2752D27A",
-      "output_bytes": 2734,
-      "output_sha256": "B69D15DE65950443D79053AA0062F2746B5298C11960F9CB4E7B536D2752D27A"
+      "source_bytes": 3216,
+      "source_sha256": "BFC3FB377BA817E3A1C7FF4C5E0EA11109E7CE0B8DA42A29C17751839FF6BD72",
+      "output_bytes": 3216,
+      "output_sha256": "BFC3FB377BA817E3A1C7FF4C5E0EA11109E7CE0B8DA42A29C17751839FF6BD72"
     },
     {
       "layer": "shared",
@@ -885,10 +885,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/index/recycling.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 5371,
-      "source_sha256": "084E278A6781D5059A78BE65E7DB21CDFB1D6E7991E4D7B1F647CAE42F1420E3",
-      "output_bytes": 5371,
-      "output_sha256": "084E278A6781D5059A78BE65E7DB21CDFB1D6E7991E4D7B1F647CAE42F1420E3"
+      "source_bytes": 7537,
+      "source_sha256": "D992F35942A4DC869B9841F27D440938AB09542E302B2EDF2AE89BF622B9FEBA",
+      "output_bytes": 7537,
+      "output_sha256": "D992F35942A4DC869B9841F27D440938AB09542E302B2EDF2AE89BF622B9FEBA"
     },
     {
       "layer": "shared",
@@ -1032,10 +1032,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/pipeline/prototype_limits.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 10907,
-      "source_sha256": "5195C6630958C763485274A56C343F26C63E18A548E4D0B976BE580E0F9315EE",
-      "output_bytes": 10907,
-      "output_sha256": "5195C6630958C763485274A56C343F26C63E18A548E4D0B976BE580E0F9315EE"
+      "source_bytes": 10675,
+      "source_sha256": "E942DD3466F6DE188CF032F83FF2E5C47A88B59064923D5547172375275C36ED",
+      "output_bytes": 10675,
+      "output_sha256": "E942DD3466F6DE188CF032F83FF2E5C47A88B59064923D5547172375275C36ED"
     },
     {
       "layer": "shared",
@@ -1284,10 +1284,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/policy/productivity_cap_scope.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3697,
-      "source_sha256": "7E66BD309259A9F0AD2D37E8538224AD986E81EE67278908CC3DE3DD3FB7D687",
-      "output_bytes": 3697,
-      "output_sha256": "7E66BD309259A9F0AD2D37E8538224AD986E81EE67278908CC3DE3DD3FB7D687"
+      "source_bytes": 4461,
+      "source_sha256": "F720D5666233B1E3B58B77FFEE5BC3C6BD79EF20C07EB8160E068199B4B2CA4C",
+      "output_bytes": 4461,
+      "output_sha256": "F720D5666233B1E3B58B77FFEE5BC3C6BD79EF20C07EB8160E068199B4B2CA4C"
     },
     {
       "layer": "shared",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "802BF1734B17DE442BE8B016A00A00B585C98870A7D7915C6E67693F1B5957E2"
+  "record_sha256": "0400CA661118896A7D2B2EB72888C89988E70AD8F75433880B0A2082B8756E2E"
 }

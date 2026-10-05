@@ -969,4 +969,101 @@ end)()
   profile_module.current=previous_current
 end)()
 
+-- Exercise the actual recycling index and cap consumer. Expected caps below
+-- come from independently counted ordinary and bonus crafts: an exclusion
+-- removes units from each successful bonus craft before probability applies.
+;(function()
+  local profiles=require("fixtures.material_routes.target_profiles")
+  local profile_module=package.loaded["prototypes.mir.platform.factorio.target_profiles"]
+  local previous_current=profile_module.current
+  local data_module=package.loaded["prototypes.mir.platform.factorio.data_raw"]
+  local previous_prototypes=data_module.prototypes
+  local recipes={}
+  data_module.prototypes=function(kind) assert(kind=="recipe"); return recipes end
+  local scope=require("prototypes.mir.policy.productivity_cap_scope")
+  local effective=package.loaded["prototypes.mir.settings.effective"]
+  local previous_get=effective.get
+  local limits=require("prototypes.mir.pipeline.prototype_limits")
+  effective.get=function(name)
+    if name=="mir-prototype-productivity-cap" then return 10000 end
+    if name=="mir-productivity-cap-self-recycling-only" then return true end
+    return nil
+  end
+  local cases={
+    {id="probabilistic exclusion",input=10,fields={amount=8,probability=0.5,ignored_by_productivity=2},cap=2},
+    {id="exclusion exceeds expected base",input=4,fields={amount=4,probability=0.25,ignored_by_productivity=1},cap=4},
+    {id="fixed amount wins",input=4,fields={amount=2,amount_min=10,amount_max=99},cap=1},
+    {id="reversed range clamps",input=8,fields={amount_min=4,amount_max=2},cap=1},
+    {id="default exclusion",input=2,fields={amount=2,probability=0.5,ignored_by_stats=1},cap=2,legacy_cap=1},
+    {id="explicit zero exclusion",input=2,fields={amount=2,probability=0.5,ignored_by_stats=1,ignored_by_productivity=0},cap=1},
+    {id="fully excluded",input=2,fields={amount=2,probability=0.5,ignored_by_productivity=9},cap=math.huge},
+    {id="zero probability",input=2,fields={amount=2,probability=0},cap=math.huge},
+    {id="tiny positive probability",input=1,fields={amount=1,probability=0.0000001},cap=9999999},
+    {id="overflowing finite cap withheld",input=1,fields={amount=1,probability=1e-309}},
+    {id="independent zero wins",input=2,fields={amount=2,independent_probability=0,probability=1},cap=math.huge},
+    {id="shared and independent rolls",input=4,fields={amount=4,independent_probability=0.5,probability=0.99,shared_probability={min=0.2,max=0.7},ignored_by_productivity=1},cap=4},
+    {id="unit return",input=1,fields={amount=1},cap=0},
+    {id="owned recycling cap remains unsafe",input=1,fields={amount=1,probability=0.5},cap=1,category="recycling",recipe_cap=3,owned=true,admitted=false},
+    {id="owned recycling cap is safe",input=1,fields={amount=1,probability=0.5},cap=1,category="recycling",recipe_cap=1,owned=true},
+    {id="plural recycling ownership",input=1,fields={amount=1,probability=0.5},cap=1,categories={"crafting","recycling"},recipe_cap=3,owned=true,admitted=false},
+    {id="plural category wins",input=1,fields={amount=1,probability=0.5},cap=1,category="recycling",categories={"crafting"},recipe_cap=3},
+    {id="unsafe native default cap",input=1,fields={amount=1,probability=0.5},cap=1,category="recycling",omit_recipe_cap=true,owned=true,admitted=false},
+    {id="native default differs from fallback",input=1,fields={amount=1,probability=0.25},cap=3,category="recycling",omit_recipe_cap=true,owned=true,fallback=4},
+    {id="explicit zero extra roll",input=2,fields={amount=1,extra_count_fraction=0},cap=1},
+    {id="extra roll withheld",input=2,fields={amount=1,extra_count_fraction=0.5}},
+    {id="malformed extra roll",input=2,fields={amount=1,extra_count_fraction="invalid"}},
+    {id="negative exclusion",input=2,fields={amount=1,ignored_by_productivity=-1}},
+    {id="invalid independent roll",input=2,fields={amount=1,independent_probability="invalid"}},
+    {id="invalid shared bounds",input=2,fields={amount=1,shared_probability={min=-1,max=0}}},
+    {id="invalid shared shape",input=2,fields={amount=1,shared_probability=0.5}},
+    {id="nonfinite amount",input=2,fields={amount=math.huge}},
+    {id="nonfinite probability",input=2,fields={amount=1,probability=0/0}},
+    {id="base gain despite exclusion",input=1,fields={amount=2,ignored_by_productivity=2}}
+  }
+  for _,version in ipairs({"2.1","2.0","1.1"}) do
+    profile_module.current=function() return assert(profiles.profiles[version]) end
+    for _,case in ipairs(cases) do
+      local result={type="item",name="component"}
+      for key,value in pairs(case.fields) do result[key]=value end
+      recipes={
+        manufacture={name="manufacture",ingredients={{"ore",1}},results={{"component",1}}},
+        reclaim={name="reclaim",ingredients={{"component",case.input}},results={result},maximum_productivity=case.recipe_cap or 100,category=case.category,categories=case.categories}
+      }
+      if case.omit_recipe_cap then recipes.reclaim.maximum_productivity=nil end
+      local declared_cap=recipes.reclaim.maximum_productivity
+      -- Snapshot equality includes malformed values without requiring the
+      -- ordinary fingerprint formatter to support NaN or infinity.
+      local before_amount=result.amount
+      local before_probability=result.probability
+      local classifier=scope.build(case.fallback or 3)
+      local expected=version=="1.1" and case.legacy_cap or case.cap
+      local actual=classifier.maximum_safe_productivity("reclaim")
+      local id="recycling cap "..version.." "..case.id
+      check(actual==expected or (actual and expected and math.abs(actual-expected)<=0.000001),id)
+      local accepted,_,witness=classifier.approve(recipes.manufacture)
+      check(accepted==(expected~=nil and case.admitted~=false),id.." forward admission")
+      if accepted then
+        check(witness.maximum_loop_gain<=1.000001,id.." loop gain")
+        check(witness.maximum_safe_recycling_productivity==actual,id.." consumed cap")
+      end
+      check(result.amount==before_amount,id.." quantity immutability")
+      check(result.probability==before_probability or (result.probability~=result.probability and before_probability~=before_probability),id.." probability immutability")
+      if version=="2.1" or version=="2.0" then
+        -- The real admitted prototype-limit pipeline must consume the cap,
+        -- using its authored percentage decoder and scoped startup control.
+        local changed=limits.apply()
+        local reclaim_cap
+        if case.owned then reclaim_cap=declared_cap
+        else reclaim_cap=expected and math.min(3,expected) or 3 end
+        check(recipes.reclaim.maximum_productivity==reclaim_cap,id.." applied return cap")
+        check(recipes.manufacture.maximum_productivity==(accepted and 100 or 3),id.." applied forward cap")
+        check(changed.productivity==(case.owned and 1 or 2),id.." consumed mutation count")
+      end
+    end
+  end
+  data_module.prototypes=previous_prototypes
+  profile_module.current=previous_current
+  effective.get=previous_get
+end)()
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

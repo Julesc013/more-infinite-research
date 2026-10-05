@@ -17,6 +17,19 @@ local function declared(recipe, definition, field)
   return nil
 end
 
+-- Shared category ownership for the cap policy and its admitted mutation.
+-- An explicit categories list takes precedence over the singular category.
+function M.has_recipe_category(recipe, wanted)
+  if type(recipe) ~= "table" then return false end
+  if type(recipe.categories) == "table" then
+    for _, category in ipairs(recipe.categories) do
+      if category == wanted then return true end
+    end
+    return false
+  end
+  return (recipe.category or "crafting") == wanted
+end
+
 -- Maximum base quantity, before probability, extra item rolls or productivity
 -- exclusions. Native products ignore ranges when amount is declared and clamp
 -- a reversed ranged maximum to its minimum. Both the fact index and carrier

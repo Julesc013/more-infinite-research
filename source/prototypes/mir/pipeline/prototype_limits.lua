@@ -3,6 +3,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local effective_settings = require("prototypes.mir.settings.effective")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
 local cap_scope = require("prototypes.mir.policy.productivity_cap_scope")
+local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 
 local P = {}
 local EPSILON = 0.000001
@@ -60,18 +61,7 @@ local function inverse_recycling_productivity_bonus(recycling_chance)
   return math.max(0, (1 / chance) - 1)
 end
 
-local function recipe_categories(recipe)
-  if type(recipe.categories) == "table" then return recipe.categories end
-  if recipe.category then return {recipe.category} end
-  return {"crafting"}
-end
-
-local function has_category(recipe, wanted)
-  for _, category in ipairs(recipe_categories(recipe)) do
-    if category == wanted then return true end
-  end
-  return false
-end
+local has_category = recipe_semantics.has_recipe_category
 
 local function apply_recipe_productivity_cap(value, recycling_chance)
   if value == nil then return 0 end

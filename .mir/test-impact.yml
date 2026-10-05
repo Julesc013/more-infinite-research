@@ -643,6 +643,48 @@
       "groups": [],
       "scenarios": [],
       "tags": []
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/runtime/Test-MIRResearchBrowser.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/support/MIRMaterialAuditInputs.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/runtime/Test-MIRBobAngelTinFinalStateAudit.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/runtime/Test-MIRA06AluminiumFinalState.ps1"
     }
   ]
 }
