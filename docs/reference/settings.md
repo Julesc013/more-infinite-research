@@ -53,6 +53,8 @@ This setting accepts a portable MIR settings profile string. It is always regist
 
 MIR 4.2.1 development gives the Rare Metals, Silicon, Glass, black paving and white paving staged material families a default `ips-max-level-<stream>` of `0`. Zero leaves the configured combined stage limit open; the compiler still stops at the highest useful recipe-productivity level. The early technology remains finite at three, and an explicit value of `3` prevents the separate level-four continuation. Existing setting IDs, increments, research times and cost controls remain the same. These are startup settings and require a restart.
 
+Material continuations preserve the existing space-first preference for a qualified later ordinary science. A pack already implied by the inherited official or mod prerequisite progression cannot become a new late frontier. If research already uses an established late tier, the planner can carry that complete ingredient set and its amounts rather than add a lower pack or impose a distinct final pack. The existing final-pack escape remains available when no ordinary or inherited late frontier is usable. Acquisition, joint-lab selection, required science and useful-effect checks still apply; this correction changes no cost or setting default. Current-package save and progression acceptance remain pending.
+
 Automatic productivity support is governed by `prototypes/mir/settings/automatic_compiler_contract.lua`, a pure schema-2 contract with no Factorio-global reads and no mod, recipe, technology, or version names. The visible settings are:
 
 | Setting ID | Type | Default | Contract |

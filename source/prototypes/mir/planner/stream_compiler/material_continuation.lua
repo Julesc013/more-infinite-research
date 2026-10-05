@@ -26,30 +26,71 @@ local function late_science_for(key, early_ingredients)
   for _, pack in ipairs({"space-science-pack", "utility-science-pack", "production-science-pack"}) do
     table.insert(candidates, pack)
   end
+  local ordinary_candidate_count = #candidates
   local end_game = science_packs.end_game_science_pack()
   if end_game then table.insert(candidates, end_game) end
-  local seen = {}
-  for _, late in ipairs(candidates) do
-    if late and not seen[late] and not contains_ingredient(early_ingredients, late)
-        and science_packs.science_pack_exists(late) then
-      seen[late] = true
-      local status = science_packs.pack_production_status(late)
-      if status == "initial" or status == "research" or status == "non-recipe" then
-        local requested = deepcopy(early_ingredients)
-        table.insert(requested, {late, 1})
-        local ingredients, lab_status, decision = planner_science.ingredients_for_selected(key, requested)
-        if ingredients and contains_ingredient(ingredients, late) then
-          return ingredients, lab_status, decision, late
-        end
+  local inherited_names = {}
+  for _, ingredient in ipairs(early_ingredients or {}) do
+    inherited_names[#inherited_names + 1] = ingredient.name or ingredient[1]
+  end
+  local function progression_for(names)
+    local out = {}
+    local inferred = science_packs.mod_progression_packs_for(names)
+    for _, pack in ipairs(inferred) do out[pack] = true end
+    -- An unfamiliar pack can imply an ordinary pack through its real unlock
+    -- technology. Include that ordinary pack's existing progression too.
+    for _, pack in ipairs(science_packs.official_progression_packs_for(inferred)) do out[pack] = true end
+    for _, pack in ipairs(names) do out[pack] = true end
+    return out
+  end
+  -- Reuse the existing official and concrete mod prerequisite policy. A
+  -- science already implied by the inherited set is not a later frontier.
+  -- Keep the established space-first preference for genuinely later packs.
+  local inherited_progression = progression_for(inherited_names)
+  local function additional_frontier(late)
+    if not late or inherited_progression[late] or not science_packs.science_pack_exists(late) then return nil end
+    local status = science_packs.pack_production_status(late)
+    if status == "initial" or status == "research" or status == "non-recipe" then
+      local requested = deepcopy(early_ingredients)
+      table.insert(requested, {late, 1})
+      local ingredients, lab_status, decision = planner_science.ingredients_for_selected(key, requested)
+      if ingredients and contains_ingredient(ingredients, late) then
+        return ingredients, lab_status, decision, late
       end
     end
   end
+  for index, late in ipairs(candidates) do
+    if index <= ordinary_candidate_count then
+      local ingredients, lab_status, decision, frontier = additional_frontier(late)
+      if ingredients then return ingredients, lab_status, decision, frontier end
+    end
+  end
   -- A material that already needs the highest reachable pack still has
-  -- useful recipe headroom. Keep that proven tier for its next stage when no
-  -- additional science pack can be reached in this overhaul profile.
-  for _, late in ipairs(candidates) do
-    if late and contains_ingredient(early_ingredients, late)
+  -- useful recipe headroom. Prefer that proven tier to imposing a distinct
+  -- final pack on the first useful continuation.
+  local inherited_frontiers, progression = {}, {}
+  for _, pack in ipairs(inherited_names) do
+    progression[pack] = progression_for({pack})
+    for _, late in ipairs(candidates) do
+      if progression[pack][late] then inherited_frontiers[pack] = true; break end
+    end
+  end
+  local fallback_candidates = deepcopy(candidates)
+  for _, pack in ipairs(inherited_names) do fallback_candidates[#fallback_candidates + 1] = pack end
+  local considered = {}
+  for _, late in ipairs(fallback_candidates) do
+    local dominated = false
+    if inherited_frontiers[late] then
+      for other in pairs(inherited_frontiers) do
+        if other ~= late and progression[other][late] and not progression[late][other] then
+          dominated = true; break
+        end
+      end
+    end
+    if late and not considered[late] and inherited_frontiers[late] and not dominated
+        and contains_ingredient(early_ingredients, late)
         and science_packs.science_pack_exists(late) then
+      considered[late] = true
       local status = science_packs.pack_production_status(late)
       if status == "initial" or status == "research" or status == "non-recipe" then
         local ingredients, lab_status, decision = planner_science.ingredients_for_selected(
@@ -60,7 +101,9 @@ local function late_science_for(key, early_ingredients)
       end
     end
   end
-  return nil
+  -- Preserve the existing end-game escape when the profile has neither a
+  -- usable ordinary later pack nor an established inherited late frontier.
+  return additional_frontier(end_game)
 end
 
 function M.plan(legacy_row)

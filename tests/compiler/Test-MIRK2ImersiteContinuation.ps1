@@ -31,6 +31,7 @@ New-Item -ItemType Directory -Force -Path $mod,(Join-Path $run 'userdata') | Out
 $modules=[ordered]@{
   'prototypes.mir.core.deepcopy'='source/prototypes/mir/core/deepcopy.lua'
   'prototypes.mir.core.fingerprint'='source/prototypes/mir/core/fingerprint.lua'
+  'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
   'prototypes.mir.compatibility.policies.k2_science_phase'='source/prototypes/mir/compatibility/policies/k2_science_phase.lua'
   'prototypes.mir.families.material_progression'='source/prototypes/mir/families/material_progression.lua'
   'prototypes.mir.domain.technology.maximum_level_binding'='source/prototypes/mir/domain/technology/maximum_level_binding.lua'
