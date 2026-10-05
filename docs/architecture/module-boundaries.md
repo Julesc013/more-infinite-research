@@ -5,7 +5,7 @@ applies_to: "4.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 ---
 # MIR 4 Repository and Module Boundaries
 
-Updated: 2026-10-04
+Updated: 2026-10-06
 
 This page records current MIR 4 authority and package boundaries while retaining explicitly labelled historical transitions that explain them.
 
@@ -33,6 +33,8 @@ Material-route certificates belong to `source/prototypes/mir/capabilities/recipe
 `tools/commands/targets/Sync-MIRTargetProfiles.ps1` resolves the selected physical adapter through the existing composition. F110 and F100 select the same base-version adapter, so its generated profile facts contain only their two reduced contracts and preserve the authored selector for `mods.base` and `script.active_mods`. Both sync/check operations must produce the same bytes. The generator retains the adapter's existing represented fields; controlled baseline comparison finds no profile-value differences, and the consumed recipe-source fixture checks both loading phases, agreement, missing authorities and unrelated engine rejection. Those controls prove the source representation and selector, not a native F110/F100 package or save pass.
 
 Binding schema 2 is explicitly selected with `relevant_route_fingerprints(recipe, 2)`. It binds productivity owner names and effect values for every recipe in the cone, each recipe's unlocks, and the recursive technology frontier's research units or triggers, prerequisites, level bounds, enabled/hidden state and cost-multiplier policy. The technology search is bounded to 10,000 entries and fails closed on missing frontier or owner facts. The existing generated-technology registry owns the shared `is_stream(name)` classifier used by certificate bindings and native-effect coverage. Only registered dedicated MIR streams are excluded; registered native continuations, base extensions and unclassified entries remain owners, and a MIR-like name alone grants no exclusion. The exact dependency matrix admits the capability's read-only domain query without a dependency exception. Unrelated recipes and technologies remain outside this boundary.
+
+The self-recycling productivity-cap guard consumes the same maximum-quantity and target-specific exclusion helpers through `index/recycling.lua`. Its expected ordinary return is the possible quantity multiplied by the output probability; its productive return subtracts the exclusion from that quantity before applying probability. A positive productive return always requires a finite cap calculation, even below the comparison tolerance. Nonzero or malformed extra rolls and invalid numerical/probability shapes remain withheld. The existing controlled material-route fixture exercises the actual index and cap policy with F210, F200 and retained legacy profile facts, then consumes the modern caps through the actual prototype-limit mutation and percentage decoder. Running those source controls in a standalone Lua interpreter grants no Factorio, package, production or save qualification.
 
 When the existing generation-report setting is enabled, certificate consideration records scalar schema-2 fingerprints through `report/diagnostics_sink.lua` during the actual planning input phase. Rejected certificates may be observed, but observation grants no admission. Capture requires the existing pipeline input-sanitation completion marker and refuses a context whose mutation journal has started; a fresh finalized observer context cannot produce an input-phase record. Capture is deduplicated by recipe in the active context and limited to 255 records plus an explicit incomplete-capture marker. Normal gameplay with diagnostics disabled does not allocate this observation state. The current F210 Tin observer requests this diagnostic setting in its isolated fixture and consumes input records separately from its preserved schema-1 finalized `ROUTE` records. Its `-AuditLogPath` mode reads an existing log without staging or starting Factorio; missing, duplicated, incomplete, unavailable or wrongly phased input records fail closed. A fresh post-emission snapshot containing MIR's own effects remains a different observation and cannot replace this capture.
 

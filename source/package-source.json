@@ -885,10 +885,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/index/recycling.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 5371,
-      "source_sha256": "084E278A6781D5059A78BE65E7DB21CDFB1D6E7991E4D7B1F647CAE42F1420E3",
-      "output_bytes": 5371,
-      "output_sha256": "084E278A6781D5059A78BE65E7DB21CDFB1D6E7991E4D7B1F647CAE42F1420E3"
+      "source_bytes": 7160,
+      "source_sha256": "C88C765E2128CDC0A0A9A565FADBC8C4B5B7F37B411E29728EE8A65C027742EF",
+      "output_bytes": 7160,
+      "output_sha256": "C88C765E2128CDC0A0A9A565FADBC8C4B5B7F37B411E29728EE8A65C027742EF"
     },
     {
       "layer": "shared",
@@ -1284,10 +1284,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/policy/productivity_cap_scope.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3697,
-      "source_sha256": "7E66BD309259A9F0AD2D37E8538224AD986E81EE67278908CC3DE3DD3FB7D687",
-      "output_bytes": 3697,
-      "output_sha256": "7E66BD309259A9F0AD2D37E8538224AD986E81EE67278908CC3DE3DD3FB7D687"
+      "source_bytes": 3869,
+      "source_sha256": "2879919EE8A778152DB3C85D1A44335049E545A049652F4D1FC932B4CE4F4310",
+      "output_bytes": 3869,
+      "output_sha256": "2879919EE8A778152DB3C85D1A44335049E545A049652F4D1FC932B4CE4F4310"
     },
     {
       "layer": "shared",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "802BF1734B17DE442BE8B016A00A00B585C98870A7D7915C6E67693F1B5957E2"
+  "record_sha256": "D553F05C1FA622B0E58B87EFFCB91BADADDEBFC196A5604D191C71E614963E3C"
 }

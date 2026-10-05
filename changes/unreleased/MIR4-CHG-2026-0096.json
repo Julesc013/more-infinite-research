@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0096",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Correct probabilistic self-recycling productivity caps.",
+  "details": [
+    "When the self-recycling-only cap scope is active, cap calculations subtract catalyst exclusions before probability, respect declared quantities and target exclusion defaults, and keep positive productive returns finite. Invalid or overflowing shapes cannot authorize elevated caps.",
+    "Nonzero or malformed extra rolls remain withheld. The existing material-route fixture covers the actual index, policy and applied recipe caps; standalone Lua source controls do not qualify native packages or saves."
+  ],
+  "semantic_domains": [
+    "recipe-productivity",
+    "compatibility",
+    "settings"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Corrects the existing self-recycling productivity-cap setting guard."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Corrects the existing self-recycling productivity-cap setting guard."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not expose the prototype-limits capability."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not expose the prototype-limits capability."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not expose the prototype-limits capability."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not expose the prototype-limits capability."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not expose the prototype-limits capability."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not expose the prototype-limits capability."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not expose the prototype-limits capability."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "changed",
+    "migration": "none",
+    "compatibility": "changed",
+    "public_contract": "none",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "source/prototypes/mir/index/recycling.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "source/prototypes/mir/policy/productivity_cap_scope.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/material_routes.lua",
+      "kind": "finding"
+    }
+  ]
+}
