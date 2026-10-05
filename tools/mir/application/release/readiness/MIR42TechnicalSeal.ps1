@@ -1431,7 +1431,7 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
     source = $candidate.source
     candidate_manifest = [ordered]@{sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
     evidence_reconciliation = [ordered]@{sha256=[string]$reconciliation.sha256;record_sha256=[string]$reconciliation.record.record_sha256}
-    engine_run = [ordered]@{sha256=[string]$engineRun.sha256;record_sha256=[string]$engineRun.record.record_sha256}
+    engine_run = [ordered]@{path=[string]$engineRun.path;sha256=[string]$engineRun.sha256;record_sha256=[string]$engineRun.record.record_sha256}
     runner = [ordered]@{sha256=[string]$engineRun.record.runner.sha256}
     targets = @($targets)
     factorio_processes = [int]$engineRun.record.factorio_processes
@@ -1520,7 +1520,7 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
     source = $candidate.source
     candidate_manifest = [ordered]@{sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
     evidence_reconciliation = [ordered]@{sha256=[string]$reconciliation.sha256;record_sha256=[string]$reconciliation.record.record_sha256}
-    engine_run = [ordered]@{sha256=[string]$engineRun.sha256;record_sha256=[string]$engineRun.record.record_sha256}
+    engine_run = [ordered]@{path=[string]$engineRun.path;sha256=[string]$engineRun.sha256;record_sha256=[string]$engineRun.record.record_sha256}
     runner = $engineRun.record.runner
     targets = $binder.record.targets
     factorio_processes = [int]$engineRun.record.factorio_processes

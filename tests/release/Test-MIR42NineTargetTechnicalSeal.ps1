@@ -12,6 +12,66 @@ function Assert-MIR42NineSealTest {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Code)
   if (-not $Condition) { throw "[mir42-nine-seal-test-$Code]" }
 }
+function Test-MIR42ConsumedEngineRunReferences {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $ErrorActionPreference = 'Stop'
+  $sourcePath = Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1'
+  $errors = $null
+  $ast = [Management.Automation.Language.Parser]::ParseFile($sourcePath,[ref]$null,[ref]$errors)
+  if ($errors) { throw '[mir42-engine-reference-source-parser]' }
+  $root = Join-Path $RepoRoot ('build/test-results/mir42-engine-reference-' + [guid]::NewGuid().ToString('N'))
+  $assertions = 0
+  try {
+    New-Item -ItemType Directory -Path $root | Out-Null
+    $path = Join-Path $root 'unqualified-reference-probe.json'
+    # This hash-valid, deliberately incomplete record has no native status,
+    # observations or qualification. The run reader must always refuse it.
+    $record = [pscustomobject][ordered]@{kind='engine-reference-source-contract-probe-not-run';record_sha256=''}
+    Write-MIR4BootstrapRecord -Record $record -Path $path | Out-Null
+    $engineRun = Read-MIR42SealRecord -Path $path -Code 'mir42-engine-reference-probe'
+    foreach ($name in @('New-MIR42FourTargetRealEngineEvidenceBinder','New-MIR42NineTargetJoinedRealEngineCampaign')) {
+      $functions = @($ast.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name },$true))
+      if ($functions.Count -ne 1) { throw '[mir42-engine-reference-producer-cardinality]' }
+      $expressions = @(
+        foreach ($table in $functions[0].Body.FindAll({ param($node) $node -is [Management.Automation.Language.HashtableAst] },$true)) {
+          foreach ($pair in $table.KeyValuePairs) {
+            if ($pair.Item1.Extent.Text -ceq 'engine_run') { $pair.Item2 }
+          }
+        }
+      )
+      if ($expressions.Count -ne 1) { throw '[mir42-engine-reference-field-cardinality]' }
+      # Consume the producer's actual expression through its real serialized
+      # shape. A separately authored reference would miss the omission.
+      $produced = & ([scriptblock]::Create($expressions[0].Extent.Text))
+      $reference = $produced | ConvertTo-Json -Depth 10 | ConvertFrom-Json -Depth 10
+      foreach ($scope in @('four-target','nine-target')) {
+        $targets = if ($scope -ceq 'four-target') { $script:MIR42SealTargets } else { $script:MIR42SealNineTargetCandidates }
+        $candidate = [pscustomobject]@{targets=@($targets | ForEach-Object { [pscustomobject]@{target=$_} })}
+        foreach ($case in @('intact','missing-file','changed-raw-hash','changed-record-hash')) {
+          $inputReference = $reference | ConvertTo-Json -Depth 10 | ConvertFrom-Json -Depth 10
+          $expected = '[mir42-seal-engine-run-shape]'
+          switch ($case) {
+            'missing-file' { $inputReference.path += '-absent'; $expected = '[mir42-seal-engine-run-reference-missing]' }
+            'changed-raw-hash' { $inputReference.sha256 = '0' * 64; $expected = '[mir42-seal-engine-run-reference-hash]' }
+            'changed-record-hash' { $inputReference.record_sha256 = '0' * 64; $expected = '[mir42-seal-engine-run-reference-binding]' }
+          }
+          $failure = ''
+          try { $null = Get-MIR42BoundEngineRun -Reference $inputReference -Candidate $candidate } catch { $failure = $_.Exception.Message }
+          Assert-MIR42NineSealTest -Condition ($failure -ceq $expected) -Code ('engine-reference-' + $name + '-' + $scope + '-' + $case)
+          $assertions++
+        }
+      }
+    }
+  } finally {
+    $approved = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/test-results')).TrimEnd('\') + '\'
+    if (-not ([IO.Path]::GetFullPath($root) + '\').StartsWith($approved,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-engine-reference-containment]' }
+    if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
+  }
+  Write-Output ('MIR42-ENGINE-REFERENCE-CONTRACT-PASSED assertions=' + $assertions + ' native-records=0 engines=0')
+}
+
+Test-MIR42ConsumedEngineRunReferences -RepoRoot $repo
+
 function Get-MIR42NineSealCommittedHistoricalFixture {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target)
 
