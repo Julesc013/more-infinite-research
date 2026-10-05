@@ -26,10 +26,14 @@ param(
   [string]$IntentionPath = '',
   [string]$PromotionRequestPath = '',
   [string]$OutputPath = '',
+  [string]$PublishedMaintenancePredecessorManifestPath = '',
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath) -and $Mode -cne 'EngineEvidence') {
+  throw '[mir42-maintenance-binder-mode-only]'
+}
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
 
@@ -47,7 +51,8 @@ switch ($Mode) {
     if ([string]::IsNullOrWhiteSpace($EngineRunPath)) { throw '[mir42-engine-evidence-run-required]' }
     if ([string]::IsNullOrWhiteSpace($OutputPath)) { throw '[mir42-engine-evidence-output-required]' }
     New-MIR42NineTargetRealEngineEvidenceBinder -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
-      -EvidenceReconciliationPath $QualificationPath -EngineRunPath $EngineRunPath -OutputPath $OutputPath | ConvertTo-Json -Depth 30
+      -EvidenceReconciliationPath $QualificationPath -EngineRunPath $EngineRunPath -OutputPath $OutputPath `
+      -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath | ConvertTo-Json -Depth 30
   }
   'JoinedCampaign' {
     if ([string]::IsNullOrWhiteSpace($QualificationPath) -or [string]::IsNullOrWhiteSpace($EngineEvidencePath) -or [string]::IsNullOrWhiteSpace($OutputPath)) {

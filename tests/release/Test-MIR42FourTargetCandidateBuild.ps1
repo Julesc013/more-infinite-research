@@ -22,6 +22,7 @@ $maintenanceCustodyAssertions=0
 $maintenanceEvidenceAssertions=0
 $maintenanceIndependentAssertions=0
 $sealCandidateContractAssertions=0
+$maintenanceBinderAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 
@@ -256,6 +257,19 @@ try {
   $sealVersion=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $schemaComplete
   Assert-MIR42CandidateBuildTest ($sealVersion.source_version-ceq'4.2.1'-and$sealVersion.requires_nine_targets) 'seal-reader-selects-v2-nine-target-contract-without-qualification'
   $sealCandidateContractAssertions++
+  $binderCandidate=[pscustomobject]@{scope='nine-target';targets=$schemaComplete.targets;identity=[pscustomobject]@{record=$schemaComplete}}
+  $binderContract=Get-MIR42EngineEvidenceBindingContract -Candidate $binderCandidate -PublishedMaintenance
+  Assert-MIR42CandidateBuildTest ($binderContract.binder_kind-ceq'MIR42NineTargetMaintenanceRealEngineEvidenceBinderV1'-and
+    $binderContract.evidence_kind-ceq'MIR42NineTargetMaintenanceEvidenceReconciliationV1'-and$binderContract.engine_run_kind-ceq'MIR42NineTargetMaintenanceEngineRunV1') 'maintenance-binder-selects-only-current-binding-identities'
+  $maintenanceBinderAssertions++
+  $unchangedSealContract=Get-MIR42SealScopeContract -Scope 'nine-target'
+  Assert-MIR42CandidateBuildTest ($unchangedSealContract.binder_kind-ceq'MIR42NineTargetRealEngineEvidenceBinderV1'-and$unchangedSealContract.campaign_kind-ceq'MIR42NineTargetRealEngineCandidateCampaignV1') 'maintenance-binder-does-not-change-global-campaign-or-seal-contract'
+  $maintenanceBinderAssertions++
+  $fourBinderCandidate=[pscustomobject]@{scope='four-target';targets=@($schemaComplete.targets|Select-Object -First 4);identity=[pscustomobject]@{record=$schemaComplete}}
+  $rejected=$false
+  try{Get-MIR42EngineEvidenceBindingContract -Candidate $fourBinderCandidate -PublishedMaintenance|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-engine-evidence-maintenance-candidate-scope]'}
+  Assert-MIR42CandidateBuildTest $rejected 'maintenance-binder-refuses-four-target-scope'
+  $maintenanceBinderAssertions++
   $engineFixturePath=Join-Path $schemaRoot 'candidate-manifest.json'
   $engineVersion=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath
   Assert-MIR42CandidateBuildTest ($engineVersion.source_version-ceq'4.2.1'-and$engineVersion.nine_targets-and-not$engineVersion.four_targets-and@($engineVersion.targets).Count-eq9) 'native-runner-reads-v2-nine-target-envelope-without-execution'
@@ -311,6 +325,12 @@ try {
     Assert-MIR42CandidateBuildTest $rejected "seal-reader-refuses-self-hashed-$($case.Key)"
     $sealCandidateContractAssertions++
   }
+  foreach($mode in @('Readiness','JoinedCampaign','Seal','PromotionPlan','MainReadback')){
+    $rejected=$false
+    try{& (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1') -RepoRoot $repo -Mode $mode -CandidateManifestPath 'unused-control.json' -PublishedMaintenancePredecessorManifestPath 'unread-control-manifest.json'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-binder-mode-only]'}
+    Assert-MIR42CandidateBuildTest $rejected ('maintenance-binder-command-refuses-other-transition-'+$mode)
+    $maintenanceBinderAssertions++
+  }
   $invalidPartial = $schemaPartial | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
   $duplicatePartialRow = $invalidPartial.targets[0] | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
   $duplicatePartialRow.asset.sha256='C'*64
@@ -335,6 +355,11 @@ try {
     Assert-MIR42CandidateBuildTest ($legacySealVersion.source_version-ceq'4.2.0'-and-not$legacySealVersion.requires_nine_targets) "seal-reader-preserves-v1-$legacyCount-target-schema"
     $sealCandidateContractAssertions++
   }
+  $oldBinderCandidate=[pscustomobject]@{scope='nine-target';targets=$legacyFixture.targets;identity=[pscustomobject]@{record=$legacyFixture}}
+  $rejected=$false
+  try{Get-MIR42EngineEvidenceBindingContract -Candidate $oldBinderCandidate -PublishedMaintenance|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-engine-evidence-maintenance-candidate-scope]'}
+  Assert-MIR42CandidateBuildTest $rejected 'maintenance-binder-refuses-source-zero'
+  $maintenanceBinderAssertions++
   # Exercise the runner's actual selection statements without its native CLI.
   $engineStatements=@($engineAst.EndBlock.Statements)
   $selectionIndex=[array]::FindIndex($engineStatements,[Predicate[object]]{param($node) $node.Extent.Text.StartsWith('$selected = ')})
@@ -495,9 +520,30 @@ try {
       Assert-MIR42CandidateBuildTest $rejected ('independent-maintenance-refuses-'+$case+'-'+$target)
       $maintenanceIndependentAssertions++
     }
+    # Predecessor fields only: no passed engine execution or native log fixture.
+    $executionFields=[pscustomobject]@{predecessor=[pscustomobject]@{path=$fixtureArchive;version=$binding.version;sha256=$binding.sha256};published_maintenance_predecessor=$independentBinding}
+    Assert-MIR42EngineEvidenceMaintenanceExecution -Target $target -Execution $executionFields -PublishedInput $independentBinding
+    $maintenanceBinderAssertions++
+    foreach($case in @('path','version','hash','missing-custody','asset-id','target')){
+      $invalid=$executionFields|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+      $expected=$independentBinding|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+      $expectedCode='[mir42-engine-evidence-maintenance-predecessor-binding] '+$target
+      switch($case){
+        'path'{$invalid.predecessor.path=$fixtureArchive+'.wrong'}
+        'version'{$invalid.predecessor.version='4.2.'+$target.Substring(1)+'01'}
+        'hash'{$invalid.predecessor.sha256='0'*64}
+        'missing-custody'{$invalid.PSObject.Properties.Remove('published_maintenance_predecessor')}
+        'asset-id'{$invalid.published_maintenance_predecessor.github_asset_id=2;$expectedCode='[mir42-engine-evidence-maintenance-custody-binding-'+$target+']'}
+        'target'{$expected.target='f999'}
+      }
+      $rejected=$false
+      try{Assert-MIR42EngineEvidenceMaintenanceExecution -Target $target -Execution $invalid -PublishedInput $expected}catch{$rejected=$_.Exception.Message-ceq$expectedCode}
+      Assert-MIR42CandidateBuildTest $rejected ('maintenance-binder-refuses-'+$case+'-'+$target)
+      $maintenanceBinderAssertions++
+    }
   }
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 
