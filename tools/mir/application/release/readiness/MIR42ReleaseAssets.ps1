@@ -18,12 +18,65 @@ if (-not (Get-Command Assert-MIR42SupportCollectorBundle -ErrorAction SilentlyCo
 }
 
 $script:MIR42ReleaseAssetTargets = @('f210', 'f200', 'f110', 'f100', 'f017', 'f016', 'f015', 'f014', 'f013')
-$script:MIR42ReleaseAssetPublicSupportPaths = @(
-  'SHA256SUMS.txt', 'SHA256SUMS.txt.sig', 'mir-4.2.0.qualification.json',
-  'mir-4.2.0.provenance.json', 'mir-4.2.0.components.json', 'mir-4.2.0.release.json',
-  'MIR42-Offline-Support-Collector.zip'
-)
 $script:MIR42ReleaseAssetLocalPaths = @('release-notes.md')
+
+function Get-MIR42ReleaseAssetVersionContract {
+  param([Parameter(Mandatory)][string]$SourceVersion,[Parameter(Mandatory)][string]$ReleaseTag)
+
+  if ($SourceVersion -cnotin @('4.2.0','4.2.1') -or $ReleaseTag -cne ('v' + $SourceVersion)) {
+    throw '[mir42-release-assets-version-contract]'
+  }
+  $maintenance = $SourceVersion -ceq '4.2.1'
+  $prefix = if ($maintenance) { 'MIR42NineTargetMaintenance' } else { 'MIR42NineTarget' }
+  $statusPrefix = if ($maintenance) { 'MIR-4.2.1-NINE-TARGET-MAINTENANCE' } else { 'MIR-4.2-NINE-TARGET' }
+  return [pscustomobject][ordered]@{
+    source_version=$SourceVersion;tag=$ReleaseTag;maintenance=$maintenance;source_patch=[int]$SourceVersion.Split('.')[2]
+    inventory_kind=($prefix + 'ReleaseAssetInventoryV1');inventory_status=($statusPrefix + '-RELEASE-ASSETS-FROZEN-NONPUBLIC')
+    publication_kind=($prefix + 'PublicationAuthorizationV1');publication_status=($statusPrefix + '-WRITTEN-GO-BOUND-TO-MAIN-AND-FROZEN-ASSETS')
+    support_paths=@('SHA256SUMS.txt','SHA256SUMS.txt.sig',"mir-$SourceVersion.qualification.json", "mir-$SourceVersion.provenance.json", "mir-$SourceVersion.components.json", "mir-$SourceVersion.release.json",$script:MIR42SupportCollectorAssetName)
+    kinds=@{qualification=($prefix + 'ReleaseQualificationSummaryV1');provenance=($prefix + 'ReleaseProvenanceV1');components=($prefix + 'ComponentInventoryV1');'release-manifest'=($prefix + 'ReleaseManifestV1')}
+    statuses=@{qualification=($statusPrefix + '-TECHNICALLY-QUALIFIED-NONPUBLIC');provenance=($statusPrefix + '-PROVENANCE-FROZEN-NONPUBLIC');components=($statusPrefix + '-COMPONENTS-FROZEN-NONPUBLIC');'release-manifest'=($statusPrefix + '-RELEASE-MANIFEST-FROZEN-NONPUBLIC')}
+  }
+}
+
+function Assert-MIR42ReleaseAssetMaintenancePredecessor {
+  param([Parameter(Mandatory)]$Inputs)
+
+  # This validates carried custody, not a native pass. The public CLI obtains
+  # these inputs through the existing complete promotion/readiness reader.
+  Assert-MIR42ReleaseAssetProperties -Value $Inputs -Expected @('release_id','source_tag','source','tag_object','remote_tag_readback','manifest','signed','targets','native_qualification','release_qualification') -Code 'mir42-release-assets-maintenance-predecessor'
+  if ([int64]$Inputs.release_id -ne 402577876 -or [string]$Inputs.source_tag -cne 'v4.2.0-stable' -or
+      [string]$Inputs.source.commit -cne '6d19c874ea7d026d297865b96aa1b2b0916e9e61' -or
+      [string]$Inputs.source.tree -cne 'e7f3cdf2170e25f0a89b94cb7706256cde28035e' -or
+      $Inputs.remote_tag_readback -isnot [bool] -or -not $Inputs.remote_tag_readback -or
+      $Inputs.signed -isnot [bool] -or $Inputs.signed -or
+      [string]$Inputs.manifest.sha256 -cne 'E5F658F253F4E3E22C38A9B08394CE8554CECD20C4583BC5D23AA72D027E93A9' -or
+      [int64]$Inputs.manifest.bytes -ne 6355 -or [string]$Inputs.tag_object -cnotmatch '^[a-f0-9]{40}$' -or
+      [string]$Inputs.native_qualification -cne 'not-performed' -or [string]$Inputs.release_qualification -cne 'not-performed') {
+    throw '[mir42-release-assets-maintenance-predecessor]'
+  }
+  Assert-MIR42SealTargetSet -Rows @($Inputs.targets) -Scope 'nine-target' -Code 'mir42-release-assets-maintenance-predecessor'
+  $pin = Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $mir42ReleaseAssetsRepoRoot 'fixtures/release-inputs/mir421-published-420-manifest.json')
+  for ($index=0; $index -lt $script:MIR42ReleaseAssetTargets.Count; $index++) {
+    $actual=$Inputs.targets[$index];$expected=$pin.manifest.targets[$index]
+    if ([string]$actual.version -cne [string]$expected.distribution_version) { throw "[mir42-release-assets-maintenance-predecessor-target] $index/version" }
+    foreach ($field in @('target','sha256','bytes','content_sha256','entry_count')) {
+      if ([string]$actual.$field -cne [string]$expected.$field) { throw "[mir42-release-assets-maintenance-predecessor-target] $index/$field" }
+    }
+    if ([int64]$actual.github_asset_id -le 0 -or [string]$actual.github_digest -cne ('sha256:' + [string]$actual.sha256.ToLowerInvariant())) {
+      throw "[mir42-release-assets-maintenance-predecessor-asset] $index"
+    }
+  }
+}
+
+function Assert-MIR42ReleaseAssetDistributionIdentity {
+  param([Parameter(Mandatory)]$Row,[Parameter(Mandatory)]$Contract,[Parameter(Mandatory)][string]$Name)
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$Row.target).Substring(1) -SourceMinor 2 -SourcePatch ([int]$Contract.source_patch)
+  if ([string]$Row.distribution_version -cne [string]$identity.distribution_version -or
+      $Name -cne ('more-infinite-research_' + [string]$identity.distribution_version + '.zip')) {
+    throw "[mir42-release-assets-distribution-identity] $([string]$Row.target)"
+  }
+}
 
 function Assert-MIR42ReleaseAssetProperties {
   param(
@@ -93,10 +146,17 @@ function Get-MIR42ReleaseAssetSetSha256 {
 }
 
 function Assert-MIR42NineTargetReleaseAssetSeal {
-  param([Parameter(Mandatory)]$Seal,[Parameter(Mandatory)]$Candidate)
+  param([Parameter(Mandatory)]$Seal,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$VersionContract,$PublishedMaintenanceInputs=$null)
 
-  $contract = Get-MIR42SealScopeContract -Scope 'nine-target'
+  $contract = Get-MIR42TechnicalSealInputContract -Candidate $Candidate -PublishedMaintenance:$VersionContract.maintenance
   $record = $Seal.record
+  if ($VersionContract.maintenance) {
+    if ($null -eq $PublishedMaintenanceInputs -or $record.PSObject.Properties.Name -cnotcontains 'published_maintenance_predecessor') { throw '[mir42-release-assets-seal-maintenance-custody-required]' }
+    Assert-MIR42ReleaseAssetMaintenancePredecessor -Inputs $PublishedMaintenanceInputs
+    Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $record.published_maintenance_predecessor -Current $PublishedMaintenanceInputs -Code 'mir42-release-assets-seal-maintenance-custody'
+  } elseif ($null -ne $PublishedMaintenanceInputs -or $record.PSObject.Properties.Name -ccontains 'published_maintenance_predecessor') {
+    throw '[mir42-release-assets-seal-maintenance-scope]'
+  }
   foreach ($field in @('schema','kind','status','source','candidate_manifest','targets','protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized')) {
     if ($record.PSObject.Properties.Name -notcontains $field) { throw "[mir42-release-assets-seal-field] $field" }
   }
@@ -125,7 +185,12 @@ function Assert-MIR42NineTargetReleaseAssetSeal {
 }
 
 function Assert-MIR42NineTargetReleaseAssetPromotionPlan {
-  param([Parameter(Mandatory)]$PromotionPlan,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Seal)
+  param([Parameter(Mandatory)]$PromotionPlan,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Seal,[Parameter(Mandatory)]$VersionContract)
+
+  if ($VersionContract.maintenance) {
+    if ($PromotionPlan.PSObject.Properties.Name -cnotcontains 'published_maintenance_predecessor') { throw '[mir42-release-assets-promotion-maintenance-custody-required]' }
+    Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $PromotionPlan.published_maintenance_predecessor -Current $Seal.record.published_maintenance_predecessor -Code 'mir42-release-assets-promotion-maintenance-custody'
+  } elseif ($PromotionPlan.PSObject.Properties.Name -ccontains 'published_maintenance_predecessor') { throw '[mir42-release-assets-promotion-maintenance-scope]' }
 
   foreach ($field in @('schema','kind','status','scope','source','technical_seal','candidate_manifest','target_assets','remote_mutation_performed','protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized')) {
     if ($PromotionPlan.PSObject.Properties.Name -notcontains $field) { throw "[mir42-release-assets-promotion-field] $field" }
@@ -189,6 +254,7 @@ function Read-MIR42ReleaseAssetSupportingRecord {
     [Parameter(Mandatory)]$Asset,
     [Parameter(Mandatory)]$Candidate,
     [Parameter(Mandatory)]$Seal,
+    [Parameter(Mandatory)]$VersionContract,
     [Parameter(Mandatory)][object[]]$PackageAssets,
     [Parameter(Mandatory)][ValidateSet('qualification','provenance','components','release-manifest')][string]$Role,
     [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$PreManifestGithubAssets,
@@ -199,6 +265,7 @@ function Read-MIR42ReleaseAssetSupportingRecord {
   $identity = Read-MIR42SealRecord -Path $Asset.full_path -Code ('mir42-release-assets-' + $Role)
   $record = $identity.record
   $base = @('schema','kind','status','release','source','candidate_manifest','human_go_required_after_main_readback','tagging_authorized','publication_authorized','record_sha256')
+  if ($VersionContract.maintenance) { $base += 'published_maintenance_predecessor' }
   $expected = switch ($Role) {
     'qualification' { $base + @('targets') }
     'provenance' { $base + @('package_source_sha256','outputs') }
@@ -209,24 +276,17 @@ function Read-MIR42ReleaseAssetSupportingRecord {
   $booleanFields = @('human_go_required_after_main_readback','tagging_authorized','publication_authorized')
   if ($Role -ceq 'release-manifest') { $booleanFields += 'signature_verified' }
   Assert-MIR42ReleaseAssetBooleanFlags -Value $record -Fields $booleanFields -Code ('mir42-release-assets-' + $Role)
-  $kind = switch ($Role) {
-    'qualification' { 'MIR42NineTargetReleaseQualificationSummaryV1' }
-    'provenance' { 'MIR42NineTargetReleaseProvenanceV1' }
-    'components' { 'MIR42NineTargetComponentInventoryV1' }
-    'release-manifest' { 'MIR42NineTargetReleaseManifestV1' }
-  }
-  $status = switch ($Role) {
-    'qualification' { 'MIR-4.2-NINE-TARGET-TECHNICALLY-QUALIFIED-NONPUBLIC' }
-    'provenance' { 'MIR-4.2-NINE-TARGET-PROVENANCE-FROZEN-NONPUBLIC' }
-    'components' { 'MIR-4.2-NINE-TARGET-COMPONENTS-FROZEN-NONPUBLIC' }
-    'release-manifest' { 'MIR-4.2-NINE-TARGET-RELEASE-MANIFEST-FROZEN-NONPUBLIC' }
-  }
+  $kind = [string]$VersionContract.kinds[$Role]
+  $status = [string]$VersionContract.statuses[$Role]
   if ([int]$record.schema -ne 1 -or [string]$record.kind -cne $kind -or [string]$record.status -cne $status -or
       -not [bool]$record.human_go_required_after_main_readback -or [bool]$record.tagging_authorized -or [bool]$record.publication_authorized) {
     throw "[mir42-release-assets-$Role-state]"
   }
   Assert-MIR42ReleaseAssetProperties -Value $record.release -Expected @('source_version','tag') -Code ('mir42-release-assets-' + $Role + '-release')
-  if ([string]$record.release.source_version -cne '4.2.0' -or [string]$record.release.tag -cne 'v4.2.0') { throw "[mir42-release-assets-$Role-release]" }
+  if ([string]$record.release.source_version -cne [string]$VersionContract.source_version -or [string]$record.release.tag -cne [string]$VersionContract.tag) { throw "[mir42-release-assets-$Role-release]" }
+  if ($VersionContract.maintenance) {
+    Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $record.published_maintenance_predecessor -Current $Seal.record.published_maintenance_predecessor -Code ('mir42-release-assets-' + $Role + '-maintenance-custody')
+  }
   Assert-MIR42ReleaseAssetSourceAndCandidate -Record $record -Candidate $Candidate -Code ('mir42-release-assets-' + $Role)
   switch ($Role) {
     'qualification' { Assert-MIR42ReleaseAssetTargetBindings -Rows @($record.targets) -PackageAssets $PackageAssets -Code 'mir42-release-assets-qualification' }
@@ -237,7 +297,7 @@ function Read-MIR42ReleaseAssetSupportingRecord {
     'components' { Assert-MIR42ReleaseAssetTargetBindings -Rows @($record.player_assets) -PackageAssets $PackageAssets -Code 'mir42-release-assets-components' }
     'release-manifest' {
       if ([string]$record.technical_seal.sha256 -cne [string]$Seal.sha256 -or [string]$record.technical_seal.record_sha256 -cne [string]$Seal.record.record_sha256 -or
-          [string]$record.manifest_asset.name -cne 'mir-4.2.0.release.json' -or [string]$record.release_body.path -cne 'release-notes.md' -or
+          [string]$record.manifest_asset.name -cne ("mir-$($VersionContract.source_version).release.json") -or [string]$record.release_body.path -cne 'release-notes.md' -or
           [string]$record.release_body.sha256 -cne [string]$Notes.sha256 -or [int64]$record.release_body.bytes -ne [int64]$Notes.bytes -or
           [bool]$record.signature_verified) { throw '[mir42-release-assets-release-manifest-binding]' }
       if (@($record.github_assets).Count -ne $PreManifestGithubAssets.Count -or @($record.mod_portal_upload_texts).Count -ne $UploadTexts.Count) { throw '[mir42-release-assets-release-manifest-count]' }
@@ -292,19 +352,21 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     [Parameter(Mandatory)][string]$CandidateManifestPath,
     [Parameter(Mandatory)][string]$TechnicalSealPath,
     [Parameter(Mandatory)]$PromotionPlan,
-    [Parameter(Mandatory)][ValidatePattern('^4\.2\.0$')][string]$SourceVersion,
-    [Parameter(Mandatory)][ValidatePattern('^v4\.2\.0$')][string]$ReleaseTag,
+    [Parameter(Mandatory)][ValidateSet('4.2.0','4.2.1')][string]$SourceVersion,
+    [Parameter(Mandatory)][string]$ReleaseTag,
     [Parameter(Mandatory)][string]$AssetRoot,
     [Parameter(Mandatory)][string]$OutputPath
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $versionContract = Get-MIR42ReleaseAssetVersionContract -SourceVersion $SourceVersion -ReleaseTag $ReleaseTag
   $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$candidate.scope -cne 'nine-target') { throw '[mir42-release-assets-candidate-scope]' }
   Assert-MIR42SealTargetSet -Rows @($candidate.targets) -Scope 'nine-target' -Code 'mir42-release-assets-candidate'
   $seal = Read-MIR42SealRecord -Path $TechnicalSealPath -Code 'mir42-release-assets-seal'
-  Assert-MIR42NineTargetReleaseAssetSeal -Seal $seal -Candidate $candidate
-  Assert-MIR42NineTargetReleaseAssetPromotionPlan -PromotionPlan $PromotionPlan -Candidate $candidate -Seal $seal
+  $maintenanceInputs = if ($PromotionPlan.PSObject.Properties.Name -ccontains 'published_maintenance_predecessor') { $PromotionPlan.published_maintenance_predecessor } else { $null }
+  Assert-MIR42NineTargetReleaseAssetSeal -Seal $seal -Candidate $candidate -VersionContract $versionContract -PublishedMaintenanceInputs $maintenanceInputs
+  Assert-MIR42NineTargetReleaseAssetPromotionPlan -PromotionPlan $PromotionPlan -Candidate $candidate -Seal $seal -VersionContract $versionContract
 
   $assetMap = Get-MIR42ReleaseAssetFileMap -Root $AssetRoot -Code 'mir42-release-assets'
   $output = [IO.Path]::GetFullPath($OutputPath)
@@ -315,6 +377,7 @@ function Get-MIR42NineTargetReleaseAssetInventory {
   $packageAssets = [Collections.Generic.List[object]]::new()
   foreach ($target in @($candidate.targets)) {
     $archiveName = [IO.Path]::GetFileName([string]$target.archive_path)
+    Assert-MIR42ReleaseAssetDistributionIdentity -Row $target -Contract $versionContract -Name $archiveName
     if ([string]::IsNullOrWhiteSpace($archiveName) -or $archiveName -cne [string]$target.archive_path.Split([IO.Path]::DirectorySeparatorChar)[-1] -or
         [IO.Path]::GetExtension($archiveName) -cne '.zip') { throw "[mir42-release-assets-package-name] $([string]$target.target)" }
     $relative = 'assets/' + [string]$target.target + '/' + $archiveName
@@ -327,6 +390,12 @@ function Get-MIR42NineTargetReleaseAssetInventory {
         [int]$archive.entry_count -ne [int]$target.entry_count) {
       throw "[mir42-release-assets-package-identity] $([string]$target.target)"
     }
+    $info = Read-MIR4ArchiveText -Path $asset.full_path -RelativePath 'info.json' | ConvertFrom-Json -Depth 20 -DateKind String
+    if ([string]$archive.root -cne ('more-infinite-research_' + [string]$target.distribution_version) -or
+        [string]$info.name -cne 'more-infinite-research' -or [string]$info.version -cne [string]$target.distribution_version -or
+        [string]$info.factorio_version -cne [string]$script:MIR42FourTargetLines[[string]$target.target]) {
+      throw "[mir42-release-assets-package-metadata] $([string]$target.target)"
+    }
     $packageAssets.Add([pscustomobject][ordered]@{
       target = [string]$target.target
       distribution_version = [string]$target.distribution_version
@@ -338,7 +407,7 @@ function Get-MIR42NineTargetReleaseAssetInventory {
       entry_count = [int]$archive.entry_count
     })
   }
-  foreach ($path in $script:MIR42ReleaseAssetPublicSupportPaths) { $expectedPaths.Add($path) }
+  foreach ($path in $versionContract.support_paths) { $expectedPaths.Add($path) }
   foreach ($path in $script:MIR42ReleaseAssetLocalPaths) { $expectedPaths.Add($path) }
   foreach ($target in $script:MIR42ReleaseAssetTargets) { $expectedPaths.Add(('upload-text/' + $target + '.md')) }
   Assert-MIR42ReleaseAssetExactFileSet -Map $assetMap -Expected @($expectedPaths) -Code 'mir42-release-assets'
@@ -375,22 +444,22 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     [pscustomobject][ordered]@{name='SHA256SUMS.txt.sig';role='signature';target='';sha256=[string]$signature.sha256;bytes=[int64]$signature.bytes},
     [pscustomobject][ordered]@{name=$script:MIR42SupportCollectorAssetName;role='support-collector';target='';sha256=[string]$collector.sha256;bytes=[int64]$collector.bytes}
   )) { $preManifestGithubAssets.Add($support) }
-  $qualificationAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path 'mir-4.2.0.qualification.json' -Code 'mir42-release-assets-qualification'
-  $provenanceAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path 'mir-4.2.0.provenance.json' -Code 'mir42-release-assets-provenance'
-  $componentsAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path 'mir-4.2.0.components.json' -Code 'mir42-release-assets-components'
-  $releaseManifestAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path 'mir-4.2.0.release.json' -Code 'mir42-release-assets-release-manifest'
-  $qualification = Read-MIR42ReleaseAssetSupportingRecord -Asset $qualificationAsset -Candidate $candidate -Seal $seal -PackageAssets @($packageAssets) -Role qualification -PreManifestGithubAssets @() -UploadTexts @($uploadTexts) -Notes $notes
-  $provenance = Read-MIR42ReleaseAssetSupportingRecord -Asset $provenanceAsset -Candidate $candidate -Seal $seal -PackageAssets @($packageAssets) -Role provenance -PreManifestGithubAssets @() -UploadTexts @($uploadTexts) -Notes $notes
-  $components = Read-MIR42ReleaseAssetSupportingRecord -Asset $componentsAsset -Candidate $candidate -Seal $seal -PackageAssets @($packageAssets) -Role components -PreManifestGithubAssets @() -UploadTexts @($uploadTexts) -Notes $notes
+  $qualificationAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path "mir-$SourceVersion.qualification.json" -Code 'mir42-release-assets-qualification'
+  $provenanceAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path "mir-$SourceVersion.provenance.json" -Code 'mir42-release-assets-provenance'
+  $componentsAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path "mir-$SourceVersion.components.json" -Code 'mir42-release-assets-components'
+  $releaseManifestAsset = Get-MIR42ReleaseAssetFile -Map $assetMap -Path "mir-$SourceVersion.release.json" -Code 'mir42-release-assets-release-manifest'
+  $qualification = Read-MIR42ReleaseAssetSupportingRecord -Asset $qualificationAsset -Candidate $candidate -Seal $seal -VersionContract $versionContract -PackageAssets @($packageAssets) -Role qualification -PreManifestGithubAssets @() -UploadTexts @($uploadTexts) -Notes $notes
+  $provenance = Read-MIR42ReleaseAssetSupportingRecord -Asset $provenanceAsset -Candidate $candidate -Seal $seal -VersionContract $versionContract -PackageAssets @($packageAssets) -Role provenance -PreManifestGithubAssets @() -UploadTexts @($uploadTexts) -Notes $notes
+  $components = Read-MIR42ReleaseAssetSupportingRecord -Asset $componentsAsset -Candidate $candidate -Seal $seal -VersionContract $versionContract -PackageAssets @($packageAssets) -Role components -PreManifestGithubAssets @() -UploadTexts @($uploadTexts) -Notes $notes
   foreach ($support in @(
-    [pscustomobject][ordered]@{name='mir-4.2.0.qualification.json';role='qualification';target='';sha256=[string]$qualification.sha256;bytes=[int64]$qualification.bytes},
-    [pscustomobject][ordered]@{name='mir-4.2.0.provenance.json';role='provenance';target='';sha256=[string]$provenance.sha256;bytes=[int64]$provenance.bytes},
-    [pscustomobject][ordered]@{name='mir-4.2.0.components.json';role='components';target='';sha256=[string]$components.sha256;bytes=[int64]$components.bytes}
+    [pscustomobject][ordered]@{name="mir-$SourceVersion.qualification.json";role='qualification';target='';sha256=[string]$qualification.sha256;bytes=[int64]$qualification.bytes},
+    [pscustomobject][ordered]@{name="mir-$SourceVersion.provenance.json";role='provenance';target='';sha256=[string]$provenance.sha256;bytes=[int64]$provenance.bytes},
+    [pscustomobject][ordered]@{name="mir-$SourceVersion.components.json";role='components';target='';sha256=[string]$components.sha256;bytes=[int64]$components.bytes}
   )) { $preManifestGithubAssets.Add($support) }
-  $releaseManifest = Read-MIR42ReleaseAssetSupportingRecord -Asset $releaseManifestAsset -Candidate $candidate -Seal $seal -PackageAssets @($packageAssets) -Role 'release-manifest' -PreManifestGithubAssets @($preManifestGithubAssets) -UploadTexts @($uploadTexts) -Notes $notes
+  $releaseManifest = Read-MIR42ReleaseAssetSupportingRecord -Asset $releaseManifestAsset -Candidate $candidate -Seal $seal -VersionContract $versionContract -PackageAssets @($packageAssets) -Role 'release-manifest' -PreManifestGithubAssets @($preManifestGithubAssets) -UploadTexts @($uploadTexts) -Notes $notes
   $githubAssets = [Collections.Generic.List[object]]::new()
   foreach ($asset in $preManifestGithubAssets) { $githubAssets.Add($asset) }
-  $githubAssets.Add([pscustomobject][ordered]@{name='mir-4.2.0.release.json';role='release-manifest';target='';sha256=[string]$releaseManifest.sha256;bytes=[int64]$releaseManifest.bytes})
+  $githubAssets.Add([pscustomobject][ordered]@{name="mir-$SourceVersion.release.json";role='release-manifest';target='';sha256=[string]$releaseManifest.sha256;bytes=[int64]$releaseManifest.bytes})
   $names = @($githubAssets | ForEach-Object { [string]$_.name })
   if (@($names | Sort-Object -Unique).Count -ne $names.Count) { throw '[mir42-release-assets-public-name-collision]' }
 
@@ -400,8 +469,8 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     @([pscustomobject][ordered]@{path=[string]$notes.path;sha256=[string]$notes.sha256;bytes=[int64]$notes.bytes}) + @($uploadTexts)
   $inventory = [pscustomobject][ordered]@{
     schema = 1
-    kind = 'MIR42NineTargetReleaseAssetInventoryV1'
-    status = 'MIR-4.2-NINE-TARGET-RELEASE-ASSETS-FROZEN-NONPUBLIC'
+    kind = [string]$versionContract.inventory_kind
+    status = [string]$versionContract.inventory_status
     release = [ordered]@{source_version=$SourceVersion;tag=$ReleaseTag}
     source = [ordered]@{commit=[string]$candidate.source.commit;tree=[string]$candidate.source.tree;package_source_sha256=[string]$candidate.source.package_source_sha256}
     candidate_manifest = [ordered]@{sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
@@ -425,17 +494,22 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     public_readback_verified = $false
     record_sha256 = ''
   }
+  if ($versionContract.maintenance) { $inventory | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $maintenanceInputs }
   return Write-MIR42ReleaseAssetInventoryRecord -Record $inventory -OutputPath $output
 }
 
 function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
   param([Parameter(Mandatory)]$Record)
 
-  Assert-MIR42ReleaseAssetProperties -Value $Record -Expected @('schema','kind','status','release','source','candidate_manifest','technical_seal','promotion_plan','package_assets','github_assets','checksum','signature','qualification','provenance','components','release_manifest','release_notes','mod_portal_upload_texts','asset_root_file_set_sha256','protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized','public_readback_verified','record_sha256') -Code 'mir42-release-assets-inventory'
+  $versionContract = Get-MIR42ReleaseAssetVersionContract -SourceVersion ([string]$Record.release.source_version) -ReleaseTag ([string]$Record.release.tag)
+  $expectedProperties=@('schema','kind','status','release','source','candidate_manifest','technical_seal','promotion_plan','package_assets','github_assets','checksum','signature','qualification','provenance','components','release_manifest','release_notes','mod_portal_upload_texts','asset_root_file_set_sha256','protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized','public_readback_verified','record_sha256')
+  if ($versionContract.maintenance) { $expectedProperties += 'published_maintenance_predecessor' }
+  Assert-MIR42ReleaseAssetProperties -Value $Record -Expected $expectedProperties -Code 'mir42-release-assets-inventory'
+  if ($versionContract.maintenance) { Assert-MIR42ReleaseAssetMaintenancePredecessor -Inputs $Record.published_maintenance_predecessor }
   Assert-MIR42ReleaseAssetBooleanFlags -Value $Record -Fields @('protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized','public_readback_verified') -Code 'mir42-release-assets-inventory'
   Assert-MIR42ReleaseAssetBooleanFlags -Value $Record.signature -Fields @('signature_verified') -Code 'mir42-release-assets-inventory-signature'
-  if ([int]$Record.schema -ne 1 -or [string]$Record.kind -cne 'MIR42NineTargetReleaseAssetInventoryV1' -or
-      [string]$Record.status -cne 'MIR-4.2-NINE-TARGET-RELEASE-ASSETS-FROZEN-NONPUBLIC' -or
+  if ([int]$Record.schema -ne 1 -or [string]$Record.kind -cne [string]$versionContract.inventory_kind -or
+      [string]$Record.status -cne [string]$versionContract.inventory_status -or
       [bool]$Record.protected_main_promotion_authorized -or -not [bool]$Record.human_go_required_after_main_readback -or
       [bool]$Record.tagging_authorized -or [bool]$Record.publication_authorized -or [bool]$Record.public_readback_verified) {
     throw '[mir42-release-assets-inventory-state]'
@@ -444,7 +518,6 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
     if ([string]$Record.source.$field -notmatch '^[A-Fa-f0-9]{40,64}$') { throw "[mir42-release-assets-inventory-source] $field" }
   }
   Assert-MIR42ReleaseAssetProperties -Value $Record.release -Expected @('source_version','tag') -Code 'mir42-release-assets-inventory-release'
-  if ([string]$Record.release.source_version -cne '4.2.0' -or [string]$Record.release.tag -cne 'v4.2.0') { throw '[mir42-release-assets-inventory-release-binding]' }
   Assert-MIR42ReleaseAssetProperties -Value $Record.candidate_manifest -Expected @('sha256','record_sha256') -Code 'mir42-release-assets-inventory-candidate'
   Assert-MIR42ReleaseAssetProperties -Value $Record.technical_seal -Expected @('sha256','record_sha256') -Code 'mir42-release-assets-inventory-seal'
   foreach ($hash in @([string]$Record.candidate_manifest.sha256,[string]$Record.candidate_manifest.record_sha256,[string]$Record.technical_seal.sha256,[string]$Record.technical_seal.record_sha256)) {
@@ -467,6 +540,7 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
     $package = $Record.package_assets[$index]
     Assert-MIR42ReleaseAssetProperties -Value $package -Expected @('target','distribution_version','path','public_name','sha256','bytes','content_sha256','entry_count') -Code 'mir42-release-assets-inventory-package'
     $expectedTarget = $script:MIR42ReleaseAssetTargets[$index]
+    Assert-MIR42ReleaseAssetDistributionIdentity -Row $package -Contract $versionContract -Name ([string]$package.public_name)
     if ([string]$package.target -cne $expectedTarget -or [string]$package.path -cne ('assets/' + $expectedTarget + '/' + [string]$package.public_name) -or
         [string]$package.public_name -notmatch '\.zip$' -or [string]$package.sha256 -notmatch '^[A-F0-9]{64}$' -or [int64]$package.bytes -le 0 -or
         [string]$package.content_sha256 -notmatch '^[A-F0-9]{64}$' -or [int]$package.entry_count -le 0) { throw "[mir42-release-assets-inventory-package-binding] $expectedTarget" }
@@ -480,10 +554,10 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
     @('SHA256SUMS.txt','checksum',$Record.checksum),
     @('SHA256SUMS.txt.sig','signature',$Record.signature),
     @($script:MIR42SupportCollectorAssetName,'support-collector',$public[11]),
-    @('mir-4.2.0.qualification.json','qualification',$Record.qualification),
-    @('mir-4.2.0.provenance.json','provenance',$Record.provenance),
-    @('mir-4.2.0.components.json','components',$Record.components),
-    @('mir-4.2.0.release.json','release-manifest',$Record.release_manifest)
+    @("mir-$($versionContract.source_version).qualification.json",'qualification',$Record.qualification),
+    @("mir-$($versionContract.source_version).provenance.json",'provenance',$Record.provenance),
+    @("mir-$($versionContract.source_version).components.json",'components',$Record.components),
+    @("mir-$($versionContract.source_version).release.json",'release-manifest',$Record.release_manifest)
   )
   for ($index = 0; $index -lt $support.Count; $index++) {
     $publicAsset = $public[$script:MIR42ReleaseAssetTargets.Count + $index]
@@ -497,10 +571,10 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
   Assert-MIR42ReleaseAssetProperties -Value $Record.checksum -Expected @('path','sha256','bytes') -Code 'mir42-release-assets-inventory-checksum'
   Assert-MIR42ReleaseAssetProperties -Value $Record.signature -Expected @('path','sha256','bytes','signature_verified') -Code 'mir42-release-assets-inventory-signature'
   foreach ($document in @(
-    @('qualification','mir-4.2.0.qualification.json',$Record.qualification),
-    @('provenance','mir-4.2.0.provenance.json',$Record.provenance),
-    @('components','mir-4.2.0.components.json',$Record.components),
-    @('release-manifest','mir-4.2.0.release.json',$Record.release_manifest)
+    @('qualification',"mir-$($versionContract.source_version).qualification.json",$Record.qualification),
+    @('provenance',"mir-$($versionContract.source_version).provenance.json",$Record.provenance),
+    @('components',"mir-$($versionContract.source_version).components.json",$Record.components),
+    @('release-manifest',"mir-$($versionContract.source_version).release.json",$Record.release_manifest)
   )) {
     $role = [string]$document[0]; $path = [string]$document[1]; $value = $document[2]
     Assert-MIR42ReleaseAssetProperties -Value $value -Expected @('role','path','sha256','bytes','record_sha256') -Code 'mir42-release-assets-inventory-document'
@@ -530,7 +604,10 @@ function Read-MIR42NineTargetWrittenReleaseAuthorization {
   param([Parameter(Mandatory)][string]$Path)
 
   $authorizationPath = (Resolve-Path -LiteralPath $Path).Path
-  $schemaPath = Join-Path $mir42ReleaseAssetsRepoRoot 'spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json'
+  $inputRecord = Get-Content -Raw -LiteralPath $authorizationPath | ConvertFrom-Json -Depth 100 -DateKind String
+  $maintenance = [string]$inputRecord.kind -ceq 'MIR421MaintainerWrittenReleaseAuthorizationV1'
+  $schemaName = if ($maintenance) { 'mir421-maintainer-written-release-authorization-v1.schema.json' } else { 'mir42-maintainer-written-release-authorization-v1.schema.json' }
+  $schemaPath = Join-Path $mir42ReleaseAssetsRepoRoot ('spec/schemas/' + $schemaName)
   if (-not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) { throw '[mir42-release-go-schema-missing]' }
   $schemaValid = $false
   try {
@@ -543,6 +620,12 @@ function Read-MIR42NineTargetWrittenReleaseAuthorization {
   }
   $identity = Read-MIR42SealRecord -Path $authorizationPath -Code 'mir42-release-go'
   $record = $identity.record
+  if ($maintenance) {
+    # This records the user's conditional authority. It establishes no engine,
+    # signing, review, seal or final-byte acceptance and imports no 4.2.0 waiver.
+    $null = Get-MIR42ReleaseAssetVersionContract -SourceVersion ([string]$record.release.source_version) -ReleaseTag ([string]$record.release.tag)
+    return $identity
+  }
   Assert-MIR42ReleaseAssetProperties -Value $record -Expected @(
     'schema','kind','status','recorded_from_user_turn_date','timezone','release','written_authorizations','maintainer_decisions',
     'nonnegotiable_constraints','current_controller_state','required_external_inputs_before_technical_seal','known_operator_inputs',
@@ -600,16 +683,19 @@ function Read-MIR42NineTargetWrittenReleaseAuthorization {
 
 function Read-MIR42NineTargetProtectedMainReadbackForPublication {
   [CmdletBinding()]
-  param([Parameter(Mandatory)][string]$Path)
+  param([Parameter(Mandatory)][string]$Path,[switch]$PublishedMaintenance)
 
   $identity = Read-MIR42SealRecord -Path $Path -Code 'mir42-release-go-main-readback'
   $record = $identity.record
-  Assert-MIR42ReleaseAssetProperties -Value $record -Expected @(
+  $expectedProperties = @(
     'schema','kind','status','scope','source','primary_main','protected_pull_request','promotion_transport','source_rebinding',
     'candidate_manifest','technical_seal','current_programme','direct_predecessors','governed_offline_restore_drill','targets',
     'target_assets','proofs','main_readback_verified','remote_mutation_performed','protected_main_promotion_authorized',
     'human_go_required_after_main_readback','tagging_authorized','publication_authorized','record_sha256'
-  ) -Code 'mir42-release-go-main-readback-shape'
+  )
+  if ($PublishedMaintenance) { $expectedProperties += 'published_maintenance_predecessor' }
+  Assert-MIR42ReleaseAssetProperties -Value $record -Expected $expectedProperties -Code 'mir42-release-go-main-readback-shape'
+  if ($PublishedMaintenance) { Assert-MIR42ReleaseAssetMaintenancePredecessor -Inputs $record.published_maintenance_predecessor }
   if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42NineTargetProtectedMainReadbackV1' -or
       [string]$record.status -cne 'MIR-4.2-NINE-TARGET-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST' -or [string]$record.scope -cne 'nine-target' -or
       $record.main_readback_verified -isnot [bool] -or -not [bool]$record.main_readback_verified -or
@@ -675,8 +761,13 @@ function New-MIR42NineTargetPublicationAuthorization {
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $authorization = Read-MIR42NineTargetWrittenReleaseAuthorization -Path $MaintainerAuthorizationPath
-  $mainReadback = Read-MIR42NineTargetProtectedMainReadbackForPublication -Path $MainReadbackPath
   $inventory = Read-MIR42NineTargetReleaseAssetInventory -Path $FrozenInventoryPath
+  $contract = Get-MIR42ReleaseAssetVersionContract -SourceVersion ([string]$inventory.record.release.source_version) -ReleaseTag ([string]$inventory.record.release.tag)
+  if ([string]$authorization.record.release.source_version -cne [string]$contract.source_version -or [string]$authorization.record.release.tag -cne [string]$contract.tag) { throw '[mir42-release-go-authorization-version-binding]' }
+  $mainReadback = Read-MIR42NineTargetProtectedMainReadbackForPublication -Path $MainReadbackPath -PublishedMaintenance:$contract.maintenance
+  if ($contract.maintenance) {
+    Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $mainReadback.record.published_maintenance_predecessor -Current $inventory.record.published_maintenance_predecessor -Code 'mir42-release-go-maintenance-custody-binding'
+  }
   $liveMain = Get-MIR42PrimaryMainSnapshot -PrimaryRepoRoot $PrimaryRepoRoot
   $record = $mainReadback.record
   foreach ($field in @('commit','tree','package_source_sha256','remote_commit')) {
@@ -703,16 +794,16 @@ function New-MIR42NineTargetPublicationAuthorization {
   }
   $output = [pscustomobject][ordered]@{
     schema = 1
-    kind = 'MIR42NineTargetPublicationAuthorizationV1'
-    status = 'MIR-4.2-NINE-TARGET-WRITTEN-GO-BOUND-TO-MAIN-AND-FROZEN-ASSETS'
-    release = [ordered]@{source_version='4.2.0';tag='v4.2.0'}
+    kind = [string]$contract.publication_kind
+    status = [string]$contract.publication_status
+    release = [ordered]@{source_version=[string]$contract.source_version;tag=[string]$contract.tag}
     written_maintainer_authorization = [ordered]@{
       path=(Resolve-Path -LiteralPath $MaintainerAuthorizationPath).Path;sha256=[string]$authorization.sha256;record_sha256=[string]$authorization.record.record_sha256
       recorded_from_user_turn_date=[string]$authorization.record.recorded_from_user_turn_date
-      acceptance_type='written-conditional-go-with-playtest-waiver'
+      acceptance_type=$(if ($contract.maintenance) { 'written-conditional-go-requiring-technical-acceptance' } else { 'written-conditional-go-with-playtest-waiver' })
       gameplay_receipt_claimed=$false
-      additional_playtest_prompt_waived=$true
-      experimental_f210_consent='qualified-experimental-consent-recorded'
+      additional_playtest_prompt_waived=(-not $contract.maintenance)
+      experimental_f210_consent=$(if ($contract.maintenance) { 'not-claimed-by-this-maintenance-authorization' } else { 'qualified-experimental-consent-recorded' })
     }
     source = $record.source
     primary_main = [ordered]@{commit=[string]$liveMain.commit;tree=[string]$liveMain.tree;package_source_sha256=[string]$liveMain.package_source_sha256;remote='origin';ref='refs/heads/main'}
@@ -730,6 +821,7 @@ function New-MIR42NineTargetPublicationAuthorization {
     public_readback_required_after_publication = $true
     record_sha256 = ''
   }
+  if ($contract.maintenance) { $output | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $inventory.record.published_maintenance_predecessor }
   $output.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $output
   return Write-MIR42NineTargetPublicationAuthorization -Record $output -PrimaryRepoRoot $PrimaryRepoRoot -OutputPath $OutputPath
 }
