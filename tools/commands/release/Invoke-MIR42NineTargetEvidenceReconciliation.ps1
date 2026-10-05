@@ -34,6 +34,7 @@ switch ($Mode) {
     if ($ObservationPaths.Count -eq 0 -or $ObservedTargets.Count -eq 0) { throw '[mir42-nine-criterion-observations-required]' }
     New-MIR42NineTargetCriterionEvidence -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath -Criterion $Criterion `
       -ObservationPaths $ObservationPaths -ObservedTargets $ObservedTargets -NotApplicableTargetReasons $NotApplicableTargetReasons `
-      -Claim $Claim -KnownLimitations $KnownLimitations -OutputPath $OutputPath | ConvertTo-Json -Depth 100
+      -Claim $Claim -KnownLimitations $KnownLimitations -OutputPath $OutputPath `
+      -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath | ConvertTo-Json -Depth 100
   }
 }

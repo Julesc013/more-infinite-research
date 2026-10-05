@@ -23,6 +23,7 @@ $maintenanceEvidenceAssertions=0
 $maintenanceIndependentAssertions=0
 $sealCandidateContractAssertions=0
 $maintenanceBinderAssertions=0
+$maintenanceCriterionAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 
@@ -473,6 +474,7 @@ try {
   }
   # Tiny archive/receipt-field controls only; no authenticated public custody
   # or upgrade receipt is fabricated by these fixtures.
+  $criterionBindings=[Collections.Generic.List[object]]::new()
   for($i=0;$i-lt9;$i++){
     $descriptor=$nineDescriptors[$i];$target=[string]$descriptor.target
     $fixtureRoot=Join-Path $identityRoot ('predecessor-binding/'+$target)
@@ -522,6 +524,7 @@ try {
     }
     # Predecessor fields only: no passed engine execution or native log fixture.
     $executionFields=[pscustomobject]@{predecessor=[pscustomobject]@{path=$fixtureArchive;version=$binding.version;sha256=$binding.sha256};published_maintenance_predecessor=$independentBinding}
+    $criterionBindings.Add([pscustomobject]@{input=$independentBinding;predecessor=$maintenance;execution=$executionFields})
     Assert-MIR42EngineEvidenceMaintenanceExecution -Target $target -Execution $executionFields -PublishedInput $independentBinding
     $maintenanceBinderAssertions++
     foreach($case in @('path','version','hash','missing-custody','asset-id','target')){
@@ -542,8 +545,86 @@ try {
       $maintenanceBinderAssertions++
     }
   }
+  # Pure custody/predecessor field subsets only. No native status, engine-run,
+  # binder, reconciliation or successful criterion evidence is fabricated.
+  $criterionInputs=[pscustomobject]@{metadata_fixture_only=$true;targets=@($criterionBindings|ForEach-Object {$_.input})}
+  foreach($criterion in @('fresh-exact-loads','target-omissions')){
+    $contract=Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance
+    $expectedKind=if($criterion-ceq'fresh-exact-loads'){'MIR42NineTargetMaintenanceRealEngineEvidenceBinderV1'}else{'MIR42NineTargetMaintenanceEvidenceReconciliationV1'}
+    Assert-MIR42CandidateBuildTest ($contract.kind-ceq$expectedKind) ('maintenance-criterion-contract-'+$criterion)
+    $maintenanceCriterionAssertions++
+    $fieldRows=@(foreach($bindingFields in $criterionBindings){
+      if($criterion-ceq'fresh-exact-loads'){
+        [pscustomobject]@{target=$bindingFields.input.target;engine_execution=$bindingFields.execution}
+      }else{
+        [pscustomobject]@{target=$bindingFields.input.target;predecessor=$bindingFields.predecessor;published_maintenance_predecessor=$bindingFields.input}
+      }
+    })
+    $fields=[pscustomobject]@{published_maintenance_predecessor=$criterionInputs;targets=$fieldRows}
+    Assert-MIR42MaintenanceCriterionObservation -Record $fields -Criterion $criterion -PublishedInputs $criterionInputs
+    $maintenanceCriterionAssertions++
+    foreach($case in @('missing-top-custody','changed-top-custody','reordered-targets','partial-targets')){
+      $invalid=$fields|ConvertTo-Json -Depth 40|ConvertFrom-Json -Depth 40
+      switch($case){
+        'missing-top-custody'{$invalid.PSObject.Properties.Remove('published_maintenance_predecessor')}
+        'changed-top-custody'{$invalid.published_maintenance_predecessor.metadata_fixture_only=$false}
+        'reordered-targets'{$invalid.targets=@($invalid.targets[1],$invalid.targets[0])+@($invalid.targets|Select-Object -Skip 2)}
+        'partial-targets'{$invalid.targets=@($invalid.targets|Select-Object -First 8)}
+      }
+      $rejected=$false
+      try{Assert-MIR42MaintenanceCriterionObservation -Record $invalid -Criterion $criterion -PublishedInputs $criterionInputs}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-criterion-custody-binding]'}
+      Assert-MIR42CandidateBuildTest $rejected ('maintenance-criterion-refuses-'+$case+'-'+$criterion)
+      $maintenanceCriterionAssertions++
+    }
+    for($i=0;$i-lt9;$i++){
+      foreach($case in @('asset-id','hash','version','path','missing-custody')){
+        $invalid=$fields|ConvertTo-Json -Depth 40|ConvertFrom-Json -Depth 40
+        $row=$invalid.targets[$i];$target=[string]$row.target
+        $expectedCode='[mir42-maintenance-criterion-predecessor-binding] '+$target
+        if($criterion-ceq'fresh-exact-loads'){
+          switch($case){
+            'asset-id'{$row.engine_execution.published_maintenance_predecessor.github_asset_id++}
+            'hash'{$row.engine_execution.predecessor.sha256='0'*64}
+            'version'{$row.engine_execution.predecessor.version='4.2.21001'}
+            'path'{$row.engine_execution.predecessor.path+='-changed'}
+            'missing-custody'{$row.engine_execution.PSObject.Properties.Remove('published_maintenance_predecessor')}
+          }
+        }else{
+          switch($case){
+            'asset-id'{$row.published_maintenance_predecessor.github_asset_id++;$expectedCode='[mir42-maintenance-criterion-row-custody-binding] '+$target}
+            'hash'{$row.predecessor.archive.sha256='0'*64}
+            'version'{$row.predecessor.version='4.2.21001'}
+            'path'{$row.predecessor.archive.path+='-changed'}
+            'missing-custody'{$row.PSObject.Properties.Remove('published_maintenance_predecessor');$expectedCode='[mir42-maintenance-criterion-row-custody-binding] '+$target}
+          }
+        }
+        $rejected=$false
+        try{Assert-MIR42MaintenanceCriterionObservation -Record $invalid -Criterion $criterion -PublishedInputs $criterionInputs}catch{$rejected=$_.Exception.Message-ceq$expectedCode}
+        Assert-MIR42CandidateBuildTest $rejected ('maintenance-criterion-refuses-'+$case+'-'+$criterion+'-'+$target)
+        $maintenanceCriterionAssertions++
+      }
+    }
+  }
+  foreach($criterion in @($script:MIR42ReleaseAcceptanceCriteria|Where-Object {$_-cnotin@('fresh-exact-loads','target-omissions')})){
+    $rejected=$false
+    try{Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-criterion-input-scope]'}
+    Assert-MIR42CandidateBuildTest $rejected ('maintenance-criterion-refuses-unrelated-option-'+$criterion)
+    $maintenanceCriterionAssertions++
+  }
+  $legacyCriterion=Get-MIR42CriterionObservationContract -Criterion 'fresh-exact-loads'
+  Assert-MIR42CandidateBuildTest ($legacyCriterion.kind-ceq'MIR42NineTargetRealEngineEvidenceBinderV1') 'maintenance-criterion-preserves-default-contract'
+  $maintenanceCriterionAssertions++
+  $rejected=$false
+  try{
+    & (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetEvidenceReconciliation.ps1') -Mode Criterion -RepoRoot $repo `
+      -CandidateManifestPath (Join-Path $identityRoot 'not-read.json') -Criterion 'performance-telemetry' -ObservationPaths @('not-read.json') `
+      -ObservedTargets @('f210') -Claim 'source flag-forwarding control' -KnownLimitations 'not native' `
+      -OutputPath (Join-Path $identityRoot 'must-not-create.json') -PublishedMaintenancePredecessorManifestPath 'not-read.json'|Out-Null
+  }catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-criterion-input-scope]'}
+  Assert-MIR42CandidateBuildTest ($rejected-and-not(Test-Path -LiteralPath (Join-Path $identityRoot 'must-not-create.json'))) 'maintenance-criterion-cli-forwards-and-refuses-out-of-scope-option'
+  $maintenanceCriterionAssertions++
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 

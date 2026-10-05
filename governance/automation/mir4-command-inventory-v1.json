@@ -3091,9 +3091,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42NineTargetEvidenceReconciliation.ps1",
       "classification": "canonical-internal",
-      "sha256": "74055B6183DAA0B41D00F02A03535B0CBECB871D8186BD6E45EBC56512443ED5",
+      "sha256": "FBDE1C016081E7CFE0A0D5657E8AB314DEF7ABDCC5E9ADBCC6E2498D21E50582",
       "hash_mode": "canonical-text-v1",
-      "lines": 40,
+      "lines": 41,
       "package_visible": false
     },
     {
@@ -5307,9 +5307,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
       "classification": "canonical-internal",
-      "sha256": "F504509C5E28E67302C85C038C5491E48D818D90650690F9FFDB3703A0D18120",
+      "sha256": "38A3D747DAFE4C436A6097E4A932E719B89C923B951E33CBCF1AD894A2DDAC2E",
       "hash_mode": "canonical-text-v1",
-      "lines": 781,
+      "lines": 856,
       "package_visible": false
     },
     {
@@ -6026,5 +6026,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:60dd558994d8671bbb14992127ad1b8691adf853bde9db65b96156801c9701a4"
+  "digest": "sha256:d3966033429fea24428456ef551b96c02409b02ea6eea110a612c07e091595e2"
 }
