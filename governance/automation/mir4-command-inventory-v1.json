@@ -2483,9 +2483,9 @@
     {
       "path": "tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1",
       "classification": "canonical-internal",
-      "sha256": "7A936BF362B769274260B7AF1CAFB358E8D64B658DF6FF1E1959EA19879C2E65",
+      "sha256": "5F29CE16591581AE57A76FADFB235E65DB82B2E0F1C058D66D834B8661509391",
       "hash_mode": "canonical-text-v1",
-      "lines": 99,
+      "lines": 184,
       "package_visible": false
     },
     {
@@ -6026,5 +6026,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:53c16248b4871b30da1108f6a68da5e604cf859cff929804fc4dfe58e6f80292"
+  "digest": "sha256:2d78865b2533398c239f7d1ea6fad904ca5b91fe1b23eb3be8aeefd00cd932c1"
 }
