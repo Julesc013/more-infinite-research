@@ -204,7 +204,17 @@ for _, mode in ipairs(modes) do
       check(has(operation.technology.prerequisites,key .. "-6") and not has(operation.technology.prerequisites,"space-science-pack"), "Actual level-7 technology retains its finite anchor: " .. key .. " " .. mode)
       check(data.raw.technology[key .. "-7"] == nil, "Science planning leaves prototype emission to the existing emitter: " .. key .. " " .. mode)
     end
+    require("prototypes.mir.pipeline.compiler_orchestrator.phase_invocation").apply_base_extensions(context.current())
+    local generated = require("prototypes.mir.domain.facts.generated_technology_registry")
+    for _, key in ipairs({"weapon-shooting-speed", "research-speed"}) do
+      local actual = data.raw.technology[key .. "-7"]
+      check(actual and #actual.unit.ingredients > 0 and not has(actual.unit.ingredients, "space-science-pack"), "Emitted level-7 technology has no retired science: " .. key .. " " .. mode)
+      check(has(actual.prerequisites, key .. "-6") and not has(actual.prerequisites, "space-science-pack"), "Emitted level-7 technology retains its finite anchor: " .. key .. " " .. mode)
+      local owner = generated.get(key .. "-7")
+      check(owner and owner.kind == "base_extension" and owner.key == key, "Emitted level-7 technology retains native continuation ownership: " .. key .. " " .. mode)
+    end
   end)
+  for _, key in ipairs({"weapon-shooting-speed", "research-speed"}) do data.raw.technology[key .. "-7"] = nil end
 end
 -- Compatibility exclusions cannot retire the compiler's mandatory gates.
 local policy_authority = require("prototypes.mir.compatibility.policy_authority")

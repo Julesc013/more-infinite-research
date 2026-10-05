@@ -664,13 +664,74 @@ function Resolve-MIR42CriterionEvidenceOutputPath {
   return $output
 }
 
+function Get-MIR42CriterionObservationContract {
+  param([Parameter(Mandatory)][string]$Criterion,[switch]$PublishedMaintenance)
+  if ($PublishedMaintenance -and $Criterion -cnotin @('fresh-exact-loads','target-omissions')) {
+    throw '[mir42-maintenance-criterion-input-scope]'
+  }
+  if ($Criterion -ceq 'fresh-exact-loads') {
+    if ($PublishedMaintenance) {
+      return [pscustomobject]@{kind='MIR42NineTargetMaintenanceRealEngineEvidenceBinderV1';status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'}
+    }
+    return [pscustomobject]@{kind='MIR42NineTargetRealEngineEvidenceBinderV1';status='MIR-4.2-NINE-TARGET-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'}
+  }
+  if ($Criterion -ceq 'target-omissions') {
+    if ($PublishedMaintenance) {
+      return [pscustomobject]@{kind='MIR42NineTargetMaintenanceEvidenceReconciliationV1';status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'}
+    }
+    return [pscustomobject]@{kind='MIR42NineTargetEvidenceReconciliationV1';status='MIR-4.2-NINE-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'}
+  }
+  return $null
+}
+
+function Assert-MIR42MaintenanceCriterionObservation {
+  param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)][string]$Criterion,[Parameter(Mandatory)]$PublishedInputs)
+  $null = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance
+  $expectedTargets = @($PublishedInputs.targets | ForEach-Object { [string]$_.target })
+  $observedTargets = @($Record.targets | ForEach-Object { [string]$_.target })
+  if ($expectedTargets.Count -ne 9 -or ($expectedTargets -join '|') -cne ($script:MIR42QualificationNineTargets -join '|') -or
+      ($observedTargets -join '|') -cne ($expectedTargets -join '|') -or
+      $Record.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor' -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $Record.published_maintenance_predecessor) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $PublishedInputs)) {
+    throw '[mir42-maintenance-criterion-custody-binding]'
+  }
+  for ($i = 0; $i -lt $expectedTargets.Count; $i++) {
+    $row = @($Record.targets)[$i]
+    $input = @($PublishedInputs.targets)[$i]
+    if ($Criterion -ceq 'fresh-exact-loads') {
+      $execution = $row.engine_execution
+      if ($execution.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor' -or
+          (ConvertTo-MIR4BootstrapCanonicalJson -Value $execution.published_maintenance_predecessor) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $input) -or
+          -not ([string]$execution.predecessor.path).Equals([string]$input.path,[StringComparison]::OrdinalIgnoreCase) -or
+          [string]$execution.predecessor.version -cne [string]$input.version -or [string]$execution.predecessor.sha256 -cne [string]$input.sha256) {
+        throw "[mir42-maintenance-criterion-predecessor-binding] $([string]$input.target)"
+      }
+    } else {
+      if ($row.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor' -or
+          (ConvertTo-MIR4BootstrapCanonicalJson -Value $row.published_maintenance_predecessor) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $input)) {
+        throw "[mir42-maintenance-criterion-row-custody-binding] $([string]$input.target)"
+      }
+      if ([string]$row.predecessor.version -cne [string]$input.version -or
+          [string]$row.predecessor.archive.path -cne [IO.Path]::GetFileName([string]$input.path) -or
+          [string]$row.predecessor.archive.sha256 -cne [string]$input.sha256 -or
+          [int64]$row.predecessor.archive.bytes -ne [int64]$input.bytes -or
+          [string]$row.predecessor.archive.content_sha256 -cne [string]$input.content_sha256 -or
+          [int]$row.predecessor.archive.entry_count -ne [int]$input.entry_count) {
+        throw "[mir42-maintenance-criterion-predecessor-binding] $([string]$input.target)"
+      }
+    }
+  }
+}
+
 function Get-MIR42CriterionEvidenceObservation {
   param(
     [Parameter(Mandatory)][string]$Path,
     [Parameter(Mandatory)][string]$Criterion,
     [Parameter(Mandatory)]$Candidate,
-    [Parameter(Mandatory)][string]$Code
+    [Parameter(Mandatory)][string]$Code,
+    $PublishedMaintenanceInputs = $null
   )
+  $contract = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs)
   $record = Read-MIR42QualificationBootstrapRecord -Path $Path -Code $Code
   $candidateManifest = $Candidate.candidate_manifest
   $source = $Candidate.source
@@ -689,13 +750,13 @@ function Get-MIR42CriterionEvidenceObservation {
   }
   $kindAndStateValid = switch ($Criterion) {
     'fresh-exact-loads' {
-      $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetRealEngineEvidenceBinderV1' -and
-        [string]$record.status -ceq 'MIR-4.2-NINE-TARGET-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED' -and
+      $candidateBound -and [string]$record.kind -ceq [string]$contract.kind -and
+        [string]$record.status -ceq [string]$contract.status -and
         [string]$record.release_qualification -ceq 'not-performed' -and [string]$record.release_acceptance -ceq 'not-performed'
     }
     'target-omissions' {
-      $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetEvidenceReconciliationV1' -and
-        [string]$record.status -ceq 'MIR-4.2-NINE-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED' -and
+      $candidateBound -and [string]$record.kind -ceq [string]$contract.kind -and
+        [string]$record.status -ceq [string]$contract.status -and
         [string]$record.release_qualification -ceq 'not-performed'
     }
     'package-exclusion' { $candidateConstruction -and [bool]$record.build_complete }
@@ -711,6 +772,9 @@ function Get-MIR42CriterionEvidenceObservation {
     }
   }
   if (-not $kindAndStateValid) { throw "[$Code-binding] $Criterion" }
+  if ($null -ne $PublishedMaintenanceInputs) {
+    Assert-MIR42MaintenanceCriterionObservation -Record $record -Criterion $Criterion -PublishedInputs $PublishedMaintenanceInputs
+  }
   return [pscustomobject][ordered]@{
     path = (Resolve-Path -LiteralPath $Path).Path
     sha256 = Get-MIR4Sha256File -Path $Path
@@ -729,11 +793,22 @@ function New-MIR42NineTargetCriterionEvidence {
     [hashtable]$NotApplicableTargetReasons = @{},
     [Parameter(Mandatory)][string]$Claim,
     [Parameter(Mandatory)][string]$KnownLimitations,
-    [Parameter(Mandatory)][string]$OutputPath
+    [Parameter(Mandatory)][string]$OutputPath,
+    [string]$PublishedMaintenancePredecessorManifestPath = ''
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
+  $null = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:$maintenanceRequested
   $candidateRows = Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$candidateRows[0].scope -cne 'nine-target') { throw '[mir42-criterion-evidence-candidate-scope]' }
+  $maintenanceInputs = $null
+  if ($maintenanceRequested) {
+    Assert-MIR42MaintenanceReconciliationScope -Scope ([string]$candidateRows[0].scope) -Candidates $candidateRows
+    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    if ($LASTEXITCODE -ne 0) { throw '[mir42-criterion-maintenance-release-readback]' }
+    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $PublishedMaintenancePredecessorManifestPath `
+      -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+  }
   $candidate = [pscustomobject][ordered]@{
     source = [pscustomobject][ordered]@{
       commit = [string]$candidateRows[0].source.commit
@@ -760,7 +835,7 @@ function New-MIR42NineTargetCriterionEvidence {
   if ($ObservationPaths.Count -eq 0) { throw '[mir42-criterion-evidence-observations-required]' }
   $evidence = @(
     foreach ($path in $ObservationPaths) {
-      Get-MIR42CriterionEvidenceObservation -Path $path -Criterion $Criterion -Candidate $candidate -Code 'mir42-criterion-evidence-observation'
+      Get-MIR42CriterionEvidenceObservation -Path $path -Criterion $Criterion -Candidate $candidate -Code 'mir42-criterion-evidence-observation' -PublishedMaintenanceInputs $maintenanceInputs
     }
   )
   if (@($evidence.path | Sort-Object -Unique).Count -ne $evidence.Count -or [string]::IsNullOrWhiteSpace($Claim) -or [string]::IsNullOrWhiteSpace($KnownLimitations)) {
