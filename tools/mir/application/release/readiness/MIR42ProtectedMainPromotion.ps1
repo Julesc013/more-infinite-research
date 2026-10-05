@@ -133,16 +133,20 @@ function Get-MIR42GovernedOfflineRestoreDrill {
     [Parameter(Mandatory)]$Seal,
     [Parameter(Mandatory)]$Signing,
     [Parameter(Mandatory)][string]$SshKeygenPath,
-    [ValidateSet('four-target','nine-target')][string]$Scope = 'four-target'
+    [ValidateSet('four-target','nine-target')][string]$Scope = 'four-target',
+    $PublishedMaintenanceInputs = $null
   )
   $candidateScope = Get-MIR42SealCandidateScope -Candidate $Candidate -Code 'mir42-promotion-governed-restore-candidate'
   if ($candidateScope -cne $Scope) { throw '[mir42-promotion-governed-restore-candidate-scope]' }
-  $contract = Get-MIR42SealScopeContract -Scope $Scope
+  $contract = Get-MIR42TechnicalSealInputContract -Candidate $Candidate -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs)
   if ([string]$Seal.record.kind -cne [string]$contract.seal_kind -or
       [string]$Seal.record.status -cne [string]$contract.seal_status -or
       [bool]$Seal.record.protected_main_promotion_authorized -or
       [bool]$Seal.record.tagging_authorized -or [bool]$Seal.record.publication_authorized) {
     throw '[mir42-promotion-governed-restore-seal-scope]'
+  }
+  if ($null -ne $PublishedMaintenanceInputs) {
+    Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $Seal.record.published_maintenance_predecessor -Current $PublishedMaintenanceInputs -Code 'mir42-promotion-governed-restore-maintenance-custody'
   }
   $receipt = Read-MIR42SealRecord -Path $Path -Code 'mir42-promotion-governed-restore'
   $record = $receipt.record
@@ -305,7 +309,8 @@ function Assert-MIR42ExpectedTechnicalSeal {
   $state = $Readiness._state
   $candidateScope = Get-MIR42SealCandidateScope -Candidate $state.candidate -Code 'mir42-promotion-seal-candidate'
   if ($candidateScope -cne $Scope) { throw '[mir42-promotion-seal-candidate-scope]' }
-  $contract = Get-MIR42SealScopeContract -Scope $Scope
+  $maintenance = $state.PSObject.Properties.Name -ccontains 'maintenance_inputs'
+  $contract = Get-MIR42TechnicalSealInputContract -Candidate $state.candidate -PublishedMaintenance:$maintenance
   $expected = [pscustomobject][ordered]@{
     schema = 1
     kind = [string]$contract.seal_kind
@@ -329,6 +334,7 @@ function Assert-MIR42ExpectedTechnicalSeal {
     publication_authorized = $false
     record_sha256 = ''
   }
+  if ($maintenance) { $expected | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $state.maintenance_inputs }
   $expected.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $expected
   if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $Seal.record) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected)) {
     throw '[mir42-promotion-seal-reconstruction]'
@@ -344,7 +350,8 @@ function Assert-MIR42PromotionReadinessScope {
   if ($null -eq $state -or $null -eq $state.candidate) { throw '[mir42-promotion-readiness-state]' }
   $candidateScope = Get-MIR42SealCandidateScope -Candidate $state.candidate -Code 'mir42-promotion-candidate'
   if ($candidateScope -cne $RequiredScope) { throw '[mir42-promotion-candidate-scope]' }
-  $contract = Get-MIR42SealScopeContract -Scope $RequiredScope
+  $maintenance = $state.PSObject.Properties.Name -ccontains 'maintenance_inputs'
+  $contract = Get-MIR42TechnicalSealInputContract -Candidate $state.candidate -PublishedMaintenance:$maintenance
   if ([string]$Readiness.kind -cne [string]$contract.readiness_kind -or
       [string]$Readiness.status -cne (([string]$contract.readiness_status_prefix) + 'READY') -or
       -not [bool]$Readiness.technical_seal_authorized -or
@@ -385,8 +392,10 @@ function Get-MIR42PromotionTechnicalSealReadiness {
     [Parameter(Mandatory)][string]$SourceFreezeAuthorityPath,
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
-    [AllowEmptyString()][string]$ProgrammePath=''
+    [AllowEmptyString()][string]$ProgrammePath='',
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath=''
   )
+  if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath) -and $RequiredScope -cne 'nine-target') { throw '[mir42-maintenance-promotion-candidate-scope]' }
   $arguments = @{
     RepoRoot=$RepoRoot;CandidateManifestPath=$CandidateManifestPath;QualificationPath=$QualificationPath
     RealEngineCampaignPath=$RealEngineCampaignPath;IndependentVerificationPath=$IndependentVerificationPath
@@ -398,6 +407,7 @@ function Get-MIR42PromotionTechnicalSealReadiness {
   }
   if ($RequiredScope -ceq 'nine-target') {
     if (-not [string]::IsNullOrWhiteSpace($ProgrammePath)) { $arguments.ProgrammePath = $ProgrammePath }
+    if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) { $arguments.PublishedMaintenancePredecessorManifestPath = $PublishedMaintenancePredecessorManifestPath }
     return Get-MIR42NineTargetTechnicalSealReadiness @arguments
   }
   return Get-MIR42FourTargetTechnicalSealReadiness @arguments
@@ -425,14 +435,16 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
     [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
-    [AllowEmptyString()][string]$ProgrammePath=''
+    [AllowEmptyString()][string]$ProgrammePath='',
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath=''
   )
   if ($PostPromotionReadback -and $RequiredScope -cne 'nine-target') { throw '[mir42-main-readback-nine-scope-required]' }
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $readiness = Get-MIR42PromotionTechnicalSealReadiness -RequiredScope $RequiredScope -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
     -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath
+    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath `
+    -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-promotion-verified-seal-inputs] $($readiness.blockers -join '; ')" }
   $contract = Assert-MIR42PromotionReadinessScope -Readiness $readiness -RequiredScope $RequiredScope
   $candidate = $readiness._state.candidate
@@ -464,7 +476,8 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
       throw "[mir42-promotion-seal-proof-binding] $name"
     }
   }
-  $restoreDrill = Get-MIR42GovernedOfflineRestoreDrill -RepoRoot $repo -Path $OfflineRestoreDrillPath -Candidate $candidate -Seal $seal -Signing $readiness._state.signing -SshKeygenPath $SshKeygenPath -Scope $RequiredScope
+  $maintenanceInputs = if ($readiness._state.PSObject.Properties.Name -ccontains 'maintenance_inputs') { $readiness._state.maintenance_inputs } else { $null }
+  $restoreDrill = Get-MIR42GovernedOfflineRestoreDrill -RepoRoot $repo -Path $OfflineRestoreDrillPath -Candidate $candidate -Seal $seal -Signing $readiness._state.signing -SshKeygenPath $SshKeygenPath -Scope $RequiredScope -PublishedMaintenanceInputs $maintenanceInputs
   $topologyPath = Join-Path $repo 'spec/releases/mir4-protected-main-promotion-topology-v1.json'
   $schemaPath = Join-Path $repo 'spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json'
   $topologyRaw = Get-Content -Raw -LiteralPath $topologyPath
@@ -546,6 +559,7 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
       source_freeze_authority = [ordered]@{sha256=[string]$readiness._state.freeze.sha256;record_sha256=[string]$readiness._state.freeze.record.record_sha256}
       independent_reviewer_attestation = [ordered]@{sha256=[string]$readiness._state.reviewer.sha256;record_sha256=[string]$readiness._state.reviewer.record.record_sha256}
     }
+    if ($null -ne $maintenanceInputs) { $plan.published_maintenance_predecessor = $maintenanceInputs }
     $plan.protected_main_promotion_authorized = $false
   }
   return [pscustomobject]$plan
@@ -595,7 +609,8 @@ function Get-MIR42NineTargetProtectedMainPromotionPlan {
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
     [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
-    [AllowEmptyString()][string]$ProgrammePath=''
+    [AllowEmptyString()][string]$ProgrammePath='',
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath=''
   )
   return Get-MIR42ProtectedMainPromotionPlanShared -RequiredScope 'nine-target' @PSBoundParameters
 }
@@ -707,7 +722,8 @@ function Get-MIR42NineTargetProtectedMainReadback {
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
     [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
-    [AllowEmptyString()][string]$ProgrammePath=''
+    [AllowEmptyString()][string]$ProgrammePath='',
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath=''
   )
   # RepoRoot is the clean, pinned qualification checkout. PrimaryRepoRoot is
   # the completed-work handoff on actual main. Reconstruct all accepted proof
@@ -740,6 +756,9 @@ function Get-MIR42NineTargetProtectedMainReadback {
     main_readback_verified=$true;remote_mutation_performed=$false;protected_main_promotion_authorized=$false
     human_go_required_after_main_readback=$true;tagging_authorized=$false;publication_authorized=$false
     record_sha256=''
+  }
+  if ($plan.PSObject.Properties.Name -ccontains 'published_maintenance_predecessor') {
+    $record | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $plan.published_maintenance_predecessor
   }
   $record.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $record
   return $record

@@ -26,6 +26,7 @@ $maintenanceBinderAssertions=0
 $maintenanceCriterionAssertions=0
 $maintenanceCampaignAssertions=0
 $maintenanceReadinessAssertions=0
+$maintenanceSealAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 
@@ -282,6 +283,18 @@ try {
   Assert-MIR42CandidateBuildTest ($defaultIndependentContract.independent_kind-ceq$unchangedSealContract.independent_kind) 'maintenance-readiness-keeps-default-independent-contract'
   $maintenanceReadinessAssertions++
   $fourBinderCandidate=[pscustomobject]@{scope='four-target';targets=@($schemaComplete.targets|Select-Object -First 4);identity=[pscustomobject]@{record=$schemaComplete}}
+  $maintenanceSealContract=Get-MIR42TechnicalSealInputContract -Candidate $binderCandidate -PublishedMaintenance
+  Assert-MIR42CandidateBuildTest ($maintenanceSealContract.seal_kind-ceq'MIR42NineTargetMaintenanceTechnicalSealV1'-and$maintenanceSealContract.seal_status-ceq'MIR-4.2.1-NINE-TARGET-MAINTENANCE-TECHNICALLY-SEALED-AWAITING-PROTECTED-MAIN-PR'-and$maintenanceSealContract.independent_kind-ceq$independentWriterContract.rehash_kind) 'maintenance-seal-selects-current-seal-and-input-contracts'
+  $maintenanceSealAssertions++
+  foreach($scopeCandidate in @($binderCandidate,$fourBinderCandidate)){
+    $defaultSealContract=Get-MIR42TechnicalSealInputContract -Candidate $scopeCandidate
+    $scopeContract=Get-MIR42SealScopeContract -Scope $scopeCandidate.scope
+    Assert-MIR42CandidateBuildTest ((ConvertTo-MIR4BootstrapCanonicalJson -Value $defaultSealContract)-ceq(ConvertTo-MIR4BootstrapCanonicalJson -Value $scopeContract)) 'maintenance-seal-preserves-default-scope-contract'
+    $maintenanceSealAssertions++
+  }
+  $failure='';try{Get-MIR42TechnicalSealInputContract -Candidate $fourBinderCandidate -PublishedMaintenance|Out-Null}catch{$failure=$_.Exception.Message}
+  Assert-MIR42CandidateBuildTest ($failure-ceq'[mir42-engine-evidence-maintenance-candidate-scope]') 'maintenance-seal-refuses-four-target-contract'
+  $maintenanceSealAssertions++
   $rejected=$false
   try{Get-MIR42EngineEvidenceBindingContract -Candidate $fourBinderCandidate -PublishedMaintenance|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-engine-evidence-maintenance-candidate-scope]'}
   Assert-MIR42CandidateBuildTest $rejected 'maintenance-binder-refuses-four-target-scope'
@@ -341,18 +354,25 @@ try {
     Assert-MIR42CandidateBuildTest $rejected "seal-reader-refuses-self-hashed-$($case.Key)"
     $sealCandidateContractAssertions++
   }
-  foreach($mode in @('Seal','PromotionPlan','MainReadback')){
+  foreach($entry in @(@{mode='Seal';code='[mir42-seal-output-path-required]'},@{mode='PromotionPlan';code='[mir42-promotion-technical-seal-required]'},@{mode='MainReadback';code='[mir42-main-readback-primary-required]'})){
     $rejected=$false
-    try{& (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1') -RepoRoot $repo -Mode $mode -CandidateManifestPath 'unused-control.json' -PublishedMaintenancePredecessorManifestPath 'unread-control-manifest.json'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-binder-mode-only]'}
-    Assert-MIR42CandidateBuildTest $rejected ('maintenance-binder-command-refuses-other-transition-'+$mode)
-    $maintenanceBinderAssertions++
+    try{& (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1') -RepoRoot $repo -Mode $entry.mode -CandidateManifestPath 'unused-control.json' -PublishedMaintenancePredecessorManifestPath 'unread-control-manifest.json'|Out-Null}catch{$rejected=$_.Exception.Message-ceq$entry.code}
+    Assert-MIR42CandidateBuildTest $rejected ('maintenance-seal-command-retains-required-input-'+$entry.mode)
+    $maintenanceSealAssertions++
   }
+  $sealedOutput=Join-Path $identityRoot 'must-not-seal.json'
+  $failure='';try{& (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1') -RepoRoot $repo -Mode Seal -CandidateManifestPath 'unused-control.json' -PublishedMaintenancePredecessorManifestPath 'unread-control-manifest.json' -OutputPath $sealedOutput|Out-Null}catch{$failure=$_.Exception.Message}
+  Assert-MIR42CandidateBuildTest ($failure.StartsWith('[mir42-seal-not-authorized]')-and-not(Test-Path -LiteralPath $sealedOutput)) 'maintenance-seal-command-refuses-missing-evidence-before-output'
+  $maintenanceSealAssertions++
+  $failure='';try{New-MIR42TechnicalSealForScope -RequiredScope four-target -RepoRoot $repo -CandidateManifestPath 'unused-control.json' -PublishedMaintenancePredecessorManifestPath 'unread-control-manifest.json' -OutputPath $sealedOutput|Out-Null}catch{$failure=$_.Exception.Message}
+  Assert-MIR42CandidateBuildTest ($failure-ceq'[mir42-maintenance-readiness-candidate-scope]'-and-not(Test-Path -LiteralPath $sealedOutput)) 'maintenance-seal-writer-refuses-four-target-scope-before-read-or-write'
+  $maintenanceSealAssertions++
   $rejected=$false
   try{& (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1') -RepoRoot $repo -Mode JoinedCampaign -CandidateManifestPath 'unused-control.json' -PublishedMaintenancePredecessorManifestPath 'unread-control-manifest.json'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-joined-campaign-inputs-required]'}
   Assert-MIR42CandidateBuildTest $rejected 'maintenance-campaign-command-reaches-required-input-guard-without-output'
   $maintenanceCampaignAssertions++
   $diagnostic=& (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1') -RepoRoot $repo -Mode Readiness -CandidateManifestPath 'unused-control.json' -PublishedMaintenancePredecessorManifestPath 'unread-control-manifest.json'|ConvertFrom-Json -Depth 100
-  Assert-MIR42CandidateBuildTest (-not$diagnostic.technical_seal_authorized-and-not$diagnostic.publication_authorized-and-not$diagnostic.checks.candidate-and-not$diagnostic.checks.maintenance_predecessor-and-not$diagnostic.checks.maintenance_seal_consumer-and$diagnostic.blockers-ccontains'[mir42-maintenance-seal-consumer-pending]') 'maintenance-readiness-command-stays-blocked-without-candidate-or-evidence'
+  Assert-MIR42CandidateBuildTest (-not$diagnostic.technical_seal_authorized-and-not$diagnostic.publication_authorized-and-not$diagnostic.checks.candidate-and-not$diagnostic.checks.maintenance_predecessor-and$diagnostic.blockers-cnotcontains'[mir42-maintenance-seal-consumer-pending]') 'maintenance-readiness-command-stays-blocked-without-candidate-or-evidence'
   $maintenanceReadinessAssertions++
   $failure='';try{Get-MIR42TechnicalSealReadinessForScope -RequiredScope four-target -RepoRoot $repo -CandidateManifestPath 'unused-control.json' -PublishedMaintenancePredecessorManifestPath 'unread-control-manifest.json'|Out-Null}catch{$failure=$_.Exception.Message}
   Assert-MIR42CandidateBuildTest ($failure-ceq'[mir42-maintenance-readiness-candidate-scope]') 'maintenance-readiness-refuses-four-target-scope-before-input-read'
@@ -386,6 +406,9 @@ try {
   try{Get-MIR42EngineEvidenceBindingContract -Candidate $oldBinderCandidate -PublishedMaintenance|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-engine-evidence-maintenance-candidate-scope]'}
   Assert-MIR42CandidateBuildTest $rejected 'maintenance-binder-refuses-source-zero'
   $maintenanceBinderAssertions++
+  $failure='';try{Get-MIR42TechnicalSealInputContract -Candidate $oldBinderCandidate -PublishedMaintenance|Out-Null}catch{$failure=$_.Exception.Message}
+  Assert-MIR42CandidateBuildTest ($failure-ceq'[mir42-engine-evidence-maintenance-candidate-scope]') 'maintenance-seal-refuses-source-zero'
+  $maintenanceSealAssertions++
   # Exercise the runner's actual selection statements without its native CLI.
   $engineStatements=@($engineAst.EndBlock.Statements)
   $selectionIndex=[array]::FindIndex($engineStatements,[Predicate[object]]{param($node) $node.Extent.Text.StartsWith('$selected = ')})
@@ -717,7 +740,7 @@ try {
   Assert-MIR42CandidateBuildTest ($rejected-and-not(Test-Path -LiteralPath (Join-Path $identityRoot 'must-not-create.json'))) 'maintenance-criterion-cli-forwards-and-refuses-out-of-scope-option'
   $maintenanceCriterionAssertions++
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 

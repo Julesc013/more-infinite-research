@@ -1735,6 +1735,16 @@ function Get-MIR42SealIndependentInputContract {
   return $contract
 }
 
+function Get-MIR42TechnicalSealInputContract {
+  param([Parameter(Mandatory)]$Candidate,[switch]$PublishedMaintenance)
+  $contract = Get-MIR42SealIndependentInputContract -Candidate $Candidate -PublishedMaintenance:$PublishedMaintenance
+  if ($PublishedMaintenance) {
+    $contract.seal_kind = 'MIR42NineTargetMaintenanceTechnicalSealV1'
+    $contract.seal_status = 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-TECHNICALLY-SEALED-AWAITING-PROTECTED-MAIN-PR'
+  }
+  return $contract
+}
+
 function Assert-MIR42SealIndependentMaintenanceCustody {
   param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)]$PublishedInputs)
   Assert-MIR42EngineEvidenceMaintenanceCustody -Recorded $Record.published_maintenance_predecessor -Current $PublishedInputs -Code 'mir42-seal-independent-maintenance-custody-binding'
@@ -2378,7 +2388,7 @@ function Get-MIR42TechnicalSealReadinessForScope {
   try {
     $state.candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
     Assert-MIR42SealTargetSet -Rows @($state.candidate.targets) -Code ("mir42-" + $RequiredScope + '-seal-candidate') -Scope $RequiredScope
-    if ($maintenanceRequested) { $null = Get-MIR42SealIndependentInputContract -Candidate $state.candidate -PublishedMaintenance }
+    if ($maintenanceRequested) { $contract = Get-MIR42TechnicalSealInputContract -Candidate $state.candidate -PublishedMaintenance }
     $checks.candidate = $true
   } catch { $checks.candidate = $false; $blockers.Add($_.Exception.Message) }
   if ($maintenanceRequested) {
@@ -2391,10 +2401,6 @@ function Get-MIR42TechnicalSealReadinessForScope {
         $checks.maintenance_predecessor = $true
       } catch { $checks.maintenance_predecessor = $false; $blockers.Add($_.Exception.Message) }
     } else { $checks.maintenance_predecessor = $false; $blockers.Add('[mir42-maintenance-readiness-predecessor-unavailable]') }
-    # This operation admits evidence readers only. The sealing writer and its
-    # downstream consumers still require a separately completed contract.
-    $checks.maintenance_seal_consumer = $false
-    $blockers.Add('[mir42-maintenance-seal-consumer-pending]')
   }
   if ($checks.candidate) { try { $programmeArguments=@{RepoRoot=$repo;Scope=$RequiredScope};if(-not [string]::IsNullOrWhiteSpace($ProgrammePath)){$programmeArguments.ProgrammePath=$ProgrammePath};$state.programme = Get-MIR42LiveProgrammeTransition @programmeArguments; if ($RequiredScope -ceq 'nine-target') { Assert-MIR42NineTargetProgrammeCandidateBinding -Programme $state.programme -Candidate $state.candidate }; $checks.programme = $true } catch { $checks.programme = $false; $blockers.Add($_.Exception.Message) } } else { $checks.programme = $false; $blockers.Add('[mir42-seal-programme-unavailable]') }
   $candidateInputsReady = $checks.candidate -and (-not $maintenanceRequested -or $checks.maintenance_predecessor)
@@ -2527,6 +2533,7 @@ function New-MIR42NineTargetTechnicalSeal {
     [AllowEmptyString()][string]$ReviewerAttestationPath='',
     [AllowEmptyString()][string]$SshKeygenPath='',
     [AllowEmptyString()][string]$ProgrammePath='',
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath='',
     [Parameter(Mandatory)][string]$OutputPath
   )
   New-MIR42TechnicalSealForScope @PSBoundParameters -RequiredScope 'nine-target'
@@ -2567,15 +2574,18 @@ function New-MIR42TechnicalSealForScope {
     [AllowEmptyString()][string]$ReviewerAttestationPath='',
     [AllowEmptyString()][string]$SshKeygenPath='',
     [AllowEmptyString()][string]$ProgrammePath='',
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath='',
     [Parameter(Mandatory)][string]$OutputPath
   )
-  $contract = Get-MIR42SealScopeContract -Scope $RequiredScope
   $readiness = Get-MIR42TechnicalSealReadinessForScope -RequiredScope $RequiredScope -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
     -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath
+    -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath `
+    -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-seal-not-authorized] $($readiness.blockers -join '; ')" }
   $state = $readiness._state
+  $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
+  $contract = Get-MIR42TechnicalSealInputContract -Candidate $state.candidate -PublishedMaintenance:$maintenanceRequested
   $seal = [pscustomobject][ordered]@{
     schema = 1
     kind = [string]$contract.seal_kind
@@ -2599,5 +2609,6 @@ function New-MIR42TechnicalSealForScope {
     publication_authorized = $false
     record_sha256 = ''
   }
+  if ($maintenanceRequested) { $seal | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $state.maintenance_inputs }
   return (Write-MIR42NormalizedRecord -Record $seal -OutputPath $OutputPath -Code 'mir42-seal-output')
 }

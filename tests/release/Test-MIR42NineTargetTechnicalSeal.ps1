@@ -80,6 +80,57 @@ function Test-MIR42ConsumedEngineRunReferences {
 
 Test-MIR42ConsumedEngineRunReferences -RepoRoot $repo
 
+function Test-MIR42MaintenanceSealConsumption {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
+  $arguments = @{
+    RepoRoot=$RepoRoot;CandidateManifestPath='absent-maintenance-control.json'
+    QualificationPath='unread-control.json';RealEngineCampaignPath='unread-control.json'
+    IndependentVerificationPath='unread-control.json';SigningCeremonyPath='unread-control.json'
+    SourceFreezeAuthorityPath='unread-control.json';ReviewerAttestationPath='unread-control.json'
+    SshKeygenPath='unread-control.exe';PublishedMaintenancePredecessorManifestPath='unread-published-control.json'
+  }
+  # Missing candidate admission prevents all network, engine, signing and
+  # promotion execution. The specific maintenance blocker proves propagation.
+  $readiness = Get-MIR42PromotionTechnicalSealReadiness -RequiredScope nine-target @arguments
+  Assert-MIR42NineSealTest -Condition (-not $readiness.technical_seal_authorized -and -not $readiness.checks.maintenance_predecessor) -Code 'maintenance-promotion-readiness-propagates-custody-request'
+  $failure='';try { Get-MIR42PromotionTechnicalSealReadiness -RequiredScope four-target @arguments | Out-Null } catch { $failure=$_.Exception.Message }
+  Assert-MIR42NineSealTest -Condition ($failure -ceq '[mir42-maintenance-promotion-candidate-scope]') -Code 'maintenance-promotion-refuses-four-scope'
+  $arguments.TechnicalSealPath='unread-control.json'
+  $arguments.OfflineRestoreDrillPath='unread-control.json'
+  foreach ($entry in @(
+    @{command='Get-MIR42NineTargetProtectedMainPromotionPlan';extra=@{}},
+    @{command='Get-MIR42NineTargetProtectedMainReadback';extra=@{PrimaryRepoRoot=(Join-Path $RepoRoot 'tests');PullRequestNumber=1;IntentionPath='unread-control.json';PromotionRequestPath='unread-control.json'}}
+  )) {
+    $failure='';$extra=$entry.extra
+    try { & $entry.command @arguments @extra | Out-Null } catch { $failure=$_.Exception.Message }
+    Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir42-promotion-verified-seal-inputs]') -and $failure.Contains('[mir42-maintenance-readiness-predecessor-unavailable]')) -Code ('maintenance-consumer-propagation-' + $entry.command)
+  }
+  # Consume only the custody field from the actual writer and reconstruction
+  # expressions. These subsets have no seal status, signature or native proof.
+  $custody = [pscustomobject]@{fixture_scope='custody-expression-only-not-executed';targets=@($script:MIR42SealNineTargetCandidates | ForEach-Object { [pscustomobject]@{target=$_;identity=('custody-' + $_)} })}
+  $state = [pscustomobject]@{maintenance_inputs=$custody}
+  foreach ($entry in @(
+    @{path='tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1';name='New-MIR42TechnicalSealForScope';variable='seal'},
+    @{path='tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1';name='Assert-MIR42ExpectedTechnicalSeal';variable='expected'}
+  )) {
+    $errors=$null
+    $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot $entry.path),[ref]$null,[ref]$errors)
+    if ($errors) { throw '[mir42-maintenance-seal-custody-expression-parser]' }
+    $definitions=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $entry.name},$true))
+    Assert-MIR42NineSealTest -Condition ($definitions.Count -eq 1) -Code 'maintenance-seal-custody-expression-function'
+    $attachments=@($definitions[0].Body.FindAll({param($node) $node -is [Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'Add-Member' -and $node.Extent.Text.Contains('published_maintenance_predecessor')},$true))
+    Assert-MIR42NineSealTest -Condition ($attachments.Count -eq 1) -Code 'maintenance-seal-custody-expression-cardinality'
+    Set-Variable -Name $entry.variable -Value ([pscustomobject]@{fixture_scope='custody-field-only-not-a-seal'})
+    . ([scriptblock]::Create($attachments[0].Parent.Extent.Text))
+    $serialized=Get-Variable -Name $entry.variable -ValueOnly | ConvertTo-Json -Depth 30 | ConvertFrom-Json -Depth 30
+    Assert-MIR42NineSealTest -Condition ((ConvertTo-MIR4BootstrapCanonicalJson -Value $serialized.published_maintenance_predecessor) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $custody)) -Code ('maintenance-seal-preserves-complete-custody-' + $entry.name)
+  }
+  Write-Output 'MIR42-MAINTENANCE-SEAL-CONSUMPTION-PASSED propagation_checks=4 custody_expression_checks=6 seals=0 engines=0 signatures=0 remote_mutations=0'
+}
+
+Test-MIR42MaintenanceSealConsumption -RepoRoot $repo
+
 function Get-MIR42NineSealCommittedHistoricalFixture {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target)
 

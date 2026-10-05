@@ -31,9 +31,6 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath) -and $Mode -cnotin @('Readiness','EngineEvidence','JoinedCampaign')) {
-  throw '[mir42-maintenance-binder-mode-only]'
-}
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1')
 
@@ -70,7 +67,8 @@ switch ($Mode) {
     New-MIR42NineTargetTechnicalSeal -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
       -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
       -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath -OutputPath $OutputPath | ConvertTo-Json -Depth 30
+      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath -OutputPath $OutputPath `
+      -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath | ConvertTo-Json -Depth 30
   }
   'PromotionPlan' {
     if ([string]::IsNullOrWhiteSpace($TechnicalSealPath)) { throw '[mir42-promotion-technical-seal-required]' }
@@ -78,7 +76,8 @@ switch ($Mode) {
     Get-MIR42NineTargetProtectedMainPromotionPlan -RepoRoot $RepoRoot -TechnicalSealPath $TechnicalSealPath -CandidateManifestPath $CandidateManifestPath `
       -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
       -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath -ProgrammePath $ProgrammePath | ConvertTo-Json -Depth 30
+      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath -ProgrammePath $ProgrammePath `
+      -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath | ConvertTo-Json -Depth 30
   }
   'MainReadback' {
     if ([string]::IsNullOrWhiteSpace($PrimaryRepoRoot)) { throw '[mir42-main-readback-primary-required]' }
@@ -89,7 +88,8 @@ switch ($Mode) {
     $result = Get-MIR42NineTargetProtectedMainReadback -RepoRoot $RepoRoot -PrimaryRepoRoot $PrimaryRepoRoot -PullRequestNumber $PullRequestNumber -IntentionPath $IntentionPath -PromotionRequestPath $PromotionRequestPath -TechnicalSealPath $TechnicalSealPath -CandidateManifestPath $CandidateManifestPath `
       -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
       -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath -ProgrammePath $ProgrammePath
+      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath -ProgrammePath $ProgrammePath `
+      -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
     if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
       Write-MIR42NineTargetProtectedMainReadback -Record $result -PrimaryRepoRoot $PrimaryRepoRoot -OutputPath $OutputPath | Out-Null
     }
