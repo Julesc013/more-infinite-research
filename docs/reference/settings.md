@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-10-06
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 source_of_truth_for:
@@ -50,6 +50,8 @@ mir-settings-profile-import
 ```
 
 This setting accepts a portable MIR settings profile string. It is always registered and stays out of profile exports so importing one profile never nests another profile inside it.
+
+MIR 4.2.1 development gives the Rare Metals, Silicon, Glass, black paving and white paving staged material families a default `ips-max-level-<stream>` of `0`. Zero leaves the configured combined stage limit open; the compiler still stops at the highest useful recipe-productivity level. The early technology remains finite at three, and an explicit value of `3` prevents the separate level-four continuation. Existing setting IDs, increments, research times and cost controls remain the same. These are startup settings and require a restart.
 
 Automatic productivity support is governed by `prototypes/mir/settings/automatic_compiler_contract.lua`, a pure schema-2 contract with no Factorio-global reads and no mod, recipe, technology, or version names. The visible settings are:
 

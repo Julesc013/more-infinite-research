@@ -5,7 +5,7 @@ applies_to: "MIR 4.1 maintenance and 4.2+ development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -89,6 +89,8 @@ Read-only intake can start once the starting state is observed. Dependencies bel
 | A21 | M43-00 | Portable research-surface core and integration-first companion route | A02, A11, A16 |
 
 Each task's explicit acceptance obligations live in the operating programme. A task is complete only when its evidence resolves those obligations. Implemented modules, planned tests, and an imported ledger do not complete gameplay requests.
+
+The five non-Imersite K2 material declarations now use the existing separate level-four continuation planner for A05/A17 and X04. Controlled source fixtures exercise finite early identities, F210 effective caps, F200 native caps, explicit cap three/four, saturated recipes, unavailable science and withheld/native-owned early rows. The source adds no recipe permissions or route-certificate exceptions. Actual admitted routes, output, science/laboratory progression and saved levels/queues still require current-package qualification in each dependency-valid K2/K2SO and retained historical/SE profile; these outcomes remain active.
 
 ## M44 4.2 consumption boundary
 

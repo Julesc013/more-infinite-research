@@ -2076,8 +2076,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize shared material progression declarations for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11773,
-      "expected_sha256": "56E61CD8A5104EB0DA10B48F944C93DA4F0C7A058DECFF1518BC6D2C8561FAB7",
+      "expected_bytes": 12888,
+      "expected_sha256": "4DABF9951CAB1E7660317ED7FBC2C7A1115D9063821D1812E66FC0BAEFBA8446",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3772,8 +3772,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 63493,
-      "expected_sha256": "3C4D12F96C630102255CD1FD8A7EFD01A543B752F4A5450B83F7E1DDF0C0454A",
+      "expected_bytes": 66568,
+      "expected_sha256": "3FB49E2BFC2735DAD28CC682B3C975CAB8D9AE1E3D2F434BEE98480BD01F2A9D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 67913,
-      "expected_sha256": "9FACA0D6D22DC3783401367B00350FE3A67D710C4F19AF7592FC854AFEA633AC",
+      "expected_bytes": 68290,
+      "expected_sha256": "7762E1D1331CC274B62378B5DF36DCF54EEB56F631E4288B9C6CE0FAD922BDC0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "77AB599B0479FF1033E872BAFA1C8568E48742A1835C3AC013E536C250643E13"
+  "record_sha256": "55A6D98F5106D8365054389AC4994479AEB3479D30D1DAC5D289CCF81782E67D"
 }

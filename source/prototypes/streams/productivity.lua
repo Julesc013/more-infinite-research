@@ -1028,6 +1028,12 @@ streams.research_material_silicon = material_family("kr-silicon", {"kr-silicon"}
 streams.research_material_glass = material_family("kr-glass", {"kr-glass"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_black_paving = material_family("kr-black-reinforced-plate", {"kr-black-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_white_paving = material_family("kr-white-reinforced-plate", {"kr-white-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
+-- The other five requested K2 outcomes use the same owned-stage, science
+-- and useful-headroom planner. Their original route admission remains the
+-- authority, including withheld return paths and paving recolour exclusions.
+for _, key in ipairs(material_progression.k2_material_stream_keys()) do
+  material_progression.attach_k2_material_continuation(key, streams[key])
+end
 -- A10-reviewed forward-route certificates. These bind one exact final recipe,
 -- one exact canonical risk fact, and one exact K2/K2SO runtime profile. They
 -- are not a general exception to material-route graph safety.

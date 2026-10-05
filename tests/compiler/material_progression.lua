@@ -41,6 +41,30 @@ check(same_array(progression.k2_213_continuation_stream_keys(), {
   "research_material_imersite"
 }), "the current K2 continuation set contains only the reviewed MIR powder stream")
 
+local expected_k2_keys = {
+  "research_material_rare_metals", "research_material_silicon", "research_material_glass",
+  "research_material_black_paving", "research_material_white_paving"
+}
+check(same_array(progression.k2_material_stream_keys(), expected_k2_keys),
+  "the other five named K2 outcomes have their own continuation declarations")
+local copied_k2_keys = progression.k2_material_stream_keys()
+copied_k2_keys[1] = "research_material_imersite"
+check(same_array(progression.k2_material_stream_keys(), expected_k2_keys),
+  "a caller cannot mutate the cached K2 continuation identity set")
+for _, key in ipairs(expected_k2_keys) do
+  local declaration = progression.attach_k2_material_continuation(key, {max_level = 3})
+  local valid, reason = progression.validate(key, declaration.staged_progression)
+  check(valid, "valid shared staged declaration for " .. key .. ": " .. tostring(reason))
+  check(declaration.staged_progression.legacy.technology_name == "recipe-prod-" .. key .. "-1"
+      and progression.legacy_max_level(key, declaration, "infinite") == 3
+      and declaration.staged_progression.continuation.technology_name == "recipe-prod-" .. key .. "-4"
+      and declaration.staged_progression.continuation.maximum_level_default == 0,
+    "K2 continuation preserves the finite early identity and adds the separate level-four identity for " .. key)
+end
+check(not pcall(function()
+  progression.attach_k2_material_continuation("research_material_imersite", {max_level = 3})
+end), "ordinary K2 declarations cannot bypass the retained exact Imersite attachment guard")
+
 for _, key in ipairs(expected_keys) do
   local declaration = progression.attach(key, {max_level = 3})
   local staged = declaration.staged_progression
@@ -141,8 +165,10 @@ for _, key in ipairs(expected_keys) do
   check(valid, "actual material stream uses the shared valid progression declaration for "
     .. key .. ": " .. tostring(reason))
 end
-check(streams.research_material_rare_metals.staged_progression == nil,
-  "K2 material declaration stays outside the unqualified continuation mechanism")
+for _, key in ipairs(expected_k2_keys) do
+  local valid, reason = progression.validate(key, streams[key].staged_progression)
+  check(valid, "actual source attaches the shared continuation declaration for " .. key .. ": " .. tostring(reason))
+end
 check(streams.research_material_imersite.staged_progression == nil,
   "Imersite stays unattached until the exact current K2 tuple guard selects its continuation")
 

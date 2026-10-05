@@ -213,6 +213,80 @@ local adopted = {action = "adopt", spec = spec}
 check(continuation.plan(adopted) == nil,
   "a native owner cannot be extended as an MIR generated family")
 
+-- These subjects are the retained requested outcomes, independent of the
+-- production key accessor. An emitted early row represents an already
+-- admitted route; this fixture does not certify any overhaul recipe graph.
+for _, subject in ipairs({
+  {"research_material_rare_metals", "kr-rare-metals"},
+  {"research_material_silicon", "kr-silicon"},
+  {"research_material_glass", "kr-glass"},
+  {"research_material_black_paving", "kr-black-reinforced-plate"},
+  {"research_material_white_paving", "kr-white-reinforced-plate"}
+}) do
+  local key, recipe_name = subject[1], subject[2]
+  recipe_prototypes[recipe_name] = {maximum_productivity = 3}
+  local family = progression.attach_k2_material_continuation(key, {max_level = 3})
+  local early = {
+    action = "emit", stream_key = key, technology_name = "recipe-prod-" .. key .. "-1", spec = family,
+    planned_max_level = 3,
+    fields = {effects = {{type = "change-recipe-productivity", recipe = recipe_name, change = 0.02}},
+      ingredients = {{"automation-science-pack", 1}}, cost_model = {base = 100}}
+  }
+  mod_data_supported = true
+  configured_maximum = "infinite"
+  local later = continuation.plan(early)
+  check(later.action == "emit" and later.technology_name == "recipe-prod-" .. key .. "-4"
+      and later.fields.level == 4 and later.planned_max_level == 150 and later.fields.max_level == "infinite",
+    "F210 plans the separate useful continuation for " .. key)
+  check(later.fields.effects[1].recipe == recipe_name and later.fields.effects[1].change == 0.02
+      and later.fields.prerequisites[2] == early.technology_name
+      and later.fields.cost_model.input.anchor_level == 4,
+    "continuation preserves the admitted recipe, increment, predecessor and cost anchor for " .. key)
+  local f210_bindings = require("prototypes.mir.domain.technology.maximum_level_binding").from_plan(
+    {stream_plan = {rows = {early, later}}, fingerprint = "controlled-" .. key},
+    {scripted_techs_supported = true, mod_data_supported = true})
+  local f210_by_name = {}
+  for _, binding in ipairs(f210_bindings.bindings) do f210_by_name[binding.technology_id] = binding end
+  check(f210_by_name[early.technology_name].prototype_strategy.max_level == 3
+      and f210_by_name[later.technology_name].prototype_strategy.max_level == "infinite"
+      and f210_by_name[later.technology_name].cap.effective == 150,
+    "F210 binds the finite early stage and later effective cap for " .. key)
+  mod_data_supported = false
+  local native_later = continuation.plan(early)
+  check(native_later.fields.max_level == 150 and native_later.planned_max_level == 150,
+    "F200 retains a finite native useful cap for " .. key)
+  local f200_bindings = require("prototypes.mir.domain.technology.maximum_level_binding").from_plan(
+    {stream_plan = {rows = {early, native_later}}, fingerprint = "controlled-f200-" .. key},
+    {scripted_techs_supported = true, mod_data_supported = false})
+  local f200_by_name = {}
+  for _, binding in ipairs(f200_bindings.bindings) do f200_by_name[binding.technology_id] = binding end
+  check(f200_by_name[native_later.technology_name].prototype_strategy.max_level == 150
+      and f200_by_name[native_later.technology_name].runtime_strategy.mode == "prototype-cap",
+    "F200 binds the later native prototype without mod-data transport for " .. key)
+  configured_maximum = 3
+  local stopped = continuation.plan(early)
+  check(stopped.action == "skip" and stopped.reason == "configured-material-cap-before-continuation",
+    "an explicit old cap three still prevents the later stage for " .. key)
+  configured_maximum = 4
+  check(continuation.plan(early).fields.max_level == 4,
+    "an explicit cap four is absolute across both stages for " .. key)
+  configured_maximum = "infinite"
+  recipe_prototypes[recipe_name].maximum_productivity = 0.06
+  check(continuation.plan(early).reason == "no-continuation-headroom",
+    "early saturation cannot create paid no-op research for " .. key)
+  recipe_prototypes[recipe_name].maximum_productivity = 3
+  late_available = false
+  check(continuation.plan(early).reason == "no_reachable_late_science_frontier",
+    "missing reachable science withholds the later stage for " .. key)
+  late_available = true
+  for _, action in ipairs({"skip", "adopt"}) do
+    early.action = action
+    check(continuation.plan(early) == nil,
+      "continuation cannot revive a withheld route or replace a native owner for " .. key)
+  end
+end
+mod_data_supported = true
+
 -- The late mutation policy must agree with the compiler and binding. The
 -- native engine rejects a level-four technology after an infinite `-1` row.
 package.loaded["prototypes.mir.streams.registry"] = {

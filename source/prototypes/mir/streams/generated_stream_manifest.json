@@ -1370,6 +1370,81 @@
         "stream:research_material_imersite"
       ]
     },
+    "recipe-prod-research_material_rare_metals-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_rare_metals",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_rare_metals-4",
+      "stream_key": "research_material_rare_metals__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_rare_metals"
+      ]
+    },
+    "recipe-prod-research_material_silicon-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_silicon",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_silicon-4",
+      "stream_key": "research_material_silicon__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_silicon"
+      ]
+    },
+    "recipe-prod-research_material_glass-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_glass",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_glass-4",
+      "stream_key": "research_material_glass__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_glass"
+      ]
+    },
+    "recipe-prod-research_material_black_paving-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_black_paving",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_black_paving-4",
+      "stream_key": "research_material_black_paving__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_black_paving"
+      ]
+    },
+    "recipe-prod-research_material_white_paving-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_white_paving",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_white_paving-4",
+      "stream_key": "research_material_white_paving__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_white_paving"
+      ]
+    },
     "recipe-prod-research_material_imersite-4": {
       "introduced_in": "4.2.0",
       "source": "community-material-staged-continuation",
