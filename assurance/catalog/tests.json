@@ -1667,6 +1667,7 @@
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1",
@@ -7980,5 +7981,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:beddca24760ccfbff531032f9db015e2613ed4d33ec7be5384f7722cfc343872"
+  "digest": "sha256:5ce64dc267961d833bfd3d7634bab386675f34caadcbfea3ee4b6c3e1aa53da8"
 }

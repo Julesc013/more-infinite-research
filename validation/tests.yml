@@ -352,6 +352,7 @@
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1",

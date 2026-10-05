@@ -10,6 +10,7 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot 
 . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
 
 function Assert-MIRKnownStagingImpactRouting {
+  $repo = $RepoRoot
   . (Join-Path $RepoRoot 'tools/lib/assurance/Core.ps1')
   $impactPath=Join-Path $RepoRoot '.mir/test-impact.yml'
   $policy=Get-Content -LiteralPath (Join-Path $RepoRoot '.mir/assurance.json') -Raw|ConvertFrom-Json
@@ -23,7 +24,8 @@ function Assert-MIRKnownStagingImpactRouting {
     'tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1',
     'tests/runtime/Test-MIRA06AluminiumFinalState.ps1',
     'tests/runtime/Test-MIRPassiveRepair.ps1',
-    'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1'
+    'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1',
+    'tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1'
   )
   $expected=@($manifest.baseline_scenarios|Sort-Object)-join'|'
   foreach($path in $paths){
@@ -40,7 +42,7 @@ function Assert-MIRKnownStagingImpactRouting {
   if(-not$selection.requires_full-or$unknown-notin$selection.unmapped_runtime_paths){throw 'Known staging rules masked unknown runtime behavior.'}
   $player=Get-MIRAssuranceClassification -Paths @('source/prototypes/mir/runtime/future_behavior.lua') -Config $policy
   if('runtime.full'-notin$player.tests){throw 'Player runtime source lost its broader checks.'}
-  Write-Host '[ok] nine known staging paths retain baseline impact and immutable-input checks; unknown and mixed runtime changes escalate.'
+  Write-Host '[ok] ten known staging paths retain baseline impact and immutable-input checks; unknown and mixed runtime changes escalate.'
 }
 Assert-MIRKnownStagingImpactRouting
 if($ImpactRoutingOnly){return}

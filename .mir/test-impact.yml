@@ -697,6 +697,12 @@
       "tags": [],
       "groups": [],
       "pattern": "tests/runtime/Test-MIRBobTinBrowserExplanation.ps1"
+    },
+    {
+      "pattern": "tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
     }
   ]
 }

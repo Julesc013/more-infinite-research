@@ -77,6 +77,11 @@
       "tests": ["static.immutable-input-staging"]
     },
     {
+      "id": "tin-continuation-input-staging",
+      "patterns": ["^tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation[.]ps1$"],
+      "tests": ["static.immutable-input-staging"]
+    },
+    {
       "id": "passive-repair-input-staging",
       "patterns": ["^tests/runtime/Test-MIRPassiveRepair[.]ps1$"],
       "tests": ["static.immutable-input-staging"]

@@ -4,7 +4,13 @@ param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin = 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExactStageRoot = 'C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-bob-20260930',
-  [string]$OutputRoot = 'build/tests/f210-bob-tin-level4',
+  [string[]]$LocalModLibraryDirs = @('C:\Projects\Factorio\testmods\2.1'),
+  [string]$SettingsPath = '',
+  [string]$CandidateZip = '',
+  [string]$SourceMaterializationPath = '',
+  [string]$OutputRoot = 'build/p/f210-tin-level4',
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
   [switch]$PrepareOnly,
   [string]$RecoverRun = ''
 )
@@ -69,6 +75,60 @@ function Assert-TinRuntimeApiSurface([string]$FixtureControl) {
   Assert-Tin (-not $control.Contains('get_recipe_productivity_bonus', [StringComparison]::Ordinal)) 'fixture still calls unsupported LuaForce productivity accessor'
   Assert-Tin ($control.Contains('force.recipes[recipe_name]', [StringComparison]::Ordinal) -and $control.Contains('recipe.productivity_bonus', [StringComparison]::Ordinal)) 'fixture does not use the documented force recipe productivity bonus'
 }
+function Read-TinCurrentCandidate([string]$Repository, [string]$Archive, [string]$ReceiptPath) {
+  Assert-Tin (-not [string]::IsNullOrWhiteSpace($Archive) -and -not [string]::IsNullOrWhiteSpace($ReceiptPath)) 'supply candidate and canonical materialization receipt'
+  $candidate = (Resolve-Path -LiteralPath $Archive).Path
+  $receipt = Get-Content -LiteralPath $ReceiptPath -Raw | ConvertFrom-Json -Depth 30 -DateKind String
+  Assert-Tin (($receipt | ConvertTo-Json -Depth 30) | Test-Json -SchemaFile (Join-Path $Repository 'spec/schemas/mir4-package-composition-result-v1.schema.json')) 'candidate materialization schema differs'
+  Assert-Tin (Test-MIR4BootstrapRecordHash -Record $receipt) 'candidate materialization record hash differs'
+  $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $Repository -Target f210 -SourceVersion '4.2.1'
+  Assert-Tin ($receipt.status -ceq 'passed-canonical-package-authority-materialization' -and $receipt.target -ceq 'f210' -and $receipt.source_version -ceq $identity.source_version -and $receipt.distribution_version -ceq $identity.distribution_version) 'candidate materialization identity differs'
+  Assert-Tin ($receipt.package_source_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $Repository)) 'candidate source fingerprint differs'
+  Assert-Tin ((Resolve-Path -LiteralPath $receipt.archive_path).Path -ceq $candidate -and [IO.Path]::GetFileName($candidate) -ceq $identity.package_name) 'candidate archive path or filename differs'
+  foreach ($invariant in @('all_source_hashes_verified','all_output_hashes_verified','version_identity_verified','canonical_package_authority')) {
+    Assert-Tin ([bool]$receipt.invariants.$invariant) "candidate invariant differs: $invariant"
+  }
+  $inventory = Get-MIR4ArchiveInventory -Path $candidate
+  Assert-Tin ($inventory.archive_sha256 -ceq $receipt.archive_sha256 -and $inventory.content_sha256 -ceq $receipt.content_sha256 -and $inventory.entry_count -eq $receipt.entry_count) 'candidate archive inventory differs'
+  $zip = [IO.Compression.ZipFile]::OpenRead($candidate)
+  try {
+    Assert-Tin (@($zip.Entries | Where-Object {-not $_.FullName.StartsWith($identity.distribution_root+'/',[StringComparison]::Ordinal) -or $_.FullName -match '/(?:tests|fixtures|docs|[.]mir|[.]codex|[.]github|build|dist)/'}).Count -eq 0) 'candidate root or exclusions differ'
+    $entry = $zip.GetEntry($identity.distribution_root+'/info.json')
+    Assert-Tin ($null -ne $entry -and $entry.Length -le 64KB) 'candidate info differs'
+    $reader = [IO.StreamReader]::new($entry.Open())
+    try {$info = $reader.ReadToEnd() | ConvertFrom-Json} finally {$reader.Dispose()}
+    Assert-Tin ($info.name -ceq 'more-infinite-research' -and $info.version -ceq $identity.distribution_version -and $info.factorio_version -ceq '2.1') 'candidate metadata differs'
+    $state = Get-MIR4TargetMaterializerState -RepoRoot $Repository -Target f210
+    $selection = Get-MIR4TargetMaterializationBindings -State $state
+    Assert-Tin ($receipt.source_manifest_sha256 -ceq $state.manifest.record_sha256 -and $receipt.target_overlay_sha256 -ceq $state.composition.record_sha256) 'candidate composition authority differs'
+    Assert-Tin ($zip.Entries.Count -eq $selection.bindings.Count) 'candidate package membership differs'
+    foreach ($binding in $selection.bindings) {
+      $member = @($zip.Entries | Where-Object FullName -CEQ ($identity.distribution_root+'/'+$binding.output_path))
+      Assert-Tin ($member.Count -eq 1) "candidate binding missing or duplicated: $($binding.output_path)"
+      # Metadata is checked above; these authored presentation files are
+      # rewritten by the existing patch-identity writer. Runtime bytes retain
+      # their exact current materializer binding, without building another ZIP.
+      if ($binding.output_path -in @('info.json','changelog.txt','README.md')) {continue}
+      Assert-Tin ($member[0].Length -eq $binding.output_bytes) "candidate binding size differs: $($binding.output_path)"
+      $stream = $member[0].Open()
+      try {$hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))} finally {$stream.Dispose()}
+      Assert-Tin ($hash -ceq $binding.output_sha256) "candidate binding hash differs: $($binding.output_path)"
+    }
+  } finally {$zip.Dispose()}
+  return [pscustomobject]@{path=$candidate;receipt=$receipt}
+}
+function Invoke-TinGovernedEngine([string]$Scenario, [string[]]$Arguments, [int]$TimeoutSeconds) {
+  $safe = Get-MIRSafeScenarioFileName -Name $Scenario
+  $actor = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $Arguments -TimeoutSeconds $TimeoutSeconds
+  $stdout = Join-Path $run ($safe+'.stdout.log'); $stderr = Join-Path $run ($safe+'.stderr.log')
+  Copy-Item -LiteralPath $actor.stdout -Destination $stdout
+  Copy-Item -LiteralPath $actor.stderr -Destination $stderr
+  $factorioLog = Join-Path $run ($safe+'.factorio.log')
+  $captured = Copy-MIRCompatFactorioCurrentLog -UserDataDir $run -Destination $factorioLog
+  $null = Get-MIRNativeProbeRemainingOutputBytes -Context $resources
+  Assert-Tin (-not [string]::IsNullOrWhiteSpace($captured)) 'native Factorio log is absent'
+  return [pscustomobject]@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=$actor.result.duration_seconds;stdout=$stdout;stderr=$stderr;factorio_log=$captured}
+}
 function Invoke-TinBoundedReload {
   param(
     [string]$Factorio,
@@ -96,8 +156,8 @@ function Invoke-TinBoundedReload {
     '--benchmark-runs', '1',
     '--benchmark-sanitize'
   )
-  $process = Invoke-MIRCompatFactorioProcess -FactorioBin $Factorio -ArgumentList $arguments -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $TimeoutSeconds
-  $captured = Copy-MIRCompatFactorioCurrentLog -UserDataDir $RunRoot -Destination $factorioLog
+  $process = Invoke-TinGovernedEngine -Scenario ($safe+'.reload') -Arguments $arguments -TimeoutSeconds $TimeoutSeconds
+  $captured = $process.factorio_log
   $saveSha = Get-TinSha $save
   [pscustomobject]@{
     passed = [bool]($process.passed -and $process.duration_seconds -le $TimeoutSeconds -and $inputSha -ceq $saveSha -and -not [string]::IsNullOrWhiteSpace($captured))
@@ -116,14 +176,20 @@ function Invoke-TinBoundedReload {
 }
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$stage = (Resolve-Path -LiteralPath $ExactStageRoot).Path
-$output = [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
+$stage = [IO.Path]::GetFullPath($ExactStageRoot)
+$output = [IO.Path]::GetFullPath($(if ([IO.Path]::IsPathRooted($OutputRoot)) {$OutputRoot} else {Join-Path $repo $OutputRoot}))
 $buildPrefix = [IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 Assert-Tin ($output.StartsWith($buildPrefix, [StringComparison]::OrdinalIgnoreCase)) 'output root must be inside build'
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/ImmutableInputStaging.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+. (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+$resources = $null
+if ([string]::IsNullOrWhiteSpace($RecoverRun)) {
+  & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
+  $resources = New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+}
 
 $fixtureRoot = Join-Path $repo 'fixtures/assert-f210-current-bob-tin-level4-continuation'
 $fixtureName = 'mir-fixture-assert-f210-current-bob-tin-level4-continuation'
@@ -147,6 +213,7 @@ foreach ($archive in @($dossier.target.archives)) {
   $expectedArchives[[string]$archive.file] = [ordered]@{ name = [string]$archive.name; version = [string]$archive.version; sha256 = [string]$archive.sha256 }
 }
 Assert-Tin ($expectedArchives.Count -eq 5) 'fixture dossier archive closure differs'
+if (-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
 $stageReceiptPath = Join-Path $stage 'result.json'
 Assert-Tin (Test-Path -LiteralPath $stageReceiptPath -PathType Leaf) 'exact retained Bob stage receipt is absent'
 $stageReceipt = Get-Content -Raw -LiteralPath $stageReceiptPath | ConvertFrom-Json -ErrorAction Stop
@@ -163,6 +230,7 @@ foreach ($entry in $expectedArchives.GetEnumerator()) {
 $stageSettings = Join-Path $stageMods 'mod-settings.dat'
 Assert-Tin (Test-Path -LiteralPath $stageSettings -PathType Leaf) 'retained Bob settings are absent'
 Assert-Tin ((Get-TinSha $stageSettings) -ceq $expectedSettingsSha) 'retained Bob settings bytes differ'
+}
 
 if (-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
   $run = (Resolve-Path -LiteralPath $RecoverRun).Path
@@ -242,16 +310,17 @@ if (-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
   return
 }
 
-& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') | Out-Host
 $changes = @(& git -C $repo status --porcelain --untracked-files=all)
 Assert-Tin ($changes.Count -eq 0) "qualification requires a clean worktree: $($changes -join '; ')"
 $engine = (Resolve-Path -LiteralPath $FactorioBin).Path
+Assert-Tin ($engine.Equals('C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',[StringComparison]::OrdinalIgnoreCase)) 'use the authorized current 2.1 engine without retargeting Steam'
 Assert-Tin ((Get-TinSha $engine) -ceq $expectedEngineSha) 'Factorio executable differs from the exact retained Bob stage'
-$version = (& $engine --version | Out-String)
-Assert-Tin ($LASTEXITCODE -eq 0 -and $version -match 'Version:\s+2[.]1[.]20') 'requires Factorio 2.1.20'
-
-$candidateResult = New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('F210-BOB-TIN-L4-' + [guid]::NewGuid().ToString('N').Substring(0, 10).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/tests/f210-bob-tin-level4/pkg'
-$candidate = (Resolve-Path -LiteralPath ([string]$candidateResult.archive_path)).Path
+$candidateInput = Read-TinCurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath
+$candidate = $candidateInput.path
+$dependencyInputs = Resolve-MIRNativeProbeDependencyInputs -StageRoot '' -ExpectedArchives $expectedArchives -LocalModLibraryDirs $LocalModLibraryDirs
+Assert-Tin (-not [string]::IsNullOrWhiteSpace($SettingsPath)) 'supply the small retained settings file separately from immutable archives'
+$stageSettings = (Resolve-Path -LiteralPath $SettingsPath).Path
+Assert-Tin ((Get-TinSha $stageSettings) -ceq $expectedSettingsSha) 'selected Bob settings bytes differ'
 $sourceCommit = (& git -C $repo rev-parse HEAD).Trim()
 $sourceTree = (& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 Assert-Tin ($sourceCommit -match '^[0-9a-f]{40}$' -and $sourceTree -match '^[0-9a-f]{40}$') 'source Git identity is invalid'
@@ -261,7 +330,8 @@ $prepared = [ordered]@{
   status = 'prepared'
   scope = [string]$dossier.scope
   source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree; package_source_sha256 = Get-TinSha (Join-Path $repo 'source/package-source.json') }
-  exact_stage = [ordered]@{ path = $stage; engine_sha256 = $expectedEngineSha; settings_sha256 = $expectedSettingsSha; archives = $expectedArchives }
+  exact_stage = [ordered]@{ path = $null; engine_sha256 = $expectedEngineSha; settings_sha256 = $expectedSettingsSha; archives = $expectedArchives; input_mode='verified-local-dependency-library' }
+  materialization = Get-TinArtifact $repo (Resolve-Path -LiteralPath $SourceMaterializationPath).Path
   candidate = Get-TinArtifact $repo $candidate
   fixture = @('info.json', 'continuation-dossier.json', 'data-final-fixes.lua', 'control.lua' | ForEach-Object { Get-TinArtifact $repo (Join-Path $fixtureRoot $_) })
   harness = Get-TinArtifact $repo $PSCommandPath
@@ -272,7 +342,7 @@ if ($PrepareOnly) {
   return
 }
 
-$run = Join-Path $output ('t-' + [guid]::NewGuid().ToString('N').Substring(0, 12))
+$run = $resources.root
 Assert-TinPath $run 'F210 Bob Tin level-four run root'
 $inputLease = $null
 try {
@@ -280,11 +350,12 @@ try {
   $mods = Join-Path $run 'mods'
   $inputs = @()
   foreach ($entry in $expectedArchives.GetEnumerator()) {
-    $archivePath = Join-Path $stageMods $entry.Key
-    $inputs += New-TinInput $archivePath 'dependency-mod' ([ordered]@{ archive = $entry.Key; sha256 = $entry.Value.sha256 }) ([ordered]@{ kind = 'retained-exact-f210-bob-stage'; stage = $stage })
+    $archivePath = $dependencyInputs[$entry.Key].source_path
+    $inputs += New-TinInput $archivePath 'dependency-mod' ([ordered]@{ archive = $entry.Key; sha256 = $entry.Value.sha256 }) ([ordered]@{ kind = $dependencyInputs[$entry.Key].provenance_kind })
   }
   $inputs += New-TinInput $candidate 'candidate' ([ordered]@{ target = 'f210'; sha256 = Get-TinSha $candidate }) ([ordered]@{ kind = 'fresh-f210-target-materialization'; source_commit = $sourceCommit; source_tree = $sourceTree })
   $inputLease = New-MIRImmutableInputLease -RunRoot $run -StageDirectory $mods -Inputs $inputs -RequireHardLinks
+  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $inputLease
   $fixtureArchive = Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name $fixtureName -Version $fixtureVersion -ModsDir $mods
   Assert-TinPath $fixtureArchive 'F210 Bob Tin level-four fixture archive'
   $enabled = @('base', 'elevated-rails', 'quality', 'recycler', 'space-age')
@@ -297,7 +368,16 @@ try {
   Assert-Tin ((Get-TinSha $stagedSettings) -ceq $expectedSettingsSha) 'copied exact Bob settings differ before create'
   $initialSettings = Get-TinArtifact $repo $stagedSettings
 
-  $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $run -ScenarioName 'f210-current-bob-tin-level4' -ScenarioTimeoutSeconds 240
+  $engineRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $engine))
+  $config = Join-Path $run 'mir-compat-config.ini'
+  [IO.File]::WriteAllText($config,"[path]`nread-data=$(Join-Path $engineRoot 'data')`nwrite-data=$run`n`n[general]`nlocale=auto`n`n[other]`nenable-steam-networking=false`ndisable-blueprint-storage=true`n",[Text.UTF8Encoding]::new($false))
+  $versionActor = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 10
+  $version = Get-Content -LiteralPath $versionActor.stdout -Raw
+  Assert-Tin ($version -match 'Version:\s+2[.]1[.]20(?:\s|$)') 'requires Factorio 2.1.20'
+  $save = Join-Path $run 'saves/f210-current-bob-tin-level4.zip'
+  $load = Invoke-TinGovernedEngine -Scenario 'f210-current-bob-tin-level4' -Arguments @('--config',$config,'--no-log-rotation','--create',$save,'--mod-directory',$mods,'--disable-audio') -TimeoutSeconds 240
+  $load | Add-Member -NotePropertyName save -NotePropertyValue $save
+  Assert-Tin (Test-Path -LiteralPath $save -PathType Leaf) 'fresh create save is absent'
   Assert-Tin ([bool]$load.passed -and -not [bool]$load.timed_out -and [int]$load.exit_code -eq 0) 'fresh create failed'
   $freshLog = [IO.File]::ReadAllText([string]$load.factorio_log)
   $dataMarker = '[mir-f210-current-bob-tin-level4] DATA PASS early=recipe-prod-research_material_tin-1:1:3 continuation=recipe-prod-research_material_tin-4:4:infinite prerequisite=true'
@@ -330,12 +410,14 @@ try {
     input_staging = $staging
   }
   $resultPath = Join-Path $run 'result.json'
-  [IO.File]::WriteAllText($resultPath, (ConvertTo-Json $result -Depth 100), [Text.UTF8Encoding]::new($false))
+  $result['resource_runs'] = $resources.runs.ToArray()
+  Write-MIRNativeProbeResult -Context $resources -Record $result
   Write-Output "[MIR-F210-CURRENT-BOB-TIN-LEVEL4] $(Get-TinRelative $repo $resultPath)"
 } catch {
   $failure = $_
   if ($null -ne $inputLease -and -not $inputLease.closed) {
     try { Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed | Out-Null } catch {}
   }
+  try { Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{schema=1;status='failed';scope=$dossier.scope;failure=$failure.Exception.Message;resource_runs=$resources.runs.ToArray();qualification=$false;publication=$false}) } catch {}
   throw $failure
 }
