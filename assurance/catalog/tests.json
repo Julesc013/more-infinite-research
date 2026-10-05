@@ -456,7 +456,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBobTinBrowserExplanation.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Graphics",
+      "command": "./tests/runtime/Test-MIRBobTinBrowserExplanation.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -ExpectedPeakMemoryMiB 3072 -MaxNewOutputMiB 120 -Graphics",
       "canonical_implementation": "tests/runtime/Test-MIRBobTinBrowserExplanation.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -466,6 +466,8 @@
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIRBobTinBrowserExplanation.ps1",
+        "tests/support/MIRMaterialAuditInputs.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
         "fixtures/assert-bob-tin-browser-explanation/**",
         "source:source/prototypes/mir/report/public_compiler_artifacts.lua",
         "source:source/prototypes/mir/runtime/research_browser*.lua",
@@ -7978,5 +7980,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:623279a7352a31bd3b0dffe3f652fdcf68485c474713330ed1f8a1a1f7fc983b"
+  "digest": "sha256:beddca24760ccfbff531032f9db015e2613ed4d33ec7be5384f7722cfc343872"
 }

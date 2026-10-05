@@ -5265,10 +5265,12 @@
       "id": "runtime.bob-tin-browser-explanation",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBobTinBrowserExplanation.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Graphics",
+      "command": "./tests/runtime/Test-MIRBobTinBrowserExplanation.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -ExpectedPeakMemoryMiB 3072 -MaxNewOutputMiB 120 -Graphics",
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIRBobTinBrowserExplanation.ps1",
+        "tests/support/MIRMaterialAuditInputs.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
         "fixtures/assert-bob-tin-browser-explanation/**",
         "source:source/prototypes/mir/report/public_compiler_artifacts.lua",
         "source:source/prototypes/mir/runtime/research_browser*.lua",

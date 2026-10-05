@@ -77,6 +77,8 @@ try {
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Browser harness allocated before peak-budget admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRPassiveRepair.ps1') -RepoRoot $repo -CandidateZip 'absent-passive-candidate' -FactorioBin 'absent-passive-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Passive repair allocated or probed an engine before peak-budget admission.'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1') -RepoRoot $repo -CandidateZip 'absent-tin-candidate' -BobModsDir 'absent-tin-library' -FactorioBin 'absent-tin-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Tin browser allocated or probed an input before peak-budget admission.'
   $context=New-MIRNativeProbeResourceContext @arguments -ExpectedPeakMemoryMiB 1024
   Assert-Probe (-not (Test-Path -LiteralPath $context.root)) 'successful admission allocated before caller initialization.'
   New-Item -ItemType Directory -Path $context.root | Out-Null
@@ -90,6 +92,16 @@ try {
     Assert-Probe ($definitions.Count -eq 1) "expected one actual browser admission function: $name"
     . ([scriptblock]::Create($definitions[0].Extent.Text))
   }
+  $tinAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1'),[ref]$browserTokens,[ref]$browserErrors)
+  Assert-Probe ($browserErrors.Count -eq 0) 'tin browser harness syntax differs.'
+  foreach($name in @('Resolve-TinBrowserEnginePath','Test-TinBrowserCandidate')) {
+    $definitions=@($tinAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+    Assert-Probe ($definitions.Count -eq 1) "expected one actual tin browser admission function: $name"
+    . ([scriptblock]::Create($definitions[0].Extent.Text))
+  }
+  $currentTin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+  Assert-Probe ((Resolve-TinBrowserEnginePath $currentTin) -ceq $currentTin) 'tin browser changed its authorized engine path.'
+  Refuses-Probe {Resolve-TinBrowserEnginePath 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'} 'engine-location'
   $historical='D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
   $current='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
   Assert-Probe ((Resolve-BrowserEnginePath -Line '2.0' -Requested '') -ceq $historical) '2.0 default used another engine authority.'
@@ -132,6 +144,7 @@ try {
         'root-case' {$root.ToUpperInvariant()+'/extra.lua'}
         'traversal' {$root+'/../outside.lua'}
         'backslash' {$root+'/nested\extra.lua'}
+        'forbidden-repo' {$root+'/fixtures/unowned.lua'}
         default {''}
       }
       if($extra){$null=$zip.CreateEntry($extra)}
@@ -144,6 +157,12 @@ try {
     $valid=New-ControlledBrowserArchive -Line $line -Identity $identity
     $checked=Test-BrowserCandidate -Candidate $valid -Line $line -Identity $identity -Repository $repo
     Assert-Probe ($checked.info.version -ceq $identity.distribution_version -and $checked.sha256 -ceq (Get-FileHash -LiteralPath $valid).Hash) "actual browser $line validator lost exact patch-one identity or input hash."
+    if($line -ceq '2.1') {
+      $tinChecked=Test-TinBrowserCandidate -Candidate $valid -Line $line -Identity $identity -Repository $repo
+      Assert-Probe ($tinChecked.sha256 -ceq $checked.sha256 -and $tinChecked.info.version -ceq '4.2.21001') 'tin browser lost its actual current source-patch identity.'
+      $forbidden=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant forbidden-repo
+      Refuses-Probe {Test-TinBrowserCandidate -Candidate $forbidden -Line $line -Identity $identity -Repository $repo} 'candidate-exclusions'
+    }
     foreach($case in @(
       @{variant='patch-zero';error='candidate-identity'},@{variant='patch-two';error='candidate-identity'},
       @{variant='wrong-target';error='target mismatch'},@{variant='filename';error='candidate-identity'},
@@ -156,6 +175,7 @@ try {
     )) {
       $invalid=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant $case.variant
       Refuses-Probe {Test-BrowserCandidate -Candidate $invalid -Line $line -Identity $identity -Repository $repo} $case.error
+      if($line -ceq '2.1'){Refuses-Probe {Test-TinBrowserCandidate -Candidate $invalid -Line $line -Identity $identity -Repository $repo} $case.error}
     }
   }
   $continuityAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1'),[ref]$browserTokens,[ref]$browserErrors)
@@ -240,6 +260,32 @@ try {
     [IO.File]::WriteAllText($stdout,'Exception at tick controlled')
     Refuses-Probe {Invoke-ProbeEngine -Label controlled-error -Arguments @('--create','owned-save.zip')} 'Passive repair controlled-error failed'
     Assert-Probe ((Get-Content -Raw (Join-Path $run 'controlled-error.log'))-ceq'Exception at tick controlled') 'passive repair discarded its failed log.'
+  }
+  & {
+    $functions=@($tinAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-Engine'},$false))
+    Assert-Probe ($functions.Count-eq1) 'tin browser engine adapter is missing.'
+    . ([scriptblock]::Create($functions[0].Extent.Text))
+    $run=Join-Path $fixture 'tin-browser';$mods=Join-Path $run 'mods'
+    New-Item -ItemType Directory -Path (Join-Path $run 'userdata') | Out-Null
+    $resources=[pscustomobject]@{controlled=$true};$engine='controlled-tin-engine'
+    $calls=[Collections.Generic.List[object]]::new();$budgets=[Collections.Generic.List[object]]::new()
+    $stdout=Join-Path $run 'stdout.txt';$stderr=Join-Path $run 'stderr.txt'
+    [IO.File]::WriteAllText($stdout,'controlled output');[IO.File]::WriteAllText($stderr,'')
+    [IO.File]::WriteAllText((Join-Path $run 'userdata/factorio-current.log'),'controlled native log')
+    function Invoke-MIRNativeProbeFactorioProcess {
+      param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds)
+      $calls.Add([pscustomobject]@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds})
+      if($Arguments -contains 'controlled-failure'){throw 'controlled governed interruption'}
+      [pscustomobject]@{stdout=$stdout;stderr=$stderr}
+    }
+    function Get-MIRNativeProbeRemainingOutputBytes {param($Context);$budgets.Add($Context);return 1MB}
+    $log=Invoke-Engine create @('--create','owned-save.zip')
+    Assert-Probe ($calls.Count-eq1-and$calls[0].context.controlled-and$calls[0].path-ceq$engine-and$calls[0].timeout-eq120) 'tin browser bypassed the governed actor.'
+    $expected=@('--config',(Join-Path $run 'config.ini'),'--mod-directory',$mods,'--create','owned-save.zip')
+    Assert-Probe (($calls[0].arguments-join'|')-ceq($expected-join'|')) 'tin browser changed its native arguments.'
+    Assert-Probe ((Get-Content -LiteralPath $log -Raw)-ceq'controlled native log'-and$budgets.Count-eq1-and$budgets[0].controlled) 'tin browser lost its original native log or total output check.'
+    Refuses-Probe {Invoke-Engine runtime @('controlled-failure')} 'controlled governed interruption'
+    Assert-Probe ($budgets.Count-eq1-and-not(Test-Path -LiteralPath (Join-Path $run 'factorio-runtime.log'))) 'tin browser continued after governed failure.'
   }
   $auditRun=Join-Path $fixture 'material-audit';New-Item -ItemType Directory -Path $auditRun|Out-Null
   $auditLease=New-MIRMaterialAuditInputLease -RunRoot $auditRun -ModsDirectory (Join-Path $auditRun 'mods') -CandidateArchive $auditCandidate -DependencyDirectory $fixture -ExpectedArchives ([ordered]@{'dependency.zip'=$archiveInput.expected_sha256})

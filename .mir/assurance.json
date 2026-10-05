@@ -72,6 +72,11 @@
   },
   "classes": [
     {
+      "id": "tin-browser-input-staging",
+      "patterns": ["^tests/runtime/Test-MIRBobTinBrowserExplanation[.]ps1$"],
+      "tests": ["static.immutable-input-staging"]
+    },
+    {
       "id": "passive-repair-input-staging",
       "patterns": ["^tests/runtime/Test-MIRPassiveRepair[.]ps1$"],
       "tests": ["static.immutable-input-staging"]
