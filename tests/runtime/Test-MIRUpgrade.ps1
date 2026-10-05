@@ -6,6 +6,9 @@ param(
   [Parameter(Mandatory)][string]$ToZip,
   [string]$SelectedReleaseManifest = '',
   [string]$SelectedTarget = '',
+  [switch]$SpaceIsFake,
+  [string]$PublishedMaintenancePredecessorManifestPath = '',
+  [string[]]$LocalModLibraryDirs = @(),
   [string]$FromVersion = "3.0.5",
   [string]$ToVersion = "3.1.0",
   [string]$FixtureName = "assert-upgrade-3-0-5-to-3-1-0",
@@ -101,7 +104,9 @@ function Invoke-MIRUpgradeMonitoredProcess {
   $prefix=Join-Path $root ('process-'+$script:upgradeProcessIndex)
   $usage=Get-MIR441TreeUsage -Path $root
   if (-not $usage.complete) { throw '[mir441-resource-output-scan-incomplete]' }
-  $remaining=$upgradeWriteBytes-[int64]$usage.bytes
+  [int64]$aliasBytes=0
+  foreach ($lease in $script:sifLeases) { $aliasBytes+=Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $lease }
+  $remaining=$upgradeWriteBytes-([int64]$usage.bytes-$aliasBytes)
   if ($remaining -le 0) { throw '[mir441-resource-output-budget]' }
   $run=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $root `
     -LedgerPath ($prefix+'.resources.jsonl') -Policy $upgradePolicy -EstimatedPeakBytes $remaining `
@@ -258,14 +263,40 @@ $upgradeWriteBytes=[int64]$MaxNewOutputMiB*1MB
 $null=Assert-MIR441ResourceAdmission -Policy $upgradePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
 $script:upgradeProcessIndex=0
 $script:upgradeResourceRuns=@()
+$script:sifLease=$null
+$script:sifLeases=@()
+. (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
-if ($SelectedReleaseManifest) {
+if ($SelectedReleaseManifest -and -not $SpaceIsFake) {
   $selectedVersion=Resolve-MIRUpgradeManifestVersion -ManifestPath (Resolve-MIRUpgradePath -Path $SelectedReleaseManifest) -CandidatePath $to -Target $SelectedTarget
   if ($PSBoundParameters.ContainsKey('ToVersion') -and $ToVersion -cne $selectedVersion) { throw '[mir-upgrade-manifest-explicit-version] ToVersion disagrees with the selected package.' }
   $ToVersion=$selectedVersion
-} elseif ($SelectedTarget) { throw '[mir-upgrade-manifest-required] SelectedTarget requires its release manifest.' }
+} elseif ($SelectedTarget -and -not $SpaceIsFake) { throw '[mir-upgrade-manifest-required] SelectedTarget requires its release manifest.' }
+$sifDescriptor=$null
+$sifInputs=@()
+$sifPublishedInputs=$null
+if ($SpaceIsFake) {
+  if (-not $SelectedReleaseManifest -or -not $PublishedMaintenancePredecessorManifestPath) { throw '[mir421-sif-manifests-required]' }
+  if (-not $OutputPath -or (Test-Path -LiteralPath $OutputPath) -or $Retention -cne 'Always') { throw '[mir421-sif-fresh-retained-output-required]' }
+  $null=Resolve-MIR441RecoveryScratchPath -Path $(if([IO.Path]::IsPathRooted($OutputPath)){$OutputPath}else{Join-Path $RepoRoot $OutputPath})
+  $sifDescriptor=Get-MIR421SpaceFakeUpgradeDescriptor -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype
+  $sifEngine=if ($SelectedTarget -ceq 'f210') { 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' } else { 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' }
+  if (-not $factorio.Equals($sifEngine,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir421-sif-engine-authority]' }
+  . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+  $sifCandidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $SelectedReleaseManifest
+  $null=Get-MIR42TechnicalSealInputContract -Candidate $sifCandidate -PublishedMaintenance
+  $sifTarget=@($sifCandidate.targets | Where-Object target -CEQ $SelectedTarget)
+  if ($sifTarget.Count -ne 1 -or [string]$sifTarget[0].distribution_version -cne $ToVersion -or [IO.Path]::GetFullPath([string]$sifTarget[0].archive_path) -cne [IO.Path]::GetFullPath($to)) { throw '[mir421-sif-candidate-path]' }
+  $sifMetadataText=(& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+  if ($LASTEXITCODE -ne 0) { throw '[mir421-sif-release-metadata]' }
+  $sifPublishedInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($sifMetadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+  $sifPredecessor=@($sifPublishedInputs.targets | Where-Object target -CEQ $SelectedTarget)
+  if ($sifPredecessor.Count -ne 1 -or [string]$sifPredecessor[0].path -cne $from -or (Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash -cne $sifPredecessor[0].sha256) { throw '[mir421-sif-published-predecessor]' }
+  $sifInputs=Resolve-MIR421SpaceFakeUpgradeInputs -RepoRoot $RepoRoot -Descriptor $sifDescriptor -LocalModLibraryDirs $LocalModLibraryDirs
+}
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
 $isHistoricalTerminalFixture = $FixtureName -eq 'assert-upgrade-historical-terminal-to-mir42'
 $isLegacyFactorio = $isHistoricalTerminalFixture -or ([string]$factorioVersionInfo.ProductVersion -match '^(?:0|1)[.]')
@@ -275,6 +306,7 @@ $fixtureModName = [string]$fixtureInfo.name
 $proofSuffix = if ($FixtureName -like "*-automatic-compiler") { " automatic compiler" } else { "" }
 $archetypeSuffix = if ($Archetype) { " archetype=$Archetype" } else { "" }
 $artifactSlug = if ($Archetype) { $Archetype } else { "default" }
+if ($SpaceIsFake) { $artifactSlug='sif-'+$artifactSlug }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$ToVersion-upgrade-$artifactSlug-proof.json"
 }
@@ -296,6 +328,11 @@ $mods = Join-Path $root "mods"
 $userdata = Join-Path $root "userdata"
 $saves = Join-Path $userdata "saves"
 New-Item -ItemType Directory -Force -Path $mods, $userdata, $saves | Out-Null
+if ($SpaceIsFake) {
+  $script:sifLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $root 'source-profile') -Dependencies $sifInputs -Archive $from -ExpectedSha256 $sifPredecessor[0].sha256 -Version $FromVersion -Role source
+  $script:sifLeases+=,$script:sifLease
+  $mods=$script:sifLease.record.stage_directory
+}
 $config = Join-Path $root "config.ini"
 @(
   "[path]",
@@ -315,6 +352,8 @@ $serverSettings = Join-Path $root "server-settings.json"
 
 $enableDlc = -not $isLegacyFactorio
 if ($Archetype) { $enableDlc = $Archetype -in @("space-age-native-owner", "affected-planet-discovery") }
+if ($SpaceIsFake) { $enableDlc=$true }
+$persistentModNames=if ($SpaceIsFake) { @($sifDescriptor.mod_names) } else { @() }
 $sourceOnlyModNames = @()
 foreach ($sourceFixtureName in $SourceOnlyFixtureNames) {
   $sourceFixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$sourceFixtureName")
@@ -326,13 +365,14 @@ foreach ($sourceFixtureName in $SourceOnlyFixtureNames) {
 }
 
 $modListPath = Join-Path $mods "mod-list.json"
-Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames $sourceOnlyModNames
-Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
+Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames @($sourceOnlyModNames+$persistentModNames)
+if (-not $SpaceIsFake) { Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from)) }
 $fixtureDirectoryName = if ($isHistoricalTerminalFixture) {
   $fixtureModName + '_' + [string]$fixtureInfo.version
 } else { $fixtureModName }
 $stagedFixture = Join-Path $mods $fixtureDirectoryName
 Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
+if ($SpaceIsFake) { Copy-Item -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Destination (Join-Path $stagedFixture 'mir421_space_fake_upgrade.lua') }
 $mir42UpgradeSpecialized=$false
 if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-4-0-20000-to-4-1-20000', 'assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
     $ToVersion -match '^4[.]2[.](?<target>210|200|110|100)(?<patch>[0-9]{2})$') {
@@ -407,6 +447,12 @@ if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
   $stagedControlText = $stagedControlText.Replace("mir-3210-upgraded", "mir-$($ToVersion.Replace('.', ''))-upgraded")
   Set-Content -LiteralPath $stagedControlPath -Value $stagedControlText -Encoding UTF8
 }
+if ($SpaceIsFake) {
+  if (-not $mir42UpgradeSpecialized) { throw '[mir421-sif-fixture-specialization]' }
+  $sifControlPath=Join-Path $stagedFixture 'control.lua'
+  $sifControl=Add-MIR421SpaceFakeUpgradeOracle -ControlText (Get-Content -Raw -LiteralPath $sifControlPath)
+  [IO.File]::WriteAllText($sifControlPath,$sifControl,[Text.UTF8Encoding]::new($false))
+}
 if ($Archetype -and -not $isHistoricalTerminalFixture) {
   $settingsPath = Join-Path $stagedFixture "settings.lua"
   if (-not (Test-Path -LiteralPath $settingsPath -PathType Leaf)) {
@@ -433,6 +479,7 @@ if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $is
   throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode. Temporary root: $root"
 }
 $createText = Get-Content -Raw -LiteralPath $log
+if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $createText -Stage source }
 if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete$archetypeSuffix")) {
   $sourceInitArgs = $nativeBaseArgs + @(
     "--start-server", $save, "--until-tick", "1"
@@ -451,17 +498,32 @@ if (-not $createText.Contains($sourceMarker)) {
 $createEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-create.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 
-Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
-Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
-foreach ($sourceModName in $sourceOnlyModNames) {
-  $sourcePath = Join-Path $mods $sourceModName
-  $resolvedSourcePath = (Resolve-Path -LiteralPath $sourcePath).Path
-  if (-not $resolvedSourcePath.StartsWith($mods, [StringComparison]::OrdinalIgnoreCase)) {
-    throw "Refusing to remove source-only fixture outside temporary mod directory: $resolvedSourcePath"
+if ($SpaceIsFake) {
+  $sifSourceTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
+  $script:sifLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $root 'candidate-profile') -Dependencies $sifInputs -Archive $to -ExpectedSha256 $sifTarget[0].archive_sha256 -Version $ToVersion -Role candidate
+  $script:sifLeases+=,$script:sifLease
+  $mods=$script:sifLease.record.stage_directory
+  $nextFixture=Join-Path $mods $fixtureDirectoryName
+  foreach ($movePath in @($stagedFixture,$nextFixture)) {
+    if (-not (Test-MIR441PathContained -Root $root -Path ([IO.Path]::GetFullPath($movePath)))) { throw '[mir421-sif-fixture-move-boundary]' }
   }
-  Remove-Item -LiteralPath $resolvedSourcePath -Recurse -Force
+  Move-Item -LiteralPath $stagedFixture -Destination $nextFixture
+  $stagedFixture=$nextFixture
+  $modListPath=Join-Path $mods 'mod-list.json'
+} else {
+  Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
+  Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
+  foreach ($sourceModName in $sourceOnlyModNames) {
+    $sourcePath = Join-Path $mods $sourceModName
+    $resolvedSourcePath = (Resolve-Path -LiteralPath $sourcePath).Path
+    if (-not $resolvedSourcePath.StartsWith($mods, [StringComparison]::OrdinalIgnoreCase)) {
+      throw "Refusing to remove source-only fixture outside temporary mod directory: $resolvedSourcePath"
+    }
+    Remove-Item -LiteralPath $resolvedSourcePath -Recurse -Force
+  }
 }
-Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc
+Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames $persistentModNames
+$nativeBaseArgs=@('--config',$config,'--no-log-rotation','--mod-directory',$mods)
 
 $requiresReloadProof = $FixtureName -in @(
   "assert-upgrade-3-2-11-to-4-0-21000",
@@ -509,6 +571,7 @@ $loadExitCode = if ($requiresReloadProof) {
 }
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
 $loadText = Get-Content -Raw -LiteralPath $log
+if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $loadText -Stage upgrade }
 $loadMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
 if (-not $loadText.Contains($loadMarker)) {
   throw "MIR $ToVersion upgrade proof marker is missing: $loadMarker. Temporary root: $root"
@@ -544,6 +607,7 @@ if ($requiresReloadProof) {
   } else { Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
+  if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $reloadText -Stage reload }
   if (-not $reloadText.Contains($reloadMarker)) {
     throw "MIR $ToVersion upgraded-save reload proof marker is missing: $reloadMarker. Temporary root: $root"
   }
@@ -561,6 +625,7 @@ if ($requiresReloadProof) {
     throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
   }
   $secondReloadText = Get-Content -Raw -LiteralPath $log
+  if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $secondReloadText -Stage reload }
   if (-not $secondReloadText.Contains($reloadMarker)) {
     throw "MIR $ToVersion upgraded-save second-reload proof marker is missing: $reloadMarker. Temporary root: $root"
   }
@@ -651,6 +716,11 @@ $resourceEvidence=@(foreach ($resourceRun in $script:upgradeResourceRuns) {
   Copy-Item -LiteralPath $resourceRun.ledger -Destination $resourcePath
   [ordered]@{filename=(Split-Path -Leaf $resourcePath);sha256=(Get-FileHash -LiteralPath $resourcePath -Algorithm SHA256).Hash;exit_code=$resourceRun.exit_code;completion_predicate_observed=$resourceRun.completion_predicate_observed;peak_working_set_bytes=$resourceRun.peak_working_set_bytes;duration_seconds=$resourceRun.duration_seconds}
 })
+if ($SpaceIsFake) {
+  if (-not $requiresReloadProof -or -not $reloadEvidence -or -not $secondReloadEvidence) { throw '[mir421-sif-two-reloads-required]' }
+  $sifTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
+  $assertions=@($assertions | Where-Object { $_ -cne 'base-only-mod-set-retained' }) + @('space-is-fake-mod-set-retained','SIF-01-final-level-seven-science-and-finite-anchors','SIF-01-earned-levels-and-native-rewards-retained')
+}
 $result = [ordered]@{
   schema = 2
   status = "passed"
@@ -679,11 +749,24 @@ if ($secondReloadEvidence) {
   $result.second_reload_log = (Split-Path -Leaf $secondReloadEvidence)
   $result.second_reload_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $secondReloadEvidence).Hash
 }
+if ($SpaceIsFake) {
+  $result.native_scenario='SIF-01-published-4.2.0-to-4.2.1'
+  $result.published_maintenance_predecessor=$sifPublishedInputs
+  $result.dependency_inputs=$sifTerminal
+  $result.source_inputs=$sifSourceTerminal
+  $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Algorithm SHA256).Hash
+}
 $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 
 $runSucceeded = $true
 Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof ($artifactSlug): $output"
 } finally {
+  foreach ($lease in $script:sifLeases) {
+    if (-not $lease.closed) {
+      try { $null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed }
+      finally { Close-MIRImmutableInputLeaseHandles -Lease $lease }
+    }
+  }
   $retained = $Retention -eq 'Always' -or (-not $runSucceeded -and $Retention -eq 'OnFailure')
   $fileCount = 0
   [int64]$bytes = 0
