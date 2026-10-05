@@ -217,6 +217,18 @@ try {
     $candidateProfileLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $context.root 'candidate-profile') -Dependencies @($archiveInput) -Archive $candidateArchive -ExpectedSha256 (Get-MIRImmutableInputSha256 $candidateArchive) -Version '4.2.20001' -Role candidate
     Assert-Probe (@($candidateProfileLease.record.inputs | Where-Object staging_mode -CNE 'hardlink').Count -eq 0) 'candidate profile copied an archive.'
     Assert-Probe (-not (Test-Path -LiteralPath (Join-Path $candidateProfileLease.record.stage_directory 'more-infinite-research_4.2.20000.zip'))) 'candidate profile retained the obsolete MIR version.'
+    $sourceMods=$sourceProfileLease.record.stage_directory;$targetMods=$candidateProfileLease.record.stage_directory
+    New-Item -ItemType Directory -Path (Join-Path $sourceMods 'controlled-fixture') | Out-Null
+    [IO.File]::WriteAllText((Join-Path $sourceMods 'controlled-fixture/control.lua'),'controlled fixture')
+    $settingsPath=Join-Path $sourceMods 'mod-settings.dat'
+    [IO.File]::WriteAllBytes($settingsPath,[byte[]](1,2,3,4))
+    $settingsHash=Get-MIRImmutableInputSha256 $settingsPath
+    Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'
+    Assert-Probe ((Get-MIRImmutableInputSha256 (Join-Path $targetMods 'mod-settings.dat')) -ceq $settingsHash -and -not (Test-Path -LiteralPath $settingsPath)) 'profile switch lost or duplicated writable settings.'
+    Assert-Probe (Test-Path -LiteralPath (Join-Path $targetMods 'controlled-fixture/control.lua')) 'profile switch lost the specialized fixture.'
+    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName '../outside'} 'move-boundary'
+    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $fixture -FixtureName 'controlled-fixture'} 'move-boundary'
+    Refuses-Probe {Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $context.root -SourceMods $sourceMods -TargetMods $targetMods -FixtureName 'controlled-fixture'} 'state-collision'
     $null=Complete-MIRImmutableInputLease -Lease $candidateProfileLease -Outcome passed
     $sourceProfileLease.record.outcome='failed'
     Refuses-Probe {Get-MIR421SpaceFakeUpgradeAliasBytes -Lease $sourceProfileLease} 'completed passed'

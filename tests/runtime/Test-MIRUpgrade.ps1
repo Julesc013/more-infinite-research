@@ -502,13 +502,10 @@ if ($SpaceIsFake) {
   $sifSourceTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
   $script:sifLease=New-MIR421SpaceFakeUpgradeProfile -RunRoot (Join-Path $root 'candidate-profile') -Dependencies $sifInputs -Archive $to -ExpectedSha256 $sifTarget[0].archive_sha256 -Version $ToVersion -Role candidate
   $script:sifLeases+=,$script:sifLease
+  $sourceMods=$mods
   $mods=$script:sifLease.record.stage_directory
-  $nextFixture=Join-Path $mods $fixtureDirectoryName
-  foreach ($movePath in @($stagedFixture,$nextFixture)) {
-    if (-not (Test-MIR441PathContained -Root $root -Path ([IO.Path]::GetFullPath($movePath)))) { throw '[mir421-sif-fixture-move-boundary]' }
-  }
-  Move-Item -LiteralPath $stagedFixture -Destination $nextFixture
-  $stagedFixture=$nextFixture
+  Move-MIR421SpaceFakeUpgradeProfileState -RunRoot $root -SourceMods $sourceMods -TargetMods $mods -FixtureName $fixtureDirectoryName
+  $stagedFixture=Join-Path $mods $fixtureDirectoryName
   $modListPath=Join-Path $mods 'mod-list.json'
 } else {
   Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force

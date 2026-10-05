@@ -55,6 +55,25 @@ function New-MIR421SpaceFakeUpgradeProfile {
   return New-MIRImmutableInputLease -RunRoot $RunRoot -StageDirectory (Join-Path $RunRoot 'mods') -Inputs @($Dependencies+$input) -RequireHardLinks
 }
 
+function Move-MIR421SpaceFakeUpgradeProfileState {
+  param([Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][string]$SourceMods,
+    [Parameter(Mandatory)][string]$TargetMods,[Parameter(Mandatory)][string]$FixtureName)
+  if ($FixtureName -cnotmatch '^[A-Za-z0-9_-]+$') { throw '[mir421-sif-fixture-move-boundary]' }
+  foreach ($name in @($FixtureName,'mod-settings.dat')) {
+    $source=Join-Path $SourceMods $name
+    $target=Join-Path $TargetMods $name
+    foreach ($path in @($source,$target)) {
+      if (-not (Test-MIR441PathContained -Root $RunRoot -Path ([IO.Path]::GetFullPath($path)))) { throw '[mir421-sif-fixture-move-boundary]' }
+    }
+    if (Test-Path -LiteralPath $target) { throw '[mir421-sif-profile-state-collision]' }
+    if (-not (Test-Path -LiteralPath $source)) {
+      if ($name -ceq $FixtureName) { throw '[mir421-sif-fixture-missing]' }
+      continue
+    }
+    Move-Item -LiteralPath $source -Destination $target
+  }
+}
+
 function Assert-MIR421SpaceFakeUpgradeMarker {
   param([string]$Text,[ValidateSet('source','upgrade','reload')][string]$Stage)
   $marker=[regex]::Escape("[mir-fixture] SIF-01 native continuations verified stage=$Stage")
