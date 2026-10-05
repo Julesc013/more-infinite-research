@@ -218,7 +218,7 @@ try {
   $mods = Join-Path $runRoot 'mods'
   [IO.Directory]::CreateDirectory($mods) | Out-Null
   [IO.Directory]::CreateDirectory((Join-Path $runRoot 'saves')) | Out-Null
-  $lease = New-MIRImmutableInputLease -RunRoot $runRoot -StageDirectory $mods -Inputs $inputs
+  $lease = New-MIRImmutableInputLease -RunRoot $runRoot -StageDirectory $mods -Inputs $inputs -RequireHardLinks
   $fixtureArchive = Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name ([string]$fixtureInfo.name) -Version ([string]$fixtureInfo.version) -ModsDir $mods
   Assert-K2213ArchiveIdentity -Path $fixtureArchive -ExpectedName ([string]$fixtureInfo.name) -ExpectedVersion ([string]$fixtureInfo.version) -ExpectedSha256 (Get-K2213Sha256 $fixtureArchive)
   # V5's exact current K2SO lock includes the four bundled Space Age modules.

@@ -31,7 +31,7 @@ function Resolve-MIR421SpaceFakeUpgradeInputs {
   })
 }
 
-function Get-MIR421SpaceFakeUpgradeAliasBytes {
+function Get-MIRUpgradeLinkedArchiveBytes {
   param([Parameter(Mandatory)]$Lease)
   [int64]$bytes = 0
   if (-not $Lease.record.require_hard_links) { throw '[mir421-sif-dependency-lease]' }
@@ -44,34 +44,36 @@ function Get-MIR421SpaceFakeUpgradeAliasBytes {
   return $bytes
 }
 
-function New-MIR421SpaceFakeUpgradeProfile {
-  param([Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][object[]]$Dependencies,
+function New-MIRUpgradeLinkedProfile {
+  param([Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Dependencies,
     [Parameter(Mandatory)][string]$Archive,[Parameter(Mandatory)][string]$ExpectedSha256,
-    [Parameter(Mandatory)][string]$Version,[ValidateSet('source','candidate')][string]$Role)
+    [Parameter(Mandatory)][string]$Version,[ValidateSet('source','candidate')][string]$Role,[string]$Request='native-upgrade')
   $input=[ordered]@{source_path=$Archive;file_name=[IO.Path]::GetFileName($Archive);expected_sha256=$ExpectedSha256;
     immutable=$true;role=$Role;identity=[ordered]@{name='more-infinite-research';version=$Version};
-    provenance=[ordered]@{kind='manifest-authenticated-upgrade-input';request='SIF-01'}}
+    provenance=[ordered]@{kind='verified-upgrade-archive-input';request=$Request}}
   New-Item -ItemType Directory -Path $RunRoot -ErrorAction Stop | Out-Null
   return New-MIRImmutableInputLease -RunRoot $RunRoot -StageDirectory (Join-Path $RunRoot 'mods') -Inputs @($Dependencies+$input) -RequireHardLinks
 }
 
-function Move-MIR421SpaceFakeUpgradeProfileState {
+function Move-MIRUpgradeProfileState {
   param([Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][string]$SourceMods,
     [Parameter(Mandatory)][string]$TargetMods,[Parameter(Mandatory)][string]$FixtureName)
-  if ($FixtureName -cnotmatch '^[A-Za-z0-9_-]+$') { throw '[mir421-sif-fixture-move-boundary]' }
+  if ($FixtureName -cnotmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') { throw '[mir421-sif-fixture-move-boundary]' }
+  $moves=@()
   foreach ($name in @($FixtureName,'mod-settings.dat')) {
     $source=Join-Path $SourceMods $name
     $target=Join-Path $TargetMods $name
     foreach ($path in @($source,$target)) {
       if (-not (Test-MIR441PathContained -Root $RunRoot -Path ([IO.Path]::GetFullPath($path)))) { throw '[mir421-sif-fixture-move-boundary]' }
     }
-    if (Test-Path -LiteralPath $target) { throw '[mir421-sif-profile-state-collision]' }
     if (-not (Test-Path -LiteralPath $source)) {
       if ($name -ceq $FixtureName) { throw '[mir421-sif-fixture-missing]' }
       continue
     }
-    Move-Item -LiteralPath $source -Destination $target
+    if (Test-Path -LiteralPath $target) { throw '[mir421-sif-profile-state-collision]' }
+    $moves += [pscustomobject]@{source=$source;target=$target}
   }
+  foreach ($move in $moves) { Move-Item -LiteralPath $move.source -Destination $move.target }
 }
 
 function Assert-MIR421SpaceFakeUpgradeMarker {

@@ -32,7 +32,9 @@ if(-not $manifestPath){
 $manifest=Get-Content -Raw $manifestPath|ConvertFrom-Json -Depth 100
 $assertions=0
 foreach($row in $manifest.targets){
-  $zip=Join-Path (Split-Path $manifestPath -Parent) $row.filename
+  $construction=$manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2')
+  $relative=if($construction){$row.asset.path}else{$row.filename}
+  $zip=Join-Path (Split-Path $manifestPath -Parent) $relative
   $version=Resolve-MIRUpgradeManifestVersion -ManifestPath $manifestPath -CandidatePath $zip -Target $row.target
   if($version -cne $row.distribution_version){throw 'Actual manifest-selected package version differs'}
   $assertions++
@@ -104,4 +106,4 @@ foreach($case in $historicalCases){
   }
 }
 # This metadata-only ZIP is controlled test input, never a release package.
-[pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;selected_targets=9;actual_hotfix_archives=[bool]$SelectedManifestPath;future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+[pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

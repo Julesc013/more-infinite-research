@@ -1,0 +1,96 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0088",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Stage selected native mod profiles through shared archives without copy fallback.",
+  "details": [
+    "Upgrade tests and twelve existing Bob/Angel and K2 native lease consumers now require verified hard links. Link failures refuse staging instead of copying dependency archives; writable settings and fixture state remain separate.",
+    "The compatibility audit defaults to Hardlink and rejects Copy/Symlink. Its MIR input must be an existing materialized ZIP; raw repository copying is retired. Matching aliases are verified, and missing or mismatched inputs fail before engine use.",
+    "Storage guidance records manifest-based profiles and affected regression selection. Historical interface and native records remain bound to their original source; no current gameplay qualification is claimed."
+  ],
+  "semantic_domains": [
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Changes native upgrade archive staging for this target; no new gameplay pass."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "changed",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/maintainer/artifact-retention.md"
+    },
+    {
+      "kind": "finding",
+      "value": "Shared archive staging: tests/tooling/Test-MIRNativeProbeResources.ps1"
+    }
+  ]
+}

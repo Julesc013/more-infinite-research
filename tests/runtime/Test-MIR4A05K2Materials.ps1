@@ -84,7 +84,7 @@ function Invoke-A05K2Case([string]$Id,[string]$K2SO,[string]$K2SOHash,[bool]$Inc
     }
     $candidateHash=Get-A05K2Sha $candidate
     $inputRecords += [ordered]@{source_path=$candidate;file_name=(Split-Path -Leaf $candidate);expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{target='f210';sha256=$candidateHash};provenance=[ordered]@{kind=if([string]::IsNullOrWhiteSpace($suppliedCandidate)){'fresh-target-materializer'}else{'supplied-candidate-verified-against-fresh-materialization'};path=$candidate;materialized_candidate_sha256=$materializedCandidateSha256};immutable=$true}
-    $inputLease=New-MIRImmutableInputLease -RunRoot $root -StageDirectory $mods -Inputs $inputRecords
+    $inputLease=New-MIRImmutableInputLease -RunRoot $root -StageDirectory $mods -Inputs $inputRecords -RequireHardLinks
     $fixture=Publish-MIRModDirectoryArchive -Source (Join-Path $repo 'fixtures/assert-k2-materials') -Name 'mir-fixture-assert-k2-materials' -Version '0.1.0' -ModsDir $mods
     $enabled=@('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','mir-validation-settings-overrides','more-infinite-research');if($IncludeXy){$enabled+='xy-k2so-enhancements-nulls-fork'};$enabled+='mir-fixture-assert-k2-materials';$list=[ordered]@{mods=@($enabled|ForEach-Object{[ordered]@{name=$_;enabled=$true}})};[IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),(($list|ConvertTo-Json -Depth 10)+"`n"),[Text.UTF8Encoding]::new($false))
     $settings=Join-Path $lockedSource 'mod-settings.dat'

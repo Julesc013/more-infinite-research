@@ -1,4 +1,10 @@
 $ErrorActionPreference = "Stop"
+$mirCompatIdentityModule=New-Module -Name MIRCompatInputIdentity -ArgumentList (Join-Path $PSScriptRoot '../validation/ImmutableInputStaging.ps1') -ScriptBlock {
+  param($Path)
+  . $Path
+  Export-ModuleMember -Function Get-MIRImmutableInputSha256,Get-MIRImmutableInputFileIdentity
+}
+Import-Module $mirCompatIdentityModule -Force
 
 function New-MIRCompatUserDataDir {
   param([Parameter(Mandatory)][string]$Root)
@@ -65,47 +71,13 @@ function Copy-MIRModUnderTest {
     [string]$ZipPath = ""
   )
 
-  if (-not [string]::IsNullOrWhiteSpace($ZipPath)) {
-    $resolvedZip = (Resolve-Path -LiteralPath $ZipPath).Path
-    if ([System.IO.Path]::GetExtension($resolvedZip) -ne ".zip") {
-      throw "MIR mod-under-test archive must be a zip: $resolvedZip"
-    }
-    $zipTarget = Join-Path $ModsDir ([System.IO.Path]::GetFileName($resolvedZip))
-    Copy-Item -LiteralPath $resolvedZip -Destination $zipTarget -Force
-    return $zipTarget
-  }
-
-  $target = Join-Path $ModsDir "more-infinite-research"
-  if (Test-Path -LiteralPath $target) {
-    Remove-Item -LiteralPath $target -Recurse -Force
-  }
-
-  $exclude = @(
-    ".codex",
-    ".git",
-    ".github",
-    ".mir",
-    "AGENTS.md",
-    "CONTRIBUTING.md",
-    "artifacts",
-    "build",
-    "dist",
-    "docs",
-    "fixtures",
-    "scripts",
-    "tests",
-    "tmp",
-    "TODO.md",
-    "tools"
-  )
-  New-Item -ItemType Directory -Path $target | Out-Null
-  Get-ChildItem -LiteralPath $RepoRoot -Force | Where-Object {
-    $exclude -notcontains $_.Name
-  } | ForEach-Object {
-    Copy-Item -LiteralPath $_.FullName -Destination $target -Recurse -Force
-  }
-
-  return $target
+  if ([string]::IsNullOrWhiteSpace($ZipPath)) { throw '[mir-compat-package-required] Supply the existing materialized MIR ZIP.' }
+  $resolvedZip=(Resolve-Path -LiteralPath $ZipPath).Path
+  $fileName=[IO.Path]::GetFileName($resolvedZip)
+  Copy-MIRCachedModZips -CacheDir (Split-Path -Parent $resolvedZip) -ModsDir $ModsDir -LockEntries @(
+    [pscustomobject]@{file_name=$fileName;source_path=$resolvedZip;sha256=Get-MIRImmutableInputSha256 -Path $resolvedZip}
+  ) -LinkMode Hardlink
+  return Join-Path $ModsDir $fileName
 }
 
 function Copy-MIRCachedModZips {
@@ -113,45 +85,11 @@ function Copy-MIRCachedModZips {
     [Parameter(Mandatory)][string]$CacheDir,
     [Parameter(Mandatory)][string]$ModsDir,
     [object[]]$LockEntries = @(),
-    [ValidateSet("Copy", "Hardlink", "Symlink")]
-    [string]$LinkMode = "Copy"
+    [ValidateSet("Hardlink")]
+    [string]$LinkMode = "Hardlink"
   )
-
-  function Copy-MIRZipIntoScenario {
-    param(
-      [Parameter(Mandatory)][string]$Source,
-      [Parameter(Mandatory)][string]$Target,
-      [ValidateSet("Copy", "Hardlink", "Symlink")]
-      [string]$Mode
-    )
-
-    if (Test-Path -LiteralPath $Target) { return }
-
-    if ($Mode -eq "Hardlink") {
-      $sourceRoot = [System.IO.Path]::GetPathRoot((Resolve-Path -LiteralPath $Source).Path)
-      $targetRoot = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Target))
-      if ($sourceRoot -eq $targetRoot) {
-        try {
-          New-Item -ItemType HardLink -Path $Target -Target $Source -ErrorAction Stop | Out-Null
-          return
-        } catch {
-          # Fall back to copy when the filesystem refuses a hardlink.
-        }
-      }
-    } elseif ($Mode -eq "Symlink") {
-      try {
-        New-Item -ItemType SymbolicLink -Path $Target -Target $Source -ErrorAction Stop | Out-Null
-        return
-      } catch {
-        # Fall back to copy when symlink creation is unavailable.
-      }
-    }
-
-    Copy-Item -LiteralPath $Source -Destination $Target -Force
-  }
-
   foreach ($entry in $LockEntries) {
-    if (-not $entry.file_name) { continue }
+    if ([string]$entry.file_name -cnotmatch '^[A-Za-z0-9][A-Za-z0-9._-]*[.]zip$') { throw '[mir-compat-archive-name]' }
     $sourcePath = ""
     $sourcePathProperty = $entry.PSObject.Properties["source_path"]
     if ($null -ne $sourcePathProperty) {
@@ -162,9 +100,20 @@ function Copy-MIRCachedModZips {
     } else {
       Join-Path $CacheDir ([string]$entry.file_name)
     }
-    if (Test-Path -LiteralPath $source) {
-      Copy-MIRZipIntoScenario -Source $source -Target (Join-Path $ModsDir ([string]$entry.file_name)) -Mode $LinkMode
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "[mir-compat-archive-missing] $($entry.file_name)" }
+    $source=(Resolve-Path -LiteralPath $source).Path
+    if (((Get-Item -LiteralPath $source -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw '[mir-compat-archive-reparse]' }
+    $expected=Get-MIRImmutableInputSha256 -Path $source
+    $hashProperty=$entry.PSObject.Properties['sha256']
+    if ($null -ne $hashProperty -and [string]$hashProperty.Value -cne $expected) { throw '[mir-compat-archive-hash]' }
+    $target=Join-Path $ModsDir ([string]$entry.file_name)
+    if ((Test-Path -LiteralPath $target) -and ((Get-Item -LiteralPath $target -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw '[mir-compat-archive-reparse]' }
+    if (-not (Test-Path -LiteralPath $target)) {
+      # A failed link refuses the scenario. Never copy a dependency archive.
+      New-Item -ItemType HardLink -Path $target -Target $source -ErrorAction Stop | Out-Null
     }
+    if ((Get-MIRImmutableInputFileIdentity -Path $source) -cne (Get-MIRImmutableInputFileIdentity -Path $target) -or
+        (Get-MIRImmutableInputSha256 -Path $target) -cne $expected) { throw '[mir-compat-archive-alias]' }
   }
 }
 

@@ -178,7 +178,7 @@ Ages are measured against the newest governed review date, 2026-10-05, so checko
 | docs/maintainer/adding-a-family-rule.md | current | 2026-07-12 | 85 | current-window |
 | docs/maintainer/adding-a-generated-stream.md | current | 2026-07-07 | 90 | current-window |
 | docs/maintainer/adding-a-policy-overlay.md | current | 2026-07-07 | 90 | current-window |
-| docs/maintainer/artifact-retention.md | current | 2026-10-04 | 1 | current-window |
+| docs/maintainer/artifact-retention.md | current | 2026-10-05 | 0 | current-window |
 | docs/maintainer/backport-reconstruction.md | current | 2026-08-08 | 58 | current-window |
 | docs/maintainer/backporting.md | current | 2026-08-17 | 49 | current-window |
 | docs/maintainer/build-and-package.md | current | 2026-07-20 | 77 | current-window |

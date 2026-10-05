@@ -155,7 +155,7 @@ function Initialize-K2MigrationStage([string]$Name,[string]$Role,[string]$Versio
   $candidatePath = if ($Role -ceq 'predecessor') { $oldCandidate } else { $newCandidate }
   $candidateHash = if ($Role -ceq 'predecessor') { $oldCandidateSha } else { $newCandidateSha }
   $inputList += [ordered]@{source_path=$candidatePath;file_name=$candidateName;expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21000';role=$Role};provenance=[ordered]@{kind='pinned-K2-Imersite-migration-candidate';sha256=$candidateHash};immutable=$true}
-  $lease = New-MIRImmutableInputLease -RunRoot $StageDirectory -StageDirectory $mods -Inputs $inputList
+  $lease = New-MIRImmutableInputLease -RunRoot $StageDirectory -StageDirectory $mods -Inputs $inputList -RequireHardLinks
   # Factorio writes mod-settings.dat during load. Copy the pinned initial
   # profile as writable stage state; never hardlink or mark it immutable.
   $stagedSettings = Join-Path $mods 'mod-settings.dat'
