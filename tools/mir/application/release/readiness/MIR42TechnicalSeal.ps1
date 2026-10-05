@@ -732,10 +732,21 @@ function Get-MIR42ExternalT16LedgerTrustRoot {
   return [pscustomobject][ordered]@{path=$trust.path;sha256=$trust.sha256;record=$record;operator=$operator;verifier=$verifier;protected_root=$protectedRoot;immutable_anchor=$immutableAnchor;acl_contract=$AclContract}
 }
 
+function Get-MIR42SealCandidateConstructionVersionContract {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Manifest)
+  $contract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $RepoRoot -Manifest $Manifest
+  if (-not (Test-MIR4BootstrapRecordHash -Record $Manifest)) { throw '[mir42-seal-candidate-record-hash]' }
+  if (-not ($Manifest | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile ([string]$contract.schema_path) -ErrorAction SilentlyContinue)) {
+    throw '[mir42-seal-candidate-manifest-schema]'
+  }
+  return $contract
+}
+
 function Get-MIR42ExactFourTargetCandidate {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$CandidateManifestPath)
   $candidateInput = Read-MIR42SealRecord -Path $CandidateManifestPath -Code 'mir42-seal-candidate'
   $candidate = $candidateInput.record
+  $versionContract = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $RepoRoot -Manifest $candidate
   if ($candidate.PSObject.Properties.Name -notcontains 'target_authority') { throw '[mir42-seal-candidate-target-authority-missing]' }
   $targetScope = Get-MIR42SealCandidateTargetScope -Rows @($candidate.targets) -Code 'mir42-seal-candidate-targets'
   $authorityScope = Get-MIR42SealCandidateTargetScope -Rows @($candidate.target_authority) -Code 'mir42-seal-candidate-target-authority'
@@ -744,7 +755,7 @@ function Get-MIR42ExactFourTargetCandidate {
   } else {
     'private-deterministic-nine-target-candidate-built-unqualified'
   }
-  if ([string]$candidate.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
+  if ([string]$candidate.kind -cne [string]$versionContract.manifest_kind -or
       $authorityScope -cne $targetScope -or [string]$candidate.status -cne $expectedStatus -or
       -not [bool]$candidate.build_complete -or
       [string]$candidate.qualification -cne 'not-performed' -or
@@ -778,7 +789,7 @@ function Get-MIR42ExactFourTargetCandidate {
     if ([int]$row.schema -ne 1 -or [string]$row.kind -cne 'MIR42FourTargetCandidateRowV1') {
       throw "[mir42-seal-candidate-target-row-schema] $([string]$target.target)"
     }
-    $expected = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target ([string]$target.target)
+    $expected = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target ([string]$target.target) -SourceVersion ([string]$versionContract.source_version)
     $authorityRow = @($candidate.target_authority | Where-Object { [string]$_.target -ceq [string]$target.target })
     if ($authorityRow.Count -ne 1) { throw "[mir42-seal-candidate-target-authority-binding] $([string]$target.target)" }
     foreach ($field in @('target','target_id','source_version','distribution_version')) {
@@ -814,6 +825,7 @@ function Get-MIR42ExactFourTargetCandidate {
       if ($row.source.PSObject.Properties.Name -notcontains $field) { throw "[mir42-seal-candidate-target-row-source-field] $([string]$target.target)/$field" }
     }
     if ([string]$row.target -cne [string]$target.target -or
+        [string]$row.source_version -cne [string]$versionContract.source_version -or
         [string]$row.distribution_version -cne [string]$target.distribution_version -or
         [string]$row.asset.sha256 -cne [string]$target.asset.sha256 -or
         [string]$row.content_sha256 -cne [string]$target.content_sha256 -or

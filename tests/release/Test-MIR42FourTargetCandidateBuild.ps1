@@ -21,6 +21,7 @@ $engineDestinationAssertions=0
 $maintenanceCustodyAssertions=0
 $maintenanceEvidenceAssertions=0
 $maintenanceIndependentAssertions=0
+$sealCandidateContractAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 
@@ -72,6 +73,7 @@ function New-MIR4TargetPackage {
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1')
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1')
+. (Join-Path $repo 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
 
 function Test-MIR42IndependentConstructionInput {
   param([Parameter(Mandatory)][string]$CandidateRoot,[Parameter(Mandatory)][object[]]$Inputs)
@@ -251,6 +253,9 @@ try {
   New-Item -ItemType Directory -Force -Path $schemaRoot | Out-Null
   $schemaComplete = Write-MIR42FourTargetManifest -OutputRoot $schemaRoot -Preflight $schemaPreflight -Rows $schemaRows -Failures @()
   Assert-MIR42CandidateBuildTest ($schemaComplete.schema -eq 2 -and $schemaComplete.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV2' -and (Test-MIR4BootstrapRecordHash -Record $schemaComplete)) 'patch-v2-manifest-writer-and-record-hash'
+  $sealVersion=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $schemaComplete
+  Assert-MIR42CandidateBuildTest ($sealVersion.source_version-ceq'4.2.1'-and$sealVersion.requires_nine_targets) 'seal-reader-selects-v2-nine-target-contract-without-qualification'
+  $sealCandidateContractAssertions++
   $engineFixturePath=Join-Path $schemaRoot 'candidate-manifest.json'
   $engineVersion=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath
   Assert-MIR42CandidateBuildTest ($engineVersion.source_version-ceq'4.2.1'-and$engineVersion.nine_targets-and-not$engineVersion.four_targets-and@($engineVersion.targets).Count-eq9) 'native-runner-reads-v2-nine-target-envelope-without-execution'
@@ -262,6 +267,10 @@ try {
   try{Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath|Out-Null}catch{$rejected=$_.Exception.Message-eq'[mir42-engine-candidate-manifest-invalid]'}
   Assert-MIR42CandidateBuildTest $rejected 'native-runner-refuses-valid-schema-with-invalid-record-hash'
   $engineEnvelopeAssertions++
+  $rejected=$false
+  try{Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $badHash|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-seal-candidate-record-hash]'}
+  Assert-MIR42CandidateBuildTest $rejected 'seal-reader-refuses-invalid-construction-record-hash'
+  $sealCandidateContractAssertions++
   $schemaPartial = Write-MIR42FourTargetManifest -OutputRoot $schemaRoot -Preflight $schemaPreflight -Rows @($schemaRows[0]) -Failures @([ordered]@{target='f200';message='schema-fixture-only'})
   Assert-MIR42CandidateBuildTest (-not $schemaPartial.build_complete -and $schemaPartial.status -ceq 'private-deterministic-nine-target-candidate-partial') 'patch-partial-manifest-preserves-complete-authority'
   $rejected=$false
@@ -297,6 +306,10 @@ try {
     try{Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $engineFixturePath|Out-Null}catch{$rejected=$_.Exception.Message-eq'[mir42-engine-candidate-manifest-schema]'}
     Assert-MIR42CandidateBuildTest $rejected "native-runner-refuses-self-hashed-$($case.Key)"
     $engineEnvelopeAssertions++
+    $rejected=$false
+    try{Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $invalid|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-seal-candidate-manifest-schema]'}
+    Assert-MIR42CandidateBuildTest $rejected "seal-reader-refuses-self-hashed-$($case.Key)"
+    $sealCandidateContractAssertions++
   }
   $invalidPartial = $schemaPartial | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
   $duplicatePartialRow = $invalidPartial.targets[0] | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
@@ -318,6 +331,9 @@ try {
     Assert-MIR42CandidateBuildTest ($legacyFixture.schema-eq1-and$legacyEngine.source_version-ceq'4.2.0'-and
       $legacyEngine.four_targets-eq($legacyCount-eq4)-and$legacyEngine.nine_targets-eq($legacyCount-eq9)) "native-runner-preserves-v1-$legacyCount-target-envelope"
     $engineEnvelopeAssertions++
+    $legacySealVersion=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $legacyFixture
+    Assert-MIR42CandidateBuildTest ($legacySealVersion.source_version-ceq'4.2.0'-and-not$legacySealVersion.requires_nine_targets) "seal-reader-preserves-v1-$legacyCount-target-schema"
+    $sealCandidateContractAssertions++
   }
   # Exercise the runner's actual selection statements without its native CLI.
   $engineStatements=@($engineAst.EndBlock.Statements)
@@ -481,7 +497,7 @@ try {
     }
   }
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 
@@ -572,6 +588,10 @@ try {
     }
     $patchInputs = @(Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath (Join-Path $patchRoot 'candidate-manifest.json'))
     $legacyInputs = @(Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath (Join-Path $nineRoot 'candidate-manifest.json'))
+    $patchSealInputs=Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath (Join-Path $patchRoot 'candidate-manifest.json')
+    $legacySealInputs=Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath (Join-Path $nineRoot 'candidate-manifest.json')
+    Assert-MIR42CandidateBuildTest ($patchSealInputs.targets.Count-eq9-and$legacySealInputs.targets.Count-eq9-and
+      ($patchSealInputs.targets.distribution_version-join'|')-ceq($patchVersions-join'|')) 'seal-input-reader-binds-nine-constructed-v1-and-v2-archives-without-sealing'
     Assert-MIR42CandidateBuildTest ($patchInputs.Count -eq 9 -and @($patchInputs | Where-Object { $_.identity.source_version -cne '4.2.1' }).Count -eq 0) 'patch-nine-input-reader-uses-current-source-version'
     Assert-MIR42CandidateBuildTest ($legacyInputs.Count -eq 9 -and @($legacyInputs | Where-Object { $_.identity.source_version -cne '4.2.0' }).Count -eq 0) 'legacy-nine-input-reader-default-preserved'
     $tamperedRowPath = Join-Path $patchRoot 'target-rows/f210.json'
@@ -583,6 +603,10 @@ try {
       $rejected = $false
       try { Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath (Join-Path $patchRoot 'candidate-manifest.json') | Out-Null } catch { $rejected=$_.Exception.Message -match 'mir42-qualification-target-row-binding' }
       Assert-MIR42CandidateBuildTest $rejected "patch-input-reader-refuses-self-hashed-$tamper"
+      $rejected=$false
+      $expectedSealRefusal=if($tamper-ceq'source-version'){'[mir42-seal-candidate-target-row-drift] f210'}else{'[mir42-seal-candidate-target-row-schema] f210'}
+      try{Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath (Join-Path $patchRoot 'candidate-manifest.json')|Out-Null}catch{$rejected=$_.Exception.Message-ceq$expectedSealRefusal}
+      Assert-MIR42CandidateBuildTest $rejected "seal-input-reader-refuses-self-hashed-$tamper"
       [IO.File]::WriteAllBytes($tamperedRowPath, $originalRowBytes)
     }
   } finally {
