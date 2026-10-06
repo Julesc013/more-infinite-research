@@ -343,11 +343,14 @@ for _, subject in ipairs({
   {"research_material_nitric_acid", "angels-liquid-nitric-acid", "angel"},
   {"research_material_hydrochloric_acid", "angels-liquid-hydrochloric-acid", "angel"},
   {"research_material_hydrofluoric_acid", "angels-liquid-hydrofluoric-acid", "angel"},
-  {"research_material_glycerol", "angels-liquid-glycerol", "angel"}
+  {"research_material_glycerol", "angels-liquid-glycerol", "angel"},
+  {"research_material_py_acid_gas", "acidgas", "py"},
+  {"research_material_py_glycerol", "glycerol2", "py"}
 }) do
   local key, recipe_name = subject[1], subject[2]
   recipe_prototypes[recipe_name] = {maximum_productivity = 3}
   local attach = subject[3] == "angel" and progression.attach_angel_petrochem_continuation
+    or subject[3] == "py" and progression.attach_py_chemical_continuation
     or progression.attach_k2_material_continuation
   local family = attach(key, {max_level = 3})
   local early = {

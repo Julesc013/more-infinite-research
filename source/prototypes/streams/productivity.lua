@@ -794,6 +794,27 @@ for _, key in ipairs(material_progression.angel_petrochem_stream_keys()) do
   material_progression.attach_angel_petrochem_continuation(key, streams[key])
 end
 
+-- ECO-PY's two retained fluid subjects use exact source-observed producers.
+-- Matching a name is insufficient: final permission, typed productive
+-- output, complete process graph, ownership and reachable science still
+-- decide admission. In particular, seed/container/coproduct return routes
+-- receive no exception. Py samples and tree/bootstrap subjects stay separate.
+streams.research_material_py_acid_gas = material_family("acidgas", {
+  "dirty-acid", "tailings-dust", "oleochemicals-distilation",
+  "refsyngas-from-meth", "refsyngas-from-meth-canister", "acidgas-2", "acidgas",
+  "coalbed-gas-to-acidgas", "tholin-to-acidgas", "cadaveric-acidgas-01",
+  "cadaveric-arum-mk02-juicer", "cadaveric-arum-mk04-juicer", "pyrite-burn"
+}, {"pycoalprocessing", "pyfusionenergy", "pyhightech", "pypetroleumhandling", "pyalienlife", "pyrawores"}, nil, "fluid")
+streams.research_material_py_glycerol = material_family("glycerol", {
+  "oleochemicals", "glycerol2", "tholin-to-glycerol", "collagen-glycerol"
+}, {"pycoalprocessing", "pyhightech", "pypetroleumhandling", "pyrawores"}, nil, "fluid")
+for _, key in ipairs(material_progression.py_chemical_stream_keys()) do
+  -- Both retained fluid definitions belong to Py Coal Processing. UI
+  -- visibility alone cannot admit a same-named recipe from another mod.
+  streams[key].required_mods = {"pycoalprocessing"}
+  material_progression.attach_py_chemical_continuation(key, streams[key])
+end
+
 -- The additional Angel final routes in this batch have one exact F200
 -- combined-world observation. Keep every other F200 closure, and F210, on
 -- their established declarations until each has its own ordering and engine

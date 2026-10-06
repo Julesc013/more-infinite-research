@@ -60,6 +60,14 @@ local ANGEL_PETROCHEM_STREAM_KEYS = {
   "research_material_glycerol"
 }
 
+-- Py fluids have separate identities from the Angel subjects. Attachment
+-- extends an admitted early owner; it cannot authorize a recipe or a return
+-- path, nor does it qualify the retained biological/sample requests.
+local PY_CHEMICAL_STREAM_KEYS = {
+  "research_material_py_acid_gas",
+  "research_material_py_glycerol"
+}
+
 local MATERIAL_STREAM_KEY_SET = {}
 for _, key in ipairs(MATERIAL_STREAM_KEYS) do MATERIAL_STREAM_KEY_SET[key] = true end
 
@@ -75,6 +83,7 @@ end
 
 local STAGED_MATERIAL_STREAM_KEY_SET = {}
 local ANGEL_PETROCHEM_STREAM_KEY_SET = {}
+local PY_CHEMICAL_STREAM_KEY_SET = {}
 for key in pairs(MATERIAL_STREAM_KEY_SET) do STAGED_MATERIAL_STREAM_KEY_SET[key] = true end
 for key in pairs(K2_213_CONTINUATION_STREAM_KEY_SET) do
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
@@ -84,6 +93,10 @@ for key in pairs(K2_MATERIAL_CONTINUATION_STREAM_KEY_SET) do
 end
 for _, key in ipairs(ANGEL_PETROCHEM_STREAM_KEYS) do
   ANGEL_PETROCHEM_STREAM_KEY_SET[key] = true
+  STAGED_MATERIAL_STREAM_KEY_SET[key] = true
+end
+for _, key in ipairs(PY_CHEMICAL_STREAM_KEYS) do
+  PY_CHEMICAL_STREAM_KEY_SET[key] = true
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
 end
 
@@ -119,6 +132,12 @@ end
 function M.angel_petrochem_stream_keys()
   local out = {}
   for index, key in ipairs(ANGEL_PETROCHEM_STREAM_KEYS) do out[index] = key end
+  return out
+end
+
+function M.py_chemical_stream_keys()
+  local out = {}
+  for index, key in ipairs(PY_CHEMICAL_STREAM_KEYS) do out[index] = key end
   return out
 end
 
@@ -287,6 +306,13 @@ end
 function M.attach_angel_petrochem_continuation(key, spec)
   if not ANGEL_PETROCHEM_STREAM_KEY_SET[key] then
     error("Angel petrochem continuation does not support stream " .. tostring(key) .. ".", 2)
+  end
+  return attach(key, spec)
+end
+
+function M.attach_py_chemical_continuation(key, spec)
+  if not PY_CHEMICAL_STREAM_KEY_SET[key] then
+    error("Py chemical continuation does not support stream " .. tostring(key) .. ".", 2)
   end
   return attach(key, spec)
 end

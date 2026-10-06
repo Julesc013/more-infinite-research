@@ -535,5 +535,54 @@
     "No current native admission, emitted catalogue, earned production or save qualification for the conditional Angel Petrochem declarations.",
     "No Py gameplay, engine, finalized-prototype, permission, safety, progression, save, migration, or public-support claim.",
     "No distinct Py nitroglycerin subject in the selected exact source suite."
-  ]
+  ],
+  "py_chemical_implementation": {
+    "request_id": "ECO-PY",
+    "status": "conditional-current-source-declarations-native-admission-pending",
+    "stream_keys": [
+      "research_material_py_acid_gas",
+      "research_material_py_glycerol"
+    ],
+    "generated_technologies": [
+      "recipe-prod-research_material_py_acid_gas-1",
+      "recipe-prod-research_material_py_acid_gas-4",
+      "recipe-prod-research_material_py_glycerol-1",
+      "recipe-prod-research_material_py_glycerol-4"
+    ],
+    "productive_output_type": "fluid",
+    "early_levels": 3,
+    "effect_per_level": 0.02,
+    "continuation_first_level": 4,
+    "source_producers": {
+      "research_material_py_acid_gas": [
+        "dirty-acid",
+        "tailings-dust",
+        "oleochemicals-distilation",
+        "refsyngas-from-meth",
+        "refsyngas-from-meth-canister",
+        "acidgas-2",
+        "acidgas",
+        "coalbed-gas-to-acidgas",
+        "tholin-to-acidgas",
+        "cadaveric-acidgas-01",
+        "cadaveric-arum-mk02-juicer",
+        "cadaveric-arum-mk04-juicer",
+        "pyrite-burn"
+      ],
+      "research_material_py_glycerol": [
+        "oleochemicals",
+        "glycerol2",
+        "tholin-to-glycerol",
+        "collagen-glycerol"
+      ]
+    },
+    "route_permission_grants": false,
+    "route_certificate_exceptions": false,
+    "engine_qualification": false,
+    "public_support_authority": false,
+    "biology_sample_or_tree_qualification": false,
+    "required_mods": [
+      "pycoalprocessing"
+    ]
+  }
 }

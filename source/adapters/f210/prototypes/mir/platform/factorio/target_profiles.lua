@@ -68,7 +68,8 @@ local M = {
         productivity_family_adoption = true
       },
       supported_required_mods = {
-        "space-age"
+        "space-age",
+        "pycoalprocessing"
       },
       supported_effect_types = {
         "cargo-landing-pad-count",
@@ -155,7 +156,8 @@ local M = {
         productivity_family_adoption = false
       },
       supported_required_mods = {
-        "space-age"
+        "space-age",
+        "pycoalprocessing"
       },
       supported_effect_types = {
         "character-build-distance",

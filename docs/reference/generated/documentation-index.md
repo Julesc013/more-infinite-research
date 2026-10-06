@@ -221,7 +221,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/compiler-diagnostics.md | Compiler Diagnostic Codes | current | developer | reference | mir-maintainers | 2026-07-13 |
 | docs/reference/factorio-api-proof-points.md | API Proof Points | current | developer | reference | mir-maintainers | 2026-09-01 |
 | docs/reference/factorio-integration-reference.md | Factorio Integration Reference | current | developer | reference | mir-maintainers | 2026-07-07 |
-| docs/reference/generated-id-reference.md | Generated ID Reference | current | developer | reference | mir-maintainers | 2026-10-06 |
+| docs/reference/generated-id-reference.md | Generated ID Reference | current | developer | reference | mir-maintainers | 2026-10-07 |
 | docs/reference/generated/compiler-schema-registry.md | Compiler Schema Registry | current | developer | reference | mir-maintainers | 2026-08-18 |
 | docs/reference/generated/documentation-index.md | Generated Documentation Index | current | maintainer | reference | mir-maintainers | 2026-08-26 |
 | docs/reference/generated/documentation-navigation.md | Generated Documentation Navigation | current | maintainer | reference | mir-maintainers | 2026-08-26 |
@@ -284,7 +284,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/schemas/technology-design.md | TechnologyDesign Schema | current | developer | reference | mir-maintainers | 2026-07-23 |
 | docs/reference/schemas/technology-lifecycle.md | Technology Lifecycle Schemas | current | developer | reference | mir-maintainers | 2026-08-03 |
 | docs/reference/settings-reference.md | Settings Reference | archived | developer | reference | mir-maintainers | 2026-07-07 |
-| docs/reference/settings.md | Settings Reference | current | developer | reference | mir-maintainers | 2026-10-06 |
+| docs/reference/settings.md | Settings Reference | current | developer | reference | mir-maintainers | 2026-10-07 |
 | docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-10-06 |
 | docs/releases/0.x-factorio-version-metadata-correction.md | MIR 0.x Factorio Version Metadata Correction | current | release-manager | reference | mir-maintainers | 2026-07-16 |
 | docs/releases/3.2.1-emergency-build-trigger.md | MIR 3.2.1 Emergency Build Trigger | historical-checkpoint | release-manager | release-plan | mir-maintainers | 2026-07-26 |
@@ -388,7 +388,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | MIR 4.2 community implementation outcomes | current | maintainer | release-plan | mir-maintainers | 2026-09-11 |
-| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-10-06 |
+| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-10-07 |
 | docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-07 |
 | docs/releases/mir42-compatibility-playtest-plan.md | MIR 4.2 Compatibility Scope and Player Playtest Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-27 |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | MIR 4.2 Nine-Target Candidate and Playtest Matrix | current | release-manager | release-plan | mir-maintainers | 2026-10-05 |

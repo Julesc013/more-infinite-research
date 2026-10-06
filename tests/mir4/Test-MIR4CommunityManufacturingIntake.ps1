@@ -108,8 +108,8 @@ function Get-CMIStreamBlock([string]$Text,[string]$Stream){
   Assert-CMI ($next -gt $start) "source stream boundary is absent: $Stream"
   return $Text.Substring($start,$next-$start)
 }
-function Get-CMIManifestRow([string]$Text,[string]$Stream){
-  $marker="    recipe-prod-$Stream-1:"
+function Get-CMIManifestRow([string]$Text,[string]$Stream,[int]$FirstLevel=1){
+  $marker="    recipe-prod-$Stream-${FirstLevel}:"
   $start=$Text.IndexOf($marker,[StringComparison]::Ordinal)
   Assert-CMI ($start -ge 0) "stream manifest row is absent: $Stream"
   $tail=$Text.Substring($start+$marker.Length)
@@ -211,11 +211,32 @@ Assert-CMI ($pyBootstrapRoutes.Count -eq 15 -and @($pyBootstrapRoutes|Where-Obje
 $pyAbsent=@($pyIntake.absent_subjects)
 Assert-CMI ($pyAbsent.Count -eq 1 -and [string]$pyAbsent[0].display_term -ceq 'nitroglycerin' -and @($pyAbsent[0].checked_aliases).Count -eq 3 -and [string]$pyAbsent[0].disposition -ceq 'not-present-in-exact-selected-py-source-suite') 'Py nitroglycerin absence must remain an exact-suite observation.'
 Assert-CMI (-not [bool]$pyIntake.finalizer_observations.target_recipe_blocks_directly_author_permission -and [int]$pyIntake.finalizer_observations.generic_maximum_productivity_when_absent -eq 1000000 -and -not [bool]$pyIntake.finalizer_observations.auto_recycle_observed_on_target_routes) 'Py finalizer observations exceeded source authority.'
+$pyImplementation=$fixture.py_chemical_implementation
+Assert-CMI ([string]$pyImplementation.request_id -ceq 'ECO-PY' -and [string]$pyImplementation.status -ceq 'conditional-current-source-declarations-native-admission-pending' -and [string]$pyImplementation.productive_output_type -ceq 'fluid') 'Py implementation must preserve its request identity, typed output and pending native admission.'
+Assert-CMI ((@($pyImplementation.stream_keys|Sort-Object)-join '|') -ceq 'research_material_py_acid_gas|research_material_py_glycerol') 'Py chemicals must retain their separate stream identities.'
+Assert-CMI ((@($pyImplementation.required_mods)-join '|') -ceq 'pycoalprocessing') 'Py chemical requirements must name the retained fluid provider.'
+Assert-CMI ([int]$pyImplementation.early_levels -eq 3 -and [int]$pyImplementation.continuation_first_level -eq 4 -and [double]$pyImplementation.effect_per_level -eq 0.02 -and @($pyImplementation.generated_technologies).Count -eq 4) 'Py implementation must use the shared stages and increment.'
+Assert-CMI (-not [bool]$pyImplementation.route_permission_grants -and -not [bool]$pyImplementation.route_certificate_exceptions -and -not [bool]$pyImplementation.engine_qualification -and -not [bool]$pyImplementation.public_support_authority -and -not [bool]$pyImplementation.biology_sample_or_tree_qualification) 'Py chemical declarations exceeded their conditional authority.'
+foreach($subject in @(@('research_material_py_acid_gas','acidgas'),@('research_material_py_glycerol','glycerol'))){
+  $key=$subject[0];$fluid=$subject[1]
+  $expectedRoutes=@($pyChemicalRoutes|Where-Object subject -CEQ $fluid|ForEach-Object recipe)
+  $declaredRoutes=@($pyImplementation.source_producers.PSObject.Properties[$key].Value)
+  Assert-CMI ((@($declaredRoutes|Sort-Object)-join '|') -ceq (@($expectedRoutes|Sort-Object)-join '|')) "Py implementation producer list differs from exact retained source intake: $key"
+  Assert-CMI (@($declaredRoutes|Sort-Object -Unique).Count -eq $declaredRoutes.Count) "Py implementation contains duplicate producers: $key"
+}
 
 $sourcePath=Join-Path $repo $fixture.realization.source_path
 $sourceText=Get-Content -Raw -LiteralPath $sourcePath
 $directEffects=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/prototypes/streams/direct-effects.lua')
 $streamManifest=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/streams.yml')
+foreach($subject in @(@('research_material_py_acid_gas','acidgas'),@('research_material_py_glycerol','glycerol'))){
+  $key=$subject[0];$fluid=$subject[1]
+  Assert-CMI ($sourceText.Contains("streams.$key = material_family(`"$fluid`", {",[StringComparison]::Ordinal)) "Py source declaration must select its retained fluid: $key"
+  foreach($level in @(1,4)){
+    $row=Get-CMIManifestRow $streamManifest $key $level
+    Assert-CMI ($row.Contains('generated_technology: recipe-prod-'+$key+'-'+$level,[StringComparison]::Ordinal) -and $row.Contains('identity_state: stable-unreleased',[StringComparison]::Ordinal) -and $row.Contains('fixtures/assert-community-manufacturing-intake',[StringComparison]::Ordinal)) "Py stream authority is missing or unbound: $key level $level"
+  }
+}
 $requests=(Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/programmes/community-requests.json')|ConvertFrom-Json -Depth 100 -DateKind String).requests
 $requestIds=@($fixture.authority.request_ids)
 $requestRows=@($requests|Where-Object{$_.id -in $requestIds})
@@ -404,6 +425,10 @@ if($archiveReplay){
   $pyRecipeMeta=Get-CMIArchiveText $archives['pypostprocessing_3.1.3.zip'] 'pypostprocessing/lib/metas/recipe.lua'
   $pyFinalFixes=Get-CMIArchiveText $archives['pypostprocessing_3.1.3.zip'] 'pypostprocessing/data-final-fixes.lua'
   Assert-CMI ($pyRecipeMeta.Contains('allow_productivity',[StringComparison]::Ordinal) -and $pyFinalFixes.Contains('recipe.maximum_productivity = 1000000',[StringComparison]::Ordinal)) 'Py permission or maximum-productivity finalizer source is absent.'
+  foreach($fluid in @('acidgas','glycerol')){
+    $fluidDefinition=Get-CMIArchiveText $archives['pycoalprocessing_3.1.4.zip'] ('pycoalprocessing/prototypes/fluids/'+$fluid+'.lua')
+    Assert-CMI ([regex]::IsMatch($fluidDefinition,'FLUID\s*\{') -and $fluidDefinition.Contains('name = "'+$fluid+'"',[StringComparison]::Ordinal)) "Py provider requirement lacks its retained source fluid definition: $fluid"
+  }
 }
 
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
@@ -482,6 +507,7 @@ $result=[ordered]@{
     final_data_raw_observed=$false
     remaining_obligations=@($pyIntake.remaining_obligations)
   }
+  py_chemical_implementation=$pyImplementation
   target_bindings=$bindings
   materialized_packages=$materializedPackages
   non_claims=@($fixture.non_claims)

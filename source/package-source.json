@@ -4439,10 +4439,10 @@
         "reason": "Shared staged material progression declaration for reviewed Bob/Angel streams."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 13662,
-      "source_sha256": "C38FCC929A698C59F47351F4655F44C6C7E20DEF987604B3D013C49D223CBEE5",
-      "output_bytes": 13662,
-      "output_sha256": "C38FCC929A698C59F47351F4655F44C6C7E20DEF987604B3D013C49D223CBEE5"
+      "source_bytes": 14542,
+      "source_sha256": "1A7E378129645A96907EAF2F3A0430349B7A0294F57537CF389961D252B994CB",
+      "output_bytes": 14542,
+      "output_sha256": "1A7E378129645A96907EAF2F3A0430349B7A0294F57537CF389961D252B994CB"
     },
     {
       "layer": "capability",
@@ -6384,10 +6384,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 71526,
-      "source_sha256": "2C848C152CD932884A7FC8595FE034412060B33B8C6281319082D43BA13AA28E",
-      "output_bytes": 71526,
-      "output_sha256": "2C848C152CD932884A7FC8595FE034412060B33B8C6281319082D43BA13AA28E"
+      "source_bytes": 73960,
+      "source_sha256": "3D93A9D7BB06C1DDD743001B16B338589EF4A47A95973DFCC0F151213FBCAF3E",
+      "output_bytes": 73960,
+      "output_sha256": "3D93A9D7BB06C1DDD743001B16B338589EF4A47A95973DFCC0F151213FBCAF3E"
     },
     {
       "layer": "capability",
@@ -6447,10 +6447,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/streams/productivity.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 69845,
-      "source_sha256": "FF2F075140A68DFD7483E590F90795137F14FCDEF859AB4D12089871A71C0519",
-      "output_bytes": 69845,
-      "output_sha256": "FF2F075140A68DFD7483E590F90795137F14FCDEF859AB4D12089871A71C0519"
+      "source_bytes": 71282,
+      "source_sha256": "037A8E9F71CFFEDB3E481B7FD7A7884635602C5B72692B83274F8A82808E062A",
+      "output_bytes": 71282,
+      "output_sha256": "037A8E9F71CFFEDB3E481B7FD7A7884635602C5B72692B83274F8A82808E062A"
     },
     {
       "layer": "presentation",
@@ -6762,10 +6762,10 @@
         "predecessor_source_path": "targets/f200/files/prototypes/mir/platform/factorio/target_profiles.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 16730,
-      "source_sha256": "6245E556F2B0804458C7FE2B33662EB2BFA079C7AF7C4BAA65B5FFC261B9246B",
-      "output_bytes": 16730,
-      "output_sha256": "6245E556F2B0804458C7FE2B33662EB2BFA079C7AF7C4BAA65B5FFC261B9246B"
+      "source_bytes": 16786,
+      "source_sha256": "F373852DFFF9080B95E1D2B4806B96A3F23056D26E4A85DED9B0728F12BCA86A",
+      "output_bytes": 16786,
+      "output_sha256": "F373852DFFF9080B95E1D2B4806B96A3F23056D26E4A85DED9B0728F12BCA86A"
     },
     {
       "layer": "adapter",
@@ -7175,10 +7175,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/platform/factorio/target_profiles.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 16730,
-      "source_sha256": "F688015441DDC258551FB417E8F9C575E81899C9BA5ACA7BB2F950CD9EFFDDE7",
-      "output_bytes": 16730,
-      "output_sha256": "F688015441DDC258551FB417E8F9C575E81899C9BA5ACA7BB2F950CD9EFFDDE7"
+      "source_bytes": 16786,
+      "source_sha256": "A14FA164C5A42847AB464757F967C36AE0EDB2543B5F7301EAE51FBC4A896AC4",
+      "output_bytes": 16786,
+      "output_sha256": "A14FA164C5A42847AB464757F967C36AE0EDB2543B5F7301EAE51FBC4A896AC4"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "624518BB0EA492E7BAAB6D32B5BDEFE5A1447327C945C965A6D3E15BD5902352"
+  "record_sha256": "F310355E663D0AA2AEE4DEF3416526F7A1ED63FDD3FAE8D870C60E4CF6D841D9"
 }

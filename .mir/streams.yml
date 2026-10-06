@@ -2074,6 +2074,110 @@ streams:
           - tests/compiler/material_progression.lua
           - tests/compiler/material_continuation.lua
 
+    recipe-prod-research_material_py_acid_gas-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_acid_gas-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_acid_gas
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_acid_gas-1
+      stream_key: research_material_py_acid_gas
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_acid_gas
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_progression.lua
+
+    recipe-prod-research_material_py_acid_gas-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_acid_gas-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_acid_gas
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_acid_gas-4
+      stream_key: research_material_py_acid_gas__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_acid_gas
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_glycerol-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_glycerol-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_glycerol
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_glycerol-1
+      stream_key: research_material_py_glycerol
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_glycerol
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_progression.lua
+
+    recipe-prod-research_material_py_glycerol-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_glycerol-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_glycerol
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_glycerol-4
+      stream_key: research_material_py_glycerol__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_glycerol
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_glycerol-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_glycerol-1
       introduced_in: "4.2.1"
