@@ -5,7 +5,7 @@ param(
   [string]$PriorRelease = "dist\more-infinite-research_3.2.0.zip",
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
-  [string]$LocalModZipDir = "C:\Projects\Factorio\testmods_2.1",
+  [string]$LocalModZipDir = "",
   [string]$OutputPath = ".mir\evidence\3.2.1-performance-regression.json",
   [string]$ArtifactRoot = "",
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
@@ -451,11 +451,9 @@ $campaignFile = Resolve-MIRCampaignPath -Path $CampaignPath
 $script:CandidatePath = Resolve-MIRCampaignPath -Path $Candidate
 $script:PriorPath = Resolve-MIRCampaignPath -Path $PriorRelease
 $script:FactorioPath = Resolve-MIRCampaignPath -Path $FactorioBin
-$script:LocalLibraryPath = Resolve-MIRCampaignPath -Path $LocalModZipDir
 $outputFile = Resolve-MIRCampaignPath -Path $OutputPath
 if (-not (Test-Path -LiteralPath $campaignFile -PathType Leaf)) { throw "Performance campaign manifest is absent: $campaignFile" }
 if (-not (Test-Path -LiteralPath $script:FactorioPath -PathType Leaf)) { throw "Factorio binary is absent: $script:FactorioPath" }
-if (-not (Test-Path -LiteralPath $script:LocalLibraryPath -PathType Container)) { throw "Local Factorio 2.1 mod library is absent: $script:LocalLibraryPath" }
 if ($ExpectedSourceCommit -notmatch '^[0-9A-Fa-f]{40}$') { throw "ExpectedSourceCommit must be a full Git commit." }
 
 $campaign = Get-Content -Raw -LiteralPath $campaignFile | ConvertFrom-Json
@@ -464,6 +462,13 @@ if ([int]$campaign.schema -ne 2 -or [string]::IsNullOrWhiteSpace([string]$campai
     -or -not ([string]$campaign.factorio_version).StartsWith([string]$campaign.factorio_line) `
     -or [string]$campaign.candidate.version -ne [string]$campaign.release) {
   throw "Performance campaign manifest does not declare a coherent governed target and candidate."
+}
+if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) {
+  $LocalModZipDir = Join-Path (Split-Path -Parent $RepoRoot) "testmods/$($campaign.factorio_line)"
+}
+$script:LocalLibraryPath = Resolve-MIRCampaignPath -Path $LocalModZipDir
+if (-not (Test-Path -LiteralPath $script:LocalLibraryPath -PathType Container)) {
+  throw "Local Factorio $($campaign.factorio_line) mod library is absent: $script:LocalLibraryPath"
 }
 
 $lanes = @($campaign.lanes)

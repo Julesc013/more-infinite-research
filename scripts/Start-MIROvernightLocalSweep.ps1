@@ -7,8 +7,8 @@ param(
   [string]$OutputRoot = "",
   [int]$ScenarioTimeoutSeconds = 900,
   [int]$GeneratedLocalPairwiseLimit = 40,
-  [ValidateSet("Copy", "Hardlink", "Symlink")]
-  [string]$LinkMode = "Copy",
+  [ValidateSet("Hardlink")]
+  [string]$LinkMode = "Hardlink",
   [switch]$SkipStrictGate,
   [switch]$SkipLocalSweep,
   [switch]$SkipGeneratedLocalPairwise,
@@ -37,11 +37,11 @@ function Resolve-MIRFactorioBinary {
 
   $candidates = @()
   if (-not [string]::IsNullOrWhiteSpace($Path)) { $candidates += $Path }
-  $candidates += @(
-    "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe",
-    "C:\Program Files (x86)\Steam\steamapps\common\Factorio\bin\x64\factorio.exe",
-    "C:\Program Files\Factorio\bin\x64\factorio.exe"
-  )
+  $candidates += if ($FactorioLine -ceq '2.0') {
+    'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
+  } else {
+    'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+  }
 
   foreach ($candidate in $candidates) {
     if (-not [string]::IsNullOrWhiteSpace($candidate) -and (Test-Path -LiteralPath $candidate)) {
@@ -54,7 +54,7 @@ function Resolve-MIRFactorioBinary {
 
 $resolvedFactorioBin = Resolve-MIRFactorioBinary -Path $FactorioBin
 if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
-  $LocalModDir = "C:\Projects\Factorio\testmods_$FactorioLine"
+  $LocalModDir = Join-Path (Split-Path -Parent $repo) "testmods/$FactorioLine"
 }
 if (-not (Test-Path -LiteralPath $LocalModDir)) {
   throw "Local mod directory does not exist: $LocalModDir"

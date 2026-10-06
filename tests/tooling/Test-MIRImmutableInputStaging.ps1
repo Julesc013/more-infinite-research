@@ -1,5 +1,5 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot = '',[switch]$NativeProbeOnly,[switch]$MaterialAuditInputsOnly)
+param([string]$RepoRoot = '',[switch]$NativeProbeOnly,[switch]$MaterialAuditInputsOnly,[switch]$EntryPointDefaultsOnly)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -11,6 +11,10 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+if (@($NativeProbeOnly,$MaterialAuditInputsOnly,$EntryPointDefaultsOnly | Where-Object { $_ }).Count -gt 1) { throw 'Select one focused immutable-input test mode.' }
+. (Join-Path $RepoRoot 'tests/support/MIRNativeEntryDefaults.ps1')
+$entryDefaults=Test-MIRNativeEntryDefaults -RepoRoot $RepoRoot
+if ($EntryPointDefaultsOnly) { $entryDefaults | ConvertTo-Json; return }
 if($NativeProbeOnly -and $MaterialAuditInputsOnly){throw 'Select one focused immutable-input test mode.'}
 if($NativeProbeOnly) { & (Join-Path $RepoRoot 'tests/tooling/Test-MIRNativeProbeResources.ps1') -RepoRoot $RepoRoot;return }
 
