@@ -699,6 +699,18 @@
       "groups": []
     },
     {
+      "pattern": "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
       "scenarios": [],
       "tags": [],
       "groups": [],

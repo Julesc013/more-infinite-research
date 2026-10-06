@@ -34,19 +34,21 @@ function Resolve-MIRNativeProbeDependencyInputs {
   return $rows
 }
 
-# Current F210 candidates are read against the existing package/materializer
+# Current player candidates are read against the existing package/materializer
 # authorities. This validates supplied bytes without writing another package.
 function Assert-MIRNativeProbeF210Candidate([bool]$Condition,[string]$Message) {
   if(-not $Condition){throw "[mir-native-probe-f210-candidate] $Message"}
 }
-function Read-MIRNativeProbeF210CurrentCandidate([string]$Repository, [string]$Archive, [string]$ReceiptPath) {
+function Read-MIRNativeProbeCurrentCandidate {
+  param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
+    [ValidateSet('f210','f200')][string]$Target='f210')
   Assert-MIRNativeProbeF210Candidate (-not [string]::IsNullOrWhiteSpace($Archive) -and -not [string]::IsNullOrWhiteSpace($ReceiptPath)) 'supply candidate and canonical materialization receipt'
   $candidate = (Resolve-Path -LiteralPath $Archive).Path
   $receipt = Get-Content -LiteralPath $ReceiptPath -Raw | ConvertFrom-Json -Depth 30 -DateKind String
   Assert-MIRNativeProbeF210Candidate (($receipt | ConvertTo-Json -Depth 30) | Test-Json -SchemaFile (Join-Path $Repository 'spec/schemas/mir4-package-composition-result-v1.schema.json')) 'candidate materialization schema differs'
   Assert-MIRNativeProbeF210Candidate (Test-MIR4BootstrapRecordHash -Record $receipt) 'candidate materialization record hash differs'
-  $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $Repository -Target f210 -SourceVersion '4.2.1'
-  Assert-MIRNativeProbeF210Candidate ($receipt.status -ceq 'passed-canonical-package-authority-materialization' -and $receipt.target -ceq 'f210' -and $receipt.source_version -ceq $identity.source_version -and $receipt.distribution_version -ceq $identity.distribution_version) 'candidate materialization identity differs'
+  $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $Repository -Target $Target -SourceVersion '4.2.1'
+  Assert-MIRNativeProbeF210Candidate ($receipt.status -ceq 'passed-canonical-package-authority-materialization' -and $receipt.target -ceq $Target -and $receipt.source_version -ceq $identity.source_version -and $receipt.distribution_version -ceq $identity.distribution_version) 'candidate materialization identity differs'
   Assert-MIRNativeProbeF210Candidate ($receipt.package_source_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $Repository)) 'candidate source fingerprint differs'
   Assert-MIRNativeProbeF210Candidate ((Resolve-Path -LiteralPath $receipt.archive_path).Path -ceq $candidate -and [IO.Path]::GetFileName($candidate) -ceq $identity.package_name) 'candidate archive path or filename differs'
   foreach ($invariant in @('all_source_hashes_verified','all_output_hashes_verified','version_identity_verified','canonical_package_authority')) {
@@ -61,8 +63,9 @@ function Read-MIRNativeProbeF210CurrentCandidate([string]$Repository, [string]$A
     Assert-MIRNativeProbeF210Candidate ($null -ne $entry -and $entry.Length -le 64KB) 'candidate info differs'
     $reader = [IO.StreamReader]::new($entry.Open())
     try {$info = $reader.ReadToEnd() | ConvertFrom-Json} finally {$reader.Dispose()}
-    Assert-MIRNativeProbeF210Candidate ($info.name -ceq 'more-infinite-research' -and $info.version -ceq $identity.distribution_version -and $info.factorio_version -ceq '2.1') 'candidate metadata differs'
-    $state = Get-MIR4TargetMaterializerState -RepoRoot $Repository -Target f210
+    $line=if($Target -ceq 'f200'){'2.0'}else{'2.1'}
+    Assert-MIRNativeProbeF210Candidate ($info.name -ceq 'more-infinite-research' -and $info.version -ceq $identity.distribution_version -and $info.factorio_version -ceq $line) 'candidate metadata differs'
+    $state = Get-MIR4TargetMaterializerState -RepoRoot $Repository -Target $Target
     $selection = Get-MIR4TargetMaterializationBindings -State $state
     Assert-MIRNativeProbeF210Candidate ($receipt.source_manifest_sha256 -ceq $state.manifest.record_sha256 -and $receipt.target_overlay_sha256 -ceq $state.composition.record_sha256) 'candidate composition authority differs'
     Assert-MIRNativeProbeF210Candidate ($zip.Entries.Count -eq $selection.bindings.Count) 'candidate package membership differs'
@@ -80,6 +83,9 @@ function Read-MIRNativeProbeF210CurrentCandidate([string]$Repository, [string]$A
     }
   } finally {$zip.Dispose()}
   return [pscustomobject]@{path=$candidate;receipt=$receipt}
+}
+function Read-MIRNativeProbeF210CurrentCandidate([string]$Repository,[string]$Archive,[string]$ReceiptPath) {
+  Read-MIRNativeProbeCurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $ReceiptPath -Target f210
 }
 function New-MIRNativeProbeResourceContext {
   param(
@@ -153,7 +159,8 @@ function Invoke-MIRNativeProbeProcess {
     [Parameter(Mandatory)]$Context,
     [Parameter(Mandatory)][string]$FilePath,
     [Parameter(Mandatory)][string[]]$Arguments,
-    [ValidateRange(1,3600)][int]$TimeoutSeconds=120
+    [ValidateRange(1,3600)][int]$TimeoutSeconds=120,
+    [scriptblock]$CompletionPredicate
   )
   $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   $Context.process_index++
@@ -162,7 +169,7 @@ function Invoke-MIRNativeProbeProcess {
     $result=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $Context.root `
       -Policy $Context.policy -EstimatedPeakBytes $remaining -ExpectedPeakMemoryBytes $Context.peak_memory_bytes `
       -LedgerPath ($prefix+'.resources.jsonl') -StdoutPath ($prefix+'.stdout.txt') -StderrPath ($prefix+'.stderr.txt') `
-      -TimeoutSeconds $TimeoutSeconds
+      -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $CompletionPredicate
     $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   } catch {
     $Context.runs.Add([pscustomobject]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$_.Exception.Message})
@@ -185,7 +192,8 @@ function Invoke-MIRNativeProbeFactorioProcess {
   param(
     [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$FilePath,
     [Parameter(Mandatory)][string[]]$Arguments,
-    [ValidateRange(1,3600)][int]$TimeoutSeconds=120
+    [ValidateRange(1,3600)][int]$TimeoutSeconds=120,
+    [scriptblock]$CompletionPredicate
   )
   if($Arguments.Count -lt 1 -or $Arguments.Count -gt 128){throw '[mir-native-probe-argument-budget]'}
   $payload=[Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-Json -InputObject $Arguments -Compress))
@@ -205,7 +213,7 @@ $env:SteamAppId='427520';$env:SteamGameId='427520'
 exit $LASTEXITCODE
 '@
   [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
-  return Invoke-MIRNativeProbeProcess -Context $Context -FilePath (Get-Command pwsh).Source -TimeoutSeconds $TimeoutSeconds `
+  return Invoke-MIRNativeProbeProcess -Context $Context -FilePath (Get-Command pwsh).Source -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $CompletionPredicate `
     -Arguments @('-NoProfile','-File',$driver,'-NativeExecutable',$FilePath,'-ArgumentsBase64',[Convert]::ToBase64String($payload))
 }
 

@@ -19,6 +19,7 @@ function Resolve-MIRAssuranceCommandText {
   $valueProviders = [ordered]@{
     "<factorio>"={ [string]$Context.factorio }
     "<candidate>"={ [string]$Context.candidate }
+    "<candidate-materialization>"={ if ($Context.PSObject.Properties['candidate_materialization']) { [string]$Context.candidate_materialization } else { '' } }
     "<prior-release>"={ [string]$Context.prior_release }
     "<mods>"={ [string]$Context.mods }
     "<baseline>"={ [string]$Plan.baseline }

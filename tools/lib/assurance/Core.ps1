@@ -423,6 +423,7 @@ function Get-MIRAssuranceContext {
   $candidateOption = Get-MIRAssuranceOption -Name "--candidate"
   if ([string]::IsNullOrWhiteSpace([string]$candidateOption)) { $candidateOption = $defaultCandidate }
   $candidate = Resolve-MIRAssurancePath -Path $candidateOption
+  $candidateMaterialization = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--candidate-materialization")
   $factorio = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--factorio" -Default ([string]$env:FACTORIO_BIN))
   $verificationProfile = Resolve-MIR4FactorioQualificationProfile -Profile $verificationProfile -FactorioBin $factorio -RepoRoot $repo
   $priorRelease = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--prior" -Default ([string]$env:MIR_PRIOR_RELEASE))
@@ -441,6 +442,7 @@ function Get-MIRAssuranceContext {
     info=$info
     target=$target
     candidate=$candidate
+    candidate_materialization=$candidateMaterialization
     factorio=$factorio
     prior_release=$priorRelease
     seal=$seal

@@ -126,6 +126,7 @@ Common overrides:
   --factorio <path>   Factorio binary path
   --factorio-line <2.0|2.1>
   --candidate <path>  Exact MIR candidate ZIP for candidate-bound runtime work
+  --candidate-materialization <path>  Existing canonical composition receipt for the supplied candidate
   --mods <path>       Local mod zip/library directory
   --output <path>     Output artifact directory
   --timeout <seconds> Per-scenario timeout
