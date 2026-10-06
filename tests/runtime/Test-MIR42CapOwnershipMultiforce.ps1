@@ -5,7 +5,10 @@ param(
   [string]$FactorioBin='',
   [string]$SteamManifest='',
   [string]$CandidateZip='',
-  [string]$OutputRoot='build/tests/mir42-cap-ownership-multiforce'
+  [string]$SourceMaterializationPath='',
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
+  [string]$OutputRoot='build/p/m421-f210-cap'
 )
 
 $ErrorActionPreference='Stop'
@@ -19,9 +22,6 @@ if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
 }
 
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$engineResolution=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo `
-  -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin $FactorioBin -SteamManifest $SteamManifest
-$engine=[string]$engineResolution.engine.path
 $fixtureName='mir-fixture-assert-mir42-cap-ownership-multiforce'
 $blockerName='late-mir42-cap-binding-blocker'
 $policyBlockerName='late-mir42-policy-binding-blocker'
@@ -175,8 +175,6 @@ function Get-MIR42SemanticStateJson($State){
   }|ConvertTo-Json -Depth 8 -Compress)
 }
 
-Assert-Exact 'Factorio executable SHA-256' (Get-MIR42Sha $engine) ([string]$engineResolution.engine.sha256)
-
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 Assert-MIR42 ($sourceCommit -match '^[0-9a-f]{40}$' -and $sourceTree -match '^[0-9a-f]{40}$') 'requires source commit/tree identities.'
@@ -203,15 +201,41 @@ Assert-MIR42 ($candidateInputChanges.Count -eq 0) "requires a clean candidate-ma
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
-
-$freshCandidate=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('MIR42-CAP-OWNERSHIP-MULTIFORCE-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/mir42-cap-ownership-multiforce/packages'
-$freshCandidateZip=(Resolve-Path -LiteralPath ([string]$freshCandidate.archive_path)).Path
-if([string]::IsNullOrWhiteSpace($CandidateZip)){
-  $candidateZip=$freshCandidateZip
-} else {
-  $candidateZip=(Resolve-Path -LiteralPath $CandidateZip).Path
-  Assert-Exact 'supplied candidate SHA-256' (Get-MIR42Sha $candidateZip) (Get-MIR42Sha $freshCandidateZip)
+. (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+$running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
+Assert-MIR42 ($running.Count-eq0) 'requires the one-Factorio-process policy; a Factorio process is already running.'
+$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+$candidateInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath
+$candidateZip=[string]$candidateInput.path
+$inputLeases=[Collections.Generic.List[object]]::new()
+trap {
+  $failure=$_
+  foreach($inputLease in $inputLeases){if(-not $inputLease.closed){try {$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed} catch {}}}
+  throw $failure
 }
+New-Item -ItemType Directory -Path $resources.root|Out-Null
+
+function Get-MIR42GovernedEngineResolution {
+  # Keep the complete existing admission oracle, including its version query,
+  # inside one owned monitored tree. No policy facts are reconstructed here.
+  $driver=Join-Path $resources.root 'resolve-engine.ps1'
+  $receipt=Join-Path $resources.root 'engine-resolution.json'
+  $driverText=@'
+param([string]$Repository,[string]$Engine,[string]$Manifest,[string]$Receipt)
+$ErrorActionPreference='Stop'
+$env:SteamAppId='427520';$env:SteamGameId='427520'
+. (Join-Path $Repository 'tools/mir/application/release/F210QualificationPolicy.ps1')
+$record=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $Repository -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin $Engine -SteamManifest $Manifest
+[IO.File]::WriteAllText($Receipt,(($record|ConvertTo-Json -Depth 50)+"`n"),[Text.UTF8Encoding]::new($false))
+'@
+  [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
+  $null=Invoke-MIRNativeProbeProcess -Context $resources -FilePath (Get-Command pwsh).Source -TimeoutSeconds 30 -Arguments @('-NoProfile','-File',$driver,'-Repository',$repo,'-Engine',$FactorioBin,'-Manifest',$SteamManifest,'-Receipt',$receipt)
+  Assert-MIR42 (Test-Path -LiteralPath $receipt -PathType Leaf) 'governed engine resolution receipt is absent.'
+  Get-Content -LiteralPath $receipt -Raw|ConvertFrom-Json -Depth 50 -DateKind String
+}
+$engineResolution=Get-MIR42GovernedEngineResolution
+$engine=[string]$engineResolution.engine.path
+Assert-Exact 'Factorio executable SHA-256' (Get-MIR42Sha $engine) ([string]$engineResolution.engine.sha256)
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $candidateArchive=[IO.Compression.ZipFile]::OpenRead($candidateZip)
@@ -235,8 +259,7 @@ foreach($path in @($fixture,$blockerFixture,$policyBlockerFixture)){
   Assert-MIR42 (Test-Path -LiteralPath $path -PathType Container) "fixture directory is absent: $path"
 }
 
-$run=Join-Path $output ([guid]::NewGuid().ToString('N'))
-New-Item -ItemType Directory -Force -Path $run|Out-Null
+$run=$resources.root
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
 
 function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker,[bool]$UsePolicyBlocker){
@@ -244,7 +267,10 @@ function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker,[bool]$UsePoli
   $mods=Join-Path $stageRoot 'mods'
   $userdata=Join-Path $stageRoot 'userdata'
   New-Item -ItemType Directory -Force -Path $mods,$userdata,(Join-Path $userdata 'saves')|Out-Null
-  Copy-Item -LiteralPath $candidateZip -Destination $mods
+  $input=[ordered]@{source_path=$candidateZip;file_name=[IO.Path]::GetFileName($candidateZip);expected_sha256=[string]$candidateInput.receipt.archive_sha256;role='candidate';identity=@{target='f210';version='4.2.21001'};provenance=@{kind='verified-current-canonical-materialization';package_source_sha256=[string]$candidateInput.receipt.package_source_sha256};immutable=$true}
+  $lease=New-MIRImmutableInputLease -RunRoot $stageRoot -StageDirectory $mods -Inputs @($input) -RequireHardLinks
+  $inputLeases.Add($lease)
+  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $lease
   $fixtureArchive=Publish-MIRModDirectoryArchive -Source $fixture -Name $fixtureName -Version '0.1.0' -ModsDir $mods
   $blockerArchive=$null
   if($UseBlocker){
@@ -286,39 +312,14 @@ function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker,[bool]$UsePoli
     policy_blocker_archive=$policyBlockerArchive
     settings_archive=(Join-Path $mods 'mir-validation-settings-overrides_0.1.0.zip')
     mod_list=$modListPath
+    lease=$lease
   }
 }
 
 function Invoke-MIR42Engine($Stage,[string]$Name,[string[]]$Arguments){
   $factorioLog=Join-Path $Stage.userdata 'factorio-current.log'
   if(Test-Path -LiteralPath $factorioLog){Remove-Item -LiteralPath $factorioLog -Force}
-  $start=[Diagnostics.ProcessStartInfo]::new($engine)
-  $start.UseShellExecute=$false
-  $start.CreateNoWindow=$true
-  $start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
-  $start.RedirectStandardOutput=$true
-  $start.RedirectStandardError=$true
-  $start.Environment['SteamAppId']='427520'
-  $start.Environment['SteamGameId']='427520'
-  foreach($argument in @('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods)+$Arguments){
-    [void]$start.ArgumentList.Add($argument)
-  }
-  $process=[Diagnostics.Process]::Start($start)
-  try{
-    $stdout=$process.StandardOutput.ReadToEndAsync()
-    $stderr=$process.StandardError.ReadToEndAsync()
-    if(-not $process.WaitForExit(120000)){
-      $process.Kill($true)
-      throw "Factorio timed out during $Name."
-    }
-    $text=$stdout.GetAwaiter().GetResult()+$stderr.GetAwaiter().GetResult()
-    [IO.File]::WriteAllText((Join-Path $Stage.root "engine-$Name.log"),$text,[Text.UTF8Encoding]::new($false))
-    if($process.ExitCode -ne 0){
-      throw "Factorio failed during ${Name}: $($text.Substring([Math]::Max(0,$text.Length-2500)))"
-    }
-  } finally {
-    $process.Dispose()
-  }
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments (@('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods)+$Arguments) -TimeoutSeconds 120
   Assert-MIR42 (Test-Path -LiteralPath $factorioLog -PathType Leaf) "Factorio log is absent after $Name."
   $copy=Join-Path $Stage.root "factorio-$Name.log"
   Copy-Item -LiteralPath $factorioLog -Destination $copy
@@ -328,34 +329,14 @@ function Invoke-MIR42Engine($Stage,[string]$Name,[string[]]$Arguments){
 function Invoke-MIR42ServerSave($Stage,[string]$Name,[string]$InputSave,[string]$ExpectedSave,[string]$ExpectedStage){
   $factorioLog=Join-Path $Stage.userdata 'factorio-current.log'
   if(Test-Path -LiteralPath $factorioLog){Remove-Item -LiteralPath $factorioLog -Force}
-  $start=[Diagnostics.ProcessStartInfo]::new($engine)
-  $start.UseShellExecute=$false
-  $start.CreateNoWindow=$true
-  $start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
-  $start.Environment['SteamAppId']='427520'
-  $start.Environment['SteamGameId']='427520'
-  foreach($argument in @('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods,'--server-settings',$Stage.server_settings,'--start-server',$InputSave)){
-    [void]$start.ArgumentList.Add($argument)
-  }
-  $process=[Diagnostics.Process]::Start($start)
-  $ready=$false
-  try{
-    $deadline=[DateTime]::UtcNow.AddSeconds(60)
-    $needle="[mir42-cap-ownership-multiforce] STATE JSON {`"stage`":`"$ExpectedStage`""
-    while([DateTime]::UtcNow -lt $deadline){
-      if($process.HasExited){throw "Factorio server exited before $Name successor with code $($process.ExitCode)."}
-      if((Test-Path -LiteralPath $factorioLog -PathType Leaf) -and (Test-Path -LiteralPath $ExpectedSave -PathType Leaf)){
-        $text=Get-Content -Raw -LiteralPath $factorioLog
-        if($text.Contains($needle) -and $text.Contains('Saving finished')){$ready=$true;break}
-      }
-      Start-Sleep -Milliseconds 200
-    }
-    if(-not $ready){throw "Factorio server did not create $Name successor."}
-  } finally {
-    if(-not $process.HasExited){try{$process.Kill($true)}catch{$process.Kill()}}
-    $process.WaitForExit()
-    $process.Dispose()
-  }
+  $needle="[mir42-cap-ownership-multiforce] STATE JSON {`"stage`":`"$ExpectedStage`""
+  $completion={
+    if(-not(Test-Path -LiteralPath $factorioLog -PathType Leaf)-or -not(Test-Path -LiteralPath $ExpectedSave -PathType Leaf)){return $false}
+    try {$text=Get-Content -LiteralPath $factorioLog -Raw -ErrorAction Stop} catch [IO.IOException] {return $false}
+    return ($null -ne $text -and $text.Contains($needle)-and$text.Contains('Saving finished'))
+  }.GetNewClosure()
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods,'--server-settings',$Stage.server_settings,'--start-server',$InputSave) -TimeoutSeconds 60 -CompletionPredicate $completion
+  Assert-MIR42 ([bool]$actor.result.completion_predicate_observed) "Factorio server did not create $Name successor."
   Assert-MIR42 (Test-Path -LiteralPath $factorioLog -PathType Leaf) "Factorio log is absent after $Name."
   $copy=Join-Path $Stage.root "factorio-$Name.log"
   Copy-Item -LiteralPath $factorioLog -Destination $copy
@@ -492,7 +473,7 @@ $result=[ordered]@{
   schema=1
   kind='MIR42F210CapOwnershipMultiforceQualificationV1'
   status='passed-current-f210-candidate-cap-ownership-multiforce-only'
-  scope='Freshly materialized F210 candidate: strict V3 policy admission, copper absolute cap ownership, named-force isolation, late policy forgery refusal, force-reset stale-ownership discard, cap removal, and terminal serialized reload; isolated/cooperative package-excluded fixture evidence.'
+  scope='Verified supplied 4.2.21001 F210 candidate: strict V3 policy admission, copper absolute cap ownership, named-force isolation, late policy forgery refusal, force-reset stale-ownership discard, cap removal, and terminal serialized reload; isolated/cooperative package-excluded fixture evidence.'
   target=[ordered]@{
     factorio_line='2.1'
     factorio_version=[string]$engineResolution.engine.version
@@ -508,12 +489,14 @@ $result=[ordered]@{
   source=[ordered]@{
     commit=$sourceCommit
     tree=$sourceTree
-    package_source_sha256=Get-MIR42Sha (Join-Path $repo 'source/package-source.json')
+    package_source_sha256=[string]$candidateInput.receipt.package_source_sha256
+    package_source_manifest_sha256=Get-MIR42Sha (Join-Path $repo 'source/package-source.json')
     candidate_materialization_closure=@($candidateMaterializationClosure)
     candidate_materialization_closure_clean=$true
   }
   candidate=Get-MIR42Artifact $candidateZip
-  freshly_materialized_candidate=Get-MIR42Artifact $freshCandidateZip
+  candidate_materialization=Get-MIR42Artifact $SourceMaterializationPath
+  candidate_created_by_harness=$false
   candidate_package_excludes_fixture_test_docs_governance_build_dist=$true
   fixture_hashes=[ordered]@{
     main_info=Get-MIR42Sha (Join-Path $fixture 'info.json')
@@ -547,7 +530,9 @@ $result=[ordered]@{
   }
   explicit_non_claims=$nonClaims
 }
-$resultPath=Join-Path $run 'result.json'
-[IO.File]::WriteAllText($resultPath,(($result|ConvertTo-Json -Depth 40)+"`n"),[Text.UTF8Encoding]::new($false))
+$result['input_staging']=@($seedStage,$cappedStage,$policyBlockedStage,$blockedStage,$removalStage|ForEach-Object {Complete-MIRImmutableInputLease -Lease $_.lease -Outcome passed})
+$result['resource_context']=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;shared_alias_bytes=$resources.shared_alias_bytes;memory_enforcement='sampled-watchdog-not-hard-cap'}
+$result['process_inventory']=@($resources.runs)
+Write-MIRNativeProbeResult -Context $resources -Record $result
 $result|ConvertTo-Json -Depth 40
 Write-Output "Evidence: $run"
