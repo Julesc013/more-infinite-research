@@ -1283,6 +1283,8 @@
         "tests/runtime/research_browser_core_regressions.lua",
         "tests/runtime/research_browser_handler_regressions.lua",
         "tests/runtime/research_browser_discovery_regressions.lua",
+        "tests/runtime/research_browser_native_discovery.lua",
+        "tests/runtime/research_browser_native_discovery_regressions.lua",
         "tests/runtime/browser_fixture_data.lua",
         "source:source/prototypes/mir/core/fingerprint.lua",
         "source:source/prototypes/mir/runtime/research_browser*.lua",
@@ -8086,5 +8088,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d322688c7c7bbf4a3c3e93ad37ebf38c1e5ad6a3f020a520a43bac3dcdcc4416"
+  "digest": "sha256:0d92d74602c4c02268c2c1dc880f72c7d3170396c631e3a3127208ef740feea4"
 }

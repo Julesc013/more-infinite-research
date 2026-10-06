@@ -49,6 +49,31 @@ function Assert-MIRKnownStagingImpactRouting {
     $requiredCheck=if($path -match 'Test-MIR42F200SettingsCapTransition'){ 'static.f200-base-only-settings-cap-transition-harness' }elseif($path -match 'Test-MIR42V2V3CapMigration'){ 'static.f210-v2-v3-migration-inputs' }elseif($path -match 'Test-MIR4HistoricalPrivateRuntime'){ 'static.mir4-historical-runtime-inputs' }else{ 'static.immutable-input-staging' }
     if($classification.escalated-or$requiredCheck-notin$classification.tests){throw "Known staging path lost its consumed staging check: $path"}
   }
+  $browserFixtures=@(
+    'tests/runtime/browser_fixture_data.lua',
+    'tests/runtime/research_browser.lua',
+    'tests/runtime/research_browser_core_regressions.lua',
+    'tests/runtime/research_browser_handler_regressions.lua',
+    'tests/runtime/research_browser_omissions.lua',
+    'tests/runtime/research_browser_discovery_regressions.lua',
+    'tests/runtime/research_browser_native_discovery.lua',
+    'tests/runtime/research_browser_native_discovery_regressions.lua'
+  )
+  foreach($path in $browserFixtures){
+    $rules=@($manifest.paths|Where-Object pattern -CEQ $path)
+    $selection=Get-MIRAssuranceImpactSelection -Paths @($path) -Config $policy
+    $classification=Get-MIRAssuranceClassification -Paths @($path) -Config $policy
+    if($rules.Count-ne1-or$selection.requires_full-or$selection.unmapped_runtime_paths.Count-or
+      (@($selection.scenarios|Sort-Object)-join'|')-cne$expected-or
+      $classification.escalated-or'runtime.research-browser'-notin$classification.tests){
+      throw "Browser fixture lost its selected native consumer or expanded unrelated campaigns: $path"
+    }
+  }
+  $browserUnknown='tests/runtime/research_browser_future_discovery.lua'
+  $selection=Get-MIRAssuranceImpactSelection -Paths @($browserFixtures+$browserUnknown) -Config $policy
+  if(-not$selection.requires_full-or$browserUnknown-notin$selection.unmapped_runtime_paths){
+    throw 'Exact browser fixture rules masked a new unclassified runtime fixture.'
+  }
   $unknown='tests/runtime/Test-MIRFutureBehavior.ps1'
   $selection=Get-MIRAssuranceImpactSelection -Paths @($unknown) -Config $policy
   if(-not$selection.requires_full-or$unknown-notin$selection.unmapped_runtime_paths){throw 'Unknown runtime behavior lost full escalation.'}
@@ -57,6 +82,7 @@ function Assert-MIRKnownStagingImpactRouting {
   $player=Get-MIRAssuranceClassification -Paths @('source/prototypes/mir/runtime/future_behavior.lua') -Config $policy
   if('runtime.full'-notin$player.tests){throw 'Player runtime source lost its broader checks.'}
   Write-Host '[ok] twenty-three known staging paths retain baseline impact and consumed staging checks; unknown and mixed runtime changes escalate.'
+  Write-Host '[ok] eight browser fixtures retain their selected native consumer; future or mixed runtime fixtures still escalate.'
 }
 Assert-MIRKnownStagingImpactRouting
 if($ImpactRoutingOnly){return}
