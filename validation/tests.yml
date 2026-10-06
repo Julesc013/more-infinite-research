@@ -5520,7 +5520,7 @@
       "id": "runtime.maximum-level-cap-ownership-multiforce-f210",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1 -FactorioBin <factorio>",
+      "command": "./tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
