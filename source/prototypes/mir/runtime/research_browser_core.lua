@@ -22,6 +22,10 @@ local M = {
 -- catalogue/locale generations deliberately retain their issued IDs until a
 -- callback or timeout releases the shared outstanding window.
 local translation_queue = {
+  discovery_subject_limit = 128,
+  discovery_text_limit = 32768,
+  discovery_cache_byte_limit = 16 * 1024 * 1024,
+  discovery_separator = "\31",
   outstanding_limit = 16,
   request_work_limit = 16,
   refresh_batch = 8,
@@ -35,6 +39,9 @@ function translation_queue.new(locale, locale_generation)
     locale_generation = locale_generation,
     catalogue_generation = 0,
     values = {},
+    search_values = {},
+    search_bytes = 0,
+    discovery_limited = false,
     pending_by_id = {},
     pending_by_key = {},
     retry_count = {},
@@ -58,6 +65,9 @@ function translation_queue.reset_catalogue(cache, names, token)
   cache.catalogue_generation = cache.catalogue_generation + 1
   cache.catalogue_token = token
   cache.values = {}
+  cache.search_values = {}
+  cache.search_bytes = 0
+  cache.discovery_limited = false
   cache.pending_by_key = {}
   cache.retry_count = {}
   cache.retry_queue = {}
@@ -99,10 +109,11 @@ function translation_queue.consume_refresh(cache)
   return true
 end
 
-function translation_queue.schedule_retry(cache, key)
+function translation_queue.schedule_retry(cache, key, discovery)
   local retries = (cache.retry_count[key] or 0) + 1
   cache.retry_count[key] = retries
   if retries >= translation_queue.retry_limit then
+    if discovery then cache.discovery_limited = true end
     translation_queue.resolve(cache, key, key)
   elseif not cache.retry_scheduled[key] then
     cache.retry_scheduled[key] = true
@@ -167,13 +178,18 @@ function translation_queue.can_request(cache)
   return cache.outstanding < translation_queue.outstanding_limit
 end
 
-function translation_queue.requested(cache, key, id, tick)
+function translation_queue.requested(cache, key, id, tick, subjects, limited)
   if not translation_queue.can_request(cache) or type(id) ~= "number" then return false end
+  subjects = subjects or 0
+  if type(subjects) ~= "number" or subjects < 0 or subjects > translation_queue.discovery_subject_limit
+      or subjects ~= math.floor(subjects) then return false end
   local request = {
     key = key,
     locale_generation = cache.locale_generation,
     catalogue_generation = cache.catalogue_generation,
-    requested_tick = tick
+    requested_tick = tick,
+    discovery_subjects = subjects,
+    discovery_limited = limited == true
   }
   cache.pending_by_id[id] = request
   cache.pending_by_key[key] = id
@@ -189,11 +205,28 @@ end
 -- collapse pcall's success and translation-ID returns through an `and`
 -- expression. A numeric Factorio request ID must occupy a pending slot;
 -- declined/failed requests resolve immediately to the stable-ID fallback.
-function translation_queue.dispatch(cache, key, tick, request)
+function translation_queue.dispatch(cache, key, tick, request, subjects, limited)
   local ok, id = pcall(request)
-  if ok and translation_queue.requested(cache, key, id, tick) then return true end
+  if ok and translation_queue.requested(cache, key, id, tick, subjects, limited) then return true end
+  if (subjects or 0) ~= 0 or limited then cache.discovery_limited = true end
   translation_queue.request_declined(cache, key)
   return false
+end
+
+local function decoded_discovery(value, subjects)
+  if type(value) ~= "string" or #value > translation_queue.discovery_text_limit then return nil end
+  local parts, cursor = {}, 1
+  while true do
+    local boundary = string.find(value, translation_queue.discovery_separator, cursor, true)
+    local part = string.sub(value, cursor, boundary and boundary - 1 or #value)
+    if #part == 0 or #part > M.detail_string_limit then return nil end
+    parts[#parts + 1] = part
+    if #parts > subjects + 1 then return nil end
+    if not boundary then break end
+    cursor = boundary + 1
+  end
+  if #parts ~= subjects + 1 then return nil end
+  return parts[1], table.concat(parts, " ", 2)
 end
 
 -- Returns true only when the result belongs to the current locale/catalogue
@@ -208,7 +241,22 @@ function translation_queue.completed(cache, id, value)
       or request.catalogue_generation ~= cache.catalogue_generation then
     return false
   end
-  translation_queue.resolve(cache, request.key, type(value) == "string" and value ~= "" and value or request.key)
+  if (request.discovery_subjects or 0) > 0 then
+    local name, search = decoded_discovery(value, request.discovery_subjects)
+    cache.search_values = cache.search_values or {}
+    local retained = (cache.search_bytes or 0) - #(cache.search_values[request.key] or "")
+    if search and retained + #search > translation_queue.discovery_cache_byte_limit then
+      search, cache.discovery_limited = nil, true
+    end
+    cache.search_values[request.key] = search
+    cache.search_bytes = retained + #(search or "")
+    cache.discovery_limited = cache.discovery_limited or request.discovery_limited or name == nil
+    translation_queue.resolve(cache, request.key, name or request.key)
+  else
+    cache.discovery_limited = cache.discovery_limited or request.discovery_limited
+    local valid = type(value) == "string" and value ~= "" and #value <= M.detail_string_limit
+    translation_queue.resolve(cache, request.key, valid and value or request.key)
+  end
   return true
 end
 
@@ -225,7 +273,8 @@ function translation_queue.expire(cache, tick)
       expired = expired + 1
       if request.locale_generation == cache.locale_generation
           and request.catalogue_generation == cache.catalogue_generation then
-        translation_queue.schedule_retry(cache, request.key)
+        translation_queue.schedule_retry(cache, request.key,
+          (request.discovery_subjects or 0) > 0 or request.discovery_limited)
       end
     end
   end
@@ -654,7 +703,9 @@ end
 
 -- Translation belongs to a host because it is player- and locale-specific.
 -- The portable core receives only an optional bounded plain-text index and
--- continues to fall back to stable technology and family identifiers.
+-- continues to fall back to stable technology and family identifiers. The
+-- optional sixth query argument adds a separate plain-text discovery index;
+-- it cannot change the technology caption, ordering key or action identity.
 local function localized_search_text(index, key)
   if type(index) ~= "table" then return "" end
   local value = index[key]
@@ -704,7 +755,7 @@ end
 -- expose a bounded legacy page or a lightweight continuous-list record set.
 -- Neither shape contains provider detail; rich data remains selected-subject
 -- work so a long catalogue cannot turn a filter update into detail copying.
-local function selected_rows(catalogue, view, enrichment, localized_search, selected_key)
+local function selected_rows(catalogue, view, enrichment, localized_search, selected_key, localized_discovery)
   if type(catalogue) ~= "table" or catalogue.schema ~= M.schema or type(catalogue.rows) ~= "table" then return nil, "invalid-catalogue" end
   if #catalogue.rows > M.catalogue_limit then return nil, "catalogue-limit" end
   enrichment = M.normalize_enrichment(enrichment)
@@ -722,6 +773,12 @@ local function selected_rows(catalogue, view, enrichment, localized_search, sele
         local display_name = (sort_by_name or v.search ~= "") and displayed_label(localized_search, key) or nil
         local search_ok = v.search == "" or matches_search(
           key .. " " .. family .. " " .. display_name, v.search, v.spaced_search)
+        if not search_ok and type(localized_discovery) == "table" then
+          local text = localized_discovery[key]
+          if type(text) == "string" and #text <= translation_queue.discovery_text_limit then
+            search_ok = matches_search(text, v.search, v.spaced_search)
+          end
+        end
         if not search_ok and enrichment and enrichment.schema == M.enrichment_schema then
           local detail = enrichment.details[key]
           local ids = enrichment.recipe_ids and enrichment.recipe_ids[key]
@@ -774,8 +831,8 @@ end
 
 -- Query only accepts copied, plain catalogue DTOs. It retains the historical
 -- fixed-size page contract for developer callers.
-function M.query(catalogue, view, enrichment, localized_search, selected_key)
-  local selected, selected_visible, v = selected_rows(catalogue, view, enrichment, localized_search, selected_key)
+function M.query(catalogue, view, enrichment, localized_search, selected_key, localized_discovery)
+  local selected, selected_visible, v = selected_rows(catalogue, view, enrichment, localized_search, selected_key, localized_discovery)
   if not selected then return nil, selected_visible end
   local pages = math.max(1, math.ceil(#selected / M.page_size))
   local page = math.min(v.page, pages)
@@ -792,8 +849,8 @@ end
 -- actual widget budget and can retain or incrementally present these rows.
 -- This function deliberately omits pages and page_size so callers do not
 -- mistake the returned collection for the legacy paginator contract.
-function M.query_all(catalogue, view, enrichment, localized_search, selected_key)
-  local selected, selected_visible, v = selected_rows(catalogue, view, enrichment, localized_search, selected_key)
+function M.query_all(catalogue, view, enrichment, localized_search, selected_key, localized_discovery)
+  local selected, selected_visible, v = selected_rows(catalogue, view, enrichment, localized_search, selected_key, localized_discovery)
   if not selected then return nil, selected_visible end
   return {
     schema = M.schema, rows = copied_rows(selected, 1, #selected, localized_search), count = #selected,

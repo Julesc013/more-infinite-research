@@ -3,6 +3,7 @@ param(
   [string]$PolicyPath,
   [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210',
   [string[]]$SelectedLocale,
+  [string[]]$SelectedKey,
   [switch]$MachineTranslateMissing,
   [switch]$RefreshMachineTranslations
 )
@@ -27,6 +28,9 @@ if ($SelectedLocale.Count -gt 0) {
 }
 $sourcePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath ([string]$policy.source_file)
 $source = Read-MIRLocaleFile -Path $sourcePath
+$SelectedKey = @($SelectedKey | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } | Sort-Object -Unique)
+$unknownKeys = @($SelectedKey | Where-Object { -not $source.Entries.Contains($_) })
+if ($unknownKeys.Count -gt 0) { throw "Requested locale keys are not in the English source: $($unknownKeys -join ', ')." }
 $memoryRoot = Join-Path $repo ($policy.translation_memory_directory -replace '/', '\')
 $overridePath = Join-Path $repo ($policy.translation_overrides -replace '/', '\')
 $overrideDocument = Get-Content -Raw -LiteralPath $overridePath -Encoding UTF8 | ConvertFrom-Json
@@ -93,6 +97,20 @@ function Test-MIRTranslationStructure {
   $sourceLiterals = (Get-MIRTechnicalLiteralSequence -Text $SourceText) -join '|'
   $translationLiterals = (Get-MIRTechnicalLiteralSequence -Text $Translation) -join '|'
   return $sourceLiterals -eq $translationLiterals
+}
+
+function Get-MIRPreservedLocaleRecord {
+  param([string]$Key, [string]$SourceHash, $MemoryByKey, $Existing)
+  if (-not $MemoryByKey.ContainsKey($Key) -or $null -eq $Existing -or
+      -not $Existing.Entries.Contains($Key)) {
+    throw "Unselected locale key has no governed source and memory pair: $Key"
+  }
+  $record = $MemoryByKey[$Key]
+  if ([string]$record.source_sha256 -cne $SourceHash -or
+      [string]$record.translation -cne [string]$Existing.Entries[$Key]) {
+    throw "Unselected locale key is stale or differs from its governed memory: $Key"
+  }
+  return [pscustomobject]@{source_sha256=$SourceHash;translation=[string]$record.translation;provenance=[string]$record.provenance}
 }
 
 function Get-MIRTechnicalLiteralSequence {
@@ -283,7 +301,7 @@ foreach ($locale in $policy.supported_factorio_locales) {
   }
 
   $memoryByKey = @{}
-  if ((Test-Path -LiteralPath $memoryPath) -and -not $RefreshMachineTranslations) {
+  if ((Test-Path -LiteralPath $memoryPath) -and (-not $RefreshMachineTranslations -or $SelectedKey.Count -gt 0)) {
     $memory = Get-Content -Raw -LiteralPath $memoryPath -Encoding UTF8 | ConvertFrom-Json
     foreach ($entry in $memory.entries) { $memoryByKey[$entry.key] = $entry }
   }
@@ -302,6 +320,13 @@ foreach ($locale in $policy.supported_factorio_locales) {
   foreach ($key in $source.Entries.Keys) {
     $sourceText = [string]$source.Entries[$key]
     $sourceHash = Get-MIRTextSha256 -Text $sourceText
+    if ($SelectedKey.Count -gt 0 -and $key -notin $SelectedKey) {
+      $records[$key] = Get-MIRPreservedLocaleRecord -Key $key -SourceHash $sourceHash -MemoryByKey $memoryByKey -Existing $existing
+      if (-not (Test-MIRTranslationStructure -SourceText $sourceText -Translation ([string]$records[$key].translation))) {
+        throw "Unselected locale key violates protected syntax: $key"
+      }
+      continue
+    }
     if ($localeOverrides.ContainsKey($key)) {
       $override = [string]$localeOverrides[$key]
       if (-not (Test-MIRTranslationStructure -SourceText $sourceText -Translation $override)) {
@@ -313,8 +338,9 @@ foreach ($locale in $policy.supported_factorio_locales) {
       $records[$key] = [pscustomobject]@{source_sha256=$sourceHash;translation=$sourceText;provenance='format-invariant'}
     }
     elseif (
-      $memoryByKey.ContainsKey($key) -and
+      -not $RefreshMachineTranslations -and $memoryByKey.ContainsKey($key) -and
       $memoryByKey[$key].source_sha256 -eq $sourceHash -and
+      [string]$memoryByKey[$key].translation -cne $sourceText -and
       (Test-MIRTranslationStructure -SourceText $sourceText -Translation ([string]$memoryByKey[$key].translation)) -and
       (
         $memoryByKey[$key].provenance -ne 'preexisting' -or
@@ -359,7 +385,9 @@ foreach ($locale in $policy.supported_factorio_locales) {
   $values = [ordered]@{}
   foreach ($key in $source.Entries.Keys) {
     $record = $records[$key]
-    $normalizedTranslation = Set-MIRLocalizedCategoryLabels -Text ([string]$record.translation) -Labels $categoryLabels
+    $normalizedTranslation = if ($SelectedKey.Count -gt 0 -and $key -notin $SelectedKey) {
+      [string]$record.translation
+    } else { Set-MIRLocalizedCategoryLabels -Text ([string]$record.translation) -Labels $categoryLabels }
     $normalizedProvenance = [string]$record.provenance
     if ($normalizedTranslation -cne [string]$record.translation) {
       $normalizedProvenance = "$normalizedProvenance+terminology"

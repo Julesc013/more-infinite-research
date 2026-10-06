@@ -223,7 +223,7 @@ local function catalogue_translation_token(catalogue_snapshot)
   -- The Factorio adapter already sorts the bounded technology-ID list.  Keep
   -- this exact token only in the player-local host cache: it is never source
   -- of research policy or shared game state.
-  return names, table.concat(names, "\30")
+  return names, "discovery-v1\30" .. table.concat(names, "\30")
 end
 
 local function ensure_translation_catalogue(player, catalogue_snapshot)
@@ -242,9 +242,11 @@ local function pump_translation_requests(player, cache)
     work = work + 1
     local technology = player.force.technologies[key]
     if technology then
+      local request, subjects, limited = factorio_catalogue.translation_request(
+        technology, prototypes, translation_queue.discovery_subject_limit)
       translation_queue.dispatch(cache, key, game.tick, function()
-        return player.request_translation(technology.localised_name)
-      end)
+        return player.request_translation(request)
+      end, subjects, limited)
     else
       -- request_translation may decline malformed data without issuing an ID;
       -- it never consumes a pending slot in that case.
@@ -271,6 +273,13 @@ local function refresh_translated_view(player, cache)
   -- or rebuild detail/rows for every eight completed translations.
   if not translation_queue.complete(cache) then
     update_translation_index(results, cache, v)
+    if v.search ~= "" then
+      local pending = state().pending_search_refresh
+      -- Share the existing deferred search work. Later callbacks must not
+      -- postpone either an already queued refresh or the player's typing.
+      if pending[player.index] == nil then pending[player.index] = game.tick end
+      set_search_refresh_subscription(true)
+    end
     return
   end
   if v.search == "" and v.sort ~= "name-asc" and v.sort ~= "name-desc" then
@@ -326,7 +335,8 @@ update_translation_index = function(results, cache, v)
   local count = indicator.tags.mir_browser_count or 0
   local unresolved = unresolved_translations(cache)
   if unresolved <= 0 or not needs_name_index(v) then
-    indicator.caption, indicator.tooltip = {"mir-browser.count", count}, nil
+    indicator.caption = {"mir-browser.count", count}
+    indicator.tooltip = cache.discovery_limited and {"mir-browser.discovery-limited"} or nil
     indicator.tags = {mir_browser_count = count}
     return
   end
@@ -1021,7 +1031,7 @@ update_research_results = function(player, results, v, c, cache)
   detail_pane.style.width, detail_pane.style.height = detail_width, stacked and math.floor(panes_height * 0.62) or panes_height
   local query = query_view(v, cache)
   if v.visibility == 2 then query.hidden = nil end
-  local found = core.query_all(c, query, c.enrichment, cache.values, v.selected)
+  local found = core.query_all(c, query, c.enrichment, cache.values, v.selected, cache.search_values)
   if v.visibility == 2 then
     local hidden = {}
     for _, row in ipairs(found.rows) do if v.hidden and v.hidden[row.key] then hidden[#hidden + 1] = row end end
@@ -1527,7 +1537,10 @@ local function translated(event)
       next_locale_generation(locale_generations, cache, player.index))
   end
   local result = event.translated and type(event.result) == "string"
-    and string.sub(event.result, 1, core.detail_string_limit) or nil
+    and event.result or nil
+  -- The queue validates either a caption or a composed discovery payload.
+  -- Truncating first would silently discard otherwise valid recipe/material
+  -- names before their separate limits and generation checks can run.
   -- A stale callback still releases its retained pending slot, but its label
   -- cannot enter the current locale/catalogue index.
   local current_generation = translation_queue.completed(cache, event.id, result)
