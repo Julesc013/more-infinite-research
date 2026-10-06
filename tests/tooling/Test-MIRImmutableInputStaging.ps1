@@ -1,5 +1,5 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot = '',[switch]$NativeProbeOnly)
+param([string]$RepoRoot = '',[switch]$NativeProbeOnly,[switch]$MaterialAuditInputsOnly)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -11,6 +11,7 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+if($NativeProbeOnly -and $MaterialAuditInputsOnly){throw 'Select one focused immutable-input test mode.'}
 if($NativeProbeOnly) { & (Join-Path $RepoRoot 'tests/tooling/Test-MIRNativeProbeResources.ps1') -RepoRoot $RepoRoot;return }
 
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
@@ -19,6 +20,7 @@ $fixtureRoot = Resolve-MIR441RecoveryScratchPath -Path (Join-Path $tempRoot ("mi
 $expectedFixtureRoot = $fixtureRoot
 $firstLease = $null
 $secondLease = $null
+$materialLease = $null
 try {
   New-Item -ItemType Directory -Force -Path $fixtureRoot | Out-Null
   $sourceRoot = Join-Path $fixtureRoot 'verified-inputs'
@@ -31,6 +33,63 @@ try {
   [IO.File]::WriteAllText($sourceTwo, 'mod bytes', [Text.UTF8Encoding]::new($false))
   $hashOne = Get-MIRImmutableInputSha256 -Path $sourceOne
   $hashTwo = Get-MIRImmutableInputSha256 -Path $sourceTwo
+
+  . (Join-Path $RepoRoot 'tests/support/MIRMaterialAuditInputs.ps1')
+  $auditLibrary=Join-Path $fixtureRoot 'audit-library'
+  New-Item -ItemType Directory -Path $auditLibrary | Out-Null
+  $expectedArchives=[ordered]@{}
+  $archivePaths=[ordered]@{}
+  $expectedHashes=[ordered]@{}
+  foreach($name in @('boblibrary','bobores','bobplates')){
+    $file=$name+'_fixture.zip'
+    $path=Join-Path $auditLibrary $file
+    [IO.File]::WriteAllText($path,"small immutable $name input",[Text.UTF8Encoding]::new($false))
+    $hash=Get-MIRImmutableInputSha256 $path
+    $expectedArchives[$name]=[ordered]@{file=$file;sha256=$hash}
+    $archivePaths[$name]=$file
+    $expectedHashes[$name]=$hash
+  }
+  $auditConsumers=@(
+    'Test-MIRBobTinProductionGain.ps1','Test-MIRBobTinMachineMatrix.ps1',
+    'Test-MIRBobTinPersistedState.ps1','Test-MIRBobTinProgressionFrontier.ps1',
+    'Test-MIRBobTinQualification.ps1','Test-MIRF200BobTinPersistedState.ps1'
+  )
+  foreach($consumer in $auditConsumers){
+    $harnessPath=Join-Path $RepoRoot ('tests/runtime/'+$consumer)
+    $tokens=$null;$parseErrors=$null
+    $null=[Management.Automation.Language.Parser]::ParseFile($harnessPath,[ref]$tokens,[ref]$parseErrors)
+    if(@($parseErrors).Count -ne 0){throw "$consumer no longer parses"}
+    $source=[IO.File]::ReadAllText($harnessPath)
+    if($source -match 'Copy-Item\s+-LiteralPath\s+\$(candidateZip|path)\s+-Destination\s+(\$mods|\(Join-Path\s+\$mods)'){
+      throw "$consumer restored archive copies"
+    }
+    $staging=[regex]::Matches($source,'(?m)^\$inputArchives=\[ordered\]@\{\}\r?\nforeach\([^\r\n]*\r?\n\$inputLease=New-MIRMaterialAuditInputLease[^\r\n]*')
+    if($staging.Count -ne 1){throw "$consumer does not expose one consumed shared-input staging block"}
+    $run=Join-Path $fixtureRoot ([IO.Path]::GetFileNameWithoutExtension($consumer))
+    $mods=Join-Path $run 'mods'
+    $candidateZip=$sourceOne;$bobMods=$auditLibrary
+    New-Item -ItemType Directory -Path $run,$mods | Out-Null
+    . ([scriptblock]::Create($staging[0].Value))
+    $materialLease=$inputLease
+    if($materialLease.record.inputs.Count -ne 4){throw "$consumer lost candidate or dependency inputs"}
+    foreach($input in $materialLease.record.inputs){
+      if($input.staging_mode -cne 'hardlink' -or
+         (Get-MIRImmutableInputFileIdentity $input.source_path) -cne (Get-MIRImmutableInputFileIdentity $input.stage_path)){
+        throw "$consumer duplicated archive data instead of linking the source file"
+      }
+    }
+    [IO.File]::WriteAllText((Join-Path $mods 'mod-settings.dat'),'private writable settings',[Text.UTF8Encoding]::new($false))
+    $terminal=Complete-MIRImmutableInputLease -Lease $materialLease -Outcome passed
+    $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal
+    $materialLease=$null
+    $completion=[regex]::Match($source,'\$terminalInputStaging=Complete-MIRImmutableInputLease -Lease \$inputLease -Outcome passed')
+    $binding=[regex]::Match($source,"\`$receipt\['input_staging'\]=\`$terminalInputStaging")
+    if(-not $completion.Success -or -not $binding.Success -or $completion.Index -ge $binding.Index){
+      throw "$consumer lost terminal input custody from its result"
+    }
+  }
+  Write-Host '[ok] six retained Bob Tin staging blocks consume 24 verified same-file aliases; no Factorio or historical gameplay replay.'
+  if($MaterialAuditInputsOnly){return}
 
   $firstLease = New-MIRImmutableInputLease -RunRoot $runOne -StageDirectory (Join-Path $runOne 'mods') -Inputs @(
     [ordered]@{
@@ -345,6 +404,9 @@ try {
   }
   if (-not $orphanReclaimRejected) { throw 'Orphaned immutable input custody was considered reclaimable.' }
 } finally {
+  if($null -ne $materialLease -and -not $materialLease.closed){
+    try { Complete-MIRImmutableInputLease -Lease $materialLease -Outcome failed | Out-Null } catch {}
+  }
   if ($null -ne $firstLease -and -not $firstLease.closed) {
     try { Complete-MIRImmutableInputLease -Lease $firstLease -Outcome failed | Out-Null } catch {}
   }

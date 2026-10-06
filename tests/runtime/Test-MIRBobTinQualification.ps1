@@ -89,6 +89,18 @@ $dossierSha256=(Get-FileHash -LiteralPath $dossier -Algorithm SHA256).Hash
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
+. (Join-Path $repo 'tests/support/MIRMaterialAuditInputs.ps1')
+
+$inputLease=$null
+trap {
+  $failure=$_
+  if($null -ne $inputLease -and -not $inputLease.closed){
+    try { $null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed }
+    catch { Write-Warning $_.Exception.Message }
+  }
+  throw $failure
+}
+
 $run=Join-Path $output ([guid]::NewGuid().ToString('N'))
 $mods=Join-Path $run 'mods'
 New-Item -ItemType Directory -Force -Path $mods,(Join-Path $run 'userdata') | Out-Null
@@ -98,17 +110,18 @@ if([string]::IsNullOrWhiteSpace($CandidateZip)) {
 } else {
   $candidateZip=(Resolve-Path -LiteralPath $CandidateZip).Path
 }
-Copy-Item -LiteralPath $candidateZip -Destination (Join-Path $mods ([IO.Path]::GetFileName($candidateZip)))
 $archivePaths=[ordered]@{
   boblibrary='boblibrary_3.0.0.zip'
   bobores='bobores_3.0.0.zip'
   bobplates='bobplates_3.0.1.zip'
 }
+$inputArchives=[ordered]@{}
+foreach($entry in $archivePaths.GetEnumerator()){$inputArchives[[string]$entry.Value]=[string]$expectedHashes[$entry.Key]}
+$inputLease=New-MIRMaterialAuditInputLease -RunRoot $run -ModsDirectory $mods -CandidateArchive $candidateZip -DependencyDirectory $bobMods -ExpectedArchives $inputArchives
 $archiveHashes=[ordered]@{}
 foreach($entry in $archivePaths.GetEnumerator()) {
   $path=Join-Path $bobMods $entry.Value
   if(-not(Test-Path -LiteralPath $path -PathType Leaf)) { throw "Bob fixture lock is unavailable: $path" }
-  Copy-Item -LiteralPath $path -Destination (Join-Path $mods $entry.Value)
   $archiveHashes[$entry.Key]=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
 }
 foreach($name in $expectedHashes.Keys) { if($archiveHashes[$name] -cne $expectedHashes[$name]) { throw "Bob fixture lock hash differs for $name." } }
@@ -168,6 +181,7 @@ if(-not(Test-Path -LiteralPath $save -PathType Leaf)) { throw 'Bob Tin initializ
 $reloadOne=Invoke-BobTinEngine -Name 'reload-one' -Arguments @('--benchmark',$save,'--benchmark-ticks','360','--benchmark-runs','1')
 $reloadTwo=Invoke-BobTinEngine -Name 'reload-two' -Arguments @('--benchmark',$save,'--benchmark-ticks','360','--benchmark-runs','1')
 $dossier=Join-Path $fixtureSource 'route-dossier.json'
+$terminalInputStaging=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome passed
 $receipt=[ordered]@{
   schema=1
   status='passed'
@@ -200,6 +214,7 @@ $receipt=[ordered]@{
   }
   non_claims=$expectedNonClaims
 }
+$receipt['input_staging']=$terminalInputStaging
 $receipt | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $run 'result.json') -Encoding utf8
 $receipt | ConvertTo-Json -Depth 8
 Write-Output "Evidence: $run"

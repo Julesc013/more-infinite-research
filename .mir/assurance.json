@@ -88,7 +88,7 @@
     },
     {
       "id": "material-audit-input-staging",
-      "patterns": ["^tests/support/MIRMaterialAuditInputs[.]ps1$", "^tests/runtime/Test-MIR(?:AngelTinFinalStateAudit|BobAngelTinFinalStateAudit|BobAngelTinRouteSafety|A06AluminiumFinalState)[.]ps1$"],
+      "patterns": ["^tests/support/MIRMaterialAuditInputs[.]ps1$", "^tests/runtime/Test-MIR(?:AngelTinFinalStateAudit|BobAngelTinFinalStateAudit|BobAngelTinRouteSafety|A06AluminiumFinalState)[.]ps1$", "^tests/runtime/Test-MIR(?:BobTin(?:ProductionGain|MachineMatrix|PersistedState|ProgressionFrontier|Qualification)|F200BobTinPersistedState)[.]ps1$"],
       "tests": ["static.immutable-input-staging"]
     },
     {
