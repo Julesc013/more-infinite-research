@@ -111,6 +111,11 @@ foreach ($constructionPath in @(
   Assert-MIRDevelopmentCISelection -Condition ((@($constructionRows|ForEach-Object id)) -contains 'static.mir42-candidate-construction') -Message "Candidate construction change omitted its executable development check: $constructionPath"
 }
 $nineTargetPaths=@('tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+foreach($historicalInputPath in @('tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1','tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1','tests/release/Test-MIR4DistributionCustodyRoutes.ps1','tools/mir/cli/router/MIR4BootstrapCommands.ps1')){
+  $historicalInputClassification=Get-MIRAssuranceClassification -Paths @($historicalInputPath) -Config $actualAssurance
+  $historicalInputRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $historicalInputClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+  Assert-MIRDevelopmentCISelection -Condition (-not $historicalInputClassification.escalated -and 'static.mir4-historical-runtime-inputs' -in @($historicalInputRows.id) -and 'static.mir4-distribution-custody-routes' -in @($historicalInputRows.id)) -Message "Historical input change omitted its consumed checks: $historicalInputPath"
+}
 foreach($migrationPath in @('tests/runtime/Test-MIR42V2V3CapMigration.ps1','tests/runtime/Test-MIR42V2V3CapMigrationStatic.ps1','tools/mir/application/package/HistoricalSourceAuthority.ps1')){
   $migrationClassification=Get-MIRAssuranceClassification -Paths @($migrationPath) -Config $actualAssurance
   $migrationRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $migrationClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')

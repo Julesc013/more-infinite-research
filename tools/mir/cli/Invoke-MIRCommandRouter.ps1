@@ -48,7 +48,7 @@ Usage:
   .\tools\mir.ps1 mir4 check-historical-private [--target <all|F018|F017|F016|F015|F014|F013>]
   .\tools\mir.ps1 mir4 build-m4c01-player-set
   .\tools\mir.ps1 mir4 check-m4c01-player-set
-  .\tools\mir.ps1 mir4 runtime-historical-private --target <F017|F016|F015|F014|F013> [--factorio-bin <path>] [--candidate <path>] [--evidence <path>]
+  .\tools\mir.ps1 mir4 runtime-historical-private --target <F017|F016|F015|F014|F013> --expected-peak-memory-mib <MiB> [--factorio-bin <path>] [--candidate <path>] [--prior <path>] [--evidence <path>] [--max-new-output-mib <MiB>]
   .\tools\mir.ps1 mir4 api <check|conformance>
   .\tools\mir.ps1 mir4 sdk <generate|check>
   .\tools\mir.ps1 mir4 platform <generate|check|conformance|package>

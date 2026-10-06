@@ -432,7 +432,7 @@
     },
     {
       "key": "mir4 runtime-historical-private",
-      "public_syntax": ".\\tools\\mir.ps1 mir4 runtime-historical-private --target <F017|F016|F015|F014|F013> [--factorio-bin <path>] [--candidate <path>] [--evidence <path>]",
+      "public_syntax": ".\\tools\\mir.ps1 mir4 runtime-historical-private --target <F017|F016|F015|F014|F013> --expected-peak-memory-mib <MiB> [--factorio-bin <path>] [--candidate <path>] [--prior <path>] [--evidence <path>] [--max-new-output-mib <MiB>]",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -5859,7 +5859,7 @@
     {
       "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-internal",
-      "sha256": "59035930778F420E6349CBFAE84EE62603D91DC8C8BAD31436B5765F88CDE9FF",
+      "sha256": "EB1D282D50755FF01E9C86259A55DC0188904445908E6DB7AD69A3103E771CE0",
       "hash_mode": "canonical-text-v1",
       "lines": 140,
       "package_visible": false
@@ -5907,9 +5907,9 @@
     {
       "path": "tools/mir/cli/router/MIR4BootstrapCommands.ps1",
       "classification": "canonical-internal",
-      "sha256": "921C4B9553D7CD6122DA4EA7CE510EE5709FB9738BE917F1FD60E27B9AEE5ABF",
+      "sha256": "B179B0C6128EC7EC6BB12D02C771AA0A16A873ED2D784A208F742C786ABA01CD",
       "hash_mode": "canonical-text-v1",
-      "lines": 210,
+      "lines": 214,
       "package_visible": false
     },
     {
@@ -6034,5 +6034,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1e43bd93d0c2f9547b54ae6a35c0284707f3c30bee2fa05b5cfbd612ecad4931"
+  "digest": "sha256:ae4b68e69073d05d47e67544e4f03dd9be8bf39cf99092c001a655bfbce4c93a"
 }
