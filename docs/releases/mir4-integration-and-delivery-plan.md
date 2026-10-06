@@ -5,7 +5,7 @@ applies_to: "MIR 4.1 maintenance and 4.2+ development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -232,7 +232,9 @@ The original spelling, IDs, acceptance lists, and unresolved prototype identitie
 
 Every material slice binds available output identities, intended production routes and machine categories, native effect ownership, science/unlock frontier, productive returns and recovery, target behavior, stable settings/technology IDs, save/reload proof, actual containing ZIP, and narrowly worded evidence-backed claim. One reusable product/process family mechanism should cover Bob/Angel's sixteen requests. Do not classify by translated-name substring or count a disabled/hidden prototype as delivered.
 
-The four retained Angel Petrochem subjects now have conditional source declarations for nitric acid, hydrochloric acid, hydrofluoric acid and glycerol. Six observed producer names must also contain the requested productive fluid result. They use the shared three-level early stage and useful level-four continuation at +2% per level. This grants no recipe permission or certificate exception. The exact-hash 2.1.2 source intake remains historical source evidence; current finalized routes, reachable labs/science, emitted catalogue, earned production and saves still need qualification. Py acid gas, Py glycerol and plant samples retain their separate request identities.
+The four retained Angel Petrochem subjects now have conditional source declarations for nitric acid, hydrochloric acid, hydrofluoric acid and glycerol. Six observed producer names must also contain the requested productive fluid result. They use the shared three-level early stage and useful level-four continuation at +2% per level. This grants no recipe permission or certificate exception. The exact-hash 2.1.2 source intake remains historical source evidence; current finalized routes, reachable labs/science, emitted catalogue, earned production and saves still need qualification.
+
+ECO-PY's acid gas (`acidgas`) and glycerol (`glycerol`) now have separate conditional fluid declarations and staged identities. Thirteen acid-gas and four glycerol source-observed producer names are exact selectors. Both require `pycoalprocessing`, which defines the retained fluids. Final permission, typed productive output, complete process safety, ownership and reachable science/labs decide emission through the existing shared machinery. Controlled source checks cover provider presence, admission, changed outputs, denied permission, return paths, incomplete graphs, useful caps and continuation ownership. No permission or route exception is granted. The original eight-archive intake remains source evidence; current-package catalogue, production, saves and older-suite applicability remain pending. Py samples, trees and bootstrap routes, and the distinct Angel plant-life sample request, remain unfinished.
 
 The existing F210 final-route observer now captures those four fluids through a separate independent raw-prototype denominator, alongside the original sixteen material outcomes and supplementary platinum wire. It captures the six named chemical candidates and reports producers outside that list as observation gaps. A missing candidate cannot close coverage. Observer receipts bind the canonical package-source fingerprint and keep the raw source-manifest hash in a separate custody field. Focused Lua and parser checks establish these contracts; current native admission, useful output and saves remain pending.
 

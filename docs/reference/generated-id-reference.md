@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 supersedes: ["schemas/stream-manifest.md"]
 superseded_by: []
 source_of_truth_for:
@@ -15,6 +15,8 @@ source_of_truth_for:
 # Generated ID Reference
 
 MIR 4.2.1 development also predeclares early `-1` and continuation `-4` identities for `research_material_nitric_acid`, `research_material_hydrochloric_acid`, `research_material_hydrofluoric_acid` and `research_material_glycerol`. These four Angel fluid families select only the retained named producers with the requested productive fluid result. The existing process, permission, ownership and progression gates still decide emission. Current native route admission, earned production, catalogue and save qualification remain pending.
+
+Py's retained acid-gas and glycerol subjects use `research_material_py_acid_gas` and `research_material_py_glycerol`, each with separate `recipe-prod-<stream-key>-1` and `-4` identities. They do not reuse Angel glycerol's identity or acquire any sample/tree request. Exact producer selection and shared final-world admission decide emission; predeclaring these IDs grants no native qualification or permission exception.
 
 ## Predeclared Automatic Family IDs
 

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 source_of_truth_for:
@@ -52,6 +52,8 @@ mir-settings-profile-import
 This setting accepts a portable MIR settings profile string. It is always registered and stays out of profile exports so importing one profile never nests another profile inside it.
 
 MIR 4.2.1 development gives the Rare Metals, Silicon, Glass, black paving and white paving staged material families a default `ips-max-level-<stream>` of `0`. Zero leaves the configured combined stage limit open; the compiler still stops at the highest useful recipe-productivity level. The early technology remains finite at three, and an explicit value of `3` prevents the separate level-four continuation. Existing setting IDs, increments, research times and cost controls remain the same. These are startup settings and require a restart.
+
+The conditional Py fluid families use `research_material_py_acid_gas` and `research_material_py_glycerol` with the same per-stream startup controls. Their default maximum of `0` still requires useful recipe headroom; a configured maximum of `3` withholds the later stage and `4` caps the combined stages at level four. Their enable controls appear when the named Py providers are active. Settings visibility alone does not establish recipe admission or current native acceptance.
 
 Material continuations preserve the existing space-first preference for a qualified later ordinary science. A pack already implied by the inherited official or mod prerequisite progression cannot become a new late frontier. If research already uses an established late tier, the planner can carry that complete ingredient set and its amounts rather than add a lower pack or impose a distinct final pack. The existing final-pack escape remains available when no ordinary or inherited late frontier is usable. Acquisition, joint-lab selection, required science and useful-effect checks still apply; this correction changes no cost or setting default. Current-package save and progression acceptance remain pending.
 

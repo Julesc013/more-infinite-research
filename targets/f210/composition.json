@@ -2076,8 +2076,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize shared material progression declarations for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 13662,
-      "expected_sha256": "C38FCC929A698C59F47351F4655F44C6C7E20DEF987604B3D013C49D223CBEE5",
+      "expected_bytes": 14542,
+      "expected_sha256": "1A7E378129645A96907EAF2F3A0430349B7A0294F57537CF389961D252B994CB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3740,8 +3740,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 71526,
-      "expected_sha256": "2C848C152CD932884A7FC8595FE034412060B33B8C6281319082D43BA13AA28E",
+      "expected_bytes": 73960,
+      "expected_sha256": "3D93A9D7BB06C1DDD743001B16B338589EF4A47A95973DFCC0F151213FBCAF3E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3788,8 +3788,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 69845,
-      "expected_sha256": "FF2F075140A68DFD7483E590F90795137F14FCDEF859AB4D12089871A71C0519",
+      "expected_bytes": 71282,
+      "expected_sha256": "037A8E9F71CFFEDB3E481B7FD7A7884635602C5B72692B83274F8A82808E062A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "CD9E4A4D3B805B02E46744F42CB94E10854A77C0BAFC1A34D5DD22ACCA42A6A8"
+  "record_sha256": "7464903462C7BE0EF541668A6C94B99A414DF83985DDF1DA860E4FED5B4AD033"
 }

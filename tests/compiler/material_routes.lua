@@ -1126,4 +1126,77 @@ do
     "a separate void route cannot enter the exact producer selection")
 end
 
+-- Consume the actual Py declarations. These controlled final facts prove
+-- selector/admission behavior, not the unexecuted upstream finalizers or
+-- production in the retained eight-archive source suite.
+do
+  local py_streams = material_streams_for({factorio_version = "2.1"}, {
+    pycoalprocessing = "3.1.4", pyfusionenergy = "3.1.3", pyhightech = "3.1.3",
+    pypetroleumhandling = "3.1.2", pyalienlife = "3.1.5", pyrawores = "3.1.3"
+  }, {})
+  local subjects = {
+    {"research_material_py_acid_gas", "acidgas", {
+      "dirty-acid", "tailings-dust", "oleochemicals-distilation", "refsyngas-from-meth",
+      "refsyngas-from-meth-canister", "acidgas-2", "acidgas", "coalbed-gas-to-acidgas",
+      "tholin-to-acidgas", "cadaveric-acidgas-01", "cadaveric-arum-mk02-juicer",
+      "cadaveric-arum-mk04-juicer", "pyrite-burn"}},
+    {"research_material_py_glycerol", "glycerol", {
+      "oleochemicals", "glycerol2", "tholin-to-glycerol", "collagen-glycerol"}}
+  }
+  for _, subject in ipairs(subjects) do
+    local key, fluid, routes = subject[1], subject[2], subject[3]
+    local spec = assert(py_streams[key])
+    local function fact_for(name, output_type, output_name)
+      local fact = canonical_route(name, "py-feed", output_name or fluid)
+      fact.variants[1].results[1].type = output_type or "fluid"
+      fact.productive_result_identities = {{type = output_type or "fluid", name = output_name or fluid}}
+      return fact
+    end
+    local function selected(name, fact, extra, incomplete)
+      local world = {[name] = fact}
+      for other_name, other in pairs(extra or {}) do world[other_name] = other end
+      environment(world)
+      risks = {}
+      if incomplete then cached.material_route_graph = {complete = false} end
+      local names = {}
+      for _, bucket in ipairs(matcher.recipes_for_stream(spec, 0.02)) do
+        for _, recipe_name in ipairs(bucket.recipes) do names[#names + 1] = recipe_name end
+      end
+      return names
+    end
+    for _, name in ipairs(routes) do
+      local positive = selected(name, fact_for(name))
+      check(#positive == 1 and positive[1] == name, "actual Py declaration admits a permitted acyclic fluid: " .. name)
+      check(#selected(name, fact_for(name, "item")) == 0, "same-named Py item is not the requested fluid: " .. name)
+      check(#selected(name, fact_for(name, "fluid", "changed-py-fluid")) == 0,
+        "a changed final Py output invalidates the retained producer: " .. name)
+      local denied = fact_for(name)
+      denied.allow_productivity, denied.declared_allow_productivity, denied.effective_allow_productivity = false, false, false
+      denied.variants[1].allow_productivity = false
+      denied.variants[1].declared_allow_productivity = false
+      denied.variants[1].effective_allow_productivity = false
+      check(#selected(name, denied) == 0, "Py declarations preserve final upstream productivity denial: " .. name)
+      local excluded = fact_for(name)
+      excluded.productive_result_identities = {}
+      check(#selected(name, excluded) == 0, "fully excluded Py output cannot receive research: " .. name)
+      check(#selected(name, fact_for(name), {reclaim = recipe(fluid, "py-feed", "fluid", "item")}) == 0,
+        "a return outside the Py selector still withholds the producer: " .. name)
+      check(#selected(name, fact_for(name), nil, true) == 0,
+        "an incomplete process graph cannot qualify a Py producer: " .. name)
+    end
+    local name = routes[1]
+    check(#selected(name .. "-void", fact_for(name .. "-void")) == 0,
+      "the exact Py selector excludes similarly named void aliases: " .. key)
+    local coproduct = fact_for(name)
+    coproduct.variants[1].results[2] = entry("py-seed", 1)
+    coproduct.productive_result_identities[2] = {type = "item", name = "py-seed"}
+    check(#selected(name, coproduct) == 1, "an acyclic coproduct does not erase a productive Py fluid: " .. key)
+    check(#selected(name, coproduct, {seed_return = recipe("py-seed", "py-feed")}) == 0,
+      "a biological coproduct return cannot inherit chemical admission: " .. key)
+    local self_return = fact_for(name)
+    self_return.variants[1].results[2] = entry("py-feed", 1)
+    check(#selected(name, self_return) == 0, "a carrier self-return receives no Py exception: " .. key)
+  end
+end
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

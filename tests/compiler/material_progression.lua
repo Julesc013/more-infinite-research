@@ -202,6 +202,79 @@ check(same_array(progression.angel_petrochem_stream_keys(), petrochem_keys),
 check(not pcall(function()
   progression.attach_angel_petrochem_continuation("research_material_tin", {max_level = 3})
 end), "chemical attachment cannot grant a different material continuation")
+local py_subjects = {
+  {"research_material_py_acid_gas", "acidgas", {
+    "dirty-acid", "tailings-dust", "oleochemicals-distilation", "refsyngas-from-meth",
+    "refsyngas-from-meth-canister", "acidgas-2", "acidgas", "coalbed-gas-to-acidgas",
+    "tholin-to-acidgas", "cadaveric-acidgas-01", "cadaveric-arum-mk02-juicer",
+    "cadaveric-arum-mk04-juicer", "pyrite-burn"}},
+  {"research_material_py_glycerol", "glycerol", {
+    "oleochemicals", "glycerol2", "tholin-to-glycerol", "collagen-glycerol"}}
+}
+local py_keys = {}
+for _, subject in ipairs(py_subjects) do
+  local key, fluid, routes = subject[1], subject[2], subject[3]
+  py_keys[#py_keys + 1] = key
+  local family = streams[key]
+  local valid, reason = progression.validate(key, family.staged_progression)
+  check(valid, "actual Py fluid has valid shared progression: " .. key .. ": " .. tostring(reason))
+  check(family.required_items == nil and same_array(family.required_fluids, {fluid})
+      and same_array(family.required_mods, {"pycoalprocessing"})
+      and family.icon_item == nil and family.icon_fluid == fluid
+      and family.localised_name[4][1] == "fluid-name." .. fluid,
+    "Py discovery and presentation use its own typed fluid: " .. key)
+  local group = family.groups[1]
+  check(family.require_acyclic_process and group.reject_explicit_productivity_denial
+      and group.change == 0.02 and #group.required_productive_outputs == 1
+      and group.required_productive_outputs[1].type == "fluid"
+      and group.required_productive_outputs[1].name == fluid,
+    "Py declarations retain all shared admission guards: " .. key)
+  local patterns = {}
+  for _, route in ipairs(routes) do patterns[#patterns + 1] = "^" .. route:gsub("%-", "%%-") .. "$" end
+  check(same_array(group.recipe_patterns, patterns) and family.reviewed_forward_routes == nil
+      and family.productivity_permission_recipes == nil,
+    "Py declaration selects exact retained producers without permission or graph exceptions: " .. key)
+end
+check(same_array(progression.py_chemical_stream_keys(), py_keys), "Py chemical identities stay separate")
+local py_copy = progression.py_chemical_stream_keys()
+py_copy[1] = "research_material_glycerol"
+check(same_array(progression.py_chemical_stream_keys(), py_keys), "Py identity accessor returns a copy")
+for _, key in ipairs({"research_material_glycerol", "research_material_tin", "research_material_imersite", "research_material_py_earth_sample"}) do
+  check(not pcall(function() progression.attach_py_chemical_continuation(key, {max_level = 3}) end),
+    "Py chemical attachment cannot acquire another request: " .. key)
+end
+check(not pcall(function()
+  progression.attach_angel_petrochem_continuation("research_material_py_glycerol", {max_level = 3})
+end), "Angel glycerol authority cannot acquire Py glycerol")
+do
+  local lookup = package.loaded["prototypes.mir.platform.factorio.prototype_lookup"]
+  local saved_mod_exists, saved_fluid = lookup.mod_exists, lookup.fluid_prototype
+  local saved_science = package.loaded["prototypes.mir.capabilities.science_integration.science_packs"]
+  local saved_technology_requirements = package.loaded["prototypes.mir.planner.technology_requirements"]
+  package.loaded["prototypes.mir.capabilities.science_integration.science_packs"] = {}
+  package.loaded["prototypes.mir.planner.technology_requirements"] = {skip_reason = function() return nil end}
+  local requirements = require("prototypes.mir.planner.requirements")
+  local provider_present, fluid_present = false, true
+  lookup.mod_exists = function(name) return provider_present and name == "pycoalprocessing" end
+  lookup.fluid_prototype = function(name)
+    return fluid_present and (name == "acidgas" or name == "glycerol") and {} or nil
+  end
+  for _, subject in ipairs(py_subjects) do
+    local key, fluid = subject[1], subject[2]
+    provider_present, fluid_present = false, true
+    check(requirements.missing_reason(key, streams[key]) == "missing required mod pycoalprocessing",
+      "actual requirements consumer refuses an unrelated same-named fluid without Py: " .. key)
+    provider_present = true
+    check(requirements.missing_reason(key, streams[key]) == nil,
+      "present Py provider and fluid satisfy the declared prototype requirements: " .. key)
+    fluid_present = false
+    check(requirements.missing_reason(key, streams[key]) == "missing required fluid " .. fluid,
+      "Py presence alone cannot supply a missing fluid: " .. key)
+  end
+  lookup.mod_exists, lookup.fluid_prototype = saved_mod_exists, saved_fluid
+  package.loaded["prototypes.mir.capabilities.science_integration.science_packs"] = saved_science
+  package.loaded["prototypes.mir.planner.technology_requirements"] = saved_technology_requirements
+end
 for _, key in ipairs(expected_keys) do
   local staged = streams[key] and streams[key].staged_progression
   local valid, reason = progression.validate(key, staged)
