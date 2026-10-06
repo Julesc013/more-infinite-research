@@ -891,7 +891,7 @@
     {
       "path": "scripts/Invoke-MIRExtendedTests.ps1",
       "classification": "canonical-internal",
-      "sha256": "4E627342FEF530F8FAC6C000F66CA229BBA57EF8DDE2A80213F9D638C1EFEC93",
+      "sha256": "9234620F41273E9793DFC8DC59A5E1351C17D76E8540D428256CEC6220DE4108",
       "hash_mode": "canonical-text-v1",
       "lines": 513,
       "package_visible": false
@@ -899,15 +899,15 @@
     {
       "path": "scripts/Invoke-MIRPerformanceQualification.ps1",
       "classification": "canonical-internal",
-      "sha256": "346845C1BCB93CD4185CBA79808E8A76835768CAE382ED6B798353AE4BC5CD58",
+      "sha256": "2FFC11C3DF9833B48E1754F8505128C61051C1CF3503A32F6E1729003463625B",
       "hash_mode": "canonical-text-v1",
-      "lines": 146,
+      "lines": 145,
       "package_visible": false
     },
     {
       "path": "scripts/Invoke-MIRReleaseTargetedGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "C4A502113C532582148706DB23FEC31BB2353F49E54732E46B7042EA132C3AEC",
+      "sha256": "84B334FF19870B7CA5A8AD0E641D7D068AD4C54C32DF61C48448CB548083B8CE",
       "hash_mode": "canonical-text-v1",
       "lines": 517,
       "package_visible": false
@@ -1331,7 +1331,7 @@
     {
       "path": "scripts/Start-MIROvernightLocalSweep.ps1",
       "classification": "canonical-internal",
-      "sha256": "53ED33BB0A0BE2FB1F110FD75891FCB1EF97CF36DBF809C7C6498EA7452BB080",
+      "sha256": "1254EB4C5B98CAF8FC87D15374CF647D79153034386FB2D513C7DA5438CF9E1F",
       "hash_mode": "canonical-text-v1",
       "lines": 225,
       "package_visible": false
@@ -3419,7 +3419,7 @@
     {
       "path": "tools/lib/assurance/Core.ps1",
       "classification": "canonical-internal",
-      "sha256": "2E5C2A8BC2973C93AFA8F3FAF6FC35ECD3F8164BE1380F503FF30BFC52B0992C",
+      "sha256": "49D0C4D8914DD8CEAE06D5456DBE7C0775E5DFD58D415564CF38614D8E002E67",
       "hash_mode": "canonical-text-v1",
       "lines": 690,
       "package_visible": false
@@ -6034,5 +6034,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:20b6b4e638de2cf6bc846d06fcdcaf3b28a06057f5b0351bf6f972eab01a3a09"
+  "digest": "sha256:156602e83ef0c67584459a404213195661adb8b7f85c9953f6fe2f380aa8aa63"
 }
