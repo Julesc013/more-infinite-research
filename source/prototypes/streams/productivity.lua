@@ -732,7 +732,7 @@ local streams = {
     },
     dynamic_items_from_lab_inputs = true,
     groups = {
-    { change=0.10, items={
+    { change=0.10, reject_explicit_productivity_denial=true, items={
       "automation-science-pack",
       "logistic-science-pack",
       "chemical-science-pack",

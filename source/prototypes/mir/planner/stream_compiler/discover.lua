@@ -42,6 +42,20 @@ function M.expand_dynamic_items(spec)
   for _, item_name in ipairs(science_packs.pack_list_all()) do
     append_unique_item(out.groups[1].items, seen, item_name)
   end
+  -- Lab science inputs are items. Matching only their names also admits a
+  -- same-named fluid producer; bind the productive output identity instead.
+  -- Preserve explicit group/stream constraints, including fail-closed values.
+  local first_group = out.groups[1]
+  if first_group.required_productive_outputs == nil and out.required_productive_outputs == nil then
+    first_group.required_productive_outputs = {}
+    local bound = {}
+    for _, item_name in ipairs(first_group.items) do
+      if not bound[item_name] then
+        bound[item_name] = true
+        table.insert(first_group.required_productive_outputs, {type = "item", name = item_name})
+      end
+    end
+  end
   return out
 end
 

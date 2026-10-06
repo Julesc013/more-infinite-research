@@ -46,6 +46,8 @@ $modules=[ordered]@{
  'prototypes.mir.report.diagnostics_sink'='source/prototypes/mir/report/diagnostics_sink.lua'
  'prototypes.mir.core.deepcopy'='source/prototypes/mir/core/deepcopy.lua'
  'prototypes.streams.productivity'='source/prototypes/streams/productivity.lua'
+ 'prototypes.mir.planner.stream_compiler.discover'='source/prototypes/mir/planner/stream_compiler/discover.lua'
+ 'prototypes.mir.domain.native_owner.contract'='source/prototypes/mir/domain/native_owner/contract.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')
