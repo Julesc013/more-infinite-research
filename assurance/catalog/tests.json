@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 221,
+  "test_count": 222,
   "tests": [
     {
       "id": "docs.check",
@@ -1023,8 +1023,8 @@
       "cohort": "compatibility-historical",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./tools/mir.ps1 mir4 runtime-historical-private --target <f017|f016|f015|f014|f013>",
-      "canonical_implementation": "tools/mir.ps1",
+      "command": "./tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1 -Target <target> -FactorioBin <factorio> -CandidateZip <candidate> -PredecessorZip <prior-release> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
+      "canonical_implementation": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
       "evaluator_abi": "powershell-exit-code/v1",
@@ -1036,7 +1036,10 @@
         "prior-release",
         "factorio",
         ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
-        "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -4093,6 +4096,30 @@
         ".mir/releases/waves/mir4-r0/**",
         "releases/migrations/**",
         "governance/repository/migrations/**"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-historical-runtime-inputs",
+      "proposition": "The governed test 'static.mir4-historical-runtime-inputs' passes for its exact selected inputs.",
+      "cohort": "compatibility-historical",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -8036,10 +8063,10 @@
       "tooling-release": 67,
       "runtime-upgrade": 52,
       "compiler-static": 19,
-      "compatibility-historical": 14
+      "compatibility-historical": 15
     },
-    "canonical_test_commands": 209,
-    "aggregate_commands": 9,
+    "canonical_test_commands": 211,
+    "aggregate_commands": 8,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
     "duplicate_test_ids": 0
@@ -8051,5 +8078,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:0726b995eef7b8563ca24714e0076acaaace614793b726f864321a825600e6b9"
+  "digest": "sha256:9b0e72cae3b8b7c6a64b7d6d4e706e4ef5f510ede6dd1199a86110eef53dc522"
 }

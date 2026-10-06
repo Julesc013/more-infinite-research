@@ -2,6 +2,20 @@
   "schema": 2,
   "tests": [
     {
+      "id": "static.mir4-historical-runtime-inputs",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json"
+      ]
+    },
+    {
       "id": "static.f210-v2-v3-migration-inputs",
       "kind": "static",
       "layer": "F0",
@@ -3401,14 +3415,17 @@
       "id": "runtime.mir4-historical-private",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./tools/mir.ps1 mir4 runtime-historical-private --target <f017|f016|f015|f014|f013>",
+      "command": "./tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1 -Target <target> -FactorioBin <factorio> -CandidateZip <candidate> -PredecessorZip <prior-release> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "requires_factorio": true,
       "inputs": [
         "candidate",
         "prior-release",
         "factorio",
         ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
-        "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1"
       ]
     },
     {

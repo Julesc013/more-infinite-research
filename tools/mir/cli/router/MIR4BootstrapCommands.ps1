@@ -171,16 +171,20 @@ function Invoke-MIR4BootstrapCommandGroup {
             $runtimeArguments = @{ RepoRoot = $repo.Path; Target = $target }
             $factorioBin = Get-MIRArgValue -Items $Args -Name "--factorio-bin"
             $candidate = Get-MIRArgValue -Items $Args -Name "--candidate"
+            $predecessor = Get-MIRArgValue -Items $Args -Name "--prior"
             $evidence = Get-MIRArgValue -Items $Args -Name "--evidence"
+            $runtimeArguments.ExpectedPeakMemoryMiB = [int](Get-MIRArgValue -Items $Args -Name "--expected-peak-memory-mib" -Default '0')
+            $runtimeArguments.MaxNewOutputMiB = [int](Get-MIRArgValue -Items $Args -Name "--max-new-output-mib" -Default '120')
             if (-not [string]::IsNullOrWhiteSpace($factorioBin)) { $runtimeArguments.FactorioBin = $factorioBin }
             if (-not [string]::IsNullOrWhiteSpace($candidate)) { $runtimeArguments.CandidateZip = $candidate }
+            if (-not [string]::IsNullOrWhiteSpace($predecessor)) { $runtimeArguments.PredecessorZip = $predecessor }
             if (-not [string]::IsNullOrWhiteSpace($evidence)) { $runtimeArguments.EvidenceRoot = $evidence }
             $historicalAuthority = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json') | ConvertFrom-Json -Depth 100
             $historicalRow = @($historicalAuthority.targets | Where-Object { [string]$_.target_key -ceq $target })
             if ($historicalRow.Count -ne 1) { throw "Historical candidate authority has no unique $target row." }
-            Invoke-MIR4WithDistributionCustodyAliases -RepoRoot $repo.Path -Version @([string]$historicalRow[0].predecessor_release) -Action {
-              & (Join-Path $repo "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1") @runtimeArguments
-            }
+            # Native preparation reads an existing input; never restore/copy a
+            # historical archive as a side effect of selecting this test.
+            & (Join-Path $repo "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1") @runtimeArguments
           }
           { $_ -in @("api", "sdk") } {
             if ($Args.Count -lt 3) { throw "mir4 $verb requires a subcommand." }
