@@ -4467,9 +4467,9 @@
     {
       "path": "tools/lib/validation/ImmutableInputStaging.ps1",
       "classification": "canonical-internal",
-      "sha256": "2CCD5FDA0FB3363C9BBD85D1405B525B8BEC73C74AC192E77448CE64C72A4144",
+      "sha256": "2ED461D25D6205235814519A036FAF09130DF10F91DE8BDCDC2CE1DF5350394F",
       "hash_mode": "canonical-text-v1",
-      "lines": 547,
+      "lines": 550,
       "package_visible": false
     },
     {
@@ -6034,5 +6034,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f7de7c23203317aeb93be46a5456aa828208a3fa426a85f149ac4d14f3e94e09"
+  "digest": "sha256:c965d438d6150be97d94edc43a6b49646f3e896011a2e2022dffef06e566fd84"
 }
