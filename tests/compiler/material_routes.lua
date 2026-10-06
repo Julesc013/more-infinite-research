@@ -1141,15 +1141,25 @@ do
       "tholin-to-acidgas", "cadaveric-acidgas-01", "cadaveric-arum-mk02-juicer",
       "cadaveric-arum-mk04-juicer", "pyrite-burn"}},
     {"research_material_py_glycerol", "glycerol", {
-      "oleochemicals", "glycerol2", "tholin-to-glycerol", "collagen-glycerol"}}
+      "oleochemicals", "glycerol2", "tholin-to-glycerol", "collagen-glycerol"}},
+    {"research_material_py_earth_generic_sample", "earth-generic-sample", {"earth-generic-sample"}, "item"},
+    {"research_material_py_earth_sunflower_sample", "earth-sunflower-sample", {"earth-sunflower-sample"}, "item"},
+    {"research_material_py_earth_flower_sample", "earth-flower-sample", {"earth-flower-sample"}, "item"},
+    {"research_material_py_earth_shroom_sample", "earth-shroom-sample", {"earth-shroom-sample"}, "item"},
+    {"research_material_py_earth_tropical_tree_sample", "earth-tropical-tree-sample", {"earth-tropical-tree-sample"}, "item"},
+    {"research_material_py_earth_potato_sample", "earth-potato-sample", {"earth-potato-sample"}, "item"},
+    {"research_material_py_earth_jute_sample", "earth-jute-sample", {"earth-jute-sample"}, "item"},
+    {"research_material_py_earth_venus_fly_sample", "earth-venus-fly-sample", {"earth-venus-fly-sample"}, "item"},
+    {"research_material_py_earth_palmtree_sample", "earth-palmtree-sample", {"earth-palmtree-sample"}, "item"}
   }
   for _, subject in ipairs(subjects) do
     local key, fluid, routes = subject[1], subject[2], subject[3]
+    local product_type = subject[4] or "fluid"
     local spec = assert(py_streams[key])
     local function fact_for(name, output_type, output_name)
       local fact = canonical_route(name, "py-feed", output_name or fluid)
-      fact.variants[1].results[1].type = output_type or "fluid"
-      fact.productive_result_identities = {{type = output_type or "fluid", name = output_name or fluid}}
+      fact.variants[1].results[1].type = output_type or product_type
+      fact.productive_result_identities = {{type = output_type or product_type, name = output_name or fluid}}
       return fact
     end
     local function selected(name, fact, extra, incomplete)
@@ -1166,9 +1176,10 @@ do
     end
     for _, name in ipairs(routes) do
       local positive = selected(name, fact_for(name))
-      check(#positive == 1 and positive[1] == name, "actual Py declaration admits a permitted acyclic fluid: " .. name)
-      check(#selected(name, fact_for(name, "item")) == 0, "same-named Py item is not the requested fluid: " .. name)
-      check(#selected(name, fact_for(name, "fluid", "changed-py-fluid")) == 0,
+      check(#positive == 1 and positive[1] == name, "actual Py declaration admits its permitted acyclic productive subject: " .. name)
+      local wrong_type = product_type == "fluid" and "item" or "fluid"
+      check(#selected(name, fact_for(name, wrong_type)) == 0, "same-named Py output of another type is not the requested subject: " .. name)
+      check(#selected(name, fact_for(name, product_type, "changed-py-subject")) == 0,
         "a changed final Py output invalidates the retained producer: " .. name)
       local denied = fact_for(name)
       denied.allow_productivity, denied.declared_allow_productivity, denied.effective_allow_productivity = false, false, false
@@ -1179,7 +1190,7 @@ do
       local excluded = fact_for(name)
       excluded.productive_result_identities = {}
       check(#selected(name, excluded) == 0, "fully excluded Py output cannot receive research: " .. name)
-      check(#selected(name, fact_for(name), {reclaim = recipe(fluid, "py-feed", "fluid", "item")}) == 0,
+      check(#selected(name, fact_for(name), {reclaim = recipe(fluid, "py-feed", product_type, "item")}) == 0,
         "a return outside the Py selector still withholds the producer: " .. name)
       check(#selected(name, fact_for(name), nil, true) == 0,
         "an incomplete process graph cannot qualify a Py producer: " .. name)
@@ -1190,7 +1201,7 @@ do
     local coproduct = fact_for(name)
     coproduct.variants[1].results[2] = entry("py-seed", 1)
     coproduct.productive_result_identities[2] = {type = "item", name = "py-seed"}
-    check(#selected(name, coproduct) == 1, "an acyclic coproduct does not erase a productive Py fluid: " .. key)
+    check(#selected(name, coproduct) == 1, "an acyclic coproduct does not erase a productive Py subject: " .. key)
     check(#selected(name, coproduct, {seed_return = recipe("py-seed", "py-feed")}) == 0,
       "a biological coproduct return cannot inherit chemical admission: " .. key)
     local self_return = fact_for(name)

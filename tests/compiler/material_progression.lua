@@ -247,8 +247,52 @@ check(not pcall(function()
   progression.attach_angel_petrochem_continuation("research_material_py_glycerol", {max_level = 3})
 end), "Angel glycerol authority cannot acquire Py glycerol")
 do
+  local subjects = {
+    {"generic", "earth-generic-sample"}, {"sunflower", "earth-sunflower-sample"},
+    {"flower", "earth-flower-sample"}, {"shroom", "earth-shroom-sample"},
+    {"tropical_tree", "earth-tropical-tree-sample"}, {"potato", "earth-potato-sample"},
+    {"jute", "earth-jute-sample"}, {"venus_fly", "earth-venus-fly-sample"},
+    {"palmtree", "earth-palmtree-sample"}
+  }
+  local keys = {}
+  for _, subject in ipairs(subjects) do
+    local key, item = "research_material_py_earth_" .. subject[1] .. "_sample", subject[2]
+    keys[#keys+1] = key
+    local family = streams[key]
+    check(family ~= nil, "retained Py sample has an actual declaration: " .. item)
+    check(same_array(family.required_items, {item}) and family.required_fluids == nil
+      and family.icon_item == item and family.localised_name[4][1] == "item-name." .. item,
+      "Py sample presentation and acquisition preserve the exact item: " .. item)
+    local required = subject[1] == "palmtree" and {"pyalienlife", "pyhightech"} or {"pyalienlife"}
+    check(same_array(family.required_mods, required), "Py sample requires its retained defining mods: " .. item)
+    local group = family.groups[1]
+    check(group.change == 0.02 and family.require_acyclic_process and group.reject_explicit_productivity_denial
+      and #group.required_productive_outputs == 1 and group.required_productive_outputs[1].type == "item"
+      and group.required_productive_outputs[1].name == item and family.productivity_permission_recipes == nil
+      and family.reviewed_forward_routes == nil,
+      "Py samples receive no permission or process exceptions: " .. item)
+    check(same_array(group.recipe_patterns, {"^" .. item:gsub("%-", "%%-") .. "$"}),
+      "Py sample selects its exact retained producer, without tree or bootstrap aliases: " .. item)
+    local valid, reason = progression.validate(key, family.staged_progression)
+    check(valid, "actual Py sample stages validate: " .. item .. ": " .. tostring(reason))
+    local late = family.staged_progression.continuation
+    check(family.max_level == 3 and late.first_level == 4 and late.effect_domain == "same-qualified-recipes"
+      and late.laboratory_policy == "require-reachable-late-frontier-lab"
+      and late.native_owner_policy == "require-mir-generated-legacy-owner"
+      and late.maximum_level_policy == "finite-highest-useful-recipe-level",
+      "Py samples retain useful science/lab/owner/cap progression: " .. item)
+  end
+  check(same_array(progression.py_sample_stream_keys(), keys), "nine sample identities remain distinct from Py chemicals and trees")
+  local copy = progression.py_sample_stream_keys(); copy[1] = "research_material_py_glycerol"
+  check(same_array(progression.py_sample_stream_keys(), keys), "sample identity accessor cannot poison the canonical set")
+  for _, key in ipairs({"research_material_py_glycerol", "research_material_glycerol", "research_material_tin", "research_material_py_tree_mk01"}) do
+    check(not pcall(function() progression.attach_py_sample_continuation(key, {max_level = 3}) end),
+      "sample attachment cannot acquire chemical, Angel or tree requests: " .. key)
+  end
+end
+do
   local lookup = package.loaded["prototypes.mir.platform.factorio.prototype_lookup"]
-  local saved_mod_exists, saved_fluid = lookup.mod_exists, lookup.fluid_prototype
+  local saved_mod_exists, saved_fluid, saved_item = lookup.mod_exists, lookup.fluid_prototype, lookup.item_prototype
   local saved_science = package.loaded["prototypes.mir.capabilities.science_integration.science_packs"]
   local saved_technology_requirements = package.loaded["prototypes.mir.planner.technology_requirements"]
   package.loaded["prototypes.mir.capabilities.science_integration.science_packs"] = {}
@@ -293,9 +337,45 @@ do
         "both actual target and provider gates must pass: " .. line .. " " .. key)
     end
   end
+  local active_mods, available_item = {}, nil
+  lookup.mod_exists = function(name) return active_mods[name] == true end
+  lookup.item_prototype = function(name) return name == available_item and {} or nil end
+  for _, key in ipairs(progression.py_sample_stream_keys()) do
+    local family = streams[key]
+    local item = family.required_items[1]
+    local palm = key == "research_material_py_earth_palmtree_sample"
+    local required = palm and {"pyalienlife", "pyhightech"} or {"pyalienlife"}
+    active_mods, available_item = {}, item
+    check(requirements.missing_reason(key, family) == "missing required mod pyalienlife",
+      "an unrelated same-named sample cannot replace its defining provider: " .. key)
+    active_mods.pyalienlife = true
+    if palm then
+      check(requirements.missing_reason(key, family) == "missing required mod pyhightech",
+        "the conditional palm sample also requires Py HighTech")
+      active_mods.pyhightech = true
+    end
+    check(requirements.missing_reason(key, family) == nil,
+      "present providers and the requested item satisfy sample requirements: " .. key)
+    available_item = nil
+    check(requirements.missing_reason(key, family) == "missing required item " .. item,
+      "provider presence does not supply an absent sample: " .. key)
+    available_item = item
+    local normalized = descriptor.normalize(key, family)
+    check(same_array(normalized.descriptor.targets.required_mods, required),
+      "descriptor preserves every defining sample provider: " .. key)
+    for _, line in ipairs({"2.1", "2.0", "1.1", "1.0"}) do
+      local profile = assert(actual_profiles.profiles[line])
+      package.loaded["prototypes.mir.platform.factorio.target_profiles"] = {current = function() return profile end}
+      package.loaded["prototypes.mir.platform.factorio.target_line"] = nil
+      local target_line = require("prototypes.mir.platform.factorio.target_line")
+      local modern = line == "2.1" or line == "2.0"
+      check((target_line.stream_supported(key, normalized) and requirements.missing_reason(key, normalized) == nil) == modern,
+        "sample admission requires both prototype requirements and recipe-productivity capability: " .. line .. " " .. key)
+    end
+  end
   package.loaded["prototypes.mir.platform.factorio.target_profiles"] = saved_profiles
   package.loaded["prototypes.mir.platform.factorio.target_line"] = saved_target_line
-  lookup.mod_exists, lookup.fluid_prototype = saved_mod_exists, saved_fluid
+  lookup.mod_exists, lookup.fluid_prototype, lookup.item_prototype = saved_mod_exists, saved_fluid, saved_item
   package.loaded["prototypes.mir.capabilities.science_integration.science_packs"] = saved_science
   package.loaded["prototypes.mir.planner.technology_requirements"] = saved_technology_requirements
 end

@@ -237,6 +237,27 @@ foreach($subject in @(@('research_material_py_acid_gas','acidgas'),@('research_m
     Assert-CMI ($row.Contains('generated_technology: recipe-prod-'+$key+'-'+$level,[StringComparison]::Ordinal) -and $row.Contains('identity_state: stable-unreleased',[StringComparison]::Ordinal) -and $row.Contains('fixtures/assert-community-manufacturing-intake',[StringComparison]::Ordinal)) "Py stream authority is missing or unbound: $key level $level"
   }
 }
+$pySamples=$fixture.py_sample_implementation
+Assert-CMI ([string]$pySamples.request_id -ceq 'ECO-PY' -and [string]$pySamples.status -ceq 'conditional-current-source-declarations-native-admission-pending' -and [string]$pySamples.productive_output_type -ceq 'item') 'Py sample implementation must preserve its request identity, typed output and pending admission.'
+Assert-CMI (@($pySamples.subjects).Count -eq 9 -and @($pySamples.generated_technologies).Count -eq 18 -and @($pySamples.generated_technologies|Sort-Object -Unique).Count -eq 18) 'Py samples must have nine subjects and eighteen separate stable stage identities.'
+Assert-CMI ([int]$pySamples.early_levels -eq 3 -and [int]$pySamples.continuation_first_level -eq 4 -and [double]$pySamples.effect_per_level -eq 0.02) 'Py samples must use shared useful stages and the retained increment.'
+Assert-CMI (-not [bool]$pySamples.route_permission_grants -and -not [bool]$pySamples.route_certificate_exceptions -and -not [bool]$pySamples.engine_qualification -and -not [bool]$pySamples.public_support_authority -and -not [bool]$pySamples.angel_plant_life_sample_qualification -and -not [bool]$pySamples.tree_or_bootstrap_qualification) 'Conditional Earth sample declarations cannot qualify separate outcomes or grant permission.'
+foreach($route in $pySampleRoutes){
+  $item=[string]$route.identity
+  $key='research_material_py_'+$item.Replace('-','_')
+  $subject=@($pySamples.subjects|Where-Object stream_key -CEQ $key)
+  Assert-CMI ($subject.Count -eq 1 -and [string]$subject[0].item -ceq $item -and (@($subject[0].source_producers)-join '|') -ceq [string]$route.recipe) "Py sample producer differs from its retained source intake: $item"
+  $expectedMods=if($item -ceq 'earth-palmtree-sample'){@('pyalienlife','pyhightech')}else{@('pyalienlife')}
+  Assert-CMI ((@($subject[0].required_mods)-join '|') -ceq ($expectedMods-join '|')) "Py sample providers differ from the retained source condition: $item"
+  $declaration='{"'+$key+'", "'+$item+'"'+$(if($item -ceq 'earth-palmtree-sample'){', "pyhightech"'}else{''})+'}'
+  Assert-CMI ($sourceText.Contains($declaration,[StringComparison]::Ordinal)) "Actual source lacks the retained sample declaration: $item"
+  foreach($level in @(1,4)){
+    $id='recipe-prod-'+$key+'-'+$level
+    Assert-CMI ($id -cin @($pySamples.generated_technologies)) "Py sample stage identity is missing: $id"
+    $row=Get-CMIManifestRow $streamManifest $key $level
+    Assert-CMI ($row.Contains('generated_technology: '+$id,[StringComparison]::Ordinal) -and $row.Contains('identity_state: stable-unreleased',[StringComparison]::Ordinal) -and $row.Contains('fixtures/assert-community-manufacturing-intake',[StringComparison]::Ordinal)) "Py sample stream authority is missing or unbound: $id"
+  }
+}
 $requests=(Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/programmes/community-requests.json')|ConvertFrom-Json -Depth 100 -DateKind String).requests
 $requestIds=@($fixture.authority.request_ids)
 $requestRows=@($requests|Where-Object{$_.id -in $requestIds})
@@ -466,6 +487,10 @@ $evidenceInputPaths=@(
   'tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1',
   'spec/programmes/mir4-4x-operating-programme-v1.json',
   '.mir/fixtures.yml',
+  '.mir/targets.json',
+  'source/prototypes/mir/streams/generated_stream_manifest.json',
+  'source/prototypes/mir/families/material_progression.lua',
+  '.mir/streams.yml',
   [string]$fixture.realization.source_path
 )
 $evidenceInputs=@($evidenceInputPaths|ForEach-Object{[ordered]@{path=[string]$_;sha256=Get-CMIHash (Join-Path $repo ([string]$_))}})
@@ -508,6 +533,7 @@ $result=[ordered]@{
     remaining_obligations=@($pyIntake.remaining_obligations)
   }
   py_chemical_implementation=$pyImplementation
+  py_sample_implementation=$pySamples
   target_bindings=$bindings
   materialized_packages=$materializedPackages
   non_claims=@($fixture.non_claims)

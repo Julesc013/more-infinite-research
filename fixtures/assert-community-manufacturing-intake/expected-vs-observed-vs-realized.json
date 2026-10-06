@@ -584,5 +584,132 @@
     "required_mods": [
       "pycoalprocessing"
     ]
+  },
+  "py_sample_implementation": {
+    "request_id": "ECO-PY",
+    "status": "conditional-current-source-declarations-native-admission-pending",
+    "subjects": [
+      {
+        "stream_key": "research_material_py_earth_generic_sample",
+        "item": "earth-generic-sample",
+        "source_producers": [
+          "earth-generic-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_flower_sample",
+        "item": "earth-flower-sample",
+        "source_producers": [
+          "earth-flower-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_sunflower_sample",
+        "item": "earth-sunflower-sample",
+        "source_producers": [
+          "earth-sunflower-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_shroom_sample",
+        "item": "earth-shroom-sample",
+        "source_producers": [
+          "earth-shroom-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_tropical_tree_sample",
+        "item": "earth-tropical-tree-sample",
+        "source_producers": [
+          "earth-tropical-tree-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_potato_sample",
+        "item": "earth-potato-sample",
+        "source_producers": [
+          "earth-potato-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_jute_sample",
+        "item": "earth-jute-sample",
+        "source_producers": [
+          "earth-jute-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_venus_fly_sample",
+        "item": "earth-venus-fly-sample",
+        "source_producers": [
+          "earth-venus-fly-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_palmtree_sample",
+        "item": "earth-palmtree-sample",
+        "source_producers": [
+          "earth-palmtree-sample"
+        ],
+        "required_mods": [
+          "pyalienlife",
+          "pyhightech"
+        ]
+      }
+    ],
+    "generated_technologies": [
+      "recipe-prod-research_material_py_earth_generic_sample-1",
+      "recipe-prod-research_material_py_earth_generic_sample-4",
+      "recipe-prod-research_material_py_earth_flower_sample-1",
+      "recipe-prod-research_material_py_earth_flower_sample-4",
+      "recipe-prod-research_material_py_earth_sunflower_sample-1",
+      "recipe-prod-research_material_py_earth_sunflower_sample-4",
+      "recipe-prod-research_material_py_earth_shroom_sample-1",
+      "recipe-prod-research_material_py_earth_shroom_sample-4",
+      "recipe-prod-research_material_py_earth_tropical_tree_sample-1",
+      "recipe-prod-research_material_py_earth_tropical_tree_sample-4",
+      "recipe-prod-research_material_py_earth_potato_sample-1",
+      "recipe-prod-research_material_py_earth_potato_sample-4",
+      "recipe-prod-research_material_py_earth_jute_sample-1",
+      "recipe-prod-research_material_py_earth_jute_sample-4",
+      "recipe-prod-research_material_py_earth_venus_fly_sample-1",
+      "recipe-prod-research_material_py_earth_venus_fly_sample-4",
+      "recipe-prod-research_material_py_earth_palmtree_sample-1",
+      "recipe-prod-research_material_py_earth_palmtree_sample-4"
+    ],
+    "productive_output_type": "item",
+    "early_levels": 3,
+    "effect_per_level": 0.02,
+    "continuation_first_level": 4,
+    "route_permission_grants": false,
+    "route_certificate_exceptions": false,
+    "engine_qualification": false,
+    "public_support_authority": false,
+    "angel_plant_life_sample_qualification": false,
+    "tree_or_bootstrap_qualification": false
   }
 }

@@ -820,6 +820,31 @@ for _, key in ipairs(material_progression.py_chemical_stream_keys()) do
   material_progression.attach_py_chemical_continuation(key, streams[key])
 end
 
+-- ECO-PY's retained Earth samples use their own exact item producers. No
+-- tree, codex, seed, bootstrap or Angel sample identity is acquired here.
+-- Final permission, productive output, process safety and reachable labs
+-- remain admission requirements; sample/codex returns grant no exception.
+local py_sample_subjects = {
+  {"research_material_py_earth_generic_sample", "earth-generic-sample"},
+  {"research_material_py_earth_sunflower_sample", "earth-sunflower-sample"},
+  {"research_material_py_earth_flower_sample", "earth-flower-sample"},
+  {"research_material_py_earth_shroom_sample", "earth-shroom-sample"},
+  {"research_material_py_earth_tropical_tree_sample", "earth-tropical-tree-sample"},
+  {"research_material_py_earth_potato_sample", "earth-potato-sample"},
+  {"research_material_py_earth_jute_sample", "earth-jute-sample"},
+  {"research_material_py_earth_venus_fly_sample", "earth-venus-fly-sample"},
+  {"research_material_py_earth_palmtree_sample", "earth-palmtree-sample", "pyhightech"}
+}
+for _, subject in ipairs(py_sample_subjects) do
+  local key, item, additional_mod = subject[1], subject[2], subject[3]
+  local required_mods = {"pyalienlife"}
+  if additional_mod then required_mods[#required_mods+1] = additional_mod end
+  local spec = material_family(item, {item}, required_mods)
+  spec.required_mods = required_mods
+  material_progression.attach_py_sample_continuation(key, spec)
+  streams[key] = spec
+end
+
 -- The additional Angel final routes in this batch have one exact F200
 -- combined-world observation. Keep every other F200 closure, and F210, on
 -- their established declarations until each has its own ordering and engine

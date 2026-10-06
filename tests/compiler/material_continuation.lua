@@ -345,12 +345,22 @@ for _, subject in ipairs({
   {"research_material_hydrofluoric_acid", "angels-liquid-hydrofluoric-acid", "angel"},
   {"research_material_glycerol", "angels-liquid-glycerol", "angel"},
   {"research_material_py_acid_gas", "acidgas", "py"},
-  {"research_material_py_glycerol", "glycerol2", "py"}
+  {"research_material_py_glycerol", "glycerol2", "py"},
+  {"research_material_py_earth_generic_sample", "earth-generic-sample", "py-sample"},
+  {"research_material_py_earth_sunflower_sample", "earth-sunflower-sample", "py-sample"},
+  {"research_material_py_earth_flower_sample", "earth-flower-sample", "py-sample"},
+  {"research_material_py_earth_shroom_sample", "earth-shroom-sample", "py-sample"},
+  {"research_material_py_earth_tropical_tree_sample", "earth-tropical-tree-sample", "py-sample"},
+  {"research_material_py_earth_potato_sample", "earth-potato-sample", "py-sample"},
+  {"research_material_py_earth_jute_sample", "earth-jute-sample", "py-sample"},
+  {"research_material_py_earth_venus_fly_sample", "earth-venus-fly-sample", "py-sample"},
+  {"research_material_py_earth_palmtree_sample", "earth-palmtree-sample", "py-sample"}
 }) do
   local key, recipe_name = subject[1], subject[2]
   recipe_prototypes[recipe_name] = {maximum_productivity = 3}
   local attach = subject[3] == "angel" and progression.attach_angel_petrochem_continuation
     or subject[3] == "py" and progression.attach_py_chemical_continuation
+    or subject[3] == "py-sample" and progression.attach_py_sample_continuation
     or progression.attach_k2_material_continuation
   local family = attach(key, {max_level = 3})
   local early = {
