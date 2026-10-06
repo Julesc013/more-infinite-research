@@ -550,8 +550,10 @@ function New-MIR42FourTargetCandidate {
         $aCandidateRoot = Split-Path -Parent ([string]$a.tree_path)
         Remove-MIR4BuildTree -OutputRoot $targetWork -Path $aCandidateRoot
 
+        $assetRelative = "assets/$target/$([string]$identity.package_name)"
+        $assetPath = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath $assetRelative
         Assert-MIR42FourTargetCleanSnapshot -RepoRoot $repo -ExpectedCommit $headCommit -ExpectedTree $headTree -ExpectedPackageSourceSha256 $packageSourceSha256
-        $b = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId "$candidatePrefix-B" -SourceVersion $SourceVersion -DistributionVersion ([string]$identity.distribution_version) -OutputRoot $targetWork
+        $b = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId "$candidatePrefix-B" -SourceVersion $SourceVersion -DistributionVersion ([string]$identity.distribution_version) -OutputRoot $output -ArchiveRelativePath $assetRelative
         $bInventory = Get-MIR42FourTargetVerifiedMaterialization -Materialization $b -ExpectedRoot ([string]$identity.distribution_root) -ExpectedVersion ([string]$identity.distribution_version)
         if ([string]$aInventory.archive_sha256 -cne [string]$bInventory.archive_sha256 -or
             [string]$aInventory.content_sha256 -cne [string]$bInventory.content_sha256 -or
@@ -559,21 +561,20 @@ function New-MIR42FourTargetCandidate {
           throw "[mir42-four-target-nondeterministic] $target"
         }
 
-        $assetRelative = "assets/$target/$([string]$identity.package_name)"
-        $assetPath = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath $assetRelative
-        if (Test-Path -LiteralPath $assetPath -PathType Leaf) { throw "[mir42-candidate-asset-collision] $target" }
-        $assetParent = Split-Path -Parent $assetPath
-        New-Item -ItemType Directory -Force -Path $assetParent | Out-Null
-        Copy-Item -LiteralPath ([string]$b.archive_path) -Destination $assetPath -ErrorAction Stop
+        if ([string]$b.archive_path -cne $assetPath -or -not (Test-MIR4BootstrapRecordHash -Record $b)) {
+          throw "[mir42-four-target-retained-materialization] $target"
+        }
         $assetIdentity = Get-MIR4RawFileIdentity -Path $assetPath
         if ([string]$assetIdentity.sha256 -cne [string]$bInventory.archive_sha256) {
-          throw "[mir42-four-target-custody-copy] $target"
+          throw "[mir42-four-target-retained-archive] $target"
         }
         $copiedInventory = Get-MIR4ArchiveInventory -Path $assetPath
         if ([string]$copiedInventory.content_sha256 -cne [string]$bInventory.content_sha256 -or
             [int]$copiedInventory.entry_count -ne [int]$bInventory.entry_count) {
-          throw "[mir42-four-target-custody-content] $target"
+          throw "[mir42-four-target-retained-content] $target"
         }
+        $receiptPath = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "materializations/$target.json"
+        Write-MIR4BootstrapRecord -Record $b -Path $receiptPath | Out-Null
 
         # Preserve the established canonical row shape exactly for the four target default.
         $row = [pscustomobject][ordered]@{
@@ -606,7 +607,7 @@ function New-MIR42FourTargetCandidate {
           publication_authorized = $false
           record_sha256 = ''
         }
-        Remove-MIR4BuildTree -OutputRoot $targetWork -Path (Split-Path -Parent ([string]$b.tree_path))
+        Remove-MIR4BuildTree -OutputRoot $output -Path (Split-Path -Parent ([string]$b.tree_path))
       } elseif ([string]$descriptor.materializer -ceq 'historical-playtest-target') {
         $construction = @(& $historicalScript -RepoRoot $repo -Target $target -CandidateId "M42-$BuildId-$($target.ToUpperInvariant())" -Repetitions 2 -OutputRoot $targetWork -SourceVersion $SourceVersion -Check)
         if ($LASTEXITCODE -ne 0 -or $construction.Count -ne 1) {

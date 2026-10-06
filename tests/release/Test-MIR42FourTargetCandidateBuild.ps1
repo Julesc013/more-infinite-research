@@ -1,10 +1,11 @@
 [CmdletBinding()]
-param([switch]$IdentityContractsOnly)
+param([switch]$IdentityContractsOnly,[switch]$MaterializerReceiptContractsOnly)
 
 Set-StrictMode -Version Latest
 
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+$script:mir42CandidateRealMaterializer = (Get-Item Function:New-MIR4TargetPackage).ScriptBlock
 $engineRunnerPath = Join-Path $repo 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1'
 $engineTokens=$null;$engineErrors=$null
 $engineAst=[Management.Automation.Language.Parser]::ParseFile($engineRunnerPath,[ref]$engineTokens,[ref]$engineErrors)
@@ -29,6 +30,7 @@ $maintenanceReadinessAssertions=0
 $maintenanceSealAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
+$script:mir42CandidateReceiptAssertions = 0
 
 function Assert-MIR42CandidateBuildTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Message)
@@ -43,7 +45,8 @@ function New-MIR4TargetPackage {
     [Parameter(Mandatory)][string]$CandidateId,
     [string]$SourceVersion,
     [string]$DistributionVersion,
-    [string]$OutputRoot
+    [string]$OutputRoot,
+    [string]$ArchiveRelativePath=''
   )
 
   $script:mir42CandidateStubCalls.Add("$Target/$CandidateId")
@@ -58,9 +61,12 @@ function New-MIR4TargetPackage {
   [IO.File]::WriteAllText((Join-Path $tree 'info.json'), (($stubInfo | ConvertTo-Json -Compress) + [Environment]::NewLine), [Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllText((Join-Path $tree 'data.lua'), ('return {}' + [Environment]::NewLine), [Text.UTF8Encoding]::new($false))
   $archive = Join-Path $candidateRoot ([string]$identity.package_name)
+  if (-not [string]::IsNullOrWhiteSpace($ArchiveRelativePath)) {
+    $archive = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath $ArchiveRelativePath
+  }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $OutputRoot
   $inventory = Get-MIR4ArchiveInventory -Path $archive
-  return [pscustomobject][ordered]@{
+  $result = [pscustomobject][ordered]@{
     target = $Target
     candidate_id = $CandidateId
     source_version = $SourceVersion
@@ -70,8 +76,10 @@ function New-MIR4TargetPackage {
     archive_sha256 = [string]$inventory.archive_sha256
     content_sha256 = [string]$inventory.content_sha256
     entry_count = [int]$inventory.entry_count
-    record_sha256 = ('A' * 64)
+    record_sha256 = ''
   }
+  $result.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $result
+  return $result
 }
 
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1')
@@ -79,6 +87,53 @@ function New-MIR4TargetPackage {
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1')
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1')
 . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+
+function Test-MIR42RetainedMaterializerReceipts {
+  param([Parameter(Mandatory)][string]$OutputRoot)
+  . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+  foreach ($target in @('f210','f200')) {
+    $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $target -SourceVersion '4.2.1'
+    $candidateId = 'RECEIPT'
+    $stageRoot = Join-Path $OutputRoot "$target/$candidateId"
+    New-Item -ItemType Directory -Force -Path $stageRoot | Out-Null
+    $marker = Join-Path $stageRoot 'preserve-until-admitted.txt'
+    [IO.File]::WriteAllText($marker, 'unique controlled staging state')
+    $assetRelative = "assets/$target/$($identity.package_name)"
+    $assetPath = Join-Path $OutputRoot $assetRelative
+    foreach ($badPath in @(('../'+$identity.package_name), $assetPath, 'assets/wrong.zip', "$target/$candidateId/$($identity.package_name)")) {
+      $rejected = $false
+      try {
+        & $script:mir42CandidateRealMaterializer -RepoRoot $repo -Target $target -CandidateId $candidateId -SourceVersion '4.2.1' -OutputRoot $OutputRoot -ArchiveRelativePath $badPath | Out-Null
+      } catch {
+        $rejected = $_.Exception.Message -match 'Unsafe MIR 4 artifact-relative path|mir4-target-materializer-archive-filename|mir4-target-materializer-retained-archive-in-staging'
+      }
+      Assert-MIR42CandidateBuildTest ($rejected -and (Test-Path -LiteralPath $marker) -and -not (Test-Path -LiteralPath $assetPath)) "retained-materializer-refuses-unsafe-destination-before-staging-$target-$badPath"
+      $script:mir42CandidateReceiptAssertions++
+    }
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $assetPath) | Out-Null
+    foreach ($collision in @($assetPath, "$assetPath.new")) {
+      [IO.File]::WriteAllText($collision, 'unique controlled asset state')
+      $collisionHash = Get-MIR4Sha256File -Path $collision
+      $rejected = $false
+      try {
+        & $script:mir42CandidateRealMaterializer -RepoRoot $repo -Target $target -CandidateId $candidateId -SourceVersion '4.2.1' -OutputRoot $OutputRoot -ArchiveRelativePath $assetRelative | Out-Null
+      } catch { $rejected = $_.Exception.Message -ceq '[mir4-target-materializer-retained-archive-collision]' }
+      Assert-MIR42CandidateBuildTest ($rejected -and (Test-Path -LiteralPath $marker) -and (Get-MIR4Sha256File -Path $collision) -ceq $collisionHash) "retained-materializer-preserves-collision-before-staging-$target"
+      $script:mir42CandidateReceiptAssertions++
+      Remove-Item -LiteralPath $collision
+    }
+    $result = & $script:mir42CandidateRealMaterializer -RepoRoot $repo -Target $target -CandidateId $candidateId -SourceVersion '4.2.1' -OutputRoot $OutputRoot -ArchiveRelativePath $assetRelative
+    Assert-MIR42CandidateBuildTest ($result.archive_path -ceq [IO.Path]::GetFullPath($assetPath) -and (Test-MIR4BootstrapRecordHash -Record $result)) "retained-materializer-original-receipt-$target"
+    $script:mir42CandidateReceiptAssertions++
+    $originalHash = [string]$result.record_sha256
+    $receiptPath = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath "materializations/$target.json"
+    Write-MIR4BootstrapRecord -Record $result -Path $receiptPath | Out-Null
+    Remove-MIR4BuildTree -OutputRoot $OutputRoot -Path (Split-Path -Parent $result.tree_path)
+    $consumed = Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $assetPath -ReceiptPath $receiptPath -Target $target
+    Assert-MIR42CandidateBuildTest ($consumed.receipt.record_sha256 -ceq $originalHash -and $consumed.receipt.archive_sha256 -ceq (Get-MIR4Sha256File -Path $assetPath) -and -not (Test-Path -LiteralPath $stageRoot) -and @(Get-ChildItem -LiteralPath $OutputRoot -Recurse -File -Filter $identity.package_name).Count -eq 1) "retained-materializer-native-reader-after-staging-retirement-$target"
+    $script:mir42CandidateReceiptAssertions++
+  }
+}
 
 function Test-MIR42IndependentConstructionInput {
   param([Parameter(Mandatory)][string]$CandidateRoot,[Parameter(Mandatory)][object[]]$Inputs)
@@ -149,11 +204,17 @@ $historicalRoot = $root + '-historical'
 $nineRoot = $root + '-nine'
 $identityRoot = $root + '-identity'
 $patchRoot = $root + '-patch'
+$receiptRoot = $root + '-receipts'
 $historicalRecordHashes = @{}
 foreach ($target in @('f017','f016','f015','f014','f013')) {
   $historicalRecordHashes[$target] = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $repo "targets/historical/$target/target.json")).Hash
 }
 try {
+  if ($MaterializerReceiptContractsOnly) {
+    Test-MIR42RetainedMaterializerReceipts -OutputRoot $receiptRoot
+    [pscustomobject]@{status='MIR-4.2.1-RETAINED-MATERIALIZER-RECEIPTS-PASSED';receipt_assertions=$script:mir42CandidateReceiptAssertions;canonical_packages=2;native_candidate_readers=2;factorio_processes=0;qualification='not-performed'}
+    return
+  }
   $nineDescriptors = @(Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SelectedTargets @('f210', 'f200', 'f110', 'f100', 'f017', 'f016', 'f015', 'f014', 'f013'))
   Assert-MIR42CandidateBuildTest (($nineDescriptors | ForEach-Object { [string]$_.target }) -join '|' -ceq 'f210|f200|f110|f100|f017|f016|f015|f014|f013') 'nine-target-descriptor-order'
   Assert-MIR42CandidateBuildTest (@($nineDescriptors | Where-Object { [string]$_.materializer -ceq 'canonical-package-source' }).Count -eq 4) 'nine-target-canonical-descriptor-count'
@@ -744,6 +805,8 @@ try {
     return
   }
 
+  Test-MIR42RetainedMaterializerReceipts -OutputRoot $receiptRoot
+
   $complete = New-MIR42FourTargetCandidate -RepoRoot $repo -FinalSourceCommit $commit -BuildId 'STATIC' -OutputRoot $root -MinimumFreeMemoryBytes 1 -MinimumFreeWorkBytes 1
   Assert-MIR42CandidateBuildTest ([bool]$complete.build_complete) 'complete-build-status'
   Assert-MIR42CandidateBuildTest ($complete.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV1') 'complete-build-manifest-kind'
@@ -760,6 +823,8 @@ try {
     Assert-MIR42CandidateBuildTest ([bool]$row.deterministic_archive_bytes -and [bool]$row.package_excluded_surface) "row-determinism-surface-$target"
     $asset = Join-Path $root ([string]$row.asset.path)
     Assert-MIR42CandidateBuildTest ((Get-MIR4Sha256File -Path $asset) -ceq [string]$row.asset.sha256) "row-custody-$target"
+    $retained = Get-Content -Raw -LiteralPath (Join-Path $root "materializations/$target.json") | ConvertFrom-Json -Depth 100
+    Assert-MIR42CandidateBuildTest ((Test-MIR4BootstrapRecordHash -Record $retained) -and $retained.record_sha256 -ceq $row.materializer_record_b_sha256 -and $retained.archive_path -ceq $asset -and -not (Test-Path -LiteralPath $retained.tree_path)) "row-retains-original-materializer-receipt-$target"
   }
 
   $script:mir42CandidateStubCalls.Clear()
@@ -868,6 +933,7 @@ try {
   [pscustomobject][ordered]@{
     status = 'MIR-4.2-NINE-TARGET-CONSTRUCTION-ADAPTER-STATIC-PASSED'
     materializer_calls_complete = 8
+    retained_receipt_assertions = $script:mir42CandidateReceiptAssertions
     partial_successful_targets = @($partial.targets).Count
     historical_target_rows = 5
     patch_target_rows = 9
@@ -876,7 +942,7 @@ try {
     engine_runs = 0
   }
 } finally {
-  foreach ($path in @($root, $partialRoot, $historicalRoot, $nineRoot, $identityRoot, $patchRoot)) {
+  foreach ($path in @($root, $partialRoot, $historicalRoot, $nineRoot, $identityRoot, $patchRoot, $receiptRoot)) {
     if (Test-Path -LiteralPath $path) {
       $resolvedPath = (Resolve-Path -LiteralPath $path).Path
       $null = Assert-MIR4DescendantPath -Root (Join-Path $repo 'build') -Path $resolvedPath
