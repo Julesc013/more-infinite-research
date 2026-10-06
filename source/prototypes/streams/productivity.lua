@@ -765,7 +765,12 @@ local function material_family(item, routes, mod_names, display_item, product_ty
     research_time = 30,
     max_level = 3,
     require_acyclic_process = true,
-    groups = {{change = 0.02, recipe_patterns = exact_recipe_patterns(routes), reject_explicit_productivity_denial = true}}
+    groups = {{
+      change = 0.02,
+      recipe_patterns = exact_recipe_patterns(routes),
+      reject_explicit_productivity_denial = true,
+      required_productive_outputs = {{type = "item", name = item}}
+    }}
   }
   if product_type == "fluid" then
     spec.required_items = nil
@@ -1013,7 +1018,15 @@ local function bob_or_angel_wire_material_family(material)
     routes[#routes + 1] = "angels-plate-" .. material .. "-2"
     routes[#routes + 1] = "angels-wire-" .. material .. "-2"
   end
-  return material_family("bob-" .. material .. "-plate", routes, {"bobplates", "angelssmelting"})
+  local spec = material_family("bob-" .. material .. "-plate", routes, {"bobplates", "angelssmelting"})
+  if (material == "gold" or material == "silver")
+    and f200_bob_angel_relevant_return_graph_routes then
+    -- These exact combined-world declarations already include a distinct
+    -- wire final. Keep its typed output alongside the plate; its existing
+    -- required return-cone certificate still binds the particular recipe.
+    spec.groups[1].required_productive_outputs[2] = {type = "item", name = "angels-wire-" .. material}
+  end
+  return spec
 end
 
 -- Separate requested materials share policy, never translated-name matching.
@@ -1065,6 +1078,9 @@ streams.research_material_rare_metals = material_family("kr-rare-metals", {"kr-r
 -- powder route, so present its generated technology as powder while keeping
 -- crystal as the existing availability anchor.
 streams.research_material_imersite = material_family("kr-imersite-crystal", {"kr-imersite-crystal", "kr-imersite-powder"}, {"Krastorio2", "Krastorio2-spaced-out"}, "kr-imersite-powder")
+-- Crystal is the retained availability anchor; the powder route is a
+-- separate admitted output, with its original ownership checks unchanged.
+streams.research_material_imersite.groups[1].required_productive_outputs[2] = {type = "item", name = "kr-imersite-powder"}
 -- Only the current exact K2/K2SO tuple receives the MIR-owned powder
 -- continuation. The separate native crystal owner remains untouched.
 if current_k2_213_material_profile() then
