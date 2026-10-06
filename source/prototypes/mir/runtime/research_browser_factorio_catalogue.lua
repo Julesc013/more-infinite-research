@@ -6,6 +6,12 @@ local progression_depth_limit = 128
 -- after a script reload; each snapshot still reads force-local research state.
 local static_by_force = {}
 
+function M.forget_force(index)
+  if type(index) == "number" and index > 0 and index == math.floor(index) then
+    static_by_force[index] = nil
+  end
+end
+
 local function available(technology)
   if not technology.enabled or technology.researched or technology.prototype.research_trigger then return false end
   for _, prerequisite in pairs(technology.prerequisites) do

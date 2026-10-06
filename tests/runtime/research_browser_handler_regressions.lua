@@ -9,7 +9,7 @@ local function expect(check, condition, message)
   if not condition then error(message) end
 end
 
-local function make_host_factory(host_source)
+local function make_host_factory(host_source, catalogue_source)
   local function make_environment()
     local events, buckets = {}, {}
     local metrics = {render_calls = 0, gameplay_mutations = 0, destroy_calls = 0, shortcut_calls = 0}
@@ -25,11 +25,17 @@ local function make_host_factory(host_source)
     }
     local defines_events = {}
     for _, name in ipairs(event_names) do defines_events[name] = name end
+    local catalogue_module = {}
+    if catalogue_source then
+      catalogue_module = assert(load(catalogue_source, "actual_browser_catalogue_fixture", "t", {
+        type = type, pairs = pairs, ipairs = ipairs, table = table, math = math, string = string
+      }))()
+    end
     local modules = {
       ["prototypes.mir.runtime.research_browser_core"] = {
         translation_queue = {}, detail_string_limit = 1024, catalogue_limit = 30000
       },
-      ["prototypes.mir.runtime.research_browser_factorio_catalogue"] = {},
+      ["prototypes.mir.runtime.research_browser_factorio_catalogue"] = catalogue_module,
       ["prototypes.mir.runtime.research_browser_mir_provider"] = {},
       ["prototypes.mir.runtime.state"] = {
         bucket = function(name)
@@ -69,7 +75,7 @@ local function make_host_factory(host_source)
     setmetatable(env, {__index = function(_, key)
       error("unexpected host global access: " .. tostring(key))
     end})
-    return env, events, metrics, buckets, function(value) player = value end
+    return env, events, metrics, buckets, function(value) player = value end, catalogue_module
   end
 
   return function(options)
@@ -96,7 +102,7 @@ local function make_host_factory(host_source)
         "if event.element and event.element.valid and event.element.name == ROOT then close(player) end", 1)
       if count ~= 1 then error("close ownership mutation anchor not found") end
     end
-    local env, events, metrics, buckets, set_player = make_environment()
+    local env, events, metrics, buckets, set_player, catalogue_module = make_environment()
     local chunk, load_error = load(source, "research_browser_handler_fixture", "t", env)
     if not chunk then error(load_error) end
     local host = chunk()
@@ -146,6 +152,8 @@ local function make_host_factory(host_source)
         foreign_button = foreign_button
       },
       metrics = metrics,
+      host = host,
+      catalogue = catalogue_module,
       state = buckets.research_browser,
       peer_view = peer_view
     }
@@ -192,11 +200,11 @@ end
 
 -- host_source_string is trusted project source supplied by the test harness.
 -- The isolated load environment exists only inside this regression fixture.
-return function(host_source_string, check)
+return function(host_source_string, check, catalogue_source_string)
   expect(check, type(host_source_string) == "string" and #host_source_string > 0,
     "handler regression receives trusted browser host source")
   expect(check, type(check) == "function", "handler regression receives an assertion function")
-  local host_factory = make_host_factory(host_source_string)
+  local host_factory = make_host_factory(host_source_string, catalogue_source_string)
   local fixture = fixture_from(host_factory, nil, check)
   -- Factorio dispatches selection/text events separately; these click probes
   -- ensure the broad click subscription cannot rebuild controls while those
@@ -267,4 +275,48 @@ return function(host_source_string, check)
   })
   expect(check, not ok or metric(negative, "render_calls", check) > before_render,
     "negative control proves an unconditional unknown-click render is detected")
+
+  expect(check, type(catalogue_source_string) == "string" and #catalogue_source_string > 0,
+    "force lifecycle controls receive trusted actual catalogue source")
+  local lifecycle = fixture_from(host_factory, nil, check)
+  local destination_reads = 0
+  local function force(index, name, key, destination)
+    local prototype = setmetatable({}, {__index = function(_, field)
+      if field == "max_level" then return 1 end
+      if field == "order" then
+        if destination then destination_reads = destination_reads + 1 end
+        return "fixture-order"
+      end
+    end})
+    return {valid = true, index = index, name = name, technologies = {
+      [key] = {name = key, enabled = true, researched = false, prerequisites = {}, prototype = prototype}
+    }, research_queue = {}}
+  end
+  local destination = force(7, "destination", "destination-tech", true)
+  local source = force(8, "source", "source-tech")
+  local before_destination = lifecycle.catalogue.snapshot(destination)
+  expect(check, before_destination.rows[1].key == "destination-tech"
+    and lifecycle.catalogue.snapshot(source).rows[1].key == "source-tech",
+    "actual adapter populates independent source and destination catalogue facts")
+  local reads = destination_reads
+  lifecycle.host.on_forces_merged{source_index = source.index, destination = destination}
+  source.technologies = force(8, "source", "fresh-source-facts").technologies
+  local refreshed_source = lifecycle.catalogue.snapshot(source)
+  expect(check, refreshed_source and refreshed_source.rows[1]
+    and refreshed_source.rows[1].key == "fresh-source-facts",
+    "the real merged-force callback discards facts belonging to the merged source index")
+  destination.technologies["destination-tech"].researched = true
+  local after_destination = lifecycle.catalogue.snapshot(destination)
+  expect(check, after_destination.rows[1].key == "destination-tech"
+    and after_destination.rows[1].researched and destination_reads == reads,
+    "merge cleanup preserves destination static facts while reading its current research state")
+  for _, event in ipairs{{}, {source_index = 0}, {source_index = -1},
+      {source_index = "7"}, {source_index = 7.5}, {source_index = 900}} do
+    lifecycle.host.on_forces_merged(event)
+  end
+  lifecycle.host.on_forces_merged()
+  lifecycle.catalogue.snapshot(destination)
+  expect(check, destination_reads == reads and lifecycle.metrics.gameplay_mutations == 0
+    and lifecycle.state.players[2] == lifecycle.peer_view,
+    "unknown or malformed merge identities preserve unrelated caches, gameplay and personal state")
 end

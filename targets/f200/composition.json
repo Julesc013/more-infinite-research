@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 89653,
-      "expected_sha256": "531C7372E05BB53F14B3CF11E4D38C542C0F4FB3DE12656822F4A89FD4E2E8BD",
+      "expected_bytes": 89724,
+      "expected_sha256": "84F733E59A872702EFC86F279CF86A9E3243F6B8479D2B5CE17A80CE8F8A1858",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3868,8 +3868,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the bounded generic Factorio catalogue adapter for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3972,
-      "expected_sha256": "3BBD5A0CD1CEA954CA88A00A41E1A15B165F6C0A6C514A7FA2129324FDC6F138",
+      "expected_bytes": 4126,
+      "expected_sha256": "3A08721F3DCE2C26A3404A7448DF6F1FC09E05871881BCE97727D353F35F0900",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "package-excluded-no-mir-core-fixture",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "2DC3FB04414E94B1779498FE47B9F3A9487D433056D14D91A8CE0291BDD830AA"
+  "record_sha256": "8D729DA03CB1C4C33BD3452C35FEA9DB34B860FAA23B3D662E62EFD5F91CF36E"
 }
