@@ -2,6 +2,24 @@
   "schema": 2,
   "tests": [
     {
+      "id": "static.f210-v2-v3-migration-inputs",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/runtime/Test-MIR42V2V3CapMigrationStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
+        "tests/runtime/Test-MIR42V2V3CapMigrationStatic.ps1",
+        "tools/mir/application/package/HistoricalSourceAuthority.ps1",
+        "tools/mir/application/package/SourceCompositionProof.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "tools/mir/application/release/F210QualificationPolicy.ps1",
+        "fixtures/assert-mir42-v2-v3-cap-migration/**"
+      ]
+    },
+    {
       "id": "static.mir42-nine-target-engine-inputs",
       "kind": "static",
       "layer": "F0",
@@ -5595,10 +5613,18 @@
       "id": "runtime.maximum-level-v2-v3-migration-f210",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIR42V2V3CapMigration.ps1 -FactorioBin <factorio>",
+      "command": "./tests/runtime/Test-MIR42V2V3CapMigration.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -PredecessorCandidateZip <prior-release> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "requires_factorio": true,
       "inputs": [
+        "candidate",
+        "prior-release",
+        "factorio",
         "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
+        "tests/runtime/Test-MIR42V2V3CapMigrationStatic.ps1",
+        "tools/mir/application/package/HistoricalSourceAuthority.ps1",
+        "tools/mir/application/package/SourceCompositionProof.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
         "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
         ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json",

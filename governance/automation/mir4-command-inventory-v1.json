@@ -5083,9 +5083,9 @@
     {
       "path": "tools/mir/application/package/HistoricalSourceAuthority.ps1",
       "classification": "historical",
-      "sha256": "4217604B7777095331EC03B0BAFEC92434AB8F0AD30D61E2823A847E76665C61",
+      "sha256": "E7387D12B089EFAD750100040087F47DC51941C791C4E23DDAA1B1C9D8D0E6EB",
       "hash_mode": "canonical-text-v1",
-      "lines": 47,
+      "lines": 130,
       "package_visible": false
     },
     {
@@ -6034,5 +6034,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2de5ce3de87124bf01d79d35c5c17a27c29ba8823cb4c8b6ce7af952ca26dae0"
+  "digest": "sha256:1e43bd93d0c2f9547b54ae6a35c0284707f3c30bee2fa05b5cfbd612ecad4931"
 }

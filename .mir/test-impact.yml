@@ -7,6 +7,18 @@
   ],
   "paths": [
     {
+      "pattern": "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/Test-MIR42V2V3CapMigrationStatic.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
       "pattern": ".mir/assurance.json",
       "groups": [],
       "scenarios": [],
