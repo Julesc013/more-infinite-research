@@ -79,16 +79,72 @@ try {
       }
     }
     [IO.File]::WriteAllText((Join-Path $mods 'mod-settings.dat'),'private writable settings',[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),'{"mods":[]}',[Text.UTF8Encoding]::new($false))
+    if(Test-Path -LiteralPath (Join-Path $auditLibrary 'mod-settings.dat')){throw "$consumer wrote settings into the dependency library"}
     $terminal=Complete-MIRImmutableInputLease -Lease $materialLease -Outcome passed
     $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal
     $materialLease=$null
+    foreach($input in $terminal.inputs){
+      if((Get-MIRImmutableInputSha256 $input.source_path) -cne $input.expected_sha256){throw "$consumer changed an input"}
+    }
+    # Retire only this completed synthetic run, then prove the shared bytes survive.
+    $null=Assert-MIRImmutableInputLeaseReclaimable -RunRoot $run -Context $consumer
+    $null=Assert-MIRImmutableInputPathWithin -Path $run -Root $fixtureRoot -Context 'Synthetic completed staging'
+    Remove-Item -LiteralPath $run -Recurse
+    foreach($input in $terminal.inputs){
+      if(-not (Test-Path -LiteralPath $input.source_path -PathType Leaf)){throw "$consumer cleanup removed a source"}
+    }
     $completion=[regex]::Match($source,'\$terminalInputStaging=Complete-MIRImmutableInputLease -Lease \$inputLease -Outcome passed')
     $binding=[regex]::Match($source,"\`$receipt\['input_staging'\]=\`$terminalInputStaging")
     if(-not $completion.Success -or -not $binding.Success -or $completion.Index -ge $binding.Index){
       throw "$consumer lost terminal input custody from its result"
     }
   }
-  Write-Host '[ok] six retained Bob Tin staging blocks consume 24 verified same-file aliases; no Factorio or historical gameplay replay.'
+  # Execute each consumed block with a real failed hard-link operation. Any copy
+  # attempt is a failure, including the general adapter's default path below.
+  $copyAttempts=0
+  function New-Item {
+    [CmdletBinding()]
+    param([string]$ItemType,[string[]]$Path,[string]$Target,[switch]$Force)
+    if($ItemType -ceq 'HardLink'){throw 'controlled unavailable hardlink'}
+    Microsoft.PowerShell.Management\New-Item @PSBoundParameters
+  }
+  function Copy-Item {
+    [CmdletBinding()]
+    param([string[]]$LiteralPath,[string]$Destination,[switch]$Force)
+    $script:copyAttempts++
+    throw 'archive copy fallback attempted'
+  }
+  try {
+    foreach($consumer in $auditConsumers){
+      $source=[IO.File]::ReadAllText((Join-Path $RepoRoot ('tests/runtime/'+$consumer)))
+      $staging=[regex]::Match($source,'(?m)^\$inputArchives=\[ordered\]@\{\}\r?\nforeach\([^\r\n]*\r?\n\$inputLease=New-MIRMaterialAuditInputLease[^\r\n]*')
+      $run=Join-Path $fixtureRoot ('failed-'+[IO.Path]::GetFileNameWithoutExtension($consumer))
+      $mods=Join-Path $run 'mods';$candidateZip=$sourceOne;$bobMods=$auditLibrary
+      New-Item -ItemType Directory -Path $run,$mods | Out-Null
+      $rejected=$false
+      try { . ([scriptblock]::Create($staging.Value)) } catch {
+        $rejected=$_.Exception.Message -match 'requires a verified hard link.*controlled unavailable hardlink'
+      }
+      if(-not $rejected){throw "$consumer did not refuse an unavailable hardlink"}
+      if(@(Get-ChildItem -LiteralPath $mods -File).Count -ne 0){throw "$consumer left copied payloads after a failed link"}
+      $failed=Get-Content -LiteralPath (Join-Path $run 'mir-immutable-input-lease.json') -Raw | ConvertFrom-Json
+      if($failed.state -cne 'staging-failed' -or $failed.require_hard_links -ne $true){throw "$consumer lost strict failure custody"}
+    }
+    $defaultRun=Join-Path $fixtureRoot 'default-no-copy'
+    New-Item -ItemType Directory -Path $defaultRun | Out-Null
+    $rejected=$false
+    try {
+      $materialLease=New-MIRImmutableInputLease -RunRoot $defaultRun -StageDirectory (Join-Path $defaultRun 'mods') -Inputs @(
+        [ordered]@{source_path=$sourceOne;file_name='candidate.zip';expected_sha256=$hashOne;role='candidate';identity=@{};provenance=@{kind='fixture'};immutable=$true}
+      )
+    } catch { $rejected=$_.Exception.Message -match 'requires a verified hard link.*controlled unavailable hardlink' }
+    if(-not $rejected -or $copyAttempts -ne 0){throw 'Default immutable staging retained an implicit copy fallback'}
+  } finally {
+    Remove-Item Function:New-Item
+    Remove-Item Function:Copy-Item
+  }
+  Write-Host '[ok] six Bob Tin blocks consume 24 same-file aliases, preserve private controls and retire completed staging; seven unavailable-link cases refuse copies.'
   if($MaterialAuditInputsOnly){return}
 
   $firstLease = New-MIRImmutableInputLease -RunRoot $runOne -StageDirectory (Join-Path $runOne 'mods') -Inputs @(
