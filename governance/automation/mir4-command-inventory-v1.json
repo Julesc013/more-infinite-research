@@ -3051,9 +3051,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
       "classification": "canonical-internal",
-      "sha256": "8DE9802E119FAF3B92ECAAB90753B2DE07DA0647C562E01A72C12DED00530C70",
+      "sha256": "B674C28189E26E437CD8CE1855AD6648FE65786EC827D406F9343FC6A45E5878",
       "hash_mode": "canonical-text-v1",
-      "lines": 731,
+      "lines": 785,
       "package_visible": false
     },
     {
@@ -4483,9 +4483,9 @@
     {
       "path": "tools/lib/validation/NativeProbeResources.ps1",
       "classification": "canonical-internal",
-      "sha256": "D285EC80BEB67DF1165AB0CCF0DACE72F65332F1D2E9834BB98330AD581EC47A",
+      "sha256": "126DB2501E5DFF97BF815C1F8F3C57129ADF268637D8383EA7798F2516D4F0B4",
       "hash_mode": "canonical-text-v1",
-      "lines": 249,
+      "lines": 254,
       "package_visible": false
     },
     {
@@ -6034,5 +6034,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8a5bbfab497cef876a97d0491c88c21fa9dc8bf2b6983c5dd3c915c2df632d2b"
+  "digest": "sha256:2de5ce3de87124bf01d79d35c5c17a27c29ba8823cb4c8b6ce7af952ca26dae0"
 }

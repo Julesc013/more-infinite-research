@@ -111,6 +111,11 @@ foreach ($constructionPath in @(
   Assert-MIRDevelopmentCISelection -Condition ((@($constructionRows|ForEach-Object id)) -contains 'static.mir42-candidate-construction') -Message "Candidate construction change omitted its executable development check: $constructionPath"
 }
 $nineTargetPaths=@('tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+foreach($enginePath in @('tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1','tests/release/Test-MIR42NineTargetHistoricalEngineRun.ps1')){
+  $engineClassification=Get-MIRAssuranceClassification -Paths @($enginePath) -Config $actualAssurance
+  $engineRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $engineClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+  Assert-MIRDevelopmentCISelection -Condition (-not $engineClassification.escalated -and 'static.mir42-nine-target-engine-inputs' -in @($engineRows.id)) -Message "Nine-target engine change omitted its executable regression check: $enginePath"
+}
 $nineTargetClassification=Get-MIRAssuranceClassification -Paths $nineTargetPaths -Config $actualAssurance
 $nineTargetRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $nineTargetClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
 $nineTargetExpected=@(

@@ -12,6 +12,8 @@ param(
   [Parameter(Mandatory)][string]$F100Predecessor,
   [Parameter(Mandatory)][string]$OutputRoot,
   [string]$PublishedMaintenancePredecessorManifestPath = '',
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 512,
   [ValidateRange(60,900)][int]$RowDeadlineSeconds = 180
 )
 
@@ -21,6 +23,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
 
 $script:MIR42ModernEngineTargets = @('f210','f200','f110','f100')
 $script:MIR42HistoricalEngineTargets = @('f017','f016','f015','f014','f013')
@@ -172,7 +175,23 @@ function Assert-MIR42HistoricalUpgradeHarness {
 function Invoke-MIR42BoundedUpgrade {
   param([Parameter(Mandatory)][string]$PowerShell,[Parameter(Mandatory)][string[]]$Arguments,
     [Parameter(Mandatory)][string]$StdoutPath,[Parameter(Mandatory)][string]$StderrPath,
-    [Parameter(Mandatory)][int]$DeadlineSeconds)
+    [Parameter(Mandatory)][int]$DeadlineSeconds,[switch]$NativeActor)
+  foreach($path in @($StdoutPath,$StderrPath)){
+    $null=Assert-MIRImmutableInputPathWithin -Path $path -Root $resources.root -Context 'Engine row capture'
+  }
+  # Fresh-load actors have no inner governor. The existing upgrade harness
+  # governs its own native actors, so its outer deadline must not take that lock.
+  if($NativeActor){
+    $actor=Invoke-MIRNativeProbeProcess -Context $resources -FilePath $PowerShell -Arguments $Arguments -TimeoutSeconds $DeadlineSeconds
+    foreach($capture in @(@{source=$actor.stdout;destination=$StdoutPath},@{source=$actor.stderr;destination=$StderrPath})){
+      if([IO.Path]::GetFullPath($capture.source) -cne [IO.Path]::GetFullPath($capture.destination)){
+        Move-Item -LiteralPath $capture.source -Destination $capture.destination
+      }
+    }
+    $actor.stdout=$StdoutPath;$actor.stderr=$StderrPath
+    return [int]$actor.result.exit_code
+  }
+  # The upgrade worker owns its existing native governor and heavy-job lock.
   $start = [Diagnostics.ProcessStartInfo]::new()
   $start.FileName = $PowerShell
   $start.UseShellExecute = $false
@@ -221,12 +240,13 @@ function Invoke-MIR42HistoricalFreshLoad {
     [Parameter(Mandatory)][string]$Candidate,
     [Parameter(Mandatory)][string]$CandidateSha256,
     [Parameter(Mandatory)][string]$Version,
+    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion='4.2.0',
     [Parameter(Mandatory)][string]$FreshRoot,
     [Parameter(Mandatory)][string]$SourceCommit,
     [Parameter(Mandatory)][int]$DeadlineSeconds
   )
-  if ($FactorioLine -cne ('0.' + $Target.Substring(2)) -or
-      $Version -cne ('4.2.' + $Target.Substring(1) + '00')) {
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch ([int]($SourceVersion.Split('.')[2]))
+  if ($FactorioLine -cne ('0.' + $Target.Substring(2)) -or $Version -cne [string]$identity.distribution_version) {
     throw "[mir42-$Target-historical-fresh-target-binding]"
   }
   $work = Join-Path $FreshRoot 'work'
@@ -258,17 +278,20 @@ function Invoke-MIR42HistoricalFreshLoad {
     '[other]',
     'check-updates=false'
   ), [Text.UTF8Encoding]::new($false))
+  $input=[ordered]@{source_path=$Candidate;file_name=[IO.Path]::GetFileName($Candidate);expected_sha256=$CandidateSha256;role='candidate';identity=@{target=$Target;version=$Version;source_version=$SourceVersion};provenance=@{kind='verified-candidate-manifest';source_commit=$SourceCommit};immutable=$true}
+  $inputLease=New-MIRImmutableInputLease -RunRoot $FreshRoot -StageDirectory $mods -Inputs @($input) -RequireHardLinks
+  $inputLeases.Add($inputLease)
+  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $inputLease
   [IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),
     (@{mods=@(@{name='base';enabled=$true},@{name='more-infinite-research';enabled=$true})} | ConvertTo-Json -Depth 5),
     [Text.UTF8Encoding]::new($false))
-  Copy-Item -LiteralPath $Candidate -Destination $staged
   if ((Get-MIR42EngineRunSha -Path $staged) -cne $CandidateSha256) {
     throw "[mir42-$Target-historical-fresh-stage-drift]"
   }
   $arguments = @('--config',$config,'--no-log-rotation')
   if ($FactorioLine -notin @('0.13','0.14')) { $arguments += '--disable-audio' }
   $arguments += @('--mod-directory',$mods,'--create',$save)
-  $null = Invoke-MIR42BoundedUpgrade -PowerShell $Engine -Arguments $arguments -StdoutPath $stdout -StderrPath $stderr -DeadlineSeconds $DeadlineSeconds
+  $null = Invoke-MIR42BoundedUpgrade -PowerShell $Engine -Arguments $arguments -StdoutPath $stdout -StderrPath $stderr -DeadlineSeconds $DeadlineSeconds -NativeActor
   if (-not (Test-Path -LiteralPath $save -PathType Leaf) -or
       -not (Test-Path -LiteralPath $log -PathType Leaf)) {
     throw "[mir42-$Target-historical-fresh-output-missing]"
@@ -298,6 +321,7 @@ function Invoke-MIR42HistoricalFreshLoad {
     log=[ordered]@{path=$log;sha256=(Get-MIR42EngineRunSha -Path $log)}
     assertions=@('exact-engine','exact-candidate','fresh-save-created','exact-mod-loaded','map-created','healthy-log')
   }
+  $null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome passed
   $normalized = ConvertTo-MIR4BootstrapCanonicalJson -Value $record | ConvertFrom-Json -Depth 100 -DateKind String
   $null = Write-MIR4BootstrapRecord -Record $normalized -Path $receipt
   $written = Get-Content -Raw -LiteralPath $receipt | ConvertFrom-Json -Depth 100 -DateKind String
@@ -309,6 +333,27 @@ function Invoke-MIR42HistoricalFreshLoad {
     stdout=[pscustomobject][ordered]@{path=$stdout;sha256=(Get-MIR42EngineRunSha -Path $stdout)}
     stderr=[pscustomobject][ordered]@{path=$stderr;sha256=(Get-MIR42EngineRunSha -Path $stderr)}
   }
+}
+
+function New-MIR42EngineArchiveStage {
+  param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)]$Row,
+    [Parameter(Mandatory)][string]$OutputRoot,[Parameter(Mandatory)][string]$SourceVersion,
+    [Parameter(Mandatory)][string]$SourceCommit,[Parameter(Mandatory)]$Context,
+    [Parameter(Mandatory)][AllowEmptyCollection()]$Leases)
+  $stageRoot=Join-Path $OutputRoot "staged-assets/$Target"
+  $stageDirectory=Join-Path $stageRoot 'archives'
+  $staged=Join-Path $stageDirectory ([IO.Path]::GetFileName($Row.candidate))
+  New-Item -ItemType Directory -Force -Path $stageRoot | Out-Null
+  $inputs=@(
+    [ordered]@{source_path=$Row.candidate;file_name=[IO.Path]::GetFileName($Row.candidate);expected_sha256=$Row.candidate_sha256;role='candidate';identity=@{target=$Target;version=$Row.to;source_version=$SourceVersion};provenance=@{kind='verified-candidate-manifest';source_commit=$SourceCommit};immutable=$true},
+    [ordered]@{source_path=$Row.predecessor;file_name=[IO.Path]::GetFileName($Row.predecessor);expected_sha256=$Row.predecessor_sha256;role='predecessor';identity=@{target=$Target;version=$Row.from};provenance=@{kind='verified-predecessor-authority';source_version=$SourceVersion};immutable=$true}
+  )
+  $lease=New-MIRImmutableInputLease -RunRoot $stageRoot -StageDirectory $stageDirectory -Inputs $inputs -RequireHardLinks
+  $Leases.Add($lease)
+  Add-MIRNativeProbeImmutableLease -Context $Context -Lease $lease
+  if ((Get-MIR42EngineRunSha -Path $staged) -cne $Row.candidate_sha256) { throw "[mir42-$Target-staged-candidate-hash]" }
+  $Row.candidate=$staged
+  if ((Get-MIR42EngineRunSha -Path $Row.predecessor) -cne $Row.predecessor_sha256) { throw "[mir42-$Target-locked-predecessor-hash]" }
 }
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -340,6 +385,15 @@ if (-not $out.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase) -or
   throw '[mir42-engine-output-admission]'
 }
 $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $out
+$running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
+if($running.Count){throw '[mir42-engine-factorio-already-running]'}
+$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $out -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
+$inputLeases=[Collections.Generic.List[object]]::new()
+trap {
+  $failure=$_
+  foreach($inputLease in $inputLeases){if(-not $inputLease.closed){try {$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed} catch {}}}
+  throw $failure
+}
 
 $inputAuthorityRelative = '.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json'
 $inputAuthorityPath = Assert-MIR42EngineRunFile -Path (Join-Path $repo $inputAuthorityRelative) -Label 'mir42-predecessor-authority'
@@ -554,17 +608,9 @@ $pwsh = Assert-MIR42EngineRunFile -Path (Get-Command pwsh).Source -Label 'mir42-
 $harness = Assert-MIR42EngineRunFile -Path (Join-Path $repo 'tests/runtime/Test-MIRUpgrade.ps1') -Label 'mir42-upgrade-harness'
 $runner = Assert-MIR42EngineRunFile -Path $PSCommandPath -Label 'mir42-engine-runner'
 New-Item -ItemType Directory -Force -Path $out | Out-Null
-$candidateLocks = [Collections.Generic.List[IDisposable]]::new()
 foreach ($target in $targets) {
   $row = $selected[$target]
-  $staged = Join-Path $out "staged-assets/$target/$([IO.Path]::GetFileName($row.candidate))"
-  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $staged) | Out-Null
-  Copy-Item -LiteralPath $row.candidate -Destination $staged
-  if ((Get-MIR42EngineRunSha -Path $staged) -cne $row.candidate_sha256) { throw "[mir42-$target-staged-candidate-hash]" }
-  $row.candidate = $staged
-  $candidateLocks.Add([IO.File]::Open($staged,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read))
-  $candidateLocks.Add([IO.File]::Open($row.predecessor,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read))
-  if ((Get-MIR42EngineRunSha -Path $row.predecessor) -cne $row.predecessor_sha256) { throw "[mir42-$target-locked-predecessor-hash]" }
+  New-MIR42EngineArchiveStage -Target $target -Row $row -OutputRoot $out -SourceVersion $sourceVersion -SourceCommit $head -Context $resources -Leases $inputLeases
 }
 $results = [Collections.Generic.List[object]]::new()
 $processTotal = 0
@@ -578,7 +624,7 @@ foreach ($target in $targets) {
     New-Item -ItemType Directory -Force -Path $freshRoot | Out-Null
     $freshLoads = @(Invoke-MIR42HistoricalFreshLoad -Target $target -FactorioLine ([string]$row.historical.terminal_seal.target) `
       -Engine $row.engine -EngineSha256 $row.engine_sha256 -Candidate $row.candidate -CandidateSha256 $row.candidate_sha256 `
-      -Version $row.to -FreshRoot $freshRoot -SourceCommit $head -DeadlineSeconds $RowDeadlineSeconds)
+      -Version $row.to -SourceVersion $sourceVersion -FreshRoot $freshRoot -SourceCommit $head -DeadlineSeconds $RowDeadlineSeconds)
     $processTotal++
   } else {
     $freshLoads = @(
@@ -598,7 +644,7 @@ foreach ($target in $targets) {
       if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) {
         throw "[mir42-$target-$scenario-staged-candidate-drift-before]"
       }
-      $null = Invoke-MIR42BoundedUpgrade -PowerShell $pwsh -Arguments $freshArgs -StdoutPath $freshStdout -StderrPath $freshStderr -DeadlineSeconds $RowDeadlineSeconds
+      $null = Invoke-MIR42BoundedUpgrade -PowerShell $pwsh -Arguments $freshArgs -StdoutPath $freshStdout -StderrPath $freshStderr -DeadlineSeconds $RowDeadlineSeconds -NativeActor
 
       if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) {
         throw "[mir42-$target-$scenario-engine-drift-after]"
@@ -638,7 +684,8 @@ foreach ($target in $targets) {
   $args = @('-NoProfile','-File',$harness,'-RepoRoot',$repo,'-FactorioBin',$row.engine,
     '-FromZip',$row.predecessor,'-ToZip',$row.candidate,'-FromVersion',$row.from,'-ToVersion',$row.to,
     '-FixtureName',$row.fixture,'-Archetype','base-default','-OutputPath',$receiptPath,
-    '-WorkRoot',(Join-Path $rowRoot 'work'),'-Retention','OnFailure')
+    '-WorkRoot',(Join-Path $rowRoot 'work'),'-Retention','OnFailure',
+    '-ExpectedPeakMemoryMiB',([string]$ExpectedPeakMemoryMiB),'-MaxNewOutputMiB',([string][int][Math]::Floor((Get-MIRNativeProbeRemainingOutputBytes -Context $resources)/1MB)))
   if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-staged-candidate-drift-before-upgrade]" }
   if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) { throw "[mir42-$target-engine-drift-before-upgrade]" }
   $exitCode = Invoke-MIR42BoundedUpgrade -PowerShell $pwsh -Arguments $args -StdoutPath $stdoutPath -StderrPath $stderrPath -DeadlineSeconds $RowDeadlineSeconds
@@ -672,6 +719,7 @@ foreach ($target in $targets) {
     }
   )
   $processTotal += [int]$receipt.factorio_processes
+  $resources.runs.Add([pscustomobject]@{kind='upgrade-worker';status='passed';stdout=$stdoutPath;stderr=$stderrPath;governor_owner='Test-MIRUpgrade';resource_policy=$receipt.resource_policy;resource_ledgers=@($receipt.resource_ledgers)})
   $execution = [ordered]@{
     executable_path=$row.engine;executable_sha256=$row.engine_sha256;version=$row.engine_version
     predecessor=[pscustomobject][ordered]@{path=$row.predecessor;sha256=$row.predecessor_sha256;version=$row.from}
@@ -722,9 +770,15 @@ if ($isNineTargetCandidate) {
   }
 }
 $recordPath = Join-Path $out 'engine-run.json'
+foreach($inputLease in $inputLeases){if(-not $inputLease.closed){$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome passed}}
+$resourceRecord=[ordered]@{kind='MIR42EngineRunResourceDiagnosticsV1';source_commit=$head;source_version=$sourceVersion;expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;shared_alias_bytes=$resources.shared_alias_bytes;memory_enforcement='sampled-watchdog-not-hard-cap';process_inventory=@($resources.runs);input_staging=@($inputLeases|ForEach-Object {$_.record});release_qualification='not-performed'}
+$resourceJson=($resourceRecord|ConvertTo-Json -Depth 40)+"`n"
+if([Text.Encoding]::UTF8.GetByteCount($resourceJson) -ge (Get-MIRNativeProbeRemainingOutputBytes -Context $resources)){throw '[mir441-resource-output-budget]'}
+[IO.File]::WriteAllText((Join-Path $out 'engine-run.resources.json'),$resourceJson,[Text.UTF8Encoding]::new($false))
 $normalizedRecord = ConvertTo-MIR4BootstrapCanonicalJson -Value $record | ConvertFrom-Json -Depth 100 -DateKind String
+$normalizedRecord|Add-Member -NotePropertyName record_sha256 -NotePropertyValue (Get-MIR4BootstrapRecordSha256 -Record $normalizedRecord)
+if([Text.Encoding]::UTF8.GetByteCount((ConvertTo-MIR4BootstrapCanonicalJson -Value $normalizedRecord)+"`n") -ge (Get-MIRNativeProbeRemainingOutputBytes -Context $resources -IncludeResultReserve)){throw '[mir441-resource-output-budget]'}
 $null = Write-MIR4BootstrapRecord -Record $normalizedRecord -Path $recordPath
 $writtenRecord = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100 -DateKind String
 if (-not (Test-MIR4BootstrapRecordHash -Record $writtenRecord)) { throw '[mir42-engine-run-record-self-hash]' }
-foreach ($lock in $candidateLocks) { $lock.Dispose() }
 Write-Host "[ok] private $runLabel engine run: $recordPath"

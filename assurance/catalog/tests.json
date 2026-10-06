@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 219,
+  "test_count": 220,
   "tests": [
     {
       "id": "docs.check",
@@ -7524,6 +7524,35 @@
       "matrix": null
     },
     {
+      "id": "static.mir42-nine-target-engine-inputs",
+      "proposition": "The governed test 'static.mir42-nine-target-engine-inputs' passes for its exact selected inputs.",
+      "cohort": "compatibility-historical",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR42NineTargetHistoricalEngineRun.ps1",
+      "canonical_implementation": "tests/release/Test-MIR42NineTargetHistoricalEngineRun.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/release/Test-MIR42NineTargetHistoricalEngineRun.ps1",
+        "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "fixtures/assert-upgrade-historical-terminal-to-mir42/**",
+        "targets/historical/**",
+        ".mir/releases/terminal/seals/**"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.mir42-nine-target-entrypoint-scope",
       "proposition": "The governed test 'static.mir42-nine-target-entrypoint-scope' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -7969,9 +7998,9 @@
       "tooling-release": 67,
       "runtime-upgrade": 51,
       "compiler-static": 19,
-      "compatibility-historical": 13
+      "compatibility-historical": 14
     },
-    "canonical_test_commands": 207,
+    "canonical_test_commands": 208,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7984,5 +8013,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:acdfe4111a88b00b2fa0da37c5f8b061a3155b8f98ef85b12bedbc9711f1e91c"
+  "digest": "sha256:f162c5f20027fb6749a0dfbc38d6207b5cc32c1ffcfd583f762071fceb721bdf"
 }
