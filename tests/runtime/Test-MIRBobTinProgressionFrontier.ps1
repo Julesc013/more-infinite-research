@@ -72,11 +72,26 @@ try{$record=Get-Content -Raw -LiteralPath $dossier|ConvertFrom-Json -ErrorAction
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
+. (Join-Path $repo 'tests/support/MIRMaterialAuditInputs.ps1')
+
+$inputLease=$null
+trap {
+  $failure=$_
+  if($null -ne $inputLease -and -not $inputLease.closed){
+    try { $null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed }
+    catch { Write-Warning $_.Exception.Message }
+  }
+  throw $failure
+}
+
 if([string]::IsNullOrWhiteSpace($CandidateZip)){$candidate=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('BOB-TIN-PROGRESSION-FRONTIER-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/bob-tin-progression-frontier/packages';$CandidateZip=[string]$candidate.archive_path}
 $candidateZip=(Resolve-Path -LiteralPath $CandidateZip).Path
 Add-Type -AssemblyName System.IO.Compression.FileSystem;$zip=[IO.Compression.ZipFile]::OpenRead($candidateZip);try{$forbidden=@($zip.Entries|Where-Object {$_.FullName -match '(^|/)(fixtures|tests|docs|[.]mir|build|dist)(/|$)'});if($forbidden.Count -ne 0){throw "Candidate includes package-excluded path $($forbidden[0].FullName)"}}finally{$zip.Dispose()}
-$run=Join-Path $output ([guid]::NewGuid().ToString('N'));$mods=Join-Path $run 'mods';New-Item -ItemType Directory -Force -Path $mods,(Join-Path $run 'userdata')|Out-Null;Copy-Item -LiteralPath $candidateZip -Destination $mods
-$archiveHashes=[ordered]@{};foreach($name in $expectedArchives.Keys){$path=Join-Path $bobMods $expectedArchives[$name].file;if(-not(Test-Path -LiteralPath $path -PathType Leaf)){throw "Bob Tin progression-frontier archive is absent $path"};$hash=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash;if($hash -cne $expectedArchives[$name].sha256){throw "Bob Tin progression-frontier archive hash differs $name"};$archiveHashes[$name]=$hash;Copy-Item -LiteralPath $path -Destination $mods}
+$run=Join-Path $output ([guid]::NewGuid().ToString('N'));$mods=Join-Path $run 'mods';New-Item -ItemType Directory -Force -Path $mods,(Join-Path $run 'userdata')|Out-Null;
+$inputArchives=[ordered]@{}
+foreach($archive in $expectedArchives.Values){$inputArchives[[string]$archive.file]=[string]$archive.sha256}
+$inputLease=New-MIRMaterialAuditInputLease -RunRoot $run -ModsDirectory $mods -CandidateArchive $candidateZip -DependencyDirectory $bobMods -ExpectedArchives $inputArchives
+$archiveHashes=[ordered]@{};foreach($name in $expectedArchives.Keys){$path=Join-Path $bobMods $expectedArchives[$name].file;if(-not(Test-Path -LiteralPath $path -PathType Leaf)){throw "Bob Tin progression-frontier archive is absent $path"};$hash=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash;if($hash -cne $expectedArchives[$name].sha256){throw "Bob Tin progression-frontier archive hash differs $name"};$archiveHashes[$name]=$hash}
 Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-fixture-assert-bob-tin-progression-frontier' -Version '0.1.0' -ModsDir $mods|Out-Null
 Initialize-MIRSettingsOverrideMod -ModsDir $mods -FactorioVersion '2.1';Set-CopiedStartupSettingDefaults -ModsDir $mods -Overrides @{'ips-enable-research_material_tin'=$true;'ips-max-level-research_material_tin'=2};Set-CopiedMIRSettingsProfileDefault -ModsDir $mods -Settings @{'ips-enable-research_material_tin'=$true;'ips-max-level-research_material_tin'=3};Complete-MIRSettingsOverrideMod -ModsDir $mods
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$true},@{name='elevated-rails';enabled=$true},@{name='quality';enabled=$true},@{name='recycler';enabled=$true},@{name='more-infinite-research';enabled=$true},@{name='boblibrary';enabled=$true},@{name='bobores';enabled=$true},@{name='bobplates';enabled=$true},@{name='mir-fixture-assert-bob-tin-progression-frontier';enabled=$true},@{name='mir-validation-settings-overrides';enabled=$true})}|ConvertTo-Json -Depth 5|Set-Content -LiteralPath (Join-Path $mods 'mod-list.json') -Encoding utf8
@@ -85,5 +100,7 @@ function Invoke-FrontierEngine([string]$Name,[string[]]$Arguments){$start=[Diagn
 $save=Join-Path $run 'bob-tin-progression-frontier.zip';$createLog=Invoke-FrontierEngine -Name create -Arguments @('--create',$save);if(-not(Test-Path -LiteralPath $save -PathType Leaf)){throw 'Bob Tin progression-frontier save was not created.'};$data=Get-FrontierObservation (Get-Content -Raw -LiteralPath $createLog) 'DATA'
 if($Probe){$data|ConvertTo-Json -Depth 50;Write-Output "Evidence: $run";return}
 $runtimeLog=Invoke-FrontierEngine -Name runtime -Arguments @('--benchmark',$save,'--benchmark-ticks','60','--benchmark-runs','1');$runtime=Get-FrontierObservation (Get-Content -Raw -LiteralPath $runtimeLog) 'RUNTIME';Assert-Observation $data $runtime $record;Assert-DriftNegatives $data $runtime $record
+$terminalInputStaging=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome passed
 $receipt=[ordered]@{schema=1;status='passed';scope=$record.scope;target='F210';engine_version=$engineVersion;engine_sha256=$engineSha256;source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=(Get-FileHash -LiteralPath $packageSource -Algorithm SHA256).Hash;package_source_roots_clean=$true};candidate_sha256=(Get-FileHash -LiteralPath $candidateZip -Algorithm SHA256).Hash;candidate_package_excludes_fixture_test_docs_mir_build_dist=$true;official_mod_closure=$record.official_mod_closure;bob_archive_sha256=$archiveHashes;dossier_sha256=(Get-FileHash -LiteralPath $dossier -Algorithm SHA256).Hash;fixture_hashes=[ordered]@{info=(Get-FileHash (Join-Path $fixture 'info.json') -Algorithm SHA256).Hash;dossier=(Get-FileHash $dossier -Algorithm SHA256).Hash;data_final_fixes=(Get-FileHash (Join-Path $fixture 'data-final-fixes.lua') -Algorithm SHA256).Hash;control=(Get-FileHash (Join-Path $fixture 'control.lua') -Algorithm SHA256).Hash};harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash;anchor=$data.anchor;science_lab_frontier=$data.science_lab_frontier;companion_continuation=$data.companion_continuation;runtime=$runtime;logs=[ordered]@{create=(Get-FileHash -LiteralPath $createLog -Algorithm SHA256).Hash;runtime=(Get-FileHash -LiteralPath $runtimeLog -Algorithm SHA256).Hash};non_claims=$expectedNonClaims}
+$receipt['input_staging']=$terminalInputStaging
 $receipt|ConvertTo-Json -Depth 50|Set-Content -LiteralPath (Join-Path $run 'result.json') -Encoding utf8;$receipt|ConvertTo-Json -Depth 50;Write-Output "Evidence: $run"

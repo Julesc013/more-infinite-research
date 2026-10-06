@@ -663,6 +663,42 @@
       "pattern": "tests/support/MIRMaterialAuditInputs.ps1"
     },
     {
+      "pattern": "tests/runtime/Test-MIRBobTinProductionGain.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/Test-MIRBobTinMachineMatrix.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/Test-MIRBobTinPersistedState.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/Test-MIRBobTinProgressionFrontier.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/Test-MIRBobTinQualification.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/Test-MIRF200BobTinPersistedState.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
       "scenarios": [],
       "tags": [],
       "groups": [],
