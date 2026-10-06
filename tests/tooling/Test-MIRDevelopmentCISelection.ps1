@@ -111,6 +111,11 @@ foreach ($constructionPath in @(
   Assert-MIRDevelopmentCISelection -Condition ((@($constructionRows|ForEach-Object id)) -contains 'static.mir42-candidate-construction') -Message "Candidate construction change omitted its executable development check: $constructionPath"
 }
 $nineTargetPaths=@('tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+foreach($migrationPath in @('tests/runtime/Test-MIR42V2V3CapMigration.ps1','tests/runtime/Test-MIR42V2V3CapMigrationStatic.ps1','tools/mir/application/package/HistoricalSourceAuthority.ps1')){
+  $migrationClassification=Get-MIRAssuranceClassification -Paths @($migrationPath) -Config $actualAssurance
+  $migrationRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $migrationClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+  Assert-MIRDevelopmentCISelection -Condition (-not $migrationClassification.escalated -and 'static.f210-v2-v3-migration-inputs' -in @($migrationRows.id)) -Message "V2/V3 input change omitted its executable regression check: $migrationPath"
+}
 foreach($enginePath in @('tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1','tests/release/Test-MIR42NineTargetHistoricalEngineRun.ps1')){
   $engineClassification=Get-MIRAssuranceClassification -Paths @($enginePath) -Config $actualAssurance
   $engineRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $engineClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
