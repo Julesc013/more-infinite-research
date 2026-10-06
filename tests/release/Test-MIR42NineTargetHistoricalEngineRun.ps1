@@ -1,11 +1,27 @@
 param(
-  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
+  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path,
+  [switch]$SharedInputsOnly
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/package/DistributionCustody.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+
+function Assert-MIR42HistoricalPredecessorCustody {
+  param([Parameter(Mandatory)][string]$Version,[Parameter(Mandatory)][string]$ExpectedSha256,
+    [Parameter(Mandatory)][string]$LocalPath)
+  $distribution=Get-MIR4DistributionCustodyEntry -RepoRoot $RepoRoot -Version $Version
+  if([string]$distribution.sha256 -cne $ExpectedSha256 -or
+      [string]$distribution.path -cne ('dist/more-infinite-research_'+$Version+'.zip')){throw "historical-predecessor-authority $Version"}
+  # Stream the pinned blob into the existing verifier, without restoring ZIPs.
+  $null=Test-MIR4DistributionHistoricalCustody -RepoRoot $RepoRoot -Distribution $distribution
+  if((Test-Path -LiteralPath $LocalPath) -and -not (Test-MIR4DistributionCustodyFile -Path $LocalPath -Distribution $distribution)){
+    throw "historical-predecessor-local-drift $Version"
+  }
+}
 
 $expected = [ordered]@{
   f017 = [ordered]@{line='0.17';version='1.7.9';candidate='4.2.01700';archive='B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C';engine='E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06';infinite='mining-productivity-4'}
@@ -30,6 +46,160 @@ function Import-MIR42EngineRunnerFunction {
 
 $runnerPath = Join-Path $RepoRoot 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1'
 $runner = Get-Content -Raw -LiteralPath $runnerPath
+function Assert-MIR42EngineSharedInputs {
+  . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
+  . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
+  # Controlled capacity applies only to tiny inputs and one PowerShell child.
+  # The historical fresh-load actor is a stub; no Factorio process runs here.
+  function Get-MIR441ResourceSnapshot {
+    param([string]$WorkRoot)
+    [pscustomobject]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');memory=[pscustomobject]@{total_bytes=16GB;free_bytes=12GB;committed_bytes=4GB;commit_limit_bytes=20GB};system_volume=[pscustomobject]@{free_bytes=100GB};work_volume=[pscustomobject]@{free_bytes=100GB}}
+  }
+  function Check([bool]$Condition,[string]$Message){if(-not $Condition){throw "Engine shared inputs: $Message"};$script:engineSharedAssertions++}
+  function Refuses([scriptblock]$Action,[string]$Expected){$failure='';try{& $Action|Out-Null}catch{$failure=$_.Exception.Message};Check ($failure.Contains($Expected)) "expected $Expected; got $failure"}
+  $script:engineSharedAssertions=0
+  $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot ('build/tmp/engine-link-controls-'+[guid]::NewGuid().ToString('N')))
+  $inputLeases=[Collections.Generic.List[object]]::new()
+  foreach($name in @('Get-MIR42EngineRunSha','Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','New-MIR42EngineArchiveStage')){
+    Import-MIR42EngineRunnerFunction -Path $runnerPath -Name $name
+  }
+  try {
+    $null=New-Item -ItemType Directory -Path $scratch
+    $exactRoot=Join-Path $scratch 'campaign'
+    Refuses {New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $exactRoot -UseExactOutputRoot} 'peak-budget-required'
+    Check (-not (Test-Path -LiteralPath $exactRoot)) 'missing peak allocated output.'
+    $resources=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $exactRoot -ExpectedPeakMemoryMiB 256 -MaxNewOutputMiB 4 -UseExactOutputRoot
+    Check ($resources.root -ceq $exactRoot -and -not (Test-Path -LiteralPath $exactRoot)) 'exact-root admission allocated or changed the output path.'
+    $null=New-Item -ItemType Directory -Path $exactRoot
+    $empty=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $exactRoot -ExpectedPeakMemoryMiB 256 -MaxNewOutputMiB 4 -UseExactOutputRoot
+    Check ($empty.root -ceq $exactRoot) 'empty exact root rejected or changed.'
+    $sentinel=Join-Path $exactRoot 'retained.txt';[IO.File]::WriteAllText($sentinel,'retained')
+    Refuses {New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $exactRoot -ExpectedPeakMemoryMiB 256 -UseExactOutputRoot} 'exact-output-not-empty'
+    Refuses {New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $sentinel -ExpectedPeakMemoryMiB 256 -UseExactOutputRoot} 'exact-output-not-empty'
+    Check ((Get-Content -Raw -LiteralPath $sentinel) -ceq 'retained') 'occupied-root refusal changed existing state.'
+    $default=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $scratch -ExpectedPeakMemoryMiB 256 -MaxNewOutputMiB 4
+    Check ($default.root -cne $scratch -and (Test-MIR441PathContained -Root $scratch -Path $default.root)) 'default isolated-root contract changed.'
+
+    $sourceRoot=Join-Path $scratch 'inputs';$null=New-Item -ItemType Directory -Path $sourceRoot
+    $rows=[ordered]@{};$originals=[ordered]@{}
+    foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
+      $to='4.2.'+$target.Substring(1)+'01';$from='4.2.'+$target.Substring(1)+'00'
+      $candidate=Join-Path $sourceRoot "more-infinite-research_$to.zip";$predecessor=Join-Path $sourceRoot "more-infinite-research_$from.zip"
+      [IO.File]::WriteAllText($candidate,"tiny candidate $target");[IO.File]::WriteAllText($predecessor,"tiny predecessor $target")
+      $row=[ordered]@{candidate=$candidate;candidate_sha256=Get-MIRImmutableInputSha256 $candidate;predecessor=$predecessor;predecessor_sha256=Get-MIRImmutableInputSha256 $predecessor;to=$to;from=$from}
+      $rows[$target]=$row;$originals[$target]=$candidate
+      New-MIR42EngineArchiveStage -Target $target -Row $row -OutputRoot $exactRoot -SourceVersion '4.2.1' -SourceCommit ('A'*40) -Context $resources -Leases $inputLeases
+      $lease=$inputLeases[$inputLeases.Count-1]
+      Check ($lease.record.require_hard_links -and $lease.record.inputs.Count -eq 2) "$target did not lease both inputs."
+      foreach($input in $lease.record.inputs){Check ($input.staging_mode -ceq 'hardlink' -and (Get-MIRImmutableInputFileIdentity $input.source_path) -ceq (Get-MIRImmutableInputFileIdentity $input.stage_path)) "$target copied $($input.role)."}
+      Check ($row.candidate -cne $candidate -and $row.predecessor -ceq $predecessor) "$target changed predecessor authority or failed to select the candidate alias."
+      Refuses {[IO.File]::WriteAllText($candidate,'attempted mutation')} 'used by another process'
+    }
+    Check ($resources.aliases.Count -eq 18 -and $resources.shared_alias_bytes -eq [int64](($inputLeases|ForEach-Object {$_.record.inputs}|ForEach-Object {(Get-Item -LiteralPath $_.stage_path).Length}|Measure-Object -Sum).Sum)) 'archive alias accounting differs.'
+    Check ((Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -gt 0) 'tiny aliases exhausted the output budget.'
+
+    $script:engineArchiveCopies=0
+    function New-Item {[CmdletBinding()]param([string]$ItemType,[string[]]$Path,[string]$Target,[switch]$Force);if($ItemType -ceq 'HardLink'){throw 'controlled link failure'};Microsoft.PowerShell.Management\New-Item @PSBoundParameters}
+    function Copy-Item {$script:engineArchiveCopies++;throw 'copy attempted'}
+    try {
+      $blocked=[ordered]@{};foreach($key in $rows.f210.Keys){$blocked[$key]=$rows.f210[$key]}
+      Refuses {New-MIR42EngineArchiveStage -Target blocked -Row $blocked -OutputRoot $exactRoot -SourceVersion '4.2.1' -SourceCommit ('A'*40) -Context $resources -Leases $inputLeases} 'requires a verified hard link'
+      Check ($script:engineArchiveCopies -eq 0) 'unavailable link invoked archive copying.'
+    } finally {Remove-Item Function:\New-Item;Remove-Item Function:\Copy-Item}
+
+    # Real governed child proves capture relocation and the shared inventory.
+    $stdout=Join-Path $exactRoot 'row.stdout.txt';$stderr=Join-Path $exactRoot 'row.stderr.txt'
+    $code=Invoke-MIR42BoundedUpgrade -PowerShell (Get-Command pwsh).Source -Arguments @('-NoProfile','-Command','[Console]::WriteLine("tiny actor"); [Console]::Error.WriteLine("tiny stderr")') -StdoutPath $stdout -StderrPath $stderr -DeadlineSeconds 15 -NativeActor
+    Check ($code -eq 0 -and (Get-Content -Raw $stdout).Contains('tiny actor') -and (Get-Content -Raw $stderr).Contains('tiny stderr')) 'governed worker lost captured output.'
+    Check ($resources.runs.Count -eq 1 -and $resources.runs[0].stdout -ceq $stdout -and $resources.runs[0].stderr -ceq $stderr -and $resources.runs[0].status -ceq 'passed') 'relocated captures were not reflected in the process inventory.'
+    Refuses {Invoke-MIR42BoundedUpgrade -PowerShell (Get-Command pwsh).Source -Arguments @('-NoProfile','-Command','exit 0') -StdoutPath (Join-Path $scratch 'outside.txt') -StderrPath $stderr -DeadlineSeconds 15 -NativeActor} 'must remain below'
+    Check ($resources.runs.Count -eq 1) 'outside capture launched another actor.'
+    Refuses {Invoke-MIR42BoundedUpgrade -PowerShell (Get-Command pwsh).Source -Arguments @('-NoProfile','-Command','exit 7') -StdoutPath (Join-Path $exactRoot 'failed.stdout.txt') -StderrPath (Join-Path $exactRoot 'failed.stderr.txt') -DeadlineSeconds 15 -NativeActor} 'mir441-process-exit'
+    Check ($resources.runs.Count -eq 2 -and $resources.runs[1].status -ceq 'interrupted' -and (Test-Path $resources.runs[1].ledger)) 'failed worker lost its interruption record.'
+    $legacyStdout=Join-Path $exactRoot 'upgrade-worker.stdout.txt';$legacyStderr=Join-Path $exactRoot 'upgrade-worker.stderr.txt'
+    $code=Invoke-MIR42BoundedUpgrade -PowerShell (Get-Command pwsh).Source -Arguments @('-NoProfile','-Command','[Console]::WriteLine("tiny governed-worker transport")') -StdoutPath $legacyStdout -StderrPath $legacyStderr -DeadlineSeconds 15
+    Check ($code -eq 0 -and $resources.runs.Count -eq 2 -and (Get-Content -Raw $legacyStdout).Contains('tiny governed-worker transport')) 'upgrade transport took a second governor or lost its output.'
+    $tokens=$null;$errors=$null
+    $ast=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$tokens,[ref]$errors)
+    $argumentNode=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Extent.Text.StartsWith('$args = @(')},$true))
+    Check ($argumentNode.Count -eq 1) 'upgrade argument construction is ambiguous.'
+    $harness='controlled harness';$repo=$RepoRoot;$rowRoot=Join-Path $exactRoot 'row';$row=$rows.f210;$row.engine='controlled';$row.fixture='controlled';$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
+    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
+    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-ExpectedPeakMemoryMiB')+1] -ceq '256' -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -gt 0 -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -lt 4) 'upgrade worker lost the declared peak or remaining output allowance.'
+
+    # The following actor synthesizes outputs, solely to exercise retained
+    # fresh-load oracles and version admission. It proves no native gameplay.
+    function Invoke-MIR42BoundedUpgrade {
+      param($PowerShell,$Arguments,$StdoutPath,$StderrPath,$DeadlineSeconds,[switch]$NativeActor)
+      $config=$Arguments[[Array]::IndexOf($Arguments,'--config')+1]
+      $mods=$Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]
+      $save=$Arguments[[Array]::IndexOf($Arguments,'--create')+1]
+      Check ($NativeActor -and $DeadlineSeconds -eq 60 -and $Arguments -contains '--no-log-rotation') 'fresh actor changed arguments or deadline.'
+      Check (($Arguments -contains '--disable-audio') -eq ($freshLine -notin @('0.13','0.14'))) 'historical audio capability changed.'
+      $modList=Get-Content -Raw -LiteralPath (Join-Path $mods 'mod-list.json')|ConvertFrom-Json
+      Check (($modList.mods.name -join '|') -ceq 'base|more-infinite-research' -and (Get-Content -Raw $config).Contains('[path]')) 'fresh load lost private configuration.'
+      $display=(($freshVersion -split '\.')|ForEach-Object {[int]$_})-join '.'
+      $log=Join-Path (Split-Path -Parent $mods) 'factorio-current.log'
+      if($freshFailure -cne 'missing'){[IO.File]::WriteAllText($save,'tiny save')}
+      [IO.File]::WriteAllText($log,"Loading mod more-infinite-research $display`nFactorio initialised`nCreating new map`nMap version controlled`n$freshFailure")
+      [IO.File]::WriteAllText($StdoutPath,'tiny controlled output');[IO.File]::WriteAllText($StderrPath,'')
+      return 0
+    }
+    $engineRoot=Join-Path $scratch 'controlled-engine';$engine=Join-Path $engineRoot 'bin/x64/factorio.exe'
+    $null=New-Item -ItemType Directory -Path (Split-Path -Parent $engine),(Join-Path $engineRoot 'data/base')
+    [IO.File]::WriteAllText($engine,'tiny engine identity never executed');$engineHash=Get-MIRImmutableInputSha256 $engine
+    $freshFailure='';$freshRoots=[Collections.Generic.List[string]]::new()
+    foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(0,1)){
+      $freshLine='0.'+$target.Substring(2);$freshVersion='4.2.'+$target.Substring(1)+('0'+$patch)
+      $candidate=Join-Path $sourceRoot "more-infinite-research_$freshVersion.zip"
+      $root=Join-Path $exactRoot "fresh-$target-$patch";$freshRoots.Add($root)
+      $freshParams=@{Target=$target;FactorioLine=$freshLine;Engine=$engine;EngineSha256=$engineHash;Candidate=$candidate;CandidateSha256=Get-MIRImmutableInputSha256 $candidate;Version=$freshVersion;SourceVersion="4.2.$patch";FreshRoot=$root;SourceCommit=('A'*40);DeadlineSeconds=60}
+      $result=Invoke-MIR42HistoricalFreshLoad @freshParams
+      $receipt=Get-Content -Raw -LiteralPath $result.receipt.path|ConvertFrom-Json -Depth 100
+      Check ($receipt.candidate.version -ceq $freshVersion -and (Test-MIR4BootstrapRecordHash $receipt) -and $inputLeases[$inputLeases.Count-1].closed) "$target/$patch did not preserve the fresh receipt or close custody."
+      Check ((Get-MIRImmutableInputFileIdentity $candidate) -ceq (Get-MIRImmutableInputFileIdentity (Join-Path $root "work/user/mods/$([IO.Path]::GetFileName($candidate))"))) "$target/$patch copied the fresh input."
+    }}
+    Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'work/user/mods/mod-list.json')}|Sort-Object -Unique).Count -eq 10) 'fresh writable controls share identities.'
+    foreach($badVersion in @('4.2.01300','4.2.01302','4.2.01401')){
+      $freshParams.Version=$badVersion;$freshParams.FreshRoot=Join-Path $exactRoot ('rejected-'+$badVersion)
+      Refuses {Invoke-MIR42HistoricalFreshLoad @freshParams} 'historical-fresh-target-binding'
+      Check (-not (Test-Path $freshParams.FreshRoot)) 'bad maintenance identity allocated staging.'
+    }
+    $freshParams.Version='4.2.01301';$freshParams.FactorioLine='0.14'
+    Refuses {Invoke-MIR42HistoricalFreshLoad @freshParams} 'historical-fresh-target-binding'
+    $freshParams.FactorioLine='0.13'
+    $freshParams.CandidateSha256='0'*64;$freshParams.FreshRoot=Join-Path $exactRoot 'hash-drift'
+    Refuses {Invoke-MIR42HistoricalFreshLoad @freshParams} 'historical-fresh-input-drift'
+    Check (-not (Test-Path (Join-Path $freshParams.FreshRoot 'summary.json'))) 'input drift produced an accepted receipt.'
+    $freshParams.CandidateSha256=Get-MIRImmutableInputSha256 $freshParams.Candidate
+    foreach($failure in @('missing','Error controlled opposing log')){
+      $freshFailure=$failure;$freshParams.FreshRoot=Join-Path $exactRoot ('failed-'+[guid]::NewGuid().ToString('N'))
+      $expected=if($failure -ceq 'missing'){'historical-fresh-output-missing'}else{'historical-fresh-log-content'}
+      Refuses {Invoke-MIR42HistoricalFreshLoad @freshParams} $expected
+      Check (-not (Test-Path (Join-Path $freshParams.FreshRoot 'summary.json'))) 'failed fresh oracle produced an accepted receipt.'
+      $null=Complete-MIRImmutableInputLease -Lease $inputLeases[$inputLeases.Count-1] -Outcome failed
+    }
+    foreach($lease in $inputLeases){if(-not $lease.closed){$terminal=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed;$null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal}}
+    foreach($lease in $inputLeases){
+      $root=[string]$lease.record.run_root
+      if($lease.record.state -ceq 'failed'){
+        Refuses {Assert-MIRImmutableInputLeaseReclaimable -RunRoot $root -Context 'failed tiny engine stage'} 'retains immutable-input custody'
+        continue
+      }
+      $null=Assert-MIRImmutableInputLeaseReclaimable -RunRoot $root -Context 'completed tiny engine stage'
+      $null=Assert-MIRImmutableInputPathWithin -Path $root -Root $exactRoot -Context 'owned tiny stage retirement'
+      Remove-Item -LiteralPath $root -Recurse
+    }
+    foreach($target in $originals.Keys){Check ((Test-Path -LiteralPath $originals[$target] -PathType Leaf) -and (Get-MIRImmutableInputSha256 $originals[$target]) -ceq $rows[$target].candidate_sha256) 'stage retirement lost or changed a shared source input.'}
+    Write-Output "MIR42-ENGINE-SHARED-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=18 fresh_version_controls=10 factorio_processes=0"
+  } finally {
+    foreach($lease in $inputLeases){if(-not $lease.closed){$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}}
+    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','New-MIR42EngineArchiveStage')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
+    if(Test-Path -LiteralPath $scratch){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny engine controls';Remove-Item -LiteralPath $scratch -Recurse -Force}
+  }
+}
+Assert-MIR42EngineSharedInputs
+if($SharedInputsOnly){return}
 $script:MIR42HistoricalTerminalInputs = [ordered]@{
   f017 = [ordered]@{ line='0.17'; predecessor='1.7.9'; target_record='targets/historical/f017/target.json'; terminal_seal='.mir/releases/terminal/seals/1.7.9.json' }
   f016 = [ordered]@{ line='0.16'; predecessor='1.6.9'; target_record='targets/historical/f016/target.json'; terminal_seal='.mir/releases/terminal/seals/1.6.9.json' }
@@ -51,7 +221,28 @@ foreach ($target in $expected.Keys) {
       [bool]$record.public_output_authorized -or [bool]$record.publication_authorized -or [string]$seal.release -cne [string]$row.version -or [string]$seal.target -cne [string]$row.line -or
       [string]$seal.archive_sha256 -cne [string]$row.archive -or [string]$seal.engine.binary_sha256 -cne [string]$row.engine) { throw "historical-binding $target" }
   $archive = Join-Path $RepoRoot ([string]$record.predecessor.archive)
-  if (-not (Test-Path -LiteralPath $archive -PathType Leaf) -or (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$row.archive) { throw "historical-predecessor $target" }
+  Assert-MIR42HistoricalPredecessorCustody -Version $row.version -ExpectedSha256 $row.archive -LocalPath $archive
+}
+
+$custodyScratch=Join-Path $RepoRoot ('build/tmp/historical-custody-controls-'+[guid]::NewGuid().ToString('N'))
+try {
+  $absent=Join-Path $custodyScratch 'absent.zip'
+  Assert-MIR42HistoricalPredecessorCustody -Version $expected.f017.version -ExpectedSha256 $expected.f017.archive -LocalPath $absent
+  if(Test-Path -LiteralPath $custodyScratch){throw 'historical-custody-check-materialized-archive'}
+  $null=New-Item -ItemType Directory -Path $custodyScratch
+  $wrong=Join-Path $custodyScratch 'wrong.zip';[IO.File]::WriteAllText($wrong,'tiny differing local archive')
+  foreach($case in @(
+    @{sha=('0'*64);path=$absent;error='historical-predecessor-authority'},
+    @{sha=$expected.f017.archive;path=$wrong;error='historical-predecessor-local-drift'}
+  )){
+    $failure='';try{Assert-MIR42HistoricalPredecessorCustody -Version $expected.f017.version -ExpectedSha256 $case.sha -LocalPath $case.path}catch{$failure=$_.Exception.Message}
+    if(-not $failure.Contains($case.error)){throw "historical-custody-opposing-case: expected $($case.error), got $failure"}
+  }
+} finally {
+  if(Test-Path -LiteralPath $custodyScratch){
+    $null=Assert-MIRImmutableInputPathWithin -Path $custodyScratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny custody controls'
+    Remove-Item -LiteralPath $custodyScratch -Recurse -Force
+  }
 }
 
 $descriptorParent = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/tmp/mir42-historical-descriptor'))

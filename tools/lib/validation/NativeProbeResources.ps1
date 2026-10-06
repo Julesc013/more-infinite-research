@@ -92,17 +92,22 @@ function New-MIRNativeProbeResourceContext {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$OutputRoot,
     [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
-    [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
+    [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
+    [switch]$UseExactOutputRoot
   )
   $path=if([IO.Path]::IsPathRooted($OutputRoot)) { $OutputRoot } else { Join-Path $RepoRoot $OutputRoot }
   $output=Resolve-MIR441RecoveryScratchPath -Path ([IO.Path]::GetFullPath($path))
+  if($UseExactOutputRoot -and (Test-Path -LiteralPath $output) -and
+      (-not (Test-Path -LiteralPath $output -PathType Container) -or @(Get-ChildItem -LiteralPath $output -Force).Count -ne 0)) {
+    throw '[mir-native-probe-exact-output-not-empty]'
+  }
   if($ExpectedPeakMemoryMiB -le 0) { throw '[mir441-resource-peak-budget-required] Declare the native probe peak memory budget.' }
   $policy=[pscustomobject]@{minimum_free_ram_gib=4}
   $peak=[int64]$ExpectedPeakMemoryMiB*1MB
   $writes=[int64]$MaxNewOutputMiB*1MB
   $null=Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $output -EstimatedPeakBytes $writes -ExpectedPeakMemoryBytes $peak
   [pscustomobject]@{
-    root=Join-Path $output ([guid]::NewGuid().ToString('N'))
+    root=$(if($UseExactOutputRoot){$output}else{Join-Path $output ([guid]::NewGuid().ToString('N'))})
     policy=$policy;peak_memory_bytes=$peak;max_new_output_bytes=$writes
     shared_alias_bytes=0L;process_index=0;result_reserve_bytes=64KB
     alias_paths=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
