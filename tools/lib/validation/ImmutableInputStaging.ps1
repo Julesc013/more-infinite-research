@@ -245,6 +245,9 @@ function New-MIRImmutableInputLease {
   )
 
   if ($RequireHardLinks -and $ForceCopy) { throw 'Strict immutable staging cannot request copy mode.' }
+  # Ordinary leases must never turn a failed link into another archive payload.
+  # Explicit copy mode remains available to the small custody/failure fixtures.
+  if (-not $ForceCopy) { $RequireHardLinks = $true }
   $runRoot = (Resolve-Path -LiteralPath $RunRoot).Path
   Assert-MIRImmutableInputDirectory -Path $runRoot -Context 'Immutable input run root'
   $stageDirectory = Assert-MIRImmutableInputPathWithin -Path $StageDirectory -Root $runRoot -Context 'Immutable input stage directory'
