@@ -31,7 +31,9 @@ function Assert-MIRKnownStagingImpactRouting {
     'tests/runtime/Test-MIRBobTinPersistedState.ps1',
     'tests/runtime/Test-MIRBobTinProgressionFrontier.ps1',
     'tests/runtime/Test-MIRBobTinQualification.ps1',
-    'tests/runtime/Test-MIRF200BobTinPersistedState.ps1'
+    'tests/runtime/Test-MIRF200BobTinPersistedState.ps1',
+    'tests/runtime/Test-MIR42F200SettingsCapTransition.ps1',
+    'tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1'
   )
   $expected=@($manifest.baseline_scenarios|Sort-Object)-join'|'
   foreach($path in $paths){
@@ -39,7 +41,8 @@ function Assert-MIRKnownStagingImpactRouting {
     if($selection.requires_full-or$selection.unmapped_runtime_paths.Count-or
       (@($selection.scenarios|Sort-Object)-join'|')-cne$expected){throw "Known staging path expanded unrelated runtime scenarios: $path"}
     $classification=Get-MIRAssuranceClassification -Paths @($path) -Config $policy
-    if($classification.escalated-or'static.immutable-input-staging'-notin$classification.tests){throw "Known staging path lost its immutable-input check: $path"}
+    $requiredCheck=if($path -match 'Test-MIR42F200SettingsCapTransition'){ 'static.f200-base-only-settings-cap-transition-harness' }else{ 'static.immutable-input-staging' }
+    if($classification.escalated-or$requiredCheck-notin$classification.tests){throw "Known staging path lost its consumed staging check: $path"}
   }
   $unknown='tests/runtime/Test-MIRFutureBehavior.ps1'
   $selection=Get-MIRAssuranceImpactSelection -Paths @($unknown) -Config $policy
@@ -48,7 +51,7 @@ function Assert-MIRKnownStagingImpactRouting {
   if(-not$selection.requires_full-or$unknown-notin$selection.unmapped_runtime_paths){throw 'Known staging rules masked unknown runtime behavior.'}
   $player=Get-MIRAssuranceClassification -Paths @('source/prototypes/mir/runtime/future_behavior.lua') -Config $policy
   if('runtime.full'-notin$player.tests){throw 'Player runtime source lost its broader checks.'}
-  Write-Host '[ok] sixteen known staging paths retain baseline impact and immutable-input checks; unknown and mixed runtime changes escalate.'
+  Write-Host '[ok] eighteen known staging paths retain baseline impact and consumed staging checks; unknown and mixed runtime changes escalate.'
 }
 Assert-MIRKnownStagingImpactRouting
 if($ImpactRoutingOnly){return}
