@@ -5,6 +5,7 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+. (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 $assertions=0
 function Check([bool]$Condition,[string]$Message){if(-not $Condition){throw "Historical inputs: $Message"};$script:assertions++}
 function Refuses([scriptblock]$Action,[string]$Expected){$failure='';try{& $Action|Out-Null}catch{$failure=$_.Exception.Message};Check ($failure.Contains($Expected)) "expected $Expected; got $failure"}
@@ -21,7 +22,18 @@ $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo ('build/tmp/hi
 $inputLeases=[Collections.Generic.List[object]]::new()
 try {
   $null=New-Item -ItemType Directory -Path $scratch
-  $authority=Get-Content -Raw (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json')|ConvertFrom-Json
+  $authority=Get-Content -Raw (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+  $authorityReader=@($ast.EndBlock.Statements|Where-Object {$_ -is [Management.Automation.Language.AssignmentStatementAst] -and $_.Left.Extent.Text -ceq '$authority'})
+  Check ($authorityReader.Count -eq 1) 'authority reader is ambiguous.'
+  $coupon=($authority|ConvertTo-Json -Depth 100)|ConvertFrom-Json -Depth 100 -DateKind String
+  $coupon.recorded_at='2001-02-03T04:05:06-09:00';$coupon.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $coupon
+  $authorityPath=Join-Path $scratch 'controlled-authority-reader.json';$couponText=$coupon|ConvertTo-Json -Depth 100
+  [IO.File]::WriteAllText($authorityPath,$couponText)
+  . ([scriptblock]::Create($authorityReader[0].Extent.Text))
+  Check ($authority.recorded_at -is [string] -and $authority.recorded_at -ceq $coupon.recorded_at -and (Test-MIR4BootstrapRecordHash -Record $authority)) 'actual reader changed timestamp bytes or rejected the canonical record.'
+  $utc=$couponText|ConvertFrom-Json -Depth 100 -DateKind Utc
+  Check (-not (Test-MIR4BootstrapRecordHash -Record $utc)) 'opposing timestamp normalization no longer detects the old hash defect.'
+  $authority=Get-Content -Raw (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
   $source=Join-Path $scratch 'tiny-shared.zip';[IO.File]::WriteAllText($source,'tiny immutable input')
   $hash=Get-MIRImmutableInputSha256 $source
   Refuses {& (Join-Path $repo 'tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1') -RepoRoot $repo -Target f017 -FactorioBin $source -CandidateZip $source -PredecessorZip $source -EvidenceRoot (Join-Path $scratch 'refused-native')} '[mir441-resource-peak-budget-required]'

@@ -110,7 +110,7 @@ function Invoke-MIR4HistoricalPhase {
 }
 
 $authorityPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json'
-$authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
+$authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json -Depth 100 -DateKind String
 if($authority.kind -cne 'MIR4HistoricalPrivateCandidateAuthorizationV1' -or $authority.status -cne 'authorized-private-experimental' -or $authority.public_output_authorized -or $authority.publication_authorized -or -not (Test-MIR4BootstrapRecordHash -Record $authority)){throw 'Historical private authority differs.'}
 $row = @($authority.targets | Where-Object { [string]$_.target_key -eq $Target })
 if ($row.Count -ne 1) { throw "Historical candidate authority has no unique $Target row." }
