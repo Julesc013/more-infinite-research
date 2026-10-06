@@ -947,9 +947,9 @@
     {
       "path": "scripts/Measure-MIRPerformanceRegression.ps1",
       "classification": "canonical-internal",
-      "sha256": "A020D12C25E2D5B2A20B7B7EE5F965292D52F1A66256B1AB49C5F74895C94090",
+      "sha256": "BD61E0990E357554D73F2C1B1505C02480AB69EB8B4D735BF9D17BB291685929",
       "hash_mode": "canonical-text-v1",
-      "lines": 839,
+      "lines": 844,
       "package_visible": false
     },
     {
@@ -6034,5 +6034,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:156602e83ef0c67584459a404213195661adb8b7f85c9953f6fe2f380aa8aa63"
+  "digest": "sha256:360c69782450ff579cbbfdaac34057c20b8765bf8604486a1c667ec01ffd9307"
 }

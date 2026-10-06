@@ -46,6 +46,31 @@ function Test-MIRNativeEntryDefaults {
     $count++
   }
   $tokens=$null; $errors=$null
+  $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'scripts/Measure-MIRPerformanceRegression.ps1'),[ref]$tokens,[ref]$errors)
+  if ($errors.Count -or $null -eq $ast.ParamBlock) { throw '[mir-native-entry-performance-parse]' }
+  $parameters=[scriptblock]::Create($ast.ParamBlock.Extent.Text + "`nreturn `$LocalModZipDir")
+  if (-not [string]::IsNullOrWhiteSpace((& $parameters -RepoRoot $RepoRoot -ExpectedSourceCommit ('1' * 40)))) {
+    throw '[mir-native-entry-performance-library-parameter]'
+  }
+  $count++
+  $defaults=@($ast.FindAll({param($node)
+    $node -is [Management.Automation.Language.IfStatementAst] -and
+    $node.Clauses[0].Item1.Extent.Text -ceq '[string]::IsNullOrWhiteSpace($LocalModZipDir)'
+  },$true))
+  if ($defaults.Count -ne 1) { throw '[mir-native-entry-performance-library-definition]' }
+  foreach ($line in @('2.0','2.1')) {
+    $campaign=[pscustomobject]@{factorio_line=$line}
+    $LocalModZipDir=''
+    $actual=& ([scriptblock]::Create($defaults[0].Extent.Text + "`nreturn `$LocalModZipDir"))
+    $expected=Join-Path (Split-Path -Parent $RepoRoot) "testmods/$line"
+    if ($actual -cne $expected) { throw "[mir-native-entry-performance-library-default] $line" }
+    $count++
+    $LocalModZipDir=Join-Path $RepoRoot 'build/private-library-control'
+    $actual=& ([scriptblock]::Create($defaults[0].Extent.Text + "`nreturn `$LocalModZipDir"))
+    if ($actual -cne $LocalModZipDir) { throw "[mir-native-entry-performance-library-override] $line" }
+    $count++
+  }
+  $tokens=$null; $errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'scripts/Start-MIROvernightLocalSweep.ps1'),[ref]$tokens,[ref]$errors)
   $definitions=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Resolve-MIRFactorioBinary'},$true))
   if ($definitions.Count -ne 1) { throw '[mir-native-entry-engine-definition]' }
