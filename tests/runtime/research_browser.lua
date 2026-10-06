@@ -288,8 +288,15 @@ script.on_nth_tick(1,function()
       check(remote.call("more-infinite-research-browser","open",actual.index),"saved personal view reopens")
       check(snapshot(force)==storage.expected_force,"reopened GUI retains force state")
     end
-    helpers.write_file("browser-reload.json",helpers.table_to_json{status="passed",assertions=count,engine=helpers.game_version,scope="native-single-player-save-reload-with-partial-research"},false)
-    script.on_nth_tick(1,nil);return
+    script.on_nth_tick(1,nil)
+    helpers.write_file("browser-reload.json",helpers.table_to_json{status="awaiting-native-discovery",engine=helpers.game_version},false)
+    check_browser_native_discovery(browser_core,browser_catalogue,check,snapshot,function(discovery)
+      check(snapshot(force)==storage.expected_force,"localized discovery after reload retains research and queue")
+      helpers.write_file("browser-reload.json",helpers.table_to_json{status="passed",assertions=count,
+        engine=helpers.game_version,scope="native-save-reload-with-partial-research; connected-translation-and-GUI-scope-recorded-separately",
+        native_discovery=discovery},false)
+    end)
+    return
   end
   check(force.add_research("mir-browser-progress"),"initial queue")
   force.research_progress=0.375
@@ -655,8 +662,14 @@ script.on_nth_tick(1,function()
   end
   local scope=native_players>0 and "exact-package-load-controlled-model-and-native-GUI-objects; rendered-client-and-two-client-GUI-not-qualified"
     or "exact-package-load-controlled-model; native-GUI-objects-rendered-client-and-two-client-GUI-not-qualified"
-  helpers.write_file("browser-test.json",helpers.table_to_json{status="passed",assertions=count,scope=scope,native_players=native_players,connected_players=#game.connected_players,native_gui_assertions_exercised=native_players>0,engine=helpers.game_version},false)
-  storage.browser_saved=true;storage.expected_force=before
-  if #game.connected_players>0 then game.auto_save("mir-browser-acceptance") end
   script.on_nth_tick(1,nil)
+  helpers.write_file("browser-test.json",helpers.table_to_json{status="awaiting-native-discovery",engine=helpers.game_version},false)
+  check_browser_native_discovery(browser_core,browser_catalogue,check,snapshot,function(discovery)
+    check(before==snapshot(force),"completed native discovery retains shared research and queue state")
+    helpers.write_file("browser-test.json",helpers.table_to_json{status="passed",assertions=count,scope=scope,
+      native_players=native_players,connected_players=#game.connected_players,
+      native_gui_assertions_exercised=native_players>0,engine=helpers.game_version,native_discovery=discovery},false)
+    storage.browser_saved=true;storage.expected_force=before
+    if #game.connected_players>0 then game.auto_save("mir-browser-acceptance") end
+  end)
 end)

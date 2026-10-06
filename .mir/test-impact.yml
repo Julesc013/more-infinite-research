@@ -781,6 +781,54 @@
       "groups": [],
       "scenarios": [],
       "tags": []
+    },
+    {
+      "pattern": "tests/runtime/browser_fixture_data.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/runtime/research_browser.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/runtime/research_browser_core_regressions.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/runtime/research_browser_handler_regressions.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/runtime/research_browser_omissions.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/runtime/research_browser_discovery_regressions.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/runtime/research_browser_native_discovery.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/runtime/research_browser_native_discovery_regressions.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
     }
   ]
 }

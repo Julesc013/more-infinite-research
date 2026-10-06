@@ -138,6 +138,17 @@ local browser_omission_provider=(function()
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_core_regressions.lua')))
 [void]$lua.AppendLine('end)()')
 $browserTestText=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser.lua'))
+[void]$lua.AppendLine('local check_browser_native_discovery=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_native_discovery.lua')))
+[void]$lua.AppendLine('end)()')
+$nativeDiscoverySource=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_native_discovery.lua'))
+$nativeDiscoveryDataSource=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/browser_fixture_data.lua'))
+if($nativeDiscoverySource.Contains(']====]') -or $nativeDiscoveryDataSource.Contains(']====]')) { throw 'Native discovery fixture source collides with its Lua delimiter.' }
+[void]$lua.AppendLine('local browser_native_discovery_source=[====['+$nativeDiscoverySource+']====]')
+[void]$lua.AppendLine('local browser_native_discovery_data_source=[====['+$nativeDiscoveryDataSource+']====]')
+[void]$lua.AppendLine('local check_browser_native_discovery_regressions=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_native_discovery_regressions.lua')))
+[void]$lua.AppendLine('end)()')
 $hostTestSource=[IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua')).Replace("`r`n","`n")
 if($hostTestSource.Contains(']====]')) { throw 'Host fixture source collides with its Lua string delimiter.' }
 [void]$lua.AppendLine('local browser_host_test_source=[====[')
@@ -162,7 +173,7 @@ $capMutant=$coreTestSource.Replace($capAnchor,$capAnchor.Replace('finite_nonnega
 [void]$lua.AppendLine('local browser_core_positive_default_mutant=(function()')
 [void]$lua.AppendLine($capMutant)
 [void]$lua.AppendLine('end)()')
-$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
+$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
 [void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player',$coreChecks))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='more-infinite-research';enabled=$true},@{name='mir-browser-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
@@ -177,12 +188,13 @@ function Invoke-BrowserEngine([string[]]$Arguments) {
   -Arguments (@('--config',(Join-Path $run 'config.ini'),'--mod-directory',(Join-Path $run 'mods'))+$graphicsArguments+$Arguments)
 }
 Invoke-BrowserEngine @('--create',$save)
-if($Graphics) { Invoke-BrowserEngine @('--benchmark-graphics',$save,'--benchmark-ticks','120','--disable-audio','--window-size','1024x768') }
+if($Graphics) { Invoke-BrowserEngine @('--benchmark-graphics',$save,'--benchmark-ticks','720','--disable-audio','--window-size','1024x768') }
 else { Invoke-BrowserEngine @('--benchmark',$save,'--benchmark-ticks','3','--benchmark-runs','1') }
 $resultPath=Join-Path $run 'userdata/script-output/browser-test.json'
 if(-not (Test-Path $resultPath)) { throw "No browser acceptance result: $run" }
 $result=Get-Content -Raw $resultPath | ConvertFrom-Json
 if($Graphics -and $result.native_players -lt 1) { throw "Graphics test did not exercise a native player: $run" }
+if($Graphics -and ($result.native_discovery.status -cne 'passed-native-connected-player-translations-and-GUI' -or $result.native_discovery.native_players -lt 1)) { throw "Graphics test did not complete native localized discovery: $run" }
 if($result.status -ne 'passed') { throw "Browser acceptance failed: $resultPath" }
 if([string]$result.engine -cne $selectedEngineVersion) { throw 'Browser native result does not match the selected engine.' }
 $result | Add-Member package_sha256 (Get-FileHash $candidate).Hash
@@ -198,15 +210,18 @@ $result | Add-Member test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/r
 $result | Add-Member omission_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_omissions.lua')).Hash
 $result | Add-Member core_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_core_regressions.lua')).Hash
 $result | Add-Member discovery_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_discovery_regressions.lua')).Hash
+$result | Add-Member native_discovery_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_native_discovery.lua')).Hash
+$result | Add-Member native_discovery_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_native_discovery_regressions.lua')).Hash
 $result | Add-Member handler_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_handler_regressions.lua')).Hash
 if($Graphics) {
  $saved=Join-Path $run 'userdata/saves/_autosave-mir-browser-acceptance.zip'
  if(-not (Test-Path $saved)) { throw "Native browser save capture missing: $saved" }
- Invoke-BrowserEngine @('--benchmark-graphics',$saved,'--benchmark-ticks','120','--disable-audio','--window-size','1024x768')
+ Invoke-BrowserEngine @('--benchmark-graphics',$saved,'--benchmark-ticks','720','--disable-audio','--window-size','1024x768')
  $reloaded=Join-Path $run 'userdata/script-output/browser-reload.json'
  if(-not(Test-Path $reloaded)) { throw "Native browser reload result missing: $run" }
  $reload=Get-Content -Raw $reloaded | ConvertFrom-Json
  if($reload.status -ne 'passed') { throw 'Browser reload failed.' }
+ if($reload.native_discovery.status -cne 'passed-native-connected-player-translations-and-GUI' -or $reload.native_discovery.native_players -lt 1) { throw 'Browser reload did not complete native localized discovery.' }
  $result | Add-Member reload $reload
  $result | Add-Member save_sha256 (Get-FileHash $saved).Hash
 }
