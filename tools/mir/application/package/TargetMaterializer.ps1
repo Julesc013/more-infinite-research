@@ -183,7 +183,8 @@ function New-MIR4TargetPackage {
     [Parameter(Mandatory)][ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId,
     [string]$SourceVersion,
     [string]$DistributionVersion,
-    [string]$OutputRoot='build/packages'
+    [string]$OutputRoot='build/packages',
+    [string]$ArchiveRelativePath=''
   )
   $state = Get-MIR4TargetMaterializerState -RepoRoot $RepoRoot -Target $Target
   $repo = [string]$state.repo
@@ -193,8 +194,25 @@ function New-MIR4TargetPackage {
   }
   if (-not [IO.Path]::IsPathRooted($OutputRoot)) { $OutputRoot = Join-Path $repo $OutputRoot }
   $output = [IO.Path]::GetFullPath($OutputRoot)
-  if (-not (Test-Path -LiteralPath $output -PathType Container)) { New-Item -ItemType Directory -Force -Path $output | Out-Null }
   $candidateRoot = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "$Target/$CandidateId"
+  $archive = Join-Path $candidateRoot ([string]$identity.package_name)
+  if (-not [string]::IsNullOrWhiteSpace($ArchiveRelativePath)) {
+    # Retained assets are written by this same canonical writer. Validate the
+    # destination before retiring or populating a staging root; never relocate
+    # a receipt to make it describe a subsequent custody copy.
+    $archive = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath $ArchiveRelativePath
+    if ([IO.Path]::GetFileName($archive) -cne [string]$identity.package_name) {
+      throw '[mir4-target-materializer-archive-filename]'
+    }
+    $candidatePrefix = $candidateRoot.TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar
+    if ($archive.StartsWith($candidatePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+      throw '[mir4-target-materializer-retained-archive-in-staging]'
+    }
+    if ((Test-Path -LiteralPath $archive) -or (Test-Path -LiteralPath "$archive.new")) {
+      throw '[mir4-target-materializer-retained-archive-collision]'
+    }
+  }
+  if (-not (Test-Path -LiteralPath $output -PathType Container)) { New-Item -ItemType Directory -Force -Path $output | Out-Null }
   Remove-MIR4BuildTree -OutputRoot $output -Path $candidateRoot
   New-Item -ItemType Directory -Force -Path $candidateRoot | Out-Null
   $tree = Resolve-MIR4ArtifactPath -OutputRoot $candidateRoot -RelativePath ([string]$identity.distribution_root)
@@ -219,7 +237,6 @@ function New-MIR4TargetPackage {
   if ([string]$identity.source_version -ceq '4.2.1') {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version)
   }
-  $archive = Join-Path $candidateRoot ([string]$identity.package_name)
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output
   $inventory = Get-MIR4ArchiveInventory -Path $archive
   $result = [pscustomobject][ordered]@{
