@@ -2126,6 +2126,528 @@ streams:
           - tests/compiler/material_progression.lua
           - tests/compiler/material_continuation.lua
 
+    recipe-prod-research_material_py_earth_flower_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_flower_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_flower_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_flower_sample-1
+      stream_key: research_material_py_earth_flower_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_flower_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_flower_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_flower_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_flower_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_flower_sample-4
+      stream_key: research_material_py_earth_flower_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_flower_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_generic_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_generic_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_generic_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_generic_sample-1
+      stream_key: research_material_py_earth_generic_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_generic_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_generic_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_generic_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_generic_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_generic_sample-4
+      stream_key: research_material_py_earth_generic_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_generic_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_jute_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_jute_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_jute_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_jute_sample-1
+      stream_key: research_material_py_earth_jute_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_jute_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_jute_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_jute_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_jute_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_jute_sample-4
+      stream_key: research_material_py_earth_jute_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_jute_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_palmtree_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_palmtree_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_palmtree_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_palmtree_sample-1
+      stream_key: research_material_py_earth_palmtree_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_palmtree_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_palmtree_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_palmtree_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_palmtree_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_palmtree_sample-4
+      stream_key: research_material_py_earth_palmtree_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_palmtree_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_potato_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_potato_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_potato_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_potato_sample-1
+      stream_key: research_material_py_earth_potato_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_potato_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_potato_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_potato_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_potato_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_potato_sample-4
+      stream_key: research_material_py_earth_potato_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_potato_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_shroom_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_shroom_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_shroom_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_shroom_sample-1
+      stream_key: research_material_py_earth_shroom_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_shroom_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_shroom_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_shroom_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_shroom_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_shroom_sample-4
+      stream_key: research_material_py_earth_shroom_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_shroom_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_sunflower_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_sunflower_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_sunflower_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_sunflower_sample-1
+      stream_key: research_material_py_earth_sunflower_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_sunflower_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_sunflower_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_sunflower_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_sunflower_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_sunflower_sample-4
+      stream_key: research_material_py_earth_sunflower_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_sunflower_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_tropical_tree_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_tropical_tree_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_tropical_tree_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_tropical_tree_sample-1
+      stream_key: research_material_py_earth_tropical_tree_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_tropical_tree_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_tropical_tree_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_tropical_tree_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_tropical_tree_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_tropical_tree_sample-4
+      stream_key: research_material_py_earth_tropical_tree_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_tropical_tree_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_venus_fly_sample-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_venus_fly_sample-1
+      introduced_in: "4.2.1"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_py_earth_venus_fly_sample
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_venus_fly_sample-1
+      stream_key: research_material_py_earth_venus_fly_sample
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_venus_fly_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
+    recipe-prod-research_material_py_earth_venus_fly_sample-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_earth_venus_fly_sample-4
+      introduced_in: "4.2.1"
+      source: community-material-staged-continuation
+      capability: recipe-productivity
+      family: material_py_earth_venus_fly_sample
+      policy: qualified-late-science-and-finite-recipe-headroom
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_py_earth_venus_fly_sample-4
+      stream_key: research_material_py_earth_venus_fly_sample__continuation
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+        f017: omitted-recipe-productivity-unavailable
+        f016: omitted-recipe-productivity-unavailable
+        f015: omitted-recipe-productivity-unavailable
+        f014: omitted-recipe-productivity-unavailable
+        f013: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_py_earth_venus_fly_sample
+      evidence:
+        fixtures:
+          - fixtures/assert-community-manufacturing-intake
+        tests:
+          - tests/compiler/material_progression.lua
+          - tests/compiler/material_routes.lua
+          - tests/compiler/material_continuation.lua
+
     recipe-prod-research_material_py_glycerol-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_py_glycerol-1
       introduced_in: "4.2.1"

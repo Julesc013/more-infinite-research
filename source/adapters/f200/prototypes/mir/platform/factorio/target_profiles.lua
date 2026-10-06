@@ -69,7 +69,9 @@ local M = {
       },
       supported_required_mods = {
         "space-age",
-        "pycoalprocessing"
+        "pycoalprocessing",
+        "pyalienlife",
+        "pyhightech"
       },
       supported_effect_types = {
         "cargo-landing-pad-count",
@@ -157,7 +159,9 @@ local M = {
       },
       supported_required_mods = {
         "space-age",
-        "pycoalprocessing"
+        "pycoalprocessing",
+        "pyalienlife",
+        "pyhightech"
       },
       supported_effect_types = {
         "character-build-distance",

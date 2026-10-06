@@ -68,6 +68,21 @@ local PY_CHEMICAL_STREAM_KEYS = {
   "research_material_py_glycerol"
 }
 
+-- These are the separate retained Earth sample outcomes, not Angel samples,
+-- tree tiers or seed breeders. The same admission and owner rules still
+-- decide whether any finalized sample producer can receive research.
+local PY_SAMPLE_STREAM_KEYS = {
+  "research_material_py_earth_generic_sample",
+  "research_material_py_earth_sunflower_sample",
+  "research_material_py_earth_flower_sample",
+  "research_material_py_earth_shroom_sample",
+  "research_material_py_earth_tropical_tree_sample",
+  "research_material_py_earth_potato_sample",
+  "research_material_py_earth_jute_sample",
+  "research_material_py_earth_venus_fly_sample",
+  "research_material_py_earth_palmtree_sample"
+}
+
 local MATERIAL_STREAM_KEY_SET = {}
 for _, key in ipairs(MATERIAL_STREAM_KEYS) do MATERIAL_STREAM_KEY_SET[key] = true end
 
@@ -84,6 +99,7 @@ end
 local STAGED_MATERIAL_STREAM_KEY_SET = {}
 local ANGEL_PETROCHEM_STREAM_KEY_SET = {}
 local PY_CHEMICAL_STREAM_KEY_SET = {}
+local PY_SAMPLE_STREAM_KEY_SET = {}
 for key in pairs(MATERIAL_STREAM_KEY_SET) do STAGED_MATERIAL_STREAM_KEY_SET[key] = true end
 for key in pairs(K2_213_CONTINUATION_STREAM_KEY_SET) do
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
@@ -97,6 +113,10 @@ for _, key in ipairs(ANGEL_PETROCHEM_STREAM_KEYS) do
 end
 for _, key in ipairs(PY_CHEMICAL_STREAM_KEYS) do
   PY_CHEMICAL_STREAM_KEY_SET[key] = true
+  STAGED_MATERIAL_STREAM_KEY_SET[key] = true
+end
+for _, key in ipairs(PY_SAMPLE_STREAM_KEYS) do
+  PY_SAMPLE_STREAM_KEY_SET[key] = true
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
 end
 
@@ -138,6 +158,12 @@ end
 function M.py_chemical_stream_keys()
   local out = {}
   for index, key in ipairs(PY_CHEMICAL_STREAM_KEYS) do out[index] = key end
+  return out
+end
+
+function M.py_sample_stream_keys()
+  local out = {}
+  for index, key in ipairs(PY_SAMPLE_STREAM_KEYS) do out[index] = key end
   return out
 end
 
@@ -313,6 +339,13 @@ end
 function M.attach_py_chemical_continuation(key, spec)
   if not PY_CHEMICAL_STREAM_KEY_SET[key] then
     error("Py chemical continuation does not support stream " .. tostring(key) .. ".", 2)
+  end
+  return attach(key, spec)
+end
+
+function M.attach_py_sample_continuation(key, spec)
+  if not PY_SAMPLE_STREAM_KEY_SET[key] then
+    error("Py sample continuation does not support stream " .. tostring(key) .. ".", 2)
   end
   return attach(key, spec)
 end
