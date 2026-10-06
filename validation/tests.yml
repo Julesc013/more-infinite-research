@@ -9,6 +9,8 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetHistoricalEngineRun.ps1",
+        "tools/mir/application/package/DistributionCustody.ps1",
+        ".mir/distributions.json",
         "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",

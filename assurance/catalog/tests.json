@@ -7539,6 +7539,8 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetHistoricalEngineRun.ps1",
+        "tools/mir/application/package/DistributionCustody.ps1",
+        ".mir/distributions.json",
         "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
@@ -8013,5 +8015,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f162c5f20027fb6749a0dfbc38d6207b5cc32c1ffcfd583f762071fceb721bdf"
+  "digest": "sha256:72c7d9342aedffc6aa70ac40b8df11354fe1837216312f9c1a52944dde7820c2"
 }

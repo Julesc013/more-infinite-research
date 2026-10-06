@@ -7,6 +7,21 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/package/DistributionCustody.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+
+function Assert-MIR42HistoricalPredecessorCustody {
+  param([Parameter(Mandatory)][string]$Version,[Parameter(Mandatory)][string]$ExpectedSha256,
+    [Parameter(Mandatory)][string]$LocalPath)
+  $distribution=Get-MIR4DistributionCustodyEntry -RepoRoot $RepoRoot -Version $Version
+  if([string]$distribution.sha256 -cne $ExpectedSha256 -or
+      [string]$distribution.path -cne ('dist/more-infinite-research_'+$Version+'.zip')){throw "historical-predecessor-authority $Version"}
+  # Stream the pinned blob into the existing verifier, without restoring ZIPs.
+  $null=Test-MIR4DistributionHistoricalCustody -RepoRoot $RepoRoot -Distribution $distribution
+  if((Test-Path -LiteralPath $LocalPath) -and -not (Test-MIR4DistributionCustodyFile -Path $LocalPath -Distribution $distribution)){
+    throw "historical-predecessor-local-drift $Version"
+  }
+}
 
 $expected = [ordered]@{
   f017 = [ordered]@{line='0.17';version='1.7.9';candidate='4.2.01700';archive='B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C';engine='E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06';infinite='mining-productivity-4'}
@@ -206,7 +221,28 @@ foreach ($target in $expected.Keys) {
       [bool]$record.public_output_authorized -or [bool]$record.publication_authorized -or [string]$seal.release -cne [string]$row.version -or [string]$seal.target -cne [string]$row.line -or
       [string]$seal.archive_sha256 -cne [string]$row.archive -or [string]$seal.engine.binary_sha256 -cne [string]$row.engine) { throw "historical-binding $target" }
   $archive = Join-Path $RepoRoot ([string]$record.predecessor.archive)
-  if (-not (Test-Path -LiteralPath $archive -PathType Leaf) -or (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$row.archive) { throw "historical-predecessor $target" }
+  Assert-MIR42HistoricalPredecessorCustody -Version $row.version -ExpectedSha256 $row.archive -LocalPath $archive
+}
+
+$custodyScratch=Join-Path $RepoRoot ('build/tmp/historical-custody-controls-'+[guid]::NewGuid().ToString('N'))
+try {
+  $absent=Join-Path $custodyScratch 'absent.zip'
+  Assert-MIR42HistoricalPredecessorCustody -Version $expected.f017.version -ExpectedSha256 $expected.f017.archive -LocalPath $absent
+  if(Test-Path -LiteralPath $custodyScratch){throw 'historical-custody-check-materialized-archive'}
+  $null=New-Item -ItemType Directory -Path $custodyScratch
+  $wrong=Join-Path $custodyScratch 'wrong.zip';[IO.File]::WriteAllText($wrong,'tiny differing local archive')
+  foreach($case in @(
+    @{sha=('0'*64);path=$absent;error='historical-predecessor-authority'},
+    @{sha=$expected.f017.archive;path=$wrong;error='historical-predecessor-local-drift'}
+  )){
+    $failure='';try{Assert-MIR42HistoricalPredecessorCustody -Version $expected.f017.version -ExpectedSha256 $case.sha -LocalPath $case.path}catch{$failure=$_.Exception.Message}
+    if(-not $failure.Contains($case.error)){throw "historical-custody-opposing-case: expected $($case.error), got $failure"}
+  }
+} finally {
+  if(Test-Path -LiteralPath $custodyScratch){
+    $null=Assert-MIRImmutableInputPathWithin -Path $custodyScratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny custody controls'
+    Remove-Item -LiteralPath $custodyScratch -Recurse -Force
+  }
 }
 
 $descriptorParent = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/tmp/mir42-historical-descriptor'))
