@@ -1705,6 +1705,7 @@
         "scripts/Start-MIROvernightLocalSweep.ps1",
         "scripts/Invoke-MIRReleaseTargetedGate.ps1",
         "scripts/Invoke-MIRPerformanceQualification.ps1",
+        "scripts/Measure-MIRPerformanceRegression.ps1",
         "tools/lib/assurance/Core.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/BrowserContinuityInputs.ps1",
@@ -8084,5 +8085,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b669e60d1eb5b4056e73b84ae23cae222ec660221dda22f0def64996573da1d9"
+  "digest": "sha256:2d062d3b1b0cbbd006b12a01356803d8b3b759c673a7ddd412bf7f1f1294a993"
 }

@@ -401,6 +401,7 @@
         "scripts/Start-MIROvernightLocalSweep.ps1",
         "scripts/Invoke-MIRReleaseTargetedGate.ps1",
         "scripts/Invoke-MIRPerformanceQualification.ps1",
+        "scripts/Measure-MIRPerformanceRegression.ps1",
         "tools/lib/assurance/Core.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/BrowserContinuityInputs.ps1",
