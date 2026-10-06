@@ -499,6 +499,7 @@ fixtures:
     notes:
       - independent-finalized-raw-prototype-denominator-for-sixteen-requested-plate-and-alloy-outcomes
       - supplementary-platinum-wire-cannot-satisfy-the-platinum-plate-request
+      - four-angel-petrochem-fluid-subjects-use-a-separate-typed-denominator
       - producer-and-observation-gap-records-do-not-prove-acquisition-admission-or-earned-benefit
       - exact-native-capture-and-package-qualification-remain-pending
     validates:
@@ -506,6 +507,9 @@ fixtures:
       - hidden-research-locked-and-productivity-denied-producers-remain-observable
       - prototype-absence-and-no-observed-producer-are-distinct
       - bounded-read-only-inventory-and-staging-free-log-replay
+      - fluid-prototype-and-producer-identities-cannot-be-satisfied-by-same-named-items
+      - missing-candidate-status-cannot-close-an-independent-producer-gap
+      - canonical-package-fingerprint-and-raw-source-manifest-custody-remain-distinct
 
   k2-science-phase-policy:
     requires_features: []
@@ -581,7 +585,7 @@ fixtures:
       base: "2.1.20"
       Krastorio2: "2.1.3"
       Krastorio2-spaced-out: "2.0.13"
-      more-infinite-research: "4.2.21000"
+      more-infinite-research: "4.2.21001"
     qualification_status: unqualified
     validates:
       - exact-current-engine-k2-k2so-and-mir-tuple
@@ -589,6 +593,9 @@ fixtures:
       - native-imersite-crystal-owner-and-effect-remain-outside-mir-domain
       - legacy-level-three-current-research-queue-and-42-percent-progress-preserved
       - one-fresh-create-and-single-bounded-reload
+      - supplied-current-421-candidate-and-materialization-bindings-verified-without-a-new-zip
+      - explicit-flat-library-inputs-over-strict-same-volume-hardlinks
+      - one-owned-row-budget-governs-engine-version-create-and-reload
       - witnessed-k2-return-paths-and-other-material-families-remain-withheld
       - historical-a05-k2-imersite-proof-remains-distinct
       - no-broad-k2-support-release-signing-or-publication-authority

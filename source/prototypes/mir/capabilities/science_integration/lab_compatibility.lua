@@ -70,7 +70,7 @@ local function lab_acquisition_witness(lab_name, diagnostic_observer, reachabili
     table.sort(items)
   else
     local item_facts = require("prototypes.mir.index.item_prototype_facts")
-    for _, name in ipairs(item_facts.placeable_items_for_entity_types({"lab"})) do
+    for _, name in ipairs(item_facts.placeable_items_for_entity(lab_name)) do
       local item = prototype_lookup.item_prototype(name)
       if item and item.place_result == lab_name then items[#items + 1] = name end
     end

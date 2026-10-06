@@ -1,0 +1,102 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0098",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Extend admitted K2 material research through a separate level-four stage.",
+  "details": [
+    "Rare Metals, Silicon, Glass and black/white paving now declare the existing staged continuation. Their early IDs still end at three; later levels retain admitted recipes, increments and cost controls. The combined configured cap defaults to zero while useful recipe headroom supplies a finite effective limit.",
+    "Explicit cap three, native owners, withheld early rows, saturation and unavailable science prevent continuation. The five new stable IDs do not widen route permissions, certificates or the retained Imersite guard. Current-package K2/K2SO production, save and profile qualification remain outstanding."
+  ],
+  "semantic_domains": [
+    "progression",
+    "recipe-productivity",
+    "settings",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Adds conditional staged material progression and a zero combined-cap default; current native acceptance is pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Adds conditional staged material progression and a zero combined-cap default; current native acceptance is pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "changed",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "source/prototypes/mir/families/material_progression.lua"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_continuation.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-integration-and-delivery-plan.md"
+    }
+  ]
+}

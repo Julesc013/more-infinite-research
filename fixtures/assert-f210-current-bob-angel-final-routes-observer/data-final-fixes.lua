@@ -35,7 +35,13 @@ local CANDIDATES = {
   {family="cobalt-steel", shape="molten-alloy", name="angels-plate-cobalt-steel"},
   {family="gunmetal", shape="molten-alloy", name="angels-plate-gunmetal"},
   {family="invar", shape="molten-alloy", name="angels-plate-invar"},
-  {family="nitinol", shape="molten-alloy", name="angels-plate-nitinol"}
+  {family="nitinol", shape="molten-alloy", name="angels-plate-nitinol"},
+  {family="nitric-acid", shape="fluid", name="angels-liquid-nitric-acid"},
+  {family="hydrochloric-acid", shape="fluid", name="angels-liquid-hydrochloric-acid"},
+  {family="hydrochloric-acid", shape="fluid-coproduct", name="angels-liquid-hydrochloric-acid-solid-sodium-sulfate"},
+  {family="hydrofluoric-acid", shape="fluid-coproduct", name="angels-liquid-hydrofluoric-acid"},
+  {family="hydrofluoric-acid", shape="fluid", name="angels-hydrogen-fluoride-dissolving"},
+  {family="glycerol", shape="fluid", name="angels-liquid-glycerol"}
 }
 
 local ENTRY_FIELDS = {
@@ -616,7 +622,7 @@ compiler_context.with_active(compiler_context.new(), function()
   if type(index) ~= "table" or type(index.facts) ~= "table" or type(input) ~= "table" then
     error("MIR F210 current Bob/Angel final observer requires finalized recipe and relationship indexes")
   end
-  local output_targets, observed, missing = {}, 0, 0
+  local output_targets, observed, missing, observed_routes = {}, 0, 0, {}
   for _, candidate in ipairs(CANDIDATES) do
     local fact = recipe_facts.view(candidate.name)
     if type(fact) ~= "table" then
@@ -625,6 +631,7 @@ compiler_context.with_active(compiler_context.new(), function()
         .. " family=" .. candidate.family .. " shape=" .. candidate.shape .. " status=missing")
     else
       observed = observed + 1
+      observed_routes[#observed_routes + 1] = candidate.name
       local generic, generic_reason = recipe_matching.material_route_is_acyclic(fact)
       local boundary, boundary_reason = recipe_matching.relevant_route_fingerprints(fact)
       local risk = recipe_risk_facts.view(candidate.name)
@@ -649,9 +656,8 @@ compiler_context.with_active(compiler_context.new(), function()
       collect_output_targets(fact, candidate.name, output_targets)
     end
   end
-  local observed_routes = {}
-  for _, candidate in ipairs(CANDIDATES) do observed_routes[#observed_routes + 1] = candidate.name end
   for _, line in ipairs(material_inventory.lines(material_inventory.collect(data.raw), observed_routes)) do log(line) end
+  for _, line in ipairs(material_inventory.lines(material_inventory.collect_petrochem(data.raw), observed_routes)) do log(line) end
   observe_hidden_output_consumers(output_targets, index)
   observe_gold_return_path(index, input)
   observe_visible_return_paths(index)

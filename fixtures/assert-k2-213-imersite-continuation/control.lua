@@ -2,7 +2,7 @@ local expected_mods = {
   base = "2.1.20",
   Krastorio2 = "2.1.3",
   ["Krastorio2-spaced-out"] = "2.0.13",
-  ["more-infinite-research"] = "4.2.21000"
+  ["more-infinite-research"] = "4.2.21001"
 }
 local legacy_name = "recipe-prod-research_material_imersite-1"
 local continuation_name = "recipe-prod-research_material_imersite-4"

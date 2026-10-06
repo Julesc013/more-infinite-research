@@ -41,6 +41,30 @@ check(same_array(progression.k2_213_continuation_stream_keys(), {
   "research_material_imersite"
 }), "the current K2 continuation set contains only the reviewed MIR powder stream")
 
+local expected_k2_keys = {
+  "research_material_rare_metals", "research_material_silicon", "research_material_glass",
+  "research_material_black_paving", "research_material_white_paving"
+}
+check(same_array(progression.k2_material_stream_keys(), expected_k2_keys),
+  "the other five named K2 outcomes have their own continuation declarations")
+local copied_k2_keys = progression.k2_material_stream_keys()
+copied_k2_keys[1] = "research_material_imersite"
+check(same_array(progression.k2_material_stream_keys(), expected_k2_keys),
+  "a caller cannot mutate the cached K2 continuation identity set")
+for _, key in ipairs(expected_k2_keys) do
+  local declaration = progression.attach_k2_material_continuation(key, {max_level = 3})
+  local valid, reason = progression.validate(key, declaration.staged_progression)
+  check(valid, "valid shared staged declaration for " .. key .. ": " .. tostring(reason))
+  check(declaration.staged_progression.legacy.technology_name == "recipe-prod-" .. key .. "-1"
+      and progression.legacy_max_level(key, declaration, "infinite") == 3
+      and declaration.staged_progression.continuation.technology_name == "recipe-prod-" .. key .. "-4"
+      and declaration.staged_progression.continuation.maximum_level_default == 0,
+    "K2 continuation preserves the finite early identity and adds the separate level-four identity for " .. key)
+end
+check(not pcall(function()
+  progression.attach_k2_material_continuation("research_material_imersite", {max_level = 3})
+end), "ordinary K2 declarations cannot bypass the retained exact Imersite attachment guard")
+
 for _, key in ipairs(expected_keys) do
   local declaration = progression.attach(key, {max_level = 3})
   local staged = declaration.staged_progression
@@ -135,14 +159,59 @@ package.loaded["prototypes.mir.platform.factorio.prototype_lookup"] = {
 }
 
 local streams = require("prototypes.streams.productivity")
+local petrochem_subjects = {
+  {"research_material_nitric_acid", "angels-liquid-nitric-acid", {"angels-liquid-nitric-acid"}},
+  {"research_material_hydrochloric_acid", "angels-liquid-hydrochloric-acid", {
+    "angels-liquid-hydrochloric-acid", "angels-liquid-hydrochloric-acid-solid-sodium-sulfate"}},
+  {"research_material_hydrofluoric_acid", "angels-liquid-hydrofluoric-acid", {
+    "angels-liquid-hydrofluoric-acid", "angels-hydrogen-fluoride-dissolving"}},
+  {"research_material_glycerol", "angels-liquid-glycerol", {"angels-liquid-glycerol"}}
+}
+local petrochem_keys = {}
+for _, subject in ipairs(petrochem_subjects) do
+  local key, fluid, routes = subject[1], subject[2], subject[3]
+  petrochem_keys[#petrochem_keys + 1] = key
+  local family = streams[key]
+  local valid, reason = progression.validate(key, family.staged_progression)
+  check(valid, "Angel chemical uses shared staged progression for " .. key .. ": " .. tostring(reason))
+  check(family.required_items == nil and same_array(family.required_fluids, {fluid})
+      and family.icon_item == nil and family.icon_fluid == fluid
+      and family.localised_name[4][1] == "fluid-name." .. fluid,
+    "chemical identity and presentation require the actual fluid for " .. key)
+  local group = family.groups[1]
+  check(family.require_acyclic_process == true and group.reject_explicit_productivity_denial == true
+      and group.change == 0.02 and #group.required_productive_outputs == 1
+      and group.required_productive_outputs[1].type == "fluid"
+      and group.required_productive_outputs[1].name == fluid,
+    "chemical routes retain process and permission gates plus a typed productive output for " .. key)
+  local patterns = {}
+  for _, route in ipairs(routes) do patterns[#patterns + 1] = "^" .. route:gsub("%-", "%%-") .. "$" end
+  check(same_array(group.recipe_patterns, patterns) and family.reviewed_forward_routes == nil
+      and family.productivity_permission_recipes == nil,
+    "only the retained exact producer names are selected without a certificate or permission grant for " .. key)
+  check(family.staged_progression.legacy.last_level == 3
+      and family.staged_progression.continuation.technology_name == "recipe-prod-" .. key .. "-4",
+    "chemical progression uses finite early levels and a separate later identity for " .. key)
+end
+check(same_array(progression.angel_petrochem_stream_keys(), petrochem_keys),
+  "the four retained Angel chemicals have a separate identity set")
+local petrochem_copy = progression.angel_petrochem_stream_keys()
+petrochem_copy[1] = "research_material_tin"
+check(same_array(progression.angel_petrochem_stream_keys(), petrochem_keys),
+  "callers cannot mutate the chemical identity set")
+check(not pcall(function()
+  progression.attach_angel_petrochem_continuation("research_material_tin", {max_level = 3})
+end), "chemical attachment cannot grant a different material continuation")
 for _, key in ipairs(expected_keys) do
   local staged = streams[key] and streams[key].staged_progression
   local valid, reason = progression.validate(key, staged)
   check(valid, "actual material stream uses the shared valid progression declaration for "
     .. key .. ": " .. tostring(reason))
 end
-check(streams.research_material_rare_metals.staged_progression == nil,
-  "K2 material declaration stays outside the unqualified continuation mechanism")
+for _, key in ipairs(expected_k2_keys) do
+  local valid, reason = progression.validate(key, streams[key].staged_progression)
+  check(valid, "actual source attaches the shared continuation declaration for " .. key .. ": " .. tostring(reason))
+end
 check(streams.research_material_imersite.staged_progression == nil,
   "Imersite stays unattached until the exact current K2 tuple guard selects its continuation")
 

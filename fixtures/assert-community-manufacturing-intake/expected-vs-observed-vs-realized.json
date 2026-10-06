@@ -494,6 +494,33 @@
       "Run representative early and late saves before making an ECO-PY support claim."
     ]
   },
+  "angel_petrochem_implementation": {
+    "status": "conditional-current-source-declarations-native-admission-pending",
+    "stream_keys": [
+      "research_material_nitric_acid",
+      "research_material_hydrochloric_acid",
+      "research_material_hydrofluoric_acid",
+      "research_material_glycerol"
+    ],
+    "generated_technologies": [
+      "recipe-prod-research_material_nitric_acid-1",
+      "recipe-prod-research_material_nitric_acid-4",
+      "recipe-prod-research_material_hydrochloric_acid-1",
+      "recipe-prod-research_material_hydrochloric_acid-4",
+      "recipe-prod-research_material_hydrofluoric_acid-1",
+      "recipe-prod-research_material_hydrofluoric_acid-4",
+      "recipe-prod-research_material_glycerol-1",
+      "recipe-prod-research_material_glycerol-4"
+    ],
+    "productive_output_type": "fluid",
+    "early_levels": 3,
+    "effect_per_level": 0.02,
+    "continuation_first_level": 4,
+    "route_permission_grants": false,
+    "route_certificate_exceptions": false,
+    "engine_qualification": false,
+    "public_support_authority": false
+  },
   "realization": {
     "targets": ["f210", "f200", "f110", "f100"],
     "source_path": "source/prototypes/streams/productivity.lua",
@@ -505,7 +532,7 @@
     "No broad Bob, Angel, or combined-environment compatibility claim.",
     "No save, migration, balance, native-owner, or public-release qualification.",
     "No admission of direct Angel wire, coolant-returning wire coils, capsules, or laser-rifle batteries.",
-    "No technology/effect emission for the Angel Petrochem source-intake subjects.",
+    "No current native admission, emitted catalogue, earned production or save qualification for the conditional Angel Petrochem declarations.",
     "No Py gameplay, engine, finalized-prototype, permission, safety, progression, save, migration, or public-support claim.",
     "No distinct Py nitroglycerin subject in the selected exact source suite."
   ]

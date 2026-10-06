@@ -1,0 +1,103 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0100",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Add conditional Angel nitric, hydrochloric, hydrofluoric acid and glycerol productivity research.",
+  "details": [
+    "Four retained Angel Petrochem fluids now declare the shared material stages: three early levels at +2% per level and a separate useful continuation from level four. Exact observed producer names must still contain the requested productive fluid output.",
+    "Final recipe permission, complete process safety, ownership, unlocks, reachable science and laboratory checks retain authority. These declarations grant no permission or route-certificate exception.",
+    "Void routes, changed outputs and same-named items do not qualify. Actual current-package route admission, production, catalogue and save qualification remain outstanding."
+  ],
+  "semantic_domains": [
+    "progression",
+    "recipe-productivity",
+    "settings",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Adds conditional fluid research and staged settings on recipe-productivity targets; current native acceptance is pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Adds conditional fluid research and staged settings on recipe-productivity targets; current native acceptance is pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "changed",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "fixtures/assert-community-manufacturing-intake/expected-vs-observed-vs-realized.json"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_routes.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-integration-and-delivery-plan.md"
+    }
+  ]
+}

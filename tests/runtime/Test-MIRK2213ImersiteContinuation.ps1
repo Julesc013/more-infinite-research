@@ -12,7 +12,10 @@ param(
   [Parameter(Mandatory)][string]$SourceMaterializationPath,
   [Parameter(Mandatory)][string]$V5ObservationResultPath,
   [string]$RepoRoot = '',
-  [string]$OutputRoot = 'build/tests/k2-213-imersite-continuation',
+  [string]$OutputRoot = 'build/p/k2-213-imersite-continuation',
+  [string[]]$LocalModLibraryDirs = @('C:\Projects\Factorio\testmods\2.1'),
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
   [switch]$PreflightOnly,
   [ValidateRange(1,180)][int]$CreateTimeoutSeconds = 90,
   [ValidateRange(1,180)][int]$ReloadTimeoutSeconds = 90
@@ -26,6 +29,8 @@ $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/package/TargetMaterializer.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
 
 function Fail-K2213 { param([string]$Code) throw "[mir42-k2-213-imersite] $Code" }
 function Assert-K2213 { param([bool]$Condition,[string]$Code) if (-not $Condition) { Fail-K2213 $Code } }
@@ -35,6 +40,42 @@ function Get-K2213Property { param($Object,[string]$Name,$Default=$null)
   $property = $Object.PSObject.Properties[$Name]
   if ($null -eq $property) { return $Default }
   return $property.Value
+}
+function Read-K2213CurrentCandidate([string]$Archive,[string]$ReceiptPath) {
+  Read-MIRNativeProbeF210CurrentCandidate -Repository $RepoRoot -Archive $Archive -ReceiptPath $ReceiptPath
+}
+function Read-K2213DependencyInputs($Observation,[Collections.IDictionary]$ExpectedDependencies,[string[]]$Libraries,[string]$ObservationPath) {
+  $lockEntries=@($Observation.staged_inputs)
+  Assert-K2213 ($lockEntries.Count -ge $ExpectedDependencies.Count) 'v5-staged-input-count'
+  $expectedHashes=[ordered]@{};$lockedPaths=[ordered]@{}
+  foreach($fileName in $ExpectedDependencies.Keys) {
+    $matches=@($lockEntries|Where-Object {[IO.Path]::GetFileName([string]$_.source_path) -ceq $fileName})
+    Assert-K2213 ($matches.Count -eq 1) "v5-dependency-lock:$fileName"
+    $entry=$matches[0]
+    Assert-K2213 ([bool]$entry.source_match -and [bool]$entry.stage_match -and ([string]$entry.sha256 -cmatch '^[0-9A-F]{64}$')) "v5-dependency-lock-integrity:$fileName"
+    $expectedHashes[$fileName]=[string]$entry.sha256
+    $lockedPaths[$fileName]=[string]$entry.source_path
+  }
+  # Historical paths remain custody text. Resolve only the explicit flat
+  # libraries; never restore or walk the retired V5 profile directories.
+  $resolved=Resolve-MIRNativeProbeDependencyInputs -ExpectedArchives $expectedHashes -LocalModLibraryDirs $Libraries
+  $inputs=@()
+  foreach($fileName in $ExpectedDependencies.Keys) {
+    $source=[string]$resolved[$fileName].source_path
+    Assert-K2213ArchiveIdentity -Path $source -ExpectedName $ExpectedDependencies[$fileName][0] -ExpectedVersion $ExpectedDependencies[$fileName][1] -ExpectedSha256 $expectedHashes[$fileName]
+    $inputs += [ordered]@{source_path=$source;file_name=$fileName;expected_sha256=$expectedHashes[$fileName];role='dependency-mod';identity=[ordered]@{name=$ExpectedDependencies[$fileName][0];version=$ExpectedDependencies[$fileName][1];archive=$fileName};provenance=[ordered]@{kind='verified-local-library-with-v5-dependency-lock';v5_result_sha256=Get-K2213Sha256 $ObservationPath;historical_source_path=$lockedPaths[$fileName]};immutable=$true}
+  }
+  return $inputs
+}
+function Invoke-MIRCompatFactorioProcess {
+  param([string]$FactorioBin,[object[]]$ArgumentList,[string]$StdoutPath,[string]$StderrPath,[int]$TimeoutSeconds)
+  # Preserve the existing create/reload collector and its exact oracles,
+  # while charging their native actors to one owned row and strict lease.
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $FactorioBin -Arguments ([string[]]$ArgumentList) -TimeoutSeconds $TimeoutSeconds
+  Copy-Item -LiteralPath $actor.stdout -Destination $StdoutPath
+  Copy-Item -LiteralPath $actor.stderr -Destination $StderrPath
+  $null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources
+  return $actor.result
 }
 function Get-K2213PathIdentity {
   param([Parameter(Mandatory)][string]$Path,[switch]$AllowExternalInput)
@@ -91,13 +132,13 @@ function Get-K2213FixtureEnvelope {
     'base: "2.1.20"',
     'Krastorio2: "2.1.3"',
     'Krastorio2-spaced-out: "2.0.13"',
-    'more-infinite-research: "4.2.21000"'
+    'more-infinite-research: "4.2.21001"'
   )
   foreach ($line in $required) { Assert-K2213 ($body.Contains($line,[StringComparison]::Ordinal)) "registered-fixture-field:$line" }
   return [pscustomobject][ordered]@{id=$fixtureId;path='fixtures/assert-k2-213-imersite-continuation';raw_sha256=Get-K2213Sha256 $Path}
 }
 function New-K2213FailureResult {
-  param([string]$RunRoot,[string]$Message,$Lease)
+  param([string]$RunRoot,[string]$Message,$Lease,$Resources)
   if ([string]::IsNullOrWhiteSpace($RunRoot) -or -not (Test-Path -LiteralPath $RunRoot -PathType Container)) { return }
   $terminal = $null
   if ($null -ne $Lease -and -not [bool]$Lease.closed) {
@@ -109,12 +150,14 @@ function New-K2213FailureResult {
     scope='exact-current-f210-k2-k2so-imersite-powder-continuation-create-and-single-reload';
     qualification=$false;support_claim=$false;release_authority=$false;publication=$false;
     immutable_input_staging=$terminal
+    resource_runs=if($Resources){$Resources.runs.ToArray()}else{@()}
   }
-  [IO.File]::WriteAllText((Join-Path $RunRoot 'result.json'),(($record | ConvertTo-Json -Depth 100 -Compress)+"`n"),[Text.UTF8Encoding]::new($false))
+  if($Resources){Write-MIRNativeProbeResult -Context $Resources -Record $record}
 }
 
 $runRoot = ''
 $lease = $null
+$resources = $null
 try {
   $engine = (Resolve-Path -LiteralPath $FactorioBin).Path
   $candidate = (Resolve-Path -LiteralPath $CandidateZip).Path
@@ -135,26 +178,17 @@ try {
   Assert-K2213 ([string]$fixtureInfo.version -ceq '0.1.0') 'fixture-version'
   Assert-K2213 ([string]$fixtureInfo.factorio_version -ceq '2.1') 'fixture-factorio-version'
   $fixtureDependencies = @($fixtureInfo.dependencies | ForEach-Object {[string]$_})
-  foreach ($dependency in @('base >= 2.1.20','Krastorio2 = 2.1.3','Krastorio2-spaced-out = 2.0.13','more-infinite-research = 4.2.21000')) {
+  foreach ($dependency in @('base >= 2.1.20','Krastorio2 = 2.1.3','Krastorio2-spaced-out = 2.0.13','more-infinite-research = 4.2.21001')) {
     Assert-K2213 ($fixtureDependencies -contains $dependency) "fixture-dependency:$dependency"
   }
   # Every run directory uses the same 32-character GUID width. Reject an
-  # overlong fixture path before copying the immutable dependency archives.
+  # overlong fixture path before leasing the immutable dependency archives.
   $plannedFixtureArchive = Join-Path $outputRootFull ('run-' + ('0' * 32))
   $plannedFixtureArchive = Join-Path $plannedFixtureArchive ('mods/' + [string]$fixtureInfo.name + '_' + [string]$fixtureInfo.version + '.zip')
   Assert-MIRFactorioPathBudget -Path $plannedFixtureArchive -Context 'K2 continuation fixture archive path'
 
-  $materialization = Read-K2213Json -Path $materializationPath -Code 'materialization'
-  Assert-K2213 ([int]$materialization.schema -eq 1 -and [string]$materialization.kind -ceq 'MIR4PackageCompositionResultV1') 'materialization-schema'
-  Assert-K2213 ([string]$materialization.status -ceq 'passed-canonical-package-authority-materialization') 'materialization-status'
-  Assert-K2213 (Test-MIR4BootstrapRecordHash -Record $materialization) 'materialization-record-integrity'
-  Assert-K2213 ([string]$materialization.target -ceq 'f210') 'materialization-target'
-  Assert-K2213 ([string]$materialization.source_version -ceq '4.2.0' -and [string]$materialization.distribution_version -ceq '4.2.21000') 'materialization-version'
-  Assert-K2213 ([bool]$materialization.invariants.canonical_package_authority) 'materialization-canonical'
-  Assert-K2213 ((Resolve-Path -LiteralPath ([string]$materialization.archive_path)).Path -ceq $candidate) 'materialization-candidate-path'
-  Assert-K2213 ((Get-K2213Sha256 $candidate) -ceq [string]$materialization.archive_sha256) 'materialization-candidate-sha256'
-  Assert-K2213 ([string]$materialization.record_sha256 -match '^[0-9A-F]{64}$') 'materialization-record-sha256'
-  Assert-K2213ArchiveIdentity -Path $candidate -ExpectedName 'more-infinite-research' -ExpectedVersion '4.2.21000' -ExpectedSha256 ([string]$materialization.archive_sha256)
+  $currentCandidate=Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $materializationPath
+  $materialization=$currentCandidate.receipt
 
   $v5 = Read-K2213Json -Path $v5Path -Code 'v5-observation'
   Assert-K2213 ([int]$v5.schema -eq 1 -and [string]$v5.kind -ceq 'MIR42ExactK2213ForwardPathObservationResultV3' -and [string]$v5.status -ceq 'passed') 'v5-schema-status'
@@ -165,8 +199,7 @@ try {
   }
   $engineHash = Get-K2213Sha256 $engine
   Assert-K2213 ($engineHash -ceq [string]$v5.engine.sha256) 'engine-sha256'
-  $engineVersion = (& $engine --version | Out-String).Trim()
-  Assert-K2213 ($LASTEXITCODE -eq 0 -and $engineVersion -match '(?m)^Version:\s*2[.]1[.]20(?:\s|$)') 'engine-version'
+  Assert-K2213 ((Get-Item -LiteralPath $engine).VersionInfo.ProductVersion -ceq '2.1.20') 'engine-product-version'
   Assert-K2213 ([string]$v5.engine.product_version -ceq '2.1.20') 'v5-engine-version'
   $engineRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $engine))
   $runtimeApi = Join-Path $engineRoot 'doc-html/runtime-api.json'
@@ -182,19 +215,8 @@ try {
     'xy-k2so-enhancements-nulls-fork_0.8.3.zip'=@('xy-k2so-enhancements-nulls-fork','0.8.3')
     'mir-validation-settings-overrides_0.1.0.zip'=@('mir-validation-settings-overrides','0.1.0')
   }
-  $lockEntries = @($v5.staged_inputs)
-  Assert-K2213 ($lockEntries.Count -ge $expectedDependencies.Count) 'v5-staged-input-count'
-  $inputs = @()
-  foreach ($fileName in $expectedDependencies.Keys) {
-    $matches = @($lockEntries | Where-Object { [IO.Path]::GetFileName([string]$_.source_path) -ceq $fileName })
-    Assert-K2213 ($matches.Count -eq 1) "v5-dependency-lock:$fileName"
-    $entry = $matches[0]
-    Assert-K2213 ([bool]$entry.source_match -and [bool]$entry.stage_match -and ([string]$entry.sha256 -match '^[0-9A-F]{64}$')) "v5-dependency-lock-integrity:$fileName"
-    $source = (Resolve-Path -LiteralPath ([string]$entry.source_path)).Path
-    Assert-K2213ArchiveIdentity -Path $source -ExpectedName $expectedDependencies[$fileName][0] -ExpectedVersion $expectedDependencies[$fileName][1] -ExpectedSha256 ([string]$entry.sha256)
-    $inputs += [ordered]@{source_path=$source;file_name=$fileName;expected_sha256=[string]$entry.sha256;role='dependency-mod';identity=[ordered]@{name=$expectedDependencies[$fileName][0];version=$expectedDependencies[$fileName][1];archive=$fileName};provenance=[ordered]@{kind='v5-observation-dependency-lock';v5_result_sha256=Get-K2213Sha256 $v5Path};immutable=$true}
-  }
-  $inputs += [ordered]@{source_path=$candidate;file_name=([IO.Path]::GetFileName($candidate));expected_sha256=([string]$materialization.archive_sha256);role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21000';materialization_record_sha256=[string]$materialization.record_sha256};provenance=[ordered]@{kind='current-candidate-materialization';raw_materialization_sha256=Get-K2213Sha256 $materializationPath};immutable=$true}
+  $inputs = @(Read-K2213DependencyInputs -Observation $v5 -ExpectedDependencies $expectedDependencies -Libraries $LocalModLibraryDirs -ObservationPath $v5Path)
+  $inputs += [ordered]@{source_path=$candidate;file_name=([IO.Path]::GetFileName($candidate));expected_sha256=([string]$materialization.archive_sha256);role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21001';materialization_record_sha256=[string]$materialization.record_sha256};provenance=[ordered]@{kind='current-candidate-materialization';raw_materialization_sha256=Get-K2213Sha256 $materializationPath};immutable=$true}
 
   if ($PreflightOnly) {
     [pscustomobject][ordered]@{
@@ -212,13 +234,18 @@ try {
     return
   }
 
-  [IO.Directory]::CreateDirectory($outputRootFull) | Out-Null
-  $runRoot = Join-Path $outputRootFull ('run-' + [guid]::NewGuid().ToString('N'))
+  & (Join-Path $RepoRoot 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -RepoRoot $RepoRoot -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+  $runRoot=$resources.root
   [IO.Directory]::CreateDirectory($runRoot) | Out-Null
   $mods = Join-Path $runRoot 'mods'
   [IO.Directory]::CreateDirectory($mods) | Out-Null
   [IO.Directory]::CreateDirectory((Join-Path $runRoot 'saves')) | Out-Null
   $lease = New-MIRImmutableInputLease -RunRoot $runRoot -StageDirectory $mods -Inputs $inputs -RequireHardLinks
+  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $lease
+  $versionRun=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 30
+  $engineVersion=(Get-Content -LiteralPath $versionRun.stdout -Raw).Trim()
+  Assert-K2213 ($engineVersion -match '(?m)^Version:\s*2[.]1[.]20(?:\s|$)') 'engine-version'
   $fixtureArchive = Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name ([string]$fixtureInfo.name) -Version ([string]$fixtureInfo.version) -ModsDir $mods
   Assert-K2213ArchiveIdentity -Path $fixtureArchive -ExpectedName ([string]$fixtureInfo.name) -ExpectedVersion ([string]$fixtureInfo.version) -ExpectedSha256 (Get-K2213Sha256 $fixtureArchive)
   # V5's exact current K2SO lock includes the four bundled Space Age modules.
@@ -257,19 +284,21 @@ try {
     scope='exact-current-f210-k2-k2so-imersite-powder-continuation-create-and-single-reload';
     qualification=$false;support_claim=$false;release_authority=$false;publication=$false;
     candidate=[ordered]@{archive=$candidateArtifact;materialization=Get-K2213Artifact $materializationPath;materialization_record_sha256=[string]$materialization.record_sha256;package_source_sha256=[string]$materialization.package_source_sha256};
+    source=[ordered]@{commit=(& git -C $RepoRoot rev-parse HEAD).Trim();tree=(& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim();source_version='4.2.1';distribution_version='4.2.21001';harness=Get-K2213Artifact $PSCommandPath};
     predecessor_observation_lock=[ordered]@{result=Get-K2213Artifact $v5Path -AllowExternalInput;kind=[string]$v5.kind;status=[string]$v5.status;role='exact-engine-and-dependency-archive-lock-only';old_candidate_sha256=[string]$v5.candidate.sha256};
     engine=[ordered]@{path=Get-K2213PathIdentity $engine -AllowExternalInput;product_version='2.1.20';executable_sha256=$engineHash;bundled_runtime_api_sha256=Get-K2213Sha256 $runtimeApi};
     fixture=[ordered]@{registration=$fixtureRegistry;files=@(Get-K2213Artifact $fixtureInfoPath;Get-K2213Artifact $fixtureDataPath;Get-K2213Artifact $fixtureControlPath);archive=Get-K2213Artifact $fixtureArchive};
     input_staging=$terminal;dependency_archives=@($dependencyArtifacts | Sort-Object path);mod_list=Get-K2213Artifact $modListPath;startup_settings='candidate-defaults-no-unbound-mod-settings';
     create=[ordered]@{duration_seconds=$load.duration_seconds;save=Get-K2213Artifact $load.save;stdout=Get-K2213Artifact $load.stdout;stderr=Get-K2213Artifact $load.stderr;factorio_log=Get-K2213Artifact $load.factorio_log};
     reload=$reload;
+    resource_runs=$resources.runs.ToArray();
     non_claims=@('The supplied V5 observation remains non-authorizing and is not rebound.','Only generated MIR Imersite powder continuation is exercised. Native Imersite crystal ownership and witnessed withheld K2 routes remain outside this receipt.','No player delivery, broad K2 admission, support, release, signing, or publication claim.')
   }
   $resultPath = Join-Path $runRoot 'result.json'
-  [IO.File]::WriteAllText($resultPath,(($result | ConvertTo-Json -Depth 100 -Compress)+"`n"),[Text.UTF8Encoding]::new($false))
+  Write-MIRNativeProbeResult -Context $resources -Record $result
   Write-Host "[MIR42_K2_213_IMERSITE_CONTINUATION_RUNTIME] $(Get-K2213Relative $resultPath)"
 } catch {
   $failure = $_.Exception.Message
-  New-K2213FailureResult -RunRoot $runRoot -Message $failure -Lease $lease
+  try{New-K2213FailureResult -RunRoot $runRoot -Message $failure -Lease $lease -Resources $resources}catch{Write-Warning 'Failed K2 result exceeded its output budget; owned ledgers remain preserved.'}
   throw
 }

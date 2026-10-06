@@ -1,4 +1,4 @@
--- Shared declaration contract for the reviewed Bob/Angel material families.
+-- Shared staged declaration contract for named material families.
 --
 -- A Factorio technology has one science-ingredient set for every level.  The
 -- released `-1` material technologies consequently retain their three early
@@ -42,6 +42,24 @@ local K2_213_CONTINUATION_STREAM_KEYS = {
   "research_material_imersite"
 }
 
+-- These declarations can extend only an already admitted MIR-owned early
+-- stage. They grant no recipe permission, graph exception or native-owner
+-- adoption. Imersite retains its separate exact-profile attachment policy.
+local K2_MATERIAL_CONTINUATION_STREAM_KEYS = {
+  "research_material_rare_metals",
+  "research_material_silicon",
+  "research_material_glass",
+  "research_material_black_paving",
+  "research_material_white_paving"
+}
+
+local ANGEL_PETROCHEM_STREAM_KEYS = {
+  "research_material_nitric_acid",
+  "research_material_hydrochloric_acid",
+  "research_material_hydrofluoric_acid",
+  "research_material_glycerol"
+}
+
 local MATERIAL_STREAM_KEY_SET = {}
 for _, key in ipairs(MATERIAL_STREAM_KEYS) do MATERIAL_STREAM_KEY_SET[key] = true end
 
@@ -50,9 +68,22 @@ for _, key in ipairs(K2_213_CONTINUATION_STREAM_KEYS) do
   K2_213_CONTINUATION_STREAM_KEY_SET[key] = true
 end
 
+local K2_MATERIAL_CONTINUATION_STREAM_KEY_SET = {}
+for _, key in ipairs(K2_MATERIAL_CONTINUATION_STREAM_KEYS) do
+  K2_MATERIAL_CONTINUATION_STREAM_KEY_SET[key] = true
+end
+
 local STAGED_MATERIAL_STREAM_KEY_SET = {}
+local ANGEL_PETROCHEM_STREAM_KEY_SET = {}
 for key in pairs(MATERIAL_STREAM_KEY_SET) do STAGED_MATERIAL_STREAM_KEY_SET[key] = true end
 for key in pairs(K2_213_CONTINUATION_STREAM_KEY_SET) do
+  STAGED_MATERIAL_STREAM_KEY_SET[key] = true
+end
+for key in pairs(K2_MATERIAL_CONTINUATION_STREAM_KEY_SET) do
+  STAGED_MATERIAL_STREAM_KEY_SET[key] = true
+end
+for _, key in ipairs(ANGEL_PETROCHEM_STREAM_KEYS) do
+  ANGEL_PETROCHEM_STREAM_KEY_SET[key] = true
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
 end
 
@@ -76,6 +107,18 @@ end
 function M.k2_213_continuation_stream_keys()
   local out = {}
   for index, key in ipairs(K2_213_CONTINUATION_STREAM_KEYS) do out[index] = key end
+  return out
+end
+
+function M.k2_material_stream_keys()
+  local out = {}
+  for index, key in ipairs(K2_MATERIAL_CONTINUATION_STREAM_KEYS) do out[index] = key end
+  return out
+end
+
+function M.angel_petrochem_stream_keys()
+  local out = {}
+  for index, key in ipairs(ANGEL_PETROCHEM_STREAM_KEYS) do out[index] = key end
   return out
 end
 
@@ -230,6 +273,20 @@ end
 function M.attach_k2_213_continuation(key, spec)
   if not K2_213_CONTINUATION_STREAM_KEY_SET[key] then
     error("K2 2.1.3 material continuation does not support stream " .. tostring(key) .. ".", 2)
+  end
+  return attach(key, spec)
+end
+
+function M.attach_k2_material_continuation(key, spec)
+  if not K2_MATERIAL_CONTINUATION_STREAM_KEY_SET[key] then
+    error("K2 material continuation does not support stream " .. tostring(key) .. ".", 2)
+  end
+  return attach(key, spec)
+end
+
+function M.attach_angel_petrochem_continuation(key, spec)
+  if not ANGEL_PETROCHEM_STREAM_KEY_SET[key] then
+    error("Angel petrochem continuation does not support stream " .. tostring(key) .. ".", 2)
   end
   return attach(key, spec)
 end

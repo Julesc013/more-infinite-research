@@ -31,6 +31,7 @@ New-Item -ItemType Directory -Force -Path $mod,(Join-Path $run 'userdata') | Out
 $modules=[ordered]@{
   'prototypes.mir.core.deepcopy'='source/prototypes/mir/core/deepcopy.lua'
   'prototypes.mir.core.fingerprint'='source/prototypes/mir/core/fingerprint.lua'
+  'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
   'prototypes.mir.compatibility.policies.k2_science_phase'='source/prototypes/mir/compatibility/policies/k2_science_phase.lua'
   'prototypes.mir.families.material_progression'='source/prototypes/mir/families/material_progression.lua'
   'prototypes.mir.domain.technology.maximum_level_binding'='source/prototypes/mir/domain/technology/maximum_level_binding.lua'
@@ -63,7 +64,7 @@ foreach($entry in $tests.GetEnumerator()) {
 }
 
 [IO.File]::WriteAllText((Join-Path $mod 'data.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
-[IO.File]::WriteAllText((Join-Path $mod 'info.json'),'{"name":"mir-k2-imersite-continuation-test","version":"1.0.0","title":"MIR controlled K2 Imersite continuation regression","author":"MIR","factorio_version":"2.1","dependencies":["base"]}',[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $mod 'info.json'),'{"name":"mir-k2-imersite-continuation-test","version":"1.0.0","title":"MIR controlled material continuation regression","author":"MIR","factorio_version":"2.1","dependencies":["base"]}',[Text.UTF8Encoding]::new($false))
 [IO.File]::WriteAllText((Join-Path $run 'mods/mod-list.json'),'{"mods":[{"name":"base","enabled":true},{"name":"mir-k2-imersite-continuation-test","enabled":true}]}',[Text.UTF8Encoding]::new($false))
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
 $config="[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n"
@@ -96,7 +97,7 @@ if($exitCode -ne 0 -or -not $progressionMatch.Success -or -not $continuationMatc
 }
 $receipt=[ordered]@{
   status='passed'
-  scope='controlled-K2-Imersite-declaration-and-continuation-planner-not-K2-profile-qualification'
+  scope='controlled-material-declarations-and-continuation-planner-not-K2-profile-qualification'
   assertions=[ordered]@{progression=[int]$progressionMatch.Groups[1].Value;continuation=[int]$continuationMatch.Groups[1].Value}
   engine_version=$version.Trim()
   engine_sha256=$engineSha256

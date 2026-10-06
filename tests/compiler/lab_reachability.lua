@@ -14,6 +14,8 @@ local lab = require('prototypes.mir.capabilities.science_integration.lab_compati
 local production = require('prototypes.mir.capabilities.science_integration.pack_production_reachability')
 local researchability = require('prototypes.mir.capabilities.science_integration.technology_researchability')
 local recipe_facts = require('prototypes.mir.index.recipe_facts')
+local item_facts = require('prototypes.mir.index.item_prototype_facts')
+local prototype_lookup = require('prototypes.mir.platform.factorio.prototype_lookup')
 local fingerprint = require('prototypes.mir.core.fingerprint')
 local function recipe(name, product, enabled)
   return {type = 'recipe', name = name, enabled = enabled ~= false,
@@ -206,5 +208,78 @@ run(raw, function(owner)
     'The isolated science diagnostic copies the actual item-acquisition service and rejects the unavailable lab')
   check('LR27', fingerprint.of(owner:snapshot()) == before,
     'Lab acquisition diagnostics do not mutate the parent context')
+end)
+raw = world()
+raw['item-with-entity-data'] = {['a-alternate-kit'] = {
+  type = 'item-with-entity-data', name = 'a-alternate-kit', place_result = 'lab'}}
+raw['assembling-machine'] = {assembler = {type = 'assembling-machine', name = 'assembler'}}
+raw.item['assembler-kit'] = {type = 'item', name = 'assembler-kit', place_result = 'assembler'}
+raw.item['orphan-kit'] = {type = 'item', name = 'orphan-kit', place_result = 'absent-entity'}
+run(raw, function()
+  local names = item_facts.placeable_items_for_entity('lab')
+  check('LR28', #names == 2 and names[1] == 'a-alternate-kit' and names[2] == 'lab-kit',
+    'Exact entity lookup sorts placement items across concrete item types')
+  names[1] = 'caller-change'; names[3] = 'caller-addition'
+  local again = item_facts.placeable_items_for_entity('lab')
+  check('LR29', #again == 2 and again[1] == 'a-alternate-kit',
+    'A caller cannot mutate the retained entity placement index')
+  check('LR30', #item_facts.placeable_items_for_entity('absent-entity') == 0
+    and #item_facts.placeable_items_for_entity('unknown') == 0
+    and item_facts.placeable_items_for_entity('assembler')[1] == 'assembler-kit',
+    'Exact entity lookup excludes orphan placements and other entities')
+  check('LR31', #item_facts.placeable_items_for_entity_types({'lab', 'lab'}) == 2,
+    'Existing entity-type lookup retains its sorted deduplicated contract')
+end)
+raw = world()
+run(raw, function()
+  check('LR32', lab.valid_research_ingredients({{'A', 1}, {'B', 1}}),
+    'Initial exact placement admits an acquired lab')
+  raw.item['lab-kit'].place_result = 'different-lab'
+  check('LR33', not lab.valid_research_ingredients({{'A', 1}, {'B', 1}}),
+    'An indexed placement item changed within the context cannot supply its former lab')
+  raw.item['lab-kit'] = nil
+  check('LR34', not lab.valid_research_ingredients({{'A', 1}, {'B', 1}}),
+    'A withdrawn placement item cannot supply an indexed lab')
+end)
+raw.item['lab-kit'] = {type = 'item', name = 'lab-kit', place_result = 'different-lab'}
+raw.lab['different-lab'] = {type = 'lab', name = 'different-lab', inputs = {'A', 'B'}}
+run(raw, function()
+  check('LR35', #item_facts.placeable_items_for_entity('lab') == 0
+    and item_facts.placeable_items_for_entity('different-lab')[1] == 'lab-kit'
+    and lab.valid_research_ingredients({{'A', 1}, {'B', 1}}),
+    'A new compiler context adopts changed prototype placement facts')
+end)
+raw = world()
+for index = 1, 500 do
+  local lab_name, kit_name = 'unrelated-lab-' .. index, 'unrelated-kit-' .. index
+  raw.lab[lab_name] = {type = 'lab', name = lab_name, inputs = {'unrelated-pack'}}
+  raw.item[kit_name] = {type = 'item', name = kit_name, place_result = lab_name}
+end
+for index = 1, 250 do raw.technology['indexed-lab-' .. index] = research({'A', 'B'}) end
+run(raw, function(owner)
+  local original_lookup = prototype_lookup.item_prototype
+  local unrelated_lookups = 0
+  prototype_lookup.item_prototype = function(name)
+    if name:match('^unrelated%-kit%-') then unrelated_lookups = unrelated_lookups + 1 end
+    return original_lookup(name)
+  end
+  local ok, failure = pcall(function()
+    local before = fingerprint.of(data.raw)
+    local all_reachable = true
+    for index = 1, 250 do
+      if researchability.technology_researchability_reason('indexed-lab-' .. index) ~= nil then
+        all_reachable = false
+      end
+    end
+    check('LR36', all_reachable and fingerprint.of(data.raw) == before,
+      '250 distinct technologies remain researchable without mutating a 501-lab catalogue')
+    check('LR37', unrelated_lookups == 0,
+      'Accepting-lab acquisition makes zero placement lookups for 500 unrelated lab items; observed=' .. unrelated_lookups)
+    local counters = owner:state_view('compiler_telemetry').counters
+    check('LR38', counters.item_prototype_index_builds == 1 and counters.recipe_index_scans == 1,
+      'The larger lab catalogue still builds each existing item and recipe index once')
+  end)
+  prototype_lookup.item_prototype = original_lookup
+  assert(ok, failure)
 end)
 print('MIR-LAB-REACHABILITY-PASS ' .. checks)

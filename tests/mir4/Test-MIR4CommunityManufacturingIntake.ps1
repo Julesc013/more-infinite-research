@@ -170,6 +170,11 @@ Assert-CMI (-not [bool]$fixture.external_input_custody.offline_replay.engine_qua
 $petrochemIntake=$fixture.angel_petrochem_source_intake
 Assert-CMI ($petrochemIntake.archive -ceq 'angelspetrochem_2.1.2.zip' -and $petrochemIntake.status -ceq 'exact-hash-source-observed-admission-blocked') 'Angel Petrochem intake must remain exact-hash and admission-blocked.'
 $petrochemSubjects=@($petrochemIntake.subjects)
+$petrochemImplementation=$fixture.angel_petrochem_implementation
+Assert-CMI ([string]$petrochemImplementation.status -ceq 'conditional-current-source-declarations-native-admission-pending' -and [string]$petrochemImplementation.productive_output_type -ceq 'fluid') 'Angel implementation must retain typed fluid selection and pending native admission.'
+Assert-CMI ((@($petrochemImplementation.stream_keys|Sort-Object)-join '|') -ceq 'research_material_glycerol|research_material_hydrochloric_acid|research_material_hydrofluoric_acid|research_material_nitric_acid') 'Angel implementation must preserve the four distinct retained chemical identities.'
+Assert-CMI ([int]$petrochemImplementation.early_levels -eq 3 -and [int]$petrochemImplementation.continuation_first_level -eq 4 -and [double]$petrochemImplementation.effect_per_level -eq 0.02 -and @($petrochemImplementation.generated_technologies).Count -eq 8) 'Angel implementation must retain the shared stages and increment.'
+Assert-CMI (-not [bool]$petrochemImplementation.route_permission_grants -and -not [bool]$petrochemImplementation.route_certificate_exceptions -and -not [bool]$petrochemImplementation.engine_qualification -and -not [bool]$petrochemImplementation.public_support_authority) 'Angel declarations must not grant route, engine or public-support authority.'
 Assert-CMI ($petrochemSubjects.Count -eq 4 -and (@($petrochemSubjects.identity|Sort-Object -Unique).Count -eq 4)) 'Angel Petrochem intake must contain four unique source subjects.'
 foreach($subject in $petrochemSubjects){
   Assert-CMI ([string]$subject.identity -match '^angels-liquid-' -and [string]$subject.disposition -ceq 'source-observed-admission-blocked' -and [bool]$subject.void_route_generated) "Angel Petrochem subject exceeded source-intake authority: $($subject.identity)"

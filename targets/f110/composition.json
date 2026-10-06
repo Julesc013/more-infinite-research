@@ -860,8 +860,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 49346,
-      "expected_sha256": "06C6CC872E8B1D05208F1F903E3AFA393234B3F16FD5322D56606D923889FBFB",
+      "expected_bytes": 50160,
+      "expected_sha256": "4B745906A79FBD4D8EEFF52C56B45FB0879B00E2CB8CD273B4CD672EB83B5F0D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -892,8 +892,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9315,
-      "expected_sha256": "9222A98A97CB3BEAE20AAC93F56AC49ABFF229D61E507284CED27F9CE6CDA1A0",
+      "expected_bytes": 9310,
+      "expected_sha256": "ED21456A71B89DB61F49C73488DDD70B58D53F629D988DF08ED4AE9FEBCA55A8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2076,8 +2076,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize shared material progression declarations for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11773,
-      "expected_sha256": "56E61CD8A5104EB0DA10B48F944C93DA4F0C7A058DECFF1518BC6D2C8561FAB7",
+      "expected_bytes": 13662,
+      "expected_sha256": "C38FCC929A698C59F47351F4655F44C6C7E20DEF987604B3D013C49D223CBEE5",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2268,8 +2268,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4032,
-      "expected_sha256": "68B99EE3DFB0B98794A6D15DD3F87CD6E56DC49DCB31570DF251C1214EA457ED",
+      "expected_bytes": 4553,
+      "expected_sha256": "298A193018072E6DBDE4B4EB9EABA3DDDC84F471D6685B0C85B09FED42D152B8",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3772,8 +3772,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 63493,
-      "expected_sha256": "3C4D12F96C630102255CD1FD8A7EFD01A543B752F4A5450B83F7E1DDF0C0454A",
+      "expected_bytes": 71526,
+      "expected_sha256": "2C848C152CD932884A7FC8595FE034412060B33B8C6281319082D43BA13AA28E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 67913,
-      "expected_sha256": "9FACA0D6D22DC3783401367B00350FE3A67D710C4F19AF7592FC854AFEA633AC",
+      "expected_bytes": 69845,
+      "expected_sha256": "FF2F075140A68DFD7483E590F90795137F14FCDEF859AB4D12089871A71C0519",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3852,8 +3852,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the shared material continuation planner for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6585,
-      "expected_sha256": "81B546583C52E337DF8CEE305BAC8BF44CF4F56F4892D4538010E00D4A9BBB19",
+      "expected_bytes": 8790,
+      "expected_sha256": "E9A563B8FCFD6F82DACF21D876B83D5CFC2745E2C586D3ABD01D7C757B95BF17",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "CD714EE03DE63441CED10A459D416B99AF154F1989E88986574621CD485E05E8"
+  "record_sha256": "EBC63DBCA9ED99484676711A4DFB133E9B59BA75484081E60F00BC9701BF9A0F"
 }

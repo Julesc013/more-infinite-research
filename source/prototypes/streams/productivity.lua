@@ -750,9 +750,9 @@ local streams = {
 }
 
 
-local function material_family(item, routes, mod_names, display_item)
+local function material_family(item, routes, mod_names, display_item, product_type)
   display_item = display_item or item
-  return {
+  local spec = {
     required_items = {item},
     icon_item = display_item,
     localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name." .. display_item}},
@@ -767,6 +767,31 @@ local function material_family(item, routes, mod_names, display_item)
     require_acyclic_process = true,
     groups = {{change = 0.02, recipe_patterns = exact_recipe_patterns(routes), reject_explicit_productivity_denial = true}}
   }
+  if product_type == "fluid" then
+    spec.required_items = nil
+    spec.required_fluids = {item}
+    spec.icon_item = nil
+    spec.icon_fluid = display_item
+    spec.localised_name = {"", {"description.productivity-bonus"}, ": ", {"fluid-name." .. display_item}}
+    spec.groups[1].required_productive_outputs = {{type = "fluid", name = item}}
+  end
+  return spec
+end
+
+-- Named source-intake subjects use the existing final-recipe, graph,
+-- permission, ownership and science admission. No void/recovery alias or
+-- certificate exception is granted by these declarations. Coproduct routes
+-- remain subject to the complete process-safety checks.
+streams.research_material_nitric_acid = material_family("angels-liquid-nitric-acid",
+  {"angels-liquid-nitric-acid"}, {"angelspetrochem"}, nil, "fluid")
+streams.research_material_hydrochloric_acid = material_family("angels-liquid-hydrochloric-acid",
+  {"angels-liquid-hydrochloric-acid", "angels-liquid-hydrochloric-acid-solid-sodium-sulfate"}, {"angelspetrochem"}, nil, "fluid")
+streams.research_material_hydrofluoric_acid = material_family("angels-liquid-hydrofluoric-acid",
+  {"angels-liquid-hydrofluoric-acid", "angels-hydrogen-fluoride-dissolving"}, {"angelspetrochem"}, nil, "fluid")
+streams.research_material_glycerol = material_family("angels-liquid-glycerol",
+  {"angels-liquid-glycerol"}, {"angelspetrochem"}, nil, "fluid")
+for _, key in ipairs(material_progression.angel_petrochem_stream_keys()) do
+  material_progression.attach_angel_petrochem_continuation(key, streams[key])
 end
 
 -- The additional Angel final routes in this batch have one exact F200
@@ -1028,6 +1053,12 @@ streams.research_material_silicon = material_family("kr-silicon", {"kr-silicon"}
 streams.research_material_glass = material_family("kr-glass", {"kr-glass"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_black_paving = material_family("kr-black-reinforced-plate", {"kr-black-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_white_paving = material_family("kr-white-reinforced-plate", {"kr-white-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
+-- The other five requested K2 outcomes use the same owned-stage, science
+-- and useful-headroom planner. Their original route admission remains the
+-- authority, including withheld return paths and paving recolour exclusions.
+for _, key in ipairs(material_progression.k2_material_stream_keys()) do
+  material_progression.attach_k2_material_continuation(key, streams[key])
+end
 -- A10-reviewed forward-route certificates. These bind one exact final recipe,
 -- one exact canonical risk fact, and one exact K2/K2SO runtime profile. They
 -- are not a general exception to material-route graph safety.

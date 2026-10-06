@@ -67,9 +67,8 @@ if($currentSourceSuccession){
     [string]$_.output_path-ceq'prototypes/mir/runtime/effects/passive_repair.lua'
   })
   Assert-MIR4M4202StreamCompiler ($repairBinding.Count-eq1-and(@($repairBinding[0].target_scope)-join'|')-ceq'f210|f200'-and[string]$repairBinding[0].source_sha256-ceq[string]$repairBinding[0].output_sha256-and[int]$repairBinding[0].source_bytes-eq[int]$repairBinding[0].output_bytes) 'current-repair-introduction'
-  # The reviewed 917c341f baseline has 372 bindings; this batch admits only
-  # the single wall/gate repair binding checked above.
-  $expectedManifestBindings=372+1
+  # The frozen repair baseline stays historical. The authenticated current
+  # source-layout succession above owns membership beyond that introduction.
 }
 Assert-MIR4M4202StreamCompiler (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
 Assert-MIR4M4202StreamCompiler (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)|$(@($_.target_scope)-join',')"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-identity-uniqueness'

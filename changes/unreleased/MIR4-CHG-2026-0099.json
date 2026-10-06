@@ -1,0 +1,102 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0099",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Prevent material continuations from adding a downward science frontier.",
+  "details": [
+    "When early material research already needs space, planetary or a concretely gated late mod science, continuation reuses the shared progression policy instead of adding a lower ordinary pack. The established space-first preference for earlier research and the pre-final useful continuation policy remain intact.",
+    "Inherited ingredients, amounts, IDs, admitted effects, caps, settings and cost anchors are preserved. Joint-lab and production checks still govern science. The final-pack escape remains when no ordinary or inherited late frontier is usable. Native save, progression and performance acceptance remain outstanding."
+  ],
+  "semantic_domains": [
+    "progression",
+    "science",
+    "recipe-productivity",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Corrects continuation science frontier selection; native save/progression acceptance is pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Corrects continuation science frontier selection; native save/progression acceptance is pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "No material recipe-productivity gameplay on this retained capability target."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "No material recipe-productivity gameplay on this retained capability target."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "No material recipe-productivity gameplay on this retained capability target."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "No material recipe-productivity gameplay on this retained capability target."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "No material recipe-productivity gameplay on this retained capability target."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "No material recipe-productivity gameplay on this retained capability target."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "No material recipe-productivity gameplay on this retained capability target."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "source/prototypes/mir/planner/stream_compiler/material_continuation.lua"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_continuation.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/reference/settings.md"
+    }
+  ]
+}

@@ -77,6 +77,12 @@ try {
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Browser harness allocated before peak-budget admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRPassiveRepair.ps1') -RepoRoot $repo -CandidateZip 'absent-passive-candidate' -FactorioBin 'absent-passive-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Passive repair allocated or probed an engine before peak-budget admission.'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1') -RepoRoot $repo -CandidateZip 'absent-tin-candidate' -BobModsDir 'absent-tin-library' -FactorioBin 'absent-tin-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Tin browser allocated or probed an input before peak-budget admission.'
+  foreach ($prepare in @($false,$true)) {
+    Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1') -RepoRoot $repo -FactorioBin 'absent-tin-engine' -CandidateZip 'absent-tin-candidate' -SettingsPath 'absent-settings' -OutputRoot $fixture -PrepareOnly:$prepare} 'resource-peak-budget-required'
+    Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Tin continuation prepared inputs before resource admission.'
+  }
   $context=New-MIRNativeProbeResourceContext @arguments -ExpectedPeakMemoryMiB 1024
   Assert-Probe (-not (Test-Path -LiteralPath $context.root)) 'successful admission allocated before caller initialization.'
   New-Item -ItemType Directory -Path $context.root | Out-Null
@@ -90,6 +96,16 @@ try {
     Assert-Probe ($definitions.Count -eq 1) "expected one actual browser admission function: $name"
     . ([scriptblock]::Create($definitions[0].Extent.Text))
   }
+  $tinAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1'),[ref]$browserTokens,[ref]$browserErrors)
+  Assert-Probe ($browserErrors.Count -eq 0) 'tin browser harness syntax differs.'
+  foreach($name in @('Resolve-TinBrowserEnginePath','Test-TinBrowserCandidate')) {
+    $definitions=@($tinAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+    Assert-Probe ($definitions.Count -eq 1) "expected one actual tin browser admission function: $name"
+    . ([scriptblock]::Create($definitions[0].Extent.Text))
+  }
+  $currentTin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+  Assert-Probe ((Resolve-TinBrowserEnginePath $currentTin) -ceq $currentTin) 'tin browser changed its authorized engine path.'
+  Refuses-Probe {Resolve-TinBrowserEnginePath 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'} 'engine-location'
   $historical='D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
   $current='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
   Assert-Probe ((Resolve-BrowserEnginePath -Line '2.0' -Requested '') -ceq $historical) '2.0 default used another engine authority.'
@@ -132,6 +148,7 @@ try {
         'root-case' {$root.ToUpperInvariant()+'/extra.lua'}
         'traversal' {$root+'/../outside.lua'}
         'backslash' {$root+'/nested\extra.lua'}
+        'forbidden-repo' {$root+'/fixtures/unowned.lua'}
         default {''}
       }
       if($extra){$null=$zip.CreateEntry($extra)}
@@ -144,6 +161,12 @@ try {
     $valid=New-ControlledBrowserArchive -Line $line -Identity $identity
     $checked=Test-BrowserCandidate -Candidate $valid -Line $line -Identity $identity -Repository $repo
     Assert-Probe ($checked.info.version -ceq $identity.distribution_version -and $checked.sha256 -ceq (Get-FileHash -LiteralPath $valid).Hash) "actual browser $line validator lost exact patch-one identity or input hash."
+    if($line -ceq '2.1') {
+      $tinChecked=Test-TinBrowserCandidate -Candidate $valid -Line $line -Identity $identity -Repository $repo
+      Assert-Probe ($tinChecked.sha256 -ceq $checked.sha256 -and $tinChecked.info.version -ceq '4.2.21001') 'tin browser lost its actual current source-patch identity.'
+      $forbidden=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant forbidden-repo
+      Refuses-Probe {Test-TinBrowserCandidate -Candidate $forbidden -Line $line -Identity $identity -Repository $repo} 'candidate-exclusions'
+    }
     foreach($case in @(
       @{variant='patch-zero';error='candidate-identity'},@{variant='patch-two';error='candidate-identity'},
       @{variant='wrong-target';error='target mismatch'},@{variant='filename';error='candidate-identity'},
@@ -156,6 +179,7 @@ try {
     )) {
       $invalid=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant $case.variant
       Refuses-Probe {Test-BrowserCandidate -Candidate $invalid -Line $line -Identity $identity -Repository $repo} $case.error
+      if($line -ceq '2.1'){Refuses-Probe {Test-TinBrowserCandidate -Candidate $invalid -Line $line -Identity $identity -Repository $repo} $case.error}
     }
   }
   $continuityAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1'),[ref]$browserTokens,[ref]$browserErrors)
@@ -241,6 +265,158 @@ try {
     Refuses-Probe {Invoke-ProbeEngine -Label controlled-error -Arguments @('--create','owned-save.zip')} 'Passive repair controlled-error failed'
     Assert-Probe ((Get-Content -Raw (Join-Path $run 'controlled-error.log'))-ceq'Exception at tick controlled') 'passive repair discarded its failed log.'
   }
+  & {
+    $functions=@($tinAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-Engine'},$false))
+    Assert-Probe ($functions.Count-eq1) 'tin browser engine adapter is missing.'
+    . ([scriptblock]::Create($functions[0].Extent.Text))
+    $run=Join-Path $fixture 'tin-browser';$mods=Join-Path $run 'mods'
+    New-Item -ItemType Directory -Path (Join-Path $run 'userdata') | Out-Null
+    $resources=[pscustomobject]@{controlled=$true};$engine='controlled-tin-engine'
+    $calls=[Collections.Generic.List[object]]::new();$budgets=[Collections.Generic.List[object]]::new()
+    $stdout=Join-Path $run 'stdout.txt';$stderr=Join-Path $run 'stderr.txt'
+    [IO.File]::WriteAllText($stdout,'controlled output');[IO.File]::WriteAllText($stderr,'')
+    [IO.File]::WriteAllText((Join-Path $run 'userdata/factorio-current.log'),'controlled native log')
+    function Invoke-MIRNativeProbeFactorioProcess {
+      param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds)
+      $calls.Add([pscustomobject]@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds})
+      if($Arguments -contains 'controlled-failure'){throw 'controlled governed interruption'}
+      [pscustomobject]@{stdout=$stdout;stderr=$stderr}
+    }
+    function Get-MIRNativeProbeRemainingOutputBytes {param($Context);$budgets.Add($Context);return 1MB}
+    $log=Invoke-Engine create @('--create','owned-save.zip')
+    Assert-Probe ($calls.Count-eq1-and$calls[0].context.controlled-and$calls[0].path-ceq$engine-and$calls[0].timeout-eq120) 'tin browser bypassed the governed actor.'
+    $expected=@('--config',(Join-Path $run 'config.ini'),'--mod-directory',$mods,'--create','owned-save.zip')
+    Assert-Probe (($calls[0].arguments-join'|')-ceq($expected-join'|')) 'tin browser changed its native arguments.'
+    Assert-Probe ((Get-Content -LiteralPath $log -Raw)-ceq'controlled native log'-and$budgets.Count-eq1-and$budgets[0].controlled) 'tin browser lost its original native log or total output check.'
+    Refuses-Probe {Invoke-Engine runtime @('controlled-failure')} 'controlled governed interruption'
+    Assert-Probe ($budgets.Count-eq1-and-not(Test-Path -LiteralPath (Join-Path $run 'factorio-runtime.log'))) 'tin browser continued after governed failure.'
+  }
+  & {
+    . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+    . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
+    $tokens=$null;$errors=$null
+    $path=Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1'
+    $ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors)
+    Assert-Probe ($errors.Count-eq0) 'Tin continuation harness parse failed.'
+    foreach($name in @('Assert-Tin','Read-TinCurrentCandidate','Invoke-TinGovernedEngine','Invoke-TinBoundedReload','Get-TinSha')) {
+      $function=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
+      Assert-Probe ($function.Count-eq1) "Tin continuation consumed adapter absent: $name"
+      . ([scriptblock]::Create($function[0].Extent.Text))
+    }
+    $k2Path=Join-Path $repo 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
+    $k2Ast=[Management.Automation.Language.Parser]::ParseFile($k2Path,[ref]$tokens,[ref]$errors)
+    Assert-Probe ($errors.Count-eq0) 'K2 continuation harness parse failed.'
+    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs')) {
+      $function=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
+      Assert-Probe ($function.Count-eq1) "K2 continuation consumed adapter absent: $name"
+      . ([scriptblock]::Create($function[0].Extent.Text))
+    }
+    $RepoRoot=$repo
+    # Synthetic membership isolates the reader; this is not a MIR package.
+    $run=Join-Path $fixture 'tin-continuation';New-Item -ItemType Directory -Path $run|Out-Null
+    $candidate=Join-Path $run 'more-infinite-research_4.2.21001.zip'
+    $receiptPath=Join-Path $run 'materialized.json'
+    $bytes=[Text.Encoding]::UTF8.GetBytes('controlled runtime bytes')
+    $binding=[pscustomobject]@{output_path='control.lua';output_bytes=$bytes.Length;output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))}
+    function Get-MIR4TargetMaterializerState {param($RepoRoot,$Target);[pscustomobject]@{manifest=@{record_sha256=('1'*64)};composition=@{record_sha256=('2'*64)}}}
+    function Get-MIR4TargetMaterializationBindings {param($State);[pscustomobject]@{bindings=@([pscustomobject]@{output_path='info.json'},$binding)}}
+    $zip=[IO.Compression.ZipFile]::Open($candidate,[IO.Compression.ZipArchiveMode]::Create)
+    try {
+      foreach($member in @(@{path='info.json';bytes=[Text.Encoding]::UTF8.GetBytes('{"name":"more-infinite-research","version":"4.2.21001","factorio_version":"2.1"}')},@{path='control.lua';bytes=$bytes})) {
+        $stream=$zip.CreateEntry('more-infinite-research_4.2.21001/'+$member.path).Open()
+        try{$stream.Write($member.bytes,0,$member.bytes.Length)}finally{$stream.Dispose()}
+      }
+    }finally{$zip.Dispose()}
+    $inventory=Get-MIR4ArchiveInventory -Path $candidate
+    $record=[ordered]@{schema=1;kind='MIR4PackageCompositionResultV1';status='passed-canonical-package-authority-materialization';materializer_abi='mir4-target-materializer/1';target='f210';candidate_id='CONTROLLED';source_version='4.2.1';distribution_version='4.2.21001';package_authority_sha256=('A'*64);package_source_sha256=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo;source_manifest_sha256=('1'*64);target_registry_sha256=('A'*64);support_policy_sha256=('A'*64);target_overlay_sha256=('2'*64);source_binding_count=2;omission_count=0;tree_path=$run;archive_path=$candidate;archive_sha256=$inventory.archive_sha256;content_sha256=$inventory.content_sha256;entry_count=$inventory.entry_count;invariants=[ordered]@{no_historical_archive_input=$true;all_source_hashes_verified=$true;all_output_hashes_verified=$true;all_target_differences_explicit=$true;scoped_operation_closure=$true;version_identity_verified=$true;canonical_package_authority=$true};transition_gate=[ordered]@{package_cutover=$true;old_writer_retirement=$true;tagging=$false;signing=$false;sealing=$false;version_allocation=$false;publication=$false};record_sha256=''}
+    function Save-ControlledTinRecord {$record.record_sha256=Get-MIR4BootstrapRecordSha256 -Record ([pscustomobject]$record);$record|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $receiptPath -Encoding utf8}
+    Save-ControlledTinRecord
+    $read=Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath
+    Assert-Probe ($read.path-ceq$candidate-and$read.receipt.distribution_version-ceq'4.2.21001') 'Tin continuation lost patch-one identity.'
+    $k2Read=Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath
+    Assert-Probe ($k2Read.path-ceq$candidate-and$k2Read.receipt.distribution_version-ceq'4.2.21001') 'K2 continuation did not consume the shared current-candidate reader.'
+    Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive '' -ReceiptPath ''} 'supply candidate'
+    $savedFingerprint=$record.package_source_sha256;$record.package_source_sha256='0'*64;Save-ControlledTinRecord
+    Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath} 'candidate source fingerprint differs'
+    Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath} 'candidate source fingerprint differs'
+    $record.package_source_sha256=$savedFingerprint
+    foreach($version in @('4.2.21000','4.2.21002')) {
+      $record.distribution_version=$version;Save-ControlledTinRecord
+      Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath} 'candidate materialization identity differs'
+      Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath} 'candidate materialization identity differs'
+    }
+    $record.distribution_version='4.2.21001';$record.source_manifest_sha256='0'*64;Save-ControlledTinRecord
+    Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath} 'candidate composition authority differs'
+    $record.source_manifest_sha256='1'*64;Save-ControlledTinRecord
+    $binding.output_sha256='0'*64
+    Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath} 'candidate binding hash differs'
+    Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath} 'candidate binding hash differs'
+    $binding.output_bytes++
+    Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath} 'candidate binding size differs'
+    Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath} 'candidate binding size differs'
+
+    $flat=Join-Path $run 'flat-library';New-Item -ItemType Directory -Path $flat|Out-Null
+    $dependency=Join-Path $flat 'controlled-k2_1.0.0.zip'
+    $zip=[IO.Compression.ZipFile]::Open($dependency,[IO.Compression.ZipArchiveMode]::Create)
+    try{$stream=[IO.StreamWriter]::new($zip.CreateEntry('controlled-k2_1.0.0/info.json').Open());try{$stream.Write('{"name":"controlled-k2","version":"1.0.0"}')}finally{$stream.Dispose()}}finally{$zip.Dispose()}
+    $retired=Join-Path $run 'retired-v5-profile/mods/controlled-k2_1.0.0.zip'
+    $observation=[pscustomobject]@{staged_inputs=@([pscustomobject]@{source_path=$retired;sha256=Get-K2213Sha256 $dependency;source_match=$true;stage_match=$true})}
+    $expected=[ordered]@{'controlled-k2_1.0.0.zip'=@('controlled-k2','1.0.0')}
+    $observationPath=Join-Path $run 'controlled-v5.json';$observation|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $observationPath
+    $resolved=@(Read-K2213DependencyInputs -Observation $observation -ExpectedDependencies $expected -Libraries @($flat) -ObservationPath $observationPath)
+    Assert-Probe ($resolved.Count-eq1-and$resolved[0].source_path-ceq$dependency-and$resolved[0].provenance.historical_source_path-ceq$retired) 'K2 resolution lost shared archive or historical custody.'
+    Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $run 'retired-v5-profile'))) 'K2 library resolution recreated a retired profile.'
+    Refuses-Probe {Read-K2213DependencyInputs -Observation $observation -ExpectedDependencies $expected -Libraries @((Join-Path $run 'absent-library')) -ObservationPath $observationPath} 'dependency-missing'
+    $observation.staged_inputs[0].sha256='0'*64
+    Refuses-Probe {Read-K2213DependencyInputs -Observation $observation -ExpectedDependencies $expected -Libraries @($flat) -ObservationPath $observationPath} 'dependency-hash'
+    $observation.staged_inputs[0].sha256=Get-K2213Sha256 $dependency
+    $observation.staged_inputs+=@($observation.staged_inputs[0])
+    Refuses-Probe {Read-K2213DependencyInputs -Observation $observation -ExpectedDependencies $expected -Libraries @($flat) -ObservationPath $observationPath} 'v5-dependency-lock'
+    $observation.staged_inputs=@($observation.staged_inputs[0]);$observation.staged_inputs[0].source_match=$false
+    Refuses-Probe {Read-K2213DependencyInputs -Observation $observation -ExpectedDependencies $expected -Libraries @($flat) -ObservationPath $observationPath} 'v5-dependency-lock-integrity'
+    $observation.staged_inputs[0].source_match=$true
+    $expected['controlled-k2_1.0.0.zip']=@('wrong-identity','1.0.0')
+    Refuses-Probe {Read-K2213DependencyInputs -Observation $observation -ExpectedDependencies $expected -Libraries @($flat) -ObservationPath $observationPath} 'archive-name'
+
+    $resources=[pscustomobject]@{controlled=$true};$engine='controlled-tin-engine';$calls=[Collections.Generic.List[object]]::new()
+    $tinActorStdout=Join-Path $run 'actor.stdout';$tinActorStderr=Join-Path $run 'actor.stderr'
+    [IO.File]::WriteAllText($tinActorStdout,'controlled healthy output');[IO.File]::WriteAllText($tinActorStderr,'')
+    [IO.File]::WriteAllText((Join-Path $run 'factorio-current.log'),'controlled native log')
+    function Invoke-MIRNativeProbeFactorioProcess {param($Context,$FilePath,$Arguments,$TimeoutSeconds);$calls.Add(@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds});if($Arguments-contains'controlled-failure'){throw 'controlled governed interruption'};[IO.File]::WriteAllText((Join-Path $run 'factorio-current.log'),'controlled native log');[pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{duration_seconds=0.01}}}
+    function Get-MIRNativeProbeRemainingOutputBytes {param($Context);return 1MB}
+    $save=Join-Path $run 'owned-save.zip';[IO.File]::WriteAllText($save,'controlled saved state')
+    $reload=Invoke-TinBoundedReload -Factorio $engine -RunRoot $run -Scenario controlled -SavePath $save -Ticks 30000 -TimeoutSeconds 240
+    Assert-Probe ($reload.passed-and$reload.save_byte_identical-and$reload.benchmark_ticks-eq30000) 'Tin continuation lost saved-state and tick bounds.'
+    Assert-Probe ($calls.Count-eq1-and$calls[0].context.controlled-and$calls[0].path-ceq$engine-and$calls[0].timeout-eq240-and'--benchmark-sanitize'-in$calls[0].arguments) 'Tin continuation bypassed governor or changed reload arguments.'
+    Refuses-Probe {Invoke-TinGovernedEngine -Scenario refused -Arguments @('controlled-failure') -TimeoutSeconds 240} 'controlled governed interruption'
+    Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $run 'refused.factorio.log'))) 'Tin continuation wrote a successful log after interruption.'
+    $function=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-MIRCompatFactorioProcess'},$false))
+    Assert-Probe ($function.Count-eq1) 'K2 continuation governed collector adapter absent.'
+    . ([scriptblock]::Create($function[0].Extent.Text))
+    $controlledEngine=Join-Path $run 'engine/bin/x64/factorio.exe'
+    New-Item -ItemType Directory -Path (Split-Path -Parent $controlledEngine),(Join-Path $run 'engine/data'),(Join-Path $run 'saves')|Out-Null
+    [IO.File]::WriteAllText($controlledEngine,'controlled actor locator; not an executable')
+    $calls.Clear();$budgets=[Collections.Generic.List[object]]::new()
+    function Get-MIRNativeProbeRemainingOutputBytes {param($Context);$budgets.Add($Context);return 1MB}
+    function Invoke-MIRNativeProbeFactorioProcess {
+      param($Context,$FilePath,$Arguments,$TimeoutSeconds)
+      $calls.Add(@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds})
+      if($Arguments-contains'controlled-failure'){throw 'controlled governed interruption'}
+      $index=[Array]::IndexOf($Arguments,'--create')
+      if($index-ge0){[IO.File]::WriteAllText($Arguments[$index+1],'controlled save; not Factorio data');$marker='initial'}else{$marker='reload'}
+      [IO.File]::WriteAllText((Join-Path $run 'factorio-current.log'),('[MIR42_K2_213_IMERSITE_CONTINUATION] stage='+$marker+';completed_level=4;next_level=5;bonus=0.08;progress=0.42'))
+      [pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=0.01}}
+    }
+    $create=Invoke-MIRFactorioLoadCheck -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -ScenarioTimeoutSeconds 90
+    $reload=Invoke-MIRFactorioReloadContract -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -SavePath $create.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 90 -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42'
+    Assert-Probe ($create.passed-and$reload.passed-and$calls.Count-eq2-and$budgets.Count-eq2) 'K2 create/reload collectors did not use the shared governed row.'
+    Assert-Probe ($calls[0].context.controlled-and$calls[1].context.controlled-and$calls[0].path-ceq$controlledEngine-and$calls[0].timeout-eq90-and$calls[1].timeout-eq90) 'K2 collector lost actor/context/timeout identity.'
+    Assert-Probe ('--create'-in$calls[0].arguments-and'--benchmark'-in$calls[1].arguments-and'--benchmark-sanitize'-in$calls[1].arguments-and$reload.reloads[0].save_byte_identical) 'K2 native create/reload arguments or saved-state custody changed.'
+    Assert-Probe ($create.stderr_sha256-ceq'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855'-and$reload.reloads[0].reload_log_contract_passed) 'K2 collector lost stderr or exact reload-marker checks.'
+    $refusedOut=Join-Path $run 'k2-refused.stdout';$refusedErr=Join-Path $run 'k2-refused.stderr'
+    Refuses-Probe {Invoke-MIRCompatFactorioProcess -FactorioBin $controlledEngine -ArgumentList @('controlled-failure') -StdoutPath $refusedOut -StderrPath $refusedErr -TimeoutSeconds 90} 'controlled governed interruption'
+    Assert-Probe ($budgets.Count-eq2-and-not(Test-Path -LiteralPath $refusedOut)-and-not(Test-Path -LiteralPath $refusedErr)) 'K2 collector continued or wrote success after governed interruption.'
+  }
   $auditRun=Join-Path $fixture 'material-audit';New-Item -ItemType Directory -Path $auditRun|Out-Null
   $auditLease=New-MIRMaterialAuditInputLease -RunRoot $auditRun -ModsDirectory (Join-Path $auditRun 'mods') -CandidateArchive $auditCandidate -DependencyDirectory $fixture -ExpectedArchives ([ordered]@{'dependency.zip'=$archiveInput.expected_sha256})
   try{
@@ -285,6 +461,8 @@ try {
   $emptyStage=Join-Path $fixture 'empty-preserved-stage'
   $lookup=Resolve-MIRNativeProbeDependencyInputs -StageRoot $emptyStage -ExpectedArchives @{'dependency.zip'=$archiveInput.expected_sha256} -LocalModLibraryDirs @($fixture)
   Assert-Probe ($lookup['dependency.zip'].source_path -ceq $source -and $lookup['dependency.zip'].provenance_kind -ceq 'verified-local-dependency-library' -and -not (Test-Path -LiteralPath $emptyStage)) 'missing-stage lookup failed or restored a staging copy.'
+  $flatOnly=Resolve-MIRNativeProbeDependencyInputs -ExpectedArchives @{'dependency.zip'=$archiveInput.expected_sha256} -LocalModLibraryDirs @($fixture)
+  Assert-Probe ($flatOnly['dependency.zip'].source_path -ceq $source -and $flatOnly['dependency.zip'].provenance_kind -ceq 'verified-local-dependency-library') 'flat-only lookup needed a retained profile.'
   Refuses-Probe {Resolve-MIRNativeProbeDependencyInputs -StageRoot $emptyStage -ExpectedArchives @{'dependency.zip'=$archiveInput.expected_sha256}} 'dependency-missing'
   $lookupStage=Join-Path $fixture 'lookup-stage';New-Item -ItemType Directory -Path (Join-Path $lookupStage 'mods')|Out-Null
   $stageArchive=Join-Path $lookupStage 'mods/dependency.zip';[IO.File]::Copy($source,$stageArchive)
@@ -448,7 +626,9 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $terminal.terminal_record_sha256=Get-MIRImmutableInputRecordSha256 -Record $terminal
   $dummyLog=Join-Path $recoveryRoot 'userdata/factorio-current.log';[IO.File]::WriteAllText($dummyLog,'controlled custody fixture; no native engine or final oracle')
   $dummySave=Join-Path $recoveryRoot 'observer.zip';[IO.File]::WriteAllText($dummySave,'controlled custody fixture; not a Factorio save')
-  $recoverySource=[ordered]@{commit='controlled-source';tree='controlled-tree';package_source_sha256=$archiveInput.expected_sha256;source_version='4.2.1';distribution_version='4.2.21001'}
+  $syntheticSourceManifest=Join-Path $recoveryRoot 'controlled-source-manifest.json'
+  [IO.File]::WriteAllText($syntheticSourceManifest,'{"controlled_parser_fixture":true,"native_proof":false}')
+  $recoverySource=[ordered]@{commit='controlled-source';tree='controlled-tree';package_source_sha256=$archiveInput.expected_sha256;source_manifest_sha256=Get-ObserverSha $syntheticSourceManifest;source_version='4.2.1';distribution_version='4.2.21001'}
   $fixtureDirectory=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-final-routes-observer'
   $lastActor=$recoveryContext.runs[2]
   $controlledRecord=[ordered]@{
@@ -464,6 +644,7 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $rowPath=Join-Path $recoveryRoot 'result.json';$rowHash=Get-ObserverSha $rowPath
   $recovered=Get-ObserverCompletedRecovery @recoveryArguments
   Assert-Probe ($recovered.source.distribution_version -ceq '4.2.21001' -and (Get-ObserverSha $rowPath) -ceq $rowHash) 'completed custody replay wrote its historical receipt.'
+  Assert-Probe ($recovered.source.source_manifest_sha256 -ceq (Get-ObserverSha $syntheticSourceManifest) -and $recovered.source.source_manifest_sha256 -cne $recovered.source.package_source_sha256) 'controlled recovery conflated manifest custody with its package fingerprint.'
   Assert-Probe ($recovered.input_lease.started_utc -is [string] -and $recovered.input_lease.started_utc -ceq '2026-10-04T00:00:00.1200000Z') 'recovery normalized a timestamp covered by its custody hash.'
   $fallbackRecovered=& {
     function Get-Command {
@@ -477,6 +658,8 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   foreach($case in @(
     @{change={$args[0].schema=1};error='completed governed observation'},
     @{change={$args[0].source.distribution_version='4.2.21002'};error='source fingerprint differs'},
+    @{change={$args[0].source.package_source_sha256=('A'*64)};error='source fingerprint differs'},
+    @{change={$args[0].source.source_manifest_sha256=('A'*64)};error='source fingerprint differs'},
     @{change={$args[0].harness.sha256=('A'*64)};error='harness fingerprint differs'},
     @{change={$args[0].fixture=$args[0].fixture[0..2]};error='fixture inventory differs'},
     @{change={$args[0].input_lease.outcome='failed'};error='completed passed immutable-input receipt'},
