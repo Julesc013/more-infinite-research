@@ -5225,6 +5225,7 @@
         "tests/runtime/research_browser_omissions.lua",
         "tests/runtime/research_browser_core_regressions.lua",
         "tests/runtime/research_browser_handler_regressions.lua",
+        "tests/runtime/research_browser_discovery_regressions.lua",
         "tests/runtime/browser_fixture_data.lua",
         "source:source/prototypes/mir/core/fingerprint.lua",
         "source:source/prototypes/mir/runtime/research_browser*.lua",

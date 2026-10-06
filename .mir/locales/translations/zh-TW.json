@@ -23,6 +23,18 @@
       "provenance": "machine-assisted"
     },
     {
+      "key": "technology-name.more-infinite-research.research_nutrients",
+      "source_sha256": "CB830104528BFAB77EB8881F63E93BF29EA72A96E1CC5E42A86468E927BA2627",
+      "translation": "營養素生產力",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_capture_robot_rockets",
+      "source_sha256": "AD4AAC15E3B6DAA561B2BCED8087B20772BA80796473FBAC3A65E3E040F3AF01",
+      "translation": "捕捉機器人火箭生產力",
+      "provenance": "machine-assisted"
+    },
+    {
       "key": "technology-name.more-infinite-research.research_spoilage_preservation",
       "source_sha256": "464A89D31A57A8CF2CBF8C8F0E7C0ECFF4BBB0C575FDF5F70B63CD2CD94377A3",
       "translation": "貪腐保存",
@@ -791,6 +803,12 @@
       "provenance": "machine-assisted"
     },
     {
+      "key": "mod-setting-name.mir-enable-passive-repair",
+      "source_sha256": "B173772DEF32D29D42DAB0C5B8EEFFF25D02271F08639933AD268CD50B194FF5",
+      "translation": "[font=default-bold][color=purple]高級：[/color][/font]被動牆與維脩大門",
+      "provenance": "machine-assisted"
+    },
+    {
       "key": "mod-setting-name.mir-debug-generation-report",
       "source_sha256": "88C6B9ADE6DCB836FAEE858F97FC056FB9610ECFAB45D3A18C1F8CC64E82F97B",
       "translation": "[font=default-bold][color=yellow]診斷：[/color][/font]產生與跳過的技術",
@@ -1022,6 +1040,12 @@
       "key": "mod-setting-description.mir-settings-profile-import",
       "source_sha256": "DCC098BDB6CD1E4202AEBEA4139B04EEAC60ACBF0D8EC2656FD74B2821E56129",
       "translation": "在此處貼上 MIR 設定設定檔字串，以在原型產生期間套用匯出的啟動設定值作為覆蓋層。對於正常設定留空。使用 /mir-settings-export 從活動保存匯出，然後在變更此值後重新啟動。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-enable-passive-repair",
+      "source_sha256": "8B18D1224ECFC86FA9483041F6BB75E0A3776D0AFB3B1CCC095C5301BB58081A",
+      "translation": "預設關閉。 10 秒後，為玩家部隊或其共同盟友所擁有的受損牆壁和大門提供免費再生，而不會造成進一步傷害。每次服務存取最多修復 1 個運作狀況，每秒服務 8 個待處理實體，最多追蹤 256 個實體。大的損壞隊列修復速度較慢。不使用修理包、改變最大生命值或復活被破壞的實體。適用於啟用時受到的傷害；不掃描現有損壞。更改此啟動設定後需要重新啟動。",
       "provenance": "machine-assisted"
     },
     {
@@ -2592,14 +2616,26 @@
     },
     {
       "key": "mir-browser.title",
-      "source_sha256": "424656A0B79ABCD44A76F63998D25BAF40B02A948E61A78C0B58A6B599C96096",
-      "translation": "MIR 研究瀏覽器",
+      "source_sha256": "5B17C8853ECC26F1F8F5B8CECA78F67ABD9DF2E9F3C256D80992EB04A8A83F7F",
+      "translation": "MIR 研究圖書館",
       "provenance": "machine-assisted"
     },
     {
       "key": "mir-browser.command",
-      "source_sha256": "4CFCE6F49352192F1DCC3F247CFDF3FCD51C7C8DDBAE3F0CE682B9D3749CA981",
-      "translation": "開啟個人 MIR 研究和設定瀏覽器。",
+      "source_sha256": "DE1D7B758AECF21AA7015341B62FAE02CD1B5B9F86DE03095B2A599051937DBB",
+      "translation": "打開個人 MIR 研究圖書館。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.shortcut-name",
+      "source_sha256": "5B17C8853ECC26F1F8F5B8CECA78F67ABD9DF2E9F3C256D80992EB04A8A83F7F",
+      "translation": "MIR 研究圖書館",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.shortcut-description",
+      "source_sha256": "D572ED167636AC9D4D570DD6D7DD8D2BD8B1821B33E6881FACAE72A5AD47723F",
+      "translation": "開啟或關閉您的個人 MIR 研究庫。",
       "provenance": "machine-assisted"
     },
     {
@@ -2609,9 +2645,27 @@
       "provenance": "machine-assisted"
     },
     {
+      "key": "mir-browser.browse",
+      "source_sha256": "979D6300FD9884FF8D8E03391D524FED8E88CD5560788F065BA2444DB3B7B20C",
+      "translation": "研究",
+      "provenance": "machine-assisted"
+    },
+    {
       "key": "mir-browser.settings",
       "source_sha256": "74A883A037BC227F91891AB654A753D3A99F31AB06AE5B5D2B6E594A692B41F8",
       "translation": "設定",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queue-tab",
+      "source_sha256": "3B2FE03E368939166BC6E318840B23FCADE3EE55D6681B6EF16E7F08C00F23AF",
+      "translation": "隊列",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.availability",
+      "source_sha256": "12F67F8539C46701E62D1C50254CF025C22A992B06FEA6D4C0E19705F21F4CAC",
+      "translation": "可用性",
       "provenance": "machine-assisted"
     },
     {
@@ -2628,14 +2682,32 @@
     },
     {
       "key": "mir-browser.search",
-      "source_sha256": "EF0296F00BBD080D00276450B6EFC488556E176C3DF869CD0C187386B1A94D24",
-      "translation": "搜尋技術 ID 或系列，然後按 Enter。",
+      "source_sha256": "F2A2DAAEFDB5083601CD73926BD1074A3EF7B84E4464F702AE0C01A710A47E67",
+      "translation": "搜尋技術 ID 或系列",
+      "provenance": "preexisting"
+    },
+    {
+      "key": "mir-browser.search-settings",
+      "source_sha256": "255B076DD82855431A4CE9A722D77D41F47755AB11BE14FC686FD71415CDEEF0",
+      "translation": "搜尋設置",
       "provenance": "machine-assisted"
     },
     {
       "key": "mir-browser.all",
       "source_sha256": "A52ACE420F2175D08B1577A1BEA5445E36801229C074EF9ED6C55A73401FD9C2",
       "translation": "全部",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.all-levels",
+      "source_sha256": "AD88C1C96C41DDDE1D09D0ED3368E2EE26F5D266FB0F595109807E250063FFE3",
+      "translation": "任意等級類型",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.all-status",
+      "source_sha256": "AC78229D6B822CE5AB1DF22E38CD10C8D31D718C851F8B55A0899E82F9006B71",
+      "translation": "任何狀態",
       "provenance": "machine-assisted"
     },
     {
@@ -2652,9 +2724,9 @@
     },
     {
       "key": "mir-browser.available",
-      "source_sha256": "E674447337E83C1346F6122ED69F35BF5526E2A11842B2F2B788F3FB67D714CA",
+      "source_sha256": "C4E6FC375BADAF9AB9D19307A705EBB2A6BBFEE0A205FEDA36A90ACC329BFCD6",
       "translation": "可用",
-      "provenance": "machine-assisted"
+      "provenance": "preexisting"
     },
     {
       "key": "mir-browser.locked",
@@ -2664,8 +2736,74 @@
     },
     {
       "key": "mir-browser.queued",
-      "source_sha256": "661FF40A07E037BBD5F7D4EC97A4DF1503096CA910E7C9E2D7A4E9ABD4E4E1A0",
+      "source_sha256": "12E364BFAF17440C5E24EEBDC686B8E9BB93135F3C17D5CD3ED235EA3F3F68CC",
       "translation": "已排隊",
+      "provenance": "preexisting"
+    },
+    {
+      "key": "mir-browser.filter-scope",
+      "source_sha256": "79CFCD274D66045AE49B13049CCF003C7AAF2794B7C8B91DC6A5251845A6E3EE",
+      "translation": "研究組",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.filter-level",
+      "source_sha256": "05597ABB2A772438067AD932747109D6019604C586BFFBE4CB3FB00E570A444F",
+      "translation": "水平型",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.filter-status",
+      "source_sha256": "920E413C7D411B61EF3E8C63B1CB6AD058D5F95F8B481DBAFE60248387D8C355",
+      "translation": "狀態",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.filter-order",
+      "source_sha256": "6BE090825C9971035AEE21D9AC0FC9C32F279B921E956026460E4CC1EB611DD6",
+      "translation": "訂購",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.scope-mir",
+      "source_sha256": "1F8B3D88924A449A6D2AC7982B0C7C10B2008DF8DD11923F8B32293814F4F7DD",
+      "translation": "MIR 研究",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.scope-all",
+      "source_sha256": "DDC3C2255B5E9E064D15E01A85DBD36199E67F8177B46A6607D021E16B028AB2",
+      "translation": "所有研究",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.scope-native",
+      "source_sha256": "0AAC6FE07B1B3030D62D39C0433B5D3D7FA31DD32E494063BB9B1566D1EF342B",
+      "translation": "原生研究",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.order-progression",
+      "source_sha256": "4CDF873C164486062F884CF38BDD13872C9503AC0D01BA7D809DAB8CBFD676E9",
+      "translation": "MIR 進展",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.order-native",
+      "source_sha256": "C0BD5E1F3B7F0F31D97ABD74B591AB0231A503988FA65B2A62FC16C4B9DE23C8",
+      "translation": "原生訂單",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.order-name-asc",
+      "source_sha256": "4E2D9E7BE43C1BDAB18CEAA08CDACBF03ABED84F59B349493A236AE49F469E17",
+      "translation": "姓名 (A–Z)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.order-name-desc",
+      "source_sha256": "F401A35B1DB304B8A1AB5BC4F8366933455D7B99C56899D39AFD2BD856B03D96",
+      "translation": "姓名 (Z–A)",
       "provenance": "machine-assisted"
     },
     {
@@ -2675,28 +2813,256 @@
       "provenance": "machine-assisted"
     },
     {
+      "key": "mir-browser.queue-empty",
+      "source_sha256": "0D31728A4907B33619B2DE6328537041D523F5656E275C87703171FEFFBD0C0F",
+      "translation": "沒有研究排隊。",
+      "provenance": "machine-assisted"
+    },
+    {
       "key": "mir-browser.count",
       "source_sha256": "A3736B02CCB984B76080E4497BDF708627A359D8EF29F8B701EB626071A64B67",
       "translation": "__1__匹配技術",
       "provenance": "machine-assisted"
     },
     {
-      "key": "mir-browser.family-owner",
-      "source_sha256": "CA2E45846A38D6CD559ABED9DF9D8C76A07FBC4371B53829427B4B258F80449B",
-      "translation": "系列：__1__ |效果擁有者：__2__ |選擇：__3__",
+      "key": "mir-browser.indexing",
+      "source_sha256": "95200755A74E1E2073797A6D41FF9A484AEF805E76BA85937B5BC1A01EE84A85",
+      "translation": "本地化__1__ 技術名稱；搜尋結果可能不完整。",
       "provenance": "machine-assisted"
     },
     {
-      "key": "mir-browser.cap",
-      "source_sha256": "616A5781464FA924BA30AF9BA60CF45E7F081574E6131BFEF0D00392F01D891D",
-      "translation": "有效最大值：__1__",
+      "key": "mir-browser.indexing-name",
+      "source_sha256": "199F8847BB55993B148E400D71A709F75F05B47E9B7EFA170B939D90AB50760C",
+      "translation": "本地化__1__ 技術名稱；準備好後將套用姓名順序。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.discovery-limited",
+      "source_sha256": "10BC96FE00F1C4770E5A9744DBF0914A0D665DCDC7A9E713FDFCFA1962C28CA3",
+      "translation": "某些配方或材料名稱無法編製索引。穩定的研究和配方 ID 仍然可搜尋。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.availability-empty",
+      "source_sha256": "CE25F9F01A8CAC44D174F9047D565F6DC1B7CB9EADC5DE655F75B8857B9845F2",
+      "translation": "沒有記錄此配置的研究遺漏。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added",
+      "source_sha256": "2460C620BEBA135235A334667D1424FF4C01E29B42466BE06ACE299F03CFD57E",
+      "translation": "未添加",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-provided",
+      "source_sha256": "21A7AD6D8F26BBD44953CB48E226F2058323ECFA658F1751EA674AD0F7086186",
+      "translation": "已被現有研究涵蓋。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-grouped",
+      "source_sha256": "1A82345D5FCAF344712523609F0D3B687C0358BAA446E09AA1E618B84E32281E",
+      "translation": "包含在另一項 MIR 研究中。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-no-effect",
+      "source_sha256": "D86C3EE9D2BD178FA3CB48F055C4022CA5D1365D13FD67916AD0F09108330076",
+      "translation": "沒有合格的研究效果。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-review",
+      "source_sha256": "CE5211C43F169EBAEB4687DDFBA0A0BE4136A4148D7A2CC085590A2BF9C8B7A0",
+      "translation": "等待相容性審核。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-disabled",
+      "source_sha256": "0623A7E405E16A862C268F2E79D56AF4CD2E02A79A8FA48BF73B264BE8FEAF96",
+      "translation": "在啟動設定中停用。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-no-recipe",
+      "source_sha256": "1DC4FA2E964217AAE6E5F166D9D95A463F5424DC39B0C906913729C14092313D",
+      "translation": "此模組集中沒有匹配的配方。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-no-science",
+      "source_sha256": "6FCE50F1C8F71045F98023EC66B0071807CD4C0275E7FF9DB1048DAC30195519",
+      "translation": "​​沒有相容的科學路線。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-material-cap",
+      "source_sha256": "3A01F0C5C5CE90A4570C8270A9E260E2AB44835A35D68D6B7C3D7BD392D86205",
+      "translation": "配置的最大值在等級 3 或之前結束，之後的材料研究開始之前。提高啟動設定中的最大值並重新啟動以啟用它。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-material-headroom",
+      "source_sha256": "8A58111B026AFB7716BEB4C7EEB3ABE35CEB1B9D9B11259F1836C610F1382EB3",
+      "translation": "受影響的配方在 1-3 級內達到其生產力極限，因此以後的研究不會增加任何好處。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-unsupported",
+      "source_sha256": "4A957588C60282DFBA194331A2E4FB949ACEA8C896D1D99BAC1261D8EB63FADA",
+      "translation": "該引擎不支援此效果。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-needs-mod",
+      "source_sha256": "B5367AFE659F2E7D127357DCB1AB0EDB4F7B96888CD31A46DD16D12F229AE190",
+      "translation": "需要模組：__1__。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-needs-item",
+      "source_sha256": "595C6E2AE34300FA46B97ACBB2BDF2C1E67A5FC464709E72D69ED3A46442706F",
+      "translation": "需要物品：__1__。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-needs-fluid",
+      "source_sha256": "2EFDA20BF86FA128E917CF50182C4957B84BE0752E7FCD2F4F7ADB9D272E4CDE",
+      "translation": "需要液體：__1__。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.not-added-generic",
+      "source_sha256": "E9439EA2D7AA033285CA3AB8687A5B7D5DEC1CAAE06C9B2ADBDEAA77706CA963",
+      "translation": "未為此配置新增。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.family",
+      "source_sha256": "A8E3BF0EFE0DC87BF4CC414F8BA6B36CB6B2C00ECBCB8F375CAB27BC75C45919",
+      "translation": "研究小組：__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.status-ready",
+      "source_sha256": "C4E6FC375BADAF9AB9D19307A705EBB2A6BBFEE0A205FEDA36A90ACC329BFCD6",
+      "translation": "準備研究",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.status-queued",
+      "source_sha256": "CADD0A487E5B0C6293CE6C764B10BB84594C807340CC5EB96241589A3C404C4B",
+      "translation": "在研究隊列中",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.status-complete",
+      "source_sha256": "22A970D2E5B1CC233E462BE7C7B64E135A275BB09D83D87683BF4236C43113A1",
+      "translation": "已完成",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.status-locked",
+      "source_sha256": "A39F58A77E8C85644BEAF7CDC207F60F62FA694DED644234C59C605FF99072BD",
+      "translation": "需要先決條件或研究觸發點",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.status-disabled",
+      "source_sha256": "A837A6CC0873C1E2C31FAC3F1D688587C6E457A88D5A379253A835E32809D8F8",
+      "translation": "在此遊戲中停用",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.level",
+      "source_sha256": "560BA7398F8472EC6B4DDB8D500C206B736542BF0F7EC869FBF808CF20C3369F",
+      "translation": "研究等級：__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.level-cap",
+      "source_sha256": "372FFFAF0EB3DBA1E098E9DA429184318B2E9ED8BDA1041C325E20C1477FDAAA",
+      "translation": "研究層次： __1__ 的 __2__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.research-cost",
+      "source_sha256": "B5A2B13528CB4E6438D4EA4BEC640C6FD553AC0D24F0DF5D0F5E4A22168253EE",
+      "translation": "[font=default-semibold]研究單位[/font]  __1__\\n[font=default-semibold]每單位時間[/font]  __2__ s",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.science-ingredient",
+      "source_sha256": "3B948389EBA3A311ED355EAF8679C42A2C14CF906B64006F35D6A5338EC5CEA8",
+      "translation": "__1__ × __2__",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "mir-browser.next-benefit",
+      "source_sha256": "97BE7434C3D1B956F05B1FC752C5CDB33500712464C505CF839ED3129BBA371D",
+      "translation": "下一個等級改進了__1__受影響的配方。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.no-next-benefit",
+      "source_sha256": "C3364F74BDFC3ED186FEA41D930AD535B290CC104EA9D59DD396C8EE57F3F8DB",
+      "translation": "對於__1__ 受影響的配方，不再有額外的 MIR 福利。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.mir-benefit",
+      "source_sha256": "38E63FD66C34EE69D1E2E91B38B2537DFEAF3FDE1DBE2780B9290874879638DB",
+      "translation": "MIR 管理的研究；詳細資訊基於主動技術。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.productivity-increment",
+      "source_sha256": "BD927E3A70B034793408E7D31406DC41468A1F81BD550AF122A3B58892AF8559",
+      "translation": "下一級：+__1__% 配方生產率",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.productivity-increment-range",
+      "source_sha256": "C626F6C918166CDBC4A5B9DBC5D98A8CF59124BA84AB434931CF81ED9A431364",
+      "translation": "下一級：+__1__% 至 +__2__% 配方生產率",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.productivity-current-cap",
+      "source_sha256": "D07ED05AEE9097B4BD6B659C3E509C44C26B14590E75B67F70E50D59C4D5BAE8",
+      "translation": "目前配方獎勵：__1__%\\n配方限制：__2__%",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.productivity-current-cap-range",
+      "source_sha256": "AA34F07692DE621F9C386530358760BEA36941A1ED4F99F564180574E733C311",
+      "translation": "目前配方獎勵： __1__%–__2__%\\n配方限制: __3__%–__4__%",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.science",
+      "source_sha256": "684C39769225C97EC1E747EEC0D663D617AB3E582F70D93DEE33CA02EA538B57",
+      "translation": "科學：",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.prerequisites",
+      "source_sha256": "376438316E1B758E183DE57EF38308262980468C796EA66FA1984FD70A5750BD",
+      "translation": "先決條件：",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.prerequisites-more",
+      "source_sha256": "8709E17B0A3B1CE6766842AD333756539D9456D878A639FB2672AADD22125C85",
+      "translation": "+__1__ 更多",
       "provenance": "machine-assisted"
     },
     {
       "key": "mir-browser.enqueue",
-      "source_sha256": "A867FF0276CC7FEC22216F9FF61F6C34AA8638E41549269F965EE11A442CADC7",
+      "source_sha256": "D49375FCA743F06E04A532F0E3B06D489DD29D7826E11C88F062CDE660D60872",
       "translation": "加入研究隊列",
-      "provenance": "machine-assisted"
+      "provenance": "preexisting"
     },
     {
       "key": "mir-browser.hide",
@@ -2724,8 +3090,122 @@
     },
     {
       "key": "mir-browser.startup-note",
-      "source_sha256": "B4E5134C0969C56D37D4537DDD8841B80B9ED558B6C31549E1633703EF90B472",
+      "source_sha256": "277B007938380A850B9B9FC839E8BF58B545947A132379872F0A0B0505DD47A3",
       "translation": "啟動設定需要重新啟動。顯示的值包括活動的 MIR 設定檔。運行時設定僅在其顯示範圍內套用。",
+      "provenance": "preexisting"
+    },
+    {
+      "key": "mir-browser.settings-count",
+      "source_sha256": "22F0E56B01EC4B02E182C5DD5A9451F1207F6171738D6F6EDFDA3568BDDAD982",
+      "translation": "__1__ 設定組",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.settings-empty",
+      "source_sha256": "BB4A5B08E29B4E34643D43A219752C7A7A9CE0045AD80FC75A84DC3D4BC4F0D6",
+      "translation": "沒有與此搜尋相符的設定。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.settings-scope-research",
+      "source_sha256": "5BEDE9931B39A00A5665E9A94843CEF449DFC9CD8BEF1DC00D3307BCB33B8590",
+      "translation": "研究設置",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.settings-scope-options",
+      "source_sha256": "2CBE84655EB2917C30D6957B5D45B67D5B0D26AA705570846BEC4E8DF8128822",
+      "translation": "其他選項",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-on",
+      "source_sha256": "130011756125313C72F2CAB730DB4347E2841526D236A89CB25F38789FA49229",
+      "translation": "開啟",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-off",
+      "source_sha256": "CA7981B46ECF2C1787B6D76D81D9FD7FA0CA95842E2FCC2A452869891A9334D1",
+      "translation": "關閉",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-unlimited",
+      "source_sha256": "11DDE17D6C3E2098E13810F19BEEDB83A10FB7035853DB1A054DDECF0679B99F",
+      "translation": "無限制",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-with-default",
+      "source_sha256": "D4D202EE3B2DB3EBB8FA9F50C6938B6FDA7C7277BB784AF9D33FFE5196C81A73",
+      "translation": "__1__（預設__2__）",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.research-startup-settings",
+      "source_sha256": "C59C827687E3DEF689EEA8C03074C2FE3793F8C950BF24CBF52036891AACED22",
+      "translation": "MIR 啟動設置",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.profile-active",
+      "source_sha256": "757186706A8B51E7CFB58EF5E98918DDAC19125F04BBC68B8A566BB6F7BE8DCE",
+      "translation": "MIRSET1 設定檔處於活動狀態： __1__ 設定，__2__ 無效。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.profile-invalid",
+      "source_sha256": "AE7081F4B0A36FA6BADA271AFEFB1A6E599B60CA0FFCD1F0465BC5A1B97AE056",
+      "translation": "MIRSET1 設定檔無效並被忽略。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.profile-none",
+      "source_sha256": "5C430058160D0D253D6795F004353BFE77F107AEEB776C52C830E1CA2BB4537B",
+      "translation": "正常模組設定；沒有匯入的設定檔。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.effective-value",
+      "source_sha256": "D3564352FE73EDDE688E53BFC20271F6DD7DAF086E85E755DE659F45C6EF74A1",
+      "translation": "有效：__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-enable",
+      "source_sha256": "92C1CDFDF4CB9CF6FCCA962F206DE36FD5D60DB1178BC9461052F8DE703A0E06",
+      "translation": "已啟用",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-cost-base",
+      "source_sha256": "A2AC8B30AA362BB23F27A3D555C22F5857900A948DC8E2ED585FB6FDCB17AE0A",
+      "translation": "基本成本",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-cost-linear-increment",
+      "source_sha256": "908DAEDAC195FE2B171B2E33514AF4E0745A13DFBD5AFBC525929BD2A63F70F8",
+      "translation": "每級增加成本",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-cost-growth",
+      "source_sha256": "25D6181C3D95096DC36B987290E45C32F87A2A169660CCA446097866060E7F4F",
+      "translation": "成本乘數",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-max-level",
+      "source_sha256": "777774AAF270918DF6B044E180BA81A0B314FA376C8A1D03D63A2630E7346080",
+      "translation": "最高等級",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-research-time",
+      "source_sha256": "CE2DCFBCACB205328B406239515588A9158235D697AA4D1133F33300D951D7A4",
+      "translation": "每個研究單位的秒數",
       "provenance": "machine-assisted"
     },
     {
@@ -2753,15 +3233,327 @@
       "provenance": "machine-assisted"
     },
     {
-      "key": "mir-browser.omission-note",
-      "source_sha256": "6FEB33C8AAB7BE7D06686AA0412867D2B09E44F8ECE989BBE718DA2EF4330C9C",
-      "translation": "以上效果為實際技術效果。路線遺漏詳情需要檢查員覆蓋報告；此視圖不限定缺席路由。",
-      "provenance": "machine-assisted"
-    },
-    {
       "key": "mir-browser.queue-more",
       "source_sha256": "F62A6A08C94A6BDCF69CFB550158DB28B27E91ED67F998EF8604E543CB0AA67E",
       "translation": "__1__ 本地研究隊列中有更多條目。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.help",
+      "source_sha256": "1A03BD2FD107C453F3183E30B9716F82200671E8270FBBEFBE602F5A48705527",
+      "translation": "調試",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.help-summary",
+      "source_sha256": "C6C011ADCD1C9DB8BEE72576F78CC4EC2ACCE58D033B65EEF95B7F2E7F545192",
+      "translation": "檢查研究中的研究效益與配置。隊列顯示共享研究；設定顯示有效值。匯出設定檔以進行配置，或匯出報告以進行故障排除。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.layout-smaller",
+      "source_sha256": "10F7F2288B936DD2A11980062076423332C548ED2A132C0DB9D8FE89A38D48B4",
+      "translation": "使庫更小。您的文字比例將被保留。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.layout-larger",
+      "source_sha256": "9B40A2ADCB31D52BCB6A02B8285663C61F37399C0B7EB9FB7B26AA8AA43DD4D8",
+      "translation": "讓圖書館更大。您的文字比例將被保留。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.layout-reset",
+      "source_sha256": "0013E0476BD4F79570C5CFA90470000F0CBC8D6FF39609F305B3C7B017771784",
+      "translation": "重置庫大小和位置。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.visibility",
+      "source_sha256": "0DF6F1CAD36C49DA768A6EFDCC2C4BE102F5729F7381CB53E4FF8061D17EAEB6",
+      "translation": "顯示",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.visibility-normal",
+      "source_sha256": "A0869D5C7B6D778C2B7F58D06091049CF82B3C85241A57D6C1E762D9CB773EA6",
+      "translation": "本遊戲的研究",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.visibility-hidden",
+      "source_sha256": "C6B75049F2BFF28B53DB8272854859292D5CB3BCE975FE6688A9428A1AF0FD49",
+      "translation": "被我隱藏了",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.availability-unavailable",
+      "source_sha256": "63290EA0EFAD1C148399370C9CEC932E7445CF93C402602067C9BB74A436D2B0",
+      "translation": "研究遺漏解釋不可用或無效。匯出報告進行調查。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.detail-unavailable",
+      "source_sha256": "307CC4B29E23DA2CA578114CD8304E5FDCC2C4A10F345478EA7B925C2BAD2311",
+      "translation": "研究詳細資料不可用 (__1__)。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.live-detail-unavailable",
+      "source_sha256": "CB0F2A2D04F6A996E7942017A35EC1CE55B8A4AC4E1CADE7BA19082657A00B36",
+      "translation": "目前配方事實無法驗證",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.affected-recipes",
+      "source_sha256": "FAE522C65FFB6564D65E2121D98501BDBEED146BD0AC9EC8D1EBC749F1D0C3A5",
+      "translation": "受影響的食譜",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-provenance",
+      "source_sha256": "2A1D1542FEAB4002DB8180EBC25444F7E2BD8861F5ABA8DF139C7EDAA06D0204",
+      "translation": "設定：__1__\\n預設：__2__\\n來源：__3__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.source-direct",
+      "source_sha256": "2C3F01D6FFD896B2E2F436A2884AD6593D948FAC3E12655E78FA2863EDB7AB10",
+      "translation": "模組設置",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.source-mirset1",
+      "source_sha256": "37CA4635FCC735FBCA37875F13BF38CAA2948A920F4C348DEC08C2F274695BF1",
+      "translation": "導入的啟動設定檔",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.source-unresolved",
+      "source_sha256": "6C4EC3F5E369380CF6A1ADC14CA99CC68A142DC7AFEADE9A3A7B1A231C504778",
+      "translation": "未解決的來源",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.profile-override",
+      "source_sha256": "A803804485946A4EBC2527E7F627056E53F666C082B4E5FA20C683C777F28FBA",
+      "translation": "設定檔覆蓋",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.native-queue-guidance",
+      "source_sha256": "9DF4E5E9946A9AEAAE97B86860977492D0473DBE404F9C44CDE3D9B91E4E383C",
+      "translation": "在本機技術視窗中管理研究，該視窗應用佇列權限和自動化控制。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-export",
+      "source_sha256": "D8D38B8002AC24441E985720921BBE6FF81A3C63D130AFE32F71A9803CF8CD0F",
+      "translation": "導出診斷摘要",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-select",
+      "source_sha256": "10564F0261E57473BE769B0C9CE98AEF742458CB516F27362FC5D543E0EC1E4C",
+      "translation": "選擇要複製的文本",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-written",
+      "source_sha256": "1AC1D5916209FB267723C38FD897A92BCEC2B9F3034F461E38215B0191650FA4",
+      "translation": "診斷摘要匯出到__1__。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.startup-report",
+      "source_sha256": "74A64CE1FD271CD92C4489F63C85FF6B54B7E8CC1D2B7818EFCBBDFC0F1D6E27",
+      "translation": "如果遊戲無法加載，請執行預覽版附帶的獨立 MIR 診斷收集器。它收集異星工廠外部的啟動日誌。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.recipe-select-hint",
+      "source_sha256": "83F83B813F94CBC26EB4C3123DBC6F2296A61C46DBC88678C8149C543DA50C2F",
+      "translation": "選擇一個食譜以查看其本地百科全書條目。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.no-results",
+      "source_sha256": "B4B8298243D7408B838EA646EB7DE35EB3CA31AB3F15BE1D50434003B33CC101",
+      "translation": "沒有研究與這些過濾器相匹配。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.search-label",
+      "source_sha256": "BE1E11E40083716BC8CCCB81446590F0E3EA7C4387DF16F14D4467403C976290",
+      "translation": "搜尋研究",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.search-settings-label",
+      "source_sha256": "255B076DD82855431A4CE9A722D77D41F47755AB11BE14FC686FD71415CDEEF0",
+      "translation": "搜尋設置",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.benefits",
+      "source_sha256": "0C0829D3E30125B0E9350631B17C2102C298265645D8252EEFDC45831517521A",
+      "translation": "好處",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.research-requirements",
+      "source_sha256": "DCF62E4A784B145A14DCC828012391C16535A5AF60A71934375E3F03A7A26DB7",
+      "translation": "研究要求",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.actions",
+      "source_sha256": "FF8059DC6752AFDD30D275932B1D5031A2EC854B387A8C57ECC6689915293A43",
+      "translation": "行動",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.open-research",
+      "source_sha256": "61D5D1740981C406D01630BE1F43D6A0F90449FE8CFAC63C278043A2E01998A7",
+      "translation": "開啟研究螢幕",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.inspect-settings",
+      "source_sha256": "AF924527F148D8FC94244BC79D93D5136E870E38E0273A37C8F085A2451773BC",
+      "translation": "查看控制設置",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.hide-tooltip",
+      "source_sha256": "5622E7C4153AD320638283BFE83E9A01889E38EFF3F821762945AC948B426499",
+      "translation": "僅在您的圖書館中隱藏此條目。研究和其他參與者沒有變化。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.scope-startup",
+      "source_sha256": "EC42E525048788F35A78682B8F22D1B27CF4BA280600F81844EDE8EE065334E2",
+      "translation": "全遊戲 · 需要重啟",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.effective-values",
+      "source_sha256": "D8C6778E4BD4C3B805F328C1E45136CEDAB78D3D96ED5546FFED6699C0AD73A6",
+      "translation": "有效值",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.configuration-source",
+      "source_sha256": "88DEF985C2F252F719399A6824D92FF293BA246409E2DBADD5DF4313F5391D0A",
+      "translation": "設定源碼",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.value",
+      "source_sha256": "8E37953D23DACA5FF01B8282C33F4E0A2152F1D1885F94C06418617E3EE1D24E",
+      "translation": "價值",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.debug-installation",
+      "source_sha256": "C3FC54AA5390DC2C333D4BB596A339D552AD787337C1FDAAC3957CA5A7FACF50",
+      "translation": "安裝",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.debug-versions",
+      "source_sha256": "83B2C3018734593E735F4177B3DFB6FFCB815DF59A4A9BBE367053CB0C46DADC",
+      "translation": "Factorio  __1__\\nMIR  __2__",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "mir-browser.debug-refresh",
+      "source_sha256": "34AE4C35CCFDD5A89E486277FFB9EEC53FED0D93D0A551C1175E58EF8D7881DE",
+      "translation": "刷新觀察結果",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.debug-refresh-tooltip",
+      "source_sha256": "35700473DAB78B854DDAB2FB34D1A9D64CE257A297F5C6725EFCD161F55C20D9",
+      "translation": "刷新此報告並使 MIR 顯示的研究快照無效。不改變研究或設定。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.configuration",
+      "source_sha256": "59C060A3B202D91AA50CB8042307C899622CEBBF4713B2FFFB537CCBD8462172",
+      "translation": "啟動配置",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.profile-purpose",
+      "source_sha256": "42079DD775D2D9BA62836BB2A6474E1A73293E195B061893033CEB6B34C97844",
+      "translation": "將有效設定匯出為可重複使用 MIRSET1 輪廓。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.layout",
+      "source_sha256": "FDE0B9F0C84067F89A6926658C1E6DB0F85798AE238376BC056F1929EB87310C",
+      "translation": "視窗佈局",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.reset-layout",
+      "source_sha256": "2E2A17849C24F8E9FA33FBA75D362302AB529AD079395BFD1F888ADB6253E99F",
+      "translation": "重置佈局",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.startup-crash",
+      "source_sha256": "0ACDC2A91976EF8EC14E6E4238968A8061EC6C8C3904A5EEBBC7B63D3924F9C4",
+      "translation": "啟動失敗",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-preview",
+      "source_sha256": "23B36533787BD1596B89BAF3AF98F1C6AB8E1663A992ECBD5E4CF940E4896422",
+      "translation": "診斷摘要",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-settings",
+      "source_sha256": "3C268EF62B06594F76EC472DF0F36DCAAA15066D5FD62F3A96C32A2448EC3BE1",
+      "translation": "啟動設置",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-omissions",
+      "source_sha256": "4A484547ABE527C5B565EBA3E238099B5364ACB5F0C5853F39115ED2EEA1BF2E",
+      "translation": "遺漏原因",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-local",
+      "source_sha256": "A6D70D504A60C9B30D609FE87D407348E2701C8ECE678DFFDCC134430CD8924C",
+      "translation": "僅限預覽。匯出儲存本機文件；沒有上傳任何內容。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-effect-per-level",
+      "source_sha256": "8E0E3F962F3CB0078B197BEE86E7C712921F40BE01CDADEB269A448B8FC761CA",
+      "translation": "每級效果",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.setting-effect-per-level-percent",
+      "source_sha256": "0EF2BE5EA3B1369E299067454DF4046137DA37592BB1A787D08272AEEF0E4F32",
+      "translation": "每級獎金 (%)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-options",
+      "source_sha256": "0C465EE92ADFEE13368FE8B2939E1C82AEBF5485E53826CDF83EB96F7EC3CC93",
+      "translation": "報告內容",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.report-saved",
+      "source_sha256": "8105C87A3DA7F784079CE01EC0B4C4B2783CAE9A2261D7302B2D4E1DA2E40AEC",
+      "translation": "已儲存：__1__",
       "provenance": "machine-assisted"
     }
   ]

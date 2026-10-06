@@ -13,6 +13,45 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath (Join-Path $MirLegacyScriptRoot "..")).Path
 Import-Module (Join-Path $MirLegacyScriptRoot "localization\MIRLocalization.psm1") -Force
+if (-not (Test-MIRFormatInvariantValue -Text '__1__ × __2__') -or
+    -not (Test-MIRFormatInvariantValue -Text 'Factorio  __1__\nMIR  __2__') -or
+    (Test-MIRFormatInvariantValue -Text '__1__ amount __2__') -or
+    (Test-MIRFormatInvariantValue -Text '__1__ × science __2__') -or
+    (Test-MIRFormatInvariantValue -Text 'Factorio version __1__\nMIR __2__')) { throw '[mir-locales-quantity-format-boundary]' }
+$canonicalFixture = Join-Path $repo ('build/tmp/mir-locale-lf-' + [guid]::NewGuid().ToString('N') + '.cfg')
+try {
+  Write-MIRLocaleFile -Template ([pscustomobject]@{Sections=@('test');SectionKeys=@{test=@('value')}}) -Values ([ordered]@{'test.value'='localized'}) -Path $canonicalFixture
+  $canonicalBytes=[IO.File]::ReadAllBytes($canonicalFixture)
+  if ($canonicalBytes -contains 13 -or $canonicalBytes[-1] -ne 10 -or $canonicalBytes[0] -ne 91) { throw '[mir-locales-canonical-lf-bytes]' }
+} finally { if (Test-Path -LiteralPath $canonicalFixture -PathType Leaf) { Remove-Item -LiteralPath $canonicalFixture } }
+
+# Exercise the consumed generator's preservation rule without executing its
+# network translation or source-writing body.
+$selectionTokens = $null; $selectionErrors = $null
+$selectionAst = [Management.Automation.Language.Parser]::ParseFile(
+  (Join-Path $repo 'tools/commands/localization/Update-MIRLocales.ps1'),
+  [ref]$selectionTokens, [ref]$selectionErrors)
+if ($selectionErrors.Count -gt 0) { throw '[mir-locales-selection-generator-parse]' }
+$preservationFunction = @($selectionAst.FindAll({param($node)
+  $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Get-MIRPreservedLocaleRecord'
+}, $true))
+if ($preservationFunction.Count -ne 1) { throw '[mir-locales-selection-generator-function]' }
+. ([scriptblock]::Create($preservationFunction[0].Extent.Text))
+$selectionMemory = @{kept = [pscustomobject]@{source_sha256='SOURCE';translation='retained';provenance='preexisting'}}
+$selectionExisting = [pscustomobject]@{Entries=[ordered]@{kept='retained'}}
+$preservedRecord = Get-MIRPreservedLocaleRecord -Key kept -SourceHash SOURCE -MemoryByKey $selectionMemory -Existing $selectionExisting
+if ($preservedRecord.translation -cne 'retained' -or $preservedRecord.provenance -cne 'preexisting') { throw '[mir-locales-selection-preserved-record]' }
+foreach ($opposing in @(
+  @{key='absent';hash='SOURCE';existing=$selectionExisting},
+  @{key='kept';hash='CHANGED';existing=$selectionExisting},
+  @{key='kept';hash='SOURCE';existing=$null},
+  @{key='kept';hash='SOURCE';existing=[pscustomobject]@{Entries=[ordered]@{kept='changed'}}}
+)) {
+  $rejected=$false
+  try { $null=Get-MIRPreservedLocaleRecord -Key $opposing.key -SourceHash $opposing.hash -MemoryByKey $selectionMemory -Existing $opposing.existing }
+  catch { $rejected=$true }
+  if (-not $rejected) { throw '[mir-locales-selection-opposing-case]' }
+}
 
 function Get-MIRTechnicalLiteralSequence {
   param([string]$Text)
@@ -193,6 +232,8 @@ foreach ($locale in $expectedLocales) {
       }
       if (
         $sourceText -match '[A-Za-z]{3,}' -and
+        -not (Test-MIRFormatInvariantValue -Text $sourceText) -and
+        $null -ne $localePolicy.PSObject.Properties['required_script_pattern'] -and
         -not [string]::IsNullOrWhiteSpace([string]$localePolicy.required_script_pattern) -and
         $translatedText -notmatch [string]$localePolicy.required_script_pattern
       ) {

@@ -146,6 +146,9 @@ if($hostTestSource.Contains(']====]')) { throw 'Host fixture source collides wit
 [void]$lua.AppendLine('local check_browser_handler_regressions=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_handler_regressions.lua')))
 [void]$lua.AppendLine('end)()')
+[void]$lua.AppendLine('local check_browser_discovery_regressions=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_discovery_regressions.lua')))
+[void]$lua.AppendLine('end)()')
 if(([regex]::Matches($browserTestText,[regex]::Escape('local force=game.forces.player'))).Count -ne 1) { throw 'Browser omission checks require one unambiguous controlled force entry.' }
 $catalogueTestSource=[IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser_factorio_catalogue.lua')).Replace("`r`n","`n")
 if($catalogueTestSource.Contains(']====]')) { throw 'Catalogue fixture source collides with its Lua string delimiter.' }
@@ -159,7 +162,7 @@ $capMutant=$coreTestSource.Replace($capAnchor,$capAnchor.Replace('finite_nonnega
 [void]$lua.AppendLine('local browser_core_positive_default_mutant=(function()')
 [void]$lua.AppendLine($capMutant)
 [void]$lua.AppendLine('end)()')
-$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
+$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
 [void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player',$coreChecks))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='more-infinite-research';enabled=$true},@{name='mir-browser-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
@@ -194,6 +197,7 @@ $result | Add-Member fixture_sha256 (Get-FileHash (Join-Path $repo 'tests/runtim
 $result | Add-Member test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser.lua')).Hash
 $result | Add-Member omission_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_omissions.lua')).Hash
 $result | Add-Member core_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_core_regressions.lua')).Hash
+$result | Add-Member discovery_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_discovery_regressions.lua')).Hash
 $result | Add-Member handler_regression_test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser_handler_regressions.lua')).Hash
 if($Graphics) {
  $saved=Join-Path $run 'userdata/saves/_autosave-mir-browser-acceptance.zip'

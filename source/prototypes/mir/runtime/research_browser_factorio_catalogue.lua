@@ -6,6 +6,57 @@ local progression_depth_limit = 128
 -- after a script reload; each snapshot still reads force-local research state.
 local static_by_force = {}
 
+-- Build translation input on demand, without retaining recipe/product facts
+-- in the force cache. One request resolves the technology caption and its
+-- associated recipe/material names in the existing player-local window.
+function M.translation_request(technology, library, subject_limit)
+  subject_limit = subject_limit or 128
+  if not technology or type(subject_limit) ~= "number" or subject_limit < 1
+      or subject_limit > 128 or subject_limit ~= math.floor(subject_limit) then
+    return technology and technology.localised_name, 0, true
+  end
+  local parts, seen, subjects, work, limited = {
+    {"?", technology.localised_name, technology.name}}, {}, 0, 0, false
+  local function append(kind, name, prototype)
+    if type(name) ~= "string" or name == "" or #name > 1024 then limited = true; return end
+    local identity = kind .. "\0" .. name
+    if seen[identity] then return end
+    if subjects >= subject_limit then limited = true; return end
+    seen[identity], subjects = true, subjects + 1
+    local label = prototype and prototype.localised_name
+    if label == nil or label == "" then label, limited = name, true end
+    parts[#parts + 1] = "\31"
+    parts[#parts + 1] = {"", {"?", label, name}, " ", name}
+  end
+  for _, effect in ipairs(technology.prototype.effects or {}) do
+    work = work + 1
+    if work > 1024 or subjects >= subject_limit then limited = true; break end
+    if effect.type == "unlock-recipe" or effect.type == "change-recipe-productivity" then
+      local name = effect.recipe
+      local recipe = library and library.recipe and library.recipe[name]
+      append("recipe", name, recipe)
+      for _, product in ipairs(recipe and recipe.products or {}) do
+        work = work + 1
+        if work > 1024 or subjects >= subject_limit then limited = true; break end
+        if product.type == "item" or product.type == "fluid" then
+          local collection = library and library[product.type]
+          append(product.type, product.name, collection and collection[product.name])
+        else limited = true end
+      end
+    end
+  end
+  if subjects == 0 then return technology.localised_name, 0, limited end
+  -- LocalisedString permits at most 20 parameters per node. At 128 subjects,
+  -- these two concatenation levels contain at most 13 twenty-part groups.
+  local payload = {""}
+  for first = 1, #parts, 20 do
+    local group = {""}
+    for index = first, math.min(first + 19, #parts) do group[#group + 1] = parts[index] end
+    payload[#payload + 1] = group
+  end
+  return payload, subjects, limited
+end
+
 function M.forget_force(index)
   if type(index) == "number" and index > 0 and index == math.floor(index) then
     static_by_force[index] = nil
