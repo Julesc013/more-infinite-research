@@ -430,7 +430,7 @@ function Get-MIRAssuranceContext {
   $seal = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--seal")
   $mods = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--mods" -Default ([string]$env:MIR_MOD_LIBRARY))
   if (-not $mods) {
-    $defaultMods = "C:\Projects\Factorio\testmods_$target"
+    $defaultMods = Join-Path (Split-Path -Parent $repo) "testmods/$target"
     if (Test-Path -LiteralPath $defaultMods -PathType Container) { $mods = $defaultMods }
   }
   $trustPolicyPath = Get-MIRAssuranceCanonicalTrustPolicyPath

@@ -141,7 +141,7 @@ if (-not $AuditFactorioVersions -or $AuditFactorioVersions.Count -eq 0) {
   $AuditFactorioVersions = @($FactorioLine)
 }
 if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
-  $LocalModDir = "C:\Projects\Factorio\testmods_$FactorioLine"
+  $LocalModDir = Join-Path (Split-Path -Parent $repo) "testmods/$FactorioLine"
 }
 if (-not $SkipRepairSmokes -and @($RepairSmokeModNames).Count -eq 0) {
   throw "RepairSmokeModNames is empty. Pass -SkipRepairSmokes or provide at least one local mod name."

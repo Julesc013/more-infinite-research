@@ -43,8 +43,8 @@ param(
   [switch]$IncludeFullAudit,
   [switch]$IncludeGeneratedLocalPairwise,
   [switch]$ShardLocalModZips,
-  [ValidateSet("Copy", "Hardlink", "Symlink")]
-  [string]$LinkMode = "Copy",
+  [ValidateSet("Hardlink")]
+  [string]$LinkMode = "Hardlink",
   [switch]$Offline
 )
 
