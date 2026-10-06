@@ -70,7 +70,7 @@
   "package_visibility": "player-package",
   "impacts": {
     "save": "unknown",
-    "settings": "unchanged",
+    "settings": "none",
     "migration": "unknown",
     "compatibility": "changed",
     "public_contract": "compatible",
