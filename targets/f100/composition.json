@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 71282,
-      "expected_sha256": "037A8E9F71CFFEDB3E481B7FD7A7884635602C5B72692B83274F8A82808E062A",
+      "expected_bytes": 72102,
+      "expected_sha256": "0707CD84D5685AB0ECBFD50D4A70275B2B4A5985125CECBB0BFA15E1BE6F7EA4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "E672FCC4FCB513CD2C7CABA4EBBE031B0601A5A9CBBF02D1C39D2C6D1ED21B90"
+  "record_sha256": "3139E268FFAD79FDEC4A55D80C28C12EA0969A91CC5EEA3205F49656CD793C3A"
 }

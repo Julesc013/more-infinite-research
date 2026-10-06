@@ -1199,4 +1199,96 @@ do
   end
 end
 
+-- Consume actual material declarations and canonical final-product facts.
+-- Keeping the availability item and recipe name does not establish that the
+-- final recipe still grants productivity to that family's typed product.
+;(function()
+  local profiles = require("fixtures.material_routes.target_profiles")
+  local profile_module = package.loaded["prototypes.mir.platform.factorio.target_profiles"]
+  local previous_current = profile_module.current
+  local actual_facts = require("prototypes.mir.index.recipe_facts")
+  local subjects = {
+    {"research_material_aluminium", "bob-aluminium-plate"},
+    {"research_material_gold", "bob-gold-plate"},
+    {"research_material_lead", "bob-lead-plate"},
+    {"research_material_nickel", "bob-nickel-plate"},
+    {"research_material_platinum", "bob-platinum-plate"},
+    {"research_material_silver", "bob-silver-plate"},
+    {"research_material_tin", "bob-tin-plate"},
+    {"research_material_titanium", "bob-titanium-plate"},
+    {"research_material_copper_tungsten", "bob-copper-tungsten-alloy"},
+    {"research_material_zinc", "bob-zinc-plate"},
+    {"research_material_bronze", "bob-bronze-alloy"},
+    {"research_material_brass", "bob-brass-alloy"},
+    {"research_material_gunmetal", "bob-gunmetal-alloy"},
+    {"research_material_invar", "bob-invar-alloy"},
+    {"research_material_cobalt_steel", "bob-cobalt-steel-alloy"},
+    {"research_material_nitinol", "bob-nitinol-alloy"},
+    {"research_material_rare_metals", "kr-rare-metals"},
+    {"research_material_imersite", "kr-imersite-powder"},
+    {"research_material_imersite", "kr-imersite-crystal"},
+    {"research_material_silicon", "kr-silicon"},
+    {"research_material_glass", "kr-glass"},
+    {"research_material_black_paving", "kr-black-reinforced-plate"},
+    {"research_material_white_paving", "kr-white-reinforced-plate"},
+    {"research_material_ric_coke", "ric-coke", "ric-carbonise-marine-biomass"},
+    {"research_material_gold", "angels-wire-gold", "angels-wire-gold-2", {angelssmelting = "fixture"}},
+    {"research_material_silver", "angels-wire-silver", "angels-wire-silver-2", {angelssmelting = "fixture"}},
+    {"research_material_platinum", "angels-wire-platinum", "angels-wire-platinum-2", {angelssmelting = "fixture"}}
+  }
+  local function selected(spec, raw)
+    local before = test_fingerprint(raw)
+    local facts = actual_facts.index_prototypes({[raw.name] = raw})
+    local risk = canonical_risks.index_facts(facts, {items = {}}).facts[raw.name]
+    environment({[raw.name] = facts.facts[raw.name]})
+    risks = {[raw.name] = risk}
+    local names = {}
+    for _, bucket in ipairs(matcher.recipes_for_stream(spec, 0.02)) do
+      check(bucket.change == 0.02, "material output binding preserves its useful modifier")
+      for _, name in ipairs(bucket.recipes) do names[#names + 1] = name end
+    end
+    check(test_fingerprint(raw) == before, "material output admission never mutates final prototypes")
+    return names
+  end
+  for _, line in ipairs({"2.1", "2.0"}) do
+    local profile = assert(profiles.profiles[line])
+    local streams = material_streams_for(profile, {bobplates = "fixture", Krastorio2 = "fixture",
+      ["real-industrial-chemistry"] = "fixture"}, {})
+    profile_module.current = function() return profile end
+    for _, subject in ipairs(subjects) do
+      local key, product, name = subject[1], subject[2], subject[3] or subject[2]
+      local selected_streams = subject[4] and material_streams_for(profile, subject[4], {}) or streams
+      local spec = assert(selected_streams[key])
+      local function raw(kind, output, ignored, coproduct)
+        local results = {{type = kind or "item", name = output or product, amount = 1,
+          ignored_by_productivity = ignored}}
+        if coproduct then results[#results + 1] = {type = "item", name = "unrelated-byproduct", amount = 1} end
+        return {name = name, allow_productivity = true,
+          ingredients = {{type = "item", name = "material-feed", amount = 1}}, results = results}
+      end
+      check(#selected(spec, raw()) == 1, "ordinary final material product stays admitted: " .. line .. "/" .. name)
+      check(#selected(spec, raw("item", "unrelated-material")) == 0,
+        "retained recipe name cannot grant another material's bonus: " .. line .. "/" .. name)
+      check(#selected(spec, raw("fluid")) == 0,
+        "same-named fluid cannot inherit an item material's bonus: " .. line .. "/" .. name)
+      check(#selected(spec, raw("item", product, 1, true)) == 0,
+        "productive byproduct cannot hide a fully excluded requested material: " .. line .. "/" .. name)
+      check(#selected(spec, raw("item", product, 0, true)) == 1,
+        "productive requested material remains useful with an ordinary byproduct: " .. line .. "/" .. name)
+    end
+  end
+  for _, material in ipairs({"gold", "silver"}) do
+    local family = exact_f200_streams["research_material_" .. material]
+    local admitted_outputs = {}
+    for _, output in ipairs(family.groups[1].required_productive_outputs or {}) do
+      admitted_outputs[output.type .. "/" .. output.name] = true
+    end
+    check(admitted_outputs["item/bob-" .. material .. "-plate"]
+        and admitted_outputs["item/angels-wire-" .. material]
+        and family.reviewed_forward_routes["angels-wire-" .. material .. "-2"].require_exact_route_certificate,
+      "combined F200 plate/wire declaration retains both outputs and the required wire certificate: " .. material)
+  end
+  profile_module.current = previous_current
+end)()
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)
