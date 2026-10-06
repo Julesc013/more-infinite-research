@@ -254,6 +254,10 @@ do
   package.loaded["prototypes.mir.capabilities.science_integration.science_packs"] = {}
   package.loaded["prototypes.mir.planner.technology_requirements"] = {skip_reason = function() return nil end}
   local requirements = require("prototypes.mir.planner.requirements")
+  local descriptor = require("prototypes.mir.domain.streams.descriptor")
+  local actual_profiles = require("fixtures.material_progression.target_profiles")
+  local saved_profiles = package.loaded["prototypes.mir.platform.factorio.target_profiles"]
+  local saved_target_line = package.loaded["prototypes.mir.platform.factorio.target_line"]
   local provider_present, fluid_present = false, true
   lookup.mod_exists = function(name) return provider_present and name == "pycoalprocessing" end
   lookup.fluid_prototype = function(name)
@@ -270,7 +274,27 @@ do
     fluid_present = false
     check(requirements.missing_reason(key, streams[key]) == "missing required fluid " .. fluid,
       "Py presence alone cannot supply a missing fluid: " .. key)
+    local normalized = descriptor.normalize(key, streams[key])
+    check(same_array(normalized.descriptor.targets.required_mods, {"pycoalprocessing"}),
+      "canonical descriptor preserves the Py provider requirement: " .. key)
+    for _, line in ipairs({"2.1", "2.0", "1.1", "1.0"}) do
+      local profile = assert(actual_profiles.profiles[line])
+      package.loaded["prototypes.mir.platform.factorio.target_profiles"] = {current = function() return profile end}
+      package.loaded["prototypes.mir.platform.factorio.target_line"] = nil
+      local target_line = require("prototypes.mir.platform.factorio.target_line")
+      local modern = line == "2.1" or line == "2.0"
+      check(target_line.stream_supported(key, normalized) == modern,
+        "actual target contract supports Py required-mod declarations only with recipe productivity: " .. line .. " " .. key)
+      provider_present, fluid_present = false, true
+      check(not (target_line.stream_supported(key, normalized) and requirements.missing_reason(key, normalized) == nil),
+        "target support alone cannot admit Py without the provider: " .. line .. " " .. key)
+      provider_present = true
+      check((target_line.stream_supported(key, normalized) and requirements.missing_reason(key, normalized) == nil) == modern,
+        "both actual target and provider gates must pass: " .. line .. " " .. key)
+    end
   end
+  package.loaded["prototypes.mir.platform.factorio.target_profiles"] = saved_profiles
+  package.loaded["prototypes.mir.platform.factorio.target_line"] = saved_target_line
   lookup.mod_exists, lookup.fluid_prototype = saved_mod_exists, saved_fluid
   package.loaded["prototypes.mir.capabilities.science_integration.science_packs"] = saved_science
   package.loaded["prototypes.mir.planner.technology_requirements"] = saved_technology_requirements
