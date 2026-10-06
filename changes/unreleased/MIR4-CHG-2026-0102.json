@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0102",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Release cached Research Library catalogue facts for merged-away forces.",
+  "details": [
+    "The Research Library removes copied static catalogue facts belonging to a merged-away force. Destination prototype facts stay cached, and current research state continues to be read from the force.",
+    "The real lifecycle callback and actual catalogue adapter are covered by the existing handler fixture. A bounded 100-merge standalone source run retains under 1 KiB instead of roughly 7 MiB; these figures do not claim native RAM or multiplayer acceptance.",
+    "The accepted library presentation, saved personal views, research state and native queue authority are preserved. Current-package save, multiplayer and native performance qualification remain outstanding."
+  ],
+  "semantic_domains": [
+    "runtime",
+    "performance",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "The active Research Library catalogue adapter receives merged-force cleanup; native qualification is pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "The active Research Library catalogue adapter receives merged-force cleanup; native qualification is pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not activate the modern Research Library runtime surface."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not activate the modern Research Library runtime surface."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not activate the modern Research Library runtime surface."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not activate the modern Research Library runtime surface."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not activate the modern Research Library runtime surface."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not activate the modern Research Library runtime surface."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "This target does not activate the modern Research Library runtime surface."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/runtime/research_browser_handler_regressions.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}

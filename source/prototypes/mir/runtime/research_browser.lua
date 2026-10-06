@@ -1510,7 +1510,10 @@ M.on_research_reversed = M.on_research_finished
 M.on_research_queued = M.on_research_finished
 function M.on_technology_effects_reset() refresh_open() end
 function M.on_force_reset(event) refresh_open(event and event.force) end
-function M.on_forces_merged() refresh_open() end
+function M.on_forces_merged(event)
+  factorio_catalogue.forget_force(event and event.source_index)
+  refresh_open()
+end
 local function translated(event)
   local player = event_player(event)
   local translations, locale_generations = translation_state()
