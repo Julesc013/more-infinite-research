@@ -10,6 +10,9 @@ local function observe_missing_tin()
     compiler_context.with_active(compiler_context.new({execution_mode="SAFE"}), function()
       science.ensure_services()
       recipe_facts.index_view()
+      local normal = production.item_acquisition_witness(name, {}, {})
+      local routes = require(prefix .. "capabilities.science_integration.recipe_route_feasibility")
+      local initial = data.raw.recipe[name] and routes.initial_recipe_witness(name, name)
       local observer = {visits=0, failures={}, stopped=false}
       function observer:is_stopped() return self.stopped end
       function observer:reserve_visit(depth)
@@ -26,10 +29,20 @@ local function observe_missing_tin()
       end
       local witness = production.item_acquisition_witness(name, {}, {}, observer)
       log("[mir-tin-acquisition-diagnostic] " .. serpent.line({item=name,
-        witness_kind=witness and witness.kind, visits=observer.visits,
+        witness_kind=witness and witness.kind, normal_witness_kind=normal and normal.kind,
+        initial_witness_kind=initial and initial.kind, visits=observer.visits,
         indeterminate=observer.stopped, failures=observer.failures,
         recipe=data.raw.recipe[name]}, {comment=false}))
     end)
+  end
+  for _, prototype_type in ipairs({"furnace", "assembling-machine"}) do
+    local machine = data.raw[prototype_type]["stone-furnace"]
+    if machine then
+      log("[mir-tin-acquisition-diagnostic] " .. serpent.line({machine="stone-furnace",
+        prototype_type=prototype_type, crafting_categories=machine.crafting_categories,
+        fixed_recipe=machine.fixed_recipe, surface_conditions=machine.surface_conditions,
+        placement_item=data.raw.item["stone-furnace"]}, {comment=false}))
+    end
   end
   for _, name in ipairs({"bob-burner-lab", "bob-lab", "automation-science-pack", "electronics"}) do
     local technology = data.raw.technology[name]
