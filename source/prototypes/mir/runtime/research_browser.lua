@@ -805,6 +805,12 @@ local function detail(player, parent, v, c, width)
   elseif tech.level and tech.level > 1 then label(parent, {"mir-browser.level", tech.level}, maximum_width) end
   add_research_cost(parent, tech, maximum_width)
   add_science_icons(parent, tech, maximum_width)
+  if #tech.research_unit_ingredients > 0 then
+    button(parent, "production-check", {"mir-browser.production-check"}, {technology = tech.name}).style.maximal_width = maximum_width
+    local panel = parent.add{type = "flow", name = PREFIX .. "production_load", direction = "vertical",
+      tags = {mir_browser_section = "production-load"}}
+    panel.style.width = maximum_width
+  end
   add_prerequisite_icons(parent, tech, maximum_width)
   section(parent, {"mir-browser.actions"}, maximum_width)
   button(parent, "open-vanilla", {"mir-browser.open-research"}, {technology = tech.name}).tooltip = {"mir-browser.native-queue-guidance"}
@@ -1359,6 +1365,27 @@ local function click(event)
   elseif action == "queue-up" or action == "queue-down" or action == "enqueue" then
     -- Old saved controls and delayed events cannot bypass the prototype's native handoff.
     player.print({"mir-browser.native-queue-guidance"})
+    return
+  elseif action == "production-check" then
+    if v.tab ~= "research" or v.visibility == 3 or tags.technology ~= v.selected then return end
+    local panel = element.parent and element.parent[PREFIX .. "production_load"]
+    if not (panel and panel.valid and panel.tags.mir_browser_section == "production-load") then return end
+    local precision = defines.flow_precision_index and defines.flow_precision_index.one_minute
+    local report = core.production_load_check(factorio_catalogue.production_snapshot(
+      player.force, player.surface, player.force.technologies[v.selected], precision, game.tick))
+    panel.clear()
+    local width = element.parent.style.maximal_width
+    if not report then label(panel, {"mir-browser.production-unavailable"}, width); return end
+    label(panel, {"mir-browser.production-scope", report.force_name, report.surface_name}, width)
+    label(panel, {"mir-browser.production-snapshot", tostring(report.tick)}, width)
+    label(panel, {"mir-browser.production-note"}, width)
+    for _, row in ipairs(report.rows) do
+      local balance = (row.balance < 0 and "-" or "") .. displayed_number(math.abs(row.balance))
+      local item = prototypes.item[row.name]
+      local caption = item and {"?", item.localised_name, row.name} or row.name
+      label(panel, {"mir-browser.production-row", caption,
+        displayed_number(row.produced), displayed_number(row.consumed), balance}, width)
+    end
     return
   elseif action == "open-vanilla" then
     local tech = tags.technology and player.force.technologies[tags.technology]

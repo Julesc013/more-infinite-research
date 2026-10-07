@@ -1097,4 +1097,43 @@ function M.family_names(enrichment)
   return names
 end
 
+-- Private copied-data view consumed by the existing host, not a stable SDK
+-- contract or a prediction of lab throughput. Reject incomplete/invalid rates
+-- instead of presenting an unavailable observation as zero.
+function M.production_load_check(snapshot)
+  local function scalar_name(value)
+    return type(value) == "string" and value ~= "" and #value <= M.detail_string_limit
+  end
+  local function nonnegative(value)
+    return type(value) == "number" and value == value and value >= 0 and value < math.huge
+  end
+  local function positive_index(value)
+    return nonnegative(value) and value > 0 and value == math.floor(value)
+  end
+  if type(snapshot) ~= "table" or snapshot.schema ~= 1 or snapshot.kind ~= "science-production-snapshot"
+      or not scalar_name(snapshot.technology_id) or not scalar_name(snapshot.force_name)
+      or not scalar_name(snapshot.surface_name) or not positive_index(snapshot.force_index)
+      or not positive_index(snapshot.surface_index) or not nonnegative(snapshot.tick)
+      or snapshot.tick ~= math.floor(snapshot.tick) or type(snapshot.rows) ~= "table" then return nil end
+  local count = 0
+  for index in pairs(snapshot.rows) do
+    count = count + 1
+    if count > M.detail_summary_science_ingredient_limit or not positive_index(index)
+        or index > M.detail_summary_science_ingredient_limit then return nil end
+  end
+  if count == 0 or #snapshot.rows ~= count then return nil end
+  local rows, seen = {}, {}
+  for index = 1, count do
+    local row = snapshot.rows[index]
+    if type(row) ~= "table" or not scalar_name(row.name) or seen[row.name] or row.quality ~= "normal"
+        or not nonnegative(row.produced) or not nonnegative(row.consumed) then return nil end
+    seen[row.name] = true
+    rows[index] = {name = row.name, produced = row.produced, consumed = row.consumed,
+      balance = row.produced - row.consumed}
+  end
+  return {technology_id = snapshot.technology_id, force_index = snapshot.force_index,
+    force_name = snapshot.force_name, surface_index = snapshot.surface_index,
+    surface_name = snapshot.surface_name, tick = snapshot.tick, rows = rows}
+end
+
 return M

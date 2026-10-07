@@ -819,6 +819,12 @@
       "tags": []
     },
     {
+      "pattern": "tests/runtime/research_browser_production_regressions.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tests/runtime/research_browser_native_discovery.lua",
       "groups": [],
       "scenarios": [],

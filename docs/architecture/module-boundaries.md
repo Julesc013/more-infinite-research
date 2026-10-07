@@ -5,7 +5,7 @@ applies_to: "4.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-07
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 ---
 # MIR 4 Repository and Module Boundaries
 
-Updated: 2026-10-06
+Updated: 2026-10-07
 
 This page records current MIR 4 authority and package boundaries while retaining explicitly labelled historical transitions that explain them.
 
@@ -1034,6 +1034,10 @@ This PS11 split is package-excluded and changes no inventory semantics, package,
 ## Research Library lifecycle boundary
 
 The Research Library's close and location callbacks in `source/prototypes/mir/runtime/research_browser.lua` accept only the player's current screen frame by object identity. A foreign, replaced or nested element with the same name cannot close that frame or overwrite its saved position. The consumed handler fixture loads the actual registered callbacks, checks peer-state preservation and independently detects restored name-only guards. These controlled checks do not qualify native GUI input, saved-state serialization or two-client multiplayer; the existing native browser and continuity lanes retain those obligations.
+
+PROG-01's optional production check uses the existing research detail pane. Its owned button samples only the selected technology's science ingredients for the player's force and current surface, then patches its own output panel without recreating the frame, filters or selection. `research_browser_factorio_catalogue.lua` reads normal-quality item production and consumption through `get_item_production_statistics(surface)` and `get_flow_count`, using the one-minute average and explicit `input`/`output` categories. These values are already per minute under the [native statistics contract](https://lua-api.factorio.com/latest/classes/LuaFlowStatistics.html#get_flow_count). The portable core validates and copies at most sixteen pack rows; invalid, unsupported or oversized observations produce an unavailable explanation. Rates include all recorded uses, exclude other qualities and surfaces, and establish neither stock counts nor lab throughput or completion forecasts.
+
+The check runs only on an explicit click. It retains no saved rate cache, changes no research or production state, and grants no new queue or SDK authority. The existing browser harness consumes the actual core, adapter and registered click callback with controlled rates, including deficits, unavailable APIs, stale controls and peer-state preservation. Those source controls do not qualify native production statistics, GUI input, saved-state behavior or multiplayer. The rest of PROG-01's tier, science-frontier, cost and upgrade acceptance remains open.
 
 ## Empty base-continuation boundary
 

@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0111",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Add an optional science production check to the Research Library.",
+  "details": [
+    "The selected research has a manual production check showing the last minute of normal-quality science pack production, total usage and balance for the current force and surface. It patches its own panel and retains no saved rates or background polling.",
+    "Unavailable APIs, invalid rates and more than sixteen science ingredients yield an unavailable explanation. The view grants no research or production mutation and makes no stock, lab throughput or completion forecast.",
+    "This implements the optional view in accepted request PROG-01. Controlled source consumers pass; current-package GUI, actual production, save and multiplayer acceptance remain outstanding, alongside the rest of the requested progression outcome."
+  ],
+  "semantic_domains": [
+    "runtime",
+    "presentation",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Adds the shared modern Research Library observation view. Native GUI, production and lifecycle behavior remain unqualified."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Adds the shared modern Research Library observation view. Native GUI, production and lifecycle behavior remain unqualified."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "The retained historical target does not enable the modern Research Library. Shared locale additions grant no new runtime capability."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "The retained historical target does not enable the modern Research Library. Shared locale additions grant no new runtime capability."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "The retained historical target does not enable the modern Research Library. Shared locale additions grant no new runtime capability."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "The retained historical target does not enable the modern Research Library. Shared locale additions grant no new runtime capability."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "The retained historical target does not enable the modern Research Library. Shared locale additions grant no new runtime capability."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "The retained historical target does not enable the modern Research Library. Shared locale additions grant no new runtime capability."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "The retained historical target does not enable the modern Research Library. Shared locale additions grant no new runtime capability."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/runtime/research_browser_production_regressions.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}
