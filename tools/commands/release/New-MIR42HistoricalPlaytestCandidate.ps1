@@ -97,10 +97,11 @@ function ConvertTo-MIR42HistoricalAdapterBytes {
       @{ from = 'MIR emits eleven stable, manifest-backed infinite research streams when their target effects are available:'; to = 'MIR presents the following manifest-backed research catalog when the target has the required effects, science packs, and prerequisites. A fresh-load receipt does not assert that every catalog entry emits on every historical line:' },
       @{ from = 'MIR also extends supported Factorio 1.0 base infinite technology families for braking force, research speed, worker robot storage, weapon shooting speed, and laser turret shooting speed. Target-aware science selection uses Factorio 1.0 `tool` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission.'; to = "MIR may create qualified continuations for supported Factorio $line base infinite technology families when target-state gates pass. Target-aware science selection uses Factorio $line ``tool`` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission." },
       @{ from = 'Fresh installations default to `only-when-dedicated-tech-enabled`. MIR removes rocket and cannon-shell speed effects from its generated vanilla continuation only when a valid dedicated MIR or preferred exact external infinite owner exists. `off` and `always` remain available, and explicit values are preserved during the 1.8.1 to 1.8.2 upgrade.'; to = "Fresh installations default to ``only-when-dedicated-tech-enabled``. The historical $predecessorVersion predecessor remains a continuity input; upgrade qualification of this exact hotfix package is NOT RUN." },
-      @{ from = 'Earlier fresh-load evidence remains bound to its original package and Factorio 1.0.0. Native qualification of this exact hotfix package is NOT RUN. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.'; to = "Earlier fresh-load evidence remains bound to its original package and Factorio $engineVersion. Native qualification of this exact hotfix package is NOT RUN. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections." },
-      @{ from = 'The exact published 1.8.1 archive remains a historical predecessor record. Save-upgrade qualification of this exact 4.2 hotfix package is NOT RUN.'; to = "The exact published $predecessorVersion archive remains a historical predecessor record. Save-upgrade qualification of this exact 4.2 hotfix package is NOT RUN." },
+      @{ from = 'Earlier fresh-load evidence used 1.0.0;'; to = "Earlier fresh-load evidence used $engineVersion;" },
+      @{ from = 'Earlier fresh-load evidence remains bound to its original package and Factorio 1.0.0. Consult the matching release record for native qualification of this exact package.'; to = "Earlier fresh-load evidence remains bound to its original package and Factorio $engineVersion. Consult the matching release record for native qualification of this exact package." },
+      @{ from = 'The exact published 1.8.1 archive remains a historical predecessor record.'; to = "The exact published $predecessorVersion archive remains a historical predecessor record." },
       @{ from = ('- `docs/releases/1.8.2.md`' + $lf + '- `.mir/backport-source-lock.json`' + $lf + '- `.mir/evidence/1.8.2-qualification.json`' + $lf + '- `.mir/evidence/candidate-seals/mir-1.8.2-factorio-1.0.json`'); to = ('- `targets/historical/' + $Record.target + '/target.json`' + $lf + '- the private historical candidate manifest' + $lf + '- the exact-engine fresh-load receipt' + $lf + '- the published ' + $predecessorVersion + ' predecessor archive identity') },
-      @{ from = '4.2.10000'; to = $version },
+      @{ from = '4.2.10001'; to = $version },
       @{ from = 'Factorio 1.0'; to = "Factorio $line" }
     )
     foreach ($replacement in $replacements) {
@@ -202,6 +203,16 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
   if ($SourceVersion -ceq '4.2.1') {
+    # Adapter output pins describe the baseline projection. Change only the
+    # three current-package identity positions, preserving historical prose.
+    $readmePath = Join-Path $tree 'README.md'
+    $readme = [IO.File]::ReadAllText($readmePath)
+    $baselineVersion = [string]$record.distribution_version
+    foreach ($anchor in @("# More Infinite Research $baselineVersion", "More Infinite Research $baselineVersion is", "more-infinite-research_$baselineVersion.zip")) {
+      if ([regex]::Matches($readme, [regex]::Escape($anchor)).Count -ne 1) { throw "[mir42-historical-readme-maintenance-identity] $anchor" }
+      $readme = $readme.Replace($anchor, $anchor.Replace($baselineVersion, $distributionVersion))
+    }
+    [IO.File]::WriteAllText($readmePath, $readme, [Text.UTF8Encoding]::new($false))
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $distributionVersion
   }
   $info = Get-Content -Raw -LiteralPath (Join-Path $tree 'info.json') | ConvertFrom-Json -Depth 20

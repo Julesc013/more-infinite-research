@@ -938,6 +938,15 @@ try {
     $recordPath = Join-Path $repo ([string]$row.target_record.path)
     $frozenRecord = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
     Assert-MIR42CandidateBuildTest ((Test-MIR4BootstrapRecordHash -Record $frozenRecord) -and [string]$frozenRecord.record_sha256 -ceq [string]$row.target_record.sha256 -and (Get-FileHash -Algorithm SHA256 -LiteralPath $recordPath).Hash -ceq $historicalRecordHashes[$target]) "patch-historical-baseline-record-preserved-$target"
+    $archive = [IO.Compression.ZipFile]::OpenRead((Join-Path $patchRoot ([string]$row.asset.path)))
+    try {
+      $version = [string]$row.distribution_version
+      $entry = $archive.GetEntry("more-infinite-research_$version/README.md")
+      $reader = [IO.StreamReader]::new($entry.Open())
+      try { $readme = $reader.ReadToEnd() } finally { $reader.Dispose() }
+      Assert-MIR42CandidateBuildTest ($readme.Contains("# More Infinite Research $version") -and $readme.Contains("More Infinite Research $version is") -and $readme.Contains("more-infinite-research_$version.zip") -and -not $readme.Contains('4.2.10001')) "patch-historical-readme-package-identity-$target"
+      Assert-MIR42CandidateBuildTest ($readme.Contains("Earlier fresh-load evidence used $($frozenRecord.engine.version);") -and $readme.Contains("The exact published $($frozenRecord.predecessor.version) archive remains a historical predecessor record.") -and $readme.Contains('Consult the matching release record for native qualification of this exact package.')) "patch-historical-readme-evidence-boundary-$target"
+    } finally { $archive.Dispose() }
   }
 
   [pscustomobject][ordered]@{
