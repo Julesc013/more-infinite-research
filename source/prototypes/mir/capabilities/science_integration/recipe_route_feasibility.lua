@@ -52,6 +52,10 @@ local function finite_nonnegative(value)
   return type(value) == "number" and value == value and value >= 0 and value < math.huge
 end
 
+local function finite_temperature(value)
+  return type(value) == "number" and value == value and math.abs(value) < math.huge
+end
+
 -- Factorio recipe names alone are not a product identity. A string public
 -- argument keeps the established item-default convenience, while callers that
 -- reason about fluids must provide {type="fluid", name="..."}.
@@ -65,15 +69,59 @@ local function normalize_identity(value, type_hint)
   if type(name) ~= "string" or name == "" or type(entry_type) ~= "string" or entry_type == "" then
     return nil
   end
-  return {type = entry_type, name = name}
+  local identity = {type = entry_type, name = name}
+  if entry_type == "fluid" then
+    -- Exact temperature takes precedence over the optional range in the
+    -- native ingredient contract. Preserve the demand through every solver,
+    -- including contextual research and memoization.
+    local minimum, maximum = value.minimum_temperature, value.maximum_temperature
+    if value.temperature ~= nil then minimum, maximum = value.temperature, value.temperature end
+    if minimum ~= nil and not finite_temperature(minimum)
+      or maximum ~= nil and not finite_temperature(maximum)
+      or minimum ~= nil and maximum ~= nil and minimum > maximum then return nil end
+    identity.minimum_temperature, identity.maximum_temperature = minimum, maximum
+  end
+  return identity
 end
 
 local function identity_key(identity)
   return identity.type .. "\0" .. identity.name
 end
 
+local function acquisition_key(identity)
+  local key = identity_key(identity)
+  if identity.type == "fluid" and (identity.minimum_temperature ~= nil or identity.maximum_temperature ~= nil) then
+    local minimum = identity.minimum_temperature and string.format("%.17g", identity.minimum_temperature) or ""
+    local maximum = identity.maximum_temperature and string.format("%.17g", identity.maximum_temperature) or ""
+    return key .. "\0temperature\0" .. minimum .. "\0" .. maximum
+  end
+  return key
+end
+
+-- The research-unlock memo and active-identity guard consume the same demand
+-- key. Producer indexes continue to use only the underlying type/name.
+function M.acquisition_key(identity)
+  local normalized = normalize_identity(identity)
+  return normalized and acquisition_key(normalized) or nil
+end
+
 local function same_identity(left, right)
   return left and right and left.type == right.type and left.name == right.name
+end
+
+local function product_temperature(product)
+  if product.type ~= "fluid" then return nil end
+  if product.temperature ~= nil then return product.temperature end
+  local fluid = data_raw.prototypes("fluid")[product.name]
+  return fluid and fluid.default_temperature
+end
+
+local function temperature_satisfied(temperature, identity)
+  if identity.type ~= "fluid"
+    or identity.minimum_temperature == nil and identity.maximum_temperature == nil then return true end
+  return finite_temperature(temperature)
+    and (identity.minimum_temperature == nil or temperature >= identity.minimum_temperature)
+    and (identity.maximum_temperature == nil or temperature <= identity.maximum_temperature)
 end
 
 -- Assigned below with the diagnostic helpers. The forward declaration lets
@@ -137,7 +185,8 @@ local function results_include_positive(results, output_identity, options, canon
   for _, result in ipairs(results or {}) do
     if not diagnostic_visit(options) then return false end
     if same_identity(normalize_identity(result), output_identity)
-      and entry_positive(result, canonical_recipe_product) then return true end
+      and entry_positive(result, canonical_recipe_product)
+      and temperature_satisfied(product_temperature(result), output_identity) then return true end
   end
   return false
 end
@@ -484,6 +533,7 @@ local function append_minable_sources(sources, prototype_type, witness_kind, opt
           prototype = source.name or name,
           prototype_type = prototype_type,
           product = identity,
+          temperature = identity.type == "fluid" and product_temperature(result) or nil,
           mining_input = mining_input or nil,
           -- The private requirement is completed by this one charged result
           -- traversal before the catalogue is exposed to any source query.
@@ -547,7 +597,7 @@ local function append_loot_sources(sources, options)
   return true
 end
 
--- Boilers are prototype-defined fluid conversions rather than recipes. Their
+-- Boilers are prototype-defined fluid heating/conversion routes. Their
 -- placement item and typed input are acquired only when this candidate is
 -- selected, through the same cycle/research guards as recipe routes. This is
 -- no fuel, power, throughput or native placement proof. Surface-constrained
@@ -559,13 +609,17 @@ local function append_boiler_sources(sources, options)
       type = "fluid",
       name = boiler.fluid_box and boiler.fluid_box.filter
     })
-    local output = normalize_identity({
-      type = "fluid",
-      name = boiler.output_fluid_box and boiler.output_fluid_box.filter
-    })
-    local target_temperature = tonumber(boiler.target_temperature)
-    if input and output and not same_identity(input, output)
-      and finite_positive(target_temperature)
+    local mode = boiler.mode or "heat-fluid-inside"
+    local output_name = input and input.name
+    if mode == "output-to-separate-pipe" then
+      output_name = boiler.output_fluid_box and boiler.output_fluid_box.filter or output_name
+    end
+    local output = normalize_identity({type = "fluid", name = output_name})
+    local fluid = input and data_raw.prototypes("fluid")[input.name]
+    local heating_maximum = mode == "heat-fluid-inside" and fluid
+      and (fluid.max_temperature or fluid.default_temperature) or nil
+    local temperature = mode == "output-to-separate-pipe" and boiler.target_temperature or heating_maximum
+    if input and output and finite_temperature(temperature)
       and boiler.energy_consumption ~= nil
       and type(boiler.energy_source) == "table"
       and (type(boiler.surface_conditions) ~= "table" or #boiler.surface_conditions == 0) then
@@ -577,7 +631,10 @@ local function append_boiler_sources(sources, options)
         source_actor = {prototype = boiler.name or name, prototype_type = "boiler"},
         product = output,
         input = input,
-        target_temperature = target_temperature
+        temperature = temperature,
+        heating_maximum = heating_maximum,
+        heating_minimum = heating_maximum and fluid.default_temperature or nil,
+        target_temperature = mode == "output-to-separate-pipe" and temperature or nil
       })
     end
   end
@@ -662,6 +719,7 @@ local function default_source_catalog(state, options)
         kind = "offshore-pump",
         source_actor = {prototype = pump.name or name, prototype_type = "offshore-pump"},
         product = identity,
+        temperature = product_temperature(identity),
         surface_conditions = deepcopy(pump.surface_conditions)
       })
     end
@@ -762,13 +820,17 @@ local function source_witness(identity, options, state)
     -- Keep the established name-first callback shape, and add the exact
     -- product type/identity for type-aware callers.
     local witness = options.source_witness(identity.name, identity.type, deepcopy(identity))
-    if witness == true then return {kind = "declared-source", product = deepcopy(identity)} end
+    if witness == true and temperature_satisfied(nil, identity) then
+      return {kind = "declared-source", product = deepcopy(identity)}
+    end
     if type(witness) == "table" then
       local declared = normalize_identity(witness.product or {
         type = witness.product_type or identity.type,
         name = witness.item or witness.name
       })
-      if same_identity(declared, identity) then
+      local temperature = witness.temperature
+        or type(witness.product) == "table" and witness.product.temperature
+      if same_identity(declared, identity) and temperature_satisfied(temperature, identity) then
         local copied = deepcopy(witness)
         copied.product = deepcopy(identity)
         return copied
@@ -779,13 +841,28 @@ local function source_witness(identity, options, state)
   for _, witness in ipairs(default_source_catalog(state, options)[identity_key(identity)] or {}) do
     if not diagnostic_visit(options) then return nil end
     diagnostic_rollback(options, source_checkpoint)
-    if surface_satisfied(witness.surface_conditions, options, state) then
+    local temperature = witness.temperature
+    if witness.heating_maximum then
+      temperature = math.min(witness.heating_maximum, identity.maximum_temperature or witness.heating_maximum)
+    end
+    local heating_applicable = not witness.heating_maximum
+      or finite_temperature(witness.heating_minimum) and temperature >= witness.heating_minimum
+        and (identity.minimum_temperature ~= nil or identity.maximum_temperature ~= nil)
+    if heating_applicable and temperature_satisfied(temperature, identity)
+      and surface_satisfied(witness.surface_conditions, options, state) then
       local copied = deepcopy(witness)
+      copied.product = deepcopy(identity)
+      copied.temperature = temperature
       copied.surface_conditions = nil
       copied.source_actor = nil
       copied.mining_actor = nil
       local input = witness.mining_input and witness.mining_input.identity
         or witness.kind == "boiler-conversion" and witness.input
+      if input and witness.kind == "boiler-conversion" then
+        -- A boiler can heat a colder seed, including the same fluid. It cannot
+        -- use its own hot output to bootstrap or act as a cooling route.
+        input = {type = input.type, name = input.name, maximum_temperature = temperature}
+      end
       local actor = witness.source_actor
       local mining_actor = witness.mining_actor and witness.mining_actor.required and witness.mining_actor
       if not input and not actor and not mining_actor then return copied end
@@ -794,7 +871,7 @@ local function source_witness(identity, options, state)
       -- and retains its actor/input's complete research witnesses.
       options.recipe_index = options.recipe_index or state.recipe_index or recipe_facts.index_view()
       state = query_state(state, options.recipe_index)
-      local key = identity_key(identity)
+      local key = acquisition_key(identity)
       if not state.visiting[key] then
         state.visiting[key] = true
         local machine = mining_actor and mining_actor_witness(mining_actor, input, options, state)
@@ -1205,7 +1282,8 @@ local STABLE_SOURCE_KINDS = {
   ["minable-entity"] = true,
   ["entity-loot"] = true,
   ["offshore-pump"] = true,
-  ["boiler-conversion"] = true
+  ["boiler-conversion"] = true,
+  ["fluid-mixing"] = true
 }
 
 local function stable_acquisition_witness(witness)
@@ -1235,12 +1313,12 @@ local function stable_acquisition_witness(witness)
 end
 
 -- A source witness or one enabled recipe alternative proves a product. The
--- active type/name set makes recursive requirements AND, recipe alternatives
+-- active acquisition-demand set makes recursive requirements AND, recipe alternatives
 -- OR, and rejects unseeded cycles. Default raw-prototype scans are cached only
 -- inside this one query state; no feasibility result is retained globally.
 local function acquisition_witness_impl(output_identity, options, state)
   if not diagnostic_visit(options) then return nil end
-  local key = identity_key(output_identity)
+  local key = acquisition_key(output_identity)
   local may_use_stable = stable_cacheable(options)
   if may_use_stable and state.stable_acquisition_memo[key] ~= nil then
     return deepcopy(state.stable_acquisition_memo[key])
@@ -1321,6 +1399,31 @@ local function acquisition_witness_impl(output_identity, options, state)
     local witness = options.research_unlock_witness(deepcopy(output_identity), state)
     if witness then
       state.visiting[key] = nil
+      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      return witness
+    end
+  end
+  -- Same-fluid sources on opposite sides of a bounded demand can be mixed.
+  -- Keep both complete acquisition trees, so their machines and research
+  -- gates survive frontier extraction. One-sided demands never need this
+  -- alternative: mixing cannot exceed either source's temperature.
+  if output_identity.type == "fluid" and output_identity.minimum_temperature ~= nil
+    and output_identity.maximum_temperature ~= nil then
+    diagnostic_rollback(options, acquisition_checkpoint)
+    local cold = acquisition_witness({type = "fluid", name = output_identity.name,
+      maximum_temperature = output_identity.minimum_temperature}, options, state)
+    local hot = cold and acquisition_witness({type = "fluid", name = output_identity.name,
+      minimum_temperature = output_identity.maximum_temperature}, options, state)
+    if cold and hot then
+      state.visiting[key] = nil
+      diagnostic_rollback(options, acquisition_checkpoint)
+      local witness = {kind = "fluid-mixing", output = deepcopy(output_identity), ingredients = {cold, hot}}
+      if may_use_stable and stable_acquisition_witness(witness) then
+        if state.stable_acquisition_memo[key] == nil then
+          state.stable_acquisition_generation = state.stable_acquisition_generation + 1
+        end
+        state.stable_acquisition_memo[key] = deepcopy(witness)
+      end
       if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
       return witness
     end

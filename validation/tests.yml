@@ -391,6 +391,21 @@
       ]
     },
     {
+      "id": "static.direct-library-activation",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRLibraryActivation.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/compatibility/ModPortal.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tests/tooling/Test-MIRLibraryActivation.ps1"
+      ]
+    },
+    {
       "id": "static.immutable-input-staging",
       "kind": "static",
       "layer": "F0",

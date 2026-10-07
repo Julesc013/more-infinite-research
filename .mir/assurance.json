@@ -411,6 +411,11 @@
       "tests": ["static.immutable-input-staging", "runtime.k2-k2so-f210-intake", "static.mir4-a05-k2-03-imersite-closure", "static.mir4-a05-k2-materials-closure"]
     },
     {
+      "id": "direct-library-activation",
+      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$"],
+      "tests": ["static.direct-library-activation"]
+    },
+    {
       "id": "native-probe-resources",
       "patterns": ["^tools/lib/validation/(?:NativeProbeResources|BrowserContinuityInputs)[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/Test-MIR(?:ResearchBrowser|BrowserPersonalStateContinuity|42CapOwnershipMultiforce)[.]ps1$"],
       "tests": ["static.immutable-input-staging", "runtime.material-route-guard", "runtime.research-browser"]

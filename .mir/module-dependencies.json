@@ -36,7 +36,7 @@
     "planner->capabilities","planner->compatibility","planner->core","planner->domain","planner->families","planner->graph","planner->index","planner->integrity","planner->pipeline","planner->platform","planner->policy","planner->presentation","planner->providers","planner->report","planner->settings","planner->streams",
     "platform->core","platform->domain",
     "policy->capabilities","policy->compatibility","policy->core","policy->domain","policy->index","policy->pipeline","policy->planner","policy->platform","policy->report","policy->settings","policy->streams",
-    "presentation->core","presentation->platform","presentation->settings",
+    "presentation->core","presentation->platform",
     "providers->compatibility","providers->core","providers->domain","providers->families","providers->index","providers->policy",
     "report->capabilities","report->core","report->domain","report->emit","report->families","report->index","report->integrity","report->pipeline","report->platform","report->settings",
     "runtime->core","runtime->domain","runtime->platform","runtime->settings","runtime->streams",

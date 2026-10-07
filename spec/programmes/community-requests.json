@@ -356,12 +356,18 @@
           "basis": "Maintainer-pasted player report and reply: most research was fixed, but Weapon shooting speed 7 and Lab research speed 7 still require space science. Relative comment ages are not absolute dates; exact installed package and profile remain unconfirmed.",
           "id": "P5",
           "observed_on": "2026-10-05"
+        },
+        {
+          "title": "Entitytiger's missing Space Age graphic report",
+          "basis": "Maintainer-pasted report on 7 October: __space-age__/graphics/technology/research-productivity.png can prevent startup without the DLC graphic. Reporter engine, MIR ZIP, enabled providers and raw/imported settings are unknown. The maintenance request requires safe fallback and actual graphical startup acceptance.",
+          "id": "P6",
+          "observed_on": "2026-10-07"
         }
       ]
     },
     "document_authority": "Proposed brief accepted as task scope; technical assertions require exact independent evidence."
   },
-  "request_count": 82,
+  "request_count": 83,
   "requests": [
     {
       "id": "UI-01",
@@ -3868,6 +3874,27 @@
       ],
       "source_ids": ["P5"],
       "feature_group": "science-retirement",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "DLC-01",
+      "title": "Prevent unavailable optional DLC artwork from crashing startup",
+      "requesters": ["entitytiger", "Julesc013"],
+      "decision": "commit-4.2.1",
+      "mechanism": "shared active-provider availability query and existing base artwork fallbacks",
+      "proposed_scope": "Research Library large/small shortcut and technology icon layers, including Space Age and Elevated Rails",
+      "rationale": "Raw and imported cosmetic opt-ins selected inactive resource roots without proving the files were installed. The default remains false; the reporter's exact installation has not been reproduced.",
+      "implementation": "Both consumers use the existing stage-safe provider query. Saved/imported setting identities remain valid but cannot authorize unavailable resources. No DLC is enabled and no research identity or effect is changed.",
+      "acceptance": [
+        "Default, saved and imported opt-ins select valid fallback artwork without active DLC, including opposing raw/imported values",
+        "Enabled Space Age and Elevated Rails retain their artwork independently",
+        "Actual materialized package covers technology layers and both shortcut sizes",
+        "Graphical client reaches the main menu with absent DLC and with installed-but-disabled DLC without modifying the user's installation",
+        "Existing settings and research survive the published CCC00 to CCC01 upgrade"
+      ],
+      "source_ids": ["P6"],
+      "feature_group": "startup-asset-availability",
       "status": "requested-not-qualified",
       "qualification": []
     }
