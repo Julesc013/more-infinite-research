@@ -207,7 +207,9 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
       function Invoke-MIR441MonitoredProcess {
         param($FilePath,$Arguments,$WorkRoot,$LedgerPath,$Policy,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes,$TimeoutSeconds,$StdoutPath,$StderrPath,[switch]$AllowNonZeroExit,$CompletionPredicate)
         Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]-ceq$library) 'upgrade process reads master library directly'
-        [IO.File]::WriteAllLines((Join-Path $WorkRoot 'userdata/factorio-current.log'),@($script:upgradeActivation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$_.version+' (data.lua)'}))
+        $currentLines=@($script:upgradeActivation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$_.version+' (data.lua)'})
+        [IO.File]::WriteAllLines($StdoutPath,$currentLines)
+        [IO.File]::WriteAllLines((Join-Path $WorkRoot 'userdata/factorio-current.log'),@('0.1 Loading mod retired-predecessor 9.9.9 (data.lua)')+$currentLines)
         return [pscustomobject]@{exit_code=0;completion_predicate_observed=$false;peak_working_set_bytes=1024;duration_seconds=0.01}
       }
       try{

@@ -122,7 +122,9 @@ function Invoke-MIRUpgradeMonitoredProcess {
     -StdoutPath ($prefix+'.stdout.txt') -StderrPath ($prefix+'.stderr.txt') -AllowNonZeroExit `
     -CompletionPredicate $CompletionPredicate
   $script:upgradeResourceRuns+=@([ordered]@{index=$script:upgradeProcessIndex;ledger=($prefix+'.resources.jsonl');exit_code=$run.exit_code;completion_predicate_observed=$run.completion_predicate_observed;peak_working_set_bytes=$run.peak_working_set_bytes;duration_seconds=$run.duration_seconds})
-  $null=Assert-MIRLibraryLoadedSelection -Activation $script:upgradeActivation -LogPath (Join-Path $root 'userdata/factorio-current.log')
+  # --no-log-rotation keeps predecessor and candidate entries in the native
+  # file. Verify only this invocation's independently captured output.
+  $null=Assert-MIRLibraryLoadedSelection -Activation $script:upgradeActivation -LogPath ($prefix+'.stdout.txt')
   return $run
 }
 
