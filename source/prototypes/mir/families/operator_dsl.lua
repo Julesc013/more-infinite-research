@@ -1,5 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
+local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 
 local M = {}
 local SCHEMA = 1
@@ -104,6 +106,16 @@ local function is_zero_or_nil(value)
 end
 
 local function safe_placeable_output(fact, item_name)
+  if type(fact.variants) ~= "table" or #fact.variants == 0 then
+    return false, "non_exclusive_placeable_output"
+  end
+  if type(fact.productive_result_identities) == "table" then
+    local productive = false
+    for _, identity in ipairs(fact.productive_result_identities) do
+      if identity.type == "item" and identity.name == item_name then productive = true; break end
+    end
+    if not productive then return false, "non_productive_placeable_output" end
+  end
   for _, variant in ipairs(fact.variants or {}) do
     if variant.effective_allow_productivity ~= true then return false, "variant_productivity_not_allowed" end
     if tonumber(variant.maximum_productivity) == 0 then return false, "variant_zero_productivity_cap" end
@@ -120,6 +132,11 @@ local function safe_placeable_output(fact, item_name)
       or not is_zero_or_nil(result.catalyst_amount)
       or not is_zero_or_nil(result.ignored_by_productivity) then
       return false, "non_deterministic_placeable_output"
+    end
+    local amount = result.amount
+    if type(amount) ~= "number" or amount ~= amount or amount <= 0 or amount == math.huge
+      or amount <= recipe_semantics.productivity_excluded_amount(result, target_profiles.current()) then
+      return false, "non_productive_placeable_output"
     end
   end
   return true, nil

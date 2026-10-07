@@ -38,6 +38,7 @@ local HARD_BLOCKERS = {
   recycling_recipe = true,
   self_return_risk = true,
   non_exclusive_placeable_output = true,
+  non_productive_placeable_output = true,
   non_deterministic_placeable_output = true,
   existing_recipe_productivity_owner = true
 }

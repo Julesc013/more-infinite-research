@@ -1,6 +1,6 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 [CmdletBinding()]
-param([string]$RepoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path,[switch]$PureSelectionOnly)
+param([string]$RepoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path,[switch]$PureSelectionOnly,[switch]$SdkRepairOnly)
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/assurance/Core.ps1')
@@ -11,6 +11,13 @@ function Assert-MIRDevelopmentCISelection {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Message)
   if(-not $Condition) { throw $Message }
   $script:selectionAssertions++
+}
+
+. (Join-Path $repo 'tests/support/MIRSdkGenerationRepairControls.ps1')
+if($SdkRepairOnly){
+  if($PureSelectionOnly){throw 'Select only one focused CI control mode'}
+  Test-MIRSdkGenerationRepairControls -RepoRoot $repo
+  return
 }
 
 function New-MIRDevelopmentSelectionRow {
@@ -337,6 +344,7 @@ try {
 }
 
 $workflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/validate.yml')
+Test-MIRSdkGenerationRepairControls -RepoRoot $repo
 $planWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'plan'
 $developmentWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'development-static'
 $releaseWorkflowBlock=Get-MIRDevelopmentCIWorkflowJobBlock -Workflow $workflow -JobId 'verification-gate'

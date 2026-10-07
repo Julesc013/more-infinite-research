@@ -1482,4 +1482,219 @@ end)()
   provider.current = previous_current
 end)()
 
+-- A declared result that cannot occur is not a material return edge. Keep
+-- unknown shapes, positive coproduct paths and productive fractional returns
+-- conservative. Run the actual normalizer, graph and manufacturing selector.
+;(function()
+  local profiles = require("fixtures.material_routes.target_profiles")
+  local provider = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_current = provider.current
+  local actual_facts = require("prototypes.mir.index.recipe_facts")
+  for _, line in ipairs({"2.1", "2.0", "1.1", "1.0", "0.17", "0.16", "0.15", "0.14", "0.13"}) do
+    local profile = profiles.profiles[line] or {factorio_version = line,
+      prototype_shapes = {product_probability_fields = {"probability", "catalyst_amount"}}}
+    provider.current = function() return profile end
+    local probability_field = line == "2.1" and "independent_probability" or "probability"
+    for _, kind in ipairs({"item", "fluid"}) do
+      for _, case in ipairs({
+        {id = "zero amount", fields = {amount = 0}, admitted = true},
+        {id = "zero native roll", fields = {amount = 1, [probability_field] = 0}, admitted = true},
+        {id = "zero declared amount overrides range", fields = {amount = 0, amount_min = 1, amount_max = 9}, admitted = true},
+        {id = "zero range", fields = {amount_min = 0, amount_max = 0}, admitted = true},
+        {id = "native clamped positive range", fields = {amount_min = 1, amount_max = 0}, admitted = false},
+        {id = "positive baseline excluded from bonus", fields = {amount = 1, ignored_by_productivity = 1}, admitted = false},
+        {id = "unknown amount", fields = {amount = "invalid"}, admitted = false},
+        {id = "false amount with zero range", fields = {amount = false, amount_min = 0, amount_max = 0}, admitted = false},
+        {id = "unknown roll", fields = {amount = 1, [probability_field] = "invalid"}, admitted = false},
+        {id = "foreign independent zero", fields = {amount = 1, independent_probability = 0}, admitted = line == "2.1"},
+        {id = "empty shared interval", fields = {amount = 1, shared_probability = {min = 0.45, max = 0.45}}, admitted = line == "2.1"},
+        {id = "tiny positive rolls", fields = {amount = 1, independent_probability = 1e-200, shared_probability = {min = 0, max = 1e-200}}, admitted = false},
+        {id = "unknown extra roll", fields = {amount = 0, extra_count_fraction = "invalid"}, admitted = false},
+        {id = "false extra roll", fields = {amount = 0, extra_count_fraction = false}, admitted = false},
+        {id = "out of range extra with zero native roll", fields = {amount = 1, extra_count_fraction = 2, [probability_field] = 0}, admitted = false},
+        {id = "fractional output", fields = {amount = 0, extra_count_fraction = 0.5}, admitted = false},
+        {id = "zero extra roll", fields = {amount = 0, extra_count_fraction = 0}, admitted = kind == "item" and (line == "2.1" or line == "2.0")},
+        {id = "positive coproduct return", fields = {amount = 0}, indirect_return = true, admitted = false}
+      }) do
+        local product = {type = kind, name = "ore"}
+        for key, value in pairs(case.fields) do product[key] = value end
+        local raw = {
+          forward = {name = "forward", allow_productivity = true,
+            ingredients = {{type = kind, name = "ore", amount = 1}},
+            results = {{type = kind, name = "plate", amount = 1}}},
+          reverse = {name = "reverse", allow_productivity = true,
+            ingredients = {{type = kind, name = "plate", amount = 1}},
+            results = {product, {type = kind, name = "slag", amount = 1}}}
+        }
+        if case.indirect_return then
+          raw.recover_slag = {name = "recover_slag", allow_productivity = true,
+            ingredients = {{type = kind, name = "slag", amount = 1}},
+            results = {{type = kind, name = "ore", amount = 1}}}
+        end
+        local before = test_fingerprint(raw)
+        local facts = actual_facts.index_prototypes(raw)
+        environment(facts.facts); risks = {}
+        local id = "zero return " .. line .. "/" .. kind .. "/" .. case.id
+        local admitted = matcher.material_route_is_acyclic(facts.facts.forward)
+        check(admitted == case.admitted, id .. " actual graph")
+        local spec = {require_acyclic_process = true, groups = {{change = 0.02,
+          items = {"plate"}, required_productive_outputs = {{type = kind, name = "plate"}}}}}
+        local buckets = matcher.recipes_for_stream(spec, 0.02)
+        check((#buckets == 1 and #buckets[1].recipes == 1) == case.admitted, id .. " actual manufacturing selector")
+        check(test_fingerprint(raw) == before, id .. " preserves input")
+      end
+      for _, zero_kind in ipairs({"amount", "roll"}) do
+        local carrier = {type = kind, name = "ore", amount = zero_kind == "amount" and 0 or 1}
+        if zero_kind == "roll" then carrier[probability_field] = 0 end
+        local raw = {name = "forward", allow_productivity = true,
+          ingredients = {{type = kind, name = "ore", amount = 1}},
+          results = {{type = kind, name = "plate", amount = 1}, carrier}}
+        local facts = actual_facts.index_prototypes({forward = raw})
+        environment(facts.facts); risks = {}
+        check(matcher.material_route_is_acyclic(facts.facts.forward), line .. "/" .. kind .. " candidate zero return " .. zero_kind)
+        for _, acyclic in ipairs({false, true}) do
+          local spec = {require_acyclic_process = acyclic, groups = {{change = 0.02,
+            items = {"plate"}, required_productive_outputs = {{type = kind, name = "plate"}}}}}
+          local buckets = matcher.recipes_for_stream(spec, 0.02)
+          check(#buckets == 1 and #buckets[1].recipes == 1,
+            line .. "/" .. kind .. " zero carrier stays eligible " .. zero_kind .. "/" .. tostring(acyclic))
+        end
+      end
+    end
+  end
+  provider.current = previous_current
+end)()
+
+-- Pattern-selected productivity must still have useful bonus output.
+;(function()
+  local profiles = require("fixtures.material_routes.target_profiles")
+  local provider = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_current = provider.current
+  local actual_facts = require("prototypes.mir.index.recipe_facts")
+  for _, line in ipairs({"2.1", "2.0"}) do
+    provider.current = function() return profiles.profiles[line] end
+    local probability_field = line == "2.1" and "independent_probability" or "probability"
+    for _, case in ipairs({
+      {id = "all zero amounts", carrier = {amount = 0}, component = {amount = 0}, admitted = false},
+      {id = "all zero rolls", carrier = {amount = 1, [probability_field] = 0}, component = {amount = 1, [probability_field] = 0}, admitted = false},
+      {id = "all bonus excluded", carrier = {amount = 1, ignored_by_productivity = 1}, component = {amount = 1, ignored_by_productivity = 1}, admitted = false},
+      {id = "useful coproduct", carrier = {amount = 0}, component = {amount = 1}, admitted = true}
+    }) do
+      local carrier = {type = "item", name = "ore"}
+      local component = {type = "item", name = "component"}
+      for key, value in pairs(case.carrier) do carrier[key] = value end
+      for key, value in pairs(case.component) do component[key] = value end
+      local raw = {name = "pattern-producer", allow_productivity = true,
+        ingredients = {{type = "item", name = "ore", amount = 1}}, results = {carrier, component}}
+      local before = test_fingerprint(raw)
+      local facts = actual_facts.index_prototypes({[raw.name] = raw})
+      for _, acyclic in ipairs({false, true}) do
+        environment(facts.facts); risks = {}
+        local spec = {require_acyclic_process = acyclic, recipe_patterns = {"^pattern%-producer$"}}
+        local buckets = matcher.recipes_for_stream(spec, 0.02)
+        check((#buckets == 1 and #buckets[1].recipes == 1) == case.admitted,
+          line .. " pattern selector " .. case.id .. "/" .. tostring(acyclic))
+      end
+      check(test_fingerprint(raw) == before, line .. " pattern selector preserves input " .. case.id)
+    end
+  end
+  provider.current = previous_current
+end)()
+
+-- Automatic placeable manufacturing must have useful output in every variant.
+;(function()
+  local profiles = require("fixtures.material_routes.target_profiles")
+  local provider = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_current = provider.current
+  local actual_facts = require("prototypes.mir.index.recipe_facts")
+  local previous_risks = package.loaded["prototypes.mir.index.recipe_risk_facts"]
+  package.loaded["prototypes.mir.index.recipe_risk_facts"] = nil
+  local actual_risks = require("prototypes.mir.index.recipe_risk_facts")
+  local operators = require("prototypes.mir.families.operator_dsl")
+  local dsl = operators.validate({schema = 1, selectors = {
+    {operator = "recipe.productivity-eligible"},
+    {operator = "output.deterministic-single-placeable"}, {operator = "risk.none"}},
+    normalizers = {{operator = "candidate.recipe-item-entity"}},
+    partitioner = {operator = "partition.single"}, tier_resolver = {operator = "tier.structural-single"},
+    effect_model = {operator = "effect.fixed", change = 0.02},
+    science_model = {operator = "science.inherit-target-stream"},
+    prerequisite_model = {operator = "prerequisite.inherit-target-stream"},
+    cost_model = {operator = "cost.inherit-target-stream"},
+    presentation_model = {operator = "presentation.inherit-target-stream"},
+    ownership_policy = {operator = "ownership.prefer-existing-exact-owner"},
+    grouping = {operator = "group.attach-existing", stream = "fixture-machine-stream"}})
+  for _, line in ipairs({"2.1", "2.0"}) do
+    provider.current = function() return profiles.profiles[line] end
+    local probability_field = line == "2.1" and "independent_probability" or "probability"
+    for _, case in ipairs({
+      {id = "sole zero amount", product = {amount = 0}, admitted = false},
+      {id = "ordinary positive output", product = {amount = 1}, admitted = true},
+      {id = "default bonus exclusion", product = {amount = 1, ignored_by_stats = 1}, admitted = false},
+      {id = "remaining useful bonus", product = {amount = 2, ignored_by_stats = 1}, admitted = true},
+      {id = "explicit zero exclusion wins", product = {amount = 1, ignored_by_stats = 1, ignored_by_productivity = 0}, admitted = true},
+      {id = "fully excluded output", product = {amount = 1, ignored_by_productivity = 1}, admitted = false},
+      {id = "false quantity", product = {amount = false}, admitted = false},
+      {id = "unknown quantity", product = {amount = "invalid"}, admitted = false},
+      {id = "infinite quantity", product = {amount = math.huge}, admitted = false},
+      {id = "fractional-only output stays nondeterministic", product = {amount = 0, extra_count_fraction = 0.5},
+        admitted = false, blocker = "non_deterministic_placeable_output"},
+      {id = "zero retained variant", product = {amount = 1}, other = {amount = 0}, admitted = false},
+      {id = "excluded retained variant", product = {amount = 1}, other = {amount = 1, ignored_by_stats = 1}, admitted = false},
+      {id = "useful retained variants", product = {amount = 1}, other = {amount = 1}, admitted = true}
+    }) do
+      local function product(fields)
+        local value = {type = "item", name = "fixture-machine"}
+        for key, field in pairs(fields) do value[key] = field end
+        return value
+      end
+      local raw = {name = "fixture-machine-recipe", allow_productivity = true,
+        ingredients = {{type = "item", name = "fixture-feed", amount = 1}}, results = {product(case.product)}}
+      if case.other then
+        -- Retained canonical variant transport, not a claim that modern upstream
+        -- engines accept the historical normal/expensive prototype declaration.
+        raw.normal = {ingredients = raw.ingredients, results = raw.results}
+        raw.expensive = {ingredients = raw.ingredients, results = {product(case.other)}}
+        raw.ingredients, raw.results = nil, nil
+      end
+      local before = test_fingerprint(raw)
+      local facts = actual_facts.index_prototypes({[raw.name] = raw})
+      local risks_index = actual_risks.index_facts(facts, {
+        items = {["fixture-machine"] = {place_result = "fixture-machine-entity"}}})
+      local fact, risk = facts.facts[raw.name], risks_index.facts[raw.name]
+      local admitted, blocker = operators.eligibility(dsl, fact, "fixture-machine", risk)
+      check(admitted == case.admitted, line .. " automatic manufacturing " .. case.id)
+      if case.blocker then check(blocker == case.blocker, line .. " automatic manufacturing reason " .. case.id) end
+      check(test_fingerprint(raw) == before, line .. " automatic manufacturing preserves " .. case.id)
+      if case.id == "sole zero amount" then
+        check(actual_risks.primary_disposition(risk) == "PASS", line .. " zero output reproduces the eligibility gap")
+      end
+    end
+    for _, case in ipairs({
+      {id = "hidden", options = {hidden = true}, flag = "hidden_internal"},
+      {id = "author denial", options = {allow_productivity = false}, flag = "productivity_disabled"},
+      {id = "zero cap", options = {maximum_productivity = 0}, flag = "zero_productivity_cap"},
+      {id = "recycling", options = {category = "recycling"}, flag = "recycling_loop"},
+      {id = "self return", self_return = true, flag = "catalyst_or_self_return"},
+      {id = "random output", roll = 0.5, flag = "non_deterministic_output"},
+      {id = "real coproduct", coproduct = true, flag = "ambiguous_placeable_output"}
+    }) do
+      local output = {type = "item", name = "fixture-machine", amount = 1}
+      if case.roll then output[probability_field] = case.roll end
+      local raw = {name = "fixture-machine-recipe", allow_productivity = true,
+        ingredients = {{type = "item", name = case.self_return and "fixture-machine" or "fixture-feed", amount = 1}},
+        results = {output}}
+      for key, value in pairs(case.options or {}) do raw[key] = value end
+      if case.coproduct then raw.results[2] = {type = "item", name = "fixture-waste", amount = 1} end
+      local facts = actual_facts.index_prototypes({[raw.name] = raw})
+      local risk = actual_risks.index_facts(facts, {
+        items = {["fixture-machine"] = {place_result = "fixture-machine-entity"}}}).facts[raw.name]
+      check(actual_risks.has_hard_flag(risk, case.flag), line .. " retained manufacturing risk " .. case.id)
+      check(not operators.eligibility(dsl, facts.facts[raw.name], "fixture-machine", risk),
+        line .. " retained manufacturing rejection " .. case.id)
+    end
+  end
+  package.loaded["prototypes.mir.index.recipe_risk_facts"] = previous_risks
+  provider.current = previous_current
+end)()
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

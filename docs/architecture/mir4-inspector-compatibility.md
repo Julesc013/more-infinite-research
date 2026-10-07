@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-28
+last_reviewed: 2026-10-07
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -42,6 +42,8 @@ The five canonical W07/T13 applications live under `tools/mir/application/inspec
 `governance/repository/migrations/inspector-compatibility-tooling-v1.json` governs the package-excluded cutover. Its append-only receipt binds W07 assessment and Inspector behavior, the immutable T13 exact-canary reference, compatibility-entrypoint parity, unchanged compatibility policy and player source, rollback, and disabled release transitions.
 
 Inspector V0 remains unchanged under `sdk/preview/mir4/inspector`. Inspector V1 lives separately under `sdk/preview/mir4/inspector-v1`. V1 accepts only `MIR4InspectionBundleV1`, renders eleven fixed bounded sections, uses native keyboard controls and accessible tables/live regions, keeps strings in a localization catalogue, and has a network-denying content security policy. It performs no upload, remote fetch, runtime polling, or mutation.
+
+The authored V1 browser and PowerShell export templates share one consumer contract emitted from the current inspection authority and bundle schema. Depth applies to object/array containers; primitive leaves do not add another container. String bounds count UTF-8 bytes, including strings inside arrays and property names. Both consumers enforce forbidden fields, fixed read-only headers, section shape/counts and unique section identities. The local input/output ceiling is 8 MiB with at most 100 properties per object; the PowerShell exporter holds its input against writers during reading and validates before replacing an output. Executed source controls consume both generated validators and the real canonical snapshot. Committed SDK and assembled preview bytes require the generator fixed point; these controls do not authenticate declared digests, prove physical browser operation or grant terminal compatibility/release authority.
 
 T12 supplies Inspector V1 with exact target/environment A/B comparisons without adding a twelfth section or importing mutable compiler objects. The overview carries both capture identities, environment-lock and snapshot digests, the total change count, and truncation state. Recipe/productivity coverage receives copied bounded change rows; diagnostics replace the former exact-snapshot blocker with `mir4-t12-exact-comparison-captured`; proof status remains non-claim-eligible. At most 100 rows enter any section, while the comparison record preserves the untruncated count. The default workbench uses the tracked F210 base-to-official comparison when the T12 reference exists.
 

@@ -3351,6 +3351,8 @@
       "requires_factorio": false,
       "inputs": [
         "tests/tooling/Test-MIRDevelopmentCISelection.ps1",
+        "tests/support/MIRSdkGenerationRepairControls.ps1",
+        "tools/lib/mir4/PlatformPreview.ps1",
         "tools/mir/application/assurance/DevelopmentValidation.ps1",
         "tools/lib/assurance/Core.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
@@ -8089,5 +8091,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ca619281ad5d6a73aa0801b71734b5556862844eab720500cb4117e1e28e57c3"
+  "digest": "sha256:b0635db5c72084023d0601ed982ad05ee9f539b49eeb310b34dce276a8ce20f4"
 }
