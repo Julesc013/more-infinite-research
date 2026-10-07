@@ -73,6 +73,27 @@ function Assert-MIR42EngineSharedInputs {
   }
   try {
     $null=New-Item -ItemType Directory -Path $scratch
+    # A fresh PowerShell scope must preserve failures before lease allocation.
+    # Running in this test scope would accidentally supply its own $inputLeases
+    # and conceal the StrictMode regression in the runner's script-wide trap.
+    $earlyFailure=Join-Path $scratch 'early-failure.ps1'
+    [IO.File]::WriteAllText($earlyFailure,@'
+param([string]$Repository,[string]$Scratch)
+$ErrorActionPreference='Stop'
+$arguments=@{RepoRoot=$Repository;CandidateManifestPath=(Join-Path $Scratch 'absent.json');OutputRoot=(Join-Path $Scratch 'never-created')}
+foreach($target in @('F210','F200','F110','F100')){$arguments[$target+'Engine']='not-executed';$arguments[$target+'Predecessor']='not-read'}
+try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1') @arguments;throw 'Unexpected runner success'}catch{[Console]::Out.WriteLine($_.Exception.Message)}
+'@)
+    $start=[Diagnostics.ProcessStartInfo]::new((Get-Command pwsh).Source)
+    $start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+    foreach($arg in @('-NoProfile','-File',$earlyFailure,'-Repository',$RepoRoot,'-Scratch',$scratch)){[void]$start.ArgumentList.Add($arg)}
+    $child=[Diagnostics.Process]::Start($start)
+    try{
+      $stdout=$child.StandardOutput.ReadToEndAsync();$stderr=$child.StandardError.ReadToEndAsync()
+      if(-not$child.WaitForExit(20000)){$child.Kill($true);$child.WaitForExit();throw 'Early-failure control exceeded its deadline'}
+      Check ($child.ExitCode-eq0 -and $stdout.Result.Contains('[mir42-candidate-manifest-missing]') -and [string]::IsNullOrWhiteSpace($stderr.Result)) ('early runner failure was masked: '+$stdout.Result+$stderr.Result)
+      Check (-not(Test-Path -LiteralPath (Join-Path $scratch 'never-created'))) 'early runner refusal allocated output'
+    }finally{$child.Dispose()}
     $exactRoot=Join-Path $scratch 'campaign'
     Refuses {New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $exactRoot -UseExactOutputRoot} 'peak-budget-required'
     Check (-not (Test-Path -LiteralPath $exactRoot)) 'missing peak allocated output.'

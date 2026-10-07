@@ -25,6 +25,9 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+# The script-wide trap also handles import and preflight failures. Initialize
+# its cleanup state before any of those operations can fail under StrictMode.
+$inputLeases=[Collections.Generic.List[object]]::new()
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
@@ -424,7 +427,6 @@ if($running.Count){throw '[mir42-engine-factorio-already-running]'}
 $targets = if ($isNineTargetCandidate) { @($script:MIR42NineTargetEngineTargets) } else { @($script:MIR42ModernEngineTargets) }
 $libraryBindings=Get-MIR42EngineLibraryBindings -Path $LibraryBindingsPath -Targets $targets
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $out -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
-$inputLeases=[Collections.Generic.List[object]]::new()
 trap {
   $failure=$_
   foreach($inputLease in $inputLeases){if(-not $inputLease.closed){try {$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed} catch {}}}

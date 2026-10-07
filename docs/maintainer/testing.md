@@ -13,6 +13,8 @@ superseded_by: []
 
 Updated: 2026-10-08
 
+The release engine runner initializes lease cleanup before imports and admission. An early refusal must preserve its original error instead of failing again because cleanup state is absent. A fresh PowerShell child exercises the actual runner with a missing candidate, checks the original diagnostic and verifies that no run output is allocated; this host-side regression test launches no Factorio process.
+
 The five historical 4.2.1 targets require explicit `-F017Engine` through `-F013Engine` bindings in the release engine runner. Their exact sealed engine hashes and versions remain mandatory; the historical workstation path remains provenance rather than the required current location. Maintenance sealing reads the preserved MIR 3 target/seal identities without requiring those old archives locally, then verifies the actual published `CCC00` predecessor. Non-maintenance sealing still requires its original predecessor archive and engine location. Controlled relocation/missing-archive cases exercise the real readers without claiming native qualification.
 
 Published `CCC00 → CCC01` maintenance execution uses `spec/engines/mir421-native-engine-inputs-v1.json` for the four modern Windows engine identities. The runner and seal consumer share the same exact binary/product/file-version binding. Paths are supplied locally. The F210 input is the observed Steam experimental 2.1.21.87673; F200/F110/F100 retain their exact 2.0.77/1.1.110/1.0.0 inputs. The record includes the observed F210 API/changelog hashes and Steam build, but grants no qualification or publication. It does not update the separate cap-harness admission or transfer older engine evidence. Historical target engine seals remain applicable unchanged.
