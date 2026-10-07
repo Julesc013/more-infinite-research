@@ -176,6 +176,48 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   Write-TestJson (Join-Path $upgradeFixture 'info.json') @{name='assert-upgrade-control';version='1.0.0';factorio_version='2.1';dependencies=@('base >= 2.1.0','more-infinite-research >= 4.2.21000')}
   [IO.File]::WriteAllText((Join-Path $upgradeFixture 'control.lua'),'-- controlled upgrade assertions')
   $null=Publish-MIRModDirectoryArchive -Source $upgradeFixture -Name 'assert-upgrade-control' -Version '1.0.0' -ModsDir $library
+  # Exercise Tin's actual selector with tiny archives and the real shared
+  # activation. This tests the staging conversion without replaying gameplay.
+  $tinHarness=Join-Path $RepoRoot 'tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1'
+  $tinAst=[Management.Automation.Language.Parser]::ParseFile($tinHarness,[ref]$tokens,[ref]$errors)
+  Assert-LibraryTest ($errors.Count-eq0) 'Tin direct-library runner parses'
+  foreach($name in @('Assert-Tin','Get-TinSha','Read-TinDirectLibraryInputs')){
+    $nodes=@($tinAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
+    if($nodes.Count-ne1){throw "Tin input function is absent or duplicated: $name"}
+    . ([scriptblock]::Create($nodes[0].Extent.Text))
+  }
+  $tinExpected=[ordered]@{'alpha_1.0.0.zip'=@{name='alpha';version='1.0.0';sha256=$hashes['alpha_1.0.0.zip']}}
+  $tinCandidate=[pscustomobject]@{path=(Join-Path $library 'more-infinite-research_4.2.21001.zip');receipt=@{distribution_version='4.2.21001'}}
+  $tinArguments=@{Library=$library;ExpectedArchives=$tinExpected;Candidate=$tinCandidate;FixtureRoot=$upgradeFixture;EngineVersion='2.1.20';OfficialMods=@('base','elevated-rails','quality','recycler','space-age')}
+  $tinZipCount=@(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.zip').Count
+  $tinDirect=Read-TinDirectLibraryInputs @tinArguments
+  Assert-LibraryTest ($tinDirect.archive_hashes.Count-eq3-and$tinDirect.mod_list.mods.Count-eq8) 'Tin projects full identity records into resolver hashes and exact profile rows'
+  $tinProfile=Join-Path $profiles 'tin-selection.json';Write-TestJson $tinProfile $tinDirect.mod_list
+  $activation=Start-MIRLibraryActivation $library $data $tinProfile $tinDirect.archive_hashes -SettingsMode File -SettingsPath $privateSettings -SettingsSha256 (Get-MIRImmutableInputSha256 $privateSettings)
+  Assert-LibraryTest (@($activation.selected|Where-Object {$_.name-ceq'alpha'-and$_.version-ceq'1.0.0'}).Count-eq1) 'Tin selects the pinned older archive with multiple versions installed'
+  Assert-LibraryTest (@($activation.selected|Where-Object {$_.name-ceq'more-infinite-research'-and$_.version-ceq'4.2.21001'}).Count-eq1) 'Tin selects source patch one'
+  Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity (Join-Path $library 'mod-settings.dat'))-cne(Get-MIRImmutableInputFileIdentity $privateSettings)) 'Tin settings remain private writable bytes'
+  $terminal=Complete-MIRLibraryActivation $activation;$activation=$null
+  Assert-LibraryTest ($terminal.dependency_payload_bytes_copied-eq0) 'Tin restores controls without archive staging'
+  $tinArguments.ExpectedArchives=[ordered]@{'alpha_9.0.0.zip'=@{name='alpha';version='9.0.0';sha256=$hashes['alpha_1.0.0.zip']}}
+  Assert-LibraryRefusal {Read-TinDirectLibraryInputs @tinArguments} 'dependency-missing'
+  $tinArguments.ExpectedArchives=$tinExpected
+  $tinExpected['alpha_1.0.0.zip'].sha256='0'*64
+  Assert-LibraryRefusal {Read-TinDirectLibraryInputs @tinArguments} 'dependency-hash'
+  $tinExpected['alpha_1.0.0.zip'].sha256=$hashes['alpha_1.0.0.zip']
+  $tinDonor=Join-Path $root 'tin-candidate-donor';[IO.Directory]::CreateDirectory($tinDonor)|Out-Null
+  $tinCandidate.path=Join-Path $tinDonor 'more-infinite-research_4.2.21001.zip'
+  [IO.File]::WriteAllText($tinCandidate.path,'different controlled candidate bytes')
+  Assert-LibraryRefusal {Read-TinDirectLibraryInputs @tinArguments} 'library candidate bytes differ'
+  $tinCandidate.path=Join-Path $library 'more-infinite-research_4.2.21001.zip'
+  [IO.File]::WriteAllText((Join-Path $upgradeFixture 'control.lua'),'-- changed controlled upgrade assertions')
+  Assert-LibraryRefusal {Read-TinDirectLibraryInputs @tinArguments} 'mir-library-fixture-member'
+  [IO.File]::WriteAllText((Join-Path $upgradeFixture 'control.lua'),'-- controlled upgrade assertions')
+  Assert-LibraryTest (@(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.zip').Count-eq($tinZipCount+1)) 'Tin adds no archives beyond the explicit tiny mismatch fixture'
+  $tinParameters=[scriptblock]::Create($tinAst.ParamBlock.Extent.Text+"`nreturn ,`$LocalModLibraryDirs")
+  Assert-LibraryTest ((& $tinParameters -RepoRoot $RepoRoot -FactorioBin unused).Count-eq0) 'Tin requires an explicit machine-local library'
+  Assert-LibraryRefusal {& $tinHarness -FactorioBin unused -RecoverRun retired} 'mir-tin-obsolete-runner-mode'
+  Assert-LibraryRefusal {& $tinHarness -FactorioBin unused -ExactStageRoot retired} 'mir-tin-obsolete-runner-mode'
   $upgradeSettings=Join-Path $root 'upgrade-settings.dat'
   foreach($version in @('4.2.21000','4.2.21001')){
     $archive=Join-Path $library ('more-infinite-research_'+$version+'.zip')

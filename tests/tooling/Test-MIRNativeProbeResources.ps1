@@ -484,18 +484,6 @@ try {
     $expected['controlled-k2_1.0.0.zip']=@('wrong-identity','1.0.0')
     Refuses-Probe {Read-K2213DependencyInputs -Observation $observation -ExpectedDependencies $expected -Libraries @($flat) -ObservationPath $observationPath} 'archive-name'
 
-    $resources=[pscustomobject]@{controlled=$true};$engine='controlled-tin-engine';$calls=[Collections.Generic.List[object]]::new()
-    $tinActorStdout=Join-Path $run 'actor.stdout';$tinActorStderr=Join-Path $run 'actor.stderr'
-    [IO.File]::WriteAllText($tinActorStdout,'controlled healthy output');[IO.File]::WriteAllText($tinActorStderr,'')
-    [IO.File]::WriteAllText((Join-Path $run 'factorio-current.log'),'controlled native log')
-    function Invoke-MIRNativeProbeFactorioProcess {param($Context,$FilePath,$Arguments,$TimeoutSeconds);$calls.Add(@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds});if($Arguments-contains'controlled-failure'){throw 'controlled governed interruption'};[IO.File]::WriteAllText((Join-Path $run 'factorio-current.log'),'controlled native log');[pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{duration_seconds=0.01}}}
-    function Get-MIRNativeProbeRemainingOutputBytes {param($Context);return 1MB}
-    $save=Join-Path $run 'owned-save.zip';[IO.File]::WriteAllText($save,'controlled saved state')
-    $reload=Invoke-TinBoundedReload -Factorio $engine -RunRoot $run -Scenario controlled -SavePath $save -Ticks 30000 -TimeoutSeconds 240
-    Assert-Probe ($reload.passed-and$reload.save_byte_identical-and$reload.benchmark_ticks-eq30000) 'Tin continuation lost saved-state and tick bounds.'
-    Assert-Probe ($calls.Count-eq1-and$calls[0].context.controlled-and$calls[0].path-ceq$engine-and$calls[0].timeout-eq240-and'--benchmark-sanitize'-in$calls[0].arguments) 'Tin continuation bypassed governor or changed reload arguments.'
-    Refuses-Probe {Invoke-TinGovernedEngine -Scenario refused -Arguments @('controlled-failure') -TimeoutSeconds 240} 'controlled governed interruption'
-    Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $run 'refused.factorio.log'))) 'Tin continuation wrote a successful log after interruption.'
     $function=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-MIRCompatFactorioProcess'},$false))
     Assert-Probe ($function.Count-eq1) 'K2 continuation governed collector adapter absent.'
     . ([scriptblock]::Create($function[0].Extent.Text))
@@ -508,6 +496,26 @@ try {
     $profilePath=Join-Path $run 'selection.json'
     [IO.File]::WriteAllText($profilePath,'{"mods":[{"name":"base","version":"2.1.20","enabled":true},{"name":"controlled-k2","version":"1.0.0","enabled":true}]}')
     $activation=Start-MIRLibraryActivation -LibraryDirectory $flat -EngineDataDirectory $data -ProfilePath $profilePath -ArchiveHashes @{'controlled-k2_1.0.0.zip'=(Get-K2213Sha256 $dependency)}
+    try {
+    $resources=[pscustomobject]@{controlled=$true};$engine=$controlledEngine;$calls=[Collections.Generic.List[object]]::new()
+    $tinActorStdout=Join-Path $run 'actor.stdout';$tinActorStderr=Join-Path $run 'actor.stderr'
+    [IO.File]::WriteAllText($tinActorStdout,'controlled healthy output');[IO.File]::WriteAllText($tinActorStderr,'')
+    [IO.File]::WriteAllText((Join-Path $run 'factorio-current.log'),'controlled native log')
+    function Invoke-MIRNativeProbeFactorioProcess {param($Context,$FilePath,$Arguments,$TimeoutSeconds);$calls.Add(@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds});if($Arguments-contains'controlled-failure'){throw 'controlled governed interruption'};[IO.File]::WriteAllLines((Join-Path $run 'factorio-current.log'),@($activation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$_.version+' (data.lua)'}));[pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{duration_seconds=0.01}}}
+    function Get-MIRNativeProbeRemainingOutputBytes {param($Context);return 1MB}
+    $config=Join-Path $run 'mir-compat-config.ini'
+    [IO.File]::WriteAllText($config,"[path]`nread-data=$data`nwrite-data=$run`n[other]`nenable-new-mods=false`n")
+    $save=Join-Path $run 'owned-save.zip' ;[IO.File]::WriteAllText($save,'controlled saved state')
+    $reload=Invoke-TinBoundedReload -Factorio $engine -RunRoot $run -Scenario controlled -SavePath $save -Ticks 30000 -TimeoutSeconds 240
+    Assert-Probe ($reload.passed-and$reload.save_byte_identical-and$reload.benchmark_ticks-eq30000) 'Tin continuation lost saved-state and tick bounds.'
+    Assert-Probe ($calls.Count-eq1-and$calls[0].context.controlled-and$calls[0].path-ceq$engine-and$calls[0].timeout-eq240-and'--benchmark-sanitize'-in$calls[0].arguments) 'Tin continuation bypassed governor or changed reload arguments.'
+    Refuses-Probe {Invoke-TinGovernedEngine -Scenario refused -Arguments @($calls[0].arguments+'controlled-failure') -TimeoutSeconds 240} 'controlled governed interruption'
+    Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $run 'refused.factorio.log'))) 'Tin continuation wrote a successful log after interruption.'
+    Assert-Probe ($calls[0].arguments[[Array]::IndexOf($calls[0].arguments,'--mod-directory')+1]-ceq$flat) 'Tin reload did not use the selected master library.'
+    $beforeWrongPath=$calls.Count
+    $wrongPathArgs=@($calls[0].arguments);$wrongPathArgs[[Array]::IndexOf($wrongPathArgs,'--mod-directory')+1]=Join-Path $run 'obsolete-mods'
+    Refuses-Probe {Invoke-TinGovernedEngine -Scenario wrong-library -Arguments $wrongPathArgs -TimeoutSeconds 240} 'mir-library-launch-directory'
+    Assert-Probe ($calls.Count-eq$beforeWrongPath-and-not(Test-Path -LiteralPath (Join-Path $run 'obsolete-mods'))) 'Tin ran or staged after an obsolete library path.'
     $calls.Clear();$budgets=[Collections.Generic.List[object]]::new()
     function Get-MIRNativeProbeRemainingOutputBytes {param($Context);$budgets.Add($Context);return 1MB}
     function Invoke-MIRNativeProbeFactorioProcess {
@@ -521,7 +529,6 @@ try {
       [IO.File]::WriteAllLines((Join-Path $run 'factorio-current.log'),$lines)
       [pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=0.01}}
     }
-    try {
     $create=Invoke-MIRFactorioLoadCheck -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -ScenarioTimeoutSeconds 90 -LibraryActivation $activation
     $reload=Invoke-MIRFactorioReloadContract -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -SavePath $create.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 90 -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation
     Assert-Probe ($create.passed-and$reload.passed-and$calls.Count-eq2-and$budgets.Count-eq2) 'K2 create/reload collectors did not use the shared governed row.'
