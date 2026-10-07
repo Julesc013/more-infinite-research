@@ -1,0 +1,106 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0120",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Require compatible acquired drills for wet mining and fluid resource sources.",
+  "details": [
+    "Resource extraction that consumes or produces fluid requires an independently acquired compatible mining drill. Native category, positive speed, fluid-box filters and item-output declarations constrain admission; dry sources and independent alternatives remain eligible.",
+    "Drill acquisition and mining-input research gates survive into lab and science progression. Unseeded placement/input cycles cannot create an initial source, and actual recipe replacement invalidates warm actor acquisition. Stable technology and ownership identities remain unchanged.",
+    "Controlled lab, researchability and source-epoch consumers exercise these decisions. Installed field/declaration readback is not engine execution. Current-package production, native placement, power, fluid delivery, catalogue preservation and saved-world acceptance remain unqualified."
+  ],
+  "semantic_domains": [
+    "science",
+    "progression",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Shared resource-extraction acquisition guard; wet-mining fields follow the target adapter. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/compiler/lab_reachability.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/researchability_planning.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/recipe_source_epoch.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/science-integration.md",
+      "kind": "document"
+    }
+  ]
+}

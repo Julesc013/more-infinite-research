@@ -286,6 +286,7 @@ local function reset_state(state, epoch, context, recipe_index)
   state.stable_acquisition_memo = {}
   state.machine_categories = nil
   state.machine_placement_items = {}
+  state.mining_drills = nil
   state.capturable_spawners = nil
   state.source_catalog = nil
   state.surface_locations = nil
@@ -462,19 +463,31 @@ local function mining_fluid_input(source)
 end
 
 local function append_minable_sources(sources, prototype_type, witness_kind, options)
-  for _, source in pairs(data_raw.prototypes(prototype_type)) do
+  for name, source in pairs(data_raw.prototypes(prototype_type)) do
     if not diagnostic_visit(options) then return false end
     local mining_input = mining_fluid_input(source)
+    local requirement = {category = source.category or "basic-solid", fluid_outputs = {},
+      item_output = false, required = not not mining_input, unsupported = prototype_type ~= "resource"}
+    -- A drill extracts resources. A fluid-dependent tree/plant/chunk cannot
+    -- gain an invented drill or hand-mining witness through MinableProperties.
     for _, result in ipairs(minable_results(source)) do
       if not diagnostic_visit(options) then return false end
       local identity = normalize_identity(result)
       if identity and mining_input ~= nil and entry_positive(result) then
+        if identity.type == "fluid" then
+          requirement.fluid_outputs[identity.name], requirement.required = true, true
+        elseif identity.type == "item" then requirement.item_output = true end
         local key = identity_key(identity)
         sources[key] = sources[key] or {}
         table.insert(sources[key], {
           kind = witness_kind,
+          prototype = source.name or name,
+          prototype_type = prototype_type,
           product = identity,
           mining_input = mining_input or nil,
+          -- The private requirement is completed by this one charged result
+          -- traversal before the catalogue is exposed to any source query.
+          mining_actor = requirement,
           surface_conditions = deepcopy(source.surface_conditions)
         })
       end
@@ -656,7 +669,8 @@ local function default_source_catalog(state, options)
   if not append_boiler_sources(sources, options) then return sources end
   for _, candidates in pairs(sources) do
     table.sort(candidates, function(left, right)
-      local left_actor, right_actor = left.source_actor ~= nil, right.source_actor ~= nil
+      local left_actor = not not (left.source_actor or left.mining_actor and left.mining_actor.required)
+      local right_actor = not not (right.source_actor or right.mining_actor and right.mining_actor.required)
       if left_actor ~= right_actor then return not left_actor end
       if left.kind ~= right.kind then return left.kind < right.kind end
       return tostring(left.prototype or "") < tostring(right.prototype or "")
@@ -680,6 +694,63 @@ local function source_actor_witness(actor, options, state)
         diagnostic_rollback(options, checkpoint)
         return {kind = "machine-placement", prototype = actor.prototype,
           prototype_type = actor.prototype_type, item = item_name, acquisition = acquired}
+      end
+    end
+  end
+  return nil
+end
+
+local function mining_actor_witness(requirement, input, options, state)
+  if requirement.unsupported then return nil end
+  if not state.mining_drills then
+    local drills = {}
+    for name, drill in pairs(data_raw.prototypes("mining-drill")) do
+      if not diagnostic_visit(options) then return nil end
+      local line = target_profiles.current_factorio_version
+      local legacy_box = line == "0.13" or line == "0.14"
+      local output_box = legacy_box and drill.fluid_box or nil
+      if not legacy_box then output_box = drill.output_fluid_box end
+      for _, category in ipairs(drill.resource_categories or {}) do
+        if not diagnostic_visit(options) then return nil end
+        drills[category] = drills[category] or {}
+        table.insert(drills[category], {prototype = drill.name or name,
+          prototype_type = "mining-drill", mining_speed = drill.mining_speed,
+          -- Connection graphics and pipe covers are not acquisition facts.
+          input_fluid_box = type(drill.input_fluid_box) == "table" and {filter = drill.input_fluid_box.filter} or nil,
+          output_fluid_box = type(output_box) == "table" and {filter = output_box.filter} or nil,
+          vector_to_place_result = deepcopy(drill.vector_to_place_result),
+          surface_conditions = deepcopy(drill.surface_conditions)})
+      end
+    end
+    for _, candidates in pairs(drills) do
+      table.sort(candidates, function(left, right) return left.prototype < right.prototype end)
+    end
+    state.mining_drills = drills
+  end
+  local checkpoint = diagnostic_checkpoint(options)
+  for _, drill in ipairs(state.mining_drills[requirement.category] or {}) do
+    if not diagnostic_visit(options) then return nil end
+    diagnostic_rollback(options, checkpoint)
+    local input_box, output_box = drill.input_fluid_box, drill.output_fluid_box
+    local compatible = finite_positive(drill.mining_speed)
+      and (not input or type(input_box) == "table"
+        and (input_box.filter == nil or input_box.filter == input.name))
+      and (not requirement.item_output or type(drill.vector_to_place_result) == "table")
+    local fluid_count = 0
+    for name in pairs(requirement.fluid_outputs) do
+      if not diagnostic_visit(options) then return nil end
+      fluid_count = fluid_count + 1
+      compatible = compatible and type(output_box) == "table"
+        and (output_box.filter == nil or output_box.filter == name)
+    end
+    -- Keep multi-fluid coproducts withheld: one output box supplies no
+    -- independent separation witness in this deliberately narrow model.
+    if compatible and fluid_count <= 1
+      and surface_satisfied(drill.surface_conditions, options, state) then
+      local witness = source_actor_witness(drill, options, state)
+      if witness then
+        diagnostic_rollback(options, checkpoint)
+        return witness
       end
     end
   end
@@ -712,10 +783,12 @@ local function source_witness(identity, options, state)
       local copied = deepcopy(witness)
       copied.surface_conditions = nil
       copied.source_actor = nil
+      copied.mining_actor = nil
       local input = witness.mining_input and witness.mining_input.identity
         or witness.kind == "boiler-conversion" and witness.input
       local actor = witness.source_actor
-      if not input and not actor then return copied end
+      local mining_actor = witness.mining_actor and witness.mining_actor.required and witness.mining_actor
+      if not input and not actor and not mining_actor then return copied end
       -- Unconditional sources keep their index-free preflight. A conditional
       -- source uses the existing typed acquisition solver only when selected,
       -- and retains its actor/input's complete research witnesses.
@@ -724,11 +797,13 @@ local function source_witness(identity, options, state)
       local key = identity_key(identity)
       if not state.visiting[key] then
         state.visiting[key] = true
-        local machine = actor and source_actor_witness(actor, options, state)
-        local acquired = input and (not actor or machine)
+        local machine = mining_actor and mining_actor_witness(mining_actor, input, options, state)
+          or actor and source_actor_witness(actor, options, state)
+        local requires_actor = actor or mining_actor
+        local acquired = input and (not requires_actor or machine)
           and acquisition_witness(input, options, state)
         state.visiting[key] = nil
-        if (not actor or machine) and (not input or acquired) then
+        if (not requires_actor or machine) and (not input or acquired) then
           copied.machine = machine or nil
           copied.ingredients = acquired and {acquired} or nil
           diagnostic_rollback(options, source_checkpoint)

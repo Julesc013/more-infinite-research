@@ -103,8 +103,20 @@ local function mining_fluid_world()
   next_raw.fluid = {acid={type='fluid',name='acid'}}
   next_raw.resource = {ore={type='resource',name='ore',minable={
     mining_time=1,result='lab-kit',fluid_amount=10,required_fluid='acid'}}}
+  next_raw['mining-drill'] = {miner={type='mining-drill',name='miner',
+    resource_categories={'basic-solid'},mining_speed=1,vector_to_place_result={0,-1},
+    input_fluid_box={production_type='input'},output_fluid_box={production_type='output'}}}
+  next_raw.item['miner-kit']={type='item',name='miner-kit',place_result='miner'}
+  next_raw.recipe.make_miner=recipe('make_miner','miner-kit')
   return next_raw
 end
+raw = mining_fluid_world()
+raw.resource.acid={minable={results={{type='fluid',name='acid',amount=1}}}}
+raw.recipe.make_miner=nil
+run(raw,function()
+  check('LRMA/missing-drill-item',not lab.valid_research_ingredients({{'A',1},{'B',1}}),
+    'An acquired mining fluid cannot substitute for acquisition of a compatible drill')
+end)
 for _, case in ipairs({
   {id='missing-fluid',expected=false},
   {id='same-named-item',item=true,expected=false},
@@ -150,6 +162,70 @@ for _, case in ipairs({
       'Mining acquisition preserves prototype inputs: '..case.id)
   end)
 end
+ -- Actual modern native pumps draw the declared tile fluid through their
+-- Conditional mining also retains the selected compatible placement actor.
+for _, case in ipairs({
+  {id='acquired-drill',expected=true,mutate=function()end},
+  {id='missing-drill',expected=false,mutate=function(r)r['mining-drill']={}end},
+  {id='missing-placement',expected=false,mutate=function(r)r.item['miner-kit'].place_result=nil end},
+  {id='unacquired-placement',expected=false,mutate=function(r)r.recipe.make_miner=nil end},
+  {id='wrong-category',expected=false,mutate=function(r)r['mining-drill'].miner.resource_categories={'foreign'}end},
+  {id='missing-input-box',expected=false,mutate=function(r)r['mining-drill'].miner.input_fluid_box=nil end},
+  {id='wrong-input-filter',expected=false,mutate=function(r)r['mining-drill'].miner.input_fluid_box.filter='water'end},
+  {id='missing-output-box',expected=false,mutate=function(r)r['mining-drill'].miner.output_fluid_box=nil end},
+  {id='wrong-output-filter',expected=false,mutate=function(r)r['mining-drill'].miner.output_fluid_box.filter='water'end},
+  {id='zero-speed',expected=false,mutate=function(r)r['mining-drill'].miner.mining_speed=0 end},
+  {id='missing-item-output',expected=false,mutate=function(r)r['mining-drill'].miner.vector_to_place_result=nil end},
+  {id='placement-cycle',expected=false,mutate=function(r)r.recipe.make_miner.ingredients={{'lab-kit',1}}end},
+  {id='independent-drill',expected=true,mutate=function(r)
+    r['mining-drill'].unacquired={name='unacquired',mining_speed=1,resource_categories={'basic-solid'},
+      input_fluid_box={},output_fluid_box={},vector_to_place_result={0,0}}
+    r.item['unacquired-kit']={type='item',name='unacquired-kit',place_result='unacquired'}
+  end},
+  {id='independent-lab',expected=true,mutate=function(r)r.recipe.make_miner=nil;r.recipe.make_lab=recipe('make_lab','lab-kit')end},
+  {id='dry-hand-source',expected=true,mutate=function(r)r['mining-drill']={};r.resource.ore.minable.fluid_amount=0 end},
+  {id='multiple-resource-fluids',expected=false,mutate=function(r)
+    r.resource.acid.minable.results[2]={type='fluid',name='other-fluid',amount=1}
+  end}
+}) do
+  raw=mining_fluid_world()
+  raw.resource.acid={minable={results={{type='fluid',name='acid',amount=1}}}}
+  case.mutate(raw)
+  run(raw,function()
+    local before=fingerprint.of(data.raw)
+    check('LRMA/'..case.id,lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+      'Wet/resource-fluid mining requires a compatible acquired drill: '..case.id)
+    check('LRMA/'..case.id..'/research',(researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'The actual researchability consumer retains mining actor admission: '..case.id)
+    check('LRMA/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Mining actor reading preserves supplied prototypes: '..case.id)
+  end)
+end
+raw=mining_fluid_world()
+raw.resource.acid={minable={results={{type='fluid',name='acid',amount=1}}}}
+raw.recipe.make_miner.enabled=false
+raw.recipe.make_B.ingredients={{'lab-kit',1}}
+raw.lab.early={name='early',inputs={'A'}}
+raw.item['early-kit']={type='item',name='early-kit',place_result='early'}
+raw.recipe.make_early=recipe('make_early','early-kit')
+raw.technology.DrillUnlock=research({'A'})
+raw.technology.DrillUnlock.effects={{type='unlock-recipe',recipe='make_miner'}}
+run(raw,function(owner)
+  check('LRMA/frontier/status',production.pack_production_status('B',{})=='research',
+    'A resource-backed pack retains the independently research-gated drill')
+  local gates=production.prereq_techs_for_science_pack('B')
+  check('LRMA/frontier/gate',#gates==1 and gates[1]=='DrillUnlock',
+    'Both wet item mining and its mined input retain the actual drill unlock')
+  local routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+  local state=assert(owner:state_view('science_pack_production').route_witness_state)
+  check('LRMA/frontier/initial',routes.source_witness('lab-kit',nil,state)==nil,
+    'A warm researched drill cannot become an initial source')
+end)
+raw.technology.DrillUnlock.unit.ingredients={{'B',1}}
+run(raw,function()
+  check('LRMA/self-funding',not lab.valid_research_ingredients({{'A',1},{'B',1}}),
+    'A drill unlock cannot fund itself through the resource-backed pack')
+end)
 -- Actual modern native pumps draw the declared tile fluid through their
 -- source offset. Consume that source through lab construction and research.
 local function native_pump_world()
@@ -776,6 +852,10 @@ local function fluid_world()
   local next_raw = world()
   next_raw.fluid = {water={type='fluid',name='water'}}
   next_raw.resource = {water={minable={results={{type='fluid',name='water',amount=1}}}}}
+  next_raw['mining-drill']={miner={name='miner',resource_categories={'basic-solid'},mining_speed=1,
+    output_fluid_box={},vector_to_place_result={0,0}}}
+  next_raw.item['miner-kit']={type='item',name='miner-kit',place_result='miner'}
+  next_raw.recipe.make_miner=recipe('make_miner','miner-kit')
   return next_raw
 end
 local function add_fluid_builder(next_raw)
@@ -832,7 +912,7 @@ for _, case in ipairs({
   if case.wrong_direction then raw['assembling-machine'].builder.fluid_boxes = {{production_type='output'}} end
   if case.two_fluids then
     raw.fluid.acid = {type='fluid',name='acid'}
-    raw.resource.water.minable.results[2] = {type='fluid',name='acid',amount=1}
+    raw.resource.acid = {minable={results={{type='fluid',name='acid',amount=1}}}}
     local entries = case.output and raw.recipe.make_lab.results or raw.recipe.make_lab.ingredients
     entries[#entries+1] = {type='fluid',name='acid',amount=1}
   end
