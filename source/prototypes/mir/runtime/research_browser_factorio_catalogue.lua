@@ -95,7 +95,8 @@ function M.forget_force(index)
 end
 
 local function available(technology)
-  if not technology.enabled or technology.researched or technology.prototype.research_trigger then return false end
+  if not technology.enabled or technology.researched or technology.prototype.hidden
+      or technology.prototype.research_trigger then return false end
   for _, prerequisite in pairs(technology.prerequisites) do
     if not prerequisite.researched then return false end
   end

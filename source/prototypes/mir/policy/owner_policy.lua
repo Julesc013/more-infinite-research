@@ -2,8 +2,54 @@ local D = require("prototypes.mir.report.diagnostics_sink")
 local competing_productivity = require("prototypes.mir.policy.competing_productivity")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+local mods_api = require("prototypes.mir.platform.factorio.mods")
 
 local M = {}
+
+-- Published 4.2.20000 emitted these identities in SIF 1.0.60. Correcting
+-- researchability makes the native owners live, but removing the old MIR
+-- prototypes also removes already-earned effects from an upgraded save.
+-- Preserve only this observed, completely covered recipe set as hidden
+-- technologies. This grants no new route and never replaces a native owner.
+local earned_identity_recipes = {
+  research_low_density_structure = {
+    ["casting-low-density-structure"] = "low-density-structure-productivity",
+    ["low-density-structure"] = "low-density-structure-productivity",
+    ["scrap-recycling"] = "scrap-recycling-productivity"
+  },
+  research_plastic = {bioplastic = "plastic-bar-productivity", ["plastic-bar"] = "plastic-bar-productivity"},
+  research_processing_unit = {["processing-unit"] = "processing-unit-productivity"},
+  research_rocket_fuel = {
+    ["ammonia-rocket-fuel"] = "rocket-fuel-productivity",
+    ["rocket-fuel"] = "rocket-fuel-productivity", ["rocket-fuel-from-jelly"] = "rocket-fuel-productivity"
+  },
+  research_steel = {["casting-steel"] = "steel-plate-productivity", ["steel-plate"] = "steel-plate-productivity"}
+}
+
+function M.can_retain_earned_effects(key, spec, original, filtered, covered)
+  local expected = earned_identity_recipes[key]
+  if not expected or spec.automatic_family or spec.native_owner_binding or #filtered ~= 0
+      or (spec.technology_name and spec.technology_name ~= "recipe-prod-" .. key .. "-1") then return false end
+  local active = mods_api.snapshot()
+  if not string.match(active.base or "", "^2%.0%.") or not active["space-age"]
+      or active["space-is-fake"] ~= "1.0.60" then return false end
+  local recipes, count, expected_count = {}, 0, 0
+  for _ in pairs(expected) do expected_count = expected_count + 1 end
+  for _, bucket in ipairs(original) do
+    if type(bucket.change) ~= "number" or bucket.change ~= bucket.change
+        or bucket.change <= 0 or bucket.change == math.huge then return false end
+    for _, name in ipairs(bucket.recipes) do
+      if not expected[name] or recipes[name] then return false end
+      recipes[name], count = true, count + 1
+    end
+  end
+  if count ~= expected_count or #covered ~= expected_count then return false end
+  for _, row in ipairs(covered) do
+    if not recipes[row.recipe] or row.owners ~= expected[row.recipe] then return false end
+    recipes[row.recipe] = nil
+  end
+  return next(recipes) == nil
+end
 
 function M.recipe_names_from_effects(effects)
   return productivity_owners.recipe_names_from_effects(effects)

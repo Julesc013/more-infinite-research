@@ -126,4 +126,19 @@ function M.skip_row(key, spec, reason, ingredients, effects, lab_status, extra, 
   )
 end
 
+function M.retain_earned_effects(row)
+  -- The same stable identity and admitted effects reach the single emitter.
+  -- Hidden research keeps paid levels and old queue entries without offering
+  -- another visible progression route alongside the current native owner.
+  row.fields.hidden = true
+  row.reason = "retained_earned_recipe_productivity"
+  row.diagnostics.status, row.diagnostics.reason = "retained", row.reason
+  row.gates.owner_conflict_free = gate_contract.passed("owner-policy", {
+    "observed-f200-sif-released-identity",
+    "complete-current-native-owner-coverage",
+    "hidden-legacy-research-preserves-earned-effects"
+  })
+  return row
+end
+
 return M

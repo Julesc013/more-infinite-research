@@ -1,12 +1,16 @@
 -- Controlled checks of the native oracle's opposing cases. No Factorio proof.
 local assertions = 0
+package.preload["__more-infinite-research__/prototypes/mir/runtime/research_browser_actions"]=function()
+  return dofile('source/prototypes/mir/runtime/research_browser_actions.lua')
+end
+defines={input_action={start_research=1}}
 local function check(condition) assert(condition); assertions = assertions + 1 end
 local function world(mode)
   storage = {}
   script = {active_mods={['space-is-fake']='controlled', ['space-age']='controlled', ['more-infinite-research']='4.2.20000'}}
   helpers = {table_to_json=function() return 'controlled-observations' end}
   log = function() end
-  local force = {technologies={}, laboratory_speed_modifier=0.7,
+  local force = {technologies={}, laboratory_speed_modifier=0.7,index=1,research_enabled=true,
     get_gun_speed_modifier=function() return 0.4 end, reset_technology_effects=function() end}
   for _, name in ipairs({'weapon-shooting-speed-7','research-speed-7'}) do
     local anchor=name:gsub('7$','6')
@@ -39,6 +43,9 @@ local function world(mode)
   if mode=='manufacturing' then
     script.active_mods.base='2.0.77'
     force.recipes={}
+    force.research_queue={{name='mining-productivity-3'}}
+    force.research_progress=0.37
+    force.add_research=function(name) table.insert(force.research_queue,force.technologies[name]); return true end
     local families={
       {'low_density_structure','casting-low-density-structure','low-density-structure','scrap-recycling'},
       {'plastic','bioplastic','plastic-bar'}, {'processing_unit','processing-unit'},
@@ -47,7 +54,7 @@ local function world(mode)
     }
     for _, row in ipairs(families) do
       local name='recipe-prod-research_'..row[1]..'-1'
-      force.technologies[name]={name=name,level=1,researched=false,enabled=true,saved_progress=0,
+      force.technologies[name]={valid=true,force=force,prototype={hidden=true},prerequisites={},name=name,level=1,researched=false,enabled=true,saved_progress=0,
         research_unit_ingredients={{name='automation-science-pack',amount=1}}}
       for slot=2,#row do force.recipes[row[slot]]={productivity_bonus=0} end
     end
@@ -61,6 +68,13 @@ local function world(mode)
     end
   end
   game={forces={player=force}}
+  game.create_force=function(name)
+    local fresh={technologies={},recipes={},reset_technology_effects=function() end}
+    for key in pairs(force.technologies) do fresh.technologies[key]={level=1,researched=false,saved_progress=0} end
+    for key in pairs(force.recipes) do fresh.recipes[key]={productivity_bonus=0} end
+    game.forces[name]=fresh
+    return fresh
+  end
   local oracle=dofile('tests/support/MIR421SpaceFakeUpgrade.lua')
   oracle.capture()
   if mode=='introduced' or mode=='manufacturing' then
@@ -129,9 +143,26 @@ force,oracle=world('manufacturing')
 local earned=storage.mir421_space_fake_upgrade.manufacturing
 check(earned.recipe_bonuses['casting-steel']==0.5 and earned.recipe_bonuses['scrap-recycling']==0.1
   and earned.recipe_bonuses['plastic-bar']==0.5)
-for name in pairs(earned.technologies) do force.technologies[name]=nil end
 check(pcall(oracle.verify,'upgrade'))
 check(pcall(oracle.verify,'reload'))
+for _, change in ipairs({
+  function(f) f.technologies['recipe-prod-research_plastic-1']=nil end,
+  function(f) f.technologies['recipe-prod-research_steel-1'].level=5 end,
+  function(f) f.technologies['recipe-prod-research_plastic-1'].saved_progress=0 end,
+  function(f) f.technologies['recipe-prod-research_plastic-1'].enabled=false end,
+  function(f) f.technologies['recipe-prod-research_plastic-1'].prototype.hidden=false end,
+  function(f) table.remove(f.research_queue,2) end,
+  function(f) f.research_queue[1],f.research_queue[2]=f.research_queue[2],f.research_queue[1] end,
+  function(f) f.research_progress=0 end,
+  function() game.forces['mir421-fresh-manufacturing'].recipes['casting-steel'].productivity_bonus=0.1 end,
+  function() game.forces['mir421-fresh-manufacturing'].technologies['recipe-prod-research_plastic-1'].level=2 end
+}) do
+  force,oracle=world('manufacturing')
+  check(pcall(oracle.verify,'upgrade'))
+  change(force)
+  check(not pcall(oracle.verify,'upgrade'))
+  check(not pcall(oracle.verify,'reload'))
+end
 for name in pairs(earned.recipe_bonuses) do
   force,oracle=world('manufacturing')
   force.recipes[name].productivity_bonus=0

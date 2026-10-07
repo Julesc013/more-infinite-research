@@ -296,6 +296,51 @@ native_owner_rejections={}
 external_owner_records={}
 owner_diagnostics={}
 
+do
+ local previous_mods=active_mods
+ active_mods={base='2.0.77',['space-age']='2.0.77',['space-is-fake']='1.0.60'}
+ local buckets={{change=0.1,recipes={'bioplastic','plastic-bar'}}}
+ local rows={{recipe='bioplastic',owners='plastic-bar-productivity'},
+   {recipe='plastic-bar',owners='plastic-bar-productivity'}}
+ local function admitted(spec,original,filtered,covered)
+  return owner_policy.can_retain_earned_effects('research_plastic',spec or {},original or buckets,filtered or {},covered or rows)
+ end
+ check('ER01',admitted(),'Observed F200 SIF paid identity can retain its complete native-covered effects')
+ for _, value in ipairs({'1.0.59','1.0.61'}) do
+  active_mods['space-is-fake']=value
+  check('ER02-'..value,not admitted(),'Unobserved SIF release cannot admit legacy reward retention')
+ end
+ active_mods['space-is-fake']='1.0.60'
+ active_mods.base='2.1.21'
+ check('ER03',not admitted(),'F210 does not inherit the F200 retention observation')
+ active_mods.base='2.0.77';active_mods['space-age']=nil
+ check('ER04',not admitted(),'Absent Space Age cannot admit the observed native owner set')
+ active_mods['space-age']='2.0.77'
+ check('ER05',not admitted({automatic_family={}}) and not admitted({native_owner_binding={}}),
+   'Automatic families and adoption remain outside stable reward retention')
+ check('ER06',not admitted({technology_name='unrelated-identity'}), 'Retention cannot create a replacement identity')
+ check('ER07',not admitted(nil,nil,{{change=0.1,recipes={'new-route'}}}),
+   'A partially owned active stream cannot become a hidden legacy stream')
+ check('ER08',not admitted(nil,{{change=0.1,recipes={'bioplastic'}}}), 'Missing prior recipe cannot be called complete retention')
+ check('ER09',not admitted(nil,{{change=0.1,recipes={'bioplastic','plastic-bar','other'}}}),
+   'Retention never grants an additional recipe')
+ check('ER10',not admitted(nil,{{change=0.1,recipes={'bioplastic','bioplastic'}}}), 'Duplicate recipes are refused')
+ check('ER11',not admitted(nil,nil,nil,{{recipe='bioplastic',owners='unrelated-owner'},rows[2]}),
+   'Another owner cannot supply the observed coverage')
+ check('ER12',not admitted(nil,nil,nil,{rows[1],{recipe='plastic-bar',owners='plastic-bar-productivity,other'}}),
+   'An extra owner remains blocking')
+ check('ER13',not admitted(nil,nil,nil,{rows[1],rows[1]}), 'Duplicate coverage cannot hide missing coverage')
+ for index, change in ipairs({0,-0.1,math.huge,0/0}) do
+  check('ER14-'..index,not admitted(nil,{{change=change,recipes={'bioplastic','plastic-bar'}}}),
+    'Only positive finite already-admitted effects can be retained')
+ end
+ check('ER15',not owner_policy.can_retain_earned_effects('unobserved',{},buckets,{},rows),
+   'Unobserved research is not added by reward retention')
+ check('ER16',#buckets==1 and #buckets[1].recipes==2 and buckets[1].change==0.1 and #rows==2,
+   'Retention eligibility does not mutate caller buckets or owner records')
+ active_mods=previous_mods
+end
+
 data.raw.lab={
  early={inputs={'automation-science-pack','logistic-science-pack','military-science-pack','chemical-science-pack'}},
  late={inputs={'space-science-pack','kr-matter-tech-card'}}
