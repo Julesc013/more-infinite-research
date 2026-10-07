@@ -406,6 +406,8 @@
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/support/MIR421SpaceFakeUpgrade.ps1",
         "tests/tooling/Test-MIRLibraryActivation.ps1"
       ]
     },

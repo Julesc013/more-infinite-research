@@ -167,6 +167,64 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   [IO.File]::WriteAllText((Join-Path $fixtureRoot 'control.lua'),'-- changed fixture body')
   Assert-LibraryRefusal {Read-K2213DirectLibraryInputs -Library $library -Inputs $tinyInputs -FixtureRoot $fixtureRoot} 'library-fixture-source:control.lua'
   Assert-LibraryTest (@(Get-ChildItem -LiteralPath $profiles -Recurse -File|Where-Object Extension -EQ '.zip').Count -eq 0) 'definition-only profiles'
+  # Consume the upgrade selector with both MIR versions installed together.
+  # The fixture archive is built once; phase switching only changes controls.
+  . (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
+  $null=New-TestArchive 'more-infinite-research' '4.2.21000'
+  $null=New-TestArchive 'more-infinite-research' '4.2.21001'
+  $upgradeFixture=Join-Path $root 'upgrade-assertions';[IO.Directory]::CreateDirectory($upgradeFixture)|Out-Null
+  Write-TestJson (Join-Path $upgradeFixture 'info.json') @{name='assert-upgrade-control';version='1.0.0';factorio_version='2.1';dependencies=@('base >= 2.1.0','more-infinite-research >= 4.2.21000')}
+  [IO.File]::WriteAllText((Join-Path $upgradeFixture 'control.lua'),'-- controlled upgrade assertions')
+  $null=Publish-MIRModDirectoryArchive -Source $upgradeFixture -Name 'assert-upgrade-control' -Version '1.0.0' -ModsDir $library
+  $upgradeSettings=Join-Path $root 'upgrade-settings.dat'
+  foreach($version in @('4.2.21000','4.2.21001')){
+    $archive=Join-Path $library ('more-infinite-research_'+$version+'.zip')
+    $selection=Get-MIRUpgradeLibrarySelection -Library $library -EngineDataDirectory $data -Archive $archive -Version $version -ExpectedSha256 (Get-MIRImmutableInputSha256 $archive) -FixtureDirectories @($upgradeFixture)
+    $profile=Join-Path $profiles ('upgrade-'+$version+'.json');Write-TestJson $profile $selection.mod_list
+    $settingsArgs=if($version-ceq'4.2.21001'){@{SettingsMode='File';SettingsPath=$upgradeSettings;SettingsSha256=Get-MIRImmutableInputSha256 $upgradeSettings}}else{@{SettingsMode='Defaults'}}
+    $activation=Start-MIRLibraryActivation $library $data $profile $selection.archive_hashes @settingsArgs
+    Assert-LibraryTest (@($activation.selected|Where-Object {$_.name-ceq'more-infinite-research'-and$_.version-ceq$version}).Count-eq1) ('upgrade selects exact '+$version)
+    if($version-ceq'4.2.21000'){
+      [IO.File]::WriteAllBytes((Join-Path $library 'mod-settings.dat'),[byte[]](2,7,9))
+      $settings=Read-MIRLibraryControl (Join-Path $library 'mod-settings.dat')
+      [IO.File]::WriteAllBytes($upgradeSettings,[Convert]::FromBase64String($settings.bytes))
+    }else{
+      Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $library 'mod-settings.dat'))-ceq(Get-MIRImmutableInputSha256 $upgradeSettings)) 'upgrade preserves predecessor settings in a private input'
+      $upgradeAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$tokens,[ref]$errors)
+      Assert-LibraryTest ($errors.Count-eq0) 'direct upgrade harness parses'
+      $function=@($upgradeAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-MIRUpgradeMonitoredProcess'},$true))
+      . ([scriptblock]::Create($function[0].Extent.Text))
+      $script:upgradeActivation=$activation;$script:upgradeProcessIndex=0;$script:upgradeResourceRuns=@()
+      $suiteRoot=$root;$root=Join-Path $suiteRoot 'upgrade-actor-run'
+      [IO.Directory]::CreateDirectory($root)|Out-Null
+      $script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=2MB;result_reserve_bytes=64KB}
+      Add-MIRNativeProbeLibraryActivation -Context $script:upgradeResourceContext -Activation $activation
+      $upgradePolicy=@{};$upgradePeakBytes=1MB
+      [IO.Directory]::CreateDirectory((Join-Path $root 'userdata'))|Out-Null
+      $upgradeConfig=Join-Path $root 'upgrade-config.ini'
+      [IO.File]::WriteAllLines($upgradeConfig,@('[path]',('read-data='+$data),('write-data='+(Join-Path $root 'userdata')),'[other]','enable-new-mods=false'))
+      $actor=(Get-Command Invoke-MIR441MonitoredProcess).ScriptBlock
+      function Invoke-MIR441MonitoredProcess {
+        param($FilePath,$Arguments,$WorkRoot,$LedgerPath,$Policy,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes,$TimeoutSeconds,$StdoutPath,$StderrPath,[switch]$AllowNonZeroExit,$CompletionPredicate)
+        Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]-ceq$library) 'upgrade process reads master library directly'
+        [IO.File]::WriteAllLines((Join-Path $WorkRoot 'userdata/factorio-current.log'),@($script:upgradeActivation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$_.version+' (data.lua)'}))
+        return [pscustomobject]@{exit_code=0;completion_predicate_observed=$false;peak_working_set_bytes=1024;duration_seconds=0.01}
+      }
+      try{
+        $result=Invoke-MIRUpgradeMonitoredProcess -FilePath $engine -Arguments @('--config',$upgradeConfig,'--mod-directory',$library)
+        Assert-LibraryTest ($result.exit_code-eq0-and$script:upgradeResourceRuns.Count-eq1) 'actual upgrade actor adapter verifies loaded versions and retains resource result'
+      }finally{Set-Item Function:Invoke-MIR441MonitoredProcess -Value $actor;$root=$suiteRoot}
+    }
+    $terminal=Complete-MIRLibraryActivation $activation;$activation=$null
+    Assert-LibraryTest ($terminal.archive_links_created-eq0-and$terminal.dependency_payload_bytes_copied-eq0) 'upgrade phase stages no dependency payload'
+  }
+  Assert-LibraryTest (-not(Test-Path -LiteralPath (Join-Path $root 'source-profile'))-and-not(Test-Path -LiteralPath (Join-Path $root 'candidate-profile'))) 'upgrade creates no populated phase profiles'
+  $badArchive=Join-Path $library 'more-infinite-research_4.2.21001.zip'
+  Assert-LibraryRefusal {Get-MIRUpgradeLibrarySelection -Library $library -EngineDataDirectory $data -Archive $badArchive -Version '4.2.21001' -ExpectedSha256 ('0'*64) -FixtureDirectories @($upgradeFixture)} 'mir-upgrade-library-input-hash'
+  [IO.File]::WriteAllText((Join-Path $upgradeFixture 'control.lua'),'-- altered upgrade assertions')
+  Assert-LibraryRefusal {Get-MIRUpgradeLibrarySelection -Library $library -EngineDataDirectory $data -Archive $badArchive -Version '4.2.21001' -ExpectedSha256 (Get-MIRImmutableInputSha256 $badArchive) -FixtureDirectories @($upgradeFixture)} 'mir-library-fixture-member'
+  [IO.File]::WriteAllText((Join-Path $upgradeFixture 'control.lua'),'-- controlled upgrade assertionX')
+  Assert-LibraryRefusal {Get-MIRUpgradeLibrarySelection -Library $library -EngineDataDirectory $data -Archive $badArchive -Version '4.2.21001' -ExpectedSha256 (Get-MIRImmutableInputSha256 $badArchive) -FixtureDirectories @($upgradeFixture)} 'mir-library-fixture-source'
   # Legacy helpers must refuse external endpoints before creating directories,
   # deleting an existing target or falling back to a physical copy. No files
   # are created outside this test's checkout-contained scratch root.

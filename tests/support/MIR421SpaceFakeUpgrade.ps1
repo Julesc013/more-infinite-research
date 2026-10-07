@@ -20,7 +20,7 @@ function Get-MIR421SpaceFakeUpgradeDescriptor {
 function Resolve-MIR421SpaceFakeUpgradeInputs {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Descriptor,[string[]]$LocalModLibraryDirs=@())
   # The dependency library is a read-only input. No downloads or copy fallback.
-  if ($LocalModLibraryDirs.Count -eq 0) { $LocalModLibraryDirs=@(Join-Path (Split-Path -Parent $RepoRoot) ('testmods/'+$Descriptor.line)) }
+  if ($LocalModLibraryDirs.Count -eq 0) { throw '[mir-upgrade-library-required] Supply the selected machine-local archive library explicitly.' }
   $expected=[ordered]@{}
   foreach ($row in $Descriptor.inputs) { $expected[([string]$row.name+'_'+[string]$row.version+'.zip')]=[string]$row.sha256 }
   $resolved=Resolve-MIRNativeProbeDependencyInputs -StageRoot (Join-Path $RepoRoot ('build/tmp/mir421-sif-input-lookup-'+$Descriptor.target)) -ExpectedArchives $expected -LocalModLibraryDirs $LocalModLibraryDirs
@@ -29,6 +29,41 @@ function Resolve-MIR421SpaceFakeUpgradeInputs {
     $path = $resolved[$fileName].source_path
     [pscustomobject]@{source_path=$path;file_name=$fileName;expected_sha256=[string]$row.sha256;immutable=$true;role='native-sif-dependency';identity=[ordered]@{name=$row.name;version=$row.version;factorio_line=$Descriptor.line};provenance=[ordered]@{kind='verified-canonical-local-library';request='SIF-01'}}
   })
+}
+
+function Get-MIRUpgradeLibrarySelection {
+  param([Parameter(Mandatory)][string]$Library,[Parameter(Mandatory)][string]$EngineDataDirectory,
+    [Parameter(Mandatory)][string]$Archive,[Parameter(Mandatory)][string]$Version,
+    [Parameter(Mandatory)][string]$ExpectedSha256,[object[]]$Dependencies=@(),
+    [Parameter(Mandatory)][string[]]$FixtureDirectories,[bool]$EnableDlc=$false)
+  $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $Library -EngineDataDirectory $EngineDataDirectory)
+  $rows=[Collections.Generic.List[object]]::new();$hashes=[ordered]@{}
+  $builtins=@('base')
+  if($EnableDlc){$builtins+=@('elevated-rails','quality','space-age')}
+  if($EnableDlc-and@($inventory|Where-Object {$_.builtin-and$_.name-ceq'recycler'}).Count){$builtins+='recycler'}
+  foreach($name in $builtins){
+    $matches=@($inventory|Where-Object {$_.builtin-and$_.name-ceq$name})
+    if($matches.Count-ne1){throw "[mir-upgrade-builtin-missing] $name"}
+    $rows.Add([ordered]@{name=$name;version=$matches[0].version;enabled=$true})
+  }
+  $candidate=[ordered]@{file_name=[IO.Path]::GetFileName($Archive);expected_sha256=$ExpectedSha256;identity=@{name='more-infinite-research';version=$Version}}
+  foreach($inputRow in @($Dependencies)+@($candidate)){
+    $path=Join-Path $Library $inputRow.file_name
+    $matches=@($inventory|Where-Object {-not$_.builtin-and$_.name-ceq$inputRow.identity.name-and$_.version-ceq$inputRow.identity.version})
+    if($matches.Count-ne1-or$matches[0].path-cne$path){throw "[mir-upgrade-library-input-missing] $($inputRow.file_name)"}
+    if((Get-MIRImmutableInputSha256 $path)-cne$inputRow.expected_sha256){throw "[mir-upgrade-library-input-hash] $($inputRow.file_name)"}
+    $rows.Add([ordered]@{name=$matches[0].name;version=$matches[0].version;enabled=$true})
+    $hashes[$inputRow.file_name]=[string]$inputRow.expected_sha256
+  }
+  foreach($directory in $FixtureDirectories){
+    $info=Get-Content -LiteralPath (Join-Path $directory 'info.json') -Raw|ConvertFrom-Json
+    $name=$info.name+'_'+$info.version+'.zip';$path=Join-Path $Library $name
+    Assert-MIRLibraryFixtureArchive -Archive $path -SourceDirectory $directory
+    $rows.Add([ordered]@{name=$info.name;version=$info.version;enabled=$true})
+    $hashes[$name]=Get-MIRImmutableInputSha256 $path
+  }
+  if(@($rows|Group-Object {$_.name}|Where-Object Count -GT 1).Count){throw '[mir-upgrade-library-duplicate-name]'}
+  return [pscustomobject]@{mod_list=[ordered]@{mods=@($rows)};archive_hashes=$hashes}
 }
 
 function Get-MIRUpgradeLinkedArchiveBytes {

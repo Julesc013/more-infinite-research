@@ -202,6 +202,28 @@ function Start-MIRLibraryActivation {
   }
 }
 
+function Assert-MIRLibraryFixtureArchive {
+  param([Parameter(Mandatory)][string]$Archive,[Parameter(Mandatory)][string]$SourceDirectory)
+  Assert-MIRLibraryPath $SourceDirectory
+  if(-not(Test-Path -LiteralPath $Archive -PathType Leaf)){throw "[mir-library-fixture-missing] Install the prepared fixture once: $Archive"}
+  Assert-MIRLibraryPath $Archive
+  $info=Get-Content -LiteralPath (Join-Path $SourceDirectory 'info.json') -Raw|ConvertFrom-Json
+  $files=@(Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File)
+  $zip=[IO.Compression.ZipFile]::OpenRead($Archive)
+  try{
+    if($zip.Entries.Count-ne$files.Count){throw '[mir-library-fixture-membership]'}
+    foreach($file in $files){
+      Assert-MIRLibraryPath $file.FullName
+      $relative=[IO.Path]::GetRelativePath($SourceDirectory,$file.FullName).Replace('\','/')
+      $entry=$zip.GetEntry($info.name+'_'+$info.version+'/'+$relative)
+      if($null-eq$entry-or$entry.Length-ne$file.Length){throw "[mir-library-fixture-member] $relative"}
+      $stream=$entry.Open()
+      try{$hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))}finally{$stream.Dispose()}
+      if($hash-cne(Get-MIRImmutableInputSha256 $file.FullName)){throw "[mir-library-fixture-source] $relative"}
+    }
+  }finally{$zip.Dispose()}
+}
+
 function Assert-MIRLibraryActivation {
   param([Parameter(Mandatory)]$Activation)
   if($Activation.closed -or -not $Activation.lock.CanRead){throw '[mir-library-activation-closed]'}
