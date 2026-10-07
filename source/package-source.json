@@ -549,10 +549,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/domain/facts/recipe_semantics.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4016,
-      "source_sha256": "C9B9EF381A93B99EA3FA9F48124D17A0DCFECDE3851990E69DC7F5818254740D",
-      "output_bytes": 4016,
-      "output_sha256": "C9B9EF381A93B99EA3FA9F48124D17A0DCFECDE3851990E69DC7F5818254740D"
+      "source_bytes": 6622,
+      "source_sha256": "02959D64A366BAFFC4E04F396DC47052DE0F4DA12F3C0D2B14A3F2EB8F4226B3",
+      "output_bytes": 6622,
+      "output_sha256": "02959D64A366BAFFC4E04F396DC47052DE0F4DA12F3C0D2B14A3F2EB8F4226B3"
     },
     {
       "layer": "shared",
@@ -2901,10 +2901,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 50160,
-      "source_sha256": "4B745906A79FBD4D8EEFF52C56B45FB0879B00E2CB8CD273B4CD672EB83B5F0D",
-      "output_bytes": 50160,
-      "output_sha256": "4B745906A79FBD4D8EEFF52C56B45FB0879B00E2CB8CD273B4CD672EB83B5F0D"
+      "source_bytes": 50842,
+      "source_sha256": "D6E3A83A49B199C0D03235F84BF44956C51EC8999CB2CE334FCA9B25C59025D2",
+      "output_bytes": 50842,
+      "output_sha256": "D6E3A83A49B199C0D03235F84BF44956C51EC8999CB2CE334FCA9B25C59025D2"
     },
     {
       "layer": "capability",
@@ -4731,10 +4731,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/index/recipe_facts.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 23344,
-      "source_sha256": "5D1E33BC35C9CF692E23A11A1DBEE9F004509E5F0FD83A7606B1692F284795B1",
-      "output_bytes": 23344,
-      "output_sha256": "5D1E33BC35C9CF692E23A11A1DBEE9F004509E5F0FD83A7606B1692F284795B1"
+      "source_bytes": 23402,
+      "source_sha256": "4DF61F522F2683E60C758A49312DC6400CD2F8CAEE873B12892AA746EF5278E3",
+      "output_bytes": 23402,
+      "output_sha256": "4DF61F522F2683E60C758A49312DC6400CD2F8CAEE873B12892AA746EF5278E3"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "2552F541996BE2810F561EB3193F3DD255DA10A2D15236E52BE92CD6BB724ADF"
+  "record_sha256": "FC5471114E2A943B3C1655589CB68CCBC73D3654B87A34B2E8DF07D326D9BE91"
 }
