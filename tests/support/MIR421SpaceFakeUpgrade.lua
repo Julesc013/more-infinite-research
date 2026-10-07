@@ -1,6 +1,7 @@
 -- Native-only oracle copied into the two existing modern upgrade fixtures.
 -- It observes final prototypes and real force state; it creates no prototypes.
 local M = {}
+local browser_actions = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_actions")
 local names = {"weapon-shooting-speed-7", "research-speed-7"}
 local reload_checked = false
 local function fail(message) error("SIF-01 native upgrade: " .. message) end
@@ -41,6 +42,51 @@ local introduced_science = {
   ["research-speed-7"] = {"automation", "logistic", "chemical", "production", "utility", "military",
     "agricultural", "metallurgic", "electromagnetic", "cryogenic"}
 }
+-- These five paid CCC00 technologies disappear from the observed F200 SIF
+-- catalogue. Seed distinct earned levels so an owner change cannot pass merely
+-- because an unresearched predecessor and candidate both have zero bonuses.
+local manufacturing = {
+  {"low_density_structure", "casting-low-density-structure", "low-density-structure", "scrap-recycling"},
+  {"plastic", "bioplastic", "plastic-bar"},
+  {"processing_unit", "processing-unit"},
+  {"rocket_fuel", "ammonia-rocket-fuel", "rocket-fuel", "rocket-fuel-from-jelly"},
+  {"steel", "casting-steel", "steel-plate"}
+}
+local function queue_names(force)
+  local result = {}
+  for _, value in ipairs(force.research_queue or {}) do result[#result+1] = value.name end
+  return result
+end
+local function seed_manufacturing(record)
+  if record.predecessor_version ~= "4.2.20000" or record.space_is_fake_version ~= "1.0.60"
+      or not string.find(script.active_mods.base or "", "^2%.0%.") then return end
+  local force = game.forces.player
+  local earned = {technologies={}, recipe_bonuses={}}
+  for index, row in ipairs(manufacturing) do
+    local value = technology("recipe-prod-research_" .. row[1] .. "-1")
+    value.researched = false
+    value.level = index + 1
+    value.saved_progress = index / 10
+    if value.level ~= index + 1 or value.researched then fail("manufacturing level seed failed: " .. value.name) end
+    earned.technologies[value.name] = state(value)
+    for slot=2,#row do earned.recipe_bonuses[row[slot]] = index * 0.1 end
+  end
+  if not force.add_research("recipe-prod-research_plastic-1") then fail("could not queue paid manufacturing continuation") end
+  earned.queue, earned.progress = queue_names(force), force.research_progress
+  if #earned.queue < 2 or earned.queue[2] ~= "recipe-prod-research_plastic-1" then fail("manufacturing queue seed failed") end
+  record.manufacturing = earned
+end
+local function observe_manufacturing(record)
+  if not record.manufacturing then return end
+  local recipes = game.forces.player.recipes
+  for name, minimum in pairs(record.manufacturing.recipe_bonuses) do
+    local value = recipes[name]
+    if not value or type(value.productivity_bonus) ~= "number" or value.productivity_bonus < minimum - 0.000001 then
+      fail("predecessor manufacturing reward was not earned: " .. name)
+    end
+    record.manufacturing.recipe_bonuses[name] = value.productivity_bonus
+  end
+end
 function M.capture()
   if not script.active_mods["space-is-fake"] or not script.active_mods["space-age"] then fail("required native mod set absent") end
   local force = game.forces.player
@@ -64,7 +110,9 @@ function M.capture()
     end
     record.anchors[name] = state(anchor)
   end
+  seed_manufacturing(record)
   force.reset_technology_effects()
+  observe_manufacturing(record)
   record.lab_bonus = force.laboratory_speed_modifier
   record.bullet_speed_bonus = force.get_gun_speed_modifier("bullet")
   storage.mir421_space_fake_upgrade = record
@@ -115,6 +163,47 @@ function M.verify(stage)
   local force = game.forces.player
   if math.abs(force.laboratory_speed_modifier - record.lab_bonus) > 0.000001 or
     math.abs(force.get_gun_speed_modifier("bullet") - record.bullet_speed_bonus) > 0.000001 then fail("earned native reward changed") end
+  if record.manufacturing then
+    for name, before in pairs(record.manufacturing.technologies) do
+      local value = technology(name)
+      same_state(value, before)
+      if not value.prototype.hidden then fail("retained manufacturing identity is visible: " .. name) end
+      if browser_actions.can_enqueue({valid=true,force=force}, value, defines.input_action.start_research) then
+        fail("retained manufacturing identity can start new Library research: " .. name)
+      end
+    end
+    local queue, before_queue = queue_names(force), record.manufacturing.queue
+    if #queue ~= #before_queue then fail("manufacturing queue length changed") end
+    for index, name in ipairs(before_queue) do if queue[index] ~= name then fail("manufacturing queue order changed") end end
+    if math.abs(force.research_progress - record.manufacturing.progress) > 0.000001 then fail("queued research progress changed") end
+    local observed, changed = {}, {}
+    for name, before in pairs(record.manufacturing.recipe_bonuses) do
+      local recipe = force.recipes[name]
+      local actual = recipe and recipe.productivity_bonus
+      observed[name] = {before=before, actual=actual, present=recipe ~= nil}
+      if type(actual) ~= "number" or math.abs(actual - before) > 0.000001 then
+        changed[#changed+1] = name .. ": expected " .. tostring(before) .. ", actual " .. tostring(actual)
+      end
+    end
+    log("[mir-fixture] SIF-01 native manufacturing rewards stage=" .. stage .. " " .. helpers.table_to_json(observed))
+    if #changed > 0 then table.sort(changed); fail("earned manufacturing bonuses changed: " .. table.concat(changed, "; ")) end
+    -- A second, unresearched force uses the same final prototypes. Retaining
+    -- old identities must not grant a new game any of the paid bonuses above.
+    local fresh_name = "mir421-fresh-manufacturing"
+    local fresh = game.forces[fresh_name]
+    if not fresh and stage == "upgrade" then fresh = game.create_force(fresh_name) end
+    if not fresh then fail("fresh manufacturing comparison force absent") end
+    fresh.reset_technology_effects()
+    for name in pairs(record.manufacturing.technologies) do
+      local value = fresh.technologies[name]
+      if not value or value.researched or value.level ~= 1 or value.saved_progress ~= 0 then fail("fresh manufacturing research changed: " .. name) end
+    end
+    for name in pairs(record.manufacturing.recipe_bonuses) do
+      local value = fresh.recipes[name]
+      if not value or math.abs(value.productivity_bonus) > 0.000001 then fail("fresh force received unearned bonus: " .. name) end
+    end
+    log("[mir-fixture] SIF-01 native manufacturing state and fresh-force zero rewards stage=" .. stage)
+  end
   marker(stage)
   if stage == "reload" then reload_checked = true end
 end

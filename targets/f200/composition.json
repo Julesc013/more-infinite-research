@@ -2956,8 +2956,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed stream-compiler qualify responsibility for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11091,
-      "expected_sha256": "909B61C23A3C751EB73FA3CB57C6E0AC33BA63A507093D1F77B4F6EFF48D0C26",
+      "expected_bytes": 11388,
+      "expected_sha256": "78A0D50346D66B14FA15B927B298005A0FA73D1D39605E8D1446AB3357A79EEA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3868,8 +3868,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the bounded generic Factorio catalogue adapter for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8317,
-      "expected_sha256": "E47E94237B227F6442D222417BB9776E2D1DF9DA43AB2D28A33E4740C876859D",
+      "expected_bytes": 8354,
+      "expected_sha256": "9A957E505589591008DFDBAF64214583B81295C0155F4BB570BB1245BD7C3DE4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "package-excluded-no-mir-core-fixture",
@@ -3900,8 +3900,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the separate native queue permission predicate for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4828,
-      "expected_sha256": "6DF6106DA647220A709B69E46803531E1B5BFC0FF9B4A84840070CD794B7F558",
+      "expected_bytes": 4865,
+      "expected_sha256": "4AF3C0407D57C7CAA8E8B891D2DFF6D7EFF634A1EC70929832B6FE70DF2E81F1",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "permission-checked-native-queue",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "DE71A41777F0C5CE0A5FC66D2F4F4AD6B7A1ACAA7CC497A36D17BCD4709E04E9"
+  "record_sha256": "2303A82B9BE8FBD25DE119E85FE191304BCDF6CAE7B92BFA5131C8ED5CCD8E2B"
 }

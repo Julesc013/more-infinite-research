@@ -210,7 +210,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/release-process.md | Release Process | current | release-manager | how-to | mir-maintainers | 2026-08-14 |
 | docs/maintainer/report-diffing.md | Report Diffing | current | developer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/settings-governance.md | Settings Governance | current | maintainer | how-to | mir-maintainers | 2026-10-04 |
-| docs/maintainer/testing.md | Testing And Fixture Strategy | current | maintainer | how-to | mir-maintainers | 2026-10-07 |
+| docs/maintainer/testing.md | Testing And Fixture Strategy | current | maintainer | how-to | mir-maintainers | 2026-10-08 |
 | docs/maintainer/triage-playbook.md | Triage Playbook | current | maintainer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | Ultimate Convergence Follow-Up Audit Prompt | archived | maintainer | archive | mir-maintainers | 2026-08-08 |
 | docs/maintainer/validation.md | Validation | current | maintainer | how-to | mir-maintainers | 2026-07-12 |
@@ -388,7 +388,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | MIR 4.2 community implementation outcomes | current | maintainer | release-plan | mir-maintainers | 2026-09-11 |
-| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-10-07 |
+| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-10-08 |
 | docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-07 |
 | docs/releases/mir42-compatibility-playtest-plan.md | MIR 4.2 Compatibility Scope and Player Playtest Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-27 |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | MIR 4.2 Nine-Target Candidate and Playtest Matrix | current | release-manager | release-plan | mir-maintainers | 2026-10-08 |

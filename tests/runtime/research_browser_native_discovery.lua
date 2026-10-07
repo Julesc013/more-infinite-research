@@ -5,6 +5,7 @@ return function(core, adapter, check, snapshot, finish)
   local technology = "mir-browser-discovery-native"
   local searches = {"préparation témoin", "matière témoin ultime", "fluide témoin"}
   local deadline, records = game.tick + 600, {}
+  local function start_discovery()
   local function find(element, tag, value)
     if not (element and element.valid) then return nil end
     if element.tags and element.tags[tag] == value then return element end
@@ -43,7 +44,9 @@ return function(core, adapter, check, snapshot, finish)
     local id = player.request_translation(payload)
     check(core.translation_queue.requested(cache, technology, id, game.tick, subjects, limited),
       "engine accepts the composed native translation request")
-    local record = {player=player,id=id,cache=cache,phase=1,before=snapshot(player.force),started=game.tick}
+    local record = {player=player,id=id,cache=cache,phase=1,before=snapshot(player.force),started=game.tick,
+      display_width=player.display_resolution and player.display_resolution.width,
+      display_height=player.display_resolution and player.display_resolution.height,display_scale=player.display_scale}
     records[player.index] = record
     open(record)
   end
@@ -74,8 +77,17 @@ return function(core, adapter, check, snapshot, finish)
     for index, record in pairs(records) do
       local player = record.player
       check(player.valid and player.connected, "native discovery player stays connected")
-      check(record.root.valid and player.gui.screen.mir_research_browser == record.root
-        and record.search.valid and record.filter.valid,
+      local stable_gui = record.root.valid and player.gui.screen.mir_research_browser == record.root
+        and record.search.valid and record.filter.valid
+      if not stable_gui and log then
+        log("[mir-fixture] native discovery GUI change root=" .. tostring(record.root.valid)
+          .. " same=" .. tostring(player.gui.screen.mir_research_browser == record.root)
+          .. " search=" .. tostring(record.search.valid) .. " filter=" .. tostring(record.filter.valid)
+          .. " display-before=" .. tostring(record.display_width) .. "x" .. tostring(record.display_height)
+          .. "@" .. tostring(record.display_scale) .. " display-now=" .. tostring(player.display_resolution.width)
+          .. "x" .. tostring(player.display_resolution.height) .. "@" .. tostring(player.display_scale))
+      end
+      check(stable_gui,
         "native asynchronous discovery retains its original GUI objects")
       check(snapshot(player.force) == record.before, "native discovery preserves shared research and queue state")
       if record.phase <= #searches then
@@ -101,5 +113,35 @@ return function(core, adapter, check, snapshot, finish)
         native_players=#observations,searches=searches,physical_input_qualified=false,
         two_client_multiplayer_qualified=false})
     end
+  end)
+  end
+
+  -- The graphical client applies its window and UI scale after the save's first
+  -- tick. A resize legitimately rebuilds layout controls. Establish the widget
+  -- preservation witness only after two unchanged client display observations;
+  -- once discovery starts, every original-object assertion remains mandatory.
+  local displays, stable_ticks = {}, 0
+  local function display(player)
+    return tostring(player.display_resolution.width) .. ":"
+      .. tostring(player.display_resolution.height) .. ":" .. tostring(player.display_scale)
+  end
+  for _, player in pairs(game.connected_players) do
+    displays[player.index] = display(player)
+  end
+  if next(displays) == nil then start_discovery(); return end
+  script.on_nth_tick(1, function()
+    check(game.tick <= deadline, "native client display settles within the bounded discovery window")
+    local unchanged, count = true, 0
+    for _, player in pairs(game.connected_players) do
+      check(player.valid and player.connected and displays[player.index] ~= nil,
+        "native discovery retains its selected connected players during client setup")
+      local current = display(player)
+      if displays[player.index] ~= current then unchanged = false end
+      displays[player.index], count = current, count + 1
+    end
+    local expected = 0; for _ in pairs(displays) do expected = expected + 1 end
+    check(count == expected, "native discovery selected players remain connected during client setup")
+    stable_ticks = unchanged and stable_ticks + 1 or 0
+    if stable_ticks >= 2 then start_discovery() end
   end)
 end

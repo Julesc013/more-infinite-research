@@ -8,7 +8,7 @@
   "generated_output_root": "build/packages",
   "source_manifest": {
     "path": "source/package-source.json",
-    "record_sha256": "02DD7C29EDAC8E130CDDBF23B585FB8143B02B8D7F3BB55D014819FF21F3E567"
+    "record_sha256": "1A4F0A5587ADD1668CE7F5EA4B212CDCD29DB06414B9AB325294FCA5364B5BFF"
   },
   "target_registry": {
     "path": "targets/registry.json",
@@ -83,5 +83,5 @@
     "sealing": false,
     "publication": false
   },
-  "record_sha256": "985C79C30712AD147EB52F862EA31983F982B20387D36F19076D08554BB65B55"
+  "record_sha256": "98F88D33AD6F65681BCA1E04C2DC0CD8131A3E55A400AA8D55CAF1837E6AB23A"
 }

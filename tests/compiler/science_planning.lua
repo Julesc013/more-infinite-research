@@ -175,6 +175,9 @@ derived_unlockers={}
 -- unreachable-science answers; this is a controlled adapter regression, not
 -- a claim about a particular overhaul's final technology graph.
 stub('prototypes.mir.index.productivity_owners',{
+ recipe_names_from_effects=function(effects)
+  local out={};for _,effect in ipairs(effects or {}) do out[#out+1]=effect.recipe end;return out
+ end,
  recipe_productivity_effects=function(owner) return owner.effects or {} end,
  recipe_outputs_any_product=function(_, _) return true end,
  has_recipe_productivity_effect=function(owner, recipe_name)
@@ -295,6 +298,136 @@ end
 native_owner_rejections={}
 external_owner_records={}
 owner_diagnostics={}
+
+do
+ local previous_mods=active_mods
+ local previous_modules={};for name,value in pairs(package.loaded) do previous_modules[name]=value end
+ active_mods={base='2.0.77',['space-age']='2.0.77',['space-is-fake']='1.0.60'}
+ -- Read the actual declarations, including native-owner bindings. Unrelated
+ -- overhaul decoration is outside this controlled retention boundary.
+ local progression={legacy_max_level=function(_,_,value) return value end,
+   attach_py_sample_continuation=function() end}
+ for _,name in ipairs({'angel_petrochem_stream_keys','py_chemical_stream_keys',
+   'py_forestry_stream_keys','material_stream_keys','k2_material_stream_keys'}) do
+  progression[name]=function() return {} end
+ end
+ stub('prototypes.mir.families.material_progression',progression)
+ stub('prototypes.mir.compatibility.overlay_loader',{get=function() return {
+  applies_when={mods={}},capabilities={['recipe-productivity']={exact_recipes={},stream={id='unrelated'}}}
+ } end})
+ stub('prototypes.mir.platform.factorio.target_profiles',{current=function() return {factorio_version='2.0'} end})
+ local declarations=require('prototypes.streams.productivity')
+ local buckets={{change=0.1,recipes={'bioplastic','plastic-bar'}}}
+ local rows={{recipe='bioplastic',owners='plastic-bar-productivity'},
+   {recipe='plastic-bar',owners='plastic-bar-productivity'}}
+ local function admitted(spec,original,filtered,covered)
+  return owner_policy.retained_earned_buckets('research_plastic',spec or declarations.research_plastic,original or buckets,filtered or {},covered or rows)
+ end
+ check('ER01',admitted(),'Observed F200 SIF paid identity can retain its complete native-covered effects')
+ for _, value in ipairs({'1.0.59','1.0.61'}) do
+  active_mods['space-is-fake']=value
+  check('ER02-'..value,not admitted(),'Unobserved SIF release cannot admit legacy reward retention')
+ end
+ active_mods['space-is-fake']='1.0.60'
+ active_mods.base='2.1.21'
+ check('ER03',not admitted(),'F210 does not inherit the F200 retention observation')
+ active_mods.base='2.0.77';active_mods['space-age']=nil
+ check('ER04',not admitted(),'Absent Space Age cannot admit the observed native owner set')
+ active_mods['space-age']='2.0.77'
+ check('ER05',not admitted({automatic_family={}}) and not admitted({native_owner_binding={}}),
+   'Automatic families and malformed bindings cannot admit stable reward retention')
+ check('ER06',not admitted({technology_name='unrelated-identity'}), 'Retention cannot create a replacement identity')
+ check('ER07',not admitted(nil,nil,{{change=0.1,recipes={'new-route'}}}),
+   'A partially owned active stream cannot become a hidden legacy stream')
+ check('ER08',not admitted(nil,{{change=0.1,recipes={'bioplastic'}}}), 'Missing prior recipe cannot be called complete retention')
+ check('ER09',not admitted(nil,{{change=0.1,recipes={'bioplastic','plastic-bar','other'}}}),
+   'Retention never grants an additional recipe')
+ check('ER10',not admitted(nil,{{change=0.1,recipes={'bioplastic','bioplastic'}}}), 'Duplicate recipes are refused')
+ check('ER11',not admitted(nil,nil,nil,{{recipe='bioplastic',owners='unrelated-owner'},rows[2]}),
+   'Another owner cannot supply the observed coverage')
+ check('ER12',not admitted(nil,nil,nil,{rows[1],{recipe='plastic-bar',owners='plastic-bar-productivity,other'}}),
+   'An extra owner remains blocking')
+ check('ER13',not admitted(nil,nil,nil,{rows[1],rows[1]}), 'Duplicate coverage cannot hide missing coverage')
+ for index, change in ipairs({0,-0.1,math.huge,0/0}) do
+  check('ER14-'..index,not admitted(nil,{{change=change,recipes={'bioplastic','plastic-bar'}}}),
+    'Only positive finite already-admitted effects can be retained')
+ end
+ check('ER15',not owner_policy.retained_earned_buckets('unobserved',{},buckets,{},rows),
+   'Unobserved research is not added by reward retention')
+ check('ER16',#buckets==1 and #buckets[1].recipes==2 and buckets[1].change==0.1 and #rows==2,
+   'Retention eligibility does not mutate caller buckets or owner records')
+ local observed={
+  research_low_density_structure={'casting-low-density-structure','low-density-structure','scrap-recycling'},
+  research_plastic={'bioplastic','plastic-bar'}, research_processing_unit={'processing-unit','scrap-recycling'},
+  research_rocket_fuel={'ammonia-rocket-fuel','rocket-fuel','rocket-fuel-from-jelly'},
+  research_steel={'casting-steel','steel-plate'}
+ }
+ local selected_buckets, adoption_calls, simulate_adoption=nil,0,false
+ stub('prototypes.mir.planner.costs',{enabled_for=function() return true end,
+  model_for=function() return {count_formula='100*L'} end,max_level_for=function() return 'infinite' end,
+  research_time_for=function() return 30 end})
+ stub('prototypes.mir.presentation.icon_builder',{icons_for_stream=function() return {} end})
+ stub('prototypes.mir.capabilities.recipe_productivity.planner',{
+  match_buckets=function() return selected_buckets end,
+  effects_from_buckets=function(_,values)
+   local out={};for _,bucket in ipairs(values) do for _,recipe in ipairs(bucket.recipes) do
+    out[#out+1]={type='change-recipe-productivity',recipe=recipe,change=bucket.change}
+   end end;return out
+  end})
+ stub('prototypes.mir.planner.native_owner_binding',{plan=function(_,spec,values)
+  adoption_calls=adoption_calls+1
+  assert(#values==0,'Legacy retention must not feed covered recipes back into native adoption')
+  if simulate_adoption then return {},{},{},spec.native_owner_binding.owner,{operation='preserve_native_owner'} end
+  return values,{},{}
+ end})
+ for _,name in ipairs({'prototypes.mir.planner.direct_effects','prototypes.mir.policy.native_effect_coverage',
+   'prototypes.mir.settings.automatic_compiler_policy'}) do stub(name,{}) end
+ stub('prototypes.mir.planner.requirements',{missing_reason=function() end})
+ stub('prototypes.mir.planner.prerequisites',{build_for=function() return {} end})
+ stub('prototypes.mir.planner.science',{ingredients_for_stream=function() return {{'automation-science-pack',1}},'full' end})
+ stub('prototypes.mir.platform.factorio.target_line',{feature_enabled=function(name) return name~='productivity_family_adoption' end})
+ stub('prototypes.mir.settings.effect_scaling',{scale_stream_effects=function(_,_,effects) return effects end})
+ stub('prototypes.mir.domain.research_cost.classification',{anchor_level=function() return 1 end})
+ stub('prototypes.mir.planner.stream_compiler.discover',{expand_dynamic_items=function(spec) return spec end})
+ stub('prototypes.mir.planner.stream_compiler.ownership',{attach_family_recipes=function(_,values) return values end})
+ stub('prototypes.mir.planner.stream_compiler.diagnostics',{
+  localized_name=function(key) return key end,localized_description=function() return '' end,
+  plan_row=function(key,spec,action,reason,diagnostics,extra) extra.action=action;extra.reason=reason;return extra end,
+  skip_row=function(_,_,reason) return {action='skip',reason=reason} end,
+  retain_earned_effects=function(row) row.fields.hidden=true;return row end})
+ stub('prototypes.mir.report.diagnostics_sink',{stream_fields=function() return {} end})
+ local qualifier=require('prototypes.mir.planner.stream_compiler.qualify')
+ for key,recipes in pairs(observed) do
+  local spec=declarations[key]
+  selected_buckets={{change=0.1,recipes=recipes}}
+  external_owner_records={}
+  for _,recipe in ipairs(recipes) do external_owner_records[recipe]={{
+   tech=recipe=='scrap-recycling' and 'scrap-recycling-productivity' or spec.native_owner_binding.owner,
+   kind='native',action='skip'
+  }} end
+  local before=adoption_calls
+  local row=qualifier.plan(key,spec)
+  check('ER17-'..key,row.action=='emit' and row.fields.hidden and row.technology_name=='recipe-prod-'..key..'-1'
+    and adoption_calls==before+1,'Actual F200 qualifier retains canonical bound identity '..key)
+  local expected_count=key=='research_processing_unit' and 1 or #recipes
+  check('ER18-'..key,#row.fields.effects==expected_count,
+    'Retention preserves only the published effect count for '..key)
+  for _,effect in ipairs(row.fields.effects) do
+   check('ER19-'..key..'-'..effect.recipe,effect.change==0.1
+     and (key~='research_processing_unit' or effect.recipe=='processing-unit'),
+     'Prior effect retained without adding processing-unit scrap recycling')
+  end
+  simulate_adoption=true
+  local adopted=qualifier.plan(key,spec)
+  check('ER20-'..key,adopted.action=='adopt' and not adopted.fields,
+    'A supported native adoption remains authoritative over retention')
+  simulate_adoption=false
+ end
+ external_owner_records={};owner_diagnostics={}
+ for name in pairs(package.loaded) do package.loaded[name]=nil end
+ for name,value in pairs(previous_modules) do package.loaded[name]=value end
+ active_mods=previous_mods
+end
 
 data.raw.lab={
  early={inputs={'automation-science-pack','logistic-science-pack','military-science-pack','chemical-science-pack'}},

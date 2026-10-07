@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 supersedes: []
 superseded_by: []
 ---
 # Testing And Fixture Strategy
 
-Updated: 2026-10-07
+Updated: 2026-10-08
 
 The 3.0 compatibility compiler needs tests for both positive emission and negative safety. The goal is not only "the mod loads." The goal is proving that MIR emits, skips, rejects, and reports exactly what the policy says.
 
@@ -36,6 +36,14 @@ The external `testmods` location may be deleted. It is not part of the repositor
 The prepared `Test-MIRK2213ImersiteContinuation.ps1` consumer uses direct activation. Supply its current candidate/materialization receipt and the existing V5 engine/dependency observation. The selected library must already contain those exact archives and a fixture ZIP whose members match the current fixture source; input acquisition and fixture construction happen once, separately. Preflight refuses missing versions or stale fixture members. The runner creates only its small selection record and normal run output, preserves the existing level-four/next-level-five, 8% bonus, 42% queued-progress and single-reload oracles, and restores prior library controls. The existing native output budget charges additional active-control and recovery-journal bytes as well as run output; existing archives are not new payload writes. Its V2 result records `library_activation` rather than a fictitious staged-input receipt; older V1 observations retain their original identities. Controlled input tests do not qualify that gameplay outcome on the current package.
 
 The existing manifest-driven `tests/runtime/Test-MIRUpgrade.ps1` also selects predecessor and candidate versions directly in one explicitly supplied library. Both exact MIR archives and the selected assertion fixtures must already be installed there; source-only fixtures are disabled for the candidate phase. The source phase's writable settings are preserved privately and activated for the candidate. Each owned engine invocation verifies the library/configuration and reads back the loaded mod versions; existing source, earned research, reward, save-completion and reload oracles remain required. Result schema 3 records `source_library_activation` and `library_activation`; it does not represent these as hard-link leases.
+
+`tests/runtime/Test-MIRResearchBrowser.ps1` uses the same direct-library path. Supply `-FactorioBin`, `-CandidateZip`, `-LibraryDirectory` and `-Target`; the runner verifies the engine line, current Library modules, installed candidate hash and every assertion-fixture member before activation. It selects only base, MIR and its assertion fixture, establishes default settings, verifies the loaded selection for each create/benchmark/reload, and restores the previous controls. `-PrepareInputsOnly` constructs the small owned fixture ZIP inside the checkout without requiring an engine, candidate or library and without native execution. Install that prepared fixture separately once. Runtime receipts record `library_activation`, not an immutable-input lease. The existing `-Graphics` player, localization, GUI and save/reload assertions remain required for those claims; host adapter controls establish no graphical or gameplay pass.
+
+The shared native-probe driver explicitly waits for its native child and propagates that child's exit code. PowerShell's call operator returned early for the Windows GUI executable during the first direct browser attempt, leaving only Factorio's startup header before the governor stopped the owned tree. The loaded-selection check rejected that attempt. A tiny delayed Windows GUI executable reproduces the premature return with the old driver and completes with the explicit wait; the controlled resource suite retains that regression alongside argument, environment and output-budget checks. Engine loads and graphical assertions remain separate native evidence.
+
+The browser failure receipt preserves the original engine/resource error separately from control-restoration status. If the engine has not fully exited, restoration remains refused and the durable library journal stays available for recovery. That cleanup refusal must not replace the primary exception. Tiny-file controls execute the runner's actual catch block for successful cleanup, delayed-shutdown refusal and exhausted receipt budget; they launch no engine.
+
+The browser fixture observes the base recipe schema to select F210 `categories` or F200 `category`. Its native discovery witness waits for two unchanged client-display observations before opening the Library: graphical startup applies the window resolution and scale after the save's first tick. The original root, search and filter must then remain intact throughout discovery. Twenty-six controlled opposing cases cover startup, later invalidation, disconnects, deadlines and translation completion. This setup correction changes no player UI behavior and does not waive widget-preservation assertions.
 
 Use the same upgrade command with `-PrepareInputsOnly` to generate the small specialized MIR-owned assertion ZIPs inside its approved build root. The preparation receipt lists their exact identities and any selected SIF dependencies, and explicitly says `prepared-not-native-tested`. This mode starts no engine and writes no archive library. It has its own small-output capacity check; normal execution retains the native reserve and declared memory budget. Supplying a construction manifest still requires the existing clean-source check. Acquire or install only these selected inputs separately, then run without `-PrepareInputsOnly` and supply `-LocalModLibraryDirs`. Neither step reconstructs historical populated profiles.
 

@@ -143,7 +143,7 @@ try {
     $resolved=Resolve-MIRAssuranceCommandText -Command $command -Context ([pscustomobject]@{factorio=$engine;target=$line}) -Plan ([pscustomobject]@{})
     Assert-Probe ($resolved.Contains("-FactorioBin '$engine'") -and $resolved.Contains("-ExpectedFactorioLine '$line'") -and $resolved.Contains('-ExpectedPeakMemoryMiB 2048') -and $resolved.Contains('-MaxNewOutputMiB 120')) "selected $line command lost its engine, line or explicit resource budgets."
     $browserCommand=[string](@($catalog.tests | Where-Object id -CEQ 'runtime.research-browser')[0].command)
-    $browserResolved=Resolve-MIRAssuranceCommandText -Command $browserCommand -Context ([pscustomobject]@{factorio=$engine;target=$line;candidate='controlled-candidate.zip'}) -Plan ([pscustomobject]@{})
+    $browserResolved=Resolve-MIRAssuranceCommandText -Command $browserCommand -Context ([pscustomobject]@{factorio=$engine;target=$line;candidate='controlled-candidate.zip';mods='controlled-library'}) -Plan ([pscustomobject]@{})
     Assert-Probe ($browserResolved.Contains("-FactorioBin '$engine'") -and $browserResolved.Contains("-Target '$line'") -and $browserResolved.Contains('-ExpectedPeakMemoryMiB 2048') -and $browserResolved.Contains('-MaxNewOutputMiB 120')) "selected browser $line command lost its actual engine, target or resource budgets."
   }
   $arguments=@{RepoRoot=$repo;OutputRoot=$fixture;MaxNewOutputMiB=1}
@@ -160,7 +160,7 @@ try {
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'PrepareOnly bypassed allocation admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1') -RepoRoot $repo -PrepareOnly -ExactStageRoot (Join-Path $fixture 'absent-stage') -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Final observer PrepareOnly bypassed allocation admission.'
-  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRResearchBrowser.ps1') -RepoRoot $repo -FactorioBin 'absent-browser-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRResearchBrowser.ps1') -RepoRoot $repo -FactorioBin 'absent-browser-engine' -CandidateZip 'absent-candidate' -LibraryDirectory 'absent-library' -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Browser harness allocated before peak-budget admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRPassiveRepair.ps1') -RepoRoot $repo -CandidateZip 'absent-passive-candidate' -FactorioBin 'absent-passive-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Passive repair allocated or probed an engine before peak-budget admission.'
@@ -173,6 +173,18 @@ try {
   $context=New-MIRNativeProbeResourceContext @arguments -ExpectedPeakMemoryMiB 1024
   Assert-Probe (-not (Test-Path -LiteralPath $context.root)) 'successful admission allocated before caller initialization.'
   New-Item -ItemType Directory -Path $context.root | Out-Null
+  $retirementPath=Join-Path $context.root 'retired-during-scan'
+  $retiredDirectory=[IO.Directory]::CreateDirectory($retirementPath)
+  Assert-Probe (-not(Test-MIR441RetiredDirectory $retiredDirectory)) 'a live directory was classified as retired.'
+  Remove-Item -LiteralPath $retirementPath
+  $retirementObserved=$false
+  try {$null=@($retiredDirectory.EnumerateFileSystemInfos())} catch [IO.DirectoryNotFoundException] {$retirementObserved=$true}
+  Assert-Probe ($retirementObserved-and(Test-MIR441RetiredDirectory $retiredDirectory)) 'actual native enumeration disappearance was not recognized.'
+  [IO.File]::WriteAllText($retirementPath,'keep')
+  Assert-Probe (-not(Test-MIR441RetiredDirectory $retiredDirectory)) 'a replacement file was mistaken for a retired directory.'
+  $retirementUsage=Get-MIR441TreeUsage -Path $context.root
+  Assert-Probe ($retirementUsage.complete-and$retirementUsage.files-eq1-and$retirementUsage.bytes-eq4) 'live output byte accounting changed.'
+  Remove-Item -LiteralPath $retirementPath
   # Extract the consumed harness functions, rather than a second validator.
   # These tiny ZIPs contain only identity/module controls, not player packages.
   $browserTokens=$null;$browserErrors=$null
@@ -193,13 +205,20 @@ try {
   $currentTin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
   Assert-Probe ((Resolve-TinBrowserEnginePath $currentTin) -ceq $currentTin) 'tin browser changed its authorized engine path.'
   Refuses-Probe {Resolve-TinBrowserEnginePath 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'} 'engine-location'
-  $historical='D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
-  $current='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
-  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.0' -Requested '') -ceq $historical) '2.0 default used another engine authority.'
-  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.1' -Requested '') -ceq $current) '2.1 default used another engine authority.'
+  $browserEngines=@{}
+  foreach($line in @('2.0','2.1')){
+    $engineRoot=Join-Path $fixture ('configured-engine-'+$line)
+    foreach($directory in @('bin/x64','data/base')){[IO.Directory]::CreateDirectory((Join-Path $engineRoot $directory))|Out-Null}
+    $executable=Join-Path $engineRoot 'bin/x64/factorio.exe';[IO.File]::WriteAllText($executable,'controlled, never executed')
+    [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version=($line+'.77')}|ConvertTo-Json))
+    $browserEngines[$line]=$executable
+  }
+  $historical=$browserEngines['2.0'];$current=$browserEngines['2.1']
+  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.0' -Requested ''} 'engine-location'
+  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.1' -Requested $current) -ceq $current) 'explicit relocated current engine was refused.'
   Assert-Probe ((Resolve-BrowserEnginePath -Line '2.0' -Requested $historical) -ceq $historical) 'explicit historical engine was refused.'
-  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.0' -Requested $current} 'engine-location'
-  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.1' -Requested $historical} 'engine-location'
+  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.0' -Requested $current} 'engine-target'
+  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.1' -Requested $historical} 'engine-target'
   Add-Type -AssemblyName System.IO.Compression.FileSystem
   function New-ControlledBrowserArchive([string]$Line,$Identity,[string]$Variant='valid') {
     $directory=Join-Path $fixture ('browser-inputs/'+[guid]::NewGuid().ToString('N'))
@@ -670,6 +689,7 @@ function New-MIR4TargetPackage {
   $echo=Join-Path $context.root 'argv-echo.ps1'
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
+[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
 [ordered]@{values=@($Values);steam_app=$env:SteamAppId;steam_game=$env:SteamGameId;temp=$env:TEMP} | ConvertTo-Json -Compress
 '@,[Text.UTF8Encoding]::new($false))
   $parentApp=[Environment]::GetEnvironmentVariable('SteamAppId');$parentGame=[Environment]::GetEnvironmentVariable('SteamGameId')
@@ -682,8 +702,18 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $priorIndex=$context.process_index
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $pwsh -Arguments @('x'*20KB)} 'argument-budget'
   Assert-Probe ($context.process_index -eq $priorIndex) 'oversized argument data launched an actor.'
+  # A console child does not expose PowerShell's GUI launch-and-return behavior.
+  # Compile a tiny Windows GUI executable with the installed framework compiler;
+  # the real driver must retain it until its delayed output and exit are complete.
+  $guiSource=Join-Path $context.root 'gui-wait.cs';$guiBinary=Join-Path $context.root 'gui-wait.exe';$guiMarker=Join-Path $context.root 'gui-finished.txt'
+  [IO.File]::WriteAllText($guiSource,'using System.IO; using System.Threading; class WaitControl { static int Main(string[] args) { Thread.Sleep(1500); File.WriteAllText(args[0],"finished"); return 0; } }')
+  $compiler=Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
+  & $compiler /nologo /target:winexe ('/out:'+$guiBinary) $guiSource
+  if($LASTEXITCODE-ne0){throw 'Controlled GUI compilation failed'}
+  $guiActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $guiBinary -Arguments @($guiMarker) -TimeoutSeconds 15
+  Assert-Probe ((Test-Path -LiteralPath $guiMarker)-and([IO.File]::ReadAllText($guiMarker)-ceq'finished')-and$guiActor.result.exit_code-eq0) 'native wrapper returned before the GUI child completed.'
   Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$context.runs.Count}
-  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 7) 'reserved result did not preserve actual actor inventory.'
+  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 8) 'reserved result did not preserve actual actor inventory.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'

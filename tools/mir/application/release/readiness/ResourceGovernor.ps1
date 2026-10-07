@@ -74,16 +74,29 @@ function Assert-MIR441ResourceAdmission {
   return $snapshot
 }
 
+function Test-MIR441RetiredDirectory {
+  param([Parameter(Mandatory)][IO.DirectoryInfo]$Directory)
+  return -not([IO.Directory]::Exists($Directory.FullName)-or[IO.File]::Exists($Directory.FullName))
+}
+
 function Get-MIR441TreeUsage {
   param([Parameter(Mandatory)][string]$Path)
   [int64]$bytes=0;[int64]$files=0;$complete=$true;$watch=[Diagnostics.Stopwatch]::StartNew()
   if(Test-Path -LiteralPath $Path -PathType Container){
     $pending=[Collections.Generic.Stack[IO.DirectoryInfo]]::new();$pending.Push([IO.DirectoryInfo]::new([IO.Path]::GetFullPath($Path)))
     while($pending.Count){
-      foreach($item in $pending.Pop().EnumerateFileSystemInfos()){
-        if($item.Attributes-band[IO.FileAttributes]::ReparsePoint){$complete=$false;continue}
-        if($item-is[IO.DirectoryInfo]){$pending.Push($item)}else{$bytes+=$item.Length;$files++}
-        if($files-ge10000-or$watch.Elapsed.TotalSeconds-ge2){return [pscustomobject]@{files=$files;bytes=$bytes;complete=$false}}
+      $directory=$pending.Pop()
+      try {
+        foreach($item in $directory.EnumerateFileSystemInfos()){
+          if($item.Attributes-band[IO.FileAttributes]::ReparsePoint){$complete=$false;continue}
+          if($item-is[IO.DirectoryInfo]){$pending.Push($item)}else{$bytes+=$item.Length;$files++}
+          if($files-ge10000-or$watch.Elapsed.TotalSeconds-ge2){return [pscustomobject]@{files=$files;bytes=$bytes;complete=$false}}
+        }
+      } catch [IO.DirectoryNotFoundException] {
+        # A constructor can retire a queued directory while this live scan is
+        # running. Ignore only actual disappearance; replacements and all
+        # other I/O failures still stop the governed process.
+        if(-not(Test-MIR441RetiredDirectory -Directory $directory)){throw}
       }
     }
   }

@@ -210,7 +210,7 @@ Ages are measured against the newest governed review date, 2026-10-08, so checko
 | docs/maintainer/release-process.md | current | 2026-08-14 | 55 | current-window |
 | docs/maintainer/report-diffing.md | current | 2026-08-03 | 66 | current-window |
 | docs/maintainer/settings-governance.md | current | 2026-10-04 | 4 | current-window |
-| docs/maintainer/testing.md | current | 2026-10-07 | 1 | current-window |
+| docs/maintainer/testing.md | current | 2026-10-08 | 0 | current-window |
 | docs/maintainer/triage-playbook.md | current | 2026-07-07 | 93 | review-soon |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | archived | 2026-08-08 | 61 | current-window |
 | docs/maintainer/validation.md | current | 2026-07-12 | 88 | current-window |
@@ -388,7 +388,7 @@ Ages are measured against the newest governed review date, 2026-10-08, so checko
 | docs/releases/mir4-4.0-whole-platform-programme.md | current | 2026-08-23 | 46 | current-window |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | archived | 2026-08-17 | 52 | current-window |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | current | 2026-09-11 | 27 | current-window |
-| docs/releases/mir4-integration-and-delivery-plan.md | current | 2026-10-07 | 1 | current-window |
+| docs/releases/mir4-integration-and-delivery-plan.md | current | 2026-10-08 | 0 | current-window |
 | docs/releases/mir4-post-4.0-roadmap.md | current | 2026-09-07 | 31 | current-window |
 | docs/releases/mir42-compatibility-playtest-plan.md | current | 2026-09-27 | 11 | current-window |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | current | 2026-10-08 | 0 | current-window |

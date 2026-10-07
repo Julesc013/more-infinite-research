@@ -1260,7 +1260,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Target <target> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
+      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -LibraryDirectory <mods> -Target <target> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/runtime/Test-MIRResearchBrowser.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -1274,6 +1274,9 @@
         "source:source/prototypes/mir/settings/profile_codec.lua",
         "tests/runtime/Test-MIRResearchBrowser.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/lib/validation/MIR4DistributionIdentity.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
@@ -1636,6 +1639,7 @@
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
+        "tests/runtime/Test-MIRResearchBrowser.ps1",
         "tests/runtime/Test-MIRUpgrade.ps1",
         "tests/support/MIR421SpaceFakeUpgrade.ps1",
         "tests/tooling/Test-MIRLibraryActivation.ps1"
@@ -8124,5 +8128,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:31c105c2509da3d698620d5d7f582ab29b3e2200668060c18d53ae199082f754"
+  "digest": "sha256:32b6a3872082436e11f444854212ffce39e23738e1380144b3f4487bc98e06ac"
 }

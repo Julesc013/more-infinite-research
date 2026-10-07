@@ -158,8 +158,10 @@ local function plan_stream(key, raw_spec)
 
   local buckets = recipe_productivity_planner.match_buckets(key, spec)
   buckets = attach_family_recipes(key, buckets)
+  local original_buckets = buckets
   local covered_by_existing
   buckets, covered_by_existing = owner_policy.filter_existing_recipe_productivity(key, spec, buckets)
+  local retained_buckets = owner_policy.retained_earned_buckets(key, spec, original_buckets, buckets, covered_by_existing)
   local adopted_effects, family_blocked, adoption_owner_name, adoption
   buckets, adopted_effects, family_blocked, adoption_owner_name, adoption = native_owner_binding.plan(key, spec, buckets)
   if adoption then
@@ -171,6 +173,7 @@ local function plan_stream(key, raw_spec)
         adoption = adoption
       })
   end
+  if retained_buckets then buckets = retained_buckets end
   local effects = recipe_productivity_planner.effects_from_buckets(key, buckets)
   if #effects == 0 then
     if adoption then
@@ -212,13 +215,14 @@ local function plan_stream(key, raw_spec)
     research_time = research_time,
     max_level = prototype_max_level,
   }
-  return plan_row(key, spec, "emit", "recipe_productivity",
+  local row = plan_row(key, spec, "emit", "recipe_productivity",
     D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects, lab_status), {
       technology_name = technology_name,
       fields = fields,
       planned_max_level = max_level,
       direct_effects = false
     })
+  return retained_buckets and diagnostics.retain_earned_effects(row) or row
 end
 
 function M.plan(key, raw_spec)
