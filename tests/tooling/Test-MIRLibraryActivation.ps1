@@ -27,6 +27,7 @@ function New-TestArchive([string]$Name,[string]$Version,[string[]]$Dependencies=
 Write-TestJson (Join-Path $data 'base/info.json') @{name='base';version='2.1.20';dependencies=@()}
 Write-TestJson (Join-Path $data 'quality/info.json') @{name='quality';version='2.1.20';dependencies=@('base')}
 $first=New-TestArchive 'alpha' '1.0.0';$second=New-TestArchive 'alpha' '2.0.0';$extra=New-TestArchive 'unrequested' '1.0.0'
+$spaceName=New-TestArchive 'Flare Stack' '4.3.1'
 $dependent=New-TestArchive 'dependent' '1.0.0' @('base','alpha >= 2.0.0')
 $optional=New-TestArchive 'optional' '1.0.0' @('? alpha >= 2.0.0')
 $incompatible=New-TestArchive 'incompatible' '1.0.0' @('! alpha >= 99.0.0')
@@ -48,7 +49,7 @@ try{
     $activation=Start-MIRLibraryActivation @arguments
     $active=Get-Content -LiteralPath (Join-Path $library 'mod-list.json') -Raw|ConvertFrom-Json
     Assert-LibraryTest (@($active.mods|Where-Object enabled).Count -eq 2) 'only requested names enabled'
-    Assert-LibraryTest (@($active.mods|Where-Object {$_.name -in @('quality','unrequested') -and -not $_.enabled}).Count -eq 2) 'unrequested archive and bundled DLC disabled'
+    Assert-LibraryTest (@($active.mods|Where-Object {$_.name -in @('quality','unrequested','Flare Stack') -and -not $_.enabled}).Count -eq 3) 'unrequested archive, space-containing name and bundled DLC disabled'
     Assert-LibraryTest ((@($active.mods|Where-Object name -EQ 'alpha')[0].version) -ceq (@($activation.selected|Where-Object name -EQ 'alpha')[0].version)) 'exact version pinned'
     if($case[2] -ceq 'Defaults'){Assert-LibraryTest (-not(Test-Path -LiteralPath (Join-Path $library 'mod-settings.dat'))) 'defaults do not inherit prior settings'}
     else{Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity (Join-Path $library 'mod-settings.dat')) -cne (Get-MIRImmutableInputFileIdentity $privateSettings)) 'settings are private writable bytes'}

@@ -16,6 +16,14 @@ function Assert-MIRLibraryIdle {
   if(@(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count){throw '[mir-library-factorio-active] Wait for the existing client to exit.'}
 }
 
+function Test-MIRLibraryModName {
+  param([AllowNull()][string]$Name)
+  # Factorio permits names (including spaces) beyond the Portal's narrower
+  # alphabet. Validate the local filename boundary, not a Portal-only rule.
+  return (-not [string]::IsNullOrWhiteSpace($Name) -and $Name.Length -le 100 -and
+    $Name -ceq $Name.Trim() -and $Name -notmatch '[\\/:*?"<>|\x00-\x1f]')
+}
+
 function Read-MIRLibraryControl {
   param([string]$Path)
   if(-not(Test-Path -LiteralPath $Path)){return [ordered]@{exists=$false;bytes='';sha256=''}}
@@ -70,7 +78,7 @@ function Get-MIRLibraryInventory {
       $reader=[IO.StreamReader]::new($entries[0].Open())
       try{$info=$reader.ReadToEnd()|ConvertFrom-Json -AsHashtable}finally{$reader.Dispose()}
     }finally{$zip.Dispose()}
-    if($info.name -cnotmatch '^[A-Za-z0-9_-]+$' -or $info.version -cnotmatch '^\d+[.]\d+[.]\d+$' -or
+    if(-not(Test-MIRLibraryModName $info.name) -or $info.version -cnotmatch '^\d+[.]\d+[.]\d+$' -or
       $file.Name -cne ($info.name+'_'+$info.version+'.zip')){throw "[mir-library-ambiguous-archive] $($file.Name)"}
     $rows.Add([pscustomobject]@{name=$info.name;version=$info.version;info=$info;path=$file.FullName;builtin=$false;identity=Get-MIRImmutableInputFileIdentity $file.FullName})
   }
@@ -144,7 +152,7 @@ function Start-MIRLibraryActivation {
     if(-not $profile.exists){throw '[mir-library-profile-missing]'}
     $definition=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($profile.bytes)).TrimStart([char]0xFEFF)|ConvertFrom-Json -AsHashtable
     if($definition.mods -isnot [array] -or @($definition.mods|Group-Object name|Where-Object Count -GT 1).Count){throw '[mir-library-profile-rows]'}
-    foreach($row in $definition.mods){if($row.enabled -isnot [bool] -or $row.name -cnotmatch '^[A-Za-z0-9_-]+$'){throw '[mir-library-profile-row]'}}
+    foreach($row in $definition.mods){if($row.enabled -isnot [bool] -or -not(Test-MIRLibraryModName $row.name)){throw '[mir-library-profile-row]'}}
     $requested=@($definition.mods|Where-Object {$_.enabled -ceq $true})
     if(@($requested|Where-Object name -CEQ 'base').Count -ne 1){throw '[mir-library-base-required]'}
     $selected=[Collections.Generic.List[object]]::new()
@@ -205,7 +213,7 @@ function Assert-MIRLibraryActivation {
 function Assert-MIRLibraryLoadedSelection {
   param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath)
   $text=[IO.File]::ReadAllText($LogPath)
-  $matches=[regex]::Matches($text,'(?m)Loading mod (?:settings )?([A-Za-z0-9_-]+) (\d+\.\d+\.\d+) \(')
+  $matches=[regex]::Matches($text,'(?m)Loading mod (?:settings )?([^\r\n]+?) (\d+\.\d+\.\d+) \(')
   $observed=@($matches|ForEach-Object {$_.Groups[1].Value+'@'+$_.Groups[2].Value}|Where-Object {$_ -notlike 'core@*'}|Sort-Object -Unique)
   $expected=@($Activation.selected|ForEach-Object {$_.name+'@'+$_.version}|Sort-Object -Unique)
   if(($observed -join '|') -cne ($expected -join '|')){throw '[mir-library-loaded-selection] Actual mod names/versions differ from the profile.'}
