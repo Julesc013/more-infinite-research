@@ -1177,19 +1177,23 @@ function Invoke-MIRAssuranceSelfTest {
       param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][int]$Attempt)
       $artifact = Join-Path $Root "$retryPrefix$Attempt-$selfTestId-$selfTestKey"
       New-Item -ItemType Directory -Force -Path $artifact | Out-Null
+      $receiptPath = & $getWorkerReceiptPath -ArtifactRoot $paths.root -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
+      $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json
       foreach ($item in @(Get-ChildItem -LiteralPath $paths.root -Force)) {
+        # Each synthetic worker publishes its own transport receipt. Copying
+        # the caller's attempt-2 transports makes the later synthetic worker
+        # ambiguous even though the underlying trusted capsule is unchanged.
+        if ($item.Name -ceq 'worker-receipts') { continue }
         Copy-Item -LiteralPath $item.FullName -Destination $artifact -Recurse -Force
       }
-      if ($Attempt -ne 1) {
-        $receiptPath = & $getWorkerReceiptPath -ArtifactRoot $artifact -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
-        $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json
-        $receipt.producer.run_id = $retryRunId
-        $receipt.producer.run_attempt = [string]$Attempt
-        $receipt.evidence_disposition = if (
-          (Get-MIRAssuranceJsonHash -Value $receipt.producer) -eq (Get-MIRAssuranceJsonHash -Value $receipt.evidence_producer)
-        ) { "produced-by-worker" } else { "adopted-exact-trusted-capsule" }
-        $null = & $writeWorkerReceipt -ArtifactRoot $artifact -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256) -Receipt $receipt
-      }
+      # Synthetic attempt 1 must also be explicit when this self-test itself
+      # runs in a later GitHub attempt. Preserve the real evidence producer.
+      $receipt.producer.run_id = $retryRunId
+      $receipt.producer.run_attempt = [string]$Attempt
+      $receipt.evidence_disposition = if (
+        (Get-MIRAssuranceJsonHash -Value $receipt.producer) -eq (Get-MIRAssuranceJsonHash -Value $receipt.evidence_producer)
+      ) { "produced-by-worker" } else { "adopted-exact-trusted-capsule" }
+      $null = & $writeWorkerReceipt -ArtifactRoot $artifact -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256) -Receipt $receipt
       return $artifact
     }
     $retryAttemptOne = & $newRetryArtifact -Root $retryRootOne -Attempt 1
@@ -1221,7 +1225,7 @@ function Invoke-MIRAssuranceSelfTest {
         @($retryImportBoth.duplicates).Count -ne 0 -or
         @($retryImportBoth.ignored | Where-Object reason -eq "superseded-by-later-run-attempt").Count -ne 1 -or
         @((Get-ChildItem -LiteralPath $retryReceiptDirectory -File -Filter '*.json' | Where-Object Name -ne 'current.json')).Count -lt 2) {
-      throw "Retry-aware fan-in did not deterministically retain earlier success, select the later worker, and preserve distinct immutable transport receipts."
+      throw "Retry-aware fan-in did not deterministically retain earlier success, select the later worker, and preserve distinct immutable transport receipts: $($retryImportBoth | ConvertTo-Json -Depth 20 -Compress)"
     }
 
     # Historical V3 workers used a single flat receipt.  Preserve their
