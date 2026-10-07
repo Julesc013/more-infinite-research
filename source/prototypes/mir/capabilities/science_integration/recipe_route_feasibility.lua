@@ -440,8 +440,11 @@ end
 
 local function minable_results(source)
   local minable = source and source.minable or {}
+  -- Native results override the singular shorthand, including an empty list.
+  -- Retained result/count fields cannot invent another acquisition source.
+  if minable.results ~= nil then return minable.results end
   if minable.result then return {{type = "item", name = minable.result, amount = minable.count or 1}} end
-  return minable.results or {}
+  return {}
 end
 
 local function append_minable_sources(sources, prototype_type, witness_kind, options)

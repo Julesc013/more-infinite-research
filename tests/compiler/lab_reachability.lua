@@ -66,6 +66,35 @@ run(raw, function(owner)
   check('LR06', telemetry and telemetry.counters.item_prototype_index_builds == 1,
     'Normal lab queries reuse the existing item prototype index')
 end)
+-- A cloned or patched minable prototype may retain both declarations. The
+-- native results list owns the drops; a stale singular result is not a second
+-- acquisition route for the laboratory's placement item.
+for _, case in ipairs({
+  {id='list-replaces-stale-item',result='lab-kit',results={{type='item',name='A',amount=1}},expected=false},
+  {id='list-supplies-lab',result='A',results={{type='item',name='lab-kit',amount=1}},expected=true},
+  {id='empty-list-replaces-item',result='lab-kit',results={},expected=false},
+  {id='zero-list-replaces-item',result='lab-kit',results={{type='item',name='lab-kit',amount=0}},expected=false},
+  {id='fluid-list-replaces-item',result='lab-kit',results={{type='fluid',name='lab-kit',amount=1}},expected=false},
+  {id='list-ignores-singular-count',result='lab-kit',count=0,results={{type='item',name='lab-kit',amount=1}},expected=true},
+  {id='singular-fallback',result='lab-kit',expected=true},
+  {id='zero-singular-count',result='lab-kit',count=0,expected=false}
+}) do
+  raw = world()
+  raw.recipe.make_lab = nil
+  raw.fluid = {['lab-kit']={type='fluid',name='lab-kit'}}
+  raw.resource = {source={type='resource',name='source',minable={
+    mining_time=1,result=case.result,results=case.results,count=case.count}}}
+  run(raw, function()
+    local before = fingerprint.of(data.raw)
+    check('LRN/'..case.id,lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+      'Native minable-result precedence determines lab acquisition: '..case.id)
+    check('LRN/'..case.id..'/research',
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Actual researchability consumes the same minable acquisition result: '..case.id)
+    check('LRN/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Minable acquisition preserves declared prototype inputs: '..case.id)
+  end)
+end
 for index, mutate in ipairs({
   function(r) r.recipe.make_lab.results[1].amount = 0 end,
   function(r) r.recipe.make_lab.results[1].probability = 0 end,
