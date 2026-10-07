@@ -83,7 +83,7 @@
     },
     {
       "id": "mir42-nine-target-engine-inputs",
-      "patterns": ["^tools/commands/release/Invoke-MIR42FourTargetEngineRun[.]ps1$", "^tests/release/Test-MIR42NineTargetHistoricalEngineRun[.]ps1$"],
+      "patterns": ["^tools/commands/release/Invoke-MIR42FourTargetEngineRun[.]ps1$", "^tests/release/Test-MIR42NineTargetHistoricalEngineRun[.]ps1$", "^spec/engines/mir421-native-engine-inputs-v1[.]json$", "^spec/schemas/mir421-native-engine-inputs-v1[.]schema[.]json$"],
       "tests": ["static.mir42-nine-target-engine-inputs", "static.immutable-input-staging"]
     },
     {

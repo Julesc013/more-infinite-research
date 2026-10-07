@@ -49,6 +49,14 @@ $runner = Get-Content -Raw -LiteralPath $runnerPath
 function Assert-MIR42EngineSharedInputs {
   . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
   . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
+  . (Join-Path $RepoRoot 'tools/lib/compatibility/FactorioRunner.ps1')
+  function Write-TinyEngineArchive($Path,$Version,$Line){
+    $zip=[IO.Compression.ZipFile]::Open($Path,[IO.Compression.ZipArchiveMode]::Create)
+    try{
+      $writer=[IO.StreamWriter]::new($zip.CreateEntry("more-infinite-research_$Version/info.json").Open())
+      try{$writer.Write((@{name='more-infinite-research';version=$Version;factorio_version=$Line;dependencies=@('base')}|ConvertTo-Json -Compress))}finally{$writer.Dispose()}
+    }finally{$zip.Dispose()}
+  }
   # Controlled capacity applies only to tiny inputs and one PowerShell child.
   # The historical fresh-load actor is a stub; no Factorio process runs here.
   function Get-MIR441ResourceSnapshot {
@@ -60,7 +68,7 @@ function Assert-MIR42EngineSharedInputs {
   $script:engineSharedAssertions=0
   $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot ('build/tmp/engine-link-controls-'+[guid]::NewGuid().ToString('N')))
   $inputLeases=[Collections.Generic.List[object]]::new()
-  foreach($name in @('Get-MIR42EngineRunSha','Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','New-MIR42EngineArchiveStage')){
+  foreach($name in @('Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','New-MIR42EngineArchiveStage')){
     Import-MIR42EngineRunnerFunction -Path $runnerPath -Name $name
   }
   try {
@@ -81,11 +89,18 @@ function Assert-MIR42EngineSharedInputs {
     Check ($default.root -cne $scratch -and (Test-MIR441PathContained -Root $scratch -Path $default.root)) 'default isolated-root contract changed.'
 
     $sourceRoot=Join-Path $scratch 'inputs';$null=New-Item -ItemType Directory -Path $sourceRoot
+    $bindingsPath=Join-Path $scratch 'bindings.json'
+    Refuses {Get-MIR42EngineLibraryBindings -Path $bindingsPath -Targets @('f210')} 'library-bindings-required'
+    [IO.File]::WriteAllText($bindingsPath,(@{f210=$sourceRoot}|ConvertTo-Json))
+    Check ((Get-MIR42EngineLibraryBindings -Path $bindingsPath -Targets @('f210')).f210 -ceq $sourceRoot) 'explicit library binding changed.'
+    Refuses {Get-MIR42EngineLibraryBindings -Path $bindingsPath -Targets @('f210','f200')} 'library-bindings-targets'
+    Refuses {Get-MIR42EngineLibraryBindings -Path $bindingsPath -Targets @('f200')} 'library-missing'
     $rows=[ordered]@{};$originals=[ordered]@{}
     foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
       $to='4.2.'+$target.Substring(1)+'01';$from='4.2.'+$target.Substring(1)+'00'
       $candidate=Join-Path $sourceRoot "more-infinite-research_$to.zip";$predecessor=Join-Path $sourceRoot "more-infinite-research_$from.zip"
-      [IO.File]::WriteAllText($candidate,"tiny candidate $target");[IO.File]::WriteAllText($predecessor,"tiny predecessor $target")
+      $line=switch($target){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'};default{'0.'+$target.Substring(2)}}
+      Write-TinyEngineArchive $candidate $to $line;Write-TinyEngineArchive $predecessor $from $line
       $row=[ordered]@{candidate=$candidate;candidate_sha256=Get-MIRImmutableInputSha256 $candidate;predecessor=$predecessor;predecessor_sha256=Get-MIRImmutableInputSha256 $predecessor;to=$to;from=$from}
       $rows[$target]=$row;$originals[$target]=$candidate
       New-MIR42EngineArchiveStage -Target $target -Row $row -OutputRoot $exactRoot -SourceVersion '4.2.1' -SourceCommit ('A'*40) -Context $resources -Leases $inputLeases
@@ -124,8 +139,10 @@ function Assert-MIR42EngineSharedInputs {
     $argumentNode=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Extent.Text.StartsWith('$args = @(')},$true))
     Check ($argumentNode.Count -eq 1) 'upgrade argument construction is ambiguous.'
     $harness='controlled harness';$repo=$RepoRoot;$rowRoot=Join-Path $exactRoot 'row';$row=$rows.f210;$row.engine='controlled';$row.fixture='controlled';$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
+    $target='f210';$libraryBindings=@{f210=$sourceRoot}
     . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
     Check ($builtArguments[[Array]::IndexOf($builtArguments,'-ExpectedPeakMemoryMiB')+1] -ceq '256' -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -gt 0 -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -lt 4) 'upgrade worker lost the declared peak or remaining output allowance.'
+    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-LocalModLibraryDirs')+1] -ceq $sourceRoot) 'upgrade worker lost the selected direct library.'
 
     # The following actor synthesizes outputs, solely to exercise retained
     # fresh-load oracles and version admission. It proves no native gameplay.
@@ -137,29 +154,36 @@ function Assert-MIR42EngineSharedInputs {
       Check ($NativeActor -and $DeadlineSeconds -eq 60 -and $Arguments -contains '--no-log-rotation') 'fresh actor changed arguments or deadline.'
       Check (($Arguments -contains '--disable-audio') -eq ($freshLine -notin @('0.13','0.14'))) 'historical audio capability changed.'
       $modList=Get-Content -Raw -LiteralPath (Join-Path $mods 'mod-list.json')|ConvertFrom-Json
-      Check (($modList.mods.name -join '|') -ceq 'base|more-infinite-research' -and (Get-Content -Raw $config).Contains('[path]')) 'fresh load lost private configuration.'
+      Check (($modList.mods.name -join '|') -ceq 'base|more-infinite-research' -and (Get-Content -Raw $config).Contains('[path]') -and $mods -ceq $sourceRoot) 'fresh load lost direct library or private configuration.'
+      Check (-not(Test-Path -LiteralPath (Join-Path $mods 'mod-settings.dat'))) 'fresh load inherited settings.'
       $display=(($freshVersion -split '\.')|ForEach-Object {[int]$_})-join '.'
-      $log=Join-Path (Split-Path -Parent $mods) 'factorio-current.log'
+      $userPath=[regex]::Match((Get-Content -Raw $config),'(?m)^write-data=(.+)$').Groups[1].Value.Trim()
+      $log=Join-Path $userPath 'factorio-current.log'
       if($freshFailure -cne 'missing'){[IO.File]::WriteAllText($save,'tiny save')}
-      [IO.File]::WriteAllText($log,"Loading mod more-infinite-research $display`nFactorio initialised`nCreating new map`nMap version controlled`n$freshFailure")
+      [IO.File]::WriteAllText($log,"Loading mod base $freshLine.1 (data.lua)`nLoading mod more-infinite-research $display (data.lua)`nFactorio initialised`nCreating new map`nMap version controlled`n$freshFailure")
       [IO.File]::WriteAllText($StdoutPath,'tiny controlled output');[IO.File]::WriteAllText($StderrPath,'')
       return 0
     }
     $engineRoot=Join-Path $scratch 'controlled-engine';$engine=Join-Path $engineRoot 'bin/x64/factorio.exe'
     $null=New-Item -ItemType Directory -Path (Split-Path -Parent $engine),(Join-Path $engineRoot 'data/base')
     [IO.File]::WriteAllText($engine,'tiny engine identity never executed');$engineHash=Get-MIRImmutableInputSha256 $engine
+    $oldList='{"mods":[{"name":"base","enabled":true}]}';$oldSettings=[byte[]](5,4,3,2,1)
+    [IO.File]::WriteAllText((Join-Path $sourceRoot 'mod-list.json'),$oldList)
+    [IO.File]::WriteAllBytes((Join-Path $sourceRoot 'mod-settings.dat'),$oldSettings)
     $freshFailure='';$freshRoots=[Collections.Generic.List[string]]::new()
     foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(0,1)){
       $freshLine='0.'+$target.Substring(2);$freshVersion='4.2.'+$target.Substring(1)+('0'+$patch)
+      [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
       $candidate=Join-Path $sourceRoot "more-infinite-research_$freshVersion.zip"
       $root=Join-Path $exactRoot "fresh-$target-$patch";$freshRoots.Add($root)
-      $freshParams=@{Target=$target;FactorioLine=$freshLine;Engine=$engine;EngineSha256=$engineHash;Candidate=$candidate;CandidateSha256=Get-MIRImmutableInputSha256 $candidate;Version=$freshVersion;SourceVersion="4.2.$patch";FreshRoot=$root;SourceCommit=('A'*40);DeadlineSeconds=60}
+      $freshParams=@{Target=$target;FactorioLine=$freshLine;Engine=$engine;EngineSha256=$engineHash;Candidate=$candidate;CandidateSha256=Get-MIRImmutableInputSha256 $candidate;Version=$freshVersion;SourceVersion="4.2.$patch";FreshRoot=$root;SourceCommit=('A'*40);DeadlineSeconds=60;LibraryDirectory=$sourceRoot}
       $result=Invoke-MIR42HistoricalFreshLoad @freshParams
       $receipt=Get-Content -Raw -LiteralPath $result.receipt.path|ConvertFrom-Json -Depth 100
-      Check ($receipt.candidate.version -ceq $freshVersion -and (Test-MIR4BootstrapRecordHash $receipt) -and $inputLeases[$inputLeases.Count-1].closed) "$target/$patch did not preserve the fresh receipt or close custody."
-      Check ((Get-MIRImmutableInputFileIdentity $candidate) -ceq (Get-MIRImmutableInputFileIdentity (Join-Path $root "work/user/mods/$([IO.Path]::GetFileName($candidate))"))) "$target/$patch copied the fresh input."
+      Check ($receipt.candidate.version -ceq $freshVersion -and (Test-MIR4BootstrapRecordHash $receipt) -and $receipt.library_input_receipt.status -ceq 'restored-direct-library-controls') "$target/$patch did not preserve the fresh receipt or restore controls."
+      Check (-not(Test-Path -LiteralPath (Join-Path $root 'work/user/mods')) -and $receipt.library_input_receipt.archive_links_created -eq 0 -and $receipt.library_input_receipt.dependency_payload_bytes_copied -eq 0) "$target/$patch materialized fresh inputs."
+      Check ((Get-Content -Raw -LiteralPath (Join-Path $sourceRoot 'mod-list.json')) -ceq $oldList -and [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $sourceRoot 'mod-settings.dat'))) -ceq [Convert]::ToBase64String($oldSettings)) 'fresh actor failed to restore controls.'
     }}
-    Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'work/user/mods/mod-list.json')}|Sort-Object -Unique).Count -eq 10) 'fresh writable controls share identities.'
+    Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'selection.json')}|Sort-Object -Unique).Count -eq 10) 'fresh definitions share identities.'
     foreach($badVersion in @('4.2.01300','4.2.01302','4.2.01401')){
       $freshParams.Version=$badVersion;$freshParams.FreshRoot=Join-Path $exactRoot ('rejected-'+$badVersion)
       Refuses {Invoke-MIR42HistoricalFreshLoad @freshParams} 'historical-fresh-target-binding'
@@ -177,7 +201,58 @@ function Assert-MIR42EngineSharedInputs {
       $expected=if($failure -ceq 'missing'){'historical-fresh-output-missing'}else{'historical-fresh-log-content'}
       Refuses {Invoke-MIR42HistoricalFreshLoad @freshParams} $expected
       Check (-not (Test-Path (Join-Path $freshParams.FreshRoot 'summary.json'))) 'failed fresh oracle produced an accepted receipt.'
-      $null=Complete-MIRImmutableInputLease -Lease $inputLeases[$inputLeases.Count-1] -Outcome failed
+      Check ((Get-Content -Raw -LiteralPath (Join-Path $sourceRoot 'mod-list.json')) -ceq $oldList -and -not(Test-Path -LiteralPath (Join-Path $sourceRoot '.mir-active-profile.json'))) 'failed fresh actor did not restore controls.'
+    }
+    # Invoke the real modern package-smoke consumer with the real activation
+    # adapter. Only the process and summary collector are substituted.
+    Import-MIR42EngineRunnerFunction -Path (Join-Path $RepoRoot 'tools/lib/validation/runner/PackageSmoke.ps1') -Name Invoke-PackageZipSmokeScenario
+    function Test-MIRScenarioSelected {return $true}
+    function Resolve-MIRScenarioDeclaration {return @{group='controlled';timeout_seconds=60;assertions=@('saved','healthy')}}
+    function Start-MIRValidationScenario {return @{status='running'}}
+    function Complete-MIRValidationScenario {param($Record,$Status,$AssertionsExecuted,$ErrorMessage);$Record.status=$Status;$script:smokeStatus=$Status}
+    function Clear-FactorioLog {if(Test-Path -LiteralPath $FactorioLog){[IO.File]::Delete($FactorioLog)}}
+    function Get-MIRFileSha256 {param($Path);Get-MIRImmutableInputSha256 $Path}
+    function Assert-RuntimeLogHealthy {if((Get-Content -Raw $FactorioLog).Contains('Error controlled')){throw 'controlled-unhealthy'}}
+    function Invoke-FactorioProcess {
+      param($FilePath,$Arguments,$TimeoutMs)
+      $mods=$Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]
+      $save=$Arguments[[Array]::IndexOf($Arguments,'--create')+1]
+      Check ($mods -ceq $sourceRoot -and $TimeoutMs -eq 60000) 'modern smoke lost direct library or deadline.'
+      Check (-not(Test-Path -LiteralPath (Join-Path $mods 'mod-settings.dat'))) 'modern smoke inherited settings.'
+      $selected=@((Get-Content -Raw (Join-Path $mods 'mod-list.json')|ConvertFrom-Json).mods|Where-Object enabled)
+      Check ($selected.Count -eq $(if($smokeDlc){6}else{2})) 'modern smoke enabled an unrelated installed mod.'
+      [IO.File]::WriteAllLines($FactorioLog,@($selected|ForEach-Object {"Loading mod $($_.name) $($_.version) (data.lua)"})+@('Factorio initialised','Creating new map'))
+      if($smokeFailure -eq 'extra'){[IO.File]::AppendAllText($FactorioLog,"Loading mod surprise 1.0.0 (data.lua)`n")}
+      if($smokeFailure -eq 'log'){[IO.File]::AppendAllText($FactorioLog,'Error controlled')}
+      if($smokeFailure -ne 'save'){[IO.File]::WriteAllText($save,'tiny save')}
+      if($smokeFailure -eq 'exit'){return 3};return 0
+    }
+    $scenarioRegistry=@{};$LibraryDirectory=$sourceRoot;$FactorioBin=$engine;$factorioReadData=Join-Path $engineRoot 'data'
+    foreach($name in @('quality','elevated-rails','space-age','recycler')){
+      $null=New-Item -ItemType Directory -Path (Join-Path $factorioReadData $name)
+      [IO.File]::WriteAllText((Join-Path $factorioReadData "$name/info.json"),(@{name=$name;version='2.1.1';dependencies=@('base')}|ConvertTo-Json))
+    }
+    foreach($target in @('f210','f200','f110','f100')){
+      $line=switch($target){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'}}
+      [IO.File]::WriteAllText((Join-Path $factorioReadData 'base/info.json'),(@{name='base';version="$line.1";dependencies=@()}|ConvertTo-Json))
+      $repoInfo=@{version=$rows[$target].to};$script:ValidationPackageZipPath=$originals[$target]
+      foreach($case in @('base','dlc','save','exit','extra','log')){
+        if($case -eq 'dlc' -and $target -ne 'f210'){continue}
+        $smokeDlc=$case -eq 'dlc';$smokeFailure=$case
+        $validationRoot=Join-Path $exactRoot "smoke-$target-$case";$null=New-Item -ItemType Directory -Path $validationRoot
+        $validationRootWithSeparator=$validationRoot+'\';$FactorioLog=Join-Path $validationRoot 'factorio-current.log';$factorioConfigPath=Join-Path $validationRoot 'config.ini'
+        [IO.File]::WriteAllLines($factorioConfigPath,@('[path]',"read-data=$factorioReadData","write-data=$validationRoot",'[other]','enable-new-mods=false'))
+        $script:smokeStatus=''
+        if($case -in @('base','dlc')){Invoke-PackageZipSmokeScenario -ScenarioName 'package-zip-base' -EnableSpaceAge:$smokeDlc;Check ($script:smokeStatus -ceq 'passed') 'modern smoke did not finish.'}
+        else{
+          $errorText=switch($case){save{'did not create'};exit{'code 3'};extra{'loaded-selection'};log{'controlled-unhealthy'}}
+          Refuses {Invoke-PackageZipSmokeScenario -ScenarioName 'package-zip-base'} $errorText
+          Check ($script:smokeStatus -ceq 'failed') 'modern smoke accepted a failed actor.'
+        }
+        Check ((Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json')) -ceq $oldList -and -not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'modern smoke failed to restore controls.'
+        Check ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $sourceRoot 'mod-settings.dat'))) -ceq [Convert]::ToBase64String($oldSettings)) 'modern smoke failed to restore settings.'
+        Check (@(Get-ChildItem -LiteralPath $validationRoot -Directory -Recurse|Where-Object Name -EQ 'mods').Count -eq 0) 'modern smoke recreated a mods stage.'
+      }
     }
     foreach($lease in $inputLeases){if(-not $lease.closed){$terminal=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed;$null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal}}
     foreach($lease in $inputLeases){
@@ -194,11 +269,85 @@ function Assert-MIR42EngineSharedInputs {
     Write-Output "MIR42-ENGINE-SHARED-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=18 fresh_version_controls=10 factorio_processes=0"
   } finally {
     foreach($lease in $inputLeases){if(-not $lease.closed){$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}}
-    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','New-MIR42EngineArchiveStage')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
+    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','New-MIR42EngineArchiveStage','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
     if(Test-Path -LiteralPath $scratch){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny engine controls';Remove-Item -LiteralPath $scratch -Recurse -Force}
   }
 }
 Assert-MIR42EngineSharedInputs
+function Test-MIR421MaintenanceEngineInputs {
+  $script:engineInputChecks=0
+  $scratch=''
+  function Check([bool]$Condition,[string]$Message){if(-not$Condition){throw "[maintenance-engine-test] $Message"};$script:engineInputChecks++}
+  function Refuses([scriptblock]$Action,[string]$Expected){$message='';try{&$Action|Out-Null}catch{$message=$_.Exception.Message};Check ($message.Contains($Expected)) "expected $Expected; got $message"}
+  $source=Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1'
+  foreach($name in @('Assert-MIR42ExactEngineAuthority','Assert-MIR42GovernedPredecessor','Assert-MIR42EngineEvidenceMaintenanceExecution','Assert-MIR42EngineEvidenceMaintenanceCustody')){Import-MIR42EngineRunnerFunction -Path $source -Name $name}
+  $oldPath=Join-Path $RepoRoot '.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json'
+  $oldSha=(Get-FileHash -LiteralPath $oldPath).Hash
+  $legacy=Get-Content -LiteralPath $oldPath -Raw|ConvertFrom-Json
+  $captured=Get-Content -LiteralPath (Join-Path $RepoRoot 'spec/engines/mir421-native-engine-inputs-v1.json') -Raw|ConvertFrom-Json
+  $fakeEngine=Join-Path $RepoRoot 'build/tmp/controlled-engine-not-executed.exe'
+  # Substitute binary metadata/bytes only. Both actual release consumers and
+  # the shared tracked-input reader execute; no engine or qualification record.
+  function Get-Item {param($LiteralPath);if($LiteralPath-ceq$fakeEngine){return [pscustomobject]@{FullName=$fakeEngine;VersionInfo=[pscustomobject]@{ProductVersion=$observed.product_version;FileVersion=$observed.file_version}}};Microsoft.PowerShell.Management\Get-Item @PSBoundParameters}
+  function Get-FileHash {param($LiteralPath,$Algorithm);if($LiteralPath-ceq$fakeEngine){return @{Hash=$observed.sha256}};Microsoft.PowerShell.Utility\Get-FileHash @PSBoundParameters}
+  function Get-MIR42DirectPredecessorAuthority {throw 'legacy-predecessor-reader-requested'}
+  function Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 {return @{engine=@{binary=@{sha256=$legacy.targets[0].engine.sha256};file_version=$legacy.targets[0].engine.file_version}}}
+  try{
+    foreach($key in @('f210','f200','f110','f100')){
+      $expected=Get-MIR421NativeEngineInput -RepoRoot $RepoRoot -Target $key
+      $observed=[pscustomobject]@{product_version=$expected.product_version;file_version=$expected.file_version;sha256=$expected.sha256}
+      $target=[pscustomobject]@{target=$key}
+      $publishedInput=[pscustomobject]@{target=$key;path=Join-Path $RepoRoot "build/tmp/more-infinite-research_4.2.$($key.Substring(1))00.zip";version="4.2.$($key.Substring(1))00";sha256=('A'*64)}
+      $execution=[pscustomobject]@{executable_path=$fakeEngine;executable_sha256=$expected.sha256;version=$expected.file_version;predecessor=[pscustomobject]@{path=$publishedInput.path;version=$publishedInput.version;sha256=$publishedInput.sha256};published_maintenance_predecessor=$publishedInput}
+      Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $execution -PublishedMaintenance
+      Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $execution -AuthorityReference @{} -RunAsset @{} -PublishedMaintenanceInput $publishedInput
+      Check ($true) "$key consumes declared maintenance engine without old predecessor archives"
+      foreach($field in @('product_version','file_version','sha256')){
+        $saved=$observed.$field;$observed.$field=if($field-eq'sha256'){'0'*64}elseif($field-eq'file_version'){'2.1.99.99999'}else{'2.1.99'}
+        Refuses {Assert-MIR421NativeEngineIdentity -RepoRoot $RepoRoot -Target $key -Observed $observed} 'mir421-engine-input-binding'
+        $observed.$field=$saved
+      }
+      $execution.executable_sha256='0'*64
+      Refuses {Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $execution -PublishedMaintenance} 'engine-local-identity-drift'
+      $execution.executable_sha256=$expected.sha256
+      $execution.predecessor.sha256='0'*64
+      Refuses {Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $execution -AuthorityReference @{} -RunAsset @{} -PublishedMaintenanceInput $publishedInput} 'maintenance-predecessor-binding'
+      $execution.predecessor.sha256=$publishedInput.sha256
+      Refuses {Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $execution -AuthorityReference @{} -RunAsset @{}} 'legacy-predecessor-reader-requested'
+      if($key-ceq'f210'){
+        Refuses {Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $execution} 'f210-engine-authority-drift'
+        # Consume the actual orchestration branch, including its legacy path.
+        $ast=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$null,[ref]$null)
+        $nodes=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Extent.Text.StartsWith('if ($isHistoricalTarget)') -and $n.Extent.Text.Contains('$row.engine_product_version.StartsWith')},$true))
+        Check ($nodes.Count-eq1) 'modern orchestration admission branch missing'
+        $repo=$RepoRoot;$target=$key;$isHistoricalTarget=$false;$maintenanceInputs=@{selected=$true};$lock=$legacy.targets[0]
+        $row=@{engine_product_version=$expected.product_version;engine_file_version=$expected.file_version;engine_sha256=$expected.sha256;engine_major='2.1';engine_version=''}
+        . ([scriptblock]::Create($nodes[0].Extent.Text))
+        Check ($row.engine_version-ceq$expected.file_version) 'orchestrator did not select the maintenance engine'
+        $maintenanceInputs=$null
+        Refuses {. ([scriptblock]::Create($nodes[0].Extent.Text))} 'mir42-f210-engine-version'
+      }
+    }
+    Check ((Get-FileHash -LiteralPath $oldPath).Hash-ceq$oldSha) 'frozen predecessor authority changed'
+    Check (-not$captured.qualification_authorized -and -not$captured.publication_authorized) 'input lock grants qualification/publication'
+    $scratch=Join-Path $RepoRoot ('build/tmp/maintenance-engine-inputs-'+[guid]::NewGuid().ToString('N'))
+    $null=New-Item -ItemType Directory -Path (Join-Path $scratch 'spec/engines'),(Join-Path $scratch 'spec/schemas')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'spec/schemas/mir421-native-engine-inputs-v1.schema.json') -Destination (Join-Path $scratch 'spec/schemas/mir421-native-engine-inputs-v1.schema.json')
+    foreach($case in @('hash','qualification','order','line')){
+      $record=$captured|ConvertTo-Json -Depth 15|ConvertFrom-Json
+      switch($case){hash{$record.targets[0].sha256='0'*64};qualification{$record.qualification_authorized=$true};order{$record.targets=@($record.targets[1],$record.targets[0],$record.targets[2],$record.targets[3])};line{$record.targets[0].product_version='2.0.77';$record.targets[0].file_version='2.0.77.84539'}}
+      if($case-ne'hash'){$record.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $record}
+      $record|ConvertTo-Json -Depth 15|Set-Content -LiteralPath (Join-Path $scratch 'spec/engines/mir421-native-engine-inputs-v1.json')
+      $errorCode=switch($case){hash{'engine-input-record'};qualification{'engine-input-schema'};order{'engine-input-record'};line{'engine-input-version'}}
+      Refuses {Get-MIR421NativeEngineInput -RepoRoot $scratch -Target f210} $errorCode
+    }
+    Write-Output "MIR421-MAINTENANCE-ENGINE-INPUTS-PASSED assertions=$script:engineInputChecks engines=0"
+  }finally{
+    if($scratch-and(Test-Path -LiteralPath $scratch)){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned engine-input test';Remove-Item -LiteralPath $scratch -Recurse -Force}
+    foreach($name in @('Assert-MIR42ExactEngineAuthority','Assert-MIR42GovernedPredecessor','Assert-MIR42EngineEvidenceMaintenanceExecution','Assert-MIR42EngineEvidenceMaintenanceCustody')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
+  }
+}
+Test-MIR421MaintenanceEngineInputs
 if($SharedInputsOnly){return}
 $script:MIR42HistoricalTerminalInputs = [ordered]@{
   f017 = [ordered]@{ line='0.17'; predecessor='1.7.9'; target_record='targets/historical/f017/target.json'; terminal_seal='.mir/releases/terminal/seals/1.7.9.json' }

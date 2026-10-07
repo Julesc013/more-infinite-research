@@ -20,6 +20,32 @@ $script:MIR42FourTargetLines = [ordered]@{
 }
 $script:MIR42HistoricalTargets = @('f017','f016','f015','f014','f013')
 
+function Get-MIR421NativeEngineInput {
+  param([Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target)
+  $path=Join-Path $RepoRoot 'spec/engines/mir421-native-engine-inputs-v1.json'
+  $schema=Join-Path $RepoRoot 'spec/schemas/mir421-native-engine-inputs-v1.schema.json'
+  $text=Get-Content -LiteralPath $path -Raw
+  if(-not($text|Test-Json -SchemaFile $schema -ErrorAction SilentlyContinue)){throw '[mir421-engine-input-schema]'}
+  $record=$text|ConvertFrom-Json -Depth 20 -DateKind String
+  if(-not(Test-MIR4BootstrapRecordHash -Record $record) -or
+    ($record.targets.target -join '|') -cne 'f210|f200|f110|f100'){throw '[mir421-engine-input-record]'}
+  foreach($row in $record.targets){
+    if(([version]$row.product_version).ToString(2) -cne $script:MIR42FourTargetLines[$row.target] -or
+      -not $row.file_version.StartsWith($row.product_version+'.',[StringComparison]::Ordinal)){throw '[mir421-engine-input-version]'}
+  }
+  return @($record.targets|Where-Object target -CEQ $Target)[0]
+}
+
+function Assert-MIR421NativeEngineIdentity {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target,
+    [Parameter(Mandatory)]$Observed)
+  $expected=Get-MIR421NativeEngineInput -RepoRoot $RepoRoot -Target $Target
+  if([string]$Observed.product_version -cne [string]$expected.product_version -or
+    [string]$Observed.file_version -cne [string]$expected.file_version -or
+    [string]$Observed.sha256 -cne [string]$expected.sha256){throw "[mir421-engine-input-binding] $Target"}
+}
+
 function Get-MIR42ReleaseTargetIdentity {
   param([Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,

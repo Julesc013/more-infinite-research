@@ -202,6 +202,35 @@ function Start-MIRLibraryActivation {
   }
 }
 
+function Start-MIRPackageLibraryActivation {
+  param(
+    [Parameter(Mandatory)][string]$LibraryDirectory,
+    [Parameter(Mandatory)][string]$EngineDataDirectory,
+    [Parameter(Mandatory)][string]$ProfilePath,
+    [Parameter(Mandatory)][string]$Version,
+    [Parameter(Mandatory)][string]$CandidateSha256,
+    [switch]$EnableSpaceAge
+  )
+  # A package smoke uses the same library transaction as progression/upgrade
+  # consumers. Only this small selection document is generated for the run.
+  . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
+  $profile=Resolve-MIR441RecoveryScratchPath -Path $ProfilePath
+  $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory)
+  $names=@('base');if($EnableSpaceAge){
+    $names+=@('quality','elevated-rails','space-age')
+    if(@($inventory|Where-Object {$_.builtin -and $_.name -ceq 'recycler'}).Count){$names+='recycler'}
+  }
+  $mods=@(foreach($name in $names){
+    $rows=@($inventory|Where-Object {$_.builtin -and $_.name -ceq $name})
+    if($rows.Count -ne 1){throw "[mir-package-library-builtin] $name"}
+    @{name=$name;version=$rows[0].version;enabled=$true}
+  })
+  $mods+=@{name='more-infinite-research';version=$Version;enabled=$true}
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $profile))|Out-Null
+  [IO.File]::WriteAllText($profile,(@{mods=$mods}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+  return Start-MIRLibraryActivation -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory -ProfilePath $profile -ArchiveHashes @{("more-infinite-research_$Version.zip")=$CandidateSha256}
+}
+
 function Assert-MIRLibraryFixtureArchive {
   param([Parameter(Mandatory)][string]$Archive,[Parameter(Mandatory)][string]$SourceDirectory)
   Assert-MIRLibraryPath $SourceDirectory
@@ -263,8 +292,10 @@ function Assert-MIRLibraryLoadedSelection {
     $text=$text.Substring($starts[$starts.Count-1].Index)
   }
   $matches=[regex]::Matches($text,'(?m)Loading mod (?:settings )?([^\r\n]+?) (\d+\.\d+\.\d+) \(')
-  $observed=@($matches|ForEach-Object {$_.Groups[1].Value+'@'+$_.Groups[2].Value}|Where-Object {$_ -notlike 'core@*'}|Sort-Object -Unique)
-  $expected=@($Activation.selected|ForEach-Object {$_.name+'@'+$_.version}|Sort-Object -Unique)
+  # Historical engines print numeric components without leading zeroes. The
+  # archive selection above still requires the exact declared version string.
+  $observed=@($matches|ForEach-Object {$_.Groups[1].Value+'@'+([version]$_.Groups[2].Value).ToString()}|Where-Object {$_ -notlike 'core@*'}|Sort-Object -Unique)
+  $expected=@($Activation.selected|ForEach-Object {$_.name+'@'+([version]$_.version).ToString()}|Sort-Object -Unique)
   if(($observed -join '|') -cne ($expected -join '|')){throw '[mir-library-loaded-selection] Actual mod names/versions differ from the profile.'}
   return $observed
 }

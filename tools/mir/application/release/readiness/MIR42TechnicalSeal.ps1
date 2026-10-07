@@ -1114,7 +1114,7 @@ function Assert-MIR42FreshEngineLoads {
 }
 
 function Assert-MIR42ExactEngineAuthority {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$Execution)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$Execution,[switch]$PublishedMaintenance)
   $targetId = [string]$Target.target
   $binary = Get-Item -LiteralPath ([string]$Execution.executable_path)
   $productVersion = [string]$binary.VersionInfo.ProductVersion
@@ -1128,7 +1128,11 @@ function Assert-MIR42ExactEngineAuthority {
       [string]$Execution.version -cne [string]$observed.file_version) {
     throw "[mir42-seal-engine-local-identity-drift] $targetId"
   }
-  if ($targetId -ceq 'f210') {
+  if ($PublishedMaintenance) {
+    Assert-MIR421NativeEngineIdentity -RepoRoot $RepoRoot -Target $targetId -Observed ([pscustomobject]@{
+      product_version=$observed.version;file_version=$observed.file_version;sha256=$observed.binary_sha256
+    })
+  } elseif ($targetId -ceq 'f210') {
     $admission = Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $RepoRoot
     if ([string]$admission.engine.binary.sha256 -cne [string]$observed.binary_sha256 -or
         [string]$admission.engine.file_version -cne [string]$observed.file_version) {
@@ -1217,6 +1221,13 @@ function Assert-MIR42PublishedV410ChecksumAsset {
 
 function Assert-MIR42GovernedPredecessor {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$Execution,[Parameter(Mandatory)]$AuthorityReference,[Parameter(Mandatory)]$RunAsset,$PublishedMaintenanceInput = $null)
+  if ($null -ne $PublishedMaintenanceInput) {
+    # Maintenance custody is the independently read-back published CCC00 set.
+    # The frozen v4.1 input record retains its original engine and archive paths.
+    Assert-MIR42EngineEvidenceMaintenanceExecution -Target ([string]$Target.target) -Execution $Execution -PublishedInput $PublishedMaintenanceInput
+    Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $Target -Execution $Execution -PublishedMaintenance
+    return
+  }
   $authority = Get-MIR42DirectPredecessorAuthority -RepoRoot $RepoRoot -Reference $AuthorityReference
   Assert-MIR42PublishedV410ChecksumAsset -Authority $authority -RunAsset $RunAsset
   $rows = @($authority.record.targets | Where-Object { [string]$_.target -ceq [string]$Target.target })
@@ -1692,7 +1703,7 @@ function Assert-MIR42RealEngineCampaignExecution {
       $historicalProperty = if ($null -ne $PublishedMaintenanceInputs) { 'historical_target_authorities' } else { 'historical_terminal_predecessors' }
       Assert-MIR42HistoricalTerminalExecution -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -HistoricalAuthorities $engineRun.record.$historicalProperty -PublishedMaintenanceInput $publishedInput
     } else {
-      Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution
+      if ($null -eq $publishedInput) { Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution }
       Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -AuthorityReference $engineRun.record.predecessor_authority -RunAsset $engineRun.record.public_v410_checksum_asset -PublishedMaintenanceInput $publishedInput
     }
     Assert-MIR42FreshEngineLoads -Target $target -CandidateTarget $Candidate -Execution $target.engine_execution
