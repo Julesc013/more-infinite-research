@@ -405,13 +405,20 @@ try {
         [string]$descriptor.historical.target_record.path -cne "targets/historical/$target/target.json" -or
         [string]$descriptor.historical.predecessor.sha256 -cne [string]$row.archive -or
         [string]$descriptor.historical.engine.sha256 -cne [string]$row.engine) { throw "descriptor-binding $target" }
-    $patchDescriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.1'
+    $localEngine=Join-Path $descriptorRoot ($target+'/configured-engine.exe')
+    $patchDescriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.1' -EnginePath $localEngine
     $patchIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch 1
     if([string]$patchDescriptor.to-cne[string]$patchIdentity.distribution_version-or
        [string]$patchDescriptor.from-cne[string]$descriptor.from-or
+       [string]$patchDescriptor.engine-cne$localEngine-or
+       [string]$patchDescriptor.historical.engine.path-cne[string]$descriptor.historical.engine.path-or
        [string]$patchDescriptor.historical.predecessor.sha256-cne[string]$descriptor.historical.predecessor.sha256-or
        [string]$patchDescriptor.historical.engine.sha256-cne[string]$descriptor.historical.engine.sha256-or
        [string]$patchDescriptor.historical.target_record.record_sha256-cne[string]$descriptor.historical.target_record.record_sha256){throw "patch-descriptor-binding $target"}
+    foreach($badPath in @('','relative/factorio.exe')){
+      $failure='';try{$null=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.1' -EnginePath $badPath}catch{$failure=$_.Exception.Message}
+      if($failure-cne"[mir421-$target-local-engine-binding-required]"){throw "patch-descriptor-local-binding $target"}
+    }
 
     $recordRelative = "targets/historical/$target/target.json"
     $sealRelative = '.mir/releases/terminal/seals/' + $row.version + '.json'
@@ -443,6 +450,45 @@ try {
     Remove-Item -LiteralPath $resolvedDescriptorRoot -Recurse -Force
   }
 }
+
+function Test-MIR421HistoricalMaintenancePortability {
+  . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+  $checks=0
+  $realContainedResolver=(Get-Command Resolve-MIR42SealContainedArtifactPath).ScriptBlock
+  # Emulate an otherwise intact relocated checkout with no old MIR 3 ZIPs.
+  # Real tracked target/seal records and the real maintenance consumer execute.
+  function Resolve-MIR42SealContainedArtifactPath {
+    param($Root,$RelativePath,$Code)
+    if($RelativePath.StartsWith('dist/')){throw 'retired-archive-read-requested'}
+    & $realContainedResolver @PSBoundParameters
+  }
+  # File-byte checking is covered by the immutable-file reader and native runs;
+  # these controlled paths isolate the caller's identity/location decisions.
+  function Resolve-MIR42SealImmutableFile {param($Path,$Sha256,$Code);[IO.Path]::GetFullPath($Path)}
+  foreach($key in @('f017','f016','f015','f014','f013')){
+    $bound=Get-MIR42HistoricalTerminalAuthority -RepoRoot $RepoRoot -Target $key -PredecessorIdentityOnly
+    if($bound.predecessor_path -cne ''){throw 'Historical identity read retained an archive dependency'};$checks++
+    $failure='';try{$null=Get-MIR42HistoricalTerminalAuthority -RepoRoot $RepoRoot -Target $key}catch{$failure=$_.Exception.Message}
+    if($failure-cne'retired-archive-read-requested'){throw 'Legacy archive check was bypassed'};$checks++
+    $descriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $key -SourceVersion '4.2.1' -EnginePath (Join-Path $RepoRoot ('build/tmp/relocated-engines/'+$key+'/factorio.exe'))
+    $history=$descriptor.historical|ConvertTo-Json -Depth 12|ConvertFrom-Json -Depth 12
+    $publishedInput=[pscustomobject]@{target=$key;path=Join-Path $RepoRoot ('build/tmp/published-'+$key+'.zip');version=('4.2.'+$key.Substring(1)+'00');sha256=('A'*64)}
+    $execution=[pscustomobject]@{executable_path=$descriptor.engine;executable_sha256=$descriptor.historical.engine.sha256;version=$descriptor.historical.engine.version;predecessor=[pscustomobject]@{path=$publishedInput.path;sha256=$publishedInput.sha256;version=$publishedInput.version};harness_receipt=@{};harness_exit_code=0;logs=@();fresh_loads=@();fresh_exact_load=$true;predecessor_upgrade=$true;reload_count=2;historical_terminal_authority=$history;published_maintenance_predecessor=$publishedInput}
+    $authority=@([pscustomobject]@{target=$key;authority=$history})
+    Assert-MIR42HistoricalTerminalExecution -RepoRoot $RepoRoot -Target ([pscustomobject]@{target=$key}) -Execution $execution -HistoricalAuthorities $authority -PublishedMaintenanceInput $publishedInput
+    $checks++
+    foreach($field in @('executable_sha256','version')){
+      $saved=$execution.$field;$execution.$field=if($field-ceq'version'){'0.99.99'}else{'0'*64}
+      $failure='';try{Assert-MIR42HistoricalTerminalExecution -RepoRoot $RepoRoot -Target ([pscustomobject]@{target=$key}) -Execution $execution -HistoricalAuthorities $authority -PublishedMaintenanceInput $publishedInput}catch{$failure=$_.Exception.Message}
+      if(-not$failure.Contains('historical-execution-binding')){throw "Historical maintenance $field mismatch accepted: $failure"};$checks++;$execution.$field=$saved
+    }
+    $execution.predecessor.sha256='0'*64
+    $failure='';try{Assert-MIR42HistoricalTerminalExecution -RepoRoot $RepoRoot -Target ([pscustomobject]@{target=$key}) -Execution $execution -HistoricalAuthorities $authority -PublishedMaintenanceInput $publishedInput}catch{$failure=$_.Exception.Message}
+    if(-not$failure.Contains('maintenance-predecessor-binding')){throw 'Historical maintenance wrong predecessor accepted'};$checks++
+  }
+  Write-Output "MIR421-HISTORICAL-MAINTENANCE-PORTABILITY-PASSED assertions=$checks engines=0"
+}
+Test-MIR421HistoricalMaintenancePortability
 
 $harnessDescriptor = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $RepoRoot
 if ([string]::IsNullOrWhiteSpace([string]$harnessDescriptor.fixture_sha256) -or

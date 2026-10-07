@@ -1254,7 +1254,7 @@ function Assert-MIR42GovernedPredecessor {
 }
 
 function Get-MIR42HistoricalTerminalAuthority {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target,[switch]$PredecessorIdentityOnly)
   if ($Target -notin $script:MIR42SealHistoricalTargets) { throw "[mir42-seal-historical-target] $Target" }
   $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target
   if ($identity.PSObject.Properties.Name -notcontains 'target_record_path') { throw "[mir42-seal-historical-target-record-missing] $Target" }
@@ -1279,12 +1279,15 @@ function Get-MIR42HistoricalTerminalAuthority {
       [string]$seal.record.engine.version -cne [string]$record.engine.version -or [string]$seal.record.engine.binary_sha256 -cne [string]$record.engine.sha256) {
     throw "[mir42-seal-historical-terminal-seal-binding] $Target"
   }
-  $predecessorPath = Resolve-MIR42SealContainedArtifactPath -Root $RepoRoot -RelativePath ([string]$record.predecessor.archive) -Code 'mir42-seal-historical-predecessor'
-  $inventory = Get-MIR4ArchiveInventory -Path $predecessorPath
-  if ([string]$inventory.archive_sha256 -cne [string]$seal.record.archive_sha256 -or
-      [int64]$inventory.bytes -ne [int64]$seal.record.bytes -or [string]$inventory.content_sha256 -cne [string]$seal.record.content_sha256 -or
-      [int]$inventory.entry_count -ne [int]$seal.record.entries) {
-    throw "[mir42-seal-historical-predecessor-binding] $Target"
+  $predecessorPath = ''
+  if (-not $PredecessorIdentityOnly) {
+    $predecessorPath = Resolve-MIR42SealContainedArtifactPath -Root $RepoRoot -RelativePath ([string]$record.predecessor.archive) -Code 'mir42-seal-historical-predecessor'
+    $inventory = Get-MIR4ArchiveInventory -Path $predecessorPath
+    if ([string]$inventory.archive_sha256 -cne [string]$seal.record.archive_sha256 -or
+        [int64]$inventory.bytes -ne [int64]$seal.record.bytes -or [string]$inventory.content_sha256 -cne [string]$seal.record.content_sha256 -or
+        [int]$inventory.entry_count -ne [int]$seal.record.entries) {
+      throw "[mir42-seal-historical-predecessor-binding] $Target"
+    }
   }
   return [pscustomobject][ordered]@{identity=$identity;target_record=$targetRecord;terminal_seal=$seal;predecessor_path=$predecessorPath}
 }
@@ -1298,7 +1301,7 @@ function Assert-MIR42HistoricalTerminalExecution {
     $PublishedMaintenanceInput = $null
   )
   $targetId = [string]$Target.target
-  $expected = Get-MIR42HistoricalTerminalAuthority -RepoRoot $RepoRoot -Target $targetId
+  $expected = Get-MIR42HistoricalTerminalAuthority -RepoRoot $RepoRoot -Target $targetId -PredecessorIdentityOnly:($null -ne $PublishedMaintenanceInput)
   $rows = @($HistoricalAuthorities | Where-Object { [string]$_.target -ceq $targetId })
   if ($rows.Count -ne 1) { throw "[mir42-seal-historical-authority-cardinality] $targetId" }
   Assert-MIR42SealPropertyNames -Value $rows[0] -Expected @('target','authority') -Code 'mir42-seal-historical-authority-shape'
@@ -1342,7 +1345,7 @@ function Assert-MIR42HistoricalTerminalExecution {
     $expectedPredecessorSha = [string]$PublishedMaintenanceInput.sha256
     $expectedPredecessorVersion = [string]$PublishedMaintenanceInput.version
   }
-  if (-not $enginePath.Equals([IO.Path]::GetFullPath([string]$expectedTargetRecord.engine.path),[StringComparison]::OrdinalIgnoreCase) -or
+  if (($null -eq $PublishedMaintenanceInput -and -not $enginePath.Equals([IO.Path]::GetFullPath([string]$expectedTargetRecord.engine.path),[StringComparison]::OrdinalIgnoreCase)) -or
       [string]$Execution.executable_sha256 -cne [string]$expectedTargetRecord.engine.sha256 -or [string]$Execution.version -cne [string]$expectedTargetRecord.engine.version -or
       -not $predecessorPath.Equals($expectedPredecessorPath,[StringComparison]::OrdinalIgnoreCase) -or
       [string]$Execution.predecessor.sha256 -cne $expectedPredecessorSha -or [string]$Execution.predecessor.version -cne $expectedPredecessorVersion) {
