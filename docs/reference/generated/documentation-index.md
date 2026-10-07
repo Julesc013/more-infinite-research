@@ -118,7 +118,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/capabilities/ore-processing.md | Ore Processing Capability | draft | developer | explanation | mir-maintainers | 2026-07-07 |
 | docs/capabilities/owner-conflicts.md | Owner Conflicts Capability | current | developer | explanation | mir-maintainers | 2026-07-07 |
 | docs/capabilities/README.md | Capabilities | current | developer | explanation | mir-maintainers | 2026-07-07 |
-| docs/capabilities/recipe-productivity.md | Recipe Productivity Capability | current | developer | explanation | mir-maintainers | 2026-07-12 |
+| docs/capabilities/recipe-productivity.md | Recipe Productivity Capability | current | developer | explanation | mir-maintainers | 2026-10-07 |
 | docs/capabilities/rule-surfaces.md | Rule Surfaces Capability | current | developer | explanation | mir-maintainers | 2026-07-07 |
 | docs/capabilities/science-integration.md | Science Integration Capability | current | developer | explanation | mir-maintainers | 2026-10-07 |
 | docs/capabilities/tile-surfaces.md | Tile Surfaces Capability | draft | developer | explanation | mir-maintainers | 2026-07-07 |

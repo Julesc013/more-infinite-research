@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0121",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Honor native output rolls when selecting useful productivity recipes.",
+  "details": [
+    "Require a positive valid independent/shared output roll before a recipe can supply a productive item or fluid identity. Modern roll declarations cannot grant productive identities on targets that do not support them.",
+    "Unexcluded fractional item outputs with zero base quantity remain useful on F210/F200. Typed material and existing lab-science selectors consume the corrected facts. Carrier guards, author denial, owners and stable research identities remain in force.",
+    "Controlled canonical fact/matcher checks cover all nine target contracts. Excluded-base fractional output, upstream finalizers, current-package production, catalogue changes and saved-world behavior still require their affected native evidence."
+  ],
+  "semantic_domains": [
+    "productivity",
+    "science",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Shared productive-output projection follows the target roll contract. Controlled checks do not qualify native production, catalogue or saved-world behavior."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/compiler/material_routes.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/recipe-productivity.md",
+      "kind": "document"
+    }
+  ]
+}

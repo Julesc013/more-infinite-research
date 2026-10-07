@@ -1418,4 +1418,68 @@ end)()
   package.loaded["prototypes.mir.planner.stream_compiler.discover"] = nil
 end)()
 
+-- Productive output admission consumes the native roll contract, not merely
+-- a positive authored amount. These controlled cases are not a garden-loop,
+-- upstream-finalizer or native production qualification.
+;(function()
+  local profiles = require("fixtures.material_routes.target_profiles")
+  local provider = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_current = provider.current
+  local actual_facts = require("prototypes.mir.index.recipe_facts")
+  for _, line in ipairs({"2.1", "2.0", "1.1", "1.0", "0.17", "0.16", "0.15", "0.14", "0.13"}) do
+    -- The generated shared provider ends at 0.15. Terminal-derived 0.14/
+    -- 0.13 packages retain the legacy probability/catalyst field boundary;
+    -- this explicit controlled boundary is not a generated profile or load.
+    local profile = profiles.profiles[line] or {factorio_version = line,
+      prototype_shapes = {product_probability_fields = {"probability", "catalyst_amount"}}}
+    provider.current = function() return profile end
+    for _, case in ipairs({
+      {id = "ordinary output", fields = {amount = 1}, expected = true},
+      {id = "zero legacy roll", fields = {amount = 1, probability = 0}, expected = false},
+      {id = "malformed legacy roll", fields = {amount = 1, probability = "invalid"}, expected = false},
+      {id = "fraction only", fields = {amount = 0, extra_count_fraction = 0.5}, expected = line == "2.1" or line == "2.0"},
+      {id = "fraction is item only", kind = "fluid", fields = {amount = 0, extra_count_fraction = 0.5}, expected = false},
+      {id = "zero fraction", fields = {amount = 0, extra_count_fraction = 0}, expected = false},
+      {id = "zero independent roll", fields = {amount = 1, independent_probability = 0}, expected = false},
+      {id = "positive independent roll", fields = {amount = 1, independent_probability = 0.5}, expected = line == "2.1"},
+      {id = "positive shared interval", fields = {amount = 5, shared_probability = {min = 0.45, max = 0.80}}, expected = line == "2.1"},
+      {id = "empty shared interval", fields = {amount = 5, shared_probability = {min = 0.45, max = 0.45}}, expected = false},
+      {id = "reversed shared interval", fields = {amount = 5, shared_probability = {min = 0.80, max = 0.45}}, expected = false},
+      {id = "invalid shared interval", fields = {amount = 5, shared_probability = {min = -0.1, max = 0.45}}, expected = false},
+      {id = "tiny positive rolls", fields = {amount = 1, independent_probability = 1e-200, shared_probability = {min = 0, max = 1e-200}}, expected = line == "2.1"},
+      {id = "fraction cannot bypass zero roll", fields = {amount = 0, extra_count_fraction = 0.5, probability = 0}, expected = false},
+      {id = "excluded base", fields = {amount = 1, ignored_by_productivity = 1}, expected = false}
+    }) do
+      local product = {type = case.kind or "item", name = "observed-product"}
+      for field, value in pairs(case.fields) do product[field] = value end
+      local raw = {name = "roll-producer", allow_productivity = true,
+        ingredients = {{type = "item", name = "feed", amount = 1}}, results = {product}}
+      local before = test_fingerprint(raw)
+      local facts = actual_facts.index_prototypes({[raw.name] = raw})
+      local fact = facts.facts[raw.name]
+      local id = "productive roll " .. line .. "/" .. case.id
+      check((#fact.productive_result_identities == 1) == case.expected, id .. " typed fact")
+      environment(facts.facts); risks = {}
+      local spec = {groups = {{change = 0.02, items = {product.name},
+        required_productive_outputs = {{type = product.type, name = product.name}}}}}
+      local buckets = matcher.recipes_for_stream(spec, 0.02)
+      check((#buckets == 1 and #buckets[1].recipes == 1) == case.expected, id .. " actual matcher")
+      check(test_fingerprint(raw) == before, id .. " preserves input")
+    end
+    if line == "2.1" or line == "2.0" then
+      local raw = {name = "fractional-carrier", allow_productivity = true,
+        ingredients = {{type = "item", name = "carrier", amount = 1}},
+        results = {{type = "item", name = "carrier", amount = 0, extra_count_fraction = 0.5},
+          {type = "item", name = "component", amount = 1}}}
+      local facts = actual_facts.index_prototypes({[raw.name] = raw})
+      local risk = canonical_risks.index_facts(facts, {items = {}}).facts[raw.name]
+      check(canonical_risks.has_hard_flag(risk, "catalyst_or_self_return"), line .. " fractional return remains a risk")
+      environment(facts.facts); risks = {[raw.name] = risk}
+      local buckets = matcher.recipes_for_stream({items = {"component"}}, 0.02)
+      check(#buckets == 1 and #buckets[1].recipes == 0, line .. " fractional carrier cannot grant ordinary productivity")
+    end
+  end
+  provider.current = previous_current
+end)()
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)
