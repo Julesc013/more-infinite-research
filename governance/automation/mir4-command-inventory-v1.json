@@ -923,9 +923,9 @@
     {
       "path": "scripts/Invoke-MIRValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "04AE6C242F1C90794FF665FFA1BF67304D007F661F10FE71F66AA146C4B2EEE9",
+      "sha256": "7AD2F57265F7C2838BF146D34554DBEC0D13F8A27D0C80FDCC877D8F38F8B5E2",
       "hash_mode": "canonical-text-v1",
-      "lines": 25,
+      "lines": 26,
       "package_visible": false
     },
     {
@@ -3051,9 +3051,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
       "classification": "canonical-internal",
-      "sha256": "B674C28189E26E437CD8CE1855AD6648FE65786EC827D406F9343FC6A45E5878",
+      "sha256": "4C54A3509A80155D5C0FA692D4E9791FE11DEA5C9DB20203CDB8C832E3FBD697",
       "hash_mode": "canonical-text-v1",
-      "lines": 785,
+      "lines": 810,
       "package_visible": false
     },
     {
@@ -3667,9 +3667,9 @@
     {
       "path": "tools/lib/compatibility/LibraryActivation.ps1",
       "classification": "canonical-internal",
-      "sha256": "FF5E17AE79D8B0F72C9A140AC71CD252A86F9CB2101B265C3227ACD0F57E8B36",
+      "sha256": "04CC924E7B0D9BACA7AF6099DC2B29E85C36B3500DB67190CA8D845DB20B843B",
       "hash_mode": "canonical-text-v1",
-      "lines": 312,
+      "lines": 343,
       "package_visible": false
     },
     {
@@ -4587,17 +4587,17 @@
     {
       "path": "tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1",
       "classification": "canonical-internal",
-      "sha256": "D88D66F4C899AD66268156A1B75C1E1FD9653B6BFD7F8206F03793A5F831759C",
+      "sha256": "123B1FEC5C6DBB4B04C7485F117A2138AB821C22944A11F475515DFDEA8BE2EB",
       "hash_mode": "canonical-text-v1",
-      "lines": 333,
+      "lines": 334,
       "package_visible": false
     },
     {
       "path": "tools/lib/validation/runner/PackageSmoke.ps1",
       "classification": "canonical-internal",
-      "sha256": "32B548153E1581759EC7CEDEAC1214199132516F4AE60FF532E44E94F641A2B2",
+      "sha256": "AE68D56E7CB0540E00976C0430F73C6F61C1474703F5B22A3EE900D54807C014",
       "hash_mode": "canonical-text-v1",
-      "lines": 162,
+      "lines": 158,
       "package_visible": false
     },
     {
@@ -4627,17 +4627,17 @@
     {
       "path": "tools/lib/validation/runner/RuntimeSelection.ps1",
       "classification": "canonical-internal",
-      "sha256": "8C6DEED1709D4394C43E60E49E55DA9BAEF0C26303DF14828585C7681B0D0476",
+      "sha256": "78BEACBD5F4AA45A63E62383F583ED021642E06B4D1297AE4649E645A0AB0A09",
       "hash_mode": "canonical-text-v1",
-      "lines": 131,
+      "lines": 137,
       "package_visible": false
     },
     {
       "path": "tools/lib/validation/runner/RuntimeWorkspace.ps1",
       "classification": "canonical-internal",
-      "sha256": "A7BF0E11A50884A92885A5DCF1653FA8F9FB13A0061FC3C27D079F4538FF7575",
+      "sha256": "AC230F9D61A4C51E27A570870036602A368F5DCEBA6B16FE5CD74ED082F55A60",
       "hash_mode": "canonical-text-v1",
-      "lines": 134,
+      "lines": 136,
       "package_visible": false
     },
     {
@@ -6042,5 +6042,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a5c17479fc54c1e970ac1a4d7853886e5c9186729bb70e174f91f1575ac5dbc2"
+  "digest": "sha256:d648854f4a70a4fdac6720a63aa2465ba77eeaa895c8e75727e0b51e155a05af"
 }

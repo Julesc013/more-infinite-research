@@ -11,6 +11,7 @@ param(
   [Parameter(Mandatory)][string]$F110Predecessor,
   [Parameter(Mandatory)][string]$F100Predecessor,
   [Parameter(Mandatory)][string]$OutputRoot,
+  [string]$LibraryBindingsPath = '',
   [string]$PublishedMaintenancePredecessorManifestPath = '',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 512,
@@ -24,6 +25,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
+. (Join-Path $RepoRoot 'tools/lib/compatibility/FactorioRunner.ps1')
 
 $script:MIR42ModernEngineTargets = @('f210','f200','f110','f100')
 $script:MIR42HistoricalEngineTargets = @('f017','f016','f015','f014','f013')
@@ -231,6 +233,24 @@ function Invoke-MIR42BoundedUpgrade {
   }
 }
 
+function Get-MIR42EngineLibraryBindings {
+  param([string]$Path,[string[]]$Targets)
+  if([string]::IsNullOrWhiteSpace($Path) -or -not(Test-Path -LiteralPath $Path -PathType Leaf)){
+    throw '[mir42-engine-library-bindings-required] Supply a local JSON object mapping each selected target to its flat archive library.'
+  }
+  if((Get-Item -LiteralPath $Path).Length -gt 64KB){throw '[mir42-engine-library-bindings-size]'}
+  $bindings=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -AsHashtable
+  if($bindings -isnot [Collections.IDictionary] -or $bindings.Count -ne $Targets.Count){throw '[mir42-engine-library-bindings-targets]'}
+  foreach($target in $Targets){
+    if($bindings[$target] -isnot [string] -or -not [IO.Path]::IsPathRooted($bindings[$target]) -or -not(Test-Path -LiteralPath $bindings[$target] -PathType Container)){
+      throw "[mir42-engine-library-missing] $target requires an explicit existing flat library."
+    }
+    Assert-MIRLibraryPath -Path $bindings[$target]
+    $bindings[$target]=(Resolve-Path -LiteralPath $bindings[$target]).Path
+  }
+  return $bindings
+}
+
 function Invoke-MIR42HistoricalFreshLoad {
   param(
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
@@ -239,6 +259,7 @@ function Invoke-MIR42HistoricalFreshLoad {
     [Parameter(Mandatory)][string]$EngineSha256,
     [Parameter(Mandatory)][string]$Candidate,
     [Parameter(Mandatory)][string]$CandidateSha256,
+    [Parameter(Mandatory)][string]$LibraryDirectory,
     [Parameter(Mandatory)][string]$Version,
     [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion='4.2.0',
     [Parameter(Mandatory)][string]$FreshRoot,
@@ -251,16 +272,13 @@ function Invoke-MIR42HistoricalFreshLoad {
   }
   $work = Join-Path $FreshRoot 'work'
   $userData = Join-Path $work 'user'
-  $mods = Join-Path $userData 'mods'
-  New-Item -ItemType Directory -Force -Path $mods | Out-Null
-  $staged = Join-Path $mods ([IO.Path]::GetFileName($Candidate))
+  New-Item -ItemType Directory -Force -Path $userData | Out-Null
   $save = Join-Path $work 'fresh.zip'
   $config = Join-Path $work 'config.ini'
   $log = Join-Path $userData 'factorio-current.log'
   $stdout = Join-Path $FreshRoot 'stdout.txt'
   $stderr = Join-Path $FreshRoot 'stderr.txt'
   $receipt = Join-Path $FreshRoot 'summary.json'
-  Assert-MIRFactorioPathBudget -Path $staged -Context "Historical $Target candidate archive path"
   Assert-MIRFactorioPathBudget -Path $save -Context "Historical $Target fresh-save path"
   if ((Get-MIR42EngineRunSha -Path $Engine) -cne $EngineSha256 -or
       (Get-MIR42EngineRunSha -Path $Candidate) -cne $CandidateSha256) {
@@ -276,21 +294,19 @@ function Invoke-MIR42HistoricalFreshLoad {
     "read-data=$($readData.Replace('\','/'))",
     "write-data=$($userData.Replace('\','/'))",
     '[other]',
-    'check-updates=false'
+    'check-updates=false',
+    'enable-new-mods=false'
   ), [Text.UTF8Encoding]::new($false))
-  $input=[ordered]@{source_path=$Candidate;file_name=[IO.Path]::GetFileName($Candidate);expected_sha256=$CandidateSha256;role='candidate';identity=@{target=$Target;version=$Version;source_version=$SourceVersion};provenance=@{kind='verified-candidate-manifest';source_commit=$SourceCommit};immutable=$true}
-  $inputLease=New-MIRImmutableInputLease -RunRoot $FreshRoot -StageDirectory $mods -Inputs @($input) -RequireHardLinks
-  $inputLeases.Add($inputLease)
-  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $inputLease
-  [IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),
-    (@{mods=@(@{name='base';enabled=$true},@{name='more-infinite-research';enabled=$true})} | ConvertTo-Json -Depth 5),
-    [Text.UTF8Encoding]::new($false))
-  if ((Get-MIR42EngineRunSha -Path $staged) -cne $CandidateSha256) {
-    throw "[mir42-$Target-historical-fresh-stage-drift]"
-  }
+  $activation=Start-MIRPackageLibraryActivation -LibraryDirectory $LibraryDirectory -EngineDataDirectory $readData `
+    -ProfilePath (Join-Path $FreshRoot 'selection.json') -Version $Version -CandidateSha256 $CandidateSha256
+  try {
+  $mods=$activation.library
+  $staged=@($activation.selected|Where-Object name -CEQ 'more-infinite-research')[0].path
+  $modListSha=Get-MIR42EngineRunSha -Path (Join-Path $mods 'mod-list.json')
   $arguments = @('--config',$config,'--no-log-rotation')
   if ($FactorioLine -notin @('0.13','0.14')) { $arguments += '--disable-audio' }
   $arguments += @('--mod-directory',$mods,'--create',$save)
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $Engine -Arguments $arguments
   $null = Invoke-MIR42BoundedUpgrade -PowerShell $Engine -Arguments $arguments -StdoutPath $stdout -StderrPath $stderr -DeadlineSeconds $DeadlineSeconds -NativeActor
   if (-not (Test-Path -LiteralPath $save -PathType Leaf) -or
       -not (Test-Path -LiteralPath $log -PathType Leaf)) {
@@ -309,6 +325,8 @@ function Invoke-MIR42HistoricalFreshLoad {
       (Get-MIR42EngineRunSha -Path $staged) -cne $CandidateSha256) {
     throw "[mir42-$Target-historical-fresh-output-drift]"
   }
+  $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log
+  $terminal=Complete-MIRLibraryActivation -Activation $activation
   $record = [ordered]@{
     schema=1;kind='MIR42HistoricalFreshLoadV1';status='passed';target=$Target
     source_commit=$SourceCommit;factorio_line=$FactorioLine
@@ -316,12 +334,12 @@ function Invoke-MIR42HistoricalFreshLoad {
     candidate=[ordered]@{path=$Candidate;sha256=$CandidateSha256;version=$Version}
     staged_candidate_sha256=(Get-MIR42EngineRunSha -Path $staged)
     config_sha256=(Get-MIR42EngineRunSha -Path $config)
-    mod_list_sha256=(Get-MIR42EngineRunSha -Path (Join-Path $mods 'mod-list.json'))
+    mod_list_sha256=$modListSha
+    library_input_receipt=$terminal
     save=[ordered]@{path=$save;sha256=(Get-MIR42EngineRunSha -Path $save)}
     log=[ordered]@{path=$log;sha256=(Get-MIR42EngineRunSha -Path $log)}
     assertions=@('exact-engine','exact-candidate','fresh-save-created','exact-mod-loaded','map-created','healthy-log')
   }
-  $null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome passed
   $normalized = ConvertTo-MIR4BootstrapCanonicalJson -Value $record | ConvertFrom-Json -Depth 100 -DateKind String
   $null = Write-MIR4BootstrapRecord -Record $normalized -Path $receipt
   $written = Get-Content -Raw -LiteralPath $receipt | ConvertFrom-Json -Depth 100 -DateKind String
@@ -332,6 +350,9 @@ function Invoke-MIR42HistoricalFreshLoad {
     log=[pscustomobject][ordered]@{path=$log;sha256=(Get-MIR42EngineRunSha -Path $log)}
     stdout=[pscustomobject][ordered]@{path=$stdout;sha256=(Get-MIR42EngineRunSha -Path $stdout)}
     stderr=[pscustomobject][ordered]@{path=$stderr;sha256=(Get-MIR42EngineRunSha -Path $stderr)}
+  }
+  } finally {
+    if(-not $activation.closed){$null=Complete-MIRLibraryActivation -Activation $activation}
   }
 }
 
@@ -387,6 +408,8 @@ if (-not $out.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase) -or
 $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $out
 $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
 if($running.Count){throw '[mir42-engine-factorio-already-running]'}
+$targets = if ($isNineTargetCandidate) { @($script:MIR42NineTargetEngineTargets) } else { @($script:MIR42ModernEngineTargets) }
+$libraryBindings=Get-MIR42EngineLibraryBindings -Path $LibraryBindingsPath -Targets $targets
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $out -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
 $inputLeases=[Collections.Generic.List[object]]::new()
 trap {
@@ -454,7 +477,6 @@ $selected = [ordered]@{
 foreach ($target in $script:MIR42ModernEngineTargets) {
   $selected[$target].to = [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion $sourceVersion).distribution_version
 }
-$targets = if ($isNineTargetCandidate) { @($script:MIR42NineTargetEngineTargets) } else { @($script:MIR42ModernEngineTargets) }
 if ((@($inputAuthority.targets | ForEach-Object { [string]$_.target }) -join '|') -cne ($script:MIR42ModernEngineTargets -join '|')) {
   throw '[mir42-engine-candidate-target-set]'
 }
@@ -624,6 +646,7 @@ foreach ($target in $targets) {
     New-Item -ItemType Directory -Force -Path $freshRoot | Out-Null
     $freshLoads = @(Invoke-MIR42HistoricalFreshLoad -Target $target -FactorioLine ([string]$row.historical.terminal_seal.target) `
       -Engine $row.engine -EngineSha256 $row.engine_sha256 -Candidate $row.candidate -CandidateSha256 $row.candidate_sha256 `
+      -LibraryDirectory $libraryBindings[$target] `
       -Version $row.to -SourceVersion $sourceVersion -FreshRoot $freshRoot -SourceCommit $head -DeadlineSeconds $RowDeadlineSeconds)
     $processTotal++
   } else {
@@ -637,6 +660,7 @@ foreach ($target in $targets) {
       $freshArgs = @('-NoProfile','-File',(Join-Path $repo 'scripts/Invoke-MIRValidation.ps1'),
         '-ScenarioWorker','-Scenario',$scenario,'-FactorioBin',$row.engine,
         '-UserDataDir',(Join-Path $freshRoot 'work'),'-CandidateZip',$row.candidate,
+        '-LibraryDirectory',$libraryBindings[$target],
         '-MaxParallel','1','-ValidationSummaryPath',$summaryPath)
       if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) {
         throw "[mir42-$target-$scenario-engine-drift-before]"
@@ -684,6 +708,7 @@ foreach ($target in $targets) {
   $args = @('-NoProfile','-File',$harness,'-RepoRoot',$repo,'-FactorioBin',$row.engine,
     '-FromZip',$row.predecessor,'-ToZip',$row.candidate,'-FromVersion',$row.from,'-ToVersion',$row.to,
     '-FixtureName',$row.fixture,'-Archetype','base-default','-OutputPath',$receiptPath,
+    '-LocalModLibraryDirs',$libraryBindings[$target],
     '-WorkRoot',(Join-Path $rowRoot 'work'),'-Retention','OnFailure',
     '-ExpectedPeakMemoryMiB',([string]$ExpectedPeakMemoryMiB),'-MaxNewOutputMiB',([string][int][Math]::Floor((Get-MIRNativeProbeRemainingOutputBytes -Context $resources)/1MB)))
   if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-staged-candidate-drift-before-upgrade]" }

@@ -7663,6 +7663,13 @@
         "tools/mir/application/package/DistributionCustody.ps1",
         ".mir/distributions.json",
         "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "scripts/Invoke-MIRValidation.ps1",
+        "tools/lib/validation/runner/PackageSmoke.ps1",
+        "tools/lib/validation/runner/RuntimeSelection.ps1",
+        "tools/lib/validation/runner/RuntimeWorkspace.ps1",
+        "tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
@@ -8136,5 +8143,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:9b7378e857ad24e944c6e425d81a85b22b2ce9667988457e7e05f407db840d97"
+  "digest": "sha256:73ddc2a4e937c1e5311c305fd3d8bac6c2ee50cd8cd0ed2231ebe78d0e7e99d2"
 }
