@@ -28,7 +28,7 @@
     "compatibility->core","compatibility->domain","compatibility->index","compatibility->pipeline","compatibility->platform","compatibility->report",
     "domain->core","domain->index","domain->integrity","domain->pipeline",
     "emit->core","emit->domain","emit->graph","emit->integrity","emit->pipeline","emit->planner","emit->platform","emit->presentation","emit->report",
-    "families->compatibility","families->core","families->graph","families->index","families->pipeline","families->platform","families->providers","families->report",
+    "families->compatibility","families->core","families->domain","families->graph","families->index","families->pipeline","families->platform","families->providers","families->report",
     "graph->capabilities","graph->core","graph->domain","graph->platform","graph->report",
     "index->compatibility","index->core","index->domain","index->integrity","index->pipeline","index->platform","index->report",
     "integrity->core","integrity->domain",

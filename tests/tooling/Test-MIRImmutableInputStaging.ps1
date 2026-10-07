@@ -1,5 +1,5 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot = '',[switch]$NativeProbeOnly,[switch]$MaterialAuditInputsOnly,[switch]$EntryPointDefaultsOnly)
+param([string]$RepoRoot = '',[switch]$NativeProbeOnly,[switch]$MaterialAuditInputsOnly,[switch]$EntryPointDefaultsOnly,[switch]$RetentionInputsOnly)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -11,7 +11,7 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
-if (@($NativeProbeOnly,$MaterialAuditInputsOnly,$EntryPointDefaultsOnly | Where-Object { $_ }).Count -gt 1) { throw 'Select one focused immutable-input test mode.' }
+if (@($NativeProbeOnly,$MaterialAuditInputsOnly,$EntryPointDefaultsOnly,$RetentionInputsOnly | Where-Object { $_ }).Count -gt 1) { throw 'Select one focused immutable-input test mode.' }
 . (Join-Path $RepoRoot 'tests/support/MIRNativeEntryDefaults.ps1')
 $entryDefaults=Test-MIRNativeEntryDefaults -RepoRoot $RepoRoot
 if ($EntryPointDefaultsOnly) { $entryDefaults | ConvertTo-Json; return }
@@ -37,6 +37,80 @@ try {
   [IO.File]::WriteAllText($sourceTwo, 'mod bytes', [Text.UTF8Encoding]::new($false))
   $hashOne = Get-MIRImmutableInputSha256 -Path $sourceOne
   $hashTwo = Get-MIRImmutableInputSha256 -Path $sourceTwo
+
+  # Exercise the consumed retention adapter with tiny inputs. The retained
+  # gameplay campaign is not rerun merely because its staging changed.
+  . (Join-Path $RepoRoot 'tests/support/MIRCandidateRetentionInputs.ps1')
+  $retentionOutput=Initialize-MIRCandidateRetentionOutputRoot -RepoRoot $RepoRoot -OutputRoot (Join-Path $fixtureRoot 'retention')
+  $sentinel=Join-Path $retentionOutput 'unique-result.txt'
+  [IO.File]::WriteAllText($sentinel,'preserve previous result',[Text.UTF8Encoding]::new($false))
+  $refused=$false
+  try { Initialize-MIRCandidateRetentionOutputRoot -RepoRoot $RepoRoot -OutputRoot $retentionOutput | Out-Null }
+  catch { $refused=$_.Exception.Message -match 'already exists; preserve' }
+  if(-not $refused -or [IO.File]::ReadAllText($sentinel) -cne 'preserve previous result'){throw 'Retention erased an existing result'}
+  foreach($outside in @((Join-Path $RepoRoot 'dist/retention-must-not-exist'),(Join-Path $fixtureRoot '../../../retention-must-not-exist'))){
+    $refused=$false
+    try { Initialize-MIRCandidateRetentionOutputRoot -RepoRoot $RepoRoot -OutputRoot $outside | Out-Null }
+    catch { $refused=$_.Exception.Message -match 'must remain below' }
+    if(-not $refused){throw 'Retention admitted output outside build'}
+  }
+  $retentionRun=Join-Path $retentionOutput 'selected'
+  $null=New-Item -ItemType Directory -Path $retentionRun
+  $materialLease=New-MIRCandidateRetentionInputLease -RunRoot $retentionRun -ModsDirectory (Join-Path $retentionRun 'mods') -ModZip $sourceOne
+  $input=$materialLease.record.inputs[0]
+  if($input.staging_mode -cne 'hardlink' -or (Get-MIRImmutableInputFileIdentity $sourceOne) -cne (Get-MIRImmutableInputFileIdentity $input.stage_path)){throw 'Retention duplicated package payload'}
+  $refused=$false
+  try { $write=[IO.File]::Open($input.stage_path,[IO.FileMode]::Open,[IO.FileAccess]::Write,[IO.FileShare]::Read);$write.Dispose() }
+  catch [IO.IOException] { $refused=$true }
+  if(-not $refused){throw 'Retention alias could mutate its shared source'}
+  $terminal=Complete-MIRImmutableInputLease -Lease $materialLease -Outcome passed
+  $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal
+  $materialLease=$null
+
+  $copyAttempts=0
+  function New-Item {
+    [CmdletBinding()]param([string]$ItemType,[string[]]$Path,[string]$Target,[switch]$Force)
+    if($ItemType -ceq 'HardLink'){throw 'controlled unavailable retention hardlink'}
+    Microsoft.PowerShell.Management\New-Item @PSBoundParameters
+  }
+  function Copy-Item {
+    [CmdletBinding()]param([string[]]$LiteralPath,[string]$Destination,[switch]$Force)
+    $script:copyAttempts++;throw 'retention archive copy attempted'
+  }
+  try {
+    $failedRetentionRun=Join-Path $retentionOutput 'link-failed'
+    $null=New-Item -ItemType Directory -Path $failedRetentionRun
+    $refused=$false
+    try {New-MIRCandidateRetentionInputLease -RunRoot $failedRetentionRun -ModsDirectory (Join-Path $failedRetentionRun 'mods') -ModZip $sourceOne|Out-Null}
+    catch {$refused=$_.Exception.Message -match 'requires a verified hard link.*controlled unavailable retention hardlink'}
+    if(-not $refused -or $copyAttempts -ne 0 -or @(Get-ChildItem -LiteralPath (Join-Path $failedRetentionRun 'mods') -File).Count -ne 0){throw 'Retention failed link copied package payload'}
+  } finally {Remove-Item Function:New-Item;Remove-Item Function:Copy-Item}
+
+  $tokens=$null;$parseErrors=$null
+  $runnerPath=Join-Path $RepoRoot 'tests/package/Test-MIRCandidateRetention.ps1'
+  $ast=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$tokens,[ref]$parseErrors)
+  if(@($parseErrors).Count){throw 'Retention runner does not parse'}
+  $definitions=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-MIRRetentionRun'},$true))
+  if($definitions.Count-ne1){throw 'Consumed retention engine operation is missing'}
+  . ([scriptblock]::Create($definitions[0].Extent.Text))
+  # A nonexistent executable exercises the real exception/finalization path
+  # after staging and private controls, without starting an engine/process.
+  $OutputRoot=$retentionOutput;$dataPath=$sourceRoot
+  $FactorioBin=Join-Path $fixtureRoot 'must-not-exist-factorio.exe'
+  $profile=[pscustomobject]@{factorio=[pscustomobject]@{line='0.13'}}
+  $TimeoutSeconds=1;$failed=$false
+  try {Invoke-MIRRetentionRun -Name 'launch-failed' -ModZip $sourceOne -Mode create -MapPath (Join-Path $retentionOutput 'unused-save.zip')|Out-Null}
+  catch {$failed=$_.Exception.Message -match 'cannot find the file|system cannot find|No such file|starting process'}
+  if(-not $failed){throw 'Retention exception path did not reach the intended missing executable'}
+  $failedRoot=Join-Path $retentionOutput 'launch-failed'
+  $receipt=Get-Content -LiteralPath (Join-Path $failedRoot 'mir-immutable-input-lease.json') -Raw | ConvertFrom-Json -Depth 20 -DateKind String
+  if($receipt.state -cne 'failed' -or $receipt.outcome -cne 'failed' -or -not $receipt.inputs_sha256_match){throw 'Retention exception lost terminal input custody'}
+  if($receipt.terminal_record_sha256 -cne (Get-MIRImmutableInputRecordSha256 -Record $receipt)){throw 'Retention exception custody digest differs'}
+  if((Get-MIRImmutableInputLeaseLiveness -RunRoot $failedRoot).active){throw 'Retention exception retained open input handles'}
+  if(-not (Test-Path -LiteralPath (Join-Path $failedRoot 'mods/mod-list.json')) -or (Test-Path -LiteralPath (Join-Path $sourceRoot 'mod-list.json'))){throw 'Retention shared its writable control file'}
+  if((Get-MIRImmutableInputSha256 $sourceOne) -cne $hashOne){throw 'Retention changed its supplied package'}
+  Write-Host '[ok] retention consumes verified aliases, refuses copies and existing/outside outputs, protects shared bytes, and records terminal launch failure with private controls; no Factorio.'
+  if($RetentionInputsOnly){return}
 
   . (Join-Path $RepoRoot 'tests/support/MIRMaterialAuditInputs.ps1')
   $auditLibrary=Join-Path $fixtureRoot 'audit-library'

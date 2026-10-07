@@ -61,6 +61,53 @@ function M.maximum_base_result_amount(entry)
   return math.max(minimum, maximum)
 end
 
+-- Baseline production, before bonus exclusions. Return true only for a
+-- supported, unambiguous product that cannot occur. Unknown fields/shapes
+-- retain their possible process edge; this is not a profitable-loop proof.
+-- Schema-2 facts synthesize an independent probability on legacy targets,
+-- so only retained authored declarations invoke the native-field gates.
+function M.result_is_definitely_zero(entry, profile, canonical)
+  if type(entry) ~= "table" then return false end
+  local kind = entry.type or "item"
+  if kind ~= "item" and kind ~= "fluid" then return false end
+  local fields = profile and profile.prototype_shapes and profile.prototype_shapes.product_probability_fields or {}
+  local function supports(field)
+    for _, declared_field in ipairs(fields) do if declared_field == field then return true end end
+    return false
+  end
+  local independent, legacy = entry.independent_probability, entry.probability
+  if canonical then
+    independent, legacy = entry.declared_independent_probability, entry.declared_probability
+  end
+  if independent ~= nil and not supports("independent_probability")
+    or legacy ~= nil and not supports("probability")
+    or entry.shared_probability ~= nil and not supports("shared_probability")
+    or entry.extra_count_fraction ~= nil and (kind ~= "item" or not supports("extra_count_fraction")) then return false end
+  local function finite_nonnegative(value)
+    return type(value) == "number" and value == value and value >= 0 and value < math.huge
+  end
+  local amount = entry.amount
+  if amount == nil then amount = entry[2] end
+  if amount == nil then
+    if not finite_nonnegative(entry.amount_min) or not finite_nonnegative(entry.amount_max) then return false end
+    amount = math.max(entry.amount_min, entry.amount_max)
+  end
+  if not finite_nonnegative(amount) then return false end
+  local extra = entry.extra_count_fraction
+  if extra == nil then extra = 0 end
+  if not finite_nonnegative(extra) or extra > 1 then return false end
+  local probability = entry.independent_probability
+  if probability == nil then probability = entry.probability end
+  if probability == nil then probability = 1 end
+  if not finite_nonnegative(probability) or probability > 1 then return false end
+  local shared = entry.shared_probability
+  if shared ~= nil and (type(shared) ~= "table"
+    or not finite_nonnegative(shared.min) or not finite_nonnegative(shared.max)
+    or shared.max > 1 or shared.min > shared.max) then return false end
+  return probability == 0 or (shared ~= nil and shared.min == shared.max)
+    or (amount == 0 and extra == 0)
+end
+
 function M.productivity_excluded_amount(entry, profile)
   if type(entry) ~= "table" then return 0 end
   if entry.ignored_by_productivity ~= nil then
