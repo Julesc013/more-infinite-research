@@ -26,6 +26,7 @@ function New-TestArchive([string]$Name,[string]$Version,[string[]]$Dependencies=
 }
 Write-TestJson (Join-Path $data 'base/info.json') @{name='base';version='2.1.20';dependencies=@()}
 Write-TestJson (Join-Path $data 'quality/info.json') @{name='quality';version='2.1.20';dependencies=@('base')}
+foreach($name in @('elevated-rails','recycler','space-age')){[IO.Directory]::CreateDirectory((Join-Path $data $name))|Out-Null;Write-TestJson (Join-Path $data ($name+'/info.json')) @{name=$name;version='2.1.20';dependencies=@('base')}}
 $first=New-TestArchive 'alpha' '1.0.0';$second=New-TestArchive 'alpha' '2.0.0';$extra=New-TestArchive 'unrequested' '1.0.0'
 $spaceName=New-TestArchive 'Flare Stack' '4.3.1'
 $dependent=New-TestArchive 'dependent' '1.0.0' @('base','alpha >= 2.0.0')
@@ -131,6 +132,40 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
     Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity $file.FullName) -ceq $before[$file.Name] -and (Get-MIRImmutableInputSha256 $file.FullName) -ceq $hashes[$file.Name]) ('archive unchanged '+$file.Name)
   }
   Assert-LibraryTest (@(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.zip'|Where-Object FullName -CNE $load.save).Count -eq $before.Count) 'only original mod archives and the owned output save exist'
+  # Invoke the actual K2 consumer's input boundary without running its engine
+  # campaign. Only pure function declarations are imported from the harness.
+  $tokens=$null;$errors=$null
+  $harness=Join-Path $RepoRoot 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
+  $ast=[Management.Automation.Language.Parser]::ParseFile($harness,[ref]$tokens,[ref]$errors)
+  Assert-LibraryTest ($errors.Count -eq 0) 'K2 direct-library consumer parses'
+  foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213DirectLibraryInputs')){
+    $nodes=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+    if($nodes.Count -ne 1){throw "K2 input function is absent or duplicated: $name"}
+    . ([scriptblock]::Create($nodes[0].Extent.Text))
+  }
+  . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
+  $fixtureRoot=Join-Path $root 'fixture-source';[IO.Directory]::CreateDirectory($fixtureRoot)|Out-Null
+  Write-TestJson (Join-Path $fixtureRoot 'info.json') @{name='mir-tiny-k2';version='0.1.0';factorio_version='2.1';dependencies=@('base','alpha >= 1.0.0')}
+  [IO.File]::WriteAllText((Join-Path $fixtureRoot 'control.lua'),'-- tiny current fixture')
+  $fixtureArchive=Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name 'mir-tiny-k2' -Version '0.1.0' -ModsDir $library
+  $tinyInputs=@([ordered]@{file_name='alpha_1.0.0.zip';expected_sha256=$hashes['alpha_1.0.0.zip'];identity=@{name='alpha';version='1.0.0'}})
+  $direct=Read-K2213DirectLibraryInputs -Library $library -Inputs $tinyInputs -FixtureRoot $fixtureRoot
+  Assert-LibraryTest ($direct.archive_hashes.Count -eq 2 -and $direct.mod_list.mods.Count -eq 7) 'actual K2 reader selects only locked archives, fixture and five exact builtins'
+  $profileK2=Join-Path $profiles 'k2-input-boundary.json';Write-TestJson $profileK2 $direct.mod_list
+  $activation=Start-MIRLibraryActivation $library $data $profileK2 $direct.archive_hashes
+  . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
+  $context=[pscustomobject]@{root=$run;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=1MB;result_reserve_bytes=64KB}
+  $beforeControls=Get-MIRNativeProbeRemainingOutputBytes -Context $context
+  Add-MIRNativeProbeLibraryActivation -Context $context -Activation $activation
+  Assert-LibraryTest ((Get-MIRNativeProbeRemainingOutputBytes -Context $context) -lt $beforeControls) 'existing output budget charges active controls and recovery journal'
+  $terminal=Complete-MIRLibraryActivation $activation;$activation=$null
+  Assert-LibraryTest ((Get-MIRNativeProbeRemainingOutputBytes -Context $context) -eq $beforeControls) 'restored controls release their temporary output charge'
+  Assert-LibraryTest ($terminal.selected.Count -eq 7 -and $terminal.dependency_payload_bytes_copied -eq 0) 'K2 selection consumes the real direct-library adapter'
+  $wrong=@([ordered]@{file_name='alpha_9.0.0.zip';expected_sha256=$hashes['alpha_1.0.0.zip'];identity=@{name='alpha';version='9.0.0'}})
+  Assert-LibraryRefusal {Read-K2213DirectLibraryInputs -Library $library -Inputs $wrong -FixtureRoot $fixtureRoot} 'archive-missing:alpha'
+  Assert-LibraryTest (-not(Test-Path -LiteralPath (Join-Path $library 'alpha_9.0.0.zip'))) 'missing K2 input was not copied or downloaded'
+  [IO.File]::WriteAllText((Join-Path $fixtureRoot 'control.lua'),'-- changed fixture body')
+  Assert-LibraryRefusal {Read-K2213DirectLibraryInputs -Library $library -Inputs $tinyInputs -FixtureRoot $fixtureRoot} 'library-fixture-source:control.lua'
   Assert-LibraryTest (@(Get-ChildItem -LiteralPath $profiles -Recurse -File|Where-Object Extension -EQ '.zip').Count -eq 0) 'definition-only profiles'
   [ordered]@{status='passed';checks=$script:checks;root=$root;native_engine_runs=0}|ConvertTo-Json
 }finally{if($null -ne $activation -and -not $activation.closed){$null=Complete-MIRLibraryActivation $activation}}

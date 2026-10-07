@@ -400,8 +400,10 @@
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/compatibility/FactorioRunner.ps1",
         "tools/lib/compatibility/ModPortal.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
         "tests/tooling/Test-MIRLibraryActivation.ps1"
       ]
     },
