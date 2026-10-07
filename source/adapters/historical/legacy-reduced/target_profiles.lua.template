@@ -33,6 +33,15 @@ local M = {
       prototype_shapes = {
         recipe_category = "category",
         handcrafting_prototype_type = "player",
+        science_pack_aliases = {
+          ["automation-science-pack"] = "science-pack-1",
+          ["logistic-science-pack"] = "science-pack-2",
+          ["chemical-science-pack"] = "science-pack-3",
+          ["utility-science-pack"] = "high-tech-science-pack"
+        },
+        extra_science_progression = ("@@FACTORIO_LINE@@" == "0.13" or "@@FACTORIO_LINE@@" == "0.14") and {
+          ["alien-science-pack"] = {"science-pack-1", "science-pack-2", "science-pack-3", "alien-science-pack"}
+        } or {},
         science_pack_prototype_kinds = {"tool"},
         product_probability_fields = {"probability", "catalyst_amount"},
         technology_formula = true,

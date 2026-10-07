@@ -62,6 +62,7 @@ end
 
 S.all_lab_inputs = pack_registry.all_lab_inputs
 S.science_pack_exists = pack_registry.science_pack_exists
+S.native_pack_name = pack_registry.native_pack_name
 S.pack_list_all = pack_registry.pack_list_all
 S.pack_list_official = pack_registry.pack_list_official
 S.is_official_science_pack = pack_registry.is_official_science_pack

@@ -1,4 +1,4 @@
--- Base/default 0.16 regression: a handcraftable lab must not disappear from
+-- Base/default 0.13-0.16 regression: a handcraftable lab must not disappear from
 -- the acquisition graph merely because the actor prototype is named player.
 assert(data.raw.player and data.raw.player.player, 'Expected the historical player prototype')
 local accepted = {}
@@ -11,10 +11,15 @@ for _, key in ipairs({
   local technology = assert(data.raw.technology[name], 'Missing handcrafting-dependent research: ' .. name)
   assert(technology.enabled ~= false and not technology.hidden, 'Unavailable research: ' .. name)
   assert(technology.unit and #technology.unit.ingredients > 0, 'Missing research science: ' .. name)
+  local expected = {['science-pack-1']=true,['science-pack-2']=true,['science-pack-3']=true}
+  if data.raw.tool['production-science-pack'] then expected['production-science-pack']=true end
   for _, ingredient in ipairs(technology.unit.ingredients) do
     local pack, amount = ingredient.name or ingredient[1], ingredient.amount or ingredient[2]
     assert(accepted[pack] and amount > 0, 'Invalid laboratory ingredient: ' .. name .. '/' .. tostring(pack))
+    assert(expected[pack], 'Unexpected default science: ' .. name .. '/' .. tostring(pack))
+    expected[pack] = nil
   end
+  assert(next(expected)==nil, 'Missing native default science: ' .. name)
   assert(technology.effects and #technology.effects > 0, 'Missing research effects: ' .. name)
   for _, prerequisite in ipairs(technology.prerequisites or {}) do
     assert(data.raw.technology[prerequisite], 'Missing prerequisite: ' .. name .. '/' .. prerequisite)

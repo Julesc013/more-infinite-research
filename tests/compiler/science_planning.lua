@@ -38,7 +38,8 @@ stub('prototypes.mir.platform.factorio.prototype_lookup', {
 stub('prototypes.mir.index.item_prototype_facts', {placeable_items_for_entity=function(name)
  return data.raw.lab[name] and {name} or {}
 end})
-local registry = {science_pack_exists=function(n) return exists[n]==true end}
+local registry = {science_pack_exists=function(n) return exists[n]==true end,
+ native_pack_name=function(n) return n end,extra_official_progression=function() return {} end}
 stub('prototypes.mir.capabilities.science_integration.pack_registry',registry)
 stub('prototypes.mir.streams.registry',{shared={per_level_default=0.1}})
 stub('prototypes.mir.capabilities.recipe_productivity.recipe_matching',{buckets_view=function(key) return derived_buckets[key] or {} end})
@@ -51,6 +52,7 @@ local lab = require('prototypes.mir.capabilities.science_integration.lab_compati
 local policy = require('prototypes.mir.capabilities.science_integration.science_selection_policy')
 local science = {
  science_pack_exists=registry.science_pack_exists,
+ native_pack_name=registry.native_pack_name,
  official_progression_packs_for=policy.official_progression_packs_for,
  space_age_progression_packs_for=policy.space_age_progression_packs_for,
  pack_list_all=function() return known end,

@@ -32,6 +32,8 @@ package.loaded["prototypes.mir.capabilities.science_integration.lab_compatibilit
   ingredient_name = function(ingredient) return ingredient.name or ingredient[1] end
 }
 package.loaded["prototypes.mir.capabilities.science_integration.pack_registry"] = {
+  native_pack_name = function(name) return name end,
+  extra_official_progression = function() return {} end,
   science_pack_exists = function() return late_available end,
   ordered_pack_list_from_set = function(set)
     local packs = {}; for pack in pairs(set) do packs[#packs + 1] = pack end

@@ -1174,4 +1174,76 @@ for _, case in ipairs({
     return researchability.reason_with_context(...)
   end)
 end
+-- Consume the shared registry, selector and progression policy with explicit
+-- historical platform names. Recipe/ecosystem policy is empty in these cases;
+-- final engine catalogues are checked separately by the native fixture.
+do
+  local shapes = require('prototypes.mir.platform.factorio.target_profiles').current().prototype_shapes
+  local old_aliases, old_extra = shapes.science_pack_aliases, shapes.extra_science_progression
+  local values = {['mir-science-pack-ingredient-policy']='configured'}
+  local saved = {}
+  for name, value in pairs({
+    ['prototypes.mir.settings.effective']={get=function(name) return values[name] end},
+    ['prototypes.mir.streams.registry']={shared={per_level_default=0.1}},
+    ['prototypes.mir.capabilities.recipe_productivity.recipe_matching']={buckets_view=function() return {} end},
+    ['prototypes.mir.compatibility.policy_authority']={science_roles_for_stream=function() return {} end}
+  }) do saved[name]=package.loaded[name]; package.loaded[name]=value end
+  local registry = require('prototypes.mir.capabilities.science_integration.pack_registry')
+  local policy = require('prototypes.mir.capabilities.science_integration.science_selection_policy')
+  local selector = require('prototypes.mir.capabilities.science_integration.science_selector')
+  local function names(ingredients)
+    local out={}; for _, ingredient in ipairs(ingredients) do out[#out+1]=ingredient[1] end
+    return table.concat(out, ',')
+  end
+  for _, case in ipairs({
+    {id='modern',packs={'automation-science-pack','logistic-science-pack','chemical-science-pack','production-science-pack','utility-science-pack'},
+      expected='automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack'},
+    {id='0.15-0.16',historical=true,packs={'science-pack-1','science-pack-2','science-pack-3','production-science-pack','high-tech-science-pack'},
+      expected='science-pack-1,science-pack-2,science-pack-3,production-science-pack'},
+    {id='0.13-0.14',historical=true,alien=true,packs={'science-pack-1','science-pack-2','science-pack-3','alien-science-pack'},
+      expected='science-pack-1,science-pack-2,science-pack-3'}
+  }) do
+    shapes.science_pack_aliases=case.historical and {
+      ['automation-science-pack']='science-pack-1', ['logistic-science-pack']='science-pack-2',
+      ['chemical-science-pack']='science-pack-3', ['utility-science-pack']='high-tech-science-pack'
+    } or nil
+    shapes.extra_science_progression=case.alien and {
+      ['alien-science-pack']={'science-pack-1','science-pack-2','science-pack-3','alien-science-pack'}
+    } or nil
+    raw=world();raw.tool={};raw.lab.lab.inputs={}
+    for _, name in ipairs(case.packs) do raw.tool[name]={type='tool',name=name};raw.lab.lab.inputs[#raw.lab.lab.inputs+1]=name end
+    raw.tool['external-card']={type='tool',name='external-card'}
+    raw.lab.lab.inputs[#raw.lab.lab.inputs+1]='external-card'
+    run(raw,function()
+      local before=fingerprint.of(data.raw)
+      values['mir-science-pack-ingredient-policy']='configured'
+      check('LRS/'..case.id..'/default',names(selector.pick_science_for_stream({},'research_character_crafting_speed'))==case.expected,
+        'Built-in defaults select actual target science names')
+      check('LRS/'..case.id..'/official',table.concat(registry.pack_list_official(),',')==table.concat(case.packs,','),
+        'All official includes the target packs but excludes an external card')
+      values['mir-science-pack-ingredient-policy']='all-official'
+      local selected=selector.apply_science_pack_ingredient_policy({{'external-card',7},{case.packs[1],3}},'probe')
+      check('LRS/'..case.id..'/all',#selected==#case.packs and selected[1][1]==case.packs[1] and selected[1][2]==3,
+        'All-official preserves inherited amounts and fills the native official set')
+      values['mir-science-pack-ingredient-policy']='official-progression'
+      selected=selector.apply_science_pack_ingredient_policy({{case.packs[#case.packs],5}},'probe')
+      check('LRS/'..case.id..'/progression',#selected==#case.packs and selected[1][2]==5,
+        'Late native science expands its official predecessors without changing amounts')
+      values['mir-science-pack-ingredient-policy']='configured'
+      selected=selector.pick_science_for_stream({science_packs={'external-card'}},'probe')
+      check('LRS/'..case.id..'/explicit',names(selected)=='external-card',
+        'Explicit ecosystem pack identities are not translated')
+      local extension=policy.pack_list_for_extension('braking-force')
+      check('LRS/'..case.id..'/extension',extension[1]==case.packs[1] and extension[2]==case.packs[2] and extension[3]==case.packs[3],
+        'Built-in extension defaults use the same native names')
+      check('LRS/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+        'Science naming does not mutate prototypes')
+    end)
+  end
+  shapes.science_pack_aliases=old_aliases;shapes.extra_science_progression=old_extra
+  for _, name in ipairs({'prototypes.mir.settings.effective','prototypes.mir.streams.registry',
+    'prototypes.mir.capabilities.recipe_productivity.recipe_matching','prototypes.mir.compatibility.policy_authority'}) do
+    package.loaded[name]=saved[name]
+  end
+end
 print('MIR-LAB-REACHABILITY-PASS ' .. checks)

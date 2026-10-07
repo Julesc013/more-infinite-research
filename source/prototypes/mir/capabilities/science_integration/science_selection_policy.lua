@@ -135,7 +135,14 @@ function M.official_progression_packs_for(selected_packs)
     if not seen[pack] then seen[pack] = true; table.insert(out, pack) end
   end
   for _, pack in ipairs(selected_packs or {}) do
-    for _, implied in ipairs(OFFICIAL_PROGRESSION_STEPS[pack] or {}) do add(implied) end
+    -- The table describes shared roles; the selected adapter supplies the
+    -- native spelling. Do not reinterpret arbitrary observed mod pack names.
+    for role, steps in pairs(OFFICIAL_PROGRESSION_STEPS) do
+      if pack_registry.native_pack_name(role) == pack then
+        for _, implied in ipairs(steps) do add(pack_registry.native_pack_name(implied)) end
+      end
+    end
+    for _, implied in ipairs(pack_registry.extra_official_progression(pack)) do add(implied) end
   end
   return out
 end
@@ -186,7 +193,9 @@ function M.pack_list_for_extension(key, desired)
   local list = EXTENSION_PACKS[key]
   if not list then return nil end
   if list == "all" then return pack_registry.pack_list_all() end
-  return deepcopy(list)
+  local out = {}
+  for _, pack in ipairs(list) do out[#out + 1] = pack_registry.native_pack_name(pack) end
+  return out
 end
 
 return M
