@@ -535,8 +535,8 @@ foreach ($target in $targets) {
       throw "[mir42-$target-historical-input-lock]"
     }
   } else {
-    if (-not $row.engine.Equals([IO.Path]::GetFullPath([string]$lock.engine.path),[StringComparison]::OrdinalIgnoreCase) -or
-        $row.engine_sha256 -cne [string]$lock.engine.sha256) {
+    if ($null -eq $maintenanceInputs -and (-not $row.engine.Equals([IO.Path]::GetFullPath([string]$lock.engine.path),[StringComparison]::OrdinalIgnoreCase) -or
+        $row.engine_sha256 -cne [string]$lock.engine.sha256)) {
       throw "[mir42-$target-input-lock]"
     }
     if ($null -eq $maintenanceInputs -and (
@@ -574,6 +574,11 @@ foreach ($target in $targets) {
       }
     }
     $row.engine_version = [string]$historical.engine.version
+  } elseif ($null -ne $maintenanceInputs) {
+    Assert-MIR421NativeEngineIdentity -RepoRoot $repo -Target $target -Observed ([pscustomobject]@{
+      product_version=$row.engine_product_version;file_version=$row.engine_file_version;sha256=$row.engine_sha256
+    })
+    $row.engine_version=$row.engine_file_version
   } elseif (-not $row.engine_product_version.StartsWith($row.engine_major + '.', [StringComparison]::Ordinal) -or
       $row.engine_product_version -cne [string]$lock.engine.product_version -or
       $row.engine_file_version -cne [string]$lock.engine.file_version) {

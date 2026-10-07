@@ -274,6 +274,80 @@ function Assert-MIR42EngineSharedInputs {
   }
 }
 Assert-MIR42EngineSharedInputs
+function Test-MIR421MaintenanceEngineInputs {
+  $script:engineInputChecks=0
+  $scratch=''
+  function Check([bool]$Condition,[string]$Message){if(-not$Condition){throw "[maintenance-engine-test] $Message"};$script:engineInputChecks++}
+  function Refuses([scriptblock]$Action,[string]$Expected){$message='';try{&$Action|Out-Null}catch{$message=$_.Exception.Message};Check ($message.Contains($Expected)) "expected $Expected; got $message"}
+  $source=Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1'
+  foreach($name in @('Assert-MIR42ExactEngineAuthority','Assert-MIR42GovernedPredecessor','Assert-MIR42EngineEvidenceMaintenanceExecution','Assert-MIR42EngineEvidenceMaintenanceCustody')){Import-MIR42EngineRunnerFunction -Path $source -Name $name}
+  $oldPath=Join-Path $RepoRoot '.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json'
+  $oldSha=(Get-FileHash -LiteralPath $oldPath).Hash
+  $legacy=Get-Content -LiteralPath $oldPath -Raw|ConvertFrom-Json
+  $captured=Get-Content -LiteralPath (Join-Path $RepoRoot 'spec/engines/mir421-native-engine-inputs-v1.json') -Raw|ConvertFrom-Json
+  $fakeEngine=Join-Path $RepoRoot 'build/tmp/controlled-engine-not-executed.exe'
+  # Substitute binary metadata/bytes only. Both actual release consumers and
+  # the shared tracked-input reader execute; no engine or qualification record.
+  function Get-Item {param($LiteralPath);if($LiteralPath-ceq$fakeEngine){return [pscustomobject]@{FullName=$fakeEngine;VersionInfo=[pscustomobject]@{ProductVersion=$observed.product_version;FileVersion=$observed.file_version}}};Microsoft.PowerShell.Management\Get-Item @PSBoundParameters}
+  function Get-FileHash {param($LiteralPath,$Algorithm);if($LiteralPath-ceq$fakeEngine){return @{Hash=$observed.sha256}};Microsoft.PowerShell.Utility\Get-FileHash @PSBoundParameters}
+  function Get-MIR42DirectPredecessorAuthority {throw 'legacy-predecessor-reader-requested'}
+  function Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 {return @{engine=@{binary=@{sha256=$legacy.targets[0].engine.sha256};file_version=$legacy.targets[0].engine.file_version}}}
+  try{
+    foreach($key in @('f210','f200','f110','f100')){
+      $expected=Get-MIR421NativeEngineInput -RepoRoot $RepoRoot -Target $key
+      $observed=[pscustomobject]@{product_version=$expected.product_version;file_version=$expected.file_version;sha256=$expected.sha256}
+      $target=[pscustomobject]@{target=$key}
+      $publishedInput=[pscustomobject]@{target=$key;path=Join-Path $RepoRoot "build/tmp/more-infinite-research_4.2.$($key.Substring(1))00.zip";version="4.2.$($key.Substring(1))00";sha256=('A'*64)}
+      $execution=[pscustomobject]@{executable_path=$fakeEngine;executable_sha256=$expected.sha256;version=$expected.file_version;predecessor=[pscustomobject]@{path=$publishedInput.path;version=$publishedInput.version;sha256=$publishedInput.sha256};published_maintenance_predecessor=$publishedInput}
+      Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $execution -PublishedMaintenance
+      Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $execution -AuthorityReference @{} -RunAsset @{} -PublishedMaintenanceInput $publishedInput
+      Check ($true) "$key consumes declared maintenance engine without old predecessor archives"
+      foreach($field in @('product_version','file_version','sha256')){
+        $saved=$observed.$field;$observed.$field=if($field-eq'sha256'){'0'*64}elseif($field-eq'file_version'){'2.1.99.99999'}else{'2.1.99'}
+        Refuses {Assert-MIR421NativeEngineIdentity -RepoRoot $RepoRoot -Target $key -Observed $observed} 'mir421-engine-input-binding'
+        $observed.$field=$saved
+      }
+      $execution.executable_sha256='0'*64
+      Refuses {Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $execution -PublishedMaintenance} 'engine-local-identity-drift'
+      $execution.executable_sha256=$expected.sha256
+      $execution.predecessor.sha256='0'*64
+      Refuses {Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $execution -AuthorityReference @{} -RunAsset @{} -PublishedMaintenanceInput $publishedInput} 'maintenance-predecessor-binding'
+      $execution.predecessor.sha256=$publishedInput.sha256
+      Refuses {Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $execution -AuthorityReference @{} -RunAsset @{}} 'legacy-predecessor-reader-requested'
+      if($key-ceq'f210'){
+        Refuses {Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $execution} 'f210-engine-authority-drift'
+        # Consume the actual orchestration branch, including its legacy path.
+        $ast=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$null,[ref]$null)
+        $nodes=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Extent.Text.StartsWith('if ($isHistoricalTarget)') -and $n.Extent.Text.Contains('$row.engine_product_version.StartsWith')},$true))
+        Check ($nodes.Count-eq1) 'modern orchestration admission branch missing'
+        $repo=$RepoRoot;$target=$key;$isHistoricalTarget=$false;$maintenanceInputs=@{selected=$true};$lock=$legacy.targets[0]
+        $row=@{engine_product_version=$expected.product_version;engine_file_version=$expected.file_version;engine_sha256=$expected.sha256;engine_major='2.1';engine_version=''}
+        . ([scriptblock]::Create($nodes[0].Extent.Text))
+        Check ($row.engine_version-ceq$expected.file_version) 'orchestrator did not select the maintenance engine'
+        $maintenanceInputs=$null
+        Refuses {. ([scriptblock]::Create($nodes[0].Extent.Text))} 'mir42-f210-engine-version'
+      }
+    }
+    Check ((Get-FileHash -LiteralPath $oldPath).Hash-ceq$oldSha) 'frozen predecessor authority changed'
+    Check (-not$captured.qualification_authorized -and -not$captured.publication_authorized) 'input lock grants qualification/publication'
+    $scratch=Join-Path $RepoRoot ('build/tmp/maintenance-engine-inputs-'+[guid]::NewGuid().ToString('N'))
+    $null=New-Item -ItemType Directory -Path (Join-Path $scratch 'spec/engines'),(Join-Path $scratch 'spec/schemas')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'spec/schemas/mir421-native-engine-inputs-v1.schema.json') -Destination (Join-Path $scratch 'spec/schemas/mir421-native-engine-inputs-v1.schema.json')
+    foreach($case in @('hash','qualification','order','line')){
+      $record=$captured|ConvertTo-Json -Depth 15|ConvertFrom-Json
+      switch($case){hash{$record.targets[0].sha256='0'*64};qualification{$record.qualification_authorized=$true};order{$record.targets=@($record.targets[1],$record.targets[0],$record.targets[2],$record.targets[3])};line{$record.targets[0].product_version='2.0.77';$record.targets[0].file_version='2.0.77.84539'}}
+      if($case-ne'hash'){$record.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $record}
+      $record|ConvertTo-Json -Depth 15|Set-Content -LiteralPath (Join-Path $scratch 'spec/engines/mir421-native-engine-inputs-v1.json')
+      $errorCode=switch($case){hash{'engine-input-record'};qualification{'engine-input-schema'};order{'engine-input-record'};line{'engine-input-version'}}
+      Refuses {Get-MIR421NativeEngineInput -RepoRoot $scratch -Target f210} $errorCode
+    }
+    Write-Output "MIR421-MAINTENANCE-ENGINE-INPUTS-PASSED assertions=$script:engineInputChecks engines=0"
+  }finally{
+    if($scratch-and(Test-Path -LiteralPath $scratch)){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned engine-input test';Remove-Item -LiteralPath $scratch -Recurse -Force}
+    foreach($name in @('Assert-MIR42ExactEngineAuthority','Assert-MIR42GovernedPredecessor','Assert-MIR42EngineEvidenceMaintenanceExecution','Assert-MIR42EngineEvidenceMaintenanceCustody')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
+  }
+}
+Test-MIR421MaintenanceEngineInputs
 if($SharedInputsOnly){return}
 $script:MIR42HistoricalTerminalInputs = [ordered]@{
   f017 = [ordered]@{ line='0.17'; predecessor='1.7.9'; target_record='targets/historical/f017/target.json'; terminal_seal='.mir/releases/terminal/seals/1.7.9.json' }

@@ -7674,6 +7674,9 @@
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "spec/engines/mir421-native-engine-inputs-v1.json",
+        "spec/schemas/mir421-native-engine-inputs-v1.schema.json",
         "tests/runtime/Test-MIRUpgrade.ps1",
         "fixtures/assert-upgrade-historical-terminal-to-mir42/**",
         "targets/historical/**",
@@ -8143,5 +8146,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:73ddc2a4e937c1e5311c305fd3d8bac6c2ee50cd8cd0ed2231ebe78d0e7e99d2"
+  "digest": "sha256:d1ea593af0cb46540627cd0859167308512be9d17280ce8e236fc50aaa2000a7"
 }
