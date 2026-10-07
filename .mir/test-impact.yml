@@ -562,6 +562,11 @@
       "scenarios": ["generated-prerequisite-safety", "k2-science-phase-policy"]
     },
     {
+      "pattern": "tests/compiler/researchability_planning.lua",
+      "groups": ["science-prerequisites"],
+      "scenarios": ["generated-prerequisite-safety", "k2-science-phase-policy"]
+    },
+    {
       "pattern": "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
       "groups": ["local-mod-library"]
     },

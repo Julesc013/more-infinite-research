@@ -194,6 +194,7 @@ local function reset(next_world, fixture_fluid_crafter)
     lab = world.labs or {},
     technology = world.techs or {},
     recipe = world.recipe_prototypes or {},
+    fluid = world.fluids or {},
     character = world.characters or {player = {crafting_categories = {"crafting"}}},
     resource = world.resources or {},
     tree = world.trees or {},
@@ -933,10 +934,12 @@ check("F09CA", feasibility.source_witness("wood").kind == "minable-entity"
 local function boiler_source_world(input_source, boiler_conditions)
   return {
     item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+    fluids = {water = {type = "fluid", name = "water", default_temperature = 15, max_temperature = 100}},
     offshore_pumps = input_source and {pump = {fluid_source_offset = {0,-1}, fluid_box = {}}} or {},
     tiles = {water = {fluid = "water"}},
     boilers = {boiler = {
       name = "boiler",
+      mode = "output-to-separate-pipe",
       fluid_box = {filter = "water"},
       output_fluid_box = {filter = "steam"},
       target_temperature = 165,
