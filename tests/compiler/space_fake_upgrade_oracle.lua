@@ -23,7 +23,7 @@ local function world(mode)
     end})
   end
   local introduced={}
-  if mode=='introduced' then
+  if mode=='introduced' or mode=='manufacturing' then
     script.active_mods['space-is-fake']='1.0.60'
     for _, name in ipairs({'weapon-shooting-speed-7','research-speed-7'}) do
       introduced[name]=force.technologies[name]
@@ -36,10 +36,34 @@ local function world(mode)
     table.insert(force.technologies['weapon-shooting-speed-7'].research_unit_ingredients,1,
       {name='production-science-pack',amount=1})
   end
+  if mode=='manufacturing' then
+    script.active_mods.base='2.0.77'
+    force.recipes={}
+    local families={
+      {'low_density_structure','casting-low-density-structure','low-density-structure','scrap-recycling'},
+      {'plastic','bioplastic','plastic-bar'}, {'processing_unit','processing-unit'},
+      {'rocket_fuel','ammonia-rocket-fuel','rocket-fuel','rocket-fuel-from-jelly'},
+      {'steel','casting-steel','steel-plate'}
+    }
+    for _, row in ipairs(families) do
+      local name='recipe-prod-research_'..row[1]..'-1'
+      force.technologies[name]={name=name,level=1,researched=false,enabled=true,saved_progress=0,
+        research_unit_ingredients={{name='automation-science-pack',amount=1}}}
+      for slot=2,#row do force.recipes[row[slot]]={productivity_bonus=0} end
+    end
+    force.reset_technology_effects=function()
+      for _, row in ipairs(families) do
+        local value=force.technologies['recipe-prod-research_'..row[1]..'-1']
+        for slot=2,#row do
+          force.recipes[row[slot]].productivity_bonus=(value.level-1)*0.1+(row[slot]=='plastic-bar' and 0.3 or 0)
+        end
+      end
+    end
+  end
   game={forces={player=force}}
   local oracle=dofile('tests/support/MIR421SpaceFakeUpgrade.lua')
   oracle.capture()
-  if mode=='introduced' then
+  if mode=='introduced' or mode=='manufacturing' then
     for name,value in pairs(introduced) do
       value.researched=false
       value.research_unit_ingredients={}
@@ -52,7 +76,7 @@ local function world(mode)
     end
   end
   for name, value in pairs(force.technologies) do
-    if name:sub(-1)=='7' and mode~='introduced' then table.remove(value.research_unit_ingredients) end
+    if name:sub(-1)=='7' and mode~='introduced' and mode~='manufacturing' then table.remove(value.research_unit_ingredients) end
   end
   if mode=='derived-production' then table.remove(force.technologies['weapon-shooting-speed-7'].research_unit_ingredients,1) end
   script.active_mods['more-infinite-research']='4.2.20001'
@@ -101,4 +125,23 @@ for _, change in ipairs({
   -- Reload must independently reject the same changed final state.
   check(not pcall(oracle.verify,'reload'))
 end
+force,oracle=world('manufacturing')
+local earned=storage.mir421_space_fake_upgrade.manufacturing
+check(earned.recipe_bonuses['casting-steel']==0.5 and earned.recipe_bonuses['scrap-recycling']==0.1
+  and earned.recipe_bonuses['plastic-bar']==0.5)
+for name in pairs(earned.technologies) do force.technologies[name]=nil end
+check(pcall(oracle.verify,'upgrade'))
+check(pcall(oracle.verify,'reload'))
+for name in pairs(earned.recipe_bonuses) do
+  force,oracle=world('manufacturing')
+  force.recipes[name].productivity_bonus=0
+  check(not pcall(oracle.verify,'upgrade'))
+  check(not pcall(oracle.verify,'reload'))
+end
+force,oracle=world('manufacturing')
+force.recipes['plastic-bar'].productivity_bonus=0.6
+check(not pcall(oracle.verify,'upgrade'))
+force,oracle=world('manufacturing')
+force.recipes['scrap-recycling']=nil
+check(not pcall(oracle.verify,'upgrade'))
 print('MIR-SIF-NATIVE-ORACLE-CONTROL-PASS '..assertions)
