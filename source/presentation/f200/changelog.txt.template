@@ -3,6 +3,10 @@ Version: 4.2.20001
 
   Bugfixes:
 
+    - Compile after Bob's Electronics and Technology finalizers when installed, so lab and science acquisition uses their completed progression.
+
+  Bugfixes:
+
     - Remove retired space science from Weapon shooting speed 7 and Lab research speed 7 with Space Is Fake.
     - Use base/MIR artwork when an optional DLC artwork provider is inactive, including saved or imported icon opt-ins.
     - Apply the selected braking-force bonus and its correct badge to the native continuation.
