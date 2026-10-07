@@ -263,6 +263,15 @@ end)()
         "The mining fluid requirement follows the selected native line contract")
     end)
     data.raw.resource.acid = {minable={results={{type="fluid",name="acid",amount=1}}}}
+    data.raw['mining-drill']={miner={name='miner',resource_categories={'basic-solid'},mining_speed=1,
+      input_fluid_box={},output_fluid_box={},vector_to_place_result={0,0}}}
+    local legacy_box=line=='0.13' or line=='0.14'
+    if legacy_box then
+      data.raw['mining-drill'].miner.fluid_box={}
+      data.raw['mining-drill'].miner.output_fluid_box=nil
+    end
+    data.raw.item={['miner-kit']={type='item',name='miner-kit',place_result='miner'}}
+    data.raw.tree={kit={minable={result='miner-kit'}}}
     compiler_context.with_active(compiler_context.new(), function()
       local witness = routes.source_witness("ore")
       check("MF"..line.."/seeded",witness~=nil,
@@ -270,6 +279,23 @@ end)()
       check("MF"..line.."/witness",line=="0.13" or line=="0.14"
         or witness.ingredients[1].product.type=="fluid" and witness.ingredients[1].product.name=="acid",
         "A supported mining input retains its typed acquisition witness")
+      local fluid=routes.source_witness({type='fluid',name='acid'})
+      check('MA'..line..'/fluid-actor',fluid and fluid.machine and fluid.machine.item=='miner-kit',
+        'A fluid resource retains its compatible acquired drill on each native line')
+    end)
+    data.raw.tree={}
+    compiler_context.with_active(compiler_context.new(),function()
+      check('MA'..line..'/missing-actor',routes.source_witness({type='fluid',name='acid'})==nil,
+        'A fluid resource cannot bypass missing drill acquisition')
+    end)
+    data.raw.tree={kit={minable={result='miner-kit'}}}
+    local native_field=legacy_box and 'fluid_box' or 'output_fluid_box'
+    local foreign_field=legacy_box and 'output_fluid_box' or 'fluid_box'
+    data.raw['mining-drill'].miner[native_field]=nil
+    data.raw['mining-drill'].miner[foreign_field]={}
+    compiler_context.with_active(compiler_context.new(),function()
+      check('MA'..line..'/foreign-box',routes.source_witness({type='fluid',name='acid'})==nil,
+        'A foreign-era output box cannot invent native drill fluid capability')
     end)
   end
   data.raw = previous_raw
@@ -419,5 +445,29 @@ end)()
       "The same query state recovers after real source restoration")
   end)
   profile_module.current_factorio_version,data.raw=previous_line,previous_raw
+end)()
+-- A selected fluid resource uses the same source epoch and placement index.
+;(function()
+  local routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+  local previous_raw=data.raw
+  data.raw={resource={oil={category='basic-fluid',minable={results={{type='fluid',name='oil',amount=1}}}}},
+    item={kit={type='item',name='kit',place_result='pumpjack'}},
+    ['mining-drill']={pumpjack={name='pumpjack',resource_categories={'basic-fluid'},mining_speed=1,output_fluid_box={}}},
+    character={player={crafting_categories={'crafting'}}},
+    recipe={kit={name='kit',enabled=true,energy_required=1,ingredients={},result='kit'}}}
+  compiler_context.with_active(compiler_context.new(),function()
+    local state={}
+    local fluid={type='fluid',name='oil'}
+    check('MAE/initial',routes.source_witness(fluid,nil,state)~=nil,
+      'The real source consumer acquires a matching basic-fluid drill')
+    local epoch=recipe_facts.source_epoch()
+    local removed=recipe_facts.replace_source({},epoch)
+    check('MAE/removed',routes.source_witness(fluid,nil,state)==nil,
+      'Actual recipe replacement removes warm drill acquisition')
+    recipe_facts.replace_source(data.raw.recipe,removed)
+    check('MAE/restored',routes.source_witness(fluid,nil,state)~=nil,
+      'The same state recovers the drill after source restoration')
+  end)
+  data.raw=previous_raw
 end)()
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)
