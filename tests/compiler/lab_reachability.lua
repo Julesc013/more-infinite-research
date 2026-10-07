@@ -66,6 +66,43 @@ run(raw, function(owner)
   check('LR06', telemetry and telemetry.counters.item_prototype_index_builds == 1,
     'Normal lab queries reuse the existing item prototype index')
 end)
+-- Historical engines use the player prototype for handcrafting. The selected
+-- adapter owns that capability; an unrelated prototype table cannot grant it.
+do
+  local shapes = require('prototypes.mir.platform.factorio.target_profiles').current().prototype_shapes
+  local previous = shapes.handcrafting_prototype_type
+  for _, case in ipairs({
+    {id='legacy-player',actor='player',selected='player',expected=true},
+    {id='modern-character',actor='character',selected='character',expected=true},
+    {id='modern-default',actor='character',expected=true},
+    {id='legacy-rejects-character',actor='character',selected='player',expected=false},
+    {id='modern-rejects-player',actor='player',expected=false},
+    {id='legacy-wrong-category',actor='player',selected='player',category='unrelated',expected=false},
+    {id='legacy-fluid-output',actor='player',selected='player',fluid=true,expected=false},
+    {id='modern-fluid-output',actor='character',selected='character',fluid=true,expected=false}
+  }) do
+    shapes.handcrafting_prototype_type = case.selected
+    raw = world()
+    raw.character = nil
+    raw[case.actor] = {player = {type=case.actor,crafting_categories={case.category or 'crafting'},
+      fluid_boxes={{production_type='output'}}}}
+    if case.fluid then
+      raw.fluid = {water={type='fluid',name='water',default_temperature=15}}
+      raw.recipe.make_lab.results[#raw.recipe.make_lab.results+1] = {type='fluid',name='water',amount=1}
+    end
+    run(raw, function()
+      local before = fingerprint.of(data.raw)
+      check('LRH/'..case.id,lab.valid_research_ingredients({{'A',2},{'B',3}})==case.expected,
+        'Lab acquisition uses the declared handcrafting actor and excludes fluid crafting: '..case.id)
+      check('LRH/'..case.id..'/research',
+        (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+        'Researchability consumes the same target-specific lab route: '..case.id)
+      check('LRH/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+        'Handcrafting acquisition preserves observed prototypes: '..case.id)
+    end)
+  end
+  shapes.handcrafting_prototype_type = previous
+end
 -- A cloned or patched minable prototype may retain both declarations. The
 -- native results list owns the drops; a stale singular result is not a second
 -- acquisition route for the laboratory's placement item.
@@ -1136,5 +1173,118 @@ for _, case in ipairs({
     queries=queries+1
     return researchability.reason_with_context(...)
   end)
+end
+-- Consume the shared registry, selector and progression policy with explicit
+-- historical platform names. Recipe/ecosystem policy is empty in these cases;
+-- final engine catalogues are checked separately by the native fixture.
+do
+  local shapes = require('prototypes.mir.platform.factorio.target_profiles').current().prototype_shapes
+  local old_aliases, old_extra = shapes.science_pack_aliases, shapes.extra_science_progression
+  local values = {['mir-science-pack-ingredient-policy']='configured'}
+  local saved = {}
+  for name, value in pairs({
+    ['prototypes.mir.settings.effective']={get=function(name) return values[name] end},
+    ['prototypes.mir.streams.registry']={shared={per_level_default=0.1}},
+    ['prototypes.mir.capabilities.recipe_productivity.recipe_matching']={buckets_view=function() return {} end},
+    ['prototypes.mir.compatibility.policy_authority']={science_roles_for_stream=function() return {} end}
+  }) do saved[name]=package.loaded[name]; package.loaded[name]=value end
+  local registry = require('prototypes.mir.capabilities.science_integration.pack_registry')
+  local policy = require('prototypes.mir.capabilities.science_integration.science_selection_policy')
+  local selector = require('prototypes.mir.capabilities.science_integration.science_selector')
+  local function names(ingredients)
+    local out={}; for _, ingredient in ipairs(ingredients) do out[#out+1]=ingredient[1] end
+    return table.concat(out, ',')
+  end
+  for _, case in ipairs({
+    {id='modern',packs={'automation-science-pack','logistic-science-pack','chemical-science-pack','production-science-pack','military-science-pack','utility-science-pack'},
+      expected='automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack'},
+    {id='0.15-0.16',historical=true,packs={'science-pack-1','science-pack-2','science-pack-3','production-science-pack','military-science-pack','high-tech-science-pack'},
+      expected='science-pack-1,science-pack-2,science-pack-3,production-science-pack'},
+    {id='0.13-0.14',historical=true,alien=true,packs={'science-pack-1','science-pack-2','science-pack-3','alien-science-pack'},
+      expected='science-pack-1,science-pack-2,science-pack-3,alien-science-pack'}
+  }) do
+    shapes.science_pack_aliases=case.historical and {
+      ['automation-science-pack']='science-pack-1', ['logistic-science-pack']='science-pack-2',
+      ['chemical-science-pack']='science-pack-3', ['utility-science-pack']='high-tech-science-pack'
+    } or nil
+    if case.alien then
+      for _, role in ipairs({'utility-science-pack','military-science-pack','production-science-pack','space-science-pack'}) do
+        shapes.science_pack_aliases[role]='alien-science-pack'
+      end
+    end
+    shapes.extra_science_progression=case.alien and {
+      ['alien-science-pack']={'science-pack-1','science-pack-2','science-pack-3','alien-science-pack'}
+    } or nil
+    raw=world();raw.tool={};raw.lab.lab.inputs={}
+    for _, name in ipairs(case.packs) do raw.tool[name]={type='tool',name=name};raw.lab.lab.inputs[#raw.lab.lab.inputs+1]=name end
+    raw.tool['external-card']={type='tool',name='external-card'}
+    raw.lab.lab.inputs[#raw.lab.lab.inputs+1]='external-card'
+    run(raw,function()
+      local before=fingerprint.of(data.raw)
+      values['mir-science-pack-ingredient-policy']='configured'
+      check('LRS/'..case.id..'/default',names(selector.pick_science_for_stream({},'research_character_crafting_speed'))==case.expected,
+        'Built-in defaults select actual target science names')
+      package.loaded['prototypes.streams.direct-effects']=nil
+      local declarations=require('prototypes.streams.direct-effects')
+      local expected_character=case.alien and 'alien-science-pack'
+        or (case.historical and 'high-tech-science-pack,military-science-pack' or 'utility-science-pack,military-science-pack')
+      for _, key in ipairs({'research_character_crafting_speed','research_character_mining_speed',
+        'research_character_reach','research_character_walking_speed','research_inventory_capacity'}) do
+        check('LRS/'..case.id..'/declaration/'..key,names(selector.pick_science_for_stream(declarations[key],key))==expected_character,
+          'Actual MIR declaration preserves its target late-science requirement')
+      end
+      check('LRS/'..case.id..'/official',table.concat(registry.pack_list_official(),',')==table.concat(case.packs,','),
+        'All official includes the target packs but excludes an external card')
+      values['mir-science-pack-ingredient-policy']='all-official'
+      local selected=selector.apply_science_pack_ingredient_policy({{'external-card',7},{case.packs[1],3}},'probe')
+      check('LRS/'..case.id..'/all',#selected==#case.packs and selected[1][1]==case.packs[1] and selected[1][2]==3,
+        'All-official preserves inherited amounts and fills the native official set')
+      values['mir-science-pack-ingredient-policy']='official-progression'
+      selected=selector.apply_science_pack_ingredient_policy({{case.packs[#case.packs],5}},'probe')
+      check('LRS/'..case.id..'/progression',#selected==(case.alien and 4 or 5) and selected[1][2]==5,
+        'Late native science expands its official predecessors without changing amounts')
+      values['mir-science-pack-ingredient-policy']='configured'
+      selected=selector.pick_science_for_stream({science_packs={'external-card'}},'probe')
+      check('LRS/'..case.id..'/explicit',names(selected)=='external-card',
+        'Explicit ecosystem pack identities are not translated')
+      local extension=policy.pack_list_for_extension('braking-force')
+      check('LRS/'..case.id..'/extension',extension[1]==case.packs[1] and extension[2]==case.packs[2] and extension[3]==case.packs[3],
+        'Built-in extension defaults use the same native names')
+      check('LRS/'..case.id..'/end-game',policy.end_game_science_pack()==(case.alien and 'alien-science-pack' or nil),
+        'End-game lookup uses the same native final-science identity')
+      check('LRS/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+        'Science naming does not mutate prototypes')
+    end)
+  end
+  shapes.science_pack_aliases=old_aliases;shapes.extra_science_progression=old_extra
+  for _, name in ipairs({'prototypes.mir.settings.effective','prototypes.mir.streams.registry',
+    'prototypes.mir.capabilities.recipe_productivity.recipe_matching','prototypes.mir.compatibility.policy_authority'}) do
+    package.loaded[name]=saved[name]
+  end
+end
+do
+  local shapes = require('prototypes.mir.platform.factorio.target_profiles').current().prototype_shapes
+  local previous = shapes.technology_icon_layers
+  local icons = require('prototypes.mir.presentation.icon_builder')
+  local stream = {overlay=false,icons={
+    {icon='__base__/graphics/technology/automation.png',icon_size=128},
+    {icon='__base__/graphics/icons/iron-plate.png',icon_size=32,tint={r=0.5,g=1,b=1}}
+  }}
+  local before=fingerprint.of(stream)
+  for _, mode in ipairs({'single','layered','default'}) do
+    shapes.technology_icon_layers=mode~='single'
+    if mode=='default' then shapes.technology_icon_layers=nil end
+    local fields=icons.technology_icon_fields_for_stream(stream)
+    if mode=='single' then
+      check('LRI/single',fields.icons==nil and fields.icon==stream.icons[1].icon and fields.icon_size==128,
+        'Historical presentation supplies the singular icon required by the engine')
+    else
+      check('LRI/'..mode,fields.icon==nil and fields.icons and #fields.icons==2 and fields.icons[2].tint.r==0.5,
+        'Modern presentation preserves every icon layer and its tint')
+    end
+    check('LRI/'..mode..'/immutable',fingerprint.of(stream)==before,
+      'Native presentation projection preserves its source declaration')
+  end
+  shapes.technology_icon_layers=previous
 end
 print('MIR-LAB-REACHABILITY-PASS ' .. checks)

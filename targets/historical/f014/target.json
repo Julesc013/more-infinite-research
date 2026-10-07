@@ -36,10 +36,10 @@
     {
       "output_path": "changelog.txt",
       "source_path": "source/presentation/historical/f014/changelog.txt.template",
-      "source_sha256": "156FAF9F70A42FCF04B04DA7B82910E6AF89FBEDD85BA245F36AA4E464D25784",
-      "source_bytes": 1257,
-      "output_bytes": 1257,
-      "output_sha256": "156FAF9F70A42FCF04B04DA7B82910E6AF89FBEDD85BA245F36AA4E464D25784"
+      "source_sha256": "FB548DE04D2FEE1627593C03A7221844774E0772B8FBBB3EAA010104B628E4DF",
+      "source_bytes": 1690,
+      "output_bytes": 1690,
+      "output_sha256": "FB548DE04D2FEE1627593C03A7221844774E0772B8FBBB3EAA010104B628E4DF"
     },
     {
       "output_path": "README.md",
@@ -54,10 +54,10 @@
       "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
       "source_path": "source/adapters/historical/legacy-reduced/target_profiles.lua.template",
       "transform": "legacy-target-profile-template-v1",
-      "source_sha256": "DE8E810E907AA9C21632FD351BA736AF76DF44B68DFF035D8CC772D8DCC4E98F",
-      "source_bytes": 3176,
-      "output_bytes": 3057,
-      "output_sha256": "32F903F5BECEF19E5D0CCD553452255822FD16F73C9AB3380E9C54C78B17EDA9"
+      "source_sha256": "24B6590C75666474FAF50CD1509F9CB707A854B0062EA8F59CA7A81207B30DEC",
+      "source_bytes": 4562,
+      "output_bytes": 4235,
+      "output_sha256": "380DCFF739B136DE9309914122F1896C36A27445FF5E4C7F2469700AFBC0082E"
     }
   ],
   "patches": [
@@ -82,5 +82,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "D6B85E4E5FB5DE9F55EEAE54CF8B34CA0CFE7037B08EF762ED2CEDFBC23F9A83"
+  "record_sha256": "03D67F076BE8A1C76C951BADB611B1C3D8463641A4626180B4D4A5D3445BF424"
 }

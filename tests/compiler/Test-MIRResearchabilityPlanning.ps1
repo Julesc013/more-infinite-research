@@ -48,6 +48,10 @@ $modules=[ordered]@{
  'prototypes.mir.capabilities.science_integration.pack_production_reachability'='source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
  'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
  'prototypes.mir.capabilities.science_integration.science_packs'='source/prototypes/mir/capabilities/science_integration/science_packs.lua'
+ 'prototypes.mir.capabilities.science_integration.science_selector'='source/prototypes/mir/capabilities/science_integration/science_selector.lua'
+ 'prototypes.mir.platform.factorio.target_line'='source/prototypes/mir/platform/factorio/target_line.lua'
+ 'prototypes.streams.direct-effects'='source/prototypes/streams/direct-effects.lua'
+ 'prototypes.mir.presentation.icon_builder'='source/prototypes/mir/presentation/icon_builder.lua'
  'fixtures.f200.base_continuations.qualify'='source/adapters/f200/prototypes/mir/planner/base_continuations/qualify.lua'
 }
 $lua=[Text.StringBuilder]::new()

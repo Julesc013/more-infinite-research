@@ -41,8 +41,18 @@ function M.sort_acquisition_producers(names, index)
 end
 
 local MACHINE_TYPES = {
-  "assembling-machine", "furnace", "mining-drill", "rocket-silo", "character"
+  "assembling-machine", "furnace", "mining-drill", "rocket-silo"
 }
+
+local function handcrafting_prototype_type()
+  local profile = target_profiles.current()
+  local shapes = profile and profile.prototype_shapes or {}
+  local kind = shapes.handcrafting_prototype_type or "character"
+  if kind ~= "character" and kind ~= "player" then
+    error("MIR target declares an unsupported handcrafting prototype type.", 2)
+  end
+  return kind
+end
 
 local function finite_positive(value)
   return type(value) == "number" and value == value and value > 0 and value < math.huge
@@ -392,7 +402,11 @@ end
 local function category_set_from_prototypes(state, options)
   if state.machine_categories then return state.machine_categories end
   local categories = {}
-  for _, prototype_type in ipairs(MACHINE_TYPES) do
+  local handcrafting_type = handcrafting_prototype_type()
+  local machine_types = {}
+  for _, kind in ipairs(MACHINE_TYPES) do machine_types[#machine_types + 1] = kind end
+  machine_types[#machine_types + 1] = handcrafting_type
+  for _, prototype_type in ipairs(machine_types) do
     for name, machine in pairs(data_raw.prototypes(prototype_type)) do
       if not diagnostic_visit(options) then return categories end
       local ports
@@ -406,6 +420,7 @@ local function category_set_from_prototypes(state, options)
         table.insert(categories[category], {
           name = name,
           prototype_type = prototype_type,
+          handcrafting = prototype_type == handcrafting_type,
           fixed_recipe = machine.fixed_recipe,
           fluid_ports = ports,
           surface_conditions = deepcopy(machine.surface_conditions)
@@ -415,8 +430,8 @@ local function category_set_from_prototypes(state, options)
   end
   for _, machines in pairs(categories) do
     table.sort(machines, function(left, right)
-      local left_character = left.prototype_type == "character"
-      local right_character = right.prototype_type == "character"
+      local left_character = left.handcrafting
+      local right_character = right.handcrafting
       if left_character ~= right_character then return left_character end
       if left.name ~= right.name then return left.name < right.name end
       return left.prototype_type < right.prototype_type
@@ -1078,12 +1093,12 @@ local function machine_acquisition_witness(machines, category, recipe_name, opti
     if not diagnostic_visit(options) then return nil end
     diagnostic_rollback(options, checkpoint)
     local ports = machine.fluid_ports
-    local fluid_compatible = not required_ports or (machine.prototype_type ~= "character" and ports
+    local fluid_compatible = not required_ports or (not machine.handcrafting and ports
       and ports.input >= required_ports.input and ports.output >= required_ports.output)
     if fluid_compatible
       and (machine.fixed_recipe == nil or machine.fixed_recipe == recipe_name)
       and surface_satisfied(machine.surface_conditions, options, state) then
-      if machine.prototype_type == "character" then
+      if machine.handcrafting then
         diagnostic_rollback(options, checkpoint)
         return {kind = "character-crafting", category = category, prototype = machine.name}
       end

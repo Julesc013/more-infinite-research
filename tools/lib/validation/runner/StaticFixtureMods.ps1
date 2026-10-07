@@ -1,10 +1,12 @@
-Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
+Invoke-RepoCheck "fixture mods have metadata and engine entrypoints" {
   $fixtureRootForStatic = Join-Path $repo "fixtures"
   if (-not (Test-Path -LiteralPath $fixtureRootForStatic)) {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
   $nonModFixtureDirs = @(
+    "assert-community-manufacturing-intake",
+    "assert-k2-k2so-f210-intake",
     "compat-matrix",
     "golden-plans",
     "mir4-api-v0",
@@ -19,6 +21,8 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     "mir4-process-ir-v0",
     "mir4-process-ir-v1",
     "museum",
+    "release",
+    "release-inputs",
     "run-profiles"
   )
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
@@ -31,6 +35,9 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
 
     $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
     $externalIdentityFixtures = @{
+      "late-mir42-cap-binding-blocker" = "late-mir42-cap-binding-blocker"
+      "late-mir42-policy-binding-blocker" = "late-mir42-policy-binding-blocker"
+      "portable-research-surface-no-mir" = "portable-research-surface-no-mir"
       "better-robots-extended-competitor" = "Better_Robots_Extended"
       "pypostprocessing-stale-unlock" = "pypostprocessing"
       "space-exploration-recipe-removal" = "space-exploration"
@@ -51,6 +58,14 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Historical upgrade fixture must retain its exact staged metadata contract: $infoPath"
     }
     $mir4TargetNativeFixtures = @{
+      "assert-historical-handcrafting" = "0.16"
+      "assert-f200-bob-angel-material-routes-observation" = "2.0"
+      "assert-f200-bob-tin-persisted-state" = "2.0"
+      "assert-f200-bob-tin-production-gain" = "2.0"
+      "assert-mir42-f200-settings-cap-transition" = "2.0"
+      "assert-upgrade-4-0-10000-to-4-1-10000" = "1.0"
+      "assert-upgrade-4-0-11000-to-4-1-11000" = "1.1"
+      "assert-upgrade-4-0-20000-to-4-1-20000" = "2.0"
       "assert-upgrade-1-8-9-to-4-0-10000" = "1.0"
       "assert-upgrade-1-9-9-to-4-0-11000" = "1.1"
       "assert-generated-cap-transition-2-0" = "2.0"
@@ -110,6 +125,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       "data.lua",
       "data-updates.lua",
       "data-final-fixes.lua"
+      "control.lua"
     )
     $hasEntry = $false
     foreach ($entryFile in $entryFiles) {
@@ -119,7 +135,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       }
     }
     if (-not $hasEntry) {
-      throw "Fixture $($info.name) has no data-stage entry file."
+      throw "Fixture $($info.name) has no data-stage or runtime entry file."
     }
   }
 

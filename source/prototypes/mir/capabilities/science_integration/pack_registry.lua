@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 
 local M = {}
 
@@ -96,8 +97,30 @@ function M.science_pack_exists(name, diagnostic_observer)
   return false
 end
 
+-- Translate only MIR's built-in science roles. Observed ingredients, mod
+-- declarations and recipe products retain their exact prototype identities.
+function M.native_pack_name(name)
+  local shapes = target_profiles.current().prototype_shapes or {}
+  return (shapes.science_pack_aliases or {})[name] or name
+end
+
+function M.extra_official_progression(name)
+  local shapes = target_profiles.current().prototype_shapes or {}
+  return deepcopy((shapes.extra_science_progression or {})[name] or {})
+end
+
 function M.official_order()
-  return deepcopy(VANILLA_PACK_ORDER)
+  local out, seen = {}, {}
+  local function add(pack)
+    if not seen[pack] then seen[pack] = true; out[#out + 1] = pack end
+  end
+  for _, pack in ipairs(VANILLA_PACK_ORDER) do add(M.native_pack_name(pack)) end
+  local shapes = target_profiles.current().prototype_shapes or {}
+  local extra = {}
+  for pack in pairs(shapes.extra_science_progression or {}) do extra[#extra + 1] = pack end
+  table.sort(extra)
+  for _, pack in ipairs(extra) do add(pack) end
+  return out
 end
 
 function M.ordered_pack_list_from_set(set)
@@ -107,7 +130,7 @@ function M.ordered_pack_list_from_set(set)
   end
 
   local out = {}
-  for _, pack in ipairs(VANILLA_PACK_ORDER) do
+  for _, pack in ipairs(M.official_order()) do
     if remaining[pack] then
       table.insert(out, pack)
       remaining[pack] = nil
@@ -131,14 +154,14 @@ function M.pack_list_official()
   local available = {}
   for _, pack in ipairs(M.all_lab_inputs()) do available[pack] = true end
   local out = {}
-  for _, pack in ipairs(VANILLA_PACK_ORDER) do
+  for _, pack in ipairs(M.official_order()) do
     if available[pack] then table.insert(out, pack) end
   end
   return out
 end
 
 function M.is_official_science_pack(name)
-  for _, pack in ipairs(VANILLA_PACK_ORDER) do
+  for _, pack in ipairs(M.official_order()) do
     if pack == name then return true end
   end
   return false

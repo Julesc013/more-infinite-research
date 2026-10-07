@@ -273,6 +273,17 @@ function I.icons_for_stream(stream)
   return add_constant_overlay(base, overlay_for_stream(stream))
 end
 
+function I.technology_icon_fields_for_stream(stream)
+  local icons = I.icons_for_stream(stream)
+  if target_line.prototype_shapes().technology_icon_layers == false then
+    -- Older technology prototypes accept one base icon. Keep the selected
+    -- asset, and project its native shape before the immutable design is made.
+    local base = assert(icons[1], "MIR technology presentation needs a base icon")
+    return {icon = base.icon, icon_size = base.icon_size}
+  end
+  return {icons = icons}
+end
+
 function I.effect_icons_for_stream(stream)
   local base = resolve_base_icons_for_stream(stream)
   if base and #base > 0 then return base end

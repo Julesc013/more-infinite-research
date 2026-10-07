@@ -121,7 +121,7 @@ function M.space_age_progression_packs_for(selected_packs)
     if selected[pack] then has_space_age_pack = true end
   end
   local out = {}
-  if has_space_age_pack then table.insert(out, "space-science-pack") end
+  if has_space_age_pack then table.insert(out, pack_registry.native_pack_name("space-science-pack")) end
   if selected["promethium-science-pack"] then
     for _, pack in ipairs(SPACE_AGE_PLANET_PACKS) do table.insert(out, pack) end
     table.insert(out, "promethium-science-pack")
@@ -135,7 +135,20 @@ function M.official_progression_packs_for(selected_packs)
     if not seen[pack] then seen[pack] = true; table.insert(out, pack) end
   end
   for _, pack in ipairs(selected_packs or {}) do
-    for _, implied in ipairs(OFFICIAL_PROGRESSION_STEPS[pack] or {}) do add(implied) end
+    -- The table describes shared roles; the selected adapter supplies the
+    -- native spelling. Do not reinterpret arbitrary observed mod pack names.
+    local extra = pack_registry.extra_official_progression(pack)
+    if #extra > 0 then
+      -- A collapsed historical role (alien science) has one explicit native
+      -- progression; table iteration order cannot choose between modern roles.
+      for _, implied in ipairs(extra) do add(implied) end
+    else
+      for role, steps in pairs(OFFICIAL_PROGRESSION_STEPS) do
+        if pack_registry.native_pack_name(role) == pack then
+          for _, implied in ipairs(steps) do add(pack_registry.native_pack_name(implied)) end
+        end
+      end
+    end
   end
   return out
 end
@@ -175,7 +188,8 @@ function M.end_game_science_pack()
   if lookup.is_space_age() and pack_registry.science_pack_exists("promethium-science-pack") then
     return "promethium-science-pack"
   end
-  if pack_registry.science_pack_exists("space-science-pack") then return "space-science-pack" end
+  local final_pack = pack_registry.native_pack_name("space-science-pack")
+  if pack_registry.science_pack_exists(final_pack) then return final_pack end
   return nil
 end
 
@@ -186,7 +200,9 @@ function M.pack_list_for_extension(key, desired)
   local list = EXTENSION_PACKS[key]
   if not list then return nil end
   if list == "all" then return pack_registry.pack_list_all() end
-  return deepcopy(list)
+  local out = {}
+  for _, pack in ipairs(list) do out[#out + 1] = pack_registry.native_pack_name(pack) end
+  return out
 end
 
 return M

@@ -127,10 +127,13 @@ local function plan_stream(key, raw_spec)
       })
     end
     local emitted_effects = effect_scaling.scale_stream_effects(key, spec, direct_effects)
+    local presentation = icon_builder.technology_icon_fields_for_stream(spec)
     local fields = {
       localised_name = lname(key, spec),
       localised_description = ldesc(spec),
-      icons = icon_builder.icons_for_stream(spec),
+      icon = presentation.icon,
+      icon_size = presentation.icon_size,
+      icons = presentation.icons,
       effects = emitted_effects,
       prerequisites = prerequisites,
       count_formula = count_formula,
@@ -203,10 +206,13 @@ local function plan_stream(key, raw_spec)
     })
   end
   local emitted_effects = effect_scaling.scale_stream_effects(key, spec, effects)
+  local presentation = icon_builder.technology_icon_fields_for_stream(spec)
   local fields = {
     localised_name = lname(key, spec),
     localised_description = ldesc(spec),
-    icons = icon_builder.icons_for_stream(spec),
+    icon = presentation.icon,
+    icon_size = presentation.icon_size,
+    icons = presentation.icons,
     effects = emitted_effects,
     prerequisites = prerequisites,
     count_formula = count_formula,

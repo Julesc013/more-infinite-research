@@ -6,6 +6,11 @@ param(
   [Parameter(Mandatory)][string]$F200Engine,
   [Parameter(Mandatory)][string]$F110Engine,
   [Parameter(Mandatory)][string]$F100Engine,
+  [string]$F017Engine = '',
+  [string]$F016Engine = '',
+  [string]$F015Engine = '',
+  [string]$F014Engine = '',
+  [string]$F013Engine = '',
   [Parameter(Mandatory)][string]$F210Predecessor,
   [Parameter(Mandatory)][string]$F200Predecessor,
   [Parameter(Mandatory)][string]$F110Predecessor,
@@ -20,6 +25,9 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+# The script-wide trap also handles import and preflight failures. Initialize
+# its cleanup state before any of those operations can fail under StrictMode.
+$inputLeases=[Collections.Generic.List[object]]::new()
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
@@ -96,7 +104,8 @@ function Get-MIR42HistoricalEngineDescriptor {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0'
+    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0',
+    [string]$EnginePath = ''
   )
   $expected = $script:MIR42HistoricalTerminalInputs[$Target]
   $recordPath = Assert-MIR42EngineRunFile -Path (Join-Path $RepoRoot ([string]$expected.target_record)) -Label "mir42-$Target-target-record"
@@ -132,8 +141,15 @@ function Get-MIR42HistoricalEngineDescriptor {
       [string]$record.engine.version -notmatch '^0[.][0-9]+[.][0-9]+$' -or [string]$record.engine.sha256 -notmatch '^[A-F0-9]{64}$') {
     throw "[mir42-$Target-engine-authority]"
   }
+  $selectedEngine = $recordEngine
+  if ($SourceVersion -ceq '4.2.1') {
+    if ([string]::IsNullOrWhiteSpace($EnginePath) -or -not [IO.Path]::IsPathFullyQualified($EnginePath)) {
+      throw "[mir421-$Target-local-engine-binding-required]"
+    }
+    $selectedEngine = [IO.Path]::GetFullPath($EnginePath)
+  }
   return [ordered]@{
-    engine = $recordEngine
+    engine = $selectedEngine
     predecessor = [IO.Path]::GetFullPath((Join-Path $RepoRoot $predecessorRelative))
     from = [string]$record.predecessor.version
     to = [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion).distribution_version
@@ -411,7 +427,6 @@ if($running.Count){throw '[mir42-engine-factorio-already-running]'}
 $targets = if ($isNineTargetCandidate) { @($script:MIR42NineTargetEngineTargets) } else { @($script:MIR42ModernEngineTargets) }
 $libraryBindings=Get-MIR42EngineLibraryBindings -Path $LibraryBindingsPath -Targets $targets
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $out -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
-$inputLeases=[Collections.Generic.List[object]]::new()
 trap {
   $failure=$_
   foreach($inputLease in $inputLeases){if(-not $inputLease.closed){try {$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed} catch {}}}
@@ -482,8 +497,9 @@ if ((@($inputAuthority.targets | ForEach-Object { [string]$_.target }) -join '|'
 }
 if ($isNineTargetCandidate) {
   $historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo
+  $historicalEngineBindings = @{f017=$F017Engine;f016=$F016Engine;f015=$F015Engine;f014=$F014Engine;f013=$F013Engine}
   foreach ($target in $script:MIR42HistoricalEngineTargets) {
-    $historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target -SourceVersion $sourceVersion
+    $historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target -SourceVersion $sourceVersion -EnginePath $historicalEngineBindings[$target]
     $historical.fixture = 'assert-upgrade-historical-terminal-to-mir42'
     $selected[$target] = $historical
   }
@@ -523,7 +539,7 @@ foreach ($target in $targets) {
   $row.predecessor_sha256 = Get-MIR42EngineRunSha -Path $row.predecessor
   if ($isHistoricalTarget) {
     $historical = $row.historical
-    if (-not $row.engine.Equals([IO.Path]::GetFullPath([string]$historical.engine.path),[StringComparison]::OrdinalIgnoreCase) -or
+    if (($null -eq $maintenanceInputs -and -not $row.engine.Equals([IO.Path]::GetFullPath([string]$historical.engine.path),[StringComparison]::OrdinalIgnoreCase)) -or
         $row.engine_sha256 -cne [string]$historical.engine.sha256) {
       throw "[mir42-$target-historical-input-lock]"
     }

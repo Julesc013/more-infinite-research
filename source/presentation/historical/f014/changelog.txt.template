@@ -6,6 +6,10 @@ Version: 4.2.01401
     - Update the Factorio 0.14 distribution identity and package guidance for source 4.2.1.
     - Preserve the reduced target research and settings surface; modern-only features remain excluded.
     - Research Library backports are not included in this package.
+    - Recognize the historical player prototype when checking handcraftable laboratory and science acquisition routes.
+    - Select the native historical science-pack names for default research and official science progression.
+    - Emit the singular technology icon field required by this engine, preserving the selected base artwork.
+    - Withhold robot-battery research because this engine does not support its native modifier.
 
   Info:
 
