@@ -11,6 +11,9 @@ param(
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
 )
 $ErrorActionPreference='Stop'
+$resources=$null;$lease=$null
+# Native execution is retired; the preserved oracle is not current acceptance.
+throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'
 $harnessHash=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')

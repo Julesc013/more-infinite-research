@@ -153,18 +153,19 @@ try {
   foreach($script in @('tests/compiler/Test-MIRMaterialRoutes.ps1','tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1','tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1')) {
     $probeArguments=@{RepoRoot=$repo;FactorioBin='absent-engine';OutputRoot=$fixture}
     if($script.StartsWith('tests/runtime/')) {$probeArguments.ExactStageRoot=Join-Path $fixture 'absent-stage'}
-    Refuses-Probe {& (Join-Path $repo $script) @probeArguments} 'resource-peak-budget-required'
+    $expectedRefusal=if($script.StartsWith('tests/runtime/')){'mir-native-obsolete-runner'}else{'resource-peak-budget-required'}
+    Refuses-Probe {& (Join-Path $repo $script) @probeArguments} $expectedRefusal
     Assert-Probe (-not (Test-Path -LiteralPath $fixture)) "$script allocated staging before refusal."
   }
-  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1') -RepoRoot $repo -PrepareOnly -OutputRoot $fixture} 'resource-peak-budget-required'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1') -RepoRoot $repo -PrepareOnly -OutputRoot $fixture} 'mir-native-obsolete-runner'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'PrepareOnly bypassed allocation admission.'
-  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1') -RepoRoot $repo -PrepareOnly -ExactStageRoot (Join-Path $fixture 'absent-stage') -OutputRoot $fixture} 'resource-peak-budget-required'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1') -RepoRoot $repo -PrepareOnly -ExactStageRoot (Join-Path $fixture 'absent-stage') -OutputRoot $fixture} 'mir-native-obsolete-runner'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Final observer PrepareOnly bypassed allocation admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRResearchBrowser.ps1') -RepoRoot $repo -FactorioBin 'absent-browser-engine' -CandidateZip 'absent-candidate' -LibraryDirectory 'absent-library' -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Browser harness allocated before peak-budget admission.'
-  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRPassiveRepair.ps1') -RepoRoot $repo -CandidateZip 'absent-passive-candidate' -FactorioBin 'absent-passive-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRPassiveRepair.ps1') -RepoRoot $repo -CandidateZip 'absent-passive-candidate' -FactorioBin 'absent-passive-engine' -OutputRoot $fixture} 'mir-native-obsolete-runner'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Passive repair allocated or probed an engine before peak-budget admission.'
-  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1') -RepoRoot $repo -CandidateZip 'absent-tin-candidate' -BobModsDir 'absent-tin-library' -FactorioBin 'absent-tin-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1') -RepoRoot $repo -CandidateZip 'absent-tin-candidate' -BobModsDir 'absent-tin-library' -FactorioBin 'absent-tin-engine' -OutputRoot $fixture} 'mir-native-obsolete-runner'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Tin browser allocated or probed an input before peak-budget admission.'
   foreach ($prepare in @($false,$true)) {
     Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1') -RepoRoot $repo -FactorioBin 'absent-tin-engine' -CandidateZip 'absent-tin-candidate' -SettingsPath 'absent-settings' -OutputRoot $fixture -PrepareOnly:$prepare} 'resource-peak-budget-required'
