@@ -1,6 +1,9 @@
 -- Base/default 0.13-0.16 regression: a handcraftable lab must not disappear from
 -- the acquisition graph merely because the actor prototype is named player.
 assert(data.raw.player and data.raw.player.player, 'Expected the historical player prototype')
+if data.raw.tool['alien-science-pack'] then
+  assert(not data.raw.technology['recipe-prod-research_robot_battery-1'], 'Unsupported historical robot-battery modifier was emitted')
+end
 local accepted = {}
 for _, name in ipairs(data.raw.lab.lab.inputs) do accepted[name] = true end
 for _, key in ipairs({

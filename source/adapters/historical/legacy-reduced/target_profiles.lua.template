@@ -56,7 +56,7 @@ local M = {
       },
       emitter_families = {"technology"},
       asset_policy = "@@ASSET_POLICY@@",
-      expected_stream_count = 11,
+      expected_stream_count = ("@@FACTORIO_LINE@@" == "0.13" or "@@FACTORIO_LINE@@" == "0.14") and 9 or 11,
       features = {
         compatibility_repairs = false,
         pipeline_extent = false,
@@ -81,7 +81,7 @@ local M = {
         "character-resource-reach-distance",
         "character-running-speed",
         "gun-speed"@@LABORATORY_PRODUCTIVITY_EFFECT@@,
-        "worker-robot-battery"
+        ("@@FACTORIO_LINE@@" == "0.15" or "@@FACTORIO_LINE@@" == "0.16") and "worker-robot-battery" or nil
       },
       required_validation_groups = {
         "static",
