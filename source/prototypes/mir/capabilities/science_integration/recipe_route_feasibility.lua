@@ -1,13 +1,15 @@
 -- A deliberately narrow, pure acquisition witness. It establishes that one
--- concrete route has declared inputs, a matching *prototype category*, valid
--- finite energy, and a declared source/surface witness before its unlock.
--- It does not prove machine acquisition, logistics, power, throughput, save
--- behavior, balance, or ecosystem compatibility.
+-- concrete route has declared inputs, an independently acquired matching
+-- machine (or character crafting), finite energy, and source/surface witnesses
+-- before its unlock. It does not prove logistics, power, throughput, native
+-- placement, save behavior, balance, or ecosystem compatibility.
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local item_prototype_facts = require("prototypes.mir.index.item_prototype_facts")
 
 local M = {}
 -- Live CompilerContext ownership is private identity, not serializable cache
@@ -243,6 +245,8 @@ local function reset_state(state, epoch, context, recipe_index)
   state.acquisition_memo = {}
   state.stable_acquisition_memo = {}
   state.machine_categories = nil
+  state.machine_placement_items = {}
+  state.capturable_spawners = nil
   state.source_catalog = nil
   state.surface_locations = nil
   state.surface_results = {}
@@ -299,24 +303,34 @@ local function category_set_from_prototypes(state, options)
   if state.machine_categories then return state.machine_categories end
   local categories = {}
   for _, prototype_type in ipairs(MACHINE_TYPES) do
-    for _, machine in pairs(data_raw.prototypes(prototype_type)) do
+    for name, machine in pairs(data_raw.prototypes(prototype_type)) do
       if not diagnostic_visit(options) then return categories end
       for _, category in ipairs(machine.crafting_categories or {}) do
         if not diagnostic_visit(options) then return categories end
-        categories[category] = true
+        categories[category] = categories[category] or {}
+        table.insert(categories[category], {
+          name = name,
+          prototype_type = prototype_type,
+          fixed_recipe = machine.fixed_recipe,
+          surface_conditions = deepcopy(machine.surface_conditions)
+        })
       end
     end
+  end
+  for _, machines in pairs(categories) do
+    table.sort(machines, function(left, right)
+      local left_character = left.prototype_type == "character"
+      local right_character = right.prototype_type == "character"
+      if left_character ~= right_character then return left_character end
+      if left.name ~= right.name then return left.name < right.name end
+      return left.prototype_type < right.prototype_type
+    end)
   end
   state.machine_categories = categories
   return categories
 end
 
-local function compatible_machine(category, options, state)
-  if type(options.machine_category_witness) == "function" then
-    return options.machine_category_witness(category) == true
-  end
-  return category_set_from_prototypes(state, options)[category] == true
-end
+local compatible_machine
 
 local function surface_conditions_satisfied(conditions, properties, options)
   for _, condition in ipairs(conditions or {}) do
@@ -622,6 +636,192 @@ end
 
 local acquisition_witness
 
+local function placement_items_for_machine(name, options, state)
+  if options.diagnostic_observer == nil then
+    -- Reuse the same comprehensive index as laboratory selection. No new
+    -- machine-by-item cross product is built for ordinary production queries.
+    return item_prototype_facts.placeable_items_for_entity(name)
+  end
+  if state.machine_placement_items[name] then return state.machine_placement_items[name] end
+  local items = {}
+  -- A cold diagnostic reserves every raw visit and cannot warm the normal
+  -- comprehensive index outside its observation budget.
+  for _, item_type in ipairs(prototype_lookup.item_types()) do
+    if not diagnostic_visit(options) then return {} end
+    for item_name, item in pairs(data_raw.prototypes(item_type)) do
+      if not diagnostic_visit(options) then return {} end
+      if item.place_result == name then table.insert(items, item_name) end
+    end
+  end
+  table.sort(items)
+  state.machine_placement_items[name] = items
+  return items
+end
+
+local function entries(value)
+  if type(value) ~= "table" then return {} end
+  if value[1] ~= nil then return value end
+  return {value}
+end
+
+local function capturable_spawners(options, state)
+  if state.capturable_spawners then return state.capturable_spawners end
+  local by_entity = {}
+  for name, spawner in pairs(data_raw.prototypes("unit-spawner")) do
+    if not diagnostic_visit(options) then return {} end
+    if type(spawner.captured_spawner_entity) == "string" then
+      local entity = spawner.captured_spawner_entity
+      by_entity[entity] = by_entity[entity] or {}
+      table.insert(by_entity[entity], {name = name, surface_conditions = deepcopy(spawner.surface_conditions)})
+    end
+  end
+  for _, spawners in pairs(by_entity) do table.sort(spawners, function(a, b) return a.name < b.name end) end
+  state.capturable_spawners = by_entity
+  return by_entity
+end
+
+-- Recognize the native direct ammo -> projectile -> instant create-entity
+-- chain. This is not a general trigger interpreter or script authorization.
+local function capture_robot_from_action(action, options, projectile_depth)
+  for _, branch in ipairs(entries(action)) do
+    if not diagnostic_visit(options) then return nil end
+    if branch.type == "direct"
+      and (branch.probability == nil or finite_positive(branch.probability))
+      and (branch.repeat_count == nil or finite_positive(branch.repeat_count)) then
+      for _, delivery in ipairs(entries(branch.action_delivery)) do
+        if not diagnostic_visit(options) then return nil end
+        if delivery.type == "projectile" and projectile_depth == 0 then
+          local projectile = data_raw.prototype("projectile", delivery.projectile)
+          if projectile then
+            local robot = capture_robot_from_action(projectile.action, options, 1)
+            if robot then return robot end
+          end
+        elseif delivery.type == "instant" then
+          for _, effect in ipairs(entries(delivery.target_effects)) do
+            if not diagnostic_visit(options) then return nil end
+            if effect.type == "create-entity"
+              and (effect.probability == nil or finite_positive(effect.probability)) then
+              local robot = data_raw.prototype("capture-robot", effect.entity_name)
+              if robot and finite_positive(robot.capture_speed) then return effect.entity_name end
+            end
+          end
+        end
+      end
+    end
+  end
+  return nil
+end
+
+local function capture_machine_witness(machine, category, options, state)
+  local profile = target_profiles.current()
+  if not profile or profile.supports_space_age ~= true then return nil end
+  local spawners = capturable_spawners(options, state)[machine.name] or {}
+  if #spawners == 0 then return nil end
+  local ammo_names, gun_names = {}, {}
+  for name in pairs(data_raw.prototypes("ammo")) do
+    if not diagnostic_visit(options) then return nil end
+    table.insert(ammo_names, name)
+  end
+  for name in pairs(data_raw.prototypes("gun")) do
+    if not diagnostic_visit(options) then return nil end
+    table.insert(gun_names, name)
+  end
+  table.sort(ammo_names); table.sort(gun_names)
+  local checkpoint = diagnostic_checkpoint(options)
+  for _, spawner in ipairs(spawners) do
+    if not diagnostic_visit(options) then return nil end
+    -- Capturing transforms the existing entity in place. Separate witnesses
+    -- on incompatible planets cannot supply this one transformation.
+    local conditions = {}
+    for _, condition in ipairs(machine.surface_conditions or {}) do
+      if not diagnostic_visit(options) then return nil end
+      table.insert(conditions, condition)
+    end
+    for _, condition in ipairs(spawner.surface_conditions or {}) do
+      if not diagnostic_visit(options) then return nil end
+      table.insert(conditions, condition)
+    end
+    if surface_satisfied(conditions, options, state) then
+      for _, ammo_name in ipairs(ammo_names) do
+        if not diagnostic_visit(options) then return nil end
+        local ammo = data_raw.prototype("ammo", ammo_name)
+        for _, ammo_type in ipairs(entries(ammo.ammo_type)) do
+          if not diagnostic_visit(options) then return nil end
+          local accepts_target = ammo_type.target_filter == nil
+          for _, name in ipairs(ammo_type.target_filter or {}) do
+            if not diagnostic_visit(options) then return nil end
+            if name == spawner.name then accepts_target = true end
+          end
+          local robot = accepts_target and capture_robot_from_action(ammo_type.action, options, 0) or nil
+          if robot then
+            for _, gun_name in ipairs(gun_names) do
+              if not diagnostic_visit(options) then return nil end
+              diagnostic_rollback(options, checkpoint)
+              local parameters = data_raw.prototype("gun", gun_name).attack_parameters or {}
+              local categories = parameters.ammo_categories
+              if categories == nil then categories = {parameters.ammo_category} end
+              local accepts_ammo = false
+              for _, gun_category in ipairs(categories) do
+                if not diagnostic_visit(options) then return nil end
+                if type(ammo.ammo_category) == "string" and gun_category == ammo.ammo_category then accepts_ammo = true end
+              end
+              if accepts_ammo then
+                local launcher = acquisition_witness({type = "item", name = gun_name}, options, state)
+                local ammunition = launcher and acquisition_witness({type = "item", name = ammo_name}, options, state) or nil
+                if ammunition then
+                  diagnostic_rollback(options, checkpoint)
+                  return {kind = "machine-capture", category = category, prototype = machine.name,
+                    captured_from = spawner.name, capture_robot = robot, gun = gun_name, ammo = ammo_name,
+                    launcher = launcher, ammunition = ammunition}
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return nil
+end
+
+compatible_machine = function(category, recipe_name, options, state)
+  if type(options.machine_category_witness) == "function" then
+    if options.machine_category_witness(category) == true then
+      return {kind = "declared-machine-category", category = category}
+    end
+    return nil
+  end
+  local machines = category_set_from_prototypes(state, options)[category] or {}
+  local checkpoint = diagnostic_checkpoint(options)
+  for _, machine in ipairs(machines) do
+    if not diagnostic_visit(options) then return nil end
+    diagnostic_rollback(options, checkpoint)
+    if (machine.fixed_recipe == nil or machine.fixed_recipe == recipe_name)
+      and surface_satisfied(machine.surface_conditions, options, state) then
+      if machine.prototype_type == "character" then
+        diagnostic_rollback(options, checkpoint)
+        return {kind = "character-crafting", category = category, prototype = machine.name}
+      end
+      for _, item_name in ipairs(placement_items_for_machine(machine.name, options, state)) do
+        if not diagnostic_visit(options) then return nil end
+        diagnostic_rollback(options, checkpoint)
+        local item = prototype_lookup.item_prototype(item_name)
+        if item and item.place_result == machine.name then
+          local witness = acquisition_witness({type = "item", name = item_name}, options, state)
+          if witness then
+            diagnostic_rollback(options, checkpoint)
+            return {kind = "machine-placement", category = category, prototype = machine.name,
+              prototype_type = machine.prototype_type, item = item_name, acquisition = witness}
+          end
+        end
+      end
+      local captured = capture_machine_witness(machine, category, options, state)
+      if captured then return captured end
+    end
+  end
+  return nil
+end
+
 local function route_for_recipe(recipe_name, output_identity, options, state, require_enabled)
   if not diagnostic_visit(options) then return nil end
   local fact = options.recipe_index.facts[recipe_name]
@@ -696,13 +896,16 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
           reason = "surface-conditions-unsatisfied"
         })
       else
-        local has_machine = false
+        local machine_witness
         local categories = variant.categories or {"crafting"}
+        local machine_checkpoint = diagnostic_checkpoint(options)
         for _, category in ipairs(categories) do
           if not diagnostic_visit(options) then return nil end
-          if compatible_machine(category, options, state) then has_machine = true; break end
+          diagnostic_rollback(options, machine_checkpoint)
+          machine_witness = compatible_machine(category, recipe_name, options, state)
+          if machine_witness then break end
         end
-        if has_machine then
+        if machine_witness then
           local ingredients_ok, ingredient_witnesses = true, {}
           for _, ingredient in ipairs(normalized_ingredients(variant)) do
             if not diagnostic_visit(options) then return nil end
@@ -743,6 +946,7 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
               recipe = recipe_name,
               variant = variant.name or "default",
               output = deepcopy(output_identity),
+              machine = machine_witness,
               ingredients = ingredient_witnesses
             }
           end
@@ -791,6 +995,14 @@ local function stable_acquisition_witness(witness)
   if type(witness) ~= "table" then return false end
   if STABLE_SOURCE_KINDS[witness.kind] then return true end
   if witness.kind ~= "recipe" then return false end
+  local machine = witness.machine
+  if not machine then return false end
+  if machine.kind == "machine-placement" then
+    if not stable_acquisition_witness(machine.acquisition) then return false end
+  elseif machine.kind == "machine-capture" then
+    if not stable_acquisition_witness(machine.launcher)
+      or not stable_acquisition_witness(machine.ammunition) then return false end
+  elseif machine.kind ~= "character-crafting" then return false end
   for _, ingredient in ipairs(witness.ingredients or {}) do
     if not stable_acquisition_witness(ingredient) then return false end
   end

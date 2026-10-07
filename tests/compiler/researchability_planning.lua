@@ -872,8 +872,8 @@ check("F09C9", feasibility.source_witness("zero-drop") == nil
   and feasibility.source_witness("impossible-drop") == nil
   and feasibility.source_witness({type = "fluid", name = "invalid-fluid-loot"}) == nil,
   "Zero, impossible and non-item loot cannot seed acquisition")
-check("F09C10", feasibility.initial_recipe_witness("eggs", "biter-egg") ~= nil,
-  "A captured spawner supplies its declared recipe category")
+check("F09C10", feasibility.initial_recipe_witness("eggs", "biter-egg") == nil,
+  "A captive-spawner category without placement or capture inputs cannot invent initial acquisition")
 world.assembling_machines = {}
 data.raw["assembling-machine"] = world.assembling_machines
 world.recipe_source_epoch = 2

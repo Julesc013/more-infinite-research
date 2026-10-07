@@ -1,0 +1,103 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0109",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Require acquired recipe machines and retain their actual science frontier.",
+  "details": [
+    "Research acquisition now requires an obtainable matching machine placement item or a declared native capture route. A category prototype cannot supply an unavailable lab construction route, and circular machine/product bootstrap paths remain withheld.",
+    "Native capture preserves matching spawner transformations through obtainable compatible ammunition and launchers; fixed recipes and common surface conditions remain required. Machine, launcher and ammunition unlocks join the selected science frontier.",
+    "Controlled canonical laboratory and researchability consumers cover both modern adapters. Native catalogue, placement/capture, output, save and performance acceptance remain pending; other scripted or trigger-created machine mechanisms require their own qualification."
+  ],
+  "semantic_domains": [
+    "science",
+    "progression",
+    "recipe-productivity",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe/machine acquisition and frontier dependencies; native catalogue, output, lifecycle and save effects remain unqualified. Native capture recognition is bounded to target capability and concrete input contracts."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/compiler/lab_reachability.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/researchability_planning.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/science-integration.md",
+      "kind": "documentation"
+    }
+  ]
+}

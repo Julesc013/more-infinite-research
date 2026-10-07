@@ -282,4 +282,142 @@ run(raw, function(owner)
   prototype_lookup.item_prototype = original_lookup
   assert(ok, failure)
 end)
+-- A prototype category does not supply the machine that constructs a lab.
+-- Exercise the actual lab and researchability consumers, rather than a
+-- machine-category callback which could bypass placement acquisition.
+local capture_frontier_raw
+for _, case in ipairs({
+  {id='missing-acquisition', expected=false},
+  {id='missing-placement', no_placement=true, expected=false},
+  {id='initial-machine', initial=true, expected=true},
+  {id='self-locked-machine', locked=true, expected=false},
+  {id='staged-machine', locked=true, early_lab=true, expected=true},
+  {id='circular-machine', circular=true, expected=false},
+  {id='alternate-machine', alternate=true, expected=true},
+  {id='wrong-surface', initial=true, wrong_surface=true, expected=false},
+  {id='fixed-other-recipe',initial=true,fixed='make_A',expected=false},
+  {id='fixed-lab-recipe',initial=true,fixed='make_lab',expected=true},
+  {id='captured-machine',capture=true,expected=true},
+  {id='capture-wrong-target',capture=true,wrong_target=true,expected=false},
+  {id='capture-wrong-transform',capture=true,wrong_transform=true,expected=false},
+  {id='capture-zero-speed',capture=true,zero_speed=true,expected=false},
+  {id='capture-missing-launcher',capture=true,no_launcher=true,expected=false},
+  {id='capture-missing-ammo',capture=true,no_ammo=true,expected=false},
+  {id='capture-wrong-gun-category',capture=true,wrong_gun=true,expected=false},
+  {id='capture-zero-effect-probability',capture=true,zero_effect=true,expected=false},
+  {id='capture-incompatible-surfaces',capture=true,capture_surface='different',expected=false},
+  {id='capture-common-surface',capture=true,capture_surface='same',expected=true},
+  {id='self-locked-capture',capture=true,capture_locked=true,expected=false},
+  {id='staged-capture',capture=true,capture_locked=true,early_lab=true,expected=true}
+}) do
+  raw = world()
+  raw.recipe.make_lab.category = 'bio-lab-manufacturing'
+  raw['assembling-machine'] = {builder = {type='assembling-machine', name='builder',
+    crafting_categories={'bio-lab-manufacturing'}}}
+  raw['assembling-machine'].builder.fixed_recipe = case.fixed
+  if case.wrong_surface then
+    raw['assembling-machine'].builder.surface_conditions = {{property='pressure',min=1000}}
+  end
+  if not case.no_placement then
+    raw.item['builder-kit'] = {type='item',name='builder-kit',place_result='builder'}
+  end
+  if case.initial or case.locked or case.circular then
+    raw.recipe.make_builder = recipe('make_builder','builder-kit',not case.locked)
+  end
+  if case.locked then
+    raw.technology.BuilderUnlock = research({'A'})
+    raw.technology.BuilderUnlock.effects = {{type='unlock-recipe',recipe='make_builder'}}
+  end
+  if case.early_lab then
+    raw.lab.early = {type='lab',name='early',inputs={'A'}}
+    raw.item['early-kit'] = {type='item',name='early-kit',place_result='early'}
+    raw.recipe.make_early = recipe('make_early','early-kit')
+  end
+  if case.circular then raw.recipe.make_builder.ingredients = {{'lab-kit',1}} end
+  if case.capture then
+    raw['unit-spawner'] = {wild = {type='unit-spawner',name='wild',
+      captured_spawner_entity=case.wrong_transform and 'different-builder' or 'builder'}}
+    if case.capture_surface then
+      raw['assembling-machine'].builder.surface_conditions = {{property='pressure',min=1000,max=1000}}
+      local pressure = case.capture_surface=='same' and 1000 or 2000
+      raw['unit-spawner'].wild.surface_conditions = {{property='pressure',min=pressure,max=pressure}}
+      raw.planet = {early={name='early',surface_properties={pressure=1000}},
+        late={name='late',surface_properties={pressure=2000}}}
+    end
+    raw['capture-robot'] = {robot = {type='capture-robot',name='robot',
+      capture_speed=case.zero_speed and 0 or 1}}
+    raw.projectile = {rocket = {type='projectile',name='rocket',action={type='direct',
+      action_delivery={type='instant',target_effects={type='create-entity',entity_name='robot',
+        probability=case.zero_effect and 0 or 1}}}}}
+    raw.ammo = {['capture-ammo'] = {type='ammo',name='capture-ammo',ammo_category='capture',
+      ammo_type={target_filter={case.wrong_target and 'other-spawner' or 'wild'},
+        action={type='direct',action_delivery={type='projectile',projectile='rocket'}}}}}
+    raw.gun = {launcher = {type='gun',name='launcher',attack_parameters={
+      ammo_categories={case.wrong_gun and 'other-ammo' or 'capture'}}}}
+    if not case.no_launcher then raw.recipe.make_launcher = recipe('make_launcher','launcher') end
+    if not case.no_ammo then
+      raw.recipe.make_ammunition = recipe('make_ammunition','capture-ammo',not case.capture_locked)
+    end
+    if case.capture_locked then
+      raw.technology.AmmoUnlock = research({'A'})
+      raw.technology.AmmoUnlock.effects = {{type='unlock-recipe',recipe='make_ammunition'}}
+    end
+  end
+  if case.alternate then
+    raw['assembling-machine']['z-builder'] = {type='assembling-machine',name='z-builder',
+      crafting_categories={'bio-lab-manufacturing'}}
+    raw['item-with-entity-data'] = {['alternate-builder-kit'] = {
+      type='item-with-entity-data',name='alternate-builder-kit',place_result='z-builder'}}
+    raw.recipe.make_alternate_builder = recipe('make_alternate_builder','alternate-builder-kit')
+  end
+  if case.id=='staged-capture' then
+    capture_frontier_raw = require('prototypes.mir.core.deepcopy')(raw)
+  end
+  run(raw, function(owner)
+    local before = fingerprint.of(data.raw)
+    check('LRM/'..case.id, lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+      'The accepting lab requires an independently obtainable matching machine: '..case.id)
+    check('LRM/'..case.id..'/research',
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Actual researchability agrees with machine acquisition: '..case.id)
+    check('LRM/'..case.id..'/immutable', fingerprint.of(data.raw)==before,
+      'Machine acquisition preserves prototype inputs: '..case.id)
+    if case.early_lab then
+      local routes = require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+      check('LRM/'..case.id..'/initial', routes.initial_recipe_witness('make_lab','lab-kit')==nil,
+        'A research-gated machine cannot become an initial lab construction witness')
+    end
+  end)
+end
+raw = assert(capture_frontier_raw)
+raw.recipe.make_lab.category = nil
+raw.recipe.make_B.category = 'bio-lab-manufacturing'
+raw.recipe.make_launcher.enabled = false
+raw.technology.LauncherUnlock = research({'A'})
+raw.technology.LauncherUnlock.effects = {{type='unlock-recipe',recipe='make_launcher'}}
+run(raw, function()
+  check('LRM/capture-frontier/status', production.pack_production_status('B',{})=='research',
+    'An enabled pack recipe retains the research-gated native capture route')
+  local gates = production.prereq_techs_for_science_pack('B')
+  check('LRM/capture-frontier/gates', #gates==2 and gates[1]=='AmmoUnlock' and gates[2]=='LauncherUnlock',
+    'The selected frontier retains both capture ammunition and launcher unlocks')
+end)
+-- Machine acquisition is part of a pack's science frontier, even when the
+-- outer pack recipe is already enabled. It must not be flattened to initial
+-- availability or lose the actual machine unlock from the selected route.
+raw = world()
+raw.recipe.make_B.category = 'late-pack-manufacturing'
+raw['assembling-machine'] = {builder={type='assembling-machine',name='builder',
+  crafting_categories={'late-pack-manufacturing'}}}
+raw.item['builder-kit'] = {type='item',name='builder-kit',place_result='builder'}
+raw.recipe.make_builder = recipe('make_builder','builder-kit',false)
+raw.technology.BuilderUnlock = research({'A'})
+raw.technology.BuilderUnlock.effects = {{type='unlock-recipe',recipe='make_builder'}}
+run(raw, function()
+  check('LRM/frontier/status', production.pack_production_status('B',{})=='research',
+    'An enabled pack recipe with a research-gated machine remains a reachable later route')
+  local gates = production.prereq_techs_for_science_pack('B')
+  check('LRM/frontier/gate', #gates==1 and gates[1]=='BuilderUnlock',
+    'The selected science frontier retains the actual machine acquisition unlock')
+end)
 print('MIR-LAB-REACHABILITY-PASS ' .. checks)

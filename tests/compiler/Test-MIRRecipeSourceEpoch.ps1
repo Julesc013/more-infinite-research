@@ -36,6 +36,7 @@ $modules=[ordered]@{
   'prototypes.mir.graph.condensation'='source/prototypes/mir/graph/condensation.lua'
   'prototypes.mir.graph.researchability_index'='source/prototypes/mir/graph/researchability_index.lua'
   'prototypes.mir.index.recipe_facts'='source/prototypes/mir/index/recipe_facts.lua'
+  'prototypes.mir.index.item_prototype_facts'='source/prototypes/mir/index/item_prototype_facts.lua'
   'prototypes.mir.index.recipe_unlocks'='source/prototypes/mir/index/recipe_unlocks.lua'
   'prototypes.mir.capabilities.science_integration.pack_registry'='source/prototypes/mir/capabilities/science_integration/pack_registry.lua'
   'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
