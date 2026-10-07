@@ -153,13 +153,17 @@ function M.verify(stage)
   if math.abs(force.laboratory_speed_modifier - record.lab_bonus) > 0.000001 or
     math.abs(force.get_gun_speed_modifier("bullet") - record.bullet_speed_bonus) > 0.000001 then fail("earned native reward changed") end
   if record.manufacturing then
+    local observed, changed = {}, {}
     for name, before in pairs(record.manufacturing.recipe_bonuses) do
       local recipe = force.recipes[name]
       local actual = recipe and recipe.productivity_bonus
+      observed[name] = {before=before, actual=actual, present=recipe ~= nil}
       if type(actual) ~= "number" or math.abs(actual - before) > 0.000001 then
-        fail("earned manufacturing bonus changed for " .. name .. ": expected " .. tostring(before) .. ", actual " .. tostring(actual))
+        changed[#changed+1] = name .. ": expected " .. tostring(before) .. ", actual " .. tostring(actual)
       end
     end
+    log("[mir-fixture] SIF-01 native manufacturing rewards stage=" .. stage .. " " .. helpers.table_to_json(observed))
+    if #changed > 0 then table.sort(changed); fail("earned manufacturing bonuses changed: " .. table.concat(changed, "; ")) end
   end
   marker(stage)
   if stage == "reload" then reload_checked = true end
