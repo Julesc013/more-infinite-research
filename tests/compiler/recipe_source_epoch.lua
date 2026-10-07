@@ -338,4 +338,45 @@ end)()
   data.raw, profile_module.current_factorio_version = previous_raw, previous_line
 end)()
 
+-- Native offshore-pump fields changed in 2.0, independently of the 2.1 loot
+-- change. Select each line contract through the actual source consumer.
+;(function()
+  local fingerprint = require("prototypes.mir.core.fingerprint")
+  local profile_module = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_line, previous_raw = profile_module.current_factorio_version, data.raw
+  local routes = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+  for _, line in ipairs({"2.1","2.0","1.1","1.0","0.17","0.16","0.15","0.14","0.13"}) do
+    profile_module.current_factorio_version=line
+    local modern = line=="2.1" or line=="2.0"
+    data.raw={['offshore-pump']={pump={fluid_source_offset={0,-1},fluid_box={}}},
+      tile={water={fluid="water"}}}
+    compiler_context.with_active(compiler_context.new(),function()
+      local before=fingerprint.of(data.raw)
+      check("PS"..line.."/offset",(routes.source_witness({type="fluid",name="water"})~=nil)==modern,
+        "Only the two modern native pump lines consume tile source offsets")
+      check("PS"..line.."/typed",routes.source_witness("water")==nil,
+        "A pumped fluid cannot supply a same-named item")
+      check("PS"..line.."/immutable",fingerprint.of(data.raw)==before,
+        "Pump source reading preserves the supplied native facts")
+    end)
+    data.raw['offshore-pump'].pump.fluid="molten-nickel"
+    compiler_context.with_active(compiler_context.new(),function()
+      check("PS"..line.."/native-fields",
+        (routes.source_witness({type="fluid",name="water"})~=nil)==modern
+        and (routes.source_witness({type="fluid",name="molten-nickel"})~=nil)==not modern,
+        "The native pump line owns its fluid fields; foreign fields cannot override it")
+    end)
+    data.raw['offshore-pump'].pump={fluid_box={filter="water"}}
+    compiler_context.with_active(compiler_context.new(),function()
+      check("PS"..line.."/filter-only",routes.source_witness({type="fluid",name="water"})==nil,
+        "A machine connection filter cannot invent a natural fluid source")
+    end)
+    data.raw['offshore-pump'].pump={fluid="water"}
+    compiler_context.with_active(compiler_context.new(),function()
+      check("PS"..line.."/explicit",(routes.source_witness({type="fluid",name="water"})~=nil)==not modern,
+        "The explicit fluid declaration remains native only before2.0")
+    end)
+  end
+  profile_module.current_factorio_version, data.raw=previous_line, previous_raw
+end)()
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)

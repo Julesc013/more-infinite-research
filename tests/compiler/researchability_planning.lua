@@ -721,7 +721,8 @@ local function source_surface_world(surfaces, planets, space_locations)
     resources = {ore = {
       minable = {result = "ore", count = 1}, surface_conditions = source_surface_conditions
     }},
-    offshore_pumps = {water = {fluid = "water", surface_conditions = source_surface_conditions}},
+    offshore_pumps = {water = {fluid_source_offset = {0,-1}, fluid_box = {}, surface_conditions = source_surface_conditions}},
+    tiles = {water = {fluid = "water"}},
     surfaces = surfaces, planets = planets, space_locations = space_locations
   }
 end
@@ -770,7 +771,8 @@ check("F09B", feasibility.initial_recipe_witness("item-same", {type = "fluid", n
 reset({
   item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
   resources = {same_resource = {minable = {result = "same", count = 1}}},
-  offshore_pumps = {same_pump = {fluid = "same"}}
+  offshore_pumps = {same_pump = {fluid_source_offset = {0,-1}, fluid_box = {}}},
+  tiles = {same = {fluid = "same"}}
 })
 check("F09C", feasibility.source_witness("same").kind == "minable-resource"
   and feasibility.source_witness({type = "fluid", name = "same"}).kind == "offshore-pump",
@@ -801,23 +803,30 @@ reset({
 check("F09C0A", feasibility.source_witness({type = "fluid", name = "molten-nickel"}) == nil,
   "An F210 filtered offshore pump without a source offset is not a natural source")
 
--- The source-offset interpretation is a Factorio-2.1 contract. A fluid-box
--- filter remains insufficient on every target.
--- F200 keeps its established explicit-pump-field semantics; an F200 mod can
--- still declare a source through `fluid`.
+-- Installed Factorio 2.0.77 has the same mandatory source-offset contract.
+-- Its real tile fluid supplies water; a filter or pre-2.0 field cannot invent
+-- another natural source. The older explicit contract remains separate.
 target_profile.current_factorio_version = "2.0"
 reset({
   item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
-  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {filter = "water"}}}
+  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {filter = "water"}}},
+  tiles = {water = {fluid = "water"}}
 })
-check("F09C1", feasibility.source_witness({type = "fluid", name = "water"}) == nil,
-  "An F200 source-offset or fluid-box pump does not infer a natural fluid source")
+check("F09C1", feasibility.source_witness({type = "fluid", name = "water"}) ~= nil,
+  "An F200 source-offset pump uses the actual tile-declared water fluid")
 reset({
   item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
   offshore_pumps = {declared_pump = {fluid = "water"}}
 })
-check("F09C2", feasibility.source_witness({type = "fluid", name = "water"}) ~= nil,
-  "An F200 pump preserves an explicit fluid source declaration")
+check("F09C2", feasibility.source_witness({type = "fluid", name = "water"}) == nil,
+  "An F200 pump cannot use the former explicit fluid field without its native source offset")
+target_profile.current_factorio_version = "1.1"
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  offshore_pumps = {declared_pump = {fluid = "water"}}
+})
+check("F09C2L", feasibility.source_witness({type = "fluid", name = "water"}) ~= nil,
+  "An older native pump preserves its actual explicit fluid declaration")
 target_profile.current_factorio_version = "2.1"
 
 reset({
@@ -911,7 +920,8 @@ check("F09CA", feasibility.source_witness("wood").kind == "minable-entity"
 local function boiler_source_world(input_source, boiler_conditions)
   return {
     item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
-    offshore_pumps = input_source and {pump = {fluid = "water"}} or {},
+    offshore_pumps = input_source and {pump = {fluid_source_offset = {0,-1}, fluid_box = {}}} or {},
+    tiles = {water = {fluid = "water"}},
     boilers = {boiler = {
       name = "boiler",
       fluid_box = {filter = "water"},

@@ -150,6 +150,68 @@ for _, case in ipairs({
       'Mining acquisition preserves prototype inputs: '..case.id)
   end)
 end
+-- Actual modern native pumps draw the declared tile fluid through their
+-- source offset. Consume that source through lab construction and research.
+local function native_pump_world()
+  local r = world()
+  r['assembling-machine'] = {builder={type='assembling-machine',name='builder',
+    crafting_categories={'chemistry'},fluid_boxes={{production_type='input'}}}}
+  r.item['builder-kit'] = {type='item',name='builder-kit',place_result='builder'}
+  r.recipe.make_builder = recipe('make_builder','builder-kit')
+  r.recipe.make_lab.category = 'chemistry'
+  r.recipe.make_lab.ingredients = {{type='fluid',name='water',amount=1}}
+  r.fluid = {water={type='fluid',name='water'}}
+  r['offshore-pump'] = {native={type='offshore-pump',name='native',
+    fluid_source_offset={0,-1},pumping_speed=20,fluid_box={production_type='output'}}}
+  r.tile = {water={type='tile',name='water',fluid='water'}}
+  return r
+end
+for _, case in ipairs({
+  {id='native-water',expected=true,mutate=function() end},
+  {id='filter-only',expected=false,mutate=function(r)
+    r['offshore-pump'].native.fluid_source_offset=nil
+    r['offshore-pump'].native.fluid_box.filter='water'
+  end},
+  {id='foreign-explicit-field',expected=false,mutate=function(r)
+    r['offshore-pump'].native.fluid_source_offset=nil
+    r['offshore-pump'].native.fluid='water'
+  end},
+  {id='absent-tile-fluid',expected=false,mutate=function(r) r.tile={} end},
+  {id='mismatched-filter',expected=false,mutate=function(r)
+    r['offshore-pump'].native.fluid_box.filter='molten-nickel'
+  end},
+  {id='stale-foreign-field',expected=true,mutate=function(r)
+    r['offshore-pump'].native.fluid='molten-nickel'
+  end}
+}) do
+  raw = native_pump_world(); case.mutate(raw)
+  run(raw, function()
+    local before = fingerprint.of(data.raw)
+    check('LRP/'..case.id,lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+      'Native tile-fluid declaration controls acquired lab construction: '..case.id)
+    check('LRP/'..case.id..'/research',
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Actual researchability consumes the native tile-fluid source: '..case.id)
+    check('LRP/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Reading pump/tile source facts preserves prototype inputs: '..case.id)
+  end)
+end
+raw = native_pump_world()
+raw.recipe.make_B.category = 'chemistry'
+raw.recipe.make_B.ingredients = {{type='fluid',name='water',amount=1}}
+raw.recipe.make_builder.enabled = false
+raw.lab.early = {type='lab',name='early',inputs={'A'}}
+raw.item['early-kit'] = {type='item',name='early-kit',place_result='early'}
+raw.recipe.make_early = recipe('make_early','early-kit')
+raw.technology.BuilderUnlock = research({'A'})
+raw.technology.BuilderUnlock.effects = {{type='unlock-recipe',recipe='make_builder'}}
+run(raw, function()
+  check('LRP/frontier/status',production.pack_production_status('B',{})=='research',
+    'Native water supplies the science recipe without flattening its machine unlock')
+  local gates = production.prereq_techs_for_science_pack('B')
+  check('LRP/frontier/gate',#gates==1 and gates[1]=='BuilderUnlock',
+    'The science frontier retains the actual machine research gate')
+end)
 -- An enabled outer recipe can consume a mined item whose fluid is unlocked
 -- through earlier research. The chosen route must keep that unlock and never
 -- warm an enabled-only acquisition memo with its conditional conclusion.

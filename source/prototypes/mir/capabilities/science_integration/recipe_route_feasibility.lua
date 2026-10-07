@@ -596,17 +596,21 @@ local function tile_source_fluids(options)
   return fluids, true
 end
 
+local function uses_tile_pump_contract()
+  local line = target_profiles.current_factorio_version
+  return line == "2.1" or line == "2.0"
+end
+
 local function offshore_pump_output_fluids(pump, options, tile_fluids)
-  -- Factorio 2.1 base offshore pumps take their unfiltered output directly
-  -- from water tiles. Its source-offset form does not carry the former
-  -- `fluid` field. The F200 profile intentionally retains its established
-  -- explicit-field contract. Its Angel pump `fluid_box.filter` describes a
-  -- machine output shape, and must not become a natural source witness.
-  -- Preserve the legacy explicit `fluid` declaration on every target.
-  local declared = pump and pump.fluid
-  if type(declared) == "string" and declared ~= "" then return {declared}, true end
+  -- Both modern native engines use source offsets and tile-declared fluids.
+  -- A retained pre-2.0 `fluid` field has no source authority on those lines.
+  -- Older engines keep their explicit native fluid declaration.
+  if not uses_tile_pump_contract() then
+    local declared = pump and pump.fluid
+    if type(declared) == "string" and declared ~= "" then return {declared}, true end
+  end
   local fluids = {}
-  if target_profiles.current_factorio_version == "2.1"
+  if uses_tile_pump_contract()
     and pump and pump.fluid_source_offset ~= nil then
     -- The pump draws the fluid declared by the tile, including Space Age
     -- oceans. A connection filter constrains that source; it cannot invent
@@ -639,9 +643,8 @@ local function default_source_catalog(state, options)
   local tile_fluids
   for _, pump in pairs(data_raw.prototypes("offshore-pump")) do
     if not diagnostic_visit(options) then return sources end
-    if target_profiles.current_factorio_version == "2.1"
+    if uses_tile_pump_contract()
       and pump.fluid_source_offset ~= nil
-      and (type(pump.fluid) ~= "string" or pump.fluid == "")
       and not tile_fluids then
       local complete
       tile_fluids, complete = tile_source_fluids(options)
