@@ -51,6 +51,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Historical upgrade fixture must retain its exact staged metadata contract: $infoPath"
     }
     $mir4TargetNativeFixtures = @{
+      "assert-historical-handcrafting" = "0.16"
       "assert-upgrade-1-8-9-to-4-0-10000" = "1.0"
       "assert-upgrade-1-9-9-to-4-0-11000" = "1.1"
       "assert-generated-cap-transition-2-0" = "2.0"
