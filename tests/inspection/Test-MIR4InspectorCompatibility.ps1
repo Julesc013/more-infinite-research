@@ -27,4 +27,5 @@ $reference=Test-MIR4T13Reference -RepoRoot $repo
 Assert-MIR4InspectorCompatibilityV1 ([string]$reference.status-ceq'passed'-and[int]$reference.canary_count-eq8-and[int]$reference.capture_count-eq11-and-not[bool]$reference.package_visible) 'mir4-inspector-compatibility-t13-reference'
 Assert-MIR4InspectorCompatibilityV1 ((Get-FileHash -LiteralPath $policyPath -Algorithm SHA256).Hash-ceq$policyBefore) 'mir4-inspector-compatibility-policy-read-only'
 Assert-MIR4InspectorCompatibilityV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-inspector-compatibility-package-mutation'
+& (Join-Path $repo 'tests/inspection/Test-MIR4InspectorExportConsumers.ps1') -RepoRoot $repo
 [pscustomobject][ordered]@{status='accepted';functional_parity_digest=[string]$parity.digest;subject_count=10;section_count=11;canary_count=8;capture_count=11;package_source_sha256=$packageBefore;package_visible=$false;public_support_authorized=$false;release_transition_authority=$false}

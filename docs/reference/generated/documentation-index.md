@@ -68,7 +68,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-assurance-scale.md | MIR 4 Assurance Scale and Offline Drill | current | maintainer | explanation | mir-maintainers | 2026-08-26 |
 | docs/architecture/mir4-change-and-release-authority.md | MIR 4 change and release narrative authority | current | developer | explanation | mir-maintainers | 2026-09-29 |
 | docs/architecture/mir4-historical-succession.md | MIR 4 Historical, Museum, and Successor-Host Closure | current | developer | explanation | mir-maintainers | 2026-08-28 |
-| docs/architecture/mir4-inspector-compatibility.md | MIR 4 Inspector and Compatibility Factory | current | developer | explanation | mir-maintainers | 2026-08-28 |
+| docs/architecture/mir4-inspector-compatibility.md | MIR 4 Inspector and Compatibility Factory | current | developer | explanation | mir-maintainers | 2026-10-07 |
 | docs/architecture/mir4-module-ecosystem.md | MIR 4 Module Ecosystem | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/architecture/mir4-offline-release-authority.md | MIR 4 Offline Release Authority | draft | maintainer | reference | mir-maintainers | 2026-08-07 |
 | docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-09-06 |
@@ -159,7 +159,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/developer/diagnostics.md | MIR 4 Diagnostic Registry | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/developer/environment-locks.md | Environment Locks, Diffs, and Support Bundles | current | developer | how-to | mir-maintainers | 2026-08-26 |
 | docs/developer/first-extension.md | Your First MIR 4 Extension from a Preview Archive | current | developer | tutorial | mir-maintainers | 2026-08-26 |
-| docs/developer/inspector.md | MIR 4 Inspector Preview | current | developer | how-to | mir-maintainers | 2026-08-26 |
+| docs/developer/inspector.md | MIR 4 Inspector Preview | current | developer | how-to | mir-maintainers | 2026-10-07 |
 | docs/developer/mep-fragment-reference.md | MEP V1 Fragment Reference | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/developer/processir.md | MIR 4 ProcessIR Preview | current | developer | explanation | mir-maintainers | 2026-08-26 |
 | docs/developer/publishing-an-extension.md | Publishing a MIR 4 Extension | current | developer | how-to | mir-maintainers | 2026-08-26 |
