@@ -75,6 +75,12 @@ The current F210 dependency lock replaces Space Is Fake 1.0.76, whose removed `f
 
 The F200 predecessor in its exact retained SIF profile does not emit either level-seven continuation; the tested CCC01 package adds both without space science (`build/p/m421-sif-final-prototypes-f200-a/capture.json`). The oracle now covers that actual introduction. F210 native source capture now verifies level eight after clearing `researched`, whose setter resets the level. Its first corrected upgrade reached configuration change and exposed production science's removal from weapon shooting speed. Inspection of the exact SIF 1.0.78 archive explains the change: `prototypes/technology.lua` replaces a space prerequisite with production/utility prerequisites, then inserts their science ingredients. Corrected MIR omits that space prerequisite, so the derived production ingredient disappears; finite level-six science remains unchanged. The oracle allows only that exact version/name/amount case and preserves the finite-anchor state and science checks. Forty-seven controlled opposing cases pass. F210 subsequently passed source capture, upgrade and first reload at `build/p/validation-upgrades/u-328a784cf2784e0c`; a separate bounded recovery passed its second reload at `build/p/m421-sif-f210-second-reload-recovery/result.json`, using the same saved game, candidate, settings and exact library inputs. Earned level eight, native speed bonuses, finite anchors and the existing queue/settings assertions survived. The original harness produced no final result JSON because benchmark stdout omitted its mod-loading lines. The reader now verifies the latest engine-start section of the native log; 103 library controls and readback of the actual first-reload log pass. F200 subsequently passed the complete native predecessor creation, upgrade and two-reload harness at source `2700dc6f`, Factorio 2.0.77 / SIF 1.0.60 / Commons 1.0.27 (`build/p/m421-sif-bound-f200-native/result.json`, candidate SHA-256 `C8089FFA302F6CDAE4AA80282AB057617A7326E60CA4F1464CE46807CE0C5CBF`). Both new continuations start unresearched at level seven, finite research and native bonuses remain, and the existing level-five/37% queue checks pass. Library controls restore with zero dependency copies or archive links. F210 canonical recovery consumption and joined release qualification remain pending. The F200 full-catalogue comparison records five removed manufacturing technologies whose ownership/migration disposition remains to be resolved.
 
+## Current direct-library graphical observation
+
+At harness source `688a7757`, Factorio 2.1.21 graphically loaded the F210 package `0A3640389C06E6174B1D6B3F246EBF37F0B45F3D8D6881E2FE73DB06443508E9` with base and the browser fixture, using default settings and no enabled DLC. The first native witness passed 884 assertions with one connected player, a 3,733-byte engine translation callback, all three localized recipe/item/fluid searches, retained GUI objects and unchanged shared research/queue state. It saved `_autosave-mir-browser-acceptance.zip`. Evidence is retained under `build/p/m421-browser-direct-f210-graphics-e/887e53ca29a742618ec0a8b02d88da1c`, including the actual `userdata/script-output/browser-test.json` and native log.
+
+The complete runner remains failed: RAM admission refused its reload. A bounded attempt to reload that exact save (`build/p/m421-browser-reload-recovery-g`) was interrupted during graphics loading when host commit headroom fell below the retained reserve. Its ledger preserves `[mir441-resource-admission-commit]`; no reload result exists. Subsequent journal recovery verified both previous control-file hashes (`build/tmp/mir421-browser-reload-g-control-recovery.json`). These attempts copied or linked no dependency archives. The first graphical pass does not establish save/reload acceptance, physical input, two-client multiplayer, absent DLC files, saved/imported DLC opt-in, or final release qualification.
+
 ## Historical 30 September 2026 preparation identity
 
 The following observations and CCC00 matrix describe the retained 4.2.0 preparation checkpoint. They do not describe current 4.2.1 acceptance or establish permission to reuse its later emergency testing waivers. The published 4.2.0 source and assets remain under the one-time `v4.2.0-stable` tag exception; the eventual accepted 4.2.1 source uses canonical `v4.2.1`.
@@ -85,7 +91,7 @@ The current development viewer handoff is preserved at `dist/mir42-viewer-intera
 
 The exact K2 V3 development observation is also retained. At source `f7a355f5018577ff43094280fa7620116fc924ab`, the unmodified Factorio 2.1.20, K2 2.1.3, and K2SO 2.0.13 candidate passed initial creation and two loads of the unchanged progressed save with its 42 percent queue/progress state. The three phase receipts are `C482441ABFD3EABE2431E86EF14D55F15E4AF0F323CE1EAA61558B36C8E50D5C`, `B8DC4B04304834FB3435A507B8554547DD39E8AB29F003C84BD8C122C6D46E8F`, and `00DD9F2F4CF20ED9DDD9F183F6B20F3E4B038F9D346578D86AE64A920C6F343A`. The compatibility and fixture authorities still label that tuple unqualified because a future release must bind fresh candidate, external-archive, engine, and package custody. The retained result neither widens K2 support nor substitutes for release qualification.
 
-## Exact target matrix
+## Historical exact target matrix
 
 All predecessor archives and installed executables below were rehashed during preparation and matched the rows in [MIR42 direct predecessor inputs](../../.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json) or the named historical target record. “Available” means only that the exact input exists locally and matches its recorded hash; it is not an upgrade, reload, or candidate-qualification result. F210 must be observed again immediately before its candidate lane because its Steam channel is moving.
 
@@ -103,7 +109,7 @@ All predecessor archives and installed executables below were rehashed during pr
 
 The ordinary target support policy currently names only F210 as current, F200 as maintained, and F110/F100 as supplemental LTS. The five historical target records are deliberately narrower: their `public_output_authorized` and `publication_authorized` values are false. Selecting all nine in a future candidate therefore does not convert the historical rows into public support. A candidate must preserve those facts or obtain a separately authorized successor before its inventory can say more.
 
-## Preconditions and execution order
+## Historical preconditions and execution order
 
 The programme records these open gates: exact candidate allocation, joined real-engine campaign, independent acceptance, protected signing and recovery, source-freeze ledger authorization, governed offline restore, and human GO after main readback. None may be filled from a preview, a passed controlled test, an installed engine, or a predecessor archive.
 
@@ -118,7 +124,7 @@ When the release manager has explicit freeze authority, the smallest executable 
 
 The command names above are preparation pointers, not authorization to execute them now. The release manager must materialize the exact candidate verification plan before any engine campaign and must preserve all failed or superseded attempts with their original identities.
 
-## Support wording and changelog draft
+## Historical support wording and changelog draft
 
 The final support list must be generated from the candidate-qualified matrix and its exact package manifests. Until then, the only accurate development wording is that MIR 4.2 has current and historical target preparation records, not that all nine targets are released or supported. Do not describe private historical playtest rows as public packages, and do not carry K2 V3, browser, performance, one-player, or preview evidence into an unqualified candidate.
 
