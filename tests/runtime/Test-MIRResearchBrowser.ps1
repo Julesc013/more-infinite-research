@@ -15,6 +15,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
+. (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 if(-not $PrepareInputsOnly -and ($LibraryDirectory -eq '' -or $FactorioBin -eq '' -or $CandidateZip -eq '')) {
  throw '[mir-browser-direct-inputs-required] Supply the engine, current candidate and flat archive library; populated profile staging is retired.'
 }

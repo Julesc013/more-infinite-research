@@ -1276,6 +1276,7 @@
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/compatibility/FactorioRunner.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/lib/validation/MIR4DistributionIdentity.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
@@ -8127,5 +8128,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ee00cc6232af98ba738a03328a3f8a9edd13ae55a568bf57ab9035d6d428f547"
+  "digest": "sha256:32b6a3872082436e11f444854212ffce39e23738e1380144b3f4487bc98e06ac"
 }
