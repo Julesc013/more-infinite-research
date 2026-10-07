@@ -99,6 +99,26 @@ Assert-MIRDevelopmentCISelection -Condition ($historicalIds -contains 'static.pa
 
 $actualCatalog=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')|ConvertFrom-Json
 $actualAssurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json
+$labPath='tests/compiler/lab_reachability.lua'
+$labClassification=Get-MIRAssuranceClassification -Paths @($labPath) -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition (-not $labClassification.escalated -and
+  'mir4-science-route-feasibility' -in @($labClassification.classes)) -Message 'The consumed lab fixture is missing its existing acquisition classification.'
+Assert-MIRDevelopmentCISelection -Condition ('runtime.researchability-planning-contract' -in @($labClassification.tests) -and
+  'static.compiler' -in @($labClassification.tests) -and 'static.architecture' -in @($labClassification.tests)) -Message 'Lab fixture selection lost its actual consumer or source checks.'
+$labConsumer=@($actualCatalog.tests|Where-Object id -CEQ 'runtime.researchability-planning-contract')
+Assert-MIRDevelopmentCISelection -Condition ($labConsumer.Count -eq 1 -and
+  $labPath -in @($labConsumer[0].inputs) -and $labConsumer[0].requires_factorio -eq $true) -Message 'The real native runner must declare its lab input and retain its native execution boundary.'
+$impactPath=Join-Path $repo '.mir/test-impact.yml'
+$labImpact=Get-MIRAssuranceImpactSelection -Paths @($labPath) -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition (-not $labImpact.requires_full -and
+  $labPath -in @($labImpact.mapped_paths) -and 'science-prerequisites' -in @($labImpact.groups) -and
+  'generated-prerequisite-safety' -in @($labImpact.scenarios) -and 'k2-science-phase-policy' -in @($labImpact.scenarios)) -Message 'The known lab fixture must retain its affected science scenarios without an unrelated full-profile fallback.'
+$unknownLabPath='tests/compiler/unowned_lab_reachability.lua'
+$unknownLabClassification=Get-MIRAssuranceClassification -Paths @($unknownLabPath) -Config $actualAssurance
+$unknownLabImpact=Get-MIRAssuranceImpactSelection -Paths @($unknownLabPath) -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition ('static.full' -in @($unknownLabClassification.tests) -and
+  'mir4-science-route-feasibility' -notin @($unknownLabClassification.classes) -and
+  $unknownLabImpact.requires_full -and $unknownLabPath -in @($unknownLabImpact.unmapped_runtime_paths)) -Message 'An unknown lab fixture must retain conservative full coverage; the exact mapping is not a wildcard exemption.'
 foreach ($constructionPath in @(
   'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1',
   'tools/mir/application/package/TargetMaterializer.ps1',

@@ -5,15 +5,25 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-10-07
 supersedes: []
 superseded_by: []
 ---
 # Testing And Fixture Strategy
 
-Updated: 2026-07-07
+Updated: 2026-10-07
 
 The 3.0 compatibility compiler needs tests for both positive emission and negative safety. The goal is not only "the mod loads." The goal is proving that MIR emits, skips, rejects, and reports exactly what the policy says.
+
+Current verification selection uses the declared inputs in `validation/tests.yml`, the existing assurance classes and `.mir/test-impact.yml`. `Test-MIRResearchabilityPlanning.ps1` consumes both `researchability_planning.lua` and `lab_reachability.lua`; its registry input and receipt hashes must include both. The exact lab fixture maps to the existing acquisition consumer and affected science scenarios. An unowned fixture retains conservative coverage. This mapping does not remove the broader static harness policy, require a historical mod profile replay, or grant native acceptance.
+
+The selection contract itself can be checked without Factorio or dependency archives:
+
+```powershell
+.\tests\tooling\Test-MIRDevelopmentCISelection.ps1 -PureSelectionOnly
+```
+
+Native lab, emitted research, production, save, multiplayer and engine performance claims still need their selected current-package scenario. Prepare only those affected scenarios from manifests over the shared dependency library, using verified same-volume hard links and private writable settings and saves. Keep compact results and required reproducers after completion; do not retain copied modpacks or count linked ZIP lengths as reclaimed physical storage.
 
 ## Test Pyramid
 
