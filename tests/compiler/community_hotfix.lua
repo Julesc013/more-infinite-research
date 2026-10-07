@@ -246,4 +246,56 @@ context.with_active(context.new(), function()
     check(final and has(final,"space-science-pack"), "Ordinary continuation space science remains without Space Is Fake: " .. key)
   end
 end)
+-- The appearance preference is not proof that inactive DLC files exist.
+-- Exercise the actual shortcut constructor and layered technology selector,
+-- including opposing raw/imported values through the effective-setting reader.
+local icons = require("prototypes.mir.presentation.icon_builder")
+local data_stage = require("prototypes.mir.stage.data")
+local icon_setting = "mir-use-installed-space-age-icons"
+check(catalog.default_value(icon_setting) == false, "DLC icon preference remains default-off")
+local saved_decode = codec.decode
+for _, providers in ipairs({{}, {"space-age"}, {"elevated-rails"}, {"space-age", "elevated-rails"}}) do
+  for _, raw_value in ipairs({false, true}) do
+    for _, imported in ipairs({"absent", "false", "true"}) do
+      mods = {base=base_version}
+      for _, name in ipairs(providers) do mods[name] = base_version end
+      settings.startup[icon_setting] = {value=raw_value}
+      settings.startup[codec.import_setting_name] = {value=imported == "absent" and "" or "controlled-profile"}
+      codec.decode = function() return {settings={[icon_setting]=imported == "true"}} end
+      local label = table.concat(providers, "+") .. "/raw=" .. tostring(raw_value) .. "/import=" .. imported
+      context.with_active(context.new(), function()
+        local expected_setting = raw_value
+        if imported ~= "absent" then expected_setting = imported == "true" end
+        check(effective.get(icon_setting) == expected_setting, "Icon preference provenance retained: " .. label)
+        data_stage.run()
+        local shortcut = data.raw.shortcut["mir-research-browser"]
+        local available = mods["space-age"] ~= nil
+        local expected = available and "__space-age__/graphics/technology/research-productivity.png"
+          or "__base__/graphics/icons/lab.png"
+        check(shortcut.icon == expected and shortcut.small_icon == expected
+          and shortcut.icon_size == (available and 256 or 64)
+          and shortcut.small_icon_size == shortcut.icon_size, "Both shortcut sizes use an available provider: " .. label)
+        local layered = icons.icons_for_stream(streams.research_lab_productivity)
+        check(layered[1].icon == (available and expected or "__base__/graphics/technology/mining-productivity.png"),
+          "Technology artwork follows the same provider availability: " .. label)
+        local rails = icons.effect_icons_for_stream({icon_candidates={
+          {icon="__elevated-rails__/graphics/technology/elevated-rail.png",icon_size=256,inactive_mod_asset="elevated-rails"},
+          {icon="__base__/graphics/icons/rail.png",icon_size=64}
+        }})
+        check(rails[1].icon == (mods["elevated-rails"] and "__elevated-rails__/graphics/technology/elevated-rail.png"
+          or "__base__/graphics/icons/rail.png"), "Elevated Rails independently falls back: " .. label)
+        local safe = true
+        for _, stream in pairs(streams) do
+          for _, layer in ipairs(icons.icons_for_stream(stream)) do
+            for _, provider in ipairs({"space-age", "elevated-rails"}) do
+              if not mods[provider] and layer.icon:find("__" .. provider .. "__/", 1, true) then safe = false end
+            end
+          end
+        end
+        check(safe, "Every declared stream avoids inactive DLC icon layers: " .. label)
+      end)
+    end
+  end
+end
+codec.decode = saved_decode
 print("MIR-COMMUNITY-HOTFIX-PASS " .. assertions)

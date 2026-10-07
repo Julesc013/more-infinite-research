@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0126",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Require suitable fluid temperatures when deciding science and laboratory acquisition routes.",
+  "details": [
+    "Preserve exact and minimum/maximum ingredient temperatures through natural sources, recipes, acquisition caches and contextual research. A cold source no longer admits a recipe requiring hotter fluid; exact temperature takes precedence over the range.",
+    "Retain independently acquired heating and same-fluid mixing alternatives with their full research frontiers. Honor boiler conversion versus in-place heating modes, output temperature, input seed and placement-item acquisition. Correct controlled boiler fixtures to declare their intended native conversion mode.",
+    "Controlled modern-adapter lab, researchability and recipe-source replacement checks preserve opposing routes and reject thermal bootstrap cycles. Native heating/mixing, final catalogue and migration behavior on current packages remain unqualified. Technology and setting identities are unchanged."
+  ],
+  "semantic_domains": ["science-integration", "compatibility", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Shared science/lab acquisition now retains fluid temperature demands; native current-package, catalogue and save acceptance is pending."},
+    {"target":"F200","disposition":"affected","reason":"Shared science/lab acquisition now retains fluid temperature demands; native current-package, catalogue and save acceptance is pending."},
+    {"target":"F110","disposition":"affected","reason":"Shared acquisition code changes; controlled modern-adapter results do not qualify this historical engine or package."},
+    {"target":"F100","disposition":"affected","reason":"Shared acquisition code changes; controlled modern-adapter results do not qualify this historical engine or package."},
+    {"target":"F017","disposition":"affected","reason":"Shared acquisition code changes; controlled modern-adapter results do not qualify this historical engine or package."},
+    {"target":"F016","disposition":"affected","reason":"Shared acquisition code changes; controlled modern-adapter results do not qualify this historical engine or package."},
+    {"target":"F015","disposition":"affected","reason":"Shared acquisition code changes; controlled modern-adapter results do not qualify this historical engine or package."},
+    {"target":"F014","disposition":"affected","reason":"Shared acquisition code and in-place boiler handling change; native historical behavior remains unqualified."},
+    {"target":"F013","disposition":"affected","reason":"Shared acquisition code and in-place boiler handling change; native historical behavior remains unqualified."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"changed","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/lab_reachability.lua"},
+    {"kind":"finding","value":"tests/compiler/recipe_source_epoch.lua"},
+    {"kind":"document","value":"docs/capabilities/science-integration.md"}
+  ]
+}

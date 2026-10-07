@@ -545,7 +545,7 @@ local function active_set_key(values)
 end
 
 local function identity_key(identity)
-  return identity.type .. "\0" .. identity.name
+  return route_feasibility.acquisition_key(identity)
 end
 
 -- Technology researchability is contextual, but one structural route query

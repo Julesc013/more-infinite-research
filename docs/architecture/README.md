@@ -138,7 +138,7 @@ Keep new domain behavior in these modules. MIR-owned modules must import the foc
 Generated technologies may borrow icon layers from active prototypes and then add MIR's own effect-type badge. The `dev` line supports explicit `icon_candidates` for ordered technology/item/icon fallback, but keeps the package boundary strict:
 
 - use official DLC technology or item art when the relevant DLC mod is loaded and the active prototype provides that icon;
-- optionally use direct official DLC icon paths such as `__space-age__` or `__elevated-rails__` in base-only games only when the user enables `mir-use-installed-space-age-icons`;
+- use direct official DLC icon paths such as `__space-age__` or `__elevated-rails__` only while that provider is active; a saved or imported `mir-use-installed-space-age-icons` value cannot establish inactive file availability;
 - otherwise fall back to base-game technology or item art, MIR-owned local art, or another clearly redistributable asset when Space Age is not loaded;
 - do not copy original Space Age PNGs or other DLC assets into MIR as base-only fallbacks;
 - require any MIR-packaged local art to have an explicit source/license note and package-validation coverage.
