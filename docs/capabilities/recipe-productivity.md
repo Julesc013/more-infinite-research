@@ -18,6 +18,8 @@ Recipe productivity is the capability lane that creates `change-recipe-productiv
 
 Productive item/fluid identities require a positive output roll and useful bonus quantity. Shared probability requires a positive valid interval; modern roll fields follow the selected target contract. An unexcluded fractional item roll can provide useful output with a zero base amount on F210/F200. Fractional returns with excluded base quantities remain conservative pending native evidence. These facts feed the existing typed material and dynamic lab-science selectors. They grant no garden, seed, carrier-return or process-loop exception. `tests/compiler/material_routes.lua` consumes the canonical fact index and matcher under all nine target contracts; controlled replay does not qualify current packages, upstream finalizers or production in a saved world.
 
+Supported results that provably cannot occur do not create material return edges, seed candidate process cones or block useful recipes as carrier returns. This includes zero quantities, zero independent rolls and empty native shared-roll intervals. Bonus exclusions do not remove baseline return edges. Unknown or foreign fields, positive fractional returns and positive coproduct paths retain their possible edges. Pattern-selected recipes with no known productive output are withheld. These checks establish possible process connectivity and useful bonus output, without establishing full stoichiometric loop safety or renewable biology acceptance.
+
 ## Gates
 
 - Target recipes must exist and be visible unless the stream explicitly opts in.

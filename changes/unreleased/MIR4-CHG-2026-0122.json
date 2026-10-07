@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0122",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Exclude impossible outputs from material return paths and withhold productivity recipes with no useful bonus.",
+  "details": [
+    "A supported result with zero quantity, zero independent roll or an empty native shared-roll interval cannot create a material return edge, seed the candidate process cone or block a useful recipe as a carrier return.",
+    "Baseline outputs excluded from productivity, positive fractional returns, positive coproduct paths and unknown or foreign shapes retain possible return edges. Pattern-only selectors with a known empty productive-output projection withhold paid no-op research.",
+    "Controlled canonical graph and selector checks cover shared target contracts, including explicit historical field boundaries. Actual current-package catalogue changes, production, upstream finalizers and saved-world behavior remain unqualified; no biology or loop-safety exception is granted."
+  ],
+  "semantic_domains": [
+    "productivity",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Shared material matching consumes native zero-output semantics and the canonical useful-output projection. Controlled checks do not qualify current-package production, catalogue changes or saved-world behavior."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/compiler/material_routes.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/recipe-productivity.md",
+      "kind": "document"
+    }
+  ]
+}

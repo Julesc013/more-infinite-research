@@ -100,10 +100,12 @@ local function normalized_entry(entry)
   local probability = entry.independent_probability
   if probability == nil then probability = entry.probability end
   if probability == nil then probability = 1 end
+  local amount = entry.amount
+  if amount == nil then amount = entry[2] end
   return {
     type = entry.type or "item",
     name = name,
-    amount = entry.amount or entry[2],
+    amount = amount,
     amount_min = entry.amount_min,
     amount_max = entry.amount_max,
     probability = probability,
