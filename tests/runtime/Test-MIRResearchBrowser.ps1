@@ -279,9 +279,12 @@ $result | ConvertTo-Json -Depth 30
 Write-Output "Evidence: $run"
 } catch {
  $failure=$_
- try { Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{status='failed';target=$Target;candidate=$candidate;error=$failure.Exception.Message;resource_runs=$resources.runs.ToArray()}) }
+ $cleanup=$null
+ if($null -ne $activation -and -not $activation.closed){
+  try{$cleanup=Complete-MIRLibraryActivation -Activation $activation;$activation=$null}
+  catch{$cleanup=@{status='recovery-required';library=$activation.library;error=$_.Exception.Message}}
+ }
+ try { Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{status='failed';target=$Target;candidate=$candidate;error=$failure.Exception.Message;library_activation=$cleanup;resource_runs=$resources.runs.ToArray()}) }
  catch { Write-Warning "Browser failure receipt exceeded its remaining budget; retained ledgers are in $run." }
  throw $failure
-} finally {
- if($null -ne $activation -and -not $activation.closed){$null=Complete-MIRLibraryActivation -Activation $activation}
 }

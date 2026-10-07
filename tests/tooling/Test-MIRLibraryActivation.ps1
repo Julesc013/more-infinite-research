@@ -287,6 +287,46 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $browserArgs.Candidate=$badArchive
   [IO.File]::WriteAllText((Join-Path $browserFixture 'control.lua'),'-- changed browser assertions')
   Assert-LibraryRefusal {Get-MIRBrowserLibrarySelection @browserArgs} 'mir-library-fixture-member'
+  # Execute the runner's actual outer catch. A delayed engine shutdown can
+  # refuse restoration; preserve both that boundary and the original failure.
+  $outerTry=@($browserAst.EndBlock.Statements|Where-Object {$_ -is [Management.Automation.Language.TryStatementAst]})
+  Assert-LibraryTest ($outerTry.Count-eq1-and$outerTry[0].CatchClauses.Count-eq1) 'browser has one terminal failure handler'
+  $browserFailure=[scriptblock]::Create("try { throw '[mir441-resource-admission-commit]' } "+$outerTry[0].CatchClauses[0].Extent.Text)
+  $completeLibrary=(Get-Command Complete-MIRLibraryActivation).ScriptBlock
+  $writeResult=(Get-Command Write-MIRNativeProbeResult).ScriptBlock
+  $originalResources=$resources
+  $resources=@{runs=[Collections.Generic.List[object]]::new()}
+  $Target='2.1';$candidate=$badArchive
+  function Complete-MIRLibraryActivation {
+    param($Activation)
+    if($script:browserCleanupRefused){throw '[mir-library-factorio-active]'}
+    return @{status='restored-direct-library-controls'}
+  }
+  function Write-MIRNativeProbeResult {
+    param($Context,$Record)
+    if($script:browserReceiptRefused){throw 'controlled receipt budget'}
+    $script:browserFailureRecord=$Record
+  }
+  try{
+    foreach($cleanupRefused in @($false,$true)){
+      $script:browserCleanupRefused=$cleanupRefused;$script:browserReceiptRefused=$false
+      $activation=@{closed=$false;library=$library}
+      Assert-LibraryRefusal $browserFailure 'mir441-resource-admission-commit'
+      $record=$script:browserFailureRecord
+      Assert-LibraryTest ($record.status-ceq'failed'-and$record.error-ceq'[mir441-resource-admission-commit]') 'browser retains primary resource failure'
+      if($cleanupRefused){
+        Assert-LibraryTest ($record.library_activation.status-ceq'recovery-required'-and$record.library_activation.error-ceq'[mir-library-factorio-active]') 'browser records cleanup refusal separately'
+      }else{
+        Assert-LibraryTest ($record.library_activation.status-ceq'restored-direct-library-controls') 'browser records successful failure cleanup'
+      }
+    }
+    $script:browserReceiptRefused=$true
+    Assert-LibraryRefusal $browserFailure 'mir441-resource-admission-commit'
+  }finally{
+    Set-Item Function:Complete-MIRLibraryActivation -Value $completeLibrary
+    Set-Item Function:Write-MIRNativeProbeResult -Value $writeResult
+    $resources=$originalResources;$activation=$null
+  }
   # Legacy helpers must refuse external endpoints before creating directories,
   # deleting an existing target or falling back to a physical copy. No files
   # are created outside this test's checkout-contained scratch root.
