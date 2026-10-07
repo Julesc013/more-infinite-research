@@ -50,6 +50,20 @@ function Get-MIRBrowserIconCase([string]$Case) {
 }
 $iconCase=Get-MIRBrowserIconCase $DlcIconCase
 $iconObservations=[Collections.Generic.List[object]]::new()
+function Initialize-MIRBrowserIconFixture([string]$Fixture,[string]$Repository,[string]$Case) {
+ $selected=Get-MIRBrowserIconCase $Case
+ if($null -eq $selected){return}
+ $rawLiteral=ConvertTo-MIRLuaLiteral $selected.raw
+ $importLiteral=if($null -eq $selected.imported){'nil'}else{ConvertTo-MIRLuaLiteral $selected.imported}
+ $settingsText="local option=data.raw['bool-setting']['mir-use-installed-space-age-icons']`nassert(option.default_value==false,'Production icon default must remain off')`noption.default_value=$rawLiteral`n"
+ if($null -ne $selected.imported){
+  $profileJson=[ordered]@{schema=1;kind='mir-settings-profile';settings=[ordered]@{'mir-use-installed-space-age-icons'=$selected.imported}}|ConvertTo-Json -Depth 4 -Compress
+  $settingsText+="data.raw['string-setting']['mir-settings-profile-import'].default_value='MIRSET1:'..helpers.encode_string("+(ConvertTo-MIRLuaLiteral $profileJson)+")`n"
+ }
+ [IO.File]::WriteAllText((Join-Path $Fixture 'settings-final-fixes.lua'),$settingsText,[Text.UTF8Encoding]::new($false))
+ $iconChecks=[IO.File]::ReadAllText((Join-Path $Repository 'tests/runtime/browser_fixture_icons.lua'))
+ [IO.File]::WriteAllText((Join-Path $Fixture 'data-final-fixes.lua'),("local check=(function()`n"+$iconChecks+"`nend)()`ncheck{case="+(ConvertTo-MIRLuaLiteral $Case)+",raw=$rawLiteral,imported=$importLiteral}`n"),[Text.UTF8Encoding]::new($false))
+}
 function Test-BrowserCandidate([string]$Candidate,[string]$Line,$Identity,[string]$Repository) {
 $candidate=$Candidate;$Target=$Line;$expectedIdentity=$Identity;$repo=$Repository
 $archive=[IO.Compression.ZipFile]::OpenRead($candidate)
@@ -106,18 +120,7 @@ $fixture=Join-Path $run 'fixture-source/mir-browser-test_1.0.0'
 New-Item -ItemType Directory -Force $fixture | Out-Null
 [ordered]@{name='mir-browser-test';version='1.0.0';title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/browser_fixture_data.lua') -Destination (Join-Path $fixture 'data.lua')
-if($null -ne $iconCase) {
- $rawLiteral=ConvertTo-MIRLuaLiteral $iconCase.raw
- $importLiteral=if($null -eq $iconCase.imported){'nil'}else{ConvertTo-MIRLuaLiteral $iconCase.imported}
- $settingsText="local option=data.raw['bool-setting']['mir-use-installed-space-age-icons']`nassert(option.default_value==false,'Production icon default must remain off')`noption.default_value=$rawLiteral`n"
- if($null -ne $iconCase.imported){
-  $profileJson=@{schema=1;kind='mir-settings-profile';settings=@{'mir-use-installed-space-age-icons'=$iconCase.imported}}|ConvertTo-Json -Depth 4 -Compress
-  $settingsText+="data.raw['string-setting']['mir-settings-profile-import'].default_value='MIRSET1:'..helpers.encode_string("+(ConvertTo-MIRLuaLiteral $profileJson)+")`n"
- }
- [IO.File]::WriteAllText((Join-Path $fixture 'settings-final-fixes.lua'),$settingsText,[Text.UTF8Encoding]::new($false))
- $iconChecks=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/browser_fixture_icons.lua'))
- [IO.File]::WriteAllText((Join-Path $fixture 'data-final-fixes.lua'),("local check=(function()`n"+$iconChecks+"`nend)()`ncheck{case="+(ConvertTo-MIRLuaLiteral $DlcIconCase)+",raw=$rawLiteral,imported=$importLiteral}`n"),[Text.UTF8Encoding]::new($false))
-}
+Initialize-MIRBrowserIconFixture -Fixture $fixture -Repository $repo -Case $DlcIconCase
 $lua=[Text.StringBuilder]::new()
 foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{name='browser_catalogue';path='research_browser_factorio_catalogue.lua'},@{name='browser_actions';path='research_browser_actions.lua'})) {
  [void]$lua.AppendLine("local $($module.name)=(function()")

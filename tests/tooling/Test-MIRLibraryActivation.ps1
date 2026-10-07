@@ -293,7 +293,7 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $browserPath=Join-Path $RepoRoot 'tests/runtime/Test-MIRResearchBrowser.ps1'
   $browserAst=[Management.Automation.Language.Parser]::ParseFile($browserPath,[ref]$tokens,[ref]$errors)
   Assert-LibraryTest ($errors.Count-eq0) 'direct browser harness parses'
-  foreach($name in @('Get-MIRBrowserLibrarySelection','Get-MIRBrowserIconCase','Invoke-BrowserEngine')){
+  foreach($name in @('Get-MIRBrowserLibrarySelection','Get-MIRBrowserIconCase','Initialize-MIRBrowserIconFixture','Invoke-BrowserEngine')){
     $function=@($browserAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$true))
     Assert-LibraryTest ($function.Count-eq1) ('browser adapter exists: '+$name)
     . ([scriptblock]::Create($function[0].Extent.Text))
@@ -305,6 +305,31 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
     Assert-LibraryTest ($selected.raw-eq$row[1]-and$selected.imported-eq$row[2]) ('explicit icon settings: '+$row[0])
   }
   Assert-LibraryRefusal {Get-MIRBrowserIconCase 'unknown'} 'mir-browser-icon-case'
+  # Preparation and execution happen in different PowerShell processes.
+  # Hashtable JSON ordering must not change the verified fixture bytes.
+  $iconBuilder=Join-Path $root 'build-icon-fixture.ps1'
+  @'
+param($Repository,$Fixture,$Case)
+$ErrorActionPreference='Stop'
+. (Join-Path $Repository 'tools/lib/validation/SettingsOverrides.ps1')
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $Repository 'tests/runtime/Test-MIRResearchBrowser.ps1'),[ref]$tokens,[ref]$errors)
+foreach($name in @('Get-MIRBrowserIconCase','Initialize-MIRBrowserIconFixture')){
+  $function=$ast.Find({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$true)
+  . ([scriptblock]::Create($function.Extent.Text))
+}
+Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case $Case
+'@|Set-Content -LiteralPath $iconBuilder
+  foreach($case in @('ImportedOptIn','RawOptInImportedOff')){
+    $digests=@()
+    foreach($attempt in 1..3){
+      $generated=Join-Path $root ('icons-'+$case+'-'+$attempt);[IO.Directory]::CreateDirectory($generated)|Out-Null
+      & (Get-Command pwsh).Source -NoProfile -File $iconBuilder -Repository $RepoRoot -Fixture $generated -Case $case
+      Assert-LibraryTest ($LASTEXITCODE-eq0) 'actual icon fixture builder succeeds in a fresh process'
+      $digests+=(@(Get-ChildItem -LiteralPath $generated -File|Sort-Object Name|ForEach-Object {(Get-FileHash -LiteralPath $_.FullName).Hash})-join '|')
+    }
+    Assert-LibraryTest (@($digests|Sort-Object -Unique).Count-eq1) ('prepared/executed icon fixture bytes are deterministic: '+$case)
+  }
   $browserFixture=Join-Path $root 'browser-assertions';[IO.Directory]::CreateDirectory($browserFixture)|Out-Null
   Write-TestJson (Join-Path $browserFixture 'info.json') @{name='mir-browser-test';version='1.0.0';factorio_version='2.1';dependencies=@('base','more-infinite-research')}
   [IO.File]::WriteAllText((Join-Path $browserFixture 'control.lua'),'-- controlled browser assertions')
