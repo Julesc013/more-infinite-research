@@ -62,6 +62,7 @@ try{
     Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log} 'mir-library-loaded-selection'
     $receipt=Complete-MIRLibraryActivation $activation;$activation=$null
     Assert-LibraryTest ($receipt.archive_links_created -eq 0 -and $receipt.dependency_payload_bytes_copied -eq 0) 'no archive staging'
+    Assert-LibraryTest (@($receipt.selected|Where-Object {-not $_.builtin -and $_.sha256 -ceq $hashes[$case[1]]}).Count -eq 1) 'receipt binds the selected archive bytes'
     Assert-LibraryTest ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $library 'mod-list.json'))) -ceq [Convert]::ToBase64String($oldList)) 'prior mod-list restored byte for byte'
     Assert-LibraryTest ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $library 'mod-settings.dat'))) -ceq [Convert]::ToBase64String($oldSettings)) 'prior settings restored byte for byte'
   }

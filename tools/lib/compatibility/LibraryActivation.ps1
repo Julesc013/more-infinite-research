@@ -80,14 +80,14 @@ function Get-MIRLibraryInventory {
     }finally{$zip.Dispose()}
     if(-not(Test-MIRLibraryModName $info.name) -or $info.version -cnotmatch '^\d+[.]\d+[.]\d+$' -or
       $file.Name -cne ($info.name+'_'+$info.version+'.zip')){throw "[mir-library-ambiguous-archive] $($file.Name)"}
-    $rows.Add([pscustomobject]@{name=$info.name;version=$info.version;info=$info;path=$file.FullName;builtin=$false;identity=Get-MIRImmutableInputFileIdentity $file.FullName})
+    $rows.Add([pscustomobject]@{name=$info.name;version=$info.version;info=$info;path=$file.FullName;builtin=$false;identity=Get-MIRImmutableInputFileIdentity $file.FullName;sha256='';bytes=$file.Length})
   }
   foreach($directory in @(Get-ChildItem -LiteralPath $EngineDataDirectory -Directory)){
     $metadata=Join-Path $directory.FullName 'info.json'
     if($directory.Name -ceq 'core' -or -not(Test-Path -LiteralPath $metadata -PathType Leaf)){continue}
     Assert-MIRLibraryPath $metadata
     $info=Get-Content -LiteralPath $metadata -Raw|ConvertFrom-Json -AsHashtable
-    $rows.Add([pscustomobject]@{name=$info.name;version=$info.version;info=$info;path=$metadata;builtin=$true;identity=Get-MIRImmutableInputFileIdentity $metadata})
+    $rows.Add([pscustomobject]@{name=$info.name;version=$info.version;info=$info;path=$metadata;builtin=$true;identity=Get-MIRImmutableInputFileIdentity $metadata;sha256='';bytes=(Get-Item -LiteralPath $metadata).Length})
   }
   if(@($rows|Group-Object name,version|Where-Object Count -GT 1).Count){throw '[mir-library-duplicate-mod-version]'}
   return $rows.ToArray()
@@ -161,13 +161,14 @@ function Start-MIRLibraryActivation {
       $matches=@($inventory|Where-Object {$_.name -ceq $request.name -and $_.version -ceq $request.version})
       if($matches.Count -ne 1){throw "[mir-library-version-missing] $($request.name) $($request.version)"}
       $row=$matches[0]
+      $handle=[IO.File]::Open($row.path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+      $handles.Add($handle)
+      $row.sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($handle))
+      $handle.Position=0
       if(-not $row.builtin){
         $name=[IO.Path]::GetFileName($row.path)
         if(-not $ArchiveHashes.Contains($name) -or $ArchiveHashes[$name] -cnotmatch '^[0-9A-F]{64}$'){throw "[mir-library-hash-required] $name"}
-        $handle=[IO.File]::Open($row.path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
-        $handles.Add($handle)
-        if([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($handle)) -cne $ArchiveHashes[$name]){throw "[mir-library-hash-mismatch] $name"}
-        $handle.Position=0
+        if($row.sha256 -cne $ArchiveHashes[$name]){throw "[mir-library-hash-mismatch] $name"}
         $base=@($inventory|Where-Object {$_.builtin -and $_.name -ceq 'base'})
         $line=(([version]$base[0].version).ToString(2))
         if($row.info.factorio_version -cne $line -and -not($line -ceq '1.0' -and $row.info.factorio_version -ceq '0.18')){throw "[mir-library-engine-line] $name"}
@@ -254,7 +255,7 @@ function Complete-MIRLibraryActivation {
   try{
     Restore-MIRLibraryControls -LibraryDirectory $Activation.library -Journal $Activation.journal
     [IO.File]::Delete((Join-Path $Activation.library '.mir-active-profile.json'))
-    return [ordered]@{status='restored-direct-library-controls';profile_sha256=$Activation.profile_sha256;dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0;selected=@($Activation.selected|Select-Object name,version,path,identity)}
+    return [ordered]@{status='restored-direct-library-controls';profile_sha256=$Activation.profile_sha256;dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0;selected=@($Activation.selected|Select-Object name,version,path,builtin,identity,sha256,bytes)}
   }finally{
     foreach($handle in $Activation.handles){$handle.Dispose()};$Activation.lock.Dispose();$Activation.closed=$true
   }
