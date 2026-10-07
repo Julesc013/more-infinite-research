@@ -1,6 +1,7 @@
 -- Native-only oracle copied into the two existing modern upgrade fixtures.
 -- It observes final prototypes and real force state; it creates no prototypes.
 local M = {}
+local browser_actions = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_actions")
 local names = {"weapon-shooting-speed-7", "research-speed-7"}
 local reload_checked = false
 local function fail(message) error("SIF-01 native upgrade: " .. message) end
@@ -163,12 +164,11 @@ function M.verify(stage)
   if math.abs(force.laboratory_speed_modifier - record.lab_bonus) > 0.000001 or
     math.abs(force.get_gun_speed_modifier("bullet") - record.bullet_speed_bonus) > 0.000001 then fail("earned native reward changed") end
   if record.manufacturing then
-    local actions = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_actions")
     for name, before in pairs(record.manufacturing.technologies) do
       local value = technology(name)
       same_state(value, before)
       if not value.prototype.hidden then fail("retained manufacturing identity is visible: " .. name) end
-      if actions.can_enqueue({valid=true,force=force}, value, defines.input_action.start_research) then
+      if browser_actions.can_enqueue({valid=true,force=force}, value, defines.input_action.start_research) then
         fail("retained manufacturing identity can start new Library research: " .. name)
       end
     end

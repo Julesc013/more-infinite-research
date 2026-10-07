@@ -77,6 +77,15 @@ local function world(mode)
   end
   local oracle=dofile('tests/support/MIR421SpaceFakeUpgrade.lua')
   oracle.capture()
+  local native_verify=oracle.verify
+  oracle.verify=function(...)
+    local parsing_require=require
+    require=function() error("Require cannot be used during a Factorio event") end
+    local result={pcall(native_verify,...)}
+    require=parsing_require
+    if not result[1] then error(result[2]) end
+    return table.unpack(result,2)
+  end
   if mode=='introduced' or mode=='manufacturing' then
     for name,value in pairs(introduced) do
       value.researched=false
