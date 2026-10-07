@@ -279,4 +279,63 @@ end)()
   profile_module.current_factorio_version = previous_line
 end)()
 
+-- The installed 2.0 spawner uses LootItem.item/counts; 2.1 uses native item
+-- products. Adapter selection owns the interpretation, including the seven
+-- reduced lines. These are controlled contracts, not nine engine executions.
+;(function()
+  local fingerprint = require("prototypes.mir.core.fingerprint")
+  local profile_module = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_line, previous_raw = profile_module.current_factorio_version, data.raw
+  local routes = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+  for _, line in ipairs({"2.1","2.0","1.1","1.0","0.17","0.16","0.15","0.14","0.13"}) do
+    profile_module.current_factorio_version = line
+    local modern = line == "2.1"
+    local native = modern and {type="item",name="pentapod-egg",amount_min=1,amount_max=3}
+      or {item="pentapod-egg",probability=1,count_min=1,count_max=3}
+    local defaults = modern and {type="item",name="default-drop"} or {item="default-drop"}
+    local foreign = modern and {item="foreign-drop",count_max=3}
+      or {type="item",name="foreign-drop",amount=3}
+    data.raw = {["unit-spawner"]={wild={loot={native,defaults,foreign}}}}
+    compiler_context.with_active(compiler_context.new(), function()
+      local before = fingerprint.of(data.raw)
+      local witness = routes.source_witness("pentapod-egg")
+      check("LS"..line.."/native",witness and witness.kind=="entity-loot"
+        and witness.product.type=="item" and witness.product.name=="pentapod-egg",
+        "The actual source consumer reads the selected native loot identity")
+      check("LS"..line.."/defaults",routes.source_witness("default-drop")~=nil,
+        "Omitted native loot counts and probability retain their positive defaults")
+      check("LS"..line.."/foreign",routes.source_witness("foreign-drop")==nil,
+        "Another target's loot shape cannot invent a source")
+      check("LS"..line.."/fluid",routes.source_witness({type="fluid",name="pentapod-egg"})==nil,
+        "Enemy loot never creates a same-named fluid source")
+      check("LS"..line.."/immutable",fingerprint.of(data.raw)==before,
+        "Reading native loot does not rewrite prototype inputs")
+    end)
+  end
+  for _, line in ipairs({"2.0","1.1","0.13"}) do
+    profile_module.current_factorio_version = line
+    data.raw = {unit={dropper={loot={{item="real-drop",name="phantom-drop",type="fluid",
+      count_min=1,count_max=3,amount=0,independent_probability=0}}}}}
+    compiler_context.with_active(compiler_context.new(), function()
+      check("LS"..line.."/native-fields",routes.source_witness("real-drop")~=nil
+        and routes.source_witness("phantom-drop")==nil
+        and routes.source_witness({type="fluid",name="real-drop"})==nil,
+        "Native LootItem fields own identity/counts; foreign product fields have no authority")
+    end)
+    data.raw.unit.dropper.loot[1]={item="empty-drop",count_min=0,count_max=0,
+      amount=3,extra_count_fraction=1}
+    compiler_context.with_active(compiler_context.new(), function()
+      check("LS"..line.."/no-foreign-revival",routes.source_witness("empty-drop")==nil,
+        "Foreign product quantities and extra rolls cannot revive an empty native loot range")
+    end)
+  end
+  profile_module.current_factorio_version = "unregistered"
+  data.raw = {unit={dropper={loot={{item="unknown-drop",name="unknown-drop",amount=1}}}}}
+  compiler_context.with_active(compiler_context.new(), function()
+    check("LSunknown",routes.source_witness("unknown-drop")==nil,
+      "An unregistered target cannot choose a loot contract by guessing")
+  end)
+  data.raw, profile_module.current_factorio_version = previous_raw, previous_line
+end)()
+
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)

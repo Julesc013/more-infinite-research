@@ -265,11 +265,49 @@ run(raw, function()
 end)
 raw = world()
 raw.recipe.make_lab = nil
-raw.unit = {dropper = {loot = {{type = 'item', name = 'lab-kit', amount = 1, probability = 1}}}}
+local current_line = require('prototypes.mir.platform.factorio.target_profiles').current_factorio_version
+local native_lab_loot = current_line == '2.1'
+  and {type = 'item', name = 'lab-kit', amount = 1, probability = 1}
+  or {item = 'lab-kit', count_min = 1, count_max = 1, probability = 1}
+raw.unit = {dropper = {loot = {native_lab_loot}}}
 run(raw, function()
   check('LR15', lab.valid_research_ingredients({{'A', 1}, {'B', 1}}),
     'An admitted concrete source can supply the lab item without a recipe')
 end)
+-- Consume each target's actual enemy-loot contract through lab acquisition,
+-- not merely the public source lookup. No combat, native output or save proof.
+for _, case in ipairs({
+  {id='native-defaults', expected=true},
+  {id='native-ranged', minimum=0, maximum=3, probability=0.5, expected=true},
+  {id='zero-chance', probability=0, expected=false},
+  {id='zero-maximum', minimum=0, maximum=0, expected=false},
+  {id='negative-maximum', maximum=-1, expected=false},
+  {id='nonfinite-maximum', maximum=math.huge, expected=false},
+  {id='malformed-probability', probability='bad', expected=false},
+  {id='changed-native-item', product='other-drop', expected=false},
+  {id='other-target-shape', foreign=true, expected=false}
+}) do
+  raw = world()
+  raw.recipe.make_lab = nil
+  local product = case.product or 'lab-kit'
+  local legacy = current_line ~= '2.1'
+  if case.foreign then legacy = not legacy end
+  local drop = legacy
+    and {item=product, count_min=case.minimum, count_max=case.maximum, probability=case.probability}
+    or {type='item', name=product, amount_min=case.minimum, amount_max=case.maximum,
+      probability=case.probability}
+  raw['unit-spawner'] = {wild = {loot = {drop}}}
+  run(raw, function()
+    local before = fingerprint.of(data.raw)
+    check('LRL/'..case.id,lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+      'Native loot identity, counts and chance determine lab acquisition: '..case.id)
+    check('LRL/'..case.id..'/research',
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Actual researchability consumes the same native loot source: '..case.id)
+    check('LRL/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Loot acquisition preserves the supplied prototype facts: '..case.id)
+  end)
+end
 raw = world()
 raw.lab.a = {type = 'lab', name = 'a', inputs = {'A'}}
 raw.lab.z = {type = 'lab', name = 'z', inputs = {'B'}}

@@ -493,6 +493,33 @@ local function has_unconditional_source(sources, identity)
   return false
 end
 
+local LEGACY_LOOT_LINES = {
+  ["2.0"] = true, ["1.1"] = true, ["1.0"] = true, ["0.17"] = true,
+  ["0.16"] = true, ["0.15"] = true, ["0.14"] = true, ["0.13"] = true
+}
+
+local function loot_item_identity(entry)
+  if type(entry) ~= "table" then return nil end
+  local line = target_profiles.current_factorio_version
+  if line == "2.1" then
+    -- Entity loot adopted ItemProductPrototype in 2.1. Keep its own native
+    -- quantity/probability contract; a retained LootItem.item is no alias.
+    local identity = normalize_identity(entry)
+    if identity and identity.type == "item" and entry_positive(entry) then return identity end
+  elseif LEGACY_LOOT_LINES[line] then
+    -- Earlier engines use LootItem, not a recipe product. Its required item
+    -- identity and independently defaulted counts cannot come from name,
+    -- amount, a foreign probability field or extra item rolls.
+    local identity = normalize_identity({type = "item", name = entry.item})
+    local minimum = entry.count_min == nil and 1 or entry.count_min
+    local maximum = entry.count_max == nil and 1 or entry.count_max
+    local probability = entry.probability == nil and 1 or entry.probability
+    if identity and finite_nonnegative(minimum) and finite_positive(maximum)
+      and finite_positive(probability) and probability <= 1 then return identity end
+  end
+  return nil
+end
+
 local function append_loot_sources(sources, options)
   -- Enemy drops are concrete acquisition seeds, including the first Gleba
   -- pentapod egg. The breeding recipe cannot seed itself without that drop.
@@ -501,8 +528,8 @@ local function append_loot_sources(sources, options)
       if not diagnostic_visit(options) then return false end
       for _, result in ipairs(source.loot or {}) do
         if not diagnostic_visit(options) then return false end
-        local identity = normalize_identity(result)
-        if identity and identity.type == "item" and entry_positive(result) then
+        local identity = loot_item_identity(result)
+        if identity then
           local key = identity_key(identity)
           sources[key] = sources[key] or {}
           table.insert(sources[key], {
