@@ -68,7 +68,7 @@ Ages are measured against the newest governed review date, 2026-10-07, so checko
 | docs/architecture/mir4-assurance-scale.md | current | 2026-08-26 | 42 | current-window |
 | docs/architecture/mir4-change-and-release-authority.md | current | 2026-09-29 | 8 | current-window |
 | docs/architecture/mir4-historical-succession.md | current | 2026-08-28 | 40 | current-window |
-| docs/architecture/mir4-inspector-compatibility.md | current | 2026-08-28 | 40 | current-window |
+| docs/architecture/mir4-inspector-compatibility.md | current | 2026-10-07 | 0 | current-window |
 | docs/architecture/mir4-module-ecosystem.md | current | 2026-08-26 | 42 | current-window |
 | docs/architecture/mir4-offline-release-authority.md | draft | 2026-08-07 | 61 | current-window |
 | docs/architecture/mir4-platform-preview.md | current | 2026-09-06 | 31 | current-window |
@@ -159,7 +159,7 @@ Ages are measured against the newest governed review date, 2026-10-07, so checko
 | docs/developer/diagnostics.md | current | 2026-08-26 | 42 | current-window |
 | docs/developer/environment-locks.md | current | 2026-08-26 | 42 | current-window |
 | docs/developer/first-extension.md | current | 2026-08-26 | 42 | current-window |
-| docs/developer/inspector.md | current | 2026-08-26 | 42 | current-window |
+| docs/developer/inspector.md | current | 2026-10-07 | 0 | current-window |
 | docs/developer/mep-fragment-reference.md | current | 2026-08-26 | 42 | current-window |
 | docs/developer/processir.md | current | 2026-08-26 | 42 | current-window |
 | docs/developer/publishing-an-extension.md | current | 2026-08-26 | 42 | current-window |

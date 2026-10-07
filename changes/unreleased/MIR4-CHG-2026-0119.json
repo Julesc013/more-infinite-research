@@ -1,0 +1,102 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0119",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Correct canonical Inspector snapshot loading and standalone export bounds.",
+  "details": [
+    "Browser validation counts object/array container depth rather than rejecting valid primitive leaves. Both consumer templates enforce the shared UTF-8 string, forbidden-field, section and read-only-header contracts.",
+    "Local consumers impose an 8 MiB input/output ceiling and 100 properties per object. The PowerShell exporter holds its input against writers and preserves an existing output on rejection. This is no general credential-redaction or digest-authentication claim.",
+    "Actual generated PowerShell and V8 validator controls cover canonical snapshots and opposing inputs. Committed SDK regeneration and assembled preview verification remain pending. No Factorio, player-package, save, compatibility or release proof is granted."
+  ],
+  "semantic_domains": [
+    "tooling",
+    "documentation",
+    "diagnostics"
+  ],
+  "audiences": [
+    "mod-authors",
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    },
+    {
+      "target": "F200",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    },
+    {
+      "target": "F110",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    },
+    {
+      "target": "F100",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    },
+    {
+      "target": "F017",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    },
+    {
+      "target": "F016",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    },
+    {
+      "target": "F015",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    },
+    {
+      "target": "F014",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    },
+    {
+      "target": "F013",
+      "disposition": "not-applicable",
+      "reason": "Package-excluded developer-preview Inspector consumers only; no player source, settings, research, migration or native target change."
+    }
+  ],
+  "package_visibility": "developer-kit",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "changed",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/inspection/Test-MIR4InspectorExportConsumers.ps1",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/inspection/inspector_export_consumers.js",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/developer/inspector.md",
+      "kind": "document"
+    }
+  ]
+}

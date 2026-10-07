@@ -5011,9 +5011,9 @@
     {
       "path": "tools/mir/application/inspection/Inspector.ps1",
       "classification": "canonical-internal",
-      "sha256": "FF29D17DB7D1C156DB2EE4F4A304A9FCA9F16403F923BB2E68E73F964472BF29",
+      "sha256": "2B5FF6D29AE2BBB9A835271F26EA2BBDF6971F5897B7A50B7003C78BC5C8F420",
       "hash_mode": "canonical-text-v1",
-      "lines": 121,
+      "lines": 217,
       "package_visible": false
     },
     {
@@ -6034,5 +6034,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1df056991d38218bc108698e1e68498f6ce04cb2a285aae449c1ed5844b71330"
+  "digest": "sha256:5a49dcbee9516891561d157fbf0cbe4cb7c6d61d055a39a9cca71810ef9a115a"
 }
