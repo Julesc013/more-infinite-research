@@ -575,6 +575,30 @@ fixtures:
       - source-save-remains-byte-identical
       - historical-a04-fixture-and-proof-remain-distinct
 
+  f210-bob-tin-level4-continuation:
+    requires_features: []
+    path: fixtures/assert-f210-current-bob-tin-level4-continuation
+    harness: tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1
+    shipped: false
+    external_mod_identity: bobplates
+    qualification_status: unqualified
+    exact_version_envelope:
+      base: "2.1.21"
+      boblibrary: "3.0.1"
+      bobores: "3.0.0"
+      bobplates: "3.0.2"
+      bobelectronics: "3.0.1"
+      bobtech: "3.0.0"
+      more-infinite-research: "4.2.21001"
+    validates:
+      - explicit-current-engine-and-archive-hash-bindings
+      - direct-library-selection-with-private-default-or-pinned-settings
+      - preserved-finite-levels-one-through-three-and-level-four-continuation
+      - actual-plus-eight-percent-tin-recipe-productivity
+      - furnace-produces-108-plates-from-100-ore-through-one-bounded-reload
+      - original-2.1.20-dossier-and-historical-result-remain-distinct
+      - no-angel-combined-profile-or-broad-material-support-claim
+
   k2-213-imersite-continuation:
     requires_features: []
     path: fixtures/assert-k2-213-imersite-continuation

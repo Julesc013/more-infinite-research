@@ -181,11 +181,24 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $tinHarness=Join-Path $RepoRoot 'tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1'
   $tinAst=[Management.Automation.Language.Parser]::ParseFile($tinHarness,[ref]$tokens,[ref]$errors)
   Assert-LibraryTest ($errors.Count-eq0) 'Tin direct-library runner parses'
-  foreach($name in @('Assert-Tin','Get-TinSha','Read-TinDirectLibraryInputs')){
+  foreach($name in @('Assert-Tin','Get-TinSha','Get-TinRelative','Get-TinArtifact','Resolve-TinEngineBinding','Save-TinSettingsObservation','Read-TinDirectLibraryInputs')){
     $nodes=@($tinAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
     if($nodes.Count-ne1){throw "Tin input function is absent or duplicated: $name"}
     . ([scriptblock]::Create($nodes[0].Extent.Text))
   }
+  $tinDossier=[pscustomobject]@{target=@{factorio_version='2.1.20';engine_sha256=('A'*64)}}
+  $historicalBinding=Resolve-TinEngineBinding -Dossier $tinDossier -Version '' -Sha256 ''
+  Assert-LibraryTest ($historicalBinding.version-ceq'2.1.20'-and$historicalBinding.sha256-ceq('A'*64)-and-not$historicalBinding.explicit) 'Tin retains historical engine binding by default'
+  $freshBinding=Resolve-TinEngineBinding -Dossier $tinDossier -Version '2.1.21' -Sha256 ('B'*64)
+  Assert-LibraryTest ($freshBinding.version-ceq'2.1.21'-and$freshBinding.sha256-ceq('B'*64)-and$freshBinding.prior_engine_version-ceq'2.1.20'-and$freshBinding.explicit) 'Tin fresh engine binding preserves historical provenance'
+  Assert-LibraryRefusal {Resolve-TinEngineBinding -Dossier $tinDossier -Version '2.1.21' -Sha256 ''} 'supply both expected engine'
+  Assert-LibraryRefusal {Resolve-TinEngineBinding -Dossier $tinDossier -Version '' -Sha256 ('B'*64)} 'supply both expected engine'
+  Assert-LibraryRefusal {Resolve-TinEngineBinding -Dossier $tinDossier -Version '2.0.77' -Sha256 ('B'*64)} 'invalid F210 engine binding'
+  Assert-LibraryRefusal {Resolve-TinEngineBinding -Dossier $tinDossier -Version '2.1.21' -Sha256 'bad'} 'invalid F210 engine binding'
+  $emptyControls=Join-Path $root 'tin-default-controls';[IO.Directory]::CreateDirectory($emptyControls)|Out-Null
+  $absentSnapshot=Join-Path $run 'tin-absent-settings.dat'
+  $observed=Save-TinSettingsObservation $RepoRoot $emptyControls $absentSnapshot
+  Assert-LibraryTest ($observed.absent-and$observed.bytes-eq0-and-not(Test-Path -LiteralPath $absentSnapshot)) 'Tin records explicit default settings without inventing an input file'
   $tinExpected=[ordered]@{'alpha_1.0.0.zip'=@{name='alpha';version='1.0.0';sha256=$hashes['alpha_1.0.0.zip']}}
   $tinCandidate=[pscustomobject]@{path=(Join-Path $library 'more-infinite-research_4.2.21001.zip');receipt=@{distribution_version='4.2.21001'}}
   $tinArguments=@{Library=$library;ExpectedArchives=$tinExpected;Candidate=$tinCandidate;FixtureRoot=$upgradeFixture;EngineVersion='2.1.20';OfficialMods=@('base','elevated-rails','quality','recycler','space-age')}
@@ -197,6 +210,9 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   Assert-LibraryTest (@($activation.selected|Where-Object {$_.name-ceq'alpha'-and$_.version-ceq'1.0.0'}).Count-eq1) 'Tin selects the pinned older archive with multiple versions installed'
   Assert-LibraryTest (@($activation.selected|Where-Object {$_.name-ceq'more-infinite-research'-and$_.version-ceq'4.2.21001'}).Count-eq1) 'Tin selects source patch one'
   Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity (Join-Path $library 'mod-settings.dat'))-cne(Get-MIRImmutableInputFileIdentity $privateSettings)) 'Tin settings remain private writable bytes'
+  $settingsSnapshot=Join-Path $run 'tin-selected-settings.dat'
+  $observed=Save-TinSettingsObservation $RepoRoot $library $settingsSnapshot
+  Assert-LibraryTest ($observed.raw_sha256-ceq(Get-MIRImmutableInputSha256 $privateSettings)-and(Get-MIRImmutableInputFileIdentity $settingsSnapshot)-cne(Get-MIRImmutableInputFileIdentity (Join-Path $library 'mod-settings.dat'))) 'Tin captures active settings privately before restoration'
   $terminal=Complete-MIRLibraryActivation $activation;$activation=$null
   Assert-LibraryTest ($terminal.dependency_payload_bytes_copied-eq0) 'Tin restores controls without archive staging'
   $tinArguments.ExpectedArchives=[ordered]@{'alpha_9.0.0.zip'=@{name='alpha';version='9.0.0';sha256=$hashes['alpha_1.0.0.zip']}}
