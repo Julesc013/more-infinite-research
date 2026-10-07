@@ -3,6 +3,7 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local effective_settings = require("prototypes.mir.settings.effective")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local item_facts = require("prototypes.mir.index.item_prototype_facts")
 
 local M = {}
 
@@ -69,7 +70,6 @@ local function lab_acquisition_witness(lab_name, diagnostic_observer, reachabili
     end
     table.sort(items)
   else
-    local item_facts = require("prototypes.mir.index.item_prototype_facts")
     for _, name in ipairs(item_facts.placeable_items_for_entity(lab_name)) do
       local item = prototype_lookup.item_prototype(name)
       if item and item.place_result == lab_name then items[#items + 1] = name end
