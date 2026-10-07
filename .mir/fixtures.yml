@@ -2005,6 +2005,13 @@ fixtures:
       - modern-only-settings-are-omitted
       - reduced-continuation-locales-are-explicit
 
+  historical-handcrafting:
+    requires_features: []
+    assertion_path: fixtures/assert-historical-handcrafting
+    validates:
+      - f016-base-default-handcrafting-dependent-catalogue
+      - f016-native-crafting-research-reward
+
   weapon-speed-safety:
     requires_features: []
     path: fixtures/weapon-speed-external-owner

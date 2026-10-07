@@ -181,6 +181,11 @@
       "tests": ["static.mir4-current-package-presentation-v7", "static.mir4-editable-source-materializer-m41-f2c"]
     },
     {
+      "id": "historical-handcrafting-regression",
+      "patterns": ["^fixtures/assert-historical-handcrafting/"],
+      "tests": ["static.compiler", "runtime.researchability-planning-contract", "static.mir42-nine-target-engine-inputs"]
+    },
+    {
       "id": "mir4-science-route-feasibility",
       "patterns": ["^source/prototypes/mir/capabilities/science_integration/(?:pack_production_reachability|recipe_route_feasibility|recipe_unlock_facts)\\.lua$", "^source/prototypes/mir/index/recipe_(?:facts|unlocks)\\.lua$", "^tests/compiler/(?:Test-MIR(?:RecipeSourceEpoch|ResearchabilityPlanning)\\.ps1|recipe_source_epoch\\.lua|researchability_planning\\.lua|lab_reachability\\.lua)$", "^tools/mir/application/release/F210QualificationPolicy\\.ps1$", "^\\.mir/control/MIR4-F210-Current-Qualification-PolicyV2\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^docs/architecture/module-boundaries\\.md$"],
       "tests": ["runtime.researchability-planning-contract", "runtime.recipe-source-epoch-contract", "static.architecture", "static.compiler"]

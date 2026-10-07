@@ -13,6 +13,8 @@ superseded_by: []
 
 Updated: 2026-10-08
 
+The historical target adapter declares `player` as the handcrafting prototype for 0.13–0.16; 0.17 and newer retain `character`. The shared acquisition solver uses that declaration when proving a laboratory's placement-item route, retains category checks and rejects fluid handcrafting. Controlled lab/researchability cases cover both prototype names, mismatched adapters, missing categories, fluid coproducts and unchanged input prototypes. These controls do not establish historical native catalogue or save acceptance.
+
 The release engine runner initializes lease cleanup before imports and admission. An early refusal must preserve its original error instead of failing again because cleanup state is absent. A fresh PowerShell child exercises the actual runner with a missing candidate, checks the original diagnostic and verifies that no run output is allocated; this host-side regression test launches no Factorio process.
 
 The five historical 4.2.1 targets require explicit `-F017Engine` through `-F013Engine` bindings in the release engine runner. Their exact sealed engine hashes and versions remain mandatory; the historical workstation path remains provenance rather than the required current location. Maintenance sealing reads the preserved MIR 3 target/seal identities without requiring those old archives locally, then verifies the actual published `CCC00` predecessor. Non-maintenance sealing still requires its original predecessor archive and engine location. Controlled relocation/missing-archive cases exercise the real readers without claiming native qualification.

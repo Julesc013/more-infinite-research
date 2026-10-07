@@ -6,6 +6,7 @@ Version: 4.2.01301
     - Update the Factorio 0.13 distribution identity and package guidance for source 4.2.1.
     - Preserve the reduced target research and settings surface; modern-only features remain excluded.
     - Research Library backports are not included in this package.
+    - Recognize the historical player prototype when checking handcraftable laboratory and science acquisition routes.
 
   Info:
 

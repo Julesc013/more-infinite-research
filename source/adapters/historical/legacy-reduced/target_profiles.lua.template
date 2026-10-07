@@ -32,6 +32,7 @@ local M = {
       profile_schema = 2,
       prototype_shapes = {
         recipe_category = "category",
+        handcrafting_prototype_type = "player",
         science_pack_prototype_kinds = {"tool"},
         product_probability_fields = {"probability", "catalyst_amount"},
         technology_formula = true,

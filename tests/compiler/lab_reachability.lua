@@ -66,6 +66,43 @@ run(raw, function(owner)
   check('LR06', telemetry and telemetry.counters.item_prototype_index_builds == 1,
     'Normal lab queries reuse the existing item prototype index')
 end)
+-- Historical engines use the player prototype for handcrafting. The selected
+-- adapter owns that capability; an unrelated prototype table cannot grant it.
+do
+  local shapes = require('prototypes.mir.platform.factorio.target_profiles').current().prototype_shapes
+  local previous = shapes.handcrafting_prototype_type
+  for _, case in ipairs({
+    {id='legacy-player',actor='player',selected='player',expected=true},
+    {id='modern-character',actor='character',selected='character',expected=true},
+    {id='modern-default',actor='character',expected=true},
+    {id='legacy-rejects-character',actor='character',selected='player',expected=false},
+    {id='modern-rejects-player',actor='player',expected=false},
+    {id='legacy-wrong-category',actor='player',selected='player',category='unrelated',expected=false},
+    {id='legacy-fluid-output',actor='player',selected='player',fluid=true,expected=false},
+    {id='modern-fluid-output',actor='character',selected='character',fluid=true,expected=false}
+  }) do
+    shapes.handcrafting_prototype_type = case.selected
+    raw = world()
+    raw.character = nil
+    raw[case.actor] = {player = {type=case.actor,crafting_categories={case.category or 'crafting'},
+      fluid_boxes={{production_type='output'}}}}
+    if case.fluid then
+      raw.fluid = {water={type='fluid',name='water',default_temperature=15}}
+      raw.recipe.make_lab.results[#raw.recipe.make_lab.results+1] = {type='fluid',name='water',amount=1}
+    end
+    run(raw, function()
+      local before = fingerprint.of(data.raw)
+      check('LRH/'..case.id,lab.valid_research_ingredients({{'A',2},{'B',3}})==case.expected,
+        'Lab acquisition uses the declared handcrafting actor and excludes fluid crafting: '..case.id)
+      check('LRH/'..case.id..'/research',
+        (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+        'Researchability consumes the same target-specific lab route: '..case.id)
+      check('LRH/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+        'Handcrafting acquisition preserves observed prototypes: '..case.id)
+    end)
+  end
+  shapes.handcrafting_prototype_type = previous
+end
 -- A cloned or patched minable prototype may retain both declarations. The
 -- native results list owns the drops; a stale singular result is not a second
 -- acquisition route for the laboratory's placement item.

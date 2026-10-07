@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 68021,
-      "source_sha256": "B4D713D12D1768D11C776A934CCB74213B5B8FEB291783202B955F7867DA1D1B",
-      "output_bytes": 68021,
-      "output_sha256": "B4D713D12D1768D11C776A934CCB74213B5B8FEB291783202B955F7867DA1D1B"
+      "source_bytes": 68604,
+      "source_sha256": "F16361077D8BAC801F1E6BADCA21906667127A875C40A57F3E4558B255842E0F",
+      "output_bytes": 68604,
+      "output_sha256": "F16361077D8BAC801F1E6BADCA21906667127A875C40A57F3E4558B255842E0F"
     },
     {
       "layer": "capability",
@@ -7424,10 +7424,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 3176,
-      "source_sha256": "DE8E810E907AA9C21632FD351BA736AF76DF44B68DFF035D8CC772D8DCC4E98F",
-      "output_bytes": 3176,
-      "output_sha256": "DE8E810E907AA9C21632FD351BA736AF76DF44B68DFF035D8CC772D8DCC4E98F"
+      "source_bytes": 3224,
+      "source_sha256": "C0A704AA034AE133AFC9D4438A48ABDA403D50E0AC45B2956D3EF349F9C7E14D",
+      "output_bytes": 3224,
+      "output_sha256": "C0A704AA034AE133AFC9D4438A48ABDA403D50E0AC45B2956D3EF349F9C7E14D"
     },
     {
       "layer": "presentation",
@@ -7500,10 +7500,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1234,
-      "source_sha256": "B8B55069F109C2085923F6DED3D93B05F5B521A2E2506A274BD5B314C0E37C29",
-      "output_bytes": 1234,
-      "output_sha256": "B8B55069F109C2085923F6DED3D93B05F5B521A2E2506A274BD5B314C0E37C29"
+      "source_bytes": 1353,
+      "source_sha256": "03FDF14834E0276B6A96B7A5B6E7D68004BD95923ACE6E6C0C98E6B8D2C8347E",
+      "output_bytes": 1353,
+      "output_sha256": "03FDF14834E0276B6A96B7A5B6E7D68004BD95923ACE6E6C0C98E6B8D2C8347E"
     },
     {
       "layer": "presentation",
@@ -7538,10 +7538,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1234,
-      "source_sha256": "43CCBA2EC85BFD8907477B1B9A72F580F6D2A6F0AE747DEF6BF47AFD2665AB2F",
-      "output_bytes": 1234,
-      "output_sha256": "43CCBA2EC85BFD8907477B1B9A72F580F6D2A6F0AE747DEF6BF47AFD2665AB2F"
+      "source_bytes": 1353,
+      "source_sha256": "B8D1A977E033E0649E23D903F1DC2A1CAFC2A9F3E4EC0FB35F44F8BA3E5653CA",
+      "output_bytes": 1353,
+      "output_sha256": "B8D1A977E033E0649E23D903F1DC2A1CAFC2A9F3E4EC0FB35F44F8BA3E5653CA"
     },
     {
       "layer": "presentation",
@@ -7576,10 +7576,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1257,
-      "source_sha256": "156FAF9F70A42FCF04B04DA7B82910E6AF89FBEDD85BA245F36AA4E464D25784",
-      "output_bytes": 1257,
-      "output_sha256": "156FAF9F70A42FCF04B04DA7B82910E6AF89FBEDD85BA245F36AA4E464D25784"
+      "source_bytes": 1376,
+      "source_sha256": "5AEA5DEEC7B5F8A2C8EE7D13D36440B01DFF4F373AD7375F4BDA0D92A5DF358F",
+      "output_bytes": 1376,
+      "output_sha256": "5AEA5DEEC7B5F8A2C8EE7D13D36440B01DFF4F373AD7375F4BDA0D92A5DF358F"
     },
     {
       "layer": "presentation",
@@ -7614,10 +7614,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1257,
-      "source_sha256": "EE1BE2D5F1865CD78370435DBC8C267A2CEDAFB8798F72ACAB5F1EB4BDABB961",
-      "output_bytes": 1257,
-      "output_sha256": "EE1BE2D5F1865CD78370435DBC8C267A2CEDAFB8798F72ACAB5F1EB4BDABB961"
+      "source_bytes": 1376,
+      "source_sha256": "D1A354A1D167585A43306F54C800EE77F48AD795AFBC1FBCDF03A6308419F0C6",
+      "output_bytes": 1376,
+      "output_sha256": "D1A354A1D167585A43306F54C800EE77F48AD795AFBC1FBCDF03A6308419F0C6"
     },
     {
       "layer": "shared",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "544AE555A18E9EDDAF2B341A3E2B8BDB18179E71587FBB047660BF5444CA9DBD"
+  "record_sha256": "AD452938824360DF3AB2076FEDAE3803822DD564DFDC0A123C4132BD05AD766A"
 }
