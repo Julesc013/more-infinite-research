@@ -447,18 +447,34 @@ local function minable_results(source)
   return {}
 end
 
+local function mining_fluid_input(source)
+  -- Fluid-consuming mining entered the native contract in 0.15. Earlier
+  -- adapters must not interpret a foreign field as a native requirement.
+  local line = target_profiles.current_factorio_version
+  if line == "0.13" or line == "0.14" then return false end
+  local minable = source and source.minable or {}
+  local amount = minable.fluid_amount or 0
+  if not finite_nonnegative(amount) then return nil end
+  if amount == 0 then return false end
+  local identity = normalize_identity({type = "fluid", name = minable.required_fluid})
+  if not identity then return nil end
+  return {identity = identity, amount = amount}
+end
+
 local function append_minable_sources(sources, prototype_type, witness_kind, options)
   for _, source in pairs(data_raw.prototypes(prototype_type)) do
     if not diagnostic_visit(options) then return false end
+    local mining_input = mining_fluid_input(source)
     for _, result in ipairs(minable_results(source)) do
       if not diagnostic_visit(options) then return false end
       local identity = normalize_identity(result)
-      if identity and entry_positive(result) then
+      if identity and mining_input ~= nil and entry_positive(result) then
         local key = identity_key(identity)
         sources[key] = sources[key] or {}
         table.insert(sources[key], {
           kind = witness_kind,
           product = identity,
+          mining_input = mining_input or nil,
           surface_conditions = deepcopy(source.surface_conditions)
         })
       end
@@ -469,7 +485,8 @@ end
 
 local function has_unconditional_source(sources, identity)
   for _, witness in ipairs(sources[identity_key(identity)] or {}) do
-    if type(witness.surface_conditions) ~= "table" or #witness.surface_conditions == 0 then
+    if witness.mining_input == nil
+      and (type(witness.surface_conditions) ~= "table" or #witness.surface_conditions == 0) then
       return true
     end
   end
@@ -621,6 +638,8 @@ local function default_source_catalog(state, options)
   return sources
 end
 
+local acquisition_witness
+
 local function source_witness(identity, options, state)
   if type(options.source_witness) == "function" then
     -- Keep the established name-first callback shape, and add the exact
@@ -639,12 +658,31 @@ local function source_witness(identity, options, state)
       end
     end
   end
+  local source_checkpoint = diagnostic_checkpoint(options)
   for _, witness in ipairs(default_source_catalog(state, options)[identity_key(identity)] or {}) do
     if not diagnostic_visit(options) then return nil end
+    diagnostic_rollback(options, source_checkpoint)
     if surface_satisfied(witness.surface_conditions, options, state) then
       local copied = deepcopy(witness)
       copied.surface_conditions = nil
-      return copied
+      local input = witness.mining_input
+      if not input then return copied end
+      -- Unconditional sources keep their index-free preflight. A conditional
+      -- mined source uses the existing typed acquisition solver only when
+      -- selected, and retains the input's complete research witness.
+      options.recipe_index = options.recipe_index or state.recipe_index or recipe_facts.index_view()
+      state = query_state(state, options.recipe_index)
+      local key = identity_key(identity)
+      if not state.visiting[key] then
+        state.visiting[key] = true
+        local acquired = acquisition_witness(input.identity, options, state)
+        state.visiting[key] = nil
+        if acquired then
+          copied.ingredients = {acquired}
+          diagnostic_rollback(options, source_checkpoint)
+          return copied
+        end
+      end
     end
   end
   return nil
@@ -653,10 +691,9 @@ end
 function M.source_witness(identity, options, state)
   local candidate = normalize_identity(identity)
   if not candidate then return nil end
-  -- A direct source check does not need to materialize the potentially large
-  -- recipe index merely to inspect resources and offshore pumps. Callers may
-  -- share a source-epoch-bound state; it contains no contextual research route
-  -- conclusion and therefore cannot alter admission semantics.
+  -- An unconditional source does not need the recipe index. Fluid-dependent
+  -- mining resolves its input on demand; without a research callback only an
+  -- initially acquired fluid can establish this direct-source preflight.
   return source_witness(candidate, copy_options(options), source_query_state(state))
 end
 
@@ -682,8 +719,6 @@ local function sorted_producers(index, output_identity, options)
   end
   return M.sort_acquisition_producers(producers, index)
 end
-
-local acquisition_witness
 
 local function placement_items_for_machine(name, options, state)
   if options.diagnostic_observer == nil then
@@ -1048,7 +1083,12 @@ local STABLE_SOURCE_KINDS = {
 
 local function stable_acquisition_witness(witness)
   if type(witness) ~= "table" then return false end
-  if STABLE_SOURCE_KINDS[witness.kind] then return true end
+  if STABLE_SOURCE_KINDS[witness.kind] then
+    for _, ingredient in ipairs(witness.ingredients or {}) do
+      if not stable_acquisition_witness(ingredient) then return false end
+    end
+    return true
+  end
   if witness.kind ~= "recipe" then return false end
   local machine = witness.machine
   if not machine then return false end
@@ -1094,6 +1134,7 @@ local function acquisition_witness_impl(output_identity, options, state)
     return nil
   end
 
+  local acquisition_checkpoint = diagnostic_checkpoint(options)
   local direct = source_witness(output_identity, options, state)
   if direct then
     if may_use_stable and stable_acquisition_witness(direct) then
@@ -1106,7 +1147,6 @@ local function acquisition_witness_impl(output_identity, options, state)
     return direct
   end
 
-  local acquisition_checkpoint = diagnostic_checkpoint(options)
   state.visiting[key] = true
   for _, recipe_name in ipairs(sorted_producers(options.recipe_index, output_identity, options)) do
     if not diagnostic_visit(options) then
