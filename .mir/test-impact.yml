@@ -656,6 +656,18 @@
       "tags": []
     },
     {
+      "pattern": "tests/compiler/recipe_source_epoch.lua",
+      "groups": ["science-prerequisites"],
+      "scenarios": ["generated-prerequisite-safety", "k2-science-phase-policy"],
+      "tags": []
+    },
+    {
+      "pattern": "tests/tooling/Test-MIRDevelopmentCISelection.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
       "groups": [],
       "scenarios": [],

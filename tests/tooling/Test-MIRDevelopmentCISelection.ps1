@@ -119,6 +119,33 @@ $unknownLabImpact=Get-MIRAssuranceImpactSelection -Paths @($unknownLabPath) -Con
 Assert-MIRDevelopmentCISelection -Condition ('static.full' -in @($unknownLabClassification.tests) -and
   'mir4-science-route-feasibility' -notin @($unknownLabClassification.classes) -and
   $unknownLabImpact.requires_full -and $unknownLabPath -in @($unknownLabImpact.unmapped_runtime_paths)) -Message 'An unknown lab fixture must retain conservative full coverage; the exact mapping is not a wildcard exemption.'
+$epochPath='tests/compiler/recipe_source_epoch.lua'
+$epochClassification=Get-MIRAssuranceClassification -Paths @($epochPath) -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition (-not $epochClassification.escalated -and
+  'mir4-science-route-feasibility' -in @($epochClassification.classes) -and
+  'runtime.recipe-source-epoch-contract' -in @($epochClassification.tests)) -Message 'The source-epoch fixture lost its exact existing acquisition consumer.'
+$epochConsumer=@($actualCatalog.tests|Where-Object id -CEQ 'runtime.recipe-source-epoch-contract')
+Assert-MIRDevelopmentCISelection -Condition ($epochConsumer.Count -eq 1 -and
+  $epochPath -in @($epochConsumer[0].inputs) -and $epochConsumer[0].requires_factorio -eq $true) -Message 'The source-epoch native runner must retain its declared fixture and execution boundary.'
+$epochImpact=Get-MIRAssuranceImpactSelection -Paths @($epochPath) -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition (-not $epochImpact.requires_full -and
+  $epochPath -in @($epochImpact.mapped_paths) -and 'science-prerequisites' -in @($epochImpact.groups) -and
+  'generated-prerequisite-safety' -in @($epochImpact.scenarios) -and 'k2-science-phase-policy' -in @($epochImpact.scenarios)) -Message 'The consumed source-epoch fixture must select affected science scenarios without unrelated profile replay.'
+$unknownEpochPath='tests/compiler/unowned_recipe_source_epoch.lua'
+$unknownEpochImpact=Get-MIRAssuranceImpactSelection -Paths @($unknownEpochPath) -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition ($unknownEpochImpact.requires_full -and
+  $unknownEpochPath -in @($unknownEpochImpact.unmapped_runtime_paths)) -Message 'An unowned epoch fixture must retain full coverage; the mapping is exact.'
+$selectorPath='tests/tooling/Test-MIRDevelopmentCISelection.ps1'
+$selectorConsumer=@($actualCatalog.tests|Where-Object id -CEQ 'static.mir4-development-ci-selection')
+Assert-MIRDevelopmentCISelection -Condition ($selectorConsumer.Count -eq 1 -and
+  $selectorPath -in @($selectorConsumer[0].inputs) -and $selectorConsumer[0].requires_factorio -eq $false) -Message 'The selector self-test must retain its actual static consumer and execution boundary.'
+$selectorImpact=Get-MIRAssuranceImpactSelection -Paths @($selectorPath) -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition (-not $selectorImpact.requires_full -and
+  $selectorPath -in @($selectorImpact.mapped_paths) -and @($selectorImpact.groups).Count -eq 0) -Message 'The known static selector test must not trigger unrelated native profile replay.'
+$unknownSelectorPath='tests/tooling/Test-MIRUnownedDevelopmentCISelection.ps1'
+$unknownSelectorImpact=Get-MIRAssuranceImpactSelection -Paths @($unknownSelectorPath) -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition ($unknownSelectorImpact.requires_full -and
+  $unknownSelectorPath -in @($unknownSelectorImpact.unmapped_runtime_paths)) -Message 'The selector mapping must not exempt unrelated tooling scripts from conservative impact selection.'
 foreach ($constructionPath in @(
   'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1',
   'tools/mir/application/package/TargetMaterializer.ps1',

@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 52430,
-      "source_sha256": "9D0C5583B55BF55E69AD5AEC462318A9521731A58089952848CA778FE9470844",
-      "output_bytes": 52430,
-      "output_sha256": "9D0C5583B55BF55E69AD5AEC462318A9521731A58089952848CA778FE9470844"
+      "source_bytes": 54291,
+      "source_sha256": "332349C17DC75BD8593A3C5E671F53D8BCD7B7544A3654E7883290F2DCF5666D",
+      "output_bytes": 54291,
+      "output_sha256": "332349C17DC75BD8593A3C5E671F53D8BCD7B7544A3654E7883290F2DCF5666D"
     },
     {
       "layer": "capability",
@@ -4439,10 +4439,10 @@
         "reason": "Shared staged material progression declaration for reviewed Bob/Angel streams."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 15761,
-      "source_sha256": "28F1DF2C485BBD5339F1E7E52FEC9E6DF5F3BC2B0D9224EC97B6870E837C7D95",
-      "output_bytes": 15761,
-      "output_sha256": "28F1DF2C485BBD5339F1E7E52FEC9E6DF5F3BC2B0D9224EC97B6870E837C7D95"
+      "source_bytes": 16597,
+      "source_sha256": "7D2A756053E074BADC62EA5B5017FD2B307CD53A29782E43C47D3EECAEA245AD",
+      "output_bytes": 16597,
+      "output_sha256": "7D2A756053E074BADC62EA5B5017FD2B307CD53A29782E43C47D3EECAEA245AD"
     },
     {
       "layer": "capability",
@@ -6384,10 +6384,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 86043,
-      "source_sha256": "2B86F92CE11C4D2BFC6BB822E3AF98B09CE69067CDD74083929AAA68E1EDE7E6",
-      "output_bytes": 86043,
-      "output_sha256": "2B86F92CE11C4D2BFC6BB822E3AF98B09CE69067CDD74083929AAA68E1EDE7E6"
+      "source_bytes": 89644,
+      "source_sha256": "280192D98F3A483FBE4A949149A6667C9F8F049A990D808B70D2258BA0345EE5",
+      "output_bytes": 89644,
+      "output_sha256": "280192D98F3A483FBE4A949149A6667C9F8F049A990D808B70D2258BA0345EE5"
     },
     {
       "layer": "capability",
@@ -6447,10 +6447,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/streams/productivity.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 73578,
-      "source_sha256": "6ABA1A2ACA478B6BBD666499945DFE0FC63DCD8C26A3AD7114154E6DAB2228A0",
-      "output_bytes": 73578,
-      "output_sha256": "6ABA1A2ACA478B6BBD666499945DFE0FC63DCD8C26A3AD7114154E6DAB2228A0"
+      "source_bytes": 74374,
+      "source_sha256": "9553361C7356770FA35CF706E926B6A2401B134F4FD5895B810852E204F1F4E9",
+      "output_bytes": 74374,
+      "output_sha256": "9553361C7356770FA35CF706E926B6A2401B134F4FD5895B810852E204F1F4E9"
     },
     {
       "layer": "presentation",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "E1F55E83DE427E3989625114B2D0D480024FE39D5F6A79CD062CB66CC2C1C6EB"
+  "record_sha256": "A2BEAD9EEB723A6C48EE027874E621FF9D73CE34E723078B173D90ADCBD83EF7"
 }

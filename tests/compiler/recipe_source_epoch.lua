@@ -251,4 +251,32 @@ end)()
   profile_module.current = previous_current
 end)()
 
+-- The public adapter line selects the native mining-input boundary. These
+-- controlled observations do not execute nine engines or qualify packages.
+;(function()
+  local profile_module = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_line = profile_module.current_factorio_version
+  local routes = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+  local previous_raw = data.raw
+  for _, line in ipairs({"2.1","2.0","1.1","1.0","0.17","0.16","0.15","0.14","0.13"}) do
+    profile_module.current_factorio_version = line
+    data.raw = {resource = {ore = {minable = {result="ore",fluid_amount=10,required_fluid="acid"}}}}
+    compiler_context.with_active(compiler_context.new(), function()
+      check("MF"..line.."/missing",(routes.source_witness("ore")~=nil)==(line=="0.13" or line=="0.14"),
+        "The mining fluid requirement follows the selected native line contract")
+    end)
+    data.raw.resource.acid = {minable={results={{type="fluid",name="acid",amount=1}}}}
+    compiler_context.with_active(compiler_context.new(), function()
+      local witness = routes.source_witness("ore")
+      check("MF"..line.."/seeded",witness~=nil,
+        "An independently acquired fluid retains the mined output")
+      check("MF"..line.."/witness",line=="0.13" or line=="0.14"
+        or witness.ingredients[1].product.type=="fluid" and witness.ingredients[1].product.name=="acid",
+        "A supported mining input retains its typed acquisition witness")
+    end)
+  end
+  data.raw = previous_raw
+  profile_module.current_factorio_version = previous_line
+end)()
+
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)

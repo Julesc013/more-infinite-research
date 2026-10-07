@@ -258,6 +258,25 @@ foreach($route in $pySampleRoutes){
     Assert-CMI ($row.Contains('generated_technology: '+$id,[StringComparison]::Ordinal) -and $row.Contains('identity_state: stable-unreleased',[StringComparison]::Ordinal) -and $row.Contains('fixtures/assert-community-manufacturing-intake',[StringComparison]::Ordinal)) "Py sample stream authority is missing or unbound: $id"
   }
 }
+$pyForestry=$fixture.py_forestry_implementation
+Assert-CMI ([string]$pyForestry.request_id -ceq 'ECO-PY' -and [string]$pyForestry.status -ceq 'conditional-current-source-declarations-native-admission-pending' -and [string]$pyForestry.productive_output_type -ceq 'item') 'Forestry must preserve ECO-PY and its pending native boundary.'
+Assert-CMI (@($pyForestry.subjects).Count -eq 3 -and @($pyForestry.generated_technologies).Count -eq 6 -and @($pyForestry.generated_technologies|Sort-Object -Unique).Count -eq 6) 'Forestry must have three products and six distinct stage identities.'
+Assert-CMI ([int]$pyForestry.early_levels -eq 3 -and [int]$pyForestry.continuation_first_level -eq 4 -and [double]$pyForestry.effect_per_level -eq 0.02) 'Forestry must consume the shared stages and useful increment.'
+Assert-CMI (-not [bool]$pyForestry.route_permission_grants -and -not [bool]$pyForestry.route_certificate_exceptions -and -not [bool]$pyForestry.engine_qualification -and -not [bool]$pyForestry.public_support_authority -and -not [bool]$pyForestry.seed_tree_module_or_bootstrap_qualification) 'Ordinary forestry declarations cannot qualify seed/tree/bootstrap outcomes or grant permission.'
+foreach($product in @('log','wood','treated-wood')){
+  $key='research_material_py_'+$product.Replace('-','_')
+  $subject=@($pyForestry.subjects|Where-Object stream_key -CEQ $key)
+  $expectedRoutes=if($product -ceq 'log'){@($pyBootstrapRoutes|Where-Object{$null -ne $_.PSObject.Properties['recipe_family'] -and [string]$_.recipe_family -clike 'log-*'}|ForEach-Object variants)}elseif($product -ceq 'wood'){@('log-wood')}else{@('treated-wood')}
+  Assert-CMI ($subject.Count -eq 1 -and [string]$subject[0].item -ceq $product -and (@($subject[0].required_mods)-join '|') -ceq 'pycoalprocessing') "Forestry provider/product identity changed: $key"
+  Assert-CMI ((@($subject[0].source_producers|Sort-Object)-join '|') -ceq (@($expectedRoutes|Sort-Object)-join '|')) "Forestry selectors must match the retained intake: $key"
+  Assert-CMI ($sourceText.Contains('streams.'+$key+' = material_family("'+$product+'",',[StringComparison]::Ordinal)) "Canonical source lacks the retained forestry product: $key"
+  foreach($level in @(1,4)){
+    $id='recipe-prod-'+$key+'-'+$level
+    Assert-CMI ($id -cin @($pyForestry.generated_technologies)) "Forestry stage identity is missing: $id"
+    $row=Get-CMIManifestRow $streamManifest $key $level
+    Assert-CMI ($row.Contains('generated_technology: '+$id,[StringComparison]::Ordinal) -and $row.Contains('identity_state: stable-unreleased',[StringComparison]::Ordinal) -and $row.Contains('fixtures/assert-community-manufacturing-intake',[StringComparison]::Ordinal)) "Forestry stream authority is missing or unbound: $id"
+  }
+}
 $requests=(Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/programmes/community-requests.json')|ConvertFrom-Json -Depth 100 -DateKind String).requests
 $requestIds=@($fixture.authority.request_ids)
 $requestRows=@($requests|Where-Object{$_.id -in $requestIds})
@@ -534,6 +553,7 @@ $result=[ordered]@{
   }
   py_chemical_implementation=$pyImplementation
   py_sample_implementation=$pySamples
+  py_forestry_implementation=$pyForestry
   target_bindings=$bindings
   materialized_packages=$materializedPackages
   non_claims=@($fixture.non_claims)

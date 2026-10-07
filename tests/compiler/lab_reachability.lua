@@ -95,6 +95,107 @@ for _, case in ipairs({
       'Minable acquisition preserves declared prototype inputs: '..case.id)
   end)
 end
+-- Fluid-consuming mining is not an independent natural seed. Exercise the
+-- real lab/researchability consumer, including typed and cyclic alternatives.
+local function mining_fluid_world()
+  local next_raw = world()
+  next_raw.recipe.make_lab = nil
+  next_raw.fluid = {acid={type='fluid',name='acid'}}
+  next_raw.resource = {ore={type='resource',name='ore',minable={
+    mining_time=1,result='lab-kit',fluid_amount=10,required_fluid='acid'}}}
+  return next_raw
+end
+for _, case in ipairs({
+  {id='missing-fluid',expected=false},
+  {id='same-named-item',item=true,expected=false},
+  {id='natural-fluid',fluid=true,expected=true},
+  {id='zero-fluid-amount',amount=0,expected=true},
+  {id='default-fluid-amount',omit_amount=true,expected=true},
+  {id='missing-fluid-identity',missing_name=true,expected=false},
+  {id='self-mining-fluid',self=true,expected=false},
+  {id='lab-fluid-cycle',cycle=true,expected=false},
+  {id='independent-lab-alternative',alternative=true,expected=true},
+  {id='independent-fluid-alternative',cycle=true,fluid=true,expected=true}
+}) do
+  raw = mining_fluid_world()
+  if case.amount ~= nil then raw.resource.ore.minable.fluid_amount = case.amount end
+  if case.omit_amount then raw.resource.ore.minable.fluid_amount = nil end
+  if case.missing_name then raw.resource.ore.minable.required_fluid = nil end
+  if case.item then
+    raw.item.acid = {type='item',name='acid'}
+    raw.resource.item_acid = {minable={result='acid'}}
+  end
+  if case.fluid then raw.resource.fluid_acid = {minable={results={{type='fluid',name='acid',amount=1}}}} end
+  if case.self then raw.resource.fluid_acid = {minable={
+    results={{type='fluid',name='acid',amount=1}},fluid_amount=1,required_fluid='acid'}} end
+  if case.cycle then
+    raw['assembling-machine'] = {builder={type='assembling-machine',name='builder',
+      crafting_categories={'chemistry'},fluid_boxes={{production_type='output'}}}}
+    raw.item['builder-kit'] = {type='item',name='builder-kit',place_result='builder'}
+    raw.recipe.make_builder = recipe('make_builder','builder-kit')
+    raw.recipe.make_acid = recipe('make_acid','acid')
+    raw.recipe.make_acid.category = 'chemistry'
+    raw.recipe.make_acid.results[1].type = 'fluid'
+    raw.recipe.make_acid.ingredients = {{'lab-kit',1}}
+  end
+  if case.alternative then raw.recipe.make_lab = recipe('make_lab','lab-kit') end
+  run(raw, function()
+    local before = fingerprint.of(data.raw)
+    check('LRQ/'..case.id,lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+      'Lab acquisition retains the mining fluid requirement: '..case.id)
+    check('LRQ/'..case.id..'/research',
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Actual researchability consumes the mining fluid witness: '..case.id)
+    check('LRQ/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Mining acquisition preserves prototype inputs: '..case.id)
+  end)
+end
+-- An enabled outer recipe can consume a mined item whose fluid is unlocked
+-- through earlier research. The chosen route must keep that unlock and never
+-- warm an enabled-only acquisition memo with its conditional conclusion.
+raw = mining_fluid_world()
+raw['assembling-machine'] = {builder={type='assembling-machine',name='builder',
+  crafting_categories={'chemistry'},fluid_boxes={{production_type='output'}}}}
+raw.item['builder-kit'] = {type='item',name='builder-kit',place_result='builder'}
+raw.recipe.make_builder = recipe('make_builder','builder-kit')
+raw.recipe.make_acid = recipe('make_acid','acid',false)
+raw.recipe.make_acid.category = 'chemistry'
+raw.recipe.make_acid.results[1].type = 'fluid'
+raw.recipe.make_B.ingredients = {{'lab-kit',1}}
+raw.lab.early = {type='lab',name='early',inputs={'A'}}
+raw.item['early-kit'] = {type='item',name='early-kit',place_result='early'}
+raw.recipe.make_early = recipe('make_early','early-kit')
+raw.technology.FluidUnlock = research({'A'})
+raw.technology.FluidUnlock.effects = {{type='unlock-recipe',recipe='make_acid'}}
+run(raw, function(owner)
+  local before = fingerprint.of(data.raw)
+  check('LRQ/frontier/lab',lab.valid_research_ingredients({{'A',1},{'B',1}}),
+    'An earlier acquired lab can unlock the required mining fluid')
+  check('LRQ/frontier/status',production.pack_production_status('B',{})=='research',
+    'An enabled pack recipe behind fluid-consuming mining remains research-gated')
+  local gates = production.prereq_techs_for_science_pack('B')
+  check('LRQ/frontier/gate',#gates==1 and gates[1]=='FluidUnlock',
+    'The selected science frontier retains the actual mining fluid unlock')
+  local routes = require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+  local shared = assert(owner:state_view('science_pack_production').route_witness_state)
+  check('LRQ/frontier/initial',routes.initial_recipe_witness('make_B','B',nil,shared)==nil,
+    'A prior researched mining witness cannot become an enabled-only route')
+  check('LRQ/frontier/source',routes.source_witness('lab-kit',nil,shared)==nil,
+    'A source preflight cannot declare a research-dependent mined item initial')
+  check('LRQ/frontier/immutable',fingerprint.of(data.raw)==before,
+    'Mining input frontier extraction preserves prototype inputs')
+end)
+raw.technology.FluidUnlock.enabled = false
+run(raw, function()
+  check('LRQ/disabled-unlock',not lab.valid_research_ingredients({{'A',1},{'B',1}}),
+    'A disabled mining fluid unlock cannot acquire the later lab')
+end)
+raw.technology.FluidUnlock.enabled = true
+raw.technology.FluidUnlock.unit.ingredients = {{'B',1}}
+run(raw, function()
+  check('LRQ/research-cycle',not lab.valid_research_ingredients({{'A',1},{'B',1}}),
+    'A mining fluid unlock cannot fund itself through its mined lab or pack')
+end)
 for index, mutate in ipairs({
   function(r) r.recipe.make_lab.results[1].amount = 0 end,
   function(r) r.recipe.make_lab.results[1].probability = 0 end,

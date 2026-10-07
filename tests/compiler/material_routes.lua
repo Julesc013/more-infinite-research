@@ -1150,7 +1150,10 @@ do
     {"research_material_py_earth_potato_sample", "earth-potato-sample", {"earth-potato-sample"}, "item"},
     {"research_material_py_earth_jute_sample", "earth-jute-sample", {"earth-jute-sample"}, "item"},
     {"research_material_py_earth_venus_fly_sample", "earth-venus-fly-sample", {"earth-venus-fly-sample"}, "item"},
-    {"research_material_py_earth_palmtree_sample", "earth-palmtree-sample", {"earth-palmtree-sample"}, "item"}
+    {"research_material_py_earth_palmtree_sample", "earth-palmtree-sample", {"earth-palmtree-sample"}, "item"},
+    {"research_material_py_log", "log", {"log1", "log2", "log3", "log4", "log5", "log6", "log7", "log8", "log7-2"}, "item"},
+    {"research_material_py_wood", "wood", {"log-wood"}, "item"},
+    {"research_material_py_treated_wood", "treated-wood", {"treated-wood"}, "item"}
   }
   for _, subject in ipairs(subjects) do
     local key, fluid, routes = subject[1], subject[2], subject[3]
@@ -1245,7 +1248,10 @@ end
     {"research_material_ric_coke", "ric-coke", "ric-carbonise-marine-biomass"},
     {"research_material_gold", "angels-wire-gold", "angels-wire-gold-2", {angelssmelting = "fixture"}},
     {"research_material_silver", "angels-wire-silver", "angels-wire-silver-2", {angelssmelting = "fixture"}},
-    {"research_material_platinum", "angels-wire-platinum", "angels-wire-platinum-2", {angelssmelting = "fixture"}}
+    {"research_material_platinum", "angels-wire-platinum", "angels-wire-platinum-2", {angelssmelting = "fixture"}},
+    {"research_material_py_log", "log", "log1", {pycoalprocessing = "fixture"}},
+    {"research_material_py_wood", "wood", "log-wood", {pycoalprocessing = "fixture"}},
+    {"research_material_py_treated_wood", "treated-wood", "treated-wood", {pycoalprocessing = "fixture"}}
   }
   local function selected(spec, raw)
     local before = test_fingerprint(raw)
@@ -1274,8 +1280,18 @@ end
         local results = {{type = kind or "item", name = output or product, amount = 1,
           ignored_by_productivity = ignored}}
         if coproduct then results[#results + 1] = {type = "item", name = "unrelated-byproduct", amount = 1} end
-        return {name = name, allow_productivity = true,
-          ingredients = {{type = "item", name = "material-feed", amount = 1}}, results = results}
+        local ingredients = {{type = "item", name = "material-feed", amount = 1}}
+        -- Preserve the source-observed ordinary forestry shapes, especially
+        -- the input-free harvest and mixed fluid/item treated-wood process.
+        if name == "log1" then
+          ingredients = {}
+        elseif name == "log-wood" then
+          ingredients = {{type = "item", name = "log", amount = 4}}
+        elseif name == "treated-wood" then
+          ingredients = {{type = "fluid", name = "creosote", amount = 100},
+            {type = "item", name = "wood", amount = 1}}
+        end
+        return {name = name, allow_productivity = true, ingredients = ingredients, results = results}
       end
       check(#selected(spec, raw()) == 1, "ordinary final material product stays admitted: " .. line .. "/" .. name)
       check(#selected(spec, raw("item", "unrelated-material")) == 0,
