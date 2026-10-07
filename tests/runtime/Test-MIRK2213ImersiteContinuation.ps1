@@ -68,9 +68,10 @@ function Read-K2213DependencyInputs($Observation,[Collections.IDictionary]$Expec
   return $inputs
 }
 function Invoke-MIRCompatFactorioProcess {
-  param([string]$FactorioBin,[object[]]$ArgumentList,[string]$StdoutPath,[string]$StderrPath,[int]$TimeoutSeconds)
+  param([string]$FactorioBin,[object[]]$ArgumentList,[string]$StdoutPath,[string]$StderrPath,[int]$TimeoutSeconds,$LibraryActivation)
   # Preserve the existing create/reload collector and its exact oracles,
-  # while charging their native actors to one owned row and strict lease.
+  # while charging their native actors to one owned row over the active library.
+  Assert-MIRLibraryLaunch -Activation $LibraryActivation -FactorioBin $FactorioBin -Arguments ([string[]]$ArgumentList)
   $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $FactorioBin -Arguments ([string[]]$ArgumentList) -TimeoutSeconds $TimeoutSeconds
   Copy-Item -LiteralPath $actor.stdout -Destination $StdoutPath
   Copy-Item -LiteralPath $actor.stderr -Destination $StderrPath
@@ -119,6 +120,41 @@ function Assert-K2213ArchiveIdentity {
   Assert-K2213 ([string]$info.name -ceq $ExpectedName) "archive-name:$ExpectedName"
   Assert-K2213 ([string]$info.version -ceq $ExpectedVersion) "archive-version:$ExpectedName"
 }
+function Read-K2213DirectLibraryInputs {
+  param([string]$Library,[object[]]$Inputs,[string]$FixtureRoot)
+  Assert-MIRLibraryPath $Library
+  $hashes=[ordered]@{}
+  $rows=@(foreach($name in @('base','elevated-rails','quality','recycler','space-age')){[ordered]@{name=$name;version='2.1.20';enabled=$true}})
+  foreach($inputRow in $Inputs){
+    $archive=Join-Path $Library ([string]$inputRow.file_name)
+    # Acquisition is separate. Missing library members do not trigger a copy,
+    # a link, a download or recovery of an obsolete populated profile.
+    Assert-K2213ArchiveIdentity -Path $archive -ExpectedName $inputRow.identity.name -ExpectedVersion $inputRow.identity.version -ExpectedSha256 $inputRow.expected_sha256
+    $hashes[$inputRow.file_name]=[string]$inputRow.expected_sha256
+    $rows+=[ordered]@{name=$inputRow.identity.name;version=$inputRow.identity.version;enabled=$true}
+  }
+  $info=Get-Content -LiteralPath (Join-Path $FixtureRoot 'info.json') -Raw|ConvertFrom-Json
+  $name=$info.name+'_'+$info.version+'.zip'
+  $fixtureArchive=Join-Path $Library $name
+  Assert-K2213 (Test-Path -LiteralPath $fixtureArchive -PathType Leaf) 'install-current-fixture-once-in-library'
+  Assert-MIRLibraryPath $fixtureArchive
+  $sourceFiles=@(Get-ChildItem -LiteralPath $FixtureRoot -Recurse -File)
+  $zip=[IO.Compression.ZipFile]::OpenRead($fixtureArchive)
+  try{
+    Assert-K2213 ($zip.Entries.Count -eq $sourceFiles.Count) 'library-fixture-membership'
+    foreach($file in $sourceFiles){
+      $relative=[IO.Path]::GetRelativePath($FixtureRoot,$file.FullName).Replace('\','/')
+      $entry=$zip.GetEntry($info.name+'_'+$info.version+'/'+$relative)
+      Assert-K2213 ($null -ne $entry -and $entry.Length -eq $file.Length) "library-fixture-member:$relative"
+      $stream=$entry.Open()
+      try{$hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))}finally{$stream.Dispose()}
+      Assert-K2213 ($hash -ceq (Get-K2213Sha256 $file.FullName)) "library-fixture-source:$relative"
+    }
+  }finally{$zip.Dispose()}
+  $hashes[$name]=Get-K2213Sha256 $fixtureArchive
+  $rows+=[ordered]@{name=$info.name;version=$info.version;enabled=$true}
+  return [pscustomobject]@{mod_list=[ordered]@{mods=$rows};archive_hashes=$hashes;fixture_archive=$fixtureArchive}
+}
 function Get-K2213FixtureEnvelope {
   param([Parameter(Mandatory)][string]$Path)
   $text = Get-Content -Raw -LiteralPath $Path
@@ -138,25 +174,25 @@ function Get-K2213FixtureEnvelope {
   return [pscustomobject][ordered]@{id=$fixtureId;path='fixtures/assert-k2-213-imersite-continuation';raw_sha256=Get-K2213Sha256 $Path}
 }
 function New-K2213FailureResult {
-  param([string]$RunRoot,[string]$Message,$Lease,$Resources)
+  param([string]$RunRoot,[string]$Message,$Activation,$Resources)
   if ([string]::IsNullOrWhiteSpace($RunRoot) -or -not (Test-Path -LiteralPath $RunRoot -PathType Container)) { return }
   $terminal = $null
-  if ($null -ne $Lease -and -not [bool]$Lease.closed) {
-    try { $terminal = Complete-MIRImmutableInputLease -Lease $Lease -Outcome failed } catch {}
+  if ($null -ne $Activation -and -not [bool]$Activation.closed) {
+    try { $terminal = Complete-MIRLibraryActivation -Activation $Activation } catch { $terminal=@{status='recovery-required';library=$Activation.library;error=$_.Exception.Message} }
   }
   $record = [ordered]@{
-    schema=1;kind='MIR42K2213ImersiteContinuationRuntimeResultV1';status='failed';
+    schema=2;kind='MIR42K2213ImersiteContinuationRuntimeResultV2';status='failed';
     generated_at=(Get-Date).ToUniversalTime().ToString('o');failure=[string]$Message;
     scope='exact-current-f210-k2-k2so-imersite-powder-continuation-create-and-single-reload';
     qualification=$false;support_claim=$false;release_authority=$false;publication=$false;
-    immutable_input_staging=$terminal
+    library_activation=$terminal
     resource_runs=if($Resources){$Resources.runs.ToArray()}else{@()}
   }
   if($Resources){Write-MIRNativeProbeResult -Context $Resources -Record $record}
 }
 
 $runRoot = ''
-$lease = $null
+$activation = $null
 $resources = $null
 try {
   $engine = (Resolve-Path -LiteralPath $FactorioBin).Path
@@ -181,10 +217,9 @@ try {
   foreach ($dependency in @('base >= 2.1.20','Krastorio2 = 2.1.3','Krastorio2-spaced-out = 2.0.13','more-infinite-research = 4.2.21001')) {
     Assert-K2213 ($fixtureDependencies -contains $dependency) "fixture-dependency:$dependency"
   }
-  # Every run directory uses the same 32-character GUID width. Reject an
-  # overlong fixture path before leasing the immutable dependency archives.
-  $plannedFixtureArchive = Join-Path $outputRootFull ('run-' + ('0' * 32))
-  $plannedFixtureArchive = Join-Path $plannedFixtureArchive ('mods/' + [string]$fixtureInfo.name + '_' + [string]$fixtureInfo.version + '.zip')
+  Assert-K2213 ($LocalModLibraryDirs.Count -eq 1) 'one-active-flat-library-required'
+  $library=(Resolve-Path -LiteralPath $LocalModLibraryDirs[0]).Path
+  $plannedFixtureArchive = Join-Path $library ([string]$fixtureInfo.name + '_' + [string]$fixtureInfo.version + '.zip')
   Assert-MIRFactorioPathBudget -Path $plannedFixtureArchive -Context 'K2 continuation fixture archive path'
 
   $currentCandidate=Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $materializationPath
@@ -217,6 +252,7 @@ try {
   }
   $inputs = @(Read-K2213DependencyInputs -Observation $v5 -ExpectedDependencies $expectedDependencies -Libraries $LocalModLibraryDirs -ObservationPath $v5Path)
   $inputs += [ordered]@{source_path=$candidate;file_name=([IO.Path]::GetFileName($candidate));expected_sha256=([string]$materialization.archive_sha256);role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21001';materialization_record_sha256=[string]$materialization.record_sha256};provenance=[ordered]@{kind='current-candidate-materialization';raw_materialization_sha256=Get-K2213Sha256 $materializationPath};immutable=$true}
+  $directInputs=Read-K2213DirectLibraryInputs -Library $library -Inputs $inputs -FixtureRoot $fixtureRoot
 
   if ($PreflightOnly) {
     [pscustomobject][ordered]@{
@@ -229,6 +265,8 @@ try {
       runtime_api_sha256=Get-K2213Sha256 $runtimeApi
       fixture_registry_sha256=$fixtureRegistry.raw_sha256
       dependency_count=$expectedDependencies.Count
+      library=$library
+      fixture_archive_sha256=$directInputs.archive_hashes[[IO.Path]::GetFileName($directInputs.fixture_archive)]
       execution_started=$false
     } | ConvertTo-Json -Depth 20
     return
@@ -238,21 +276,20 @@ try {
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
   $runRoot=$resources.root
   [IO.Directory]::CreateDirectory($runRoot) | Out-Null
-  $mods = Join-Path $runRoot 'mods'
-  [IO.Directory]::CreateDirectory($mods) | Out-Null
   [IO.Directory]::CreateDirectory((Join-Path $runRoot 'saves')) | Out-Null
-  $lease = New-MIRImmutableInputLease -RunRoot $runRoot -StageDirectory $mods -Inputs $inputs -RequireHardLinks
-  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $lease
   $versionRun=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 30
   $engineVersion=(Get-Content -LiteralPath $versionRun.stdout -Raw).Trim()
   Assert-K2213 ($engineVersion -match '(?m)^Version:\s*2[.]1[.]20(?:\s|$)') 'engine-version'
-  $fixtureArchive = Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name ([string]$fixtureInfo.name) -Version ([string]$fixtureInfo.version) -ModsDir $mods
-  Assert-K2213ArchiveIdentity -Path $fixtureArchive -ExpectedName ([string]$fixtureInfo.name) -ExpectedVersion ([string]$fixtureInfo.version) -ExpectedSha256 (Get-K2213Sha256 $fixtureArchive)
+  $fixtureArchive=$directInputs.fixture_archive
   # V5's exact current K2SO lock includes the four bundled Space Age modules.
   # They are part of the observed profile, rather than an inferred DLC choice.
   $enabled = @('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','xy-k2so-enhancements-nulls-fork','mir-validation-settings-overrides','more-infinite-research',[string]$fixtureInfo.name)
-  Write-MIRModList -ModsDir $mods -EnabledMods $enabled
-  $modListPath = Join-Path $mods 'mod-list.json'
+  $profilePath=Join-Path $runRoot 'selection.json'
+  [IO.File]::WriteAllText($profilePath,($directInputs.mod_list|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+  $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory (Join-Path $engineRoot 'data') -ProfilePath $profilePath -ArchiveHashes $directInputs.archive_hashes -SettingsMode Defaults
+  Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
+  $modListPath = Join-Path $runRoot 'active-mod-list.json'
+  [IO.File]::WriteAllBytes($modListPath,$activation.mod_list_bytes)
   $modList = Read-K2213Json -Path $modListPath -Code 'mod-list'
   $enabledRows = @($modList.mods | Where-Object {[bool]$_.enabled} | ForEach-Object {[string]$_.name} | Sort-Object)
   Assert-K2213 ((@($enabledRows) -join '|') -ceq (@($enabled | Sort-Object) -join '|')) 'mod-list-exact-enabled-closure'
@@ -262,33 +299,33 @@ try {
   }
   # The continuation fixture proves the current declaration's default zero
   # configuration.  It never inherits a settings file that V5 did not hash.
-  Assert-K2213 (-not (Test-Path -LiteralPath (Join-Path $mods 'mod-settings.dat') -PathType Leaf)) 'unexpected-unbound-mod-settings'
+  Assert-K2213 (-not (Test-Path -LiteralPath (Join-Path $library 'mod-settings.dat') -PathType Leaf)) 'unexpected-unbound-mod-settings'
 
-  $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -ScenarioTimeoutSeconds $CreateTimeoutSeconds
+  $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -ScenarioTimeoutSeconds $CreateTimeoutSeconds -LibraryActivation $activation
   Assert-K2213 ([bool]$load.passed -and -not [bool]$load.timed_out -and [int]$load.exit_code -eq 0) 'create'
   Assert-K2213 ([string]$load.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') 'create-stderr'
   $loadLog = [IO.File]::ReadAllText([string]$load.factorio_log)
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION_DATA]',[StringComparison]::Ordinal)) 'create-data-marker'
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION] stage=initial;completed_level=4;next_level=5;bonus=0.08;progress=0.42',[StringComparison]::Ordinal)) 'create-initial-marker'
-  $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42'
+  $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation
   Assert-K2213 ([bool]$reload.passed) 'single-reload'
-  $terminal = Complete-MIRImmutableInputLease -Lease $lease
-  $lease = $null
-  $null = Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal -Context 'K2 2.1.3 Imersite continuation input staging'
-  $dependencyArtifacts = @($terminal.inputs | Where-Object {[string]$_.role -ceq 'dependency-mod'} | ForEach-Object { ConvertTo-MIRImmutableInputArtifact -Receipt $terminal -InputRecord $_ -Locator (Get-K2213Relative ([string]$_.stage_path)) })
-  $candidateInput = @($terminal.inputs | Where-Object {[string]$_.role -ceq 'candidate'})
-  Assert-K2213 ($candidateInput.Count -eq 1) 'terminal-candidate-input'
-  $candidateArtifact = ConvertTo-MIRImmutableInputArtifact -Receipt $terminal -InputRecord $candidateInput[0] -Locator (Get-K2213Relative ([string]$candidateInput[0].stage_path))
+  # Capture locators while the archive read handles are still held; a later
+  # activation may select different MIR bytes under the same numeric version.
+  $dependencyArtifacts = @($inputs | Where-Object {[string]$_.role -ceq 'dependency-mod'} | ForEach-Object { Get-K2213Artifact (Join-Path $library $_.file_name) -AllowExternalInput })
+  $candidateArtifact = Get-K2213Artifact (Join-Path $library ([IO.Path]::GetFileName($candidate))) -AllowExternalInput
+  $fixtureArtifact = Get-K2213Artifact $fixtureArchive -AllowExternalInput
+  $terminal = Complete-MIRLibraryActivation -Activation $activation
+  $activation = $null
   $result = [ordered]@{
-    schema=1;kind='MIR42K2213ImersiteContinuationRuntimeResultV1';status='passed';generated_at=(Get-Date).ToUniversalTime().ToString('o');
+    schema=2;kind='MIR42K2213ImersiteContinuationRuntimeResultV2';status='passed';generated_at=(Get-Date).ToUniversalTime().ToString('o');
     scope='exact-current-f210-k2-k2so-imersite-powder-continuation-create-and-single-reload';
     qualification=$false;support_claim=$false;release_authority=$false;publication=$false;
     candidate=[ordered]@{archive=$candidateArtifact;materialization=Get-K2213Artifact $materializationPath;materialization_record_sha256=[string]$materialization.record_sha256;package_source_sha256=[string]$materialization.package_source_sha256};
     source=[ordered]@{commit=(& git -C $RepoRoot rev-parse HEAD).Trim();tree=(& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim();source_version='4.2.1';distribution_version='4.2.21001';harness=Get-K2213Artifact $PSCommandPath};
     predecessor_observation_lock=[ordered]@{result=Get-K2213Artifact $v5Path -AllowExternalInput;kind=[string]$v5.kind;status=[string]$v5.status;role='exact-engine-and-dependency-archive-lock-only';old_candidate_sha256=[string]$v5.candidate.sha256};
     engine=[ordered]@{path=Get-K2213PathIdentity $engine -AllowExternalInput;product_version='2.1.20';executable_sha256=$engineHash;bundled_runtime_api_sha256=Get-K2213Sha256 $runtimeApi};
-    fixture=[ordered]@{registration=$fixtureRegistry;files=@(Get-K2213Artifact $fixtureInfoPath;Get-K2213Artifact $fixtureDataPath;Get-K2213Artifact $fixtureControlPath);archive=Get-K2213Artifact $fixtureArchive};
-    input_staging=$terminal;dependency_archives=@($dependencyArtifacts | Sort-Object path);mod_list=Get-K2213Artifact $modListPath;startup_settings='candidate-defaults-no-unbound-mod-settings';
+    fixture=[ordered]@{registration=$fixtureRegistry;files=@(Get-K2213Artifact $fixtureInfoPath;Get-K2213Artifact $fixtureDataPath;Get-K2213Artifact $fixtureControlPath);archive=$fixtureArtifact};
+    library_activation=$terminal;dependency_archives=@($dependencyArtifacts | Sort-Object path);mod_list=Get-K2213Artifact $modListPath;startup_settings='candidate-defaults-no-unbound-mod-settings';
     create=[ordered]@{duration_seconds=$load.duration_seconds;save=Get-K2213Artifact $load.save;stdout=Get-K2213Artifact $load.stdout;stderr=Get-K2213Artifact $load.stderr;factorio_log=Get-K2213Artifact $load.factorio_log};
     reload=$reload;
     resource_runs=$resources.runs.ToArray();
@@ -299,6 +336,6 @@ try {
   Write-Host "[MIR42_K2_213_IMERSITE_CONTINUATION_RUNTIME] $(Get-K2213Relative $resultPath)"
 } catch {
   $failure = $_.Exception.Message
-  try{New-K2213FailureResult -RunRoot $runRoot -Message $failure -Lease $lease -Resources $resources}catch{Write-Warning 'Failed K2 result exceeded its output budget; owned ledgers remain preserved.'}
+  try{New-K2213FailureResult -RunRoot $runRoot -Message $failure -Activation $activation -Resources $resources}catch{Write-Warning 'Failed K2 result exceeded its output budget; owned ledgers remain preserved.'}
   throw
 }

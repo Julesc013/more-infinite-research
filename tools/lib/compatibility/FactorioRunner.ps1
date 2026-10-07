@@ -5,6 +5,7 @@ $mirCompatIdentityModule=New-Module -Name MIRCompatInputIdentity -ArgumentList (
   Export-ModuleMember -Function Get-MIRImmutableInputSha256,Get-MIRImmutableInputFileIdentity
 }
 Import-Module $mirCompatIdentityModule -Force
+. (Join-Path $PSScriptRoot 'LibraryActivation.ps1')
 
 function New-MIRCompatUserDataDir {
   param([Parameter(Mandatory)][string]$Root)
@@ -150,14 +151,15 @@ function Get-MIRCompatFileSha256 {param([string]$Path);if([string]::IsNullOrWhit
 function Copy-MIRCompatFactorioCurrentLog {param([string]$UserDataDir,[string]$Destination);$source=Join-Path $UserDataDir 'factorio-current.log';if(-not(Test-Path -LiteralPath $source -PathType Leaf)){return ''};Copy-Item -LiteralPath $source -Destination $Destination -Force;return $Destination}
 function Invoke-MIRCompatFactorioProcess {
   param([string]$FactorioBin,[object[]]$ArgumentList,[string]$StdoutPath,[string]$StderrPath,[int]$TimeoutSeconds,
-    [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0)
+    [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0,$LibraryActivation=$null)
   . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/Common.ps1')
   . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
   $work=Resolve-MIR441RecoveryScratchPath -Path (Split-Path -Parent $StdoutPath)
+  if($null -ne $LibraryActivation){Assert-MIRLibraryLaunch -Activation $LibraryActivation -FactorioBin $FactorioBin -Arguments $ArgumentList}
   foreach($flag in @('--config','--mod-directory','--create','--log-file')){
     if(@($ArgumentList|Where-Object {$_-ceq$flag}).Count-gt1){throw '[mir441-resource-factorio-duplicate-output-argument]'}
     $index=[Array]::IndexOf($ArgumentList,$flag)
-    if($index-ge0){if($index+1-ge$ArgumentList.Count){throw '[mir441-resource-factorio-output-argument]'};$null=Resolve-MIR441RecoveryScratchPath -Path ([string]$ArgumentList[$index+1])}
+    if($index-ge0){if($index+1-ge$ArgumentList.Count){throw '[mir441-resource-factorio-output-argument]'};if($flag -cne '--mod-directory' -or $null -eq $LibraryActivation){$null=Resolve-MIR441RecoveryScratchPath -Path ([string]$ArgumentList[$index+1])}}
   }
   $configIndex=[Array]::IndexOf($ArgumentList,'--config')
   if($configIndex-lt0){throw '[mir441-resource-factorio-config-required]'}
@@ -171,7 +173,7 @@ function Invoke-MIRCompatFactorioProcess {
     -StdoutPath $StdoutPath -StderrPath $StderrPath -TimeoutSeconds $TimeoutSeconds -AllowNonZeroExit
 }
 function Invoke-MIRFactorioLoadCheck {
-  param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[int]$ScenarioTimeoutSeconds=900)
+  param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[int]$ScenarioTimeoutSeconds=900,$LibraryActivation=$null)
   $safe=Get-MIRSafeScenarioFileName -Name $ScenarioName
   $save=Join-Path $UserDataDir "saves\$safe.zip";$stdout=Join-Path $UserDataDir "$safe.stdout.log";$stderr=Join-Path $UserDataDir "$safe.stderr.log";$factorioLog=Join-Path $UserDataDir "$safe.factorio.log"
   $binary=(Resolve-Path -LiteralPath $FactorioBin).Path;$factorioRoot=Split-Path -Parent(Split-Path -Parent(Split-Path -Parent $binary));$readData=Join-Path $factorioRoot 'data'
@@ -188,27 +190,34 @@ locale=auto
 [other]
 enable-steam-networking=false
 disable-blueprint-storage=true
+enable-new-mods=false
 "@
   Set-Content -LiteralPath $config -Value $configText -Encoding UTF8
   $currentLog=Join-Path $UserDataDir 'factorio-current.log';if(Test-Path -LiteralPath $currentLog){Remove-Item -LiteralPath $currentLog -Force}
-  $arguments=@('--config',$config,'--no-log-rotation','--create',$save,'--mod-directory',(Join-Path $UserDataDir 'mods'),'--disable-audio')
-  $process=Invoke-MIRCompatFactorioProcess -FactorioBin $binary -ArgumentList $arguments -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $ScenarioTimeoutSeconds
+  $mods=if($null -ne $LibraryActivation){$LibraryActivation.library}else{Join-Path $UserDataDir 'mods'}
+  $arguments=@('--config',$config,'--no-log-rotation','--create',$save,'--mod-directory',$mods,'--disable-audio')
+  $activationArgs=@{};if($null -ne $LibraryActivation){$activationArgs.LibraryActivation=$LibraryActivation}
+  $process=Invoke-MIRCompatFactorioProcess -FactorioBin $binary -ArgumentList $arguments -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $ScenarioTimeoutSeconds @activationArgs
   $captured=Copy-MIRCompatFactorioCurrentLog -UserDataDir $UserDataDir -Destination $factorioLog
+  if($null -ne $LibraryActivation -and $process.passed){$null=Assert-MIRLibraryLoadedSelection -Activation $LibraryActivation -LogPath $captured}
   $audit=if($captured-and(Get-Command Read-MIRAuditLog -ErrorAction SilentlyContinue)){@(Read-MIRAuditLog -Path $captured)}else{@()};$sanitation=if($captured-and(Get-Command Read-MIRSanitationLog -ErrorAction SilentlyContinue)){@(Read-MIRSanitationLog -Path $captured)}else{@()};$saveHash=Get-MIRCompatFileSha256 -Path $save
   [pscustomobject]@{scenario=$ScenarioName;exit_code=$process.exit_code;timed_out=$process.timed_out;timeout_seconds=$ScenarioTimeoutSeconds;duration_seconds=$process.duration_seconds;save=$save;save_sha256=$saveHash;stdout=$stdout;stdout_sha256=Get-MIRCompatFileSha256 $stdout;stderr=$stderr;stderr_sha256=Get-MIRCompatFileSha256 $stderr;factorio_log=$captured;factorio_log_sha256=Get-MIRCompatFileSha256 $captured;audit_rows=$audit;sanitation_rows=$sanitation;passed=$process.passed-and-not[string]::IsNullOrWhiteSpace($saveHash)-and-not[string]::IsNullOrWhiteSpace($captured)}
 }
 
 function Invoke-MIRFactorioBenchmarkReload {
-  param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[string]$SavePath,[ValidateRange(1,2)][int]$Ordinal,[ValidateRange(1,3600)][int]$MaximumDurationSeconds)
+  param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[string]$SavePath,[ValidateRange(1,2)][int]$Ordinal,[ValidateRange(1,3600)][int]$MaximumDurationSeconds,$LibraryActivation=$null)
   $userData=(Resolve-Path -LiteralPath $UserDataDir).Path;$save=(Resolve-Path -LiteralPath $SavePath).Path;$prefix=$userData.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
   if(-not$save.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){throw "Reload save is outside the compatibility user-data root: $save"}
   $inputHash=Get-MIRCompatFileSha256 $save;$safe=Get-MIRSafeScenarioFileName -Name $ScenarioName;$label="$safe.reload-{0:D2}"-f$Ordinal
   $stdout=Join-Path $userData "$label.stdout.log";$stderr=Join-Path $userData "$label.stderr.log";$factorioLog=Join-Path $userData "$label.factorio.log";$currentLog=Join-Path $userData 'factorio-current.log'
   if(Test-Path -LiteralPath $currentLog){Remove-Item -LiteralPath $currentLog -Force}
   $config=Join-Path $userData 'mir-compat-config.ini';$binary=(Resolve-Path -LiteralPath $FactorioBin).Path
-  $arguments=@('--config',$config,'--no-log-rotation','--disable-audio','--mod-directory',(Join-Path $userData 'mods'),'--benchmark',$save,'--benchmark-ticks','1','--benchmark-runs','1','--benchmark-sanitize')
-  $process=Invoke-MIRCompatFactorioProcess -FactorioBin $binary -ArgumentList $arguments -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $MaximumDurationSeconds
+  $mods=if($null -ne $LibraryActivation){$LibraryActivation.library}else{Join-Path $userData 'mods'}
+  $arguments=@('--config',$config,'--no-log-rotation','--disable-audio','--mod-directory',$mods,'--benchmark',$save,'--benchmark-ticks','1','--benchmark-runs','1','--benchmark-sanitize')
+  $activationArgs=@{};if($null -ne $LibraryActivation){$activationArgs.LibraryActivation=$LibraryActivation}
+  $process=Invoke-MIRCompatFactorioProcess -FactorioBin $binary -ArgumentList $arguments -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $MaximumDurationSeconds @activationArgs
   $captured=Copy-MIRCompatFactorioCurrentLog -UserDataDir $userData -Destination $factorioLog;$saveHash=Get-MIRCompatFileSha256 $save;$identical=-not[string]::IsNullOrWhiteSpace($inputHash)-and$saveHash-ceq$inputHash
+  if($null -ne $LibraryActivation -and $process.passed){$null=Assert-MIRLibraryLoadedSelection -Activation $LibraryActivation -LogPath $captured}
   $audit=if($captured-and(Get-Command Read-MIRAuditLog -ErrorAction SilentlyContinue)){@(Read-MIRAuditLog -Path $captured)}else{@()};$sanitation=if($captured-and(Get-Command Read-MIRSanitationLog -ErrorAction SilentlyContinue)){@(Read-MIRSanitationLog -Path $captured)}else{@()}
   $passed=$process.passed-and$process.duration_seconds-le$MaximumDurationSeconds-and$identical-and-not[string]::IsNullOrWhiteSpace($captured)
   [pscustomobject]@{ordinal=$Ordinal;status=if($passed){'passed'}else{'failed'};passed=$passed;exit_code=$process.exit_code;timed_out=$process.timed_out;duration_seconds=$process.duration_seconds;maximum_duration_seconds=$MaximumDurationSeconds;input_save_sha256=$inputHash;save_sha256=$saveHash;save_byte_identical=$identical;stdout=$stdout;stdout_sha256=Get-MIRCompatFileSha256 $stdout;stderr=$stderr;stderr_sha256=Get-MIRCompatFileSha256 $stderr;factorio_log=$captured;factorio_log_sha256=Get-MIRCompatFileSha256 $captured;audit_rows=$audit;sanitation_rows=$sanitation}
@@ -221,7 +230,8 @@ function Invoke-MIRFactorioReloadContract {
     [Parameter(Mandatory)][string]$SavePath,
     [ValidateRange(1, 2)][int]$RequiredReloadCount,
     [ValidateRange(1, 3600)][int]$MaxReloadDurationSeconds,
-    [string[]]$RequiredLogFragments = @()
+    [string[]]$RequiredLogFragments = @(),
+    $LibraryActivation=$null
   )
 
   $reloads = @()
@@ -232,7 +242,7 @@ function Invoke-MIRFactorioReloadContract {
       -ScenarioName $ScenarioName `
       -SavePath $SavePath `
       -Ordinal $ordinal `
-      -MaximumDurationSeconds $MaxReloadDurationSeconds
+      -MaximumDurationSeconds $MaxReloadDurationSeconds -LibraryActivation $LibraryActivation
     $reloadLogText = if (-not [string]::IsNullOrWhiteSpace([string]$reload.factorio_log) -and
         (Test-Path -LiteralPath ([string]$reload.factorio_log) -PathType Leaf)) {
       [IO.File]::ReadAllText([string]$reload.factorio_log)

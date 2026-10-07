@@ -1,11 +1,8 @@
 local techs = data.raw.technology or {}
 local recipes = data.raw.recipe or {}
 local is_space_age = mods and mods["space-age"] ~= nil
-local use_installed_space_age_icons =
-  settings
-  and settings.startup
-  and settings.startup["mir-use-installed-space-age-icons"]
-  and settings.startup["mir-use-installed-space-age-icons"].value == true
+-- mir-use-installed-space-age-icons cannot establish inactive file availability.
+local use_installed_space_age_icons = is_space_age
 local stream_registry = require("__more-infinite-research__.prototypes.mir.streams.registry")
 local stream_descriptor = require("__more-infinite-research__.prototypes.mir.domain.streams.descriptor")
 local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.domain.streams.raw_catalog")
@@ -18,6 +15,17 @@ local recipe_semantics = require("__more-infinite-research__.prototypes.mir.doma
 
 local function fail(message)
   error("MIR validation failed: " .. message)
+end
+
+if target_profile.features and target_profile.features.settings_profiles then
+  local shortcut = (data.raw.shortcut or {})["mir-research-browser"]
+  local icon = is_space_age and "__space-age__/graphics/technology/research-productivity.png"
+    or "__base__/graphics/icons/lab.png"
+  local size = is_space_age and 256 or 64
+  if not shortcut or shortcut.icon ~= icon or shortcut.small_icon ~= icon
+    or shortcut.icon_size ~= size or shortcut.small_icon_size ~= size then
+    fail("Research Library shortcut does not use available large/small artwork")
+  end
 end
 
 local blocked_pickup_effect_types = {
@@ -689,11 +697,12 @@ local function assert_generated_icon_badge(tech_name, tech)
 end
 
 local function assert_no_space_age_icon_path_in_base(tech_name, tech)
-  if is_space_age or use_installed_space_age_icons then return end
-
   for _, layer in ipairs((tech and tech.icons) or {}) do
-    if type(layer.icon) == "string" and string.find(layer.icon, "__space-age__", 1, true) then
-      fail("base-only generated technology " .. tech_name .. " resolved Space Age icon path " .. layer.icon .. ".")
+    for _, provider in ipairs({"space-age", "elevated-rails"}) do
+      if not (mods and mods[provider]) and type(layer.icon) == "string"
+        and string.find(layer.icon, "__" .. provider .. "__/", 1, true) then
+        fail("generated technology " .. tech_name .. " resolved inactive provider icon path " .. layer.icon .. ".")
+      end
     end
   end
 end
