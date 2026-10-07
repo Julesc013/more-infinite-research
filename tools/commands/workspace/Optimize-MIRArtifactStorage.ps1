@@ -274,6 +274,7 @@ foreach ($row in $plan) {
       -not (Test-MIRStoragePlainPathChain -Path $source -Root $sourceLibraries[0])) {
     throw "Storage optimization eligibility changed after planning: $target"
   }
+  Assert-MIRCheckoutHardLinkBoundary -Source $source -Destination $target
   if (-not $PSCmdlet.ShouldProcess($target, "replace verified duplicate with hard link to $source")) { continue }
 
   $temporary = Join-Path (Split-Path -Parent $target) ('.mir-relink-' + [guid]::NewGuid().ToString('N') + '.tmp')

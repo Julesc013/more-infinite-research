@@ -470,4 +470,32 @@ end)()
   end)
   data.raw=previous_raw
 end)()
+-- Temperature-demand caches must follow actual recipe-source replacement.
+;(function()
+  local routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+  local previous_raw=data.raw
+  local function producer(temperature)
+    return {hot={name='hot',enabled=true,energy_required=1,ingredients={},
+      results={{type='fluid',name='water',amount=1,temperature=temperature}}}}
+  end
+  data.raw={fluid={water={type='fluid',name='water',default_temperature=15,max_temperature=500}},
+    item={kit={type='item',name='kit',place_result='builder'}},resource={kit={minable={result='kit'}}},
+    ['assembling-machine']={builder={name='builder',crafting_categories={'crafting'},
+      fluid_boxes={{production_type='output'}}}},recipe=producer(165)}
+  compiler_context.with_active(compiler_context.new(),function()
+    local state={}
+    local demand={type='fluid',name='water',minimum_temperature=100}
+    check('TE/initial',routes.acquisition_witness(demand,nil,state)~=nil,
+      'The real acquisition consumer warms a temperature-qualified recipe')
+    local cold_epoch=recipe_facts.replace_source(producer(15),recipe_facts.source_epoch())
+    check('TE/cooled',routes.acquisition_witness(demand,nil,state)==nil,
+      'Actual recipe replacement invalidates the previously hot acquisition')
+    check('TE/unconstrained',routes.acquisition_witness({type='fluid',name='water'},nil,state)~=nil,
+      'The replacement still supplies an unconstrained cold-fluid demand')
+    recipe_facts.replace_source(data.raw.recipe,cold_epoch)
+    check('TE/restored',routes.acquisition_witness(demand,nil,state)~=nil,
+      'Restoring the hot recipe restores acquisition in the same state')
+  end)
+  data.raw=previous_raw
+end)()
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)

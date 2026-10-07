@@ -152,11 +152,43 @@ function Get-MIRNativeProbeRemainingOutputBytes {
   $usage=Get-MIR441TreeUsage -Path $Context.root
   if(-not $usage.complete) { throw '[mir441-resource-output-scan-incomplete]' }
   $newBytes=[int64]$usage.bytes-[int64]$Context.shared_alias_bytes
+  $activationProperty=$Context.PSObject.Properties['library_activation']
+  if($null -ne $activationProperty -and $null -ne $activationProperty.Value -and -not $activationProperty.Value.closed){
+    $activation=$activationProperty.Value
+    $controlBytes=0L
+    foreach($name in @('mod-list.json','mod-settings.dat','.mir-active-profile.json')){
+      foreach($suffix in @('','.mir-new')){
+        $path=Join-Path $activation.library ($name+$suffix)
+        if(Test-Path -LiteralPath $path){
+          Assert-MIRLibraryPath $path
+          $controlBytes+=[int64](Get-Item -LiteralPath $path).Length
+        }
+      }
+    }
+    # Archives remain outside the run and are never charged as new copies.
+    # Charge only additional control/journal bytes over the previous controls.
+    $newBytes += [Math]::Max(0L,$controlBytes-[int64]$Context.library_control_baseline_bytes)
+  }
   if($newBytes -lt 0) { throw '[mir-native-probe-shared-alias-missing]' }
   $remaining=[int64]$Context.max_new_output_bytes-$newBytes
   if(-not $IncludeResultReserve) { $remaining-=[int64]$Context.result_reserve_bytes }
   if($remaining -le 0) { throw '[mir441-resource-output-budget]' }
   return $remaining
+}
+
+function Add-MIRNativeProbeLibraryActivation {
+  param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)]$Activation)
+  if($Activation.closed -or -not $Activation.lock.CanRead -or
+    (Test-MIR441PathContained -Root $Context.root -Path $Activation.library)) {throw '[mir-native-probe-library-activation]'}
+  $previous=$Context.PSObject.Properties['library_activation']
+  if($null -ne $previous -and $null -ne $previous.Value -and -not $previous.Value.closed){throw '[mir-native-probe-library-already-active]'}
+  $baseline=0L
+  foreach($name in @('mod-list.json','mod-settings.dat')){
+    if($Activation.journal.controls[$name].exists){$baseline += [Convert]::FromBase64String($Activation.journal.controls[$name].bytes).Length}
+  }
+  $Context|Add-Member -NotePropertyName library_activation -NotePropertyValue $Activation -Force
+  $Context|Add-Member -NotePropertyName library_control_baseline_bytes -NotePropertyValue $baseline -Force
+  $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
 }
 
 function Invoke-MIRNativeProbeProcess {

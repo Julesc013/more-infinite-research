@@ -442,7 +442,7 @@ try {
     $flat=Join-Path $run 'flat-library';New-Item -ItemType Directory -Path $flat|Out-Null
     $dependency=Join-Path $flat 'controlled-k2_1.0.0.zip'
     $zip=[IO.Compression.ZipFile]::Open($dependency,[IO.Compression.ZipArchiveMode]::Create)
-    try{$stream=[IO.StreamWriter]::new($zip.CreateEntry('controlled-k2_1.0.0/info.json').Open());try{$stream.Write('{"name":"controlled-k2","version":"1.0.0"}')}finally{$stream.Dispose()}}finally{$zip.Dispose()}
+    try{$stream=[IO.StreamWriter]::new($zip.CreateEntry('controlled-k2_1.0.0/info.json').Open());try{$stream.Write('{"name":"controlled-k2","version":"1.0.0","factorio_version":"2.1"}')}finally{$stream.Dispose()}}finally{$zip.Dispose()}
     $retired=Join-Path $run 'retired-v5-profile/mods/controlled-k2_1.0.0.zip'
     $observation=[pscustomobject]@{staged_inputs=@([pscustomobject]@{source_path=$retired;sha256=Get-K2213Sha256 $dependency;source_match=$true;stage_match=$true})}
     $expected=[ordered]@{'controlled-k2_1.0.0.zip'=@('controlled-k2','1.0.0')}
@@ -480,6 +480,12 @@ try {
     $controlledEngine=Join-Path $run 'engine/bin/x64/factorio.exe'
     New-Item -ItemType Directory -Path (Split-Path -Parent $controlledEngine),(Join-Path $run 'engine/data'),(Join-Path $run 'saves')|Out-Null
     [IO.File]::WriteAllText($controlledEngine,'controlled actor locator; not an executable')
+    $data=Join-Path $run 'engine/data'
+    New-Item -ItemType Directory -Path (Join-Path $data 'base')|Out-Null
+    [IO.File]::WriteAllText((Join-Path $data 'base/info.json'),'{"name":"base","version":"2.1.20","dependencies":[]}')
+    $profilePath=Join-Path $run 'selection.json'
+    [IO.File]::WriteAllText($profilePath,'{"mods":[{"name":"base","version":"2.1.20","enabled":true},{"name":"controlled-k2","version":"1.0.0","enabled":true}]}')
+    $activation=Start-MIRLibraryActivation -LibraryDirectory $flat -EngineDataDirectory $data -ProfilePath $profilePath -ArchiveHashes @{'controlled-k2_1.0.0.zip'=(Get-K2213Sha256 $dependency)}
     $calls.Clear();$budgets=[Collections.Generic.List[object]]::new()
     function Get-MIRNativeProbeRemainingOutputBytes {param($Context);$budgets.Add($Context);return 1MB}
     function Invoke-MIRNativeProbeFactorioProcess {
@@ -488,18 +494,22 @@ try {
       if($Arguments-contains'controlled-failure'){throw 'controlled governed interruption'}
       $index=[Array]::IndexOf($Arguments,'--create')
       if($index-ge0){[IO.File]::WriteAllText($Arguments[$index+1],'controlled save; not Factorio data');$marker='initial'}else{$marker='reload'}
-      [IO.File]::WriteAllText((Join-Path $run 'factorio-current.log'),('[MIR42_K2_213_IMERSITE_CONTINUATION] stage='+$marker+';completed_level=4;next_level=5;bonus=0.08;progress=0.42'))
+      $lines=@($activation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$_.version+' (data.lua)'})
+      $lines+=('[MIR42_K2_213_IMERSITE_CONTINUATION] stage='+$marker+';completed_level=4;next_level=5;bonus=0.08;progress=0.42')
+      [IO.File]::WriteAllLines((Join-Path $run 'factorio-current.log'),$lines)
       [pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=0.01}}
     }
-    $create=Invoke-MIRFactorioLoadCheck -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -ScenarioTimeoutSeconds 90
-    $reload=Invoke-MIRFactorioReloadContract -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -SavePath $create.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 90 -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42'
+    try {
+    $create=Invoke-MIRFactorioLoadCheck -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -ScenarioTimeoutSeconds 90 -LibraryActivation $activation
+    $reload=Invoke-MIRFactorioReloadContract -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -SavePath $create.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 90 -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation
     Assert-Probe ($create.passed-and$reload.passed-and$calls.Count-eq2-and$budgets.Count-eq2) 'K2 create/reload collectors did not use the shared governed row.'
     Assert-Probe ($calls[0].context.controlled-and$calls[1].context.controlled-and$calls[0].path-ceq$controlledEngine-and$calls[0].timeout-eq90-and$calls[1].timeout-eq90) 'K2 collector lost actor/context/timeout identity.'
     Assert-Probe ('--create'-in$calls[0].arguments-and'--benchmark'-in$calls[1].arguments-and'--benchmark-sanitize'-in$calls[1].arguments-and$reload.reloads[0].save_byte_identical) 'K2 native create/reload arguments or saved-state custody changed.'
     Assert-Probe ($create.stderr_sha256-ceq'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855'-and$reload.reloads[0].reload_log_contract_passed) 'K2 collector lost stderr or exact reload-marker checks.'
     $refusedOut=Join-Path $run 'k2-refused.stdout';$refusedErr=Join-Path $run 'k2-refused.stderr'
-    Refuses-Probe {Invoke-MIRCompatFactorioProcess -FactorioBin $controlledEngine -ArgumentList @('controlled-failure') -StdoutPath $refusedOut -StderrPath $refusedErr -TimeoutSeconds 90} 'controlled governed interruption'
+    Refuses-Probe {Invoke-MIRCompatFactorioProcess -FactorioBin $controlledEngine -ArgumentList @($calls[0].arguments+'controlled-failure') -StdoutPath $refusedOut -StderrPath $refusedErr -TimeoutSeconds 90 -LibraryActivation $activation} 'controlled governed interruption'
     Assert-Probe ($budgets.Count-eq2-and-not(Test-Path -LiteralPath $refusedOut)-and-not(Test-Path -LiteralPath $refusedErr)) 'K2 collector continued or wrote success after governed interruption.'
+    } finally {$null=Complete-MIRLibraryActivation $activation}
   }
   $auditRun=Join-Path $fixture 'material-audit';New-Item -ItemType Directory -Path $auditRun|Out-Null
   $auditLease=New-MIRMaterialAuditInputLease -RunRoot $auditRun -ModsDirectory (Join-Path $auditRun 'mods') -CandidateArchive $auditCandidate -DependencyDirectory $fixture -ExpectedArchives ([ordered]@{'dependency.zip'=$archiveInput.expected_sha256})

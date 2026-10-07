@@ -29,7 +29,7 @@ This file records local image assets packaged by More Infinite Research. Generat
 Policy:
 
 - Do not copy original Space Age PNGs or other DLC asset files into this mod as base-only fallbacks.
-- Direct official DLC icon references such as `__space-age__` or `__elevated-rails__` are allowed only as prototype paths gated by `mir-use-installed-space-age-icons`; they are not packaged assets.
+- Direct official DLC icon references such as `__space-age__` or `__elevated-rails__` require the corresponding active provider; they are not packaged assets. The retained `mir-use-installed-space-age-icons` setting, including an imported value, cannot establish that inactive DLC files exist. Shortcut and technology artwork use the same active-provider query and fall back when it is unavailable.
 - Target-line fallback overlays should reference assets already present in the active Factorio install. Prefer the same high-resolution stock core technology badge layers used by the target game's own technology helpers, such as `__core__/graphics/icons/technology/constants/*`, for technology tile overlays. The smaller `__core__/graphics/icons/technology/effect-constant/*` sprites are effect row utility art and should not be used as technology tile badges unless a target line has no high-resolution equivalent and the substitution is documented.
 - If a target line has no separate technology constant/control icon assets and no documented native modifier icon surface, do not simulate badges from unrelated technology art. Use the best target-era main technology texture and locale text instead.
 - Any future MIR-owned or third-party local art must be added to this table with an explicit source and redistribution note before package validation can pass.

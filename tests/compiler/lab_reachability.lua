@@ -236,7 +236,7 @@ local function native_pump_world()
   r.recipe.make_builder = recipe('make_builder','builder-kit')
   r.recipe.make_lab.category = 'chemistry'
   r.recipe.make_lab.ingredients = {{type='fluid',name='water',amount=1}}
-  r.fluid = {water={type='fluid',name='water'}}
+  r.fluid = {water={type='fluid',name='water',default_temperature=15,max_temperature=100}}
   r['offshore-pump'] = {native={type='offshore-pump',name='native',
     fluid_source_offset={0,-1},pumping_speed=20,fluid_box={production_type='output'}}}
   r.tile = {water={type='tile',name='water',fluid='water'}}
@@ -298,12 +298,12 @@ run(raw, function()
 end)
 local function native_boiler_world()
   local r=native_pump_world()
-  r.boiler={boiler={type='boiler',name='boiler',fluid_box={filter='water'},
+  r.boiler={boiler={type='boiler',name='boiler',mode='output-to-separate-pipe',fluid_box={filter='water'},
     output_fluid_box={filter='steam'},target_temperature=165,energy_consumption='1.8MW',
     energy_source={type='burner'}}}
   r.item['boiler-kit']={type='item',name='boiler-kit',place_result='boiler'}
   r.recipe.make_boiler=recipe('make_boiler','boiler-kit')
-  r.fluid.steam={type='fluid',name='steam'}
+  r.fluid.steam={type='fluid',name='steam',default_temperature=15,max_temperature=1000}
   r.recipe.make_lab.ingredients={{type='fluid',name='steam',amount=1}}
   return r
 end
@@ -950,4 +950,137 @@ run(raw, function()
   check('LRF/frontier/gate',#gates==1 and gates[1]=='BuilderUnlock',
     'The fluid-producing science route retains its actual machine unlock')
 end)
+-- Temperature is part of fluid acquisition, including the pack's actual
+-- machine/source/unlock chain. All worlds below are complete controlled
+-- inputs; these checks do not claim native heat, throughput or logistics proof.
+local function temperature_world(demand)
+  local r=fluid_world()
+  add_fluid_builder(r)
+  r.fluid.water.default_temperature=15
+  r.fluid.water.max_temperature=500
+  r.recipe.make_B.ingredients={{type='fluid',name='water',amount=1,
+    temperature=demand.temperature,minimum_temperature=demand.minimum_temperature,
+    maximum_temperature=demand.maximum_temperature}}
+  return r
+end
+for _, case in ipairs({
+  {id='unconstrained-cold',demand={},expected=true},
+  {id='cold-below-minimum',demand={minimum_temperature=100},expected=false},
+  {id='cold-at-minimum',demand={minimum_temperature=15},expected=true},
+  {id='cold-at-maximum',demand={maximum_temperature=15},expected=true},
+  {id='cold-above-maximum',demand={maximum_temperature=10},expected=false},
+  {id='exact-cold',demand={temperature=15},expected=true},
+  {id='exact-hot-missing',demand={temperature=100},expected=false},
+  {id='exact-overrides-range',demand={temperature=15,minimum_temperature=100,maximum_temperature=0},expected=true},
+  {id='inverted-range',demand={minimum_temperature=100,maximum_temperature=0},expected=false},
+  {id='nonfinite-demand',demand={minimum_temperature=math.huge},expected=false},
+  {id='hot-resource',source_temperature=165,demand={minimum_temperature=100},expected=true},
+  {id='hot-resource-above-maximum',source_temperature=165,demand={maximum_temperature=100},expected=false},
+  {id='recipe-default-cold',producer=true,demand={minimum_temperature=100},expected=false},
+  {id='recipe-explicit-hot',producer=true,source_temperature=165,demand={minimum_temperature=100},expected=true},
+  {id='recipe-exact-hot',producer=true,source_temperature=165,demand={temperature=165},expected=true},
+  {id='recipe-too-hot',producer=true,source_temperature=165,demand={maximum_temperature=100},expected=false},
+  {id='cold-and-hot-mixture',mixed=true,demand={temperature=100},expected=true},
+  {id='mixture-range',mixed=true,demand={minimum_temperature=50,maximum_temperature=80},expected=true},
+  {id='mixture-cannot-overheat',mixed=true,demand={minimum_temperature=200},expected=false},
+  {id='mixture-cannot-cool',mixed=true,demand={maximum_temperature=10},expected=false},
+  {id='missing-temperature-fact',unknown=true,demand={minimum_temperature=100},expected=false}
+}) do
+  raw=temperature_world(case.demand)
+  raw.resource.water.minable.results[1].temperature=case.source_temperature
+  if case.unknown then raw.fluid.water.default_temperature=nil end
+  if case.producer then
+    raw.resource={}
+    raw.recipe.make_water=recipe('make_water','water')
+    raw.recipe.make_water.results={{type='fluid',name='water',amount=1,temperature=case.source_temperature}}
+  end
+  if case.mixed then
+    raw.resource.hot_water={minable={results={{type='fluid',name='water',amount=1,temperature=165}}}}
+  end
+  run(raw,function()
+    local before=fingerprint.of(data.raw)
+    check('LRT/'..case.id,production.pack_production_status('B',{})==(case.expected and 'initial' or 'unreachable'),
+      'Actual pack acquisition respects the available fluid temperatures: '..case.id)
+    check('LRT/'..case.id..'/research',
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Actual science/lab researchability consumes the temperature demand: '..case.id)
+    check('LRT/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Temperature selection preserves prototype inputs: '..case.id)
+  end)
+end
+local temperature_routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+raw=temperature_world({})
+run(raw,function()
+  local state={}
+  for _, case in ipairs({
+    {id='any',expected=true}, {id='hot',minimum_temperature=100,expected=false},
+    {id='cold',maximum_temperature=20,expected=true},
+    {id='hot-again',minimum_temperature=100,expected=false},
+    {id='exact',temperature=15,expected=true}
+  }) do
+    local demand={type='fluid',name='water',temperature=case.temperature,
+      minimum_temperature=case.minimum_temperature,maximum_temperature=case.maximum_temperature}
+    check('LRT/memo/'..case.id,(temperature_routes.acquisition_witness(demand,nil,state)~=nil)==case.expected,
+      'Shared query state cannot reuse a different temperature demand: '..case.id)
+  end
+  check('LRT/callback/boolean',temperature_routes.source_witness(
+    {type='fluid',name='water',minimum_temperature=100},{source_witness=function()return true end})==nil,
+    'A name-only declared source cannot invent a constrained fluid temperature')
+  check('LRT/callback/temperature',temperature_routes.source_witness(
+    {type='fluid',name='water',minimum_temperature=100},
+    {source_witness=function()return {product={type='fluid',name='water',temperature=165}} end})~=nil,
+    'A declared source may supply a concrete matching temperature')
+end)
+for _, case in ipairs({
+  {id='hot-unlock',demand={minimum_temperature=100},expected='research'},
+  {id='mixed-unlock',demand={temperature=100},expected='research'},
+  {id='self-lock',demand={minimum_temperature=100},self_lock=true,expected='unreachable'},
+  {id='cold-research-memo',demand={minimum_temperature=100},cold_only=true,expected='unreachable'}
+}) do
+  raw=temperature_world(case.demand)
+  raw.recipe.make_hot=recipe('make_hot','water',false)
+  raw.recipe.make_hot.results={{type='fluid',name='water',amount=1,temperature=case.cold_only and 15 or 165}}
+  raw.technology.HeatUnlock=research({case.self_lock and 'B' or 'A'})
+  raw.technology.HeatUnlock.effects={{type='unlock-recipe',recipe='make_hot'}}
+  if case.cold_only then
+    raw.resource={}
+    table.insert(raw.recipe.make_B.ingredients,1,{type='fluid',name='water',amount=1,maximum_temperature=20})
+  end
+  run(raw,function()
+    check('LRT/frontier/'..case.id,production.pack_production_status('B',{})==case.expected,
+      'A temperature-constrained source retains its actual research boundary: '..case.id)
+    if case.expected=='research' then
+      local gates=production.prereq_techs_for_science_pack('B')
+      check('LRT/frontier/'..case.id..'/gate',#gates==1 and gates[1]=='HeatUnlock',
+        'Heating or mixing retains the selected hot-fluid recipe unlock')
+    end
+  end)
+end
+for _, case in ipairs({
+  {id='conversion-matches',minimum=165,expected=true},
+  {id='conversion-too-cold',minimum=200,expected=false},
+  {id='conversion-too-hot',maximum=100,expected=false},
+  {id='inside-ignores-output-filter',mode='heat-fluid-inside',minimum=100,expected=false},
+  {id='default-mode-ignores-output-filter',default_mode=true,minimum=100,expected=false},
+  {id='inside-heats-seed',mode='heat-fluid-inside',same_fluid=true,minimum=100,expected=true},
+  {id='inside-max-limit',mode='heat-fluid-inside',same_fluid=true,minimum=200,expected=false},
+  {id='same-fluid-separate-pipe',same_fluid=true,minimum=165,expected=true},
+  {id='same-fluid-no-seed',same_fluid=true,minimum=165,no_seed=true,expected=false},
+  {id='inside-no-seed',mode='heat-fluid-inside',same_fluid=true,minimum=100,no_seed=true,expected=false}
+}) do
+  raw=native_boiler_world()
+  if case.mode then raw.boiler.boiler.mode=case.mode end
+  if case.default_mode then raw.boiler.boiler.mode=nil end
+  if case.same_fluid then
+    raw.boiler.boiler.output_fluid_box.filter='water'
+    raw.recipe.make_lab.ingredients[1].name='water'
+  end
+  if case.no_seed then raw.tile={} end
+  raw.recipe.make_lab.ingredients[1].minimum_temperature=case.minimum
+  raw.recipe.make_lab.ingredients[1].maximum_temperature=case.maximum
+  run(raw,function()
+    check('LRT/boiler/'..case.id,lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+      'Actual lab acquisition respects boiler mode, seed and temperature: '..case.id)
+  end)
+end
 print('MIR-LAB-REACHABILITY-PASS ' .. checks)
