@@ -8,8 +8,10 @@ function Get-MIR421SpaceFakeUpgradeDescriptor {
       $FixtureName -cne $expectedFixture -or $Archetype -cne $expectedArchetype) { throw '[mir421-sif-transition]' }
   $line = if ($Target -ceq 'f210') { '2.1' } else { '2.0' }
   $inputs = if ($Target -ceq 'f210') { @(
-    [pscustomobject]@{name='space-is-fake';version='1.0.76';sha256='064F2DF2D669AA0EE12A27146EFA32B5243AEBA86D7B72241A540D635F0461FF'},
-    [pscustomobject]@{name='cr-commons';version='1.0.32';sha256='75C8010ADBB03173E46C1E6A52E64239C3A837C826E385706AC0C9C6EDA69CDC'}
+    # 1.0.76 fails native 2.1.21 item validation before save creation; 1.0.78
+    # carries the upstream fuel-categories correction and requires commons .33.
+    [pscustomobject]@{name='space-is-fake';version='1.0.78';sha256='3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13'},
+    [pscustomobject]@{name='cr-commons';version='1.0.33';sha256='378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB'}
   ) } else { @(
     [pscustomobject]@{name='space-is-fake';version='1.0.60';sha256='860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC'},
     [pscustomobject]@{name='cr-commons';version='1.0.27';sha256='6F3622AE6270F9B365A9E2E07FA5E07B61B2BBFCAB3A4D930CC410EBDEB63B92'}
@@ -120,6 +122,14 @@ function Assert-MIR421SpaceFakeUpgradeMarker {
 function Add-MIR421SpaceFakeUpgradeOracle {
   param([Parameter(Mandatory)][string]$ControlText)
   if ($ControlText.Contains('require("mir421_space_fake_upgrade")')) { throw '[mir421-sif-fixture-anchor]' }
+  # This scenario always enables Space Age. Its native data updates remove
+  # mining-productivity-4 and make mining-productivity-3 infinite. Keep the
+  # F200 fixture's earned level and queued progress checks on that native owner.
+  $baseMiningAnchor='local technology_name="mining-productivity-4"'
+  if($ControlText.Contains($baseMiningAnchor)){
+    if([regex]::Matches($ControlText,[regex]::Escape($baseMiningAnchor)).Count-ne1){throw '[mir421-sif-fixture-anchor]'}
+    $ControlText=$ControlText.Replace($baseMiningAnchor,'local technology_name="mining-productivity-3"')
+  }
   # Specialize only the disposable copy of the existing generated fixture.
   # Preserve its research/progress oracle and require each insertion anchor once.
   $anchors = @(

@@ -122,6 +122,9 @@ try {
     Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor @bad} 'sif-transition'
     $control=Get-Content -Raw -LiteralPath (Join-Path $repo ('fixtures/'+$sifArguments.FixtureName+'/control.lua'))
     $specialized=Add-MIR421SpaceFakeUpgradeOracle -ControlText $control
+    if($target-ceq'f200'){
+      Assert-Probe ($control.Contains('local technology_name="mining-productivity-4"') -and $specialized.Contains('local technology_name="mining-productivity-3"') -and $specialized.Contains('tech.level=5') -and $specialized.Contains('expected_progress=0.37')) 'SIF must retain level/progress checks on the Space Age native mining owner without changing the base-only fixture.'
+    }
     Assert-Probe ($specialized.Contains('sif.capture()') -and $specialized.Contains('sif.verify("upgrade")') -and $specialized.Contains('sif.verify("reload")') -and $specialized.Contains('force.research_progress=expected_progress')) "actual $target staged fixture lost the original research oracle."
     Refuses-Probe {Add-MIR421SpaceFakeUpgradeOracle -ControlText $specialized} 'sif-fixture-anchor'
   }
