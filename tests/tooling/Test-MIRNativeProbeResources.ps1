@@ -810,59 +810,95 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   Assert-Probe ((Get-MIRImmutableInputSha256 $source) -ceq $archiveInput.expected_sha256) 'controlled recovery changed a canonical input.'
 
   $browserJob=Join-Path $fixture 'browser-lifecycle'
-  $mirInput=[ordered]@{};foreach($entry in $archiveInput.GetEnumerator()){$mirInput[$entry.Key]=$entry.Value};$mirInput.role='mir-candidate';$mirInput.file_name='more-infinite-research_4.2.20001.zip'
-  $fixtureInput=[ordered]@{};foreach($entry in $archiveInput.GetEnumerator()){$fixtureInput[$entry.Key]=$entry.Value};$fixtureInput.role='continuity-fixture';$fixtureInput.file_name='continuity-fixture.zip'
-  $profileInputs=@($mirInput,$fixtureInput)
-  $profile=New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase initial -Inputs $profileInputs
-  Assert-Probe ((Get-MIRImmutableInputFileIdentity (Join-Path $profile.mods $mirInput.file_name)) -ceq (Get-MIRImmutableInputFileIdentity $source)) 'browser lifecycle initial profile copied its archive.'
-  [IO.File]::WriteAllText((Join-Path $profile.mods 'mod-settings.dat'),'private settings')
-  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase configured -Inputs @($archiveInput) -PreviousProfile $profile} 'previous-profile-active'
-  $terminal=Complete-MIRImmutableInputLease -Lease $profile.lease -Outcome passed
-  $priorSettings=Join-Path $profile.mods 'mod-settings.dat'
-  foreach($phase in @('configured','removed','readded')){
-    $phaseInputs=if($phase-ceq'removed'){@($profileInputs|Where-Object role -ne 'mir-candidate')}else{$profileInputs}
-    $profile=New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase $phase -Inputs $phaseInputs -PreviousProfile $profile
-    Assert-Probe (-not(Test-Path -LiteralPath $priorSettings) -and (Get-Content -LiteralPath (Join-Path $profile.mods 'mod-settings.dat') -Raw) -ceq 'private settings') "browser $phase copied or lost private settings."
-    Assert-Probe ((Get-MIRImmutableInputFileIdentity (Join-Path $profile.mods $fixtureInput.file_name)) -ceq (Get-MIRImmutableInputFileIdentity $source)) "browser $phase lost shared archive identity."
-    Assert-Probe ((Test-Path -LiteralPath (Join-Path $profile.mods $mirInput.file_name))-eq($phase-cne'removed')) "browser $phase has the wrong literal MIR presence."
-    $terminal=Complete-MIRImmutableInputLease -Lease $profile.lease -Outcome passed
-    $priorSettings=Join-Path $profile.mods 'mod-settings.dat'
+  $browserLibrary=Join-Path $browserJob 'library';$browserData=Join-Path $browserJob 'engine/data'
+  [IO.Directory]::CreateDirectory($browserLibrary)|Out-Null
+  [IO.Directory]::CreateDirectory((Join-Path $browserData 'base'))|Out-Null
+  [IO.File]::WriteAllText((Join-Path $browserData 'base/info.json'),' {"name":"base","version":"2.0.77","dependencies":[]}')
+  function New-BrowserInput([string]$Name,[string]$Version,[string]$Role){
+    $path=Join-Path $browserLibrary ($Name+'_'+$Version+'.zip')
+    $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
+    try{$entry=$zip.CreateEntry($Name+'_'+$Version+'/info.json');$writer=[IO.StreamWriter]::new($entry.Open());try{$writer.Write((@{name=$Name;version=$Version;factorio_version='2.0';dependencies=@('base >= 2.0.0')}|ConvertTo-Json))}finally{$writer.Dispose()}}finally{$zip.Dispose()}
+    [ordered]@{source_path=$path;file_name=[IO.Path]::GetFileName($path);expected_sha256=Get-MIRImmutableInputSha256 $path;role=$Role}
   }
-  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase readded -Inputs @($archiveInput) -PreviousProfile $profile} 'profile-preserved'
-  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase '../outside' -Inputs @($archiveInput)} 'profile-phase'
+  $mirInput=New-BrowserInput 'more-infinite-research' '4.2.20001' 'mir-candidate'
+  $fixtureInput=New-BrowserInput 'continuity-fixture' '0.1.0' 'continuity-fixture'
+  $extraInput=New-BrowserInput 'unrequested' '1.0.0' 'other'
+  $profileInputs=@($mirInput,$fixtureInput)
+  $libraryArguments=@{LibraryDirectory=$browserLibrary;EngineDataDirectory=$browserData;EngineVersion='2.0.77'}
+  $originalControls=@{'mod-list.json'='{"mods":[]}';'mod-settings.dat'='original controls'}
+  foreach($entry in $originalControls.GetEnumerator()){[IO.File]::WriteAllText((Join-Path $browserLibrary $entry.Key),$entry.Value)}
+  $archiveIdentities=@{};foreach($row in @($profileInputs)+@($extraInput)){$archiveIdentities[$row.file_name]=Get-MIRImmutableInputFileIdentity $row.source_path}
+  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase initial -Inputs $profileInputs} 'direct-inputs-required'
+  $profile=New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase initial -Inputs $profileInputs @libraryArguments
+  Assert-Probe ($profile.mods-ceq$browserLibrary-and-not(Test-Path -LiteralPath (Join-Path $browserJob 'profiles'))) 'browser lifecycle recreated a populated profile.'
+  Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $profile.mods 'mod-settings.dat'))) 'browser inherited previous library settings.'
+  Assert-Probe (-not(@($profile.activation.selected.name)-contains'unrequested')) 'browser enabled an unrelated archive.'
+  [IO.File]::WriteAllText((Join-Path $profile.mods 'mod-settings.dat'),'private settings')
+  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase configured -Inputs $profileInputs @libraryArguments -PreviousProfile $profile} 'previous-profile-active'
+  $terminal=Complete-MIRBrowserContinuityProfile -Profile $profile
+  Assert-MIRBrowserContinuityTerminalReceipt -Receipt $terminal -JobRoot $browserJob
+  $changed=($terminal|ConvertTo-Json -Depth 20)|ConvertFrom-Json
+  $changed.profile_sha256='A'*64
+  Refuses-Probe {Assert-MIRBrowserContinuityTerminalReceipt -Receipt $changed -JobRoot $browserJob} 'selection-custody'
+  $changed=($terminal|ConvertTo-Json -Depth 20)|ConvertFrom-Json
+  $changed.selected[0].version='99.0.0'
+  Refuses-Probe {Assert-MIRBrowserContinuityTerminalReceipt -Receipt $changed -JobRoot $browserJob} 'selected-inputs'
+  $changed=($terminal|ConvertTo-Json -Depth 20)|ConvertFrom-Json
+  $changed.archive_links_created=1
+  Refuses-Probe {Assert-MIRBrowserContinuityTerminalReceipt -Receipt $changed -JobRoot $browserJob} 'direct-receipt'
+  foreach($phase in @('configured','removed','readded')){
+    foreach($entry in $originalControls.GetEnumerator()){Assert-Probe ((Get-Content -LiteralPath (Join-Path $browserLibrary $entry.Key) -Raw)-ceq$entry.Value) "browser $phase did not restore prior library controls."}
+    $phaseInputs=if($phase-ceq'removed'){@($fixtureInput)}else{$profileInputs}
+    $profile=New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase $phase -Inputs $phaseInputs @libraryArguments -PreviousProfile $profile
+    Assert-Probe ((Get-Content -LiteralPath (Join-Path $profile.mods 'mod-settings.dat') -Raw)-ceq'private settings') "browser $phase lost private settings."
+    Assert-Probe ((@($profile.activation.selected.name)-contains'more-infinite-research')-eq($phase-cne'removed')) "browser $phase has the wrong active MIR selection."
+    Assert-Probe (Test-Path -LiteralPath $mirInput.source_path) "browser $phase deleted the retained candidate."
+    $terminal=Complete-MIRBrowserContinuityProfile -Profile $profile
+    Assert-MIRBrowserContinuityTerminalReceipt -Receipt $terminal -JobRoot $browserJob
+  }
+  foreach($entry in $archiveIdentities.GetEnumerator()){Assert-Probe ((Get-MIRImmutableInputFileIdentity (Join-Path $browserLibrary $entry.Key))-ceq$entry.Value) 'lifecycle changed archive identity.'}
+  Assert-Probe (@(Get-ChildItem -LiteralPath (Join-Path $browserJob 'selections') -File|Where-Object Extension -NE '.json').Count-eq0) 'lifecycle selections contain payloads.'
+  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase readded -Inputs $profileInputs @libraryArguments -PreviousProfile $profile} 'profile-preserved'
+  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase '../outside' -Inputs $profileInputs @libraryArguments} 'profile-phase'
+  $missing=[ordered]@{};foreach($entry in $fixtureInput.GetEnumerator()){$missing[$entry.Key]=$entry.Value};$missing.file_name='absent_0.1.0.zip'
+  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase missing -Inputs @($missing) @libraryArguments} 'library-input-missing'
+  [IO.File]::WriteAllText($profile.terminal.settings.path,'tampered settings')
+  Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase tampered -Inputs $profileInputs @libraryArguments -PreviousProfile $profile} 'settings-custody'
+  [IO.File]::WriteAllText($profile.terminal.settings.path,'private settings')
 
   & {
-    # Run the real parent/owned-child protocol with a tiny synthetic worker.
-    # Existing fake capacity applies only to this child; no Factorio executes.
+    # Exercise the actual owned-worker protocol with tiny direct-library inputs.
+    # This controlled worker has no Factorio process or gameplay oracle.
     $gitExecutable=@(Microsoft.PowerShell.Core\Get-Command git -CommandType Application)[0].Source
     function git {if('status'-in$args){$global:LASTEXITCODE=0;return};& $gitExecutable @args;$global:LASTEXITCODE=$LASTEXITCODE}
     $worker=Join-Path $fixture 'synthetic-browser-worker.ps1'
     $workerText=@'
-param($CandidateArchive,$RepositoryRoot,$Target,$FactorioExe,$TimeoutSeconds,$StageLimit,$InputMode,$SourceVersion,$OwnedJobPath,$OwnedJobSha256)
+param($CandidateArchive,$RepositoryRoot,$Target,$FactorioExe,$TimeoutSeconds,$StageLimit,$InputMode,$SourceVersion,$LibraryDirectory,$Operation,$OwnedJobPath,$OwnedJobSha256)
 $ErrorActionPreference='Stop'
 . (Join-Path $RepositoryRoot 'tools/lib/validation/BrowserContinuityInputs.ps1')
 $job=Read-MIRBrowserContinuityOwnedJob -RepositoryRoot $RepositoryRoot -ScriptPath $PSCommandPath -RequestPath $OwnedJobPath -RequestSha256 $OwnedJobSha256
-$syntheticInput=[ordered]@{source_path=$CandidateArchive;file_name='synthetic-input.zip';expected_sha256=(Get-FileHash $CandidateArchive).Hash;role='synthetic-fixture';identity=@{synthetic=$true};provenance=@{kind='not-factorio'};immutable=$true}
-$root=Join-Path $job.root 'worker';$profile=New-MIRBrowserContinuityProfile -JobRoot $root -Phase initial -Inputs @($syntheticInput)
-$receipt=Complete-MIRImmutableInputLease -Lease $profile.lease -Outcome passed
-$record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protocol, not Factorio';source=@{harness_sha256=$job.harness_sha256};source_version=$SourceVersion;target=@{key=$Target};input_mode=$InputMode;candidate=@{archive_sha256=(Get-FileHash $CandidateArchive).Hash};stages=@(@{stage='initial'});immutable_input_receipts=@($receipt)}
+$syntheticInput=[ordered]@{source_path=$CandidateArchive;file_name=[IO.Path]::GetFileName($CandidateArchive);expected_sha256=(Get-FileHash $CandidateArchive).Hash;role='mir-candidate'}
+$root=Join-Path $job.root 'worker';$data=Join-Path (Split-Path -Parent $LibraryDirectory) 'engine/data'
+$profile=New-MIRBrowserContinuityProfile -JobRoot $root -Phase initial -Inputs @($syntheticInput) -LibraryDirectory $LibraryDirectory -EngineDataDirectory $data -EngineVersion '2.0.77'
+$receipt=Complete-MIRBrowserContinuityProfile -Profile $profile
+$record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protocol, not Factorio';source=@{harness_sha256=$job.harness_sha256};source_version=$SourceVersion;target=@{key=$Target};input_mode=$InputMode;candidate=@{archive_sha256=(Get-FileHash $CandidateArchive).Hash};stages=@(@{stage='initial'});library_input_receipts=@($receipt)}
 [IO.File]::WriteAllText((Join-Path $root 'browser-personal-state-continuity-receipt.json'),($record|ConvertTo-Json -Depth 30),[Text.UTF8Encoding]::new($false))
 '@
     [IO.File]::WriteAllText($worker,$workerText,[Text.UTF8Encoding]::new($false))
-    $parameters=[ordered]@{CandidateArchive=$source;RepositoryRoot=$repo;Target='F200';FactorioExe=$pwsh;TimeoutSeconds=30;StageLimit='Initial';InputMode='ScriptedFixture';SourceVersion='4.2.1'}
+    $parameters=[ordered]@{CandidateArchive=$mirInput.source_path;RepositoryRoot=$repo;Target='F200';FactorioExe=$pwsh;TimeoutSeconds=30;StageLimit='Initial';InputMode='ScriptedFixture';SourceVersion='4.2.1';LibraryDirectory=$browserLibrary;Operation='Run'}
     $output=@(Invoke-MIRBrowserContinuityGovernedRun -RepositoryRoot $repo -ScriptPath $worker -Parameters $parameters -OutputRoot $fixture -ExpectedPeakMemoryMiB 512 -MaxNewOutputMiB 8)
     $resultPath=($output|Where-Object{$_-like'MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=*'}).Substring('MIR_BROWSER_CONTINUITY_GOVERNED_RESULT='.Length)
     $result=Get-Content -LiteralPath $resultPath -Raw|ConvertFrom-Json -Depth 40 -DateKind String
-    Assert-Probe ($result.status -ceq 'checkpointed' -and -not$result.release_qualification -and $result.whole_process_tree.result.passed -and $result.archive_bytes_discounted -eq 0) 'browser owned synthetic actor lost the shared governor or claimed qualification.'
+    Assert-Probe ($result.kind-ceq'MIRBrowserContinuityGovernedRunV2'-and$result.status-ceq'checkpointed'-and-not$result.release_qualification-and$result.whole_process_tree.result.passed-and$result.archive_bytes_discounted-eq0) 'browser synthetic actor lost its governor or claimed qualification.'
     $request=Join-Path (Split-Path -Parent $resultPath) 'owned-job.json'
     Refuses-Probe {Read-MIRBrowserContinuityOwnedJob -RepositoryRoot $repo -ScriptPath $worker -RequestPath $request -RequestSha256 ('0'*64)} 'owned-request-hash'
     Refuses-Probe {Read-MIRBrowserContinuityOwnedJob -RepositoryRoot $repo -ScriptPath $worker -RequestPath $request -RequestSha256 (Get-FileHash $request).Hash} 'owned-request-binding'
     $fallback=& {
       function Get-Command {param([string]$Name) if($Name-ceq'ConvertFrom-Json'){return [pscustomobject]@{Parameters=@{}}};Microsoft.PowerShell.Core\Get-Command $Name}
-      Read-MIRBrowserContinuityJson -Path $result.receipt -LeaseReceipts
+      Read-MIRBrowserContinuityJson -Path $result.receipt -DocumentOnly
     }
-    $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $fallback.immutable_input_receipts[0]
-    Assert-Probe ($fallback.immutable_input_receipts[0].started_utc -is [string]) 'browser fallback reader normalized canonical lease timestamps.'
+    Assert-MIRBrowserContinuityTerminalReceipt -Receipt $fallback.library_input_receipts[0] -JobRoot (Join-Path (Split-Path -Parent $resultPath) 'worker')
+    Assert-Probe ($fallback.library_input_receipts[0].status-ceq'restored-direct-library-controls') 'browser fallback reader lost its direct-library receipt.'
   }
 
   $failedRoot=Join-Path $fixture 'link-failure';New-Item -ItemType Directory -Path $failedRoot | Out-Null

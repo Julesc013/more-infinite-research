@@ -225,15 +225,33 @@ function Assert-MIRLibraryFixtureArchive {
 }
 
 function Assert-MIRLibraryActivation {
-  param([Parameter(Mandatory)]$Activation)
+  param([Parameter(Mandatory)]$Activation,[object[]]$OwnedProcesses=@())
   if($Activation.closed -or -not $Activation.lock.CanRead){throw '[mir-library-activation-closed]'}
-  Assert-MIRLibraryIdle
+  if($OwnedProcesses.Count){
+    # A lifecycle stage may have a server and clients sharing one unchanged
+    # selection. Every existing engine must be a still-owned direct child.
+    $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
+    if($running.Count-ne$OwnedProcesses.Count){throw '[mir-library-unowned-process]'}
+    foreach($process in $running){
+      $owned=@($OwnedProcesses|Where-Object Id -EQ $process.Id)
+      $parent=Get-CimInstance Win32_Process -Filter "ProcessId=$($process.Id)"
+      if($owned.Count-ne1-or$owned[0].HasExited-or$owned[0].StartTime-ne$process.StartTime-or$parent.ParentProcessId-ne$PID){throw '[mir-library-unowned-process]'}
+    }
+  }else{Assert-MIRLibraryIdle}
   $current=@(Get-MIRLibraryInventory -LibraryDirectory $Activation.library -EngineDataDirectory $Activation.engine_data)
   $signature={param($rows) @($rows|Sort-Object path|ForEach-Object {$_.path+'|'+$_.identity+'|'+$_.version}) -join "`n"}
   if((& $signature $current) -cne (& $signature $Activation.inventory)){throw '[mir-library-inventory-changed]'}
   # Reassert the complete selection before each launch; keep settings produced
   # by a previous create/reload within this activation private to this run.
-  Write-MIRLibraryControl -Path (Join-Path $Activation.library 'mod-list.json') -Bytes $Activation.mod_list_bytes
+  if($OwnedProcesses.Count){
+    # Do not rewrite shared controls while the server or another client lives.
+    $control=Read-MIRLibraryControl (Join-Path $Activation.library 'mod-list.json')
+    if(-not$control.exists){throw '[mir-library-live-selection]'}
+    $actual=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($control.bytes)).TrimStart([char]0xFEFF)|ConvertFrom-Json
+    $expected=[Text.Encoding]::UTF8.GetString($Activation.mod_list_bytes)|ConvertFrom-Json
+    $selection={param($rows) @($rows|Sort-Object name|ForEach-Object {if($_.enabled -isnot [bool]){throw '[mir-library-live-selection]'};$version=if($_.enabled){if($null-eq$_.PSObject.Properties['version']){throw '[mir-library-live-selection]'};[string]$_.version}else{''};[string]$_.name+'|'+[string]$_.enabled+'|'+$version})-join "`n"}
+    if((& $selection $actual.mods)-cne(& $selection $expected.mods)){throw '[mir-library-live-selection]'}
+  }else{Write-MIRLibraryControl -Path (Join-Path $Activation.library 'mod-list.json') -Bytes $Activation.mod_list_bytes}
 }
 
 function Assert-MIRLibraryLoadedSelection {
@@ -252,7 +270,7 @@ function Assert-MIRLibraryLoadedSelection {
 }
 
 function Assert-MIRLibraryLaunch {
-  param([Parameter(Mandatory)]$Activation,[string]$FactorioBin,[string[]]$Arguments)
+  param([Parameter(Mandatory)]$Activation,[string]$FactorioBin,[string[]]$Arguments,[object[]]$OwnedProcesses=@())
   . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
   foreach($arg in $Arguments){
     if($arg -match '^(?:--(?:sync-mods|apply-update|download|update-mods)(?:=|$)|--(?:config|mod-directory)=|-c$)'){throw '[mir-library-acquisition-or-ambiguous-argument]'}
@@ -274,7 +292,8 @@ function Assert-MIRLibraryLaunch {
   $engineData=Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent ([IO.Path]::GetFullPath($FactorioBin))))) 'data'
   if($engineData -cne $Activation.engine_data){throw '[mir-library-launch-engine]'}
   if($config -notmatch '(?m)^enable-new-mods=false\s*$'){throw '[mir-library-auto-enable]'}
-  Assert-MIRLibraryActivation -Activation $Activation
+  foreach($process in $OwnedProcesses){if([IO.Path]::GetFullPath($process.Path)-cne[IO.Path]::GetFullPath($FactorioBin)){throw '[mir-library-owned-engine]'}}
+  Assert-MIRLibraryActivation -Activation $Activation -OwnedProcesses $OwnedProcesses
 }
 
 function Complete-MIRLibraryActivation {

@@ -122,6 +122,29 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $arguments=@('--config',(Join-Path $run 'mir-compat-config.ini'),'--mod-directory',$library)
   Assert-LibraryRefusal {Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments ($arguments+@('--sync-mods','unused.zip'))} 'mir-library-acquisition-or-ambiguous-argument'
   Assert-LibraryRefusal {Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments ($arguments+@('--mod-directory','elsewhere'))} 'mir-library-launch-path-argument'
+  & {
+    # Bounded process observations, not an engine run: additional clients may
+    # read one active selection but must never rewrite it under a live server.
+    $server=[pscustomobject]@{Id=901;StartTime=[DateTime]'2026-10-08';HasExited=$false;Path=$engine}
+    $script:observedEngines=@($server);$script:observedParent=$PID
+    function Get-Process {param($Name) if($Name-cne'factorio'){throw 'Unexpected process query'};return $script:observedEngines}
+    function Get-CimInstance {param($ClassName,$Filter) [pscustomobject]@{ParentProcessId=$script:observedParent}}
+    function Write-MIRLibraryControl {throw 'Controls were rewritten while a server was live'}
+    Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -OwnedProcesses @($server)
+    Assert-LibraryTest $true 'owned live server permits read-only client admission'
+    $script:observedEngines=@($server,[pscustomobject]@{Id=902})
+    Assert-LibraryRefusal {Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -OwnedProcesses @($server)} 'mir-library-unowned-process'
+    $script:observedEngines=@($server);$script:observedParent=$PID+1
+    Assert-LibraryRefusal {Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -OwnedProcesses @($server)} 'mir-library-unowned-process'
+    $script:observedParent=$PID
+    $stale=[pscustomobject]@{Id=901;StartTime=[DateTime]'2026-10-07';HasExited=$false;Path=$engine}
+    Assert-LibraryRefusal {Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -OwnedProcesses @($stale)} 'mir-library-unowned-process'
+    $changed=[Text.Encoding]::UTF8.GetString($activation.mod_list_bytes)|ConvertFrom-Json
+    ($changed.mods|Where-Object name -EQ 'unrequested').enabled=$true
+    [IO.File]::WriteAllText((Join-Path $library 'mod-list.json'),($changed|ConvertTo-Json -Depth 8))
+    Assert-LibraryRefusal {Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -OwnedProcesses @($server)} 'mir-library-live-selection'
+    [IO.File]::WriteAllBytes((Join-Path $library 'mod-list.json'),$activation.mod_list_bytes)
+  }
   $savedGuard=(Get-Command Assert-MIRLibraryIdle).ScriptBlock
   function Assert-MIRLibraryIdle {throw '[mir-library-factorio-active] controlled live client'}
   Assert-LibraryRefusal {Complete-MIRLibraryActivation $activation} 'mir-library-factorio-active'

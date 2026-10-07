@@ -3667,9 +3667,9 @@
     {
       "path": "tools/lib/compatibility/LibraryActivation.ps1",
       "classification": "canonical-internal",
-      "sha256": "B57B90CDBF7057F3C57D06C4C6218F08646E9D34778FFFE6B149725BFCFFA03C",
+      "sha256": "FF5E17AE79D8B0F72C9A140AC71CD252A86F9CB2101B265C3227ACD0F57E8B36",
       "hash_mode": "canonical-text-v1",
-      "lines": 293,
+      "lines": 312,
       "package_visible": false
     },
     {
@@ -4443,9 +4443,9 @@
     {
       "path": "tools/lib/validation/BrowserContinuityInputs.ps1",
       "classification": "canonical-internal",
-      "sha256": "2825D95B7DF7ED06D4154DE4926827CE723302411D1A30CF9AAAFF967B1B1FB1",
+      "sha256": "83A9C6DDBAA73F6F41B9C2431385BF75AE8494153B463B0CA5B622651FBCC9E7",
       "hash_mode": "canonical-text-v1",
-      "lines": 126,
+      "lines": 203,
       "package_visible": false
     },
     {
@@ -6042,5 +6042,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7192fa5dafa8aa413a0c0e10f7fade7648efe1a9feccc9e84247e578f9601f44"
+  "digest": "sha256:a5c17479fc54c1e970ac1a4d7853886e5c9186729bb70e174f91f1575ac5dbc2"
 }
