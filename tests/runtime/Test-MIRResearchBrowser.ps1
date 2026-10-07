@@ -223,9 +223,9 @@ else { Invoke-BrowserEngine @('--benchmark',$save,'--benchmark-ticks','3','--ben
 $resultPath=Join-Path $run 'userdata/script-output/browser-test.json'
 if(-not (Test-Path $resultPath)) { throw "No browser acceptance result: $run" }
 $result=Get-Content -Raw $resultPath | ConvertFrom-Json
+if($result.status -ne 'passed') { throw "Browser acceptance did not finish: status=$($result.status); result=$resultPath; native log=$(Join-Path $run 'userdata/factorio-current.log')" }
 if($Graphics -and $result.native_players -lt 1) { throw "Graphics test did not exercise a native player: $run" }
 if($Graphics -and ($result.native_discovery.status -cne 'passed-native-connected-player-translations-and-GUI' -or $result.native_discovery.native_players -lt 1)) { throw "Graphics test did not complete native localized discovery: $run" }
-if($result.status -ne 'passed') { throw "Browser acceptance failed: $resultPath" }
 if([string]$result.engine -cne $selectedEngineVersion) { throw 'Browser native result does not match the selected engine.' }
 $result | Add-Member package_sha256 (Get-FileHash $candidate).Hash
 $result | Add-Member engine_sha256 $engineSha256

@@ -43,7 +43,9 @@ return function(core, adapter, check, snapshot, finish)
     local id = player.request_translation(payload)
     check(core.translation_queue.requested(cache, technology, id, game.tick, subjects, limited),
       "engine accepts the composed native translation request")
-    local record = {player=player,id=id,cache=cache,phase=1,before=snapshot(player.force),started=game.tick}
+    local record = {player=player,id=id,cache=cache,phase=1,before=snapshot(player.force),started=game.tick,
+      display_width=player.display_resolution and player.display_resolution.width,
+      display_height=player.display_resolution and player.display_resolution.height,display_scale=player.display_scale}
     records[player.index] = record
     open(record)
   end
@@ -74,8 +76,17 @@ return function(core, adapter, check, snapshot, finish)
     for index, record in pairs(records) do
       local player = record.player
       check(player.valid and player.connected, "native discovery player stays connected")
-      check(record.root.valid and player.gui.screen.mir_research_browser == record.root
-        and record.search.valid and record.filter.valid,
+      local stable_gui = record.root.valid and player.gui.screen.mir_research_browser == record.root
+        and record.search.valid and record.filter.valid
+      if not stable_gui and log then
+        log("[mir-fixture] native discovery GUI change root=" .. tostring(record.root.valid)
+          .. " same=" .. tostring(player.gui.screen.mir_research_browser == record.root)
+          .. " search=" .. tostring(record.search.valid) .. " filter=" .. tostring(record.filter.valid)
+          .. " display-before=" .. tostring(record.display_width) .. "x" .. tostring(record.display_height)
+          .. "@" .. tostring(record.display_scale) .. " display-now=" .. tostring(player.display_resolution.width)
+          .. "x" .. tostring(player.display_resolution.height) .. "@" .. tostring(player.display_scale))
+      end
+      check(stable_gui,
         "native asynchronous discovery retains its original GUI objects")
       check(snapshot(player.force) == record.before, "native discovery preserves shared research and queue state")
       if record.phase <= #searches then
