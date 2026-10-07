@@ -148,6 +148,10 @@ add_placeable_risk("mir-hidden-placeable-machine", {hidden = true})
 add_placeable_risk("mir-parameter-placeable-machine", {parameter = true})
 add_placeable_risk("mir-productivity-disabled-machine", {allow_productivity = false})
 add_placeable_risk("mir-zero-cap-placeable-machine", {maximum_productivity = 0})
+add_placeable_risk("mir-zero-output-placeable-machine", {}, nil,
+  {{type = "item", name = "mir-zero-output-placeable-machine", amount = 0}})
+add_placeable_risk("mir-excluded-output-placeable-machine", {}, nil,
+  {{type = "item", name = "mir-excluded-output-placeable-machine", amount = 1, ignored_by_stats = 1}})
 add_placeable_risk("mir-recycling-placeable-machine", {categories = {"recycling"}})
 add_placeable_risk(
   "mir-self-return-placeable-machine",
