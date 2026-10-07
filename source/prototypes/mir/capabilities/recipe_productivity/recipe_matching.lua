@@ -100,7 +100,8 @@ local function has_productive_shared_input_output(recipe)
       -- Withhold that return, including malformed rolls, until separately
       -- qualified; this guard is not a numeric profitable-loop proof.
       local extra_return = entry.type == "item" and (extra == nil or extra ~= 0)
-      if not identity or (ingredients[identity] and (maximum - ignored > 0 or extra_return)) then return true end
+      if not identity or (ingredients[identity] and (maximum - ignored > 0 or extra_return)
+        and not recipe_semantics.result_is_definitely_zero(entry, target_profiles.current(), true)) then return true end
     end
   end
   return false
@@ -125,6 +126,17 @@ local function material_graph()
     local graph = {typed_edges = {}, complete = true, edge_count = 0}
     recipe_facts.for_each(function(_, fact)
       for _, variant in ipairs(fact.variants or {}) do
+        local outputs = {}
+        for _, output in ipairs(variant.results or {}) do
+          local identity = typed_identity(output)
+          if not identity then
+            graph.complete, graph.reason = false, "process-graph-identity"
+            return
+          end
+          if not recipe_semantics.result_is_definitely_zero(output, target_profiles.current(), true) then
+            outputs[#outputs + 1] = identity
+          end
+        end
         for _, input in ipairs(variant.ingredients or {}) do
           local input_identity = typed_identity(input)
           if not input_identity then
@@ -132,12 +144,7 @@ local function material_graph()
             return
           end
           graph.typed_edges[input_identity] = graph.typed_edges[input_identity] or {}
-          for _, output in ipairs(variant.results or {}) do
-            local output_identity = typed_identity(output)
-            if not output_identity then
-              graph.complete, graph.reason = false, "process-graph-identity"
-              return
-            end
+          for _, output_identity in ipairs(outputs) do
             if not graph.typed_edges[input_identity][output_identity] then
               graph.edge_count = graph.edge_count + 1
               if graph.edge_count > 100000 then graph.complete = false; return end
@@ -163,7 +170,8 @@ local function route_identities(recipe, field)
   for _, variant in ipairs((recipe and recipe.variants) or {}) do
     for _, entry in ipairs(variant[field] or {}) do
       local identity = typed_identity(entry)
-      if identity then out[identity] = true end
+      if identity and (field ~= "results"
+        or not recipe_semantics.result_is_definitely_zero(entry, target_profiles.current(), true)) then out[identity] = true end
     end
   end
   return out
@@ -418,7 +426,9 @@ function R.material_route_is_acyclic(recipe)
     for _, output in ipairs(variant.results or {}) do
       local identity = typed_identity(output)
       if not identity then return false, "missing-process-identity" end
-      if not visited[identity] then queue[#queue + 1] = identity; visited[identity] = true end
+      if not visited[identity] and not recipe_semantics.result_is_definitely_zero(output, target_profiles.current(), true) then
+        queue[#queue + 1] = identity; visited[identity] = true
+      end
     end
     local head = 1
     while head <= #queue do
@@ -808,6 +818,9 @@ function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, ru
   return true, "accepted"
 end
 local function should_skip_recipe(recipe_name, recipe, options)
+  if type(recipe.productive_result_names) == "table" and #recipe.productive_result_names == 0 then
+    return true
+  end
   local certificate = options.reviewed_forward_routes and options.reviewed_forward_routes[recipe_name]
   if type(certificate) == "table" then observe_route_contract(recipe) end
   local certificate_required = options.require_exact_route_certificate == true
