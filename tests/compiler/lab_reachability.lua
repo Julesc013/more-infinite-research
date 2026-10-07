@@ -164,6 +164,8 @@ local function native_pump_world()
   r['offshore-pump'] = {native={type='offshore-pump',name='native',
     fluid_source_offset={0,-1},pumping_speed=20,fluid_box={production_type='output'}}}
   r.tile = {water={type='tile',name='water',fluid='water'}}
+  r.item['pump-kit'] = {type='item',name='pump-kit',place_result='native'}
+  r.recipe.make_pump = recipe('make_pump','pump-kit')
   return r
 end
 for _, case in ipairs({
@@ -197,6 +199,12 @@ for _, case in ipairs({
   end)
 end
 raw = native_pump_world()
+raw.recipe.make_pump = nil
+run(raw, function()
+  check('LRPA/missing-pump-item',not lab.valid_research_ingredients({{'A',1},{'B',1}}),
+    'A native pump prototype without an acquired placement item cannot construct the lab')
+end)
+raw = native_pump_world()
 raw.recipe.make_B.category = 'chemistry'
 raw.recipe.make_B.ingredients = {{type='fluid',name='water',amount=1}}
 raw.recipe.make_builder.enabled = false
@@ -211,6 +219,117 @@ run(raw, function()
   local gates = production.prereq_techs_for_science_pack('B')
   check('LRP/frontier/gate',#gates==1 and gates[1]=='BuilderUnlock',
     'The science frontier retains the actual machine research gate')
+end)
+local function native_boiler_world()
+  local r=native_pump_world()
+  r.boiler={boiler={type='boiler',name='boiler',fluid_box={filter='water'},
+    output_fluid_box={filter='steam'},target_temperature=165,energy_consumption='1.8MW',
+    energy_source={type='burner'}}}
+  r.item['boiler-kit']={type='item',name='boiler-kit',place_result='boiler'}
+  r.recipe.make_boiler=recipe('make_boiler','boiler-kit')
+  r.fluid.steam={type='fluid',name='steam'}
+  r.recipe.make_lab.ingredients={{type='fluid',name='steam',amount=1}}
+  return r
+end
+for _, case in ipairs({
+  {id='acquired-pump-and-boiler',expected=true,mutate=function() end},
+  {id='missing-pump',expected=false,mutate=function(r) r.recipe.make_pump=nil end},
+  {id='missing-boiler',expected=false,mutate=function(r) r.recipe.make_boiler=nil end},
+  {id='zero-boiler-output',expected=false,mutate=function(r) r.recipe.make_boiler.results[1].amount=0 end},
+  {id='wrong-boiler-placement',expected=false,mutate=function(r) r.item['boiler-kit'].place_result='other' end},
+  {id='pump-bootstrap-cycle',expected=false,mutate=function(r)
+    r.recipe.make_pump.category='chemistry'
+    r.recipe.make_pump.ingredients={{type='fluid',name='water',amount=1}}
+  end},
+  {id='boiler-bootstrap-cycle',expected=false,mutate=function(r)
+    r.recipe.make_boiler.category='chemistry'
+    r.recipe.make_boiler.ingredients={{type='fluid',name='steam',amount=1}}
+  end},
+  {id='independent-water-recipe',expected=true,mutate=function(r)
+    r.recipe.make_pump=nil
+    table.insert(r['assembling-machine'].builder.fluid_boxes,{production_type='output'})
+    r.recipe.make_water=recipe('make_water','water')
+    r.recipe.make_water.category='chemistry'; r.recipe.make_water.results[1].type='fluid'
+  end},
+  {id='later-pump-alternative',expected=true,mutate=function(r)
+    r['offshore-pump']['a-broken']={type='offshore-pump',name='a-broken',
+      fluid_source_offset={0,-1},fluid_box={}}
+    r.item['broken-pump-kit']={type='item',name='broken-pump-kit',place_result='a-broken'}
+    r.recipe.make_broken_pump=recipe('make_broken_pump','broken-pump-kit')
+    r.recipe.make_broken_pump.category='chemistry'
+    r.recipe.make_broken_pump.ingredients={{type='fluid',name='water',amount=1}}
+  end},
+  {id='declared-source-callback',expected=true,mutate=function(r)
+    r.recipe.make_pump=nil; r.recipe.make_boiler=nil
+  end,callback=true}
+}) do
+  raw=native_boiler_world(); case.mutate(raw)
+  run(raw,function()
+    local routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+    local before=fingerprint.of(data.raw)
+    if case.callback then
+      check('LRPA/'..case.id,routes.source_witness({type='fluid',name='steam'},{
+        source_witness=function(name,kind) return name=='steam' and kind=='fluid' end})~=nil,
+        'The explicit caller-owned source callback retains its separate boundary')
+    else
+      check('LRPA/'..case.id,lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+        'Lab construction consumes acquired native pump/boiler and input witnesses: '..case.id)
+      check('LRPA/'..case.id..'/research',
+        (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+        'Actual researchability consumes the conditional fluid actor: '..case.id)
+    end
+    check('LRPA/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Fluid actor acquisition preserves prototype inputs: '..case.id)
+  end)
+end
+raw=native_boiler_world()
+raw.recipe.make_B.category='chemistry'
+raw.recipe.make_B.ingredients={{type='fluid',name='steam',amount=1}}
+raw.recipe.make_pump.enabled=false
+raw.recipe.make_boiler.enabled=false
+raw.lab.early={type='lab',name='early',inputs={'A'}}
+raw.item['early-kit']={type='item',name='early-kit',place_result='early'}
+raw.recipe.make_early=recipe('make_early','early-kit')
+for _, entry in ipairs({{'PumpUnlock','make_pump'},{'BoilerUnlock','make_boiler'}}) do
+  raw.technology[entry[1]]=research({'A'})
+  raw.technology[entry[1]].effects={{type='unlock-recipe',recipe=entry[2]}}
+end
+run(raw,function(owner)
+  local routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+  local before=fingerprint.of(data.raw)
+  check('LRPA/frontier/status',production.pack_production_status('B',{})=='research',
+    'Pump/boiler construction unlocks keep the fluid-dependent pack research-gated')
+  local gates=production.prereq_techs_for_science_pack('B')
+  check('LRPA/frontier/gates',#gates==2 and gates[1]=='BoilerUnlock' and gates[2]=='PumpUnlock',
+    'The science frontier retains both selected native actor unlocks')
+  local state=assert(owner:state_view('science_pack_production').route_witness_state)
+  check('LRPA/frontier/initial',routes.initial_recipe_witness('make_B','B',nil,state)==nil,
+    'A researched actor witness cannot warm the initial recipe memo')
+  check('LRPA/frontier/source',routes.source_witness({type='fluid',name='steam'},nil,state)==nil,
+    'A direct source preflight cannot borrow research-gated pump or boiler construction')
+  check('LRPA/frontier/immutable',fingerprint.of(data.raw)==before,
+    'Actor frontier extraction preserves final input facts')
+end)
+local actor_frontier_raw=raw
+raw=native_boiler_world()
+run(raw,function()
+  local routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+  local first=assert(routes.source_witness({type='fluid',name='steam'}))
+  check('LRPA/witness/actor',first.machine and first.machine.prototype=='boiler'
+    and first.ingredients[1].machine.prototype=='native',
+    'The native fluid witness retains both selected placement actors')
+  first.machine.acquisition.kind='tampered'
+  first.ingredients[1].machine.item='tampered'
+  local second=assert(routes.source_witness({type='fluid',name='steam'}))
+  check('LRPA/witness/defensive',second.machine.acquisition.kind~='tampered'
+    and second.ingredients[1].machine.item=='pump-kit',
+    'Returned actor/input witness mutation cannot poison the source catalogue')
+end)
+raw=actor_frontier_raw
+raw.technology.PumpUnlock.unit.ingredients={{'B',1}}
+run(raw,function()
+  check('LRPA/self-funding-unlock',not lab.valid_research_ingredients({{'A',1},{'B',1}}),
+    'The pump unlock cannot fund itself through its own pumped-fluid pack or lab')
 end)
 -- An enabled outer recipe can consume a mined item whose fluid is unlocked
 -- through earlier research. The chosen route must keep that unlock and never

@@ -483,16 +483,6 @@ local function append_minable_sources(sources, prototype_type, witness_kind, opt
   return true
 end
 
-local function has_unconditional_source(sources, identity)
-  for _, witness in ipairs(sources[identity_key(identity)] or {}) do
-    if witness.mining_input == nil
-      and (type(witness.surface_conditions) ~= "table" or #witness.surface_conditions == 0) then
-      return true
-    end
-  end
-  return false
-end
-
 local LEGACY_LOOT_LINES = {
   ["2.0"] = true, ["1.1"] = true, ["1.0"] = true, ["0.17"] = true,
   ["0.16"] = true, ["0.15"] = true, ["0.14"] = true, ["0.13"] = true
@@ -544,14 +534,13 @@ local function append_loot_sources(sources, options)
   return true
 end
 
--- Boilers are prototype-defined fluid conversions rather than recipes. A
--- boiler whose input fluid already has an unconditional natural source gives
--- a concrete acquisition route for its declared output fluid. As with recipe
--- machine checks, this witness deliberately does not claim machine, fuel,
--- power, throughput, or placement acquisition. Surface-constrained boiler or
--- input sources remain conservative until a same-surface witness is modeled.
+-- Boilers are prototype-defined fluid conversions rather than recipes. Their
+-- placement item and typed input are acquired only when this candidate is
+-- selected, through the same cycle/research guards as recipe routes. This is
+-- no fuel, power, throughput or native placement proof. Surface-constrained
+-- boilers remain conservative until a same-surface witness is modeled.
 local function append_boiler_sources(sources, options)
-  for _, boiler in pairs(data_raw.prototypes("boiler")) do
+  for name, boiler in pairs(data_raw.prototypes("boiler")) do
     if not diagnostic_visit(options) then return false end
     local input = normalize_identity({
       type = "fluid",
@@ -566,13 +555,13 @@ local function append_boiler_sources(sources, options)
       and finite_positive(target_temperature)
       and boiler.energy_consumption ~= nil
       and type(boiler.energy_source) == "table"
-      and (type(boiler.surface_conditions) ~= "table" or #boiler.surface_conditions == 0)
-      and has_unconditional_source(sources, input) then
+      and (type(boiler.surface_conditions) ~= "table" or #boiler.surface_conditions == 0) then
       local key = identity_key(output)
       sources[key] = sources[key] or {}
       table.insert(sources[key], {
         kind = "boiler-conversion",
-        prototype = boiler.name,
+        prototype = boiler.name or name,
+        source_actor = {prototype = boiler.name or name, prototype_type = "boiler"},
         product = output,
         input = input,
         target_temperature = target_temperature
@@ -641,7 +630,7 @@ local function default_source_catalog(state, options)
   if not append_minable_sources(sources, "asteroid-chunk", "minable-entity", options) then return sources end
   if not append_loot_sources(sources, options) then return sources end
   local tile_fluids
-  for _, pump in pairs(data_raw.prototypes("offshore-pump")) do
+  for name, pump in pairs(data_raw.prototypes("offshore-pump")) do
     if not diagnostic_visit(options) then return sources end
     if uses_tile_pump_contract()
       and pump.fluid_source_offset ~= nil
@@ -658,17 +647,44 @@ local function default_source_catalog(state, options)
       sources[key] = sources[key] or {}
       table.insert(sources[key], {
         kind = "offshore-pump",
+        source_actor = {prototype = pump.name or name, prototype_type = "offshore-pump"},
         product = identity,
         surface_conditions = deepcopy(pump.surface_conditions)
       })
     end
   end
   if not append_boiler_sources(sources, options) then return sources end
+  for _, candidates in pairs(sources) do
+    table.sort(candidates, function(left, right)
+      local left_actor, right_actor = left.source_actor ~= nil, right.source_actor ~= nil
+      if left_actor ~= right_actor then return not left_actor end
+      if left.kind ~= right.kind then return left.kind < right.kind end
+      return tostring(left.prototype or "") < tostring(right.prototype or "")
+    end)
+  end
   state.source_catalog = sources
   return sources
 end
 
-local acquisition_witness
+local acquisition_witness, placement_items_for_machine
+
+local function source_actor_witness(actor, options, state)
+  local checkpoint = diagnostic_checkpoint(options)
+  for _, item_name in ipairs(placement_items_for_machine(actor.prototype, options, state)) do
+    if not diagnostic_visit(options) then return nil end
+    diagnostic_rollback(options, checkpoint)
+    local item = prototype_lookup.item_prototype(item_name)
+    if item and item.place_result == actor.prototype then
+      local acquired = acquisition_witness({type = "item", name = item_name}, options, state)
+      if acquired then
+        diagnostic_rollback(options, checkpoint)
+        return {kind = "machine-placement", prototype = actor.prototype,
+          prototype_type = actor.prototype_type, item = item_name, acquisition = acquired}
+      end
+    end
+  end
+  return nil
+end
 
 local function source_witness(identity, options, state)
   if type(options.source_witness) == "function" then
@@ -695,20 +711,26 @@ local function source_witness(identity, options, state)
     if surface_satisfied(witness.surface_conditions, options, state) then
       local copied = deepcopy(witness)
       copied.surface_conditions = nil
-      local input = witness.mining_input
-      if not input then return copied end
+      copied.source_actor = nil
+      local input = witness.mining_input and witness.mining_input.identity
+        or witness.kind == "boiler-conversion" and witness.input
+      local actor = witness.source_actor
+      if not input and not actor then return copied end
       -- Unconditional sources keep their index-free preflight. A conditional
-      -- mined source uses the existing typed acquisition solver only when
-      -- selected, and retains the input's complete research witness.
+      -- source uses the existing typed acquisition solver only when selected,
+      -- and retains its actor/input's complete research witnesses.
       options.recipe_index = options.recipe_index or state.recipe_index or recipe_facts.index_view()
       state = query_state(state, options.recipe_index)
       local key = identity_key(identity)
       if not state.visiting[key] then
         state.visiting[key] = true
-        local acquired = acquisition_witness(input.identity, options, state)
+        local machine = actor and source_actor_witness(actor, options, state)
+        local acquired = input and (not actor or machine)
+          and acquisition_witness(input, options, state)
         state.visiting[key] = nil
-        if acquired then
-          copied.ingredients = {acquired}
+        if (not actor or machine) and (not input or acquired) then
+          copied.machine = machine or nil
+          copied.ingredients = acquired and {acquired} or nil
           diagnostic_rollback(options, source_checkpoint)
           return copied
         end
@@ -721,9 +743,9 @@ end
 function M.source_witness(identity, options, state)
   local candidate = normalize_identity(identity)
   if not candidate then return nil end
-  -- An unconditional source does not need the recipe index. Fluid-dependent
-  -- mining resolves its input on demand; without a research callback only an
-  -- initially acquired fluid can establish this direct-source preflight.
+  -- Unconditional sources need no recipe index. Conditional mining, pumps
+  -- and boilers resolve their input/placement dependencies on demand. Without
+  -- a research callback only initial acquisition can prove this preflight.
   return source_witness(candidate, copy_options(options), source_query_state(state))
 end
 
@@ -750,7 +772,7 @@ local function sorted_producers(index, output_identity, options)
   return M.sort_acquisition_producers(producers, index)
 end
 
-local function placement_items_for_machine(name, options, state)
+placement_items_for_machine = function(name, options, state)
   if options.diagnostic_observer == nil then
     -- Reuse the same comprehensive index as laboratory selection. No new
     -- machine-by-item cross product is built for ordinary production queries.
@@ -1114,6 +1136,9 @@ local STABLE_SOURCE_KINDS = {
 local function stable_acquisition_witness(witness)
   if type(witness) ~= "table" then return false end
   if STABLE_SOURCE_KINDS[witness.kind] then
+    local machine = witness.machine
+    if machine and (machine.kind ~= "machine-placement"
+      or not stable_acquisition_witness(machine.acquisition)) then return false end
     for _, ingredient in ipairs(witness.ingredients or {}) do
       if not stable_acquisition_witness(ingredient) then return false end
     end

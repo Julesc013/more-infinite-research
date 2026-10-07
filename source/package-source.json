@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 55453,
-      "source_sha256": "8CBC10171D78EFBD87F3166CAAAD7D49EE50C2151BA571B77E14596F0988F111",
-      "output_bytes": 55453,
-      "output_sha256": "8CBC10171D78EFBD87F3166CAAAD7D49EE50C2151BA571B77E14596F0988F111"
+      "source_bytes": 57016,
+      "source_sha256": "7BC1BA7C8DE21BDD8644CAB50E8E8CDF7C7282F596C1D69335B62A5D720DC2F3",
+      "output_bytes": 57016,
+      "output_sha256": "7BC1BA7C8DE21BDD8644CAB50E8E8CDF7C7282F596C1D69335B62A5D720DC2F3"
     },
     {
       "layer": "capability",
@@ -5695,10 +5695,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/platform/factorio/prototype_lookup.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4205,
-      "source_sha256": "B10048E18EF0B431C4F2177E61D89AECB962DD33CAC2EB6840DC96E205CFFE10",
-      "output_bytes": 4205,
-      "output_sha256": "B10048E18EF0B431C4F2177E61D89AECB962DD33CAC2EB6840DC96E205CFFE10"
+      "source_bytes": 4222,
+      "source_sha256": "1D6A9C614428D327572810E2DD72759E7B9802C2C07A1F43B39C2D30511EE161",
+      "output_bytes": 4222,
+      "output_sha256": "1D6A9C614428D327572810E2DD72759E7B9802C2C07A1F43B39C2D30511EE161"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "38132FCAB370B0EEB17D0AF902A94A488AE674A13AEE0DA90AECFEE7078574E3"
+  "record_sha256": "711F1CF5B6FDB330DDF20075D7E7719A8CB14C32343B0198CDBED44C296DBFBD"
 }

@@ -7,7 +7,7 @@ local FALLBACK_ENTITY_TYPES = {
   "accumulator", "ammo-turret", "artillery-turret", "assembling-machine", "beacon", "boiler",
   "burner-generator", "car", "container", "electric-energy-interface", "electric-pole", "electric-turret",
   "fluid-turret", "furnace", "generator", "inserter", "lab", "loader", "loader-1x1",
-  "logistic-container", "mining-drill", "pipe", "pipe-to-ground", "pump", "radar", "reactor",
+  "logistic-container", "mining-drill", "offshore-pump", "pipe", "pipe-to-ground", "pump", "radar", "reactor",
   "rocket-silo", "roboport", "solar-panel", "splitter", "lane-splitter", "storage-tank", "transport-belt",
   "underground-belt"
 }
