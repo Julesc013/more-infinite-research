@@ -26,29 +26,51 @@ local earned_identity_recipes = {
   research_steel = {["casting-steel"] = "steel-plate-productivity", ["steel-plate"] = "steel-plate-productivity"}
 }
 
-function M.can_retain_earned_effects(key, spec, original, filtered, covered)
+local earned_identity_products = {
+  research_low_density_structure = "low-density-structure",
+  research_plastic = "plastic-bar", research_processing_unit = "processing-unit",
+  research_rocket_fuel = "rocket-fuel", research_steel = "steel-plate"
+}
+
+function M.retained_earned_buckets(key, spec, original, filtered, covered)
   local expected = earned_identity_recipes[key]
-  if not expected or spec.automatic_family or spec.native_owner_binding or #filtered ~= 0
-      or (spec.technology_name and spec.technology_name ~= "recipe-prod-" .. key .. "-1") then return false end
+  if not expected or spec.automatic_family or #filtered ~= 0
+      or (spec.technology_name and spec.technology_name ~= "recipe-prod-" .. key .. "-1") then return nil end
+  local binding, product = spec.native_owner_binding, earned_identity_products[key]
+  if not binding or binding.owner ~= expected[product] or not binding.effect_scope
+      or binding.effect_scope.type ~= "change-recipe-productivity"
+      or type(binding.effect_scope.products) ~= "table" or #binding.effect_scope.products ~= 1
+      or binding.effect_scope.products[1] ~= product then return nil end
   local active = mods_api.snapshot()
   if not string.match(active.base or "", "^2%.0%.") or not active["space-age"]
-      or active["space-is-fake"] ~= "1.0.60" then return false end
-  local recipes, count, expected_count = {}, 0, 0
+      or active["space-is-fake"] ~= "1.0.60" then return nil end
+  local recipes, retained, count, expected_count, matched_count = {}, {}, 0, 0, 0
   for _ in pairs(expected) do expected_count = expected_count + 1 end
   for _, bucket in ipairs(original) do
     if type(bucket.change) ~= "number" or bucket.change ~= bucket.change
-        or bucket.change <= 0 or bucket.change == math.huge then return false end
+        or bucket.change <= 0 or bucket.change == math.huge then return nil end
+    local selected = {change = bucket.change, recipes = {}}
     for _, name in ipairs(bucket.recipes) do
-      if not expected[name] or recipes[name] then return false end
-      recipes[name], count = true, count + 1
+      -- The current processing-unit matcher also sees scrap recycling. Its
+      -- native owner remains authoritative; the old MIR identity never paid
+      -- that effect, so it must not acquire it through save preservation.
+      local owner = expected[name]
+      local excluded = key == "research_processing_unit" and name == "scrap-recycling"
+      if (not owner and not excluded) or recipes[name] then return nil end
+      recipes[name], matched_count = owner or "scrap-recycling-productivity", matched_count + 1
+      if owner then
+        table.insert(selected.recipes, name)
+        count = count + 1
+      end
     end
+    if #selected.recipes > 0 then table.insert(retained, selected) end
   end
-  if count ~= expected_count or #covered ~= expected_count then return false end
+  if count ~= expected_count or #covered ~= matched_count then return nil end
   for _, row in ipairs(covered) do
-    if not recipes[row.recipe] or row.owners ~= expected[row.recipe] then return false end
+    if not recipes[row.recipe] or row.owners ~= recipes[row.recipe] then return nil end
     recipes[row.recipe] = nil
   end
-  return next(recipes) == nil
+  if next(recipes) == nil then return retained end
 end
 
 function M.recipe_names_from_effects(effects)
