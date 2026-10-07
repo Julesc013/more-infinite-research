@@ -143,7 +143,7 @@ try {
     $resolved=Resolve-MIRAssuranceCommandText -Command $command -Context ([pscustomobject]@{factorio=$engine;target=$line}) -Plan ([pscustomobject]@{})
     Assert-Probe ($resolved.Contains("-FactorioBin '$engine'") -and $resolved.Contains("-ExpectedFactorioLine '$line'") -and $resolved.Contains('-ExpectedPeakMemoryMiB 2048') -and $resolved.Contains('-MaxNewOutputMiB 120')) "selected $line command lost its engine, line or explicit resource budgets."
     $browserCommand=[string](@($catalog.tests | Where-Object id -CEQ 'runtime.research-browser')[0].command)
-    $browserResolved=Resolve-MIRAssuranceCommandText -Command $browserCommand -Context ([pscustomobject]@{factorio=$engine;target=$line;candidate='controlled-candidate.zip'}) -Plan ([pscustomobject]@{})
+    $browserResolved=Resolve-MIRAssuranceCommandText -Command $browserCommand -Context ([pscustomobject]@{factorio=$engine;target=$line;candidate='controlled-candidate.zip';mods='controlled-library'}) -Plan ([pscustomobject]@{})
     Assert-Probe ($browserResolved.Contains("-FactorioBin '$engine'") -and $browserResolved.Contains("-Target '$line'") -and $browserResolved.Contains('-ExpectedPeakMemoryMiB 2048') -and $browserResolved.Contains('-MaxNewOutputMiB 120')) "selected browser $line command lost its actual engine, target or resource budgets."
   }
   $arguments=@{RepoRoot=$repo;OutputRoot=$fixture;MaxNewOutputMiB=1}
@@ -160,7 +160,7 @@ try {
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'PrepareOnly bypassed allocation admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1') -RepoRoot $repo -PrepareOnly -ExactStageRoot (Join-Path $fixture 'absent-stage') -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Final observer PrepareOnly bypassed allocation admission.'
-  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRResearchBrowser.ps1') -RepoRoot $repo -FactorioBin 'absent-browser-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
+  Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRResearchBrowser.ps1') -RepoRoot $repo -FactorioBin 'absent-browser-engine' -CandidateZip 'absent-candidate' -LibraryDirectory 'absent-library' -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Browser harness allocated before peak-budget admission.'
   Refuses-Probe {& (Join-Path $repo 'tests/runtime/Test-MIRPassiveRepair.ps1') -RepoRoot $repo -CandidateZip 'absent-passive-candidate' -FactorioBin 'absent-passive-engine' -OutputRoot $fixture} 'resource-peak-budget-required'
   Assert-Probe (-not (Test-Path -LiteralPath $fixture)) 'Passive repair allocated or probed an engine before peak-budget admission.'
@@ -193,13 +193,20 @@ try {
   $currentTin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
   Assert-Probe ((Resolve-TinBrowserEnginePath $currentTin) -ceq $currentTin) 'tin browser changed its authorized engine path.'
   Refuses-Probe {Resolve-TinBrowserEnginePath 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'} 'engine-location'
-  $historical='D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
-  $current='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
-  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.0' -Requested '') -ceq $historical) '2.0 default used another engine authority.'
-  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.1' -Requested '') -ceq $current) '2.1 default used another engine authority.'
+  $browserEngines=@{}
+  foreach($line in @('2.0','2.1')){
+    $engineRoot=Join-Path $fixture ('configured-engine-'+$line)
+    foreach($directory in @('bin/x64','data/base')){[IO.Directory]::CreateDirectory((Join-Path $engineRoot $directory))|Out-Null}
+    $executable=Join-Path $engineRoot 'bin/x64/factorio.exe';[IO.File]::WriteAllText($executable,'controlled, never executed')
+    [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version=($line+'.77')}|ConvertTo-Json))
+    $browserEngines[$line]=$executable
+  }
+  $historical=$browserEngines['2.0'];$current=$browserEngines['2.1']
+  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.0' -Requested ''} 'engine-location'
+  Assert-Probe ((Resolve-BrowserEnginePath -Line '2.1' -Requested $current) -ceq $current) 'explicit relocated current engine was refused.'
   Assert-Probe ((Resolve-BrowserEnginePath -Line '2.0' -Requested $historical) -ceq $historical) 'explicit historical engine was refused.'
-  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.0' -Requested $current} 'engine-location'
-  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.1' -Requested $historical} 'engine-location'
+  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.0' -Requested $current} 'engine-target'
+  Refuses-Probe {Resolve-BrowserEnginePath -Line '2.1' -Requested $historical} 'engine-target'
   Add-Type -AssemblyName System.IO.Compression.FileSystem
   function New-ControlledBrowserArchive([string]$Line,$Identity,[string]$Variant='valid') {
     $directory=Join-Path $fixture ('browser-inputs/'+[guid]::NewGuid().ToString('N'))

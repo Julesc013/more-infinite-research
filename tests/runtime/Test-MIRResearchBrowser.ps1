@@ -3,6 +3,8 @@ param(
  [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
  [string]$FactorioBin='',
  [string]$CandidateZip='',
+ [string]$LibraryDirectory='',
+ [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
  [switch]$Graphics,
  [string]$OutputRoot='build/p/browser',
@@ -12,19 +14,24 @@ param(
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+. (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
+if(-not $PrepareInputsOnly -and ($LibraryDirectory -eq '' -or $FactorioBin -eq '' -or $CandidateZip -eq '')) {
+ throw '[mir-browser-direct-inputs-required] Supply the engine, current candidate and flat archive library; populated profile staging is retired.'
+}
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
 # No engine lookup, package, stage or version query precedes admission.
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
 Assert-MIR441CleanTrackedSource -RepoRoot $repo
 function Resolve-BrowserEnginePath([ValidateSet('2.0','2.1')][string]$Line,[string]$Requested) {
- $expected=if($Line -ceq '2.0'){'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'}else{'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'}
- $selected=if([string]::IsNullOrWhiteSpace($Requested)){$expected}else{[IO.Path]::GetFullPath($Requested)}
- if(-not $selected.Equals($expected,[StringComparison]::OrdinalIgnoreCase)){throw '[mir-browser-engine-location] Select the target-authorized local engine.'}
+ if([string]::IsNullOrWhiteSpace($Requested)){throw '[mir-browser-engine-location] Supply an explicit engine location.'}
+ $selected=(Resolve-Path -LiteralPath $Requested).Path
+ $engineRoot=Split-Path (Split-Path (Split-Path $selected -Parent) -Parent) -Parent
+ $base=Get-Content -LiteralPath (Join-Path $engineRoot 'data/base/info.json') -Raw|ConvertFrom-Json
+ if($base.name -cne 'base' -or [string]$base.version -cnotmatch ('^'+[regex]::Escape($Line)+'\.[0-9]+$')){throw '[mir-browser-engine-target] Selected engine data does not match the target.'}
  return $selected
 }
-$engine=(Resolve-Path -LiteralPath (Resolve-BrowserEnginePath -Line $Target -Requested $FactorioBin)).Path
 $run=$resources.root
-$lease=$null
+$activation=$null
 $candidate=''
 $targetKey=if($Target -ceq '2.0'){'f200'}else{'f210'}
 $expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch 1
@@ -62,34 +69,27 @@ try {
  return [pscustomobject]@{info=$info;sha256=(Get-FileHash -LiteralPath $candidate).Hash}
 } finally { $archive.Dispose() }
 }
+function Get-MIRBrowserLibrarySelection([string]$Library,[string]$EngineVersion,[string]$Candidate,[string]$Version,[string]$ExpectedSha256,[string]$FixtureDirectory) {
+ Assert-MIRLibraryPath $Library
+ $name=[IO.Path]::GetFileName($Candidate);$installed=Join-Path $Library $name
+ if(-not(Test-Path -LiteralPath $installed -PathType Leaf)){throw "[mir-browser-library-input-missing] $name"}
+ Assert-MIRLibraryPath $installed
+ if((Get-MIRImmutableInputSha256 $installed) -cne $ExpectedSha256){throw '[mir-browser-library-input-hash]'}
+ $fixtureInfo=Get-Content -LiteralPath (Join-Path $FixtureDirectory 'info.json') -Raw|ConvertFrom-Json
+ $fixtureName=$fixtureInfo.name+'_'+$fixtureInfo.version+'.zip';$fixtureArchive=Join-Path $Library $fixtureName
+ Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory $FixtureDirectory
+ return [pscustomobject]@{
+  mod_list=@{mods=@(@{name='base';version=$EngineVersion;enabled=$true},@{name='more-infinite-research';version=$Version;enabled=$true},@{name=$fixtureInfo.name;version=$fixtureInfo.version;enabled=$true})}
+  archive_hashes=@{$name=$ExpectedSha256;$fixtureName=(Get-MIRImmutableInputSha256 $fixtureArchive)}
+ }
+}
 New-Item -ItemType Directory -Path $run | Out-Null
 try {
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
-$engineSha256=(Get-FileHash -LiteralPath $engine).Hash
-if(-not [string]::IsNullOrWhiteSpace($CandidateZip)) {
- $candidateInput=if([IO.Path]::IsPathRooted($CandidateZip)){$CandidateZip}else{Join-Path $repo $CandidateZip}
- $candidate=(Resolve-Path -LiteralPath $candidateInput).Path
- $validatedCandidate=Test-BrowserCandidate -Candidate $candidate -Line $Target -Identity $expectedIdentity -Repository $repo
-}
-$versionActor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 10
-$engineVersionText=Get-Content -LiteralPath $versionActor.stdout -Raw
-if($engineVersionText -notmatch '(?m)^Version:\s*(?<version>[0-9]+\.[0-9]+\.[0-9]+)') { throw 'Browser test cannot identify the selected engine version.' }
-$selectedEngineVersion=[string]$Matches.version
-if(-not $selectedEngineVersion.StartsWith($Target + '.', [StringComparison]::Ordinal)) {
- throw "Browser engine target mismatch: requested $Target, selected engine is $selectedEngineVersion."
-}
-if([string]::IsNullOrWhiteSpace($CandidateZip)) {
- $package=New-MIRNativeProbeTargetPackage -Context $resources -RepoRoot $repo -Target $targetKey -CandidatePrefix BROWSER
- $candidate=[string]$package.archive_path
- $validatedCandidate=Test-BrowserCandidate -Candidate $candidate -Line $Target -Identity $expectedIdentity -Repository $repo
-}
-$fixture=Join-Path $run 'mods/mir-browser-test_1.0.0'
+$fixture=Join-Path $run 'fixture-source/mir-browser-test_1.0.0'
 New-Item -ItemType Directory -Force $fixture | Out-Null
-$packageInput=[ordered]@{source_path=$candidate;file_name=[IO.Path]::GetFileName($candidate);expected_sha256=$validatedCandidate.sha256;role='mir-candidate';identity=@{target=$targetKey;source_version='4.2.1';distribution_version=[string]$expectedIdentity.distribution_version};provenance=@{kind='exact-source-checked-browser-candidate'};immutable=$true}
-$lease=New-MIRImmutableInputLease -RunRoot $run -StageDirectory (Join-Path $run 'mods') -Inputs @($packageInput) -RequireHardLinks
-Add-MIRNativeProbeImmutableLease -Context $resources -Lease $lease
-@{name='mir-browser-test';version='1.0.0';title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
+[ordered]@{name='mir-browser-test';version='1.0.0';title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/browser_fixture_data.lua') -Destination (Join-Path $fixture 'data.lua')
 $lua=[Text.StringBuilder]::new()
 foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{name='browser_catalogue';path='research_browser_factorio_catalogue.lua'},@{name='browser_actions';path='research_browser_actions.lua'})) {
@@ -179,16 +179,42 @@ $capMutant=$coreTestSource.Replace($capAnchor,$capAnchor.Replace('finite_nonnega
 $coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
 [void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player',$coreChecks))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
-@{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='more-infinite-research';enabled=$true},@{name='mir-browser-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
+if($PrepareInputsOnly) {
+ $preparedRoot=Join-Path $run 'prepared-fixtures';[IO.Directory]::CreateDirectory($preparedRoot)|Out-Null
+ $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-browser-test' -Version '1.0.0' -ModsDir $preparedRoot
+ Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_commit=$sourceCommit;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
+ Write-Output "Browser fixture prepared without native execution or library writes: $run"
+ return
+}
+$engine=Resolve-BrowserEnginePath -Line $Target -Requested $FactorioBin
+$engineSha256=(Get-FileHash -LiteralPath $engine).Hash
+$candidateInput=if([IO.Path]::IsPathRooted($CandidateZip)){$CandidateZip}else{Join-Path $repo $CandidateZip}
+$candidate=(Resolve-Path -LiteralPath $candidateInput).Path
+$validatedCandidate=Test-BrowserCandidate -Candidate $candidate -Line $Target -Identity $expectedIdentity -Repository $repo
+$versionActor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 10
+$engineVersionText=Get-Content -LiteralPath $versionActor.stdout -Raw
+if($engineVersionText -notmatch '(?m)^Version:\s*(?<version>[0-9]+\.[0-9]+\.[0-9]+)') { throw 'Browser test cannot identify the selected engine version.' }
+$selectedEngineVersion=[string]$Matches.version
+if(-not $selectedEngineVersion.StartsWith($Target + '.', [StringComparison]::Ordinal)) {
+ throw "Browser engine target mismatch: requested $Target, selected engine is $selectedEngineVersion."
+}
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent) -Parent) -Parent
+$library=(Resolve-Path -LiteralPath $LibraryDirectory).Path
+$selection=Get-MIRBrowserLibrarySelection -Library $library -EngineVersion $selectedEngineVersion -Candidate $candidate -Version $expectedIdentity.distribution_version -ExpectedSha256 $validatedCandidate.sha256 -FixtureDirectory $fixture
+$profile=Join-Path $run 'selection.json';$selection.mod_list|ConvertTo-Json -Depth 6|Set-Content -LiteralPath $profile -Encoding utf8
+$activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory (Join-Path $engineRoot 'data') -ProfilePath $profile -ArchiveHashes $selection.archive_hashes -SettingsMode Defaults
+Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
 # This fixture exercises research/GUI state, not the player's blueprint library.
 # Keep Steam from copying that library into each isolated acceptance directory.
-"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n[other]`ndisable-blueprint-storage=true`nenable-blueprint-storage-cloud-sync=false`n[graphics]`nfull-screen=false`ncache-sprite-atlas=false`n" | Set-Content (Join-Path $run 'config.ini')
+"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n[other]`nenable-new-mods=false`ncheck-updates=false`ndisable-blueprint-storage=true`nenable-blueprint-storage-cloud-sync=false`n[graphics]`nfull-screen=false`ncache-sprite-atlas=false`n" | Set-Content (Join-Path $run 'config.ini')
 $save=Join-Path $run 'probe.zip'
 function Invoke-BrowserEngine([string[]]$Arguments) {
  $graphicsArguments=if($Arguments -contains '--benchmark-graphics') { @('--force-graphics-preset','low','--video-memory-usage','low','--single-thread-loading') } else { @() }
+ $nativeArguments=@('--config',(Join-Path $run 'config.ini'),'--mod-directory',$library)+$graphicsArguments+$Arguments
+ Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $nativeArguments
  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -TimeoutSeconds 120 `
-  -Arguments (@('--config',(Join-Path $run 'config.ini'),'--mod-directory',(Join-Path $run 'mods'))+$graphicsArguments+$Arguments)
+  -Arguments $nativeArguments
+ $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath (Join-Path $run 'userdata/factorio-current.log') -LatestInvocation
 }
 Invoke-BrowserEngine @('--create',$save)
 if($Graphics) { Invoke-BrowserEngine @('--benchmark-graphics',$save,'--benchmark-ticks','720','--disable-audio','--window-size','1024x768') }
@@ -240,9 +266,9 @@ $result | Add-Member resource_policy @{declared_peak_memory_mib=$ExpectedPeakMem
 $result | Add-Member resource_runs $resources.runs.ToArray()
 $result | Add-Member factorio_driver_sha256 (Get-FileHash -LiteralPath (Join-Path $run 'factorio-driver.ps1')).Hash
 $result | Add-Member resource_adapter_sha256 (Get-FileHash -LiteralPath (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')).Hash
-$terminal=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed
-$lease=$null
-$result | Add-Member input_lease $terminal
+$terminal=Complete-MIRLibraryActivation -Activation $activation
+$activation=$null
+$result | Add-Member library_activation $terminal
 Write-MIRNativeProbeResult -Context $resources -Record $result
 $result | ConvertTo-Json -Depth 30
 Write-Output "Evidence: $run"
@@ -252,5 +278,5 @@ Write-Output "Evidence: $run"
  catch { Write-Warning "Browser failure receipt exceeded its remaining budget; retained ledgers are in $run." }
  throw $failure
 } finally {
- if($null -ne $lease -and -not $lease.closed){$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}
+ if($null -ne $activation -and -not $activation.closed){$null=Complete-MIRLibraryActivation -Activation $activation}
 }

@@ -230,6 +230,63 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   Assert-LibraryRefusal {Get-MIRUpgradeLibrarySelection -Library $library -EngineDataDirectory $data -Archive $badArchive -Version '4.2.21001' -ExpectedSha256 (Get-MIRImmutableInputSha256 $badArchive) -FixtureDirectories @($upgradeFixture)} 'mir-library-fixture-member'
   [IO.File]::WriteAllText((Join-Path $upgradeFixture 'control.lua'),'-- controlled upgrade assertionX')
   Assert-LibraryRefusal {Get-MIRUpgradeLibrarySelection -Library $library -EngineDataDirectory $data -Archive $badArchive -Version '4.2.21001' -ExpectedSha256 (Get-MIRImmutableInputSha256 $badArchive) -FixtureDirectories @($upgradeFixture)} 'mir-library-fixture-source'
+  # Run the actual browser selection and launch adapters against tiny inputs.
+  # Only the native actor is substituted; shared activation owns the controls.
+  $browserPath=Join-Path $RepoRoot 'tests/runtime/Test-MIRResearchBrowser.ps1'
+  $browserAst=[Management.Automation.Language.Parser]::ParseFile($browserPath,[ref]$tokens,[ref]$errors)
+  Assert-LibraryTest ($errors.Count-eq0) 'direct browser harness parses'
+  foreach($name in @('Get-MIRBrowserLibrarySelection','Invoke-BrowserEngine')){
+    $function=@($browserAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$true))
+    Assert-LibraryTest ($function.Count-eq1) ('browser adapter exists: '+$name)
+    . ([scriptblock]::Create($function[0].Extent.Text))
+  }
+  Assert-LibraryRefusal {& $browserPath -RepoRoot $RepoRoot} 'mir-browser-direct-inputs-required'
+  $browserFixture=Join-Path $root 'browser-assertions';[IO.Directory]::CreateDirectory($browserFixture)|Out-Null
+  Write-TestJson (Join-Path $browserFixture 'info.json') @{name='mir-browser-test';version='1.0.0';factorio_version='2.1';dependencies=@('base','more-infinite-research')}
+  [IO.File]::WriteAllText((Join-Path $browserFixture 'control.lua'),'-- controlled browser assertions')
+  $browserArgs=@{Library=$library;EngineVersion='2.1.20';Candidate=$badArchive;Version='4.2.21001';ExpectedSha256=(Get-MIRImmutableInputSha256 $badArchive);FixtureDirectory=$browserFixture}
+  Assert-LibraryRefusal {Get-MIRBrowserLibrarySelection @browserArgs} 'mir-library-fixture-missing'
+  $null=Publish-MIRModDirectoryArchive -Source $browserFixture -Name 'mir-browser-test' -Version '1.0.0' -ModsDir $library
+  $selection=Get-MIRBrowserLibrarySelection @browserArgs
+  $profile=Join-Path $profiles 'browser.json';Write-TestJson $profile $selection.mod_list
+  $activation=Start-MIRLibraryActivation $library $data $profile $selection.archive_hashes -SettingsMode Defaults
+  Assert-LibraryTest (-not(Test-Path -LiteralPath (Join-Path $library 'mod-settings.dat'))) 'browser defaults do not inherit previous settings'
+  $active=Get-Content -LiteralPath (Join-Path $library 'mod-list.json') -Raw|ConvertFrom-Json
+  Assert-LibraryTest ((@($active.mods|Where-Object enabled|ForEach-Object name|Sort-Object)-join '|')-ceq'base|mir-browser-test|more-infinite-research') 'browser enables only its exact base profile'
+  $run=Join-Path $root 'browser-actor-run';[IO.Directory]::CreateDirectory((Join-Path $run 'userdata'))|Out-Null
+  [IO.File]::WriteAllLines((Join-Path $run 'config.ini'),@('[path]',('read-data='+$data),('write-data='+(Join-Path $run 'userdata')),'[other]','enable-new-mods=false'))
+  $resources=[pscustomobject]@{root=$run;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=2MB;result_reserve_bytes=64KB}
+  Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
+  $browserActor=(Get-Command Invoke-MIRNativeProbeFactorioProcess).ScriptBlock
+  $browserWrongVersion=$false
+  function Invoke-MIRNativeProbeFactorioProcess {
+    param($Context,$FilePath,$Arguments,$TimeoutSeconds)
+    Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]-ceq$library) 'browser process reads master library directly'
+    if($Arguments -contains '--benchmark-graphics'){
+      Assert-LibraryTest ($Arguments -contains '--single-thread-loading') 'browser retains bounded graphics arguments'
+    }
+    $lines=@('0.001 2026-10-08 00:00:00; Factorio 2.1.20 (build controlled)')
+    $lines+=@($activation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$(if($browserWrongVersion-and$_.name-ceq'more-infinite-research'){'4.2.21000'}else{$_.version})+' (data.lua)'})
+    [IO.File]::WriteAllLines((Join-Path $Context.root 'userdata/factorio-current.log'),$lines)
+    return [pscustomobject]@{result=@{exit_code=0}}
+  }
+  try{
+    Invoke-BrowserEngine @('--create',(Join-Path $run 'test.zip'))
+    Invoke-BrowserEngine @('--benchmark-graphics',(Join-Path $run 'test.zip'),'--benchmark-ticks','1')
+    $browserWrongVersion=$true
+    Assert-LibraryRefusal {Invoke-BrowserEngine @('--benchmark',(Join-Path $run 'test.zip'))} 'mir-library-loaded-selection'
+  }finally{Set-Item Function:Invoke-MIRNativeProbeFactorioProcess -Value $browserActor}
+  $terminal=Complete-MIRLibraryActivation $activation;$activation=$null
+  Assert-LibraryTest ($terminal.archive_links_created-eq0-and$terminal.dependency_payload_bytes_copied-eq0-and$terminal.archive_extractions-eq0-and-not(Test-Path -LiteralPath (Join-Path $run 'mods'))) 'browser switches controls without a populated mod directory'
+  Assert-LibraryTest ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $library 'mod-list.json')))-ceq[Convert]::ToBase64String($oldList)) 'browser restores previous selection'
+  $browserArgs.ExpectedSha256='0'*64
+  Assert-LibraryRefusal {Get-MIRBrowserLibrarySelection @browserArgs} 'mir-browser-library-input-hash'
+  $browserArgs.ExpectedSha256=Get-MIRImmutableInputSha256 $badArchive
+  $browserArgs.Candidate='absent-candidate.zip'
+  Assert-LibraryRefusal {Get-MIRBrowserLibrarySelection @browserArgs} 'mir-browser-library-input-missing'
+  $browserArgs.Candidate=$badArchive
+  [IO.File]::WriteAllText((Join-Path $browserFixture 'control.lua'),'-- changed browser assertions')
+  Assert-LibraryRefusal {Get-MIRBrowserLibrarySelection @browserArgs} 'mir-library-fixture-member'
   # Legacy helpers must refuse external endpoints before creating directories,
   # deleting an existing target or falling back to a physical copy. No files
   # are created outside this test's checkout-contained scratch root.
