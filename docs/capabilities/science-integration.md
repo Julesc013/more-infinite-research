@@ -36,6 +36,8 @@ Science ingredients and progression prerequisites are separate decisions. MIR ad
 
 Hidden technologies are not rejected merely for being hidden. A hidden implementation technology can remain a valid gate when it is enabled, researchable, and recipe-proven. Disabled tutorial, campaign, scenario, debug, or deprecated technologies are not valid inferred freeplay gates.
 
+Recipe acquisition and category matching consume the same normalized category facts as productivity-cap policy. An explicit plural list takes precedence over a leftover singular category; an empty or malformed list does not invent a crafting route. Modeled recipe variants inherit their parent's category when neither variant field is declared, and the candidate index contains only those resolved variant categories. Controlled source checks cover these rules and the resulting acquisition decisions; native machine availability and affected catalogue/save behavior still need their selected environment.
+
 If a recipe-produced science pack has no valid unlocker, MIR removes that pack before final lab compatibility selection. It does not invent a gate or emit an unreachable technology. Packs produced through launch products, scripts, or other non-recipe systems remain eligible from active-lab evidence and may use a reachable same-named technology as their progression gate.
 
 The `generated-prerequisite-safety` fixture reproduces the Factorio 0.17 `basic-mining` failure shape on the current line, verifies deterministic choice between multiple valid unlockers, checks the emitted prerequisite graph, and runs normal `research_all_technologies()` behavior in an isolated save.

@@ -162,18 +162,7 @@ local function normalized_variant(variant)
   local definition = variant.value
   local semantics = recipe_semantics.resolve(variant.recipe, definition, target_profiles.current())
   local ingredients, results = {}, {}
-  local categories, seen_categories = {}, {}
-  local function add_category(category)
-    category = category or "crafting"
-    if not seen_categories[category] then
-      seen_categories[category] = true
-      table.insert(categories, category)
-    end
-  end
-  for _, category in ipairs(definition.categories or {}) do add_category(category) end
-  if definition.category then add_category(definition.category) end
-  if #categories == 0 then add_category("crafting") end
-  table.sort(categories)
+  local categories = recipe_semantics.recipe_categories(variant.recipe, definition)
   for _, entry in pairs(entries_for(definition, "ingredients")) do
     local normalized = normalized_entry(entry)
     if normalized then table.insert(ingredients, normalized) end
@@ -246,19 +235,14 @@ local function productive_results(recipe)
   return names, identities
 end
 
-local function categories_for(recipe)
+local function categories_for(normalized_variants)
   local seen, out = {}, {}
   local function add(category)
-    category = category or "crafting"
     if not seen[category] then seen[category] = true; table.insert(out, category) end
   end
-  for _, category in ipairs(recipe.categories or {}) do add(category) end
-  if recipe.category then add(recipe.category) end
-  for _, variant in ipairs(variants(recipe)) do
-    for _, category in ipairs(variant.value.categories or {}) do add(category) end
-    if variant.value.category then add(variant.value.category) end
+  for _, variant in ipairs(normalized_variants) do
+    for _, category in ipairs(variant.categories) do add(category) end
   end
-  if #out == 0 then add("crafting") end
   table.sort(out)
   return out
 end
@@ -322,7 +306,7 @@ local function build_index(recipe_prototypes)
     end
     local ingredients, ingredient_names, ingredient_identities = aggregate_io(recipe, "ingredients")
     local results, result_names, result_identities = aggregate_io(recipe, "results")
-    local categories = categories_for(recipe)
+    local categories = categories_for(normalized_variants)
     local is_hidden = hidden(recipe)
     local productive_outputs, productive_output_identities = productive_results(recipe)
     facts[recipe_name] = {
