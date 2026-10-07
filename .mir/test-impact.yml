@@ -852,6 +852,12 @@
       "groups": [],
       "scenarios": [],
       "tags": []
+    },
+    {
+      "pattern": "tests/support/MIRSdkGenerationRepairControls.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
     }
   ]
 }
