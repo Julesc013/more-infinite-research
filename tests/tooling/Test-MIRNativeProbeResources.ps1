@@ -173,6 +173,18 @@ try {
   $context=New-MIRNativeProbeResourceContext @arguments -ExpectedPeakMemoryMiB 1024
   Assert-Probe (-not (Test-Path -LiteralPath $context.root)) 'successful admission allocated before caller initialization.'
   New-Item -ItemType Directory -Path $context.root | Out-Null
+  $retirementPath=Join-Path $context.root 'retired-during-scan'
+  $retiredDirectory=[IO.Directory]::CreateDirectory($retirementPath)
+  Assert-Probe (-not(Test-MIR441RetiredDirectory $retiredDirectory)) 'a live directory was classified as retired.'
+  Remove-Item -LiteralPath $retirementPath
+  $retirementObserved=$false
+  try {$null=@($retiredDirectory.EnumerateFileSystemInfos())} catch [IO.DirectoryNotFoundException] {$retirementObserved=$true}
+  Assert-Probe ($retirementObserved-and(Test-MIR441RetiredDirectory $retiredDirectory)) 'actual native enumeration disappearance was not recognized.'
+  [IO.File]::WriteAllText($retirementPath,'keep')
+  Assert-Probe (-not(Test-MIR441RetiredDirectory $retiredDirectory)) 'a replacement file was mistaken for a retired directory.'
+  $retirementUsage=Get-MIR441TreeUsage -Path $context.root
+  Assert-Probe ($retirementUsage.complete-and$retirementUsage.files-eq1-and$retirementUsage.bytes-eq4) 'live output byte accounting changed.'
+  Remove-Item -LiteralPath $retirementPath
   # Extract the consumed harness functions, rather than a second validator.
   # These tiny ZIPs contain only identity/module controls, not player packages.
   $browserTokens=$null;$browserErrors=$null
