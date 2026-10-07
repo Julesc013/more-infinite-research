@@ -111,7 +111,8 @@ end
 local early = data.raw.technology[early_name]
 local continuation = data.raw.technology[continuation_name]
 if type(early) ~= "table" or early.max_level ~= 3 then
-  observe_missing_tin()
+  local observed, diagnostic_error = pcall(observe_missing_tin)
+  if not observed then log("[mir-tin-acquisition-diagnostic] unavailable: " .. tostring(diagnostic_error)) end
   fail("finite legacy Tin technology differs")
 end
 if type(continuation) ~= "table" or continuation.level ~= 4 or continuation.max_level ~= "infinite" then
