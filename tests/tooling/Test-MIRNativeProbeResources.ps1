@@ -677,6 +677,7 @@ function New-MIR4TargetPackage {
   $echo=Join-Path $context.root 'argv-echo.ps1'
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
+[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
 [ordered]@{values=@($Values);steam_app=$env:SteamAppId;steam_game=$env:SteamGameId;temp=$env:TEMP} | ConvertTo-Json -Compress
 '@,[Text.UTF8Encoding]::new($false))
   $parentApp=[Environment]::GetEnvironmentVariable('SteamAppId');$parentGame=[Environment]::GetEnvironmentVariable('SteamGameId')
@@ -689,8 +690,18 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $priorIndex=$context.process_index
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $pwsh -Arguments @('x'*20KB)} 'argument-budget'
   Assert-Probe ($context.process_index -eq $priorIndex) 'oversized argument data launched an actor.'
+  # A console child does not expose PowerShell's GUI launch-and-return behavior.
+  # Compile a tiny Windows GUI executable with the installed framework compiler;
+  # the real driver must retain it until its delayed output and exit are complete.
+  $guiSource=Join-Path $context.root 'gui-wait.cs';$guiBinary=Join-Path $context.root 'gui-wait.exe';$guiMarker=Join-Path $context.root 'gui-finished.txt'
+  [IO.File]::WriteAllText($guiSource,'using System.IO; using System.Threading; class WaitControl { static int Main(string[] args) { Thread.Sleep(1500); File.WriteAllText(args[0],"finished"); return 0; } }')
+  $compiler=Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
+  & $compiler /nologo /target:winexe ('/out:'+$guiBinary) $guiSource
+  if($LASTEXITCODE-ne0){throw 'Controlled GUI compilation failed'}
+  $guiActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $guiBinary -Arguments @($guiMarker) -TimeoutSeconds 15
+  Assert-Probe ((Test-Path -LiteralPath $guiMarker)-and([IO.File]::ReadAllText($guiMarker)-ceq'finished')-and$guiActor.result.exit_code-eq0) 'native wrapper returned before the GUI child completed.'
   Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$context.runs.Count}
-  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 7) 'reserved result did not preserve actual actor inventory.'
+  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 8) 'reserved result did not preserve actual actor inventory.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'

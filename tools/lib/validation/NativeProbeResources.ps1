@@ -246,8 +246,23 @@ $ErrorActionPreference='Stop'
 $nativeArguments=[string[]]([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($ArgumentsBase64)) | ConvertFrom-Json)
 $env:SteamAppId='427520';$env:SteamGameId='427520'
 [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
-& $NativeExecutable @nativeArguments
-exit $LASTEXITCODE
+# A GUI-subsystem executable can return from PowerShell's call operator before
+# it finishes. Keep this monitored parent alive until the native child exits.
+$start=[Diagnostics.ProcessStartInfo]::new()
+$start.FileName=$NativeExecutable;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
+$start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
+$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+foreach($argument in $nativeArguments){[void]$start.ArgumentList.Add($argument)}
+$native=[Diagnostics.Process]::new();$native.StartInfo=$start
+try{
+ if(-not $native.Start()){throw 'Native engine did not start.'}
+ $stdoutCopy=$native.StandardOutput.BaseStream.CopyToAsync([Console]::OpenStandardOutput())
+ $stderrCopy=$native.StandardError.BaseStream.CopyToAsync([Console]::OpenStandardError())
+ $native.WaitForExit()
+ $null=$stdoutCopy.GetAwaiter().GetResult();$null=$stderrCopy.GetAwaiter().GetResult()
+ $nativeExitCode=$native.ExitCode
+}finally{$native.Dispose()}
+exit $nativeExitCode
 '@
   [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
   return Invoke-MIRNativeProbeProcess -Context $Context -FilePath (Get-Command pwsh).Source -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $CompletionPredicate `
