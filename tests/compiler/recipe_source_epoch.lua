@@ -187,4 +187,68 @@ end)()
   _G.mods,_G.script,package.loaded[alias]=previous_mods,previous_script,previous_module
 end)()
 
+-- The fact index and acquisition consumer must agree on effective categories.
+-- A leftover singular category cannot supplement an explicit plural list.
+;(function()
+  local profiles = require("fixtures.recipe_source_epoch.target_profiles")
+  local profile_module = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_current = profile_module.current
+  local routes = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+  local fingerprint = require("prototypes.mir.core.fingerprint")
+  local deepcopy = require("prototypes.mir.core.deepcopy")
+  local cases = {
+    {id="default", fields={}, categories="crafting", acquired=true},
+    {id="singular", fields={category="smelting"}, categories="smelting", acquired=false},
+    {id="plural-wins", fields={category="crafting", categories={"angels-seed-extractor"}},
+      categories="angels-seed-extractor", acquired=false},
+    {id="plural-crafting", fields={category="smelting", categories={"crafting"}},
+      categories="crafting", acquired=true},
+    {id="plural-deduplicated", fields={categories={"z-extractor","crafting","crafting"}},
+      categories="crafting|z-extractor", acquired=true},
+    {id="empty-list", fields={category="crafting", categories={}}, categories="", acquired=false},
+    {id="malformed-list", fields={category="crafting", categories=false}, categories="", acquired=false},
+    {id="inherited-variant", fields={category="smelting", normal={enabled=true,
+      energy_required=1, ingredients={}, results={{type="item",name="A",amount=1}}}},
+      categories="smelting", acquired=false},
+    {id="variant-overrides", fields={category="crafting",
+      normal={enabled=true,category="smelting",energy_required=1,ingredients={},results={{type="item",name="A",amount=1}}},
+      expensive={enabled=true,category="angels-seed-extractor",energy_required=1,ingredients={},results={{type="item",name="A",amount=1}}}},
+      categories="angels-seed-extractor|smelting", acquired=false}
+  }
+  for _, line in ipairs({"2.1","2.0","1.1","1.0"}) do
+    local profile = assert(profiles.profiles[line])
+    profile_module.current = function() return profile end
+    for _, case in ipairs(cases) do
+      -- Historical engines use the singular/variant contract. A foreign
+      -- plural field is not an upstream historical-engine qualification.
+      if (line == "2.1" or line == "2.0") or case.fields.categories == nil then
+      local raw = {name="category-producer",enabled=true,energy_required=1,ingredients={},
+        results={{type="item",name="A",amount=1}}}
+      for field, value in pairs(case.fields) do raw[field] = deepcopy(value) end
+      local before = fingerprint.of(raw)
+      local indexed = recipe_facts.index_prototypes({[raw.name]=raw})
+      local fact = indexed.facts[raw.name]
+      local id = "CAT" .. line .. "/" .. case.id
+      local acquired = compiler_context.with_active(compiler_context.new(), function()
+        return routes.initial_recipe_witness(raw.name,"A",{recipe_index=indexed})~=nil
+      end)
+      check(id .. "/acquisition", acquired==case.acquired,
+        "The actual acquisition consumer cannot use a phantom hand-crafting category")
+      check(id .. "/facts", table.concat(fact.categories,"|")==case.categories,
+        "Canonical facts retain only effective variant categories")
+      local has_crafting = string.find("|"..case.categories.."|","|crafting|",1,true)~=nil
+      check(id .. "/index", (indexed.by_category.crafting~=nil)==has_crafting,
+        "Category candidate index cannot advertise a discarded crafting route")
+      if not raw.normal and not raw.expensive then
+        check(id .. "/variant", table.concat(fact.variants[1].categories,"|")==case.categories,
+          "The concrete route variant uses the same effective categories")
+      end
+      check(id .. "/immutable", fingerprint.of(raw)==before,
+        "Category normalization and acquisition preserve prototype inputs")
+      end
+    end
+  end
+  profile_module.current = previous_current
+end)()
+
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)

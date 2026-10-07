@@ -17,17 +17,35 @@ local function declared(recipe, definition, field)
   return nil
 end
 
--- Shared category ownership for the cap policy and its admitted mutation.
--- An explicit categories list takes precedence over the singular category.
-function M.has_recipe_category(recipe, wanted)
-  if type(recipe) ~= "table" then return false end
-  if type(recipe.categories) == "table" then
-    for _, category in ipairs(recipe.categories) do
-      if category == wanted then return true end
+-- One category authority for recipe facts, acquisition and cap policy.
+-- Variants inherit the parent only when neither category field is declared.
+-- An explicit list takes precedence; an empty/invalid list invents no route.
+function M.recipe_categories(recipe, definition)
+  if type(recipe) ~= "table" then return {} end
+  local source = type(definition) == "table" and definition or recipe
+  if source ~= recipe and source.categories == nil and source.category == nil then source = recipe end
+  local categories, seen = {}, {}
+  local function add(category)
+    if type(category) ~= "string" or category == "" then return false end
+    if not seen[category] then
+      seen[category] = true
+      table.insert(categories, category)
     end
-    return false
+    return true
   end
-  return (recipe.category or "crafting") == wanted
+  if source.categories ~= nil then
+    if type(source.categories) ~= "table" then return {} end
+    for _, category in ipairs(source.categories) do if not add(category) then return {} end end
+  elseif not add(source.category == nil and "crafting" or source.category) then
+    return {}
+  end
+  table.sort(categories)
+  return categories
+end
+
+function M.has_recipe_category(recipe, wanted)
+  for _, category in ipairs(M.recipe_categories(recipe)) do if category == wanted then return true end end
+  return false
 end
 
 -- Maximum base quantity, before probability, extra item rolls or productivity
