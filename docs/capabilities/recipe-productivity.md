@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-10-07
 supersedes: []
 superseded_by: []
 ---
@@ -15,6 +15,8 @@ superseded_by: []
 Recipe productivity is the capability lane that creates `change-recipe-productivity` effects for validated recipe families.
 
 `prototypes/mir/index/recipe_facts.lua` scans final recipe prototypes once and keeps the normalized authority private. RecipeFactV2 preserves typed variant ingredients/products, probabilities, catalysts, productivity exclusions, surface conditions, and source class while retaining the aggregate compatibility fields used by existing matchers. `prototypes/mir/index/relationships.lua` derives shared lookups by output, ingredient, category, unlock, placement result, entity type, effect identity, lab pack, module tier, upgrade, subgroup, and surface. Recipe productivity matching, science pack production facts, compatibility diagnostics, and the diagnostic fact registry share those authorities instead of rebuilding independent views. The generation-integrity fixture asserts a single recipe scan and copy isolation. Prototype mutation passes and the recycler pre-mutation safety classifier remain phase-local live-prototype operations, not competing general fact authorities.
+
+Productive item/fluid identities require a positive output roll and useful bonus quantity. Shared probability requires a positive valid interval; modern roll fields follow the selected target contract. An unexcluded fractional item roll can provide useful output with a zero base amount on F210/F200. Fractional returns with excluded base quantities remain conservative pending native evidence. These facts feed the existing typed material and dynamic lab-science selectors. They grant no garden, seed, carrier-return or process-loop exception. `tests/compiler/material_routes.lua` consumes the canonical fact index and matcher under all nine target contracts; controlled replay does not qualify current packages, upstream finalizers or production in a saved world.
 
 ## Gates
 

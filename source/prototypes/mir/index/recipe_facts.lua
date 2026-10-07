@@ -52,14 +52,42 @@ local function amount_of(entry)
   return tonumber(entry.amount or entry[2] or entry.amount_max or entry.amount_min) or 1
 end
 
-local function productive_amount(entry)
-  if type(entry) ~= "table" then return 1 end
+local function has_productive_output(entry)
+  if type(entry) ~= "table" then return true end
+  local profile = target_profiles.current()
+  local fields = profile and profile.prototype_shapes and profile.prototype_shapes.product_probability_fields or {}
+  local function supports(field)
+    for _, declared in ipairs(fields) do if declared == field then return true end end
+    return false
+  end
+  -- Modern authored fields cannot grant productive identities on an older
+  -- target. Normalized facts retain those fields separately for diagnostics.
+  for _, field in ipairs({"independent_probability", "shared_probability", "extra_count_fraction"}) do
+    if entry[field] ~= nil and not supports(field) then return false end
+  end
   local maximum = recipe_semantics.maximum_base_result_amount(entry)
-  local ignored = recipe_semantics.productivity_excluded_amount(entry, target_profiles.current())
-  local probability = tonumber(entry.independent_probability)
-  if probability == nil then probability = tonumber(entry.probability) end
+  local ignored = recipe_semantics.productivity_excluded_amount(entry, profile)
+  local probability = entry.independent_probability
+  if probability == nil then probability = entry.probability end
   if probability == nil then probability = 1 end
-  return math.max(0, maximum - ignored) * probability
+  probability = tonumber(probability)
+  if probability == nil or probability ~= probability or probability <= 0 or probability > 1 then return false end
+  local shared = entry.shared_probability
+  if shared ~= nil then
+    if type(shared) ~= "table" or type(shared.min) ~= "number" or type(shared.max) ~= "number"
+      or shared.min ~= shared.min or shared.max ~= shared.max
+      or shared.min < 0 or shared.max > 1 or shared.min >= shared.max then return false end
+  end
+  local extra = 0
+  if (entry.type or "item") == "item" and ignored == 0 then
+    extra = tonumber(entry.extra_count_fraction or 0)
+    if extra == nil or extra ~= extra or extra < 0 or extra > 1 then return false end
+  end
+  -- This projection asks whether a useful bonus output is possible. It is
+  -- not an expected-yield or profitable-loop certificate. An unexcluded
+  -- fractional item roll is productive even when the base amount is zero;
+  -- excluded-base fractional returns still need their own native witness.
+  return maximum - ignored > 0 or extra > 0
 end
 
 local function normalized_entry(entry)
@@ -215,7 +243,7 @@ local function productive_results(recipe)
       local name = name_of(entry)
       local entry_type = (type(entry) == "table" and entry.type) or "item"
       local key = identity_key(entry_type, name)
-      if name and productive_amount(entry) > 0 then
+      if name and has_productive_output(entry) then
         if not seen_names[name] then
           seen_names[name] = true
           table.insert(names, name)
