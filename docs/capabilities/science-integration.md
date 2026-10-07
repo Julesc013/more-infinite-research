@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-09-22
+last_reviewed: 2026-10-07
 supersedes: []
 superseded_by: []
 ---
@@ -13,6 +13,8 @@ superseded_by: []
 # Science Integration Capability
 
 Science integration decides when active science packs participate in generated research costs or science-pack productivity. A pack must have a physical item prototype and be listed as an input by an active lab; lab compatibility remains the hard gate. Its prototype kind is not an admission contract: target profiles describe engine shapes, while the active lab relationship proves research use.
+
+The dynamic science-pack manufacturing stream binds its base and discovered lab inputs to productive item outputs and rejects explicit upstream productivity bans. A same-named fluid cannot receive the item's manufacturing bonus, and a fully productivity-excluded science item cannot qualify through an unrelated coproduct. Explicit caller output constraints retain their authority. A modded sample used by a lab belongs to this existing science stream when its final recipe passes admission; adding a separate sample owner would duplicate that coverage. This rule does not qualify garden, seed or tree production, upstream finalizers, native output or save upgrades.
 
 The 3.1 implementation separates six authorities behind the stable `science_packs.lua` facade:
 

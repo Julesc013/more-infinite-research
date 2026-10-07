@@ -1302,4 +1302,104 @@ end
   profile_module.current = previous_current
 end)()
 
+-- Lab inputs are physical science items. Execute the actual discovery helper,
+-- fact normalizer and matcher without claiming an upstream finalizer/native run.
+;(function()
+  local profiles = require("fixtures.material_routes.target_profiles")
+  local profile_module = require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_current = profile_module.current
+  local actual_facts = require("prototypes.mir.index.recipe_facts")
+  local deepcopy = require("prototypes.mir.core.deepcopy")
+  local registry_name = "prototypes.mir.streams.registry"
+  local science_name = "prototypes.mir.capabilities.science_integration.science_packs"
+  local saved_registry, saved_science = package.loaded[registry_name], package.loaded[science_name]
+  local lab_inputs = {}
+  stub(registry_name, {shared = {per_level_default = 0.05}})
+  stub(science_name, {pack_list_all = function() return lab_inputs end})
+  local discovery = require("prototypes.mir.planner.stream_compiler.discover")
+
+  local function selected(spec, results, denied)
+    local raw = {name = "fixture-science-producer", allow_productivity = not denied,
+      ingredients = {{type = "item", name = "fixture-science-feed", amount = 1}}, results = results}
+    local before = test_fingerprint(raw)
+    local facts = actual_facts.index_prototypes({[raw.name] = raw})
+    environment(facts.facts)
+    risks = {}
+    local names = {}
+    for _, bucket in ipairs(matcher.recipes_for_stream(spec, 0.05)) do
+      check(bucket.change == 0.10, "dynamic science discovery preserves the existing modifier")
+      for _, name in ipairs(bucket.recipes) do names[#names + 1] = name end
+    end
+    check(test_fingerprint(raw) == before, "dynamic science matching preserves raw prototypes")
+    return names
+  end
+  local function result(kind, name, ignored)
+    return {type = kind, name = name, amount = 1, ignored_by_productivity = ignored}
+  end
+  for _, line in ipairs({"2.1", "2.0"}) do
+    local profile = assert(profiles.profiles[line])
+    local source = assert(material_streams_for(profile, {}, {}).research_science_pack_productivity)
+    profile_module.current = function() return profile end
+    -- Controlled lab membership; this is not a finalized Angel compatibility claim.
+    lab_inputs = {"angels-token-bio", "automation-science-pack", "angels-token-bio"}
+    local before = test_fingerprint(source)
+    local spec = discovery.expand_dynamic_items(source)
+    check(#selected(spec, {result("item", "angels-token-bio")}) == 1,
+      "lab science item producer stays owned by the existing science stream: " .. line)
+    check(#selected(spec, {result("fluid", "angels-token-bio")}) == 0,
+      "same-named fluid cannot inherit lab science item productivity: " .. line)
+    check(#selected(spec, {result("fluid", "automation-science-pack")}) == 0,
+      "base science item names are also typed: " .. line)
+    check(#selected(spec, {result("item", "unrelated-sample")}) == 0,
+      "unrequested sample is not adopted by lab discovery: " .. line)
+    check(#selected(spec, {result("item", "angels-token-bio", 1), result("item", "unrelated-sample")}) == 0,
+      "a productive coproduct cannot hide a fully excluded science item: " .. line)
+    check(#selected(spec, {result("item", "angels-token-bio", 0), result("item", "unrelated-sample")}) == 1,
+      "ordinary coproduct retains productive science item admission: " .. line)
+    check(#selected(spec, {result("item", "angels-token-bio")}, true) == 0,
+      "dynamic discovery cannot override upstream productivity denial: " .. line)
+    check(test_fingerprint(source) == before, "dynamic discovery never mutates its declaration: " .. line)
+    check(test_fingerprint(discovery.expand_dynamic_items(spec)) == test_fingerprint(spec),
+      "repeated discovery is deterministic and does not grow duplicate constraints: " .. line)
+    local expected, occurrences = {}, {}
+    for _, name in ipairs(spec.groups[1].items) do expected[name] = true end
+    for _, output in ipairs(spec.groups[1].required_productive_outputs or {}) do
+      check(output.type == "item" and expected[output.name], "constraint is a requested typed item")
+      occurrences[output.name] = (occurrences[output.name] or 0) + 1
+    end
+    for name in pairs(expected) do check(occurrences[name] == 1, "each discovered science item has one binding: " .. name) end
+
+    for _, boundary in ipairs({"group", "stream"}) do
+      for _, constraint in ipairs({false, {}, {{type = "fluid", name = "angels-token-bio"}}}) do
+        local explicit = deepcopy(source)
+        local destination = boundary == "group" and explicit.groups[1] or explicit
+        destination.required_productive_outputs = constraint
+        local expanded = discovery.expand_dynamic_items(explicit)
+        local actual
+        if boundary == "group" then actual = expanded.groups[1].required_productive_outputs
+        else actual = expanded.required_productive_outputs end
+        check(test_fingerprint(actual) == test_fingerprint(constraint),
+          "explicit caller output constraint survives lab discovery: " .. boundary .. "/" .. line)
+        check(#selected(expanded, {result("fluid", "angels-token-bio")})
+            == (type(constraint) == "table" and #constraint > 0 and 1 or 0),
+          "actual matching consumes the explicit caller constraint: " .. boundary .. "/" .. line)
+        if boundary == "stream" then
+          check(expanded.groups[1].required_productive_outputs == nil,
+            "stream-level constraint is not shadowed by an implicit group constraint")
+        end
+      end
+    end
+    local nongrouped = discovery.expand_dynamic_items({dynamic_items_from_lab_inputs = true,
+      items = {"fixture-base-science"}})
+    check(nongrouped.groups[1].change == 0.05, "synthesized group retains the shared default")
+    check(nongrouped.groups[1].required_productive_outputs[1].name == "fixture-base-science",
+      "base items receive a typed binding in a synthesized group")
+    local ordinary = {groups = {{items = {"ordinary-item"}}}}
+    check(discovery.expand_dynamic_items(ordinary) == ordinary, "non-dynamic declarations retain identity")
+  end
+  profile_module.current = previous_current
+  package.loaded[registry_name], package.loaded[science_name] = saved_registry, saved_science
+  package.loaded["prototypes.mir.planner.stream_compiler.discover"] = nil
+end)()
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)
