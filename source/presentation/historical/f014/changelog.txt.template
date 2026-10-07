@@ -8,6 +8,7 @@ Version: 4.2.01401
     - Research Library backports are not included in this package.
     - Recognize the historical player prototype when checking handcraftable laboratory and science acquisition routes.
     - Select the native historical science-pack names for default research and official science progression.
+    - Emit the singular technology icon field required by this engine, preserving the selected base artwork.
 
   Info:
 

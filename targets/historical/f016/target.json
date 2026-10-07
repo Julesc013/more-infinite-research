@@ -54,10 +54,10 @@
       "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
       "source_path": "source/adapters/historical/legacy-reduced/target_profiles.lua.template",
       "transform": "legacy-target-profile-template-v1",
-      "source_sha256": "3B73DAB33034234715B5F15981D5953466DE5DA723938F5E87273C4D1CAC4031",
-      "source_bytes": 4313,
-      "output_bytes": 4100,
-      "output_sha256": "CD60F23085608489145CBBB8785F46F7E814BA5AA2E6FC4857491BC6E0EF02F3"
+      "source_sha256": "3B66AC979996FACFFD9499AC22E46B51F780754A5201D0501E32CEB4D2E79559",
+      "source_bytes": 4412,
+      "output_bytes": 4173,
+      "output_sha256": "14B440B2CD71D0ECF002B7284F2E5D0DC4B90042C17A6BCCE1DE96FEFC45DD60"
     }
   ],
   "patches": [
@@ -70,5 +70,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "47B740C08443087E8A700A3A5101575C06B9143D16DF559677B6D923A725B161"
+  "record_sha256": "B01D3109EE733796CDA4C706C41D9ED33FFB9296254F714F19045FA17C04B732"
 }

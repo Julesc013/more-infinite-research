@@ -368,7 +368,7 @@ do
  stub('prototypes.mir.planner.costs',{enabled_for=function() return true end,
   model_for=function() return {count_formula='100*L'} end,max_level_for=function() return 'infinite' end,
   research_time_for=function() return 30 end})
- stub('prototypes.mir.presentation.icon_builder',{icons_for_stream=function() return {} end})
+ stub('prototypes.mir.presentation.icon_builder',{technology_icon_fields_for_stream=function() return {icons={}} end})
  stub('prototypes.mir.capabilities.recipe_productivity.planner',{
   match_buckets=function() return selected_buckets end,
   effects_from_buckets=function(_,values)

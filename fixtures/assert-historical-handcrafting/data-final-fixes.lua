@@ -10,6 +10,11 @@ for _, key in ipairs({
   local name = 'recipe-prod-' .. key .. '-1'
   local technology = assert(data.raw.technology[name], 'Missing handcrafting-dependent research: ' .. name)
   assert(technology.enabled ~= false and not technology.hidden, 'Unavailable research: ' .. name)
+  if data.raw.tool['alien-science-pack'] then
+    assert(type(technology.icon)=='string' and technology.icons==nil, 'Missing historical singular icon: ' .. name)
+  else
+    assert(technology.icons and #technology.icons>0, 'Missing layered icon: ' .. name)
+  end
   assert(technology.unit and #technology.unit.ingredients > 0, 'Missing research science: ' .. name)
   -- MIR's terminal 0.13/0.14 predecessor uses alien science for these late
   -- character upgrades. The 0.15/0.16 equivalent is high-tech plus military.

@@ -1262,4 +1262,29 @@ do
     package.loaded[name]=saved[name]
   end
 end
+do
+  local shapes = require('prototypes.mir.platform.factorio.target_profiles').current().prototype_shapes
+  local previous = shapes.technology_icon_layers
+  local icons = require('prototypes.mir.presentation.icon_builder')
+  local stream = {overlay=false,icons={
+    {icon='__base__/graphics/technology/automation.png',icon_size=128},
+    {icon='__base__/graphics/icons/iron-plate.png',icon_size=32,tint={r=0.5,g=1,b=1}}
+  }}
+  local before=fingerprint.of(stream)
+  for _, mode in ipairs({'single','layered','default'}) do
+    shapes.technology_icon_layers=mode~='single'
+    if mode=='default' then shapes.technology_icon_layers=nil end
+    local fields=icons.technology_icon_fields_for_stream(stream)
+    if mode=='single' then
+      check('LRI/single',fields.icons==nil and fields.icon==stream.icons[1].icon and fields.icon_size==128,
+        'Historical presentation supplies the singular icon required by the engine')
+    else
+      check('LRI/'..mode,fields.icon==nil and fields.icons and #fields.icons==2 and fields.icons[2].tint.r==0.5,
+        'Modern presentation preserves every icon layer and its tint')
+    end
+    check('LRI/'..mode..'/immutable',fingerprint.of(stream)==before,
+      'Native presentation projection preserves its source declaration')
+  end
+  shapes.technology_icon_layers=previous
+end
 print('MIR-LAB-REACHABILITY-PASS ' .. checks)

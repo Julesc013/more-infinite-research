@@ -2956,8 +2956,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed stream-compiler qualify responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 13167,
-      "expected_sha256": "D4AC38E303EAF1073F15E226527BC787FC74E004D1EF0BCE17D5BE346133396A",
+      "expected_bytes": 13431,
+      "expected_sha256": "A0339F701705825F756FB06E4A87D1603746CCC6BCACD96F97DFFAD76E1BF430",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3212,8 +3212,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9842,
-      "expected_sha256": "AC7987F1518B0187A2D92B8FC2787889374DC458CDE42855C66988270D51E5B8",
+      "expected_bytes": 10343,
+      "expected_sha256": "9B2788BEC9B6C9E290C8A8D038BF3E6F3D86DBDB39BE1D5C237DCB94DB01099A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "26B19B8C184FADDE051F83DDACD829CC596D93520F5F71766D134F1E02E7FF48"
+  "record_sha256": "6E2E969511984D81BF674E4A82C6F361A9E7DB684E6B6DF613CB6FCF0C177520"
 }
