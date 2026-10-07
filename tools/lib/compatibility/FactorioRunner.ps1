@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 $mirCompatIdentityModule=New-Module -Name MIRCompatInputIdentity -ArgumentList (Join-Path $PSScriptRoot '../validation/ImmutableInputStaging.ps1') -ScriptBlock {
   param($Path)
   . $Path
-  Export-ModuleMember -Function Get-MIRImmutableInputSha256,Get-MIRImmutableInputFileIdentity
+  Export-ModuleMember -Function Get-MIRImmutableInputSha256,Get-MIRImmutableInputFileIdentity,Assert-MIRCheckoutHardLinkBoundary
 }
 Import-Module $mirCompatIdentityModule -Force
 . (Join-Path $PSScriptRoot 'LibraryActivation.ps1')
@@ -108,6 +108,7 @@ function Copy-MIRCachedModZips {
     $hashProperty=$entry.PSObject.Properties['sha256']
     if ($null -ne $hashProperty -and [string]$hashProperty.Value -cne $expected) { throw '[mir-compat-archive-hash]' }
     $target=Join-Path $ModsDir ([string]$entry.file_name)
+    Assert-MIRCheckoutHardLinkBoundary -Source $source -Destination $target
     if ((Test-Path -LiteralPath $target) -and ((Get-Item -LiteralPath $target -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw '[mir-compat-archive-reparse]' }
     if (-not (Test-Path -LiteralPath $target)) {
       # A failed link refuses the scenario. Never copy a dependency archive.

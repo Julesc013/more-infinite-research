@@ -148,7 +148,9 @@ function New-MIR441TechnicalSeal {
   foreach($target in @($independent.targets)){
     $id=[string]$target.target;$candidateRow=@($candidate.targets|Where-Object target -eq $id)[0];$sourceAsset=Join-Path $evidence "assets/$([string]$candidateRow.asset.path)";$relative="assets/$([string]$candidateRow.asset.path)";$destination=Join-Path $window $relative
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)|Out-Null
-    try{New-Item -ItemType HardLink -Path $destination -Target $sourceAsset -ErrorAction Stop|Out-Null}catch{Copy-Item -LiteralPath $sourceAsset -Destination $destination}
+    # Release custody is a separately verified package copy, never an alias to
+    # an external evidence root. This does not stage dependency mod archives.
+    Copy-Item -LiteralPath $sourceAsset -Destination $destination
     $asset=Get-MIR441FileIdentity -Path $destination -RelativePath $relative
     if([string]$asset.sha256-cne[string]$target.archive.archive_sha256){throw "[mir441-seal-asset-copy] $id"}
     $targetRows.Add([pscustomobject][ordered]@{target=$id;distribution_version=[string]$target.distribution_version;asset=$asset;content_sha256=[string]$target.archive.content_sha256;entry_count=[int]$target.archive.entry_count;engine=$target.engine;qualification='passed';independent_verification='passed'})

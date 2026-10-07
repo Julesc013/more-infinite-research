@@ -167,5 +167,61 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   [IO.File]::WriteAllText((Join-Path $fixtureRoot 'control.lua'),'-- changed fixture body')
   Assert-LibraryRefusal {Read-K2213DirectLibraryInputs -Library $library -Inputs $tinyInputs -FixtureRoot $fixtureRoot} 'library-fixture-source:control.lua'
   Assert-LibraryTest (@(Get-ChildItem -LiteralPath $profiles -Recurse -File|Where-Object Extension -EQ '.zip').Count -eq 0) 'definition-only profiles'
+  # Legacy helpers must refuse external endpoints before creating directories,
+  # deleting an existing target or falling back to a physical copy. No files
+  # are created outside this test's checkout-contained scratch root.
+  . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
+  . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+  $inside=Join-Path $library 'alpha_1.0.0.zip'
+  $outside=Join-Path (Split-Path -Parent $RepoRoot) ('must-not-create-'+[guid]::NewGuid().ToString('N'))
+  $prefixCollision=$RepoRoot+'-not-this-checkout/file.zip'
+  foreach($external in @($outside,$prefixCollision,(Join-Path $RepoRoot '../must-not-create-traversal.zip'))){
+    Assert-LibraryRefusal {Assert-MIRCheckoutHardLinkBoundary -Source $inside -Destination $external} 'mir-hardlink-outside-checkout'
+    Assert-LibraryRefusal {Assert-MIRCheckoutHardLinkBoundary -Source $external -Destination (Join-Path $root 'safe.zip')} 'mir-hardlink-outside-checkout'
+  }
+  $sentinel=Join-Path $root 'untouched.txt';[IO.File]::WriteAllText($sentinel,'keep prior bytes')
+  Assert-LibraryRefusal {Copy-MIRFileWithHardlinkFallback -Source $outside -Destination $sentinel} 'mir-hardlink-outside-checkout'
+  Assert-LibraryTest ([IO.File]::ReadAllText($sentinel)-ceq'keep prior bytes') 'external rejection precedes target deletion and fallback'
+  Assert-LibraryRefusal {Copy-MIRModDirectory -Source $fixtureRoot -Name fixture -ModsDir $outside} 'mir-hardlink-outside-checkout'
+  Assert-LibraryRefusal {Copy-MIRCachedModZips -CacheDir $library -ModsDir $outside -LockEntries @([pscustomobject]@{file_name='alpha_1.0.0.zip';sha256=$hashes['alpha_1.0.0.zip']})} 'mir-hardlink-outside-checkout'
+  $guardRun=Join-Path $root 'guard-run';[IO.Directory]::CreateDirectory($guardRun)|Out-Null
+  $guardInputs=@(@{source_path=$outside;file_name='outside.zip';expected_sha256=('0'*64);role='test';identity=@{};provenance=@{};immutable=$true})
+  Assert-LibraryRefusal {New-MIRImmutableInputLease -RunRoot $guardRun -StageDirectory (Join-Path $guardRun 'mods') -Inputs $guardInputs} 'mir-hardlink-outside-checkout'
+  Assert-LibraryTest (@(Get-ChildItem -LiteralPath $guardRun -Force).Count-eq0) 'external input rejected before lease or staging creation'
+  $guardInputs[0].source_path=$inside
+  Assert-LibraryRefusal {New-MIRImmutableInputLease -RunRoot (Split-Path -Parent $RepoRoot) -StageDirectory $outside -Inputs $guardInputs} 'mir-hardlink-outside-checkout'
+  Assert-LibraryTest (-not(Test-Path -LiteralPath $outside)) 'external output never created'
+  # Check the existing internal fixture helper still works, including identity.
+  $alias=Join-Path $root 'internal-alias.txt'
+  Copy-MIRFileWithHardlinkFallback -Source $sentinel -Destination $alias
+  Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity $alias)-ceq(Get-MIRImmutableInputFileIdentity $sentinel)) 'checkout-local fixture alias remains valid'
+  $junction=Join-Path $root 'junction-check'
+  New-Item -ItemType Junction -Path $junction -Target $library|Out-Null
+  try{
+    Assert-LibraryRefusal {Assert-MIRCheckoutHardLinkBoundary -Source (Join-Path $junction 'alpha_1.0.0.zip') -Destination $alias} 'mir-hardlink-reparse'
+    Assert-LibraryRefusal {Assert-MIRCheckoutHardLinkBoundary -Source $sentinel -Destination (Join-Path $junction 'new/alias.txt')} 'mir-hardlink-reparse'
+  }finally{[IO.Directory]::Delete($junction,$false)}
+  $parameters=[scriptblock]::Create($ast.ParamBlock.Extent.Text+"`nreturn ,`$LocalModLibraryDirs")
+  $defaults=& $parameters -FactorioBin unused -CandidateZip unused -SourceMaterializationPath unused -V5ObservationResultPath unused
+  Assert-LibraryTest ($defaults.Count-eq0) 'K2 runner requires an explicit machine-local archive library'
+  $missingLibrary=Join-Path $root 'missing-library'
+  Assert-LibraryRefusal {Start-MIRLibraryActivation $missingLibrary $data $profileA @{'alpha_1.0.0.zip'=$hashes['alpha_1.0.0.zip']}} 'mir-library-missing'
+  Assert-LibraryTest (-not(Test-Path -LiteralPath $missingLibrary)) 'missing library is not recreated'
+  # A tiny relocated path fixture, not a Git clone/worktree: execute the real
+  # path helper from another root and verify it derives that root itself.
+  $relocated=Join-Path $root 'relocated-path-fixture'
+  $relocatedTools=Join-Path $relocated 'tools/lib/workspace'
+  [IO.Directory]::CreateDirectory($relocatedTools)|Out-Null
+  [IO.File]::WriteAllText((Join-Path $relocated '.git'),'controlled path marker; no Git repository')
+  Copy-Item -LiteralPath (Join-Path $RepoRoot 'tools/lib/workspace/RepoPaths.ps1') -Destination $relocatedTools
+  $pathModule=New-Module -ArgumentList (Join-Path $relocatedTools 'RepoPaths.ps1'),$relocated,$sentinel -ScriptBlock {
+    param($Implementation,$Root,$Outside)
+    . $Implementation
+    Assert-MIRCheckoutHardLinkBoundary -Source (Join-Path $Root 'input.txt') -Destination (Join-Path $Root 'build/output.txt')
+    $refused=$false
+    try{Assert-MIRCheckoutHardLinkBoundary -Source $Outside -Destination (Join-Path $Root 'build/output.txt')}catch{$refused=$_.Exception.Message.Contains('mir-hardlink-outside-checkout')}
+    if(-not$refused){throw 'Relocated helper retained the original root'}
+  }
+  Assert-LibraryTest ($null-ne$pathModule) 'relocated implementation uses its own checkout boundary without machine paths'
   [ordered]@{status='passed';checks=$script:checks;root=$root;native_engine_runs=0}|ConvertTo-Json
 }finally{if($null -ne $activation -and -not $activation.closed){$null=Complete-MIRLibraryActivation $activation}}

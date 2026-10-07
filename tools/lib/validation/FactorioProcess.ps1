@@ -1,3 +1,10 @@
+$mirProcessPathModule=New-Module -Name MIRProcessPathBoundary -ArgumentList (Join-Path $PSScriptRoot '../workspace/RepoPaths.ps1') -ScriptBlock {
+  param($Path)
+  . $Path
+  Export-ModuleMember -Function Assert-MIRCheckoutHardLinkBoundary
+}
+Import-Module $mirProcessPathModule -Force
+
 function Invoke-FactorioProcess {
   param(
     [string]$FilePath,
@@ -63,6 +70,7 @@ function Remove-MIRCopiedModDirectory {
 
 function Copy-MIRModDirectory {
   param([string]$Source, [string]$Name, [string]$ModsDir)
+  Assert-MIRCheckoutHardLinkBoundary -Source $Source -Destination (Join-Path $ModsDir $Name)
   $target = Remove-MIRCopiedModDirectory -Name $Name -ModsDir $ModsDir
   New-Item -ItemType Directory -Force -Path $target | Out-Null
   $sourceRoot = (Resolve-Path -LiteralPath $Source).Path
@@ -73,6 +81,7 @@ function Copy-MIRModDirectory {
   foreach ($file in Get-ChildItem -LiteralPath $sourceRoot -Recurse -File) {
     $relative = [System.IO.Path]::GetRelativePath($sourceRoot, $file.FullName)
     $destination = Join-Path $target $relative
+    Assert-MIRCheckoutHardLinkBoundary -Source $file.FullName -Destination $destination
     try {
       New-Item -ItemType HardLink -Path $destination -Target $file.FullName -ErrorAction Stop | Out-Null
     } catch {
@@ -150,6 +159,7 @@ function Publish-MIRModDirectoryArchive {
 
 function Copy-MIRFileWithHardlinkFallback {
   param([Parameter(Mandatory)][string]$Source, [Parameter(Mandatory)][string]$Destination)
+  Assert-MIRCheckoutHardLinkBoundary -Source $Source -Destination $Destination
   if (Test-Path -LiteralPath $Destination) { Remove-Item -LiteralPath $Destination -Force }
   try {
     New-Item -ItemType HardLink -Path $Destination -Target $Source -ErrorAction Stop | Out-Null

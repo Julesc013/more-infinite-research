@@ -412,7 +412,7 @@
     },
     {
       "id": "direct-library-activation",
-      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/runtime/Test-MIRK2213ImersiteContinuation[.]ps1$"],
+      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tools/lib/workspace/RepoPaths[.]ps1$", "^tools/lib/validation/(?:FactorioProcess|ImmutableInputStaging)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/runtime/Test-MIRK2213ImersiteContinuation[.]ps1$"],
       "tests": ["static.direct-library-activation"]
     },
     {

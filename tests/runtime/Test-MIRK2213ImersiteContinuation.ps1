@@ -13,7 +13,7 @@ param(
   [Parameter(Mandatory)][string]$V5ObservationResultPath,
   [string]$RepoRoot = '',
   [string]$OutputRoot = 'build/p/k2-213-imersite-continuation',
-  [string[]]$LocalModLibraryDirs = @('C:\Projects\Factorio\testmods\2.1'),
+  [string[]]$LocalModLibraryDirs = @(),
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
   [switch]$PreflightOnly,

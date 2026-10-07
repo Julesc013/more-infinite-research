@@ -400,6 +400,8 @@
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/compatibility/FactorioRunner.ps1",
         "tools/lib/compatibility/ModPortal.ps1",
+        "tools/lib/workspace/RepoPaths.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
@@ -415,6 +417,7 @@
       "requires_factorio": false,
       "inputs": [
         "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/workspace/RepoPaths.ps1",
         "tests/support/MIRNativeEntryDefaults.ps1",
         "scripts/Invoke-MIRExtendedTests.ps1",
         "scripts/Start-MIROvernightLocalSweep.ps1",
@@ -465,6 +468,7 @@
       "inputs": [
         "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/workspace/RepoPaths.ps1",
         "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
         "tools/mir/cli/router/RepositoryCommands.ps1",
         "tests/tooling/Test-MIRArtifactStorageOptimization.ps1",

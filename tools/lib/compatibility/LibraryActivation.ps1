@@ -128,6 +128,9 @@ function Start-MIRLibraryActivation {
     [ValidateSet('Defaults','File')][string]$SettingsMode='Defaults',
     [string]$SettingsPath='',[string]$SettingsSha256=''
   )
+  if(-not(Test-Path -LiteralPath $LibraryDirectory -PathType Container)){
+    throw "[mir-library-missing] Supply the exact selected archive library: $LibraryDirectory"
+  }
   $library=(Resolve-Path -LiteralPath $LibraryDirectory).Path
   Assert-MIRLibraryPath $library
   Assert-MIRLibraryIdle
