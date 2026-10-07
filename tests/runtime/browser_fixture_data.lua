@@ -23,10 +23,17 @@ data:extend{
   base_color={r=0.1,g=0.2,b=0.3},flow_color={r=0.2,g=0.3,b=0.4}}
 }
 discovery_results[#discovery_results+1] = {type="fluid",name="mir-browser-discovery-fluid",amount=1}
+local discovery_recipe = {type="recipe",name="mir-browser-discovery-recipe",localised_name="préparation témoin des produits",
+ enabled=false,ingredients={{type="item",name="iron-plate",amount=1}},
+ results=discovery_results,main_product="mir-browser-discovery-product-01"}
+local base_recipe = data.raw and data.raw.recipe and data.raw.recipe["iron-plate"]
+if base_recipe and base_recipe.categories ~= nil then
+ discovery_recipe.categories = {"chemistry"}
+else
+ discovery_recipe.category = "chemistry"
+end
 data:extend{
- {type="recipe",name="mir-browser-discovery-recipe",localised_name="préparation témoin des produits",
-  category="chemistry",enabled=false,ingredients={{type="item",name="iron-plate",amount=1}},
-  results=discovery_results,main_product="mir-browser-discovery-product-01"},
+ discovery_recipe,
  {type="technology",name="mir-browser-discovery-native",localised_name="Native discovery witness",
   icon="__base__/graphics/icons/iron-plate.png",icon_size=64,
   effects={{type="unlock-recipe",recipe="mir-browser-discovery-recipe"}},

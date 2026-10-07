@@ -2,13 +2,23 @@
 -- copied tables establish neither engine translation nor native GUI evidence.
 return function(core, adapter, native_source, fixture_source, check)
   local technology = "mir-browser-discovery-native"
-  local raw = {}
-  local data = {extend=function(_, rows)
-    for _, row in ipairs(rows) do raw[row.type] = raw[row.type] or {}; raw[row.type][row.name] = row end
-  end}
-  assert(load(fixture_source, "native-discovery-data", "t", {
-    data=data,math=math,string=string,table=table,ipairs=ipairs
-  }))()
+  local function materialize_fixture(modern)
+    local raw = {}
+    local data = {raw={recipe={["iron-plate"]=modern and {categories={"smelting"}} or {category="smelting"}}},extend=function(_, rows)
+      for _, row in ipairs(rows) do raw[row.type] = raw[row.type] or {}; raw[row.type][row.name] = row end
+    end}
+    assert(load(fixture_source, "native-discovery-data", "t", {
+      data=data,math=math,string=string,table=table,ipairs=ipairs
+    }))()
+    return raw
+  end
+  local raw = materialize_fixture(false)
+  local modern = materialize_fixture(true).recipe["mir-browser-discovery-recipe"]
+  check(raw.recipe["mir-browser-discovery-recipe"].category == "chemistry"
+    and raw.recipe["mir-browser-discovery-recipe"].categories == nil,
+    "native discovery fixture retains the 2.0 recipe category")
+  check(modern.category == nil and #modern.categories == 1 and modern.categories[1] == "chemistry",
+    "native discovery fixture uses the observed 2.1 recipe categories")
   local library = {recipe={},item=raw.item,fluid=raw.fluid}
   for name, recipe in pairs(raw.recipe) do
     library.recipe[name] = {localised_name=recipe.localised_name,products=recipe.results}
