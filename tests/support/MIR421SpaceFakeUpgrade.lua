@@ -28,8 +28,9 @@ function M.capture()
   local record = {technologies={}, predecessor_version=script.active_mods["more-infinite-research"]}
   for _, name in ipairs(names) do
     local value = technology(name)
-    value.level = 8
     value.researched = false
+    value.level = 8
+    if value.level ~= 8 or value.researched then fail(name .. " did not retain seeded earned level") end
     record.technologies[name] = state(value)
   end
   force.reset_technology_effects()

@@ -9,9 +9,15 @@ local function world()
   local force = {technologies={}, laboratory_speed_modifier=0.7,
     get_gun_speed_modifier=function() return 0.4 end, reset_technology_effects=function() end}
   for _, name in ipairs({'weapon-shooting-speed-7','research-speed-7'}) do
-    force.technologies[name] = {name=name,level=7,researched=true,enabled=true,saved_progress=0,
+    local values = {name=name,level=7,researched=true,enabled=true,saved_progress=0,
       research_unit_ingredients={{name='automation-science-pack',amount=2},{name='utility-science-pack',amount=3},{name='space-science-pack',amount=1}},
       prerequisites={[name:gsub('7$','6')]={}},prototype={effects={{modifier=0.1}}}}
+    -- Match the observed native setter: clearing researched resets the
+    -- infinite technology's current level to its prototype's first level.
+    force.technologies[name] = setmetatable({}, {__index=values, __newindex=function(_, key, value)
+      values[key]=value
+      if key=='researched' and value==false then values.level=7 end
+    end})
   end
   game={forces={player=force}}
   local oracle=dofile('tests/support/MIR421SpaceFakeUpgrade.lua')
