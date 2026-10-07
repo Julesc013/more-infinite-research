@@ -6,7 +6,7 @@ local function space_age_setting_visibility()
   }
 end
 
-return {
+local streams = {
   research_spoilage_preservation = {
     technology_risk = {
       class = "factory-disruptive",
@@ -298,3 +298,16 @@ return {
   },
 
 }
+
+-- These are MIR-owned declarations, before compatibility patches. Translate
+-- their built-in roles here so explicitly supplied ecosystem names remain
+-- exact at the selector boundary. No game prototypes are read or mutated.
+local aliases = require("prototypes.mir.platform.factorio.target_line").prototype_shapes().science_pack_aliases or {}
+for _, spec in pairs(streams) do
+  if type(spec.science_packs) == "table" then
+    for index, pack in ipairs(spec.science_packs) do
+      spec.science_packs[index] = aliases[pack] or pack
+    end
+  end
+end
+return streams

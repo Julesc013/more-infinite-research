@@ -179,9 +179,9 @@ function M.apply_science_pack_ingredient_policy(ingredients, key)
   -- This setting intentionally changes only research ingredients. The
   -- finish-game prerequisite gate is handled separately in prerequisites.
   if policy == "space" then
-    append_ingredient(out, seen, "space-science-pack", 1)
+    append_ingredient(out, seen, science.native_pack_name("space-science-pack"), 1)
   elseif policy == "space-and-promethium" then
-    append_ingredient(out, seen, "space-science-pack", 1)
+    append_ingredient(out, seen, science.native_pack_name("space-science-pack"), 1)
     append_ingredient(out, seen, "promethium-science-pack", 1)
   elseif policy == "space-age-progression" then
     for _, pack in ipairs(science.space_age_progression_packs_for(selected_packs)) do
@@ -236,7 +236,7 @@ function M.pick_science_for_stream(spec, key)
     for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}) do
       add_if_science_pack_exists(packs, science.native_pack_name(p))
     end
-    for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, p) end
+    for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, science.native_pack_name(p)) end
   end
 
   local denied = {}

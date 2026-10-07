@@ -1196,17 +1196,22 @@ do
     return table.concat(out, ',')
   end
   for _, case in ipairs({
-    {id='modern',packs={'automation-science-pack','logistic-science-pack','chemical-science-pack','production-science-pack','utility-science-pack'},
+    {id='modern',packs={'automation-science-pack','logistic-science-pack','chemical-science-pack','production-science-pack','military-science-pack','utility-science-pack'},
       expected='automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack'},
-    {id='0.15-0.16',historical=true,packs={'science-pack-1','science-pack-2','science-pack-3','production-science-pack','high-tech-science-pack'},
+    {id='0.15-0.16',historical=true,packs={'science-pack-1','science-pack-2','science-pack-3','production-science-pack','military-science-pack','high-tech-science-pack'},
       expected='science-pack-1,science-pack-2,science-pack-3,production-science-pack'},
     {id='0.13-0.14',historical=true,alien=true,packs={'science-pack-1','science-pack-2','science-pack-3','alien-science-pack'},
-      expected='science-pack-1,science-pack-2,science-pack-3'}
+      expected='science-pack-1,science-pack-2,science-pack-3,alien-science-pack'}
   }) do
     shapes.science_pack_aliases=case.historical and {
       ['automation-science-pack']='science-pack-1', ['logistic-science-pack']='science-pack-2',
       ['chemical-science-pack']='science-pack-3', ['utility-science-pack']='high-tech-science-pack'
     } or nil
+    if case.alien then
+      for _, role in ipairs({'utility-science-pack','military-science-pack','production-science-pack','space-science-pack'}) do
+        shapes.science_pack_aliases[role]='alien-science-pack'
+      end
+    end
     shapes.extra_science_progression=case.alien and {
       ['alien-science-pack']={'science-pack-1','science-pack-2','science-pack-3','alien-science-pack'}
     } or nil
@@ -1219,6 +1224,15 @@ do
       values['mir-science-pack-ingredient-policy']='configured'
       check('LRS/'..case.id..'/default',names(selector.pick_science_for_stream({},'research_character_crafting_speed'))==case.expected,
         'Built-in defaults select actual target science names')
+      package.loaded['prototypes.streams.direct-effects']=nil
+      local declarations=require('prototypes.streams.direct-effects')
+      local expected_character=case.alien and 'alien-science-pack'
+        or (case.historical and 'high-tech-science-pack,military-science-pack' or 'utility-science-pack,military-science-pack')
+      for _, key in ipairs({'research_character_crafting_speed','research_character_mining_speed',
+        'research_character_reach','research_character_walking_speed','research_inventory_capacity'}) do
+        check('LRS/'..case.id..'/declaration/'..key,names(selector.pick_science_for_stream(declarations[key],key))==expected_character,
+          'Actual MIR declaration preserves its target late-science requirement')
+      end
       check('LRS/'..case.id..'/official',table.concat(registry.pack_list_official(),',')==table.concat(case.packs,','),
         'All official includes the target packs but excludes an external card')
       values['mir-science-pack-ingredient-policy']='all-official'
@@ -1227,7 +1241,7 @@ do
         'All-official preserves inherited amounts and fills the native official set')
       values['mir-science-pack-ingredient-policy']='official-progression'
       selected=selector.apply_science_pack_ingredient_policy({{case.packs[#case.packs],5}},'probe')
-      check('LRS/'..case.id..'/progression',#selected==#case.packs and selected[1][2]==5,
+      check('LRS/'..case.id..'/progression',#selected==(case.alien and 4 or 5) and selected[1][2]==5,
         'Late native science expands its official predecessors without changing amounts')
       values['mir-science-pack-ingredient-policy']='configured'
       selected=selector.pick_science_for_stream({science_packs={'external-card'}},'probe')
@@ -1236,6 +1250,8 @@ do
       local extension=policy.pack_list_for_extension('braking-force')
       check('LRS/'..case.id..'/extension',extension[1]==case.packs[1] and extension[2]==case.packs[2] and extension[3]==case.packs[3],
         'Built-in extension defaults use the same native names')
+      check('LRS/'..case.id..'/end-game',policy.end_game_science_pack()==(case.alien and 'alien-science-pack' or nil),
+        'End-game lookup uses the same native final-science identity')
       check('LRS/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
         'Science naming does not mutate prototypes')
     end)

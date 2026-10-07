@@ -110,13 +110,16 @@ function M.extra_official_progression(name)
 end
 
 function M.official_order()
-  local out = {}
-  for _, pack in ipairs(VANILLA_PACK_ORDER) do out[#out + 1] = M.native_pack_name(pack) end
+  local out, seen = {}, {}
+  local function add(pack)
+    if not seen[pack] then seen[pack] = true; out[#out + 1] = pack end
+  end
+  for _, pack in ipairs(VANILLA_PACK_ORDER) do add(M.native_pack_name(pack)) end
   local shapes = target_profiles.current().prototype_shapes or {}
   local extra = {}
   for pack in pairs(shapes.extra_science_progression or {}) do extra[#extra + 1] = pack end
   table.sort(extra)
-  for _, pack in ipairs(extra) do out[#out + 1] = pack end
+  for _, pack in ipairs(extra) do add(pack) end
   return out
 end
 

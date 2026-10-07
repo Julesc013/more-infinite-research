@@ -37,7 +37,11 @@ local M = {
           ["automation-science-pack"] = "science-pack-1",
           ["logistic-science-pack"] = "science-pack-2",
           ["chemical-science-pack"] = "science-pack-3",
-          ["utility-science-pack"] = "high-tech-science-pack"
+          -- Preserve the terminal historical target's late-science mapping.
+          ["utility-science-pack"] = ("@@FACTORIO_LINE@@" == "0.13" or "@@FACTORIO_LINE@@" == "0.14") and "alien-science-pack" or "high-tech-science-pack",
+          ["military-science-pack"] = ("@@FACTORIO_LINE@@" == "0.13" or "@@FACTORIO_LINE@@" == "0.14") and "alien-science-pack" or nil,
+          ["production-science-pack"] = ("@@FACTORIO_LINE@@" == "0.13" or "@@FACTORIO_LINE@@" == "0.14") and "alien-science-pack" or nil,
+          ["space-science-pack"] = ("@@FACTORIO_LINE@@" == "0.13" or "@@FACTORIO_LINE@@" == "0.14") and "alien-science-pack" or nil
         },
         extra_science_progression = ("@@FACTORIO_LINE@@" == "0.13" or "@@FACTORIO_LINE@@" == "0.14") and {
           ["alien-science-pack"] = {"science-pack-1", "science-pack-2", "science-pack-3", "alien-science-pack"}

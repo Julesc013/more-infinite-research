@@ -11,8 +11,10 @@ for _, key in ipairs({
   local technology = assert(data.raw.technology[name], 'Missing handcrafting-dependent research: ' .. name)
   assert(technology.enabled ~= false and not technology.hidden, 'Unavailable research: ' .. name)
   assert(technology.unit and #technology.unit.ingredients > 0, 'Missing research science: ' .. name)
-  local expected = {['science-pack-1']=true,['science-pack-2']=true,['science-pack-3']=true}
-  if data.raw.tool['production-science-pack'] then expected['production-science-pack']=true end
+  -- MIR's terminal 0.13/0.14 predecessor uses alien science for these late
+  -- character upgrades. The 0.15/0.16 equivalent is high-tech plus military.
+  local expected = data.raw.tool['alien-science-pack'] and {['alien-science-pack']=true}
+    or {['high-tech-science-pack']=true,['military-science-pack']=true}
   for _, ingredient in ipairs(technology.unit.ingredients) do
     local pack, amount = ingredient.name or ingredient[1], ingredient.amount or ingredient[2]
     assert(accepted[pack] and amount > 0, 'Invalid laboratory ingredient: ' .. name .. '/' .. tostring(pack))
