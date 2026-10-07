@@ -5,6 +5,7 @@ return function(expected)
   assert(not mods["space-age"] and not mods["elevated-rails"], "Icon fixture requires inactive DLC providers")
   local codec = require("__more-infinite-research__.prototypes.mir.settings.profile_codec")
   local effective = require("__more-infinite-research__.prototypes.mir.settings.effective")
+  local contexts = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
   local raw = settings.startup[name].value
   local imported_text = settings.startup[codec.import_setting_name].value
   local imported, decoded
@@ -16,7 +17,9 @@ return function(expected)
   assert(raw == expected.raw and imported == expected.imported, "Native icon settings differ from selected case")
   local expected_effective = expected.imported
   if expected_effective == nil then expected_effective = expected.raw end
-  assert(effective.get(name) == expected_effective, "Native imported setting precedence differs")
+  -- MIR's compilation scope has ended. Observe the settings with a private
+  -- context rather than assuming the emitter left a global context active.
+  assert(effective.get(name, contexts.new()) == expected_effective, "Native imported setting precedence differs")
 
   local shortcut = assert(data.raw.shortcut["mir-research-browser"], "Library shortcut is absent")
   assert(shortcut.icon == "__base__/graphics/icons/lab.png" and shortcut.small_icon == shortcut.icon
