@@ -1,0 +1,103 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0110",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Require machines for acquisition recipes involving fluids.",
+  "details": [
+    "Character crafting no longer supplies recipes with fluid ingredients or results merely because their category matches. Exact typed item-only routes and independently acquired machines remain available.",
+    "Fluid-consuming science routes retain their selected machine unlock instead of being flattened to initial availability. Controlled lab, frontier and researchability fixtures preserve the original probability and typed-output assertions with explicit fluid machines.",
+    "Native fluid capacity, final emitted catalogue, earned production and existing-save migration remain unqualified. This grants no recipe permission, effect owner, stream identity, setting or compatibility claim."
+  ],
+  "semantic_domains": [
+    "science",
+    "progression",
+    "recipe-productivity",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Corrects shared character-crafting acquisition of typed fluid ingredients and results. Native catalogue, machine output and saved-state implications remain unqualified."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/compiler/lab_reachability.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/researchability_planning.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/science-integration.md",
+      "kind": "documentation"
+    }
+  ]
+}

@@ -30,7 +30,9 @@ stub("prototypes.mir.platform.factorio.prototype_lookup", {
     for name, prototype in pairs(world.item_prototypes) do callback(name, prototype, prototype.type or "item") end
   end,
   each_entity_prototype = function(callback)
-    for name, prototype in pairs(data.raw.lab or {}) do callback(name, prototype, "lab") end
+    for _, prototype_type in ipairs({"lab", "assembling-machine"}) do
+      for name, prototype in pairs(data.raw[prototype_type] or {}) do callback(name, prototype, prototype_type) end
+    end
   end
 })
 stub("prototypes.mir.capabilities.science_integration.lab_compatibility", {
@@ -162,8 +164,19 @@ researchability = require("prototypes.mir.capabilities.science_integration.techn
 feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
 route_policy = require("prototypes.mir.capabilities.science_integration.production_route_policy")
 
-local function reset(next_world)
+local function reset(next_world, fixture_fluid_crafter)
   world = next_world
+  -- Typed-fluid and yield fixtures need a concrete machine independently of
+  -- their output/probability oracle. Manual crafting cannot supply that route.
+  if fixture_fluid_crafter then
+    world.item_prototypes = world.item_prototypes or {}
+    world.item_prototypes['fixture-fluid-kit'] = {type='item',place_result='fixture-fluid-crafter'}
+    world.resources = world.resources or {}
+    world.resources['fixture-fluid-kit-source'] = {minable={result='fixture-fluid-kit',count=1}}
+    world.assembling_machines = world.assembling_machines or {}
+    world.assembling_machines['fixture-fluid-crafter'] = {crafting_categories={'crafting'},
+      fluid_boxes={{production_type='input'},{production_type='output'}}}
+  end
   data.raw = {
     lab = world.labs or {},
     technology = world.techs or {},
@@ -184,6 +197,7 @@ local function reset(next_world)
     ["space-location"] = world.space_locations or {},
     planet = world.planets or {}
   }
+  if fixture_fluid_crafter then data.raw.item = world.item_prototypes end
   active_context = nil
   context = new_context()
   -- The real compiler reaches this diagnostic only after it has captured its
@@ -743,6 +757,9 @@ local collision_index = {
     ["fluid\0same"] = {"fluid-same"}
   }
 }
+reset({
+  item_prototypes={},labs={},techs={},recipe_prototypes={},recipe_facts={},producers={},unlockers={}
+}, true)
 check("F09B", feasibility.initial_recipe_witness("item-same", {type = "fluid", name = "same"}, {
   recipe_index = collision_index
 }) == nil and feasibility.initial_recipe_witness("fluid-same", {type = "fluid", name = "same"}, {
@@ -2012,7 +2029,7 @@ before_projection = context_observation_snapshot()
 check("U03A", production.pack_production_rejection_projection("B") == nil
   and context_observation_unchanged(before_projection),
   "Query order and warm caches remain unchanged when a successful route is observed")
-reset(fluid_intermediate_world())
+reset(fluid_intermediate_world(), true)
 check("U04", production.pack_production_status("fluid_pack", {}) == "research",
   "A seeded research-unlocked fluid intermediate retains its typed output route")
 before_projection = context_observation_snapshot()
@@ -2765,7 +2782,7 @@ local function product_acquisition_witness(product)
     item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
     recipe_facts = {source = route_fact("declared-product", {}, {results = {product}})},
     producers = { ["declared-product"] = {"source"} }
-  })
+  }, true)
   return feasibility.initial_recipe_witness("source", {
     type = product.type or "item", name = "declared-product"
   })

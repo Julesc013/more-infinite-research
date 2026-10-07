@@ -171,6 +171,19 @@ local function normalized_ingredients(variant)
   return variant.ingredients or {}
 end
 
+local function requires_fluid_handling(variant, results, options)
+  -- Category membership alone cannot give a character a fluid inventory.
+  -- Inspect the typed declarations, including coproducts, so an otherwise
+  -- reachable fluid source cannot manufacture a hand-crafting witness.
+  for _, entries in ipairs({normalized_ingredients(variant), results or {}}) do
+    for _, entry in ipairs(entries) do
+      if not diagnostic_visit(options) then return nil end
+      if type(entry) == "table" and entry.type == "fluid" then return true end
+    end
+  end
+  return false
+end
+
 local function copy_options(options)
   local copied = {}
   for key, value in pairs(options or {}) do copied[key] = value end
@@ -784,7 +797,7 @@ local function capture_machine_witness(machine, category, options, state)
   return nil
 end
 
-compatible_machine = function(category, recipe_name, options, state)
+compatible_machine = function(category, recipe_name, options, state, needs_fluid_handling)
   if type(options.machine_category_witness) == "function" then
     if options.machine_category_witness(category) == true then
       return {kind = "declared-machine-category", category = category}
@@ -796,7 +809,8 @@ compatible_machine = function(category, recipe_name, options, state)
   for _, machine in ipairs(machines) do
     if not diagnostic_visit(options) then return nil end
     diagnostic_rollback(options, checkpoint)
-    if (machine.fixed_recipe == nil or machine.fixed_recipe == recipe_name)
+    if (not needs_fluid_handling or machine.prototype_type ~= "character")
+      and (machine.fixed_recipe == nil or machine.fixed_recipe == recipe_name)
       and surface_satisfied(machine.surface_conditions, options, state) then
       if machine.prototype_type == "character" then
         diagnostic_rollback(options, checkpoint)
@@ -897,12 +911,14 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
         })
       else
         local machine_witness
+        local needs_fluid_handling = requires_fluid_handling(variant, results, options)
+        if needs_fluid_handling == nil then return nil end
         local categories = variant.categories or {"crafting"}
         local machine_checkpoint = diagnostic_checkpoint(options)
         for _, category in ipairs(categories) do
           if not diagnostic_visit(options) then return nil end
           diagnostic_rollback(options, machine_checkpoint)
-          machine_witness = compatible_machine(category, recipe_name, options, state)
+          machine_witness = compatible_machine(category, recipe_name, options, state, needs_fluid_handling)
           if machine_witness then break end
         end
         if machine_witness then

@@ -420,4 +420,76 @@ run(raw, function()
   check('LRM/frontier/gate', #gates==1 and gates[1]=='BuilderUnlock',
     'The selected science frontier retains the actual machine acquisition unlock')
 end)
+-- A category shared with a character does not permit manual fluid handling.
+-- These scenarios drive the same lab consumer and typed acquisition solver,
+-- rather than assuming a fluid in a craftable category is an initial route.
+local function fluid_world()
+  local next_raw = world()
+  next_raw.fluid = {water={type='fluid',name='water'}}
+  next_raw.resource = {water={minable={results={{type='fluid',name='water',amount=1}}}}}
+  return next_raw
+end
+local function add_fluid_builder(next_raw)
+  next_raw['assembling-machine'] = {builder={type='assembling-machine',name='builder',
+    crafting_categories={'crafting'},fluid_boxes={{production_type='input'},{production_type='output'}}}}
+  next_raw.item['builder-kit'] = {type='item',name='builder-kit',place_result='builder'}
+  next_raw.recipe.make_builder = recipe('make_builder','builder-kit')
+end
+for _, case in ipairs({
+  {id='fluid-input',expected=false},
+  {id='fluid-output',output=true,expected=false},
+  {id='fluid-intermediate',intermediate=true,expected=false},
+  {id='same-name-item',item=true,expected=true},
+  {id='acquired-input-machine',machine=true,expected=true},
+  {id='acquired-output-machine',machine=true,output=true,expected=true},
+  {id='missing-machine-kit',machine=true,missing_kit=true,expected=false},
+  {id='alternative-item-route',alternative=true,expected=true}
+}) do
+  raw = fluid_world()
+  if case.output then
+    raw.recipe.make_lab.results[2] = {type='fluid',name='water',amount=1}
+  else
+    raw.recipe.make_lab.ingredients = {{type=case.item and 'item' or 'fluid',name='water',amount=1}}
+  end
+  if case.item then
+    raw.item.water = {type='item',name='water'}
+    raw.resource.water.minable.results[2] = {type='item',name='water',amount=1}
+  end
+  if case.intermediate then
+    raw.resource = {}
+    raw.recipe.make_water = recipe('make_water','water')
+    raw.recipe.make_water.results[1].type = 'fluid'
+  end
+  if case.machine then add_fluid_builder(raw) end
+  if case.missing_kit then raw.recipe.make_builder = nil end
+  if case.alternative then raw.recipe.alternate_lab = recipe('alternate_lab','lab-kit') end
+  run(raw, function()
+    local before = fingerprint.of(data.raw)
+    check('LRF/'..case.id, lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
+      'Fluid recipes require a machine; typed item-only alternatives retain character crafting: '..case.id)
+    check('LRF/'..case.id..'/research',
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Actual researchability agrees with fluid machine selection: '..case.id)
+    check('LRF/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Fluid machine selection preserves prototype inputs: '..case.id)
+    if case.intermediate then
+      local routes = require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+      check('LRF/fluid-intermediate/route',routes.initial_recipe_witness('make_water',{type='fluid',name='water'})==nil,
+        'An enabled character-category recipe cannot supply the fluid intermediate itself')
+    end
+  end)
+end
+raw = fluid_world()
+add_fluid_builder(raw)
+raw.recipe.make_B.ingredients = {{type='fluid',name='water',amount=1}}
+raw.recipe.make_builder.enabled = false
+raw.technology.BuilderUnlock = research({'A'})
+raw.technology.BuilderUnlock.effects = {{type='unlock-recipe',recipe='make_builder'}}
+run(raw, function()
+  check('LRF/frontier/status',production.pack_production_status('B',{})=='research',
+    'A character category cannot flatten a fluid-consuming pack behind a gated machine to initial availability')
+  local gates = production.prereq_techs_for_science_pack('B')
+  check('LRF/frontier/gate',#gates==1 and gates[1]=='BuilderUnlock',
+    'The fluid-producing science route retains its actual machine unlock')
+end)
 print('MIR-LAB-REACHABILITY-PASS ' .. checks)
