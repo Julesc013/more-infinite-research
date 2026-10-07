@@ -2615,6 +2615,42 @@
       "provenance": "machine-assisted"
     },
     {
+      "key": "mir-browser.production-check",
+      "source_sha256": "23B31D6A7300D609A14913987044A91EF031E5C0D78CB7F3C8F28E4003B85F20",
+      "translation": "檢查科技包生產",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.production-scope",
+      "source_sha256": "E51DEFCEF806B9B226A06C6A4F7B0959F7BF225220A2E756F59924656B99CF22",
+      "translation": "最近一分鐘：__1__ / __2__。普通品質。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.production-note",
+      "source_sha256": "3B4D667B622491CDE94145E20EBE77DFC5F29837446EB62DAB643EE1031C2C8F",
+      "translation": "速率包含所有用途，不表示庫存數量，也不預測研究完成時間。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.production-row",
+      "source_sha256": "8CCE1FAE4C15F863A2624370455D74668CCCCC0FEA30AB8A039CBDA11099978A",
+      "translation": "__1__：每分鐘生產 __2__，使用 __3__，收支 __4__。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.production-unavailable",
+      "source_sha256": "C25AA6D5E301FFCE7D302645BC7FBDCE85B28A6E59C9BE41200DCD8797F6E3CF",
+      "translation": "此研究的科技包生產統計無法使用。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.production-snapshot",
+      "source_sha256": "F3976C10A575B2B4D0F5ECB596658DDBF19A3D96211AA619975FAB8A05049C4C",
+      "translation": "取樣於遊戲刻 __1__。再次點擊重新整理。",
+      "provenance": "machine-assisted"
+    },
+    {
       "key": "mir-browser.title",
       "source_sha256": "5B17C8853ECC26F1F8F5B8CECA78F67ABD9DF2E9F3C256D80992EB04A8A83F7F",
       "translation": "MIR 研究圖書館",

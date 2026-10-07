@@ -6,6 +6,37 @@ local progression_depth_limit = 128
 -- after a script reload; each snapshot still reads force-local research state.
 local static_by_force = {}
 
+-- Manual, current-surface observation. No LuaObjects, production history or
+-- writable statistics are retained. Item statistics use per-minute rates;
+-- input is production and output is consumption, not an inventory count.
+function M.production_snapshot(force, surface, technology, precision, tick)
+  local ok, snapshot = pcall(function()
+    if not (force and force.valid and surface and surface.valid and technology and technology.valid
+        and technology.force.index == force.index and type(precision) == "number") then return nil end
+    local ingredients = technology.research_unit_ingredients
+    if not ingredients or #ingredients == 0 or #ingredients > 16 then return nil end
+    local statistics = force.get_item_production_statistics(surface)
+    if not (statistics and statistics.valid) then return nil end
+    local rows = {}
+    for _, ingredient in ipairs(ingredients) do
+      local identity = {name = ingredient.name, quality = "normal"}
+      rows[#rows + 1] = {
+        name = ingredient.name, quality = "normal",
+        produced = statistics.get_flow_count{
+          name = identity, category = "input", precision_index = precision, count = false
+        },
+        consumed = statistics.get_flow_count{
+          name = identity, category = "output", precision_index = precision, count = false
+        }
+      }
+    end
+    return {schema = 1, kind = "science-production-snapshot", technology_id = technology.name,
+      force_index = force.index, force_name = force.name, surface_index = surface.index,
+      surface_name = surface.name, tick = tick, rows = rows}
+  end)
+  return ok and snapshot or nil
+end
+
 -- Build translation input on demand, without retaining recipe/product facts
 -- in the force cache. One request resolves the technology caption and its
 -- associated recipe/material names in the existing player-local window.

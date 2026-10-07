@@ -122,7 +122,7 @@
     },
     {
       "id": "mir42-browser-consumed-regressions",
-      "patterns": ["^source/prototypes/mir/runtime/research_browser(?:_core)?[.]lua$", "^tests/runtime/(?:Test-MIRResearchBrowser[.]ps1|browser_fixture_data[.]lua|research_browser(?:_core_regressions|_handler_regressions|_discovery_regressions|_native_discovery|_native_discovery_regressions|_omissions)?[.]lua)$"],
+      "patterns": ["^source/prototypes/mir/runtime/research_browser(?:_core|_factorio_catalogue)?[.]lua$", "^tests/runtime/(?:Test-MIRResearchBrowser[.]ps1|browser_fixture_data[.]lua|research_browser(?:_core_regressions|_handler_regressions|_discovery_regressions|_production_regressions|_native_discovery|_native_discovery_regressions|_omissions)?[.]lua)$"],
       "tests": ["runtime.research-browser"]
     },
     {
@@ -182,7 +182,7 @@
     },
     {
       "id": "mir4-science-route-feasibility",
-      "patterns": ["^source/prototypes/mir/capabilities/science_integration/(?:pack_production_reachability|recipe_route_feasibility|recipe_unlock_facts)\\.lua$", "^source/prototypes/mir/index/recipe_(?:facts|unlocks)\\.lua$", "^tests/compiler/(?:Test-MIR(?:RecipeSourceEpoch|ResearchabilityPlanning)\\.ps1|recipe_source_epoch\\.lua|researchability_planning\\.lua)$", "^tools/mir/application/release/F210QualificationPolicy\\.ps1$", "^\\.mir/control/MIR4-F210-Current-Qualification-PolicyV2\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^docs/architecture/module-boundaries\\.md$"],
+      "patterns": ["^source/prototypes/mir/capabilities/science_integration/(?:pack_production_reachability|recipe_route_feasibility|recipe_unlock_facts)\\.lua$", "^source/prototypes/mir/index/recipe_(?:facts|unlocks)\\.lua$", "^tests/compiler/(?:Test-MIR(?:RecipeSourceEpoch|ResearchabilityPlanning)\\.ps1|recipe_source_epoch\\.lua|researchability_planning\\.lua|lab_reachability\\.lua)$", "^tools/mir/application/release/F210QualificationPolicy\\.ps1$", "^\\.mir/control/MIR4-F210-Current-Qualification-PolicyV2\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^docs/architecture/module-boundaries\\.md$"],
       "tests": ["runtime.researchability-planning-contract", "runtime.recipe-source-epoch-contract", "static.architecture", "static.compiler"]
     },
     {

@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0113",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Use native minable-result precedence for acquisition.",
+  "details": [
+    "An explicit minable results list now replaces singular result/count fields when resolving acquisition. Empty, zero-output or differently typed lists cannot invent a lab placement item through stale shorthand; valid item lists remain eligible.",
+    "The shared reader preserves singular-only sources and declared prototype bytes. Actual lab and researchability controls exercise the resulting decisions without creating another item, recipe, owner or stream identity.",
+    "Native final-catalogue, mining, progression, save and migration acceptance remain outstanding. This source correction grants no new productivity permission or public compatibility claim."
+  ],
+  "semantic_domains": ["science", "progression", "compatibility", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."},
+    {"target":"F200","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."},
+    {"target":"F110","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."},
+    {"target":"F100","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."},
+    {"target":"F017","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."},
+    {"target":"F016","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."},
+    {"target":"F015","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."},
+    {"target":"F014","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."},
+    {"target":"F013","disposition":"affected","reason":"Corrects the shared minable acquisition reader; native catalogue and existing-save implications remain unqualified."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"changed","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"value":"tests/compiler/lab_reachability.lua","kind":"finding"},
+    {"value":"tests/compiler/researchability_planning.lua","kind":"finding"},
+    {"value":"docs/capabilities/science-integration.md","kind":"document"}
+  ]
+}

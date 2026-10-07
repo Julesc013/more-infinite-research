@@ -1314,6 +1314,7 @@
         "factorio",
         "tests/compiler/Test-MIRResearchabilityPlanning.ps1",
         "tests/compiler/researchability_planning.lua",
+        "tests/compiler/lab_reachability.lua",
         "tools/mir/application/release/F210QualificationPolicy.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
@@ -8088,5 +8089,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:0d92d74602c4c02268c2c1dc880f72c7d3170396c631e3a3127208ef740feea4"
+  "digest": "sha256:ca619281ad5d6a73aa0801b71734b5556862844eab720500cb4117e1e28e57c3"
 }

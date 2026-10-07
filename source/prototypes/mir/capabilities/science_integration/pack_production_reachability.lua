@@ -644,6 +644,22 @@ local RESEARCH_UNLOCK_POSITIVE_MEMO_LIMIT = 8
 local RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT = 64
 local RESEARCH_UNLOCK_NEGATIVE_MEMO_LIMIT = 8192
 
+-- One selected acquisition tree includes ingredients and the machine that
+-- realizes its recipe. Frontier extraction and memo/cycle guards must walk
+-- the same children, including native capture's launcher and ammunition.
+local function acquisition_children(witness)
+  local children = {}
+  if witness.recipe_witness then table.insert(children, witness.recipe_witness) end
+  for _, ingredient in ipairs(witness.ingredients or {}) do table.insert(children, ingredient) end
+  local machine = witness.machine
+  if machine then
+    if machine.acquisition then table.insert(children, machine.acquisition) end
+    if machine.launcher then table.insert(children, machine.launcher) end
+    if machine.ammunition then table.insert(children, machine.ammunition) end
+  end
+  return children
+end
+
 local function witness_avoids_active_identities(witness, visiting, root_key)
   if type(witness) ~= "table" then return true end
   local output = witness.output or witness.product
@@ -655,12 +671,8 @@ local function witness_avoids_active_identities(witness, visiting, root_key)
     -- cycle boundary.
     if key ~= root_key and visiting[key] then return false end
   end
-  if witness.recipe_witness
-    and not witness_avoids_active_identities(witness.recipe_witness, visiting, root_key) then
-    return false
-  end
-  for _, ingredient in ipairs(witness.ingredients or {}) do
-    if not witness_avoids_active_identities(ingredient, visiting, root_key) then return false end
+  for _, child in ipairs(acquisition_children(witness)) do
+    if not witness_avoids_active_identities(child, visiting, root_key) then return false end
   end
   return true
 end
@@ -679,11 +691,8 @@ local function witness_unlock_dependencies(witness, entry_technologies, dependen
       end
     end
   end
-  if witness.recipe_witness then
-    witness_unlock_dependencies(witness.recipe_witness, entry_technologies, dependencies)
-  end
-  for _, ingredient in ipairs(witness.ingredients or {}) do
-    witness_unlock_dependencies(ingredient, entry_technologies, dependencies)
+  for _, child in ipairs(acquisition_children(witness)) do
+    witness_unlock_dependencies(child, entry_technologies, dependencies)
   end
 end
 
@@ -889,9 +898,8 @@ local function selected_research_unlock_pairs(witness)
         seen[key] = true
         table.insert(pairs, {recipe = node.recipe, unlocker = node.unlocker})
       end
-      visit(node.recipe_witness)
     end
-    for _, ingredient in ipairs(node.ingredients or {}) do visit(ingredient) end
+    for _, child in ipairs(acquisition_children(node)) do visit(child) end
   end
   visit(witness)
   table.sort(pairs, function(left, right)
@@ -1717,8 +1725,9 @@ end
 -- and inherited traversal make it a contextual witness, not a global fact.
 -- Labs consume this same contextual acquisition solver for their concrete
 -- placement items. No second reachability graph or item-as-science admission
--- is introduced. Machine categories remain prototype witnesses, as documented
--- by recipe_route_feasibility; this does not certify power or placement.
+-- is introduced. The shared solver also acquires a matching machine's concrete
+-- placement item without borrowing a circular or later-only bootstrap. This
+-- structural witness does not certify native placement, power or throughput.
 function M.item_acquisition_witness(item_name, visiting_packs, visiting_technologies, observer)
   if type(item_name) ~= "string" or item_name == "" then return nil end
   return route_feasibility.acquisition_witness({type = "item", name = item_name},

@@ -79,7 +79,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-28 |
-| docs/architecture/module-boundaries.md | MIR 4 Repository and Module Boundaries | current | maintainer | explanation | mir-maintainers | 2026-10-06 |
+| docs/architecture/module-boundaries.md | MIR 4 Repository and Module Boundaries | current | maintainer | explanation | mir-maintainers | 2026-10-07 |
 | docs/architecture/native-owner-binding.md | Native Owner Binding | current | maintainer | explanation | mir-maintainers | 2026-07-20 |
 | docs/architecture/procedural-compatibility-kernel.md | Procedural Compatibility Kernel | current | maintainer | explanation | mir-maintainers | 2026-08-03 |
 | docs/architecture/README.md | Architecture | current | maintainer | explanation | mir-maintainers | 2026-08-08 |
@@ -210,7 +210,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/release-process.md | Release Process | current | release-manager | how-to | mir-maintainers | 2026-08-14 |
 | docs/maintainer/report-diffing.md | Report Diffing | current | developer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/settings-governance.md | Settings Governance | current | maintainer | how-to | mir-maintainers | 2026-10-04 |
-| docs/maintainer/testing.md | Testing And Fixture Strategy | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
+| docs/maintainer/testing.md | Testing And Fixture Strategy | current | maintainer | how-to | mir-maintainers | 2026-10-07 |
 | docs/maintainer/triage-playbook.md | Triage Playbook | current | maintainer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | Ultimate Convergence Follow-Up Audit Prompt | archived | maintainer | archive | mir-maintainers | 2026-08-08 |
 | docs/maintainer/validation.md | Validation | current | maintainer | how-to | mir-maintainers | 2026-07-12 |
