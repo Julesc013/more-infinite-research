@@ -284,11 +284,21 @@ try {
     $writtenHistory = [IO.File]::ReadAllText((Join-Path $tree 'changelog.txt'))
     Assert-MIR42CandidateBuildTest ($writtenHistory.StartsWith("---------------------------------------------------------------------------------------------------`nVersion: $($patchVersions[$i])`n", [StringComparison]::Ordinal) -and $writtenHistory.EndsWith($history, [StringComparison]::Ordinal)) "patch-current-changelog-and-preserved-history-$i"
     $writtenReadme = [IO.File]::ReadAllText((Join-Path $tree 'README.md'))
-    Assert-MIR42CandidateBuildTest ($writtenReadme.StartsWith("MIR $($patchVersions[$i]), source 4.2.1.", [StringComparison]::Ordinal) -and $writtenReadme.EndsWith($readme, [StringComparison]::Ordinal)) "patch-readme-identity-and-preserved-prose-$i"
+    Assert-MIR42CandidateBuildTest ($writtenReadme -ceq "MIR $($patchVersions[$i]), source 4.2.1.`n`n$readme") "patch-readme-identity-and-preserved-prose-$i"
     $firstHashes = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash -Algorithm SHA256 | ForEach-Object Hash)
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $patchVersions[$i]
     $secondHashes = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash -Algorithm SHA256 | ForEach-Object Hash)
     Assert-MIR42CandidateBuildTest (($firstHashes -join '|') -ceq ($secondHashes -join '|')) "patch-metadata-idempotence-$i"
+    # A current authored entry must survive unchanged, rather than acquiring a
+    # construction-only entry that would need mutation after candidate acceptance.
+    $target = [string]$patchDescriptors[$i].target
+    $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
+    $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
+    $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
+    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and $authoredVersion.Groups[1].Value -ceq $patchVersions[$i]) "patch-authored-current-version-$i"
+    [IO.File]::WriteAllText((Join-Path $tree 'changelog.txt'), $authoredHistory, $utf8)
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $patchVersions[$i]
+    Assert-MIR42CandidateBuildTest ([IO.File]::ReadAllText((Join-Path $tree 'changelog.txt')) -ceq $authoredHistory) "patch-authored-current-changelog-unchanged-$i"
   }
   $negativeTree = Join-Path $identityRoot 'f210'
   foreach ($badVersion in @('4.2.21002','4.2.20001','4.2.99901')) {
@@ -928,6 +938,15 @@ try {
     $recordPath = Join-Path $repo ([string]$row.target_record.path)
     $frozenRecord = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
     Assert-MIR42CandidateBuildTest ((Test-MIR4BootstrapRecordHash -Record $frozenRecord) -and [string]$frozenRecord.record_sha256 -ceq [string]$row.target_record.sha256 -and (Get-FileHash -Algorithm SHA256 -LiteralPath $recordPath).Hash -ceq $historicalRecordHashes[$target]) "patch-historical-baseline-record-preserved-$target"
+    $archive = [IO.Compression.ZipFile]::OpenRead((Join-Path $patchRoot ([string]$row.asset.path)))
+    try {
+      $version = [string]$row.distribution_version
+      $entry = $archive.GetEntry("more-infinite-research_$version/README.md")
+      $reader = [IO.StreamReader]::new($entry.Open())
+      try { $readme = $reader.ReadToEnd() } finally { $reader.Dispose() }
+      Assert-MIR42CandidateBuildTest ($readme.Contains("# More Infinite Research $version") -and $readme.Contains("More Infinite Research $version is") -and $readme.Contains("more-infinite-research_$version.zip") -and -not $readme.Contains('4.2.10001')) "patch-historical-readme-package-identity-$target"
+      Assert-MIR42CandidateBuildTest ($readme.Contains("Earlier fresh-load evidence used $($frozenRecord.engine.version);") -and $readme.Contains("The exact published $($frozenRecord.predecessor.version) archive remains a historical predecessor record.") -and $readme.Contains('Consult the matching release record for native qualification of this exact package.')) "patch-historical-readme-evidence-boundary-$target"
+    } finally { $archive.Dispose() }
   }
 
   [pscustomobject][ordered]@{

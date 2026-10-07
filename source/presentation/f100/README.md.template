@@ -1,12 +1,12 @@
-# More Infinite Research 4.2.10000
+# More Infinite Research 4.2.10001
 
-More Infinite Research 4.2.10000 is a Factorio 1.0 legacy-target hotfix package.
+More Infinite Research 4.2.10001 is a Factorio 1.0 reduced-target maintenance package from source 4.2.1.
 
 It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.
 
 ## Requirements
 
-- Factorio 1.0, fresh-load qualified on 1.0.0.
+- Factorio 1.0. Earlier fresh-load evidence used 1.0.0; current qualification belongs to the matching release record.
 - `base >= 1.0`.
 - No optional dependency is required.
 
@@ -48,17 +48,19 @@ For maximum-level settings, `0` means the retained stream remains infinite. For 
 
 ## Compatibility Scope
 
-Earlier fresh-load evidence remains bound to its original package and Factorio 1.0.0. Native qualification of this exact hotfix package is NOT RUN. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.
+Earlier fresh-load evidence remains bound to its original package and Factorio 1.0.0. Consult the matching release record for native qualification of this exact package. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.
 
 ## Upgrade
 
-The exact published 1.8.1 archive remains a historical predecessor record. Save-upgrade qualification of this exact 4.2 hotfix package is NOT RUN.
+The exact published 1.8.1 archive remains a historical predecessor record. The maintenance upgrade starts from the published 4.2.0 package for this target; its evidence is separate from that older predecessor.
 
-Source `v4.2.0` maps to target packages ending `00`; source `v4.2.1` maps to `01`. Earlier RC/withdrawn final ZIPs are superseded by the corrected ZIPs. Same-version RC installations require manual replacement and new-checksum verification. Withdrawn `01` installations also require explicit manual replacement; automatic downgrade is not promised. Preserve original saves and existing startup values. Do not assume same-version replacement reruns version-gated migrations or resets earned research.
+Source `v4.2.0-stable` maps to target packages ending `00`; canonical `v4.2.1` maps to `01`. Preserve original saves and keep startup settings unchanged for the first load. Replace private or withdrawn ZIPs sharing the new version explicitly and verify the published checksum. Same-version replacement does not itself rerun version-gated migrations or reset earned research.
 
 ## Installation
 
-Place `more-infinite-research_4.2.10000.zip` in the Factorio 1.0 `mods` directory. Do not unpack it.
+Place `more-infinite-research_4.2.10001.zip` in the Factorio 1.0 `mods` directory. Do not unpack it.
+
+The modern Research Library is not included in this reduced package.
 
 The source repository contains maintainer documentation, fixtures, scripts, and evidence. Those files are intentionally excluded from the release ZIP.
 

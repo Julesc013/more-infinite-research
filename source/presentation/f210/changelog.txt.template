@@ -1,4 +1,39 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.2.21001
+
+  Bugfixes:
+
+    - Compile after Bob's Electronics and Technology finalizers when installed, so lab and science acquisition uses their completed progression.
+    - Remove retired space science from Weapon shooting speed 7 and Lab research speed 7 with Space Is Fake.
+    - Use base/MIR artwork when an optional DLC artwork provider is inactive, including saved or imported icon opt-ins.
+    - Apply the selected braking-force bonus and its correct badge to the native continuation.
+    - Reject continuations whose useful effects are zero after ownership resolution.
+    - Require an obtainable compatible laboratory and acquisition routes for selected science packs.
+    - Reject circular science acquisition before recursively selecting a laboratory.
+    - Account for machine, drill, pump, boiler and fluid-temperature requirements when checking acquisition routes.
+    - Respect typed outputs, result probabilities, productive quantities and productivity exclusions in route admission.
+    - Reject unsafe self-return routes without treating impossible return edges as reachable production.
+    - Include localized recipe and material names in Research Library discovery.
+    - Preserve Library close/position ownership and release obsolete source-force catalogue caches after a merge.
+
+  Compatibility:
+
+    - Extend guarded material continuation and science-frontier handling through the existing route and owner checks.
+    - Keep new Angel/Py subjects conditional; declarations alone do not establish supported overhaul profiles.
+    - Preserve existing community breeding and equipment-manufacturing fixes from 4.2.0.
+
+  Changes:
+
+    - Cache decoded startup profiles and index laboratory placement items during planning.
+    - Try initially obtainable crafting machines before exploring research-gated alternatives during acquisition planning.
+    - Optional DLC icon preferences no longer authorize reading files from inactive Space Age or Elevated Rails.
+
+  Info:
+
+    - Use 4.2.21001 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+    - Preserve original saves before upgrading from the published 4.2.0 package for the same Factorio target.
+
+---------------------------------------------------------------------------------------------------
 Version: 4.2.21000
 
   Changes:

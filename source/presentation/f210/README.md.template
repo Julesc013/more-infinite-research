@@ -8,15 +8,23 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `4.2.x`** targets **Factorio `2.1`** and requires `base >= 2.1.18`.
 
-F210 targets experimental Factorio `2.1`. The external release manifest identifies the exact source, package checksum and validation limits; this hotfix does not claim final-package native qualification.
+F210 targets experimental Factorio `2.1`. The matching external release manifest identifies the exact source, package checksum and validation scope.
 
-### MIR 4.2.0 community hotfix
+### MIR 4.2.1 maintenance update
+
+This update corrects Space Is Fake's Weapon shooting speed 7 and Lab research speed 7 ingredients, native braking-force scaling, zero-effect continuations, and acquisition checks for science and production. The Research Library adds localized recipe/material discovery and fixes view ownership and force-merge cache cleanup. It retains the accepted layout.
+
+Optional DLC artwork now requires an active provider. The saved `mir-use-installed-space-age-icons` setting remains recognized, but neither a checked box nor an imported `MIRSET1` value permits reading an inactive provider's files. Technology icons and both Library shortcut sizes use base/MIR fallback artwork when the provider is inactive. This does not enable Space Age or Elevated Rails; restart after changing startup settings.
+
+New material and Angel/Py declarations still require safe routes, available science, laboratories and compatible owners. A declaration is not a general compatibility guarantee. The matching release evidence defines the tested packages and environments; broader integrations and historical Library ports remain separate work.
+
+### Upgrading from published 4.2.0
+
+Source `v4.2.0-stable` uses target packages ending `00`; canonical `v4.2.1` uses `01`. Install the `01` package for the same Factorio target. Preserve original saves, keep startup values unchanged for the first load, and retain the package checksum for support. A private or previously withdrawn ZIP may share the new numeric version: replace those bytes explicitly with the matching published package and verify its checksum. A same-version file replacement does not itself rerun version-gated migrations or reset earned research.
+
+### Retained 4.2.0 community fixes
 
 This package includes the existing ownership, weapon-overlap `off`, science-snapshot and serialization repairs. It also excludes retired space science with Space Is Fake, exposes existing breeding controls without requiring Space Age, and extends existing furnace/electricity manufacturing research to the requested AAI industrial furnace, SE panel/accumulator tiers, SolarMatrix and Accumulator-V2. These bonuses affect equipment crafting, preserving upstream power, capacity and unlocks.
-
-Source `v4.2.0` uses target packages ending `00`; `v4.2.1` uses `01`. Earlier RC/withdrawn final downloads are superseded by the corrected ZIPs. Same-version RC users must replace the ZIP manually and verify its new checksum. Withdrawn `01` installations also require explicit manual replacement; automatic downgrade to `00` is not promised. Preserve original saves, keep startup values unchanged for the first load, and retain the checksum for support. Same-version replacement does not itself rerun version-gated migrations or reset earned research.
-
-Focused controlled source/package checks passed. Native final-package, save-upgrade, client/multiplayer and performance qualification remains NOT RUN. Broader compatibility and unfinished integrations continue in maintenance work; no overall speedup is claimed.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 

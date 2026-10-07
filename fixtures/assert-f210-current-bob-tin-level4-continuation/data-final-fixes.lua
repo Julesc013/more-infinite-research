@@ -1,3 +1,58 @@
+-- Failure-only observation of this exact finalized environment. These facts
+-- are post-MIR inputs, not a pre-compiler capture or a gameplay acceptance.
+local function observe_missing_tin()
+  local prefix = "__more-infinite-research__.prototypes.mir."
+  local compiler_context = require(prefix .. "pipeline.compiler_context")
+  local science = require(prefix .. "capabilities.science_integration.science_packs")
+  local production = science.pack_production_reachability
+  local recipe_facts = require(prefix .. "index.recipe_facts")
+  for _, name in ipairs({"bob-burner-lab", "lab", "bob-glass", "bob-quartz", "stone-furnace", "wood", "iron-plate"}) do
+    compiler_context.with_active(compiler_context.new({execution_mode="SAFE"}), function()
+      science.ensure_services()
+      recipe_facts.index_view()
+      local normal = production.item_acquisition_witness(name, {}, {})
+      local routes = require(prefix .. "capabilities.science_integration.recipe_route_feasibility")
+      local initial = data.raw.recipe[name] and routes.initial_recipe_witness(name, name)
+      local observer = {visits=0, failures={}, stopped=false}
+      function observer:is_stopped() return self.stopped end
+      function observer:reserve_visit(depth)
+        self.visits = self.visits + 1
+        if self.visits > 200000 or depth > 96 then self.stopped = true end
+        return not self.stopped
+      end
+      function observer:record(failure, depth)
+        if #self.failures < 30 then self.failures[#self.failures+1] = {depth=depth, failure=failure} end
+      end
+      function observer:checkpoint() return #self.failures end
+      function observer:rollback(count)
+        while #self.failures > count do self.failures[#self.failures] = nil end
+      end
+      local witness = production.item_acquisition_witness(name, {}, {}, observer)
+      log("[mir-tin-acquisition-diagnostic] " .. serpent.line({item=name,
+        witness_kind=witness and witness.kind, normal_witness_kind=normal and normal.kind,
+        initial_witness_kind=initial and initial.kind, visits=observer.visits,
+        indeterminate=observer.stopped, failures=observer.failures,
+        recipe=data.raw.recipe[name]}, {comment=false}))
+    end)
+  end
+  for _, prototype_type in ipairs({"furnace", "assembling-machine"}) do
+    local machine = data.raw[prototype_type]["stone-furnace"]
+    if machine then
+      log("[mir-tin-acquisition-diagnostic] " .. serpent.line({machine="stone-furnace",
+        prototype_type=prototype_type, crafting_categories=machine.crafting_categories,
+        fixed_recipe=machine.fixed_recipe, surface_conditions=machine.surface_conditions,
+        placement_item=data.raw.item["stone-furnace"]}, {comment=false}))
+    end
+  end
+  for _, name in ipairs({"bob-burner-lab", "bob-lab", "automation-science-pack", "electronics"}) do
+    local technology = data.raw.technology[name]
+    log("[mir-tin-acquisition-diagnostic] " .. serpent.line({technology=name,
+      prerequisites=technology and technology.prerequisites,
+      research_trigger=technology and technology.research_trigger,
+      unit=technology and technology.unit, effects=technology and technology.effects}, {comment=false}))
+  end
+end
+
 local early_name = "recipe-prod-research_material_tin-1"
 local continuation_name = "recipe-prod-research_material_tin-4"
 local recipe_name = "bob-tin-plate"
@@ -56,6 +111,8 @@ end
 local early = data.raw.technology[early_name]
 local continuation = data.raw.technology[continuation_name]
 if type(early) ~= "table" or early.max_level ~= 3 then
+  local observed, diagnostic_error = pcall(observe_missing_tin)
+  if not observed then log("[mir-tin-acquisition-diagnostic] unavailable: " .. tostring(diagnostic_error)) end
   fail("finite legacy Tin technology differs")
 end
 if type(continuation) ~= "table" or continuation.level ~= 4 or continuation.max_level ~= "infinite" then

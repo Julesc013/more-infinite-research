@@ -12,8 +12,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f200 adapter source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 79430,
-      "expected_sha256": "80C4DBF06D0722A053EC594AD6CCE8BA11B2A9F8662CEB9BB97A2CD35D88BB5E",
+      "expected_bytes": 81980,
+      "expected_sha256": "99BCC7CD1C9F9BE32512156B5F9214E180A11CDFD12574381DF2D0E9F3B158F3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -28,8 +28,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f200 adapter source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 542,
-      "expected_sha256": "74BF74CF28786AF3B18A6CCD436D31736BEC59538E353EDD0D896246B9BD1FEE",
+      "expected_bytes": 587,
+      "expected_sha256": "837EE433A0DD45B6C4B5115DCBA223A787AFAC3E3D06B3B829462128959A288D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -892,8 +892,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9310,
-      "expected_sha256": "ED21456A71B89DB61F49C73488DDD70B58D53F629D988DF08ED4AE9FEBCA55A8",
+      "expected_bytes": 9306,
+      "expected_sha256": "3308A351BDF32EF469EE00BFE95F0BF8807388D79AAA23F15AFDD1BD32C508E3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 67002,
-      "expected_sha256": "0DBA1EA57B640CEC69A12D6C09F722FB7CF1EC1E6C4C91FE614C6C481EE9D885",
+      "expected_bytes": 68021,
+      "expected_sha256": "B4D713D12D1768D11C776A934CCB74213B5B8FEB291783202B955F7867DA1D1B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3804,8 +3804,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f200 adapter source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 78101,
-      "expected_sha256": "D083687561893555B018980B7B93AC9ADCE3CD5D70F8A83F0480F700391A7307",
+      "expected_bytes": 79370,
+      "expected_sha256": "B5DB3441632448342B6A3C815C1FA2039830A37F2910A12A2946AB5105D76FE3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "2303A82B9BE8FBD25DE119E85FE191304BCDF6CAE7B92BFA5131C8ED5CCD8E2B"
+  "record_sha256": "AAEF7C5F0EDBD0E2B6B831742988B2B3956A1D16F29492AAD3647542CE1A5E9E"
 }

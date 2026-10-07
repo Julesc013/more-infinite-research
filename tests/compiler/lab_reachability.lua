@@ -35,13 +35,13 @@ local function world()
     technology = {Probe = research({'A', 'B'})},
     character = {player = {type = 'character', crafting_categories = {'crafting'}}}}
 end
-local function run(raw, callback)
+local function run(raw, callback, technology_reason)
   _G.data = {raw = raw, extend = function() error('Unexpected prototype mutation') end}
   local owner = context.new()
   owner:set_service('science.pack_production_status', production.pack_production_status)
   owner:set_service('science.item_acquisition_witness', production.item_acquisition_witness or function() return nil end)
   owner:set_service('science.independent_pack_acquisition_witness', production.independent_pack_acquisition_witness)
-  owner:set_service('science.technology_researchability_reason', researchability.reason_with_context)
+  owner:set_service('science.technology_researchability_reason', technology_reason or researchability.reason_with_context)
   owner:freeze_services()
   return context.with_active(owner, callback, owner)
 end
@@ -1081,6 +1081,60 @@ for _, case in ipairs({
   run(raw,function()
     check('LRT/boiler/'..case.id,lab.valid_research_ingredients({{'A',1},{'B',1}})==case.expected,
       'Actual lab acquisition respects boiler mode, seed and temperature: '..case.id)
+  end)
+end
+-- A contextual machine query must try an independently acquired machine
+-- before researching another compatible machine. Names do not set science
+-- progression, and the researched alternative must remain available when
+-- the initial machine fails its real placement/recipe/surface requirements.
+for _, case in ipairs({
+  {id='initial-alternative',early=true,expected='z_early',queries=0},
+  {id='only-researched',expected='a_late'},
+  {id='wrong-fixed-recipe',early=true,fixed=true,expected='a_late'},
+  {id='missing-placement-item',early=true,missing=true,expected='a_late'},
+  {id='circular-initial-machine',early=true,cycle=true,expected='a_late'},
+  {id='unreachable-research',blocked=true,expected=false},
+  {id='initial-despite-blocked-research',early=true,blocked=true,expected='z_early',queries=0}
+}) do
+  raw=world()
+  raw.item.plate={type='item',name='plate'}
+  raw.recipe.plate=recipe('plate','plate')
+  raw.recipe.plate.category='smelting'
+  raw.furnace={a_late={type='furnace',name='a_late',crafting_categories={'smelting'}}}
+  raw.item.a_late={type='item',name='a_late',place_result='a_late'}
+  raw.recipe.a_late=recipe('a_late','a_late',false)
+  raw.technology.Late=research({case.blocked and 'unavailable-science' or 'A'})
+  raw.technology.Late.effects={{type='unlock-recipe',recipe='a_late'}}
+  if case.early then
+    raw.furnace.z_early={type='furnace',name='z_early',crafting_categories={'smelting'},
+      fixed_recipe=case.fixed and 'different-recipe' or nil}
+    raw.item.z_early={type='item',name='z_early',place_result=not case.missing and 'z_early' or nil}
+    raw.recipe.z_early=recipe('z_early','z_early')
+    if case.cycle then raw.recipe.z_early.ingredients={{'plate',1}} end
+  end
+  local queries=0
+  run(raw,function()
+    local before=fingerprint.of(data.raw)
+    local witness=production.item_acquisition_witness('plate',{}, {})
+    check('LRM/'..case.id..'/machine',(witness and witness.machine.prototype or false)==case.expected,
+      'The selected machine has a complete applicable acquisition route: '..case.id)
+    if case.queries then
+      check('LRM/'..case.id..'/work',queries==case.queries,
+        'An initial machine avoids unrelated technology/lab traversal')
+    end
+    if witness and case.expected=='a_late' then
+      check('LRM/'..case.id..'/gate',witness.machine.acquisition.unlocker=='Late',
+        'A necessary machine research gate remains in the actual acquisition witness')
+    end
+    local routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+    check('LRM/'..case.id..'/initial',
+      (routes.initial_recipe_witness('plate','plate')~=nil)==(case.expected=='z_early'),
+      'A contextual machine witness cannot contaminate an initial-only query')
+    check('LRM/'..case.id..'/immutable',fingerprint.of(data.raw)==before,
+      'Machine selection preserves prototype inputs')
+  end,function(...)
+    queries=queries+1
+    return researchability.reason_with_context(...)
   end)
 end
 print('MIR-LAB-REACHABILITY-PASS ' .. checks)
