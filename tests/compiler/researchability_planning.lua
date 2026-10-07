@@ -30,7 +30,7 @@ stub("prototypes.mir.platform.factorio.prototype_lookup", {
     for name, prototype in pairs(world.item_prototypes) do callback(name, prototype, prototype.type or "item") end
   end,
   each_entity_prototype = function(callback)
-    for _, prototype_type in ipairs({"lab", "assembling-machine"}) do
+    for _, prototype_type in ipairs({"lab", "assembling-machine", "offshore-pump", "boiler"}) do
       for name, prototype in pairs(data.raw[prototype_type] or {}) do callback(name, prototype, prototype_type) end
     end
   end
@@ -166,6 +166,19 @@ route_policy = require("prototypes.mir.capabilities.science_integration.producti
 
 local function reset(next_world, fixture_fluid_crafter)
   world = next_world
+  -- Existing fluid-shape fixtures need independently acquired placement
+  -- actors, separate from their output/filter oracle. These resources are
+  -- controlled fixture inputs, not a source policy or native placement claim.
+  for _, bucket in ipairs({world.offshore_pumps or {},world.boilers or {}}) do
+    for key, prototype in pairs(bucket) do
+      local entity=prototype.name or key
+      local item='fixture-actor-'..entity
+      world.item_prototypes=world.item_prototypes or {}
+      world.item_prototypes[item]={type='item',place_result=entity}
+      world.resources=world.resources or {}
+      world.resources[item]={minable={result=item,count=1}}
+    end
+  end
   -- Typed-fluid and yield fixtures need a concrete machine independently of
   -- their output/probability oracle. Manual crafting cannot supply that route.
   if fixture_fluid_crafter then

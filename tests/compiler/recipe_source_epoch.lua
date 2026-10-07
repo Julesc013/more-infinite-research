@@ -38,9 +38,6 @@ stub("prototypes.mir.platform.factorio.target_profiles", {
     }, science_pack_prototype_kinds = {"item"}}}
   end
 })
-stub("prototypes.mir.platform.factorio.prototype_lookup", {
-  item_prototype = function(name) return data.raw.item[name] end
-})
 stub("prototypes.mir.capabilities.science_integration.lab_compatibility", {
   ingredient_name = function(ingredient) return ingredient and (ingredient.name or ingredient[1]) or nil end
 })
@@ -348,7 +345,9 @@ end)()
   for _, line in ipairs({"2.1","2.0","1.1","1.0","0.17","0.16","0.15","0.14","0.13"}) do
     profile_module.current_factorio_version=line
     local modern = line=="2.1" or line=="2.0"
-    data.raw={['offshore-pump']={pump={fluid_source_offset={0,-1},fluid_box={}}},
+    data.raw={item={['pump-kit']={type='item',name='pump-kit',place_result='pump'}},
+      resource={kit={minable={result='pump-kit',count=1}}},
+      ['offshore-pump']={pump={fluid_source_offset={0,-1},fluid_box={}}},
       tile={water={fluid="water"}}}
     compiler_context.with_active(compiler_context.new(),function()
       local before=fingerprint.of(data.raw)
@@ -376,7 +375,49 @@ end)()
       check("PS"..line.."/explicit",(routes.source_witness({type="fluid",name="water"})~=nil)==not modern,
         "The explicit fluid declaration remains native only before2.0")
     end)
+    data.raw['offshore-pump'].pump = modern
+      and {fluid_source_offset={0,-1},fluid_box={}} or {fluid="water"}
+    data.raw.resource = {}
+    compiler_context.with_active(compiler_context.new(),function()
+      check("PS"..line.."/unacquired",routes.source_witness({type="fluid",name="water"})==nil,
+        "A native pump prototype cannot supply water without its placement item")
+    end)
+    data.raw.resource.kit = {minable={result='pump-kit',count=1}}
+    compiler_context.with_active(compiler_context.new(),function()
+      local witness=routes.source_witness({type="fluid",name="water"})
+      check("PS"..line.."/actor",witness and witness.machine
+        and witness.machine.prototype_type=="offshore-pump"
+        and witness.machine.item=="pump-kit",
+        "The shared placement index and source consumer retain the acquired native actor")
+    end)
   end
   profile_module.current_factorio_version, data.raw=previous_line, previous_raw
+end)()
+
+-- Recipe replacement must invalidate a warm actor acquisition. The entity
+-- and placement item stay fixed; only the actual canonical recipe source moves.
+;(function()
+  local profile_module=require("prototypes.mir.platform.factorio.target_profiles")
+  local previous_line,previous_raw=profile_module.current_factorio_version,data.raw
+  profile_module.current_factorio_version="2.0"
+  local routes=require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+  data.raw={item={kit={type="item",name="kit",place_result="pump"}},
+    ['offshore-pump']={pump={fluid_source_offset={0,-1},fluid_box={}}},
+    tile={water={fluid="water"}},character={player={crafting_categories={"crafting"}}},
+    recipe={kit={name="kit",enabled=true,energy_required=1,ingredients={},result="kit"}}}
+  compiler_context.with_active(compiler_context.new(),function()
+    local state={}
+    local water={type="fluid",name="water"}
+    check("PAE/initial",routes.source_witness(water,nil,state)~=nil,
+      "The real actor source consumer warms a craftable placement item")
+    local epoch=recipe_facts.source_epoch()
+    local removed=recipe_facts.replace_source({},epoch)
+    check("PAE/removed",routes.source_witness(water,nil,state)==nil,
+      "A real recipe-source replacement removes the warm pump acquisition")
+    recipe_facts.replace_source(data.raw.recipe,removed)
+    check("PAE/restored",routes.source_witness(water,nil,state)~=nil,
+      "The same query state recovers after real source restoration")
+  end)
+  profile_module.current_factorio_version,data.raw=previous_line,previous_raw
 end)()
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)
