@@ -237,8 +237,13 @@ function Assert-MIRLibraryActivation {
 }
 
 function Assert-MIRLibraryLoadedSelection {
-  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath)
+  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath,[switch]$LatestInvocation)
   $text=[IO.File]::ReadAllText($LogPath)
+  if($LatestInvocation){
+    $starts=[regex]::Matches($text,'(?m)^[ \t]*[0-9]+\.[0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}; Factorio [0-9]+\.[0-9]+\.[0-9]+ ')
+    if($starts.Count-eq0){throw '[mir-library-loaded-invocation] Native launch boundary is absent.'}
+    $text=$text.Substring($starts[$starts.Count-1].Index)
+  }
   $matches=[regex]::Matches($text,'(?m)Loading mod (?:settings )?([^\r\n]+?) (\d+\.\d+\.\d+) \(')
   $observed=@($matches|ForEach-Object {$_.Groups[1].Value+'@'+$_.Groups[2].Value}|Where-Object {$_ -notlike 'core@*'}|Sort-Object -Unique)
   $expected=@($Activation.selected|ForEach-Object {$_.name+'@'+$_.version}|Sort-Object -Unique)

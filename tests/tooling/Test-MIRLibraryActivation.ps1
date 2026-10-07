@@ -208,8 +208,11 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
         param($FilePath,$Arguments,$WorkRoot,$LedgerPath,$Policy,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes,$TimeoutSeconds,$StdoutPath,$StderrPath,[switch]$AllowNonZeroExit,$CompletionPredicate)
         Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]-ceq$library) 'upgrade process reads master library directly'
         $currentLines=@($script:upgradeActivation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$_.version+' (data.lua)'})
-        [IO.File]::WriteAllLines($StdoutPath,$currentLines)
-        [IO.File]::WriteAllLines((Join-Path $WorkRoot 'userdata/factorio-current.log'),@('0.1 Loading mod retired-predecessor 9.9.9 (data.lua)')+$currentLines)
+        [IO.File]::WriteAllLines($StdoutPath,@('Performed 1 updates in 0.597 ms'))
+        [IO.File]::WriteAllLines((Join-Path $WorkRoot 'userdata/factorio-current.log'),@(
+          '0.001 2026-10-08 00:00:00; Factorio 2.1.21 (build controlled)',
+          '0.1 Loading mod retired-predecessor 9.9.9 (data.lua)',
+          '0.001 2026-10-08 00:01:00; Factorio 2.1.21 (build controlled)')+$currentLines)
         return [pscustomobject]@{exit_code=0;completion_predicate_observed=$false;peak_working_set_bytes=1024;duration_seconds=0.01}
       }
       try{
