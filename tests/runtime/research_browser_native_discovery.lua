@@ -5,6 +5,7 @@ return function(core, adapter, check, snapshot, finish)
   local technology = "mir-browser-discovery-native"
   local searches = {"préparation témoin", "matière témoin ultime", "fluide témoin"}
   local deadline, records = game.tick + 600, {}
+  local function start_discovery()
   local function find(element, tag, value)
     if not (element and element.valid) then return nil end
     if element.tags and element.tags[tag] == value then return element end
@@ -112,5 +113,35 @@ return function(core, adapter, check, snapshot, finish)
         native_players=#observations,searches=searches,physical_input_qualified=false,
         two_client_multiplayer_qualified=false})
     end
+  end)
+  end
+
+  -- The graphical client applies its window and UI scale after the save's first
+  -- tick. A resize legitimately rebuilds layout controls. Establish the widget
+  -- preservation witness only after two unchanged client display observations;
+  -- once discovery starts, every original-object assertion remains mandatory.
+  local displays, stable_ticks = {}, 0
+  local function display(player)
+    return tostring(player.display_resolution.width) .. ":"
+      .. tostring(player.display_resolution.height) .. ":" .. tostring(player.display_scale)
+  end
+  for _, player in pairs(game.connected_players) do
+    displays[player.index] = display(player)
+  end
+  if next(displays) == nil then start_discovery(); return end
+  script.on_nth_tick(1, function()
+    check(game.tick <= deadline, "native client display settles within the bounded discovery window")
+    local unchanged, count = true, 0
+    for _, player in pairs(game.connected_players) do
+      check(player.valid and player.connected and displays[player.index] ~= nil,
+        "native discovery retains its selected connected players during client setup")
+      local current = display(player)
+      if displays[player.index] ~= current then unchanged = false end
+      displays[player.index], count = current, count + 1
+    end
+    local expected = 0; for _ in pairs(displays) do expected = expected + 1 end
+    check(count == expected, "native discovery selected players remain connected during client setup")
+    stable_ticks = unchanged and stable_ticks + 1 or 0
+    if stable_ticks >= 2 then start_discovery() end
   end)
 end

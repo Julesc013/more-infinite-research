@@ -51,6 +51,7 @@ return function(core, adapter, native_source, fixture_source, check)
       root.mir_browser_tabs={mir_browser_research_content={mir_browser_search=search}}
       local force = {technologies={[technology]=tech},serial="original-shared-research"}
       local player = {index=index,valid=true,connected=true,locale="en",force=force,
+        display_resolution={width=1920,height=1080},display_scale=1,
         gui={screen={mir_research_browser=root}},list=list,query=""}
       player.request_translation=function(input) requests[index]=flatten(input); return 101 end
       local cache = core.translation_queue.new("en",1)
@@ -66,7 +67,7 @@ return function(core, adapter, native_source, fixture_source, check)
       player.list.items = found.count == 1 and {{"","[img=technology/"..technology.."] ",tech.localised_name}} or {}
     end
     local env = {game=game,prototypes=library,core=core,pairs=pairs,ipairs=ipairs,next=next,
-      type=type,string=string,defines={events={on_string_translated=17}},
+      type=type,tostring=tostring,string=string,defines={events={on_string_translated=17}},
       script={on_event=function(_,handler) event=handler end,on_nth_tick=function(_,handler) tick=handler end},
       remote={call=function(_,method,index,options)
         assert(method == "open")
@@ -75,7 +76,7 @@ return function(core, adapter, native_source, fixture_source, check)
         update(player); return true
       end}}
     local begin=assert(load(native_source,"actual-native-discovery-witness","t",env))()
-    local function start() begin(core,adapter,verify,function(force) return force.serial end,function(value) result=value end) end
+    local function start_raw() begin(core,adapter,verify,function(force) return force.serial end,function(value) result=value end) end
     local function callback(index,value,id,success)
       event{player_index=index,id=id or 101,translated=success ~= false,result=value or requests[index]}
     end
@@ -85,7 +86,8 @@ return function(core, adapter, native_source, fixture_source, check)
       update(player)
     end
     local function poll() game.tick=game.tick+1; tick() end
-    return {start=start,callback=callback,gui=gui,poll=poll,players=players,game=game,
+    local function start() start_raw(); if player_count > 0 then poll(); poll() end end
+    return {start=start,start_raw=start_raw,requests=requests,callback=callback,gui=gui,poll=poll,players=players,game=game,
       result=function() return result end,count=function() return count end,
       tick=function() return tick end,event=function() return event end}
   end
@@ -93,6 +95,26 @@ return function(core, adapter, native_source, fixture_source, check)
   check(empty.result().status == "not-exercised-no-connected-player" and empty.result().native_players == 0
     and empty.tick() == nil and empty.event() == nil,
     "no connected player records unexercised scope and never native success")
+  local startup=scenario(1); startup.start_raw(); startup.poll()
+  check(startup.requests[1] == nil and startup.event() == nil,
+    "native discovery waits for client setup before issuing translations or opening its GUI")
+  startup.players[1].display_resolution={width=1024,height=768}; startup.players[1].display_scale=0.75
+  startup.poll(); startup.poll()
+  check(startup.requests[1] == nil,
+    "initial client resolution and scale change restarts the display settling boundary")
+  startup.poll()
+  check(startup.requests[1] ~= nil and startup.event() ~= nil,
+    "stable client display starts the unchanged native discovery witness")
+  startup.callback(1); startup.gui(1)
+  startup.players[1].gui.screen.mir_research_browser.mir_browser_tabs.mir_browser_research_content.mir_browser_search.valid=false
+  check(not pcall(startup.poll) and startup.result() == nil,
+    "waiting for client setup cannot excuse invalidated search controls during discovery")
+  local departing=scenario(1); departing.start_raw(); departing.game.connected_players={}
+  check(not pcall(departing.poll) and departing.result() == nil,
+    "client setup cannot silently drop a selected player")
+  local unsettled=scenario(1); unsettled.start_raw(); unsettled.game.tick=601
+  check(not pcall(unsettled.poll) and unsettled.result() == nil,
+    "client setup shares the original bounded discovery deadline")
   local pending=scenario(1); pending.start(); pending.gui(1); pending.poll()
   check(pending.result() == nil, "GUI matches alone cannot finish without the engine callback")
   pending.callback(1,nil,999); pending.poll()
