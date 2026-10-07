@@ -1072,14 +1072,7 @@ local function capture_machine_witness(machine, category, options, state)
   return nil
 end
 
-compatible_machine = function(category, recipe_name, options, state, required_ports)
-  if type(options.machine_category_witness) == "function" then
-    if options.machine_category_witness(category) == true then
-      return {kind = "declared-machine-category", category = category}
-    end
-    return nil
-  end
-  local machines = category_set_from_prototypes(state, options)[category] or {}
+local function machine_acquisition_witness(machines, category, recipe_name, options, state, required_ports)
   local checkpoint = diagnostic_checkpoint(options)
   for _, machine in ipairs(machines) do
     if not diagnostic_visit(options) then return nil end
@@ -1112,6 +1105,30 @@ compatible_machine = function(category, recipe_name, options, state, required_po
     end
   end
   return nil
+end
+
+compatible_machine = function(category, recipe_name, options, state, required_ports)
+  if type(options.machine_category_witness) == "function" then
+    if options.machine_category_witness(category) == true then
+      return {kind = "declared-machine-category", category = category}
+    end
+    return nil
+  end
+  local machines = category_set_from_prototypes(state, options)[category] or {}
+  if type(options.research_unlock_witness) == "function" then
+    -- Try every independently acquired machine before following a machine's
+    -- research/lab graph. Alphabetical machine order must not force a late
+    -- furnace traversal when an initial furnace already proves this route.
+    -- Keep the same cycle state, structural requirements and observer; only
+    -- the optional research alternative is absent in this first pass.
+    local initial_options = copy_options(options)
+    initial_options.research_unlock_witness = nil
+    local checkpoint = diagnostic_checkpoint(options)
+    local witness = machine_acquisition_witness(machines, category, recipe_name, initial_options, state, required_ports)
+    diagnostic_rollback(options, checkpoint)
+    if witness then return witness end
+  end
+  return machine_acquisition_witness(machines, category, recipe_name, options, state, required_ports)
 end
 
 local function route_for_recipe(recipe_name, output_identity, options, state, require_enabled)

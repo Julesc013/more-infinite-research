@@ -5,6 +5,7 @@ Version: 4.2.11001
 
     - Update the Factorio 1.1 distribution identity and package guidance for source 4.2.1.
     - Preserve the reduced target research and settings surface; modern-only features remain excluded.
+    - Try initially obtainable crafting machines before exploring research-gated alternatives during acquisition planning.
     - Research Library backports are not included in this package.
 
   Info:

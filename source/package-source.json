@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 67002,
-      "source_sha256": "0DBA1EA57B640CEC69A12D6C09F722FB7CF1EC1E6C4C91FE614C6C481EE9D885",
-      "output_bytes": 67002,
-      "output_sha256": "0DBA1EA57B640CEC69A12D6C09F722FB7CF1EC1E6C4C91FE614C6C481EE9D885"
+      "source_bytes": 68021,
+      "source_sha256": "B4D713D12D1768D11C776A934CCB74213B5B8FEB291783202B955F7867DA1D1B",
+      "output_bytes": 68021,
+      "output_sha256": "B4D713D12D1768D11C776A934CCB74213B5B8FEB291783202B955F7867DA1D1B"
     },
     {
       "layer": "capability",
@@ -6465,10 +6465,10 @@
         "predecessor_source_path": "targets/f100/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 52592,
-      "source_sha256": "DD0393D5321B5973BA859AFB45F438945362DEAEB5676C991D22464627FCFB4A",
-      "output_bytes": 52592,
-      "output_sha256": "DD0393D5321B5973BA859AFB45F438945362DEAEB5676C991D22464627FCFB4A"
+      "source_bytes": 52715,
+      "source_sha256": "AD48C0768142FF4882D6C70EA1DEAE26AE2DE52024F794F1648A20F7F9864288",
+      "output_bytes": 52715,
+      "output_sha256": "AD48C0768142FF4882D6C70EA1DEAE26AE2DE52024F794F1648A20F7F9864288"
     },
     {
       "layer": "presentation",
@@ -6543,10 +6543,10 @@
         "predecessor_source_path": "targets/f110/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 52574,
-      "source_sha256": "CDCC5E22E44F32BB5DE71753FB8890E9FEB97D2CC9114485E11A74FDEACDC0DA",
-      "output_bytes": 52574,
-      "output_sha256": "CDCC5E22E44F32BB5DE71753FB8890E9FEB97D2CC9114485E11A74FDEACDC0DA"
+      "source_bytes": 52697,
+      "source_sha256": "BB90358693FBB77EC1F386B3C36F1D430BC86CE8F82AEA70417291359743FD31",
+      "output_bytes": 52697,
+      "output_sha256": "BB90358693FBB77EC1F386B3C36F1D430BC86CE8F82AEA70417291359743FD31"
     },
     {
       "layer": "presentation",
@@ -6597,10 +6597,10 @@
         "predecessor_source_path": "targets/f200/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 81857,
-      "source_sha256": "12E8516BAD9F61C3EF0762CBECB3465C6CCBB2BF1EBE003E56A75D196C44A87E",
-      "output_bytes": 81857,
-      "output_sha256": "12E8516BAD9F61C3EF0762CBECB3465C6CCBB2BF1EBE003E56A75D196C44A87E"
+      "source_bytes": 81980,
+      "source_sha256": "99BCC7CD1C9F9BE32512156B5F9214E180A11CDFD12574381DF2D0E9F3B158F3",
+      "output_bytes": 81980,
+      "output_sha256": "99BCC7CD1C9F9BE32512156B5F9214E180A11CDFD12574381DF2D0E9F3B158F3"
     },
     {
       "layer": "presentation",
@@ -6852,10 +6852,10 @@
         "predecessor_source_path": "targets/f210/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 83507,
-      "source_sha256": "B993324919EB21481E48EA4EF0046692217A13291F5F8010E0B0780822D6A980",
-      "output_bytes": 83507,
-      "output_sha256": "B993324919EB21481E48EA4EF0046692217A13291F5F8010E0B0780822D6A980"
+      "source_bytes": 83630,
+      "source_sha256": "7F6C37BE1FE9EB0A5B147B6CB60664D95970FE69233C4A6663A499F32393133B",
+      "output_bytes": 83630,
+      "output_sha256": "7F6C37BE1FE9EB0A5B147B6CB60664D95970FE69233C4A6663A499F32393133B"
     },
     {
       "layer": "presentation",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "6B3F97D70FF55CD6EAADD59CAB96D5A5B7838A15E9A74B96FACA5B54E612F203"
+  "record_sha256": "544AE555A18E9EDDAF2B341A3E2B8BDB18179E71587FBB047660BF5444CA9DBD"
 }

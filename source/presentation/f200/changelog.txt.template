@@ -27,6 +27,7 @@ Version: 4.2.20001
   Changes:
 
     - Cache decoded startup profiles and index laboratory placement items during planning.
+    - Try initially obtainable crafting machines before exploring research-gated alternatives during acquisition planning.
     - Optional DLC icon preferences no longer authorize reading files from inactive Space Age or Elevated Rails.
 
   Info:
