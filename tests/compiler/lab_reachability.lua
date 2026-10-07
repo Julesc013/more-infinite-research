@@ -443,6 +443,18 @@ for _, case in ipairs({
   {id='acquired-input-machine',machine=true,expected=true},
   {id='acquired-output-machine',machine=true,output=true,expected=true},
   {id='missing-machine-kit',machine=true,missing_kit=true,expected=false},
+  {id='machine-without-fluid-ports',machine=true,no_ports=true,expected=false},
+  {id='machine-output-port-only',machine=true,wrong_direction=true,expected=false},
+  {id='machine-input-port-only-output',machine=true,output=true,ports={'input'},expected=false},
+  {id='untyped-port-default',machine=true,ports={'none'},expected=false},
+  {id='bidirectional-input',machine=true,ports={'input-output'},expected=true},
+  {id='bidirectional-output',machine=true,output=true,ports={'input-output'},expected=true},
+  {id='two-fluid-inputs-one-port',machine=true,two_fluids=true,expected=false},
+  {id='two-fluid-inputs-two-ports',machine=true,two_fluids=true,ports={'input','output','input'},expected=true},
+  {id='two-fluid-outputs-one-port',machine=true,output=true,two_fluids=true,expected=false},
+  {id='two-fluid-outputs-two-ports',machine=true,output=true,two_fluids=true,ports={'output','input','output'},expected=true},
+  {id='dry-machine-item-alternative',machine=true,no_ports=true,alternative=true,expected=true},
+  {id='duplicate-fluid-products-one-port',machine=true,output=true,duplicate=true,expected=true},
   {id='alternative-item-route',alternative=true,expected=true}
 }) do
   raw = fluid_world()
@@ -461,6 +473,23 @@ for _, case in ipairs({
     raw.recipe.make_water.results[1].type = 'fluid'
   end
   if case.machine then add_fluid_builder(raw) end
+  if case.ports then
+    raw['assembling-machine'].builder.fluid_boxes = {}
+    for index, kind in ipairs(case.ports) do
+      raw['assembling-machine'].builder.fluid_boxes[index] = {production_type=kind}
+    end
+  end
+  if case.no_ports then raw['assembling-machine'].builder.fluid_boxes = nil end
+  if case.wrong_direction then raw['assembling-machine'].builder.fluid_boxes = {{production_type='output'}} end
+  if case.two_fluids then
+    raw.fluid.acid = {type='fluid',name='acid'}
+    raw.resource.water.minable.results[2] = {type='fluid',name='acid',amount=1}
+    local entries = case.output and raw.recipe.make_lab.results or raw.recipe.make_lab.ingredients
+    entries[#entries+1] = {type='fluid',name='acid',amount=1}
+  end
+  if case.duplicate then
+    raw.recipe.make_lab.results[#raw.recipe.make_lab.results+1] = {type='fluid',name='water',amount=2}
+  end
   if case.missing_kit then raw.recipe.make_builder = nil end
   if case.alternative then raw.recipe.alternate_lab = recipe('alternate_lab','lab-kit') end
   run(raw, function()

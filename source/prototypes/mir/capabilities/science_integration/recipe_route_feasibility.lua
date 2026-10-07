@@ -171,17 +171,44 @@ local function normalized_ingredients(variant)
   return variant.ingredients or {}
 end
 
-local function requires_fluid_handling(variant, results, options)
+local function fluid_port_requirements(variant, results, options)
   -- Category membership alone cannot give a character a fluid inventory.
   -- Inspect the typed declarations, including coproducts, so an otherwise
   -- reachable fluid source cannot manufacture a hand-crafting witness.
-  for _, entries in ipairs({normalized_ingredients(variant), results or {}}) do
+  local required = {input = 0, output = 0}
+  local seen = {input = {}, output = {}}
+  for direction, entries in ipairs({normalized_ingredients(variant), results or {}}) do
+    local key = direction == 1 and "input" or "output"
     for _, entry in ipairs(entries) do
       if not diagnostic_visit(options) then return nil end
-      if type(entry) == "table" and entry.type == "fluid" then return true end
+      if type(entry) == "table" and entry.type == "fluid" then
+        local identity = normalize_identity(entry)
+        if not identity then return nil end
+        -- Duplicate native products are permitted. Count distinct fluid
+        -- identities, not probability/quantity entries for the same fluid;
+        -- exact slot assignment remains a native qualification boundary.
+        if not seen[key][identity.name] then
+          seen[key][identity.name] = true
+          required[key] = required[key] + 1
+        end
+      end
     end
   end
-  return false
+  if required.input == 0 and required.output == 0 then return false end
+  return required
+end
+
+local function fluid_port_counts(machine, options)
+  local counts = {input = 0, output = 0}
+  for _, box in ipairs(machine.fluid_boxes or {}) do
+    if not diagnostic_visit(options) then return nil end
+    if type(box) == "table" then
+      local kind = box.production_type
+      if kind == "input" or kind == "input-output" then counts.input = counts.input + 1 end
+      if kind == "output" or kind == "input-output" then counts.output = counts.output + 1 end
+    end
+  end
+  return counts
 end
 
 local function copy_options(options)
@@ -318,13 +345,19 @@ local function category_set_from_prototypes(state, options)
   for _, prototype_type in ipairs(MACHINE_TYPES) do
     for name, machine in pairs(data_raw.prototypes(prototype_type)) do
       if not diagnostic_visit(options) then return categories end
+      local ports
       for _, category in ipairs(machine.crafting_categories or {}) do
         if not diagnostic_visit(options) then return categories end
+        if not ports then
+          ports = fluid_port_counts(machine, options)
+          if not ports then return categories end
+        end
         categories[category] = categories[category] or {}
         table.insert(categories[category], {
           name = name,
           prototype_type = prototype_type,
           fixed_recipe = machine.fixed_recipe,
+          fluid_ports = ports,
           surface_conditions = deepcopy(machine.surface_conditions)
         })
       end
@@ -797,7 +830,7 @@ local function capture_machine_witness(machine, category, options, state)
   return nil
 end
 
-compatible_machine = function(category, recipe_name, options, state, needs_fluid_handling)
+compatible_machine = function(category, recipe_name, options, state, required_ports)
   if type(options.machine_category_witness) == "function" then
     if options.machine_category_witness(category) == true then
       return {kind = "declared-machine-category", category = category}
@@ -809,7 +842,10 @@ compatible_machine = function(category, recipe_name, options, state, needs_fluid
   for _, machine in ipairs(machines) do
     if not diagnostic_visit(options) then return nil end
     diagnostic_rollback(options, checkpoint)
-    if (not needs_fluid_handling or machine.prototype_type ~= "character")
+    local ports = machine.fluid_ports
+    local fluid_compatible = not required_ports or (machine.prototype_type ~= "character" and ports
+      and ports.input >= required_ports.input and ports.output >= required_ports.output)
+    if fluid_compatible
       and (machine.fixed_recipe == nil or machine.fixed_recipe == recipe_name)
       and surface_satisfied(machine.surface_conditions, options, state) then
       if machine.prototype_type == "character" then
@@ -911,14 +947,14 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
         })
       else
         local machine_witness
-        local needs_fluid_handling = requires_fluid_handling(variant, results, options)
-        if needs_fluid_handling == nil then return nil end
+        local required_ports = fluid_port_requirements(variant, results, options)
+        if required_ports == nil then return nil end
         local categories = variant.categories or {"crafting"}
         local machine_checkpoint = diagnostic_checkpoint(options)
         for _, category in ipairs(categories) do
           if not diagnostic_visit(options) then return nil end
           diagnostic_rollback(options, machine_checkpoint)
-          machine_witness = compatible_machine(category, recipe_name, options, state, needs_fluid_handling)
+          machine_witness = compatible_machine(category, recipe_name, options, state, required_ports)
           if machine_witness then break end
         end
         if machine_witness then
