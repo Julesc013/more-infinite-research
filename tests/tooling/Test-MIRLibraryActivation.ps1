@@ -293,12 +293,18 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $browserPath=Join-Path $RepoRoot 'tests/runtime/Test-MIRResearchBrowser.ps1'
   $browserAst=[Management.Automation.Language.Parser]::ParseFile($browserPath,[ref]$tokens,[ref]$errors)
   Assert-LibraryTest ($errors.Count-eq0) 'direct browser harness parses'
-  foreach($name in @('Get-MIRBrowserLibrarySelection','Invoke-BrowserEngine')){
+  foreach($name in @('Get-MIRBrowserLibrarySelection','Get-MIRBrowserIconCase','Invoke-BrowserEngine')){
     $function=@($browserAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$true))
     Assert-LibraryTest ($function.Count-eq1) ('browser adapter exists: '+$name)
     . ([scriptblock]::Create($function[0].Extent.Text))
   }
   Assert-LibraryRefusal {& $browserPath -RepoRoot $RepoRoot} 'mir-browser-direct-inputs-required'
+  Assert-LibraryTest ($null-eq(Get-MIRBrowserIconCase 'None')) 'ordinary browser fixture has no icon-setting override'
+  foreach($row in @(@('Defaults',$false,$null),@('RawOptIn',$true,$null),@('ImportedOptIn',$false,$true),@('RawOptInImportedOff',$true,$false))){
+    $selected=Get-MIRBrowserIconCase $row[0]
+    Assert-LibraryTest ($selected.raw-eq$row[1]-and$selected.imported-eq$row[2]) ('explicit icon settings: '+$row[0])
+  }
+  Assert-LibraryRefusal {Get-MIRBrowserIconCase 'unknown'} 'mir-browser-icon-case'
   $browserFixture=Join-Path $root 'browser-assertions';[IO.Directory]::CreateDirectory($browserFixture)|Out-Null
   Write-TestJson (Join-Path $browserFixture 'info.json') @{name='mir-browser-test';version='1.0.0';factorio_version='2.1';dependencies=@('base','more-infinite-research')}
   [IO.File]::WriteAllText((Join-Path $browserFixture 'control.lua'),'-- controlled browser assertions')
@@ -317,6 +323,10 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   $browserActor=(Get-Command Invoke-MIRNativeProbeFactorioProcess).ScriptBlock
   $browserWrongVersion=$false
+  $iconCase=$null
+  $DlcIconCase='None';$iconObservations=[Collections.Generic.List[object]]::new()
+  $resources|Add-Member process_index 0
+  $browserIconMarker='present'
   function Invoke-MIRNativeProbeFactorioProcess {
     param($Context,$FilePath,$Arguments,$TimeoutSeconds)
     Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]-ceq$library) 'browser process reads master library directly'
@@ -325,12 +335,24 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
     }
     $lines=@('0.001 2026-10-08 00:00:00; Factorio 2.1.20 (build controlled)')
     $lines+=@($activation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$(if($browserWrongVersion-and$_.name-ceq'more-infinite-research'){'4.2.21000'}else{$_.version})+' (data.lua)'})
+    if($null-ne$iconCase-and$browserIconMarker-cne'absent'){
+      $observedCase=if($browserIconMarker-ceq'wrong-case'){'Defaults'}else{$DlcIconCase}
+      $line='0.2 Script: [mir-browser-icons] PASS '+(@{case=$observedCase;inactive_provider_references=0}|ConvertTo-Json -Compress)
+      $lines+=$line;if($browserIconMarker-ceq'duplicate'){$lines+=$line}
+    }
     [IO.File]::WriteAllLines((Join-Path $Context.root 'userdata/factorio-current.log'),$lines)
     return [pscustomobject]@{result=@{exit_code=0}}
   }
   try{
     Invoke-BrowserEngine @('--create',(Join-Path $run 'test.zip'))
     Invoke-BrowserEngine @('--benchmark-graphics',(Join-Path $run 'test.zip'),'--benchmark-ticks','1')
+    $DlcIconCase='ImportedOptIn';$iconCase=Get-MIRBrowserIconCase $DlcIconCase
+    Invoke-BrowserEngine @('--benchmark-graphics',(Join-Path $run 'test.zip'),'--benchmark-ticks','1')
+    Assert-LibraryTest ($iconObservations.Count-eq1-and$iconObservations[0].graphics-and$iconObservations[0].observation.case-ceq$DlcIconCase) 'browser binds native icon observation to graphical actor'
+    foreach($browserIconMarker in @('absent','duplicate','wrong-case')){
+      Assert-LibraryRefusal {Invoke-BrowserEngine @('--create',(Join-Path $run 'test.zip'))} 'mir-browser-icon-observation'
+    }
+    $iconCase=$null
     $browserWrongVersion=$true
     Assert-LibraryRefusal {Invoke-BrowserEngine @('--benchmark',(Join-Path $run 'test.zip'))} 'mir-library-loaded-selection'
   }finally{Set-Item Function:Invoke-MIRNativeProbeFactorioProcess -Value $browserActor}

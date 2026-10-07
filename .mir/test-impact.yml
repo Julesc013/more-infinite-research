@@ -838,6 +838,12 @@
       "tags": []
     },
     {
+      "pattern": "tests/runtime/browser_fixture_icons.lua",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tests/runtime/research_browser.lua",
       "groups": [],
       "scenarios": [],

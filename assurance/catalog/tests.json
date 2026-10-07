@@ -1289,6 +1289,11 @@
         "tests/runtime/research_browser_native_discovery.lua",
         "tests/runtime/research_browser_native_discovery_regressions.lua",
         "tests/runtime/browser_fixture_data.lua",
+        "tests/runtime/browser_fixture_icons.lua",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "source:source/prototypes/mir/presentation/icon_builder.lua",
+        "source:source/prototypes/mir/stage/data.lua",
+        "source:source/prototypes/mir/settings/effective.lua",
         "source:source/prototypes/mir/core/fingerprint.lua",
         "source:source/prototypes/mir/runtime/research_browser*.lua",
         "source:source/prototypes/mir/runtime/settings_profile.lua",
@@ -8128,5 +8133,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:32b6a3872082436e11f444854212ffce39e23738e1380144b3f4487bc98e06ac"
+  "digest": "sha256:8e72a1e69622056a977df6867387625e187df6a828d2fddcb7b0eb62405acb10"
 }
