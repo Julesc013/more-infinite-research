@@ -1,5 +1,6 @@
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'NativeProbeResources.ps1')
+. (Join-Path $PSScriptRoot '../compatibility/FactorioRunner.ps1')
 
 function Get-MIRBrowserContinuityReadmeSha256 {
   param([string]$RepositoryRoot,[ValidateSet('f210','f200')][string]$Target,[ValidateSet('4.2.0','4.2.1')][string]$SourceVersion,[string]$ReadmePath)
@@ -17,7 +18,7 @@ function Get-MIRBrowserContinuityReadmeSha256 {
 }
 
 function Read-MIRBrowserContinuityJson {
-  param([string]$Path,[switch]$LeaseReceipts)
+  param([string]$Path,[switch]$LeaseReceipts,[switch]$DocumentOnly)
   if((Get-Item -LiteralPath $Path).Length -gt 32MB){throw '[mir-browser-continuity-json-budget]'}
   $json=Get-Content -LiteralPath $Path -Raw
   $arguments=@{Depth=40};$preserves=(Get-Command ConvertFrom-Json).Parameters.ContainsKey('DateKind')
@@ -32,7 +33,7 @@ function Read-MIRBrowserContinuityJson {
           foreach($name in @('started_utc','receipt_captured_utc','completed_utc')){$record.immutable_input_receipts[$index].$name=$row.GetProperty($name).GetString()}
           $index++
         }
-      }else{$record.owner_started_utc=$document.RootElement.GetProperty('owner_started_utc').GetString()}
+      }elseif(-not$DocumentOnly){$record.owner_started_utc=$document.RootElement.GetProperty('owner_started_utc').GetString()}
     }finally{$document.Dispose()}
   }
   $record
@@ -65,6 +66,8 @@ function Invoke-MIRBrowserContinuityGovernedRun {
   $archive=[string]$Parameters.CandidateArchive
   if(-not[IO.Path]::IsPathRooted($archive)){$archive=Join-Path $RepositoryRoot $archive}
   $Parameters.CandidateArchive=(Resolve-Path -LiteralPath $archive).Path
+  if(-not $Parameters.LibraryDirectory){throw '[mir-browser-continuity-direct-inputs-required]'}
+  $Parameters.LibraryDirectory=(Resolve-Path -LiteralPath ([string]$Parameters.LibraryDirectory)).Path
   if($Parameters.FactorioExe-and-not[IO.Path]::IsPathRooted([string]$Parameters.FactorioExe)){$Parameters.FactorioExe=(Resolve-Path -LiteralPath (Join-Path $RepositoryRoot ([string]$Parameters.FactorioExe))).Path}
   $dirty=@(&git -C $RepositoryRoot status --porcelain --untracked-files=no)
   if($LASTEXITCODE -ne 0 -or $dirty.Count){throw '[mir-browser-continuity-tracked-source-dirty]'}
@@ -81,45 +84,119 @@ function Invoke-MIRBrowserContinuityGovernedRun {
   try{$run=Invoke-MIRNativeProbeProcess -Context $context -FilePath (Get-Command pwsh).Source -Arguments $arguments -TimeoutSeconds 3600}finally{$requestHandle.Dispose()}
   $receipt=Join-Path $context.root 'worker/browser-personal-state-continuity-receipt.json'
   if(-not $run.result.passed -or -not(Test-Path -LiteralPath $receipt -PathType Leaf)){throw '[mir-browser-continuity-worker-receipt]'}
-  $record=Read-MIRBrowserContinuityJson -Path $receipt -LeaseReceipts
+  $record=Read-MIRBrowserContinuityJson -Path $receipt -DocumentOnly
+  if($Parameters.Operation-ceq'PrepareInputs'){
+    if($record.kind-cne'MIRBrowserContinuityPreparedInputsV1'-or$record.status-cne'prepared-not-native-tested'-or$record.factorio_processes-ne0-or$record.target-cne$Parameters.Target){throw '[mir-browser-continuity-prepared-receipt]'}
+    foreach($archive in $record.archives){
+      if(-not(Test-MIR441PathContained -Root (Join-Path $context.root 'worker') -Path $archive.path)-or(Get-MIRImmutableInputSha256 $archive.path)-cne$archive.sha256){throw '[mir-browser-continuity-prepared-archive]'}
+    }
+    Write-MIRNativeProbeResult -Context $context -Record ([ordered]@{kind=$record.kind;status=$record.status;receipt=$receipt;receipt_sha256=(Get-FileHash $receipt).Hash;whole_process_tree=$run;factorio_processes=0;archives=$record.archives})
+    Write-Output "MIR_BROWSER_CONTINUITY_PREPARED_RESULT=$(Join-Path $context.root 'result.json')"
+    return
+  }
   $expectedStages=if($Parameters.StageLimit -ceq 'Full'){@('initial','save-reload','configuration-change','removal','readd')}else{@('initial')}
   $expectedStatus=if($Parameters.StageLimit -ceq 'Full'){'passed'}else{'checkpointed'}
   if($record.source.harness_sha256 -cne $job.harness_sha256 -or $record.status -cne $expectedStatus -or
     $record.source_version -cne $Parameters.SourceVersion -or $record.target.key -cne $Parameters.Target.ToUpperInvariant() -or
     $record.input_mode -cne $Parameters.InputMode -or $record.candidate.archive_sha256 -cne $job.candidate_archive_sha256 -or
-    (@($record.stages.stage)-join'|') -cne ($expectedStages-join'|') -or @($record.immutable_input_receipts).Count -ne $(if($Parameters.StageLimit -ceq 'Full'){4}else{1})){throw '[mir-browser-continuity-worker-receipt-binding]'}
-  foreach($inputReceipt in $record.immutable_input_receipts){$null=Assert-MIRImmutableInputTerminalReceipt -Receipt $inputReceipt}
-  $result=[ordered]@{kind='MIRBrowserContinuityGovernedRunV1';status=$record.status;receipt=$receipt;receipt_sha256=(Get-FileHash -LiteralPath $receipt -Algorithm SHA256).Hash;whole_process_tree=$run;immutable_input_receipts=$record.immutable_input_receipts;archive_bytes_discounted=0;release_qualification=$false}
-  # All alias entries are charged conservatively in this lifecycle job.
+    (@($record.stages.stage)-join'|') -cne ($expectedStages-join'|') -or @($record.library_input_receipts).Count -ne $(if($Parameters.StageLimit -ceq 'Full'){4}else{1})){throw '[mir-browser-continuity-worker-receipt-binding]'}
+  $phases=if($Parameters.StageLimit-ceq'Full'){@('initial','configured','removed','readded')}else{@('initial')}
+  if((@($record.library_input_receipts.phase)-join'|')-cne($phases-join'|')){throw '[mir-browser-continuity-worker-phases]'}
+  foreach($inputReceipt in $record.library_input_receipts){Assert-MIRBrowserContinuityTerminalReceipt -Receipt $inputReceipt -JobRoot (Join-Path $context.root 'worker')}
+  $result=[ordered]@{kind='MIRBrowserContinuityGovernedRunV2';status=$record.status;receipt=$receipt;receipt_sha256=(Get-FileHash -LiteralPath $receipt -Algorithm SHA256).Hash;whole_process_tree=$run;library_input_receipts=$record.library_input_receipts;archive_bytes_discounted=0;release_qualification=$false}
+  # Library archives are inputs, not output-tree aliases.
   Write-MIRNativeProbeResult -Context $context -Record $result
   Write-Output "MIR_BROWSER_PERSONAL_STATE_CONTINUITY_RECEIPT=$receipt"
   Write-Output "MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=$(Join-Path $context.root 'result.json')"
 }
 
 function New-MIRBrowserContinuityProfile {
-  param([string]$JobRoot,[string]$Phase,[object[]]$Inputs,$PreviousProfile=$null)
+  param([string]$JobRoot,[string]$Phase,[object[]]$Inputs,[string]$LibraryDirectory,[string]$EngineDataDirectory,[string]$EngineVersion,$PreviousProfile=$null)
   $root=Resolve-MIR441RecoveryScratchPath -Path $JobRoot
   if($Phase -cnotmatch '^[a-z][a-z-]{0,39}$'){throw '[mir-browser-continuity-profile-phase]'}
-  if($null -ne $PreviousProfile -and -not $PreviousProfile.lease.closed){throw '[mir-browser-continuity-previous-profile-active]'}
-  if($null -ne $PreviousProfile){$null=Assert-MIRImmutableInputTerminalReceipt -Receipt $PreviousProfile.lease.record}
-  $run=Join-Path $root ('profiles/'+$Phase)
-  if(Test-Path -LiteralPath $run){throw '[mir-browser-continuity-profile-preserved]'}
-  New-Item -ItemType Directory -Path $run -ErrorAction Stop|Out-Null
-  $lease=$null
-  try{
-    $lease=New-MIRImmutableInputLease -RunRoot $run -StageDirectory (Join-Path $run 'mods') -Inputs $Inputs -RequireHardLinks
-    if($null -ne $PreviousProfile){
-      Assert-MIRImmutableInputDirectory -Path $PreviousProfile.mods -Context 'Browser continuity previous private settings directory'
-      $source=Join-Path $PreviousProfile.mods 'mod-settings.dat';$target=Join-Path $lease.record.stage_directory 'mod-settings.dat'
-      if(-not (Test-MIR441PathContained -Root $root -Path $source)){throw '[mir-browser-continuity-settings-boundary]'}
-      if(Test-Path -LiteralPath $source -PathType Leaf){
-        if((Get-Item -LiteralPath $source -Force).Attributes -band [IO.FileAttributes]::ReparsePoint){throw '[mir-browser-continuity-settings-reparse]'}
-        Move-Item -LiteralPath $source -Destination $target -ErrorAction Stop
+  if(-not $LibraryDirectory-or-not $EngineDataDirectory-or$EngineVersion-cnotmatch '^\d+[.]\d+[.]\d+$'){throw '[mir-browser-continuity-direct-inputs-required] Supply the library and engine; populated profile staging is retired.'}
+  if($null -ne $PreviousProfile -and -not $PreviousProfile.activation.closed){throw '[mir-browser-continuity-previous-profile-active]'}
+  if($null -ne $PreviousProfile){Assert-MIRBrowserContinuityTerminalReceipt -Receipt $PreviousProfile.terminal -JobRoot $root}
+  $definition=Join-Path $root ('selections/'+$Phase+'.json')
+  if(Test-Path -LiteralPath $definition){throw '[mir-browser-continuity-profile-preserved]'}
+  $rows=@([ordered]@{name='base';version=$EngineVersion;enabled=$true});$hashes=[ordered]@{}
+  foreach($inputRow in $Inputs){
+    $name=[string]$inputRow.file_name
+    if([IO.Path]::GetFileName($name)-cne$name-or$name-cnotmatch '[.]zip$'-or$hashes.Contains($name)){throw '[mir-browser-continuity-input-name]'}
+    $source=[string]$inputRow.source_path;$installed=Join-Path $LibraryDirectory $name
+    Assert-MIRLibraryPath $source
+    if((Get-MIRImmutableInputSha256 $source)-cne$inputRow.expected_sha256){throw '[mir-browser-continuity-source-hash]'}
+    if(-not(Test-Path -LiteralPath $installed -PathType Leaf)){throw "[mir-browser-continuity-library-input-missing] Install the selected input once: $name"}
+    Assert-MIRLibraryPath $installed
+    $zip=[IO.Compression.ZipFile]::OpenRead($source)
+    try{
+      $infos=@($zip.Entries|Where-Object FullName -Match '^[^/]+/info[.]json$')
+      if($infos.Count-ne1-or$infos[0].Length-gt64KB){throw '[mir-browser-continuity-input-info]'}
+      $reader=[IO.StreamReader]::new($infos[0].Open());try{$info=$reader.ReadToEnd()|ConvertFrom-Json}finally{$reader.Dispose()}
+      if($name-cne($info.name+'_'+$info.version+'.zip')){throw '[mir-browser-continuity-input-identity]'}
+      if($inputRow.role-ceq'mir-candidate'){
+        if((Get-MIRImmutableInputSha256 $installed)-cne$inputRow.expected_sha256){throw '[mir-browser-continuity-candidate-hash]'}
+      }else{
+        # Owned fixture ZIP compression/timestamps may differ. Bind every
+        # member to the current prepared source instead of rebuilding inputs.
+        $other=[IO.Compression.ZipFile]::OpenRead($installed)
+        try{
+          if($zip.Entries.Count-gt32-or$zip.Entries.Count-ne$other.Entries.Count){throw '[mir-browser-continuity-fixture-membership]'}
+          foreach($entry in $zip.Entries){
+            $match=$other.GetEntry($entry.FullName)
+            if($null-eq$match-or$entry.Length-gt4MB-or$match.Length-ne$entry.Length){throw '[mir-browser-continuity-fixture-member]'}
+            $left=$entry.Open();$right=$match.Open()
+            try{$a=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($left));$b=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($right))}finally{$left.Dispose();$right.Dispose()}
+            if($a-cne$b){throw '[mir-browser-continuity-fixture-source]'}
+          }
+        }finally{$other.Dispose()}
       }
-    }
-    [pscustomobject]@{lease=$lease;mods=[string]$lease.record.stage_directory;phase=$Phase}
-  }catch{
-    if($null-ne$lease-and-not$lease.closed){try{$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}catch{Write-Warning $_.Exception.Message}}
-    throw
+      $rows+=,[ordered]@{name=[string]$info.name;version=[string]$info.version;enabled=$true}
+      $hashes[$name]=Get-MIRImmutableInputSha256 $installed
+    }finally{$zip.Dispose()}
   }
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $definition))|Out-Null
+  [IO.File]::WriteAllText($definition,(@{mods=$rows}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+  $arguments=@{LibraryDirectory=$LibraryDirectory;EngineDataDirectory=$EngineDataDirectory;ProfilePath=$definition;ArchiveHashes=$hashes;SettingsMode='Defaults'}
+  if($null-ne$PreviousProfile-and$PreviousProfile.terminal.settings.exists){$arguments.SettingsMode='File';$arguments.SettingsPath=$PreviousProfile.terminal.settings.path;$arguments.SettingsSha256=$PreviousProfile.terminal.settings.sha256}
+  $activation=Start-MIRLibraryActivation @arguments
+  [pscustomobject]@{activation=$activation;mods=$activation.library;phase=$Phase;root=$root;terminal=$null}
+}
+
+function Complete-MIRBrowserContinuityProfile {
+  param([Parameter(Mandatory)]$Profile)
+  Assert-MIRLibraryIdle
+  Assert-MIRLibraryActivation -Activation $Profile.activation
+  $settings=Read-MIRLibraryControl (Join-Path $Profile.mods 'mod-settings.dat')
+  $snapshot=Join-Path $Profile.root ('controls/'+$Profile.phase+'-mod-settings.dat')
+  if(Test-Path -LiteralPath $snapshot){throw '[mir-browser-continuity-settings-preserved]'}
+  if($settings.exists){
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $snapshot))|Out-Null
+    [IO.File]::WriteAllBytes($snapshot,[Convert]::FromBase64String($settings.bytes))
+    if((Get-MIRImmutableInputSha256 $snapshot)-cne$settings.sha256){throw '[mir-browser-continuity-settings-readback]'}
+  }
+  $terminal=Complete-MIRLibraryActivation -Activation $Profile.activation
+  $terminal.phase=$Profile.phase
+  $terminal.settings=[ordered]@{exists=$settings.exists;path=if($settings.exists){$snapshot}else{''};sha256=$settings.sha256}
+  $Profile.terminal=$terminal
+  return $terminal
+}
+
+function Assert-MIRBrowserContinuityTerminalReceipt {
+  param([Parameter(Mandatory)]$Receipt,[Parameter(Mandatory)][string]$JobRoot)
+  if($Receipt.status-cne'restored-direct-library-controls'-or$Receipt.dependency_payload_bytes_copied-ne0-or$Receipt.archive_links_created-ne0-or$Receipt.archive_extractions-ne0-or$Receipt.profile_sha256-cnotmatch'^[A-F0-9]{64}$'){throw '[mir-browser-continuity-direct-receipt]'}
+  if($Receipt.phase-cnotmatch'^[a-z][a-z-]{0,39}$'){throw '[mir-browser-continuity-direct-phase]'}
+  $definition=Read-MIRLibraryControl (Join-Path $JobRoot ('selections/'+$Receipt.phase+'.json'))
+  if(-not$definition.exists-or$definition.sha256-cne$Receipt.profile_sha256){throw '[mir-browser-continuity-selection-custody]'}
+  $requested=([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($definition.bytes))|ConvertFrom-Json).mods
+  if(@($Receipt.selected|Group-Object name|Where-Object Count -NE 1).Count-or@($Receipt.selected|Where-Object name -CEQ 'base').Count-ne1){throw '[mir-browser-continuity-selected-inputs]'}
+  $identities={param($rows) @($rows|Sort-Object name|ForEach-Object {$_.name+'@'+$_.version})-join '|'}
+  if((& $identities $requested)-cne(& $identities $Receipt.selected)){throw '[mir-browser-continuity-selected-inputs]'}
+  foreach($row in $Receipt.selected){if($row.sha256-cnotmatch'^[A-F0-9]{64}$'-or$row.bytes-le0){throw '[mir-browser-continuity-selected-inputs]'}}
+  if($Receipt.settings.exists){
+    $expected=Join-Path ([IO.Path]::GetFullPath($JobRoot)) ('controls/'+$Receipt.phase+'-mod-settings.dat')
+    if([IO.Path]::GetFullPath($Receipt.settings.path)-cne$expected){throw '[mir-browser-continuity-settings-boundary]'}
+    $settings=Read-MIRLibraryControl $expected
+    if(-not$settings.exists-or$settings.sha256-cne$Receipt.settings.sha256){throw '[mir-browser-continuity-settings-custody]'}
+  }elseif($Receipt.settings.path-or$Receipt.settings.sha256){throw '[mir-browser-continuity-absent-settings]'}
 }

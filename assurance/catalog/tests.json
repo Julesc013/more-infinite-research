@@ -616,7 +616,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F210 -SourceVersion 4.2.1 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240 -ExpectedPeakMemoryMiB 3072 -MaxNewOutputMiB 240",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F210 -SourceVersion 4.2.1 -FactorioExe <factorio> -LibraryDirectory <library> -CandidateArchive <candidate> -TimeoutSeconds 240 -ExpectedPeakMemoryMiB 3072 -MaxNewOutputMiB 240",
       "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -627,6 +627,7 @@
       "inputs": [
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
         "tools/lib/validation/BrowserContinuityInputs.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "fixtures/assert-browser-personal-state-continuity/**",
         "source:source/prototypes/mir/runtime/research_browser.lua",
@@ -749,7 +750,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -SourceVersion 4.2.1 -FactorioExe <factorio> -CandidateArchive <candidate> -InputMode ScriptedFixture -TimeoutSeconds 240 -ExpectedPeakMemoryMiB 3072 -MaxNewOutputMiB 240",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -Target F200 -SourceVersion 4.2.1 -FactorioExe <factorio> -LibraryDirectory <library> -CandidateArchive <candidate> -InputMode ScriptedFixture -TimeoutSeconds 240 -ExpectedPeakMemoryMiB 3072 -MaxNewOutputMiB 240",
       "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -760,6 +761,7 @@
       "inputs": [
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
         "tools/lib/validation/BrowserContinuityInputs.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "fixtures/assert-browser-personal-state-continuity/**",
         "source:source/prototypes/mir/runtime/research_browser.lua",
@@ -1289,6 +1291,11 @@
         "tests/runtime/research_browser_native_discovery.lua",
         "tests/runtime/research_browser_native_discovery_regressions.lua",
         "tests/runtime/browser_fixture_data.lua",
+        "tests/runtime/browser_fixture_icons.lua",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "source:source/prototypes/mir/presentation/icon_builder.lua",
+        "source:source/prototypes/mir/stage/data.lua",
+        "source:source/prototypes/mir/settings/effective.lua",
         "source:source/prototypes/mir/core/fingerprint.lua",
         "source:source/prototypes/mir/runtime/research_browser*.lua",
         "source:source/prototypes/mir/runtime/settings_profile.lua",
@@ -1749,6 +1756,7 @@
         "tools/lib/assurance/Core.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/BrowserContinuityInputs.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
         "tests/support/MIRMaterialAuditInputs.ps1",
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
         "tools/lib/assurance/evidence/CommandExecution.ps1",
@@ -8128,5 +8136,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:32b6a3872082436e11f444854212ffce39e23738e1380144b3f4487bc98e06ac"
+  "digest": "sha256:9b7378e857ad24e944c6e425d81a85b22b2ce9667988457e7e05f407db840d97"
 }

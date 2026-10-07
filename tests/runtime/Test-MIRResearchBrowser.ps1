@@ -7,6 +7,7 @@ param(
  [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
  [switch]$Graphics,
+ [ValidateSet('None','Defaults','RawOptIn','ImportedOptIn','RawOptInImportedOff')][string]$DlcIconCase='None',
  [string]$OutputRoot='build/p/browser',
  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
@@ -16,6 +17,7 @@ $repo=(Resolve-Path $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
+. (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
 if(-not $PrepareInputsOnly -and ($LibraryDirectory -eq '' -or $FactorioBin -eq '' -or $CandidateZip -eq '')) {
  throw '[mir-browser-direct-inputs-required] Supply the engine, current candidate and flat archive library; populated profile staging is retired.'
 }
@@ -36,6 +38,32 @@ $activation=$null
 $candidate=''
 $targetKey=if($Target -ceq '2.0'){'f200'}else{'f210'}
 $expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch 1
+function Get-MIRBrowserIconCase([string]$Case) {
+ switch -CaseSensitive ($Case) {
+  'None' { return $null }
+  'Defaults' { return @{case=$Case;raw=$false;imported=$null} }
+  'RawOptIn' { return @{case=$Case;raw=$true;imported=$null} }
+  'ImportedOptIn' { return @{case=$Case;raw=$false;imported=$true} }
+  'RawOptInImportedOff' { return @{case=$Case;raw=$true;imported=$false} }
+  default { throw '[mir-browser-icon-case]' }
+ }
+}
+$iconCase=Get-MIRBrowserIconCase $DlcIconCase
+$iconObservations=[Collections.Generic.List[object]]::new()
+function Initialize-MIRBrowserIconFixture([string]$Fixture,[string]$Repository,[string]$Case) {
+ $selected=Get-MIRBrowserIconCase $Case
+ if($null -eq $selected){return}
+ $rawLiteral=ConvertTo-MIRLuaLiteral $selected.raw
+ $importLiteral=if($null -eq $selected.imported){'nil'}else{ConvertTo-MIRLuaLiteral $selected.imported}
+ $settingsText="local option=data.raw['bool-setting']['mir-use-installed-space-age-icons']`nassert(option.default_value==false,'Production icon default must remain off')`noption.default_value=$rawLiteral`n"
+ if($null -ne $selected.imported){
+  $profileJson=[ordered]@{schema=1;kind='mir-settings-profile';settings=[ordered]@{'mir-use-installed-space-age-icons'=$selected.imported}}|ConvertTo-Json -Depth 4 -Compress
+  $settingsText+="data.raw['string-setting']['mir-settings-profile-import'].default_value='MIRSET1:'..helpers.encode_string("+(ConvertTo-MIRLuaLiteral $profileJson)+")`n"
+ }
+ [IO.File]::WriteAllText((Join-Path $Fixture 'settings-final-fixes.lua'),$settingsText,[Text.UTF8Encoding]::new($false))
+ $iconChecks=[IO.File]::ReadAllText((Join-Path $Repository 'tests/runtime/browser_fixture_icons.lua'))
+ [IO.File]::WriteAllText((Join-Path $Fixture 'data-final-fixes.lua'),("local check=(function()`n"+$iconChecks+"`nend)()`ncheck{case="+(ConvertTo-MIRLuaLiteral $Case)+",raw=$rawLiteral,imported=$importLiteral}`n"),[Text.UTF8Encoding]::new($false))
+}
 function Test-BrowserCandidate([string]$Candidate,[string]$Line,$Identity,[string]$Repository) {
 $candidate=$Candidate;$Target=$Line;$expectedIdentity=$Identity;$repo=$Repository
 $archive=[IO.Compression.ZipFile]::OpenRead($candidate)
@@ -92,6 +120,7 @@ $fixture=Join-Path $run 'fixture-source/mir-browser-test_1.0.0'
 New-Item -ItemType Directory -Force $fixture | Out-Null
 [ordered]@{name='mir-browser-test';version='1.0.0';title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/browser_fixture_data.lua') -Destination (Join-Path $fixture 'data.lua')
+Initialize-MIRBrowserIconFixture -Fixture $fixture -Repository $repo -Case $DlcIconCase
 $lua=[Text.StringBuilder]::new()
 foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{name='browser_catalogue';path='research_browser_factorio_catalogue.lua'},@{name='browser_actions';path='research_browser_actions.lua'})) {
  [void]$lua.AppendLine("local $($module.name)=(function()")
@@ -187,7 +216,7 @@ $coreChecks='check_omissions(check); check_browser_core_regressions(browser_core
 if($PrepareInputsOnly) {
  $preparedRoot=Join-Path $run 'prepared-fixtures';[IO.Directory]::CreateDirectory($preparedRoot)|Out-Null
  $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-browser-test' -Version '1.0.0' -ModsDir $preparedRoot
- Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_commit=$sourceCommit;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
+ Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_commit=$sourceCommit;dlc_icon_case=$DlcIconCase;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
  Write-Output "Browser fixture prepared without native execution or library writes: $run"
  return
 }
@@ -220,6 +249,14 @@ function Invoke-BrowserEngine([string[]]$Arguments) {
  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -TimeoutSeconds 120 `
   -Arguments $nativeArguments
  $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath (Join-Path $run 'userdata/factorio-current.log') -LatestInvocation
+ if($null -ne $iconCase){
+  $text=Get-Content -LiteralPath (Join-Path $run 'userdata/factorio-current.log') -Raw
+  $markers=@([regex]::Matches($text,'\[mir-browser-icons\] PASS (?<json>\{[^\r\n]+\})'))
+  if($markers.Count-ne1){throw '[mir-browser-icon-observation] Expected one current native artwork observation.'}
+  $observation=$markers[0].Groups['json'].Value|ConvertFrom-Json
+  if($observation.case-cne$DlcIconCase-or$observation.inactive_provider_references-ne0){throw '[mir-browser-icon-observation] Native case differs.'}
+  $iconObservations.Add([ordered]@{process_index=$resources.process_index;graphics=($Arguments-contains'--benchmark-graphics');observation=$observation})
+ }
 }
 Invoke-BrowserEngine @('--create',$save)
 if($Graphics) { Invoke-BrowserEngine @('--benchmark-graphics',$save,'--benchmark-ticks','720','--disable-audio','--window-size','1024x768') }
@@ -261,6 +298,17 @@ if($Graphics) {
  $result | Add-Member save_sha256 (Get-FileHash $saved).Hash
 }
 $result | Add-Member target $Target
+$result | Add-Member dlc_icon_case $DlcIconCase
+$result | Add-Member icon_observations $iconObservations.ToArray()
+if($null -ne $iconCase){
+ $settingsControl=Read-MIRLibraryControl (Join-Path $library 'mod-settings.dat')
+ if(-not $settingsControl.exists){throw '[mir-browser-icon-settings-missing] Native settings were not saved.'}
+ $settingsSnapshot=Join-Path $run 'observed-mod-settings.dat'
+ [IO.File]::WriteAllBytes($settingsSnapshot,[Convert]::FromBase64String($settingsControl.bytes))
+ $settingsHash=Get-MIRImmutableInputSha256 $settingsSnapshot
+ if($settingsHash-cne$settingsControl.sha256){throw '[mir-browser-icon-settings-readback]'}
+ $result|Add-Member icon_settings_snapshot @{path=$settingsSnapshot;sha256=$settingsHash;private_writable_copy=$true}
+}
 Assert-MIR441CleanTrackedSource -RepoRoot $repo
 if((Get-FileHash -LiteralPath $engine).Hash -cne $engineSha256 -or
    (& git -C $repo rev-parse HEAD).Trim() -cne $sourceCommit){throw '[mir-browser-input-drift] Engine or source changed during the native run.'}
