@@ -185,7 +185,7 @@
       "purpose": "ci",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "E53941A1F4412D7F6F9C830280A8D0DCA4279EE3C45963F7E33D8E7C38AD9985"
+      "sha256": "B2E1F5B052E8A27AC8506282A212016498AEB15007FA15B42E4307996BF04605"
     }
   ],
   "summary": {
@@ -211,5 +211,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:93554a50d9941fa5cb5b7525878894db9d7b16ee604868f831df211054bb1b17"
+  "digest": "sha256:5ec15eb50d3679c21ccf59c6fd721f6141145818ad4e711bbd10c1ef8985475e"
 }

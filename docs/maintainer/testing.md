@@ -25,6 +25,8 @@ The selection contract itself can be checked without Factorio or dependency arch
 
 Native lab, emitted research, production, save, multiplayer and engine performance claims still need their selected current-package scenario. Prepare only those affected scenarios from manifests over the shared dependency library, using verified same-volume hard links and private writable settings and saves. Keep compact results and required reproducers after completion; do not retain copied modpacks or count linked ZIP lengths as reclaimed physical storage.
 
+When the hosted `static.mir4-platform-preview` worker fails on a stale generated projection, the same worker can preserve a separate SDK generation repair artifact. It invokes the existing complete fixed-point writer from the exact clean checkout and exports only changed files returned by that writer, with paths, hashes, source commit/tree, player-source fingerprint and run identity. The output is limited to 16 MiB; no player package or dependency archive is constructed. The original test and verification gate remain failed. Before adopting these bytes locally, verify the producer and exact source, all file hashes and generated path scope; preserve any local changes. Commit the generated corrections and obtain fresh required checks before integration. This artifact provides generated source for repair; it grants no native, release or signing acceptance.
+
 ## Test Pyramid
 
 ### Static Tests

@@ -98,6 +98,8 @@
       "requires_factorio": false,
       "inputs": [
         "tests/tooling/Test-MIRDevelopmentCISelection.ps1",
+        "tests/support/MIRSdkGenerationRepairControls.ps1",
+        "tools/lib/mir4/PlatformPreview.ps1",
         "tools/mir/application/assurance/DevelopmentValidation.ps1",
         "tools/lib/assurance/Core.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
