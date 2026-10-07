@@ -70,7 +70,6 @@ local function seed_manufacturing(record)
     earned.technologies[value.name] = state(value)
     for slot=2,#row do earned.recipe_bonuses[row[slot]] = index * 0.1 end
   end
-  force.research_queue_enabled = true
   if not force.add_research("recipe-prod-research_plastic-1") then fail("could not queue paid manufacturing continuation") end
   earned.queue, earned.progress = queue_names(force), force.research_progress
   if #earned.queue < 2 or earned.queue[2] ~= "recipe-prod-research_plastic-1" then fail("manufacturing queue seed failed") end
