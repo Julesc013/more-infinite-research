@@ -8,8 +8,10 @@ function Get-MIR421SpaceFakeUpgradeDescriptor {
       $FixtureName -cne $expectedFixture -or $Archetype -cne $expectedArchetype) { throw '[mir421-sif-transition]' }
   $line = if ($Target -ceq 'f210') { '2.1' } else { '2.0' }
   $inputs = if ($Target -ceq 'f210') { @(
-    [pscustomobject]@{name='space-is-fake';version='1.0.76';sha256='064F2DF2D669AA0EE12A27146EFA32B5243AEBA86D7B72241A540D635F0461FF'},
-    [pscustomobject]@{name='cr-commons';version='1.0.32';sha256='75C8010ADBB03173E46C1E6A52E64239C3A837C826E385706AC0C9C6EDA69CDC'}
+    # 1.0.76 fails native 2.1.21 item validation before save creation; 1.0.78
+    # carries the upstream fuel-categories correction and requires commons .33.
+    [pscustomobject]@{name='space-is-fake';version='1.0.78';sha256='3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13'},
+    [pscustomobject]@{name='cr-commons';version='1.0.33';sha256='378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB'}
   ) } else { @(
     [pscustomobject]@{name='space-is-fake';version='1.0.60';sha256='860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC'},
     [pscustomobject]@{name='cr-commons';version='1.0.27';sha256='6F3622AE6270F9B365A9E2E07FA5E07B61B2BBFCAB3A4D930CC410EBDEB63B92'}
@@ -20,7 +22,7 @@ function Get-MIR421SpaceFakeUpgradeDescriptor {
 function Resolve-MIR421SpaceFakeUpgradeInputs {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Descriptor,[string[]]$LocalModLibraryDirs=@())
   # The dependency library is a read-only input. No downloads or copy fallback.
-  if ($LocalModLibraryDirs.Count -eq 0) { $LocalModLibraryDirs=@(Join-Path (Split-Path -Parent $RepoRoot) ('testmods/'+$Descriptor.line)) }
+  if ($LocalModLibraryDirs.Count -eq 0) { throw '[mir-upgrade-library-required] Supply the selected machine-local archive library explicitly.' }
   $expected=[ordered]@{}
   foreach ($row in $Descriptor.inputs) { $expected[([string]$row.name+'_'+[string]$row.version+'.zip')]=[string]$row.sha256 }
   $resolved=Resolve-MIRNativeProbeDependencyInputs -StageRoot (Join-Path $RepoRoot ('build/tmp/mir421-sif-input-lookup-'+$Descriptor.target)) -ExpectedArchives $expected -LocalModLibraryDirs $LocalModLibraryDirs
@@ -29,6 +31,41 @@ function Resolve-MIR421SpaceFakeUpgradeInputs {
     $path = $resolved[$fileName].source_path
     [pscustomobject]@{source_path=$path;file_name=$fileName;expected_sha256=[string]$row.sha256;immutable=$true;role='native-sif-dependency';identity=[ordered]@{name=$row.name;version=$row.version;factorio_line=$Descriptor.line};provenance=[ordered]@{kind='verified-canonical-local-library';request='SIF-01'}}
   })
+}
+
+function Get-MIRUpgradeLibrarySelection {
+  param([Parameter(Mandatory)][string]$Library,[Parameter(Mandatory)][string]$EngineDataDirectory,
+    [Parameter(Mandatory)][string]$Archive,[Parameter(Mandatory)][string]$Version,
+    [Parameter(Mandatory)][string]$ExpectedSha256,[object[]]$Dependencies=@(),
+    [Parameter(Mandatory)][string[]]$FixtureDirectories,[bool]$EnableDlc=$false)
+  $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $Library -EngineDataDirectory $EngineDataDirectory)
+  $rows=[Collections.Generic.List[object]]::new();$hashes=[ordered]@{}
+  $builtins=@('base')
+  if($EnableDlc){$builtins+=@('elevated-rails','quality','space-age')}
+  if($EnableDlc-and@($inventory|Where-Object {$_.builtin-and$_.name-ceq'recycler'}).Count){$builtins+='recycler'}
+  foreach($name in $builtins){
+    $matches=@($inventory|Where-Object {$_.builtin-and$_.name-ceq$name})
+    if($matches.Count-ne1){throw "[mir-upgrade-builtin-missing] $name"}
+    $rows.Add([ordered]@{name=$name;version=$matches[0].version;enabled=$true})
+  }
+  $candidate=[ordered]@{file_name=[IO.Path]::GetFileName($Archive);expected_sha256=$ExpectedSha256;identity=@{name='more-infinite-research';version=$Version}}
+  foreach($inputRow in @($Dependencies)+@($candidate)){
+    $path=Join-Path $Library $inputRow.file_name
+    $matches=@($inventory|Where-Object {-not$_.builtin-and$_.name-ceq$inputRow.identity.name-and$_.version-ceq$inputRow.identity.version})
+    if($matches.Count-ne1-or$matches[0].path-cne$path){throw "[mir-upgrade-library-input-missing] $($inputRow.file_name)"}
+    if((Get-MIRImmutableInputSha256 $path)-cne$inputRow.expected_sha256){throw "[mir-upgrade-library-input-hash] $($inputRow.file_name)"}
+    $rows.Add([ordered]@{name=$matches[0].name;version=$matches[0].version;enabled=$true})
+    $hashes[$inputRow.file_name]=[string]$inputRow.expected_sha256
+  }
+  foreach($directory in $FixtureDirectories){
+    $info=Get-Content -LiteralPath (Join-Path $directory 'info.json') -Raw|ConvertFrom-Json
+    $name=$info.name+'_'+$info.version+'.zip';$path=Join-Path $Library $name
+    Assert-MIRLibraryFixtureArchive -Archive $path -SourceDirectory $directory
+    $rows.Add([ordered]@{name=$info.name;version=$info.version;enabled=$true})
+    $hashes[$name]=Get-MIRImmutableInputSha256 $path
+  }
+  if(@($rows|Group-Object {$_.name}|Where-Object Count -GT 1).Count){throw '[mir-upgrade-library-duplicate-name]'}
+  return [pscustomobject]@{mod_list=[ordered]@{mods=@($rows)};archive_hashes=$hashes}
 }
 
 function Get-MIRUpgradeLinkedArchiveBytes {
@@ -85,6 +122,14 @@ function Assert-MIR421SpaceFakeUpgradeMarker {
 function Add-MIR421SpaceFakeUpgradeOracle {
   param([Parameter(Mandatory)][string]$ControlText)
   if ($ControlText.Contains('require("mir421_space_fake_upgrade")')) { throw '[mir421-sif-fixture-anchor]' }
+  # This scenario always enables Space Age. Its native data updates remove
+  # mining-productivity-4 and make mining-productivity-3 infinite. Keep the
+  # F200 fixture's earned level and queued progress checks on that native owner.
+  $baseMiningAnchor='local technology_name="mining-productivity-4"'
+  if($ControlText.Contains($baseMiningAnchor)){
+    if([regex]::Matches($ControlText,[regex]::Escape($baseMiningAnchor)).Count-ne1){throw '[mir421-sif-fixture-anchor]'}
+    $ControlText=$ControlText.Replace($baseMiningAnchor,'local technology_name="mining-productivity-3"')
+  }
   # Specialize only the disposable copy of the existing generated fixture.
   # Preserve its research/progress oracle and require each insertion anchor once.
   $anchors = @(

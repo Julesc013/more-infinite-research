@@ -427,7 +427,7 @@ For each case, verify:
 - Factorio reaches the main menu without prototype errors.
 - Generated technologies have non-empty science-pack ingredients.
 - At least one lab accepts each generated technology's full science-pack set.
-- Default base-only runs do not load direct DLC asset paths. The `mir-use-installed-space-age-icons` startup setting is an explicit opt-in for players who have official DLC icon files installed but disabled and want MIR to reference those local icon files.
+- Base-only runs fall back from inactive DLC art even with a saved or imported `mir-use-installed-space-age-icons` opt-in. The setting identity remains registered; disabled providers are treated as unavailable because construction cannot safely check their installed files. Active Space Age and Elevated Rails providers retain their artwork. Controlled selector checks are separate from required graphical-client startup qualification.
 - Logs show skipped or reduced streams clearly and do not show stack traces.
 - Finite vanilla weapon shooting speed effects are preserved even when the overlap adjustment setting is enabled. The setting only affects MIR's generated continuation.
 

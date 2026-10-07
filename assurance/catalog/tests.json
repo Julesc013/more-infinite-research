@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 222,
+  "test_count": 223,
   "tests": [
     {
       "id": "docs.check",
@@ -1613,6 +1613,37 @@
       "matrix": null
     },
     {
+      "id": "static.direct-library-activation",
+      "proposition": "The governed test 'static.direct-library-activation' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRLibraryActivation.ps1",
+      "canonical_implementation": "tests/tooling/Test-MIRLibraryActivation.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/compatibility/ModPortal.ps1",
+        "tools/lib/workspace/RepoPaths.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/support/MIR421SpaceFakeUpgrade.ps1",
+        "tests/tooling/Test-MIRLibraryActivation.ps1"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.f200-base-only-settings-cap-transition-harness",
       "proposition": "The governed test 'static.f200-base-only-settings-cap-transition-harness' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -1704,6 +1735,7 @@
       "requires_factorio": false,
       "inputs": [
         "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/workspace/RepoPaths.ps1",
         "tests/support/MIRNativeEntryDefaults.ps1",
         "scripts/Invoke-MIRExtendedTests.ps1",
         "scripts/Start-MIROvernightLocalSweep.ps1",
@@ -1821,6 +1853,7 @@
       "inputs": [
         "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/workspace/RepoPaths.ps1",
         "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
         "tools/mir/cli/router/RepositoryCommands.ps1",
         "tests/tooling/Test-MIRArtifactStorageOptimization.ps1",
@@ -8073,12 +8106,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 69,
-      "tooling-release": 67,
+      "tooling-release": 68,
       "runtime-upgrade": 52,
       "compiler-static": 19,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 211,
+    "canonical_test_commands": 212,
     "aggregate_commands": 8,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8091,5 +8124,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b0635db5c72084023d0601ed982ad05ee9f539b49eeb310b34dce276a8ce20f4"
+  "digest": "sha256:31c105c2509da3d698620d5d7f582ab29b3e2200668060c18d53ae199082f754"
 }

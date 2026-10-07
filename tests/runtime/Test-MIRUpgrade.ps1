@@ -9,6 +9,7 @@ param(
   [switch]$SpaceIsFake,
   [string]$PublishedMaintenancePredecessorManifestPath = '',
   [string[]]$LocalModLibraryDirs = @(),
+  [switch]$PrepareInputsOnly,
   [string]$FromVersion = "3.0.5",
   [string]$ToVersion = "3.1.0",
   [string]$FixtureName = "assert-upgrade-3-0-5-to-3-1-0",
@@ -28,6 +29,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
+. (Join-Path $RepoRoot 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/Common.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
 
@@ -110,20 +112,19 @@ function Resolve-MIRHistoricalUpgradeTransition {
 
 function Invoke-MIRUpgradeMonitoredProcess {
   param([string]$FilePath,[string[]]$Arguments,[int]$TimeoutMs=300000,[scriptblock]$CompletionPredicate=$null)
+  Assert-MIRLibraryLaunch -Activation $script:upgradeActivation -FactorioBin $FilePath -Arguments $Arguments
   $script:upgradeProcessIndex++
   $prefix=Join-Path $root ('process-'+$script:upgradeProcessIndex)
-  $usage=Get-MIR441TreeUsage -Path $root
-  if (-not $usage.complete) { throw '[mir441-resource-output-scan-incomplete]' }
-  [int64]$aliasBytes=0
-  foreach ($lease in $script:sifLeases) { $aliasBytes+=Get-MIRUpgradeLinkedArchiveBytes -Lease $lease }
-  $remaining=$upgradeWriteBytes-([int64]$usage.bytes-$aliasBytes)
-  if ($remaining -le 0) { throw '[mir441-resource-output-budget]' }
+  $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $script:upgradeResourceContext
   $run=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $root `
     -LedgerPath ($prefix+'.resources.jsonl') -Policy $upgradePolicy -EstimatedPeakBytes $remaining `
     -ExpectedPeakMemoryBytes $upgradePeakBytes -TimeoutSeconds ([int][Math]::Ceiling($TimeoutMs/1000)) `
     -StdoutPath ($prefix+'.stdout.txt') -StderrPath ($prefix+'.stderr.txt') -AllowNonZeroExit `
     -CompletionPredicate $CompletionPredicate
   $script:upgradeResourceRuns+=@([ordered]@{index=$script:upgradeProcessIndex;ledger=($prefix+'.resources.jsonl');exit_code=$run.exit_code;completion_predicate_observed=$run.completion_predicate_observed;peak_working_set_bytes=$run.peak_working_set_bytes;duration_seconds=$run.duration_seconds})
+  # --no-log-rotation accumulates launches, while benchmark stdout omits mod
+  # loading. Verify the native log from its latest engine-start boundary.
+  $null=Assert-MIRLibraryLoadedSelection -Activation $script:upgradeActivation -LogPath (Join-Path $root 'userdata/factorio-current.log') -LatestInvocation
   return $run
 }
 
@@ -265,19 +266,25 @@ $generatedUpgradeRoot = if ([string]::IsNullOrWhiteSpace($WorkRoot)) {
   [IO.Path]::GetFullPath($WorkRoot)
 }
 $resolvedUpgradeRoot=Resolve-MIR441RecoveryScratchPath -Path $generatedUpgradeRoot
-if ($ExpectedPeakMemoryMiB -le 0) { throw '[mir441-resource-peak-budget-required] Declare the upgrade peak memory budget.' }
+if (-not $PrepareInputsOnly -and $LocalModLibraryDirs.Count -ne 1) { throw '[mir-upgrade-library-required] Supply exactly one flat archive library; retired profile staging is unsupported.' }
+if (-not $PrepareInputsOnly -and $ExpectedPeakMemoryMiB -le 0) { throw '[mir441-resource-peak-budget-required] Declare the upgrade peak memory budget.' }
 $upgradePolicy=[pscustomobject]@{minimum_free_ram_gib=4}
 $upgradePeakBytes=[int64]$ExpectedPeakMemoryMiB*1MB
 $upgradeWriteBytes=[int64]$MaxNewOutputMiB*1MB
 # Refuse before source resolution, staging, evidence allocation or any engine.
-$null=Assert-MIR441ResourceAdmission -Policy $upgradePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
+if (-not $PrepareInputsOnly) {
+  $null=Assert-MIR441ResourceAdmission -Policy $upgradePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
+} elseif ([IO.DriveInfo]::new([IO.Path]::GetPathRoot($resolvedUpgradeRoot)).AvailableFreeSpace -lt 544MB) {
+  throw '[mir-upgrade-preparation-capacity] Small fixture preparation requires 32 MiB output allowance plus 512 MiB headroom; this does not admit a native run.'
+}
 $script:upgradeProcessIndex=0
 $script:upgradeResourceRuns=@()
-$script:sifLease=$null
-$script:sifLeases=@()
+$script:upgradeActivation=$null
+$script:upgradeActivations=@()
 . (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
+$engineData=Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorio))) 'data'
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
 if ($SelectedReleaseManifest -and -not $SpaceIsFake) {
@@ -293,8 +300,8 @@ if ($SpaceIsFake) {
   if (-not $OutputPath -or (Test-Path -LiteralPath $OutputPath) -or $Retention -cne 'Always') { throw '[mir421-sif-fresh-retained-output-required]' }
   $null=Resolve-MIR441RecoveryScratchPath -Path $(if([IO.Path]::IsPathRooted($OutputPath)){$OutputPath}else{Join-Path $RepoRoot $OutputPath})
   $sifDescriptor=Get-MIR421SpaceFakeUpgradeDescriptor -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype
-  $sifEngine=if ($SelectedTarget -ceq 'f210') { 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' } else { 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' }
-  if (-not $factorio.Equals($sifEngine,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir421-sif-engine-authority]' }
+  $engineBaseInfo=Get-Content -LiteralPath (Join-Path $engineData 'base/info.json') -Raw|ConvertFrom-Json
+  if(([version]$engineBaseInfo.version).ToString(2)-cne$sifDescriptor.line){throw '[mir421-sif-engine-authority] Configured engine does not match the selected target.'}
   . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
   $sifCandidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $SelectedReleaseManifest
   $null=Get-MIR42TechnicalSealInputContract -Candidate $sifCandidate -PublishedMaintenance
@@ -305,7 +312,7 @@ if ($SpaceIsFake) {
   $sifPublishedInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($sifMetadataText | ConvertFrom-Json -Depth 100 -DateKind String)
   $sifPredecessor=@($sifPublishedInputs.targets | Where-Object target -CEQ $SelectedTarget)
   if ($sifPredecessor.Count -ne 1 -or [string]$sifPredecessor[0].path -cne $from -or (Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash -cne $sifPredecessor[0].sha256) { throw '[mir421-sif-published-predecessor]' }
-  $sifInputs=Resolve-MIR421SpaceFakeUpgradeInputs -RepoRoot $RepoRoot -Descriptor $sifDescriptor -LocalModLibraryDirs $LocalModLibraryDirs
+  if (-not $PrepareInputsOnly) { $sifInputs=Resolve-MIR421SpaceFakeUpgradeInputs -RepoRoot $RepoRoot -Descriptor $sifDescriptor -LocalModLibraryDirs $LocalModLibraryDirs }
 }
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
 $isHistoricalTerminalFixture = $FixtureName -eq 'assert-upgrade-historical-terminal-to-mir42'
@@ -318,9 +325,11 @@ $archetypeSuffix = if ($Archetype) { " archetype=$Archetype" } else { "" }
 $artifactSlug = if ($Archetype) { $Archetype } else { "default" }
 if ($SpaceIsFake) { $artifactSlug='sif-'+$artifactSlug }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
-  $OutputPath = ".mir\evidence\$ToVersion-upgrade-$artifactSlug-proof.json"
+  $OutputPath = "build/p/validation-upgrades/$ToVersion-upgrade-$artifactSlug-proof.json"
 }
 $output = if ([System.IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
+$output=Resolve-MIR441RecoveryScratchPath -Path $output
+if(Test-Path -LiteralPath $output){throw '[mir-upgrade-fresh-output-required] Preserve the previous result and select a fresh output path.'}
 $outputParent = Split-Path -Parent $output
 if (-not (Test-Path -LiteralPath $outputParent)) { New-Item -ItemType Directory -Force -Path $outputParent | Out-Null }
 
@@ -334,22 +343,21 @@ $runSucceeded = $false
 $factorioProcesses = 0
 try {
 Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log") -Context "Upgrade Factorio log path"
-$mods = Join-Path $root "mods"
+$fixtureSources = Join-Path $root 'fixture-sources'
 $userdata = Join-Path $root "userdata"
 $saves = Join-Path $userdata "saves"
-New-Item -ItemType Directory -Force -Path $mods, $userdata, $saves | Out-Null
+New-Item -ItemType Directory -Force -Path $fixtureSources, $userdata, $saves | Out-Null
 $upgradeRequest=if($SpaceIsFake){'SIF-01'}else{'native-upgrade'}
 $sourceHash=if($SpaceIsFake){$sifPredecessor[0].sha256}else{(Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash}
-$script:sifLease=New-MIRUpgradeLinkedProfile -RunRoot (Join-Path $root 'source-profile') -Dependencies $sifInputs -Archive $from -ExpectedSha256 $sourceHash -Version $FromVersion -Role source -Request $upgradeRequest
-$script:sifLeases+=,$script:sifLease
-$mods=$script:sifLease.record.stage_directory
+$script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=$upgradeWriteBytes;result_reserve_bytes=64KB}
 $config = Join-Path $root "config.ini"
 @(
   "[path]",
-  "read-data=__PATH__executable__/../../data",
+  "read-data=$($engineData.Replace('\', '/'))",
   "write-data=$($userdata.Replace('\', '/'))",
   "[other]",
-  "check-updates=false"
+  "check-updates=false",
+  "enable-new-mods=false"
 ) | Set-Content -LiteralPath $config -Encoding UTF8
 $serverSettings = Join-Path $root "server-settings.json"
 [ordered]@{
@@ -365,21 +373,23 @@ if ($Archetype) { $enableDlc = $Archetype -in @("space-age-native-owner", "affec
 if ($SpaceIsFake) { $enableDlc=$true }
 $persistentModNames=if ($SpaceIsFake) { @($sifDescriptor.mod_names) } else { @() }
 $sourceOnlyModNames = @()
+$sourceOnlyDirectories=@()
 foreach ($sourceFixtureName in $SourceOnlyFixtureNames) {
   $sourceFixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$sourceFixtureName")
   $sourceInfo = Get-Content -Raw -LiteralPath (Join-Path $sourceFixture "info.json") | ConvertFrom-Json
   $sourceModName = [string]$sourceInfo.name
   if ([string]::IsNullOrWhiteSpace($sourceModName)) { throw "Source-only fixture $sourceFixtureName has no mod name." }
-  Copy-Item -LiteralPath $sourceFixture -Destination (Join-Path $mods $sourceModName) -Recurse
+  $sourceOnlyDirectories+=$sourceFixture
   $sourceOnlyModNames += $sourceModName
 }
 
-$modListPath = Join-Path $mods "mod-list.json"
-Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames @($sourceOnlyModNames+$persistentModNames)
 $fixtureDirectoryName = if ($isHistoricalTerminalFixture) {
   $fixtureModName + '_' + [string]$fixtureInfo.version
 } else { $fixtureModName }
-$stagedFixture = Join-Path $mods $fixtureDirectoryName
+$stagedFixture = Join-Path $fixtureSources $fixtureDirectoryName
+$fixtureFiles=@(Get-ChildItem -LiteralPath $fixture -Recurse -File)
+if($fixtureFiles.Count-gt2048-or($fixtureFiles|Measure-Object Length -Sum).Sum-gt4MB){throw '[mir-upgrade-fixture-preparation-size]'}
+foreach($file in $fixtureFiles){Assert-MIRLibraryPath $file.FullName}
 Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
 if ($SpaceIsFake) { Copy-Item -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Destination (Join-Path $stagedFixture 'mir421_space_fake_upgrade.lua') }
 $mir42UpgradeSpecialized=$false
@@ -475,6 +485,23 @@ if ($Archetype -and -not $isHistoricalTerminalFixture) {
   Set-Content -LiteralPath $settingsPath -Value $updatedSettingsText -Encoding UTF8
 }
 
+if ($PrepareInputsOnly) {
+  $preparedRoot=Join-Path $root 'prepared-fixtures';[IO.Directory]::CreateDirectory($preparedRoot)|Out-Null
+  $prepared=@(foreach($directory in @($stagedFixture)+$sourceOnlyDirectories){
+    $info=Get-Content -LiteralPath (Join-Path $directory 'info.json') -Raw|ConvertFrom-Json
+    $archive=Publish-MIRModDirectoryArchive -Source $directory -Name $info.name -Version $info.version -ModsDir $preparedRoot
+    [ordered]@{name=$info.name;version=$info.version;path=$archive;sha256=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash}
+  })
+  [ordered]@{schema=1;kind='MIRUpgradePreparedInputsV1';status='prepared-not-native-tested';from_version=$FromVersion;to_version=$ToVersion;archetype=$Archetype;fixtures=$prepared;dependency_inputs=if($SpaceIsFake){$sifDescriptor.inputs}else{@()};factorio_processes=0}|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $output -Encoding utf8
+  Write-Host "[ok] Upgrade assertion fixtures prepared without archive-library writes or native execution: $output"
+  return
+}
+$mods=(Resolve-Path -LiteralPath $LocalModLibraryDirs[0]).Path
+$sourceSelection=Get-MIRUpgradeLibrarySelection -Library $mods -EngineDataDirectory $engineData -Archive $from -Version $FromVersion -ExpectedSha256 $sourceHash -Dependencies $sifInputs -FixtureDirectories @(@($stagedFixture)+$sourceOnlyDirectories) -EnableDlc $enableDlc
+$sourceProfile=Join-Path $root 'source-selection.json';$sourceSelection.mod_list|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $sourceProfile -Encoding utf8
+$script:upgradeActivation=Start-MIRLibraryActivation -LibraryDirectory $mods -EngineDataDirectory $engineData -ProfilePath $sourceProfile -ArchiveHashes $sourceSelection.archive_hashes
+$script:upgradeActivations+=,$script:upgradeActivation
+Add-MIRNativeProbeLibraryActivation -Context $script:upgradeResourceContext -Activation $script:upgradeActivation
 $save = Join-Path $root "source.zip"
 Assert-MIRFactorioPathBudget -Path $save -Context "Upgrade source-save path"
 $log = Join-Path $userdata "factorio-current.log"
@@ -507,16 +534,19 @@ if (-not $createText.Contains($sourceMarker)) {
 $createEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-create.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 
-$sifSourceTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
+# Retain the engine's source settings privately, then restore the prior library
+# controls before selecting the candidate. Dependency archives never move.
+$sourceSettings=Read-MIRLibraryControl -Path (Join-Path $mods 'mod-settings.dat')
+$sourceSettingsPath=Join-Path $root 'source-mod-settings.dat'
+if($sourceSettings.exists){[IO.File]::WriteAllBytes($sourceSettingsPath,[Convert]::FromBase64String($sourceSettings.bytes))}
+$sifSourceTerminal=Complete-MIRLibraryActivation -Activation $script:upgradeActivation
 $candidateHash=if($SpaceIsFake){$sifTarget[0].archive_sha256}else{(Get-FileHash -LiteralPath $to -Algorithm SHA256).Hash}
-$script:sifLease=New-MIRUpgradeLinkedProfile -RunRoot (Join-Path $root 'candidate-profile') -Dependencies $sifInputs -Archive $to -ExpectedSha256 $candidateHash -Version $ToVersion -Role candidate -Request $upgradeRequest
-$script:sifLeases+=,$script:sifLease
-$sourceMods=$mods
-$mods=$script:sifLease.record.stage_directory
-Move-MIRUpgradeProfileState -RunRoot $root -SourceMods $sourceMods -TargetMods $mods -FixtureName $fixtureDirectoryName
-$stagedFixture=Join-Path $mods $fixtureDirectoryName
-$modListPath=Join-Path $mods 'mod-list.json'
-Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames $persistentModNames
+$candidateSelection=Get-MIRUpgradeLibrarySelection -Library $mods -EngineDataDirectory $engineData -Archive $to -Version $ToVersion -ExpectedSha256 $candidateHash -Dependencies $sifInputs -FixtureDirectories @($stagedFixture) -EnableDlc $enableDlc
+$candidateProfile=Join-Path $root 'candidate-selection.json';$candidateSelection.mod_list|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $candidateProfile -Encoding utf8
+$settingsArgs=if($sourceSettings.exists){@{SettingsMode='File';SettingsPath=$sourceSettingsPath;SettingsSha256=$sourceSettings.sha256}}else{@{SettingsMode='Defaults'}}
+$script:upgradeActivation=Start-MIRLibraryActivation -LibraryDirectory $mods -EngineDataDirectory $engineData -ProfilePath $candidateProfile -ArchiveHashes $candidateSelection.archive_hashes @settingsArgs
+$script:upgradeActivations+=,$script:upgradeActivation
+Add-MIRNativeProbeLibraryActivation -Context $script:upgradeResourceContext -Activation $script:upgradeActivation
 $nativeBaseArgs=@('--config',$config,'--no-log-rotation','--mod-directory',$mods)
 
 $requiresReloadProof = $FixtureName -in @(
@@ -714,9 +744,9 @@ if ($SpaceIsFake) {
   if (-not $requiresReloadProof -or -not $reloadEvidence -or -not $secondReloadEvidence) { throw '[mir421-sif-two-reloads-required]' }
   $assertions=@($assertions | Where-Object { $_ -cne 'base-only-mod-set-retained' }) + @('space-is-fake-mod-set-retained','SIF-01-final-level-seven-science-and-finite-anchors','SIF-01-earned-levels-and-native-rewards-retained')
 }
-$sifTerminal=Complete-MIRImmutableInputLease -Lease $script:sifLease -Outcome passed
+$sifTerminal=Complete-MIRLibraryActivation -Activation $script:upgradeActivation
 $result = [ordered]@{
-  schema = 2
+  schema = 3
   status = "passed"
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
   git_commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
@@ -746,20 +776,19 @@ if ($secondReloadEvidence) {
 if ($SpaceIsFake) {
   $result.native_scenario='SIF-01-published-4.2.0-to-4.2.1'
   $result.published_maintenance_predecessor=$sifPublishedInputs
-  $result.dependency_inputs=$sifTerminal
+  $result.dependency_inputs=$sifTerminal.selected
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Algorithm SHA256).Hash
 }
-$result.archive_inputs=$sifTerminal
-$result.source_inputs=$sifSourceTerminal
+$result.library_activation=$sifTerminal
+$result.source_library_activation=$sifSourceTerminal
 $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 
 $runSucceeded = $true
 Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof ($artifactSlug): $output"
 } finally {
-  foreach ($lease in $script:sifLeases) {
-    if (-not $lease.closed) {
-      try { $null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed }
-      finally { Close-MIRImmutableInputLeaseHandles -Lease $lease }
+  foreach ($activation in $script:upgradeActivations) {
+    if (-not $activation.closed) {
+      $null=Complete-MIRLibraryActivation -Activation $activation
     }
   }
   $retained = $Retention -eq 'Always' -or (-not $runSucceeded -and $Retention -eq 'OnFailure')
@@ -783,7 +812,7 @@ Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof ($artifactSlug): $
     kind = 'MIRUpgradeExpandedRootCleanupV1'
     status = if ($retained) { 'retained' } else { 'removed' }
     retention = $Retention
-    run_status = if ($runSucceeded) { 'passed' } else { 'failed' }
+    run_status = if ($PrepareInputsOnly -and (Test-Path -LiteralPath $output)) { 'prepared-not-native-tested' } elseif ($runSucceeded) { 'passed' } else { 'failed' }
     admitted_work_root_sha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($resolvedUpgradeRoot.ToLowerInvariant())))
     expanded_root = Split-Path -Leaf $resolvedRoot
     file_count = $fileCount

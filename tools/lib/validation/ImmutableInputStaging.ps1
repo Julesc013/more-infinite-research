@@ -1,4 +1,5 @@
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot '../workspace/RepoPaths.ps1')
 
 function Get-MIRImmutableInputSha256 {
   param([Parameter(Mandatory)][string]$Path)
@@ -251,6 +252,12 @@ function New-MIRImmutableInputLease {
   $runRoot = (Resolve-Path -LiteralPath $RunRoot).Path
   Assert-MIRImmutableInputDirectory -Path $runRoot -Context 'Immutable input run root'
   $stageDirectory = Assert-MIRImmutableInputPathWithin -Path $StageDirectory -Root $runRoot -Context 'Immutable input stage directory'
+  if (-not $ForceCopy) {
+    # Validate every boundary before creating staging or its lease journal.
+    foreach ($input in $Inputs) {
+      Assert-MIRCheckoutHardLinkBoundary -Source ([string](Get-MIRImmutableInputProperty -InputObject $input -Name 'source_path')) -Destination $stageDirectory
+    }
+  }
   if (-not (Test-Path -LiteralPath $stageDirectory)) {
     New-Item -ItemType Directory -Force -Path $stageDirectory | Out-Null
   }
@@ -337,6 +344,7 @@ function New-MIRImmutableInputLease {
       $stageIdentity = $null
       $linkError = $null
       if ($immutable -and -not $ForceCopy) {
+        Assert-MIRCheckoutHardLinkBoundary -Source $sourceFull -Destination $destination
         try {
           $sourceIdentity = Get-MIRImmutableInputFileIdentity -Path $sourceFull
           New-Item -ItemType HardLink -Path $destination -Target $sourceFull -ErrorAction Stop | Out-Null

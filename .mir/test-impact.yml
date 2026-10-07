@@ -7,6 +7,18 @@
   ],
   "paths": [
     {
+      "pattern": "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/tooling/Test-MIRLibraryActivation.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
       "pattern": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
       "scenarios": [],
       "tags": [],
@@ -517,6 +529,21 @@
       "pattern": "source/prototypes/mir/settings/automatic_compiler_*.lua",
       "groups": ["automatic-compiler"],
       "scenarios": ["compiler-contracts", "semantic-family-off", "semantic-family-report", "semantic-family-attach", "semantic-family-generate", "semantic-family-exact-pack"]
+    },
+    {
+      "pattern": "source/prototypes/mir/presentation/icon_builder.lua",
+      "groups": ["base-load", "settings-codec", "space-age"],
+      "scenarios": ["base-generation-integrity", "settings-profile-roundtrip", "space-age-generation-integrity"]
+    },
+    {
+      "pattern": "source/prototypes/mir/stage/data.lua",
+      "groups": ["base-load", "runtime-state", "space-age"],
+      "scenarios": ["base-generation-integrity", "space-age-generation-integrity"]
+    },
+    {
+      "pattern": "tests/compiler/community_hotfix.lua",
+      "groups": ["base-load", "settings-codec", "science-prerequisites", "space-age"],
+      "scenarios": ["base-generation-integrity", "settings-profile-roundtrip", "space-age-generation-integrity", "generated-prerequisite-safety"]
     },
     {
       "pattern": "source/prototypes/mir/settings/**",

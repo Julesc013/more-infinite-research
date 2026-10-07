@@ -1,7 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
-local effective_settings = require("prototypes.mir.settings.effective")
+local factorio_mods = require("prototypes.mir.platform.factorio.mods")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local I = {}
@@ -70,23 +70,6 @@ local function icon_from_fluid(name)
   return nil
 end
 
-local function startup_setting(name)
-  return effective_settings.get(name)
-end
-
-local INSTALLED_ASSET_OPT_IN_MODS = {
-  ["elevated-rails"] = true,
-  ["space-age"] = true
-}
-
-local function inactive_asset_mod_allowed(mod_name)
-  if not mod_name then return true end
-  if lookup.mod_exists(mod_name) then return true end
-
-  return INSTALLED_ASSET_OPT_IN_MODS[mod_name] == true
-    and startup_setting("mir-use-installed-space-age-icons") == true
-end
-
 local function required_mods_loaded(candidate)
   if not candidate then return true end
 
@@ -103,7 +86,10 @@ local function required_mods_loaded(candidate)
   end
 
   local asset_mod = candidate.inactive_mod_asset or candidate.asset_mod
-  if not inactive_asset_mod_allowed(asset_mod) then return false end
+  -- mir-use-installed-space-age-icons remains a recognized saved setting,
+  -- but neither its raw nor imported value establishes file availability.
+  -- Data-stage Lua cannot probe an inactive provider's image files safely.
+  if asset_mod and not factorio_mods.exists(asset_mod) then return false end
 
   return true
 end

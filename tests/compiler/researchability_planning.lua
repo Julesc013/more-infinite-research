@@ -2436,11 +2436,22 @@ context.services["science.pack_production_status"] = function(name, ...)
   return production.pack_production_status(name, ...)
 end
 local early_visiting_techs = {}
+do
+local early_lab = package.loaded["prototypes.mir.capabilities.science_integration.lab_compatibility"]
+local original_early_lab_check, early_lab_calls = early_lab.valid_research_ingredients, 0
+early_lab.valid_research_ingredients = function(...)
+  early_lab_calls = early_lab_calls + 1
+  return original_early_lab_check(...)
+end
 check("U19", researchability.reason_with_context("Root", {
   unlock_recipe_name = "ordinary", visiting_packs = {["active-pack"] = true},
   visiting_technologies = early_visiting_techs}) == "prerequisite-ZCycle-unreachable-science-active-pack"
   and unrelated_pack_calls == 0 and active_pack_calls == 1 and early_visiting_techs.Root == nil,
   "A known active science contradiction rejects the AND closure before unrelated pack traversal")
+check("U19L", early_lab_calls == 0,
+  "An active science contradiction rejects before recursively acquiring a laboratory")
+early_lab.valid_research_ingredients = original_early_lab_check
+end
 context.services["science.independent_pack_acquisition_witness"] = function() return {kind = "source"} end
 check("U20", researchability.reason_with_context("Root", {
   unlock_recipe_name = "self_pack", visiting_packs = {["active-pack"] = true}, visiting_technologies = {}}) == nil
