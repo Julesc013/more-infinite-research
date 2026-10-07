@@ -290,6 +290,45 @@ do
       "sample attachment cannot acquire chemical, Angel or tree requests: " .. key)
   end
 end
+local forestry_subjects = {
+  {"research_material_py_log", "log", {"log1", "log2", "log3", "log4", "log5", "log6", "log7", "log8", "log7-2"}},
+  {"research_material_py_wood", "wood", {"log-wood"}},
+  {"research_material_py_treated_wood", "treated-wood", {"treated-wood"}}
+}
+do
+  local keys = {}
+  for _, subject in ipairs(forestry_subjects) do
+    local key, item, routes = subject[1], subject[2], subject[3]
+    keys[#keys + 1] = key
+    local family = assert(streams[key])
+    check(same_array(family.required_items, {item}) and family.required_fluids == nil
+        and same_array(family.required_mods, {"pycoalprocessing"})
+        and family.icon_item == item and family.localised_name[4][1] == "item-name." .. item,
+      "forestry preserves its product identity and provider: " .. key)
+    local group, patterns = family.groups[1], {}
+    for _, route in ipairs(routes) do patterns[#patterns + 1] = "^" .. route:gsub("%-", "%%-") .. "$" end
+    check(same_array(group.recipe_patterns, patterns)
+        and #group.required_productive_outputs == 1
+        and group.required_productive_outputs[1].type == "item"
+        and group.required_productive_outputs[1].name == item,
+      "forestry binds exact retained producers to their productive item: " .. key)
+    check(group.change == 0.02 and family.require_acyclic_process and group.reject_explicit_productivity_denial
+        and family.productivity_permission_recipes == nil and family.reviewed_forward_routes == nil,
+      "forestry grants no process or permission exception: " .. key)
+    check(progression.validate(key, family.staged_progression) and family.max_level == 3
+        and family.staged_progression.continuation.first_level == 4,
+      "forestry uses the validated shared staged contract: " .. key)
+  end
+  check(same_array(progression.py_forestry_stream_keys(), keys), "forestry has three separate product identities")
+  local copy = progression.py_forestry_stream_keys(); copy[1] = "research_material_py_wood_seeds"
+  check(same_array(progression.py_forestry_stream_keys(), keys), "forestry identity accessor returns a copy")
+  for _, key in ipairs({"research_material_py_glycerol", "research_material_py_earth_generic_sample",
+      "research_material_py_wood_seeds", "research_material_py_tree_mk01", "research_material_tin"}) do
+    check(not pcall(function() progression.attach_py_forestry_continuation(key, {max_level = 3}) end),
+      "forestry cannot acquire a separate subject: " .. key)
+  end
+end
+
 do
   local lookup = package.loaded["prototypes.mir.platform.factorio.prototype_lookup"]
   local saved_mod_exists, saved_fluid, saved_item = lookup.mod_exists, lookup.fluid_prototype, lookup.item_prototype
@@ -371,6 +410,30 @@ do
       local modern = line == "2.1" or line == "2.0"
       check((target_line.stream_supported(key, normalized) and requirements.missing_reason(key, normalized) == nil) == modern,
         "sample admission requires both prototype requirements and recipe-productivity capability: " .. line .. " " .. key)
+    end
+  end
+  for _, subject in ipairs(forestry_subjects) do
+    local key, item = subject[1], subject[2]
+    local family = streams[key]
+    active_mods, available_item = {}, item
+    check(requirements.missing_reason(key, family) == "missing required mod pycoalprocessing",
+      "native wood or an unrelated same-named item cannot replace the Py provider: " .. key)
+    active_mods.pycoalprocessing = true
+    check(requirements.missing_reason(key, family) == nil, "provider and item satisfy forestry requirements: " .. key)
+    available_item = nil
+    check(requirements.missing_reason(key, family) == "missing required item " .. item,
+      "provider presence does not supply an absent forestry item: " .. key)
+    available_item = item
+    local normalized = descriptor.normalize(key, family)
+    check(same_array(normalized.descriptor.targets.required_mods, {"pycoalprocessing"}),
+      "canonical descriptor retains the forestry provider: " .. key)
+    for _, line in ipairs({"2.1", "2.0", "1.1", "1.0"}) do
+      local profile = assert(actual_profiles.profiles[line])
+      package.loaded["prototypes.mir.platform.factorio.target_profiles"] = {current = function() return profile end}
+      package.loaded["prototypes.mir.platform.factorio.target_line"] = nil
+      local target_line = require("prototypes.mir.platform.factorio.target_line")
+      check(target_line.stream_supported(key, normalized) == (line == "2.1" or line == "2.0"),
+        "forestry requires actual recipe-productivity capability: " .. line .. " " .. key)
     end
   end
   package.loaded["prototypes.mir.platform.factorio.target_profiles"] = saved_profiles

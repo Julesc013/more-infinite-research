@@ -845,6 +845,19 @@ for _, subject in ipairs(py_sample_subjects) do
   streams[key] = spec
 end
 
+-- ECO-PY's ordinary forestry products use their retained exact producers.
+-- Final process safety includes routes outside these selectors. Seeds,
+-- breeders, tree modules and bootstrap acquisition receive no exception.
+streams.research_material_py_log = material_family("log", {
+  "log1", "log2", "log3", "log4", "log5", "log6", "log7", "log8", "log7-2"
+}, {"pycoalprocessing"})
+streams.research_material_py_wood = material_family("wood", {"log-wood"}, {"pycoalprocessing"})
+streams.research_material_py_treated_wood = material_family("treated-wood", {"treated-wood"}, {"pycoalprocessing"})
+for _, key in ipairs(material_progression.py_forestry_stream_keys()) do
+  streams[key].required_mods = {"pycoalprocessing"}
+  material_progression.attach_py_forestry_continuation(key, streams[key])
+end
+
 -- The additional Angel final routes in this batch have one exact F200
 -- combined-world observation. Keep every other F200 closure, and F210, on
 -- their established declarations until each has its own ordering and engine

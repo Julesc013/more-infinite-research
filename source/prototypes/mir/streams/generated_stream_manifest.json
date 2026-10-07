@@ -2209,6 +2209,96 @@
       "targets": [
         "stream:research_material_py_earth_palmtree_sample"
       ]
+    },
+    "recipe-prod-research_material_py_log-1": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_py_log",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_py_log-1",
+      "stream_key": "research_material_py_log",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_py_log"
+      ]
+    },
+    "recipe-prod-research_material_py_log-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_py_log",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_py_log-4",
+      "stream_key": "research_material_py_log__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_py_log"
+      ]
+    },
+    "recipe-prod-research_material_py_treated_wood-1": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_py_treated_wood",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_py_treated_wood-1",
+      "stream_key": "research_material_py_treated_wood",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_py_treated_wood"
+      ]
+    },
+    "recipe-prod-research_material_py_treated_wood-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_py_treated_wood",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_py_treated_wood-4",
+      "stream_key": "research_material_py_treated_wood__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_py_treated_wood"
+      ]
+    },
+    "recipe-prod-research_material_py_wood-1": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_py_wood",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_py_wood-1",
+      "stream_key": "research_material_py_wood",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_py_wood"
+      ]
+    },
+    "recipe-prod-research_material_py_wood-4": {
+      "introduced_in": "4.2.1",
+      "source": "community-material-staged-continuation",
+      "capability": "recipe-productivity",
+      "family": "material_py_wood",
+      "policy": "qualified-late-science-and-finite-recipe-headroom",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_py_wood-4",
+      "stream_key": "research_material_py_wood__continuation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_py_wood"
+      ]
     }
   }
 }

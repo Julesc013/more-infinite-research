@@ -83,6 +83,14 @@ local PY_SAMPLE_STREAM_KEYS = {
   "research_material_py_earth_palmtree_sample"
 }
 
+-- Ordinary forestry products remain separate from seed breeding, tree
+-- modules and bootstrap acquisition. Attachment grants no route exception.
+local PY_FORESTRY_STREAM_KEYS = {
+  "research_material_py_log",
+  "research_material_py_wood",
+  "research_material_py_treated_wood"
+}
+
 local MATERIAL_STREAM_KEY_SET = {}
 for _, key in ipairs(MATERIAL_STREAM_KEYS) do MATERIAL_STREAM_KEY_SET[key] = true end
 
@@ -100,6 +108,7 @@ local STAGED_MATERIAL_STREAM_KEY_SET = {}
 local ANGEL_PETROCHEM_STREAM_KEY_SET = {}
 local PY_CHEMICAL_STREAM_KEY_SET = {}
 local PY_SAMPLE_STREAM_KEY_SET = {}
+local PY_FORESTRY_STREAM_KEY_SET = {}
 for key in pairs(MATERIAL_STREAM_KEY_SET) do STAGED_MATERIAL_STREAM_KEY_SET[key] = true end
 for key in pairs(K2_213_CONTINUATION_STREAM_KEY_SET) do
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
@@ -117,6 +126,10 @@ for _, key in ipairs(PY_CHEMICAL_STREAM_KEYS) do
 end
 for _, key in ipairs(PY_SAMPLE_STREAM_KEYS) do
   PY_SAMPLE_STREAM_KEY_SET[key] = true
+  STAGED_MATERIAL_STREAM_KEY_SET[key] = true
+end
+for _, key in ipairs(PY_FORESTRY_STREAM_KEYS) do
+  PY_FORESTRY_STREAM_KEY_SET[key] = true
   STAGED_MATERIAL_STREAM_KEY_SET[key] = true
 end
 
@@ -164,6 +177,12 @@ end
 function M.py_sample_stream_keys()
   local out = {}
   for index, key in ipairs(PY_SAMPLE_STREAM_KEYS) do out[index] = key end
+  return out
+end
+
+function M.py_forestry_stream_keys()
+  local out = {}
+  for index, key in ipairs(PY_FORESTRY_STREAM_KEYS) do out[index] = key end
   return out
 end
 
@@ -346,6 +365,13 @@ end
 function M.attach_py_sample_continuation(key, spec)
   if not PY_SAMPLE_STREAM_KEY_SET[key] then
     error("Py sample continuation does not support stream " .. tostring(key) .. ".", 2)
+  end
+  return attach(key, spec)
+end
+
+function M.attach_py_forestry_continuation(key, spec)
+  if not PY_FORESTRY_STREAM_KEY_SET[key] then
+    error("Py forestry continuation does not support stream " .. tostring(key) .. ".", 2)
   end
   return attach(key, spec)
 end

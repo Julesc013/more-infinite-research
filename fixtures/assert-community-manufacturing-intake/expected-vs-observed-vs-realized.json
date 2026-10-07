@@ -711,5 +711,66 @@
     "public_support_authority": false,
     "angel_plant_life_sample_qualification": false,
     "tree_or_bootstrap_qualification": false
+  },
+  "py_forestry_implementation": {
+    "request_id": "ECO-PY",
+    "status": "conditional-current-source-declarations-native-admission-pending",
+    "subjects": [
+      {
+        "stream_key": "research_material_py_log",
+        "item": "log",
+        "source_producers": [
+          "log1",
+          "log2",
+          "log3",
+          "log4",
+          "log5",
+          "log6",
+          "log7",
+          "log8",
+          "log7-2"
+        ],
+        "required_mods": [
+          "pycoalprocessing"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_wood",
+        "item": "wood",
+        "source_producers": [
+          "log-wood"
+        ],
+        "required_mods": [
+          "pycoalprocessing"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_treated_wood",
+        "item": "treated-wood",
+        "source_producers": [
+          "treated-wood"
+        ],
+        "required_mods": [
+          "pycoalprocessing"
+        ]
+      }
+    ],
+    "generated_technologies": [
+      "recipe-prod-research_material_py_log-1",
+      "recipe-prod-research_material_py_log-4",
+      "recipe-prod-research_material_py_treated_wood-1",
+      "recipe-prod-research_material_py_treated_wood-4",
+      "recipe-prod-research_material_py_wood-1",
+      "recipe-prod-research_material_py_wood-4"
+    ],
+    "productive_output_type": "item",
+    "early_levels": 3,
+    "effect_per_level": 0.02,
+    "continuation_first_level": 4,
+    "route_permission_grants": false,
+    "route_certificate_exceptions": false,
+    "engine_qualification": false,
+    "public_support_authority": false,
+    "seed_tree_module_or_bootstrap_qualification": false
   }
 }
