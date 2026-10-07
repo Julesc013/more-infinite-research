@@ -284,11 +284,21 @@ try {
     $writtenHistory = [IO.File]::ReadAllText((Join-Path $tree 'changelog.txt'))
     Assert-MIR42CandidateBuildTest ($writtenHistory.StartsWith("---------------------------------------------------------------------------------------------------`nVersion: $($patchVersions[$i])`n", [StringComparison]::Ordinal) -and $writtenHistory.EndsWith($history, [StringComparison]::Ordinal)) "patch-current-changelog-and-preserved-history-$i"
     $writtenReadme = [IO.File]::ReadAllText((Join-Path $tree 'README.md'))
-    Assert-MIR42CandidateBuildTest ($writtenReadme.StartsWith("MIR $($patchVersions[$i]), source 4.2.1.", [StringComparison]::Ordinal) -and $writtenReadme.EndsWith($readme, [StringComparison]::Ordinal)) "patch-readme-identity-and-preserved-prose-$i"
+    Assert-MIR42CandidateBuildTest ($writtenReadme -ceq "MIR $($patchVersions[$i]), source 4.2.1.`n`n$readme") "patch-readme-identity-and-preserved-prose-$i"
     $firstHashes = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash -Algorithm SHA256 | ForEach-Object Hash)
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $patchVersions[$i]
     $secondHashes = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash -Algorithm SHA256 | ForEach-Object Hash)
     Assert-MIR42CandidateBuildTest (($firstHashes -join '|') -ceq ($secondHashes -join '|')) "patch-metadata-idempotence-$i"
+    # A current authored entry must survive unchanged, rather than acquiring a
+    # construction-only entry that would need mutation after candidate acceptance.
+    $target = [string]$patchDescriptors[$i].target
+    $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
+    $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
+    $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
+    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and $authoredVersion.Groups[1].Value -ceq $patchVersions[$i]) "patch-authored-current-version-$i"
+    [IO.File]::WriteAllText((Join-Path $tree 'changelog.txt'), $authoredHistory, $utf8)
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $patchVersions[$i]
+    Assert-MIR42CandidateBuildTest ([IO.File]::ReadAllText((Join-Path $tree 'changelog.txt')) -ceq $authoredHistory) "patch-authored-current-changelog-unchanged-$i"
   }
   $negativeTree = Join-Path $identityRoot 'f210'
   foreach ($badVersion in @('4.2.21002','4.2.20001','4.2.99901')) {

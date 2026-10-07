@@ -12,8 +12,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 81319,
-      "expected_sha256": "5F5EEF321D1BAF6E0C22AC1D946D08F6D25721B5A5687DE5CDA5BECC948CEB35",
+      "expected_bytes": 83362,
+      "expected_sha256": "5A0ED281161BE4FD9D1E2553E7A39B493F3AE55126C55ABAEE366FA1C2DF2762",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3804,8 +3804,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 77458,
-      "expected_sha256": "5536E7665B6E9F728F432EB172826DA1E4A522C03BF29096490BD51B523293C0",
+      "expected_bytes": 78312,
+      "expected_sha256": "DC9FA13510470208F1EDA1F389D6739ADA912A36D7007C55357F0E0BD30B5ED9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3931,5 +3931,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "FEDFCF6D317A5B7C3497BDF6C3000779DBFC8C12900426014919869D5942082F"
+  "record_sha256": "B2A7DAAF2B3D2B22D2AF5C7EF2C2E41F40387E0A6CE4B533D5774FE3EC33261C"
 }

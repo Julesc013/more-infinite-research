@@ -131,7 +131,9 @@ function Get-MIR4PrivatePatchPackageReadmeBytes {
   if ([int]$decoded.source_patch -ne 1) { throw '[mir4-private-patch-package-source-patch]' }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $readme = $utf8.GetString($ReadmeBytes).Replace("`r`n", "`n")
-  $heading = "MIR $DistributionVersion, source 4.2.1. This private construction requires qualification before release.`n`n"
+  # Package bytes identify their source. Qualification belongs to the external
+  # release evidence, so the frozen candidate needs no prose rewrite at publication.
+  $heading = "MIR $DistributionVersion, source 4.2.1.`n`n"
   if (-not $readme.StartsWith($heading, [StringComparison]::Ordinal)) { $readme = $heading + $readme }
   return ,$utf8.GetBytes($readme)
 }
@@ -167,7 +169,7 @@ function Write-MIR4PrivatePatchPackageIdentity {
   [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
   $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
   if (-not $firstVersion.Success -or $firstVersion.Groups[1].Value -cne $DistributionVersion) {
-    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Private construction from source 4.2.1; qualification and publication are not performed by this build.`n"
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source 4.2.1.`n"
     [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
   }
   if ($null -ne $readme) {
