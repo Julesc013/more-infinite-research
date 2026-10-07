@@ -3133,10 +3133,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 18409,
-      "source_sha256": "367F6AD7E55BFE6AE474062397F2215AE7D1B5FEB4C66A0A6C19C747B7F800B5",
-      "output_bytes": 18409,
-      "output_sha256": "367F6AD7E55BFE6AE474062397F2215AE7D1B5FEB4C66A0A6C19C747B7F800B5"
+      "source_bytes": 18710,
+      "source_sha256": "6E88F240627935B16BFC64EF0534AF94AE9EAF0003779C7BCE23F9CAC61449DE",
+      "output_bytes": 18710,
+      "output_sha256": "6E88F240627935B16BFC64EF0534AF94AE9EAF0003779C7BCE23F9CAC61449DE"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "12CC695876313FF04815E4F138E738167AFED70FB398CEC4C17F91718A08EC33"
+  "record_sha256": "02DD7C29EDAC8E130CDDBF23B585FB8143B02B8D7F3BB55D014819FF21F3E567"
 }

@@ -218,9 +218,13 @@ local function active_science_rejection(technology, context)
     if pack_name and (context.visiting_packs or {})[pack_name]
       and not (unlock_recipe and recipe_facts.recipe_outputs_item(unlock_recipe, pack_name))
       and pack_registry.science_pack_exists(pack_name)
-      and lab_compatibility.valid_research_ingredients(ingredients, nil, context)
       and pack_production_status(pack_name, context.visiting_packs,
         context.visiting_technologies or {}) == "unreachable" then
+      -- This AND term already proves rejection. Acquiring a lab here can
+      -- reopen its ingredients and their machine unlocks for every member of
+      -- the prerequisite closure, before returning the same circular answer.
+      -- A second rejection (no acquired lab) cannot make this route valid.
+      -- The bounded diagnostic path retains its original explanation order.
       return "unreachable-science-" .. pack_name
     end
   end

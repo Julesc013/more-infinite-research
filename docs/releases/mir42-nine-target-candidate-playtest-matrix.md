@@ -5,7 +5,7 @@ applies_to: "MIR 4.2.1 construction and historical MIR 4.2.0 preparation"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-08
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -58,18 +58,22 @@ Promotion planning and main readback forward the maintenance option through the 
 
 ## Native Space Is Fake maintenance scenario
 
-The existing `tests/runtime/Test-MIRUpgrade.ps1` accepts `-SpaceIsFake` for SIF-01. Supply the actual nine-target `candidate-manifest.json` as `-SelectedReleaseManifest`, the published 4.2.0 manifest as `-PublishedMaintenancePredecessorManifestPath`, and the selected archive and published predecessor paths. The runner authenticates the complete current construction and published custody before using the existing upgrade fixture. Source and candidate profiles contain small mod lists and verified hard links to shared MIR, Space Is Fake and Commons archives. No archive contents are copied, and a failed link has no copy fallback. Only the disposable fixture receives the native oracle. Use `-LocalModLibraryDirs` to select retained shared archive libraries; the default is the corresponding `testmods/2.0` or `testmods/2.1` library. Use a fresh output under `build/tmp` or `build/p`, `-Retention Always`, and explicit peak-memory/output budgets.
+The existing `tests/runtime/Test-MIRUpgrade.ps1` accepts `-SpaceIsFake` for SIF-01. Supply the actual nine-target `candidate-manifest.json` as `-SelectedReleaseManifest`, the published 4.2.0 manifest as `-PublishedMaintenancePredecessorManifestPath`, and the selected archive and published predecessor paths. The runner authenticates the complete current construction and published custody before using the existing upgrade fixture. Supply exactly one flat archive library through `-LocalModLibraryDirs`; there is no workstation-specific default. Source and candidate runs activate small mod-list/settings controls under the existing exclusive library lock and launch directly against its verified archives. Previous controls are recovered/restored, and run output stays inside the checkout. No dependency archive is copied, linked or extracted. `-PrepareInputsOnly` prepares the small owned assertion fixture for verified installation once into that library; it executes no native test. Use a fresh output under `build/tmp` or `build/p`, `-Retention Always`, and explicit peak-memory/output budgets.
 
 Select changed behavior and reported defects through the existing verification plan. Source and captured-prototype regression checks do not need installed mod profiles. Reuse native evidence only for its matching package, dependency, settings and scenario inputs. Save migration, runtime API behavior, multiplayer and actual production require their affected native scenarios. Do not recreate historical profile copies to rerun unrelated tests. Retain each unique dependency archive once in the shared library; different versions and hashes remain distinct inputs.
 
 | Target | Transition | Fixture | Archetype | Dependency inputs |
 |---|---|---|---|---|
-| F210 | `4.2.21000 → 4.2.21001` | `assert-upgrade-4-0-21000-to-4-1-21000` | `base-continuations` | Space Is Fake 1.0.76; Commons 1.0.32 |
+| F210 | `4.2.21000 → 4.2.21001` | `assert-upgrade-4-0-21000-to-4-1-21000` | `base-continuations` | Space Is Fake 1.0.78; Commons 1.0.33; Factorio 2.1.21 |
 | F200 | `4.2.20000 → 4.2.20001` | `assert-upgrade-4-0-20000-to-4-1-20000` | `base-default` | Space Is Fake 1.0.60; Commons 1.0.27 |
 
 This scenario observes both level-seven technologies in the final installed game, rejects retired space science and prerequisites, checks the finite level-six anchors and useful modifiers, and compares seeded predecessor levels and native speed bonuses after upgrade and two separate reloads. The existing current-research/progress oracle remains active. It does not establish production-route, full-catalogue, multiplayer or whole-programme acceptance. Controlled oracle and lease tests are source evidence only; SIF-01 remains pending until the native scenario actually passes.
 
-On 5 October the former `build` tree, private candidates and local scratch receipts were absent. Fresh inspection found about 18.7 GiB free, no eligible typed staging in registered workspaces, and intact published 4.2.0 custody for all nine archives. The F200 native admission attempt refused before staging at the retained disk reserve; no Factorio process started. Recover adequate capacity plus the selected job's write allowance, reconstruct the current private nine packages from a committed source, and run this scenario. Earlier controlled results retain their original identities and are not reconstructed as missing receipts.
+The 5 October capacity refusal is historical. On 7 October the verified profile retirement removed all 2,041 ZIP paths while retaining definitions and unique fixture bytes; it did not reclaim their summed logical lengths. Subsequent native runs were resource-admitted and used the master libraries directly with zero dependency payload copies or archive links. Their receipts remain under `build/handoff/MIR421_SOL_CURRENT` and the named `build/p` runs; they are local evidence locators, not new-machine prerequisites.
+
+The current F210 dependency lock replaces Space Is Fake 1.0.76, whose removed `fuel_category` field failed on Factorio 2.1.21 before MIR qualification. The published CCC00 package then created its source save in 9.81 seconds with 1.0.78. The initial CCC01 package stalled in MIR science-root resolution and timed out at 180 seconds. After rejecting an already-circular science dependency before recursive lab acquisition, the canonical package `0A3640389C06E6174B1D6B3F246EBF37F0B45F3D8D6881E2FE73DB06443508E9` completed the instrumented native prototype run in 18.65 seconds (`build/p/m421-sif-profile-f210-d/capture.json`). Both level-seven continuations are visible, infinite, useful, anchored to level six and free of space science. The controlled regression fails on the predecessor code and passes with 206 researchability and 469 lab assertions. This is loading/final-prototype evidence; save continuity, graphical startup and broad performance acceptance remain separate.
+
+The F200 predecessor in its exact retained SIF profile does not emit either level-seven continuation; the tested CCC01 package adds both without space science (`build/p/m421-sif-final-prototypes-f200-a/capture.json`). Its upgrade oracle must cover that actual introduction rather than invent predecessor research. The F210 oracle also needs to assert the seeded native level after changing `researched`, whose setter resets the level. Neither target's complete save-upgrade scenario has passed yet. The F200 full-catalogue comparison records five removed manufacturing technologies whose ownership/migration disposition remains to be resolved.
 
 ## Historical 30 September 2026 preparation identity
 
