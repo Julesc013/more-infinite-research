@@ -49,7 +49,6 @@ try{
   # or staging; these controls cannot launch Factorio even if a guard regresses.
   $retired=@(
     'MIR4HistoricalPrivateRuntime','MIR4A05K2Materials','MIR4A05K203Imersite','MIR4A03K2K2SOIntake',
-    'MIR42V2V3CapMigration',
     'MIRA06BobGoldQualification','MIRA06BobAluminiumQualification','MIRA06BobLeadQualification',
     'MIRA06BobOrdinaryAlloysQualification','MIRA06AluminiumFinalState',
     'MIRBobAngelTinRouteSafety','MIRBobAngelTinFinalStateAudit','MIRAngelTinFinalStateAudit',
@@ -378,6 +377,9 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
       $function=@($upgradeAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-MIRUpgradeMonitoredProcess'},$true))
       . ([scriptblock]::Create($function[0].Extent.Text))
       $script:upgradeActivation=$activation;$script:upgradeProcessIndex=0;$script:upgradeResourceRuns=@()
+      # This controlled actor represents the ordinary base upgrade. The actual
+      # adapter also supports a K2 observer; initialize that scenario explicitly.
+      $k2Scenario=$false
       $suiteRoot=$root;$root=Join-Path $suiteRoot 'upgrade-actor-run'
       [IO.Directory]::CreateDirectory($root)|Out-Null
       $script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=2MB;result_reserve_bytes=64KB}

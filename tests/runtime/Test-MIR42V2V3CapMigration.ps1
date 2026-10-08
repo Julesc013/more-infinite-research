@@ -4,6 +4,8 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='',
   [string]$SteamManifest='',
+  [string]$LibraryDirectory='',
+  [switch]$PrepareInputsOnly,
   [string]$OutputRoot='build/tmp/m42mig',
   [string]$CandidateZip='',
   [string]$SourceMaterializationPath='',
@@ -13,9 +15,10 @@ param(
 )
 
 $ErrorActionPreference='Stop'
-$inputLeases=@()
-# Native execution is retired; the preserved oracle is not current acceptance.
-throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'
+$activeStage=$null
+if(-not $PrepareInputsOnly -and (-not $FactorioBin -or -not $LibraryDirectory)){
+  throw '[mir42-v2-v3-direct-inputs-required] Supply an explicit engine and flat archive library. No populated profile is created.'
+}
 Set-StrictMode -Version Latest
 
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
@@ -53,10 +56,12 @@ function Assert-Properties([string]$Name,$Value,[string[]]$Expected){
   Assert-Migration ($null -ne $Value) "$Name is absent."
   Assert-Exact "$Name properties" (($Value.PSObject.Properties.Name|Sort-Object)-join "`n") (($Expected|Sort-Object)-join "`n")
 }
-function Get-Artifact([string]$Path){
+function Get-Artifact([string]$Path,[switch]$AllowExternal){
   $resolved=(Resolve-Path -LiteralPath $Path).Path
-  Assert-Migration ($resolved.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) "artifact is outside the repository: $resolved"
-  [ordered]@{path=$resolved.Substring($repo.Length+1).Replace('\','/');bytes=(Get-Item -LiteralPath $resolved).Length;raw_sha256=Get-MigrationSha $resolved}
+  Assert-MIRLibraryPath $resolved
+  $inside=$resolved.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)
+  Assert-Migration ($inside -or $AllowExternal) "artifact is outside the repository: $resolved"
+  [ordered]@{path=$(if($inside){$resolved.Substring($repo.Length+1).Replace('\','/')}else{$resolved});path_kind=$(if($inside){'repository-relative'}else{'machine-local-input'});bytes=(Get-Item -LiteralPath $resolved).Length;raw_sha256=Get-MigrationSha $resolved}
 }
 
 function Read-State([string]$Text,[string]$Stage){
@@ -124,12 +129,14 @@ Assert-Migration ($closureChanges.Count -eq 0) "Requires a clean current-candida
 
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
+. (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 $fixture=(Join-Path $repo 'fixtures/assert-mir42-v2-v3-cap-migration')
 Assert-Migration (Test-Path -LiteralPath $fixture -PathType Container) 'Migration assertion fixture is absent.'
 
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 . (Join-Path $repo 'tools/mir/application/package/HistoricalSourceAuthority.ps1')
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxBranches 32 | Out-Host
 $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
 Assert-Migration ($running.Count -eq 0) 'requires one Factorio process tree; an engine is already running.'
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
@@ -143,14 +150,49 @@ Assert-Migration ((Get-ZipEntryText $currentCandidate 'prototypes/mir/emit/mod_d
 $currentMaximumLevelControl=Get-ZipEntryText $currentCandidate 'prototypes/mir/runtime/maximum_level_control.lua'
 Assert-Migration ($currentMaximumLevelControl -match 'local POLICY_VERSION = 3') 'Current package does not contain the V3 controller.'
 Assert-Migration ($currentMaximumLevelControl -match 'unowned_disabled_by_cap' -and $currentMaximumLevelControl -match 'migrated_unowned_disable' -and $currentMaximumLevelControl -match 'restore_unowned_disable_continuity') 'Current package does not contain the V2 unowned-disable continuity repair.'
-$inputLeases=[Collections.Generic.List[object]]::new()
 trap {
   $failure=$_
-  foreach($inputLease in $inputLeases){if(-not $inputLease.closed){try{$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed}catch{}}}
+  if($null -ne $activeStage -and $null -ne $activeStage.activation -and -not $activeStage.activation.closed){
+    try{$activeStage.terminals.Add((Complete-MIRLibraryActivation $activeStage.activation))}catch{Write-Warning $_.Exception.Message}
+  }
+  if($null -ne $resources -and (Test-Path -LiteralPath $resources.root)){
+    try{Write-MIRNativeProbeResult -Context $resources -Record @{status='failed';error=$failure.Exception.Message;source=$currentCommit;resource_runs=$resources.runs.ToArray()}}catch{Write-Warning $_.Exception.Message}
+  }
   throw $failure
 }
 $run=$resources.root
 New-Item -ItemType Directory -Path $run|Out-Null
+function New-MigrationFixtureSource([string]$FixtureDirectory,[string]$Version){
+  # This is generated assertion-fixture metadata. Player inputs are consumed
+  # separately through the pinned predecessor and current materializer readers.
+  Copy-Item -LiteralPath $fixture -Destination $FixtureDirectory -Recurse
+  $infoPath=Join-Path $FixtureDirectory 'info.json';$info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
+  $info.version=$Version
+  [IO.File]::WriteAllText($infoPath,(($info|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
+  [pscustomobject]@{source=$FixtureDirectory;version=$Version;file=($fixtureName+'_'+$Version+'.zip')}
+}
+function New-MigrationSettingsSource([string]$SettingsDirectory,[int]$Cap){
+  Assert-Migration ($Cap -in @(0,3)) 'unsupported settings cap'
+  Initialize-MIRSettingsOverrideMod -ModsDir $SettingsDirectory -FactorioVersion '2.1'
+  Set-CopiedStartupSettingDefaults -ModsDir $SettingsDirectory -Overrides @{'ips-enable-research_copper'=$true;'ips-max-level-research_copper'=$Cap}
+  $source=Join-Path $SettingsDirectory 'mir-validation-settings-overrides';$infoPath=Join-Path $source 'info.json'
+  $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
+  $info=[ordered]@{name=$info.name;version=$(if($Cap -eq 0){'0.1.310'}else{'0.1.313'});title=$info.title;author=$info.author;factorio_version=$info.factorio_version;dependencies=@($info.dependencies)}
+  [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+  [pscustomobject]@{source=$source;version=$info.version;file=('mir-validation-settings-overrides_'+$info.version+'.zip')}
+}
+$preparedFixtures=@{};$preparedSettings=@{}
+foreach($version in @('0.1.0','0.1.1','0.1.2','0.1.3')){$preparedFixtures[$version]=New-MigrationFixtureSource (Join-Path $run ('input-definitions/fixture-'+$version)) $version}
+foreach($cap in @(0,3)){$preparedSettings[$cap]=New-MigrationSettingsSource (Join-Path $run ('input-definitions/cap-'+$cap)) $cap}
+if($PrepareInputsOnly){
+  $assets=Join-Path $run 'owned-inputs';[IO.Directory]::CreateDirectory($assets)|Out-Null
+  $archives=@(foreach($version in @('0.1.0','0.1.1','0.1.2','0.1.3')){Publish-MIRModDirectoryArchive -Source $preparedFixtures[$version].source -Name $fixtureName -Version $version -ModsDir $assets})
+  foreach($cap in @(0,3)){$input=$preparedSettings[$cap];$archives+=Publish-MIRModDirectoryArchive -Source $input.source -Name 'mir-validation-settings-overrides' -Version $input.version -ModsDir $assets}
+  Write-MIRNativeProbeResult -Context $resources -Record @{status='prepared-owned-inputs-only';source=$currentCommit;archives=@($archives|ForEach-Object{Get-Artifact $_});native_factorio=$false;predecessor_input=$predecessorInput;candidate_materialization=$currentInput.receipt}
+  Write-Output "Prepared inputs: $run";return
+}
+Assert-MIR441CleanTrackedSource -RepoRoot $repo
+$library=(Resolve-Path -LiteralPath $LibraryDirectory).Path;Assert-MIRLibraryPath $library
 function Get-MigrationGovernedEngineResolution {
   # Keep the complete existing admission oracle, including its version query,
   # inside one owned monitored tree. No policy facts are reconstructed here.
@@ -175,59 +217,74 @@ Assert-Exact 'Factorio executable SHA-256' (Get-MigrationSha $engine) ([string]$
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
 function New-Stage([string]$Name,[string]$Candidate,[string]$FixtureVersion,[int]$Cap){
   $root=Join-Path $run $Name
-  $mods=Join-Path $root 'mods'
   $userdata=Join-Path $root 'userdata'
-  New-Item -ItemType Directory -Force -Path $mods,$userdata,(Join-Path $userdata 'saves')|Out-Null
+  New-Item -ItemType Directory -Force -Path $userdata,(Join-Path $userdata 'saves')|Out-Null
   $isPredecessor=$Candidate -ceq $predecessorCandidate
   $hash=if($isPredecessor){$predecessorInput.archive_sha256}else{$currentInput.receipt.archive_sha256}
-  $identity=if($isPredecessor){@{source_commit=$predecessorInput.source_commit;version='4.2.21000';kind='pinned-private-V2-source'}}else{@{source_version='4.2.1';version='4.2.21001';package_source_sha256=$currentInput.receipt.package_source_sha256}}
-  $input=[ordered]@{source_path=$Candidate;file_name=[IO.Path]::GetFileName($Candidate);expected_sha256=$hash;role=$(if($isPredecessor){'predecessor'}else{'candidate'});identity=$identity;provenance=@{kind='verified-package-input';source_commit=$(if($isPredecessor){$predecessorCommit}else{$currentCommit})};immutable=$true}
-  $inputLease=New-MIRImmutableInputLease -RunRoot $root -StageDirectory $mods -Inputs @($input) -RequireHardLinks
-  $inputLeases.Add($inputLease)
-  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $inputLease
-  $fixtureSource=Join-Path $root 'fixture-source'
-  Copy-Item -LiteralPath $fixture -Destination $fixtureSource -Recurse
-  $infoPath=Join-Path $fixtureSource 'info.json'
-  $info=Get-Content -Raw -LiteralPath $infoPath|ConvertFrom-Json
-  $info.version=$FixtureVersion
-  [IO.File]::WriteAllText($infoPath,(($info|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
-  $fixtureArchive=Publish-MIRModDirectoryArchive -Source $fixtureSource -Name $fixtureName -Version $FixtureVersion -ModsDir $mods
-  Initialize-MIRSettingsOverrideMod -ModsDir $mods -FactorioVersion '2.1'
-  Set-CopiedStartupSettingDefaults -ModsDir $mods -Overrides @{'ips-enable-research_copper'=$true;'ips-max-level-research_copper'=$Cap}
-  Complete-MIRSettingsOverrideMod -ModsDir $mods
-  $names=@('base','elevated-rails','quality','recycler','space-age','more-infinite-research',$fixtureName,'mir-validation-settings-overrides')
-  $modList=[ordered]@{mods=@($names|ForEach-Object{[ordered]@{name=$_;enabled=$true}})}
-  $modListPath=Join-Path $mods 'mod-list.json'
+  $version=if($isPredecessor){'4.2.21000'}else{'4.2.21001'}
+  $candidateName=[IO.Path]::GetFileName($Candidate);$installed=Join-Path $library $candidateName
+  Assert-MIRLibraryPath $installed
+  Assert-Exact 'installed candidate hash' (Get-MigrationSha $installed) ([string]$hash)
+  $fixtureInput=$preparedFixtures[$FixtureVersion];$settingsInput=$preparedSettings[$Cap]
+  $fixtureArchive=Join-Path $library $fixtureInput.file;$settingsArchive=Join-Path $library $settingsInput.file
+  Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory $fixtureInput.source
+  Assert-MIRLibraryFixtureArchive -Archive $settingsArchive -SourceDirectory $settingsInput.source
+  $hashes=@{$candidateName=[string]$hash;$fixtureInput.file=(Get-MigrationSha $fixtureArchive);$settingsInput.file=(Get-MigrationSha $settingsArchive)}
+  $baseVersion=[string](Get-Content -LiteralPath (Join-Path $engineRoot 'data/base/info.json') -Raw|ConvertFrom-Json).version
+  $modList=[ordered]@{mods=@(
+    @('base','elevated-rails','quality','recycler','space-age')|ForEach-Object{[ordered]@{name=$_;version=$baseVersion;enabled=$true}}
+    [ordered]@{name='more-infinite-research';version=$version;enabled=$true}
+    [ordered]@{name=$fixtureName;version=$FixtureVersion;enabled=$true}
+    [ordered]@{name='mir-validation-settings-overrides';version=$settingsInput.version;enabled=$true}
+  )}
+  $modListPath=Join-Path $root 'selection.json'
   [IO.File]::WriteAllText($modListPath,(($modList|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
   $config=Join-Path $root 'config.ini'
-  [IO.File]::WriteAllText($config,"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($userdata.Replace('\','/'))`n",[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($config,"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($userdata.Replace('\','/'))`n[other]`nenable-new-mods=false`ncheck-updates=false`ndisable-blueprint-storage=true`n",[Text.UTF8Encoding]::new($false))
   $server=Join-Path $root 'server-settings.json'
   $serverData=[ordered]@{name='MIR V2 to V3 migration';description='';tags=@();max_players=1;visibility=[ordered]@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false}
   [IO.File]::WriteAllText($server,(($serverData|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
-  [pscustomobject]@{name=$Name;root=$root;mods=$mods;userdata=$userdata;config=$config;server=$server;fixture_archive=$fixtureArchive;settings_archive=(Join-Path $mods 'mir-validation-settings-overrides_0.1.0.zip');mod_list=$modListPath;cap=$Cap;fixture_version=$FixtureVersion;lease=$inputLease}
+  [pscustomobject]@{name=$Name;root=$root;mods=$library;userdata=$userdata;config=$config;server=$server;fixture_archive=$fixtureArchive;settings_archive=$settingsArchive;mod_list=$modListPath;cap=$Cap;fixture_version=$FixtureVersion;archive_hashes=$hashes;activation=$null;terminals=[Collections.Generic.List[object]]::new()}
+}
+function Start-MigrationStage($Stage){
+  $Stage.activation=Start-MIRLibraryActivation -LibraryDirectory $Stage.mods -EngineDataDirectory (Join-Path $engineRoot 'data') -ProfilePath $Stage.mod_list -ArchiveHashes $Stage.archive_hashes -SettingsMode Defaults
+  $script:activeStage=$Stage
+  Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $Stage.activation
+  [IO.File]::WriteAllBytes((Join-Path $Stage.root 'active-mod-list.json'),$Stage.activation.mod_list_bytes)
+}
+function Complete-MigrationStage($Stage,[string]$Log){
+  $null=Assert-MIRLibraryLoadedSelection -Activation $Stage.activation -LogPath $Log -LatestInvocation
+  $Stage.terminals.Add((Complete-MIRLibraryActivation $Stage.activation))
+  $script:activeStage=$null
 }
 function Invoke-Engine([object]$Stage,[string]$Name,[string[]]$Arguments){
+  Start-MigrationStage $Stage
   $factorioLog=Join-Path $Stage.userdata 'factorio-current.log'
   if(Test-Path -LiteralPath $factorioLog){Remove-Item -LiteralPath $factorioLog -Force}
-  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -TimeoutSeconds 120 -Arguments (@('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods)+$Arguments)
+  $nativeArguments=@('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods)+$Arguments
+  Assert-MIRLibraryLaunch -Activation $Stage.activation -FactorioBin $engine -Arguments $nativeArguments
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -TimeoutSeconds 120 -Arguments $nativeArguments
   $text=(Get-Content -Raw -LiteralPath $actor.stdout)+(Get-Content -Raw -LiteralPath $actor.stderr)
   Assert-Migration ([Text.Encoding]::UTF8.GetByteCount($text) -lt (Get-MIRNativeProbeRemainingOutputBytes -Context $resources)) 'engine capture exceeds remaining output allowance.'
   [IO.File]::WriteAllText((Join-Path $Stage.root "engine-$Name.log"),$text,[Text.UTF8Encoding]::new($false))
   Assert-Migration (Test-Path -LiteralPath $factorioLog -PathType Leaf) "Factorio log is absent after $Name."
-  $copy=Join-Path $Stage.root "factorio-$Name.log";Copy-Item -LiteralPath $factorioLog -Destination $copy;$copy
+  $copy=Join-Path $Stage.root "factorio-$Name.log";Copy-Item -LiteralPath $factorioLog -Destination $copy;Complete-MigrationStage $Stage $copy;$copy
 }
 function Invoke-ServerSave([object]$Stage,[string]$Name,[string]$InputSave,[string]$ExpectedSave,[string]$ExpectedStage){
+  Start-MigrationStage $Stage
   $factorioLog=Join-Path $Stage.userdata 'factorio-current.log'
   if(Test-Path -LiteralPath $factorioLog){Remove-Item -LiteralPath $factorioLog -Force}
   $needle="[mir42-v2-v3-cap-migration] STATE JSON {`"stage`":`"$ExpectedStage`""
   $completion={
     if(-not (Test-Path -LiteralPath $factorioLog -PathType Leaf) -or -not (Test-Path -LiteralPath $ExpectedSave -PathType Leaf)){return $false}
-    $text=Get-Content -Raw -LiteralPath $factorioLog
-    return $text.Contains($needle) -and $text.Contains('Saving finished')
+    try{$text=Get-Content -Raw -LiteralPath $factorioLog -ErrorAction Stop}catch [IO.IOException]{return $false}
+    return $null -ne $text -and $text.Contains($needle) -and $text.Contains('Saving finished')
   }.GetNewClosure()
-  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -TimeoutSeconds 60 -CompletionPredicate $completion -Arguments @('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods,'--server-settings',$Stage.server,'--start-server',$InputSave)
+  $nativeArguments=@('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods,'--server-settings',$Stage.server,'--start-server',$InputSave)
+  Assert-MIRLibraryLaunch -Activation $Stage.activation -FactorioBin $engine -Arguments $nativeArguments
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -TimeoutSeconds 60 -CompletionPredicate $completion -Arguments $nativeArguments
   Assert-Migration ([bool]$actor.result.completion_predicate_observed) "Factorio server did not create $Name successor."
-  $copy=Join-Path $Stage.root "factorio-$Name.log";Copy-Item -LiteralPath $factorioLog -Destination $copy;$copy
+  $copy=Join-Path $Stage.root "factorio-$Name.log";Copy-Item -LiteralPath $factorioLog -Destination $copy;Complete-MigrationStage $Stage $copy;$copy
 }
 
 $v2UnboundedStage=New-Stage -Name v2-unbounded -Candidate $predecessorCandidate -FixtureVersion '0.1.0' -Cap 0
@@ -281,7 +338,7 @@ for($index=1;$index -lt $lineage.Count;$index++){
   Assert-Exact "save lineage $($lineage[$index].stage)" $lineage[$index].predecessor_sha256 $lineage[$index-1].save.raw_sha256
 }
 function Get-StageManifest([object]$Stage,[string]$Candidate){
-  [ordered]@{name=$Stage.name;cap=$Stage.cap;fixture_version=$Stage.fixture_version;artifacts=[ordered]@{candidate=Get-Artifact (Join-Path $Stage.mods (Split-Path -Leaf $Candidate));fixture=Get-Artifact $Stage.fixture_archive;settings=Get-Artifact $Stage.settings_archive;mod_list=Get-Artifact $Stage.mod_list;config=Get-Artifact $Stage.config}}
+  [ordered]@{name=$Stage.name;cap=$Stage.cap;fixture_version=$Stage.fixture_version;artifacts=[ordered]@{candidate=Get-Artifact (Join-Path $Stage.mods (Split-Path -Leaf $Candidate)) -AllowExternal;fixture=Get-Artifact $Stage.fixture_archive -AllowExternal;settings=Get-Artifact $Stage.settings_archive -AllowExternal;mod_list=Get-Artifact $Stage.mod_list;config=Get-Artifact $Stage.config}}
 }
 $result=[ordered]@{
   schema=1
@@ -300,9 +357,9 @@ $result=[ordered]@{
     steam_build_id=[string]$engineResolution.steam.build_id
     steam_manifest_sha256=[string]$engineResolution.steam.app_manifest_sha256
   }
-  predecessor=[ordered]@{commit=$predecessorCommit;tree=$predecessorCommitTree;candidate=Get-Artifact (Join-Path $v2UnboundedStage.mods (Split-Path -Leaf $predecessorCandidate));transport='maximum-level-policy-v2';runtime_controller_policy_version=1}
+  predecessor=[ordered]@{commit=$predecessorCommit;tree=$predecessorCommitTree;candidate=Get-Artifact (Join-Path $v2UnboundedStage.mods (Split-Path -Leaf $predecessorCandidate)) -AllowExternal;transport='maximum-level-policy-v2';runtime_controller_policy_version=1}
   source=[ordered]@{commit=$currentCommit;tree=$currentTree;package_source_sha256=$currentInput.receipt.package_source_sha256;candidate_materialization_closure=$candidateClosure;candidate_materialization_closure_clean=$true}
-  current_candidate=Get-Artifact (Join-Path $v3Stage.mods (Split-Path -Leaf $currentCandidate))
+  current_candidate=Get-Artifact (Join-Path $v3Stage.mods (Split-Path -Leaf $currentCandidate)) -AllowExternal
   candidate_package_excludes_fixture_test_docs_governance_build_dist=$true
   fixture_source_hashes=[ordered]@{info=Get-MigrationSha (Join-Path $fixture 'info.json');data_final_fixes=Get-MigrationSha (Join-Path $fixture 'data-final-fixes.lua');control=Get-MigrationSha (Join-Path $fixture 'control.lua')}
   harness_sha256=Get-MigrationSha $PSCommandPath
@@ -315,11 +372,17 @@ $result=[ordered]@{
   logs=[ordered]@{predecessor_v2_unbounded=Get-Artifact $v2UnboundedLog;predecessor_v2_capped=Get-Artifact $v2CappedLog;v3_capped=Get-Artifact $v3Log;v3_relaxed=Get-Artifact $relaxedLog;terminal=Get-Artifact $terminalLog}
 }
 $resultPath=Join-Path $run 'result.json'
-$result['input_staging']=@($inputLeases|ForEach-Object {Complete-MIRImmutableInputLease -Lease $_ -Outcome passed})
+$result['library_activations']=@($v2UnboundedStage,$v2CappedStage,$v3Stage,$relaxedStage|ForEach-Object {$_.terminals.ToArray()})
+$result['dependency_payload_bytes_copied']=0
+$result['archive_links_created']=0
 $result['predecessor_input']=$predecessorInput
 $result['candidate_materialization']=$currentInput.receipt
 $result['resource_context']=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;shared_alias_bytes=$resources.shared_alias_bytes;memory_enforcement='sampled-watchdog-not-hard-cap'}
 $result['process_inventory']=@($resources.runs)
+Assert-MIR441CleanTrackedSource -RepoRoot $repo
+Assert-Exact 'source after execution' ((& git -C $repo rev-parse HEAD).Trim()) $currentCommit
+Assert-Exact 'engine after execution' (Get-MigrationSha $engine) ([string]$engineResolution.engine.sha256)
+foreach($stage in @($v2UnboundedStage,$v2CappedStage,$v3Stage,$relaxedStage)){foreach($entry in $stage.archive_hashes.GetEnumerator()){Assert-Exact ('library input after '+$stage.name+': '+$entry.Key) (Get-MigrationSha (Join-Path $library $entry.Key)) ([string]$entry.Value)}}
 Write-MIRNativeProbeResult -Context $resources -Record $result
 $result|ConvertTo-Json -Depth 40
 Write-Output "Evidence: $run"

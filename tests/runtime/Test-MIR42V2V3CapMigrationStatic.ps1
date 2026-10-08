@@ -9,6 +9,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
+. (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/assurance/evidence/CommandExecution.ps1')
 $assertions=0
 function Check([bool]$Condition,[string]$Message){if(-not $Condition){throw "V2 migration inputs: $Message"};$script:assertions++}
@@ -19,18 +20,22 @@ function Get-MIR441ResourceSnapshot {
   [pscustomobject]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');memory=[pscustomobject]@{total_bytes=16GB;free_bytes=12GB;committed_bytes=4GB;commit_limit_bytes=20GB};system_volume=[pscustomobject]@{free_bytes=100GB};work_volume=[pscustomobject]@{free_bytes=100GB}}
 }
 $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo ('build/tmp/v2-input-controls-'+[guid]::NewGuid().ToString('N')))
-$inputLeases=[Collections.Generic.List[object]]::new()
+$activeStage=$null
 $tokens=$null;$errors=$null
 $harness=Join-Path $repo 'tests/runtime/Test-MIR42V2V3CapMigration.ps1'
 $ast=[Management.Automation.Language.Parser]::ParseFile($harness,[ref]$tokens,[ref]$errors)
 Check (@($errors).Count -eq 0) 'migration harness no longer parses.'
-foreach($name in @('Assert-Migration','New-Stage','Invoke-Engine','Invoke-ServerSave','Get-MigrationGovernedEngineResolution')){
+foreach($name in @('Assert-Migration','Assert-Exact','Get-MigrationSha','New-MigrationFixtureSource','New-MigrationSettingsSource','New-Stage','Start-MigrationStage','Complete-MigrationStage','Invoke-Engine','Invoke-ServerSave','Get-MigrationGovernedEngineResolution')){
   $definition=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$false))
   Check ($definition.Count -eq 1) "consumed function is ambiguous: $name"
   . ([scriptblock]::Create($definition[0].Extent.Text))
 }
 try {
   $null=New-Item -ItemType Directory -Path $scratch
+  $absentRoot=Join-Path $scratch 'must-not-create'
+  $diagnostic=@(& pwsh -NoProfile -File $harness -RepoRoot $absentRoot -FactorioBin (Join-Path $absentRoot 'engine.exe') 2>&1)|Out-String
+  Check ($LASTEXITCODE -ne 0 -and $diagnostic.Contains('[mir42-v2-v3-direct-inputs-required]') -and -not(Test-Path $absentRoot)) 'native entry did not require the direct library before accessing inputs.'
+  $global:LASTEXITCODE=0
   # One bounded 337-entry source coupon, built with the existing archive writer.
   # It authenticates pinned source bytes; it is not native predecessor evidence.
   $pinned=Get-MIR421PinnedV2PackageInputs -RepoRoot $repo
@@ -68,28 +73,66 @@ try {
 
   # Stage controls use tiny files rather than another materialized mod profile.
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $scratch -ExpectedPeakMemoryMiB 256 -MaxNewOutputMiB 4
-  $run=$resources.root;$engineRoot=$scratch;$engine='controlled engine';$FactorioBin='controlled requested engine';$SteamManifest='controlled manifest'
+  $run=$resources.root;$engineRoot=Join-Path $scratch 'engine';$engine=Join-Path $engineRoot 'bin/x64/factorio.exe';$FactorioBin=$engine;$SteamManifest='controlled manifest'
+  $library=Join-Path $scratch 'library'
+  foreach($directory in @($library,(Split-Path -Parent $engine))){[IO.Directory]::CreateDirectory($directory)|Out-Null}
+  [IO.File]::WriteAllText($engine,'controlled engine; never executed')
+  foreach($name in @('base','elevated-rails','quality','recycler','space-age')){
+    $directory=Join-Path $engineRoot ('data/'+$name);[IO.Directory]::CreateDirectory($directory)|Out-Null
+    [IO.File]::WriteAllText((Join-Path $directory 'info.json'),(@{name=$name;version='2.1.21';dependencies=@('base')}|ConvertTo-Json))
+  }
   $predecessorCommit=$pinned.commit;$currentCommit='A'*40
-  $predecessorCandidate=Join-Path $scratch 'tiny-v2_4.2.21000.zip';$currentCandidate=Join-Path $scratch 'tiny-v3_4.2.21001.zip'
-  [IO.File]::WriteAllText($predecessorCandidate,'tiny verified predecessor control');[IO.File]::WriteAllText($currentCandidate,'tiny verified current control')
+  function New-TinyInput([string]$Name,[string]$Version){
+    $path=Join-Path $library ($Name+'_'+$Version+'.zip');$zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
+    try{$entry=$zip.CreateEntry($Name+'_'+$Version+'/info.json');$writer=[IO.StreamWriter]::new($entry.Open());try{$writer.Write((@{name=$Name;version=$Version;factorio_version='2.1';dependencies=@('base')}|ConvertTo-Json))}finally{$writer.Dispose()}}finally{$zip.Dispose()}
+    $path
+  }
+  $predecessorCandidate=New-TinyInput 'more-infinite-research' '4.2.21000';$currentCandidate=New-TinyInput 'more-infinite-research' '4.2.21001';$extra=New-TinyInput 'unrequested' '1.0.0'
   $predecessorInput=[pscustomobject]@{archive_sha256=Get-MIRImmutableInputSha256 $predecessorCandidate;source_commit=$pinned.commit}
   $currentInput=[pscustomobject]@{receipt=[pscustomobject]@{archive_sha256=Get-MIRImmutableInputSha256 $currentCandidate;package_source_sha256='B'*64}}
   $fixture=Join-Path $repo 'fixtures/assert-mir42-v2-v3-cap-migration';$fixtureName='mir-fixture-assert-mir42-v2-v3-cap-migration'
+  $preparedFixtures=@{};$preparedSettings=@{}
+  foreach($version in @('0.1.0','0.1.1','0.1.2','0.1.3')){
+    $preparedFixtures[$version]=New-MigrationFixtureSource (Join-Path $run ('input-definitions/fixture-'+$version)) $version
+    $null=Publish-MIRModDirectoryArchive -Source $preparedFixtures[$version].source -Name $fixtureName -Version $version -ModsDir $library
+  }
+  foreach($cap in @(0,3)){
+    $preparedSettings[$cap]=New-MigrationSettingsSource (Join-Path $run ('input-definitions/cap-'+$cap)) $cap
+    $null=Publish-MIRModDirectoryArchive -Source $preparedSettings[$cap].source -Name 'mir-validation-settings-overrides' -Version $preparedSettings[$cap].version -ModsDir $library
+  }
+  $originalList=[Text.Encoding]::UTF8.GetBytes('{"mods":[{"name":"personal-selection","enabled":true}]}');$originalSettings=[byte[]](1,4,6,8,255)
+  [IO.File]::WriteAllBytes((Join-Path $library 'mod-list.json'),$originalList);[IO.File]::WriteAllBytes((Join-Path $library 'mod-settings.dat'),$originalSettings)
+  $archiveIdentities=@{};foreach($file in @(Get-ChildItem -LiteralPath $library -File -Filter '*.zip')){$archiveIdentities[$file.Name]=@{identity=(Get-MIRImmutableInputFileIdentity $file.FullName);sha256=(Get-MIRImmutableInputSha256 $file.FullName)}}
   $stages=@((New-Stage v2-unbounded $predecessorCandidate '0.1.0' 0),(New-Stage v2-capped $predecessorCandidate '0.1.1' 3),(New-Stage v3-capped $currentCandidate '0.1.2' 3),(New-Stage v3-relaxed $currentCandidate '0.1.3' 0))
   foreach($stage in $stages){
-    $input=$stage.lease.record.inputs[0]
-    Check ($stage.lease.record.require_hard_links -and $input.staging_mode -ceq 'hardlink' -and (Get-MIRImmutableInputFileIdentity $input.source_path) -ceq (Get-MIRImmutableInputFileIdentity $input.stage_path)) "$($stage.name) copied its input."
-    Check (($input.role -ceq 'predecessor') -eq $stage.name.StartsWith('v2-')) "$($stage.name) selected the wrong input lineage."
+    Check ($stage.mods -ceq $library -and -not(Test-Path (Join-Path $stage.root 'mods')) -and @(Get-ChildItem -LiteralPath $stage.root -Recurse -File -Filter '*.zip').Count -eq 0) "$($stage.name) materialized archives."
+    $selection=Get-Content -LiteralPath $stage.mod_list -Raw|ConvertFrom-Json
+    $mir=@($selection.mods|Where-Object name -CEQ 'more-infinite-research')
+    Check ($mir.Count -eq 1 -and $mir[0].version -ceq $(if($stage.name.StartsWith('v2-')){'4.2.21000'}else{'4.2.21001'})) "$($stage.name) selected the wrong input lineage."
     $zip=[IO.Compression.ZipFile]::OpenRead($stage.settings_archive)
-    try{$reader=[IO.StreamReader]::new($zip.GetEntry('mir-validation-settings-overrides_0.1.0/settings-updates.lua').Open());try{$text=$reader.ReadToEnd()}finally{$reader.Dispose()}}finally{$zip.Dispose()}
+    try{$reader=[IO.StreamReader]::new($zip.GetEntry('mir-validation-settings-overrides_'+$preparedSettings[$stage.cap].version+'/settings-updates.lua').Open());try{$text=$reader.ReadToEnd()}finally{$reader.Dispose()}}finally{$zip.Dispose()}
     Check ($text.Contains('override("ips-max-level-research_copper", '+$stage.cap+')')) "$($stage.name) lost its private cap."
-    [IO.File]::WriteAllText((Join-Path $stage.mods 'mod-settings.dat'),$stage.name)
   }
-  Check (@($stages|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_.mods 'mod-settings.dat')}|Sort-Object -Unique).Count -eq 4) 'mutable settings share identities.'
-  $script:archiveCopies=0
-  function New-Item {[CmdletBinding()]param([string]$ItemType,[string[]]$Path,[string]$Target,[switch]$Force);if($ItemType -ceq 'HardLink'){throw 'controlled unavailable link'};Microsoft.PowerShell.Management\New-Item @PSBoundParameters}
-  function Copy-Item {$script:archiveCopies++;throw 'copy attempted'}
-  try{Refuses {New-Stage unavailable $currentCandidate '0.1.3' 0} 'requires a verified hard link';Check ($script:archiveCopies -eq 0) 'link failure attempted archive copying.'}finally{Remove-Item Function:\New-Item;Remove-Item Function:\Copy-Item}
+  Check (@($stages.userdata|Sort-Object -Unique).Count -eq 4) 'writable output directories share paths.'
+  function Write-LoadedLog($Stage,[string]$Log,[string]$Suffix=''){
+    $text="0.000 2026-10-09 00:00:00; Factorio 2.1.21 (build 87673, win64, full)`n"
+    foreach($row in $Stage.activation.selected){$text+='0.100 Loading mod '+$row.name+' '+$row.version+" (data.lua)`n"}
+    [IO.File]::WriteAllText($Log,($text+$Suffix))
+  }
+  foreach($stage in @($stages[0],$stages[3],$stages[0])){
+    Start-MigrationStage $stage
+    Check (-not(Test-Path (Join-Path $library 'mod-settings.dat'))) 'stage inherited prior settings.'
+    $active=Get-Content -LiteralPath (Join-Path $library 'mod-list.json') -Raw|ConvertFrom-Json
+    Check (-not[bool](@($active.mods|Where-Object name -CEQ 'unrequested')[0].enabled)) 'unrequested library mod was enabled.'
+    Refuses {Start-MigrationStage $stages[1]} 'mir-library-busy'
+    [IO.File]::WriteAllText((Join-Path $library 'mod-settings.dat'),$stage.name)
+    $log=Join-Path $stage.root 'switch.log';Write-LoadedLog $stage $log;Complete-MigrationStage $stage $log
+    Check ([Convert]::ToHexString([IO.File]::ReadAllBytes((Join-Path $library 'mod-list.json'))) -ceq [Convert]::ToHexString($originalList) -and [Convert]::ToHexString([IO.File]::ReadAllBytes((Join-Path $library 'mod-settings.dat'))) -ceq [Convert]::ToHexString($originalSettings)) 'stage did not restore exact previous controls.'
+  }
+  $currentInput.receipt.archive_sha256='0'*64;Refuses {New-Stage wrong-hash $currentCandidate '0.1.3' 0} 'installed candidate hash';$currentInput.receipt.archive_sha256=Get-MIRImmutableInputSha256 $currentCandidate
+  $archivePath=Join-Path $library $preparedFixtures['0.1.3'].file;$held=Join-Path $run 'held-fixture.zip'
+  Move-Item -LiteralPath $archivePath -Destination $held
+  try{Refuses {New-Stage missing-fixture $currentCandidate '0.1.3' 0} 'mir-library-fixture-missing';Check (-not(Test-Path $archivePath)) 'missing input was recreated.'}finally{Move-Item -LiteralPath $held -Destination $archivePath}
   function Invoke-MIRNativeProbeProcess {
     param($Context,$FilePath,$Arguments,$TimeoutSeconds)
     Check ($Context -eq $resources -and $FilePath -ceq (Get-Command pwsh).Source -and $TimeoutSeconds -eq 30 -and $Arguments -contains $FactorioBin -and $Arguments -contains $SteamManifest) 'resolver lost its governed transport.'
@@ -104,7 +147,8 @@ try {
     param($Context,$FilePath,$Arguments,$TimeoutSeconds,[scriptblock]$CompletionPredicate)
     Check ($Context -eq $resources -and $FilePath -ceq $engine -and $Arguments -contains $stages[2].config) 'actor lost its private stage or engine.'
     $log=Join-Path $stages[2].userdata 'factorio-current.log'
-    if($null -eq $CompletionPredicate){Check ($TimeoutSeconds -eq 120 -and $Arguments -contains '--create') 'create actor arguments changed.';[IO.File]::WriteAllText($log,'tiny creation');return [pscustomobject]@{stdout=$stdout;stderr=$stderr}}
+    Check ($Arguments -contains $library -and $stages[2].activation.selected.Count -eq 8) 'actor does not use the selected library.'
+    if($null -eq $CompletionPredicate){Check ($TimeoutSeconds -eq 120 -and $Arguments -contains '--create') 'create actor arguments changed.';Write-LoadedLog $stages[2] $log;return [pscustomobject]@{stdout=$stdout;stderr=$stderr}}
     Check ($TimeoutSeconds -eq 60 -and $Arguments -contains '--start-server' -and $Arguments -contains $stages[2].server) 'server actor arguments changed.'
     if(Test-Path $expectedSave){Remove-Item -LiteralPath $expectedSave}
     Check (-not (& $CompletionPredicate)) 'completion accepted missing save/log.'
@@ -112,24 +156,25 @@ try {
     [IO.File]::WriteAllText($expectedSave,'tiny save');Check (-not (& $CompletionPredicate)) 'completion accepted missing state.'
     [IO.File]::WriteAllText($log,'[mir42-v2-v3-cap-migration] STATE JSON {"stage":"v3-relaxed"} Saving finished');Check (-not (& $CompletionPredicate)) 'completion accepted another stage.'
     [IO.File]::WriteAllText($log,'[mir42-v2-v3-cap-migration] STATE JSON {"stage":"v3-capped"}');Check (-not (& $CompletionPredicate)) 'completion accepted an unfinished save.'
-    [IO.File]::WriteAllText($log,'[mir42-v2-v3-cap-migration] STATE JSON {"stage":"v3-capped"} Saving finished');Check (& $CompletionPredicate) 'original completion conditions were rejected.'
+    Write-LoadedLog $stages[2] $log '[mir42-v2-v3-cap-migration] STATE JSON {"stage":"v3-capped"} Saving finished';Check (& $CompletionPredicate) 'original completion conditions were rejected.'
     [pscustomobject]@{result=[pscustomobject]@{completion_predicate_observed=$observed}}
   }
   $null=Invoke-Engine $stages[2] create @('--create','controlled save')
   $null=Invoke-ServerSave $stages[2] capped 'controlled seed' $expectedSave 'v3-capped'
   $observed=$false;Refuses {Invoke-ServerSave $stages[2] capped 'controlled seed' $expectedSave 'v3-capped'} 'did not create capped successor'
-  foreach($stage in $stages){$terminal=Complete-MIRImmutableInputLease -Lease $stage.lease -Outcome passed;$null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal;$null=Assert-MIRImmutableInputLeaseReclaimable -RunRoot $stage.root -Context 'completed tiny migration stage';Remove-Item -LiteralPath $stage.root -Recurse}
+  $null=Complete-MIRLibraryActivation $activeStage.activation;$activeStage=$null
+  foreach($file in @(Get-ChildItem -LiteralPath $library -File -Filter '*.zip')){Check ((Get-MIRImmutableInputFileIdentity $file.FullName) -ceq $archiveIdentities[$file.Name].identity -and (Get-MIRImmutableInputSha256 $file.FullName) -ceq $archiveIdentities[$file.Name].sha256) 'switching changed archive bytes or identity.'}
   Check ((Test-Path $predecessorCandidate) -and (Test-Path $currentCandidate)) 'retirement lost shared inputs.'
   $catalog=Get-Content -LiteralPath (Join-Path $repo 'validation/tests.yml') -Raw|ConvertFrom-Json
   $row=@($catalog.tests|Where-Object id -CEQ 'runtime.maximum-level-v2-v3-migration-f210')
   Check ($row.Count -eq 1 -and 'candidate' -in $row[0].inputs -and 'prior-release' -in $row[0].inputs -and 'factorio' -in $row[0].inputs) 'consumed command lost exact native input fingerprints.'
-  $commandContext=[pscustomobject]@{factorio='controlled engine with spaces';candidate='controlled current package';candidate_materialization='controlled canonical receipt';prior_release='controlled pinned V2 input'}
+  $commandContext=[pscustomobject]@{factorio='controlled engine with spaces';candidate='controlled current package';candidate_materialization='controlled canonical receipt';prior_release='controlled pinned V2 input';mods='controlled relocated library'}
   $command=Resolve-MIRAssuranceCommandText -Command $row[0].command -Context $commandContext -Plan ([pscustomobject]@{})
-  foreach($expected in @("-FactorioBin 'controlled engine with spaces'","-CandidateZip 'controlled current package'","-SourceMaterializationPath 'controlled canonical receipt'","-PredecessorCandidateZip 'controlled pinned V2 input'",'-ExpectedPeakMemoryMiB 2048','-MaxNewOutputMiB 120')){Check ($command.Contains($expected)) "consumed command lost $expected"}
+  foreach($expected in @("-FactorioBin 'controlled engine with spaces'","-CandidateZip 'controlled current package'","-SourceMaterializationPath 'controlled canonical receipt'","-PredecessorCandidateZip 'controlled pinned V2 input'","-LibraryDirectory 'controlled relocated library'",'-ExpectedPeakMemoryMiB 2048','-MaxNewOutputMiB 120')){Check ($command.Contains($expected)) "consumed command lost $expected"}
   $commandContext.prior_release='';Refuses {Resolve-MIRAssuranceCommandText -Command $row[0].command -Context $commandContext -Plan ([pscustomobject]@{})} 'requires <prior-release>'
   $commandContext.prior_release='controlled pinned V2 input';$commandContext.candidate_materialization='';Refuses {Resolve-MIRAssuranceCommandText -Command $row[0].command -Context $commandContext -Plan ([pscustomobject]@{})} 'requires <candidate-materialization>'
   [pscustomobject]@{status='passed';assertions=$assertions;controlled_source_coupon_entries=337;controlled_stages=4;archive_payload_bytes_copied=0;factorio_processes=0;qualification='none; pinned-input authentication and consumed adapter controls only'}
 } finally {
-  foreach($lease in $inputLeases){if(-not $lease.closed){$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}}
+  if($null -ne $activeStage -and $null -ne $activeStage.activation -and -not $activeStage.activation.closed){$null=Complete-MIRLibraryActivation $activeStage.activation}
   if(Test-Path $scratch){$resolved=(Resolve-Path -LiteralPath $scratch).Path;$prefix=(Resolve-Path -LiteralPath (Join-Path $repo 'build/tmp')).Path.TrimEnd('\')+'\';if(-not $resolved.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){throw 'Synthetic migration cleanup escapes its owned parent'};Remove-Item -LiteralPath $resolved -Recurse -Force}
 }
