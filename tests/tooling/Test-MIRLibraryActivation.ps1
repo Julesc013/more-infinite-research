@@ -57,16 +57,20 @@ try{
     'MIRBobTinMachineMatrix','MIRBobTinProgressionFrontier','MIRBobTinQualification',
     'MIRF200BobTinPersistedState','MIRF200BobTinProductionGain',
     'MIRF210CurrentBobAngelFinalRoutesObserver','MIRF210CurrentBobAngelTinRouteObserver',
-    'MIRF210CurrentBobAngelGunmetalInvarQualification','MIRK2213ImersiteMigration','MIRPassiveRepair'
+    'MIRF210CurrentBobAngelGunmetalInvarQualification','MIRK2213ImersiteMigration','MIRPassiveRepair',
+    'MIRCandidateRetention'
   )
   $absentRoot=Join-Path $root 'must-not-create-retired-run'
   foreach($name in $retired){
-    $runner=Join-Path $RepoRoot ('tests/runtime/Test-'+$name+'.ps1')
+    $runnerDirectory=if($name-ceq'MIRCandidateRetention'){'tests/package/'}else{'tests/runtime/'}
+    $runner=Join-Path $RepoRoot ($runnerDirectory+'Test-'+$name+'.ps1')
     $tokens=$null;$errors=$null
     $ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors)
     Assert-LibraryTest ($errors.Count-eq0) "$name entry parses"
     $parameters=@($ast.ParamBlock.Parameters.Name.VariablePath.UserPath)
-    $argsList=@('-NoProfile','-NonInteractive','-File',$runner,'-RepoRoot',$absentRoot)
+    $argsList=@('-NoProfile','-NonInteractive','-File',$runner)
+    if('RepoRoot' -in $parameters){$argsList+=@('-RepoRoot',$absentRoot)}
+    if('OutputRoot' -in $parameters){$argsList+=@('-OutputRoot',$absentRoot)}
     foreach($inputName in @('FactorioBin','CandidateZip','OldCandidateZip','NewCandidateZip','V5ObservationResultPath')){
       if($inputName -in $parameters){$argsList+=@(('-'+$inputName),(Join-Path $absentRoot $inputName))}
     }

@@ -1723,6 +1723,7 @@
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tests/package/Test-MIRCandidateRetention.ps1",
         "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
         "tests/runtime/Test-MIRResearchBrowser.ps1",
         "tests/runtime/Test-MIRUpgrade.ps1",
@@ -8257,5 +8258,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:0cf5858db9e2ac096896222d0a5ccc3ee52e9ba00b7cc53f192915681ffd270d"
+  "digest": "sha256:40523d303c446b6f64db950f0a9d46d5487604f99232a2e71bdd46fff400b8e8"
 }
