@@ -4,10 +4,10 @@
   "change_id": "MIR4-CHG-2026-0092",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Lease exact ProcessIR inputs from the shared archive library.",
+  "summary": "Preserve exact ProcessIR inspection and refuse retired live staging.",
   "details": [
-    "Live capture requires explicit selection and whole-job resource admission. Candidate and dependency ZIPs use verified same-volume hardlinks with no copy fallback; writable settings, observer files, saves and logs remain private. Existing run and reference outputs are preserved.",
-    "Controlled capture-consumer tests use tiny synthetic inputs and a stubbed engine actor. They verify hardlinks, hash custody, repetitions, output accounting and failure refusals; historical ProcessIR proof is retained without claiming a new native or release pass."
+    "The live capture entry point now refuses its retired mod-directory staging before reading engine or archive inputs or creating run output. Offline reference checking remains available. Current native capture requires conversion to the configured master library; this release does not deliver that conversion.",
+    "Retained capture controls use tiny checkout-local files and a substituted engine actor. They permit no normal native staging and establish no new gameplay or release acceptance. Historical ProcessIR records remain unchanged."
   ],
   "semantic_domains": [
     "compatibility",

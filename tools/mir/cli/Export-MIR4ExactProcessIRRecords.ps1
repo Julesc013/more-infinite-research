@@ -54,6 +54,7 @@ $output=Resolve-T12Output -Relative $OutputRoot -AllowedRoot 'build/tmp'
 $reference=Resolve-T12Output -Relative $ReferenceRoot -AllowedRoot 'sdk/preview/mir4/reference'
 if($Check){Test-T12Reference -Root $reference|ConvertTo-Json -Depth 10;exit 0}
 if($CaptureId.Count -eq 0){throw '[mir4-t12-explicit-capture-selection-required]'}
+throw '[mir-native-obsolete-runner] ProcessIR live capture still materializes a mod directory. Retain offline -Check and the historical capture definitions; live capture requires a direct-library conversion. No engine or staging was started.'
 if($PublishReference-and(Test-Path -LiteralPath $reference)-and((Test-Path -LiteralPath $reference -PathType Leaf)-or@(Get-ChildItem -LiteralPath $reference -Force).Count)){throw '[mir4-t12-existing-reference-preserved]'}
 $trackedDirty=@(&git -C $repo status --porcelain --untracked-files=no)
 if($trackedDirty.Count){throw '[mir4-t12-source-dirty] Commit tracked implementation before exact engine capture.'}

@@ -2075,9 +2075,9 @@
     {
       "path": "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
       "classification": "canonical-internal",
-      "sha256": "DA8DCCA2AAE31C309BBCD6421E2991B9CEF7163448BF8BEDE3E2174D92650483",
+      "sha256": "25AEF752FB37FC19CB4C7FE185FFFDCFCC69EE329CB7F28577118418EC5C52CF",
       "hash_mode": "canonical-text-v1",
-      "lines": 60,
+      "lines": 64,
       "package_visible": false
     },
     {
@@ -5619,9 +5619,9 @@
     {
       "path": "tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1",
       "classification": "canonical-internal",
-      "sha256": "2410406B0F0D0CAB697F825C09B5921398EF15DB2F1C301F975F29098B96F9C9",
+      "sha256": "75D0C777CE0D5162EA533C5EF86D44AABDAA9D0EE347C0BE1F613845E6441377",
       "hash_mode": "canonical-text-v1",
-      "lines": 148,
+      "lines": 149,
       "package_visible": false
     },
     {
@@ -6050,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7546f478646998672e509490ad06fca1276876ba402d413e3c62ce0e0eff035d"
+  "digest": "sha256:576ce7ef5cab35bbdf88f578834391dcb6da257715cf0821aa1873e7248dd4f1"
 }

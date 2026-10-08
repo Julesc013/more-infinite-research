@@ -4,11 +4,11 @@
   "change_id": "MIR4-CHG-2026-0124",
   "status": "draft",
   "change_type": "fixed",
-  "summary": "Use verified immutable links and preserve existing output in the retained package-retention runner.",
+  "summary": "Preserve package-retention custody checks and refuse obsolete native staging.",
   "details": [
-    "Each supplied candidate and predecessor uses the existing strict immutable-input lease, with exact hashes, verified same-file identity and held handles. A failed link refuses archive copies. Writable controls, logs and saves remain private.",
-    "Require a fresh output directory beneath build and reject reparse ancestors. Preserve existing results rather than recursively deleting the selected directory. Record terminal custody on engine success or failure and consume completed receipts in the retention summary.",
-    "Focused tiny-file controls exercise the consumed adapter and actual runner exception path without Factorio. Historical gameplay campaigns, current-package upgrades and nine-target acceptance remain pending; player package source is unchanged."
+    "The older package-retention native entry point refuses before staging until it can use the configured master library. Its historical save/reload oracle and strict immutable-input custody helper remain preserved.",
+    "The retained helper requires fresh checkout-local output, rejects reparse ancestors and preserves existing results. Tiny-file tests exercise verified file identity, held handles, terminal receipts and exception cleanup without Factorio.",
+    "These internal controls do not permit populated native profiles, links outside the checkout or gameplay acceptance. Use the migrated manifest-driven upgrade runner for selected current package upgrades."
   ],
   "semantic_domains": ["developer-tooling", "artifact-retention", "documentation"],
   "audiences": ["contributors", "maintainers"],
@@ -26,7 +26,7 @@
   "package_visibility": "repository-only",
   "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
   "security_visibility": "public-at-merge",
-  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
   "references": [
     {"kind":"finding","value":"tests/tooling/Test-MIRImmutableInputStaging.ps1"},
     {"kind":"document","value":"docs/maintainer/artifact-retention.md"}

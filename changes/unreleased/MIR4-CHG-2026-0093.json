@@ -4,10 +4,10 @@
   "change_id": "MIR4-CHG-2026-0093",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Govern browser continuity with shared immutable archives.",
+  "summary": "Use direct-library activation for governed browser continuity.",
   "details": [
-    "The server and two-client lifecycle use one resource-governed process tree. Phase profiles share verified archive hardlinks, move private settings, omit MIR during removal and restore its original archive on re-addition. Existing gameplay oracles remain required.",
-    "Candidate admission validates source-patch identity and canonical README bytes through the existing materializer transformation. Controlled actor and archive checks preserve historical evidence without claiming new native multiplayer, physical input or release acceptance."
+    "The server and two-client lifecycle retain one governed process tree and private writable run state. Each phase activates its exact selection in the configured master library; phase changes wait for owned processes to stop, and previous controls are restored.",
+    "Candidate admission retains source-patch and authored README checks. Controlled actor/input tests and historical results remain separate from current native multiplayer, physical-input and release acceptance."
   ],
   "semantic_domains": [
     "tooling",
