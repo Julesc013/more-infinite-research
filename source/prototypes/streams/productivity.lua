@@ -1098,10 +1098,7 @@ local function current_k2_213_material_profile()
   if type(active) ~= "table" then return false end
   -- Older target packages intentionally omit this 2.1-only policy.
   local k2_science_phase = require("prototypes.mir.compatibility.policies.k2_science_phase")
-  for name, version in pairs(k2_science_phase.v3_applicability) do
-    if active[name] ~= version then return false end
-  end
-  return true
+  return k2_science_phase.imersite_continuation_applies(active)
 end
 
 -- RIC 0.36.1 Marine carbonisation is the one observed productivity-permitted

@@ -102,7 +102,7 @@ check('V301',k2.policy_id=='K2SciencePhasePolicyV1' and k2.applicability.Krastor
 check('V302',not k2.applies({base='2.1.20',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.13'})
   and not k2.applies({base='2.1.20',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.14'}),'V3 does not admit adjacent K2 or K2SO versions')
 check('V303',not k2.applies({base='2.1.14',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}) and not k2.applies({base='2.1.19',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'})
-  and not k2.applies({base='2.1.21',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'})
+  and not k2.applies({base='2.1.22',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'})
   and not k2.applies({Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}),'V3 rejects adjacent or missing base versions')
 local v3_original={
  {name='automation-science-pack',amount=2},
@@ -124,6 +124,15 @@ check('V308',names(v3_again)==names(v3_normalized) and v3_again[1].amount==3 and
 local v3_phase_one,v3_phase_one_decision=k2.normalize({{'kr-basic-tech-card',1},{'production-science-pack',4}},active_mods_v3)
 check('V309',#v3_phase_one==1 and v3_phase_one[1][1]=='production-science-pack' and v3_phase_one[1][2]==4
   and v3_phase_one_decision.status=='normalized','V3 phase-one normalization retains a nonempty late-compatible result')
+local active_mods_v5={base='2.1.21',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}
+local v5_normalized,v5_decision=k2.normalize(v3_original,active_mods_v5)
+check('V501',v5_decision.policy_id=='K2SciencePhasePolicyV5' and v5_decision.applicable
+  and v5_decision.exact_versions.base=='2.1.21','Current reviewed engine has a distinct exact science-policy identity')
+check('V502',names(v5_normalized)==names(v3_normalized) and #v5_decision.removed_packs==#v3_decision.removed_packs,
+  'Current exact tuple retains the existing phase-two ingredient retirement')
+check('V503',not k2.applies({base='2.1.21',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.13'})
+  and not k2.applies({base='2.1.21',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.14'}),
+  'Current engine admission does not widen the named overhaul releases')
 roles={{role='exclude',pack='automation-science-pack'}}
 local spec={science_packs={'automation-science-pack','utility-science-pack'}}
 local selected=selector.pick_science_for_stream(spec,'audit_stream')

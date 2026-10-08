@@ -1100,8 +1100,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4754,
-      "expected_sha256": "F117A85DDE4ED12DBD4D1E6A0BCE243095F693A34403D94C73FFC836999734C3",
+      "expected_bytes": 5359,
+      "expected_sha256": "71D5607F03313E0C99325776238361C90A3DD3D8F7CAE7602A8DF939E523920F",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 74374,
-      "expected_sha256": "9553361C7356770FA35CF706E926B6A2401B134F4FD5895B810852E204F1F4E9",
+      "expected_bytes": 74298,
+      "expected_sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3867,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "0CF9FB2793410209C28547F26BEA6E792864F4C825B0297B9B725A2C17461EE0"
+  "record_sha256": "4A4DD5A88109BA3530B7C6847842CFA599018BBCB0504DDEAFDFC931828EAC25"
 }
