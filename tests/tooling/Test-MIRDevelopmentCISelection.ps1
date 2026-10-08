@@ -237,6 +237,12 @@ $affectedSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $coverageSelectio
 $affectedSelection.classification.tests=@('static.compiler','static.package')
 $initialAffectedPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $affectedSelection
 Assert-MIRDevelopmentCISelection -Condition ($initialAffectedPlan.profile -ceq 'auto' -and $initialAffectedPlan.use_baseline -and $initialAffectedPlan.use_affected_selection -and $initialAffectedPlan.selection_rows_covered_by_auto) -Message 'Known baseline-bound development selection did not reduce to its automatic affected plan.'
+foreach($extra in @('runtime.affected','runtime.full','static.unselected')) {
+  $mixedSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $affectedSelection
+  $mixedSelection.classification.tests+=@($extra)
+  $mixedPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $mixedSelection
+  Assert-MIRDevelopmentCISelection -Condition ($mixedPlan.profile -ceq 'mir4-development' -and $mixedPlan.use_baseline -and -not $mixedPlan.use_affected_selection) -Message ('Hosted planning admitted an unselected automatic row: '+$extra)
+}
 $uncoveredStaticSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $affectedSelection
 $uncoveredStaticSelection.tests=@('static.compiler','static.package','static.unrelated')
 $uncoveredStaticPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $uncoveredStaticSelection

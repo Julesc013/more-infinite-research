@@ -4523,7 +4523,7 @@
     {
       "path": "tools/lib/validation/ResearchAllPerformance.ps1",
       "classification": "canonical-internal",
-      "sha256": "A49E267279E8CE8D8DC47F928F921CEB6DB33593CE091E32AA44ECE1665F3B5E",
+      "sha256": "64281E8FAB7013362BD79099CE7ACA8DC22562DE55CA59FDDC0165175933C557",
       "hash_mode": "canonical-text-v1",
       "lines": 106,
       "package_visible": false
@@ -4787,9 +4787,9 @@
     {
       "path": "tools/mir/application/assurance/DevelopmentValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "1C6B126D319A63E9693265A18DDBED1B0CCD2E2B1D344A34E1C67FB66DB041AD",
+      "sha256": "0EAA000F0D4182F7C942D0C7445FAA7DF4CC1D456659E054560AC6234A15104E",
       "hash_mode": "canonical-text-v1",
-      "lines": 344,
+      "lines": 347,
       "package_visible": false
     },
     {
@@ -6050,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:12c95ba0a68b8dfea57641b594c9aba6de5079d26cd5b3b9f8f46d55dff43eec"
+  "digest": "sha256:82766d95d6df45deaa6b1c2836a316539dfeceb470ba092ef53dd057a1675de7"
 }

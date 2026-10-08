@@ -6,7 +6,7 @@ function Read-MIRResearchAllObservation {
     $row=$Observation.observations[$index++]
     if($row.phase-cne$phase-or$row.completion_events-lt1-or$row.technologies-lt1){throw '[mir-research-all-observation-events]'}
     $markers=@([regex]::Matches($LogText,'(?m)\[mir-research-all\] '+$phase+'=(?<value>[^\r\n]+)'))
-    if($markers.Count-ne1-or$markers[0].Groups['value'].Value-notmatch '^\s*(?<ms>[0-9]+(?:\.[0-9]+)?)\s+ms\s*$'){throw '[mir-research-all-observation-timer]'}
+    if($markers.Count-ne1-or$markers[0].Groups['value'].Value-notmatch '^\s*Duration:\s*(?<ms>[0-9]+(?:\.[0-9]+)?)\s*ms\s*$'){throw '[mir-research-all-observation-timer]'}
     $milliseconds=[double]::Parse($Matches.ms,[Globalization.CultureInfo]::InvariantCulture)
     if([double]::IsInfinity($milliseconds)-or[double]::IsNaN($milliseconds)){throw '[mir-research-all-observation-timer]'}
     $rows+=@{phase=$phase;milliseconds=$milliseconds;completion_events=[int]$row.completion_events;technologies=[int]$row.technologies}

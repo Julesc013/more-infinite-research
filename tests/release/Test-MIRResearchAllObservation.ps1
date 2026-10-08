@@ -6,19 +6,20 @@ Set-StrictMode -Version Latest
 $checks=0
 function Assert-Observation([bool]$Value,[string]$Message){if(-not$Value){throw $Message};$script:checks++}
 $json='{"schema":1,"status":"observed","engine":"2.0.77","mir_version":"4.2.20001","connected_players":0,"observations":[{"phase":"first","completion_events":250,"technologies":250},{"phase":"repeat","completion_events":63,"technologies":250}]}'
-$log="0.1 Script: [mir-research-all] first=125.125 ms`n0.2 Script: [mir-research-all] repeat=5.500 ms"
+# Native Factorio 2.0.77 profiler representation captured in the paired baseline run.
+$log="5.906 Script: [mir-research-all] first=Duration: 8.677500ms`n5.908 Script: [mir-research-all] repeat=Duration: 1.018600ms"
 $arguments=@{Observation=($json|ConvertFrom-Json);LogText=$log;MirVersion='4.2.20001';EngineVersion='2.0.77'}
 $result=@(Read-MIRResearchAllObservation @arguments)
-Assert-Observation ($result.Count-eq2-and$result[0].milliseconds-eq125.125-and$result[1].milliseconds-eq5.5) 'Native timer values must retain their phase and unit.'
+Assert-Observation ($result.Count-eq2-and$result[0].milliseconds-eq8.6775-and$result[1].milliseconds-eq1.0186) 'Native timer values must retain their phase and unit.'
 Assert-Observation ($result[0].completion_events-eq250-and$result[1].completion_events-eq63) 'Event counts distinguish work performed.'
 foreach($case in @('missing-timer','duplicate-timer','negative-time','wrong-unit','nonfinite-time','missing-repeat','wrong-engine','wrong-package','players','zero-events','wrong-order')){
   $argsCopy=@{};foreach($key in $arguments.Keys){$argsCopy[$key]=$arguments[$key]};$argsCopy.Observation=$json|ConvertFrom-Json
   switch($case){
     'missing-timer' {$argsCopy.LogText='no profiler marker'}
     'duplicate-timer' {$argsCopy.LogText=$log+"`n"+$log}
-    'negative-time' {$argsCopy.LogText=$log.Replace('125.125','-1')}
-    'wrong-unit' {$argsCopy.LogText=$log.Replace(' ms',' s')}
-    'nonfinite-time' {$argsCopy.LogText=$log.Replace('125.125','NaN')}
+    'negative-time' {$argsCopy.LogText=$log.Replace('8.677500','-1')}
+    'wrong-unit' {$argsCopy.LogText=$log.Replace('ms','s')}
+    'nonfinite-time' {$argsCopy.LogText=$log.Replace('8.677500','NaN')}
     'missing-repeat' {$argsCopy.Observation.observations=@($argsCopy.Observation.observations[0])}
     'wrong-engine' {$argsCopy.Observation.engine='2.1.21'}
     'wrong-package' {$argsCopy.Observation.mir_version='4.2.20000'}
