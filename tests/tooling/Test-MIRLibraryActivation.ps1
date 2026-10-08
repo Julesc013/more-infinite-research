@@ -49,7 +49,7 @@ try{
   # or staging; these controls cannot launch Factorio even if a guard regresses.
   $retired=@(
     'MIR4HistoricalPrivateRuntime','MIR4A05K2Materials','MIR4A05K203Imersite','MIR4A03K2K2SOIntake',
-    'MIR42V2V3CapMigration','MIR42CapOwnershipMultiforce',
+    'MIR42V2V3CapMigration',
     'MIRA06BobGoldQualification','MIRA06BobAluminiumQualification','MIRA06BobLeadQualification',
     'MIRA06BobOrdinaryAlloysQualification','MIRA06AluminiumFinalState',
     'MIRBobAngelTinRouteSafety','MIRBobAngelTinFinalStateAudit','MIRAngelTinFinalStateAudit',

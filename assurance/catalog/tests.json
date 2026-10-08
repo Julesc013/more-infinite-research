@@ -975,7 +975,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
+      "command": "./tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -LibraryDirectory <mods> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -8351,5 +8351,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ce780ac3e30003b386c08ec8785de03709d50a19f400bbbf502bb3243d18b059"
+  "digest": "sha256:15e259b92619ff9bf85db4c131602a16a00972b123b6209faf9944a16cac56f9"
 }
