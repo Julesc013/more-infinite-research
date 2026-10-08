@@ -19,7 +19,7 @@
       "type": "object", "additionalProperties": false, "required": ["path", "sha256", "kind", "review_status"],
       "properties": {
         "path": {"const": "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json"},
-        "sha256": {"const": "6CEEB0BB6EE6AED2F451C17D1CA41F26345E9F5E93A0E5B7791DD30B0F38063C"},
+        "sha256": {"const": "B1497E6122F0C448A8AF958FD782E36CF01BD106D32B65F67D8CF33718EAF159"},
         "kind": {"const": "MIR4Factorio21ExperimentalChannelV1"},
         "review_status": {"const": "reviewed-current-observation"}
       }
@@ -37,14 +37,14 @@
     "engine": {
       "type": "object", "additionalProperties": false, "required": ["version", "build", "file_version", "platform", "distribution", "binary"],
       "properties": {
-        "version": {"const": "2.1.20"}, "build": {"const": 87512}, "file_version": {"const": "2.1.20.87512"}, "platform": {"const": "win64"}, "distribution": {"const": "steam"},
+        "version": {"const": "2.1.21"}, "build": {"const": 87673}, "file_version": {"const": "2.1.21.87673"}, "platform": {"const": "win64"}, "distribution": {"const": "steam"},
         "binary": {"$ref": "#/$defs/binary"}
       }
     },
     "steam": {
       "type": "object", "additionalProperties": false, "required": ["app_id", "branch", "build_id", "state_flags", "app_manifest"],
       "properties": {
-        "app_id": {"const": "427520"}, "branch": {"const": "experimental"}, "build_id": {"const": "25458442"}, "state_flags": {"const": "4"},
+        "app_id": {"const": "427520"}, "branch": {"const": "experimental"}, "build_id": {"const": "25749703"}, "state_flags": {"const": "4"},
         "app_manifest": {"$ref": "#/$defs/manifest"}
       }
     },
@@ -73,16 +73,16 @@
     "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
     "policyV2": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json"}, "sha256": {"const": "EA6339603DE411827193344C57F48A636D5E64BC7959C77207EC59D54DED5FF8"}, "record_sha256": {"const": "927B9DC5E87313A7FA223E4D180878991E051C34B5E1998840A4A3BBD79A91BD"}}},
     "policySuccessionV1": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json"}, "sha256": {"const": "8A6B206B529FA1D20F2AC63625AE3EF895F7FB6F0D03032BA77C0E6839C645F8"}, "record_sha256": {"const": "2744FFF6AB91E46CF61275951624AC013409FA0B490245DD6DA6B852B08286EF"}}},
-    "binary": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "bin/x64/factorio.exe"}, "sha256": {"const": "E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92"}}},
-    "manifest": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "appmanifest_427520.acf"}, "sha256": {"const": "49EB6468E975B7226242DC52300F7EE882D396EA197BA4944DFA5EF321561FD5"}}},
-    "runtimeApi": {"type": "object", "additionalProperties": false, "required": ["path", "application_version", "sha256"], "properties": {"path": {"const": "doc-html/runtime-api.json"}, "application_version": {"const": "2.1.20"}, "sha256": {"const": "1FF275CC085347FAFDDC01B5BA53DF10259319339E78CD6E5B4E0D067E1DAEB6"}}},
-    "prototypeApi": {"type": "object", "additionalProperties": false, "required": ["path", "application_version", "sha256"], "properties": {"path": {"const": "doc-html/prototype-api.json"}, "application_version": {"const": "2.1.20"}, "sha256": {"const": "5D2AAB6483F33D1582D2FDFD661B4B9F6FF6A1F97548311524D062ECC32F200B"}}},
-    "changelog": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "data/changelog.txt"}, "sha256": {"const": "20F980C654DD0D3CDE1BDF3DEEF606F6B000E3238CF69C7A21E3CD83BFA66392"}}},
+    "binary": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "bin/x64/factorio.exe"}, "sha256": {"const": "703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1"}}},
+    "manifest": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "appmanifest_427520.acf"}, "sha256": {"const": "5506DCA9263EBEC6FE12EDC607F939657B278CFE011D276FFB8F350F6D994519"}}},
+    "runtimeApi": {"type": "object", "additionalProperties": false, "required": ["path", "application_version", "sha256"], "properties": {"path": {"const": "doc-html/runtime-api.json"}, "application_version": {"const": "2.1.21"}, "sha256": {"const": "F21602449EC6C077AFB4A26311EF075AF7AEDB8C067D53B9CC87EFCCCA4D761F"}}},
+    "prototypeApi": {"type": "object", "additionalProperties": false, "required": ["path", "application_version", "sha256"], "properties": {"path": {"const": "doc-html/prototype-api.json"}, "application_version": {"const": "2.1.21"}, "sha256": {"const": "5ABE17BC8797770AB6C7CEB0CBE4348AB3B716EFEF59C7EE3E539596337132E6"}}},
+    "changelog": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "data/changelog.txt"}, "sha256": {"const": "F6256F393B0033577303BEA1D93B82687D6740D5942A095A8F19023BB8477108"}}},
     "baseMod": {"$ref": "#/$defs/baseModExact"}, "elevatedRailsMod": {"$ref": "#/$defs/elevatedRailsModExact"}, "qualityMod": {"$ref": "#/$defs/qualityModExact"}, "recyclerMod": {"$ref": "#/$defs/recyclerModExact"}, "spaceAgeMod": {"$ref": "#/$defs/spaceAgeModExact"},
-    "baseModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "base"}, "version": {"const": "2.1.20"}, "info_path": {"const": "data/base/info.json"}, "raw_sha256": {"const": "C4A22B050AD6C758223A46789FA3642E6C31CF1E122D6AB632131943684FE050"}, "canonical_sha256": {"const": "CE3B6C0A194884BC214A1A4E53015CAEA52623AA89F7C093BB37265E44510733"}}},
-    "elevatedRailsModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "elevated-rails"}, "version": {"const": "2.1.20"}, "info_path": {"const": "data/elevated-rails/info.json"}, "raw_sha256": {"const": "0A0F77CA5086FCF220B223D8F7E90D4E3FB16EBCF99F0C57D9110A6DD1173C15"}, "canonical_sha256": {"const": "A0C956ECCEFEABF8301F115BAAD7D2E5D13811EBEA90D018147E9DD97DAE1588"}}},
-    "qualityModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "quality"}, "version": {"const": "2.1.20"}, "info_path": {"const": "data/quality/info.json"}, "raw_sha256": {"const": "E39B1C7682ED2BD834BD02772D37B36447D2BD66BCE8E6370F68AE8255C08E3B"}, "canonical_sha256": {"const": "F2D33E95F51FE5E5978E0991F0E925BB6EF713E16E0D729292EAF54C71AA9290"}}},
-    "recyclerModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "recycler"}, "version": {"const": "2.1.20"}, "info_path": {"const": "data/recycler/info.json"}, "raw_sha256": {"const": "627BD5A7113933CFAB29F12A724A2DB5225BA65A75EA96D12AB79AA5947BF5AC"}, "canonical_sha256": {"const": "FFEA13B2A535ECA34FC1A76154F9D2208F205981668E16F176D020CD48E5DB3B"}}},
-    "spaceAgeModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "space-age"}, "version": {"const": "2.1.20"}, "info_path": {"const": "data/space-age/info.json"}, "raw_sha256": {"const": "717C605E951A7F05DC9594930E328CA7306F62FEA09872441C18F35D3BC61A65"}, "canonical_sha256": {"const": "3D97264F66F8743F051703E3001D46E337672C27A436960A9B4D12794B60EE88"}}}
+    "baseModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "base"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/base/info.json"}, "raw_sha256": {"const": "C1B8F8B74948524801B64109B4A8A4A2701CB2A6A868A3674EE20B2C27E0684C"}, "canonical_sha256": {"const": "C28C7F60E4500843FBAC24DDC05DDC91783F78253928EB511E473D3B1F5C68B4"}}},
+    "elevatedRailsModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "elevated-rails"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/elevated-rails/info.json"}, "raw_sha256": {"const": "ADE1CDB0E617343CB9DD8C373262326D5CAE1B0E820BBFC00466B850A2989541"}, "canonical_sha256": {"const": "30708573FFDC1EA8790E06EF3E08A1907FEBC6A85608D16C2281DBF7666D742F"}}},
+    "qualityModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "quality"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/quality/info.json"}, "raw_sha256": {"const": "401FD5F624D09EFF68E8A3EA141B201CF16D574761E3882A553E16D43026F4B2"}, "canonical_sha256": {"const": "D39FC0D58EA2BDF11A6EDF42EDC853F907F2CC353D29B9816671457375383571"}}},
+    "recyclerModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "recycler"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/recycler/info.json"}, "raw_sha256": {"const": "AB94595C08764E419CAF49A0856F371111671D0695F77BACCB5868DEA45A5800"}, "canonical_sha256": {"const": "CA65FAEA6C40B77C21104EFFC82A3F07C4CBE12E8DDD64E788DF7BFC1EE6DC16"}}},
+    "spaceAgeModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "space-age"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/space-age/info.json"}, "raw_sha256": {"const": "D0F338F39A22E1BC574BE08C07A3466EA6B5AF906D79CFFDFE1FDB2EBF30B5D5"}, "canonical_sha256": {"const": "9F9B6C1D2BE23D2F288B9E8C92552C00E5F1FAAF1114A11677D7011A7C10A782"}}}
   }
 }

@@ -505,6 +505,94 @@ function Assert-MIR4F210CurrentEngineCapHarnessBindingV3 {
   if ($Actual -cne $Expected) { throw "[mir4-f210-current-cap-harness-admission-drift] $Name" }
 }
 
+function New-MIR4F210CurrentEngineCapHarnessAdmissionV3 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Resolution,
+    [Parameter(Mandatory)][string]$RecordedAt
+  )
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  if (-not(Test-MIR4BootstrapRecordHash -Record $Resolution) -or
+      $Resolution.kind -cne 'MIR4F210EngineResolutionV2' -or
+      $Resolution.status -cne 'selected-pre-freeze-experimental-exact-execution-lock' -or
+      @($Resolution.boundaries.PSObject.Properties|Where-Object {[bool]$_.Value}).Count -ne 0) {
+    throw '[mir4-f210-current-cap-capture-resolution]'
+  }
+  $channelPath=Join-Path $repo $script:MIR4F210CurrentEngineChannelReviewRelativePath
+  $channelJson=Get-Content -LiteralPath $channelPath -Raw
+  if (-not($channelJson|Test-Json -SchemaFile (Join-Path $repo $script:MIR4F210CurrentEngineChannelReviewSchemaRelativePath))) {
+    throw '[mir4-f210-current-cap-capture-review-schema]'
+  }
+  $channel=$channelJson|ConvertFrom-Json -Depth 100 -DateKind String
+  $review=$channel.current_review
+  $tasks=@($review.review_tasks|ForEach-Object {[string]$_.id}|Sort-Object)
+  if (($tasks -join '|') -cne ((@($channel.change_review.required_tasks|Sort-Object)) -join '|') -or
+      @($review.review_tasks|Where-Object {$_.status -cne 'complete'}).Count -ne 0) {
+    throw '[mir4-f210-current-cap-capture-review-incomplete]'
+  }
+  $policy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
+  $succession=Get-MIR4F210CurrentQualificationPolicySuccessionV1 -RepoRoot $repo
+  $binary=(Resolve-Path -LiteralPath $Resolution.engine.path).Path
+  $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $binary))
+  $manifest=(Resolve-Path -LiteralPath $Resolution.steam.app_manifest).Path
+  $manifestText=Get-Content -LiteralPath $manifest -Raw
+  $manifestBinary=Join-Path (Split-Path -Parent $manifest) ('common/'+(Get-MIR4F210AcfValueV1 -Text $manifestText -Name 'installdir')+'/bin/x64/factorio.exe')
+  Assert-MIR4F210EngineFactsV2 -Policy $policy -Version $Resolution.engine.version -Build $Resolution.engine.build -FileVersion $Resolution.engine.file_version `
+    -Distribution $Resolution.engine.distribution -Platform $Resolution.engine.platform -SteamAppId $Resolution.steam.app_id -SteamBranch $Resolution.steam.branch `
+    -SteamBuildId $Resolution.steam.build_id -ResolvedBinaryPath $binary -ManifestBinaryPath $manifestBinary | Out-Null
+  foreach($binding in @(
+    @('review.version',[string]$Resolution.engine.version,[string]$review.version),
+    @('review.file-version',[string]$Resolution.engine.file_version,[string]$review.file_version),
+    @('review.binary',[string]$Resolution.engine.sha256,[string]$review.binary_sha256),
+    @('binary.sha256',(Get-FileHash -LiteralPath $binary).Hash,[string]$review.binary_sha256),
+    @('binary.file-version',[string](Get-Item -LiteralPath $binary).VersionInfo.FileVersion,[string]$review.file_version),
+    @('manifest.sha256',(Get-FileHash -LiteralPath $manifest).Hash,[string]$Resolution.steam.app_manifest_sha256),
+    @('policy.record',[string]$Resolution.policy.record_sha256,[string]$policy.record_sha256),
+    @('policy.sha256',[string]$Resolution.policy.sha256,(Get-FileHash -LiteralPath (Join-Path $repo $script:MIR4F210CurrentPolicyRelativePath)).Hash)
+  )) { Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name $binding[0] -Actual $binding[1] -Expected $binding[2] }
+  $official=[ordered]@{}
+  foreach($kind in @('runtime_api','prototype_api')){
+    $relative='doc-html/'+$kind.Replace('_','-')+'.json'
+    $path=Join-Path $root $relative
+    $document=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -Depth 100 -DateKind String
+    $hash=(Get-FileHash -LiteralPath $path).Hash
+    Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($kind+'.version') -Actual ([string]$document.application_version) -Expected ([string]$review.version)
+    Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($kind+'.sha256') -Actual $hash -Expected ([string]$review.$kind.sha256)
+    $official[$kind]=[ordered]@{path=$relative;application_version=[string]$document.application_version;sha256=$hash}
+  }
+  $changelogHash=(Get-FileHash -LiteralPath (Join-Path $root 'data/changelog.txt')).Hash
+  Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name 'changelog.sha256' -Actual $changelogHash -Expected ([string]$review.changelog_sha256)
+  $official.changelog=[ordered]@{path='data/changelog.txt';sha256=$changelogHash}
+  $official.mods=[ordered]@{}
+  foreach($name in @('base','elevated-rails','quality','recycler','space-age')){
+    $relative='data/'+$name+'/info.json';$path=Join-Path $root $relative
+    $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -Depth 30 -DateKind String
+    Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($name+'.name') -Actual ([string]$info.name) -Expected $name
+    Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($name+'.version') -Actual ([string]$info.version) -Expected ([string]$review.version)
+    $official.mods[$name.Replace('-','_')]=[ordered]@{name=$name;version=[string]$info.version;info_path=$relative;raw_sha256=(Get-FileHash -LiteralPath $path).Hash;canonical_sha256=(Get-MIR4F210CanonicalJsonSha256V1 -Path $path)}
+  }
+  $record=[pscustomobject][ordered]@{
+    schema=3;kind='MIR4F210CurrentEngineCapHarnessAdmissionV3';recorded_at=$RecordedAt
+    predecessor=[ordered]@{
+      policy_v2=[ordered]@{path=$script:MIR4F210CurrentPolicyRelativePath;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $script:MIR4F210CurrentPolicyRelativePath)).Hash;record_sha256=$policy.record_sha256}
+      policy_succession_v1=[ordered]@{path=$script:MIR4F210CurrentPolicySuccessionRelativePath;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $script:MIR4F210CurrentPolicySuccessionRelativePath)).Hash;record_sha256=$succession.record_sha256}
+    }
+    engine_channel_review=[ordered]@{path=$script:MIR4F210CurrentEngineChannelReviewRelativePath;sha256=(Get-FileHash -LiteralPath $channelPath).Hash;kind=$channel.kind;review_status=$review.status}
+    admission=[ordered]@{target='F210';scope='exact-current-engine-cap-harness-execution-only';admitted=$true;harnesses=@('runtime.maximum-level-cap-ownership-multiforce-f210','runtime.maximum-level-v2-v3-migration-f210');package_visible=$false}
+    engine=[ordered]@{version=$Resolution.engine.version;build=$Resolution.engine.build;file_version=$Resolution.engine.file_version;platform=$Resolution.engine.platform;distribution=$Resolution.engine.distribution;binary=[ordered]@{path='bin/x64/factorio.exe';sha256=$Resolution.engine.sha256}}
+    steam=[ordered]@{app_id=$Resolution.steam.app_id;branch=$Resolution.steam.branch;build_id=$Resolution.steam.build_id;state_flags=$Resolution.steam.state_flags;app_manifest=[ordered]@{path=[IO.Path]::GetFileName($manifest);sha256=$Resolution.steam.app_manifest_sha256}}
+    official_data=$official
+    qualification=[ordered]@{current_engine_api_prototype_data_mod_capsule_admitted=$true;current_engine_cap_harness_execution_admitted=$true;current_engine_qualification_passed=$false;stable_transition_recorded=$false;stable_qualification_passed=$false}
+    boundaries=[ordered]@{prototype_mutation_authorized=$false;source_freeze_authorized=$false;candidate_allocation_authorized=$false;signing_authorized=$false;promotion_to_main_authorized=$false;publication_authorized=$false}
+    status='active-current-experimental-exact-engine-cap-harness-admitted-qualification-pending';record_sha256=''
+  }
+  $record.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $record
+  if (-not(($record|ConvertTo-Json -Depth 100)|Test-Json -SchemaFile (Join-Path $repo $script:MIR4F210CurrentEngineCapHarnessAdmissionSchemaRelativePath))) {
+    throw '[mir4-f210-current-cap-capture-exact-schema]'
+  }
+  return $record
+}
+
 function Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
