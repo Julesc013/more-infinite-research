@@ -35,12 +35,15 @@ foreach($relative in @('scripts/Measure-MIRPerformanceRegression.ps1','tools/lib
   Assert-Observation ($errors.Count-eq0) ('PowerShell parse failure: '+$relative)
 }
 $refusal=''
-$metadata=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text-ceq'$info'},$true))
-Assert-Observation ($metadata.Count-eq1) 'One fixture metadata construction must be tested.'
+$fixtureRoot=Join-Path $RepoRoot ('build/tmp/research-all-fixture-'+[guid]::NewGuid().ToString('N'))
 foreach($target in @('f200','f210')){
   $profile=Get-Content -LiteralPath (Join-Path $RepoRoot ('fixtures/run-profiles/research-all-'+$target+'.json')) -Raw|ConvertFrom-Json
-  . ([scriptblock]::Create($metadata[0].Extent.Text))
+  $fixture=New-MIRResearchAllFixtureSource -Root (Join-Path $fixtureRoot $target) -Profile $profile -ControlPath (Join-Path $RepoRoot 'fixtures/performance-regression-probe/research-all.lua')
+  $info=Get-Content -LiteralPath (Join-Path $fixture 'info.json') -Raw|ConvertFrom-Json
   Assert-Observation ($info.dependencies.Count-eq2-and$info.dependencies[0]-ceq('base = '+$profile.engine_version)-and$info.dependencies[1]-ceq'more-infinite-research') ('Independent fixture dependencies: '+$target)
+  $members=(Get-ChildItem -LiteralPath $fixture -File|Sort-Object Name|ForEach-Object Name)-join','
+  Assert-Observation ($members-ceq'control.lua,data.lua,info.json') ('Fixture has runtime and versioned data-stage load entries: '+$target)
+  Assert-Observation ((Get-FileHash -LiteralPath (Join-Path $fixture 'control.lua')).Hash-ceq(Get-FileHash -LiteralPath (Join-Path $RepoRoot 'fixtures/performance-regression-probe/research-all.lua')).Hash) ('Prepared fixture runs the canonical observation: '+$target)
 }
 try{& (Join-Path $RepoRoot 'scripts/Measure-MIRPerformanceRegression.ps1') -RepoRoot $RepoRoot -ExpectedSourceCommit ('1'*40) -ObserveResearchAll}catch{$refusal=$_.Exception.Message}
 Assert-Observation ($refusal.StartsWith('[mir-research-all-direct-inputs]')) 'Direct observation must reject missing bindings before output or native work.'

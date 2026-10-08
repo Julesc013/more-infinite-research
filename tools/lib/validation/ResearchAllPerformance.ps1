@@ -14,6 +14,18 @@ function Read-MIRResearchAllObservation {
   return $rows
 }
 
+function New-MIRResearchAllFixtureSource {
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)]$Profile,[Parameter(Mandatory)][string]$ControlPath)
+  $fixture=Join-Path $Root 'fixture-source';[IO.Directory]::CreateDirectory($fixture)|Out-Null
+  $info=[ordered]@{name=$Profile.fixture.name;version=$Profile.fixture.version;title='MIR research-all observation';author='MIR tests';factorio_version=$Profile.factorio_line;dependencies=@(('base = '+$Profile.engine_version),'more-infinite-research')}
+  [IO.File]::WriteAllText((Join-Path $fixture 'info.json'),(($info|ConvertTo-Json -Depth 4).Replace("`r`n","`n")+"`n"),[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllBytes((Join-Path $fixture 'control.lua'),[IO.File]::ReadAllBytes($ControlPath))
+  # A data-stage entry makes Factorio log this fixture's exact loaded version.
+  # It changes no prototypes; the ordinary shared selection verifier stays strict.
+  [IO.File]::WriteAllText((Join-Path $fixture 'data.lua'),"-- MIR runtime observation; no data-stage mutations.`n",[Text.UTF8Encoding]::new($false))
+  return $fixture
+}
+
 function Invoke-MIRResearchAllPerformance {
   param([string]$RepoRoot,[ValidateSet('f200','f210')][string]$Target,[string]$Candidate,[string]$PriorRelease,[string]$FactorioBin,[string]$ExpectedSourceCommit,[string]$LibraryDirectory,[string]$SourceMaterializationPath,[string]$OutputRoot,[switch]$PrepareInputsOnly,[int]$ExpectedPeakMemoryMiB=1024,[int]$MaxNewOutputMiB=120)
   $ErrorActionPreference='Stop'
@@ -32,10 +44,7 @@ function Invoke-MIRResearchAllPerformance {
   $profilePath=Join-Path $repo ('fixtures/run-profiles/research-all-'+$Target+'.json')
   $profile=Get-Content -LiteralPath $profilePath -Raw|ConvertFrom-Json
   if($profile.target-cne$Target-or$profile.settings-cne'defaults'-or($profile.official_mods-join',')-cne'base'){throw '[mir-research-all-profile]'}
-  $fixture=Join-Path $resources.root 'fixture-source';[IO.Directory]::CreateDirectory($fixture)|Out-Null
-  $info=[ordered]@{name=$profile.fixture.name;version=$profile.fixture.version;title='MIR research-all observation';author='MIR tests';factorio_version=$profile.factorio_line;dependencies=@(('base = '+$profile.engine_version),'more-infinite-research')}
-  [IO.File]::WriteAllText((Join-Path $fixture 'info.json'),(($info|ConvertTo-Json -Depth 4).Replace("`r`n","`n")+"`n"),[Text.UTF8Encoding]::new($false))
-  [IO.File]::WriteAllBytes((Join-Path $fixture 'control.lua'),[IO.File]::ReadAllBytes((Join-Path $repo 'fixtures/performance-regression-probe/research-all.lua')))
+  $fixture=New-MIRResearchAllFixtureSource -Root $resources.root -Profile $profile -ControlPath (Join-Path $repo 'fixtures/performance-regression-probe/research-all.lua')
   if($PrepareInputsOnly){
     $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name $profile.fixture.name -Version $profile.fixture.version -ModsDir $resources.root
     Write-MIRNativeProbeResult -Context $resources -Record @{status='prepared-not-native-tested';target=$Target;source_commit=$source;fixture=@{path=$archive;sha256=(Get-FileHash -LiteralPath $archive).Hash};factorio_processes=0}
