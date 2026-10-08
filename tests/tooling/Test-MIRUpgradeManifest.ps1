@@ -11,6 +11,9 @@ if($functions.Count -ne 1){throw 'Manifest resolver missing or ambiguous'}
 $historicalFunctions=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Resolve-MIRHistoricalUpgradeTransition'},$true))
 if($historicalFunctions.Count -ne 1){throw 'Historical transition resolver missing or ambiguous'}
 . ([scriptblock]::Create($historicalFunctions[0].Extent.Text))
+$currentFunctions=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Assert-MIR421CurrentUpgradeInputMode'},$true))
+if($currentFunctions.Count -ne 1){throw 'Current-package input mode validator missing or ambiguous'}
+. ([scriptblock]::Create($currentFunctions[0].Extent.Text))
 $testRoot=Join-Path $RepoRoot ('build/handoff/mir421-upgrade-manifest/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $testRoot|Out-Null
 $manifestPath=$SelectedManifestPath
@@ -153,4 +156,39 @@ $overrideText=Get-Content -LiteralPath (Join-Path $override 'settings-updates.lu
 if($overrideInfo.version-cne'0.1.210'-or$overrideInfo.factorio_version-cne'2.1'-or$overrideText-notmatch 'override\("ips-max-level-research_material_imersite", 0\)' -or ([regex]::Matches($overrideText,'(?m)^override\(')).Count-ne1){throw 'Explicit zero-cap override identity or selected settings differ'}
 $k2Assertions+=2
 # These controlled inputs prove readers and rejection paths, never native saves.
-[pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+. (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
+$currentAssertions=0
+foreach($target in @('f210','f200')){
+  $code=$target.Substring(1)
+  $mode=@{Target=$target;FromVersion="4.2.${code}00";ToVersion="4.2.${code}01";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile=''}
+  Assert-MIR421CurrentUpgradeInputMode @mode;$currentAssertions++
+  $sif=$mode.Clone();$sif.SpaceIsFake=$true;$sif.Archetype=if($target-ceq'f210'){'base-continuations'}else{'base-default'}
+  Assert-MIR421CurrentUpgradeInputMode @sif;$currentAssertions++
+  foreach($case in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SourceOnlyFixtureNames','SelectedReleaseManifest','PublishedPredecessorManifest','Retention','K2ImersiteInputProfile')){
+    $mutated=$mode.Clone()
+    $mutated[$case]=switch($case){
+      'Target' {'f110'}
+      'FromVersion' {"4.1.${code}00"}
+      'ToVersion' {"4.2.${code}02"}
+      'SourceOnlyFixtureNames' {@('unrequested')}
+      'SelectedReleaseManifest' {'candidate.json'}
+      'PublishedPredecessorManifest' {''}
+      'Retention' {'Never'}
+      default {'wrong'}
+    }
+    $rejected=$false
+    try{Assert-MIR421CurrentUpgradeInputMode @mutated}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-')}
+    if(-not$rejected){throw "Current-package invalid mode accepted: $target $case"};$currentAssertions++
+  }
+  $mutated=$sif.Clone();$mutated.Archetype='space-age-native-owner'
+  $rejected=$false
+  try{Assert-MIR421CurrentUpgradeInputMode @mutated}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-sif-transition]')}
+  if(-not$rejected){throw "Current-package SIF archetype accepted: $target"};$currentAssertions++
+}
+$currentK2=@{Target='f210';FromVersion='4.2.21000';ToVersion='4.2.21001';FixtureName='assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001';Archetype='';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile=$profilePath}
+Assert-MIR421CurrentUpgradeInputMode @currentK2;$currentAssertions++
+$currentK2.K2ImersiteInputProfile=''
+$rejected=$false
+try{Assert-MIR421CurrentUpgradeInputMode @currentK2}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-inputs-required]')}
+if(-not$rejected){throw 'Current-package K2 mode accepted without its locked profile'};$currentAssertions++
+[pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

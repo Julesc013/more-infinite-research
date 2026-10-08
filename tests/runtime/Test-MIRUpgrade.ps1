@@ -75,6 +75,29 @@ function Resolve-MIRUpgradeManifestVersion {
   return [string]$identity.distribution_version
 }
 
+function Assert-MIR421CurrentUpgradeInputMode {
+  param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,
+    [string]$Archetype,[bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),
+    [string]$SelectedReleaseManifest,[string]$PublishedPredecessorManifest,[string]$Retention,
+    [string]$K2ImersiteInputProfile='')
+  if ($Target -cnotin @('f210','f200') -or $SelectedReleaseManifest -or
+      -not $PublishedPredecessorManifest -or $Retention -cne 'Always') {
+    throw '[mir421-current-upgrade-input-mode]'
+  }
+  $code=$Target.Substring(1)
+  if ($FromVersion -cne "4.2.${code}00" -or $ToVersion -cne "4.2.${code}01" -or $SourceOnlyFixtureNames.Count) {
+    throw '[mir421-current-upgrade-transition]'
+  }
+  if ($K2ImersiteInputProfile -or $FixtureName -ceq 'assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001') {
+    if (-not $K2ImersiteInputProfile) { throw '[mir421-k2-upgrade-inputs-required]' }
+    Assert-MIR421K2UpgradeTransition -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake $SpaceIsFake -SourceOnlyFixtureNames $SourceOnlyFixtureNames
+  } elseif ($SpaceIsFake) {
+    $null=Get-MIR421SpaceFakeUpgradeDescriptor -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype
+  } elseif ($FixtureName -cne "assert-upgrade-4-0-${code}00-to-4-1-${code}00" -or $Archetype -cnotin @('','base-default')) {
+    throw '[mir421-current-upgrade-scenario]'
+  }
+}
+
 function Resolve-MIRHistoricalUpgradeTransition {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -293,7 +316,10 @@ if($k2Scenario -or $K2ImersiteInputProfile){
   Assert-MIR421K2UpgradeTransition -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -SourceOnlyFixtureNames $SourceOnlyFixtureNames
   if(-not$K2ImersiteInputProfile-or(-not$SelectedReleaseManifest-and-not$SourceMaterializationPath)-or-not$PublishedMaintenancePredecessorManifestPath-or$Retention-cne'Always'){throw '[mir421-k2-upgrade-inputs-required]'}
 }
-if(($SourceMaterializationPath-and(-not$k2Scenario-or$SelectedReleaseManifest))-or($PSBoundParameters.ContainsKey('K2ImersiteCap')-and-not$k2Scenario)){throw '[mir421-k2-upgrade-input-mode]'}
+if($PSBoundParameters.ContainsKey('K2ImersiteCap')-and-not$k2Scenario){throw '[mir421-k2-upgrade-input-mode]'}
+if($SourceMaterializationPath){
+  Assert-MIR421CurrentUpgradeInputMode -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SelectedReleaseManifest $SelectedReleaseManifest -PublishedPredecessorManifest $PublishedMaintenancePredecessorManifestPath -Retention $Retention -K2ImersiteInputProfile $K2ImersiteInputProfile
+}
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $engineData=Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorio))) 'data'
 $from = Resolve-MIRUpgradePath -Path $FromZip
@@ -314,24 +340,29 @@ if($SourceMaterializationPath){
 } elseif ($SelectedTarget -and -not $SpaceIsFake) { throw '[mir-upgrade-manifest-required] SelectedTarget requires its release manifest.' }
 $sifDescriptor=$null
 $sifInputs=@()
-$sifPublishedInputs=$null
+$publishedInputs=$null
+if ($SpaceIsFake -or $k2Scenario -or $currentMaterialization) {
+  . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+  $metadataText=(& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+  if ($LASTEXITCODE -ne 0) { throw '[mir421-upgrade-release-metadata]' }
+  $publishedInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+  $predecessor=@($publishedInputs.targets | Where-Object target -CEQ $SelectedTarget)
+  if ($predecessor.Count -ne 1 -or [string]$predecessor[0].path -cne $from -or
+      (Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash -cne $predecessor[0].sha256) { throw '[mir421-upgrade-published-predecessor]' }
+}
 if ($SpaceIsFake) {
-  if (-not $SelectedReleaseManifest -or -not $PublishedMaintenancePredecessorManifestPath) { throw '[mir421-sif-manifests-required]' }
+  if ((-not $SelectedReleaseManifest -and -not $currentMaterialization) -or -not $PublishedMaintenancePredecessorManifestPath) { throw '[mir421-sif-manifests-required]' }
   if (-not $OutputPath -or (Test-Path -LiteralPath $OutputPath) -or $Retention -cne 'Always') { throw '[mir421-sif-fresh-retained-output-required]' }
   $null=Resolve-MIR441RecoveryScratchPath -Path $(if([IO.Path]::IsPathRooted($OutputPath)){$OutputPath}else{Join-Path $RepoRoot $OutputPath})
   $sifDescriptor=Get-MIR421SpaceFakeUpgradeDescriptor -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype
   $engineBaseInfo=Get-Content -LiteralPath (Join-Path $engineData 'base/info.json') -Raw|ConvertFrom-Json
   if(([version]$engineBaseInfo.version).ToString(2)-cne$sifDescriptor.line){throw '[mir421-sif-engine-authority] Configured engine does not match the selected target.'}
-  . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
-  $sifCandidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $SelectedReleaseManifest
-  $null=Get-MIR42TechnicalSealInputContract -Candidate $sifCandidate -PublishedMaintenance
-  $sifTarget=@($sifCandidate.targets | Where-Object target -CEQ $SelectedTarget)
-  if ($sifTarget.Count -ne 1 -or [string]$sifTarget[0].distribution_version -cne $ToVersion -or [IO.Path]::GetFullPath([string]$sifTarget[0].archive_path) -cne [IO.Path]::GetFullPath($to)) { throw '[mir421-sif-candidate-path]' }
-  $sifMetadataText=(& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
-  if ($LASTEXITCODE -ne 0) { throw '[mir421-sif-release-metadata]' }
-  $sifPublishedInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($sifMetadataText | ConvertFrom-Json -Depth 100 -DateKind String)
-  $sifPredecessor=@($sifPublishedInputs.targets | Where-Object target -CEQ $SelectedTarget)
-  if ($sifPredecessor.Count -ne 1 -or [string]$sifPredecessor[0].path -cne $from -or (Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash -cne $sifPredecessor[0].sha256) { throw '[mir421-sif-published-predecessor]' }
+  if (-not $currentMaterialization) {
+    $sifCandidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $SelectedReleaseManifest
+    $null=Get-MIR42TechnicalSealInputContract -Candidate $sifCandidate -PublishedMaintenance
+    $sifTarget=@($sifCandidate.targets | Where-Object target -CEQ $SelectedTarget)
+    if ($sifTarget.Count -ne 1 -or [string]$sifTarget[0].distribution_version -cne $ToVersion -or [IO.Path]::GetFullPath([string]$sifTarget[0].archive_path) -cne [IO.Path]::GetFullPath($to)) { throw '[mir421-sif-candidate-path]' }
+  }
   if (-not $PrepareInputsOnly) { $sifInputs=Resolve-MIR421SpaceFakeUpgradeInputs -RepoRoot $RepoRoot -Descriptor $sifDescriptor -LocalModLibraryDirs $LocalModLibraryDirs }
 }
 $k2Inputs=$null
@@ -339,12 +370,6 @@ if($k2Scenario){
   $k2Inputs=Read-MIR421K2UpgradeProfile -Path (Resolve-MIRUpgradePath $K2ImersiteInputProfile)
   if((Get-FileHash -LiteralPath $factorio).Hash-cne$k2Inputs.profile.engine_sha256-or
      (Get-FileHash -LiteralPath (Join-Path (Split-Path -Parent $engineData) 'doc-html/runtime-api.json')).Hash-cne$k2Inputs.profile.runtime_api_sha256){throw '[mir421-k2-upgrade-engine-identity]'}
-  . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
-  $metadataText=(& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable'|Out-String)
-  if($LASTEXITCODE-ne0){throw '[mir421-k2-upgrade-release-metadata]'}
-  $k2Published=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText|ConvertFrom-Json -Depth 100 -DateKind String)
-  $predecessor=@($k2Published.targets|Where-Object target -CEQ 'f210')
-  if($predecessor.Count-ne1-or$predecessor[0].path-cne$from-or(Get-FileHash -LiteralPath $from).Hash-cne$predecessor[0].sha256){throw '[mir421-k2-upgrade-published-predecessor]'}
   $sifInputs=@($k2Inputs.inputs)
   if(-not$PrepareInputsOnly){
     $hashes=[ordered]@{};foreach($row in $sifInputs){$hashes[$row.file_name]=$row.expected_sha256}
@@ -386,7 +411,7 @@ $userdata = Join-Path $root "userdata"
 $saves = Join-Path $userdata "saves"
 New-Item -ItemType Directory -Force -Path $fixtureSources, $userdata, $saves | Out-Null
 $upgradeRequest=if($SpaceIsFake){'SIF-01'}else{'native-upgrade'}
-$sourceHash=if($SpaceIsFake){$sifPredecessor[0].sha256}else{(Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash}
+$sourceHash=if($publishedInputs){$predecessor[0].sha256}else{(Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash}
 $script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=$upgradeWriteBytes;result_reserve_bytes=64KB}
 $config = Join-Path $root "config.ini"
 @(
@@ -585,7 +610,7 @@ $sourceSettings=Read-MIRLibraryControl -Path (Join-Path $mods 'mod-settings.dat'
 $sourceSettingsPath=Join-Path $root 'source-mod-settings.dat'
 if($sourceSettings.exists){[IO.File]::WriteAllBytes($sourceSettingsPath,[Convert]::FromBase64String($sourceSettings.bytes))}
 $sifSourceTerminal=Complete-MIRLibraryActivation -Activation $script:upgradeActivation
-$candidateHash=if($SpaceIsFake){$sifTarget[0].archive_sha256}else{(Get-FileHash -LiteralPath $to -Algorithm SHA256).Hash}
+$candidateHash=if($currentMaterialization){$currentMaterialization.receipt.archive_sha256}elseif($SpaceIsFake){$sifTarget[0].archive_sha256}else{(Get-FileHash -LiteralPath $to -Algorithm SHA256).Hash}
 $candidateSelection=Get-MIRUpgradeLibrarySelection -Library $mods -EngineDataDirectory $engineData -Archive $to -Version $ToVersion -ExpectedSha256 $candidateHash -Dependencies $sifInputs -FixtureDirectories $persistentFixtureDirectories -EnableDlc $enableDlc
 $candidateProfile=Join-Path $root 'candidate-selection.json';$candidateSelection.mod_list|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $candidateProfile -Encoding utf8
 $settingsArgs=if($sourceSettings.exists){@{SettingsMode='File';SettingsPath=$sourceSettingsPath;SettingsSha256=$sourceSettings.sha256}}else{@{SettingsMode='Defaults'}}
@@ -837,13 +862,11 @@ if ($secondReloadEvidence) {
 }
 if ($SpaceIsFake) {
   $result.native_scenario='SIF-01-published-4.2.0-to-4.2.1'
-  $result.published_maintenance_predecessor=$sifPublishedInputs
   $result.dependency_inputs=$sifTerminal.selected
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Algorithm SHA256).Hash
 }
 if($k2Scenario){
   $result.native_scenario='K2-421-published-4.2.0-to-4.2.1'
-  $result.published_maintenance_predecessor=$k2Published
   $result.input_profile_sha256=$k2Inputs.sha256
   $result.dependency_inputs=$sifTerminal.selected
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $fixture 'control.lua')).Hash
@@ -852,7 +875,12 @@ if($k2Scenario){
   $result.harness_worktree_dirty=[bool](@(& git -C $RepoRoot status --porcelain).Count)
   $result.imersite_cap=$K2ImersiteCap
   $result.cap_input=if($K2ImersiteCap-eq3){'published-default-no-override'}else{'explicit-shared-settings-override-fixture'}
-  if($currentMaterialization){$result.candidate_materialization=[ordered]@{path=$SourceMaterializationPath;sha256=(Get-FileHash -LiteralPath (Resolve-MIRUpgradePath $SourceMaterializationPath)).Hash;record_sha256=$currentMaterialization.receipt.record_sha256;package_source_sha256=$currentMaterialization.receipt.package_source_sha256}}
+}
+if($publishedInputs){$result.published_maintenance_predecessor=$publishedInputs}
+if($currentMaterialization){
+  $result.candidate_materialization=[ordered]@{path=$SourceMaterializationPath;sha256=(Get-FileHash -LiteralPath (Resolve-MIRUpgradePath $SourceMaterializationPath)).Hash;record_sha256=$currentMaterialization.receipt.record_sha256;package_source_sha256=$currentMaterialization.receipt.package_source_sha256}
+  $result.harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath).Hash
+  $result.harness_worktree_dirty=[bool](@(& git -C $RepoRoot status --porcelain).Count)
 }
 $result.library_activation=$sifTerminal
 $result.source_library_activation=$sifSourceTerminal
