@@ -1825,6 +1825,25 @@ fixtures:
       - broader-withheld-route-admission
       - release-readiness
 
+  community-power-manufacturing-f200:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-community-power-manufacturing
+    harness: tests/runtime/Test-MIRCommunityPowerManufacturing.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: fixtures/run-profiles/community-power-f200.json
+    validates:
+      - paired-SolarMatrix-Accumulator-V2-final-unlock-and-single-research-owner
+      - first-level-five-percent-native-recipe-bonus
+      - twenty-unmodified-crafts-produce-twenty-one-versus-twenty-without-research
+      - earned-bonus-and-production-state-survive-save-reload
+      - direct-library-exact-inputs-and-control-restoration
+    non_claims:
+      - F210-SE-AAI-Paracelsin-or-enabled-DLC
+      - general-progression-or-published-predecessor-upgrade
+      - release-readiness
+
   community-manufacturing-intake:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-community-manufacturing-intake
