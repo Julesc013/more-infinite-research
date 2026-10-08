@@ -12,8 +12,19 @@ function Assert-MIRLibraryPath {
 }
 
 function Assert-MIRLibraryIdle {
+  param([ValidateRange(0,5000)][int]$WaitMilliseconds=0)
   # Conservatively refuse even a personal client whose command line is unknown.
-  if(@(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count){throw '[mir-library-factorio-active] Wait for the existing client to exit.'}
+  # A stopped process tree can remain enumerable briefly after its root exits.
+  # Restoration may wait under the library lock; this never terminates a client.
+  $timer=[Diagnostics.Stopwatch]::StartNew()
+  do {
+    $observed=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
+    $busy=$observed.Count -gt 0
+    foreach($process in $observed){if($process -is [IDisposable]){$process.Dispose()}}
+    if(-not $busy){return}
+    if($timer.ElapsedMilliseconds-ge$WaitMilliseconds){throw '[mir-library-factorio-active] Wait for the existing client to exit.'}
+    Start-Sleep -Milliseconds ([int][Math]::Max(1,[Math]::Min(100,($WaitMilliseconds-$timer.ElapsedMilliseconds))))
+  } while($true)
 }
 
 function Test-MIRLibraryModName {
@@ -331,7 +342,7 @@ function Complete-MIRLibraryActivation {
   param([Parameter(Mandatory)]$Activation)
   if($Activation.closed){throw '[mir-library-activation-closed]'}
   # Keep the lock and archive handles if an engine still uses this selection.
-  Assert-MIRLibraryIdle
+  Assert-MIRLibraryIdle -WaitMilliseconds 3000
   try{
     Restore-MIRLibraryControls -LibraryDirectory $Activation.library -Journal $Activation.journal
     [IO.File]::Delete((Join-Path $Activation.library '.mir-active-profile.json'))

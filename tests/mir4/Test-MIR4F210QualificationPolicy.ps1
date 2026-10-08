@@ -6,6 +6,35 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) { $RepoRoot = (Resolve-Path (Join-P
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
 
+# Exercise Git's real checkout filters without another checkout or engine.
+# These records carry raw-byte bindings, so JSON equivalence is insufficient.
+function Get-MIRF210CheckoutHash([string]$RelativePath,[string]$AutoCrlf) {
+  $start=[Diagnostics.ProcessStartInfo]::new()
+  $start.FileName=(Get-Command git -CommandType Application|Select-Object -First 1).Source
+  $start.UseShellExecute=$false;$start.CreateNoWindow=$true
+  $start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+  foreach($argument in @('-C',$repo,'-c',('core.autocrlf='+$AutoCrlf),'cat-file','--filters',('--path='+$RelativePath),('HEAD:'+$RelativePath))){$start.ArgumentList.Add($argument)}
+  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+  try {
+    if(-not $process.Start()){throw '[mir4-f210-checkout-filter-start]'}
+    $errorRead=$process.StandardError.ReadToEndAsync()
+    $hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($process.StandardOutput.BaseStream))
+    $process.WaitForExit();$null=$errorRead.GetAwaiter().GetResult()
+    if($process.ExitCode-ne0){throw "[mir4-f210-checkout-filter] $RelativePath"}
+    return $hash
+  } finally {$process.Dispose()}
+}
+foreach($relative in @(
+  '.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json',
+  '.mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json',
+  '.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json',
+  'spec/engines/mir4-factorio-2.1-experimental-channel-v1.json'
+)) {
+  if((Get-MIRF210CheckoutHash $relative 'true') -cne (Get-MIRF210CheckoutHash $relative 'false')) {
+    throw "[mir4-f210-checkout-bytes-depend-on-autocrlf] $relative"
+  }
+}
+
 $historical = Test-MIR4F210HistoricalPolicyV1 -RepoRoot $repo
 if ([string]$historical.kind -cne 'MIR4F210ReleaseQualificationPolicyV1' -or
     [string]$historical.support_floor -cne '2.1.8' -or
@@ -26,6 +55,23 @@ if (-not $historicalWriteRejected) { throw '[mir4-f210-historical-policy-write-f
 $policy = Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
 $receipt = Get-MIR4F210CurrentQualificationPolicySuccessionV1 -RepoRoot $repo
 $admission = Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo
+$admissionPath = Join-Path $repo '.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json'
+$admissionHash = (Get-FileHash -LiteralPath $admissionPath).Hash
+$refreshRejected = $false
+try {
+  & (Join-Path $repo 'tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1') -RepoRoot $repo -RefreshCapAdmission `
+    -RecordedAt '2026-10-08T00:00:00Z' -EngineResolutionPath 'missing-resolution.json' -ExpectedPreviousAdmissionSha256 ('0' * 64) | Out-Null
+} catch { $refreshRejected = $_.Exception.Message -match 'current-cap-refresh-inputs' }
+if (-not $refreshRejected -or (Get-FileHash -LiteralPath $admissionPath).Hash -cne $admissionHash) {
+  throw '[mir4-f210-current-cap-refresh-predecessor-fail-closed]'
+}
+$untrustedResolution = [pscustomobject]@{kind='MIR4F210EngineResolutionV2';record_sha256=('0' * 64)}
+$captureRejected = $false
+try { New-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -Resolution $untrustedResolution -RecordedAt '2026-10-08T00:00:00Z' | Out-Null }
+catch { $captureRejected = $_.Exception.Message -match 'current-cap-capture-resolution' }
+if (-not $captureRejected -or (Get-FileHash -LiteralPath $admissionPath).Hash -cne $admissionHash) {
+  throw '[mir4-f210-current-cap-refresh-untrusted-resolution-fail-closed]'
+}
 if ((Get-FileHash -LiteralPath (Join-Path $repo '.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json') -Algorithm SHA256).Hash.ToUpperInvariant() -cne 'EA6339603DE411827193344C57F48A636D5E64BC7959C77207EC59D54DED5FF8' -or
     (Get-FileHash -LiteralPath (Join-Path $repo '.mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json') -Algorithm SHA256).Hash.ToUpperInvariant() -cne '8A6B206B529FA1D20F2AC63625AE3EF895F7FB6F0D03032BA77C0E6839C645F8') {
   throw '[mir4-f210-current-policy-v2-immutability]'
@@ -114,8 +160,8 @@ foreach ($contract in $progressionHarnessContracts) {
   $fixturePattern = '(?ms)^  ' + [regex]::Escape([string]$contract.id) + ':\r?\n(?<body>.*?)(?=^  [^\s].*:\r?$|\z)'
   $fixtureMatch = [regex]::Match($fixtureAuthorityText,$fixturePattern)
   if (-not $fixtureMatch.Success -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_version:\s*"2[.]1[.]20"' -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_file_version:\s*"2[.]1[.]20[.]87512"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_version:\s*"2[.]1[.]21"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_file_version:\s*"2[.]1[.]21[.]87673"' -or
       $fixtureMatch.Groups['body'].Value -notmatch 'engine_selection_authority:\s*[.]mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3[.]json' -or
       $fixtureMatch.Groups['body'].Value -notmatch 'engine_admission:\s*admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only' -or
       $fixtureMatch.Groups['body'].Value -match 'factorio_version:\s*"2[.]1[.]17"|exact-engine-2[.]1[.]17') {
@@ -157,9 +203,9 @@ if ([string]$admission.kind -cne 'MIR4F210CurrentEngineCapHarnessAdmissionV3' -o
     [bool]$admission.qualification.stable_transition_recorded -or
     [bool]$admission.qualification.stable_qualification_passed -or
     @($admission.boundaries.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0 -or
-    [string]$admission.engine.version -cne '2.1.20' -or [int]$admission.engine.build -ne 87512 -or
-    [string]$admission.engine.binary.sha256 -cne 'E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92' -or
-    [string]$admission.steam.build_id -cne '25458442' -or [string]$admission.steam.app_manifest.sha256 -cne '49EB6468E975B7226242DC52300F7EE882D396EA197BA4944DFA5EF321561FD5') {
+    [string]$admission.engine.version -cne '2.1.21' -or [int]$admission.engine.build -ne 87673 -or
+    [string]$admission.engine.binary.sha256 -cne '703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1' -or
+    [string]$admission.steam.build_id -cne '25749703' -or [string]$admission.steam.app_manifest.sha256 -cne '5506DCA9263EBEC6FE12EDC607F939657B278CFE011D276FFB8F350F6D994519') {
   throw '[mir4-f210-current-cap-harness-admission-contract]'
 }
 
@@ -219,6 +265,17 @@ if ($IsWindows -and (Test-Path -LiteralPath ([string]$policy.pre_freeze.steam.fa
   try { Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -HarnessId 'runtime.not-admitted' | Out-Null } catch { $scopeRejected = $_.Exception.Message -match 'current-cap-harness-admission-scope' }
   if (-not $scopeRejected) { throw '[mir4-f210-current-cap-harness-admission-scope-fail-closed]' }
   $resolved = Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210'
+  $rawResolution = $resolved | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+  $rawResolution.PSObject.Properties.Remove('admission')
+  $captured = New-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -Resolution $rawResolution -RecordedAt ([string]$admission.recorded_at)
+  if ([string]$captured.record_sha256 -cne [string]$admission.record_sha256) { throw '[mir4-f210-current-cap-capture-roundtrip]' }
+  $changedResolution = $rawResolution | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+  $changedResolution.engine.sha256 = '0' * 64
+  $changedResolution.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $changedResolution
+  $changedRejected = $false
+  try { New-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -Resolution $changedResolution -RecordedAt ([string]$admission.recorded_at) | Out-Null }
+  catch { $changedRejected = $_.Exception.Message -match 'current-cap-harness-admission-drift.*review.binary' }
+  if (-not $changedRejected) { throw '[mir4-f210-current-cap-capture-changed-engine-fail-closed]' }
   if ([string]$resolved.engine.sha256 -cne [string]$admission.engine.binary.sha256 -or
       [string]$resolved.admission.record_sha256 -cne [string]$admission.record_sha256 -or
       [bool]$resolved.admission.current_engine_qualification_passed -or
@@ -227,4 +284,4 @@ if ($IsWindows -and (Test-Path -LiteralPath ([string]$policy.pre_freeze.steam.fa
   }
 }
 
-Write-Host '[ok] Historical F210 evidence and current V2 policy remain immutable; the V3 successor admits only the exact 2.1.20.87512 cap harnesses while qualification and release boundaries stay closed.'
+Write-Host '[ok] Historical F210 evidence and current V2 policy remain immutable; the V3 successor admits only the exact 2.1.21.87673 cap harnesses while qualification and release boundaries stay closed.'

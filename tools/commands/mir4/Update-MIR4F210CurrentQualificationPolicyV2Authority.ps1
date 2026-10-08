@@ -2,6 +2,9 @@
 param(
   [string]$RepoRoot = '',
   [string]$RecordedAt = '2026-09-21T00:00:00+10:00',
+  [switch]$RefreshCapAdmission,
+  [string]$EngineResolutionPath = '',
+  [string]$ExpectedPreviousAdmissionSha256 = '',
   [switch]$Check
 )
 
@@ -15,6 +18,24 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/F210QualificationPolicy.ps1')
+
+if ($RefreshCapAdmission) {
+  $path=Join-Path $RepoRoot $script:MIR4F210CurrentEngineCapHarnessAdmissionRelativePath
+  if ($Check) {
+    $record=Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $RepoRoot
+    return [pscustomobject]@{status='current';admission=$script:MIR4F210CurrentEngineCapHarnessAdmissionRelativePath;version=$record.engine.version;record_sha256=$record.record_sha256}
+  }
+  if (-not $PSBoundParameters.ContainsKey('RecordedAt') -or -not $EngineResolutionPath -or
+      $ExpectedPreviousAdmissionSha256 -cnotmatch '^[A-F0-9]{64}$' -or
+      (Get-FileHash -LiteralPath $path).Hash -cne $ExpectedPreviousAdmissionSha256) {
+    throw '[mir4-f210-current-cap-refresh-inputs] Supply the reviewed resolution, explicit recording time and unchanged preceding admission hash.'
+  }
+  $resolution=Get-Content -LiteralPath $EngineResolutionPath -Raw|ConvertFrom-Json -Depth 100 -DateKind String
+  $record=New-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $RepoRoot -Resolution $resolution -RecordedAt $RecordedAt
+  Write-MIR4BootstrapRecord -Record $record -Path $path|Out-Null
+  & $PSCommandPath -RepoRoot $RepoRoot -RefreshCapAdmission -Check|Out-Null
+  return [pscustomobject]@{status='refreshed-current-cap-admission';version=$record.engine.version;record_sha256=$record.record_sha256;qualification_passed=$false}
+}
 
 $policyPath = Join-Path $RepoRoot $script:MIR4F210CurrentPolicyRelativePath
 $receiptPath = Join-Path $RepoRoot $script:MIR4F210CurrentPolicySuccessionRelativePath

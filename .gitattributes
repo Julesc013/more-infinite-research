@@ -52,6 +52,12 @@ docs/releases/archive/MIR-3.5-WAVE-INDEX.json text eol=crlf
 .mir/targets.json text eol=lf
 .mir/releases/waves/mir4-r0/**/*.json text eol=lf
 .mir/releases/governance/mir4/*.json text eol=lf
+# Current F210 policy/admission receipts bind these exact LF bytes. Windows
+# checkout defaults must not rewrite their historical or current raw hashes.
+.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json text eol=lf
+.mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json text eol=lf
+.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json text eol=lf
+spec/engines/mir4-factorio-2.1-experimental-channel-v1.json text eol=lf
 CHANGELOG.md text eol=lf
 spec/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json text eol=lf
 spec/schemas/mir4-terminal-normalized-snapshot.schema.json text eol=lf

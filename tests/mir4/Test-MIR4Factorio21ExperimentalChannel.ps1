@@ -24,7 +24,9 @@ Assert-MIR4F210Channel ([string]$resolved.qualification_factorio_version -eq [st
 Assert-MIR4F210Channel (Test-MIR4Factorio21SelectedVersion -Version '2.1.999' -Authority $authority) 'mir4-f210-channel-future-patch-admitted'
 Assert-MIR4F210Channel (-not (Test-MIR4Factorio21SelectedVersion -Version '2.2.0' -Authority $authority)) 'mir4-f210-channel-other-line-rejected'
 
-$temporaryChangelog = [IO.Path]::GetTempFileName()
+$scratchRoot = Join-Path $RepoRoot 'build/tmp'
+[IO.Directory]::CreateDirectory($scratchRoot) | Out-Null
+$temporaryChangelog = Join-Path $scratchRoot ('f210-channel-' + [guid]::NewGuid().ToString('N') + '.txt')
 try {
   [IO.File]::WriteAllText($temporaryChangelog, @"
 Version: 2.1.18

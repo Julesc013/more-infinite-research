@@ -106,6 +106,36 @@ Assert-MIRDevelopmentCISelection -Condition ($historicalIds -contains 'static.pa
 
 $actualCatalog=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')|ConvertFrom-Json
 $actualAssurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json
+$currentEnginePaths=@(
+  '.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json',
+  'spec/engines/mir4-factorio-2.1-experimental-channel-v1.json',
+  'spec/schemas/mir4-f210-current-engine-cap-harness-admission-v3.schema.json',
+  'tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1',
+  'tools/mir/application/release/F210QualificationPolicy.ps1',
+  'tests/mir4/Test-MIR4F210QualificationPolicy.ps1',
+  'tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1'
+)
+foreach($currentEnginePath in $currentEnginePaths) {
+  $currentEngineClassification=Get-MIRAssuranceClassification -Paths @($currentEnginePath) -Config $actualAssurance
+  Assert-MIRDevelopmentCISelection -Condition (-not $currentEngineClassification.escalated) -Message "Current engine input must not request an unknown native campaign: $currentEnginePath"
+  $currentEngineRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $currentEngineClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+  foreach($required in @('static.mir4-f210-qualification-policy','static.mir4-factorio-2.1-experimental-channel')) {
+    Assert-MIRDevelopmentCISelection -Condition ($required -in @($currentEngineRows.id)) -Message "Current engine input lost its actual static consumer ${required}: $currentEnginePath"
+  }
+  Assert-MIRDevelopmentCISelection -Condition (@($currentEngineRows|Where-Object requires_factorio).Count -eq 0) -Message 'Hosted engine-admission checks must work without installed engines or a candidate archive.'
+  $currentEngineSelection=New-MIRDevelopmentCanonicalCoverageSelection
+  $currentEngineSelection.classification=$currentEngineClassification
+  $currentEngineSelection.tests=@($currentEngineRows.id)
+  $currentEnginePlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $currentEngineSelection
+  if(@($currentEngineClassification.tests|Where-Object {$_ -notin $currentEngineSelection.tests}).Count -gt 0 -or
+     @($currentEngineSelection.tests|Where-Object {$_ -notin $currentEngineClassification.tests}).Count -gt 0) {
+    Assert-MIRDevelopmentCISelection -Condition ($currentEnginePlan.profile -ceq 'mir4-development') -Message 'Mixed native/static or additional catalog selections must retain the complete hosted static plan.'
+  } else {
+    Assert-MIRDevelopmentCISelection -Condition ($currentEnginePlan.profile -ceq 'auto') -Message 'Fully covered engine checks should use the affected static plan.'
+  }
+}
+$unknownEngineClassification=Get-MIRAssuranceClassification -Paths @('spec/engines/unreviewed-engine.json') -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition ($unknownEngineClassification.escalated -and 'runtime.full' -in @($unknownEngineClassification.tests)) -Message 'Exact engine-admission mapping must retain conservative escalation for unreviewed engine authorities.'
 $performancePaths=@('tools/lib/validation/ResearchAllPerformance.ps1','fixtures/performance-regression-probe/research-all.lua','fixtures/run-profiles/research-all-f210.json')
 $performanceClassification=Get-MIRAssuranceClassification -Paths $performancePaths -Config $actualAssurance
 Assert-MIRDevelopmentCISelection -Condition (-not $performanceClassification.escalated -and 'static.research-all-observation' -in @($performanceClassification.tests) -and 'runtime.research-all-observation-f200' -in @($performanceClassification.tests) -and 'runtime.research-all-observation-f210' -in @($performanceClassification.tests)) -Message 'The performance consumer must retain its exact static and native selections without unknown-path escalation.'

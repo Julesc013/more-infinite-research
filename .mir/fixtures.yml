@@ -1907,11 +1907,11 @@ fixtures:
     harness: tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1
     exact_target:
       factorio_line: "2.1"
-      factorio_version: "2.1.20"
-      factorio_file_version: "2.1.20.87512"
+      factorio_version: "2.1.21"
+      factorio_file_version: "2.1.21.87673"
       engine_selection_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json
       engine_admission: admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only
-      mod_lock: exact-f210-2.1.20-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
+      mod_lock: exact-f210-2.1.21-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
     validates:
       - canonical-schema-3-copper-binding-and-transport
       - strict-runtime-and-browser-refusal-of-late-forged-schema-3-policy-identities
@@ -1965,12 +1965,12 @@ fixtures:
     harness: tests/runtime/Test-MIR42V2V3CapMigration.ps1
     exact_target:
       factorio_line: "2.1"
-      factorio_version: "2.1.20"
-      factorio_file_version: "2.1.20.87512"
+      factorio_version: "2.1.21"
+      factorio_file_version: "2.1.21.87673"
       predecessor_commit: f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e
       engine_selection_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json
       engine_admission: admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only
-      mod_lock: exact-f210-2.1.20-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
+      mod_lock: exact-f210-2.1.21-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
     validates:
       - authentic-pinned-F210-V2-package-reconstruction-and-runtime-state-seeding
       - recognized-V2-owned-enable-and-visibility-records-migrate-to-V3
