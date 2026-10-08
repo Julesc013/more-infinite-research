@@ -162,18 +162,20 @@ trap {
 }
 $run=$resources.root
 New-Item -ItemType Directory -Path $run|Out-Null
-function New-MigrationFixtureSource([string]$Root,[string]$Version){
-  Copy-Item -LiteralPath $fixture -Destination $Root -Recurse
-  $infoPath=Join-Path $Root 'info.json';$info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
+function New-MigrationFixtureSource([string]$FixtureDirectory,[string]$Version){
+  # This is generated assertion-fixture metadata. Player inputs are consumed
+  # separately through the pinned predecessor and current materializer readers.
+  Copy-Item -LiteralPath $fixture -Destination $FixtureDirectory -Recurse
+  $infoPath=Join-Path $FixtureDirectory 'info.json';$info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
   $info.version=$Version
   [IO.File]::WriteAllText($infoPath,(($info|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
-  [pscustomobject]@{source=$Root;version=$Version;file=($fixtureName+'_'+$Version+'.zip')}
+  [pscustomobject]@{source=$FixtureDirectory;version=$Version;file=($fixtureName+'_'+$Version+'.zip')}
 }
-function New-MigrationSettingsSource([string]$Root,[int]$Cap){
+function New-MigrationSettingsSource([string]$SettingsDirectory,[int]$Cap){
   Assert-Migration ($Cap -in @(0,3)) 'unsupported settings cap'
-  Initialize-MIRSettingsOverrideMod -ModsDir $Root -FactorioVersion '2.1'
-  Set-CopiedStartupSettingDefaults -ModsDir $Root -Overrides @{'ips-enable-research_copper'=$true;'ips-max-level-research_copper'=$Cap}
-  $source=Join-Path $Root 'mir-validation-settings-overrides';$infoPath=Join-Path $source 'info.json'
+  Initialize-MIRSettingsOverrideMod -ModsDir $SettingsDirectory -FactorioVersion '2.1'
+  Set-CopiedStartupSettingDefaults -ModsDir $SettingsDirectory -Overrides @{'ips-enable-research_copper'=$true;'ips-max-level-research_copper'=$Cap}
+  $source=Join-Path $SettingsDirectory 'mir-validation-settings-overrides';$infoPath=Join-Path $source 'info.json'
   $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
   $info=[ordered]@{name=$info.name;version=$(if($Cap -eq 0){'0.1.310'}else{'0.1.313'});title=$info.title;author=$info.author;factorio_version=$info.factorio_version;dependencies=@($info.dependencies)}
   [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
