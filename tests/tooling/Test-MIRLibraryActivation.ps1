@@ -157,6 +157,31 @@ try{
   }
   Assert-LibraryRefusal {Start-MIRLibraryActivation $library $data $profileA @{'alpha_1.0.0.zip'=('A'*64)}} 'mir-library-hash-mismatch'
   Assert-LibraryTest (-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'rejected selections leave no active transaction'
+  # The durable owner timestamp must remain an exact string. PowerShell's
+  # automatic date conversion otherwise permits recovery under a live owner.
+  $journalPath=Join-Path $library '.mir-active-profile.json'
+  $listPath=Join-Path $library 'mod-list.json';$settingsPath=Join-Path $library 'mod-settings.dat'
+  $originalControls=@{'mod-list.json'=(Read-MIRLibraryControl $listPath);'mod-settings.dat'=(Read-MIRLibraryControl $settingsPath)}
+  $ownerStarted=(Get-Process -Id $PID).StartTime.ToUniversalTime()
+  foreach($matchingOwner in @($true,$false)){
+    [IO.File]::WriteAllText($listPath,'{"mods":[{"name":"live-owner-selection","enabled":true}]}')
+    [IO.File]::WriteAllBytes($settingsPath,[byte[]](3,2,1))
+    $recordedStart=if($matchingOwner){$ownerStarted}else{$ownerStarted.AddSeconds(-1)}
+    Write-TestJson $journalPath @{kind='MIRDirectLibraryActivationV1';library=$library;owner_pid=$PID;owner_started_utc=$recordedStart.ToString('o');controls=$originalControls}
+    $ownedHashes=@{};foreach($path in @($listPath,$settingsPath,$journalPath)){$ownedHashes[$path]=Get-MIRImmutableInputSha256 $path}
+    $missingProfile=Join-Path $profiles 'missing-next-profile.json'
+    if($matchingOwner){
+      Assert-LibraryRefusal {Start-MIRLibraryActivation $library $data $missingProfile @{}} 'mir-library-recovery-owner-alive'
+      foreach($path in @($listPath,$settingsPath,$journalPath)){
+        Assert-LibraryTest ((Test-Path -LiteralPath $path)-and(Get-MIRImmutableInputSha256 $path)-ceq$ownedHashes[$path]) ('live owner preserves '+[IO.Path]::GetFileName($path))
+      }
+    }else{
+      Assert-LibraryRefusal {Start-MIRLibraryActivation $library $data $missingProfile @{}} 'mir-library-profile-missing'
+      Assert-LibraryTest (-not(Test-Path -LiteralPath $journalPath)) 'different birth identity permits stale-journal recovery'
+      Assert-LibraryTest ([Convert]::ToBase64String([IO.File]::ReadAllBytes($listPath))-ceq[Convert]::ToBase64String($oldList)) 'stale identity restores original mod-list'
+      Assert-LibraryTest ([Convert]::ToBase64String([IO.File]::ReadAllBytes($settingsPath))-ceq[Convert]::ToBase64String($oldSettings)) 'stale identity restores original settings'
+    }
+  }
   # Real child exit: a finally block cannot restore these controls. The next
   # invocation must consume the durable backup, then start its own selection.
   $child=Join-Path $root 'abandon.ps1'
