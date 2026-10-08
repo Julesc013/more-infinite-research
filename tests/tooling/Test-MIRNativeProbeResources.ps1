@@ -25,84 +25,117 @@ function Get-MIR441ResourceSnapshot {
 }
 function Assert-F210CapSharedInputs {
   . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
+  . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
   . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
   $capRoot=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo ('build/tmp/f210-cap-controls-'+[guid]::NewGuid().ToString('N')))
-  $tokens=$null;$errors=$null
   $harness=Join-Path $repo 'tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1'
+  $tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($harness,[ref]$tokens,[ref]$errors)
-  Assert-Probe (@($errors).Count -eq 0) 'F210 cap harness no longer parses.'
-  foreach($name in @('Assert-MIR42','Assert-Exact','New-MIR42Stage','Invoke-MIR42Engine','Invoke-MIR42ServerSave','Get-MIR42GovernedEngineResolution')) {
-    $definition=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$false))
-    Assert-Probe ($definition.Count -eq 1) "expected one consumed F210 cap function: $name"
+  Assert-Probe (@($errors).Count-eq0) 'F210 cap harness no longer parses.'
+  foreach($name in @('Assert-MIR42','Assert-Exact','Get-MIR42Sha','New-MIR42CapSettingsSource','New-MIR42Stage','Start-MIR42CapStage','Complete-MIR42CapStage','Invoke-MIR42Engine','Invoke-MIR42ServerSave','Get-MIR42GovernedEngineResolution')){
+    $definition=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$false))
+    Assert-Probe ($definition.Count-eq1) "Expected one consumed F210 cap function: $name"
     . ([scriptblock]::Create($definition[0].Extent.Text))
   }
-  $inputLeases=[Collections.Generic.List[object]]::new()
-  try {
-    $null=New-Item -ItemType Directory -Path $capRoot
-    $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $capRoot -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 4
-    $run=$resources.root;$engineRoot=$capRoot;$engine='controlled-engine-never-executed';$FactorioBin='controlled requested engine';$SteamManifest='controlled requested manifest'
-    $candidateZip=Join-Path $capRoot 'more-infinite-research_4.2.21001.zip'
-    [IO.File]::WriteAllText($candidateZip,'tiny immutable F210 cap candidate control')
+  $activeStage=$null;$script:activeStage=$null
+  try{
+    [IO.Directory]::CreateDirectory($capRoot)|Out-Null
+    $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $capRoot -ExpectedPeakMemoryMiB 768 -MaxNewOutputMiB 4
+    $run=$resources.root;$engineRoot=Join-Path $capRoot 'engine';$engine=Join-Path $engineRoot 'bin/x64/factorio.exe'
+    $FactorioBin='controlled requested engine';$SteamManifest='controlled requested manifest'
+    $engineResolution=[pscustomobject]@{engine=[pscustomobject]@{version='2.1.99'}}
+    foreach($name in @('base','elevated-rails','quality','recycler','space-age')){
+      $data=Join-Path $engineRoot ('data/'+$name);[IO.Directory]::CreateDirectory($data)|Out-Null
+      @{name=$name;version='2.1.99';dependencies=@()}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $data 'info.json')
+    }
+    $library=Join-Path $capRoot 'library';[IO.Directory]::CreateDirectory($library)|Out-Null
+    $tiny=Join-Path $capRoot 'tiny-candidate';[IO.Directory]::CreateDirectory($tiny)|Out-Null
+    @{name='more-infinite-research';version='4.2.21001';factorio_version='2.1';dependencies=@('base')}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $tiny 'info.json')
+    $candidateZip=Publish-MIRModDirectoryArchive -Source $tiny -Name more-infinite-research -Version 4.2.21001 -ModsDir $library
     $candidateHash=Get-MIRImmutableInputSha256 $candidateZip
     $candidateInput=[pscustomobject]@{receipt=[pscustomobject]@{archive_sha256=$candidateHash;package_source_sha256=('A'*64)}}
-    $fixture=Join-Path $repo 'fixtures/assert-mir42-cap-ownership-multiforce'
-    $blockerFixture=Join-Path $repo 'fixtures/late-mir42-cap-binding-blocker'
-    $policyBlockerFixture=Join-Path $repo 'fixtures/late-mir42-policy-binding-blocker'
-    $fixtureName='mir-fixture-assert-mir42-cap-ownership-multiforce';$blockerName='late-mir42-cap-binding-blocker';$policyBlockerName='late-mir42-policy-binding-blocker'
-    $stages=@((New-MIR42Stage seed 0 $false $false),(New-MIR42Stage capped 3 $false $false),(New-MIR42Stage policy-blocked 3 $false $true),(New-MIR42Stage blocked 3 $true $false),(New-MIR42Stage removal 0 $false $false))
-    foreach($stage in $stages) {
-      $input=$stage.lease.record.inputs[0]
-      Assert-Probe ($stage.lease.record.require_hard_links -and $input.staging_mode -ceq 'hardlink' -and (Get-MIRImmutableInputFileIdentity $candidateZip) -ceq (Get-MIRImmutableInputFileIdentity $input.stage_path)) "F210 $($stage.name) copied its candidate."
-      $modList=Get-Content -Raw -LiteralPath $stage.mod_list|ConvertFrom-Json
-      Assert-Probe (($blockerName -in @($modList.mods.name)) -eq $stage.blocker -and ($policyBlockerName -in @($modList.mods.name)) -eq $stage.policy_blocker) "F210 $($stage.name) changed blocker selection."
-      $zip=[IO.Compression.ZipFile]::OpenRead($stage.settings_archive)
-      try {$reader=[IO.StreamReader]::new($zip.GetEntry('mir-validation-settings-overrides_0.1.0/settings-updates.lua').Open());try {$text=$reader.ReadToEnd()} finally {$reader.Dispose()}} finally {$zip.Dispose()}
-      Assert-Probe ($text.Contains('override("ips-max-level-research_copper", '+$stage.cap+')')) "F210 $($stage.name) lost its private cap value."
-      [IO.File]::WriteAllText((Join-Path $stage.mods 'mod-settings.dat'),"private $($stage.name)")
+    $fixture=Join-Path $repo 'fixtures/assert-mir42-cap-ownership-multiforce';$fixtureName='mir-fixture-assert-mir42-cap-ownership-multiforce'
+    $blockerFixture=Join-Path $repo 'fixtures/late-mir42-cap-binding-blocker';$blockerName='late-mir42-cap-binding-blocker'
+    $policyBlockerFixture=Join-Path $repo 'fixtures/late-mir42-policy-binding-blocker';$policyBlockerName='late-mir42-policy-binding-blocker'
+    foreach($pair in @(@($fixture,$fixtureName),@($blockerFixture,$blockerName),@($policyBlockerFixture,$policyBlockerName))){$null=Publish-MIRModDirectoryArchive -Source $pair[0] -Name $pair[1] -Version 0.1.0 -ModsDir $library}
+    $preparedSettings=@{}
+    foreach($cap in @(0,3)){
+      $preparedSettings[$cap]=New-MIR42CapSettingsSource (Join-Path $capRoot ('settings-'+$cap)) $cap
+      $entry=$preparedSettings[$cap];$null=Publish-MIRModDirectoryArchive -Source $entry.source -Name mir-validation-settings-overrides -Version $entry.version -ModsDir $library
+      $replica=New-MIR42CapSettingsSource (Join-Path $capRoot ('replica-'+$cap)) $cap
+      Assert-MIRLibraryFixtureArchive -Archive (Join-Path $library $entry.file) -SourceDirectory $replica.source
     }
-    Assert-Probe ($resources.shared_alias_bytes -eq 5*(Get-Item -LiteralPath $candidateZip).Length) 'F210 cap alias output accounting differs.'
-    Assert-Probe (@($stages|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_.mods 'mod-settings.dat')}|Sort-Object -Unique).Count -eq 5) 'F210 cap mutable settings share file identities.'
-    $script:capCopies=0
-    function New-Item { [CmdletBinding()]param([string]$ItemType,[string[]]$Path,[string]$Target,[switch]$Force);if($ItemType -ceq 'HardLink'){throw 'controlled unavailable hardlink'};Microsoft.PowerShell.Management\New-Item @PSBoundParameters }
-    function Copy-Item { $script:capCopies++;throw 'copy attempted' }
-    try {Refuses-Probe {New-MIR42Stage unavailable 0 $false $false} 'requires a verified hard link';Assert-Probe ($script:capCopies -eq 0) 'F210 cap link failure invoked copying.'} finally {Remove-Item Function:\New-Item;Remove-Item Function:\Copy-Item}
-
-    # Stubs exercise the consumed entry points and predicates; no engine runs.
+    [IO.File]::WriteAllText((Join-Path $library 'mod-list.json'),'original selection')
+    [IO.File]::WriteAllBytes((Join-Path $library 'mod-settings.dat'),[byte[]](3,1,4))
+    $originalList=(Get-FileHash (Join-Path $library 'mod-list.json')).Hash
+    $originalSettings=(Get-FileHash (Join-Path $library 'mod-settings.dat')).Hash
+    $inventory=@(Get-ChildItem -LiteralPath $library -Filter '*.zip'|ForEach-Object{$_.Name+'|'+(Get-FileHash $_.FullName).Hash})-join "`n"
+    $stages=@((New-MIR42Stage seed 0 $false $false),(New-MIR42Stage capped 3 $false $false),(New-MIR42Stage policy-blocked 3 $false $true),(New-MIR42Stage blocked 3 $true $false),(New-MIR42Stage removal 0 $false $false))
+    foreach($stage in $stages){
+      Assert-Probe ($stage.mods-ceq$library -and -not(Test-Path (Join-Path $stage.root 'mods'))) 'F210 stage materialized another mods directory.'
+      $list=Get-Content -Raw -LiteralPath $stage.mod_list|ConvertFrom-Json
+      Assert-Probe (($blockerName-in@($list.mods.name))-eq$stage.blocker -and ($policyBlockerName-in@($list.mods.name))-eq$stage.policy_blocker) 'F210 blocker selection changed.'
+      Assert-Probe (@($list.mods|Where-Object{-not$_.version}).Count-eq0) 'F210 selection contains an unpinned input.'
+      Start-MIR42CapStage $stage
+      Assert-Probe (-not(Test-Path (Join-Path $library 'mod-settings.dat'))) 'F210 defaults inherited preceding settings.'
+      $active=Get-Content (Join-Path $library 'mod-list.json') -Raw|ConvertFrom-Json
+      Assert-Probe (@($active.mods|Where-Object{$_.enabled-and$_.name-eq'mir-validation-settings-overrides'})[0].version-ceq$preparedSettings[$stage.cap].version) 'F210 selected the wrong cap settings release.'
+      if(-not$stage.blocker){Assert-Probe (@($active.mods|Where-Object name -EQ $blockerName)[0].enabled-eq$false) 'Unrequested blocker enabled.'}
+      [IO.File]::WriteAllBytes((Join-Path $library 'mod-settings.dat'),[byte[]](8,9))
+      $log=Join-Path $stage.root 'controlled.log'
+      $rows=@('0.000 2026-10-08 12:00:00; Factorio 2.1.99 (build 1)',@($stage.activation.selected|ForEach-Object{'Loading mod '+$_.name+' '+$_.version+' (data.lua)'}))
+      [IO.File]::WriteAllLines($log,[string[]]@($rows|ForEach-Object{$_}),[Text.UTF8Encoding]::new($false))
+      Complete-MIR42CapStage $stage $log
+      Assert-Probe ((Get-FileHash (Join-Path $library 'mod-list.json')).Hash-ceq$originalList -and (Get-FileHash (Join-Path $library 'mod-settings.dat')).Hash-ceq$originalSettings) 'F210 did not restore the original control files.'
+    }
+    # Repeat A after B and the opposing blockers, then verify refusal before any activation.
+    Start-MIR42CapStage $stages[0]
+    Complete-MIR42CapStage $stages[0] (Join-Path $stages[0].root 'controlled.log')
+    $candidateInput.receipt.archive_sha256='B'*64
+    Refuses-Probe {New-MIR42Stage changed-bytes 0 $false $false} 'installed candidate hash'
+    $candidateInput.receipt.archive_sha256=$candidateHash
+    $missingLibrary=Join-Path $capRoot 'missing';$savedLibrary=$library;$library=$missingLibrary
+    Refuses-Probe {New-MIR42Stage missing-input 0 $false $false} 'does not exist'
+    $library=$savedLibrary
+    Assert-Probe (-not(Test-Path -LiteralPath $missingLibrary)) 'Missing library recreated a profile.'
+    Refuses-Probe {& $harness -RepoRoot $repo -FactorioBin absent -CandidateZip absent -OutputRoot (Join-Path $capRoot 'absent-run')} 'mir42-f210-direct-inputs-required'
+    Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $capRoot 'absent-run'))) 'Unbound entry point allocated output.'
+    Assert-Probe ((@(Get-ChildItem -LiteralPath $library -Filter '*.zip'|ForEach-Object{$_.Name+'|'+(Get-FileHash $_.FullName).Hash})-join "`n")-ceq$inventory) 'Stage switching wrote dependency archives.'
+    Assert-Probe (@(Get-ChildItem -LiteralPath $run -Recurse -Filter '*.zip').Count-eq0 -and $resources.shared_alias_bytes-eq0) 'Stage switching copied or linked archives.'
     function Invoke-MIRNativeProbeProcess {
       param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds)
-      Assert-Probe ($Context -eq $resources -and $FilePath -ceq (Get-Command pwsh).Source -and $TimeoutSeconds -eq 30 -and $Arguments -contains $FactorioBin -and $Arguments -contains $SteamManifest) 'F210 resolver lost its governed context, inputs or timeout.'
-      $driver=Get-Content -Raw -LiteralPath (Join-Path $Context.root 'resolve-engine.ps1')
-      Assert-Probe ($driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3') -and $driver.Contains("-HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210'")) 'F210 resolver bypasses its existing admission oracle.'
-      [IO.File]::WriteAllText((Join-Path $Context.root 'engine-resolution.json'),'{"engine":{"version":"controlled","sha256":"controlled"},"record_sha256":"controlled"}')
+      Assert-Probe ($Context-eq$resources -and $FilePath-ceq(Get-Command pwsh).Source -and $TimeoutSeconds-eq30 -and $Arguments-contains$FactorioBin -and $Arguments-contains$SteamManifest) 'F210 resolver lost its governed inputs.'
+      $driver=Get-Content -Raw (Join-Path $Context.root 'resolve-engine.ps1')
+      Assert-Probe ($driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3')) 'F210 bypassed its admission oracle.'
+      [IO.File]::WriteAllText((Join-Path $Context.root 'engine-resolution.json'),'{"engine":{"version":"controlled"},"record_sha256":"controlled"}')
     }
     $resolution=Get-MIR42GovernedEngineResolution
-    Assert-Probe ($resolution.engine.version -ceq 'controlled' -and $resolution.record_sha256 -ceq 'controlled') 'F210 resolution response was reconstructed or lost.'
+    Assert-Probe ($resolution.engine.version-ceq'controlled') 'Resolver transport changed.'
     $expectedSave=Join-Path $stages[0].userdata 'saves/successor.zip';$reportCompletion=$true
     function Invoke-MIRNativeProbeFactorioProcess {
       param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds,[scriptblock]$CompletionPredicate)
-      Assert-Probe ($Context -eq $resources -and $FilePath -ceq $engine -and $Arguments -contains $stages[0].config) 'F210 actor lost private context or engine.'
+      Assert-Probe ($Context-eq$resources -and $FilePath-ceq$engine -and $Arguments-contains$stages[0].config -and $Arguments-contains$library) 'F210 actor lost its direct library or private configuration.'
       $log=Join-Path $stages[0].userdata 'factorio-current.log'
-      if($null -eq $CompletionPredicate){Assert-Probe ($TimeoutSeconds -eq 120 -and $Arguments -contains '--create') 'F210 create actor lost its timeout or arguments.';[IO.File]::WriteAllText($log,'tiny creation control');return [pscustomobject]@{result=[pscustomobject]@{completion_predicate_observed=$false}}}
-      Assert-Probe ($TimeoutSeconds -eq 60 -and $Arguments -contains '--start-server' -and $Arguments -contains $stages[0].server_settings) 'F210 server lost its controls or timeout.'
-      if(Test-Path -LiteralPath $expectedSave){Remove-Item -LiteralPath $expectedSave}
-      Assert-Probe (-not (& $CompletionPredicate)) 'F210 completion accepts absent log/save.'
-      [IO.File]::WriteAllText($log,'Saving finished');Assert-Probe (-not (& $CompletionPredicate)) 'F210 completion accepts absent save.'
-      [IO.File]::WriteAllText($expectedSave,'tiny save control');Assert-Probe (-not (& $CompletionPredicate)) 'F210 completion accepts absent state.'
-      [IO.File]::WriteAllText($log,'[mir42-cap-ownership-multiforce] STATE JSON {"stage":"event-probe"}');Assert-Probe (-not (& $CompletionPredicate)) 'F210 completion accepts an unfinished save.'
-      [IO.File]::WriteAllText($log,'[mir42-cap-ownership-multiforce] STATE JSON {"stage":"blocked"} Saving finished');Assert-Probe (-not (& $CompletionPredicate)) 'F210 completion accepts another stage.'
-      [IO.File]::WriteAllText($log,'[mir42-cap-ownership-multiforce] STATE JSON {"stage":"event-probe"} Saving finished');Assert-Probe (& $CompletionPredicate) 'F210 completion rejects all original conditions.'
+      $loaded=Get-Content (Join-Path $stages[0].root 'controlled.log') -Raw
+      if($null-eq$CompletionPredicate){Assert-Probe ($TimeoutSeconds-eq120 -and $Arguments-contains'--create') 'F210 create actor changed.';[IO.File]::WriteAllText($log,$loaded);return [pscustomobject]@{result=[pscustomobject]@{completion_predicate_observed=$false}}}
+      Assert-Probe ($TimeoutSeconds-eq60 -and $Arguments-contains'--start-server') 'F210 server changed.'
+      if(Test-Path $expectedSave){Remove-Item -LiteralPath $expectedSave}
+      Assert-Probe (-not(&$CompletionPredicate)) 'Completion accepts absent save/log.'
+      [IO.File]::WriteAllText($log,'Saving finished');Assert-Probe (-not(&$CompletionPredicate)) 'Completion accepts missing save.'
+      [IO.File]::WriteAllText($expectedSave,'tiny save');Assert-Probe (-not(&$CompletionPredicate)) 'Completion accepts missing state.'
+      [IO.File]::WriteAllText($log,'[mir42-cap-ownership-multiforce] STATE JSON {"stage":"event-probe"}');Assert-Probe (-not(&$CompletionPredicate)) 'Completion accepts unfinished save.'
+      [IO.File]::WriteAllText($log,'[mir42-cap-ownership-multiforce] STATE JSON {"stage":"blocked"} Saving finished');Assert-Probe (-not(&$CompletionPredicate)) 'Completion accepts another stage.'
+      [IO.File]::WriteAllText($log,$loaded+'[mir42-cap-ownership-multiforce] STATE JSON {"stage":"event-probe"} Saving finished');Assert-Probe (&$CompletionPredicate) 'Completion rejects original conditions.'
       [pscustomobject]@{result=[pscustomobject]@{completion_predicate_observed=$reportCompletion}}
     }
     $null=Invoke-MIR42Engine $stages[0] seed @('--create','controlled-input.zip')
     $null=Invoke-MIR42ServerSave $stages[0] capped 'controlled-input.zip' $expectedSave event-probe
     $reportCompletion=$false
     Refuses-Probe {Invoke-MIR42ServerSave $stages[0] incomplete 'controlled-input.zip' $expectedSave event-probe} 'did not create incomplete successor'
-    foreach($stage in $stages){$terminal=Complete-MIRImmutableInputLease -Lease $stage.lease -Outcome passed;$null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal;$null=Assert-MIRImmutableInputLeaseReclaimable -RunRoot $stage.root -Context 'completed tiny F210 cap stage';$null=Assert-MIRImmutableInputPathWithin -Path $stage.root -Root $capRoot -Context 'tiny F210 stage cleanup';Remove-Item -LiteralPath $stage.root -Recurse}
-    Assert-Probe ((Get-MIRImmutableInputSha256 $candidateZip) -ceq $candidateHash) 'F210 cap retirement changed or removed source bytes.'
-    Write-Host '[ok] F210 cap consumer: five strict-link stages, private settings, no-copy failure, governed resolver transport and original save-completion prerequisites; no Factorio or construction.'
-  } finally {
-    foreach($inputLease in $inputLeases){if(-not $inputLease.closed){$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed}}
-    if(Test-Path -LiteralPath $capRoot){$null=Assert-MIRImmutableInputPathWithin -Path $capRoot -Root (Join-Path $repo 'build/tmp') -Context 'owned tiny F210 control cleanup';Remove-Item -LiteralPath $capRoot -Recurse -Force}
+    Write-Host '[ok] F210 cap direct-library stages, exact settings, restoration, missing/changed input refusal, governed resolution and original save-completion prerequisites; no Factorio.'
+  }finally{
+    if($null-ne$script:activeStage -and $null-ne$script:activeStage.activation -and -not$script:activeStage.activation.closed){$null=Complete-MIRLibraryActivation $script:activeStage.activation}
+    if(Test-Path -LiteralPath $capRoot){$null=Assert-MIRImmutableInputPathWithin -Path $capRoot -Root (Join-Path $repo 'build/tmp') -Context 'owned tiny F210 controls';Remove-Item -LiteralPath $capRoot -Recurse -Force}
   }
 }
 Assert-F210CapSharedInputs

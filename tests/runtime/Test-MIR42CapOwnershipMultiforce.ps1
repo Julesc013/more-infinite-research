@@ -4,6 +4,8 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='',
   [string]$SteamManifest='',
+  [string]$LibraryDirectory='',
+  [switch]$PrepareInputsOnly,
   [string]$CandidateZip='',
   [string]$SourceMaterializationPath='',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
@@ -12,10 +14,11 @@ param(
 )
 
 $ErrorActionPreference='Stop'
-$inputLeases=@()
-# Native execution is retired; the preserved oracle is not current acceptance.
-throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'
+$resources=$null;$activeStage=$null
 Set-StrictMode -Version Latest
+if(-not $PrepareInputsOnly -and (-not $FactorioBin -or -not $LibraryDirectory)){
+  throw '[mir42-f210-direct-inputs-required] Supply an explicit engine and flat archive library. No populated profile is created.'
+}
 
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
@@ -60,11 +63,14 @@ function Assert-Properties([string]$Name,$Value,[string[]]$Expected){
   $wanted=@($Expected|Sort-Object)
   Assert-Exact "$Name properties" ($actual -join "`n") ($wanted -join "`n")
 }
-function Get-MIR42Artifact([string]$Path){
+function Get-MIR42Artifact([string]$Path,[switch]$AllowExternal){
   $resolved=(Resolve-Path -LiteralPath $Path).Path
-  Assert-MIR42 ($resolved.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) "artifact is outside the repository: $resolved"
+  Assert-MIRLibraryPath $resolved
+  $inside=$resolved.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)
+  Assert-MIR42 ($inside -or $AllowExternal) "artifact is outside the repository: $resolved"
   return [ordered]@{
-    path=$resolved.Substring($repo.Length+1).Replace('\','/')
+    path=$(if($inside){$resolved.Substring($repo.Length+1).Replace('\','/')}else{$resolved})
+    path_kind=$(if($inside){'repository-relative'}else{'machine-local-input'})
     bytes=(Get-Item -LiteralPath $resolved).Length
     raw_sha256=Get-MIR42Sha $resolved
   }
@@ -205,15 +211,21 @@ Assert-MIR42 ($candidateInputChanges.Count -eq 0) "requires a clean candidate-ma
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
+. (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
 Assert-MIR42 ($running.Count-eq0) 'requires the one-Factorio-process policy; a Factorio process is already running.'
+& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
 $candidateInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath
 $candidateZip=[string]$candidateInput.path
-$inputLeases=[Collections.Generic.List[object]]::new()
 trap {
   $failure=$_
-  foreach($inputLease in $inputLeases){if(-not $inputLease.closed){try {$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed} catch {}}}
+  if($null-ne$activeStage -and $null-ne$activeStage.activation -and -not$activeStage.activation.closed){
+    try{$activeStage.terminals.Add((Complete-MIRLibraryActivation $activeStage.activation))}catch{Write-Warning $_.Exception.Message}
+  }
+  if($null-ne$resources -and (Test-Path -LiteralPath $resources.root)){
+    try{Write-MIRNativeProbeResult -Context $resources -Record @{status='failed';error=$failure.Exception.Message;source=$sourceCommit;resource_runs=$resources.runs.ToArray()}}catch{Write-Warning $_.Exception.Message}
+  }
   throw $failure
 }
 New-Item -ItemType Directory -Path $resources.root|Out-Null
@@ -236,10 +248,6 @@ $record=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $Repository
   Assert-MIR42 (Test-Path -LiteralPath $receipt -PathType Leaf) 'governed engine resolution receipt is absent.'
   Get-Content -LiteralPath $receipt -Raw|ConvertFrom-Json -Depth 50 -DateKind String
 }
-$engineResolution=Get-MIR42GovernedEngineResolution
-$engine=[string]$engineResolution.engine.path
-Assert-Exact 'Factorio executable SHA-256' (Get-MIR42Sha $engine) ([string]$engineResolution.engine.sha256)
-
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $candidateArchive=[IO.Compression.ZipFile]::OpenRead($candidateZip)
 try{
@@ -263,40 +271,68 @@ foreach($path in @($fixture,$blockerFixture,$policyBlockerFixture)){
 }
 
 $run=$resources.root
+
+function New-MIR42CapSettingsSource([string]$Root,[int]$Cap){
+  Assert-MIR42 ($Cap-in@(0,3)) 'unsupported cap fixture'
+  Initialize-MIRSettingsOverrideMod -ModsDir $Root -FactorioVersion '2.1'
+  Set-CopiedStartupSettingDefaults -ModsDir $Root -Overrides @{'ips-enable-research_copper'=$true;'ips-max-level-research_copper'=$Cap}
+  $source=Join-Path $Root 'mir-validation-settings-overrides'
+  $infoPath=Join-Path $source 'info.json';$info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
+  $info=[ordered]@{name=$info.name;version=$(if($Cap-eq0){'0.1.200'}else{'0.1.203'});title=$info.title;author=$info.author;factorio_version=$info.factorio_version;dependencies=@($info.dependencies)}
+  [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+  [pscustomobject]@{source=$source;version=$info.version;file=('mir-validation-settings-overrides_'+$info.version+'.zip')}
+}
+$preparedSettings=@{}
+foreach($cap in @(0,3)){$preparedSettings[$cap]=New-MIR42CapSettingsSource (Join-Path $run ('input-definitions/cap-'+$cap)) $cap}
+if($PrepareInputsOnly){
+  $assets=Join-Path $run 'owned-inputs';[IO.Directory]::CreateDirectory($assets)|Out-Null
+  $archives=@(Publish-MIRModDirectoryArchive -Source $fixture -Name $fixtureName -Version '0.1.0' -ModsDir $assets)
+  $archives+=Publish-MIRModDirectoryArchive -Source $blockerFixture -Name $blockerName -Version '0.1.0' -ModsDir $assets
+  $archives+=Publish-MIRModDirectoryArchive -Source $policyBlockerFixture -Name $policyBlockerName -Version '0.1.0' -ModsDir $assets
+  foreach($cap in @(0,3)){$settingsInput=$preparedSettings[$cap];$archives+=Publish-MIRModDirectoryArchive -Source $settingsInput.source -Name 'mir-validation-settings-overrides' -Version $settingsInput.version -ModsDir $assets}
+  Write-MIRNativeProbeResult -Context $resources -Record @{status='prepared-owned-inputs-only';source=$sourceCommit;candidate=Get-MIR42Artifact $candidateZip;archives=@($archives|ForEach-Object{Get-MIR42Artifact $_});native_factorio=$false}
+  Write-Output "Prepared inputs: $run";return
+}
+Assert-MIR441CleanTrackedSource -RepoRoot $repo
+$engineResolution=Get-MIR42GovernedEngineResolution
+$engine=[string]$engineResolution.engine.path
+Assert-Exact 'Factorio executable SHA-256' (Get-MIR42Sha $engine) ([string]$engineResolution.engine.sha256)
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
+$library=(Resolve-Path -LiteralPath $LibraryDirectory).Path;Assert-MIRLibraryPath $library
 
 function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker,[bool]$UsePolicyBlocker){
   $stageRoot=Join-Path $run $Name
-  $mods=Join-Path $stageRoot 'mods'
+  $mods=$library
   $userdata=Join-Path $stageRoot 'userdata'
-  New-Item -ItemType Directory -Force -Path $mods,$userdata,(Join-Path $userdata 'saves')|Out-Null
-  $input=[ordered]@{source_path=$candidateZip;file_name=[IO.Path]::GetFileName($candidateZip);expected_sha256=[string]$candidateInput.receipt.archive_sha256;role='candidate';identity=@{target='f210';version='4.2.21001'};provenance=@{kind='verified-current-canonical-materialization';package_source_sha256=[string]$candidateInput.receipt.package_source_sha256};immutable=$true}
-  $lease=New-MIRImmutableInputLease -RunRoot $stageRoot -StageDirectory $mods -Inputs @($input) -RequireHardLinks
-  $inputLeases.Add($lease)
-  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $lease
-  $fixtureArchive=Publish-MIRModDirectoryArchive -Source $fixture -Name $fixtureName -Version '0.1.0' -ModsDir $mods
+  New-Item -ItemType Directory -Force -Path $userdata,(Join-Path $userdata 'saves')|Out-Null
+  $candidateName=[IO.Path]::GetFileName($candidateZip);$installed=Join-Path $mods $candidateName
+  Assert-MIRLibraryPath $installed
+  Assert-Exact 'installed candidate hash' (Get-MIR42Sha $installed) ([string]$candidateInput.receipt.archive_sha256)
+  $settings=$preparedSettings[$Cap];$settingsArchive=Join-Path $mods $settings.file
+  Assert-MIRLibraryFixtureArchive -Archive $settingsArchive -SourceDirectory $settings.source
+  $fixtureArchive=Join-Path $mods ($fixtureName+'_0.1.0.zip')
+  Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory $fixture
+  $hashes=@{$candidateName=[string]$candidateInput.receipt.archive_sha256;$settings.file=(Get-MIR42Sha $settingsArchive);([IO.Path]::GetFileName($fixtureArchive))=(Get-MIR42Sha $fixtureArchive)}
   $blockerArchive=$null
   if($UseBlocker){
-    $blockerArchive=Publish-MIRModDirectoryArchive -Source $blockerFixture -Name $blockerName -Version '0.1.0' -ModsDir $mods
+    $blockerArchive=Join-Path $mods ($blockerName+'_0.1.0.zip')
+    Assert-MIRLibraryFixtureArchive -Archive $blockerArchive -SourceDirectory $blockerFixture
+    $hashes[[IO.Path]::GetFileName($blockerArchive)]=Get-MIR42Sha $blockerArchive
   }
   $policyBlockerArchive=$null
   if($UsePolicyBlocker){
-    $policyBlockerArchive=Publish-MIRModDirectoryArchive -Source $policyBlockerFixture -Name $policyBlockerName -Version '0.1.0' -ModsDir $mods
+    $policyBlockerArchive=Join-Path $mods ($policyBlockerName+'_0.1.0.zip')
+    Assert-MIRLibraryFixtureArchive -Archive $policyBlockerArchive -SourceDirectory $policyBlockerFixture
+    $hashes[[IO.Path]::GetFileName($policyBlockerArchive)]=Get-MIR42Sha $policyBlockerArchive
   }
-  Initialize-MIRSettingsOverrideMod -ModsDir $mods -FactorioVersion '2.1'
-  Set-CopiedStartupSettingDefaults -ModsDir $mods -Overrides @{
-    'ips-enable-research_copper'=$true
-    'ips-max-level-research_copper'=$Cap
-  }
-  Complete-MIRSettingsOverrideMod -ModsDir $mods
-  $modNames=@('base','elevated-rails','quality','recycler','space-age','more-infinite-research',$fixtureName,'mir-validation-settings-overrides')
-  if($UseBlocker){$modNames+=,$blockerName}
-  if($UsePolicyBlocker){$modNames+=,$policyBlockerName}
-  $modList=[ordered]@{mods=@($modNames|ForEach-Object{[ordered]@{name=$_;enabled=$true}})}
-  $modListPath=Join-Path $mods 'mod-list.json'
+  $modList=[ordered]@{mods=@(@('base','elevated-rails','quality','recycler','space-age')|ForEach-Object{[ordered]@{name=$_;version=[string]$engineResolution.engine.version;enabled=$true}})}
+  $modList.mods+=@(@{name='more-infinite-research';version='4.2.21001';enabled=$true},@{name=$fixtureName;version='0.1.0';enabled=$true},@{name='mir-validation-settings-overrides';version=$settings.version;enabled=$true})
+  if($UseBlocker){$modList.mods+=,@{name=$blockerName;version='0.1.0';enabled=$true}}
+  if($UsePolicyBlocker){$modList.mods+=,@{name=$policyBlockerName;version='0.1.0';enabled=$true}}
+  $modListPath=Join-Path $stageRoot 'selection.json'
   [IO.File]::WriteAllText($modListPath,(($modList|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
   $configPath=Join-Path $stageRoot 'config.ini'
-  [IO.File]::WriteAllText($configPath,"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($userdata.Replace('\','/'))`n",[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($configPath,"[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($userdata.Replace('\','/'))`n[other]`nenable-new-mods=false`ncheck-updates=false`ndisable-blueprint-storage=true`n",[Text.UTF8Encoding]::new($false))
   $serverSettings=Join-Path $stageRoot 'server-settings.json'
   $server=[ordered]@{name='MIR42 cap ownership/multiforce';description='';tags=@();max_players=1;visibility=[ordered]@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false}
   [IO.File]::WriteAllText($serverSettings,(($server|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
@@ -313,23 +349,41 @@ function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker,[bool]$UsePoli
     fixture_archive=$fixtureArchive
     blocker_archive=$blockerArchive
     policy_blocker_archive=$policyBlockerArchive
-    settings_archive=(Join-Path $mods 'mir-validation-settings-overrides_0.1.0.zip')
+    settings_archive=$settingsArchive
     mod_list=$modListPath
-    lease=$lease
+    archive_hashes=$hashes
+    activation=$null
+    terminals=[Collections.Generic.List[object]]::new()
   }
 }
 
+function Start-MIR42CapStage($Stage){
+  $Stage.activation=Start-MIRLibraryActivation -LibraryDirectory $Stage.mods -EngineDataDirectory (Join-Path $engineRoot 'data') -ProfilePath $Stage.mod_list -ArchiveHashes $Stage.archive_hashes -SettingsMode Defaults
+  $script:activeStage=$Stage
+  Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $Stage.activation
+}
+function Complete-MIR42CapStage($Stage,[string]$Log){
+  $null=Assert-MIRLibraryLoadedSelection -Activation $Stage.activation -LogPath $Log -LatestInvocation
+  $Stage.terminals.Add((Complete-MIRLibraryActivation $Stage.activation))
+  $script:activeStage=$null
+}
+
 function Invoke-MIR42Engine($Stage,[string]$Name,[string[]]$Arguments){
+  Start-MIR42CapStage $Stage
   $factorioLog=Join-Path $Stage.userdata 'factorio-current.log'
   if(Test-Path -LiteralPath $factorioLog){Remove-Item -LiteralPath $factorioLog -Force}
-  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments (@('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods)+$Arguments) -TimeoutSeconds 120
+  $nativeArguments=@('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods)+$Arguments
+  Assert-MIRLibraryLaunch -Activation $Stage.activation -FactorioBin $engine -Arguments $nativeArguments
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $nativeArguments -TimeoutSeconds 120
   Assert-MIR42 (Test-Path -LiteralPath $factorioLog -PathType Leaf) "Factorio log is absent after $Name."
   $copy=Join-Path $Stage.root "factorio-$Name.log"
   Copy-Item -LiteralPath $factorioLog -Destination $copy
+  Complete-MIR42CapStage $Stage $copy
   return $copy
 }
 
 function Invoke-MIR42ServerSave($Stage,[string]$Name,[string]$InputSave,[string]$ExpectedSave,[string]$ExpectedStage){
+  Start-MIR42CapStage $Stage
   $factorioLog=Join-Path $Stage.userdata 'factorio-current.log'
   if(Test-Path -LiteralPath $factorioLog){Remove-Item -LiteralPath $factorioLog -Force}
   $needle="[mir42-cap-ownership-multiforce] STATE JSON {`"stage`":`"$ExpectedStage`""
@@ -338,11 +392,14 @@ function Invoke-MIR42ServerSave($Stage,[string]$Name,[string]$InputSave,[string]
     try {$text=Get-Content -LiteralPath $factorioLog -Raw -ErrorAction Stop} catch [IO.IOException] {return $false}
     return ($null -ne $text -and $text.Contains($needle)-and$text.Contains('Saving finished'))
   }.GetNewClosure()
-  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods,'--server-settings',$Stage.server_settings,'--start-server',$InputSave) -TimeoutSeconds 60 -CompletionPredicate $completion
+  $nativeArguments=@('--config',$Stage.config,'--no-log-rotation','--disable-audio','--mod-directory',$Stage.mods,'--server-settings',$Stage.server_settings,'--start-server',$InputSave)
+  Assert-MIRLibraryLaunch -Activation $Stage.activation -FactorioBin $engine -Arguments $nativeArguments
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $nativeArguments -TimeoutSeconds 60 -CompletionPredicate $completion
   Assert-MIR42 ([bool]$actor.result.completion_predicate_observed) "Factorio server did not create $Name successor."
   Assert-MIR42 (Test-Path -LiteralPath $factorioLog -PathType Leaf) "Factorio log is absent after $Name."
   $copy=Join-Path $Stage.root "factorio-$Name.log"
   Copy-Item -LiteralPath $factorioLog -Destination $copy
+  Complete-MIR42CapStage $Stage $copy
   return $copy
 }
 
@@ -461,14 +518,14 @@ for($index=1;$index -lt $lineage.Count;$index++){
 
 function Get-MIR42StageManifest($Stage){
   $entries=[ordered]@{
-    candidate=Get-MIR42Artifact (Join-Path $Stage.mods (Split-Path -Leaf $candidateZip))
-    fixture=Get-MIR42Artifact $Stage.fixture_archive
-    settings=Get-MIR42Artifact $Stage.settings_archive
+    candidate=Get-MIR42Artifact (Join-Path $Stage.mods (Split-Path -Leaf $candidateZip)) -AllowExternal
+    fixture=Get-MIR42Artifact $Stage.fixture_archive -AllowExternal
+    settings=Get-MIR42Artifact $Stage.settings_archive -AllowExternal
     mod_list=Get-MIR42Artifact $Stage.mod_list
     config=Get-MIR42Artifact $Stage.config
   }
-  if($Stage.blocker){$entries.blocker=Get-MIR42Artifact $Stage.blocker_archive}
-  if($Stage.policy_blocker){$entries.policy_blocker=Get-MIR42Artifact $Stage.policy_blocker_archive}
+  if($Stage.blocker){$entries.blocker=Get-MIR42Artifact $Stage.blocker_archive -AllowExternal}
+  if($Stage.policy_blocker){$entries.policy_blocker=Get-MIR42Artifact $Stage.policy_blocker_archive -AllowExternal}
   return [ordered]@{name=$Stage.name;cap=$Stage.cap;blocker=$Stage.blocker;policy_blocker=$Stage.policy_blocker;artifacts=$entries}
 }
 
@@ -533,7 +590,10 @@ $result=[ordered]@{
   }
   explicit_non_claims=$nonClaims
 }
-$result['input_staging']=@($seedStage,$cappedStage,$policyBlockedStage,$blockedStage,$removalStage|ForEach-Object {Complete-MIRImmutableInputLease -Lease $_.lease -Outcome passed})
+Assert-MIR441CleanTrackedSource -RepoRoot $repo
+Assert-Exact 'source after execution' ((&git -C $repo rev-parse HEAD).Trim()) $sourceCommit
+Assert-Exact 'engine after execution' (Get-MIR42Sha $engine) ([string]$engineResolution.engine.sha256)
+$result['library_activations']=@($seedStage,$cappedStage,$policyBlockedStage,$blockedStage,$removalStage|ForEach-Object {$_.terminals.ToArray()})
 $result['resource_context']=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;shared_alias_bytes=$resources.shared_alias_bytes;memory_enforcement='sampled-watchdog-not-hard-cap'}
 $result['process_inventory']=@($resources.runs)
 Write-MIRNativeProbeResult -Context $resources -Record $result

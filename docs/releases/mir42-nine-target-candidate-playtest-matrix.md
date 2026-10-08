@@ -70,6 +70,18 @@ Candidate C passed actual published `CCC00 → CCC01` upgrades and two subsequen
 
 The first batch completed F210/F200/F110 before host commit admission refused F100's declared 1,024 MiB workload. Only F100/F017 resumed, at 512 MiB each: more than twice the retained F100 peak and three times the F017 peak. Actual resumed peaks were 192,724,992 and 168,341,504 bytes. System reserves were unchanged, completed targets were not repeated, prior controls restored and the primary branch returned cleanly after each exact-source invocation. Installing the selected current MIR packages and small owned fixtures wrote 2,028,023 bytes; dependency payload copies, archive links and extractions remained zero. These five exact-package results do not qualify the remaining F013–F016 maintenance transitions, representative overhauls or the joined nine-target release.
 
+## Current F014–F016 fresh-game character research
+
+The existing handcrafting fixture passed against candidate C on Factorio 0.14.23, 0.15.40 and 0.16.51 at harness source `0b4a70e208e6de14103941306be14ede1474daef`. Each actual package emits the five expected character-research entries with available prerequisites, positive effects and laboratory-compatible default science. F014 uses alien science and singular icon fields; F015/F016 use high-tech plus military science and layered icons. On all three engines, completing the crafting-speed research changes the native force modifier from `0` to `0.05`. The fixture checks prototype effects for the other four entries; it does not demonstrate their earned runtime rewards.
+
+| Target | Result path | Result SHA-256 |
+|---|---|---|
+| F014 | `build/p/m421-current-historical-native-f014-c/result.json` | `3574C9E186ED09B75C615BA6D6F8114D4D23F7373B02E110E3C71FE4077B6057` |
+| F015 | `build/p/m421-current-historical-native-f015-c/result.json` | `CCF6B3CB8BC2F36C93707BD60B589684D296E18228FFE5F434BFFDCAEB186B2D` |
+| F016 | `build/p/m421-current-historical-native-f016-c/result.json` | `9FB7319279E55019763A0A98AB19014FD2C22E84936E2B5ED9E678A07607361E` |
+
+The receipts bind the actual candidate C ZIPs, installed engine hashes, fixture bytes, logs and new saves. The largest observed process peak was 181,559,296 bytes under a 512 MiB workload budget; system reserves were unchanged. All three runs restored previous controls and used their existing checkout-local libraries without dependency copies, links or extraction. These fresh-game observations do not establish predecessor upgrades, reload continuity, a Library backport or complete historical-target acceptance. F013 was not attempted in this batch.
+
 ## Current F200 settings-derived cap transition
 
 Candidate C's `4.2.20001` ZIP (`2ED9D135408BC1D97ACD00691C54BB22186DA2C0EEDB341D7BD0F2ECBB775D6A`) passed the existing native cap-transition fixture on Factorio 2.0.77 at harness source `9cd5e620e46a525b8f66074b0f7eec06e6f0e021`. The `0 → 3 → 0` setting changes preserve earned level four, restore only MIR-owned enablement and visibility, and leave independently disabled research disabled across configuration changes and saved-state loads. Result `build/p/m421-f200-cap-current-c/e333373a5c1e43878a5daebb4b7f03c5/result.json` has SHA-256 `999707845E66BD5AB0DEF702EF83BEBB63A8C99BADAA22119A5B9EC2506103B9`. All three library activations restored their previous controls; no dependency archives were copied or linked. The measured peak was 366,022,656 bytes under a 768 MiB workload budget, with system reserves unchanged. This is the exact F200 base-only settings-derived cap scenario, not F210 cap migration, physical multiplayer or joined release acceptance.
