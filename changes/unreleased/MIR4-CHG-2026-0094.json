@@ -4,10 +4,10 @@
   "change_id": "MIR4-CHG-2026-0094",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Share exact material-audit archives and refresh test catalogues.",
+  "summary": "Preserve material-audit definitions while refusing retired native staging.",
   "details": [
-    "Angel Tin, combined Bob/Angel Tin, route-safety and Aluminium audits lease candidate and dependency ZIPs through strict hardlinks, retain original archive locks and record terminal custody. Private fixture and settings files remain separate. Historical outcome assertions are unchanged.",
-    "The existing test and workflow catalogue writers consume updated native commands and inputs, correcting the stale derived catalogue caught by CI. Controlled input checks do not establish a new native material, lifecycle or release pass."
+    "The unconverted Angel Tin, combined Bob/Angel Tin, route-safety and Aluminium native entry points now refuse before staging. Their original archive locks and gameplay oracles remain available for later direct-library conversion; existing log-audit and candidate-binding modes retain their stated scope.",
+    "The existing test and workflow catalogue writers track the current commands and inputs. Historical and controlled input evidence supplies no new native material, lifecycle or release pass."
   ],
   "semantic_domains": [
     "tooling",
@@ -77,7 +77,7 @@
   "release_surfaces": {
     "source_changelog": "include",
     "target_changelog": "omit",
-    "github": "include",
+    "github": "omit",
     "mod_portal": "omit",
     "technical": "include",
     "manifest": "include"

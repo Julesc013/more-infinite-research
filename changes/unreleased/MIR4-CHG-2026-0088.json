@@ -4,11 +4,11 @@
   "change_id": "MIR4-CHG-2026-0088",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Stage selected native mod profiles through shared archives without copy fallback.",
+  "summary": "Run selected native tests directly against a configured archive library.",
   "details": [
-    "Upgrade tests and twelve existing Bob/Angel and K2 native lease consumers now require verified hard links. Link failures refuse staging instead of copying dependency archives; writable settings and fixture state remain separate.",
-    "The compatibility audit defaults to Hardlink and rejects Copy/Symlink. Its MIR input must be an existing materialized ZIP; raw repository copying is retired. Matching aliases are verified, and missing or mismatched inputs fail before engine use.",
-    "Storage guidance records manifest-based profiles and affected regression selection. Historical interface and native records remain bound to their original source; no current gameplay qualification is claimed."
+    "Profiles contain small selection definitions. Migrated upgrade, progression and Library runners switch verified mod-list/settings controls under exclusive library ownership, retain private run output and restore previous controls.",
+    "The direct-library path creates no dependency copies, hard links or extracted mod directories. Unconverted native entry points refuse before staging. Checkout-local immutable custody tests remain separate from normal gameplay execution.",
+    "Exact versions, hashes and scenario definitions remain in tracked contracts; machine-specific engine and library paths are explicit local bindings. Missing inputs do not recreate retired profiles."
   ],
   "semantic_domains": [
     "compatibility",

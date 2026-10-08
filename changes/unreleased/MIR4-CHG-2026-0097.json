@@ -4,10 +4,10 @@
   "change_id": "MIR4-CHG-2026-0097",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Share passive-repair probe archives with governed native calls.",
+  "summary": "Retain passive-repair probe controls and refuse its obsolete native entry point.",
   "details": [
-    "The existing F210/F200 passive-repair host probe now leases its selected archive through a strict same-volume hardlink. Its version, create, enabled/default-off and reload calls use the shared resource governor with explicit memory and output budgets.",
-    "Focused controls verify actual input identity, governed engine arguments, failure diagnostics and preallocation refusal without Factorio. The original save/reload oracles remain intact; this tooling change establishes no current-package native qualification."
+    "The F210/F200 passive-repair host probe still requires direct-library conversion and stops before staging or engine use. Its historical enabled/default-off and reload scenarios remain preserved.",
+    "Retained tiny-file controls cover input identity, resource budgets and failure behavior. They do not authorize the old staging path or establish current native passive-repair acceptance."
   ],
   "semantic_domains": [
     "tooling",
@@ -77,7 +77,7 @@
   "release_surfaces": {
     "source_changelog": "include",
     "target_changelog": "omit",
-    "github": "include",
+    "github": "omit",
     "mod_portal": "omit",
     "technical": "include",
     "manifest": "include"
