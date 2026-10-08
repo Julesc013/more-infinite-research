@@ -198,7 +198,27 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
     [IO.File]::WriteAllBytes((Join-Path $library 'mod-list.json'),$activation.mod_list_bytes)
   }
   $savedGuard=(Get-Command Assert-MIRLibraryIdle).ScriptBlock
-  function Assert-MIRLibraryIdle {throw '[mir-library-factorio-active] controlled live client'}
+  & {
+    $script:idleObservations=0;$script:engineRemains=$false
+    function Get-Process {
+      param($Name)
+      if($Name-cne'factorio'){throw 'Unexpected process query'}
+      $script:idleObservations++
+      if($script:engineRemains -or $script:idleObservations-le2){return [pscustomobject]@{Id=901}}
+    }
+    Assert-LibraryRefusal {Assert-MIRLibraryIdle} 'mir-library-factorio-active'
+    Assert-LibraryTest ($script:idleObservations-eq1) 'initial admission refuses a live client immediately'
+    $script:idleObservations=0
+    Assert-MIRLibraryIdle -WaitMilliseconds 500
+    Assert-LibraryTest ($script:idleObservations-eq3) 'bounded restoration wait observes complete process exit'
+    $script:engineRemains=$true
+    Assert-LibraryRefusal {Assert-MIRLibraryIdle -WaitMilliseconds 100} 'mir-library-factorio-active'
+  }
+  function Assert-MIRLibraryIdle {
+    param($WaitMilliseconds)
+    Assert-LibraryTest ($WaitMilliseconds-eq3000) 'restoration waits under the existing exclusive lock'
+    throw '[mir-library-factorio-active] controlled live client'
+  }
   Assert-LibraryRefusal {Complete-MIRLibraryActivation $activation} 'mir-library-factorio-active'
   Assert-LibraryTest ($activation.lock.CanRead -and -not $activation.closed) 'live engine retains lock and read handles'
   Set-Item -Path Function:Assert-MIRLibraryIdle -Value $savedGuard

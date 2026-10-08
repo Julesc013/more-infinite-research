@@ -3667,9 +3667,9 @@
     {
       "path": "tools/lib/compatibility/LibraryActivation.ps1",
       "classification": "canonical-internal",
-      "sha256": "04CC924E7B0D9BACA7AF6099DC2B29E85C36B3500DB67190CA8D845DB20B843B",
+      "sha256": "5BF518FF862E5CD613C005B869A62D416353EDC6B0A53207E736691F6F1A0FB3",
       "hash_mode": "canonical-text-v1",
-      "lines": 343,
+      "lines": 354,
       "package_visible": false
     },
     {
@@ -6050,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1491c90d97946ab819c106a0a90e3a7c229d45a8258d0b42dc0fdaca14f382f9"
+  "digest": "sha256:5b74f855eb51399799236d00072d26a6a125a2b0f49b7d7659751fc2b7da9c3c"
 }
