@@ -14,7 +14,7 @@ script.on_nth_tick(1, function()
   for _ in pairs(force.technologies) do technologies = technologies + 1 end
   assert(technologies > 0 and #game.connected_players == 0, "expected private headless research state")
   completions = 0
-  local timer = game.create_profiler()
+  local timer = helpers.create_profiler()
   force.research_all_technologies()
   timer.stop()
   assert(completions > 0, "research-all did not raise completion events")

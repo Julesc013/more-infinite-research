@@ -6,7 +6,7 @@
   "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
   "baseline": {"version":"4.2.20000","sha256":"9C4EFA1D4C3D09F5D945F227A480EA1644C494F6F9162A9CC1FB50A7523D7557"},
   "candidate_version": "4.2.20001",
-  "fixture": {"name":"mir-fixture-research-all-performance","version":"1.0.1"},
+  "fixture": {"name":"mir-fixture-research-all-performance","version":"1.0.2"},
   "settings": "defaults",
   "official_mods": ["base"],
   "scope": "base-only first and repeated research_all_technologies; single paired observation, not statistical or GUI acceptance"
