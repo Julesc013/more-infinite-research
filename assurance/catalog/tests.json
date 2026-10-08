@@ -1055,7 +1055,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIR42V2V3CapMigration.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -PredecessorCandidateZip <prior-release> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
+      "command": "./tests/runtime/Test-MIR42V2V3CapMigration.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -PredecessorCandidateZip <prior-release> -LibraryDirectory <mods> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -1072,6 +1072,7 @@
         "tools/mir/application/package/HistoricalSourceAuthority.ps1",
         "tools/mir/application/package/SourceCompositionProof.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
         "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
@@ -8351,5 +8352,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:15e259b92619ff9bf85db4c131602a16a00972b123b6209faf9944a16cac56f9"
+  "digest": "sha256:c728def132c35284d7d336455bc6f9e15c31b7d83078587db2590d68f934b4f0"
 }
