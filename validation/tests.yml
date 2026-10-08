@@ -5827,7 +5827,7 @@
       "id": "runtime.maximum-level-v2-v3-migration-f210",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIR42V2V3CapMigration.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -PredecessorCandidateZip <prior-release> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
+      "command": "./tests/runtime/Test-MIR42V2V3CapMigration.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -PredecessorCandidateZip <prior-release> -LibraryDirectory <mods> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "requires_factorio": true,
       "inputs": [
         "candidate",
@@ -5838,6 +5838,7 @@
         "tools/mir/application/package/HistoricalSourceAuthority.ps1",
         "tools/mir/application/package/SourceCompositionProof.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
         "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
