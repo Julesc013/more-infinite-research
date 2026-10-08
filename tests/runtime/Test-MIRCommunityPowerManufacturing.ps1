@@ -17,7 +17,7 @@ if(-not $PrepareInputsOnly -and (-not $FactorioBin -or -not $LibraryDirectory -o
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
-& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -AsJson | Out-Host
+& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
 Assert-MIR441CleanTrackedSource -RepoRoot $repo
 $source=(&git -C $repo rev-parse HEAD).Trim()
@@ -54,10 +54,10 @@ try{
   $record.profile=@{path=$profilePath;sha256=(Get-FileHash -LiteralPath $profilePath).Hash}
   $record.engine=@{path=$engine;sha256=$profile.engine_sha256}
   $record.fixture=@{path=$fixtureArchive;sha256=$hashes[$fixtureName]}
-  function Invoke-PowerStage([string]$Name,[string[]]$StageArguments){
+  function Invoke-PowerStage([string]$Name,[string[]]$StageArguments,[scriptblock]$CompletionPredicate){
     $arguments=@('--config',$config,'--mod-directory',$library,'--disable-audio')+$StageArguments
     Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
-    $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds 120
+    $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds 120 -CompletionPredicate $CompletionPredicate
     if(-not $actor.result.passed){throw ('[mir-community-power-native] '+$Name)}
     $log=Join-Path $user 'factorio-current.log'
     $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation
@@ -67,11 +67,24 @@ try{
   }
   $save=Join-Path $resources.root 'source.zip'
   Invoke-PowerStage 'create' @('--create',$save)
-  Invoke-PowerStage 'production' @('--benchmark',$save,'--benchmark-ticks','30000','--benchmark-runs','1')
   $productionPath=Join-Path $user 'script-output/community-power-production.json'
+  $progressed=Join-Path $user 'saves/_autosave-mir-community-power.zip'
+  $productionLog=Join-Path $user 'factorio-current.log'
+  $serverSettings=Join-Path $resources.root 'server-settings.json'
+  @{name='MIR owned community production';description='Local assertion fixture';visibility=@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false}|ConvertTo-Json -Depth 4|Set-Content -LiteralPath $serverSettings
+  $listener=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0)
+  try{$listener.Start();$port=([Net.IPEndPoint]$listener.LocalEndpoint).Port}finally{$listener.Stop()}
+  $finished={
+    if(-not(Test-Path -LiteralPath $productionPath) -or -not(Test-Path -LiteralPath $progressed)){return $false}
+    try{
+      $value=Get-Content -LiteralPath $productionPath -Raw|ConvertFrom-Json
+      return $value.status-ceq'passed' -and $value.stage-ceq'production' -and
+        ((Get-Content -LiteralPath $productionLog -Raw)-match 'Saving finished')
+    }catch{return $false}
+  }.GetNewClosure()
+  Invoke-PowerStage 'production' @('--start-server',$save,'--bind',('127.0.0.1:'+$port),'--server-settings',$serverSettings) $finished
   $production=Get-Content -LiteralPath $productionPath -Raw|ConvertFrom-Json
   if($production.status-cne'passed' -or $production.stage-cne'production' -or @($production.cases).Count-ne4){throw '[mir-community-power-production]'}
-  $progressed=Join-Path $user 'saves/_autosave-mir-community-power.zip'
   if(-not(Test-Path -LiteralPath $progressed)){throw '[mir-community-power-save]'}
   Invoke-PowerStage 'reload' @('--benchmark',$progressed,'--benchmark-ticks','10','--benchmark-runs','1')
   $reloadPath=Join-Path $user 'script-output/community-power-reload.json'

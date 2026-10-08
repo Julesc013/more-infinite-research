@@ -13,12 +13,13 @@ local function report(stage)
   end
   helpers.write_file('community-power-' .. stage .. '.json', helpers.table_to_json{
     status='passed', stage=stage, cases=facts, mods=script.active_mods,
-    production='20 unmodified recipe crafts; no modules or beacons; fixture supplies ingredients and machine energy',
+    production='20 unmodified recipe crafts; no modules or beacons; fixture supplies ingredients and machine energy; game speed 64',
     boundary='Exact F200 paired base/default manufacturing; no SE, AAI, Paracelsin, DLC or package-upgrade claim'
   }, false)
   log('[mir-community-power] ' .. stage .. ' PASS actual-output=21 researched / 20 unresearched per recipe')
 end
 script.on_init(function()
+  game.speed = 64
   assert(script.active_mods.base == '2.0.77' and script.active_mods['more-infinite-research'] == '4.2.20001')
   assert(script.active_mods.SolarMatrix == '1.0.8' and script.active_mods['Accumulator-V2'] == '1.0.7')
   local researched = game.forces.player
