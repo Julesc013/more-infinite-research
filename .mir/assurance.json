@@ -421,6 +421,11 @@
       "tests": ["static.direct-library-activation"]
     },
     {
+      "id": "research-all-observation",
+      "patterns": ["^tools/lib/validation/ResearchAllPerformance[.]ps1$", "^scripts/Measure-MIRPerformanceRegression[.]ps1$", "^tests/release/Test-MIRResearchAllObservation[.]ps1$", "^fixtures/performance-regression-probe/research-all[.]lua$", "^fixtures/run-profiles/research-all-f(?:200|210)[.]json$"],
+      "tests": ["static.research-all-observation", "runtime.research-all-observation-f200", "runtime.research-all-observation-f210"]
+    },
+    {
       "id": "native-probe-resources",
       "patterns": ["^tools/lib/validation/(?:NativeProbeResources|BrowserContinuityInputs)[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/Test-MIR(?:ResearchBrowser|BrowserPersonalStateContinuity|42CapOwnershipMultiforce)[.]ps1$"],
       "tests": ["static.immutable-input-staging", "static.direct-library-activation", "runtime.material-route-guard", "runtime.research-browser"]
