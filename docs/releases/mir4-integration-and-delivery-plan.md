@@ -5,7 +5,7 @@ applies_to: "MIR 4.1 maintenance and 4.2+ development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -24,7 +24,7 @@ The task authority is the `synthesis` section of [the existing operating program
 
 ### Maintainer amendment: 4.2.1 release window, 7 October 2026
 
-The maintainer's current request scopes this maintenance release around completed and nearly completed corrections. Implementation admission closes **8 October 2026 at 20:46 AEDT**; GitHub publication, anonymous-download verification and matching primary `dist` delivery target **9 October at 20:46 AEDT**. The second day is for joined acceptance and concrete candidate repairs. These dates grant no test waiver or completion claim. The remaining programme retains its original request identities for **4.2.2, targeted for 16 October**, and subsequent qualified work. This amendment supersedes earlier prose requiring the entire original programme to finish in 4.2.1.
+The maintainer's request scopes this maintenance release around completed and nearly completed corrections. Implementation admission closed **8 October 2026 at 20:46 AEDT**. The latest 9 October instruction starts final validation and targets GitHub publication, anonymous-download verification and matching primary `dist` delivery **eight hours from that instruction, approximately 16:42 AEDT on 9 October**, superseding the earlier 20:46 publication target. Feature admission is closed; remaining changes are candidate repairs, evidence and documentation. This target grants no test waiver or completion claim. The remaining programme retains its original request identities for **4.2.2, targeted for 16 October**, and subsequent qualified work. This amendment supersedes earlier prose requiring the entire original programme to finish in 4.2.1.
 
 | Existing request/work | Owner and admitted code | Remaining acceptance and stop condition |
 | --- | --- | --- |
@@ -59,7 +59,7 @@ Preserve `v4.2.0-rc.1` as historical. The earlier final release and its source/d
 
 Publish the complete accepted nine-target set on GitHub before any Mod Portal upload. The maintainer uploads identical ZIPs in order F210, F200, F110, F100, F017, F016, F015, F014, F013, with six-hour elapsed gaps. Anchor persisted UTC due times to the actual first upload; eight gaps make a 48-hour rollout. Before every upload reconcile actual Portal state, target/version/hash, any newer same-target correction, and new blocking reports. Pause affected targets for serious defects, and skip superseded pending uploads. A successful newer-engine upload is not qualification for an older engine.
 
-`4.2.1` immediately owns work absent from this selected source and new regressions. Target publication is Friday **9 October 2026, Melbourne local time (AEDT)**. The current amendment admits selected features through Thursday 8 October at 20:46 AEDT and reserves the following 24 hours for joined checks and delivery. Prioritize crashes, lost state, broken upgrades and unusable research, then wrong effects, ownership, science and progression, followed by responsiveness and unfinished integrations. Publish serious corrections as soon as ready rather than waiting for Friday; advance both source and distribution identities when a hotfix consumes a revision. Friday is a maintenance objective, not a guarantee that every remaining feature will be finished.
+`4.2.1` immediately owns work absent from this selected source and new regressions. Target publication is Friday **9 October 2026, Melbourne local time (AEDT)**. Feature admission closed Thursday 8 October at 20:46 AEDT; the latest 9 October instruction targets publication about 16:42 AEDT after final validation. Prioritize crashes, lost state, broken upgrades and unusable research, then wrong effects, ownership, science and progression, followed by responsiveness and unfinished integrations. Publish serious corrections as soon as ready rather than waiting for Friday; advance both source and distribution identities when a hotfix consumes a revision. Friday is a maintenance objective, not a guarantee that every remaining feature will be finished.
 
 Reports must bind package version/hash, exact Factorio version, mod set, settings and first failing step, and corrections add concrete reproducers to the existing tests. The local final-candidate handoff is `dist/LATEST-MIR42-FINAL-CANDIDATE.txt`; `dist/LATEST-MIR42-PUBLISHED.txt` records the published mutable `v4.2.0-stable` release, its frozen source and local CCC00 assets. Keep original evidence at its original candidate identity. The reporters' exact versions remain unknown, so the reports are not labelled 4.2 regressions. A native check prevented by the resource guard remains NOT RUN; no result is converted to passed because of the release deadline.
 

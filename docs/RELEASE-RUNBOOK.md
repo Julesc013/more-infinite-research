@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -51,7 +51,7 @@ Stage every accepted asset before publication; verify exact tag/source, filename
 5. Qualify each committed target independently on its exact engine, including its required predecessor upgrade and reload evidence. F210 re-observes the current installed experimental engine immediately before its lane. A previous four-target result does not qualify a new candidate or replace its target commitments.
 6. Independently recompute package, engine, runtime, transition, resource, and custody identities; create the technical seal and pass the offline restore drill.
 7. Promote only the exact qualified candidate through the accepted protected procedure, with required checks and protections intact. Read back the resulting `main` commit and require the exact qualified tree and package bytes before recording its commit rebinding. Unresolved ancestry, rules, tree identity, or package identity is a preflight blocker, not permission to suspend protections.
-8. Present the candidate-bound human gameplay playtest against the sealed packages represented by read-back `main`. On `NO-GO`, publish nothing and correct forward through a new candidate. Until actual `GO`, do not create, push, or publish a tag.
+8. Apply the candidate-bound acceptance decision to the sealed packages represented by read-back `main`. For 4.2.1, the maintainer's written conditional authorization supplies the publication decision only after actual required technical acceptance; a personal playthrough is not a prerequisite. It does not supply signatures, independent review, recovery evidence or a test waiver. Other release windows retain their governed human-playtest requirements. On `NO-GO`, publish nothing and correct forward through a new candidate. Until actual candidate-bound `GO`, do not create, push, or publish a tag.
 9. Only with actual `GO` and publication authority, prepare and push the tag against verified `main` and publish the existing sealed assets without rebuilding or rewriting their source. Read back public bytes and close publication receipts. Mod Portal upload remains a separate maintainer action using the identical sealed target ZIPs and prepared copy.
 
 ## Historical MIR 4.1 closeout
