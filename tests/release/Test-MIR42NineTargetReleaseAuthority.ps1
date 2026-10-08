@@ -115,6 +115,8 @@ try {
   Copy-Item -LiteralPath (Join-Path $repo $programmeSchemaRelative) -Destination (Join-Path $scratch $programmeSchemaRelative)
   Copy-Item -LiteralPath $oldPath -Destination (Join-Path $scratch $four.programme_path)
   $programme = New-MIR42NineTargetReleaseCutProgramme -RepoRoot $repo -OutputPath $programmePath
+  $committedProgramme = Read-MIR42SealRecord -Path (Join-Path $repo $nine.programme_path) -Code 'mir42-nine-authority-committed-programme'
+  Assert-NineAuthority ((ConvertTo-MIR4BootstrapCanonicalJson -Value $committedProgramme.record) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $programme)) 'committed-pending-programme-matches-current-authorities'
   Assert-NineAuthority (($programme.selected_targets -join '|') -ceq ($script:MIR42SealNineTargetCandidates -join '|') -and @($programme.direct_predecessors).Count -eq 9 -and @($programme.historical_predecessor_authorities).Count -eq 5) 'all-nine-predecessors'
   Assert-NineAuthority (@($programme.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0 -and -not $programme.publication_authorized -and -not $programme.release_transition_authority) 'preparation-grants-no-transition'
   Assert-NineAuthority ((Get-FileHash -LiteralPath $oldPath -Algorithm SHA256).Hash -ceq $oldHash) 'old-programme-bytes-preserved'
