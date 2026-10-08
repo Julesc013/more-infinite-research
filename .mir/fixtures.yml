@@ -358,6 +358,8 @@ fixtures:
       - exact-archive-paired-phase-timing
       - diagnostics-artifact-volume-export
       - baseline-candidate-symmetric-instrumentation
+      - runtime-research-all-first-and-repeat-native-profiler-observation
+      - runtime-research-all-event-count-and-exact-package-binding
 
   space-exploration-recipe-removal:
     requires_features: [recipe_productivity]

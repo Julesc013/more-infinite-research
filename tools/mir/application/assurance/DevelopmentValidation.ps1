@@ -162,7 +162,10 @@ function Get-MIR4DevelopmentInitialPlanProfile {
   }
   $baselineAvailable=([string]$baselineState -ceq 'resolved' -and [string]$baseline -cmatch '^[0-9a-f]{40}$')
   $autoCoversSelection=@($selectionTests|Where-Object {$_ -notin $classificationTests}).Count -eq 0
-  $useAffectedSelection=($baselineAvailable -and -not [bool]$escalated -and $classificationPaths.Count -gt 0 -and $classificationTests.Count -gt 0 -and $selectionTests.Count -gt 0 -and $autoCoversSelection)
+  # The general classifier can also select native matrices. Hosted static
+  # planning has no candidate or engine and must not expand those matrices.
+  $autoContainsOnlySelection=@($classificationTests|Where-Object {$_ -notin $selectionTests}).Count -eq 0
+  $useAffectedSelection=($baselineAvailable -and -not [bool]$escalated -and $classificationPaths.Count -gt 0 -and $classificationTests.Count -gt 0 -and $selectionTests.Count -gt 0 -and $autoCoversSelection -and $autoContainsOnlySelection)
   return [ordered]@{
     profile=$(if($useAffectedSelection){'auto'}else{'mir4-development'})
     baseline=$(if($baselineAvailable){[string]$baseline}else{''})

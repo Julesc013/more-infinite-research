@@ -106,6 +106,13 @@ Assert-MIRDevelopmentCISelection -Condition ($historicalIds -contains 'static.pa
 
 $actualCatalog=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')|ConvertFrom-Json
 $actualAssurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json
+$performancePaths=@('tools/lib/validation/ResearchAllPerformance.ps1','fixtures/performance-regression-probe/research-all.lua','fixtures/run-profiles/research-all-f210.json')
+$performanceClassification=Get-MIRAssuranceClassification -Paths $performancePaths -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition (-not $performanceClassification.escalated -and 'static.research-all-observation' -in @($performanceClassification.tests) -and 'runtime.research-all-observation-f200' -in @($performanceClassification.tests) -and 'runtime.research-all-observation-f210' -in @($performanceClassification.tests)) -Message 'The performance consumer must retain its exact static and native selections without unknown-path escalation.'
+$performanceRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $performanceClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+Assert-MIRDevelopmentCISelection -Condition ('static.research-all-observation' -in @($performanceRows.id) -and @($performanceRows|Where-Object requires_factorio).Count -eq 0) -Message 'Hosted performance selection must consume its actual source check without native execution.'
+$unknownPerformance=Get-MIRAssuranceClassification -Paths @('tools/lib/validation/UnregisteredPerformanceProbe.ps1') -Config $actualAssurance
+Assert-MIRDevelopmentCISelection -Condition ($unknownPerformance.escalated -and 'runtime.full' -in @($unknownPerformance.tests)) -Message 'Exact performance mapping must not exempt unknown native tooling.'
 $labPath='tests/compiler/lab_reachability.lua'
 $labClassification=Get-MIRAssuranceClassification -Paths @($labPath) -Config $actualAssurance
 Assert-MIRDevelopmentCISelection -Condition (-not $labClassification.escalated -and
@@ -237,6 +244,12 @@ $affectedSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $coverageSelectio
 $affectedSelection.classification.tests=@('static.compiler','static.package')
 $initialAffectedPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $affectedSelection
 Assert-MIRDevelopmentCISelection -Condition ($initialAffectedPlan.profile -ceq 'auto' -and $initialAffectedPlan.use_baseline -and $initialAffectedPlan.use_affected_selection -and $initialAffectedPlan.selection_rows_covered_by_auto) -Message 'Known baseline-bound development selection did not reduce to its automatic affected plan.'
+foreach($extra in @('runtime.affected','runtime.full','static.unselected')) {
+  $mixedSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $affectedSelection
+  $mixedSelection.classification.tests+=@($extra)
+  $mixedPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $mixedSelection
+  Assert-MIRDevelopmentCISelection -Condition ($mixedPlan.profile -ceq 'mir4-development' -and $mixedPlan.use_baseline -and -not $mixedPlan.use_affected_selection) -Message ('Hosted planning admitted an unselected automatic row: '+$extra)
+}
 $uncoveredStaticSelection=Copy-MIRDevelopmentCanonicalCoverageFixture $affectedSelection
 $uncoveredStaticSelection.tests=@('static.compiler','static.package','static.unrelated')
 $uncoveredStaticPlan=Get-MIR4DevelopmentInitialPlanProfile -Selection $uncoveredStaticSelection

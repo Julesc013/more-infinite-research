@@ -11,8 +11,20 @@ param(
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
   [ValidateRange(5, 25)][int]$MeasuredRuns = 5,
   [switch]$ProbeSmokeOnly,
-  [string]$CompatSmokeLaneId = ""
+  [string]$CompatSmokeLaneId = "",
+  [switch]$ObserveResearchAll,
+  [switch]$PrepareResearchAllInputs,
+  [ValidateSet('f200','f210')][string]$Target='f210',
+  [string]$SourceMaterializationPath='',
+  [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB=1024,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
 )
+
+if($ObserveResearchAll -or $PrepareResearchAllInputs){
+  . (Join-Path $RepoRoot 'tools/lib/validation/ResearchAllPerformance.ps1')
+  Invoke-MIRResearchAllPerformance -RepoRoot $RepoRoot -Target $Target -Candidate $Candidate -PriorRelease $PriorRelease -FactorioBin $FactorioBin -ExpectedSourceCommit $ExpectedSourceCommit -LibraryDirectory $LocalModZipDir -SourceMaterializationPath $SourceMaterializationPath -OutputRoot $ArtifactRoot -PrepareInputsOnly:$PrepareResearchAllInputs -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+  return
+}
 
 throw '[mir-native-obsolete-runner] The legacy performance campaign stages populated mod directories. Use an explicitly selected direct-library native consumer; this campaign must be migrated before it can provide new performance evidence.'
 

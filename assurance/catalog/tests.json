@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 225,
+  "test_count": 228,
   "tests": [
     {
       "id": "docs.check",
@@ -1330,6 +1330,72 @@
         "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
         "source:source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
         "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "runtime.research-all-observation-f200",
+      "proposition": "The governed test 'runtime.research-all-observation-f200' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./scripts/Measure-MIRPerformanceRegression.ps1 -ObserveResearchAll -Target f200 -Candidate <candidate> -PriorRelease <published-predecessor> -FactorioBin <factorio> -ExpectedSourceCommit <source-commit> -LocalModZipDir <mods> -SourceMaterializationPath <candidate-materialization> -ArtifactRoot <test-output>",
+      "canonical_implementation": "scripts/Measure-MIRPerformanceRegression.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "factorio",
+        "prior-release",
+        "source:source/prototypes/mir/runtime/**",
+        "scripts/Measure-MIRPerformanceRegression.ps1",
+        "tools/lib/validation/ResearchAllPerformance.ps1",
+        "fixtures/performance-regression-probe/research-all.lua",
+        "fixtures/run-profiles/research-all-f200.json",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "runtime.research-all-observation-f210",
+      "proposition": "The governed test 'runtime.research-all-observation-f210' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./scripts/Measure-MIRPerformanceRegression.ps1 -ObserveResearchAll -Target f210 -Candidate <candidate> -PriorRelease <published-predecessor> -FactorioBin <factorio> -ExpectedSourceCommit <source-commit> -LocalModZipDir <mods> -SourceMaterializationPath <candidate-materialization> -ArtifactRoot <test-output>",
+      "canonical_implementation": "scripts/Measure-MIRPerformanceRegression.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "factorio",
+        "prior-release",
+        "source:source/prototypes/mir/runtime/**",
+        "scripts/Measure-MIRPerformanceRegression.ps1",
+        "tools/lib/validation/ResearchAllPerformance.ps1",
+        "fixtures/performance-regression-probe/research-all.lua",
+        "fixtures/run-profiles/research-all-f210.json",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -8163,6 +8229,30 @@
       "matrix": null
     },
     {
+      "id": "static.research-all-observation",
+      "proposition": "The governed test 'static.research-all-observation' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIRResearchAllObservation.ps1",
+      "canonical_implementation": "tests/release/Test-MIRResearchAllObservation.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "scripts/Measure-MIRPerformanceRegression.ps1",
+        "tools/lib/validation/ResearchAllPerformance.ps1",
+        "tests/release/Test-MIRResearchAllObservation.ps1",
+        "fixtures/performance-regression-probe/research-all.lua",
+        "fixtures/run-profiles/research-all-*.json"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.settings",
       "proposition": "The governed test 'static.settings' passes for its exact selected inputs.",
       "cohort": "compiler-static",
@@ -8243,13 +8333,13 @@
   "summary": {
     "cohorts": {
       "package-repository": 69,
-      "tooling-release": 68,
-      "runtime-upgrade": 54,
+      "tooling-release": 69,
+      "runtime-upgrade": 56,
       "compiler-static": 19,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 214,
-    "aggregate_commands": 8,
+    "canonical_test_commands": 215,
+    "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
     "duplicate_test_ids": 0
@@ -8261,5 +8351,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:915c6cad963392399049156521637ee0856e1c62265eeb2aed9bfcf936dc35ba"
+  "digest": "sha256:ce780ac3e30003b386c08ec8785de03709d50a19f400bbbf502bb3243d18b059"
 }
