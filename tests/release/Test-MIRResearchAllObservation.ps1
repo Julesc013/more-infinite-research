@@ -44,4 +44,11 @@ foreach($target in @('f200','f210')){
 }
 try{& (Join-Path $RepoRoot 'scripts/Measure-MIRPerformanceRegression.ps1') -RepoRoot $RepoRoot -ExpectedSourceCommit ('1'*40) -ObserveResearchAll}catch{$refusal=$_.Exception.Message}
 Assert-Observation ($refusal.StartsWith('[mir-research-all-direct-inputs]')) 'Direct observation must reject missing bindings before output or native work.'
+$repo=$RepoRoot
+$imports=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.CommandAst] -and $node.InvocationOperator-eq[Management.Automation.Language.TokenKind]::Dot},$true))
+foreach($node in $imports){. ([scriptblock]::Create($node.Extent.Text))}
+foreach($target in @('f200','f210')){
+  $identity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.1'
+  Assert-Observation ($identity.distribution_version-ceq('4.2.'+$target.Substring(1)+'01')) ('Consumer imports its actual candidate identity resolver: '+$target)
+}
 Write-Output "[ok] Research-all observation: $checks checks; no native process or dependency staging."

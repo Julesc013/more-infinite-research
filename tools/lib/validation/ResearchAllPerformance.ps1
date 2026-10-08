@@ -19,6 +19,7 @@ function Invoke-MIRResearchAllPerformance {
   $ErrorActionPreference='Stop'
   if(-not$PrepareInputsOnly-and(-not$LibraryDirectory-or-not$FactorioBin-or-not$SourceMaterializationPath)){throw '[mir-research-all-direct-inputs] Supply explicit engine/library locations and the current materialization receipt.'}
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
   . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
   . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')

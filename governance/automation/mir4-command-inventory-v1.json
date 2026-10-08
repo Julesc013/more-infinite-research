@@ -4523,9 +4523,9 @@
     {
       "path": "tools/lib/validation/ResearchAllPerformance.ps1",
       "classification": "canonical-internal",
-      "sha256": "10D3B4594A40EEB53BE6FA9DB206567A9DFC09762002DFC2656A2EF4EA53E362",
+      "sha256": "46C384048418CC23FE2C3959FE4971F076D426951CC102EDD8A58823FC1A97B7",
       "hash_mode": "canonical-text-v1",
-      "lines": 96,
+      "lines": 97,
       "package_visible": false
     },
     {
@@ -6050,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c12aa58707cb44d7fdd8411f46fe508c56a4c943690afa23233415c673558493"
+  "digest": "sha256:ddf916b0212231ffb675783eed77539def971651f5139e1e7c668f61330b12b9"
 }
