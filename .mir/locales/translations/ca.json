@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "Quan està activat, el MIR pot fer referència a fitxers d'icones de DLC oficials instal·lats, inclosos l'era espacial i els carrils elevats, fins i tot quan aquests mods estiguin desactivats per a l'execució del joc base. Deixeu-ho desactivat si aquests fitxers DLC no estan instal·lats; Factorio no es pot recuperar amb gràcia dels fitxers d'icones que falten durant la càrrega del prototip.",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "Es conserva per a la configuració desada i els perfils importats. MIR només utilitza gràfics dels DLC mentre el mod que els proporciona està activat; altrament utilitza icones del joc base, fins i tot quan aquesta opció està activada. Els fitxers dels DLC instal·lats però desactivats no es poden comprovar de manera segura durant l'inici. No activa Space Age ni Elevated Rails. Cal reiniciar.",
       "provenance": "machine-assisted"
     },
     {

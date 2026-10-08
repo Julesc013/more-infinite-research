@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "Þegar virkjað er, getur MIR vísað til uppsettra opinberra DLC táknaskráa, þar á meðal Space Age og Elevated Rails, jafnvel þegar þessi stillingar eru óvirkar til að keyra grunnleik. Slepptu þessu ef þessar DLC skrár eru ekki settar upp; Factorio getur ekki jafnað sig með þokkabót eftir táknskrár sem vantar við hleðslu frumgerðarinnar.",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "Haldið fyrir vistaðar stillingar og innflutta prófíla. MIR notar aðeins DLC-myndir þegar viðbótin sem veitir þær er virk; annars eru tákn grunnleiksins notuð, jafnvel þótt kveikt sé á þessum valkosti. Ekki er hægt að athuga skrár uppsetts en óvirks DLC með öruggum hætti við ræsingu. Virkjar hvorki Space Age né Elevated Rails. Krefst endurræsingar.",
       "provenance": "machine-assisted"
     },
     {

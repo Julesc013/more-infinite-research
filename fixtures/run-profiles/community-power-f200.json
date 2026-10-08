@@ -1,6 +1,7 @@
 {
   "schema": 1,
   "target": "f200",
+  "factorio_line": "2.0",
   "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
   "mods": [
     {"name":"base","version":"2.0.77","enabled":true},

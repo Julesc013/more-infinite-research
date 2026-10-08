@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine_sha256": "703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1",
+  "mods": [
+    {"name":"base","version":"2.1.21","enabled":true},
+    {"name":"more-infinite-research","version":"4.2.21001","enabled":true},
+    {"name":"SolarMatrix","version":"1.0.9","enabled":true},
+    {"name":"Accumulator-V2","version":"1.0.8","enabled":true},
+    {"name":"mir-fixture-community-power-manufacturing","version":"1.0.0","enabled":true}
+  ],
+  "archive_sha256": {
+    "SolarMatrix_1.0.9.zip": "D56C64B762B39B28C8D6F1B32F90A1134CD50961BE420C3C067CC099368DFA8B",
+    "Accumulator-V2_1.0.8.zip": "484505A04282450B767EA1A165A443FFD25B73F69ADFA09AAB4D1C9249EA0537"
+  }
+}

@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "Indien ingeschakeld, kan MIR verwijzen naar geïnstalleerde officiële DLC-pictogrambestanden, waaronder Space Age en Elevated Rails, zelfs als deze mods zijn uitgeschakeld voor een basisgame. Laat dit uitgeschakeld als die DLC-bestanden niet zijn geïnstalleerd; Factorio kan tijdens het laden van het prototype niet correct herstellen van ontbrekende pictogrambestanden.",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "Behouden voor opgeslagen instellingen en geïmporteerde profielen. MIR gebruikt DLC-afbeeldingen alleen wanneer de mod die ze levert is ingeschakeld; anders gebruikt het pictogrammen van het basisspel, ook als deze optie aanstaat. Bestanden van geïnstalleerde maar uitgeschakelde DLC kunnen tijdens het opstarten niet veilig worden gecontroleerd. Schakelt Space Age of Elevated Rails niet in. Vereist opnieuw opstarten.",
       "provenance": "machine-assisted"
     },
     {

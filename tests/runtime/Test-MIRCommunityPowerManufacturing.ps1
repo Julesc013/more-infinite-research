@@ -1,6 +1,7 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
+  [ValidateSet('f200','f210')][string]$Target='f200',
   [string]$FactorioBin='', [string]$LibraryDirectory='',
   [string]$CandidateZip='', [string]$SourceMaterializationPath='',
   [switch]$PrepareInputsOnly,
@@ -21,23 +22,34 @@ if(-not $PrepareInputsOnly -and (-not $FactorioBin -or -not $LibraryDirectory -o
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
 Assert-MIR441CleanTrackedSource -RepoRoot $repo
 $source=(&git -C $repo rev-parse HEAD).Trim()
-$fixture=Join-Path $repo 'fixtures/assert-community-power-manufacturing'
-$fixtureInfo=Get-Content -LiteralPath (Join-Path $fixture 'info.json') -Raw|ConvertFrom-Json
+$fixtureSource=Join-Path $repo 'fixtures/assert-community-power-manufacturing'
+$profilePath=Join-Path $repo ('fixtures/run-profiles/community-power-'+$Target+'.json')
+$profile=Get-Content -LiteralPath $profilePath -Raw|ConvertFrom-Json -AsHashtable
+if($profile.target-cne$Target){throw '[mir-community-power-profile-target]'}
+$fixtureInfo=Get-Content -LiteralPath (Join-Path $fixtureSource 'info.json') -Raw|ConvertFrom-Json
+$fixtureInfo.factorio_version=$profile.factorio_line
+$fixtureInfo.dependencies=@($profile.mods | Where-Object {$_.enabled -and $_.name-cne$fixtureInfo.name} | ForEach-Object {$_.name+' = '+$_.version})
 $fixtureName=$fixtureInfo.name+'_'+$fixtureInfo.version+'.zip'
 [IO.Directory]::CreateDirectory($resources.root)|Out-Null
+# Only this small MIR-owned assertion fixture is generated. Dependency ZIPs
+# remain in the configured flat library and are never copied or linked here.
+$fixture=Join-Path $resources.root 'fixture-source'
+[IO.Directory]::CreateDirectory($fixture)|Out-Null
+[IO.File]::WriteAllText((Join-Path $fixture 'info.json'),(($fixtureInfo|ConvertTo-Json -Depth 4).Replace("`r`n","`n")+"`n"),[Text.UTF8Encoding]::new($false))
+foreach($file in @('data-final-fixes.lua','control.lua')){
+  [IO.File]::WriteAllBytes((Join-Path $fixture $file),[IO.File]::ReadAllBytes((Join-Path $fixtureSource $file)))
+}
 if($PrepareInputsOnly){
   $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name $fixtureInfo.name -Version $fixtureInfo.version -ModsDir $resources.root
-  Write-MIRNativeProbeResult -Context $resources -Record @{status='prepared-not-native-tested';source_commit=$source;fixture=@{path=$archive;sha256=(Get-FileHash -LiteralPath $archive).Hash};native_factorio=$false;dependency_payload_bytes_copied=0;archive_links_created=0}
+  Write-MIRNativeProbeResult -Context $resources -Record @{status='prepared-not-native-tested';source_commit=$source;target=$Target;fixture=@{path=$archive;sha256=(Get-FileHash -LiteralPath $archive).Hash};native_factorio=$false;dependency_payload_bytes_copied=0;archive_links_created=0}
   return
 }
 $activation=$null
-$record=[ordered]@{status='started';source_commit=$source;target='f200';dependency_payload_bytes_copied=0;archive_links_created=0;error=''}
+$record=[ordered]@{status='started';source_commit=$source;target=$Target;dependency_payload_bytes_copied=0;archive_links_created=0;error=''}
 try{
-  $profilePath=Join-Path $repo 'fixtures/run-profiles/community-power-f200.json'
-  $profile=Get-Content -LiteralPath $profilePath -Raw|ConvertFrom-Json -AsHashtable
   $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
   if((Get-FileHash -LiteralPath $engine).Hash-cne$profile.engine_sha256){throw '[mir-community-power-engine]'}
-  $candidate=Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -Target f200
+  $candidate=Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -Target $Target
   $library=(Resolve-Path -LiteralPath $LibraryDirectory).Path
   $fixtureArchive=Join-Path $library $fixtureName
   Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory $fixture
@@ -98,7 +110,7 @@ try{
   }
   Assert-MIR441CleanTrackedSource -RepoRoot $repo
   if((&git -C $repo rev-parse HEAD).Trim()-cne$source -or (Get-FileHash -LiteralPath $engine).Hash-cne$profile.engine_sha256){throw '[mir-community-power-source-changed]'}
-  $record.status='passed-exact-f200-paired-manufacturing-production-and-reload'
+  $record.status='passed-exact-'+$Target+'-paired-manufacturing-production-and-reload'
 }catch{$record.status='failed';$record.error=$_.Exception.Message}
 finally{
   if($null-ne$activation){try{$record.library_activation=Complete-MIRLibraryActivation $activation}catch{$record.status='failed';$record.control_restoration_error=$_.Exception.Message}}

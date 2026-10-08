@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "Etkinleştirildiğinde MIR, bu modlar temel oyun çalışması için devre dışı bırakılsa bile, Space Age ve Elevated Rails dahil olmak üzere yüklü resmi DLC simge dosyalarına referans verebilir. Bu DLC dosyaları yüklü değilse bunu kapalı bırakın; Factorio, prototip yükleme sırasında eksik simge dosyalarını sorunsuz bir şekilde kurtaramaz.",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "Kaydedilmiş ayarlar ve içe aktarılan profiller için korunur. MIR, DLC görsellerini yalnızca onları sağlayan mod etkinken kullanır; aksi halde, bu seçenek açık olsa bile temel oyunun simgelerini kullanır. Kurulu ancak devre dışı olan DLC dosyaları başlangıç sırasında güvenli biçimde denetlenemez. Space Age veya Elevated Rails'i etkinleştirmez. Yeniden başlatma gerektirir.",
       "provenance": "machine-assisted"
     },
     {

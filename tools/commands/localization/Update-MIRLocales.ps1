@@ -113,6 +113,30 @@ function Get-MIRPreservedLocaleRecord {
   return [pscustomobject]@{source_sha256=$SourceHash;translation=[string]$record.translation;provenance=[string]$record.provenance}
 }
 
+function Get-MIRReusableLocaleRecord {
+  param([string]$SourceText, [string]$SourceHash, $MemoryRecord,
+        [string]$ExistingTranslation, [switch]$Refresh)
+
+  if ($Refresh) { return $null }
+  if ($null -ne $MemoryRecord) {
+    # Once a value has governed memory, a stale or invalid row must be
+    # translated again. Its generated CFG cannot establish a new source hash.
+    if ([string]$MemoryRecord.source_sha256 -ceq $SourceHash -and
+        [string]$MemoryRecord.translation -cne $SourceText -and
+        (Test-MIRTranslationStructure -SourceText $SourceText -Translation ([string]$MemoryRecord.translation)) -and
+        ($MemoryRecord.provenance -ne 'preexisting' -or
+         (Test-MIRReusablePreexistingTranslation -SourceText $SourceText -Translation ([string]$MemoryRecord.translation)))) {
+      return [pscustomobject]@{source_sha256=$SourceHash;translation=[string]$MemoryRecord.translation;provenance=[string]$MemoryRecord.provenance}
+    }
+    return $null
+  }
+  if (-not [string]::IsNullOrWhiteSpace($ExistingTranslation) -and
+      (Test-MIRReusablePreexistingTranslation -SourceText $SourceText -Translation $ExistingTranslation)) {
+    return [pscustomobject]@{source_sha256=$SourceHash;translation=$ExistingTranslation;provenance='preexisting'}
+  }
+  return $null
+}
+
 function Get-MIRTechnicalLiteralSequence {
   param([string]$Text)
   $pattern = '(?<![\p{L}\p{M}\p{N}_./\\-])script-output/more-infinite-research/settings/browser-profile\.txt(?![\p{L}\p{M}\p{N}_/\\-]|[.][\p{L}\p{M}\p{N}_-])|(?<![\p{L}\p{M}\p{N}_])MIRSET1(?![\p{L}\p{M}\p{N}_])'
@@ -301,7 +325,7 @@ foreach ($locale in $policy.supported_factorio_locales) {
   }
 
   $memoryByKey = @{}
-  if ((Test-Path -LiteralPath $memoryPath) -and (-not $RefreshMachineTranslations -or $SelectedKey.Count -gt 0)) {
+  if (Test-Path -LiteralPath $memoryPath) {
     $memory = Get-Content -Raw -LiteralPath $memoryPath -Encoding UTF8 | ConvertFrom-Json
     foreach ($entry in $memory.entries) { $memoryByKey[$entry.key] = $entry }
   }
@@ -327,6 +351,8 @@ foreach ($locale in $policy.supported_factorio_locales) {
       }
       continue
     }
+    $existingTranslation = if ($null -ne $existing -and $existing.Entries.Contains($key)) { [string]$existing.Entries[$key] } else { '' }
+    $reusableRecord = Get-MIRReusableLocaleRecord -SourceText $sourceText -SourceHash $sourceHash -MemoryRecord $memoryByKey[$key] -ExistingTranslation $existingTranslation -Refresh:$RefreshMachineTranslations
     if ($localeOverrides.ContainsKey($key)) {
       $override = [string]$localeOverrides[$key]
       if (-not (Test-MIRTranslationStructure -SourceText $sourceText -Translation $override)) {
@@ -337,24 +363,8 @@ foreach ($locale in $policy.supported_factorio_locales) {
     elseif (Test-MIRFormatInvariantValue -Text $sourceText) {
       $records[$key] = [pscustomobject]@{source_sha256=$sourceHash;translation=$sourceText;provenance='format-invariant'}
     }
-    elseif (
-      -not $RefreshMachineTranslations -and $memoryByKey.ContainsKey($key) -and
-      $memoryByKey[$key].source_sha256 -eq $sourceHash -and
-      [string]$memoryByKey[$key].translation -cne $sourceText -and
-      (Test-MIRTranslationStructure -SourceText $sourceText -Translation ([string]$memoryByKey[$key].translation)) -and
-      (
-        $memoryByKey[$key].provenance -ne 'preexisting' -or
-        (Test-MIRReusablePreexistingTranslation -SourceText $sourceText -Translation ([string]$memoryByKey[$key].translation))
-      )
-    ) {
-      $records[$key] = [pscustomobject]@{source_sha256=$sourceHash;translation=[string]$memoryByKey[$key].translation;provenance=[string]$memoryByKey[$key].provenance}
-    }
-    elseif (
-      $null -ne $existing -and
-      $existing.Entries.Contains($key) -and
-      (Test-MIRReusablePreexistingTranslation -SourceText $sourceText -Translation ([string]$existing.Entries[$key])
-    )) {
-      $records[$key] = [pscustomobject]@{source_sha256=$sourceHash;translation=[string]$existing.Entries[$key];provenance='preexisting'}
+    elseif ($null -ne $reusableRecord) {
+      $records[$key] = $reusableRecord
     }
     else {
       $missing.Add([pscustomobject]@{Index=$index;Key=$key;Source=$sourceText;SourceHash=$sourceHash})

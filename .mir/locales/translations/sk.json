@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "Keď je povolený, MIR môže odkazovať na nainštalované oficiálne súbory ikon DLC, vrátane Space Age a Elevated Rails, aj keď sú tieto mody zakázané pre spustenie základnej hry. Nechajte toto vypnuté, ak tieto súbory DLC nie sú nainštalované; Factorio sa nemôže elegantne zotaviť z chýbajúcich súborov ikon počas načítania prototypu.",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "Zachované pre uložené nastavenia a importované profily. MIR používa grafiku DLC iba vtedy, keď je mod, ktorý ju poskytuje, zapnutý; inak používa ikony základnej hry, aj keď je táto možnosť zapnutá. Súbory nainštalovaného, ale vypnutého DLC nemožno pri spustení bezpečne overiť. Nezapína Space Age ani Elevated Rails. Vyžaduje reštart.",
       "provenance": "machine-assisted"
     },
     {

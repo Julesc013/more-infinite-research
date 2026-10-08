@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "Ha engedélyezve van, a MIR hivatkozhat a telepített hivatalos DLC ikonfájlokra, beleértve a Space Age-t és az Elevated Rails-t, még akkor is, ha ezek a modok le vannak tiltva az alapjáték futtatásához. Hagyja ezt kikapcsolva, ha ezek a DLC-fájlok nincsenek telepítve; A Factorio nem tud kecsesen helyreállítani a hiányzó ikonfájlokat a prototípus betöltése során.",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "A mentett beállítások és importált profilok miatt megőrizve. A MIR csak akkor használ DLC-grafikát, ha az azt biztosító mod engedélyezve van; egyébként az alapjáték ikonjait használja, még bekapcsolt beállítás esetén is. A telepített, de letiltott DLC-k fájljai indításkor nem ellenőrizhetők biztonságosan. Nem engedélyezi a Space Age vagy az Elevated Rails modot. Újraindítást igényel.",
       "provenance": "machine-assisted"
     },
     {
