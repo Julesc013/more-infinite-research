@@ -2,6 +2,13 @@ local function fail(message)
   error("MIR K2 2.1.3 Imersite continuation validation failed: " .. message)
 end
 
+local active = {}
+for name, version in pairs(mods) do
+  if name ~= "core" then active[#active + 1] = name .. "@" .. version end
+end
+table.sort(active)
+log("[MIR_ACTIVE_MODS] " .. table.concat(active, "|"))
+
 local expected = {
   Krastorio2 = "2.1.3",
   ["Krastorio2-spaced-out"] = "2.0.13",

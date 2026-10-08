@@ -113,6 +113,23 @@ try{
     Assert-LibraryTest (@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log).Count -eq 2) 'loaded names and versions read back'
     [IO.File]::AppendAllText($log,"`n0.3 Loading mod unrequested 1.0.0 (data.lua)`n")
     Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log} 'mir-library-loaded-selection'
+    $complete=@($activation.selected|Sort-Object name|ForEach-Object {$_.name+'@'+$_.version})-join '|'
+    $stageLine='0.2 Loading mod base 2.1.20 (data.lua)'
+    $observerLine='0.3 Script @__alpha__/data-final-fixes.lua:8: [MIR_ACTIVE_MODS] '+$complete
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log} 'mir-library-loaded-selection'
+    Assert-LibraryTest (@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha).Count-eq2) 'explicit native observer includes asset-only identities'
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver unrequested} 'mir-library-loaded-observer'
+    foreach($invalid in @('base@2.1.20','base@2.1.20|alpha@9.0.0','base@2.1.20|base@2.1.20',($complete+'|unrequested@1.0.0'))){
+      [IO.File]::WriteAllLines($log,@($stageLine,('0.3 Script @__alpha__/data-final-fixes.lua:8: [MIR_ACTIVE_MODS] '+$invalid)))
+      Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-selection'
+    }
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine,$observerLine))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-observation'
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine,'0.4 Loading mod alpha 9.0.0 (data.lua)'))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-selection'
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine.Replace('@__alpha__/','@__unrequested__/')))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-observation'
     $receipt=Complete-MIRLibraryActivation $activation;$activation=$null
     Assert-LibraryTest ($receipt.archive_links_created -eq 0 -and $receipt.dependency_payload_bytes_copied -eq 0) 'no archive staging'
     Assert-LibraryTest (@($receipt.selected|Where-Object {-not $_.builtin -and $_.sha256 -ceq $hashes[$case[1]]}).Count -eq 1) 'receipt binds the selected archive bytes'

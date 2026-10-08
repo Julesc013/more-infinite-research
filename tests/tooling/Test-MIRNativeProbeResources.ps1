@@ -505,7 +505,7 @@ try {
     $portablePath=Join-Path $run 'portable-inputs.json'
     $portable=[ordered]@{schema=1;target='f210';factorio_line='2.1';engine_version='2.1.21';engine_sha256=('A'*64);runtime_api_sha256=('B'*64);settings_mode='Defaults';mods=@();archive_sha256=@{'controlled-k2_1.0.0.zip'=(Get-K2213Sha256 $dependency)}}
     foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$portable.mods+=@{name=$name;version='2.1.21';enabled=$true}}
-    $portable.mods+=@(@{name='controlled-k2';version='1.0.0';enabled=$true},@{name='more-infinite-research';version='4.2.21001';enabled=$true},@{name='mir-fixture-assert-k2-213-imersite-continuation';version='0.1.1';enabled=$true})
+    $portable.mods+=@(@{name='controlled-k2';version='1.0.0';enabled=$true},@{name='more-infinite-research';version='4.2.21001';enabled=$true},@{name='mir-fixture-assert-k2-213-imersite-continuation';version='0.1.2';enabled=$true})
     function Save-ControlledK2Profile {$portable|ConvertTo-Json -Depth 10|Set-Content -LiteralPath $portablePath}
     Save-ControlledK2Profile
     $bound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)
@@ -595,12 +595,13 @@ try {
       $index=[Array]::IndexOf($Arguments,'--create')
       if($index-ge0){[IO.File]::WriteAllText($Arguments[$index+1],'controlled save; not Factorio data');$marker='initial'}else{$marker='reload'}
       $lines=@($activation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$_.version+' (data.lua)'})
+      $lines+=('0.2 Script @__controlled-k2__/data-final-fixes.lua:1: [MIR_ACTIVE_MODS] '+(@($activation.selected|Sort-Object name|ForEach-Object {$_.name+'@'+$_.version})-join '|'))
       $lines+=('[MIR42_K2_213_IMERSITE_CONTINUATION] stage='+$marker+';completed_level=4;next_level=5;bonus=0.08;progress=0.42')
       [IO.File]::WriteAllLines((Join-Path $run 'factorio-current.log'),$lines)
       [pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=0.01}}
     }
-    $create=Invoke-MIRFactorioLoadCheck -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -ScenarioTimeoutSeconds 90 -LibraryActivation $activation
-    $reload=Invoke-MIRFactorioReloadContract -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -SavePath $create.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 90 -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation
+    $create=Invoke-MIRFactorioLoadCheck -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -ScenarioTimeoutSeconds 90 -LibraryActivation $activation -ActiveModsObserver controlled-k2
+    $reload=Invoke-MIRFactorioReloadContract -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -SavePath $create.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 90 -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation -ActiveModsObserver controlled-k2
     Assert-Probe ($create.passed-and$reload.passed-and$calls.Count-eq2-and$budgets.Count-eq2) 'K2 create/reload collectors did not use the shared governed row.'
     Assert-Probe ($calls[0].context.controlled-and$calls[1].context.controlled-and$calls[0].path-ceq$controlledEngine-and$calls[0].timeout-eq90-and$calls[1].timeout-eq90) 'K2 collector lost actor/context/timeout identity.'
     Assert-Probe ('--create'-in$calls[0].arguments-and'--benchmark'-in$calls[1].arguments-and'--benchmark-sanitize'-in$calls[1].arguments-and$reload.reloads[0].save_byte_identical) 'K2 native create/reload arguments or saved-state custody changed.'

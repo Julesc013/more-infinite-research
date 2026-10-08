@@ -174,7 +174,7 @@ function Invoke-MIRCompatFactorioProcess {
     -StdoutPath $StdoutPath -StderrPath $StderrPath -TimeoutSeconds $TimeoutSeconds -AllowNonZeroExit
 }
 function Invoke-MIRFactorioLoadCheck {
-  param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[int]$ScenarioTimeoutSeconds=900,$LibraryActivation=$null)
+  param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[int]$ScenarioTimeoutSeconds=900,$LibraryActivation=$null,[string]$ActiveModsObserver='')
   $safe=Get-MIRSafeScenarioFileName -Name $ScenarioName
   $save=Join-Path $UserDataDir "saves\$safe.zip";$stdout=Join-Path $UserDataDir "$safe.stdout.log";$stderr=Join-Path $UserDataDir "$safe.stderr.log";$factorioLog=Join-Path $UserDataDir "$safe.factorio.log"
   $binary=(Resolve-Path -LiteralPath $FactorioBin).Path;$factorioRoot=Split-Path -Parent(Split-Path -Parent(Split-Path -Parent $binary));$readData=Join-Path $factorioRoot 'data'
@@ -200,13 +200,13 @@ enable-new-mods=false
   $activationArgs=@{};if($null -ne $LibraryActivation){$activationArgs.LibraryActivation=$LibraryActivation}
   $process=Invoke-MIRCompatFactorioProcess -FactorioBin $binary -ArgumentList $arguments -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $ScenarioTimeoutSeconds @activationArgs
   $captured=Copy-MIRCompatFactorioCurrentLog -UserDataDir $UserDataDir -Destination $factorioLog
-  if($null -ne $LibraryActivation -and $process.passed){$null=Assert-MIRLibraryLoadedSelection -Activation $LibraryActivation -LogPath $captured}
+  if($null -ne $LibraryActivation -and $process.passed){$null=Assert-MIRLibraryLoadedSelection -Activation $LibraryActivation -LogPath $captured -ActiveModsObserver $ActiveModsObserver}
   $audit=if($captured-and(Get-Command Read-MIRAuditLog -ErrorAction SilentlyContinue)){@(Read-MIRAuditLog -Path $captured)}else{@()};$sanitation=if($captured-and(Get-Command Read-MIRSanitationLog -ErrorAction SilentlyContinue)){@(Read-MIRSanitationLog -Path $captured)}else{@()};$saveHash=Get-MIRCompatFileSha256 -Path $save
   [pscustomobject]@{scenario=$ScenarioName;exit_code=$process.exit_code;timed_out=$process.timed_out;timeout_seconds=$ScenarioTimeoutSeconds;duration_seconds=$process.duration_seconds;save=$save;save_sha256=$saveHash;stdout=$stdout;stdout_sha256=Get-MIRCompatFileSha256 $stdout;stderr=$stderr;stderr_sha256=Get-MIRCompatFileSha256 $stderr;factorio_log=$captured;factorio_log_sha256=Get-MIRCompatFileSha256 $captured;audit_rows=$audit;sanitation_rows=$sanitation;passed=$process.passed-and-not[string]::IsNullOrWhiteSpace($saveHash)-and-not[string]::IsNullOrWhiteSpace($captured)}
 }
 
 function Invoke-MIRFactorioBenchmarkReload {
-  param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[string]$SavePath,[ValidateRange(1,2)][int]$Ordinal,[ValidateRange(1,3600)][int]$MaximumDurationSeconds,$LibraryActivation=$null)
+  param([string]$FactorioBin,[string]$UserDataDir,[string]$ScenarioName,[string]$SavePath,[ValidateRange(1,2)][int]$Ordinal,[ValidateRange(1,3600)][int]$MaximumDurationSeconds,$LibraryActivation=$null,[string]$ActiveModsObserver='')
   $userData=(Resolve-Path -LiteralPath $UserDataDir).Path;$save=(Resolve-Path -LiteralPath $SavePath).Path;$prefix=$userData.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
   if(-not$save.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){throw "Reload save is outside the compatibility user-data root: $save"}
   $inputHash=Get-MIRCompatFileSha256 $save;$safe=Get-MIRSafeScenarioFileName -Name $ScenarioName;$label="$safe.reload-{0:D2}"-f$Ordinal
@@ -218,7 +218,7 @@ function Invoke-MIRFactorioBenchmarkReload {
   $activationArgs=@{};if($null -ne $LibraryActivation){$activationArgs.LibraryActivation=$LibraryActivation}
   $process=Invoke-MIRCompatFactorioProcess -FactorioBin $binary -ArgumentList $arguments -StdoutPath $stdout -StderrPath $stderr -TimeoutSeconds $MaximumDurationSeconds @activationArgs
   $captured=Copy-MIRCompatFactorioCurrentLog -UserDataDir $userData -Destination $factorioLog;$saveHash=Get-MIRCompatFileSha256 $save;$identical=-not[string]::IsNullOrWhiteSpace($inputHash)-and$saveHash-ceq$inputHash
-  if($null -ne $LibraryActivation -and $process.passed){$null=Assert-MIRLibraryLoadedSelection -Activation $LibraryActivation -LogPath $captured}
+  if($null -ne $LibraryActivation -and $process.passed){$null=Assert-MIRLibraryLoadedSelection -Activation $LibraryActivation -LogPath $captured -ActiveModsObserver $ActiveModsObserver}
   $audit=if($captured-and(Get-Command Read-MIRAuditLog -ErrorAction SilentlyContinue)){@(Read-MIRAuditLog -Path $captured)}else{@()};$sanitation=if($captured-and(Get-Command Read-MIRSanitationLog -ErrorAction SilentlyContinue)){@(Read-MIRSanitationLog -Path $captured)}else{@()}
   $passed=$process.passed-and$process.duration_seconds-le$MaximumDurationSeconds-and$identical-and-not[string]::IsNullOrWhiteSpace($captured)
   [pscustomobject]@{ordinal=$Ordinal;status=if($passed){'passed'}else{'failed'};passed=$passed;exit_code=$process.exit_code;timed_out=$process.timed_out;duration_seconds=$process.duration_seconds;maximum_duration_seconds=$MaximumDurationSeconds;input_save_sha256=$inputHash;save_sha256=$saveHash;save_byte_identical=$identical;stdout=$stdout;stdout_sha256=Get-MIRCompatFileSha256 $stdout;stderr=$stderr;stderr_sha256=Get-MIRCompatFileSha256 $stderr;factorio_log=$captured;factorio_log_sha256=Get-MIRCompatFileSha256 $captured;audit_rows=$audit;sanitation_rows=$sanitation}
@@ -232,7 +232,8 @@ function Invoke-MIRFactorioReloadContract {
     [ValidateRange(1, 2)][int]$RequiredReloadCount,
     [ValidateRange(1, 3600)][int]$MaxReloadDurationSeconds,
     [string[]]$RequiredLogFragments = @(),
-    $LibraryActivation=$null
+    $LibraryActivation=$null,
+    [string]$ActiveModsObserver=''
   )
 
   $reloads = @()
@@ -243,7 +244,7 @@ function Invoke-MIRFactorioReloadContract {
       -ScenarioName $ScenarioName `
       -SavePath $SavePath `
       -Ordinal $ordinal `
-      -MaximumDurationSeconds $MaxReloadDurationSeconds -LibraryActivation $LibraryActivation
+      -MaximumDurationSeconds $MaxReloadDurationSeconds -LibraryActivation $LibraryActivation -ActiveModsObserver $ActiveModsObserver
     $reloadLogText = if (-not [string]::IsNullOrWhiteSpace([string]$reload.factorio_log) -and
         (Test-Path -LiteralPath ([string]$reload.factorio_log) -PathType Leaf)) {
       [IO.File]::ReadAllText([string]$reload.factorio_log)

@@ -79,7 +79,7 @@ function Read-K2213ProfileInputs {
   foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$expected[$name]=[string]$profile.engine_version}
   foreach($fileName in $ExpectedDependencies.Keys){$expected[$ExpectedDependencies[$fileName][0]]=$ExpectedDependencies[$fileName][1]}
   $expected['more-infinite-research']='4.2.21001'
-  $expected['mir-fixture-assert-k2-213-imersite-continuation']='0.1.1'
+  $expected['mir-fixture-assert-k2-213-imersite-continuation']='0.1.2'
   Assert-K2213 (@($profile.mods).Count -eq $expected.Count) 'input-profile-selection-count'
   foreach($name in $expected.Keys){
     $rows=@($profile.mods|Where-Object {$_.name -ceq $name})
@@ -248,7 +248,7 @@ try {
   foreach ($fixturePath in @($fixtureInfoPath,$fixtureDataPath,$fixtureControlPath)) { Assert-K2213 (Test-Path -LiteralPath $fixturePath -PathType Leaf) "fixture-missing:$fixturePath" }
   $fixtureInfo = Read-K2213Json -Path $fixtureInfoPath -Code 'fixture-info'
   Assert-K2213 ([string]$fixtureInfo.name -ceq 'mir-fixture-assert-k2-213-imersite-continuation') 'fixture-name'
-  Assert-K2213 ([string]$fixtureInfo.version -ceq '0.1.1') 'fixture-version'
+  Assert-K2213 ([string]$fixtureInfo.version -ceq '0.1.2') 'fixture-version'
   Assert-K2213 ([string]$fixtureInfo.factorio_version -ceq '2.1') 'fixture-factorio-version'
   $fixtureDependencies = @($fixtureInfo.dependencies | ForEach-Object {[string]$_})
   foreach ($dependency in @('base >= 2.1.20','Krastorio2 = 2.1.3','Krastorio2-spaced-out = 2.0.13','more-infinite-research = 4.2.21001')) {
@@ -357,13 +357,13 @@ try {
   # It never inherits an unbound settings file from a previous test.
   Assert-K2213 (-not (Test-Path -LiteralPath (Join-Path $library 'mod-settings.dat') -PathType Leaf)) 'unexpected-unbound-mod-settings'
 
-  $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -ScenarioTimeoutSeconds $CreateTimeoutSeconds -LibraryActivation $activation
+  $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -ScenarioTimeoutSeconds $CreateTimeoutSeconds -LibraryActivation $activation -ActiveModsObserver $fixtureInfo.name
   Assert-K2213 ([bool]$load.passed -and -not [bool]$load.timed_out -and [int]$load.exit_code -eq 0) 'create'
   Assert-K2213 ([string]$load.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') 'create-stderr'
   $loadLog = [IO.File]::ReadAllText([string]$load.factorio_log)
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION_DATA]',[StringComparison]::Ordinal)) 'create-data-marker'
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION] stage=initial;completed_level=4;next_level=5;bonus=0.08;progress=0.42',[StringComparison]::Ordinal)) 'create-initial-marker'
-  $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation
+  $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation -ActiveModsObserver $fixtureInfo.name
   Assert-K2213 ([bool]$reload.passed) 'single-reload'
   # Capture locators while the archive read handles are still held; a later
   # activation may select different MIR bytes under the same numeric version.
