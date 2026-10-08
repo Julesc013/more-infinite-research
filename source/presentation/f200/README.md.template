@@ -648,7 +648,9 @@ Stable direct script equivalent:
 .\scripts\Invoke-MIRReleaseTargetedGate.ps1
 ```
 
-**Credentialed exploratory compatibility audits:**
+**Historical exploratory compatibility-audit interfaces:**
+
+The retained examples in this section describe the older sweep interface. Native compatibility-audit load mode now refuses before input discovery, downloads or staging because it has not been converted to direct-library execution. Use a selected migrated runner for current native tests; metadata inspection and historical scenario definitions remain available.
 
 ```powershell
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
@@ -656,11 +658,11 @@ Stable direct script equivalent:
 
 Set `FACTORIO_BIN`, `FACTORIO_USERNAME`, and `FACTORIO_TOKEN` before running download/load tiers. Audit scenarios time out after `900` seconds by default; override with `-ScenarioTimeoutSeconds` for unusually slow modsets. Full `downloads_count >= 10000` audits are intentionally opt-in through `-IncludeFullAudit` and can be sharded with `-StartIndex`, `-ShardSize`, and optionally `-FromLockfile`.
 
-Local modpack zips can be included with the `LocalModZips` tier and `-LocalModZipDirs .\tmp`. Local zip roots are copied from disk, while any missing third-party dependencies are resolved from `-LocalModLibraryDirs` first and then, unless `-Offline` is set, through the Mod Portal cache when credentials are supplied. The local zip tier includes `+` recommended dependencies because many modpack wrapper mods use them as the pack contents.
+The retained `LocalModZips` tier distinguishes scenario roots (`LocalModZipDirs`) from dependency inventory (`LocalModLibraryDirs`) and includes recommended dependencies used by modpack wrappers. These definitions do not authorize copying archives or recreating populated profiles. Acquire only genuinely missing selected inputs separately from native execution.
 
-For offline local testing, keep root candidates and dependency libraries separate. `LocalModZipDirs` is the set of mods that may become one-mod, curated, or generated scenarios. `LocalModLibraryDirs` is dependency inventory only, so generated scenarios do not accidentally become rooted in support libraries. Use a writable dependency-cache directory for downloaded prerequisites and keep read-only mod collections unchanged. Broad local runs can use `--link-mode Hardlink` on same-drive inputs to reduce copy overhead, or `--link-mode Copy` for the safest cross-drive behavior.
+For current offline native testing, keep profiles as small tracked definitions and retain each required exact archive once in the configured engine-family library. Supply engine and library paths explicitly. The selected runner reads archives directly, switches only mod-list/settings under exclusive ownership, restores those controls afterward, and keeps writable run output inside the checkout. It creates no dependency copies, archive links or extracted profiles. Source-only checks do not require that library; missing native inputs must be reported precisely.
 
-Use read-only local mod libraries for large offline sweeps:
+Retained overnight sweep example; its native audit stage requires conversion before current use:
 
 ```powershell
 .\scripts\mir.ps1 overnight local

@@ -47,6 +47,10 @@ param(
   [string]$KnownExclusions = (Join-Path $PSScriptRoot "..\..\..\validation\adapters\portal-exclusions.json")
 )
 
+if ($RunLoadTests) {
+  throw '[mir-native-obsolete-runner] Compatibility-audit native sweeps still materialize mod directories. Use a selected direct-library runner; retain these scenario definitions and metadata inspection until conversion. No input discovery, download, cache or staging was started.'
+}
+
 $compatAuditCommandRoot = $PSScriptRoot
 # Dot-sourced modules have their own automatic parameter metadata. Preserve
 # the caller's explicit manifest choice before loading them.

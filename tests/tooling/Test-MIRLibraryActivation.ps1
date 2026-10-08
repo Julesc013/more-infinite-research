@@ -85,6 +85,17 @@ try{
     Assert-LibraryTest ($exitCode-ne0) "$name refuses before accessing inputs"
     Assert-LibraryTest (-not(Test-Path -LiteralPath $absentRoot)) "$name allocated no retired environment"
   }
+  # Native compatibility sweeps must refuse before policy/input discovery can
+  # allocate their legacy cache or populated run directory. Metadata mode keeps
+  # reaching its normal input validation; missing policies keep both cases tiny.
+  foreach($native in @($true,$false)){
+    $entry=Join-Path $RepoRoot 'tools/commands/compatibility/Invoke-MIRCompatAudit.ps1'
+    $argsList=@('-NoProfile','-NonInteractive','-File',$entry,('-RunLoadTests:'+('$'+$native.ToString().ToLowerInvariant())),'-Offline','-SanitationBudgetPath',(Join-Path $absentRoot 'missing-policy.json'),'-OutputDir',$absentRoot,'-ModCacheDir',(Join-Path $absentRoot 'cache'))
+    $text=@(& pwsh @argsList 2>&1)|Out-String
+    $exitCode=$LASTEXITCODE;$global:LASTEXITCODE=0
+    Assert-LibraryTest ($exitCode-ne0-and$text.Contains('[mir-native-obsolete-runner]')-eq$native) "compatibility audit native=$native has the expected entry boundary"
+    Assert-LibraryTest (-not(Test-Path -LiteralPath $absentRoot)) "compatibility audit native=$native creates no cache or staging"
+  }
   # The control-plane wrapper used to clone an overlay before reaching the
   # guarded performance command. Execute its real function without importing
   # prerequisites: retirement must precede context lookup and clone creation.
