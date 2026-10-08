@@ -899,9 +899,9 @@
     {
       "path": "scripts/Invoke-MIRPerformanceQualification.ps1",
       "classification": "canonical-internal",
-      "sha256": "2FFC11C3DF9833B48E1754F8505128C61051C1CF3503A32F6E1729003463625B",
+      "sha256": "8E50B99E2FC5264854027CBBCA41A74E8BC4ABB4324C8784C984D2B1C68CE50F",
       "hash_mode": "canonical-text-v1",
-      "lines": 145,
+      "lines": 147,
       "package_visible": false
     },
     {
@@ -947,9 +947,9 @@
     {
       "path": "scripts/Measure-MIRPerformanceRegression.ps1",
       "classification": "canonical-internal",
-      "sha256": "BD61E0990E357554D73F2C1B1505C02480AB69EB8B4D735BF9D17BB291685929",
+      "sha256": "1D0A9F975BBF8B7C5AE5C37768FEED7E25137A783E52FD6D884EF4B037FE57DB",
       "hash_mode": "canonical-text-v1",
-      "lines": 844,
+      "lines": 846,
       "package_visible": false
     },
     {
@@ -3763,9 +3763,9 @@
     {
       "path": "tools/lib/control/executor/RuntimeMeasurements.ps1",
       "classification": "canonical-internal",
-      "sha256": "8C56B5D2DCCB6C7414223F865026719884E9AD16A982831C4697988C072F7BE6",
+      "sha256": "1FE0498956A7748594619E4F658B9D70A77A99CAD593EFFFE82B131FD59F5587",
       "hash_mode": "canonical-text-v1",
-      "lines": 203,
+      "lines": 204,
       "package_visible": false
     },
     {
@@ -6042,5 +6042,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4410409af35a17d0e7d19c927d30cf95cdf79c73f147c0dc6d9bf4f29e50a03e"
+  "digest": "sha256:1e9e33c47999783552623f98f65816e15c3ca572291d0ffef09a25eb2b75fd5c"
 }

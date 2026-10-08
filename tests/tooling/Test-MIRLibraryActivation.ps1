@@ -58,12 +58,13 @@ try{
     'MIRF200BobTinPersistedState','MIRF200BobTinProductionGain',
     'MIRF210CurrentBobAngelFinalRoutesObserver','MIRF210CurrentBobAngelTinRouteObserver',
     'MIRF210CurrentBobAngelGunmetalInvarQualification','MIRK2213ImersiteMigration','MIRPassiveRepair',
-    'MIRCandidateRetention'
+    'MIRCandidateRetention',
+    'scripts/Measure-MIRPerformanceRegression.ps1','scripts/Invoke-MIRPerformanceQualification.ps1'
   )
   $absentRoot=Join-Path $root 'must-not-create-retired-run'
   foreach($name in $retired){
     $runnerDirectory=if($name-ceq'MIRCandidateRetention'){'tests/package/'}else{'tests/runtime/'}
-    $runner=Join-Path $RepoRoot ($runnerDirectory+'Test-'+$name+'.ps1')
+    $runner=Join-Path $RepoRoot $(if($name.StartsWith('scripts/')){$name}else{$runnerDirectory+'Test-'+$name+'.ps1'})
     $tokens=$null;$errors=$null
     $ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors)
     Assert-LibraryTest ($errors.Count-eq0) "$name entry parses"
@@ -71,9 +72,12 @@ try{
     $argsList=@('-NoProfile','-NonInteractive','-File',$runner)
     if('RepoRoot' -in $parameters){$argsList+=@('-RepoRoot',$absentRoot)}
     if('OutputRoot' -in $parameters){$argsList+=@('-OutputRoot',$absentRoot)}
-    foreach($inputName in @('FactorioBin','CandidateZip','OldCandidateZip','NewCandidateZip','V5ObservationResultPath')){
+    foreach($inputName in @('FactorioBin','Candidate','PriorRelease','CandidateZip','OldCandidateZip','NewCandidateZip','V5ObservationResultPath')){
       if($inputName -in $parameters){$argsList+=@(('-'+$inputName),(Join-Path $absentRoot $inputName))}
     }
+    if('ExpectedSourceCommit' -in $parameters){$argsList+=@('-ExpectedSourceCommit',('1'*40))}
+    if('ExpectedBaselineVersion' -in $parameters){$argsList+=@('-ExpectedBaselineVersion','4.2.21000')}
+    if('ExpectedFactorioVersion' -in $parameters){$argsList+=@('-ExpectedFactorioVersion','2.1.21')}
     if($name-ceq'MIR4HistoricalPrivateRuntime'){$argsList+=@('-Target','f013')}
     $text=@(& pwsh @argsList 2>&1)|Out-String
     $exitCode=$LASTEXITCODE;$global:LASTEXITCODE=0
@@ -81,6 +85,17 @@ try{
     Assert-LibraryTest ($exitCode-ne0) "$name refuses before accessing inputs"
     Assert-LibraryTest (-not(Test-Path -LiteralPath $absentRoot)) "$name allocated no retired environment"
   }
+  # The control-plane wrapper used to clone an overlay before reaching the
+  # guarded performance command. Execute its real function without importing
+  # prerequisites: retirement must precede context lookup and clone creation.
+  $tokens=$null;$errors=$null
+  $performanceAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tools/lib/control/executor/RuntimeMeasurements.ps1'),[ref]$tokens,[ref]$errors)
+  Assert-LibraryTest ($errors.Count-eq0) 'performance executor parses'
+  $performanceEntry=@($performanceAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name-ceq'Invoke-MIRCPPerformanceMeasurement'},$true))
+  Assert-LibraryTest ($performanceEntry.Count-eq1) 'one consumed performance executor'
+  . ([scriptblock]::Create($performanceEntry[0].Extent.Text))
+  Assert-LibraryRefusal {Invoke-MIRCPPerformanceMeasurement -ContextPath $absentRoot -FactorioBin $absentRoot -PriorRelease $absentRoot -RepoRoot $absentRoot} 'mir-native-obsolete-runner'
+  Assert-LibraryTest (-not(Test-Path -LiteralPath $absentRoot)) 'performance executor creates no overlay or output'
   foreach($case in @(@($profileA,'alpha_1.0.0.zip','Defaults'),@($profileB,'alpha_2.0.0.zip','File'),@($profileA,'alpha_1.0.0.zip','Defaults'))){
     $arguments=@{LibraryDirectory=$library;EngineDataDirectory=$data;ProfilePath=$case[0];ArchiveHashes=@{$case[1]=$hashes[$case[1]]};SettingsMode=$case[2]}
     if($case[2] -ceq 'File'){$arguments.SettingsPath=$privateSettings;$arguments.SettingsSha256=Get-MIRImmutableInputSha256 $privateSettings}

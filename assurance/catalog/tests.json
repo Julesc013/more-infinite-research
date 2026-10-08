@@ -1724,6 +1724,9 @@
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/package/Test-MIRCandidateRetention.ps1",
+        "scripts/Measure-MIRPerformanceRegression.ps1",
+        "scripts/Invoke-MIRPerformanceQualification.ps1",
+        "tools/lib/control/executor/RuntimeMeasurements.ps1",
         "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
         "tests/runtime/Test-MIRResearchBrowser.ps1",
         "tests/runtime/Test-MIRUpgrade.ps1",
@@ -8258,5 +8261,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:40523d303c446b6f64db950f0a9d46d5487604f99232a2e71bdd46fff400b8e8"
+  "digest": "sha256:915c6cad963392399049156521637ee0856e1c62265eeb2aed9bfcf936dc35ba"
 }

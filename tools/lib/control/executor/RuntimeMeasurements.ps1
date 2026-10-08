@@ -9,6 +9,7 @@ function Invoke-MIRCPPerformanceMeasurement {
     [string]$SourceRepoRoot = "",
     [string]$RepoRoot = ""
   )
+  throw '[mir-native-obsolete-runner] The legacy performance executor creates a source overlay and invokes populated-profile staging. Migrate it to the existing direct-library consumer before execution.'
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
   $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot

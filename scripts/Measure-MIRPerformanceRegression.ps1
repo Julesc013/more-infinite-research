@@ -14,6 +14,8 @@ param(
   [string]$CompatSmokeLaneId = ""
 )
 
+throw '[mir-native-obsolete-runner] The legacy performance campaign stages populated mod directories. Use an explicitly selected direct-library native consumer; this campaign must be migrated before it can provide new performance evidence.'
+
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "validation\ReleaseAttestations.ps1")
 . (Join-Path $PSScriptRoot "validation\PerformanceCampaign.ps1")
