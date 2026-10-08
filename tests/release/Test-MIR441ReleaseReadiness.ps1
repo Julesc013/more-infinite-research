@@ -43,9 +43,9 @@ function Test-MIR441ResourceRecovery {
   if(Test-Path -LiteralPath $root){throw 'Characterization refused after allocating output'}
   $upgrade=Join-Path $repo 'tests/runtime/Test-MIRUpgrade.ps1'
   $upgradeArguments=@{RepoRoot=$repo;FactorioBin=$pwsh;FromZip='absent-predecessor.zip';ToZip='absent-candidate.zip';WorkRoot=$root;OutputPath=(Join-Path $root 'proof.json')}
-  Refuses {& $upgrade @upgradeArguments} 'resource-peak-budget-required'
+  Refuses {& $upgrade @upgradeArguments -LocalModLibraryDirs @($root)} 'resource-peak-budget-required'
   $upgradeArguments.WorkRoot=Join-Path $repo 'build/tmp-other/escape'
-  Refuses {& $upgrade @upgradeArguments -ExpectedPeakMemoryMiB 512} 'resource-output-root'
+  Refuses {& $upgrade @upgradeArguments -LocalModLibraryDirs @($root) -ExpectedPeakMemoryMiB 512} 'resource-output-root'
   if(Test-Path -LiteralPath $root){throw 'Upgrade refused after allocating output'}
   $matrix=Join-Path $repo 'tests/runtime/Test-MIRUpgradeMatrix.ps1'
   $upgradeArguments.WorkRoot=$root
@@ -60,6 +60,8 @@ function Test-MIR441ResourceRecovery {
     $passed=Invoke-MIR441MonitoredProcess @invoke
     $jobTemp=[IO.File]::ReadAllText($invoke.StdoutPath).Trim()
     if(-not$passed.passed-or$passed.completion_predicate_observed-or-not$jobTemp.StartsWith($root+'\')-or(Test-Path -LiteralPath $jobTemp)){throw 'Per-job temp isolation or post-run cleanup failed'}
+    $completedLedger=Get-Content -LiteralPath $invoke.LedgerPath -Tail 1|ConvertFrom-Json
+    if($passed.peak_sampled_private_bytes-le0-or$completedLedger.peak_sampled_private_bytes-ne$passed.peak_sampled_private_bytes){throw 'Completed process lost its sampled private-memory peak'}
     if($env:TEMP-cne$originalTemp-or$env:TMP-cne$originalTmp){throw 'Global temp environment changed'}
     $parent=Join-Path $root 'parent.ps1'
     $parentText=@'
@@ -104,6 +106,34 @@ Start-Sleep -Seconds 20
       if($last.phase-cne'interrupted'){throw 'Interrupted job was not recorded as interrupted'}
     }
     $script:RecoveryFault=''
+    # Inject separate working-set/private observations while supervising a real
+    # owned child tree. No actual memory exhaustion is needed to test either
+    # cancellation branch or retention of the exact triggering observation.
+    $actualTreeFunction=(Get-Command Get-MIR441OwnedProcessTree).ScriptBlock
+    function Get-MIR441OwnedProcessTree {
+      param($Process,$StartedUtc)
+      $tree=& $actualTreeFunction -Process $Process -StartedUtc $StartedUtc
+      if(Test-Path -LiteralPath $script:RecoveryChildPid){
+        if($script:RecoveryFault-eq'working-budget'){$tree.working_set_bytes=1GB+1;$tree.private_bytes=1MB}
+        if($script:RecoveryFault-eq'private-budget'){$tree.working_set_bytes=1MB;$tree.private_bytes=1GB+1}
+      }
+      return $tree
+    }
+    try{
+      foreach($fault in @('working-budget','private-budget')){
+        Remove-Item -LiteralPath $script:RecoveryChildPid -Force -ErrorAction SilentlyContinue
+        $script:RecoveryFault=$fault
+        Refuses {Invoke-MIR441MonitoredProcess @invoke} 'resource-process-budget'
+        $childId=[int][IO.File]::ReadAllText($script:RecoveryChildPid)
+        if(Get-Process -Id $childId -ErrorAction SilentlyContinue){throw 'Over-budget owned child survived cancellation'}
+        $lastTwo=@(Get-Content -LiteralPath $invoke.LedgerPath -Tail 2|ForEach-Object {$_|ConvertFrom-Json})
+        $metric=if($fault-eq'working-budget'){'working_set_bytes'}else{'private_bytes'}
+        $peakMetric=if($fault-eq'working-budget'){'peak_working_set_bytes'}else{'peak_sampled_private_bytes'}
+        if($lastTwo[0].process.$metric-ne(1GB+1)-or$lastTwo[0].process.expected_peak_memory_bytes-ne1GB){throw "Lost triggering $metric observation or budget"}
+        if($lastTwo[1].phase-cne'interrupted'-or$lastTwo[1].$peakMetric-ne(1GB+1)){throw "Lost interrupted $peakMetric evidence"}
+        if(@(Get-ChildItem -LiteralPath $root -Directory -Filter 'temp-*').Count){throw 'Over-budget job left temporary output'}
+      }
+    }finally{Set-Item Function:Get-MIR441OwnedProcessTree -Value $actualTreeFunction;$script:RecoveryFault=''}
     # Evaluate the real save/reload predicate against controlled log/map bytes;
     # this is an oracle regression, separate from the real child tests above.
     & {
@@ -117,6 +147,14 @@ Start-Sleep -Seconds 20
       }
       $upgradePolicy=$policy;$upgradeWriteBytes=1MB;$upgradePeakBytes=1GB
       $script:upgradeProcessIndex=0;$script:upgradeResourceRuns=@()
+      # This check runs PowerShell through the real upgrade process adapter and
+      # governor. Library activation/loaded-mod checks have their own real
+      # tiny-library consumer test in Test-MIRLibraryActivation.ps1.
+      $script:upgradeActivation=[pscustomobject]@{controlled_resource_test=$true}
+      $script:upgradeResourceContext=[pscustomobject]@{controlled_resource_test=$true}
+      function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments) if(-not$Activation.controlled_resource_test){throw 'Unexpected activation in resource-only control'}}
+      function Assert-MIRLibraryLoadedSelection {param($Activation,$LogPath,[switch]$LatestInvocation) if(-not$Activation.controlled_resource_test){throw 'Unexpected selection in resource-only control'}}
+      function Get-MIRNativeProbeRemainingOutputBytes {param($Context) if(-not$Context.controlled_resource_test){throw 'Unexpected output context in resource-only control'};return $upgradeWriteBytes}
       if((Invoke-MIRUpgradeFactorioProcess -FilePath $pwsh -Arguments @('-NoProfile','-Command','exit 0'))-ne0){throw 'Upgrade process adapter lost the exit code'}
       if($script:upgradeResourceRuns.Count-ne1-or-not(Test-Path $script:upgradeResourceRuns[0].ledger)-or$script:upgradeResourceRuns[0].completion_predicate_observed){throw 'Upgrade process adapter lost resource evidence'}
       $upgradeWriteBytes=1
@@ -158,7 +196,7 @@ Start-Sleep -Seconds 20
     $null=Resolve-MIR441RecoveryScratchPath -Path $root
     Remove-Item -LiteralPath $root -Recurse -Force
   }
-  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;out_of_root=$true;characterization_admission=$true;upgrade_admission=$true;upgrade_process_adapter=$true;save_reload_oracle=$true;completion_predicate=$true;predicate_failure_cancellation=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
+  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;out_of_root=$true;characterization_admission=$true;upgrade_admission=$true;upgrade_process_adapter=$true;save_reload_oracle=$true;completion_predicate=$true;predicate_failure_cancellation=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;process_budget_cancellation=$true;triggering_memory_sample=$true;sampled_private_memory_peak=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
 }
 if($ResourceRecoveryOnly){Test-MIR441ResourceRecovery;return}
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
