@@ -18,6 +18,8 @@ param(
   [switch]$KeepArtifacts
 )
 
+throw '[mir-native-obsolete-runner] The legacy performance qualification wrapper allocates staging for an unmigrated campaign. Use an explicitly selected direct-library native consumer; no performance qualification is implied by this refusal.'
+
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "validation\ReleaseAttestations.ps1")
 . (Join-Path $PSScriptRoot "validation\PerformanceCampaign.ps1")

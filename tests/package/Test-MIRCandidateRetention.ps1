@@ -6,6 +6,8 @@ param(
   [string]$OutputRoot,
   [int]$TimeoutSeconds = 180
 )
+# Native execution is retired; the preserved oracle is not current acceptance.
+throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.
 $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path
