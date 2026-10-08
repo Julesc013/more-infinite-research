@@ -1,6 +1,13 @@
 local owner = 'recipe-prod-research_electric_energy-1'
 local names = {'solar-matrix', 'accumulator-v2'}
 local reload_pending = false
+local profiles = {
+  ['2.0.77'] = {target='F200', mir='4.2.20001', solar='1.0.8', accumulator='1.0.7'},
+  ['2.1.21'] = {target='F210', mir='4.2.21001', solar='1.0.9', accumulator='1.0.8'},
+}
+local function selected_profile()
+  return assert(profiles[script.active_mods.base], 'Unqualified community power engine tuple')
+end
 local function near(actual, expected) return math.abs(actual - expected) < 0.000001 end
 local function report(stage)
   local state = assert(storage.mir_community_power)
@@ -14,14 +21,15 @@ local function report(stage)
   helpers.write_file('community-power-' .. stage .. '.json', helpers.table_to_json{
     status='passed', stage=stage, cases=facts, mods=script.active_mods,
     production='20 unmodified recipe crafts; no modules or beacons; fixture supplies ingredients and machine energy; game speed 64',
-    boundary='Exact F200 paired base/default manufacturing; no SE, AAI, Paracelsin, DLC or package-upgrade claim'
+    boundary='Exact ' .. selected_profile().target .. ' paired base/default manufacturing; no SE, AAI, Paracelsin, DLC or package-upgrade claim'
   }, false)
   log('[mir-community-power] ' .. stage .. ' PASS actual-output=21 researched / 20 unresearched per recipe')
 end
 script.on_init(function()
   game.speed = 64
-  assert(script.active_mods.base == '2.0.77' and script.active_mods['more-infinite-research'] == '4.2.20001')
-  assert(script.active_mods.SolarMatrix == '1.0.8' and script.active_mods['Accumulator-V2'] == '1.0.7')
+  local profile = selected_profile()
+  assert(script.active_mods['more-infinite-research'] == profile.mir)
+  assert(script.active_mods.SolarMatrix == profile.solar and script.active_mods['Accumulator-V2'] == profile.accumulator)
   local researched = game.forces.player
   local control = game.create_force('mir-community-unresearched')
   local technology = assert(researched.technologies[owner])

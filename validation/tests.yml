@@ -5699,6 +5699,32 @@
       ]
     },
     {
+      "id": "runtime.community-power-manufacturing-f210",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRCommunityPowerManufacturing.ps1 -Target f210 -FactorioBin <factorio> -LibraryDirectory <mods> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 120",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "factorio",
+        "tests/runtime/Test-MIRCommunityPowerManufacturing.ps1",
+        "fixtures/assert-community-power-manufacturing/**",
+        "fixtures/run-profiles/community-power-f210.json",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "source:source/package-source.json",
+        "targets/f210/composition.json",
+        "targets/package-authority.json",
+        "source:source/prototypes/streams/productivity.lua",
+        "source:source/prototypes/mir/capabilities/recipe_productivity/**"
+      ]
+    },
+    {
       "id": "runtime.community-power-manufacturing-f200",
       "kind": "runtime",
       "layer": "F3",
