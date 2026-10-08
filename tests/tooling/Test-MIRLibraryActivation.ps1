@@ -246,6 +246,8 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $tinyInputs=@([ordered]@{file_name='alpha_1.0.0.zip';expected_sha256=$hashes['alpha_1.0.0.zip'];identity=@{name='alpha';version='1.0.0'}})
   $direct=Read-K2213DirectLibraryInputs -Library $library -Inputs $tinyInputs -FixtureRoot $fixtureRoot
   Assert-LibraryTest ($direct.archive_hashes.Count -eq 2 -and $direct.mod_list.mods.Count -eq 7) 'actual K2 reader selects only locked archives, fixture and five exact builtins'
+  $current=Read-K2213DirectLibraryInputs -Library $library -Inputs $tinyInputs -FixtureRoot $fixtureRoot -EngineVersion '2.1.21'
+  Assert-LibraryTest (@($current.mod_list.mods|Where-Object {$_.version -ceq '2.1.21'}).Count -eq 5 -and $current.archive_hashes.Count -eq 2) 'K2 current engine selection changes bundled versions without staging archives'
   $profileK2=Join-Path $profiles 'k2-input-boundary.json';Write-TestJson $profileK2 $direct.mod_list
   $activation=Start-MIRLibraryActivation $library $data $profileK2 $direct.archive_hashes
   . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
