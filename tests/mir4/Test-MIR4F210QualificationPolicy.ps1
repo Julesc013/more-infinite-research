@@ -6,6 +6,35 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) { $RepoRoot = (Resolve-Path (Join-P
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
 
+# Exercise Git's real checkout filters without another checkout or engine.
+# These records carry raw-byte bindings, so JSON equivalence is insufficient.
+function Get-MIRF210CheckoutHash([string]$RelativePath,[string]$AutoCrlf) {
+  $start=[Diagnostics.ProcessStartInfo]::new()
+  $start.FileName=(Get-Command git -CommandType Application|Select-Object -First 1).Source
+  $start.UseShellExecute=$false;$start.CreateNoWindow=$true
+  $start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+  foreach($argument in @('-C',$repo,'-c',('core.autocrlf='+$AutoCrlf),'cat-file','--filters',('--path='+$RelativePath),('HEAD:'+$RelativePath))){$start.ArgumentList.Add($argument)}
+  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+  try {
+    if(-not $process.Start()){throw '[mir4-f210-checkout-filter-start]'}
+    $errorRead=$process.StandardError.ReadToEndAsync()
+    $hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($process.StandardOutput.BaseStream))
+    $process.WaitForExit();$null=$errorRead.GetAwaiter().GetResult()
+    if($process.ExitCode-ne0){throw "[mir4-f210-checkout-filter] $RelativePath"}
+    return $hash
+  } finally {$process.Dispose()}
+}
+foreach($relative in @(
+  '.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json',
+  '.mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json',
+  '.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json',
+  'spec/engines/mir4-factorio-2.1-experimental-channel-v1.json'
+)) {
+  if((Get-MIRF210CheckoutHash $relative 'true') -cne (Get-MIRF210CheckoutHash $relative 'false')) {
+    throw "[mir4-f210-checkout-bytes-depend-on-autocrlf] $relative"
+  }
+}
+
 $historical = Test-MIR4F210HistoricalPolicyV1 -RepoRoot $repo
 if ([string]$historical.kind -cne 'MIR4F210ReleaseQualificationPolicyV1' -or
     [string]$historical.support_floor -cne '2.1.8' -or
