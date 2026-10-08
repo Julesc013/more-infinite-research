@@ -505,7 +505,7 @@ try {
     $portablePath=Join-Path $run 'portable-inputs.json'
     $portable=[ordered]@{schema=1;target='f210';factorio_line='2.1';engine_version='2.1.21';engine_sha256=('A'*64);runtime_api_sha256=('B'*64);settings_mode='Defaults';mods=@();archive_sha256=@{'controlled-k2_1.0.0.zip'=(Get-K2213Sha256 $dependency)}}
     foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$portable.mods+=@{name=$name;version='2.1.21';enabled=$true}}
-    $portable.mods+=@(@{name='controlled-k2';version='1.0.0';enabled=$true},@{name='more-infinite-research';version='4.2.21001';enabled=$true},@{name='mir-fixture-assert-k2-213-imersite-continuation';version='0.1.2';enabled=$true})
+    $portable.mods+=@(@{name='controlled-k2';version='1.0.0';enabled=$true},@{name='more-infinite-research';version='4.2.21001';enabled=$true},@{name='mir-fixture-assert-k2-213-imersite-continuation';version='0.1.3';enabled=$true})
     function Save-ControlledK2Profile {$portable|ConvertTo-Json -Depth 10|Set-Content -LiteralPath $portablePath}
     Save-ControlledK2Profile
     $bound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)

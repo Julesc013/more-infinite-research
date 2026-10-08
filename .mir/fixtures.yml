@@ -619,6 +619,7 @@ fixtures:
       - only-generated-mir-imersite-powder-continuation-from-level-four
       - native-imersite-crystal-owner-and-effect-remain-outside-mir-domain
       - legacy-level-three-current-research-queue-and-42-percent-progress-preserved
+      - actual-unmodified-crusher-output-after-reload-324-powder-and-sand-versus-300-from-equal-300-ore
       - one-fresh-create-and-single-bounded-reload
       - supplied-current-421-candidate-and-materialization-bindings-verified-without-a-new-zip
       - explicit-flat-library-selection-with-no-dependency-staging

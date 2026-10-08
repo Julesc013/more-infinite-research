@@ -79,7 +79,7 @@ function Read-K2213ProfileInputs {
   foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$expected[$name]=[string]$profile.engine_version}
   foreach($fileName in $ExpectedDependencies.Keys){$expected[$ExpectedDependencies[$fileName][0]]=$ExpectedDependencies[$fileName][1]}
   $expected['more-infinite-research']='4.2.21001'
-  $expected['mir-fixture-assert-k2-213-imersite-continuation']='0.1.2'
+  $expected['mir-fixture-assert-k2-213-imersite-continuation']='0.1.3'
   Assert-K2213 (@($profile.mods).Count -eq $expected.Count) 'input-profile-selection-count'
   foreach($name in $expected.Keys){
     $rows=@($profile.mods|Where-Object {$_.name -ceq $name})
@@ -105,6 +105,10 @@ function Invoke-MIRCompatFactorioProcess {
   # Preserve the existing create/reload collector and its exact oracles,
   # while charging their native actors to one owned row over the active library.
   Assert-MIRLibraryLaunch -Activation $LibraryActivation -FactorioBin $FactorioBin -Arguments ([string[]]$ArgumentList)
+  # This scenario's one reload also measures real crusher output. Preserve the
+  # shared collector's one-tick default for every other native consumer.
+  $tickIndex=[Array]::IndexOf($ArgumentList,'--benchmark-ticks')
+  if($tickIndex-ge0){$ArgumentList[$tickIndex+1]='25000'}
   $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $FactorioBin -Arguments ([string[]]$ArgumentList) -TimeoutSeconds $TimeoutSeconds
   Copy-Item -LiteralPath $actor.stdout -Destination $StdoutPath
   Copy-Item -LiteralPath $actor.stderr -Destination $StderrPath
@@ -248,7 +252,7 @@ try {
   foreach ($fixturePath in @($fixtureInfoPath,$fixtureDataPath,$fixtureControlPath)) { Assert-K2213 (Test-Path -LiteralPath $fixturePath -PathType Leaf) "fixture-missing:$fixturePath" }
   $fixtureInfo = Read-K2213Json -Path $fixtureInfoPath -Code 'fixture-info'
   Assert-K2213 ([string]$fixtureInfo.name -ceq 'mir-fixture-assert-k2-213-imersite-continuation') 'fixture-name'
-  Assert-K2213 ([string]$fixtureInfo.version -ceq '0.1.2') 'fixture-version'
+  Assert-K2213 ([string]$fixtureInfo.version -ceq '0.1.3') 'fixture-version'
   Assert-K2213 ([string]$fixtureInfo.factorio_version -ceq '2.1') 'fixture-factorio-version'
   $fixtureDependencies = @($fixtureInfo.dependencies | ForEach-Object {[string]$_})
   foreach ($dependency in @('base >= 2.1.20','Krastorio2 = 2.1.3','Krastorio2-spaced-out = 2.0.13','more-infinite-research = 4.2.21001')) {
@@ -363,8 +367,15 @@ try {
   $loadLog = [IO.File]::ReadAllText([string]$load.factorio_log)
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION_DATA]',[StringComparison]::Ordinal)) 'create-data-marker'
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION] stage=initial;completed_level=4;next_level=5;bonus=0.08;progress=0.42',[StringComparison]::Ordinal)) 'create-initial-marker'
-  $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation -ActiveModsObserver $fixtureInfo.name
+  $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments @('[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42','[MIR42_K2_213_IMERSITE_PRODUCTION] ore=300;powder=324;sand=324;control_powder=300;control_sand=300;after_reload=true') -LibraryActivation $activation -ActiveModsObserver $fixtureInfo.name
   Assert-K2213 ([bool]$reload.passed) 'single-reload'
+  $productionPath=Join-Path $runRoot 'script-output/k2-imersite-production.json'
+  $production=Read-K2213Json -Path $productionPath -Code 'production-output'
+  Assert-K2213 ($production.status -ceq 'passed' -and @($production.cases).Count -eq 2) 'production-result'
+  foreach($row in @(@{force='player';output=324;bonus=0.08},@{force='mir-k2-unresearched';output=300;bonus=0})){
+    $actual=@($production.cases|Where-Object force -ceq $row.force)
+    Assert-K2213 ($actual.Count -eq 1 -and $actual[0].ore -eq 300 -and $actual[0].powder -eq $row.output -and $actual[0].sand -eq $row.output -and $actual[0].bonus -eq $row.bonus) 'production-counts'
+  }
   # Capture locators while the archive read handles are still held; a later
   # activation may select different MIR bytes under the same numeric version.
   $dependencyArtifacts = @($inputs | Where-Object {[string]$_.role -ceq 'dependency-mod'} | ForEach-Object { Get-K2213Artifact (Join-Path $library $_.file_name) -AllowExternalInput })
@@ -384,6 +395,7 @@ try {
     library_activation=$terminal;dependency_archives=@($dependencyArtifacts | Sort-Object path);mod_list=Get-K2213Artifact $modListPath;startup_settings='candidate-defaults-no-unbound-mod-settings';
     create=[ordered]@{duration_seconds=$load.duration_seconds;save=Get-K2213Artifact $load.save;stdout=Get-K2213Artifact $load.stdout;stderr=Get-K2213Artifact $load.stderr;factorio_log=Get-K2213Artifact $load.factorio_log};
     reload=$reload;
+    production=[ordered]@{evidence=Get-K2213Artifact $productionPath;benchmark_ticks=25000;recipe='kr-imersite-powder';machine='kr-crusher';cases=$production.cases};
     resource_runs=$resources.runs.ToArray();
     non_claims=@('The supplied V5 observation remains non-authorizing and is not rebound.','Only generated MIR Imersite powder continuation is exercised. Native Imersite crystal ownership and witnessed withheld K2 routes remain outside this receipt.','No player delivery, broad K2 admission, support, release, signing, or publication claim.')
   }
