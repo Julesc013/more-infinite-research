@@ -13,6 +13,8 @@ param(
   [string[]]$ExpectedInputRecipes=@('angels-plate-tin','angels-plate-tin-2')
 )
 $ErrorActionPreference='Stop'
+# Native execution is retired; the preserved oracle is not current acceptance.
+if(-not ($AuditLogPath)){throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'}
 Set-StrictMode -Version Latest
 
 function Assert-Observer([bool]$Condition,[string]$Message) {

@@ -22,6 +22,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+# Native execution is retired; the preserved oracle is not current acceptance.
+throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'
 Set-StrictMode -Version Latest
 if ([string]::IsNullOrWhiteSpace($RepoRoot)) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path }
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path

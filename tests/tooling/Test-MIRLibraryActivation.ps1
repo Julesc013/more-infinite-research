@@ -44,6 +44,39 @@ $oldSettings=[byte[]](1,4,6,8,0,255)
 $privateSettings=Join-Path $root 'selected-settings.dat';[IO.File]::WriteAllBytes($privateSettings,[byte[]](9,8,7,6,5))
 $activation=$null
 try{
+  # Exercise the actual entry points in fresh hosts with deliberately missing
+  # inputs. Retirement must win before repository/engine lookup, construction
+  # or staging; these controls cannot launch Factorio even if a guard regresses.
+  $retired=@(
+    'MIR4HistoricalPrivateRuntime','MIR4A05K2Materials','MIR4A05K203Imersite','MIR4A03K2K2SOIntake',
+    'MIR42F200SettingsCapTransition','MIR42V2V3CapMigration','MIR42CapOwnershipMultiforce',
+    'MIRA06BobGoldQualification','MIRA06BobAluminiumQualification','MIRA06BobLeadQualification',
+    'MIRA06BobOrdinaryAlloysQualification','MIRA06AluminiumFinalState',
+    'MIRBobAngelTinRouteSafety','MIRBobAngelTinFinalStateAudit','MIRAngelTinFinalStateAudit',
+    'MIRBobTinBrowserExplanation','MIRBobTinPersistedState','MIRBobTinProductionGain',
+    'MIRBobTinMachineMatrix','MIRBobTinProgressionFrontier','MIRBobTinQualification',
+    'MIRF200BobTinPersistedState','MIRF200BobTinProductionGain',
+    'MIRF210CurrentBobAngelFinalRoutesObserver','MIRF210CurrentBobAngelTinRouteObserver',
+    'MIRF210CurrentBobAngelGunmetalInvarQualification','MIRK2213ImersiteMigration','MIRPassiveRepair'
+  )
+  $absentRoot=Join-Path $root 'must-not-create-retired-run'
+  foreach($name in $retired){
+    $runner=Join-Path $RepoRoot ('tests/runtime/Test-'+$name+'.ps1')
+    $tokens=$null;$errors=$null
+    $ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors)
+    Assert-LibraryTest ($errors.Count-eq0) "$name entry parses"
+    $parameters=@($ast.ParamBlock.Parameters.Name.VariablePath.UserPath)
+    $argsList=@('-NoProfile','-NonInteractive','-File',$runner,'-RepoRoot',$absentRoot)
+    foreach($inputName in @('FactorioBin','CandidateZip','OldCandidateZip','NewCandidateZip','V5ObservationResultPath')){
+      if($inputName -in $parameters){$argsList+=@(('-'+$inputName),(Join-Path $absentRoot $inputName))}
+    }
+    if($name-ceq'MIR4HistoricalPrivateRuntime'){$argsList+=@('-Target','f013')}
+    $text=@(& pwsh @argsList 2>&1)|Out-String
+    $exitCode=$LASTEXITCODE;$global:LASTEXITCODE=0
+    if($exitCode-eq0 -or -not$text.Contains('[mir-native-obsolete-runner]')){throw "[library-test] $name retirement diagnostic differs: $text"}
+    Assert-LibraryTest ($exitCode-ne0) "$name refuses before accessing inputs"
+    Assert-LibraryTest (-not(Test-Path -LiteralPath $absentRoot)) "$name allocated no retired environment"
+  }
   foreach($case in @(@($profileA,'alpha_1.0.0.zip','Defaults'),@($profileB,'alpha_2.0.0.zip','File'),@($profileA,'alpha_1.0.0.zip','Defaults'))){
     $arguments=@{LibraryDirectory=$library;EngineDataDirectory=$data;ProfilePath=$case[0];ArchiveHashes=@{$case[1]=$hashes[$case[1]]};SettingsMode=$case[2]}
     if($case[2] -ceq 'File'){$arguments.SettingsPath=$privateSettings;$arguments.SettingsSha256=Get-MIRImmutableInputSha256 $privateSettings}

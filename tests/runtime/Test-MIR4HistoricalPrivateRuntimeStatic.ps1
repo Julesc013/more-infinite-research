@@ -36,8 +36,8 @@ try {
   $authority=Get-Content -Raw (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
   $source=Join-Path $scratch 'tiny-shared.zip';[IO.File]::WriteAllText($source,'tiny immutable input')
   $hash=Get-MIRImmutableInputSha256 $source
-  Refuses {& (Join-Path $repo 'tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1') -RepoRoot $repo -Target f017 -FactorioBin $source -CandidateZip $source -PredecessorZip $source -EvidenceRoot (Join-Path $scratch 'refused-native')} '[mir441-resource-peak-budget-required]'
-  Check (-not (Test-Path (Join-Path $scratch 'refused-native'))) 'missing native budget created staging.'
+  Refuses {& (Join-Path $repo 'tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1') -RepoRoot $repo -Target f017 -FactorioBin $source -CandidateZip $source -PredecessorZip $source -EvidenceRoot (Join-Path $scratch 'refused-native')} '[mir-native-obsolete-runner]'
+  Check (-not (Test-Path (Join-Path $scratch 'refused-native'))) 'retired native runner created staging.'
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $scratch -ExpectedPeakMemoryMiB 256 -MaxNewOutputMiB 4
   $null=New-Item -ItemType Directory -Path $resources.root
   $stages=[Collections.Generic.List[object]]::new()
