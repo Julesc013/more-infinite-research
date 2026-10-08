@@ -55,6 +55,7 @@ Write-Host '[ok] MIR42 F200 settings-cap-transition static base-only closure con
 # inputs. This proves storage/process plumbing, not Factorio gameplay.
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
+. (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $repo 'tools/lib/assurance/evidence/CommandExecution.ps1')
 function Get-MIR441ResourceSnapshot {
@@ -62,51 +63,72 @@ function Get-MIR441ResourceSnapshot {
   [pscustomobject]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');memory=[pscustomobject]@{total_bytes=16GB;free_bytes=12GB;committed_bytes=4GB;commit_limit_bytes=20GB};system_volume=[pscustomobject]@{free_bytes=100GB};work_volume=[pscustomobject]@{free_bytes=100GB}}
 }
 $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo ('build/tmp/f200-cap-controls-'+[guid]::NewGuid().ToString('N')))
-$inputLeases=[Collections.Generic.List[object]]::new()
+$activeStage=$null;$stages=@()
 $nativeActor=(Get-Command Invoke-MIRNativeProbeFactorioProcess).ScriptBlock
 $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseInput($harnessText,[ref]$tokens,[ref]$errors)
-foreach($name in @('Assert-MIR42F200','Assert-Exact','Assert-Properties','New-MIR42F200BaseOnlyModList','Assert-MIR42F200BaseOnlyStageModList','New-Stage','Invoke-Engine','Invoke-ServerSave')) {
+foreach($name in @('Assert-MIR42F200','Assert-Exact','Assert-Properties','Get-Sha','New-MIR42F200BaseOnlyModList','Assert-MIR42F200BaseOnlyStageModList','New-CapSettingsSource','New-Stage','Start-CapStage','Complete-CapStage','Invoke-Engine','Invoke-ServerSave')) {
   . ([scriptblock]::Create((Get-MIR42F200StaticFunctionText $ast $name)))
 }
 try {
   New-Item -ItemType Directory -Path $scratch | Out-Null
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $scratch -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 4
-  $candidateZip=Join-Path $scratch 'more-infinite-research_4.2.20001.zip'
-  [IO.File]::WriteAllText($candidateZip,'tiny immutable archive payload control')
+  $library=Join-Path $scratch 'library';[IO.Directory]::CreateDirectory($library)|Out-Null
+  $engineRoot=Join-Path $scratch 'engine';$engine=Join-Path $engineRoot 'bin/x64/factorio.exe'
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $engine))|Out-Null
+  [IO.File]::WriteAllText($engine,'controlled engine; never executed')
+  $officialExpansionMods=@('elevated-rails','quality','space-age')
+  foreach($name in @('base')+$officialExpansionMods){
+    $dir=Join-Path $engineRoot ('data/'+$name);[IO.Directory]::CreateDirectory($dir)|Out-Null
+    [IO.File]::WriteAllText((Join-Path $dir 'info.json'),(@{name=$name;version='2.0.77';dependencies=@()}|ConvertTo-Json))
+  }
+  $tiny=Join-Path $scratch 'candidate-source';[IO.Directory]::CreateDirectory($tiny)|Out-Null
+  [IO.File]::WriteAllText((Join-Path $tiny 'info.json'),(@{name='more-infinite-research';version='4.2.20001';factorio_version='2.0';dependencies=@('base >= 2.0.77')}|ConvertTo-Json))
+  $candidateZip=Publish-MIRModDirectoryArchive -Source $tiny -Name 'more-infinite-research' -Version '4.2.20001' -ModsDir $library
   $candidateHash=Get-MIRImmutableInputSha256 $candidateZip
   $candidateInput=[pscustomobject]@{receipt=[pscustomobject]@{archive_sha256=$candidateHash;package_source_sha256=('A'*64)}}
   $fixture=Join-Path $repo 'fixtures/assert-mir42-f200-settings-cap-transition'
   $fixtureName='mir-fixture-assert-mir42-f200-settings-cap-transition'
-  $engineRoot=$scratch;$engine='controlled-engine-never-executed'
-  $officialExpansionMods=@('elevated-rails','quality','space-age')
+  $null=Publish-MIRModDirectoryArchive -Source $fixture -Name $fixtureName -Version '0.1.0' -ModsDir $library
+  $preparedSettings=@{}
+  foreach($cap in @(0,3)){
+    $preparedSettings[$cap]=New-CapSettingsSource (Join-Path $resources.root ('input-definitions/cap-'+$cap)) $cap
+    $input=$preparedSettings[$cap]
+    $null=Publish-MIRModDirectoryArchive -Source $input.source -Name 'mir-validation-settings-overrides' -Version $input.version -ModsDir $library
+  }
+  $before=@{};foreach($file in @(Get-ChildItem -LiteralPath $library -File)){$before[$file.Name]=@{sha256=Get-MIRImmutableInputSha256 $file.FullName;id=Get-MIRImmutableInputFileIdentity $file.FullName}}
+  $oldList=[Text.Encoding]::UTF8.GetBytes('{"mods":[{"name":"base","enabled":true}]}')
+  $oldSettings=[Text.Encoding]::UTF8.GetBytes('prior private settings control')
+  [IO.File]::WriteAllBytes((Join-Path $library 'mod-list.json'),$oldList)
+  [IO.File]::WriteAllBytes((Join-Path $library 'mod-settings.dat'),$oldSettings)
   $expectedEnabledModNames=@('base','more-infinite-research',$fixtureName,'mir-validation-settings-overrides')
   $stages=@((New-Stage seed 0),(New-Stage capped 3),(New-Stage relaxed 0))
-  foreach($stage in $stages) {
-    $null=Assert-MIR42F200BaseOnlyStageModList $stage
-    $row=$stage.lease.record.inputs[0]
-    Assert-MIR42F200Static ($stage.lease.record.require_hard_links -and $row.staging_mode -ceq 'hardlink' -and (Get-MIRImmutableInputFileIdentity $candidateZip) -ceq (Get-MIRImmutableInputFileIdentity $row.stage_path)) "$($stage.name) copied its candidate payload."
-    $settings=[IO.Compression.ZipFile]::OpenRead($stage.settings_archive)
-    try {
-      $reader=[IO.StreamReader]::new($settings.GetEntry('mir-validation-settings-overrides_0.1.0/settings-updates.lua').Open())
-      try {$settingsText=$reader.ReadToEnd()} finally {$reader.Dispose()}
-      Assert-MIR42F200Static ($settingsText.Contains('override("ips-max-level-research_copper", '+$stage.cap+')')) "$($stage.name) lost its original private cap setting."
-    } finally {$settings.Dispose()}
-    [IO.File]::WriteAllText((Join-Path $stage.mods 'mod-settings.dat'),"private $($stage.name)")
-    Assert-MIR42F200Static ((Get-MIRImmutableInputFileIdentity $stage.mod_list) -cne (Get-MIRImmutableInputFileIdentity $row.stage_path)) 'mod-list shares immutable input identity.'
+  function Assert-CapControlsRestored {
+    Assert-MIR42F200Static ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $library 'mod-list.json')))-ceq[Convert]::ToBase64String($oldList)) 'previous mod-list not restored'
+    Assert-MIR42F200Static ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $library 'mod-settings.dat')))-ceq[Convert]::ToBase64String($oldSettings)) 'previous settings not restored'
   }
-  Assert-MIR42F200Static ($resources.shared_alias_bytes -eq 3*(Get-Item -LiteralPath $candidateZip).Length) 'verified aliases are not excluded from physical output accounting.'
-  Assert-MIR42F200Static (@($stages|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_.mods 'mod-settings.dat')}|Sort-Object -Unique).Count -eq 3) 'mutable settings share a file between stages.'
-  $writeDenied=$false;try {$stream=[IO.File]::Open($candidateZip,[IO.FileMode]::Open,[IO.FileAccess]::Write);$stream.Dispose()} catch [IO.IOException] {$writeDenied=$true}
-  Assert-MIR42F200Static $writeDenied 'source is writable during active leases.'
-
-  # A real failed link at the consumed constructor must never invoke copying.
-  $script:copyAttempts=0
-  function New-Item { [CmdletBinding()]param([string]$ItemType,[string[]]$Path,[string]$Target,[switch]$Force);if($ItemType -ceq 'HardLink'){throw 'controlled unavailable hardlink'};Microsoft.PowerShell.Management\New-Item @PSBoundParameters }
-  function Copy-Item { [CmdletBinding()]param([string]$LiteralPath,[string]$Destination);$script:copyAttempts++;throw 'archive copy attempted' }
-  try {
-    $failure='';try {New-Stage unavailable 0|Out-Null} catch {$failure=$_.Exception.Message}
-    Assert-MIR42F200Static ($failure.Contains('hardlink') -and $script:copyAttempts -eq 0) "failed link copied an archive or lost its diagnostic: $failure"
-  } finally {Remove-Item Function:\New-Item;Remove-Item Function:\Copy-Item}
+  foreach($stage in $stages){
+    $null=Assert-MIR42F200BaseOnlyStageModList $stage
+    Start-CapStage $stage
+    Assert-MIR42F200Static ($stage.activation.library-ceq$library-and-not(Test-Path (Join-Path $stage.root 'mods'))) 'cap stage materialized a mod directory'
+    $selected=@($stage.activation.selected|Where-Object name -CEQ 'mir-validation-settings-overrides')
+    Assert-MIR42F200Static ($selected.Count-eq1-and$selected[0].version-ceq$preparedSettings[$stage.cap].version) 'cap selected the wrong exact settings version'
+    Assert-MIR42F200Static (-not(Test-Path (Join-Path $library 'mod-settings.dat'))) 'cap inherited the previous settings'
+    $denied=$false;try{$f=[IO.File]::Open($candidateZip,[IO.FileMode]::Open,[IO.FileAccess]::Write);$f.Dispose()}catch [IO.IOException]{$denied=$true}
+    Assert-MIR42F200Static $denied 'active selected candidate is writable'
+    $busy=$false;try{Start-CapStage $stages[0]}catch{$busy=$_.Exception.Message.Contains('mir-library-busy')}
+    Assert-MIR42F200Static $busy 'second selection was not refused'
+    [IO.File]::WriteAllText((Join-Path $library 'mod-settings.dat'),'private writable native settings')
+    $stage.terminal=Complete-MIRLibraryActivation $stage.activation;$script:activeStage=$null
+    Assert-MIR42F200Static ($stage.terminal.dependency_payload_bytes_copied-eq0-and$stage.terminal.archive_links_created-eq0) 'cap staging copied or linked payloads'
+    Assert-CapControlsRestored
+  }
+  Assert-MIR42F200Static ($resources.shared_alias_bytes-eq0) 'direct library was charged as aliases'
+  # Bad supplied hashes fail before selecting controls. Never link or copy as recovery.
+  $originalHash=$candidateInput.receipt.archive_sha256;$candidateInput.receipt.archive_sha256='A'*64
+  $rejected=$false;try{New-Stage wrong-hash 0|Out-Null}catch{$rejected=$_.Exception.Message.Contains('installed candidate hash')}
+  $candidateInput.receipt.archive_sha256=$originalHash
+  Assert-MIR42F200Static $rejected 'changed candidate bytes were accepted'
+  Assert-CapControlsRestored
 
   # Exercise the consumed save predicate with each missing prerequisite, then
   # all original conditions. The actor stub never starts a native executable.
@@ -115,10 +137,12 @@ try {
     param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds,[scriptblock]$CompletionPredicate)
     $script:actorCalls++
     Assert-MIR42F200Static ($Context -eq $resources -and $FilePath -ceq $engine -and $Arguments -contains $stages[0].config) 'actor lost context, engine or private configuration.'
+    Assert-MIR42F200Static ($Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]-ceq$library) 'native actor received a staged path'
+    $prefix="0.000 2026-10-08 00:00:00; Factorio 2.0.77 (controlled)\n".Replace('\n',"`n")+(@($stages[0].activation.selected|ForEach-Object{"0.001 Loading mod $($_.name) $($_.version) (data.lua)"})-join"`n")+"`n"
     $log=Join-Path $stages[0].userdata 'factorio-current.log'
     if($null -eq $CompletionPredicate) {
       Assert-MIR42F200Static ($TimeoutSeconds -eq 120 -and $Arguments -contains '--create') 'create invocation lost its timeout or original argument.'
-      [IO.File]::WriteAllText($log,'controlled creation log')
+      [IO.File]::WriteAllText($log,$prefix+'controlled creation log')
       return [pscustomobject]@{result=[pscustomobject]@{completion_predicate_observed=$false}}
     }
     Assert-MIR42F200Static ($TimeoutSeconds -eq 60 -and $Arguments -contains '--start-server' -and $Arguments -contains $stages[0].server) 'server invocation lost its original private controls.'
@@ -132,16 +156,19 @@ try {
     Assert-MIR42F200Static (-not (& $CompletionPredicate)) 'completion accepted missing finished-save marker.'
     [IO.File]::WriteAllText($log,'[mir42-f200-settings-cap-transition] STATE JSON {"stage":"capped"} Saving finished')
     Assert-MIR42F200Static (-not (& $CompletionPredicate)) 'completion accepted another stage.'
-    [IO.File]::WriteAllText($log,'[mir42-f200-settings-cap-transition] STATE JSON {"stage":"relaxed"} Saving finished')
+    [IO.File]::WriteAllText($log,$prefix+'[mir42-f200-settings-cap-transition] STATE JSON {"stage":"relaxed"} Saving finished')
     Assert-MIR42F200Static (& $CompletionPredicate) 'completion rejected all original conditions.'
     [pscustomobject]@{result=[pscustomobject]@{completion_predicate_observed=$script:reportCompletion}}
   }
   $expectedSave=Join-Path $stages[0].userdata 'saves/successor.zip'
   $null=Invoke-Engine $stages[0] create @('--create','controlled-input.zip')
   $null=Invoke-ServerSave $stages[0] successor 'controlled-input.zip' $expectedSave relaxed
+  Assert-CapControlsRestored
   $script:reportCompletion=$false;$failure=''
   try {Invoke-ServerSave $stages[0] incomplete 'controlled-input.zip' $expectedSave relaxed|Out-Null} catch {$failure=$_.Exception.Message}
   Assert-MIR42F200Static ($failure.Contains('did not create incomplete successor')) 'server accepted actor return without observed completion.'
+  $null=Complete-MIRLibraryActivation $stages[0].activation;$script:activeStage=$null
+  Assert-CapControlsRestored
   Set-Item Function:\Invoke-MIRNativeProbeFactorioProcess -Value $nativeActor
 
   # The real shared adapter must forward completion, terminate its owned child
@@ -152,28 +179,25 @@ try {
   $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath (Get-Command pwsh).Source -Arguments @('-NoProfile','-File',$actorPath,'-Marker',$actorMarker) -TimeoutSeconds 20 -CompletionPredicate {Test-Path -LiteralPath $actorMarker -PathType Leaf}
   $actorPid=[int](Get-Content -LiteralPath $actorMarker -Raw)
   Assert-MIR42F200Static ($actor.result.completion_predicate_observed -and $null -eq (Get-Process -Id $actorPid -ErrorAction SilentlyContinue)) 'completion returned with its owned child alive.'
-  Assert-MIR42F200Static (@($inputLeases|Where-Object closed).Count -eq 0) 'process adapter prematurely released input custody.'
+  Assert-CapControlsRestored
 
   $catalog=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')|ConvertFrom-Json
   $command=[string](@($catalog.tests|Where-Object id -CEQ 'runtime.maximum-level-settings-derived-cap-transition-f200')[0].command)
-  $context=[pscustomobject]@{factorio='controlled engine';candidate='controlled candidate';candidate_materialization="receipt with ' quote.json"}
+  $context=[pscustomobject]@{factorio='controlled engine';mods='controlled library';candidate='controlled candidate';candidate_materialization="receipt with ' quote.json"}
   $resolved=Resolve-MIRAssuranceCommandText -Command $command -Context $context -Plan ([pscustomobject]@{})
-  Assert-MIR42F200Static ($resolved.Contains("-SourceMaterializationPath 'receipt with '' quote.json'") -and $resolved.Contains('-ExpectedPeakMemoryMiB 2048') -and $resolved.Contains('-MaxNewOutputMiB 120')) 'catalogue command lost supplied receipt, quoting or budgets.'
-  $failure='';try {Resolve-MIRAssuranceCommandText -Command $command -Context ([pscustomobject]@{factorio='engine';candidate='candidate'}) -Plan ([pscustomobject]@{})|Out-Null} catch {$failure=$_.Exception.Message}
+  Assert-MIR42F200Static ($resolved.Contains("-SourceMaterializationPath 'receipt with '' quote.json'") -and $resolved.Contains("-LibraryDirectory 'controlled library'") -and $resolved.Contains('-ExpectedPeakMemoryMiB 2048') -and $resolved.Contains('-MaxNewOutputMiB 120')) 'catalogue command lost supplied receipt, quoting or budgets.'
+  $failure='';try {Resolve-MIRAssuranceCommandText -Command $command -Context ([pscustomobject]@{factorio='engine';mods='library';candidate='candidate'}) -Plan ([pscustomobject]@{})|Out-Null} catch {$failure=$_.Exception.Message}
   Assert-MIR42F200Static ($failure.Contains('requires <candidate-materialization>')) 'missing receipt did not produce the exact required-option diagnostic.'
   Assert-MIR42F200Static ((Resolve-MIRAssuranceCommandText -Command './static-command' -Context ([pscustomobject]@{}) -Plan ([pscustomobject]@{})) -ceq './static-command') 'new optional receipt breaks unrelated static commands.'
 
-  foreach($stage in $stages) {
-    $terminal=Complete-MIRImmutableInputLease -Lease $stage.lease -Outcome passed
-    $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal
-    $null=Assert-MIRImmutableInputLeaseReclaimable -RunRoot $stage.root -Context 'completed tiny F200 stage'
-    $null=Assert-MIRImmutableInputPathWithin -Path $stage.root -Root $scratch -Context 'tiny F200 staging cleanup'
-    Remove-Item -LiteralPath $stage.root -Recurse
+  foreach($file in @(Get-ChildItem -LiteralPath $library -Filter '*.zip' -File)){
+    Assert-MIR42F200Static ($before.ContainsKey($file.Name)-and$before[$file.Name].sha256-ceq(Get-MIRImmutableInputSha256 $file.FullName)-and$before[$file.Name].id-ceq(Get-MIRImmutableInputFileIdentity $file.FullName)) 'archive identity changed while switching cap stages'
   }
-  Assert-MIR42F200Static ((Get-MIRImmutableInputSha256 $candidateZip) -ceq $candidateHash) 'stage retirement removed or changed supplied bytes.'
-  Write-Host '[ok] F200 cap runner: three actual strict-link constructors, independent writable controls, no-copy refusal, original completion prerequisites and owned-child shutdown passed; Factorio was not run.'
+  Assert-MIR42F200Static (@(Get-ChildItem -LiteralPath $resources.root -Recurse -Filter '*.zip' -File|Where-Object{$_.FullName-ne$expectedSave}).Count-eq0) 'cap switch wrote an archive payload'
+  Write-Host '[ok] F200 cap direct-library A/B/A selection, exact settings versions, private controls, concurrent/hash refusal, unchanged archives, save-completion predicates and owned-child shutdown; no Factorio.'
+
 } finally {
   Set-Item Function:\Invoke-MIRNativeProbeFactorioProcess -Value $nativeActor
-  foreach($lease in $inputLeases){if(-not $lease.closed){$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}}
+  foreach($stage in @($stages)){if($null-ne$stage.activation-and-not$stage.activation.closed){$null=Complete-MIRLibraryActivation $stage.activation}}
   if(Test-Path -LiteralPath $scratch){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $repo 'build/tmp') -Context 'owned tiny F200 fixture cleanup';Remove-Item -LiteralPath $scratch -Recurse -Force}
 }

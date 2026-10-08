@@ -948,7 +948,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIR42F200SettingsCapTransition.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
+      "command": "./tests/runtime/Test-MIR42F200SettingsCapTransition.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -LibraryDirectory <mods> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -957,6 +957,12 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": true,
       "inputs": [
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
         "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
         "fixtures/assert-mir42-f200-settings-cap-transition/**",
@@ -1697,6 +1703,11 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
         "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
@@ -8174,5 +8185,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e22a326b693e99d55d9f40da5a27f0be2e41110c8ac29c7b3b929db3cdbce7cf"
+  "digest": "sha256:b3a19cec6427704098c35517f328758c63bcd339bb64810159f2a3ea3686d34f"
 }
