@@ -110,7 +110,9 @@ function New-CapSettingsSource([string]$Root,[int]$Cap){
   Set-CopiedStartupSettingDefaults -ModsDir $Root -Overrides @{'ips-enable-research_copper'=$true;'ips-max-level-research_copper'=$Cap}
   $source=Join-Path $Root 'mir-validation-settings-overrides'
   $infoPath=Join-Path $source 'info.json';$info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
-  $info.version=if($Cap-eq0){'0.1.100'}else{'0.1.103'}
+  # The existing writer starts with a Hashtable. Preserve its authored values
+  # in a stable order so another PowerShell host produces identical members.
+  $info=[ordered]@{name=$info.name;version=$(if($Cap-eq0){'0.1.100'}else{'0.1.103'});title=$info.title;author=$info.author;factorio_version=$info.factorio_version;dependencies=@($info.dependencies)}
   [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
   [pscustomobject]@{source=$source;version=$info.version;file=('mir-validation-settings-overrides_'+$info.version+'.zip')}
 }

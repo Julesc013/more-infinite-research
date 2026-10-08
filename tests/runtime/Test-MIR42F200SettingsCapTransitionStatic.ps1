@@ -95,6 +95,28 @@ try {
     $input=$preparedSettings[$cap]
     $null=Publish-MIRModDirectoryArchive -Source $input.source -Name 'mir-validation-settings-overrides' -Version $input.version -ModsDir $library
   }
+  # Preparation and native execution use different PowerShell hosts. Compare
+  # the real writer's members across that boundary, not parsed JSON equality.
+  $writerHost=Join-Path $scratch 'settings-writer-host.ps1'
+  $writerBody=@'
+param([string]$Repo,[string]$Harness,[string]$Output)
+$ErrorActionPreference='Stop'
+. (Join-Path $Repo 'tools/lib/validation/SettingsOverrides.ps1')
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile($Harness,[ref]$tokens,[ref]$errors)
+foreach($name in @('Assert-MIR42F200','New-CapSettingsSource')){
+  $definition=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$true))
+  . ([scriptblock]::Create($definition[0].Extent.Text))
+}
+$null=New-CapSettingsSource $Output 3
+'@
+  [IO.File]::WriteAllText($writerHost,$writerBody,[Text.UTF8Encoding]::new($false))
+  $freshOutput=Join-Path $scratch 'fresh-settings-host'
+  & pwsh -NoProfile -NonInteractive -File $writerHost -Repo $repo -Harness $harnessPath -Output $freshOutput
+  Assert-MIR42F200Static ($LASTEXITCODE-eq0) 'fresh settings writer failed'
+  foreach($member in @('info.json','settings-updates.lua')){
+    Assert-MIR42F200Static ((Get-Sha (Join-Path $preparedSettings[3].source $member))-ceq(Get-Sha (Join-Path $freshOutput ('mir-validation-settings-overrides/'+$member)))) "settings member differs between hosts: $member"
+  }
   $before=@{};foreach($file in @(Get-ChildItem -LiteralPath $library -File)){$before[$file.Name]=@{sha256=Get-MIRImmutableInputSha256 $file.FullName;id=Get-MIRImmutableInputFileIdentity $file.FullName}}
   $oldList=[Text.Encoding]::UTF8.GetBytes('{"mods":[{"name":"base","enabled":true}]}')
   $oldSettings=[Text.Encoding]::UTF8.GetBytes('prior private settings control')
