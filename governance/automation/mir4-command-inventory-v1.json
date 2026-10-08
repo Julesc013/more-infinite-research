@@ -5419,9 +5419,9 @@
     {
       "path": "tools/mir/application/release/readiness/ResourceGovernor.ps1",
       "classification": "canonical-internal",
-      "sha256": "05BBBF18BB2D04D6C2CFE6741FC1749EC5FCAEB883C017A83DA5AE1202B818BD",
+      "sha256": "45945D5A3F7A57BEA76C8C69D32F2A7F9535FCD6A2AB570938D8B1C1B0932DF6",
       "hash_mode": "canonical-text-v1",
-      "lines": 199,
+      "lines": 202,
       "package_visible": false
     },
     {
@@ -6050,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:55bd2ba911d1eb46903677c96543bdb46b1f6a6536af9f9b4de0ca11a312c412"
+  "digest": "sha256:7546f478646998672e509490ad06fca1276876ba402d413e3c62ce0e0eff035d"
 }

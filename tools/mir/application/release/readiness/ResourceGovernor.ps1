@@ -141,7 +141,7 @@ function Invoke-MIR441MonitoredProcess {
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
   try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
-  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$started=[DateTime]::UtcNow;$timer=[Diagnostics.Stopwatch]::StartNew();$timedOut=$false;$completionObserved=$false
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=[DateTime]::UtcNow;$timer=[Diagnostics.Stopwatch]::StartNew();$timedOut=$false;$completionObserved=$false
   try{
     # Check again under the lock, before any job output or worker is allocated.
     $null=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
@@ -156,13 +156,16 @@ function Invoke-MIR441MonitoredProcess {
     foreach($pair in @(@($StdoutPath,'StandardOutput'),@($StderrPath,'StandardError'))){if($pair[0]){$stream=[IO.File]::Create($pair[0]);$streams+=$stream;$copies+=$process.($pair[1]).BaseStream.CopyToAsync($stream)}}
     while($true){
       $tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children|Sort-Object id,started_utc -Unique);$peak=[Math]::Max($peak,[int64]$tree.working_set_bytes)
+      $privatePeak=[Math]::Max($privatePeak,[int64]$tree.private_bytes)
       # A reaction margin cancels before the retained reserve, subject to sampling latency.
       $sample=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes 32MB -ExpectedPeakMemoryBytes 64MB
+      # Preserve the triggering process observation before enforcing its budget.
+      # Private bytes can exceed working set during graphical resource loading.
+      $sample|Add-Member -NotePropertyName process -NotePropertyValue ([ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'})
+      Write-MIR441Json -Value $sample -Path $ledger -Append
       if($tree.working_set_bytes-gt$ExpectedPeakMemoryBytes-or$tree.private_bytes-gt$ExpectedPeakMemoryBytes){throw '[mir441-resource-process-budget]'}
       $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw '[mir441-resource-output-scan-incomplete]'}
       if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
-      $sample|Add-Member -NotePropertyName process -NotePropertyValue ([ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'})
-      Write-MIR441Json -Value $sample -Path $ledger -Append
       if($process.HasExited){break}
       if($timer.Elapsed.TotalSeconds-ge$TimeoutSeconds){$timedOut=$true;throw '[mir441-process-timeout]'}
       if($null-ne$CompletionPredicate){
@@ -177,14 +180,14 @@ function Invoke-MIR441MonitoredProcess {
     $process.Refresh();$peak=[Math]::Max($peak,[int64]$process.PeakWorkingSet64)
     if($process.ExitCode-ne0-and-not$AllowNonZeroExit-and-not$completionObserved){throw "[mir441-process-exit] $($process.ExitCode)"}
     $passed=$completionObserved-or$process.ExitCode-eq0
-    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;completion_predicate_observed=$completionObserved}) -Path $ledger -Append
+    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;completion_predicate_observed=$completionObserved}) -Path $ledger -Append
     # Native process timestamps keep watchdog sampling overhead out of engine timing.
-    return [pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;admission=$admission}
+    return [pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;admission=$admission}
   }catch{
     $failure=$_
     if($null-ne$process){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children)}catch{}}
     Stop-MIR441OwnedProcess -Process $process -Children $children
-    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message}) -Path $ledger -Append
+    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
     throw $failure
   }finally{
     try{Stop-MIR441OwnedProcess -Process $process -Children $children}finally{
