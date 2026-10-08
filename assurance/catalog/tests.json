@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 223,
+  "test_count": 224,
   "tests": [
     {
       "id": "docs.check",
@@ -642,6 +642,42 @@
       "matrix": null
     },
     {
+      "id": "runtime.community-power-manufacturing-f200",
+      "proposition": "The governed test 'runtime.community-power-manufacturing-f200' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRCommunityPowerManufacturing.ps1 -FactorioBin <factorio> -LibraryDirectory <mods> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 120",
+      "canonical_implementation": "tests/runtime/Test-MIRCommunityPowerManufacturing.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "factorio",
+        "tests/runtime/Test-MIRCommunityPowerManufacturing.ps1",
+        "fixtures/assert-community-power-manufacturing/**",
+        "fixtures/run-profiles/community-power-f200.json",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "source:source/package-source.json",
+        "targets/f200/composition.json",
+        "targets/package-authority.json",
+        "source:source/prototypes/streams/productivity.lua",
+        "source:source/prototypes/mir/capabilities/recipe_productivity/**"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "runtime.ecosystem",
       "proposition": "The governed test 'runtime.ecosystem' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -948,7 +984,7 @@
       "cohort": "runtime-upgrade",
       "kind": "runtime",
       "layer": "F3",
-      "command": "./tests/runtime/Test-MIR42F200SettingsCapTransition.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
+      "command": "./tests/runtime/Test-MIR42F200SettingsCapTransition.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -SourceMaterializationPath <candidate-materialization> -LibraryDirectory <mods> -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 120",
       "canonical_implementation": "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
       "target_scope": "exact-selected-factorio-target",
       "freshness": "exact-input-fingerprint",
@@ -957,6 +993,12 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": true,
       "inputs": [
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
         "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
         "fixtures/assert-mir42-f200-settings-cap-transition/**",
@@ -1697,6 +1739,11 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
         "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
@@ -8157,11 +8204,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 68,
-      "runtime-upgrade": 52,
+      "runtime-upgrade": 53,
       "compiler-static": 19,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 212,
+    "canonical_test_commands": 213,
     "aggregate_commands": 8,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8174,5 +8221,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e22a326b693e99d55d9f40da5a27f0be2e41110c8ac29c7b3b929db3cdbce7cf"
+  "digest": "sha256:1c67b906708f9d4fba58d676e51a92fb3d24d2f82a4fee80dcab8b92dc158994"
 }
