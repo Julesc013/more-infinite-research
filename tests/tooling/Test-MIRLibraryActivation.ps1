@@ -445,6 +445,7 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
   $browserWrongVersion=$false
   $iconCase=$null
   $DlcIconCase='None';$iconObservations=[Collections.Generic.List[object]]::new()
+  $GraphicsPreset='very-low'
   $resources|Add-Member process_index 0
   $browserIconMarker='present'
   function Invoke-MIRNativeProbeFactorioProcess {
@@ -452,6 +453,7 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
     Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]-ceq$library) 'browser process reads master library directly'
     if($Arguments -contains '--benchmark-graphics'){
       Assert-LibraryTest ($Arguments -contains '--single-thread-loading') 'browser retains bounded graphics arguments'
+      Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--force-graphics-preset')+1]-ceq$GraphicsPreset) 'browser forwards its selected graphics preset'
     }
     $lines=@('0.001 2026-10-08 00:00:00; Factorio 2.1.20 (build controlled)')
     $lines+=@($activation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$(if($browserWrongVersion-and$_.name-ceq'more-infinite-research'){'4.2.21000'}else{$_.version})+' (data.lua)'})
