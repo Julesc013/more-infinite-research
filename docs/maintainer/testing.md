@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-09
 supersedes: []
 superseded_by: []
 ---
 # Testing And Fixture Strategy
 
-Updated: 2026-10-08
+Updated: 2026-10-09
 
 The historical target adapter declares `player` as the handcrafting prototype for 0.13–0.16; 0.17 and newer retain `character`. The shared acquisition solver uses that declaration when proving a laboratory's placement-item route, retains category checks and rejects fluid handcrafting. Controlled lab/researchability cases cover both prototype names, mismatched adapters, missing categories, fluid coproducts and unchanged input prototypes. These controls do not establish historical native catalogue or save acceptance.
 
@@ -96,6 +96,8 @@ Fixture 0.1.3 extends that same candidate and exact profile with paired native c
 The existing manifest-driven `tests/runtime/Test-MIRUpgrade.ps1` also selects predecessor and candidate versions directly in one explicitly supplied library. Both exact MIR archives and the selected assertion fixtures must already be installed there; source-only fixtures are disabled for the candidate phase. The source phase's writable settings are preserved privately and activated for the candidate. Each owned engine invocation verifies the library/configuration and reads back the loaded mod versions; existing source, earned research, reward, save-completion and reload oracles remain required. Result schema 3 records `source_library_activation` and `library_activation`; it does not represent these as hard-link leases.
 
 For current F210/F200 published `CCC00 → CCC01` base and Space Is Fake checks, `-SourceMaterializationPath` selects the canonical receipt instead of `-SelectedReleaseManifest`. It checks the supplied archive against current player-source bindings, allowing test or documentation changes without rebuilding identical player packages. It retains the actual published-predecessor custody checks, exact transition and scenario selectors, retained output, native loaded-selection checks and two reloads. Results bind the materialization receipt, player fingerprint, harness bytes and actual worktree state. This mode does not grant frozen-source release acceptance; the separate seal reader still requires the frozen committed source.
+
+The E F210/F200 base upgrades and E F210 Space Is Fake upgrade completed through this path, including both reloads. The [candidate matrix](../releases/mir42-nine-target-candidate-playtest-matrix.md#mir-421-private-construction) binds the three result hashes to their exact candidate and clean harness source, alongside the E paired mass-research observations. It also retains the current Tin memory stop and F200 Space Is Fake admission refusals; these cases remain unqualified. Missing inputs and capacity failures block their selected native case, rather than unrelated source work or already-completed cases.
 
 Its K2 maintenance case selects `-FixtureName assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001 -K2ImersiteInputProfile fixtures/run-profiles/k2-213-imersite-f210.json`, exact `-FromVersion 4.2.21000 -ToVersion 4.2.21001`, and `-SelectedTarget f210`. Supply the current candidate manifest or its canonical `-SourceMaterializationPath`, plus the published-predecessor manifest, engine and one library explicitly; omit `-Archetype`. `-PrepareInputsOnly` prepares the small owned assertion/settings ZIPs for separate installation without touching library controls.
 

@@ -5,7 +5,7 @@ applies_to: "MIR 4.2.1 construction and historical MIR 4.2.0 preparation"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -27,7 +27,26 @@ E's exact F210 and F200 archives subsequently passed the selected Solar Matrix/A
 | F210 | `5B1F56479D490DCA116EC373809C63138513B5A7AEBDDE1871DAB7373709A396` | `build/p/m421-community-power-current-native-e/f210/df03ca6743ed420f9028fbba18e2a23a/result.json`; `D47C8A15E7D9031D9AF16E5B3D0612D3D55ED8F29F0649E0F50958CDE856DF7D` |
 | F200 | `EDD4A15F1C405C4B2F8487D86FC16F8C0A06470F71D3B4D05B4CAB8329D41732` | `build/p/m421-community-power-current-native-e/f200/e2207fab3efb41b6a505ce2b47196342/result.json`; `56750EC71FDE42754225263A3C8E0A8218504F6FF3CEE3B7378A34F173EFA116` |
 
-These passes cover the named exact base-game mod tuples, not SE, AAI, Paracelsin, enabled DLC, general progression or predecessor upgrades. The prepared K2 published-maintenance upgrade fixture was corrected after its first native attempt exposed a wrong test assumption: published 4.2.0 defaults Imersite's cap to three, not zero. Separate default-three and explicitly configured zero-cap cases now have controlled checks; their corrected native runs remain pending host commit headroom. This does not change K2's previously recorded fresh-game production result or establish a maintenance upgrade pass. Signing, freeze, review, historical selection recovery, joined qualification, promotion and publication remain outstanding.
+The same E archives passed three published `CCC00 → CCC01` upgrades at clean harness source `211c6cdd4d0ecedba5fa2ec9f85b9aac110527c0`. Each used four serial Factorio actors, preserved the tested research, settings and fixture state through two reloads, restored library controls and created zero dependency copies or archive links. The Space Is Fake case additionally checks both level-seven continuations, finite prerequisites, earned bonuses and queue progress in its exact DLC-enabled profile.
+
+| Selected E upgrade | Native result | Result SHA-256 | Peak working set |
+|---|---|---|---:|
+| F210 base-default | `build/p/m421-current-base-upgrades-e/f210/result.json` | `5BA044F61B060F7418B59962EFB7184948D1C9B67E1903E46DC780BE5B09F006` | 259,182,592 bytes |
+| F200 base-default | `build/p/m421-current-base-upgrades-e/f200/result.json` | `E168CAE3BAEED6A6C7DDD631139B6A30418CCEE9C8F80C1745E4CEFA168F42D1` | 365,084,672 bytes |
+| F210 Space Is Fake | `build/p/m421-current-sif-upgrades-e/f210/result.json` | `5006263D08E772B15309AD43497A4BC86AC2AB62B9E6830E9A59512D97A4D5AE` | 673,456,128 bytes |
+
+E's paired base-only mass-research observations also completed at that harness source with fixture 1.0.2, default settings, zero players and the Library closed. F200 result `build/p/m421-current-e-research-all/f200/52302d0764d245d6b6e67c4aa21500ec/result.json` has SHA-256 `32DB256D83443B568AA0D8129C573F21A1E491F9D83433151DDEA07A38D729A8`; F210 result `build/p/m421-current-e-research-all/f210/225c52c37a4b414b9ee493ff11f275af/result.json` has SHA-256 `1FC585622BBD0FD5D9DC25D2952A38263484B5481DB36AC3408039DAC319C2BF`. Both verified the actual loaded selection and native completion-event counts, restored controls and created zero dependency copies or links. Their respective peak working sets were 393,396,224 and 353,869,824 bytes under 512 MiB allowances.
+
+| Exact package pair | Published CCC00 first/repeated command | E CCC01 first/repeated command | Baseline/candidate technology counts |
+|---|---:|---:|---:|
+| F200 | 8.1058 / 0.9502 ms | 13.3127 / 3.2885 ms | 242 / 250 |
+| F210 | 26.4508 / 1.1510 ms | 36.5226 / 3.1266 ms | 249 / 249 |
+
+These are single paired observations, with larger candidate timings in both pairs. They establish neither a statistical performance budget nor graphical, multiplayer, open-Library or full-catalogue acceptance. The fixture's first missing-input attempt and subsequent commit-admission refusal remain retained separately; neither is a pass.
+
+Current E Tin remains unqualified: `build/p/m421-current-tin-native-e/05e1e03b017e4c8183abcfc6b92918a6/result.json` (SHA-256 `00D078921F57F271246B73D0DCE1CEBFE6E2EFDBFC3D1452CF8F2E4DC7C3D5D8`) records a startup stop when the process tree reached 891,342,848 working-set bytes against its 768 MiB allowance. The corrected 1,024 MiB run was refused by commit admission before Factorio started. F200 Space Is Fake was likewise refused before launch at 1,024 MiB and then at a measured 896 MiB allowance. Compact stops are retained in `build/tmp/mir421-current-tin-corrected-admission-stop-e.json` and `build/tmp/mir421-current-e-sif-f200-admission-stop-b.json`. Host reserves were unchanged. Prior Tin and Space Is Fake passes retain their original package identities; another affected attempt requires changed capacity.
+
+The power-manufacturing passes cover only their named exact base-game mod tuples; SE, AAI, Paracelsin, enabled DLC, general progression and their predecessor upgrades remain separate obligations. The prepared K2 published-maintenance upgrade fixture was corrected after its first native attempt exposed a wrong test assumption: published 4.2.0 defaults Imersite's cap to three, not zero. Separate default-three and explicitly configured zero-cap cases now have controlled checks; their corrected native runs remain pending host commit headroom. This does not change K2's previously recorded fresh-game production result or establish a maintenance upgrade pass. Signing, freeze, review, historical selection recovery, joined qualification, promotion and publication remain outstanding.
 
 The 8 October private construction `M421-20261008-MAINTENANCE-D` built all nine CCC01 archives twice from `d74d18114aeb57123f9ce63eb39467199c88402f`, with byte-identical A/B outputs. Its manifest is `build/p/m421-maintenance-nine-build-d/candidate/candidate-manifest.json` (SHA-256 `7EE5F4B3DC2932221F403E81A1771DD43B89EF4DC19BB8E12754E93A26E2F094`); player source is `4B7476BD6B53224B0D9FB34FBAE84A3CB8741FA556BC36F4C197020F3D14CF6A`. The F210 and F200 archives exactly match the separately constructed current K2 and graphical-test inputs. Comparison with construction C found unchanged archive membership and only the K2 science-policy/continuation guard changes. This does not transfer C's native receipts to D. The actual release reader accepted D's candidate and published 4.2.0 predecessor custody; joined qualification, signing, freeze, review, promotion and publication remain outstanding.
 

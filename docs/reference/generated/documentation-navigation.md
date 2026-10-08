@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-10-08.
+Current-page navigation generated from Markdown front matter as of 2026-10-09.
 
 ## developer
 
