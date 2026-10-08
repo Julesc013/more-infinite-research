@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "启用后，MIR 可能会引用已安装的官方 DLC 图标文件，包括 Space Age 和 Elevated Rails，即使这些 mod 在基础游戏运行中被禁用。如果未安装这些 DLC 文件，请将其关闭； Factorio 无法在原型加载期间从丢失的图标文件中正常恢复。",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "为已保存的设置和导入的配置保留。MIR 仅在提供图像的模组已启用时使用 DLC 图像；否则使用基础游戏图标，即使此选项已开启也一样。启动时无法安全检查已安装但未启用的 DLC 文件。此选项不会启用 Space Age 或 Elevated Rails。需要重启。",
       "provenance": "machine-assisted"
     },
     {

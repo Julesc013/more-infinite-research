@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "有効にすると、基本ゲームの実行で MOD が無効になっている場合でも、MIR は、Space Age や Elevated Rails など、インストールされている公式 DLC アイコン ファイルを参照することがあります。これらの DLC ファイルがインストールされていない場合は、これをオフのままにしておきます。 Factorio は、プロトタイプのロード中に欠落したアイコン ファイルを正常に回復できません。",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "保存済み設定およびインポートしたプロファイルとの互換性のために残されています。MIR は、画像を提供する MOD が有効な場合にのみ DLC の画像を使用します。それ以外の場合は、このオプションがオンでもベースゲームのアイコンを使用します。インストール済みでも無効になっている DLC のファイルは、起動時に安全に確認できません。Space Age や Elevated Rails を有効にすることはありません。再起動が必要です。",
       "provenance": "machine-assisted"
     },
     {

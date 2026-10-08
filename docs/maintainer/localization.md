@@ -20,15 +20,15 @@ MIR ships a complete locale file for every language directory supported by the q
 
 | Authority | Purpose |
 | --- | --- |
-| `locale/en/more-infinite-research.cfg` | Canonical keys, section order, placeholders, rich-text tags, and English meaning. |
+| `source/locale/en/more-infinite-research.cfg` | Canonical keys, section order, placeholders, rich-text tags, and English meaning. |
 | `.mir/locales/manifest.json` | Supported Factorio locale set, translation codes, script expectations, and UI prose budgets. |
 | `.mir/locales/translations/<locale>.json` | Complete per-key translations, English source hashes, and provenance. |
 | `.mir/locales/overrides.json` | Small reviewed corrections for terminology or machine-draft values that need explicit wording. |
 | `tools/commands/localization/Update-MIRLocales.ps1` | Deterministic CFG and translation-memory generator. |
-| `validation/tests/docs/Test-MIRLocales.ps1` | Offline release gate for completeness, freshness, syntax, and prose constraints. |
+| `tests/docs/Test-MIRLocales.ps1` | Offline release gate for completeness, freshness, syntax, and prose constraints. |
 | `tools/lib/localization/MIRLocalization.psm1` | Shared parser, writer, hashing, placeholder, rich-text, and length primitives. |
 
-Files below `locale/<code>/` other than English are generated outputs. Change a translation-memory value or add a narrow override, then regenerate; do not leave a hand-edited CFG that differs from its memory.
+Files below `source/locale/<code>/` other than English are generated outputs. The policy's `locale/...` paths describe package output and resolve through the existing package-source mapping. Change a translation-memory value or add a narrow override, then regenerate; do not leave a hand-edited CFG that differs from its memory.
 
 ## Normal Workflow
 
@@ -42,10 +42,12 @@ This intentionally fails and lists a language with missing or stale source hashe
 
 ```powershell
 .\tools\commands\localization\Update-MIRLocales.ps1 -MachineTranslateMissing
-.\validation\tests\docs\Test-MIRLocales.ps1
+.\tests\docs\Test-MIRLocales.ps1
 ```
 
 Machine assistance is an initial completion mechanism, not a substitute for the exact-candidate `locale-fit-and-truncation` manual release item. Community or maintainer corrections should replace machine-assisted values in translation memory or the small override catalog and preserve the matching English source hash.
+
+Use `-SelectedKey` and optionally `-SelectedLocale` for a bounded correction. Unselected keys must already match both their current English hash and generated value. A stale memory row cannot be replaced by importing its old CFG text under the new hash; `-RefreshMachineTranslations` also bypasses existing CFG reuse. Importing preexisting text is limited to keys without governed memory. The DLC fallback tooltip refresh for 4.2.1 uses this path and retains machine-assisted provenance; structural checks do not claim human language review.
 
 ## Enforced Contract
 

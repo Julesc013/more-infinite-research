@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "Kai įjungta, MIR gali nurodyti įdiegtus oficialius DLC piktogramų failus, įskaitant „Space Age“ ir „Elevated Rails“, net jei tie modifikacijos yra išjungtos pagrindiniam žaidimui. Palikite tai išjungtą, jei tie DLC failai neįdiegti; Factorio negali gražiai atsigauti po trūkstamų piktogramų failų prototipo įkėlimo metu.",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "Palikta išsaugotiems nustatymams ir importuotiems profiliams. MIR naudoja DLC grafiką tik tada, kai ją teikianti modifikacija įjungta; kitu atveju naudoja pagrindinio žaidimo piktogramas, net kai ši parinktis įjungta. Įdiegto, bet išjungto DLC failų paleidimo metu negalima saugiai patikrinti. Neįjungia Space Age ar Elevated Rails. Reikia paleisti iš naujo.",
       "provenance": "machine-assisted"
     },
     {

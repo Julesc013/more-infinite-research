@@ -966,8 +966,8 @@
     },
     {
       "key": "mod-setting-description.mir-use-installed-space-age-icons",
-      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
-      "translation": "Ja tas ir iespējots, MIR var atsaukties uz instalētiem oficiālajiem DLC ikonu failiem, tostarp Space Age un Elevated Rails, pat ja šie modi ir atspējoti pamata spēles palaišanai. Atstājiet šo opciju, ja šie DLC faili nav instalēti; Factorio nevar graciozi atgūties no trūkstošajiem ikonu failiem prototipa ielādes laikā.",
+      "source_sha256": "FA74872E59D19DB59612D646790D0A3AF3409486F6C6903395FE96AD8D1BE075",
+      "translation": "Saglabāts saglabātajiem iestatījumiem un importētajiem profiliem. MIR izmanto DLC grafiku tikai tad, kad to nodrošinošais mods ir ieslēgts; citādi tiek izmantotas pamatspēles ikonas, arī tad, ja šī opcija ir ieslēgta. Instalēta, bet izslēgta DLC failus nevar droši pārbaudīt palaišanas laikā. Neieslēdz Space Age vai Elevated Rails. Nepieciešama restartēšana.",
       "provenance": "machine-assisted"
     },
     {

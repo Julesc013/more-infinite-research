@@ -89,6 +89,30 @@ if (((Get-MIRTechnicalLiteralSequence -Text $technicalProbe) -join '|') -ne ((Ge
   throw '[mir-locales-technical-literal-punctuation-regression]'
 }
 
+# Execute the generator's actual reuse decision. A generated translation with
+# known stale provenance must never be rebound to the changed English hash.
+foreach ($functionName in @('Test-MIRReusablePreexistingTranslation','Test-MIRTranslationStructure','Get-MIRReusableLocaleRecord')) {
+  $function = @($selectionAst.FindAll({param($node)
+    $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $functionName
+  }, $true))
+  if ($function.Count -ne 1) { throw "[mir-locales-generator-function:$functionName]" }
+  . ([scriptblock]::Create($function[0].Extent.Text))
+}
+$reuseArguments = @{SourceText='Use base icons __1__';SourceHash='CURRENT';ExistingTranslation='Utiliser les icônes __1__'}
+$currentMemory = [pscustomobject]@{source_sha256='CURRENT';translation='Utiliser les icônes __1__';provenance='machine-assisted'}
+$reused = Get-MIRReusableLocaleRecord @reuseArguments -MemoryRecord $currentMemory
+if ($null -eq $reused -or $reused.provenance -cne 'machine-assisted' -or $reused.source_sha256 -cne 'CURRENT') { throw '[mir-locales-current-memory-reuse]' }
+$bootstrap = Get-MIRReusableLocaleRecord @reuseArguments
+if ($null -eq $bootstrap -or $bootstrap.provenance -cne 'preexisting') { throw '[mir-locales-untracked-translation-bootstrap]' }
+foreach ($opposing in @(
+  @{MemoryRecord=[pscustomobject]@{source_sha256='OLD';translation=$currentMemory.translation;provenance='machine-assisted'}},
+  @{MemoryRecord=[pscustomobject]@{source_sha256='CURRENT';translation='Utiliser les icônes __2__';provenance='machine-assisted'}},
+  @{MemoryRecord=$currentMemory;Refresh=$true},
+  @{Refresh=$true}
+)) {
+  if ($null -ne (Get-MIRReusableLocaleRecord @reuseArguments @opposing)) { throw '[mir-locales-stale-or-refresh-reused-generated-prose]' }
+}
+
 $canonicalJsonProbeRoot = Join-Path $repo ('build/tests/locales/canonical-json-' + [guid]::NewGuid().ToString('N'))
 $canonicalJsonProbePath = Join-Path $canonicalJsonProbeRoot 'probe.json'
 New-Item -ItemType Directory -Force -Path $canonicalJsonProbeRoot | Out-Null
