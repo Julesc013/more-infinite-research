@@ -12,6 +12,12 @@ local M = {
   -- range: an upstream version must be separately observed and admitted.
   v3_policy_id = "K2SciencePhasePolicyV3",
   v4_policy_id = "K2SciencePhasePolicyV4",
+  v5_policy_id = "K2SciencePhasePolicyV5",
+  v5_applicability = {
+    base = "2.1.21",
+    Krastorio2 = "2.1.3",
+    ["Krastorio2-spaced-out"] = "2.0.13"
+  },
   v4_applicability = {
     base = "2.1.20",
     Krastorio2 = "2.1.2",
@@ -59,6 +65,9 @@ local function matches_exact_tuple(active_mods, exact_versions)
 end
 
 local function matching_policy(active_mods)
+  if matches_exact_tuple(active_mods, M.v5_applicability) then
+    return M.v5_policy_id, M.v5_applicability
+  end
   -- Current-engine profiles expose base. Do not apply the historical V1
   -- tuple to a different engine merely because its two named mods match.
   if matches_exact_tuple(active_mods, M.v4_applicability) then
@@ -79,6 +88,13 @@ end
 function M.applies(active_mods)
   local policy_id = matching_policy(active_mods)
   return policy_id ~= nil
+end
+
+-- This selects the existing continuation declaration only. Recipe safety,
+-- useful output and ownership still require their ordinary planner gates.
+function M.imersite_continuation_applies(active_mods)
+  return matches_exact_tuple(active_mods, M.v3_applicability)
+    or matches_exact_tuple(active_mods, M.v5_applicability)
 end
 
 function M.normalize(ingredients, active_mods)

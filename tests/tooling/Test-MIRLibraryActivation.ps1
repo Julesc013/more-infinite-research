@@ -113,6 +113,23 @@ try{
     Assert-LibraryTest (@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log).Count -eq 2) 'loaded names and versions read back'
     [IO.File]::AppendAllText($log,"`n0.3 Loading mod unrequested 1.0.0 (data.lua)`n")
     Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log} 'mir-library-loaded-selection'
+    $complete=@($activation.selected|Sort-Object name|ForEach-Object {$_.name+'@'+$_.version})-join '|'
+    $stageLine='0.2 Loading mod base 2.1.20 (data.lua)'
+    $observerLine='0.3 Script @__alpha__/data-final-fixes.lua:8: [MIR_ACTIVE_MODS] '+$complete
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log} 'mir-library-loaded-selection'
+    Assert-LibraryTest (@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha).Count-eq2) 'explicit native observer includes asset-only identities'
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver unrequested} 'mir-library-loaded-observer'
+    foreach($invalid in @('base@2.1.20','base@2.1.20|alpha@9.0.0','base@2.1.20|base@2.1.20',($complete+'|unrequested@1.0.0'))){
+      [IO.File]::WriteAllLines($log,@($stageLine,('0.3 Script @__alpha__/data-final-fixes.lua:8: [MIR_ACTIVE_MODS] '+$invalid)))
+      Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-selection'
+    }
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine,$observerLine))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-observation'
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine,'0.4 Loading mod alpha 9.0.0 (data.lua)'))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-selection'
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine.Replace('@__alpha__/','@__unrequested__/')))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-observation'
     $receipt=Complete-MIRLibraryActivation $activation;$activation=$null
     Assert-LibraryTest ($receipt.archive_links_created -eq 0 -and $receipt.dependency_payload_bytes_copied -eq 0) 'no archive staging'
     Assert-LibraryTest (@($receipt.selected|Where-Object {-not $_.builtin -and $_.sha256 -ceq $hashes[$case[1]]}).Count -eq 1) 'receipt binds the selected archive bytes'
@@ -246,6 +263,8 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $tinyInputs=@([ordered]@{file_name='alpha_1.0.0.zip';expected_sha256=$hashes['alpha_1.0.0.zip'];identity=@{name='alpha';version='1.0.0'}})
   $direct=Read-K2213DirectLibraryInputs -Library $library -Inputs $tinyInputs -FixtureRoot $fixtureRoot
   Assert-LibraryTest ($direct.archive_hashes.Count -eq 2 -and $direct.mod_list.mods.Count -eq 7) 'actual K2 reader selects only locked archives, fixture and five exact builtins'
+  $current=Read-K2213DirectLibraryInputs -Library $library -Inputs $tinyInputs -FixtureRoot $fixtureRoot -EngineVersion '2.1.21'
+  Assert-LibraryTest (@($current.mod_list.mods|Where-Object {$_.version -ceq '2.1.21'}).Count -eq 5 -and $current.archive_hashes.Count -eq 2) 'K2 current engine selection changes bundled versions without staging archives'
   $profileK2=Join-Path $profiles 'k2-input-boundary.json';Write-TestJson $profileK2 $direct.mod_list
   $activation=Start-MIRLibraryActivation $library $data $profileK2 $direct.archive_hashes
   . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
@@ -445,6 +464,7 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
   $browserWrongVersion=$false
   $iconCase=$null
   $DlcIconCase='None';$iconObservations=[Collections.Generic.List[object]]::new()
+  $GraphicsPreset='very-low'
   $resources|Add-Member process_index 0
   $browserIconMarker='present'
   function Invoke-MIRNativeProbeFactorioProcess {
@@ -452,6 +472,7 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
     Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]-ceq$library) 'browser process reads master library directly'
     if($Arguments -contains '--benchmark-graphics'){
       Assert-LibraryTest ($Arguments -contains '--single-thread-loading') 'browser retains bounded graphics arguments'
+      Assert-LibraryTest ($Arguments[[Array]::IndexOf($Arguments,'--force-graphics-preset')+1]-ceq$GraphicsPreset) 'browser forwards its selected graphics preset'
     }
     $lines=@('0.001 2026-10-08 00:00:00; Factorio 2.1.20 (build controlled)')
     $lines+=@($activation.selected|ForEach-Object {'0.1 Loading mod '+$_.name+' '+$(if($browserWrongVersion-and$_.name-ceq'more-infinite-research'){'4.2.21000'}else{$_.version})+' (data.lua)'})

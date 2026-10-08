@@ -2,12 +2,19 @@ local function fail(message)
   error("MIR K2 2.1.3 Imersite continuation validation failed: " .. message)
 end
 
+local active = {}
+for name, version in pairs(mods) do
+  if name ~= "core" then active[#active + 1] = name .. "@" .. version end
+end
+table.sort(active)
+log("[MIR_ACTIVE_MODS] " .. table.concat(active, "|"))
+
 local expected = {
-  base = "2.1.20",
   Krastorio2 = "2.1.3",
   ["Krastorio2-spaced-out"] = "2.0.13",
   ["more-infinite-research"] = "4.2.21001"
 }
+if mods.base ~= "2.1.20" and mods.base ~= "2.1.21" then fail("unexpected exact engine") end
 for name, version in pairs(expected) do
   if mods[name] ~= version then fail("unexpected exact profile " .. name) end
 end

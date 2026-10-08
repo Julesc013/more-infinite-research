@@ -295,7 +295,7 @@ function Assert-MIRLibraryActivation {
 }
 
 function Assert-MIRLibraryLoadedSelection {
-  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath,[switch]$LatestInvocation)
+  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath,[switch]$LatestInvocation,[string]$ActiveModsObserver='')
   $text=[IO.File]::ReadAllText($LogPath)
   if($LatestInvocation){
     $starts=[regex]::Matches($text,'(?m)^[ \t]*[0-9]+\.[0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}; Factorio [0-9]+\.[0-9]+\.[0-9]+ ')
@@ -307,6 +307,22 @@ function Assert-MIRLibraryLoadedSelection {
   # archive selection above still requires the exact declared version string.
   $observed=@($matches|ForEach-Object {$_.Groups[1].Value+'@'+([version]$_.Groups[2].Value).ToString()}|Where-Object {$_ -notlike 'core@*'}|Sort-Object -Unique)
   $expected=@($Activation.selected|ForEach-Object {$_.name+'@'+([version]$_.version).ToString()}|Sort-Object -Unique)
+  if($ActiveModsObserver){
+    # Asset-only mods have no Lua-stage loading line. An explicitly selected,
+    # hash-bound fixture may report Factorio's full mods table instead. Never
+    # infer a missing version from filenames or ignore contradictory log rows.
+    if(@($Activation.selected|Where-Object name -CEQ $ActiveModsObserver).Count-ne1){throw '[mir-library-loaded-observer] Observer is not selected.'}
+    $pattern='(?m)^[ \t]*[0-9]+\.[0-9]+ Script @__'+[regex]::Escape($ActiveModsObserver)+'__/data-final-fixes[.]lua:[0-9]+: \[MIR_ACTIVE_MODS\] ([^\r\n]+)\r?$'
+    $reports=[regex]::Matches($text,$pattern)
+    if($reports.Count-ne1){throw '[mir-library-loaded-observation] Expected one complete native mod table.'}
+    $rows=@($reports[0].Groups[1].Value.Split('|'))
+    $complete=@(foreach($row in $rows){
+      if($row -cnotmatch '^(.+)@(\d+\.\d+\.\d+)$'){throw '[mir-library-loaded-observation] Invalid mod identity.'}
+      $Matches[1]+'@'+([version]$Matches[2]).ToString()
+    })
+    if(@($complete|Sort-Object -Unique).Count-ne$complete.Count -or @($observed|Where-Object {$_ -cnotin $expected}).Count){throw '[mir-library-loaded-selection] Duplicate or contradictory native identity.'}
+    $observed=@($complete|Sort-Object)
+  }
   if(($observed -join '|') -cne ($expected -join '|')){throw '[mir-library-loaded-selection] Actual mod names/versions differ from the profile.'}
   return $observed
 }

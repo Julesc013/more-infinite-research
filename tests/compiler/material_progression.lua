@@ -484,6 +484,23 @@ check(exact_valid, "the exact current K2 tuple attaches valid Imersite continuat
 check(exact_imersite.continuation.technology_name == "recipe-prod-research_material_imersite-4"
     and exact_imersite.legacy.last_level == 3,
   "the exact K2 tuple preserves the finite legacy stage and adds only the separate level-four identity")
+local current_streams = load_streams_for({
+  base = "2.1.21", Krastorio2 = "2.1.3", ["Krastorio2-spaced-out"] = "2.0.13"
+})
+local current_imersite = current_streams.research_material_imersite.staged_progression
+check(progression.validate("research_material_imersite", current_imersite),
+  "the reviewed 2.1.21 engine retains the admitted powder continuation")
+check(current_imersite.continuation.technology_name == exact_imersite.continuation.technology_name
+    and current_imersite.legacy.last_level == exact_imersite.legacy.last_level,
+  "current engine preserves the existing finite and continuation identities")
+for _, tuple in ipairs({
+  {base="2.1.22", Krastorio2="2.1.3", ["Krastorio2-spaced-out"]="2.0.13"},
+  {base="2.1.21", Krastorio2="2.1.2", ["Krastorio2-spaced-out"]="2.0.13"},
+  {base="2.1.21", Krastorio2="2.1.3", ["Krastorio2-spaced-out"]="2.0.14"}
+}) do
+  check(load_streams_for(tuple).research_material_imersite.staged_progression == nil,
+    "neighboring engine and overhaul tuples remain outside continuation admission")
+end
 mods = prior_mods
 
 local function effect(recipe, change)

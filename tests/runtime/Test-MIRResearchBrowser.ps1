@@ -7,6 +7,7 @@ param(
  [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
  [switch]$Graphics,
+ [ValidateSet('low','very-low')][string]$GraphicsPreset='low',
  [ValidateSet('None','Defaults','RawOptIn','ImportedOptIn','RawOptInImportedOff')][string]$DlcIconCase='None',
  [string]$OutputRoot='build/p/browser',
  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
@@ -243,7 +244,7 @@ Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
 "[path]`nread-data=$($engineRoot.Replace('\','/'))/data`nwrite-data=$($run.Replace('\','/'))/userdata`n[other]`nenable-new-mods=false`ncheck-updates=false`ndisable-blueprint-storage=true`nenable-blueprint-storage-cloud-sync=false`n[graphics]`nfull-screen=false`ncache-sprite-atlas=false`n" | Set-Content (Join-Path $run 'config.ini')
 $save=Join-Path $run 'probe.zip'
 function Invoke-BrowserEngine([string[]]$Arguments) {
- $graphicsArguments=if($Arguments -contains '--benchmark-graphics') { @('--force-graphics-preset','low','--video-memory-usage','low','--single-thread-loading') } else { @() }
+ $graphicsArguments=if($Arguments -contains '--benchmark-graphics') { @('--force-graphics-preset',$GraphicsPreset,'--video-memory-usage','low','--single-thread-loading') } else { @() }
  $nativeArguments=@('--config',(Join-Path $run 'config.ini'),'--mod-directory',$library)+$graphicsArguments+$Arguments
  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $nativeArguments
  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -TimeoutSeconds 120 `
@@ -298,6 +299,7 @@ if($Graphics) {
  $result | Add-Member save_sha256 (Get-FileHash $saved).Hash
 }
 $result | Add-Member target $Target
+$result | Add-Member graphics_preset $(if($Graphics){$GraphicsPreset}else{'not-used'})
 $result | Add-Member dlc_icon_case $DlcIconCase
 $result | Add-Member icon_observations $iconObservations.ToArray()
 if($null -ne $iconCase){

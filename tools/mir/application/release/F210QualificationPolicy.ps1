@@ -533,7 +533,7 @@ function New-MIR4F210CurrentEngineCapHarnessAdmissionV3 {
   $policy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
   $succession=Get-MIR4F210CurrentQualificationPolicySuccessionV1 -RepoRoot $repo
   $binary=(Resolve-Path -LiteralPath $Resolution.engine.path).Path
-  $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $binary))
+  $engineRoot=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $binary))
   $manifest=(Resolve-Path -LiteralPath $Resolution.steam.app_manifest).Path
   $manifestText=Get-Content -LiteralPath $manifest -Raw
   $manifestBinary=Join-Path (Split-Path -Parent $manifest) ('common/'+(Get-MIR4F210AcfValueV1 -Text $manifestText -Name 'installdir')+'/bin/x64/factorio.exe')
@@ -553,19 +553,19 @@ function New-MIR4F210CurrentEngineCapHarnessAdmissionV3 {
   $official=[ordered]@{}
   foreach($kind in @('runtime_api','prototype_api')){
     $relative='doc-html/'+$kind.Replace('_','-')+'.json'
-    $path=Join-Path $root $relative
+    $path=Join-Path $engineRoot $relative
     $document=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -Depth 100 -DateKind String
     $hash=(Get-FileHash -LiteralPath $path).Hash
     Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($kind+'.version') -Actual ([string]$document.application_version) -Expected ([string]$review.version)
     Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($kind+'.sha256') -Actual $hash -Expected ([string]$review.$kind.sha256)
     $official[$kind]=[ordered]@{path=$relative;application_version=[string]$document.application_version;sha256=$hash}
   }
-  $changelogHash=(Get-FileHash -LiteralPath (Join-Path $root 'data/changelog.txt')).Hash
+  $changelogHash=(Get-FileHash -LiteralPath (Join-Path $engineRoot 'data/changelog.txt')).Hash
   Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name 'changelog.sha256' -Actual $changelogHash -Expected ([string]$review.changelog_sha256)
   $official.changelog=[ordered]@{path='data/changelog.txt';sha256=$changelogHash}
   $official.mods=[ordered]@{}
   foreach($name in @('base','elevated-rails','quality','recycler','space-age')){
-    $relative='data/'+$name+'/info.json';$path=Join-Path $root $relative
+    $relative='data/'+$name+'/info.json';$path=Join-Path $engineRoot $relative
     $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -Depth 30 -DateKind String
     Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($name+'.name') -Actual ([string]$info.name) -Expected $name
     Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($name+'.version') -Actual ([string]$info.version) -Expected ([string]$review.version)
