@@ -5703,6 +5703,50 @@
       ]
     },
     {
+      "id": "static.research-all-observation",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIRResearchAllObservation.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "scripts/Measure-MIRPerformanceRegression.ps1",
+        "tools/lib/validation/ResearchAllPerformance.ps1",
+        "tests/release/Test-MIRResearchAllObservation.ps1",
+        "fixtures/performance-regression-probe/research-all.lua",
+        "fixtures/run-profiles/research-all-*.json"
+      ]
+    },
+    {
+      "id": "runtime.research-all-observation-f200",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./scripts/Measure-MIRPerformanceRegression.ps1 -ObserveResearchAll -Target f200 -Candidate <candidate> -PriorRelease <published-predecessor> -FactorioBin <factorio> -ExpectedSourceCommit <source-commit> -LocalModZipDir <mods> -SourceMaterializationPath <candidate-materialization> -ArtifactRoot <test-output>",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate", "factorio", "prior-release", "source:source/prototypes/mir/runtime/**",
+        "scripts/Measure-MIRPerformanceRegression.ps1", "tools/lib/validation/ResearchAllPerformance.ps1",
+        "fixtures/performance-regression-probe/research-all.lua", "fixtures/run-profiles/research-all-f200.json",
+        "tools/lib/validation/NativeProbeResources.ps1", "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1", "tools/lib/validation/FactorioProcess.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1", "tools/mir/application/package/TargetMaterializer.ps1"
+      ]
+    },
+    {
+      "id": "runtime.research-all-observation-f210",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./scripts/Measure-MIRPerformanceRegression.ps1 -ObserveResearchAll -Target f210 -Candidate <candidate> -PriorRelease <published-predecessor> -FactorioBin <factorio> -ExpectedSourceCommit <source-commit> -LocalModZipDir <mods> -SourceMaterializationPath <candidate-materialization> -ArtifactRoot <test-output>",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate", "factorio", "prior-release", "source:source/prototypes/mir/runtime/**",
+        "scripts/Measure-MIRPerformanceRegression.ps1", "tools/lib/validation/ResearchAllPerformance.ps1",
+        "fixtures/performance-regression-probe/research-all.lua", "fixtures/run-profiles/research-all-f210.json",
+        "tools/lib/validation/NativeProbeResources.ps1", "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/compatibility/FactorioRunner.ps1", "tools/lib/validation/FactorioProcess.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1", "tools/mir/application/package/TargetMaterializer.ps1"
+      ]
+    },
+    {
       "id": "runtime.community-power-manufacturing-f210",
       "kind": "runtime",
       "layer": "F3",

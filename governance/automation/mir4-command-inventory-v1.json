@@ -947,9 +947,9 @@
     {
       "path": "scripts/Measure-MIRPerformanceRegression.ps1",
       "classification": "canonical-internal",
-      "sha256": "1D0A9F975BBF8B7C5AE5C37768FEED7E25137A783E52FD6D884EF4B037FE57DB",
+      "sha256": "BE8A75DDD34A2293FECC4E3861A04059BEC882A2694178F52E71B31FACFADE1A",
       "hash_mode": "canonical-text-v1",
-      "lines": 846,
+      "lines": 858,
       "package_visible": false
     },
     {
@@ -4521,6 +4521,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/lib/validation/ResearchAllPerformance.ps1",
+      "classification": "canonical-internal",
+      "sha256": "10D3B4594A40EEB53BE6FA9DB206567A9DFC09762002DFC2656A2EF4EA53E362",
+      "hash_mode": "canonical-text-v1",
+      "lines": 96,
+      "package_visible": false
+    },
+    {
       "path": "tools/lib/validation/ResultAggregation.ps1",
       "classification": "canonical-internal",
       "sha256": "0509AD6CF96A5DD2FA74E02B96919B57D577139267B1E0C5C2F74C1B71612E3D",
@@ -6027,7 +6035,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 419,
+    "canonical_internal": 420,
     "compatibility_wrapper": 168,
     "migration_only": 59,
     "historical": 18,
@@ -6042,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1e9e33c47999783552623f98f65816e15c3ca572291d0ffef09a25eb2b75fd5c"
+  "digest": "sha256:c12aa58707cb44d7fdd8411f46fe508c56a4c943690afa23233415c673558493"
 }
