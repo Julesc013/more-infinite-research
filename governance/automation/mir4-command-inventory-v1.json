@@ -2235,9 +2235,9 @@
     {
       "path": "tools/commands/localization/Update-MIRLocales.ps1",
       "classification": "canonical-internal",
-      "sha256": "A0A27844655A39FA1D29B633D8D3D4D1BFEA27DC1BB3B84C2E23A2D663A1BFC3",
+      "sha256": "D899D473CADFD57B4EA050E85E2D235AD81D436C47BB0C4C3D2A9C3EE57206F1",
       "hash_mode": "canonical-text-v1",
-      "lines": 417,
+      "lines": 427,
       "package_visible": false
     },
     {
@@ -6042,5 +6042,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:64f4c6cac55f915157c2ccb227016879049d9284ad999984a1857582ee269721"
+  "digest": "sha256:4410409af35a17d0e7d19c927d30cf95cdf79c73f147c0dc6d9bf4f29e50a03e"
 }
