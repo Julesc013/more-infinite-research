@@ -640,6 +640,8 @@ fixtures:
       - actual-published-ccc00-predecessor-custody-and-current-ccc01-candidate
       - finite-imersite-domain-and-powder-six-percent-crystal-ten-percent-retained
       - existing-copper-queue-and-completed-work-retained-before-continuation-completion
+      - published-default-cap-three-withholds-continuation-through-two-reloads
+      - explicit-zero-cap-shared-settings-override-preserved-through-upgrade
       - newly-available-level-four-powder-continuation-earns-eight-percent
       - level-five-queued-at-42-percent-through-two-distinct-native-reloads
       - direct-master-library-with-no-dependency-staging-and-restored-controls

@@ -1,6 +1,6 @@
 {
   "name": "mir-fixture-assert-k2-imersite-maintenance-upgrade",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "MIR K2 Imersite published maintenance upgrade assertion",
   "author": "MIR maintainers",
   "factorio_version": "2.1",

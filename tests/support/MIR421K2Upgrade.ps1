@@ -39,6 +39,21 @@ function Assert-MIR421K2UpgradeTransition {
 }
 
 function Assert-MIR421K2UpgradeMarker {
-  param([string]$Text,[ValidateSet('source','upgrade','reload')][string]$Stage)
-  if(-not$Text.Contains("[mir-fixture] K2-421 maintenance state verified stage=$Stage")){throw "[mir421-k2-upgrade-$Stage-marker]"}
+  param([string]$Text,[ValidateSet('source','upgrade','reload')][string]$Stage,[ValidateSet(0,3)][int]$Cap=3)
+  if(-not$Text.Contains("[mir-fixture] K2-421 maintenance state verified stage=$Stage;cap=$Cap")){throw "[mir421-k2-upgrade-$Stage-marker]"}
+}
+
+# Use the shared settings writer. Cap three deliberately has no override so
+# that the published default is observed; zero is an explicit test setting.
+function New-MIR421K2CapOverride {
+  param([string]$Root,[ValidateSet(0,3)][int]$Cap)
+  if($Cap-eq3){return}
+  Initialize-MIRSettingsOverrideMod -ModsDir $Root -FactorioVersion '2.1'
+  Set-CopiedStartupSettingDefaults -ModsDir $Root -Overrides @{'ips-max-level-research_material_imersite'=0}
+  $source=Join-Path $Root 'mir-validation-settings-overrides'
+  $path=Join-Path $source 'info.json'
+  $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json
+  $info=[ordered]@{name=$info.name;version='0.1.210';title=$info.title;author=$info.author;factorio_version=$info.factorio_version;dependencies=@($info.dependencies)}
+  [IO.File]::WriteAllText($path,($info|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+  return $source
 }

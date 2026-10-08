@@ -138,11 +138,19 @@ foreach($case in @('Target','FromVersion','ToVersion','FixtureName','Archetype',
   try{Assert-MIR421K2UpgradeTransition @mutated}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-transition]')}
   if(-not$rejected){throw "K2 transition rejection missing: $case"};$k2Assertions++
 }
-foreach($stage in @('source','upgrade','reload')){
-  Assert-MIR421K2UpgradeMarker -Text "native log [mir-fixture] K2-421 maintenance state verified stage=$stage" -Stage $stage
+foreach($stage in @('source','upgrade','reload')){foreach($cap in @(0,3)){
+  Assert-MIR421K2UpgradeMarker -Text "native log [mir-fixture] K2-421 maintenance state verified stage=$stage;cap=$cap" -Stage $stage -Cap $cap
   $rejected=$false
-  try{Assert-MIR421K2UpgradeMarker -Text 'unrelated pass' -Stage $stage}catch{$rejected=$_.Exception.Message.StartsWith("[mir421-k2-upgrade-$stage-marker]")}
+  try{Assert-MIR421K2UpgradeMarker -Text "[mir-fixture] K2-421 maintenance state verified stage=$stage;cap=$([int](3-$cap))" -Stage $stage -Cap $cap}catch{$rejected=$_.Exception.Message.StartsWith("[mir421-k2-upgrade-$stage-marker]")}
   if(-not$rejected){throw "K2 stage marker missing: $stage"};$k2Assertions+=2
-}
+}}
+. (Join-Path $RepoRoot 'tools/lib/validation/SettingsOverrides.ps1')
+$defaultRoot=Join-Path $testRoot 'k2-default'
+if((New-MIR421K2CapOverride -Root $defaultRoot -Cap 3)-or(Test-Path -LiteralPath $defaultRoot)){throw 'Default cap scenario must not create settings overrides'}
+$override=New-MIR421K2CapOverride -Root (Join-Path $testRoot 'k2-zero') -Cap 0
+$overrideInfo=Get-Content -LiteralPath (Join-Path $override 'info.json') -Raw|ConvertFrom-Json
+$overrideText=Get-Content -LiteralPath (Join-Path $override 'settings-updates.lua') -Raw
+if($overrideInfo.version-cne'0.1.210'-or$overrideInfo.factorio_version-cne'2.1'-or$overrideText-notmatch 'override\("ips-max-level-research_material_imersite", 0\)' -or ([regex]::Matches($overrideText,'(?m)^override\(')).Count-ne1){throw 'Explicit zero-cap override identity or selected settings differ'}
+$k2Assertions+=2
 # These controlled inputs prove readers and rejection paths, never native saves.
 [pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
