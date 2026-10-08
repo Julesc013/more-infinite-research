@@ -105,5 +105,52 @@ foreach($case in $historicalCases){
     $historicalAssertions++
   }
 }
-# This metadata-only ZIP is controlled test input, never a release package.
-[pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+. (Join-Path $RepoRoot 'tests/support/MIR421K2Upgrade.ps1')
+$k2Assertions=0
+$profilePath=Join-Path $RepoRoot 'fixtures/run-profiles/k2-213-imersite-f210.json'
+$bound=Read-MIR421K2UpgradeProfile -Path $profilePath
+if($bound.inputs.Count-ne7-or@($bound.inputs|Where-Object {$_.identity.name-like'mir-fixture-*'-or$_.identity.name-ceq'more-infinite-research'}).Count){throw 'K2 upgrade must consume only the seven exact dependencies'}
+$k2Assertions++
+$mutatedPath=Join-Path $testRoot 'k2-input-profile.json'
+foreach($case in @('engine','extra-mod','missing-mod','wrong-version','disabled','missing-hash','bad-hash','extra-hash','settings')){
+  $mutated=Get-Content -LiteralPath $profilePath -Raw|ConvertFrom-Json -Depth 20
+  $code=switch($case){
+    'engine' {$mutated.engine_version='2.1.20';'[mir421-k2-upgrade-profile]'}
+    'extra-mod' {$mutated.mods+=@{name='unrequested';version='1.0.0';enabled=$true};'[mir421-k2-upgrade-selection]'}
+    'missing-mod' {$mutated.mods=@($mutated.mods|Where-Object name -CNE 'flib');'[mir421-k2-upgrade-selection]'}
+    'wrong-version' {@($mutated.mods|Where-Object name -CEQ 'Krastorio2')[0].version='2.1.2';'[mir421-k2-upgrade-selection]'}
+    'disabled' {@($mutated.mods|Where-Object name -CEQ 'Krastorio2')[0].enabled=$false;'[mir421-k2-upgrade-selection]'}
+    'missing-hash' {$mutated.archive_sha256.PSObject.Properties.Remove('flib_0.17.2.zip');'[mir421-k2-upgrade-archive-count]'}
+    'bad-hash' {$mutated.archive_sha256.'flib_0.17.2.zip'='not-a-hash';'[mir421-k2-upgrade-archive-hash]'}
+    'extra-hash' {$mutated.archive_sha256|Add-Member NoteProperty 'extra_1.0.0.zip' ('0'*64);'[mir421-k2-upgrade-archive-count]'}
+    'settings' {$mutated.settings_mode='File';'[mir421-k2-upgrade-profile]'}
+  }
+  $mutated|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $mutatedPath
+  $rejected=$false
+  try{$null=Read-MIR421K2UpgradeProfile -Path $mutatedPath}catch{$rejected=$_.Exception.Message.StartsWith($code)}
+  if(-not$rejected){throw "K2 profile rejection missing: $case"};$k2Assertions++
+}
+$transition=@{Target='f210';FromVersion='4.2.21000';ToVersion='4.2.21001';FixtureName='assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001';Archetype='';SpaceIsFake=$false;SourceOnlyFixtureNames=@()}
+Assert-MIR421K2UpgradeTransition @transition;$k2Assertions++
+foreach($case in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SpaceIsFake','SourceOnlyFixtureNames')){
+  $mutated=$transition.Clone();$mutated[$case]=switch($case){'SpaceIsFake'{$true};'SourceOnlyFixtureNames'{@('unrequested')};default{'wrong'}}
+  $rejected=$false
+  try{Assert-MIR421K2UpgradeTransition @mutated}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-transition]')}
+  if(-not$rejected){throw "K2 transition rejection missing: $case"};$k2Assertions++
+}
+foreach($stage in @('source','upgrade','reload')){foreach($cap in @(0,3)){
+  Assert-MIR421K2UpgradeMarker -Text "native log [mir-fixture] K2-421 maintenance state verified stage=$stage;cap=$cap" -Stage $stage -Cap $cap
+  $rejected=$false
+  try{Assert-MIR421K2UpgradeMarker -Text "[mir-fixture] K2-421 maintenance state verified stage=$stage;cap=$([int](3-$cap))" -Stage $stage -Cap $cap}catch{$rejected=$_.Exception.Message.StartsWith("[mir421-k2-upgrade-$stage-marker]")}
+  if(-not$rejected){throw "K2 stage marker missing: $stage"};$k2Assertions+=2
+}}
+. (Join-Path $RepoRoot 'tools/lib/validation/SettingsOverrides.ps1')
+$defaultRoot=Join-Path $testRoot 'k2-default'
+if((New-MIR421K2CapOverride -Root $defaultRoot -Cap 3)-or(Test-Path -LiteralPath $defaultRoot)){throw 'Default cap scenario must not create settings overrides'}
+$override=New-MIR421K2CapOverride -Root (Join-Path $testRoot 'k2-zero') -Cap 0
+$overrideInfo=Get-Content -LiteralPath (Join-Path $override 'info.json') -Raw|ConvertFrom-Json
+$overrideText=Get-Content -LiteralPath (Join-Path $override 'settings-updates.lua') -Raw
+if($overrideInfo.version-cne'0.1.210'-or$overrideInfo.factorio_version-cne'2.1'-or$overrideText-notmatch 'override\("ips-max-level-research_material_imersite", 0\)' -or ([regex]::Matches($overrideText,'(?m)^override\(')).Count-ne1){throw 'Explicit zero-cap override identity or selected settings differ'}
+$k2Assertions+=2
+# These controlled inputs prove readers and rejection paths, never native saves.
+[pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
