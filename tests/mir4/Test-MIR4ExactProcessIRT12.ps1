@@ -157,9 +157,13 @@ if($packageBefore-cne$preT14Package){
   [IO.File]::WriteAllText((Join-Path $existing 'unique.txt'),'keep')
   try{$null=Reset-MIR4T12RunDirectory -Root $root -Path $existing;throw '[control-not-rejected]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-t12-existing-run-preserved]')){throw}}
   if((Get-Content -Raw (Join-Path $existing 'unique.txt'))-cne'keep'){throw '[mir421-t12-existing-run-changed]'}
-  foreach($case in @(@{CaptureId=@()},@{CaptureId=@('f210-base');PublishReference=$true})){
-    $caught=$false;try{& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1') -RepoRoot $RepoRoot @case|Out-Null}catch{if($_.Exception.Message-notmatch'^\[mir4-t12-(explicit-capture-selection-required|existing-reference-preserved)\]'){throw};$caught=$true}
+  foreach($case in @(@{CaptureId=@()},@{CaptureId=@('f210-base');PublishReference=$true},@{CaptureId=@('f210-base')})){
+    $refusedOutput=Join-Path $root ('retired-live-'+[guid]::NewGuid().ToString('N'))
+    $relativeOutput=[IO.Path]::GetRelativePath($RepoRoot,$refusedOutput)
+    $expectedError=if($case.CaptureId.Count){'^\[mir-native-obsolete-runner\]'}else{'^\[mir4-t12-explicit-capture-selection-required\]'}
+    $caught=$false;try{& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $relativeOutput -F210Engine (Join-Path $root 'must-not-read-engine.exe') -ArchiveSearchRoots @((Join-Path $root 'must-not-read-library')) @case|Out-Null}catch{if($_.Exception.Message-notmatch$expectedError){throw};$caught=$true}
     if(-not$caught){throw '[mir421-t12-cli-early-refusal]'}
+    if(Test-Path -LiteralPath $refusedOutput){throw '[mir421-t12-retired-live-output-created]'}
   }
   Write-Host '[ok] ProcessIR consumer: two strict shared-input repetitions; wrong hashes, missing save/log, engine failure, root mismatch and destructive reference reuse rejected. Synthetic actor only; no Factorio.'
 }
