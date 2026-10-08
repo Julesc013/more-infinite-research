@@ -62,7 +62,7 @@ Readiness mode authenticates the same current custody before reading the mainten
 
 Promotion planning and main readback forward the maintenance option through the same readiness checks, reconstruct the complete expected seal including its published custody, and retain the existing offline restore, protected ref, exact tree and transport requirements. Offline restore accepts the maintenance seal only with matching published custody; its signed challenge still binds the seal hashes and all nine target inventories. Plans and readbacks retain published custody separately from historical baseline predecessor authorities. The release-asset consumer now selects the maintenance inventory and support-record contracts, carries the same published predecessor custody, and binds conditional maintainer authorization to the frozen inventory and main readback. These consumed source contracts remove the former sealing and asset-reader implementation blockers. Source controls produce no seal, signature, native pass, main promotion or publication. Actual qualification, accepted programme/freeze/review/signing/restore inputs, protected promotion, accepted asset freezing and verified publication remain required.
 
-## Current five-target base maintenance upgrades
+## Retained candidate C five-target base maintenance upgrades
 
 Candidate C passed actual published `CCC00 → CCC01` upgrades and two subsequent reloads on F210 2.1.21, F200 2.0.77, F110 1.1.110, F100 1.0.0 and F017 0.17.79. All 20 engine actors ran through the existing manifest-driven harness at exact candidate source `eb74d2e7d6223d9a8c284060f5f4c8b31a68f54a`. The four modern fixtures preserve startup settings, technology level, current research, fractional progress and fixture state in base-only environments. F017 preserves its researched level, active research/progress, supported earned bonus and global state through the existing historical continuity fixture; its actual predecessor is the published `4.2.01700` archive, not MIR 3.
 
@@ -78,15 +78,15 @@ The first batch completed F210/F200/F110 before host commit admission refused F1
 
 ## Current F014–F016 fresh-game character research
 
-The existing handcrafting fixture passed against candidate C on Factorio 0.14.23, 0.15.40 and 0.16.51 at harness source `0b4a70e208e6de14103941306be14ede1474daef`. Each actual package emits the five expected character-research entries with available prerequisites, positive effects and laboratory-compatible default science. F014 uses alien science and singular icon fields; F015/F016 use high-tech plus military science and layered icons. On all three engines, completing the crafting-speed research changes the native force modifier from `0` to `0.05`. The fixture checks prototype effects for the other four entries; it does not demonstrate their earned runtime rewards.
+The existing handcrafting fixture passed against candidate D on Factorio 0.14.23, 0.15.40 and 0.16.51 at harness source `8cbf785ff010d49eaef72754346658ef31a0b335`. The candidate source remains `d74d18114aeb57123f9ce63eb39467199c88402f`; the later harness adds no player changes. Each actual package emits the five expected character-research entries with available prerequisites, positive effects and laboratory-compatible default science. F014 uses alien science and singular icon fields; F015/F016 use high-tech plus military science and layered icons. On all three engines, completing the crafting-speed research changes the native force modifier from `0` to `0.05`. The fixture checks prototype effects for the other four entries; it does not demonstrate their earned runtime rewards.
 
 | Target | Result path | Result SHA-256 |
 |---|---|---|
-| F014 | `build/p/m421-current-historical-native-f014-c/result.json` | `3574C9E186ED09B75C615BA6D6F8114D4D23F7373B02E110E3C71FE4077B6057` |
-| F015 | `build/p/m421-current-historical-native-f015-c/result.json` | `CCF6B3CB8BC2F36C93707BD60B589684D296E18228FFE5F434BFFDCAEB186B2D` |
-| F016 | `build/p/m421-current-historical-native-f016-c/result.json` | `9FB7319279E55019763A0A98AB19014FD2C22E84936E2B5ED9E678A07607361E` |
+| F014 | `build/p/m421-current-historical-native-f014-d/result.json` | `8C7FCDF91F24D8D3282DB6C8F6CD7609AD2A8290A8D39B988171C551B4CAC22A` |
+| F015 | `build/p/m421-current-historical-native-f015-d/result.json` | `86AF59796B35733C2D3C6CB27093383A69A1543D0FABA70BAA02379692E840C7` |
+| F016 | `build/p/m421-current-historical-native-f016-d/result.json` | `8A99FFA4CCE5A4C77A9E849283657FF8EA8F204D2AF6E82B9571A53063C08C9A` |
 
-The receipts bind the actual candidate C ZIPs, installed engine hashes, fixture bytes, logs and new saves. The largest observed process peak was 181,559,296 bytes under a 512 MiB workload budget; system reserves were unchanged. All three runs restored previous controls and used their existing checkout-local libraries without dependency copies, links or extraction. These fresh-game observations do not establish predecessor upgrades, reload continuity, a Library backport or complete historical-target acceptance. F013 was not attempted in this batch.
+The receipts bind the actual candidate D ZIPs, installed engine hashes, fixture bytes, logs and new saves. The largest observed working set was 189,440,000 bytes and private allocation was 116,981,760 bytes under a 512 MiB workload budget; system reserves were unchanged. All three runs restored previous controls and used their existing checkout-local libraries without dependency copies, links or extraction. Earlier candidate C receipts remain under their original identities. These fresh-game observations do not establish predecessor upgrades, reload continuity, a Library backport or complete historical-target acceptance. F013 was not attempted in this batch.
 
 ## Current F200 settings-derived cap transition
 

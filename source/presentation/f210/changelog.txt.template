@@ -5,6 +5,7 @@ Version: 4.2.21001
 
     - Compile after Bob's Electronics and Technology finalizers when installed, so lab and science acquisition uses their completed progression.
     - Remove retired space science from Weapon shooting speed 7 and Lab research speed 7 with Space Is Fake.
+    - Restore Imersite powder continuation with K2 2.1.3/K2SO 2.0.13 on Factorio 2.1.21.
     - Use base/MIR artwork when an optional DLC artwork provider is inactive, including saved or imported icon opt-ins.
     - Apply the selected braking-force bonus and its correct badge to the native continuation.
     - Reject continuations whose useful effects are zero after ownership resolution.
