@@ -4443,7 +4443,7 @@
     {
       "path": "tools/lib/validation/BrowserContinuityInputs.ps1",
       "classification": "canonical-internal",
-      "sha256": "83A9C6DDBAA73F6F41B9C2431385BF75AE8494153B463B0CA5B622651FBCC9E7",
+      "sha256": "75EE443B8B6F2BDC038F3CC9B779153EA11053B32F196D869D47EECFF5866BED",
       "hash_mode": "canonical-text-v1",
       "lines": 203,
       "package_visible": false
@@ -4491,9 +4491,9 @@
     {
       "path": "tools/lib/validation/NativeProbeResources.ps1",
       "classification": "canonical-internal",
-      "sha256": "F0C1C4E043C2E750E16215D2297CC1E0D6BFC77EBDC62B5786BD45965A551D73",
+      "sha256": "5B02BD7D0F0F07A2B4AA2F3CAE3CB5FA382868FD5A9E9B770811CE3CDF0A76B7",
       "hash_mode": "canonical-text-v1",
-      "lines": 301,
+      "lines": 305,
       "package_visible": false
     },
     {
@@ -6050,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ce925cb713d55fcac7ffad9385faaf1bbb204815f6ccb4dc581b1ad685e71b86"
+  "digest": "sha256:7203aa719b3a5a99d5a890ed3d06802c41d5469ba9fa371b016500b95758328e"
 }

@@ -41,13 +41,14 @@ function Assert-MIRNativeProbeF210Candidate([bool]$Condition,[string]$Message) {
 }
 function Read-MIRNativeProbeCurrentCandidate {
   param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
-    [ValidateSet('f210','f200')][string]$Target='f210')
+    [ValidateSet('f210','f200')][string]$Target='f210',
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   Assert-MIRNativeProbeF210Candidate (-not [string]::IsNullOrWhiteSpace($Archive) -and -not [string]::IsNullOrWhiteSpace($ReceiptPath)) 'supply candidate and canonical materialization receipt'
   $candidate = (Resolve-Path -LiteralPath $Archive).Path
   $receipt = Get-Content -LiteralPath $ReceiptPath -Raw | ConvertFrom-Json -Depth 30 -DateKind String
   Assert-MIRNativeProbeF210Candidate (($receipt | ConvertTo-Json -Depth 30) | Test-Json -SchemaFile (Join-Path $Repository 'spec/schemas/mir4-package-composition-result-v1.schema.json')) 'candidate materialization schema differs'
   Assert-MIRNativeProbeF210Candidate (Test-MIR4BootstrapRecordHash -Record $receipt) 'candidate materialization record hash differs'
-  $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $Repository -Target $Target -SourceVersion '4.2.1'
+  $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $Repository -Target $Target -SourceVersion $SourceVersion
   Assert-MIRNativeProbeF210Candidate ($receipt.status -ceq 'passed-canonical-package-authority-materialization' -and $receipt.target -ceq $Target -and $receipt.source_version -ceq $identity.source_version -and $receipt.distribution_version -ceq $identity.distribution_version) 'candidate materialization identity differs'
   Assert-MIRNativeProbeF210Candidate ($receipt.package_source_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $Repository)) 'candidate source fingerprint differs'
   Assert-MIRNativeProbeF210Candidate ((Resolve-Path -LiteralPath $receipt.archive_path).Path -ceq $candidate -and [IO.Path]::GetFileName($candidate) -ceq $identity.package_name) 'candidate archive path or filename differs'
@@ -84,8 +85,10 @@ function Read-MIRNativeProbeCurrentCandidate {
   } finally {$zip.Dispose()}
   return [pscustomobject]@{path=$candidate;receipt=$receipt}
 }
-function Read-MIRNativeProbeF210CurrentCandidate([string]$Repository,[string]$Archive,[string]$ReceiptPath) {
-  Read-MIRNativeProbeCurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $ReceiptPath -Target f210
+function Read-MIRNativeProbeF210CurrentCandidate {
+  param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+  Read-MIRNativeProbeCurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $ReceiptPath -Target f210 -SourceVersion $SourceVersion
 }
 function New-MIRNativeProbeResourceContext {
   param(
@@ -272,21 +275,22 @@ exit $nativeExitCode
 function New-MIRNativeProbeTargetPackage {
   param(
     [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$RepoRoot,
-    [ValidateSet('F210-TIN-OBS','F210-CURRENT-BA-FINAL-ROUTES-OBSERVER','BROWSER')][string]$CandidatePrefix='F210-TIN-OBS',
-    [ValidateSet('f210','f200')][string]$Target='f210'
+    [ValidateSet('F210-TIN-OBS','F210-CURRENT-BA-FINAL-ROUTES-OBSERVER','BROWSER','SCIENCE-LAUNCH')][string]$CandidatePrefix='F210-TIN-OBS',
+    [ValidateSet('f210','f200')][string]$Target='f210',
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1'
   )
   $targetKey=$Target.ToLowerInvariant()
-  if($CandidatePrefix -cne 'BROWSER' -and $targetKey -cne 'f210'){throw '[mir-native-probe-observer-target]'}
-  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch 1
-  $prefix=if($CandidatePrefix -ceq 'BROWSER'){$targetKey.ToUpperInvariant()+'-BROWSER'}else{$CandidatePrefix}
+  if($CandidatePrefix -cnotin @('BROWSER','SCIENCE-LAUNCH') -and $targetKey -cne 'f210'){throw '[mir-native-probe-observer-target]'}
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch ([int]$SourceVersion.Split('.')[2])
+  $prefix=if($CandidatePrefix -cin @('BROWSER','SCIENCE-LAUNCH')){$targetKey.ToUpperInvariant()+'-'+$CandidatePrefix}else{$CandidatePrefix}
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   $driver=Join-Path $Context.root 'materialize.ps1'
   $receipt=Join-Path $Context.root 'materialized-package.json'
   $driverText=@'
-param([string]$RepoRoot,[string]$OutputRoot,[string]$CandidateId,[string]$ReceiptPath,[string]$Target,[string]$DistributionVersion)
+param([string]$RepoRoot,[string]$OutputRoot,[string]$CandidateId,[string]$ReceiptPath,[string]$Target,[string]$DistributionVersion,[string]$SourceVersion)
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/package/TargetMaterializer.ps1')
-$record=New-MIR4TargetPackage -RepoRoot $RepoRoot -Target $Target -CandidateId $CandidateId -SourceVersion '4.2.1' -DistributionVersion $DistributionVersion -OutputRoot $OutputRoot
+$record=New-MIR4TargetPackage -RepoRoot $RepoRoot -Target $Target -CandidateId $CandidateId -SourceVersion $SourceVersion -DistributionVersion $DistributionVersion -OutputRoot $OutputRoot
 [IO.File]::WriteAllText($ReceiptPath,($record | ConvertTo-Json -Depth 30),[Text.UTF8Encoding]::new($false))
 '@
   [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
@@ -294,7 +298,7 @@ $record=New-MIR4TargetPackage -RepoRoot $RepoRoot -Target $Target -CandidateId $
   $run=Invoke-MIRNativeProbeProcess -Context $Context -FilePath (Get-Command pwsh).Source -TimeoutSeconds 180 `
     -Arguments @('-NoProfile','-File',$driver,'-RepoRoot',$RepoRoot,'-OutputRoot',$output,
       '-CandidateId',($prefix+'-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()),'-ReceiptPath',$receipt,
-      '-Target',$targetKey,'-DistributionVersion',[string]$identity.distribution_version)
+      '-Target',$targetKey,'-DistributionVersion',[string]$identity.distribution_version,'-SourceVersion',$SourceVersion)
   if(-not (Test-Path -LiteralPath $receipt -PathType Leaf)) { throw '[mir-native-probe-package-receipt]' }
   return Get-Content -LiteralPath $receipt -Raw | ConvertFrom-Json -Depth 30
 }
