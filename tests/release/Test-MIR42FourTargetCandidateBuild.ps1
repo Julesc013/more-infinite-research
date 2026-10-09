@@ -593,6 +593,59 @@ try {
   try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $invalidPinPath|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
   Assert-MIR42CandidateBuildTest $rejected 'published-predecessor-refuses-same-size-changed-manifest-by-raw-hash'
   $maintenanceCustodyAssertions++
+  # Exact 4.2.1 publication, selected explicitly for 4.2.2. The release's
+  # disclosed gaps remain in the receipt; synthetic API metadata is not a
+  # remote readback or native qualification.
+  $published421Path=Join-Path $repo 'fixtures/release-inputs/mir422-published-421-manifest.json'
+  $published421=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published421Path -CandidateSourceVersion '4.2.2'
+  $assets421=@(for($i=0;$i-lt9;$i++){
+    $row=$published421.manifest.targets[$i]
+    [pscustomobject]@{id=$i+1;name=$row.filename;size=$row.bytes;digest=('sha256:'+[string]$row.sha256).ToLowerInvariant();state='uploaded'}
+  })
+  $assets421+=,[pscustomobject]@{id=10;name='mir-4.2.1.release.json';size=$published421.bytes;digest=('sha256:'+$published421.sha256).ToLowerInvariant();state='uploaded'}
+  $assets421+=@(for($i=11;$i-le16;$i++){[pscustomobject]@{id=$i;name="controlled-supporting-asset-$i";size=1;digest=('sha256:'+('a'*64));state='uploaded'}})
+  $metadata421=[pscustomobject]@{id=407909462;tag_name='v4.2.1';draft=$false;prerelease=$false;immutable=$false;assets=$assets421}
+  $rows421=@(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published421 -ReleaseMetadata $metadata421 -CandidateSourceVersion '4.2.2')
+  Assert-MIR42CandidateBuildTest ($rows421.Count-eq9-and-not$published421.manifest.signed-and-not$published421.manifest.acceptance.full_technical_seal-and-not$published421.manifest.acceptance.independent_review-and-not$published421.manifest.acceptance.protected_signing_and_restore) '422-predecessor-retains-disclosed-acceptance-gaps'
+  foreach($row in $rows421){
+    Assert-MIR42CandidateBuildTest ($row.version-ceq('4.2.'+$row.target.Substring(1)+'01')) ('422-predecessor-exact-CCC01-'+$row.target)
+    $tinyRoot=Join-Path $identityRoot ('published-421-archive-input/'+$row.target)
+    $tinyTree=Join-Path $tinyRoot ('more-infinite-research_'+$row.version)
+    New-Item -ItemType Directory -Path $tinyTree -Force|Out-Null
+    $tinyInfo=[ordered]@{name='more-infinite-research';version=$row.version;factorio_version=$script:MIR42FourTargetLines[$row.target]}
+    [IO.File]::WriteAllText((Join-Path $tinyTree 'info.json'),($tinyInfo|ConvertTo-Json -Compress),$utf8)
+    $tinyArchive=Join-Path $tinyRoot $row.filename
+    Write-MIR4DeterministicRawTreeArchive -SourceRoot $tinyTree -EntryRoot (Split-Path -Leaf $tinyTree) -OutputPath $tinyArchive -ContainmentRoot $identityRoot
+    $archiveInput=Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target $row.target -Path $tinyArchive -SourceVersion '4.2.1'
+    Assert-MIR42CandidateBuildTest ($archiveInput.distribution_version-ceq$row.version-and$archiveInput.qualification-ceq'not-run') ('422-predecessor-archive-reader-explicit-version-'+$row.target)
+    $rejected=$false
+    try{Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target $row.target -Path $tinyArchive|Out-Null}catch{$rejected=$_.Exception.Message-ceq('[mir42-preflight-package-root] '+$row.target)}
+    Assert-MIR42CandidateBuildTest $rejected ('422-predecessor-archive-reader-keeps-420-default-'+$row.target)
+  }
+  foreach($case in $metadataMutations.GetEnumerator()){
+    $invalid=$metadata421|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+    & $case.Value $invalid
+    $rejected=$false
+    try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published421 -ReleaseMetadata $invalid -CandidateSourceVersion '4.2.2'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir42-maintenance-predecessor-')}
+    Assert-MIR42CandidateBuildTest $rejected ('422-predecessor-refuses-'+$case.Key)
+  }
+  foreach($case in @(
+    @{path=$published421Path;version='4.2.1'},
+    @{path=$publishedPin.path;version='4.2.2'}
+  )){
+    $rejected=$false
+    try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $case.path -CandidateSourceVersion $case.version|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+    Assert-MIR42CandidateBuildTest $rejected ('422-predecessor-refuses-cross-release-'+$case.version)
+  }
+  $changed421=Join-Path $identityRoot 'changed-421-published-manifest.json'
+  $bytes421=[IO.File]::ReadAllBytes($published421.path);$bytes421[100]=$bytes421[100]-bxor1
+  [IO.File]::WriteAllBytes($changed421,$bytes421)
+  $rejected=$false
+  try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $changed421 -CandidateSourceVersion '4.2.2'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+  Assert-MIR42CandidateBuildTest $rejected '422-predecessor-refuses-same-size-changed-manifest'
+  $rejected=$false
+  try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published421 -ReleaseMetadata $metadata421|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-release-metadata]'}
+  Assert-MIR42CandidateBuildTest $rejected '422-predecessor-metadata-default-remains-420'
   $scopeCandidates=@($patchDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})
   Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $scopeCandidates
   $maintenanceEvidenceAssertions++

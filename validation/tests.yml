@@ -105,6 +105,8 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+        "fixtures/release-inputs/mir421-published-420-manifest.json",
+        "fixtures/release-inputs/mir422-published-421-manifest.json",
         "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
         "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
         "tools/mir/application/package/TargetMaterializer.ps1",

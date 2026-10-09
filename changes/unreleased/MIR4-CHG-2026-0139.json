@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0139",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Authenticate published 4.2.1 predecessors and enable current 4.2.2 base-upgrade inputs.",
+  "details": [
+    "The shared custody reader explicitly selects the exact v4.2.1 manifest, source tag and nine CCC01 archives for a 4.2.2 candidate. Historical default v4.2.0-stable input contracts remain unchanged.",
+    "The existing modern base-upgrade caller forwards explicit source selection to the current candidate reader and published predecessor verifier. Prepared 4.2.2 fixtures use version 0.1.2 to coexist with prior fixtures; omitted current-base archetype selects base-game controls.",
+    "Focused tests cover release/source mismatches, changed manifest and asset bytes, all nine predecessor identities, current caller selection and fixture identity preservation. Custody authentication is not native upgrade qualification, signing or technical acceptance.",
+    "The dedicated Space Is Fake/K2 upgrade oracles retain their original transitions. Current native upgrades and joined campaign/seal/publication bindings remain outstanding."
+  ],
+  "semantic_domains": [
+    "testing",
+    "release"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Published predecessor custody and explicit current base-upgrade inputs; native execution remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Published predecessor custody and explicit current base-upgrade inputs; native execution remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared published predecessor custody for the exact CCC01 archive; current native execution remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared published predecessor custody for the exact CCC01 archive; current native execution remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Shared published predecessor custody for the exact CCC01 archive; current native execution remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Shared published predecessor custody for the exact CCC01 archive; current native execution remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Shared published predecessor custody for the exact CCC01 archive; current native execution remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Shared published predecessor custody for the exact CCC01 archive; current native execution remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Shared published predecessor custody for the exact CCC01 archive; current native execution remains pending."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/maintainer/fixture-workflow.md"
+    },
+    {
+      "kind": "finding",
+      "value": "A14/X17 current upgrade execution and joined acceptance remain pending"
+    }
+  ]
+}

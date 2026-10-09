@@ -50,6 +50,20 @@ Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Targe
 Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $baseFixture 'info.json'))-ceq$baseInfoHash) 'prepared base fixture identity is idempotent'
 Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Target f200} 'mir421-modern-base-fixture-template'
 Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $baseFixture 'info.json'))-ceq$baseInfoHash) 'wrong-target refusal preserves fixture bytes'
+foreach($target422 in @('f210','f200')){
+  $fixture422=Join-Path $root ('owned-fixtures/'+$target422+'-422')
+  [IO.Directory]::CreateDirectory($fixture422)|Out-Null
+  $info422=Join-Path $fixture422 'info.json';$code422=$target422.Substring(1)
+  Write-TestJson $info422 @{name="mir-fixture-assert-upgrade-4-0-${code422}00-to-4-1-${code422}00";version='0.1.0';factorio_version=if($target422-ceq'f210'){'2.1'}else{'2.0'};dependencies=@('base')}
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixture422 -Target $target422 -SourceVersion '4.2.2'
+  Assert-LibraryTest ((Get-Content -LiteralPath $info422 -Raw|ConvertFrom-Json).version-ceq'0.1.2') "4.2.2 $target422 fixture does not collide with prior upgrades"
+  $hash422=Get-MIRImmutableInputSha256 $info422
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixture422 -Target $target422 -SourceVersion '4.2.2'
+  Assert-LibraryTest ((Get-MIRImmutableInputSha256 $info422)-ceq$hash422) "4.2.2 $target422 fixture identity is idempotent"
+  Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixture422 -Target $target422} 'mir421-modern-base-fixture-template'
+  Assert-LibraryTest ((Get-MIRImmutableInputSha256 $info422)-ceq$hash422) 'default source cannot rebrand a prepared 4.2.2 fixture'
+}
+Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Target f210 -SourceVersion '4.2.2'} 'mir421-modern-base-fixture-template'
 Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Target f210} 'mir441-resource-output-root'
 $baseFixtureArchive=New-TestArchive $fixtureName '0.1.1' -InfoJson (Get-Content -LiteralPath (Join-Path $baseFixture 'info.json') -Raw)
 $sifFixtureArchive=New-TestArchive $fixtureName '0.1.0' -InfoJson (Get-Content -LiteralPath (Join-Path $sifFixture 'info.json') -Raw)

@@ -14,6 +14,8 @@ superseded_by: []
 
 Use fixtures to turn compatibility claims, bug reports, and risk cases into repeatable evidence.
 
+For current F210/F200 base upgrades, [Test-MIRUpgrade.ps1](../../tests/runtime/Test-MIRUpgrade.ps1) accepts explicit `-SourceVersion 4.2.2`, the supplied candidate's `-SourceMaterializationPath`, `-SelectedTarget`, `-FromVersion 4.2.CCC01`, `-ToVersion 4.2.CCC02` and `-PublishedMaintenancePredecessorManifestPath` pointing to the retained `mir-4.2.1.release.json` beside its nine published ZIPs. Replace `CCC` with `210` or `200`; use the existing `assert-upgrade-4-0-CCC00-to-4-1-CCC00` fixture template, `-Archetype base-default` and `-Retention Always`. Omitted archetype in this mode also selects base-game controls. Source version defaults to 4.2.1 and still requires its `CCC00` predecessor. Prepare the small assertion fixture first with `-PrepareInputsOnly`; 4.2.2 base fixtures use version `0.1.2`, separate from the retained 4.2.1 base `0.1.1` and Space Is Fake `0.1.0` fixtures. Run against one explicit `-LocalModLibraryDirs` library with the selected archives already present and a declared resource budget. The existing runner verifies current candidate bytes and published predecessor custody, then uses direct-library activation and private output. This enables the selected base-upgrade input path; actual saves and reloads remain native work. The dedicated Space Is Fake and K2 upgrade oracles retain their 4.2.0-to-4.2.1 transitions and do not acquire 4.2.2 acceptance through this option.
+
 1. Add or update a fixture mod under `fixtures/`.
 2. Add a post-MIR assertion fixture when behavior must be proved after MIR runs.
 3. Register the fixture in `.mir/fixtures.yml` when it backs a durable claim.
