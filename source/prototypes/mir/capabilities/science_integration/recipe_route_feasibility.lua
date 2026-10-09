@@ -1219,6 +1219,10 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
         if not diagnostic_visit(options) then return nil end
         table.insert(surface_conditions, condition)
       end
+      for _, condition in ipairs(construction.receiver.surface_conditions or {}) do
+        if not diagnostic_visit(options) then return nil end
+        table.insert(surface_conditions, condition)
+      end
     end
     if variant.hidden == true and not construction then
       record_diagnostic_failure(options, {
@@ -1356,6 +1360,15 @@ rocket_launch_witness = function(source, identity, options, state)
   if state.visiting[key] then return nil end
   state.visiting[key] = true
   local function resolve()
+    -- Modern launch products arrive at a cargo landing pad on the launching
+    -- surface. Permission to launch without one is not item acquisition.
+    -- Keep this receiver's research in the same witness as the payload/silo.
+    local receivers = {}
+    for name in pairs(data_raw.prototypes("cargo-landing-pad")) do
+      if not diagnostic_visit(options) then return nil end
+      table.insert(receivers, name)
+    end
+    table.sort(receivers)
     local names = {}
     for name in pairs(data_raw.prototypes("rocket-silo")) do
       if not diagnostic_visit(options) then return nil end
@@ -1375,22 +1388,33 @@ rocket_launch_witness = function(source, identity, options, state)
         local placement = source_actor_witness({prototype = name, prototype_type = "rocket-silo"}, options, state)
         local ports = fluid_port_counts(silo, options)
         if placement and ports then
-          local actor = {prototype = silo, placement = placement, fluid_ports = ports}
-          local function construct(require_enabled)
-            return route_for_recipe(recipe, nil, options, state, require_enabled, actor)
-          end
-          local construction = construct(true)
-          if not construction and type(options.research_recipe_unlock_witness) == "function" then
-            construction = options.research_recipe_unlock_witness(recipe, state, function() return construct(false) end)
-          end
-          local payload = construction and acquisition_witness({type = "item", name = source.payload}, options, state)
-          if payload then
-            local result = deepcopy(source)
-            result.product = deepcopy(identity)
-            result.machine = placement
-            result.recipe_witness = construction
-            result.ingredients = {payload}
-            return result
+          local checkpoint = diagnostic_checkpoint(options)
+          for _, receiver_name in ipairs(receivers) do
+            if not diagnostic_visit(options) then return nil end
+            diagnostic_rollback(options, checkpoint)
+            local receiver = data_raw.prototypes("cargo-landing-pad")[receiver_name]
+            local received = finite_positive(receiver.inventory_size)
+              and source_actor_witness({prototype = receiver_name, prototype_type = "cargo-landing-pad"}, options, state)
+            if received then
+              local actor = {prototype = silo, placement = placement, fluid_ports = ports, receiver = receiver}
+              local function construct(require_enabled)
+                return route_for_recipe(recipe, nil, options, state, require_enabled, actor)
+              end
+              local construction = construct(true)
+              if not construction and type(options.research_recipe_unlock_witness) == "function" then
+                construction = options.research_recipe_unlock_witness(recipe, state, function() return construct(false) end)
+              end
+              local payload = construction and acquisition_witness({type = "item", name = source.payload}, options, state)
+              if payload then
+                local result = deepcopy(source)
+                result.product = deepcopy(identity)
+                result.machine = placement
+                result.receiver = received
+                result.recipe_witness = construction
+                result.ingredients = {payload}
+                return result
+              end
+            end
           end
         end
       end

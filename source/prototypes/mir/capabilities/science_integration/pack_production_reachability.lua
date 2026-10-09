@@ -651,6 +651,9 @@ local function acquisition_children(witness)
   local children = {}
   if witness.recipe_witness then table.insert(children, witness.recipe_witness) end
   for _, ingredient in ipairs(witness.ingredients or {}) do table.insert(children, ingredient) end
+  if witness.receiver and witness.receiver.acquisition then
+    table.insert(children, witness.receiver.acquisition)
+  end
   local machine = witness.machine
   if machine then
     if machine.acquisition then table.insert(children, machine.acquisition) end
