@@ -10,6 +10,7 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$CandidateZip,
   [Parameter(Mandatory)][string]$SourceMaterializationPath,
+  [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1',
   [string]$V5ObservationResultPath = '',
   [string]$InputProfilePath = '',
   [string]$RepoRoot = '',
@@ -42,8 +43,9 @@ function Get-K2213Property { param($Object,[string]$Name,$Default=$null)
   if ($null -eq $property) { return $Default }
   return $property.Value
 }
-function Read-K2213CurrentCandidate([string]$Archive,[string]$ReceiptPath) {
-  Read-MIRNativeProbeF210CurrentCandidate -Repository $RepoRoot -Archive $Archive -ReceiptPath $ReceiptPath
+function Read-K2213CurrentCandidate([string]$Archive,[string]$ReceiptPath,
+  [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1') {
+  Read-MIRNativeProbeF210CurrentCandidate -Repository $RepoRoot -Archive $Archive -ReceiptPath $ReceiptPath -SourceVersion $SourceVersion
 }
 function Read-K2213DependencyInputs($Observation,[Collections.IDictionary]$ExpectedDependencies,[string[]]$Libraries,[string]$ObservationPath) {
   $lockEntries=@($Observation.staged_inputs)
@@ -69,7 +71,8 @@ function Read-K2213DependencyInputs($Observation,[Collections.IDictionary]$Expec
   return $inputs
 }
 function Read-K2213ProfileInputs {
-  param([string]$Path,[Collections.IDictionary]$ExpectedDependencies,[string[]]$Libraries)
+  param([string]$Path,[Collections.IDictionary]$ExpectedDependencies,[string[]]$Libraries,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   $profile=Read-K2213Json -Path $Path -Code 'input-profile'
   Assert-K2213 ($profile.schema -eq 1 -and $profile.target -ceq 'f210' -and $profile.factorio_line -ceq '2.1') 'input-profile-schema-target'
   Assert-K2213 ($profile.engine_version -cin @('2.1.20','2.1.21')) 'input-profile-engine-version'
@@ -78,8 +81,9 @@ function Read-K2213ProfileInputs {
   $expected=[ordered]@{}
   foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$expected[$name]=[string]$profile.engine_version}
   foreach($fileName in $ExpectedDependencies.Keys){$expected[$ExpectedDependencies[$fileName][0]]=$ExpectedDependencies[$fileName][1]}
-  $expected['more-infinite-research']='4.2.21001'
-  $expected['mir-fixture-assert-k2-213-imersite-continuation']='0.1.3'
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode 210 -SourceMinor 2 -SourcePatch ([int]$SourceVersion.Split('.')[2])
+  $expected['more-infinite-research']=$identity.distribution_version
+  $expected['mir-fixture-assert-k2-213-imersite-continuation']='0.1.4'
   Assert-K2213 (@($profile.mods).Count -eq $expected.Count) 'input-profile-selection-count'
   foreach($name in $expected.Keys){
     $rows=@($profile.mods|Where-Object {$_.name -ceq $name})
@@ -205,7 +209,8 @@ function Get-K2213FixtureEnvelope {
     'base: "2.1.21"',
     'Krastorio2: "2.1.3"',
     'Krastorio2-spaced-out: "2.0.13"',
-    'more-infinite-research: "4.2.21001"'
+    'more-infinite-research: "4.2.21001"',
+    'candidate_versions: ["4.2.21001", "4.2.21002"]'
   )
   foreach ($line in $required) { Assert-K2213 ($body.Contains($line,[StringComparison]::Ordinal)) "registered-fixture-field:$line" }
   return [pscustomobject][ordered]@{id=$fixtureId;path='fixtures/assert-k2-213-imersite-continuation';raw_sha256=Get-K2213Sha256 $Path}
@@ -252,10 +257,10 @@ try {
   foreach ($fixturePath in @($fixtureInfoPath,$fixtureDataPath,$fixtureControlPath)) { Assert-K2213 (Test-Path -LiteralPath $fixturePath -PathType Leaf) "fixture-missing:$fixturePath" }
   $fixtureInfo = Read-K2213Json -Path $fixtureInfoPath -Code 'fixture-info'
   Assert-K2213 ([string]$fixtureInfo.name -ceq 'mir-fixture-assert-k2-213-imersite-continuation') 'fixture-name'
-  Assert-K2213 ([string]$fixtureInfo.version -ceq '0.1.3') 'fixture-version'
+  Assert-K2213 ([string]$fixtureInfo.version -ceq '0.1.4') 'fixture-version'
   Assert-K2213 ([string]$fixtureInfo.factorio_version -ceq '2.1') 'fixture-factorio-version'
   $fixtureDependencies = @($fixtureInfo.dependencies | ForEach-Object {[string]$_})
-  foreach ($dependency in @('base >= 2.1.20','Krastorio2 = 2.1.3','Krastorio2-spaced-out = 2.0.13','more-infinite-research = 4.2.21001')) {
+  foreach ($dependency in @('base >= 2.1.20','Krastorio2 = 2.1.3','Krastorio2-spaced-out = 2.0.13','more-infinite-research >= 4.2.21001')) {
     Assert-K2213 ($fixtureDependencies -contains $dependency) "fixture-dependency:$dependency"
   }
   Assert-K2213 ($LocalModLibraryDirs.Count -eq 1) 'one-active-flat-library-required'
@@ -263,7 +268,7 @@ try {
   $plannedFixtureArchive = Join-Path $library ([string]$fixtureInfo.name + '_' + [string]$fixtureInfo.version + '.zip')
   Assert-MIRFactorioPathBudget -Path $plannedFixtureArchive -Context 'K2 continuation fixture archive path'
 
-  $currentCandidate=Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $materializationPath
+  $currentCandidate=Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $materializationPath -SourceVersion $SourceVersion
   $materialization=$currentCandidate.receipt
 
   $engineHash = Get-K2213Sha256 $engine
@@ -281,7 +286,7 @@ try {
   $predecessorLock=$null
   $inputProfile=$null
   if($profilePath){
-    $bound=Read-K2213ProfileInputs -Path $profilePath -ExpectedDependencies $expectedDependencies -Libraries $LocalModLibraryDirs
+    $bound=Read-K2213ProfileInputs -Path $profilePath -ExpectedDependencies $expectedDependencies -Libraries $LocalModLibraryDirs -SourceVersion $SourceVersion
     $expectedEngineVersion=[string]$bound.profile.engine_version
     Assert-K2213 ($engineHash -ceq $bound.profile.engine_sha256) 'engine-sha256'
     Assert-K2213 ((Get-K2213Sha256 $runtimeApi) -ceq $bound.profile.runtime_api_sha256) 'engine-runtime-api'
@@ -304,11 +309,12 @@ try {
     $predecessorLock=[ordered]@{result=Get-K2213Artifact $v5Path -AllowExternalInput;kind=[string]$v5.kind;status=[string]$v5.status;role='exact-engine-and-dependency-archive-lock-only';old_candidate_sha256=[string]$v5.candidate.sha256}
   }
   Assert-K2213 ((Get-Item -LiteralPath $engine).VersionInfo.ProductVersion -ceq $expectedEngineVersion) 'engine-product-version'
-  $inputs += [ordered]@{source_path=$candidate;file_name=([IO.Path]::GetFileName($candidate));expected_sha256=([string]$materialization.archive_sha256);role='candidate';identity=[ordered]@{name='more-infinite-research';version='4.2.21001';materialization_record_sha256=[string]$materialization.record_sha256};provenance=[ordered]@{kind='current-candidate-materialization';raw_materialization_sha256=Get-K2213Sha256 $materializationPath};immutable=$true}
+  $inputs += [ordered]@{source_path=$candidate;file_name=([IO.Path]::GetFileName($candidate));expected_sha256=([string]$materialization.archive_sha256);role='candidate';identity=[ordered]@{name='more-infinite-research';version=$materialization.distribution_version;materialization_record_sha256=[string]$materialization.record_sha256};provenance=[ordered]@{kind='current-candidate-materialization';raw_materialization_sha256=Get-K2213Sha256 $materializationPath};immutable=$true}
   $directInputs=Read-K2213DirectLibraryInputs -Library $library -Inputs $inputs -FixtureRoot $fixtureRoot -EngineVersion $expectedEngineVersion
   $inputBinding=[ordered]@{
     source_commit=(& git -C $RepoRoot rev-parse HEAD).Trim();harness=Get-K2213Artifact $PSCommandPath
     candidate_sha256=[string]$materialization.archive_sha256;materialization_sha256=Get-K2213Sha256 $materializationPath
+    source_version=$materialization.source_version;distribution_version=$materialization.distribution_version
     engine_version=$expectedEngineVersion;engine_sha256=$engineHash;runtime_api_sha256=Get-K2213Sha256 $runtimeApi
     input_profile=$inputProfile;predecessor_observation_lock=$predecessorLock;archive_hashes=$directInputs.archive_hashes
   }
@@ -318,6 +324,7 @@ try {
       status='passed-preflight-only'
       scope='exact-current-f210-k2-k2so-imersite-continuation-input-and-envelope-validation'
       candidate_sha256=[string]$materialization.archive_sha256
+      source_version=$materialization.source_version;distribution_version=$materialization.distribution_version
       materialization_sha256=Get-K2213Sha256 $materializationPath
       predecessor_observation_lock=$predecessorLock
       input_profile=$inputProfile
@@ -388,7 +395,7 @@ try {
     scope='exact-current-f210-k2-k2so-imersite-powder-continuation-create-and-single-reload';
     qualification=$false;support_claim=$false;release_authority=$false;publication=$false;
     candidate=[ordered]@{archive=$candidateArtifact;materialization=Get-K2213Artifact $materializationPath;materialization_record_sha256=[string]$materialization.record_sha256;package_source_sha256=[string]$materialization.package_source_sha256};
-    source=[ordered]@{commit=(& git -C $RepoRoot rev-parse HEAD).Trim();tree=(& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim();source_version='4.2.1';distribution_version='4.2.21001';harness=Get-K2213Artifact $PSCommandPath};
+    source=[ordered]@{commit=(& git -C $RepoRoot rev-parse HEAD).Trim();tree=(& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim();source_version=$materialization.source_version;distribution_version=$materialization.distribution_version;harness=Get-K2213Artifact $PSCommandPath};
     predecessor_observation_lock=$predecessorLock;input_profile=$inputProfile;
     engine=[ordered]@{path=Get-K2213PathIdentity $engine -AllowExternalInput;product_version=$expectedEngineVersion;executable_sha256=$engineHash;bundled_runtime_api_sha256=Get-K2213Sha256 $runtimeApi};
     fixture=[ordered]@{registration=$fixtureRegistry;files=@(Get-K2213Artifact $fixtureInfoPath;Get-K2213Artifact $fixtureDataPath;Get-K2213Artifact $fixtureControlPath);archive=$fixtureArtifact};

@@ -1946,6 +1946,12 @@
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "fixtures/run-profiles/k2-213-imersite-f210.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/assert-k2-213-imersite-continuation/info.json",
+        "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
+        "fixtures/assert-k2-213-imersite-continuation/control.lua",
+        "tests/runtime/k2_imersite_version_controls.lua",
         "tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
@@ -8376,5 +8382,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:644422ca3f58949b59b2b96fe5d418235995c558d54ab7c3d9d4a1eb8b87284e"
+  "digest": "sha256:3a82f6eecd3e9d9fbd5fbfedfc09519575b60c8201b404ce15f439ea6f0f03a0"
 }

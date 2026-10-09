@@ -526,8 +526,20 @@ try {
         if($target-ceq'f210') {
           $wrapped=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
           Assert-Probe ($wrapped.receipt.archive_sha256-ceq$inventory.archive_sha256) 'F210 wrapper lost explicit source selection.'
+          $tinRead=Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
+          $k2Read=Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
+          Assert-Probe ($tinRead.receipt.source_version-ceq$sourceVersion-and$tinRead.receipt.archive_sha256-ceq$inventory.archive_sha256) 'Tin caller lost explicit maintenance identity.'
+          Assert-Probe ($k2Read.receipt.source_version-ceq$sourceVersion-and$k2Read.receipt.archive_sha256-ceq$inventory.archive_sha256) 'K2 caller lost explicit maintenance identity.'
         }
         $other=if($sourceVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
+        if($target-ceq'f210') {
+          Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
+          Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
+          if($sourceVersion-ceq'4.2.2') {
+            Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath} 'materialization identity differs'
+            Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath} 'materialization identity differs'
+          }
+        }
         Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -Target $target -SourceVersion $other} 'materialization identity differs'
         if($sourceVersion-ceq'4.2.2') {
           Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -Target $target} 'materialization identity differs'
@@ -539,6 +551,10 @@ try {
         $record.package_source_sha256=$savedFingerprint;Save-ControlledTinRecord
         $binding.output_sha256='0'*64
         Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'binding hash differs'
+        if($target-ceq'f210') {
+          Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
+          Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
+        }
         $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
       }
     }
@@ -554,11 +570,23 @@ try {
     $portablePath=Join-Path $run 'portable-inputs.json'
     $portable=[ordered]@{schema=1;target='f210';factorio_line='2.1';engine_version='2.1.21';engine_sha256=('A'*64);runtime_api_sha256=('B'*64);settings_mode='Defaults';mods=@();archive_sha256=@{'controlled-k2_1.0.0.zip'=(Get-K2213Sha256 $dependency)}}
     foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$portable.mods+=@{name=$name;version='2.1.21';enabled=$true}}
-    $portable.mods+=@(@{name='controlled-k2';version='1.0.0';enabled=$true},@{name='more-infinite-research';version='4.2.21001';enabled=$true},@{name='mir-fixture-assert-k2-213-imersite-continuation';version='0.1.3';enabled=$true})
+    $portable.mods+=@(@{name='controlled-k2';version='1.0.0';enabled=$true},@{name='more-infinite-research';version='4.2.21001';enabled=$true},@{name='mir-fixture-assert-k2-213-imersite-continuation';version='0.1.4';enabled=$true})
     function Save-ControlledK2Profile {$portable|ConvertTo-Json -Depth 10|Set-Content -LiteralPath $portablePath}
     Save-ControlledK2Profile
     $bound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)
     Assert-Probe ($bound.inputs.Count-eq1-and$bound.inputs[0].source_path-ceq$dependency-and$bound.profile.engine_version-ceq'2.1.21'-and$bound.inputs[0].provenance.profile_sha256-ceq(Get-K2213Sha256 $portablePath)) 'Portable K2 inputs lost exact archive or profile provenance.'
+    foreach($selectedVersion in @('4.2.1','4.2.2')) {
+      $distribution='4.2.2100'+$selectedVersion.Split('.')[2]
+      $portable.mods[6].version=$distribution;Save-ControlledK2Profile
+      $bound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion $selectedVersion
+      Assert-Probe ($bound.profile.mods[6].version-ceq$distribution-and$bound.inputs[0].source_path-ceq$dependency) 'K2 profile lost explicit candidate or reused dependency.'
+      $other=if($selectedVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
+      Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion $other} 'input-profile-selection:more-infinite-research'
+    }
+    Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)} 'input-profile-selection:more-infinite-research'
+    $portable.mods[6].version='4.2.21001';$portable.mods[7].version='0.1.3';Save-ControlledK2Profile
+    Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)} 'input-profile-selection:mir-fixture'
+    $portable.mods[7].version='0.1.4';Save-ControlledK2Profile
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @((Join-Path $run 'absent-library'))} 'dependency-missing'
     $portable.archive_sha256['controlled-k2_1.0.0.zip']='0'*64;Save-ControlledK2Profile
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)} 'dependency-hash'

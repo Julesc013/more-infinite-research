@@ -599,6 +599,7 @@ fixtures:
     shipped: false
     external_mod_identity: bobplates
     qualification_status: unqualified
+    candidate_versions: ["4.2.21001", "4.2.21002"]
     exact_version_envelope:
       base: "2.1.21"
       boblibrary: "3.0.1"
@@ -623,6 +624,8 @@ fixtures:
     external_mod_identity: Krastorio2-spaced-out
     planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213-imersite-continuation
     input_profile: fixtures/run-profiles/k2-213-imersite-f210.json
+    maintenance_input_profile: fixtures/run-profiles/k2-213-imersite-f210-422.json
+    candidate_versions: ["4.2.21001", "4.2.21002"]
     exact_version_envelope:
       base: "2.1.21"
       Krastorio2: "2.1.3"
@@ -636,7 +639,7 @@ fixtures:
       - legacy-level-three-current-research-queue-and-42-percent-progress-preserved
       - actual-unmodified-crusher-output-after-reload-324-powder-and-sand-versus-300-from-equal-300-ore
       - one-fresh-create-and-single-bounded-reload
-      - supplied-current-421-candidate-and-materialization-bindings-verified-without-a-new-zip
+      - supplied-explicit-421-or-422-candidate-and-materialization-bindings-verified-without-a-new-zip
       - explicit-flat-library-selection-with-no-dependency-staging
       - portable-current-input-profile-without-historical-private-receipt
       - one-owned-row-budget-governs-engine-version-create-and-reload
