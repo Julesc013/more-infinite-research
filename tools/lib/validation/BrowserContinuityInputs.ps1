@@ -3,16 +3,16 @@ Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot '../compatibility/FactorioRunner.ps1')
 
 function Get-MIRBrowserContinuityReadmeSha256 {
-  param([string]$RepositoryRoot,[ValidateSet('f210','f200')][string]$Target,[ValidateSet('4.2.0','4.2.1')][string]$SourceVersion,[string]$ReadmePath)
+  param([string]$RepositoryRoot,[ValidateSet('f210','f200')][string]$Target,[ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion,[string]$ReadmePath)
   . (Join-Path $RepositoryRoot 'tools/mir/application/package/TargetMaterializer.ps1')
   $Target=$Target.ToLowerInvariant()
   $state=Get-MIR4TargetMaterializerState -RepoRoot $RepositoryRoot -Target $Target
   $binding=@((Get-MIR4TargetMaterializationBindings -State $state).bindings|Where-Object output_path -CEQ 'README.md')
   if($binding.Count-ne 1-or [IO.Path]::GetFullPath($ReadmePath)-ine [IO.Path]::GetFullPath((Join-Path $RepositoryRoot $binding[0].source_path))){throw '[mir-browser-continuity-readme-authority]'}
   $bytes=Read-MIR4CanonicalSourceBindingBytes -State $state -Binding $binding[0]
-  if($SourceVersion-ceq'4.2.1'){
-    $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch 1
-    $bytes=Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $bytes -DistributionVersion $identity.distribution_version
+  if($SourceVersion-cin@('4.2.1','4.2.2')){
+    $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch ([int]$SourceVersion.Split('.')[2])
+    $bytes=Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $bytes -DistributionVersion $identity.distribution_version -SourceVersion $SourceVersion
   }
   Get-MIR4Sha256Bytes -Bytes $bytes
 }

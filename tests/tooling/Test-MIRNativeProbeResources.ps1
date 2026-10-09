@@ -334,14 +334,14 @@ try {
     $Target=$target.ToUpperInvariant();$line=if($target-ceq'f210'){'2.1'}else{'2.0'};$TargetContract=@{factorio_line=$line}
     $hostPath=Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua';$locale=Join-Path $repo 'source/locale/en/more-infinite-research.cfg'
     $readmePath=Join-Path $repo "source/presentation/$target/README.md.template"
-    foreach($sourceVersion in @('4.2.0','4.2.1')){
+    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2')){
       $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch ([int]$sourceVersion.Split('.')[2])
       $ExpectedDistributionVersion=$identity.distribution_version;$ExpectedPackageRoot='more-infinite-research_'+$ExpectedDistributionVersion
       $ExpectedReadmeSha256=Get-MIRBrowserContinuityReadmeSha256 -RepositoryRoot $repo -Target $target -SourceVersion $sourceVersion -ReadmePath $readmePath
       $readmeBytes=[IO.File]::ReadAllBytes($readmePath)
-      if($sourceVersion-ceq'4.2.1'){
-        $readmeBytes=Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readmeBytes -DistributionVersion $ExpectedDistributionVersion
-        Assert-Probe ((Get-MIR4Sha256Bytes -Bytes (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readmeBytes -DistributionVersion $ExpectedDistributionVersion))-ceq$ExpectedReadmeSha256) 'private readme identity transformation is not idempotent.'
+      if($sourceVersion-cin@('4.2.1','4.2.2')){
+        $readmeBytes=Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readmeBytes -DistributionVersion $ExpectedDistributionVersion -SourceVersion $sourceVersion
+        Assert-Probe ((Get-MIR4Sha256Bytes -Bytes (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readmeBytes -DistributionVersion $ExpectedDistributionVersion -SourceVersion $sourceVersion))-ceq$ExpectedReadmeSha256) 'private readme identity transformation is not idempotent.'
       }
       $valid=New-ControlledBrowserArchive -Line $line -Identity $identity
       $zip=[IO.Compression.ZipFile]::Open($valid,[IO.Compression.ZipArchiveMode]::Update)
@@ -494,6 +494,55 @@ try {
     $binding.output_bytes++
     Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath} 'candidate binding size differs'
     Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath} 'candidate binding size differs'
+
+    # Consume the actual current-candidate reader for both explicit maintenance
+    # versions. These tiny synthetic ZIPs isolate version/content refusal;
+    # their mocked membership is not a player package or native acceptance.
+    $binding.output_bytes=$bytes.Length
+    $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+    foreach($target in @('f210','f200')) {
+      foreach($sourceVersion in @('4.2.1','4.2.2')) {
+        $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch ([int]$sourceVersion.Split('.')[2])
+        $caseRoot=Join-Path $run ($target+'-'+$sourceVersion);[IO.Directory]::CreateDirectory($caseRoot)|Out-Null
+        $candidate=Join-Path $caseRoot $identity.package_name
+        $receiptPath=Join-Path $caseRoot 'materialized.json'
+        $line=if($target-ceq'f210'){'2.1'}else{'2.0'}
+        $info=@{name='more-infinite-research';version=$identity.distribution_version;factorio_version=$line}|ConvertTo-Json -Compress
+        $zip=[IO.Compression.ZipFile]::Open($candidate,[IO.Compression.ZipArchiveMode]::Create)
+        try {
+          foreach($member in @(@{path='info.json';bytes=[Text.Encoding]::UTF8.GetBytes($info)},@{path='control.lua';bytes=$bytes})) {
+            $stream=$zip.CreateEntry(('more-infinite-research_'+$identity.distribution_version)+'/'+$member.path).Open()
+            try{$stream.Write($member.bytes,0,$member.bytes.Length)}finally{$stream.Dispose()}
+          }
+        }finally{$zip.Dispose()}
+        $inventory=Get-MIR4ArchiveInventory -Path $candidate
+        $record.target=$target;$record.source_version=$sourceVersion;$record.distribution_version=$identity.distribution_version
+        $record.archive_path=$candidate;$record.archive_sha256=$inventory.archive_sha256
+        $record.content_sha256=$inventory.content_sha256;$record.entry_count=$inventory.entry_count
+        Save-ControlledTinRecord
+        $selected=@{Repository=$repo;Archive=$candidate;ReceiptPath=$receiptPath;Target=$target;SourceVersion=$sourceVersion}
+        $read=Read-MIRNativeProbeCurrentCandidate @selected
+        Assert-Probe ($read.path-ceq$candidate-and$read.receipt.source_version-ceq$sourceVersion) "explicit $target/$sourceVersion reader lost its selected identity."
+        if($target-ceq'f210') {
+          $wrapped=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
+          Assert-Probe ($wrapped.receipt.archive_sha256-ceq$inventory.archive_sha256) 'F210 wrapper lost explicit source selection.'
+        }
+        $other=if($sourceVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
+        Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -Target $target -SourceVersion $other} 'materialization identity differs'
+        if($sourceVersion-ceq'4.2.2') {
+          Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -Target $target} 'materialization identity differs'
+        }
+        $record.distribution_version=$record.distribution_version.Substring(0,$record.distribution_version.Length-2)+'00';Save-ControlledTinRecord
+        Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'materialization identity differs'
+        $record.distribution_version=$identity.distribution_version;$record.package_source_sha256='0'*64;Save-ControlledTinRecord
+        Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'source fingerprint differs'
+        $record.package_source_sha256=$savedFingerprint;Save-ControlledTinRecord
+        $binding.output_sha256='0'*64
+        Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'binding hash differs'
+        $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+      }
+    }
+    Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion '4.2.3'} 'SourceVersion'
 
     $flat=Join-Path $run 'flat-library';New-Item -ItemType Directory -Path $flat|Out-Null
     $dependency=Join-Path $flat 'controlled-k2_1.0.0.zip'
@@ -764,6 +813,15 @@ function New-MIR4TargetPackage {
     $browserIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch 1
     Assert-Probe ($browserPackage.target -ceq $target -and $browserPackage.source_version -ceq '4.2.1' -and $browserPackage.distribution_version -ceq $browserIdentity.distribution_version -and $browserPackage.candidate_id.StartsWith($target.ToUpperInvariant()+'-BROWSER-') -and -not $browserPackage.actual_package) "browser driver lost the exact $target source-patch or target identity."
   }
+  foreach($target in @('f210','f200')) {
+    $nextPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -Target $target -CandidatePrefix SCIENCE-LAUNCH -SourceVersion '4.2.2'
+    $nextIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch 2
+    Assert-Probe ($nextPackage.target-ceq$target-and$nextPackage.source_version-ceq'4.2.2'-and$nextPackage.distribution_version-ceq$nextIdentity.distribution_version-and$nextPackage.candidate_id.StartsWith($target.ToUpperInvariant()+'-SCIENCE-LAUNCH-')) 'governed child lost explicit source patch two.'
+  }
+  $driverHash=(Get-FileHash -LiteralPath (Join-Path $context.root 'materialize.ps1')).Hash
+  $driverProcessIndex=$context.process_index
+  Refuses-Probe {New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.2.3'} 'SourceVersion'
+  Assert-Probe ($driverProcessIndex-eq$context.process_index-and(Get-FileHash -LiteralPath (Join-Path $context.root 'materialize.ps1')).Hash-ceq$driverHash) 'unknown source version changed the driver or launched a process.'
   $echo=Join-Path $context.root 'argv-echo.ps1'
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
@@ -791,7 +849,7 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $guiActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $guiBinary -Arguments @($guiMarker) -TimeoutSeconds 15
   Assert-Probe ((Test-Path -LiteralPath $guiMarker)-and([IO.File]::ReadAllText($guiMarker)-ceq'finished')-and$guiActor.result.exit_code-eq0) 'native wrapper returned before the GUI child completed.'
   Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$context.runs.Count}
-  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 8) 'reserved result did not preserve actual actor inventory.'
+  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 10) 'reserved result did not preserve actual actor inventory.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'
