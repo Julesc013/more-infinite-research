@@ -488,7 +488,12 @@
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tests/runtime/Test-MIRK2213ImersiteMigration.ps1",
         "tests/runtime/Test-MIRPassiveRepair.ps1",
-        "tests/tooling/Test-MIRLibraryActivation.ps1"
+        "tests/tooling/Test-MIRLibraryActivation.ps1",
+        "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/**",
+        "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/**",
+        "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/**",
+        "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/**",
+        "fixtures/assert-upgrade-historical-terminal-to-mir42/**"
       ]
     },
     {

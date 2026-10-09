@@ -41,16 +41,17 @@ function Resolve-MIR42IndependentChild {
 }
 
 function Get-MIR42IndependentScopeContract {
-  param([Parameter(Mandatory)][ValidateSet('four-target','nine-target')][string]$Scope,[switch]$PublishedMaintenance)
+  param([Parameter(Mandatory)][ValidateSet('four-target','nine-target')][string]$Scope,[switch]$PublishedMaintenance,
+    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   if ($PublishedMaintenance) {
-    if ($Scope -cne 'nine-target') { throw '[mir42-independent-maintenance-candidate-scope]' }
+    Assert-MIR42IndependentMaintenanceScope -Scope $Scope -SourceVersion $SourceVersion
     return [pscustomobject][ordered]@{
       targets=@($script:MIR42IndependentNineTargets)
       candidate_status='private-deterministic-nine-target-candidate-built-unqualified'
       reconciliation_kind='MIR42NineTargetMaintenanceEvidenceReconciliationV1'
-      reconciliation_status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'
+      reconciliation_status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"
       rehash_kind='MIR42NineTargetMaintenanceIndependentEvidenceRehashV1'
-      rehash_status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED'
+      rehash_status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED"
       target_requirement='all_nine_targets_required'
     }
   }
@@ -97,7 +98,7 @@ function Assert-MIR42IndependentFourRows {
 function Get-MIR42IndependentEngine {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)]$Qualified)
   if ($Target -in $script:MIR42IndependentHistoricalTargets) {
-    $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $Target
+    $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $Target -PredecessorIdentityOnly
     $path = [string]$historical.record.engine.path
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir42-independent-engine-missing] $Target" }
     $actualHash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()
@@ -133,7 +134,7 @@ function Get-MIR42IndependentEngine {
 
 function Assert-MIR42IndependentMaintenanceScope {
   param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][string]$SourceVersion)
-  if ($Scope -cne 'nine-target' -or $SourceVersion -cne '4.2.1') {
+  if ($Scope -cne 'nine-target' -or $SourceVersion -cnotin @('4.2.1','4.2.2')) {
     throw '[mir42-independent-maintenance-candidate-scope]'
   }
 }
@@ -205,7 +206,7 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
   if ($maintenanceRequested) {
     Assert-MIR42IndependentMaintenanceScope -Scope $scope -SourceVersion ([string]$versionContract.source_version)
   }
-  $contract = Get-MIR42IndependentScopeContract -Scope $scope -PublishedMaintenance:$maintenanceRequested
+  $contract = Get-MIR42IndependentScopeContract -Scope $scope -PublishedMaintenance:$maintenanceRequested -SourceVersion ([string]$versionContract.source_version)
   if ((Get-MIR42IndependentTargetScope -Rows @($builder.target_authority) -Code 'mir42-independent-builder-authority') -cne $scope) {
     throw '[mir42-independent-builder-authority-targets]'
   }
@@ -244,10 +245,11 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
   }
   $maintenanceInputs = $null
   if ($maintenanceRequested) {
-    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion ([string]$versionContract.source_version)
+    $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-independent-maintenance-release-readback]' }
     $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion ([string]$versionContract.source_version)
     if ($qualification.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor') {
       throw '[mir42-independent-maintenance-custody-missing]'
     }
@@ -294,7 +296,7 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     }
     $historical = $null
     if ($target -in $script:MIR42IndependentHistoricalTargets) {
-      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target $target -SourceVersion ([string]$versionContract.source_version)
+      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target $target -SourceVersion ([string]$versionContract.source_version) -PredecessorIdentityOnly:$maintenanceRequested
       foreach ($field in @('materializer','base_materializer_target','target_record','factorio_line','engine','predecessor','public_output_authorized','publication_authorized')) {
         if ($row.PSObject.Properties.Name -notcontains $field) { throw "[mir42-independent-historical-row-field] $target/$field" }
       }

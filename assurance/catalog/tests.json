@@ -1826,7 +1826,12 @@
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tests/runtime/Test-MIRK2213ImersiteMigration.ps1",
         "tests/runtime/Test-MIRPassiveRepair.ps1",
-        "tests/tooling/Test-MIRLibraryActivation.ps1"
+        "tests/tooling/Test-MIRLibraryActivation.ps1",
+        "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/**",
+        "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/**",
+        "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/**",
+        "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/**",
+        "fixtures/assert-upgrade-historical-terminal-to-mir42/**"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -8415,5 +8420,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8c8797041fab70085aa32075be297c2e5088c0a0f8b4a939daa48281013ed41a"
+  "digest": "sha256:084ac422cac7a448406901039046a5b8c61003335269c28620c081fc2819f8d1"
 }

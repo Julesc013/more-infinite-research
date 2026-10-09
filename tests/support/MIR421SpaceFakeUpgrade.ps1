@@ -1,7 +1,7 @@
 # Optional native scenario inputs for the existing manifest-driven upgrade runner.
 function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
-    [Parameter(Mandatory)][ValidateSet('f210','f200')][string]$Target,
+    [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target,
     [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   # Only the disposable prepared fixture changes. Its SIF counterpart keeps
   # 0.1.0; base upgrades to 4.2.1/4.2.2 use 0.1.1/0.1.2 respectively so
@@ -12,10 +12,29 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   Assert-MIRLibraryPath $path
   $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
   $code=$Target.Substring(1)
-  $line=if($Target-ceq'f210'){'2.1'}else{'2.0'}
+  $line=switch($Target){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'}}
   if($info.name-cne"mir-fixture-assert-upgrade-4-0-${code}00-to-4-1-${code}00"-or
     $info.factorio_version-cne$line-or$info.version-cnotin@('0.1.0',$fixtureVersion)){
     throw '[mir421-modern-base-fixture-template]'
+  }
+  if($info.version-ceq$fixtureVersion){return}
+  $info.version=$fixtureVersion
+  [IO.File]::WriteAllText($path,($info|ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false))
+}
+
+function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
+  param([Parameter(Mandatory)][string]$FixtureDirectory,
+    [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
+    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2')][string]$SourceVersion)
+  $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
+  $path=Join-Path $directory 'info.json'
+  Assert-MIRLibraryPath $path
+  $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
+  $fixtureVersion='1.0.'+([version]$SourceVersion).Build
+  $line='0.'+[int]$Target.Substring(1)
+  if($info.name-cne'mir-fixture-assert-upgrade-historical-terminal-to-mir42'-or
+    $info.factorio_version-cne$line-or$info.version-cnotin@('1.0.0',$fixtureVersion)){
+    throw '[mir42-historical-maintenance-fixture-template]'
   }
   if($info.version-ceq$fixtureVersion){return}
   $info.version=$fixtureVersion
