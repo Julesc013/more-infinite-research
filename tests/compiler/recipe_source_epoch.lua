@@ -498,4 +498,32 @@ end)()
   end)
   data.raw=previous_raw
 end)()
+-- A recipe can keep the same number of fluid ingredients while replacing
+-- their identities. A warm machine count must not bypass its actual filter.
+;(function()
+  local routes=require('prototypes.mir.capabilities.science_integration.recipe_route_feasibility')
+  local previous_raw=data.raw
+  local function producer(fluid)
+    return {make_A={name='make_A',enabled=true,energy_required=1,
+      ingredients={{type='fluid',name=fluid,amount=1}},results={{type='item',name='A',amount=1}}}}
+  end
+  data.raw={fluid={water={type='fluid',name='water'},acid={type='fluid',name='acid'}},
+    item={A={type='item',name='A'},kit={type='item',name='kit',place_result='builder'}},
+    resource={kit={minable={result='kit'}}},
+    ['assembling-machine']={builder={name='builder',crafting_categories={'crafting'},
+      fluid_boxes={{production_type='input',filter='water'}}}},recipe=producer('water')}
+  compiler_context.with_active(compiler_context.new(),function()
+    local state={}
+    local options={source_witness=function(name,kind) return kind=='fluid' and (name=='water' or name=='acid') end}
+    check('FPE/initial',routes.acquisition_witness('A',options,state)~=nil,
+      'The initial recipe uses its acquired machine and compatible filter')
+    local changed=recipe_facts.replace_source(producer('acid'),recipe_facts.source_epoch())
+    check('FPE/changed',routes.acquisition_witness('A',options,state)==nil,
+      'Changing the ingredient identity invalidates warm acquisition despite unchanged port counts')
+    recipe_facts.replace_source(data.raw.recipe,changed)
+    check('FPE/restored',routes.acquisition_witness('A',options,state)~=nil,
+      'Restoring the matching fluid recovers the actual recipe witness in the same state')
+  end)
+  data.raw=previous_raw
+end)()
 print("MIR-RECIPE-SOURCE-EPOCH-PASS " .. checks)

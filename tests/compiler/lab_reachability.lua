@@ -932,6 +932,10 @@ for _, case in ipairs({
   {id='same-name-item',item=true,expected=true},
   {id='acquired-input-machine',machine=true,expected=true},
   {id='acquired-output-machine',machine=true,output=true,expected=true},
+  {id='wrong-input-fluid-filter',machine=true,filter='acid',expected=false},
+  {id='matching-input-fluid-filter',machine=true,filter='water',expected=true},
+  {id='wrong-output-fluid-filter',machine=true,output=true,filter='acid',expected=false},
+  {id='matching-output-fluid-filter',machine=true,output=true,filter='water',expected=true},
   {id='missing-machine-kit',machine=true,missing_kit=true,expected=false},
   {id='machine-without-fluid-ports',machine=true,no_ports=true,expected=false},
   {id='machine-output-port-only',machine=true,wrong_direction=true,expected=false},
@@ -941,8 +945,18 @@ for _, case in ipairs({
   {id='bidirectional-output',machine=true,output=true,ports={'input-output'},expected=true},
   {id='two-fluid-inputs-one-port',machine=true,two_fluids=true,expected=false},
   {id='two-fluid-inputs-two-ports',machine=true,two_fluids=true,ports={'input','output','input'},expected=true},
+  {id='two-fluids-shared-unfiltered-port',machine=true,two_fluids=true,ports={'input','input'},filters={'oil'},expected=false},
+  {id='two-fluids-dedicated-then-free',machine=true,two_fluids=true,ports={'input','input'},filters={'water'},expected=true},
+  {id='two-fluids-free-then-dedicated',machine=true,two_fluids=true,ports={'input','input'},filters={[2]='water'},expected=true},
+  {id='two-fluids-duplicate-filter',machine=true,two_fluids=true,ports={'input','input'},filters={'water','water'},expected=false},
+  {id='two-fluids-distinct-filters',machine=true,two_fluids=true,ports={'input','input'},filters={'water','acid'},expected=true},
   {id='two-fluid-outputs-one-port',machine=true,output=true,two_fluids=true,expected=false},
   {id='two-fluid-outputs-two-ports',machine=true,output=true,two_fluids=true,ports={'output','input','output'},expected=true},
+  {id='two-output-fluids-shared-free-port',machine=true,output=true,two_fluids=true,ports={'output','output'},filters={'oil'},expected=false},
+  {id='two-output-fluids-dedicated-then-free',machine=true,output=true,two_fluids=true,ports={'output','output'},filters={'water'},expected=true},
+  {id='two-output-fluids-distinct-filters',machine=true,output=true,two_fluids=true,ports={'output','output'},filters={'acid','water'},expected=true},
+  {id='wrong-input-filter-item-alternative',machine=true,filter='acid',alternative=true,expected=true},
+  {id='duplicate-fluid-products-filtered-port',machine=true,output=true,duplicate=true,filter='water',expected=true},
   {id='dry-machine-item-alternative',machine=true,no_ports=true,alternative=true,expected=true},
   {id='duplicate-fluid-products-one-port',machine=true,output=true,duplicate=true,expected=true},
   {id='alternative-item-route',alternative=true,expected=true}
@@ -963,11 +977,17 @@ for _, case in ipairs({
     raw.recipe.make_water.results[1].type = 'fluid'
   end
   if case.machine then add_fluid_builder(raw) end
+  if case.filter then
+    raw['assembling-machine'].builder.fluid_boxes[case.output and 2 or 1].filter=case.filter
+  end
   if case.ports then
     raw['assembling-machine'].builder.fluid_boxes = {}
     for index, kind in ipairs(case.ports) do
       raw['assembling-machine'].builder.fluid_boxes[index] = {production_type=kind}
     end
+  end
+  for index, filter in pairs(case.filters or {}) do
+    raw['assembling-machine'].builder.fluid_boxes[index].filter=filter
   end
   if case.no_ports then raw['assembling-machine'].builder.fluid_boxes = nil end
   if case.wrong_direction then raw['assembling-machine'].builder.fluid_boxes = {{production_type='output'}} end
@@ -1011,6 +1031,29 @@ run(raw, function()
   check('LRF/frontier/gate',#gates==1 and gates[1]=='BuilderUnlock',
     'The fluid-producing science route retains its actual machine unlock')
 end)
+-- A filtered early machine cannot erase the later compatible machine's
+-- research gate, or bootstrap its own unlock from the pack being assessed.
+for _, self_locked in ipairs({false, true}) do
+  raw = fluid_world()
+  add_fluid_builder(raw)
+  raw.recipe.make_B.ingredients = {{type='fluid',name='water',amount=1}}
+  raw['assembling-machine'].builder.fluid_boxes[1].filter = 'oil'
+  raw['assembling-machine'].late_builder = {name='late_builder',crafting_categories={'crafting'},
+    fluid_boxes={{production_type='input',filter='water'}}}
+  raw.item['late-kit'] = {type='item',name='late-kit',place_result='late_builder'}
+  raw.recipe.make_late_builder = recipe('make_late_builder','late-kit',false)
+  raw.technology.LateBuilder = research({self_locked and 'B' or 'A'})
+  raw.technology.LateBuilder.effects = {{type='unlock-recipe',recipe='make_late_builder'}}
+  run(raw, function()
+    check('LRF/filter-frontier/'..tostring(self_locked),
+      production.pack_production_status('B',{})==(self_locked and 'unreachable' or 'research'),
+      'Only the compatible machine can contribute an acquisition witness')
+    local gates=production.prereq_techs_for_science_pack('B')
+    check('LRF/filter-frontier/gates/'..tostring(self_locked),
+      self_locked and #gates==0 or not self_locked and #gates==1 and gates[1]=='LateBuilder',
+      'The science frontier preserves the compatible machine gate and rejects self-locking')
+  end)
+end
 -- Temperature is part of fluid acquisition, including the pack's actual
 -- machine/source/unlock chain. All worlds below are complete controlled
 -- inputs; these checks do not claim native heat, throughput or logistics proof.

@@ -235,8 +235,7 @@ local function fluid_port_requirements(variant, results, options)
   -- Category membership alone cannot give a character a fluid inventory.
   -- Inspect the typed declarations, including coproducts, so an otherwise
   -- reachable fluid source cannot manufacture a hand-crafting witness.
-  local required = {input = 0, output = 0}
-  local seen = {input = {}, output = {}}
+  local required = {input = 0, output = 0, names = {input = {}, output = {}}}
   for direction, entries in ipairs({normalized_ingredients(variant), results or {}}) do
     local key = direction == 1 and "input" or "output"
     for _, entry in ipairs(entries) do
@@ -247,8 +246,8 @@ local function fluid_port_requirements(variant, results, options)
         -- Duplicate native products are permitted. Count distinct fluid
         -- identities, not probability/quantity entries for the same fluid;
         -- exact slot assignment remains a native qualification boundary.
-        if not seen[key][identity.name] then
-          seen[key][identity.name] = true
+        if not required.names[key][identity.name] then
+          required.names[key][identity.name] = true
           required[key] = required[key] + 1
         end
       end
@@ -258,17 +257,47 @@ local function fluid_port_requirements(variant, results, options)
   return required
 end
 
-local function fluid_port_counts(machine, options)
-  local counts = {input = 0, output = 0}
+local function fluid_port_facts(machine, options)
+  local counts = {input = 0, output = 0, unfiltered = {input = 0, output = 0},
+    filters = {input = {}, output = {}}}
   for _, box in ipairs(machine.fluid_boxes or {}) do
     if not diagnostic_visit(options) then return nil end
     if type(box) == "table" then
       local kind = box.production_type
-      if kind == "input" or kind == "input-output" then counts.input = counts.input + 1 end
-      if kind == "output" or kind == "input-output" then counts.output = counts.output + 1 end
+      for _, direction in ipairs({"input", "output"}) do
+        if kind == direction or kind == "input-output" then
+          counts[direction] = counts[direction] + 1
+          if box.filter == nil then
+            counts.unfiltered[direction] = counts.unfiltered[direction] + 1
+          elseif type(box.filter) == "string" and box.filter ~= "" then
+            counts.filters[direction][box.filter] = true
+          end
+        end
+      end
     end
   end
   return counts
+end
+
+local function fluid_ports_compatible(ports, required, options)
+  if not required then return true end
+  if not ports then return false end
+  for _, direction in ipairs({"input", "output"}) do
+    if ports[direction] < required[direction] then return false end
+    -- Each filtered box accepts one identity. Reserve those matches first;
+    -- only remaining distinct fluids consume unfiltered boxes. This avoids
+    -- both greedy-order rejection and reusing one free port for two fluids.
+    -- Exact native slot indices and temperature assignment remain separate.
+    local free = ports.unfiltered[direction]
+    for name in pairs(required.names[direction]) do
+      if not diagnostic_visit(options) then return false end
+      if not ports.filters[direction][name] then
+        free = free - 1
+        if free < 0 then return false end
+      end
+    end
+  end
+  return true
 end
 
 local function copy_options(options)
@@ -414,7 +443,7 @@ local function category_set_from_prototypes(state, options)
       for _, category in ipairs(machine.crafting_categories or {}) do
         if not diagnostic_visit(options) then return categories end
         if not ports then
-          ports = fluid_port_counts(machine, options)
+          ports = fluid_port_facts(machine, options)
           if not ports then return categories end
         end
         categories[category] = categories[category] or {}
@@ -1157,8 +1186,8 @@ local function machine_acquisition_witness(machines, category, recipe_name, opti
     if not diagnostic_visit(options) then return nil end
     diagnostic_rollback(options, checkpoint)
     local ports = machine.fluid_ports
-    local fluid_compatible = not required_ports or (not machine.handcrafting and ports
-      and ports.input >= required_ports.input and ports.output >= required_ports.output)
+    local fluid_compatible = not required_ports or (not machine.handcrafting
+      and fluid_ports_compatible(ports, required_ports, options))
     if fluid_compatible
       and (machine.fixed_recipe == nil or machine.fixed_recipe == recipe_name)
       and surface_satisfied(machine.surface_conditions, options, state) then
@@ -1310,8 +1339,7 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
             for _, declared in ipairs(construction.prototype.crafting_categories or {}) do
               if not diagnostic_visit(options) then return nil end
               local ports = construction.fluid_ports
-              if declared == category and (not required_ports or
-                ports.input >= required_ports.input and ports.output >= required_ports.output) then
+              if declared == category and fluid_ports_compatible(ports, required_ports, options) then
                 machine_witness = construction.placement
                 break
               end
@@ -1414,7 +1442,7 @@ rocket_launch_witness = function(source, identity, options, state)
         and finite_positive(rocket.inventory_size) and finite_positive(silo.crafting_speed)
         and finite_positive(silo.rocket_parts_required) and silo.rocket_parts_required % 1 == 0 then
         local placement = source_actor_witness({prototype = name, prototype_type = "rocket-silo"}, options, state)
-        local ports = fluid_port_counts(silo, options)
+        local ports = fluid_port_facts(silo, options)
         if placement and ports then
           local checkpoint = diagnostic_checkpoint(options)
           for _, receiver_name in ipairs(receivers) do

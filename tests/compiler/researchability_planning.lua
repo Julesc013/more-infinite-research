@@ -920,6 +920,14 @@ do
       "An obtainable fluid input and compatible silo port complete construction")
     check("LAUNCH12-" .. version, feasibility.acquisition_witness("pack") == nil,
       "A fluid port alone never proves the construction fluid obtainable")
+    w.rocket_silos.silo.fluid_boxes[1].filter = "oil"
+    reset(w)
+    check("LAUNCH-FILTER-REJECT-" .. version, feasibility.acquisition_witness("pack", water_source) == nil,
+      "An independently available construction fluid cannot enter a silo port filtered for another fluid")
+    w.rocket_silos.silo.fluid_boxes[1].filter = "water"
+    reset(w)
+    check("LAUNCH-FILTER-ACCEPT-" .. version, feasibility.acquisition_witness("pack", water_source) ~= nil,
+      "A matching silo input filter preserves the complete launch acquisition route")
 
     w = launch_world(true)
     w.techs["alternate-parts"] = technology("seed", "parts")

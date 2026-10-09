@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 77097,
-      "source_sha256": "3611E1EBA4C39FBD76EC3303663A3D516A13F11C2B2380AA86797658B9FD3BDC",
-      "output_bytes": 77097,
-      "output_sha256": "3611E1EBA4C39FBD76EC3303663A3D516A13F11C2B2380AA86797658B9FD3BDC"
+      "source_bytes": 78233,
+      "source_sha256": "79B09BEA607955B5A75F98DF96F14D41FAA6BF6CE1AE990DD60DB1B6CBF5D5D7",
+      "output_bytes": 78233,
+      "output_sha256": "79B09BEA607955B5A75F98DF96F14D41FAA6BF6CE1AE990DD60DB1B6CBF5D5D7"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "7EB28EECCFA9BEF81FE84B1D8223B9FB6A14BF64EEEFC971E5D2D3EA624767A8"
+  "record_sha256": "77B3CD7C6975042AEE1F5DFDDF8B0BD81ADA9FEAC20C4AE1B6ABE5011C5F3FC5"
 }
