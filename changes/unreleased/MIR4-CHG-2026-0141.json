@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0141",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Reject material productivity routes that return their inputs through item spoilage.",
+  "details": [
+    "The typed material graph now follows positive-duration item spoilage through the existing shared item index. Direct and mixed recipe/spoilage returns remain withheld; older recipe-only certificates cannot grant exceptions for native spoilage.",
+    "Relevant spoilage facts and alternate native output producers enter the route fingerprint. Disconnected spoilage preserves historical recipe-only bindings; private snapshots and one item scan per compiler context remain intact.",
+    "Controlled canonical Lua regressions reproduce the predecessor failure and cover safe routes, typed identities, graph budgets, mixed paths, certificate refusal and cache reuse. Current-package native production, catalogue changes and save qualification remain pending."
+  ],
+  "semantic_domains": [
+    "compatibility",
+    "progression"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Modern material-route guard consumes item spoilage; controlled checks pass, native qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Modern material-route guard consumes item spoilage; controlled checks pass, native qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared index compatibility is checked separately."
+    },
+    {
+      "target": "F100",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared index compatibility is checked separately."
+    },
+    {
+      "target": "F017",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared index compatibility is checked separately."
+    },
+    {
+      "target": "F016",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared index compatibility is checked separately."
+    },
+    {
+      "target": "F015",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared index compatibility is checked separately."
+    },
+    {
+      "target": "F014",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared index compatibility is checked separately."
+    },
+    {
+      "target": "F013",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared index compatibility is checked separately."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "Accepted material/process safety programme: native spoilage return missing from the recipe-only graph",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/material_routes.lua: direct/mixed spoilage returns, recipe certificate refusal, relevant-boundary binding and item index isolation",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/recipe-productivity.md",
+      "kind": "document"
+    }
+  ]
+}

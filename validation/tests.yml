@@ -5998,6 +5998,7 @@
         "source:source/prototypes/mir/families/material_progression.lua",
         "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/prototypes/mir/index/recipe_risk_facts.lua",
+        "source:source/prototypes/mir/index/item_prototype_facts.lua",
         "source:source/prototypes/mir/core/deepcopy.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
