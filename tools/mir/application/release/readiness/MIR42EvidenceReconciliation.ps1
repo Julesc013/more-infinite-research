@@ -409,6 +409,34 @@ function Get-MIR42QualificationEnvironment {
   }
 }
 
+function Assert-MIR42QualificationDirectLibraryUpgradeReceipt {
+  param([Parameter(Mandatory)]$Receipt,[Parameter(Mandatory)][string]$Target)
+  $code = "[mir42-qualification-upgrade-direct-library] $Target"
+  $hasHash = $Receipt.PSObject.Properties.Name -contains 'harness_sha256'
+  $hasDirty = $Receipt.PSObject.Properties.Name -contains 'harness_worktree_dirty'
+  $materialized = $Receipt.PSObject.Properties.Name -contains 'candidate_materialization'
+  if ($hasHash -ne $hasDirty -or ($materialized -and -not $hasHash) -or
+      $Receipt.PSObject.Properties.Name -notcontains 'factorio_processes' -or
+      $Receipt.factorio_processes -ne 4) { throw $code }
+  if ($hasHash -and ([string]$Receipt.harness_sha256 -cnotmatch '^[A-F0-9]{64}$' -or
+      $Receipt.harness_worktree_dirty -isnot [bool] -or $Receipt.harness_worktree_dirty)) { throw $code }
+  foreach ($phase in @('source_library_activation','library_activation')) {
+    if ($Receipt.PSObject.Properties.Name -notcontains $phase) { throw $code }
+    $activation = $Receipt.$phase
+    foreach ($field in @('status','dependency_payload_bytes_copied','archive_links_created','archive_extractions','selected')) {
+      if ($null -eq $activation -or $activation.PSObject.Properties.Name -notcontains $field) { throw $code }
+    }
+    if ([string]$activation.status -cne 'restored-direct-library-controls' -or
+        $activation.dependency_payload_bytes_copied -ne 0 -or
+        $activation.archive_links_created -ne 0 -or $activation.archive_extractions -ne 0 -or
+        $activation.selected -isnot [array]) { throw $code }
+    $mir = @($activation.selected | Where-Object { [string]$_.name -ceq 'more-infinite-research' })
+    $expected = if ($phase -ceq 'source_library_activation') { $Receipt.from } else { $Receipt.to }
+    if ($mir.Count -ne 1 -or [string]$mir[0].version -cne [string]$expected.version -or
+        [string]$mir[0].sha256 -cne [string]$expected.sha256) { throw $code }
+  }
+}
+
 function Get-MIR42QualificationUpgradeReceipt {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -421,12 +449,15 @@ function Get-MIR42QualificationUpgradeReceipt {
   $receiptPath = (Resolve-Path -LiteralPath $Path).Path
   try { $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100 -DateKind String }
   catch { throw "[mir42-qualification-upgrade-receipt-json] $Target" }
-  if ([int]$receipt.schema -ne 2 -or [string]$receipt.status -cne 'passed' -or
+  if ([int]$receipt.schema -notin @(2,3) -or [string]$receipt.status -cne 'passed' -or
       [string]$receipt.archetype -cne 'base-default' -or
       [string]$receipt.git_commit -notmatch '^[a-f0-9]{40}$' -or
       [string]$receipt.to.version -cne [string]$Candidate.identity.distribution_version -or
       [string]$receipt.to.sha256 -cne [string]$Candidate.archive.sha256) {
     throw "[mir42-qualification-upgrade-receipt-binding] $Target"
+  }
+  if ([int]$receipt.schema -eq 3) {
+    Assert-MIR42QualificationDirectLibraryUpgradeReceipt -Receipt $receipt -Target $Target
   }
   $assertions = @($receipt.assertions | ForEach-Object { [string]$_ })
   $requiredAssertions = @($script:MIR42QualificationAssertions)

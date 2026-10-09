@@ -170,6 +170,54 @@ try {
   Assert-MIR42QualificationTest (@($result.targets | Where-Object { @($_.harness.assertions | Where-Object { $_ -eq 'upgraded-save-second-reload-passed' }).Count -ne 1 }).Count -eq 0) 'second-reload-assertions'
   Assert-MIR42QualificationTest (-not [bool]$result.publication_authorized -and [string]$result.technical_seal -ceq 'not-performed') 'release-boundaries'
 
+  # The actual direct-library runner writes schema 3. Exercise the same reader
+  # and retained log bindings; these tiny records do not represent native runs.
+  $direct = Get-Content -Raw -LiteralPath $receipts.f200 | ConvertFrom-Json -AsHashtable -Depth 100 -DateKind String
+  $direct.schema = 3
+  $direct.harness_sha256 = ('A' * 64)
+  $direct.harness_worktree_dirty = $false
+  $direct.factorio_processes = 4
+  foreach ($phase in @('source_library_activation','library_activation')) {
+    $selected = if ($phase -ceq 'source_library_activation') { $direct.from } else { $direct.to }
+    $direct[$phase] = [ordered]@{
+      status = 'restored-direct-library-controls'
+      dependency_payload_bytes_copied = 0; archive_links_created = 0; archive_extractions = 0
+      selected = @(@{name='more-infinite-research';version=$selected.version;sha256=$selected.sha256})
+    }
+  }
+  $directPath = Join-Path $testRoot 'receipts/f200/direct-result.json'
+  $direct | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $directPath -Encoding utf8
+  $selectedCandidate = @(Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $manifestPath | Where-Object target -CEQ 'f200')[0]
+  $consumed = Get-MIR42QualificationUpgradeReceipt -RepoRoot $repo -Target f200 -Path $directPath -Candidate $selectedCandidate
+  Assert-MIR42QualificationTest ($consumed.source_commit -ceq $source.commit -and $consumed.logs.Count -eq 4) 'direct-schema3-consumes-original-provenance-and-logs'
+  $standard = $direct | ConvertTo-Json -Depth 100 | ConvertFrom-Json -AsHashtable -Depth 100 -DateKind String
+  $standard.Remove('harness_sha256'); $standard.Remove('harness_worktree_dirty')
+  $standard | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $directPath -Encoding utf8
+  $standardConsumed = Get-MIR42QualificationUpgradeReceipt -RepoRoot $repo -Target f200 -Path $directPath -Candidate $selectedCandidate
+  Assert-MIR42QualificationTest ($standardConsumed.source_commit -ceq $source.commit) 'direct-schema3-standard-mode-retains-existing-harness-contract'
+  $negativeCases = @(
+    @{name='dirty-harness';change={param($record) $record.harness_worktree_dirty=$true}},
+    @{name='incomplete-harness-binding';change={param($record) $record.Remove('harness_sha256')}},
+    @{name='materialized-without-harness-binding';change={param($record) $record.Remove('harness_sha256');$record.Remove('harness_worktree_dirty');$record.candidate_materialization=@{}}},
+    @{name='missing-source-activation';change={param($record) $record.Remove('source_library_activation')}},
+    @{name='unrestored-controls';change={param($record) $record.library_activation.status='active'}},
+    @{name='dependency-copy';change={param($record) $record.library_activation.dependency_payload_bytes_copied=1}},
+    @{name='archive-link';change={param($record) $record.source_library_activation.archive_links_created=1}},
+    @{name='extraction';change={param($record) $record.library_activation.archive_extractions=1}},
+    @{name='candidate-selection-hash';change={param($record) $record.library_activation.selected[0].sha256=('0' * 64)}},
+    @{name='predecessor-selection-version';change={param($record) $record.source_library_activation.selected[0].version='4.2.20001'}},
+    @{name='missing-native-stage';change={param($record) $record.factorio_processes=3}}
+  )
+  foreach ($case in $negativeCases) {
+    $invalid = $direct | ConvertTo-Json -Depth 100 | ConvertFrom-Json -AsHashtable -Depth 100 -DateKind String
+    & $case.change $invalid | Out-Null
+    $invalid | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $directPath -Encoding utf8
+    $message = ''
+    try { Get-MIR42QualificationUpgradeReceipt -RepoRoot $repo -Target f200 -Path $directPath -Candidate $selectedCandidate | Out-Null }
+    catch { $message = $_.Exception.Message }
+    Assert-MIR42QualificationTest ($message -ceq '[mir42-qualification-upgrade-direct-library] f200') ('direct-schema3-refuses-'+$case.name)
+  }
+
   $bad = Get-Content -Raw -LiteralPath $receipts.f200 | ConvertFrom-Json -Depth 100 -DateKind String
   $bad.to.sha256 = ('0' * 64)
   $badPath = Join-Path $testRoot 'receipts/f200/bad-result.json'

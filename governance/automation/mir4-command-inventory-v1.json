@@ -5331,9 +5331,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
       "classification": "canonical-internal",
-      "sha256": "38A3D747DAFE4C436A6097E4A932E719B89C923B951E33CBCF1AD894A2DDAC2E",
+      "sha256": "07B386F968EFF149963C4AB7882891177B49B6769833396F710B1A971EEA5ECA",
       "hash_mode": "canonical-text-v1",
-      "lines": 856,
+      "lines": 887,
       "package_visible": false
     },
     {
@@ -6050,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2442c482a6203852f69535aac48ad864909936600ec25ee8c804933eeccd4f19"
+  "digest": "sha256:f853a49fa120383f0e70e56f444b9e9b8f4b54c2b486981246b55e2693d7b33a"
 }

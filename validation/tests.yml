@@ -230,6 +230,7 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetEvidenceGenerators.ps1",
+        "tests/release/Test-MIR42FourTargetEvidenceReconciliation.ps1",
         "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
         "tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
