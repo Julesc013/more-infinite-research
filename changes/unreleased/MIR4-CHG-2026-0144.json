@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0144",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Require compatible machine fluid filters when acquiring labs and research ingredients.",
+  "details": [
+    "The shared machine index records directional fluid filters once. Distinct recipe fluids need distinct compatible capacity; one unfiltered port cannot satisfy several fluids while incompatible filtered ports inflate the total.",
+    "The actual lab and science services retain independent alternatives, compatible machine research gates and self-lock rejection. Rocket construction uses the same input check; real recipe-source replacement invalidates warm filter decisions.",
+    "Controlled Lua tests reproduce the predecessor failure. Exact native slot assignment, fluidbox_index, temperatures, production, changed catalogues and saved-world behavior remain separate qualification requirements."
+  ],
+  "semantic_domains": [
+    "compatibility",
+    "progression"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared recipe acquisition consumes directional machine fluid filters; current-package native qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared recipe acquisition consumes directional machine fluid filters; current-package native qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared recipe acquisition consumes directional machine fluid filters; current-package native qualification remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared recipe acquisition consumes directional machine fluid filters; current-package native qualification remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "not-applicable",
+      "reason": "This shared acquisition implementation is not composed into the early historical research-only targets."
+    },
+    {
+      "target": "F016",
+      "disposition": "not-applicable",
+      "reason": "This shared acquisition implementation is not composed into the early historical research-only targets."
+    },
+    {
+      "target": "F015",
+      "disposition": "not-applicable",
+      "reason": "This shared acquisition implementation is not composed into the early historical research-only targets."
+    },
+    {
+      "target": "F014",
+      "disposition": "not-applicable",
+      "reason": "This shared acquisition implementation is not composed into the early historical research-only targets."
+    },
+    {
+      "target": "F013",
+      "disposition": "not-applicable",
+      "reason": "This shared acquisition implementation is not composed into the early historical research-only targets."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "A04/PROG-01: acquired fluid machines previously ignored incompatible input/output filters",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/lab_reachability.lua, researchability_planning.lua and recipe_source_epoch.lua: real consumer, frontier, silo and replacement controls",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/science-integration.md",
+      "kind": "document"
+    }
+  ]
+}
