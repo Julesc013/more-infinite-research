@@ -180,12 +180,36 @@ function Get-MIR4CommunityByteSha256([byte[]]$Bytes) {
  try { return (($algorithm.ComputeHash($Bytes) | ForEach-Object { $_.ToString('X2') }) -join '') }
  finally { $algorithm.Dispose() }
 }
+function Test-MIR4CommunitySnapshotLineage([string]$SnapshotCommit,[string]$Head='HEAD') {
+ & git -C $RepoRoot merge-base --is-ancestor $SnapshotCommit $Head 2>$null
+ if($LASTEXITCODE -eq 0) { return $true }
+ # The governed main promotion preserves the exact dev tree through a squash,
+ # not dev's parent edges. Follow only an exact, single-parent tree binding in
+ # this head's history. A trailer alone never establishes evidence lineage.
+ $promotions=@(& git -C $RepoRoot log $Head --format=%H --grep='^MIR4-Frozen-Dev-Commit: ' 2>$null)
+ if($LASTEXITCODE -ne 0) { return $false }
+ foreach($promotion in $promotions) {
+  $body=(@(& git -C $RepoRoot show -s --format=%B $promotion 2>$null) -join "`n")
+  if($LASTEXITCODE -ne 0) { continue }
+  $bindings=[regex]::Matches($body,'(?m)^MIR4-Frozen-Dev-Commit: ([0-9a-f]{40})\r?$')
+  if($bindings.Count -ne 1) { continue }
+  $frozen=$bindings[0].Groups[1].Value
+  $parents=([string](& git -C $RepoRoot show -s --format=%P $promotion 2>$null)).Trim()
+  if($LASTEXITCODE -ne 0 -or $parents -cnotmatch '^[0-9a-f]{40}$') { continue }
+  $promotedTree=@(& git -C $RepoRoot rev-parse --verify "$promotion`^{tree}" 2>$null)
+  if($LASTEXITCODE -ne 0 -or $promotedTree.Count -ne 1) { continue }
+  $frozenTree=@(& git -C $RepoRoot rev-parse --verify "$frozen`^{tree}" 2>$null)
+  if($LASTEXITCODE -ne 0 -or $frozenTree.Count -ne 1 -or $promotedTree[0] -cne $frozenTree[0]) { continue }
+  & git -C $RepoRoot merge-base --is-ancestor $SnapshotCommit $frozen 2>$null
+  if($LASTEXITCODE -eq 0) { return $true }
+ }
+ return $false
+}
 $scienceRelativePath='spec/programmes/evidence/synthesis-2026-09-06/science-modules.json'
 $scienceEvidence=Resolve-MIR4CommunityRepositoryPath $scienceRelativePath
 $scienceSnapshotCommit='abe152a332741db268a39b5088866e5aab634fed'
 $scienceSnapshotBlob='1b2fda97662d1e281f2a21781f937c48d467c277'
-& git -C $RepoRoot merge-base --is-ancestor $scienceSnapshotCommit HEAD 2>$null
-if($LASTEXITCODE -ne 0) { throw '[synthesis-science-proof-snapshot-not-ancestor]' }
+if(-not(Test-MIR4CommunitySnapshotLineage $scienceSnapshotCommit)) { throw '[synthesis-science-proof-snapshot-not-ancestor]' }
 $scienceSnapshot=Get-MIR4CommunityGitBlob $scienceSnapshotCommit $scienceRelativePath
 if($scienceSnapshot.object_id -cne $scienceSnapshotBlob) { throw '[synthesis-science-proof-snapshot-blob]' }
 $scienceCurrentBytes=[IO.File]::ReadAllBytes($scienceEvidence)
@@ -204,8 +228,7 @@ $communityPath=Resolve-MIR4CommunityRepositoryPath $communityRelativePath
 if(-not (Test-Path -LiteralPath $communityPath -PathType Leaf)) { throw '[community-evidence-snapshot-record]' }
 $snapshotCommit='464e7bef0e0962fd8472809a7e2e6fe9889682bb'
 $snapshotBlob='1d1670295c94700573f49dbb6199f9ec8d23d388'
-& git -C $RepoRoot merge-base --is-ancestor $snapshotCommit HEAD 2>$null
-if($LASTEXITCODE -ne 0) { throw '[community-evidence-snapshot-not-ancestor]' }
+if(-not(Test-MIR4CommunitySnapshotLineage $snapshotCommit)) { throw '[community-evidence-snapshot-not-ancestor]' }
 $snapshotOutcomes=Get-MIR4CommunityGitBlob $snapshotCommit $communityRelativePath
 if($snapshotOutcomes.object_id -cne $snapshotBlob) { throw '[community-evidence-snapshot-blob]' }
 $currentOutcomesBytes=[IO.File]::ReadAllBytes($communityPath)
