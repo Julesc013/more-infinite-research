@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-10
 supersedes: []
 superseded_by: []
 ---
@@ -41,6 +41,8 @@ Hidden technologies are not rejected merely for being hidden. A hidden implement
 Recipe acquisition and category matching consume the same normalized category facts as productivity-cap policy. An explicit plural list takes precedence over a leftover singular category; an empty or malformed list does not invent a crafting route. Modeled recipe variants inherit their parent's category when neither variant field is declared, and the candidate index contains only those resolved variant categories. Controlled source checks cover these rules and the resulting acquisition decisions; native machine availability and affected catalogue/save behavior still need their selected environment.
 
 A matching crafting category also needs an independently obtainable machine placement item, a declared native capture route, or a matching character crafting category. The shared acquisition solver checks these inputs with the same active research and cycle guards; a machine requiring the lab or product under assessment cannot bootstrap that route. For native capture, a spawner must declare the exact resulting entity, compatible obtainable ammunition must create a positive-speed capture robot through the recognized direct projectile/instant trigger chain, and an obtainable launcher must accept that ammunition. Fixed-recipe machines must name the selected recipe, and machine and spawner surface conditions must have matching location witnesses. Normal queries reuse the existing item placement index; bounded diagnostics reserve their cold visits separately. Research-gated construction or capture remains a later route rather than initial availability. Controlled lab and researchability fixtures exercise these decisions; native placement/capture, power, throughput, other trigger chains, script-created machines, catalogue changes and saved-world behavior remain separate qualification requirements.
+
+Rocket silos cannot prove ordinary acquisition of their construction recipe's item or fluid products: the [native silo contract](https://lua-api.factorio.com/2.1.21/prototypes/RocketSiloPrototype.html#rocket_parts_required) counts completed crafts toward the rocket and ignores those products. An independently acquired ordinary assembler sharing that category can still prove the actual recipe output. Controlled recipe, item-acquisition and downstream-science checks cover both outcomes and invalidate warm results when the ordinary producer disappears. This 4.2.2 correction does not yet admit satellite launch products; that A04 route still needs a complete launch-item, silo, construction, research and surface witness, followed by native production, catalogue and save qualification.
 
 Character crafting cannot supply a recipe with any declared fluid ingredient or result, including a fluid coproduct. This follows the [engine's manual-crafting boundary](https://wiki.factorio.com/Crafting). Selection checks typed entries, so an item sharing a fluid's name remains eligible for ordinary hand crafting. An acquired machine or an independent item-only producer may still supply the route, and a fluid route keeps its machine's research gate. Controlled fixtures exercise the actual lab and science-frontier consumers; they do not establish native production or saved-world migration.
 

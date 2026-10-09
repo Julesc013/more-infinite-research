@@ -30,7 +30,7 @@ stub("prototypes.mir.platform.factorio.prototype_lookup", {
     for name, prototype in pairs(world.item_prototypes) do callback(name, prototype, prototype.type or "item") end
   end,
   each_entity_prototype = function(callback)
-    for _, prototype_type in ipairs({"lab", "assembling-machine", "offshore-pump", "boiler"}) do
+    for _, prototype_type in ipairs({"lab", "assembling-machine", "rocket-silo", "offshore-pump", "boiler"}) do
       for name, prototype in pairs(data.raw[prototype_type] or {}) do callback(name, prototype, prototype_type) end
     end
   end
@@ -204,6 +204,7 @@ local function reset(next_world, fixture_fluid_crafter)
     unit = world.units or {},
     turret = world.turrets or {},
     ["assembling-machine"] = world.assembling_machines or {},
+    ["rocket-silo"] = world.rocket_silos or {},
     tile = world.tiles or {},
     ["offshore-pump"] = world.offshore_pumps or {},
     boiler = world.boilers or {},
@@ -578,6 +579,78 @@ local function route_fact(output, ingredients, options)
       surface_conditions = options.surface_conditions
     }}
   }
+end
+
+-- Rocket-silo crafts count toward construction; their recipe products are
+-- ignored by the engine (RocketSiloPrototype.rocket_parts_required). A launch
+-- product is a separate process and cannot be inferred from that recipe.
+do
+  local previous_version = target_profile.current_factorio_version
+  for _, version in ipairs({"2.0", "2.1"}) do
+    target_profile.current_factorio_version = version
+    reset({
+      item_prototypes = {
+        pack = {type = "item"}, part = {type = "item"},
+        ["silo-kit"] = {type = "item", place_result = "silo"},
+        ["assembler-kit"] = {type = "item", place_result = "assembler"}
+      },
+      labs = {lab = {inputs = {"pack"}}}, techs = {}, recipe_prototypes = {}, unlockers = {},
+      resources = {
+        ore = {minable = {result = "ore", count = 1}},
+        silo = {minable = {result = "silo-kit", count = 1}},
+        assembler = {minable = {result = "assembler-kit", count = 1}}
+      },
+      recipe_facts = {
+        parts = route_fact("part", {{name = "ore", amount = 1}}, {categories = {"rocket-building"}}),
+        pack = route_fact("pack", {{name = "part", amount = 1}})
+      },
+      producers = {part = {"parts"}, pack = {"pack"}},
+      rocket_silos = {silo = {
+        name = "silo", crafting_categories = {"rocket-building"}, fixed_recipe = "parts",
+        rocket_parts_required = 100, rocket_entity = "rocket"
+      }}
+    })
+    check("ROCKET01-" .. version,
+      feasibility.initial_recipe_witness("parts", "part") == nil,
+      "An obtainable silo does not emit the item listed in its construction recipe")
+    check("ROCKET02-" .. version,
+      feasibility.acquisition_witness("part") == nil,
+      "The shared item-acquisition solver rejects phantom silo recipe products")
+    check("ROCKET03-" .. version,
+      production.pack_production_status("pack", {}) == "unreachable",
+      "A downstream science recipe cannot consume the silo's discarded product")
+
+    -- An ordinary assembler may legitimately share the category. Reject the
+    -- silo actor, not the recipe name or the category as a whole.
+    world.assembling_machines = {
+      assembler = {crafting_categories = {"rocket-building"}, fixed_recipe = "parts"}
+    }
+    data.raw["assembling-machine"] = world.assembling_machines
+    world.recipe_source_epoch = 2
+    reset(world)
+    local part = feasibility.acquisition_witness("part")
+    check("ROCKET04-" .. version,
+      part and part.machine and part.machine.prototype_type == "assembling-machine"
+        and production.pack_production_status("pack", {}) == "initial",
+      "A separate obtainable assembler proves the real output and downstream science route")
+    world.assembling_machines.assembler = nil
+    world.recipe_source_epoch = 3
+    check("ROCKET05-" .. version,
+      feasibility.acquisition_witness("part") == nil
+        and production.pack_production_status("pack", {}) == "unreachable",
+      "Removing the real producer invalidates its warm acquisition and science results")
+
+    world.recipe_facts.parts = route_fact("ignored-fluid", {}, {
+      categories = {"rocket-building"},
+      results = {{type = "fluid", name = "ignored-fluid", amount = 10}}
+    })
+    world.rocket_silos.silo.fluid_boxes = {{production_type = "output"}}
+    world.recipe_source_epoch = 4
+    check("ROCKET06-" .. version,
+      feasibility.initial_recipe_witness("parts", {type = "fluid", name = "ignored-fluid"}) == nil,
+      "Adding output ports cannot make a silo emit discarded fluid recipe products")
+  end
+  target_profile.current_factorio_version = previous_version
 end
 
 local function feasibility_world()
