@@ -125,15 +125,16 @@ function Get-MIR4TargetMaterializationBindings {
 
 function Get-MIR4PrivatePatchPackageReadmeBytes {
   [CmdletBinding()]
-  param([Parameter(Mandatory)][byte[]]$ReadmeBytes,[Parameter(Mandatory)][string]$DistributionVersion)
+  param([Parameter(Mandatory)][byte[]]$ReadmeBytes,[Parameter(Mandatory)][string]$DistributionVersion,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1')
   if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
   $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
-  if ([int]$decoded.source_patch -ne 1) { throw '[mir4-private-patch-package-source-patch]' }
+  if ([int]$decoded.source_patch -ne [int]($SourceVersion.Split('.')[2])) { throw '[mir4-private-patch-package-source-patch]' }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $readme = $utf8.GetString($ReadmeBytes).Replace("`r`n", "`n")
   # Package bytes identify their source. Qualification belongs to the external
   # release evidence, so the frozen candidate needs no prose rewrite at publication.
-  $heading = "MIR $DistributionVersion, source 4.2.1.`n`n"
+  $heading = "MIR $DistributionVersion, source $SourceVersion.`n`n"
   if (-not $readme.StartsWith($heading, [StringComparison]::Ordinal)) { $readme = $heading + $readme }
   return ,$utf8.GetBytes($readme)
 }
@@ -142,12 +143,13 @@ function Write-MIR4PrivatePatchPackageIdentity {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$Tree,
-    [Parameter(Mandatory)][string]$DistributionVersion
+    [Parameter(Mandatory)][string]$DistributionVersion,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1'
   )
 
   if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
   $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
-  if ([int]$decoded.source_patch -ne 1) { throw '[mir4-private-patch-package-source-patch]' }
+  if ([int]$decoded.source_patch -ne [int]($SourceVersion.Split('.')[2])) { throw '[mir4-private-patch-package-source-patch]' }
   $targetLines = @{ '210'='2.1'; '200'='2.0'; '110'='1.1'; '100'='1.0'; '017'='0.17'; '016'='0.16'; '015'='0.15'; '014'='0.14'; '013'='0.13' }
   $targetCode = [string]$decoded.distribution_target_code
   if (-not $targetLines.ContainsKey($targetCode)) { throw '[mir4-private-patch-package-target]' }
@@ -169,11 +171,11 @@ function Write-MIR4PrivatePatchPackageIdentity {
   [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
   $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
   if (-not $firstVersion.Success -or $firstVersion.Groups[1].Value -cne $DistributionVersion) {
-    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source 4.2.1.`n"
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source $SourceVersion.`n"
     [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
   }
   if ($null -ne $readme) {
-    [IO.File]::WriteAllBytes($readmePath, (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion))
+    [IO.File]::WriteAllBytes($readmePath, (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion))
   }
 }
 
@@ -236,8 +238,8 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -ceq '4.2.1') {
-    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version)
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2')) {
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output
   $inventory = Get-MIR4ArchiveInventory -Path $archive
