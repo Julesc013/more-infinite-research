@@ -42,6 +42,12 @@ Keep GitHub release immutability disabled and do not restore removed rulesets. T
 
 Stage every accepted asset before publication; verify exact tag/source, filenames, sizes and hashes in one draft. Reconcile interrupted operations by actual release ID and server state before retrying. Publish the existing draft as final, then stream anonymous downloads and check their SHA-256. Record the receipt and primary-checkout handoff before starting the maintainer-managed six-hour Portal rollout. Documentation maintenance never rebuilds the published packages.
 
+## Published 4.2.1 acceptance boundary
+
+On 9 October, after the remaining qualification/signing/recovery/review gaps were disclosed, the maintainer instructed immediate tagging and publication and confirmed the exact development tree to promote to main. [PR #599](https://github.com/Julesc013/more-infinite-research/pull/599) used the existing main-based exact-tree squash topology. [v4.2.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.1), published on 10 October 2026 AEDT, names main commit `27c4777c27b3287f18df02e200235a1870bac465`, after the package-excluded proof-lineage repair in PR #598; its nine player packages remain byte-identical to development commit `3f93d4f51db02b27d0800fa13ba9de694cab552e`. All nine H ZIP hashes and all sixteen public asset downloads were verified. The release is unsigned and mutable; its manifest and notes disclose the incomplete joined qualification, graphical/client/historical checks, signing, independent review and restore work.
+
+This later maintainer acceptance superseded the earlier conditional publication timing only for those accepted bytes. The original conditional authorization, blocked readiness records and 4.2.0 receipts retain their original meaning. No missing result was converted to a pass, no signature was invented, and no external protection or immutability setting was changed. The [4.2.2 handoff](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.1/MIR-4.2.2-backlog.md) carries unfinished work forward. The normal readiness sequence below remains the default for subsequent releases; the 4.2.1 decision is not a reusable waiver.
+
 ## Readiness order
 
 1. Reconcile exact repository, programme, queue, branch, and external-state identity.
