@@ -7815,6 +7815,8 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+        "fixtures/release-inputs/mir421-published-420-manifest.json",
+        "fixtures/release-inputs/mir422-published-421-manifest.json",
         "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
         "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
         "tools/mir/application/package/TargetMaterializer.ps1",
@@ -8413,5 +8415,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d7394d4cb822fd37a38760412a8d41ff4a12fe26fe198b0dc4e288172633469c"
+  "digest": "sha256:8c8797041fab70085aa32075be297c2e5088c0a0f8b4a939daa48281013ed41a"
 }

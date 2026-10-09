@@ -203,6 +203,24 @@ foreach($target in @('f210','f200')){
   $code=$target.Substring(1)
   $mode=@{Target=$target;FromVersion="4.2.${code}00";ToVersion="4.2.${code}01";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile=''}
   Assert-MIR421CurrentUpgradeInputMode @mode;$currentAssertions++
+  $mode422=$mode.Clone();$mode422.SourceVersion='4.2.2';$mode422.FromVersion="4.2.${code}01";$mode422.ToVersion="4.2.${code}02"
+  Assert-MIR421CurrentUpgradeInputMode @mode422;$currentAssertions++
+  foreach($case in @('SourceVersion','FromVersion','ToVersion','SpaceIsFake','K2ImersiteInputProfile','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
+    $invalid422=$mode422.Clone()
+    $invalid422[$case]=switch($case){
+      'SourceVersion' {'4.2.1'}
+      'FromVersion' {"4.2.${code}00"}
+      'ToVersion' {"4.2.${code}01"}
+      'SpaceIsFake' {$true}
+      'K2ImersiteInputProfile' {'old-k2-profile.json'}
+      'SourceOnlyFixtureNames' {@('unrequested')}
+      'PublishedPredecessorManifest' {''}
+      'Retention' {'Never'}
+    }
+    $rejected=$false
+    try{Assert-MIR421CurrentUpgradeInputMode @invalid422}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-')}
+    if(-not$rejected){throw "4.2.2 current-package invalid mode accepted: $target $case"};$currentAssertions++
+  }
   $sif=$mode.Clone();$sif.SpaceIsFake=$true;$sif.Archetype=if($target-ceq'f210'){'base-continuations'}else{'base-default'}
   Assert-MIR421CurrentUpgradeInputMode @sif;$currentAssertions++
   foreach($case in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SourceOnlyFixtureNames','SelectedReleaseManifest','PublishedPredecessorManifest','Retention','K2ImersiteInputProfile')){
@@ -232,4 +250,32 @@ $currentK2.K2ImersiteInputProfile=''
 $rejected=$false
 try{Assert-MIR421CurrentUpgradeInputMode @currentK2}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-inputs-required]')}
 if(-not$rejected){throw 'Current-package K2 mode accepted without its locked profile'};$currentAssertions++
+# Execute the actual caller statements with a recording reader, so adding a
+# validator parameter without forwarding it cannot pass these controls.
+$readerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$currentMaterialization'-and$node.Right.Extent.Text.StartsWith('Read-MIRNativeProbeCurrentCandidate ')},$true))
+if($readerCalls.Count-ne1){throw 'Current candidate reader assignment missing or ambiguous'}
+$modeCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR421CurrentUpgradeInputMode'},$true))
+if($modeCalls.Count-ne1){throw 'Current candidate mode call missing or ambiguous'}
+$modeBlocks=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.IfStatementAst]-and$node.Extent.Text.StartsWith('if($SourceMaterializationPath){')-and$node.Extent.Text.Contains('Assert-MIR421CurrentUpgradeInputMode ')},$true))
+if($modeBlocks.Count-ne1){throw 'Current candidate input block missing or ambiguous'}
+$RepoRootOriginal=$RepoRoot
+try {
+  function Resolve-MIRUpgradePath {param([string]$Path) return $Path}
+  function Read-MIRNativeProbeCurrentCandidate {param($Repository,$Archive,$ReceiptPath,$Target,$SourceVersion) [pscustomobject]@{source=$SourceVersion;target=$Target;archive=$Archive;receipt=$ReceiptPath}}
+  foreach($SourceVersion in @('4.2.1','4.2.2')){
+    $SelectedTarget='f210';$to='selected.zip';$SourceMaterializationPath='selected-receipt.json'
+    $FromVersion=if($SourceVersion-ceq'4.2.2'){'4.2.21001'}else{'4.2.21000'}
+    $ToVersion=if($SourceVersion-ceq'4.2.2'){'4.2.21002'}else{'4.2.21001'}
+    $FixtureName='assert-upgrade-4-0-21000-to-4-1-21000';$Archetype='base-default';$SpaceIsFake=$false
+    $SourceOnlyFixtureNames=@();$SelectedReleaseManifest='';$PublishedMaintenancePredecessorManifestPath='published.json';$Retention='Always';$K2ImersiteInputProfile=''
+    . ([scriptblock]::Create($modeCalls[0].Extent.Text))
+    . ([scriptblock]::Create($readerCalls[0].Extent.Text))
+    if($currentMaterialization.source-cne$SourceVersion-or$currentMaterialization.target-cne'f210'-or$currentMaterialization.archive-cne$to-or$currentMaterialization.receipt-cne$SourceMaterializationPath){throw 'Upgrade caller dropped explicit candidate selection'}
+    $currentAssertions++
+    $Archetype=''
+    . ([scriptblock]::Create($modeBlocks[0].Extent.Text))
+    if($Archetype-cne'base-default'){throw 'Omitted current base archetype could accidentally enable DLC'}
+    $currentAssertions++
+  }
+} finally { $RepoRoot=$RepoRootOriginal }
 [pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

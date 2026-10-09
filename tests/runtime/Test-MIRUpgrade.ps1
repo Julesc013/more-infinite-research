@@ -7,6 +7,7 @@ param(
   [string]$SelectedReleaseManifest = '',
   [string]$SourceMaterializationPath = '',
   [string]$SelectedTarget = '',
+  [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1',
   [switch]$SpaceIsFake,
   [string]$K2ImersiteInputProfile = '',
   [ValidateSet(0,3)][int]$K2ImersiteCap = 3,
@@ -79,13 +80,16 @@ function Assert-MIR421CurrentUpgradeInputMode {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,
     [string]$Archetype,[bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),
     [string]$SelectedReleaseManifest,[string]$PublishedPredecessorManifest,[string]$Retention,
-    [string]$K2ImersiteInputProfile='')
+    [string]$K2ImersiteInputProfile='',
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   if ($Target -cnotin @('f210','f200') -or $SelectedReleaseManifest -or
       -not $PublishedPredecessorManifest -or $Retention -cne 'Always') {
     throw '[mir421-current-upgrade-input-mode]'
   }
   $code=$Target.Substring(1)
-  if ($FromVersion -cne "4.2.${code}00" -or $ToVersion -cne "4.2.${code}01" -or $SourceOnlyFixtureNames.Count) {
+  $toPatch=([version]$SourceVersion).Build
+  $fromPatch=$toPatch-1
+  if ($FromVersion -cne ('4.2.'+$code+$fromPatch.ToString('00')) -or $ToVersion -cne ('4.2.'+$code+$toPatch.ToString('00')) -or $SourceOnlyFixtureNames.Count) {
     throw '[mir421-current-upgrade-transition]'
   }
   if ($K2ImersiteInputProfile -or $FixtureName -ceq 'assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001') {
@@ -318,7 +322,8 @@ if($k2Scenario -or $K2ImersiteInputProfile){
 }
 if($PSBoundParameters.ContainsKey('K2ImersiteCap')-and-not$k2Scenario){throw '[mir421-k2-upgrade-input-mode]'}
 if($SourceMaterializationPath){
-  Assert-MIR421CurrentUpgradeInputMode -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SelectedReleaseManifest $SelectedReleaseManifest -PublishedPredecessorManifest $PublishedMaintenancePredecessorManifestPath -Retention $Retention -K2ImersiteInputProfile $K2ImersiteInputProfile
+  Assert-MIR421CurrentUpgradeInputMode -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SelectedReleaseManifest $SelectedReleaseManifest -PublishedPredecessorManifest $PublishedMaintenancePredecessorManifestPath -Retention $Retention -K2ImersiteInputProfile $K2ImersiteInputProfile -SourceVersion $SourceVersion
+  if (-not $SpaceIsFake -and -not $k2Scenario -and -not $Archetype) { $Archetype='base-default' }
 }
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $engineData=Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorio))) 'data'
@@ -331,7 +336,7 @@ if($SourceMaterializationPath){
   # Harness-only corrections need not rebuild identical player archives. The
   # existing native reader checks current bindings and supplied archive bytes;
   # this mode does not relax the separate frozen-source release-seal reader.
-  $currentMaterialization=Read-MIRNativeProbeCurrentCandidate -Repository $RepoRoot -Archive $to -ReceiptPath (Resolve-MIRUpgradePath $SourceMaterializationPath) -Target $SelectedTarget
+  $currentMaterialization=Read-MIRNativeProbeCurrentCandidate -Repository $RepoRoot -Archive $to -ReceiptPath (Resolve-MIRUpgradePath $SourceMaterializationPath) -Target $SelectedTarget -SourceVersion $SourceVersion
   if($ToVersion-cne$currentMaterialization.receipt.distribution_version){throw '[mir-upgrade-manifest-explicit-version]'}
 } elseif ($SelectedReleaseManifest -and -not $SpaceIsFake) {
   $selectedVersion=Resolve-MIRUpgradeManifestVersion -ManifestPath (Resolve-MIRUpgradePath -Path $SelectedReleaseManifest) -CandidatePath $to -Target $SelectedTarget
@@ -341,14 +346,18 @@ if($SourceMaterializationPath){
 $sifDescriptor=$null
 $sifInputs=@()
 $publishedInputs=$null
-if ($SpaceIsFake -or $k2Scenario -or $currentMaterialization) {
+if ($SpaceIsFake -or $k2Scenario -or $currentMaterialization -or $PublishedMaintenancePredecessorManifestPath) {
   . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
-  $metadataText=(& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+  $predecessorContract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $SourceVersion
+  $metadataText=(& gh api ('repos/Julesc013/more-infinite-research/releases/tags/'+$predecessorContract.source_tag) | Out-String)
   if ($LASTEXITCODE -ne 0) { throw '[mir421-upgrade-release-metadata]' }
-  $publishedInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+  $publishedInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $SourceVersion
   $predecessor=@($publishedInputs.targets | Where-Object target -CEQ $SelectedTarget)
   if ($predecessor.Count -ne 1 -or [string]$predecessor[0].path -cne $from -or
+      [string]$predecessor[0].version -cne $FromVersion -or
       (Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash -cne $predecessor[0].sha256) { throw '[mir421-upgrade-published-predecessor]' }
+  $expectedTo=New-MIR4DistributionIdentityProjection -DistributionTargetCode $SelectedTarget.Substring(1) -SourceMinor 2 -SourcePatch ([version]$SourceVersion).Build
+  if ($ToVersion -cne $expectedTo.distribution_version) { throw '[mir-upgrade-manifest-explicit-version]' }
 }
 if ($SpaceIsFake) {
   if ((-not $SelectedReleaseManifest -and -not $currentMaterialization) -or -not $PublishedMaintenancePredecessorManifestPath) { throw '[mir421-sif-manifests-required]' }
@@ -484,9 +493,11 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   $dependencyFrom = "more-infinite-research >= $fixtureFrom"
   if (-not $stagedInfo.Contains($dependencyFrom)) { throw 'MIR 4.2 upgrade fixture dependency anchor changed.' }
   [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo.Replace($dependencyFrom, "more-infinite-research >= $FromVersion"), [Text.UTF8Encoding]::new($false))
-  if ($targetCode -cin @('210','200') -and $FromVersion -ceq "4.2.${targetCode}00" -and
-      $ToVersion -ceq "4.2.${targetCode}01" -and -not $SpaceIsFake -and $Archetype -cin @('','base-default')) {
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode)
+  if ($targetCode -cin @('210','200') -and
+      (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
+       ($FromVersion -ceq "4.2.${targetCode}01" -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
+      -not $SpaceIsFake -and $Archetype -cin @('','base-default')) {
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion
   }
 }
 if ($isHistoricalTerminalFixture) {

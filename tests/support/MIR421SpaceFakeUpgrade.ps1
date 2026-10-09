@@ -1,9 +1,12 @@
 # Optional native scenario inputs for the existing manifest-driven upgrade runner.
 function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
-    [Parameter(Mandatory)][ValidateSet('f210','f200')][string]$Target)
+    [Parameter(Mandatory)][ValidateSet('f210','f200')][string]$Target,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   # Only the disposable prepared fixture changes. Its SIF counterpart keeps
-  # 0.1.0, so both exact inputs can coexist in the direct archive library.
+  # 0.1.0; base upgrades to 4.2.1/4.2.2 use 0.1.1/0.1.2 respectively so
+  # different prepared bytes never compete for one installed mod identity.
+  $fixtureVersion=if($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
@@ -11,11 +14,11 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   $code=$Target.Substring(1)
   $line=if($Target-ceq'f210'){'2.1'}else{'2.0'}
   if($info.name-cne"mir-fixture-assert-upgrade-4-0-${code}00-to-4-1-${code}00"-or
-    $info.factorio_version-cne$line-or$info.version-cnotin@('0.1.0','0.1.1')){
+    $info.factorio_version-cne$line-or$info.version-cnotin@('0.1.0',$fixtureVersion)){
     throw '[mir421-modern-base-fixture-template]'
   }
-  if($info.version-ceq'0.1.1'){return}
-  $info.version='0.1.1'
+  if($info.version-ceq$fixtureVersion){return}
+  $info.version=$fixtureVersion
   [IO.File]::WriteAllText($path,($info|ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false))
 }
 
