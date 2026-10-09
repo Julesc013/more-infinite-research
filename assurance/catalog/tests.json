@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 228,
+  "test_count": 229,
   "tests": [
     {
       "id": "docs.check",
@@ -8158,6 +8158,29 @@
       "matrix": null
     },
     {
+      "id": "static.modern-launch-return-harness",
+      "proposition": "The governed test 'static.modern-launch-return-harness' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRModernLaunchReturnStatic.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIRModernLaunchReturnStatic.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRModernLaunchReturn.ps1",
+        "tests/runtime/Test-MIRModernLaunchReturnStatic.ps1",
+        "tests/runtime/modern_launch_return_controls.lua",
+        "fixtures/assert-modern-launch-return/**"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.museum",
       "proposition": "The governed test 'static.museum' passes for its exact selected inputs.",
       "cohort": "compatibility-historical",
@@ -8336,11 +8359,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 69,
-      "runtime-upgrade": 56,
+      "runtime-upgrade": 57,
       "compiler-static": 19,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 215,
+    "canonical_test_commands": 216,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8353,5 +8376,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2f0f3dfa6fa7a24e63efe244d1d4adcc192778277320518190401333efb286b8"
+  "digest": "sha256:644422ca3f58949b59b2b96fe5d418235995c558d54ab7c3d9d4a1eb8b87284e"
 }

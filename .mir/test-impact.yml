@@ -7,6 +7,12 @@
   ],
   "paths": [
     {
+      "pattern": "tests/runtime/Test-MIRModernLaunchReturn*.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
       "pattern": "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
       "scenarios": [],
       "tags": [],
