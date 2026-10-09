@@ -30,9 +30,19 @@ local function build()
   local placeable_items_by_entity_type = {}
   local placeable_items_by_entity_name = {}
   local module_items_by_tier = {}
+  local spoilage_transitions = {}
   local item_rows, placeable_rows, module_rows = 0, 0, 0
   lookup.each_item_prototype(function(name, prototype, item_type)
     item_rows = item_rows + 1
+    -- ItemPrototype loads spoil_result only for positive spoil_ticks. Keep
+    -- this native conversion in the shared index; recipe facts cannot see it.
+    if type(prototype) == "table" and type(prototype.spoil_ticks) == "number"
+      and prototype.spoil_ticks > 0 and type(prototype.spoil_result) == "string"
+      and prototype.spoil_result ~= "" then
+      spoilage_transitions[#spoilage_transitions + 1] = {
+        source = name, result = prototype.spoil_result, ticks = prototype.spoil_ticks
+      }
+    end
     local entity_type = type(prototype) == "table"
       and prototype.place_result
       and entity_type_by_name[prototype.place_result]
@@ -54,6 +64,7 @@ local function build()
   for _, names in pairs(placeable_items_by_entity_type) do table.sort(names) end
   for _, names in pairs(placeable_items_by_entity_name) do table.sort(names) end
   for _, names in pairs(module_items_by_tier) do table.sort(names) end
+  table.sort(spoilage_transitions, function(left, right) return left.source < right.source end)
 
   local canonical = {
     schema = SCHEMA,
@@ -61,6 +72,7 @@ local function build()
     placeable_items_by_entity_type = placeable_items_by_entity_type,
     placeable_items_by_entity_name = placeable_items_by_entity_name,
     module_items_by_tier = module_items_by_tier,
+    spoilage_transitions = spoilage_transitions,
     metrics = {
       entity_rows = entity_rows,
       item_rows = item_rows,
@@ -129,6 +141,12 @@ end
 
 function M.snapshot()
   return deepcopy(build())
+end
+
+function M.for_each_spoilage(callback)
+  for _, transition in ipairs(build().spoilage_transitions) do
+    callback(transition.source, transition.result, transition.ticks)
+  end
 end
 
 return M

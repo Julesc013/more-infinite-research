@@ -123,7 +123,7 @@ end
 -- final route is an ordinary, deterministic, non-recovery process.
 local function material_graph()
   return compiler_context.current():state_view("material_route_graph", function()
-    local graph = {typed_edges = {}, complete = true, edge_count = 0}
+    local graph = {typed_edges = {}, spoilage_edges = {}, spoilage_transitions = {}, complete = true, edge_count = 0}
     recipe_facts.for_each(function(_, fact)
       for _, variant in ipairs(fact.variants or {}) do
         local outputs = {}
@@ -153,6 +153,20 @@ local function material_graph()
           end
         end
       end
+    end)
+    item_prototype_facts.for_each_spoilage(function(source, result, ticks)
+      local input_identity = typed_identity({type = "item", name = source})
+      local output_identity = typed_identity({type = "item", name = result})
+      graph.typed_edges[input_identity] = graph.typed_edges[input_identity] or {}
+      if not graph.typed_edges[input_identity][output_identity] then
+        graph.edge_count = graph.edge_count + 1
+        if graph.edge_count > 100000 then graph.complete = false; return end
+        graph.typed_edges[input_identity][output_identity] = true
+      end
+      graph.spoilage_edges[input_identity] = output_identity
+      graph.spoilage_transitions[#graph.spoilage_transitions + 1] = {
+        source = input_identity, result = output_identity, ticks = ticks
+      }
     end)
     return graph
   end)
@@ -235,7 +249,7 @@ local function relevant_return_graph(recipe)
   for _, recipe_name in ipairs(sorted_keys(selected)) do
     facts[#facts + 1] = {name = recipe_name, fact = index.facts[recipe_name]}
   end
-  return {
+  local boundary = {
     schema = 1,
     route = recipe.name,
     input_identities = sorted_keys(inputs),
@@ -244,6 +258,16 @@ local function relevant_return_graph(recipe)
     direct_output_producers = sorted_keys(direct_output_producers),
     facts = facts
   }
+  -- Preserve historical recipe-only fingerprints when no native spoilage
+  -- touches the cone. A changed relevant item transition invalidates its
+  -- certificate even when reachable names and recipe facts stay identical.
+  for _, transition in ipairs(graph.spoilage_transitions) do
+    if reached[transition.source] or outputs[transition.result] then
+      boundary.spoilage_transitions = boundary.spoilage_transitions or {}
+      boundary.spoilage_transitions[#boundary.spoilage_transitions + 1] = transition
+    end
+  end
+  return boundary
 end
 
 local function relevant_route_bindings(recipe_name)
@@ -416,8 +440,9 @@ function R.material_route_is_acyclic(recipe)
   if type(recipe.variants) ~= "table" or #recipe.variants == 0 then return false, "missing-process-variants" end
   local graph = material_graph()
   if not graph.complete then return false, graph.reason or "process-graph-budget" end
+  local recipe_return
   for _, variant in ipairs(recipe.variants or {}) do
-    local inputs, queue, visited = {}, {}, {}
+    local inputs, queue, spoiled_steps, visited, spoiled_visited = {}, {}, {}, {}, {}
     for _, input in ipairs(variant.ingredients or {}) do
       local identity = typed_identity(input)
       if not identity then return false, "missing-process-identity" end
@@ -433,13 +458,28 @@ function R.material_route_is_acyclic(recipe)
     local head = 1
     while head <= #queue do
       if head > 30000 then return false, "process-search-budget" end
-      local identity = queue[head]; head = head + 1
-      if inputs[identity] then return false, "potential-return-path:" .. inputs[identity] end
+      local identity, used_spoilage = queue[head], spoiled_steps[head] == true
+      head = head + 1
+      if inputs[identity] then
+        -- Recipe-only certificates have no authority over a native return.
+        -- Continue past an ordinary return so traversal order cannot hide a
+        -- second path that uses spoilage.
+        if used_spoilage then return false, "potential-spoilage-return-path:" .. inputs[identity] end
+        recipe_return = "potential-return-path:" .. inputs[identity]
+        if next(graph.spoilage_edges) == nil then return false, recipe_return end
+      end
       for next_identity in pairs(graph.typed_edges[identity] or {}) do
-        if not visited[next_identity] then visited[next_identity] = true; queue[#queue + 1] = next_identity end
+        local spoiled = used_spoilage or graph.spoilage_edges[identity] == next_identity
+        local seen = spoiled and spoiled_visited or visited
+        if not seen[next_identity] then
+          seen[next_identity] = true
+          queue[#queue + 1] = next_identity
+          if spoiled then spoiled_steps[#queue] = true end
+        end
       end
     end
   end
+  if recipe_return then return false, recipe_return end
   return true, "no-recipe-return-path"
 end
 

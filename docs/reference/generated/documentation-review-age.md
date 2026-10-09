@@ -118,7 +118,7 @@ Ages are measured against the newest governed review date, 2026-10-10, so checko
 | docs/capabilities/ore-processing.md | draft | 2026-07-07 | 95 | review-soon |
 | docs/capabilities/owner-conflicts.md | current | 2026-07-07 | 95 | review-soon |
 | docs/capabilities/README.md | current | 2026-07-07 | 95 | review-soon |
-| docs/capabilities/recipe-productivity.md | current | 2026-10-07 | 3 | current-window |
+| docs/capabilities/recipe-productivity.md | current | 2026-10-10 | 0 | current-window |
 | docs/capabilities/rule-surfaces.md | current | 2026-07-07 | 95 | review-soon |
 | docs/capabilities/science-integration.md | current | 2026-10-10 | 0 | current-window |
 | docs/capabilities/tile-surfaces.md | draft | 2026-07-07 | 95 | review-soon |

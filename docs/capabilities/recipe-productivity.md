@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-10
 supersedes: []
 superseded_by: []
 ---
@@ -21,6 +21,8 @@ Productive item/fluid identities require a positive output roll and useful bonus
 Supported results that provably cannot occur do not create material return edges, seed candidate process cones or block useful recipes as carrier returns. This includes zero quantities, zero independent rolls and empty native shared-roll intervals. Bonus exclusions do not remove baseline return edges. Unknown or foreign fields, positive fractional returns and positive coproduct paths retain their possible edges. Pattern-selected recipes with no known productive output are withheld. These checks establish possible process connectivity and useful bonus output, without establishing full stoichiometric loop safety or renewable biology acceptance.
 
 Automatic placeable manufacturing uses the canonical productive identity and requires a finite positive fixed item quantity with useful bonus remaining in every retained variant. The family operator reads productivity exclusions from the shared recipe semantics and target profile; explicit zero overrides the modern `ignored_by_stats` default. `non_productive_placeable_output` is a hard family blocker, so a compatibility attachment cannot override it. Existing single-output, deterministic-output, author-permission, risk and ownership gates remain in force. The registered capability-negative fixture includes zero-quantity and fully excluded native cases; current-package fixture, catalogue and save acceptance remain pending.
+
+The material guard also follows native item spoilage when `spoil_ticks` is positive and `spoil_result` names an item. A possible return to a route ingredient through spoilage remains withheld even when a recipe-only forward-route certificate exists. Relevant spoilage transitions, including their duration and alternate producers of the output, enter the certificate fingerprint; disconnected transitions leave existing recipe-only bindings unchanged. These facts share the existing item index and its compiler context. Controlled regressions cover direct and mixed recipe/spoilage paths, version-independent item/fluid separation, cache reuse and certificate rejection. This does not qualify trigger-created products, planting/mining conversions or native production and save behavior.
 
 ## Gates
 
