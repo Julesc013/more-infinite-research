@@ -1,0 +1,95 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0137",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Regenerate preview SDK references against the current fixture registry.",
+  "details": [
+    "Adopt the complete existing generator output from hosted run 37969318408 at source tree 1501b4ccdf88521925c5b1bb946d75d0a0c3abb6. Verify all 186 normalized inputs, the unchanged canonical player-source fingerprint and all five declared output hashes before adoption.",
+    "The lock and dependent compilation, inspection and query records now bind the current fixture registry. Changes are input and derived digests only; no player package or research behavior changes.",
+    "The producing platform-preview failure remains recorded. Its repair output is not accepted test evidence, native qualification or release authority; corrected-source verification is still required."
+  ],
+  "semantic_domains": [
+    "testing"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    },
+    {
+      "target": "F200",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Package-excluded SDK projection and digest refresh; no player-source changes."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/architecture/mir4-platform-preview.md"
+    },
+    {
+      "kind": "finding",
+      "value": "Hosted platform-preview failure in run 37969318408: mir.lock stale after fixture registry changes"
+    }
+  ]
+}
