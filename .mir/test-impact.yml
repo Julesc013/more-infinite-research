@@ -745,6 +745,12 @@
       "scenarios": [],
       "tags": [],
       "groups": [],
+      "pattern": "tests/tooling/Test-MIRNativeProbeResources.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
       "pattern": "tests/support/MIRMaterialAuditInputs.ps1"
     },
     {

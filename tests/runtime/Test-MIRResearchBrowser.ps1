@@ -6,6 +6,7 @@ param(
  [string]$LibraryDirectory='',
  [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
+ [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1',
  [switch]$Graphics,
  [ValidateSet('low','very-low')][string]$GraphicsPreset='low',
  [ValidateSet('None','Defaults','RawOptIn','ImportedOptIn','RawOptInImportedOff')][string]$DlcIconCase='None',
@@ -38,7 +39,7 @@ $run=$resources.root
 $activation=$null
 $candidate=''
 $targetKey=if($Target -ceq '2.0'){'f200'}else{'f210'}
-$expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch 1
+$expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch ([int]$SourceVersion.Split('.')[2])
 function Get-MIRBrowserIconCase([string]$Case) {
  switch -CaseSensitive ($Case) {
   'None' { return $null }
@@ -86,7 +87,7 @@ try {
       $_.FullName -cmatch '[\\\x00]' -or
       @($_.FullName.TrimEnd('/').Split('/') | Where-Object {$_ -in @('','.','..')}).Count -gt 0
     }).Count -ne 0) {
-  throw '[mir-browser-candidate-identity] Candidate filename, root and metadata must encode source 4.2.1 for the selected target.'
+  throw '[mir-browser-candidate-identity] Candidate filename, root and metadata must encode the selected source version and target.'
  }
  foreach($name in @('research_browser.lua','research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')) {
   $entry=@($archive.Entries | Where-Object FullName -CEQ "$packageRoot/prototypes/mir/runtime/$name")
@@ -217,7 +218,7 @@ $coreChecks='check_omissions(check); check_browser_core_regressions(browser_core
 if($PrepareInputsOnly) {
  $preparedRoot=Join-Path $run 'prepared-fixtures';[IO.Directory]::CreateDirectory($preparedRoot)|Out-Null
  $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-browser-test' -Version '1.0.0' -ModsDir $preparedRoot
- Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_commit=$sourceCommit;dlc_icon_case=$DlcIconCase;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
+ Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_version=$SourceVersion;distribution_version=$expectedIdentity.distribution_version;source_commit=$sourceCommit;dlc_icon_case=$DlcIconCase;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
  Write-Output "Browser fixture prepared without native execution or library writes: $run"
  return
 }
@@ -316,6 +317,7 @@ if((Get-FileHash -LiteralPath $engine).Hash -cne $engineSha256 -or
    (& git -C $repo rev-parse HEAD).Trim() -cne $sourceCommit){throw '[mir-browser-input-drift] Engine or source changed during the native run.'}
 $result | Add-Member source_commit $sourceCommit
 $result | Add-Member source_tree $sourceTree
+$result | Add-Member source_version $SourceVersion
 $result | Add-Member distribution_version $expectedIdentity.distribution_version
 $result | Add-Member resource_policy @{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'}
 $result | Add-Member resource_runs $resources.runs.ToArray()
@@ -334,7 +336,7 @@ Write-Output "Evidence: $run"
   try{$cleanup=Complete-MIRLibraryActivation -Activation $activation;$activation=$null}
   catch{$cleanup=@{status='recovery-required';library=$activation.library;error=$_.Exception.Message}}
  }
- try { Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{status='failed';target=$Target;candidate=$candidate;error=$failure.Exception.Message;library_activation=$cleanup;resource_runs=$resources.runs.ToArray()}) }
+ try { Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{status='failed';target=$Target;source_version=$SourceVersion;distribution_version=$expectedIdentity.distribution_version;candidate=$candidate;error=$failure.Exception.Message;library_activation=$cleanup;resource_runs=$resources.runs.ToArray()}) }
  catch { Write-Warning "Browser failure receipt exceeded its remaining budget; retained ledgers are in $run." }
  throw $failure
 }
