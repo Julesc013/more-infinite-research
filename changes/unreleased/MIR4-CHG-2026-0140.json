@@ -4,11 +4,12 @@
   "change_id": "MIR4-CHG-2026-0140",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Carry 4.2.2 maintenance identities through nine-target engine and evidence consumers.",
+  "summary": "Carry 4.2.2 identities through nine-target upgrades, evidence and publication inputs.",
   "details": [
     "The existing joined engine runner selects the matching published predecessor and forwards the source version to its upgrade worker. All nine prepared maintenance fixtures have separate 4.2.1 and 4.2.2 identities while retaining the existing continuity assertions.",
     "Reconciliation, criterion, campaign, independent-rehash and technical-seal readers consume the selected maintenance version. Historical metadata no longer demands obsolete terminal archives for maintenance candidates; custody of the selected published predecessor remains mandatory.",
-    "Focused checks exercise actual preparation branches, version and scope refusals, direct-library activation and existing evidence contracts. These controls establish no native gameplay, upgrade, joined qualification or seal. Release-asset and publication adoption remain outstanding."
+    "Focused checks exercise preparation branches, version and scope refusals, direct-library activation and evidence contracts. These controls establish no native gameplay, upgrade, joined qualification, seal or publication.",
+    "Release-asset and publication-authorization readers bind 4.2.2 to the published 4.2.1 predecessor. Exact target versions, support records and main readback remain mandatory; older authorizations and inherited testing waivers are rejected."
   ],
   "semantic_domains": [
     "testing",
