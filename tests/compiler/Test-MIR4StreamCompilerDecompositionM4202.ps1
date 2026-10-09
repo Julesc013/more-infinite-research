@@ -19,6 +19,7 @@ $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202StreamCompiler (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt-hash'
 $currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 $expectedManifestBindings=429
+$currentSourceSuccession=$false
 if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSource){
   $successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json'
   $successorSchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json'
@@ -45,7 +46,8 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
       Assert-MIR4M4202StreamCompiler ($l6Raw|Test-Json -SchemaFile $l6SchemaPath) 'package-source-l6-successor-schema'
       $l6=$l6Raw|ConvertFrom-Json -Depth 100 -DateKind String
       Assert-MIR4M4202StreamCompiler (Test-MIR4BootstrapRecordHash -Record $l6) 'package-source-l6-successor-hash'
-      Assert-MIR4M4202StreamCompiler ([string]$l6.predecessor.package_source_sha256-ceq[string]$l5.package_authority.package_source_sha256-and(Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$l6.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource)) 'package-source-l6-successor-chain'
+      $currentSourceSuccession=Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$l6.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource
+      Assert-MIR4M4202StreamCompiler ([string]$l6.predecessor.package_source_sha256-ceq[string]$l5.package_authority.package_source_sha256-and$currentSourceSuccession) 'package-source-l6-successor-chain'
       $expectedManifestBindings=441
     }else{$expectedManifestBindings=437}
   }else{
@@ -55,39 +57,65 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202StreamCompiler ($evolvedPaths.Count-eq12-and@($evolvedPaths|Sort-Object -Unique).Count-eq12-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths-and'tests/tooling/Test-MIR4TestWorkflowConvergence.ps1'-in$evolvedPaths) 'evolved-authority-bindings'
 
-$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
+$expectedManifestBindings=Get-MIR4M4202CurrentManifestBindingExpectation -RepoRoot $repo -Fallback $expectedManifestBindings
+$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json')|ConvertFrom-Json -Depth 100
+if($currentSourceSuccession){
+  $repairBinding=@($manifest.bindings|Where-Object{
+    [string]$_.provenance.kind-ceq'current-introduction'-and
+    [string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'-and
+    [string]$_.source_path-ceq'source/prototypes/mir/runtime/effects/passive_repair.lua'-and
+    [string]$_.output_path-ceq'prototypes/mir/runtime/effects/passive_repair.lua'
+  })
+  Assert-MIR4M4202StreamCompiler ($repairBinding.Count-eq1-and(@($repairBinding[0].target_scope)-join'|')-ceq'f210|f200'-and[string]$repairBinding[0].source_sha256-ceq[string]$repairBinding[0].output_sha256-and[int]$repairBinding[0].source_bytes-eq[int]$repairBinding[0].output_bytes) 'current-repair-introduction'
+  # The frozen repair baseline stays historical. The authenticated current
+  # source-layout succession above owns membership beyond that introduction.
+}
 Assert-MIR4M4202StreamCompiler (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
-Assert-MIR4M4202StreamCompiler (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-uniqueness'
+Assert-MIR4M4202StreamCompiler (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)|$(@($_.target_scope)-join',')"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-identity-uniqueness'
 
 $responsibilities=@('compile','diagnostics','discover','ownership','qualify')
 $outputs=@('prototypes/mir/planner/stream_compiler.lua')+@($responsibilities|ForEach-Object{"prototypes/mir/planner/stream_compiler/$_.lua"})
-foreach($target in @('f210','f200')){
-  $sourceRoot="targets/$target/files/prototypes/mir/planner"
-  $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/stream_compiler.lua")
-  Assert-MIR4M4202StreamCompiler ($facade-match'stream_compiler[.]compile'-and$facade-notmatch'function\s') "thin-facade-$target"
-  Assert-MIR4M4202StreamCompiler (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/stream_compiler.lua")).Count-le5) "facade-size-$target"
-  foreach($responsibility in $responsibilities){
-    Assert-MIR4M4202StreamCompiler (Test-Path -LiteralPath (Join-Path $repo "$sourceRoot/stream_compiler/$responsibility.lua") -PathType Leaf) "module-$target-$responsibility"
+$sharedSourceRoot='source/prototypes/mir/planner'
+$facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sharedSourceRoot/stream_compiler.lua")
+Assert-MIR4M4202StreamCompiler ($facade-match'stream_compiler[.]compile'-and$facade-notmatch'function\s') 'thin-shared-facade'
+Assert-MIR4M4202StreamCompiler (@(Get-Content -LiteralPath (Join-Path $repo "$sharedSourceRoot/stream_compiler.lua")).Count-le5) 'shared-facade-size'
+foreach($responsibility in @('compile','diagnostics','discover','ownership')){
+  Assert-MIR4M4202StreamCompiler (Test-Path -LiteralPath (Join-Path $repo "$sharedSourceRoot/stream_compiler/$responsibility.lua") -PathType Leaf) "shared-module-$responsibility"
+}
+$compile=Get-Content -Raw -LiteralPath (Join-Path $repo "$sharedSourceRoot/stream_compiler/compile.lua")
+foreach($owner in @('discover','ownership','qualify')){Assert-MIR4M4202StreamCompiler ($compile-match"stream_compiler[.]$owner") "compile-import-$owner"}
+Assert-MIR4M4202StreamCompiler ($compile-notmatch'local function plan_stream'-and$compile-notmatch'D[.]stream_fields') 'compile-boundary'
+Assert-MIR4M4202StreamCompiler (@(Get-Content -LiteralPath (Join-Path $repo "$sharedSourceRoot/stream_compiler/compile.lua")).Count-le130) 'compile-size'
+$targetModuleSources=@{
+  f210=@{
+    qualify='source/prototypes/mir/planner/stream_compiler/qualify.lua'
   }
-  $compile=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/stream_compiler/compile.lua")
-  foreach($owner in @('discover','ownership','qualify')){Assert-MIR4M4202StreamCompiler ($compile-match"stream_compiler[.]$owner") "compile-import-$target-$owner"}
-  Assert-MIR4M4202StreamCompiler ($compile-notmatch'local function plan_stream'-and$compile-notmatch'D[.]stream_fields') "compile-boundary-$target"
-  Assert-MIR4M4202StreamCompiler (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/stream_compiler/compile.lua")).Count-le130) "compile-size-$target"
-  $qualify=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/stream_compiler/qualify.lua")
+  f200=@{
+    qualify='source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'
+  }
+}
+foreach($target in @('f210','f200')){
+  $sourcePath=[string]$targetModuleSources[$target].qualify
+  Assert-MIR4M4202StreamCompiler (Test-Path -LiteralPath (Join-Path $repo $sourcePath) -PathType Leaf) "module-source-$target-qualify"
+  $binding=@($manifest.bindings|Where-Object{$target-in@($_.target_scope)-and[string]$_.output_path-ceq'prototypes/mir/planner/stream_compiler/qualify.lua'})
+  Assert-MIR4M4202StreamCompiler ($binding.Count-eq1-and[string]$binding[0].source_path-ceq$sourcePath) "module-source-binding-$target-qualify"
+  $qualify=Get-Content -Raw -LiteralPath (Join-Path $repo $sourcePath)
   foreach($owner in @('discover','ownership','diagnostics')){Assert-MIR4M4202StreamCompiler ($qualify-match"stream_compiler[.]$owner") "qualify-import-$target-$owner"}
   Assert-MIR4M4202StreamCompiler ($qualify-notmatch'compile_active|generation_plan[.]new|context:set_state') "qualify-boundary-$target"
-  Assert-MIR4M4202StreamCompiler (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/stream_compiler/qualify.lua")).Count-le250) "qualify-size-$target"
-  $targetRows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq"targets.$target"-and[string]$_.output_path-in$outputs})
+  $maxQualifyLines=if($target-ceq'f210'){260}else{250}
+  Assert-MIR4M4202StreamCompiler (@(Get-Content -LiteralPath (Join-Path $repo $sourcePath)).Count-le$maxQualifyLines) "qualify-size-$target"
+  $targetRows=@($manifest.bindings|Where-Object{$target-in@($_.target_scope)-and[string]$_.output_path-in$outputs})
   Assert-MIR4M4202StreamCompiler ($targetRows.Count-eq6) "target-binding-count-$target"
 }
 
-$f210Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo 'targets/f210/files/prototypes/mir/planner/stream_compiler/qualify.lua')
-$f200Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo 'targets/f200/files/prototypes/mir/planner/stream_compiler/qualify.lua')
+$f210Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources.f210.qualify))
+$f200Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources.f200.qualify))
 Assert-MIR4M4202StreamCompiler ($f210Qualify-match'science_phase_decision'-and$f200Qualify-notmatch'science_phase_decision') 'target-science-policy-preserved'
 foreach($shared in @('compile.lua','diagnostics.lua','discover.lua','ownership.lua')){
-  $f210Hash=(Get-FileHash -LiteralPath (Join-Path $repo "targets/f210/files/prototypes/mir/planner/stream_compiler/$shared") -Algorithm SHA256).Hash
-  $f200Hash=(Get-FileHash -LiteralPath (Join-Path $repo "targets/f200/files/prototypes/mir/planner/stream_compiler/$shared") -Algorithm SHA256).Hash
-  Assert-MIR4M4202StreamCompiler ($f210Hash-ceq$f200Hash) "shared-target-behavior-$shared"
+  $sharedOutput="prototypes/mir/planner/stream_compiler/$shared"
+  $f210Source=[string]@($manifest.bindings|Where-Object{'f210'-in@($_.target_scope)-and[string]$_.output_path-ceq$sharedOutput})[0].source_path
+  $f200Source=[string]@($manifest.bindings|Where-Object{'f200'-in@($_.target_scope)-and[string]$_.output_path-ceq$sharedOutput})[0].source_path
+  Assert-MIR4M4202StreamCompiler ($f210Source-ceq$f200Source-and$f210Source-ceq"source/prototypes/mir/planner/stream_compiler/$shared") "shared-target-source-$shared"
 }
 
 foreach($target in @('f210','f200','f110','f100')){

@@ -1,0 +1,36 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0065",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Reject base continuations whose retained numeric research effects are all zero.",
+  "details": [
+    "Normalization rejects all-zero modifiers or recipe-productivity changes through the shared integrity helper, with a failed effect gate and zero_base_extension_effects reason. Planned ownership uses the same helper when removal leaves only zero values, preserving its existing rejection and ledger.",
+    "Consumed compiler controls reject all-zero continuations before and after planned ownership and preserve mixed effects. Controlled finalizer checks exercise four adapters, recipe-change semantics, signed and small values, existing nonnumeric forms and previous empty/ownership regressions.",
+    "The existing ownership facts module now owns the duplicated material-stage pair predicate used by resolution and compilation validation. Parent identities, effect signatures and the exactly-two-claims rule remain required; the existing module size limits are retained.",
+    "The selected ownership architecture check now enforces canonical shared bytes across its four current target scopes. Its historical receipt, target proofs and module size limits remain separate and unchanged; source binding checks do not claim actual package or native qualification.",
+    "This is an exact-zero admission check, not native usefulness or saturation proof. Actual package rewards, native ownership interactions, upgrades, multiplayer and performance still require qualification; save and migration acceptance remain open."
+  ],
+  "semantic_domains": ["compiler", "runtime", "documentation", "tooling"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The shared compilation planner qualifies base-continuation effects."},
+    {"target":"F200","disposition":"affected","reason":"The shared compilation planner qualifies base-continuation effects."},
+    {"target":"F110","disposition":"affected","reason":"The composed shared compilation planner qualifies base-continuation effects."},
+    {"target":"F100","disposition":"affected","reason":"The composed shared compilation planner qualifies base-continuation effects."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"changed","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"fixtures/assert-compiler-contracts/data-final-fixes.lua: consumed all-zero and mixed-zero base-continuation controls"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

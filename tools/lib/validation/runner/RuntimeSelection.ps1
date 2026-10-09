@@ -116,6 +116,12 @@ if ($ScenarioWorker) {
   }
 }
 $expectedScenarios = Get-MIRExpectedScenarioNames -Registry $scenarioRegistry
+if(@($scenarioRegistry.records|Where-Object {$_.kind -notin @('gate','package')}).Count){
+  throw '[mir-validation-obsolete-runner] Selected runtime scenarios still require conversion to direct-library inputs. Use their migrated focused consumers; populated mod directories are retired.'
+}
+if([string]::IsNullOrWhiteSpace($LibraryDirectory) -or -not(Test-Path -LiteralPath $LibraryDirectory -PathType Container)){
+  throw '[mir-package-library-required] Supply the selected flat archive library; profile staging is retired.'
+}
 $selectedScenarioNames = @{}
 foreach ($name in $expectedScenarios) { $selectedScenarioNames[$name] = $true }
 $requiredGroupsForRun = if ($selectionActive) {

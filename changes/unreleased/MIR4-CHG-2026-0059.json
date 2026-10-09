@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0059",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Require a concrete lab acquisition route before accepting research ingredients.",
+  "details": [
+    "A single lab must accept the full selected ingredient set and have an acquisition witness for its exact placement item. The existing recipe, natural-source and research-unlock solver retains active science and technology boundaries; a merely present or self-locked lab cannot justify research.",
+    "Lab reduction selects only an acquired lab while retaining required packs and phase constraints. Complementary labs do not jointly accept a full research set. Normal queries reuse the existing item index; isolated diagnostics retain their work caps and cannot alter parent admission.",
+    "The consumed fixture checks actual contexts and indexes, staged unlocks, unavailable routes, source epochs and repeated queries. Native power, placement, save, multiplayer, package and overhaul qualification remains pending. Script-created labs need separately declared acquisition evidence.",
+    "The new admission boundary can omit previously proposed research that depended on an unavailable lab. Save and migration impacts remain unknown until actual package and upgrade qualification compares the emitted technology sets; this draft is not technical acceptance."
+  ],
+  "semantic_domains": ["progression", "compiler"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The shared science planner consumes lab acquisition witnesses."},
+    {"target":"F200","disposition":"affected","reason":"The shared science planner and continuation qualifier consume lab acquisition witnesses."},
+    {"target":"F110","disposition":"affected","reason":"The composed shared science implementation consumes lab acquisition witnesses."},
+    {"target":"F100","disposition":"affected","reason":"The composed shared science implementation consumes lab acquisition witnesses."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"This reduced composition does not select the shared science planner."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"This reduced composition does not select the shared science planner."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"This reduced composition does not select the shared science planner."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"This reduced composition does not select the shared science planner."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"This reduced composition does not select the shared science planner."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"compatible","migration":"unknown","compatibility":"changed","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/lab_reachability.lua: consumed acquisition, staged lab, source epoch, diagnostic and repeated-query controls"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

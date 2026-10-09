@@ -4,6 +4,17 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+$preCutoverCommit = '297aa5cc902da96847165a4f9caa1048608839fb'
+
+function Read-MIR4SOL03HistoricalSource {
+  param([Parameter(Mandatory)][string]$RelativePath)
+  $text = @(& git -C $RepoRoot show "${preCutoverCommit}:$RelativePath")
+  if ($LASTEXITCODE -ne 0 -or $text.Count -eq 0) {
+    throw "SOL-03 pinned historical authority is absent: $RelativePath"
+  }
+  return $text -join "`n"
+}
 $path = Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Maximum-Level-Binding-SOL03V1.json"
 $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
 $shaPattern = '^[A-F0-9]{64}$'
@@ -86,13 +97,14 @@ $requiredAuthorities = @(
   "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua"
 )
 foreach ($relative in $requiredAuthorities) {
-  if ($relative -notin @($record.implementation_authorities) -or -not (Test-Path -LiteralPath (Join-Path $RepoRoot $relative))) {
+  if ($relative -notin @($record.implementation_authorities)) {
     throw "SOL-03 implementation authority is missing: $relative"
   }
+  $null = Read-MIR4SOL03HistoricalSource -RelativePath $relative
 }
-$bindingSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/domain/technology/maximum_level_binding.lua")
-$runtimeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/runtime/maximum_level_control.lua")
-$repairSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua")
+$bindingSource = Read-MIR4SOL03HistoricalSource -RelativePath 'prototypes/mir/domain/technology/maximum_level_binding.lua'
+$runtimeSource = Read-MIR4SOL03HistoricalSource -RelativePath 'prototypes/mir/runtime/maximum_level_control.lua'
+$repairSource = Read-MIR4SOL03HistoricalSource -RelativePath 'prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua'
 foreach ($token in @("MIRMaximumLevelPolicyV3", "exact-technology", "exact-native-owner", "exact-stream", "ecosystem-profile", "factorio-data-final-fixes-v1")) {
   if ($bindingSource -notmatch [regex]::Escape($token)) {
     throw "Maximum-level binding authority lacks required V3 token: $token"

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MIR421NativeEngineInputsV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "source_version", "status", "qualification_authorized", "publication_authorized", "f210_observation", "targets", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR421NativeEngineInputsV1"},
+    "source_version": {"const": "4.2.1"},
+    "status": {"const": "locked-native-inputs-qualification-pending"},
+    "qualification_authorized": {"const": false},
+    "publication_authorized": {"const": false},
+    "f210_observation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["steam_beta_key", "steam_build_id", "runtime_api_sha256", "prototype_api_sha256", "changelog_sha256"],
+      "properties": {
+        "steam_beta_key": {"const": "experimental"},
+        "steam_build_id": {"type": "string", "pattern": "^[0-9]+$"},
+        "runtime_api_sha256": {"$ref": "#/$defs/sha"},
+        "prototype_api_sha256": {"$ref": "#/$defs/sha"},
+        "changelog_sha256": {"$ref": "#/$defs/sha"}
+      }
+    },
+    "targets": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["target", "platform", "product_version", "file_version", "sha256"],
+        "properties": {
+          "target": {"enum": ["f210", "f200", "f110", "f100"]},
+          "platform": {"const": "win64"},
+          "product_version": {"type": "string", "pattern": "^[0-9]+[.][0-9]+[.][0-9]+$"},
+          "file_version": {"type": "string", "pattern": "^[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+$"},
+          "sha256": {"$ref": "#/$defs/sha"}
+        }
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha"}
+  },
+  "$defs": {"sha": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

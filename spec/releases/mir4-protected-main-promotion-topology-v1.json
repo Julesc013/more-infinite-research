@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "kind": "MIR42ProtectedMainPromotionTopologyV1",
+  "release_line": "4.2",
+  "status": "implemented-and-synthetically-rehearsed-release-blocked",
+  "strategy": "main-based-tree-transplant-protected-pr",
+  "selection": {
+    "reason": "Protected branches require a pull request and linear history. A qualified dev commit is therefore represented by one single-parent candidate whose tree is transplanted through a protected squash pull request.",
+    "main_dev_divergence_allowed": true,
+    "main_unique_changes_must_be_patch_equivalent_in_dev": true,
+    "protection_exception_allowed": false
+  },
+  "governance": {
+    "canonical_repository": "Julesc013/more-infinite-research",
+    "canonical_main_ref": "refs/heads/main",
+    "policy_observation": "github-rest-v3-current-observation-required",
+    "effective_policy_rechecked_before_merge": true,
+    "synthetic_rehearsal_only": true
+  },
+  "candidate": {
+    "base": "exact observed main commit",
+    "parent_count": 1,
+    "exact_dev_tree": true,
+    "source_commit_trailer_required": true,
+    "create_only_ref": true,
+    "restart_adopts_only_exact_existing_ref": true
+  },
+  "qualification": {
+    "before_promotion": true,
+    "exact_candidate_commit": true,
+    "exact_candidate_tree": true,
+    "exact_target_package_bytes": true,
+    "materializer_blob_bound": true,
+    "exact_current_package_presentation_record_bound": true,
+    "source_manifest_identity_bound": true,
+    "package_authority_identity_bound": true,
+    "governed_independent_receipts_required": true,
+    "package_files_rehashed_at_intention": true,
+    "package_files_rehashed_at_readback": true,
+    "calendar_does_not_waive_gates": true
+  },
+  "promotion": {
+    "target": "main",
+    "merge_method": "squash",
+    "pull_request_required": true,
+    "linear_history_required": true,
+    "required_status_checks": ["branch-policy", "verification-gate"],
+    "commit_identity_changes_at_squash_boundary": true,
+    "candidate_create_only_push": true,
+    "protected_request_contract_required": true,
+    "force_push": false,
+    "branch_deletion": false,
+    "ruleset_mutation": false,
+    "bypass_actor_count": 0
+  },
+  "readback": {
+    "main_base_ancestry_required": true,
+    "exact_tree_required": true,
+    "exact_package_bytes_required": true,
+    "qualified_dev_ref_unchanged_required": true,
+    "direct_main_child_required": true,
+    "commit_message_binding_required": true,
+    "actual_pr_observation_required": true,
+    "squash_method_required": true,
+    "required_checks_observed": true,
+    "commit_rebinding_record_required": true,
+    "human_playtest_after_readback": true
+  },
+  "recovery": {
+    "persist_before_effect": true,
+    "remote_candidate_create_only_required": true,
+    "protected_request_persisted_before_execution": true,
+    "remote_ref_readback_required": true,
+    "ref_drift_fails_closed": true,
+    "tree_or_package_mismatch_creates_new_candidate": true
+  },
+  "authority": {
+    "candidate_allocation": false,
+    "main_mutation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false,
+    "human_acceptance": false
+  }
+}

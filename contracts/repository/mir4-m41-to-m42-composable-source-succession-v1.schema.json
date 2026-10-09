@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-to-m42-composable-source-succession-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "historical", "current", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M41ToM42ComposableSourceSuccessionV1"},
+    "status": {"const": "MIR41-HISTORICAL-SOURCE-FREEZE-PRESERVED-MIR42-COMPOSABLE-SUCCESSOR-VERIFIED"},
+    "recorded_at": {"type": "string", "minLength": 1},
+    "historical": {"type": "object", "additionalProperties": false, "required": ["readiness", "source_freeze"], "properties": {
+      "readiness": {"$ref": "#/$defs/historicalBinding"},
+      "source_freeze": {"$ref": "#/$defs/freezeBinding"}
+    }},
+    "current": {"type": "object", "additionalProperties": false, "required": ["fixed_point", "layout_authority", "layout_proof", "layout_receipt", "package_source_sha256", "package_authority"], "properties": {
+      "fixed_point": {"const": "MIR42-COMPOSABLE-SOURCE-LAYOUT"},
+      "layout_authority": {"$ref": "#/$defs/fileBinding"},
+      "layout_proof": {"$ref": "#/$defs/fileBinding"},
+      "layout_receipt": {"$ref": "#/$defs/recordBinding"},
+      "package_source_sha256": {"$ref": "#/$defs/sha256"},
+      "package_authority": {"$ref": "#/$defs/recordBinding"}
+    }},
+    "invariants": {"type": "object", "additionalProperties": false, "required": ["historical_mir41_lineage_immutable", "current_v2_composable_authority_proven", "package_bytes_unchanged", "current_mir41_release_operations_authorized", "gameplay_semantics_changed"], "properties": {
+      "historical_mir41_lineage_immutable": {"const": true},
+      "current_v2_composable_authority_proven": {"const": true},
+      "package_bytes_unchanged": {"const": true},
+      "current_mir41_release_operations_authorized": {"const": false},
+      "gameplay_semantics_changed": {"const": false}
+    }},
+    "transition_gate": {"type": "object", "additionalProperties": false, "required": ["development_merge", "private_build", "qualification", "technical_seal", "main_promotion", "version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {
+      "development_merge": {"const": true}, "private_build": {"const": false}, "qualification": {"const": false}, "technical_seal": {"const": false}, "main_promotion": {"const": false}, "version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}
+    }},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "historicalBinding": {"type": "object", "additionalProperties": false, "required": ["path", "package_source_sha256", "authority_record_sha256"], "properties": {"path": {"const": "governance/release/mir4-4.1-release-readiness-v1.json"}, "package_source_sha256": {"$ref": "#/$defs/sha256"}, "authority_record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "freezeBinding": {"type": "object", "additionalProperties": false, "required": ["path", "record_sha256", "package_source_sha256", "authority_record_sha256"], "properties": {"path": {"const": "releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "package_source_sha256": {"$ref": "#/$defs/sha256"}, "authority_record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "fileBinding": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "recordBinding": {"type": "object", "additionalProperties": false, "required": ["path", "record_sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "record_sha256": {"$ref": "#/$defs/sha256"}}}
+  }
+}

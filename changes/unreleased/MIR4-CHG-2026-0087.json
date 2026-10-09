@@ -1,0 +1,99 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0087",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Prepare native Space Is Fake maintenance upgrades in the existing harness.",
+  "details": [
+    "The manifest-driven upgrade runner accepts an explicit SIF-01 scenario for the exact F210 and F200 published CCC00 to CCC01 transitions, with authenticated nine-target construction and published-predecessor custody.",
+    "Source and candidate profiles hardlink MIR and pinned Space Is Fake/Commons archives from configurable shared libraries, with no archive-copy fallback. Only the disposable fixture receives the native oracle; existing progress and reload checks remain.",
+    "The oracle checks final level-seven science and finite prerequisites, earned levels and actual native speed bonuses. Controlled opposing cases validate its refusals; no native gameplay pass is claimed.",
+    "The actual F200 admission attempt refused before staging at the retained reserve. The earlier build directory and private candidates are absent, so new current candidate bytes and native qualification are still required."
+  ],
+  "semantic_domains": [
+    "compatibility",
+    "science",
+    "progression",
+    "documentation"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Adds a native SIF-01 upgrade scenario for this target; execution remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Adds a native SIF-01 upgrade scenario for this target; execution remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "No Space Is Fake scenario or support claim is added for this historical target."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "No Space Is Fake scenario or support claim is added for this historical target."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "No Space Is Fake scenario or support claim is added for this historical target."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "No Space Is Fake scenario or support claim is added for this historical target."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "No Space Is Fake scenario or support claim is added for this historical target."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "No Space Is Fake scenario or support claim is added for this historical target."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "No Space Is Fake scenario or support claim is added for this historical target."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "SIF-01: tests/compiler/community_hotfix.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/releases/mir42-playtest-findings.md#space-is-fake-continuation-follow-up"
+    }
+  ]
+}

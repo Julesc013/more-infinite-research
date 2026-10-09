@@ -1,13 +1,32 @@
 {
   "schema": 1,
-  "status": "tracked-root-dist-inventory",
-  "generated_at": "2026-08-30",
+  "status": "ignored-local-distribution-inventory",
+  "generated_at": "2026-09-20",
   "distribution_count": 74,
   "policy": {
     "tagged_archives_are_immutable": true,
     "superseded_candidates_are_not_releases": true,
     "active_candidates_must_be_typed": true,
-    "release_packager_must_exclude": "dist"
+    "release_packager_must_exclude": "dist",
+    "working_tree_archives_are_tracked": false,
+    "network_retrieval_is_not_custody": true
+  },
+  "custody": {
+    "kind": "git-pinned-predecessor-archive-custody-v1",
+    "predecessor_commit": "D82395F1DAB2E8E5E135EB2F57E97767DF6C0C87",
+    "predecessor_tree": "263C404799354C62557DEAD44399E927C7E83E02",
+    "archive_root": "dist",
+    "history_rewritten": false,
+    "working_tree_archives_tracked": false,
+    "network_retrieval_permitted": false,
+    "cache_environment": "MIR_CACHE_HOME",
+    "cache_relative_path": "distributions",
+    "restore_command": ".\\tools\\mir.ps1 mir4 distribution restore --version <version> [--output <dist-or-build-root>]",
+    "github_release_asset_digest_match_count": 72,
+    "github_release_asset_digest_mismatch_versions": ["2.0.0", "2.2.0"],
+    "github_release_assets_are_not_complete_historical_custody": true,
+    "release_transition_authority": false,
+    "publication_authority": false
   },
   "distributions": [
     {

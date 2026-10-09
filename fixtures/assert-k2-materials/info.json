@@ -1,0 +1,1 @@
+{"name":"mir-fixture-assert-k2-materials","version":"0.1.0","title":"MIR Fixture - K2 Material Qualification","author":"MIR maintainers","factorio_version":"2.1","dependencies":["base >= 2.1.8","Krastorio2 >= 2.1.2","Krastorio2-spaced-out >= 2.0.13","more-infinite-research >= 4.2.0"]}

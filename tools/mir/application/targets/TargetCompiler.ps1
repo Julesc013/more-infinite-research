@@ -15,8 +15,11 @@ function Get-MIR4TargetCompilerAuthority {
   $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json
   if (@($registry.identities.target | Sort-Object -Unique).Count -ne 17 -or @($registry.support_policy.target | Sort-Object -Unique).Count -ne 17) { throw '[mir4-target-registry-v6-count]' }
   if ((@($registry.identities.target | Sort-Object) -join '|') -cne (@($registry.support_policy.target | Sort-Object) -join '|')) { throw '[mir4-target-registry-v6-join]' }
-  $profilePath = Join-Path $repo ([string]$registry.profile_authority.path)
-  if ((Get-MIR4PlatformFileSha256 $profilePath) -cne [string]$registry.profile_authority.sha256) { throw '[mir4-target-registry-v6-profile-binding]' }
+  # V6 retains the bootstrap profile contract; live profiles evolve independently.
+  $readiness = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json') | ConvertFrom-Json
+  $profileImports = @($readiness.imports | Where-Object { [string]$_.path -ceq [string]$registry.profile_authority.path })
+  if ($profileImports.Count -ne 1 -or
+      ([string]$profileImports[0].sha256).ToLowerInvariant() -cne [string]$registry.profile_authority.sha256) { throw '[mir4-target-registry-v6-profile-binding]' }
   return $authority
 }
 

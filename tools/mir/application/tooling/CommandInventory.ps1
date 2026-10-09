@@ -116,12 +116,50 @@ function Get-MIR4CommandInventoryV1 {
   return [pscustomobject]$record
 }
 
+function Get-MIR4ChangedCommandInventoryV1 {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidatePattern('^[a-f0-9]{40}$')][string]$Baseline)
+  # Refresh existing implementation rows without inventorying the repository.
+  # The exact baseline inventory supplies unchanged rows; full CI Check still recomputes all rows.
+  $relative='governance/automation/mir4-command-inventory-v1.json'
+  $raw=@(& git -C $RepoRoot show ($Baseline+':'+$relative))
+  if($LASTEXITCODE-ne0){throw '[mir4-command-inventory-incremental-baseline]'}
+  $baselineText=($raw-join"`n").TrimEnd("`n","`r")
+  $current=(Get-Content -LiteralPath (Join-Path $RepoRoot $relative) -Raw).Replace("`r`n","`n").TrimEnd("`n","`r")
+  if($current-cne$baselineText){throw '[mir4-command-inventory-incremental-seed-changed]'}
+  $record=$baselineText|ConvertFrom-Json -Depth 100
+  $material=[ordered]@{};foreach($property in $record.PSObject.Properties){if($property.Name-cne'digest'){$material[$property.Name]=$property.Value}}
+  if((Get-MIR4CommandInventoryDigestV1 -Value $material)-cne$record.digest){throw '[mir4-command-inventory-incremental-seed-digest]'}
+  $roots=@('tools/mir.ps1','tools/mir','tools/commands','tools/lib','scripts')
+  $changed=@(& git -C $RepoRoot diff --name-only --no-renames $Baseline -- @roots)
+  if($LASTEXITCODE-ne0){throw '[mir4-command-inventory-incremental-diff]'}
+  $untracked=@(& git -C $RepoRoot ls-files --others --exclude-standard -- @roots)
+  if($LASTEXITCODE-ne0-or$untracked.Count-gt0){throw '[mir4-command-inventory-incremental-untracked]'}
+  $changed=@($changed|Where-Object {$_-like'*.ps1'}|Sort-Object -Unique)
+  if($changed.Count-gt32){throw '[mir4-command-inventory-incremental-budget]'}
+  $rows=@{};foreach($row in $record.implementation_files){$rows[$row.path]=$row}
+  foreach($path in $changed){
+    if($path-ceq$record.router-or-not$rows.ContainsKey($path)-or-not(Test-Path -LiteralPath (Join-Path $RepoRoot $path) -PathType Leaf)){throw '[mir4-command-inventory-incremental-full-refresh-required]'}
+    $item=Get-Item -LiteralPath (Join-Path $RepoRoot $path) -Force
+    if($item.Length-gt2MB-or$item.Attributes-band[IO.FileAttributes]::ReparsePoint){throw '[mir4-command-inventory-incremental-input-budget]'}
+    $text=Get-Content -LiteralPath $item.FullName -Raw
+    $rows[$path].classification=Get-MIR4CommandImplementationClassificationV1 -RelativePath $path -Text $text
+    $rows[$path].sha256=Get-MIR4CommandInventoryTextSha256V1 -Path $item.FullName
+    $rows[$path].lines=($text-split([string][char]10)).Count
+  }
+  foreach($classification in @('canonical-public','canonical-internal','compatibility-wrapper','migration-only','historical','obsolete','unknown')){
+    $name=$classification.Replace('-','_');$record.summary.$name=@($record.implementation_files|Where-Object classification -eq $classification).Count
+  }
+  $material=[ordered]@{};foreach($property in $record.PSObject.Properties){if($property.Name-cne'digest'){$material[$property.Name]=$property.Value}}
+  $record.digest=Get-MIR4CommandInventoryDigestV1 -Value $material
+  return $record
+}
+
 function Update-MIR4CommandInventoryV1 {
-  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check,[string]$ChangedSinceCommit='')
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $path = Join-Path $repo 'governance/automation/mir4-command-inventory-v1.json'
   $schema = Join-Path $repo 'contracts/repository/mir4-command-inventory-v1.schema.json'
-  $record = Get-MIR4CommandInventoryV1 -RepoRoot $repo
+  $record = if($ChangedSinceCommit){Get-MIR4ChangedCommandInventoryV1 -RepoRoot $repo -Baseline $ChangedSinceCommit}else{Get-MIR4CommandInventoryV1 -RepoRoot $repo}
   $json = (($record | ConvertTo-Json -Depth 100) + [string][char]10).
     Replace(([string][char]13 + [char]10),[string][char]10).
     Replace([string][char]13,[string][char]10)

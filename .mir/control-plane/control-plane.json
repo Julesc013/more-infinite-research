@@ -39,7 +39,7 @@
   "outputs": {
     "verification_context": "path:workspace.build.results.verification-context",
     "evidence_store": "path:workspace.build.results.evidence",
-    "todo": "todo.md",
+    "todo": "TODO.md",
     "current_candidate": "path:docs.root/releases/current-candidate.md",
     "release_dashboard": "path:docs.root/releases/control-plane-dashboard.md",
     "branch_status": "path:views.branch-status",

@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0047",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Adopt the expanded MIR 4.2 programme and portable in-game research-surface architecture.",
+  "details": [
+    "Expand the canonical 4.2 outcome to complete qualified material routes, useful progression, localized explanations, auditable profiles, current integrations and recoverable delivery.",
+    "Add six OmniAB, eight RIC and one portable-player-surface request to the active 81-request authority.",
+    "Keep in-surface filter, sort and personal hide state presentation-only; document the installed engine boundary against direct vanilla-tree extension.",
+    "Prefer a public extension contract with a maintained research UI before a separately downloadable companion; retain a full OEM+ tree and queue as an evidence-led 4.5 candidate.",
+    "Require one canonical copied-data core, one visible UI host, no second emitter, no private third-party GUI mutation and no new hard dependency for MIR."
+  ],
+  "semantic_domains": [
+    "programme",
+    "research-browser",
+    "architecture",
+    "compatibility"
+  ],
+  "audiences": [
+    "players",
+    "mod-authors",
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "unaffected",
+      "reason": "This change adopts programme and architecture authority; player-package implementation and qualification remain future work."
+    },
+    {
+      "target": "F200",
+      "disposition": "unaffected",
+      "reason": "This change adopts programme and architecture authority; player-package implementation and qualification remain future work."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "The portable modern research surface is not implemented or added to the legacy package by this authority change."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "The portable modern research surface is not implemented or added to the legacy package by this authority change."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "none",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-integration-and-delivery-plan.md"
+    },
+    {
+      "kind": "document",
+      "value": "docs/adr/0031-portable-player-surfaces.md"
+    }
+  ]
+}

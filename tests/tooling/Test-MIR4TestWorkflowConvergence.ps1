@@ -27,18 +27,20 @@ Assert-MIR4TestWorkflowConvergenceV1 ([int]$inventory.summary.unknown -eq 0 -and
 $canonicalMoved = @(Get-ChildItem -LiteralPath (Join-Path $repo 'tests') -File -Filter '*.ps1' -Recurse | Where-Object {
   (Get-Content -LiteralPath $_.FullName -TotalCount 1) -ceq '# MIR4-CANONICAL-EXECUTABLE-TEST'
 })
-$postConvergenceDecompositions = @(Get-ChildItem -LiteralPath (Join-Path $repo 'releases/migrations') -File -Filter 'MIR4-M42-02-*-DecompositionV1.json')
-$postConvergenceCharacterizations = @(Get-ChildItem -LiteralPath (Join-Path $repo 'releases/migrations') -File -Filter 'MIR4-M42-02-*-CharacterizationV1.json')
-$postConvergenceReleaseProofs = @('tests/release/Test-MIR441ReleaseReadiness.ps1')
-Assert-MIR4TestWorkflowConvergenceV1 ($canonicalMoved.Count -eq (137 + $postConvergenceDecompositions.Count + $postConvergenceCharacterizations.Count + $postConvergenceReleaseProofs.Count)) 'mir4-m42-01b-relocation-count'
 Assert-MIR4TestWorkflowConvergenceV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-01b-package-mutation'
 
 $receiptPath = Join-Path $repo 'releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json'
-if (Test-Path -LiteralPath $receiptPath -PathType Leaf) {
-  $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
-  Assert-MIR4TestWorkflowConvergenceV1 ([string]$receipt.status -ceq 'M42-01-TOOLING-TEST-WORKFLOW-CONVERGENCE-COMPLETE') 'mir4-m42-01b-receipt'
-  Assert-MIR4TestWorkflowConvergenceV1 (@($receipt.relocated_bindings).Count -eq 137) 'mir4-m42-01b-receipt-relocations'
-}
+Assert-MIR4TestWorkflowConvergenceV1 (Test-Path -LiteralPath $receiptPath -PathType Leaf) 'mir4-m42-01b-receipt-path'
+$receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
+Assert-MIR4TestWorkflowConvergenceV1 ([string]$receipt.status -ceq 'M42-01-TOOLING-TEST-WORKFLOW-CONVERGENCE-COMPLETE') 'mir4-m42-01b-receipt'
+$relocatedBindings = @($receipt.relocated_bindings)
+Assert-MIR4TestWorkflowConvergenceV1 ($relocatedBindings.Count -eq 137) 'mir4-m42-01b-receipt-relocations'
+$relocatedPaths = @($relocatedBindings | ForEach-Object { [string]$_.to_path })
+$canonicalMovedPaths = @($canonicalMoved | ForEach-Object {
+  $_.FullName.Substring($repo.Length + 1).Replace('\', '/')
+})
+Assert-MIR4TestWorkflowConvergenceV1 (@($relocatedPaths | Sort-Object -Unique).Count -eq $relocatedPaths.Count) 'mir4-m42-01b-receipt-relocation-uniqueness'
+Assert-MIR4TestWorkflowConvergenceV1 (@($relocatedPaths | Where-Object { $_ -notin $canonicalMovedPaths }).Count -eq 0) 'mir4-m42-01b-receipt-relocation-paths'
 
 [pscustomobject][ordered]@{
   status='M42-01-TOOLING-TEST-WORKFLOW-CONVERGENCE-PASSED'

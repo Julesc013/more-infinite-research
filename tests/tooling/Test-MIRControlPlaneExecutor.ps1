@@ -12,19 +12,25 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Executor")) {
   . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
+. (Join-Path $repo 'tools/mir/application/package/DistributionCustody.ps1')
 
 $release = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
-$candidate = Join-Path $repo ([string]$release.package.archive)
-if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
-  & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1") | Out-Host
-}
-$performanceSource = Join-Path $repo "build/results/control-plane-v5-self-test/performance-sources/$([string]$release.package.source_commit)"
+$candidate = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version ([string]$release.release)).cache_path
+# v2 sources are guaranteed to be shared clones. Legacy full-copy cache roots
+# remain inert until bounded retention cleanup accounts for them.
+$performanceSource = Join-Path $repo "build/results/control-plane-v5-self-test/performance-sources-v2/$([string]$release.package.source_commit)"
 if (-not (Test-Path -LiteralPath $performanceSource -PathType Container)) {
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $performanceSource))
-  & git -c "safe.directory=$repo" -c "safe.directory=$(Join-Path $repo '.git')" clone --local --no-hardlinks --no-checkout -- $repo $performanceSource 2>$null
+  & git -c core.longpaths=true -c "safe.directory=$repo" -c "safe.directory=$(Join-Path $repo '.git')" clone --shared --no-checkout -- $repo $performanceSource 2>$null
   if ($LASTEXITCODE -ne 0) { throw "Could not clone exact performance source for executor self-test." }
-  & git -C $performanceSource checkout --detach ([string]$release.package.source_commit) 2>$null
+  $performanceGitDir = Join-Path $performanceSource '.git'
+  if (-not (Test-Path -LiteralPath $performanceGitDir -PathType Container)) { throw 'Performance source clone lacks its private Git directory.' }
+  & git -c core.longpaths=true "--git-dir=$performanceGitDir" "--work-tree=$performanceSource" checkout --force --detach ([string]$release.package.source_commit) 2>$null
   if ($LASTEXITCODE -ne 0) { throw "Could not check out exact performance source for executor self-test." }
+}
+$performanceAlternates = Join-Path $performanceSource '.git/objects/info/alternates'
+if (-not (Test-Path -LiteralPath $performanceAlternates -PathType Leaf)) {
+  throw 'Executor self-test performance source does not reuse the immutable local Git object store.'
 }
 $historicalInputTask = [pscustomobject][ordered]@{
   id = "historical-input-self-test"
@@ -182,7 +188,7 @@ if ([string]$overlay.package_source_sha256 -ne [string]$candidateDescriptor.sour
     $overlayStatus -notcontains "?? validation/scenarios/local-2.1.json") {
   throw "Performance source overlay is not exact, checkout-independent, and package-preserving."
 }
-$baselineCandidate = Join-Path $repo "dist/more-infinite-research_3.2.1.zip"
+$baselineCandidate = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version '3.2.1').cache_path
 $baselineObservation = Get-MIRCPZipPackageObservation -Path $baselineCandidate
 $currentObservation = Get-MIRCPZipPackageObservation -Path $canonicalCandidate
 $baselinePaths = @{}
@@ -200,7 +206,7 @@ if ($deltaPolicy.Count -ne 1 -or [string]$baselineObservation.archive_sha256 -ne
     -not (Test-MIRCPExactPathSet -Expected @($deltaPolicy[0].allowed_removed_paths) -Actual $removedPaths) -or
     -not (Test-MIRCPExactPathSet -Expected @($deltaPolicy[0].allowed_changed_paths) -Actual $changedPaths)) {
   throw "Native C24 approved-delta policy does not accept only the exact immutable four-path patch."
-}$c30Observation = Get-MIRCPZipPackageObservation -Path (Join-Path $repo "dist/more-infinite-research_3.2.3.zip")
+}$c30Observation = Get-MIRCPZipPackageObservation -Path ([string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version '3.2.3').cache_path)
 $c30Paths = @{}
 foreach ($file in @($c30Observation.files)) { $c30Paths[[string]$file.path] = [string]$file.sha256 }
 $c30AddedPaths = @($c30Paths.Keys | Where-Object { -not $currentPaths.ContainsKey($_) } | Sort-Object)
@@ -218,10 +224,7 @@ $selectedC30Policies = @(Get-MIRCPNativePatchDeltaPolicy -Target "2.1" -FromVers
 if ($selectedC30Policies.Count -ne 1 -or [string]$selectedC30Policies[0].id -ne "c30-platform-logistics-hotfix-v1") {
   throw "Public C30 approved-delta dispatch does not select the exact native C30 policy."
 }
-$c32Candidate = Join-Path $repo "dist/more-infinite-research_3.2.5.zip"
-if (-not (Test-Path -LiteralPath $c32Candidate -PathType Leaf)) {
-  throw "C32 approved-delta regression requires the exact governed 3.2.5 candidate archive."
-}
+$c32Candidate = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version '3.2.5').cache_path
 $c32Observation = Get-MIRCPZipPackageObservation -Path $c32Candidate
 $c32Paths = @{}
 foreach ($file in @($c32Observation.files)) { $c32Paths[[string]$file.path] = [string]$file.sha256 }
@@ -321,12 +324,50 @@ if (-not $hostedRunnerRejected) { throw "A hosted runner could claim the protect
 $scratchContextId = Get-MIRCPSha256Text -Value ("executor-path-budget/" + [guid]::NewGuid().ToString("N"))
 $scratchState = [pscustomobject][ordered]@{context=[pscustomobject][ordered]@{context_id=$scratchContextId}}
 $scratchCampaign = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/performance-campaign.json") | ConvertFrom-Json
-$scratch = New-MIRCPCompactPerformanceArtifactRoot -State $scratchState -Campaign $scratchCampaign
+$scratch = New-MIRCPCompactPerformanceArtifactRoot -State $scratchState -Campaign $scratchCampaign -RepoRoot $repo
 $compatBudgetPath = Join-Path $scratch.path "medium-ecosystem.factorio-total\measured-25-candidate\compat\runs\u-0123456789ab\mods\mir-validation-settings-overrides\settings-updates.lua"
 $scratchPayload = Join-Path $scratch.path "path-budget-self-test.txt"
 "exact-context-bound-scratch" | Set-Content -LiteralPath $scratchPayload -Encoding UTF8
 $scratchDestination = Join-Path $repo "build/results/control-plane-v5-self-test/performance-artifact-relocation/$scratchContextId"
-$scratchRelocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination
+foreach ($invalidRoot in @(
+  [pscustomobject]@{path=$scratch.path;context_id=("F" * 64);strategy=$scratch.strategy},
+  [pscustomobject]@{path=(Split-Path -Parent $scratch.path);context_id=$scratchContextId;strategy=$scratch.strategy},
+  [pscustomobject]@{path=$scratch.path;context_id=$scratchContextId;strategy='foreign-scratch-strategy'}
+)) {
+  $unsafeRelocationRejected = $false
+  try { $null = Move-MIRCPPerformanceArtifacts -ExecutionRoot $invalidRoot -Destination $scratchDestination -RepoRoot $repo }
+  catch { if ($_.Exception.Message -match "exact project scratch path") { $unsafeRelocationRejected = $true } else { throw } }
+  if (-not $unsafeRelocationRejected -or -not (Test-Path -LiteralPath $scratchPayload) -or (Test-Path -LiteralPath $scratchDestination)) {
+    throw "Performance artifact relocation did not reject an unrelated root before copying or deleting anything."
+  }
+}
+$markerBytes = [IO.File]::ReadAllBytes($scratch.marker_path)
+$forgedMarker = Get-Content -Raw -LiteralPath $scratch.marker_path | ConvertFrom-Json
+$forgedMarker.kind = "unrelated-scratch-root"
+$forgedMarker | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $scratch.marker_path -Encoding UTF8
+try {
+  $forgedMarkerRejected = $false
+  try { $null = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination -RepoRoot $repo }
+  catch { if ($_.Exception.Message -match "marker does not bind") { $forgedMarkerRejected = $true } else { throw } }
+  if (-not $forgedMarkerRejected -or -not (Test-Path -LiteralPath $scratchPayload) -or (Test-Path -LiteralPath $scratchDestination)) {
+    throw "Performance artifact relocation accepted a foreign marker or modified its source/destination."
+  }
+} finally { [IO.File]::WriteAllBytes($scratch.marker_path, $markerBytes) }
+$forgedMarker = Get-Content -Raw -LiteralPath $scratch.marker_path | ConvertFrom-Json
+$forgedMarker.strategy = 'foreign-scratch-strategy'
+$forgedMarker | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $scratch.marker_path -Encoding UTF8
+try {
+  foreach ($strategy in @($scratch.strategy, $forgedMarker.strategy)) {
+    $forgedRoot = [pscustomobject]@{path=$scratch.path;context_id=$scratchContextId;strategy=$strategy}
+    $forgedStrategyRejected = $false
+    try { $null = Move-MIRCPPerformanceArtifacts -ExecutionRoot $forgedRoot -Destination $scratchDestination -RepoRoot $repo }
+    catch { if ($_.Exception.Message -match 'marker does not bind|exact project scratch path') { $forgedStrategyRejected = $true } else { throw } }
+    if (-not $forgedStrategyRejected -or -not (Test-Path -LiteralPath $scratchPayload) -or (Test-Path -LiteralPath $scratchDestination)) {
+      throw 'Performance artifact relocation accepted an unowned strategy or modified its source/destination.'
+    }
+  }
+} finally { [IO.File]::WriteAllBytes($scratch.marker_path, $markerBytes) }
+$scratchRelocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination -RepoRoot $repo
 if ([string]$scratch.strategy -ne "compact-context-scratch-v1" -or
     [int]$scratch.maximum_factorio_path_length -gt [int]$scratch.conservative_path_budget -or
     [int]$scratch.maximum_factorio_path_length -lt $compatBudgetPath.Length -or

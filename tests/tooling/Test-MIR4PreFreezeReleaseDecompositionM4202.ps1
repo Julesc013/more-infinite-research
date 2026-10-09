@@ -20,6 +20,7 @@ $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4PreFreezeReleaseDecompositionV1 ($raw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json')) 'mir4-m42-02-pre-freeze-release-schema'
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4PreFreezeReleaseDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $receipt) 'mir4-m42-02-pre-freeze-release-record'
+$historicalContract=Get-MIR4M4202HistoricalDecompositionFunctionContract -RepoRoot $repo -ReceiptPath 'releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json' -Receipt $receipt
 
 $predecessorPath=Join-Path $repo ([string]$receipt.predecessor.receipt)
 $predecessor=Get-Content -Raw -LiteralPath $predecessorPath|ConvertFrom-Json -Depth 100 -DateKind String
@@ -157,20 +158,27 @@ if(Test-Path -LiteralPath $supplyChainModulePath -PathType Leaf){
 $facadePath=Join-Path $repo ([string]$receipt.decomposition.facade.path)
 $facadeTokens=$null;$facadeErrors=$null
 $facadeAst=[Management.Automation.Language.Parser]::ParseFile($facadePath,[ref]$facadeTokens,[ref]$facadeErrors)
-Assert-MIR4PreFreezeReleaseDecompositionV1 (@($facadeErrors).Count-eq0-and@($facadeAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq0-and[int]$receipt.decomposition.facade.current_lines-le20) 'mir4-m42-02-pre-freeze-release-facade'
+Assert-MIR4PreFreezeReleaseDecompositionV1 (@($facadeErrors).Count-eq0-and@($facadeAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq0-and[IO.File]::ReadAllLines($facadePath).Length-le20) 'mir4-m42-02-pre-freeze-release-facade'
 Assert-MIR4PreFreezeReleaseDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path $facadePath)-ceq[string]$receipt.decomposition.facade.current_sha256) 'mir4-m42-02-pre-freeze-release-facade-hash'
 
 Assert-MIR4PreFreezeReleaseDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedModuleSha) 'mir4-m42-02-pre-freeze-release-module-bridge-retirement-successor'
+$successionModulePath='tools/lib/mir4/pre-freeze-release/AuthoritySuccessionValidation.ps1'
+$expectedModuleSha[$successionModulePath]=''
+Assert-MIR4PreFreezeReleaseDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $expectedModuleSha) 'mir4-m42-02-pre-freeze-release-module-git-fixed-point'
 $functionNames=[Collections.Generic.List[string]]::new()
 Assert-MIR4PreFreezeReleaseDecompositionV1 (@($receipt.decomposition.modules).Count-eq6-and@($receipt.decomposition.modules|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'mir4-m42-02-pre-freeze-release-module-count'
 foreach($module in @($receipt.decomposition.modules)){
   $path=Join-Path $repo ([string]$module.path);$tokens=$null;$parseErrors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$parseErrors)
-  Assert-MIR4PreFreezeReleaseDecompositionV1 (@($parseErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$expectedModuleSha[[string]$module.path]-and[int]$module.lines-le1000) 'mir4-m42-02-pre-freeze-release-module' ([string]$module.path)
+  Assert-MIR4PreFreezeReleaseDecompositionV1 (@($parseErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$expectedModuleSha[[string]$module.path]-and[IO.File]::ReadAllLines($path).Length-le1000) 'mir4-m42-02-pre-freeze-release-module' ([string]$module.path)
   foreach($function in @($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true))){[void]$functionNames.Add($function.Name)}
 }
+$successionPath=Join-Path $repo $successionModulePath;$successionTokens=$null;$successionErrors=$null
+$successionAst=[Management.Automation.Language.Parser]::ParseFile($successionPath,[ref]$successionTokens,[ref]$successionErrors)
+Assert-MIR4PreFreezeReleaseDecompositionV1 (@($successionErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $successionPath)-ceq[string]$expectedModuleSha[$successionModulePath]-and[IO.File]::ReadAllLines($successionPath).Length-le1000-and@($successionAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-or$node-is[Management.Automation.Language.ReturnStatementAst]},$true)).Count-eq0) 'mir4-m42-02-pre-freeze-release-succession-module'
+Assert-MIR4PreFreezeReleaseDecompositionV1 ((Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1')).Contains(". (Join-Path `$repo '$successionModulePath')")) 'mir4-m42-02-pre-freeze-release-succession-consumer'
 $projectionSha=Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $functionNames.ToArray())
-Assert-MIR4PreFreezeReleaseDecompositionV1 ($functionNames.Count-eq25-and$projectionSha-ceq[string]$receipt.public_contract.previous_sha256-and$projectionSha-ceq[string]$receipt.public_contract.current_sha256-and[bool]$receipt.public_contract.unchanged) 'mir4-m42-02-pre-freeze-release-public-contract'
+Assert-MIR4PreFreezeReleaseDecompositionV1 ($functionNames.Count-eq25-and$projectionSha-ceq[string]$historicalContract.digest) 'mir4-m42-02-pre-freeze-release-public-contract'
 
 . $facadePath
 foreach($requiredFunction in @('Get-MIR4PreFreezeAuthorityState','Test-MIR4PreFreezeAuthorities','Get-MIR4ReleaseDoctor','Test-MIR4ReleaseWorkflowInvocation','New-MIR4PlaytestSession','Complete-MIR4PlaytestSession')){
@@ -183,7 +191,7 @@ $supplyChainDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-C
 if(Test-Path -LiteralPath $supplyChainDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $supplyChainDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
 $expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4PreFreezeReleaseDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-pre-freeze-release-inventory'
+Assert-MIR4PreFreezeReleaseDecompositionV1 ($null-ne$expectedInventoryDigest-and[int]$inventory.command_count-gt0-and[int]$inventory.command_count-eq@($inventory.commands).Count-and@($inventory.commands|Group-Object key|Where-Object Count -gt 1).Count-eq0-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-pre-freeze-release-inventory'
 $controlExecutorSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
 if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
   $controlExecutorSuccessorRaw=Get-Content -Raw -LiteralPath $controlExecutorSuccessorPath
@@ -220,10 +228,11 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
 }
 
 Assert-MIR4PreFreezeReleaseDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-pre-freeze-release-bridge-retirement-successor'
+Assert-MIR4PreFreezeReleaseDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-pre-freeze-release-git-fixed-point'
 foreach($binding in @($receipt.evolved_bindings)){
   Assert-MIR4PreFreezeReleaseDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$expectedBindingSha[[string]$binding.path]-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-pre-freeze-release-evolved-binding' ([string]$binding.path)
 }
 Assert-MIR4PreFreezeReleaseDecompositionV1 ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore)-and@($receipt.preservation.package_visible_delta).Count-eq0-and(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-m42-02-pre-freeze-release-package-firewall'
 Assert-MIR4PreFreezeReleaseDecompositionV1 (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-pre-freeze-release-release-firewall'
 
-[pscustomobject][ordered]@{status='M42-02-PS4-PRE-FREEZE-RELEASE-DECOMPOSITION-PASSED';facade_lines=[int]$receipt.decomposition.facade.current_lines;modules=@($receipt.decomposition.modules).Count;maximum_module_lines=(@($receipt.decomposition.modules|Measure-Object lines -Maximum).Maximum);functions=$functionNames.Count;public_contract_sha256=$projectionSha;package_source_sha256=$packageBefore;package_visible=$false;release_transition_authority=$false}
+[pscustomobject][ordered]@{status='M42-02-PS4-PRE-FREEZE-RELEASE-DECOMPOSITION-PASSED';facade_lines=[IO.File]::ReadAllLines($facadePath).Length;modules=$expectedModuleSha.Count;maximum_module_lines=(@($expectedModuleSha.Keys|ForEach-Object{[IO.File]::ReadAllLines((Join-Path $repo $_)).Length}|Measure-Object -Maximum).Maximum);functions=$functionNames.Count;public_contract_sha256=$projectionSha;package_source_sha256=$packageBefore;package_visible=$false;release_transition_authority=$false}

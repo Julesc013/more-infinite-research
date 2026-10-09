@@ -30,10 +30,10 @@ function Invoke-MIRAssuranceSelfTest {
   }
 
   $cases = @(
-    @{path="control.lua"; class="runtime-or-migration"},
-    @{path="migrations/more-infinite-research_3.1.9.json"; class="runtime-or-migration"},
-    @{path="settings.lua"; class="settings"},
-    @{path="locale/en/more-infinite-research.cfg"; class="locale"},
+    @{path="source/generation/lifecycle/control.lua.template"; class="runtime-or-migration"},
+    @{path="source/migrations/more-infinite-research_3.1.9.json"; class="runtime-or-migration"},
+    @{path="source/prototypes/mir/settings/catalog.lua"; class="settings"},
+    @{path="source/locale/en/more-infinite-research.cfg"; class="locale"},
     @{path="docs/maintainer/example.md"; class="repository-docs"},
     @{path="scripts/Invoke-MIRValidation.ps1"; class="test-harness"},
     @{path="unclassified.future"; class="unknown"}
@@ -93,7 +93,10 @@ function Invoke-MIRAssuranceSelfTest {
   if ([string]$activeApprovedDeltaFingerprint.state -eq "pending") {
     $developmentContext = [string]$activeApprovedDeltaFingerprint.authority_class -ceq 'development-context-no-release-authority'
     $validBoundary = if ($developmentContext) {
-      [string]$activeApprovedDeltaFingerprint.release_state -ceq 'active-private-mir4.1-qualification-no-release-authority'
+      [string]$activeApprovedDeltaFingerprint.release_state -in @(
+        'active-private-mir4.1-qualification-no-release-authority',
+        'active-private-mir4.2-verification-plan-no-release-authority'
+      )
     } else {
       [string]$activeApprovedDeltaFingerprint.release_state -in @("planned", "source-frozen", "package-built", "authorized-in-progress")
     }
@@ -171,6 +174,12 @@ function Invoke-MIRAssuranceSelfTest {
     }
     if (-not $candidateAuthorityRejected) {
       throw "Planned release reservation was incorrectly accepted as exact candidate authority."
+    }
+  } elseif ([string]$Context.verification_profile.execution_context_mode -eq 'development-context') {
+    if ([string]$planningAuthority.authority_class -ne 'development-context-no-release-authority' -or
+        [bool]$planningAuthority.release_authority -or
+        [string]$planningAuthority.package_source_commit -ne (Resolve-MIRAssuranceCommit -Commit HEAD)) {
+      throw 'Development planning authority escaped its private, current-source-only boundary.'
     }
   }
 
@@ -306,8 +315,642 @@ function Invoke-MIRAssuranceSelfTest {
     duration_seconds=0
     message=""
   }
-  $null = Write-MIRAssuranceAttempt -Capsule $capsule
+  $null = Write-MIRAssuranceAttempt -Capsule $capsule -Context $Context
   if ($null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint -Context $Context)) { throw "Passing exact-input evidence was not reusable." }
+
+  # Attempts are immutable observations.  Identical trusted records may share
+  # one reusable pointer, while any changed conclusion or result digest is a
+  # quarantined contradiction that requires a new independent reproduction.
+  $syntheticAttemptRoots = [Collections.Generic.List[string]]::new()
+
+  # Captured artifacts are catalogue obligations: a worker capsule must carry
+  # the schema-validated development-contract receipt, not merely report that
+  # its command exited zero.  Exercise the real executor and worker-object
+  # reader with a tiny schema-valid receipt, then prove absent, ambiguous,
+  # malformed, and descriptor-mismatched receipts are rejected.
+  $capturedCaseRoot = Join-Path $artifactRoot ('captured-artifact-self-test-' + [guid]::NewGuid().ToString('N'))
+  $capturedSchema = 'contracts/repository/mir4-development-contracts-local-result-v1.schema.json'
+  $capturedKind = 'MIR4DevelopmentContractsLocalResultV1'
+  $capturedPackages = @(
+    foreach ($target in @('f210','f200','f110','f100')) {
+      [ordered]@{target=$target;archive_sha256=('4' * 64);content_sha256=('5' * 64);entry_count=1}
+    }
+  )
+  $newCapturedValidJson = {
+    param([Parameter(Mandatory)]$Plan)
+    return (([ordered]@{
+      schema=1;kind=$capturedKind;status='passed';scope='current-source-and-four-target-determinism'
+      source=[ordered]@{
+        commit=[string]$Plan.source_commit;tree=[string]$Plan.source_tree;package_source_sha256=[string]$Plan.package_source_sha256;package_source_dirty=$false
+        selected_inputs_sha256=('3' * 64);selected_input_file_count=1;selected_inputs_dirty=$false;repository_dirty=$false
+      }
+      command_inventory_digest=('sha256:' + ('6' * 64));packages=$capturedPackages
+      retained_expanded_packages=$false;release_authority=$false
+    } | ConvertTo-Json -Depth 20) + "`n")
+  }
+  $invokeCapturedCase = {
+    param(
+      [Parameter(Mandatory)][string]$Label,
+      [Parameter(Mandatory)][ValidateSet('valid','missing','ambiguous','invalid')][string]$Mode,
+      [switch]$ExactTestOutput
+    )
+    $caseDirectory = Join-Path $capturedCaseRoot $Label
+    New-Item -ItemType Directory -Force -Path $caseDirectory | Out-Null
+    $writerPath = Join-Path $caseDirectory 'write-receipt.ps1'
+    $receiptStem = Join-Path $caseDirectory 'receipt'
+    $plan = [pscustomobject][ordered]@{
+      baseline='self-test';source_commit=(& git -C $repo rev-parse HEAD).Trim();source_tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim();package_source_sha256=('2' * 64)
+    }
+    $capturedValidJson = & $newCapturedValidJson $plan
+    $writes = [Collections.Generic.List[string]]::new()
+    if (-not $ExactTestOutput) {
+      switch ($Mode) {
+        'valid' { $writes.Add($receiptStem + '-one.json') }
+        'ambiguous' {
+          $writes.Add($receiptStem + '-one.json')
+          $writes.Add($receiptStem + '-two.json')
+        }
+        'invalid' { $writes.Add($receiptStem + '-one.json') }
+      }
+    }
+    $writerLines = [Collections.Generic.List[string]]::new()
+    $payload = if ($Mode -eq 'invalid') { "{}`n" } else { $capturedValidJson }
+    $base64 = [Convert]::ToBase64String([Text.UTF8Encoding]::new($false).GetBytes($payload))
+    if ($ExactTestOutput) {
+      $writerLines.Add('param([Parameter(Mandatory)][string]$ReceiptPath)')
+      if ($Mode -ne 'missing') {
+        $writerLines.Add("[IO.File]::WriteAllBytes(`$ReceiptPath,[Convert]::FromBase64String('$base64'))")
+        # A neighbouring JSON file would make a glob declaration ambiguous.
+        # The worker-provided output identity must ignore it.
+        $writerLines.Add("[IO.File]::WriteAllBytes((Join-Path (Split-Path -Parent `$ReceiptPath) 'unrelated.json'),[Convert]::FromBase64String('$base64'))")
+      }
+    } else {
+      foreach ($path in $writes) {
+        $writerLines.Add("[IO.File]::WriteAllBytes('$($path.Replace("'","''"))',[Convert]::FromBase64String('$base64'))")
+      }
+    }
+    [IO.File]::WriteAllText($writerPath, (($writerLines -join "`n") + "`n"), [Text.UTF8Encoding]::new($false))
+    $relativeWriter = (Get-MIRAssuranceRepoRelativePath -Path $writerPath).Replace('\','/')
+    $pattern = if ($ExactTestOutput) { '<test-output>' } else { (Get-MIRAssuranceRepoRelativePath -Path (Join-Path $caseDirectory 'receipt-*.json')).Replace('\','/') }
+    $command = if ($ExactTestOutput) { './' + $relativeWriter + ' -ReceiptPath <test-output>' } else { './' + $relativeWriter }
+    $test = [pscustomobject][ordered]@{
+      id=('self-test.captured-artifact.' + $Label)
+      safe_test_id=('self-test.captured-artifact.' + $Label)
+      kind='static';layer='F0';requires_factorio=$false;requires_candidate=$false;inputs=@()
+      command=$command
+      captured_artifacts=@([pscustomobject][ordered]@{path_pattern=$pattern;schema=$capturedSchema;kind=$capturedKind})
+      force_fresh=$false
+    }
+    $test | Add-Member -NotePropertyName fingerprint -NotePropertyValue (Get-MIRAssuranceTestFingerprint -Test $test -Plan $plan -Context $Context)
+    $casePaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$test.id) -InputKey ([string]$test.fingerprint.input_key)
+    $syntheticAttemptRoots.Add([string]$casePaths.root)
+    try {
+      # The durable worker boundary is the immutable JSON capsule, whose
+      # canonical representation is what reuse/import validates.
+      $liveCapsule = Invoke-MIRAssuranceTest -Test $test -Plan $plan -Context $Context
+      $capsulePath = Resolve-MIRAssurancePath -Path ([string]$liveCapsule.attempt_path)
+      $capsule = Get-Content -Raw -LiteralPath $capsulePath | ConvertFrom-Json
+      return [pscustomobject][ordered]@{test=$test;plan=$plan;paths=$casePaths;capsule=$capsule;error=$null}
+    } catch {
+      return [pscustomobject][ordered]@{test=$test;plan=$plan;paths=$casePaths;capsule=$null;error=$_.Exception.Message}
+    }
+  }
+  $capturedValid = & $invokeCapturedCase 'valid' 'valid'
+  $capturedValidation = if ($null -ne $capturedValid.capsule) {
+    Test-MIRAssuranceCapsule -Capsule $capturedValid.capsule -Fingerprint $capturedValid.test.fingerprint -Context $Context -Test $capturedValid.test
+  } else {
+    [ordered]@{valid=$false;reason='no-capsule'}
+  }
+  $capturedDeclarationCount = @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $capturedValid.test).Count
+  $capturedDescriptorCount = if ($null -ne $capturedValid.capsule) { @($capturedValid.capsule.artifacts | Where-Object { [bool]$_.captured_artifact }).Count } else { 0 }
+  if ($null -eq $capturedValid.capsule -or -not [string]::IsNullOrWhiteSpace([string]$capturedValid.error) -or
+      @($capturedValid.capsule.artifacts).Count -ne 1 -or
+      [string]$capturedValid.capsule.artifacts[0].kind -ne $capturedKind -or
+      [string]$capturedValid.capsule.artifacts[0].schema -ne $capturedSchema -or
+      [string]$capturedValid.capsule.artifacts[0].sha256 -notmatch '^[A-F0-9]{64}$' -or
+      -not [bool]$capturedValidation.valid) {
+    throw "A catalogue-declared development-contract receipt was not captured and descriptor-bound into the worker capsule: $($capturedValid.error) [$($capturedValidation.reason); declarations=$capturedDeclarationCount; captured=$capturedDescriptorCount]"
+  }
+  $exactCaptured = & $invokeCapturedCase 'exact-output' 'valid' -ExactTestOutput
+  $exactCapturedValidation = if ($null -ne $exactCaptured.capsule) {
+    Test-MIRAssuranceCapsule -Capsule $exactCaptured.capsule -Fingerprint $exactCaptured.test.fingerprint -Context $Context -Test $exactCaptured.test
+  } else { [ordered]@{valid=$false;reason='no-capsule'} }
+  if ($null -eq $exactCaptured.capsule -or -not [string]::IsNullOrWhiteSpace([string]$exactCaptured.error) -or
+      [string]$exactCaptured.capsule.artifacts[0].path_pattern -cne '<test-output>' -or
+      [string]$exactCaptured.capsule.artifacts[0].source_path -notmatch '/work/[0-9a-f]{32}/test-output[.]json$' -or
+      -not [bool]$exactCapturedValidation.valid) {
+    throw "An exact worker test-output receipt was not captured independently of adjacent JSON files: $($exactCaptured.error) [$($exactCapturedValidation.reason)]"
+  }
+  $missingExactCaptured = & $invokeCapturedCase 'exact-output-missing' 'missing' -ExactTestOutput
+  if ($null -ne $missingExactCaptured.capsule -or [string]$missingExactCaptured.error -notmatch 'exact <test-output>') {
+    throw "A missing exact worker test-output receipt did not fail closed: $($missingExactCaptured.error)"
+  }
+  $planIdentityMismatch = ConvertTo-MIRAssuranceOrderedMap -Object (($exactCaptured.plan | ConvertTo-Json -Depth 20) | ConvertFrom-Json)
+  $planIdentityMismatch['source_tree'] = ('0' * 40)
+  $planIdentityCaught = $false
+  try {
+    $null = Test-MIRAssuranceCapturedArtifactJson -Path (Resolve-MIRAssurancePath -Path ([string]$exactCaptured.capsule.artifacts[0].path)) -Declaration (Get-MIRAssuranceCapturedArtifactDeclarations -Test $exactCaptured.test)[0] -TestId ([string]$exactCaptured.test.id) -Plan $planIdentityMismatch
+  } catch { $planIdentityCaught = $_.Exception.Message -match 'does not match the active plan' }
+  if (-not $planIdentityCaught) { throw 'A receipt for a different plan source identity was accepted.' }
+  $capturedWorkerPlan = [pscustomobject][ordered]@{
+    tests=@($capturedValid.test)
+    work=@([pscustomobject][ordered]@{test_id=[string]$capturedValid.test.id;safe_test_id=[string]$capturedValid.test.safe_test_id;fingerprint=[string]$capturedValid.test.fingerprint.fingerprint_sha256;disposition='RUN';layer='F0'})
+    plan_material_sha256=(Get-MIRAssuranceTextHash -Text ('captured-artifact-worker-' + [guid]::NewGuid().ToString('N')))
+    required_test_set_sha256=(Get-MIRAssuranceJsonHash -Value @([string]$capturedValid.test.id))
+    generated_at=[string]$capturedValid.capsule.started_at;source_commit=[string]$capturedValid.capsule.producer.commit
+    source_tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim();target=[string]$Context.target;profile='self-test-captured-artifact';producer=$capturedValid.capsule.producer
+  }
+  $null = Write-MIRAssuranceWorkerReceipt -Plan $capturedWorkerPlan -Test $capturedValid.test -Capsule $capturedValid.capsule
+  $capturedWorkerRoot = Join-Path $capturedCaseRoot 'worker'
+  $capturedWorkerArtifact = Join-Path $capturedWorkerRoot 'captured-artifact-worker'
+  New-Item -ItemType Directory -Force -Path $capturedWorkerArtifact | Out-Null
+  foreach ($item in @(Get-ChildItem -LiteralPath $capturedValid.paths.root -Force)) {
+    Copy-Item -LiteralPath $item.FullName -Destination $capturedWorkerArtifact -Recurse -Force
+  }
+  $capturedWorkerObject = Read-MIRAssuranceWorkerObject -SourceRoot $capturedWorkerArtifact -Plan $capturedWorkerPlan -Test $capturedValid.test -Context $Context
+  if (@($capturedWorkerObject.capsule.artifacts).Count -ne 1 -or
+      [string]$capturedWorkerObject.capsule.artifacts[0].kind -ne $capturedKind -or
+      [string]$capturedWorkerObject.capsule.artifacts[0].sha256 -ne [string]$capturedValid.capsule.artifacts[0].sha256) {
+    throw 'Worker artifact import did not retain the captured development-contract receipt kind and digest.'
+  }
+  foreach ($negative in @(
+    [ordered]@{label='missing';mode='missing';reason='exactly one captured artifact'},
+    [ordered]@{label='ambiguous';mode='ambiguous';reason='exactly one captured artifact'},
+    [ordered]@{label='invalid';mode='invalid';reason='schema-invalid'}
+  )) {
+    $case = & $invokeCapturedCase ([string]$negative.label) ([string]$negative.mode)
+    if ($null -ne $case.capsule -or [string]$case.error -notmatch [regex]::Escape([string]$negative.reason)) {
+      throw "Captured-artifact negative case '$($negative.label)' did not fail closed: $($case.error)"
+    }
+  }
+  $identityMismatchedCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($exactCaptured.capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
+  $identityMismatchedArtifact = ConvertTo-MIRAssuranceOrderedMap -Object $identityMismatchedCapsule.artifacts[0]
+  $identityMismatchedArtifact['source_tree'] = ('0' * 40)
+  $identityMismatchedCapsule['artifacts'] = @($identityMismatchedArtifact)
+  $identityMismatchedStructured = Get-Content -Raw -LiteralPath (Resolve-MIRAssurancePath -Path ([string]$identityMismatchedCapsule.result.path)) | ConvertFrom-Json
+  $identityMismatchedStructured.artifacts = @([pscustomobject]$identityMismatchedArtifact)
+  Write-MIRAssuranceAtomicJson -Value $identityMismatchedStructured -Path (Resolve-MIRAssurancePath -Path ([string]$identityMismatchedCapsule.result.path))
+  $identityMismatchedResult = Get-MIRAssuranceArtifactDescriptor -Path (Resolve-MIRAssurancePath -Path ([string]$identityMismatchedCapsule.result.path)) -Kind 'structured-test-result'
+  $identityMismatchedResult['schema'] = 'mir-test-result-v1';$identityMismatchedResult['status'] = 'passed'
+  $identityMismatchedCapsule['result'] = $identityMismatchedResult
+  $identityMismatchedCapsule['result_digest'] = Get-MIRAssuranceCapsuleDigest -Capsule $identityMismatchedCapsule
+  $identityMismatchedValidation = Test-MIRAssuranceCapsule -Capsule $identityMismatchedCapsule -Fingerprint $exactCaptured.test.fingerprint -Context $Context -Test $exactCaptured.test
+  if ([bool]$identityMismatchedValidation.valid -or [string]$identityMismatchedValidation.reason -ne 'captured-artifact-source-identity-mismatch') {
+    throw 'A capsule whose captured receipt identity descriptor disagreed with its receipt was accepted.'
+  }
+  $mismatchedCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($capturedValid.capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
+  $mismatchedArtifact = ConvertTo-MIRAssuranceOrderedMap -Object $mismatchedCapsule.artifacts[0]
+  $mismatchedArtifact['kind'] = 'MIR4DevelopmentContractsMismatchedReceiptV1'
+  $mismatchedCapsule['artifacts'] = @($mismatchedArtifact)
+  $mismatchedStructured = Get-Content -Raw -LiteralPath (Resolve-MIRAssurancePath -Path ([string]$mismatchedCapsule.result.path)) | ConvertFrom-Json
+  $mismatchedStructured.artifacts = @([pscustomobject]$mismatchedArtifact)
+  Write-MIRAssuranceAtomicJson -Value $mismatchedStructured -Path (Resolve-MIRAssurancePath -Path ([string]$mismatchedCapsule.result.path))
+  $mismatchedResult = Get-MIRAssuranceArtifactDescriptor -Path (Resolve-MIRAssurancePath -Path ([string]$mismatchedCapsule.result.path)) -Kind 'structured-test-result'
+  $mismatchedResult['schema'] = 'mir-test-result-v1';$mismatchedResult['status'] = 'passed'
+  $mismatchedCapsule['result'] = $mismatchedResult
+  $mismatchedCapsule['result_digest'] = Get-MIRAssuranceCapsuleDigest -Capsule $mismatchedCapsule
+  if ([bool](Test-MIRAssuranceCapsule -Capsule $mismatchedCapsule -Fingerprint $capturedValid.test.fingerprint -Context $Context -Test $capturedValid.test).valid) {
+    throw 'A descriptor-mismatched captured development-contract receipt was accepted.'
+  }
+  if (Test-Path -LiteralPath $capturedCaseRoot) { Remove-Item -LiteralPath $capturedCaseRoot -Recurse -Force }
+
+  $newSyntheticAttempt = {
+    param(
+      [Parameter(Mandatory)]$Identity,
+      [Parameter(Mandatory)][ValidateSet('passed', 'failed')][string]$Status,
+      [Parameter(Mandatory)][string]$Label,
+      $Producer = $null,
+      [switch]$Unpublished,
+      [switch]$WithArtifact
+    )
+    $casePaths = Get-MIRAssuranceEvidencePaths -TestId $Identity.test_id -InputKey $Identity.input_key
+    $syntheticAttemptRoots.Add([string]$casePaths.root)
+    $work = Join-Path $casePaths.root (Join-Path 'work' $Label)
+    New-Item -ItemType Directory -Force -Path $work | Out-Null
+    $stdout = Join-Path $work 'stdout.txt'
+    $stderr = Join-Path $work 'stderr.txt'
+    $result = Join-Path $work 'result.json'
+    [IO.File]::WriteAllText($stdout, '', [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($stderr, '', [Text.UTF8Encoding]::new($false))
+    $exitCode = if ($Status -eq 'passed') { 0 } else { 1 }
+    $evidence = if ($Status -eq 'passed') { $stdout } else { $stderr }
+    $assertions = @([ordered]@{id='executor-exit-zero';status=$Status;evidence=(Get-MIRAssuranceRepoRelativePath -Path $evidence)})
+    $artifacts = @()
+    if ($WithArtifact) {
+      $artifactPath = Join-Path $work 'artifact.txt'
+      [IO.File]::WriteAllText($artifactPath, "synthetic artifact: $Label`n", [Text.UTF8Encoding]::new($false))
+      $artifacts = @(Get-MIRAssuranceArtifactDescriptor -Path $artifactPath -Kind 'synthetic-artifact')
+    }
+    $now = (Get-Date).ToUniversalTime().ToString('o')
+    $structured = [ordered]@{
+      schema='mir-test-result-v1'
+      test_id=[string]$Identity.test_id
+      status=$Status
+      exit_code=$exitCode
+      assertions=$assertions
+      artifacts=$artifacts
+      started_at=$now
+      completed_at=$now
+      message=if ($Status -eq 'passed') { '' } else { 'synthetic failure' }
+    }
+    Write-MIRAssuranceAtomicJson -Value $structured -Path $result
+    $descriptor = Get-MIRAssuranceArtifactDescriptor -Path $result -Kind 'structured-test-result'
+    $descriptor['schema'] = 'mir-test-result-v1'
+    $descriptor['status'] = $Status
+    $capsule = [ordered]@{
+      schema=$evidenceSchema
+      test_id=[string]$Identity.test_id
+      status=$Status
+      conclusion=$Status
+      disposition='RUN'
+      input_key=[string]$Identity.input_key
+      fingerprint_sha256=[string]$Identity.fingerprint_sha256
+      definition_sha256=[string]$Identity.definition_sha256
+      target=[string]$Identity.target
+      layer='F0'
+      command='synthetic'
+      resolved_command='synthetic'
+      inputs=[ordered]@{}
+      producer=if ($null -ne $Producer) { $Producer } else { Get-MIRAssuranceProducer }
+      assertions=$assertions
+      exit_code=$exitCode
+      result=$descriptor
+      artifacts=$artifacts
+      stdout_sha256=(Get-MIRAssuranceSha256 -Path $stdout)
+      stderr_sha256=(Get-MIRAssuranceSha256 -Path $stderr)
+      log_digest=(Get-MIRAssuranceTextHash -Text "`n")
+      started_at=$now
+      completed_at=$now
+      duration_seconds=0
+      message=if ($Status -eq 'passed') { '' } else { 'synthetic failure' }
+    }
+    if (-not $Unpublished) {
+      $capsule = Write-MIRAssuranceAttempt -Capsule $capsule -Context $Context
+    }
+    return [pscustomobject][ordered]@{identity=$Identity;paths=$casePaths;work=$work;capsule=$capsule}
+  }
+  $newSyntheticIdentity = {
+    param([Parameter(Mandatory)][string]$Label)
+    $key = Get-MIRAssuranceTextHash -Text "$Label-$([guid]::NewGuid().ToString('N'))"
+    return [ordered]@{
+      schema=$evidenceSchema
+      test_id="self-test.attempt-state.$Label"
+      target=[string]$Context.target
+      input_key=$key
+      fingerprint_sha256=$key
+      definition_sha256=(Get-MIRAssuranceTextHash -Text "attempt-state-definition-$Label")
+    }
+  }
+  $sameIdentity = & $newSyntheticIdentity 'same-result'
+  $sameFirst = & $newSyntheticAttempt -Identity $sameIdentity -Status passed -Label 'first'
+  Start-Sleep -Milliseconds 2
+  $sameSecond = & $newSyntheticAttempt -Identity $sameIdentity -Status passed -Label 'second-independent-work-path'
+  if ([bool]$sameSecond.capsule.quarantined -or
+      @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $sameIdentity).Count -ne 0 -or
+      $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $sameIdentity -Context $Context)) {
+    throw 'Independent same-semantic trusted attempts with distinct work paths and times were incorrectly quarantined or made non-reusable.'
+  }
+
+  # Model the only recoverable crash window: the immutable contradictory
+  # capsule reached disk but its producer died before it could transition the
+  # mutable pointer.  A reader under the exact lock must see that capsule and
+  # reject the formerly valid passed pointer before a later writer reconciles
+  # it.  This is deterministic rather than scheduler-dependent.
+  $crashWindowIdentity = & $newSyntheticIdentity 'durable-publication-before-pointer'
+  $crashWindowPass = & $newSyntheticAttempt -Identity $crashWindowIdentity -Status passed -Label 'initial-pass'
+  $crashWindowFailure = & $newSyntheticAttempt `
+    -Identity $crashWindowIdentity `
+    -Status failed `
+    -Label 'durable-failure-before-pointer' `
+    -Unpublished
+  $crashWindowPaths = Get-MIRAssuranceEvidencePaths -TestId $crashWindowIdentity.test_id -InputKey $crashWindowIdentity.input_key
+  $crashWindowLock = Enter-MIRAssuranceAttemptStateLock -Identity $crashWindowIdentity
+  $crashWindowReuse = $null
+  $crashWindowState = $null
+  try {
+    $crashWindowFailure.capsule['outcome_digest'] = Get-MIRAssuranceOutcomeDigest -Capsule $crashWindowFailure.capsule
+    $crashWindowRoundTrip = ($crashWindowFailure.capsule | ConvertTo-Json -Depth 40 -Compress) | ConvertFrom-Json
+    $crashWindowFailure.capsule['result_digest'] = Get-MIRAssuranceCapsuleDigest -Capsule $crashWindowRoundTrip
+    New-Item -ItemType Directory -Force -Path $crashWindowPaths.attempts | Out-Null
+    $crashWindowAttemptPath = Join-Path $crashWindowPaths.attempts ("unreconciled-$([guid]::NewGuid().ToString('N')).json")
+    $crashWindowFailure.capsule['attempt_path'] = Get-MIRAssuranceRepoRelativePath -Path $crashWindowAttemptPath
+    Write-MIRAssuranceAtomicJson -Value $crashWindowFailure.capsule -Path $crashWindowAttemptPath
+    $crashWindowReuse = Get-MIRAssuranceReusableEvidence `
+      -Fingerprint $crashWindowIdentity `
+      -Context $Context `
+      -Lock $crashWindowLock
+    $crashWindowReaderReconciled =
+      -not (Test-Path -LiteralPath $crashWindowPass.paths.passed -PathType Leaf) -and
+      (Test-Path -LiteralPath $crashWindowPass.paths.blocked -PathType Leaf)
+    $crashWindowState = Set-MIRAssuranceAttemptPointer `
+      -Capsule $crashWindowFailure.capsule `
+      -AttemptPath $crashWindowAttemptPath `
+      -Context $Context `
+      -Lock $crashWindowLock
+  } finally {
+    Exit-MIRAssuranceAttemptStateLock -Lock $crashWindowLock
+  }
+  if ($null -ne $crashWindowReuse -or
+      -not $crashWindowReaderReconciled -or
+      -not [bool]$crashWindowState.quarantined -or
+      (Test-Path -LiteralPath $crashWindowPass.paths.passed -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $crashWindowPass.paths.blocked -PathType Leaf) -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $crashWindowIdentity -Context $Context)) {
+    throw 'A durable contradictory attempt published before its pointer transition was incorrectly allowed to reuse a stale pass.'
+  }
+
+  $contradictionIdentity = & $newSyntheticIdentity 'contradiction'
+  $contradictionPass = & $newSyntheticAttempt -Identity $contradictionIdentity -Status passed -Label 'passing'
+  $contradictionFail = & $newSyntheticAttempt -Identity $contradictionIdentity -Status failed -Label 'failing'
+  $contradictionIncidents = @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $contradictionIdentity)
+  $contradictionAttempts = @(Get-MIRAssuranceTrustedExactAttempts -Identity $contradictionIdentity -Context $Context)
+  $contradictionBlocked = Get-Content -Raw -LiteralPath $contradictionPass.paths.blocked | ConvertFrom-Json -DateKind String
+  if (-not [bool]$contradictionFail.capsule.quarantined -or
+      $contradictionIncidents.Count -ne 1 -or
+      @($contradictionIncidents[0].incident.attempts).Count -ne 2 -or
+      [string]$contradictionIncidents[0].incident.required_action -ne 'independent-fresh-reproduction-required' -or
+      -not [bool]$contradictionIncidents[0].incident.independent_fresh_reproduction_required -or
+      $contradictionAttempts.Count -ne 2 -or
+      (Test-Path -LiteralPath $contradictionPass.paths.passed -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $contradictionPass.paths.blocked -PathType Leaf) -or
+      [string]$contradictionBlocked.incident_path -ne [string]$contradictionIncidents[0].path -or
+      [string]::IsNullOrWhiteSpace([string]$contradictionBlocked.opposite_capsule_path) -or
+      [string]$contradictionBlocked.capsule_path -ne [string]$contradictionBlocked.opposite_capsule_path -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $contradictionIdentity -Context $Context) -or
+      (Get-MIRAssuranceEvidenceDecision -Fingerprint $contradictionIdentity -Context $Context -TestId $contradictionIdentity.test_id).disposition -ne 'INVALID') {
+    throw 'Contradictory trusted attempts did not preserve both observations, quarantine their identity, and disable reuse.'
+  }
+
+  # A normal retry and a delayed first writer both remain blocked.  The latter
+  # is exercised while the same exact identity lock is held, so a second writer
+  # cannot publish a passed pointer between the conflict scan and the incident.
+  $normalRetry = & $newSyntheticAttempt -Identity $contradictionIdentity -Status passed -Label 'normal-same-worker-retry'
+  $stateLock = Enter-MIRAssuranceAttemptStateLock -Identity $contradictionIdentity
+  $lateWriterRejected = $false
+  try {
+    try {
+      $null = Set-MIRAssuranceAttemptPointer `
+        -Capsule $contradictionPass.capsule `
+        -AttemptPath (Resolve-MIRAssurancePath -Path ([string]$contradictionPass.capsule.attempt_path)) `
+        -Context $Context `
+        -LockTimeoutMilliseconds 25
+    } catch {
+      $lateWriterRejected = $_.Exception.Message -match 'attempt-state lock'
+    }
+  } finally {
+    Exit-MIRAssuranceAttemptStateLock -Lock $stateLock
+  }
+  $lateWriter = Set-MIRAssuranceAttemptPointer `
+    -Capsule $contradictionPass.capsule `
+    -AttemptPath (Resolve-MIRAssurancePath -Path ([string]$contradictionPass.capsule.attempt_path)) `
+    -Context $Context
+  $unresolvedState = Get-MIRAssuranceAttemptQuarantineState -Identity $contradictionIdentity -Context $Context
+  if (-not [bool]$normalRetry.capsule.quarantined -or
+      -not $lateWriterRejected -or
+      -not [bool]$lateWriter.quarantined -or
+      @($unresolvedState.unresolved_incidents).Count -ne 1 -or
+      (Test-Path -LiteralPath $contradictionPass.paths.passed -PathType Leaf) -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $contradictionIdentity -Context $Context)) {
+    throw 'A normal retry or interleaved writer bypassed an unresolved exact-evidence quarantine.'
+  }
+
+  # A syntactically complete resolution that points to an independent *failed*
+  # attempt must not clear quarantine.  This exercises the reader, not merely
+  # the guarded writer, because historical/crafted resolution files are input.
+  $forgedResolutionIdentity = & $newSyntheticIdentity 'forged-failing-resolution'
+  $forgedResolutionPass = & $newSyntheticAttempt -Identity $forgedResolutionIdentity -Status passed -Label 'initial-pass'
+  $forgedResolutionFailure = & $newSyntheticAttempt -Identity $forgedResolutionIdentity -Status failed -Label 'initial-failure'
+  $forgedIncidents = @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $forgedResolutionIdentity)
+  if ($forgedIncidents.Count -ne 1) {
+    throw 'Forged-resolution self-test did not establish exactly one contradiction incident.'
+  }
+  $forgedIncident = $forgedIncidents[0]
+  Start-Sleep -Milliseconds 2
+  $forgedProducer = ConvertTo-MIRAssuranceOrderedMap -Object (Get-MIRAssuranceProducer)
+  $forgedProducer['run_id'] = "independent-failed-$([guid]::NewGuid().ToString('N'))"
+  $forgedProducer['job'] = 'self-test-forged-failed-resolution'
+  $forgedIndependentFailure = & $newSyntheticAttempt `
+    -Identity $forgedResolutionIdentity `
+    -Status failed `
+    -Label 'independent-failed-reproduction' `
+    -Producer $forgedProducer
+  $forgedAttemptRows = @(Get-MIRAssuranceTrustedExactAttempts -Identity $forgedResolutionIdentity -Context $Context)
+  $forgedSelectedRows = @($forgedAttemptRows | Where-Object {
+    [string]$_.path -eq [string]$forgedIndependentFailure.capsule.attempt_path
+  })
+  if ($forgedSelectedRows.Count -ne 1) {
+    throw 'Forged-resolution self-test did not find its independent failed immutable attempt.'
+  }
+  $forgedSelected = $forgedSelectedRows[0]
+  $forgedResolution = [ordered]@{
+    schema=1
+    kind='mir-assurance-quarantine-resolution-v1'
+    status='resolved'
+    identity=$forgedResolutionIdentity
+    incident_path=[string]$forgedIncident.path
+    incident_sha256=[string]$forgedIncident.incident.incident_sha256
+    decision='accept-independent-fresh-reproduction'
+    accepted_outcome_digest=[string]$forgedSelected.outcome_digest
+    independent_attempt=[ordered]@{
+      path=[string]$forgedSelected.path
+      sha256=[string]$forgedSelected.sha256
+      result_digest=[string]$forgedSelected.result_digest
+      outcome_digest=[string]$forgedSelected.outcome_digest
+      definition_sha256=[string]$forgedSelected.capsule.definition_sha256
+      producer_execution_identity=[string]$forgedSelected.producer_execution_identity
+    }
+    adjudicator='self-test-forged-failed-adjudicator'
+    adjudicated_at=[DateTimeOffset]::UtcNow.ToString('o')
+  }
+  $forgedResolution['resolution_sha256'] = Get-MIRAssuranceJsonHash -Value $forgedResolution
+  $forgedResolutionPath = Join-Path `
+    (Get-MIRAssuranceAttemptQuarantineResolutionDirectory -Identity $forgedResolutionIdentity) `
+    ("$($forgedResolution.resolution_sha256).json")
+  Write-MIRAssuranceAtomicJson -Value $forgedResolution -Path $forgedResolutionPath
+  $forgedResolutionState = Get-MIRAssuranceAttemptQuarantineState -Identity $forgedResolutionIdentity -Context $Context
+  if (@($forgedResolutionState.unresolved_incidents).Count -ne 1 -or
+      @($forgedResolutionState.resolved_incidents).Count -ne 0 -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $forgedResolutionIdentity -Context $Context) -or
+      (Get-MIRAssuranceEvidenceDecision -Fingerprint $forgedResolutionIdentity -Context $Context -TestId $forgedResolutionIdentity.test_id).disposition -ne 'INVALID') {
+    throw 'A crafted failed independent reproduction was incorrectly accepted as a quarantine resolution.'
+  }
+
+  # Resolution replays the full reusable-capsule check.  A structurally exact
+  # pass is not enough when its bound result is tampered or its declared
+  # artifact disappeared after the immutable attempt was recorded.
+  $fullValidationIdentity = & $newSyntheticIdentity 'resolution-full-capsule-validation'
+  $null = & $newSyntheticAttempt -Identity $fullValidationIdentity -Status passed -Label 'initial-pass'
+  $null = & $newSyntheticAttempt -Identity $fullValidationIdentity -Status failed -Label 'initial-failure'
+  Start-Sleep -Milliseconds 2
+  $fullValidationProducer = ConvertTo-MIRAssuranceOrderedMap -Object (Get-MIRAssuranceProducer)
+  $fullValidationProducer['run_id'] = "independent-full-validation-$([guid]::NewGuid().ToString('N'))"
+  $fullValidationProducer['job'] = 'self-test-full-resolution-validation'
+  $fullValidationPass = & $newSyntheticAttempt `
+    -Identity $fullValidationIdentity `
+    -Status passed `
+    -Label 'independent-pass-with-artifact' `
+    -Producer $fullValidationProducer `
+    -WithArtifact
+  $fullValidationResultPath = Resolve-MIRAssurancePath -Path ([string]$fullValidationPass.capsule.result.path)
+  $fullValidationResultBytes = [IO.File]::ReadAllBytes($fullValidationResultPath)
+  [IO.File]::WriteAllText($fullValidationResultPath, '{"tampered":true}`n', [Text.UTF8Encoding]::new($false))
+  $tamperedResultRejected = $false
+  try {
+    $null = Resolve-MIRAssuranceAttemptQuarantine `
+      -Identity $fullValidationIdentity `
+      -IndependentAttemptPath ([string]$fullValidationPass.capsule.attempt_path) `
+      -Adjudicator 'self-test-full-validation-adjudicator' `
+      -Context $Context
+  } catch {
+    $tamperedResultRejected = $_.Exception.Message -match 'fully validated independent passing capsule'
+  }
+  [IO.File]::WriteAllBytes($fullValidationResultPath, $fullValidationResultBytes)
+  $fullValidationArtifactPath = Resolve-MIRAssurancePath -Path ([string]$fullValidationPass.capsule.artifacts[0].path)
+  $fullValidationArtifactBytes = [IO.File]::ReadAllBytes($fullValidationArtifactPath)
+  Remove-Item -LiteralPath $fullValidationArtifactPath -Force
+  $missingArtifactRejected = $false
+  try {
+    $null = Resolve-MIRAssuranceAttemptQuarantine `
+      -Identity $fullValidationIdentity `
+      -IndependentAttemptPath ([string]$fullValidationPass.capsule.attempt_path) `
+      -Adjudicator 'self-test-full-validation-adjudicator' `
+      -Context $Context
+  } catch {
+    $missingArtifactRejected = $_.Exception.Message -match 'fully validated independent passing capsule'
+  }
+  [IO.File]::WriteAllBytes($fullValidationArtifactPath, $fullValidationArtifactBytes)
+  $fullValidationResolution = Resolve-MIRAssuranceAttemptQuarantine `
+    -Identity $fullValidationIdentity `
+    -IndependentAttemptPath ([string]$fullValidationPass.capsule.attempt_path) `
+    -Adjudicator 'self-test-full-validation-adjudicator' `
+    -Context $Context
+  if (-not $tamperedResultRejected -or
+      -not $missingArtifactRejected -or
+      [string]$fullValidationResolution.status -ne 'resolved' -or
+      $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $fullValidationIdentity -Context $Context)) {
+    throw 'Quarantine resolution accepted a tampered result or missing bound artifact, or failed after valid bytes were restored.'
+  }
+
+  # An unrelated executor preflight error must inspect the resolved state with
+  # the same definition identity.  It must not turn an already valid resolution
+  # into a fabricated quarantine merely because the error handler omitted that
+  # authoritative fingerprint component.
+  $resolvedExecutionErrorTest = [pscustomobject][ordered]@{
+    id=[string]$fullValidationIdentity.test_id
+    requires_factorio=$true
+    fingerprint=[pscustomobject]$fullValidationIdentity
+  }
+  $resolvedExecutionErrorContext = $Context.PSObject.Copy()
+  $resolvedExecutionErrorContext.factorio = ''
+  $resolvedExecutionErrorResults = @(Invoke-MIRAssurancePlan `
+    -Plan ([pscustomobject][ordered]@{tests=@($resolvedExecutionErrorTest)}) `
+    -Context $resolvedExecutionErrorContext)
+  $resolvedExecutionErrorState = Get-MIRAssuranceAttemptQuarantineState -Identity $fullValidationIdentity -Context $Context
+  if ($resolvedExecutionErrorResults.Count -ne 1 -or
+      [string]$resolvedExecutionErrorResults[0].schema -ne 'mir-plan-execution-error-v1' -or
+      [string]$resolvedExecutionErrorResults[0].message -notmatch 'requires --factorio' -or
+      @($resolvedExecutionErrorState.resolved_incidents).Count -ne 1 -or
+      @($resolvedExecutionErrorState.unresolved_incidents).Count -ne 0) {
+    throw 'An unrelated executor error failed to preserve a valid prior quarantine resolution.'
+  }
+
+  # The accepted reproduction remains live evidence, not a one-time ceremony.
+  # If its bound artifact is corrupted after resolution, resolution readers must
+  # reopen the incident and reuse must replace the old passed pointer with a
+  # quarantined state.
+  [IO.File]::WriteAllText($fullValidationArtifactPath, "tampered after resolution`n", [Text.UTF8Encoding]::new($false))
+  $postResolutionTamperState = Get-MIRAssuranceAttemptQuarantineState -Identity $fullValidationIdentity -Context $Context
+  $postResolutionTamperReuse = Get-MIRAssuranceReusableEvidence -Fingerprint $fullValidationIdentity -Context $Context
+  $postResolutionTamperReconciledState = Get-MIRAssuranceAttemptQuarantineState -Identity $fullValidationIdentity -Context $Context
+  $fullValidationPaths = Get-MIRAssuranceEvidencePaths -TestId $fullValidationIdentity.test_id -InputKey $fullValidationIdentity.input_key
+  if (@($postResolutionTamperState.resolved_incidents).Count -ne 0 -or
+      @($postResolutionTamperState.unresolved_incidents).Count -ne 1 -or
+      $null -ne $postResolutionTamperReuse -or
+      @($postResolutionTamperReconciledState.unresolved_incidents).Count -ne 1 -or
+      (Test-Path -LiteralPath $fullValidationPaths.passed -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $fullValidationPaths.blocked -PathType Leaf)) {
+    throw 'Tampering after a valid quarantine resolution did not reopen and reconcile the incident.'
+  }
+
+  Start-Sleep -Milliseconds 2
+  $independentProducer = ConvertTo-MIRAssuranceOrderedMap -Object (Get-MIRAssuranceProducer)
+  $independentProducer['run_id'] = "independent-$([guid]::NewGuid().ToString('N'))"
+  $independentProducer['job'] = 'self-test-independent-reproduction'
+  $independentPass = & $newSyntheticAttempt `
+    -Identity $contradictionIdentity `
+    -Status passed `
+    -Label 'independent-fresh-reproduction' `
+    -Producer $independentProducer
+  $resolution = Resolve-MIRAssuranceAttemptQuarantine `
+    -Identity $contradictionIdentity `
+    -IndependentAttemptPath ([string]$independentPass.capsule.attempt_path) `
+    -Adjudicator 'self-test-independent-adjudicator' `
+    -Context $Context
+  $resolvedState = Get-MIRAssuranceAttemptQuarantineState -Identity $contradictionIdentity -Context $Context
+  if ([string]$resolution.status -ne 'resolved' -or
+      @($resolvedState.unresolved_incidents).Count -ne 0 -or
+      @($resolvedState.resolved_incidents).Count -ne 1 -or
+      -not (Test-Path -LiteralPath $contradictionPass.paths.passed -PathType Leaf) -or
+      $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $contradictionIdentity -Context $Context)) {
+    throw 'A valid independently reproduced and adjudicated outcome did not resolve the quarantine into a trusted pass.'
+  }
+
+  # Resolution clears only its recorded contradiction.  A subsequent opposite
+  # observation must become a fresh incident; an ordinary later pass cannot
+  # silently inherit the old acceptance.
+  Start-Sleep -Milliseconds 2
+  $postResolutionFailure = & $newSyntheticAttempt -Identity $contradictionIdentity -Status failed -Label 'post-resolution-failure'
+  $ordinaryPostResolutionPass = & $newSyntheticAttempt -Identity $contradictionIdentity -Status passed -Label 'ordinary-post-resolution-pass'
+  $postResolutionState = Get-MIRAssuranceAttemptQuarantineState -Identity $contradictionIdentity -Context $Context
+  $postResolutionIncidents = @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $contradictionIdentity)
+  if (-not [bool]$postResolutionFailure.capsule.quarantined -or
+      -not [bool]$ordinaryPostResolutionPass.capsule.quarantined -or
+      $postResolutionIncidents.Count -ne 2 -or
+      @($postResolutionState.resolved_incidents).Count -ne 1 -or
+      @($postResolutionState.unresolved_incidents).Count -ne 1 -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $contradictionIdentity -Context $Context)) {
+    throw 'A post-resolution opposite observation did not create a fresh unresolved incident before an ordinary pass could reuse evidence.'
+  }
+
+  # The command itself succeeds, but a seeded exact opposite observation turns
+  # the execution into a nonqualified plan failure.  This proves the local
+  # executor cannot return a passing result merely because its child process
+  # exited zero; verify and qualify consume this same result-count contract.
+  $executionQuarantineIdentity = & $newSyntheticIdentity 'execution-quarantine'
+  $null = & $newSyntheticAttempt -Identity $executionQuarantineIdentity -Status failed -Label 'seeded-opposite'
+  $executionQuarantineTest = [pscustomobject][ordered]@{
+    id=[string]$executionQuarantineIdentity.test_id
+    safe_test_id=[string]$executionQuarantineIdentity.test_id
+    requires_factorio=$false
+    requires_candidate=$false
+    inputs=@()
+    kind='static'
+    layer='F0'
+    command='./tests/tooling/Test-MIRVerificationSchemas.ps1'
+    force_fresh=$false
+    fingerprint=[pscustomobject]$executionQuarantineIdentity
+  }
+  $executionQuarantinePlan = [pscustomobject][ordered]@{
+    baseline='self-test'
+    tests=@($executionQuarantineTest)
+  }
+  $executionQuarantineResults = @(Invoke-MIRAssurancePlan `
+    -Plan $executionQuarantinePlan `
+    -Context $Context)
+  $executionQuarantineAttempts = @(Get-MIRAssuranceTrustedExactAttempts -Identity $executionQuarantineIdentity -Context $Context)
+  $executionQuarantineCounts = Get-MIRAssuranceResultCounts `
+    -Results $executionQuarantineResults `
+    -ExpectedTotal 1
+  if ($executionQuarantineResults.Count -ne 1 -or
+      [string]$executionQuarantineResults[0].schema -ne 'mir-plan-execution-quarantine-v1' -or
+      [string]$executionQuarantineResults[0].status -ne 'failed' -or
+      [string]$executionQuarantineResults[0].conclusion -ne 'quarantined' -or
+      $executionQuarantineCounts.failed -ne 1 -or
+      $executionQuarantineCounts.quarantined -ne 1 -or
+      @($executionQuarantineAttempts | Where-Object conclusion -eq 'passed').Count -ne 1 -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $executionQuarantineIdentity -Context $Context)) {
+    throw 'A locally successful assurance command incorrectly escaped exact-evidence quarantine as a qualified result.'
+  }
 
   $fanInRoot = Join-Path $artifactRoot ("worker-import-self-test\" + [guid]::NewGuid().ToString("N"))
   $fanInPrefix = "mir-selftest-"
@@ -342,6 +985,38 @@ function Invoke-MIRAssuranceSelfTest {
     [pscustomobject][ordered]@{label="datetime-offset";value=$exactFanInGeneratedAt},
     [pscustomobject][ordered]@{label="datetime";value=$exactFanInGeneratedAt.UtcDateTime}
   )
+  $getWorkerReceiptPath = {
+    param(
+      [Parameter(Mandatory)][string]$ArtifactRoot,
+      [Parameter(Mandatory)][string]$PlanMaterialSha256
+    )
+    $receiptDirectory = Join-Path $ArtifactRoot "worker-receipts\$PlanMaterialSha256"
+    $selectorPath = Join-Path $receiptDirectory "current.json"
+    if (Test-Path -LiteralPath $selectorPath -PathType Leaf) {
+      $selector = Get-Content -Raw -LiteralPath $selectorPath | ConvertFrom-Json
+      return Join-Path $receiptDirectory "$([string]$selector.receipt_material_sha256).json"
+    }
+    return Join-Path $ArtifactRoot "worker-receipts\$PlanMaterialSha256.json"
+  }
+  $writeWorkerReceipt = {
+    param(
+      [Parameter(Mandatory)][string]$ArtifactRoot,
+      [Parameter(Mandatory)][string]$PlanMaterialSha256,
+      [Parameter(Mandatory)]$Receipt
+    )
+    $receiptDirectory = Join-Path $ArtifactRoot "worker-receipts\$PlanMaterialSha256"
+    New-Item -ItemType Directory -Force -Path $receiptDirectory | Out-Null
+    $stagingReceiptPath = Join-Path $receiptDirectory (".$([guid]::NewGuid().ToString('N')).json")
+    Write-MIRAssuranceAtomicJson -Value $Receipt -Path $stagingReceiptPath
+    $receiptMaterialSha256 = Get-MIRAssuranceSha256 -Path $stagingReceiptPath
+    $receiptPath = Join-Path $receiptDirectory "$receiptMaterialSha256.json"
+    Move-Item -LiteralPath $stagingReceiptPath -Destination $receiptPath -Force
+    Write-MIRAssuranceAtomicJson -Value ([ordered]@{
+      schema=1
+      receipt_material_sha256=$receiptMaterialSha256
+    }) -Path (Join-Path $receiptDirectory "current.json")
+    return $receiptPath
+  }
   $copyFanInArtifact = {
     param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][string[]]$CreationOrder)
     New-Item -ItemType Directory -Force -Path $Root | Out-Null
@@ -357,10 +1032,10 @@ function Invoke-MIRAssuranceSelfTest {
         $decoyPointer = Get-Content -Raw -LiteralPath $decoyPointerPath | ConvertFrom-Json
         $decoyPointer.input_key = "stale-colliding-pointer"
         Write-MIRAssuranceAtomicJson -Value $decoyPointer -Path $decoyPointerPath
-        $decoyReceiptPath = Join-Path $destination "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+        $decoyReceiptPath = & $getWorkerReceiptPath -ArtifactRoot $destination -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
         $decoyReceipt = Get-Content -Raw -LiteralPath $decoyReceiptPath | ConvertFrom-Json
         $decoyReceipt.plan.material_sha256 = Get-MIRAssuranceTextHash -Text "stale-plan-material"
-        Write-MIRAssuranceAtomicJson -Value $decoyReceipt -Path $decoyReceiptPath
+        $null = & $writeWorkerReceipt -ArtifactRoot $destination -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256) -Receipt $decoyReceipt
       }
     }
   }
@@ -378,7 +1053,7 @@ function Invoke-MIRAssuranceSelfTest {
       foreach ($timestampCase in $fanInTimestampCases) {
         $fanInPlan.generated_at = $timestampCase.value
         $null = Write-MIRAssuranceWorkerReceipt -Plan $fanInPlan -Test $fanInTest -Capsule $capsule
-        $timestampReceiptPath = Join-Path $paths.root "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+        $timestampReceiptPath = & $getWorkerReceiptPath -ArtifactRoot $paths.root -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
         $timestampReceipt = Get-Content -Raw -LiteralPath $timestampReceiptPath | ConvertFrom-Json
         $expectedTimestamp = ConvertTo-MIRAssuranceDateTimeOffset -Value $fanInPlan.generated_at
         $receiptTimestamp = ConvertTo-MIRAssuranceDateTimeOffset -Value $timestampReceipt.plan.generated_at
@@ -454,17 +1129,14 @@ function Invoke-MIRAssuranceSelfTest {
 
     $adoptedRoot = Join-Path $fanInRoot "adopted-exact-evidence"
     & $copyFanInArtifact $adoptedRoot @("expected")
-    $adoptedReceiptPath = Join-Path (Join-Path $adoptedRoot "$fanInPrefix$selfTestId") "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+    $adoptedArtifactRoot = Join-Path $adoptedRoot "$fanInPrefix$selfTestId"
+    $adoptedReceiptPath = & $getWorkerReceiptPath -ArtifactRoot $adoptedArtifactRoot -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
     $adoptedReceipt = Get-Content -Raw -LiteralPath $adoptedReceiptPath | ConvertFrom-Json
     $adoptedReceipt.producer.run_id = "trusted-continuation-run"
     $adoptedReceipt.producer.job = "trusted-continuation-worker"
     $adoptedReceipt.evidence_disposition = "adopted-exact-trusted-capsule"
-    Write-MIRAssuranceAtomicJson -Value $adoptedReceipt -Path $adoptedReceiptPath
+    $null = & $writeWorkerReceipt -ArtifactRoot $adoptedArtifactRoot -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256) -Receipt $adoptedReceipt
     & $resetFanInDestination
-    $adoptedDestinationReceipt = Join-Path $paths.root "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
-    if (Test-Path -LiteralPath $adoptedDestinationReceipt -PathType Leaf) {
-      Remove-Item -LiteralPath $adoptedDestinationReceipt -Force
-    }
     $adoptedImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $adoptedRoot -ArtifactPrefix $fanInPrefix
     if ([string]$adoptedImport.status -ne "passed" -or @($adoptedImport.imported).Count -ne 1) {
       throw "Worker fan-in rejected exact trusted evidence adopted by a later trusted worker."
@@ -472,10 +1144,11 @@ function Invoke-MIRAssuranceSelfTest {
 
     $receiptMismatchRoot = Join-Path $fanInRoot "receipt-mismatch"
     & $copyFanInArtifact $receiptMismatchRoot @("expected")
-    $receiptMismatchPath = Join-Path (Join-Path $receiptMismatchRoot "$fanInPrefix$selfTestId") "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+    $receiptMismatchArtifactRoot = Join-Path $receiptMismatchRoot "$fanInPrefix$selfTestId"
+    $receiptMismatchPath = & $getWorkerReceiptPath -ArtifactRoot $receiptMismatchArtifactRoot -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
     $receiptMismatch = Get-Content -Raw -LiteralPath $receiptMismatchPath | ConvertFrom-Json
     $receiptMismatch.plan.material_sha256 = "different-verification-context"
-    Write-MIRAssuranceAtomicJson -Value $receiptMismatch -Path $receiptMismatchPath
+    $null = & $writeWorkerReceipt -ArtifactRoot $receiptMismatchArtifactRoot -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256) -Receipt $receiptMismatch
     $receiptMismatchImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $receiptMismatchRoot -ArtifactPrefix $fanInPrefix
     if ([string]$receiptMismatchImport.status -ne "failed" -or @($receiptMismatchImport.rejected).Count -ne 1) {
       throw "Worker fan-in accepted a receipt from a different verification context."
@@ -483,13 +1156,113 @@ function Invoke-MIRAssuranceSelfTest {
 
     $producerMismatchRoot = Join-Path $fanInRoot "producer-mismatch"
     & $copyFanInArtifact $producerMismatchRoot @("expected")
-    $producerMismatchPath = Join-Path (Join-Path $producerMismatchRoot "$fanInPrefix$selfTestId") "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+    $producerMismatchArtifactRoot = Join-Path $producerMismatchRoot "$fanInPrefix$selfTestId"
+    $producerMismatchPath = & $getWorkerReceiptPath -ArtifactRoot $producerMismatchArtifactRoot -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
     $producerMismatch = Get-Content -Raw -LiteralPath $producerMismatchPath | ConvertFrom-Json
     $producerMismatch.producer.job = "different-worker-job"
-    Write-MIRAssuranceAtomicJson -Value $producerMismatch -Path $producerMismatchPath
+    $null = & $writeWorkerReceipt -ArtifactRoot $producerMismatchArtifactRoot -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256) -Receipt $producerMismatch
     $producerMismatchImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $producerMismatchRoot -ArtifactPrefix $fanInPrefix
     if ([string]$producerMismatchImport.status -ne "failed" -or @($producerMismatchImport.rejected).Count -ne 1) {
       throw "Worker fan-in accepted a receipt whose declared evidence disposition contradicted its producer lineage."
+    }
+
+    # GitHub reruns only failed jobs.  A later aggregate must keep attempt-1
+    # successes, accept a replacement worker from attempt 2, and not collide
+    # its distinct transport receipt with the same plan-owned evidence root.
+    $retryRunId = [string]$fanInPlan.producer.run_id
+    $retryPrefix = "mir-retry-$retryRunId-"
+    $retryRootOne = Join-Path $fanInRoot "retry-attempt-one"
+    $retryRootBoth = Join-Path $fanInRoot "retry-attempts-one-and-two"
+    $newRetryArtifact = {
+      param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][int]$Attempt)
+      $artifact = Join-Path $Root "$retryPrefix$Attempt-$selfTestId-$selfTestKey"
+      New-Item -ItemType Directory -Force -Path $artifact | Out-Null
+      $receiptPath = & $getWorkerReceiptPath -ArtifactRoot $paths.root -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
+      $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json
+      foreach ($item in @(Get-ChildItem -LiteralPath $paths.root -Force)) {
+        # Each synthetic worker publishes its own transport receipt. Copying
+        # the caller's attempt-2 transports makes the later synthetic worker
+        # ambiguous even though the underlying trusted capsule is unchanged.
+        if ($item.Name -ceq 'worker-receipts') { continue }
+        Copy-Item -LiteralPath $item.FullName -Destination $artifact -Recurse -Force
+      }
+      # Synthetic attempt 1 must also be explicit when this self-test itself
+      # runs in a later GitHub attempt. Preserve the real evidence producer.
+      $receipt.producer.run_id = $retryRunId
+      $receipt.producer.run_attempt = [string]$Attempt
+      $receipt.evidence_disposition = if (
+        (Get-MIRAssuranceJsonHash -Value $receipt.producer) -eq (Get-MIRAssuranceJsonHash -Value $receipt.evidence_producer)
+      ) { "produced-by-worker" } else { "adopted-exact-trusted-capsule" }
+      $null = & $writeWorkerReceipt -ArtifactRoot $artifact -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256) -Receipt $receipt
+      return $artifact
+    }
+    $retryAttemptOne = & $newRetryArtifact -Root $retryRootOne -Attempt 1
+    & $resetFanInDestination
+    $retryImportOne = Import-MIRAssuranceWorkerEvidence `
+      -Plan $fanInPlan `
+      -Context $Context `
+      -WorkerRoot $retryRootOne `
+      -ArtifactPrefix $retryPrefix `
+      -RetryAcrossAttempts `
+      -CurrentRunAttempt 1
+    if ([string]$retryImportOne.status -ne "passed" -or @($retryImportOne.imported).Count -ne 1) {
+      throw "Retry-aware fan-in did not import the first trusted worker attempt: $($retryImportOne | ConvertTo-Json -Depth 20 -Compress)"
+    }
+    $retryAttemptTwo = & $newRetryArtifact -Root $retryRootBoth -Attempt 2
+    Copy-Item -LiteralPath $retryAttemptOne -Destination $retryRootBoth -Recurse
+    & $resetFanInDestination
+    $retryImportBoth = Import-MIRAssuranceWorkerEvidence `
+      -Plan $fanInPlan `
+      -Context $Context `
+      -WorkerRoot $retryRootBoth `
+      -ArtifactPrefix $retryPrefix `
+      -RetryAcrossAttempts `
+      -CurrentRunAttempt 2
+    $retryReceiptDirectory = Join-Path $paths.root "worker-receipts\$([string]$fanInPlan.plan_material_sha256)"
+    if ([string]$retryImportBoth.status -ne "passed" -or
+        @($retryImportBoth.imported).Count -ne 1 -or
+        [string]$retryImportBoth.imported[0].artifact -ne (Split-Path -Leaf $retryAttemptTwo) -or
+        @($retryImportBoth.duplicates).Count -ne 0 -or
+        @($retryImportBoth.ignored | Where-Object reason -eq "superseded-by-later-run-attempt").Count -ne 1 -or
+        @((Get-ChildItem -LiteralPath $retryReceiptDirectory -File -Filter '*.json' | Where-Object Name -ne 'current.json')).Count -lt 2) {
+      throw "Retry-aware fan-in did not deterministically retain earlier success, select the later worker, and preserve distinct immutable transport receipts: $($retryImportBoth | ConvertTo-Json -Depth 20 -Compress)"
+    }
+
+    # Historical V3 workers used a single flat receipt.  Preserve their
+    # one-shot import path, but reject that transport shape during a GitHub
+    # retry because it cannot bind one immutable receipt to each attempt.
+    $flatReceiptRoot = Join-Path $fanInRoot "historical-flat-receipt"
+    & $copyFanInArtifact $flatReceiptRoot @("expected")
+    $flatReceiptArtifact = Join-Path $flatReceiptRoot "$fanInPrefix$selfTestId"
+    $flatReceiptPath = & $getWorkerReceiptPath -ArtifactRoot $flatReceiptArtifact -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
+    $legacyReceiptPath = Join-Path $flatReceiptArtifact "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+    Copy-Item -LiteralPath $flatReceiptPath -Destination $legacyReceiptPath
+    $flatReceiptDirectory = Join-Path $flatReceiptArtifact "worker-receipts\$([string]$fanInPlan.plan_material_sha256)"
+    Remove-Item -LiteralPath $flatReceiptDirectory -Recurse -Force
+    if ((Test-Path -LiteralPath $flatReceiptDirectory -PathType Container) -or -not (Test-Path -LiteralPath $legacyReceiptPath -PathType Leaf)) {
+      throw "Historical flat V3 receipt fixture did not remove the content-addressed receipt directory exactly."
+    }
+    & $resetFanInDestination
+    $flatReceiptImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $flatReceiptRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$flatReceiptImport.status -ne "passed" -or @($flatReceiptImport.imported).Count -ne 1) {
+      throw "Historical flat V3 worker receipt did not retain its one-shot import compatibility: $($flatReceiptImport | ConvertTo-Json -Depth 20 -Compress)"
+    }
+    $retryFlatRoot = Join-Path $fanInRoot "historical-flat-retry"
+    New-Item -ItemType Directory -Force -Path $retryFlatRoot | Out-Null
+    Copy-Item -LiteralPath $flatReceiptArtifact -Destination (Join-Path $retryFlatRoot "${retryPrefix}1-$selfTestId-$selfTestKey") -Recurse
+    & $resetFanInDestination
+    $retryFlatImport = Import-MIRAssuranceWorkerEvidence `
+      -Plan $fanInPlan -Context $Context -WorkerRoot $retryFlatRoot -ArtifactPrefix $retryPrefix `
+      -RetryAcrossAttempts -CurrentRunAttempt 1
+    if ([string]$retryFlatImport.status -ne "failed" -or @($retryFlatImport.rejected).Count -ne 1 -or @($retryFlatImport.imported).Count -ne 0) {
+      throw "Retry-aware worker fan-in accepted a historical flat receipt without an immutable transport binding."
+    }
+    $restoreFanInRoot = Join-Path $fanInRoot "restore-current-evidence"
+    & $copyFanInArtifact $restoreFanInRoot @("expected")
+    & $resetFanInDestination
+    $restoreFanInImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $restoreFanInRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$restoreFanInImport.status -ne "passed" -or @($restoreFanInImport.imported).Count -ne 1) {
+      throw "Worker fan-in did not restore the normal current receipt after the historical compatibility exercise."
     }
 
     $duplicateRoot = Join-Path $fanInRoot "duplicate"
@@ -549,6 +1322,36 @@ function Invoke-MIRAssuranceSelfTest {
     try { $null = Assert-MIRAssuranceWorkerArtifactTree -ArtifactRoot $limitRoot -Context $limitContext } catch { $limitRejected = $true }
     if (-not $limitRejected) { throw "Worker artifact ingestion did not enforce the individual-file size limit." }
 
+    # Admission bounds apply before any receipt lookup.  Both artifacts have
+    # deliberately unusable receipt material; the importer must reject them
+    # for their resource shape rather than attempting JSON/receipt parsing.
+    $oversizedFanInRoot = Join-Path $fanInRoot "oversized-receipt"
+    & $copyFanInArtifact $oversizedFanInRoot @("expected")
+    $oversizedArtifact = Join-Path $oversizedFanInRoot "$fanInPrefix$selfTestId"
+    $oversizedReceiptPath = & $getWorkerReceiptPath -ArtifactRoot $oversizedArtifact -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
+    [IO.File]::WriteAllText($oversizedReceiptPath, "not-json", [Text.UTF8Encoding]::new($false))
+    $oversizedImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $limitContext -WorkerRoot $oversizedFanInRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$oversizedImport.status -ne "failed" -or @($oversizedImport.rejected).Count -ne 1 -or
+        ((@($oversizedImport.rejected[0].reasons) -join " ") -notmatch "oversized file")) {
+      throw "Worker fan-in parsed an oversized receipt before enforcing artifact resource bounds."
+    }
+    $excessReceiptRoot = Join-Path $fanInRoot "excess-receipts"
+    & $copyFanInArtifact $excessReceiptRoot @("expected")
+    $excessArtifact = Join-Path $excessReceiptRoot "$fanInPrefix$selfTestId"
+    $baselineArtifactTree = Assert-MIRAssuranceWorkerArtifactTree -ArtifactRoot $excessArtifact -Context $Context
+    $excessContext = $Context.PSObject.Copy()
+    $excessContext.config = (($Context.config | ConvertTo-Json -Depth 20) | ConvertFrom-Json)
+    $excessContext.config.worker_import.max_entries_per_artifact = [int]$baselineArtifactTree.entries + 1
+    $excessReceiptPath = & $getWorkerReceiptPath -ArtifactRoot $excessArtifact -PlanMaterialSha256 ([string]$fanInPlan.plan_material_sha256)
+    $excessReceiptDirectory = Split-Path -Parent $excessReceiptPath
+    Copy-Item -LiteralPath $excessReceiptPath -Destination (Join-Path $excessReceiptDirectory (("a" * 64) + ".json"))
+    Copy-Item -LiteralPath $excessReceiptPath -Destination (Join-Path $excessReceiptDirectory (("b" * 64) + ".json"))
+    $excessImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $excessContext -WorkerRoot $excessReceiptRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$excessImport.status -ne "failed" -or @($excessImport.rejected).Count -ne 1 -or
+        ((@($excessImport.rejected[0].reasons) -join " ") -notmatch "entry-count limit")) {
+      throw "Worker fan-in enumerated excessive receipt objects before enforcing artifact entry bounds."
+    }
+
     $mixedPrefix = "mir-mixed-"
     $mixedIds = [ordered]@{
       reuse=$selfTestId
@@ -591,9 +1394,14 @@ function Invoke-MIRAssuranceSelfTest {
       producer=$capsule.producer
     }
     $newMixedContribution = {
-      param([Parameter(Mandatory)]$Test, [Parameter(Mandatory)][ValidateSet("passed", "failed")][string]$Status)
+      param(
+        [Parameter(Mandatory)]$Test,
+        [Parameter(Mandatory)][ValidateSet("passed", "failed")][string]$Status,
+        [Parameter(Mandatory)]$Plan,
+        [string]$WorkLabel = "synthetic"
+      )
       $mixedPaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$Test.id) -InputKey ([string]$Test.fingerprint.input_key)
-      $workRoot = Join-Path $mixedPaths.root "work\synthetic"
+      $workRoot = Join-Path $mixedPaths.root (Join-Path "work" $WorkLabel)
       New-Item -ItemType Directory -Force -Path $workRoot | Out-Null
       $stdout = Join-Path $workRoot "stdout.txt"
       $stderr = Join-Path $workRoot "stderr.txt"
@@ -622,12 +1430,261 @@ function Invoke-MIRAssuranceSelfTest {
         log_digest=(Get-MIRAssuranceTextHash -Text "`n");started_at=[string]$capsule.started_at;completed_at=[string]$capsule.completed_at
         duration_seconds=0;message=if($Status -eq "passed"){""}else{"synthetic failure"}
       }
-      $mixedCapsule = Write-MIRAssuranceAttempt -Capsule $mixedCapsule
-      $null = Write-MIRAssuranceWorkerReceipt -Plan $mixedPlan -Test $Test -Capsule $mixedCapsule
+      $mixedCapsule = Write-MIRAssuranceAttempt -Capsule $mixedCapsule -Context $Context
+      $null = Write-MIRAssuranceWorkerReceipt -Plan $Plan -Test $Test -Capsule $mixedCapsule
       return [pscustomobject][ordered]@{paths=$mixedPaths;capsule=$mixedCapsule}
     }
-    $mixedSuccess = & $newMixedContribution -Test @($mixedTests | Where-Object id -eq $mixedIds.success)[0] -Status passed
-    $mixedFailure = & $newMixedContribution -Test @($mixedTests | Where-Object id -eq $mixedIds.failed)[0] -Status failed
+
+    # The first aggregate gate was cancelled before it could import either
+    # artifact below.  The retry fan-in therefore starts from an empty local
+    # destination and must discover both immutable observations itself.
+    $newRetryScenario = {
+      param([Parameter(Mandatory)][string]$Label)
+      $id = "self-test.retry.$Label"
+      $key = Get-MIRAssuranceTextHash -Text "$id-$([guid]::NewGuid().ToString('N'))"
+      $test = [pscustomobject][ordered]@{
+        id=$id
+        safe_test_id=$id
+        fingerprint=[pscustomobject][ordered]@{
+          schema=$evidenceSchema
+          test_id=$id
+          target=[string]$Context.target
+          input_key=$key
+          fingerprint_sha256=$key
+          definition_sha256=(Get-MIRAssuranceTextHash -Text "retry-definition-$Label")
+        }
+        force_fresh=$false
+      }
+      $work = [pscustomobject][ordered]@{test_id=$id;safe_test_id=$id;fingerprint=$key;disposition="RUN";layer="F0"}
+      $plan = [pscustomobject][ordered]@{
+        tests=@($test)
+        work=@($work)
+        plan_material_sha256=(Get-MIRAssuranceTextHash -Text "retry-plan-$Label-$([guid]::NewGuid().ToString('N'))")
+        required_test_set_sha256=(Get-MIRAssuranceJsonHash -Value @($id))
+        generated_at=[string]$capsule.started_at
+        source_commit=[string]$capsule.producer.commit
+        source_tree=(((& git -C $repo rev-parse "HEAD^{tree}").Trim()))
+        target=[string]$Context.target
+        profile="self-test-retry-$Label"
+        producer=$capsule.producer
+      }
+      return [pscustomobject][ordered]@{label=$Label;test=$test;plan=$plan}
+    }
+    $retryScenarioPrefix = "mir-retry-scenario-$([string]$capsule.producer.run_id)-"
+    $newRetryScenarioArtifact = {
+      param(
+        [Parameter(Mandatory)]$Scenario,
+        [Parameter(Mandatory)][ValidateSet("passed", "failed")][string]$Status,
+        [Parameter(Mandatory)][int]$Attempt,
+        [Parameter(Mandatory)][string]$Root
+      )
+      $contribution = & $newMixedContribution `
+        -Test $Scenario.test -Status $Status -Plan $Scenario.plan `
+        -WorkLabel "retry-$Attempt-$Status-$([guid]::NewGuid().ToString('N'))"
+      $artifactName = "$retryScenarioPrefix$Attempt-$([string]$Scenario.test.safe_test_id)-$([string]$Scenario.test.fingerprint.fingerprint_sha256)"
+      $artifact = Join-Path $Root $artifactName
+      New-Item -ItemType Directory -Force -Path $artifact | Out-Null
+      foreach ($item in @(Get-ChildItem -LiteralPath $contribution.paths.root -Force)) {
+        Copy-Item -LiteralPath $item.FullName -Destination $artifact -Recurse -Force
+      }
+      $receiptPath = & $getWorkerReceiptPath -ArtifactRoot $artifact -PlanMaterialSha256 ([string]$Scenario.plan.plan_material_sha256)
+      $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json
+      $receipt.producer.run_id = [string]$Scenario.plan.producer.run_id
+      $receipt.producer.run_attempt = [string]$Attempt
+      $receipt.evidence_disposition = if (
+        (Get-MIRAssuranceJsonHash -Value $receipt.producer) -eq (Get-MIRAssuranceJsonHash -Value $receipt.evidence_producer)
+      ) { "produced-by-worker" } else { "adopted-exact-trusted-capsule" }
+      $rewrittenReceiptPath = & $writeWorkerReceipt -ArtifactRoot $artifact -PlanMaterialSha256 ([string]$Scenario.plan.plan_material_sha256) -Receipt $receipt
+      if ([IO.Path]::GetFullPath($rewrittenReceiptPath) -ne [IO.Path]::GetFullPath($receiptPath) -and
+          (Test-Path -LiteralPath $receiptPath -PathType Leaf)) {
+        Remove-Item -LiteralPath $receiptPath -Force
+      }
+      Remove-Item -LiteralPath $contribution.paths.root -Recurse -Force
+      return $artifact
+    }
+    $assertRetryScenario = {
+      param(
+        [Parameter(Mandatory)][string]$Label,
+        [Parameter(Mandatory)][ValidateSet("passed", "failed")][string]$First,
+        [Parameter(Mandatory)][ValidateSet("passed", "failed")][string]$Second,
+        [Parameter(Mandatory)][bool]$Contradictory
+      )
+      $scenario = & $newRetryScenario -Label $Label
+      $scenarioRoot = Join-Path $fanInRoot "retry-scenario-$Label"
+      New-Item -ItemType Directory -Force -Path $scenarioRoot | Out-Null
+      $firstArtifact = & $newRetryScenarioArtifact -Scenario $scenario -Status $First -Attempt 1 -Root $scenarioRoot
+      $secondArtifact = & $newRetryScenarioArtifact -Scenario $scenario -Status $Second -Attempt 2 -Root $scenarioRoot
+      $scenarioPaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$scenario.test.id) -InputKey ([string]$scenario.test.fingerprint.input_key)
+      if (Test-Path -LiteralPath $scenarioPaths.root) {
+        throw "Retry scenario did not begin with the cancelled first aggregate gate's empty destination."
+      }
+      $import = Import-MIRAssuranceWorkerEvidence `
+        -Plan $scenario.plan -Context $Context -WorkerRoot $scenarioRoot -ArtifactPrefix $retryScenarioPrefix `
+        -RetryAcrossAttempts -CurrentRunAttempt 2
+      $incidents = @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $scenario.test.fingerprint)
+      if ($Contradictory) {
+        if ([string]$import.status -ne "failed" -or @($import.imported).Count -ne 0 -or
+            @($import.rejected).Count -ne 1 -or $incidents.Count -ne 1 -or
+            @($incidents[0].incident.attempts).Count -ne 2 -or
+            $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $scenario.test.fingerprint -Context $Context)) {
+          throw "Retry fan-in did not quarantine both immutable $First-to-$Second observations from an empty aggregate destination: $($import | ConvertTo-Json -Depth 20 -Compress)"
+        }
+      } elseif ([string]$import.status -ne "passed" -or @($import.imported).Count -ne 1 -or
+          [string]$import.imported[0].artifact -ne (Split-Path -Leaf $secondArtifact) -or
+          @($import.ignored | Where-Object reason -eq "superseded-by-later-run-attempt").Count -ne 1 -or
+          $incidents.Count -ne 0) {
+        throw "Retry fan-in did not retain both matching observations and select the latest transport attempt: $($import | ConvertTo-Json -Depth 20 -Compress)"
+      }
+      if (Test-Path -LiteralPath $scenarioPaths.root) { Remove-Item -LiteralPath $scenarioPaths.root -Recurse -Force }
+    }
+    & $assertRetryScenario -Label "pass-pass" -First passed -Second passed -Contradictory $false
+    & $assertRetryScenario -Label "failed-pass" -First failed -Second passed -Contradictory $true
+    & $assertRetryScenario -Label "pass-failed" -First passed -Second failed -Contradictory $true
+    # A full GitHub rerun replaces the planner transport as well as rerunning
+    # workers. The unchanged row fingerprint means both worker artifact names
+    # remain in the aggregate download, but attempt 1 is proof for the old
+    # plan only. It must be structurally accounted for as stale transport,
+    # without poisoning valid new-plan attempt 2 or publishing old evidence.
+    $rerunAllScenario = & $newRetryScenario -Label "full-rerun-stale-plan"
+    $rerunAllOldScenario = [pscustomobject][ordered]@{
+      test=$rerunAllScenario.test
+      plan=$rerunAllScenario.plan
+    }
+    $rerunAllPlan = [pscustomobject][ordered]@{
+      tests=@($rerunAllScenario.test)
+      work=@($rerunAllScenario.plan.work)
+      plan_material_sha256=(Get-MIRAssuranceTextHash -Text "retry-full-rerun-plan-$([guid]::NewGuid().ToString('N'))")
+      required_test_set_sha256=[string]$rerunAllScenario.plan.required_test_set_sha256
+      generated_at=([DateTimeOffset]::Parse([string]$rerunAllScenario.plan.generated_at).AddSeconds(1).ToString('o'))
+      source_commit=[string]$rerunAllScenario.plan.source_commit
+      source_tree=[string]$rerunAllScenario.plan.source_tree
+      target=[string]$rerunAllScenario.plan.target
+      profile=[string]$rerunAllScenario.plan.profile
+      producer=$rerunAllScenario.plan.producer
+    }
+    $rerunAllCurrentScenario = [pscustomobject][ordered]@{
+      test=$rerunAllScenario.test
+      plan=$rerunAllPlan
+    }
+    $rerunAllRoot = Join-Path $fanInRoot "retry-scenario-full-rerun-stale-plan"
+    New-Item -ItemType Directory -Force -Path $rerunAllRoot | Out-Null
+    $rerunAllOldArtifact = & $newRetryScenarioArtifact -Scenario $rerunAllOldScenario -Status passed -Attempt 1 -Root $rerunAllRoot
+    $rerunAllCurrentArtifact = & $newRetryScenarioArtifact -Scenario $rerunAllCurrentScenario -Status passed -Attempt 2 -Root $rerunAllRoot
+    $rerunAllPaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$rerunAllScenario.test.id) -InputKey ([string]$rerunAllScenario.test.fingerprint.input_key)
+    if (Test-Path -LiteralPath $rerunAllPaths.root) {
+      throw "Full-rerun stale-plan retry scenario did not begin with an empty aggregate destination."
+    }
+    $rerunAllImport = Import-MIRAssuranceWorkerEvidence `
+      -Plan $rerunAllPlan -Context $Context -WorkerRoot $rerunAllRoot -ArtifactPrefix $retryScenarioPrefix `
+      -RetryAcrossAttempts -CurrentRunAttempt 2
+    $stalePlanTransport = @($rerunAllImport.ignored | Where-Object {
+      [string]$_.reason -eq "stale-plan-transport" -and
+      [string]$_.artifact -eq (Split-Path -Leaf $rerunAllOldArtifact) -and
+      [string]$_.plan_material_sha256 -eq [string]$rerunAllOldScenario.plan.plan_material_sha256 -and
+      [string]$_.current_plan_material_sha256 -eq [string]$rerunAllPlan.plan_material_sha256
+    })
+    if ([string]$rerunAllImport.status -ne "passed" -or @($rerunAllImport.imported).Count -ne 1 -or
+        [string]$rerunAllImport.imported[0].artifact -ne (Split-Path -Leaf $rerunAllCurrentArtifact) -or
+        @($rerunAllImport.rejected).Count -ne 0 -or $stalePlanTransport.Count -ne 1) {
+      throw "Retry fan-in did not ignore a structurally trusted prior-plan transport during a full rerun: $($rerunAllImport | ConvertTo-Json -Depth 20 -Compress)"
+    }
+    if (Test-Path -LiteralPath $rerunAllPaths.root) { Remove-Item -LiteralPath $rerunAllPaths.root -Recurse -Force }
+    # A changed receipt can still be content-addressed by its own declared
+    # bytes. It is not stale-safe unless its receipt structure remains valid;
+    # retain that rejection even when a later new-plan worker is valid.
+    $malformedStaleRoot = Join-Path $fanInRoot "retry-scenario-full-rerun-malformed-stale-plan"
+    New-Item -ItemType Directory -Force -Path $malformedStaleRoot | Out-Null
+    foreach ($artifact in @($rerunAllOldArtifact, $rerunAllCurrentArtifact)) {
+      Copy-Item -LiteralPath $artifact -Destination $malformedStaleRoot -Recurse -Force
+    }
+    $malformedStaleArtifact = Join-Path $malformedStaleRoot (Split-Path -Leaf $rerunAllOldArtifact)
+    $malformedStaleReceiptPath = & $getWorkerReceiptPath -ArtifactRoot $malformedStaleArtifact -PlanMaterialSha256 ([string]$rerunAllOldScenario.plan.plan_material_sha256)
+    $malformedStaleReceipt = Get-Content -Raw -LiteralPath $malformedStaleReceiptPath | ConvertFrom-Json
+    $malformedStaleReceipt.result.result_digest = "not-a-sha256-digest"
+    $rewrittenMalformedStaleReceipt = & $writeWorkerReceipt `
+      -ArtifactRoot $malformedStaleArtifact -PlanMaterialSha256 ([string]$rerunAllOldScenario.plan.plan_material_sha256) `
+      -Receipt $malformedStaleReceipt
+    if ([IO.Path]::GetFullPath($rewrittenMalformedStaleReceipt) -ne [IO.Path]::GetFullPath($malformedStaleReceiptPath)) {
+      Remove-Item -LiteralPath $malformedStaleReceiptPath -Force
+    }
+    $malformedStaleImport = Import-MIRAssuranceWorkerEvidence `
+      -Plan $rerunAllPlan -Context $Context -WorkerRoot $malformedStaleRoot -ArtifactPrefix $retryScenarioPrefix `
+      -RetryAcrossAttempts -CurrentRunAttempt 2
+    if ([string]$malformedStaleImport.status -ne "failed" -or @($malformedStaleImport.rejected).Count -ne 1 -or
+        @($malformedStaleImport.imported).Count -ne 0 -or (Test-Path -LiteralPath $rerunAllPaths.root)) {
+      throw "Retry fan-in treated a malformed prior-plan transport as ignorable or published a later result: $($malformedStaleImport | ConvertTo-Json -Depth 20 -Compress)"
+    }
+    # The receipt filename alone is not its plan binding. A receipt with valid
+    # self-hash and old-plan fields cannot be relocated beneath another
+    # content-addressed plan-material directory to evade stale-plan handling.
+    $relocatedStaleRoot = Join-Path $fanInRoot "retry-scenario-full-rerun-relocated-stale-plan"
+    New-Item -ItemType Directory -Force -Path $relocatedStaleRoot | Out-Null
+    foreach ($artifact in @($rerunAllOldArtifact, $rerunAllCurrentArtifact)) {
+      Copy-Item -LiteralPath $artifact -Destination $relocatedStaleRoot -Recurse -Force
+    }
+    $relocatedStaleArtifact = Join-Path $relocatedStaleRoot (Split-Path -Leaf $rerunAllOldArtifact)
+    $oldReceiptDirectory = Join-Path $relocatedStaleArtifact "worker-receipts\$([string]$rerunAllOldScenario.plan.plan_material_sha256)"
+    $relocatedPlanMaterial = Get-MIRAssuranceTextHash -Text "relocated-retry-plan-directory-$([guid]::NewGuid().ToString('N'))"
+    Move-Item -LiteralPath $oldReceiptDirectory -Destination (Join-Path (Split-Path -Parent $oldReceiptDirectory) $relocatedPlanMaterial)
+    $relocatedStaleImport = Import-MIRAssuranceWorkerEvidence `
+      -Plan $rerunAllPlan -Context $Context -WorkerRoot $relocatedStaleRoot -ArtifactPrefix $retryScenarioPrefix `
+      -RetryAcrossAttempts -CurrentRunAttempt 2
+    if ([string]$relocatedStaleImport.status -ne "failed" -or @($relocatedStaleImport.rejected).Count -ne 1 -or
+        @($relocatedStaleImport.imported).Count -ne 0 -or (Test-Path -LiteralPath $rerunAllPaths.root)) {
+      throw "Retry fan-in accepted a receipt relocated beneath a different content-addressed plan directory: $($relocatedStaleImport | ConvertTo-Json -Depth 20 -Compress)"
+    }
+    $futureScenario = & $newRetryScenario -Label "future-attempt"
+    $futureScenarioRoot = Join-Path $fanInRoot "retry-scenario-future-attempt"
+    New-Item -ItemType Directory -Force -Path $futureScenarioRoot | Out-Null
+    $null = & $newRetryScenarioArtifact -Scenario $futureScenario -Status passed -Attempt 2 -Root $futureScenarioRoot
+    $futureImport = Import-MIRAssuranceWorkerEvidence `
+      -Plan $futureScenario.plan -Context $Context -WorkerRoot $futureScenarioRoot -ArtifactPrefix $retryScenarioPrefix `
+      -RetryAcrossAttempts -CurrentRunAttempt 1
+    if ([string]$futureImport.status -ne "failed" -or @($futureImport.rejected).Count -ne 1 -or @($futureImport.imported).Count -ne 0) {
+      throw "Retry fan-in trusted a transport attempt newer than the independently supplied aggregate attempt."
+    }
+    $futurePaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$futureScenario.test.id) -InputKey ([string]$futureScenario.test.fingerprint.input_key)
+    if (Test-Path -LiteralPath $futurePaths.root) { Remove-Item -LiteralPath $futurePaths.root -Recurse -Force }
+    $invalidNewerScenario = & $newRetryScenario -Label "invalid-newer"
+    $invalidNewerRoot = Join-Path $fanInRoot "retry-scenario-invalid-newer"
+    New-Item -ItemType Directory -Force -Path $invalidNewerRoot | Out-Null
+    $null = & $newRetryScenarioArtifact -Scenario $invalidNewerScenario -Status passed -Attempt 1 -Root $invalidNewerRoot
+    $invalidNewerArtifact = & $newRetryScenarioArtifact -Scenario $invalidNewerScenario -Status passed -Attempt 2 -Root $invalidNewerRoot
+    $invalidNewerReceipt = & $getWorkerReceiptPath -ArtifactRoot $invalidNewerArtifact -PlanMaterialSha256 ([string]$invalidNewerScenario.plan.plan_material_sha256)
+    $invalidNewerReceiptRecord = Get-Content -Raw -LiteralPath $invalidNewerReceipt | ConvertFrom-Json
+    $invalidNewerPaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$invalidNewerScenario.test.id) -InputKey ([string]$invalidNewerScenario.test.fingerprint.input_key)
+    $invalidNewerCapsulePath = Resolve-MIRAssuranceWorkerObjectPath `
+      -SourceRoot $invalidNewerArtifact `
+      -DestinationRoot $invalidNewerPaths.root `
+      -RepoRelativePath ([string]$invalidNewerReceiptRecord.result.capsule_path)
+    $invalidNewerCapsule = Get-Content -Raw -LiteralPath $invalidNewerCapsulePath | ConvertFrom-Json
+    # Keep every outer digest and receipt binding internally consistent while
+    # making the capsule's result descriptor invalid.  Preparation must run
+    # the complete capsule validator before it can publish attempt 1.
+    $invalidNewerCapsule.result.schema = "invalid-test-result-schema"
+    $invalidNewerCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $invalidNewerCapsule
+    Write-MIRAssuranceAtomicJson -Value $invalidNewerCapsule -Path $invalidNewerCapsulePath
+    $invalidNewerReceiptRecord.result.result_digest = [string]$invalidNewerCapsule.result_digest
+    $invalidNewerReceiptRecord.result.capsule_sha256 = Get-MIRAssuranceSha256 -Path $invalidNewerCapsulePath
+    $rewrittenInvalidNewerReceipt = & $writeWorkerReceipt `
+      -ArtifactRoot $invalidNewerArtifact `
+      -PlanMaterialSha256 ([string]$invalidNewerScenario.plan.plan_material_sha256) `
+      -Receipt $invalidNewerReceiptRecord
+    if ([IO.Path]::GetFullPath($rewrittenInvalidNewerReceipt) -ne [IO.Path]::GetFullPath($invalidNewerReceipt)) {
+      Remove-Item -LiteralPath $invalidNewerReceipt -Force
+    }
+    $invalidNewerImport = Import-MIRAssuranceWorkerEvidence `
+      -Plan $invalidNewerScenario.plan -Context $Context -WorkerRoot $invalidNewerRoot -ArtifactPrefix $retryScenarioPrefix `
+      -RetryAcrossAttempts -CurrentRunAttempt 2
+    if ([string]$invalidNewerImport.status -ne "failed" -or @($invalidNewerImport.rejected).Count -ne 1 -or
+        @($invalidNewerImport.imported).Count -ne 0 -or (Test-Path -LiteralPath $invalidNewerPaths.root) -or
+        $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $invalidNewerScenario.test.fingerprint -Context $Context)) {
+      throw "Retry fan-in fell back to an older pass after a newer artifact failed full validation."
+    }
+    if (Test-Path -LiteralPath $invalidNewerPaths.root) { Remove-Item -LiteralPath $invalidNewerPaths.root -Recurse -Force }
+
+    $mixedSuccess = & $newMixedContribution -Test @($mixedTests | Where-Object id -eq $mixedIds.success)[0] -Status passed -Plan $mixedPlan
+    $mixedFailure = & $newMixedContribution -Test @($mixedTests | Where-Object id -eq $mixedIds.failed)[0] -Status failed -Plan $mixedPlan
     $mixedCleanupRoots.Add([string]$mixedSuccess.paths.root)
     $mixedCleanupRoots.Add([string]$mixedFailure.paths.root)
     $mixedRoot = Join-Path $fanInRoot "mixed"
@@ -638,10 +1695,10 @@ function Invoke-MIRAssuranceSelfTest {
     }
     $irrelevant = Join-Path $mixedRoot "${mixedPrefix}irrelevant"
     Copy-Item -LiteralPath (Join-Path $mixedRoot "$mixedPrefix$($mixedIds.success)") -Destination $irrelevant -Recurse
-    $irrelevantReceiptPath = Join-Path $irrelevant "worker-receipts\$([string]$mixedPlan.plan_material_sha256).json"
+    $irrelevantReceiptPath = & $getWorkerReceiptPath -ArtifactRoot $irrelevant -PlanMaterialSha256 ([string]$mixedPlan.plan_material_sha256)
     $irrelevantReceipt = Get-Content -Raw -LiteralPath $irrelevantReceiptPath | ConvertFrom-Json
     $irrelevantReceipt.plan.material_sha256 = Get-MIRAssuranceTextHash -Text "stale-irrelevant-plan"
-    Write-MIRAssuranceAtomicJson -Value $irrelevantReceipt -Path $irrelevantReceiptPath
+    $null = & $writeWorkerReceipt -ArtifactRoot $irrelevant -PlanMaterialSha256 ([string]$mixedPlan.plan_material_sha256) -Receipt $irrelevantReceipt
     $mixedImport = Import-MIRAssuranceWorkerEvidence -Plan $mixedPlan -Context $Context -WorkerRoot $mixedRoot -ArtifactPrefix $mixedPrefix
     $mixedSuccessPaths = Get-MIRAssuranceEvidencePaths -TestId $mixedIds.success -InputKey ([string]@($mixedTests | Where-Object id -eq $mixedIds.success)[0].fingerprint.input_key)
     $mixedFailurePaths = Get-MIRAssuranceEvidencePaths -TestId $mixedIds.failed -InputKey ([string]@($mixedTests | Where-Object id -eq $mixedIds.failed)[0].fingerprint.input_key)
@@ -758,6 +1815,7 @@ function Invoke-MIRAssuranceSelfTest {
   if (-not $tamperedFreshnessRejected) {
     throw "Tampered fresh-evidence campaign binding was accepted."
   }
+  $checkpointPaths = $null
   if ([string]$Context.trust_class -eq "untrusted-local") {
     $freshnessTest.required_campaign_id = [string]$freshnessPlan.campaign.id
     $boundProducer = Get-MIRAssuranceEvidenceProducer -Test $freshnessTest -Plan $freshnessPlan -Context $Context
@@ -773,11 +1831,47 @@ function Invoke-MIRAssuranceSelfTest {
 
     # Regression: an exact row completed before a coordinator timeout is
     # checkpointed by a replacement process; a different plan is rejected.
+    # It uses its own exact identity so it does not simulate a contradiction
+    # with the reusable evidence fixture above.
+    $checkpointKey = Get-MIRAssuranceTextHash -Text "checkpoint-$([guid]::NewGuid().ToString('N'))"
+    $checkpointFingerprint = [ordered]@{
+      schema=$evidenceSchema
+      test_id='self-test.freshness-checkpoint'
+      target=[string]$Context.target
+      input_key=$checkpointKey
+      fingerprint_sha256=$checkpointKey
+      definition_sha256=(Get-MIRAssuranceTextHash -Text 'freshness-checkpoint-definition')
+    }
+    $freshnessTest.fingerprint = [pscustomobject]$checkpointFingerprint
+    $checkpointPaths = Get-MIRAssuranceEvidencePaths -TestId $checkpointFingerprint.test_id -InputKey $checkpointKey
+    $checkpointWork = Join-Path $checkpointPaths.root 'work\synthetic'
+    New-Item -ItemType Directory -Force -Path $checkpointWork | Out-Null
+    $checkpointResultPath = Join-Path $checkpointWork 'result.json'
+    $checkpointStructured = [ordered]@{
+      schema='mir-test-result-v1'
+      test_id=[string]$checkpointFingerprint.test_id
+      status='passed'
+      exit_code=0
+      assertions=$capsule.assertions
+      artifacts=@($capsule.artifacts)
+      started_at=[string]$capsule.started_at
+      completed_at=(Get-Date).ToUniversalTime().ToString('o')
+      message=''
+    }
+    Write-MIRAssuranceAtomicJson -Value $checkpointStructured -Path $checkpointResultPath
     $checkpointCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
+    $checkpointCapsule.test_id = [string]$checkpointFingerprint.test_id
+    $checkpointCapsule.input_key = $checkpointKey
+    $checkpointCapsule.fingerprint_sha256 = $checkpointKey
+    $checkpointCapsule.definition_sha256 = [string]$checkpointFingerprint.definition_sha256
+    $checkpointDescriptor = Get-MIRAssuranceArtifactDescriptor -Path $checkpointResultPath -Kind 'structured-test-result'
+    $checkpointDescriptor['schema'] = 'mir-test-result-v1'
+    $checkpointDescriptor['status'] = 'passed'
+    $checkpointCapsule.result = $checkpointDescriptor
     $checkpointCapsule.producer = $boundProducer
-    $checkpointCapsule.completed_at = (Get-Date).ToUniversalTime().ToString("o")
+    $checkpointCapsule.completed_at = [string]$checkpointStructured.completed_at
     $checkpointCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $checkpointCapsule
-    $null = Write-MIRAssuranceAttempt -Capsule $checkpointCapsule
+    $null = Write-MIRAssuranceAttempt -Capsule $checkpointCapsule -Context $Context
     $checkpoint = Get-MIRAssuranceCampaignCheckpoint -Test $freshnessTest -Plan $freshnessPlan -Context $Context
     if ($null -eq $checkpoint -or [string]$checkpoint.disposition -ne "CHECKPOINT") {
       throw "An exact completed campaign row was not checkpointed for a resumed coordinator."
@@ -796,6 +1890,71 @@ function Invoke-MIRAssuranceSelfTest {
     throw "Refusing to remove assurance self-test evidence outside the evidence root."
   }
   Remove-Item -LiteralPath $resolvedSelfTestRoot -Recurse -Force
+  if ($null -ne $checkpointPaths -and (Test-Path -LiteralPath $checkpointPaths.root)) {
+    Remove-Item -LiteralPath $checkpointPaths.root -Recurse -Force
+  }
+
+  # A trusted worker artifact may add immutable objects, but it may not bypass
+  # the local reusable-pointer contradiction guard.
+  $importIdentity = & $newSyntheticIdentity 'worker-import-contradiction'
+  $importFailure = & $newSyntheticAttempt -Identity $importIdentity -Status failed -Label 'target-failure'
+  $importPass = & $newSyntheticAttempt -Identity $importIdentity -Status passed -Label 'worker-pass'
+  $importTest = [pscustomobject][ordered]@{
+    id=[string]$importIdentity.test_id
+    safe_test_id=[string]$importIdentity.test_id
+    fingerprint=[pscustomobject]$importIdentity
+    force_fresh=$false
+  }
+  $importPlan = [pscustomobject][ordered]@{
+    tests=@($importTest)
+    work=@([pscustomobject][ordered]@{
+      test_id=[string]$importTest.id
+      safe_test_id=[string]$importTest.safe_test_id
+      fingerprint=[string]$importIdentity.fingerprint_sha256
+      disposition='RUN'
+      layer='F0'
+    })
+    plan_material_sha256=(Get-MIRAssuranceTextHash -Text "worker-import-plan-$([guid]::NewGuid().ToString('N'))")
+    required_test_set_sha256=(Get-MIRAssuranceJsonHash -Value @([string]$importTest.id))
+    generated_at=[string]$importPass.capsule.started_at
+    source_commit=[string]$importPass.capsule.producer.commit
+    source_tree=(((& git -C $repo rev-parse 'HEAD^{tree}').Trim()))
+    target=[string]$Context.target
+    profile='self-test-worker-import'
+    producer=$importPass.capsule.producer
+  }
+  $null = Write-MIRAssuranceWorkerReceipt -Plan $importPlan -Test $importTest -Capsule $importPass.capsule
+  $importArtifactRoot = Join-Path $artifactRoot ("worker-import-contradiction\" + [guid]::NewGuid().ToString('N'))
+  $importArtifactPrefix = 'a13-import-'
+  $importArtifact = Join-Path $importArtifactRoot "$importArtifactPrefix$($importTest.safe_test_id)"
+  New-Item -ItemType Directory -Force -Path $importArtifact | Out-Null
+  foreach ($item in @(Get-ChildItem -LiteralPath $importPass.paths.root -Force)) {
+    Copy-Item -LiteralPath $item.FullName -Destination $importArtifact -Recurse -Force
+  }
+  $importPassAttemptPath = Resolve-MIRAssurancePath -Path ([string]$importPass.capsule.attempt_path)
+  Remove-Item -LiteralPath $importPassAttemptPath -Force
+  if (Test-Path -LiteralPath $importPass.work) { Remove-Item -LiteralPath $importPass.work -Recurse -Force }
+  $importQuarantine = Join-Path $importPass.paths.root 'quarantine'
+  if (Test-Path -LiteralPath $importQuarantine) { Remove-Item -LiteralPath $importQuarantine -Recurse -Force }
+  foreach ($pointerPath in @($importPass.paths.passed, $importPass.paths.blocked)) {
+    if (Test-Path -LiteralPath $pointerPath) { Remove-Item -LiteralPath $pointerPath -Force }
+  }
+  $importedContradiction = Import-MIRAssuranceWorkerEvidence `
+    -Plan $importPlan `
+    -Context $Context `
+    -WorkerRoot $importArtifactRoot `
+    -ArtifactPrefix $importArtifactPrefix
+  $importIncidents = @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $importIdentity)
+  if ([string]$importedContradiction.status -ne 'failed' -or
+      @($importedContradiction.imported).Count -ne 0 -or
+      @($importedContradiction.rejected).Count -ne 1 -or
+      $importIncidents.Count -ne 1 -or
+      @($importIncidents[0].incident.attempts).Count -ne 2 -or
+      (Test-Path -LiteralPath $importPass.paths.passed -PathType Leaf) -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $importIdentity -Context $Context)) {
+    throw 'Worker import bypassed the trusted-attempt contradiction quarantine guard.'
+  }
+  Remove-Item -LiteralPath $importArtifactRoot -Recurse -Force
 
   $newRunningCase = {
     param([Parameter(Mandatory)][string]$Label)
@@ -950,6 +2109,16 @@ function Invoke-MIRAssuranceSelfTest {
       $completeCounts.unexpected -ne 0 -or $completeCounts.total -ne $completeCounts.expected) {
     throw "Complete assurance result cardinality was not accepted."
   }
+  $timingCounts = Get-MIRAssuranceResultCounts -Results @(
+    [pscustomobject]@{status='passed';disposition='RUN';duration_seconds=3.5},
+    [pscustomobject]@{status='passed';disposition='REUSE';duration_seconds=0;source_duration_seconds=7.25},
+    [pscustomobject]@{status='passed';disposition='CHECKPOINT';duration_seconds=0;source_duration_seconds=5.5}
+  ) -ExpectedTotal 3
+  if ($timingCounts.cold_execution_seconds -ne 3.5 -or
+      $timingCounts.reused_source_seconds -ne 7.25 -or
+      $timingCounts.checkpointed_source_seconds -ne 5.5) {
+    throw 'Assurance result timing aggregates did not preserve cold, reused-source, and checkpointed-source durations.'
+  }
   $incompleteCounts = Get-MIRAssuranceResultCounts -Results @(
     [pscustomobject]@{status="passed"; disposition="RUN"}
   ) -ExpectedTotal 2
@@ -1008,9 +2177,34 @@ function Invoke-MIRAssuranceSelfTest {
   } catch { $truncatedPlanRejected = $true }
   if (-not $truncatedPlanRejected) { throw "Truncated verification plan was accepted." }
 
+  foreach ($planWithoutManifest in @([ordered]@{}, [pscustomobject][ordered]@{})) {
+    if ($null -ne (Get-MIRAssuranceOptionalObjectValue -Object $planWithoutManifest -Name 'domain_manifest')) {
+      throw 'An absent optional plan domain manifest was not normalized to null.'
+    }
+  }
+  $manifestSentinel = [pscustomobject][ordered]@{manifest_sha256=('A' * 64)}
+  foreach ($planWithManifest in @(
+    [ordered]@{domain_manifest=$manifestSentinel},
+    [pscustomobject][ordered]@{domain_manifest=$manifestSentinel}
+  )) {
+    $resolvedManifest = Get-MIRAssuranceOptionalObjectValue -Object $planWithManifest -Name 'domain_manifest'
+    if ([string]$resolvedManifest.manifest_sha256 -cne [string]$manifestSentinel.manifest_sha256) {
+      throw 'An optional plan domain manifest was not preserved across supported plan object types.'
+    }
+  }
+
   $plan = [ordered]@{baseline="abc123"}
   $resolved = Resolve-MIRAssuranceCommandText -Command "./scripts/Invoke-MIRValidation.ps1 -ChangedSince <baseline> -CandidateZip <candidate>" -Context $Context -Plan $plan
   if ($resolved -notmatch "abc123" -or $resolved -match "<baseline>") { throw "Baseline command propagation self-test failed." }
 
-  Write-Host "[ok] MIR assurance classifier, plan closure, structured evidence, lease ownership, trust, freshness binding, blocking, and version-only reuse tests passed."
+  foreach ($syntheticRoot in @($syntheticAttemptRoots | Sort-Object -Unique)) {
+    if (-not (Test-Path -LiteralPath $syntheticRoot)) { continue }
+    $resolvedSyntheticRoot = [IO.Path]::GetFullPath($syntheticRoot)
+    if (-not $resolvedSyntheticRoot.StartsWith($resolvedEvidenceRoot, [StringComparison]::OrdinalIgnoreCase)) {
+      throw "Refusing to remove synthetic assurance evidence outside the evidence root."
+    }
+    Remove-Item -LiteralPath $resolvedSyntheticRoot -Recurse -Force
+  }
+
+  Write-Host "[ok] MIR assurance classifier, plan closure, structured evidence, contradiction quarantine, worker import, timing aggregates, lease ownership, trust, freshness binding, blocking, and version-only reuse tests passed."
 }

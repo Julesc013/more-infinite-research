@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "kind": "MIR4A06BobOrdinaryAlloysQualificationV1",
+  "scope": "F210 exact Bob-only ordinary-alloy matrix: five admitted routes, one withheld Brass guard, Bronze quantitative production, cap/profile transport, and fresh-current-candidate serialized reload evidence; package-excluded only",
+  "observation": {
+    "path": "build/tests/mir42-a06-bob-ordinary-alloys-observe/ea94b8ad11934b88b377ae31ca8c71f1/factorio-create.log",
+    "raw_sha256": "985511EBC0F4FBBECFAEC4BFEDE9CF56826356E43E9AD73D91248018E13CC6AF",
+    "role": "historical route-shape input only; not current-fixture completion evidence"
+  },
+  "target": {
+    "factorio_version": "2.1.17",
+    "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+    "boblibrary_sha256": "49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4",
+    "bobores_sha256": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B",
+    "bobplates_sha256": "503D7BF6E88DA1F99463AC00CEC959C2003B2701D80DC4A564CF2EC3920AC8AF"
+  },
+  "admission": {
+    "qualification_id": "A06-Bob-OrdinaryAlloys-F210-2.1.17-v1",
+    "evidence_id": "A06-Bob-OrdinaryAlloys-F210-locked-current-v1",
+    "mechanism": "ordinary-acyclic-route",
+    "graph_reason": "no-recipe-return-path",
+    "canonical_risk_fingerprint": "mir32-e44a5d1a",
+    "hard_flags": [],
+    "review_flags": [],
+    "shared_input_output": [],
+    "evidence_confidence": 1,
+    "maximum_productivity": 3.0,
+    "source_class": "ordinary",
+    "hidden": false,
+    "declared_allow_productivity": true,
+    "effective_allow_productivity": true
+  },
+  "route": {
+    "key": "bronze",
+    "recipe": "bob-bronze-alloy",
+    "technology": "recipe-prod-research_material_bronze-1",
+    "setting": "ips-max-level-research_material_bronze",
+    "machine": "bob-electric-mixing-furnace",
+    "machine_type": "assembling-machine",
+    "category": "bob-mixing-furnace",
+    "ingredients": [
+      {"type": "item", "name": "copper-plate", "amount": 3},
+      {"type": "item", "name": "bob-tin-plate", "amount": 2}
+    ],
+    "result": {"type": "item", "name": "bob-bronze-alloy", "amount": 5},
+    "risk": "mir32-e44a5d1a",
+    "prerequisites": [],
+    "science": ["automation-science-pack"]
+  },
+  "routes": [
+    {
+      "key": "bronze",
+      "recipe": "bob-bronze-alloy",
+      "technology": "recipe-prod-research_material_bronze-1",
+      "machine": "bob-electric-mixing-furnace",
+      "machine_type": "assembling-machine",
+      "category": "bob-mixing-furnace",
+      "ingredients": [
+        {"type": "item", "name": "copper-plate", "amount": 3},
+        {"type": "item", "name": "bob-tin-plate", "amount": 2}
+      ],
+      "result": {"type": "item", "name": "bob-bronze-alloy", "amount": 5},
+      "risk": "mir32-e44a5d1a",
+      "science": ["automation-science-pack"]
+    },
+    {
+      "key": "gunmetal",
+      "recipe": "bob-gunmetal-alloy",
+      "technology": "recipe-prod-research_material_gunmetal-1",
+      "machine": "bob-electric-mixing-furnace",
+      "machine_type": "assembling-machine",
+      "category": "bob-mixing-furnace",
+      "ingredients": [
+        {"type": "item", "name": "copper-plate", "amount": 8},
+        {"type": "item", "name": "bob-tin-plate", "amount": 1},
+        {"type": "item", "name": "bob-zinc-plate", "amount": 1}
+      ],
+      "result": {"type": "item", "name": "bob-gunmetal-alloy", "amount": 10},
+      "risk": "mir32-7ac4d701",
+      "science": ["automation-science-pack", "logistic-science-pack"]
+    },
+    {
+      "key": "invar",
+      "recipe": "bob-invar-alloy",
+      "technology": "recipe-prod-research_material_invar-1",
+      "machine": "bob-electric-mixing-furnace",
+      "machine_type": "assembling-machine",
+      "category": "bob-mixing-furnace",
+      "ingredients": [
+        {"type": "item", "name": "bob-nickel-plate", "amount": 2},
+        {"type": "item", "name": "iron-plate", "amount": 3}
+      ],
+      "result": {"type": "item", "name": "bob-invar-alloy", "amount": 5},
+      "risk": "mir32-af1ecd3b",
+      "science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack"]
+    },
+    {
+      "key": "nitinol",
+      "recipe": "bob-nitinol-alloy",
+      "technology": "recipe-prod-research_material_nitinol-1",
+      "machine": "bob-electric-mixing-furnace",
+      "machine_type": "assembling-machine",
+      "category": "bob-mixing-furnace",
+      "ingredients": [
+        {"type": "item", "name": "bob-nickel-plate", "amount": 3},
+        {"type": "item", "name": "bob-titanium-plate", "amount": 2}
+      ],
+      "result": {"type": "item", "name": "bob-nitinol-alloy", "amount": 5},
+      "risk": "mir32-946acc06",
+      "science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "production-science-pack"]
+    },
+    {
+      "key": "copper-tungsten",
+      "recipe": "bob-copper-tungsten-alloy",
+      "technology": "recipe-prod-research_material_copper_tungsten-1",
+      "machine": "foundry",
+      "machine_type": "assembling-machine",
+      "category": "metallurgy",
+      "ingredients": [
+        {"type": "item", "name": "bob-powdered-tungsten", "amount": 3},
+        {"type": "fluid", "name": "molten-copper", "amount": 20}
+      ],
+      "result": {"type": "item", "name": "bob-copper-tungsten-alloy", "amount": 5},
+      "risk": "mir32-d92d266f",
+      "science": ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "metallurgic-science-pack", "production-science-pack", "space-science-pack"]
+    }
+  ],
+  "negative_guard": {
+    "recipe": "bob-brass-alloy",
+    "technology": "recipe-prod-research_material_brass-1",
+    "risk": "mir32-99ebf44b",
+    "guard_reason": "potential-return-path:copper-plate",
+    "owner_effects": 0,
+    "technology_absent": true,
+    "ingredients": [
+      {"type": "item", "name": "copper-plate", "amount": 3},
+      {"type": "item", "name": "bob-zinc-plate", "amount": 2}
+    ],
+    "result": {"type": "item", "name": "bob-brass-alloy", "amount": 5}
+  },
+  "owner": {
+    "effect_change_per_completed_level": 0.02,
+    "exact_owner_count": 1
+  },
+  "progression": {
+    "prerequisites": [],
+    "science": ["automation-science-pack"],
+    "lab": "lab"
+  },
+  "cap_transport": {
+    "raw_direct": 2,
+    "mirset1_imported": 3,
+    "effective": 3,
+    "no_level_four": true
+  },
+  "production": {
+    "input": {"copper-plate": 150, "bob-tin-plate": 100},
+    "levels": [
+      {"completed_level": 0, "expected_output": 250, "expected_bonus": 0},
+      {"completed_level": 1, "expected_output": 255, "expected_bonus": 5},
+      {"completed_level": 2, "expected_output": 260, "expected_bonus": 10},
+      {"completed_level": 3, "expected_output": 265, "expected_bonus": 15}
+    ]
+  },
+  "persisted_state": {
+    "route": "bronze",
+    "completed_levels": 2,
+    "current_level": 3,
+    "fractional_progress": 0.42,
+    "serialized_reload_cycles": 2
+  },
+  "continuity": {
+    "kind": "fresh-current-candidate-serialized-reload",
+    "predecessor_upgrade_status": "unresolved-no-authentic-predecessor-package"
+  },
+  "explicit_non_claims": [
+    "F200",
+    "Angel-or-combined-admission",
+    "predecessor-upgrade-or-migration",
+    "progression-continuation",
+    "broader-withheld-route-admission",
+    "release-readiness"
+  ]
+}

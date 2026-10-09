@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "scope": "exact-locked-load-final-stream-science-and-two-save-reloads",
+  "generated_streams": 65,
+  "labs": 5,
+  "assertions": 195,
+  "load_results_sha256": "F7064A67055D236FDC7E3FE798AAE8994D5CBD5117AC775E2CA590378BAE58AB",
+  "save_sha256": "366F401FFD6BDAC6F597C8C2BBD8FF2E059D5F78D7E38CABC832608EBB1818D3",
+  "reloads": [
+    {
+      "exit_code": 0,
+      "log_sha256": "5F5922B3051C1F09DCFDF2D2018E3A041B6229D3D6C7CCC60EBD347D43700668",
+      "reload": 1
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "CA39D7696D1BD2D20E3E61DF678DE307DBD7E9D08DFC1D293F8ECEFE4BEBE74F",
+      "reload": 2
+    }
+  ]
+}

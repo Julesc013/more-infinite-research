@@ -5,6 +5,7 @@ $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path }
 
 . (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $RepoRoot "tools\mir\application\package\DistributionCustody.ps1")
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function ConvertTo-CanonicalJsonBytes($Value) {
@@ -159,7 +160,7 @@ try {
     $waveRows = @($wave.releases | Where-Object version -eq $release)
     if ($waveRows.Count -ne 1) { throw "$release is not unique in the immutable .5 wave index." }
     $waveRow = $waveRows[0]
-    $archive = Join-Path $RepoRoot ([string]$waveRow.dist)
+    $archive = [string](Restore-MIR4DistributionArchive -RepoRoot $RepoRoot -Version $release).cache_path
     $zip = [IO.Compression.ZipFile]::OpenRead($archive)
     try { $entryCount = $zip.Entries.Count } finally { $zip.Dispose() }
     if ([string]$identity.archive_sha256 -ne [string]$waveRow.archive_sha256 -or
@@ -233,13 +234,26 @@ try {
         @($realizedCompatibility.items).Count -ne [int]$expected[$release].realized_compatibility) {
       throw "$release exact-engine realized inventory count drifted."
     }
-    if ($release -in @("1.4.5", "1.3.5") -and @($realizedSettings.explicit_omissions).Count -eq 0) {
+    if ($release -in @("1.4.5", "1.3.5") -and @($realizedSettings.fields_unavailable).Count -eq 0) {
       throw "$release must retain the independently established settings-stage capability omission."
     }
 
     $generatedOutput = Join-Path $testRoot "output"
     $generatedBuild = Join-Path $testRoot "build"
-    & $exporter -Release $release -RepoRoot $RepoRoot -OutputRoot $generatedOutput -BuildRoot $generatedBuild | Out-Host
+    $localArchivePath = Join-Path $RepoRoot ([string]$waveRow.dist)
+    $preserveLocalArchive = Test-Path -LiteralPath $localArchivePath -PathType Leaf
+    if (-not $preserveLocalArchive) {
+      Restore-MIR4DistributionArchive -RepoRoot $RepoRoot -Version $release -OutputRoot 'dist' | Out-Null
+    }
+    try {
+      & pwsh -NoProfile -File $exporter -Release $release -RepoRoot $RepoRoot -OutputRoot $generatedOutput -BuildRoot $generatedBuild | Out-Host
+      if ($LASTEXITCODE -ne 0) { throw "$release terminal baseline exporter failed with exit code $LASTEXITCODE." }
+    }
+    finally {
+      if (-not $preserveLocalArchive -and (Test-Path -LiteralPath $localArchivePath -PathType Leaf)) {
+        Remove-Item -LiteralPath $localArchivePath -Force
+      }
+    }
     $generatedRoot = Join-Path $generatedOutput $release
     $trackedMap = Get-RelativeFileMap $trackedRoot
     $generatedMap = Get-RelativeFileMap $generatedRoot
@@ -301,7 +315,8 @@ try {
   if (@($matrix.unresolved_findings).Count -ne 0) { throw "Terminal .5 semantic matrix must contain no unresolved baseline realization findings." }
 
   $generatedMatrix = Join-Path $testRoot "MIR3-Dot5-Semantic-MatrixV1.json"
-  & (Join-Path $RepoRoot "scripts\Export-MIRTerminalBaselineMatrix.ps1") -RepoRoot $RepoRoot -OutputPath $generatedMatrix | Out-Host
+  & pwsh -NoProfile -File (Join-Path $RepoRoot "scripts\Export-MIRTerminalBaselineMatrix.ps1") -RepoRoot $RepoRoot -OutputPath $generatedMatrix | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "Terminal baseline matrix exporter failed with exit code $LASTEXITCODE." }
   if ((Get-CanonicalTextFileSha256 $generatedMatrix) -ne (Get-CanonicalTextFileSha256 $matrixPath)) {
     throw "Terminal .5 semantic matrix regeneration differs from the tracked authority."
   }

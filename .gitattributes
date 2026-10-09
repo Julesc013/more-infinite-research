@@ -1,5 +1,9 @@
 /.gitattributes text eol=lf
 
+# This fixture is an exact raw-hash copy of the published 4.2.0 manifest.
+# Retain its CRLF bytes and the ordinary trailing-space/blank-line checks.
+fixtures/release-inputs/mir421-published-420-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
 .mir/evidence/**/*.md text eol=lf
 .mir/evidence/**/*.txt text eol=lf
 .mir/evidence/**/*-attestation.json text eol=lf
@@ -9,6 +13,11 @@
 
 # Byte-compared generated terminal authorities and their generator must retain
 # canonical LF bytes even when a maintainer has core.autocrlf enabled globally.
+.mir/releases/terminal/**/*.json text eol=crlf
+.mir/evidence/terminal-publication/2026-08-15/**/*.json text eol=crlf
+.mir/evidence/terminal-publication/2026-08-15/*.json text eol=crlf
+.mir/releases/terminal/mod-portal-descriptions/*.md text eol=crlf
+.mir/releases/terminal/release-bodies/*.md text eol=crlf
 .mir/releases/terminal/baselines/**/*.json text eol=lf
 # The imported .5 bundle manifests are sealed historical CRLF inputs.
 .mir/releases/terminal/baselines/*.5/baseline-manifest.json text eol=crlf
@@ -20,6 +29,22 @@
 .mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json text eol=lf
 .mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json text eol=lf
 .mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json text eol=lf
+# This retained implementation receipt is sealed and referenced by the exact
+# CRLF raw SHA-256 recorded in MIR3TerminalProductImplementationReconciliationV1.
+.mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json text eol=crlf
+# The foundation admission is later reused by its exact retained CRLF raw
+# SHA-256 in MIR3TerminalAssuranceCalibrationReceiptV1.
+.mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json text eol=crlf
+# Terminal target seals retain the raw CRLF identities of these two shared
+# qualification authorities.
+.mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json text eol=crlf
+.mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json text eol=crlf
+# The admitted MIR 3 .5 wave index is bound by its exact retained CRLF raw
+# SHA-256 in MIR3TerminalFoundationAdmissionV1.
+docs/releases/archive/MIR-3.5-WAVE-INDEX.json text eol=crlf
+# The historical manual-review object is named for the exact CRLF attestation
+# bytes retained by MIR3TerminalAssuranceCalibrationReceiptV1.
+.mir/evidence/objects/sha256/83/83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748.json text eol=crlf
 .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json text eol=lf
 .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json text eol=lf
 .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json text eol=lf
@@ -27,6 +52,12 @@
 .mir/targets.json text eol=lf
 .mir/releases/waves/mir4-r0/**/*.json text eol=lf
 .mir/releases/governance/mir4/*.json text eol=lf
+# Current F210 policy/admission receipts bind these exact LF bytes. Windows
+# checkout defaults must not rewrite their historical or current raw hashes.
+.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json text eol=lf
+.mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json text eol=lf
+.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json text eol=lf
+spec/engines/mir4-factorio-2.1-experimental-channel-v1.json text eol=lf
 CHANGELOG.md text eol=lf
 spec/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json text eol=lf
 spec/schemas/mir4-terminal-normalized-snapshot.schema.json text eol=lf
@@ -152,8 +183,21 @@ tests/platform/** text eol=lf
 tests/technology/** text eol=lf
 tests/release-tooling/** text eol=lf
 tools/mir/** text eol=lf
-src/mod/** text eol=lf
+# The live composable player source is raw-byte hashed by the target
+# materializer. Pin all editable source bytes across checkout configurations.
+source/** text eol=lf
 # The editable target authority is raw-byte hashed by the deterministic
 # materializer. Pin every textual target source, including *.template and
 # target-specific Lua overlays, so Windows and hosted checkouts are identical.
 targets/** text eol=lf
+
+# Preserve imported review and generated evidence bytes, including sealed CRLF.
+spec/programmes/inputs/synthesis-2026-09-05/** -text whitespace=cr-at-eol
+spec/programmes/evidence/synthesis-2026-09-06/** -text whitespace=cr-at-eol
+tests/compiler/science_planning.lua text eol=lf
+tests/compiler/Test-MIRSciencePlanning.ps1 text eol=lf
+tests/release/Test-MIR4LocalDelivery.ps1 text eol=lf
+tests/release/Test-MIR4PromotionRecovery.ps1 text eol=lf
+
+# Community receipts are compared by exact SHA-256 on every checkout.
+spec/programmes/evidence/community-2026-09-06/*.json text eol=lf

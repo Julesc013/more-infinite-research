@@ -48,6 +48,16 @@ if ($CommandArguments.Count -ge 2 -and $CommandArguments[0] -eq "api" -and $Comm
   exit 0
 }
 
+if ($CommandArguments.Count -ge 2 -and $CommandArguments[0] -eq "api" -and $CommandArguments[1] -match '/immutable-releases$') {
+  switch ($env:MIR_GH_ADMIN_TEST_MODE) {
+    'immutable-enabled' { '{"enabled":true,"enforced_by_owner":false}' }
+    'immutable-owner' { '{"enabled":false,"enforced_by_owner":true}' }
+    'immutable-invalid' { '{"enabled":"false","enforced_by_owner":false}' }
+    default { '{"enabled":false,"enforced_by_owner":false}' }
+  }
+  exit 0
+}
+
 if ($CommandArguments.Count -ge 2 -and $CommandArguments[0] -eq "api" -and $CommandArguments[1] -match '^repos/') {
   '{"admin":true,"push":true,"pull":true}'
   exit 0
@@ -71,6 +81,7 @@ exit 2
       [string]$success.status -ne "ready" -or [string]$success.authenticated_login -ne "Julesc013" -or
       -not [bool]$success.permissions.admin -or @($success.rulesets.items).Count -ne 2 -or
       [string]$success.probes.auth_status -ne "passed" -or [string]$success.probes.repository_rulesets -ne "passed" -or
+      [string]$success.probes.release_immutability -ne 'passed' -or $success.release_immutability.enabled -or $success.release_immutability.enforced_by_owner -or
       -not [bool]$success.environment.gh_token_present -or -not [bool]$success.environment.github_token_present) {
     throw "GitHub administration success receipt is incomplete."
   }
@@ -96,12 +107,28 @@ exit 2
       throw "GitHub administration HTTP $httpStatus classification is incorrect or unsafe."
     }
   }
+  foreach ($mode in @('immutable-enabled','immutable-owner','immutable-invalid')) {
+    $env:MIR_GH_ADMIN_TEST_MODE = $mode
+    $receiptPath = Join-Path $scratch "$mode.json"
+    & pwsh -NoProfile -File $toolPath -RepoRoot $RepoRoot -GhExecutable $fakeCommand -OutputPath $receiptPath 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) { throw "Unsafe immutability state accepted: $mode" }
+    $raw = Get-Content -LiteralPath $receiptPath -Raw
+    $failure = $raw | ConvertFrom-Json
+    $classification = if ($mode -eq 'immutable-invalid') { 'invalid-response' } else { 'release-policy-immutable' }
+    if ($failure.failure.operation -cne 'release-immutability' -or $failure.failure.classification -cne $classification -or
+        $raw.Contains($sentinelGh) -or $raw.Contains($sentinelGitHub)) { throw "Incorrect immutability rejection: $mode" }
+  }
 } finally {
   $env:GH_TOKEN = $originalGhToken
   $env:GITHUB_TOKEN = $originalGitHubToken
   $env:MIR_GH_ADMIN_TEST_MODE = $originalMode
-  if (Test-Path -LiteralPath $scratch) { Remove-Item -LiteralPath $scratch -Recurse -Force }
+  if (Test-Path -LiteralPath $scratch) {
+    $resolvedScratch = (Resolve-Path -LiteralPath $scratch).Path
+    $allowedRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/results/github-administration-self-test/'))
+    if (-not $resolvedScratch.StartsWith($allowedRoot,[StringComparison]::OrdinalIgnoreCase)) { throw 'Refusing cleanup outside this test staging root.' }
+    Remove-Item -LiteralPath $resolvedScratch -Recurse -Force
+  }
 }
 
 $global:LASTEXITCODE = 0
-Write-Host "[ok] GitHub administration preflight is secret-safe and classifies HTTP 401, 403, and 422."
+Write-Host "[ok] GitHub administration preflight is secret-safe, classifies HTTP failures and rejects enabled, owner-enforced or unrecognized release immutability."

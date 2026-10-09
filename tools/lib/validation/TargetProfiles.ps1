@@ -12,6 +12,29 @@ function Get-MIRTargetManifest {
   return $manifest
 }
 
+function Resolve-MIRTargetProfileImplementationPath {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$FactorioVersion,
+    [Parameter(Mandatory)][string]$PackagePath
+  )
+  $targetByFactorioVersion = @{
+    '2.1' = 'f210'
+    '2.0' = 'f200'
+    '1.1' = 'f110'
+    '1.0' = 'f100'
+  }
+  $target = [string]$targetByFactorioVersion[$FactorioVersion]
+  if ([string]::IsNullOrWhiteSpace($target)) {
+    throw "Factorio $FactorioVersion feature implementation has no current target composition: $PackagePath"
+  }
+  if (-not (Get-Command New-MIR4CurrentTargetPackageContext -ErrorAction SilentlyContinue)) {
+    . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target
+  return Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $PackagePath -AllowMissing
+}
+
 function Get-MIRTargetProfile {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -60,6 +83,16 @@ function Get-MIRTargetProfile {
       throw "Factorio $FactorioVersion target profile is missing prototype shape $shapeField."
     }
   }
+  $productDefaults = $profile.prototype_shapes.PSObject.Properties['product_property_defaults']
+  if ($null -ne $productDefaults) {
+    $declarations = @($productDefaults.Value.PSObject.Properties)
+    if ($declarations.Count -ne 1 -or $declarations[0].Name -cne 'ignored_by_productivity' -or
+        [string]$declarations[0].Value -cne 'ignored_by_stats' -or
+        'ignored_by_productivity' -cnotin @($profile.prototype_shapes.product_probability_fields) -or
+        'ignored_by_stats' -cnotin @($profile.prototype_shapes.product_probability_fields)) {
+      throw "Factorio $FactorioVersion has an unsupported product default declaration."
+    }
+  }
   if ([int]$profile.expected_stream_count -le 0) {
     throw "Factorio $FactorioVersion target profile must declare a positive expected_stream_count."
   }
@@ -90,8 +123,12 @@ function Get-MIRTargetProfile {
       }
     }
     foreach ($implementation in @([string]$requirements.runtime_consumer, [string]$requirements.data_stage_emitter)) {
+      $resolvedImplementation = if ([string]::IsNullOrWhiteSpace($implementation)) { $null } else {
+        Resolve-MIRTargetProfileImplementationPath -RepoRoot $RepoRoot -FactorioVersion $FactorioVersion -PackagePath $implementation
+      }
       if ([string]::IsNullOrWhiteSpace($implementation) -or
-          -not (Test-Path -LiteralPath (Join-Path $RepoRoot $implementation) -PathType Leaf)) {
+          [string]::IsNullOrWhiteSpace($resolvedImplementation) -or
+          -not (Test-Path -LiteralPath $resolvedImplementation -PathType Leaf)) {
         throw "Factorio $FactorioVersion feature $feature references a missing implementation: $implementation"
       }
     }

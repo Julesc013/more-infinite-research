@@ -48,7 +48,7 @@ Usage:
   .\tools\mir.ps1 mir4 check-historical-private [--target <all|F018|F017|F016|F015|F014|F013>]
   .\tools\mir.ps1 mir4 build-m4c01-player-set
   .\tools\mir.ps1 mir4 check-m4c01-player-set
-  .\tools\mir.ps1 mir4 runtime-historical-private --target <F017|F016|F015|F014|F013> [--factorio-bin <path>] [--candidate <path>] [--evidence <path>]
+  .\tools\mir.ps1 mir4 runtime-historical-private --target <F017|F016|F015|F014|F013> --expected-peak-memory-mib <MiB> [--factorio-bin <path>] [--candidate <path>] [--prior <path>] [--evidence <path>] [--max-new-output-mib <MiB>]
   .\tools\mir.ps1 mir4 api <check|conformance>
   .\tools\mir.ps1 mir4 sdk <generate|check>
   .\tools\mir.ps1 mir4 platform <generate|check|conformance|package>
@@ -62,7 +62,7 @@ Usage:
   .\tools\mir.ps1 mir4 release-narratives <render|check> --plan <path> --output <path>
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 factorio-2.1-channel <inspect|check> [--factorio <path>] [--output <path>]
-  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check> [--target <f210|f200|f110|f100>] [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <refresh|refresh-check|baseline|baseline-check|shadow|shadow-check|model|model-check> [--target <f210|f200|f110|f100>] [--output <path>]
   .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 target-key-migration <check|show> [--output <path>]
@@ -77,7 +77,8 @@ Usage:
   .\tools\mir.ps1 mir4 assurance-offline-custody-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-tooling-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-succession <export|check> [--output <path>]
-  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check|runtime-replay|runtime-replay-check> [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--factorio <path>] [--work-root <path>] [--evidence-root <path>] [--retention <OnFailure|Always|Never>] [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <refresh|refresh-check|baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check|runtime-replay|runtime-replay-check> [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--factorio <path>] [--work-root <path>] [--evidence-root <path>] [--retention <OnFailure|Always|Never>] [--output <path>]
+  .\tools\mir.ps1 mir4 distribution <status|verify|restore> [--version <version>] [--output <dist-or-build-root>] [--cache-root <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -98,14 +99,16 @@ Usage:
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
   .\tools\mir.ps1 release docs-refresh
+  release deliver --manifest <file> --source-root <directory>
   .\tools\mir.ps1 overnight local [--profile <name>]
   .\tools\mir.ps1 audit local [--profile <name>]
   .\tools\mir.ps1 audit top25 --space-age
   .\tools\mir.ps1 package build [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--output <build/packages/...>]
   .\tools\mir.ps1 backport validate [--manifest <path>] [--allow-pending-tags]
   .\tools\mir.ps1 backport materialize --source <tag> --baseline <tag> --target <line> --manifest <path> --worktree <path> [--receipt <path>]
-  .\tools\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]
-  .\tools\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply
+  .\tools\mir.ps1 storage audit [--artifact-type <result|test|package|campaign>[,...]] [--campaign-root <build/mir4/name>] [--all-worktrees] [--older-than-days <days>]
+  .\tools\mir.ps1 storage clean [--artifact-type <result|test|package|campaign>[,...]] [--campaign-root <build/mir4/name>] [--all-worktrees] [--older-than-days <days>] --apply
+  .\tools\mir.ps1 storage optimize [--library-root <path>] [--test-run-root <build/tests/.../GUID>] [--older-than-days <days>] [--apply]
   .\tools\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
   .\tools\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
   .\tools\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>
@@ -123,6 +126,7 @@ Common overrides:
   --factorio <path>   Factorio binary path
   --factorio-line <2.0|2.1>
   --candidate <path>  Exact MIR candidate ZIP for candidate-bound runtime work
+  --candidate-materialization <path>  Existing canonical composition receipt for the supplied candidate
   --mods <path>       Local mod zip/library directory
   --output <path>     Output artifact directory
   --timeout <seconds> Per-scenario timeout

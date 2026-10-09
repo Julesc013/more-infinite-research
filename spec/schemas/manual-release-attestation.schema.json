@@ -12,7 +12,6 @@
     "source_commit",
     "factorio_version",
     "factorio_binary_sha256",
-    "reviewer",
     "status",
     "attestation_sha256"
   ],
@@ -22,7 +21,13 @@
     "candidate_sha256": { "$ref": "#/$defs/sha256" },
     "candidate_content_sha256": { "$ref": "#/$defs/sha256" },
     "source_commit": { "type": "string", "pattern": "^[0-9a-fA-F]{40}$" },
-    "checklist_version": { "const": "mir-manual-release-review-v1" },
+    "checklist_version": {
+      "enum": [
+        "mir-manual-release-review-v1",
+        "mir-manual-release-review-historical-statement-v1",
+        "mir-manual-release-review-written-waiver-v1"
+      ]
+    },
     "factorio_version": { "type": "string", "minLength": 1 },
     "factorio_binary_sha256": { "$ref": "#/$defs/sha256" },
     "reviewer": { "type": "string", "minLength": 1 },
@@ -39,26 +44,42 @@
       "items": { "$ref": "#/$defs/artifact" }
     },
     "custody_manifest_path": { "type": "string", "minLength": 1 },
+    "written_release_authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "record_sha256", "recorded_from_user_turn_date"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "record_sha256": { "$ref": "#/$defs/sha256" },
+        "recorded_from_user_turn_date": { "type": "string", "format": "date" }
+      }
+    },
+    "manual_review_performed": { "type": "boolean" },
+    "gameplay_receipt_claimed": { "type": "boolean" },
+    "waiver_disposition": { "const": "mir42-pre-public-written-authorization-playtest-waiver" },
     "items": {
       "type": "array",
       "minItems": 6,
       "items": { "$ref": "#/$defs/item" }
     },
-    "status": { "const": "passed" },
+    "status": { "enum": ["passed", "waived"] },
     "attestation_sha256": { "$ref": "#/$defs/sha256" }
   },
   "oneOf": [
     {
       "title": "Observed pre-seal checklist review",
-      "required": ["checklist_version", "reviewed_at", "items"],
+      "required": ["checklist_version", "reviewer", "reviewed_at", "items"],
       "properties": {
-        "checklist_version": { "const": "mir-manual-release-review-v1" }
+        "checklist_version": { "const": "mir-manual-release-review-v1" },
+        "status": { "const": "passed" }
       }
     },
     {
       "title": "Post-publication attestation of an explicitly stated historical maintainer review",
       "required": [
         "checklist_version",
+        "reviewer",
         "attestation_recorded_at",
         "review_performed_before_publication",
         "review_exact_time_known",
@@ -70,11 +91,43 @@
       ],
       "properties": {
         "checklist_version": { "const": "mir-manual-release-review-historical-statement-v1" },
+        "status": { "const": "passed" },
         "review_performed_before_publication": { "const": true },
         "review_exact_time_known": { "const": false },
         "attestation_recorded_after_publication": { "const": true }
       },
       "not": { "required": ["reviewed_at", "items"] }
+    },
+    {
+      "title": "Pre-public written maintainer playtest waiver",
+      "required": [
+        "checklist_version",
+        "written_release_authorization",
+        "manual_review_performed",
+        "gameplay_receipt_claimed",
+        "waiver_disposition"
+      ],
+      "properties": {
+        "checklist_version": { "const": "mir-manual-release-review-written-waiver-v1" },
+        "status": { "const": "waived" },
+        "manual_review_performed": { "const": false },
+        "gameplay_receipt_claimed": { "const": false },
+        "waiver_disposition": { "const": "mir42-pre-public-written-authorization-playtest-waiver" }
+      },
+      "not": {
+        "anyOf": [
+          { "required": ["reviewer"] },
+          { "required": ["reviewed_at"] },
+          { "required": ["items"] },
+          { "required": ["review_performed_before_publication"] },
+          { "required": ["review_exact_time_known"] },
+          { "required": ["attestation_recorded_after_publication"] },
+          { "required": ["reviewed_release"] },
+          { "required": ["statement"] },
+          { "required": ["supporting_artifacts"] },
+          { "required": ["custody_manifest_path"] }
+        ]
+      }
     }
   ],
   "$defs": {

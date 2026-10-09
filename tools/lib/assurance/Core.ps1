@@ -5,6 +5,11 @@ $mirAssuranceRepoPathsModule = New-Module -Name MIRAssuranceRepositoryPaths -Arg
   Export-ModuleMember -Function Resolve-MIRRepoPath
 }
 Import-Module $mirAssuranceRepoPathsModule -Force -Function Resolve-MIRRepoPath
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$script:MIRAssuranceRunnerHashCache = ''
+$script:MIRAssuranceRepositoryFilesCache = $null
+$script:MIRAssuranceExternalFileFingerprintCache = @{}
+$script:MIRAssuranceExternalTreeFingerprintCache = @{}
 
 function Resolve-MIRAssuranceRepoPathId {
   param(
@@ -376,12 +381,13 @@ function Get-MIRAssuranceDevelopmentCandidatePath {
     $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
     $targetRow = @($authority.targets | Where-Object { [string]$_.target_id -ceq "factorio-$Target" })
     if ($targetRow.Count -ne 1) { throw "MIR 4 assurance target is not canonical: $Target" }
-    $sourceVersion = if ($release.StartsWith('4.', [StringComparison]::Ordinal)) {
-      $release
+    $identity = if ($release -match '^4[.][0-9]{1,5}[.][0-9]{5}$') {
+      Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target ([string]$targetRow[0].target) -DistributionVersion $release
+    } elseif ($release -match '^4[.][0-9]{1,5}[.][0-9]{1,2}$') {
+      Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target ([string]$targetRow[0].target) -SourceVersion $release
     } else {
-      [string]$targetRow[0].baseline_source_version
+      Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target ([string]$targetRow[0].target) -SourceVersion ([string]$targetRow[0].baseline_source_version)
     }
-    $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target ([string]$targetRow[0].target) -SourceVersion $sourceVersion
     $candidateId = 'MIR4-ASSURANCE-' + $SourceTree.ToUpperInvariant()
     return Join-Path $repo "build\packages\assurance\$([string]$targetRow[0].target)\$candidateId\$([string]$identity.package_name)"
   }
@@ -407,8 +413,9 @@ function Get-MIRAssuranceCanonicalTrustPolicyPath {
 function Get-MIRAssuranceContext {
   $config = Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
-  $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
   $target = Get-MIRAssuranceOption -Name "--target" -Default ([string]$config.default_target)
+  $targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target (ConvertTo-MIR4CurrentTargetKey -FactorioVersion $target)
+  $info = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
   $verificationProfile = Get-MIRAssuranceVerificationProfile -Target $target
   $sourceTree = @(& git -C $repo rev-parse "HEAD^{tree}" 2>$null)
   if ($LASTEXITCODE -ne 0 -or $sourceTree.Count -ne 1) { throw "Unable to resolve the development source tree." }
@@ -416,13 +423,14 @@ function Get-MIRAssuranceContext {
   $candidateOption = Get-MIRAssuranceOption -Name "--candidate"
   if ([string]::IsNullOrWhiteSpace([string]$candidateOption)) { $candidateOption = $defaultCandidate }
   $candidate = Resolve-MIRAssurancePath -Path $candidateOption
+  $candidateMaterialization = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--candidate-materialization")
   $factorio = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--factorio" -Default ([string]$env:FACTORIO_BIN))
   $verificationProfile = Resolve-MIR4FactorioQualificationProfile -Profile $verificationProfile -FactorioBin $factorio -RepoRoot $repo
   $priorRelease = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--prior" -Default ([string]$env:MIR_PRIOR_RELEASE))
   $seal = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--seal")
   $mods = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--mods" -Default ([string]$env:MIR_MOD_LIBRARY))
   if (-not $mods) {
-    $defaultMods = "C:\Projects\Factorio\testmods_$target"
+    $defaultMods = Join-Path (Split-Path -Parent $repo) "testmods/$target"
     if (Test-Path -LiteralPath $defaultMods -PathType Container) { $mods = $defaultMods }
   }
   $trustPolicyPath = Get-MIRAssuranceCanonicalTrustPolicyPath
@@ -434,6 +442,7 @@ function Get-MIRAssuranceContext {
     info=$info
     target=$target
     candidate=$candidate
+    candidate_materialization=$candidateMaterialization
     factorio=$factorio
     prior_release=$priorRelease
     seal=$seal
@@ -566,9 +575,9 @@ function Get-MIRAssuranceImpactSelection {
       if (Test-MIRAssurancePathPattern -Path $path -Pattern ([string]$rule.pattern)) {
         $matchedRule = $true
         $mapped += $path
-        $scenarios += @($rule.scenarios | ForEach-Object { [string]$_ })
-        $groups += @($rule.groups | ForEach-Object { [string]$_ })
-        $tags += @($rule.tags | ForEach-Object { [string]$_ })
+        if ($rule.PSObject.Properties['scenarios']) { $scenarios += @($rule.scenarios | ForEach-Object { [string]$_ }) }
+        if ($rule.PSObject.Properties['groups']) { $groups += @($rule.groups | ForEach-Object { [string]$_ }) }
+        if ($rule.PSObject.Properties['tags']) { $tags += @($rule.tags | ForEach-Object { [string]$_ }) }
       }
     }
     if (-not $matchedRule) {

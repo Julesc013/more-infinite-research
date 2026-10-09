@@ -1,13 +1,16 @@
 param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../..")),
+  [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210',
   [switch]$Check
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $Target
 $runnerPath = Join-Path $RepoRoot "scripts\Invoke-MIRValidation.ps1"
 $manifestPath = Join-Path $RepoRoot "validation\scenarios\runtime.json"
-$factorioVersion = [string]((Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json).factorio_version)
+$factorioVersion = [string]((Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json).factorio_version)
 
 function ConvertTo-MIRScenarioAuthorityValue {
   param([AllowNull()]$Value)

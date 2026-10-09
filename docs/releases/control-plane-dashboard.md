@@ -24,30 +24,30 @@ source_of_truth_for:
 | `3.2.10` | `C34` | `C / 34` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
 | `3.2.9` | `C33` | `C / 33` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 0 |
 | `3.2.5` | `C32` | `C32` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
-| `3.2.4` | `C31` | `pending` | `2.1` | `dev` | `package-built` | `superseded-unpublished` | 0 |
-| `3.2.3` | `C30` | `pending` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
-| `3.2.2` | `C24` | `pending` | `2.1` | `main` | `tagged` | `tagged` | 1 |
-| `3.2.1` | `C21` | `pending` | `2.1` | `main` | `published` | `published` | 1 |
+| `3.2.4` | `C31` | `n/a` | `2.1` | `dev` | `package-built` | `superseded-unpublished` | 0 |
+| `3.2.3` | `C30` | `n/a` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
+| `3.2.2` | `C24` | `n/a` | `2.1` | `main` | `tagged` | `tagged` | 1 |
+| `3.2.1` | `C21` | `n/a` | `2.1` | `main` | `published` | `published` | 1 |
 | `2.5.11` | `2.5-P15` | `2.5-P / 15` | `2.0` | `hotfix/mir3-max-level-2.5.11` | `publicly-verified` | `publicly-verified` | 0 |
 | `2.5.10` | `2.5-P14` | `2.5-P / 14` | `2.0` | `hotfix/mir3-max-level-2.5.10` | `publicly-verified` | `publicly-verified` | 0 |
 | `2.5.9` | `2.5-P13` | `2.5-P / 13` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 0 |
-| `2.5.5` | `2.5-P12` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
-| `2.5.0` | `2.5-P11` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
-| `2.4.9` | `2.4.9-final` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
+| `2.5.5` | `2.5-P12` | `n/a` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
+| `2.5.0` | `2.5-P11` | `n/a` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
+| `2.4.9` | `2.4.9-final` | `n/a` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
 | `1.9.9` | `1.9-P1` | `1.9-P / 1` | `1.1` | `tag-only` | `publicly-verified` | `publicly-verified` | 0 |
-| `1.9.5` | `1.9.5-final` | `pending` | `1.1` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
+| `1.9.5` | `1.9.5-final` | `n/a` | `1.1` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
 | `1.8.9` | `1.8-P1` | `1.8-P / 1` | `1.0` | `tag-only` | `publicly-verified` | `publicly-verified` | 0 |
-| `1.8.5` | `1.8.5-final` | `pending` | `1.0` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
+| `1.8.5` | `1.8.5-final` | `n/a` | `1.0` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
 | `1.7.9` | `1.7-P1` | `1.7-P / 1` | `0.17` | `tag-only` | `publicly-verified` | `publicly-verified` | 0 |
-| `1.7.5` | `1.7.5-final` | `pending` | `0.17` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
+| `1.7.5` | `1.7.5-final` | `n/a` | `0.17` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
 | `1.6.9` | `1.6-P1` | `1.6-P / 1` | `0.16` | `tag-only` | `publicly-verified` | `publicly-verified` | 0 |
-| `1.6.5` | `1.6.5-final` | `pending` | `0.16` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
+| `1.6.5` | `1.6.5-final` | `n/a` | `0.16` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
 | `1.5.9` | `1.5-P1` | `1.5-P / 1` | `0.15` | `tag-only` | `publicly-verified` | `publicly-verified` | 0 |
-| `1.5.5` | `1.5.5-final` | `pending` | `0.15` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
+| `1.5.5` | `1.5.5-final` | `n/a` | `0.15` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
 | `1.4.9` | `1.4-P1` | `1.4-P / 1` | `0.14` | `tag-only` | `publicly-verified` | `publicly-verified` | 0 |
-| `1.4.5` | `1.4.5-final` | `pending` | `0.14` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
+| `1.4.5` | `1.4.5-final` | `n/a` | `0.14` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
 | `1.3.9` | `1.3-P1` | `1.3-P / 1` | `0.13` | `tag-only` | `publicly-verified` | `publicly-verified` | 0 |
-| `1.3.5` | `1.3.5-final` | `pending` | `0.13` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
+| `1.3.5` | `1.3.5-final` | `n/a` | `0.13` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
 
 A state is an admitted fact, not a mutable job status. Every later transition requires its own immutable proof record.
 

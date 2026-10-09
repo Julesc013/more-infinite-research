@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0101",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Avoid scanning unrelated lab placement items during research admission.",
+  "details": [
+    "The shared item index groups placement items by exact entity identity once per compiler context. Laboratory acquisition now checks only candidates for the accepting lab, reducing repeated work in large lab catalogues.",
+    "Acquisition routes, pack and technology recursion guards, settings, research identities and admission policies retain authority. Changed or withdrawn indexed items are rechecked, and bounded diagnostics keep their existing work limits.",
+    "Controlled F210/F200 source tests measure zero unrelated placement lookups where the predecessor caller performs 125,000 across 250 technology queries and 501 labs. Actual current-package progression, saves and native performance remain unqualified."
+  ],
+  "semantic_domains": [
+    "science",
+    "progression",
+    "performance",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Uses the shared laboratory placement index; current native qualification is pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Uses the shared laboratory placement index; current native qualification is pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Uses the shared laboratory placement index; current native qualification is pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Uses the shared laboratory placement index; current native qualification is pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Retains its separate historical implementation; this shared-source lookup change does not alter that target."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Retains its separate historical implementation; this shared-source lookup change does not alter that target."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Retains its separate historical implementation; this shared-source lookup change does not alter that target."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Retains its separate historical implementation; this shared-source lookup change does not alter that target."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Retains its separate historical implementation; this shared-source lookup change does not alter that target."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/lab_reachability.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}

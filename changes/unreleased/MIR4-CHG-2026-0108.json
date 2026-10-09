@@ -1,0 +1,103 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0108",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Use effective recipe categories consistently for matching and acquisition.",
+  "details": [
+    "Canonical category facts now follow the shared category resolver. An explicit plural list supersedes a stale singular category; an empty or malformed list cannot invent a crafting route.",
+    "Modeled recipe variants inherit parent categories only when neither variant field is declared. Candidate category indexes use the resolved variants, preserving legitimate routes while preventing phantom hand-crafting acquisition.",
+    "Controlled source checks exercise actual CompilerContext, canonical facts and acquisition decisions, with opposing category/variant cases and prototype immutability. Shared source is present in all nine targets; native catalogue, machine availability, production and save acceptance remain pending."
+  ],
+  "semantic_domains": [
+    "science",
+    "progression",
+    "recipe-productivity",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Corrects shared recipe category facts and acquisition boundaries; target-specific native catalogue, output and save acceptance remain pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/recipe_source_epoch.lua"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_routes.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/capabilities/science-integration.md"
+    }
+  ]
+}

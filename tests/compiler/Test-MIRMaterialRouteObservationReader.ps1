@@ -1,0 +1,156 @@
+# MIR4-CANONICAL-EXECUTABLE-TEST
+[CmdletBinding()]
+param(
+  [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
+  [string]$AuditLinePath='',
+  [string]$InventoryLogPath=''
+)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+$repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/compatibility/DiagnosticsParser.ps1')
+# Import only the actual reader and its assertion helper; never execute the
+# observer's native preparation or process path during a static check.
+$tokens=$null;$parseErrors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1'),[ref]$tokens,[ref]$parseErrors)
+if($parseErrors.Count) { throw 'Observer has PowerShell parse errors.' }
+foreach($name in @('Assert-Observer','Get-ObserverInputContracts')) {
+  $functions=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+  if($functions.Count -ne 1) { throw "Expected one actual observer function: $name" }
+  . ([scriptblock]::Create($functions[0].Extent.Text))
+}
+$assertions=0
+function Assert-Reader([bool]$Condition,[string]$Message) {
+  if(-not $Condition) { throw "Material input observation reader: $Message" }
+  $script:assertions++
+}
+function Assert-ReaderReject([object[]]$Rows,[string]$ExpectedError) {
+  $failure=''
+  try { $null=@(Get-ObserverInputContracts -AuditRows $Rows -ExpectedRecipes @('smelting')) } catch { $failure=$_.Exception.Message }
+  Assert-Reader ($failure.Contains($ExpectedError)) "expected rejection $ExpectedError; got $failure"
+}
+$line=if($AuditLinePath) { Get-Content -LiteralPath $AuditLinePath -Raw } else {
+  '[more-infinite-research] audit schema=1 kind=material_route_certificate binding_schema=2 bindings_fingerprint=mir32-01234567 canonical_risk_fingerprint=mir32-89abcdef direct_output_producer_count=1 phase=input reachable_identity_count=2 recipe=smelting relevant_recipe_count=3 return_graph_fingerprint=mir32-abcdef01 status=observed'
+}
+$row=ConvertFrom-MIRAuditLine -Line $line
+$contracts=@(Get-ObserverInputContracts -AuditRows @($row) -ExpectedRecipes @('smelting'))
+Assert-Reader ($contracts.Count -eq 1 -and $contracts[0].schema -eq 2 -and $contracts[0].phase -ceq 'input') 'actual reader must preserve explicit input schema.'
+Assert-Reader ($contracts[0].bindings_fingerprint -ceq $row.bindings_fingerprint -and $contracts[0].return_graph_fingerprint -ceq $row.return_graph_fingerprint) 'actual reader must preserve exact observed fingerprints.'
+Assert-Reader ($contracts[0].relevant_recipe_count -is [int]) 'counts must be typed independently of audit strings.'
+Assert-ReaderReject @() 'expected one input contract'
+Assert-ReaderReject @($row,$row) 'expected one input contract'
+$incomplete=ConvertFrom-MIRAuditLine -Line '[more-infinite-research] audit schema=1 kind=material_route_certificate binding_schema=2 phase=input status=incomplete reason=observation-row-budget'
+Assert-ReaderReject @($row,$incomplete) 'input capture is incomplete'
+foreach($change in @(
+  @('schema','2','wrong input phase'),
+  @('binding_schema','1','wrong input phase'),
+  @('phase','final','wrong input phase'),
+  @('status','unavailable','wrong input phase'),
+  @('canonical_risk_fingerprint','not-recorded','invalid input fingerprint'),
+  @('bindings_fingerprint','mir32-ABCDEF01','invalid input fingerprint'),
+  @('relevant_recipe_count','0','invalid input count'),
+  @('reachable_identity_count','2147483648','invalid input count'),
+  @('direct_output_producer_count','1.5','invalid input count')
+)) {
+  $changed=$row | Select-Object *
+  $changed.($change[0])=$change[1]
+  Assert-ReaderReject @($changed) $change[2]
+}
+$missing=$row | Select-Object * -ExcludeProperty 'phase'
+Assert-ReaderReject @($missing) 'missing input field phase'
+$inventoryAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelFinalRoutesObserver.ps1'),[ref]$tokens,[ref]$parseErrors)
+if($parseErrors.Count) { throw 'Final-routes observer has PowerShell parse errors.' }
+foreach($name in @('Assert-Observer','Get-ObserverSha','Get-ObserverCurrentSourceRecord','Get-ObserverMaterialOutcomeInventory')) {
+  $functions=@($inventoryAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+  if($functions.Count -ne 1) { throw "Expected one actual final-routes observer function: $name" }
+  . ([scriptblock]::Create($functions[0].Extent.Text))
+}
+. (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+$observedSource=Get-ObserverCurrentSourceRecord $repo
+Assert-Reader ($observedSource.package_source_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'source records must use the canonical package fingerprint.'
+Assert-Reader ($observedSource.source_manifest_sha256 -ceq (Get-FileHash -LiteralPath (Join-Path $repo 'source/package-source.json') -Algorithm SHA256).Hash -and $observedSource.source_manifest_sha256 -cne $observedSource.package_source_sha256) 'raw manifest custody must remain separate from the package fingerprint.'
+$expectedSubjects=@('aluminium/plate','gold/plate','lead/plate','nickel/plate','platinum/plate','silver/plate','tin/plate','titanium/plate','copper-tungsten/alloy','zinc/plate','bronze/alloy','brass/alloy','gunmetal/alloy','invar/alloy','cobalt-steel/alloy','nitinol/alloy','platinum/wire')
+$emptyInventory=(@($expectedSubjects|ForEach-Object {"[mir-material-outcome-inventory] SUBJECT id=$_ status=prototype-absent items=0 producers=0"})+@('[mir-material-outcome-inventory] PASS complete=true phase=finalized-raw-prototypes subjects=17 recipes=0 results=0 gaps=0 acquisition=false admission=false')) -join "`n"
+$inventory=Get-ObserverMaterialOutcomeInventory $emptyInventory
+Assert-Reader ($inventory.subjects.Count -eq 17 -and -not $inventory.acquisition_proved -and -not $inventory.admission_granted) 'independent denominator preserves sixteen outcomes plus separate wire and no admission.'
+$prefixedInventory=($emptyInventory -split "`n"|ForEach-Object {"0.123 Script @fixture/data-final-fixes.lua:1: $_"}) -join "`r`n"
+Assert-Reader ((Get-ObserverMaterialOutcomeInventory $prefixedInventory).subjects.Count -eq 17) 'native log prefixes and CRLF must preserve complete records.'
+$wrongShape=$emptyInventory.Replace('id=platinum/plate status=prototype-absent items=0 producers=0','id=platinum/plate status=no-observed-producer items=1 producers=0')+"`n"+'[mir-material-outcome-inventory] ITEM subject=platinum/plate name=angels-wire-platinum hidden=false'
+foreach($badInventory in @(
+  $emptyInventory.Replace('id=platinum/plate','id=platinum/wire'),
+  $emptyInventory.Replace('subjects=17','subjects=16'),
+  $emptyInventory.Replace('gaps=0','gaps=1'),
+  $emptyInventory.Replace('acquisition=false','acquisition=true'),
+  $emptyInventory.Replace('admission=false','admission=true'),
+  $emptyInventory.Replace('status=prototype-absent items=0','status=observed items=0'),
+  $wrongShape,
+  $emptyInventory.Replace('admission=false','admission=falseXYZ'),
+  $emptyInventory.Replace('items=0 producers=0','items=0 producers=0 trailing=true'),
+  ($emptyInventory+"`n"+'[mir-material-outcome-inventory] PASS complete=false phase=finalized-raw-prototypes'),
+  ($emptyInventory+"`n"+'[mir-material-outcome-inventory] UNKNOWN admission=true'),
+  ($emptyInventory+"`n"+'[mir-material-outcome-inventory]PASS complete=true'),
+  ($emptyInventory+"`n"+$emptyInventory)
+)) {
+  $rejected=$false
+  try {$null=Get-ObserverMaterialOutcomeInventory $badInventory} catch {$rejected=$true}
+  Assert-Reader $rejected 'malformed, duplicated, incomplete or admission-bearing inventory was accepted.'
+}
+$caseDistinctInventory=$emptyInventory.Replace('id=tin/plate status=prototype-absent items=0 producers=0','id=tin/plate status=observed items=1 producers=2').Replace('recipes=0 results=0 gaps=0','recipes=2 results=2 gaps=2')+"`n"+(@(
+  '[mir-material-outcome-inventory] ITEM subject=tin/plate name=bob-tin-plate hidden=false',
+  '[mir-material-outcome-inventory] PRODUCER subject=tin/plate recipe=TinCasting hidden=false enabled=true productivity=true',
+  '[mir-material-outcome-inventory] PRODUCER subject=tin/plate recipe=tincasting hidden=false enabled=true productivity=true',
+  '[mir-material-outcome-inventory] GAP subject=tin/plate recipe=TinCasting',
+  '[mir-material-outcome-inventory] GAP subject=tin/plate recipe=tincasting'
+) -join "`n")
+$caseDistinct=Get-ObserverMaterialOutcomeInventory $caseDistinctInventory
+Assert-Reader (@($caseDistinct.subjects|Where-Object id -CEQ 'tin/plate')[0].producers.Count -eq 2) 'case-distinct prototype identities were conflated.'
+$fluidSubjects=@('nitric-acid/fluid','hydrochloric-acid/fluid','hydrofluoric-acid/fluid','glycerol/fluid')
+$emptyFluids=(@($fluidSubjects|ForEach-Object {"[mir-fluid-material-outcome-inventory] SUBJECT id=$_ status=prototype-absent fluids=0 producers=0"})+@('[mir-fluid-material-outcome-inventory] PASS complete=true phase=finalized-raw-prototypes subjects=4 recipes=0 results=0 gaps=0 acquisition=false admission=false')) -join "`n"
+$fluidInventory=Get-ObserverMaterialOutcomeInventory $emptyFluids -Petrochem
+Assert-Reader ($fluidInventory.subjects.Count -eq 4 -and $fluidInventory.kind -ceq 'MIRFluidMaterialOutcomeInventoryObservationV1' -and -not $fluidInventory.acquisition_proved -and -not $fluidInventory.admission_granted) 'fluid observations must be distinct and grant no admission.'
+Assert-Reader ((Get-ObserverMaterialOutcomeInventory ($emptyInventory+"`n"+$emptyFluids)).subjects.Count -eq 17) 'the original item reader must preserve its denominator alongside fluids.'
+$oneFluid=$emptyFluids.Replace('id=nitric-acid/fluid status=prototype-absent fluids=0 producers=0','id=nitric-acid/fluid status=observed fluids=1 producers=1').Replace('recipes=0 results=0 gaps=0','recipes=1 results=1 gaps=1')+"`n"+(@(
+  '[mir-fluid-material-outcome-inventory] FLUID subject=nitric-acid/fluid name=angels-liquid-nitric-acid hidden=false',
+  '[mir-fluid-material-outcome-inventory] PRODUCER subject=nitric-acid/fluid recipe=named-acid hidden=false enabled=true productivity=unspecified',
+  '[mir-fluid-material-outcome-inventory] GAP subject=nitric-acid/fluid recipe=named-acid'
+) -join "`n")
+$missingRoute='[mir-f210-current-ba-final-observer] ROUTE recipe=named-acid family=nitric-acid shape=fluid status=missing'
+$presentRoute=$missingRoute.Replace('status=missing','status=present')
+Assert-Reader ((Get-ObserverMaterialOutcomeInventory ($oneFluid+"`n"+$missingRoute) -Petrochem).observation_gaps.Count -eq 1) 'a missing candidate must retain its independent producer gap.'
+$coveredFluid=$oneFluid.Replace('[mir-fluid-material-outcome-inventory] GAP subject=nitric-acid/fluid recipe=named-acid','').Replace('gaps=1','gaps=0')
+$covered=Get-ObserverMaterialOutcomeInventory ($coveredFluid+"`n"+$presentRoute) -Petrochem
+Assert-Reader ($covered.observation_gaps.Count -eq 0 -and $covered.subjects[0].fluids[0].name -ceq 'angels-liquid-nitric-acid') 'only a present route may close a typed fluid observation gap.'
+foreach($badFluids in @(
+  $emptyFluids.Replace('subjects=4','subjects=3'),
+  $emptyFluids.Replace('admission=false','admission=true'),
+  $emptyFluids.Replace('acquisition=false','acquisition=true'),
+  ($emptyFluids+"`n"+$emptyFluids),
+  $oneFluid.Replace(' FLUID subject=',' ITEM subject='),
+  $oneFluid.Replace('name=angels-liquid-nitric-acid','name=angels-liquid-glycerol'),
+  $oneFluid.Replace('fluids=1 producers=1','fluids=1 producers=2'),
+  ($coveredFluid+"`n"+$missingRoute),
+  ($coveredFluid+"`n"+$presentRoute+"`n"+$presentRoute),
+  ($coveredFluid+"`n"+$presentRoute.Replace(' status=present',' not-status=present'))
+)) {
+  $rejected=$false
+  try {$null=Get-ObserverMaterialOutcomeInventory $badFluids -Petrochem} catch {$rejected=$true}
+  Assert-Reader $rejected 'incomplete, wrong-type, forged admission or missing route capture closed fluid coverage.'
+}
+if($InventoryLogPath){
+  $capturedText=Get-Content -Raw -LiteralPath $InventoryLogPath
+  $capture=Get-ObserverMaterialOutcomeInventory $capturedText
+  $plate=@($capture.subjects|Where-Object id -CEQ 'platinum/plate')[0]
+  $wire=@($capture.subjects|Where-Object id -CEQ 'platinum/wire')[0]
+  Assert-Reader ($plate.producers[0].recipe -ceq 'unselected-casting' -and $wire.producers[0].recipe -ceq 'wire-only') 'actual formatter conflated plate and wire.'
+  Assert-Reader (@($capture.observation_gaps|Where-Object recipe -CEQ 'unselected-casting').Count -eq 1) 'actual formatter omitted the independent casting gap.'
+  Assert-Reader (@(@($capture.subjects|Where-Object id -CEQ 'tin/plate')[0].producers|Where-Object recipe -CEQ 'named route%one').Count -eq 1) 'escaped producer identity did not round-trip.'
+  $maskedGap=$capturedText.Replace('[mir-material-outcome-inventory] GAP subject=platinum/plate recipe=unselected-casting','').Replace('gaps=4','gaps=3')
+  Assert-Reader ($maskedGap -cne $capturedText) 'casting gap negative control did not change the fixture.'
+  $rejected=$false
+  try {$null=Get-ObserverMaterialOutcomeInventory $maskedGap} catch {$rejected=$true}
+  Assert-Reader $rejected 'a deleted casting gap was hidden by matching the completion count.'
+  $fluidCapture=Get-ObserverMaterialOutcomeInventory $capturedText -Petrochem
+  Assert-Reader ($fluidCapture.subjects[1].fluids[0].hidden -and $fluidCapture.subjects[1].producers[0].declared_productivity -ceq 'false') 'actual fluid formatter must preserve visibility and upstream denial.'
+  Assert-Reader ($fluidCapture.observation_gaps.Count -eq 1 -and $fluidCapture.observation_gaps[0].recipe -ceq 'unselected-synthesis') 'actual fluid formatter must retain the independently discovered producer gap.'
+}
+Write-Host "[ok] material input/inventory observation readers passed $assertions assertions; no native engine or route admission."

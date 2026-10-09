@@ -21,6 +21,7 @@ $buildReceiptSchema = 3
 $assuranceRunnerVersion = "4"
 
 . (Join-Path $repo "tools/lib/validation/FactorioVersionPolicy.ps1")
+. (Join-Path $repo "tools/lib/validation/CurrentTargetPackage.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Core.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Domains.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Evidence.ps1")
@@ -179,11 +180,18 @@ switch ($command) {
     if ([string]::IsNullOrWhiteSpace($workers) -or [string]::IsNullOrWhiteSpace($artifactPrefix)) {
       throw "import-workers requires --workers <directory> and --artifact-prefix <prefix>."
     }
+    $retryAcrossAttempts = Test-MIRAssuranceSwitch -Name "--retry-across-attempts"
+    $currentRunAttempt = Get-MIRAssuranceOption -Name "--current-run-attempt"
+    if ($retryAcrossAttempts -and [string]::IsNullOrWhiteSpace($currentRunAttempt)) {
+      throw "import-workers with --retry-across-attempts requires --current-run-attempt <positive aggregate attempt>."
+    }
     $workerImport = Import-MIRAssuranceWorkerEvidence `
       -Plan $plan `
       -Context $context `
       -WorkerRoot $workers `
-      -ArtifactPrefix $artifactPrefix
+      -ArtifactPrefix $artifactPrefix `
+      -RetryAcrossAttempts:$retryAcrossAttempts `
+      -CurrentRunAttempt $currentRunAttempt
     Write-MIRAssuranceJson -Value $workerImport -DefaultPath "build/results/assurance/worker-import.json"
     if ([string]$workerImport.status -ne "passed") {
       throw "Worker evidence import did not close the active plan: failed=$(@($workerImport.failed).Count), missing=$(@($workerImport.missing).Count), rejected=$(@($workerImport.rejected).Count), duplicates=$(@($workerImport.duplicates).Count)."
@@ -231,21 +239,23 @@ switch ($command) {
     if ($LASTEXITCODE -ne 0) { throw "Research-cost model validation failed." }
     & (Join-Path $repo "tests\compiler\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
     if ($LASTEXITCODE -ne 0) { throw "Native-owner balance contract validation failed." }
+    $currentTarget = ConvertTo-MIR4CurrentTargetKey -FactorioVersion ([string]$context.target)
+    $currentPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $currentTarget
     $snapshot = [ordered]@{
       schema=1
       target=$context.target
       version=[string]$context.info.version
       streams_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo ".mir\streams.yml"))
-      generated_stream_manifest_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"))
+      generated_stream_manifest_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'prototypes/mir/streams/generated_stream_manifest.json'))
       settings_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo ".mir\settings.yml"))
-      planner_costs_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\planner\costs.lua"))
-      research_cost_model_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\research_cost\model.lua"))
-      research_cost_formula_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\research_cost\formula.lua"))
-      research_cost_classification_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\research_cost\classification.lua"))
+      planner_costs_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'prototypes/mir/planner/costs.lua'))
+      research_cost_model_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'prototypes/mir/domain/research_cost/model.lua'))
+      research_cost_formula_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'prototypes/mir/domain/research_cost/formula.lua'))
+      research_cost_classification_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'prototypes/mir/domain/research_cost/classification.lua'))
       native_owner_cost_models_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo ".mir\native-owner-cost-models.json"))
-      native_owner_contract_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\native_owner\contract.lua"))
-      native_owner_formula_adapter_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\native_owner\cost_model.lua"))
-      native_owner_binding_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\planner\native_owner_binding.lua"))
+      native_owner_contract_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'prototypes/mir/domain/native_owner/contract.lua'))
+      native_owner_formula_adapter_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'prototypes/mir/domain/native_owner/cost_model.lua'))
+      native_owner_binding_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'prototypes/mir/planner/native_owner_binding.lua'))
     }
     $snapshot.fingerprint = Get-MIRAssuranceTextHash -Text (($snapshot.Values | ForEach-Object { [string]$_ }) -join "`n")
     Write-MIRAssuranceJson -Value $snapshot -DefaultPath "build/results/assurance/balance-snapshot.json"
@@ -257,4 +267,3 @@ switch ($command) {
   "self-test" { Invoke-MIRAssuranceSelfTest -Context $context }
   default { throw "Unknown assurance command: $command" }
 }
-

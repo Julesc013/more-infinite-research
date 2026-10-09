@@ -18,6 +18,8 @@ param(
   [switch]$KeepArtifacts
 )
 
+throw '[mir-native-obsolete-runner] The legacy performance qualification wrapper allocates staging for an unmigrated campaign. Use an explicitly selected direct-library native consumer; no performance qualification is implied by this refusal.'
+
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "validation\ReleaseAttestations.ps1")
 . (Join-Path $PSScriptRoot "validation\PerformanceCampaign.ps1")
@@ -42,11 +44,10 @@ if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) {
   $libraryCandidates = @(
     $libraryEnvironmentValue,
     (Join-Path (Split-Path -Parent $RepoRoot) "testmods\$factorioLine"),
-    (Join-Path $RepoRoot "testmods\$factorioLine"),
-    (Join-Path (Split-Path -Parent $RepoRoot) "testmods_$factorioLine")
+    (Join-Path $RepoRoot "testmods\$factorioLine")
   ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
   $LocalModZipDir = $libraryCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -First 1
-  if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) { $LocalModZipDir = $libraryCandidates[-1] }
+  if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) { $LocalModZipDir = Join-Path (Split-Path -Parent $RepoRoot) "testmods/$factorioLine" }
 }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$($candidateInfo.version)-performance-regression.json"
@@ -63,7 +64,8 @@ if ($usesGeneratedArtifactRoot) {
   $factorioSha256 = Get-MIRPerformanceRawSha256 -Path $FactorioBin
   $planFingerprint = Get-MIRPerformanceTextSha256 -Value ("$candidateSha256`n$baselineSha256`n$factorioSha256`n$(Get-MIRPerformanceRawSha256 -Path $resolvedCampaignPath)`n$ExpectedSourceCommit")
   $targetCode = "f" + $factorioLine.Replace(".", "")
-  $candidates = if ($ScratchRootCandidates.Count -gt 0) { $ScratchRootCandidates } else { @("C:\mir-tmp", "C:\tmp", [IO.Path]::GetTempPath()) }
+  # Keep this legacy deep-path runner inside the project without exceeding its 240-character budget.
+  $candidates = if ($ScratchRootCandidates.Count -gt 0) { $ScratchRootCandidates } else { @((Join-Path $RepoRoot 'build/p')) }
   $staging = New-MIRPerformanceStagingRoot -Campaign $campaign -TargetCode $targetCode -TestId "performance.qualification" `
     -PlanFingerprint $planFingerprint -CandidateSha256 $candidateSha256 -BaselineSha256 $baselineSha256 -FactorioBinarySha256 $factorioSha256 `
     -DurableDestination ("build/results/performance-custody/" + $planFingerprint.Substring(0, 16)) -AttemptOrdinal $AttemptOrdinal -ScratchRootCandidates $candidates

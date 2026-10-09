@@ -12,12 +12,8 @@ superseded_by: []
 
 # Cubium Compatibility
 
-Claim: MIR provides exact, bounded interoperability for `cubium_1.0.30` on Factorio `2.1` in two tested areas only: loader-schema normalization and science-pack production-route selection.
+Current claim: MIR has no active Factorio `2.1` loader-schema repair for `cubium_1.0.30`.
 
-Cubium `1.0.30` uses the obsolete singular `ambient-sound.planet` field. MIR changes those exact Cubium ambient-sound prototypes to the Factorio `2.1` `ambient-sound.planets` representation without changing the selected planet or sound content.
+The current F210 package does not bind the former `ambient-sound.planet` repair. The old repair and the historical local campaign must not be used as evidence that a current MIR candidate makes this Cubium version load on Factorio `2.1`.
 
-Cubium also adds cubic alternate recipes for eleven science packs at `cube-mastery-4`. MIR treats those recipes as ordinary alternate production routes. It retains each ordinary primary science recipe as the first-acquisition route, so MIR-generated research is not delayed behind `cube-mastery-4` merely because Cubium adds a later alternate.
-
-The governed campaign `local-2-1-cubium-production-routes` binds the exact Cubium archive and runs a dedicated assertion fixture. It checks all eleven cubic routes, their `cube-mastery-4` unlock, deterministic multi-route selection, and the absence of `cube-mastery-4` from MIR-generated prerequisites.
-
-This is not a broad Cubium support claim. Other Cubium progression, balance, runtime, and migration behavior remains outside this evidence boundary.
+Cubium's cubic alternate science recipes remain a distinct production-route-policy subject: the historical `local-2-1-cubium-production-routes` fixture records all eleven cubic routes at `cube-mastery-4` as later alternates rather than first-acquisition prerequisites. That record is historical evidence, not a current loader-schema or broad Cubium compatibility claim.

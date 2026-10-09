@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-assert-f210-current-bob-angel-final-routes-observer",
+  "version": "0.1.0",
+  "title": "MIR F210 current Bob Angel final routes observer",
+  "author": "More Infinite Research",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.0", "more-infinite-research >= 4.2.0"]
+}

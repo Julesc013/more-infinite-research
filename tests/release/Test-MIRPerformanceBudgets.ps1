@@ -15,6 +15,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Pat
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
 . (Join-Path $RepoRoot "tools/lib/control/Core.ps1")
 
 function Resolve-MIRPerformancePath {
@@ -126,7 +127,8 @@ foreach ($id in $requiredCounterBudgetIds) {
     throw "Compiler performance counter budget is missing: $id"
   }
 }
-$telemetrySource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\report\compiler_telemetry.lua")
+$currentPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f210
+$telemetrySource = Get-MIR4CurrentTargetPackageOutputText -Context $currentPackage -RelativePath 'prototypes/mir/report/compiler_telemetry.lua'
 foreach ($name in $requiredTelemetryCounters) {
   if ($telemetrySource -notmatch ('"' + [regex]::Escape($name) + '"')) {
     throw "Compiler telemetry does not initialize required counter '$name'."

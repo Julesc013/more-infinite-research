@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0060",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Allow immutable archive optimization to select one completed test run.",
+  "details": [
+    "The optional test-run selector scans only direct mod archives in one canonical completed run. Default discovery is unchanged. Stale terminal status, lease exclusion, plain paths, exact archive identity, same-volume linking, apply-time rechecks and rollback remain required.",
+    "Consumed controls cover bounded discovery, invalid and ineligible scopes, reparse and lease races, peer isolation, public command forwarding, content preservation and fixed points. Fixtures stay under primary build/tmp and create no linked checkout.",
+    "A preserved completed-run preview found its three library archives already hardlinked and no eligible duplicates. No deletion, physical space recovery or native qualification is claimed; native resource admission limits remain unchanged.",
+    "The selected router control checks the current source path, inventory, parsed module bounds and public probes. Historical migration binding proof stays pinned; the existing committed-worktree guard checks current integrity separately, matching the validation-runner control."
+  ],
+  "semantic_domains": ["tooling", "documentation"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Repository archive optimization can inspect a completed run for this target; player bytes are unchanged."},
+    {"target":"F200","disposition":"affected","reason":"Repository archive optimization can inspect a completed run for this target; player bytes are unchanged."},
+    {"target":"F110","disposition":"affected","reason":"The target-neutral repository optimizer is available for completed test staging."},
+    {"target":"F100","disposition":"affected","reason":"The target-neutral repository optimizer is available for completed test staging."},
+    {"target":"F017","disposition":"affected","reason":"The target-neutral repository optimizer is available for completed test staging."},
+    {"target":"F016","disposition":"affected","reason":"The target-neutral repository optimizer is available for completed test staging."},
+    {"target":"F015","disposition":"affected","reason":"The target-neutral repository optimizer is available for completed test staging."},
+    {"target":"F014","disposition":"affected","reason":"The target-neutral repository optimizer is available for completed test staging."},
+    {"target":"F013","disposition":"affected","reason":"The target-neutral repository optimizer is available for completed test staging."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/tooling/Test-MIRArtifactStorageOptimization.ps1: consumed scoped optimizer controls"},
+    {"kind":"document","value":"docs/maintainer/artifact-retention.md"}
+  ]
+}

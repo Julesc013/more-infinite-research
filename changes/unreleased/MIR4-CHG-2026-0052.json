@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0052",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Apply finite material research caps before rejecting oversized recipe headroom.",
+  "details": [
+    "A valid finite maximum can bound a qualified level-four continuation even when upstream recipe headroom would exceed the technology level domain.",
+    "Unbounded or out-of-domain effective maxima still withhold the continuation. Missing recipes, invalid effects, explicit legacy-only caps and recipe saturation retain their existing dispositions.",
+    "Technology and setting identities, early-stage behavior, effect increments, cost policy and material-route admission remain preserved.",
+    "Controlled progression and planner regressions cover the boundary and F200/F210 prototype strategies. Exact native package and save qualification remains pending."
+  ],
+  "semantic_domains": ["progression", "compiler"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Recipe-productivity continuation uses the configured effective maximum."},
+    {"target":"F200","disposition":"affected","reason":"Recipe-productivity continuation uses the configured effective maximum and a native finite prototype."},
+    {"target":"F110","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."},
+    {"target":"F100","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"compatible","settings":"compatible","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/material_progression.lua: oversized headroom bounded by finite configured maxima"},
+    {"kind":"finding","value":"tests/compiler/material_continuation.lua: bounded level-four planner and target prototype strategies"}
+  ]
+}

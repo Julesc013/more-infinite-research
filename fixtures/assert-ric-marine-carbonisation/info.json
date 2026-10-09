@@ -1,0 +1,1 @@
+{"name":"mir-fixture-assert-ric-marine-carbonisation","version":"0.1.0","title":"MIR fixture - RIC Marine carbonisation","author":"MIR maintainers","factorio_version":"2.1","dependencies":["base >= 2.1.20","real-industrial-chemistry = 0.36.1","more-infinite-research >= 4.2.21000"]}

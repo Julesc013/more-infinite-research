@@ -93,11 +93,40 @@ function ConvertFrom-MIR4DistributionComponent {
   }
 }
 
+function Get-MIR4FinalManifestSourceVersion {
+  param([Parameter(Mandatory)]$Manifest)
+  if ($Manifest.kind -cne 'MIR42FinalReleaseManifestV1') { throw '[mir4-release-source-version] Expected a final release manifest.' }
+  $tag = [string]$Manifest.source_tag
+  if ($tag -ceq 'v4.2.0-stable') {
+    if ($Manifest.canonical_source_tag -cne 'v4.2.0' -or
+        $Manifest.source.commit -cne '6d19c874ea7d026d297865b96aa1b2b0916e9e61' -or
+        $Manifest.source_tag_exception.tag -cne $tag -or
+        $Manifest.source_tag_exception.scope -cne 'this 4.2.0 publication only' -or
+        $Manifest.source_tag_exception.changes_numeric_version -isnot [bool] -or
+        $Manifest.source_tag_exception.changes_numeric_version -or
+        $Manifest.version_contract.source_version -cne '4.2.0' -or
+        $Manifest.version_contract.source_patch -ne 0) {
+      throw '[mir4-release-source-version] The one-time stable tag must identify the exact authorized 4.2.0 source and patch.'
+    }
+    return '4.2.0'
+  }
+  if ($tag -cnotmatch '^v4[.](?<minor>0|[1-9][0-9]*)[.](?<patch>0|[1-9][0-9]?)$') {
+    throw '[mir4-release-source-version] Final source tags must use canonical vMAJOR.MINOR.PATCH.'
+  }
+  $version = "4.$($Matches.minor).$($Matches.patch)"
+  if ($Manifest.PSObject.Properties.Name -contains 'version_contract' -and
+      ($Manifest.version_contract.source_version -cne $version -or $Manifest.version_contract.source_patch -ne [int]$Matches.patch)) {
+    throw '[mir4-release-source-version] Source tag and numeric source version disagree.'
+  }
+  return $version
+}
+
 function New-MIR4DistributionIdentityProjection {
   param(
     [Parameter(Mandatory)][string]$DistributionTargetCode,
     [Parameter(Mandatory)][int]$SourceMinor,
-    [Parameter(Mandatory)][int]$SourcePatch
+    [Parameter(Mandatory)][int]$SourcePatch,
+    [string]$DistributionVersion
   )
 
   if ($SourceMinor -lt 0 -or $SourceMinor -gt 65535) {
@@ -108,7 +137,10 @@ function New-MIR4DistributionIdentityProjection {
     -DistributionTargetCode $DistributionTargetCode `
     -SourcePatch $SourcePatch
   $sourceVersion = "4.$SourceMinor.$SourcePatch"
-  $distributionVersion = "4.$SourceMinor.$($component.encoded_component_text)"
+  $projectedVersion = "4.$SourceMinor.$($component.encoded_component_text)"
+  if (-not [string]::IsNullOrWhiteSpace($DistributionVersion) -and $DistributionVersion -cne $projectedVersion) {
+    throw '[mir4-distribution-source-patch] Distribution version must encode the exact source patch.'
+  }
   return [pscustomobject][ordered]@{
     distribution_target_code = $DistributionTargetCode
     source_minor = $SourceMinor
@@ -118,9 +150,9 @@ function New-MIR4DistributionIdentityProjection {
     source_tag = "v$sourceVersion"
     encoded_component = [int]$component.encoded_component
     encoded_component_text = [string]$component.encoded_component_text
-    distribution_version = $distributionVersion
-    distribution_tag = "dist/f$DistributionTargetCode/v$distributionVersion"
-    package_name = "more-infinite-research_$distributionVersion.zip"
+    distribution_version = $projectedVersion
+    distribution_tag = "dist/f$DistributionTargetCode/v$projectedVersion"
+    package_name = "more-infinite-research_$projectedVersion.zip"
   }
 }
 
@@ -186,7 +218,9 @@ function Assert-MIR4R0DistributionIdentity {
     }
   }
 
-  Assert-MIR4IdentitySchema -RepoRoot $RepoRoot -RelativePath $script:MIR4TargetRegistryV2Path -SchemaRelativePath "spec/schemas/mir4-target-registry-v2.schema.json"
+  # The filename of the V2 schema was later reassigned to the four-target
+  # composed registry. This validator below retains the complete historical
+  # 17-target R0 contract and must not validate it against the successor shape.
   Assert-MIR4IdentitySchema -RepoRoot $RepoRoot -RelativePath $script:MIR4VersionAuthorityV2Path -SchemaRelativePath "spec/schemas/mir4-versioning-distribution-identity-v2.schema.json"
   Assert-MIR4IdentitySchema -RepoRoot $RepoRoot -RelativePath $script:MIR4CodecVectorsV2Path -SchemaRelativePath "spec/schemas/mir4-distribution-version-codec-vectors-v2.schema.json"
 

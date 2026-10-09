@@ -87,7 +87,7 @@ $packageMatrix = [ordered]@{
   preserved_candidates = $preservedRows
   corrected_mandatory_candidates = $correctedRows
   mandatory_target_rule = 'f210 and f200 release qualification must use fresh packages from the eventual source-frozen commit; preserved fixed-point bytes are superseded evidence'
-  release_zip_denylist = @('.mir/', '.codex/', '.github/', 'build/', 'dist/', 'docs/', 'fixtures/', 'scripts/', 'tests/', 'validation/', 'tools/', 'AGENTS.md', 'CONTRIBUTING.md', 'todo.md')
+  release_zip_denylist = @('.mir/', '.codex/', '.github/', 'build/', 'dist/', 'docs/', 'fixtures/', 'scripts/', 'tests/', 'validation/', 'tools/', 'AGENTS.md', 'CONTRIBUTING.md', 'TODO.md')
   public_output_authorized = $false
 }
 $null = Write-CloseoutJson 'MIR4_M4C01_PACKAGE_MATRIX.json' $packageMatrix

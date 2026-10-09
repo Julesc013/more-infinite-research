@@ -29,7 +29,7 @@ The resulting `build/reports/repository-characterization/authority-ledger.json` 
 | --- | --- | --- |
 | repository migration history | `governance/repository/migrations/*.json` ordered by `.mir/control/repository-fixed-point.json` | characterization bundle |
 | accepted release changes | `changes/unreleased/*.json` and released history | generated changelogs and release narratives |
-| player package membership | `src/mod/package-source.json`, `targets/package-authority.json`, and target overlays | package-membership report and generated target packages |
+| player package membership | `source/package-source.json`, `targets/package-authority.json`, and target overlays | package-membership report and generated target packages |
 | current development execution | `spec/execution/mir4-4.1-development-context-v1.json` | exact engine and candidate evidence |
 | historical compatibility bridges | `governance/repository/migrations/current-product-bridge-retirement-v1.json` | bridge-expiry report and succession receipt |
 | documentation metadata | Markdown front matter | `.mir/docs.yml` and documentation indexes |

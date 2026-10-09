@@ -8,16 +8,19 @@ if (-not (Get-Command Test-MIR4BootstrapRecordHash -ErrorAction SilentlyContinue
 if (-not (Get-Command Get-MIR4CanonicalPackageAuthority -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir4TargetMaterializerRoot 'tools/mir/application/package/PackageAuthority.ps1')
 }
-if (-not (Get-Command Write-MIR441PackagePresentationV1 -ErrorAction SilentlyContinue)) {
-  . (Join-Path $mir4TargetMaterializerRoot 'tools/mir/application/package/MIR441PackagePresentation.ps1')
-}
 
 function Read-MIR4TargetMaterializerRecord {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RelativePath,[Parameter(Mandatory)][string]$Kind)
-  $path = Join-Path $RepoRoot $RelativePath
-  $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100 -DateKind String
-  if ([string]$record.kind -cne $Kind -or -not (Test-MIR4BootstrapRecordHash -Record $record)) { throw "[mir4-target-materializer-record] $RelativePath" }
-  return $record
+  $definitions = [ordered]@{
+    MIR4CanonicalPackageAuthorityV2 = 'spec/schemas/mir4-canonical-package-authority-v2.schema.json'
+    MIR4ComposablePackageSourceV2 = 'spec/schemas/mir4-composable-package-source-v2.schema.json'
+    MIR4ComposablePackageSourceV3 = 'spec/schemas/mir4-composable-package-source-v3.schema.json'
+    MIR4TargetRegistryV2 = 'spec/schemas/mir4-target-registry-v2.schema.json'
+    MIR4TargetSupportPolicyV1 = 'spec/schemas/mir4-target-support-policy-v1.schema.json'
+    MIR4TargetCompositionV2 = 'spec/schemas/mir4-target-composition-v2.schema.json'
+  }
+  if (-not $definitions.Contains($Kind)) { throw "[mir4-target-materializer-kind] $Kind" }
+  return Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $RepoRoot -RelativePath $RelativePath -Kind $Kind -Schema ([string]$definitions[$Kind]) -Code 'mir4-target-materializer-record'
 }
 
 function Get-MIR4TargetMaterializerState {
@@ -25,29 +28,29 @@ function Get-MIR4TargetMaterializerState {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target)
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
-  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'src/mod/package-source.json' -Kind 'MIR4PackageSourceManifestV1'
-  $registry = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -Kind 'MIR4TargetRegistryV1'
+  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
+  $registry = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -Kind 'MIR4TargetRegistryV2'
   $support = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/support-policy.json' -Kind 'MIR4TargetSupportPolicyV1'
   $targetRows = @($registry.targets | Where-Object { [string]$_.target -ceq $Target })
   $supportRows = @($support.targets | Where-Object { [string]$_.target -ceq $Target })
   if ($targetRows.Count -ne 1 -or $supportRows.Count -ne 1) { throw "[mir4-target-materializer-target] $Target" }
   $targetRow = $targetRows[0]
-  $overlay = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath ([string]$targetRow.overlay) -Kind 'MIR4TargetOverlayV1'
-  if ([string]$overlay.target -cne $Target -or [string]$overlay.family -cne [string]$targetRow.family -or
+  $composition = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath ([string]$targetRow.composition) -Kind 'MIR4TargetCompositionV2'
+  if ([string]$composition.target -cne $Target -or
       [string]$manifest.materializer_abi -cne [string]$registry.materializer_abi -or
-      [string]$manifest.materializer_abi -cne [string]$overlay.materializer_abi -or
+      [string]$manifest.materializer_abi -cne [string]$composition.materializer_abi -or
       [string]$authority.materializer_abi -cne [string]$manifest.materializer_abi -or
       [string]$authority.source_manifest.record_sha256 -cne [string]$manifest.record_sha256 -or
       [string]$authority.target_registry.record_sha256 -cne [string]$registry.record_sha256 -or
       [string]$authority.support_policy.record_sha256 -cne [string]$support.record_sha256) { throw "[mir4-target-materializer-contract] $Target" }
-  return [pscustomobject][ordered]@{repo=$repo;authority=$authority;manifest=$manifest;registry=$registry;support=$support;target=$targetRow;support_target=$supportRows[0];overlay=$overlay}
+  return [pscustomobject][ordered]@{repo=$repo;authority=$authority;manifest=$manifest;registry=$registry;support=$support;target=$targetRow;support_target=$supportRows[0];composition=$composition}
 }
 
 function Read-MIR4CanonicalSourceBindingBytes {
   param([Parameter(Mandatory)]$State,[Parameter(Mandatory)]$Binding)
   $relative = [string]$Binding.source_path
   Assert-MIR4PortableArchivePath -Path $relative
-  if ($relative -notmatch '^(?:src/mod/|targets/f(?:210|200|110|100)/(?:files|generation)/)') { throw "[mir4-target-materializer-source-boundary] $relative" }
+  if ($relative -notmatch '^source/') { throw "[mir4-target-materializer-source-boundary] $relative" }
   $full = [IO.Path]::GetFullPath((Join-Path ([string]$State.repo) $relative))
   $repoPrefix = ([string]$State.repo).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
   if (-not $full.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase) -or -not (Test-Path -LiteralPath $full -PathType Leaf)) { throw "[mir4-target-materializer-source] $relative" }
@@ -67,25 +70,111 @@ function Get-MIR4TargetMaterializationBindings {
   param([Parameter(Mandatory)]$State)
   $target = [string]$State.target.target
   $pathMap = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
-  foreach ($binding in @($State.manifest.bindings | Where-Object { [string]$_.layer -ceq 'common' })) {
-    if ($target -notin @($binding.target_scope)) { throw "[mir4-target-materializer-common-scope] $($binding.output_path)" }
-    $pathMap.Add([string]$binding.output_path, $binding)
+  $expectedBindings = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+  foreach ($binding in @($State.manifest.bindings | Where-Object { $target -in @($_.target_scope) })) {
+    $path = [string]$binding.output_path
+    Assert-MIR4PortableArchivePath -Path $path
+    if (-not $expectedBindings.TryAdd($path, $binding)) { throw "[mir4-target-materializer-manifest-collision] ${target}:$path" }
+    if ([string]$binding.layer -ceq 'shared') { $pathMap.Add($path, $binding) }
   }
+  if ($expectedBindings.Count -eq 0) { throw "[mir4-target-materializer-empty-target] $target" }
   $omissions = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-  foreach ($operation in @($State.overlay.operations)) {
+  $operations = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+  foreach ($operation in @($State.composition.operations)) {
     $path = [string]$operation.path
     Assert-MIR4PortableArchivePath -Path $path
+    if (-not $operations.TryAdd($path, $operation)) { throw "[mir4-target-materializer-operation-collision] ${target}:$path" }
     if ([string]$operation.operation -ceq 'omit') {
-      if ($pathMap.ContainsKey($path) -or -not $omissions.Add($path) -or $null -ne $operation.source_path -or $null -ne $operation.expected_sha256) { throw "[mir4-target-materializer-omission] ${target}:$path" }
+      $otherTargetBindings = @($State.manifest.bindings | Where-Object { [string]$_.output_path -ceq $path -and $target -notin @($_.target_scope) })
+      if ($expectedBindings.ContainsKey($path) -or $pathMap.ContainsKey($path) -or -not $omissions.Add($path) -or
+          $otherTargetBindings.Count -eq 0 -or [string]$operation.semantic_class -cne 'target-omission' -or
+          $null -ne $operation.source_path -or $null -ne $operation.transform -or
+          $null -ne $operation.expected_bytes -or $null -ne $operation.expected_sha256) {
+        throw "[mir4-target-materializer-omission] ${target}:$path"
+      }
       continue
     }
-    $matches = @($State.manifest.bindings | Where-Object {
-      [string]$_.output_path -ceq $path -and [string]$_.source_path -ceq [string]$operation.source_path -and $target -in @($_.target_scope) -and [string]$_.layer -cne 'common'
-    })
-    if ($matches.Count -ne 1 -or $pathMap.ContainsKey($path) -or [string]$matches[0].output_sha256 -cne [string]$operation.expected_sha256) { throw "[mir4-target-materializer-overlay] ${target}:$path" }
-    $pathMap.Add($path, $matches[0])
+    if (-not $expectedBindings.ContainsKey($path)) { throw "[mir4-target-materializer-operation-unbound] ${target}:$path" }
+    $binding = $expectedBindings[$path]
+    if ([string]$binding.layer -ceq 'shared' -or $pathMap.ContainsKey($path) -or
+        [string]$binding.source_path -cne [string]$operation.source_path -or
+        [string]$binding.transform -cne [string]$operation.transform -or
+        [string]$binding.semantic_class -cne [string]$operation.semantic_class -or
+        [int64]$binding.output_bytes -ne [int64]$operation.expected_bytes -or
+        [string]$binding.output_sha256 -cne [string]$operation.expected_sha256) {
+      throw "[mir4-target-materializer-operation-mismatch] ${target}:$path"
+    }
+    $pathMap.Add($path, $binding)
   }
-  return [pscustomobject][ordered]@{bindings=@($pathMap.Values | Sort-Object output_path -CaseSensitive);omissions=@($omissions | Sort-Object -CaseSensitive)}
+  foreach ($entry in $expectedBindings.GetEnumerator()) {
+    $path = [string]$entry.Key
+    $binding = $entry.Value
+    if ([string]$binding.layer -ceq 'shared') {
+      if ($operations.ContainsKey($path)) { throw "[mir4-target-materializer-shared-operation] ${target}:$path" }
+    } elseif (-not $operations.ContainsKey($path) -or -not $pathMap.ContainsKey($path)) {
+      throw "[mir4-target-materializer-operation-closure] ${target}:$path"
+    }
+  }
+  if ($pathMap.Count -ne $expectedBindings.Count) { throw "[mir4-target-materializer-selection-closure] $target" }
+  return [pscustomobject][ordered]@{
+    bindings=@($pathMap.Values | Sort-Object output_path -CaseSensitive)
+    omissions=@($omissions | Sort-Object -CaseSensitive)
+    scoped_operation_closure=$true
+  }
+}
+
+function Get-MIR4PrivatePatchPackageReadmeBytes {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][byte[]]$ReadmeBytes,[Parameter(Mandatory)][string]$DistributionVersion)
+  if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+  $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
+  if ([int]$decoded.source_patch -ne 1) { throw '[mir4-private-patch-package-source-patch]' }
+  $utf8 = [Text.UTF8Encoding]::new($false)
+  $readme = $utf8.GetString($ReadmeBytes).Replace("`r`n", "`n")
+  # Package bytes identify their source. Qualification belongs to the external
+  # release evidence, so the frozen candidate needs no prose rewrite at publication.
+  $heading = "MIR $DistributionVersion, source 4.2.1.`n`n"
+  if (-not $readme.StartsWith($heading, [StringComparison]::Ordinal)) { $readme = $heading + $readme }
+  return ,$utf8.GetBytes($readme)
+}
+
+function Write-MIR4PrivatePatchPackageIdentity {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$Tree,
+    [Parameter(Mandatory)][string]$DistributionVersion
+  )
+
+  if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+  $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
+  if ([int]$decoded.source_patch -ne 1) { throw '[mir4-private-patch-package-source-patch]' }
+  $targetLines = @{ '210'='2.1'; '200'='2.0'; '110'='1.1'; '100'='1.0'; '017'='0.17'; '016'='0.16'; '015'='0.15'; '014'='0.14'; '013'='0.13' }
+  $targetCode = [string]$decoded.distribution_target_code
+  if (-not $targetLines.ContainsKey($targetCode)) { throw '[mir4-private-patch-package-target]' }
+  $baseline = New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetCode -SourceMinor 2 -SourcePatch 0
+  $infoPath = Join-Path $Tree 'info.json'
+  $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json -Depth 20 -DateKind String
+  if ([string]$info.name -cne 'more-infinite-research' -or
+      [string]$info.version -notin @([string]$baseline.distribution_version, $DistributionVersion) -or
+      [string]$info.factorio_version -cne [string]$targetLines[$targetCode]) {
+    throw '[mir4-private-patch-package-input-identity]'
+  }
+  # Read every authored input before changing this private materialized copy.
+  $changelogPath = Join-Path $Tree 'changelog.txt'
+  $changelog = [IO.File]::ReadAllText($changelogPath).Replace("`r`n", "`n")
+  $readmePath = Join-Path $Tree 'README.md'
+  $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllBytes($readmePath) } else { $null }
+  $utf8 = [Text.UTF8Encoding]::new($false)
+  $info.version = $DistributionVersion
+  [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
+  $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
+  if (-not $firstVersion.Success -or $firstVersion.Groups[1].Value -cne $DistributionVersion) {
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source 4.2.1.`n"
+    [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
+  }
+  if ($null -ne $readme) {
+    [IO.File]::WriteAllBytes($readmePath, (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion))
+  }
 }
 
 function New-MIR4TargetPackage {
@@ -96,15 +185,36 @@ function New-MIR4TargetPackage {
     [Parameter(Mandatory)][ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId,
     [string]$SourceVersion,
     [string]$DistributionVersion,
-    [string]$OutputRoot='build/packages'
+    [string]$OutputRoot='build/packages',
+    [string]$ArchiveRelativePath=''
   )
   $state = Get-MIR4TargetMaterializerState -RepoRoot $RepoRoot -Target $Target
   $repo = [string]$state.repo
   $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $Target -SourceVersion $SourceVersion -DistributionVersion $DistributionVersion
+  if ([string]$identity.source_version -ceq '4.1.0') {
+    throw '[mir4-target-materializer-historical-source-version-requires-pinned-checkout] 4.1.0'
+  }
   if (-not [IO.Path]::IsPathRooted($OutputRoot)) { $OutputRoot = Join-Path $repo $OutputRoot }
   $output = [IO.Path]::GetFullPath($OutputRoot)
-  if (-not (Test-Path -LiteralPath $output -PathType Container)) { New-Item -ItemType Directory -Force -Path $output | Out-Null }
   $candidateRoot = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "$Target/$CandidateId"
+  $archive = Join-Path $candidateRoot ([string]$identity.package_name)
+  if (-not [string]::IsNullOrWhiteSpace($ArchiveRelativePath)) {
+    # Retained assets are written by this same canonical writer. Validate the
+    # destination before retiring or populating a staging root; never relocate
+    # a receipt to make it describe a subsequent custody copy.
+    $archive = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath $ArchiveRelativePath
+    if ([IO.Path]::GetFileName($archive) -cne [string]$identity.package_name) {
+      throw '[mir4-target-materializer-archive-filename]'
+    }
+    $candidatePrefix = $candidateRoot.TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar
+    if ($archive.StartsWith($candidatePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+      throw '[mir4-target-materializer-retained-archive-in-staging]'
+    }
+    if ((Test-Path -LiteralPath $archive) -or (Test-Path -LiteralPath "$archive.new")) {
+      throw '[mir4-target-materializer-retained-archive-collision]'
+    }
+  }
+  if (-not (Test-Path -LiteralPath $output -PathType Container)) { New-Item -ItemType Directory -Force -Path $output | Out-Null }
   Remove-MIR4BuildTree -OutputRoot $output -Path $candidateRoot
   New-Item -ItemType Directory -Force -Path $candidateRoot | Out-Null
   $tree = Resolve-MIR4ArtifactPath -OutputRoot $candidateRoot -RelativePath ([string]$identity.distribution_root)
@@ -126,10 +236,9 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -ceq '4.1.0') {
-    [void](Write-MIR441PackagePresentationV1 -RepoRoot $repo -Target $Target -SourceVersion ([string]$identity.source_version) -PackageRoot $tree)
+  if ([string]$identity.source_version -ceq '4.2.1') {
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version)
   }
-  $archive = Join-Path $candidateRoot ([string]$identity.package_name)
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output
   $inventory = Get-MIR4ArchiveInventory -Path $archive
   $result = [pscustomobject][ordered]@{
@@ -146,7 +255,7 @@ function New-MIR4TargetPackage {
     source_manifest_sha256=[string]$state.manifest.record_sha256
     target_registry_sha256=[string]$state.registry.record_sha256
     support_policy_sha256=[string]$state.support.record_sha256
-    target_overlay_sha256=[string]$state.overlay.record_sha256
+    target_overlay_sha256=[string]$state.composition.record_sha256
     source_binding_count=@($selection.bindings).Count
     omission_count=@($selection.omissions).Count
     tree_path=$tree
@@ -154,7 +263,7 @@ function New-MIR4TargetPackage {
     archive_sha256=[string]$inventory.archive_sha256
     content_sha256=[string]$inventory.content_sha256
     entry_count=[int]$inventory.entry_count
-    invariants=[pscustomobject][ordered]@{no_historical_archive_input=$true;all_source_hashes_verified=$true;all_output_hashes_verified=$true;all_target_differences_explicit=$true;version_identity_verified=$true;canonical_package_authority=$true}
+    invariants=[pscustomobject][ordered]@{no_historical_archive_input=$true;all_source_hashes_verified=$true;all_output_hashes_verified=$true;all_target_differences_explicit=$true;scoped_operation_closure=[bool]$selection.scoped_operation_closure;version_identity_verified=$true;canonical_package_authority=$true}
     transition_gate=[pscustomobject][ordered]@{package_cutover=$true;old_writer_retirement=$true;tagging=$false;signing=$false;sealing=$false;version_allocation=$false;publication=$false}
     record_sha256=''
   }
@@ -179,7 +288,8 @@ function Invoke-MIR4TargetMaterializerParity {
     $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $target
     $a = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M41-F2E-A' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
     $b = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M41-F2E-B' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
-    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count) { throw "[mir4-target-materializer-determinism] $target" }
+    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count -or
+        -not [bool]$a.invariants.scoped_operation_closure -or -not [bool]$b.invariants.scoped_operation_closure) { throw "[mir4-target-materializer-determinism] $target" }
     if ([string]$a.content_sha256 -cne [string]$identity.target_authority.baseline_content_sha256 -or
         [int]$a.entry_count -ne [int]$identity.target_authority.baseline_entry_count) { throw "[mir4-target-materializer-baseline-parity] $target" }
     $rows.Add([pscustomobject][ordered]@{target=$target;distribution_version=[string]$a.distribution_version;source_binding_count=[int]$a.source_binding_count;omission_count=[int]$a.omission_count;archive_a=[string]$a.archive_sha256;archive_b=[string]$b.archive_sha256;content_sha256=[string]$a.content_sha256;entry_count=[int]$a.entry_count;deterministic_archive_bytes=$true;composition_record_a=[string]$a.record_sha256;composition_record_b=[string]$b.record_sha256})
@@ -187,7 +297,7 @@ function Invoke-MIR4TargetMaterializerParity {
     Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$a.tree_path))
     Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$b.tree_path))
   }
-  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'src/mod/package-source.json' -Kind 'MIR4PackageSourceManifestV1'
+  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
   $report = [pscustomobject][ordered]@{schema=1;kind='MIR4EditableSourceMaterializerProofV1';status='passed-four-target-canonical-package-authority-parity';materializer_abi=[string]$manifest.materializer_abi;package_authority_sha256=[string]$authority.record_sha256;package_source_sha256=(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo);source_manifest_sha256=[string]$manifest.record_sha256;targets=@($rows);invariants=[pscustomobject][ordered]@{four_target_determinism=$true;historical_archives_are_comparison_fixtures_only=$true;production_materializer_has_no_archive_input=$true;accepted_baseline_reconstruction=$true;package_cutover_complete=$true};transition_gate=[pscustomobject][ordered]@{package_cutover=$true;old_writer_retirement=$true;tagging=$false;signing=$false;sealing=$false;version_allocation=$false;publication=$false};record_sha256=''}
   $report.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $report
@@ -221,7 +331,8 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
     $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $target
     $a = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M42-02-CURRENT-A' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
     $b = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M42-02-CURRENT-B' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
-    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count) {
+    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count -or
+        -not [bool]$a.invariants.scoped_operation_closure -or -not [bool]$b.invariants.scoped_operation_closure) {
       throw "[mir4-current-source-materializer-determinism] $target"
     }
     $absoluteOutput = if ([IO.Path]::IsPathRooted($OutputRoot)) { [IO.Path]::GetFullPath($OutputRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot)) }
@@ -256,7 +367,7 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
     Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$a.tree_path))
     Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$b.tree_path))
   }
-  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'src/mod/package-source.json' -Kind 'MIR4PackageSourceManifestV1'
+  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
   $report = [pscustomobject][ordered]@{
     schema=1
@@ -293,4 +404,107 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
   if (-not (Test-Path -LiteralPath $parent -PathType Container)) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
   [IO.File]::WriteAllText($ReportPath, $reportJson, [Text.UTF8Encoding]::new($false))
   return $report
+}
+
+function Update-MIR4CurrentSourceBindings {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  # Refresh only existing, admitted paths. Membership, target scope, transforms,
+  # versioning and support remain separately reviewed authorities.
+  $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
+  $authority=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/package-authority.json' -Kind 'MIR4CanonicalPackageAuthorityV2'
+  $records=[ordered]@{}
+  $identities=@{}
+  $changed=[Collections.Generic.List[string]]::new()
+  foreach($binding in @($manifest.bindings)) {
+    $relative=[string]$binding.source_path
+    Assert-MIR4PortableArchivePath -Path $relative
+    if($relative -notmatch '^source/') { throw "[mir4-source-refresh-boundary] $relative" }
+    $full=[IO.Path]::GetFullPath((Join-Path $repo $relative))
+    if(-not $full.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-source-refresh-path]' }
+    $source=[IO.File]::ReadAllBytes($full)
+    $sha=Get-MIR4Sha256Bytes -Bytes $source
+    if([string]$binding.source_sha256 -cne $sha) { $changed.Add($relative) }
+    $output=switch([string]$binding.transform) {
+      'copy-exact-bytes' { $source; break }
+      'exact-template-v1' { $source; break }
+      'decode-base64-v1' { [Convert]::FromBase64String([Text.UTF8Encoding]::new($false).GetString($source).Trim()); break }
+      default { throw "[mir4-source-refresh-transform] $relative" }
+    }
+    $binding.source_bytes=[int64]$source.Length
+    $binding.source_sha256=$sha
+    $binding.output_bytes=[int64]$output.Length
+    $binding.output_sha256=Get-MIR4Sha256Bytes -Bytes $output
+    $identities[$relative]=$sha
+  }
+  $manifest.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $manifest
+  $records['source/package-source.json']=@{record=$manifest;schema='mir4-composable-package-source-v3.schema.json'}
+  foreach($target in @('f210','f200','f110','f100')) {
+    $path="targets/$target/composition.json"
+    $composition=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath $path -Kind 'MIR4TargetCompositionV2'
+    foreach($operation in @($composition.operations)) {
+      if([string]$operation.operation -ceq 'omit') { continue }
+      $rows=@($manifest.bindings | Where-Object { [string]$_.output_path -ceq [string]$operation.path -and [string]$_.source_path -ceq [string]$operation.source_path -and $target -in @($_.target_scope) })
+      if($rows.Count -ne 1 -or [string]$rows[0].transform -cne [string]$operation.transform) { throw "[mir4-source-refresh-overlay] $target/$($operation.path)" }
+      $operation.expected_bytes=[int64]$rows[0].output_bytes
+      $operation.expected_sha256=[string]$rows[0].output_sha256
+    }
+    $composition.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $composition
+    $records[$path]=@{record=$composition;schema='mir4-target-composition-v2.schema.json'}
+  }
+  $authority.source_manifest.record_sha256=[string]$manifest.record_sha256
+  $authority.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $authority
+  $records['targets/package-authority.json']=@{record=$authority;schema='mir4-canonical-package-authority-v2.schema.json'}
+  # Historical construction uses the same admitted f100 bytes before applying
+  # each target's explicit patches. Refresh their base pins without changing
+  # patch text, adapters, engines, predecessors, or publication authority.
+  foreach($target in @('f017','f016','f015','f014','f013')) {
+    $path="targets/historical/$target/target.json"
+    $historical=Get-Content -Raw -LiteralPath (Join-Path $repo $path) | ConvertFrom-Json -Depth 100
+    if([int]$historical.schema -ne 1 -or [string]$historical.kind -cne 'MIR42HistoricalPlaytestTargetV1' -or
+       [string]$historical.target -cne $target -or [string]$historical.base_materializer_target -cne 'f100' -or
+       [bool]$historical.public_output_authorized -or [bool]$historical.publication_authorized -or
+       -not(Test-MIR4BootstrapRecordHash -Record $historical)) { throw "[mir4-source-refresh-historical-record] $target" }
+    $historicalChanged=$false
+    foreach($patch in @($historical.patches)) {
+      $rows=@($manifest.bindings | Where-Object { [string]$_.output_path -ceq [string]$patch.output_path -and 'f100' -in @($_.target_scope) })
+      if($rows.Count -ne 1 -or [string]$rows[0].transform -cne 'copy-exact-bytes' -or
+         @($historical.adapter_files | Where-Object { [string]$_.output_path -ceq [string]$patch.output_path }).Count -ne 0) {
+        throw "[mir4-source-refresh-historical-patch-binding] $target/$($patch.output_path)"
+      }
+      $text=[Text.UTF8Encoding]::new($false,$true).GetString([IO.File]::ReadAllBytes((Join-Path $repo ([string]$rows[0].source_path))))
+      if([string]::IsNullOrEmpty([string]$patch.find) -or
+         [regex]::Matches($text,[regex]::Escape([string]$patch.find)).Count -ne 1) {
+        throw "[mir4-source-refresh-historical-patch-anchor] $target/$($patch.output_path)"
+      }
+      if([string]$patch.base_sha256 -cne [string]$rows[0].output_sha256) {
+        $patch.base_sha256=[string]$rows[0].output_sha256
+        $historicalChanged=$true
+      }
+    }
+    if($historicalChanged) {
+      $historical.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $historical
+      $records[$path]=@{record=$historical;schema=''}
+    }
+  }
+  $writes=[ordered]@{}
+  foreach($entry in $records.GetEnumerator()) {
+    $json=($entry.Value.record | ConvertTo-Json -Depth 100).Replace("`r`n","`n")+"`n"
+    if($entry.Value.schema -and -not($json | Test-Json -SchemaFile (Join-Path $repo "spec/schemas/$($entry.Value.schema)"))) { throw "[mir4-source-refresh-schema] $($entry.Key)" }
+    if([IO.File]::ReadAllText((Join-Path $repo $entry.Key)).Replace("`r`n","`n") -cne $json) { $writes[$entry.Key]=$json }
+  }
+  if($Check -and $writes.Count -gt 0) { throw "[mir4-source-refresh-stale] $($writes.Keys -join ', ')" }
+  foreach($entry in $identities.GetEnumerator()) {
+    if((Get-MIR4Sha256Bytes -Bytes ([IO.File]::ReadAllBytes((Join-Path $repo $entry.Key)))) -cne [string]$entry.Value) { throw "[mir4-source-refresh-input-drift] $($entry.Key)" }
+  }
+  if(-not $Check) {
+    foreach($entry in $writes.GetEnumerator()) {
+      $path=Join-Path $repo $entry.Key
+      $temporary=$path+'.refresh-tmp'
+      [IO.File]::WriteAllText($temporary,[string]$entry.Value,[Text.UTF8Encoding]::new($false))
+      [IO.File]::Move($temporary,$path,$true)
+    }
+  }
+  [pscustomobject][ordered]@{status='current';changed_sources=@($changed.ToArray() | Sort-Object -Unique);projections=@($writes.Keys);membership_changed=$false;publication_authorized=$false}
 }

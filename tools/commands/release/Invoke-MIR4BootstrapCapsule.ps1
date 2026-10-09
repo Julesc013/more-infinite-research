@@ -504,6 +504,10 @@ $capsuleAuthorityPath = Join-Path $workspace 'tools/lib/mir4/BootstrapMaterializ
 Assert-Exact (Get-RawSha256 $packageIdentityPath) $envelope.package_membership.authority_sha256 'Package-membership authority member hash'
 Assert-Exact (Get-RawSha256 $capsuleAuthorityPath) $envelope.package_membership.capsule_tool_sha256 'Capsule authority member hash'
 
+# MIR4-ROOT-PROJECTION-HISTORICAL-EXCEPTION: bootstrap-capsule-historical-root-v1
+# `$workspace is the sealed historical capsule verified by
+# Assert-MIR4GitSourceProof and manifest closure above, not the active source
+# checkout or a current package authority.
 $infoPath = Join-Path $workspace 'info.json'
 $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json -DateKind String
 Assert-Exact $info.version $envelope.predecessor.release 'Capsule predecessor version'

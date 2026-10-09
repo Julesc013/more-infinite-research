@@ -1,0 +1,106 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0106",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Declare the nine retained Py Earth sample research subjects with shared useful continuation.",
+  "details": [
+    "The nine exact Earth sample item producers have separate stable early and level-four research identities at +2% per level. Py AlienLife must supply each item; the conditional palm sample also requires Py HighTech. Existing per-technology startup controls also apply to these new families and require a restart.",
+    "Final productive item identity, permission, complete process safety, ownership and reachable science/labs decide admission. No sample/codex return exception or productivity permission is granted; tree, seed/bootstrap and Angel plant-life requests remain separate.",
+    "Controlled source checks cover actual route admission, provider requirements, modern target capability and shared useful continuation. Current-package emitted catalogue, useful production, save upgrades and ecosystem applicability remain pending; this draft is not release qualification."
+  ],
+  "semantic_domains": [
+    "recipe-productivity",
+    "compatibility",
+    "progression",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Conditionally declares the retained Py sample item producers; finalized native admission, production and save acceptance remain pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Conditionally declares the retained Py sample item producers; finalized native admission, production and save acceptance remain pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "Recipe-productivity gameplay remains omitted by the retained target capability; shared source bytes do not qualify a material outcome."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "Recipe-productivity gameplay remains omitted by the retained target capability; shared source bytes do not qualify a material outcome."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "Recipe-productivity gameplay remains omitted by the retained target capability; shared source bytes do not qualify a material outcome."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "Recipe-productivity gameplay remains omitted by the retained target capability; shared source bytes do not qualify a material outcome."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "Recipe-productivity gameplay remains omitted by the retained target capability; shared source bytes do not qualify a material outcome."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "Recipe-productivity gameplay remains omitted by the retained target capability; shared source bytes do not qualify a material outcome."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "Recipe-productivity gameplay remains omitted by the retained target capability; shared source bytes do not qualify a material outcome."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "changed",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "fixtures/assert-community-manufacturing-intake/expected-vs-observed-vs-realized.json"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_progression.lua"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_routes.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-integration-and-delivery-plan.md"
+    }
+  ]
+}

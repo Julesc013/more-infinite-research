@@ -38,13 +38,15 @@ function Resolve-MIRCPPathToken {
   if ($Path -notmatch '^path:(?<id>[a-z][a-z0-9.-]+)(?<suffix>/.*)?$') {
     throw "Invalid logical repository path token: $Path"
   }
-  return Resolve-MIRCPPathId -Id $Matches.id -Suffix ([string]$Matches.suffix) -RepoRoot $RepoRoot
+  $suffix = if ($Matches.ContainsKey('suffix')) { [string]$Matches['suffix'] } else { '' }
+  return Resolve-MIRCPPathId -Id $Matches.id -Suffix $suffix -RepoRoot $RepoRoot
 }
 
 function Read-MIRCPJson {
   param(
     [Parameter(Mandatory)][string]$Path,
-    [string]$RepoRoot = ""
+    [string]$RepoRoot = "",
+    [switch]$PreserveTimestamps
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $Path = Resolve-MIRCPPathToken -Path $Path -RepoRoot $repo
@@ -53,6 +55,9 @@ function Read-MIRCPJson {
     throw "Control-plane JSON not found: $Path"
   }
   try {
+    if ($PreserveTimestamps) {
+      return Get-Content -Raw -LiteralPath $resolved | ConvertFrom-Json -DateKind String
+    }
     return Get-Content -Raw -LiteralPath $resolved | ConvertFrom-Json
   } catch {
     throw "Invalid control-plane JSON at ${Path}: $($_.Exception.Message)"

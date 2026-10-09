@@ -6,6 +6,8 @@ param(
   [string]$OutputRoot,
   [int]$TimeoutSeconds = 180
 )
+# Native execution is retired; the preserved oracle is not current acceptance.
+throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.
 $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path
@@ -13,14 +15,14 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path
+. (Join-Path $repo 'tests/support/MIRCandidateRetentionInputs.ps1')
 $profile = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\target-reconstruction.json") | ConvertFrom-Json
 if ((Get-FileHash -LiteralPath $FactorioBin -Algorithm SHA256).Hash -ne $profile.factorio.binary_sha256) {
   throw "Factorio binary hash does not match the qualified target profile."
 }
 $candidate = (Resolve-Path -LiteralPath $CandidateZip).Path
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $OutputRoot = Join-Path $repo "build\retention\$($profile.release)" }
-if (Test-Path -LiteralPath $OutputRoot) { Remove-Item -LiteralPath $OutputRoot -Recurse -Force }
-New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
+$OutputRoot = Initialize-MIRCandidateRetentionOutputRoot -RepoRoot $repo -OutputRoot $OutputRoot
 
 $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $FactorioBin))
 $dataPath = Join-Path $factorioRoot "data"
@@ -32,7 +34,8 @@ function Invoke-MIRRetentionRun {
   $mods = Join-Path $runRoot "mods"
   $user = Join-Path $runRoot "user"
   New-Item -ItemType Directory -Force -Path $mods, $user | Out-Null
-  Copy-Item -LiteralPath $ModZip -Destination (Join-Path $mods ([System.IO.Path]::GetFileName($ModZip)))
+  $inputLease = New-MIRCandidateRetentionInputLease -RunRoot $runRoot -ModsDirectory $mods -ModZip $ModZip
+  try {
   $modList = @{ mods = @(@{ name = "base"; enabled = $true }, @{ name = "more-infinite-research"; enabled = $true }) } | ConvertTo-Json -Depth 5
   [System.IO.File]::WriteAllText((Join-Path $mods "mod-list.json"), $modList, [System.Text.UTF8Encoding]::new($false))
   $config = "[path]`nread-data=$($dataPath.Replace('\','/'))`nwrite-data=$($user.Replace('\','/'))`n`n[general]`nlocale=auto`n`n[other]`nenable-steam-networking=false`ndisable-blueprint-storage=true`n"
@@ -98,7 +101,15 @@ function Invoke-MIRRetentionRun {
       $proofText -notmatch '(?im)Map version ' -or ($requiresGoodbye -and $proofText -notmatch '(?im)Goodbye'))) {
     throw "Factorio $Name exited without benchmarked loaded-map proof; see $log"
   }
+  $terminalInputStaging = Complete-MIRImmutableInputLease -Lease $inputLease -Outcome passed
+  $null = Assert-MIRImmutableInputTerminalReceipt -Receipt $terminalInputStaging
   return $log
+  } finally {
+    if (-not $inputLease.closed) {
+      try { Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed | Out-Null }
+      finally { Close-MIRImmutableInputLeaseHandles -Lease $inputLease }
+    }
+  }
 }
 
 $freshMap = Join-Path $OutputRoot "fresh-$($profile.release).zip"
@@ -118,6 +129,11 @@ if (-not [string]::IsNullOrWhiteSpace($PriorZip)) {
   $priorStatus = "passed"
 }
 
-[ordered]@{ schema=1; status="passed"; release=$profile.release; fresh_create="passed"; fresh_reload="passed"; prior_upgrade=$priorStatus; logs=@($logs | ForEach-Object { [IO.Path]::GetRelativePath($repo, $_).Replace('\','/') }) } |
-  ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $OutputRoot "retention-summary.json") -Encoding utf8
+$inputStaging=@($logs | ForEach-Object {
+  $receipt=Get-Content -LiteralPath (Join-Path (Split-Path -Parent $_) 'mir-immutable-input-lease.json') -Raw | ConvertFrom-Json -Depth 20 -DateKind String
+  $null=Assert-MIRImmutableInputTerminalReceipt -Receipt $receipt
+  $receipt
+})
+[ordered]@{ schema=1; status="passed"; release=$profile.release; fresh_create="passed"; fresh_reload="passed"; prior_upgrade=$priorStatus; input_staging=$inputStaging; logs=@($logs | ForEach-Object { [IO.Path]::GetRelativePath($repo, $_).Replace('\','/') }) } |
+  ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $OutputRoot "retention-summary.json") -Encoding utf8
 Write-Host "[ok] exact-candidate create/reload and retention proof passed."

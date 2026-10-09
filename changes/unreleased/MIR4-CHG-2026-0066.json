@@ -1,0 +1,36 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0066",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Recognize native braking-force effects in setting scaling and technology badges.",
+  "details": [
+    "Shared effect metadata recognizes train-braking-force-bonus as a percentage. The existing scaler applies explicit selections, including modded-chain scaling, while preserving the published braking setting, 15% default, default chain values and prior logical alias.",
+    "The icon builder selects the existing braking badge for that native type and preserves source icons, explicit overrides and adapter overlay policy. Consumed compiler/generation assertions check the native descriptor and badge expectation.",
+    "The affected SDK inspector test verifies the live policy remains unchanged during execution and separately authenticates its frozen migration policy binding. Historical receipt bytes, current policy and package source remain unchanged by that workflow.",
+    "Controlled actual-source checks cover four adapters and detect restoration of the original descriptor and badge predicates. Native profile helpers, rendered assets, rewards, upgrades, multiplayer and performance remain unqualified; save and migration acceptance remain open."
+  ],
+  "semantic_domains": ["compiler", "runtime", "documentation", "tooling"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Shared metadata and presentation recognize the native braking effect; settings use existing target registration."},
+    {"target":"F200","disposition":"affected","reason":"Shared metadata and presentation recognize the native braking effect; settings use existing target registration."},
+    {"target":"F110","disposition":"affected","reason":"Shared metadata and presentation recognize the native braking effect; the selected adapter retains its overlay policy."},
+    {"target":"F100","disposition":"affected","reason":"Shared metadata recognizes the native braking effect; the selected adapter retains its policy of no constant overlays."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select these shared metadata and icon-builder modules."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select these shared metadata and icon-builder modules."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select these shared metadata and icon-builder modules."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select these shared metadata and icon-builder modules."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select these shared metadata and icon-builder modules."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"changed","migration":"unknown","compatibility":"changed","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"fixtures/assert-compiler-contracts/data-final-fixes.lua: consumed native braking effect descriptor contract"},
+    {"kind":"finding","value":"fixtures/assert-generation-integrity/data-final-fixes.lua: native braking badge expectation"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-a02-component-reconciliation-v1.schema.json",
+  "title": "MIR 4 A02 component reconciliation V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "task", "status", "reconciliation_subject", "sources", "component_inventory", "current_authority", "materializer_proof", "components", "authorities", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4A02ComponentReconciliationV1"},
+    "task": {"const": "A02"},
+    "status": {"const": "complete"},
+    "reconciliation_subject": {"$ref": "#/$defs/subject"},
+    "sources": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["R02", "R03", "R14"]}, "allOf": [{"contains": {"const": "R02"}}, {"contains": {"const": "R03"}}, {"contains": {"const": "R14"}}]},
+    "component_inventory": {"$ref": "#/$defs/componentInventory"},
+    "current_authority": {"$ref": "#/$defs/currentAuthority"},
+    "materializer_proof": {"$ref": "#/$defs/materializerProof"},
+    "components": {"type": "array", "minItems": 34, "maxItems": 34, "items": {"$ref": "#/$defs/component"}},
+    "authorities": {"$ref": "#/$defs/authorities"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "path": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$", "minLength": 1},
+    "subject": {
+      "type": "object", "additionalProperties": false,
+      "required": ["stable_commit", "retained_dev_commit", "merge_base", "comparison_mode"],
+      "properties": {
+        "stable_commit": {"const": "f458598732e9583a9d086032ebfbe9ffb747d130"},
+        "retained_dev_commit": {"const": "3683369ba00cfbdd7f8872a5a1b24f0d59f31062"},
+        "merge_base": {"const": "3562377b520cccb071b97b3968946eae7024c950"},
+        "comparison_mode": {"const": "merge-base-to-retained-dev-with-stable-reference"}
+      }
+    },
+    "componentInventory": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "component_count", "ids"],
+      "properties": {
+        "path": {"const": "spec/programmes/inputs/synthesis-2026-09-05/COMPONENT_DELIVERY.json"},
+        "component_count": {"const": 34},
+        "ids": {"type": "array", "minItems": 34, "maxItems": 34, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9-]+$"}}
+      }
+    },
+    "currentAuthority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["package_authority_sha256", "package_source_sha256", "source_manifest_sha256", "materializer_abi", "package_cutover", "release_authority", "player_mutation_authority", "component_graduation_authority"],
+      "properties": {
+        "package_authority_sha256": {"$ref": "#/$defs/sha256"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"},
+        "source_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "materializer_abi": {"type": "string", "minLength": 1},
+        "package_cutover": {"const": true},
+        "release_authority": {"const": false},
+        "player_mutation_authority": {"const": false},
+        "component_graduation_authority": {"const": false}
+      }
+    },
+    "targetArchive": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "archive_sha256", "content_sha256", "entry_count", "composition_record_sha256"],
+      "properties": {
+        "target": {"enum": ["f210", "f200", "f110", "f100"]},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "entry_count": {"type": "integer", "minimum": 1},
+        "composition_record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "materializerProof": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "record_sha256", "status", "targets"],
+      "properties": {
+        "path": {"const": "spec/programmes/evidence/synthesis-2026-09-10/a02-current-source-materializer-proof.json"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "status": {"const": "passed-four-target-current-source-determinism"},
+        "targets": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/targetArchive"}}
+      }
+    },
+    "ownedPath": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "stable_blob", "retained_blob", "retained_delta"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"},
+        "stable_blob": {"$ref": "#/$defs/sha1"},
+        "retained_blob": {"$ref": "#/$defs/sha1"},
+        "retained_delta": {"const": "unchanged"}
+      }
+    },
+    "packageExcludedGovernsSourceOverlayZipTrace": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "exclusion_evidence", "excluded_owned_paths", "source_manifest", "target_overlays", "materializer_proof", "target_archives", "player_authority"],
+      "properties": {
+        "mode": {"const": "package-excluded-governs-source-overlay-zip"},
+        "exclusion_evidence": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["src/mod/package-source.json", "targets/package-authority.json", "spec/platform/mir4-preview-v0/platform.json"]}},
+        "excluded_owned_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/path"}},
+        "source_manifest": {"const": "src/mod/package-source.json"},
+        "target_overlays": {"type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true, "items": {"enum": ["targets/f210/overlay.json", "targets/f200/overlay.json", "targets/f110/overlay.json", "targets/f100/overlay.json"]}},
+        "materializer_proof": {"const": "spec/programmes/evidence/synthesis-2026-09-10/a02-current-source-materializer-proof.json"},
+        "target_archives": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/targetArchive"}},
+        "player_authority": {"const": false}
+      }
+    },
+    "packageExcludedTrace": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "exclusion_evidence", "excluded_owned_paths", "player_authority"],
+      "properties": {
+        "mode": {"const": "package-excluded"},
+        "exclusion_evidence": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["src/mod/package-source.json", "targets/package-authority.json", "spec/platform/mir4-preview-v0/platform.json"]}},
+        "excluded_owned_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/path"}},
+        "player_authority": {"const": false}
+      }
+    },
+    "semanticEvidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "comparison", "stable_comparison_ref", "retained_comparison_ref"],
+      "properties": {
+        "source": {"const": "R14"},
+        "comparison": {"const": "3562377b520cccb071b97b3968946eae7024c950...3683369ba00cfbdd7f8872a5a1b24f0d59f31062"},
+        "stable_comparison_ref": {"const": "f458598732e9583a9d086032ebfbe9ffb747d130"},
+        "retained_comparison_ref": {"const": "3683369ba00cfbdd7f8872a5a1b24f0d59f31062"}
+      }
+    },
+    "crossBranchDelta": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "compared_owned_path_count", "changed_owned_path_count"],
+      "properties": {
+        "status": {"const": "unchanged"},
+        "compared_owned_path_count": {"type": "integer", "minimum": 1},
+        "changed_owned_path_count": {"const": 0}
+      }
+    },
+    "assessment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["assessed", "complete", "unresolved", "closure"],
+      "properties": {
+        "assessed": {"const": true},
+        "complete": {"const": true},
+        "unresolved": {"const": false},
+        "closure": {"type": "string", "minLength": 80}
+      }
+    },
+    "component": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "reported_maturity", "platform_mode", "destination", "next_obligation", "canonical_owned_paths", "package_trace", "cross_branch_delta", "semantic_disposition", "semantic_evidence", "assessment", "admitted_by_this_review", "graduated", "player_authority"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "reported_maturity": {"type": "string", "minLength": 1},
+        "platform_mode": {"type": "string", "minLength": 1},
+        "destination": {"type": "string", "minLength": 1},
+        "next_obligation": {"type": "string", "minLength": 1},
+        "canonical_owned_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/ownedPath"}},
+        "package_trace": {"oneOf": [{"$ref": "#/$defs/packageExcludedGovernsSourceOverlayZipTrace"}, {"$ref": "#/$defs/packageExcludedTrace"}]},
+        "cross_branch_delta": {"$ref": "#/$defs/crossBranchDelta"},
+        "semantic_disposition": {"const": "unchanged"},
+        "semantic_evidence": {"$ref": "#/$defs/semanticEvidence"},
+        "assessment": {"$ref": "#/$defs/assessment"},
+        "admitted_by_this_review": {"const": false},
+        "graduated": {"const": false},
+        "player_authority": {"const": false}
+      }
+    },
+    "authorities": {
+      "type": "object", "additionalProperties": false,
+      "required": ["all_components_assessed", "blanket_graduation", "player_mutation_authorized", "prototype_write_authorized", "setting_mutation_authorized", "persistent_state_mutation_authorized", "migration_authorized", "public_support_claim_authorized", "release_authority", "publication_authorized"],
+      "properties": {
+        "all_components_assessed": {"const": true},
+        "blanket_graduation": {"const": false},
+        "player_mutation_authorized": {"const": false},
+        "prototype_write_authorized": {"const": false},
+        "setting_mutation_authorized": {"const": false},
+        "persistent_state_mutation_authorized": {"const": false},
+        "migration_authorized": {"const": false},
+        "public_support_claim_authorized": {"const": false},
+        "release_authority": {"const": false},
+        "publication_authorized": {"const": false}
+      }
+    }
+  }
+}

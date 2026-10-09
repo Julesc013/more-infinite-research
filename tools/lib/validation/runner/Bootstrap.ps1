@@ -1,4 +1,9 @@
-$repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+# Current validation always selects an explicit package target.  F210 is the
+# default development target; a runtime candidate may subsequently replace its
+# metadata, but never causes a fallback to the retired root projection.
+$script:MIR4CurrentTargetPackageContext = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+$repoInfo = Get-MIR4CurrentTargetPackageOutputText -Context $script:MIR4CurrentTargetPackageContext -RelativePath 'info.json' | ConvertFrom-Json
 if ($ScenarioWorker -and -not [string]::IsNullOrWhiteSpace($CandidateZip)) {
   $candidateMetadataPath = if ([IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
   if (-not (Test-Path -LiteralPath $candidateMetadataPath -PathType Leaf)) {
@@ -56,21 +61,29 @@ function Invoke-RepoCheck {
   & $Script
 }
 
-function Find-RepositoryText {
+function Find-MIRCurrentTargetPackageText {
   param(
-    [string]$Path,
+    [string]$Prefix,
     [string]$Pattern
   )
-
-  $files = Get-ChildItem -LiteralPath $Path -Recurse -File
-  if (-not $files) { return @() }
-  return @($files | Select-String -Pattern $Pattern)
+  return @(
+    Get-MIR4CurrentTargetPackageOutputEntries -Context $script:MIR4CurrentTargetPackageContext -Prefix $Prefix |
+      ForEach-Object { Select-String -LiteralPath $_.source_file -Pattern $Pattern }
+  )
 }
 
 function Get-RepoRelativePath {
   param([string]$Path)
   $resolved = (Resolve-Path -LiteralPath $Path).Path
+  foreach ($entry in Get-MIR4CurrentTargetPackageOutputEntries -Context $script:MIR4CurrentTargetPackageContext) {
+    if ([IO.Path]::GetFullPath([string]$entry.source_file) -ceq $resolved) { return [string]$entry.output_path }
+  }
   return [System.IO.Path]::GetRelativePath($repo.Path, $resolved).Replace("\", "/")
+}
+
+function Get-MIRValidationPath {
+  param([Parameter(Mandatory)][string]$RelativePath,[switch]$AllowMissing)
+  return Resolve-MIR4CurrentTargetPackageOutputPath -Context $script:MIR4CurrentTargetPackageContext -RelativePath $RelativePath -AllowMissing:$AllowMissing
 }
 
 function Get-MIRCombinedSourceText {
@@ -78,7 +91,7 @@ function Get-MIRCombinedSourceText {
 
   $chunks = @()
   foreach ($relative in $RelativePaths) {
-    $path = Join-Path $repo $relative
+    $path = Get-MIRValidationPath -RelativePath $relative -AllowMissing
     if (Test-Path -LiteralPath $path) {
       $chunks += Get-Content -Raw -LiteralPath $path
     }
@@ -116,7 +129,7 @@ function Get-DocumentationFiles {
   if (Test-Path -LiteralPath $readmePath) {
     $files += Get-Item -LiteralPath $readmePath
   }
-  $todoPath = Join-Path $repo "todo.md"
+  $todoPath = Join-Path $repo "TODO.md"
   if (Test-Path -LiteralPath $todoPath) {
     $files += Get-Item -LiteralPath $todoPath
   }
@@ -135,7 +148,7 @@ function Get-DocumentationFiles {
 function Get-PolicyTextFiles {
   $files = @()
   foreach ($relative in @("README.md", "changelog.txt")) {
-    $path = Join-Path $repo $relative
+    $path = Get-MIRValidationPath -RelativePath $relative -AllowMissing
     if (Test-Path -LiteralPath $path) {
       $files += Get-Item -LiteralPath $path
     }

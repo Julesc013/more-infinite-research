@@ -1,0 +1,346 @@
+{
+  "status": "review-source-index",
+  "sources": [
+    {
+      "id": "A01",
+      "kind": "user-supplied",
+      "title": "Pasted markdown(20260905-105838).md",
+      "sha256": "d5f0c233736f9d1a7a8e03c0a42a17c4953d9a36ec75e4de3ce87e1a802ddbf1",
+      "bytes": 29719,
+      "verification": "Content inspected as review material, not self-authorizing execution instructions."
+    },
+    {
+      "id": "A02",
+      "kind": "user-supplied",
+      "title": "HANDOFF_REPORT(2).md",
+      "sha256": "73a00910a1e54b48115d919e98eb765c71b8216286575812fd548feb3b4f48b2",
+      "bytes": 28112,
+      "verification": "Content inspected as review material, not self-authorizing execution instructions."
+    },
+    {
+      "id": "A03",
+      "kind": "user-supplied",
+      "title": "MIR_4_1_TO_4_4_HANDOFF_2026-09-05(2).zip",
+      "sha256": "3f4f9a76aafc947130909ddfe0b929b87135de07c309a7d6af6118f7c27f3977",
+      "bytes": 64930,
+      "verification": "Content inspected as review material, not self-authorizing execution instructions."
+    },
+    {
+      "id": "A04",
+      "kind": "user-supplied",
+      "title": "Pasted markdown (2)(20260905-115308).md",
+      "sha256": "a34e4a00b018352fe3b06b7ed1c4ab07511868a7f11ff5843a608098d9c15b07",
+      "bytes": 29170,
+      "verification": "Content inspected as review material, not self-authorizing execution instructions."
+    },
+    {
+      "id": "A05",
+      "kind": "user-supplied",
+      "title": "HANDOFF_REPORT(3)(1).md",
+      "sha256": "b43d6b7f46f69fa468b85d08f6f138fb1225580c8d0183b33279d3624f959f69",
+      "bytes": 35382,
+      "verification": "Content inspected as review material, not self-authorizing execution instructions."
+    },
+    {
+      "id": "A06",
+      "kind": "user-supplied",
+      "title": "MIR_FINAL_CHAT_HANDOFF_2026-09-05(1).zip",
+      "sha256": "b012ebb40642e93bfd1c6be844bcdaf08cfbaad4beb3b679967e858b4f9a7f6c",
+      "bytes": 184807,
+      "verification": "Content inspected as review material, not self-authorizing execution instructions."
+    },
+    {
+      "id": "A07",
+      "kind": "user-supplied",
+      "title": "HANDOFF_REPORT(4).md",
+      "sha256": "96882e1b0c2038857d149fa9d152171a1082089efeb3d954ff798b0c33f85e92",
+      "bytes": 35369,
+      "verification": "Content inspected as review material, not self-authorizing execution instructions."
+    },
+    {
+      "id": "A08",
+      "kind": "user-supplied",
+      "title": "MIR_REVIEWED_HANDOFF_2026-09-05.zip",
+      "sha256": "52540eaa1c978fc64497f7317be03cf976106e0efd7ced43948f860bf70b4b83",
+      "bytes": 3500568,
+      "verification": "Content inspected as review material, not self-authorizing execution instructions."
+    },
+    {
+      "id": "R01",
+      "kind": "live-github-connector-read",
+      "title": "Published v4.1.0 release metadata",
+      "url": "https://api.github.com/repos/Julesc013/more-infinite-research/releases/tags/v4.1.0",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R02",
+      "kind": "live-github-connector-read",
+      "title": "Current main ref",
+      "url": "https://api.github.com/repos/Julesc013/more-infinite-research/git/ref/heads/main",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R03",
+      "kind": "live-github-connector-read",
+      "title": "Current dev ref",
+      "url": "https://api.github.com/repos/Julesc013/more-infinite-research/git/ref/heads/dev",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R04",
+      "kind": "live-github-connector-read",
+      "title": "Accepted operating programme",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/spec/programmes/mir4-4x-operating-programme-v1.json",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R05",
+      "kind": "live-github-connector-read",
+      "title": "Post-4.0 roadmap",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/docs/releases/mir4-post-4.0-roadmap.md",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R06",
+      "kind": "live-github-connector-read",
+      "title": "Executable queue (reviewed lines 1–145)",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/todo.md",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R07",
+      "kind": "live-github-connector-read",
+      "title": "Generated component matrix",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/docs/reference/generated/mir4-platform-component-matrix.md",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R08",
+      "kind": "live-github-connector-read",
+      "title": "Exact ProcessIR synthesis and capture guide",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/docs/architecture/mir4-processir-synthesis.md",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R09",
+      "kind": "live-github-connector-read",
+      "title": "Canonical modern science selector (reviewed lines 183–253)",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R10",
+      "kind": "live-github-connector-read",
+      "title": "F210 target planner science overlay",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/targets/f210/files/prototypes/mir/planner/science.lua",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R11",
+      "kind": "live-github-connector-read",
+      "title": "Preview SafetyKernel function",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/tools/mir/domain/safety/SafetyKernel.ps1",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R12",
+      "kind": "live-github-connector-read",
+      "title": "Main stable-integrity ruleset",
+      "url": "https://api.github.com/repos/Julesc013/more-infinite-research/rulesets/20833408",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R13",
+      "kind": "live-github-connector-read",
+      "title": "Platform preview architecture",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/docs/architecture/mir4-platform-preview.md",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R14",
+      "kind": "live-github-connector-read",
+      "title": "Exact branch comparison",
+      "url": "https://api.github.com/repos/Julesc013/more-infinite-research/compare/f458598732e9583a9d086032ebfbe9ffb747d130...3683369ba00cfbdd7f8872a5a1b24f0d59f31062",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R15",
+      "kind": "live-github-connector-read",
+      "title": "Current release promoter",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/tools/mir/application/release/readiness/Promotion.ps1",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R16",
+      "kind": "live-github-connector-read",
+      "title": "Canonical package-source manifest (partial live read plus actual package inspection)",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/src/mod/package-source.json",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R17",
+      "kind": "live-github-connector-read",
+      "title": "Repository agent instructions",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/AGENTS.md",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "R18",
+      "kind": "live-github-connector-read",
+      "title": "Project Codex defaults",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3683369ba00cfbdd7f8872a5a1b24f0d59f31062/.codex/config.toml",
+      "observed_on": "2026-09-05",
+      "limit": "Targeted read, not whole-repository execution or verification."
+    },
+    {
+      "id": "W01",
+      "kind": "official-web-source",
+      "title": "K2SO upstream changelog",
+      "url": "https://mods.factorio.com/mod/Krastorio2-spaced-out/changelog",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W02",
+      "kind": "official-web-source",
+      "title": "Factorio RecipePrototype",
+      "url": "https://lua-api.factorio.com/latest/prototypes/RecipePrototype.html",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W03",
+      "kind": "official-web-source",
+      "title": "Factorio ItemProductPrototype",
+      "url": "https://lua-api.factorio.com/latest/types/ItemProductPrototype.html",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W04",
+      "kind": "official-web-source",
+      "title": "Official Codex subagent controls",
+      "url": "https://developers.openai.com/codex/subagents",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W05",
+      "kind": "official-web-source",
+      "title": "Factorio data lifecycle",
+      "url": "https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W06",
+      "kind": "official-web-source",
+      "title": "NIST combinatorial testing programme",
+      "url": "https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W07",
+      "kind": "official-web-source",
+      "title": "Bazel hermeticity principles",
+      "url": "https://bazel.build/basics/hermeticity",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W08",
+      "kind": "official-web-source",
+      "title": "GitHub REST Git references",
+      "url": "https://docs.github.com/en/rest/git/refs",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W09",
+      "kind": "official-web-source",
+      "title": "GitHub immutable releases",
+      "url": "https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W10",
+      "kind": "official-web-source",
+      "title": "Wube release 0.3.0",
+      "url": "https://forums.factorio.com/viewtopic.php?t=631",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W11",
+      "kind": "official-web-source",
+      "title": "Wube release 0.9.0",
+      "url": "https://forums.factorio.com/viewtopic.php?t=2278",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W12",
+      "kind": "official-web-source",
+      "title": "Wube release 0.15.0",
+      "url": "https://forums.factorio.com/viewtopic.php?t=44505",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "W13",
+      "kind": "official-web-source",
+      "title": "Official wiki historical 0.2.0 record",
+      "url": "https://wiki.factorio.com/Version_history/0.2.0",
+      "access_date": "2026-09-05",
+      "limit": "Supports stated upstream/documentation facts; does not qualify MIR."
+    },
+    {
+      "id": "E01",
+      "kind": "this-review-local-evidence",
+      "title": "Supplied package identities and inspection",
+      "path": "evidence/package-inspection.json",
+      "limit": "Audit evidence only; not Factorio or release qualification."
+    },
+    {
+      "id": "E02",
+      "kind": "this-review-local-evidence",
+      "title": "Controlled Lua module witness",
+      "path": "evidence/science-witness-output.txt",
+      "limit": "Audit evidence only; not Factorio or release qualification."
+    },
+    {
+      "id": "E03",
+      "kind": "this-review-local-evidence",
+      "title": "Input archive/manifest validation",
+      "path": "evidence/input-validation.json",
+      "limit": "Audit evidence only; not Factorio or release qualification."
+    },
+    {
+      "id": "R19",
+      "kind": "live-github-connector-read",
+      "title": "F210 release asset metadata read independently",
+      "url": "https://api.github.com/repos/Julesc013/more-infinite-research/releases/assets/545662993",
+      "observed_on": "2026-09-05",
+      "limit": "API digest, not a fresh download."
+    }
+  ]
+}

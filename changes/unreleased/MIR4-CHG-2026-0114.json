@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0114",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Retain required mining fluids in acquisition and science progression.",
+  "details": [
+    "Fluid-consuming mined outputs require acquisition of the exact fluid instead of acting as unconditional starting inputs. Missing fluids, differently typed items and unseeded cycles cannot acquire a lab or supply a recipe route.",
+    "Independent fluid sources and production alternatives remain usable. A selected lab or recipe route retains the mining fluid's research unlocks; a researched witness cannot become an initial acquisition answer through shared memo reuse.",
+    "Controlled canonical lab, researchability and source-epoch checks cover the correction and adapter boundary. Native mining, final catalogue, progression, existing saves and migration implications remain unqualified; no new productivity permission or support claim is granted."
+  ],
+  "semantic_domains": ["science", "progression", "compatibility", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Retains native mining-fluid acquisition requirements and selected recipe/lab research gates; native acceptance remains pending."},
+    {"target":"F200","disposition":"affected","reason":"Retains native mining-fluid acquisition requirements and selected recipe/lab research gates; native acceptance remains pending."},
+    {"target":"F110","disposition":"affected","reason":"Retains native mining-fluid acquisition requirements; native reduced-target acceptance remains pending."},
+    {"target":"F100","disposition":"affected","reason":"Retains native mining-fluid acquisition requirements; native reduced-target acceptance remains pending."},
+    {"target":"F017","disposition":"affected","reason":"Retains native mining-fluid acquisition requirements; native reduced-target acceptance remains pending."},
+    {"target":"F016","disposition":"affected","reason":"Retains native mining-fluid acquisition requirements; native reduced-target acceptance remains pending."},
+    {"target":"F015","disposition":"affected","reason":"Retains native mining-fluid acquisition requirements; native reduced-target acceptance remains pending."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"The native engine predates fluid-consuming mining; later foreign fields do not establish a requirement."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"The native engine predates fluid-consuming mining; later foreign fields do not establish a requirement."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"changed","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"value":"tests/compiler/lab_reachability.lua","kind":"finding"},
+    {"value":"tests/compiler/recipe_source_epoch.lua","kind":"finding"},
+    {"value":"docs/capabilities/science-integration.md","kind":"document"}
+  ]
+}

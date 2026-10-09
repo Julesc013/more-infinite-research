@@ -28,7 +28,7 @@ function Test-MIRDocsOnlyReleasePath {
       "changelog.txt",
       "CONTRIBUTING.md",
       "LICENSE",
-      "todo.md"
+      "TODO.md"
     )
   )
 }

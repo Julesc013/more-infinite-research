@@ -9,6 +9,8 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
 $policyPath = Join-Path $repo ".mir\module-dependencies.json"
 $policy = Get-Content -Raw -LiteralPath $policyPath | ConvertFrom-Json
 if ($policy.schema -ne 2 -or [string]$policy.edge_policy -ne "exact-observed-cross-layer-v1") {
@@ -16,6 +18,9 @@ if ($policy.schema -ne 2 -or [string]$policy.edge_policy -ne "exact-observed-cro
 }
 
 function Get-RelativePath([string]$Path) {
+  foreach ($entry in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix 'prototypes/') {
+    if ([IO.Path]::GetFullPath([string]$entry.source_file) -ceq [IO.Path]::GetFullPath($Path)) { return [string]$entry.output_path }
+  }
   return [IO.Path]::GetRelativePath($repo, $Path).Replace('\', '/')
 }
 
@@ -44,19 +49,20 @@ foreach ($edge in $policy.allowed_edges) {
   $allowed[[string]$edge] = $true
 }
 
-$moduleFiles = Get-ChildItem -LiteralPath (Join-Path $repo "prototypes\mir") -Recurse -File -Filter "*.lua"
+$moduleFiles = @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix 'prototypes/mir/' |
+  Where-Object { [string]$_.output_path -like '*.lua' })
 $graph = @{}
 $observedEdges = @{}
 foreach ($file in $moduleFiles) {
-  $source = Get-RelativePath $file.FullName
+  $source = [string]$file.output_path
   $sourceLayer = Get-Layer $source
   if (-not $sourceLayer) { throw "MIR Lua source has no governed layer: $source" }
   $graph[$source] = [Collections.Generic.List[string]]::new()
-  $text = Get-Content -Raw -LiteralPath $file.FullName
+  $text = Get-Content -Raw -LiteralPath $file.source_file
   foreach ($match in [regex]::Matches($text, 'require\s*\(\s*["''](prototypes\.mir\.[A-Za-z0-9_\.]+)["'']\s*\)')) {
     $target = $match.Groups[1].Value.Replace('.', '/') + '.lua'
-    $targetPath = Join-Path $repo $target.Replace('/', '\')
-    if (-not (Test-Path -LiteralPath $targetPath)) {
+    $targetPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $target -AllowMissing
+    if ($null -eq $targetPath) {
       throw "Lua require target does not exist: $source -> $target"
     }
     $graph[$source].Add($target)
@@ -107,17 +113,18 @@ foreach ($module in @($graph.Keys | Sort-Object)) {
   Visit-Module $module ([Collections.Generic.List[string]]::new())
 }
 
-$overlayRoot = Join-Path $repo ([string]$policy.overlay_policy.path).Replace('/', '\')
-foreach ($file in Get-ChildItem -LiteralPath $overlayRoot -File -Filter "*.lua") {
-  $text = Get-Content -Raw -LiteralPath $file.FullName
+$overlayPrefix = ([string]$policy.overlay_policy.path).TrimEnd('/') + '/'
+foreach ($file in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix $overlayPrefix) {
+  if (-not ([string]$file.output_path -like '*.lua')) { continue }
+  $text = Get-Content -Raw -LiteralPath $file.source_file
   foreach ($token in $policy.overlay_policy.forbidden_tokens) {
     if ($text.Contains([string]$token)) {
-      throw "Compatibility overlay mutates prototypes directly: $(Get-RelativePath $file.FullName) contains $token"
+      throw "Compatibility overlay mutates prototypes directly: $($file.output_path) contains $token"
     }
   }
 }
 
-$commandsPath = Join-Path $repo ([string]$policy.command_authority).Replace('/', '\')
+$commandsPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath ([string]$policy.command_authority)
 $commandsText = Get-Content -Raw -LiteralPath $commandsPath
 foreach ($required in @('kind = ', 'requires_features = ', 'implementation = ', 'function M.order()', 'function M.run(')) {
   if (-not $commandsText.Contains($required)) {

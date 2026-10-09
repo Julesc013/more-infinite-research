@@ -1,0 +1,16 @@
+{
+  "name": "mir-fixture-assert-f210-current-bob-tin-level4-continuation",
+  "version": "0.1.0",
+  "title": "MIR F210 current Bob Tin level four continuation",
+  "author": "More Infinite Research",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.20",
+    "more-infinite-research >= 4.2.0",
+    "boblibrary >= 3.0.1",
+    "bobores >= 3.0.0",
+    "bobplates >= 3.0.2",
+    "bobelectronics >= 3.0.1",
+    "bobtech >= 3.0.0"
+  ]
+}

@@ -14,6 +14,10 @@ Invoke-RepoCheck "terminal baseline calibrations are exact and deterministic" {
   & (Join-Path $repo "tests\release\Test-MIRTerminalBaselineCapture.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "documented MIR 4 bootstrap routes resolve retired distributions through custody" {
+  & (Join-Path $repo "tests\release\Test-MIR4DistributionCustodyRoutes.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "MIR 4 R0 distribution identity is exact and V2-only" {
   & (Join-Path $repo "tests\release\Test-MIR4R0Identity.ps1") -RepoRoot $repo
 }
@@ -151,14 +155,14 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
     }
   } elseif ($isFactorio21Line) {
     $requiredDeps = @(
-      "base >= 2.1.8",
+      "base >= 2.1.18",
       "(?) elevated-rails",
-      "? recycler >= 2.1.8",
+      "? recycler >= 2.1.18",
       "(?) quality",
       "(?) Krastorio2",
       "(?) Krastorio2-spaced-out",
       "(?) space-exploration",
-      "? space-age >= 2.1.8"
+      "? space-age >= 2.1.18"
     )
     foreach ($requiredDep in $requiredDeps) {
       if ($deps -notcontains $requiredDep) {
@@ -244,7 +248,7 @@ Invoke-RepoCheck "legacy inventory thresholds pass" {
 }
 
 Invoke-RepoCheck "no old tool-based science pack authority remains" {
-  $matches = Find-RepositoryText -Path (Join-Path $repo "prototypes") -Pattern "data.raw.tool|tool_exists|has_tool|PACKS_ALL"
+  $matches = Find-MIRCurrentTargetPackageText -Prefix 'prototypes/' -Pattern "data.raw.tool|tool_exists|has_tool|PACKS_ALL"
   if ($matches.Count -gt 0) {
     $matches | Write-Host
     throw "Old science-pack authority references remain."
@@ -256,7 +260,7 @@ Invoke-RepoCheck "generated count formulas use the unified canonical research-co
 }
 
 Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
-  $matches = Find-RepositoryText -Path (Join-Path $repo "prototypes") -Pattern "icon_mipmaps"
+  $matches = Find-MIRCurrentTargetPackageText -Prefix 'prototypes/' -Pattern "icon_mipmaps"
   if ($matches.Count -gt 0) {
     $matches | Write-Host
     throw "icon_mipmaps references remain in prototypes."
@@ -304,15 +308,14 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
 
 Invoke-RepoCheck "control runtime avoids tick handlers" {
   $luaFiles = @()
-  $controlLua = Join-Path $repo "control.lua"
-  $runtimeDir = Join-Path $repo "prototypes\mir\runtime"
+  $controlLua = Get-MIRValidationPath -RelativePath "control.lua"
 
   if (Test-Path -LiteralPath $controlLua) {
     $luaFiles += Get-Item -LiteralPath $controlLua
   }
-  if (Test-Path -LiteralPath $runtimeDir) {
-    $luaFiles += @(Get-ChildItem -LiteralPath $runtimeDir -Recurse -File -Filter "*.lua")
-  }
+  $luaFiles += @(Get-MIR4CurrentTargetPackageOutputEntries -Context $script:MIR4CurrentTargetPackageContext -Prefix 'prototypes/mir/runtime/' |
+    Where-Object { [string]$_.output_path -like '*.lua' } |
+    ForEach-Object { Get-Item -LiteralPath $_.source_file })
 
   $matches = @(
     foreach ($file in $luaFiles) {
@@ -327,7 +330,7 @@ Invoke-RepoCheck "control runtime avoids tick handlers" {
 }
 
 Invoke-RepoCheck "scripted technology defaults and risks remain explicit" {
-  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
+  $defaultsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/defaults.lua")
   if ($isReducedLegacyLine) {
     if ($defaultsText -match "research_(spoilage_preservation|agricultural_growth_speed)\s*=") {
       throw "Factorio $($repoInfo.factorio_version) must omit scripted Space Age streams instead of carrying disabled settings."
@@ -337,7 +340,7 @@ Invoke-RepoCheck "scripted technology defaults and risks remain explicit" {
   if ($defaultsText -notmatch "(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*true") {
     throw "Spoilage preservation must be enabled by default."
   }
-  $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
+  $directEffectsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/streams/direct-effects.lua")
   if ($directEffectsText -notmatch '(?s)research_spoilage_preservation\s*=\s*\{.*?technology_risk\s*=\s*\{.*?class\s*=\s*"factory-disruptive"') {
     throw "Spoilage preservation must retain its explicit factory-disruptive classification independently of its default."
   }
@@ -347,22 +350,22 @@ Invoke-RepoCheck "scripted technology defaults and risks remain explicit" {
 }
 
 Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
-  $safetyPath = Join-Path $repo "prototypes\mir\domain\technology\effect_safety_policy.lua"
+  $safetyPath = Get-MIRValidationPath -RelativePath "prototypes/mir/domain/technology/effect_safety_policy.lua"
   if (-not (Test-Path -LiteralPath $safetyPath)) {
     throw "Missing technology effect safety policy: prototypes/mir/domain/technology/effect_safety_policy.lua"
   }
 
   $safetyText = Get-Content -Raw -LiteralPath $safetyPath
-  $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\direct_effects.lua")
-  $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\stream_spec_adapter.lua")
-  $technologyDesignAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_design_adapter.lua")
-  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
-  $technologyOperationExecutorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_operation_executor.lua")
-  $graphSafetyText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_graph_safety.lua")
-  $pipelineCommandsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua")
-  $integrityContractsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")
+  $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/planner/direct_effects.lua")
+  $streamAdapterText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua")
+  $technologyDesignAdapterText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/emit/technology_design_adapter.lua")
+  $baseContinuationsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/planner/base_continuations.lua")
+  $technologyOperationExecutorText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/emit/technology_operation_executor.lua")
+  $graphSafetyText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/emit/technology_graph_safety.lua")
+  $pipelineCommandsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/commands.lua")
+  $integrityContractsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/integrity/effect_contracts.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $dataFinalFixesStageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes.lua")
+  $dataFinalFixesStageText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/stage/data_final_fixes.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
 
   foreach ($effectType in @("character-item-pickup-distance", "character-loot-pickup-distance")) {
@@ -398,11 +401,12 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   }
 
   $safetyRelative = "prototypes/mir/domain/technology/effect_safety_policy.lua"
-  $prototypeLuaFiles = Get-ChildItem -LiteralPath (Join-Path $repo "prototypes") -Recurse -File -Filter "*.lua"
+  $prototypeLuaFiles = @(Get-MIR4CurrentTargetPackageOutputEntries -Context $script:MIR4CurrentTargetPackageContext -Prefix 'prototypes/' |
+    Where-Object { [string]$_.output_path -like '*.lua' })
   foreach ($file in $prototypeLuaFiles) {
-    $relative = Get-RepoRelativePath $file.FullName
+    $relative = [string]$file.output_path
     if ($relative -eq $safetyRelative) { continue }
-    $text = Get-Content -Raw -LiteralPath $file.FullName
+    $text = Get-Content -Raw -LiteralPath $file.source_file
     foreach ($effectType in @("character-item-pickup-distance", "character-loot-pickup-distance")) {
       if ($text.Contains($effectType)) {
         throw "Unsafe pickup reach effect type appears outside the safety guard in ${relative}: $effectType"
@@ -412,7 +416,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
 }
 
 Invoke-RepoCheck "merged trash-slot technology has save migration" {
-  $migrationPath = Join-Path $repo "migrations\more-infinite-research_2.0.5.json"
+  $migrationPath = Get-MIRValidationPath -RelativePath "migrations/more-infinite-research_2.0.5.json"
   if (-not (Test-Path -LiteralPath $migrationPath)) {
     throw "Missing migration for removed character trash-slot technology: $migrationPath"
   }
@@ -509,4 +513,3 @@ Invoke-RepoCheck "package and harness fingerprints are checkout-line-ending inva
 Invoke-RepoCheck "Markdown formatter preserves structural syntax" {
   & (Join-Path $repo "tests\docs\Test-MIRMarkdownFormatting.ps1") -RepoRoot $repo
 }
-

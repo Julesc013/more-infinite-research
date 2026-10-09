@@ -1,10 +1,12 @@
-Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
+Invoke-RepoCheck "fixture mods have metadata and engine entrypoints" {
   $fixtureRootForStatic = Join-Path $repo "fixtures"
   if (-not (Test-Path -LiteralPath $fixtureRootForStatic)) {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
   $nonModFixtureDirs = @(
+    "assert-community-manufacturing-intake",
+    "assert-k2-k2so-f210-intake",
     "compat-matrix",
     "golden-plans",
     "mir4-api-v0",
@@ -19,6 +21,8 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     "mir4-process-ir-v0",
     "mir4-process-ir-v1",
     "museum",
+    "release",
+    "release-inputs",
     "run-profiles"
   )
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
@@ -31,6 +35,9 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
 
     $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
     $externalIdentityFixtures = @{
+      "late-mir42-cap-binding-blocker" = "late-mir42-cap-binding-blocker"
+      "late-mir42-policy-binding-blocker" = "late-mir42-policy-binding-blocker"
+      "portable-research-surface-no-mir" = "portable-research-surface-no-mir"
       "better-robots-extended-competitor" = "Better_Robots_Extended"
       "pypostprocessing-stale-unlock" = "pypostprocessing"
       "space-exploration-recipe-removal" = "space-exploration"
@@ -41,12 +48,30 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       ($info.name -notmatch "^mir-fixture-" -and -not $allowedExternalIdentity)) {
       throw "Fixture info.json must declare a mir-fixture-* name or an explicitly mapped upstream identity: $infoPath"
     }
+    $isHistoricalUpgradeTemplate = $fixture.Name -ceq 'assert-upgrade-historical-terminal-to-mir42'
+    if ($isHistoricalUpgradeTemplate -and (
+      [string]$info.name -cne 'mir-fixture-assert-upgrade-historical-terminal-to-mir42' -or
+      [string]$info.version -cne '1.0.0' -or
+      [string]$info.factorio_version -cne '@@FACTORIO_LINE@@' -or
+      (@($info.dependencies) -join '|') -cne 'base|more-infinite-research >= @@MIR_UPGRADE_FROM_VERSION@@' -or
+      -not (Test-Path -LiteralPath (Join-Path $fixture.FullName 'control.lua') -PathType Leaf))) {
+      throw "Historical upgrade fixture must retain its exact staged metadata contract: $infoPath"
+    }
     $mir4TargetNativeFixtures = @{
+      "assert-historical-handcrafting" = "0.16"
+      "assert-f200-bob-angel-material-routes-observation" = "2.0"
+      "assert-f200-bob-tin-persisted-state" = "2.0"
+      "assert-f200-bob-tin-production-gain" = "2.0"
+      "assert-mir42-f200-settings-cap-transition" = "2.0"
+      "assert-upgrade-4-0-10000-to-4-1-10000" = "1.0"
+      "assert-upgrade-4-0-11000-to-4-1-11000" = "1.1"
+      "assert-upgrade-4-0-20000-to-4-1-20000" = "2.0"
       "assert-upgrade-1-8-9-to-4-0-10000" = "1.0"
       "assert-upgrade-1-9-9-to-4-0-11000" = "1.1"
       "assert-generated-cap-transition-2-0" = "2.0"
       "assert-generated-max-level-2-0" = "2.0"
       "assert-recycler-progression-routes-f200" = "2.0"
+      "assert-f200-science-researchability-diagnostic" = "2.0"
       "assert-upgrade-2-5-9-to-4-0-20000" = "2.0"
       "assert-upgrade-2-5-10-to-4-0-20000" = "2.0"
       "assert-upgrade-2-5-10-to-2-5-11" = "2.0"
@@ -55,7 +80,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     $allowedMIR4TargetNativeFixture = $isFactorio21Line -and
       $mir4TargetNativeFixtures.ContainsKey($fixture.Name) -and
       [string]$info.factorio_version -eq [string]$mir4TargetNativeFixtures[$fixture.Name]
-    if ($info.factorio_version -ne $repoInfo.factorio_version) {
+    if (-not $isHistoricalUpgradeTemplate -and $info.factorio_version -ne $repoInfo.factorio_version) {
       if ($isReducedLegacyLine) { continue }
       if ($allowedMIR4TargetNativeFixture) {
         $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
@@ -68,7 +93,9 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
-    if ($isFactorio017Line) {
+    if ($isHistoricalUpgradeTemplate) {
+      # Its exact base dependency and staged version anchors were checked above.
+    } elseif ($isFactorio017Line) {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.17(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 0.17 base dependency on this branch; found '$fixtureBaseDependency'."
       }
@@ -98,6 +125,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       "data.lua",
       "data-updates.lua",
       "data-final-fixes.lua"
+      "control.lua"
     )
     $hasEntry = $false
     foreach ($entryFile in $entryFiles) {
@@ -107,8 +135,29 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       }
     }
     if (-not $hasEntry) {
-      throw "Fixture $($info.name) has no data-stage entry file."
+      throw "Fixture $($info.name) has no data-stage or runtime entry file."
     }
   }
-}
 
+  # The F200 Bob/Angel diagnostic is explicitly allowed to prebuild the
+  # canonical recipe snapshot only in its short-lived parent context. Its
+  # child projection must borrow that snapshot, so retain a static ordering
+  # guard that catches a fixture which otherwise fails every query closed as
+  # recipe-index-unavailable.
+  $scienceDiagnosticPath = Join-Path $fixtureRootForStatic "assert-f200-science-researchability-diagnostic/data-final-fixes.lua"
+  $scienceDiagnosticText = Get-Content -Raw -LiteralPath $scienceDiagnosticPath
+  $contextStart = $scienceDiagnosticText.IndexOf('compiler_context.with_active(')
+  $recipeFactsRequire = if ($contextStart -ge 0) {
+    $scienceDiagnosticText.IndexOf('local canonical_recipe_facts = require(', $contextStart)
+  } else { -1 }
+  $recipeIndexBuild = if ($recipeFactsRequire -ge 0) {
+    $scienceDiagnosticText.IndexOf('local parent_recipe_index = canonical_recipe_facts.index_view()', $recipeFactsRequire)
+  } else { -1 }
+  $firstProjection = if ($contextStart -ge 0) {
+    $scienceDiagnosticText.IndexOf('reachability.pack_production_rejection_projection(', $contextStart)
+  } else { -1 }
+  if ($contextStart -lt 0 -or $recipeFactsRequire -lt $contextStart -or $recipeIndexBuild -lt $recipeFactsRequire -or
+    $firstProjection -lt $recipeIndexBuild) {
+    throw "F200 science researchability diagnostic must initialize its parent recipe snapshot before projections."
+  }
+}

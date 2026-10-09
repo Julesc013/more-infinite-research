@@ -148,8 +148,9 @@ function Assert-MIR4BootstrapCapsuleArtifact {
     $treeMap.Add([string]$tree.sha1, @(Read-MIR4GitTreeObject -Bytes $treeBytes))
   }
   if (-not $treeMap.ContainsKey([string]$gitProof.source_tree)) { throw 'MIR 4 capsule raw Git proof omits its root tree.' }
+  $packageLayout = Get-MIRPackageSourceLayoutFromPaths -Paths @($gitProof.package_files.path)
   $packagePaths = @()
-  foreach ($root in @(Get-MIRPackageSourceRoots)) {
+  foreach ($root in @($packageLayout.roots)) {
     $packagePaths += @($inventory.entries.path | Where-Object { [string]$_ -ceq $root -or ([string]$_).StartsWith("$root/", [StringComparison]::Ordinal) })
   }
   $packagePathSet = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -226,8 +227,9 @@ function New-MIR4BootstrapSourceCapsule {
     throw "Source tree mismatch for $($Target.target_key): expected $($Target.source.source_tree), got $actualTree."
   }
 
+  $packageLayout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $repo -Commit ([string]$Target.source.candidate_commit)
   $existingRoots = @()
-  foreach ($root in @(Get-MIRPackageSourceRoots)) {
+  foreach ($root in @($packageLayout.roots)) {
     & git -C $repo cat-file -e "$($Target.source.candidate_commit):$root" 2>$null
     if ($LASTEXITCODE -eq 0) { $existingRoots += $root }
   }

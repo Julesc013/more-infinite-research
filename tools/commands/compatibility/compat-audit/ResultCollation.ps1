@@ -9,6 +9,9 @@ $scenarioSummaries = @($selectedScenarios | ForEach-Object {
     dependency_failures = @($_.dependency_failures)
     claim_level = [string](Get-MIRObjectProperty -Object $_ -Name "claim_level" -Default "loads")
     timeout_seconds = [int](Get-MIRObjectProperty -Object $_ -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+    runtime_fixtures = @(Get-MIRObjectProperty -Object $_ -Name "runtime_fixtures" -Default @())
+    required_reload_count = [int](Get-MIRObjectProperty -Object $_ -Name "required_reload_count" -Default 0)
+    max_reload_duration_seconds = [int](Get-MIRObjectProperty -Object $_ -Name "max_reload_duration_seconds" -Default 0)
     settings = Get-MIRObjectProperty -Object $_ -Name "settings" -Default ([pscustomobject]@{})
     expected_plan = Get-MIRObjectProperty -Object $_ -Name "expected_plan" -Default ([pscustomobject]@{})
     source_manifest = [string](Get-MIRObjectProperty -Object $_ -Name "source_manifest" -Default "")
@@ -224,6 +227,25 @@ if ($RunLoadTests) {
         duration_seconds = [double]$result.duration_seconds
         settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
         expected_plan = $expectedPlan
+        runtime_fixtures = @(Get-MIRObjectProperty -Object $scenario -Name "runtime_fixtures" -Default @())
+        reload_policy = [ordered]@{
+          required_count = [int](Get-MIRObjectProperty -Object $scenario -Name "required_reload_count" -Default 0)
+          max_duration_seconds = [int](Get-MIRObjectProperty -Object $scenario -Name "max_reload_duration_seconds" -Default 0)
+        }
+        initial_evidence = [ordered]@{
+          save_sha256 = [string](Get-MIRObjectProperty -Object $result -Name "save_sha256" -Default "")
+          stdout_sha256 = [string](Get-MIRObjectProperty -Object $result -Name "stdout_sha256" -Default "")
+          stderr_sha256 = [string](Get-MIRObjectProperty -Object $result -Name "stderr_sha256" -Default "")
+          factorio_log_sha256 = [string](Get-MIRObjectProperty -Object $result -Name "factorio_log_sha256" -Default "")
+          science_contract_passed = [bool](Get-MIRObjectProperty -Object $result -Name "science_contract_passed" -Default $false)
+          science_assertions = @(Get-MIRObjectProperty -Object $result -Name "science_assertions" -Default @())
+          forbidden_science_assertions = @(Get-MIRObjectProperty -Object $result -Name "forbidden_science_assertions" -Default @())
+          runtime_contract_passed = [bool](Get-MIRObjectProperty -Object $result -Name "runtime_contract_passed" -Default $false)
+        }
+        reload_contract = [ordered]@{
+          passed = [bool](Get-MIRObjectProperty -Object $result -Name "reload_contract_passed" -Default $false)
+          reloads = @(Get-MIRObjectProperty -Object $result -Name "reloads" -Default @())
+        }
         sanitation_budget = [ordered]@{
           scope = $budgetScope
           key = $budgetKey

@@ -153,8 +153,9 @@ function Assert-MIR4GitSourceProof {
   }
   if (-not $treeMap.ContainsKey([string]$Proof.source_tree)) { throw 'MIR 4 capsule omits its source root tree object.' }
 
+  $layout = Get-MIRPackageSourceLayoutFromPaths -Paths @($Proof.package_files.path)
   $observedFileList = [Collections.Generic.List[string]]::new()
-  foreach ($relative in @(Get-MIRPackageSourceFiles -RepoRoot $CapsuleRoot)) { $observedFileList.Add([string]$relative) }
+  foreach ($relative in @(Get-MIRPackageSourceFiles -RepoRoot $CapsuleRoot -Roots @($layout.roots))) { $observedFileList.Add([string]$relative) }
   $observedFileList.Sort([StringComparer]::Ordinal)
   $observedFiles = @($observedFileList)
   $expectedFiles = @($Proof.package_files.path)
@@ -257,7 +258,8 @@ function New-MIR4GitSourceProof {
   $commitBytes = [IO.File]::ReadAllBytes($commitPayload)
   if ((Get-MIR4GitObjectSha1 -Type commit -Bytes $commitBytes) -cne $Commit) { throw 'Captured Git commit payload does not reproduce its object identity.' }
 
-  $roots = @(Get-MIRPackageSourceRoots)
+  $layout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $RepoRoot -Commit $Commit
+  $roots = @($layout.roots)
   $treeLines = @(& git -C $RepoRoot ls-tree -r -t $Commit -- @roots 2>$null)
   if ($LASTEXITCODE -ne 0) { throw "Unable to capture package Git tree proof for $Commit." }
   $treeIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -293,7 +295,7 @@ function New-MIR4GitSourceProof {
   $packagePathList.Sort([StringComparer]::Ordinal)
   $packageFiles = @($packagePathList | ForEach-Object { $packageFileMap[[string]$_] })
   $sourceFileList = [Collections.Generic.List[string]]::new()
-  foreach ($relative in @(Get-MIRPackageSourceFiles -RepoRoot $CapsuleRoot)) { $sourceFileList.Add([string]$relative) }
+  foreach ($relative in @(Get-MIRPackageSourceFiles -RepoRoot $CapsuleRoot -Roots $roots)) { $sourceFileList.Add([string]$relative) }
   $sourceFileList.Sort([StringComparer]::Ordinal)
   $sourceFiles = @($sourceFileList)
   if (($sourceFiles -join '|') -cne (@($packageFiles.path) -join '|')) { throw 'Git package tree proof is not total over package source.' }

@@ -34,8 +34,8 @@ param(
   [switch]$GenerateLocalPairwiseScenarios,
   [int]$GeneratedLocalPairwiseLimit = 40,
   [switch]$IncludeRecommendedDependencies,
-  [ValidateSet("Copy", "Hardlink", "Symlink")]
-  [string]$LinkMode = "Copy",
+  [ValidateSet("Hardlink")]
+  [string]$LinkMode = "Hardlink",
   [switch]$Offline,
   [string[]]$ScenarioNames = @(),
   [int]$ScenarioTimeoutSeconds = 900,
@@ -47,7 +47,14 @@ param(
   [string]$KnownExclusions = (Join-Path $PSScriptRoot "..\..\..\validation\adapters\portal-exclusions.json")
 )
 
+if ($RunLoadTests) {
+  throw '[mir-native-obsolete-runner] Compatibility-audit native sweeps still materialize mod directories. Use a selected direct-library runner; retain these scenario definitions and metadata inspection until conversion. No input discovery, download, cache or staging was started.'
+}
+
 $compatAuditCommandRoot = $PSScriptRoot
+# Dot-sourced modules have their own automatic parameter metadata. Preserve
+# the caller's explicit manifest choice before loading them.
+$compatAuditManualScenariosExplicit = $PSBoundParameters.ContainsKey('ManualScenariosPath')
 . (Join-Path $compatAuditCommandRoot 'compat-audit/Configuration.ps1')
 . (Join-Path $compatAuditCommandRoot 'compat-audit/InputDiscovery.ps1')
 . (Join-Path $compatAuditCommandRoot 'compat-audit/ScenarioDefinitions.ps1')

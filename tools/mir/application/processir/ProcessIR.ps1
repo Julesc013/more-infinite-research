@@ -3,6 +3,26 @@ function Get-MIR4ProcessIRRepoRoot {
   return (Resolve-Path -LiteralPath $RepoRoot).Path
 }
 
+function Resolve-MIR4ProcessIRAuthorityPath {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$AuthorityPath
+  )
+  $repo = Get-MIR4ProcessIRRepoRoot $RepoRoot
+  $relative = $AuthorityPath.Replace('\', '/')
+  if (-not (Get-Command Test-MIR4CurrentTargetPackageOutputPath -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  if (Test-MIR4CurrentTargetPackageOutputPath -RelativePath $relative) {
+    $cached = Get-Variable -Scope Script -Name MIR4ProcessIRCurrentTargetPackageContext -ErrorAction SilentlyContinue
+    if ($null -eq $cached -or $null -eq $cached.Value -or [string]$cached.Value.repo -cne $repo) {
+      $script:MIR4ProcessIRCurrentTargetPackageContext = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+    }
+    return Resolve-MIR4CurrentTargetPackageOutputPath -Context $script:MIR4ProcessIRCurrentTargetPackageContext -RelativePath $relative
+  }
+  return Join-Path $repo $relative
+}
+
 function Get-MIR4ProcessIRInputSha256 {
   param([Parameter(Mandatory)][string]$Path)
   $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
@@ -362,7 +382,7 @@ function New-MIR4EffectChannelRegistryV1 {
   $repo = Get-MIR4ProcessIRRepoRoot $RepoRoot
   $channels = @(
     foreach ($source in @($Authority.effect_channels | Sort-Object id -CaseSensitive)) {
-      $ownerPath = Join-Path $repo ([string]$source.owner_path)
+      $ownerPath = Resolve-MIR4ProcessIRAuthorityPath -RepoRoot $repo -AuthorityPath ([string]$source.owner_path)
       if (-not (Test-Path -LiteralPath $ownerPath -PathType Leaf)) { throw "[mir4-effect-channel-owner-missing] $($source.owner_path)" }
       $row = [ordered]@{
         id=[string]$source.id;class=[string]$source.class;subject=[string]$source.subject

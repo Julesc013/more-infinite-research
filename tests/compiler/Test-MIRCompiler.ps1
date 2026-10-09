@@ -13,5 +13,6 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 & (Join-Path $repo "tests\compiler\Test-MIRCompilerSchemaDrift.ps1") -RepoRoot $repo
 & (Join-Path $repo "tests\compiler\Test-MIRCompilerContractCoverage.ps1") -RepoRoot $repo
 & (Join-Path $repo "tests\architecture\Test-MIRModuleDependencies.ps1") -RepoRoot $repo
+& (Join-Path $repo "tests\compiler\Test-MIRMaterialRouteObservationReader.ps1") -RepoRoot $repo
 
 Write-Host "[ok] MIR compiler schema, authority, contract coverage, dependencies, and mutation sentinels passed."

@@ -95,15 +95,6 @@
         "mode": "load-only",
         "required_result": "passed",
         "maximum_dependency_failures": 0,
-        "required_audit_rows": [
-          {
-            "kind": "rule_mutation",
-            "key": "factorio_2_1_ambient_sound_schema",
-            "status": "repaired",
-            "mod": "corrundum",
-            "observed_value": "1.0.47"
-          }
-        ],
         "required_log_fragments": [
           "Maximum-level state force=player technology=braking-force-8 selected-cap=13 effective-cap=13 prototype-max=4294967295",
           "Maximum-level state force=player technology=low-density-structure-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
@@ -121,7 +112,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "diagnostic-only",
-      "notes": "Exact Corrundum 1.0.47 and PlanetsLib 1.19.5 loader-schema and maximum-cap-13 reproduction envelope on Factorio 2.1.14."
+      "notes": "Historical Corrundum 1.0.47 and PlanetsLib 1.19.5 maximum-cap-13 reproduction envelope on Factorio 2.1.14. The removed ambient-sound repair is not a current-source claim."
     },
     {
       "name": "local-2-1-cubium-production-routes",
@@ -145,15 +136,6 @@
         "mode": "load-only",
         "required_result": "passed",
         "maximum_dependency_failures": 0,
-        "required_audit_rows": [
-          {
-            "kind": "rule_mutation",
-            "key": "factorio_2_1_ambient_sound_schema",
-            "status": "repaired",
-            "mod": "cubium",
-            "observed_value": "1.0.30"
-          }
-        ],
         "required_log_fragments": [
           "[mir-fixture-assert-cubium-production-routes] PASS packs=11 selected=ordinary-primary late-route=cube-mastery-4"
         ],
@@ -163,7 +145,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "diagnostic-only",
-      "notes": "Exact Cubium 1.0.30 route-selection assertion harness on Factorio 2.1.14. The harness proves that all eleven Cubium cubic alternates remain later routes rather than first-acquisition prerequisites."
+      "notes": "Historical Cubium 1.0.30 route-selection assertion harness on Factorio 2.1.14. The removed ambient-sound repair is not a current-source claim; the archived harness records eleven cubic alternates as later routes rather than first-acquisition prerequisites."
     },
     {
       "name": "local-2-1-recycler-progression-routes",
@@ -468,36 +450,47 @@
         "xy-k2so-enhancements-nulls-fork"
       ],
       "settings": {},
-        "expected_plan": {
-          "mode": "load-only",
-          "required_result": "passed",
-          "maximum_dependency_failures": 0,
-          "required_stream_science": {
-            "research_advanced_circuit": [
-              "automation-science-pack",
-              "logistic-science-pack",
-              "chemical-science-pack",
-              "production-science-pack",
-              "electromagnetic-science-pack"
-            ],
-            "research_belts": [
-              "production-science-pack",
-              "space-science-pack"
-            ]
-          },
-          "forbidden_stream_science": {
-            "research_belts": [
-              "kr-basic-tech-card",
-              "automation-science-pack",
-              "logistic-science-pack",
-              "military-science-pack",
-              "chemical-science-pack"
-            ]
-          }
+      "runtime_fixtures": [
+        "fixtures/assert-k2-science-progressed-reload-a04"
+      ],
+      "required_reload_count": 2,
+      "max_reload_duration_seconds": 300,
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0,
+        "required_stream_science": {
+          "research_advanced_circuit": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "electromagnetic-science-pack"
+          ],
+          "research_belts": [
+            "production-science-pack",
+            "space-science-pack"
+          ]
         },
-        "timeout_seconds": 900,
-        "claim_level": "partial-support",
-        "notes": "Local Krastorio 2 Spaced Out stack. The exact archive must load after K2SO finalizes its science and lab graph, and the representative advanced-circuit stream must retain red, green, blue, purple, and electromagnetic science. The local library must include Krastorio2 assets and all required companions."
+        "forbidden_stream_science": {
+          "research_advanced_circuit": [
+            "kr-basic-tech-card"
+          ],
+          "research_belts": [
+            "kr-basic-tech-card",
+            "automation-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "chemical-science-pack"
+          ]
+        },
+        "required_reload_log_fragments": [
+          "[MIR4_A04_K2_PROGRESS] stage=reload technology=recipe-prod-research_advanced_circuit-1 progress=0.42"
+        ]
+      },
+      "timeout_seconds": 900,
+      "claim_level": "partial-support",
+      "notes": "Local Krastorio 2 Spaced Out stack. The exact archive must load after K2SO finalizes its science and lab graph, and the representative advanced-circuit stream must retain red, green, blue, purple, and electromagnetic science. The local library must include Krastorio2 assets and all required companions."
     },
     {
       "name": "local-2-1-krastorio-base",
@@ -773,6 +766,68 @@
       "timeout_seconds": 900,
       "claim_level": "loads",
       "notes": "Local Xander scenario without Space Age because the mod declares a Space Age incompatibility."
+    },
+    {
+      "name": "local-2-1-krastorio-spaced-out-213",
+      "targets": [
+        "2.1"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": true,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "Krastorio2-spaced-out",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "settings": {
+        "debug_generation": true
+      },
+      "runtime_fixtures": [
+        "fixtures/assert-k2-213-science-progressed-reload"
+      ],
+      "required_reload_count": 2,
+      "max_reload_duration_seconds": 90,
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0,
+        "required_stream_science": {
+          "research_advanced_circuit": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "electromagnetic-science-pack"
+          ],
+          "research_belts": [
+            "production-science-pack",
+            "space-science-pack"
+          ]
+        },
+        "forbidden_stream_science": {
+          "research_advanced_circuit": [
+            "kr-basic-tech-card"
+          ],
+          "research_belts": [
+            "kr-basic-tech-card",
+            "automation-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "chemical-science-pack"
+          ]
+        },
+        "required_reload_log_fragments": [
+          "[MIR4_K2_213_PROGRESS] stage=reload technology=recipe-prod-research_advanced_circuit-1 progress=0.42"
+        ]
+      },
+      "timeout_seconds": 90,
+      "claim_level": "loads",
+      "notes": "Planned exact Factorio2.1.20 / K2 2.1.3 / K2SO2.0.13 current successor, with two bounded progressed-save reloads. Unqualified implementation; every archive, source, package, engine and setting must receive fresh exact custody. Historical2.1.2 A04 remains unchanged and grants no current evidence reuse."
     }
   ]
 }

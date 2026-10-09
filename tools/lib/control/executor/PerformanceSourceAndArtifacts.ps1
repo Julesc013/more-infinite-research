@@ -74,16 +74,48 @@ function New-MIRCPPerformanceSourceOverlay {
   $authorityRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $Descriptor -RepoRoot $repo
   $authorityPath = Join-Path $repo $authorityRelativePath
   $authority = Assert-MIRCPPerformanceCampaignAuthority -Path $authorityPath -Descriptor $Descriptor -TargetProfile $TargetProfile -RepoRoot $repo
-  $root = Join-Path $repo "build/results/control-plane-v5/source-overlays/$([string]$State.context.context_id)"
+  # v2 overlays require a shared object store. Keeping the root versioned makes
+  # pre-repair full-copy clones inert instead of treating them as valid cache
+  # entries or destructively replacing a directory created by an older run.
+  $root = Join-Path $repo "build/results/control-plane-v5/source-overlays-v2/$([string]$State.context.context_id)"
   $destination = Join-Path $root "performance"
   if (-not (Test-Path -LiteralPath $destination -PathType Container)) {
     [void](New-Item -ItemType Directory -Force -Path $root)
-    $staging = Join-Path $root ("performance-staging-" + [guid]::NewGuid().ToString("N"))
-    & git clone --local --no-hardlinks --no-checkout -- ([string]$Source.path) $staging 2>$null
-    if ($LASTEXITCODE -ne 0) { throw "Could not clone the immutable qualification source for the performance authority overlay." }
-    & git -C $staging checkout --detach ([string]$Source.commit) 2>$null
-    if ($LASTEXITCODE -ne 0) { throw "Could not check out the immutable qualification source for the performance authority overlay." }
-    Move-Item -LiteralPath $staging -Destination $destination
+    $stagingRoot = Join-Path $repo 'build/temp'
+    [void](New-Item -ItemType Directory -Force -Path $stagingRoot)
+    $staging = Join-Path $stagingRoot ("mircp-performance-" + [guid]::NewGuid().ToString("N"))
+    try {
+      # The qualification source is immutable and retained for the life of the
+      # overlay. Reuse its Git object store instead of copying multi-gigabyte
+      # packs into every private working directory.
+      $cloneOutput = @(& git -c core.longpaths=true clone --shared --no-checkout -- ([string]$Source.path) $staging 2>&1)
+      if ($LASTEXITCODE -ne 0) {
+        throw "Could not clone the immutable qualification source for the performance authority overlay: $($cloneOutput -join ' ')"
+      }
+      $stagingGitDir = Join-Path $staging '.git'
+      if (-not (Test-Path -LiteralPath $stagingGitDir -PathType Container)) {
+        throw 'Performance authority staging clone lacks its private Git directory.'
+      }
+      $checkoutOutput = @(& git -c core.longpaths=true "--git-dir=$stagingGitDir" "--work-tree=$staging" checkout --force --detach ([string]$Source.commit) 2>&1)
+      if ($LASTEXITCODE -ne 0) {
+        throw "Could not check out the immutable qualification source for the performance authority overlay: $($checkoutOutput -join ' ')"
+      }
+      Move-Item -LiteralPath $staging -Destination $destination
+    }
+    finally {
+      if (Test-Path -LiteralPath $staging -PathType Container) {
+        Get-ChildItem -LiteralPath $staging -Recurse -Force | ForEach-Object {
+          if (($_.Attributes -band [IO.FileAttributes]::ReadOnly) -ne 0) {
+            $_.Attributes = $_.Attributes -band (-bnot [IO.FileAttributes]::ReadOnly)
+          }
+        }
+        Remove-Item -LiteralPath $staging -Recurse -Force
+      }
+    }
+  }
+  $overlayAlternates = Join-Path $destination '.git/objects/info/alternates'
+  if (-not (Test-Path -LiteralPath $overlayAlternates -PathType Leaf)) {
+    throw 'Performance authority overlay does not reuse its immutable source object store.'
   }
   $head = ([string](& git -C $destination rev-parse HEAD)).Trim()
   if ($LASTEXITCODE -ne 0 -or $head -ne [string]$Source.commit) { throw "Performance authority overlay source commit differs from the immutable context source." }
@@ -152,7 +184,7 @@ function New-MIRCPPerformanceSourceOverlay {
   })
   if ($unexpected.Count -ne 0) { throw "Performance authority overlay contains changes outside its governed package-excluded files." }
   $canonicalPackageLayout = (
-    (Test-Path -LiteralPath (Join-Path $destination 'src/mod/package-source.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $destination 'source/package-source.json') -PathType Leaf) -and
     (Test-Path -LiteralPath (Join-Path $destination 'targets/package-authority.json') -PathType Leaf)
   )
   $packageSha256 = if ($canonicalPackageLayout) {
@@ -193,14 +225,22 @@ function New-MIRCPPerformanceSourceOverlay {
 function New-MIRCPCompactPerformanceArtifactRoot {
   param(
     [Parameter(Mandatory)]$State,
-    [Parameter(Mandatory)]$Campaign
+    [Parameter(Mandatory)]$Campaign,
+    [string]$RepoRoot = ""
   )
   $contextId = [string]$State.context.context_id
   if ($contextId -notmatch '^[0-9A-F]{64}$') {
     throw "Compact performance staging requires an exact context digest."
   }
-  $scratchParent = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
-  $path = Join-Path $scratchParent ("mircp-p-" + $contextId.Substring(0, 24))
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $scratchParent = Join-Path $repo "build/p"
+  foreach ($parent in @((Join-Path $repo "build"), $scratchParent)) {
+    if ((Test-Path -LiteralPath $parent) -and
+        ((Get-Item -LiteralPath $parent -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Performance scratch parent must not be a reparse point: $parent"
+    }
+  }
+  $path = Join-Path $scratchParent ("c" + $contextId.Substring(0, 24))
   if (Test-Path -LiteralPath $path) {
     throw "Compact performance staging already exists and will not be overwritten: $path"
   }
@@ -226,6 +266,7 @@ function New-MIRCPCompactPerformanceArtifactRoot {
   if ($maximumPathLength -gt $pathBudget) {
     throw "Compact performance staging exceeds the conservative Factorio path budget ($maximumPathLength > $pathBudget): $maximumPath"
   }
+  [void](New-Item -ItemType Directory -Force -Path $scratchParent)
   [void](New-Item -ItemType Directory -Path $path)
   $marker = [pscustomobject][ordered]@{
     schema = 1
@@ -250,7 +291,8 @@ function New-MIRCPCompactPerformanceArtifactRoot {
 function Move-MIRCPPerformanceArtifacts {
   param(
     [Parameter(Mandatory)]$ExecutionRoot,
-    [Parameter(Mandatory)][string]$Destination
+    [Parameter(Mandatory)][string]$Destination,
+    [string]$RepoRoot = ""
   )
   if (-not (Test-Path -LiteralPath ([string]$ExecutionRoot.path) -PathType Container)) {
     throw "Compact performance execution root is absent: $($ExecutionRoot.path)"
@@ -258,18 +300,40 @@ function Move-MIRCPPerformanceArtifacts {
   if (Test-Path -LiteralPath $Destination) {
     throw "Performance artifact destination already exists and will not be merged: $Destination"
   }
-  $verified = Copy-MIRPerformanceArtifactsVerified -SourceRoot ([string]$ExecutionRoot.path) -DestinationRoot $Destination
-  Remove-Item -LiteralPath ([string]$ExecutionRoot.path) -Recurse -Force
-  if (Test-Path -LiteralPath ([string]$ExecutionRoot.path)) { throw "Compact performance execution root still exists after verified artifact relocation." }
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  foreach ($parent in @((Join-Path $repo "build"), (Join-Path $repo "build/p"))) {
+    if ((Get-Item -LiteralPath $parent -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) {
+      throw "Performance scratch parent must not be a reparse point: $parent"
+    }
+  }
+  $scratchParent = (Resolve-Path -LiteralPath (Join-Path $repo "build/p")).Path
+  $source = (Resolve-Path -LiteralPath ([string]$ExecutionRoot.path)).Path
+  $contextId = [string]$ExecutionRoot.context_id
+  if ([string]$ExecutionRoot.strategy -cne 'compact-context-scratch-v1' -or
+      $contextId -notmatch '^[0-9A-F]{64}$' -or
+      -not [string]::Equals((Split-Path -Parent $source), $scratchParent, [StringComparison]::OrdinalIgnoreCase) -or
+      (Split-Path -Leaf $source) -cne ("c" + $contextId.Substring(0, 24))) {
+    throw "Refusing to relocate or remove a performance execution root outside its exact project scratch path."
+  }
+  $sourceMarker = Get-Content -Raw -LiteralPath (Join-Path $source "control-plane-execution-root.json") | ConvertFrom-Json
+  if ([int]$sourceMarker.schema -ne 1 -or
+      [string]$sourceMarker.kind -cne "mir-control-plane-performance-execution-root" -or
+      [string]$sourceMarker.context_id -cne $contextId -or
+      [string]$sourceMarker.strategy -cne 'compact-context-scratch-v1') {
+    throw "Performance execution-root marker does not bind the expected source before relocation."
+  }
+  $verified = Copy-MIRPerformanceArtifactsVerified -SourceRoot $source -DestinationRoot $Destination
   $markerPath = Join-Path $Destination "control-plane-execution-root.json"
   if (-not (Test-Path -LiteralPath $markerPath -PathType Leaf)) {
     throw "Relocated performance artifacts lack their execution-root binding marker."
   }
   $marker = Get-Content -Raw -LiteralPath $markerPath | ConvertFrom-Json
   if ([string]$marker.context_id -ne [string]$ExecutionRoot.context_id -or
-      [string]$marker.strategy -ne [string]$ExecutionRoot.strategy) {
+      [string]$marker.strategy -cne 'compact-context-scratch-v1') {
     throw "Relocated performance artifacts do not bind the expected context and staging strategy."
   }
+  Remove-Item -LiteralPath $source -Recurse -Force
+  if (Test-Path -LiteralPath $source) { throw "Compact performance execution root still exists after verified artifact relocation." }
   return [pscustomobject][ordered]@{
     path = $Destination
     strategy = [string]$marker.strategy

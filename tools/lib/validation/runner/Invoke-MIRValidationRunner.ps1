@@ -6,6 +6,7 @@ $repo = Resolve-Path (Join-Path $runnerModuleRoot "../../../..")
 . (Join-Path $repo "tools\lib\validation\ScenarioGroups.ps1")
 . (Join-Path $repo "tools\lib\validation\ResultAggregation.ps1")
 . (Join-Path $repo "tools\lib\validation\FactorioProcess.ps1")
+. (Join-Path $repo "tools/lib/compatibility/FactorioRunner.ps1")
 . (Join-Path $repo "tools\lib\validation\SettingsOverrides.ps1")
 . (Join-Path $repo "tools\lib\validation\ScenarioRegistry.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
@@ -13,6 +14,14 @@ $repo = Resolve-Path (Join-Path $runnerModuleRoot "../../../..")
 $validationRunnerCompleted = $false
 . (Join-Path $runnerModuleRoot "Bootstrap.ps1")
 if ($validationRunnerCompleted) { return }
+
+# A development epoch has a separate current contract profile. Frozen release
+# validators remain unchanged and replay against their pinned historical source.
+if ($StaticOnly -and (Test-Path -LiteralPath (Join-Path $repo 'governance/repository/development-epoch-v1.json'))) {
+  . (Join-Path $repo 'tools/mir/application/assurance/DevelopmentValidation.ps1')
+  Invoke-MIR4DevelopmentStaticChecks -RepoRoot $repo.Path
+  return
+}
 
 $moduleSequence = @(
   "StaticCore.ps1",
@@ -145,7 +154,7 @@ if ($selectionActive -and -not $checkpointActive) {
         } elseif ($declaration.name -eq "space-age-generation-integrity-inserter-enabled") {
           Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity with inserter enabled scenario"
         } elseif ($declaration.name -eq "space-age-native-owner-settings-max-level-late-conflict") {
-          Assert-LogContains -Expected "Maximum-level conflict technology=processing-unit-productivity selected=5 planned=5 final-observed=9 binding-operation=configure_native_owner source=native-owner reason=late_prototype_mutation" -Context $declaration.name
+          Assert-LogContains -Expected "Maximum-level conflict technology=processing-unit-productivity selected=5 final-observed=9 binding-operation=configure_native_owner source=native-owner reason=maximum_level_late_prototype_mutation setting=ips-max-level-research_processing_unit; runtime queue normalization was refused." -Context $declaration.name
         }
       } elseif ($declaration.kind -eq "configuration-change") {
         switch ($declaration.name) {

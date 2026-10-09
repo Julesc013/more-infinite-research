@@ -97,7 +97,7 @@ foreach($pair in $contractPairs.GetEnumerator()){
 }
 $assurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json -Depth 100
 $postReleaseProfile=@($assurance.profiles.'mir4-post-release')
-  $expectedPostReleaseProfile=@('docs.check','tooling.self-test','static.package','static.branch-policy','static.mir4-release-adapters-t05','static.mir4-release-narratives-m41-03','static.mir4-repository-characterization-m42-00a','static.mir4-golden-four-target-baseline-m41-f1','static.mir4-shadow-target-materializer-m41-f2a','static.mir4-shadow-source-model-m41-f2b','static.mir4-editable-source-materializer-m41-f2c','static.mir4-compilation-plan-decomposition-m42-02-l1','static.mir4-base-continuations-decomposition-m42-02-l2','static.mir4-stream-compiler-decomposition-m42-02-l3','static.mir4-technology-catalog-decomposition-m42-02-l4','static.mir4-effect-ownership-decomposition-m42-02-l5','static.mir4-compiler-orchestrator-decomposition-m42-02-l6','static.mir4-powershell-characterization-m42-02','static.mir4-powershell-command-router-decomposition-m42-02-ps1','static.mir4-validation-runner-decomposition-m42-02-ps2','static.mir4-assurance-evidence-decomposition-m42-02-ps3','static.mir4-pre-freeze-release-decomposition-m42-02-ps4','static.mir4-bootstrap-materialization-decomposition-m42-02-ps5','static.mir4-assurance-release-decomposition-m42-02-ps6','static.mir4-compatibility-audit-decomposition-m42-02-ps7','static.mir4-offline-custody-decomposition-m42-02-ps8','static.mir4-release-capsule-decomposition-m42-02-ps9','static.mir4-control-executor-decomposition-m42-02-ps10','static.mir4-supply-chain-decomposition-m42-02-ps11','static.mir4-factorio-2.1-experimental-channel','static.mir4-f2d-runtime-replay','static.mir4-pre-freeze-hardening')
+$expectedPostReleaseProfile=@('docs.check','tooling.self-test','static.package','static.branch-policy','static.mir4-release-adapters-t05','static.mir4-release-operator-recovery-a07','static.mir4-release-narratives-m41-03','static.mir4-repository-characterization-m42-00a','static.mir4-golden-four-target-baseline-m41-f1','static.mir4-shadow-target-materializer-m41-f2a','static.mir4-shadow-source-model-m41-f2b','static.mir4-editable-source-materializer-m41-f2c','static.mir4-compilation-plan-decomposition-m42-02-l1','static.mir4-base-continuations-decomposition-m42-02-l2','static.mir4-stream-compiler-decomposition-m42-02-l3','static.mir4-technology-catalog-decomposition-m42-02-l4','static.mir4-effect-ownership-decomposition-m42-02-l5','static.mir4-compiler-orchestrator-decomposition-m42-02-l6','static.mir4-powershell-characterization-m42-02','static.mir4-powershell-command-router-decomposition-m42-02-ps1','static.mir4-validation-runner-decomposition-m42-02-ps2','static.mir4-assurance-evidence-decomposition-m42-02-ps3','static.mir4-pre-freeze-release-decomposition-m42-02-ps4','static.mir4-bootstrap-materialization-decomposition-m42-02-ps5','static.mir4-assurance-release-decomposition-m42-02-ps6','static.mir4-compatibility-audit-decomposition-m42-02-ps7','static.mir4-offline-custody-decomposition-m42-02-ps8','static.mir4-release-capsule-decomposition-m42-02-ps9','static.mir4-control-executor-decomposition-m42-02-ps10','static.mir4-supply-chain-decomposition-m42-02-ps11','static.mir4-factorio-2.1-experimental-channel','static.mir4-f2d-runtime-replay','static.mir4-release-doctor-structured-failure','static.mir4-pre-freeze-hardening')
 if(($postReleaseProfile-join'|')-cne($expectedPostReleaseProfile-join'|')){throw '[mir4-t05-post-release-profile]'}
 $validateWorkflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/validate.yml')
 if(-not$validateWorkflow.Contains("'mir4-post-release'")-or-not$validateWorkflow.Contains('spec/programmes/mir4-4x-operating-programme-v1.json')){throw '[mir4-t05-post-release-workflow]'}
@@ -160,22 +160,45 @@ try{$null=Invoke-T05 Verify promotion $promotionTamperRoot $promotionAdapter $pr
 if(-not$promotionTamperRejected){throw '[mir4-t05-promotion-tamper-accepted]'}
 
 $transferCalls=[Collections.Generic.List[object]]::new()
+function New-T05PublicationResponse {
+  param($Request,[ValidateSet('absent','already-present-exact','transferred-exact','uncertain')][string]$State)
+  $bound=[ordered]@{}
+  foreach($name in @('transfer_id','candidate_id','source_commit','source_tree','release_plan_digest','draft_identity','tag_identity','seal_identity','target','channel','asset_id','package_sha256','content_sha256','bytes','entry_count')){$bound[$name]=$Request.$name}
+  $response=[ordered]@{}
+  foreach($pair in $bound.GetEnumerator()){$response[$pair.Key]=$pair.Value}
+  $present=$State-cin@('already-present-exact','transferred-exact')
+  $response.state=$State;$response.observed_sha256=$(if($present){[string]$Request.package_sha256}else{$null})
+  $response.observed_bytes=$(if($present){[long]$Request.bytes}else{0});$response.match_count=$(if($present){1}else{0})
+  if($present){
+    $match=[ordered]@{};foreach($pair in $bound.GetEnumerator()){$match[$pair.Key]=$pair.Value}
+    $match.observed_sha256=[string]$Request.package_sha256;$match.observed_bytes=[long]$Request.bytes
+    $response.matches=@([pscustomobject]$match)
+  }else{$response.matches=$null}
+  $response.network_calls=0;$response.production_mutation_performed=$false
+  return [pscustomobject]$response
+}
+$t05ResponseFunction=(Get-Item -Path Function:New-T05PublicationResponse).ScriptBlock
+Set-Item -Path Function:\global:New-T05PublicationResponse -Value $t05ResponseFunction
 $transferProvider={
   param([string]$FixtureRepo,$Request,[string]$Mode,$Context)
   $transferCalls.Add([pscustomobject][ordered]@{transfer_id=[string]$Request.transfer_id;mode=$Mode})|Out-Null
-  if($Mode-ceq'Transfer'){return [pscustomobject][ordered]@{state='uncertain';transfer_id=[string]$Request.transfer_id;observed_sha256=$null;network_calls=0;production_mutation_performed=$false}}
-  return [pscustomobject][ordered]@{state='already-present-exact';transfer_id=[string]$Request.transfer_id;observed_sha256=[string]$Request.package_sha256;network_calls=0;production_mutation_performed=$false}
+  if($Mode-ceq'Transfer'){return New-T05PublicationResponse -Request $Request -State uncertain}
+  $seen=@($transferCalls|Where-Object{[string]$_.transfer_id-ceq[string]$Request.transfer_id-and[string]$_.mode-ceq'Transfer'})
+  if($seen.Count-eq0){return New-T05PublicationResponse -Request $Request -State absent}
+  return New-T05PublicationResponse -Request $Request -State 'already-present-exact'
 }.GetNewClosure()
 $publicationAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase target-publication -PublicationTransferProvider $transferProvider -PublicationTransferProviderIdentity ('A'*64)
 $publication=Complete-T05 target-publication (Join-Path $testRoot 'publication') $publicationAdapter
 $transferGroups=@($transferCalls|Group-Object transfer_id)
-if($transferGroups.Count-ne4-or@($transferGroups|Where-Object{$_.Count-ne2-or(@($_.Group.mode)-join'|')-cne'Transfer|Reconcile'}).Count-ne0-or
-   [int]$publication.execute.result.detail.reconciled_count-ne4-or[bool]$publication.execute.result.detail.builder_available-or
-   [bool]$publication.execute.result.detail.source_checkout_required){throw '[mir4-t05-publication-reconciliation]'}
+if($transferGroups.Count-ne4-or@($transferGroups|Where-Object{$_.Count-ne3-or(@($_.Group.mode)-join'|')-cne'Reconcile|Transfer|Reconcile'}).Count-ne0-or
+  [int]$publication.execute.result.detail.reconcile_required_count-ne4-or[bool]$publication.execute.result.detail.builder_available-or
+  [bool]$publication.execute.result.detail.source_checkout_required){throw '[mir4-t05-publication-reconciliation]'}
 
 $wrongTransferProvider={
   param([string]$FixtureRepo,$Request,[string]$Mode,$Context)
-  [pscustomobject][ordered]@{state='transferred-exact';transfer_id=[string]$Request.transfer_id;observed_sha256=('D'*64);network_calls=0;production_mutation_performed=$false}
+  $response=New-T05PublicationResponse -Request $Request -State 'already-present-exact'
+  $response.observed_sha256=('D'*64);$response.matches[0].observed_sha256=('D'*64)
+  return $response
 }
 $wrongPublicationAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase target-publication -PublicationTransferProvider $wrongTransferProvider -PublicationTransferProviderIdentity ('C'*64)
 $wrongPublicationInputs=$inputs.PSObject.Copy();$wrongPublicationInputs.candidate_id='DEV-T05-WRONG-PUBLICATION';$wrongPublicationRoot=Join-Path $testRoot 'publication-wrong'

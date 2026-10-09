@@ -8,7 +8,10 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Pat
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
-$manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\streams\generated_stream_manifest.json") | ConvertFrom-Json
+$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+$manifest = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'prototypes/mir/streams/generated_stream_manifest.json' | ConvertFrom-Json
 $golden = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\golden-plans\stable-technology-ids.json") | ConvertFrom-Json
 $automatic = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\golden-plans\automatic-family-technology-ids.json") | ConvertFrom-Json
 $release320 = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\golden-plans\3.2.0-technology-ids.json") | ConvertFrom-Json

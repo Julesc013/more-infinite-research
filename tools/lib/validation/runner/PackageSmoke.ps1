@@ -39,6 +39,7 @@ function Invoke-PackageZipSmokeScenario {
     -EnableSpaceAge:$EnableSpaceAge
   $scenarioGroup = $declaration.group
   $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "package" -Group $scenarioGroup -EvidencePaths @($script:ValidationPackageZipPath, $FactorioLog)
+  $activation=$null
   try {
     if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath)) {
       throw "Validation package zip is unavailable for packaged zip smoke."
@@ -53,22 +54,11 @@ function Invoke-PackageZipSmokeScenario {
     Remove-Item -LiteralPath $resolvedScenarioRoot -Recurse -Force
   }
 
-  $modsDir = Join-Path $scenarioRoot "mods"
-  New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
-  $packageDestination = Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath)
-  Assert-MIRFactorioPathBudget -Path $packageDestination -Context "Packaged smoke archive path"
-  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination $packageDestination
-
-  $mods = @(
-    @{ name = "base"; enabled = $true },
-    @{ name = "elevated-rails"; enabled = [bool]$EnableSpaceAge },
-    @{ name = "recycler"; enabled = [bool]$EnableSpaceAge },
-    @{ name = "quality"; enabled = [bool]$EnableSpaceAge },
-    @{ name = "space-age"; enabled = [bool]$EnableSpaceAge },
-    @{ name = "more-infinite-research"; enabled = $true }
-  )
-  $modList = @{ mods = $mods } | ConvertTo-Json -Depth 5
-  Set-Content -LiteralPath (Join-Path $modsDir "mod-list.json") -Value $modList -Encoding UTF8
+  if([string]::IsNullOrWhiteSpace($LibraryDirectory)){throw '[mir-package-library-required] Supply the selected flat archive library; profile staging is retired.'}
+  $activation=Start-MIRPackageLibraryActivation -LibraryDirectory $LibraryDirectory -EngineDataDirectory $factorioReadData `
+    -ProfilePath (Join-Path $scenarioRoot 'selection.json') -Version ([string]$repoInfo.version) `
+    -CandidateSha256 (Get-MIRFileSha256 -Path $script:ValidationPackageZipPath) -EnableSpaceAge:$EnableSpaceAge
+  $modsDir=$activation.library
 
   $savePath = Join-Path $scenarioRoot "mir-package-zip-smoke.zip"
   if (Test-Path -LiteralPath $savePath) {
@@ -87,6 +77,7 @@ function Invoke-PackageZipSmokeScenario {
     "--create",
     $savePath
   )
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $FactorioBin -Arguments $factorioArgs
   $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs -TimeoutMs ($declaration.timeout_seconds * 1000)
   if ($factorioExitCode -ne 0) {
     throw "Factorio package zip smoke $ScenarioName exited with code $factorioExitCode"
@@ -96,10 +87,15 @@ function Invoke-PackageZipSmokeScenario {
   }
 
     Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $FactorioLog
+    $terminal=Complete-MIRLibraryActivation -Activation $activation;$activation=$null
+    [IO.File]::WriteAllText((Join-Path $scenarioRoot 'library-inputs.json'),($terminal|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
     Complete-MIRValidationScenario -Record $resultRecord -Status "passed" -AssertionsExecuted @($declaration.assertions).Count
   } catch {
     Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
     throw
+  } finally {
+    if($null -ne $activation -and -not $activation.closed){$null=Complete-MIRLibraryActivation -Activation $activation}
   }
 }
 
