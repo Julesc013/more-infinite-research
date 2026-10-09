@@ -103,6 +103,9 @@ environment{smelting=forward}
 check(matcher.material_route_is_acyclic(forward),"context isolation")
 environment({smelting=forward}, {plate={spoil_ticks=60,spoil_result="ore"}})
 check(not matcher.material_route_is_acyclic(forward),"item spoilage returning a product to feedstock must be rejected")
+
+environment({smelting=forward}, {plate={fuel_value="1MJ",burnt_result="ore",fuel_category="chemical"}})
+check(not matcher.material_route_is_acyclic(forward),"burnt fuel returning a product to feedstock must be rejected")
 environment{smelting=forward}
 local denied=recipe("ore","plate"); denied.allow_productivity=false
 check(not matcher.material_route_is_acyclic(denied),"no upstream eligibility override")
@@ -286,6 +289,89 @@ local valid_risk_row=risk_row("smelting");
     local producer=capture({fruit={spoil_ticks=60,spoil_result="plate"}})
     check(clean.return_graph_fingerprint~=producer.return_graph_fingerprint,"direct native producer belongs to certificate boundary")
   end
+end)();
+(function()
+  local item_index = require("prototypes.mir.index.item_prototype_facts")
+  local function fuel(result, value)
+    return {burnt_result=result,fuel_value=value or "8MJ",fuel_categories={"chemical"}}
+  end
+  for _, case in ipairs({
+    {name="direct",items={plate=fuel("ore")}},
+    {name="fuel chain",items={plate=fuel("waste"),waste=fuel("ore")}},
+    {name="recipe after burning",items={plate=fuel("waste")},return_recipe=canonical_route("reclaim","waste","ore")},
+    {name="burning after recipe",items={waste=fuel("ore")},return_recipe=canonical_route("reclaim","plate","waste")},
+    {name="spoilage after burning",items={plate=fuel("waste"),waste={spoil_ticks=60,spoil_result="ore"}}},
+    {name="burning after spoilage",items={plate={spoil_ticks=60,spoil_result="waste"},waste=fuel("ore")},kind="spoilage"},
+    {name="dead end",items={plate=fuel("waste")},safe=true},
+    {name="unrelated",items={fuel=fuel("ore")},safe=true},
+    {name="default energy",items={plate={burnt_result="ore"}},safe=true},
+    {name="zero energy",items={plate=fuel("ore","0J")},safe=true},
+    {name="scaled zero energy",items={plate=fuel("ore","0.00MJ")},safe=true},
+    {name="no result",items={plate={fuel_value="8MJ"}},safe=true},
+    {name="empty result",items={plate=fuel("")},safe=true},
+    {name="unknown energy",items={plate=fuel("ore","unknown")}},
+    {name="unrecognized energy shape",items={plate=fuel("ore",{})}}
+  }) do
+    local before=test_fingerprint(case.items)
+    environment({smelting=valid_route,reclaim=case.return_recipe},case.items)
+    local admitted,reason=matcher.material_route_is_acyclic(valid_route)
+    check(admitted==(case.safe==true),"fuel return "..case.name)
+    if not case.safe then
+      check(reason=="potential-"..(case.kind or "fuel-burning").."-return-path:ore","native fuel reason "..case.name)
+    end
+    check(matcher.material_route_is_acyclic(valid_route)==admitted,"cached fuel return "..case.name)
+    item_index.placeable_items_for_entity("fixture-lab")
+    check(item_scans==1 and builds==1,"fuel and spoilage share one item/recipe scan "..case.name)
+    check(test_fingerprint(case.items)==before,"native return indexing preserves prototypes "..case.name)
+  end
+  environment({smelting=valid_route},{plate=fuel("ore")})
+  item_index.for_each_fuel_burning(function(row)
+    row.result="changed"; row.fuel_categories[1]="changed"
+  end)
+  local snapshot=item_index.snapshot()
+  check(snapshot.fuel_burning_transitions[1].result=="ore"
+    and snapshot.fuel_burning_transitions[1].fuel_categories[1]=="chemical","fuel callback receives private facts")
+  snapshot.fuel_burning_transitions[1].fuel_categories[1]="changed"
+  check(item_index.snapshot().fuel_burning_transitions[1].fuel_categories[1]=="chemical","fuel snapshot remains private")
+  environment({smelting=typed_forward},{brine=fuel("ore")})
+  check(matcher.material_route_is_acyclic(typed_forward),"burning an item cannot consume a same-named fluid")
+  for _, required in ipairs({false,true}) do
+    for _, recipe_return in ipairs({false,true}) do
+      environment({smelting=valid_route,reclaim=recipe_return and canonical_route("reclaim","plate","ore") or nil},
+        {plate=fuel("waste"),waste=fuel("ore")})
+      risks={smelting=valid_risk_row}
+      mods={Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13"}
+      local bucket=matcher.recipes_for_stream({items={"plate"},require_acyclic_process=true,
+        require_exact_route_certificate=required,reviewed_forward_routes={smelting=valid_certificate}},0.02)
+      check(#bucket[1].recipes==0,"recipe-only certificate cannot override a fuel return")
+      local _,reason=matcher.material_route_is_acyclic(valid_route)
+      check(reason=="potential-fuel-burning-return-path:ore","fuel return dominates an ordinary recipe path")
+    end
+  end
+  for _, schema in ipairs({1,2}) do
+    local function capture(items)
+      environment({smelting=valid_route},items)
+      return assert(matcher.relevant_route_fingerprints(valid_route,schema))
+    end
+    local clean=capture({})
+    local unrelated=capture({fuel=fuel("waste")})
+    local zero=capture({plate=fuel("ore","0J")})
+    check(clean.return_graph_fingerprint==unrelated.return_graph_fingerprint
+      and clean.return_graph_fingerprint==zero.return_graph_fingerprint,"unrelated/zero fuel preserves certificate boundary")
+    local observed=capture({plate=fuel("waste")})
+    local changed=capture({plate=fuel("waste","10MJ")})
+    check(clean.return_graph_fingerprint~=observed.return_graph_fingerprint,"reachable fuel return changes certificate")
+    check(observed.reachable_identity_count==changed.reachable_identity_count
+      and observed.return_graph_fingerprint~=changed.return_graph_fingerprint,"fuel energy binds without a reachability change")
+    local categories=fuel("waste");categories.fuel_categories={"nuclear"}
+    check(observed.return_graph_fingerprint~=capture({plate=categories}).return_graph_fingerprint,"fuel category binds the process declaration")
+    local singular=fuel("waste");singular.fuel_categories=nil;singular.fuel_category="chemical"
+    local singular_changed=fuel("waste");singular_changed.fuel_categories=nil;singular_changed.fuel_category="nuclear"
+    check(capture({plate=singular}).return_graph_fingerprint~=capture({plate=singular_changed}).return_graph_fingerprint,
+      "F200 singular fuel category remains part of the declared process binding")
+    check(clean.return_graph_fingerprint~=capture({fuel=fuel("plate")}).return_graph_fingerprint,
+      "A direct native fuel producer belongs to the output certificate boundary")
+  end
 end)()
 check(table.concat(ordinary_acyclic_routes("smelting",valid_route,valid_risk_row),",")=="smelting","ordinary acyclic route remains admitted without opting into certificates")
 check(table.concat(certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate),",")=="smelting","exact certificate can require an ordinary acyclic route")
@@ -301,7 +387,7 @@ for index=1,30001 do
   search_edges[previous]={[next_name]=true}
   previous=next_name
 end
-check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,{complete=true,typed_edges=search_edges,spoilage_edges={}})==0,"certificate-required route cannot override search budget")
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,{complete=true,typed_edges=search_edges,native_edges={}})==0,"certificate-required route cannot override search budget")
 check(table.concat(certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,nil,true),",")=="smelting","certificate-required reviewed return accepts exact certificate")
 check(#certificate_required_routes("smelting",valid_route,valid_risk_row,certificate("ore","gear"),nil,nil,true)==0,"certificate-required reviewed return rejects invalid certificate")
 local certificate_denied_route=canonical_route("smelting","ore","plate")

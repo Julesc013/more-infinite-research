@@ -123,7 +123,8 @@ end
 -- final route is an ordinary, deterministic, non-recovery process.
 local function material_graph()
   return compiler_context.current():state_view("material_route_graph", function()
-    local graph = {typed_edges = {}, spoilage_edges = {}, spoilage_transitions = {}, complete = true, edge_count = 0}
+    local graph = {typed_edges = {}, native_edges = {}, spoilage_transitions = {},
+      fuel_burning_transitions = {}, complete = true, edge_count = 0}
     recipe_facts.for_each(function(_, fact)
       for _, variant in ipairs(fact.variants or {}) do
         local outputs = {}
@@ -154,7 +155,7 @@ local function material_graph()
         end
       end
     end)
-    item_prototype_facts.for_each_spoilage(function(source, result, ticks)
+    local function append_native_return(kind, source, result)
       local input_identity = typed_identity({type = "item", name = source})
       local output_identity = typed_identity({type = "item", name = result})
       graph.typed_edges[input_identity] = graph.typed_edges[input_identity] or {}
@@ -163,10 +164,22 @@ local function material_graph()
         if graph.edge_count > 100000 then graph.complete = false; return end
         graph.typed_edges[input_identity][output_identity] = true
       end
-      graph.spoilage_edges[input_identity] = output_identity
+      graph.native_edges[input_identity] = graph.native_edges[input_identity] or {}
+      graph.native_edges[input_identity][output_identity] = graph.native_edges[input_identity][output_identity] or kind
+      return input_identity, output_identity
+    end
+    item_prototype_facts.for_each_spoilage(function(source, result, ticks)
+      local input_identity, output_identity = append_native_return("spoilage", source, result)
+      if not input_identity then return end
       graph.spoilage_transitions[#graph.spoilage_transitions + 1] = {
         source = input_identity, result = output_identity, ticks = ticks
       }
+    end)
+    item_prototype_facts.for_each_fuel_burning(function(transition)
+      local input_identity, output_identity = append_native_return("fuel-burning", transition.source, transition.result)
+      if not input_identity then return end
+      transition.source, transition.result = input_identity, output_identity
+      graph.fuel_burning_transitions[#graph.fuel_burning_transitions + 1] = transition
     end)
     return graph
   end)
@@ -258,13 +271,19 @@ local function relevant_return_graph(recipe)
     direct_output_producers = sorted_keys(direct_output_producers),
     facts = facts
   }
-  -- Preserve historical recipe-only fingerprints when no native spoilage
+  -- Preserve historical recipe-only fingerprints when no native conversion
   -- touches the cone. A changed relevant item transition invalidates its
   -- certificate even when reachable names and recipe facts stay identical.
   for _, transition in ipairs(graph.spoilage_transitions) do
     if reached[transition.source] or outputs[transition.result] then
       boundary.spoilage_transitions = boundary.spoilage_transitions or {}
       boundary.spoilage_transitions[#boundary.spoilage_transitions + 1] = transition
+    end
+  end
+  for _, transition in ipairs(graph.fuel_burning_transitions) do
+    if reached[transition.source] or outputs[transition.result] then
+      boundary.fuel_burning_transitions = boundary.fuel_burning_transitions or {}
+      boundary.fuel_burning_transitions[#boundary.fuel_burning_transitions + 1] = transition
     end
   end
   return boundary
@@ -442,7 +461,7 @@ function R.material_route_is_acyclic(recipe)
   if not graph.complete then return false, graph.reason or "process-graph-budget" end
   local recipe_return
   for _, variant in ipairs(recipe.variants or {}) do
-    local inputs, queue, spoiled_steps, visited, spoiled_visited = {}, {}, {}, {}, {}
+    local inputs, queue, native_steps, visited, native_visited = {}, {}, {}, {}, {}
     for _, input in ipairs(variant.ingredients or {}) do
       local identity = typed_identity(input)
       if not identity then return false, "missing-process-identity" end
@@ -458,23 +477,24 @@ function R.material_route_is_acyclic(recipe)
     local head = 1
     while head <= #queue do
       if head > 30000 then return false, "process-search-budget" end
-      local identity, used_spoilage = queue[head], spoiled_steps[head] == true
+      local identity, native_kind = queue[head], native_steps[head]
       head = head + 1
       if inputs[identity] then
         -- Recipe-only certificates have no authority over a native return.
         -- Continue past an ordinary return so traversal order cannot hide a
-        -- second path that uses spoilage.
-        if used_spoilage then return false, "potential-spoilage-return-path:" .. inputs[identity] end
+        -- second path that uses a native conversion.
+        if native_kind then return false, "potential-" .. native_kind .. "-return-path:" .. inputs[identity] end
         recipe_return = "potential-return-path:" .. inputs[identity]
-        if next(graph.spoilage_edges) == nil then return false, recipe_return end
+        if next(graph.native_edges) == nil then return false, recipe_return end
       end
+      local native_edges = graph.native_edges[identity]
       for next_identity in pairs(graph.typed_edges[identity] or {}) do
-        local spoiled = used_spoilage or graph.spoilage_edges[identity] == next_identity
-        local seen = spoiled and spoiled_visited or visited
+        local kind = native_kind or native_edges and native_edges[next_identity]
+        local seen = kind and native_visited or visited
         if not seen[next_identity] then
           seen[next_identity] = true
           queue[#queue + 1] = next_identity
-          if spoiled then spoiled_steps[#queue] = true end
+          if kind then native_steps[#queue] = kind end
         end
       end
     end
