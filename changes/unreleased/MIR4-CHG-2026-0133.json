@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0133",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Require an obtainable cargo landing pad for modern rocket-return science.",
+  "details": [
+    "Modern rocket-return acquisition now requires an obtainable cargo landing pad with positive inventory capacity. Silo, construction and receiver must share a surface witness; permission to launch without a pad cannot prove acquisition of the return.",
+    "Receiver unlocks join the same dependency tree used by science frontiers, self-lock rejection and contextual reuse. Independent receivers and alternate unlocks remain usable; changed receiver recipes invalidate warmed acquisition.",
+    "Controlled LAUNCH01-LAUNCH29 cases exercise the canonical solver and consumed science prerequisite service. Current-package native launch, production and saved-world qualification remain pending under A04."
+  ],
+  "semantic_domains": [
+    "compatibility",
+    "progression"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Modern landing-pad acquisition and retained receiver research gates; controlled checks only, native qualification pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Modern landing-pad acquisition and retained receiver research gates; controlled checks only, native qualification pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared dependency traversal includes receiver witnesses, while modern launch sources remain withheld on historical targets."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared dependency traversal includes receiver witnesses, while modern launch sources remain withheld on historical targets."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Shared dependency traversal includes receiver witnesses, while modern launch sources remain withheld on historical targets."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Shared dependency traversal includes receiver witnesses, while modern launch sources remain withheld on historical targets."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Shared dependency traversal includes receiver witnesses, while modern launch sources remain withheld on historical targets."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Shared dependency traversal includes receiver witnesses, while modern launch sources remain withheld on historical targets."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Shared dependency traversal includes receiver witnesses, while modern launch sources remain withheld on historical targets."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "A04: launch acquisition follow-up retained in the published 4.2.2 backlog"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/researchability_planning.lua: LAUNCH01 through LAUNCH29, including receiver exclusion, cycles, alternate unlocks and same-surface selection"
+    },
+    {
+      "kind": "document",
+      "value": "docs/capabilities/science-integration.md"
+    }
+  ]
+}
