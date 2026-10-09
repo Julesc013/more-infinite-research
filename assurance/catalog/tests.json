@@ -7909,6 +7909,7 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetEvidenceGenerators.ps1",
+        "tests/release/Test-MIR42FourTargetEvidenceReconciliation.ps1",
         "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
         "tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
@@ -8352,5 +8353,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c728def132c35284d7d336455bc6f9e15c31b7d83078587db2590d68f934b4f0"
+  "digest": "sha256:2f0f3dfa6fa7a24e63efe244d1d4adcc192778277320518190401333efb286b8"
 }
