@@ -40,9 +40,10 @@ function M.sort_acquisition_producers(names, index)
   return names
 end
 
-local MACHINE_TYPES = {
-  "assembling-machine", "furnace", "mining-drill", "rocket-silo"
-}
+-- A rocket silo counts completed crafts toward its rocket; the engine ignores
+-- the construction recipe's products. It cannot witness ordinary item/fluid
+-- acquisition. Launch products need their own complete process witness.
+local MACHINE_TYPES = {"assembling-machine", "furnace", "mining-drill"}
 
 local function handcrafting_prototype_type()
   local profile = target_profiles.current()
