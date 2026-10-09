@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0142",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Retain item spoilage acquisition and its research gates in science and laboratory progression.",
+  "details": [
+    "Factorio 2.0 and 2.1 acquisition can follow positive-duration item spoilage when the engine enables spoiling. The existing solver requires an acquired perishable input and retains its actual research unlocks.",
+    "Unseeded native or mixed recipe/spoilage cycles, self-locked science, missing capability facts and same-named fluids cannot grant acquisition. Normal queries reuse the shared item index; capped diagnostics retain budgeted raw traversal.",
+    "Controlled canonical Lua tests reproduce the predecessor failure, exercise actual laboratory services and check research gates, alternative seeds, recipe-epoch invalidation and bounded diagnostics. Current-package native production, catalogue and save acceptance remain pending."
+  ],
+  "semantic_domains": [
+    "compatibility",
+    "progression"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Modern enabled-spoiling acquisition; controlled checks pass and native qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Modern enabled-spoiling acquisition; controlled checks pass and native qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "not-applicable",
+      "reason": "This historical target does not grant the modern spoiling acquisition capability."
+    },
+    {
+      "target": "F100",
+      "disposition": "not-applicable",
+      "reason": "This historical target does not grant the modern spoiling acquisition capability."
+    },
+    {
+      "target": "F017",
+      "disposition": "not-applicable",
+      "reason": "This historical target does not grant the modern spoiling acquisition capability."
+    },
+    {
+      "target": "F016",
+      "disposition": "not-applicable",
+      "reason": "This historical target does not grant the modern spoiling acquisition capability."
+    },
+    {
+      "target": "F015",
+      "disposition": "not-applicable",
+      "reason": "This historical target does not grant the modern spoiling acquisition capability."
+    },
+    {
+      "target": "F014",
+      "disposition": "not-applicable",
+      "reason": "This historical target does not grant the modern spoiling acquisition capability."
+    },
+    {
+      "target": "F013",
+      "disposition": "not-applicable",
+      "reason": "This historical target does not grant the modern spoiling acquisition capability."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "Accepted science/laboratory progression programme: native item spoilage was absent from acquisition witnesses"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/researchability_planning.lua and tests/compiler/lab_reachability.lua: seeded spoilage, research gates, cycle refusal and real lab-service consumption"
+    },
+    {
+      "kind": "document",
+      "value": "docs/capabilities/science-integration.md"
+    }
+  ]
+}

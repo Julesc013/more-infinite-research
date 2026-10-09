@@ -1137,10 +1137,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/platform/factorio/data_raw.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 906,
-      "source_sha256": "FEECAA1ADAEFDF5D53594A63C2616BACED85EB03DFFEFFABBE539D2AF76EC31F",
-      "output_bytes": 906,
-      "output_sha256": "FEECAA1ADAEFDF5D53594A63C2616BACED85EB03DFFEFFABBE539D2AF76EC31F"
+      "source_bytes": 1229,
+      "source_sha256": "14F8FF4D054A24F834B4A166AC96123924119B27683CE386726D24762238C15D",
+      "output_bytes": 1229,
+      "output_sha256": "14F8FF4D054A24F834B4A166AC96123924119B27683CE386726D24762238C15D"
     },
     {
       "layer": "shared",
@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 75688,
-      "source_sha256": "5DDBDA42AC9AC75144AB932261354E51CBB0C0215B35865C4C34530991D6EC14",
-      "output_bytes": 75688,
-      "output_sha256": "5DDBDA42AC9AC75144AB932261354E51CBB0C0215B35865C4C34530991D6EC14"
+      "source_bytes": 77097,
+      "source_sha256": "3611E1EBA4C39FBD76EC3303663A3D516A13F11C2B2380AA86797658B9FD3BDC",
+      "output_bytes": 77097,
+      "output_sha256": "3611E1EBA4C39FBD76EC3303663A3D516A13F11C2B2380AA86797658B9FD3BDC"
     },
     {
       "layer": "capability",
@@ -7669,5 +7669,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "EA9CB40936AB09C5BA92621C6B88D4DB307E659A4ABC620C908FDC5646CE0CBA"
+  "record_sha256": "E56E1EFA4C025B7312956C00C79D7B31C10993CB091BF62C1AAB061F4C7D30DB"
 }
