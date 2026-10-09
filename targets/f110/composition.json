@@ -1,0 +1,3871 @@
+{
+  "schema": 2,
+  "kind": "MIR4TargetCompositionV2",
+  "target": "f110",
+  "materializer_abi": "mir4-target-materializer/1",
+  "operations": [
+    {
+      "path": "changelog.txt",
+      "operation": "generate",
+      "semantic_class": "package-documentation",
+      "source_path": "source/presentation/f110/changelog.txt.template",
+      "transform": "exact-template-v1",
+      "reason": "Materialize the governed f110 adapter source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 52697,
+      "expected_sha256": "BB90358693FBB77EC1F386B3C36F1D430BC86CE8F82AEA70417291359743FD31",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "info.json",
+      "operation": "generate",
+      "semantic_class": "generated-metadata",
+      "source_path": "source/presentation/f110/info.json.template",
+      "transform": "exact-template-v1",
+      "reason": "Materialize the governed f110 adapter source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 326,
+      "expected_sha256": "192AE792EF34CA559410D677D7C66D6ED11D4473FE5112EDD4244ADEEA9FD8AA",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/af/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ar/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/be/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/bg/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ca/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/cs/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/da/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/de/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/de/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 64431,
+      "expected_sha256": "5864A1357B7068B86AF8E5B9F9817C5EFF0DF17B5096CF2B6BAF504E9E2BAF36",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/el/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/en/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/en/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 53757,
+      "expected_sha256": "AA4438663C797F4DD2AD2B32016D0763F7152E8615D5BE6AE608E7AF012896D9",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/eo/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/es-ES/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/es-ES/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 64238,
+      "expected_sha256": "509EDD3A29ADB093F983FF07EA6B639EF0959776512464A792F90EC0C322B0C6",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/et/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/eu/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fa/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fi/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fil/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fr/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/fr/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 65474,
+      "expected_sha256": "88A3CB359DEB02A0452B570F80D9E34E0944A6E3B2EAD8745AE0C4A2ACF6B725",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fy-NL/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ga-IE/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/he/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/hr/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/hu/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/id/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/is/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/it/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/it/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 63032,
+      "expected_sha256": "5D3226D3C927DC328C1973948089EE35BEE80CD8969DDC7434A555D2A14B4F36",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ja/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ka/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/kk/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ko/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/lt/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/lv/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/nl/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/no/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/pl/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/pl/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 62222,
+      "expected_sha256": "3FAD1A68AEFF6359DF9201EC20921F47176E6832C508474C38F05013AFFCBA6B",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/pt-BR/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/pt-BR/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 61892,
+      "expected_sha256": "0F7FFD2063A4B81B0F9E54468A5568D38FD010DA508A635467C7896AB6F695B6",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/pt-PT/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ro/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ru/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/ru/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 95766,
+      "expected_sha256": "6FADF33190997D82A99320871696094EF2728114F6117A7221A2CF74B1CD8D49",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sk/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sl/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sq/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sr/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sv-SE/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/th/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/tr/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/uk/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/vi/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/zh-CN/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "source/locale/zh-CN/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 50854,
+      "expected_sha256": "B798882F3C0448D124EE59B4F98930C3C27F0F5ACBEAC1A2071CABCE12F65046",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/zh-TW/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/recipe_productivity/planner.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/recipe_productivity/planner.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 831,
+      "expected_sha256": "12503B163878AFBC460C55B8151051217B9EB10BA6D09620A722ADA35E3D7635",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 50842,
+      "expected_sha256": "D6E3A83A49B199C0D03235F84BF44956C51EC8999CB2CE334FCA9B25C59025D2",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 22743,
+      "expected_sha256": "58D9D9C776714B782D7B7AA5C4A131A291C7A8D9EDC40F66B2ADA2E37CCC96CF",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/lab_compatibility.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/lab_compatibility.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9306,
+      "expected_sha256": "3308A351BDF32EF469EE00BFE95F0BF8807388D79AAA23F15AFDD1BD32C508E3",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 75216,
+      "expected_sha256": "0B20AA308B4DE11F99EF93944B9222EFF752F1EE49A7EE471B9C7ED0F5AAE5BD",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 68604,
+      "expected_sha256": "F16361077D8BAC801F1E6BADCA21906667127A875C40A57F3E4558B255842E0F",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/pack_registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6118,
+      "expected_sha256": "0C5799553CB833F8A48B5C54F47EEDAB2C2D07BA89C3C0B506A96914EDA38EED",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3935,
+      "expected_sha256": "BDA0708224D9D38A4A8C8CCEDD8D2D0A8BE0659F949F036E88F4F8BD0A10BA71",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5026,
+      "expected_sha256": "83284645BAC4BC985C92D3370C674B7975533F789F39FCBDC87879EDA9F07921",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_packs.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/science_packs.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4973,
+      "expected_sha256": "81DCE816D87EC11B9F4893AA84B31ADA7169D418916E19C8C77ACEB3B3604C9D",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9262,
+      "expected_sha256": "060EC9E0AE106DA11069A60ADF2D284344C122341604B63696E01738420BE409",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 13559,
+      "expected_sha256": "83358DC6B9095BD0DDF3654CAEF8587C7666DC1111C2D3DB166B11B39333E0FB",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/technology_researchability.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 18710,
+      "expected_sha256": "6E88F240627935B16BFC64EF0534AF94AE9EAF0003779C7BCE23F9CAC61449DE",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/claim_registry.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/prototypes/mir/compatibility/claim_registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10381,
+      "expected_sha256": "D368CE73CB6D4FE0AA59D093A3A5580EE23756AFB7398B05EB85CF9070B94539",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/packs/registry.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/prototypes/mir/compatibility/packs/registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9728,
+      "expected_sha256": "0B5FDEFA417C710610E12D6CF68CE19C59D151569DB213D7E5F4425F7487048D",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/packs/schema.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/prototypes/mir/compatibility/packs/schema.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9700,
+      "expected_sha256": "D580330701A300A038B490EB5E717423B817DF70D97F5D97048F1866A58280C9",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5359,
+      "expected_sha256": "71D5607F03313E0C99325776238361C90A3DD3D8F7CAE7602A8DF939E523920F",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/policy_authority.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/prototypes/mir/compatibility/policy_authority.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2861,
+      "expected_sha256": "7B7A77ED7775D42AD8FD9D7F5772F3BAD5AD6A2455B946B87CF51497A65F7191",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/profiles.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/prototypes/mir/compatibility/profiles.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5576,
+      "expected_sha256": "EC346717BF56D07563FD58DFC51415690015F7E22594B9FCA785A6540D548FE3",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/core/fingerprint.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/core/fingerprint.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10740,
+      "expected_sha256": "79F5BC3BA8FECDFF5CAA526B3416010DDBA4D370711CF72EC04B47A85EAF9433",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/core/schema.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/core/schema.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1023,
+      "expected_sha256": "D201F32A123AC1DC015C5C1CC62DCF5716659C9694EF620D3103CE4A84CF985E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/core/structural_equal.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/core/structural_equal.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 604,
+      "expected_sha256": "ADCEC6CB0FCE47E4702CE7AEDBD776966F44565FCEF4137AA1E3260B110F2B14",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/core/trusted_record.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/core/trusted_record.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2743,
+      "expected_sha256": "E7A7314E94758D8CC46D41292C96A096575962C968D3FF6E1D4F73C838722A4C",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compilation_snapshot.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/compilation_snapshot.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 12836,
+      "expected_sha256": "921F13B156F6B2CC158E08B2087F1F3CA767A04DACCD55327990D36ADC838780",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compiler_input.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/compiler_input.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6836,
+      "expected_sha256": "5AA29FB26A53A2FCBFB93A1F1C0EF7D15598C226D748301C2EAC12E28D2C96C5",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compiler_result.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/compiler_result.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10824,
+      "expected_sha256": "524F42956863DA7F1D36CDDF195D0A3B6231B434CE6B55BC7B6CDF37B03A599B",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/execution_mode.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/execution_mode.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1176,
+      "expected_sha256": "ACCEB79BBEA388B90F568C8AB7E3BB1171472C0BCCB8274DE9779D004688B00D",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/mutation_journal.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/mutation_journal.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7727,
+      "expected_sha256": "FD5AEA19C87EDB244485C5DDC4383E63E032F1A0D9D01F8B206E66EDB299762F",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/policy_snapshot.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/policy_snapshot.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4816,
+      "expected_sha256": "F93CC8AC2ABB9FDBDC139C88E434D77C57FE5B6B030A66AEB8B7C4594B61AE58",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/public_artifact_budget.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/public_artifact_budget.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 711,
+      "expected_sha256": "9410BF22A036EF1AC6CC4290901B2262FF478152D47B49AA6422E58E962186FA",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/transformation_operation.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/transformation_operation.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5834,
+      "expected_sha256": "3DD80295518A8E40365BAD03279F4D72615CF223469162B7CA0EC37AB620FC9E",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/transformation_plan.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/transformation_plan.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4817,
+      "expected_sha256": "149C6082938987FB94E32B595A0E84048D92EAED5A0EB0E4179EECD03F3E1753",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/effects/generated_target_contracts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/effects/generated_target_contracts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2313,
+      "expected_sha256": "2D23AE9A5E1D2AA4DCFC0D2BC580C97EF50BCD8741B4319817C40CEDE1F48B83",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/effects/metadata.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/effects/metadata.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1818,
+      "expected_sha256": "687AA9B942CCF4BF46F446CE8F1122AB5B4B6F8CE8DFEBF284899389BD15D936",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/environment_identity.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/environment_identity.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5599,
+      "expected_sha256": "E86E24D3ABAC63F5388CFFB7FFB1E2D54E15F5768D1DA956D2648CD126F878F7",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/evidence/compiler_evidence.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/evidence/compiler_evidence.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1975,
+      "expected_sha256": "99573DCD020B953CD611263370783DCF852CAF11F2ABEE768FD0085AA4FF945E",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/facts/generated_technology_registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/facts/generated_technology_registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1221,
+      "expected_sha256": "1D97B1FE1E5C3F1072FC4B6148E7D07C489909CBE077233D082CE2698260E106",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/qualification_environment_identity.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/compatibility_slice.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/research_cost/compatibility_slice.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 13876,
+      "expected_sha256": "D92CC40BE19AE3F6128EC4A9EDA102325A7446E1AD0C1A16EBD961ACC4C5C1E2",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/streams/descriptor.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/streams/descriptor.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 11425,
+      "expected_sha256": "176D19F7F005521CDB354EB939E04DD4630DD6C96BC0AD8E6AFDC40EE3DB9D51",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/streams/stream_spec.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/streams/stream_spec.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1213,
+      "expected_sha256": "6FFC04BC7C1CB076D3677A9B0EEA6C738C330BD862AAA01A8A9DFF9F9193AE7E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/applicability_envelope.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/design_assessment.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/effect_safety_policy.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/effect_safety_policy.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 983,
+      "expected_sha256": "3EF11B84C35A587508A0FDF8394E82EAF76CCA7B6C60D9EA9011E7A8F857BA00",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/gate.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/gate.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6440,
+      "expected_sha256": "E004FF72A468543BE5D13B110AFB8CF46BDEFBD9597DD583E6E5783BDD863AC3",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_hard_gate_authority.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/generated_hard_gate_authority.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1067,
+      "expected_sha256": "6237C154D8E5AFC811603901508574D6CDAB6211D3F5D76B89FD390FCDF31A53",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_promotion_registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/generated_promotion_registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1503,
+      "expected_sha256": "E8962BC9E1839EB5922944CC67E04C333E57C54330CD0B3E9030130B5E2A60EE",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_quality_profiles.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/generated_quality_profiles.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6896,
+      "expected_sha256": "66578148236612993AAAF4C3B2D6DAA0A7075B2E5E068B807FB1EAFCCBD4568B",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/hard_gate_authority.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/hard_gate_authority.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1139,
+      "expected_sha256": "62CE23985C877595B08409F4AB9475DAC113D7C6A06753C9D22C680A85083907",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/promotion_authorization.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/promotion_registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/promotion_registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2027,
+      "expected_sha256": "99C1F7584F38982E7366C6365BB415B2C638C2E76BCD210AAD86D5CD13E385CD",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/safety_qualification.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/safety_qualification.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7591,
+      "expected_sha256": "BF5C3402DFCDD240485EDBAAE051C6B7075C04FE62749AB0CBA8B374C16FBF77",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_approval.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_candidate.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/technology_candidate.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5331,
+      "expected_sha256": "A15FD8ED38E6E98DB66384FE189E7CCEA0990B777FE061431A80E4CFE40773DB",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_design.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/technology_design.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 52269,
+      "expected_sha256": "2FE7AD2F150F1EB90004C35161F96AC6B8747F76CB132B763DFF68AE99574A01",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_migration.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_promotion.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_qualification.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/technology_qualification.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 224,
+      "expected_sha256": "724CDD0932CBBF488E4DE4417A3D84EFB254AC3B841C41FEC2842AC6706C41F0",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_quality_assessment.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_risk.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/technology/technology_risk.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2533,
+      "expected_sha256": "A8C1B7E1A9050050C7BF261B37410324B0B4C9D268C954302F1E1270B4416AEA",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/base_continuation_executor.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/base_continuation_executor.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 628,
+      "expected_sha256": "5AB80A7F8181CA4C85760DE9DE8C3DE4F1B17C6D350B72D3957C677358D8EE83",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/base_extension_builder.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/base_extensions.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/base_extensions.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 430,
+      "expected_sha256": "09AC3B1B1C2385F09B1005EF929EDCF81D93675A953E780DD60100A8F86C4407",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/compiler_evidence_adapter.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/compiler_evidence_adapter.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 863,
+      "expected_sha256": "AD940680FBB5FCC57A17AFFE97B2A345F299D3368CC49B356D092D8FFAF5D06E",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/effect_safety.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/effect_safety.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8019,
+      "expected_sha256": "02EEE534CA59285EAE77D57071F3DF5E219C80270F195068A85DF41B497A363E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/icon_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/icon_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 170,
+      "expected_sha256": "FD677AAAECC429CC3DF68750915C79EB026E627CD342B88F3CE938026DF4A1BC",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/mod_data.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/mod_data.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3305,
+      "expected_sha256": "D50772611479EE5A659512167020E5F6782FDD7FE41456B01C5004D98E5AEF1A",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/research_cost_compatibility_adapter.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/research_cost_compatibility_adapter.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 977,
+      "expected_sha256": "25CFC1EACFD259C99EB559E1A2B2A8D68A9977EB02D80EF486F7ABAC1C42605E",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/stream_executor.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/stream_executor.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1799,
+      "expected_sha256": "87D241AB0B2ED9BD6DFD1B61D2AFDBCB04515373E196B72BF16D593E4AA7497F",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/stream_spec_adapter.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/stream_spec_adapter.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 331,
+      "expected_sha256": "8A68F60C6A8C9A50092EAD78E324D4D03BE966004713D183D2A341424B4644B6",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/technology_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1534,
+      "expected_sha256": "892B80735867D3D9D4B20D790D18C71F2C915A384677D376A91C3199D95CB824",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_design_adapter.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/technology_design_adapter.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1197,
+      "expected_sha256": "6F18A48E6304828D4395AD8473A30BCA22CF4A50D4FA6C623F9A304AB8E76124",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_graph_safety.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/technology_graph_safety.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10497,
+      "expected_sha256": "8467B375F695F1C20DE36EE75506F61F6127CA6545FA12FF0FF11D76E730A772",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_operation_executor.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/technology_operation_executor.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3074,
+      "expected_sha256": "F15C57DFF132DDBB059BD4D9BFAD1ADC8DA764D7B8FA037BC251F918190B9DEB",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_replacement.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/technology_replacement.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8678,
+      "expected_sha256": "E57C46A978809AD0ACDFE954FF3986D9354DEADC10DF486F588D142D38CDCB4C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/transactions/productivity_family_adoption.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/emit/transactions/productivity_family_adoption.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6473,
+      "expected_sha256": "FAEDB7D11A8CA6B373119A295660FD1564EA5D1FB43E5EA06B0DB18E4CC9A311",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/families/operator_dsl.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/families/operator_dsl.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9737,
+      "expected_sha256": "58B505C6054350B5318102BAB7CDC7E14ABC5CA55D07C9F3815C5A8369A20CF7",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/families/material_progression.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/families/material_progression.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize shared material progression declarations for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 16597,
+      "expected_sha256": "7D2A756053E074BADC62EA5B5017FD2B307CD53A29782E43C47D3EECAEA245AD",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/families/registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/families/registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4959,
+      "expected_sha256": "93F4216480286016952AAEB7AF422C19A07B318DFFC3F9A950D04F746E5B8F76",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/families/resolver.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/families/resolver.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 13347,
+      "expected_sha256": "222D5044B121B4F6E65663B9357703A8A9642C63362F88418000C98AB83FF910",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/condensation.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/graph/condensation.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 760,
+      "expected_sha256": "0F43A0BA7EC9AFA1D05A9B0791FC42A3D731BE91494894B3D716B55DB5468798",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/diff.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/graph/diff.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 494,
+      "expected_sha256": "8E2F034A62D35F153C9783BEE0F85004AB6784C1FC19056A4142519ECE61C90B",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/evidence.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/graph/evidence.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 488,
+      "expected_sha256": "0D76065282F8417BA31BF76139ED8DB069AD63A5F79BBF3E69CA30948FA25B2D",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/qualification.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/graph/qualification.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 15867,
+      "expected_sha256": "542CBAE3C7CA39060806925F61628A4B8538872DE9ED33752C71DF70B2A667CA",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/reachability.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/researchability_index.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/graph/researchability_index.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4054,
+      "expected_sha256": "5CDC5962898E392C44452E92437F795B58F3C3C9C349749B8BF4F229118D399C",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/researchability.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/graph/researchability.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 692,
+      "expected_sha256": "F91B8F2094CEDA38AF63BB91B435F39926344BAB742FD280A9F36BABEC43E53E",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/scc.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/graph/scc.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2734,
+      "expected_sha256": "454D54C1B2F78A6C10776F45B0F9B1F0352FF9AB262866F6CE6EECD997E35E4E",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/snapshot.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/graph/snapshot.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8317,
+      "expected_sha256": "95321E7261485B681CF673D0BBA7151EE3CFEF6AD3F569B0F87F9C72C9D3C5ED",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/item_prototype_facts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/index/item_prototype_facts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4553,
+      "expected_sha256": "298A193018072E6DBDE4B4EB9EABA3DDDC84F471D6685B0C85B09FED42D152B8",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/productivity_owners.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/index/productivity_owners.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5900,
+      "expected_sha256": "EC148F4ED6469FB6D598E86C5AEF5605B7A6B7C87E8C3D9C77D0FB1530953AD3",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/recipe_facts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/index/recipe_facts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 23402,
+      "expected_sha256": "4DF61F522F2683E60C758A49312DC6400CD2F8CAEE873B12892AA746EF5278E3",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/recipe_risk_facts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/index/recipe_risk_facts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9442,
+      "expected_sha256": "D3572FB06002079BE40B08BBA3577238F3200EA56E694974B92C2680119F38AB",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/registry_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/index/registry_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 13966,
+      "expected_sha256": "02D7BD3047D4A601046120AD29758777F1752DDB880E7C3BE7B83298853259BE",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/relationships.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/index/relationships.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4815,
+      "expected_sha256": "AF18027080397B8578F385B4C4EAE15054EC68F337F02E7C8A109805018AEA80",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/integrity/effect_contracts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/integrity/effect_contracts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3661,
+      "expected_sha256": "925564AF2E3B66A805D99D5E65C8FA7B2AE74725572265B58A77D193D235B5A3",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/integrity/technology_effects.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/integrity/technology_effects.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2227,
+      "expected_sha256": "C1E8466E3EEFDB00CF8A93076C62ACE16D6939BC630F26C345A552AC674B5DBB",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/commands.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/commands.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 13631,
+      "expected_sha256": "1108CC1AB108BA5E7203E8BBA51C148B800BFA9DA397822A59057C07F85A421D",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compilation_snapshot_adapter.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/compilation_snapshot_adapter.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6374,
+      "expected_sha256": "8A96F4149CA7E1B221BD61BF04324D246A72FA7FA54D9A00ED2F5582494C1705",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_context.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/compiler_context.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7821,
+      "expected_sha256": "65490A92DAC0ED079EFE40211E16E5E331C050D3DE606E35D671219C2A30926E",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/compiler_orchestrator.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 906,
+      "expected_sha256": "A5C2C918C774CDB1292DEBA2D623BD3E4CDCF926002A59A6A87F7EF5FEE3C271",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10522,
+      "expected_sha256": "692EFF4E7A6D7A8E84E9F1B28CAD8761793B1FEE534228CAAC9B89C50AB13A09",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator/contract_checks.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/compiler_orchestrator/contract_checks.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4997,
+      "expected_sha256": "3D1B64E9FAEF3A4566740982CDD9C743CA2EBB30B865FD127140142CFA0EB740",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator/phase_invocation.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/compiler_orchestrator/phase_invocation.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1203,
+      "expected_sha256": "0100D0CF7598320FCDA302CD97F67AC020F8842F2F1A2DD7C7DC4AE112E41691",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7818,
+      "expected_sha256": "8A28E7E1F9CE5363B244624AE9A31DADC33E542266FB2F8DB47B2336950C6E68",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1808,
+      "expected_sha256": "F0E3BDD20EFCAD0E137732D94EDCDC0380D82DBDD654BC7E32743992CED9F15B",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/competing_productivity.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/mutations/competing_productivity.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1183,
+      "expected_sha256": "F676F64887A4DF8DC812FF8C76304FF7CE0C6AB12DC6ABF5CC8A090D2478D4C7",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4218,
+      "expected_sha256": "FE610E353775389BE52507A52640C169B1D5C8B4DAC25F8B9E0D4747DE000B30",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/policy_snapshot_adapter.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/policy_snapshot_adapter.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1836,
+      "expected_sha256": "21DBC44A2BC8326CF7B9ECF5D1283E0D3435D269B63C7557F7225E6F9C3E8695",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/recipe_productivity_permissions.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/recipe_productivity_permissions.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1188,
+      "expected_sha256": "2DDB0D271E88D4036F4DF46681E908638D6AC17A0C99F11F3383453459C1B96E",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuation_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/base_continuation_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1139,
+      "expected_sha256": "FBFBA3D106AC3A957FE2169563AE95C032C6134B276508B84D43DCEBD50B2600",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations/plan.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/prototypes/mir/planner/base_continuations/plan.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 16422,
+      "expected_sha256": "B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations/qualify.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/prototypes/mir/planner/base_continuations/qualify.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5029,
+      "expected_sha256": "53BAB53A88DA0B9C8847EAAD47EF315C08E31C49F4F18BD9DE0352E75A87AF38",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/compilation_plan.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 111,
+      "expected_sha256": "96D4982DF9B953E1CA01BC9223637B3C993B5160E679B9BA5DB7670A9466B286",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/build.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/compilation_plan/build.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 32308,
+      "expected_sha256": "41D35180C1DB3035A71F3563D69F2FB3B08113FC34580092F877F796D0E57763",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1260,
+      "expected_sha256": "13463F103C31AE733E3635C66384233DE10EACEE2CCDFB485D4070D741FA4C1D",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/model.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/compilation_plan/model.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7804,
+      "expected_sha256": "6EBCBE188F7AD69FA7491597BA298EE2ECEB8CB39FC6DF862F69D299BBDDBCE2",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/serialize.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/compilation_plan/serialize.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2948,
+      "expected_sha256": "85BAAB4B80AF480493FDBD91A1D9FE4B318DF1AC0B3E5E31CF39076130A05DBE",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/validate.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/compilation_plan/validate.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4695,
+      "expected_sha256": "619F607807902F1CDE0DCEFE1438BF50F45E5C0140BE9E29A0F010056A2289CB",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compiler.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/compiler.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9538,
+      "expected_sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/direct_effects.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/direct_effects.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1272,
+      "expected_sha256": "776F1017F68F02DB6BDBE8AE0B7F721F341465A70609D987D71881DA2D7B4176",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/effect_ownership.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 284,
+      "expected_sha256": "4B3496EBDF62489D5324D354B239B0557995A2CF969836E2427387EC1AF10C61",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership/facts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/effect_ownership/facts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6418,
+      "expected_sha256": "51F8108DCDE74564501C08490C946AE1AC1AC04D5393811D277F3C5E45B80956",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership/planned_operations.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/effect_ownership/planned_operations.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8892,
+      "expected_sha256": "5F9B62DE02A271041300A37F9C406D48EBB6C2678C54FD4696C9BA56ED767F5D",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership/resolution.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/effect_ownership/resolution.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3986,
+      "expected_sha256": "E33118C4BADBF5549A59FB045046E2C8E973772CA600E28AA35D228FF7827EB0",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/generation_plan.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/generation_plan.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 13397,
+      "expected_sha256": "C8DC0BD0072253E64EDDC644110CB057126AFE0BBE5745AC4FA60953046C71A6",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/native_owner_binding.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/prototypes/mir/planner/native_owner_binding.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10099,
+      "expected_sha256": "067C47A7AD5415924DFF543733BA4B120035D796A407D0567B519278BBD3ED2C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/output_validator.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/output_validator.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9643,
+      "expected_sha256": "9C742236169C72E51F838844B7FF3315E3AD2E9D61EC030AFD8CB0FE96E05A6B",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/prerequisites.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/prerequisites.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3203,
+      "expected_sha256": "704E5B3A6D4C26ACAA59B463DD358197C007A6511B2BA94EC763C14C330EB3FC",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/science.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/prototypes/mir/planner/science.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3055,
+      "expected_sha256": "034A196CFA4CBA3CC2049BA81121B8EB08AFED347C83A0129F4AE6652C0967E7",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/prototypes/mir/planner/stream_compiler.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 65,
+      "expected_sha256": "F575B7117740549CF3F2547C23F708FEC982247A8A254AF46DF3D0DA93335572",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler/qualify.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 13431,
+      "expected_sha256": "A0339F701705825F756FB06E4A87D1603746CCC6BCACD96F97DFFAD76E1BF430",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/technology_catalog.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 700,
+      "expected_sha256": "6EFFE39695549D2FFB52FEA96EE7AA9383F78C969CB8834528572A2DDE2BF34F",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/build.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/technology_catalog/build.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7354,
+      "expected_sha256": "0A2560165C8E0CC281ACC807A883D113429064EB43A11F5EADF1645AAD363D92",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/index.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/technology_catalog/index.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 864,
+      "expected_sha256": "CBBD313BAD8AD1537C694DE95D68B046C923662217611D1E1D30522F90D87DAA",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/model.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/technology_catalog/model.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5126,
+      "expected_sha256": "720A88AE6653492933A731D9321F2D244BE68F34F6771E5AB2DEAC4F90CB4FDF",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/query.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/technology_catalog/query.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1066,
+      "expected_sha256": "7A7711D1D16D65D32585AA3B5BFE99FD3B5AD51833A5CCC413F09294966FF78F",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/validate.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/technology_catalog/validate.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6621,
+      "expected_sha256": "7F6B801C60819AA41278DA6DEA2BF45F8E329BCC3395DBCB1DFA035170D5ADBA",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_graph.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/technology_graph.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 209,
+      "expected_sha256": "EF22F7CDABDBAEDC41AF8BDBFC1160CA6B256D026CA358BDB52089ED1DD74128",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_selection_policy.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/technology_selection_policy.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5017,
+      "expected_sha256": "E101524BC57622E8DA1B0743379A14F5F0DA1BE9C2875EA7DE00449B9618FDF2",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/effect_target_inventory.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/platform/factorio/effect_target_inventory.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2594,
+      "expected_sha256": "83EA60DF304EA94FEDAACF00490895556DB48D1C201E622A40E8373D241FA3EB",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/environment_identity.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/platform/factorio/environment_identity.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1235,
+      "expected_sha256": "CCED615B4018E4D17B2D03E5B04B8EEE727078FB93CE0CEB6AE239724F2C7453",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/prototype_lookup.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/platform/factorio/prototype_lookup.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4222,
+      "expected_sha256": "1D6A9C614428D327572810E2DD72759E7B9802C2C07A1F43B39C2D30511EE161",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/adapters/platform/base-version-profile/target_profiles.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed f110 adapter source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6036,
+      "expected_sha256": "88D07CED23E909D58B8D9A671F30625CB81839E5170FFFCECAD0097352489220",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/policy/competing_base_extensions.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/policy/competing_base_extensions.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4027,
+      "expected_sha256": "737B469DA4F13BDC14C914E2A0EA0BFE7DFF6F4C603404C78F3E31AEE88904AB",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/policy/competing_productivity.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/policy/competing_productivity.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7154,
+      "expected_sha256": "F5E853A553CEC1A11120A7EBF7E8D9C63CE3094D0397D1F49746CBE0FD2B2594",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/policy/max_level.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/prototypes/mir/policy/max_level.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1386,
+      "expected_sha256": "AE1239FBA2CC7D9F6313D7BC042C15E115360466BE1ACD86838224BDAD69CDEF",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/presentation/icon_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/presentation/icon_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10343,
+      "expected_sha256": "9B2788BEC9B6C9E290C8A8D038BF3E6F3D86DBDB39BE1D5C237DCB94DB01099A",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/builtins.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/builtins.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6964,
+      "expected_sha256": "91247E44C0DAE3EF7915ED4E1154C7CB106AEEAFE391128E483563DC3FDD396C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/contract.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/contract.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5006,
+      "expected_sha256": "36887B283CEF3BD072D4ACC23B53551BB3E265CF792CD4FBE8D467B78841CEF2",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/budget.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "source/prototypes/mir/providers/pipeline/budget.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3862,
+      "expected_sha256": "EC19366CD511857F5EED0421BCB67864DA40FFBFB56C07ABD83501C5557ED5B4",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/classification.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/pipeline/classification.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1141,
+      "expected_sha256": "4150F48DF2D24F4F93B8646A644A222AB7FA3B3807BFEDD8D2A86FD088BF7E1C",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/decision.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/pipeline/decision.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2439,
+      "expected_sha256": "90E07EAB680A39D8DF02E1D69732595A6436F82529A2BED909ABEDA821EA210F",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/discovery.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/pipeline/discovery.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2254,
+      "expected_sha256": "56F4CC3BF0DF338BD39EAA54D3F1DE4CE11DA8FF1C0EAD4D1152D763957DE3C1",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/hazard_policy.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/pipeline/hazard_policy.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 871,
+      "expected_sha256": "CA88E07C92619F4DAD498E051EA791F91063A94CF03CE32142F86D77B6957773",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/normalization.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/pipeline/normalization.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 538,
+      "expected_sha256": "609F4A9374A4BE61B7B67E59A4E4261B08D7A84AA6D24F111A34F55196372B18",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/owner_arbitration.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/pipeline/owner_arbitration.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 506,
+      "expected_sha256": "D1245FB0F47B4C94B9C3B0F9A954CB8FF8AE0B758778A58C765419C324F4CB1A",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/pack_policy.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/pipeline/pack_policy.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 338,
+      "expected_sha256": "D5723AECDB4F205D007B0B325A8C36DBC26425573AA969055745C63340426633",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/provider_claim.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/pipeline/provider_claim.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3130,
+      "expected_sha256": "6EF54AC93F4EAF0AFABBB9BCE5B0D2744D771704CD3D3E72DD3FF6289BB5E2A8",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/provider_metrics.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/providers/provider_metrics.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7261,
+      "expected_sha256": "723081DCAFDFAC60D59CFC3B4C115088E6FE9BC6190A798D930350BEAF9579C7",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/compiler_diagnostics.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/report/compiler_diagnostics.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6156,
+      "expected_sha256": "062B246D5A82C9FFB98A11DDD84799C37BC41F086429A6B8B0BF4B00C347C586",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/compiler_telemetry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/report/compiler_telemetry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4890,
+      "expected_sha256": "0AE4E6F80423DED9C5073AF05EFCBCAD2423A58FA7CD04EE334A39110B953010",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/coverage.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/report/coverage.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10128,
+      "expected_sha256": "2D6B6E00FD6522777E15A66BB4E481D91E4B1550B19968C07080F53C263A4272",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/diagnostics_sink.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/report/diagnostics_sink.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 12705,
+      "expected_sha256": "A780A5EF08B1898C15BF286048752B1D56CD9556407A4EEB26F6F26C6457E428",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/public_compiler_artifacts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/report/public_compiler_artifacts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 12391,
+      "expected_sha256": "335A17A08570D9122D7ADFA27B63B253405D4CF057538B0C0CE46C9710BE5008",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/maximum_level_control.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/planet_discovery_recovery.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/runtime/productivity_family_adoption.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4644,
+      "expected_sha256": "15DDCEE63ACB65D52DD7E345DFEA2FC2C92B7266698BF14EC78B003C87AB7C15",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser_model.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The bundled browser requires the modern runtime and mod-data contracts; this legacy target omits it.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "modern-runtime-contract-unavailable"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The bundled browser requires the modern runtime and mod-data contracts; this legacy target omits it.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "modern-runtime-contract-unavailable"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/scripted_techs.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 400,
+      "expected_sha256": "18477C06CD8FB884DC0369133854989178283E3BE8FBB20C3BF0EA2534657109",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/settings_profile.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/runtime/settings_profile.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5393,
+      "expected_sha256": "03DFCAC8505D043A3BCC35473F0D31206318AD45CE664104F2ADB0CE9B9FFDB4",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/settings_resolver.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/runtime/settings_resolver.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1110,
+      "expected_sha256": "57122FB881A76C970ACE3591F5E418949FB8E3D4883CF386962CDC21F2EBB720",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/startup_settings.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/runtime/startup_settings.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1975,
+      "expected_sha256": "4E6E6B19411130F0C2BC244400592407AD94EC12FBD27A986CE3C889AF0C1B37",
+      "proof_obligations": [
+        "exact-path-and-source-identity",
+        "complete-literal-module-dependency-closure",
+        "factorio-1-syntax-api-and-lifecycle-qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/automatic_compiler_contract.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/settings/automatic_compiler_contract.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 11173,
+      "expected_sha256": "866D65F28BAB805BD7680CB090DD60E673A7949F7044C59A97C355AEE12C2E98",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/defaults.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/settings/defaults.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5841,
+      "expected_sha256": "7537E3792A07DE60C4591972925C65D208808C2329C432891FECE2528467AC63",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/effective.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/settings/effective.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2965,
+      "expected_sha256": "4A50344CF38C88A3C8D80BEE25956F99421C5BDDE5AD91D862145863FECFF495",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/pipeline_extent.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/settings/pipeline_extent.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 992,
+      "expected_sha256": "996B9F61FC61E9BCA14EB8F2D9AAEC7521CA72F40F369700903F38726204D09C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/stage_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/settings/stage_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9476,
+      "expected_sha256": "EFA724F34AC025E824781B429D1D11B803AEBA5066673FFDEE2AE9F86D15236D",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/stage/data_final_fixes_steps.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/stage/data_final_fixes_steps.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1837,
+      "expected_sha256": "97C3F63AEF2A44370CBA343A0B50BF703D00838F34595D4E35F15EFACB61658B",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/stage/data_final_fixes.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/stage/data_final_fixes.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 152,
+      "expected_sha256": "CD43DDECC7CCAFFCDA431830B5CAEBFA361393E4ED5D4836B228B652F2480998",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/streams/generated_continuation_manifest.json",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/streams/generated_stream_manifest.json",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/streams/generated_stream_manifest.json",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 89644,
+      "expected_sha256": "280192D98F3A483FBE4A949149A6667C9F8F049A990D808B70D2258BA0345EE5",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/streams/registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/streams/registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1274,
+      "expected_sha256": "98F9398FA7F1AE290868D424740007AE6DB73BA8539563950A0A04401555891E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/streams/direct-effects.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/streams/direct-effects.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 11547,
+      "expected_sha256": "7AA6D11919D4CBB0149B1347474B732400010156A79C0E0E83635EB8290D8DC4",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/streams/productivity.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/streams/productivity.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 74298,
+      "expected_sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "README.md",
+      "operation": "generate",
+      "semantic_class": "package-documentation",
+      "source_path": "source/presentation/f110/README.md.template",
+      "transform": "exact-template-v1",
+      "reason": "Materialize the governed f110 adapter source for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4692,
+      "expected_sha256": "21D21BD16A1A5A5578AC431D2C3158184FEF3BB130E842AA028796A6F57E5585",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler/material_continuation.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/stream_compiler/material_continuation.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the shared material continuation planner for f110.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8790,
+      "expected_sha256": "E9A563B8FCFD6F82DACF21D876B83D5CFC2745E2C586D3ABD01D7C757B95BF17",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    }
+  ],
+  "invariants": {
+    "all_target_differences_explicit": true,
+    "no_full_target_source_copy": true,
+    "independent_target_proof_required": true,
+    "era_family_labels_absent": true
+  },
+  "record_sha256": "4A4DD5A88109BA3530B7C6847842CFA599018BBCB0504DDEAFDFC931828EAC25"
+}

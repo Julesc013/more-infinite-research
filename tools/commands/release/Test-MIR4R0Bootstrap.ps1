@@ -70,18 +70,36 @@ $continuationScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3PostTe
 $f200ContinuationScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1"
 $importScript = Join-Path $RepoRoot "tools\commands\release\Import-MIR3TerminalBaselines.ps1"
 $bootstrapRootSetScript = Join-Path $RepoRoot "tools\commands\release\New-MIR4BootstrapRootSet.ps1"
-if ($Update) {
-  $captureParams = @{ RepoRoot=$RepoRoot }
-  if ($BuildBundles) { $captureParams.BuildBundles = $true }
-  & $captureScript @captureParams
-  & $continuationScript -RepoRoot $RepoRoot
-  & $f200ContinuationScript -RepoRoot $RepoRoot
-  & $importScript -RepoRoot $RepoRoot
-} else {
-  & $captureScript -RepoRoot $RepoRoot -Check
-  & $continuationScript -RepoRoot $RepoRoot -Check
-  & $f200ContinuationScript -RepoRoot $RepoRoot -Check
-  & $importScript -RepoRoot $RepoRoot -Check
+$custodyCli = Join-Path $RepoRoot 'tools/mir/cli/Invoke-MIR4DistributionCustody.ps1'
+$bootstrapArchiveVersions = @('3.2.9','2.5.9','1.9.9','1.8.9','1.7.9','1.6.9','1.5.9','1.4.9','1.3.9','3.2.11','2.5.11')
+$temporaryBootstrapArchives = [Collections.Generic.List[string]]::new()
+try {
+  foreach ($version in $bootstrapArchiveVersions) {
+    $localArchive = Join-Path $RepoRoot "dist/more-infinite-research_$version.zip"
+    if (-not (Test-Path -LiteralPath $localArchive -PathType Leaf)) {
+      & pwsh -NoProfile -File $custodyCli -Command restore -RepoRoot $RepoRoot -Version $version -OutputRoot dist | Out-Null
+      if ($LASTEXITCODE -ne 0) { throw "Could not stage pinned MIR $version bootstrap custody." }
+      $temporaryBootstrapArchives.Add($localArchive)
+    }
+  }
+  if ($Update) {
+    $captureParams = @{ RepoRoot=$RepoRoot }
+    if ($BuildBundles) { $captureParams.BuildBundles = $true }
+    & $captureScript @captureParams
+    & $continuationScript -RepoRoot $RepoRoot
+    & $f200ContinuationScript -RepoRoot $RepoRoot
+    & $importScript -RepoRoot $RepoRoot
+  } else {
+    & $captureScript -RepoRoot $RepoRoot -Check
+    & $continuationScript -RepoRoot $RepoRoot -Check
+    & $f200ContinuationScript -RepoRoot $RepoRoot -Check
+    & $importScript -RepoRoot $RepoRoot -Check
+  }
+}
+finally {
+  foreach ($temporaryArchive in $temporaryBootstrapArchives) {
+    if (Test-Path -LiteralPath $temporaryArchive -PathType Leaf) { Remove-Item -LiteralPath $temporaryArchive -Force }
+  }
 }
 if ($Update) {
   & $bootstrapRootSetScript -RepoRoot $RepoRoot
@@ -105,13 +123,21 @@ $executableKinds = @(
 )
 foreach ($kind in $executableKinds) {
   $path = "$authorityDirectory/$kind.json"
-  $schemaPath = switch ($kind) {
-    "MIR4-Target-RegistryV2" { "spec/schemas/mir4-target-registry-v2.schema.json"; break }
-    "MIR4-Versioning-and-Distribution-Identity-ADRv2" { "spec/schemas/mir4-versioning-distribution-identity-v2.schema.json"; break }
-    default { "spec/schemas/mir4-r0-authority.schema.json" }
+  if ($kind -ne 'MIR4-Target-RegistryV2') {
+    $schemaPath = switch ($kind) {
+      "MIR4-Versioning-and-Distribution-Identity-ADRv2" { "spec/schemas/mir4-versioning-distribution-identity-v2.schema.json"; break }
+      default { "spec/schemas/mir4-r0-authority.schema.json" }
+    }
+    Assert-Schema $path $schemaPath
   }
-  Assert-Schema $path $schemaPath
   $authority = Read-Json $path
+  # The frozen pre-composition registry predates the current four-target V2
+  # schema that reused its filename. Preserve and validate its own historical
+  # envelope instead of projecting the successor contract backward.
+  if ($kind -eq 'MIR4-Target-RegistryV2' -and
+      ([int]$authority.schema -ne 2 -or [string]$authority.authority_id -cne 'MIR4-target-registry-v2' -or [int]$authority.payload.target_count -ne 17)) {
+    throw "Historical MIR 4 R0 target registry envelope is invalid: $path"
+  }
   if ([string]$authority.kind -ne $kind -or [bool]$authority.package_visible) { throw "MIR 4 R0 authority identity mismatch: $path" }
 }
 

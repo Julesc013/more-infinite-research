@@ -190,3 +190,35 @@ assert_close("custom pipeline percentage parse", pipeline_extent.parse(123.45), 
 assert_close("custom productivity percentage parse", prototype_limits.value("productivity", 4321.5), 43.215)
 assert_close("custom efficiency percentage parse", prototype_limits.value("efficiency", -83.25), -0.8325)
 assert_close("custom recycler percentage parse", prototype_limits.recycling_return_value(12.34, nil), 0.1234)
+
+-- Exercise the shipped reader with real native codec APIs and a synthetic
+-- startup table. Never write through Factorio's startup setting objects.
+local startup_reader = require("__more-infinite-research__.prototypes.mir.runtime.startup_settings")
+local original_settings, original_decode = settings, profile_codec.decode
+local decode_count = 0
+local ok, err = pcall(function()
+  profile_codec.decode = function(text)
+    decode_count = decode_count + 1
+    return original_decode(text)
+  end
+  settings = {startup = {
+    [profile_codec.import_setting_name] = {value = encoded_a},
+    ["ips-cost-base-research_tungsten"] = {value = 20},
+    ["ips-enable-research_air_scrubbing_clean_filter"] = {value = true}
+  }}
+  for _ = 1, 400 do
+    assert_equal("repeated imported cost", startup_reader.get("ips-cost-base-research_tungsten"), 12345)
+    assert_equal("repeated imported false", startup_reader.get("ips-enable-research_air_scrubbing_clean_filter"), false)
+  end
+  assert_equal("one native decode for repeated reads", decode_count, 1)
+  settings.startup[profile_codec.import_setting_name].value = profile_codec.encode({
+    schema = profile_codec.schema, settings = {["ips-cost-base-research_tungsten"] = 23456}
+  })
+  assert_equal("changed imported cost", startup_reader.get("ips-cost-base-research_tungsten"), 23456)
+  assert_equal("changed profile omitted boolean fallback", startup_reader.get("ips-enable-research_air_scrubbing_clean_filter"), true)
+  assert_equal("changed text decoded once", decode_count, 2)
+  settings.startup[profile_codec.import_setting_name].value = ""
+  assert_equal("empty import direct cost", startup_reader.get("ips-cost-base-research_tungsten"), 20)
+end)
+settings, profile_codec.decode = original_settings, original_decode
+if not ok then fail(tostring(err)) end

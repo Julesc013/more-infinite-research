@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0116",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Recognize native enemy loot in acquisition on Factorio 2.0 and older targets.",
+  "details": [
+    "Enemy drops use the selected engine's native identity, count and probability fields. Earlier LootItem declarations can supply an item acquisition seed, including the Factorio 2.0 pentapod egg; Factorio 2.1 keeps its item-product contract.",
+    "Foreign declaration fields cannot supply an identity or revive a zero-count drop. Native default counts and probability remain usable, and fluid identities cannot act as placement items.",
+    "Controlled canonical lab and source-epoch checks exercise the nine line contracts and prototype immutability. Native combat, world placement, drop quantities, progression, catalogue and saved-world behavior remain unqualified; no new permission, owner or support claim is granted."
+  ],
+  "semantic_domains": ["science", "progression", "compatibility", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Retains native item-product loot semantics and rejects the foreign earlier declaration shape; native acceptance remains pending."},
+    {"target":"F200","disposition":"affected","reason":"Restores native LootItem acquisition seeds; native acceptance remains pending."},
+    {"target":"F110","disposition":"affected","reason":"Restores native LootItem acquisition seeds; native reduced-target acceptance remains pending."},
+    {"target":"F100","disposition":"affected","reason":"Restores native LootItem acquisition seeds; native reduced-target acceptance remains pending."},
+    {"target":"F017","disposition":"affected","reason":"Restores native LootItem acquisition seeds; native reduced-target acceptance remains pending."},
+    {"target":"F016","disposition":"affected","reason":"Restores native LootItem acquisition seeds; native reduced-target acceptance remains pending."},
+    {"target":"F015","disposition":"affected","reason":"Restores native LootItem acquisition seeds; native reduced-target acceptance remains pending."},
+    {"target":"F014","disposition":"affected","reason":"Restores native LootItem acquisition seeds; native reduced-target acceptance remains pending."},
+    {"target":"F013","disposition":"affected","reason":"Restores native LootItem acquisition seeds; native reduced-target acceptance remains pending."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"changed","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"value":"tests/compiler/lab_reachability.lua","kind":"finding"},
+    {"value":"tests/compiler/recipe_source_epoch.lua","kind":"finding"},
+    {"value":"docs/capabilities/science-integration.md","kind":"document"}
+  ]
+}

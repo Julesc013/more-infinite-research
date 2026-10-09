@@ -33,7 +33,7 @@
       "purpose": "qualification",
       "surface": "public",
       "invocation": "reusable-workflow",
-      "sha256": "60C1E09BB20D624E45906C0AC0AF1CB1FF7993C4491665ABBB56F00F088610F1"
+      "sha256": "27CB95ED16D7F8020992A6AE3ACB64479870E82ECDD39B4FA5B532FDDA6900E7"
     },
     {
       "file": ".github/workflows/assurance-promotion.yml",
@@ -49,7 +49,7 @@
       "purpose": "nightly",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "744AB438F612D5396B843895755F2BD7820CF9EB493A8922D88ADE5E7925CB1B"
+      "sha256": "6A96781D11F3E6B615749797F89C2C9FD51B9467F8B3B9D297A0B351F207588B"
     },
     {
       "file": ".github/workflows/assurance-targeted.yml",
@@ -57,7 +57,7 @@
       "purpose": "qualification",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "A7C432B94B46B81490052DF05A4903BDB9158B382D0E3C0FA1A83D090B3AFA42"
+      "sha256": "FB278AE974BB6B404D28451B74A848541C446AC4A7E16B0E9373C225C73C8668"
     },
     {
       "file": ".github/workflows/branch-policy.yml",
@@ -73,7 +73,7 @@
       "purpose": "qualification",
       "surface": "private-reusable",
       "invocation": "private-reusable-workflow",
-      "sha256": "F45594DA81F08FB57745040B14F5F738FE4816A66BA175BE445762839FF1234F"
+      "sha256": "1FDDA4EBFDDCF5B0D4C4407278EBD127342DA73EBD696C993BFA0662E5C5069A"
     },
     {
       "file": ".github/workflows/emergency-package.yml",
@@ -81,7 +81,7 @@
       "purpose": "release",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "AF3B982EE58208149F3E4B737CFEAA0BEC8CC3B1E206DA7A741D4E3DDAEF4E49"
+      "sha256": "1F5C6D506E787BC196C0F2182BEF86D7146C371BC1EF1F0F8A58D2F4B3118FFB"
     },
     {
       "file": ".github/workflows/extended-compat-audit.yml",
@@ -177,7 +177,7 @@
       "purpose": "release",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "E8D63D687601D1889CAB08619FF08897E92416BF57B56FD87A7268F2B99D49DC"
+      "sha256": "744EE9AAB1C337F3F24F1227FD0637406A1ACF4F748DEC924A7CDD90A3EF173F"
     },
     {
       "file": ".github/workflows/validate.yml",
@@ -185,7 +185,7 @@
       "purpose": "ci",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "5A6FB2CD13CE97420018908D9707B5D0C068AD7203BD12ADC107B1B8630315FC"
+      "sha256": "B2E1F5B052E8A27AC8506282A212016498AEB15007FA15B42E4307996BF04605"
     }
   ],
   "summary": {
@@ -211,5 +211,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a3b35dd6bdee9a86644a2a81bb77b67a2640e10429fe6efdf98cf63896202336"
+  "digest": "sha256:5ec15eb50d3679c21ccf59c6fd721f6141145818ad4e711bbd10c1ef8985475e"
 }

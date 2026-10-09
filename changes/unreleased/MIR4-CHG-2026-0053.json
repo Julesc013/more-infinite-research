@@ -1,0 +1,34 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0053",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Reuse the current decoded settings import across effective startup-setting reads.",
+  "details": [
+    "The startup reader keeps one decode for unchanged import text and helper codec identities, including invalid imports, and releases it for empty or absent imports.",
+    "Current setting registration and catalog validation still run for every read. Invalid or unavailable entries retain direct-setting fallback, false and zero values retain their values, and no startup setting is mutated.",
+    "Controlled API call counts cover reuse and invalidation. The existing native profile round-trip fixture now covers repeated effective reads and changed text; exact MIR 4.2.1 native package and performance qualification remains pending."
+  ],
+  "semantic_domains": ["settings", "performance"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The composed package ships the shared startup reader and profile codec."},
+    {"target":"F200","disposition":"affected","reason":"The composed package ships the shared startup reader and profile codec."},
+    {"target":"F110","disposition":"omitted-by-capability","reason":"Shared module bytes are present, but the platform adapter disables portable settings profiles."},
+    {"target":"F100","disposition":"omitted-by-capability","reason":"Shared module bytes are present, but the platform adapter disables portable settings profiles."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"The reduced target omits portable settings profiles."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"The reduced target omits portable settings profiles."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"The reduced target omits portable settings profiles."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"The reduced target omits portable settings profiles."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"The reduced target omits portable settings profiles."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"compatible","settings":"compatible","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/startup_settings_decode_reuse.lua: controlled API reuse and invalidation"},
+    {"kind":"finding","value":"fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua: native codec repeated reads and changed text; qualification pending"}
+  ]
+}

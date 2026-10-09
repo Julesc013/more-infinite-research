@@ -5,14 +5,28 @@ param(
   [string]$PriorRelease = "dist\more-infinite-research_3.2.0.zip",
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
-  [string]$LocalModZipDir = "C:\Projects\Factorio\testmods_2.1",
+  [string]$LocalModZipDir = "",
   [string]$OutputPath = ".mir\evidence\3.2.1-performance-regression.json",
   [string]$ArtifactRoot = "",
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
   [ValidateRange(5, 25)][int]$MeasuredRuns = 5,
   [switch]$ProbeSmokeOnly,
-  [string]$CompatSmokeLaneId = ""
+  [string]$CompatSmokeLaneId = "",
+  [switch]$ObserveResearchAll,
+  [switch]$PrepareResearchAllInputs,
+  [ValidateSet('f200','f210')][string]$Target='f210',
+  [string]$SourceMaterializationPath='',
+  [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB=1024,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
 )
+
+if($ObserveResearchAll -or $PrepareResearchAllInputs){
+  . (Join-Path $RepoRoot 'tools/lib/validation/ResearchAllPerformance.ps1')
+  Invoke-MIRResearchAllPerformance -RepoRoot $RepoRoot -Target $Target -Candidate $Candidate -PriorRelease $PriorRelease -FactorioBin $FactorioBin -ExpectedSourceCommit $ExpectedSourceCommit -LibraryDirectory $LocalModZipDir -SourceMaterializationPath $SourceMaterializationPath -OutputRoot $ArtifactRoot -PrepareInputsOnly:$PrepareResearchAllInputs -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+  return
+}
+
+throw '[mir-native-obsolete-runner] The legacy performance campaign stages populated mod directories. Use an explicitly selected direct-library native consumer; this campaign must be migrated before it can provide new performance evidence.'
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "validation\ReleaseAttestations.ps1")
@@ -159,7 +173,7 @@ function Copy-MIRCampaignProbe {
   if ([string]$info.name -ne "mir-fixture-performance-regression-probe") {
     throw "Performance probe metadata has an unexpected mod identity."
   }
-  $minimumBase = if ($FactorioLine -eq "2.1") { "2.1.8" } else { "2.0.0" }
+  $minimumBase = if ($FactorioLine -eq "2.1") { "2.1.18" } else { "2.0.0" }
   $info.factorio_version = $FactorioLine
   $info.dependencies = @("base >= $minimumBase", "more-infinite-research")
   $info | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $infoPath -Encoding UTF8
@@ -451,11 +465,9 @@ $campaignFile = Resolve-MIRCampaignPath -Path $CampaignPath
 $script:CandidatePath = Resolve-MIRCampaignPath -Path $Candidate
 $script:PriorPath = Resolve-MIRCampaignPath -Path $PriorRelease
 $script:FactorioPath = Resolve-MIRCampaignPath -Path $FactorioBin
-$script:LocalLibraryPath = Resolve-MIRCampaignPath -Path $LocalModZipDir
 $outputFile = Resolve-MIRCampaignPath -Path $OutputPath
 if (-not (Test-Path -LiteralPath $campaignFile -PathType Leaf)) { throw "Performance campaign manifest is absent: $campaignFile" }
 if (-not (Test-Path -LiteralPath $script:FactorioPath -PathType Leaf)) { throw "Factorio binary is absent: $script:FactorioPath" }
-if (-not (Test-Path -LiteralPath $script:LocalLibraryPath -PathType Container)) { throw "Local Factorio 2.1 mod library is absent: $script:LocalLibraryPath" }
 if ($ExpectedSourceCommit -notmatch '^[0-9A-Fa-f]{40}$') { throw "ExpectedSourceCommit must be a full Git commit." }
 
 $campaign = Get-Content -Raw -LiteralPath $campaignFile | ConvertFrom-Json
@@ -464,6 +476,13 @@ if ([int]$campaign.schema -ne 2 -or [string]::IsNullOrWhiteSpace([string]$campai
     -or -not ([string]$campaign.factorio_version).StartsWith([string]$campaign.factorio_line) `
     -or [string]$campaign.candidate.version -ne [string]$campaign.release) {
   throw "Performance campaign manifest does not declare a coherent governed target and candidate."
+}
+if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) {
+  $LocalModZipDir = Join-Path (Split-Path -Parent $RepoRoot) "testmods/$($campaign.factorio_line)"
+}
+$script:LocalLibraryPath = Resolve-MIRCampaignPath -Path $LocalModZipDir
+if (-not (Test-Path -LiteralPath $script:LocalLibraryPath -PathType Container)) {
+  throw "Local Factorio $($campaign.factorio_line) mod library is absent: $script:LocalLibraryPath"
 }
 
 $lanes = @($campaign.lanes)
@@ -541,9 +560,12 @@ if ($ProbeSmokeOnly) {
   if ($null -eq $lane) { throw "Performance campaign phase-source lane is absent." }
   $baselineProbe = Invoke-MIRCampaignLaneRun -Lane $lane -PackageLabel baseline -Phase "probe-smoke" -Index 1
   $candidateProbe = Invoke-MIRCampaignLaneRun -Lane $lane -PackageLabel candidate -Phase "probe-smoke" -Index 1
-  if ($null -eq $baselineProbe.probe -or $null -eq $candidateProbe.probe -or
-      $null -eq $candidateProbe.probe.telemetry -or
-      [string]$candidateProbe.probe.telemetry.evidence_sha256 -notmatch '^[0-9A-Fa-f]{64}$') {
+  if ($null -eq $baselineProbe.probe -or $null -eq $candidateProbe.probe) {
+    throw "Exact-archive performance probe smoke did not capture paired compiler phases."
+  }
+  if ($script:RequiresArtifactVolume -and
+      ($null -eq $candidateProbe.probe.telemetry -or
+       [string]$candidateProbe.probe.telemetry.evidence_sha256 -notmatch '^[0-9A-Fa-f]{64}$')) {
     throw "Exact-archive performance probe smoke did not capture candidate telemetry."
   }
   $smoke = [ordered]@{

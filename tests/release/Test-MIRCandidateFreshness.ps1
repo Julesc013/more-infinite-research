@@ -11,8 +11,11 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
+. (Join-Path $repo "tools\lib\validation\CurrentTargetPackage.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
 . (Join-Path $repo "tools\lib\control\Records.ps1")
+$currentPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target f210
+$currentPackageInfo = Get-MIR4CurrentTargetPackageOutputText -Context $currentPackage -RelativePath 'info.json' | ConvertFrom-Json
 
 function Get-MIRCandidateFields {
   param([Parameter(Mandatory)][string]$Text)
@@ -172,7 +175,7 @@ $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
 if (Test-Path -LiteralPath $sourceLockPath -PathType Leaf) {
   & (Join-Path $repo "tests\release\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
   $sourceLock = Get-Content -Raw -LiteralPath $sourceLockPath | ConvertFrom-Json
-  $currentInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $currentInfo = $currentPackageInfo
   if ([string]$currentInfo.version -eq [string]$sourceLock.mir_version -and
       [string]$currentInfo.factorio_version -eq [string]$sourceLock.target) {
     Write-Host "[ok] MIR target-line freshness is governed by the validated backport source lock."
@@ -181,7 +184,7 @@ if (Test-Path -LiteralPath $sourceLockPath -PathType Leaf) {
   Write-Host "[check] historical backport source lock is valid; continuing with the current-line candidate freshness gate."
 }
 
-$activeInfo = Get-Content -Raw -LiteralPath (Join-Path $repo 'info.json') | ConvertFrom-Json
+$activeInfo = $currentPackageInfo
 $activeProfilePath = Join-Path $repo "validation\profiles\factorio-$([string]$activeInfo.factorio_version).json"
 $activeProfile = Get-Content -Raw -LiteralPath $activeProfilePath | ConvertFrom-Json
 if ([string]$activeProfile.execution_context_mode -eq 'development-context') {
@@ -342,7 +345,7 @@ if ($status -eq "package-built") {
   if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
     throw "Package-visible paths changed after the package-built freeze: $($changedPackagePaths -join ', ')"
   }
-  $packageInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $packageInfo = $currentPackageInfo
   $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
   $release = Get-Content -Raw -LiteralPath (Join-Path $repo (Join-Path $releaseRecordRoot "$($packageInfo.version).json")) | ConvertFrom-Json
   $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
@@ -393,7 +396,7 @@ if ($status -eq "maintainer-accepted-emergency") {
 
   $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
   $artifactPath = Join-Path $repo $artifactRelative
-  $currentInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $currentInfo = $currentPackageInfo
   $admittedEmergencyStates = @(
     "manually-accepted",
     "protected-qualified",
@@ -560,7 +563,7 @@ if ($status -eq "release-candidate-awaiting-external-qualification") {
     throw "Upgrade-matrix evidence is not an exact five-archetype passing binding for the candidate."
   }
 
-  $packageInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $packageInfo = $currentPackageInfo
   $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
   $release = Get-Content -Raw -LiteralPath (Join-Path $repo (Join-Path $releaseRecordRoot "$($packageInfo.version).json")) | ConvertFrom-Json
   if ([string]$release.state -ne "focused-qualified" -or [string]$release.candidate_id -ne "C32" -or
@@ -574,7 +577,7 @@ if ($status -eq "release-candidate-awaiting-external-qualification") {
   exit 0
 }
 
-$info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$info = $currentPackageInfo
 $profile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion ([string]$info.factorio_version)
 $requiredGroups = @($profile.required_validation_groups | ForEach-Object { [string]$_ } | Sort-Object -Unique)
 

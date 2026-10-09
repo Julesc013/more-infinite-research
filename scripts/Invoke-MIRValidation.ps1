@@ -3,6 +3,7 @@ param(
   [string]$FactorioLog = $env:FACTORIO_LOG,
   [string]$UserDataDir = $env:FACTORIO_USERDATA,
   [string]$CandidateZip = "",
+  [string]$LibraryDirectory = "",
   [switch]$DocsOnly,
   [switch]$ManifestsOnly,
   [switch]$ArchitectureOnly,

@@ -34,6 +34,31 @@ local operations = repair.plan(reported_shape, {astroponics = "1.7.3", ["planet-
 if #operations ~= 1 or operations[1].id ~= "muluna-astroponics-space-science-cycle" then
   fail("bounded Muluna and Astroponics repair was not selected")
 end
+
+local injected_operation_shape = {
+  astroponics = {prerequisites = {"landfill", "space-science-pack"}},
+  unrelated = {prerequisites = {"must-remain"}}
+}
+repair.apply_plan({
+  {
+    id = "muluna-astroponics-space-science-cycle",
+    technology = "unrelated",
+    remove_prerequisite = "must-remain",
+    evidence = "astroponics+planet-muluna:mutual-prerequisite-path"
+  },
+  {
+    id = "muluna-astroponics-space-science-cycle",
+    technology = "astroponics",
+    remove_prerequisite = "space-science-pack",
+    evidence = "forged-mutual-prerequisite-path"
+  }
+}, injected_operation_shape)
+if #injected_operation_shape.unrelated.prerequisites ~= 1
+  or injected_operation_shape.unrelated.prerequisites[1] ~= "must-remain"
+  or #injected_operation_shape.astroponics.prerequisites ~= 2 then
+  fail("undeclared repair operation mutated a prerequisite")
+end
+
 repair.apply_plan(operations, reported_shape)
 local repaired = inspect(reported_shape, {root = true})
 if repaired.external_cycle_count ~= 0 then fail("repaired graph retained an external cycle") end

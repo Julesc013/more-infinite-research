@@ -122,9 +122,9 @@ function Invoke-MIR4ApplicationCommandGroup {
             & (Join-Path $repo "tools/mir/cli/Invoke-MIR4Factorio21Channel.ps1") @channelArguments
           }
           "package-source" {
-            if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline, baseline-check, shadow, shadow-check, model, model-check, materialize, materialize-check, runtime-replay, or runtime-replay-check." }
+            if ($Args.Count -lt 3) { throw "mir4 package-source requires refresh, refresh-check, baseline, baseline-check, shadow, shadow-check, model, model-check, materialize, materialize-check, runtime-replay, or runtime-replay-check." }
             $subcommand = [string]$Args[2]
-            if ($subcommand -notin @('baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')) { throw "Unknown mir4 package-source command: $subcommand" }
+            if ($subcommand -notin @('refresh','refresh-check','baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')) { throw "Unknown mir4 package-source command: $subcommand" }
             $packageSourceArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
             $output = Get-MIRArgValue -Items $Args -Name '--output'
             if (-not [string]::IsNullOrWhiteSpace($output)) { $packageSourceArguments.OutputPath = $output }
@@ -141,6 +141,17 @@ function Invoke-MIR4ApplicationCommandGroup {
               if (-not [string]::IsNullOrWhiteSpace($value)) { $packageSourceArguments[$option.property] = $value }
             }
             & (Join-Path $repo "tools/mir/cli/Invoke-MIR4PackageSource.ps1") @packageSourceArguments
+          }
+          "distribution" {
+            if ($Args.Count -lt 3) { throw "mir4 distribution requires status, verify, or restore." }
+            $subcommand = [string]$Args[2]
+            if ($subcommand -notin @('status','verify','restore')) { throw "Unknown mir4 distribution command: $subcommand" }
+            $distributionArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+            foreach ($option in @(@{name='--version';property='Version'},@{name='--output';property='OutputRoot'},@{name='--cache-root';property='CacheRoot'})) {
+              $value = Get-MIRArgValue -Items $Args -Name $option.name
+              if (-not [string]::IsNullOrWhiteSpace($value)) { $distributionArguments[$option.property] = $value }
+            }
+            & (Join-Path $repo "tools/mir/cli/Invoke-MIR4DistributionCustody.ps1") @distributionArguments
           }
       default { throw '[mir4-router-application-command]' }
     }

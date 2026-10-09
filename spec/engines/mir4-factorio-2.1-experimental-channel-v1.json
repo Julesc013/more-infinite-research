@@ -8,7 +8,7 @@
     "channel": "latest-experimental",
     "source": "official-steam-current-installation",
     "patch_pinned": false,
-    "minimum_version": "2.1.8",
+    "minimum_version": "2.1.18",
     "rule": "select-latest-installed-official-2.1-experimental",
     "stable_transition": "stop-and-reopen-policy-when-official-2.1-stable-appears"
   },
@@ -38,34 +38,90 @@
   },
   "current_review": {
     "status": "reviewed-current-observation",
-    "reviewed_at": "2026-09-01",
-    "previous_version": "2.1.14",
-    "version": "2.1.17",
-    "file_version": "2.1.17.87315",
-    "binary_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
-    "runtime_api": {"application_version": "2.1.17", "sha256": "2E1FD436404B712AF6FE7B6C53E21A8F5688092A9E132FD2A5571327A96E5211", "surface_count": 382},
-    "prototype_api": {"application_version": "2.1.17", "sha256": "156F33CB4BC7EE2C538BB93F291F5270F2CDC45BE654BBE6F226E402BF8F5368", "surface_count": 982},
-    "changelog_sha256": "10CC3B613AD653B11FBDA0A6D9D9CE2FD9D7EA334B5240707AE4F5FA58EFE07C",
+    "reviewed_at": "2026-10-08",
+    "previous_version": "2.1.20",
+    "version": "2.1.21",
+    "file_version": "2.1.21.87673",
+    "binary_sha256": "703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1",
+    "runtime_api": {
+      "application_version": "2.1.21",
+      "sha256": "F21602449EC6C077AFB4A26311EF075AF7AEDB8C067D53B9CC87EFCCCA4D761F",
+      "surface_count": 383
+    },
+    "prototype_api": {
+      "application_version": "2.1.21",
+      "sha256": "5ABE17BC8797770AB6C7CEB0CBE4348AB3B716EFEF59C7EE3E539596337132E6",
+      "surface_count": 982
+    },
+    "changelog_sha256": "F6256F393B0033577303BEA1D93B82687D6740D5942A095A8F19023BB8477108",
     "review_tasks": [
-      {"id": "capture-exact-engine-identity", "status": "complete", "disposition": "Recorded 2.1.17.87315 and the exact executable and API-document digests."},
-      {"id": "diff-release-notes", "status": "complete", "disposition": "Reviewed the installed 2.1.15, 2.1.16, and 2.1.17 entries relative to 2.1.14."},
-      {"id": "diff-runtime-api", "status": "complete", "disposition": "Reviewed the 2.1.15 scripting additions and replacements; no current MIR call site requires an immediate compatibility edit."},
-      {"id": "diff-prototype-api", "status": "complete", "disposition": "Reviewed new ghost and rocket-silo fields plus circuit-connector moves; MIR has no current references to the removed fields."},
-      {"id": "review-removals-and-deprecations", "status": "complete", "disposition": "Repository search found no LuaGroup, LuaSimulation widget, or removed circuit-connector field dependency."},
-      {"id": "review-implementation-opportunities", "status": "complete", "disposition": "LuaEntity potential_effects is retained as a future Inspector and effect-observability opportunity, not an F2D semantic change."},
-      {"id": "review-functionality-opportunities", "status": "complete", "disposition": "LuaControl opened, completed platform trips, and on_next_day_started do not improve the current package fixed-point scope; reconsider in integration work."},
-      {"id": "review-fixture-and-test-impact", "status": "complete", "disposition": "F210 replay must retain prerequisite and current-research assertions because 2.1.15 changed a Space Age technology prerequisite and 2.1.17 fixed lab-set research state."},
-      {"id": "review-runtime-upgrade-and-performance-impact", "status": "complete", "disposition": "No direct API migration is required; exact 2.1.17 fresh-load, upgrade, two-reload, and performance evidence cannot reuse 2.1.14 execution proof."},
-      {"id": "review-documentation-locale-and-ui-impact", "status": "complete", "disposition": "No immediate player-facing text change is required; new GUI-opening support remains a future read-only Inspector candidate."},
-      {"id": "review-minimum-mod-compatibility", "status": "complete", "disposition": "The 2.1.8 floor remains valid for the reproduced 4.0.21000 product; future use of newer APIs may raise the declared floor through a qualified change."},
-      {"id": "check-official-stable-transition", "status": "complete", "disposition": "The governing decision remains latest experimental until a separately confirmed official 2.1 stable transition triggers maintainer review."}
+      {
+        "id": "capture-exact-engine-identity",
+        "status": "complete",
+        "disposition": "Recorded installed Steam experimental 2.1.21.87673, executable, both API documents and changelog by the exact hashes below. The governed native version query records Steam build 25749703; this is execution admission, not gameplay qualification."
+      },
+      {
+        "id": "diff-release-notes",
+        "status": "complete",
+        "disposition": "Reviewed all 67 installed 2.1.21 changelog entries after 2.1.20, including 12 change, modding or scripting opportunities. Relevant fixes include save/shutdown, force merge, GUI margins and recycling time; their affected runtime scenarios still require exact current-engine evidence."
+      },
+      {
+        "id": "diff-runtime-api",
+        "status": "complete",
+        "disposition": "Compared the official 2.1.20 runtime document (1FF275CC085347FAFDDC01B5BA53DF10259319339E78CD6E5B4E0D067E1DAEB6) with the installed 2.1.21 document; both have 383 surfaces. Reviewed grid-field rename, mine-entity trigger array, element-type changes, circuit and death-notification additions, Blueprint fix_positions and TechnologyModifier.hidden. MIR checks trigger presence without dereferencing the changed entity field; no removed member is consumed."
+      },
+      {
+        "id": "diff-prototype-api",
+        "status": "complete",
+        "disposition": "Compared the official 2.1.20 prototype document (5D2AAB6483F33D1582D2FDFD661B4B9F6FF6A1F97548311524D062ECC32F200B) with installed 2.1.21; both have 982 surfaces. Reviewed ProxyContainer direction/connector and picture changes, boiler validation, FluidWagon offsets, animation and night-vision additions, and recycling alias documentation. MIR constructs none of these affected prototypes in the selected cap fixtures."
+      },
+      {
+        "id": "review-removals-and-deprecations",
+        "status": "complete",
+        "disposition": "No source or selected cap-fixture consumer uses LuaEntityPrototype.building_grid_bit_shift, the removed quality-suffixed element types or boiler runtime filter mutation. Research Library, graph and science readers use only research-trigger presence or transport the table; they do not dereference the renamed runtime mine-entity field. No compatibility migration is indicated."
+      },
+      {
+        "id": "review-implementation-opportunities",
+        "status": "complete",
+        "disposition": "TechnologyModifier.hidden and new circuit/rendering controls are optional future opportunities, not newly required MIR APIs. The recycler resolves recycle_to_ingredients_of during its data-updates stage; MIR index/recycling.lua reads actual recipe ingredients/results during MIR data-final-fixes and recipe_risk_facts retains recycling_loop. No speculative alias implementation is added and arbitrary later foreign finalizers are not certified."
+      },
+      {
+        "id": "review-functionality-opportunities",
+        "status": "complete",
+        "disposition": "Reviewed selector-combinator, platform drag/damage, pipette, machine sound and night-vision additions. They do not implement an accepted MIR research outcome by themselves. Preserve existing research, cap ownership and Library appearance; any new use requires separate product admission and native evidence."
+      },
+      {
+        "id": "review-fixture-and-test-impact",
+        "status": "complete",
+        "disposition": "Preserve cap ownership, foreign-disabled research, queue/progress, force creation/reset/merge and reload assertions. Admit the exact 2.1.21 engine and five bundled mod info identities for the existing two cap harnesses. The converted direct-library multiforce runner needs a fresh current-package run; the still-retired V2/V3 runner remains blocked by its storage guard."
+      },
+      {
+        "id": "review-runtime-upgrade-and-performance-impact",
+        "status": "complete",
+        "disposition": "Save/shutdown and force-merge bug fixes require current-engine runtime evidence. Recycling-time fixes affect timing, not MIR return-quantity ratios. Existing 2.1.21 candidate-C upgrade and research-all observations retain their own exact inputs and limits; this review neither transfers 2.1.20 results nor grants full performance, multiplayer or release acceptance."
+      },
+      {
+        "id": "review-documentation-locale-and-ui-impact",
+        "status": "complete",
+        "disposition": "Reviewed GUI margin, technology/Factoriopedia closure and tooltip fixes plus new hidden modifier metadata. No changed API requires a MIR locale or widget rewrite. Preserve accepted Library design and retain actual graphical/client checks; source review alone does not prove interaction or missing-DLC graphics."
+      },
+      {
+        "id": "review-minimum-mod-compatibility",
+        "status": "complete",
+        "disposition": "The declared MIR F210 minimum remains 2.1.18 and the existing cap fixture minimum remains 2.1.20. No mandatory 2.1.21-only API is adopted. Exact execution admission is 2.1.21 and does not change the support floor or authorize cross-version evidence reuse."
+      },
+      {
+        "id": "check-official-stable-transition",
+        "status": "complete",
+        "disposition": "The installed Steam manifest records BetaKey experimental, build 25749703 and StateFlags 4. The official Factorio download page inspected on 2026-10-08 lists stable 2.0.77 and experimental 2.1.21. Keep the stable-transition stop-and-reopen boundary; no stable 2.1 policy is inferred."
+      }
     ],
     "findings": [
-      "2.1.15 added EntityPrototype.ghost_build_sound and broadened RocketSiloPrototype.rocket_parts_storage_cap.",
-      "2.1.15 moved circuit-connector render-layer fields and removed their older type-specific locations.",
-      "2.1.15 added LuaEntity.potential_effects, LuaSpacePlatform.completed_trips, and on_next_day_started, and replaced LuaGroup with LuaItemGroup and LuaItemSubGroup.",
-      "2.1.15 changed a Space Age technology prerequisite; 2.1.17 fixed lab-set active-research state, both of which reinforce F2D prerequisite and research-state replay coverage.",
-      "No reviewed 2.1.15-2.1.17 API change requires an immediate MIR package semantic change. Opportunity candidates remain explicit and deferred rather than silently ignored."
+      "Exact 2.1.21.87673 engine/API/changelog and bundled-mod identities admit only the named cap harness execution; qualification and release boundaries remain closed.",
+      "The 67-entry changelog and both complete API deltas were reviewed against current source and selected cap fixtures; no mandatory product API migration was found.",
+      "Actual recycler-generated return recipes remain the safety input. This establishes the inspected stage boundary, not universal compatibility or new route qualification.",
+      "No 2.1.20 native proof transfers. Current-package cap, force, save, graphical and client results must retain their exact engine and input identities.",
+      "The compatibility floor remains 2.1.18; the moving experimental selector and stable-transition stop remain unchanged."
     ]
   }
 }

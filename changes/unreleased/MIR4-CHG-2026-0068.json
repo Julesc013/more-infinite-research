@@ -1,0 +1,36 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0068",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Restore actual tooling module bounds and distinguish current contracts from frozen decomposition proofs.",
+  "details": [
+    "Historical decomposition checks authenticate the original characterization, exact receipt introduction and frozen module bytes. Current source bindings, function membership and physical line bounds are checked separately; frozen receipts and their ordered contract digests remain unchanged.",
+    "The unchanged archive-identity getter moves to the existing seal authority module. Candidate planning returns to 399 lines under its unchanged 400-line bound, preserving every production function body and the existing development-context callable.",
+    "The pre-freeze validator consumes one private succession component in its existing scope. All 843 extracted lines retain their exact text and order; the trailing blank separator stays at the call site. Both components remain under 1,000 lines. Actual read-only authority results and refusal behavior remain required.",
+    "Source-bound controls reject overflow, including an extra final line without a newline, invalid syntax, changed hashes and private functions or returns. This repository-only correction grants no native, package, release, signing, promotion or publication acceptance."
+  ],
+  "semantic_domains": ["tooling", "documentation"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."},
+    {"target":"F200","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."},
+    {"target":"F110","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."},
+    {"target":"F100","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."},
+    {"target":"F017","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."},
+    {"target":"F016","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."},
+    {"target":"F015","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."},
+    {"target":"F014","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."},
+    {"target":"F013","disposition":"unaffected","reason":"Repository tooling and source-contract corrections leave this target's player source and package construction unchanged."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1"},
+    {"kind":"finding","value":"tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

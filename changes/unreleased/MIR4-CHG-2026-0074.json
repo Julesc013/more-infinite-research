@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0074",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Apply Space Is Fake science retirement to weapon and laboratory research continuations.",
+  "details": [
+    "Weapon shooting speed 7 and Lab research speed 7 could retain space science because their base-continuation ingredient policy omitted the stream identity.",
+    "The shared qualifier and F200 adapter now apply compatibility exclusions after configured or expanded science selection, preserving upstream units, finite prerequisites, stable identities and mandatory progression packs.",
+    "Controlled regressions cover both planned level-7 technologies under all seven expansion settings and opposing ordinary-science and hard-gate cases. Exact native package, predecessor upgrade and reload qualification remains pending."
+  ],
+  "semantic_domains": ["science", "progression", "compatibility", "documentation"],
+  "audiences": ["players", "contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Shared continuation planning consumes the science-retirement policy."},
+    {"target":"F200","disposition":"affected","reason":"The existing F200 continuation adapter consumes the same exclusion policy."},
+    {"target":"F110","disposition":"affected","reason":"Uses the shared ingredient policy; historical Space Is Fake support is not inferred."},
+    {"target":"F100","disposition":"affected","reason":"Uses the shared ingredient policy; historical Space Is Fake support is not inferred."},
+    {"target":"F017","disposition":"affected","reason":"Composes the shared F100 ingredient policy; historical Space Is Fake support is not inferred."},
+    {"target":"F016","disposition":"affected","reason":"Composes the shared F100 ingredient policy; historical Space Is Fake support is not inferred."},
+    {"target":"F015","disposition":"affected","reason":"Composes the shared F100 ingredient policy; historical Space Is Fake support is not inferred."},
+    {"target":"F014","disposition":"affected","reason":"Composes the shared F100 ingredient policy; historical Space Is Fake support is not inferred."},
+    {"target":"F013","disposition":"affected","reason":"Composes the shared F100 ingredient policy; historical Space Is Fake support is not inferred."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"compatible","settings":"none","migration":"none","compatibility":"compatible","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"SIF-01: https://mods.factorio.com/mod/more-infinite-research/discussion/6ab6af245dc9150e0f1459aa"},
+    {"kind":"document","value":"docs/releases/mir42-playtest-findings.md#space-is-fake-continuation-follow-up"},
+    {"kind":"finding","value":"tests/compiler/community_hotfix.lua"}
+  ]
+}

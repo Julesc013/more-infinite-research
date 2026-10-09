@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "kind": "MIR4F210CurrentBobTinLevelFourContinuationV1",
+  "scope": "F210 exact 2.1.20 Bob-only Tin fourth-level material continuation, quantitative productivity effect, and one save/reload observation; package-excluded fixture evidence",
+  "target": {
+    "factorio_version": "2.1.20",
+    "engine_sha256": "E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92",
+    "stage": "build/tests/wed-material-f210/current-bob-20260930",
+    "stage_settings_sha256": "EC7213A2125DC5ADFF95C8BCCEDCB142C405D12B727CD122E3287AEB874C458B",
+    "official_mods": ["base", "elevated-rails", "quality", "recycler", "space-age"],
+    "archives": [
+      {"name": "boblibrary", "file": "boblibrary_3.0.1.zip", "version": "3.0.1", "sha256": "3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B"},
+      {"name": "bobores", "file": "bobores_3.0.0.zip", "version": "3.0.0", "sha256": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B"},
+      {"name": "bobplates", "file": "bobplates_3.0.2.zip", "version": "3.0.2", "sha256": "0C9A4910E2DCAA8DCABBE5BFFA67333F214EAB2EFD8C798D5EF84D90B691862D"},
+      {"name": "bobelectronics", "file": "bobelectronics_3.0.1.zip", "version": "3.0.1", "sha256": "50C2718E38D507CF4D4ACA2DBFE3240997172309413397C9C70083BBAE6927BE"},
+      {"name": "bobtech", "file": "bobtech_3.0.0.zip", "version": "3.0.0", "sha256": "397D979976316C3CE082D2AD29A046CCBAA147E412A0AEB727230BDECF665E5B"}
+    ]
+  },
+  "technology": {
+    "legacy": "recipe-prod-research_material_tin-1",
+    "legacy_completed_levels": 3,
+    "continuation": "recipe-prod-research_material_tin-4",
+    "continuation_first_level": 4,
+    "continuation_max_level": "infinite",
+    "recipe": "bob-tin-plate",
+    "change_per_completed_level": 0.02,
+    "legacy_bonus": 0.06,
+    "bonus_after_level_four": 0.08
+  },
+  "manufacturing_witness": {
+    "machine": "stone-furnace",
+    "input": "bob-tin-ore",
+    "input_count": 100,
+    "output": "bob-tin-plate",
+    "expected_output_after_level_four": 108
+  },
+  "required_flow": [
+    "add_research-then-levelled-completion-for-legacy-levels-one-and-two",
+    "add_research-then-researched-completion-for-finite-legacy-level-three",
+    "add_research-then-levelled-completion-for-continuation-level-four",
+    "data-stage-continuation-prerequisite-and-lab-input-validation",
+    "fresh-create",
+    "one-bounded-reload-with-saved-state-and-quantitative-output-observation"
+  ],
+  "explicit_non_claims": [
+    "Angel-or-combined-Bob-Angel-admission",
+    "late-science-frontier-for-the-current-Bob-Angel-tuple",
+    "all-material-continuations",
+    "full-science-pack-production-playthrough",
+    "multiplayer-or-second-force-isolation",
+    "research-browser",
+    "upgrade-or-migration",
+    "release-readiness"
+  ]
+}

@@ -5,7 +5,7 @@ applies_to: "4.0.0 candidate programme"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-28
+last_reviewed: 2026-09-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -36,7 +36,7 @@ The preview is physically split across visible roots. `tools/mir/application/com
 
 API/SDK V1 carries nine copied, bounded, capability-labelled surfaces. MEP V1 adds 12 typed data fragments. The reference extension and Inspector are synthetic first-party conformance consumers, packaged separately from the Factorio mod. Independent production-consumer acceptance remains open for component graduation. V0 is retained only for V0-to-V1 migration testing.
 
-ProcessIR V1 derives deterministic process identities, exact/bounded flows, catalysts, returned containers, recycling/recovery classifications, self-intersections, SCCs, and minimal witnesses from copied canonical fact transports. It preserves terminal risk fingerprints and treats incomplete evidence as `UNKNOWN`. The repository currently has only a synthetic fixture corpus, so exact-target parity is explicitly blocked.
+ProcessIR V1 derives deterministic process identities, exact/bounded flows, catalysts, returned containers, recycling/recovery classifications, self-intersections, SCCs, and minimal witnesses from copied canonical fact transports. It preserves terminal risk fingerprints and treats incomplete evidence as `UNKNOWN`. The immutable T12 reference contains ten exact captures and its historical F200 K2SO custody blocker. T13 resolves that custody blocker and records all eleven captures reproduced twice. These exact locks and observations remain package-excluded preview evidence; they do not authorize player mutation or broader support. See [the ProcessIR capture and custody boundary](mir4-processir-synthesis.md#exact-t12-and-t13-evidence).
 
 Autonomous synthesis V1 exposes ten descriptive constructors across Diagnose, Conservative, and Experimental modes. Known unsafe candidates fail hard safety, known safe candidates remain preview-admissible or explicitly quarantined, and no candidate becomes a player operation. Effect channels retain their existing semantic owners; opaque channels remain opaque.
 

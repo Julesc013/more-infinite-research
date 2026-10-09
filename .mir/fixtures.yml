@@ -111,6 +111,10 @@ local_campaign_manifest:
     - timeout_seconds
     - claim_level
     - required_stream_science
+    - runtime_fixtures
+    - required_reload_count
+    - max_reload_duration_seconds
+    - required_reload_log_fragments
   sanitation_budget:
     path: .mir/sanitation-budgets.json
     policy: mir-ecosystem-sanitation-budget-v1
@@ -162,6 +166,18 @@ real_mod_gates:
     status: required
 
 fixtures:
+  portable-research-surface-no-mir:
+    requires_features: []
+    path: fixtures/portable-research-surface-no-mir
+    shipped: false
+    validates:
+      - exact-canonical-copied-data-core
+      - generic-factorio-catalogue-dtos
+      - bounded-deterministic-filter-pagination-and-search
+      - bounded-detail-enrichment-fails-closed
+      - mir-provider-absence-removes-enrichment-only
+      - no-mir-private-state-or-package-dependency
+
   mir4-api-v0-conformance:
     requires_features: []
     path: fixtures/mir4-api-v0
@@ -342,6 +358,8 @@ fixtures:
       - exact-archive-paired-phase-timing
       - diagnostics-artifact-volume-export
       - baseline-candidate-symmetric-instrumentation
+      - runtime-research-all-first-and-repeat-native-profiler-observation
+      - runtime-research-all-event-count-and-exact-package-binding
 
   space-exploration-recipe-removal:
     requires_features: [recipe_productivity]
@@ -457,34 +475,284 @@ fixtures:
       - recycler-1-does-not-enter-generated-prerequisites
       - rejected-recycling-route-witnesses-remain-explainable
 
+  f200-science-researchability-diagnostic:
+    requires_features: []
+    assertion_path: fixtures/assert-f200-science-researchability-diagnostic
+    exact_real_campaign: local-2-0-bob-angels
+    validates:
+      - exact-f200-bob-angels-finalized-research-unlocked-logistic-science-route
+      - exact-same-unlocker-circuit-component-boiler-steam-and-typed-molten-solder-chain
+      - exact-four-generated-direct-effect-streams
+      - exact-five-military-science-lab-compatible-direct-effect-streams
+      - no-player-or-prototype-mutation-authority
+
+  f200-bob-angel-material-routes-observation:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-f200-bob-angel-material-routes-observation
+    exact_real_campaign: local-2-0-bob-angels
+    validates:
+      - exact-f200-bob-angel-sixteen-declared-material-effect-sets
+      - exact-f200-nickel-silver-reviewed-forward-route-guards
+      - finalized-route-observations-remain-package-excluded
+
+  f210-current-bob-angel-material-outcome-inventory:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-f210-current-bob-angel-final-routes-observer
+    notes:
+      - independent-finalized-raw-prototype-denominator-for-sixteen-requested-plate-and-alloy-outcomes
+      - supplementary-platinum-wire-cannot-satisfy-the-platinum-plate-request
+      - four-angel-petrochem-fluid-subjects-use-a-separate-typed-denominator
+      - producer-and-observation-gap-records-do-not-prove-acquisition-admission-or-earned-benefit
+      - exact-native-capture-and-package-qualification-remain-pending
+    validates:
+      - omitted-casting-route-is-detectable-without-consuming-mir-selected-family-sets
+      - hidden-research-locked-and-productivity-denied-producers-remain-observable
+      - prototype-absence-and-no-observed-producer-are-distinct
+      - bounded-read-only-inventory-and-staging-free-log-replay
+      - fluid-prototype-and-producer-identities-cannot-be-satisfied-by-same-named-items
+      - missing-candidate-status-cannot-close-an-independent-producer-gap
+      - canonical-package-fingerprint-and-raw-source-manifest-custody-remain-distinct
+
   k2-science-phase-policy:
     requires_features: []
     assertion_path: fixtures/assert-k2-science-phase-policy
     external_mod_identity: Krastorio2-spaced-out
     exact_real_campaigns:
       - local-2-1-krastorio-spaced-out
-      - local-2-0-krastorio-spaced-out
-    exact_endpoint_evidence:
-      lower: build/results/mir4-sol/sol06/k2so-f210-lower-v3
-      upper: build/results/mir4-sol/sol06/k2so-f210-upper-v3
-    bounded_version_envelopes:
+    player_authority:
+      target: f210
+      policy: K2SciencePhasePolicyV1
+      source: source/prototypes/mir/compatibility/policies/k2_science_phase.lua
+      root_v2_disposition: package-excluded-preview
+    exact_version_envelope:
       f210:
-        Krastorio2: ">=2.1.2 <2.1.3"
-        Krastorio2-spaced-out: ">=2.0.11 <2.0.14"
-      f200:
-        Krastorio2: absent
-        Krastorio2-spaced-out: ">=1.6.21 <1.6.22"
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.13"
     validates:
-      - target-specific-bounded-version-envelopes
-      - required-science-identity-capability-fingerprint
+      - shipped-f210-v1-exact-version-pair
       - no-behavior-when-k2-is-absent
-      - no-behavior-outside-the-bounded-version-envelopes
-      - factorio-2-0-standalone-profile-forbids-krastorio2
+      - no-behavior-outside-the-exact-version-pair
       - idempotent-mir-owned-technology-normalization
       - ingredient-order-shape-and-amount-preservation
+      - phase-trigger-witness-preservation-through-lab-selection
       - nonempty-normalized-ingredient-lists
       - production-and-utility-basic-card-removal
       - advanced-space-matter-and-singularity-early-pack-removal
+
+  k2-science-progressed-reload-a04:
+    requires_features: []
+    path: fixtures/assert-k2-science-progressed-reload-a04
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    exact_real_campaign: local-2-1-krastorio-spaced-out
+    exact_version_envelope:
+      Krastorio2: "2.1.2"
+      Krastorio2-spaced-out: "2.0.13"
+      more-infinite-research: "4.2.21000"
+    validates:
+      - exact-current-k2-k2so-and-mir-version-pair
+      - early-and-late-shipped-f210-science-lists
+      - fractional-current-research-at-42-percent
+      - queue-and-storage-survive-each-bounded-reload
+      - source-save-remains-byte-identical
+
+  k2-213-science-progressed-reload:
+    requires_features: []
+    path: fixtures/assert-k2-213-science-progressed-reload
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213
+    exact_version_envelope:
+      base: "2.1.20"
+      Krastorio2: "2.1.3"
+      Krastorio2-spaced-out: "2.0.13"
+      more-infinite-research: "4.2.21000"
+    implementation_policy: K2SciencePhasePolicyV3
+    qualification_status: unqualified
+    validates:
+      - exact-current-engine-k2-k2so-and-mir-tuple
+      - representative-early-and-late-final-emission-science
+      - fractional-current-research-at-42-percent
+      - queue-and-storage-survive-two-bounded-reloads
+      - source-save-remains-byte-identical
+      - historical-a04-fixture-and-proof-remain-distinct
+
+  f210-bob-tin-level4-continuation:
+    requires_features: []
+    path: fixtures/assert-f210-current-bob-tin-level4-continuation
+    harness: tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1
+    shipped: false
+    external_mod_identity: bobplates
+    qualification_status: unqualified
+    exact_version_envelope:
+      base: "2.1.21"
+      boblibrary: "3.0.1"
+      bobores: "3.0.0"
+      bobplates: "3.0.2"
+      bobelectronics: "3.0.1"
+      bobtech: "3.0.0"
+      more-infinite-research: "4.2.21001"
+    validates:
+      - explicit-current-engine-and-archive-hash-bindings
+      - direct-library-selection-with-private-default-or-pinned-settings
+      - preserved-finite-levels-one-through-three-and-level-four-continuation
+      - actual-plus-eight-percent-tin-recipe-productivity
+      - furnace-produces-108-plates-from-100-ore-through-one-bounded-reload
+      - original-2.1.20-dossier-and-historical-result-remain-distinct
+      - no-angel-combined-profile-or-broad-material-support-claim
+
+  k2-213-imersite-continuation:
+    requires_features: []
+    path: fixtures/assert-k2-213-imersite-continuation
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213-imersite-continuation
+    input_profile: fixtures/run-profiles/k2-213-imersite-f210.json
+    exact_version_envelope:
+      base: "2.1.21"
+      Krastorio2: "2.1.3"
+      Krastorio2-spaced-out: "2.0.13"
+      more-infinite-research: "4.2.21001"
+    qualification_status: unqualified
+    validates:
+      - exact-current-engine-k2-k2so-and-mir-tuple
+      - only-generated-mir-imersite-powder-continuation-from-level-four
+      - native-imersite-crystal-owner-and-effect-remain-outside-mir-domain
+      - legacy-level-three-current-research-queue-and-42-percent-progress-preserved
+      - actual-unmodified-crusher-output-after-reload-324-powder-and-sand-versus-300-from-equal-300-ore
+      - one-fresh-create-and-single-bounded-reload
+      - supplied-current-421-candidate-and-materialization-bindings-verified-without-a-new-zip
+      - explicit-flat-library-selection-with-no-dependency-staging
+      - portable-current-input-profile-without-historical-private-receipt
+      - one-owned-row-budget-governs-engine-version-create-and-reload
+      - witnessed-k2-return-paths-and-other-material-families-remain-withheld
+      - historical-a05-k2-imersite-proof-remains-distinct
+      - no-broad-k2-support-release-signing-or-publication-authority
+
+  k2-213-imersite-maintenance-upgrade:
+    requires_features: []
+    path: fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001
+    harness: tests/runtime/Test-MIRUpgrade.ps1
+    input_profile: fixtures/run-profiles/k2-213-imersite-f210.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - actual-published-ccc00-predecessor-custody-and-current-ccc01-candidate
+      - finite-imersite-domain-and-powder-six-percent-crystal-ten-percent-retained
+      - existing-copper-queue-and-completed-work-retained-before-continuation-completion
+      - published-default-cap-three-withholds-continuation-through-two-reloads
+      - explicit-zero-cap-shared-settings-override-preserved-through-upgrade
+      - newly-available-level-four-powder-continuation-earns-eight-percent
+      - level-five-queued-at-42-percent-through-two-distinct-native-reloads
+      - direct-master-library-with-no-dependency-staging-and-restored-controls
+      - no-natural-acquisition-production-throughput-or-broader-profile-claim
+
+  k2-213-imersite-continuation-migration:
+    requires_features: []
+    path: fixtures/assert-k2-213-imersite-continuation-migration
+    harness: tests/runtime/Test-MIRK2213ImersiteMigration.ps1
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213-imersite-continuation
+    exact_version_envelope:
+      base: "2.1.20"
+      Krastorio2: "2.1.3"
+      Krastorio2-spaced-out: "2.0.13"
+      more-infinite-research: "4.2.21000"
+    qualification_status: unqualified
+    validates:
+      - pinned-cap-three-profile-preserves-legacy-levels-one-through-three-and-powder-plus-0.06
+      - pinned-cap-three-profile-preserves-native-crystal-plus-0.10-and-withholds-continuation-at-absolute-cap
+      - controlled-cap-zero-copy-is-one-field-patched-and-bounded-by-finite-recipe-headroom
+      - cap-zero-profile-adds-PR-411-level-four-continuation-without-replacing-legacy-identity
+      - both-cap-profiles-preserve-stable-copper-level-three-queue-and-42-percent-progress-through-upgrade-and-reload
+      - original-V5-settings-source-remains-byte-identical-and-profile-hashes-are-recorded
+      - predecessor-and-current-candidate-archive-identities-are-pinned
+      - no-broad-k2-support-release-signing-or-publication-authority
+
+  k2-03-imersite-bounded:
+    requires_features: []
+    path: fixtures/assert-k2-03-imersite
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    exact_version_envelopes:
+      locked:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.13"
+        xy-k2so-enhancements-nulls-fork: "0.8.3"
+        more-infinite-research: "4.2.21000"
+      current-fresh-load-only:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.17"
+        more-infinite-research: "4.2.21000"
+    validates:
+      - exact-native-owner-preserved-for-imersite-crystal
+      - one-mir-owner-for-imersite-powder
+      - nineteen-final-imersite-route-dispositions
+      - hidden-return-route-remains-excluded
+      - exact-final-science-and-compatible-labs
+      - locked-save-survives-two-byte-identical-reloads-at-42-percent
+      - current-k2so-fresh-load-owner-and-route-parity-only
+      - no-infinite-broad-k2-or-release-authority
+
+  ric-marine-carbonisation:
+    requires_features: []
+    path: fixtures/assert-ric-marine-carbonisation
+    shipped: false
+    external_mod_identity: real-industrial-chemistry
+    exact_version_envelopes:
+      current:
+        base: "2.1.20"
+        real-industrial-chemistry: "0.36.1"
+        more-infinite-research: "4.2.21000"
+    validates:
+      - space-age-progression-mode-is-explicitly-locked
+      - marine-mode-exact-carbonisation-route-and-unique-productivity-owner
+      - effective-productivity-permission-and-final-input-output-shape
+      - two-percent-force-recipe-bonus-after-level-one
+      - researched-level-and-earned-bonus-survive-save-reload
+      - no-other-recipe-in-the-generated-technology-effect-domain
+      - sixteen-productivity-allowed-return-path-routes-stay-withheld
+      - continental-mode-withholds-marine-only-technology
+
+  k2-materials-bounded:
+    requires_features: []
+    path: fixtures/assert-k2-materials
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    exact_version_envelopes:
+      locked:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.13"
+        xy-k2so-enhancements-nulls-fork: "0.8.3"
+        more-infinite-research: "4.2.21000"
+      current:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.17"
+        more-infinite-research: "4.2.21000"
+    validates:
+      - exact-rare-silicon-and-glass-final-route-owners
+      - potential-return-paths-withheld-unless-exact-profile-locked-reviewed-forward-certificate-proves-a-bounded-ordinary-route
+      - exact-science-and-compatible-labs
+      - casting-ignored-by-productivity-and-paving-denials-retained
+      - three-forces-at-42-percent-survive-two-byte-identical-reloads-per-profile
+      - bounded-current-k2so-material-qualification-is-not-broader-k2so-enhancement-or-a06-support
+      - no-infinite-broad-k2-or-release-authority
+  mir4-a03-k2-k2so-f210-intake:
+    requires_features: []
+    path: fixtures/assert-k2-k2so-f210-intake
+    shipped: false
+    validates:
+      - exact-current-f210-k2-k2so-archive-closure
+      - post-finalizer-read-only-native-technology-observation
+      - exact-native-reference-prerequisites-and-ten-science-inputs
+      - exact-compatible-laboratory-input-sets
+      - effective-mir-debug-generation-report-startup-setting
+      - isolated-fresh-headless-create-with-zero-stderr
+      - observer-has-no-player-or-prototype-mutation-authority
+      - exact-environment-lock-includes-settings-helper-and-observer
+      - fresh-assurance-plan-capsule-result-and-runtime-proof-chain
+      - historical-attempts-preserved-separate-from-current-proof
 
   external-technology-cycle:
     requires_features: []
@@ -1120,6 +1388,631 @@ fixtures:
       - late-prototype-conflict-reported-and-refused
       - repeated-reload-idempotence
 
+  bob-tin-qualification:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-qualification
+    harness: tests/runtime/Test-MIRBobTinQualification.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-Bob-only-final-tin-recipe-route
+      - exact-smelting-machine-and-productivity-permission
+      - stable-unreleased-Tin-owner-and-runtime-enforced-level-three-cap
+      - no-byproduct-catalyst-return-or-recycling-route
+      - MIRSET1-imported-cap-three-overrides-distinguishable-direct-cap-two
+      - engine-current-level-two-fractional-and-queued-initialized-current-candidate-state
+      - initialized-current-candidate-state-loaded-twice
+    non_claims:
+      - F200
+      - Angel-or-combined-Bob-Angel
+      - PIPE-01
+      - infinite-continuation
+      - weighted-balance
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
+  bob-tin-production-gain:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-production-gain
+    harness: tests/runtime/Test-MIRBobTinProductionGain.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-Bob-only-finite-Tin-quantitative-production-gain-diagnostic
+      - exact-Bob-Tin-route-stone-furnace-and-single-MIR-owner
+      - exact-two-percent-per-completed-level-and-imported-cap-three
+      - drained-actual-machine-output-levels-zero-through-three-with-input-exhaustion
+      - baseline-cap-and-no-level-four-fail-closed-controls
+    non_claims:
+      - Angel-or-combined-Bob-Angel-admission
+      - route-safety-completion
+      - F200
+      - science-frontier-or-balance
+      - all-intended-machines-or-stages
+      - vertical-slice-obligation-three-completion
+      - upgrade-or-persisted-save-recovery
+      - multiplayer
+      - research-browser
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
+  bob-tin-machine-matrix:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-machine-matrix
+    harness: tests/runtime/Test-MIRBobTinMachineMatrix.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-exact-locked-Bob-only-finite-Tin-manufacturing-machine-matrix-diagnostic
+      - exact-six-placeable-usable-smelting-machine-data-stage-set-and-no-unadmitted-match
+      - exact-data-category-energy-placement-and-runtime-recipe-assignment-boundary
+      - drained-actual-ore-to-plate-output-on-every-admitted-machine-levels-zero-through-three
+      - exact-single-MIR-owner-imported-cap-three-and-no-level-four
+    non_claims:
+      - actual-gameplay-balance
+      - all-Bob-recipes-or-machine-stages
+      - Angel-or-combined-Bob-Angel-admission
+      - F200
+      - upgrade-or-migration
+      - infinite-continuation
+      - human-playtest
+      - release-readiness
+      - full-BA-07-or-PROG-01
+
+  bob-tin-progression-frontier:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-progression-frontier
+    harness: tests/runtime/Test-MIRBobTinProgressionFrontier.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-Bob-only-Tin-science-and-lab-progression-frontier-diagnostic
+      - exact-stable-anchor-owner-effect-cap-and-direct-prerequisite-observation
+      - exact-installed-science-pack-producers-and-direct-unlock-observation
+      - exact-present-non-hidden-compatible-lab-input-observation
+      - companion-stable-ID-allocation-and-emission-explicitly-blocked
+    non_claims:
+      - companion-stable-id-allocation-or-emission
+      - infinite-continuation-support
+      - progression-completion
+      - migration-or-save-state-transfer
+      - F200
+      - Angel-or-combined-Bob-Angel-admission
+      - multiplayer
+      - research-browser
+      - full-cross-target-parity
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
+  bob-tin-persisted-state:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-persisted-state
+    harness: tests/runtime/Test-MIRBobTinPersistedState.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-Bob-only-current-candidate-Tin-persisted-force-research-state-diagnostic
+      - exact-published-anchor-two-completed-levels-and-level-three-fractional-queue
+      - exact-raw-MIRSET1-effective-cap-and-sole-policy-binding
+      - two-serialized-server-save-successors-with-predecessor-hash-lineage
+      - terminal-cycle-two-reload-preserves-exact-force-research-state
+      - derived-earned-modifier-is-runtime-observed-anchor-effect-times-completed-levels
+    non_claims:
+      - older-candidate-upgrade-or-migration
+      - future-companion-or-infinite-continuation
+      - F200
+      - Angel-or-combined-Bob-Angel-admission
+      - multiplayer-or-second-force-isolation
+      - research-browser
+      - route-safety-or-balance
+      - science-frontier-or-progression-completion
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
+  bob-tin-browser-explanation:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-browser-explanation
+    harness: tests/runtime/Test-MIRBobTinBrowserExplanation.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-exact-locked-Bob-only-Tin-browser-explanation-diagnostic
+      - native-browser-refresh-after-LuaForce-reset-dispatch
+      - exact-public-owner-affected-recipe-compiler-disposition-science-and-scoped-route-exclusion-facts
+      - exact-current-effective-cap-and-next-level-effective-benefit-facts
+      - exact-MIRSET1-effective-default-raw-direct-source-and-restart-required-setting-comparison
+      - fresh-native-player-GUI-and-headless-DTO-execution-surfaces
+    non_claims:
+      - F200-Tin-qualification
+      - Angel-or-combined-Bob-Angel-route-coverage
+      - two-genuine-client-or-multiplayer-isolation
+      - vanilla-technology-tree-button-injection
+      - startup-hot-mutation
+      - full-A16-BA-07-or-PROG-01
+      - release-readiness
+
+  browser-personal-state-continuity:
+    requires_features: [scripted_techs, settings_profiles]
+    path: fixtures/assert-browser-personal-state-continuity
+    harness: tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.20"
+      mod_lock: base-only
+    validates:
+      - F210-exact-localhost-two-client-browser-personal-state-isolation
+      - bounded-browser-selected-subject-visibility-and-malformed-hidden-payload-preservation
+      - hidden-queued-technology-remains-on-identical-shared-force-queue
+      - exact-save-reload-and-two-client-reconnect-personal-view-continuity
+      - inert-configuration-change-personal-view-and-full-active-force-continuity
+      - literal-MIR-removal-and-readd-fail-closed-before-after-disposition
+    non_claims:
+      - F200
+      - Angel-or-combined-Bob-Angel-route-coverage
+      - remote-wide-network-behavior-beyond-observed-two-local-clients
+      - native-vanilla-technology-tree-mutation-or-injection
+      - queue-ownership-or-reorder
+      - F210-two-client-native-input-execution-not-established-under-single-Steam-identity
+      - full-PLAT-UI-01-A16-or-X11-closure
+      - release-readiness
+
+  f200-browser-personal-state-continuity:
+    requires_features: [scripted_techs, settings_profiles]
+    path: fixtures/assert-browser-personal-state-continuity
+    harness: tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: base-only
+    validates:
+      - F200-exact-localhost-two-client-browser-personal-state-isolation-through-scripted-fixture-interaction
+      - bounded-browser-selected-subject-visibility-and-malformed-hidden-payload-preservation
+      - hidden-queued-technology-remains-on-identical-shared-force-queue
+      - exact-save-reload-and-two-client-reconnect-personal-view-continuity
+      - inert-configuration-change-personal-view-and-full-active-force-continuity
+      - literal-MIR-removal-and-readd-fail-closed-before-after-disposition
+    non_claims:
+      - F210
+      - Angel-or-combined-Bob-Angel-route-coverage
+      - remote-wide-network-behavior-beyond-observed-two-local-clients
+      - native-vanilla-technology-tree-mutation-or-injection
+      - queue-ownership-or-reorder
+      - F200-two-client-native-input-execution-not-established-under-current-Windows-foreground-policy
+      - full-PLAT-UI-01-A16-or-X11-closure
+      - release-readiness
+
+  f200-bob-tin-production-gain:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-f200-bob-tin-production-gain
+    harness: tests/runtime/Test-MIRF200BobTinProductionGain.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: boblibrary-2.1.0_bobores-2.1.2_bobplates-2.1.1
+    validates:
+      - F200-Bob-only-finite-Tin-quantitative-production-gain-diagnostic
+      - exact-F200-Bob-Tin-route-stone-furnace-and-single-MIR-owner
+      - exact-two-percent-per-completed-level-and-imported-cap-three
+      - drained-actual-machine-output-levels-zero-through-three-with-input-exhaustion
+      - baseline-cap-and-no-level-four-fail-closed-controls
+    non_claims:
+      - F210
+      - Angel-or-combined-Bob-Angel-admission
+      - route-safety-completion
+      - science-frontier-or-balance
+      - infinite-continuation
+      - all-intended-machines-or-stages
+      - upgrade-or-persisted-save-recovery
+      - multiplayer
+      - research-browser
+      - full-cross-target-parity
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
+  f200-bob-tin-persisted-state:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-f200-bob-tin-persisted-state
+    harness: tests/runtime/Test-MIRF200BobTinPersistedState.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: boblibrary-2.1.0_bobores-2.1.2_bobplates-2.1.1
+    validates:
+      - F200-Bob-only-current-candidate-Tin-persisted-force-research-state-diagnostic
+      - exact-published-anchor-two-completed-levels-and-level-three-fractional-queue
+      - exact-raw-MIRSET1-effective-cap-and-create-stage-product-maximum-level-observation
+      - two-serialized-server-save-successors-with-predecessor-hash-lineage
+      - terminal-cycle-two-reload-preserves-exact-force-research-state
+      - derived-earned-modifier-is-runtime-observed-anchor-effect-times-completed-levels
+    non_claims:
+      - public-F200-support-or-local-playtest-admission
+      - row-level-source-policy-transport-or-uniqueness
+      - private-MIR-managed-state-binding-or-cardinality
+      - older-candidate-upgrade-or-migration
+      - future-companion-or-infinite-continuation
+      - F210
+      - Angel-or-combined-Bob-Angel-admission
+      - multiplayer-or-second-force-isolation
+      - research-browser
+      - route-safety-or-balance
+      - science-frontier-or-progression-completion
+      - full-X11-BA-07-or-PROG-01
+      - release-readiness
+
+  angel-tin-final-state-audit:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-angel-tin-final-state-audit
+    harness: tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: angelsrefining-2.1.2_angelsrefininggraphics-2.1.0_angelspetrochem-2.1.2_angelspetrochemgraphics-2.1.0_angelssmelting-2.1.1_angelssmeltinggraphics-2.1.0
+    validates:
+      - F210-Angel-only-final-tin-state-diagnostic
+      - exact-hidden-disabled-implicit-crafting-transformations
+      - no-ordinary-tin-ore-acquisition-route
+      - no-native-or-MIR-Tin-productivity-owner
+      - conditional-crafting-capability-is-not-reachability
+      - hidden-disabled-Tin-science-frontier-is-not-progression
+    non_claims:
+      - Bob-plus-Angel
+      - F200
+      - Angel-productivity-support-or-admission
+      - PIPE-01
+      - infinite-continuation
+      - weighted-balance
+      - full-BA-07-or-PROG-01
+      - release-readiness
+      - upgrade-or-persisted-save-recovery
+
+  bob-angel-tin-final-state-audit:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-bob-angel-tin-final-state-audit
+    harness: tests/runtime/Test-MIRBobAngelTinFinalStateAudit.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_angelsrefining-2.1.2_angelsrefininggraphics-2.1.0_angelspetrochem-2.1.2_angelspetrochemgraphics-2.1.0_angelssmelting-2.1.1_angelssmeltinggraphics-2.1.0
+    validates:
+      - F210-combined-Bob-Angel-final-tin-state-diagnostic
+      - exact-51-recipe-identity-and-raw-disabled-implicit-crafting-state-with-22-hidden-members
+      - exact-six-all-declared-final-plate-producer-identities-three-declared-recycling-producers-and-three-non-recycling-final-plate-transformations-and-12-ordinary-ore-producers
+      - catalyst-coolant-recycling-direct-plate-to-ore-edge-absence-and-MIR-potential-return-omission
+      - no-native-or-MIR-Tin-productivity-owner
+      - conditional-crafting-capability-and-prototype-frontier-are-not-reachability
+    non_claims:
+      - combined-productivity-admission
+      - MIR-emission
+      - F200
+      - gameplay-progression-or-reachability
+      - upgrade-or-persisted-save-recovery
+      - balance-or-process-safety
+      - PIPE-01
+      - infinite-continuation
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
+  bob-angel-tin-route-safety:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-bob-angel-tin-route-safety
+    harness: tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_angelsrefining-2.1.2_angelsrefininggraphics-2.1.0_angelspetrochem-2.1.2_angelspetrochemgraphics-2.1.0_angelssmelting-2.1.1_angelssmeltinggraphics-2.1.0
+    validates:
+      - F210-combined-Bob-Angel-Tin-independent-route-safety-diagnostic
+      - exact-six-declared-final-plate-producers-with-three-recycling-exclusions-and-three-non-recycling-unsafe-under-conservative-potential-return-certificate
+      - exact-eight-edge-witnesses-for-all-three-non-recycling-return-paths
+      - direct-plate-to-ore-edge-absence-is-distinct-from-Bob-MIR-potential-return-log-agreement
+      - synthetic-known-safe-and-malformed-search-node-edge-budget-fail-closed-controls-are-not-real-Tin-admissions
+      - Angel-classifications-remain-independent-checker-only-under-Factorio-cross-mod-private-require-isolation
+    non_claims:
+      - combined-productivity-admission
+      - MIR-emission
+      - F200
+      - gameplay-progression-or-reachability
+      - upgrade-or-persisted-save-recovery
+      - balance-or-process-safety
+      - PIPE-01
+      - infinite-continuation
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
+  a06-aluminium-final-state-matrix:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-a06-aluminium-final-state
+    harness: tests/runtime/Test-MIRA06AluminiumFinalState.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: bob-3.0.0-3.0.1_or_angel-2.1.0-2.1.2_or_combined-bob-angel-with-official-expansions
+    validates:
+      - F210-Bob-only-Aluminium-single-owner-route-and-red-green-progression
+      - F210-Angel-only-two-final-Aluminium-routes-single-owner-and-red-green-blue-progression
+      - exact-environment-resolved-item-icon-and-localised-name
+      - permission-unset-Angel-intermediates-remain-unowned
+      - F210-combined-Aluminium-all-three-routes-withheld-by-exact-acyclic-guard-reasons
+      - combined-hidden-Bob-route-and-ownerlessness-preserved
+    non_claims:
+      - combined-productivity-admission
+      - all-enabled-Bob-productivity-admission
+      - production-gain-or-balance
+      - predecessor-upgrade-or-migration
+      - infinite-continuation
+      - full-BA-01-or-A06-completion
+      - F200
+      - release-readiness
+
+  a06-bob-aluminium-qualification:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-a06-bob-aluminium-qualification
+    harness: tests/runtime/Test-MIRA06BobAluminiumQualification.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: official-expansions_boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_only
+    validates:
+      - F210-Bob-only-Aluminium-reviewed-forward-route-certificate
+      - exact-post-finalizer-canonical-risk-and-deterministic-IO-binding
+      - exact-single-owner-0.02-per-completed-tier-and-red-green-progression
+      - deterministic-100-102-104-106-production-at-completed-levels-0-through-3
+      - direct-cap-2-MIRSET1-effective-cap-3-and-no-level-four
+      - fresh-current-candidate-level-three-state-across-two-serialized-reloads
+    non_claims:
+      - predecessor-upgrade-or-migration
+      - Angel-or-combined-admission
+      - F200
+      - broader-route-safety-or-balance
+      - release-readiness
+
+  a06-bob-gold-qualification:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-a06-bob-gold-qualification
+    harness: tests/runtime/Test-MIRA06BobGoldQualification.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: official-expansions_boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_only
+    validates:
+      - F210-Bob-only-Gold-ordinary-acyclic-route-qualification
+      - exact-post-finalizer-canonical-risk-and-deterministic-item-fluid-IO-binding
+      - exact-single-owner-0.02-per-completed-tier-and-red-green-blue-progression
+      - deterministic-100-102-104-106-production-at-completed-levels-0-through-3
+      - direct-cap-2-MIRSET1-effective-cap-3-and-no-level-four
+      - fresh-current-candidate-level-three-state-across-two-serialized-reloads
+    non_claims:
+      - predecessor-upgrade-or-migration
+      - Angel-or-combined-admission
+      - F200
+      - broader-route-safety-or-balance
+      - progression-completion
+      - release-readiness
+
+  a06-bob-lead-qualification:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-a06-bob-lead-qualification
+    harness: tests/runtime/Test-MIRA06BobLeadQualification.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: official-expansions_boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_only
+    validates:
+      - F210-Bob-only-Lead-ordinary-acyclic-route-qualification
+      - exact-post-finalizer-canonical-risk-permission-IO-and-negative-alternative-binding
+      - exact-single-owner-0.02-per-completed-tier-and-red-green-blue-progression
+      - deterministic-100-102-104-106-production-at-completed-levels-0-through-3
+      - direct-cap-2-MIRSET1-effective-cap-3-and-no-level-four
+      - fresh-current-candidate-level-three-state-across-two-serialized-reloads
+    non_claims:
+      - predecessor-upgrade-or-migration
+      - Angel-or-combined-admission
+      - F200
+      - infinite-progression
+      - broader-route-safety-or-balance
+      - bob-lead-plate-2-quantitative-or-cycle-safety-investigation
+      - release-readiness
+
+  a06-bob-ordinary-alloys-qualification:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-a06-bob-ordinary-alloys-qualification
+    harness: tests/runtime/Test-MIRA06BobOrdinaryAlloysQualification.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: official-expansions_boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_only
+    validates:
+      - F210-Bob-only-five-ordinary-alloy-acyclic-route-qualifications
+      - exact-post-finalizer-canonical-risk-permission-owner-and-science-matrix
+      - exact-Brass-potential-return-negative-guard-and-zero-owner-effects
+      - Bronze-deterministic-250-255-260-265-production-at-completed-levels-0-through-3
+      - Bronze-direct-cap-2-MIRSET1-effective-cap-3-and-no-level-four
+      - Bronze-fresh-current-candidate-level-three-state-across-two-serialized-reloads
+    non_claims:
+      - predecessor-upgrade-or-migration
+      - Angel-or-combined-admission
+      - F200
+      - progression-continuation
+      - broader-withheld-route-admission
+      - release-readiness
+
+  community-power-manufacturing-f200:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-community-power-manufacturing
+    harness: tests/runtime/Test-MIRCommunityPowerManufacturing.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: fixtures/run-profiles/community-power-f200.json
+    validates:
+      - paired-SolarMatrix-Accumulator-V2-final-unlock-and-single-research-owner
+      - first-level-five-percent-native-recipe-bonus
+      - twenty-unmodified-crafts-produce-twenty-one-versus-twenty-without-research
+      - earned-bonus-and-production-state-survive-save-reload
+      - direct-library-exact-inputs-and-control-restoration
+    non_claims:
+      - F210-SE-AAI-Paracelsin-or-enabled-DLC
+      - general-progression-or-published-predecessor-upgrade
+      - release-readiness
+
+  community-power-manufacturing-f210:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-community-power-manufacturing
+    harness: tests/runtime/Test-MIRCommunityPowerManufacturing.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.21"
+      mod_lock: fixtures/run-profiles/community-power-f210.json
+    validates:
+      - paired-SolarMatrix-Accumulator-V2-final-unlock-and-single-research-owner
+      - first-level-five-percent-native-recipe-bonus
+      - twenty-unmodified-crafts-produce-twenty-one-versus-twenty-without-research
+      - earned-bonus-and-production-state-survive-save-reload
+      - direct-library-exact-inputs-and-control-restoration
+    non_claims:
+      - other-engine-or-mod-tuples-SE-AAI-Paracelsin-or-enabled-DLC
+      - general-progression-or-published-predecessor-upgrade
+      - release-readiness
+
+  community-manufacturing-intake:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-community-manufacturing-intake
+    harness: tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1
+    exact_target:
+      factorio_line: "2.1"
+      external_input_custody: committed-provenance-safe-source-observation-fixture-v1
+      archive_locks: Angel-Bob-and-selected-eight-archive-Py-source-observation-only
+      hosted_evaluation: fixture-and-canonical-source-only
+      offline_replay: explicit-ArchiveRoot-hash-bound-source-observation-only
+    validates:
+      - existing-BA-02-BA-05-and-BA-06-authorities-reused-without-duplicate-intake
+      - Angel-only-permission-granted-Gold-Platinum-and-Silver-wire-finals
+      - coolant-returning-wire-coils-and-unpermitted-direct-wire-remain-withheld
+      - exact-Bob-bullet-heavy-ammo-and-rocket-manufacturing-stream-composition
+      - no-manufacturing-route-is-bound-to-a-direct-damage-or-firing-speed-stream
+      - exact-hash-Angel-Petrochem-source-intake-for-nitric-hydrochloric-hydrofluoric-acid-and-glycerol
+      - Angel-Petrochem-void-and-coproduct-hazards-remain-admission-blockers
+      - nitroglycerin-recipe-resolves-to-explosives-without-inventing-a-distinct-output-subject
+      - exact-hash-eight-archive-Py-source-intake-for-acidgas-glycerol-plant-samples-tree-and-wood-identities
+      - thirteen-Py-acidgas-and-four-glycerol-source-routes-with-coproduct-return-probability-and-loop-hazards
+      - selected-Py-source-suite-contains-no-nitroglycerin-nitro-glycerin-or-nitro_glycerin-identity
+      - ECO-PY-remains-active-with-final-data-raw-engine-save-and-safety-qualification-open
+      - canonical-productivity-byte-parity-and-deterministic-materialization-for-f210-f200-f110-and-f100
+    non_claims:
+      - Factorio-engine-qualification-or-production-gain
+      - F210-2.1.18-or-later-capsule-pass
+      - broad-Bob-or-Angel-compatibility
+      - capsule-or-laser-battery-ammunition-admission
+      - Angel-Petrochem-technology-or-effect-emission
+      - Py-gameplay-engine-finalized-prototype-permission-safety-progression-save-migration-or-public-support
+      - save-upgrade-migration-or-release-readiness
+
+  maximum-level-cap-ownership-multiforce-f210:
+    requires_features: [recipe_productivity, scripted_techs]
+    path: fixtures/assert-mir42-cap-ownership-multiforce
+    supplemental_paths:
+      - fixtures/late-mir42-cap-binding-blocker
+      - fixtures/late-mir42-policy-binding-blocker
+    harness: tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.21"
+      factorio_file_version: "2.1.21.87673"
+      engine_selection_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json
+      engine_admission: admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only
+      mod_lock: exact-f210-2.1.21-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
+    validates:
+      - canonical-schema-3-copper-binding-and-transport
+      - strict-runtime-and-browser-refusal-of-late-forged-schema-3-policy-identities
+      - MIR-owned-enable-and-visibility-restoration-after-cap-removal
+      - foreign-disabled-state-preservation-through-cap-and-removal
+      - native-queue-preservation-when-no-external-queue-owner-is-present
+      - force-created-and-technology-effects-reset-event-isolation
+      - LuaForce-reset-clears-only-reset-force-stale-ownership-before-current-cap-reconciliation
+      - positive-distinct-and-stable-named-force-identities
+      - exact-late-policy-forgery-refusal-without-runtime-browser-queue-or-force-mutation
+      - serialized-removal-to-terminal-reload-semantic-equivalence
+    non_claims:
+      - predecessor-upgrade-or-general-save-migration
+      - multiplayer-gameplay-or-human-playtest
+      - unbounded-multiforce-coverage
+      - browser-or-profile-user-interface-qualification
+      - all-stream-or-all-ecosystem-cap-qualification
+      - external-late-mutator-compatibility-or-endorsement
+      - external-queue-manager-interoperability-or-second-queue-owner
+      - unobservable-same-value-foreign-write-detection
+      - CAP-FOREIGN-DISABLE
+      - performance-or-memory-envelope-qualification
+      - release-readiness-or-publication-authorization
+
+  maximum-level-settings-derived-cap-transition-f200:
+    requires_features: [recipe_productivity, scripted_techs]
+    path: fixtures/assert-mir42-f200-settings-cap-transition
+    harness: tests/runtime/Test-MIR42F200SettingsCapTransition.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: exact-engine-2.0.77-base-only-explicit-elevated-rails-quality-space-age-disabled
+    validates:
+      - F200-no-mod-data-policy-transport-uses-settings-derived-V3-controller-records
+      - F200-finite-cap-three-disables-MIR-owned-and-preserves-foreign-disabled-enablement
+      - F200-cap-zero-restores-only-settings-derived-V3-MIR-owned-enablement-and-visibility
+      - F200-research-all-keeps-MIR-cap-ownership-through-unrelated-completion-events
+      - F200-settings-derived-V3-is-distinct-from-read-only-V2-transport-migration
+    non_claims:
+      - F200-V2-to-V3-transported-ownership-migration-qualification
+      - external-queue-manager-interoperability-or-second-queue-owner
+      - unobservable-same-value-foreign-write-detection
+      - CAP-FOREIGN-DISABLE
+      - multiplayer-gameplay-or-human-playtest
+      - all-stream-or-ecosystem-coverage
+      - release-readiness-or-publication-authorization
+
+  maximum-level-v2-v3-migration-f210:
+    requires_features: [recipe_productivity, scripted_techs]
+    path: fixtures/assert-mir42-v2-v3-cap-migration
+    harness: tests/runtime/Test-MIR42V2V3CapMigration.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.21"
+      factorio_file_version: "2.1.21.87673"
+      predecessor_commit: f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e
+      engine_selection_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json
+      engine_admission: admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only
+      mod_lock: exact-f210-2.1.21-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
+    validates:
+      - authentic-pinned-F210-V2-package-reconstruction-and-runtime-state-seeding
+      - recognized-V2-owned-enable-and-visibility-records-migrate-to-V3
+      - exact-runtime-diagnostic-identifies-admitted-owned-and-visibility-only-V2-records
+      - foreign-disabled-state-never-gains-MIR-enablement-ownership
+      - current-V3-cap-enforcement-keeps-a-distinct-V3-ownership-record
+      - cap-zero-restores-only-V2-or-V3-MIR-owned-enablement-and-visibility
+      - completed-levels-current-research-queue-and-fractional-progress-survive-upgrade-and-reload
+    f200_disposition:
+      status: settings-derived-V3-transition-qualified-no-transported-V2-migration
+      factorio_version: "2.0.77"
+      reason: F200 declares prototype_shapes.mod_data=false. Its new settings-derived V3 controller records current MIR ownership and is separately exact-engine qualified through finite cap to zero; only authentic transported V2 ownership migration remains unclaimed.
+      reconsider_when: F200-specific accepted V3 transport plus an authentic persisted V2 predecessor case is implemented and exact-engine qualified.
+    non_claims:
+      - F200-v2-to-v3-ownership-migration-qualification
+      - general-save-migration-or-all-predecessor-coverage
+      - multiplayer-gameplay-or-human-playtest
+      - non-copper-or-non-F210-cap-migration
+      - browser-or-profile-user-interface-qualification
+      - release-readiness-or-publication-authorization
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity
@@ -1162,6 +2055,8 @@ fixtures:
       - settings-catalog-copy-isolation
       - automatic-controls-profile-roundtrip
       - hidden-legacy-automatic-mode-profile-roundtrip
+      - imported-startup-profile-decode-reuse
+      - changed-import-text-invalidates-decoded-profile
 
   reduced-settings-surface:
     requires_features: []
@@ -1170,6 +2065,13 @@ fixtures:
       - reduced-supported-settings-remain-visible
       - modern-only-settings-are-omitted
       - reduced-continuation-locales-are-explicit
+
+  historical-handcrafting:
+    requires_features: []
+    assertion_path: fixtures/assert-historical-handcrafting
+    validates:
+      - f016-base-default-handcrafting-dependent-catalogue
+      - f016-native-crafting-research-reward
 
   weapon-speed-safety:
     requires_features: []

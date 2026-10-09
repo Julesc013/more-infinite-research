@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-factorio-one-source-convergence-receipt-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "migration_id", "authority", "predecessor_layout", "proof", "factorio_two_executable_content_proof", "current", "target_content_identities", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4FactorioOneSourceConvergenceReceiptV1"},
+    "status": {"const": "passed-static-factorio-one-source-convergence-exact-engine-proof-required"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "migration_id": {"const": "MIR4-FACTORIO-ONE-SOURCE-CONVERGENCE-V1"},
+    "authority": {"$ref": "#/$defs/fileBinding"},
+    "predecessor_layout": {"$ref": "#/$defs/recordBinding"},
+    "proof": {
+      "type": "object", "additionalProperties": false,
+      "required": ["implementation", "schema", "test", "record_sha256"],
+      "properties": {
+        "implementation": {"const": "tools/mir/application/package/FactorioOneSourceConvergence.ps1"},
+        "schema": {"const": "spec/schemas/mir4-factorio-one-source-convergence-proof-v1.schema.json"},
+        "test": {"const": "tests/mir4/Test-MIR4FactorioOneSourceConvergenceM4202.ps1"},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "factorio_two_executable_content_proof": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "status", "baseline_revision", "record_sha256"],
+      "properties": {
+        "kind": {"const": "MIR4FactorioTwoExecutableContentPreservationProofV1"},
+        "status": {"const": "passed-exact-pinned-predecessor-executable-content-preservation"},
+        "baseline_revision": {"const": "297aa5cc902da96847165a4f9caa1048608839fb"},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "current": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_root", "package_source_fingerprint_sha256", "manifest", "package_authority", "target_registry", "target_compositions", "sole_writer"],
+      "properties": {
+        "source_root": {"const": "source"},
+        "package_source_fingerprint_sha256": {"$ref": "#/$defs/sha256"},
+        "manifest": {"$ref": "#/$defs/recordBinding"},
+        "package_authority": {"$ref": "#/$defs/recordBinding"},
+        "target_registry": {"$ref": "#/$defs/recordBinding"},
+        "target_compositions": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/targetBinding"}},
+        "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"}
+      }
+    },
+    "target_content_identities": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/targetIdentity"}},
+    "invariants": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_layout_predecessor_immutable", "whole_factorio_one_tree_removed", "one_canonical_physical_source_per_binding", "factorio_two_presentation_content_changed", "factorio_two_executable_content_preserved", "factorio_one_content_changed", "factorio_one_exact_engine_proof_required", "release_transition_authority"],
+      "properties": {
+        "source_layout_predecessor_immutable": {"const": true}, "whole_factorio_one_tree_removed": {"const": true}, "one_canonical_physical_source_per_binding": {"const": true}, "factorio_two_presentation_content_changed": {"const": true}, "factorio_two_executable_content_preserved": {"const": true}, "factorio_one_content_changed": {"const": true}, "factorio_one_exact_engine_proof_required": {"const": true}, "release_transition_authority": {"const": false}
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/gates"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "fileBinding": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "recordBinding": {"type": "object", "additionalProperties": false, "required": ["path", "kind", "record_sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "kind": {"type": "string", "minLength": 1}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "targetBinding": {"type": "object", "additionalProperties": false, "required": ["target", "path", "record_sha256"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "path": {"pattern": "^targets/f(?:210|200|110|100)/composition[.]json$"}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "targetIdentity": {"type": "object", "additionalProperties": false, "required": ["target", "content_sha256", "entry_count", "predecessor_content_sha256", "predecessor_entry_count", "relation", "deterministic_archive_bytes", "executable_content_preserved", "exact_engine_proof_required"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "content_sha256": {"$ref": "#/$defs/sha256"}, "entry_count": {"type": "integer", "minimum": 1}, "predecessor_content_sha256": {"$ref": "#/$defs/sha256"}, "predecessor_entry_count": {"type": "integer", "minimum": 1}, "relation": {"enum": ["presentation-only-content-change-executable-preserved", "changed-semantic-content-exact-engine-proof-required"]}, "deterministic_archive_bytes": {"const": true}, "executable_content_preserved": {"type": "boolean"}, "exact_engine_proof_required": {"type": "boolean"}}},
+    "gates": {"type": "object", "additionalProperties": false, "required": ["development_merge", "private_build", "qualification", "technical_seal", "main_promotion", "version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {"development_merge": {"const": true}, "private_build": {"const": false}, "qualification": {"const": false}, "technical_seal": {"const": false}, "main_promotion": {"const": false}, "version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  }
+}

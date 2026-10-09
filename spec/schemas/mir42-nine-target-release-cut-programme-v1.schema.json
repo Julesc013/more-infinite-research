@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir42-nine-target-release-cut-programme-v1.schema.json",
+  "title": "MIR 4.2 nine-target release-cut programme V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "release_line", "selected_targets", "candidate", "supersedes", "direct_predecessor_authority", "historical_predecessor_authorities", "direct_predecessors", "required_gates", "transition_gate", "release_transition_authority", "publication_authorized", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR42NineTargetReleaseCutProgrammeV1"},
+    "status": {"enum": ["active-current-4.2-release-cut-pre-freeze-no-transition-authority", "active-current-4.2-release-cut-transition-authorized-awaiting-technical-proof"]},
+    "release_line": {"const": "4.2"},
+    "selected_targets": {"const": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]},
+    "candidate": {"type": "object", "additionalProperties": false, "required": ["version_line", "state", "exact_candidate_required"], "properties": {"version_line": {"const": "4.2"}, "state": {"enum": ["unallocated", "allocated-written-conditional-go-awaiting-technical-proof"]}, "exact_candidate_required": {"const": true}}},
+    "supersedes": {"type": "object"},
+    "direct_predecessor_authority": {"type": "object"},
+    "historical_predecessor_authorities": {"type": "array"},
+    "direct_predecessors": {"type": "array"},
+    "required_gates": {"type": "array"},
+    "transition_gate": {"type": "object", "additionalProperties": false, "required": ["source_freeze", "candidate_allocation", "production_signing", "technical_seal", "promotion", "tagging", "publication"], "properties": {"source_freeze": {"type": "boolean"}, "candidate_allocation": {"type": "boolean"}, "production_signing": {"type": "boolean"}, "technical_seal": {"const": false}, "promotion": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}},
+    "written_transition_authorization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "baseline_programme", "maintainer_authorization", "candidate_manifest", "source", "selected_targets", "authorized_transition"],
+      "properties": {
+        "mode": {"const": "written-conditional-maintainer-go"},
+        "baseline_programme": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": ".mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json"}, "sha256": {"pattern": "^[A-F0-9]{64}$"}, "record_sha256": {"pattern": "^[A-F0-9]{64}$"}}},
+        "maintainer_authorization": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256", "recorded_from_user_turn_date"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"pattern": "^[A-F0-9]{64}$"}, "record_sha256": {"pattern": "^[A-F0-9]{64}$"}, "recorded_from_user_turn_date": {"type": "string", "format": "date"}}},
+        "candidate_manifest": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"pattern": "^[A-F0-9]{64}$"}, "record_sha256": {"pattern": "^[A-F0-9]{64}$"}}},
+        "source": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "package_source_sha256"], "properties": {"commit": {"pattern": "^[a-f0-9]{40}$"}, "tree": {"pattern": "^[a-f0-9]{40}$"}, "package_source_sha256": {"pattern": "^[A-F0-9]{64}$"}}},
+        "selected_targets": {"const": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]},
+        "authorized_transition": {"type": "object", "additionalProperties": false, "required": ["source_freeze", "candidate_allocation", "production_signing", "technical_seal", "promotion", "tagging", "publication"], "properties": {"source_freeze": {"const": true}, "candidate_allocation": {"const": true}, "production_signing": {"const": true}, "technical_seal": {"const": false}, "promotion": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}}
+      }
+    },
+    "release_transition_authority": {"const": false},
+    "publication_authorized": {"const": false},
+    "record_sha256": {"pattern": "^[A-F0-9]{64}$"}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "active-current-4.2-release-cut-pre-freeze-no-transition-authority"}}}, "then": {"not": {"required": ["written_transition_authorization"]}}},
+    {"if": {"properties": {"status": {"const": "active-current-4.2-release-cut-transition-authorized-awaiting-technical-proof"}}}, "then": {"required": ["written_transition_authorization"]}}
+  ]
+}

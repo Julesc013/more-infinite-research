@@ -6,12 +6,21 @@ param(
   [string]$Target,
   [string]$FactorioBin = '',
   [string]$CandidateZip = '',
+  [string]$PredecessorZip = '',
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
   [string]$EvidenceRoot = '',
   [int]$TimeoutSeconds = 120
 )
 
 $ErrorActionPreference = 'Stop'
+$inputLeases=@()
+# Native execution is retired; the preserved oracle is not current acceptance.
+throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'
+$inputLeases=[Collections.Generic.List[object]]::new()
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 
 function Get-MIR4ArchiveInfo {
   param([Parameter(Mandatory)][string]$Path)
@@ -45,6 +54,20 @@ function Assert-MIR4RuntimeLog {
   return $text
 }
 
+function New-MIR4HistoricalArchiveStage {
+  param([Parameter(Mandatory)][string]$Role,[Parameter(Mandatory)][string]$Source,
+    [Parameter(Mandatory)][string]$ExpectedSha256,[Parameter(Mandatory)][string]$Version)
+  $stageRoot=Join-Path $EvidenceRoot ('inputs/'+$Role)
+  $stageMods=Join-Path $stageRoot 'mods'
+  $null=New-Item -ItemType Directory -Path $stageRoot,$stageMods -Force
+  $input=[ordered]@{source_path=$Source;file_name=[IO.Path]::GetFileName($Source);expected_sha256=$ExpectedSha256;role=$Role;identity=@{target=$Target;version=$Version;authority_record_sha256=$authority.record_sha256};provenance=@{kind='supplied-historical-private-input';public_support_claim=$false};immutable=$true}
+  $lease=New-MIRImmutableInputLease -RunRoot $stageRoot -StageDirectory $stageMods -Inputs @($input) -RequireHardLinks
+  $inputLeases.Add($lease)
+  Add-MIRNativeProbeImmutableLease -Context $resources -Lease $lease
+  [ordered]@{mods=@([ordered]@{name='base';enabled=$true},[ordered]@{name='more-infinite-research';enabled=$true})}|ConvertTo-Json -Depth 5|Set-Content -LiteralPath (Join-Path $stageMods 'mod-list.json') -Encoding UTF8
+  [pscustomobject]@{root=$stageRoot;mods=$stageMods;lease=$lease;role=$Role}
+}
+
 function Invoke-MIR4HistoricalPhase {
   param(
     [Parameter(Mandatory)][string]$Name,
@@ -58,46 +81,22 @@ function Invoke-MIR4HistoricalPhase {
   )
   if (Test-Path -LiteralPath $LiveLog) { Remove-Item -LiteralPath $LiveLog -Force }
   $started = Get-Date
-  $terminatedAfterProof = $false
+  $completion=$null
   if ($BoundedServer) {
-    $processInfo = [Diagnostics.ProcessStartInfo]::new()
-    $processInfo.FileName = $Binary
-    $processInfo.UseShellExecute = $false
-    $processInfo.CreateNoWindow = $true
-    $processInfo.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
-    foreach ($argument in $Arguments) { [void]$processInfo.ArgumentList.Add($argument) }
-    $process = [Diagnostics.Process]::Start($processInfo)
-    $deadline = (Get-Date).AddMilliseconds($TimeoutMs)
-    $loaded = $false
-    while ((Get-Date) -lt $deadline -and -not $process.HasExited) {
-      Start-Sleep -Milliseconds 200
-      if (Test-Path -LiteralPath $LiveLog -PathType Leaf) {
-        $candidateText = Get-Content -Raw -LiteralPath $LiveLog
-        $displayVersion = (($ExpectedVersion -split '\.') | ForEach-Object { [int]$_ }) -join '.'
-        if ($candidateText -match '(?im)(^|\s)(Error|Failed to load mods|Failed to load mod|Invalid Mod|Couldn.t load|stack traceback)') {
-          try { $process.Kill($true) } catch { $process.Kill() }
-          throw "$Name log contains a load failure: $LiveLog"
-        }
-        if ($candidateText.Contains("Loading mod more-infinite-research $displayVersion") -and
-            $candidateText.Contains('Map version ') -and
-            ($candidateText.Contains('Hosting game at') -or $candidateText.Contains('changing state from(CreatingGame) to(InGame)'))) {
-          $loaded = $true
-          break
-        }
+    $displayVersion = (($ExpectedVersion -split '\.') | ForEach-Object { [int]$_ }) -join '.'
+    $completion={
+      if(-not (Test-Path -LiteralPath $LiveLog -PathType Leaf)){return $false}
+      $candidateText=Get-Content -Raw -LiteralPath $LiveLog
+      if($candidateText -match '(?im)(^|\s)(Error|Failed to load mods|Failed to load mod|Invalid Mod|Couldn.t load|stack traceback)'){
+        throw "$Name log contains a load failure: $LiveLog"
       }
-    }
-    if (-not $loaded) {
-      if (-not $process.HasExited) { try { $process.Kill($true) } catch { $process.Kill() } }
-      throw "$Name did not reach a proven exact-package loaded-map state within $TimeoutMs ms."
-    }
-    if (-not $process.HasExited) { try { $process.Kill($true) } catch { $process.Kill() } }
-    [void]$process.WaitForExit(10000)
-    $exitCode = $process.ExitCode
-    $terminatedAfterProof = $true
-  } else {
-    $exitCode = Invoke-FactorioProcess -FilePath $Binary -Arguments $Arguments -TimeoutMs $TimeoutMs
-    if ($exitCode -ne 0) { throw "$Name exited with code $exitCode." }
+      return $candidateText.Contains("Loading mod more-infinite-research $displayVersion") -and
+        $candidateText.Contains('Map version ') -and
+        ($candidateText.Contains('Hosting game at') -or $candidateText.Contains('changing state from(CreatingGame) to(InGame)'))
+    }.GetNewClosure()
   }
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $Binary -Arguments $Arguments -TimeoutSeconds ([int][Math]::Ceiling($TimeoutMs/1000)) -CompletionPredicate $completion
+  if($BoundedServer -and -not $actor.result.completion_predicate_observed){throw "$Name did not reach a proven exact-package loaded-map state within $TimeoutMs ms."}
   [void](Assert-MIR4RuntimeLog -Path $LiveLog -Version $ExpectedVersion -Phase $Name)
   $proof = Join-Path $OutputRoot "$Name.log"
   Copy-Item -LiteralPath $LiveLog -Destination $proof -Force
@@ -106,15 +105,16 @@ function Invoke-MIR4HistoricalPhase {
     status = 'passed'
     version = $ExpectedVersion
     duration_seconds = [math]::Round(((Get-Date) - $started).TotalSeconds, 3)
-    terminated_after_proof = $terminatedAfterProof
-    process_exit_code = $exitCode
+    terminated_after_proof = [bool]$BoundedServer
+    process_exit_code = $actor.result.exit_code
     log = [IO.Path]::GetRelativePath($OutputRoot, $proof).Replace('\', '/')
     log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $proof).Hash
   }
 }
 
 $authorityPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json'
-$authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
+$authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json -Depth 100 -DateKind String
+if($authority.kind -cne 'MIR4HistoricalPrivateCandidateAuthorizationV1' -or $authority.status -cne 'authorized-private-experimental' -or $authority.public_output_authorized -or $authority.publication_authorized -or -not (Test-MIR4BootstrapRecordHash -Record $authority)){throw 'Historical private authority differs.'}
 $row = @($authority.targets | Where-Object { [string]$_.target_key -eq $Target })
 if ($row.Count -ne 1) { throw "Historical candidate authority has no unique $Target row." }
 $row = $row[0]
@@ -126,19 +126,25 @@ if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
   $CandidateZip = Join-Path $RepoRoot "build/mir4/m4c01-player-candidates/distributions/more-infinite-research_$([string]$row.distribution_version).zip"
 }
 if ([string]::IsNullOrWhiteSpace($EvidenceRoot)) {
-  $EvidenceRoot = Join-Path $RepoRoot "build/results/mir4-m4c01/runtime/$Target"
+  $EvidenceRoot = Join-Path $RepoRoot "build/tmp/mir4-historical-private/$Target"
 }
 if (-not [IO.Path]::IsPathRooted($FactorioBin)) { $FactorioBin = Join-Path $RepoRoot $FactorioBin }
 if (-not [IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip = Join-Path $RepoRoot $CandidateZip }
 if (-not [IO.Path]::IsPathRooted($EvidenceRoot)) { $EvidenceRoot = Join-Path $RepoRoot $EvidenceRoot }
 $FactorioBin = (Resolve-Path -LiteralPath $FactorioBin).Path
 $CandidateZip = (Resolve-Path -LiteralPath $CandidateZip).Path
-$predecessorZip = (Resolve-Path -LiteralPath (Join-Path $RepoRoot ([string]$row.predecessor_archive))).Path
+if([string]::IsNullOrWhiteSpace($PredecessorZip)){$PredecessorZip=Join-Path $RepoRoot ([string]$row.predecessor_archive)}
+if(-not [IO.Path]::IsPathRooted($PredecessorZip)){$PredecessorZip=Join-Path $RepoRoot $PredecessorZip}
+$predecessorZip = (Resolve-Path -LiteralPath $PredecessorZip).Path
+if(@(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count){throw 'Historical runtime requires one engine process tree; Factorio is already running.'}
+$resources=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $EvidenceRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+$EvidenceRoot=$resources.root
 
 $binarySha = (Get-FileHash -Algorithm SHA256 -LiteralPath $FactorioBin).Hash
 if ($binarySha -cne [string]$row.engine.sha256) { throw "$Target engine fingerprint mismatch: $binarySha" }
 $predecessorSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $predecessorZip).Hash
 if ($predecessorSha -cne [string]$row.predecessor_archive_sha256) { throw "$Target predecessor fingerprint mismatch: $predecessorSha" }
+$candidateSha=(Get-FileHash -Algorithm SHA256 -LiteralPath $CandidateZip).Hash
 $candidateInfo = Get-MIR4ArchiveInfo -Path $CandidateZip
 if ([string]$candidateInfo.name -cne 'more-infinite-research' -or
     [string]$candidateInfo.version -cne [string]$row.distribution_version -or
@@ -146,18 +152,17 @@ if ([string]$candidateInfo.name -cne 'more-infinite-research' -or
   throw "$Target candidate metadata does not match its authority row."
 }
 
-if (Test-Path -LiteralPath $EvidenceRoot) {
-  $resolvedEvidence = (Resolve-Path -LiteralPath $EvidenceRoot).Path
-  $allowedRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/results/mir4-m4c01/runtime')).TrimEnd('\') + '\'
-  if (-not ($resolvedEvidence + '\').StartsWith($allowedRoot, [StringComparison]::OrdinalIgnoreCase)) {
-    throw "Refusing to replace runtime evidence outside the M4C01 result root: $resolvedEvidence"
-  }
-  Remove-Item -LiteralPath $resolvedEvidence -Recurse -Force
+trap {
+  $failure=$_
+  foreach($lease in $inputLeases){if(-not $lease.closed){try{$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}catch{}}}
+  throw $failure
 }
-New-Item -ItemType Directory -Force -Path $EvidenceRoot | Out-Null
+New-Item -ItemType Directory -Path $EvidenceRoot | Out-Null
 $userData = Join-Path $EvidenceRoot 'user'
-$mods = Join-Path $userData 'mods'
-New-Item -ItemType Directory -Force -Path $mods | Out-Null
+New-Item -ItemType Directory -Path $userData | Out-Null
+$predecessorStage=New-MIR4HistoricalArchiveStage -Role predecessor -Source $predecessorZip -ExpectedSha256 $predecessorSha -Version ([string]$row.predecessor_release)
+$candidateStage=New-MIR4HistoricalArchiveStage -Role candidate -Source $CandidateZip -ExpectedSha256 $candidateSha -Version ([string]$row.distribution_version)
+$mods=$predecessorStage.mods
 
 $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $FactorioBin))
 $readData = Join-Path $factorioRoot 'data'
@@ -170,13 +175,6 @@ $config = Join-Path $EvidenceRoot 'config.ini'
   '[other]',
   'check-updates=false'
 ) | Set-Content -LiteralPath $config -Encoding UTF8
-[ordered]@{ mods = @(
-  [ordered]@{ name = 'base'; enabled = $true },
-  [ordered]@{ name = 'more-infinite-research'; enabled = $true }
-) } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $mods 'mod-list.json') -Encoding UTF8
-
-$deployedPredecessor = Join-Path $mods (Split-Path -Leaf $predecessorZip)
-Copy-Item -LiteralPath $predecessorZip -Destination $deployedPredecessor
 $save = Join-Path $EvidenceRoot "mir-$Target-direct-upgrade.zip"
 $liveLog = Join-Path $userData 'factorio-current.log'
 $common = @('--config', $config, '--no-log-rotation')
@@ -197,9 +195,15 @@ if (-not (Test-Path -LiteralPath $save -PathType Leaf)) {
   Copy-Item -LiteralPath $fallbackSave -Destination $save
 }
 
-Remove-Item -LiteralPath $deployedPredecessor -Force
-$deployedCandidate = Join-Path $mods (Split-Path -Leaf $CandidateZip)
-Copy-Item -LiteralPath $CandidateZip -Destination $deployedCandidate
+$null=Complete-MIRImmutableInputLease -Lease $predecessorStage.lease -Outcome passed
+# Carry only the mutable startup settings, never an archive or directory alias.
+$startupSettings=Join-Path $mods 'mod-settings.dat'
+if(Test-Path -LiteralPath $startupSettings -PathType Leaf){
+  if((Get-Item -LiteralPath $startupSettings).Length -gt 4MB){throw 'Historical mutable settings exceed their bounded allowance.'}
+  Copy-Item -LiteralPath $startupSettings -Destination (Join-Path $candidateStage.mods 'mod-settings.dat')
+}
+$mods=$candidateStage.mods
+$common[$common.Count-1]=$mods
 $candidateArgs = @($common) + @('--start-server', $save)
 $upgrade = Invoke-MIR4HistoricalPhase -Name 'candidate-upgrade-load' -Arguments $candidateArgs `
   -ExpectedVersion ([string]$row.distribution_version) -LiveLog $liveLog -OutputRoot $EvidenceRoot `
@@ -226,7 +230,13 @@ $record = [ordered]@{
   public_support_claim = $false
   admission_status = 'private-proof-only-repeat-loads-do-not-satisfy-admission-reload-gate'
 }
+$record['input_staging']=@($inputLeases|ForEach-Object {Complete-MIRImmutableInputLease -Lease $_ -Outcome passed})
+$record['resource_context']=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;shared_alias_bytes=$resources.shared_alias_bytes;memory_enforcement='sampled-watchdog-not-hard-cap'}
+$record['process_inventory']=@($resources.runs)
+$record['authority_record_sha256']=$authority.record_sha256
 $recordPath = Join-Path $EvidenceRoot 'runtime-proof.json'
-$record | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $recordPath -Encoding UTF8
+$json=($record|ConvertTo-Json -Depth 25)+"`n"
+if([Text.Encoding]::UTF8.GetByteCount($json) -ge (Get-MIRNativeProbeRemainingOutputBytes -Context $resources -IncludeResultReserve)){throw '[mir441-resource-output-budget]'}
+[IO.File]::WriteAllText($recordPath,$json,[Text.UTF8Encoding]::new($false))
 Write-Host "[ok] MIR 4 historical private runtime proof: $Target $recordPath"
 $record

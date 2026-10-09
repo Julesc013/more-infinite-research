@@ -40,57 +40,6 @@ $ledger = Read-MIRJson ".mir/releases.json"
 if ([int]$ledger.schema -ne 1 -or [string]$ledger.authority -ne "canonical-release-ledger") {
   throw "Canonical release ledger schema 1 is required."
 }
-$candidate = $ledger.development."factorio-2.1"
-$superseded = $candidate.supersedes_candidate
-$candidateLines = @(
-  "---",
-  "title: `"Current Development Candidate`"",
-  "status: current",
-  "applies_to: `"$($candidate.mir_version)`"",
-  "audience: release-manager",
-  "doc_type: reference",
-  "owner: mir-maintainers",
-  "last_reviewed: $($ledger.updated_at)",
-  "supersedes: []",
-  "superseded_by: []",
-  "---",
-  "",
-  "# Current Development Candidate",
-  "",
-  "> Generated from ``.mir/releases.json`` by ``tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1``. Do not edit candidate identity here.",
-  "",
-  "## Factorio 2.1 development line",
-  "",
-  "| Field | Authority |",
-  "| --- | --- |",
-  "| MIR version | ``$(ConvertTo-MIRDisplay $candidate.mir_version)`` |",
-  "| Candidate | ``$(ConvertTo-MIRDisplay $candidate.candidate_id)`` |",
-  "| Branch | ``$(ConvertTo-MIRDisplay $candidate.branch)`` |",
-  "| Package source commit | ``$(ConvertTo-MIRDisplay $candidate.package_source_commit)`` |",
-  "| Package source tree | ``$(ConvertTo-MIRDisplay $candidate.package_source_tree)`` |",
-  "| Package source SHA-256 | ``$(ConvertTo-MIRDisplay $candidate.package_source_sha256)`` |",
-  "| Archive | ``$(ConvertTo-MIRDisplay $candidate.archive)`` |",
-  "| Archive bytes | ``$(ConvertTo-MIRDisplay $candidate.archive_bytes)`` |",
-  "| Archive entries | ``$(ConvertTo-MIRDisplay $candidate.archive_entries)`` |",
-  "| Archive SHA-256 | ``$(ConvertTo-MIRDisplay $candidate.archive_sha256)`` |",
-  "| Package content SHA-256 | ``$(ConvertTo-MIRDisplay $candidate.package_content_sha256)`` |",
-  "| Qualification | ``$(ConvertTo-MIRDisplay $candidate.qualification)`` |",
-  "| Publication | ``$(ConvertTo-MIRDisplay $candidate.publication_status)`` |",
-  "| Status | ``$(ConvertTo-MIRDisplay $candidate.status)`` |",
-  "",
-  "## Superseded candidate",
-  "",
-  "| Field | Authority |",
-  "| --- | --- |",
-  "| Candidate | ``$(ConvertTo-MIRDisplay $superseded.candidate_id)`` |",
-  "| Package source commit | ``$(ConvertTo-MIRDisplay $superseded.package_source_commit)`` |",
-  "| Archive bytes | ``$(ConvertTo-MIRDisplay $superseded.archive_bytes)`` |",
-  "| Archive entries | ``$(ConvertTo-MIRDisplay $superseded.archive_entries)`` |",
-  "| Archive SHA-256 | ``$(ConvertTo-MIRDisplay $superseded.archive_sha256)`` |",
-  "| Reason | $(ConvertTo-MIRDisplay $superseded.reason) |",
-  "",
-  "Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree."
-)
 # Current-candidate and all other release-engineering views are emitted by Control Plane v5 above.
 
 $profiles = Read-MIRJson ".mir/technology-quality-profiles.json"

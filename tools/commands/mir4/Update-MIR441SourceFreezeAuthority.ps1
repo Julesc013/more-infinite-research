@@ -22,7 +22,7 @@ $expectedPaths=@(
   '.mir/fixtures.yml',
   'CHANGELOG.md',
   'README.md',
-  'RELEASE-RUNBOOK.md',
+  'docs/RELEASE-RUNBOOK.md',
   'assurance/catalog/tests.json',
   'changes/unreleased/MIR4-CHG-2026-0032.json',
   'changes/unreleased/MIR4-CHG-2026-0033.json',
@@ -132,7 +132,7 @@ function Get-MIR441ReadinessRole([string]$Path){
   if($Path-like'targets/*'-or$Path-like'src/mod/*'){return 'Canonical generated-package source or target authority.'}
   if($Path-like'fixtures/*'-or$Path-like'tests/*'-or$Path-ceq'validation/tests.yml'-or$Path-ceq'assurance/catalog/tests.json'){return 'Executable release-readiness proof or fixture authority.'}
   if($Path-like'tools/*'){return 'Bounded release-readiness application, generator, or validator.'}
-  if($Path-like'docs/*'-or$Path-in@('README.md','RELEASE-RUNBOOK.md','CHANGELOG.md')){return 'Repository or generated release documentation authority.'}
+  if($Path-like'docs/*'-or$Path-in@('README.md','CHANGELOG.md')){return 'Repository or generated release documentation authority.'}
   return 'MIR 4.1 release-readiness governance or generated projection.'
 }
 

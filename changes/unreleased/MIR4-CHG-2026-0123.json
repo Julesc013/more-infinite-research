@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0123",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Withhold automatic manufacturing research for placeable recipes with no useful productivity bonus.",
+  "details": [
+    "Require a canonical productive item identity and finite positive fixed quantity with useful bonus remaining in every retained placeable-output variant. Apply the shared target-specific productivity exclusion, including the inherited modern ignored_by_stats default and explicit-zero precedence.",
+    "The new non_productive_placeable_output blocker cannot be overridden by a compatibility attachment. Existing single-output, deterministic-output, permission, risk, owner and cardinality gates remain in force. No technology, setting or request identity changes.",
+    "Controlled canonical facts, risk and operator checks preserve useful opposing cases and retained hazard rejections. The already-registered negative fixture now includes zero-quantity and fully excluded outputs. Actual current-package fixture, catalogue/removal and saved-world acceptance remain pending."
+  ],
+  "semantic_domains": [
+    "productivity",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Automatic recipe-productivity selection rejects zero-useful-output placeable manufacturing. Current-package native, catalogue and save behavior remains unqualified."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Automatic recipe-productivity selection rejects zero-useful-output placeable manufacturing. Current-package native, catalogue and save behavior remains unqualified."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "Reduced targets do not activate the automatic recipe-productivity capability. Shared source bytes change without granting an unsupported effect."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "Reduced targets do not activate the automatic recipe-productivity capability. Shared source bytes change without granting an unsupported effect."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "Reduced targets do not activate the automatic recipe-productivity capability. Shared source bytes change without granting an unsupported effect."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "Reduced targets do not activate the automatic recipe-productivity capability. Shared source bytes change without granting an unsupported effect."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "Reduced targets do not activate the automatic recipe-productivity capability. Shared source bytes change without granting an unsupported effect."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "Reduced targets do not activate the automatic recipe-productivity capability. Shared source bytes change without granting an unsupported effect."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "Reduced targets do not activate the automatic recipe-productivity capability. Shared source bytes change without granting an unsupported effect."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/compiler/material_routes.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/recipe-productivity.md",
+      "kind": "document"
+    }
+  ]
+}

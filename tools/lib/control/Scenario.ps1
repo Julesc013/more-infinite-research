@@ -98,7 +98,13 @@ function Get-MIRCPScenarioInvocationAuthority {
     $fixtureStatic = $true
     if ($fixtureParameter.Count -gt 0) {
       $fixtureStatic = @($fixtureParameter | Where-Object { -not [bool]$_.static }).Count -eq 0
-      if ($fixtureStatic) { $fixtureNames = @($fixtureParameter.literal_strings | Sort-Object -Unique) }
+      if ($fixtureStatic) {
+        $fixtureNames = @(
+          $fixtureParameter |
+            ForEach-Object { @($_.literal_strings) } |
+            Sort-Object -Unique
+        )
+      }
     }
     $records.Add([pscustomobject][ordered]@{
       command = [string]$command.GetCommandName()
@@ -143,8 +149,8 @@ function New-MIRCPExecutionRegistry {
   $declarations = @($targetProperty.Value | Sort-Object name)
   $invocations = @(Get-MIRCPScenarioInvocationAuthority -RunnerPath $runnerPath -RepoRoot $repo)
   $literalInvocations = @($invocations | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.scenario_name) })
-  $declaredNames = @($declarations.name | ForEach-Object { [string]$_ })
-  $extraLiteralNames = @($literalInvocations.scenario_name | Where-Object { $_ -notin $declaredNames } | Sort-Object -Unique)
+  $declaredNames = @($declarations | ForEach-Object { [string]$_.name })
+  $extraLiteralNames = @($literalInvocations | ForEach-Object { [string]$_.scenario_name } | Where-Object { $_ -notin $declaredNames } | Sort-Object -Unique)
   $scenarioRows = [Collections.Generic.List[object]]::new()
   $assertionCount = 0
   $literalAuthorityCount = 0
@@ -168,7 +174,7 @@ function New-MIRCPExecutionRegistry {
         type = "declaration-isolated-fallback"
         reason = if ($matches.Count -eq 0) { "no unique literal runner call" } elseif ($matches.Count -gt 1) { "multiple conditional literal runner calls" } else { "runner environment contains dynamic AST values" }
         matching_literal_calls = $matches.Count
-        lines = @($matches.line | Sort-Object)
+        lines = @($matches | ForEach-Object { [int]$_.line } | Sort-Object)
       }
     }
     $fixtures = if ($literalAuthority) { @($matches[0].fixture_names | Sort-Object -Unique) } else { @($declaration.fixtures | ForEach-Object { [string]$_ } | Sort-Object -Unique) }

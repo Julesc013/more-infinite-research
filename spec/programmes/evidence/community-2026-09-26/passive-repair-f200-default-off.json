@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "scope": "materialized-native-host-base-profile-not-overhaul-or-two-client-multiplayer",
+  "target": "2.0",
+  "enabled": false,
+  "engine": "Version: 2.0.77 (build 84539, win64, full)\r\nVersion: 64\r\nMap input version: 1.0.0-0\r\nMap output version: 2.0.77-0",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "candidate_sha256": "7A860EF5051F2FD59BF25D831ADFB557EA8A0DB2D91617D6CC09AC5D41EBB1B0",
+  "service_sha256": "38178A2F06ABD99E45CB71EAF9770278033AFB544317261DF3173C746D851AB3",
+  "fixture_sha256": "1BEB0E68733EE79B02EC9213E187F13AF01021A9B0D71EDB04E0AD092F247E16",
+  "harness_sha256": "8B888A2FF27B8FCA057F27924C7FDEA8A3C1E470C5B26A42FADB34E63738F0DA",
+  "phases": [
+    {
+      "status": "passed",
+      "phase": "disabled",
+      "assertions": 18,
+      "enabled": false,
+      "tick": 721,
+      "scope": "materialized-MIR-default-off-native-damage-remains-unrepaired"
+    }
+  ]
+}

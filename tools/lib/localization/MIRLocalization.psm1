@@ -85,7 +85,8 @@ function Get-MIRFormattingSequence {
 
 function Test-MIRFormatInvariantValue {
   param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
-  return $Text -match '^[+\-]?\d+(?:\.\d+)?%$'
+  return $Text -match '^[+\-]?\d+(?:\.\d+)?%$' -or
+    $Text -match '^__\d+__ × __\d+__$' -or $Text -match '^Factorio  __\d+__\\nMIR  __\d+__$'
 }
 
 function Get-MIRVisibleTextLength {
@@ -146,7 +147,17 @@ function Write-MIRLocaleFile {
   if (-not (Test-Path -LiteralPath $directory)) {
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
   }
-  Set-Content -LiteralPath $Path -Value $lines -Encoding utf8
+  [IO.File]::WriteAllText($Path, ($lines -join "`n") + "`n", [Text.UTF8Encoding]::new($false))
+}
+
+function Write-MIRCanonicalJson {
+  param(
+    [Parameter(Mandatory)]$Value,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  $json = (($Value | ConvertTo-Json -Depth 100) + "`n").Replace("`r`n", "`n").Replace("`r", "`n")
+  [System.IO.File]::WriteAllText($Path, $json, [System.Text.UTF8Encoding]::new($false))
 }
 
 Export-ModuleMember -Function @(
@@ -159,5 +170,6 @@ Export-ModuleMember -Function @(
   'Read-MIRLocaleFile',
   'Read-MIRLocalePolicy',
   'Test-MIRFormatInvariantValue',
+  'Write-MIRCanonicalJson',
   'Write-MIRLocaleFile'
 )

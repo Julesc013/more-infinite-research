@@ -1,5 +1,10 @@
 Set-StrictMode -Version Latest
 
+$mir4GoldenDependencyRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../../..')).Path
+if (-not (Get-Command Restore-MIR4DistributionArchive -ErrorAction SilentlyContinue)) {
+  . (Join-Path $mir4GoldenDependencyRoot 'tools/mir/application/package/DistributionCustody.ps1')
+}
+
 function Get-MIR4GoldenRepoRoot {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -138,7 +143,7 @@ function New-MIR4GoldenClassification {
 
 function New-MIR4GoldenTargetBaselineRecord {
   [CmdletBinding()]
-  param([Parameter(Mandatory)][string]$RepoRoot,[string]$RecordedAt='2026-09-01T14:00:00+10:00')
+  param([Parameter(Mandatory)][string]$RepoRoot,[string]$RecordedAt='2026-09-01T14:00:00+10:00',[string]$CacheRoot)
   $repo = Get-MIR4GoldenRepoRoot -RepoRoot $RepoRoot
   if (-not (Get-Command Get-MIR4ArchiveInventory -ErrorAction SilentlyContinue)) { . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1') }
   $definitions = @(Get-MIR4GoldenTargetDefinitions -RepoRoot $repo)
@@ -146,7 +151,7 @@ function New-MIR4GoldenTargetBaselineRecord {
   $targetRecords = [Collections.Generic.List[object]]::new()
   foreach ($definition in $definitions) {
     $archiveRelative = [string]$definition.distribution.path
-    $archivePath = Join-Path $repo $archiveRelative
+    $archivePath = (Restore-MIR4DistributionArchive -RepoRoot $repo -Version ([string]$definition.distribution_version) -CacheRoot $CacheRoot).cache_path
     $inventory = Get-MIR4ArchiveInventory -Path $archivePath
     $inventories[[string]$definition.target] = $inventory
     if ([string]$inventory.archive_sha256 -cne [string]$definition.distribution.sha256 -or [int64]$inventory.bytes -ne [int64]$definition.distribution.bytes) { throw "[mir4-golden-target-archive-binding] $($definition.target)" }
@@ -191,20 +196,29 @@ function New-MIR4GoldenTargetBaselineRecord {
 
 function Write-MIR4GoldenTargetBaseline {
   [CmdletBinding()]
-  param([Parameter(Mandatory)][string]$RepoRoot,[string]$OutputPath='spec/distribution/mir4-golden-four-target-baseline-v1.json',[switch]$Check)
+  param([Parameter(Mandatory)][string]$RepoRoot,[string]$OutputPath='spec/distribution/mir4-golden-four-target-baseline-v1.json',[switch]$Check,[string]$CacheRoot)
   $repo = Get-MIR4GoldenRepoRoot -RepoRoot $RepoRoot
   if (-not [IO.Path]::IsPathRooted($OutputPath)) { $OutputPath = Join-Path $repo $OutputPath }
-  $expected = New-MIR4GoldenTargetBaselineRecord -RepoRoot $repo
-  $lf = [string][char]10
-  $json = ($expected | ConvertTo-Json -Depth 100).Replace([Environment]::NewLine, $lf) + $lf
-  if ($Check) {
-    if (-not (Test-Path -LiteralPath $OutputPath -PathType Leaf)) { throw '[mir4-golden-target-baseline-missing]' }
-    $actualText = [IO.File]::ReadAllText($OutputPath).Replace(([string][char]13 + $lf), $lf).Replace([string][char]13, $lf)
-    if ($actualText -cne $json) { throw '[mir4-golden-target-baseline-stale]' }
-  } else {
-    $parent = Split-Path -Parent $OutputPath
-    if (-not (Test-Path -LiteralPath $parent -PathType Container)) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
-    [IO.File]::WriteAllText($OutputPath, $json, [Text.UTF8Encoding]::new($false))
+  if (-not $Check) { throw '[mir4-golden-target-baseline-immutable] historical baseline generation is disabled after local-dist retirement.' }
+  if (-not (Test-Path -LiteralPath $OutputPath -PathType Leaf)) { throw '[mir4-golden-target-baseline-missing]' }
+  if (-not (Get-Command Get-MIR4ArchiveInventory -ErrorAction SilentlyContinue)) { . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1') }
+  $record = Get-Content -Raw -LiteralPath $OutputPath | ConvertFrom-Json -Depth 100 -DateKind String
+  if ([string]$record.kind -cne 'MIR4GoldenFourTargetBaselineV1' -or -not (Test-MIR4BootstrapRecordHash -Record $record)) {
+    throw '[mir4-golden-target-baseline-integrity]'
   }
-  return $expected
+  foreach ($target in @($record.targets)) {
+    $archivePath = (Restore-MIR4DistributionArchive -RepoRoot $repo -Version ([string]$target.distribution_version) -CacheRoot $CacheRoot).cache_path
+    $inventory = Get-MIR4ArchiveInventory -Path $archivePath
+    if ([string]$inventory.archive_sha256 -cne [string]$target.archive.sha256 -or
+        [int64]$inventory.bytes -ne [int64]$target.archive.bytes -or
+        [int]$inventory.entry_count -ne [int]$target.archive.entry_count) {
+      throw "[mir4-golden-target-baseline-archive] $($target.target)"
+    }
+    $expectedEntries = @($target.entries | ForEach-Object { "$($_.path)|$($_.bytes)|$($_.sha256)" } | Sort-Object)
+    $actualEntries = @($inventory.entries | ForEach-Object { "$($_.path)|$($_.raw_bytes)|$($_.raw_sha256)" } | Sort-Object)
+    if (($expectedEntries -join [char]10) -cne ($actualEntries -join [char]10)) {
+      throw "[mir4-golden-target-baseline-entry-parity] $($target.target)"
+    }
+  }
+  return $record
 }

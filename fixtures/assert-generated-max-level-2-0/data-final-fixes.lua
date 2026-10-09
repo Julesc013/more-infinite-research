@@ -1,3 +1,12 @@
+local stream_registry = require("__more-infinite-research__.prototypes.mir.streams.registry")
+local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
+local stream_count = 0
+for _ in pairs(stream_registry.snapshot()) do stream_count = stream_count + 1 end
+if stream_count ~= target_profile.expected_stream_count then
+  error("MIR Factorio 2.0 target profile expected " .. tostring(target_profile.expected_stream_count)
+    .. " streams, got " .. tostring(stream_count))
+end
+
 local technologies = {
   "recipe-prod-research_processing_unit-1",
   "recipe-prod-research_plastic-1",

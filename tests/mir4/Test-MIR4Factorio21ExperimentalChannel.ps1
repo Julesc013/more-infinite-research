@@ -24,7 +24,9 @@ Assert-MIR4F210Channel ([string]$resolved.qualification_factorio_version -eq [st
 Assert-MIR4F210Channel (Test-MIR4Factorio21SelectedVersion -Version '2.1.999' -Authority $authority) 'mir4-f210-channel-future-patch-admitted'
 Assert-MIR4F210Channel (-not (Test-MIR4Factorio21SelectedVersion -Version '2.2.0' -Authority $authority)) 'mir4-f210-channel-other-line-rejected'
 
-$temporaryChangelog = [IO.Path]::GetTempFileName()
+$scratchRoot = Join-Path $RepoRoot 'build/tmp'
+[IO.Directory]::CreateDirectory($scratchRoot) | Out-Null
+$temporaryChangelog = Join-Path $scratchRoot ('f210-channel-' + [guid]::NewGuid().ToString('N') + '.txt')
 try {
   [IO.File]::WriteAllText($temporaryChangelog, @"
 Version: 2.1.18
@@ -46,7 +48,7 @@ $workflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.github/workflow
 Assert-MIR4F210Channel ($workflow.Contains('factorio-2.1-channel inspect') -and $workflow.Contains('factorio-2.1-review.json')) 'mir4-f210-channel-scheduled-task-packet'
 $programme = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json') | ConvertFrom-Json
 Assert-MIR4F210Channel (@($programme.engine_channels | Where-Object target -eq 'f210').Count -eq 1) 'mir4-f210-channel-programme-obligation'
-$runbook = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'RELEASE-RUNBOOK.md')
+$runbook = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'docs/RELEASE-RUNBOOK.md')
 Assert-MIR4F210Channel ($runbook.Contains('latest official Steam experimental 2.1.x') -and $runbook.Contains('invalidates cross-patch evidence reuse')) 'mir4-f210-channel-runbook'
 
 Write-Host '[ok] MIR 4 F210 moving experimental-channel policy'

@@ -13,7 +13,7 @@ foreach($flag in @('package_visible','semantic_authority','target_policy_authori
 $parity=Test-MIR4HistoricalToolingFunctionalParityV1 -RepoRoot $repo
 $proof=Get-MIR4HistoricalToolingMigrationProofPolicyV1 -RepoRoot $repo
 Assert-MIR4HistoricalToolingV1 ([string]$proof.pre_cutover_functional_digest-ceq$script:MIR4HistoricalToolingPreCutoverDigestV1-and[string]$proof.pre_cutover_archive_content_sha256-ceq$script:MIR4HistoricalToolingArchiveContentSha256V1) 'mir4-historical-tooling-pre-cutover-evidence'
-Assert-MIR4HistoricalToolingV1 ([string]$parity.digest-ceq$script:MIR4HistoricalToolingParityDigestV1) 'mir4-historical-tooling-functional-parity'
+Assert-MIR4HistoricalToolingV1 ([string]$parity.comparison_digest-ceq$script:MIR4HistoricalToolingParityDigestV1-and[string]$parity.record.source_identity.package_source_sha256-ceq$packageBefore) 'mir4-historical-tooling-functional-parity'
 Assert-MIR4HistoricalToolingV1 ([string]$parity.record.archive.content_sha256-ceq$script:MIR4HistoricalToolingArchiveContentSha256V1-and[int]$parity.record.archive.uncompressed_bytes-eq1029-and[int]$parity.record.archive.entry_count-eq3) 'mir4-historical-tooling-archive-content'
 Assert-MIR4HistoricalToolingV1 ([int]$parity.record.authority.historical_target_count-eq6-and[int]$parity.record.authority.museum_target_count-eq7-and-not[bool]$parity.record.authority.package_visible) 'mir4-historical-tooling-authority-shape'
 Assert-MIR4HistoricalToolingV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-historical-tooling-package-mutation'

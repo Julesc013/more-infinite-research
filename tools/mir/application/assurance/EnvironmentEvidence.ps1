@@ -1,9 +1,28 @@
 . (Join-Path $PSScriptRoot '../../domain/canonicalization/CanonicalJsonV1.ps1')
 
 $script:MIR4EnvironmentPrivateFields = @(
-  'access_token','api_key','authorization','cookie','credential','email','home','hostname',
-  'machine','password','path','private_key','secret','token','user','username'
+  'access_token','address','api_key','authorization','cookie','credential','email','home','hostname',
+  'ip','ip_address','machine','password','path','phone','phone_number','private_key','proxy-authorization',
+  'proxy_authorization','secret','token',
+  'user','username'
 )
+
+# Shared text grammar for conversion and both support-export validators.
+# Quoted values are one value, including spaces and escaped quote characters.
+$script:MIR4SupportCredentialTextPattern = '(?i)(?<prefix>\b(?:access[_-]?token|token|secret|password|api[_-]?key)["'']?\s*[=:]\s*)(?<value>"(?:\\.|[^"\\])*"|''(?:\\.|[^''\\])*''|[^\s,;]+)'
+
+function Test-MIR4SupportSensitiveTextV1 {
+  param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
+  if ($Text -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/[^/\s]+|\b(?:proxy-)?authorization\s*:\s*(?:bearer|basic)\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+|\bbearer\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b') { return $true }
+  foreach ($match in [regex]::Matches($Text, $script:MIR4SupportCredentialTextPattern)) {
+    $value=$match.Groups['value'].Value
+    if ($value.Length -ge 2 -and ($value[0] -ceq [char]34 -or $value[0] -ceq [char]39) -and $value[0] -ceq $value[$value.Length-1]) {
+      $value=$value.Substring(1,$value.Length-2)
+    }
+    if ($value.Length -gt 0 -and $value -cne '<redacted>') { return $true }
+  }
+  return $false
+}
 
 function Get-MIR4EnvironmentDigest {
   param([Parameter(Mandatory)]$Value)
@@ -41,7 +60,7 @@ function Test-MIR4EnvironmentPrivateValue {
       Test-MIR4EnvironmentPrivateValue -Value $item -Location "$Location[$index]" | Out-Null
       $index++
     }
-  } elseif ($Value -is [string] -and ($Value -match '(?i)^[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]' -or $Value -match '(?i)^/(?:home|Users)/[^/\s]+' -or $Value -match '(?i)\b(?:token|secret|password|api[_-]?key)\s*[=:]\s*[^\s,;]+')) {
+  } elseif ($Value -is [string] -and (Test-MIR4SupportSensitiveTextV1 -Text $Value)) {
     throw "[mir4-environment-private-value] $Location"
   }
   $true
@@ -57,7 +76,10 @@ function ConvertTo-MIR4EnvironmentRows {
   param([AllowEmptyCollection()]$Rows,[Parameter(Mandatory)][string]$IdField,[Parameter(Mandatory)][string]$Diagnostic)
   $byId = [Collections.Generic.Dictionary[string,object]]::new([StringComparer]::Ordinal)
   foreach ($row in @($Rows)) {
-    $id = [string]$row.$IdField
+    if ($row -isnot [pscustomobject] -and $row -isnot [Collections.IDictionary]) { throw "[$Diagnostic]" }
+    $rawId = if ($row -is [Collections.IDictionary]) { $row[$IdField] } else { $row.$IdField }
+    if ($rawId -isnot [string]) { throw "[$Diagnostic]" }
+    $id = [string]$rawId
     if ([string]::IsNullOrWhiteSpace($id) -or $byId.ContainsKey($id)) { throw "[$Diagnostic] $id" }
     $byId.Add($id,$row)
   }
@@ -74,12 +96,42 @@ function ConvertTo-MIR4EnvironmentRows {
   @($result)
 }
 
+function Test-MIR4EnvironmentObjectFieldsV1 {
+  param([Parameter(Mandatory)]$Value,[Parameter(Mandatory)][string[]]$Names,[Parameter(Mandatory)][string]$Diagnostic)
+  if ($Value -isnot [pscustomobject] -and $Value -isnot [Collections.IDictionary]) { throw "[$Diagnostic]" }
+  $actual = if ($Value -is [Collections.IDictionary]) { @($Value.Keys | ForEach-Object { [string]$_ }) } else { @($Value.PSObject.Properties | ForEach-Object { [string]$_.Name }) }
+  if ($actual.Count -ne $Names.Count -or @($actual | Where-Object { $_ -cnotin $Names }).Count -or @($Names | Where-Object { $_ -cnotin $actual }).Count) { throw "[$Diagnostic]" }
+}
+
+function Test-MIR4EnvironmentSettingValueV1 {
+  param([AllowNull()]$Value,[Parameter(Mandatory)][string]$Diagnostic)
+  if ($null -eq $Value -or $Value -is [Collections.IDictionary] -or $Value -is [pscustomobject] -or ($Value -is [Collections.IEnumerable] -and $Value -isnot [string])) { throw "[$Diagnostic]" }
+  if ($Value -is [string] -or $Value -is [bool] -or $Value -is [byte] -or $Value -is [sbyte] -or $Value -is [int16] -or $Value -is [uint16] -or $Value -is [int32] -or $Value -is [uint32] -or $Value -is [int64] -or $Value -is [uint64] -or $Value -is [decimal]) { return }
+  if ($Value -is [single] -or $Value -is [double]) { if ([double]::IsNaN([double]$Value) -or [double]::IsInfinity([double]$Value)) { throw "[$Diagnostic]" }; return }
+  throw "[$Diagnostic]"
+}
+
+function Test-MIR4EnvironmentLockShapeV1 {
+  param([Parameter(Mandatory)]$Lock,[Parameter(Mandatory)][string]$Diagnostic)
+  Test-MIR4EnvironmentObjectFieldsV1 -Value $Lock -Names @('schema','kind','maturity','capture','target','engine','mir','mods','startup_settings','extensions','contracts','canonicalization','portable','privacy_safe','package_visible','player_mutation_authorized','prototype_write_authorized','public_support_authorized','release_authority','digest') -Diagnostic $Diagnostic
+  Test-MIR4EnvironmentObjectFieldsV1 -Value $Lock.engine -Names @('version','executable_sha256') -Diagnostic $Diagnostic
+  Test-MIR4EnvironmentObjectFieldsV1 -Value $Lock.mir -Names @('version','package_sha256','source_commit','source_tree') -Diagnostic $Diagnostic
+  foreach ($arrayName in @('mods','startup_settings','extensions','contracts')) { if ($Lock.$arrayName -is [string] -or $Lock.$arrayName -isnot [Collections.IEnumerable]) { throw "[$Diagnostic]" } }
+  if (@($Lock.mods).Count -gt 512 -or @($Lock.startup_settings).Count -gt 2048 -or @($Lock.extensions).Count -gt 256 -or @($Lock.contracts).Count -gt 128) { throw "[$Diagnostic]" }
+  foreach ($mod in @($Lock.mods)) { Test-MIR4EnvironmentObjectFieldsV1 -Value $mod -Names @('name','version','sha256') -Diagnostic $Diagnostic }
+  foreach ($setting in @($Lock.startup_settings)) { Test-MIR4EnvironmentObjectFieldsV1 -Value $setting -Names @('name','value') -Diagnostic $Diagnostic; Test-MIR4EnvironmentSettingValueV1 -Value $setting.value -Diagnostic $Diagnostic }
+  foreach ($extension in @($Lock.extensions)) { Test-MIR4EnvironmentObjectFieldsV1 -Value $extension -Names @('extension_id','version','digest') -Diagnostic $Diagnostic }
+  foreach ($flag in @('portable','privacy_safe','package_visible','player_mutation_authorized','prototype_write_authorized','public_support_authorized','release_authority')) { if ($Lock.$flag -isnot [bool]) { throw "[$Diagnostic]" } }
+}
+
 function New-MIR4EnvironmentLockV1 {
   param([Parameter(Mandatory)]$Manifest,[string]$Capture='authority-projected')
   Test-MIR4EnvironmentPrivateValue -Value $Manifest | Out-Null
-  if ([string]$Manifest.target -cnotmatch '^f[0-9]{3}$' -or
-      [string]$Manifest.engine.version -cnotmatch '^[0-9]+(?:\.[0-9]+){1,2}(?:-[a-z0-9.-]+)?$' -or
-      [string]$Manifest.mir.version -cnotmatch '^4\.0\.[0-9]{5}$') { throw '[mir4-environment-lock-identity]' }
+  if ($Capture -cnotin @('authority-projected','observed','engine-post-finalizer-exact')) { throw '[mir4-environment-lock-capture]' }
+  if ($Manifest.target -isnot [string] -or [string]$Manifest.target -cnotmatch '^f[0-9]{3}$' -or
+      $Manifest.engine.version -isnot [string] -or [string]$Manifest.engine.version -cnotmatch '^[0-9]+(?:\.[0-9]+){1,2}(?:-[a-z0-9.-]+)?$' -or
+      $Manifest.mir.version -isnot [string] -or [string]$Manifest.mir.version -cnotmatch '^4\.(?:0|[1-9][0-9]*)\.[0-9]{5}$') { throw '[mir4-environment-lock-identity]' }
+  if (@($Manifest.mods).Count -gt 512 -or @($Manifest.startup_settings).Count -gt 2048 -or @($Manifest.extensions).Count -gt 256 -or @($Manifest.contracts).Count -gt 128) { throw '[mir4-environment-lock-boundary]' }
   $engine = [ordered]@{
     version=[string]$Manifest.engine.version
     executable_sha256=ConvertTo-MIR4PortableSha256 -Value ([string]$Manifest.engine.executable_sha256) -Diagnostic 'mir4-environment-engine-digest'
@@ -97,14 +149,22 @@ function New-MIR4EnvironmentLockV1 {
     $mod.sha256 = ConvertTo-MIR4PortableSha256 -Value ([string]$mod.sha256) -Diagnostic 'mir4-environment-mod-digest'
   }
   $settings = @(ConvertTo-MIR4EnvironmentRows -Rows @($Manifest.startup_settings) -IdField 'name' -Diagnostic 'mir4-environment-setting-id')
+  foreach ($setting in $settings) {
+    Test-MIR4EnvironmentObjectFieldsV1 -Value $setting -Names @('name','value') -Diagnostic 'mir4-environment-setting-shape'
+    if ($setting.name -isnot [string] -or [string]::IsNullOrWhiteSpace($setting.name)) { throw '[mir4-environment-setting-id]' }
+    Test-MIR4EnvironmentSettingValueV1 -Value $setting.value -Diagnostic 'mir4-environment-setting-value'
+  }
   $extensions = @(ConvertTo-MIR4EnvironmentRows -Rows @($Manifest.extensions) -IdField 'extension_id' -Diagnostic 'mir4-environment-extension-id')
   foreach ($extension in $extensions) {
+    Test-MIR4EnvironmentObjectFieldsV1 -Value $extension -Names @('extension_id','version','digest') -Diagnostic 'mir4-environment-extension-shape'
+    if ($extension.extension_id -isnot [string] -or [string]::IsNullOrWhiteSpace($extension.extension_id) -or $extension.version -isnot [string] -or [string]::IsNullOrWhiteSpace($extension.version)) { throw '[mir4-environment-extension-id]' }
     $extension.digest = ConvertTo-MIR4PortableSha256 -Value ([string]$extension.digest) -Diagnostic 'mir4-environment-extension-digest'
   }
+  foreach ($contract in @($Manifest.contracts)) { if ($contract -isnot [string] -or [string]::IsNullOrWhiteSpace($contract)) { throw '[mir4-environment-contract-id]' } }
   $record = [pscustomobject][ordered]@{
     schema=1;kind='MIR4EnvironmentLockV1';maturity='developer-preview';capture=$Capture;target=[string]$Manifest.target
     engine=$engine;mir=$mir;mods=$mods;startup_settings=$settings;extensions=$extensions
-    contracts=@(Get-MIR4OrdinalSortedUniqueV1 -Values @($Manifest.contracts | ForEach-Object { [string]$_ }))
+    contracts=@(Get-MIR4OrdinalSortedUniqueV1 -Values @($Manifest.contracts))
     canonicalization='mir-canonical-json/1';portable=$true;privacy_safe=$true;package_visible=$false
     player_mutation_authorized=$false;prototype_write_authorized=$false;public_support_authorized=$false;release_authority=$false;digest=''
   }
@@ -116,11 +176,27 @@ function New-MIR4EnvironmentLockV1 {
 function Test-MIR4EnvironmentLockV1 {
   param([Parameter(Mandatory)]$Lock)
   Test-MIR4EnvironmentPrivateValue -Value $Lock | Out-Null
-  if ([int]$Lock.schema -ne 1 -or [string]$Lock.kind -cne 'MIR4EnvironmentLockV1' -or
-      [string]$Lock.maturity -cne 'developer-preview' -or [string]$Lock.target -cnotmatch '^f[0-9]{3}$' -or
-      [string]$Lock.canonicalization -cne 'mir-canonical-json/1' -or -not [bool]$Lock.portable -or -not [bool]$Lock.privacy_safe -or
+  Test-MIR4EnvironmentLockShapeV1 -Lock $Lock -Diagnostic 'mir4-environment-lock-boundary'
+  $schemaIsInteger = $Lock.schema -is [sbyte] -or $Lock.schema -is [byte] -or
+    $Lock.schema -is [int16] -or $Lock.schema -is [uint16] -or
+    $Lock.schema -is [int32] -or $Lock.schema -is [uint32] -or
+    $Lock.schema -is [int64] -or $Lock.schema -is [uint64]
+  if (-not $schemaIsInteger -or [decimal]$Lock.schema -ne 1 -or $Lock.kind -isnot [string] -or [string]$Lock.kind -cne 'MIR4EnvironmentLockV1' -or
+      $Lock.maturity -isnot [string] -or [string]$Lock.maturity -cne 'developer-preview' -or $Lock.capture -isnot [string] -or [string]$Lock.capture -cnotin @('authority-projected','observed','engine-post-finalizer-exact') -or $Lock.target -isnot [string] -or [string]$Lock.target -cnotmatch '^f[0-9]{3}$' -or
+      $Lock.mir.version -isnot [string] -or [string]$Lock.mir.version -cnotmatch '^4\.(?:0|[1-9][0-9]*)\.[0-9]{5}$' -or
+      $Lock.canonicalization -isnot [string] -or [string]$Lock.canonicalization -cne 'mir-canonical-json/1' -or -not [bool]$Lock.portable -or -not [bool]$Lock.privacy_safe -or
       [bool]$Lock.package_visible -or [bool]$Lock.player_mutation_authorized -or [bool]$Lock.prototype_write_authorized -or
       [bool]$Lock.public_support_authorized -or [bool]$Lock.release_authority) { throw '[mir4-environment-lock-boundary]' }
+  if ($Lock.engine.version -isnot [string] -or [string]$Lock.engine.version -cnotmatch '^[0-9]+(?:\.[0-9]+){1,2}(?:-[a-z0-9.-]+)?$' -or
+      $Lock.engine.executable_sha256 -isnot [string] -or [string]$Lock.engine.executable_sha256 -cnotmatch '^sha256:[0-9a-f]{64}$' -or
+      $Lock.mir.package_sha256 -isnot [string] -or [string]$Lock.mir.package_sha256 -cnotmatch '^sha256:[0-9a-f]{64}$' -or
+      $Lock.mir.source_commit -isnot [string] -or [string]$Lock.mir.source_commit -cnotmatch '^[0-9a-f]{40}$' -or
+      $Lock.mir.source_tree -isnot [string] -or [string]$Lock.mir.source_tree -cnotmatch '^[0-9a-f]{40}$' -or
+      $Lock.digest -isnot [string] -or [string]$Lock.digest -cnotmatch '^sha256:[0-9a-f]{64}$') { throw '[mir4-environment-lock-boundary]' }
+  foreach ($mod in @($Lock.mods)) { if ($mod.name -isnot [string] -or [string]$mod.name -cnotmatch '^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$' -or $mod.version -isnot [string] -or [string]$mod.version -cnotmatch '^[0-9]+(?:\.[0-9]+){1,3}(?:-[a-z0-9.-]+)?$' -or $mod.sha256 -isnot [string] -or [string]$mod.sha256 -cnotmatch '^sha256:[0-9a-f]{64}$') { throw '[mir4-environment-lock-boundary]' } }
+  foreach ($setting in @($Lock.startup_settings)) { if ($setting.name -isnot [string] -or [string]::IsNullOrWhiteSpace($setting.name)) { throw '[mir4-environment-lock-boundary]' } }
+  foreach ($extension in @($Lock.extensions)) { if ($extension.extension_id -isnot [string] -or [string]::IsNullOrWhiteSpace($extension.extension_id) -or $extension.version -isnot [string] -or [string]::IsNullOrWhiteSpace($extension.version) -or $extension.digest -isnot [string] -or [string]$extension.digest -cnotmatch '^sha256:[0-9a-f]{64}$') { throw '[mir4-environment-lock-boundary]' } }
+  foreach ($contract in @($Lock.contracts)) { if ($contract -isnot [string] -or [string]::IsNullOrWhiteSpace($contract)) { throw '[mir4-environment-lock-boundary]' } }
   Test-MIR4OrdinalSortedUniqueV1 -Values @($Lock.contracts) -Diagnostic 'mir4-environment-contract-order' | Out-Null
   foreach ($pair in @(@($Lock.mods,'name'),@($Lock.startup_settings,'name'),@($Lock.extensions,'extension_id'))) {
     $values = @($pair[0] | ForEach-Object { [string]$_.$($pair[1]) })
@@ -170,13 +246,43 @@ function Test-MIR4EnvironmentDiffV1 {
   $true
 }
 
+function Test-MIR4SupportDiagnosticV1 {
+  param([Parameter(Mandatory)]$Diagnostic)
+  Test-MIR4EnvironmentObjectFieldsV1 -Value $Diagnostic -Names @('code','severity','message') -Diagnostic 'mir4-support-diagnostic-shape'
+  if ($Diagnostic.code -isnot [string] -or [string]$Diagnostic.code -cnotmatch '^[a-z][a-z0-9-]{0,63}$') { throw '[mir4-support-diagnostic-code]' }
+  if ($Diagnostic.severity -isnot [string] -or [string]$Diagnostic.severity -cnotin @('error','warning','info')) { throw '[mir4-support-diagnostic-severity]' }
+  if ($Diagnostic.message -isnot [string] -or ([string]$Diagnostic.message).Length -gt 4096) { throw '[mir4-support-diagnostic-message]' }
+  if (Test-MIR4SupportSensitiveTextV1 -Text ([string]$Diagnostic.message)) { throw '[mir4-support-bundle-redaction]' }
+  $true
+}
+
 function ConvertTo-MIR4RedactedDiagnosticV1 {
   param([Parameter(Mandatory)]$Diagnostic)
-  $message = [string]$Diagnostic.message
+  if ($Diagnostic -isnot [pscustomobject] -and $Diagnostic -isnot [Collections.IDictionary]) { throw '[mir4-support-diagnostic-shape]' }
+  $code = if ($Diagnostic -is [Collections.IDictionary]) { $Diagnostic['code'] } else { $Diagnostic.code }
+  $severity = if ($Diagnostic -is [Collections.IDictionary] -and $Diagnostic.Contains('severity')) { $Diagnostic['severity'] } elseif ($Diagnostic -isnot [Collections.IDictionary] -and $null -ne $Diagnostic.PSObject.Properties['severity']) { $Diagnostic.severity } else { 'error' }
+  $rawMessage = if ($Diagnostic -is [Collections.IDictionary]) { $Diagnostic['message'] } else { $Diagnostic.message }
+  if ($code -isnot [string] -or [string]$code -cnotmatch '^[a-z][a-z0-9-]{0,63}$') { throw '[mir4-support-diagnostic-code]' }
+  if ($severity -isnot [string] -or [string]$severity -cnotin @('error','warning','info')) { throw '[mir4-support-diagnostic-severity]' }
+  if ($rawMessage -isnot [string] -or ([string]$rawMessage).Length -gt 4096) { throw '[mir4-support-diagnostic-message]' }
+  $message = [string]$rawMessage
   $message = [regex]::Replace($message,'(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s]+','<user-home>')
   $message = [regex]::Replace($message,'(?i)/(?:home|Users)/[^/\s]+','<user-home>')
-  $message = [regex]::Replace($message,'(?i)\b(token|secret|password|api[_-]?key)\s*[=:]\s*[^\s,;]+','$1=<redacted>')
-  [ordered]@{code=[string]$Diagnostic.code;severity=$(if($Diagnostic.severity){[string]$Diagnostic.severity}else{'error'});message=$message}
+  $message = [regex]::Replace($message,$script:MIR4SupportCredentialTextPattern,[Text.RegularExpressions.MatchEvaluator]{
+    param($match)
+    $value=$match.Groups['value'].Value
+    $replacement='<redacted>'
+    if ($value.Length -ge 2 -and ($value[0] -ceq [char]34 -or $value[0] -ceq [char]39) -and $value[0] -ceq $value[$value.Length-1]) {
+      $replacement=[string]$value[0]+'<redacted>'+[string]$value[0]
+    }
+    return $match.Groups['prefix'].Value+$replacement
+  })
+  $message = [regex]::Replace($message,'(?i)\b((?:proxy-)?authorization)\s*:\s*(bearer|basic)\s+[^\s,;]+','$1: $2 <redacted>')
+  $message = [regex]::Replace($message,'(?i)\bbearer\s+[^\s,;]+','Bearer <redacted>')
+  $message = [regex]::Replace($message,'(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b','<email-redacted>')
+  $record = [ordered]@{code=[string]$code;severity=[string]$severity;message=$message}
+  Test-MIR4SupportDiagnosticV1 $record | Out-Null
+  $record
 }
 
 function Get-MIR4EvidenceClosureV1 {
@@ -219,6 +325,8 @@ function New-MIR4EnvironmentSupportBundleV1 {
     [AllowEmptyCollection()]$EvidenceItems=@(),[AllowEmptyCollection()]$Diagnostics=@()
   )
   Test-MIR4EnvironmentLockV1 $EnvironmentLock | Out-Null
+  Test-MIR4EnvironmentPrivateValue -Value $Subjects -Location '$.subjects' | Out-Null
+  Test-MIR4EnvironmentPrivateValue -Value $EvidenceItems -Location '$.evidence_items' | Out-Null
   $evidence = @(ConvertTo-MIR4EnvironmentRows -Rows @($EvidenceItems) -IdField 'id' -Diagnostic 'mir4-support-evidence-id')
   foreach ($item in $evidence) {
     if ($null -eq $item.PSObject.Properties['dependencies']) { $item | Add-Member -NotePropertyName dependencies -NotePropertyValue @() }
@@ -249,6 +357,7 @@ function New-MIR4EnvironmentSupportBundleV1 {
 
 function Test-MIR4SupportBundleV1 {
   param([Parameter(Mandatory)]$Bundle)
+  Test-MIR4EnvironmentObjectFieldsV1 -Value $Bundle -Names @('schema','kind','bundle_id','target','subjects','source_ledger_digest','environment_lock','environment_lock_digest','evidence_items','diagnostics','redaction','reproducer','minimized','source_bundle_digest','minimization','maturity','synthetic','claim_eligible','arbitrary_code','executable_content','network_access_authorized','package_visible','player_mutation_authorized','prototype_write_authorized','public_support_authorized','release_authority','canonicalization','digest') -Diagnostic 'mir4-support-bundle-shape'
   Test-MIR4EnvironmentLockV1 $Bundle.environment_lock | Out-Null
   if ([int]$Bundle.schema -ne 1 -or [string]$Bundle.kind -cne 'MIR4SupportBundleV1' -or
       [string]$Bundle.target -cne [string]$Bundle.environment_lock.target -or
@@ -256,13 +365,14 @@ function Test-MIR4SupportBundleV1 {
       [bool]$Bundle.claim_eligible -or [bool]$Bundle.arbitrary_code -or [bool]$Bundle.executable_content -or
       [bool]$Bundle.network_access_authorized -or [bool]$Bundle.package_visible -or [bool]$Bundle.player_mutation_authorized -or
       [bool]$Bundle.prototype_write_authorized -or [bool]$Bundle.public_support_authorized -or [bool]$Bundle.release_authority) { throw '[mir4-support-bundle-boundary]' }
+  foreach ($diagnostic in @($Bundle.diagnostics)) { Test-MIR4SupportDiagnosticV1 $diagnostic | Out-Null }
+  # This walks every serialized field, rather than trusting the redaction
+  # declaration, so direct callers cannot inject private evidence metadata.
+  Test-MIR4EnvironmentPrivateValue -Value $Bundle -Location '$' | Out-Null
   $roots = @($Bundle.reproducer.required_evidence_ids | ForEach-Object { [string]$_ })
   $signature = Get-MIR4ReproducerSignatureV1 -EnvironmentLock $Bundle.environment_lock -Evidence @($Bundle.evidence_items) -Roots $roots
   if ([string]$Bundle.reproducer.signature -cne $signature -or -not [bool]$Bundle.reproducer.preserved -or
       [bool]$Bundle.redaction.raw_private_values_retained -or [string]$Bundle.digest -cne (Get-MIR4EnvironmentDigest $Bundle)) { throw '[mir4-support-bundle-integrity]' }
-  foreach ($diagnostic in @($Bundle.diagnostics)) {
-    if ([string]$diagnostic.message -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/[^/\s]+|(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>)') { throw '[mir4-support-bundle-redaction]' }
-  }
   $true
 }
 

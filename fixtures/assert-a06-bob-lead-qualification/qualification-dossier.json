@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "kind": "MIR4A06BobLeadQualificationV1",
+  "scope": "F210 Bob-only Lead ordinary-route quantitative, progression, excluded-alternative, and current-candidate persisted-state diagnostic; package-excluded evidence",
+  "target": {"factorio_version":"2.1.17","engine_sha256":"710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8","boblibrary_sha256":"49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4","bobores_sha256":"7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B","bobplates_sha256":"503D7BF6E88DA1F99463AC00CEC959C2003B2701D80DC4A564CF2EC3920AC8AF"},
+  "route": {"recipe":"bob-lead-plate","machine":"electric-furnace","category":"smelting","ingredients":{"bob-lead-ore":1},"output":{"bob-lead-plate":1},"allow_productivity":true,"auto_recycle":false},
+  "admission": {"qualification_id":"A06-Bob-Lead-F210-2.1.17-v1","evidence_id":"A06-Bob-Lead-F210-locked-current-v1","mechanism":"ordinary-acyclic-route","graph_reason":"no-recipe-return-path","canonical_risk_fingerprint":"mir32-1806ec36","hard_flags":[],"review_flags":[],"shared_input_output":[],"evidence_confidence":1,"maximum_productivity":3.0,"source_class":"ordinary","hidden":false,"declared_allow_productivity":true,"effective_allow_productivity":true},
+  "excluded_alternative": {"recipe":"bob-lead-plate-2","machine":"bob-electric-chemical-furnace","category":"bob-chemical-furnace","ingredients":{"bob-lead-oxide":2,"carbon":1},"output":{"bob-lead-plate":2},"allow_productivity":true,"auto_recycle":false,"canonical_risk_fingerprint":"mir32-ea26340b","hard_flags":[],"review_flags":[],"shared_input_output":[],"evidence_confidence":1,"maximum_productivity":3.0,"source_class":"ordinary","hidden":false,"declared_allow_productivity":true,"effective_allow_productivity":true,"admitted":false,"guard_reason":"potential-return-path:carbon","owner_effects":0},
+  "owner":{"technology":"recipe-prod-research_material_lead-1","effect_change_per_completed_level":0.02,"exact_owner_count":1,"excluded_alternative_effect_count":0},
+  "progression": {"prerequisites":["automation-science-pack","chemical-science-pack","logistic-science-pack"],"science":["automation-science-pack","chemical-science-pack","logistic-science-pack"],"lab":"lab"},
+  "cap_transport": {"raw_direct":2,"mirset1_imported":3,"effective":3,"no_level_four":true},
+  "production": {"input":{"bob-lead-ore":100},"levels":[{"completed_level":0,"expected_output":100,"expected_bonus":0},{"completed_level":1,"expected_output":102,"expected_bonus":2},{"completed_level":2,"expected_output":104,"expected_bonus":4},{"completed_level":3,"expected_output":106,"expected_bonus":6}]},
+  "persisted_state": {"completed_levels":2,"current_level":3,"fractional_progress":0.42,"serialized_reload_cycles":2},
+  "continuity": {"kind":"fresh-current-candidate-serialized-reload","predecessor_upgrade_status":"unresolved-no-authentic-predecessor-package"},
+  "explicit_non_claims": ["predecessor-upgrade-or-migration","Angel-or-combined-admission","F200","infinite-progression","route-safety-or-balance-completion","bob-lead-plate-2-quantitative-or-cycle-safety-investigation","release-readiness"]
+}

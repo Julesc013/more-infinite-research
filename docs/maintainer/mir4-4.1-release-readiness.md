@@ -1,13 +1,15 @@
 ---
-title: "MIR 4.1 Release Readiness"
-status: current
+title: "MIR 4.1 Release Readiness (Historical Checkpoint)"
+status: historical-checkpoint
 applies_to: "MIR 4.1.0"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-09-05
+last_reviewed: 2026-09-16
 supersedes: []
-superseded_by: []
+superseded_by: docs/maintainer/mir4-release-operations.md
+checkpoint_source_commit: not-recorded
+checkpoint_candidate_sha256: not-recorded
 source_of_truth_for:
   - mir4-4.1-release-readiness
   - mir4-4.1-resource-bounded-release
@@ -15,6 +17,8 @@ source_of_truth_for:
 ---
 
 # MIR 4.1 release readiness
+
+> Historical checkpoint: this is the 4.1 release-window procedure retained for provenance. It does not authorize a current candidate, a ruleset change, or reuse of `Finalize-MIR410.ps1`. Use [MIR 4 release operations](mir4-release-operations.md) and the active programme for current work.
 
 MIR 4.1.0 is prepared through one public command surface and a set of bounded application modules. Tracked source freezes before construction. The durable release window lives outside the repository and binds the exact source commit, four package archives, four normalized content roots, exact engine identities, runtime and upgrade evidence, release copy, technical seal, signed local tag object, and exact-main promotion receipt.
 

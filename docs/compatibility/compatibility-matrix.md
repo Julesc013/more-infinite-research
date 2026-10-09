@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-09-30
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -25,6 +25,7 @@ Status vocabulary:
 | Planned | Candidate work, but not a public compatibility claim yet. |
 | Future campaign | Dedicated post-`2.2.0` compatibility work, not a casual stream batch. |
 | Adjacent | Compatible or useful, but outside MIR core unless a separate design accepts it. |
+| Development observation | One exact development profile produced the named observation; this is not a compatibility support claim. |
 
 Role vocabulary:
 
@@ -68,6 +69,7 @@ The machine-readable support-lane ledger lives at `spec/compatibility/support-la
 | Loop-risk and rule-surface diagnostics | Supported in `2.2.0` as report-only diagnostics | Observe recycling, cleaning, voiding, container, transmutation, self-return, cap, beacon, lab, and machine-rule surfaces | Static validation and audit rows | False positives are acceptable; behavior remains diagnostic until policy and fixtures exist. |
 | `atan-air-scrubbing` | Supported in `2.2.0` | MIR-owned productivity for exact clean pollution and spore filter recipes only | Static and runtime fixture | Does not touch scrubbing, cleaning, recovery, or environmental-removal recipes. |
 | `atan-ash` | Supported in `2.2.0`; exact loader-schema repair added in `3.0.0` | MIR-owned productivity for exact ash separation only; exact `atan-ash_2.2.1` recipe category schema repair | Static and runtime fixture with Ash-style sink recipes; local supported-zip load check | Targets `atan-ash-seperation` only. Landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks are excluded even when productivity-allowed. The schema repair only converts known old recipe category fields to Factorio `2.1` `categories`. |
+| Real Industrial Chemistry `0.36.1`, Marine / Continental modes | Development observation | In Marine mode, one carbonisation recipe receives the observed `+2%` level-1 productivity effect; Continental mode has no Marine carbonisation technology at data stage | Exact Factorio `2.1.20` candidate create/reload receipts; Marine data/runtime/reload assertions and Continental data-stage assertion | Development evidence only: the Marine fixture observed `ric-carbonise-marine-biomass` and its level-1 effect retained on reload. Sixteen return-path routes were withheld. This does not claim broader RIC support or publication. See [the exact RIC observation](targets/ric-marine-carbonisation-observation.md). |
 | `atan-nuclear-science` | Supported in `2.2.0` as fixture-backed science-pack behavior; exact loader-schema repair added in `3.0.0` | Existing `research_science_pack_productivity` support for visible `nuclear-science-pack` lab-input recipes; exact `atan-nuclear-science_0.3.3` recipe category schema repair | Static and runtime fixture with Nuclear Science-style science pack and atom forge surfaces; local supported-zip load check | Adds science-pack productivity to the science pack recipe only. Does not add productivity to non-science atom forge crafting. The schema repair only converts known old recipe category fields to Factorio `2.1` `categories`. |
 | Crushing Industry ore crushing | Planned for `2.2.0` | New stream candidate or guarded profile | Recipe-ID fixture with Crushing Industry | Follow-up family-stream candidate after the ATAN proof slices. |
 | `big-mining-drill` | Supported in `2.2.0` as fixture-backed existing-stream behavior | Existing `research_mining_drill` support for visible `big-mining-drill` recipes plus entity-backed mining-drill manufacturing diagnostics | Static and runtime fixture | Uses the high-tier mining-drill productivity bucket; no separate Big Mining Drill research line or native mining-yield stack. |

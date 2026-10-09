@@ -90,7 +90,7 @@ Require-MIR4F2DAggregateWriter ([string]$change.record.change_id -ceq 'MIR4-CHG-
 
 $rolePaths = @(& git -C $RepoRoot diff --name-only $authorityBaseCommit --)
 $rolePaths += @(& git -C $RepoRoot ls-files --others --exclude-standard)
-$rolePaths += @($change.relative,$schemaRelative,$verifierRelative,'CHANGELOG.md','docs/releases/mir4-post-4.0-roadmap.md','releases/governance/MIR4-Source-Changelog-PlanV1.json','spec/programmes/mir4-4x-operating-programme-v1.json','spec/schemas/mir4-4x-operating-programme-v1.schema.json','todo.md','tools/lib/mir4/PreFreezeRelease.ps1','validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1','validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1','tools/commands/mir4/Update-MIR4M41F2DFourTargetRuntimeReplayAggregate.ps1')
+$rolePaths += @($change.relative,$schemaRelative,$verifierRelative,'CHANGELOG.md','docs/releases/mir4-post-4.0-roadmap.md','releases/governance/MIR4-Source-Changelog-PlanV1.json','spec/programmes/mir4-4x-operating-programme-v1.json','spec/schemas/mir4-4x-operating-programme-v1.schema.json','TODO.md','tools/lib/mir4/PreFreezeRelease.ps1','validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1','validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1','tools/commands/mir4/Update-MIR4M41F2DFourTargetRuntimeReplayAggregate.ps1')
 $rolePaths = @($rolePaths | ForEach-Object { ([string]$_).Replace('\','/') } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and $_ -cne $outputRelative } | Sort-Object -Unique -CaseSensitive)
 $evolved = [Collections.Generic.List[object]]::new()
 $current = [Collections.Generic.List[object]]::new()

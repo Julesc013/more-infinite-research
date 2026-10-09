@@ -60,6 +60,8 @@ write-data=$validationRoot
 locale=auto
 
 [other]
+enable-new-mods=false
+check-updates=false
 enable-steam-networking=false
 disable-blueprint-storage=true
 "@

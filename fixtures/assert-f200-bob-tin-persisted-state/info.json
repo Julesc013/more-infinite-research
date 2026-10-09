@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-assert-f200-bob-tin-persisted-state",
+  "version": "0.1.0",
+  "title": "MIR Fixture - F200 Bob Tin Persisted Research State",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.0",
+    "boblibrary >= 2.1.0",
+    "bobores >= 2.1.2",
+    "bobplates >= 2.1.1",
+    "more-infinite-research >= 4.2.0"
+  ]
+}

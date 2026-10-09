@@ -97,15 +97,30 @@ package_excluded_modules:
     command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
     public_facade: tools/mir.ps1
     proof: tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
-    immutable_archives:
-      - dist/more-infinite-research_4.0.21000.zip
-      - dist/more-infinite-research_4.0.20000.zip
-      - dist/more-infinite-research_4.0.11000.zip
-      - dist/more-infinite-research_4.0.10000.zip
+    immutable_archives: git-pinned-local-custody
+    archive_custody: .mir/distributions.json
+    archive_materializer: tools/mir/application/package/DistributionCustody.ps1
     package_visible: false
     package_cutover_authority: false
     release_transition_authority: false
     runtime_replay_required_before_cutover: true
+  mir4_distribution_custody_v1:
+    authority: .mir/distributions.json
+    implementation: tools/mir/application/package/DistributionCustody.ps1
+    command: tools/mir/cli/Invoke-MIR4DistributionCustody.ps1
+    public_facade: tools/mir.ps1
+    proof:
+      - tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
+      - tests/release/Test-MIRPublishedSnapshotIntegrity.ps1
+      - tests/release/Test-MIR4BootstrapMaterialization.ps1
+      - tests/mir4/Test-MIR4RuntimeReplayF2D.ps1
+      - tests/tooling/Test-MIRControlPlaneExecutor.ps1
+    historical_predecessor_commit: D82395F1DAB2E8E5E135EB2F57E97767DF6C0C87
+    local_cache_only: true
+    network_retrieval_permitted: false
+    history_rewrite_authority: false
+    release_transition_authority: false
+    publication_authority: false
   mir4_m41_f1_golden_baseline_authority_evolution_v1:
     predecessor: releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json
     receipt: releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json
@@ -146,19 +161,39 @@ package_excluded_modules:
     runtime_replay_required_before_cutover: true
   mir4_shadow_source_model_v1:
     predecessor: releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json
-    implementation: tools/mir/application/package/ShadowSourceModel.ps1
-    command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
-    public_facade: tools/mir.ps1
+    historical_receipt_verifier: tools/mir/application/package/ShadowSourceModel.ps1
     proof: tests/mir4/Test-MIR4ShadowSourceModel.ps1
-    proof_schema: spec/schemas/mir4-shadow-source-model-proof-v1.schema.json
-    output: build/reports/package-source/mir4-shadow-source-model-v1.json
-    algorithm: semantic-common-family-target-overlay-and-omission-model-v1
+    receipt_schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
+    receipt: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
+    status: frozen-historical-receipt-no-current-source-authority
     package_visible: false
     editable_source_authority: false
     package_cutover_authority: false
     release_transition_authority: false
     current_writer_unchanged: true
     runtime_replay_required_before_cutover: true
+  mir4_composable_source_model_v2:
+    source_manifest: source/package-source.json
+    package_authority: targets/package-authority.json
+    target_registry: targets/registry.json
+    target_compositions:
+      - targets/f210/composition.json
+      - targets/f200/composition.json
+      - targets/f110/composition.json
+      - targets/f100/composition.json
+    implementation: tools/mir/application/package/ComposableSourceModel.ps1
+    command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
+    public_facade: tools/mir.ps1
+    proof: tests/mir4/Test-MIR4ComposableSourceModelM4202.ps1
+    proof_schema: spec/schemas/mir4-composable-source-model-proof-v2.schema.json
+    output: build/reports/package-source/mir4-composable-source-model-v2.json
+    algorithm: canonical-source-target-composition-inspection-v2
+    package_visible: false
+    editable_source_authority: true
+    package_cutover_authority: true
+    release_transition_authority: false
+    current_writer: tools/mir/application/package/TargetMaterializer.ps1
+    historical_receipts_comparison_only: true
   mir4_m41_f2b_shadow_source_model_authority_evolution_v1:
     predecessor: releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json
     receipt: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
@@ -172,20 +207,20 @@ package_excluded_modules:
     package_cutover_authority: false
     release_transition_authority: false
     runtime_replay_required_before_cutover: true
-  mir4_editable_source_materializer_v1:
+  mir4_composable_source_materializer_v3:
     predecessor: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
-    source_manifest: src/mod/package-source.json
-    source_manifest_schema: spec/schemas/mir4-package-source-manifest-v1.schema.json
+    source_manifest: source/package-source.json
+    source_manifest_schema: spec/schemas/mir4-composable-package-source-v3.schema.json
     package_authority: targets/package-authority.json
-    package_authority_schema: spec/schemas/mir4-canonical-package-authority-v1.schema.json
+    package_authority_schema: spec/schemas/mir4-canonical-package-authority-v2.schema.json
     package_authority_application: tools/mir/application/package/PackageAuthority.ps1
     target_registry: targets/registry.json
     target_support_policy: targets/support-policy.json
-    target_overlays:
-      - targets/f210/overlay.json
-      - targets/f200/overlay.json
-      - targets/f110/overlay.json
-      - targets/f100/overlay.json
+    target_compositions:
+      - targets/f210/composition.json
+      - targets/f200/composition.json
+      - targets/f110/composition.json
+      - targets/f100/composition.json
     implementation: tools/mir/application/package/TargetMaterializer.ps1
     command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
     public_facade: tools/mir.ps1
@@ -196,7 +231,23 @@ package_excluded_modules:
     cutover_receipt_schema: contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json
     proof_schema: spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json
     output: build/packages
-    algorithm: canonical-common-family-target-overlay-materializer-v1
+    algorithm: canonical-package-shaped-source-target-composition-materializer-v2
+    layout_migration_authority: governance/repository/composable-source-layout-v1.json
+    layout_migration_proof: assurance/repository/composable-source-layout-v1.json
+    layout_migration_receipt: assurance/repository/composable-source-layout-receipt-v1.json
+    layout_migration_test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
+    predecessor_proof: tools/mir/application/package/SourceCompositionProof.ps1
+    predecessor_proof_schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
+    factorio_1_source_convergence_proof_implementation: tools/mir/application/package/FactorioOneSourceConvergence.ps1
+    factorio_1_source_convergence_test: tests/mir4/Test-MIR4FactorioOneSourceConvergenceM4202.ps1
+    factorio_1_source_convergence_schema: spec/schemas/mir4-factorio-one-source-convergence-proof-v1.schema.json
+    factorio_1_convergence_authority: governance/repository/factorio-one-source-convergence-v1.json
+    factorio_1_convergence_authority_schema: contracts/repository/mir4-factorio-one-source-convergence-authority-v1.schema.json
+    factorio_1_convergence_receipt: assurance/repository/factorio-one-source-convergence-v1.json
+    factorio_1_convergence_receipt_schema: contracts/repository/mir4-factorio-one-source-convergence-receipt-v1.schema.json
+    factorio_1_convergence_application: tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1
+    factorio_1_convergence_writer: tools/commands/mir4/Update-MIR4FactorioOneSourceConvergenceAuthority.ps1
+    factorio_1_convergence_authority_proof: tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority.ps1
     package_visible: false
     editable_source_authority: true
     package_cutover_authority: true
@@ -204,7 +255,71 @@ package_excluded_modules:
     current_writer: tools/mir/application/package/TargetMaterializer.ps1
     legacy_root_writer_retired: true
     historical_archives_are_comparison_fixtures_only: true
+    binary_safe_predecessor_equivalence: true
     four_target_runtime_replay_complete: true
+    factorio_1_code_convergence: static-source-complete-exact-engine-proof-required
+  mir4_m41_to_m42_composable_source_succession_v1:
+    historical_readiness: governance/release/mir4-4.1-release-readiness-v1.json
+    historical_source_freeze: releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json
+    current_layout_authority: governance/repository/composable-source-layout-v1.json
+    current_layout_proof: assurance/repository/composable-source-layout-v1.json
+    current_layout_receipt: assurance/repository/composable-source-layout-receipt-v1.json
+    record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json
+    record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v1.schema.json
+    implementation: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+    writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionAuthority.ps1
+    proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccession.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    historical_mir41_lineage_immutable: true
+    current_mir41_release_operations_authorized: false
+  mir4_m41_to_m42_composable_source_succession_v2:
+    historical_record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json
+    historical_record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v1.schema.json
+    factorio_one_authority: governance/repository/factorio-one-source-convergence-v1.json
+    record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json
+    record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json
+    implementation: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+    writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority.ps1
+    proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    historical_mir41_lineage_immutable: true
+    factorio_two_executable_content_preserved: true
+    factorio_one_exact_engine_proof_required: true
+  mir4_m41_to_m42_composable_source_succession_v3:
+    historical_record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json
+    historical_record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json
+    progression_package_presentation: spec/distribution/mir4-current-package-presentation-v5.json
+    record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json
+    record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v3.schema.json
+    implementation: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+    writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority.ps1
+    proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV3.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    historical_mir41_lineage_immutable: true
+    f210_f200_exact_engine_qualification_required: true
+    f110_f100_progression_capability_omitted_nonclaim: true
+  mir4_m41_to_m42_composable_source_succession_v4:
+    historical_record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json
+    historical_record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v3.schema.json
+    progression_package_presentation: spec/distribution/mir4-current-package-presentation-v5.json
+    record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v4.json
+    record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v4.schema.json
+    implementation: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+    writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV4Authority.ps1
+    proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV4.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    historical_mir41_lineage_immutable: true
+    proof_input_authorities_typed_and_fail_closed: true
+    f210_f200_exact_engine_qualification_required: true
+    f110_f100_progression_capability_omitted_nonclaim: true
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
     implementation: tools/mir/application/platform/WholePlatform.ps1
@@ -309,6 +424,67 @@ package_excluded_modules:
     authority_evolution_writer: tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1
     boundary: package-excluded deterministic planning and disposable local branch rehearsal only; no implementation merge, version allocation, remote branch write, signing, sealing, tagging, package publication, or public release authority
     stability: stable-m40-01-unpublished-rehearsal-passed
+  mir4_a03_k2_k2so_intake_v1:
+    programme: spec/programmes/mir4-4x-operating-programme-v1.json
+    authority_observation: spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json
+    environment_lock: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json
+    execution_proof: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json
+    dossier: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-dossier.json
+    receipt: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-receipt.json
+    schemas:
+      - spec/schemas/mir4-a03-k2-k2so-execution-proof-v1.schema.json
+      - spec/schemas/mir4-a03-k2-k2so-intake-dossier-v1.schema.json
+      - spec/schemas/mir4-a03-k2-k2so-intake-receipt-v1.schema.json
+    fixture: fixtures/assert-k2-k2so-f210-intake
+    evidence_writer: tools/commands/mir4/Write-MIR4A00A03Evidence.ps1
+    proof_writer: tools/commands/mir4/Write-MIR4A03K2K2SOExecutionProof.ps1
+    runtime_verification: tests/runtime/Test-MIR4A03K2K2SOIntake.ps1
+    closure_verification: tests/mir4/Test-MIR4A03K2K2SOIntakeClosure.ps1
+    boundary: exact current F210 K2/K2SO intake, locked package and configuration, fresh post-finalizer read-only observation, and separate historical lineage only; no A04 progression, upgrade, reload, public-support, release, player-mutation, or prototype-write authority
+    stability: qualified-current-intake-a04-not-authorized
+  mir4_a04_k2_science_closure_v1:
+    programme: spec/programmes/mir4-4x-operating-programme-v1.json
+    runtime_proof: spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-Runtime-ProofV1.json
+    closure: .mir/releases/waves/mir4-r0/MIR4-K2-Science-A04-ClosureV1.json
+    schemas:
+      - spec/schemas/mir4-a04-k2-science-runtime-proof-v1.schema.json
+      - spec/schemas/mir4-a04-k2-science-closure-v1.schema.json
+    writer: tools/commands/mir4/Write-MIR4A04K2ScienceClosure.ps1
+    closure_verification: tests/mir4/Test-MIR4A04K2ScienceClosure.ps1
+    custody: spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science
+    fixture: fixtures/assert-k2-science-progressed-reload-a04
+    boundary: exact current F210 K2/K2SO final-emission, progression, and two-reload observation only; no player mutation, generated-prototype write, public-support, release, signing, or publication authority
+    stability: bounded-a04-closure-passed-4.2-qualification-only
+  mir4_a05_k2_03_imersite_closure_v1:
+    programme: spec/programmes/mir4-4x-operating-programme-v1.json
+    runtime_proof: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03/MIR4-A05-K2-03-Imersite-Runtime-ProofV1.json
+    closure: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03/MIR4-A05-K2-03-Imersite-ClosureV1.json
+    command_inventory_evolution: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03/MIR4-A05-K2-03-Command-Inventory-EvolutionV1.json
+    schemas:
+      - spec/schemas/mir4-a05-k2-03-imersite-runtime-proof-v1.schema.json
+      - spec/schemas/mir4-a05-k2-03-imersite-closure-v1.schema.json
+      - spec/schemas/mir4-a05-k2-03-command-inventory-evolution-v1.schema.json
+    writer: tools/commands/mir4/Write-MIR4A05K203ImersiteClosure.ps1
+    runtime_verification: tests/runtime/Test-MIR4A05K203Imersite.ps1
+    closure_verification: tests/mir4/Test-MIR4A05K203ImersiteClosure.ps1
+    custody: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03
+    fixture: fixtures/assert-k2-03-imersite
+    boundary: exact locked K2SO 2.0.13 plus xy fresh and two-reload Imersite owner, science, route, and partial-research continuity proof together with current K2SO 2.0.17 fresh-load owner and route parity only; no infinite continuation, weighted-process admission, broader K2 or A05 completion, player mutation, prototype write, public support, release, signing, or publication authority
+    stability: bounded-k2-03-passed-a05-open-projection-gap-blocks-release
+  mir4_a05_k2_materials_closure_v1:
+    programme: spec/programmes/mir4-4x-operating-programme-v1.json
+    closure: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json
+    command_inventory_evolution: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-Command-Inventory-EvolutionV1.json
+    schemas:
+      - spec/schemas/mir4-a05-k2-materials-closure-v1.schema.json
+      - spec/schemas/mir4-a05-k2-materials-command-inventory-evolution-v1.schema.json
+    writer: tools/commands/mir4/Write-MIR4A05K2MaterialsClosure.ps1
+    runtime_verification: tests/runtime/Test-MIR4A05K2Materials.ps1
+    closure_verification: tests/mir4/Test-MIR4A05K2MaterialsClosure.ps1
+    custody: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials
+    fixture: fixtures/assert-k2-materials
+    boundary: exact locked K2SO 2.0.13 plus xy and current K2SO 2.0.17 without xy qualification for bounded rare-metals, silicon, and glass routes with exact casting and paving omissions and two byte-identical 42-percent reloads per profile; potential return paths remain withheld unless the exact profile-locked reviewed-forward certificate proves the exact final route is bounded and ordinary; no broader K2SO or enhancement support, Angel or combined A06 support, infinite continuation, broader K2 or A05 completion, public support, release, signing, or publication authority
+    stability: bounded-k2-materials-passed-a05-open-root-projection-gap-blocks-release
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
     current_github_actions_lock: governance/automation/github-actions-lock.json
@@ -317,11 +493,18 @@ package_excluded_modules:
     automation_authority_cutover_receipt: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
     automation_authority_cutover_schema: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
-    current_package_presentation_authority: spec/distribution/mir4-package-presentation-baseline-v1.json
-    current_package_presentation_schema: spec/schemas/mir4-package-presentation-baseline-v1.schema.json
-    current_package_presentation_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
-    current_package_presentation_evolution_schema: spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
-    current_package_presentation_evolution_writer: tools/commands/mir4/Update-MIR4PostReleasePackageBaselineAuthority.ps1
+    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v7.json
+    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v7.schema.json
+    current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV6Authority.ps1
+    frozen_package_presentation_v5: spec/distribution/mir4-current-package-presentation-v5.json
+    frozen_package_presentation_v5_schema: spec/schemas/mir4-current-package-presentation-v5.schema.json
+    frozen_package_presentation_v4: spec/distribution/mir4-current-package-presentation-v4.json
+    frozen_package_presentation_v4_schema: spec/schemas/mir4-current-package-presentation-v4.schema.json
+    frozen_package_presentation_v3: spec/distribution/mir4-current-package-presentation-v3.json
+    frozen_package_presentation_v3_schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
+    frozen_package_presentation_v2: spec/distribution/mir4-current-package-presentation-v2.json
+    frozen_package_presentation_v2_evolution_receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
+    frozen_package_presentation_v2_verifier: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
     completion_authority: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
     independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
     authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
@@ -750,16 +933,30 @@ package_excluded_modules:
     source_changelog_projection: CHANGELOG.md
     contracts:
       - contracts/release/mir4-change-fragment-v2.schema.json
+      - contracts/release/mir4-change-fragment-v3.schema.json
       - contracts/release/mir4-defect-record-v1.schema.json
       - contracts/release/mir4-change-realization-v1.schema.json
       - contracts/release/mir4-release-narrative-plan-v1.schema.json
+      - contracts/release/mir4-release-narrative-plan-v2.schema.json
       - contracts/release/mir4-release-narrative-result-v1.schema.json
+      - contracts/release/mir4-release-narrative-result-v2.schema.json
     implementation: tools/mir/application/release/ReleaseNarratives.ps1
     command: tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1
     documentation: docs/architecture/mir4-change-and-release-authority.md
     test: tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1
+    nine_target_test: tests/mir4/Test-MIR42NineTargetReleaseNarratives.ps1
     boundary: accepted typed changes render deterministic package-excluded narrative views and the generated root source-family changelog; renderers do not discover changes, infer target support, write player packages, allocate versions, or grant merge, signing, sealing, tagging, or publication authority
-    stability: stable-package-excluded-change-and-narrative-authority-v1
+    stability: stable-package-excluded-change-and-narrative-authority-v1-plus-nine-target-v2
+  mir42_support_collector_release_asset_v1:
+    source_launcher: scripts/Collect-MIRPlayerReport.cmd
+    source_collector: scripts/Collect-MIRPlayerReport.ps1
+    bundle_builder: tools/mir/application/release/readiness/MIR42SupportCollectorBundle.ps1
+    bundle_command: tools/commands/release/New-MIR42SupportCollectorBundle.ps1
+    release_inventory: tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1
+    documentation: docs/maintainer/mir4-release-operations.md
+    test: tests/release/Test-MIR42NineTargetReleaseAssets.ps1
+    boundary: deterministic separate support download from frozen source blobs; the collector cannot create player packages, qualify targets, sign, seal, promote, tag, publish, or grant support claims
+    stability: nine-target-development-release-asset-pre-freeze
   mir4_full_platform_closeout_v1:
     implementation: tools/lib/mir4/FullPlatformCloseout.ps1
     exporter: tools/commands/mir4/Export-MIR4FullPlatform24HRecords.ps1
@@ -776,7 +973,7 @@ package_excluded_modules:
     generated_views:
       - .mir/releases/waves/mir4-r0/dashboard.json
       - .mir/releases/waves/mir4-r0/queue.json
-      - todo.md
+      - TODO.md
     validator: tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
     documentation: docs/maintainer/mir4-full-platform-closeout.md
     boundary: append-only reconciliation of historical queue and closeout records plus one current pre-freeze release cut, workflow maturity vocabulary, blocker authority, MIR 3 residual disposition, and generated execution queue; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
@@ -788,6 +985,8 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
       - .mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json
       - .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
+      - .mir/control/MIR4-F210-Current-Qualification-PolicyV2.json
+      - .mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json
@@ -820,8 +1019,16 @@ package_excluded_modules:
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
     implementation_modules: tools/lib/mir4/pre-freeze-release
+    current_authority_succession_validation: tools/lib/mir4/pre-freeze-release/AuthoritySuccessionValidation.ps1
+    protected_main_promotion_topology: spec/releases/mir4-protected-main-promotion-topology-v1.json
+    protected_main_promotion_topology_schema: spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json
+    protected_main_qualification_schema: spec/schemas/mir4-protected-main-qualification-v1.schema.json
+    protected_main_promotion_topology_implementation: tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1
     f210_qualification_policy_implementation: tools/mir/application/release/F210QualificationPolicy.ps1
-    f210_qualification_policy_authority_writer: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
+    f210_historical_qualification_policy_immutability_checker: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
+    f210_current_qualification_policy_authority_writer: tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1
+    f210_current_engine_cap_harness_admission_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json
+    f210_current_engine_cap_harness_admission_resolver: tools/mir/application/release/F210QualificationPolicy.ps1
     final_mile_tooling_authority_writer: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
     final_release_closure_authority_writer: tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
     post_release_automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
@@ -851,6 +1058,9 @@ package_excluded_modules:
       - spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json
       - spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json
       - spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json
+      - spec/schemas/mir4-f210-current-qualification-policy-succession-v1.schema.json
+      - spec/schemas/mir4-f210-current-engine-cap-harness-admission-v3.schema.json
       - spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json
       - spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json
@@ -894,7 +1104,10 @@ package_excluded_modules:
       - tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
       - tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1
       - tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
+      - tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1
       - tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
+      - tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1
+      - tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1
       - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
       - validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1
       - tests/mir4/Test-MIR4SdkV1T08.ps1
@@ -907,7 +1120,7 @@ package_excluded_modules:
       - tests/release/Test-MIRTerminalGovernance.ps1
     validator: tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
-    boundary: package-excluded release preparation, exact-input validation, pre-freeze F210 Steam experimental selection, future stable minimum/latest lane policy, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
+    boundary: package-excluded release preparation, immutable historical F210 policy evidence plus current 2.1.18 F210 Steam experimental selection, numeric stable-minimum floor resolution, exact-input validation, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, fail-closed workflow control, and isolated synthetic protected-main topology rehearsal only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
     stability: stable-pre-freeze-control-plane-with-exact-f210-execution-locks-t03-t06-non-production-rehearsal-and-human-and-freeze-blockers
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
@@ -941,10 +1154,17 @@ runtime_boundaries:
       - prototypes/mir/runtime/settings_resolver.lua
       - prototypes/mir/runtime/startup_settings.lua
       - prototypes/mir/runtime/settings_profile.lua
+      - prototypes/mir/runtime/research_browser.lua
+      - prototypes/mir/runtime/research_browser_model.lua
+      - prototypes/mir/runtime/research_browser_core.lua
+      - prototypes/mir/runtime/research_browser_factorio_catalogue.lua
+      - prototypes/mir/runtime/research_browser_mir_provider.lua
+      - prototypes/mir/runtime/research_browser_actions.lua
       - prototypes/mir/runtime/planet_discovery_recovery.lua
       - prototypes/mir/runtime/productivity_family_adoption.lua
       - prototypes/mir/runtime/maximum_level_control.lua
       - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
+      - prototypes/mir/runtime/effects/passive_repair.lua
       - prototypes/mir/runtime/effects/spoilage_preservation.lua
     allowed_globals:
       - script
@@ -1077,6 +1297,7 @@ modules:
     - prototypes/mir/domain/streams/descriptor.lua
     - prototypes/mir/domain/diagnostics/codes.lua
     - prototypes/mir/domain/technology/technology_candidate.lua
+    - prototypes/mir/domain/technology/maximum_level_binding.lua
     - prototypes/mir/domain/technology/technology_risk.lua
     - prototypes/mir/domain/technology/technology_design.lua
     - prototypes/mir/domain/technology/technology_qualification.lua
@@ -1115,6 +1336,7 @@ modules:
     - prototypes/mir/capabilities/science_integration/pack_registry.lua
     - prototypes/mir/capabilities/science_integration/lab_compatibility.lua
     - prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua
+    - prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua
     - prototypes/mir/capabilities/science_integration/technology_researchability.lua
     - prototypes/mir/capabilities/science_integration/pack_production_reachability.lua
     - prototypes/mir/capabilities/science_integration/production_route_policy.lua
@@ -1122,6 +1344,7 @@ modules:
   families:
     - prototypes/mir/families/rules.lua
     - prototypes/mir/families/registry.lua
+    - prototypes/mir/families/material_progression.lua
     - prototypes/mir/families/operator_dsl.lua
     - prototypes/mir/families/resolver.lua
   providers:
@@ -1170,6 +1393,7 @@ modules:
     - prototypes/mir/planner/stream_compiler/discover.lua
     - prototypes/mir/planner/stream_compiler/ownership.lua
     - prototypes/mir/planner/stream_compiler/qualify.lua
+    - prototypes/mir/planner/stream_compiler/material_continuation.lua
     - prototypes/mir/planner/generation_plan.lua
     - prototypes/mir/planner/output_validator.lua
     - prototypes/mir/planner/costs.lua
@@ -1245,11 +1469,18 @@ modules:
     - prototypes/mir/runtime/settings_resolver.lua
     - prototypes/mir/runtime/startup_settings.lua
     - prototypes/mir/runtime/settings_profile.lua
+    - prototypes/mir/runtime/research_browser.lua
+    - prototypes/mir/runtime/research_browser_model.lua
+    - prototypes/mir/runtime/research_browser_core.lua
+    - prototypes/mir/runtime/research_browser_factorio_catalogue.lua
+    - prototypes/mir/runtime/research_browser_mir_provider.lua
+    - prototypes/mir/runtime/research_browser_actions.lua
     - prototypes/mir/runtime/planet_discovery_recovery.lua
     - prototypes/mir/runtime/productivity_family_adoption.lua
     - prototypes/mir/runtime/maximum_level_control.lua
     - prototypes/mir/runtime/state.lua
     - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
+    - prototypes/mir/runtime/effects/passive_repair.lua
     - prototypes/mir/runtime/effects/spoilage_preservation.lua
 
 mutation_commands:
@@ -1580,6 +1811,9 @@ validation_tooling:
     repository_path_command: tools/commands/workspace/Resolve-MIRRepoPath.ps1
     repository_legacy_inventory_command: tools/commands/workspace/Get-MIRLegacyInventory.ps1
     repository_stale_artifact_command: tools/commands/workspace/Remove-MIRStaleArtifacts.ps1
+    repository_storage_optimization_command: tools/commands/workspace/Optimize-MIRArtifactStorage.ps1
+    repository_development_health_command: tools/commands/workspace/Test-MIRDevelopmentHealth.ps1
+    repository_development_health_hook: tools/commands/workspace/Invoke-MIRDevelopmentHealthHook.ps1
     deprecated_work_root_cleaner: tools/maintenance/Remove-MIRDeprecatedWorkRoot.ps1
     repository_schema_root_migrator: tools/maintenance/Move-MIRSchemaRoot.ps1
     repository_test_root_migrator: tools/maintenance/Move-MIRTestRoot.ps1
@@ -1868,6 +2102,7 @@ validation_tooling:
     scenario_groups: tools/lib/validation/ScenarioGroups.ps1
     structured_evidence: tools/lib/validation/ResultAggregation.ps1
     factorio_process: tools/lib/validation/FactorioProcess.ps1
+    native_probe_resource_adapters: tools/lib/validation/NativeProbeResources.ps1
     settings_overrides: tools/lib/validation/SettingsOverrides.ps1
     scenario_registry: tools/lib/validation/ScenarioRegistry.ps1
     golden_plans: tests/tooling/Test-MIRGoldenPlans.ps1

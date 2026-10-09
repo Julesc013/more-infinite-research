@@ -4,7 +4,9 @@ function New-MIR4NormalizedTargetProviders {
   $registry = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json') | ConvertFrom-Json
   $supportByTarget = @{}
   foreach ($row in $registry.support_policy) { $supportByTarget[[string]$row.target] = $row }
-  $profiles = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/targets.json') | ConvertFrom-Json
+  $profileAuthorityPath = '.mir/targets.json'
+  $profileAuthoritySha256 = Get-MIR4PlatformFileSha256 (Join-Path $repo $profileAuthorityPath)
+  $profiles = Get-Content -Raw -LiteralPath (Join-Path $repo $profileAuthorityPath) | ConvertFrom-Json
   $plan = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json') | ConvertFrom-Json
   $planById = @{}
   foreach ($target in $plan.targets) { $planById[[string]$target.target_id] = $target }
@@ -42,10 +44,10 @@ function New-MIR4NormalizedTargetProviders {
         authority = if ($maturity -eq 'preview') { 'candidate-programme-only' } else { 'private-experimental-only' }
         predecessor = if ($predecessor) { [ordered]@{ release=$predecessor; snapshot=$snapshot } } else { $null }
         engine_lock = if ($planned) { [ordered]@{ version=[string]$planned.engine_lock.version; sha256=[string]$planned.engine_lock.executable_sha256; authority='MIR4-Bootstrap-Local-Candidate-PlanV3' } } elseif (-not [string]::IsNullOrWhiteSpace($historicalEngineVersion)) { [ordered]@{ version=$historicalEngineVersion; sha256=[string]$historicalTarget.engine.sha256; authority='MIR4-Historical-Private-Candidate-AuthorizationV1' } } else { $null }
-        profile = [ordered]@{ status=$profileStatus; authority=[string]$registry.profile_authority.path; authority_sha256=[string]$registry.profile_authority.sha256; digest=$profileDigest }
+        profile = [ordered]@{ status=$profileStatus; authority=$profileAuthorityPath; authority_sha256=$profileAuthoritySha256; digest=$profileDigest }
         provenance = @(
           [ordered]@{role='identity-and-support';path='.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json';sha256=(Get-MIR4PlatformInputSha256 (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json'))},
-          [ordered]@{role='target-profile';path=[string]$registry.profile_authority.path;sha256=[string]$registry.profile_authority.sha256}
+          [ordered]@{role='target-profile';path=$profileAuthorityPath;sha256=$profileAuthoritySha256}
         )
         operations = @('identify','normalize-capabilities','explain-omissions','plan-private-candidate')
         forbidden_operations = @('mutate-prototypes','emit-authoritative-output','claim-public-support','weaken-safety')

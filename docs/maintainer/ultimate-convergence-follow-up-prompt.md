@@ -45,7 +45,7 @@ Required reading:
 - docs/releases/3.2.5-convergence-release.md
 - docs/architecture/3.3-2.6-convergence-platform-roadmap.md
 - docs/architecture/mir-extension-protocol-v1.md
-- todo.md
+- TODO.md
 
 First report the exact HEAD, upstream relation, dirty paths, current release pointer, release states, and any concurrent-worker overlap. Then check every item below.
 

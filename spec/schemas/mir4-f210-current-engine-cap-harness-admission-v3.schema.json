@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-f210-current-engine-cap-harness-admission-v3.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "predecessor", "engine_channel_review", "admission", "engine", "steam", "official_data", "qualification", "boundaries", "status", "record_sha256"],
+  "properties": {
+    "schema": {"const": 3},
+    "kind": {"const": "MIR4F210CurrentEngineCapHarnessAdmissionV3"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "predecessor": {
+      "type": "object", "additionalProperties": false, "required": ["policy_v2", "policy_succession_v1"],
+      "properties": {
+        "policy_v2": {"$ref": "#/$defs/policyV2"},
+        "policy_succession_v1": {"$ref": "#/$defs/policySuccessionV1"}
+      }
+    },
+    "engine_channel_review": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256", "kind", "review_status"],
+      "properties": {
+        "path": {"const": "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json"},
+        "sha256": {"const": "B1497E6122F0C448A8AF958FD782E36CF01BD106D32B65F67D8CF33718EAF159"},
+        "kind": {"const": "MIR4Factorio21ExperimentalChannelV1"},
+        "review_status": {"const": "reviewed-current-observation"}
+      }
+    },
+    "admission": {
+      "type": "object", "additionalProperties": false, "required": ["target", "scope", "admitted", "harnesses", "package_visible"],
+      "properties": {
+        "target": {"const": "F210"},
+        "scope": {"const": "exact-current-engine-cap-harness-execution-only"},
+        "admitted": {"const": true},
+        "harnesses": {"const": ["runtime.maximum-level-cap-ownership-multiforce-f210", "runtime.maximum-level-v2-v3-migration-f210"]},
+        "package_visible": {"const": false}
+      }
+    },
+    "engine": {
+      "type": "object", "additionalProperties": false, "required": ["version", "build", "file_version", "platform", "distribution", "binary"],
+      "properties": {
+        "version": {"const": "2.1.21"}, "build": {"const": 87673}, "file_version": {"const": "2.1.21.87673"}, "platform": {"const": "win64"}, "distribution": {"const": "steam"},
+        "binary": {"$ref": "#/$defs/binary"}
+      }
+    },
+    "steam": {
+      "type": "object", "additionalProperties": false, "required": ["app_id", "branch", "build_id", "state_flags", "app_manifest"],
+      "properties": {
+        "app_id": {"const": "427520"}, "branch": {"const": "experimental"}, "build_id": {"const": "25749703"}, "state_flags": {"const": "4"},
+        "app_manifest": {"$ref": "#/$defs/manifest"}
+      }
+    },
+    "official_data": {
+      "type": "object", "additionalProperties": false, "required": ["runtime_api", "prototype_api", "changelog", "mods"],
+      "properties": {
+        "runtime_api": {"$ref": "#/$defs/runtimeApi"}, "prototype_api": {"$ref": "#/$defs/prototypeApi"}, "changelog": {"$ref": "#/$defs/changelog"},
+        "mods": {
+          "type": "object", "additionalProperties": false, "required": ["base", "elevated_rails", "quality", "recycler", "space_age"],
+          "properties": {"base": {"$ref": "#/$defs/baseMod"}, "elevated_rails": {"$ref": "#/$defs/elevatedRailsMod"}, "quality": {"$ref": "#/$defs/qualityMod"}, "recycler": {"$ref": "#/$defs/recyclerMod"}, "space_age": {"$ref": "#/$defs/spaceAgeMod"}}
+        }
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false, "required": ["current_engine_api_prototype_data_mod_capsule_admitted", "current_engine_cap_harness_execution_admitted", "current_engine_qualification_passed", "stable_transition_recorded", "stable_qualification_passed"],
+      "properties": {"current_engine_api_prototype_data_mod_capsule_admitted": {"const": true}, "current_engine_cap_harness_execution_admitted": {"const": true}, "current_engine_qualification_passed": {"const": false}, "stable_transition_recorded": {"const": false}, "stable_qualification_passed": {"const": false}}
+    },
+    "boundaries": {
+      "type": "object", "additionalProperties": false, "required": ["prototype_mutation_authorized", "source_freeze_authorized", "candidate_allocation_authorized", "signing_authorized", "promotion_to_main_authorized", "publication_authorized"],
+      "properties": {"prototype_mutation_authorized": {"const": false}, "source_freeze_authorized": {"const": false}, "candidate_allocation_authorized": {"const": false}, "signing_authorized": {"const": false}, "promotion_to_main_authorized": {"const": false}, "publication_authorized": {"const": false}}
+    },
+    "status": {"const": "active-current-experimental-exact-engine-cap-harness-admitted-qualification-pending"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "policyV2": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json"}, "sha256": {"const": "EA6339603DE411827193344C57F48A636D5E64BC7959C77207EC59D54DED5FF8"}, "record_sha256": {"const": "927B9DC5E87313A7FA223E4D180878991E051C34B5E1998840A4A3BBD79A91BD"}}},
+    "policySuccessionV1": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json"}, "sha256": {"const": "8A6B206B529FA1D20F2AC63625AE3EF895F7FB6F0D03032BA77C0E6839C645F8"}, "record_sha256": {"const": "2744FFF6AB91E46CF61275951624AC013409FA0B490245DD6DA6B852B08286EF"}}},
+    "binary": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "bin/x64/factorio.exe"}, "sha256": {"const": "703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1"}}},
+    "manifest": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "appmanifest_427520.acf"}, "sha256": {"const": "5506DCA9263EBEC6FE12EDC607F939657B278CFE011D276FFB8F350F6D994519"}}},
+    "runtimeApi": {"type": "object", "additionalProperties": false, "required": ["path", "application_version", "sha256"], "properties": {"path": {"const": "doc-html/runtime-api.json"}, "application_version": {"const": "2.1.21"}, "sha256": {"const": "F21602449EC6C077AFB4A26311EF075AF7AEDB8C067D53B9CC87EFCCCA4D761F"}}},
+    "prototypeApi": {"type": "object", "additionalProperties": false, "required": ["path", "application_version", "sha256"], "properties": {"path": {"const": "doc-html/prototype-api.json"}, "application_version": {"const": "2.1.21"}, "sha256": {"const": "5ABE17BC8797770AB6C7CEB0CBE4348AB3B716EFEF59C7EE3E539596337132E6"}}},
+    "changelog": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": "data/changelog.txt"}, "sha256": {"const": "F6256F393B0033577303BEA1D93B82687D6740D5942A095A8F19023BB8477108"}}},
+    "baseMod": {"$ref": "#/$defs/baseModExact"}, "elevatedRailsMod": {"$ref": "#/$defs/elevatedRailsModExact"}, "qualityMod": {"$ref": "#/$defs/qualityModExact"}, "recyclerMod": {"$ref": "#/$defs/recyclerModExact"}, "spaceAgeMod": {"$ref": "#/$defs/spaceAgeModExact"},
+    "baseModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "base"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/base/info.json"}, "raw_sha256": {"const": "C1B8F8B74948524801B64109B4A8A4A2701CB2A6A868A3674EE20B2C27E0684C"}, "canonical_sha256": {"const": "C28C7F60E4500843FBAC24DDC05DDC91783F78253928EB511E473D3B1F5C68B4"}}},
+    "elevatedRailsModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "elevated-rails"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/elevated-rails/info.json"}, "raw_sha256": {"const": "ADE1CDB0E617343CB9DD8C373262326D5CAE1B0E820BBFC00466B850A2989541"}, "canonical_sha256": {"const": "30708573FFDC1EA8790E06EF3E08A1907FEBC6A85608D16C2281DBF7666D742F"}}},
+    "qualityModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "quality"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/quality/info.json"}, "raw_sha256": {"const": "401FD5F624D09EFF68E8A3EA141B201CF16D574761E3882A553E16D43026F4B2"}, "canonical_sha256": {"const": "D39FC0D58EA2BDF11A6EDF42EDC853F907F2CC353D29B9816671457375383571"}}},
+    "recyclerModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "recycler"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/recycler/info.json"}, "raw_sha256": {"const": "AB94595C08764E419CAF49A0856F371111671D0695F77BACCB5868DEA45A5800"}, "canonical_sha256": {"const": "CA65FAEA6C40B77C21104EFFC82A3F07C4CBE12E8DDD64E788DF7BFC1EE6DC16"}}},
+    "spaceAgeModExact": {"type": "object", "additionalProperties": false, "required": ["name", "version", "info_path", "raw_sha256", "canonical_sha256"], "properties": {"name": {"const": "space-age"}, "version": {"const": "2.1.21"}, "info_path": {"const": "data/space-age/info.json"}, "raw_sha256": {"const": "D0F338F39A22E1BC574BE08C07A3466EA6B5AF906D79CFFDFE1FDB2EBF30B5D5"}, "canonical_sha256": {"const": "9F9B6C1D2BE23D2F288B9E8C92552C00E5F1FAAF1114A11677D7011A7C10A782"}}}
+  }
+}

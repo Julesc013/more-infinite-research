@@ -26,7 +26,8 @@ function Test-MIR4ApiRecord{
     else{$bundlePath=Join-Path $PSScriptRoot '../json-schema/mir4-api-v0.bundle.schema.json';$bundle=Get-Content -Raw -LiteralPath $bundlePath|ConvertFrom-Json;$schema=$bundle.'$defs'.([string]$Record.kind)|ConvertTo-Json -Depth 50 -Compress;$valid=(($Record|ConvertTo-Json -Depth 50)|Test-Json -Schema $schema -ErrorAction Stop)}
   }catch{throw '[mir4-api-schema] Contract schema validation failed.'}
   if(-not$valid){throw '[mir4-api-schema] Contract schema validation failed.'}
-  foreach($namespace in @($Record.extensions.PSObject.Properties.Name|Where-Object{$_})){if($namespace-notmatch'^[a-z][a-z0-9]*(\.[a-z][a-z0-9-]*)+$'){throw '[mir4-api-namespace] Invalid extension namespace.'}}
+  $extensionNamespaces=if($Record.extensions-is[Collections.IDictionary]){@($Record.extensions.Keys|ForEach-Object{[string]$_})}else{@($Record.extensions.PSObject.Properties|ForEach-Object{[string]$_.Name})}
+  foreach($namespace in @($extensionNamespaces|Where-Object{$_})){if($namespace-notmatch'^[a-z][a-z0-9]*(\.[a-z][a-z0-9-]*)+$'){throw '[mir4-api-namespace] Invalid extension namespace.'}}
   if([string]$Record.digest-cne(Get-MIR4ApiDigest $Record)){throw '[mir4-api-digest] Contract digest mismatch.'}
   return $true
 }

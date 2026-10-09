@@ -1,14 +1,14 @@
 Invoke-RepoCheck "science-pack progression settings are wired" {
   $settingsText = Get-MIRSettingsSourceText
-  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
-  $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\resolver.lua")
-  $settingsRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\registry.lua")
-  $settingsVisibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\visibility.lua")
-  $settingsBuilderText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\builder.lua")
-  $settingsStageAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\stage_adapter.lua")
-  $runtimeSettingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\runtime\settings_resolver.lua")
-  $spoilageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\runtime\effects\spoilage_preservation.lua")
-  $agriculturalGrowthText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\runtime\effects\agricultural_growth_speed.lua")
+  $baseContinuationsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/planner/base_continuations.lua")
+  $settingsResolverText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/resolver.lua")
+  $settingsRegistryText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/registry.lua")
+  $settingsVisibilityText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/visibility.lua")
+  $settingsBuilderText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/builder.lua")
+  $settingsStageAdapterText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/stage_adapter.lua")
+  $runtimeSettingsResolverText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/runtime/settings_resolver.lua")
+  $spoilageText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/runtime/effects/spoilage_preservation.lua")
+  $agriculturalGrowthText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/runtime/effects/agricultural_growth_speed.lua")
   $scienceText = Get-MIRCombinedSourceText -RelativePaths @(
     "prototypes/mir/capabilities/science_integration/science_packs.lua",
     "prototypes/mir/capabilities/science_integration/pack_registry.lua",
@@ -18,24 +18,24 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
     "prototypes/mir/capabilities/science_integration/science_selection_policy.lua"
   )
-  $scienceSelectorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\science_integration\science_selector.lua")
-  $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
-  $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
-  $recipeMatchingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua")
-  $prototypeLookupText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\platform\factorio\prototype_lookup.lua")
-  $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\presentation\icon_builder.lua")
-  $plannerCostsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\costs.lua")
-  $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
-  $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
-  $recipeUnlockIndexText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_unlocks.lua")
-  $productivityStreamsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
+  $scienceSelectorText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/capabilities/science_integration/science_selector.lua")
+  $directEffectsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/streams/direct-effects.lua")
+  $productivityText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/streams/productivity.lua")
+  $recipeMatchingText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua")
+  $prototypeLookupText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/platform/factorio/prototype_lookup.lua")
+  $technologyIconsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/presentation/icon_builder.lua")
+  $plannerCostsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/planner/costs.lua")
+  $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/planner/prerequisites.lua")
+  $plannerRequirementsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/planner/requirements.lua")
+  $recipeUnlockIndexText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/index/recipe_unlocks.lua")
+  $productivityStreamsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/streams/productivity.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\extent.lua")
-  $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\pipeline_extent.lua")
-  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
-  $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\weapon_speed.lua")
-  $nativeEffectCoverageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\native_effect_coverage.lua")
-  $generatedRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\facts\generated_technology_registry.lua")
+  $pipelineExtentText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/extent.lua")
+  $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/pipeline_extent.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/report/diagnostics_sink.lua")
+  $weaponSpeedText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/policy/weapon_speed.lua")
+  $nativeEffectCoverageText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/policy/native_effect_coverage.lua")
+  $generatedRegistryText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/domain/facts/generated_technology_registry.lua")
   $weaponSpeedFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-weapon-speed-safety\data-final-fixes.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
   $generatedPrerequisiteFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua")
@@ -57,9 +57,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
   $capabilityNegativeFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\capability-negative-cases\data.lua")
   $capabilityNegativeAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-capability-negative-cases\data-final-fixes.lua")
-  $recipeRiskFactsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_risk_facts.lua")
-  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
-  $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
+  $recipeRiskFactsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/index/recipe_risk_facts.lua")
+  $defaultsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/defaults.lua")
+  $localeText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "locale/en/more-infinite-research.cfg")
 
   $requiredSnippets = @(
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-require-space-gate"' },
@@ -166,7 +166,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'mods_any = atan_ash_overlay.applies_when.mods' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = atan_ash_capability.stream.id' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'exact_recipe_patterns(atan_ash_capability.exact_recipes)' },
-    @{ File = "prototypes\mir\compatibility\overlays\atan_ash.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\overlays\atan_ash.lua")); Snippet = '"mir-prod-atan-ash-separation"' },
+    @{ File = "prototypes\mir\compatibility\overlays\atan_ash.lua"; Text = (Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/overlays/atan_ash.lua")); Snippet = '"mir-prod-atan-ash-separation"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'local function space_age_setting_visibility()' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'hidden_reason = "space-age-not-active"' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'local function space_age_setting_visibility()' },
@@ -456,14 +456,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   foreach ($consumer in @(
     @{ File = "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua"; Text = $recipeMatchingText },
     @{ File = "prototypes\mir\capabilities\science_integration\recipe_unlock_facts.lua"; Text = $scienceText },
-    @{ File = "prototypes\mir\index\registry_builder.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\registry_builder.lua")) },
-    @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua")) }
+    @{ File = "prototypes\mir\index\registry_builder.lua"; Text = (Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/index/registry_builder.lua")) },
+    @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = (Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua")) }
   )) {
     if ($consumer.Text.Contains('data_raw.prototypes("recipe")')) {
       throw "Recipe consumers must query the canonical build-once fact catalog: $($consumer.File)"
     }
   }
-  $recipeFactsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_facts.lua")
+  $recipeFactsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/index/recipe_facts.lua")
   if (-not $recipeFactsText.Contains("function M.candidate_names") -or -not $recipeFactsText.Contains("function M.scan_count")) {
     throw "Canonical recipe facts must expose indexed candidate queries and scan-count evidence."
   }
@@ -471,7 +471,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     throw "Generation integrity fixture must prove one canonical recipe prototype scan."
   }
 
-  $settingsPresetsPath = Join-Path $repo "prototypes\settings-presets.lua"
+  $settingsPresetsPath = Get-MIRValidationPath -RelativePath "prototypes/settings-presets.lua"
   if (Test-Path -LiteralPath $settingsPresetsPath) {
     throw "Removed settings preset module should not exist: prototypes\settings-presets.lua"
   }

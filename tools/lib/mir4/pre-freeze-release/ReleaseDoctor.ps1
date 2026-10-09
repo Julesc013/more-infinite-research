@@ -54,15 +54,21 @@ function Get-MIR4ReleaseDoctor {
   }
   Add-AutomatedCheck 'authorities' { Test-MIR4PreFreezeAuthorities -RepoRoot $repo | Out-Null } 'Append-only receipt and bound authorities are current.'
   Add-AutomatedCheck 'f210-qualification-policy' {
-    $policy = Get-MIR4F210QualificationPolicyV1 -RepoRoot $repo
-    if ([string]$policy.support_floor -cne '2.1.8' -or
+    $policy = Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
+    if ([string]$policy.kind -cne 'MIR4F210CurrentQualificationPolicyV2' -or
+        [string]$policy.support_floor -cne '2.1.18' -or
         [string]$policy.pre_freeze.selection -cne 'highest-official-experimental-installed-on-single-authorized-steam-path-at-execution-time' -or
-        [string]$policy.post_stable.minimum_lane.version -cne '2.1.8' -or
+        [string]$policy.post_stable.minimum_lane.floor_rule -cne 'numeric-version-max(requested-2.1.18,first-official-stable-2.1-patch,later-accepted-mandatory-floor)' -or
         [string]$policy.post_stable.latest_lane.selection -cne 'latest-official-stable-2.1.x' -or
-        @($policy.boundaries.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+        [bool]$policy.qualification.current_engine_api_prototype_data_mod_capsule_admitted -or
+        [bool]$policy.qualification.current_engine_qualification_passed -or
+        [bool]$policy.qualification.stable_transition_recorded -or
+        [bool]$policy.qualification.stable_qualification_passed -or
+        -not [bool]$policy.boundaries.compatibility_floor_changed -or
+        @($policy.boundaries.PSObject.Properties | Where-Object { $_.Name -ne 'compatibility_floor_changed' -and [bool]$_.Value }).Count -ne 0) {
       throw '[mir4-doctor-f210-qualification-policy]'
     }
-  } 'F210 uses the installed official Steam experimental before freeze, exact freeze locks, and stable minimum/latest lanes after the 2.1 stable transition.'
+  } 'F210 requires 2.1.18 or newer, uses the installed official Steam experimental before freeze, exact freeze locks, and resolves the stable minimum by numeric maximum after the 2.1 stable transition.'
   Add-AutomatedCheck 'rulesets' { Test-MIR4RulesetSnapshot -RepoRoot $repo | Out-Null } 'Release branch and v4 tag ruleset snapshot passes positive and negative checks.'
   Add-AutomatedCheck 'actions-lock' { Test-MIR4ProductionActionLock -RepoRoot $repo | Out-Null } 'Production Actions are pinned to the governed full SHAs.'
   Add-AutomatedCheck 'platform-maturity-authority' {
@@ -133,7 +139,7 @@ function Get-MIR4ReleaseDoctor {
         @{path=$predecessor;sha256=[string]$row.predecessor.sha256}
       )
       if ([string]$row.target -ceq 'F210') {
-        $resolution = Get-MIR4F210EngineResolutionV1 -RepoRoot $repo
+        $resolution = Get-MIR4F210EngineResolutionV2 -RepoRoot $repo
         $bindings += @{path=[string]$resolution.engine.path;sha256=[string]$resolution.engine.sha256}
       } else {
         $bindings += @{path=[string]$row.engine.path;sha256=[string]$row.engine.sha256}
@@ -196,10 +202,20 @@ function Get-MIR4ReleaseDoctor {
 
   $governance = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/governance/mir4/release-governance.json' -Kind 'MIR4ReleaseGovernanceV1'
   $checks.Add((New-MIR4DoctorCheck 'protected-signing-secret' 'human' 'blocked' ([string]$governance.state)))
-  $plan = Get-MIR4FinalMilePlaytestCandidateAuthorityV1 -RepoRoot $repo
-  $currentF210Resolution = try { Get-MIR4F210EngineResolutionV1 -RepoRoot $repo } catch { $null }
-  $acceptedTargets = @{}
-  foreach ($decisionFile in @(Get-ChildItem -LiteralPath (Join-Path $repo 'build/mir4/playtests') -Recurse -Filter 'manual-decision.json' -File -ErrorAction SilentlyContinue)) {
+  $plan = $null
+  $automatedIds.Add('final-mile-playtest-candidate-authority')
+  try {
+    $plan = Get-MIR4FinalMilePlaytestCandidateAuthorityV1 -RepoRoot $repo
+    $checks.Add((New-MIR4DoctorCheck 'final-mile-playtest-candidate-authority' 'automated' 'passed' 'Final-mile playtest candidate authority is current.'))
+  } catch {
+    $checks.Add((New-MIR4DoctorCheck 'final-mile-playtest-candidate-authority' 'automated' 'failed' $_.Exception.Message))
+  }
+  if ($null -eq $plan) {
+    $checks.Add((New-MIR4DoctorCheck 'maintainer-manual-playtest' 'human' 'blocked' 'Candidate authority is unavailable; maintainer playtest receipts cannot be inspected and acceptance is never inferred.'))
+  } else {
+    $currentF210Resolution = try { Get-MIR4F210EngineResolutionV2 -RepoRoot $repo } catch { $null }
+    $acceptedTargets = @{}
+    foreach ($decisionFile in @(Get-ChildItem -LiteralPath (Join-Path $repo 'build/mir4/playtests') -Recurse -Filter 'manual-decision.json' -File -ErrorAction SilentlyContinue)) {
     try {
       $root = Split-Path -Parent $decisionFile.FullName
       $decision = Get-Content -Raw -LiteralPath $decisionFile.FullName | ConvertFrom-Json -Depth 100
@@ -235,11 +251,12 @@ function Get-MIR4ReleaseDoctor {
       }
       if ($evidenceCurrent) { $acceptedTargets[[string]$session.target] = $true }
     } catch {}
+    }
+    $playtestComplete = @('F210','F200' | Where-Object { -not $acceptedTargets.ContainsKey($_) }).Count -eq 0
+    $playtestStatus = if ($playtestComplete) { 'passed' } else { 'blocked' }
+    $playtestDetail = if ($playtestComplete) { 'Explicit, current maintainer ACCEPTED receipts exist for F210 and F200.' } else { 'Current explicit maintainer ACCEPTED receipts are required for both F210 and F200; the command never infers either decision.' }
+    $checks.Add((New-MIR4DoctorCheck 'maintainer-manual-playtest' 'human' $playtestStatus $playtestDetail))
   }
-  $playtestComplete = @('F210','F200' | Where-Object { -not $acceptedTargets.ContainsKey($_) }).Count -eq 0
-  $playtestStatus = if ($playtestComplete) { 'passed' } else { 'blocked' }
-  $playtestDetail = if ($playtestComplete) { 'Explicit, current maintainer ACCEPTED receipts exist for F210 and F200.' } else { 'Current explicit maintainer ACCEPTED receipts are required for both F210 and F200; the command never infers either decision.' }
-  $checks.Add((New-MIR4DoctorCheck 'maintainer-manual-playtest' 'human' $playtestStatus $playtestDetail))
   $automatedFailed = @($checks | Where-Object { $_.stage -eq 'automated' -and $_.status -ne 'passed' }).Count
   $humanBlocked = @($checks | Where-Object { $_.stage -eq 'human' -and $_.status -ne 'passed' }).Count
   return [pscustomobject][ordered]@{

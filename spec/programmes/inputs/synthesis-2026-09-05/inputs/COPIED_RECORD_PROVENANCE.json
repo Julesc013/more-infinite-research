@@ -1,0 +1,22 @@
+{
+  "source_archive": "A08",
+  "source_subdirectory": "HANDOFF_2026-09-05",
+  "records": [
+    {
+      "name": "REQUEST_LEDGER.json",
+      "sha256": "940085bff15ca90e8a99219dc309f7e52e67aa23d2ff6adf3063bac28fc3dfee",
+      "unchanged": true
+    },
+    {
+      "name": "HISTORICAL_TARGET_MATRIX.json",
+      "sha256": "35b5ff3ad09b115cdda7f8f53b9de7e834c2c4b7c2d94e858054b28ac515a51b",
+      "unchanged": true
+    },
+    {
+      "name": "SOURCES.json",
+      "sha256": "1a38384280eed0a51a0f3b1651dafd679f9cf9b1e0f0f7c6f77a053138a10cdf",
+      "unchanged": true
+    }
+  ],
+  "note": "Embedded source references in copied records use ORIGINAL_HANDOFF_SOURCES.json, not the new review source namespace. No request completion state was changed."
+}

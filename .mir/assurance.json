@@ -18,26 +18,192 @@
   },
   "profiles": {
     "edit": ["static.architecture", "static.compiler"],
+    "mir42-nine-target-evidence": ["static.mir42-candidate-construction", "static.mir4-protected-promotion-topology-a08", "static.mir42-nine-target-evidence-generators", "static.mir42-nine-target-entrypoint-scope", "static.mir42-nine-target-seal-readers", "static.mir42-nine-target-release-authority", "static.mir42-nine-target-promotion", "static.mir42-nine-target-release-assets", "static.mir42-nine-target-written-go-authorization", "static.mir42-protected-main-checks"],
+    "mir4-development-ci-selection": ["static.mir4-development-ci-selection"],
+    "mir42-preview-browser": ["runtime.research-browser"],
+      "mir42-preview-native-boundaries": ["static.settings", "static.mir4-runtime-continuity-w04", "static.mir4-platform-preview", "runtime.research-browser"],
+    "mir42-preview-feedback": ["runtime.research-browser", "static.mir4-integration-programme", "static.mir4-development-ci-selection"],
     "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.release-history", "static.package"],
     "auto": [],
     "locale": ["static.locales", "runtime.exact-zip"],
     "balance": ["static.balance", "runtime.affected"],
     "museum-exact": ["static.museum", "runtime.museum-exact"],
-    "mir4-bootstrap": ["static.mir4-r0-identity", "static.mir4-r0-bootstrap", "static.mir4-public-feedback-intake", "static.mir4-maximum-level-sol03", "static.mir4-production-route-sol04", "static.mir4-research-cost-v2-sol05", "static.mir4-k2-science-sol06", "static.mir4-compatibility-campaign-sol07", "static.mir4-affected-proof-sol08", "static.mir4-m4c01-closeout-sol09", "static.mir4-final-programme-reconciliation", "static.mir3-dot9-portal-visibility", "static.mir4-bootstrap-target-readiness", "static.mir4-local-playtest-shadow", "static.mir4-bootstrap-materialization", "static.mir4-offline-custody", "static.mir4-experimental-api-sdk", "static.mir4-target-compiler-w02", "static.mir4-semantic-compiler-w03", "static.mir4-runtime-continuity-w04", "static.mir4-module-ecosystem-w05", "static.mir4-processir-synthesis-w06", "static.mir4-exact-processir-t12", "static.mir4-release-compatibility-canaries-t13", "static.mir4-documentation-continuity-t14", "static.mir4-inspector-compatibility-w07", "static.mir4-assurance-scale-w08", "static.mir4-historical-succession-w09", "static.mir4-whole-platform", "static.mir4-full-platform-closeout", "static.mir4-release-readiness-reconciliation", "static.mir4-release-phase-engine", "static.mir4-release-adapters-t03", "static.mir4-release-adapters-t04", "static.mir4-release-adapters-t05", "static.mir4-release-doctor-t06", "static.mir4-canonicalization-diagnostics-t07", "static.mir4-extension-developer-experience-t09", "static.mir4-environment-evidence-t10", "static.mir4-mep-discovery-t11", "static.mir4-pre-freeze-hardening", "static.mir4-platform-preview", "static.mir4-supply-chain-foundation", "static.mir4-supply-chain-attestation", "static.mir4-release-capsule", "static.mir4-runner-publisher-confinement", "static.mir4-signing-ceremony-preparation", "static.mir4-supply-chain-preservation-t15", "static.mir4-hybrid-platform-authority", "static.mir4-repository-fixed-point-v2", "static.mir4-canonicalization-migration-v1", "static.mir4-diagnostics-v1", "static.mir4-diagnostics-migration-v1", "static.mir4-target-key-v1", "static.mir4-target-key-migration-v1", "static.mir4-target-compiler-v1", "static.mir4-target-compiler-migration-v1", "static.mir4-semantic-compiler-v1", "static.mir4-semantic-compiler-policy-migration-v1", "static.mir4-runtime-continuity-v1", "static.mir4-runtime-continuity-migration-v1", "static.mir4-module-sdk-mep-v1", "static.mir4-module-sdk-mep-migration-v1", "static.mir4-processir-exact-v1", "static.mir4-processir-exact-migration-v1", "static.mir4-inspector-compatibility-v1", "static.mir4-inspector-compatibility-migration-v1", "static.mir4-assurance-offline-custody-v1", "static.mir4-assurance-offline-custody-migration-v1", "static.mir4-historical-tooling-v1", "static.mir4-historical-tooling-migration-v1", "static.mir4-release-tooling-v1", "static.mir4-release-tooling-migration-v1"],
-    "mir4-post-release": ["docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.mir4-release-adapters-t05", "static.mir4-release-narratives-m41-03", "static.mir4-repository-characterization-m42-00a", "static.mir4-golden-four-target-baseline-m41-f1", "static.mir4-shadow-target-materializer-m41-f2a", "static.mir4-shadow-source-model-m41-f2b", "static.mir4-editable-source-materializer-m41-f2c", "static.mir4-compilation-plan-decomposition-m42-02-l1", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-technology-catalog-decomposition-m42-02-l4", "static.mir4-effect-ownership-decomposition-m42-02-l5", "static.mir4-compiler-orchestrator-decomposition-m42-02-l6", "static.mir4-powershell-characterization-m42-02", "static.mir4-powershell-command-router-decomposition-m42-02-ps1", "static.mir4-validation-runner-decomposition-m42-02-ps2", "static.mir4-assurance-evidence-decomposition-m42-02-ps3", "static.mir4-pre-freeze-release-decomposition-m42-02-ps4", "static.mir4-bootstrap-materialization-decomposition-m42-02-ps5", "static.mir4-assurance-release-decomposition-m42-02-ps6", "static.mir4-compatibility-audit-decomposition-m42-02-ps7", "static.mir4-offline-custody-decomposition-m42-02-ps8", "static.mir4-release-capsule-decomposition-m42-02-ps9", "static.mir4-control-executor-decomposition-m42-02-ps10", "static.mir4-supply-chain-decomposition-m42-02-ps11", "static.mir4-factorio-2.1-experimental-channel", "static.mir4-f2d-runtime-replay", "static.mir4-pre-freeze-hardening"],
+    "mir4-bootstrap": ["static.mir4-r0-identity", "static.mir4-r0-bootstrap", "static.mir4-public-feedback-intake", "static.mir4-maximum-level-sol03", "static.mir4-production-route-sol04", "static.mir4-research-cost-v2-sol05", "static.mir4-k2-science-sol06", "static.mir4-compatibility-campaign-sol07", "static.mir4-affected-proof-sol08", "static.mir4-m4c01-closeout-sol09", "static.mir4-final-programme-reconciliation", "static.mir3-dot9-portal-visibility", "static.mir4-bootstrap-target-readiness", "static.mir4-local-playtest-shadow", "static.mir4-bootstrap-materialization", "static.mir4-offline-custody", "static.mir4-experimental-api-sdk", "static.mir4-target-compiler-w02", "static.mir4-semantic-compiler-w03", "static.mir4-runtime-continuity-w04", "static.mir4-module-ecosystem-w05", "static.mir4-processir-synthesis-w06", "static.mir4-exact-processir-t12", "static.mir4-release-compatibility-canaries-t13", "static.mir4-documentation-continuity-t14", "static.mir4-inspector-compatibility-w07", "static.mir4-assurance-scale-w08", "static.mir4-historical-succession-w09", "static.mir4-whole-platform", "static.mir4-full-platform-closeout", "static.mir4-release-readiness-reconciliation", "static.mir4-release-phase-engine", "static.mir4-release-adapters-t03", "static.mir4-release-adapters-t04", "static.mir4-release-adapters-t05", "static.mir4-release-operator-recovery-a07", "static.mir4-release-doctor-t06", "static.mir4-canonicalization-diagnostics-t07", "static.mir4-extension-developer-experience-t09", "static.mir4-environment-evidence-t10", "static.mir4-mep-discovery-t11", "static.mir4-pre-freeze-hardening", "static.mir4-platform-preview", "static.mir4-supply-chain-foundation", "static.mir4-supply-chain-attestation", "static.mir4-release-capsule", "static.mir4-runner-publisher-confinement", "static.mir4-signing-ceremony-preparation", "static.mir4-supply-chain-preservation-t15", "static.mir4-hybrid-platform-authority", "static.mir4-repository-fixed-point-v2", "static.mir4-canonicalization-migration-v1", "static.mir4-diagnostics-v1", "static.mir4-diagnostics-migration-v1", "static.mir4-target-key-v1", "static.mir4-target-key-migration-v1", "static.mir4-target-compiler-v1", "static.mir4-target-compiler-migration-v1", "static.mir4-semantic-compiler-v1", "static.mir4-semantic-compiler-policy-migration-v1", "static.mir4-runtime-continuity-v1", "static.mir4-runtime-continuity-migration-v1", "static.mir4-module-sdk-mep-v1", "static.mir4-module-sdk-mep-migration-v1", "static.mir4-processir-exact-v1", "static.mir4-processir-exact-migration-v1", "static.mir4-inspector-compatibility-v1", "static.mir4-inspector-compatibility-migration-v1", "static.mir4-assurance-offline-custody-v1", "static.mir4-assurance-offline-custody-migration-v1", "static.mir4-historical-tooling-v1", "static.mir4-historical-tooling-migration-v1", "static.mir4-release-tooling-v1", "static.mir4-release-tooling-migration-v1"],
+    "mir4-post-release": ["docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.mir4-release-adapters-t05", "static.mir4-release-operator-recovery-a07", "static.mir4-release-narratives-m41-03", "static.mir42-nine-target-release-narratives", "static.mir4-repository-characterization-m42-00a", "static.mir4-golden-four-target-baseline-m41-f1", "static.mir4-shadow-target-materializer-m41-f2a", "static.mir4-shadow-source-model-m41-f2b", "static.mir4-editable-source-materializer-m41-f2c", "static.mir4-compilation-plan-decomposition-m42-02-l1", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-technology-catalog-decomposition-m42-02-l4", "static.mir4-effect-ownership-decomposition-m42-02-l5", "static.mir4-compiler-orchestrator-decomposition-m42-02-l6", "static.mir4-powershell-characterization-m42-02", "static.mir4-powershell-command-router-decomposition-m42-02-ps1", "static.mir4-validation-runner-decomposition-m42-02-ps2", "static.mir4-assurance-evidence-decomposition-m42-02-ps3", "static.mir4-pre-freeze-release-decomposition-m42-02-ps4", "static.mir4-bootstrap-materialization-decomposition-m42-02-ps5", "static.mir4-assurance-release-decomposition-m42-02-ps6", "static.mir4-compatibility-audit-decomposition-m42-02-ps7", "static.mir4-offline-custody-decomposition-m42-02-ps8", "static.mir4-release-capsule-decomposition-m42-02-ps9", "static.mir4-control-executor-decomposition-m42-02-ps10", "static.mir4-supply-chain-decomposition-m42-02-ps11", "static.mir4-factorio-2.1-experimental-channel", "static.mir4-f2d-runtime-replay", "static.mir4-release-doctor-structured-failure", "static.mir4-pre-freeze-hardening"],
     "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
     "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "development-breadth": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta"],
     "full": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta", "runtime.performance-regression", "manual.release-review"],
     "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "runtime.performance-regression", "manual.release-review"],
-    "promotion-check": ["seal.verify"]
+    "promotion-check": ["seal.verify"],
+    "synthesis": ["static.mir4-integration-programme", "runtime.science-planning-contract", "runtime.researchability-planning-contract", "runtime.recipe-source-epoch-contract", "docs.check", "static.architecture", "static.compiler", "static.package", "static.mir4-platform-preview", "static.mir4-local-delivery", "static.mir4-promotion-recovery"],
+    "mir4-development": ["static.mir4-f210-qualification-policy", "static.mir4-factorio-2.1-experimental-channel", "static.research-all-observation", "static.mir4-historical-runtime-inputs", "static.mir4-distribution-custody-routes", "static.f210-v2-v3-migration-inputs", "static.mir42-nine-target-engine-inputs", "static.f200-base-only-settings-cap-transition-harness", "static.mir42-candidate-construction", "static.mir4-historical-baseline", "static.mir4-development-contracts", "static.mir4-a00-current-authority-observation", "static.mir4-a02-component-reconciliation", "docs.check", "tooling.self-test", "static.immutable-input-staging", "static.mir-artifact-storage-optimization", "static.mir4-community-manufacturing-intake", "static.mir4-current-package-presentation-v7", "static.mir4-editable-source-materializer-m41-f2c", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07", "static.mir4-protected-promotion-topology-a08", "static.mir42-nine-target-evidence-generators", "static.mir42-nine-target-entrypoint-scope", "static.mir42-nine-target-seal-readers", "static.mir42-nine-target-release-authority", "static.mir42-nine-target-promotion", "static.mir42-nine-target-release-assets", "static.mir42-nine-target-written-go-authorization", "static.mir42-protected-main-checks", "static.mir42-nine-target-release-narratives", "static.mir4-development-ci-selection", "static.mir-development-health"],
+    "mir-development-health": ["static.mir-development-health"],
+    "mir4-current-package-presentation-v2": ["static.mir4-current-package-presentation-v2"],
+    "mir4-current-package-presentation-v3": ["static.mir4-current-package-presentation-v3"],
+    "mir4-current-package-presentation-v4": ["static.mir4-current-package-presentation-v4"],
+    "mir4-current-package-presentation-v5": ["static.mir4-current-package-presentation-v5"],
+    "mir4-current-package-presentation-v6": ["static.mir4-current-package-presentation-v6"],
+    "mir4-current-package-presentation-v7": ["static.mir4-current-package-presentation-v7"],
+    "mir4-factorio-one-source-convergence": ["static.mir4-factorio-one-source-convergence"],
+    "mir4-m41-to-m42-composable-source-succession-v2": ["static.mir4-m41-to-m42-composable-source-succession-v2"],
+    "mir4-m41-to-m42-composable-source-succession-v3": ["static.mir4-m41-to-m42-composable-source-succession-v3"],
+    "mir4-m41-to-m42-composable-source-succession-v4": ["static.mir4-m41-to-m42-composable-source-succession-v4"],
+    "k2-k2so-intake-f210": ["runtime.k2-k2so-f210-intake"],
+    "k2-k2so-intake-closure": ["static.mir4-a03-k2-k2so-intake-closure"],
+    "a02-component-reconciliation": ["static.mir4-a02-component-reconciliation"],
+    "bob-tin-qualification-f210": ["runtime.bob-tin-qualification"],
+    "bob-tin-production-gain-f210": ["runtime.bob-tin-production-gain"],
+    "bob-tin-machine-matrix-f210": ["runtime.bob-tin-machine-matrix"],
+    "bob-tin-progression-frontier-f210": ["runtime.bob-tin-progression-frontier"],
+    "bob-tin-persisted-state-f210": ["runtime.bob-tin-persisted-state"],
+    "bob-tin-browser-explanation-f210": ["runtime.bob-tin-browser-explanation"],
+    "browser-personal-state-continuity-f210": ["runtime.browser-personal-state-continuity"],
+    "browser-personal-state-continuity-f200": ["runtime.f200-browser-personal-state-continuity"],
+    "f200-bob-tin-production-gain": ["runtime.f200-bob-tin-production-gain"],
+    "f200-bob-tin-persisted-state": ["runtime.f200-bob-tin-persisted-state"],
+    "angel-tin-final-state-audit-f210": ["runtime.angel-tin-final-state-audit"],
+    "bob-angel-tin-final-state-audit-f210": ["runtime.bob-angel-tin-final-state-audit"],
+    "bob-angel-tin-route-safety-f210": ["runtime.bob-angel-tin-route-safety"],
+    "maximum-level-cap-ownership-multiforce-f210": ["runtime.maximum-level-cap-ownership-multiforce-f210"],
+    "maximum-level-settings-derived-cap-transition-f200": ["runtime.maximum-level-settings-derived-cap-transition-f200"],
+    "maximum-level-v2-v3-migration-f210": ["runtime.maximum-level-v2-v3-migration-f210"]
   },
   "classes": [
+    {
+      "id": "f210-current-engine-admission",
+      "patterns": ["^\\.mir/control/MIR4-F210-Current-(?:Engine-Cap-Harness-AdmissionV3|Qualification-PolicyV2|Qualification-Policy-SuccessionV1)[.]json$", "^spec/engines/mir4-factorio-2[.]1-experimental-channel-v1[.]json$", "^spec/schemas/mir4-(?:f210-current-(?:engine-cap-harness-admission-v3|qualification-policy-v2|qualification-policy-succession-v1)|factorio-2[.]1-experimental-channel-v1)[.]schema[.]json$", "^tools/mir/application/release/F210QualificationPolicy[.]ps1$", "^tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority[.]ps1$", "^tests/mir4/Test-MIR4(?:F210QualificationPolicy|Factorio21ExperimentalChannel)[.]ps1$"],
+      "tests": ["static.mir4-f210-qualification-policy", "static.mir4-factorio-2.1-experimental-channel"]
+    },
+    {
+      "id": "historical-private-runtime-inputs",
+      "patterns": ["^tests/runtime/Test-MIR4HistoricalPrivateRuntime(?:Static)?[.]ps1$", "^tests/release/Test-MIR4DistributionCustodyRoutes[.]ps1$", "^tools/mir/cli/router/MIR4BootstrapCommands[.]ps1$"],
+      "tests": ["static.mir4-historical-runtime-inputs", "static.mir4-distribution-custody-routes", "static.immutable-input-staging"]
+    },
+    {
+      "id": "f210-v2-v3-migration-inputs",
+      "patterns": ["^tests/runtime/Test-MIR42V2V3CapMigration(?:Static)?[.]ps1$", "^tools/mir/application/package/HistoricalSourceAuthority[.]ps1$"],
+      "tests": ["static.f210-v2-v3-migration-inputs", "static.immutable-input-staging", "static.mir4-development-contracts"]
+    },
+    {
+      "id": "mir42-nine-target-engine-inputs",
+      "patterns": ["^tools/commands/release/Invoke-MIR42FourTargetEngineRun[.]ps1$", "^tests/release/Test-MIR42NineTargetHistoricalEngineRun[.]ps1$", "^spec/engines/mir421-native-engine-inputs-v1[.]json$", "^spec/schemas/mir421-native-engine-inputs-v1[.]schema[.]json$"],
+      "tests": ["static.mir42-nine-target-engine-inputs", "static.immutable-input-staging"]
+    },
+    {
+      "id": "tin-browser-input-staging",
+      "patterns": ["^tests/runtime/Test-MIRBobTinBrowserExplanation[.]ps1$"],
+      "tests": ["static.immutable-input-staging"]
+    },
+    {
+      "id": "tin-continuation-input-staging",
+      "patterns": ["^tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation[.]ps1$"],
+      "tests": ["static.immutable-input-staging"]
+    },
+    {
+      "id": "passive-repair-input-staging",
+      "patterns": ["^tests/runtime/Test-MIRPassiveRepair[.]ps1$"],
+      "tests": ["static.immutable-input-staging"]
+    },
+    {
+      "id": "material-audit-input-staging",
+      "patterns": ["^tests/support/MIRMaterialAuditInputs[.]ps1$", "^tests/runtime/Test-MIR(?:AngelTinFinalStateAudit|BobAngelTinFinalStateAudit|BobAngelTinRouteSafety|A06AluminiumFinalState)[.]ps1$", "^tests/runtime/Test-MIR(?:BobTin(?:ProductionGain|MachineMatrix|PersistedState|ProgressionFrontier|Qualification)|F200BobTinPersistedState)[.]ps1$"],
+      "tests": ["static.immutable-input-staging"]
+    },
+    {
+      "id": "mir42-candidate-construction",
+      "patterns": [
+        "^tests/release/Test-MIR42FourTargetCandidateBuild[.]ps1$",
+        "^tools/commands/release/New-MIR42(?:FourTarget|HistoricalPlaytest)Candidate[.]ps1$",
+        "^tools/mir/application/package/TargetMaterializer[.]ps1$",
+        "^tools/mir/application/release/readiness/MIR42(?:CandidateBuild|FourTargetPreflight)[.]ps1$",
+        "^spec/schemas/mir42-four-target-deterministic-candidate-manifest-v[12][.]schema[.]json$",
+        "^targets/historical/",
+        "^source/package-source[.]json$",
+        "^targets/package-authority[.]json$"
+      ],
+      "tests": ["static.mir42-candidate-construction"]
+    },
+    {
+      "id": "mir42-browser-consumed-regressions",
+      "patterns": ["^source/prototypes/mir/runtime/research_browser(?:_core|_factorio_catalogue)?[.]lua$", "^tests/runtime/(?:Test-MIRResearchBrowser[.]ps1|browser_fixture_(?:data|icons)[.]lua|research_browser(?:_core_regressions|_handler_regressions|_discovery_regressions|_production_regressions|_native_discovery|_native_discovery_regressions|_omissions)?[.]lua)$"],
+      "tests": ["runtime.research-browser"]
+    },
+    {
+      "id": "mir42-support-collector-release-asset",
+      "patterns": ["^scripts/Collect-MIRPlayerReport\\.(?:cmd|ps1)$", "^tools/commands/release/New-MIR42SupportCollectorBundle\\.ps1$", "^tools/mir/application/release/readiness/MIR42SupportCollectorBundle\\.ps1$", "^tests/release/Test-MIR42NineTargetReleaseAssets\\.ps1$", "^tests/support/MIR42StartupCollectorControls\\.ps1$", "^docs/maintainer/mir4-release-operations\\.md$"],
+      "tests": ["static.mir42-nine-target-release-assets"]
+    },
+    {
+      "id": "mir42-nine-target-evidence",
+      "patterns": ["^tools/mir/application/release/readiness/MIR42(?:EvidenceReconciliation|IndependentEvidenceRehash|TechnicalSeal|ProtectedMainPromotion|ProtectedMainChecks|ReleaseAssets)[.]ps1$", "^tools/commands/release/Invoke-MIR42NineTarget(?:EvidenceReconciliation|IndependentEvidenceRehash|SealPromotion|ReleaseAssets)[.]ps1$", "^tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme[.]ps1$", "^tests/release/Test-MIR42NineTarget(?:EvidenceGenerators|EntryPointScope|TechnicalSeal|ReleaseAuthority|Promotion|ReleaseAssets|WrittenGoAuthorization)[.]ps1$", "^tests/release/Test-MIR42ProtectedMainChecks[.]ps1$", "^[.]mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1[.]json$", "^spec/schemas/mir42-maintainer-written-release-authorization-v1[.]schema[.]json$"],
+      "tests": ["static.mir42-nine-target-evidence-generators", "static.mir42-nine-target-entrypoint-scope", "static.mir42-nine-target-seal-readers", "static.mir42-nine-target-release-authority", "static.mir42-nine-target-promotion", "static.mir42-nine-target-release-assets", "static.mir42-nine-target-written-go-authorization", "static.mir42-protected-main-checks"]
+    },
+    {
+      "id": "mir4-development-ci-selection",
+      "patterns": ["^tools/mir/application/assurance/DevelopmentValidation[.]ps1$", "^tests/tooling/Test-MIRDevelopmentCISelection[.]ps1$", "^[.]github/workflows/validate[.]yml$", "^governance/automation/mir4-workflow-purposes-v1[.]json$"],
+      "tests": ["static.mir4-development-ci-selection"]
+    },
+    {
+      "id": "mir-development-health",
+        "patterns": ["^\\.codex/(?:config\\.toml|hooks\\.json)$", "^tools/commands/workspace/(?:Test-MIRDevelopmentHealth|Invoke-MIRDevelopmentHealthHook)[.]ps1$", "^tests/tooling/Test-MIRDevelopmentHealth[.]ps1$", "^tools/commands/workspace/Remove-MIRStaleArtifacts[.]ps1$"],
+      "tests": ["static.mir-development-health"]
+    },
     {
       "id": "mir4-bootstrap",
       "patterns": ["^\\.gitattributes$", "^mir\\.(?:toml|lock)$", "^\\.mir/targets\\.json$", "^\\.mir/releases/waves/mir4-r0/", "^\\.mir/performance-campaigns/4\\.0\\.", "^\\.mir/evidence/mir4-r0/", "^\\.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-(?:CustodyObservation|VisibilityRecheck|Visibility-Canonicalization-Reconciliation)V1\\.json$", "^dist/more-infinite-research_(?:3\\.2\\.(?:9|11)|2\\.5\\.(?:9|11)|1\\.9\\.9|1\\.8\\.9)\\.zip$", "^tools/lib/mir4/", "^tools/lib/assurance/(?:Evidence\\.ps1|evidence/)", "^tools/lib/validation/(?:MIR4DistributionIdentity|PackageIdentity)\\.ps1$", "^tools/commands/mir4/", "^tools/commands/package/Build-MIRPackage\\.ps1$", "^tools/commands/release/(?:Invoke-MIR4BootstrapCapsule|New-MIR4(?:Bootstrap(?:RootSet|LocalCandidate)|HistoricalPrivateCandidate|M4C01PlayerCandidateSet)|Test-MIR4R0Bootstrap)\\.ps1$", "^spec/(?:api/mir4-v[01]|canonicalization|platform/mir4-preview-v0)/", "^spec/schemas/(?:experimental|preview)/", "^spec/schemas/mir4-", "^spec/templates/mir4-", "^spec/schemas/mir3-dot9-mod-portal-visibility-(?:recheck|canonicalization-reconciliation-v1)\\.schema\\.json$", "^sdk/(?:experimental|preview)/mir4/", "^fixtures/mir4-(?:api-v0|canonical-json-v1|mep-v[01]|mep-discovery-v1|process-ir-v[01]|inspector-compatibility-v1|environment-evidence-v1|assurance-scale-v1|historical-succession-v1)/", "^fixtures/assert-upgrade-(?:3-2-11|2-5-11)-to-4-0-", "^tests/mir4/", "^tests/release/(?:Test-MIR4|Test-MIR3Dot9ModPortalVisibilityRecheck)", "^docs/architecture/(?:current-architecture-matrix|mir4-|decisions/000[1-7]-mir)", "^docs/(?:reference/mir4-(?:canonical-json-v1|mep-v0|environment-evidence|f210-mep-discovery)|maintainer/mir4-(?:m4c01-runbook|w09-manual-playtest|full-platform-closeout))\\.md$", "^docs/reference/generated/mir4-(?:experimental-api-v0|api-sdk-v1|platform-component-matrix)\\.md$"],
       "tests": ["static.mir4-r0-identity", "static.mir4-r0-bootstrap", "static.mir4-public-feedback-intake", "static.mir4-maximum-level-sol03", "static.mir4-production-route-sol04", "static.mir4-research-cost-v2-sol05", "static.mir4-k2-science-sol06", "static.mir4-compatibility-campaign-sol07", "static.mir4-affected-proof-sol08", "static.mir4-m4c01-closeout-sol09", "static.mir4-final-programme-reconciliation", "static.mir3-dot9-portal-visibility", "static.mir4-bootstrap-target-readiness", "static.mir4-local-playtest-shadow", "static.mir4-bootstrap-materialization", "static.mir4-offline-custody", "static.mir4-experimental-api-sdk", "static.mir4-target-compiler-w02", "static.mir4-semantic-compiler-w03", "static.mir4-runtime-continuity-w04", "static.mir4-module-ecosystem-w05", "static.mir4-processir-synthesis-w06", "static.mir4-exact-processir-t12", "static.mir4-release-compatibility-canaries-t13", "static.mir4-documentation-continuity-t14", "static.mir4-inspector-compatibility-w07", "static.mir4-assurance-scale-w08", "static.mir4-historical-succession-w09", "static.mir4-whole-platform", "static.mir4-full-platform-closeout", "static.mir4-release-readiness-reconciliation", "static.mir4-release-phase-engine", "static.mir4-release-adapters-t03", "static.mir4-release-adapters-t04", "static.mir4-release-adapters-t05", "static.mir4-release-doctor-t06", "static.mir4-canonicalization-diagnostics-t07", "static.mir4-extension-developer-experience-t09", "static.mir4-environment-evidence-t10", "static.mir4-mep-discovery-t11", "static.mir4-pre-freeze-hardening", "static.mir4-platform-preview", "static.mir4-supply-chain-foundation", "static.mir4-supply-chain-attestation", "static.mir4-release-capsule", "static.mir4-runner-publisher-confinement", "static.mir4-signing-ceremony-preparation", "static.mir4-supply-chain-preservation-t15", "static.mir4-hybrid-platform-authority"]
+    },
+    {
+      "id": "mir4-current-package-presentation-v2",
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v2(?:-evolution-receipt)?\\.json$", "^spec/schemas/mir4-current-package-presentation-v2\\.schema\\.json$", "^contracts/repository/mir4-current-package-presentation-v2-evolution-receipt\\.schema\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV2\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v2"]
+    },
+    {
+      "id": "mir4-current-package-presentation-v3",
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v3\\.json$", "^spec/schemas/mir4-current-package-presentation-v3\\.schema\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV3\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v3"]
+    },
+    {
+      "id": "mir4-current-package-presentation-v4",
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v4\\.json$", "^spec/schemas/mir4-current-package-presentation-v4\\.schema\\.json$", "^spec/distribution/mir4-current-package-presentation-v3\\.json$", "^(?:governance|assurance)/repository/factorio-one-source-convergence-v1\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/mir/application/package/FactorioOneSourceConvergenceAuthority\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV4\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v4"]
+    },
+    {
+      "id": "mir4-current-package-presentation-v5",
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v[45]\\.json$", "^spec/schemas/mir4-current-package-presentation-v[45]\\.schema\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV5Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV5\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v5"]
+    },
+    {
+      "id": "mir4-current-package-presentation-v6",
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v[56]\\.json$", "^spec/schemas/mir4-current-package-presentation-v[56]\\.schema\\.json$", "^\\.mir/locales/manifest\\.json$", "^source/locale/", "^source/package-source\\.json$", "^targets/(?:package-authority|registry)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/mir/application/package/(?:PackageAuthority|TargetMaterializer)\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV6Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV6\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v6"]
+    },
+    {
+      "id": "mir4-current-package-presentation-v7",
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v[67]\\.json$", "^spec/schemas/mir4-current-package-presentation-v[67]\\.schema\\.json$", "^spec/schemas/mir4-composable-package-source-v3\\.schema\\.json$", "^\\.mir/locales/manifest\\.json$", "^source/locale/", "^source/package-source\\.json$", "^targets/(?:package-authority|registry)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/mir/application/package/(?:PackageAuthority|TargetMaterializer)\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV6Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV7\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v7", "static.mir4-editable-source-materializer-m41-f2c"]
+    },
+    {
+      "id": "historical-handcrafting-regression",
+      "patterns": ["^fixtures/assert-historical-handcrafting/"],
+      "tests": ["static.compiler", "runtime.researchability-planning-contract", "static.mir42-nine-target-engine-inputs"]
+    },
+    {
+      "id": "mir4-science-route-feasibility",
+      "patterns": ["^source/prototypes/mir/capabilities/science_integration/(?:pack_production_reachability|recipe_route_feasibility|recipe_unlock_facts)\\.lua$", "^source/prototypes/mir/index/recipe_(?:facts|unlocks)\\.lua$", "^tests/compiler/(?:Test-MIR(?:RecipeSourceEpoch|ResearchabilityPlanning)\\.ps1|recipe_source_epoch\\.lua|researchability_planning\\.lua|lab_reachability\\.lua)$", "^tools/mir/application/release/F210QualificationPolicy\\.ps1$", "^\\.mir/control/MIR4-F210-Current-Qualification-PolicyV2\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^docs/architecture/module-boundaries\\.md$"],
+      "tests": ["runtime.researchability-planning-contract", "runtime.recipe-source-epoch-contract", "static.architecture", "static.compiler"]
+    },
+    {
+      "id": "mir4-protected-promotion-topology-a08",
+      "patterns": ["^source/package-source\\.json$", "^targets/(?:package-authority|f(?:210|200|110|100)/composition)\\.json$", "^spec/distribution/mir4-current-package-presentation-v[67]\\.json$", "^spec/programmes/mir4-4x-operating-programme-v1\\.json$", "^spec/releases/mir4-protected-main-promotion-topology-v1\\.json$", "^spec/schemas/mir4-(?:composable-package-source-v3|current-package-presentation-v7|protected-main-(?:promotion-topology|qualification)-v1|target-qualification-worker-receipt-v1|independent-verification-receipt-v1)\\.schema\\.json$", "^validation/trust\\.json$", "^tools/mir/application/package/TargetMaterializer\\.ps1$", "^tools/lib/validation/PackageIdentity\\.ps1$", "^tools/lib/mir4/(?:PackagePresentation|pre-freeze-release/ProtectedPromotionTopology)\\.ps1$", "^tools/commands/mir4/Invoke-MIR4PreFreeze\\.ps1$", "^tests/mir4/Test-MIR4ProtectedPromotionTopologyA08\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/assurance\\.json$"],
+      "tests": ["static.mir4-protected-promotion-topology-a08"]
+    },
+    {
+      "id": "mir4-factorio-one-source-convergence",
+      "patterns": ["^governance/repository/factorio-one-source-convergence-v1\\.json$", "^assurance/repository/factorio-one-source-convergence-v1\\.json$", "^contracts/repository/mir4-factorio-one-source-convergence-(?:authority|receipt)-v1\\.schema\\.json$", "^tools/mir/application/package/FactorioOneSourceConvergenceAuthority\\.ps1$", "^tools/commands/mir4/Update-MIR4FactorioOneSourceConvergenceAuthority\\.ps1$", "^tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority\\.ps1$"],
+      "tests": ["static.mir4-factorio-one-source-convergence"]
     },
     {
       "id": "mir4-post-release-foundation",
@@ -47,7 +213,12 @@
     {
       "id": "mir4-change-and-release-authority",
       "patterns": ["^CHANGELOG\\.md$", "^changes/", "^releases/governance/MIR4-Source-Changelog-PlanV1\\.json$", "^contracts/release/mir4-(?:change-fragment-v2|defect-record-v1|change-realization-v1|release-narrative-(?:plan|result)-v1)\\.schema\\.json$", "^fixtures/release/m41-03/", "^tools/mir/application/release/(?:ReleaseNarrativeModel|ReleaseNarratives|SourceChangelogRenderer|FactorioTargetChangelogRenderer|GitHubReleaseRenderer|ModPortalRenderer|TechnicalReleaseRenderer|ReleaseManifestChangeRenderer)\\.ps1$", "^tools/mir/cli/Invoke-MIR4ReleaseNarratives\\.ps1$", "^tests/mir4/Test-MIR4ReleaseNarrativesM4103\\.ps1$", "^docs/architecture/mir4-change-and-release-authority\\.md$"],
-      "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-release-narratives-m41-03"]
+      "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-release-narratives-m41-03", "static.mir42-nine-target-release-narratives"]
+    },
+    {
+      "id": "mir42-nine-target-release-narratives",
+      "patterns": ["^contracts/release/mir4-(?:change-fragment-v3|release-narrative-(?:plan|result)-v2)\\.schema\\.json$", "^fixtures/release/m42-nine-narratives/", "^tests/mir4/Test-MIR42NineTargetReleaseNarratives\\.ps1$", "^tools/mir/application/release/(?:ReleaseNarrativeModel|ReleaseNarratives|SourceChangelogRenderer|FactorioTargetChangelogRenderer|GitHubReleaseRenderer|ModPortalRenderer|TechnicalReleaseRenderer|ReleaseManifestChangeRenderer)\\.ps1$", "^docs/architecture/mir4-change-and-release-authority\\.md$"],
+      "tests": ["docs.check", "static.mir4-release-narratives-m41-03", "static.mir42-nine-target-release-narratives"]
     },
     {
       "id": "mir4-repository-characterization",
@@ -56,7 +227,7 @@
     },
     {
       "id": "mir4-package-source-baseline",
-      "patterns": ["^changes/unreleased/MIR4-CHG-2026-0004\\.json$", "^contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1\\.json$", "^spec/distribution/mir4-golden-four-target-baseline-v1\\.json$", "^spec/schemas/mir4-golden-four-target-baseline-v1\\.schema\\.json$", "^tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority\\.ps1$", "^tools/mir/application/package/GoldenTargetBaselines\\.ps1$", "^tools/mir/cli/Invoke-MIR4PackageSource\\.ps1$", "^tests/mir4/Test-MIR4(?:GoldenFourTargetBaseline|PreFreezeHardening)\\.ps1$", "^dist/more-infinite-research_4\\.0\\.(?:21000|20000|11000|10000)\\.zip$"],
+      "patterns": ["^changes/unreleased/MIR4-CHG-2026-0004\\.json$", "^contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1\\.json$", "^\\.mir/distributions\\.json$", "^spec/distribution/mir4-golden-four-target-baseline-v1\\.json$", "^spec/schemas/mir4-golden-four-target-baseline-v1\\.schema\\.json$", "^tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority\\.ps1$", "^tools/mir/application/package/(?:DistributionCustody|GoldenTargetBaselines)\\.ps1$", "^tools/mir/cli/Invoke-MIR4(?:DistributionCustody|PackageSource)\\.ps1$", "^tests/mir4/Test-MIR4(?:GoldenFourTargetBaseline|PreFreezeHardening)\\.ps1$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-golden-four-target-baseline-m41-f1", "static.mir4-pre-freeze-hardening"]
     },
     {
@@ -71,32 +242,52 @@
     },
     {
       "id": "mir4-package-source-editable-materializer",
-      "patterns": ["^\\.gitattributes$", "^src/mod/", "^targets/(?:registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/", "^spec/schemas/mir4-(?:package-source-manifest|target-registry|target-support-policy|target-overlay|package-composition-result|editable-source-materializer-proof|current-source-materializer-proof)-v1\\.schema\\.json$", "^tools/mir/application/package/TargetMaterializer\\.ps1$", "^tools/mir/cli/Invoke-MIR4PackageSource\\.ps1$", "^tools/mir\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|PreFreezeHardening|ReleaseAdaptersT05)\\.ps1$", "^contracts/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1\\.json$", "^tools/commands/mir4/Update-MIR4M41F2CEditableSourceMaterializerAuthority\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0007\\.json$", "^tests/compiler/Test-MIR4CompilationPlanDecompositionM4202\\.ps1$", "^contracts/repository/mir4-m42-02-compilation-plan-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Compilation-Plan-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202CompilationPlanDecompositionAuthority\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0017\\.json$", "^tests/compiler/Test-MIR4BaseContinuationsDecompositionM4202\\.ps1$", "^contracts/repository/mir4-m42-02-base-continuations-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Base-Continuations-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202BaseContinuationsDecompositionAuthority\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0018\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml|control-plane/ownership\\.json)$", "^docs/architecture/module-boundaries\\.md$"],
-      "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-golden-four-target-baseline-m41-f1", "static.mir4-shadow-target-materializer-m41-f2a", "static.mir4-shadow-source-model-m41-f2b", "static.mir4-editable-source-materializer-m41-f2c", "static.mir4-compilation-plan-decomposition-m42-02-l1", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-technology-catalog-decomposition-m42-02-l4", "static.mir4-pre-freeze-hardening"]
+      "patterns": ["^\\.gitattributes$", "^source/", "^targets/(?:package-authority|registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/", "^spec/schemas/mir4-(?:(?:composable-package-source|canonical-package-authority|target-registry|target-composition|composable-source-model-proof)-v2|(?:target-support-policy|package-composition-result|editable-source-materializer-proof|current-source-materializer-proof|composable-source-predecessor-proof)-v1)\\.schema\\.json$", "^(?:governance|assurance)/repository/composable-source-layout-v1\\.json$", "^contracts/repository/mir4-composable-source-layout-migration-v1\\.schema\\.json$", "^releases/migrations/MIR4-Composable-Source-Layout-MigrationV1\\.json$", "^tools/mir/application/package/(?:PackageAuthority|TargetMaterializer|ComposableSourceModel|SourceCompositionProof)\\.ps1$", "^tools/mir/cli/Invoke-MIR4PackageSource\\.ps1$", "^tools/mir\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|CanonicalSourceCompositionM4202|ComposableSourceModelM4202|PreFreezeHardening|ReleaseAdaptersT05)\\.ps1$", "^tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0050\\.json$", "^contracts/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1\\.json$", "^tools/commands/mir4/Update-MIR4M41F2CEditableSourceMaterializerAuthority\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0007\\.json$", "^tests/compiler/Test-MIR4CompilationPlanDecompositionM4202\\.ps1$", "^contracts/repository/mir4-m42-02-compilation-plan-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Compilation-Plan-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202CompilationPlanDecompositionAuthority\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0017\\.json$", "^tests/compiler/Test-MIR4BaseContinuationsDecompositionM4202\\.ps1$", "^contracts/repository/mir4-m42-02-base-continuations-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Base-Continuations-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202BaseContinuationsDecompositionAuthority\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0018\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml|control-plane/ownership\\.json)$", "^docs/architecture/module-boundaries\\.md$"],
+      "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-golden-four-target-baseline-m41-f1", "static.mir4-shadow-target-materializer-m41-f2a", "static.mir4-shadow-source-model-m41-f2b", "static.mir4-composable-source-model-m42-02", "static.mir4-editable-source-materializer-m41-f2c", "static.mir4-composable-source-layout-v1", "static.mir4-compilation-plan-decomposition-m42-02-l1", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-technology-catalog-decomposition-m42-02-l4", "static.mir4-pre-freeze-hardening"]
+    },
+    {
+      "id": "mir4-m41-to-m42-composable-source-succession",
+      "patterns": ["^governance/release/mir4-4\\.1-release-readiness-v1\\.json$", "^releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1\\.json$", "^(?:governance|assurance)/repository/composable-source-layout-v1\\.json$", "^assurance/repository/(?:composable-source-layout-receipt|mir4-m41-to-m42-composable-source-succession)-v1\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v1\\.schema\\.json$", "^tools/mir/application/release/readiness/(?:ComposableSourceSuccession|Contract|CandidateBuild|Qualification|IndependentVerification|TechnicalSeal|Promotion)\\.ps1$", "^tools/mir/application/release/MIR441ReleaseReadiness\\.ps1$", "^tools/lib/mir4/(?:PostReleaseDocumentation|pre-freeze-release/AuthorityValidation)\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionAuthority\\.ps1$", "^tests/(?:release/Test-MIR4(?:41ReleaseReadiness|M41ToM42ComposableSourceSuccession)|tooling/Test-MIR4CliReleaseConvergence|mir4/Test-MIR4PreFreezeHardening)\\.ps1$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$"],
+      "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-composable-source-layout-v1", "static.mir4-m41-to-m42-composable-source-succession-v1", "static.mir4-release-readiness-m41-08", "static.mir4-cli-release-convergence-m42-01a", "static.mir4-pre-freeze-hardening"]
+    },
+    {
+      "id": "mir4-m41-to-m42-composable-source-succession-v2",
+      "patterns": ["^assurance/repository/mir4-m41-to-m42-composable-source-succession-v[12]\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v[12]\\.schema\\.json$", "^(?:governance|assurance)/repository/factorio-one-source-convergence-v1\\.json$", "^tools/mir/application/release/readiness/ComposableSourceSuccession\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority\\.ps1$", "^tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2\\.ps1$"],
+      "tests": ["static.mir4-m41-to-m42-composable-source-succession-v2"]
+    },
+    {
+      "id": "mir4-m41-to-m42-composable-source-succession-v3",
+      "patterns": ["^assurance/repository/mir4-m41-to-m42-composable-source-succession-v3\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v3\\.schema\\.json$", "^tools/mir/application/release/readiness/ComposableSourceSuccession\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority\\.ps1$", "^tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV3\\.ps1$"],
+      "tests": ["static.mir4-m41-to-m42-composable-source-succession-v3"]
+    },
+    {
+      "id": "mir4-m41-to-m42-composable-source-succession-v4",
+      "patterns": ["^assurance/repository/mir4-m41-to-m42-composable-source-succession-v[34]\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v[34]\\.schema\\.json$", "^spec/distribution/mir4-current-package-presentation-v5\\.json$", "^spec/schemas/mir4-current-package-presentation-v5\\.schema\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^\\.github/workflows/release-candidate\\.yml$", "^\\.mir/(?:assurance\\.json|compatibility\\.yml|test-impact\\.yml|modules\\.yml|control/(?:paths\\.yml|repository-fixed-point\\.json))$", "^assurance/catalog/tests\\.json$", "^docs/compatibility/targets/(?:corrundum|cubium)\\.md$", "^tests/(?:package/Test-MIRContextPackage|tooling/(?:Test-MIRAssurance|support/MIRAssuranceSelfTest)|repository/Test-MIR4RepositoryFixedPoint|support/MIR4M4202PackageSuccession|release/Test-MIR4M41ToM42ComposableSourceSuccessionV4)\\.ps1$", "^tools/lib/(?:assurance/(?:Domains|evidence/Fingerprints)|validation/runner/StaticCompilerDiagnostics|mir4/PackagePresentation|mir4/pre-freeze-release/AuthorityValidation)\\.ps1$", "^tools/mir/application/(?:package/(?:PackageAuthority|TargetMaterializer)|release/readiness/ComposableSourceSuccession)\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV4Authority\\.ps1$", "^validation/(?:scenarios/local-2\\.1\\.json|tests\\.yml)$"],
+      "tests": ["static.mir4-m41-to-m42-composable-source-succession-v4"]
     },
     {
       "id": "mir4-package-source-runtime-replay",
-      "patterns": ["^tools/lib/validation/FactorioVersionPolicy\\.ps1$", "^tools/mir/application/package/RuntimeReplay(?:AggregateVerifier|Verifier)?\\.ps1$", "^tools/commands/mir4/Update-MIR4M41F2D(?:TargetRuntimeReplayAuthority|FourTargetRuntimeReplayAggregate)\\.ps1$", "^contracts/repository/mir4-m41-f2d-(?:target-runtime-replay-authority-evolution|four-target-runtime-replay-aggregate)-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F2D-(?:F(?:210|200|110|100)-Runtime-Replay-Authority-EvolutionV1|Four-Target-Runtime-Replay-AggregateV1)\\.json$", "^changes/unreleased/MIR4-CHG-2026-00(?:08|09|10|11|12)\\.json$", "^tests/mir4/Test-MIR4RuntimeReplayF2D\\.ps1$", "^docs/maintainer/mir4-f2d-runtime-replay\\.md$"],
+      "patterns": ["^\\.mir/distributions\\.json$", "^tools/lib/validation/FactorioVersionPolicy\\.ps1$", "^tools/mir/application/package/(?:DistributionCustody|RuntimeReplay(?:AggregateVerifier|Verifier)?)\\.ps1$", "^tools/commands/mir4/Update-MIR4M41F2D(?:TargetRuntimeReplayAuthority|FourTargetRuntimeReplayAggregate)\\.ps1$", "^contracts/repository/mir4-m41-f2d-(?:target-runtime-replay-authority-evolution|four-target-runtime-replay-aggregate)-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F2D-(?:F(?:210|200|110|100)-Runtime-Replay-Authority-EvolutionV1|Four-Target-Runtime-Replay-AggregateV1)\\.json$", "^changes/unreleased/MIR4-CHG-2026-00(?:08|09|10|11|12)\\.json$", "^tests/mir4/Test-MIR4RuntimeReplayF2D\\.ps1$", "^docs/maintainer/mir4-f2d-runtime-replay\\.md$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-factorio-2.1-experimental-channel", "static.mir4-f2d-runtime-replay", "static.mir4-pre-freeze-hardening"]
     },
     {
       "id": "mir4-m42-02-stream-compiler",
-      "patterns": ["^targets/f(?:210|200)/files/prototypes/mir/planner/stream_compiler(?:\\.lua|/)", "^src/mod/package-source\\.json$", "^targets/(?:package-authority\\.json|f(?:210|200)/overlay\\.json)$", "^spec/schemas/mir4-package-source-manifest-v1\\.schema\\.json$", "^contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority\\.ps1$", "^tests/compiler/Test-MIR4(?:CompilationPlan|BaseContinuations|StreamCompiler)DecompositionM4202\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|ReleaseAdaptersT05)\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0019\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^tools/lib/mir4/PreFreezeRelease\\.ps1$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^docs/architecture/module-boundaries\\.md$"],
+      "patterns": ["^source/prototypes/mir/planner/stream_compiler(?:\\.lua|/)", "^source/package-source\\.json$", "^targets/(?:package-authority\\.json|f(?:210|200)/composition\\.json)$", "^spec/schemas/mir4-package-source-manifest-v1\\.schema\\.json$", "^contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority\\.ps1$", "^tests/compiler/Test-MIR4(?:CompilationPlan|BaseContinuations|StreamCompiler)DecompositionM4202\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|ReleaseAdaptersT05)\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0019\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^tools/lib/mir4/PreFreezeRelease\\.ps1$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^docs/architecture/module-boundaries\\.md$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-editable-source-materializer-m41-f2c", "static.mir4-compilation-plan-decomposition-m42-02-l1", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-factorio-2.1-experimental-channel", "static.mir4-pre-freeze-hardening"]
     },
     {
       "id": "mir4-m42-02-technology-catalog",
-      "patterns": ["^src/mod/families/modern/prototypes/mir/planner/technology_catalog(?:\\.lua|/)", "^src/mod/package-source\\.json$", "^targets/(?:package-authority\\.json|f(?:210|200)/overlay\\.json)$", "^spec/schemas/mir4-package-source-manifest-v1\\.schema\\.json$", "^contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202TechnologyCatalogDecompositionAuthority\\.ps1$", "^tests/compiler/Test-MIR4(?:CompilationPlan|BaseContinuations|StreamCompiler|TechnologyCatalog)DecompositionM4202\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|ReleaseAdaptersT05)\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0020\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^tools/lib/mir4/PreFreezeRelease\\.ps1$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^docs/architecture/module-boundaries\\.md$"],
+      "patterns": ["^source/prototypes/mir/planner/technology_catalog(?:\\.lua|/)", "^source/package-source\\.json$", "^targets/(?:package-authority\\.json|f(?:210|200)/composition\\.json)$", "^spec/schemas/mir4-package-source-manifest-v1\\.schema\\.json$", "^contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202TechnologyCatalogDecompositionAuthority\\.ps1$", "^tests/compiler/Test-MIR4(?:CompilationPlan|BaseContinuations|StreamCompiler|TechnologyCatalog)DecompositionM4202\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|ReleaseAdaptersT05)\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0020\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^tools/lib/mir4/PreFreezeRelease\\.ps1$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^docs/architecture/module-boundaries\\.md$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-editable-source-materializer-m41-f2c", "static.mir4-compilation-plan-decomposition-m42-02-l1", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-technology-catalog-decomposition-m42-02-l4", "static.mir4-factorio-2.1-experimental-channel", "static.mir4-pre-freeze-hardening"]
     },
     {
       "id": "mir4-m42-02-effect-ownership",
-      "patterns": ["^src/mod/families/modern/prototypes/mir/planner/effect_ownership(?:\\.lua|/)", "^src/mod/package-source\\.json$", "^targets/(?:package-authority\\.json|f(?:210|200)/overlay\\.json)$", "^spec/schemas/mir4-package-source-manifest-v1\\.schema\\.json$", "^contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202EffectOwnershipDecompositionAuthority\\.ps1$", "^tests/compiler/Test-MIR4(?:CompilationPlan|BaseContinuations|StreamCompiler|TechnologyCatalog|EffectOwnership)DecompositionM4202\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|ReleaseAdaptersT05)\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0021\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^tools/lib/mir4/PreFreezeRelease\\.ps1$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^docs/architecture/module-boundaries\\.md$"],
+      "patterns": ["^source/prototypes/mir/planner/effect_ownership(?:\\.lua|/)", "^source/package-source\\.json$", "^targets/(?:package-authority\\.json|f(?:210|200)/composition\\.json)$", "^spec/schemas/mir4-package-source-manifest-v1\\.schema\\.json$", "^contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202EffectOwnershipDecompositionAuthority\\.ps1$", "^tests/compiler/Test-MIR4(?:CompilationPlan|BaseContinuations|StreamCompiler|TechnologyCatalog|EffectOwnership)DecompositionM4202\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|ReleaseAdaptersT05)\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0021\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^tools/lib/mir4/PreFreezeRelease\\.ps1$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^docs/architecture/module-boundaries\\.md$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-editable-source-materializer-m41-f2c", "static.mir4-compilation-plan-decomposition-m42-02-l1", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-technology-catalog-decomposition-m42-02-l4", "static.mir4-effect-ownership-decomposition-m42-02-l5", "static.mir4-factorio-2.1-experimental-channel", "static.mir4-pre-freeze-hardening"]
     },
     {
       "id": "mir4-m42-02-compiler-orchestrator",
-      "patterns": ["^src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator(?:\\.lua|/)", "^src/mod/package-source\\.json$", "^targets/(?:package-authority\\.json|f(?:210|200)/overlay\\.json)$", "^spec/schemas/mir4-package-source-manifest-v1\\.schema\\.json$", "^contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202CompilerOrchestratorDecompositionAuthority\\.ps1$", "^tests/compiler/Test-MIR4(?:CompilationPlan|BaseContinuations|StreamCompiler|TechnologyCatalog|EffectOwnership|CompilerOrchestrator)DecompositionM4202\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|ReleaseAdaptersT05)\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0022\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^tools/lib/mir4/PreFreezeRelease\\.ps1$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^docs/architecture/module-boundaries\\.md$"],
+      "patterns": ["^source/prototypes/mir/pipeline/compiler_orchestrator(?:\\.lua|/)", "^source/package-source\\.json$", "^targets/(?:package-authority\\.json|f(?:210|200)/composition\\.json)$", "^spec/schemas/mir4-package-source-manifest-v1\\.schema\\.json$", "^contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1\\.schema\\.json$", "^releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1\\.json$", "^tools/commands/mir4/Update-MIR4M4202CompilerOrchestratorDecompositionAuthority\\.ps1$", "^tests/compiler/Test-MIR4(?:CompilationPlan|BaseContinuations|StreamCompiler|TechnologyCatalog|EffectOwnership|CompilerOrchestrator)DecompositionM4202\\.ps1$", "^tests/mir4/Test-MIR4(?:EditableSourceMaterializer|ReleaseAdaptersT05)\\.ps1$", "^changes/unreleased/MIR4-CHG-2026-0022\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml)$", "^validation/tests\\.yml$", "^assurance/catalog/tests\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^tools/lib/mir4/PreFreezeRelease\\.ps1$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^docs/architecture/module-boundaries\\.md$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-editable-source-materializer-m41-f2c", "static.mir4-compilation-plan-decomposition-m42-02-l1", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-technology-catalog-decomposition-m42-02-l4", "static.mir4-effect-ownership-decomposition-m42-02-l5", "static.mir4-compiler-orchestrator-decomposition-m42-02-l6", "static.mir4-factorio-2.1-experimental-channel", "static.mir4-pre-freeze-hardening"]
     },
     {
@@ -141,7 +332,7 @@
     },
     {
       "id": "mir4-package-source-authority-cutover",
-      "patterns": ["^src/mod/", "^targets/", "^tools/(?:lib/(?:validation/PackageIdentity|control/Records|mir4/PreFreezeRelease|assurance/(?:Core|Evidence))|mir/application/(?:package/(?:PackageAuthority|PackageAuthorityVerifier|TargetMaterializer)|release/ReleaseNarratives|repository/RepositoryCharacterization)|commands/package/Build-MIRPackage|commands/mir4/New-MIR4TargetProductSet|commands/release/New-MIR4BootstrapLocalCandidate|mir)\\.ps1$", "^scripts/(?:Build-MIRPackage|Invoke-MIRReleaseTargetedGate|Invoke-MIRValidation)\\.ps1$", "^spec/schemas/mir4-(?:canonical-package-authority|package-source-manifest|target-registry|target-overlay|package-composition-result|editable-source-materializer-proof)-v1\\.schema\\.json$", "^contracts/(?:repository/mir4-m41-f2e-package-authority-cutover|release/mir4-release-narrative-result)-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1\\.json$", "^changes/unreleased/MIR4-CHG-2026-0013\\.json$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^tests/(?:mir4/Test-MIR4(?:PackageAuthorityF2E|EditableSourceMaterializer|PreFreezeHardening|RepositoryCharacterizationM4200A|RuntimeReplayF2D)|package/Test-MIRDeterministicPackage|tooling/Test-MIR(?:Assurance|ControlPlaneWorkflow))\\.ps1$", "^\\.github/workflows/(?:control-plane-v5|validate)\\.yml$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml|control-plane/ownership\\.json)$", "^docs/architecture/module-boundaries\\.md$"],
+      "patterns": ["^source/", "^targets/", "^tools/(?:lib/(?:validation/PackageIdentity|control/Records|mir4/PreFreezeRelease|assurance/(?:Core|Evidence))|mir/application/(?:package/(?:PackageAuthority|PackageAuthorityVerifier|TargetMaterializer)|release/ReleaseNarratives|repository/RepositoryCharacterization)|commands/package/Build-MIRPackage|commands/mir4/New-MIR4TargetProductSet|commands/release/New-MIR4BootstrapLocalCandidate|mir)\\.ps1$", "^scripts/(?:Build-MIRPackage|Invoke-MIRReleaseTargetedGate|Invoke-MIRValidation)\\.ps1$", "^spec/schemas/mir4-(?:canonical-package-authority|package-source-manifest|target-registry|target-overlay|package-composition-result|editable-source-materializer-proof)-v1\\.schema\\.json$", "^contracts/(?:repository/mir4-m41-f2e-package-authority-cutover|release/mir4-release-narrative-result)-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1\\.json$", "^changes/unreleased/MIR4-CHG-2026-0013\\.json$", "^tests/repository/Test-MIR4RepositoryFixedPoint\\.ps1$", "^tests/(?:mir4/Test-MIR4(?:PackageAuthorityF2E|EditableSourceMaterializer|PreFreezeHardening|RepositoryCharacterizationM4200A|RuntimeReplayF2D)|package/Test-MIRDeterministicPackage|tooling/Test-MIR(?:Assurance|ControlPlaneWorkflow))\\.ps1$", "^\\.github/workflows/(?:control-plane-v5|validate)\\.yml$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/paths\\.yml|control-plane/ownership\\.json)$", "^docs/architecture/module-boundaries\\.md$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-f2d-runtime-replay", "static.mir4-package-authority-m41-f2e", "static.mir4-pre-freeze-hardening"]
     },
     {
@@ -151,7 +342,7 @@
     },
     {
       "id": "repository-migration",
-      "patterns": ["^\\.gitattributes$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/(?:paths\\.yml|repository-fixed-point\\.json)|control-plane/ownership\\.json|releases/waves/mir4-r0/MIR4-(?:Whole-Platform|Target-Compiler|Semantic-Compiler|Runtime-Continuity|Module-Ecosystem|ProcessIR-Synthesis)-ProgrammeV1\\.json|releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1\\.json)$", "^(?:assurance|contracts|governance)/repository/", "^tests/(?:repository|canonicalization|diagnostics|targets|platform|technology|compiler|runtime|extensions|processir)/", "^releases/migrations/", "^(?:assurance|changes|contracts|docs|examples|governance|modules|releases|sdk|spec|src|targets|tests|tools/mir)/\\.mir-root\\.json$", "^tools/mir/(?:(?:adapters|application|domain|ports)/(?:repository|canonicalization|diagnostics|targets|platform|technology|migration|compiler|runtime|extensions|processir|safety|policy)/|cli/(?:Export-MIR4(?:SemanticCompiler|RuntimeContinuity|ModuleEcosystem|ProcessIRSynthesis|ExactProcessIR)Records|Invoke-MIR4(?:RepositoryFixedPoint|CanonicalizationMigration|DiagnosticsMigration|TargetKeyMigration|WholePlatformMigration|TechnologyAcceptanceMigration|TargetCompilerMigration|SemanticCompilerPolicyMigration|RuntimeContinuityMigration|ExperimentalApi|Extension|ModuleSdkMepMigration|ProcessIRExactMigration))\\.ps1$)", "^tools/lib/mir4/(?:CanonicalJsonV1|CompatibilityCanary|CompilationRun|DiagnosticsV1|EnvironmentEvidence|ExactProcessIR|ExperimentalApiSdk|ExtensionDeveloperExperience|MepDiscovery|ModuleEcosystem|NormalizedCompiler|PlatformPreview|ProcessIR|PolicyEngine|PreFreezeRelease|RuntimeStateModel|SafetyKernel|SdkV1|SupportAssessment|TargetKey|TargetCompiler|TechnologyAcceptance|WholePlatform)\\.ps1$", "^tools/lib/assurance/(?:Evidence\\.ps1|evidence/)", "^tests/(?:mir4/Test-MIR4(?:CanonicalizationDiagnosticsT07|ExperimentalApiSdk|ExtensionDeveloperExperienceT09|MepDiscoveryT11|ModuleEcosystemW05|ProcessIRSynthesisW06|ExactProcessIRT12|RepositoryFixedPointW01|RuntimeContinuityW04|SemanticCompilationW03|TargetCompilerW02|WholePlatform)|release/Test-MIRPublishedSnapshotIntegrity|tooling/Test-MIRAssurance)\\.ps1$", "^validation/tests\\.yml$", "^tools/mir\\.ps1$", "^tools/commands/mir4/(?:Export-MIR4AssuranceScaleRecords|Export-MIR4ModuleEcosystemRecords|Export-MIR4ExactProcessIRRecords|Export-MIR4ProcessIRSynthesisRecords|Export-MIR4RuntimeContinuityRecords|Export-MIR4SemanticCompilerRecords|Invoke-MIR4ExperimentalApi|Invoke-MIR4Extension|Invoke-MIR4WholePlatform|New-MIR4TechnologyAcceptanceQueue)\\.ps1$", "^docs/architecture/(?:mir4-repository-fixed-point|mir4-target-compiler|mir4-semantic-compiler|mir4-runtime-continuity|mir4-module-ecosystem|mir4-platform-preview|mir4-processir-synthesis|module-boundaries)\\.md$", "^docs/reference/generated/mir4-(?:platform-component-matrix|whole-platform-matrix)\\.md$", "^docs/releases/mir4-4\\.0-whole-platform-programme\\.md$", "^mir\\.lock$"],
+      "patterns": ["^\\.gitattributes$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/(?:paths\\.yml|repository-fixed-point\\.json)|control-plane/ownership\\.json|releases/waves/mir4-r0/MIR4-(?:Whole-Platform|Target-Compiler|Semantic-Compiler|Runtime-Continuity|Module-Ecosystem|ProcessIR-Synthesis)-ProgrammeV1\\.json|releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1\\.json)$", "^(?:assurance|contracts|governance)/repository/", "^tests/(?:repository|canonicalization|diagnostics|targets|platform|technology|compiler|runtime|extensions|processir)/", "^releases/migrations/", "^(?:assurance|changes|contracts|docs|examples|governance|modules|releases|sdk|spec|source|targets|tests|tools/mir)/\\.mir-root\\.json$", "^tools/mir/(?:(?:adapters|application|domain|ports)/(?:repository|canonicalization|diagnostics|targets|platform|technology|migration|compiler|runtime|extensions|processir|safety|policy)/|cli/(?:Export-MIR4(?:SemanticCompiler|RuntimeContinuity|ModuleEcosystem|ProcessIRSynthesis|ExactProcessIR)Records|Invoke-MIR4(?:RepositoryFixedPoint|CanonicalizationMigration|DiagnosticsMigration|TargetKeyMigration|WholePlatformMigration|TechnologyAcceptanceMigration|TargetCompilerMigration|SemanticCompilerPolicyMigration|RuntimeContinuityMigration|ExperimentalApi|Extension|ModuleSdkMepMigration|ProcessIRExactMigration))\\.ps1$)", "^tools/lib/mir4/(?:CanonicalJsonV1|CompatibilityCanary|CompilationRun|DiagnosticsV1|EnvironmentEvidence|ExactProcessIR|ExperimentalApiSdk|ExtensionDeveloperExperience|MepDiscovery|ModuleEcosystem|NormalizedCompiler|PlatformPreview|ProcessIR|PolicyEngine|PreFreezeRelease|RuntimeStateModel|SafetyKernel|SdkV1|SupportAssessment|TargetKey|TargetCompiler|TechnologyAcceptance|WholePlatform)\\.ps1$", "^tools/lib/assurance/(?:Evidence\\.ps1|evidence/)", "^tests/(?:mir4/Test-MIR4(?:CanonicalizationDiagnosticsT07|ExperimentalApiSdk|ExtensionDeveloperExperienceT09|MepDiscoveryT11|ModuleEcosystemW05|ProcessIRSynthesisW06|ExactProcessIRT12|RepositoryFixedPointW01|RuntimeContinuityW04|SemanticCompilationW03|TargetCompilerW02|WholePlatform)|release/Test-MIRPublishedSnapshotIntegrity|tooling/Test-MIRAssurance)\\.ps1$", "^validation/tests/mir4/Test-MIR4WholePlatform\\.ps1$", "^validation/tests\\.yml$", "^tools/mir\\.ps1$", "^tools/commands/mir4/(?:Export-MIR4AssuranceScaleRecords|Export-MIR4ModuleEcosystemRecords|Export-MIR4ExactProcessIRRecords|Export-MIR4ProcessIRSynthesisRecords|Export-MIR4RuntimeContinuityRecords|Export-MIR4SemanticCompilerRecords|Invoke-MIR4ExperimentalApi|Invoke-MIR4Extension|Invoke-MIR4WholePlatform|New-MIR4TechnologyAcceptanceQueue)\\.ps1$", "^docs/architecture/(?:mir4-repository-fixed-point|mir4-target-compiler|mir4-semantic-compiler|mir4-runtime-continuity|mir4-module-ecosystem|mir4-platform-preview|mir4-processir-synthesis|module-boundaries)\\.md$", "^docs/reference/generated/mir4-(?:platform-component-matrix|whole-platform-matrix)\\.md$", "^docs/releases/mir4-4\\.0-whole-platform-programme\\.md$", "^mir\\.lock$"],
       "tests": ["docs.check", "tooling.self-test", "static.full", "static.package", "static.mir4-repository-fixed-point-v2", "static.mir4-canonicalization-diagnostics-t07", "static.mir4-canonicalization-migration-v1", "static.mir4-diagnostics-v1", "static.mir4-diagnostics-migration-v1", "static.mir4-target-key-v1", "static.mir4-target-key-migration-v1", "static.mir4-whole-platform", "static.mir4-whole-platform-migration-v1", "static.mir4-technology-acceptance-v1", "static.mir4-technology-acceptance-migration-v1", "static.mir4-target-compiler-v1", "static.mir4-target-compiler-migration-v1", "static.mir4-semantic-compiler-v1", "static.mir4-semantic-compiler-policy-migration-v1", "static.mir4-runtime-continuity-v1", "static.mir4-runtime-continuity-migration-v1", "static.mir4-module-sdk-mep-v1", "static.mir4-module-sdk-mep-migration-v1", "static.mir4-processir-exact-v1", "static.mir4-processir-exact-migration-v1"]
     },
     {
@@ -176,48 +367,203 @@
     },
     {
       "id": "runtime-or-migration",
-      "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/domain/research_cost/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$", "^tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
+      "patterns": ["^source/generation/lifecycle/control\\.lua\\.template$", "^source/migrations/", "^source/prototypes/mir/domain/research_cost/", "^source/prototypes/mir/runtime/", "^source/prototypes/mir/stage/control\\.lua$", "^tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
       "tests": ["static.full", "runtime.full", "runtime.upgrade"]
     },
     {
       "id": "settings",
-      "patterns": ["^settings", "^prototypes/mir/settings/", "^\\.mir/settings\\.yml$"],
+      "patterns": ["^source/generation/lifecycle/settings\\.lua\\.template$", "^source/prototypes/mir/settings/", "^\\.mir/settings\\.yml$"],
       "tests": ["static.settings", "static.locales", "static.compiler", "runtime.affected", "runtime.upgrade", "runtime.exact-zip"]
     },
     {
       "id": "compiler-data-stage",
-      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
+      "patterns": ["^source/generation/lifecycle/data(?:-updates|-final-fixes)?\\.lua\\.template$", "^source/prototypes/", "^tools/lib/validation/TargetProfiles[.]ps1$", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
       "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
     },
     {
       "id": "balance",
-      "patterns": ["^prototypes/mir/planner/costs\\.lua$", "^prototypes/streams/", "^prototypes/mir/domain/native_owner/", "^prototypes/mir/planner/native_owner_binding\\.lua$", "^prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
+      "patterns": ["^source/prototypes/mir/planner/costs\\.lua$", "^source/prototypes/streams/", "^source/prototypes/mir/domain/native_owner/", "^source/prototypes/mir/planner/native_owner_binding\\.lua$", "^source/prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
       "tests": ["static.balance", "static.compiler", "runtime.affected", "runtime.exact-zip"]
     },
     {
       "id": "locale",
-      "patterns": ["^locale/", "^\\.mir/locales/", "^tools/lib/localization/", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
+      "patterns": ["^source/locale/", "^\\.mir/locales/", "^tools/lib/localization/", "^tools/commands/localization/Update-MIRLocales\\.ps1$", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
       "tests": ["static.locales", "static.package", "runtime.exact-zip"]
     },
     {
       "id": "metadata-dependencies",
-      "patterns": ["^info\\.json$"],
+      "patterns": ["^source/presentation/f(?:210|200|110|100)/info\\.json\\.template$"],
       "tests": ["static.package", "runtime.full", "runtime.upgrade", "runtime.exact-zip"]
     },
     {
       "id": "current-product-bridge-retirement",
-      "patterns": ["^governance/repository/migrations/current-product-bridge-retirement-v1\\.json$", "^contracts/repository/mir4-(?:current-product|m41-current-product)-bridge-retirement-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1\\.json$", "^spec/(?:execution/mir4-4\\.1-development-context-v1|schemas/mir4-development-execution-context-v1\\.schema)\\.json$", "^tools/(?:commands/mir4/Update-MIR4M41CurrentProductBridgeRetirement(?:Authority|Receipt)|mir/application/repository/(?:BridgeRetirement|RepositoryCharacterization)|lib/validation/PackageIdentity)\\.ps1$", "^tests/(?:repository/Test-MIR4(?:CurrentProductBridgeRetirement|RepositoryFixedPoint)|mir4/Test-MIR4(?:PackageAuthorityF2E|RepositoryCharacterizationM4200A))\\.ps1$", "^targets/package-authority\\.json$", "^src/mod/package-source\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/(?:paths\\.yml|repository-fixed-point\\.json))$", "^spec/programmes/mir4-4x-operating-programme-v1\\.json$", "^docs/(?:architecture/(?:mir4-repository-fixed-point|module-boundaries)|maintainer/mir4-authority-map|releases/mir4-post-4\\.0-roadmap)\\.md$", "^changes/unreleased/MIR4-CHG-2026-0035\\.json$", "^validation/tests\\.yml$"],
+      "patterns": ["^governance/repository/migrations/current-product-bridge-retirement-v1\\.json$", "^contracts/repository/mir4-(?:current-product|m41-current-product)-bridge-retirement-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1\\.json$", "^spec/(?:execution/mir4-4\\.(?:1|2)-development-context-v1|schemas/mir4-development-execution-context-v[12]\\.schema)\\.json$", "^tools/(?:commands/mir4/Update-MIR4M41CurrentProductBridgeRetirement(?:Authority|Receipt)|mir/application/repository/(?:BridgeRetirement|RepositoryCharacterization)|lib/validation/PackageIdentity)\\.ps1$", "^tests/(?:repository/Test-MIR4(?:CurrentProductBridgeRetirement|RepositoryFixedPoint)|mir4/Test-MIR4(?:PackageAuthorityF2E|RepositoryCharacterizationM4200A))\\.ps1$", "^targets/package-authority\\.json$", "^source/package-source\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/(?:paths\\.yml|repository-fixed-point\\.json))$", "^spec/programmes/mir4-4x-operating-programme-v1\\.json$", "^docs/(?:architecture/(?:mir4-repository-fixed-point|module-boundaries)|maintainer/mir4-authority-map|releases/mir4-post-4\\.0-roadmap)\\.md$", "^changes/unreleased/MIR4-CHG-2026-0035\\.json$", "^validation/tests\\.yml$"],
       "tests": ["docs.check", "tooling.self-test", "static.full", "static.package", "static.mir4-repository-fixed-point-v2", "static.mir4-repository-characterization-m42-00a", "static.mir4-package-authority-m41-f2e", "static.mir4-current-product-bridge-retirement-m41"]
     },
     {
       "id": "packaged-non-runtime",
-      "patterns": ["^(README\\.md|changelog\\.txt|thumbnail\\.png|LICENSE)$"],
+      "patterns": ["^(?:source/presentation/f(?:210|200|110|100)/(?:README\\.md|changelog\\.txt)\\.template|source/assets/thumbnail\\.png\\.base64|source/LICENSE)$"],
       "tests": ["static.package", "runtime.exact-zip"]
     },
     {
       "id": "assurance-tooling",
       "patterns": ["^\\.gitattributes$", "^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|release|targets|workspace)/|lib/(?:assurance|cli|compatibility|control|workspace)/|maintenance/)", "^spec/schemas/", "^tests/(?:tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)|release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
+    },
+    {
+      "id": "mir4-a00-current-authority-observation",
+      "patterns": ["^tests/mir4/Test-MIR4A00CurrentAuthorityObservation[.]ps1$", "^spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation[.]json$", "^spec/schemas/mir4-a00-current-authority-observation-v1[.]schema[.]json$", "^tools/commands/mir4/Write-MIR4A00A03Evidence[.]ps1$", "^tools/lib/mir4/(?:BootstrapMaterialization|bootstrap-materialization)/"],
+      "tests": ["static.mir4-a00-current-authority-observation"]
+    },
+    {
+      "id": "k2-immutable-input-staging",
+      "patterns": ["^tools/lib/validation/ImmutableInputStaging[.]ps1$"],
+      "tests": ["static.immutable-input-staging", "runtime.k2-k2so-f210-intake", "static.mir4-a05-k2-03-imersite-closure", "static.mir4-a05-k2-materials-closure"]
+    },
+    {
+      "id": "direct-library-activation",
+      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tools/lib/workspace/RepoPaths[.]ps1$", "^tools/lib/validation/(?:FactorioProcess|ImmutableInputStaging)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/support/MIR421SpaceFakeUpgrade[.]ps1$", "^tests/runtime/Test-MIR(?:K2213ImersiteContinuation|Upgrade)[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210[.]json$"],
+      "tests": ["static.direct-library-activation"]
+    },
+    {
+      "id": "research-all-observation",
+      "patterns": ["^tools/lib/validation/ResearchAllPerformance[.]ps1$", "^scripts/Measure-MIRPerformanceRegression[.]ps1$", "^tests/release/Test-MIRResearchAllObservation[.]ps1$", "^fixtures/performance-regression-probe/research-all[.]lua$", "^fixtures/run-profiles/research-all-f(?:200|210)[.]json$"],
+      "tests": ["static.research-all-observation", "runtime.research-all-observation-f200", "runtime.research-all-observation-f210"]
+    },
+    {
+      "id": "native-probe-resources",
+      "patterns": ["^tools/lib/validation/(?:NativeProbeResources|BrowserContinuityInputs)[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/Test-MIR(?:ResearchBrowser|BrowserPersonalStateContinuity|42CapOwnershipMultiforce)[.]ps1$"],
+      "tests": ["static.immutable-input-staging", "static.direct-library-activation", "runtime.material-route-guard", "runtime.research-browser"]
+    },
+    {
+      "id": "artifact-storage-optimization",
+      "patterns": ["^tools/commands/workspace/Optimize-MIRArtifactStorage[.]ps1$", "^tests/tooling/Test-MIRArtifactStorageOptimization[.]ps1$", "^tools/mir/cli/(?:Invoke-MIRCommandRouter|router/RepositoryCommands)[.]ps1$"],
+      "tests": ["static.mir-artifact-storage-optimization", "tooling.self-test"]
+    },
+    {
+      "id": "k2-k2so-intake-f210",
+      "patterns": ["^fixtures/assert-k2-k2so-f210-intake/", "^tests/(?:runtime/Test-MIR4A03K2K2SOIntake|mir4/Test-MIR4A03K2K2SOIntakeClosure)[.]ps1$", "^spec/programmes/mir4-4x-operating-programme-v1[.]json$", "^spec/programmes/evidence/synthesis-2026-09-10/(?:a00-current-authority-observation|a03-k2-k2so-f210-(?:current[.]lock|execution-proof|intake-(?:dossier|receipt)))[.]json$", "^spec/schemas/(?:mir4-a00-current-authority-observation-v1|mir4-a03-k2-k2so-(?:execution-proof|intake-(?:dossier|receipt))-v1)[.]schema[.]json$", "^spec/schemas/preview/mir4-environment-lock-v1[.]schema[.]json$", "^tools/commands/mir4/(?:Write-MIR4A00A03Evidence|Write-MIR4A03K2K2SOExecutionProof)[.]ps1$", "^tools/mir/application/assurance/EnvironmentEvidence[.]ps1$", "^tools/lib/(?:compatibility/FactorioRunner|validation/FactorioProcess)[.]ps1$"],
+      "tests": ["static.mir4-a03-k2-k2so-intake-closure", "runtime.k2-k2so-f210-intake"]
+    },
+    {
+      "id": "bob-tin-qualification-f210",
+      "patterns": ["^fixtures/assert-bob-tin-qualification/", "^tests/runtime/Test-MIRBobTinQualification[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.bob-tin-qualification"]
+    },
+    {
+      "id": "bob-tin-production-gain-f210",
+      "patterns": ["^fixtures/assert-bob-tin-production-gain/", "^tests/runtime/Test-MIRBobTinProductionGain[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.bob-tin-production-gain"]
+    },
+    {
+      "id": "bob-tin-machine-matrix-f210",
+      "patterns": ["^fixtures/assert-bob-tin-machine-matrix/", "^tests/runtime/Test-MIRBobTinMachineMatrix[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.bob-tin-machine-matrix"]
+    },
+    {
+      "id": "bob-tin-progression-frontier-f210",
+      "patterns": ["^fixtures/assert-bob-tin-progression-frontier/", "^tests/runtime/Test-MIRBobTinProgressionFrontier[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.bob-tin-progression-frontier"]
+    },
+    {
+      "id": "bob-tin-persisted-state-f210",
+      "patterns": ["^fixtures/assert-bob-tin-persisted-state/", "^tests/runtime/Test-MIRBobTinPersistedState[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.bob-tin-persisted-state"]
+    },
+    {
+      "id": "bob-tin-browser-explanation-f210",
+      "patterns": ["^fixtures/assert-bob-tin-browser-explanation/", "^tests/runtime/Test-MIRBobTinBrowserExplanation[.]ps1$", "^source/prototypes/mir/report/public_compiler_artifacts[.]lua$", "^source/prototypes/mir/runtime/research_browser.*[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.bob-tin-browser-explanation"]
+    },
+    {
+      "id": "browser-personal-state-continuity-f210",
+      "patterns": ["^fixtures/assert-browser-personal-state-continuity/", "^tests/runtime/Test-MIRBrowserPersonalStateContinuity[.]ps1$", "^source/prototypes/mir/runtime/research_browser[.]lua$", "^source/locale/en/more-infinite-research[.]cfg$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$", "^targets/package-authority[.]json$", "^source/presentation/f210/README[.]md[.]template$"],
+      "tests": ["runtime.browser-personal-state-continuity"]
+    },
+    {
+      "id": "browser-personal-state-continuity-f200",
+      "patterns": ["^fixtures/assert-browser-personal-state-continuity/", "^tests/runtime/Test-MIRBrowserPersonalStateContinuity[.]ps1$", "^source/prototypes/mir/runtime/research_browser[.]lua$", "^source/locale/en/more-infinite-research[.]cfg$", "^source/package-source[.]json$", "^targets/f200/composition[.]json$", "^targets/package-authority[.]json$", "^source/presentation/f200/README[.]md[.]template$"],
+      "tests": ["runtime.f200-browser-personal-state-continuity"]
+    },
+    {
+      "id": "f200-bob-tin-production-gain",
+      "patterns": ["^fixtures/assert-f200-bob-tin-production-gain/", "^tests/runtime/Test-MIRF200BobTinProductionGain[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f200/composition[.]json$"],
+      "tests": ["runtime.f200-bob-tin-production-gain"]
+    },
+    {
+      "id": "f200-bob-tin-persisted-state",
+      "patterns": ["^fixtures/assert-f200-bob-tin-persisted-state/", "^tests/runtime/Test-MIRF200BobTinPersistedState[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f200/composition[.]json$"],
+      "tests": ["runtime.f200-bob-tin-persisted-state"]
+    },
+    {
+      "id": "angel-tin-final-state-audit-f210",
+      "patterns": ["^fixtures/assert-angel-tin-final-state-audit/", "^tests/runtime/Test-MIRAngelTinFinalStateAudit[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.angel-tin-final-state-audit"]
+    },
+    {
+      "id": "bob-angel-tin-final-state-audit-f210",
+      "patterns": ["^fixtures/assert-bob-angel-tin-final-state-audit/", "^tests/runtime/Test-MIRBobAngelTinFinalStateAudit[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.bob-angel-tin-final-state-audit"]
+    },
+    {
+      "id": "bob-angel-tin-route-safety-f210",
+      "patterns": ["^fixtures/assert-bob-angel-tin-route-safety/", "^fixtures/assert-bob-angel-tin-final-state-audit/route-dossier[.]json$", "^tests/runtime/Test-MIRBobAngelTinRouteSafety[.]ps1$", "^source/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/package-source[.]json$", "^targets/f210/composition[.]json$"],
+      "tests": ["runtime.bob-angel-tin-route-safety"]
+    },
+    {
+      "id": "a06-aluminium-final-state-f210",
+      "patterns": ["^fixtures/assert-a06(?:-aluminium-final-state|-bob-aluminium-qualification)/", "^tests/runtime/Test-MIRA06(?:Aluminium|BobAluminium|AngelAluminium|BobAngelAluminium)FinalState[.]ps1$", "^tests/runtime/Test-MIRA06BobAluminiumQualification[.]ps1$", "^source/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^source/prototypes/mir/(?:pipeline/recipe_productivity_permissions|index/productivity_owners|policy/competing_productivity)[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/fixtures[.]yml$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.a06-bob-aluminium-final-state", "runtime.a06-bob-aluminium-qualification", "runtime.a06-angel-aluminium-final-state", "runtime.a06-bob-angel-aluminium-final-state"]
+    },
+    {
+      "id": "a06-bob-gold-qualification-f210",
+      "patterns": ["^fixtures/assert-a06-bob-gold-qualification/", "^tests/runtime/Test-MIRA06BobGoldQualification[.]ps1$", "^source/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^source/prototypes/mir/(?:pipeline/recipe_productivity_permissions|index/productivity_owners|policy/competing_productivity)[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.a06-bob-gold-qualification"]
+    },
+    {
+      "id": "a06-bob-lead-qualification-f210",
+      "patterns": ["^fixtures/assert-a06-bob-lead-qualification/", "^tests/runtime/Test-MIRA06BobLeadQualification[.]ps1$", "^source/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^source/prototypes/mir/(?:pipeline/recipe_productivity_permissions|index/productivity_owners|policy/competing_productivity)[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.a06-bob-lead-qualification"]
+    },
+    {
+      "id": "a06-bob-ordinary-alloys-qualification-f210",
+      "patterns": ["^fixtures/assert-a06-bob-ordinary-alloys-qualification/", "^tests/runtime/Test-MIRA06BobOrdinaryAlloysQualification[.]ps1$", "^source/prototypes/mir/settings/profile_codec[.]lua$", "^source/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^source/prototypes/mir/(?:pipeline/(?:mutations/maximum_level_presentation|recipe_productivity_permissions)|index/productivity_owners|policy/competing_productivity|runtime/(?:maximum_level_control|startup_settings))[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.a06-bob-ordinary-alloys-qualification"]
+    },
+    {
+      "id": "community-manufacturing-intake-static",
+      "patterns": ["^fixtures/assert-community-manufacturing-intake/", "^tests/mir4/Test-MIR4CommunityManufacturingIntake[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/streams/direct-effects[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200|f110|f100)/composition[.]json$", "^targets/package-authority[.]json$", "^spec/programmes/community-requests[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml|streams[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["static.mir4-community-manufacturing-intake"]
+    },
+    {
+      "id": "maximum-level-cap-ownership-multiforce-f210",
+      "patterns": ["^fixtures/(?:assert-mir42-cap-ownership-multiforce|late-mir42-(?:cap|policy)-binding-blocker)/", "^tests/runtime/Test-MIR42CapOwnershipMultiforce[.]ps1$", "^source/prototypes/mir/(?:core/fingerprint|domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/(?:maximum_level_control|research_browser.*))[.]lua$", "^source/package-source[.]json$", "^source/adapters/(?:f210|f200)/prototypes/mir/runtime/scripted_techs[.]lua$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.maximum-level-cap-ownership-multiforce-f210"]
+    },
+    {
+      "id": "f200-settings-cap-harness-storage-static",
+      "patterns": ["^tests/runtime/Test-MIR42F200SettingsCapTransition(?:Static)?[.]ps1$", "^tools/lib/validation/NativeProbeResources[.]ps1$", "^tools/lib/assurance/(?:Core|evidence/CommandExecution)[.]ps1$"],
+      "tests": ["static.f200-base-only-settings-cap-transition-harness"]
+    },
+    {
+      "id": "maximum-level-settings-derived-cap-transition-f200",
+      "patterns": ["^fixtures/assert-mir42-f200-settings-cap-transition/", "^tests/runtime/Test-MIR42F200SettingsCapTransition[.]ps1$", "^source/prototypes/mir/runtime/maximum_level_control[.]lua$", "^source/package-source[.]json$", "^source/adapters/f200/prototypes/mir/(?:runtime/scripted_techs|platform/factorio/target_profiles)[.]lua$", "^targets/f200/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.maximum-level-settings-derived-cap-transition-f200"]
+    },
+    {
+      "id": "maximum-level-v2-v3-migration-f210",
+      "patterns": ["^fixtures/assert-mir42-v2-v3-cap-migration/", "^tests/runtime/Test-MIR42V2V3CapMigration[.]ps1$", "^source/prototypes/mir/platform/factorio/target_line[.]lua$", "^source/prototypes/mir/(?:domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/maximum_level_control)[.]lua$", "^source/package-source[.]json$", "^source/adapters/f200/prototypes/mir/platform/factorio/target_profiles[.]lua$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.maximum-level-v2-v3-migration-f210"]
+    },
+    {
+      "id": "k2-materials-bounded-f210",
+      "patterns": ["^fixtures/assert-k2-materials/", "^tests/(?:runtime/Test-MIR4A05K2Materials|mir4/Test-MIR4A05K2MaterialsClosure)[.]ps1$", "^tools/commands/mir4/Write-MIR4A05K2MaterialsClosure[.]ps1$", "^tools/commands/targets/Sync-MIRTargetProfiles[.]ps1$", "^tools/mir/application/(?:tooling/CommandInventory|package/TargetMaterializer)[.]ps1$", "^source/prototypes/mir/(?:capabilities/recipe_productivity/recipe_matching|pipeline/(?:recipe_productivity_permissions|compiler_context)|index/(?:productivity_owners|recipe_facts|recipe_risk_facts|relationships|item_prototype_facts)|policy/competing_productivity|platform/factorio/prototype_lookup|core/fingerprint|report/compiler_telemetry)[.]lua$", "^source/prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/prototypes/mir/(?:core/deepcopy|domain/facts/recipe_semantics|platform/factorio/data_raw|settings/automatic_compiler_policy)[.]lua$", "^source/adapters/f210/prototypes/mir/platform/factorio/target_profiles[.]lua$", "^prototypes/mir/streams/generated_stream_manifest[.]json$", "^source/prototypes/streams/productivity[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^governance/automation/mir4-command-inventory-v1[.]json$", "^spec/programmes/(?:mir4-4x-operating-programme-v1|community-requests)[.]json$", "^spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/(?:k2-materials/MIR4-A05-K2-Materials-(?:Closure|Command-Inventory-Evolution)V1|k2-03/MIR4-A05-K2-03-Command-Inventory-EvolutionV1)[.]json$", "^spec/schemas/mir4-a05-k2-(?:materials-(?:closure|command-inventory-evolution)|03-command-inventory-evolution)-v1[.]schema[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml|modules[.]yml|control/paths[.]yml|targets[.]json|streams[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["static.mir4-a05-k2-materials-closure"]
+    },
+    {
+      "id": "k2-213-imersite-continuation-compiler",
+      "patterns": ["^fixtures/assert-k2-213-imersite-continuation/", "^tests/compiler/Test-MIRK2ImersiteContinuation[.]ps1$", "^tests/compiler/material_(?:continuation|progression)[.]lua$", "^source/prototypes/mir/compatibility/policies/k2_science_phase[.]lua$", "^source/prototypes/mir/families/material_progression[.]lua$", "^source/prototypes/mir/planner/stream_compiler/material_continuation[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml|test-impact[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.k2-213-imersite-continuation-compiler"]
     },
     {
       "id": "test-harness",
@@ -241,13 +587,77 @@
     },
     {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^\\.mir/docs-immutable-source-truth\\.json$", "^(?:README|CONTRIBUTING|AGENTS|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)\\.md$", "^todo\\.md$", "^tools/commands/docs/Update-MIR(?:DocumentationIndex|PipelineDocumentation|READMEStreamDefaults|PostReleaseDocumentation)\\.ps1$", "^tests/tooling/Test-MIRGovernance\\.ps1$", "^contracts/repository/mir4-post-release-documentation-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Readme-RestorationV1\\.json$"],
+      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^\\.mir/docs-immutable-source-truth\\.json$", "^(?:README|CONTRIBUTING|AGENTS|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)\\.md$", "^TODO\\.md$", "^tools/commands/docs/Update-MIR(?:DocumentationIndex|PipelineDocumentation|READMEStreamDefaults|PostReleaseDocumentation)\\.ps1$", "^tests/tooling/Test-MIRGovernance\\.ps1$", "^contracts/repository/mir4-post-release-documentation-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Readme-RestorationV1\\.json$"],
       "tests": ["docs.check"]
     },
     {
       "id": "release-evidence",
       "patterns": ["^\\.mir/(evidence|target-lines|releases/(deltas|sources))/", "^dist/", "^tests/release/Test-MIRPublishedSnapshotIntegrity\\.ps1$"],
       "tests": ["tooling.self-test", "static.release-history", "static.full", "static.package"]
+    },
+    {
+      "id": "mir4-integration-synthesis",
+      "patterns": [
+        "^spec/programmes/inputs/synthesis-2026-09-05/",
+        "^spec/programmes/evidence/synthesis-2026-09-06/",
+        "^tests/mir4/Test-MIR4IntegrationProgramme[.]ps1$",
+        "^tests/compiler/(?:Test-MIRSciencePlanning[.]ps1|science_planning[.]lua)$",
+        "^docs/releases/mir4-integration-and-delivery-plan[.]md$"
+      ],
+      "tests": [
+        "static.mir4-integration-programme",
+        "docs.check"
+      ]
+    },
+    {
+      "id": "mir4-release-operator-recovery-a07",
+      "patterns": [
+        "^tools/lib/mir4/ReleaseLifecycleAdapters[.]ps1$",
+        "^tools/lib/mir4/Release(?:Adapters|PhaseEngine)[.]ps1$",
+        "^tools/mir/application/release/LocalDelivery[.]ps1$",
+        "^tests/(?:mir4/Test-MIR4ReleaseOperatorRecoveryA07|release/Test-MIR4LocalDelivery)[.]ps1$",
+        "^spec/programmes/mir4-4x-operating-programme-v1[.]json$",
+        "^[.]mir/(?:assurance[.]json|modules[.]yml)$",
+        "^validation/tests[.]yml$"
+      ],
+      "tests": [
+        "static.mir4-release-operator-recovery-a07",
+        "static.mir4-local-delivery"
+      ]
+    },
+    {
+      "id": "mir4-development-epoch",
+      "patterns": [
+        "^governance/repository/development-epoch-v1[.]json$",
+        "^tools/lib/validation/runner/Invoke-MIRValidationRunner[.]ps1$",
+        "^tools/mir/application/assurance/DevelopmentValidation[.]ps1$",
+        "^tests/repository/Test-MIR4(?:HistoricalBaseline|DevelopmentContracts)[.]ps1$"
+      ],
+      "tests": [
+        "static.mir4-historical-baseline",
+        "static.mir4-development-contracts",
+        "tooling.self-test"
+      ]
+    },
+    {
+      "id": "a02-component-reconciliation",
+      "patterns": [
+        "^tests/mir4/Test-MIR4A02Reconciliation[.]ps1$",
+        "^tools/commands/mir4/Write-MIR4A02Reconciliation[.]ps1$",
+        "^tools/lib/mir4/BootstrapMaterialization[.]ps1$",
+        "^tools/lib/mir4/bootstrap-materialization/",
+        "^tools/mir/application/package/TargetMaterializer[.]ps1$",
+        "^targets/(?:package-authority[.]json|f(?:210|200|110|100)/composition[.]json)$",
+        "^source/package-source[.]json$",
+        "^spec/programmes/mir4-4x-operating-programme-v1[.]json$",
+        "^spec/programmes/inputs/synthesis-2026-09-05/(?:COMPONENT_DELIVERY|SOURCES)[.]json$",
+        "^spec/platform/mir4-preview-v0/platform[.]json$",
+        "^spec/programmes/evidence/synthesis-2026-09-10/a02-(?:component-reconciliation|current-source-materializer-proof)[.]json$",
+        "^spec/schemas/mir4-(?:a02-component-reconciliation|current-source-materializer-proof)-v1[.]schema[.]json$"
+      ],
+      "tests": [
+        "static.mir4-a02-component-reconciliation"
+      ]
     }
   ],
   "unknown_policy": {

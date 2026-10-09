@@ -95,7 +95,7 @@ function Get-MIRScenarioRootMods {
 
   foreach ($scenario in @($json.scenarios)) {
     $scenarioCount++
-    foreach ($mod in @($scenario.mods)) {
+    foreach ($mod in @($scenario.roots)) {
       if (-not [string]::IsNullOrWhiteSpace([string]$mod)) {
         $mods[[string]$mod] = $true
       }
@@ -107,6 +107,21 @@ function Get-MIRScenarioRootMods {
     scenario_count = $scenarioCount
     mods = @($mods.Keys | Sort-Object)
   }
+}
+
+function Get-MIRRepositoryFixtureModNames {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $names = @{}
+  $fixtureRoot = Join-Path $RepoRoot "fixtures"
+  foreach ($infoPath in @(Get-ChildItem -LiteralPath $fixtureRoot -Directory | ForEach-Object { Join-Path $_.FullName "info.json" } | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf })) {
+    $json = Get-Content -Raw -LiteralPath $infoPath
+    $name = Read-MIRJsonStringProperty -Json $json -Name "name"
+    if (-not [string]::IsNullOrWhiteSpace($name)) {
+      $names[$name] = $true
+    }
+  }
+  return $names
 }
 
 $resolvedDirs = @(
@@ -160,9 +175,10 @@ foreach ($record in $records) {
 }
 
 $scenario = Get-MIRScenarioRootMods -Path $ScenarioPath
+$repositoryFixtureMods = Get-MIRRepositoryFixtureModNames -RepoRoot $repo
 $missingScenarioMods = @(
   foreach ($mod in $scenario.mods) {
-    if (-not $byName.ContainsKey($mod)) { $mod }
+    if (-not $byName.ContainsKey($mod) -and -not $repositoryFixtureMods.ContainsKey($mod)) { $mod }
   }
 ) | Sort-Object
 
@@ -182,6 +198,8 @@ $report = [ordered]@{
   duplicate_name_count = $duplicateNames.Count
   scenario_count = $scenario.scenario_count
   scenario_mod_count = $scenario.mods.Count
+  repository_fixture_mod_count = @($scenario.mods | Where-Object { $repositoryFixtureMods.ContainsKey($_) }).Count
+  repository_fixture_mods = @($scenario.mods | Where-Object { $repositoryFixtureMods.ContainsKey($_) } | Sort-Object)
   missing_scenario_mod_count = $missingScenarioMods.Count
   missing_scenario_mods = @($missingScenarioMods)
   duplicate_names = @($duplicateNames)

@@ -1,0 +1,40 @@
+local C = require("prototypes.mir.streams.registry")
+local costs = require("prototypes.mir.planner.costs")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
+
+local M = {}
+
+local function plan_max_level(key, spec)
+  local tech_name = "recipe-prod-" .. key .. "-1"
+  local tech = data_raw.technology(tech_name)
+  if not tech then return end
+
+  local max_level = costs.max_level_for(key, spec)
+  local legacy = spec.staged_progression and spec.staged_progression.legacy
+  if legacy then
+    if legacy.technology_name ~= tech_name or legacy.last_level ~= 3 then
+      error("Invalid early material stage for " .. key, 2)
+    end
+    max_level = type(max_level) == "number"
+      and math.min(max_level, legacy.last_level) or legacy.last_level
+  end
+  return {
+    technology = tech_name,
+    max_level = target_line.feature_enabled("scripted_techs")
+      and not spec.staged_progression and "infinite" or max_level,
+    planned_max_level = max_level
+  }
+end
+
+function M.plan()
+  local commands = {}
+  for key, spec in pairs(C.snapshot()) do
+    local command = plan_max_level(key, spec)
+    if command then table.insert(commands, command) end
+  end
+  table.sort(commands, function(a, b) return a.technology < b.technology end)
+  return commands
+end
+
+return M

@@ -8,6 +8,9 @@ function Get-MIR4CustodyAdmissionV1 {
   )
 
   $repo = Get-MIR4CustodyRepoRootV1 -RepoRoot $RepoRoot
+  if (-not (Get-Command Restore-MIR4DistributionArchive -ErrorAction SilentlyContinue)) {
+    . (Join-Path $PSScriptRoot '../../package/DistributionCustody.ps1')
+  }
   $schemas = Get-MIR4CustodySchemaRootV1 -RepoRoot $repo -SchemaRoot $SchemaRoot
   $expectedPlanPath = (Resolve-Path -LiteralPath (Join-Path $repo ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json")).Path
   if ((Resolve-Path -LiteralPath $CandidatePlanPath).Path -cne $expectedPlanPath) {
@@ -87,7 +90,9 @@ function Get-MIR4CustodyAdmissionV1 {
       [long]$inventory.entry_count -ne [long]$manifest.local_distribution.entry_count) {
     throw "The candidate archive inventory and exact package root do not match the admitted self-hashed manifest."
   }
-  $predecessorPath = Join-Path $repo ([string]$target.predecessor.archive_path)
+  $predecessorPath = [string](Restore-MIR4DistributionArchive `
+    -RepoRoot $repo `
+    -Version ([string]$target.predecessor.release)).cache_path
   if ((Get-MIR4Sha256File -Path $predecessorPath) -cne [string]$target.predecessor.archive_sha256) {
     throw "The admitted plan predecessor archive does not match its exact bound identity."
   }

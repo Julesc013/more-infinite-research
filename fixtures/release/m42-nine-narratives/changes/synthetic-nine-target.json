@@ -1,0 +1,27 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-SYN-4200-0001",
+  "status": "accepted",
+  "change_type": "added",
+  "summary": "Add synthetic nine-target release narrative coverage for MIR 4.2.",
+  "details": ["This package-excluded fixture proves explicit target dispositions and rendered target copy across all nine Factorio lines."],
+  "semantic_domains": ["release-narratives"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target": "F210", "disposition": "affected", "reason": "Synthetic current-engine target."},
+    {"target": "F200", "disposition": "affected", "reason": "Synthetic current-engine target."},
+    {"target": "F110", "disposition": "affected", "reason": "Synthetic legacy-engine target."},
+    {"target": "F100", "disposition": "affected", "reason": "Synthetic legacy-engine target."},
+    {"target": "F017", "disposition": "affected", "reason": "Synthetic historical-engine target."},
+    {"target": "F016", "disposition": "affected", "reason": "Synthetic historical-engine target."},
+    {"target": "F015", "disposition": "affected", "reason": "Synthetic historical-engine target."},
+    {"target": "F014", "disposition": "affected", "reason": "Synthetic historical-engine target."},
+    {"target": "F013", "disposition": "affected", "reason": "Synthetic historical-engine target."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save": "compatible", "settings": "none", "migration": "none", "compatibility": "compatible", "public_contract": "compatible", "support_claim": "none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog": "include", "target_changelog": "include", "github": "include", "mod_portal": "include", "technical": "include", "manifest": "include"},
+  "references": [{"kind": "finding", "value": "MIR42-nine-target-narrative-fixture"}]
+}

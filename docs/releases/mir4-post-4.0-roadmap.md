@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-05
+last_reviewed: 2026-09-07
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -18,12 +18,15 @@ MIR 4.0.0 proved that the project can produce a multi-target, proof-governed pro
 
 The objective is not another platform layer. It is one semantic source, one obvious repository structure, one public command surface, one authority per mutable fact, one generated release narrative, independently generated target packages, and detailed evidence that never clutters or enters the player package.
 
+MIR 4.1.0 is published at source `3562377b520cccb071b97b3968946eae7024c950` with four player ZIPs and five supporting assets. F200 direct verification and the release-specific F210 direct-playtest waiver retain their original classifications. The [integration and delivery plan](mir4-integration-and-delivery-plan.md) now orders the eight audit findings, 81 active requests, 34 component destinations, 19 delivery slices, and historical target inventory. The immutable original 23-request packet remains preserved inside that larger active authority.
+
 The machine-readable programme is `spec/programmes/mir4-4x-operating-programme-v1.json`. The self-contained package promise is `spec/distribution/mir4-deployment-contract-v1.json`; patch semantics are in `spec/releases/mir4-patch-policy-v1.json`; proof applicability is in `spec/assurance/mir4-proof-applicability-v1.json`.
 
 ## Permanent product invariants
 
 - A player downloads one self-contained MIR ZIP for the selected Factorio target. Official MIR features and integrations for that target are inside it and are inert when the corresponding external mod is absent.
 - Optional extensions may add behavior but cannot be required to recover a capability advertised as part of MIR.
+- Player surfaces separate a reusable copied-data core from host adapters. MIR keeps an embedded self-contained host; an optional companion may integrate with a maintained third-party UI only through a documented public contract and exactly one visible host.
 - F210 and F200 are primary maintained targets. F110 and F100 are conditional targets that qualify independently and may publish later without delaying an otherwise complete source release. Older targets remain experimental or museum work until exact engine, predecessor, rights, package, and support custody exist.
 - Until the first official Factorio 2.1 stable release, F210 selects the latest official experimental build installed by Steam. The channel is moving, but every proof binds one exact version and executable hash. Each observed engine or API change creates a required feature, implementation, compatibility, fixture, runtime, performance, documentation, and stable-transition review task set before its evidence can be treated as current.
 - Each target receives its own numeric distribution version, package, engine proof, qualification, seal, publication receipt, and public readback. Evidence from one target never substitutes for another.
@@ -58,19 +61,19 @@ The governance and characterization foundation is complete, so MIR 4.1 now owns 
 | M41-04 | Prove protected stable-to-`dev` exact-tree convergence during branch transition | Complete |
 | M41-06 | Establish `main` as latest stable and `dev` as the next-minor or next-major integration line | Complete |
 | M41-05 | Route documentation by reader need, then separate repository and package landing pages | Complete: M41-05A routing and M41-05B package-documentation cutover accepted |
-| M42-00 | Establish one package source, target overlays, one materializer, and four independently generated targets inside the 4.1 completion boundary | Complete: F1 through F2E accepted; `src/mod`, `targets`, and `TargetMaterializer` are current package authority |
+| M42-00 | Establish one package source, target overlays, one materializer, and four independently generated targets inside the 4.1 completion boundary | Complete: F1 through F2E accepted; `source`, `targets`, and `TargetMaterializer` are current package authority |
 | M42-01 | Converge PowerShell, executable tests, proof catalogues, workflows, and release orchestration behind one supported public surface | Complete |
 | M42-02 | Perform only reviewable behavior-preserving Lua and PowerShell decomposition needed for the 4.1 maintainability fixed point | Complete: six Lua and eleven PowerShell responsibility splits accepted; bridge retirement and private four-target qualification remain separate MIR 4.1 gates |
 | M41-07 | Retire every current-product authority bridge and bound retained historical readers | Complete: zero current-product authority bridges; retained compatibility paths are read-only, owned, tested, package-excluded, and expiry-bounded |
-| M41-08 | Freeze, build, qualify, seal, and promote the private four-target MIR 4.1 candidate | Active: production-readiness implementation and release surfaces are prepared; completion is recorded by the external exact-source release-window receipt |
+| M41-08 | Freeze, build, qualify, seal, and promote the private four-target MIR 4.1 candidate | Complete: published v4.1.0 release 383203807 and exact-source closure; future releases require fresh acceptance |
 
 Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No implementation decomposition starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback. A split that cannot be reviewed and proved safely remains unchanged with an explicit disposition.
 
-The accepted F2D chain is complete for F210, F200, F110, and F100, including the independent four-target aggregate. F2E then bound stable target identity separately from version projection, promoted `src/mod` and `targets` as canonical editable source, routed ordinary and target-product construction through `TargetMaterializer`, and fenced the bootstrap writer as historical compatibility. Four fresh deterministic reconstructions matched the accepted 4.0 content roots and entry sets. M41-07 completed the physical retirement: the repository root is not an editable Factorio package, and historical root-package bytes can be read only through explicit immutable-commit compatibility paths.
+The accepted F2D chain is complete for F210, F200, F110, and F100, including the independent four-target aggregate. F2E then bound stable target identity separately from version projection, promoted `source` and `targets` as canonical editable source, routed ordinary and target-product construction through `TargetMaterializer`, and fenced the bootstrap writer as historical compatibility. Four fresh deterministic reconstructions matched the accepted 4.0 content roots and entry sets. M41-07 completed the physical retirement: the repository root is not an editable Factorio package, and historical root-package bytes can be read only through explicit immutable-commit compatibility paths.
 
-M41-05B replaced the root README with a concise package-excluded repository landing page and made target player documentation a generated package projection. Repository and player narratives now have separate owned audiences and generated views.
+M41-05B separated repository documentation from generated target player documentation. The detailed repository README was subsequently restored in PRs #251 and #252, preserving badges, catalog, settings, examples, and troubleshooting. Both audiences retain their owned surfaces; separation does not authorize shortening the repository README.
 
-MIR 4.1 separates technical completion from publication. All four targets are required for the `GO-4TARGET` technical result. F210/F200 are primary publication assets; F110/F100 are independently publishable supplemental LTS assets, without permitting cross-target proof substitution. The final order is frozen-source build, four-target qualification, independent verification, technical seal, signed-tag preparation, exact `dev`-to-`main` promotion, maintainer playtest, then tag and publication of the already sealed bytes. A playtest `NO-GO` publishes nothing and advances only through a new forward candidate.
+The completed MIR 4.1 release separated technical completion from publication. Its historical sequence is retained below; it is not a command to rerun publication. All four targets are required for the `GO-4TARGET` technical result. F210/F200 are primary publication assets; F110/F100 are independently publishable supplemental LTS assets, without permitting cross-target proof substitution. The final order is frozen-source build, four-target qualification, independent verification, technical seal, signed-tag preparation, exact `dev`-to-`main` promotion, maintainer playtest, then tag and publication of the already sealed bytes. A playtest `NO-GO` publishes nothing and advances only through a new forward candidate.
 
 ## Preserved 4.0.0 baseline
 
@@ -110,9 +113,11 @@ Version numbers below are candidate labels assigned only at source freeze. Outco
 | --- | --- |
 | 4.0.x | Verified stable defects only; no release exists merely to carry repository work |
 | 4.1.0 | Truthful repository; one package source; four target products; one CLI; one release engine; one executable test authority; generated repository and package documentation; bounded maintainable implementation; zero mutable dual authority |
-| 4.2.0 | Integration kernel and rolling built-in ecosystem admissions across ownership, progression, productivity, finalizers, recovery, runtime-mediated channels, and exact advanced-process certificates; public extension contracts still graduate individually |
+| 4.2.0 | Integration kernel delivering complete qualified industrial routes, useful progression, localized explanations, auditable profiles, K2/Bob/Angel/OmniAB/RIC outcomes, a portable embedded research surface, and recoverable release delivery; public extension contracts still graduate individually |
 | 4.3.0 | Industrialized semantic-impact selection, evidence reuse and revocation, partial-run recovery, nondeterminism handling, measured release lanes, offline operation, EOL automation, and recurring architecture audits |
-| 4.4.0+ | Unallocated until evidence supports a coherent external outcome |
+| 4.4.0 | Independently supported historical products only after exact capability, loader, installation, rights, engine, effect and lifecycle proof |
+| 4.5.0 | Next demonstrated industrial/operational expansion; a full OEM+ technology-tree and ultimate queue is a candidate only if maintained-project integration cannot meet its accepted contract |
+| Beyond | Rolling compatibility, explicit maintenance tiers and preservation; MIR 5 only for a justified public-contract break |
 
 The next major begins only when a change cannot be delivered honestly under MIR 4 settings, technology identity, save migration, API, and distribution promises.
 

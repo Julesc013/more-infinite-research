@@ -2,6 +2,8 @@ Set-StrictMode -Version Latest
 
 function Get-MIR4NarrativeAbiV1 { return 'mir4-release-narratives/1' }
 function Get-MIR4NarrativeTargetsV1 { return @('F210', 'F200', 'F110', 'F100') }
+function Get-MIR4NarrativeAbiV2 { return 'mir4-release-narratives/2' }
+function Get-MIR4NarrativeTargetsV2 { return @('F210', 'F200', 'F110', 'F100', 'F017', 'F016', 'F015', 'F014', 'F013') }
 function Get-MIR4NarrativeRedactionV1 { return 'Security correction details withheld pending coordinated disclosure.' }
 
 function Read-MIR4NarrativeJsonV1 {
@@ -20,13 +22,12 @@ function Get-MIR4NarrativeFileIdentityV1 {
 }
 
 function Assert-MIR4NarrativeFragmentV1 {
-  param([Parameter(Mandatory)]$Fragment)
+  param([Parameter(Mandatory)]$Fragment, [string[]]$TargetSet = @(Get-MIR4NarrativeTargetsV1))
   if ([string]$Fragment.status -notin @('accepted','released')) { throw "[mir4-release-narrative-change-not-accepted] $($Fragment.change_id)" }
   $rows = @($Fragment.target_dispositions)
-  if ($rows.Count -ne 4 -or @($rows.target | Sort-Object -Unique).Count -ne 4) { throw "[mir4-release-narrative-target-closure] $($Fragment.change_id)" }
-  $targets=@(Get-MIR4NarrativeTargetsV1)
-  for ($i = 0; $i -lt $targets.Count; $i++) {
-    if ([string]$rows[$i].target -cne $targets[$i]) { throw "[mir4-release-narrative-target-order] $($Fragment.change_id)" }
+  if ($rows.Count -ne $TargetSet.Count -or @($rows.target | Sort-Object -Unique).Count -ne $TargetSet.Count) { throw "[mir4-release-narrative-target-closure] $($Fragment.change_id)" }
+  for ($i = 0; $i -lt $TargetSet.Count; $i++) {
+    if ([string]$rows[$i].target -cne $TargetSet[$i]) { throw "[mir4-release-narrative-target-order] $($Fragment.change_id)" }
   }
   if (@($rows | Where-Object disposition -eq 'unknown').Count -ne 0) { throw "[mir4-release-narrative-unknown-target] $($Fragment.change_id)" }
   foreach ($impact in $Fragment.impacts.PSObject.Properties) {

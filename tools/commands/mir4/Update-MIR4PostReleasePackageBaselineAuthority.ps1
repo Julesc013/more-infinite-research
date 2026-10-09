@@ -21,7 +21,7 @@ $expectedPackageSource = '8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE
 $state = Get-MIR4PreFreezeAuthorityState -RepoRoot $RepoRoot -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration -IncludeHistoricalToolingMigration -IncludeReleaseToolingMigration -IncludeF210QualificationPolicyEvolution -IncludeFinalMileToolingEvolution -IncludeFinalReleaseClosureEvolution
 if ([string]$state.prior_receipt_path -cne $predecessorRelative -or [string]$state.prior_receipt_sha256 -cne $predecessorSha256) { throw '[mir4-post-release-package-baseline-writer-predecessor]' }
 $packageSource = Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
-if ($packageSource -cne $expectedPackageSource -or (Get-MIR4CurrentPackageSourceSha256 -RepoRoot $RepoRoot) -cne $expectedPackageSource) { throw "[mir4-post-release-package-baseline-writer-package-source] expected=$expectedPackageSource actual=$packageSource" }
+if ($packageSource -cne $expectedPackageSource -or (Get-MIR4FrozenPackagePresentationV1SourceSha256 -RepoRoot $RepoRoot) -cne $expectedPackageSource) { throw "[mir4-post-release-package-baseline-writer-package-source] expected=$expectedPackageSource actual=$packageSource" }
 
 $roles = [ordered]@{
   'README.md' = 'package-visible-readme-presentation'

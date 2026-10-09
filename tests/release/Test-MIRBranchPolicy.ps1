@@ -52,7 +52,22 @@ function Test-GitRefExists {
 
 function Read-InfoJsonFromRef {
   param([string]$Ref)
-  $text = Invoke-Git show "$Ref`:info.json"
+  $rootInfo = 'info.json'
+  $composedInfo = 'source/presentation/f210/info.json.template'
+  & git -C $repo cat-file -e "$Ref`:$rootInfo" 2>$null
+  $hasRootInfo = $LASTEXITCODE -eq 0
+  if ($hasRootInfo) {
+    $path = $rootInfo
+  } else {
+    foreach ($requiredPath in @($composedInfo, 'source/package-source.json', 'targets/package-authority.json')) {
+      & git -C $repo cat-file -e "$Ref`:$requiredPath" 2>$null
+      if ($LASTEXITCODE -ne 0) {
+        throw "$Ref has neither root info.json nor a complete composed F210 package authority; missing $requiredPath."
+      }
+    }
+    $path = $composedInfo
+  }
+  $text = Invoke-Git show "$Ref`:$path"
   return ($text -join "`n") | ConvertFrom-Json
 }
 
@@ -85,7 +100,7 @@ foreach ($branch in @("main", "dev", "legacy", "release/4.0")) {
   $policy = $branches[$branch]
   $info = Read-InfoJsonFromRef $ref
   if ($info.name -ne "more-infinite-research") {
-    throw "origin/$branch info.json has unexpected mod name '$($info.name)'."
+    throw "origin/$branch package info has unexpected mod name '$($info.name)'."
   }
   $resolvedCommit = (Invoke-Git rev-parse "$ref`^{commit}" | Select-Object -First 1).Trim()
   $legacyTransitionState = ($branch -eq "legacy" -and $resolvedCommit -eq $historicalLegacyCommit -and $info.factorio_version -eq "2.0")

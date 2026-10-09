@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "MIR42HistoricalPlaytestTargetV1",
+  "target": "f016",
+  "maturity": "private-historical-playtest",
+  "base_materializer_target": "f100",
+  "factorio_line": "0.16",
+  "distribution_version": "4.2.01600",
+  "profile": {
+    "support_class": "old-science-native-infinite",
+    "science_family": "legacy-0.16",
+    "asset_policy": "factorio-0.16-icons",
+    "laboratory_productivity": true,
+    "old_science_map": true,
+    "legacy_numeric_research_cost": false
+  },
+  "engine": {
+    "path": "D:/Programs/Factorio/0.16/bin/x64/factorio.exe",
+    "version": "0.16.51",
+    "sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966"
+  },
+  "predecessor": {
+    "version": "1.6.9",
+    "archive": "dist/more-infinite-research_1.6.9.zip",
+    "sha256": "928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84"
+  },
+  "adapter_files": [
+    {
+      "output_path": "info.json",
+      "source_path": "source/presentation/historical/f016/info.json.template",
+      "source_sha256": "DC49439F280BB0A2A5FA3BC1B3DE62763219E411CD44D3E3C95F261D7D9CAC93",
+      "source_bytes": 282,
+      "output_bytes": 282,
+      "output_sha256": "DC49439F280BB0A2A5FA3BC1B3DE62763219E411CD44D3E3C95F261D7D9CAC93"
+    },
+    {
+      "output_path": "changelog.txt",
+      "source_path": "source/presentation/historical/f016/changelog.txt.template",
+      "source_sha256": "43D2AB87C23589D1BCDC9CD2DB9E8E3CC155CA8F27FE5C0E04CBC4AD2FEAED54",
+      "source_bytes": 1462,
+      "output_bytes": 1462,
+      "output_sha256": "43D2AB87C23589D1BCDC9CD2DB9E8E3CC155CA8F27FE5C0E04CBC4AD2FEAED54"
+    },
+    {
+      "output_path": "README.md",
+      "source_path": "source/presentation/f100/README.md.template",
+      "transform": "historical-readme-template-v1",
+      "source_sha256": "84E308C5EDBCD4E8EF9BC590C1DE581511AA17AE35520910A8734F6D3CED181F",
+      "source_bytes": 4701,
+      "output_bytes": 4568,
+      "output_sha256": "F890259236DD196CF2B88021182053D07047C1BA79E61DD6EA3A96D9A6F1CF9E"
+    },
+    {
+      "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "source_path": "source/adapters/historical/legacy-reduced/target_profiles.lua.template",
+      "transform": "legacy-target-profile-template-v1",
+      "source_sha256": "24B6590C75666474FAF50CD1509F9CB707A854B0062EA8F59CA7A81207B30DEC",
+      "source_bytes": 4562,
+      "output_bytes": 4271,
+      "output_sha256": "BC0854AA134E7ADC2637D686D02D1C9FF5B6CDD494FF9D30114DC5C5DFF974D5"
+    }
+  ],
+  "patches": [
+    {
+      "output_path": "prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+      "base_sha256": "8A28E7E1F9CE5363B244624AE9A31DADC33E542266FB2F8DB47B2336950C6E68",
+      "find": "  [\"1.0\"] = \"omit-unqualified\"",
+      "replace": "  [\"1.0\"] = \"omit-unqualified\",\n  [\"0.16\"] = \"omit-unqualified\""
+    }
+  ],
+  "public_output_authorized": false,
+  "publication_authorized": false,
+  "record_sha256": "697707E49C7165BBCCA685FEB9553F535FAE234122167390A13EA50C42CB17E1"
+}

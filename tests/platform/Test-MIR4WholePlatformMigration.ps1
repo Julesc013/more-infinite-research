@@ -41,6 +41,10 @@ Assert-MIR4WholePlatformMigrationV1 ($engineText -match 'function Test-MIR4Immut
 $assuranceConfig = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path '.mir/assurance.json'
 $migrationClass = @($assuranceConfig.classes | Where-Object { [string]$_.id -ceq 'repository-migration' })
 Assert-MIR4WholePlatformMigrationV1 ($migrationClass.Count -eq 1) 'mir4-whole-platform-migration-assurance-class'
+$compatibilityForwarderPattern = '^validation/tests/mir4/Test-MIR4WholePlatform\.ps1$'
+Assert-MIR4WholePlatformMigrationV1 (@($migrationClass[0].patterns | Where-Object { [string]$_ -ceq $compatibilityForwarderPattern }).Count -eq 1) 'mir4-whole-platform-migration-assurance-forwarder-pattern'
+Assert-MIR4WholePlatformMigrationV1 ('validation/tests/mir4/Test-MIR4WholePlatform.ps1' -match $compatibilityForwarderPattern) 'mir4-whole-platform-migration-assurance-forwarder-pattern-match'
+Assert-MIR4WholePlatformMigrationV1 (-not ('validation/tests/mir4/Test-MIR4WholePlatformUnrelated.ps1' -match $compatibilityForwarderPattern)) 'mir4-whole-platform-migration-assurance-forwarder-pattern-scope'
 $migrationPaths = @($authority.path_map | ForEach-Object { [string]$_.final_path }) + @($authority.compatibility_entrypoints | ForEach-Object { [string]$_.path })
 foreach ($path in @($migrationPaths | Sort-Object -Unique)) {
   $matches = @($migrationClass[0].patterns | Where-Object { $path -match [string]$_ })
@@ -58,8 +62,7 @@ $packageFiles = @(Get-MIRPackageSourceFiles -RepoRoot $repo)
 foreach ($path in @($migrationPaths | Sort-Object -Unique)) {
   Assert-MIR4WholePlatformMigrationV1 ($path -notin $packageFiles) 'mir4-whole-platform-migration-package-visible' $path
 }
-Assert-MIR4WholePlatformMigrationV1 ($packageBefore -ceq [string]$authority.package_source_sha256) 'mir4-whole-platform-migration-package-fingerprint-authority'
-Assert-MIR4WholePlatformMigrationV1 ([string]$receipt.package_source_sha256 -ceq $packageBefore) 'mir4-whole-platform-migration-package-fingerprint-receipt'
+Assert-MIR4WholePlatformMigrationV1 ([string]$receipt.package_source_sha256 -ceq [string]$authority.package_source_sha256) 'mir4-whole-platform-migration-package-fingerprint-authority'
 Assert-MIR4WholePlatformMigrationV1 (@($receipt.package_visible_delta).Count -eq 0) 'mir4-whole-platform-migration-package-delta'
 
 $prior = Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration

@@ -43,7 +43,21 @@ jobs:
           ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
+      - name: Detect historical root package authority
+        id: authority
+        shell: pwsh
+        run: |
+          $historicalRoot =
+            (Test-Path -LiteralPath info.json -PathType Leaf) -and
+            (Test-Path -LiteralPath changelog.txt -PathType Leaf)
+          "historical_root=$($historicalRoot.ToString().ToLowerInvariant())" |
+            Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          if (-not $historicalRoot) {
+            Write-Host 'Historical root-package authority is absent; current composed-source packages are governed by the MIR validation workflow.'
+          }
+
       - name: Verify emergency release metadata
+        if: steps.authority.outputs.historical_root == 'true'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -62,10 +76,12 @@ jobs:
           }
 
       - name: Verify planet target contract
+        if: steps.authority.outputs.historical_root == 'true'
         shell: pwsh
         run: ./tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1
 
       - name: Build twice and require deterministic bytes
+        if: steps.authority.outputs.historical_root == 'true'
         id: package
         shell: pwsh
         run: |
@@ -114,6 +130,7 @@ jobs:
           "sha256=$second" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: steps.authority.outputs.historical_root == 'true'
         with:
           name: mir-emergency-package-${{ github.sha }}
           path: |

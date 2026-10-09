@@ -8,11 +8,31 @@ More Infinite Research (MIR) is a proof-governed Factorio research product line.
 
 ## MIR 4.0 Whole-Platform Genesis
 
-MIR 4.0 established the shared product line. **[MIR 4.1.0 is now published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0)** with four target-specific player packages. It preserves the detailed research and settings model below while separating editable package source, target overlays, repository documentation, and release evidence.
+MIR 4.0 established the shared product line. **[MIR 4.1.0 was published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0)** with four target-specific player packages. It preserves the research and settings model below while separating editable package source, target adapters, repository documentation, and release evidence.
 
-### MIR 4.1: choose the right target
+### MIR 4.2: choose the right target
 
-Download the ZIP for your Factorio line. All four packages have independent technical qualification; F210 and F200 are the primary player targets, with F110 and F100 supplied as supplemental LTS targets.
+**[MIR 4.2.0 is published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0-stable)** as a final, mutable release under the one-time authorized tag `v4.2.0-stable`. All twelve assets passed anonymous SHA-256 verification. The corrected source includes the ownership, weapon-overlap `off`, science-snapshot and serialization repairs implemented after RC1, plus Space Is Fake science retirement for generated streams, visible breeding controls without Space Age, and the requested AAI/SE/SolarMatrix/Accumulator-V2 equipment-manufacturing coverage. The exact source, ZIPs, checksums and Portal copy are delivered through `dist/LATEST-MIR42-PUBLISHED.txt`. Native final-package, save-upgrade, full client/multiplayer and performance checks remain NOT RUN. Complete overhaul compatibility and completion of the remaining programme are not claimed.
+
+The Space Is Fake follow-up reports that Weapon shooting speed 7 and Lab research speed 7 still require space science. Their base-continuation correction is in 4.2.1 development. The current E packages passed native published-predecessor upgrades and two reloads in the named F210 and F200 Space Is Fake profiles; final joined release acceptance remains pending. See [the exact candidate evidence](docs/releases/mir42-nine-target-candidate-playtest-matrix.md). Published 4.2.0 downloads are preserved. See [the current findings](docs/releases/mir42-playtest-findings.md#space-is-fake-continuation-follow-up).
+
+| Product | Factorio line | Distribution version |
+| --- | --- | --- |
+| F210 | 2.1 experimental | [4.2.21000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.21000.zip) |
+| F200 | 2.0 | [4.2.20000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.20000.zip) |
+| F110 | 1.1 | [4.2.11000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.11000.zip) |
+| F100 | 1.0 | [4.2.10000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.10000.zip) |
+| F017 | 0.17 | [4.2.01700](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01700.zip) |
+| F016 | 0.16 | [4.2.01600](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01600.zip) |
+| F015 | 0.15 | [4.2.01500](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01500.zip) |
+| F014 | 0.14 | [4.2.01400](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01400.zip) |
+| F013 | 0.13 | [4.2.01300](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.0-stable/more-infinite-research_4.2.01300.zip) |
+
+The version contract is `100 × target code + source patch`, padded to five digits: source `v4.2.0` uses `4.2.CCC00`; source `v4.2.1` uses `4.2.CCC01`. The earlier source/distribution exception is withdrawn. Only this publication uses `v4.2.0-stable`; source version remains 4.2.0, and future final tags return to `vMAJOR.MINOR.PATCH`. Release immutability remains disabled. RC1 remains historical; its same-version installations need manual ZIP replacement using the corrected checksum. Withdrawn `CCC01` installations also need explicit manual replacement; no automatic downgrade is promised. Preserve original saves, select the same Factorio line and keep startup settings unchanged for the first load. Same-version replacement does not guarantee that version-gated migrations rerun. Tags are unsigned. The maintainer will upload these identical ZIPs from F210 through F013 at six-hour elapsed intervals.
+
+### MIR 4.1: previous qualified release
+
+Download the ZIP for your Factorio line. Each published 4.1 package has independent target qualification; F210 and F200 are the primary player targets, with F110 and F100 supplied as supplemental LTS targets.
 
 | Product | Factorio line | Distribution version | Upgrade baseline | Release requirement |
 | --- | --- | --- | --- | --- |
@@ -21,19 +41,15 @@ Download the ZIP for your Factorio line. All four packages have independent tech
 | F110 | 1.1 | [4.1.11000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.11000.zip) | MIR `4.0.11000` | required / supplemental LTS |
 | F100 | 1.0 | [4.1.10000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.10000.zip) | MIR `4.0.10000` | required / supplemental LTS |
 
-`4.1.0` identifies the shared source release. The five-digit distribution suffix identifies the target line; it is not a claim that every Factorio generation has identical capabilities. F018 through F013 remain private experimental products unless separately admitted.
+`4.1.0` identifies the shared source release. The five-digit distribution suffix identifies the target line; it does not imply identical capabilities on every Factorio generation. F017 through F013 are absent from the historical 4.1 release; their current 4.2 packages and validation limits are listed above.
 
-F210 follows the latest installed official Factorio 2.1 experimental build until the first official 2.1 stable release. Each qualification records the exact executable, runtime API, prototype API, and changelog identity. An identity change opens fresh review work before evidence is reused. The published F210 package was qualified on 2.1.17; F200, F110, and F100 were qualified on 2.0.77, 1.1.110, and 1.0.0 respectively.
+The published F210 package was qualified on Factorio 2.1.17; F200, F110, and F100 were qualified on 2.0.77, 1.1.110, and 1.0.0 respectively. Each new candidate needs its own exact-engine evidence before its support claim changes.
 
-The MIR 4 source tree contains five maturity classes:
+## MIR 4.2 research browser
 
-- **stable** — authorized player compiler, emitter, runtime, migration, and admitted target behavior;
-- **preview** — separately packaged developer interfaces with versioned schemas and conformance tests;
-- **shadow** — executable comparison machinery that cannot write player output;
-- **experimental** — bounded private work with no public support authority;
-- **omitted** — intentionally absent from a target or release artifact.
+The MIR 4.2 packages for Factorio 2.1 and 2.0 bundle a research library. Open it with the MIR shortcut or `/mir-research`. **Research** searches, sorts and filters technologies, shows selected benefits and requirements, and can display verified research not added in the current configuration. **Queue** shows the force's current queue. **Settings** groups effective values and their sources. **Debug** previews a local diagnostic report and provides startup-profile export and layout recovery. Personal search, filters and hiding leave force research unchanged. The library currently hands research selection and queue changes to Factorio's native research screen; its own queue mutation controls are withheld pending authority and lifecycle qualification. Startup values require a restart, and profile export uses the existing MIRSET1 import setting. Player usability, multiplayer, save/reload and non-English translation qualification remain open in the [community request ledger](spec/programmes/community-requests.json) and [current playtest findings](docs/releases/mir42-playtest-findings.md).
 
-Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](RELEASE-RUNBOOK.md).
+For 4.2 maintenance and the integration programme for 4.3 and later targets, see the [integration and delivery plan](docs/releases/mir4-integration-and-delivery-plan.md). Planned or preview work does not expand current compatibility claims.
 
 ## Player behavior
 
@@ -45,34 +61,44 @@ Code existence never promotes maturity. The stable player ZIP contains only admi
 
 ## Install and upgrade
 
-Install the target-matching player ZIP from the [Factorio Mod Portal](https://mods.factorio.com/mod/more-infinite-research) or the [GitHub release assets](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0), and leave the ZIP packed in the Factorio mods directory. Do not install developer-preview archives or the automatically generated GitHub source archives as a mod.
+Install the target-matching player ZIP from the [Factorio Mod Portal](https://mods.factorio.com/mod/more-infinite-research) or the [GitHub release assets](https://github.com/Julesc013/more-infinite-research/releases), and leave the ZIP packed in the Factorio mods directory. Do not install developer-preview archives or the automatically generated GitHub source archives as a mod.
 
 - F210 upgrades directly from MIR 4.0.21000 and retains its admitted technology IDs, settings, migrations, and runtime state.
 - F200 upgrades directly from MIR 4.0.20000 under its target-local evidence.
 - F110 and F100 upgrade from MIR 4.0.11000 and 4.0.10000 respectively.
 - Back up the save, select the package for the running Factorio line, and keep startup settings unchanged for the first load.
-- A support request should include an exact [SupportBundleV1](SUPPORT.md), not only a mod list or screenshot.
+- A support request should include an exact [SupportBundleV1](SUPPORT.md), with the package version and target, not only a mod list or screenshot.
 
 For MIR 3 saves, follow [Upgrading from MIR 3 to MIR 4](docs/user/mir3-to-mir4.md) to reach the corresponding 4.0 baseline first. See also [installation](docs/user/installation.md) and the target package README for current steps. MIR 3 and earlier remain immutable historical baselines; their architecture and release records are retained under `docs/releases/` and `.mir/releases/terminal/`.
 
 ## Repository and branches
 
+The MIR 4 source tree contains five maturity classes:
+
+- **stable** — authorized player compiler, emitter, runtime, migration, and admitted target behavior;
+- **preview** — separately packaged developer interfaces with versioned schemas and conformance tests;
+- **shadow** — executable comparison machinery that cannot write player output;
+- **experimental** — bounded private work with no public support authority;
+- **omitted** — intentionally absent from a target or release artifact.
+
+Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](docs/EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](docs/RELEASE-RUNBOOK.md).
+
 `dev` is the MIR 4 integration authority. Short-lived branches merge to protected `dev` through passing aggregate verification. `main` is the published stable line: player releases arrive through exact sealed-candidate promotion, while bounded documentation and repository-governance corrections use protected PRs under the branch policy. Historical target branches are custody references, not alternative MIR 4 authoring roots.
 
-Editable player source lives in `src/mod`: `common` owns shared files and `families/modern` and `families/legacy` own the engine-family implementations. Target definitions, overlays, and package README/changelog templates live in `targets`. The repository root is not a player package; its retained MIR 3 files are historical compatibility inputs. The canonical materializer produces standalone target packages below `build/packages`.
+Editable player code lives in the single package-shaped `source` tree. Shared behavior uses its package path directly; exact target differences live under narrowly scoped `source/adapters`, package presentation inputs under `source/presentation`, and lifecycle generators under `source/generation`. Factorio 1 targets use the same shared implementation with explicit base-version and disabled-runtime-capability adapters—there is no parallel Factorio 1 source tree. `targets` contains only target identity, policy, and composition records—not second source copies. The repository root is not a player package; its retained MIR 3 files are historical compatibility inputs. The canonical materializer produces standalone target packages below `build/packages`.
 
-The primary checkout is the normal handoff location: final published ZIPs belong in `dist`, with their release notes and upload text available alongside them. External custody archives retain original evidence; they do not replace delivery into the working checkout. Temporary worktrees need an explicit completion or preservation disposition. Read [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and [Project continuity](PROJECT-CONTINUITY.md) before changing authorities or release state.
+The primary checkout is the normal handoff location: final published ZIPs belong in `dist`, with their release notes and upload text available alongside them. External custody archives retain original evidence; they do not replace delivery into the working checkout. Temporary worktrees need an explicit completion or preservation disposition. Read [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and [Project continuity](docs/PROJECT-CONTINUITY.md) before changing authorities or release state.
 
 ## Stable player plane reference
 
-The following generated pipeline, settings, and research catalog describe the modern player family used by the F210/F200 targets. Individual rows still depend on the active game content and settings. F110/F100 use the legacy family and omit effects and Space Age features unavailable on those engines; their package README and target definitions state the supported subset. Shadow and preview implementations do not replace player behavior by code existence alone.
+The following generated pipeline, settings, and research catalog describe the shared implementation used by the F210/F200 targets. Individual rows still depend on the active game content and settings. F110/F100 are composed from the explicitly bounded Factorio 1 compatibility implementation and omit effects and Space Age features unavailable on those engines; their package README and target definitions state the supported subset. Shadow and preview implementations do not replace player behavior by code existence alone.
 
 ### How it works
 
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 
 <!-- BEGIN GENERATED MIR PIPELINE -->
-This package-excluded reference is generated from `src/mod/families/modern/prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
+This package-excluded reference is generated from `source/prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
 
 | Phase | Command | Kind | Implementation | Depends on |
 | ---: | --- | --- | --- | --- |
@@ -340,6 +366,7 @@ Vanilla continuations:
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `only-when-dedicated-tech-enabled` | Removes rocket and cannon-shell bonuses from MIR's generated general continuation only when an enabled, reachable infinite technology provides the exact replacement effect. Finite vanilla technologies are never stripped. Existing saved startup choices are not rewritten. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-pipeline-extent-multiplier` | string/dropdown | `100%` | Strictly opt-in startup-only multiplier for recognized fluid box pipeline extent fields across prototypes, not only pipe entities. At `100%`, MIR does not load the pipeline pass, scan fluid boxes, or change prototypes. Allowed values: `50%`, `75%`, `100%`, `125%`, `150%`, `200%`, `250%`, `300%`, `400%`, `500%`. Non-`100%` values are experimental and can affect machines, tanks, thrusters, and modded prototypes that define fluid boxes. |
+| `mir-enable-passive-repair` | bool | `false` | Optional free wall/gate regeneration on F200/F210 after 10 seconds without damage. Tracks newly damaged entities owned by the player force or its mutual allies: up to 256 pending, 8 service visits each second, at most 1 health per visit. Large queues repair more slowly. Uses no repair packs, does not change maximum health, and never revives destroyed entities. Restart after changing this setting. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
 | `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
@@ -361,7 +388,7 @@ Every generated stream receives:
 Per-stream effective defaults and exceptions:
 
 <!-- BEGIN GENERATED MIR STREAM DEFAULTS -->
-This package-excluded effective-default table is generated from `src/mod/families/modern/prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.
+This package-excluded effective-default table is generated from `source/prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.
 
 | Stream | Enabled | Base cost | Growth | Time | Max |
 | --- | --- | ---: | ---: | ---: | --- |
@@ -447,7 +474,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 
 ### Main Files
 
-Paths in this table are paths inside a materialized modern player package. In the repository, locate their editable definitions under `src/mod/common` or `src/mod/families/modern`; lifecycle entrypoints are rendered from `src/mod/generation/lifecycle`, with target-owned replacements under `targets`. The generated pipeline above shows the current command order.
+Paths in this table are paths inside a materialized F210/F200 player package. In the repository, the shared editable definitions use the same paths below `source`; lifecycle entrypoints are rendered from `source/generation/lifecycle`, and exact target differences come from `source/adapters` through `targets/*/composition.json`. The generated pipeline above shows the current command order.
 
 | File | Purpose |
 | --- | --- |
@@ -566,10 +593,11 @@ Before testing, inspect or materialize the MIR verification plan and run the nar
 ```powershell
 .\tools\mir.ps1 docs check
 .\tools\mir.ps1 mir4 package-source materialize --target f210 --output build/packages/local/f210
-.\tools\mir.ps1 mir4 release-engine readiness-check --work-root <external-work-root>
 ```
 
-Use [testing guidance](docs/maintainer/testing.md) and the [release runbook](RELEASE-RUNBOOK.md) for exact prerequisites and release authority. Build and qualify before sealing; after maintainer GO, publish the prepared bytes and verify delivery. A repository README correction does not rebuild a published package.
+The retained `mir4 release-engine readiness-check` command evaluates the fail-closed historical MIR 4.1 successor contract. It is not the MIR 4.2 candidate executor and cannot authorize a private build, tag, or publication.
+
+Use [testing guidance](docs/maintainer/testing.md) and the [release runbook](docs/RELEASE-RUNBOOK.md) for exact prerequisites and release authority. Build and qualify before sealing; after maintainer GO, publish the prepared bytes and verify delivery. A repository README correction does not rebuild a published package.
 
 The detailed validation and audit commands below remain useful for development and historical MIR 3 workflows. The older `release gate` and `release docs-only` commands rebuild archives and must not be used to refresh a sealed MIR 4 release.
 
@@ -633,7 +661,9 @@ Stable direct script equivalent:
 .\scripts\Invoke-MIRReleaseTargetedGate.ps1
 ```
 
-**Credentialed exploratory compatibility audits:**
+**Historical exploratory compatibility-audit interfaces:**
+
+The retained examples in this section describe the older sweep interface. Native compatibility-audit load mode now refuses before input discovery, downloads or staging because it has not been converted to direct-library execution. Use a selected migrated runner for current native tests; metadata inspection and historical scenario definitions remain available.
 
 ```powershell
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
@@ -641,11 +671,11 @@ Stable direct script equivalent:
 
 Set `FACTORIO_BIN`, `FACTORIO_USERNAME`, and `FACTORIO_TOKEN` before running download/load tiers. Audit scenarios time out after `900` seconds by default; override with `-ScenarioTimeoutSeconds` for unusually slow modsets. Full `downloads_count >= 10000` audits are intentionally opt-in through `-IncludeFullAudit` and can be sharded with `-StartIndex`, `-ShardSize`, and optionally `-FromLockfile`.
 
-Local modpack zips can be included with the `LocalModZips` tier and `-LocalModZipDirs .\tmp`. Local zip roots are copied from disk, while any missing third-party dependencies are resolved from `-LocalModLibraryDirs` first and then, unless `-Offline` is set, through the Mod Portal cache when credentials are supplied. The local zip tier includes `+` recommended dependencies because many modpack wrapper mods use them as the pack contents.
+The retained `LocalModZips` tier distinguishes scenario roots (`LocalModZipDirs`) from dependency inventory (`LocalModLibraryDirs`) and includes recommended dependencies used by modpack wrappers. These definitions do not authorize copying archives or recreating populated profiles. Acquire only genuinely missing selected inputs separately from native execution.
 
-For offline local testing, keep root candidates and dependency libraries separate. `LocalModZipDirs` is the set of mods that may become one-mod, curated, or generated scenarios. `LocalModLibraryDirs` is dependency inventory only, so generated scenarios do not accidentally become rooted in support libraries. Use a writable dependency-cache directory for downloaded prerequisites and keep read-only mod collections unchanged. Broad local runs can use `--link-mode Hardlink` on same-drive inputs to reduce copy overhead, or `--link-mode Copy` for the safest cross-drive behavior.
+For current offline native testing, keep profiles as small tracked definitions and retain each required exact archive once in the configured engine-family library. Supply engine and library paths explicitly. The selected runner reads archives directly, switches only mod-list/settings under exclusive ownership, restores those controls afterward, and keeps writable run output inside the checkout. It creates no dependency copies, archive links or extracted profiles. Source-only checks do not require that library; missing native inputs must be reported precisely.
 
-Use read-only local mod libraries for large offline sweeps:
+Retained overnight sweep example; its native audit stage requires conversion before current use:
 
 ```powershell
 .\tools\mir.ps1 overnight local
@@ -689,7 +719,7 @@ The validation script checks:
 
 ## Documentation Map
 
-- **`todo.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
+- **`TODO.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
 - **`docs/architecture/README.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
 - **`docs/architecture/compatibility-compiler-charter.md`:** 3.0 architecture charter, compiler pipeline, invariants, release ladder, non-goals, and acceptance gates.
 - **`docs/architecture/module-boundaries.md`:** 3.0 Factorio shell, `prototypes/mir` compiler namespace, layer rules, no-shim shipped layout, package boundary, and architecture lint targets.

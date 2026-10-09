@@ -1,0 +1,1522 @@
+-- A deliberately narrow, pure acquisition witness. It establishes that one
+-- concrete route has declared inputs, an independently acquired matching
+-- machine (or character crafting), finite energy, and source/surface witnesses
+-- before its unlock. It does not prove logistics, power, throughput, native
+-- placement, save behavior, balance, or ecosystem compatibility.
+local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local item_prototype_facts = require("prototypes.mir.index.item_prototype_facts")
+
+local M = {}
+-- Live CompilerContext ownership is private identity, not serializable cache
+-- data. Weak keys keep query-local states collectible without retaining a
+-- context/service back-reference inside public state snapshots.
+local state_contexts = setmetatable({}, {__mode = "k"})
+
+function M.bind_state_context(state, context)
+  state_contexts[state] = context
+  return state
+end
+
+function M.state_context_matches(state, context)
+  return state ~= nil and state_contexts[state] == context
+end
+
+-- Acquisition alternatives remain complete, but ordinary production is tried
+-- before reverse recycling routes. A known forward route should not first
+-- traverse every item whose recycling can return this same ingredient.
+function M.sort_acquisition_producers(names, index)
+  local facts = index and index.facts or {}
+  table.sort(names, function(left, right)
+    local left_recycling = facts[left] and facts[left].source_class == "recycling" or false
+    local right_recycling = facts[right] and facts[right].source_class == "recycling" or false
+    if left_recycling ~= right_recycling then return not left_recycling end
+    return left < right
+  end)
+  return names
+end
+
+local MACHINE_TYPES = {
+  "assembling-machine", "furnace", "mining-drill", "rocket-silo"
+}
+
+local function handcrafting_prototype_type()
+  local profile = target_profiles.current()
+  local shapes = profile and profile.prototype_shapes or {}
+  local kind = shapes.handcrafting_prototype_type or "character"
+  if kind ~= "character" and kind ~= "player" then
+    error("MIR target declares an unsupported handcrafting prototype type.", 2)
+  end
+  return kind
+end
+
+local function finite_positive(value)
+  return type(value) == "number" and value == value and value > 0 and value < math.huge
+end
+
+local function finite_nonnegative(value)
+  return type(value) == "number" and value == value and value >= 0 and value < math.huge
+end
+
+local function finite_temperature(value)
+  return type(value) == "number" and value == value and math.abs(value) < math.huge
+end
+
+-- Factorio recipe names alone are not a product identity. A string public
+-- argument keeps the established item-default convenience, while callers that
+-- reason about fluids must provide {type="fluid", name="..."}.
+local function normalize_identity(value, type_hint)
+  if type(value) == "string" then
+    return {type = type_hint or "item", name = value}
+  end
+  if type(value) ~= "table" then return nil end
+  local name = value.name or value[1]
+  local entry_type = value.type or type_hint or "item"
+  if type(name) ~= "string" or name == "" or type(entry_type) ~= "string" or entry_type == "" then
+    return nil
+  end
+  local identity = {type = entry_type, name = name}
+  if entry_type == "fluid" then
+    -- Exact temperature takes precedence over the optional range in the
+    -- native ingredient contract. Preserve the demand through every solver,
+    -- including contextual research and memoization.
+    local minimum, maximum = value.minimum_temperature, value.maximum_temperature
+    if value.temperature ~= nil then minimum, maximum = value.temperature, value.temperature end
+    if minimum ~= nil and not finite_temperature(minimum)
+      or maximum ~= nil and not finite_temperature(maximum)
+      or minimum ~= nil and maximum ~= nil and minimum > maximum then return nil end
+    identity.minimum_temperature, identity.maximum_temperature = minimum, maximum
+  end
+  return identity
+end
+
+local function identity_key(identity)
+  return identity.type .. "\0" .. identity.name
+end
+
+local function acquisition_key(identity)
+  local key = identity_key(identity)
+  if identity.type == "fluid" and (identity.minimum_temperature ~= nil or identity.maximum_temperature ~= nil) then
+    local minimum = identity.minimum_temperature and string.format("%.17g", identity.minimum_temperature) or ""
+    local maximum = identity.maximum_temperature and string.format("%.17g", identity.maximum_temperature) or ""
+    return key .. "\0temperature\0" .. minimum .. "\0" .. maximum
+  end
+  return key
+end
+
+-- The research-unlock memo and active-identity guard consume the same demand
+-- key. Producer indexes continue to use only the underlying type/name.
+function M.acquisition_key(identity)
+  local normalized = normalize_identity(identity)
+  return normalized and acquisition_key(normalized) or nil
+end
+
+local function same_identity(left, right)
+  return left and right and left.type == right.type and left.name == right.name
+end
+
+local function product_temperature(product)
+  if product.type ~= "fluid" then return nil end
+  if product.temperature ~= nil then return product.temperature end
+  local fluid = data_raw.prototypes("fluid")[product.name]
+  return fluid and fluid.default_temperature
+end
+
+local function temperature_satisfied(temperature, identity)
+  if identity.type ~= "fluid"
+    or identity.minimum_temperature == nil and identity.maximum_temperature == nil then return true end
+  return finite_temperature(temperature)
+    and (identity.minimum_temperature == nil or temperature >= identity.minimum_temperature)
+    and (identity.maximum_temperature == nil or temperature <= identity.maximum_temperature)
+end
+
+-- Assigned below with the diagnostic helpers. The forward declaration lets
+-- every nested result/category/source iterator charge the same work budget.
+local diagnostic_visit
+
+local function supported_product_field(name)
+  local profile = target_profiles.current()
+  local fields = profile and profile.prototype_shapes and profile.prototype_shapes.product_probability_fields
+  for _, field in ipairs(fields or {}) do
+    if field == name then return true end
+  end
+  return false
+end
+
+local function entry_positive(entry, canonical_recipe_product)
+  if type(entry) ~= "table" then return false end
+  local declared_independent = entry.independent_probability
+  if canonical_recipe_product then
+    -- Schema-2 recipe facts synthesize an effective independent probability
+    -- even on legacy targets. Only the retained authored declaration may
+    -- invoke the foreign-field gate; do not change those canonical bytes.
+    declared_independent = entry.declared_independent_probability
+  end
+  -- Foreign modern fields cannot create an acquisition witness on a target
+  -- whose native product contract does not declare them.
+  if declared_independent ~= nil and not supported_product_field("independent_probability")
+    or entry.shared_probability ~= nil and not supported_product_field("shared_probability")
+    or entry.extra_count_fraction ~= nil and not supported_product_field("extra_count_fraction") then return false end
+  local amount = entry.amount or entry[2]
+  if amount == nil then
+    if entry.amount_min ~= nil or entry.amount_max ~= nil then
+      local minimum, maximum = tonumber(entry.amount_min), tonumber(entry.amount_max)
+      if not finite_nonnegative(minimum) or not finite_nonnegative(maximum) then return false end
+      -- Native item/fluid products clamp a reversed maximum to the minimum.
+      amount = math.max(minimum, maximum)
+    else
+      amount = 1
+    end
+  end
+  amount = tonumber(amount)
+  if not finite_nonnegative(amount) then return false end
+  local probability = tonumber(entry.independent_probability or entry.probability or 1) or 0
+  if not finite_positive(probability) or probability > 1 then return false end
+  local shared = entry.shared_probability
+  if shared ~= nil then
+    if type(shared) ~= "table" or not finite_nonnegative(shared.min)
+      or not finite_nonnegative(shared.max) or shared.max > 1
+      or shared.min >= shared.max then return false end
+  end
+  local extra = 0
+  if (entry.type or "item") == "item" then
+    extra = tonumber(entry.extra_count_fraction or 0)
+    if not finite_nonnegative(extra) then return false end
+  end
+  -- This is possible baseline acquisition, not a productivity or loop proof.
+  return amount > 0 or extra > 0
+end
+
+local function results_include_positive(results, output_identity, options, canonical_recipe_product)
+  for _, result in ipairs(results or {}) do
+    if not diagnostic_visit(options) then return false end
+    if same_identity(normalize_identity(result), output_identity)
+      and entry_positive(result, canonical_recipe_product)
+      and temperature_satisfied(product_temperature(result), output_identity) then return true end
+  end
+  return false
+end
+
+local function variants_for(fact)
+  if type(fact.variants) == "table" and #fact.variants > 0 then return fact.variants end
+  return {{
+    name = "default",
+    categories = fact.categories or {"crafting"},
+    ingredients = fact.ingredients or {},
+    results = fact.results,
+    result_names = fact.result_names,
+    enabled = fact.enabled_without_research == true,
+    hidden = fact.hidden == true,
+    energy_required = fact.energy_required,
+    surface_conditions = fact.surface_conditions
+  }}
+end
+
+local function normalized_results(variant, options)
+  if variant.results then return variant.results end
+  local results = {}
+  for _, name in ipairs(variant.result_names or {}) do
+    if not diagnostic_visit(options) then return nil end
+    table.insert(results, {type = "item", name = name, amount = 1, probability = 1})
+  end
+  return results
+end
+
+local function normalized_ingredients(variant)
+  return variant.ingredients or {}
+end
+
+local function fluid_port_requirements(variant, results, options)
+  -- Category membership alone cannot give a character a fluid inventory.
+  -- Inspect the typed declarations, including coproducts, so an otherwise
+  -- reachable fluid source cannot manufacture a hand-crafting witness.
+  local required = {input = 0, output = 0}
+  local seen = {input = {}, output = {}}
+  for direction, entries in ipairs({normalized_ingredients(variant), results or {}}) do
+    local key = direction == 1 and "input" or "output"
+    for _, entry in ipairs(entries) do
+      if not diagnostic_visit(options) then return nil end
+      if type(entry) == "table" and entry.type == "fluid" then
+        local identity = normalize_identity(entry)
+        if not identity then return nil end
+        -- Duplicate native products are permitted. Count distinct fluid
+        -- identities, not probability/quantity entries for the same fluid;
+        -- exact slot assignment remains a native qualification boundary.
+        if not seen[key][identity.name] then
+          seen[key][identity.name] = true
+          required[key] = required[key] + 1
+        end
+      end
+    end
+  end
+  if required.input == 0 and required.output == 0 then return false end
+  return required
+end
+
+local function fluid_port_counts(machine, options)
+  local counts = {input = 0, output = 0}
+  for _, box in ipairs(machine.fluid_boxes or {}) do
+    if not diagnostic_visit(options) then return nil end
+    if type(box) == "table" then
+      local kind = box.production_type
+      if kind == "input" or kind == "input-output" then counts.input = counts.input + 1 end
+      if kind == "output" or kind == "input-output" then counts.output = counts.output + 1 end
+    end
+  end
+  return counts
+end
+
+local function copy_options(options)
+  local copied = {}
+  for key, value in pairs(options or {}) do copied[key] = value end
+  return copied
+end
+
+local function resolved_options(options)
+  local copied = copy_options(options)
+  copied.recipe_index = copied.recipe_index or recipe_facts.index_view()
+  return copied
+end
+
+-- Diagnostics are deliberately observer-only. Production callers do not pass
+-- this callback, and no admission or memo decision may depend on it.
+--
+-- A diagnostic observer may additionally provide query-local checkpoints. A
+-- recipe has OR semantics across its variants, and acquisition has OR
+-- semantics across producer recipes. If a later branch succeeds, observations
+-- from earlier rejected branches are not a cause of the selected result and
+-- must be discarded with that branch. This keeps a successful structural
+-- alternative from masking the later technology/self-lock rejection which is
+-- actually decisive for a pack candidate.
+local function record_diagnostic_failure(options, failure)
+  local observer = options and options.diagnostic_observer
+  if observer and type(observer.record) == "function" then
+    observer:record(deepcopy(failure), options.diagnostic_depth or 0)
+  elseif type(options.diagnostic_failure) == "function" then
+    options.diagnostic_failure(deepcopy(failure))
+  end
+end
+
+local function diagnostic_checkpoint(options)
+  local observer = options and options.diagnostic_observer
+  if observer and type(observer.checkpoint) == "function" then return observer:checkpoint() end
+  return nil
+end
+
+local function diagnostic_rollback(options, checkpoint)
+  local observer = options and options.diagnostic_observer
+  if checkpoint and observer and type(observer.rollback) == "function" then
+    observer:rollback(checkpoint)
+  end
+end
+
+-- Diagnostic work is irreversible even where its explanatory trace is not.
+-- The observer is absent in normal admission, preserving feasibility
+-- semantics; when present, every raw-prototype scan and recursive descent
+-- must reserve work before inspecting its next node.
+diagnostic_visit = function(options, depth)
+  local observer = options and options.diagnostic_observer
+  if not observer then return true end
+  if type(observer.is_stopped) == "function" and observer:is_stopped() then return false end
+  if type(observer.reserve_visit) == "function" then
+    return observer:reserve_visit(depth or options.diagnostic_depth or 0)
+  end
+  return true
+end
+
+local function recipe_source_epoch()
+  return recipe_facts.source_epoch and recipe_facts.source_epoch() or nil
+end
+
+local function reset_state(state, epoch, context, recipe_index)
+  state = state or {}
+  local next_stable_generation = (state.stable_acquisition_generation or 0) + 1
+  for key in pairs(state) do state[key] = nil end
+  state.stable_acquisition_generation = next_stable_generation
+  M.bind_state_context(state, context)
+  state.recipe_source_epoch = epoch
+  state.recipe_index = recipe_index
+  state.visiting = {}
+  state.acquisition_memo = {}
+  state.stable_acquisition_memo = {}
+  state.machine_categories = nil
+  state.machine_placement_items = {}
+  state.mining_drills = nil
+  state.capturable_spawners = nil
+  state.source_catalog = nil
+  state.surface_locations = nil
+  state.surface_results = {}
+  return state
+end
+
+local function new_state(recipe_index)
+  return reset_state({}, recipe_source_epoch(), compiler_context.current(), recipe_index)
+end
+
+-- State is intentionally query-local. A caller may pass it down a recursive
+-- query, but it is discarded if the active recipe source epoch changes; this
+-- prevents a result from one CompilerContext/recipe snapshot leaking into the
+-- next one.
+local function query_state(state, recipe_index)
+  local epoch = recipe_source_epoch()
+  local context = compiler_context.current()
+  if not state or state.recipe_source_epoch ~= epoch or not M.state_context_matches(state, context) then
+    return reset_state(state, epoch, context, recipe_index)
+  end
+  if state.recipe_index ~= recipe_index then
+    -- A direct-source preflight intentionally starts without a recipe index.
+    -- Once the same query proceeds to recipe feasibility, retain its immutable
+    -- prototype catalogs while establishing the previously absent index. An
+    -- explicit replacement with a different populated index remains a new
+    -- query identity and must discard every prior memo.
+    if state.recipe_index == nil and recipe_index ~= nil then
+      state.recipe_index = recipe_index
+      state.visiting = {}
+      state.acquisition_memo = {}
+      state.stable_acquisition_memo = {}
+      state.stable_acquisition_generation = state.stable_acquisition_generation + 1
+      return state
+    end
+    return reset_state(state, epoch, context, recipe_index)
+  end
+  return state
+end
+
+-- Direct-source checks do not need a recipe index, but a caller may supply a
+-- state which has already acquired one. Preserve that state when its context
+-- and source epoch match so separate science-pack roots can reuse the same
+-- immutable resource, machine, and surface observations.
+local function source_query_state(state)
+  local epoch = recipe_source_epoch()
+  local context = compiler_context.current()
+  if not state or state.recipe_source_epoch ~= epoch or not M.state_context_matches(state, context) then
+    return reset_state(state, epoch, context, nil)
+  end
+  return state
+end
+
+local function category_set_from_prototypes(state, options)
+  if state.machine_categories then return state.machine_categories end
+  local categories = {}
+  local handcrafting_type = handcrafting_prototype_type()
+  local machine_types = {}
+  for _, kind in ipairs(MACHINE_TYPES) do machine_types[#machine_types + 1] = kind end
+  machine_types[#machine_types + 1] = handcrafting_type
+  for _, prototype_type in ipairs(machine_types) do
+    for name, machine in pairs(data_raw.prototypes(prototype_type)) do
+      if not diagnostic_visit(options) then return categories end
+      local ports
+      for _, category in ipairs(machine.crafting_categories or {}) do
+        if not diagnostic_visit(options) then return categories end
+        if not ports then
+          ports = fluid_port_counts(machine, options)
+          if not ports then return categories end
+        end
+        categories[category] = categories[category] or {}
+        table.insert(categories[category], {
+          name = name,
+          prototype_type = prototype_type,
+          handcrafting = prototype_type == handcrafting_type,
+          fixed_recipe = machine.fixed_recipe,
+          fluid_ports = ports,
+          surface_conditions = deepcopy(machine.surface_conditions)
+        })
+      end
+    end
+  end
+  for _, machines in pairs(categories) do
+    table.sort(machines, function(left, right)
+      local left_character = left.handcrafting
+      local right_character = right.handcrafting
+      if left_character ~= right_character then return left_character end
+      if left.name ~= right.name then return left.name < right.name end
+      return left.prototype_type < right.prototype_type
+    end)
+  end
+  state.machine_categories = categories
+  return categories
+end
+
+local compatible_machine
+
+local function surface_conditions_satisfied(conditions, properties, options)
+  for _, condition in ipairs(conditions or {}) do
+    if not diagnostic_visit(options) then return false end
+    local property = condition.property
+    local value = property and properties and properties[property] or nil
+    if type(value) ~= "number" then return false end
+    if condition.min ~= nil and value < condition.min then return false end
+    if condition.max ~= nil and value > condition.max then return false end
+  end
+  return true
+end
+
+local function condition_key(conditions, options)
+  local values = {}
+  for _, condition in ipairs(conditions or {}) do
+    if not diagnostic_visit(options) then return nil end
+    table.insert(values, table.concat({
+      type(condition.property) .. ":" .. tostring(condition.property),
+      type(condition.min) .. ":" .. tostring(condition.min),
+      type(condition.max) .. ":" .. tostring(condition.max)
+    }, "\0"))
+  end
+  return table.concat(values, "\1")
+end
+
+local function all_surfaces(state, options)
+  if state.surface_locations then return state.surface_locations end
+  local locations = {}
+  -- A space-location can be orbital or otherwise non-buildable. Surface
+  -- feasibility needs a real SurfacePrototype or a planet, not merely a
+  -- matching space-location record.
+  for _, prototype_type in ipairs({"surface", "planet"}) do
+    for _, location in pairs(data_raw.prototypes(prototype_type)) do
+      if not diagnostic_visit(options) then return locations end
+      table.insert(locations, location)
+    end
+  end
+  state.surface_locations = locations
+  return locations
+end
+
+local function surface_satisfied(conditions, options, state)
+  if not conditions or #conditions == 0 then return true end
+  if type(options.surface_witness) == "function" then
+    return options.surface_witness(conditions) == true
+  end
+  local key = condition_key(conditions, options)
+  if not key then return false end
+  if state.surface_results[key] ~= nil then return state.surface_results[key] end
+  for _, location in ipairs(all_surfaces(state, options)) do
+    if not diagnostic_visit(options) then return false end
+    if surface_conditions_satisfied(conditions, location.surface_properties or {}, options) then
+      state.surface_results[key] = true
+      return true
+    end
+  end
+  state.surface_results[key] = false
+  return false
+end
+
+local function minable_results(source)
+  local minable = source and source.minable or {}
+  -- Native results override the singular shorthand, including an empty list.
+  -- Retained result/count fields cannot invent another acquisition source.
+  if minable.results ~= nil then return minable.results end
+  if minable.result then return {{type = "item", name = minable.result, amount = minable.count or 1}} end
+  return {}
+end
+
+local function mining_fluid_input(source)
+  -- Fluid-consuming mining entered the native contract in 0.15. Earlier
+  -- adapters must not interpret a foreign field as a native requirement.
+  local line = target_profiles.current_factorio_version
+  if line == "0.13" or line == "0.14" then return false end
+  local minable = source and source.minable or {}
+  local amount = minable.fluid_amount or 0
+  if not finite_nonnegative(amount) then return nil end
+  if amount == 0 then return false end
+  local identity = normalize_identity({type = "fluid", name = minable.required_fluid})
+  if not identity then return nil end
+  return {identity = identity, amount = amount}
+end
+
+local function append_minable_sources(sources, prototype_type, witness_kind, options)
+  for name, source in pairs(data_raw.prototypes(prototype_type)) do
+    if not diagnostic_visit(options) then return false end
+    local mining_input = mining_fluid_input(source)
+    local requirement = {category = source.category or "basic-solid", fluid_outputs = {},
+      item_output = false, required = not not mining_input, unsupported = prototype_type ~= "resource"}
+    -- A drill extracts resources. A fluid-dependent tree/plant/chunk cannot
+    -- gain an invented drill or hand-mining witness through MinableProperties.
+    for _, result in ipairs(minable_results(source)) do
+      if not diagnostic_visit(options) then return false end
+      local identity = normalize_identity(result)
+      if identity and mining_input ~= nil and entry_positive(result) then
+        if identity.type == "fluid" then
+          requirement.fluid_outputs[identity.name], requirement.required = true, true
+        elseif identity.type == "item" then requirement.item_output = true end
+        local key = identity_key(identity)
+        sources[key] = sources[key] or {}
+        table.insert(sources[key], {
+          kind = witness_kind,
+          prototype = source.name or name,
+          prototype_type = prototype_type,
+          product = identity,
+          temperature = identity.type == "fluid" and product_temperature(result) or nil,
+          mining_input = mining_input or nil,
+          -- The private requirement is completed by this one charged result
+          -- traversal before the catalogue is exposed to any source query.
+          mining_actor = requirement,
+          surface_conditions = deepcopy(source.surface_conditions)
+        })
+      end
+    end
+  end
+  return true
+end
+
+local LEGACY_LOOT_LINES = {
+  ["2.0"] = true, ["1.1"] = true, ["1.0"] = true, ["0.17"] = true,
+  ["0.16"] = true, ["0.15"] = true, ["0.14"] = true, ["0.13"] = true
+}
+
+local function loot_item_identity(entry)
+  if type(entry) ~= "table" then return nil end
+  local line = target_profiles.current_factorio_version
+  if line == "2.1" then
+    -- Entity loot adopted ItemProductPrototype in 2.1. Keep its own native
+    -- quantity/probability contract; a retained LootItem.item is no alias.
+    local identity = normalize_identity(entry)
+    if identity and identity.type == "item" and entry_positive(entry) then return identity end
+  elseif LEGACY_LOOT_LINES[line] then
+    -- Earlier engines use LootItem, not a recipe product. Its required item
+    -- identity and independently defaulted counts cannot come from name,
+    -- amount, a foreign probability field or extra item rolls.
+    local identity = normalize_identity({type = "item", name = entry.item})
+    local minimum = entry.count_min == nil and 1 or entry.count_min
+    local maximum = entry.count_max == nil and 1 or entry.count_max
+    local probability = entry.probability == nil and 1 or entry.probability
+    if identity and finite_nonnegative(minimum) and finite_positive(maximum)
+      and finite_positive(probability) and probability <= 1 then return identity end
+  end
+  return nil
+end
+
+local function append_loot_sources(sources, options)
+  -- Enemy drops are concrete acquisition seeds, including the first Gleba
+  -- pentapod egg. The breeding recipe cannot seed itself without that drop.
+  for _, prototype_type in ipairs({"unit-spawner", "unit", "turret"}) do
+    for _, source in pairs(data_raw.prototypes(prototype_type)) do
+      if not diagnostic_visit(options) then return false end
+      for _, result in ipairs(source.loot or {}) do
+        if not diagnostic_visit(options) then return false end
+        local identity = loot_item_identity(result)
+        if identity then
+          local key = identity_key(identity)
+          sources[key] = sources[key] or {}
+          table.insert(sources[key], {
+            kind = "entity-loot",
+            product = identity,
+            surface_conditions = deepcopy(source.surface_conditions)
+          })
+        end
+      end
+    end
+  end
+  return true
+end
+
+-- Boilers are prototype-defined fluid heating/conversion routes. Their
+-- placement item and typed input are acquired only when this candidate is
+-- selected, through the same cycle/research guards as recipe routes. This is
+-- no fuel, power, throughput or native placement proof. Surface-constrained
+-- boilers remain conservative until a same-surface witness is modeled.
+local function append_boiler_sources(sources, options)
+  for name, boiler in pairs(data_raw.prototypes("boiler")) do
+    if not diagnostic_visit(options) then return false end
+    local input = normalize_identity({
+      type = "fluid",
+      name = boiler.fluid_box and boiler.fluid_box.filter
+    })
+    local mode = boiler.mode or "heat-fluid-inside"
+    local output_name = input and input.name
+    if mode == "output-to-separate-pipe" then
+      output_name = boiler.output_fluid_box and boiler.output_fluid_box.filter or output_name
+    end
+    local output = normalize_identity({type = "fluid", name = output_name})
+    local fluid = input and data_raw.prototypes("fluid")[input.name]
+    local heating_maximum = mode == "heat-fluid-inside" and fluid
+      and (fluid.max_temperature or fluid.default_temperature) or nil
+    local temperature = mode == "output-to-separate-pipe" and boiler.target_temperature or heating_maximum
+    if input and output and finite_temperature(temperature)
+      and boiler.energy_consumption ~= nil
+      and type(boiler.energy_source) == "table"
+      and (type(boiler.surface_conditions) ~= "table" or #boiler.surface_conditions == 0) then
+      local key = identity_key(output)
+      sources[key] = sources[key] or {}
+      table.insert(sources[key], {
+        kind = "boiler-conversion",
+        prototype = boiler.name or name,
+        source_actor = {prototype = boiler.name or name, prototype_type = "boiler"},
+        product = output,
+        input = input,
+        temperature = temperature,
+        heating_maximum = heating_maximum,
+        heating_minimum = heating_maximum and fluid.default_temperature or nil,
+        target_temperature = mode == "output-to-separate-pipe" and temperature or nil
+      })
+    end
+  end
+  return true
+end
+
+local function tile_source_fluids(options)
+  local fluids, seen = {}, {}
+  for _, tile in pairs(data_raw.prototypes("tile")) do
+    if not diagnostic_visit(options) then return fluids, false end
+    local fluid = tile.fluid
+    if type(fluid) == "string" and fluid ~= "" and not seen[fluid] then
+      seen[fluid] = true
+      table.insert(fluids, fluid)
+    end
+  end
+  table.sort(fluids)
+  return fluids, true
+end
+
+local function uses_tile_pump_contract()
+  local line = target_profiles.current_factorio_version
+  return line == "2.1" or line == "2.0"
+end
+
+local function offshore_pump_output_fluids(pump, options, tile_fluids)
+  -- Both modern native engines use source offsets and tile-declared fluids.
+  -- A retained pre-2.0 `fluid` field has no source authority on those lines.
+  -- Older engines keep their explicit native fluid declaration.
+  if not uses_tile_pump_contract() then
+    local declared = pump and pump.fluid
+    if type(declared) == "string" and declared ~= "" then return {declared}, true end
+  end
+  local fluids = {}
+  if uses_tile_pump_contract()
+    and pump and pump.fluid_source_offset ~= nil then
+    -- The pump draws the fluid declared by the tile, including Space Age
+    -- oceans. A connection filter constrains that source; it cannot invent
+    -- one. In particular, never assume every unfiltered pump produces water.
+    local filter = pump.fluid_box and pump.fluid_box.filter
+    for _, fluid in ipairs(tile_fluids or {}) do
+      if not diagnostic_visit(options) then return fluids, false end
+      if filter == nil or filter == fluid then
+        table.insert(fluids, fluid)
+      end
+    end
+  end
+  return fluids, true
+end
+
+local function default_source_catalog(state, options)
+  if state.source_catalog then return state.source_catalog end
+  local sources = {}
+  if not append_minable_sources(sources, "resource", "minable-resource", options) then return sources end
+  -- Trees are concrete natural acquisition sources (for example, the
+  -- starting wood used by an early electronics board).  They are not stored
+  -- in data.raw.resource, so omitting their MinableProperties turns a real
+  -- seeded route into a false no-source cycle.
+  if not append_minable_sources(sources, "tree", "minable-entity", options) then return sources end
+  -- Space Age crops and collected asteroid chunks have concrete minable
+  -- products in separate prototype namespaces, not resource or tree.
+  if not append_minable_sources(sources, "plant", "minable-entity", options) then return sources end
+  if not append_minable_sources(sources, "asteroid-chunk", "minable-entity", options) then return sources end
+  if not append_loot_sources(sources, options) then return sources end
+  local tile_fluids
+  for name, pump in pairs(data_raw.prototypes("offshore-pump")) do
+    if not diagnostic_visit(options) then return sources end
+    if uses_tile_pump_contract()
+      and pump.fluid_source_offset ~= nil
+      and not tile_fluids then
+      local complete
+      tile_fluids, complete = tile_source_fluids(options)
+      if not complete then return sources end
+    end
+    local output_fluids, complete = offshore_pump_output_fluids(pump, options, tile_fluids)
+    if not complete then return sources end
+    for _, fluid in ipairs(output_fluids) do
+      local identity = normalize_identity({type = "fluid", name = fluid})
+      local key = identity_key(identity)
+      sources[key] = sources[key] or {}
+      table.insert(sources[key], {
+        kind = "offshore-pump",
+        source_actor = {prototype = pump.name or name, prototype_type = "offshore-pump"},
+        product = identity,
+        temperature = product_temperature(identity),
+        surface_conditions = deepcopy(pump.surface_conditions)
+      })
+    end
+  end
+  if not append_boiler_sources(sources, options) then return sources end
+  for _, candidates in pairs(sources) do
+    table.sort(candidates, function(left, right)
+      local left_actor = not not (left.source_actor or left.mining_actor and left.mining_actor.required)
+      local right_actor = not not (right.source_actor or right.mining_actor and right.mining_actor.required)
+      if left_actor ~= right_actor then return not left_actor end
+      if left.kind ~= right.kind then return left.kind < right.kind end
+      return tostring(left.prototype or "") < tostring(right.prototype or "")
+    end)
+  end
+  state.source_catalog = sources
+  return sources
+end
+
+local acquisition_witness, placement_items_for_machine
+
+local function source_actor_witness(actor, options, state)
+  local checkpoint = diagnostic_checkpoint(options)
+  for _, item_name in ipairs(placement_items_for_machine(actor.prototype, options, state)) do
+    if not diagnostic_visit(options) then return nil end
+    diagnostic_rollback(options, checkpoint)
+    local item = prototype_lookup.item_prototype(item_name)
+    if item and item.place_result == actor.prototype then
+      local acquired = acquisition_witness({type = "item", name = item_name}, options, state)
+      if acquired then
+        diagnostic_rollback(options, checkpoint)
+        return {kind = "machine-placement", prototype = actor.prototype,
+          prototype_type = actor.prototype_type, item = item_name, acquisition = acquired}
+      end
+    end
+  end
+  return nil
+end
+
+local function mining_actor_witness(requirement, input, options, state)
+  if requirement.unsupported then return nil end
+  if not state.mining_drills then
+    local drills = {}
+    for name, drill in pairs(data_raw.prototypes("mining-drill")) do
+      if not diagnostic_visit(options) then return nil end
+      local line = target_profiles.current_factorio_version
+      local legacy_box = line == "0.13" or line == "0.14"
+      local output_box = legacy_box and drill.fluid_box or nil
+      if not legacy_box then output_box = drill.output_fluid_box end
+      for _, category in ipairs(drill.resource_categories or {}) do
+        if not diagnostic_visit(options) then return nil end
+        drills[category] = drills[category] or {}
+        table.insert(drills[category], {prototype = drill.name or name,
+          prototype_type = "mining-drill", mining_speed = drill.mining_speed,
+          -- Connection graphics and pipe covers are not acquisition facts.
+          input_fluid_box = type(drill.input_fluid_box) == "table" and {filter = drill.input_fluid_box.filter} or nil,
+          output_fluid_box = type(output_box) == "table" and {filter = output_box.filter} or nil,
+          vector_to_place_result = deepcopy(drill.vector_to_place_result),
+          surface_conditions = deepcopy(drill.surface_conditions)})
+      end
+    end
+    for _, candidates in pairs(drills) do
+      table.sort(candidates, function(left, right) return left.prototype < right.prototype end)
+    end
+    state.mining_drills = drills
+  end
+  local checkpoint = diagnostic_checkpoint(options)
+  for _, drill in ipairs(state.mining_drills[requirement.category] or {}) do
+    if not diagnostic_visit(options) then return nil end
+    diagnostic_rollback(options, checkpoint)
+    local input_box, output_box = drill.input_fluid_box, drill.output_fluid_box
+    local compatible = finite_positive(drill.mining_speed)
+      and (not input or type(input_box) == "table"
+        and (input_box.filter == nil or input_box.filter == input.name))
+      and (not requirement.item_output or type(drill.vector_to_place_result) == "table")
+    local fluid_count = 0
+    for name in pairs(requirement.fluid_outputs) do
+      if not diagnostic_visit(options) then return nil end
+      fluid_count = fluid_count + 1
+      compatible = compatible and type(output_box) == "table"
+        and (output_box.filter == nil or output_box.filter == name)
+    end
+    -- Keep multi-fluid coproducts withheld: one output box supplies no
+    -- independent separation witness in this deliberately narrow model.
+    if compatible and fluid_count <= 1
+      and surface_satisfied(drill.surface_conditions, options, state) then
+      local witness = source_actor_witness(drill, options, state)
+      if witness then
+        diagnostic_rollback(options, checkpoint)
+        return witness
+      end
+    end
+  end
+  return nil
+end
+
+local function source_witness(identity, options, state)
+  if type(options.source_witness) == "function" then
+    -- Keep the established name-first callback shape, and add the exact
+    -- product type/identity for type-aware callers.
+    local witness = options.source_witness(identity.name, identity.type, deepcopy(identity))
+    if witness == true and temperature_satisfied(nil, identity) then
+      return {kind = "declared-source", product = deepcopy(identity)}
+    end
+    if type(witness) == "table" then
+      local declared = normalize_identity(witness.product or {
+        type = witness.product_type or identity.type,
+        name = witness.item or witness.name
+      })
+      local temperature = witness.temperature
+        or type(witness.product) == "table" and witness.product.temperature
+      if same_identity(declared, identity) and temperature_satisfied(temperature, identity) then
+        local copied = deepcopy(witness)
+        copied.product = deepcopy(identity)
+        return copied
+      end
+    end
+  end
+  local source_checkpoint = diagnostic_checkpoint(options)
+  for _, witness in ipairs(default_source_catalog(state, options)[identity_key(identity)] or {}) do
+    if not diagnostic_visit(options) then return nil end
+    diagnostic_rollback(options, source_checkpoint)
+    local temperature = witness.temperature
+    if witness.heating_maximum then
+      temperature = math.min(witness.heating_maximum, identity.maximum_temperature or witness.heating_maximum)
+    end
+    local heating_applicable = not witness.heating_maximum
+      or finite_temperature(witness.heating_minimum) and temperature >= witness.heating_minimum
+        and (identity.minimum_temperature ~= nil or identity.maximum_temperature ~= nil)
+    if heating_applicable and temperature_satisfied(temperature, identity)
+      and surface_satisfied(witness.surface_conditions, options, state) then
+      local copied = deepcopy(witness)
+      copied.product = deepcopy(identity)
+      copied.temperature = temperature
+      copied.surface_conditions = nil
+      copied.source_actor = nil
+      copied.mining_actor = nil
+      local input = witness.mining_input and witness.mining_input.identity
+        or witness.kind == "boiler-conversion" and witness.input
+      if input and witness.kind == "boiler-conversion" then
+        -- A boiler can heat a colder seed, including the same fluid. It cannot
+        -- use its own hot output to bootstrap or act as a cooling route.
+        input = {type = input.type, name = input.name, maximum_temperature = temperature}
+      end
+      local actor = witness.source_actor
+      local mining_actor = witness.mining_actor and witness.mining_actor.required and witness.mining_actor
+      if not input and not actor and not mining_actor then return copied end
+      -- Unconditional sources keep their index-free preflight. A conditional
+      -- source uses the existing typed acquisition solver only when selected,
+      -- and retains its actor/input's complete research witnesses.
+      options.recipe_index = options.recipe_index or state.recipe_index or recipe_facts.index_view()
+      state = query_state(state, options.recipe_index)
+      local key = acquisition_key(identity)
+      if not state.visiting[key] then
+        state.visiting[key] = true
+        local machine = mining_actor and mining_actor_witness(mining_actor, input, options, state)
+          or actor and source_actor_witness(actor, options, state)
+        local requires_actor = actor or mining_actor
+        local acquired = input and (not requires_actor or machine)
+          and acquisition_witness(input, options, state)
+        state.visiting[key] = nil
+        if (not requires_actor or machine) and (not input or acquired) then
+          copied.machine = machine or nil
+          copied.ingredients = acquired and {acquired} or nil
+          diagnostic_rollback(options, source_checkpoint)
+          return copied
+        end
+      end
+    end
+  end
+  return nil
+end
+
+function M.source_witness(identity, options, state)
+  local candidate = normalize_identity(identity)
+  if not candidate then return nil end
+  -- Unconditional sources need no recipe index. Conditional mining, pumps
+  -- and boilers resolve their input/placement dependencies on demand. Without
+  -- a research callback only initial acquisition can prove this preflight.
+  return source_witness(candidate, copy_options(options), source_query_state(state))
+end
+
+local function sorted_producers(index, output_identity, options)
+  local producers = {}
+  local exact = index.by_output_identity and index.by_output_identity[identity_key(output_identity)]
+  -- Fixture and historical callers may still expose only the legacy index.
+  -- It is safe to use only for an item identity; fluid callers must never
+  -- silently fall back to a name-only match.
+  local selected = exact
+  if selected == nil and index.by_output_identity == nil and output_identity.type == "item" then
+    selected = index.by_output[output_identity.name]
+  end
+  for _, recipe_name in ipairs(selected or {}) do
+    if not diagnostic_visit(options) then break end
+    table.insert(producers, recipe_name)
+  end
+  -- Rejection projections retain their established lexical branch order and
+  -- bounded-work accounting. The normal search alone prefers forward routes.
+  if options.diagnostic_observer ~= nil then
+    table.sort(producers)
+    return producers
+  end
+  return M.sort_acquisition_producers(producers, index)
+end
+
+placement_items_for_machine = function(name, options, state)
+  if options.diagnostic_observer == nil then
+    -- Reuse the same comprehensive index as laboratory selection. No new
+    -- machine-by-item cross product is built for ordinary production queries.
+    return item_prototype_facts.placeable_items_for_entity(name)
+  end
+  if state.machine_placement_items[name] then return state.machine_placement_items[name] end
+  local items = {}
+  -- A cold diagnostic reserves every raw visit and cannot warm the normal
+  -- comprehensive index outside its observation budget.
+  for _, item_type in ipairs(prototype_lookup.item_types()) do
+    if not diagnostic_visit(options) then return {} end
+    for item_name, item in pairs(data_raw.prototypes(item_type)) do
+      if not diagnostic_visit(options) then return {} end
+      if item.place_result == name then table.insert(items, item_name) end
+    end
+  end
+  table.sort(items)
+  state.machine_placement_items[name] = items
+  return items
+end
+
+local function entries(value)
+  if type(value) ~= "table" then return {} end
+  if value[1] ~= nil then return value end
+  return {value}
+end
+
+local function capturable_spawners(options, state)
+  if state.capturable_spawners then return state.capturable_spawners end
+  local by_entity = {}
+  for name, spawner in pairs(data_raw.prototypes("unit-spawner")) do
+    if not diagnostic_visit(options) then return {} end
+    if type(spawner.captured_spawner_entity) == "string" then
+      local entity = spawner.captured_spawner_entity
+      by_entity[entity] = by_entity[entity] or {}
+      table.insert(by_entity[entity], {name = name, surface_conditions = deepcopy(spawner.surface_conditions)})
+    end
+  end
+  for _, spawners in pairs(by_entity) do table.sort(spawners, function(a, b) return a.name < b.name end) end
+  state.capturable_spawners = by_entity
+  return by_entity
+end
+
+-- Recognize the native direct ammo -> projectile -> instant create-entity
+-- chain. This is not a general trigger interpreter or script authorization.
+local function capture_robot_from_action(action, options, projectile_depth)
+  for _, branch in ipairs(entries(action)) do
+    if not diagnostic_visit(options) then return nil end
+    if branch.type == "direct"
+      and (branch.probability == nil or finite_positive(branch.probability))
+      and (branch.repeat_count == nil or finite_positive(branch.repeat_count)) then
+      for _, delivery in ipairs(entries(branch.action_delivery)) do
+        if not diagnostic_visit(options) then return nil end
+        if delivery.type == "projectile" and projectile_depth == 0 then
+          local projectile = data_raw.prototype("projectile", delivery.projectile)
+          if projectile then
+            local robot = capture_robot_from_action(projectile.action, options, 1)
+            if robot then return robot end
+          end
+        elseif delivery.type == "instant" then
+          for _, effect in ipairs(entries(delivery.target_effects)) do
+            if not diagnostic_visit(options) then return nil end
+            if effect.type == "create-entity"
+              and (effect.probability == nil or finite_positive(effect.probability)) then
+              local robot = data_raw.prototype("capture-robot", effect.entity_name)
+              if robot and finite_positive(robot.capture_speed) then return effect.entity_name end
+            end
+          end
+        end
+      end
+    end
+  end
+  return nil
+end
+
+local function capture_machine_witness(machine, category, options, state)
+  local profile = target_profiles.current()
+  if not profile or profile.supports_space_age ~= true then return nil end
+  local spawners = capturable_spawners(options, state)[machine.name] or {}
+  if #spawners == 0 then return nil end
+  local ammo_names, gun_names = {}, {}
+  for name in pairs(data_raw.prototypes("ammo")) do
+    if not diagnostic_visit(options) then return nil end
+    table.insert(ammo_names, name)
+  end
+  for name in pairs(data_raw.prototypes("gun")) do
+    if not diagnostic_visit(options) then return nil end
+    table.insert(gun_names, name)
+  end
+  table.sort(ammo_names); table.sort(gun_names)
+  local checkpoint = diagnostic_checkpoint(options)
+  for _, spawner in ipairs(spawners) do
+    if not diagnostic_visit(options) then return nil end
+    -- Capturing transforms the existing entity in place. Separate witnesses
+    -- on incompatible planets cannot supply this one transformation.
+    local conditions = {}
+    for _, condition in ipairs(machine.surface_conditions or {}) do
+      if not diagnostic_visit(options) then return nil end
+      table.insert(conditions, condition)
+    end
+    for _, condition in ipairs(spawner.surface_conditions or {}) do
+      if not diagnostic_visit(options) then return nil end
+      table.insert(conditions, condition)
+    end
+    if surface_satisfied(conditions, options, state) then
+      for _, ammo_name in ipairs(ammo_names) do
+        if not diagnostic_visit(options) then return nil end
+        local ammo = data_raw.prototype("ammo", ammo_name)
+        for _, ammo_type in ipairs(entries(ammo.ammo_type)) do
+          if not diagnostic_visit(options) then return nil end
+          local accepts_target = ammo_type.target_filter == nil
+          for _, name in ipairs(ammo_type.target_filter or {}) do
+            if not diagnostic_visit(options) then return nil end
+            if name == spawner.name then accepts_target = true end
+          end
+          local robot = accepts_target and capture_robot_from_action(ammo_type.action, options, 0) or nil
+          if robot then
+            for _, gun_name in ipairs(gun_names) do
+              if not diagnostic_visit(options) then return nil end
+              diagnostic_rollback(options, checkpoint)
+              local parameters = data_raw.prototype("gun", gun_name).attack_parameters or {}
+              local categories = parameters.ammo_categories
+              if categories == nil then categories = {parameters.ammo_category} end
+              local accepts_ammo = false
+              for _, gun_category in ipairs(categories) do
+                if not diagnostic_visit(options) then return nil end
+                if type(ammo.ammo_category) == "string" and gun_category == ammo.ammo_category then accepts_ammo = true end
+              end
+              if accepts_ammo then
+                local launcher = acquisition_witness({type = "item", name = gun_name}, options, state)
+                local ammunition = launcher and acquisition_witness({type = "item", name = ammo_name}, options, state) or nil
+                if ammunition then
+                  diagnostic_rollback(options, checkpoint)
+                  return {kind = "machine-capture", category = category, prototype = machine.name,
+                    captured_from = spawner.name, capture_robot = robot, gun = gun_name, ammo = ammo_name,
+                    launcher = launcher, ammunition = ammunition}
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return nil
+end
+
+local function machine_acquisition_witness(machines, category, recipe_name, options, state, required_ports)
+  local checkpoint = diagnostic_checkpoint(options)
+  for _, machine in ipairs(machines) do
+    if not diagnostic_visit(options) then return nil end
+    diagnostic_rollback(options, checkpoint)
+    local ports = machine.fluid_ports
+    local fluid_compatible = not required_ports or (not machine.handcrafting and ports
+      and ports.input >= required_ports.input and ports.output >= required_ports.output)
+    if fluid_compatible
+      and (machine.fixed_recipe == nil or machine.fixed_recipe == recipe_name)
+      and surface_satisfied(machine.surface_conditions, options, state) then
+      if machine.handcrafting then
+        diagnostic_rollback(options, checkpoint)
+        return {kind = "character-crafting", category = category, prototype = machine.name}
+      end
+      for _, item_name in ipairs(placement_items_for_machine(machine.name, options, state)) do
+        if not diagnostic_visit(options) then return nil end
+        diagnostic_rollback(options, checkpoint)
+        local item = prototype_lookup.item_prototype(item_name)
+        if item and item.place_result == machine.name then
+          local witness = acquisition_witness({type = "item", name = item_name}, options, state)
+          if witness then
+            diagnostic_rollback(options, checkpoint)
+            return {kind = "machine-placement", category = category, prototype = machine.name,
+              prototype_type = machine.prototype_type, item = item_name, acquisition = witness}
+          end
+        end
+      end
+      local captured = capture_machine_witness(machine, category, options, state)
+      if captured then return captured end
+    end
+  end
+  return nil
+end
+
+compatible_machine = function(category, recipe_name, options, state, required_ports)
+  if type(options.machine_category_witness) == "function" then
+    if options.machine_category_witness(category) == true then
+      return {kind = "declared-machine-category", category = category}
+    end
+    return nil
+  end
+  local machines = category_set_from_prototypes(state, options)[category] or {}
+  if type(options.research_unlock_witness) == "function" then
+    -- Try every independently acquired machine before following a machine's
+    -- research/lab graph. Alphabetical machine order must not force a late
+    -- furnace traversal when an initial furnace already proves this route.
+    -- Keep the same cycle state, structural requirements and observer; only
+    -- the optional research alternative is absent in this first pass.
+    local initial_options = copy_options(options)
+    initial_options.research_unlock_witness = nil
+    local checkpoint = diagnostic_checkpoint(options)
+    local witness = machine_acquisition_witness(machines, category, recipe_name, initial_options, state, required_ports)
+    diagnostic_rollback(options, checkpoint)
+    if witness then return witness end
+  end
+  return machine_acquisition_witness(machines, category, recipe_name, options, state, required_ports)
+end
+
+local function route_for_recipe(recipe_name, output_identity, options, state, require_enabled)
+  if not diagnostic_visit(options) then return nil end
+  local fact = options.recipe_index.facts[recipe_name]
+  if not fact then
+    record_diagnostic_failure(options, {
+      kind = "identity",
+      recipe = recipe_name,
+      identity = deepcopy(output_identity),
+      reason = "missing-recipe-fact"
+    })
+    return nil
+  end
+  if fact.hidden == true then
+    record_diagnostic_failure(options, {
+      kind = "identity",
+      recipe = recipe_name,
+      identity = deepcopy(output_identity),
+      reason = "hidden-recipe"
+    })
+    return nil
+  end
+  local route_checkpoint = diagnostic_checkpoint(options)
+  for _, variant in ipairs(variants_for(fact)) do
+    if not diagnostic_visit(options) then return nil end
+    -- The next alternative is the one currently selected for explanation.
+    -- A failed sibling is not an ancestor of this branch, so retaining it
+    -- would manufacture a mixed failure tree.
+    diagnostic_rollback(options, route_checkpoint)
+    local variant_name = variant.name or "default"
+    if variant.hidden == true then
+      record_diagnostic_failure(options, {
+        kind = "identity",
+        recipe = recipe_name,
+        variant = variant_name,
+        identity = deepcopy(output_identity),
+        reason = "hidden-variant"
+      })
+    elseif require_enabled and variant.enabled ~= true then
+      record_diagnostic_failure(options, {
+        kind = "identity",
+        recipe = recipe_name,
+        variant = variant_name,
+        identity = deepcopy(output_identity),
+        reason = "recipe-not-enabled"
+      })
+    else
+      local results = normalized_results(variant, options)
+      if not diagnostic_visit(options) then return nil
+      elseif not results_include_positive(results, output_identity, options, fact.schema == 2) then
+        record_diagnostic_failure(options, {
+          kind = "identity",
+          recipe = recipe_name,
+          variant = variant_name,
+          identity = deepcopy(output_identity),
+          reason = "output-identity-mismatch"
+        })
+      elseif variant.energy_required ~= nil
+        and not finite_positive(tonumber(variant.energy_required)) then
+        record_diagnostic_failure(options, {
+          kind = "identity",
+          recipe = recipe_name,
+          variant = variant_name,
+          identity = deepcopy(output_identity),
+          reason = "invalid-energy-required"
+        })
+      elseif not surface_satisfied(variant.surface_conditions, options, state) then
+        record_diagnostic_failure(options, {
+          kind = "identity",
+          recipe = recipe_name,
+          variant = variant_name,
+          identity = deepcopy(output_identity),
+          reason = "surface-conditions-unsatisfied"
+        })
+      else
+        local machine_witness
+        local required_ports = fluid_port_requirements(variant, results, options)
+        if required_ports == nil then return nil end
+        local categories = variant.categories or {"crafting"}
+        local machine_checkpoint = diagnostic_checkpoint(options)
+        for _, category in ipairs(categories) do
+          if not diagnostic_visit(options) then return nil end
+          diagnostic_rollback(options, machine_checkpoint)
+          machine_witness = compatible_machine(category, recipe_name, options, state, required_ports)
+          if machine_witness then break end
+        end
+        if machine_witness then
+          local ingredients_ok, ingredient_witnesses = true, {}
+          for _, ingredient in ipairs(normalized_ingredients(variant)) do
+            if not diagnostic_visit(options) then return nil end
+            local ingredient_identity = normalize_identity(ingredient)
+            if not ingredient_identity
+              or not finite_positive(tonumber(ingredient.amount or ingredient.amount_max or ingredient[2] or 1)) then
+              record_diagnostic_failure(options, {
+                kind = "identity",
+                recipe = recipe_name,
+                variant = variant_name,
+                identity = deepcopy(output_identity),
+                reason = "invalid-ingredient-identity"
+              })
+              ingredients_ok = false
+              break
+            end
+            local witness = acquisition_witness(ingredient_identity, options, state)
+            if not witness then
+              record_diagnostic_failure(options, {
+                kind = "ingredient",
+                recipe = recipe_name,
+                variant = variant_name,
+                identity = deepcopy(ingredient_identity),
+                reason = "unreachable-acquisition"
+              })
+              ingredients_ok = false
+              break
+            end
+            table.insert(ingredient_witnesses, witness)
+          end
+          if ingredients_ok then
+            -- A reachable variant selects this recipe route. None of the
+            -- diagnostic events produced by discarded sibling alternatives
+            -- are a structural failure of the selected route.
+            diagnostic_rollback(options, route_checkpoint)
+            return {
+              kind = "recipe",
+              recipe = recipe_name,
+              variant = variant.name or "default",
+              output = deepcopy(output_identity),
+              machine = machine_witness,
+              ingredients = ingredient_witnesses
+            }
+          end
+        else
+          record_diagnostic_failure(options, {
+            kind = "category",
+            recipe = recipe_name,
+            variant = variant_name,
+            category = categories[1],
+            identity = deepcopy(output_identity),
+            reason = "no-compatible-machine-category"
+          })
+        end
+      end
+    end
+  end
+  return nil
+end
+
+local function cacheable(options)
+  return type(options.source_witness) ~= "function"
+    and type(options.machine_category_witness) ~= "function"
+    and type(options.surface_witness) ~= "function"
+    -- An unlock witness is contextual: its caller carries the active
+    -- technology/science traversal.  A conclusion from that branch must not
+    -- become a reusable acquisition answer for another traversal.
+    and type(options.research_unlock_witness) ~= "function"
+end
+
+local function stable_cacheable(options)
+  return options.diagnostic_observer == nil
+    and type(options.source_witness) ~= "function"
+    and type(options.machine_category_witness) ~= "function"
+    and type(options.surface_witness) ~= "function"
+end
+
+local STABLE_SOURCE_KINDS = {
+  ["minable-resource"] = true,
+  ["minable-entity"] = true,
+  ["entity-loot"] = true,
+  ["offshore-pump"] = true,
+  ["boiler-conversion"] = true,
+  ["fluid-mixing"] = true
+}
+
+local function stable_acquisition_witness(witness)
+  if type(witness) ~= "table" then return false end
+  if STABLE_SOURCE_KINDS[witness.kind] then
+    local machine = witness.machine
+    if machine and (machine.kind ~= "machine-placement"
+      or not stable_acquisition_witness(machine.acquisition)) then return false end
+    for _, ingredient in ipairs(witness.ingredients or {}) do
+      if not stable_acquisition_witness(ingredient) then return false end
+    end
+    return true
+  end
+  if witness.kind ~= "recipe" then return false end
+  local machine = witness.machine
+  if not machine then return false end
+  if machine.kind == "machine-placement" then
+    if not stable_acquisition_witness(machine.acquisition) then return false end
+  elseif machine.kind == "machine-capture" then
+    if not stable_acquisition_witness(machine.launcher)
+      or not stable_acquisition_witness(machine.ammunition) then return false end
+  elseif machine.kind ~= "character-crafting" then return false end
+  for _, ingredient in ipairs(witness.ingredients or {}) do
+    if not stable_acquisition_witness(ingredient) then return false end
+  end
+  return true
+end
+
+-- A source witness or one enabled recipe alternative proves a product. The
+-- active acquisition-demand set makes recursive requirements AND, recipe alternatives
+-- OR, and rejects unseeded cycles. Default raw-prototype scans are cached only
+-- inside this one query state; no feasibility result is retained globally.
+local function acquisition_witness_impl(output_identity, options, state)
+  if not diagnostic_visit(options) then return nil end
+  local key = acquisition_key(output_identity)
+  local may_use_stable = stable_cacheable(options)
+  if may_use_stable and state.stable_acquisition_memo[key] ~= nil then
+    return deepcopy(state.stable_acquisition_memo[key])
+  end
+  -- A recursive answer is conditional on the caller's active cycle set. Only
+  -- a root query can safely memoize a positive or negative acquisition result;
+  -- recursive calls still reuse the bounded raw-prototype scan indexes.
+  local root_query = next(state.visiting) == nil
+  local may_cache = root_query and cacheable(options)
+  if may_cache and state.acquisition_memo[key] ~= nil then
+    local cached = state.acquisition_memo[key]
+    if cached == false then return nil end
+    return deepcopy(cached)
+  end
+  if state.visiting[key] then
+    record_diagnostic_failure(options, {
+      kind = "cycle",
+      identity = deepcopy(output_identity),
+      reason = "active-acquisition-identity"
+    })
+    return nil
+  end
+
+  local acquisition_checkpoint = diagnostic_checkpoint(options)
+  local direct = source_witness(output_identity, options, state)
+  if direct then
+    if may_use_stable and stable_acquisition_witness(direct) then
+      if state.stable_acquisition_memo[key] == nil then
+        state.stable_acquisition_generation = state.stable_acquisition_generation + 1
+      end
+      state.stable_acquisition_memo[key] = deepcopy(direct)
+    end
+    if may_cache then state.acquisition_memo[key] = deepcopy(direct) end
+    return direct
+  end
+
+  state.visiting[key] = true
+  for _, recipe_name in ipairs(sorted_producers(options.recipe_index, output_identity, options)) do
+    if not diagnostic_visit(options) then
+      state.visiting[key] = nil
+      return nil
+    end
+    -- Producer recipes are alternatives. Preserve only the branch being
+    -- evaluated, rather than accumulating causes from discarded siblings.
+    diagnostic_rollback(options, acquisition_checkpoint)
+    local witness = route_for_recipe(recipe_name, output_identity, options, state, true)
+    if witness then
+      state.visiting[key] = nil
+      -- As with recipe variants, one reachable producer proves acquisition;
+      -- provisional failures from other producers cannot be propagated as the
+      -- selected branch's explanation.
+      diagnostic_rollback(options, acquisition_checkpoint)
+      if may_use_stable and stable_acquisition_witness(witness) then
+        if state.stable_acquisition_memo[key] == nil then
+          state.stable_acquisition_generation = state.stable_acquisition_generation + 1
+        end
+        state.stable_acquisition_memo[key] = deepcopy(witness)
+      end
+      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      return witness
+    end
+  end
+  -- An enabled route is preferred, but an ingredient can also be supplied by
+  -- a concrete recipe whose unlock technology is already researchable.  The
+  -- caller supplies that proof because this generic structural module neither
+  -- owns the technology graph nor decides which research mechanisms qualify.
+  -- Keep the output active while asking for it so a locked reciprocal route
+  -- remains an unseeded cycle rather than becoming a bootstrap witness.
+  if type(options.research_unlock_witness) == "function" then
+    -- A researched acquisition is the final alternative. If it rejects, its
+    -- concrete technology/pair cause is more specific than an earlier
+    -- disabled producer and is therefore the selected failure tree.
+    diagnostic_rollback(options, acquisition_checkpoint)
+    if not diagnostic_visit(options) then
+      state.visiting[key] = nil
+      return nil
+    end
+    local witness = options.research_unlock_witness(deepcopy(output_identity), state)
+    if witness then
+      state.visiting[key] = nil
+      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      return witness
+    end
+  end
+  -- Same-fluid sources on opposite sides of a bounded demand can be mixed.
+  -- Keep both complete acquisition trees, so their machines and research
+  -- gates survive frontier extraction. One-sided demands never need this
+  -- alternative: mixing cannot exceed either source's temperature.
+  if output_identity.type == "fluid" and output_identity.minimum_temperature ~= nil
+    and output_identity.maximum_temperature ~= nil then
+    diagnostic_rollback(options, acquisition_checkpoint)
+    local cold = acquisition_witness({type = "fluid", name = output_identity.name,
+      maximum_temperature = output_identity.minimum_temperature}, options, state)
+    local hot = cold and acquisition_witness({type = "fluid", name = output_identity.name,
+      minimum_temperature = output_identity.maximum_temperature}, options, state)
+    if cold and hot then
+      state.visiting[key] = nil
+      diagnostic_rollback(options, acquisition_checkpoint)
+      local witness = {kind = "fluid-mixing", output = deepcopy(output_identity), ingredients = {cold, hot}}
+      if may_use_stable and stable_acquisition_witness(witness) then
+        if state.stable_acquisition_memo[key] == nil then
+          state.stable_acquisition_generation = state.stable_acquisition_generation + 1
+        end
+        state.stable_acquisition_memo[key] = deepcopy(witness)
+      end
+      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      return witness
+    end
+  end
+  state.visiting[key] = nil
+  if may_cache then state.acquisition_memo[key] = false end
+  record_diagnostic_failure(options, {
+    kind = "ingredient",
+    identity = deepcopy(output_identity),
+    reason = "no-enabled-acquisition-route"
+  })
+  return nil
+end
+
+acquisition_witness = function(output_identity, options, state)
+  -- Depth is observation-only and lives on the already query-local options
+  -- table. It never participates in source selection, cycle detection, or
+  -- acquisition memoization.
+  local previous_depth = options.diagnostic_depth or 0
+  options.diagnostic_depth = previous_depth + 1
+  local witness
+  if diagnostic_visit(options, options.diagnostic_depth) then
+    witness = acquisition_witness_impl(output_identity, options, state)
+  end
+  options.diagnostic_depth = previous_depth
+  return witness
+end
+
+function M.acquisition_witness(identity, options, state)
+  local output_identity = normalize_identity(identity)
+  if not output_identity then return nil end
+  local resolved = resolved_options(options)
+  return acquisition_witness(output_identity, resolved, query_state(state, resolved.recipe_index))
+end
+
+-- Prove a concrete route for a named output. Locked recipes may be checked as
+-- future production routes with require_enabled=false; their inputs still use
+-- only enabled alternatives or declared natural sources.
+function M.recipe_witness(recipe_name, output, options, state)
+  local output_identity = normalize_identity(output)
+  if not output_identity then return nil end
+  local resolved = resolved_options(options)
+  return route_for_recipe(
+    recipe_name,
+    output_identity,
+    resolved,
+    query_state(state, resolved.recipe_index),
+    resolved.require_enabled == true
+  )
+end
+
+function M.initial_recipe_witness(recipe_name, output, options, state)
+  -- Never mutate the caller's option table: a caller can safely reuse it for a
+  -- later locked-route query without inheriting require_enabled=true.
+  local initial_options = copy_options(options)
+  initial_options.require_enabled = true
+  -- Initial availability is a strict enabled-only proof. A future
+  -- research-unlocked ingredient may establish a later route, but it must not
+  -- turn an enabled outer recipe into an initial acquisition witness.
+  initial_options.research_unlock_witness = nil
+  return M.recipe_witness(recipe_name, output, initial_options, state)
+end
+
+return M

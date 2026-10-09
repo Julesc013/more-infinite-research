@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-assert-k2-imersite-maintenance-upgrade",
+  "version": "0.1.1",
+  "title": "MIR K2 Imersite published maintenance upgrade assertion",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base = 2.1.21", "more-infinite-research >= 4.2.21000", "Krastorio2 = 2.1.3", "Krastorio2-spaced-out = 2.0.13"]
+}

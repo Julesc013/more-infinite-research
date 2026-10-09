@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0 pre-freeze development"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-29
+last_reviewed: 2026-09-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -32,17 +32,19 @@ The shared T02 kernel is implemented under `tools/lib/mir4/ReleasePhaseEngine.ps
 
 T05 completes the ten-phase executor surface in rehearsal mode. Release seal assembles an unsigned, self-hashed exact-target closure and rejects any later byte-identity mutation. Promotion emits and re-verifies a fast-forward-only plan without updating refs or tags. Target publication consumes only exact sealed-byte identities, exposes no builder, and reconciles uncertain transfers by the same domain-separated idempotency key. Public readback compares every mandatory target/channel byte hash and byte count. Restore drill reconstructs a clean attempt-local closure and rejects extra or changed files. None of these operations creates a production seal, mutates a protected ref, calls a public service, or grants publication authority.
 
+A07 hardens this same non-production rehearsal by atomically recording an exact attempt-local publication intent before provider effects, binding the plan and candidate to explicit unallocated draft/tag identities, the exact seal-root identity, and the exact requested assets. Each deterministic transfer reconciles first: zero exact matches permits one transfer, one exact match is adopted, and many matches or any identity drift fails closed; atomically checkpointed terminal receipts support timeout, kill-equivalent, and verified local-copy interruption/resume. These records do not allocate a draft, tag, or seal, invoke network delivery, or change the false signing, promotion, or publication authority boundaries.
+
 T06 closes the ten-phase non-production rehearsal and fault-injection programme. The typed fault corpus binds each phase to its complete `Plan`, `DryRun`, `Execute`, `Verify`, and `Receipt` path plus one exact fail-closed injection. It covers unauthorized source freeze, incomplete target cardinality, wrong qualification package, changed preview bytes, wrong independent engine, post-assembly seal mutation, a stale promotion base, wrong publication bytes, wrong readback bytes, and an extra restored file. The aggregate verifier requires the T03, T04, T05, and T06 tests together; a metadata flag alone cannot satisfy rehearsal maturity.
 
 The workflow contract and release doctor use six ordered maturity fields: `workflow_registered`, `workflow_fail_closed`, `workflow_executor_implemented`, `workflow_dry_run_passed`, `workflow_production_rehearsal_passed`, and `workflow_production_authorized`. Registration and fail-closed behavior are safety properties, not evidence that a named release operation can run. All ten phases now truthfully report implementation, dry-run, and non-production production-shaped rehearsal maturity. `workflow_production_authorized` remains false for every phase. Source freeze remains blocked by protected signing/recovery, explicit maintainer F210/F200 playtest acceptance, later dependency work, and the separately authorized freeze decision.
 
 ## F210 engine selection
 
-`.mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json` supersedes the development plan's historical 2.1.14 engine binding for new F210 pre-freeze executions without altering that evidence. Before source freeze, F210 resolves the highest official experimental 2.1.x currently installed in the single authorized Steam installation at `C:\Program Files\Steam\steamapps\common\Factorio`; the support floor remains 2.1.8. Every build, automated qualification, and playtest session locks the observed version, Factorio build, Windows file version, executable SHA-256, Steam build ID, and app-manifest SHA-256. The resolver does not claim a globally latest version from local state.
+`.mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json` and its 2.1.8/2.1.17 evidence are immutable historical inputs. `.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json` is the current selection authority: before source freeze, F210 requires 2.1.18 or newer and resolves the highest official experimental 2.1.x currently installed in the single authorized Steam installation at `C:\Program Files\Steam\steamapps\common\Factorio`. Every build, automated qualification, and playtest session locks the observed version, Factorio build, Windows file version, executable SHA-256, Steam build ID, app-manifest SHA-256, and admitted API/prototype/data/mod closure. The resolver does not claim a globally latest version from local state, and the current engine capsule remains unadmitted until exact evidence is recorded.
 
 T19 must convert the then-current observation into an exact freeze lock only after explicit source-freeze authorization. Any later engine, Steam build, manifest, or official-data identity drift invalidates the F210 candidate and requires a rebuild plus complete F210 requalification; evidence from a nearby patch is never reused silently. This policy does not itself authorize T19, candidate allocation, signing, sealing, promotion, or publication.
 
-After Factorio 2.1 becomes officially stable and a separate append-only transition authority activates the stable phase, F210 uses two exact lanes: stable minimum 2.1.8 and latest official stable 2.1.x. Each lane receives its own exact candidate engine and official-data lock. The policy changes qualification selection, not the public compatibility floor and not any prototype.
+After Factorio 2.1 becomes officially stable and a separate append-only transition authority activates the stable phase, F210 uses two exact lanes. The stable-minimum lane is the numeric version maximum of requested 2.1.18, the first official 2.1 stable patch, and any later accepted mandatory floor; the stable-latest lane is the latest official stable 2.1.x. Each lane receives its own exact candidate engine and official-data lock. The policy changes the declared compatibility floor and qualification selection, not any prototype.
 
 ## Pre-freeze checks
 
@@ -61,6 +63,8 @@ Run any of the ten phase dry runs against exact source identities with:
 Use only repository-descendant package-excluded paths. Qualification execution reads `<proof-root>/qualification-workers/f200.json` and `f210.json`; independent verification reads the corresponding files under `<proof-root>/independent-receipts/`. Their schemas are the tracked worker and independent receipt V1 contracts. `M4RC1` is rejected while allocation is unauthorized. Execute, resume, verify, compensate, and receipt operations are available only inside the same non-production attempt boundary.
 
 The doctor checks the authority schemas and bindings, current F210 policy and authorized Steam experimental resolution, remote-ruleset snapshot, immutable action pins, publisher confinement, V1 default extension path, package identity, preview contract, the non-production phase kernel, workflow registration, and the distinct executor-maturity fields. Human signing input and explicit playtest acceptance remain separate blockers and are reported as such.
+
+When the current final-mile candidate authority does not bind this development package source, `release doctor --json --dry-run --output <path>` still emits parseable JSON, writes the explicitly requested output file during dry-run, and exits 2 because an automated check failed. It reports the unavailable candidate authority and blocks manual playtest inspection rather than inferring acceptance; human checks remain blockers, never approval.
 
 Audit the recorded branch and tag policy with:
 

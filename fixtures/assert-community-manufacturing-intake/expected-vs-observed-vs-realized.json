@@ -1,0 +1,776 @@
+{
+  "schema": 1,
+  "kind": "MIR4CommunityManufacturingIntakeStaticFixtureV1",
+  "status": "static-provenance-fixture-and-canonical-materialization-only",
+  "authority": {
+    "request_ids": ["BA-02", "BA-05", "BA-06", "NATIVE-01", "ECO-PY"],
+    "new_request_records": 0,
+    "source_intake_subjects": 23,
+    "engine_qualification": false,
+    "public_support_authority": false
+  },
+  "archives": {
+    "angelspetrochem_2.1.2.zip": "9B4CC14156CF16C9F41784108CCA5E767180A7330B1AF23A387231653CE10A49",
+    "angelssmelting_2.1.1.zip": "1DFCDD77D075FD545CFEE74BD8A6443E7E90B133D3832FDD47649C84892243A9",
+    "bobwarfare_3.0.1.zip": "903A09740B494E3A249A39C54D33260AC527A716D56C29482DB5022BC4DB8DFF",
+    "pyalienlife_3.1.5.zip": "6C0DDAB3694EB130DE10353AF5FD4075AE1B9F7945A6BA2E5254748B0E99D474",
+    "pycoalprocessing_3.1.4.zip": "3B6BC138DB314B4CECC50558E53F7569ECA3DB217FED9267495ACC9046146C07",
+    "pyfusionenergy_3.1.3.zip": "D459AC8248A37472B1BB5B0B48E0AD7FE9425B9CDA96C99DF71694850D7E0F0D",
+    "pyhightech_3.1.3.zip": "884FC3046A9918AEB662C7C1D32EA7B86CD3998936BF9B74E3A26EE9C2DF005D",
+    "pyindustry_3.1.3.zip": "9ED54953FCC6AE5CD7C5D692BF8F6A6BAAC53B3A13B39D594230CBBC2D078E7A",
+    "pypetroleumhandling_3.1.2.zip": "DC0D10EFE7E5347C4803263A707BAB8B53AB93A9644D78AC7C6BEBC7F1D41BCA",
+    "pypostprocessing_3.1.3.zip": "8B6CDFEC41F4D62D6F61F5181058FA8D144610F8F64FDC97302A7CB006853964",
+    "pyrawores_3.1.3.zip": "EA1ACE0AC408F291C5F5D6E5A8B4A50EF5DCB925CE077785727A88D0DECD8258"
+  },
+  "external_input_custody": {
+    "kind": "MIR4CommittedProvenanceSafeExternalObservationFixtureV1",
+    "archive_bytes_vendored": false,
+    "hosted_evaluation": "fixture-and-canonical-source-only",
+    "offline_replay": {
+      "parameter": "ArchiveRoot",
+      "archive_root_must_be_explicit": true,
+      "archive_hashes_must_match": true,
+      "purpose": "hash-bound-source-observation-replay-only",
+      "engine_qualification": false,
+      "public_support_authority": false
+    }
+  },
+  "wire_routes": [
+    {
+      "request_id": "BA-02",
+      "material": "gold",
+      "stream": "research_material_gold",
+      "technology": "recipe-prod-research_material_gold-1",
+      "recipe": "angels-wire-gold-2",
+      "product": "angels-wire-gold",
+      "recipe_member": "angelssmelting/prototypes/recipes/smelting-gold.lua",
+      "unpermitted_direct_recipe": "angels-wire-gold",
+      "coolant_return_recipe": "angels-wire-coil-gold-2"
+    },
+    {
+      "request_id": "BA-05",
+      "material": "platinum",
+      "stream": "research_material_platinum",
+      "technology": "recipe-prod-research_material_platinum-1",
+      "recipe": "angels-wire-platinum-2",
+      "product": "angels-wire-platinum",
+      "recipe_member": "angelssmelting/prototypes/recipes/smelting-platinum.lua",
+      "unpermitted_direct_recipe": "angels-wire-platinum",
+      "coolant_return_recipe": "angels-wire-coil-platinum-2"
+    },
+    {
+      "request_id": "BA-06",
+      "material": "silver",
+      "stream": "research_material_silver",
+      "technology": "recipe-prod-research_material_silver-1",
+      "recipe": "angels-wire-silver-2",
+      "product": "angels-wire-silver",
+      "recipe_member": "angelssmelting/prototypes/recipes/smelting-silver.lua",
+      "unpermitted_direct_recipe": "angels-wire-silver",
+      "coolant_return_recipe": "angels-wire-coil-silver-2"
+    }
+  ],
+  "ammunition_groups": [
+    {
+      "stream": "research_bullets",
+      "per_level": 0.1,
+      "products": ["bob-bullet-magazine", "bob-better-shotgun-shell"]
+    },
+    {
+      "stream": "research_bullets",
+      "per_level": 0.05,
+      "products": ["bob-ap-bullet-magazine", "bob-shotgun-ap-shell"]
+    },
+    {
+      "stream": "research_bullets",
+      "per_level": 0.02,
+      "products": ["bob-shotgun-uranium-shell"]
+    },
+    {
+      "stream": "research_bullets",
+      "per_level": 0.01,
+      "products": ["bob-he-bullet-magazine", "bob-flame-bullet-magazine", "bob-acid-bullet-magazine", "bob-poison-bullet-magazine", "bob-electric-bullet-magazine", "bob-plasma-bullet-magazine", "bob-shotgun-electric-shell", "bob-shotgun-explosive-shell", "bob-shotgun-flame-shell", "bob-shotgun-acid-shell", "bob-shotgun-poison-shell", "bob-shotgun-plasma-shell"]
+    },
+    {
+      "stream": "research_heavy_ammo",
+      "per_level": 0.01,
+      "products": ["bob-scatter-cannon-shell", "bob-poison-artillery-shell", "bob-fire-artillery-shell", "bob-explosive-artillery-shell", "bob-distractor-artillery-shell", "bob-atomic-artillery-shell"]
+    },
+    {
+      "stream": "research_rockets",
+      "per_level": 0.1,
+      "products": ["bob-rocket"]
+    },
+    {
+      "stream": "research_rockets",
+      "per_level": 0.05,
+      "products": ["bob-explosive-rocket"]
+    },
+    {
+      "stream": "research_rockets",
+      "per_level": 0.01,
+      "products": ["bob-piercing-rocket", "bob-electric-rocket", "bob-acid-rocket", "bob-flame-rocket", "bob-poison-rocket", "bob-plasma-rocket"]
+    }
+  ],
+  "ammunition_negative_controls": [
+    {
+      "recipe": "bob-fire-capsule",
+      "reason": "capsules are not admitted to the bullet-heavy-ammo-rocket manufacturing families"
+    },
+    {
+      "recipe": "bob-laser-rifle-battery",
+      "reason": "laser-rifle batteries are not admitted to the bullet-heavy-ammo-rocket manufacturing families"
+    }
+  ],
+  "angel_petrochem_source_intake": {
+    "archive": "angelspetrochem_2.1.2.zip",
+    "status": "exact-hash-source-observed-admission-blocked",
+    "subjects": [
+      {
+        "display_term": "nitric acid",
+        "identity": "angels-liquid-nitric-acid",
+        "routes": [
+          {
+            "recipe": "angels-liquid-nitric-acid",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-nitrogen.lua",
+            "category": "chemistry",
+            "ingredients": [
+              {"type": "fluid", "name": "angels-gas-nitrogen-dioxide", "amount": 100},
+              {"type": "fluid", "name": "angels-water-purified", "amount": 50}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-nitric-acid", "amount": 50}
+            ]
+          }
+        ],
+        "void_route_generated": true,
+        "disposition": "source-observed-admission-blocked"
+      },
+      {
+        "display_term": "hydrochloric acid",
+        "identity": "angels-liquid-hydrochloric-acid",
+        "routes": [
+          {
+            "recipe": "angels-liquid-hydrochloric-acid",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-chlorine.lua",
+            "category": "chemistry",
+            "ingredients": [
+              {"type": "fluid", "name": "angels-gas-hydrogen-chloride", "amount": 100},
+              {"type": "fluid", "name": "angels-water-purified", "amount": 50}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-hydrochloric-acid", "amount": 50}
+            ]
+          },
+          {
+            "recipe": "angels-liquid-hydrochloric-acid-solid-sodium-sulfate",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-chlorine.lua",
+            "category": "angels-liquifying",
+            "ingredients": [
+              {"type": "item", "name": "angels-solid-salt", "amount": 6},
+              {"type": "fluid", "name": "sulfuric-acid", "amount": 120}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-hydrochloric-acid", "amount": 70},
+              {"type": "item", "name": "angels-solid-sodium-sulfate", "amount": 3}
+            ],
+            "auto_recycle": false,
+            "coproduct_hazard": true
+          }
+        ],
+        "void_route_generated": true,
+        "disposition": "source-observed-admission-blocked"
+      },
+      {
+        "display_term": "hydrofluoric acid",
+        "identity": "angels-liquid-hydrofluoric-acid",
+        "routes": [
+          {
+            "recipe": "angels-liquid-hydrofluoric-acid",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-sulfur.lua",
+            "category": "angels-liquifying",
+            "ingredients": [
+              {"type": "item", "name": "angels-fluorite-ore", "amount": 5},
+              {"type": "fluid", "name": "sulfuric-acid", "amount": 50}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-hydrofluoric-acid", "amount": 50},
+              {"type": "item", "name": "angels-solid-calcium-sulfate", "amount": 1}
+            ],
+            "auto_recycle": false,
+            "coproduct_hazard": true
+          },
+          {
+            "recipe": "angels-hydrogen-fluoride-dissolving",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-sulfur.lua",
+            "category": "chemistry",
+            "ingredients": [
+              {"type": "fluid", "name": "angels-gas-hydrogen-fluoride", "amount": 90},
+              {"type": "fluid", "name": "angels-water-purified", "amount": 40}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-hydrofluoric-acid", "amount": 60}
+            ]
+          }
+        ],
+        "void_route_generated": true,
+        "disposition": "source-observed-admission-blocked"
+      },
+      {
+        "display_term": "glycerol",
+        "identity": "angels-liquid-glycerol",
+        "routes": [
+          {
+            "recipe": "angels-liquid-glycerol",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-chlorine.lua",
+            "category": "chemistry",
+            "ingredients": [
+              {"type": "fluid", "name": "angels-gas-epichlorohydrin", "amount": 100},
+              {"type": "fluid", "name": "angels-water-purified", "amount": 50}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-glycerol", "amount": 50}
+            ]
+          }
+        ],
+        "void_route_generated": true,
+        "disposition": "source-observed-admission-blocked"
+      }
+    ],
+    "rejected_subjects": [
+      {
+        "display_term": "nitroglycerin",
+        "observed_recipe": "angels-solid-nitroglycerin",
+        "member": "angelspetrochem/prototypes/recipes/petrochem-solids.lua",
+        "actual_result": {"type": "item", "name": "explosives", "amount": 2},
+        "disposition": "rejected-no-distinct-output-identity"
+      }
+    ],
+    "remaining_obligations": [
+      "Capture finalized prototypes in a dependency-valid exact Angel environment on F210 2.1.18 or later.",
+      "Resolve final productivity permission, native owner, unlock, science, laboratory and settings semantics.",
+      "Prove that admitted bonuses cannot exploit voids, coproducts, returns or closed loops.",
+      "Keep Py acid gas and Py glycerol in a separate selected-suite intake."
+    ]
+  },
+  "py_chemical_biology_source_intake": {
+    "request_id": "ECO-PY",
+    "status": "exact-hash-multi-archive-source-observed-admission-blocked",
+    "suite": {
+      "factorio_line": "2.1",
+      "minimum_non_graphics_source_archives": [
+        "pyalienlife_3.1.5.zip",
+        "pyrawores_3.1.3.zip",
+        "pypetroleumhandling_3.1.2.zip",
+        "pycoalprocessing_3.1.4.zip",
+        "pyfusionenergy_3.1.3.zip",
+        "pyhightech_3.1.3.zip",
+        "pyindustry_3.1.3.zip",
+        "pypostprocessing_3.1.3.zip"
+      ],
+      "graphics_archives_required_for_engine_loading": true,
+      "graphics_archives_required_for_source_observation": false,
+      "final_data_raw_observed": false
+    },
+    "subjects": {
+      "chemicals": ["acidgas", "glycerol"],
+      "plant_samples": [
+        "earth-generic-sample",
+        "earth-sunflower-sample",
+        "earth-flower-sample",
+        "earth-shroom-sample",
+        "earth-tropical-tree-sample",
+        "earth-potato-sample",
+        "earth-jute-sample",
+        "earth-venus-fly-sample"
+      ],
+      "conditional_plant_samples": ["earth-palmtree-sample"],
+      "tree_and_wood": ["wood-seedling", "wood-seeds", "tree-mk01", "tree-mk02", "tree-mk03", "tree-mk04", "log", "treated-wood"]
+    },
+    "chemical_routes": [
+      {
+        "subject": "acidgas",
+        "recipe": "dirty-acid",
+        "archive": "pycoalprocessing_3.1.4.zip",
+        "member": "pycoalprocessing/prototypes/recipes/recipes.lua",
+        "inputs": ["biofilm:1", "tailings:200"],
+        "outputs": ["acidgas:60"],
+        "unlock": "biofilm"
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "tailings-dust",
+        "archive": "pycoalprocessing_3.1.4.zip",
+        "member": "pycoalprocessing/prototypes/recipes/coal-processing-recipes.lua",
+        "inputs": ["tailings:100"],
+        "outputs": ["tailings-dust:4", "acidgas:30@independent_probability=0.5"],
+        "unlock": "fluid-processing-machines-1",
+        "hazards": ["probability-output", "coproduct"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "oleochemicals-distilation",
+        "archive": "pycoalprocessing_3.1.4.zip",
+        "member": "pycoalprocessing/prototypes/recipes/coal-processing-recipes.lua",
+        "inputs": ["oleochemicals:250", "water:400"],
+        "outputs": ["syngas:500", "petroleum-gas:100", "acidgas:100", "coal:10"],
+        "unlock": "advanced-oil-processing",
+        "hazards": ["multiple-coproducts"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "refsyngas-from-meth",
+        "archive": "pycoalprocessing_3.1.4.zip",
+        "member": "pycoalprocessing/prototypes/fluids/refsyngas.lua",
+        "inputs": ["syngas:100", "methanol:100"],
+        "outputs": ["refsyngas:100", "water:30", "carbon-dioxide:30", "acidgas:65"],
+        "unlock": "methanol-processing-2",
+        "hazards": ["multiple-coproducts"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "refsyngas-from-meth-canister",
+        "archive": "pycoalprocessing_3.1.4.zip",
+        "member": "pycoalprocessing/prototypes/fluids/refsyngas.lua",
+        "inputs": ["syngas:100", "methanol-gas-canister:1"],
+        "outputs": ["refsyngas:100", "water:30", "carbon-dioxide:20", "acidgas:60", "empty-gas-canister:1"],
+        "unlock": "methanol-processing-1",
+        "hazards": ["container-return-ignored-by-productivity"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "acidgas-2",
+        "archive": "pyfusionenergy_3.1.3.zip",
+        "member": "pyfusionenergy/prototypes/recipes/recipes.lua",
+        "inputs": ["flue-gas:2000", "water:600", "gasoline:5"],
+        "outputs": ["acidgas:30", "steam:600@temperature=150"],
+        "unlock": "advanced-oil-processing",
+        "hazards": ["steam-output-ignored-by-productivity-and-statistics"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "acidgas",
+        "archive": "pyhightech_3.1.3.zip",
+        "member": "pyhightech/prototypes/recipes/recipes.lua",
+        "inputs": ["sulfur:10", "refsyngas:100"],
+        "outputs": ["acidgas:150"],
+        "unlock": "sulfur-processing"
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "coalbed-gas-to-acidgas",
+        "archive": "pypetroleumhandling_3.1.2.zip",
+        "member": "pypetroleumhandling/prototypes/recipes/coalbed-recipes.lua",
+        "inputs": ["coalbed-gas:200", "hot-air:250"],
+        "outputs": ["acidgas:150", "flue-gas:900"],
+        "unlock": "petroleum-gas-mk01",
+        "hazards": ["coproduct"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "tholin-to-acidgas",
+        "archive": "pypetroleumhandling_3.1.2.zip",
+        "member": "pypetroleumhandling/prototypes/recipes/tholin-recipes.lua",
+        "inputs": ["tholins:50"],
+        "outputs": ["acidgas:240"],
+        "unlock": "tholin-mk02"
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "cadaveric-acidgas-01",
+        "archive": "pyalienlife_3.1.5.zip",
+        "member": "pyalienlife/prototypes/recipes/cadaveric-arum/recipes-cadaveric.lua",
+        "inputs": ["cadaveric-arum:2"],
+        "outputs": ["acidgas:100", "cadaveric-arum-seeds:2"],
+        "unlock": "cadaveric-arum",
+        "hazards": ["seed-return", "closed-loop-review-required"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "cadaveric-arum-mk02-juicer",
+        "archive": "pyalienlife_3.1.5.zip",
+        "member": "pyalienlife/prototypes/recipes/cadaveric-arum/recipes-arum-modules.lua",
+        "inputs": ["cadaveric-arum-mk02-seed-juice:75", "methanol:100", "sulfur:10"],
+        "outputs": ["cadaveric-arum-seeds-mk02:3", "dms:25", "acidgas:50"],
+        "hazards": ["seed-return", "multiple-coproducts", "closed-loop-review-required"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "cadaveric-arum-mk04-juicer",
+        "archive": "pyalienlife_3.1.5.zip",
+        "member": "pyalienlife/prototypes/recipes/cadaveric-arum/recipes-arum-modules.lua",
+        "inputs": ["cadaveric-arum-mk04-seed-juice:75", "coal-gas:500", "sulfur:10"],
+        "outputs": ["cadaveric-arum-seeds-mk04:3", "dms:25", "acidgas:50"],
+        "hazards": ["seed-return", "multiple-coproducts", "closed-loop-review-required"]
+      },
+      {
+        "subject": "acidgas",
+        "recipe": "pyrite-burn",
+        "archive": "pyrawores_3.1.3.zip",
+        "member": "pyrawores/prototypes/recipes/recipes.lua",
+        "inputs": ["pyrite:5"],
+        "outputs": ["acidgas:50", "iron-oxide:12"],
+        "unlock": "pyrite",
+        "hazards": ["coproduct"]
+      },
+      {
+        "subject": "glycerol",
+        "recipe": "oleochemicals",
+        "archive": "pycoalprocessing_3.1.4.zip",
+        "member": "pycoalprocessing/prototypes/recipes/mukmoux-recipes.lua",
+        "inputs": ["mukmoux-fat:20", "nichrome:1", "water:2000"],
+        "outputs": ["oleochemicals:300", "glycerol:150", "steam:2000"],
+        "unlock": "mukmoux",
+        "hazards": ["multiple-coproducts", "steam-output-ignored-by-productivity"]
+      },
+      {
+        "subject": "glycerol",
+        "recipe": "glycerol2",
+        "archive": "pyhightech_3.1.3.zip",
+        "member": "pyhightech/prototypes/recipes/recipes.lua",
+        "inputs": ["steam:300", "skin:5"],
+        "outputs": ["glycerol:50"]
+      },
+      {
+        "subject": "glycerol",
+        "recipe": "tholin-to-glycerol",
+        "archive": "pypetroleumhandling_3.1.2.zip",
+        "member": "pypetroleumhandling/prototypes/recipes/tholin-recipes.lua",
+        "inputs": ["tholins:50"],
+        "outputs": ["glycerol:210"]
+      },
+      {
+        "subject": "glycerol",
+        "recipe": "collagen-glycerol",
+        "archive": "pyrawores_3.1.3.zip",
+        "member": "pyrawores/prototypes/recipes/pyhightech-recipes.lua",
+        "inputs": ["water:100", "collagen:10"],
+        "outputs": ["glycerol:100"]
+      }
+    ],
+    "plant_sample_routes": [
+      {"identity": "earth-generic-sample", "recipe": "earth-generic-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/recipes.lua", "inputs": ["iron-chest:1", "automation-science-pack:15", "bio-sample:10"], "output": "earth-generic-sample:1", "unlock": "xenobiology"},
+      {"identity": "earth-flower-sample", "recipe": "earth-flower-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/ralesia/recipes-ralesia.lua", "inputs": ["earth-generic-sample:1", "automation-science-pack:100", "ralesia-codex:1"], "output": "earth-flower-sample:1"},
+      {"identity": "earth-sunflower-sample", "recipe": "earth-sunflower-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/rennea/recipes-rennea.lua", "inputs": ["earth-generic-sample:1", "logistic-science-pack:100", "rennea-codex:1"], "output": "earth-sunflower-sample:1"},
+      {"identity": "earth-shroom-sample", "recipe": "earth-shroom-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/fawogae/recipes-fawogae.lua", "inputs": ["wooden-chest:1", "automation-science-pack:100", "fawogae-codex:1"], "output": "earth-shroom-sample:1"},
+      {"identity": "earth-tropical-tree-sample", "recipe": "earth-tropical-tree-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/yotoi/recipes-yotoi.lua", "inputs": ["earth-generic-sample:1", "logistic-science-pack:100", "yotoi-codex:1"], "output": "earth-tropical-tree-sample:1"},
+      {"identity": "earth-potato-sample", "recipe": "earth-potato-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/tuuphra/recipes-tuuphra.lua", "inputs": ["earth-generic-sample:1", "logistic-science-pack:100", "tuuphra-codex:1"], "output": "earth-potato-sample:1"},
+      {"identity": "earth-jute-sample", "recipe": "earth-jute-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/grod/recipes-grod.lua", "inputs": ["earth-generic-sample:1", "logistic-science-pack:50", "grod-codex:1"], "output": "earth-jute-sample:1"},
+      {"identity": "earth-venus-fly-sample", "recipe": "earth-venus-fly-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/cridren/recipes-cridren.lua", "inputs": ["earth-generic-sample:1", "automation-science-pack:100", "cridren-codex:2"], "output": "earth-venus-fly-sample:1"},
+      {"identity": "earth-palmtree-sample", "recipe": "earth-palmtree-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/kicalk/recipes-kicalk.lua", "inputs": ["earth-generic-sample:1", "automation-science-pack:50", "kicalk-codex:1"], "output": "earth-palmtree-sample:1", "condition": "pyhightech"}
+    ],
+    "bootstrap_and_tree_routes": [
+      {"recipe": "bio-sample", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/recipes.lua", "inputs": ["bio-container:1", "native-flora:15"], "outputs": ["bio-sample:1"], "unlock": "biotech-mk01", "hazards": ["native-flora-acquisition-required"]},
+      {"recipe": "wood-seedling", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/recipes.lua", "inputs": ["wood-seeds:1", "moss:5", "water:100"], "outputs": ["wood-seedling:3"], "unlock": "wood-processing"},
+      {"recipe": "wood-seeds", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/recipes.lua", "inputs": ["wood:5"], "outputs": ["wood-seeds:4"], "unlock": "wood-processing", "hazards": ["seed-bootstrap-review-required"]},
+      {"recipe": "tree", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/tree/recipes-tree.lua", "inputs": ["wood-seedling:3", "planter-box:1"], "outputs": ["tree-mk01:1"], "unlock": "wood-processing", "hazards": ["tree-mk-items-are-modules-not-entities"]},
+      {"recipe": "wood-seeds-mk02", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/tree/recipes-tree-modules.lua", "inputs": ["tree-mk01:1", "tailings:200", "moss-gen:3"], "outputs": ["wood-seeds-mk02:1@independent_probability=0.005", "wood-seeds:1@independent_probability=0.5"], "hazards": ["probability-seed-returns", "tier-bootstrap", "closed-loop-review-required"]},
+      {"recipe": "wood-seeds-mk03", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/tree/recipes-tree-modules.lua", "inputs": ["tree-mk02:1", "tailings:200", "anthracene-oil:200", "moss-gen:5", "cdna:3"], "outputs": ["wood-seeds-mk03:1@independent_probability=0.005", "wood-seeds-mk02:1@independent_probability=0.5"], "hazards": ["probability-seed-returns", "tier-bootstrap", "closed-loop-review-required"]},
+      {"recipe": "wood-seeds-mk04", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/tree/recipes-tree-modules.lua", "inputs": ["tree-mk03:1", "chelator:200", "anthracene-oil:400", "moss-gen:7", "cdna:5", "peptidase-m58:3"], "outputs": ["wood-seeds-mk04:1@independent_probability=0.005", "wood-seeds-mk03:1@independent_probability=0.5"], "hazards": ["probability-seed-returns", "tier-bootstrap", "closed-loop-review-required"]},
+      {"recipe": "wood-seeds-mk02-breeder", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/tree/recipes-tree-modules.lua", "inputs": ["tree-mk02:1"], "outputs": ["wood-seeds-mk02:5"], "hazards": ["deterministic-seed-breeder", "closed-loop-review-required"]},
+      {"recipe": "wood-seeds-mk03-breeder", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/tree/recipes-tree-modules.lua", "inputs": ["tree-mk03:1"], "outputs": ["wood-seeds-mk03:5"], "hazards": ["deterministic-seed-breeder", "closed-loop-review-required"]},
+      {"recipe": "wood-seeds-mk04-breeder", "archive": "pyalienlife_3.1.5.zip", "member": "pyalienlife/prototypes/recipes/tree/recipes-tree-modules.lua", "inputs": ["tree-mk04:1"], "outputs": ["wood-seeds-mk04:5"], "hazards": ["deterministic-seed-breeder", "closed-loop-review-required"]},
+      {"recipe_family": "log-base", "archive": "pycoalprocessing_3.1.4.zip", "member": "pycoalprocessing/prototypes/recipes/coal-processing-recipes.lua", "outputs": ["log:3"], "variants": ["log1", "log2", "log3", "log4", "log5", "log6"]},
+      {"recipe_family": "log-waste-water", "archive": "pyfusionenergy_3.1.3.zip", "member": "pyfusionenergy/prototypes/recipes/recipes.lua", "outputs": ["log:3"], "variants": ["log7", "log8"]},
+      {"recipe_family": "log-fertilized", "archive": "pyhightech_3.1.3.zip", "member": "pyhightech/prototypes/recipes/recipes.lua", "outputs": ["log:3"], "variants": ["log7-2"]},
+      {"recipe": "log-wood", "archive": "pycoalprocessing_3.1.4.zip", "member": "pycoalprocessing/prototypes/recipes/coal-processing-recipes.lua", "inputs": ["log:4"], "outputs": ["wood:20"]},
+      {"recipe": "treated-wood", "archive": "pycoalprocessing_3.1.4.zip", "member": "pycoalprocessing/prototypes/recipes/coal-processing-recipes.lua", "inputs": ["creosote:100", "wood:1"], "outputs": ["treated-wood:2"]}
+    ],
+    "absent_subjects": [
+      {"display_term": "nitroglycerin", "checked_aliases": ["nitroglycerin", "nitro-glycerin", "nitro_glycerin"], "disposition": "not-present-in-exact-selected-py-source-suite"}
+    ],
+    "finalizer_observations": {
+      "target_recipe_blocks_directly_author_permission": false,
+      "generic_maximum_productivity_when_absent": 1000000,
+      "auto_recycle_observed_on_target_routes": false,
+      "permission_sources": ["pypostprocessing/lib/metas/recipe.lua", "pypostprocessing/data-final-fixes.lua", "per-mod-data-final-fixes"],
+      "qualification_boundary": "static source does not establish final permission, realized route, unlock timing, acquisition, conservation safety or native ownership"
+    },
+    "remaining_obligations": [
+      "Capture finalized data.raw in the exact dependency-valid suite on a governed Factorio engine.",
+      "Resolve final permission, unlock, acquisition, science, laboratory, native-owner and settings semantics.",
+      "Prove probability returns, seed and native-flora bootstrap, coproducts, containers and closed loops conserve resources under the admitted bonus.",
+      "Admit only independently useful final routes; keep absent nitroglycerin and unsafe or circular routes explicitly withheld.",
+      "Run representative early and late saves before making an ECO-PY support claim."
+    ]
+  },
+  "angel_petrochem_implementation": {
+    "status": "conditional-current-source-declarations-native-admission-pending",
+    "stream_keys": [
+      "research_material_nitric_acid",
+      "research_material_hydrochloric_acid",
+      "research_material_hydrofluoric_acid",
+      "research_material_glycerol"
+    ],
+    "generated_technologies": [
+      "recipe-prod-research_material_nitric_acid-1",
+      "recipe-prod-research_material_nitric_acid-4",
+      "recipe-prod-research_material_hydrochloric_acid-1",
+      "recipe-prod-research_material_hydrochloric_acid-4",
+      "recipe-prod-research_material_hydrofluoric_acid-1",
+      "recipe-prod-research_material_hydrofluoric_acid-4",
+      "recipe-prod-research_material_glycerol-1",
+      "recipe-prod-research_material_glycerol-4"
+    ],
+    "productive_output_type": "fluid",
+    "early_levels": 3,
+    "effect_per_level": 0.02,
+    "continuation_first_level": 4,
+    "route_permission_grants": false,
+    "route_certificate_exceptions": false,
+    "engine_qualification": false,
+    "public_support_authority": false
+  },
+  "realization": {
+    "targets": ["f210", "f200", "f110", "f100"],
+    "source_path": "source/prototypes/streams/productivity.lua",
+    "output_path": "prototypes/streams/productivity.lua",
+    "materialize_target": "all-declared-targets"
+  },
+  "non_claims": [
+    "No Factorio engine execution or F210 >=2.1.18 capsule pass.",
+    "No broad Bob, Angel, or combined-environment compatibility claim.",
+    "No save, migration, balance, native-owner, or public-release qualification.",
+    "No admission of direct Angel wire, coolant-returning wire coils, capsules, or laser-rifle batteries.",
+    "No current native admission, emitted catalogue, earned production or save qualification for the conditional Angel Petrochem declarations.",
+    "No Py gameplay, engine, finalized-prototype, permission, safety, progression, save, migration, or public-support claim.",
+    "No distinct Py nitroglycerin subject in the selected exact source suite."
+  ],
+  "py_chemical_implementation": {
+    "request_id": "ECO-PY",
+    "status": "conditional-current-source-declarations-native-admission-pending",
+    "stream_keys": [
+      "research_material_py_acid_gas",
+      "research_material_py_glycerol"
+    ],
+    "generated_technologies": [
+      "recipe-prod-research_material_py_acid_gas-1",
+      "recipe-prod-research_material_py_acid_gas-4",
+      "recipe-prod-research_material_py_glycerol-1",
+      "recipe-prod-research_material_py_glycerol-4"
+    ],
+    "productive_output_type": "fluid",
+    "early_levels": 3,
+    "effect_per_level": 0.02,
+    "continuation_first_level": 4,
+    "source_producers": {
+      "research_material_py_acid_gas": [
+        "dirty-acid",
+        "tailings-dust",
+        "oleochemicals-distilation",
+        "refsyngas-from-meth",
+        "refsyngas-from-meth-canister",
+        "acidgas-2",
+        "acidgas",
+        "coalbed-gas-to-acidgas",
+        "tholin-to-acidgas",
+        "cadaveric-acidgas-01",
+        "cadaveric-arum-mk02-juicer",
+        "cadaveric-arum-mk04-juicer",
+        "pyrite-burn"
+      ],
+      "research_material_py_glycerol": [
+        "oleochemicals",
+        "glycerol2",
+        "tholin-to-glycerol",
+        "collagen-glycerol"
+      ]
+    },
+    "route_permission_grants": false,
+    "route_certificate_exceptions": false,
+    "engine_qualification": false,
+    "public_support_authority": false,
+    "biology_sample_or_tree_qualification": false,
+    "required_mods": [
+      "pycoalprocessing"
+    ]
+  },
+  "py_sample_implementation": {
+    "request_id": "ECO-PY",
+    "status": "conditional-current-source-declarations-native-admission-pending",
+    "subjects": [
+      {
+        "stream_key": "research_material_py_earth_generic_sample",
+        "item": "earth-generic-sample",
+        "source_producers": [
+          "earth-generic-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_flower_sample",
+        "item": "earth-flower-sample",
+        "source_producers": [
+          "earth-flower-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_sunflower_sample",
+        "item": "earth-sunflower-sample",
+        "source_producers": [
+          "earth-sunflower-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_shroom_sample",
+        "item": "earth-shroom-sample",
+        "source_producers": [
+          "earth-shroom-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_tropical_tree_sample",
+        "item": "earth-tropical-tree-sample",
+        "source_producers": [
+          "earth-tropical-tree-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_potato_sample",
+        "item": "earth-potato-sample",
+        "source_producers": [
+          "earth-potato-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_jute_sample",
+        "item": "earth-jute-sample",
+        "source_producers": [
+          "earth-jute-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_venus_fly_sample",
+        "item": "earth-venus-fly-sample",
+        "source_producers": [
+          "earth-venus-fly-sample"
+        ],
+        "required_mods": [
+          "pyalienlife"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_earth_palmtree_sample",
+        "item": "earth-palmtree-sample",
+        "source_producers": [
+          "earth-palmtree-sample"
+        ],
+        "required_mods": [
+          "pyalienlife",
+          "pyhightech"
+        ]
+      }
+    ],
+    "generated_technologies": [
+      "recipe-prod-research_material_py_earth_generic_sample-1",
+      "recipe-prod-research_material_py_earth_generic_sample-4",
+      "recipe-prod-research_material_py_earth_flower_sample-1",
+      "recipe-prod-research_material_py_earth_flower_sample-4",
+      "recipe-prod-research_material_py_earth_sunflower_sample-1",
+      "recipe-prod-research_material_py_earth_sunflower_sample-4",
+      "recipe-prod-research_material_py_earth_shroom_sample-1",
+      "recipe-prod-research_material_py_earth_shroom_sample-4",
+      "recipe-prod-research_material_py_earth_tropical_tree_sample-1",
+      "recipe-prod-research_material_py_earth_tropical_tree_sample-4",
+      "recipe-prod-research_material_py_earth_potato_sample-1",
+      "recipe-prod-research_material_py_earth_potato_sample-4",
+      "recipe-prod-research_material_py_earth_jute_sample-1",
+      "recipe-prod-research_material_py_earth_jute_sample-4",
+      "recipe-prod-research_material_py_earth_venus_fly_sample-1",
+      "recipe-prod-research_material_py_earth_venus_fly_sample-4",
+      "recipe-prod-research_material_py_earth_palmtree_sample-1",
+      "recipe-prod-research_material_py_earth_palmtree_sample-4"
+    ],
+    "productive_output_type": "item",
+    "early_levels": 3,
+    "effect_per_level": 0.02,
+    "continuation_first_level": 4,
+    "route_permission_grants": false,
+    "route_certificate_exceptions": false,
+    "engine_qualification": false,
+    "public_support_authority": false,
+    "angel_plant_life_sample_qualification": false,
+    "tree_or_bootstrap_qualification": false
+  },
+  "py_forestry_implementation": {
+    "request_id": "ECO-PY",
+    "status": "conditional-current-source-declarations-native-admission-pending",
+    "subjects": [
+      {
+        "stream_key": "research_material_py_log",
+        "item": "log",
+        "source_producers": [
+          "log1",
+          "log2",
+          "log3",
+          "log4",
+          "log5",
+          "log6",
+          "log7",
+          "log8",
+          "log7-2"
+        ],
+        "required_mods": [
+          "pycoalprocessing"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_wood",
+        "item": "wood",
+        "source_producers": [
+          "log-wood"
+        ],
+        "required_mods": [
+          "pycoalprocessing"
+        ]
+      },
+      {
+        "stream_key": "research_material_py_treated_wood",
+        "item": "treated-wood",
+        "source_producers": [
+          "treated-wood"
+        ],
+        "required_mods": [
+          "pycoalprocessing"
+        ]
+      }
+    ],
+    "generated_technologies": [
+      "recipe-prod-research_material_py_log-1",
+      "recipe-prod-research_material_py_log-4",
+      "recipe-prod-research_material_py_treated_wood-1",
+      "recipe-prod-research_material_py_treated_wood-4",
+      "recipe-prod-research_material_py_wood-1",
+      "recipe-prod-research_material_py_wood-4"
+    ],
+    "productive_output_type": "item",
+    "early_levels": 3,
+    "effect_per_level": 0.02,
+    "continuation_first_level": 4,
+    "route_permission_grants": false,
+    "route_certificate_exceptions": false,
+    "engine_qualification": false,
+    "public_support_authority": false,
+    "seed_tree_module_or_bootstrap_qualification": false
+  }
+}

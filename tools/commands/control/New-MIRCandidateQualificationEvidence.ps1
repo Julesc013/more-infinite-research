@@ -57,7 +57,14 @@ if ($LASTEXITCODE -ne 0 -or $head -ne [string]$plan.source_commit -or $tree -ne 
     (Test-MIRPackageSourceGitDirty -RepoRoot $repo) -or (Test-MIRValidationHarnessGitDirty -RepoRoot $repo)) {
   throw "Candidate qualification projection requires its exact clean committed source and validation harness."
 }
-$info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+# C32 is a completed MIR 3 qualification record.  Preserve its writer as a
+# pinned historical verifier rather than deriving a C32 receipt from current
+# MIR 4 package metadata.
+$c32Record = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/records/3.2.5.json') | ConvertFrom-Json
+$c32SourceCommit = [string]$c32Record.package.source_commit
+$c32InfoText = @(& git -C $repo show "$c32SourceCommit`:info.json") -join "`n"
+if ($LASTEXITCODE -ne 0) { throw "C32 historical source info is unavailable: $c32SourceCommit" }
+$info = $c32InfoText | ConvertFrom-Json
 $profile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion ([string]$info.factorio_version)
 $requiredGroups = @($profile.required_validation_groups | ForEach-Object { [string]$_ } | Sort-Object -Unique)
 $factorio = @($plan.tests | Where-Object requires_factorio | Select-Object -First 1)[0].fingerprint.inputs.factorio

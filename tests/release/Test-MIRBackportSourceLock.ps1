@@ -200,7 +200,13 @@ if ($LASTEXITCODE -ne 0 -or [string]$anchorRefCommit -ne [string]$lock.canonical
 & git -C $RepoRoot merge-base --is-ancestor ([string]$lock.canonical_dev_anchor) HEAD
 if ($LASTEXITCODE -ne 0) { throw "Target history does not contain the canonical development anchor." }
 
-$info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+# The lock describes a published backport.  Its product identity belongs to the
+# lock's pinned package-source object, not to the current MIR 4 source tree.
+$historicalSourceCommit = [string]$lock.projection.package_source_commit
+if ($historicalSourceCommit -notmatch '^[0-9a-f]{40}$') { throw 'Published backport lock lacks a pinned package source commit.' }
+$historicalInfoText = @(& git -C $RepoRoot show "$historicalSourceCommit`:info.json") -join "`n"
+if ($LASTEXITCODE -ne 0) { throw "Published backport source info is unavailable: $historicalSourceCommit" }
+$info = $historicalInfoText | ConvertFrom-Json
 $infoTarget = [string]$info.factorio_version
 if ([string]::IsNullOrWhiteSpace($infoTarget)) {
   $identityCatalogPath = Join-Path $RepoRoot ".mir\museum-targets.json"

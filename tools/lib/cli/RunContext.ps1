@@ -26,13 +26,14 @@ function New-MIRRunContext {
   $gitBranch = (& git -C $RepoRoot rev-parse --abbrev-ref HEAD 2>$null | Select-Object -First 1)
   $gitCommit = (& git -C $RepoRoot rev-parse HEAD 2>$null | Select-Object -First 1)
   $mirVersion = ""
-  $infoPath = Join-Path $RepoRoot "info.json"
-  if (Test-Path -LiteralPath $infoPath) {
-    try {
-      $mirVersion = [string]((Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json).version)
-    } catch {
-      $mirVersion = ""
+  try {
+    if (-not (Get-Command New-MIR4CurrentTargetPackageContext -ErrorAction SilentlyContinue)) {
+      . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
     }
+    $targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target 'f210'
+    $mirVersion = [string]((Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json).version)
+  } catch {
+    $mirVersion = ""
   }
   $factorioVersion = ""
   if (-not [string]::IsNullOrWhiteSpace($FactorioBin) -and (Test-Path -LiteralPath $FactorioBin)) {

@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0105",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Search associated recipe and material names in the Research Library.",
+  "details": [
+    "The existing player-local translation window now resolves each technology caption with its unlock/productivity recipes and declared item/fluid products. The copied-data query searches those names separately from the technology caption and keeps stable action identities.",
+    "Partial translated search results share the existing deferred refresh. Subject, payload and saved-index budgets retain raw-ID fallback and show a limitation tooltip when coverage is incomplete. Pending callbacks retain their locale/catalogue generation boundaries.",
+    "Controlled actual-adapter, host-dispatch and query regressions pass. Current-package native localization, interaction, saves, multiplayer and performance remain pending; this draft fragment establishes no release acceptance.",
+    "Completes the 142 missing/stale governed keys in all 49 non-English locale memories through explicitly selected, machine-assisted drafts. The existing locale runner now preserves trusted unselected source/memory pairs instead of redrafting older entries; no human linguistic review is implied."
+  ],
+  "semantic_domains": [
+    "presentation",
+    "runtime",
+    "localization",
+    "tooling",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Adds localized associated recipe/material discovery to the accepted Library layout; native interaction, save, multiplayer and performance acceptance remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Adds localized associated recipe/material discovery to the accepted Library layout; native interaction, save, multiplayer and performance acceptance remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Refreshes governed translations of shared source strings. This target still omits the modern Research Library capability; translated source bytes do not deliver that surface."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Refreshes governed translations of shared source strings. This target still omits the modern Research Library capability; translated source bytes do not deliver that surface."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Refreshes governed translations of shared source strings. This target still omits the modern Research Library capability; translated source bytes do not deliver that surface."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Refreshes governed translations of shared source strings. This target still omits the modern Research Library capability; translated source bytes do not deliver that surface."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Refreshes governed translations of shared source strings. This target still omits the modern Research Library capability; translated source bytes do not deliver that surface."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Refreshes governed translations of shared source strings. This target still omits the modern Research Library capability; translated source bytes do not deliver that surface."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Refreshes governed translations of shared source strings. This target still omits the modern Research Library capability; translated source bytes do not deliver that surface."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/runtime/research_browser_discovery_regressions.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-integration-and-delivery-plan.md"
+    }
+  ]
+}

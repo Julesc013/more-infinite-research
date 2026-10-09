@@ -96,7 +96,7 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
     "dirtying git",
     "scaffolding"
   )
-  $path = Join-Path $repo "changelog.txt"
+  $path = Get-MIRValidationPath -RelativePath "changelog.txt"
   $lines = @(Get-Content -LiteralPath $path -Encoding UTF8)
   if ($lines.Count -eq 0) {
     throw "changelog.txt is empty."
@@ -183,4 +183,3 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
     throw "changelog.txt ended immediately after a separator."
   }
 }
-

@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0127",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Fall back from unavailable DLC artwork in research icons and the Research Library shortcut.",
+  "details": [
+    "A saved or imported installed-DLC-icon opt-in no longer selects Space Age or Elevated Rails files while that provider is inactive. The shortcut and technology selector use the same active-provider query; enabled providers keep their artwork.",
+    "Keep the default-off setting, imported profile values and all research identities/effects. Explain that installed but disabled DLC cannot be checked safely during construction and therefore uses base artwork.",
+    "Controlled current-source checks reproduce the predecessor's imported-opt-in failure and cover provider combinations, opposing raw/imported values, technology layers and both shortcut sizes. Actual graphical startup and published-predecessor upgrade acceptance remain pending."
+  ],
+  "semantic_domains": ["presentation", "compatibility", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Shared DLC technology selector and large/small Library shortcut are corrected; actual graphics acceptance remains pending."},
+    {"target":"F200","disposition":"affected","reason":"Shared DLC technology selector and large/small Library shortcut are corrected; actual graphics acceptance remains pending."},
+    {"target":"F110","disposition":"affected","reason":"Shared technology presentation falls back from inactive providers; no Library backport is introduced."},
+    {"target":"F100","disposition":"affected","reason":"Shared technology presentation falls back from inactive providers; no Library backport is introduced."},
+    {"target":"F017","disposition":"affected","reason":"Shared technology presentation and setting tooltip change; historical engine acceptance remains separate."},
+    {"target":"F016","disposition":"affected","reason":"Shared technology presentation and setting tooltip change; historical engine acceptance remains separate."},
+    {"target":"F015","disposition":"affected","reason":"Shared technology presentation and setting tooltip change; historical engine acceptance remains separate."},
+    {"target":"F014","disposition":"affected","reason":"Shared technology presentation changes; historical engine acceptance remains separate."},
+    {"target":"F013","disposition":"affected","reason":"Shared technology presentation changes; historical engine acceptance remains separate."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"none","settings":"changed","migration":"none","compatibility":"changed","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"DLC-01 in spec/programmes/community-requests.json"},
+    {"kind":"finding","value":"tests/compiler/community_hotfix.lua"},
+    {"kind":"document","value":"docs/reference/asset-sources.md"}
+  ]
+}

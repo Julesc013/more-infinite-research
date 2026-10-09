@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "kind": "MIR4BobTinManufacturingMachineMatrixV1",
+  "scope": "F210 Bob-only finite Tin manufacturing-machine matrix diagnostic; package-excluded evidence",
+  "target": {
+    "factorio_line": "2.1",
+    "factorio_version": "2.1.17",
+    "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+    "boblibrary": {"version": "3.0.0", "sha256": "49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4"},
+    "bobores": {"version": "3.0.0", "sha256": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B"},
+    "bobplates": {"version": "3.0.1", "sha256": "503D7BF6E88DA1F99463AC00CEC959C2003B2701D80DC4A564CF2EC3920AC8AF"}
+  },
+  "official_mod_closure": [
+    {"name": "base", "enabled": true},
+    {"name": "elevated-rails", "enabled": false},
+    {"name": "quality", "enabled": false},
+    {"name": "recycler", "enabled": false},
+    {"name": "space-age", "enabled": false}
+  ],
+  "route": {
+    "recipe": "bob-tin-plate",
+    "category": "smelting",
+    "input": {"type": "item", "name": "bob-tin-ore", "amount": 1},
+    "output": {"type": "item", "name": "bob-tin-plate", "amount": 1},
+    "allow_productivity": true,
+    "auto_recycle": false
+  },
+  "mir_owner": {
+    "stream_key": "research_material_tin",
+    "technology": "recipe-prod-research_material_tin-1",
+    "effect_type": "change-recipe-productivity",
+    "effect_recipe": "bob-tin-plate",
+    "effect_change_per_completed_level": 0.02,
+    "exact_owner_count": 1,
+    "prototype_max_level": "infinite"
+  },
+  "machine_selection": {
+    "entity_types_scanned": ["assembling-machine", "furnace"],
+    "required_crafting_category": "smelting",
+    "required_place_item_rule": "item-place-result-equals-entity-name",
+    "supported_runtime_energy_types": ["burner", "electric"],
+    "runtime_category_validation_rule": "contains-exact-data-stage-categories-plus-entity-type-specific-recipe-assignment",
+    "expected_unadmitted_matching_entities": [],
+    "machines": [
+      {"name": "bob-electric-mixing-furnace", "entity_type": "assembling-machine", "place_item": "bob-electric-mixing-furnace", "energy_type": "electric", "crafting_categories": ["bob-mixing-furnace", "smelting"]},
+      {"name": "bob-steel-mixing-furnace", "entity_type": "assembling-machine", "place_item": "bob-steel-mixing-furnace", "energy_type": "burner", "crafting_categories": ["bob-mixing-furnace", "smelting"]},
+      {"name": "bob-stone-mixing-furnace", "entity_type": "assembling-machine", "place_item": "bob-stone-mixing-furnace", "energy_type": "burner", "crafting_categories": ["bob-mixing-furnace", "smelting"]},
+      {"name": "electric-furnace", "entity_type": "furnace", "place_item": "electric-furnace", "energy_type": "electric", "crafting_categories": ["smelting"]},
+      {"name": "steel-furnace", "entity_type": "furnace", "place_item": "steel-furnace", "energy_type": "burner", "crafting_categories": ["smelting"]},
+      {"name": "stone-furnace", "entity_type": "furnace", "place_item": "stone-furnace", "energy_type": "burner", "crafting_categories": ["smelting"]}
+    ]
+  },
+  "runtime_energy_provisioning": {
+    "burner": "solid-fuel-in-crafter-fuel-inventory",
+    "electric": "verified-per-tick-electric-buffer"
+  },
+  "runtime_recipe_assignment": {
+    "assembling-machine": "direct-set-recipe-bob-tin-plate",
+    "furnace": "automatic-smelting-selection-validated-by-bob-tin-plate-output"
+  },
+  "cap_transport": {
+    "raw_direct_max_level": 2,
+    "mirset1_imported_max_level": 3,
+    "effective_max_level": 3,
+    "no_level_4": true
+  },
+  "production": {
+    "input_ore_per_machine_per_level": 100,
+    "output_drain_observed": true,
+    "requires_input_exhaustion": true,
+    "levels": [
+      {"completed_level": 0, "expected_output": 100, "expected_bonus": 0},
+      {"completed_level": 1, "expected_output": 102, "expected_bonus": 2},
+      {"completed_level": 2, "expected_output": 104, "expected_bonus": 4},
+      {"completed_level": 3, "expected_output": 106, "expected_bonus": 6}
+    ]
+  },
+  "evidence_role": "bounded manufacturing-machine diagnostic input to A06 BA-07 A17 and PROG-01; not completion authority",
+  "explicit_non_claims": [
+    "actual-gameplay-balance",
+    "all-Bob-recipes-or-machine-stages",
+    "Angel-or-combined-Bob-Angel-admission",
+    "F200",
+    "upgrade-or-migration",
+    "infinite-continuation",
+    "human-playtest",
+    "release-readiness",
+    "full-BA-07-or-PROG-01"
+  ]
+}

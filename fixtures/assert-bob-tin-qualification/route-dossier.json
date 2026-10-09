@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "scope": "F210 Bob-only finite Tin qualification; package-excluded fixture evidence",
+  "target": {
+    "factorio_line": "2.1",
+    "factorio_version": "2.1.17",
+    "bobplates_version": "3.0.1",
+    "bobplates_sha256": "503D7BF6E88DA1F99463AC00CEC959C2003B2701D80DC4A564CF2EC3920AC8AF",
+    "boblibrary_version": "3.0.0",
+    "boblibrary_sha256": "49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4",
+    "bobores_version": "3.0.0",
+    "bobores_sha256": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B"
+  },
+  "route": {
+    "recipe": "bob-tin-plate",
+    "categories": ["smelting"],
+    "machine_witness": "stone-furnace",
+    "input": { "type": "item", "name": "bob-tin-ore", "amount": 1 },
+    "output": { "type": "item", "name": "bob-tin-plate", "amount": 1 },
+    "allow_productivity": true,
+    "auto_recycle": false,
+    "byproducts": [],
+    "catalysts": [],
+    "return_or_recycling_paths": []
+  },
+  "mir_owner": {
+    "stream_key": "research_material_tin",
+    "technology": "recipe-prod-research_material_tin-1",
+    "effect_type": "change-recipe-productivity",
+    "effect_recipe": "bob-tin-plate",
+    "runtime_enforced_max_level": 3,
+    "prototype_max_level": "infinite",
+    "raw_direct_max_level": 2,
+    "mirset1_imported_max_level": 3,
+    "identity_state": "stable-unreleased"
+  },
+  "explicit_non_claims": [
+    "F200",
+    "Angel or combined Bob/Angel route qualification",
+    "PIPE-01",
+    "infinite continuation",
+    "weighted balance",
+    "full BA-07 or PROG-01",
+    "release readiness"
+  ]
+}
