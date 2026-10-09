@@ -112,13 +112,18 @@
       "tests": ["static.immutable-input-staging"]
     },
     {
+      "id": "upgrade-manifest-inputs",
+      "patterns": ["^tests/tooling/Test-MIRUpgradeManifest[.]ps1$", "^tests/runtime/Test-MIRUpgrade[.]ps1$", "^tests/support/MIR421(?:K2|SpaceFake)Upgrade[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210[.]json$"],
+      "tests": ["static.upgrade-manifest-inputs"]
+    },
+    {
       "id": "mir42-candidate-construction",
       "patterns": [
         "^tests/release/Test-MIR42FourTargetCandidateBuild[.]ps1$",
         "^tools/commands/release/New-MIR42(?:FourTarget|HistoricalPlaytest)Candidate[.]ps1$",
         "^tools/mir/application/package/TargetMaterializer[.]ps1$",
         "^tools/mir/application/release/readiness/MIR42(?:CandidateBuild|FourTargetPreflight)[.]ps1$",
-        "^spec/schemas/mir42-four-target-deterministic-candidate-manifest-v[12][.]schema[.]json$",
+        "^spec/schemas/mir42-four-target-deterministic-candidate-manifest-v[123][.]schema[.]json$",
         "^targets/historical/",
         "^source/package-source[.]json$",
         "^targets/package-authority[.]json$"

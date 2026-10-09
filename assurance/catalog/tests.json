@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 229,
+  "test_count": 230,
   "tests": [
     {
       "id": "docs.check",
@@ -7824,6 +7824,7 @@
         "tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v3.schema.json",
         "source:source/package-source.json",
         "targets/package-authority.json",
         "targets/historical/**",
@@ -8315,6 +8316,36 @@
       "matrix": null
     },
     {
+      "id": "static.upgrade-manifest-inputs",
+      "proposition": "The governed test 'static.upgrade-manifest-inputs' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRUpgradeManifest.ps1",
+      "canonical_implementation": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/tooling/Test-MIRUpgradeManifest.ps1",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/support/MIR421K2Upgrade.ps1",
+        "tests/support/MIR421SpaceFakeUpgrade.ps1",
+        "tools/lib/validation/MIR4DistributionIdentity.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
+        "fixtures/run-profiles/k2-213-imersite-f210.json",
+        "targets/historical/**"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "tooling.self-test",
       "proposition": "The governed test 'tooling.self-test' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -8365,11 +8396,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 69,
-      "runtime-upgrade": 57,
+      "runtime-upgrade": 58,
       "compiler-static": 19,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 216,
+    "canonical_test_commands": 217,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8382,5 +8413,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:3a82f6eecd3e9d9fbd5fbfedfc09519575b60c8201b404ce15f439ea6f0f03a0"
+  "digest": "sha256:d7394d4cb822fd37a38760412a8d41ff4a12fe26fe198b0dc4e288172633469c"
 }

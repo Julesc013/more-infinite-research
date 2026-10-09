@@ -49,7 +49,7 @@ function Assert-MIR421NativeEngineIdentity {
 function Get-MIR42ReleaseTargetIdentity {
   param([Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0')
+    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0')
   if ($Target -in @('f210','f200','f110','f100')) {
     return Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
   }
@@ -83,6 +83,7 @@ function Get-MIR42CandidateConstructionVersionContract {
   $sourceVersion = switch ($schemaVersion) {
     1 { '4.2.0' }
     2 { '4.2.1' }
+    3 { '4.2.2' }
     default { throw '[mir42-candidate-construction-version-contract]' }
   }
   $kind = "MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"
@@ -94,7 +95,7 @@ function Get-MIR42CandidateConstructionVersionContract {
     manifest_kind = $kind
     source_version = $sourceVersion
     schema_path = Join-Path $RepoRoot "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v$schemaVersion.schema.json"
-    requires_nine_targets = $schemaVersion -eq 2
+    requires_nine_targets = $schemaVersion -ge 2
   }
 }
 

@@ -7,6 +7,18 @@
   ],
   "paths": [
     {
+      "pattern": "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
       "pattern": "tests/runtime/k2_imersite_version_controls.lua",
       "scenarios": [],
       "tags": [],

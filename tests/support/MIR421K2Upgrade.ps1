@@ -11,11 +11,13 @@ function Read-MIR421K2UpgradeProfile {
   $expected=[ordered]@{base='2.1.21';'elevated-rails'='2.1.21';quality='2.1.21';recycler='2.1.21';'space-age'='2.1.21';
     flib='0.17.2';'k2so-assets'='1.0.7';Krastorio2='2.1.3';'Krastorio2-spaced-out'='2.0.13';
     Krastorio2Assets='2.1.0';Krastorio2MenuSimulations='2.1.0';'xy-k2so-enhancements-nulls-fork'='0.8.3';
-    'more-infinite-research'='4.2.21001';'mir-fixture-assert-k2-213-imersite-continuation'='0.1.3'}
+    'more-infinite-research'='4.2.21001';'mir-fixture-assert-k2-213-imersite-continuation'=@('0.1.3','0.1.4')}
+  # Both retained profile versions select the same dependency releases. The
+  # fresh-game fixture is excluded below and replaced by the upgrade fixture.
   if(@($profile.mods).Count-ne$expected.Count){throw '[mir421-k2-upgrade-selection]'}
   foreach($name in $expected.Keys){
     $rows=@($profile.mods|Where-Object name -CEQ $name)
-    if($rows.Count-ne1-or$rows[0].enabled-isnot[bool]-or-not$rows[0].enabled-or$rows[0].version-cne$expected[$name]){throw "[mir421-k2-upgrade-selection] $name"}
+    if($rows.Count-ne1-or$rows[0].enabled-isnot[bool]-or-not$rows[0].enabled-or$rows[0].version-cnotin@($expected[$name])){throw "[mir421-k2-upgrade-selection] $name"}
   }
   $builtins=@('base','elevated-rails','quality','recycler','space-age')
   $dependencies=@($profile.mods|Where-Object {$_.name-cnotin$builtins-and$_.name-cne'more-infinite-research'-and$_.name-cne'mir-fixture-assert-k2-213-imersite-continuation'})

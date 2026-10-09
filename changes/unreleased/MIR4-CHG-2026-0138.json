@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0138",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Construct explicit nine-target 4.2.2 candidates with a versioned private manifest.",
+  "details": [
+    "The existing joined writer selects all nine CCC02 identities when source 4.2.2 is requested and records construction manifest V3. Older defaults and V1/V2 meanings remain intact.",
+    "Engine and seal construction readers consume the same strict V3 contract. The upgrade version resolver recognizes V3 and all nine CCC02 final-manifest inputs. Source-version, target, archive-path and incomplete-state controls retain the private unqualified boundary.",
+    "This change supplies a construction contract, not a release or executed native campaign. Actual current packages, published 4.2.1 predecessor custody and the downstream 4.2.2 qualification/seal/publication bindings remain required.",
+    "Focused upgrade checks exposed and repaired the K2 4.2.1 profile reader rejecting continuation fixture 0.1.4. Both retained 0.1.3/0.1.4 profile selections preserve exact dependencies and replace the fresh-game fixture; unknown versions remain refused."
+  ],
+  "semantic_domains": [
+    "testing",
+    "release"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Explicit CCC02 identity in the existing nine-target private construction and input readers; actual release qualification remains pending."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "docs/releases/mir42-nine-target-candidate-playtest-matrix.md",
+      "kind": "document"
+    },
+    {
+      "value": "A14/X17 joined 4.2.2 construction and published-4.2.1 upgrade acceptance remain pending",
+      "kind": "finding"
+    }
+  ]
+}

@@ -35,7 +35,7 @@ if(-not $manifestPath){
 $manifest=Get-Content -Raw $manifestPath|ConvertFrom-Json -Depth 100
 $assertions=0
 foreach($row in $manifest.targets){
-  $construction=$manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2')
+  $construction=$manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3')
   $relative=if($construction){$row.asset.path}else{$row.filename}
   $zip=Join-Path (Split-Path $manifestPath -Parent) $relative
   $version=Resolve-MIRUpgradeManifestVersion -ManifestPath $manifestPath -CandidatePath $zip -Target $row.target
@@ -71,6 +71,32 @@ $fixture.targets[0].sha256=(Get-FileHash -LiteralPath $futureZip).Hash
 $fixture.targets+=@($fixture.targets[0]);Write-UpgradeManifestFixture
 Assert-UpgradeManifestRejected '[mir-upgrade-manifest-target]'
 $historicalAssertions=0
+$maintenance422Assertions=0
+$currentManifestPath=Join-Path $testRoot 'current-maintenance-manifest.json'
+$currentRows=@()
+$lines=@{'210'='2.1';'200'='2.0';'110'='1.1';'100'='1.0';'017'='0.17';'016'='0.16';'015'='0.15';'014'='0.14';'013'='0.13'}
+foreach($code in @('210','200','110','100','017','016','015','014','013')){
+  $version="4.2.${code}02";$path=Join-Path $testRoot "more-infinite-research_$version.zip"
+  $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
+  try{
+    $entry=$zip.CreateEntry("more-infinite-research_$version/info.json");$writer=[IO.StreamWriter]::new($entry.Open())
+    try{$writer.Write((@{name='more-infinite-research';version=$version;factorio_version=$lines[$code]}|ConvertTo-Json -Compress))}finally{$writer.Dispose()}
+  }finally{$zip.Dispose()}
+  $currentRows+=@{target="f$code";filename=[IO.Path]::GetFileName($path);distribution_version=$version;sha256=(Get-FileHash $path).Hash}
+}
+$currentManifest=@{kind='MIR42FinalReleaseManifestV1';source_tag='v4.2.2';targets=$currentRows}
+$currentManifest|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $currentManifestPath
+foreach($row in $currentRows){
+  $actual=Resolve-MIRUpgradeManifestVersion -ManifestPath $currentManifestPath -CandidatePath (Join-Path $testRoot $row.filename) -Target $row.target
+  if($actual-cne$row.distribution_version){throw 'Current maintenance version differs from selected target'}
+  $maintenance422Assertions++
+}
+$currentManifest.source_tag='v4.2.1'
+$currentManifest|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $currentManifestPath
+$rejected=$false
+try{Resolve-MIRUpgradeManifestVersion -ManifestPath $currentManifestPath -CandidatePath (Join-Path $testRoot $currentRows[0].filename) -Target f210|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir4-distribution-source-patch]')}
+if(-not$rejected){throw 'Current maintenance archive was accepted under a previous release tag'}
+$maintenance422Assertions++
 $historicalCases=@(
   @{code='017';line='0.17';terminal='1.7.9';infinite='mining-productivity-4'},
   @{code='016';line='0.16';terminal='1.6.9';infinite='mining-productivity-16'},
@@ -112,6 +138,21 @@ foreach($case in $historicalCases){
 $k2Assertions=0
 $profilePath=Join-Path $RepoRoot 'fixtures/run-profiles/k2-213-imersite-f210.json'
 $bound=Read-MIR421K2UpgradeProfile -Path $profilePath
+foreach($fixtureVersion in @('0.1.3','0.1.4','0.1.5')){
+  $variant=Get-Content -LiteralPath $profilePath -Raw|ConvertFrom-Json -Depth 20
+  @($variant.mods|Where-Object name -CEQ 'mir-fixture-assert-k2-213-imersite-continuation')[0].version=$fixtureVersion
+  $variantPath=Join-Path $testRoot ('k2-profile-'+$fixtureVersion+'.json')
+  $variant|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $variantPath
+  if($fixtureVersion-ceq'0.1.5'){
+    $rejected=$false
+    try{Read-MIR421K2UpgradeProfile -Path $variantPath|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-selection]')}
+    if(-not$rejected){throw 'Unreviewed fresh fixture profile was admitted'}
+  }else{
+    $selected=Read-MIR421K2UpgradeProfile -Path $variantPath
+    if(($selected.inputs|ConvertTo-Json -Depth 10 -Compress)-cne($bound.inputs|ConvertTo-Json -Depth 10 -Compress)-or@($selected.inputs|Where-Object file_name -Like '*continuation*').Count){throw 'K2 upgrade profile changed dependencies or retained the replaced fresh fixture'}
+  }
+  $k2Assertions++
+}
 if($bound.inputs.Count-ne7-or@($bound.inputs|Where-Object {$_.identity.name-like'mir-fixture-*'-or$_.identity.name-ceq'more-infinite-research'}).Count){throw 'K2 upgrade must consume only the seven exact dependencies'}
 $k2Assertions++
 $mutatedPath=Join-Path $testRoot 'k2-input-profile.json'
@@ -191,4 +232,4 @@ $currentK2.K2ImersiteInputProfile=''
 $rejected=$false
 try{Assert-MIR421CurrentUpgradeInputMode @currentK2}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-inputs-required]')}
 if(-not$rejected){throw 'Current-package K2 mode accepted without its locked profile'};$currentAssertions++
-[pscustomobject]@{status='passed';assertions=$assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

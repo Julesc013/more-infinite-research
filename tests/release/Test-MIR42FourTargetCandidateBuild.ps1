@@ -31,10 +31,12 @@ $maintenanceSealAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 $script:mir42CandidateReceiptAssertions = 0
+$script:mir422ConstructionAssertions = 0
 
 function Assert-MIR42CandidateBuildTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Message)
   if (-not $Condition) { throw "[mir42-candidate-build-test] $Message" }
+  if ($Message.StartsWith('422-',[StringComparison]::Ordinal)) { $script:mir422ConstructionAssertions++ }
 }
 
 function New-MIR4TargetPackage {
@@ -236,15 +238,15 @@ try {
   Assert-MIR42CandidateBuildTest (@($patchDescriptors|Where-Object{[string]$_.source_version-cne'4.2.1'-or[bool]$_.public_output_authorized-or[bool]$_.publication_authorized}).Count-eq0) 'nine-target-requested-source-private-boundary'
   Assert-MIR42CandidateBuildTest (@($nineDescriptors|Where-Object{[string]$_.source_version-cne'4.2.0'}).Count-eq0) 'historical-default-source-preserved'
   $unsupportedSourceRejected=$false
-  try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2'|Out-Null}catch{$unsupportedSourceRejected=$true}
+  try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.3'|Out-Null}catch{$unsupportedSourceRejected=$true}
   Assert-MIR42CandidateBuildTest $unsupportedSourceRejected 'unsupported-source-version-rejected'
-  foreach ($schemaVersion in @(1,2)) {
+  foreach ($schemaVersion in @(1,2,3)) {
     $versionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $repo -Manifest ([pscustomobject]@{schema=$schemaVersion;kind="MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"})
-    $expectedSource = if ($schemaVersion -eq 1) { '4.2.0' } else { '4.2.1' }
-    Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -eq 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
+    $expectedSource = @('4.2.0','4.2.1','4.2.2')[$schemaVersion-1]
+    Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -ge 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
   }
   foreach ($badContract in @(
-    [pscustomobject]@{schema=3;kind='MIR42FourTargetDeterministicCandidateManifestV3'},
+    [pscustomobject]@{schema=4;kind='MIR42FourTargetDeterministicCandidateManifestV4'},
     [pscustomobject]@{schema=2;kind='MIR42FourTargetDeterministicCandidateManifestV1'}
   )) {
     $rejected = $false
@@ -328,6 +330,47 @@ try {
   $schemaRoot = Join-Path $identityRoot 'schema'
   New-Item -ItemType Directory -Force -Path $schemaRoot | Out-Null
   $schemaComplete = Write-MIR42FourTargetManifest -OutputRoot $schemaRoot -Preflight $schemaPreflight -Rows $schemaRows -Failures @()
+  # Exercise the existing writer and consumed envelope readers for the next
+  # maintenance cut. These metadata rows are not built or qualified packages.
+  $currentDescriptors=@(Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2')
+  $currentVersions=@('4.2.21002','4.2.20002','4.2.11002','4.2.10002','4.2.01702','4.2.01602','4.2.01502','4.2.01402','4.2.01302')
+  Assert-MIR42CandidateBuildTest (($currentDescriptors.target-join'|')-ceq($patchDescriptors.target-join'|')-and($currentDescriptors.distribution_version-join'|')-ceq($currentVersions-join'|')) '422-default-selects-nine-exact-identities'
+  for($i=0;$i-lt$currentVersions.Count;$i++){
+    $currentIdentity=Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $currentDescriptors[$i].target -SourceVersion '4.2.2'
+    Assert-MIR42CandidateBuildTest ($currentIdentity.source_version-ceq'4.2.2'-and$currentIdentity.distribution_version-ceq$currentVersions[$i]-and$currentIdentity.package_name-ceq("more-infinite-research_"+$currentVersions[$i]+'.zip')) "422-release-identity-$i"
+  }
+  $rejected=$false
+  try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2' -SelectedTargets @('f210','f200','f110','f100')|Out-Null}catch{$rejected=$_.Exception.Message-match'mir42-candidate-target-selection-unsupported'}
+  Assert-MIR42CandidateBuildTest $rejected '422-rejects-four-target-selection'
+  $currentPreflight=$schemaPreflight|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  $currentPreflight.target_authority=@($currentDescriptors|Select-Object target,target_id,source_version,distribution_version)
+  $currentRows=@(foreach($d in $currentDescriptors){[pscustomobject]@{target=$d.target;distribution_version=$d.distribution_version;asset=@{path="assets/$($d.target)/more-infinite-research_$($d.distribution_version).zip";bytes=1;sha256=('A'*64)};content_sha256=('B'*64);entry_count=1}})
+  $currentRoot=Join-Path $identityRoot 'schema-422';New-Item -ItemType Directory -Path $currentRoot|Out-Null
+  $currentManifest=Write-MIR42FourTargetManifest -OutputRoot $currentRoot -Preflight $currentPreflight -Rows $currentRows -Failures @()
+  $currentContract=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $currentManifest
+  $currentEnvelope=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $currentRoot 'candidate-manifest.json')
+  Assert-MIR42CandidateBuildTest ($currentManifest.schema-eq3-and$currentContract.source_version-ceq'4.2.2'-and$currentEnvelope.source_version-ceq'4.2.2'-and$currentEnvelope.nine_targets-and-not$currentManifest.publication_authorized-and$currentManifest.qualification-ceq'not-performed') '422-writer-and-consumed-readers-preserve-private-boundary'
+  foreach($mutate in @(
+    {param($m)$m.target_authority[0].source_version='4.2.1'},
+    {param($m)$m.targets[0].distribution_version='4.2.21001'},
+    {param($m)$m.targets[0].asset.path='assets/f210/more-infinite-research_4.2.21001.zip'},
+    {param($m)$m.targets[0].target='f200'},
+    {param($m)$m.targets=@($m.targets[0])},
+    {param($m)$m.publication_authorized=$true},
+    {param($m)$m.qualification='passed'}
+  )){
+    $invalid=$currentManifest|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+    & $mutate $invalid
+    $invalid.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $invalid
+    $rejected=$false
+    try{Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $invalid|Out-Null}catch{$rejected=$_.Exception.Message-match'mir42-seal-candidate-manifest-schema'}
+    Assert-MIR42CandidateBuildTest $rejected '422-rejects-mixed-version-target-or-authority'
+  }
+  $currentPartial=Write-MIR42FourTargetManifest -OutputRoot $currentRoot -Preflight $currentPreflight -Rows @($currentRows[0]) -Failures @(@{target='f200';message='controlled incomplete construction'})
+  Assert-MIR42CandidateBuildTest (-not$currentPartial.build_complete-and$currentPartial.schema-eq3) '422-partial-state-retained'
+  $rejected=$false
+  try{Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $currentRoot 'candidate-manifest.json')|Out-Null}catch{$rejected=$_.Exception.Message-match'mir42-engine-candidate-manifest-invalid'}
+  Assert-MIR42CandidateBuildTest $rejected '422-partial-construction-not-engine-acceptance'
   Assert-MIR42CandidateBuildTest ($schemaComplete.schema -eq 2 -and $schemaComplete.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV2' -and (Test-MIR4BootstrapRecordHash -Record $schemaComplete)) 'patch-v2-manifest-writer-and-record-hash'
   $sealVersion=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $schemaComplete
   Assert-MIR42CandidateBuildTest ($sealVersion.source_version-ceq'4.2.1'-and$sealVersion.requires_nine_targets) 'seal-reader-selects-v2-nine-target-contract-without-qualification'
@@ -811,7 +854,7 @@ try {
   Assert-MIR42CandidateBuildTest ($rejected-and-not(Test-Path -LiteralPath (Join-Path $identityRoot 'must-not-create.json'))) 'maintenance-criterion-cli-forwards-and-refuses-out-of-scope-option'
   $maintenanceCriterionAssertions++
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; source_versions=@('4.2.0','4.2.1','4.2.2'); current_maintenance_contract_assertions=$script:mir422ConstructionAssertions; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 
