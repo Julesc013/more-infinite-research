@@ -37,4 +37,11 @@ function M.technology(name)
   return M.prototype("technology", name)
 end
 
+function M.feature_enabled(name)
+  -- Available data-stage capabilities come from the engine, not installed
+  -- files, mod names or player appearance preferences. Older engines and
+  -- incomplete captures cannot grant a capability by omission.
+  return type(feature_flags) == "table" and feature_flags[name] == true
+end
+
 return M

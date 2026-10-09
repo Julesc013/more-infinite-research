@@ -66,6 +66,30 @@ run(raw, function(owner)
   check('LR06', telemetry and telemetry.counters.item_prototype_index_builds == 1,
     'Normal lab queries reuse the existing item prototype index')
 end)
+-- A spoilage result can also be a lab placement item. Exercise the real item
+-- index, recipe facts, lab service and researchability together, with no
+-- unconditional acquisition stub or Factorio process.
+do
+  local previous_flags = _G.feature_flags
+  for _, case in ipairs({
+    {id = 'enabled', flag = true, seed = true, expected = true},
+    {id = 'disabled', flag = false, seed = true, expected = false},
+    {id = 'unseeded', flag = true, seed = false, expected = false}
+  }) do
+    _G.feature_flags = {spoiling = case.flag}
+    raw = world()
+    raw.item['perishable-kit'] = {type = 'item', name = 'perishable-kit',
+      spoil_ticks = 60, spoil_result = 'lab-kit'}
+    raw.recipe.make_lab = case.seed and recipe('make_lab', 'perishable-kit') or nil
+    run(raw, function()
+      check('LR-SPOIL-' .. case.id,
+        (researchability.technology_researchability_reason('Probe') == nil) == case.expected,
+        'The real lab service requires an acquired spoilage input and the enabled engine capability')
+    end)
+  end
+  _G.feature_flags = previous_flags
+end
+
 -- Historical engines use the player prototype for handcrafting. The selected
 -- adapter owns that capability; an unrelated prototype table cannot grant it.
 do

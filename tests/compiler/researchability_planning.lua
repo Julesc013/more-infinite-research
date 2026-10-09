@@ -166,6 +166,7 @@ route_policy = require("prototypes.mir.capabilities.science_integration.producti
 
 local function reset(next_world, fixture_fluid_crafter)
   world = next_world
+  _G.feature_flags = world.feature_flags
   -- Existing fluid-shape fixtures need independently acquired placement
   -- actors, separate from their output/filter oracle. These resources are
   -- controlled fixture inputs, not a source policy or native placement claim.
@@ -581,6 +582,142 @@ local function route_fact(output, ingredients, options)
       surface_conditions = options.surface_conditions
     }}
   }
+end
+
+-- Native spoilage is a conditional item source, not a recipe and not an
+-- unconditional seed. These controlled prototypes exercise actual acquisition
+-- and science traversal, without claiming native production or freshness.
+do
+  local function spoilage_world(locked)
+    local w = {
+      feature_flags = {spoiling = true},
+      item_prototypes = {
+        bacteria = {spoil_ticks = 3600, spoil_result = "ore"}, ore = {}, starter = {}
+      },
+      labs = {lab = {inputs = {"ore", "starter"}}}, techs = {},
+      recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+      resources = {seed = {minable = {result = locked and "starter" or "bacteria", count = 1}}}
+    }
+    if locked then
+      w.techs.Culture = technology("starter", "culture")
+      w.recipe_prototypes.culture = {enabled = false}
+      w.recipe_facts.culture = route_fact("bacteria", {{name = "starter", amount = 1}}, {enabled = false})
+      w.producers.bacteria = {"culture"}
+      w.unlockers.culture = {"Culture"}
+    end
+    return w
+  end
+  local previous_version = target_profile.current_factorio_version
+  for _, version in ipairs({"2.0", "2.1"}) do
+    target_profile.current_factorio_version = version
+    reset(spoilage_world())
+    local witness = feasibility.acquisition_witness("ore")
+    check("SPOIL01-" .. version, witness and witness.kind == "item-spoilage"
+      and witness.prototype == "bacteria" and witness.spoil_ticks == 3600
+      and witness.ingredients and witness.ingredients[1].product.name == "bacteria",
+      "An acquired item can spoil into a declared item while preserving its seed witness")
+    check("SPOIL02-" .. version, production.pack_production_status("ore", {}) == "non-recipe"
+      and feasibility.acquisition_witness({type = "fluid", name = "ore"}) == nil,
+      "A lab-listed spoilage item can supply science without inventing a same-named fluid")
+    if witness then witness.ingredients[1].product.name = "mutated" end
+    local repeated = feasibility.acquisition_witness("ore")
+    check("SPOIL03-" .. version, repeated and repeated.ingredients[1].product.name == "bacteria"
+      and context.states.compiler_telemetry.counters.item_prototype_index_builds == 1,
+      "Returned proofs are private and normal queries share one item index per context")
+
+    reset(spoilage_world(true))
+    local status = production.pack_production_status("ore", {})
+    local route = production.independent_pack_acquisition_witness("ore", "unrelated", {}, {})
+    check("SPOIL04-" .. version, status == "research" and route
+      and route.source.kind == "item-spoilage" and table.concat(route.unlockers, ",") == "Culture"
+      and table.concat(production.prereq_techs_for_science_pack("ore"), ",") == "Culture",
+      "The spoilage input retains its recipe unlock in science progression")
+    check("SPOIL05-" .. version, feasibility.source_witness("ore") == nil
+      and production.independent_pack_acquisition_witness("ore", "Culture", {}, {}) == nil,
+      "A warmed future route cannot become initial or bypass its required unlock")
+    world.recipe_facts.culture.variants[1].ingredients = {{name = "ore", amount = 1}}
+    world.recipe_source_epoch = 2
+    check("SPOIL06-" .. version, production.pack_production_status("ore", {}) == "unreachable",
+      "Replacing the seed recipe invalidates a cached spoilage route")
+
+    local w = spoilage_world(true)
+    w.techs.Culture = technology("ore", "culture")
+    reset(w)
+    check("SPOIL07-" .. version, production.pack_production_status("ore", {}) == "unreachable",
+      "Science cannot fund the research that first acquires its own spoilage input")
+    w = spoilage_world()
+    w.resources = {}
+    w.item_prototypes.ore = {spoil_ticks = 60, spoil_result = "bacteria"}
+    reset(w)
+    check("SPOIL08-" .. version, feasibility.acquisition_witness("ore") == nil,
+      "An unseeded native spoilage cycle cannot bootstrap acquisition")
+    w = spoilage_world()
+    w.resources = {}
+    w.recipe_facts.recycle = route_fact("bacteria", {{name = "ore", amount = 1}})
+    w.producers.bacteria = {"recycle"}
+    reset(w)
+    check("SPOIL09-" .. version, feasibility.acquisition_witness("ore") == nil,
+      "An unseeded mixed recipe and spoilage cycle cannot bootstrap acquisition")
+    w.item_prototypes["other-seed"] = {spoil_ticks = 30, spoil_result = "ore"}
+    w.resources.seed = {minable = {result = "other-seed", count = 1}}
+    reset(w)
+    local alternative = feasibility.acquisition_witness("ore")
+    check("SPOIL10-" .. version, alternative and alternative.prototype == "other-seed",
+      "A cyclic earlier input cannot hide another acquired spoilage source")
+    w = spoilage_world()
+    w.item_prototypes.ore = {spoil_ticks = 60, spoil_result = "aged-pack"}
+    w.item_prototypes["aged-pack"] = {}
+    reset(w)
+    local chain = feasibility.acquisition_witness("aged-pack")
+    check("SPOIL11-" .. version, chain and chain.ingredients[1].kind == "item-spoilage",
+      "A seeded multi-step spoilage chain retains both conversions")
+
+    for index, flag in ipairs({false, "true", 1}) do
+      w = spoilage_world(); w.feature_flags.spoiling = flag; reset(w)
+      check("SPOIL12-" .. version .. "-" .. index, feasibility.acquisition_witness("ore") == nil,
+        "Only the engine's enabled spoiling feature grants the conversion")
+    end
+    w = spoilage_world(); w.feature_flags = nil; reset(w)
+    check("SPOIL13-" .. version, feasibility.acquisition_witness("ore") == nil,
+      "Missing feature facts do not grant positive spoilage acquisition")
+    for index, ticks in ipairs({0, -1, "60", math.huge, 0/0}) do
+      w = spoilage_world(); w.item_prototypes.bacteria.spoil_ticks = ticks; reset(w)
+      check("SPOIL14-" .. version .. "-" .. index, feasibility.acquisition_witness("ore") == nil,
+        "Disabled or invalid spoil durations cannot supply items")
+    end
+    w = spoilage_world()
+    w.item_prototypes.bacteria.spoil_result = nil
+    w.item_prototypes.bacteria.spoil_to_trigger_result = {items_per_trigger = 1, trigger = {}}
+    reset(w)
+    check("SPOIL15-" .. version, feasibility.acquisition_witness("ore") == nil,
+      "A spoil trigger alone does not declare an item product")
+
+    reset(spoilage_world())
+    data.raw.item = world.item_prototypes
+    local visits = 0
+    local observer = {reserve_visit = function()
+      visits = visits + 1; return true
+    end}
+    local diagnostic = feasibility.acquisition_witness("ore", {diagnostic_observer = observer})
+    check("SPOIL16-" .. version, diagnostic and diagnostic.kind == "item-spoilage"
+      and visits > 0 and context.states.item_prototype_index == nil,
+      "A cold diagnostic follows spoilage without building the comprehensive index")
+    for index = 1, 100 do data.raw.item["filler-" .. index] = {} end
+    visits = 0
+    observer.reserve_visit = function()
+      if visits >= 8 then return false end
+      visits = visits + 1; return true
+    end
+    check("SPOIL17-" .. version,
+      feasibility.acquisition_witness("ore", {diagnostic_observer = observer}) == nil
+      and visits == 8 and context.states.item_prototype_index == nil,
+      "An incomplete diagnostic scan cannot grant a spoilage route or warm the item index")
+  end
+  target_profile.current_factorio_version = "1.1"
+  reset(spoilage_world())
+  check("SPOIL18", feasibility.acquisition_witness("ore") == nil,
+    "Spoilage fields cannot grant a capability to a historical target")
+  target_profile.current_factorio_version = previous_version
 end
 
 -- Rocket-silo crafts count toward construction; their recipe products are

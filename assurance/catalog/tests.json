@@ -1487,6 +1487,8 @@
         "source:source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
         "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
         "source:source/prototypes/mir/index/recipe_unlocks.lua",
+        "source:source/prototypes/mir/index/item_prototype_facts.lua",
+        "source:source/prototypes/mir/platform/factorio/prototype_lookup.lua",
         "source:source/prototypes/mir/platform/factorio/data_raw.lua"
       ],
       "captured_artifacts": [],
@@ -8433,5 +8435,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:583689422551ad71f994695d672222cecd754d200b57d7269c20ab4c3734c6c0"
+  "digest": "sha256:bc196da6e8fc055729f2d03749551760aec43cba8981f2b3576d4a1b43f4c454"
 }

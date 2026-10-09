@@ -726,6 +726,33 @@ local function append_launch_sources(sources, options)
   return complete
 end
 
+local function append_spoilage_sources(sources, options)
+  local line = target_profiles.current_factorio_version
+  if (line ~= "2.0" and line ~= "2.1") or not data_raw.feature_enabled("spoiling") then return true end
+  local function append(source, result, ticks)
+    if type(result) ~= "string" or result == "" or not finite_positive(ticks) then return end
+    local identity = {type = "item", name = result}
+    local key = identity_key(identity)
+    sources[key] = sources[key] or {}
+    table.insert(sources[key], {kind = "item-spoilage", prototype = source,
+      input = {type = "item", name = source}, product = identity, spoil_ticks = ticks})
+  end
+  if options.diagnostic_observer == nil then
+    item_prototype_facts.for_each_spoilage(append)
+  else
+    -- Like placement lookup, a cold diagnostic reserves raw visits instead
+    -- of constructing a comprehensive item/entity index outside its budget.
+    for _, item_type in ipairs(prototype_lookup.item_types()) do
+      if not diagnostic_visit(options) then return false end
+      for name, item in pairs(data_raw.prototypes(item_type)) do
+        if not diagnostic_visit(options) then return false end
+        append(name, item.spoil_result, item.spoil_ticks)
+      end
+    end
+  end
+  return true
+end
+
 local function default_source_catalog(state, options)
   if state.source_catalog then return state.source_catalog end
   local sources = {}
@@ -767,6 +794,7 @@ local function default_source_catalog(state, options)
   end
   if not append_boiler_sources(sources, options) then return sources end
   if not append_launch_sources(sources, options) then return sources end
+  if not append_spoilage_sources(sources, options) then return sources end
   for _, candidates in pairs(sources) do
     table.sort(candidates, function(left, right)
       local left_actor = not not (left.source_actor or left.mining_actor and left.mining_actor.required)
@@ -908,7 +936,7 @@ local function source_witness(identity, options, state)
       copied.source_actor = nil
       copied.mining_actor = nil
       local input = witness.mining_input and witness.mining_input.identity
-        or witness.kind == "boiler-conversion" and witness.input
+        or (witness.kind == "boiler-conversion" or witness.kind == "item-spoilage") and witness.input
       if input and witness.kind == "boiler-conversion" then
         -- A boiler can heat a colder seed, including the same fluid. It cannot
         -- use its own hot output to bootstrap or act as a cooling route.
@@ -946,9 +974,9 @@ end
 function M.source_witness(identity, options, state)
   local candidate = normalize_identity(identity)
   if not candidate then return nil end
-  -- Unconditional sources need no recipe index. Conditional mining, pumps
-  -- and boilers resolve their input/placement dependencies on demand. Without
-  -- a research callback only initial acquisition can prove this preflight.
+  -- Unconditional sources need no recipe index. Conditional mining, pumps,
+  -- boilers and spoilage resolve input/placement dependencies on demand.
+  -- Without a research callback only initial acquisition proves this preflight.
   return source_witness(candidate, copy_options(options), source_query_state(state))
 end
 
@@ -1450,6 +1478,7 @@ local STABLE_SOURCE_KINDS = {
   ["entity-loot"] = true,
   ["offshore-pump"] = true,
   ["boiler-conversion"] = true,
+  ["item-spoilage"] = true,
   ["fluid-mixing"] = true
 }
 

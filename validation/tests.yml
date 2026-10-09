@@ -5233,6 +5233,8 @@
         "source:source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
         "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
         "source:source/prototypes/mir/index/recipe_unlocks.lua",
+        "source:source/prototypes/mir/index/item_prototype_facts.lua",
+        "source:source/prototypes/mir/platform/factorio/prototype_lookup.lua",
         "source:source/prototypes/mir/platform/factorio/data_raw.lua"
       ]
     },
