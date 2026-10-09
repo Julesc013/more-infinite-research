@@ -285,7 +285,7 @@ Ages are measured against the newest governed review date, 2026-10-09, so checko
 | docs/reference/schemas/technology-lifecycle.md | current | 2026-08-03 | 67 | current-window |
 | docs/reference/settings-reference.md | archived | 2026-07-07 | 94 | review-soon |
 | docs/reference/settings.md | current | 2026-10-07 | 2 | current-window |
-| docs/RELEASE-RUNBOOK.md | current | 2026-10-06 | 3 | current-window |
+| docs/RELEASE-RUNBOOK.md | current | 2026-10-09 | 0 | current-window |
 | docs/releases/0.x-factorio-version-metadata-correction.md | current | 2026-07-16 | 85 | current-window |
 | docs/releases/3.2.1-emergency-build-trigger.md | historical-checkpoint | 2026-07-26 | 75 | current-window |
 | docs/releases/3.2.2-to-3.2.3-repository-change-report.md | current | 2026-07-31 | 70 | current-window |
@@ -388,7 +388,7 @@ Ages are measured against the newest governed review date, 2026-10-09, so checko
 | docs/releases/mir4-4.0-whole-platform-programme.md | current | 2026-08-23 | 47 | current-window |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | archived | 2026-08-17 | 53 | current-window |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | current | 2026-09-11 | 28 | current-window |
-| docs/releases/mir4-integration-and-delivery-plan.md | current | 2026-10-08 | 1 | current-window |
+| docs/releases/mir4-integration-and-delivery-plan.md | current | 2026-10-09 | 0 | current-window |
 | docs/releases/mir4-post-4.0-roadmap.md | current | 2026-09-07 | 32 | current-window |
 | docs/releases/mir42-compatibility-playtest-plan.md | current | 2026-09-27 | 12 | current-window |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | current | 2026-10-09 | 0 | current-window |
