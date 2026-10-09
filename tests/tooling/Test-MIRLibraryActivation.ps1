@@ -587,6 +587,7 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
   $originalResources=$resources
   $resources=@{runs=[Collections.Generic.List[object]]::new()}
   $Target='2.1';$candidate=$badArchive
+  $SourceVersion='4.2.2';$expectedIdentity=@{distribution_version='4.2.21002'}
   function Complete-MIRLibraryActivation {
     param($Activation)
     if($script:browserCleanupRefused){throw '[mir-library-factorio-active]'}
@@ -604,6 +605,7 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
       Assert-LibraryRefusal $browserFailure 'mir441-resource-admission-commit'
       $record=$script:browserFailureRecord
       Assert-LibraryTest ($record.status-ceq'failed'-and$record.error-ceq'[mir441-resource-admission-commit]') 'browser retains primary resource failure'
+      Assert-LibraryTest ($record.source_version-ceq'4.2.2'-and$record.distribution_version-ceq'4.2.21002') 'browser failure retains the selected maintenance identity'
       if($cleanupRefused){
         Assert-LibraryTest ($record.library_activation.status-ceq'recovery-required'-and$record.library_activation.error-ceq'[mir-library-factorio-active]') 'browser records cleanup refusal separately'
       }else{
