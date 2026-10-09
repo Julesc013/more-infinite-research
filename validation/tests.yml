@@ -2,6 +2,19 @@
   "schema": 2,
   "tests": [
     {
+      "id": "static.modern-launch-return-harness",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRModernLaunchReturnStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRModernLaunchReturn.ps1",
+        "tests/runtime/Test-MIRModernLaunchReturnStatic.ps1",
+        "tests/runtime/modern_launch_return_controls.lua",
+        "fixtures/assert-modern-launch-return/**"
+      ]
+    },
+    {
       "id": "static.mir4-historical-runtime-inputs",
       "kind": "static",
       "layer": "F0",

@@ -436,6 +436,11 @@
       "tests": ["static.immutable-input-staging", "static.direct-library-activation", "runtime.material-route-guard", "runtime.research-browser"]
     },
     {
+      "id": "modern-launch-return-harness",
+      "patterns": ["^tests/runtime/Test-MIRModernLaunchReturn(?:Static)?[.]ps1$", "^tests/runtime/modern_launch_return_controls[.]lua$", "^fixtures/assert-modern-launch-return/"],
+      "tests": ["static.modern-launch-return-harness"]
+    },
+    {
       "id": "artifact-storage-optimization",
       "patterns": ["^tools/commands/workspace/Optimize-MIRArtifactStorage[.]ps1$", "^tests/tooling/Test-MIRArtifactStorageOptimization[.]ps1$", "^tools/mir/cli/(?:Invoke-MIRCommandRouter|router/RepositoryCommands)[.]ps1$"],
       "tests": ["static.mir-artifact-storage-optimization", "tooling.self-test"]

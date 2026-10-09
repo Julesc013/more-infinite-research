@@ -185,7 +185,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/developer-tools.md | Developer Tools | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/documentation-governance.md | Documentation Governance | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/factorio-2.1-experimental-channel.md | Factorio 2.1 Experimental Channel Policy | current | maintainer | how-to | mir-maintainers | 2026-09-01 |
-| docs/maintainer/fixture-workflow.md | Fixture Workflow | current | maintainer | how-to | mir-maintainers | 2026-09-11 |
+| docs/maintainer/fixture-workflow.md | Fixture Workflow | current | maintainer | how-to | mir-maintainers | 2026-10-10 |
 | docs/maintainer/localization.md | Localization Governance | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/manual-test-plan.md | Manual Test Plan | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
 | docs/maintainer/mir3-terminal-repository-protections.md | MIR 3 Terminal Repository Protections | current | release-manager | how-to | mir-maintainers | 2026-08-15 |

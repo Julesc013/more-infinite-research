@@ -166,6 +166,21 @@ real_mod_gates:
     status: required
 
 fixtures:
+  modern-launch-return:
+    requires_features: []
+    path: fixtures/assert-modern-launch-return
+    harness: tests/runtime/Test-MIRModernLaunchReturn.ps1
+    input_profile: fixtures/assert-modern-launch-return/scenario.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - explicit-current-422-package-source-and-engine-bindings
+      - base-only-direct-library-selection-and-control-restoration
+      - unmodified-100-craft-construction-and-satellite-return-of-1000-space-science
+      - returned-science-consumed-by-lab-for-level-seven-continuation
+      - completed-production-save-and-independent-reload-preserve-earned-progress
+      - declared-factory-setup-without-an-early-game-playthrough-claim
+
   portable-research-surface-no-mir:
     requires_features: []
     path: fixtures/portable-research-surface-no-mir
