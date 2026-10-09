@@ -1,4 +1,24 @@
 # Optional native scenario inputs for the existing manifest-driven upgrade runner.
+function Set-MIR421ModernBaseUpgradeFixtureIdentity {
+  param([Parameter(Mandatory)][string]$FixtureDirectory,
+    [Parameter(Mandatory)][ValidateSet('f210','f200')][string]$Target)
+  # Only the disposable prepared fixture changes. Its SIF counterpart keeps
+  # 0.1.0, so both exact inputs can coexist in the direct archive library.
+  $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
+  $path=Join-Path $directory 'info.json'
+  Assert-MIRLibraryPath $path
+  $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
+  $code=$Target.Substring(1)
+  $line=if($Target-ceq'f210'){'2.1'}else{'2.0'}
+  if($info.name-cne"mir-fixture-assert-upgrade-4-0-${code}00-to-4-1-${code}00"-or
+    $info.factorio_version-cne$line-or$info.version-cnotin@('0.1.0','0.1.1')){
+    throw '[mir421-modern-base-fixture-template]'
+  }
+  if($info.version-ceq'0.1.1'){return}
+  $info.version='0.1.1'
+  [IO.File]::WriteAllText($path,($info|ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false))
+}
+
 function Get-MIR421SpaceFakeUpgradeDescriptor {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype)
   $code = switch -CaseSensitive ($Target) { 'f210' { '210' }; 'f200' { '200' }; default { throw '[mir421-sif-target]' } }

@@ -217,4 +217,8 @@ if ($LASTEXITCODE -ne 0) { throw '[mir42-nine-generator-baseline-independent]' }
 Assert-MIR42NineGeneratorTest -Condition ((@(Get-MIR42NineGeneratorFunctionParameters -Path $evidence -SourceText $baseEvidence -Name 'Invoke-MIR42FourTargetEvidenceReconciliation') -join '|') -ceq (@(Get-MIR42NineGeneratorFunctionParameters -Path $evidence -Name 'Invoke-MIR42FourTargetEvidenceReconciliation') -join '|')) -Code 'four-evidence-parameter-parity'
 Assert-MIR42NineGeneratorTest -Condition ((@(Get-MIR42NineGeneratorFunctionParameters -Path $independent -SourceText $baseIndependent -Name 'Invoke-MIR42FourTargetIndependentEvidenceRehash') -join '|') -ceq (@(Get-MIR42NineGeneratorFunctionParameters -Path $independent -Name 'Invoke-MIR42FourTargetIndependentEvidenceRehash') -join '|')) -Code 'four-independent-parameter-parity'
 
+# Consume the upgrade reader's schema-2/schema-3 and opposing controls through
+# the registered evidence-generator check, rather than leaving them standalone.
+& (Join-Path $repo 'tests/release/Test-MIR42FourTargetEvidenceReconciliation.ps1') | Out-Null
+
 Write-Output 'MIR42-NINE-TARGET-EVIDENCE-GENERATOR-PASSED scopes=4,9 historical=5 engines=0'

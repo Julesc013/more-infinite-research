@@ -6,6 +6,7 @@ Set-StrictMode -Version Latest
 if(-not $RepoRoot){$RepoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path}
 . (Join-Path $RepoRoot 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+. (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
 $root=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot ('build/tmp/library-activation-'+[guid]::NewGuid().ToString('N')))
 [IO.Directory]::CreateDirectory($root)|Out-Null
 $library=Join-Path $root 'library';$data=Join-Path $root 'engine/data';$profiles=Join-Path $root 'profiles'
@@ -14,13 +15,13 @@ $script:checks=0
 function Assert-LibraryTest([bool]$Condition,[string]$Name){if(-not $Condition){throw "[library-test] $Name"};$script:checks++;Write-Host "[ok] $Name"}
 function Assert-LibraryRefusal([scriptblock]$Action,[string]$Code){$caught='';try{& $Action|Out-Null}catch{$caught=$_.Exception.Message};Assert-LibraryTest ($caught.Contains($Code)) "refused $Code"}
 function Write-TestJson($Path,$Value){[IO.File]::WriteAllText($Path,($Value|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))}
-function New-TestArchive([string]$Name,[string]$Version,[string[]]$Dependencies=@('base >= 2.1.0')){
+function New-TestArchive([string]$Name,[string]$Version,[string[]]$Dependencies=@('base >= 2.1.0'),[string]$InfoJson=''){
   $path=Join-Path $library ($Name+'_'+$Version+'.zip')
   $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
   try{
     $entry=$zip.CreateEntry($Name+'_'+$Version+'/info.json')
     $writer=[IO.StreamWriter]::new($entry.Open())
-    try{$writer.Write((@{name=$Name;version=$Version;factorio_version='2.1';dependencies=$Dependencies}|ConvertTo-Json))}finally{$writer.Dispose()}
+    try{$writer.Write($(if($InfoJson){$InfoJson}else{@{name=$Name;version=$Version;factorio_version='2.1';dependencies=$Dependencies}|ConvertTo-Json}))}finally{$writer.Dispose()}
   }finally{$zip.Dispose()}
   return $path
 }
@@ -32,6 +33,26 @@ $spaceName=New-TestArchive 'Flare Stack' '4.3.1'
 $dependent=New-TestArchive 'dependent' '1.0.0' @('base','alpha >= 2.0.0')
 $optional=New-TestArchive 'optional' '1.0.0' @('? alpha >= 2.0.0')
 $incompatible=New-TestArchive 'incompatible' '1.0.0' @('! alpha >= 99.0.0')
+$fixtureName='mir-fixture-assert-upgrade-4-0-21000-to-4-1-21000'
+$baseFixture=Join-Path $root 'owned-fixtures/base';$sifFixture=Join-Path $root 'owned-fixtures/sif';$f200Fixture=Join-Path $root 'owned-fixtures/f200'
+foreach($directory in @($baseFixture,$sifFixture,$f200Fixture)){[IO.Directory]::CreateDirectory($directory)|Out-Null}
+foreach($directory in @($baseFixture,$sifFixture)){Write-TestJson (Join-Path $directory 'info.json') @{name=$fixtureName;version='0.1.0';factorio_version='2.1';dependencies=@('base');title='Owned fixture probe'}}
+Write-TestJson (Join-Path $f200Fixture 'info.json') @{name='mir-fixture-assert-upgrade-4-0-20000-to-4-1-20000';version='0.1.0';factorio_version='2.0';dependencies=@('base')}
+$sifInfoHash=Get-MIRImmutableInputSha256 (Join-Path $sifFixture 'info.json')
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Target f210
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f200Fixture -Target f200
+$baseInfo=Get-Content -LiteralPath (Join-Path $baseFixture 'info.json') -Raw|ConvertFrom-Json
+Assert-LibraryTest ($baseInfo.version-ceq'0.1.1'-and$baseInfo.name-ceq$fixtureName-and$baseInfo.title-ceq'Owned fixture probe') 'modern base fixture has distinct version and retained metadata'
+Assert-LibraryTest ((Get-Content -LiteralPath (Join-Path $f200Fixture 'info.json') -Raw|ConvertFrom-Json).version-ceq'0.1.1') 'F200 base fixture has distinct version'
+Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $sifFixture 'info.json'))-ceq$sifInfoHash) 'SIF fixture bytes and 0.1.0 identity remain unchanged'
+$baseInfoHash=Get-MIRImmutableInputSha256 (Join-Path $baseFixture 'info.json')
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Target f210
+Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $baseFixture 'info.json'))-ceq$baseInfoHash) 'prepared base fixture identity is idempotent'
+Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Target f200} 'mir421-modern-base-fixture-template'
+Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $baseFixture 'info.json'))-ceq$baseInfoHash) 'wrong-target refusal preserves fixture bytes'
+Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Target f210} 'mir441-resource-output-root'
+$baseFixtureArchive=New-TestArchive $fixtureName '0.1.1' -InfoJson (Get-Content -LiteralPath (Join-Path $baseFixture 'info.json') -Raw)
+$sifFixtureArchive=New-TestArchive $fixtureName '0.1.0' -InfoJson (Get-Content -LiteralPath (Join-Path $sifFixture 'info.json') -Raw)
 $hashes=@{};foreach($file in @(Get-ChildItem -LiteralPath $library -File)){$hashes[$file.Name]=Get-MIRImmutableInputSha256 $file.FullName}
 $before=@{};foreach($file in @(Get-ChildItem -LiteralPath $library -File)){$before[$file.Name]=Get-MIRImmutableInputFileIdentity $file.FullName}
 $profileA=Join-Path $profiles 'a.json';$profileB=Join-Path $profiles 'b.json'
@@ -44,6 +65,16 @@ $oldSettings=[byte[]](1,4,6,8,0,255)
 $privateSettings=Join-Path $root 'selected-settings.dat';[IO.File]::WriteAllBytes($privateSettings,[byte[]](9,8,7,6,5))
 $activation=$null
 try{
+  foreach($case in @(@('0.1.0',$sifFixture,$sifFixtureArchive),@('0.1.1',$baseFixture,$baseFixtureArchive),@('0.1.0',$sifFixture,$sifFixtureArchive))){
+    Assert-MIRLibraryFixtureArchive -Archive $case[2] -SourceDirectory $case[1]
+    $profile=Join-Path $profiles ('owned-fixture-'+$case[0]+'.json')
+    Write-TestJson $profile @{mods=@(@{name='base';version='2.1.20';enabled=$true},@{name=$fixtureName;version=$case[0];enabled=$true})}
+    $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes @{([IO.Path]::GetFileName($case[2]))=$hashes[[IO.Path]::GetFileName($case[2])]}
+    Assert-LibraryTest ((@($activation.selected|Where-Object {$_.name-ceq$fixtureName})[0].version)-ceq$case[0]) 'actual library selects exact SIF/base/SIF fixture version'
+    $active=Get-Content -LiteralPath (Join-Path $library 'mod-list.json') -Raw|ConvertFrom-Json
+    Assert-LibraryTest ((@($active.mods|Where-Object {$_.name-ceq$fixtureName})[0].version)-ceq$case[0]) 'active control pins owned fixture version with both archives present'
+    $null=Complete-MIRLibraryActivation $activation;$activation=$null
+  }
   # Exercise the actual entry points in fresh hosts with deliberately missing
   # inputs. Retirement must win before repository/engine lookup, construction
   # or staging; these controls cannot launch Factorio even if a guard regresses.
