@@ -36,3 +36,4 @@ if($superseded.Count-ne39-or
 $compositionSchema=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/schemas/mir4-package-composition-result-v1.schema.json')
 if(-not$compositionSchema.Contains('passed-canonical-package-authority-materialization')-or-not$compositionSchema.Contains('"package_cutover": {"const": true}')){throw '[mir4-f2e-composition-contract]'}
 Write-Host '[ok] M41-F2E has one canonical writer and reader authority, exact four-target reconstruction, retained rollback, and no release transition.'
+& (Join-Path $repo 'tests/release/Test-MIR42VersionContract.ps1') -RepoRoot $repo

@@ -1,22 +1,3 @@
-function Get-MIRAssuranceCandidateArchiveIdentity {
-  param([Parameter(Mandatory)][string]$Path)
-
-  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Candidate does not exist: $Path" }
-  Add-Type -AssemblyName System.IO.Compression.FileSystem
-  $archive = [IO.Compression.ZipFile]::OpenRead($Path)
-  try {
-    $entryCount = @($archive.Entries | Where-Object { -not $_.FullName.EndsWith("/") }).Count
-  } finally {
-    $archive.Dispose()
-  }
-  return [pscustomobject]@{
-    bytes = (Get-Item -LiteralPath $Path).Length
-    entries = $entryCount
-    sha256 = Get-MIRAssuranceSha256 -Path $Path
-    content_sha256 = Get-MIRAssuranceZipContentHash -Path $Path
-  }
-}
-
 function Test-MIRAssuranceReleaseCandidateId {
   param([Parameter(Mandatory)][string]$CandidateId)
   return $CandidateId -match '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$'
@@ -199,11 +180,71 @@ function Get-MIRAssuranceLocalPlaytestPlanningAuthority {
   }
 }
 
+function Get-MIRAssuranceDevelopmentPlanningAuthority {
+  param([Parameter(Mandatory)]$Context)
+
+  if ([string]$Context.verification_profile.execution_context_mode -ne 'development-context') {
+    return $null
+  }
+  $contextSpecification = Get-MIRAssuranceDevelopmentExecutionContextSpecification -ContextPath ([string]$Context.verification_profile.execution_context)
+  $authorityRelative = [string]$contextSpecification.relative_path
+  $authorityPath = Join-Path $repo $authorityRelative
+  $registryRelative = 'targets/registry.json'
+  $registryPath = Join-Path $repo $registryRelative
+  if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $registryPath -PathType Leaf)) {
+    throw 'Development planning execution context or target registry is absent.'
+  }
+  $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json -DateKind String
+  $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json -DateKind String
+  $targetRows = @($registry.targets | Where-Object { [string]$_.factorio_line -eq [string]$Context.target })
+  if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+      -not (Test-MIR4BootstrapRecordHash -Record $registry) -or
+      -not (Test-MIRAssuranceDevelopmentExecutionContextBoundary -Authority $authority -Specification $contextSpecification) -or
+      [string]$registry.kind -ne 'MIR4TargetRegistryV2' -or
+      $targetRows.Count -ne 1) {
+    throw 'Development planning execution context boundary is invalid.'
+  }
+  $targetRow = $targetRows[0]
+  if (@($contextSpecification.targets) -notcontains [string]$targetRow.target -or
+      [string]$Context.info.version -notmatch '^4[.][0-9]{1,5}[.][0-9]{5}$') {
+    throw 'Development planning target or distribution identity is invalid.'
+  }
+  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+  $identity = Resolve-MIR4CanonicalPackageIdentity `
+    -RepoRoot $repo `
+    -Target ([string]$targetRow.target) `
+    -DistributionVersion ([string]$Context.info.version)
+  $sourceCommit = Resolve-MIRAssuranceCommit -Commit HEAD
+  return [pscustomobject][ordered]@{
+    release = [string]$identity.distribution_version
+    target = [string]$Context.target
+    state = [string]$authority.status
+    authority_class = 'development-context-no-release-authority'
+    candidate_id = 'MIR4-ASSURANCE-' + ((& git -C $repo rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant())
+    package_source_commit = $sourceCommit
+    release_authority = $false
+  }
+}
+
 function Get-MIRAssuranceReleasePlanningAuthority {
   param([Parameter(Mandatory)]$Context)
 
+  # The 4.2 context is a closed, F210/F200-only private planning authority.
+  # Resolve it before historical local-playtest lanes, which deliberately
+  # reject ordinary current-package paths when their archived manifests are
+  # absent. V1 contexts retain that historical lane behavior below.
+  if ([string]$Context.verification_profile.execution_context_mode -eq 'development-context') {
+    $contextSpecification = Get-MIRAssuranceDevelopmentExecutionContextSpecification -ContextPath ([string]$Context.verification_profile.execution_context)
+    if ([string]$contextSpecification.kind -eq 'MIR4DevelopmentExecutionContextV2') {
+      $development = Get-MIRAssuranceDevelopmentPlanningAuthority -Context $Context
+      if ($null -ne $development) { return $development }
+    }
+  }
   $localPlaytest = Get-MIRAssuranceLocalPlaytestPlanningAuthority -Context $Context
   if ($null -ne $localPlaytest) { return $localPlaytest }
+  $development = Get-MIRAssuranceDevelopmentPlanningAuthority -Context $Context
+  if ($null -ne $development) { return $development }
 
   $version = [string]$Context.info.version
   $recordPath = Join-Path $repo ".mir\releases\records\$version.json"
@@ -301,7 +342,8 @@ function Get-MIRAssuranceCommitCandidateIdentity {
   param([Parameter(Mandatory)][string]$Commit)
 
   $resolvedCommit = Resolve-MIRAssuranceCommit -Commit $Commit
-  $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-seal-source-" + [guid]::NewGuid().ToString("N"))
+  $temporaryParent = [IO.Path]::GetFullPath((Join-Path $repo 'build/tmp'))
+  $temporaryRoot = Join-Path $temporaryParent ("mir-seal-source-" + [guid]::NewGuid().ToString("N"))
   $sourceRoot = Join-Path $temporaryRoot "source"
   $sourceArchive = Join-Path $temporaryRoot "source.zip"
   try {
@@ -345,7 +387,13 @@ function Get-MIRAssuranceCommitCandidateIdentity {
     }
   } finally {
     if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
-      Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+      $cleanupRoot = (Resolve-Path -LiteralPath $temporaryRoot).ProviderPath
+      if (-not $cleanupRoot.StartsWith($temporaryParent.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+          (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint -or
+          (Split-Path -Leaf $cleanupRoot) -notlike 'mir-seal-source-*') {
+        throw 'Candidate reconstruction cleanup target is outside owned scratch.'
+      }
+      Remove-Item -LiteralPath $cleanupRoot -Recurse -Force
     }
   }
 }

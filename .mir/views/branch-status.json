@@ -3,7 +3,7 @@
   "branches": [
     {
       "branch": "dev",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "C31",
       "effective_status": "superseded-unpublished",
       "release": "3.2.4",
@@ -33,7 +33,7 @@
     },
     {
       "branch": "legacy",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "2.4.9-final",
       "effective_status": "publicly-verified",
       "release": "2.4.9",
@@ -43,7 +43,7 @@
     },
     {
       "branch": "legacy",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "2.5-P11",
       "effective_status": "publicly-verified",
       "release": "2.5.0",
@@ -53,7 +53,7 @@
     },
     {
       "branch": "legacy",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "2.5-P12",
       "effective_status": "publicly-verified",
       "release": "2.5.5",
@@ -73,7 +73,7 @@
     },
     {
       "branch": "main",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "C21",
       "effective_status": "published",
       "release": "3.2.1",
@@ -103,7 +103,7 @@
     },
     {
       "branch": "main",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "C24",
       "effective_status": "tagged",
       "release": "3.2.2",
@@ -113,7 +113,7 @@
     },
     {
       "branch": "main",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "C30",
       "effective_status": "publicly-verified",
       "release": "3.2.3",
@@ -143,7 +143,7 @@
     },
     {
       "branch": "tag-only",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "1.3.5-final",
       "effective_status": "publicly-verified",
       "release": "1.3.5",
@@ -163,7 +163,7 @@
     },
     {
       "branch": "tag-only",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "1.4.5-final",
       "effective_status": "publicly-verified",
       "release": "1.4.5",
@@ -183,7 +183,7 @@
     },
     {
       "branch": "tag-only",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "1.5.5-final",
       "effective_status": "publicly-verified",
       "release": "1.5.5",
@@ -203,7 +203,7 @@
     },
     {
       "branch": "tag-only",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "1.6.5-final",
       "effective_status": "publicly-verified",
       "release": "1.6.5",
@@ -223,7 +223,7 @@
     },
     {
       "branch": "tag-only",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "1.7.5-final",
       "effective_status": "publicly-verified",
       "release": "1.7.5",
@@ -243,7 +243,7 @@
     },
     {
       "branch": "tag-only",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "1.8.5-final",
       "effective_status": "publicly-verified",
       "release": "1.8.5",
@@ -263,7 +263,7 @@
     },
     {
       "branch": "tag-only",
-      "candidate_floor": "",
+      "candidate_floor": "n/a",
       "candidate_id": "1.9.5-final",
       "effective_status": "publicly-verified",
       "release": "1.9.5",

@@ -62,7 +62,7 @@ $standardEvolved = @(
   'tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1',
   'tests/history/Test-MIR4HistoricalToolingMigration.ps1',
   'tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1',
-  'todo.md',
+  'TODO.md',
   'tools/lib/mir4/PreFreezeRelease.ps1',
   'tools/mir/application/package/RuntimeReplay.ps1',
   'tools/mir/cli/Invoke-MIR4ToolingConvergence.ps1',

@@ -1,0 +1,12 @@
+{
+  "name": "late-mir42-cap-binding-blocker",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Late F210 Cap Binding Blocker",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.17",
+    "more-infinite-research >= 4.2.0",
+    "mir-fixture-assert-mir42-cap-ownership-multiforce >= 0.1.0"
+  ]
+}

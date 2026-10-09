@@ -56,7 +56,11 @@ function Test-MIR4ReleaseToolingDeclaredConsumersV1 {
     'validation/tests.yml'=@($releaseDag,'tests/release-tooling/Test-MIR4ReleaseTooling.ps1','tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1')
     '.mir/control/paths.yml'=@($releaseDag,'tools/mir/application/release/ReleaseToolingMigration.ps1','tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1')
     '.mir/modules.yml'=@($releaseDag,'tools/mir/application/release/ReleaseToolingMigration.ps1','tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1')
-    'tools/mir.ps1'=@('tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1')
+    'tools/mir.ps1'=@('tools/mir/cli/Invoke-MIRCommandRouter.ps1')
+    'tools/mir/cli/Invoke-MIRCommandRouter.ps1'=@('tools/mir/cli/router/CommandDispatcher.ps1','tools/mir/cli/router/MIR4CommandDispatcher.ps1','tools/mir/cli/router/MIR4MigrationCommands.ps1')
+    'tools/mir/cli/router/CommandDispatcher.ps1'=@('Invoke-MIR4CommandDispatch')
+    'tools/mir/cli/router/MIR4CommandDispatcher.ps1'=@('release-tooling-migration','Invoke-MIR4MigrationCommandGroup')
+    'tools/mir/cli/router/MIR4MigrationCommands.ps1'=@('tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1')
     'docs/architecture/mir4-platform-preview.md'=@('tools/mir/application/release/ReleaseDag.ps1')
     'docs/architecture/module-boundaries.md'=@('tools/mir/application/release/ReleaseDag.ps1')
   }
@@ -95,30 +99,8 @@ function Test-MIR4ReleaseToolingFunctionalParityV1 {
 function Test-MIR4ReleaseToolingFinalMileSuccessorV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-  $successorPath='.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json'
-  $state=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo `
-    -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration `
-    -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration `
-    -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration `
-    -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration `
-    -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration `
-    -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration `
-    -IncludeHistoricalToolingMigration -IncludeReleaseToolingMigration `
-    -IncludeF210QualificationPolicyEvolution -IncludeFinalMileToolingEvolution
-  if([string]$state.prior_receipt_path-cne$successorPath){return $false}
-  $successor=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $successorPath
-  if([string]$successor.kind-cne'MIR4FinalMileToolingAuthorityEvolutionReceiptV1'-or
-     [string]$successor.change_id-cne'MIR4-FINAL-MILE-TOOLING-2026-08-29'-or
-     @($successor.package_visible_delta).Count-ne0-or
-     [string]$successor.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
-     @($successor.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){return $false}
-  $paths=@('releases/migrations/MIR4-Release-Tooling-MigrationV1.json','tools/mir.ps1','tools/mir/application/release/ReleaseToolingMigration.ps1','tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1','tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1')
-  foreach($path in $paths){
-    if(-not$state.authority_hashes.ContainsKey($path)){return $false}
-    $mode=if($state.authority_hash_modes.ContainsKey($path)){[string]$state.authority_hash_modes[$path]}else{'raw-bytes'}
-    if((Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $path) -Mode $mode)-cne[string]$state.authority_hashes[$path]){return $false}
-  }
-  return $true
+  $receipt=Invoke-MIR4ReleaseToolingMigrationProjectionV1 -RepoRoot $repo -Check
+  return Test-MIR4FinalMileHistoricalBindingsV1 -RepoRoot $repo -PackageSourceSha256 ([string]$receipt.package_source_sha256) -Paths @('releases/migrations/MIR4-Release-Tooling-MigrationV1.json','tools/mir.ps1','tools/mir/application/release/ReleaseToolingMigration.ps1','tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1','tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1')
 }
 
 function New-MIR4ReleaseToolingMigrationReceiptV1 {

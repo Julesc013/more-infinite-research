@@ -24,11 +24,11 @@
     {"name":"compatibility","prefix":"prototypes/mir/compatibility/"}
   ],
   "allowed_edges": [
-    "capabilities->compatibility","capabilities->core","capabilities->families","capabilities->graph","capabilities->index","capabilities->pipeline","capabilities->platform","capabilities->policy","capabilities->report","capabilities->settings","capabilities->streams",
+    "capabilities->compatibility","capabilities->core","capabilities->domain","capabilities->families","capabilities->graph","capabilities->index","capabilities->pipeline","capabilities->platform","capabilities->policy","capabilities->report","capabilities->settings","capabilities->streams",
     "compatibility->core","compatibility->domain","compatibility->index","compatibility->pipeline","compatibility->platform","compatibility->report",
     "domain->core","domain->index","domain->integrity","domain->pipeline",
     "emit->core","emit->domain","emit->graph","emit->integrity","emit->pipeline","emit->planner","emit->platform","emit->presentation","emit->report",
-    "families->compatibility","families->core","families->graph","families->index","families->pipeline","families->platform","families->providers","families->report",
+    "families->compatibility","families->core","families->domain","families->graph","families->index","families->pipeline","families->platform","families->providers","families->report",
     "graph->capabilities","graph->core","graph->domain","graph->platform","graph->report",
     "index->compatibility","index->core","index->domain","index->integrity","index->pipeline","index->platform","index->report",
     "integrity->core","integrity->domain",
@@ -36,10 +36,10 @@
     "planner->capabilities","planner->compatibility","planner->core","planner->domain","planner->families","planner->graph","planner->index","planner->integrity","planner->pipeline","planner->platform","planner->policy","planner->presentation","planner->providers","planner->report","planner->settings","planner->streams",
     "platform->core","platform->domain",
     "policy->capabilities","policy->compatibility","policy->core","policy->domain","policy->index","policy->pipeline","policy->planner","policy->platform","policy->report","policy->settings","policy->streams",
-    "presentation->core","presentation->platform","presentation->settings",
+    "presentation->core","presentation->platform",
     "providers->compatibility","providers->core","providers->domain","providers->families","providers->index","providers->policy",
     "report->capabilities","report->core","report->domain","report->emit","report->families","report->index","report->integrity","report->pipeline","report->platform","report->settings",
-    "runtime->domain","runtime->platform","runtime->settings","runtime->streams",
+    "runtime->core","runtime->domain","runtime->platform","runtime->settings","runtime->streams",
     "settings->core","settings->domain","settings->pipeline","settings->platform","settings->streams",
     "stage->compatibility","stage->pipeline","stage->platform","stage->report","stage->runtime","stage->settings","stage->streams",
     "streams->compatibility","streams->core","streams->domain","streams->platform"

@@ -1,3 +1,18 @@
+$script:MIRAssurancePatternFingerprintCache = @{}
+$script:MIRAssuranceHistoricalPatternFingerprintCache = @{}
+$script:MIRAssuranceMaterializedPackageContextCache = @{}
+
+function Get-MIRAssuranceOptionalObjectValue {
+  param([AllowNull()]$Object, [Parameter(Mandatory)][string]$Name)
+  if ($null -eq $Object) { return $null }
+  if ($Object -is [System.Collections.IDictionary] -and $Object.Contains($Name)) {
+    return $Object[$Name]
+  }
+  $property = $Object.PSObject.Properties[$Name]
+  if ($null -ne $property) { return $property.Value }
+  return $null
+}
+
 function Get-MIRAssurancePatternFingerprint {
   param([Parameter(Mandatory)][string[]]$Patterns)
   if ($null -eq $script:MIRAssurancePatternFingerprintCache) { $script:MIRAssurancePatternFingerprintCache = @{} }
@@ -18,6 +33,149 @@ function Get-MIRAssurancePatternFingerprint {
     sha256=$hash
   }
   $script:MIRAssurancePatternFingerprintCache[$cacheKey] = $fingerprint
+  return $fingerprint
+}
+
+function Assert-MIRAssuranceSafeProofInputPath {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$Kind
+  )
+
+  # PowerShell string literals do not use a backslash escape. Replacing two
+  # consecutive separators left a single Windows separator intact, allowing a
+  # typed source proof such as \`source:source\..\README.md\` to evade the
+  # traversal check below.
+  $portable = $Path.Replace("\", "/").TrimStart("/")
+  if ([string]::IsNullOrWhiteSpace($portable) -or
+      $portable -match '(^|/)\.\.?(?:/|$)' -or
+      $portable -match '^[A-Za-z]:') {
+    throw "[mir-assurance-$Kind-input-path] $Path"
+  }
+  return $portable
+}
+
+function Get-MIRAssuranceRequiredSourceInputFingerprint {
+  param([Parameter(Mandatory)][string]$Pattern)
+
+  $portable = Assert-MIRAssuranceSafeProofInputPath -Path $Pattern -Kind 'source'
+  if (-not $portable.StartsWith('source/', [StringComparison]::Ordinal)) {
+    throw "[mir-assurance-source-input-not-canonical] $Pattern"
+  }
+  $files = @(Resolve-MIRAssurancePatternFiles -Patterns @($portable))
+  if ($files.Count -eq 0) {
+    throw "[mir-assurance-required-source-input-no-match] $portable"
+  }
+  return [ordered]@{
+    kind='current-source'
+    authority='source'
+    patterns=@($portable)
+    file_count=$files.Count
+    sha256=(Get-MIRAssuranceTreeHash -Paths $files)
+  }
+}
+
+function Test-MIRAssuranceMaterializedPackagePattern {
+  param([Parameter(Mandatory)][string]$Pattern)
+
+  $portable = $Pattern.Replace("\\", "/").TrimStart("/")
+  $fixedPrefix = ($portable -split '[*?]', 2)[0]
+  return $fixedPrefix -in @(
+    'info.json', 'changelog.txt', 'thumbnail.png', 'settings.lua', 'data.lua',
+    'data-updates.lua', 'data-final-fixes.lua', 'control.lua', 'README.md', 'LICENSE'
+  ) -or
+    $fixedPrefix.StartsWith('prototypes/', [StringComparison]::Ordinal) -or
+    $fixedPrefix.StartsWith('locale/', [StringComparison]::Ordinal) -or
+    $fixedPrefix.StartsWith('migrations/', [StringComparison]::Ordinal)
+}
+
+function Get-MIRAssuranceMaterializedPackageContext {
+  param([Parameter(Mandatory)][string]$Target)
+
+  if ($null -eq $script:MIRAssuranceMaterializedPackageContextCache) {
+    $script:MIRAssuranceMaterializedPackageContextCache = @{}
+  }
+  $cacheKey = "$repo`n$Target"
+  if (-not $script:MIRAssuranceMaterializedPackageContextCache.ContainsKey($cacheKey)) {
+    $script:MIRAssuranceMaterializedPackageContextCache[$cacheKey] =
+      New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $Target
+  }
+  return $script:MIRAssuranceMaterializedPackageContextCache[$cacheKey]
+}
+
+function Get-MIRAssuranceMaterializedPackageInputFingerprint {
+  param(
+    [Parameter(Mandatory)][string]$Pattern,
+    [Parameter(Mandatory)]$Context
+  )
+
+  $portable = Assert-MIRAssuranceSafeProofInputPath -Path $Pattern -Kind 'package'
+  if (-not (Test-MIRAssuranceMaterializedPackagePattern -Pattern $portable)) {
+    throw "[mir-assurance-package-input-not-player-output] $Pattern"
+  }
+  $target = ConvertTo-MIR4CurrentTargetKey -FactorioVersion ([string]$Context.target)
+  $package = Get-MIRAssuranceMaterializedPackageContext -Target $target
+  $rows = @(
+    $package.outputs.Values |
+      Where-Object { Test-MIRAssurancePathPattern -Path ([string]$_.output_path) -Pattern $portable } |
+      Sort-Object output_path -CaseSensitive |
+      ForEach-Object { "$($_.output_path)`t$($_.output_sha256)" }
+  )
+  if ($rows.Count -eq 0) {
+    throw "[mir-assurance-required-package-input-no-match] $target $portable"
+  }
+  return [ordered]@{
+    kind='materialized-package'
+    authority='target-materializer'
+    target=$target
+    patterns=@($portable)
+    package_source_sha256=[string]$package.package_source_sha256
+    file_count=$rows.Count
+    sha256=(Get-MIRAssuranceTextHash -Text ($rows -join "`n"))
+  }
+}
+
+function Get-MIRAssuranceHistoricalInputFingerprint {
+  param([Parameter(Mandatory)][string]$Descriptor)
+
+  if ($Descriptor -notmatch '^(?<commit>[0-9a-fA-F]{40}):(?<pattern>.+)$') {
+    throw "[mir-assurance-historical-input-format] $Descriptor"
+  }
+  $commit = Resolve-MIRAssuranceCommit -Commit $Matches.commit
+  $pattern = Assert-MIRAssuranceSafeProofInputPath -Path $Matches.pattern -Kind 'historical'
+  if ($null -eq $script:MIRAssuranceHistoricalPatternFingerprintCache) {
+    $script:MIRAssuranceHistoricalPatternFingerprintCache = @{}
+  }
+  $cacheKey = "$commit`n$pattern"
+  if ($script:MIRAssuranceHistoricalPatternFingerprintCache.ContainsKey($cacheKey)) {
+    return $script:MIRAssuranceHistoricalPatternFingerprintCache[$cacheKey]
+  }
+
+  $rows = @(
+    & git -C $repo ls-tree -r $commit -- 2>$null |
+      ForEach-Object {
+        if ($_ -match '^\d+\s+blob\s+([0-9a-fA-F]+)\t(.+)$' -and
+            (Test-MIRAssurancePathPattern -Path ([string]$Matches[2]) -Pattern $pattern)) {
+          "$($Matches[2].Replace('\\', '/'))`t$($Matches[1].ToLowerInvariant())"
+        }
+      } |
+      Sort-Object -Unique
+  )
+  if ($LASTEXITCODE -ne 0) {
+    throw "[mir-assurance-historical-input-enumeration] $commit"
+  }
+  if ($rows.Count -eq 0) {
+    throw "[mir-assurance-required-historical-input-no-match] $commit $pattern"
+  }
+  $fingerprint = [ordered]@{
+    kind='pinned-historical'
+    authority='git-commit'
+    commit=$commit
+    patterns=@($pattern)
+    file_count=$rows.Count
+    sha256=(Get-MIRAssuranceTextHash -Text ($rows -join "`n"))
+  }
+  $script:MIRAssuranceHistoricalPatternFingerprintCache[$cacheKey] = $fingerprint
   return $fingerprint
 }
 
@@ -105,10 +263,8 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
   # package-excluded execution context permits exact private proof without
   # fabricating release authority.
   if ([string]$Context.verification_profile.execution_context_mode -eq 'development-context') {
-    $authorityRelative = ([string]$Context.verification_profile.execution_context).Replace('\', '/')
-    if ($authorityRelative -cne 'spec/execution/mir4-4.1-development-context-v1.json') {
-      throw "Development approved-delta execution context path is unsafe: $authorityRelative"
-    }
+    $contextSpecification = Get-MIRAssuranceDevelopmentExecutionContextSpecification -ContextPath ([string]$Context.verification_profile.execution_context)
+    $authorityRelative = [string]$contextSpecification.relative_path
     $authorityPath = Join-Path $repo $authorityRelative
     $registryRelative = 'targets/registry.json'
     $registryPath = Join-Path $repo $registryRelative
@@ -125,18 +281,14 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
     })
     if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
         -not (Test-MIR4BootstrapRecordHash -Record $registry) -or
-        [string]$authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
-        [string]$authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or
-        @($authority.allowed) -notcontains 'exact-engine-development-proof' -or
-        @($authority.forbidden) -notcontains 'production-signing' -or
-        @($authority.forbidden) -notcontains 'tagging' -or
-        @($authority.forbidden) -notcontains 'publication' -or
-        [string]$registry.kind -ne 'MIR4TargetRegistryV1' -or
+        -not (Test-MIRAssuranceDevelopmentExecutionContextBoundary -Authority $authority -Specification $contextSpecification) -or
+        [string]$registry.kind -ne 'MIR4TargetRegistryV2' -or
         $targetRows.Count -ne 1) {
       throw 'Development approved-delta execution context boundary is invalid.'
     }
     $targetRow = $targetRows[0]
-    if ([string]$targetRow.predecessor -ne $fromVersion -or
+    if (@($contextSpecification.targets) -notcontains [string]$targetRow.target -or
+        [string]$targetRow.predecessor -ne $fromVersion -or
         [string]$Context.verification_profile.upgrade.to_version -ne $toVersion) {
       throw 'Development approved-delta profile does not match the exact target registry row.'
     }
@@ -187,6 +339,15 @@ function Get-MIRAssuranceInputFingerprint {
     [Parameter(Mandatory)]$Context,
     [Parameter(Mandatory)]$Test
   )
+  if ($InputName.StartsWith('source:', [StringComparison]::Ordinal)) {
+    return Get-MIRAssuranceRequiredSourceInputFingerprint -Pattern $InputName.Substring('source:'.Length)
+  }
+  if ($InputName.StartsWith('package:', [StringComparison]::Ordinal)) {
+    return Get-MIRAssuranceMaterializedPackageInputFingerprint -Pattern $InputName.Substring('package:'.Length) -Context $Context
+  }
+  if ($InputName.StartsWith('historical:', [StringComparison]::Ordinal)) {
+    return Get-MIRAssuranceHistoricalInputFingerprint -Descriptor $InputName.Substring('historical:'.Length)
+  }
   switch ($InputName) {
     "candidate" { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.candidate -MissingLabel "candidate" }
     "factorio" { return Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath $Context.factorio }
@@ -225,16 +386,49 @@ function Get-MIRAssuranceInputFingerprint {
       if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
         throw "Manual-review attestation is absent: $relativePath"
       }
-      return [ordered]@{
+      $material = [ordered]@{
         kind="manual-review-attestation"
         version=[string]$Context.info.version
         path=$relativePath
         sha256=(Get-MIRAssuranceSha256 -Path $path)
       }
+      try {
+        $attestation = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
+        if ([string]$attestation.checklist_version -eq 'mir-manual-release-review-written-waiver-v1') {
+          $reference = $attestation.written_release_authorization
+          if ($null -eq $reference -or [string]::IsNullOrWhiteSpace([string]$reference.path)) {
+            throw '[mir-assurance-manual-waiver-authorization-reference]'
+          }
+          $authorizationPath = [string]$reference.path
+          $material.written_release_authorization = [ordered]@{
+            path = $authorizationPath
+            expected_sha256 = [string]$reference.sha256
+            expected_record_sha256 = [string]$reference.record_sha256
+            observed = Get-MIRAssuranceExternalFileFingerprint -Path $authorizationPath -MissingLabel 'manual-written-waiver-authorization'
+          }
+        }
+      } catch {
+        throw "[mir-assurance-manual-waiver-input] $($_.Exception.Message)"
+      }
+      return $material
     }
     "package-source" {
       $files = @(Get-MIRAssurancePackageFiles)
       return [ordered]@{ kind="package-source"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }
+    }
+    "source-identity" {
+      $material = [ordered]@{
+        commit=[string]$Plan.source_commit
+        tree=[string]$Plan.source_tree
+        package_source_sha256=[string]$Plan.package_source_sha256
+      }
+      return [ordered]@{
+        kind='source-identity'
+        commit=[string]$material.commit
+        tree=[string]$material.tree
+        package_source_sha256=[string]$material.package_source_sha256
+        sha256=(Get-MIRAssuranceJsonHash -Value $material)
+      }
     }
     "repository" {
       $files = @(Get-MIRAssuranceRepositoryFiles)
@@ -247,7 +441,11 @@ function Get-MIRAssuranceInputFingerprint {
       if ([int]$sourceLock.file_count -ne 1) {
         throw "Unable to resolve the staged compact source-lock authority for release-history fingerprinting."
       }
-      $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(".mir/distributions.json", "dist")
+      $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(
+        ".mir/distributions.json",
+        "tools/mir/application/package/DistributionCustody.ps1",
+        "tools/mir/cli/Invoke-MIR4DistributionCustody.ps1"
+      )
       $successorAuthority = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(
         ".gitattributes",
         ".mir/assurance.json",
@@ -367,7 +565,15 @@ function Get-MIRAssuranceInputFingerprint {
     "balance-contract" { return Get-MIRAssuranceBalanceContractFingerprint }
     "fixtures" { return Get-MIRAssurancePatternFingerprint -Patterns @("fixtures/**") }
     "settings" {
-      return Get-MIRAssurancePatternFingerprint -Patterns @("settings*.lua", "prototypes/mir/settings/**", ".mir/settings.yml")
+      $source = Get-MIRAssuranceRequiredSourceInputFingerprint -Pattern 'source/prototypes/mir/settings/**'
+      $policy = Get-MIRAssurancePatternFingerprint -Patterns @('.mir/settings.yml')
+      if ([int]$policy.file_count -ne 1) { throw '[mir-assurance-required-settings-policy-no-match]' }
+      return [ordered]@{
+        kind='settings'
+        source=$source
+        policy=$policy
+        sha256=(Get-MIRAssuranceJsonHash -Value ([ordered]@{source=$source;policy=$policy}))
+      }
     }
     "mod-lock" {
       $policy = Get-MIRAssurancePatternFingerprint -Patterns @(
@@ -403,6 +609,8 @@ function Get-MIRAssuranceInputFingerprint {
         "fixtures/upgrade-modset-source/**",
         "tests/runtime/Test-MIRUpgrade.ps1",
         "tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "tools/mir/application/release/readiness/Common.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "spec/schemas/upgrade-matrix.schema.json"
       )
     }
@@ -413,13 +621,13 @@ function Get-MIRAssuranceInputFingerprint {
       $isReparse = $null -ne $rootItem -and (($rootItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
       $state = if ($null -eq $rootItem) { "missing" } elseif (-not $isDirectory) { "invalid-file" } `
         elseif ($isReparse) { "invalid-reparse-directory" } else { "directory" }
-      $files = if ($isDirectory -and -not $isReparse) {
+      $files = @(if ($isDirectory -and -not $isReparse) {
         @(Get-ChildItem -LiteralPath $governedRoot -Recurse -File -Force | ForEach-Object {
           Get-MIRAssuranceRepoRelativePath -Path $_.FullName
         })
       } elseif ($null -ne $rootItem -and -not $isDirectory) {
         @(Get-MIRAssuranceRepoRelativePath -Path $rootItem.FullName)
-      } else { @() }
+      } else { @() })
       return [ordered]@{
         kind="mir4-bootstrap-governed-output"
         state=$state
@@ -494,10 +702,11 @@ function Get-MIRAssuranceInputFingerprint {
       return [ordered]@{ kind="evidence"; file_count=$paths.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $paths) }
     }
     "runtime.full" {
+      $domainManifest = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'domain_manifest'
       $material = [ordered]@{
         target=[string]$Context.target
         scenario_registry_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $scenarioRegistryPath)
-        domain_manifest_sha256=if ($Plan.domain_manifest) { [string]$Plan.domain_manifest.manifest_sha256 } else { "" }
+        domain_manifest_sha256=if ($null -ne $domainManifest) { [string]$domainManifest.manifest_sha256 } else { "" }
         harness=(Get-MIRAssuranceScenarioHarnessFingerprint).sha256
       }
       return [ordered]@{ kind="required-runtime-set"; sha256=(Get-MIRAssuranceJsonHash -Value $material) }
@@ -516,23 +725,86 @@ function Get-MIRAssuranceTestFingerprint {
     [Parameter(Mandatory)]$Plan,
     [Parameter(Mandatory)]$Context
   )
+  $templateId = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'template_id'
+  $domainDependencies = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'domain_dependencies'
+  $scenario = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'scenario'
+  $requiresFactorio = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_factorio'
+  $requiresCandidate = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_candidate'
+  $inputs = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'inputs'
   $definition = [ordered]@{
     id=[string]$Test.id
-    template_id=[string]$Test.template_id
+    template_id=if ($null -ne $templateId) { [string]$templateId } else { '' }
     kind=[string]$Test.kind
     layer=[string]$Test.layer
     command=[string]$Test.command
-    requires_factorio=[bool]$Test.requires_factorio
-    requires_candidate=[bool]$Test.requires_candidate
-    inputs=@($Test.inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique)
-    domain_dependencies=@($Test.domain_dependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique)
-    scenario_sha256=if ($Test.scenario) { Get-MIRAssuranceJsonHash -Value $Test.scenario } else { "" }
+    requires_factorio=if ($null -ne $requiresFactorio) { [bool]$requiresFactorio } else { $false }
+    requires_candidate=if ($null -ne $requiresCandidate) { [bool]$requiresCandidate } else { $false }
+    inputs=if ($null -ne $inputs) { @($inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
+    captured_artifacts=@(
+      foreach ($artifact in @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)) {
+        [ordered]@{
+          path_pattern=[string]$artifact.path_pattern
+          schema=[string]$artifact.schema
+          kind=[string]$artifact.kind
+        }
+      }
+    )
+    domain_dependencies=if ($null -ne $domainDependencies) { @($domainDependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
+    scenario_sha256=if ($null -ne $scenario) { Get-MIRAssuranceJsonHash -Value $scenario } else { "" }
   }
   $definitionHash = Get-MIRAssuranceJsonHash -Value $definition
   $inputFingerprints = [ordered]@{}
   $runnerHash = Get-MIRAssuranceRunnerHash
   if ($env:MIR_ASSURANCE_TIMING) { Write-Host "[assurance-timing] fingerprint $($Test.id) runner" }
   $inputFingerprints["assurance-runner"] = [ordered]@{ kind="runner"; version=$assuranceRunnerVersion; sha256=$runnerHash }
+  # A test's command definition is necessary but not sufficient to identify
+  # its evaluator.  The command router, assurance implementation and the
+  # target/scenario adapters can change independently of a catalogue row.
+  # Bind their current source as a separate, named input so reused evidence
+  # cannot silently cross an evaluator revision.
+  $evaluator = Get-MIRAssurancePatternFingerprint -Patterns @(
+    "scripts/Invoke-MIRAssurance.ps1",
+    "tools/mir.ps1",
+    "tools/lib/assurance/**",
+    "tools/lib/validation/CurrentTargetPackage.ps1",
+    "tools/lib/validation/FactorioVersionPolicy.ps1",
+    "tools/lib/validation/ScenarioRegistry.ps1",
+    "tools/mir_verify/**",
+    "spec/schemas/**"
+  )
+  $evaluator["kind"] = "assurance-evaluator"
+  $inputFingerprints["assurance-evaluator"] = $evaluator
+
+  # Candidate archive bytes alone do not state which authored package source
+  # produced them.  Keep the package-source and source identity alongside the
+  # candidate descriptor.  This permits unrelated repository changes to be
+  # handled by impact selection while refusing evidence from a different
+  # candidate source.
+  $candidateDescriptor = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'candidate_descriptor'
+  if ($null -eq $candidateDescriptor) {
+    $candidateDescriptor = Get-MIRAssuranceCandidateDescriptor -Context $Context
+  }
+  $candidateSource = [ordered]@{
+    kind="candidate-source"
+    package_source_commit=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'package_source_commit')
+    source_commit=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'source_commit')
+    source_tree=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'source_tree')
+    package_source_sha256=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'package_source_sha256')
+    candidate_descriptor_sha256=[string](Get-MIRAssuranceOptionalObjectValue -Object $candidateDescriptor -Name 'descriptor_sha256')
+  }
+  $candidateSource["sha256"] = Get-MIRAssuranceJsonHash -Value $candidateSource
+  $inputFingerprints["candidate-source"] = $candidateSource
+
+  # Static rows have no machine runtime to fingerprint, while runtime rows
+  # declare Factorio, mod and scenario inputs below.  Both classes still bind
+  # the target's verification-profile environment contract here.
+  $environment = [ordered]@{
+    kind="assurance-environment"
+    target=[string]$Context.target
+    verification_profile_sha256=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'verification_profile_sha256')
+  }
+  $environment["sha256"] = Get-MIRAssuranceJsonHash -Value $environment
+  $inputFingerprints["assurance-environment"] = $environment
   foreach ($inputName in @($definition.inputs)) {
     if ($env:MIR_ASSURANCE_TIMING) { Write-Host "[assurance-timing] fingerprint $($Test.id) input=$inputName start" }
     $inputFingerprints[$inputName] = Get-MIRAssuranceInputFingerprint -InputName $inputName -Plan $Plan -Context $Context -Test $Test

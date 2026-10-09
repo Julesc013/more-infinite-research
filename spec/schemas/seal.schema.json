@@ -82,7 +82,7 @@
     "performance_status": { "const": "passed" },
     "manual_review_attestation": { "type": "string", "minLength": 1 },
     "manual_review_attestation_sha256": { "$ref": "#/$defs/sha256" },
-    "manual_review_status": { "const": "passed" },
+    "manual_review_status": { "enum": ["passed", "waived"] },
     "verifier_release_sha256": { "$ref": "#/$defs/sha256" },
     "producer_attestation": { "type": "object" },
     "sealed_at": { "type": "string", "format": "date-time" },

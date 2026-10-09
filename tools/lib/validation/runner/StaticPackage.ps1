@@ -46,6 +46,22 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     }
   }
 
+  function Get-ZipEntryBytes {
+    param($Entry)
+    $stream = $Entry.Open()
+    try {
+      $memory = [IO.MemoryStream]::new()
+      try {
+        $stream.CopyTo($memory)
+        return ,$memory.ToArray()
+      } finally {
+        $memory.Dispose()
+      }
+    } finally {
+      $stream.Dispose()
+    }
+  }
+
   function Normalize-TextForPackageComparison {
     param([string]$Text)
     return ($Text -replace "`r`n", "`n").TrimEnd()
@@ -119,12 +135,15 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 
     $forbiddenPatterns = @(
       "^$([regex]::Escape($root))(\.git|\.github|\.mir|\.codex|artifacts|build|dist|docs|fixtures|scripts|tests|tools)(/|$)",
-      "^$([regex]::Escape($root))(AGENTS\.md|CONTRIBUTING\.md|todo\.md)$",
+      "^$([regex]::Escape($root))(?i:AGENTS\.md|CONTRIBUTING\.md|TODO\.md)$",
       "(^|/)(\.DS_Store|Thumbs\.db)$",
       "(^|/)__MACOSX(/|$)",
       "~$",
       "\.(tmp|bak|swp)$"
     )
+    if ("${root}TODO.md" -notmatch $forbiddenPatterns[1]) {
+      throw 'Package exclusion guard does not reject the canonical TODO.md queue.'
+    }
     $forbiddenEntries = @(
       foreach ($entryName in $entryNames) {
         foreach ($pattern in $forbiddenPatterns) {
@@ -141,59 +160,45 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 
     $innerInfoEntry = $entries | Where-Object { $_.FullName -eq "${root}info.json" } | Select-Object -First 1
     $innerInfo = Read-ZipEntryText $innerInfoEntry | ConvertFrom-Json
-    if ($innerInfo.name -ne $info.name -or $innerInfo.version -ne $info.version -or $innerInfo.factorio_version -ne $info.factorio_version) {
-      throw "Package info.json metadata does not match repository info.json."
+    if ($innerInfo.name -ne $repoInfo.name -or $innerInfo.version -ne $repoInfo.version -or $innerInfo.factorio_version -ne $repoInfo.factorio_version) {
+      throw "Package info.json metadata does not match the selected target composition."
     }
-    $repoDeps = @($info.dependencies)
+    $repoDeps = @($repoInfo.dependencies)
     $packageDeps = @($innerInfo.dependencies)
     $depDiff = @(Compare-Object -ReferenceObject $repoDeps -DifferenceObject $packageDeps)
     if ($depDiff.Count -gt 0) {
       throw "Package info.json dependencies do not match repository info.json."
     }
 
-    $repoPath = $repo.Path
-    $mustMatchRepo = @(
-      "README.md",
-      "changelog.txt",
-      "control.lua",
-      "data.lua",
-      "data-updates.lua",
-      "data-final-fixes.lua",
-      "settings.lua",
-      "thumbnail.png"
-    )
-
-    foreach ($directory in @("locale", "migrations", "prototypes")) {
-      $directoryPath = Join-Path $repo $directory
-      if (Test-Path -LiteralPath $directoryPath) {
-        $mustMatchRepo += @(
-          Get-ChildItem -LiteralPath $directoryPath -Recurse -File |
-          ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
-        )
-      }
+    $targetByFactorioVersion = @{
+      '2.1' = 'f210'
+      '2.0' = 'f200'
+      '1.1' = 'f110'
+      '1.0' = 'f100'
+    }
+    $currentTarget = [string]$targetByFactorioVersion[[string]$innerInfo.factorio_version]
+    if ([string]::IsNullOrWhiteSpace($currentTarget)) {
+      throw "Package uses an unsupported current target: $($innerInfo.factorio_version)"
+    }
+    $packageContext = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $currentTarget
+    $mustMatchTargetOutputs = @(Get-MIR4CurrentTargetPackageOutputEntries -Context $packageContext)
+    if ($mustMatchTargetOutputs.Count -eq 0) {
+      throw "Current target composition is empty: $currentTarget"
     }
 
-    $mustMatchRepo = @($mustMatchRepo | Sort-Object -Unique)
-
-    foreach ($relative in $mustMatchRepo) {
+    foreach ($output in $mustMatchTargetOutputs) {
+      $relative = [string]$output.output_path
       $entryName = "${root}$relative"
       $entry = $entries | Where-Object { $_.FullName -eq $entryName } | Select-Object -First 1
       if (-not $entry) {
-        throw "Package is missing expected source file: $entryName"
+        throw "Package is missing expected target-composed output: $entryName"
       }
-
-      if (Test-PackageTextPath -RelativePath $relative) {
-        $repoText = Get-Content -Raw -LiteralPath (Join-Path $repo $relative)
-        $zipText = Read-ZipEntryText $entry
-        if ((Normalize-TextForPackageComparison $repoText) -ne (Normalize-TextForPackageComparison $zipText)) {
-          throw "Package source file differs from repository source: $relative"
-        }
-      } else {
-        $repoHash = Get-FileSha256 -Path (Join-Path $repo $relative)
-        $zipHash = Get-ZipEntrySha256 -Entry $entry
-        if ($repoHash -ne $zipHash) {
-          throw "Package source file differs from repository source: $relative"
-        }
+      $expectedBytes = Get-MIR4CurrentTargetPackageOutputBytes -Context $packageContext -RelativePath $relative
+      $actualBytes = Get-ZipEntryBytes -Entry $entry
+      $expectedHash = -join ([Security.Cryptography.SHA256]::HashData($expectedBytes) | ForEach-Object { $_.ToString('x2') })
+      $actualHash = -join ([Security.Cryptography.SHA256]::HashData($actualBytes) | ForEach-Object { $_.ToString('x2') })
+      if ($expectedHash -cne $actualHash) {
+        throw "Package source differs from target composition: $relative"
       }
     }
   } finally {

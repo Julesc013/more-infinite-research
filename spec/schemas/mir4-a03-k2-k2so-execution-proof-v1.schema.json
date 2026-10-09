@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","recorded_at","task","status","authority_observation","environment_lock","candidate","engine","configuration","closure_files","execution","observation","invariants","record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4A03K2K2SOExecutionProofV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "task": {"const": "A03"},
+    "status": {"const": "passed"},
+    "authority_observation": {"$ref": "#/$defs/recordBinding"},
+    "environment_lock": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path","raw_sha256","digest"],
+      "properties": {"path":{"$ref":"#/$defs/path"},"raw_sha256":{"$ref":"#/$defs/sha"},"digest":{"$ref":"#/$defs/digest"}}
+    },
+    "candidate": {"$ref": "#/$defs/candidate"},
+    "engine": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version","executable_sha256"],
+      "properties": {"version":{"const":"2.1.17"},"executable_sha256":{"$ref":"#/$defs/sha"}}
+    },
+    "configuration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_mod_list","launch_mod_list","source_mod_settings","post_engine_mod_settings","settings_helper","governed_observer","enabled_mods"],
+      "properties": {
+        "source_mod_list":{"$ref":"#/$defs/artifact"},"launch_mod_list":{"$ref":"#/$defs/artifact"},
+        "source_mod_settings":{"$ref":"#/$defs/artifact"},"post_engine_mod_settings":{"$ref":"#/$defs/artifact"},
+        "settings_helper":{
+          "type":"object","additionalProperties":false,"required":["archive_sha256","source_sha256"],
+          "properties":{"archive_sha256":{"$ref":"#/$defs/sha"},"source_sha256":{"$ref":"#/$defs/observerSource"}}
+        },
+        "governed_observer":{
+          "type":"object","additionalProperties":false,"required":["archive_sha256","source_sha256"],
+          "properties":{"archive_sha256":{"$ref":"#/$defs/sha"},"source_sha256":{"$ref":"#/$defs/governedObserverSource"}}
+        },
+        "enabled_mods":{"type":"array","minItems":15,"maxItems":15,"uniqueItems":true,"items":{"type":"string","minLength":1}}
+      }
+    },
+    "closure_files": {"type":"array","minItems":12,"maxItems":12,"uniqueItems":true,"items":{"$ref":"#/$defs/archive"}},
+    "execution": {
+      "type":"object","additionalProperties":false,"required":["plan","summary","attempt","runtime"],
+      "properties": {
+        "plan":{"$ref":"#/$defs/plan"},"summary":{"$ref":"#/$defs/summary"},"attempt":{"$ref":"#/$defs/attempt"},"runtime":{"$ref":"#/$defs/runtime"}
+      }
+    },
+    "observation": {
+      "type":"object","additionalProperties":false,"required":["canonical_sha256","value"],
+      "properties":{"canonical_sha256":{"$ref":"#/$defs/sha"},"value":{"$ref":"#/$defs/observation"}}
+    },
+    "invariants": {
+      "type":"object","additionalProperties":false,
+      "required":["fresh_no_reuse_run","single_executed_attempt_in_final_plan","post_finalizer_read_only","configuration_hash_bound","lock_mod_archives_match","observation_matches_runtime","player_mutation_authorized","prototype_write_authorized","public_support_authorized","release_authority"],
+      "properties": {
+        "fresh_no_reuse_run":{"const":true},"single_executed_attempt_in_final_plan":{"const":true},"post_finalizer_read_only":{"const":true},"configuration_hash_bound":{"const":true},"lock_mod_archives_match":{"const":true},"observation_matches_runtime":{"const":true},
+        "player_mutation_authorized":{"const":false},"prototype_write_authorized":{"const":false},"public_support_authorized":{"const":false},"release_authority":{"const":false}
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha"}
+  },
+  "$defs": {
+    "sha":{"type":"string","pattern":"^[A-F0-9]{64}$"},
+    "digest":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$"},
+    "path":{"type":"string","pattern":"^[A-Za-z0-9._/-]+$"},
+    "recordBinding":{"type":"object","additionalProperties":false,"required":["path","record_sha256"],"properties":{"path":{"$ref":"#/$defs/path"},"record_sha256":{"$ref":"#/$defs/sha"}}},
+    "artifact":{"type":"object","additionalProperties":false,"required":["path","sha256","bytes"],"properties":{"path":{"$ref":"#/$defs/path"},"sha256":{"$ref":"#/$defs/sha"},"bytes":{"type":"integer","minimum":0}}},
+    "archive":{"type":"object","additionalProperties":false,"required":["name","sha256"],"properties":{"name":{"type":"string","pattern":"^[A-Za-z0-9._-]+$"},"sha256":{"$ref":"#/$defs/sha"}}},
+    "observerSource":{"type":"object","additionalProperties":false,"required":["info","settings_updates"],"properties":{"info":{"$ref":"#/$defs/sha"},"settings_updates":{"$ref":"#/$defs/sha"}}},
+    "governedObserverSource":{"type":"object","additionalProperties":false,"required":["data_final_fixes","info"],"properties":{"data_final_fixes":{"$ref":"#/$defs/sha"},"info":{"$ref":"#/$defs/sha"}}},
+    "candidate":{"type":"object","additionalProperties":false,"required":["archive_sha256","content_sha256","bytes","entries","source_commit","source_tree"],"properties":{"archive_sha256":{"$ref":"#/$defs/sha"},"content_sha256":{"$ref":"#/$defs/sha"},"bytes":{"type":"integer","minimum":1},"entries":{"type":"integer","minimum":1},"source_commit":{"type":"string","pattern":"^[a-f0-9]{40}$"},"source_tree":{"type":"string","pattern":"^[a-f0-9]{40}$"}}},
+    "planCounts":{"type":"object","additionalProperties":false,"required":["total","run","reuse","wait","invalid"],"properties":{"total":{"const":1},"run":{"const":1},"reuse":{"const":0},"wait":{"const":0},"invalid":{"const":0}}},
+    "runCounts":{"type":"object","additionalProperties":false,"required":["total","executed","reused","failed","incomplete","unexpected"],"properties":{"total":{"const":1},"executed":{"const":1},"reused":{"const":0},"failed":{"const":0},"incomplete":{"const":0},"unexpected":{"const":0}}},
+    "plan":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","plan_material_sha256","candidate_descriptor_sha256","input_key","digest_policy_ids","counts"],"properties":{"path":{"$ref":"#/$defs/path"},"raw_sha256":{"$ref":"#/$defs/sha"},"plan_material_sha256":{"$ref":"#/$defs/sha"},"candidate_descriptor_sha256":{"$ref":"#/$defs/sha"},"input_key":{"$ref":"#/$defs/sha"},"digest_policy_ids":{"type":"object","additionalProperties":false,"required":["text","json"],"properties":{"text":{"const":"utf8-nfc-lf-final-newline-v1"},"json":{"const":"json-sorted-properties-utf8-nfc-lf-final-newline-v1"}}},"counts":{"$ref":"#/$defs/planCounts"}}},
+    "summary":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","status","input_key","counts"],"properties":{"path":{"$ref":"#/$defs/path"},"raw_sha256":{"$ref":"#/$defs/sha"},"status":{"const":"passed"},"input_key":{"$ref":"#/$defs/sha"},"counts":{"$ref":"#/$defs/runCounts"}}},
+    "attempt":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","test_id","status","input_key","fingerprint_sha256","definition_sha256","exit_code","structured_result","executor_stdout","executor_stderr","stdout_sha256","stderr_sha256","log_digest","result_digest"],"properties":{"path":{"$ref":"#/$defs/path"},"raw_sha256":{"$ref":"#/$defs/sha"},"test_id":{"const":"runtime.k2-k2so-f210-intake"},"status":{"const":"passed"},"input_key":{"$ref":"#/$defs/sha"},"fingerprint_sha256":{"$ref":"#/$defs/sha"},"definition_sha256":{"$ref":"#/$defs/sha"},"exit_code":{"const":0},"structured_result":{"$ref":"#/$defs/artifact"},"executor_stdout":{"$ref":"#/$defs/artifact"},"executor_stderr":{"$ref":"#/$defs/artifact"},"stdout_sha256":{"$ref":"#/$defs/sha"},"stderr_sha256":{"$ref":"#/$defs/sha"},"log_digest":{"$ref":"#/$defs/sha"},"result_digest":{"$ref":"#/$defs/sha"}}},
+    "runtime":{"type":"object","additionalProperties":false,"required":["result_file","record_sha256","result","duration_seconds","stdout","stderr","factorio_log","save","observer_marker_count"],"properties":{"result_file":{"$ref":"#/$defs/artifact"},"record_sha256":{"$ref":"#/$defs/sha"},"result":{"const":"passed"},"duration_seconds":{"type":"number","minimum":0},"stdout":{"$ref":"#/$defs/artifact"},"stderr":{"$ref":"#/$defs/artifact"},"factorio_log":{"$ref":"#/$defs/artifact"},"save":{"$ref":"#/$defs/artifact"},"observer_marker_count":{"const":1}}},
+    "technology":{"type":"object","additionalProperties":false,"required":["id","prerequisites","science"],"properties":{"id":{"const":"kr-singularity-lab"},"prerequisites":{"type":"array","minItems":2,"maxItems":2,"uniqueItems":true,"items":{"type":"string"}},"science":{"type":"array","minItems":10,"maxItems":10,"uniqueItems":true,"items":{"type":"string"}}}},
+    "lab":{"type":"object","additionalProperties":false,"required":["id","inputs"],"properties":{"id":{"type":"string","minLength":1},"inputs":{"type":"array","minItems":14,"maxItems":15,"uniqueItems":true,"items":{"type":"string"}}}},
+    "observation":{"type":"object","additionalProperties":false,"required":["schema","kind","post_finalizer_observation","effective_startup_settings","native_reference_technology","compatible_labs","mutation_authorized","package_visible"],"properties":{"schema":{"const":1},"kind":{"const":"MIR4A03K2IntakeObservationV1"},"post_finalizer_observation":{"const":true},"effective_startup_settings":{"type":"object","additionalProperties":false,"required":["mir-debug-generation-report"],"properties":{"mir-debug-generation-report":{"const":true}}},"native_reference_technology":{"$ref":"#/$defs/technology"},"compatible_labs":{"type":"array","minItems":4,"maxItems":4,"uniqueItems":true,"items":{"$ref":"#/$defs/lab"}},"mutation_authorized":{"const":false},"package_visible":{"const":false}}}
+  }
+}

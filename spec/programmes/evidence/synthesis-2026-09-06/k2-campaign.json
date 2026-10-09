@@ -1,0 +1,145 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-evidence",
+  "generated_at": "2026-09-05T22:39:42.1315909Z",
+  "factorio_line": "2.1",
+  "factorio_binary": {
+    "name": "factorio.exe",
+    "version": "2.1.17.87315",
+    "sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"
+  },
+  "mir_archive": {
+    "path": "more-infinite-research_4.2.21000.zip",
+    "sha256": "802D8502594F44CDC5D7383DE0C593309E24582B31269FB7269A2AD29AA48F13",
+    "source_commit": "",
+    "source_commit_binding": "unbound"
+  },
+  "dependency_lock": {
+    "path": "compat-candidates.lock.json",
+    "sha256": "8FB8A3FE0E31D0E2456B1710D7F0A933E7E6C124A89BCF66BDDE5FF0461835FE"
+  },
+  "sanitation_budget": {
+    "policy": "mir-ecosystem-sanitation-budget-v1",
+    "path": ".mir/sanitation-budgets.json",
+    "sha256": "66ADEB0B55ABF3BAB2F72427309FBB38C7E9E0875414FDED48E21377A2A74EB6"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "local-2-1-krastorio-spaced-out",
+      "requested_roots": [
+        "Krastorio2-spaced-out",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "actual_executed_roots": [
+        "Krastorio2-spaced-out",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "resolved_mods": [
+        "flib",
+        "k2so-assets",
+        "Krastorio2",
+        "Krastorio2-spaced-out",
+        "Krastorio2Assets",
+        "Krastorio2MenuSimulations",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "official_mods": [
+        "elevated-rails",
+        "quality",
+        "recycler",
+        "space-age"
+      ],
+      "dependency_closure": [
+        {
+          "name": "flib",
+          "version": "0.17.2",
+          "sha256": "0a48c15dc0fc6c13bb3fe8293ba6cb35a07f3b0f37d37acb50ab30e32e8e019d",
+          "source": "local_zip"
+        },
+        {
+          "name": "k2so-assets",
+          "version": "1.0.7",
+          "sha256": "c3e11214407b08120b2ee717405d3b0398f533647695ab2e6ef6df9267d62017",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2",
+          "version": "2.1.2",
+          "sha256": "89989e60784ea3e94345289e063c64abfce5f35693db7b9a69d656a163620f43",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "version": "2.0.13",
+          "sha256": "a2eeb2e5a6119c4117bd3653979d40d305d17539e184bfa6f4ed53ef12a5f242",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2Assets",
+          "version": "2.1.0",
+          "sha256": "39ef950ec8b21a40357dd0240ef8389501ee75cca82717f2773b98554da46e29",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2MenuSimulations",
+          "version": "2.1.0",
+          "sha256": "3a485b449b356dc4b3eb4233de4e803b3a001259fbc251bdc9f9d9120b3c53a7",
+          "source": "local_zip"
+        },
+        {
+          "name": "xy-k2so-enhancements-nulls-fork",
+          "version": "0.8.3",
+          "sha256": "930f43b96b04012fef090c40d8b16a6b3f259d1713c86cf59dff3e9a5a97e2be",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 26.918389,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0,
+        "required_stream_science": {
+          "research_advanced_circuit": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "electromagnetic-science-pack"
+          ],
+          "research_belts": [
+            "production-science-pack",
+            "space-science-pack"
+          ]
+        },
+        "forbidden_stream_science": {
+          "research_belts": [
+            "kr-basic-tech-card",
+            "automation-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "chemical-science-pack"
+          ]
+        }
+      },
+      "sanitation_budget": {
+        "scope": "campaigns",
+        "key": "local-2-1-krastorio-spaced-out",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\tools\\commands\\compatibility\\..\\..\\..\\validation\\scenarios\\local-2.1.json",
+      "claim_level": "partial-support"
+    }
+  ]
+}

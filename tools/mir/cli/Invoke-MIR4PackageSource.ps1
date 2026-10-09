@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory)][ValidateSet('baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')][string]$Command,
+  [Parameter(Mandatory)][ValidateSet('refresh','refresh-check','baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')][string]$Command,
   [Parameter(Mandatory)][string]$RepoRoot,
   [string]$OutputPath,
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'M41-EDITABLE-SOURCE',
@@ -14,6 +14,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+if ($Command -in @('refresh','refresh-check')) {
+  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check:($Command -ceq 'refresh-check') | ConvertTo-Json -Depth 6
+  return
+}
 if ($Command -eq 'runtime-replay') {
   foreach ($required in @(@{name='FactorioBin';value=$FactorioBin},@{name='WorkRoot';value=$WorkRoot},@{name='EvidenceRoot';value=$EvidenceRoot})) {
     if ([string]::IsNullOrWhiteSpace([string]$required.value)) { throw "runtime-replay requires $($required.name)." }
@@ -37,14 +42,14 @@ if ($Command -in @('baseline','baseline-check')) {
   return
 }
 if ($Command -in @('model','model-check')) {
-  . (Join-Path $repo 'tools/mir/application/package/ShadowSourceModel.ps1')
-  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/reports/package-source/mir4-shadow-source-model-v1.json' }
-  $model = Write-MIR4ShadowSourceModel -RepoRoot $repo -OutputPath $OutputPath -Check:($Command -ceq 'model-check')
+  . (Join-Path $repo 'tools/mir/application/package/ComposableSourceModel.ps1')
+  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/reports/package-source/mir4-composable-source-model-v2.json' }
+  $model = Write-MIR4ComposableSourceModel -RepoRoot $repo -OutputPath $OutputPath -Check:($Command -ceq 'model-check')
   [pscustomobject][ordered]@{
     status=[string]$model.status
     bindings=@($model.bindings).Count
-    targets=@($model.target_overlays).Count
-    omissions=@($model.target_overlays.operations | Where-Object semantic_class -ceq 'target-omission').Count
+    targets=@($model.targets).Count
+    omissions=@($model.targets | ForEach-Object { [int]$_.composition.omission_count } | Measure-Object -Sum).Sum
     output=$OutputPath
     record_sha256=[string]$model.record_sha256
   } | ConvertTo-Json -Depth 6

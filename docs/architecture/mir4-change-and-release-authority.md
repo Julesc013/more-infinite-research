@@ -7,7 +7,7 @@ owner: mir-maintainers
 applies_to: "MIR 4.x"
 supersedes: []
 superseded_by: []
-last_reviewed: 2026-08-31
+last_reviewed: 2026-09-29
 generated_from: []
 ---
 
@@ -16,6 +16,8 @@ generated_from: []
 MIR 4 uses accepted JSON change fragments under `changes/unreleased/` as the only mutable authority for release changes. Released fragments move to `changes/history/<source-version>/`; they remain typed historical facts rather than hand-maintained prose. Commit history, filenames, GitHub state, and old release copy are inputs or references, never substitute change authorities. `releases/governance/MIR4-Source-Changelog-PlanV1.json` deterministically projects that inventory into package-excluded root `CHANGELOG.md` through `tools/mir.ps1 mir4 release-narratives source-render`.
 
 The `MIR4ChangeFragmentV2` contract requires a stable ID, curated summary, semantic domains, audiences, exact target dispositions, package visibility, save/settings/migration/compatibility/contract/support impacts, disclosure policy, and an explicit disposition for every release surface. An `unknown` target or impact blocks source freeze. Embargoed records may render only the standard redaction until a separate disclosure authority changes their accepted disposition.
+
+For MIR 4.2 nine-target plans, `MIR4ChangeFragmentV3` extends exact dispositions through F017, F016, F015, F014, and F013. `MIR4ReleaseNarrativePlanV2` requires all nine target rows in their canonical order and binds each to its Factorio line. It uses the same package-excluded renderers with a versioned result digest. Historical four-target plans and fragments retain their V1/V2 contracts and output bytes. This change prepares release copy only; it does not approve a 4.2 release or add support claims.
 
 ## Renderer boundary
 
@@ -44,3 +46,5 @@ Every run validates the plan and fragments, rejects duplicate identities and unr
 MIR 4.0.0 is imported as a semantic historical corpus. Its shadow render uses the exact preserved target distributions and public asset names but does not rewrite the GitHub Release, tag, packages, or historical campaign language. Semantic equivalence is required; undesirable old prose is not reproduced.
 
 Synthetic corpora prove an F210-only patch, a multi-target compatible feature, a repository-only change, a migration, an embargoed security correction, and target capability omissions. They are fixtures only and do not allocate MIR 4.0.1 or MIR 4.1.0.
+
+The MIR 4.2 synthetic nine-target corpus proves one change renders distinct Factorio changelog and Mod Portal copy for every committed target, with exact target order, deterministic output hashes, and rejection of unresolved dispositions or mismatched engine lines. Its version and asset names are fixture data, not an allocated candidate.

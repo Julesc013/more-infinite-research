@@ -54,7 +54,7 @@
     {"id":"extension-closure-v1","maturity":"preview","mode":"deterministic-resolver-package-excluded"},
     {"id":"api-sdk-v1","maturity":"preview","mode":"bounded-copied-data-only-package-excluded"},
     {"id":"synthetic-reference-consumer-v1","maturity":"preview","mode":"blocked-independent-production-consumer"},
-    {"id":"process-ir-v1","maturity":"preview","mode":"synthetic-parity-exact-target-snapshot-blocked"},
+    {"id":"process-ir-v1","maturity":"preview","mode":"exact-t12-t13-captures-preview-no-player-mutation"},
     {"id":"effect-channel-registry-v1","maturity":"preview","mode":"owner-references-and-opaque-preservation"},
     {"id":"autonomous-synthesis-v1","maturity":"preview","mode":"diagnose-conservative-experimental-no-player-mutation"},
     {"id":"compatibility-subject-ledger-v1","maturity":"preview","mode":"multidimensional-private-evidence-nontransferable"},

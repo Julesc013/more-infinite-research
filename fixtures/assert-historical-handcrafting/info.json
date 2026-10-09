@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-assert-historical-handcrafting",
+  "version": "1.0.0",
+  "title": "MIR historical handcrafting regression",
+  "author": "More Infinite Research",
+  "factorio_version": "0.16",
+  "dependencies": ["base >= 0.16.51", "more-infinite-research"]
+}

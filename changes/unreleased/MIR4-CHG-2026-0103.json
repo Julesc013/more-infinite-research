@@ -1,0 +1,103 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0103",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Add conditional Py acid-gas and glycerol productivity research.",
+  "details": [
+    "The retained ECO-PY acidgas and glycerol fluid subjects have separate stable research identities and use the shared three early levels at +2% per level plus a useful continuation from level four. The thirteen acid-gas and four glycerol source-observed producer names are exact selectors.",
+    "Final productivity permission, typed productive output, complete process safety, ownership, science and acquired laboratory checks still decide emission. These declarations add no permission or route exception. Void aliases, changed outputs and return loops remain withheld.",
+    "Current-package route admission, production, catalogue and save acceptance remain pending. Py biological samples and tree/bootstrap outcomes, and the distinct Angel plant-life sample request, are not qualified by this change."
+  ],
+  "semantic_domains": [
+    "progression",
+    "recipe-productivity",
+    "settings",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Adds conditional shared fluid research and staged settings where the exact producers qualify; native acceptance and older-suite applicability remain pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Adds conditional shared fluid research and staged settings where the exact producers qualify; native acceptance and older-suite applicability remain pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F017",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F016",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F015",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F014",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    },
+    {
+      "target": "F013",
+      "disposition": "omitted-by-capability",
+      "reason": "Retained targets have no native recipe-productivity capability; shared identity metadata adds no material-stage gameplay."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "changed",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "fixtures/assert-community-manufacturing-intake/expected-vs-observed-vs-realized.json"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_routes.lua"
+    },
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-integration-and-delivery-plan.md"
+    }
+  ]
+}

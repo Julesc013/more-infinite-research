@@ -3,6 +3,7 @@ param([string]$RepoRoot = "")
 
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path }
+. (Join-Path $RepoRoot "tools\mir\application\package\DistributionCustody.ps1")
 
 & (Join-Path $RepoRoot "tests/release/Test-MIRTerminalShadowProjection.ps1") -RepoRoot $RepoRoot
 if ($LASTEXITCODE -ne 0) { throw "MIR terminal shadow projection validation failed." }
@@ -236,7 +237,8 @@ $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archiv
 foreach ($identity in @($admission.dot5_identity_authority.releases)) {
   $row = @($wave.releases | Where-Object version -eq $identity.version)
   if ($row.Count -ne 1) { throw "Admitted .5 identity is absent from the wave index: $($identity.version)" }
-  $archive = Join-Path $RepoRoot ([string]$row[0].dist)
+  $resolvedArchive = Restore-MIR4DistributionArchive -RepoRoot $RepoRoot -Version ([string]$identity.version)
+  $archive = [string]$resolvedArchive.cache_path
   $zip = [System.IO.Compression.ZipFile]::OpenRead($archive)
   try { $entryCount = $zip.Entries.Count } finally { $zip.Dispose() }
   if ([string]$identity.archive_sha256 -ne [string]$row[0].archive_sha256 -or [string]$identity.content_sha256 -ne [string]$row[0].content_sha256 -or
@@ -851,10 +853,9 @@ foreach ($release in $family) {
       [string]$settingsDisposition[0].status -ne "passed" -or [string]::IsNullOrWhiteSpace([string]$settingsDisposition[0].basis)) {
     throw "Terminal candidate settings evidence is absent or drifted: $release"
   }
-  $candidateArchive = Join-Path $RepoRoot ([string]$reconstructed[0].dist_path)
-  if (-not (Test-Path -LiteralPath $candidateArchive -PathType Leaf)) { throw "Reconstructed candidate archive is missing: $release" }
+  $candidateArchive = [string](Restore-MIR4DistributionArchive -RepoRoot $RepoRoot -Version $release).cache_path
   if ($dot5WaveRow.Count -ne 1) { throw "Immutable .5 settings predecessor is missing from the wave index: $release" }
-  $predecessorArchive = Join-Path $RepoRoot ([string]$dot5WaveRow[0].dist)
+  $predecessorArchive = [string](Restore-MIR4DistributionArchive -RepoRoot $RepoRoot -Version ([string]$matrixTarget[0].immutable_dot5_predecessor)).cache_path
   foreach ($kind in @("settings", "locale")) {
     $candidateText = Get-MIRTerminalZipTextEntries -Path $candidateArchive -Kind $kind
     $predecessorText = Get-MIRTerminalZipTextEntries -Path $predecessorArchive -Kind $kind
@@ -1412,7 +1413,7 @@ if ([string]$wave.mod_portal_custody.authority -ne [string]$baselineQueue.source
   throw "The archived .5 wave index does not agree with the current Mod Portal custody authority."
 }
 foreach ($release in @($wave.releases)) {
-  $zip = Join-Path $RepoRoot ([string]$release.dist)
+  $zip = [string](Restore-MIR4DistributionArchive -RepoRoot $RepoRoot -Version ([string]$release.version)).cache_path
   if ((Get-Item -LiteralPath $zip).Length -ne [long]$release.bytes -or (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ne [string]$release.archive_sha256) {
     throw "Immutable .5 distribution changed: $($release.version)"
   }

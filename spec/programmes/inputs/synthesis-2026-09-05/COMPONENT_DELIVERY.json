@@ -1,0 +1,245 @@
+{
+  "status": "proposed-dispositions-not-maturity-upgrades",
+  "source": "R07",
+  "component_count": 34,
+  "components": [
+    {
+      "id": "source-distribution-codec",
+      "reported_maturity": "stable",
+      "destination": "build/release tooling",
+      "next_obligation": "Preserve codec; round-trip each admitted loader, including leading-zero transport.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "target-identity-predecessor-contracts",
+      "reported_maturity": "stable",
+      "destination": "build/release tooling",
+      "next_obligation": "Preserve exact identity; add legitimate clean-install/no-predecessor admission where needed.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "legacy-compiler-host-adapter-v1",
+      "reported_maturity": "stable / bootstrap",
+      "destination": "bounded adapter or historical tooling",
+      "next_obligation": "Resolve its current owner after cutover; never restore a competing package writer.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "target-materializer",
+      "reported_maturity": "stable",
+      "destination": "build tooling",
+      "next_obligation": "Extend admitted target mappings without target-to-target ZIP patch chains.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "package-surface-lock",
+      "reported_maturity": "stable",
+      "destination": "assurance tooling",
+      "next_obligation": "Keep exact player-byte scope distinct from package-excluded edits.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "release-dag",
+      "reported_maturity": "stable",
+      "destination": "release tooling",
+      "next_obligation": "Keep graph authority; exercise real restart and publication boundaries.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "whole-platform-programme-v1",
+      "reported_maturity": "stable",
+      "destination": "programme tooling",
+      "next_obligation": "Reconcile existing completion rather than adding a parallel programme.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "uppercase-f-target-presentation-v1",
+      "reported_maturity": "stable",
+      "destination": "shared presentation",
+      "next_obligation": "Preserve canonical display and accepted legacy input normalization.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "technology-acceptance-queue-v1",
+      "reported_maturity": "preview",
+      "destination": "maintainer review tooling",
+      "next_obligation": "Connect accepted proposals to existing admission; a queued proposal is not player behavior.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "api-sdk-v0",
+      "reported_maturity": "preview / superseded",
+      "destination": "migration fixtures",
+      "next_obligation": "Keep only bounded compatibility obligations; do not re-advertise as new SDK.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "mep-v0",
+      "reported_maturity": "preview / superseded",
+      "destination": "migration fixtures",
+      "next_obligation": "Preserve accepted V0\u2192V1 checks, not new mutation authority.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "query-profile-observation-v0",
+      "reported_maturity": "preview",
+      "destination": "developer compatibility",
+      "next_obligation": "Retain only required readers; graduate current query surfaces independently.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "inspector-v0",
+      "reported_maturity": "preview",
+      "destination": "developer compatibility",
+      "next_obligation": "Avoid a second actively developed UI without a supported consumer.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "target-provider-abi-v1",
+      "reported_maturity": "preview",
+      "destination": "developer/build tooling",
+      "next_obligation": "Qualify real provider consumers and target omissions before ABI stability.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "normalized-compiler-v1",
+      "reported_maturity": "shadow",
+      "destination": "independent comparison tooling",
+      "next_obligation": "Preserve a useful independent oracle; no automatic second emitter or cutover.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "feature-setting-aggregate-v1",
+      "reported_maturity": "shadow",
+      "destination": "comparison tooling",
+      "next_obligation": "Test against real target settings and stage boundaries.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "provider-micro-protocol-v1",
+      "reported_maturity": "shadow",
+      "destination": "provider conformance tooling",
+      "next_obligation": "Graduate only operations exercised by an admitted real provider.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "merge-law-catalogue-v1",
+      "reported_maturity": "shadow",
+      "destination": "conformance tooling",
+      "next_obligation": "Use laws in concrete contribution merges; static completion is not full runtime proof.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "safety-kernel-policy-engine-boundary-v0",
+      "reported_maturity": "shadow",
+      "destination": "trusted admission checks",
+      "next_obligation": "Retain separation; checked evidence required before mutation.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "runtime-state-model-v1",
+      "reported_maturity": "shadow",
+      "destination": "runtime conformance / eventual player slice",
+      "next_obligation": "Admit actual state owners, migrations, disable/remove and reload semantics.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "runtime-registration-plan-v1",
+      "reported_maturity": "shadow",
+      "destination": "runtime conformance / eventual player slice",
+      "next_obligation": "Bound event subscriptions and costs; reuse the existing dispatcher.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "migration-graph-v1",
+      "reported_maturity": "shadow",
+      "destination": "migration assurance",
+      "next_obligation": "Test actual published predecessor transitions, including nonzero progress.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "continuity-bundle-v1",
+      "reported_maturity": "preview",
+      "destination": "maintainer/developer tooling",
+      "next_obligation": "Prove redacted offline restore without distributing credentials or game binaries.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "mep-v1",
+      "reported_maturity": "preview",
+      "destination": "Developer Kit; eventual admitted player transport",
+      "next_obligation": "Independent real consumer, typed data, unknown-required-field and budget tests.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "extension-closure-v1",
+      "reported_maturity": "preview",
+      "destination": "Developer Kit / admission tooling",
+      "next_obligation": "Deterministic dependency-valid closure and conflict diagnostics; no arbitrary callbacks.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "api-sdk-v1",
+      "reported_maturity": "preview",
+      "destination": "Developer Kit; selected read-only player surfaces",
+      "next_obligation": "Graduate each copied-data interface through real use, bounds and migration policy.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "synthetic-reference-consumer-v1",
+      "reported_maturity": "preview",
+      "destination": "test fixture",
+      "next_obligation": "Keep as conformance fixture; it does not substitute for an independent production consumer.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "process-ir-v1",
+      "reported_maturity": "preview; matrix wording stale",
+      "destination": "developer capture/certification tooling",
+      "next_obligation": "Reuse documented T12/T13 captures; resolve stale state and verify certificates before admission.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "effect-channel-registry-v1",
+      "reported_maturity": "preview",
+      "destination": "semantic/admission tooling; admitted player projection",
+      "next_obligation": "Keep owner/composition/bounds explicit; opaque ownership is not permission to rewrite.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "autonomous-synthesis-v1",
+      "reported_maturity": "preview",
+      "destination": "diagnose/proposal tools; bounded future admitted slices",
+      "next_obligation": "Real safe/unsafe corpus and checked target/migration/process evidence; no confidence-based mutation.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "compatibility-subject-ledger-v1",
+      "reported_maturity": "preview",
+      "destination": "maintainer/support tooling",
+      "next_obligation": "Separate accounting coverage from requested behavior and exact support claims.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "compatibility-factory-v1",
+      "reported_maturity": "preview",
+      "destination": "developer contribution tooling",
+      "next_obligation": "Use data-only bounded contributions; prove packaged effects through the existing emitter.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "inspector-v1",
+      "reported_maturity": "preview",
+      "destination": "Developer Kit; selected in-mod read-only explanations",
+      "next_obligation": "Reuse snapshots/queries, page output, preserve deterministic runtime and target omissions.",
+      "admitted_by_this_review": false
+    },
+    {
+      "id": "historical-target-providers-v0",
+      "reported_maturity": "experimental",
+      "destination": "independent historical products after admission",
+      "next_obligation": "Exact engine, loader, effects, install/rollback, rights and baseline proof per target.",
+      "admitted_by_this_review": false
+    }
+  ]
+}

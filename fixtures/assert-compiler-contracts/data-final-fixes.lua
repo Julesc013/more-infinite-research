@@ -70,7 +70,7 @@ end
 
 if not focused_contracts.maximum_level_binding then
   local mir_version = mods and mods["more-infinite-research"] or ""
-  -- MIR 4.1 preserves the accepted MIR 4.0 player surface while package authority moves to src/mod.
+  -- MIR 4.1 preserves the accepted MIR 4.0 player surface while package authority moves to source.
   -- The shadow MaximumLevelBinding contract remains package-excluded until a separate semantic cutover.
   if not tostring(mir_version):match("^4%.[01]%.%d+$") then
     fail("MaximumLevelBinding is absent outside the governed MIR 4.0/4.1 package targets")
@@ -1169,7 +1169,7 @@ expect_error("CompilationPlan cross collision", "technology-name collision", fun
     operation = "emit_base_extension",
     key = "collision-base",
     technology_name = "collision-tech",
-    technology = {name = "collision-tech", effects = {}, prerequisites = {}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
+    technology = {name = "collision-tech", effects = {{type = "laboratory-speed", modifier = 0.1}}, prerequisites = {}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
   }})
 end)
 
@@ -1249,6 +1249,74 @@ if #combined_empty_plan.operations ~= 1
   fail("combined-plan ownership did not cleanly omit an emptied base continuation")
 end
 
+local covered_zero_source = combined_base_operation("mir-covered-zero-base-control", {
+  {type = "gun-speed", ammo_category = "tesla", modifier = 0.1},
+  {type = "laboratory-speed", modifier = 0}
+})
+local covered_zero_plan = focused_contracts.finalize_compilation(
+  combined_tesla_stream_plan, {covered_zero_source})
+if #covered_zero_plan.operations ~= 1
+  or covered_zero_plan.operations[1].technology_name ~= "mir-combined-tesla-speed"
+  or covered_zero_plan.validation_summary.effect_ownership.omitted_operation_count ~= 1
+  or covered_zero_plan.validation_summary.effect_ownership.conflict_count ~= 1
+  or #covered_zero_plan.compiler_result.rejected_candidates ~= 1
+  or covered_zero_plan.compiler_result.rejected_candidates[1].reason ~= "covered_by_planned_operation"
+  or #covered_zero_source.technology.effects ~= 2
+  or covered_zero_source.technology.effects[1].modifier ~= 0.1
+  or covered_zero_source.technology.effects[2].modifier ~= 0 then
+  fail("combined-plan ownership must omit a base continuation whose only nonzero effect is covered without source mutation")
+end
+
+local authored_empty_source = combined_base_operation("mir-authored-empty-base-control", {})
+authored_empty_source.key = "braking-force"
+local authored_empty_plan = focused_contracts.finalize_compilation(
+  generation_plan.new():finalize(), {authored_empty_source})
+local authored_empty_rejections = authored_empty_plan.compiler_result.rejected_candidates
+if #authored_empty_plan.operations ~= 0
+  or authored_empty_plan.validation_summary.effect_integrity.base_extensions.skipped_base_extension_count ~= 1
+  or #authored_empty_rejections ~= 1
+  or authored_empty_rejections[1].reason ~= "no_base_extension_effects"
+  or authored_empty_plan.validation_summary.effect_integrity.base_extensions.rejected_candidates[1].gates.effect_valid.status ~= "failed"
+  or next(authored_empty_source.technology.effects) ~= nil then
+  fail("an originally empty base continuation must retain a failed-effect candidate without a paid technology or source mutation")
+end
+
+local zero_base_source = combined_base_operation("mir-zero-base-effect-control", {
+  {type = "laboratory-speed", modifier = 0},
+  {type = "train-braking-force-bonus", modifier = 0}
+})
+zero_base_source.key = "braking-force"
+local zero_base_plan = focused_contracts.finalize_compilation(
+  generation_plan.new():finalize(), {zero_base_source})
+local zero_base_integrity = zero_base_plan.validation_summary.effect_integrity.base_extensions
+if #zero_base_plan.operations ~= 0
+  or #zero_base_plan.compiler_result.rejected_candidates ~= 1
+  or zero_base_plan.compiler_result.rejected_candidates[1].reason ~= "zero_base_extension_effects"
+  or zero_base_integrity.skipped_base_extension_count ~= 1
+  or zero_base_integrity.removed_effect_count ~= 0
+  or zero_base_integrity.rejected_candidates[1].gates.effect_valid.status ~= "failed"
+  or #zero_base_source.technology.effects ~= 2
+  or zero_base_source.technology.effects[1].modifier ~= 0
+  or zero_base_source.technology.effects[2].modifier ~= 0 then
+  fail("an all-zero base continuation must retain a failed-effect candidate without a paid technology or source mutation")
+end
+
+local mixed_zero_source = combined_base_operation("mir-mixed-zero-base-control", {
+  {type = "laboratory-speed", modifier = 0},
+  {type = "train-braking-force-bonus", modifier = 0.1}
+})
+mixed_zero_source.key = "braking-force"
+local mixed_zero_plan = focused_contracts.finalize_compilation(
+  generation_plan.new():finalize(), {mixed_zero_source})
+if #mixed_zero_plan.operations ~= 1
+  or #mixed_zero_plan.compiler_result.rejected_candidates ~= 0
+  or #mixed_zero_plan.operations[1].technology.effects ~= 2
+  or mixed_zero_plan.operations[1].technology.effects[1].modifier ~= 0
+  or mixed_zero_plan.operations[1].technology.effects[2].modifier ~= 0.1
+  or #mixed_zero_source.technology.effects ~= 2 then
+  fail("a useful mixed-zero base continuation must preserve its effects and source proposal")
+end
+
 expect_error("strict combined duplicate validator", "duplicate direct-effect identity", function()
   focused_contracts.finalize_compilation(generation_plan.new():finalize(), {
     combined_base_operation("mir-combined-within-owner-duplicate", {
@@ -1257,6 +1325,27 @@ expect_error("strict combined duplicate validator", "duplicate direct-effect ide
     })
   })
 end)
+end)()
+end
+
+-- MIR native braking effect descriptor contract.
+do
+(function()
+  local settings_effects = require("__more-infinite-research__.prototypes.mir.settings.effect_contracts")
+  local native_braking = {type = "train-braking-force-bonus", modifier = 0.15}
+  local descriptor = settings_effects.numeric_effect_descriptor(native_braking)
+  local chain_descriptor = settings_effects.descriptor_from_effects({native_braking})
+  if not descriptor or descriptor.field ~= "modifier" or descriptor.unit ~= "percent"
+    or descriptor.display_multiplier ~= 100 or descriptor.value ~= 0.15
+    or not chain_descriptor or chain_descriptor.canonical_anchor ~= 0.15 then
+    fail("native braking-force effects must retain their typed percentage descriptor")
+  end
+  local setting = settings_effects.base_setting_spec("braking-force")
+  if not setting or setting.name ~= "mir-effect-per-level-braking-force"
+    or setting.default_value ~= 15 or native_braking.type ~= "train-braking-force-bonus"
+    or native_braking.modifier ~= 0.15 then
+    fail("native braking-force descriptor correction must preserve setting identity, default and source effects")
+  end
 end)()
 end
 

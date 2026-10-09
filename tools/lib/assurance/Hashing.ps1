@@ -1,5 +1,9 @@
 Set-Variable -Name MIRAssuranceCanonicalTextDigestPolicyId -Scope Script -Option ReadOnly -Value "utf8-nfc-lf-final-newline-v1" -ErrorAction SilentlyContinue
 Set-Variable -Name MIRAssuranceCanonicalJsonDigestPolicyId -Scope Script -Option ReadOnly -Value "json-sorted-properties-utf8-nfc-lf-final-newline-v1" -ErrorAction SilentlyContinue
+$script:MIRAssuranceGitIndexBlobs = $null
+$script:MIRAssuranceDirtyPaths = @{}
+$script:MIRAssuranceBlobCache = @{}
+$script:MIRAssuranceTreeHashCache = @{}
 
 function Get-MIRAssuranceCanonicalTextDigest {
   param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
@@ -181,7 +185,8 @@ function Get-MIRAssuranceCommitPackageSourceHash {
   param([Parameter(Mandatory)][string]$Commit)
 
   $resolvedCommit = Resolve-MIRAssuranceCommit -Commit $Commit
-  $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-package-source-" + [guid]::NewGuid().ToString("N"))
+  $temporaryParent = [IO.Path]::GetFullPath((Join-Path $repo 'build/tmp'))
+  $temporaryRoot = Join-Path $temporaryParent ("mir-package-source-" + [guid]::NewGuid().ToString("N"))
   $sourceArchive = Join-Path $temporaryRoot "source.zip"
   $sourceRoot = Join-Path $temporaryRoot "source"
   try {
@@ -192,13 +197,19 @@ function Get-MIRAssuranceCommitPackageSourceHash {
     & git -C $repo archive --format=zip --output=$sourceArchive $resolvedCommit -- @roots 2>$null
     if ($LASTEXITCODE -ne 0) { throw "Unable to extract committed package inputs for $resolvedCommit." }
     Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
-    if ([string]$layout.kind -ceq 'canonical-materializer-source') {
-      return Get-MIRPackageSourceFingerprint -RepoRoot $sourceRoot
+    if ([string]$layout.kind -in @('canonical-materializer-source','canonical-materializer-source-v1')) {
+      return Get-MIRPackageSourceFingerprint -RepoRoot $sourceRoot -Roots $roots
     }
     return Get-MIRLegacyRootPackageSourceFingerprint -RepoRoot $sourceRoot
   } finally {
     if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
-      Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+      $cleanupRoot = (Resolve-Path -LiteralPath $temporaryRoot).ProviderPath
+      if (-not $cleanupRoot.StartsWith($temporaryParent.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+          (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint -or
+          (Split-Path -Leaf $cleanupRoot) -notlike 'mir-package-source-*') {
+        throw 'Package-source hash cleanup target is outside owned scratch.'
+      }
+      Remove-Item -LiteralPath $cleanupRoot -Recurse -Force
     }
   }
 }

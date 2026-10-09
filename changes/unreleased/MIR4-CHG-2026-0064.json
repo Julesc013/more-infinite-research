@@ -1,0 +1,34 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0064",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Reject base continuations that begin with no research effects.",
+  "details": [
+    "The existing normalization module sanitizes base inputs; assembly delegates to it. Empty or absent effects retain a rejected candidate and failed effect gate instead of a paid empty technology. Missing-target and ownership-removal dispositions stay distinct.",
+    "Consumed compiler-contract controls check the exact rejection and preserve useful collision, partial ownership and unique-effect behavior. Actual finalizer host controls cover four selected adapters and detect the original empty-input predicate without mutating source proposals.",
+    "Controlled structure and graph facts do not qualify native rewards, saved-state migration, multiplayer or performance. Actual packages and upgrade evidence, including any previously generated empty technology, remain required; save and migration acceptance are open."
+  ],
+  "semantic_domains": ["compiler", "runtime", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The shared compilation planner qualifies base-continuation effects."},
+    {"target":"F200","disposition":"affected","reason":"The shared compilation planner qualifies base-continuation effects."},
+    {"target":"F110","disposition":"affected","reason":"The composed shared compilation planner qualifies base-continuation effects."},
+    {"target":"F100","disposition":"affected","reason":"The composed shared compilation planner qualifies base-continuation effects."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"The reduced historical composition does not select this shared compilation planner."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"changed","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"fixtures/assert-compiler-contracts/data-final-fixes.lua: consumed originally empty base-continuation and preserved combined-ownership controls"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

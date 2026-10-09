@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "assertions": 18,
+  "scope": "exact-package-load-and-controlled-personal-view-model-on-real-force; native-two-client-GUI-not-qualified",
+  "native_players": 1,
+  "engine": "2.0.77",
+  "package_sha256": "272975C3AFBCCCB649AD844F25C5ED37604469ADCAA2DBFF2A31BAFD806843E6",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "model_sha256": "0BED8E3CDCD22A319FC270F48E19D4BE9C5D44DE3D8EEA2CA5BBA3D89AD5945D",
+  "harness_sha256": "85C40B4EA2DBD24F772D988D1AA8473297AEA93576A5E4AA9B8A290C2EF39FAB",
+  "fixture_sha256": "571A056F43E9D0B657FBCA62D39B344B9C2D42B9E710E9F6E9F252D139F989C4",
+  "test_sha256": "5713A24EF652305B5B4EE45987D5E716F7675CDC2ED94517CC7BDF8CB7504D52",
+  "reload": {
+    "status": "passed",
+    "assertions": 3,
+    "engine": "2.0.77",
+    "scope": "native-single-player-save-reload-with-partial-research"
+  },
+  "save_sha256": "E36B7059FCB3FF335F8D366CF64FF9CFA7EAC366F65FE5917F791C8CBD90FEEB",
+  "target": "2.0"
+}

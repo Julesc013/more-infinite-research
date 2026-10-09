@@ -88,6 +88,9 @@ if ($RunManualScenarios) {
       -EnableSpaceAgeBundle $includeBundle `
       -ClaimLevel ([string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")) `
       -TimeoutSeconds ([int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)) `
+      -RuntimeFixtures @((Get-MIRObjectProperty -Object $scenario -Name "runtime_fixtures" -Default @()) | ForEach-Object { [string]$_ }) `
+      -RequiredReloadCount ([int](Get-MIRObjectProperty -Object $scenario -Name "required_reload_count" -Default 0)) `
+      -MaxReloadDurationSeconds ([int](Get-MIRObjectProperty -Object $scenario -Name "max_reload_duration_seconds" -Default 0)) `
       -Settings (Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})) `
       -ExpectedPlan (Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})) `
       -SourceManifest ([string](Get-MIRObjectProperty -Object $scenario -Name "_source_manifest" -Default "")) `

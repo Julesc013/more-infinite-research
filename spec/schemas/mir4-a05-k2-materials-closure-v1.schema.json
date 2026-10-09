@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mir4-a05-k2-materials-closure-v1.schema.json",
+  "title": "MIR4 A05 K2 material bounded closure V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "task", "requests", "status", "runtime_result", "candidate", "engine", "command_inventory_evolution", "source_authorities", "cases", "qualification_boundary", "projection_gap", "outcomes", "remaining_obligations", "authority_flags", "non_claims", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4A05K2MaterialsClosureV1"},
+    "recorded_at": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T"},
+    "task": {"const": "A05"},
+    "requests": {"const": ["K2-02", "K2-04", "K2-05", "K2-06", "K2-07"]},
+    "status": {"const": "bounded-claims-passed"},
+    "runtime_result": {"$ref": "#/$defs/artifact"},
+    "candidate": {"$ref": "#/$defs/artifact"},
+    "engine": {"type": "object", "additionalProperties": true},
+    "command_inventory_evolution": {"$ref": "#/$defs/recordBinding"},
+    "source_authorities": {"type": "array", "minItems": 30, "items": {"$ref": "#/$defs/sourceBinding"}},
+    "cases": {"type": "object", "additionalProperties": false, "required": ["locked_2_0_13", "current_2_0_17"], "properties": {"locked_2_0_13": {"$ref": "#/$defs/case"}, "current_2_0_17": {"$ref": "#/$defs/case"}}},
+    "qualification_boundary": {"type": "object", "additionalProperties": false, "required": ["graph_guard", "reviewed_forward_certificate", "current_k2so_material_qualification", "broader_k2so_support", "angel_or_combined_a06_support"], "properties": {"graph_guard": {"const": "potential-return-paths-withheld-unless-exact-profile-locked-reviewed-forward-certificate-proves-bounded-ordinary-route"}, "reviewed_forward_certificate": {"const": "exact-final-recipe-facts-risk-fingerprint-and-complete-mod-profile-locked"}, "current_k2so_material_qualification": {"const": "bounded-rare-metals-silicon-glass-fresh-and-two-reload-evidence"}, "broader_k2so_support": {"const": "not-proven"}, "angel_or_combined_a06_support": {"const": "not-proven"}}},
+    "projection_gap": {"type": "object", "additionalProperties": false, "required": ["status", "blocks_release", "package_source", "root_projection", "mir_projection_authority", "required_disposition"], "properties": {"status": {"const": "unresolved-pre-release"}, "blocks_release": {"const": true}, "package_source": {"$ref": "#/$defs/projection"}, "root_projection": {"$ref": "#/$defs/projection"}, "mir_projection_authority": {"$ref": "#/$defs/sourceBinding"}, "required_disposition": {"const": "regenerate-whole-projection-or-authoritatively-reconcile-before-release-candidate"}}},
+    "outcomes": {"type": "object", "additionalProperties": false, "required": ["K2_02", "K2_04", "K2_05", "K2_06", "K2_07", "casting", "paving"], "properties": {"K2_02": {"$ref": "#/$defs/admitted"}, "K2_04": {"$ref": "#/$defs/admitted"}, "K2_05": {"$ref": "#/$defs/admitted"}, "K2_06": {"$ref": "#/$defs/withheld"}, "K2_07": {"$ref": "#/$defs/withheld"}, "casting": {"$ref": "#/$defs/withheld"}, "paving": {"$ref": "#/$defs/paving"}}},
+    "remaining_obligations": {"type": "array", "minItems": 4, "items": {"type": "string", "minLength": 1}},
+    "authority_flags": {"type": "object", "additionalProperties": false, "required": ["a05_complete", "broader_k2so_support", "angel_or_combined_a06_support", "release_authority", "signing_authority", "publication_authority"], "properties": {"a05_complete": {"const": false}, "broader_k2so_support": {"const": false}, "angel_or_combined_a06_support": {"const": false}, "release_authority": {"const": false}, "signing_authority": {"const": false}, "publication_authority": {"const": false}}},
+    "non_claims": {"type": "array", "minItems": 5, "items": {"type": "string", "minLength": 1}},
+    "record_sha256": {"$ref": "#/$defs/sha"}
+  },
+  "$defs": {
+    "sha": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "path": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$"},
+    "sourceBinding": {"type": "object", "additionalProperties": false, "required": ["path", "canonical_sha256"], "properties": {"path": {"$ref": "#/$defs/path"}, "canonical_sha256": {"$ref": "#/$defs/sha"}}},
+    "recordBinding": {"type": "object", "additionalProperties": false, "required": ["path", "raw_sha256", "record_sha256"], "properties": {"path": {"$ref": "#/$defs/path"}, "raw_sha256": {"$ref": "#/$defs/sha"}, "record_sha256": {"$ref": "#/$defs/sha"}}},
+    "artifact": {"type": "object", "additionalProperties": false, "required": ["path", "bytes", "raw_sha256"], "properties": {"path": {"$ref": "#/$defs/path"}, "bytes": {"type": "integer", "minimum": 0}, "raw_sha256": {"$ref": "#/$defs/sha"}}},
+    "projection": {"type": "object", "additionalProperties": false, "required": ["path", "rows", "raw_sha256"], "properties": {"path": {"$ref": "#/$defs/path"}, "rows": {"type": "integer", "minimum": 1}, "raw_sha256": {"$ref": "#/$defs/sha"}}},
+    "fresh": {"type": "object", "additionalProperties": false, "required": ["save", "stdout", "stderr", "factorio_log"], "properties": {"save": {"$ref": "#/$defs/artifact"}, "stdout": {"$ref": "#/$defs/artifact"}, "stderr": {"$ref": "#/$defs/artifact"}, "factorio_log": {"$ref": "#/$defs/artifact"}}},
+    "reload": {"type": "object", "additionalProperties": false, "required": ["ordinal", "input_save_sha256", "save_sha256", "stdout", "stderr", "factorio_log"], "properties": {"ordinal": {"enum": [1, 2]}, "input_save_sha256": {"$ref": "#/$defs/sha"}, "save_sha256": {"$ref": "#/$defs/sha"}, "stdout": {"$ref": "#/$defs/artifact"}, "stderr": {"$ref": "#/$defs/artifact"}, "factorio_log": {"$ref": "#/$defs/artifact"}}},
+    "case": {"type": "object", "additionalProperties": false, "required": ["k2so_version", "k2so_archive_sha256", "xy_enabled", "paving_routes", "fresh_load", "mod_archives", "fixture", "candidate", "mod_list", "mod_settings", "reloads"], "properties": {"k2so_version": {"enum": ["2.0.13", "2.0.17"]}, "k2so_archive_sha256": {"$ref": "#/$defs/sha"}, "xy_enabled": {"type": "boolean"}, "paving_routes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}, "fresh_load": {"$ref": "#/$defs/fresh"}, "mod_archives": {"type": "array", "minItems": 7, "items": {"$ref": "#/$defs/artifact"}}, "fixture": {"$ref": "#/$defs/artifact"}, "candidate": {"$ref": "#/$defs/artifact"}, "mod_list": {"$ref": "#/$defs/artifact"}, "mod_settings": {"$ref": "#/$defs/artifact"}, "reloads": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/reload"}}}},
+    "admitted": {"type": "object", "additionalProperties": false, "required": ["admitted_routes", "technology", "effect_per_tier", "finite_tiers", "science"], "properties": {"admitted_routes": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "technology": {"type": "string"}, "effect_per_tier": {"const": 0.02}, "finite_tiers": {"const": 3}, "science": {"type": "array", "minItems": 2, "items": {"type": "string"}}}},
+    "withheld": {"type": "object", "additionalProperties": false, "required": ["withheld_recipe", "reason"], "properties": {"withheld_recipe": {"type": "string"}, "reason": {"type": "string"}}},
+    "paving": {"type": "object", "additionalProperties": false, "required": ["routes", "recolor_return_routes"], "properties": {"routes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}, "recolor_return_routes": {"const": []}}}
+  }
+}

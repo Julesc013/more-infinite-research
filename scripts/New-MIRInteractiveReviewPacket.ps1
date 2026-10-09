@@ -15,6 +15,7 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repo "tools\lib\validation\ReleaseAttestations.ps1")
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
 
 function Write-MIRReviewJson {
   param(
@@ -29,7 +30,8 @@ function Write-MIRReviewJson {
   )
 }
 
-$info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+$info = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 $candidatePath = if ([System.IO.Path]::IsPathRooted($CandidateZip)) {
   (Resolve-Path -LiteralPath $CandidateZip).Path
 } else {

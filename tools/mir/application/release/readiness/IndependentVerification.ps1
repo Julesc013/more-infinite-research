@@ -64,6 +64,7 @@ function Test-MIR441IndependentQualification {
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   $evidence=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $EvidenceRoot -Name EvidenceRoot
   $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
+  Assert-MIR441CurrentReleaseOperationAuthorized -Contract $contract -Operation 'technical_seal'
   $source=Get-MIR441GitIdentity -RepoRoot $repo
   $candidate=Get-Content -Raw -LiteralPath (Join-Path $evidence 'candidate-manifest.json')|ConvertFrom-Json -Depth 100 -DateKind String
   $aggregate=Get-Content -Raw -LiteralPath (Join-Path $evidence 'qualification/aggregate.json')|ConvertFrom-Json -Depth 100 -DateKind String

@@ -12,4 +12,4 @@ An honest successor should:
 
 Do not reuse MIR signatures, claim an unperformed audit, or present preview/shadow behavior as stable. If a fork retains compatible public contracts, it should publish a bounded compatibility statement and migration horizon rather than implying shared governance.
 
-The portable starting points are [Project continuity](PROJECT-CONTINUITY.md), [Maintainer handoff](MAINTAINER-HANDOFF.md), and the generated documentation reference matrix.
+The portable starting points are [Project continuity](docs/PROJECT-CONTINUITY.md), [Maintainer handoff](docs/MAINTAINER-HANDOFF.md), and the generated documentation reference matrix.

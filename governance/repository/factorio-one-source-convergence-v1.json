@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "kind": "MIR4FactorioOneSourceConvergenceAuthorityV1",
+  "migration_id": "MIR4-FACTORIO-ONE-SOURCE-CONVERGENCE-V1",
+  "state": "authorized-development-source-convergence",
+  "predecessor": {
+    "layout_receipt": "assurance/repository/composable-source-layout-receipt-v1.json",
+    "source_layout_migration_id": "MIR4-COMPOSABLE-SOURCE-LAYOUT-V1"
+  },
+  "proof": {
+    "implementation": "tools/mir/application/package/FactorioOneSourceConvergence.ps1",
+    "schema": "spec/schemas/mir4-factorio-one-source-convergence-proof-v1.schema.json",
+    "test": "tests/mir4/Test-MIR4FactorioOneSourceConvergenceM4202.ps1",
+    "baseline_revision": "297aa5cc902da96847165a4f9caa1048608839fb"
+  },
+  "required_invariants": [
+    "single-canonical-source-per-current-binding",
+    "no-factorio-one-whole-tree",
+    "literal-require-closure-complete",
+    "factorio-two-executable-content-preserved-presentation-identity-evolved",
+    "factorio-one-semantic-content-identities-changed",
+    "exact-factorio-one-engine-proof-required",
+    "release-firewall"
+  ],
+  "rollback": "Revert the exact Factorio-1 convergence change set and restore the immutable composable-source-layout receipt; do not recreate a parallel Factorio-1 source tree as a compatibility shortcut.",
+  "transition_gate": {
+    "development_merge": true,
+    "private_build": false,
+    "qualification": false,
+    "technical_seal": false,
+    "main_promotion": false,
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  }
+}

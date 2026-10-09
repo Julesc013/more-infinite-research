@@ -20,5 +20,4 @@ Current manifest entry points:
 - `agents.yml`: required reading and validation routes for Codex-style agents.
 - `control/paths.yml`: compatibility path registry while final authorities move to their declared repository roots.
 
-The current MIR 4.x work programme is `spec/programmes/mir4-4x-operating-programme-v1.json`. The MIR 4.0 pre-freeze programme under `.mir/releases/waves/mir4-r0/` is a completed historical execution record. MIR 3 release records remain immutable history. Root `todo.md` and other generated views must be regenerated from these authorities through the supported toolchain.
-
+The current MIR 4.x work programme is `spec/programmes/mir4-4x-operating-programme-v1.json`. The MIR 4.0 pre-freeze programme under `.mir/releases/waves/mir4-r0/` is a completed historical execution record. MIR 3 release records remain immutable history. Root `TODO.md` and other generated views must be regenerated from these authorities through the supported toolchain.

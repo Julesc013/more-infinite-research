@@ -1,0 +1,34 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0073",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Allow the existing historical upgrade fixture to validate same-target maintenance transitions.",
+  "details": [
+    "The manifest-driven harness previously rejected every historical 4.2.0 CCC00 to 4.2.1 CCC01 transition because its fixture specialization selected only MIR 3 terminal predecessors.",
+    "A shared transition resolver retains the exact terminal paths and admits strictly earlier same-target MIR 4.2 maintenance versions through the existing distribution codec and continuity fixture. Equal versions, downgrades, wrong targets and malformed identities are refused.",
+    "Focused tests cover all five historical targets and preserve their engine-line and infinite-research selections. Actual published predecessor custody, candidate-bound native execution, reload proof and current-version engine-runner admission remain outstanding."
+  ],
+  "semantic_domains": ["tooling", "packaging", "documentation"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"Existing modern manifest-driven specialization is retained."},
+    {"target":"F200","disposition":"unaffected","reason":"Existing modern manifest-driven specialization is retained."},
+    {"target":"F110","disposition":"unaffected","reason":"Existing modern manifest-driven specialization is retained."},
+    {"target":"F100","disposition":"unaffected","reason":"Existing modern manifest-driven specialization is retained."},
+    {"target":"F017","disposition":"affected","reason":"The existing historical continuity fixture admits same-target maintenance transitions."},
+    {"target":"F016","disposition":"affected","reason":"The existing historical continuity fixture admits same-target maintenance transitions."},
+    {"target":"F015","disposition":"affected","reason":"The existing historical continuity fixture admits same-target maintenance transitions."},
+    {"target":"F014","disposition":"affected","reason":"The existing historical continuity fixture admits same-target maintenance transitions."},
+    {"target":"F013","disposition":"affected","reason":"The existing historical continuity fixture admits same-target maintenance transitions."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/tooling/Test-MIRUpgradeManifest.ps1"},
+    {"kind":"document","value":"docs/releases/mir42-nine-target-candidate-playtest-matrix.md"}
+  ]
+}

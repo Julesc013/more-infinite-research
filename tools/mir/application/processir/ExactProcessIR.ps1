@@ -5,6 +5,16 @@ if (-not (Get-Command New-MIR4ProcessIRV1 -ErrorAction SilentlyContinue)) {
 if (-not (Get-Command New-MIR4EnvironmentLockV1 -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot '../assurance/EnvironmentEvidence.ps1')
 }
+if (-not (Get-Command New-MIRNativeProbeResourceContext -ErrorAction SilentlyContinue)) {
+  # Keep the native adapters' StrictMode inside their module, rather than
+  # changing the existing ProcessIR reader's optional-field semantics.
+  $mirT12NativeResources=New-Module -Name MIRProcessIRNativeResources -ArgumentList (Join-Path $PSScriptRoot '../../../lib/validation/NativeProbeResources.ps1') -ScriptBlock {
+    param($Path)
+    . $Path
+    Export-ModuleMember -Function New-MIRNativeProbeResourceContext,New-MIRImmutableInputLease,Add-MIRNativeProbeImmutableLease,Complete-MIRImmutableInputLease,Close-MIRImmutableInputLeaseHandles,Invoke-MIRNativeProbeFactorioProcess,Get-MIRNativeProbeRemainingOutputBytes
+  }
+  Import-Module $mirT12NativeResources -Force
+}
 
 function Get-MIR4T12RepoRoot {
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -74,7 +84,8 @@ function Resolve-MIR4T12Archive {
   foreach($root in $SearchRoots){
     if(-not(Test-Path -LiteralPath $root)){continue}
     $direct=Join-Path $root $fileName;if(Test-Path -LiteralPath $direct -PathType Leaf){$candidates+=$direct}
-    $candidates+=@(Get-ChildItem -LiteralPath $root -Recurse -File -Filter $fileName -ErrorAction SilentlyContinue|ForEach-Object FullName)
+    # Profiles select an exact archive or a flat shared library, never a
+    # recursive search through old copied profiles or unrelated downloads.
   }
   foreach($candidate in @($candidates|Select-Object -Unique)){
     if((Test-Path -LiteralPath $candidate -PathType Leaf)-and(Get-MIR4T12FileSha256 $candidate)-ceq$expected){return (Resolve-Path -LiteralPath $candidate).Path}
@@ -294,7 +305,7 @@ function Reset-MIR4T12RunDirectory {
   param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Path)
   $rootFull=[IO.Path]::GetFullPath($Root).TrimEnd('\')+'\';$pathFull=[IO.Path]::GetFullPath($Path)
   if(-not($pathFull+'\').StartsWith($rootFull,[StringComparison]::OrdinalIgnoreCase)){throw "[mir4-t12-run-boundary] $pathFull"}
-  if(Test-Path -LiteralPath $pathFull){Remove-Item -LiteralPath $pathFull -Recurse -Force}
+  if(Test-Path -LiteralPath $pathFull){throw '[mir4-t12-existing-run-preserved]'}
   New-Item -ItemType Directory -Path $pathFull -Force|Out-Null
   $pathFull
 }
@@ -304,9 +315,11 @@ function Invoke-MIR4T12ExactCapture {
     [Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Authority,[Parameter(Mandatory)]$Capture,
     [Parameter(Mandatory)][string]$EnginePath,[Parameter(Mandatory)][string]$OutputRoot,
     [Parameter(Mandatory)][string[]]$ArchiveSearchRoots,[Parameter(Mandatory)]$SourceIdentity,
+    [Parameter(Mandatory)]$ResourceContext,
     [int]$Repetitions=2
   )
   $repo=Get-MIR4T12RepoRoot $RepoRoot
+  if(-not [string]::Equals([IO.Path]::GetFullPath($OutputRoot),[IO.Path]::GetFullPath([string]$ResourceContext.root),[StringComparison]::OrdinalIgnoreCase)){throw '[mir4-t12-resource-root-binding]'}
   $targetSource=$Authority.targets.PSObject.Properties[[string]$Capture.target].Value
   $target=[pscustomobject][ordered]@{target_key=[string]$Capture.target;factorio_line=[string]$targetSource.factorio_line;engine_version=[string]$targetSource.engine_version;engine_sha256=[string]$targetSource.engine_sha256;candidate=[string]$targetSource.candidate;candidate_version=[string]$targetSource.candidate_version;candidate_sha256=[string]$targetSource.candidate_sha256;available_official_mods=@($targetSource.available_official_mods)}
   $engine=(Resolve-Path -LiteralPath $EnginePath).Path
@@ -322,23 +335,40 @@ function Invoke-MIR4T12ExactCapture {
   }
   $environmentLock=New-MIR4T12EnvironmentLock -Authority $Authority -Target $target -Scenario $evidence.scenario -ClosureRows $closure
   $observations=@()
+  $inputReceipts=@()
   for($repetition=1;$repetition-le$Repetitions;$repetition++){
     $run=Reset-MIR4T12RunDirectory -Root $OutputRoot -Path (Join-Path $OutputRoot "runtime/$($Capture.id)/run-$repetition")
     $mods=Join-Path $run 'mods';New-Item -ItemType Directory -Path $mods|Out-Null
-    Copy-Item -LiteralPath $candidate -Destination (Join-Path $mods ([IO.Path]::GetFileName($candidate))) -Force
-    foreach($row in $resolved){Copy-Item -LiteralPath $row.archive -Destination (Join-Path $mods $row.file_name) -Force}
+    $inputs=@([ordered]@{source_path=$candidate;file_name=[IO.Path]::GetFileName($candidate);expected_sha256=([string]$target.candidate_sha256).ToUpperInvariant();role='mir-candidate';identity=@{target=$target.target_key;version=$target.candidate_version};provenance=@{kind='exact-processir-candidate'};immutable=$true})
+    foreach($row in $resolved){$inputs+=@([ordered]@{source_path=$row.archive;file_name=$row.file_name;expected_sha256=([string]$row.sha256).ToUpperInvariant();role='library-mod';identity=@{name=$row.name;version=$row.version};provenance=@{kind='exact-processir-dependency-lock'};immutable=$true})}
+    $lease=$null
+    try {
+    $lease=New-MIRImmutableInputLease -RunRoot $run -StageDirectory $mods -Inputs $inputs -RequireHardLinks
+    Add-MIRNativeProbeImmutableLease -Context $ResourceContext -Lease $lease
     $observerSource=Join-Path $run 'observer-source'
     Write-MIR4T12ObserverSource -RepoRoot $repo -Path $observerSource -Capture $Capture -Target $target -MaximumProcesses ([int]$Authority.maximum_processes_per_capture)
     Publish-MIRModDirectoryArchive -Source $observerSource -Name 'mir4-processir-exact-observer' -Version '0.1.0' -ModsDir $mods|Out-Null
     $enabled=@('more-infinite-research','mir4-processir-exact-observer')+@($resolved|ForEach-Object{[string]$_.name})+@($evidence.scenario.official_mods|ForEach-Object{[string]$_})
     $enabled=@($enabled|Where-Object{-not[string]::IsNullOrWhiteSpace([string]$_)})
     Write-MIRModList -ModsDir $mods -EnabledMods $enabled -OfficialBuiltinMods @($target.available_official_mods)
-    $result=Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $run -ScenarioName ([string]$Capture.id) -ScenarioTimeoutSeconds 900
-    if(-not$result.passed){$stderr=if(Test-Path -LiteralPath $result.stderr){Get-Content -Raw -LiteralPath $result.stderr}else{''};throw "[mir4-t12-factorio] $($Capture.id) repetition=$repetition exit=$($result.exit_code) $stderr"}
+    $readData=Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $engine))) 'data'
+    if(-not(Test-Path -LiteralPath $readData -PathType Container)){throw '[mir4-t12-engine-read-data]'}
+    $config=Join-Path $run 'factorio-config.ini'
+    [IO.File]::WriteAllText($config,"[path]`nread-data=$readData`nwrite-data=$run`n[other]`nenable-steam-networking=false`ndisable-blueprint-storage=true`n",[Text.UTF8Encoding]::new($false))
+    $save=Join-Path $run 'saves/capture.zip'
+    New-Item -ItemType Directory -Path (Split-Path -Parent $save)|Out-Null
+    $result=Invoke-MIRNativeProbeFactorioProcess -Context $ResourceContext -FilePath $engine -Arguments @('--config',$config,'--no-log-rotation','--create',$save,'--mod-directory',$mods,'--disable-audio') -TimeoutSeconds 900
+    $currentLog=Join-Path $run 'factorio-current.log'
+    if(-not $result.result.passed -or $result.result.exit_code -ne 0 -or -not(Test-Path -LiteralPath $save -PathType Leaf) -or (Get-Item -LiteralPath $save).Length -eq 0 -or -not(Test-Path -LiteralPath $currentLog -PathType Leaf)){$stderr=if(Test-Path -LiteralPath $result.stderr){Get-Content -Raw -LiteralPath $result.stderr}else{''};throw "[mir4-t12-factorio] $($Capture.id) repetition=$repetition exit=$($result.result.exit_code) $stderr"}
     $observations+=Read-MIR4T12ObserverLog -Path $result.stdout -CaptureId ([string]$Capture.id)
+    $inputReceipts+=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed
+    } catch {
+      if($null -ne $lease -and -not $lease.closed){try{$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}catch{Write-Warning $_.Exception.Message}}
+      throw
+    } finally {if($null -ne $lease){Close-MIRImmutableInputLeaseHandles -Lease $lease}}
   }
   $digests=@($observations.digest|Sort-Object -Unique -CaseSensitive);$deterministic=$digests.Count-eq 1
   if($Repetitions-ge[int]$Authority.required_repetitions-and-not$deterministic){throw "[mir4-t12-nondeterministic] $($Capture.id) $($digests -join ',')"}
   $snapshot=New-MIR4T12ExactSnapshot -RepoRoot $repo -Capture $Capture -EnvironmentLock $environmentLock -Observed $observations[0] -SourceIdentity $SourceIdentity -Evidence $evidence -Repetitions $Repetitions -Deterministic $deterministic
-  [pscustomobject][ordered]@{snapshot=$snapshot;environment_lock=$environmentLock;observer_digests=@($observations.digest);deterministic=$deterministic;resolved_mods=@($resolved|ForEach-Object{[ordered]@{name=$_.name;version=$_.version;sha256='sha256:'+([string]$_.sha256).ToLowerInvariant()}})}
+  [pscustomobject][ordered]@{snapshot=$snapshot;environment_lock=$environmentLock;observer_digests=@($observations.digest);deterministic=$deterministic;immutable_input_receipts=@($inputReceipts);resolved_mods=@($resolved|ForEach-Object{[ordered]@{name=$_.name;version=$_.version;sha256='sha256:'+([string]$_.sha256).ToLowerInvariant()}})}
 }

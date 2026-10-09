@@ -10,9 +10,12 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$lookupPath = Join-Path $RepoRoot "prototypes\mir\platform\factorio\prototype_lookup.lua"
-$inventoryPath = Join-Path $RepoRoot "prototypes\mir\platform\factorio\effect_target_inventory.lua"
-$contractsPath = Join-Path $RepoRoot "prototypes\mir\domain\effects\generated_target_contracts.lua"
+$RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target 'f210'
+$lookupPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/platform/factorio/prototype_lookup.lua'
+$inventoryPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/platform/factorio/effect_target_inventory.lua'
+$contractsPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/domain/effects/generated_target_contracts.lua'
 
 foreach ($path in @($lookupPath, $inventoryPath, $contractsPath)) {
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {

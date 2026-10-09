@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine_version": "2.1.21",
+  "engine_sha256": "703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1",
+  "baseline": {"version":"4.2.21000","sha256":"DE45F114931BEACF78F2CC6ABFBF3B2BDD7A79CC27E780A6E1A483FCA5ED9422"},
+  "candidate_version": "4.2.21001",
+  "fixture": {"name":"mir-fixture-research-all-performance","version":"1.0.2"},
+  "settings": "defaults",
+  "official_mods": ["base"],
+  "scope": "base-only first and repeated research_all_technologies; single paired observation, not statistical or GUI acceptance"
+}

@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "MIR4ComposableSourceLayoutAuthorityV1",
+  "migration_id": "MIR4-COMPOSABLE-SOURCE-LAYOUT-V1",
+  "state": "authorized-development-migration",
+  "scope": "Replace the abbreviated and era-split live player-source layout with one package-shaped source root, explicit target adapters, explicit Factorio-1 compatibility code, and content-identity deduplication without changing materialized package bytes.",
+  "predecessor": {
+    "branch": "dev",
+    "commit": "92d563ada31e82430fbf25f639267b03a8a180d1",
+    "package_source_fingerprint_sha256": "BD29DCCC6818E3B2593B2DD182E62F8AA68827EC58E1E27AC1CBA915C582AF57",
+    "manifest": "src/mod/package-source.json",
+    "manifest_record_sha256": "8BDB2B9D3D63A5FBD49556609D6A7371B2BF11FA1D5F15BFD696E4C17EA3EF5E"
+  },
+  "writers": [
+    {
+      "fact_family": "composable-source-layout",
+      "path": "tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1"
+    }
+  ],
+  "required_invariants": [
+    "one-live-source-root",
+    "no-live-src-root",
+    "no-live-modern-or-legacy-lanes",
+    "cross-checkout-source-bytes-pinned-to-lf",
+    "one-binding-per-target-output",
+    "exact-predecessor-path-map",
+    "binary-safe-all-binding-predecessor-proof",
+    "content-identical-inputs-share-one-physical-source",
+    "all-four-materialized-package-trees-unchanged",
+    "historical-records-remain-immutable",
+    "one-current-package-writer",
+    "release-firewall"
+  ],
+  "rollback": "Revert the exact source-layout work package to the recorded dev predecessor; do not recreate partial src/mod or target payload trees.",
+  "transition_gate": {
+    "development_merge": true,
+    "main_promotion": false,
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  }
+}

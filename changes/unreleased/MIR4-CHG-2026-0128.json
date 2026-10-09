@@ -1,0 +1,37 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0128",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Retain Imersite powder research beyond level three in the reviewed Factorio 2.1.21 K2/K2SO profile.",
+  "details": [
+    "An exact-engine compatibility guard omitted the existing level-four continuation on Factorio 2.1.21 with Krastorio2 2.1.3 and Krastorio2-spaced-out 2.0.13. A distinct exact profile now selects the existing science policy and continuation without widening recipe permissions or route certificates.",
+    "The finite levels 1–3 and their identities remain. Native creation and reload preserve an 8% completed-level-four powder bonus, the separate 10% crystal bonus, and level five queued with 42% progress.",
+    "In the exact retained profile, two unmodified native crushers demonstrate output after reload: 300 ore produces 324 powder and 324 sand with the earned bonus, versus 300 of each without research.",
+    "The fixture supplies ingredients and energy. This does not establish natural acquisition, published-predecessor upgrades, other K2 routes or joined release acceptance."
+  ],
+  "semantic_domains": ["compatibility", "progression", "productivity"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Restores the existing continuation in the exact reviewed 2.1.21/K2 2.1.3/K2SO 2.0.13 profile."},
+    {"target":"F200","disposition":"unaffected","reason":"The new engine guard cannot match Factorio 2.0; existing K2 lineages are unchanged."},
+    {"target":"F110","disposition":"unaffected","reason":"The exact current-engine K2/K2SO profile cannot match this engine."},
+    {"target":"F100","disposition":"unaffected","reason":"The exact current-engine K2/K2SO profile cannot match this engine."},
+    {"target":"F017","disposition":"unaffected","reason":"The exact current-engine K2/K2SO profile cannot match this engine."},
+    {"target":"F016","disposition":"unaffected","reason":"The exact current-engine K2/K2SO profile cannot match this engine."},
+    {"target":"F015","disposition":"unaffected","reason":"The exact current-engine K2/K2SO profile cannot match this engine."},
+    {"target":"F014","disposition":"unaffected","reason":"The exact current-engine K2/K2SO profile cannot match this engine."},
+    {"target":"F013","disposition":"unaffected","reason":"The exact current-engine K2/K2SO profile cannot match this engine."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"compatible","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"A05, A17 and K2-03: exact current-engine Imersite continuation"},
+    {"kind":"document","value":"docs/releases/mir42-nine-target-candidate-playtest-matrix.md"},
+    {"kind":"finding","value":"fixtures/run-profiles/k2-213-imersite-f210.json"},
+    {"kind":"finding","value":"Native production result SHA-256 4D433FC7A8944B922C9CAC0A4216945CF441C1E9467CC97331258269CDCF2971"}
+  ]
+}

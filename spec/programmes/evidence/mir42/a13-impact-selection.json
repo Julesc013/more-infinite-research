@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "MIR42A13ImpactSelectionReceiptV1",
+  "task": "A13",
+  "status": "implemented-and-contract-tested",
+  "candidate_bound_plan": {
+    "writer": "tools/lib/assurance/evidence/Plans.ps1",
+    "ledger_schema": "mir-assurance-impact-proposition-ledger-v1",
+    "candidate_fields": [
+      "target",
+      "source_commit",
+      "source_tree",
+      "package_source_commit",
+      "package_source_sha256",
+      "candidate_descriptor_sha256"
+    ],
+    "selection_modes": [
+      "declared-semantic-impact",
+      "full-escalation",
+      "full-profile"
+    ]
+  },
+  "selection_contract": {
+    "universe": "all non-gate records in the target-qualified runtime scenario registry",
+    "selected": "runtime.affected records selected by the declared scenarios, groups, or tags",
+    "omitted": "every unselected proposition is named as scenario/<target>/<name> with reason unaffected-by-declared-semantic-impact",
+    "full_escalation": "an unmapped runtime impact selects the full universe and records no scoped unaffected omission",
+    "tamper_response": "a plan whose runtime.affected rows differ from the deterministic selector is rejected"
+  },
+  "evidence": {
+    "static_test": "tests/tooling/Test-MIRAssurance.ps1",
+    "checks": [
+      "deterministic ledger hash",
+      "selected plus omitted proposition coverage equals the target scenario universe",
+      "over-selection rejection",
+      "full-escalation no-omission behavior",
+      "candidate binding fields"
+    ]
+  },
+  "non_claims": [
+    "This receipt is not a qualified gameplay candidate or release approval.",
+    "Candidate-specific selected and omitted values are materialized in the exact verification plan, not prefilled in this source receipt.",
+    "An unaffected omission never authorizes cross-target runtime evidence reuse."
+  ],
+  "release_authority": false,
+  "publication_authority": false
+}

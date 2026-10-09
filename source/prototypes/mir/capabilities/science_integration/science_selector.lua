@@ -1,0 +1,307 @@
+local C = require("prototypes.mir.streams.registry")
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
+local recipe_unlock_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
+local effective_settings = require("prototypes.mir.settings.effective")
+local compatibility_policy = require("prototypes.mir.compatibility.policy_authority")
+
+local M = {}
+
+local STREAM_EXTRA_PACKS = {
+  research_concrete = {"space-science-pack"},
+  research_furnace = {"metallurgic-science-pack"},
+  research_landfill = {"metallurgic-science-pack", "space-science-pack"},
+  research_platform = {"space-science-pack", "cryogenic-science-pack"},
+  research_artificial_soil = {"agricultural-science-pack", "space-science-pack"},
+  research_molten_metals = {"metallurgic-science-pack"},
+  research_mining_drill = {"metallurgic-science-pack"},
+  research_walls = {"military-science-pack", "space-science-pack"},
+  research_grenades = {"military-science-pack", "space-science-pack"},
+  research_rails = {"space-science-pack"},
+  research_electric_energy = {"electromagnetic-science-pack"},
+
+  research_breeding = {"agricultural-science-pack", "cryogenic-science-pack"},
+  research_nutrients = {"agricultural-science-pack", "cryogenic-science-pack"},
+  research_capture_robot_rockets = {"military-science-pack", "agricultural-science-pack"},
+  research_plastic = {"agricultural-science-pack"},
+  research_rocket_fuel = {"agricultural-science-pack"},
+  research_thruster_fuel_productivity = {"space-science-pack", "agricultural-science-pack"},
+  research_thruster_oxidizer_productivity = {"space-science-pack", "agricultural-science-pack"},
+  research_oil_processing_productivity = {"cryogenic-science-pack"},
+  research_oil_cracking_productivity = {"agricultural-science-pack"},
+  research_lubricant_productivity = {"electromagnetic-science-pack"},
+  research_sulfuric_acid_productivity = {"metallurgic-science-pack"},
+  research_bacteria_cultivation = {"agricultural-science-pack", "cryogenic-science-pack"},
+  research_bioflux = {"agricultural-science-pack"},
+  research_carbon = {"space-science-pack"},
+  research_carbon_fiber = {"agricultural-science-pack"},
+  research_ice = {"space-science-pack", "cryogenic-science-pack"},
+  research_rockets = {"agricultural-science-pack", "military-science-pack"},
+
+  research_sulfur = {"metallurgic-science-pack"},
+  research_explosives = {"metallurgic-science-pack"},
+  research_low_density_structure = {"metallurgic-science-pack"},
+  research_engine = {"metallurgic-science-pack"},
+  research_tungsten = {"metallurgic-science-pack"},
+
+  research_batteries = {"electromagnetic-science-pack"},
+  research_electronic_circuit = {"electromagnetic-science-pack"},
+  research_advanced_circuit = {"electromagnetic-science-pack"},
+  research_processing_unit = {"electromagnetic-science-pack"},
+  research_electric_engine = {"electromagnetic-science-pack"},
+  research_flying_robot_frame = {"electromagnetic-science-pack"},
+  research_holmium = {"electromagnetic-science-pack"},
+  research_supercapacitor = {"electromagnetic-science-pack"},
+  research_superconductor = {"electromagnetic-science-pack"},
+
+  research_lithium = {"cryogenic-science-pack"},
+  research_quantum_processor = {"cryogenic-science-pack"},
+  research_modules = {"cryogenic-science-pack"},
+
+  research_belts = {"space-science-pack"},
+  research_inserters = {"space-science-pack"},
+  research_bullets = {"military-science-pack", "space-science-pack"},
+  research_heavy_ammo = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
+  research_armor_components = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
+
+  research_inventory_capacity = {"agricultural-science-pack"},
+  research_robot_battery = {"space-science-pack"},
+  research_science_pack_productivity = {}
+}
+
+-- These packs are progression gates, not compatibility suggestions.
+-- Compatibility overlays and lab reduction must never remove them from an
+-- emitted technology.
+local STREAM_REQUIRED_PACKS = {
+  research_ice = {"cryogenic-science-pack"},
+  research_platform = {"cryogenic-science-pack"}
+}
+
+local function startup_setting(name)
+  return effective_settings.get(name)
+end
+
+local function add_if_science_pack_exists(list, name)
+  if science.science_pack_exists(name) then table.insert(list, name) end
+end
+
+local function ingredient_name(ingredient)
+  if not ingredient then return nil end
+  if type(ingredient) == "string" then return ingredient end
+  return ingredient.name or ingredient[1]
+end
+
+local function ingredient_amount(ingredient)
+  if not ingredient or type(ingredient) == "string" then return 1 end
+  return ingredient.amount or ingredient[2] or 1
+end
+
+local function append_ingredient(out, seen, name, amount)
+  if name and science.science_pack_exists(name) and not seen[name] then
+    seen[name] = true
+    table.insert(out, {name, amount or 1})
+  end
+end
+
+local function stream_recipe_names(key, spec)
+  local seen = {}
+  local out = {}
+  for _, bucket in ipairs(recipes.buckets_view(key, spec or {}, C.shared.per_level_default) or {}) do
+    for _, recipe_name in ipairs(bucket.recipes or {}) do
+      if not seen[recipe_name] then
+        seen[recipe_name] = true
+        table.insert(out, recipe_name)
+      end
+    end
+  end
+  table.sort(out)
+  return out
+end
+
+local function science_from_unlocks(key, spec)
+  local out, seen = {}, {}
+  for _, recipe_name in ipairs(stream_recipe_names(key, spec)) do
+    -- A derived stream also derives the prerequisite technology below.  It is
+    -- safe to use the ordinary fallback only when a recipe was available from
+    -- the start.  Treating a recipe with no *researchable* unlocker as an
+    -- early recipe would otherwise let a generated technology bypass an
+    -- unreachable external science or prerequisite cycle.  That occurs in
+    -- content-heavy packs often enough that this must remain a generic
+    -- provenance rule rather than a set of mod-name exceptions.
+    local unlockers = science.researchable_unlockers_for_recipe(recipe_name)
+    if not recipe_unlock_facts.recipe_enabled_without_research(recipe_name) and #unlockers == 0 then
+      return {}, "research-locked-recipe-has-no-researchable-unlocker"
+    end
+    for _, tech_name in ipairs(unlockers) do
+      local tech = data_raw.technology(tech_name)
+      for _, ingredient in ipairs(((tech and tech.unit) and tech.unit.ingredients) or {}) do
+        append_ingredient(out, seen, ingredient_name(ingredient), ingredient_amount(ingredient))
+      end
+    end
+  end
+  return out
+end
+
+local function apply_science_exclusions(ingredients, key)
+  if not key then return ingredients end
+  local required, denied = {}, {}
+  for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do required[pack] = true end
+  for _, role in ipairs(compatibility_policy.science_roles_for_stream(key)) do
+    if role.role == "exclude" and not required[role.pack] then denied[role.pack] = true end
+  end
+  local out = {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    if not denied[ingredient_name(ingredient)] then out[#out + 1] = ingredient end
+  end
+  return out
+end
+
+function M.apply_science_pack_ingredient_policy(ingredients, key)
+  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
+  if policy == "configured" then
+    -- Preserve configured ingredients inside the compatibility contract,
+    -- without loading optional ingredient expansion policies.
+    return apply_science_exclusions(deepcopy(ingredients or {}), key)
+  end
+
+  local out, seen = {}, {}
+  local selected_packs = {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    local name = ingredient_name(ingredient)
+    if name then table.insert(selected_packs, name) end
+    if policy ~= "all-official" or science.is_official_science_pack(name) then
+      append_ingredient(out, seen, name, ingredient_amount(ingredient))
+    end
+  end
+
+  -- This setting intentionally changes only research ingredients. The
+  -- finish-game prerequisite gate is handled separately in prerequisites.
+  if policy == "space" then
+    append_ingredient(out, seen, science.native_pack_name("space-science-pack"), 1)
+  elseif policy == "space-and-promethium" then
+    append_ingredient(out, seen, science.native_pack_name("space-science-pack"), 1)
+    append_ingredient(out, seen, "promethium-science-pack", 1)
+  elseif policy == "space-age-progression" then
+    for _, pack in ipairs(science.space_age_progression_packs_for(selected_packs)) do
+      append_ingredient(out, seen, pack, 1)
+    end
+  elseif policy == "official-progression" then
+    for _, pack in ipairs(science.official_progression_packs_for(selected_packs)) do
+      append_ingredient(out, seen, pack, 1)
+    end
+  elseif policy == "mod-progression" then
+    for _, pack in ipairs(science.mod_progression_packs_for(selected_packs)) do
+      append_ingredient(out, seen, pack, 1)
+    end
+  elseif policy == "all-official" then
+    for _, pack in ipairs(science.pack_list_official()) do
+      append_ingredient(out, seen, pack, 1)
+    end
+  elseif policy == "all" then
+    for _, pack in ipairs(science.pack_list_all()) do
+      append_ingredient(out, seen, pack, 1)
+    end
+  end
+
+  return apply_science_exclusions(out, key)
+end
+
+function M.pick_science_for_stream(spec, key)
+  local packs = {}
+  local desired = spec and spec.science_packs
+  if desired == "all" then
+    for _, p in ipairs(science.pack_list_all()) do add_if_science_pack_exists(packs, p) end
+  elseif desired == "derive-from-unlocks" then
+    local derived, reason = science_from_unlocks(key, spec)
+    if reason then
+      -- Do not let an overlay, a hard-coded default, or an ingredient
+      -- expansion turn an unavailable unlock chain into a research gate that
+      -- looks valid. The compiler will retain its existing no-compatible-set
+      -- failure path for this stream.
+      return {}
+    end
+    for _, ingredient in ipairs(derived) do
+      add_if_science_pack_exists(packs, ingredient_name(ingredient))
+    end
+  elseif type(desired) == "table" then
+    for _, p in ipairs(desired) do add_if_science_pack_exists(packs, p) end
+  elseif type(desired) == "string" then
+    local list = science.pack_list_for_extension(key, desired) or science.pack_list_for_extension(desired)
+    if list then for _, p in ipairs(list) do add_if_science_pack_exists(packs, p) end end
+  elseif key == "research_science_pack_productivity" then
+    for _, p in ipairs(science.pack_list_all()) do add_if_science_pack_exists(packs, p) end
+  else
+    for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}) do
+      add_if_science_pack_exists(packs, science.native_pack_name(p))
+    end
+    for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, science.native_pack_name(p)) end
+  end
+
+  local denied = {}
+  local required = {}
+  for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do required[pack] = true end
+  local policy_roles = compatibility_policy.science_roles_for_stream(key)
+  for _, role in ipairs(policy_roles) do
+    if role.role == "exclude" and not required[role.pack] then denied[role.pack] = true end
+  end
+  for _, role in ipairs(policy_roles) do
+    if role.role ~= "exclude" and not denied[role.pack] then add_if_science_pack_exists(packs, role.pack) end
+  end
+
+  if desired == "derive-from-unlocks" and #packs == 0 then
+    for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack"}) do
+      add_if_science_pack_exists(packs, science.native_pack_name(p))
+    end
+  end
+  for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do
+    add_if_science_pack_exists(packs, pack)
+  end
+
+  local out, seen = {}, {}
+  for _, name in ipairs(packs) do
+    if not seen[name] and not denied[name] then
+      seen[name] = true
+      table.insert(out, {name, 1})
+    end
+  end
+  -- Expansion is a preference inside the compatibility contract. Reapply
+  -- exclusions to added packs; hard progression requirements still win.
+  local selected = M.apply_science_pack_ingredient_policy(out, key)
+  local selected_names = {}
+  for _, ingredient in ipairs(selected or {}) do
+    selected_names[ingredient_name(ingredient)] = true
+  end
+  for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do
+    if science.science_pack_exists(pack) and not selected_names[pack] then
+      table.insert(selected, {pack, 1})
+      selected_names[pack] = true
+    end
+  end
+  return selected
+end
+
+function M.required_science_packs_for_stream(key)
+  return deepcopy(STREAM_REQUIRED_PACKS[key] or {})
+end
+
+-- Science-pack productivity is meaningful only at the currently selected
+-- ecosystem stage. Those selected packs are phase requirements: a named
+-- phase policy may retire them, but laboratory reduction must not silently
+-- redefine the stage by dropping whichever packs were hard to acquire.
+function M.phase_required_science_packs_for_stream(key, selected)
+  if key ~= "research_science_pack_productivity" then return {} end
+  local out, seen = {}, {}
+  for _, ingredient in ipairs(selected or {}) do
+    local name = ingredient_name(ingredient)
+    if name and not seen[name] then
+      seen[name] = true
+      table.insert(out, name)
+    end
+  end
+  table.sort(out)
+  return out
+end
+
+return M

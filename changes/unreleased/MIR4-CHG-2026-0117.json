@@ -1,0 +1,36 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0117",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Recognize native Factorio 2.0 offshore-pump fluids in acquisition and progression.",
+  "details": [
+    "Both modern targets read the fluid declared by a tile through the pump's native source offset. Factorio 2.0 water can supply a selected lab or science recipe without erasing its crafting machine's research unlock.",
+    "A fluid-box filter cannot invent an absent fluid. The former explicit pump fluid field remains native on the seven older targets and cannot override the modern tile source or supply one without its offset.",
+    "Controlled lab, researchability and source-epoch checks cover nine line contracts and immutable inputs. Native pump acquisition/placement, world tiles, power, fluid delivery, production, catalogue and saved-world behavior remain unqualified. No permission, owner or support claim is granted."
+  ],
+  "semantic_domains": ["science", "progression", "compatibility", "documentation"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Native source-offset/tile fluid owns pump acquisition facts; a retained foreign explicit field cannot override it. Native acceptance remains pending."},
+    {"target":"F200","disposition":"affected","reason":"Restores the native source-offset/tile fluid contract and rejects the former foreign explicit field. Native acquisition/progression acceptance remains pending."},
+    {"target":"F110","disposition":"affected","reason":"Retains the older native explicit pump-fluid contract while rejecting a foreign source-offset inference; native reduced-target acceptance remains pending."},
+    {"target":"F100","disposition":"affected","reason":"Retains the older native explicit pump-fluid contract while rejecting a foreign source-offset inference; native reduced-target acceptance remains pending."},
+    {"target":"F017","disposition":"affected","reason":"Retains the older native explicit pump-fluid contract while rejecting a foreign source-offset inference; native reduced-target acceptance remains pending."},
+    {"target":"F016","disposition":"affected","reason":"Retains the older native explicit pump-fluid contract while rejecting a foreign source-offset inference; native reduced-target acceptance remains pending."},
+    {"target":"F015","disposition":"affected","reason":"Retains the older native explicit pump-fluid contract while rejecting a foreign source-offset inference; native reduced-target acceptance remains pending."},
+    {"target":"F014","disposition":"affected","reason":"Retains the older native explicit pump-fluid contract while rejecting a foreign source-offset inference; native reduced-target acceptance remains pending."},
+    {"target":"F013","disposition":"affected","reason":"Retains the older native explicit pump-fluid contract while rejecting a foreign source-offset inference; native reduced-target acceptance remains pending."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"changed","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"value":"tests/compiler/lab_reachability.lua","kind":"finding"},
+    {"value":"tests/compiler/researchability_planning.lua","kind":"finding"},
+    {"value":"tests/compiler/recipe_source_epoch.lua","kind":"finding"},
+    {"value":"docs/capabilities/science-integration.md","kind":"document"}
+  ]
+}

@@ -10,7 +10,7 @@
     "executable_authority_root": {"const": "tests"},
     "compatibility_root": {"const": "validation/tests"},
     "test_count": {"type": "integer", "minimum": 1},
-    "tests": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["id", "proposition", "cohort", "command", "canonical_implementation", "target_scope", "freshness", "evaluator_abi", "result_schema", "exit_behavior", "requires_factorio", "inputs"]}},
+    "tests": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["id", "proposition", "cohort", "command", "canonical_implementation", "target_scope", "freshness", "evaluator_abi", "result_schema", "exit_behavior", "requires_factorio", "inputs", "captured_artifacts"], "properties": {"captured_artifacts": {"type": "array", "items": {"type": "object", "required": ["path_pattern", "schema", "kind"], "properties": {"path_pattern": {"type": "string", "minLength": 1}, "schema": {"type": "string", "minLength": 1}, "kind": {"type": "string", "minLength": 1}}, "additionalProperties": true}}}}},
     "summary": {"type": "object", "required": ["cohorts", "compatibility_selected", "duplicate_test_ids"]},
     "transition_gate": {"type": "object", "required": ["version_allocation", "tagging", "signing", "sealing", "publication"]},
     "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}

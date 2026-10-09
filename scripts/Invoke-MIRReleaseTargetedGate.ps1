@@ -127,7 +127,9 @@ function Assert-MIRReleaseGateCrossTargetCandidate {
   }
 }
 
-$modInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+$modInfo = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 $modName = [string]$modInfo.name
 $modVersion = [string]$modInfo.version
 $targetFactorioVersion = [string]$modInfo.factorio_version
@@ -139,7 +141,7 @@ if (-not $AuditFactorioVersions -or $AuditFactorioVersions.Count -eq 0) {
   $AuditFactorioVersions = @($FactorioLine)
 }
 if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
-  $LocalModDir = "C:\Projects\Factorio\testmods_$FactorioLine"
+  $LocalModDir = Join-Path (Split-Path -Parent $repo) "testmods/$FactorioLine"
 }
 if (-not $SkipRepairSmokes -and @($RepairSmokeModNames).Count -eq 0) {
   throw "RepairSmokeModNames is empty. Pass -SkipRepairSmokes or provide at least one local mod name."

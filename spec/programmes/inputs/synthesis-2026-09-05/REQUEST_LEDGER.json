@@ -1,0 +1,689 @@
+{
+  "kind": "mir.handoff.player-requests",
+  "status": "proposed-intake-not-compatibility-authority",
+  "prepared_date": "2026-09-05",
+  "request_count": 23,
+  "requests": [
+    {
+      "id": "K2-01",
+      "status": "requested-not-implemented",
+      "requester": "RealK",
+      "source_refs": [
+        "U02"
+      ],
+      "user_term": "Red, Green, Military/Black and Blue science retained on late-game MIR productivity research",
+      "group": "k2",
+      "kind": "reported-compatibility-defect",
+      "priority": "P0",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Respect the exact ecosystem progression/science retirement policy on applicable MIR-owned research; retain early progression and valid labs.",
+      "acceptance": [
+        "reproduce on exact 4.1 package before calling it a current defect",
+        "record final-stage recipe/technology/lab graph and science field writer provenance",
+        "no retired packs on governed late-game research",
+        "no early-game science removal",
+        "nonempty reachable allowed science and lab set",
+        "preserve current research, completed levels, queue and progress across upgrade",
+        "ordinary non-instrumented load and two reloads pass"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "patch_candidate": "4.1.x only if independently reproduced and repair fits existing compatibility contract",
+      "diagnosis": "unknown; load order, selector exclusion and stale copy are hypotheses, not confirmed causes"
+    },
+    {
+      "id": "K2-02",
+      "status": "requested-not-implemented",
+      "requester": "RealK",
+      "source_refs": [
+        "U02"
+      ],
+      "user_term": "Rare Metals",
+      "group": "k2",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Add or extend a safe recipe-productivity family only for exact discovered outputs and certified recipe routes.",
+      "acceptance": [
+        "resolve exact item, recipe, unlock and effect IDs",
+        "one effective productivity owner per recipe/channel",
+        "all intended safe routes accounted for",
+        "recovery, matter and catalyst routes individually classified",
+        "science/progression tests pass",
+        "upgrade and two reloads pass"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "normalized_display": "Rare Metals",
+      "upstream_existing_owner_evidence": []
+    },
+    {
+      "id": "K2-03",
+      "status": "requested-not-implemented",
+      "requester": "RealK",
+      "source_refs": [
+        "U02"
+      ],
+      "user_term": "Immersite",
+      "group": "k2",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Resolve upstream Imersite identities; preserve/adopt an existing K2SO productivity owner; extend only uncovered certified routes without duplication.",
+      "acceptance": [
+        "resolve exact item, recipe, unlock and effect IDs",
+        "one effective productivity owner per recipe/channel",
+        "all intended safe routes accounted for",
+        "recovery, matter and catalyst routes individually classified",
+        "science/progression tests pass",
+        "upgrade and two reloads pass"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "normalized_display": "Imersite",
+      "upstream_existing_owner_evidence": [
+        "W03"
+      ]
+    },
+    {
+      "id": "K2-04",
+      "status": "requested-not-implemented",
+      "requester": "RealK",
+      "source_refs": [
+        "U02"
+      ],
+      "user_term": "Sillicon",
+      "group": "k2",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Add or extend a safe recipe-productivity family only for exact discovered outputs and certified recipe routes.",
+      "acceptance": [
+        "resolve exact item, recipe, unlock and effect IDs",
+        "one effective productivity owner per recipe/channel",
+        "all intended safe routes accounted for",
+        "recovery, matter and catalyst routes individually classified",
+        "science/progression tests pass",
+        "upgrade and two reloads pass"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "normalized_display": "Silicon",
+      "upstream_existing_owner_evidence": []
+    },
+    {
+      "id": "K2-05",
+      "status": "requested-not-implemented",
+      "requester": "RealK",
+      "source_refs": [
+        "U02"
+      ],
+      "user_term": "Glass",
+      "group": "k2",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Add or extend a safe recipe-productivity family only for exact discovered outputs and certified recipe routes.",
+      "acceptance": [
+        "resolve exact item, recipe, unlock and effect IDs",
+        "one effective productivity owner per recipe/channel",
+        "all intended safe routes accounted for",
+        "recovery, matter and catalyst routes individually classified",
+        "science/progression tests pass",
+        "upgrade and two reloads pass"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "normalized_display": "Glass",
+      "upstream_existing_owner_evidence": []
+    },
+    {
+      "id": "K2-06",
+      "status": "requested-not-implemented",
+      "requester": "RealK",
+      "source_refs": [
+        "U02"
+      ],
+      "user_term": "Black tiles plate",
+      "group": "k2",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Prefer membership in the existing concrete-productivity family when progression and process semantics match; otherwise create one justified paving family.",
+      "acceptance": [
+        "resolve recipe-produced paving item; do not invent tile-prototype productivity",
+        "placement/mining/recoloring/recycling routes cannot create a gain loop",
+        "no duplicate owner",
+        "family presentation and unlocks fit exact ecosystem",
+        "explicit grouping decision in profile"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": []
+    },
+    {
+      "id": "K2-07",
+      "status": "requested-not-implemented",
+      "requester": "RealK",
+      "source_refs": [
+        "U02"
+      ],
+      "user_term": "White tiles plate",
+      "group": "k2",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Prefer membership in the existing concrete-productivity family when progression and process semantics match; otherwise create one justified paving family.",
+      "acceptance": [
+        "resolve recipe-produced paving item; do not invent tile-prototype productivity",
+        "placement/mining/recoloring/recycling routes cannot create a gain loop",
+        "no duplicate owner",
+        "family presentation and unlocks fit exact ecosystem",
+        "explicit grouping decision in profile"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": []
+    },
+    {
+      "id": "BA-01",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Aluminium plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-02",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Gold Plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-03",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Lead plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-04",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "NIckel plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-05",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Platinum plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-06",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Silver plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-07",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Tin plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-08",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Titanium Plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-09",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Copper Tungsten plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "alloy",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-10",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Zinc plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "base-metal",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-11",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Bronze plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "alloy",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-12",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Brass Plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "alloy",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-13",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Gunmetal plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "alloy",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-14",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Invar plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "alloy",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-15",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Cobalt Steel plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "alloy",
+      "group_is_presentation_only": true
+    },
+    {
+      "id": "BA-16",
+      "status": "requested-not-implemented",
+      "requester": "igneustempus",
+      "source_refs": [
+        "U03"
+      ],
+      "user_term": "Nitinol plate",
+      "group": "bob-angel",
+      "kind": "feature",
+      "priority": "P1",
+      "target_release": "4.2.0",
+      "latest_goal": "4.3 programme closure; no automatic false pass",
+      "prototype_ids": [],
+      "prototype_resolution": "pending-exact-environment-capture",
+      "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+      "acceptance": [
+        "requested display term mapped to exact environment-specific prototype IDs",
+        "missing subject explicitly NOT_PRESENT, not invented or called supported",
+        "direct smelting/casting/molten/ingot alternatives separately enumerated",
+        "catalysts and by-products accounted for",
+        "existing productivity owners preserved",
+        "no unsafe recovery/transmutation amplification",
+        "science, upgrade and reload proof"
+      ],
+      "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+      "qualification": [],
+      "reporting_group": "alloy",
+      "group_is_presentation_only": true
+    }
+  ],
+  "claim_rule": "A request is satisfied only by verified implemented or intentionally native-preserved behavior in named environments. NOT_PRESENT, REVIEW_REQUIRED and UNSUPPORTED are explicit dispositions, not successful feature deliveries."
+}

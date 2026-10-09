@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-f210-current-qualification-policy-succession-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "historical_policy", "current_policy", "current_generation_inputs", "exact_engine_qualification", "transition_gate", "status", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1}, "kind": {"const": "MIR4F210CurrentQualificationPolicySuccessionV1"}, "recorded_at": {"type": "string", "format": "date-time"},
+    "historical_policy": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256", "disposition"], "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json"}, "sha256": {"const": "386DA641FF9661CECADB4E23619ACCB0AD5F52EF97886B27E217956DC5569E4E"}, "record_sha256": {"const": "7DC4D7CBD8B1F5AB8FB0B0CDF819489C9BAA18008607EDA1A27AD3EE297F504F"}, "disposition": {"const": "immutable-historical-predecessor-not-current-selection-authority"}}},
+    "current_policy": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256", "support_floor"], "properties": {"path": {"const": ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "support_floor": {"const": "2.1.18"}}},
+    "current_generation_inputs": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["path", "required_dependencies"], "properties": {"path": {"const": "source/presentation/f210/info.json.template"}, "required_dependencies": {"const": ["base >= 2.1.18", "? recycler >= 2.1.18", "? space-age >= 2.1.18"]}}}},
+    "exact_engine_qualification": {"type": "object", "additionalProperties": false, "required": ["required_floor", "admitted", "qualified", "blocker"], "properties": {"required_floor": {"const": "2.1.18"}, "admitted": {"const": false}, "qualified": {"const": false}, "blocker": {"type": "string", "minLength": 1}}},
+    "transition_gate": {"type": "object", "additionalProperties": false, "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"], "properties": {"source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "production_seal": {"const": false}, "promotion_to_main": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}},
+    "status": {"const": "CURRENT-F210-FLOOR-2.1.18-ADOPTED-ENGINE-ADMISSION-AND-QUALIFICATION-PENDING"}, "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

@@ -15,7 +15,16 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 
 $tempRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
 $fixtureRoot = Join-Path $tempRoot ("mir-artifact-cleanup-{0}" -f [guid]::NewGuid().ToString("N"))
+$emptyAuditRoot = $null
+$allWorktreesFixtureRoot = $null
+$allWorktreesLinkedRoot = $null
+$allWorktreesFixtureGitDirectory = $null
+$wideDiscoveryFixtureRoot = $null
+$raceFixtureRoots = [Collections.Generic.List[string]]::new()
 $cleanupScript = Join-Path $RepoRoot "tools\commands\workspace\Remove-MIRStaleArtifacts.ps1"
+$activeLeaseLock = $null
+$nestedCampaignLeaseLock = $null
+$scopedCampaignLeaseLock = $null
 $gitEnvironmentNames = @(
   "GIT_INDEX_FILE", "GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR",
   "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES"
@@ -29,33 +38,165 @@ foreach ($name in $gitEnvironmentNames) {
   }
 }
 
+function New-MIRArtifactCleanupRaceFixture {
+  param([Parameter(Mandatory)][string]$Name)
+
+  $root = Join-Path $tempRoot ("mir-artifact-cleanup-{0}-{1}" -f $Name, [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $root -Force | Out-Null
+  & git -C $root init --quiet
+  if ($LASTEXITCODE -ne 0) { throw "Unable to initialize the $Name cleanup-race fixture repository." }
+  '/build/' | Set-Content -LiteralPath (Join-Path $root '.gitignore') -Encoding UTF8
+  & git -C $root config user.email 'mir-artifact-cleanup@example.invalid'
+  & git -C $root config user.name 'MIR artifact cleanup test'
+  & git -C $root add -- .gitignore
+  if ($LASTEXITCODE -ne 0) { throw "Unable to stage the $Name cleanup-race fixture policy." }
+  & git -C $root commit --quiet -m "fixture: establish $Name cleanup-race root"
+  if ($LASTEXITCODE -ne 0) { throw "Unable to commit the $Name cleanup-race fixture policy." }
+  $raceFixtureRoots.Add($root)
+  return $root
+}
+
 try {
   New-Item -ItemType Directory -Path $fixtureRoot -Force | Out-Null
   & git -C $fixtureRoot init --quiet
   if ($LASTEXITCODE -ne 0) { throw "Unable to initialize artifact-cleanup fixture repository." }
-  "/build/results/" | Set-Content -LiteralPath (Join-Path $fixtureRoot ".gitignore") -Encoding UTF8
+  "/build/" | Set-Content -LiteralPath (Join-Path $fixtureRoot ".gitignore") -Encoding UTF8
+  & git -C $fixtureRoot config user.email 'mir-artifact-cleanup@example.invalid'
+  & git -C $fixtureRoot config user.name 'MIR artifact cleanup test'
+  & git -C $fixtureRoot add -- .gitignore
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to stage the artifact-cleanup fixture ignore policy.' }
+  & git -C $fixtureRoot commit --quiet -m 'fixture: establish ignored build root'
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the artifact-cleanup fixture ignore policy.' }
 
   $artifactRoot = Join-Path $fixtureRoot "build/results"
+  $testRoot = Join-Path $fixtureRoot "build/tests"
+  $packageRoot = Join-Path $fixtureRoot "build/packages"
+  $campaignRoot = Join-Path $fixtureRoot "build/mir4"
   $protectedAssurance = Join-Path $artifactRoot "assurance"
   $protectedValidation = Join-Path $artifactRoot "validation"
   $staleRun = Join-Path $artifactRoot "stale-run"
   $recentRun = Join-Path $artifactRoot "recent-run"
-  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun)) {
+  $staleTestRun = Join-Path $testRoot "series/stale-run"
+  $changingTestRun = Join-Path $testRoot "series/changing-run"
+  $pinnedTestRun = Join-Path $testRoot "series/pinned-run"
+  $activeLeaseRun = Join-Path $testRoot "series/active-lease-run"
+  $receiptCapturedLeaseRun = Join-Path $testRoot "series/receipt-captured-crash-run"
+  $failedLeaseRun = Join-Path $testRoot "series/interrupted-lease-run"
+  $orphanLeaseRun = Join-Path $testRoot "series/orphan-lease-run"
+  $staleGuidTestRun = Join-Path $testRoot 'local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+  $pinnedGuidTestRun = Join-Path $testRoot 'local-delivery/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+  $wideGuidTestRun = Join-Path $testRoot 'local-delivery/cccccccccccccccccccccccccccccccc'
+  $scanBoundedTestRun = Join-Path $testRoot 'series/scan-bounded-run'
+  $stalePackage = Join-Path $packageRoot "stale-package"
+  $pinnedPackage = Join-Path $packageRoot "pinned-package"
+  $staleCampaign = Join-Path $campaignRoot 'stale-campaign'
+  $pinnedCampaign = Join-Path $campaignRoot 'pinned-campaign'
+  $activeLeaseCampaign = Join-Path $campaignRoot 'active-lease-campaign'
+  $ambiguousLeaseCampaign = Join-Path $campaignRoot 'ambiguous-lease-campaign'
+  $interruptedLeaseCampaign = Join-Path $campaignRoot 'interrupted-lease-campaign'
+  $terminalLeaseCampaign = Join-Path $campaignRoot 'terminal-lease-campaign'
+  $scopedCampaign = Join-Path $campaignRoot 'scoped-campaign'
+  $staleScopedRun = Join-Path $scopedCampaign 'stale-result-run'
+  $referencedScopedRun = Join-Path $scopedCampaign 'referenced-run'
+  $custodyScopedRun = Join-Path $scopedCampaign 'custody-run'
+  $activeLeaseScopedRun = Join-Path $scopedCampaign 'active-lease-run'
+  $recentScopedRun = Join-Path $scopedCampaign 'recent-run'
+  $scopedCampaignResult = Join-Path $scopedCampaign 'result.json'
+  $activeCampaignLeaseRun = Join-Path $activeLeaseCampaign 'candidate/inputs'
+  $ambiguousCampaignLeaseRun = Join-Path $ambiguousLeaseCampaign 'candidate/inputs'
+  $interruptedCampaignLeaseRun = Join-Path $interruptedLeaseCampaign 'candidate/inputs'
+  $terminalCampaignLeaseRun = Join-Path $terminalLeaseCampaign 'candidate/inputs'
+  $developmentContracts = Join-Path $packageRoot 'development-contracts'
+  $staleDevelopmentContract = Join-Path $developmentContracts '11111111111111111111111111111111'
+  $recentDevelopmentContract = Join-Path $developmentContracts '22222222222222222222222222222222'
+  $referencedDevelopmentContract = Join-Path $developmentContracts '33333333333333333333333333333333'
+  $nonCanonicalDevelopmentContract = Join-Path $developmentContracts 'legacy-expanded-output'
+  $nestedNonCanonicalDevelopmentContract = Join-Path $nonCanonicalDevelopmentContract '66666666666666666666666666666666'
+  $nestedReparseDevelopmentContract = Join-Path $developmentContracts '55555555555555555555555555555555'
+  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $pinnedGuidTestRun, $wideGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $terminalLeaseCampaign, $staleScopedRun, $referencedScopedRun, $custodyScopedRun, $activeLeaseScopedRun, $recentScopedRun, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     New-Item -ItemType Directory -Path $path -Force | Out-Null
     "fixture" | Set-Content -LiteralPath (Join-Path $path "result.txt") -Encoding UTF8
   }
+  "[path]`n" | Set-Content -LiteralPath (Join-Path $staleTestRun "config.ini") -Encoding UTF8
+  "[path]`n" | Set-Content -LiteralPath (Join-Path $changingTestRun "config.ini") -Encoding UTF8
+  "pinned evidence" | Set-Content -LiteralPath (Join-Path $pinnedTestRun "result.json") -Encoding UTF8
+  "candidate" | Set-Content -LiteralPath (Join-Path $stalePackage "candidate.zip") -Encoding UTF8
+  "pinned candidate" | Set-Content -LiteralPath (Join-Path $pinnedPackage "candidate-pin.json") -Encoding UTF8
+  New-Item -ItemType Directory -Path (Join-Path $staleGuidTestRun 'repo'), (Join-Path $staleGuidTestRun 'source'), (Join-Path $pinnedGuidTestRun 'evidence/nested'), (Join-Path $wideGuidTestRun 'payload/one'), (Join-Path $wideGuidTestRun 'payload/two'), (Join-Path $wideGuidTestRun 'payload/three'), (Join-Path $wideGuidTestRun 'payload/four'), (Join-Path $scanBoundedTestRun 'payload'), (Join-Path $pinnedCampaign 'nested'), $activeCampaignLeaseRun, $ambiguousCampaignLeaseRun, $interruptedCampaignLeaseRun, $terminalCampaignLeaseRun -Force | Out-Null
+  'copied repository fixture' | Set-Content -LiteralPath (Join-Path $staleGuidTestRun 'repo/fixture.txt') -Encoding UTF8
+  'copied source fixture' | Set-Content -LiteralPath (Join-Path $staleGuidTestRun 'source/fixture.txt') -Encoding UTF8
+  'nested GUID evidence that must remain pinned' | Set-Content -LiteralPath (Join-Path $pinnedGuidTestRun 'evidence/nested/candidate-pin.json') -Encoding UTF8
+  '[path]' | Set-Content -LiteralPath (Join-Path $scanBoundedTestRun 'config.ini') -Encoding UTF8
+  1..4 | ForEach-Object { "payload $_" | Set-Content -LiteralPath (Join-Path $scanBoundedTestRun ("payload/item-{0}.txt" -f $_)) -Encoding UTF8 }
+  'campaign result that must remain pinned' | Set-Content -LiteralPath (Join-Path $pinnedCampaign 'nested/result.json') -Encoding UTF8
+  '{"status":"superseded"}' | Set-Content -LiteralPath (Join-Path $staleScopedRun 'result.json') -Encoding UTF8
+  '{"status":"referenced"}' | Set-Content -LiteralPath (Join-Path $referencedScopedRun 'result.json') -Encoding UTF8
+  '{"status":"custody"}' | Set-Content -LiteralPath (Join-Path $custodyScopedRun 'result.json') -Encoding UTF8
+  '{"kind":"unique-evidence"}' | Set-Content -LiteralPath (Join-Path $custodyScopedRun 'evidence.json') -Encoding UTF8
+  '{"status":"active"}' | Set-Content -LiteralPath (Join-Path $activeLeaseScopedRun 'result.json') -Encoding UTF8
+  '{"status":"recent"}' | Set-Content -LiteralPath (Join-Path $recentScopedRun 'result.json') -Encoding UTF8
+  '{"status":"campaign-root-evidence"}' | Set-Content -LiteralPath $scopedCampaignResult -Encoding UTF8
+  "{}" | Set-Content -LiteralPath (Join-Path $staleDevelopmentContract 'receipt.json') -Encoding UTF8
+  "{}" | Set-Content -LiteralPath (Join-Path $referencedDevelopmentContract 'receipt.json') -Encoding UTF8
+  @('build/packages/development-contracts/33333333333333333333333333333333','build/mir4/scoped-campaign/referenced-run/result.json') | Set-Content -LiteralPath (Join-Path $fixtureRoot 'tracked-reference.txt') -Encoding UTF8
+  & git -C $fixtureRoot add -- .gitignore tracked-reference.txt
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to establish tracked-reference fixture.' }
+  $leaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture';owner_pid=$PID;state='active'}
+  ($leaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $activeLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  $failedLeaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture-failed';owner_pid=2147483647;state='staging-failed'}
+  ($failedLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $failedLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  $receiptCapturedLeaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture-receipt-captured';owner_pid=2147483647;state='receipt-captured'}
+  ($receiptCapturedLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $receiptCapturedLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  $orphanLeaseLock = [IO.File]::Open((Join-Path $orphanLeaseRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+  $orphanLeaseLock.Dispose()
+  ($leaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $activeCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  '{ not valid JSON' | Set-Content -LiteralPath (Join-Path $ambiguousCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  ($receiptCapturedLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $interruptedCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  ($leaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $activeLeaseScopedRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  $terminalLeaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture-terminal';owner_pid=$null;state='completed'}
+  ($terminalLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $terminalCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
 
   $staleTimestamp = [DateTime]::UtcNow.AddDays(-10)
-  Get-ChildItem -LiteralPath $staleRun -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
-  (Get-Item -LiteralPath $staleRun).LastWriteTimeUtc = $staleTimestamp
+  New-Item -ItemType Directory -Path $nestedNonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract -Force | Out-Null
+  'fixture' | Set-Content -LiteralPath (Join-Path $nestedNonCanonicalDevelopmentContract 'result.txt') -Encoding UTF8
+  'fixture' | Set-Content -LiteralPath (Join-Path $nestedReparseDevelopmentContract 'result.txt') -Encoding UTF8
+  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $pinnedGuidTestRun, $wideGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $terminalLeaseCampaign, $staleScopedRun, $referencedScopedRun, $custodyScopedRun, $activeLeaseScopedRun, $staleDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract)) {
+    Get-ChildItem -LiteralPath $stalePath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
+    (Get-Item -LiteralPath $stalePath).LastWriteTimeUtc = $staleTimestamp
+  }
+  (Get-Item -LiteralPath $scopedCampaignResult).LastWriteTimeUtc = $staleTimestamp
   foreach ($protectedPath in @($protectedAssurance, $protectedValidation)) {
     Get-ChildItem -LiteralPath $protectedPath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $protectedPath).LastWriteTimeUtc = $staleTimestamp
   }
+  $activeLeaseLock = [IO.File]::Open((Join-Path $activeLeaseRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+  $nestedCampaignLeaseLock = [IO.File]::Open((Join-Path $activeCampaignLeaseRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+  $scopedCampaignLeaseLock = [IO.File]::Open((Join-Path $activeLeaseScopedRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+
+  $reparseTarget = Join-Path $fixtureRoot 'reparse-target'
+  $reparseRun = Join-Path $artifactRoot 'reparse-run'
+  $nestedReparseTarget = Join-Path $fixtureRoot 'nested-reparse-target'
+  New-Item -ItemType Directory -Path $reparseTarget -Force | Out-Null
+  "outside" | Set-Content -LiteralPath (Join-Path $reparseTarget 'outside.txt') -Encoding UTF8
+  New-Item -ItemType Junction -Path $reparseRun -Target $reparseTarget | Out-Null
+  New-Item -ItemType Directory -Path $nestedReparseTarget -Force | Out-Null
+  'outside nested' | Set-Content -LiteralPath (Join-Path $nestedReparseTarget 'outside.txt') -Encoding UTF8
+  $nestedReparseLink = Join-Path $nestedReparseDevelopmentContract 'nested-link'
+  New-Item -ItemType Junction -Path $nestedReparseLink -Target $nestedReparseTarget | Out-Null
+  # The fixture represents a stale run which already contained the unsafe
+  # link.  Restoring both link and leaf timestamps prevents the current-root
+  # timestamp fast path from mistaking the test setup operation for a recent
+  # runtime write.
+  (Get-Item -LiteralPath $nestedReparseLink -Force).LastWriteTimeUtc = $staleTimestamp
+  (Get-Item -LiteralPath $nestedReparseDevelopmentContract -Force).LastWriteTimeUtc = $staleTimestamp
+
+  $planBoundCaught = $false
+  try { & $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -MaxPlanEntries 1 -PassThru | Out-Null } catch { $planBoundCaught = $_.Exception.Message -match 'bounded 1-entry limit' }
+  if (-not $planBoundCaught) { throw 'Cleanup did not stop before removal when its bounded plan limit was exceeded.' }
 
   $preview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -PassThru)
   if (-not (Test-Path -LiteralPath $staleRun)) { throw "Dry-run cleanup removed a stale artifact." }
-  if (@($preview | Where-Object { $_.item -eq "stale-run" -and $_.status -eq "eligible" }).Count -ne 1) {
+  if (@($preview | Where-Object { $_.relative_path -ceq 'build/results/stale-run' -and $_.status -eq "eligible" }).Count -ne 1) {
     throw "Dry-run cleanup did not identify the stale artifact exactly once."
   }
   foreach ($protectedName in @("assurance", "validation")) {
@@ -63,17 +204,269 @@ try {
       throw "Cleanup did not protect build/results/$protectedName."
     }
   }
+  foreach ($expected in @(
+    @{path='build/tests/series/stale-run';status='eligible'},
+    @{path='build/packages/stale-package';status='eligible'},
+    @{path='build/tests/series/pinned-run';status='pinned-custody'},
+    @{path='build/packages/pinned-package';status='pinned-custody'},
+    @{path='build/tests/series/active-lease-run';status='active-lease'},
+    @{path='build/tests/series/receipt-captured-crash-run';status='interrupted-lease'},
+    @{path='build/tests/series/interrupted-lease-run';status='interrupted-lease'},
+    @{path='build/tests/series/orphan-lease-run';status='interrupted-lease'},
+    @{path='build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';status='eligible'},
+    @{path='build/tests/local-delivery/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';status='pinned-custody'},
+    @{path='build/tests/local-delivery/cccccccccccccccccccccccccccccccc';status='eligible'},
+    @{path='build/mir4/stale-campaign';status='eligible'},
+    @{path='build/mir4/pinned-campaign';status='pinned-custody'},
+    @{path='build/mir4/active-lease-campaign';status='active-lease'},
+    @{path='build/mir4/ambiguous-lease-campaign';status='ambiguous-lease'},
+    @{path='build/mir4/interrupted-lease-campaign';status='interrupted-lease'},
+    @{path='build/mir4/terminal-lease-campaign';status='eligible'},
+    @{path='build/packages/development-contracts/11111111111111111111111111111111';status='eligible'},
+    @{path='build/packages/development-contracts/22222222222222222222222222222222';status='recent'},
+    @{path='build/packages/development-contracts/33333333333333333333333333333333';status='pinned-reference'},
+    @{path='build/packages/development-contracts/legacy-expanded-output';status='noncanonical-child'},
+    @{path='build/packages/development-contracts/55555555555555555555555555555555';status='unsafe-reparse'},
+    @{path='build/results/reparse-run';status='unsafe-reparse'}
+  )) {
+    if (@($preview | Where-Object { $_.relative_path -ceq $expected.path -and $_.status -ceq $expected.status }).Count -ne 1) {
+      throw "Cleanup did not classify $($expected.path) as $($expected.status)."
+    }
+  }
+  if (@($preview | Where-Object { $_.relative_path -ceq 'build/packages/development-contracts/legacy-expanded-output/66666666666666666666666666666666' }).Count -ne 0) {
+    throw 'Typed-root cleanup descended into a noncanonical development-contract child.'
+  }
+  if (@($preview | Where-Object { $_.relative_path -ceq 'build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/repo/fixture.txt' }).Count -ne 0) {
+    throw 'A canonical GUID test run was expanded into individual copied-checkout files instead of one owned run boundary.'
+  }
 
-  $applied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
+  # A per-candidate no-follow scan limit must fail closed.  The normal audit
+  # remains able to classify this completed run, while a deliberately tiny
+  # limit proves that a large copied fixture is never selected on partial
+  # metadata alone.
+  $scanBoundedPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType test -MaxScannedEntriesPerCandidate 2 -PassThru)
+  if (@($scanBoundedPreview | Where-Object { $_.relative_path -ceq 'build/tests/series/scan-bounded-run' -and $_.status -ceq 'scan-budget-exceeded' }).Count -ne 1) {
+    throw 'A bounded no-follow scan did not fail closed for an oversized test-run candidate.'
+  }
+
+  # A modestly wide GUID run must also stop before storing an unbounded set of
+  # child paths.  The discovery stack remains independent, so this exercises
+  # the per-candidate no-follow facts stack rather than the root discovery.
+  $wideStackPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType test -MaxScannedEntriesPerCandidate 64 -MaxPendingDirectoriesPerCandidate 2 -PassThru)
+  if (@($wideStackPreview | Where-Object { $_.relative_path -ceq 'build/tests/local-delivery/cccccccccccccccccccccccccccccccc' -and $_.status -ceq 'scan-budget-exceeded' }).Count -ne 1) {
+    throw 'A wide canonical GUID run did not fail closed before exceeding its bounded pending-directory stack.'
+  }
+
+  # The scanner reads only one bounded output path.  Deliberately lowering the
+  # configured cap below this tracked filename exercises the streaming reader
+  # itself and must fail closed instead of accepting arbitrary grep output.
+  $boundedReferencePreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType package -MaxTrackedReferencePathCharacters 16 -PassThru)
+  if (@($boundedReferencePreview | Where-Object { $_.relative_path -ceq 'build/packages/development-contracts/33333333333333333333333333333333' -and $_.status -ceq 'unsafe-inspection' }).Count -ne 1) {
+    throw 'Tracked-reference scanning did not fail closed on bounded first-match output.'
+  }
+
+  $resultOnlyPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType result -PassThru)
+  if ($resultOnlyPreview.Count -eq 0 -or @($resultOnlyPreview | Where-Object { $_.artifact_type -cne 'result' }).Count -ne 0) {
+    throw 'Typed cleanup selection did not remain bounded to build/results.'
+  }
+  if (@($resultOnlyPreview | Where-Object { $_.relative_path -ceq 'build/results/stale-run' -and $_.status -ceq 'eligible' }).Count -ne 1) {
+    throw 'Typed cleanup selection did not retain result-root classification.'
+  }
+
+  $selectedPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType result,package -PassThru)
+  if (@($selectedPreview | Where-Object { $_.artifact_type -ceq 'test' }).Count -ne 0 -or
+      @($selectedPreview | Where-Object { $_.artifact_type -ceq 'result' }).Count -eq 0 -or
+      @($selectedPreview | Where-Object { $_.artifact_type -ceq 'package' }).Count -eq 0) {
+    throw 'Multi-type cleanup selection did not include exactly the requested typed roots.'
+  }
+
+  $scopedCampaignPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot 'build/mir4/scoped-campaign' -PassThru)
+  if (@($scopedCampaignPreview | Where-Object { $_.relative_path -ceq 'build/mir4/scoped-campaign/result.json' }).Count -ne 0) {
+    throw 'Scoped campaign cleanup treated root evidence as a child run candidate.'
+  }
+  foreach ($expected in @(
+    @{path='build/mir4/scoped-campaign/stale-result-run';status='eligible'},
+    @{path='build/mir4/scoped-campaign/referenced-run';status='pinned-reference'},
+    @{path='build/mir4/scoped-campaign/custody-run';status='pinned-custody'},
+    @{path='build/mir4/scoped-campaign/active-lease-run';status='active-lease'},
+    @{path='build/mir4/scoped-campaign/recent-run';status='recent'}
+  )) {
+    if (@($scopedCampaignPreview | Where-Object { $_.relative_path -ceq $expected.path -and $_.status -ceq $expected.status }).Count -ne 1) {
+      throw "Scoped campaign cleanup did not classify $($expected.path) as $($expected.status)."
+    }
+  }
+  foreach ($invalidCampaignRoot in @('build/mir4', 'build/mir4/scoped-campaign/stale-result-run', '../build/mir4/scoped-campaign')) {
+    $invalidCampaignCaught = $false
+    try { & $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot $invalidCampaignRoot -PassThru | Out-Null } catch { $invalidCampaignCaught = $true }
+    if (-not $invalidCampaignCaught) { throw "Scoped campaign cleanup accepted an invalid root: $invalidCampaignRoot" }
+  }
+
+  # Mutations made after planning but before apply must be observed by the
+  # exact-boundary check.  These isolated fixtures make the race deterministic
+  # without weakening or bypassing the production re-audit.
+  $emptyRaceRoot = New-MIRArtifactCleanupRaceFixture -Name 'empty-boundary'
+  $emptyRaceTarget = Join-Path $emptyRaceRoot 'build/tests/series/empty-target'
+  New-Item -ItemType Directory -Path $emptyRaceTarget -Force | Out-Null
+  (Get-Item -LiteralPath $emptyRaceTarget).LastWriteTimeUtc = $staleTimestamp
+  (Get-Item -LiteralPath (Split-Path -Parent $emptyRaceTarget)).LastWriteTimeUtc = $staleTimestamp
+  $emptyRaceState = @{ called = $false }
+  $emptyRaceHook = {
+    $emptyRaceState.called = $true
+    'arrived after planning' | Set-Content -LiteralPath (Join-Path $emptyRaceTarget 'late-child.txt') -Encoding UTF8
+  }.GetNewClosure()
+  $emptyRaceCaught = $false
+  try {
+    & $cleanupScript -RepoRoot $emptyRaceRoot -OlderThanDays 7 -ArtifactType test -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false -BeforeApplyTestHook $emptyRaceHook | Out-Null
+  } catch {
+    $emptyRaceCaught = $_.Exception.Message -match 'no longer an exact typed-root candidate'
+  }
+  if (-not $emptyRaceState.called -or -not $emptyRaceCaught) { throw 'Apply did not reject an initially empty candidate that gained content after planning.' }
+  if (-not (Test-Path -LiteralPath (Join-Path $emptyRaceTarget 'late-child.txt') -PathType Leaf)) { throw 'Apply removed an empty-directory candidate after it gained content.' }
+
+  $ancestorRaceRoot = New-MIRArtifactCleanupRaceFixture -Name 'ancestor-boundary'
+  $ancestorRaceParent = Join-Path $ancestorRaceRoot 'build/tests/series/new-run-boundary'
+  $ancestorRaceTarget = Join-Path $ancestorRaceParent 'empty-target'
+  New-Item -ItemType Directory -Path $ancestorRaceTarget -Force | Out-Null
+  (Get-Item -LiteralPath $ancestorRaceTarget).LastWriteTimeUtc = $staleTimestamp
+  (Get-Item -LiteralPath $ancestorRaceParent).LastWriteTimeUtc = $staleTimestamp
+  $ancestorRaceState = @{ called = $false }
+  $ancestorRaceHook = {
+    $ancestorRaceState.called = $true
+    '[path]' | Set-Content -LiteralPath (Join-Path $ancestorRaceParent 'config.ini') -Encoding UTF8
+  }.GetNewClosure()
+  $ancestorRaceCaught = $false
+  try {
+    & $cleanupScript -RepoRoot $ancestorRaceRoot -OlderThanDays 7 -ArtifactType test -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false -BeforeApplyTestHook $ancestorRaceHook | Out-Null
+  } catch {
+    $ancestorRaceCaught = $_.Exception.Message -match 'no longer an exact typed-root candidate'
+  }
+  if (-not $ancestorRaceState.called -or -not $ancestorRaceCaught) { throw 'Apply did not reject a child after its ancestor became a run boundary.' }
+  if (-not (Test-Path -LiteralPath $ancestorRaceTarget -PathType Container)) { throw 'Apply removed a child whose ancestor became a run boundary after planning.' }
+
+  $scopedApplyHookState = @{ called = $false }
+  $scopedApplyHook = { $scopedApplyHookState.called = $true }.GetNewClosure()
+  $scopedCampaignApplied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot 'build/mir4/scoped-campaign' -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false -BeforeApplyTestHook $scopedApplyHook)
+  if (-not $scopedApplyHookState.called) { throw 'Scoped campaign apply did not pass through the controlled revalidation point.' }
+  if (Test-Path -LiteralPath $staleScopedRun) { throw 'Scoped campaign cleanup retained an eligible superseded result run.' }
+  if (-not (Test-Path -LiteralPath $scopedCampaignResult -PathType Leaf)) { throw 'Scoped campaign cleanup removed campaign-root evidence.' }
+  foreach ($retained in @($referencedScopedRun, $custodyScopedRun, $activeLeaseScopedRun, $recentScopedRun)) {
+    if (-not (Test-Path -LiteralPath $retained)) { throw "Scoped campaign cleanup removed protected state: $retained" }
+  }
+  if (@($scopedCampaignApplied | Where-Object { $_.relative_path -ceq 'build/mir4/scoped-campaign/stale-result-run' -and $_.status -ceq 'deleted' }).Count -ne 1) {
+    throw 'Scoped campaign apply did not delete exactly its eligible superseded result run.'
+  }
+
+  "new write before apply" | Set-Content -LiteralPath (Join-Path $changingTestRun 'result.txt') -Encoding UTF8
+  (Get-Item -LiteralPath $changingTestRun).LastWriteTimeUtc = [DateTime]::UtcNow
+
+  $directApplyHookState = @{ called = $false }
+  $directApplyHook = { $directApplyHookState.called = $true }.GetNewClosure()
+  $applied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false -BeforeApplyTestHook $directApplyHook)
+  if (-not $directApplyHookState.called) { throw 'Direct-child apply did not pass through the controlled revalidation point.' }
   if (Test-Path -LiteralPath $staleRun) { throw "Applied cleanup retained the stale artifact." }
+  if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $staleGuidTestRun) -or (Test-Path -LiteralPath $wideGuidTestRun) -or (Test-Path -LiteralPath $stalePackage) -or (Test-Path -LiteralPath $staleCampaign) -or (Test-Path -LiteralPath $terminalLeaseCampaign) -or (Test-Path -LiteralPath $staleDevelopmentContract)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
   if (-not (Test-Path -LiteralPath $recentRun)) { throw "Applied cleanup removed a recent artifact." }
+  if (-not (Test-Path -LiteralPath $changingTestRun)) { throw 'Applied cleanup removed an artifact that received a write before apply.' }
+  foreach ($retained in @($pinnedTestRun, $pinnedGuidTestRun, $pinnedPackage, $pinnedCampaign, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $reparseRun, $nestedReparseDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
+    if (-not (Test-Path -LiteralPath $retained)) { throw "Applied cleanup removed protected or unsafe state: $retained" }
+  }
   if (-not (Test-Path -LiteralPath $protectedAssurance) -or -not (Test-Path -LiteralPath $protectedValidation)) {
     throw "Applied cleanup removed a protected artifact root."
   }
-  if (@($applied | Where-Object { $_.item -eq "stale-run" -and $_.status -eq "deleted" }).Count -ne 1) {
+  if (-not (Test-Path -LiteralPath (Join-Path $nestedReparseTarget 'outside.txt'))) {
+    throw 'Applied cleanup followed a nested development-contract reparse point.'
+  }
+  if (@($applied | Where-Object { $_.relative_path -ceq 'build/results/stale-run' -and $_.status -eq "deleted" }).Count -ne 1) {
     throw "Applied cleanup did not report the stale artifact as deleted."
   }
+  foreach ($path in @('build/tests/series/stale-run', 'build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'build/tests/local-delivery/cccccccccccccccccccccccccccccccc', 'build/packages/stale-package', 'build/mir4/stale-campaign', 'build/mir4/terminal-lease-campaign', 'build/packages/development-contracts/11111111111111111111111111111111')) {
+    if (@($applied | Where-Object { $_.relative_path -ceq $path -and $_.status -ceq 'deleted' }).Count -ne 1) {
+      throw "Apply did not preserve dry-run eligibility for $path."
+    }
+  }
+  if (@($applied | Where-Object { $_.relative_path -ceq 'build/tests/series/changing-run' -and $_.status -eq 'deleted' }).Count -ne 0) {
+    throw 'Apply deleted a target with a newer write.'
+  }
+  $secondApply = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
+  if (@($secondApply | Where-Object { $_.status -eq 'deleted' }).Count -ne 0) {
+    throw 'A repeated cleanup was not idempotent after exact stale targets were removed.'
+  }
+
+  # A public no-PassThru audit with no typed roots must report a zero-byte
+  # summary rather than relying on Measure-Object's null Sum result.
+  $emptyAuditRoot = Join-Path $tempRoot ("mir-artifact-cleanup-empty-{0}" -f [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $emptyAuditRoot -Force | Out-Null
+  & git -C $emptyAuditRoot init --quiet
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to initialize the empty artifact-cleanup fixture repository.' }
+  $emptyAuditOutput = & $cleanupScript -RepoRoot $emptyAuditRoot -OlderThanDays 7 6>&1 2>&1
+  if (-not (@($emptyAuditOutput | Out-String) -match 'logical_size=0 B')) {
+    throw 'A public empty-root artifact audit did not complete with an explicit zero-byte summary.'
+  }
+
+  # Discovery uses a separate bounded path stack from facts collection.  Keep
+  # this fixture deliberately small while proving that a wide unmarked tree
+  # cannot enqueue beyond either the pending-directory or entry limit.
+  $wideDiscoveryFixtureRoot = Join-Path $tempRoot ("mir-artifact-cleanup-wide-discovery-{0}" -f [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $wideDiscoveryFixtureRoot -Force | Out-Null
+  & git -C $wideDiscoveryFixtureRoot init --quiet
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to initialize the wide discovery fixture repository.' }
+  '/build/' | Set-Content -LiteralPath (Join-Path $wideDiscoveryFixtureRoot '.gitignore') -Encoding UTF8
+  $wideDiscoveryTestRoot = Join-Path $wideDiscoveryFixtureRoot 'build/tests/wide'
+  1..4 | ForEach-Object { New-Item -ItemType Directory -Path (Join-Path $wideDiscoveryTestRoot ("branch-{0}" -f $_)) -Force | Out-Null }
+  Get-ChildItem -LiteralPath (Join-Path $wideDiscoveryFixtureRoot 'build') -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
+  (Get-Item -LiteralPath (Join-Path $wideDiscoveryFixtureRoot 'build')).LastWriteTimeUtc = $staleTimestamp
+  $discoveryStackBoundCaught = $false
+  try { & $cleanupScript -RepoRoot $wideDiscoveryFixtureRoot -OlderThanDays 7 -ArtifactType test -MaxPendingCandidateDiscoveryDirectories 2 -PassThru | Out-Null } catch { $discoveryStackBoundCaught = $_.Exception.Message -match 'bounded 2-directory pending limit' }
+  if (-not $discoveryStackBoundCaught) { throw 'Candidate discovery did not stop before a modest wide tree exceeded its pending-directory stack.' }
+  $discoveryEntryBoundCaught = $false
+  try { & $cleanupScript -RepoRoot $wideDiscoveryFixtureRoot -OlderThanDays 7 -ArtifactType test -MaxCandidateDiscoveryEntries 2 -PassThru | Out-Null } catch { $discoveryEntryBoundCaught = $_.Exception.Message -match 'bounded 2-entry limit' }
+  if (-not $discoveryEntryBoundCaught) { throw 'Candidate discovery did not stop before a modest wide tree exceeded its entry budget.' }
+
+  # Starting from a linked worktree must use Git's common directory to include
+  # the primary checkout even when it was initialized with --separate-git-dir,
+  # and a tracked primary reference must pin the matching disposable child
+  # throughout the selected registered-worktree scope.
+  $allWorktreesFixtureRoot = Join-Path $tempRoot ("mir-artifact-cleanup-all-worktrees-{0}" -f [guid]::NewGuid().ToString('N'))
+  $allWorktreesLinkedRoot = Join-Path $allWorktreesFixtureRoot 'build/worktrees/selected'
+  $allWorktreesFixtureGitDirectory = Join-Path $tempRoot ("mir-artifact-cleanup-all-worktrees-git-{0}" -f [guid]::NewGuid().ToString('N'))
+  & git init --quiet "--separate-git-dir=$allWorktreesFixtureGitDirectory" $allWorktreesFixtureRoot
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to initialize the registered-worktree fixture repository.' }
+  '/build/' | Set-Content -LiteralPath (Join-Path $allWorktreesFixtureRoot '.gitignore') -Encoding UTF8
+  & git -C $allWorktreesFixtureRoot config user.email 'mir-artifact-cleanup@example.invalid'
+  & git -C $allWorktreesFixtureRoot config user.name 'MIR artifact cleanup test'
+  & git -C $allWorktreesFixtureRoot config core.worktree $allWorktreesFixtureRoot
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to bind the separate-Git-directory primary worktree through Git metadata.' }
+  & git -C $allWorktreesFixtureRoot add -- .gitignore
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to stage the registered-worktree fixture ignore policy.' }
+  & git -C $allWorktreesFixtureRoot commit --quiet -m 'fixture: establish ignored build root'
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the registered-worktree fixture ignore policy.' }
+  & git -C $allWorktreesFixtureRoot worktree add --detach --quiet $allWorktreesLinkedRoot HEAD
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to create the registered linked-worktree fixture.' }
+  $sharedGuid = '44444444444444444444444444444444'
+  "build/packages/development-contracts/$sharedGuid" | Set-Content -LiteralPath (Join-Path $allWorktreesFixtureRoot 'primary-pin.txt') -Encoding UTF8
+  & git -C $allWorktreesFixtureRoot add -- primary-pin.txt
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to stage the primary worktree pin fixture.' }
+  & git -C $allWorktreesFixtureRoot commit --quiet -m 'fixture: pin shared development-contract path'
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the primary worktree pin fixture.' }
+  $primaryStale = Join-Path $allWorktreesFixtureRoot 'build/results/primary-stale'
+  $linkedDevelopmentContract = Join-Path $allWorktreesLinkedRoot "build/packages/development-contracts/$sharedGuid"
+  foreach ($path in @($primaryStale, $linkedDevelopmentContract)) {
+    New-Item -ItemType Directory -Path $path -Force | Out-Null
+    'fixture' | Set-Content -LiteralPath (Join-Path $path 'result.txt') -Encoding UTF8
+    Get-ChildItem -LiteralPath $path -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
+    (Get-Item -LiteralPath $path).LastWriteTimeUtc = $staleTimestamp
+  }
+  $allWorktreesPreview = @(& $cleanupScript -RepoRoot $allWorktreesLinkedRoot -AllWorktrees -ArtifactType result,package -OlderThanDays 7 -PassThru)
+  if (@($allWorktreesPreview | Where-Object { $_.worktree_root -ceq $allWorktreesFixtureRoot -and $_.relative_path -ceq 'build/results/primary-stale' -and $_.status -ceq 'eligible' }).Count -ne 1) {
+    throw 'All-worktrees cleanup from a linked worktree omitted its Git-metadata-derived primary checkout.'
+  }
+  if (@($allWorktreesPreview | Where-Object { $_.worktree_root -ceq $allWorktreesLinkedRoot -and $_.relative_path -ceq "build/packages/development-contracts/$sharedGuid" -and $_.status -ceq 'pinned-reference' }).Count -ne 1) {
+    throw 'All-worktrees cleanup did not apply the selected registered-worktree pin scope.'
+  }
 } finally {
+  if ($null -ne $activeLeaseLock) { $activeLeaseLock.Dispose() }
+  if ($null -ne $nestedCampaignLeaseLock) { $nestedCampaignLeaseLock.Dispose() }
+  if ($null -ne $scopedCampaignLeaseLock) { $scopedCampaignLeaseLock.Dispose() }
   if (Test-Path -LiteralPath $fixtureRoot) {
     $resolvedFixture = [System.IO.Path]::GetFullPath($fixtureRoot)
     $tempPrefix = $tempRoot + [System.IO.Path]::DirectorySeparatorChar
@@ -82,10 +475,30 @@ try {
     }
     Remove-Item -LiteralPath $resolvedFixture -Recurse -Force
   }
+  if ($null -ne $allWorktreesFixtureRoot -and (Test-Path -LiteralPath $allWorktreesFixtureRoot)) {
+    if ($null -ne $allWorktreesLinkedRoot -and (Test-Path -LiteralPath $allWorktreesLinkedRoot)) {
+      & git -C $allWorktreesFixtureRoot worktree remove --force $allWorktreesLinkedRoot 2>$null
+    }
+    Remove-Item -LiteralPath $allWorktreesFixtureRoot -Recurse -Force
+  }
+  if ($null -ne $allWorktreesFixtureGitDirectory -and (Test-Path -LiteralPath $allWorktreesFixtureGitDirectory)) {
+    Remove-Item -LiteralPath $allWorktreesFixtureGitDirectory -Recurse -Force
+  }
+  if ($null -ne $emptyAuditRoot -and (Test-Path -LiteralPath $emptyAuditRoot)) {
+    Remove-Item -LiteralPath $emptyAuditRoot -Recurse -Force
+  }
+  if ($null -ne $wideDiscoveryFixtureRoot -and (Test-Path -LiteralPath $wideDiscoveryFixtureRoot)) {
+    Remove-Item -LiteralPath $wideDiscoveryFixtureRoot -Recurse -Force
+  }
+  foreach ($raceFixtureRoot in $raceFixtureRoots) {
+    if (Test-Path -LiteralPath $raceFixtureRoot) {
+      Remove-Item -LiteralPath $raceFixtureRoot -Recurse -Force
+    }
+  }
   foreach ($name in $gitEnvironmentNames) {
     if ($savedGitEnvironment.ContainsKey($name)) { Set-Item -LiteralPath "Env:$name" -Value $savedGitEnvironment[$name] }
     else { Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue }
   }
 }
 
-Write-Host "[ok] artifact cleanup is dry-run-first, age-aware, Git-ignored-only, and protects assurance and validation roots."
+Write-Host '[ok] artifact cleanup is dry-run-first, typed-root-only, no-follow, lease-aware, custody-preserving, and re-audits before deletion.'

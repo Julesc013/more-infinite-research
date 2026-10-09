@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/package/mir4-composable-source-predecessor-proof-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "predecessor", "current", "binding_count", "physical_source_count", "target_output_counts", "invariants", "release_transition_authority", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ComposableSourcePredecessorProofV1"},
+    "status": {"const": "passed-binary-safe-predecessor-source-equivalence"},
+    "predecessor": {"type": "object", "additionalProperties": false, "required": ["commit", "manifest_path", "manifest_record_sha256"], "properties": {"commit": {"pattern": "^[a-f0-9]{40}$"}, "manifest_path": {"const": "src/mod/package-source.json"}, "manifest_record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "current": {"type": "object", "additionalProperties": false, "required": ["source_manifest_path", "source_manifest_record_sha256", "source_root"], "properties": {"source_manifest_path": {"const": "source/package-source.json"}, "source_manifest_record_sha256": {"$ref": "#/$defs/sha256"}, "source_root": {"const": "source"}}},
+    "binding_count": {"const": 447},
+    "physical_source_count": {"const": 439},
+    "target_output_counts": {"type": "object", "additionalProperties": false, "required": ["f210", "f200", "f110", "f100"], "properties": {"f210": {"const": 337}, "f200": {"const": 335}, "f110": {"const": 174}, "f100": {"const": 174}}},
+    "invariants": {"type": "object", "additionalProperties": false, "required": ["binary_safe_git_blob_reads", "all_predecessor_bindings_resolved_once", "source_output_scope_transform_and_identity_equal", "transformed_output_bytes_and_hash_equal", "source_paths_deduplicated_without_identity_loss", "target_outputs_unique", "resolver_round_trip_complete"], "properties": {"binary_safe_git_blob_reads": {"const": true}, "all_predecessor_bindings_resolved_once": {"const": true}, "source_output_scope_transform_and_identity_equal": {"const": true}, "transformed_output_bytes_and_hash_equal": {"const": true}, "source_paths_deduplicated_without_identity_loss": {"const": true}, "target_outputs_unique": {"const": true}, "resolver_round_trip_complete": {"const": true}}},
+    "release_transition_authority": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

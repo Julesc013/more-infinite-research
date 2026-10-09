@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "kind": "MIR4BobTinProgressionFrontierV1",
+  "scope": "F210 exact Bob-only Tin science and lab progression-frontier diagnostic; package-excluded evidence",
+  "target": {
+    "factorio_line": "2.1",
+    "factorio_version": "2.1.17",
+    "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"
+  },
+  "official_mod_closure": [
+    {"name": "base", "enabled": true},
+    {"name": "elevated-rails", "enabled": true},
+    {"name": "quality", "enabled": true},
+    {"name": "recycler", "enabled": true},
+    {"name": "space-age", "enabled": true}
+  ],
+  "archive_closure": [
+    {"name": "boblibrary", "version": "3.0.0", "sha256": "49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4"},
+    {"name": "bobores", "version": "3.0.0", "sha256": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B"},
+    {"name": "bobplates", "version": "3.0.1", "sha256": "503D7BF6E88DA1F99463AC00CEC959C2003B2701D80DC4A564CF2EC3920AC8AF"}
+  ],
+  "anchor": {
+    "stream_key": "research_material_tin",
+    "technology": "recipe-prod-research_material_tin-1",
+    "effect_type": "change-recipe-productivity",
+    "effect_recipe": "bob-tin-plate",
+    "effect_change_per_completed_level": 0.02,
+    "exact_owner_count": 1,
+    "prototype_max_level": "infinite",
+    "prerequisites": ["automation-science-pack"],
+    "science_ingredients": [
+      {"type": "item", "name": "automation-science-pack", "amount": 1}
+    ],
+    "cap_transport": {
+      "raw_direct_max_level": 2,
+      "mirset1_imported_max_level": 3,
+      "effective_max_level": 3
+    }
+  },
+  "runtime_binding": {
+    "native_infinite_max_level_sentinel": 4294967295,
+    "maximum_level_policy_binding_count": 1
+  },
+  "science_lab_frontier": {
+    "candidate_selection_rule": "all-final-technology-unit-ingredients-with-exact-item-or-tool-prototype-binding",
+    "raw_recipe_enabled_semantics": "enabled-not-false",
+    "candidate_science_packs": [
+      {"name":"agricultural-science-pack","prototype_type":"item","producer_recipe_ids":["agricultural-science-pack","agricultural-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["agricultural-science-pack","recycling"]},
+      {"name":"automation-science-pack","prototype_type":"item","producer_recipe_ids":["automation-science-pack","automation-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["automation-science-pack","recycling"]},
+      {"name":"chemical-science-pack","prototype_type":"item","producer_recipe_ids":["chemical-science-pack","chemical-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["chemical-science-pack","recycling"]},
+      {"name":"cryogenic-science-pack","prototype_type":"item","producer_recipe_ids":["cryogenic-science-pack","cryogenic-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["cryogenic-science-pack","recycling"]},
+      {"name":"electromagnetic-science-pack","prototype_type":"item","producer_recipe_ids":["electromagnetic-science-pack","electromagnetic-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["electromagnetic-science-pack","recycling"]},
+      {"name":"logistic-science-pack","prototype_type":"item","producer_recipe_ids":["logistic-science-pack","logistic-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["logistic-science-pack","recycling"]},
+      {"name":"metallurgic-science-pack","prototype_type":"item","producer_recipe_ids":["metallurgic-science-pack","metallurgic-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["metallurgic-science-pack","recycling"]},
+      {"name":"military-science-pack","prototype_type":"item","producer_recipe_ids":["military-science-pack","military-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["military-science-pack","recycling"]},
+      {"name":"production-science-pack","prototype_type":"item","producer_recipe_ids":["production-science-pack","production-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["production-science-pack","recycling"]},
+      {"name":"promethium-science-pack","prototype_type":"item","producer_recipe_ids":["promethium-science-pack","promethium-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["promethium-science-pack","recycling"]},
+      {"name":"space-science-pack","prototype_type":"item","producer_recipe_ids":["space-science-pack","space-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["recycling","space-science-pack"]},
+      {"name":"utility-science-pack","prototype_type":"item","producer_recipe_ids":["utility-science-pack","utility-science-pack-recycling"],"default_enabled_producer_recipe_ids":[],"direct_unlock_technology_ids":["recycling","utility-science-pack"]}
+    ],
+    "present_non_hidden_lab_prototypes": [
+      {"id":"biolab","inputs":["agricultural-science-pack","automation-science-pack","chemical-science-pack","cryogenic-science-pack","electromagnetic-science-pack","logistic-science-pack","metallurgic-science-pack","military-science-pack","production-science-pack","promethium-science-pack","space-science-pack","utility-science-pack"]},
+      {"id":"lab","inputs":["agricultural-science-pack","automation-science-pack","chemical-science-pack","cryogenic-science-pack","electromagnetic-science-pack","logistic-science-pack","metallurgic-science-pack","military-science-pack","production-science-pack","promethium-science-pack","space-science-pack","utility-science-pack"]}
+    ],
+    "anchor_compatible_present_non_hidden_lab_ids": ["biolab","lab"]
+  },
+  "companion_continuation": {
+    "stable_id_allocation": "blocked",
+    "emission": "blocked",
+    "reason": "diagnostic-establishes-inputs-only"
+  },
+  "evidence_role": "bounded diagnostic input to A17 X04 BA-07 and PROG-01; not progression or continuation completion authority",
+  "explicit_non_claims": [
+    "companion-stable-id-allocation-or-emission",
+    "infinite-continuation-support",
+    "progression-completion",
+    "migration-or-save-state-transfer",
+    "F200",
+    "Angel-or-combined-Bob-Angel-admission",
+    "multiplayer",
+    "research-browser",
+    "full-cross-target-parity",
+    "full-BA-07-or-PROG-01",
+    "release-readiness"
+  ]
+}

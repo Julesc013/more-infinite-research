@@ -312,7 +312,7 @@ function Update-MIRCPEvidenceIndex {
         kind = [string]$record.kind
         context_digest = [string]$record.context_digest
         identity_key = [string]$record.identity_key
-        task_id = [string]$record.subject.task_id
+        task_id = if ($null -ne $record.subject.PSObject.Properties['task_id']) { [string]$record.subject.task_id } else { '' }
         target = [string]$record.subject.target
         status = [string]$record.payload.status
         trust_class = [string]$record.producer.trust_class

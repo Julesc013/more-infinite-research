@@ -157,6 +157,30 @@ function New-MIRCPV4Observation {
   return New-MIRCPObservation -Kind legacy-v4-adapter -EnvironmentSignature (Get-MIRCPSha256Object -Value $environmentMaterial) -Target $Target -CandidateSha256 $CandidateSha256 -Facts $facts -Artifacts @() -Source $source
 }
 
+function Get-MIRCPV4HistoricalBundleIdentity {
+  param([Parameter(Mandatory)][string]$Path)
+  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Historical v4 bundle is missing: $Path" }
+  $bytes = [IO.File]::ReadAllBytes($Path)
+  $rawSha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+  # The receipt last changed at 1138ed55; Git blob 240521f9 is LF, while the
+  # accepted replay bound its original Windows CRLF bytes. Accept only those
+  # two exact representations and reconstruct the accepted identity in memory.
+  $originalCrLfSha256 = 'AB79AB1450287C67361B6F17D1B90B0ED95A913D411DEC714B406304CEBA16DF'
+  $trackedLfSha256 = '0AF6F8B82C24EB76D6C4BE9856E4D38AA377B07B86971D7680BAAA24CAEAD23A'
+  if ($rawSha256 -ceq $originalCrLfSha256) {
+    return [pscustomobject][ordered]@{json_text=[Text.Encoding]::UTF8.GetString($bytes);source_sha256=$originalCrLfSha256;working_tree_sha256=$rawSha256;representation='original-crlf-v1'}
+  }
+  if ($rawSha256 -ceq $trackedLfSha256) {
+    $text = [Text.UTF8Encoding]::new($false,$true).GetString($bytes)
+    if ($text.Contains("`r")) { throw '[mircp-v4-historical-bundle-line-endings]' }
+    $originalBytes = [Text.Encoding]::UTF8.GetBytes($text.Replace("`n","`r`n"))
+    $reconstructedSha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($originalBytes))
+    if ($reconstructedSha256 -cne $originalCrLfSha256) { throw '[mircp-v4-historical-bundle-reconstruction]' }
+    return [pscustomobject][ordered]@{json_text=$text;source_sha256=$originalCrLfSha256;working_tree_sha256=$rawSha256;representation='tracked-lf-reconstructs-original-crlf-v1'}
+  }
+  throw "[mircp-v4-historical-bundle-identity] $rawSha256"
+}
+
 function New-MIRCPV4ReplayReport {
   param(
     [string]$BundlePath = ".mir/evidence/3.2.2-local-automated-qualification.json",
@@ -164,8 +188,9 @@ function New-MIRCPV4ReplayReport {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $resolved = if ([IO.Path]::IsPathRooted($BundlePath)) { $BundlePath } else { Join-Path $repo $BundlePath }
-  $bundle = Get-Content -Raw -LiteralPath $resolved | ConvertFrom-Json
-  $bundleSha = Get-MIRCPSha256File -Path $resolved
+  $bundleIdentity = Get-MIRCPV4HistoricalBundleIdentity -Path $resolved
+  $bundle = $bundleIdentity.json_text | ConvertFrom-Json
+  $bundleSha = [string]$bundleIdentity.source_sha256
   $candidateSha = [string]$bundle.candidate_descriptor.sha256
   $rows = [Collections.Generic.List[object]]::new()
   $passed = 0

@@ -1,0 +1,428 @@
+{
+  "status": "passed",
+  "scope": "package-excluded-VEH-02-native-capability-probe; no-service-or-support-admission",
+  "assertions": 4,
+  "tick": 300,
+  "factor": 0.8,
+  "tracks": {
+    "control": {
+      "name": "straight-rail",
+      "built": 181
+    },
+    "economy": {
+      "name": "straight-rail",
+      "built": 181
+    }
+  },
+  "vehicles": {
+    "car": {
+      "kind": "car",
+      "setter_support": true,
+      "control": {
+        "kind": "car",
+        "entity_created": true,
+        "fuel": {
+          "categories": [
+            "chemical"
+          ],
+          "coal_category_accepted": true,
+          "coal_inserted": true
+        },
+        "setters": {
+          "attempted": true,
+          "factor": 0.8,
+          "before": {
+            "consumption": 1,
+            "effectivity": 1
+          },
+          "write": {
+            "consumption": true,
+            "effectivity": true,
+            "observed": true
+          },
+          "after": {
+            "consumption": 0.8,
+            "effectivity": 1.25
+          },
+          "supported": true
+        },
+        "setter_probe_restored": true,
+        "work": {
+          "attempted": true,
+          "origin": {
+            "x": -20,
+            "y": 0
+          },
+          "input": "normal-riding-state",
+          "started": true,
+          "samples": [
+            {
+              "tick": 0,
+              "distance": 0,
+              "speed": 0
+            },
+            {
+              "tick": 50,
+              "distance": 7.9375,
+              "speed": 0.234339
+            },
+            {
+              "tick": 100,
+              "distance": 21.878906,
+              "speed": 0.31891
+            },
+            {
+              "tick": 150,
+              "distance": 39.269531,
+              "speed": 0.376257
+            },
+            {
+              "tick": 200,
+              "distance": 59.125,
+              "speed": 0.418971
+            },
+            {
+              "tick": 250,
+              "distance": 80.855469,
+              "speed": 0.452192
+            },
+            {
+              "tick": 300,
+              "distance": 104.070313,
+              "speed": 0.47868199999999994
+            }
+          ]
+        },
+        "start_energy": 200000000,
+        "end_energy": 199249833.33333334,
+        "distance": 104.070313,
+        "fuel_used": 750166.666667
+      },
+      "economy": {
+        "kind": "car",
+        "entity_created": true,
+        "fuel": {
+          "categories": [
+            "chemical"
+          ],
+          "coal_category_accepted": true,
+          "coal_inserted": true
+        },
+        "setters": {
+          "attempted": true,
+          "factor": 0.8,
+          "before": {
+            "consumption": 1,
+            "effectivity": 1
+          },
+          "write": {
+            "consumption": true,
+            "effectivity": true,
+            "observed": true
+          },
+          "after": {
+            "consumption": 0.8,
+            "effectivity": 1.25
+          },
+          "supported": true
+        },
+        "setter_probe_restored": true,
+        "mapping_applied": true,
+        "work": {
+          "attempted": true,
+          "origin": {
+            "x": 20,
+            "y": 0
+          },
+          "input": "normal-riding-state",
+          "started": true,
+          "samples": [
+            {
+              "tick": 0,
+              "distance": 0,
+              "speed": 0
+            },
+            {
+              "tick": 50,
+              "distance": 7.9375,
+              "speed": 0.234339
+            },
+            {
+              "tick": 100,
+              "distance": 21.878906,
+              "speed": 0.31891
+            },
+            {
+              "tick": 150,
+              "distance": 39.269531,
+              "speed": 0.376257
+            },
+            {
+              "tick": 200,
+              "distance": 59.125,
+              "speed": 0.418971
+            },
+            {
+              "tick": 250,
+              "distance": 80.855469,
+              "speed": 0.452192
+            },
+            {
+              "tick": 300,
+              "distance": 104.070313,
+              "speed": 0.47868199999999994
+            }
+          ]
+        },
+        "start_energy": 200000000,
+        "end_energy": 199399866.66666666,
+        "distance": 104.070313,
+        "fuel_used": 600133.333333,
+        "setter_restored": true
+      },
+      "work": {
+        "attempted": true,
+        "normal_input": "normal-riding-state",
+        "control_distance": 104.070313,
+        "economy_distance": 104.070313,
+        "control_fuel_used": 750166.666667,
+        "economy_fuel_used": 600133.333333,
+        "equal_distance": true,
+        "motion": {
+          "sample_count": 7,
+          "speed_matched": true,
+          "acceleration_matched": true,
+          "acceleration_samples": {
+            "control": [
+              0.004687,
+              0.0016910000000000002,
+              0.001147,
+              0.000854,
+              0.0006640000000000001,
+              0.0005300000000000001
+            ],
+            "economy": [
+              0.004687,
+              0.0016910000000000002,
+              0.001147,
+              0.000854,
+              0.0006640000000000001,
+              0.0005300000000000001
+            ]
+          }
+        },
+        "measurable": true,
+        "fuel_ratio": 0.8,
+        "expected_ratio": 0.8,
+        "ratio_matches": true
+      },
+      "engine_native_mapping": true,
+      "decision": "measured-native-mapping"
+    },
+    "spider-vehicle": {
+      "kind": "spider-vehicle",
+      "setter_support": false,
+      "control": {
+        "kind": "spider-vehicle",
+        "entity_created": true,
+        "fuel": {
+          "categories": {},
+          "reason": "no-burner-prototype"
+        },
+        "setters": {
+          "attempted": true,
+          "factor": 0.8,
+          "supported": false,
+          "reason": "modifiers-unreadable: Entity is not car."
+        },
+        "setter_probe_restore_reason": "not-applicable-without-readable-setter-baseline",
+        "work": {
+          "attempted": false,
+          "reason": "efficiency-setters-unsupported-or-unreadable"
+        }
+      },
+      "economy": {
+        "kind": "spider-vehicle",
+        "entity_created": true,
+        "fuel": {
+          "categories": {},
+          "reason": "no-burner-prototype"
+        },
+        "setters": {
+          "attempted": true,
+          "factor": 0.8,
+          "supported": false,
+          "reason": "modifiers-unreadable: Entity is not car."
+        },
+        "setter_probe_restore_reason": "not-applicable-without-readable-setter-baseline",
+        "mapping_applied": false,
+        "mapping_apply_reason": "not-applied-without-compatible-coal-fuel",
+        "work": {
+          "attempted": false,
+          "reason": "efficiency-setters-unsupported-or-unreadable"
+        },
+        "setter_restore_reason": "not-applicable-without-an-applied-economy-mapping"
+      },
+      "work": {
+        "attempted": false,
+        "reason": "efficiency-setters-unsupported-or-unreadable",
+        "measurable": false,
+        "ratio_matches": false
+      },
+      "engine_native_mapping": false,
+      "decision": "not-admitted-by-this-probe"
+    },
+    "locomotive": {
+      "kind": "locomotive",
+      "setter_support": false,
+      "control": {
+        "kind": "locomotive",
+        "entity_created": true,
+        "track": {
+          "name": "straight-rail",
+          "built": 181
+        },
+        "fuel": {
+          "categories": [
+            "chemical"
+          ],
+          "coal_category_accepted": true,
+          "coal_inserted": true
+        },
+        "setters": {
+          "attempted": true,
+          "factor": 0.8,
+          "supported": false,
+          "reason": "modifiers-unreadable: Entity is not car."
+        },
+        "setter_probe_restore_reason": "not-applicable-without-readable-setter-baseline",
+        "work": {
+          "attempted": false,
+          "reason": "efficiency-setters-unsupported-or-unreadable"
+        }
+      },
+      "economy": {
+        "kind": "locomotive",
+        "entity_created": true,
+        "track": {
+          "name": "straight-rail",
+          "built": 181
+        },
+        "fuel": {
+          "categories": [
+            "chemical"
+          ],
+          "coal_category_accepted": true,
+          "coal_inserted": true
+        },
+        "setters": {
+          "attempted": true,
+          "factor": 0.8,
+          "supported": false,
+          "reason": "modifiers-unreadable: Entity is not car."
+        },
+        "setter_probe_restore_reason": "not-applicable-without-readable-setter-baseline",
+        "mapping_apply_reason": "setter-probe-did-not-pass",
+        "mapping_applied": false,
+        "work": {
+          "attempted": false,
+          "reason": "efficiency-setters-unsupported-or-unreadable"
+        },
+        "setter_restore_reason": "not-applicable-without-an-applied-economy-mapping"
+      },
+      "work": {
+        "attempted": false,
+        "reason": "efficiency-setters-unsupported-or-unreadable",
+        "measurable": false,
+        "ratio_matches": false
+      },
+      "engine_native_mapping": false,
+      "decision": "not-admitted-by-this-probe"
+    }
+  },
+  "target": "2.0",
+  "engine": "Version: 2.0.77 (build 84539, win64, full)\r\nVersion: 64\r\nMap input version: 1.0.0-0\r\nMap output version: 2.0.77-0",
+  "engine_sha256": {
+    "before": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "after": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "runtime_api": {
+    "path": "D:\\Programs\\Factorio\\2.0\\doc-html\\runtime-api.json",
+    "sha256_before": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+    "sha256_after": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+    "application_version": "2.0.77",
+    "api_version": 6,
+    "lua_entity": {
+      "consumption_modifier": {
+        "read_type": "float",
+        "write_type": "float",
+        "optional": false
+      },
+      "effectivity_modifier": {
+        "read_type": "float",
+        "write_type": "float",
+        "optional": false
+      },
+      "burner": {
+        "read_type": "LuaBurner",
+        "write_type": null,
+        "optional": true
+      },
+      "speed": {
+        "read_type": "float",
+        "write_type": "float",
+        "optional": true
+      },
+      "train": {
+        "read_type": "LuaTrain",
+        "write_type": null,
+        "optional": true
+      }
+    },
+    "normal_driving": {
+      "lua_entity_parent": "LuaControl",
+      "riding_state": {
+        "read_type": "RidingState",
+        "write_type": "RidingState"
+      },
+      "entity_methods": {
+        "set_driver": {
+          "present": true,
+          "parameters": [
+            {
+              "name": "driver",
+              "order": 0,
+              "description": "The new driver. Writing `nil` ejects the current driver, if any.",
+              "type": {
+                "complex_type": "union",
+                "options": [
+                  "LuaEntity",
+                  "PlayerIdentification",
+                  "nil"
+                ],
+                "full_format": false
+              },
+              "optional": false
+            }
+          ]
+        },
+        "get_driver": {
+          "present": true,
+          "parameters": []
+        },
+        "get_fuel_inventory": {
+          "present": true,
+          "parameters": []
+        }
+      }
+    }
+  },
+  "fixture_sha256": "C5682FBA7068D6B31C0AD1FEF874D3DD86DB885CD5273082BD4CBA5B82C14915",
+  "car_control_sha256": "6B19171C5CA359A7B5863D47A8A12DAB82133124B3497FBCEE10D898880CCE75",
+  "harness_sha256": "6E0BAE1E67E2E0EACD99F5EAEA6EAA26324A0D4E5F5A36BEC3C1E35766C3D422",
+  "execution_context": {
+    "checkout_head_context": "bcef9b3fb9646dc8b079c2d8bcecad5926e0d4e1",
+    "controlled_harness_state": "uncommitted-snapshot-explicitly-hash-bound",
+    "candidate_or_player_package": false
+  }
+}

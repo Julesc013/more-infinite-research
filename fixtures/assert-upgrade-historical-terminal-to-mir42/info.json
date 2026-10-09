@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-assert-upgrade-historical-terminal-to-mir42",
+  "version": "1.0.0",
+  "title": "MIR historical terminal continuity fixture",
+  "author": "More Infinite Research",
+  "factorio_version": "@@FACTORIO_LINE@@",
+  "dependencies": ["base", "more-infinite-research >= @@MIR_UPGRADE_FROM_VERSION@@"]
+}

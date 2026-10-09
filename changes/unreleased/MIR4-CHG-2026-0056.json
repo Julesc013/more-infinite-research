@@ -1,0 +1,34 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0056",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Use declared native productivity-exclusion defaults for carrier products.",
+  "details": [
+    "The F210 and F200 contracts declare that omitted ignored_by_productivity inherits ignored_by_stats. The canonical base productive-output index and manufacturing carrier guard now share that rule; explicit zero remains an override.",
+    "Unqualified extra item carrier rolls remain withheld. A covered base quantity cannot authorize fractional bonus behavior or establish a profitable-loop proof.",
+    "The consumed material-route fixture passes 382 controlled assertions, including 124 new exclusion, explicit-zero, denial, legacy-default and fractional-carrier controls. Native machine, loop, package and save qualification remains pending."
+  ],
+  "semantic_domains": ["progression", "compiler"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Native product exclusions are selected through the current target contract."},
+    {"target":"F200","disposition":"affected","reason":"The package requires base 2.0.77, whose native product contract inherits the statistics exclusion."},
+    {"target":"F110","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect and declares no modern exclusion default."},
+    {"target":"F100","disposition":"omitted-by-capability","reason":"This target has no recipe-productivity technology effect and declares no modern exclusion default."},
+    {"target":"F017","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."},
+    {"target":"F016","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."},
+    {"target":"F015","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."},
+    {"target":"F014","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."},
+    {"target":"F013","disposition":"omitted-by-capability","reason":"This reduced target does not select the shared manufacturing guard."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"compatible","settings":"compatible","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/material_routes.lua: inherited exclusion and fractional carrier controls"},
+    {"kind":"finding","value":"Installed Factorio 2.1.20 and 2.0.77 prototype API product exclusion defaults; source/presentation/f200/info.json.template base floor"}
+  ]
+}

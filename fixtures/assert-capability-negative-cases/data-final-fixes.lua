@@ -11,6 +11,8 @@ local denied_recipes = {
   ["mir-parameter-placeable-machine"] = true,
   ["mir-productivity-disabled-machine"] = true,
   ["mir-zero-cap-placeable-machine"] = true,
+  ["mir-zero-output-placeable-machine"] = true,
+  ["mir-excluded-output-placeable-machine"] = true,
   ["mir-recycling-placeable-machine"] = true,
   ["mir-self-return-placeable-machine"] = true,
   ["mir-nondeterministic-placeable-machine"] = true,
@@ -91,6 +93,14 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
       or not decision or decision.risk_fingerprint ~= risk.risk_fingerprint
       or decision.risk_disposition ~= "REVIEW_REQUIRED" or decision.decision ~= "review-required" then
       error("MIR review RecipeRiskFact did not produce REVIEW_REQUIRED: " .. recipe_name .. "/" .. expected)
+    end
+  end
+  for _, recipe_name in ipairs({"mir-zero-output-placeable-machine", "mir-excluded-output-placeable-machine"}) do
+    local risk = risk_facts.view(recipe_name)
+    local decision = decisions[recipe_name]
+    if not risk or not decision or decision.risk_fingerprint ~= risk.risk_fingerprint
+      or decision.blocker ~= "non_productive_placeable_output" or decision.decision ~= "diagnose" then
+      error("MIR automatic manufacturing admitted an output with no useful bonus: " .. recipe_name)
     end
   end
 end)

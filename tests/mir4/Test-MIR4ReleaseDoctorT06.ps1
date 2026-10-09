@@ -21,9 +21,57 @@ $expectedPhases=@('source-freeze','target-build','target-qualification','preview
 if((@($corpus.phases.phase|Sort-Object)-join'|')-cne(@($expectedPhases|Sort-Object)-join'|')-or
    @($corpus.phases.phase|Group-Object|Where-Object Count -ne 1).Count-ne0-or
    @($corpus.phases.fault.id|Group-Object|Where-Object Count -ne 1).Count-ne0){throw '[mir4-t06-fault-corpus-closure]'}
+
+# The T06 corpus is historical and retains its original proof locators.  The
+# M42-01B relocation authority is the only permitted bridge to current tests;
+# broad path rewriting would make a missing historical proof look current.
+$workflowConvergencePath=Join-Path $repo 'releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json'
+if(-not(Test-Path -LiteralPath $workflowConvergencePath -PathType Leaf)){throw '[mir4-t06-fault-binding-relocation-authority]'}
+$workflowConvergence=Get-Content -Raw -LiteralPath $workflowConvergencePath|ConvertFrom-Json -Depth 100
+if([string]$workflowConvergence.kind-cne'MIR4M4201BTestWorkflowConvergenceV1'-or-not(Test-MIR4BootstrapRecordHash -Record $workflowConvergence)){throw '[mir4-t06-fault-binding-relocation-authority]'}
+$relocations=@($workflowConvergence.relocated_bindings)
+$expectedCanonicalProofSha256=@{
+  'tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1'='319060667FF7DB328106A14CC12EB1CBABDE605635479F8E3CF5103F8E166C17'
+  'tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1'='7BEF2BEF656D64F588CAF18DFC04E5FE8B14A676F6BE0D61D96881E322BA62C4'
+  'tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1'='8ECA00F8BD5B3D98806B3E260478C77D0D21CD90D2543DE633C88D8F1FEA6747'
+}
+function Resolve-MIR4T06HistoricalProofPath([string]$RelativePath,[object[]]$RelocationBindings,[hashtable]$ExpectedCanonicalSha256){
+  $directPath=Join-Path $repo $RelativePath
+  if(Test-Path -LiteralPath $directPath -PathType Leaf){
+    if($RelativePath-match'^validation/tests/'){throw "[mir4-t06-fault-binding-relocation-direct] $RelativePath"}
+    return [pscustomobject]@{relative_path=$RelativePath;full_path=$directPath;relocated=$false}
+  }
+  $matches=@($RelocationBindings|Where-Object{[string]$_.from_path-ceq$RelativePath})
+  if($matches.Count-ne1){throw "[mir4-t06-fault-binding-relocation-cardinality] $RelativePath"}
+  $binding=$matches[0];$targetRelative=[string]$binding.to_path
+  if([string]$binding.from_path-cne$RelativePath-or$targetRelative-notmatch'^tests/mir4/Test-MIR4Release(?:AdaptersT0[345]|DoctorT06)\.ps1$'-or
+     [string]$binding.previous_git_blob-notmatch'^[0-9a-f]{40}$'-or[string]$binding.previous_sha256-notmatch'^[A-F0-9]{64}$'-or
+     [string]$binding.current_sha256-notmatch'^[A-F0-9]{64}$'-or[string]$binding.hash_mode-cne'canonical-text-v1'){
+    throw "[mir4-t06-fault-binding-relocation-hash] $RelativePath"
+  }
+  $targetPath=Join-Path $repo $targetRelative
+  if(-not(Test-Path -LiteralPath $targetPath -PathType Leaf)){throw "[mir4-t06-fault-binding-relocation-target] $targetRelative"}
+  if(-not$ExpectedCanonicalSha256.ContainsKey($targetRelative)-or
+     (Get-MIR4PreFreezeFileSha256 -Path $targetPath -Mode canonical-text-v1)-cne[string]$ExpectedCanonicalSha256[$targetRelative]){
+    throw "[mir4-t06-fault-binding-relocation-hash] $targetRelative"
+  }
+  return [pscustomobject]@{relative_path=$targetRelative;full_path=$targetPath;relocated=$true}
+}
+$referenceRelocation=@($relocations|Where-Object{[string]$_.from_path-ceq'validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1'})
+if($referenceRelocation.Count-ne1){throw '[mir4-t06-fault-binding-relocation-reference]'}
+foreach($counterexample in @(
+  @{bindings=@();code='[mir4-t06-fault-binding-relocation-cardinality]'},
+  @{bindings=@($referenceRelocation[0],$referenceRelocation[0]);code='[mir4-t06-fault-binding-relocation-cardinality]'},
+  @{bindings=@($referenceRelocation[0]);expected=@{'tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1'=('0'*64)};code='[mir4-t06-fault-binding-relocation-hash]'}
+)){
+  $expected=if($counterexample.ContainsKey('expected')){$counterexample.expected}else{$expectedCanonicalProofSha256}
+  try{[void](Resolve-MIR4T06HistoricalProofPath -RelativePath 'validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1' -RelocationBindings $counterexample.bindings -ExpectedCanonicalSha256 $expected);throw '[mir4-t06-fault-binding-relocation-counterexample-accepted]'}
+  catch{if(-not$_.Exception.Message.StartsWith([string]$counterexample.code,[StringComparison]::Ordinal)){throw}}
+}
 foreach($row in @($corpus.phases)){
   foreach($relative in @([string]$row.happy_path.path,[string]$row.fault.assertion_path)){
-    $source=Get-Content -Raw -LiteralPath (Join-Path $repo $relative)
+    $proof=Resolve-MIR4T06HistoricalProofPath -RelativePath $relative -RelocationBindings $relocations -ExpectedCanonicalSha256 $expectedCanonicalProofSha256
+    $source=Get-Content -Raw -LiteralPath $proof.full_path
     if($source-notmatch[regex]::Escape([string]$row.phase)-or$source-notmatch[regex]::Escape([string]$row.fault.expected_error_prefix)){throw "[mir4-t06-fault-binding] $($row.phase)"}
   }
 }

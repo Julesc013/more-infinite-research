@@ -77,7 +77,7 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
   }
 }
 
-$sourceRoot='src/mod/families/modern/prototypes/mir/planner'
+$sourceRoot='source/prototypes/mir/planner'
 $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/compilation_plan.lua")
 Assert-MIR4M4202CompilationPlan ($facade-match'compilation_plan[.]build'-and$facade-notmatch'function\s') 'thin-facade'
 $required=[ordered]@{model='model.lua';build='build.lua';validate='validate.lua';fingerprint='fingerprint.lua';serialize='serialize.lua'}

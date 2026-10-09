@@ -13,6 +13,14 @@ $cutover=New-MIR4FeatureSettingCutoverMatrix -RepoRoot $RepoRoot -Providers $pro
 $laws=Test-MIR4SemanticMergeLaws -RepoRoot $RepoRoot
 if(@($runs).Count-ne 17-or@($runs.target.id|Sort-Object -Unique).Count-ne 17){throw '[mir4-w03-run-count]'}
 if(@($runs|Where-Object{[string]$_.kind-ne'MIR4CompilationRunV1'-or[int]$_.schema-ne 1-or$_.authoritative_output-or$_.mutation_capability-or$_.runtime_state_mutation_capability-or$_.public_support_claim}).Count-ne 0){throw '[mir4-w03-run-boundary]'}
+$f200Run=@($runs|Where-Object{[string]$_.target.id-ceq'f200'})|Select-Object -First 1
+if($null-eq$f200Run-or[string]$f200Run.target.composition_target-cne'f200'){throw '[mir4-w03-f200-composition-target]'}
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+$f200Package=New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f200
+$f200ClaimPath=Resolve-MIR4CurrentTargetPackageOutputPath -Context $f200Package -RelativePath 'prototypes/mir/compatibility/claim_registry.lua'
+$f200ClaimAuthority=[IO.Path]::GetRelativePath($RepoRoot,$f200ClaimPath).Replace('\','/')
+$f200ClaimHash=(Get-FileHash -LiteralPath $f200ClaimPath -Algorithm SHA256).Hash.ToUpperInvariant()
+if([string]$f200Run.claims.registry.authority-cne$f200ClaimAuthority-or[string]$f200Run.claims.registry.sha256-cne$f200ClaimHash){throw '[mir4-w03-f200-composition-authority]'}
 if(@($runs|Where-Object{-not$_.contract_set.digest-or-not$_.environment_lock.digest-or-not$_.target_provider.digest-or-not$_.feature_manifest-or-not$_.setting_spec-or-not$_.normalized_facts-or-not$_.graphs-or-not$_.process_ir-or-not$_.policy-or-not$_.claims-or-not$_.resolutions-or@($_.plans).Count-ne 7-or-not$_.operations-or-not$_.runtime_state-or@($_.proof_obligations).Count-lt 6-or-not$_.bounded_public_projections}).Count-ne 0){throw '[mir4-w03-run-incomplete]'}
 if(@($runs.plans|Where-Object{$_.executor_authorized}).Count-ne 0){throw '[mir4-w03-executor-authority]'}
 if(@($protocols.protocols).Count-ne 13-or@($protocols.protocols|Where-Object{$_.rewrite_required-or'mutate-prototype'-notin@($_.forbidden_operations)}).Count-ne 0){throw '[mir4-w03-protocol-adapter]'}

@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "kind": "MIR42A13ExactFingerprintReuseReceiptV1",
+  "task": "A13",
+  "status": "implemented-and-contract-tested",
+  "fingerprint_contract": {
+    "target": "fingerprint.target",
+    "candidate_source": "fingerprint.inputs.candidate-source",
+    "environment": "fingerprint.inputs.assurance-environment plus test-declared Factorio, mod, profile, scenario, and fixture inputs",
+    "command": "fingerprint.definition.command",
+    "evaluator": "fingerprint.inputs.assurance-evaluator",
+    "inputs": "fingerprint.inputs",
+    "exact_match": "the complete canonical fingerprint hash and definition hash identify reusable evidence"
+  },
+  "candidate_source_fields": [
+    "package_source_commit",
+    "source_commit",
+    "source_tree",
+    "package_source_sha256",
+    "candidate_descriptor_sha256"
+  ],
+  "evaluator_inputs": [
+    "scripts/Invoke-MIRAssurance.ps1",
+    "tools/mir.ps1",
+    "tools/lib/assurance/**",
+    "tools/lib/validation/CurrentTargetPackage.ps1",
+    "tools/lib/validation/FactorioVersionPolicy.ps1",
+    "tools/lib/validation/ScenarioRegistry.ps1",
+    "tools/mir_verify/**",
+    "spec/schemas/**"
+  ],
+  "contradiction_policy": {
+    "same_exact_identity": "trusted contradictory attempts quarantine the identity",
+    "reuse_after_contradiction": false,
+    "required_action": "independent-fresh-reproduction-required"
+  },
+  "timing": {
+    "reporter": "Get-MIRAssuranceResultCounts",
+    "observed_fields": [
+      "cold_execution_seconds",
+      "reused_source_seconds",
+      "checkpointed_source_seconds"
+    ],
+    "rule": "candidate execution reports observed durations; this source receipt stores no synthetic duration as a release measurement"
+  },
+  "evidence": {
+    "static_test": "tests/tooling/Test-MIRAssurance.ps1",
+    "existing_self_test": "tests/tooling/support/MIRAssuranceSelfTest.ps1",
+    "checks": [
+      "candidate-source, environment, command, and evaluator fingerprint invalidation",
+      "trusted same-fingerprint contradiction quarantine",
+      "cold/reused/checkpointed duration aggregation"
+    ]
+  },
+  "non_claims": [
+    "This receipt does not treat a static proof as a release candidate qualification.",
+    "Evidence never crosses Factorio targets merely because a test identifier is similar.",
+    "A contradiction cannot be resolved by rerunning the same untrusted result."
+  ],
+  "release_authority": false,
+  "publication_authority": false
+}

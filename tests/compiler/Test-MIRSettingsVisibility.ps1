@@ -10,14 +10,17 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
 . (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
-$repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$repoInfo = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 $targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
 $isReducedLegacyLine = [bool]$targetProfile.reduced_legacy
 
 function Read-MIRText {
   param([Parameter(Mandatory)][string]$RelativePath)
-  $path = Join-Path $repo $RelativePath
+  $path = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath -AllowMissing
+  if ($null -eq $path) { $path = Join-Path $repo $RelativePath }
   if (-not (Test-Path -LiteralPath $path)) {
     throw "Missing required settings visibility file: $RelativePath"
   }
@@ -78,14 +81,19 @@ function Assert-NoPatternInTree {
     [Parameter(Mandatory)][string]$Message
   )
 
-  $root = Join-Path $repo $RelativeRoot
-  if (-not (Test-Path -LiteralPath $root)) { return }
-
-  $matches = @(
-    Get-ChildItem -LiteralPath $root -Recurse -File |
-      Where-Object { $_.Extension -in @(".lua", ".yml", ".md", ".ps1") } |
-      Select-String -Pattern $Pattern
+  $packageFiles = @(
+    Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix ($RelativeRoot.TrimEnd('/') + '/') |
+      ForEach-Object { Get-Item -LiteralPath $_.source_file } |
+      Where-Object { $_.Extension -in @(".lua", ".yml", ".md", ".ps1") }
   )
+  $files = if ($packageFiles.Count -gt 0) {
+    $packageFiles
+  } else {
+    $root = Join-Path $repo $RelativeRoot
+    if (-not (Test-Path -LiteralPath $root)) { return }
+    @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object { $_.Extension -in @(".lua", ".yml", ".md", ".ps1") })
+  }
+  $matches = @($files | Select-String -Pattern $Pattern)
 
   if ($matches.Count -gt 0) {
     $matches | Write-Host
@@ -105,6 +113,7 @@ $visibilityText = Read-MIRText -RelativePath "prototypes/mir/settings/visibility
 $builderText = Read-MIRText -RelativePath "prototypes/mir/settings/builder.lua"
 $adapterText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_adapter.lua"
 $profileCodecText = Read-MIRText -RelativePath "prototypes/mir/settings/profile_codec.lua"
+$runtimeStartupSettingsText = Read-MIRText -RelativePath "prototypes/mir/runtime/startup_settings.lua"
 $effectiveSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/effective.lua"
 $runtimeSettingsProfileText = Read-MIRText -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 $testOverridesText = Read-MIRText -RelativePath "prototypes/mir/settings/test_overrides.lua"
@@ -121,8 +130,10 @@ $fixtureText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readab
 $fixtureSettingsText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
 $fixtureInfoText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/info.json"
 $streamKeys = @(
-  Get-RegexValues -Text $productivityText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
-  Get-RegexValues -Text $directEffectsText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
+  # Only top-level stream declarations are setting subjects.  Nested fields
+  # such as research_time are not stream keys.
+  Get-RegexValues -Text $productivityText -Pattern '(?m)^  (research_(?!time\b)[A-Za-z0-9_]+)\s*='
+  Get-RegexValues -Text $directEffectsText -Pattern '(?m)^  (research_(?!time\b)[A-Za-z0-9_]+)\s*='
 ) | Sort-Object -Unique
 $baseExtensionKeys = Get-RegexValues -Text $catalogText -Pattern '\{\s*key\s*=\s*"([^"]+)"' | Sort-Object -Unique
 
@@ -197,6 +208,27 @@ Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text 
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.codec = "canonical-json-deflate-base64"'
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "local function sorted_keys(value)"
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "function M.current_profile(options)"
+Assert-Matches `
+  -RelativePath "prototypes/mir/runtime/startup_settings.lua" `
+  -Text $runtimeStartupSettingsText `
+  -Pattern '(?s)local function raw_setting\(name\).*?if setting ~= nil then\s*return setting\.value\s*end\s*return nil\s*end'
+Assert-NoPattern `
+  -RelativePath "prototypes/mir/runtime/startup_settings.lua" `
+  -Text $runtimeStartupSettingsText `
+  -Pattern 'return setting and setting\.value or nil'
+Assert-Matches `
+  -RelativePath "prototypes/mir/runtime/startup_settings.lua" `
+  -Text $runtimeStartupSettingsText `
+  -Pattern '(?s)function M\.get\(name\).*?local imported = profile\.settings and profile\.settings\[name\].*?if imported ~= nil and settings_catalog\.validate_value\(name, imported\) then\s*return imported'
+Assert-Matches `
+  -RelativePath "prototypes/mir/settings/profile_codec.lua" `
+  -Text $profileCodecText `
+  -Pattern '(?s)local function resolved_setting_value\(name, value_resolver\)\s*if value_resolver then\s*return value_resolver\(name\)\s*end\s*return setting_value\(name\)\s*end'
+Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "local value = resolved_setting_value(name, value_resolver)"
+Assert-NoPattern `
+  -RelativePath "prototypes/mir/settings/profile_codec.lua" `
+  -Text $profileCodecText `
+  -Pattern 'local value = value_resolver and value_resolver\(name\) or setting_value\(name\)'
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "function M.get(name, context)"
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "settings_catalog.validate_value(name, imported)"
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-export"'
@@ -267,6 +299,11 @@ if (-not $isReducedLegacyLine) {
 Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle 'automatic_family.creation_maturity == "experimental"'
 Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle 'hidden_reason = "experimental-family-hidden-until-reviewed"'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "generation_requirements = {"
+$breedingBlock = [regex]::Match($productivityText, '(?s)research_breeding\s*=\s*\{(.*?)\r?\n\s*research_nutrients\s*=').Groups[1].Value
+if ([string]::IsNullOrWhiteSpace($breedingBlock)) { throw 'Breeding stream declaration was not found.' }
+Assert-NoPattern -RelativePath "prototypes/streams/productivity.lua" -Text $breedingBlock -Pattern 'space_age_setting_visibility|mods_any\s*=\s*\{"space-age"\}|required_mods\s*=\s*\{"space-age"\}'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle 'assert_stream_hidden("research_breeding", false)'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle '"ips-cost-linear-increment-%s"'
 Assert-Matches `
   -RelativePath "prototypes/streams/productivity.lua" `
   -Text $productivityText `

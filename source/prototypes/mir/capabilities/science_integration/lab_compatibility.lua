@@ -1,0 +1,214 @@
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local effective_settings = require("prototypes.mir.settings.effective")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local item_facts = require("prototypes.mir.index.item_prototype_facts")
+
+local M = {}
+
+local function pack_production_status(...)
+  local service = compiler_context.current():service("science.pack_production_status")
+  if not service then error("MIR science pack-production service is not registered in CompilerContext.", 2) end
+  return service(...)
+end
+
+function M.ingredient_name(ingredient)
+  if not ingredient then return nil end
+  if type(ingredient) == "string" then return ingredient end
+  return ingredient.name or ingredient[1]
+end
+
+function M.ingredient_amount(ingredient)
+  if not ingredient or type(ingredient) == "string" then return 1 end
+  return ingredient.amount or ingredient[2] or 1
+end
+
+local function policy()
+  local value = effective_settings.get("mir-lab-incompatibility-policy")
+  if value == "engine-default" then return "engine-default" end
+  if value == "skip" then return "skip" end
+  return "reduce"
+end
+
+-- Only the private bounded rejection projection supplies this observer. The
+-- normal lab policy has no cap and retains its existing admission semantics.
+local function diagnostic_visit(observer)
+  if not observer then return true end
+  if type(observer.is_stopped) == "function" and observer:is_stopped() then return false end
+  if type(observer.reserve_visit) == "function" then return observer:reserve_visit(0) end
+  return true
+end
+
+local function lab_accepts_all(lab, packs, diagnostic_observer)
+  local accepted = {}
+  for _, input in ipairs((lab and lab.inputs) or {}) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
+    accepted[input] = true
+  end
+  for _, pack in ipairs(packs or {}) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
+    if not accepted[pack] then return false end
+  end
+  return true
+end
+
+local function lab_acquisition_witness(lab_name, diagnostic_observer, reachability_context)
+  local context = reachability_context or {}
+  local service = compiler_context.current():service("science.item_acquisition_witness")
+  if not service then error("MIR item-acquisition service is not registered in CompilerContext.", 2) end
+  local items = {}
+  if diagnostic_observer then
+    -- A cold diagnostic must reserve each raw visit rather than construct the
+    -- normal comprehensive item index outside its work budget.
+    for _, item_type in ipairs(prototype_lookup.item_types()) do
+      if not diagnostic_visit(diagnostic_observer) then return nil end
+      for name, item in pairs(data_raw.prototypes(item_type)) do
+        if not diagnostic_visit(diagnostic_observer) then return nil end
+        if item.place_result == lab_name then items[#items + 1] = name end
+      end
+    end
+    table.sort(items)
+  else
+    for _, name in ipairs(item_facts.placeable_items_for_entity(lab_name)) do
+      local item = prototype_lookup.item_prototype(name)
+      if item and item.place_result == lab_name then items[#items + 1] = name end
+    end
+  end
+  for _, name in ipairs(items) do
+    if not diagnostic_visit(diagnostic_observer) then return nil end
+    local witness = service(name, context.visiting_packs or {},
+      context.visiting_technologies or {}, diagnostic_observer)
+    if witness then return witness end
+  end
+  return nil
+end
+
+function M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
+  if not packs or #packs == 0 then return false end
+  for name, lab in pairs(data_raw.prototypes("lab")) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
+    if lab_accepts_all(lab, packs, diagnostic_observer)
+      and lab_acquisition_witness(name, diagnostic_observer, reachability_context) then return true end
+  end
+  return false
+end
+
+function M.valid_research_ingredients(ingredients, diagnostic_observer, reachability_context)
+  local packs = {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
+    local name = M.ingredient_name(ingredient)
+    if name then table.insert(packs, name) end
+  end
+  return M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
+end
+
+local function required_set(required_packs)
+  local out = {}
+  for _, pack in ipairs(required_packs or {}) do out[pack] = true end
+  return out
+end
+
+local function contains_required(ingredients, required)
+  for pack, _ in pairs(required) do
+    local found = false
+    for _, ingredient in ipairs(ingredients or {}) do
+      if M.ingredient_name(ingredient) == pack then found = true; break end
+    end
+    if not found then return false, pack end
+  end
+  return true
+end
+
+local function contains_phase_trigger(ingredients, alternatives)
+  if not alternatives or #alternatives == 0 then return true end
+  local acceptable = required_set(alternatives)
+  for _, ingredient in ipairs(ingredients or {}) do
+    if acceptable[M.ingredient_name(ingredient)] then return true end
+  end
+  return false
+end
+
+function M.best_lab_compatible_ingredients(ingredients, context, required_packs, required_any_packs)
+  local required = required_set(required_packs)
+  if not contains_phase_trigger(ingredients, required_any_packs) then return nil, "missing-phase-trigger" end
+  local source_has_required, missing_required = contains_required(ingredients, required)
+  if not source_has_required then
+    log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
+      .. " because required science pack " .. tostring(missing_required) .. " was not selected.")
+    return nil, "missing-required"
+  end
+  if policy() == "engine-default" then
+    local unchanged = deepcopy(ingredients or {})
+    local reachable = #unchanged > 0
+    for _, ingredient in ipairs(unchanged) do
+      local pack_name = M.ingredient_name(ingredient)
+      if not pack_name or pack_production_status(pack_name) == "unreachable" then
+        reachable = false
+        break
+      end
+    end
+    if reachable and M.valid_research_ingredients(unchanged) then return unchanged, "unchanged" end
+    log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
+      .. " because engine-default lab policy forbids ingredient rewriting and the selected set is not safely researchable.")
+    return nil, "invalid"
+  end
+
+  local source = {}
+  for _, ingredient in ipairs(deepcopy(ingredients or {})) do
+    local pack_name = M.ingredient_name(ingredient)
+    if pack_name and pack_production_status(pack_name) ~= "unreachable" then
+      table.insert(source, ingredient)
+    else
+      log("[more-infinite-research] Excluding science pack " .. tostring(pack_name)
+        .. " from " .. tostring(context or "unknown technology")
+        .. " because it has no initially available recipe or enabled reachable unlock technology.")
+    end
+  end
+  if #source == 0 then return nil, "empty" end
+  if not contains_phase_trigger(source, required_any_packs) then return nil, "phase-trigger-unreachable" end
+  local reachable_has_required, unreachable_required = contains_required(source, required)
+  if not reachable_has_required then
+    log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
+      .. " because required science pack " .. tostring(unreachable_required) .. " is unreachable.")
+    return nil, "required-unreachable"
+  end
+  if M.valid_research_ingredients(source) then return source, "full" end
+  if policy() == "skip" then
+    log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
+      .. " because no lab accepts the full selected science-pack set and the lab incompatibility policy is skip.")
+    return nil, "invalid"
+  end
+
+  local labs = {}
+  for name, lab in pairs(data_raw.prototypes("lab")) do table.insert(labs, {name = name, lab = lab}) end
+  table.sort(labs, function(a, b) return a.name < b.name end)
+
+  local best, best_lab = nil, nil
+  for _, entry in ipairs(labs) do
+    local candidate, accepted = {}, {}
+    for _, input in ipairs(entry.lab.inputs or {}) do accepted[input] = true end
+    for _, ingredient in ipairs(source) do
+      local name = M.ingredient_name(ingredient)
+      if name and accepted[name] then table.insert(candidate, {name, M.ingredient_amount(ingredient)}) end
+    end
+    local candidate_has_required = contains_required(candidate, required)
+    if candidate_has_required and contains_phase_trigger(candidate, required_any_packs)
+      and #candidate > 0 and lab_acquisition_witness(entry.name)
+      and (not best or #candidate > #best) then
+      best, best_lab = candidate, entry.name
+    end
+  end
+
+  if best then
+    log("[more-infinite-research] Reduced science packs for " .. tostring(context or "unknown technology")
+      .. " to a lab-compatible subset accepted by " .. best_lab .. ".")
+    return best, "reduced"
+  end
+  log("[more-infinite-research] No lab can research the selected science packs for "
+    .. tostring(context or "unknown technology") .. ".")
+  return nil, "invalid"
+end
+
+return M

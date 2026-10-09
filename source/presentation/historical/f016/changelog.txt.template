@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------------------------------
+Version: 4.2.01601
+
+  Changes:
+
+    - Update the Factorio 0.16 distribution identity and package guidance for source 4.2.1.
+    - Preserve the reduced target research and settings surface; modern-only features remain excluded.
+    - Research Library backports are not included in this package.
+    - Recognize the historical player prototype when checking handcraftable laboratory and science acquisition routes.
+    - Select the native historical science-pack names for default research and official science progression.
+
+  Info:
+
+    - Use 4.2.01601 for source 4.2.1. The final 01 identifies the source patch, not a packaging retry.
+    - Preserve original saves before upgrading from the published 4.2.0 package for the same Factorio target.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.2.01600
+
+  Playtest:
+
+    - Rebuilt the reduced eleven-stream research surface from current MIR 4.2 source.
+    - Added the Factorio 0.16 old-science target adapter and exact-engine package smoke coverage.
+    - Kept Factorio-2-only research-cost support output out of this historical target.
+
+  Status:
+
+    - Private historical playtest package. It is not a public compatibility claim or release asset.
+---------------------------------------------------------------------------------------------------

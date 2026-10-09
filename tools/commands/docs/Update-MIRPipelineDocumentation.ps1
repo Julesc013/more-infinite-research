@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$commandsPath = Join-Path $RepoRoot "src\mod\families\modern\prototypes\mir\pipeline\commands.lua"
+$commandsPath = Join-Path $RepoRoot "source\prototypes\mir\pipeline\commands.lua"
 $documentPath = Join-Path $RepoRoot "docs\reference\generated\runtime-pipeline.md"
 $commandsText = Get-Content -Raw -LiteralPath $commandsPath
 
@@ -67,7 +67,7 @@ $lines.Add('')
 $lines.Add('# Generated Runtime Pipeline')
 $lines.Add('')
 $lines.Add('<!-- BEGIN GENERATED MIR PIPELINE -->')
-$lines.Add('This package-excluded reference is generated from `src/mod/families/modern/prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.')
+$lines.Add('This package-excluded reference is generated from `source/prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.')
 $lines.Add('')
 $lines.Add('| Phase | Command | Kind | Implementation | Depends on |')
 $lines.Add('| ---: | --- | --- | --- | --- |')

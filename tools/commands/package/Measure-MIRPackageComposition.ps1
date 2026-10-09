@@ -3,6 +3,7 @@ param(
   [string]$ArchivePath,
   [string]$BaselinePath,
   [string]$OutputPath,
+  [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210',
   [int]$TopEntryCount = 20,
   [double]$GrowthReviewPercent = 20.0,
   [double]$RootGrowthReviewPercent = 30.0,
@@ -12,7 +13,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $Target
+$info = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 
 if ([string]::IsNullOrWhiteSpace($ArchivePath)) {
   $ArchivePath = Join-Path $repo "dist\$($info.name)_$($info.version).zip"
@@ -190,7 +193,7 @@ if ($unclassified.Count -gt 0) {
 $forbiddenNames = @(".mir", ".codex", ".github", ".work", "docs", "fixtures", "scripts", "tests", "tools", "build", "dist")
 $forbidden = @($current.entries | Where-Object {
   $first = ($_.path.Replace("\", "/") -split "/", 2)[0]
-  $forbiddenNames -contains $first -or @("AGENTS.md", "CONTRIBUTING.md", "todo.md") -contains $_.path
+  $forbiddenNames -contains $first -or @("AGENTS.md", "CONTRIBUTING.md", "TODO.md") -contains $_.path
 } | ForEach-Object { $_.path })
 if ($forbidden.Count -gt 0) {
   $triggers.Add([pscustomobject][ordered]@{ kind = "repository-only-path"; paths = $forbidden })

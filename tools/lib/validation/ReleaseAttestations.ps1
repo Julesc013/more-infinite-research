@@ -69,6 +69,11 @@ function Get-MIRReleaseArchiveContentSha256 {
   return Get-MIRZipContentFingerprint -Path $Path
 }
 
+function Get-MIRReleaseFactorioVersion {
+  param([Parameter(Mandatory)][string]$Path)
+  return [Diagnostics.FileVersionInfo]::GetVersionInfo($Path).FileVersion
+}
+
 function Get-MIRReleasePercentile {
   param([Parameter(Mandatory)][double[]]$Values, [Parameter(Mandatory)][double]$Percentile)
   $sorted = @($Values | Sort-Object)
@@ -316,6 +321,143 @@ function Test-MIRRuntimePerformanceEvidence {
   }
 }
 
+function Read-MIRManualReleaseWrittenWaiverAuthorization {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  if ([string]::IsNullOrWhiteSpace($Path) -or -not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+    throw '[mir-manual-review-waiver-authorization-path]'
+  }
+  $readerPath = Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1'
+  $technicalSealPath = Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1'
+  $preflightPath = Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1'
+  if (-not (Test-Path -LiteralPath $readerPath -PathType Leaf) -or -not (Test-Path -LiteralPath $technicalSealPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $preflightPath -PathType Leaf)) {
+    throw '[mir-manual-review-waiver-authorization-reader]'
+  }
+  try {
+    # These release scripts intentionally keep their target contracts in
+    # script scope.  Load the target identity before its consumers in this
+    # reader scope, so a caller cannot supply an uninitialised sibling scope.
+    . $preflightPath
+    . $technicalSealPath
+    . $readerPath
+    return Read-MIR42NineTargetWrittenReleaseAuthorization -Path $Path
+  } catch {
+    throw "[mir-manual-review-waiver-authorization] $($_.Exception.Message)"
+  }
+}
+
+function Assert-MIRManualReleaseWrittenWaiverCandidateVersion {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$CandidateVersion,
+    [Parameter(Mandatory)]$Authorization
+  )
+
+  $targets = @($Authorization.record.release.selected_targets | ForEach-Object { [string]$_ })
+  if ($targets.Count -ne 9 -or ($targets -join '|') -cne 'f210|f200|f110|f100|f017|f016|f015|f014|f013') {
+    throw '[mir-manual-review-waiver-authorization-target-scope]'
+  }
+  $authorizedVersions = @(
+    foreach ($target in $targets) {
+      try { [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $target).distribution_version }
+      catch { throw "[mir-manual-review-waiver-authorization-target] $target" }
+    }
+  )
+  if ([string]$CandidateVersion -cnotin $authorizedVersions) {
+    throw '[mir-manual-review-waiver-candidate-version]'
+  }
+}
+function Write-MIRManualReleaseWrittenWaiverAttestation {
+  param(
+    [Parameter(Mandatory)]$Record,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes(($Record | ConvertTo-Json -Depth 40 -Compress) + "`n")
+  if (Test-Path -LiteralPath $Path -PathType Leaf) {
+    if (-not (Test-MIRReleaseByteIdentity -Expected $bytes -Actual ([IO.File]::ReadAllBytes($Path)))) {
+      throw '[mir-manual-review-waiver-output-existing-authority-preserved]'
+    }
+  } else {
+    $parent = Split-Path -Parent $Path
+    if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
+      New-Item -ItemType Directory -Force -Path $parent | Out-Null
+    }
+    $stream = [IO.File]::Open($Path, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+    try { $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
+  }
+  return $Path
+}
+
+function New-MIRManualReleaseWrittenWaiverAttestation {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Candidate,
+    [Parameter(Mandatory)][string]$FactorioBin,
+    [Parameter(Mandatory)][string]$ExpectedSourceCommit,
+    [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
+    [Parameter(Mandatory)][string]$MaintainerAuthorizationPath,
+    [string]$Path = ''
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $candidatePath = Resolve-MIRReleasePath -RepoRoot $repo -Path $Candidate
+  if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) { throw '[mir-manual-review-waiver-candidate]' }
+  if (-not (Test-Path -LiteralPath $FactorioBin -PathType Leaf)) { throw '[mir-manual-review-waiver-factorio]' }
+  if ([string]$ExpectedSourceCommit -notmatch '^[0-9a-fA-F]{40}$') { throw '[mir-manual-review-waiver-source]' }
+  $candidateInfo = Get-MIRReleasePackageInfo -Path $candidatePath
+  if ([string]$candidateInfo.version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') { throw '[mir-manual-review-waiver-version]' }
+  $factorioVersion = Get-MIRReleaseFactorioVersion -Path $FactorioBin
+  if (-not ([string]$factorioVersion).StartsWith($ExpectedFactorioVersion)) { throw '[mir-manual-review-waiver-factorio-version]' }
+  $authorization = Read-MIRManualReleaseWrittenWaiverAuthorization -RepoRoot $repo -Path $MaintainerAuthorizationPath
+  Assert-MIRManualReleaseWrittenWaiverCandidateVersion -RepoRoot $repo -CandidateVersion ([string]$candidateInfo.version) -Authorization $authorization
+  $outputPath = if ([string]::IsNullOrWhiteSpace($Path)) {
+    Resolve-MIRReleasePath -RepoRoot $repo -Path ".mir/evidence/$($candidateInfo.version)-manual-review-attestation.json"
+  } else {
+    Resolve-MIRReleasePath -RepoRoot $repo -Path $Path
+  }
+  $repoPrefix = [IO.Path]::GetFullPath($repo).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  if (-not $outputPath.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir-manual-review-waiver-output-containment]' }
+
+  $record = [ordered]@{
+    schema = 2
+    kind = 'mir-manual-release-review'
+    candidate_sha256 = Get-MIRReleaseSha256 -Path $candidatePath
+    candidate_content_sha256 = Get-MIRReleaseArchiveContentSha256 -Path $candidatePath
+    source_commit = $ExpectedSourceCommit.ToLowerInvariant()
+    checklist_version = 'mir-manual-release-review-written-waiver-v1'
+    factorio_version = [string]$factorioVersion
+    factorio_binary_sha256 = Get-MIRReleaseSha256 -Path $FactorioBin
+    written_release_authorization = [ordered]@{
+      path = [string]$authorization.path
+      sha256 = [string]$authorization.sha256
+      record_sha256 = [string]$authorization.record.record_sha256
+      recorded_from_user_turn_date = [string]$authorization.record.recorded_from_user_turn_date
+    }
+    manual_review_performed = $false
+    gameplay_receipt_claimed = $false
+    waiver_disposition = 'mir42-pre-public-written-authorization-playtest-waiver'
+    status = 'waived'
+    attestation_sha256 = ''
+  }
+  $material = [ordered]@{}
+  foreach ($key in $record.Keys) {
+    if ([string]$key -ne 'attestation_sha256') { $material[[string]$key] = $record[$key] }
+  }
+  $record.attestation_sha256 = Get-MIRReleaseTextSha256 -Text ($material | ConvertTo-Json -Depth 40 -Compress)
+  $writtenPath = Write-MIRManualReleaseWrittenWaiverAttestation -Record $record -Path $outputPath
+  return [pscustomobject][ordered]@{
+    path = $writtenPath
+    sha256 = Get-MIRReleaseSha256 -Path $writtenPath
+    status = 'waived'
+    disposition = 'written-maintainer-playtest-waiver'
+  }
+}
+
 function Test-MIRManualReleaseAttestation {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -332,28 +474,35 @@ function Test-MIRManualReleaseAttestation {
   if ([string]::IsNullOrWhiteSpace($Path)) { $Path = ".mir/evidence/$($candidateInfo.version)-manual-review-attestation.json" }
   $attestationPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $Path
   if (-not (Test-Path -LiteralPath $attestationPath -PathType Leaf)) { throw "Manual release attestation is absent: $attestationPath" }
+  $schemaPath = Join-Path $RepoRoot 'spec/schemas/manual-release-attestation.schema.json'
+  try {
+    $schemaValid = [bool](Get-Content -Raw -LiteralPath $attestationPath | Test-Json -SchemaFile $schemaPath)
+  } catch { $schemaValid = $false }
+  if (-not $schemaValid) { throw '[mir-manual-release-attestation-schema]' }
   $attestation = Get-Content -Raw -LiteralPath $attestationPath | ConvertFrom-Json
-  if ([int]$attestation.schema -ne 2 -or [string]$attestation.kind -ne "mir-manual-release-review" -or
-      [string]$attestation.status -ne "passed") {
-    throw "Manual release attestation is not a passing schema-2 package review."
+  if ([int]$attestation.schema -ne 2 -or [string]$attestation.kind -ne 'mir-manual-release-review' -or
+      [string]$attestation.status -notin @('passed', 'waived')) {
+    throw '[mir-manual-release-attestation-state]'
   }
   if ([string]$attestation.candidate_sha256 -ne (Get-MIRReleaseSha256 -Path $candidatePath) -or
       [string]$attestation.candidate_content_sha256 -ne (Get-MIRReleaseArchiveContentSha256 -Path $candidatePath) -or
       [string]$attestation.source_commit -ne $ExpectedSourceCommit) {
     throw "Manual release attestation does not bind the exact candidate and package source authority."
   }
-  $factorioVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($FactorioBin).FileVersion
+  $factorioVersion = Get-MIRReleaseFactorioVersion -Path $FactorioBin
   if (-not ([string]$attestation.factorio_version).StartsWith($ExpectedFactorioVersion) -or
       -not ([string]$factorioVersion).StartsWith($ExpectedFactorioVersion) -or
       [string]$attestation.factorio_binary_sha256 -ne (Get-MIRReleaseSha256 -Path $FactorioBin)) {
     throw "Manual release attestation is not bound to the exact qualified Factorio $ExpectedFactorioVersion binary."
   }
-  if ([string]::IsNullOrWhiteSpace([string]$attestation.reviewer)) {
-    throw "Manual release attestation lacks reviewer identity."
-  }
-
   $attestationMode = [string]$attestation.checklist_version
+  $disposition = ''
+  $manualReviewPerformed = $false
+  $gameplayReceiptClaimed = $false
   if ($attestationMode -eq "mir-manual-release-review-v1") {
+    if ([string]$attestation.status -ne 'passed' -or [string]::IsNullOrWhiteSpace([string]$attestation.reviewer)) {
+      throw '[mir-manual-review-observed-state]'
+    }
     if ([string]::IsNullOrWhiteSpace([string]$attestation.reviewed_at)) {
       throw "Manual release attestation lacks review time."
     }
@@ -387,6 +536,8 @@ function Test-MIRManualReleaseAttestation {
         }
       }
     }
+    $disposition = 'observed-manual-review'
+    $manualReviewPerformed = $true
   } elseif ($attestationMode -eq "mir-manual-release-review-historical-statement-v1") {
     $hasObservedItems = $null -ne $attestation.PSObject.Properties["items"]
     $hasObservedReviewTime = $null -ne $attestation.PSObject.Properties["reviewed_at"]
@@ -455,6 +606,38 @@ function Test-MIRManualReleaseAttestation {
         -not (Test-MIRReleaseByteIdentity -Expected $attestationBytes -Actual $objectBytes)) {
       throw "Historical manual review custody object does not retain byte-identical attestation evidence."
     }
+    $disposition = 'historical-manual-review-statement'
+    $manualReviewPerformed = $true
+  } elseif ($attestationMode -eq 'mir-manual-release-review-written-waiver-v1') {
+    $forbiddenObservationFields = @(
+      'reviewer','reviewed_at','items','review_performed_before_publication','review_exact_time_known',
+      'attestation_recorded_after_publication','reviewed_release','statement','supporting_artifacts','custody_manifest_path'
+    )
+    if ([string]$attestation.status -ne 'waived' -or [bool]$attestation.manual_review_performed -or
+        [bool]$attestation.gameplay_receipt_claimed -or
+        [string]$attestation.waiver_disposition -ne 'mir42-pre-public-written-authorization-playtest-waiver' -or
+        @($forbiddenObservationFields | Where-Object { $null -ne $attestation.PSObject.Properties[$_] }).Count -ne 0) {
+      throw '[mir-manual-review-waiver-observation]'
+    }
+    $authorizationReference = $attestation.written_release_authorization
+    if ($null -eq $authorizationReference -or [string]::IsNullOrWhiteSpace([string]$authorizationReference.path) -or
+        [string]$authorizationReference.sha256 -notmatch '^[A-F0-9]{64}$' -or
+        [string]$authorizationReference.record_sha256 -notmatch '^[A-F0-9]{64}$' -or
+        [string]$authorizationReference.recorded_from_user_turn_date -notmatch '^20[0-9]{2}-[0-9]{2}-[0-9]{2}$') {
+      throw '[mir-manual-review-waiver-reference]'
+    }
+    $authorization = Read-MIRManualReleaseWrittenWaiverAuthorization -RepoRoot $RepoRoot -Path ([string]$authorizationReference.path)
+    if ([string]$authorization.sha256 -cne [string]$authorizationReference.sha256 -or
+        [string]$authorization.record.record_sha256 -cne [string]$authorizationReference.record_sha256 -or
+        [string]$authorization.record.recorded_from_user_turn_date -cne [string]$authorizationReference.recorded_from_user_turn_date) {
+      throw '[mir-manual-review-waiver-authorization-binding]'
+    }
+    if ([string]$authorization.record.maintainer_decisions.additional_playtest_prompt -cne 'waived-for-this-release-decision' -or
+        [string]$authorization.record.maintainer_decisions.f210_f200_playtest_receipt -cne 'not-claimed-and-not-materialized' -or
+        [string]$authorization.record.maintainer_decisions.technical_acceptance -cne 'not-established') {
+      throw '[mir-manual-review-waiver-authorization-state]'
+    }
+    $disposition = 'written-maintainer-playtest-waiver'
   } else {
     throw "Manual release attestation has an unsupported checklist mode: $attestationMode"
   }
@@ -467,7 +650,10 @@ function Test-MIRManualReleaseAttestation {
   return [pscustomobject][ordered]@{
     path = $attestationPath
     sha256 = Get-MIRReleaseSha256 -Path $attestationPath
-    status = "passed"
+    status = [string]$attestation.status
+    disposition = $disposition
+    manual_review_performed = $manualReviewPerformed
+    gameplay_receipt_claimed = $gameplayReceiptClaimed
     evidence = $attestation
   }
 }

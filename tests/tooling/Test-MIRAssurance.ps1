@@ -1,5 +1,5 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
-param([string]$RepoRoot = "")
+param([string]$RepoRoot = "",[switch]$ImpactRoutingOnly)
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.
 $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path
@@ -7,6 +7,85 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path }
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+
+function Assert-MIRKnownStagingImpactRouting {
+  $repo = $RepoRoot
+  . (Join-Path $RepoRoot 'tools/lib/assurance/Core.ps1')
+  $impactPath=Join-Path $RepoRoot '.mir/test-impact.yml'
+  $policy=Get-Content -LiteralPath (Join-Path $RepoRoot '.mir/assurance.json') -Raw|ConvertFrom-Json
+  $manifest=Get-Content -LiteralPath $impactPath -Raw|ConvertFrom-Json
+  $paths=@(
+    'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1',
+    'tests/runtime/Test-MIRResearchBrowser.ps1',
+    'tests/support/MIRMaterialAuditInputs.ps1',
+    'tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1',
+    'tests/runtime/Test-MIRBobAngelTinFinalStateAudit.ps1',
+    'tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1',
+    'tests/runtime/Test-MIRA06AluminiumFinalState.ps1',
+    'tests/runtime/Test-MIRPassiveRepair.ps1',
+    'tests/runtime/Test-MIRBobTinBrowserExplanation.ps1',
+    'tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1',
+    'tests/runtime/Test-MIRBobTinProductionGain.ps1',
+    'tests/runtime/Test-MIRBobTinMachineMatrix.ps1',
+    'tests/runtime/Test-MIRBobTinPersistedState.ps1',
+    'tests/runtime/Test-MIRBobTinProgressionFrontier.ps1',
+    'tests/runtime/Test-MIRBobTinQualification.ps1',
+    'tests/runtime/Test-MIRF200BobTinPersistedState.ps1',
+    'tests/runtime/Test-MIR42F200SettingsCapTransition.ps1',
+    'tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1',
+    'tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1',
+    'tests/runtime/Test-MIR42V2V3CapMigration.ps1',
+    'tests/runtime/Test-MIR42V2V3CapMigrationStatic.ps1',
+    'tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1',
+    'tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1'
+  )
+  $expected=@($manifest.baseline_scenarios|Sort-Object)-join'|'
+  foreach($path in $paths){
+    $selection=Get-MIRAssuranceImpactSelection -Paths @($path) -Config $policy
+    if($selection.requires_full-or$selection.unmapped_runtime_paths.Count-or
+      (@($selection.scenarios|Sort-Object)-join'|')-cne$expected){throw "Known staging path expanded unrelated runtime scenarios: $path"}
+    $classification=Get-MIRAssuranceClassification -Paths @($path) -Config $policy
+    $requiredCheck=if($path -match 'Test-MIR42F200SettingsCapTransition'){ 'static.f200-base-only-settings-cap-transition-harness' }elseif($path -match 'Test-MIR42V2V3CapMigration'){ 'static.f210-v2-v3-migration-inputs' }elseif($path -match 'Test-MIR4HistoricalPrivateRuntime'){ 'static.mir4-historical-runtime-inputs' }else{ 'static.immutable-input-staging' }
+    if($classification.escalated-or$requiredCheck-notin$classification.tests){throw "Known staging path lost its consumed staging check: $path"}
+  }
+  $browserFixtures=@(
+    'tests/runtime/browser_fixture_data.lua',
+    'tests/runtime/research_browser.lua',
+    'tests/runtime/research_browser_core_regressions.lua',
+    'tests/runtime/research_browser_handler_regressions.lua',
+    'tests/runtime/research_browser_omissions.lua',
+    'tests/runtime/research_browser_discovery_regressions.lua',
+    'tests/runtime/research_browser_native_discovery.lua',
+    'tests/runtime/research_browser_native_discovery_regressions.lua'
+  )
+  foreach($path in $browserFixtures){
+    $rules=@($manifest.paths|Where-Object pattern -CEQ $path)
+    $selection=Get-MIRAssuranceImpactSelection -Paths @($path) -Config $policy
+    $classification=Get-MIRAssuranceClassification -Paths @($path) -Config $policy
+    if($rules.Count-ne1-or$selection.requires_full-or$selection.unmapped_runtime_paths.Count-or
+      (@($selection.scenarios|Sort-Object)-join'|')-cne$expected-or
+      $classification.escalated-or'runtime.research-browser'-notin$classification.tests){
+      throw "Browser fixture lost its selected native consumer or expanded unrelated campaigns: $path"
+    }
+  }
+  $browserUnknown='tests/runtime/research_browser_future_discovery.lua'
+  $selection=Get-MIRAssuranceImpactSelection -Paths @($browserFixtures+$browserUnknown) -Config $policy
+  if(-not$selection.requires_full-or$browserUnknown-notin$selection.unmapped_runtime_paths){
+    throw 'Exact browser fixture rules masked a new unclassified runtime fixture.'
+  }
+  $unknown='tests/runtime/Test-MIRFutureBehavior.ps1'
+  $selection=Get-MIRAssuranceImpactSelection -Paths @($unknown) -Config $policy
+  if(-not$selection.requires_full-or$unknown-notin$selection.unmapped_runtime_paths){throw 'Unknown runtime behavior lost full escalation.'}
+  $selection=Get-MIRAssuranceImpactSelection -Paths @($paths+$unknown) -Config $policy
+  if(-not$selection.requires_full-or$unknown-notin$selection.unmapped_runtime_paths){throw 'Known staging rules masked unknown runtime behavior.'}
+  $player=Get-MIRAssuranceClassification -Paths @('source/prototypes/mir/runtime/future_behavior.lua') -Config $policy
+  if('runtime.full'-notin$player.tests){throw 'Player runtime source lost its broader checks.'}
+  Write-Host '[ok] twenty-three known staging paths retain baseline impact and consumed staging checks; unknown and mixed runtime changes escalate.'
+  Write-Host '[ok] eight browser fixtures retain their selected native consumer; future or mixed runtime fixtures still escalate.'
+}
+Assert-MIRKnownStagingImpactRouting
+if($ImpactRoutingOnly){return}
 
 & (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1") self-test
 if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
@@ -32,6 +111,8 @@ $releaseAssuranceSource = @(
 ) -join "`n"
 $assuranceSelfTestSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tests\tooling\support\MIRAssuranceSelfTest.ps1")
 $assuranceEntryPointSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
+$releaseCandidateWorkflowSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\release-candidate.yml")
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
 $assuranceEvidenceSource = @(
   Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
   Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\evidence") -File -Filter "*.ps1" |
@@ -50,9 +131,87 @@ foreach ($requiredTrustSelfTestSnippet in @(
 
 if ($releaseAssuranceFacadeSource.Contains('function Invoke-MIRAssuranceSelfTest')) { throw 'Release authority still embeds assurance self-test implementation.' }
 if (-not $assuranceEntryPointSource.Contains('tests/tooling/support/MIRAssuranceSelfTest.ps1')) { throw 'Assurance self-test command does not load canonical test support.' }
+if (([regex]::Matches($releaseCandidateWorkflowSource, [regex]::Escape('CurrentTargetPackage.ps1'))).Count -lt 3 -or
+    ([regex]::Matches($releaseCandidateWorkflowSource, [regex]::Escape('Get-MIR4CurrentTargetPackageOutputText'))).Count -lt 3 -or
+    $releaseCandidateWorkflowSource.Contains('Get-Content info.json -Raw') -or
+    $releaseCandidateWorkflowSource.Contains("Join-Path `$candidate 'info.json'") -or
+    $releaseCandidateWorkflowSource.Contains("Join-Path `$controller 'info.json'")) {
+  throw 'Release-candidate workflow must derive current package metadata from the canonical materialized target, not a retired repository-root info.json.'
+}
+foreach ($requiredExactArchiveSnippet in @(
+  '$build = @(./tools/commands/package/Build-MIRPackage.ps1)',
+  '$candidateArchive = [IO.Path]::GetFullPath([string]$build[0].archive_path)',
+  'MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive',
+  ". (Join-Path `$controller 'tools/lib/validation/CurrentTargetPackage.ps1')",
+  'Get-MIR4ExactRetainedCandidateArchive',
+  '-ExpectedSha256 $env:MIR_RC_ARCHIVE_SHA256',
+  'sha256 = [string]$retainedCandidate.sha256',
+  "kind = 'MIRProtectedReleaseCandidateRunV2'",
+  "archive_origin = 'candidate-build-result'",
+  'role = [string]$retainedCandidate.role'
+)) {
+  if (-not $releaseCandidateWorkflowSource.Contains($requiredExactArchiveSnippet)) {
+    throw "Release-candidate workflow does not retain its exact candidate build result: $requiredExactArchiveSnippet"
+  }
+}
+
+function Assert-MIR4ExactRetainedCandidateArchiveRegression {
+  $root=Join-Path ([IO.Path]::GetTempPath()) ('mir-retained-candidate-'+[guid]::NewGuid().ToString('N'))
+  $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  if(-not[IO.Path]::GetFullPath($root).StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir-retained-candidate-test-root]' }
+  try {
+    $candidate=Join-Path $root 'candidate'
+    New-Item -ItemType Directory -Path $candidate -Force|Out-Null
+    $archive=Join-Path $candidate 'candidate.zip'
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52))
+    $sha=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+    $row=Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha
+    if([string]$row.path-cne'candidate/candidate.zip'-or[string]$row.sha256-cne$sha-or[int64]$row.bytes-ne8){throw '[mir-retained-candidate-test-positive]'}
+
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52,0))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-sha256'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-corruption]'}
+
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52))
+    [IO.File]::WriteAllBytes((Join-Path $candidate 'extra.zip'),[byte[]](80,75,3,4))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-count'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-extra-archive]'}
+
+    $outside=Join-Path $root 'outside'
+    New-Item -ItemType Directory -Path $outside|Out-Null
+    [IO.File]::WriteAllBytes((Join-Path $outside 'candidate.zip'),[byte[]](80,75,3,4,77,73,82,52))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $outside -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-directory'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-directory]'}
+  } finally {
+    if(Test-Path -LiteralPath $root){Remove-Item -LiteralPath $root -Recurse -Force}
+  }
+}
+Assert-MIR4ExactRetainedCandidateArchiveRegression
+foreach ($forbiddenDistCandidateSnippet in @(
+  'Join-Path $candidate "dist/more-infinite-research_',
+  'Join-Path $controller "dist/more-infinite-research_'
+)) {
+  if ($releaseCandidateWorkflowSource.Contains($forbiddenDistCandidateSnippet)) {
+    throw "Release-candidate workflow must not substitute a dist archive for the candidate build result: $forbiddenDistCandidateSnippet"
+  }
+}
 $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)
 if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicates.Name -join ', ')" }
+
+$developmentContractsTest = @($catalog.tests | Where-Object { [string]$_.id -eq 'static.mir4-development-contracts' })
+if ($developmentContractsTest.Count -ne 1 -or
+    [string]$developmentContractsTest[0].command -cne './tests/repository/Test-MIR4DevelopmentContracts.ps1 -ExpectedSourceCommit <source-commit> -ExpectedSourceTree <source-tree> -ExpectedPackageSourceSha256 <package-source-sha256> -ReceiptPath <test-output>' -or
+    @($developmentContractsTest[0].inputs) -notcontains 'source-identity' -or
+    @($developmentContractsTest[0].captured_artifacts).Count -ne 1 -or
+    [string]$developmentContractsTest[0].captured_artifacts[0].path_pattern -cne '<test-output>' -or
+    [string]$developmentContractsTest[0].captured_artifacts[0].schema -cne 'contracts/repository/mir4-development-contracts-local-result-v1.schema.json' -or
+    [string]$developmentContractsTest[0].captured_artifacts[0].kind -cne 'MIR4DevelopmentContractsLocalResultV1') {
+  throw 'static.mir4-development-contracts must bind a clean exact plan source and one worker-private receipt output.'
+}
 
 $releaseHistoryClassificationCases = [ordered]@{
   ".mir/portable-return.yml" = "release-governance"
@@ -290,9 +449,9 @@ if ($performanceTest.Count -ne 1 -or
   throw "runtime.performance-regression must produce fresh evidence inside its unique assurance work root without reading or writing tracked historical evidence."
 }
 foreach ($requiredPerformanceIsolationSnippet in @(
-  '"<test-output>"=[string]$TestOutput',
-  '$performanceOutputPath = Join-Path $workRoot "performance-regression.json"',
-  '-TestOutput $performanceOutputPath',
+  '"<test-output>"={ [string]$TestOutput }',
+  '$testOutputPath = Join-Path $workRoot "test-output.json"',
+  '-TestOutput $testOutputPath',
   '-CampaignPath (Resolve-MIRAssurancePerformanceCampaignPath -Context $Context)',
   '-Kind "runtime-performance-evidence"'
 )) {
@@ -347,20 +506,27 @@ $publishedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\rel
 $terminalRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.9.json") | ConvertFrom-Json
 $currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.11.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
-$mir4Authority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\execution\mir4-4.1-development-context-v1.json") | ConvertFrom-Json
+$mir41Authority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\execution\mir4-4.1-development-context-v1.json") | ConvertFrom-Json
+$mir42Authority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\execution\mir4-4.2-development-context-v1.json") | ConvertFrom-Json
 $mir4Targets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-Target-RegistryV5.json") | ConvertFrom-Json
 $mir4F210 = @($mir4Targets.payload.targets | Where-Object id -eq 'factorio-2.1')
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
 if ($currentReleaseBoundary -ne 'publicly-verified|C35' -or [string]$currentRelease.candidate_floor -ne 'C35' -or
     [string]$currentProfile.execution_context_mode -ne 'development-context' -or
-    [string]$currentProfile.execution_context -ne 'spec/execution/mir4-4.1-development-context-v1.json' -or
-    [string]$mir4Authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
-    [string]$mir4Authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or $mir4F210.Count -ne 1 -or
+    [string]$currentProfile.execution_context -ne 'spec/execution/mir4-4.2-development-context-v1.json' -or
+    [string]$mir41Authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
+    [string]$mir41Authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or
+    [string]$mir42Authority.kind -ne 'MIR4DevelopmentExecutionContextV2' -or
+    [string]$mir42Authority.status -ne 'active-private-mir4.2-verification-plan-no-release-authority' -or
+    @($mir42Authority.targets).Count -ne 2 -or @($mir42Authority.targets) -notcontains 'f210' -or @($mir42Authority.targets) -notcontains 'f200' -or
+    [bool]$mir42Authority.transition_gate.source_freeze -or [bool]$mir42Authority.transition_gate.version_allocation -or
+    [bool]$mir42Authority.transition_gate.tagging -or [bool]$mir42Authority.transition_gate.signing -or
+    [bool]$mir42Authority.transition_gate.sealing -or [bool]$mir42Authority.transition_gate.publication -or $mir4F210.Count -ne 1 -or
     [string]$mir4F210[0].mir3_predecessor -ne [string]$currentProfile.upgrade.from_version -or
     [string]$currentProfile.upgrade.from_version -ne '3.2.11' -or
     [string]$currentProfile.upgrade.to_version -ne '4.0.21000' -or
     [string]$currentProfile.upgrade.fixture -ne 'assert-upgrade-3-2-11-to-4-0-21000') {
-  throw "Factorio 2.1 assurance profile must bind the exact development execution context and 3.2.11 to MIR 4 transition fixture."
+  throw "Factorio 2.1 assurance profile must bind the exact private MIR 4.2 development context, preserve the MIR 4.1 boundary, and retain the 3.2.11 to MIR 4 transition fixture."
 }
 if ([string]$terminalRelease.state -ne "publicly-verified" -or
     [string]$terminalRelease.candidate_id -ne "C33" -or
@@ -591,6 +757,7 @@ foreach ($requiredSuccessorFingerprint in @(
 }
 
 $coreScript = Join-Path $RepoRoot "tools\lib\assurance\Core.ps1"
+$repo = $RepoRoot
 . $coreScript
 . (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
 $nfcText = "caf$([char]0x00E9)`npolicy`n"
@@ -611,8 +778,324 @@ if ([string]$jsonDigestA.policy_id -ne "json-sorted-properties-utf8-nfc-lf-final
 }
 $script:repo = $RepoRoot
 . (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
+. (Join-Path $RepoRoot "tools\lib\assurance\Domains.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\ScenarioRegistry.ps1")
+$scenarioRegistryPath = Join-Path $RepoRoot "validation\scenarios\runtime.json"
+$evidenceSchema = 4
+$assuranceRunnerVersion = '4'
+
+# A13: the runtime selector must leave a candidate-bound, deterministic
+# account of both the propositions it selected and every proposition it
+# deliberately omitted as unaffected.  Exercise the actual plan decoration
+# path with real registry records, but use no Factorio process or mutable
+# evidence store.
+$a13Registry = Import-MIRScenarioRegistry -Path $scenarioRegistryPath -TargetProfile '2.1'
+$a13Records = @($a13Registry.records | Where-Object kind -ne 'gate' | Sort-Object name)
+$a13Baseline = @($a13Records | Where-Object { [string]$_.name -eq 'compiler-contracts' })
+if ($a13Records.Count -lt 2 -or $a13Baseline.Count -ne 1) {
+  throw 'A13 impact-selection regression requires the named compiler-contracts baseline and at least one omittable scenario.'
+}
+$a13Impact = [ordered]@{
+  schema=1
+  scenarios=@('compiler-contracts')
+  groups=@()
+  tags=@()
+  mapped_paths=@('source/prototypes/mir/settings/automatic_compiler_policy.lua')
+  unmapped_runtime_paths=@()
+  requires_full=$false
+}
+$a13Expected = @(Select-MIRAssuranceMatrixScenarios -Registry $a13Registry -Selector 'affected' -ImpactSelection $a13Impact)
+if ($a13Expected.Count -ne 1 -or [string]$a13Expected[0].name -ne 'compiler-contracts') {
+  throw 'A13 impact-selection regression did not isolate the declared compiler-contracts proposition.'
+}
+$a13NewPlan = {
+  param(
+    [Parameter(Mandatory)]$Impact,
+    [Parameter(Mandatory)]$Records,
+    [string]$TemplateId = 'runtime.affected',
+    [string]$SourceCommit = ('A' * 40),
+    [string]$SourceTree = ('B' * 40),
+    [string]$PackageSourceCommit = ('C' * 40),
+    [string]$PackageSourceSha256 = ('D' * 64),
+    [string]$CandidateDescriptorSha256 = ('E' * 64),
+    [string]$VerificationProfileSha = ('F' * 64)
+  )
+  $tests = @(
+    foreach ($record in @($Records)) {
+      [pscustomobject][ordered]@{
+        id="scenario/2.1/$([string]$record.name)"
+        template_id=$TemplateId
+        safe_test_id=("scenario_2.1_" + ([string]$record.name -replace '[^A-Za-z0-9._-]', '_'))
+        kind='factorio-scenario'
+        layer='F3'
+        command='./synthetic-a13.ps1'
+        requires_factorio=$false
+        requires_candidate=$false
+        inputs=@('spec/programmes/mir4-4x-operating-programme-v1.json')
+        domain_dependencies=@()
+        scenario=$record
+      }
+    }
+  )
+  return [ordered]@{
+    target='2.1'
+    profile='auto'
+    source_commit=$SourceCommit
+    source_tree=$SourceTree
+    package_source_commit=$PackageSourceCommit
+    package_source_sha256=$PackageSourceSha256
+    verification_profile_sha256=$VerificationProfileSha
+    candidate_descriptor=[ordered]@{descriptor_sha256=$CandidateDescriptorSha256}
+    impact_selection=$Impact
+    tests=$tests
+  }
+}
+$a13Context = [pscustomobject][ordered]@{
+  target='2.1'
+  candidate=''
+  reuse_enabled=$false
+  rerun_tests=@()
+}
+$a13Plan = & $a13NewPlan -Impact $a13Impact -Records $a13Expected
+$null = Add-MIRAssurancePlanDecisions -Plan $a13Plan -Context $a13Context
+$a13NoRuntimePlan = & $a13NewPlan -Impact $a13Impact -Records @() -TemplateId 'static.synthetic'
+$null = Add-MIRAssurancePlanDecisions -Plan $a13NoRuntimePlan -Context $a13Context
+if ($a13NoRuntimePlan.Contains('impact_proposition_ledger')) {
+  throw 'A13 non-runtime plan incorrectly claimed a runtime impact selection or unaffected omissions.'
+}
+$a13Repeat = & $a13NewPlan -Impact $a13Impact -Records $a13Expected
+$null = Add-MIRAssurancePlanDecisions -Plan $a13Repeat -Context $a13Context
+$a13Ledger = $a13Plan.impact_proposition_ledger
+$a13RepeatLedger = $a13Repeat.impact_proposition_ledger
+$a13SelectedNames = @($a13Ledger.selected | ForEach-Object { [string]$_.scenario } | Sort-Object -Unique)
+$a13OmittedNames = @($a13Ledger.omitted_unaffected | ForEach-Object { [string]$_.scenario } | Sort-Object -Unique)
+$a13AllNames = @($a13Records | ForEach-Object { [string]$_.name } | Sort-Object -Unique)
+if ([string]$a13Ledger.selection_mode -ne 'declared-semantic-impact' -or
+    [string]$a13Ledger.ledger_sha256 -ne [string]$a13RepeatLedger.ledger_sha256 -or
+    @(Compare-Object $a13SelectedNames @('compiler-contracts')).Count -ne 0 -or
+    @(Compare-Object (@($a13SelectedNames + $a13OmittedNames | Sort-Object -Unique)) $a13AllNames).Count -ne 0 -or
+    @($a13Ledger.omitted_unaffected | Where-Object {
+      [string]$_.proposition -ne "scenario/2.1/$([string]$_.scenario)" -or
+      [string]$_.reason -ne 'unaffected-by-declared-semantic-impact'
+    }).Count -ne 0 -or
+    @($a13Ledger.selected | Where-Object { @($_.selected_by).Count -eq 0 }).Count -ne 0 -or
+    [string]$a13Ledger.candidate_binding.target -ne '2.1' -or
+    [string]$a13Ledger.candidate_binding.source_commit -ne ('A' * 40) -or
+    [string]$a13Ledger.candidate_binding.source_tree -ne ('B' * 40) -or
+    [string]$a13Ledger.candidate_binding.package_source_commit -ne ('C' * 40) -or
+    [string]$a13Ledger.candidate_binding.package_source_sha256 -ne ('D' * 64) -or
+    [string]$a13Ledger.candidate_binding.candidate_descriptor_sha256 -ne ('E' * 64)) {
+  throw 'A13 impact selection did not produce a deterministic candidate-bound selected/omitted proposition ledger.'
+}
+$a13Extra = @($a13Expected + @($a13Records | Where-Object { [string]$_.name -ne 'compiler-contracts' } | Select-Object -First 1))
+$a13OverSelectionRejected = $false
+try {
+  $a13OverSelectedPlan = & $a13NewPlan -Impact $a13Impact -Records $a13Extra
+  $null = Add-MIRAssurancePlanDecisions -Plan $a13OverSelectedPlan -Context $a13Context
+} catch { $a13OverSelectionRejected = $_.Exception.Message -match '\[mir-assurance-impact-selection-mismatch\]' }
+if (-not $a13OverSelectionRejected) {
+  throw 'A13 impact selection accepted a runtime proposition outside the declared semantic impact.'
+}
+$a13FullImpact = [ordered]@{
+  schema=1
+  scenarios=@('compiler-contracts')
+  groups=@()
+  tags=@()
+  mapped_paths=@()
+  unmapped_runtime_paths=@('source/prototypes/mir/unknown-runtime.lua')
+  requires_full=$true
+}
+$a13FullPlan = & $a13NewPlan -Impact $a13FullImpact -Records $a13Records -TemplateId 'runtime.full'
+$null = Add-MIRAssurancePlanDecisions -Plan $a13FullPlan -Context $a13Context
+if ([string]$a13FullPlan.impact_proposition_ledger.selection_mode -ne 'full-escalation' -or
+    @($a13FullPlan.impact_proposition_ledger.selected).Count -ne $a13Records.Count -or
+    @($a13FullPlan.impact_proposition_ledger.omitted_unaffected).Count -ne 0) {
+  throw 'A13 full escalation incorrectly made a scoped unaffected-omission claim.'
+}
+$a13MixedFull = & $a13NewPlan -Impact $a13FullImpact -Records $a13Records -TemplateId 'runtime.full'
+$a13MixedFull.tests[0].template_id = 'runtime.exact-zip'
+$null = Add-MIRAssurancePlanDecisions -Plan $a13MixedFull -Context $a13Context
+if ([string]$a13MixedFull.impact_proposition_ledger.selection_mode -ne 'full-escalation' -or
+    @($a13MixedFull.impact_proposition_ledger.selected).Count -ne $a13Records.Count) {
+  throw 'A13 full escalation lost a scenario deduplicated under an earlier smoke template.'
+}
+$a13FullProfilePlan = & $a13NewPlan -Impact $a13Impact -Records $a13Records -TemplateId 'runtime.full'
+$null = Add-MIRAssurancePlanDecisions -Plan $a13FullProfilePlan -Context $a13Context
+if ([string]$a13FullProfilePlan.impact_proposition_ledger.selection_mode -ne 'full-profile' -or
+    @($a13FullProfilePlan.impact_proposition_ledger.selected).Count -ne $a13Records.Count -or
+    @($a13FullProfilePlan.impact_proposition_ledger.omitted_unaffected).Count -ne 0) {
+  throw 'A13 runtime.full without escalation did not record full-profile coverage without scoped omissions.'
+}
+$a13Fingerprint = $a13Plan.tests[0].fingerprint
+$a13CandidateMutations = @(
+  [ordered]@{ field='source_commit'; parameter='SourceCommit'; value=('1' * 40) },
+  [ordered]@{ field='source_tree'; parameter='SourceTree'; value=('2' * 40) },
+  [ordered]@{ field='package_source_commit'; parameter='PackageSourceCommit'; value=('3' * 40) },
+  [ordered]@{ field='package_source_sha256'; parameter='PackageSourceSha256'; value=('4' * 64) },
+  [ordered]@{ field='candidate_descriptor_sha256'; parameter='CandidateDescriptorSha256'; value=('5' * 64) }
+)
+$a13CandidateMutationFingerprints = @(
+  foreach ($mutation in $a13CandidateMutations) {
+    $arguments = @{ Impact=$a13Impact; Records=$a13Expected }
+    $arguments[[string]$mutation.parameter] = [string]$mutation.value
+    $mutationPlan = & $a13NewPlan @arguments
+    $null = Add-MIRAssurancePlanDecisions -Plan $mutationPlan -Context $a13Context
+    [pscustomobject][ordered]@{
+      field=[string]$mutation.field
+      fingerprint_sha256=[string]$mutationPlan.tests[0].fingerprint.fingerprint_sha256
+    }
+  }
+)
+$a13ChangedEnvironmentPlan = & $a13NewPlan -Impact $a13Impact -Records $a13Expected -VerificationProfileSha ('8' * 64)
+$null = Add-MIRAssurancePlanDecisions -Plan $a13ChangedEnvironmentPlan -Context $a13Context
+$a13ChangedCommand = $a13Plan.tests[0].PSObject.Copy()
+$a13ChangedCommand.command = './synthetic-a13-different-command.ps1'
+$a13ChangedCommandFingerprint = Get-MIRAssuranceTestFingerprint -Test $a13ChangedCommand -Plan $a13Plan -Context $a13Context
+$a13ChangedTargetContext = $a13Context.PSObject.Copy()
+$a13ChangedTargetContext.target = '2.0'
+$a13ChangedTargetFingerprint = Get-MIRAssuranceTestFingerprint -Test $a13Plan.tests[0] -Plan $a13Plan -Context $a13ChangedTargetContext
+$a13ChangedInput = $a13Plan.tests[0].PSObject.Copy()
+$a13ChangedInput.inputs = @('spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json')
+$a13ChangedInputFingerprint = Get-MIRAssuranceTestFingerprint -Test $a13ChangedInput -Plan $a13Plan -Context $a13Context
+$a13EvaluatorPatterns = @(
+  'scripts/Invoke-MIRAssurance.ps1',
+  'tools/mir.ps1',
+  'tools/lib/assurance/**',
+  'tools/lib/validation/CurrentTargetPackage.ps1',
+  'tools/lib/validation/FactorioVersionPolicy.ps1',
+  'tools/lib/validation/ScenarioRegistry.ps1',
+  'tools/mir_verify/**',
+  'spec/schemas/**'
+)
+$a13EvaluatorCacheKey = @($a13EvaluatorPatterns | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique) -join "`n"
+$a13OriginalEvaluator = $script:MIRAssurancePatternFingerprintCache[$a13EvaluatorCacheKey]
+$script:MIRAssurancePatternFingerprintCache[$a13EvaluatorCacheKey] = [ordered]@{
+  kind='repository-patterns'
+  patterns=@($a13EvaluatorPatterns | Sort-Object -Unique)
+  file_count=[int]$a13OriginalEvaluator.file_count
+  sha256=('7' * 64)
+}
+try {
+  $a13ChangedEvaluatorFingerprint = Get-MIRAssuranceTestFingerprint -Test $a13Plan.tests[0] -Plan $a13Plan -Context $a13Context
+} finally {
+  $script:MIRAssurancePatternFingerprintCache[$a13EvaluatorCacheKey] = $a13OriginalEvaluator
+}
+if ([string]$a13Fingerprint.inputs.'candidate-source'.kind -ne 'candidate-source' -or
+    [string]$a13Fingerprint.inputs.'assurance-environment'.kind -ne 'assurance-environment' -or
+    [string]$a13Fingerprint.inputs.'assurance-evaluator'.kind -ne 'assurance-evaluator' -or
+    [string]$a13Fingerprint.inputs.'candidate-source'.source_tree -ne ('B' * 40) -or
+    [string]$a13Fingerprint.inputs.'spec/programmes/mir4-4x-operating-programme-v1.json'.kind -ne 'repository-patterns' -or
+    @($a13CandidateMutationFingerprints).Count -ne $a13CandidateMutations.Count -or
+    @($a13CandidateMutationFingerprints | Where-Object { [string]$_.fingerprint_sha256 -eq [string]$a13Fingerprint.fingerprint_sha256 }).Count -ne 0 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedEnvironmentPlan.tests[0].fingerprint.fingerprint_sha256 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedCommandFingerprint.fingerprint_sha256 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedTargetFingerprint.fingerprint_sha256 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedInputFingerprint.fingerprint_sha256 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedEvaluatorFingerprint.fingerprint_sha256) {
+  throw 'A13 exact-reuse fingerprint did not bind target, candidate source, environment, command, evaluator, and declared input components.'
+}
+$a13Programme = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json') | ConvertFrom-Json -Depth 100
+$a13Task = @($a13Programme.synthesis.tasks | Where-Object { [string]$_.id -eq 'A13' })
+$a13ImpactReceiptPath = Join-Path $RepoRoot 'spec/programmes/evidence/mir42/a13-impact-selection.json'
+$a13ReuseReceiptPath = Join-Path $RepoRoot 'spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json'
+if ($a13Task.Count -ne 1 -or [string]$a13Task[0].state -ne 'active' -or
+    (@($a13Task[0].evidence | ForEach-Object { [string]$_ }) -join '|') -ne
+      'spec/programmes/evidence/mir42/a13-impact-selection.json|spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json' -or
+    -not (Test-Path -LiteralPath $a13ImpactReceiptPath -PathType Leaf) -or
+    -not (Test-Path -LiteralPath $a13ReuseReceiptPath -PathType Leaf)) {
+  throw 'A13 programme state does not retain the two candidate-bound implementation receipts without claiming candidate completion.'
+}
+$a13ImpactReceipt = Get-Content -Raw -LiteralPath $a13ImpactReceiptPath | ConvertFrom-Json -Depth 100
+$a13ReuseReceipt = Get-Content -Raw -LiteralPath $a13ReuseReceiptPath | ConvertFrom-Json -Depth 100
+if ([int]$a13ImpactReceipt.schema -ne 1 -or [string]$a13ImpactReceipt.kind -ne 'MIR42A13ImpactSelectionReceiptV1' -or
+    [string]$a13ImpactReceipt.candidate_bound_plan.ledger_schema -ne 'mir-assurance-impact-proposition-ledger-v1' -or
+    @($a13ImpactReceipt.candidate_bound_plan.candidate_fields).Count -ne 6 -or
+    @($a13ImpactReceipt.candidate_bound_plan.selection_modes).Count -ne 3 -or
+    [bool]$a13ImpactReceipt.release_authority -or [bool]$a13ImpactReceipt.publication_authority -or
+    [int]$a13ReuseReceipt.schema -ne 1 -or [string]$a13ReuseReceipt.kind -ne 'MIR42A13ExactFingerprintReuseReceiptV1' -or
+    [string]$a13ReuseReceipt.fingerprint_contract.candidate_source -ne 'fingerprint.inputs.candidate-source' -or
+    [string]$a13ReuseReceipt.fingerprint_contract.environment -notmatch 'assurance-environment' -or
+    [string]$a13ReuseReceipt.fingerprint_contract.command -ne 'fingerprint.definition.command' -or
+    [string]$a13ReuseReceipt.fingerprint_contract.evaluator -ne 'fingerprint.inputs.assurance-evaluator' -or
+    [string]$a13ReuseReceipt.contradiction_policy.required_action -ne 'independent-fresh-reproduction-required' -or
+    @($a13ReuseReceipt.timing.observed_fields).Count -ne 3 -or
+    [bool]$a13ReuseReceipt.release_authority -or [bool]$a13ReuseReceipt.publication_authority) {
+  throw 'A13 receipts do not state the selected/omitted, exact-reuse, timing, and no-release-authority contract.'
+}
+$retiredCurrentInputPattern = '^(?:src(?:/|$)|prototypes(?:/|$)|locale(?:/|$)|settings[^/]*\.lua$|info\.json$)'
+$typedInputCounts = [ordered]@{ source = 0; package = 0; historical = 0 }
+foreach ($test in @($catalog.tests)) {
+  $testInputs = Get-MIRAssuranceOptionalObjectValue -Object $test -Name 'inputs'
+  foreach ($input in @($testInputs)) {
+    $inputName = [string]$input
+    if ($inputName -match $retiredCurrentInputPattern) {
+      throw "Current assurance input revives a retired product root: $($test.id) -> $inputName"
+    }
+    if ($inputName.StartsWith('source/', [StringComparison]::Ordinal)) {
+      throw "Current source assurance input must declare source: authority: $($test.id) -> $inputName"
+    }
+    if ($inputName.StartsWith('source:', [StringComparison]::Ordinal)) {
+      $typedInputCounts.source++
+      if (-not $inputName.Substring('source:'.Length).StartsWith('source/', [StringComparison]::Ordinal)) {
+        throw "Current source assurance input is outside the canonical source root: $($test.id) -> $inputName"
+      }
+    } elseif ($inputName.StartsWith('package:', [StringComparison]::Ordinal)) {
+      $typedInputCounts.package++
+    } elseif ($inputName.StartsWith('historical:', [StringComparison]::Ordinal)) {
+      $typedInputCounts.historical++
+      if ($inputName -notmatch '^historical:[0-9a-f]{40}:[^:]+$') {
+        throw "Historical assurance input is not commit-pinned: $($test.id) -> $inputName"
+      }
+    }
+  }
+}
+foreach ($kind in $typedInputCounts.Keys) {
+  if ([int]$typedInputCounts[$kind] -eq 0) {
+    throw "Assurance catalog must exercise explicit $kind proof-input authority."
+  }
+}
+$typedFingerprintContext = [pscustomobject]@{ target = '2.1' }
+$typedFingerprintPlan = [pscustomobject]@{}
+$typedFingerprintTest = [pscustomobject]@{}
+$sourceFingerprint = Get-MIRAssuranceInputFingerprint -InputName 'source:source/prototypes/mir/settings/**' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+$packageFingerprint = Get-MIRAssuranceInputFingerprint -InputName 'package:info.json' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+$historicalFingerprint = Get-MIRAssuranceInputFingerprint -InputName 'historical:297aa5cc902da96847165a4f9caa1048608839fb:prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+$balanceFingerprint = Get-MIRAssuranceBalanceContractFingerprint
+if ([string]$sourceFingerprint.kind -ne 'current-source' -or [int]$sourceFingerprint.file_count -le 0 -or
+    [string]$packageFingerprint.kind -ne 'materialized-package' -or [string]$packageFingerprint.target -ne 'f210' -or [int]$packageFingerprint.file_count -ne 1 -or
+    [string]$historicalFingerprint.kind -ne 'pinned-historical' -or [string]$historicalFingerprint.commit -ne '297aa5cc902da96847165a4f9caa1048608839fb' -or
+    [string]$balanceFingerprint.kind -ne 'balance-contract' -or @($balanceFingerprint.source.Keys).Count -ne 5) {
+  throw 'Typed assurance proof-input fingerprints did not retain their distinct current-source, materialized-package, and pinned-historical authorities.'
+}
+try {
+  $null = Get-MIRAssuranceInputFingerprint -InputName 'source:source/does-not-exist/**' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+  throw 'A required missing current-source assurance input was accepted.'
+} catch {
+  if ($_.Exception.Message -notmatch '^\[mir-assurance-required-source-input-no-match\] source/does-not-exist/\*\*$') { throw }
+}
+try {
+  $null = Get-MIRAssuranceInputFingerprint -InputName 'source:source\..\README.md' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+  throw 'A Windows-separator source traversal assurance input was accepted.'
+} catch {
+  if ($_.Exception.Message -cne '[mir-assurance-source-input-path] source\..\README.md') { throw }
+}
+$currentTargetContext = Get-MIRAssuranceMaterializedPackageContext -Target 'f210'
+$ambientRepairOutput = Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentTargetContext -RelativePath 'prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua' -AllowMissing
+$currentCompatibilitySource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/compatibility.yml')
+$currentCompilerDiagnosticsSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/lib/validation/runner/StaticCompilerDiagnostics.ps1')
+if ($null -ne $ambientRepairOutput -or
+    $currentCompatibilitySource.Contains('factorio_2_1_ambient_sound_schema') -or
+    $currentCompilerDiagnosticsSource.Contains('factorio_2_1_ambient_sound_schema')) {
+  throw 'Current source or F210 materialization revived the retired ambient-sound schema repair instead of preserving it as historical-only evidence.'
+}
 $campaignFingerprintRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-performance-campaign-" + [guid]::NewGuid().ToString("N"))
 $originalAssuranceRepo = $script:repo
+$originalAssuranceRepositoryFilesCache = $script:MIRAssuranceRepositoryFilesCache
+$originalAssurancePatternFingerprintCache = $script:MIRAssurancePatternFingerprintCache
+$originalAssuranceGitIndexBlobs = $script:MIRAssuranceGitIndexBlobs
+$originalAssuranceDirtyPaths = $script:MIRAssuranceDirtyPaths
+$originalAssuranceBlobCache = $script:MIRAssuranceBlobCache
+$originalAssuranceTreeHashCache = $script:MIRAssuranceTreeHashCache
 try {
   $campaignRoot = Join-Path $campaignFingerprintRoot ".mir"
   $versionedCampaignRoot = Join-Path $campaignRoot "performance-campaigns"
@@ -627,7 +1110,12 @@ try {
   & git -C $campaignFingerprintRoot add -- .mir
   if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the performance campaign fingerprint fixture Git index." }
   $script:repo = $campaignFingerprintRoot
+  $script:MIRAssuranceRepositoryFilesCache = $null
   $script:MIRAssurancePatternFingerprintCache = @{}
+  $script:MIRAssuranceGitIndexBlobs = $null
+  $script:MIRAssuranceDirtyPaths = $null
+  $script:MIRAssuranceBlobCache = $null
+  $script:MIRAssuranceTreeHashCache = $null
   $campaignContext = [pscustomobject]@{target="2.1"}
   $resolvedCampaignPath = Resolve-MIRAssurancePerformanceCampaignPath -Context $campaignContext
   $beforeCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
@@ -653,10 +1141,16 @@ try {
   }
 } finally {
   $script:repo = $originalAssuranceRepo
-  $script:MIRAssurancePatternFingerprintCache = @{}
+  $script:MIRAssuranceRepositoryFilesCache = $originalAssuranceRepositoryFilesCache
+  $script:MIRAssurancePatternFingerprintCache = $originalAssurancePatternFingerprintCache
+  $script:MIRAssuranceGitIndexBlobs = $originalAssuranceGitIndexBlobs
+  $script:MIRAssuranceDirtyPaths = $originalAssuranceDirtyPaths
+  $script:MIRAssuranceBlobCache = $originalAssuranceBlobCache
+  $script:MIRAssuranceTreeHashCache = $originalAssuranceTreeHashCache
   if (Test-Path -LiteralPath $campaignFingerprintRoot) { Remove-Item -LiteralPath $campaignFingerprintRoot -Recurse -Force }
 }
-$candidateInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+$candidateContext = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f210
+$candidateInfo = Get-MIR4CurrentTargetPackageOutputText -Context $candidateContext -RelativePath 'info.json' | ConvertFrom-Json
 $candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
 $candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree -Target '2.1').Replace("\", "/")
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
@@ -759,7 +1253,7 @@ foreach ($requiredReleaseCandidateSnippet in @(
   'git clone --quiet --shared --no-checkout',
   'git -C $authority cat-file -e',
   'Checked-out controller does not match the workflow source commit.',
-  'Archive SHA mismatch for ${archive}',
+  'Built archive SHA mismatch:',
   'resume_exact_dist_evidence_run:',
   'Admit prior passing exact-dist evidence',
   'Prior exact-dist evidence was invalidated by controller changes',
@@ -779,7 +1273,8 @@ foreach ($requiredReleaseCandidateSnippet in @(
   "--candidate `$candidateArchive",
   '--candidate-source $env:MIR_RC_CANDIDATE_SHA',
   "--output 'build/results/release-gate'",
-  'MIRProtectedReleaseCandidateRunV1',
+  'MIRProtectedReleaseCandidateRunV2',
+  'MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive',
   'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}',
   "runtime-evidence",
   'runtime_evidence = $runtimeEvidenceRows'
@@ -799,6 +1294,10 @@ foreach ($requiredWorkflowSnippet in @(
   'path: ${{ env.MIR_DEVELOPMENT_CANDIDATE }}',
   'mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}',
   'mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}',
+  'plan_artifact: ${{ steps.artifact-names.outputs.plan_artifact }}',
+  'candidate_artifact: ${{ steps.artifact-names.outputs.candidate_artifact }}',
+  'name: ${{ needs.plan.outputs.plan_artifact }}',
+  'name: ${{ needs.plan.outputs.candidate_artifact }}',
   'mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}',
   '$plan.candidate_descriptor.path',
   '[IO.Path]::IsPathRooted($candidateRelative)',
@@ -810,11 +1309,16 @@ foreach ($requiredWorkflowSnippet in @(
   'no_op = $true',
   '${{ matrix.no_op != true }}',
   '${{ matrix.no_op == true }}',
-  '${{ always() && matrix.no_op != true }}'
+  '${{ always() && matrix.no_op != true }}',
+  'pattern: mir-evidence-${{ github.run_id }}-*',
+  '--artifact-prefix mir-evidence-${{ github.run_id }}- --retry-across-attempts --current-run-attempt ${{ github.run_attempt }}'
 )) {
   if (-not $validateWorkflow.Contains($requiredWorkflowSnippet)) {
     throw "Hosted validation workflow does not safely handle an all-reuse plan: $requiredWorkflowSnippet"
   }
+}
+if ($validateWorkflow.Contains('pattern: mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-*')) {
+  throw "Hosted aggregate fan-in must retain verified worker artifacts from earlier attempts of the same workflow run."
 }
 if ($validateWorkflow.Contains('Remove-Item -LiteralPath $source -Force')) {
   throw "Hosted planning must preserve the tracked candidate source so every clean worker reconstructs the same canonical repository state."
@@ -852,9 +1356,15 @@ foreach ($fanInCase in @(
   $fanInWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $fanInCase.Path)
   foreach ($requiredFanInSnippet in @(
     'path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}',
-    'path: build/results/assurance/worker-evidence',
+    'path: ${{ steps.worker-download-path.outputs.path }}',
+    'id: worker-download-path',
+    'github.rest.actions.listWorkflowRunArtifacts',
+    'workers.length === 1 ? `${root}/${workers[0].name}` : root',
+    'actions: read',
     'verify import-workers',
-    "--artifact-prefix $($fanInCase.Prefix)",
+    ('name: ' + $fanInCase.Prefix + '${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}'),
+    ('pattern: ' + $fanInCase.Prefix + '${{ github.run_id }}-*'),
+    ('--artifact-prefix ' + $fanInCase.Prefix + '${{ github.run_id }}- --retry-across-attempts --current-run-attempt ${{ github.run_attempt }}'),
     'build/results/assurance/worker-import.json'
   )) {
     if (-not $fanInWorkflow.Contains($requiredFanInSnippet)) {
@@ -863,6 +1373,29 @@ foreach ($fanInCase in @(
   }
   if ($fanInWorkflow.Contains("merge-multiple: true")) {
     throw "Assurance workflow '$($fanInCase.Path)' still extracts mutable worker pointers into one shared directory."
+  }
+}
+
+foreach ($planTransportCase in @(
+  @{Path=".github\workflows\validate.yml"; Artifact="mir-verification-plan-"},
+  @{Path=".github\workflows\assurance-targeted.yml"; Artifact="mir-targeted-plan-and-candidate-"},
+  @{Path=".github\workflows\assurance-scheduled.yml"; Artifact="mir-scheduled-plan-and-candidate-"}
+)) {
+  $planTransportWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $planTransportCase.Path)
+  foreach ($requiredPlanTransportSnippet in @(
+    'plan_artifact: ${{ steps.artifact-names.outputs.plan_artifact }}',
+    'id: artifact-names',
+    ('"plan_artifact=' + $planTransportCase.Artifact + '${{ github.run_id }}-${{ github.run_attempt }}"'),
+    'name: ${{ steps.artifact-names.outputs.plan_artifact }}',
+    'name: ${{ needs.plan.outputs.plan_artifact }}'
+  )) {
+    if (-not $planTransportWorkflow.Contains($requiredPlanTransportSnippet)) {
+      throw "Assurance workflow '$($planTransportCase.Path)' omits attempt-qualified exact plan/candidate transport: $requiredPlanTransportSnippet"
+    }
+  }
+  $attemptInvariantName = [regex]::Escape([string]$planTransportCase.Artifact.TrimEnd('-'))
+  if ($planTransportWorkflow -match "(?m)^\s*name:\s*$attemptInvariantName\s*$") {
+    throw "Assurance workflow '$($planTransportCase.Path)' retains an attempt-invariant plan/candidate artifact name."
   }
 }
 
@@ -888,12 +1421,30 @@ foreach ($requiredIngestionGuard in @(
   'evidence-disposition',
   'Test-MIRAssuranceFreshCampaignEvidence',
   'Get-MIRAssuranceCampaignCheckpoint',
+  'Set-MIRAssuranceAttemptPointer',
+  'Get-MIRAssuranceOutcomeDigest',
+  'Resolve-MIRAssuranceAttemptQuarantine',
+  'mir-assurance-attempt-state-lock-v1',
+  'trusted-exact-attempt-contradiction',
+  'independent-fresh-reproduction-required',
+  'mir-plan-execution-quarantine-v1',
+  'cold_execution_seconds',
+  'reused_source_seconds',
+  'checkpointed_source_seconds',
   'stale-ignored',
   'ReparsePoint',
   'max_entries_per_artifact',
   'max_expanded_bytes_per_artifact',
   'max_file_bytes',
-  'duplicate canonical object paths'
+  'duplicate canonical object paths',
+  'receipt_material_sha256',
+  'RetryAcrossAttempts',
+  'CurrentRunAttempt',
+  'Publish-MIRAssuranceWorkerObject',
+  'bounded tree scan',
+  'superseded-by-later-run-attempt',
+  'stale-plan-transport',
+  'selected transport run and attempt'
 )) {
   if (-not $assuranceEvidence.Contains($requiredIngestionGuard)) {
     throw "Assurance worker ingestion omits structural guard: $requiredIngestionGuard"
@@ -903,6 +1454,11 @@ $assuranceEntry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\In
 foreach ($requiredCheckpointSnippet in @('time-budget-minutes', 'status -eq "checkpointed"', 'TimeBudgetSeconds')) {
   if (-not $assuranceEntry.Contains($requiredCheckpointSnippet)) {
     throw "Assurance checkpoint facade omits required contract: $requiredCheckpointSnippet"
+  }
+}
+foreach ($requiredRetryImportSnippet in @('--current-run-attempt', 'RetryAcrossAttempts', 'CurrentRunAttempt')) {
+  if (-not $assuranceEntry.Contains($requiredRetryImportSnippet)) {
+    throw "Assurance import facade omits the independently bound aggregate retry attempt: $requiredRetryImportSnippet"
   }
 }
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
@@ -929,7 +1485,8 @@ foreach ($generatedOutputExclusion in @('build/results/*', 'build/*', 'build/res
   }
 }
 
-$equivalenceRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-clean-root-equivalence-" + [guid]::NewGuid().ToString("N"))
+$equivalenceParent = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/tmp'))
+$equivalenceRoot = Join-Path $equivalenceParent ("mir-clean-root-equivalence-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
 $plannerRoot = Join-Path $equivalenceRoot "planner"
 $workerRoot = Join-Path $equivalenceRoot "worker"
 $pwshPath = (Get-Process -Id $PID).Path
@@ -945,29 +1502,35 @@ try {
   # The roots need independent indexes and working trees for LF/CRLF proof, not
   # duplicate copies of the immutable repository object store. Sharing objects
   # prevents this regression from becoming a disk-capacity false failure.
-  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --shared $RepoRoot $plannerRoot
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" clone -c core.autocrlf=false --quiet --shared $RepoRoot $plannerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
-  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=true clone --quiet --shared $RepoRoot $workerRoot
-  if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root." }
+  if ((Get-Item -LiteralPath $stagedPatchPath).Length -gt 0) {
+    & git -C $plannerRoot apply --index --whitespace=nowarn $stagedPatchPath
+    if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the exact staged tree in separate root: $plannerRoot" }
+    # Give both line-ending configurations a real clean checkout of the same
+    # staged tree. Applying a patch independently under core.autocrlf=true can
+    # leave newly relocated raw-hashed files in non-canonical working bytes.
+    & git -C $plannerRoot -c user.name='MIR assurance self-test' -c user.email='mir-assurance@invalid.local' commit --quiet -m 'self-test: materialize staged equivalence tree'
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the staged equivalence tree in the disposable planner root.' }
+  }
+  & git -c "safe.directory=$plannerRoot" clone -c core.autocrlf=true --quiet --shared $plannerRoot $workerRoot
+  if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root from the exact staged tree." }
 
   foreach ($root in @($plannerRoot, $workerRoot)) {
-    if ((Get-Item -LiteralPath $stagedPatchPath).Length -gt 0) {
-      & git -C $root apply --index --whitespace=nowarn $stagedPatchPath
-      if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the exact staged tree in separate root: $root" }
-    }
     & $pwshPath -NoProfile -File (Join-Path $root "tools\mir.ps1") assurance build --target 2.1 --output build/results/assurance/development-build.json
     if ($LASTEXITCODE -ne 0) { throw "Content-addressed candidate build failed in separate root: $root" }
   }
 
-  # A normal planner must not consume mutable worktree bytes from published
-  # dist. Corrupt one worker-root copy after the isolated candidate exists.
+  # A normal planner must not consume mutable local staging bytes from dist.
+  # Create a worker-private ignored decoy after the isolated candidate exists.
   $dirtyPublicDist = Join-Path $workerRoot "dist\more-infinite-research_3.2.5.zip"
-  $stream = [IO.File]::Open($dirtyPublicDist, [IO.FileMode]::Append, [IO.FileAccess]::Write, [IO.FileShare]::None)
-  try { $stream.WriteByte(0) } finally { $stream.Dispose() }
-  $dirtyPublishedDistPaths = @(& git -C $workerRoot diff --name-only -- dist)
-  if ($dirtyPublishedDistPaths.Count -ne 1 -or
-      [string]$dirtyPublishedDistPaths[0] -ne "dist/more-infinite-research_3.2.5.zip") {
-    throw "Separate-root regression did not create the intended dirty published-dist decoy."
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dirtyPublicDist) | Out-Null
+  [IO.File]::WriteAllBytes($dirtyPublicDist, [byte[]](80,75,3,4,77,73,82,52))
+  $ignoredPublishedDistPaths = @(& git -C $workerRoot check-ignore --no-index -- 'dist/more-infinite-research_3.2.5.zip')
+  if ($LASTEXITCODE -ne 0 -or $ignoredPublishedDistPaths.Count -ne 1 -or
+      [string]$ignoredPublishedDistPaths[0] -ne "dist/more-infinite-research_3.2.5.zip" -or
+      @(& git -C $workerRoot diff --name-only -- dist).Count -ne 0) {
+    throw "Separate-root regression did not create the intended ignored local-dist decoy."
   }
 
   & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile fast --output build/results/assurance/verification-plan.json
@@ -989,8 +1552,57 @@ try {
       [string]$plannerPlan.candidate_descriptor.content_sha256 -ne [string]$workerPlan.candidate_descriptor.content_sha256) {
     throw "Separate roots did not preserve exact isolated candidate identity."
   }
+
+  # The development-contract proof reads command dispatch and script sources in
+  # addition to the package builder.  Prove the real planner invalidates its
+  # reusable row when each representative source changes; a synthetic hash
+  # comparison would not exercise catalogue-to-fingerprint binding.
+  function Get-MIRDevelopmentContractsPlanFingerprint {
+    param([Parameter(Mandatory)]$Plan)
+    $rows = @($Plan.tests | Where-Object { [string]$_.id -eq 'static.mir4-development-contracts' })
+    if ($rows.Count -ne 1) { throw 'Verification plan does not contain exactly one development-contract test row.' }
+    return $rows[0].fingerprint
+  }
+  # The development-contract test is deliberately selected by the dedicated
+  # development profile, rather than the minimal `fast` profile used above for
+  # the cross-platform general-plan comparison.  Exercise the profile that
+  # owns this proposition so a missing row is never mistaken for reusable
+  # evidence.
+  & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile mir4-development --output build/results/assurance/verification-plan-development-contracts.json
+  if ($LASTEXITCODE -ne 0) { throw 'Development-contract verification plan did not materialize.' }
+  $developmentContractsPlan = Get-Content -Raw -LiteralPath (Join-Path $plannerRoot 'build\results\assurance\verification-plan-development-contracts.json') | ConvertFrom-Json
+  $baselineDevelopmentContractsFingerprint = Get-MIRDevelopmentContractsPlanFingerprint -Plan $developmentContractsPlan
+  $nonBuildCommandPath = Join-Path $plannerRoot 'tools\commands\workspace\Remove-MIRStaleArtifacts.ps1'
+  [IO.File]::AppendAllText($nonBuildCommandPath, "`n# assurance planner invalidation: non-Build command`n", [Text.UTF8Encoding]::new($false))
+  & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile mir4-development --output build/results/assurance/verification-plan-non-build-command.json
+  if ($LASTEXITCODE -ne 0) { throw 'Verification plan did not reconstruct after non-Build command mutation.' }
+  $nonBuildCommandPlan = Get-Content -Raw -LiteralPath (Join-Path $plannerRoot 'build\results\assurance\verification-plan-non-build-command.json') | ConvertFrom-Json
+  $nonBuildCommandFingerprint = Get-MIRDevelopmentContractsPlanFingerprint -Plan $nonBuildCommandPlan
+  if ([string]$nonBuildCommandFingerprint.fingerprint_sha256 -eq [string]$baselineDevelopmentContractsFingerprint.fingerprint_sha256 -or
+      [string]$nonBuildCommandFingerprint.inputs.'tools/commands/**'.sha256 -eq [string]$baselineDevelopmentContractsFingerprint.inputs.'tools/commands/**'.sha256) {
+    throw 'Development-contract assurance-plan reuse was not invalidated by a non-Build command source change.'
+  }
+
+  $scriptInputPath = Join-Path $plannerRoot 'scripts\Invoke-MIRAssurance.ps1'
+  [IO.File]::AppendAllText($scriptInputPath, "`n# assurance planner invalidation: script input`n", [Text.UTF8Encoding]::new($false))
+  & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile mir4-development --output build/results/assurance/verification-plan-scripts-input.json
+  if ($LASTEXITCODE -ne 0) { throw 'Verification plan did not reconstruct after script input mutation.' }
+  $scriptInputPlan = Get-Content -Raw -LiteralPath (Join-Path $plannerRoot 'build\results\assurance\verification-plan-scripts-input.json') | ConvertFrom-Json
+  $scriptInputFingerprint = Get-MIRDevelopmentContractsPlanFingerprint -Plan $scriptInputPlan
+  if ([string]$scriptInputFingerprint.fingerprint_sha256 -eq [string]$nonBuildCommandFingerprint.fingerprint_sha256 -or
+      [string]$scriptInputFingerprint.inputs.'scripts/**'.sha256 -eq [string]$nonBuildCommandFingerprint.inputs.'scripts/**'.sha256) {
+    throw 'Development-contract assurance-plan reuse was not invalidated by a scripts source change.'
+  }
 } finally {
-  if (Test-Path -LiteralPath $equivalenceRoot) { Remove-Item -LiteralPath $equivalenceRoot -Recurse -Force }
+  if (Test-Path -LiteralPath $equivalenceRoot) {
+    $cleanupRoot = (Resolve-Path -LiteralPath $equivalenceRoot).ProviderPath
+    if (-not $cleanupRoot.StartsWith($equivalenceParent.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+        (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint -or
+        (Split-Path -Leaf $cleanupRoot) -notlike 'mir-clean-root-equivalence-*') {
+      throw 'Separate-root cleanup target is outside the owned scratch directory.'
+    }
+    Remove-Item -LiteralPath $cleanupRoot -Recurse -Force
+  }
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."

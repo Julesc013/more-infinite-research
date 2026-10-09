@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 if (-not (Get-Command Resolve-MIR4FactorioQualificationProfile -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot '../../../../lib/validation/FactorioVersionPolicy.ps1')
 }
-if (-not (Get-Command Get-MIR4F210EngineResolutionV1 -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command Get-MIR4F210EngineResolutionV2 -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot '../F210QualificationPolicy.ps1')
 }
 
@@ -25,7 +25,7 @@ function Get-MIR441TargetEngineIdentity {
   $effective=Resolve-MIR4FactorioQualificationProfile -Profile $profile -FactorioBin $binary -RepoRoot $RepoRoot
   if([string]$effective.qualification_factorio_version-cne$version){throw "[mir441-engine-profile] $([string]$Target.target)"}
   if([string]$Target.target-ceq'f210'){
-    $channel=Get-MIR4F210EngineResolutionV1 -RepoRoot $RepoRoot -FactorioBin $binary
+    $channel=Get-MIR4F210EngineResolutionV2 -RepoRoot $RepoRoot -FactorioBin $binary
     if([string]$channel.engine.sha256-cne[string]$identity.binary_sha256){throw '[mir441-f210-engine-channel]'}
     $identity|Add-Member -NotePropertyName policy -NotePropertyValue 'latest-installed-official-experimental-exact-lock'
     $identity|Add-Member -NotePropertyName channel_record_sha256 -NotePropertyValue ([string]$channel.record_sha256)
@@ -46,6 +46,7 @@ function Invoke-MIR441TargetQualification {
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   Assert-MIR441CleanTrackedSource -RepoRoot $repo
   $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
+  Assert-MIR441CurrentReleaseOperationAuthorized -Contract $contract -Operation 'qualification'
   $targetRows=@($contract.targets|Where-Object{[string]$_.target-ceq$Target})
   if($targetRows.Count-ne1){throw "[mir441-qualification-target] $Target"};$targetRow=$targetRows[0]
   $work=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $WorkRoot -Name WorkRoot
@@ -59,7 +60,7 @@ function Invoke-MIR441TargetQualification {
   if([string]$candidateManifest.source.commit-cne[string]$source.commit-or[string]$candidateManifest.source.tree-cne[string]$source.tree){throw '[mir441-qualification-source-drift]'}
   $candidate=Join-Path $evidence "assets/$([string]$candidateRow.asset.path)"
   if((Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash-cne[string]$candidateRow.asset.sha256){throw '[mir441-qualification-candidate-drift]'}
-  $predecessor=Join-Path $repo "dist/more-infinite-research_$([string]$targetRow.predecessor).zip"
+  $predecessor=[string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version ([string]$targetRow.predecessor)).cache_path
   if(-not(Test-Path -LiteralPath $predecessor -PathType Leaf)){throw "[mir441-qualification-predecessor] $Target"}
   $engine=Get-MIR441TargetEngineIdentity -RepoRoot $repo -Target $targetRow
   $resultPath=Join-Path $targetEvidence 'target-qualification.json'

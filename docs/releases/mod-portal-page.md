@@ -5,7 +5,7 @@ applies_to: "all supported More Infinite Research editions"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-10-05
 supersedes: [docs/releases/archive/mod-portal-page-old.md]
 superseded_by: []
 source_of_truth_for:
@@ -19,6 +19,18 @@ Adds fully customizable repeatable late-game research for productivity, speed, l
 More Infinite Research is for players who want useful long-term scaling in megabases, long-running saves, Space Age factories, and modded playthroughs without turning the mod into a full content overhaul.
 
 The Mod Portal automatically offers an archive compatible with your Factorio version. Modern editions provide the complete compatibility-compiler feature set; historical-engine editions intentionally provide smaller target-appropriate sets. Install the newest compatible download shown by Factorio rather than copying an archive between engine generations.
+
+## MIR 4.2.0 release
+
+[MIR 4.2.0 is available on GitHub](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.2.0-stable) for Factorio 2.1, 2.0, 1.1, 1.0 and 0.17 through 0.13, with all twelve downloads verified anonymously. The release uses the one-time tag `v4.2.0-stable`; all numeric package versions retain their required `00` suffix. Mod Portal uploads remain maintainer-managed and have not been performed by the executor. Choose the package for your Factorio generation; the 2.1 package requires the selected experimental Factorio 2.1 engine.
+
+This build includes the native-owner overlap, weapon-overlap `off`, science-snapshot and serialization corrections implemented after RC1. The modern packages also exclude retired space science from generated streams with Space Is Fake, expose existing breeding controls without Space Age, and include the requested AAI industrial furnace, SE panel/accumulator tiers, SolarMatrix and Accumulator-V2 manufacturing recipes. These are crafting-productivity bonuses; upstream electrical output, capacity and unlocks are preserved. The 2.1/2.0 packages include the research library; its own research-queue mutation controls remain unavailable. Historical editions retain their engine-specific limits.
+
+The Space Is Fake follow-up identifies two remaining 4.2.0 requirements: Weapon shooting speed 7 and Lab research speed 7. Their continuation fix is in 4.2.1 development and awaits native package and upgrade verification. The published 4.2.0 downloads are preserved.
+
+Preserve original saves and keep startup settings unchanged for the first load. Source `v4.2.0` maps strictly to `4.2.CCC00`; `v4.2.1` maps to `4.2.CCC01`. Earlier RC/withdrawn final downloads are superseded by the corrected GitHub ZIPs. Same-version RC users must manually replace their ZIP and verify its new checksum. Withdrawn `CCC01` users require explicit manual replacement; automatic downgrade to `CCC00` is not promised. Same-version replacement does not itself rerun version-gated migrations.
+
+The maintainer accepts reduced assurance for this hotfix. Focused controlled source/package and upstream-file tests passed; native final-package, save-upgrade, client/multiplayer and performance qualification remains NOT RUN. Tags are unsigned. Unfinished integrations remain unfinished; comprehensive overhaul support and an overall performance improvement are not claimed. Remaining work and reported defects continue in 4.2.1, targeting Friday 9 October 2026 in Melbourne (AEDT) without guaranteeing completion of every feature.
 
 ## At a glance
 

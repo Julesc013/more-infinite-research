@@ -9,6 +9,8 @@ param(
   [string]$FixtureName = "assert-upgrade-3-2-3-to-3-2-5",
   [string]$OutputPath = "build/results/assurance/3.2.5-upgrade-proof.json",
   [string]$WorkRoot = "",
+  [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
   [ValidateSet('OnFailure','Always','Never')][string]$Retention = 'Always'
 )
 # Canonical validation scripts live three levels below the repository root.
@@ -17,6 +19,12 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Pat
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+if ($WorkRoot -and -not [IO.Path]::IsPathRooted($WorkRoot)) { throw 'Upgrade -WorkRoot must be an absolute controlled path.' }
+$upgradeWorkRoot=if($WorkRoot){$WorkRoot}else{Join-Path $RepoRoot 'build/p/validation-upgrades'}
+$null=Resolve-MIR441RecoveryScratchPath -Path $upgradeWorkRoot
+if ($ExpectedPeakMemoryMiB -le 0) { throw '[mir441-resource-peak-budget-required] Declare the upgrade peak memory budget.' }
+$null=Assert-MIR441ResourceAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $upgradeWorkRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB)
 $runner = Join-Path $RepoRoot "tests\runtime\Test-MIRUpgrade.ps1"
 $output = if ([IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
 $outputParent = Split-Path -Parent $output
@@ -65,6 +73,8 @@ foreach ($case in $cases) {
     SourceOnlyFixtureNames = @($case.source_only)
     OutputPath = $rowOutput
     WorkRoot = $WorkRoot
+    ExpectedPeakMemoryMiB = $ExpectedPeakMemoryMiB
+    MaxNewOutputMiB = $MaxNewOutputMiB
     Retention = $Retention
   }
   & $runner @arguments

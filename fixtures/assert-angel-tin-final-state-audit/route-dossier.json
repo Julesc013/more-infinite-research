@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "kind": "MIR4AngelTinFinalStateAuditV1",
+  "scope": "F210 Angel-only final Tin state diagnostic audit; package-excluded evidence",
+  "target": {
+    "factorio_line": "2.1",
+    "factorio_version": "2.1.17",
+    "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"
+  },
+  "archive_closure": [
+    {"name": "angelsrefining", "version": "2.1.2", "sha256": "AF5E79E35E591F68D52F13EDA082950E10AC98A4B7722B3F568D0211E3FEB813"},
+    {"name": "angelsrefininggraphics", "version": "2.1.0", "sha256": "79F373BC628F619EDE3B1875827172390D2C3F5EAB56310F6F1572C4553CB6EF"},
+    {"name": "angelspetrochem", "version": "2.1.2", "sha256": "9B4CC14156CF16C9F41784108CCA5E767180A7330B1AF23A387231653CE10A49"},
+    {"name": "angelspetrochemgraphics", "version": "2.1.0", "sha256": "DECDC2FCD5BBBDEF70784943C142C30FAA7294B98E814296C5D44D09A9DE4790"},
+    {"name": "angelssmelting", "version": "2.1.1", "sha256": "1DFCDD77D075FD545CFEE74BD8A6443E7E90B133D3832FDD47649C84892243A9"},
+    {"name": "angelssmeltinggraphics", "version": "2.1.0", "sha256": "EBEF8D1F6F13F84B242DF295CE9FAB9618ED90B4C52852A0B4345908A88D5D35"}
+  ],
+  "no_bob_mods": true,
+  "source_emission_target": "bob-tin-plate",
+  "final_output_identities": ["angels-plate-tin"],
+  "final_plate_recipes": ["angels-plate-tin", "angels-plate-tin-2"],
+  "declared_tin_transformations": ["angels-processed-tin", "angels-pellet-tin", "angels-ingot-tin", "angels-ingot-tin-2", "angels-ingot-tin-3", "angels-liquid-molten-tin", "angels-roll-tin", "angels-roll-tin-2", "angels-plate-tin", "angels-plate-tin-2"],
+  "declared_transformation_state": {
+    "recipes": ["angels-processed-tin", "angels-pellet-tin", "angels-ingot-tin", "angels-ingot-tin-2", "angels-ingot-tin-3", "angels-liquid-molten-tin", "angels-roll-tin", "angels-roll-tin-2", "angels-plate-tin", "angels-plate-tin-2"],
+    "enabled": false,
+    "hidden": true,
+    "category": null,
+    "category_disposition": "implicit-crafting",
+    "auto_recycle": false
+  },
+  "ordinary_acquisition_routes": [],
+  "ordinary_acquisition_disposition": "unsupported-no-producer-for-angels-tin-ore",
+  "category": "implicit-crafting",
+  "conditional_crafting_category_capability": {
+    "category": "implicit-crafting",
+    "entities": ["assembling-machine-1", "assembling-machine-2", "assembling-machine-3"],
+    "not_a_reachable_route": true
+  },
+  "productivity": {
+    "permission_recipes": ["angels-plate-tin", "angels-plate-tin-2"],
+    "native_owner_technologies": [],
+    "mir_owner_technology": null,
+    "disposition": "permission-present-without-native-or-mir-owner"
+  },
+  "side_paths": {
+    "plate_to_ore_recycling_or_return_paths": [],
+    "catalyst_paths": [],
+    "transformation_byproducts": [{"recipe": "angels-roll-tin-2", "product": "angels-liquid-coolant-used", "amount": 40}]
+  },
+  "science_lab_frontier": {
+    "technology": "angels-tin-smelting-1",
+    "science": ["automation-science-pack"],
+    "lab": "lab",
+    "enabled": false,
+    "hidden": true,
+    "reachable": false
+  },
+  "observed_disposition": "diagnostic-unsupported-no-ordinary-acquisition-or-productivity-owner",
+  "evidence_role": "bounded diagnostic input to A06 BA-07 A17 and PROG-01; not completion authority",
+  "explicit_non_claims": ["Bob-plus-Angel", "F200", "Angel-productivity-support-or-admission", "PIPE-01", "infinite-continuation", "weighted-balance", "full-BA-07-or-PROG-01", "release-readiness", "upgrade-or-persisted-save-recovery"]
+}

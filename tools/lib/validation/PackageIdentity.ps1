@@ -17,7 +17,35 @@ function Get-MIRLegacyRootPackageSourceRoots {
 }
 
 function Get-MIRPackageSourceRoots {
-  return @('src/mod', 'targets')
+  return @('source', 'targets')
+}
+
+function Get-MIRPackageSourceLayoutFromPaths {
+  param([Parameter(Mandatory)][AllowEmptyCollection()][string[]]$Paths)
+
+  $pathSet = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  foreach ($path in @($Paths)) { $null = $pathSet.Add(([string]$path).Replace('\', '/')) }
+  if ($pathSet.Contains('source/package-source.json') -and
+      $pathSet.Contains('targets/package-authority.json')) {
+    return [pscustomobject][ordered]@{
+      kind = 'canonical-materializer-source'
+      roots = @(Get-MIRPackageSourceRoots)
+    }
+  }
+  if ($pathSet.Contains('src/mod/package-source.json') -and
+      $pathSet.Contains('targets/package-authority.json')) {
+    return [pscustomobject][ordered]@{
+      kind = 'canonical-materializer-source-v1'
+      roots = @('src/mod', 'targets')
+    }
+  }
+  if ($pathSet.Contains('info.json') -and $pathSet.Contains('data.lua')) {
+    return [pscustomobject][ordered]@{
+      kind = 'historical-legacy-root'
+      roots = @(Get-MIRLegacyRootPackageSourceRoots)
+    }
+  }
+  throw 'Paths do not contain a recognized package-source layout.'
 }
 
 function Get-MIRPackageSourceLayoutAtCommit {
@@ -29,20 +57,8 @@ function Get-MIRPackageSourceLayoutAtCommit {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $trackedPaths = @(& git -C $repo ls-tree -r --name-only $Commit 2>$null)
   if ($LASTEXITCODE -ne 0) { throw "Unable to inspect package-source layout at commit $Commit." }
-  if ($trackedPaths -ccontains 'src/mod/package-source.json' -and
-      $trackedPaths -ccontains 'targets/package-authority.json') {
-    return [pscustomobject][ordered]@{
-      kind = 'canonical-materializer-source'
-      roots = @(Get-MIRPackageSourceRoots)
-    }
-  }
-  if ($trackedPaths -ccontains 'info.json' -and $trackedPaths -ccontains 'data.lua') {
-    return [pscustomobject][ordered]@{
-      kind = 'historical-legacy-root'
-      roots = @(Get-MIRLegacyRootPackageSourceRoots)
-    }
-  }
-  throw "Commit does not contain a recognized package-source layout: $Commit"
+  try { return Get-MIRPackageSourceLayoutFromPaths -Paths $trackedPaths }
+  catch { throw "Commit does not contain a recognized package-source layout: $Commit" }
 }
 
 function Get-MIRPackageOutputPaths {
@@ -52,7 +68,7 @@ function Get-MIRPackageOutputPaths {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $manifestPath = Join-Path $repo 'src/mod/package-source.json'
+  $manifestPath = Join-Path $repo 'source/package-source.json'
   if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
     throw '[mir4-canonical-package-source-manifest-missing]'
   }
@@ -82,11 +98,14 @@ function Resolve-MIRPackageCommandPath {
 }
 
 function Get-MIRPackageSourceFiles {
-  param([Parameter(Mandatory)][string]$RepoRoot)
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [string[]]$Roots = @(Get-MIRPackageSourceRoots)
+  )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $files = @()
-  foreach ($relative in Get-MIRPackageSourceRoots) {
+  foreach ($relative in @($Roots)) {
     $path = Join-Path $repo $relative
     if (Test-Path -LiteralPath $path -PathType Leaf) {
       $files += $relative.Replace("\", "/")
@@ -263,11 +282,14 @@ function Get-MIRZipEntryContentIdentity {
 }
 
 function Get-MIRPackageSourceFingerprint {
-  param([Parameter(Mandatory)][string]$RepoRoot)
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [string[]]$Roots = @(Get-MIRPackageSourceRoots)
+  )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $rows = @(
-    foreach ($relative in Get-MIRPackageSourceFiles -RepoRoot $repo) {
+    foreach ($relative in Get-MIRPackageSourceFiles -RepoRoot $repo -Roots $Roots) {
       $path = Join-Path $repo $relative
       $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
       "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256

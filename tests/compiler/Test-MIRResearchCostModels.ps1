@@ -7,6 +7,15 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path }
+$RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target 'f210'
+
+function Resolve-MIRResearchCostTestPath([string]$RelativePath) {
+  $currentPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath -AllowMissing
+  if ($null -ne $currentPath) { return $currentPath }
+  return Join-Path $RepoRoot $RelativePath
+}
 
 function Get-CanonicalFormula {
   param([int]$Anchor, [double]$Base, [int]$Increment, [double]$Growth)
@@ -95,19 +104,22 @@ $paths = @{
   PublicArtifactBudget = "prototypes/mir/domain/compiler/public_artifact_budget.lua"
   ModData = "prototypes/mir/emit/mod_data.lua"
   Orchestrator = "prototypes/mir/pipeline/compiler_orchestrator.lua"
+  Publication = "prototypes/mir/pipeline/compiler_orchestrator/publication.lua"
   AdoptionEmitter = "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
   AdoptionRuntime = "prototypes/mir/runtime/productivity_family_adoption.lua"
-  Streams = "prototypes/mir/planner/stream_compiler.lua"
+  Streams = "prototypes/mir/planner/stream_compiler/qualify.lua"
   NativeCost = "prototypes/mir/domain/native_owner/cost_model.lua"
   Native = "prototypes/mir/planner/native_owner_binding.lua"
-  Continuations = "prototypes/mir/planner/base_continuations.lua"
+  Continuations = "prototypes/mir/planner/base_continuations/plan.lua"
   MaximumLevel = "prototypes/mir/policy/max_level.lua"
-  MaximumBinding = "prototypes/mir/domain/technology/maximum_level_binding.lua"
+  MaximumLevelBinding = "prototypes/mir/domain/technology/maximum_level_binding.lua"
+  MaximumLevelContext = "prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua"
+  MaximumLevelPresentation = "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua"
   RuntimeMaximum = "prototypes/mir/runtime/maximum_level_control.lua"
 }
 $source = @{}
 foreach ($entry in $paths.GetEnumerator()) {
-  $path = Join-Path $RepoRoot $entry.Value
+  $path = Resolve-MIRResearchCostTestPath $entry.Value
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Missing research-cost module: $($entry.Value)" }
   $source[$entry.Key] = Get-Content -Raw -LiteralPath $path
 }
@@ -178,10 +190,10 @@ if ($source.PublicArtifactBudget -notmatch '\["mir-research-cost-support-public"
     $source.PublicArtifacts -notmatch 'function M\.research_cost_compatibility') {
   throw "Research-cost compatibility support does not have a hard 16 KiB public projection budget."
 }
-$finalResultIndex = $source.Orchestrator.IndexOf('local final_result = context:state_view("final_compiler_result")')
-$sliceIndex = $source.Orchestrator.IndexOf('research_cost_compatibility.build({')
+$finalResultIndex = $source.Publication.IndexOf('local final_result = context:state_view("final_compiler_result")')
+$sliceIndex = $source.Publication.IndexOf('research_cost_compatibility.build({')
 if ($finalResultIndex -lt 0 -or $sliceIndex -le $finalResultIndex -or
-    $source.Orchestrator -notmatch 'research_cost_compatibility_adapter"\)\.publish') {
+    $source.Publication -notmatch 'research_cost_compatibility_adapter"\)\.publish') {
   throw "Research-cost compatibility support must derive and publish only after final CompilerResult authority exists."
 }
 foreach ($budget in @(
@@ -226,21 +238,41 @@ foreach ($route in @("Streams", "Native", "Continuations", "MaximumLevel")) {
     throw "$route may not make prototypes infinite without the governed scripted maximum-level controller."
   }
 }
-if ($source.ModData -notmatch 'target_line\.mod_data_supported\(\)' -or
-    $source.RuntimeMaximum -notmatch 'if next\(managed\) == nil then' -or
-    $source.RuntimeMaximum -notmatch 'add_runtime_settings_policy\(managed\)' -or
-    $source.RuntimeMaximum -notmatch 'selected_maximum\(setting_name\)') {
-  throw "Runtime maximum-level policy must use mod-data where supported and reconstruct the same binding from startup settings otherwise."
+$maximumLevelBindingPath = 'prototypes/mir/domain/technology/maximum_level_binding.lua'
+foreach ($target in @('f210', 'f200')) {
+  $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target
+  if ($null -eq (Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $maximumLevelBindingPath -AllowMissing)) {
+    throw "Current $target composition must materialize the schema-3 MaximumLevelBinding module."
+  }
 }
-if ($source.MaximumBinding -match 'data\.raw|prototypes\.technology|target_line' -or
-    $source.MaximumBinding -notmatch 'MIRMaximumLevelPolicyV3' -or
-    $source.MaximumBinding -notmatch 'absolute-highest-technology-level' -or
-    $source.MaximumBinding -notmatch 'exact-technology' -or
-    $source.MaximumBinding -notmatch 'maximum_level_unknown_finalizer_adapter' -or
-    $source.Orchestrator -notmatch 'maximum_level_binding\.from_plan' -or
-    $source.ModData -notmatch 'maximum-level-policy-v3' -or
-    $source.RuntimeMaximum -notmatch 'record_type == "MaximumLevelBinding"') {
-  throw "Schema-3 MaximumLevelBinding must remain the pure normalized authority consumed by compiler transport and runtime."
+foreach ($target in @('f110', 'f100')) {
+  $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target
+  if ($null -ne (Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $maximumLevelBindingPath -AllowMissing)) {
+    throw "Current $target composition must omit the script-owned schema-3 MaximumLevelBinding module."
+  }
+}
+foreach ($required in @(
+  'local SCHEMA = 3',
+  'local KIND = "MIRMaximumLevelPolicyV3"',
+  '["exact-technology"] = 1',
+  'semantics = "absolute-highest-technology-level"',
+  'finalizer_status = "pending"',
+  'function M.observe_finalizers'
+)) {
+  if (-not $source.MaximumLevelBinding.Contains($required)) {
+    throw "Current schema-3 MaximumLevelBinding contract is missing: $required"
+  }
+}
+if ($source.MaximumLevelContext -notmatch 'maximum_level_binding\.from_plan\(latest' -or
+    $source.MaximumLevelPresentation -notmatch 'maximum_level_binding\.observe_finalizers\(policy, observations\)' -or
+    $source.MaximumLevelPresentation -notmatch 'context:replace_epoch\(' -or
+    $source.ModData -notmatch 'more-infinite-research\.maximum-level-policy-v3' -or
+    $source.RuntimeMaximum -notmatch 'POLICY_VERSION = 3' -or
+    $source.RuntimeMaximum -notmatch 'if target_line\.mod_data_supported\(\) then return \{\}, true end' -or
+    $source.RuntimeMaximum -notmatch 'if not managed then\s+managed = \{\}\s+add_runtime_settings_policy\(managed\)' -or
+    $source.RuntimeMaximum -notmatch 'legacy-v2-read-only' -or
+    $source.RuntimeMaximum -notmatch 'selected_maximum\(setting_name\)') {
+  throw "Current maximum-level policy must publish V3, fail closed on missing modern transport, retain read-only V2 migration, and limit settings reconstruction to targets without mod-data."
 }
 if ($source.Continuations -notmatch 'base_coefficient \* \(growth \^ \(desired_new_level - 1\)\)' -or
     $source.Continuations -notmatch 'legacy_formula_number\(base_coefficient\)' -or
@@ -262,12 +294,12 @@ if ($projectedHybridNextCost -le $projectedInserterAnchorCost) {
   throw "The base-continuation additive increment did not begin after the projected anchor."
 }
 
-$defaults = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/settings/defaults.lua")
+$defaults = Get-Content -Raw -LiteralPath (Resolve-MIRResearchCostTestPath 'prototypes/mir/settings/defaults.lua')
 if ($defaults -notmatch 'linear_increment\s*=\s*0') { throw "Default linear increment must remain zero." }
 $unknownFixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures/native-owner-unrecognized-formula/data-updates.lua")
 if ($unknownFixture -notmatch 'L\^2') { throw "Unknown-formula fixture must remain outside the supported fixed/linear/exponential/hybrid family." }
 
-$contract = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $paths.ContractAuthority) | ConvertFrom-Json
+$contract = Get-Content -Raw -LiteralPath (Resolve-MIRResearchCostTestPath $paths.ContractAuthority) | ConvertFrom-Json
 if ([int]$contract.schema -ne 1 -or [string]$contract.kind -ne "mir-research-cost-contract" -or
     [string]$contract.release -ne "3.2.5" -or [string]$contract.public_predecessor -ne "3.2.3" -or
     [string]$contract.authority_state -ne "product-complete-awaiting-source-freeze") {

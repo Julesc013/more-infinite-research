@@ -44,7 +44,7 @@ MIR compiler namespace:
   prototypes/mir/compatibility/
 
 Development workspace:
-  docs/, fixtures/, scripts/, tests/, build/, dist/, todo.md, CONTRIBUTING.md
+  docs/, fixtures/, scripts/, tests/, build/, dist/, TODO.md, CONTRIBUTING.md
 ```
 
 Root entrypoints should become thin stage wrappers. Compatibility packs register policy overlays only. `emit/` is the only layer that creates generated technology prototypes and MIR mod-data prototypes. Old shim paths are not part of the 3.x shipped layout; target-line backports must carry any temporary compatibility surface on their own branch.

@@ -92,6 +92,7 @@ function Invoke-MIR4TargetRuntimeReplay {
   try {
     . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
     . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+    . (Join-Path $repo 'tools/mir/application/package/DistributionCustody.ps1')
     . (Join-Path $repo 'tools/lib/validation/FactorioVersionPolicy.ps1')
     $golden = Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/distribution/mir4-golden-four-target-baseline-v1.json') | ConvertFrom-Json
     $baseline = @($golden.targets | Where-Object target -eq $Target)
@@ -110,8 +111,9 @@ function Invoke-MIR4TargetRuntimeReplay {
     $materialization = New-MIR4TargetPackage -RepoRoot $repo -Target $Target -CandidateId $CandidateId -OutputRoot $packageRoot
     if ([string]$materialization.content_sha256 -ne [string]$baseline[0].archive.content_sha256 -or [int]$materialization.entry_count -ne [int]$baseline[0].archive.entry_count) { throw 'F2D materialized target does not match the accepted content identity.' }
     $candidate = [string]$materialization.archive_path
-    $predecessor = Join-Path $repo "dist/more-infinite-research_$([string]$baseline[0].predecessor).zip"
-    if (-not (Test-Path -LiteralPath $predecessor -PathType Leaf)) { throw "F2D predecessor is missing: $predecessor" }
+    $predecessor = [string](Restore-MIR4DistributionArchive `
+      -RepoRoot $repo `
+      -Version ([string]$baseline[0].predecessor)).cache_path
     $redactionPaths = @($work,$factorio,$factorioInstall,$repo)
     $freshRoot = Join-Path $work 'fresh-load-userdata'
     $freshSummaryRoot = Join-Path $work 'fresh-load-summaries'

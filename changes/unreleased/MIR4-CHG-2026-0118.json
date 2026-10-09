@@ -1,0 +1,106 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0118",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Require obtainable pump and boiler placement items for science acquisition.",
+  "details": [
+    "A pump or boiler prototype alone cannot supply a lab or science recipe. The existing typed solver requires its placement item, preserves actor research gates, and rejects unseeded water/steam bootstrap cycles.",
+    "Boilers resolve their input through the same acquisition solver, including independent recipe producers. Alternative sources remain eligible. A researched actor cannot become an initial answer through a warm cache.",
+    "Controlled lab, frontier and recipe-epoch checks retain nine pump contracts and immutable inputs. Native placement, tiles, fuel, power, fluid delivery, production, catalogue and save acceptance remain pending. No new permission, owner or support claim is granted."
+  ],
+  "semantic_domains": [
+    "science",
+    "progression",
+    "compatibility",
+    "documentation"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Uses the shared pump/boiler placement-item acquisition guard. Controlled contract checks do not establish native production, catalogue or saved-world acceptance."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/compiler/lab_reachability.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/researchability_planning.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/compiler/recipe_source_epoch.lua",
+      "kind": "finding"
+    },
+    {
+      "value": "docs/capabilities/science-integration.md",
+      "kind": "document"
+    }
+  ]
+}

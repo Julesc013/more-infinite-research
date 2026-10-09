@@ -5,6 +5,7 @@ $ErrorActionPreference='Stop'
 
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
 
 function Assert-MIR4DocumentationCutover([bool]$Condition,[string]$Code) {
   if (-not $Condition) { throw "[$Code]" }
@@ -33,47 +34,35 @@ $readme = [IO.File]::ReadAllText($readmePath)
 # The maintainer requires the detailed README to remain intact. The historical
 # cutover separated package documentation; its byte limit and landing-page shape
 # are not a continuing license to discard the repository reference.
-foreach ($heading in @('MIR 4.0 Whole-Platform Genesis','Player behavior','Install and upgrade','Repository and branches','Stable player plane reference','Cost Model','Science Packs and Labs','Generated Prototype Names','Research Catalog','Startup Settings','Compatibility Specification','Developer Specification','Validation and Release Workflow','Documentation Map','Troubleshooting','Save Compatibility')) {
+foreach ($heading in @('Development research browser','Player behavior','Install and upgrade','Repository and branches','Stable player plane reference','Cost Model','Science Packs and Labs','Generated Prototype Names','Research Catalog','Startup Settings','Compatibility Specification','Developer Specification','Validation and Release Workflow','Documentation Map','Troubleshooting','Save Compatibility')) {
   Assert-MIR4DocumentationCutover ($readme.Contains("## $heading")) "mir4-readme-section-$($heading.ToLowerInvariant().Replace(' ','-'))"
 }
 foreach ($badge in @('Mod downloads','Latest release','Last updated','Issues','Validate')) {
   Assert-MIR4DocumentationCutover ($readme.Contains("[![$badge]")) 'mir4-readme-badges-preserved'
 }
 Assert-MIR4DocumentationCutover ($readme.Contains('Julesc013/more-infinite-research/validate.yml?branch=main')) 'mir4-readme-ci-badge'
-foreach ($term in @('latest installed official Factorio 2.1 experimental build','runtime API','prototype API','changelog identity','review work','4.1.21000','4.1.20000','4.1.11000','4.1.10000','4.0.21000','4.0.20000','4.0.11000','4.0.10000')) {
-  Assert-MIR4DocumentationCutover ($readme.Contains($term)) 'mir4-readme-current-targets'
-}
+# Versioned package claims belong to the target compositions rather than an
+# accumulating list of historical release labels on the repository homepage.
+$registry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'targets/registry.json') | ConvertFrom-Json -Depth 30
+Assert-MIR4DocumentationCutover ((@($registry.targets | ForEach-Object { [string]$_.target }) -join '|') -ceq 'f210|f200|f110|f100') 'mir4-readme-current-targets'
 # Both reference writers above check their README projections against the same
 # generated blocks as the standalone documents, preventing a second authority.
 foreach ($marker in @('PIPELINE','STREAM DEFAULTS')) {
   Assert-MIR4DocumentationCutover ($readme.Contains("BEGIN GENERATED MIR $marker")) 'mir4-readme-inline-reference'
 }
-Assert-MIR4DocumentationCutover ($readme.Contains('src/mod') -and $readme.Contains('targets') -and $readme.Contains('repository root is not a player package')) 'mir4-readme-package-boundary'
+Assert-MIR4DocumentationCutover ($readme.Contains('source') -and $readme.Contains('targets') -and $readme.Contains('repository root is not a player package')) 'mir4-readme-package-boundary'
 
+$presentation = Get-MIR4CurrentPackagePresentationV3 -RepoRoot $RepoRoot
+$manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'source/package-source.json') | ConvertFrom-Json -Depth 100
 $files = @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $RepoRoot)
 Assert-MIR4DocumentationCutover ('README.md' -notin $files) 'mir4-m41-05b-root-package-membership'
 foreach ($target in @('f210','f200','f110','f100')) {
-  Assert-MIR4DocumentationCutover ("targets/$target/generation/README.md.template" -in $files) 'mir4-m41-05b-target-readme-membership'
-  Assert-MIR4DocumentationCutover ("targets/$target/generation/changelog.txt.template" -in $files) 'mir4-m41-05b-target-changelog-membership'
+  $readme = @($manifest.bindings | Where-Object { [string]$_.source_path -ceq "source/presentation/$target/README.md.template" -and [string]$_.output_path -ceq 'README.md' })
+  $changelog = @($manifest.bindings | Where-Object { [string]$_.source_path -ceq "source/presentation/$target/changelog.txt.template" -and [string]$_.output_path -ceq 'changelog.txt' })
+  Assert-MIR4DocumentationCutover ($readme.Count -eq 1 -and $changelog.Count -eq 1) 'mir4-m41-05b-current-presentation-binding'
 }
-$expectedPackageSourceSha256 = '632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E'
-$powerShellCharacterizationPath = Join-Path $RepoRoot 'releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json'
-if (Test-Path -LiteralPath $powerShellCharacterizationPath -PathType Leaf) {
-  $powerShellCharacterizationText = Get-Content -Raw -LiteralPath $powerShellCharacterizationPath
-  Assert-MIR4DocumentationCutover ($powerShellCharacterizationText | Test-Json -SchemaFile (Join-Path $RepoRoot 'contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json')) 'mir4-m41-05b-powershell-successor-schema'
-  $powerShellCharacterization = $powerShellCharacterizationText | ConvertFrom-Json -Depth 100
-  Assert-MIR4DocumentationCutover (Test-MIR4BootstrapRecordHash -Record $powerShellCharacterization) 'mir4-m41-05b-powershell-successor-record'
-  $expectedPackageSourceSha256 = [string]$powerShellCharacterization.preservation.package_source_sha256
-}
-$freezeEvolutionPath = Join-Path $RepoRoot 'releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json'
-if (Test-Path -LiteralPath $freezeEvolutionPath -PathType Leaf) {
-  $freezeEvolutionText = Get-Content -Raw -LiteralPath $freezeEvolutionPath
-  Assert-MIR4DocumentationCutover ($freezeEvolutionText | Test-Json -SchemaFile (Join-Path $RepoRoot 'contracts/repository/mir4-m41-source-freeze-authority-evolution-v1.schema.json')) 'mir4-readme-freeze-successor-schema'
-  $freezeEvolution = $freezeEvolutionText | ConvertFrom-Json -Depth 100 -DateKind String
-  Assert-MIR4DocumentationCutover (Test-MIR4BootstrapRecordHash -Record $freezeEvolution) 'mir4-readme-freeze-successor-record'
-  $expectedPackageSourceSha256 = [string]$freezeEvolution.package_source.current_sha256
-}
-Assert-MIR4DocumentationCutover ((Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot) -ceq $expectedPackageSourceSha256) 'mir4-m41-05b-package-source-stability'
+Assert-MIR4DocumentationCutover ([string]$presentation.package_source.fingerprint_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot)) 'mir4-m41-05b-current-presentation-fingerprint'
+Assert-MIR4DocumentationCutover ([string]$presentation.package_source.legacy_root_state -ceq 'retired-historical-read-only') 'mir4-m41-05b-current-presentation-root-state'
 
 $programmeText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json')
 Assert-MIR4DocumentationCutover ($programmeText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-4x-operating-programme-v1.schema.json')) 'mir4-m41-05b-programme-schema'
