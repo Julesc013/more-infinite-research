@@ -285,7 +285,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/schemas/technology-lifecycle.md | Technology Lifecycle Schemas | current | developer | reference | mir-maintainers | 2026-08-03 |
 | docs/reference/settings-reference.md | Settings Reference | archived | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/settings.md | Settings Reference | current | developer | reference | mir-maintainers | 2026-10-07 |
-| docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-10-09 |
+| docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-10-10 |
 | docs/releases/0.x-factorio-version-metadata-correction.md | MIR 0.x Factorio Version Metadata Correction | current | release-manager | reference | mir-maintainers | 2026-07-16 |
 | docs/releases/3.2.1-emergency-build-trigger.md | MIR 3.2.1 Emergency Build Trigger | historical-checkpoint | release-manager | release-plan | mir-maintainers | 2026-07-26 |
 | docs/releases/3.2.2-to-3.2.3-repository-change-report.md | MIR 3.2.2 To 3.2.3 Repository Change Report | current | release-manager | reference | mir-maintainers | 2026-07-31 |

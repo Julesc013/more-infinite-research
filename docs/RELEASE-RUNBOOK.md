@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-09
+last_reviewed: 2026-10-10
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -49,6 +49,8 @@ On 9 October, after the remaining qualification/signing/recovery/review gaps wer
 This later maintainer acceptance superseded the earlier conditional publication timing only for those accepted bytes. The original conditional authorization, blocked readiness records and 4.2.0 receipts retain their original meaning. No missing result was converted to a pass, no signature was invented, and no external protection or immutability setting was changed. The [4.2.2 handoff](https://github.com/Julesc013/more-infinite-research/releases/download/v4.2.1/MIR-4.2.2-backlog.md) carries unfinished work forward. The normal readiness sequence below remains the default for subsequent releases; the 4.2.1 decision is not a reusable waiver.
 
 ## Readiness order
+
+The 4.2.2 package-writer extension accepts explicit `-SourceVersion 4.2.2` in the canonical materializer and historical package command. It writes `CCC02` consistently to the ZIP root, metadata, leading changelog entry and package identity heading, while retaining authored history and prose. The shared metadata helper still defaults to 4.2.1 and rejects a mismatched numeric patch before writes. Tiny-file checks cover all nine identities; repeated F210 and F013 construction proves the two writer paths and package exclusions. These are private construction results only. The joined nine-target construction/campaign contract, published 4.2.1 predecessor custody, current 4.2.2 release narratives and native acceptance still need their own adoption and qualification; the older automatic verification default must not be satisfied by recreating a missing 4.0 candidate.
 
 1. Reconcile exact repository, programme, queue, branch, and external-state identity.
 2. Run the release doctor. Distinguish registered, fail-closed, executor-implemented, dry-run-passed, production-rehearsal-passed, and production-authorized. Until the first official 2.1 stable release, F210 selects the latest official Steam experimental 2.1.x at or above the current governed floor and records its exact version and executable hash in every proof. A Steam update selects a new execution identity, invalidates cross-patch evidence reuse, and materializes the API and opportunity review task set; it does not permanently pin the former patch. If newer APIs are adopted, raise the declared compatibility floor through an exact qualified change. When official 2.1 stable appears, stop and reopen the channel, floor, and release policy with the maintainer.

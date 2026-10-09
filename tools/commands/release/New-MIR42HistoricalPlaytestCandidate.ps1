@@ -2,7 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
-  [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
@@ -202,7 +202,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   $tree = Join-Path $candidateParent "more-infinite-research_$distributionVersion"
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
-  if ($SourceVersion -ceq '4.2.1') {
+  if ($SourceVersion -in @('4.2.1','4.2.2')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.
     $readmePath = Join-Path $tree 'README.md'
@@ -213,7 +213,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
       $readme = $readme.Replace($anchor, $anchor.Replace($baselineVersion, $distributionVersion))
     }
     [IO.File]::WriteAllText($readmePath, $readme, [Text.UTF8Encoding]::new($false))
-    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $distributionVersion
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $distributionVersion -SourceVersion $SourceVersion
   }
   $info = Get-Content -Raw -LiteralPath (Join-Path $tree 'info.json') | ConvertFrom-Json -Depth 20
   if ([string]$info.name -cne 'more-infinite-research' -or [string]$info.version -cne $distributionVersion -or
