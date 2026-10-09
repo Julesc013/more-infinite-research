@@ -302,7 +302,7 @@ The reusable mechanism is expanded only after this dossier, implementation, play
 
 ## Component destinations and safety
 
-The following destinations account for the full reviewed inventory. They are delivery obligations, not maturity upgrades. Preserve current authoring roots `source/common`, `source/families`, `source/generation`, `source/package-source.json`, and target overlays.
+The following destinations account for the full reviewed inventory. They are delivery obligations, not maturity upgrades. Use the canonical responsibility-based components in `source/prototypes`, `source/presentation`, `source/adapters`, `source/generation`, `source/locale`, `source/migrations` and `source/assets`. `source/package-source.json` composes those components with target overlays; target selection does not create another editable mod tree.
 
 | Component | Destination | Next obligation |
 | --- | --- | --- |
