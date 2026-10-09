@@ -7,6 +7,12 @@
   ],
   "paths": [
     {
+      "pattern": "tests/runtime/k2_imersite_version_controls.lua",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
       "pattern": "tests/runtime/Test-MIRModernLaunchReturn*.ps1",
       "scenarios": [],
       "tags": [],

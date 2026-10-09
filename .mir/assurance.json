@@ -422,7 +422,7 @@
     },
     {
       "id": "direct-library-activation",
-      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tools/lib/workspace/RepoPaths[.]ps1$", "^tools/lib/validation/(?:FactorioProcess|ImmutableInputStaging)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/support/MIR421SpaceFakeUpgrade[.]ps1$", "^tests/runtime/Test-MIR(?:K2213ImersiteContinuation|Upgrade)[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210[.]json$"],
+      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tools/lib/workspace/RepoPaths[.]ps1$", "^tools/lib/validation/(?:FactorioProcess|ImmutableInputStaging)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/support/MIR421SpaceFakeUpgrade[.]ps1$", "^tests/runtime/Test-MIR(?:K2213ImersiteContinuation|Upgrade)[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210(?:-422)?[.]json$"],
       "tests": ["static.direct-library-activation"]
     },
     {
@@ -432,7 +432,7 @@
     },
     {
       "id": "native-probe-resources",
-      "patterns": ["^tools/lib/validation/(?:NativeProbeResources|BrowserContinuityInputs)[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/Test-MIR(?:ResearchBrowser|BrowserPersonalStateContinuity|42CapOwnershipMultiforce)[.]ps1$"],
+      "patterns": ["^tools/lib/validation/(?:NativeProbeResources|BrowserContinuityInputs)[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/k2_imersite_version_controls[.]lua$", "^tests/runtime/Test-MIR(?:ResearchBrowser|BrowserPersonalStateContinuity|42CapOwnershipMultiforce)[.]ps1$"],
       "tests": ["static.immutable-input-staging", "static.direct-library-activation", "runtime.material-route-guard", "runtime.research-browser"]
     },
     {

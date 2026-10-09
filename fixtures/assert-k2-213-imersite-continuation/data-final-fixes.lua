@@ -11,9 +11,10 @@ log("[MIR_ACTIVE_MODS] " .. table.concat(active, "|"))
 
 local expected = {
   Krastorio2 = "2.1.3",
-  ["Krastorio2-spaced-out"] = "2.0.13",
-  ["more-infinite-research"] = "4.2.21001"
+  ["Krastorio2-spaced-out"] = "2.0.13"
 }
+if mods["more-infinite-research"] ~= "4.2.21001"
+    and mods["more-infinite-research"] ~= "4.2.21002" then fail("unexpected exact MIR candidate") end
 if mods.base ~= "2.1.20" and mods.base ~= "2.1.21" then fail("unexpected exact engine") end
 for name, version in pairs(expected) do
   if mods[name] ~= version then fail("unexpected exact profile " .. name) end

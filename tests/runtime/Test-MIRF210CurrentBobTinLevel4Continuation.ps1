@@ -11,6 +11,7 @@ param(
   [string]$SettingsPath = '',
   [string]$CandidateZip = '',
   [string]$SourceMaterializationPath = '',
+  [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1',
   [string]$OutputRoot = 'build/p/f210-tin-level4',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
@@ -68,8 +69,9 @@ function Assert-TinRuntimeApiSurface([string]$FixtureControl, [string]$EngineRoo
   Assert-Tin (-not $control.Contains('get_recipe_productivity_bonus', [StringComparison]::Ordinal)) 'fixture still calls unsupported LuaForce productivity accessor'
   Assert-Tin ($control.Contains('force.recipes[recipe_name]', [StringComparison]::Ordinal) -and $control.Contains('recipe.productivity_bonus', [StringComparison]::Ordinal)) 'fixture does not use the documented force recipe productivity bonus'
 }
-function Read-TinCurrentCandidate([string]$Repository, [string]$Archive, [string]$ReceiptPath) {
-  Read-MIRNativeProbeF210CurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $ReceiptPath
+function Read-TinCurrentCandidate([string]$Repository, [string]$Archive, [string]$ReceiptPath,
+  [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1') {
+  Read-MIRNativeProbeF210CurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $ReceiptPath -SourceVersion $SourceVersion
 }
 function Resolve-TinEngineBinding {
   param($Dossier,[string]$Version,[string]$Sha256)
@@ -220,7 +222,7 @@ Assert-Tin ((Get-TinSha $engine) -ceq $expectedEngineSha) 'engine differs from i
 Assert-TinRuntimeApiSurface (Join-Path $fixtureRoot 'control.lua') $engineRoot
 Assert-Tin ($LocalModLibraryDirs.Count -eq 1) 'supply exactly one explicit flat archive library'
 $library=(Resolve-Path -LiteralPath $LocalModLibraryDirs[0]).Path
-$candidateInput = Read-TinCurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath
+$candidateInput = Read-TinCurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -SourceVersion $SourceVersion
 $candidate = $candidateInput.path
 $direct=Read-TinDirectLibraryInputs -Library $library -ExpectedArchives $expectedArchives -Candidate $candidateInput -FixtureRoot $fixtureRoot -EngineVersion $engineBinding.version -OfficialMods $dossier.target.official_mods
 $stageSettings=''
@@ -237,7 +239,7 @@ $prepared = [ordered]@{
   kind = 'MIR4F210CurrentBobTinLevelFourContinuationV2'
   status = 'prepared'
   scope = "Fresh F210 Bob-only Tin level-four production/reload observation; engine $($engineBinding.version); settings $SettingsMode. No historical engine or settings pass is transferred."
-  source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree; package_source_sha256 = Get-TinSha (Join-Path $repo 'source/package-source.json') }
+  source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree; package_source_sha256 = $candidateInput.receipt.package_source_sha256; source_version = $candidateInput.receipt.source_version; distribution_version = $candidateInput.receipt.distribution_version }
   exact_stage = [ordered]@{ path = $null; engine_sha256 = $expectedEngineSha; engine_version=$engineBinding.version; settings_sha256 = $expectedSettingsSha; settings_mode=$SettingsMode; archives = $expectedArchives; input_mode='direct-library'; library=$library }
   prior_environment = [ordered]@{engine_version=$engineBinding.prior_engine_version;engine_sha256=$engineBinding.prior_engine_sha256;settings_sha256=$dossier.target.stage_settings_sha256;role='historical-provenance-only'}
   materialization = Get-TinArtifact $repo (Resolve-Path -LiteralPath $SourceMaterializationPath).Path
