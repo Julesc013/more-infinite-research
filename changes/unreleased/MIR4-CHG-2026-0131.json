@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0131",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Recognize modern rocket-return science through payload, silo and construction acquisition.",
+  "details": [
+    "Factorio 2.0/2.1 launch products use the existing typed solver for their payload, obtainable fixed-recipe silo and construction inputs. The selected source retains all research gates without inventing a recipe output for the returned pack.",
+    "Construction shares the silo surface and input-port requirements; discarded recipe products remain unavailable. Existing researchability checks reject self-locks and cycles, preserve independent unlock alternatives and continue to apply bounded diagnostic work limits.",
+    "Controlled LAUNCH01-LAUNCH19 cases cover this source contract. Actual current-package launches, catalogue changes, production and save qualification remain pending under A04; platform logistics and historical launch contracts are not newly qualified."
+  ],
+  "semantic_domains": [
+    "compatibility",
+    "progression"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Modern launch-return route and shared research-gate controls; controlled regression passed, native catalogue and save qualification pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Modern launch-return route and shared research-gate controls; controlled regression passed, native catalogue and save qualification pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared research-gate refactor only; modern launch fields remain withheld on historical targets and target-specific behavior is unqualified."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared research-gate refactor only; modern launch fields remain withheld on historical targets and target-specific behavior is unqualified."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Shared research-gate refactor only; modern launch fields remain withheld on historical targets and target-specific behavior is unqualified."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Shared research-gate refactor only; modern launch fields remain withheld on historical targets and target-specific behavior is unqualified."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Shared research-gate refactor only; modern launch fields remain withheld on historical targets and target-specific behavior is unqualified."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Shared research-gate refactor only; modern launch fields remain withheld on historical targets and target-specific behavior is unqualified."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Shared research-gate refactor only; modern launch fields remain withheld on historical targets and target-specific behavior is unqualified."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "A04: launch acquisition follow-up retained in the published 4.2.2 backlog"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/researchability_planning.lua: LAUNCH01 through LAUNCH19"
+    },
+    {
+      "kind": "document",
+      "value": "docs/capabilities/science-integration.md"
+    }
+  ]
+}
