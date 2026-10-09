@@ -143,7 +143,7 @@
     },
     {
       "id": "mir42-nine-target-evidence",
-      "patterns": ["^tools/mir/application/release/readiness/MIR42(?:EvidenceReconciliation|IndependentEvidenceRehash|TechnicalSeal|ProtectedMainPromotion|ProtectedMainChecks|ReleaseAssets)[.]ps1$", "^tools/commands/release/Invoke-MIR42NineTarget(?:EvidenceReconciliation|IndependentEvidenceRehash|SealPromotion|ReleaseAssets)[.]ps1$", "^tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme[.]ps1$", "^tests/release/Test-MIR42NineTarget(?:EvidenceGenerators|EntryPointScope|TechnicalSeal|ReleaseAuthority|Promotion|ReleaseAssets|WrittenGoAuthorization)[.]ps1$", "^tests/release/Test-MIR42ProtectedMainChecks[.]ps1$", "^[.]mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1[.]json$", "^spec/schemas/mir42-maintainer-written-release-authorization-v1[.]schema[.]json$"],
+      "patterns": ["^tools/mir/application/release/readiness/MIR42(?:EvidenceReconciliation|IndependentEvidenceRehash|TechnicalSeal|ProtectedMainPromotion|ProtectedMainChecks|ReleaseAssets)[.]ps1$", "^tools/commands/release/Invoke-MIR42NineTarget(?:EvidenceReconciliation|IndependentEvidenceRehash|SealPromotion|ReleaseAssets)[.]ps1$", "^tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme[.]ps1$", "^tests/release/Test-MIR42NineTarget(?:EvidenceGenerators|EntryPointScope|TechnicalSeal|ReleaseAuthority|Promotion|ReleaseAssets|WrittenGoAuthorization)[.]ps1$", "^tests/release/Test-MIR42ProtectedMainChecks[.]ps1$", "^[.]mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1[.]json$", "^spec/schemas/mir42[12]?-maintainer-written-release-authorization-v1[.]schema[.]json$", "^tests/support/MIR421ReleaseAssetControls[.]ps1$", "^fixtures/release-inputs/mir42[12]-published-42[01]-manifest[.]json$"],
       "tests": ["static.mir42-nine-target-evidence-generators", "static.mir42-nine-target-entrypoint-scope", "static.mir42-nine-target-seal-readers", "static.mir42-nine-target-release-authority", "static.mir42-nine-target-promotion", "static.mir42-nine-target-release-assets", "static.mir42-nine-target-written-go-authorization", "static.mir42-protected-main-checks"]
     },
     {
@@ -428,7 +428,7 @@
     },
     {
       "id": "direct-library-activation",
-      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tools/lib/workspace/RepoPaths[.]ps1$", "^tools/lib/validation/(?:FactorioProcess|ImmutableInputStaging)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/support/MIR421SpaceFakeUpgrade[.]ps1$", "^tests/runtime/Test-MIR(?:K2213ImersiteContinuation|Upgrade)[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210(?:-422)?[.]json$"],
+      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tools/lib/workspace/RepoPaths[.]ps1$", "^tools/lib/validation/(?:FactorioProcess|ImmutableInputStaging)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/support/MIR421SpaceFakeUpgrade[.]ps1$", "^tests/runtime/Test-MIR(?:K2213ImersiteContinuation|Upgrade)[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210(?:-422)?[.]json$", "^fixtures/assert-upgrade-(?:4-0-(?:210|200|110|100)00-to-4-1-(?:210|200|110|100)00|historical-terminal-to-mir42)/"],
       "tests": ["static.direct-library-activation"]
     },
     {

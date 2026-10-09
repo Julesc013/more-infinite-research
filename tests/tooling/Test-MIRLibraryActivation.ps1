@@ -50,11 +50,11 @@ Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Targe
 Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $baseFixture 'info.json'))-ceq$baseInfoHash) 'prepared base fixture identity is idempotent'
 Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Target f200} 'mir421-modern-base-fixture-template'
 Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $baseFixture 'info.json'))-ceq$baseInfoHash) 'wrong-target refusal preserves fixture bytes'
-foreach($target422 in @('f210','f200')){
+foreach($target422 in @('f210','f200','f110','f100')){
   $fixture422=Join-Path $root ('owned-fixtures/'+$target422+'-422')
   [IO.Directory]::CreateDirectory($fixture422)|Out-Null
   $info422=Join-Path $fixture422 'info.json';$code422=$target422.Substring(1)
-  Write-TestJson $info422 @{name="mir-fixture-assert-upgrade-4-0-${code422}00-to-4-1-${code422}00";version='0.1.0';factorio_version=if($target422-ceq'f210'){'2.1'}else{'2.0'};dependencies=@('base')}
+  Write-TestJson $info422 @{name="mir-fixture-assert-upgrade-4-0-${code422}00-to-4-1-${code422}00";version='0.1.0';factorio_version=switch($target422){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'}};dependencies=@('base')}
   Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixture422 -Target $target422 -SourceVersion '4.2.2'
   Assert-LibraryTest ((Get-Content -LiteralPath $info422 -Raw|ConvertFrom-Json).version-ceq'0.1.2') "4.2.2 $target422 fixture does not collide with prior upgrades"
   $hash422=Get-MIRImmutableInputSha256 $info422
@@ -63,8 +63,53 @@ foreach($target422 in @('f210','f200')){
   Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixture422 -Target $target422} 'mir421-modern-base-fixture-template'
   Assert-LibraryTest ((Get-MIRImmutableInputSha256 $info422)-ceq$hash422) 'default source cannot rebrand a prepared 4.2.2 fixture'
 }
+foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(1,2)){
+  $prepared=Join-Path $root "owned-fixtures/historical-$target-$patch"
+  [IO.Directory]::CreateDirectory($prepared)|Out-Null
+  $path=Join-Path $prepared 'info.json'
+  $info=Get-Content -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-historical-terminal-to-mir42/info.json') -Raw|ConvertFrom-Json
+  $info.factorio_version='0.'+[int]$target.Substring(1)
+  $info.dependencies=@('base',('more-infinite-research >= 4.2.'+$target.Substring(1)+'0'+($patch-1)))
+  Write-TestJson $path $info
+  Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $prepared -Target $target -SourceVersion "4.2.$patch"
+  $read=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json
+  Assert-LibraryTest ($read.version-ceq"1.0.$patch"-and$read.name-ceq$info.name-and($read.dependencies-join'|')-ceq($info.dependencies-join'|')) "$target maintenance fixture $patch retains metadata under a distinct identity"
+  $hash=Get-MIRImmutableInputSha256 $path
+  Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $prepared -Target $target -SourceVersion "4.2.$patch"
+  Assert-LibraryTest ((Get-MIRImmutableInputSha256 $path)-ceq$hash) "$target historical fixture identity is idempotent"
+  Assert-LibraryRefusal {Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $prepared -Target $target -SourceVersion $(if($patch-eq1){'4.2.2'}else{'4.2.1'})} 'mir42-historical-maintenance-fixture-template'
+  $otherTarget=if($target-ceq'f013'){'f014'}else{'f013'}
+  Assert-LibraryRefusal {Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $prepared -Target $otherTarget -SourceVersion "4.2.$patch"} 'mir42-historical-maintenance-fixture-template'
+  Assert-LibraryTest ((Get-MIRImmutableInputSha256 $path)-ceq$hash) "$target historical refusal preserves bytes"
+}}
 Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $baseFixture -Target f210 -SourceVersion '4.2.2'} 'mir421-modern-base-fixture-template'
 Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Target f210} 'mir441-resource-output-root'
+function Test-MaintenanceFixtureCallSites {
+  $tokens=$null;$errors=$null
+  $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$tokens,[ref]$errors)
+  Assert-LibraryTest (-not$errors.Count) 'upgrade fixture caller parses'
+  $resolver=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name-ceq'Resolve-MIRHistoricalUpgradeTransition'},$true))
+  $modern=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Extent.Text.StartsWith("if (`$FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000'")},$true))
+  $historicalBlocks=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Extent.Text.StartsWith('if ($isHistoricalTerminalFixture) {') -and $n.Extent.Text.Contains('$historical = Resolve-MIRHistoricalUpgradeTransition')},$true))
+  Assert-LibraryTest ($resolver.Count-eq1-and$modern.Count-eq1-and$historicalBlocks.Count-eq1) 'upgrade fixture specialization call sites are unambiguous'
+  . ([scriptblock]::Create($resolver[0].Extent.Text))
+  foreach($targetToken in @('210','200','110','100','017','016','015','014','013')){foreach($patch in @(1,2)){
+    $code=$targetToken
+    $SourceVersion="4.2.$patch";$FromVersion="4.2.${code}0$($patch-1)";$ToVersion="4.2.${code}0$patch"
+    $isHistoricalTerminalFixture=$code.StartsWith('0');$SpaceIsFake=$false;$Archetype='base-default'
+    $FixtureName=if($isHistoricalTerminalFixture){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
+    $stagedFixture=Join-Path $root "owned-fixtures/caller-$code-$patch"
+    Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$FixtureName)) -Destination $stagedFixture -Recurse
+    $block=if($isHistoricalTerminalFixture){$historicalBlocks[0]}else{$modern[0]}
+    . ([scriptblock]::Create($block.Extent.Text))
+    $read=Get-Content -LiteralPath (Join-Path $stagedFixture 'info.json') -Raw|ConvertFrom-Json
+    $version=if($isHistoricalTerminalFixture){"1.0.$patch"}else{"0.1.$patch"}
+    Assert-LibraryTest ($read.version-ceq$version-and$read.dependencies -ccontains "more-infinite-research >= $FromVersion") "$code/$patch real caller chooses a distinct prepared fixture and predecessor"
+    $control=Get-Content -LiteralPath (Join-Path $stagedFixture 'control.lua') -Raw
+    Assert-LibraryTest ($control.Contains($FromVersion)-and$control.Contains($ToVersion)-and-not$control.Contains('__MIR_UPGRADE_')) "$code/$patch real caller specializes continuity assertions"
+  }}
+}
+Test-MaintenanceFixtureCallSites
 $baseFixtureArchive=New-TestArchive $fixtureName '0.1.1' -InfoJson (Get-Content -LiteralPath (Join-Path $baseFixture 'info.json') -Raw)
 $sifFixtureArchive=New-TestArchive $fixtureName '0.1.0' -InfoJson (Get-Content -LiteralPath (Join-Path $sifFixture 'info.json') -Raw)
 $hashes=@{};foreach($file in @(Get-ChildItem -LiteralPath $library -File)){$hashes[$file.Name]=Get-MIRImmutableInputSha256 $file.FullName}

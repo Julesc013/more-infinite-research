@@ -350,6 +350,25 @@ try {
   $currentContract=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $currentManifest
   $currentEnvelope=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $currentRoot 'candidate-manifest.json')
   Assert-MIR42CandidateBuildTest ($currentManifest.schema-eq3-and$currentContract.source_version-ceq'4.2.2'-and$currentEnvelope.source_version-ceq'4.2.2'-and$currentEnvelope.nine_targets-and-not$currentManifest.publication_authorized-and$currentManifest.qualification-ceq'not-performed') '422-writer-and-consumed-readers-preserve-private-boundary'
+  $currentEvidenceCandidate=[pscustomobject]@{scope='nine-target';targets=$currentManifest.targets;identity=[pscustomobject]@{record=$currentManifest}}
+  $currentEvidence=Get-MIR42EngineEvidenceBindingContract -Candidate $currentEvidenceCandidate -PublishedMaintenance
+  $currentCampaign=Get-MIR42JoinedCampaignInputContract -Candidate $currentEvidenceCandidate -PublishedMaintenance
+  $currentSeal=Get-MIR42TechnicalSealInputContract -Candidate $currentEvidenceCandidate -PublishedMaintenance
+  $currentIndependent=Get-MIR42IndependentScopeContract -Scope 'nine-target' -PublishedMaintenance -SourceVersion '4.2.2'
+  foreach($field in @('evidence_status','binder_status','campaign_status','independent_status','seal_status')){
+    Assert-MIR42CandidateBuildTest ($currentSeal.$field.StartsWith('MIR-4.2.2-NINE-TARGET-MAINTENANCE-')) ('422-maintenance-reader-selects-'+$field)
+  }
+  Assert-MIR42CandidateBuildTest ($currentIndependent.reconciliation_status-ceq$currentEvidence.evidence_status-and$currentIndependent.rehash_status-ceq$currentSeal.independent_status-and$currentCampaign.maintenance_source_version-ceq'4.2.2') '422-evidence-campaign-seal-readers-agree-on-version'
+  foreach($criterion in @('fresh-exact-loads','target-omissions')){
+    $criterionContract=Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance -SourceVersion '4.2.2'
+    $expectedStatus=if($criterion-ceq'fresh-exact-loads'){$currentEvidence.binder_status}else{$currentEvidence.evidence_status}
+    Assert-MIR42CandidateBuildTest ($criterionContract.status-ceq$expectedStatus) ('422-criterion-consumes-'+$criterion)
+    Assert-MIR42CandidateBuildTest ((Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance).status-cne$criterionContract.status) ('422-criterion-does-not-relabel-421-'+$criterion)
+  }
+  foreach($target in @('f017','f016','f015','f014','f013')){
+    $historicalIdentity=Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target $target -SourceVersion '4.2.2' -PredecessorIdentityOnly
+    Assert-MIR42CandidateBuildTest ($null-eq$historicalIdentity.inventory-and$historicalIdentity.identity.source_version-ceq'4.2.2'-and$historicalIdentity.record.target-ceq$target) ('422-historical-provenance-does-not-require-terminal-archive-'+$target)
+  }
   foreach($mutate in @(
     {param($m)$m.target_authority[0].source_version='4.2.1'},
     {param($m)$m.targets[0].distribution_version='4.2.21001'},
@@ -649,10 +668,15 @@ try {
   $scopeCandidates=@($patchDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})
   Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $scopeCandidates
   $maintenanceEvidenceAssertions++
+  $currentScopeCandidates=@($currentDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})
+  Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $currentScopeCandidates
+  Assert-MIR42IndependentMaintenanceScope -Scope 'nine-target' -SourceVersion '4.2.2'
+  $mixedScope=@($scopeCandidates[0])+@($currentScopeCandidates|Select-Object -Skip 1)
   foreach($case in @(
     @{scope='four-target';rows=@($scopeCandidates|Select-Object -First 4)},
     @{scope='nine-target';rows=@($nineDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})},
-    @{scope='nine-target';rows=@($scopeCandidates|Select-Object -First 8)}
+    @{scope='nine-target';rows=@($scopeCandidates|Select-Object -First 8)},
+    @{scope='nine-target';rows=$mixedScope}
   )){
     $rejected=$false
     try{Assert-MIR42MaintenanceReconciliationScope -Scope $case.scope -Candidates $case.rows}catch{$rejected=$_.Exception.Message-ceq'[mir42-reconciliation-maintenance-candidate-scope]'}

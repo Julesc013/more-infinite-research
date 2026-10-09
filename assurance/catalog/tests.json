@@ -53,6 +53,8 @@
         "manual-review-attestation",
         "spec/schemas/manual-release-attestation.schema.json",
         "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir421-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir422-maintainer-written-release-authorization-v1.schema.json",
         "tests/release/Test-MIRManualReleaseReview.ps1",
         "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
@@ -1826,7 +1828,12 @@
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tests/runtime/Test-MIRK2213ImersiteMigration.ps1",
         "tests/runtime/Test-MIRPassiveRepair.ps1",
-        "tests/tooling/Test-MIRLibraryActivation.ps1"
+        "tests/tooling/Test-MIRLibraryActivation.ps1",
+        "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/**",
+        "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/**",
+        "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/**",
+        "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/**",
+        "fixtures/assert-upgrade-historical-terminal-to-mir42/**"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7977,6 +7984,10 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
+        "tests/support/MIR421ReleaseAssetControls.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "fixtures/release-inputs/mir421-published-420-manifest.json",
+        "fixtures/release-inputs/mir422-published-421-manifest.json",
         "scripts/Collect-MIRPlayerReport.cmd",
         "scripts/Collect-MIRPlayerReport.ps1",
         "tools/commands/release/New-MIR42SupportCollectorBundle.ps1",
@@ -8091,6 +8102,10 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+        "tests/support/MIR421ReleaseAssetControls.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "fixtures/release-inputs/mir421-published-420-manifest.json",
+        "fixtures/release-inputs/mir422-published-421-manifest.json",
         "tests/release/Test-MIRManualReleaseReview.ps1",
         "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
         "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
@@ -8100,7 +8115,9 @@
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/validation/ReleaseAttestations.ps1",
         "spec/schemas/manual-release-attestation.schema.json",
-        "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json"
+        "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir421-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir422-maintainer-written-release-authorization-v1.schema.json"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -8415,5 +8432,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8c8797041fab70085aa32075be297c2e5088c0a0f8b4a939daa48281013ed41a"
+  "digest": "sha256:7dfeaa4532424cb85d2cf70d44a5c63aedca2157d20994335b9b88e0bad3c3c2"
 }

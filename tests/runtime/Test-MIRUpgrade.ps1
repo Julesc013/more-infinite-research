@@ -493,7 +493,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   $dependencyFrom = "more-infinite-research >= $fixtureFrom"
   if (-not $stagedInfo.Contains($dependencyFrom)) { throw 'MIR 4.2 upgrade fixture dependency anchor changed.' }
   [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo.Replace($dependencyFrom, "more-infinite-research >= $FromVersion"), [Text.UTF8Encoding]::new($false))
-  if ($targetCode -cin @('210','200') -and
+  if ($targetCode -cin @('210','200','110','100') -and
       (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
        ($FromVersion -ceq "4.2.${targetCode}01" -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
       -not $SpaceIsFake -and $Archetype -cin @('','base-default')) {
@@ -523,6 +523,11 @@ if ($isHistoricalTerminalFixture) {
     Replace('__MIR_FACTORIO_LINE__',[string]$historical.line).Replace('__MIR_INFINITE_TECHNOLOGY__',[string]$historical.infinite_technology).
     Replace('__MIR_UPGRADE_SAVE_NAME__',$saveName)
   [IO.File]::WriteAllText($stagedControlPath, $stagedControl, [Text.UTF8Encoding]::new($false))
+  $targetCode=([string]$historical.line).Replace('.','').PadLeft(3,'0')
+  if (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
+      ($FromVersion -ceq "4.2.${targetCode}01" -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) {
+    Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion
+  }
 }
 if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
   # The emergency programme governs three predecessor lanes through one

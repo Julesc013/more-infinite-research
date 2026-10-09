@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir422-maintainer-written-release-authorization-v1.schema.json",
+  "title": "MIR 4.2.2 conditional execution and GitHub release authorization V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_from_user_turn_date", "timezone", "release", "written_authorizations", "constraints", "technical_acceptance", "final_byte_binding", "personal_playthrough", "secret_values_present", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR422MaintainerWrittenReleaseAuthorizationV1"},
+    "status": {"const": "written-maintainer-authorization-awaiting-technical-acceptance"},
+    "recorded_from_user_turn_date": {"type": "string", "format": "date"},
+    "timezone": {"const": "Australia/Sydney"},
+    "release": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_version", "tag", "selected_targets"],
+      "properties": {
+        "source_version": {"const": "4.2.2"},
+        "tag": {"const": "v4.2.2"},
+        "selected_targets": {"const": ["f210", "f200", "f110", "f100", "f017", "f016", "f015", "f014", "f013"]}
+      }
+    },
+    "written_authorizations": {
+      "type": "object", "additionalProperties": false,
+      "required": ["complete_mir_4_2", "protected_main_promotion", "required_distribution_tags", "github_publication", "nine_target_github_zip_assets", "mod_portal_upload"],
+      "properties": {
+        "complete_mir_4_2": {"const": "authorized-subject-to-required-technical-checks"},
+        "protected_main_promotion": {"const": "authorized-after-accepted-technical-seal-and-governed-restore"},
+        "required_distribution_tags": {"const": "authorized-after-protected-main-readback-and-candidate-bound-go"},
+        "github_publication": {"const": "authorized-after-final-byte-acceptance-and-tag-verification"},
+        "nine_target_github_zip_assets": {"const": "authorized-after-final-byte-acceptance"},
+        "mod_portal_upload": {"const": "not-claimed-by-this-github-release-authorization"}
+      }
+    },
+    "constraints": {
+      "type": "object", "additionalProperties": false,
+      "required": ["preserve_published_420", "preserve_published_421", "inherit_predecessor_testing_waivers", "fabricate_signatures_or_review", "mutable_github_release_required", "mod_portal_maintainer_managed"],
+      "properties": {
+        "preserve_published_420": {"const": true},
+        "preserve_published_421": {"const": true},
+        "inherit_predecessor_testing_waivers": {"const": false},
+        "fabricate_signatures_or_review": {"const": false},
+        "mutable_github_release_required": {"const": true},
+        "mod_portal_maintainer_managed": {"const": true}
+      }
+    },
+    "technical_acceptance": {"const": "not-established-by-this-authorization"},
+    "final_byte_binding": {"const": "required-before-publication"},
+    "personal_playthrough": {"const": "not-a-prerequisite-for-authorized-execution"},
+    "secret_values_present": {"const": false},
+    "record_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  }
+}
