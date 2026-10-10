@@ -134,6 +134,9 @@ New-Item -ItemType Directory -Force $fixture | Out-Null
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/browser_fixture_data.lua') -Destination (Join-Path $fixture 'data.lua')
 Initialize-MIRBrowserIconFixture -Fixture $fixture -Repository $repo -Case $DlcIconCase
 $lua=[Text.StringBuilder]::new()
+[void]$lua.AppendLine('local browser_platform=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/platform/factorio/browser_host.lua')))
+[void]$lua.AppendLine('end)()')
 foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{name='browser_catalogue';path='research_browser_factorio_catalogue.lua'},@{name='browser_actions';path='research_browser_actions.lua'})) {
  [void]$lua.AppendLine("local $($module.name)=(function()")
  [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo "source/prototypes/mir/runtime/$($module.path)")))
@@ -186,7 +189,7 @@ $browserTestText=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research
 [void]$lua.AppendLine('local check_browser_hidden_regressions=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_hidden_regressions.lua')))
 [void]$lua.AppendLine('end)()')
-[void]$lua.AppendLine('check_browser_hidden_regressions(browser_catalogue,browser_actions,function(ok,message) assert(ok,message) end)')
+[void]$lua.AppendLine('check_browser_hidden_regressions(browser_catalogue,browser_actions,function(ok,message) assert(ok,message) end,browser_platform)')
 [void]$lua.AppendLine('local check_browser_native_discovery=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_native_discovery.lua')))
 [void]$lua.AppendLine('end)()')

@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 53757,
-      "expected_sha256": "AA4438663C797F4DD2AD2B32016D0763F7152E8615D5BE6AE608E7AF012896D9",
+      "expected_bytes": 53858,
+      "expected_sha256": "354E8D51AE84FAF8C81BFD00ED069F8DB4992D7AAB1BF01FB49D0B1A9F53088F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3868,8 +3868,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Select the Library prototype/export API adapter for this engine; historical Library remains disabled.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 635,
-      "expected_sha256": "6D6F34BE9800BB6FA90E73A104E8D8B211BF69127D962B9EB81786EEAA5B6FCF",
+      "expected_bytes": 1160,
+      "expected_sha256": "F20C2055ADBBB04A90113A696A6677ED59E843B813F41A3E88E34B94D6868701",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3883,5 +3883,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "3E2ABEDDB33F34A34DF6C4BE040A2E7F0199EC0CAA40B5AD22B6C755D85FFAAC"
+  "record_sha256": "FE57A46A598D07BDB91847DFF5D19AB782901A746135CCA0AFC2C562BC7E37E7"
 }

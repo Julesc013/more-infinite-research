@@ -184,7 +184,7 @@ local catalogue_cache = {}
 local function catalogue(force)
   local cached = catalogue_cache[force.index]
   if cached and cached.tick == game.tick then return cached.value end
-  local result = factorio_catalogue.snapshot(force)
+  local result = factorio_catalogue.snapshot(force, browser_host)
   if not result then return nil end
   -- Dynamic cap/level facts must be refreshed with the copied Force snapshot.
   -- Only the pure core is cache-safe; provider state is never retained here.
@@ -1376,11 +1376,12 @@ local function click(event)
     if not (panel and panel.valid and panel.tags.mir_browser_section == "production-load") then return end
     local precision = defines.flow_precision_index and defines.flow_precision_index.one_minute
     local report = core.production_load_check(factorio_catalogue.production_snapshot(
-      player.force, player.surface, player.force.technologies[v.selected], precision, game.tick))
+      player.force, player.surface, player.force.technologies[v.selected], precision, game.tick, browser_host))
     panel.clear()
     local width = element.parent.style.maximal_width
     if not report then label(panel, {"mir-browser.production-unavailable"}, width); return end
-    label(panel, {"mir-browser.production-scope", report.force_name, report.surface_name}, width)
+    label(panel, report.scope == "force" and {"mir-browser.production-scope-force", report.force_name}
+      or {"mir-browser.production-scope", report.force_name, report.surface_name}, width)
     label(panel, {"mir-browser.production-snapshot", tostring(report.tick)}, width)
     label(panel, {"mir-browser.production-note"}, width)
     for _, row in ipairs(report.rows) do

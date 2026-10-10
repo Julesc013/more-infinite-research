@@ -5,7 +5,7 @@ script.on_nth_tick(1, function()
   check(not remote.interfaces["more-infinite-research-browser"], "fixture has no MIR browser host")
   check(storage.research_browser == nil, "fixture requires no MIR private state")
 
-  local catalogue = portable_factorio_catalogue.snapshot(force)
+  local catalogue = portable_factorio_catalogue.snapshot(force, portable_browser_host)
   check(catalogue and catalogue.schema == 1 and catalogue.kind == "portable-factorio-research-catalogue", "generic Factorio DTO catalogue")
   local finite = portable_core.query(catalogue, {mode = 2, status = 1, page = 2, search = "portable-surface-item"})
   check(finite.count == 25 and finite.pages == 2 and finite.page == 2 and #finite.rows == 5, "positive filtering and pagination")

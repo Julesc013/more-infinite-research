@@ -9,7 +9,7 @@ local function expect(check, condition, message)
   if not condition then error(message) end
 end
 
-local function make_host_factory(host_source, catalogue_source)
+local function make_host_factory(host_source, catalogue_source, platform_source)
   local function make_environment(options)
     local events, buckets = {}, {}
     local metrics = {render_calls = 0, gameplay_mutations = 0, destroy_calls = 0, shortcut_calls = 0}
@@ -27,9 +27,11 @@ local function make_host_factory(host_source, catalogue_source)
     for _, name in ipairs(event_names) do defines_events[name] = name end
     local catalogue_module = {}
     if catalogue_source then
-      catalogue_module = assert(load(catalogue_source, "actual_browser_catalogue_fixture", "t", {
+      local actual = assert(load(catalogue_source, "actual_browser_catalogue_fixture", "t", {
         type = type, pairs = pairs, ipairs = ipairs, table = table, math = math, string = string
       }))()
+      local platform = assert(load(platform_source, "actual_catalogue_host_fixture", "t", {}))()
+      catalogue_module = setmetatable({snapshot = function(force) return actual.snapshot(force, platform) end}, {__index = actual})
     end
     local modules = {
       ["prototypes.mir.runtime.research_browser_core"] = {
@@ -204,14 +206,43 @@ local function invoke_and_assert_inert(fixture, element_name, check)
     element_name .. " click cannot mutate gameplay")
 end
 
-local function check_capability_stages(sources, check)
+local function check_capability_stages(sources, check, catalogue_source)
   expect(check, type(sources) == "table", "Library capability controls receive actual stage and coordinator source")
-  for family, source in pairs(sources.host_adapters) do
+  for _, family in ipairs{"game", "modern"} do
+    local source = sources.host_adapters[family]
     local reads, writes = 0, {}
     local env = setmetatable({}, {__index = function(_, key)
       error("Library adapter read " .. key .. " before its runtime callback")
     end})
     local adapter = assert(load(source, "actual-library-host-" .. family, "t", env))()
+    local catalogue = assert(load(catalogue_source, "actual-host-catalogue", "t", {
+      type = type, pairs = pairs, ipairs = ipairs, table = table, math = math, string = string
+    }))()
+    local trigger, trigger_reads = nil, 0
+    local prototype = setmetatable({hidden = false, max_level = 1, order = ""}, {__index = function(_, key)
+      if key == "research_trigger" and family == "modern" then trigger_reads = trigger_reads + 1; return trigger end
+      error("unsupported technology property: " .. key)
+    end})
+    local technology = {name = "host-field-probe", enabled = true, researched = false,
+      prototype = prototype, prerequisites = {}}
+    local force = {valid = true, index = 903, name = "host-field-probe",
+      research_queue = {}, technologies = {[technology.name] = technology}}
+    expect(check, catalogue.snapshot(force, adapter).rows[1].available,
+      family .. " catalogues ordinary research through only supported prototype fields")
+    trigger = {type = "craft-item", item = "iron-plate", count = 1}
+    expect(check, catalogue.snapshot(force, adapter).rows[1].available == (family ~= "modern"),
+      family .. " honors the engine's trigger-research capability")
+    expect(check, family == "modern" and trigger_reads == 2 or family ~= "modern" and trigger_reads == 0,
+      family .. " never probes a missing historical research_trigger field")
+    prototype.hidden = true
+    expect(check, not catalogue.snapshot(force, adapter).rows[1].available,
+      family .. " keeps hidden research out of the available catalogue")
+    prototype.hidden = false; trigger = nil
+    technology.prerequisites.locked = {name = "locked", researched = false, prerequisites = {}}
+    expect(check, not catalogue.snapshot(force, adapter).rows[1].available,
+      family .. " retains prerequisite requirements")
+    local absent, reason = catalogue.snapshot(force)
+    expect(check, absent == nil and reason == "missing-host", "missing host does not guess an engine API")
     local function write_file(path, contents, append, player_index)
       writes[#writes + 1] = {path, contents, append, player_index}
       return "controlled-result"
@@ -319,11 +350,11 @@ end
 -- host_source_string is trusted project source supplied by the test harness.
 -- The isolated load environment exists only inside this regression fixture.
 return function(host_source_string, check, catalogue_source_string, capability_sources)
-  check_capability_stages(capability_sources, check)
+  check_capability_stages(capability_sources, check, catalogue_source_string)
   expect(check, type(host_source_string) == "string" and #host_source_string > 0,
     "handler regression receives trusted browser host source")
   expect(check, type(check) == "function", "handler regression receives an assertion function")
-  local host_factory = make_host_factory(host_source_string, catalogue_source_string)
+  local host_factory = make_host_factory(host_source_string, catalogue_source_string, capability_sources.host_adapters.modern)
   local fixture = fixture_from(host_factory, nil, check)
   expect(check, #fixture.host.requires_features == 1
     and fixture.host.requires_features[1] == "research_library",
