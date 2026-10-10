@@ -12,6 +12,8 @@ param(
   [string]$K2ImersiteInputProfile = '',
   [ValidateSet(0,3)][int]$K2ImersiteCap = 3,
   [string]$PublishedMaintenancePredecessorManifestPath = '',
+  [string]$PersistedDamageZip = '',
+  [string]$PublishedDamageManifestPath = '',
   [string[]]$LocalModLibraryDirs = @(),
   [switch]$PrepareInputsOnly,
   [string]$FromVersion = "3.0.5",
@@ -331,6 +333,14 @@ $script:upgradeProcessIndex=0
 $script:upgradeResourceRuns=@()
 $script:upgradeActivation=$null
 $script:upgradeActivations=@()
+if($PersistedDamageZip -or $PublishedDamageManifestPath){
+  if(-not$PersistedDamageZip-or-not$PublishedDamageManifestPath-or$SelectedTarget-cne'f210'-or
+    $SourceVersion-cne'4.2.2'-or$FromVersion-cne'4.2.21000'-or$ToVersion-cne'4.2.21002'-or
+    $Archetype-cne'space-age-native-owner'-or$SpaceIsFake-or$SourceOnlyFixtureNames.Count-or
+    $FixtureName-cne'assert-upgrade-4-0-21000-to-4-1-21000'){
+    throw '[mir422-persisted-damage-scenario] Only the exact published F210 420/421/422 Space Age lane is supported.'
+  }
+}
 . (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
 . (Join-Path $RepoRoot 'tests/support/MIR421K2Upgrade.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
@@ -393,6 +403,15 @@ if ($SpaceIsFake) {
     if ($sifTarget.Count -ne 1 -or [string]$sifTarget[0].distribution_version -cne $ToVersion -or [IO.Path]::GetFullPath([string]$sifTarget[0].archive_path) -cne [IO.Path]::GetFullPath($to)) { throw '[mir421-sif-candidate-path]' }
   }
   if (-not $PrepareInputsOnly) { $sifInputs=Resolve-MIR421SpaceFakeUpgradeInputs -RepoRoot $RepoRoot -Descriptor $sifDescriptor -LocalModLibraryDirs $LocalModLibraryDirs }
+}
+if($PersistedDamageZip){
+  $damageArchive=Resolve-MIRUpgradePath $PersistedDamageZip
+  $damageContract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.2.2'
+  $damageMetadata=(& gh api ('repos/Julesc013/more-infinite-research/releases/tags/'+$damageContract.source_tag)|Out-String)
+  if($LASTEXITCODE-ne0){throw '[mir422-persisted-damage-release-metadata]'}
+  $damageInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedDamageManifestPath -ReleaseMetadata ($damageMetadata|ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion '4.2.2' -SelectedTarget f210 -SelectedArchivePath $damageArchive
+  $damageRow=@($damageInputs.targets|Where-Object target -CEQ f210)
+  if($damageRow.Count-ne1-or$damageRow[0].version-cne'4.2.21001'){throw '[mir422-persisted-damage-published-version]'}
 }
 $k2Inputs=$null
 if($k2Scenario){
@@ -518,6 +537,14 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
        ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
       ($SpaceIsFake -or $Archetype -cin @('','base-default') -or ($targetCode-ceq'210' -and $Archetype-ceq'space-age-native-owner'))) {
     Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceIsFake:$SpaceIsFake -SpaceAge:($Archetype-ceq'space-age-native-owner')
+  }
+  if($PersistedDamageZip){
+    $damageControl=Get-Content -LiteralPath $stagedControlPath -Raw
+    if(-not$damageControl.Contains('local persisted_damage_probe = false')){throw '[mir422-persisted-damage-fixture-anchor]'}
+    [IO.File]::WriteAllText($stagedControlPath,$damageControl.Replace('local persisted_damage_probe = false','local persisted_damage_probe = true'),[Text.UTF8Encoding]::new($false))
+    $damageInfo=Get-Content -LiteralPath $stagedInfoPath -Raw|ConvertFrom-Json
+    $damageInfo.version='0.1.15'
+    $damageInfo|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $stagedInfoPath
   }
 }
 if ($isHistoricalTerminalFixture) {
@@ -650,6 +677,26 @@ $sourceSettings=Read-MIRLibraryControl -Path (Join-Path $mods 'mod-settings.dat'
 $sourceSettingsPath=Join-Path $root 'source-mod-settings.dat'
 if($sourceSettings.exists){[IO.File]::WriteAllBytes($sourceSettingsPath,[Convert]::FromBase64String($sourceSettings.bytes))}
 $sifSourceTerminal=Complete-MIRLibraryActivation -Activation $script:upgradeActivation
+if($PersistedDamageZip){
+  $damageSelection=Get-MIRUpgradeLibrarySelection -Library $mods -EngineDataDirectory $engineData -Archive $damageArchive -Version '4.2.21001' -ExpectedSha256 $damageRow[0].sha256 -FixtureDirectories $persistentFixtureDirectories -EnableDlc $true
+  $damageProfile=Join-Path $root 'damage-selection.json';$damageSelection.mod_list|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $damageProfile
+  $damageSettingsArgs=if($sourceSettings.exists){@{SettingsMode='File';SettingsPath=$sourceSettingsPath;SettingsSha256=$sourceSettings.sha256}}else{@{SettingsMode='Defaults'}}
+  $script:upgradeActivation=Start-MIRLibraryActivation -LibraryDirectory $mods -EngineDataDirectory $engineData -ProfilePath $damageProfile -ArchiveHashes $damageSelection.archive_hashes @damageSettingsArgs
+  $script:upgradeActivations+=,$script:upgradeActivation
+  Add-MIRNativeProbeLibraryActivation -Context $script:upgradeResourceContext -Activation $script:upgradeActivation
+  [IO.File]::WriteAllText($log,'',[Text.UTF8Encoding]::new($false))
+  $damageSave=Join-Path $saves 'mir-422-persisted-damage.zip'
+  $factorioProcesses++
+  $damageExit=Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments ($nativeBaseArgs+@('--server-settings',$serverSettings,'--start-server',$save)) -LogPath $log -Marker '[mir-fixture] published 4.2.1 damage state captured;post-upgrade-progress=0.57' -SavedMapPath $damageSave -TimeoutMs 30000
+  if($damageExit-ne0-or-not(Test-Path -LiteralPath $damageSave)){throw '[mir422-persisted-damage-save-required]'}
+  $damageSaveHash=(Get-FileHash -LiteralPath $damageSave).Hash
+  $damageEvidence=Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-damage.txt"
+  Copy-MIRUpgradeLogEvidence -Source $log -Destination $damageEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
+  $sourceSettings=Read-MIRLibraryControl -Path (Join-Path $mods 'mod-settings.dat')
+  if($sourceSettings.exists){[IO.File]::WriteAllBytes($sourceSettingsPath,[Convert]::FromBase64String($sourceSettings.bytes))}
+  $damageTerminal=Complete-MIRLibraryActivation -Activation $script:upgradeActivation
+  $save=$damageSave
+}
 $candidateHash=if($currentMaterialization){$currentMaterialization.receipt.archive_sha256}elseif($SpaceIsFake){$sifTarget[0].archive_sha256}else{(Get-FileHash -LiteralPath $to -Algorithm SHA256).Hash}
 $candidateSelection=Get-MIRUpgradeLibrarySelection -Library $mods -EngineDataDirectory $engineData -Archive $to -Version $ToVersion -ExpectedSha256 $candidateHash -Dependencies $sifInputs -FixtureDirectories $persistentFixtureDirectories -EnableDlc $enableDlc
 $candidateProfile=Join-Path $root 'candidate-selection.json';$candidateSelection.mod_list|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $candidateProfile -Encoding utf8
@@ -928,6 +975,11 @@ if($k2Scenario){
   $result.cap_input=if($K2ImersiteCap-eq3){'published-default-no-override'}else{'explicit-shared-settings-override-fixture'}
 }
 if($publishedInputs){$result.published_maintenance_predecessor=$publishedInputs}
+if($PersistedDamageZip){
+  if((Get-FileHash -LiteralPath $damageSave).Hash-cne$damageSaveHash){throw '[mir422-persisted-damage-input-mutated]'}
+  $result.native_scenario='reduced-published420-persisted421-damage-to422-survivor-preservation'
+  $result.persisted_damage=[ordered]@{published_intermediate=$damageInputs;save_path=$damageSave;save_sha256=$damageSaveHash;log=(Split-Path -Leaf $damageEvidence);log_sha256=(Get-FileHash -LiteralPath $damageEvidence).Hash;post_damage_progress=0.57;controls=$damageTerminal;pre_damage_snapshot_is_external_only=$true;lost_history_recovered=$false}
+}
 if($currentMaterialization){
   $result.candidate_materialization=[ordered]@{path=$SourceMaterializationPath;sha256=(Get-FileHash -LiteralPath (Resolve-MIRUpgradePath $SourceMaterializationPath)).Hash;record_sha256=$currentMaterialization.receipt.record_sha256;package_source_sha256=$currentMaterialization.receipt.package_source_sha256}
   $result.harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath).Hash

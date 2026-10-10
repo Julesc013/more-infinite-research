@@ -1,5 +1,7 @@
 local from_version = "4.0.21000"
 local to_version = "4.1.21000"
+local persisted_damage_probe = false
+local damage_version = "4.2.21001"
 local archetype = settings.startup["mir-upgrade-archetype"].value
 local expected_progress = 0.42
 local epsilon = 0.000001
@@ -116,7 +118,7 @@ if to_version == "4.2.21002" then
   end
 end
 local function restored_promethium_frontier(name, before, after)
-  if from_version ~= "4.2.21001" or to_version ~= "4.2.21002" then return false end
+  if (from_version ~= "4.2.21001" and not persisted_damage_probe) or to_version ~= "4.2.21002" then return false end
   if name ~= "research-speed-7" and name ~= "recipe-prod-research_cargo_bay_unloading_distance-1"
     and name ~= "recipe-prod-research_cargo_landing_pad_count-1" then return false end
   local expected = scalar_copy(before)
@@ -211,16 +213,38 @@ script.on_init(function()
   force.research_progress=expected_progress
   storage.mir_upgrade_fixture={archetype=archetype,technology=profile.technology,technology_level=tech.level,research_progress=force.research_progress,research_unit_count=tech.research_unit_count,science=science_names(tech),source_version=from_version}
   if complete_catalogue_upgrade then
-    storage.mir_upgrade_fixture.complete_state = complete_state(force)
-    storage.mir_upgrade_fixture.complete_forces = all_force_states()
+    if not persisted_damage_probe then
+      storage.mir_upgrade_fixture.complete_state = complete_state(force)
+      storage.mir_upgrade_fixture.complete_forces = all_force_states()
+    end
     export_state("source")
   end
   log("[mir-fixture] "..from_version.." upgrade source proof complete archetype="..archetype)
 end)
 
 script.on_configuration_changed(function()
-  if script.active_mods["more-infinite-research"]~=to_version then fail("upgraded save used wrong MIR version") end
   local state=storage.mir_upgrade_fixture;if not state or state.source_version~=from_version then fail("fixture storage did not survive") end
+  if persisted_damage_probe and script.active_mods["more-infinite-research"] == damage_version then
+    if state.damage_complete or state.complete_forces then fail("unexpected pre-damage evaluator state in damaged save") end
+    local force = game.forces.player
+    local tech = technology()
+    if tech.level ~= state.technology_level or not force.current_research
+      or force.current_research.name ~= profile.technology then fail("unaffected research changed during damage reproduction") end
+    -- Test-only new work after the damaging upgrade. Product recovery cannot
+    -- consult any pre-damage snapshot: only the external evaluator retains it.
+    force.research_progress = 0.57
+    state.research_progress = force.research_progress
+    state.research_unit_count = tech.research_unit_count
+    state.science = science_names(tech)
+    state.complete_forces = all_force_states()
+    state.complete_state = state.complete_forces.player
+    state.damage_complete = true
+    export_state("persisted-damage")
+    log("[mir-fixture] published 4.2.1 damage state captured;post-upgrade-progress=0.57")
+    return
+  end
+  if script.active_mods["more-infinite-research"]~=to_version then fail("upgraded save used wrong MIR version") end
+  if persisted_damage_probe and not state.damage_complete then fail("persisted 4.2.1 damage phase missing") end
   local force=game.forces.player;local tech=technology()
   if tech.level~=state.technology_level then fail("technology level did not survive") end
   if not force.current_research or force.current_research.name~=profile.technology then fail("current research did not survive") end
@@ -244,6 +268,13 @@ end)
 local checked_complete_reload = false
 script.on_event(defines.events.on_tick,function()
   local state=storage.mir_upgrade_fixture
+  if persisted_damage_probe and state and state.damage_complete and not state.upgrade_complete then
+    if not state.damage_save_requested then
+      state.damage_save_requested=true
+      game.server_save("mir-422-persisted-damage")
+    end
+    return
+  end
   if state and state.upgrade_complete then
     if complete_catalogue_upgrade and not checked_complete_reload then
       verify_all_forces(state.complete_forces)

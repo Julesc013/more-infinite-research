@@ -2,12 +2,13 @@
 -- prove oracle activation and refusal; they are not native save evidence.
 local checks = 0
 local function check(value, message) checks = checks + 1; assert(value, message) end
-local function fixture(from, to)
+local function fixture(from, to, persisted_damage)
   local file = assert(io.open(REPO_ROOT .. "/fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua", "rb"))
   local source = file:read("*a"); file:close()
   -- Use the same collision-free version substitutions as the native runner.
   source = source:gsub("4%.0%.21000", "__FROM__"):gsub("4%.1%.21000", "__TO__")
   source = source:gsub("__FROM__", from):gsub("__TO__", to)
+  if persisted_damage then source=source:gsub("local persisted_damage_probe = false", "local persisted_damage_probe = true") end
   local callbacks, logs = {}, {}
   local function technology_record(name)
     return {name=name,level=3,researched=false,enabled=true,visible_when_disabled=true,
@@ -126,4 +127,20 @@ f.env.storage.mir_upgrade_fixture.complete_forces.player.technologies["recipe-pr
 f.env.storage.mir_upgrade_fixture.complete_state.technologies["recipe-prod-research_ice-1"]=nil
 local ok,reason=pcall(f.callbacks.upgrade)
 check(not ok and tostring(reason):find("reported technology absent",1,true)~=nil,"damaged predecessor cannot hide missing restored definition")
+local damage=fixture("4.2.21000","4.2.21002",true)
+check(damage.env.storage.mir_upgrade_fixture.complete_forces==nil,"pre-damage catalogue cannot be a recovery input")
+damage.env.script.active_mods["more-infinite-research"]="4.2.21001"
+damage.force.technologies["recipe-prod-research_science_pack_productivity-1"]=nil
+damage.callbacks.upgrade()
+check(damage.env.storage.mir_upgrade_fixture.complete_forces.player.technologies["recipe-prod-research_science_pack_productivity-1"]==nil,"persisted expectation contains only 421 survivors")
+check(damage.force.research_progress==0.57,"new work after damage is recorded")
+damage.reload();damage.env.script.active_mods["more-infinite-research"]="4.2.21002"
+damage.force.technologies["recipe-prod-research_science_pack_productivity-1"]={name="recipe-prod-research_science_pack_productivity-1",level=1,researched=false,enabled=true,visible_when_disabled=true,saved_progress=0,research_unit_count=100,research_unit_energy=30,research_unit_ingredients={{name="automation-science-pack",amount=1}},prototype={max_level=4294967295,order="a",hidden=false,hidden_in_factoriopedia=false,prerequisites={automation={}},effects={{type="worker-robot-storage",modifier=1}}}}
+damage.callbacks.upgrade()
+check(damage.env.storage.mir_upgrade_fixture.upgrade_complete,"cold corrected load preserves surviving state")
+damage.reload();damage.callbacks.load();damage.callbacks.tick()
+check(damage.force.research_progress==0.57,"cold reload retains newer progress")
+local skipped=fixture("4.2.21000","4.2.21002",true)
+local passed,why=pcall(skipped.callbacks.upgrade)
+check(not passed and tostring(why):find("persisted 4.2.1 damage phase missing",1,true),"skipped damage phase fails")
 print("MIR-MODERN-CATALOGUE-CONTROLS-PASS "..checks)

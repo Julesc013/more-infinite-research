@@ -27,7 +27,10 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if(-not$fromMatch.Success-or([int]$fromMatch.Groups['patch'].Value-ge$sourcePatch)){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromPatch=[int]$fromMatch.Groups['patch'].Value
   $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
-  $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.14'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.13'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  if($Target-ceq'f210'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceAge){
+    $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
+  }
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
@@ -53,6 +56,9 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   $fromMatch=[regex]::Match($FromVersion,('^4[.]2[.]'+$code+'(?<patch>00|01)$'))
   if(-not$fromMatch.Success-or([int]$fromMatch.Groups['patch'].Value-ge$sourcePatch)){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromPatch=[int]$fromMatch.Groups['patch'].Value
+  if($Target-ceq'f210'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceAge){
+    $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
+  }
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
