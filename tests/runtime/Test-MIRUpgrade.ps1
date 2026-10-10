@@ -644,7 +644,8 @@ if ($PrepareInputsOnly) {
 $mods=(Resolve-Path -LiteralPath $LocalModLibraryDirs[0]).Path
 $sourceSelection=Get-MIRUpgradeLibrarySelection -Library $mods -EngineDataDirectory $engineData -Archive $from -Version $FromVersion -ExpectedSha256 $sourceHash -Dependencies $sifInputs -FixtureDirectories @($persistentFixtureDirectories+$sourceOnlyDirectories) -EnableDlc $enableDlc
 $sourceProfile=Join-Path $root 'source-selection.json';$sourceSelection.mod_list|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $sourceProfile -Encoding utf8
-$script:upgradeActivation=Start-MIRLibraryActivation -LibraryDirectory $mods -EngineDataDirectory $engineData -ProfilePath $sourceProfile -ArchiveHashes $sourceSelection.archive_hashes
+$ownedArchivePrePin=if($isHistoricalTerminalFixture-and$SelectedTarget-cin@('f016','f015','f014','f013')){@('more-infinite-research',$fixtureModName)}else{@()}
+$script:upgradeActivation=Start-MIRLibraryActivation -LibraryDirectory $mods -EngineDataDirectory $engineData -ProfilePath $sourceProfile -ArchiveHashes $sourceSelection.archive_hashes -PrePinMIROwnedArchiveNames $ownedArchivePrePin
 $script:upgradeActivations+=,$script:upgradeActivation
 Add-MIRNativeProbeLibraryActivation -Context $script:upgradeResourceContext -Activation $script:upgradeActivation
 $save = Join-Path $root "source.zip"
@@ -710,7 +711,7 @@ $candidateHash=if($currentMaterialization){$currentMaterialization.receipt.archi
 $candidateSelection=Get-MIRUpgradeLibrarySelection -Library $mods -EngineDataDirectory $engineData -Archive $to -Version $ToVersion -ExpectedSha256 $candidateHash -Dependencies $sifInputs -FixtureDirectories $persistentFixtureDirectories -EnableDlc $enableDlc
 $candidateProfile=Join-Path $root 'candidate-selection.json';$candidateSelection.mod_list|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $candidateProfile -Encoding utf8
 $settingsArgs=if($sourceSettings.exists){@{SettingsMode='File';SettingsPath=$sourceSettingsPath;SettingsSha256=$sourceSettings.sha256}}else{@{SettingsMode='Defaults'}}
-$script:upgradeActivation=Start-MIRLibraryActivation -LibraryDirectory $mods -EngineDataDirectory $engineData -ProfilePath $candidateProfile -ArchiveHashes $candidateSelection.archive_hashes @settingsArgs
+$script:upgradeActivation=Start-MIRLibraryActivation -LibraryDirectory $mods -EngineDataDirectory $engineData -ProfilePath $candidateProfile -ArchiveHashes $candidateSelection.archive_hashes -PrePinMIROwnedArchiveNames $ownedArchivePrePin @settingsArgs
 $script:upgradeActivations+=,$script:upgradeActivation
 Add-MIRNativeProbeLibraryActivation -Context $script:upgradeResourceContext -Activation $script:upgradeActivation
 $nativeBaseArgs=@('--config',$config,'--no-log-rotation','--mod-directory',$mods)
