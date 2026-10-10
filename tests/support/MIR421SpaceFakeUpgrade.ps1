@@ -1,7 +1,7 @@
 # Optional native scenario inputs for the existing manifest-driven upgrade runner.
 function Assert-MIR42CompleteCatalogueUpgradeMarker {
   param([Parameter(Mandatory)][string]$Text)
-  $markers=[regex]::Matches($Text,'\[mir-fixture\] complete Space Age state retained technologies=(?<technologies>[0-9]+) recipes=(?<recipes>[0-9]+)')
+  $markers=[regex]::Matches($Text,'\[mir-fixture\] complete (?:Space Age|research) state retained technologies=(?<technologies>[0-9]+) recipes=(?<recipes>[0-9]+)')
   if($markers.Count-eq0-or @($markers|Where-Object {[int]$_.Groups['technologies'].Value-lt3-or[int]$_.Groups['recipes'].Value-lt1}).Count){
     throw '[mir42-complete-catalogue-upgrade-marker] Full-state oracle did not execute successfully.'
   }
@@ -31,6 +31,9 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if($Target-ceq'f210'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceAge){
     $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
   }
+  if($Target-ceq'f200'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake){
+    $fixtureVersion=if($direct420To422){'0.1.22'}else{'0.1.23'}
+  }
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
@@ -43,6 +46,30 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if($info.version-ceq$fixtureVersion){return}
   $info.version=$fixtureVersion
   [IO.File]::WriteAllText($path,($info|ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false))
+}
+
+function Set-MIR422F200CompleteStateUpgradeOracle {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$FixtureDirectory,
+    [Parameter(Mandatory)][ValidateSet('4.2.20000','4.2.20001')][string]$FromVersion)
+  # Reuse the complete canonical oracle. Only its private native test copy is
+  # adapted to F200 base research; Space Age-only expected rows do not exist in
+  # that environment. Every observed technology, recipe and force still compares.
+  $control=Get-Content -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua') -Raw
+  $start='local complete_catalogue_upgrade = archetype == "space-age-native-owner"'
+  $end='  and to_version:match("^4%.2%.210%d%d$")'
+  $first=$control.IndexOf($start);$last=$control.IndexOf($end)
+  if($first-lt0-or$last-lt$first){throw '[mir422-f200-complete-oracle-anchor]'}
+  $control=$control.Remove($first,$last+$end.Length-$first).Insert($first,'local complete_catalogue_upgrade = true')
+  $rows='  for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do'
+  if(-not$control.Contains($rows)){throw '[mir422-f200-complete-oracle-reported-rows]'}
+  $control=$control.Replace($rows,'  for _, name in ipairs({}) do')
+  $control=$control.Replace('"4.0.21000"','"'+$FromVersion+'"').Replace('"4.1.21000"','"4.2.20002"')
+  $control=$control.Replace('["base-default"]={technology="recipe-prod-research_iron-1",level=3}',
+    '["base-default"]={technology="mining-productivity-4",level=5}')
+  $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "4.2.20002" then')
+  $control=$control.Replace('complete Space Age state retained','complete research state retained')
+  $control=$control.Replace('mir-4121000-upgraded','mir-4120000-upgraded')
+  [IO.File]::WriteAllText((Join-Path $FixtureDirectory 'control.lua'),$control,[Text.UTF8Encoding]::new($false))
 }
 
 function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {

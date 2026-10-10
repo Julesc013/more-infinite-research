@@ -538,6 +538,9 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
       ($SpaceIsFake -or $Archetype -cin @('','base-default') -or ($targetCode-ceq'210' -and $Archetype-ceq'space-age-native-owner'))) {
     Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceIsFake:$SpaceIsFake -SpaceAge:($Archetype-ceq'space-age-native-owner')
   }
+  if($targetCode-ceq'200'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake-and$Archetype-ceq'base-default'){
+    Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -FromVersion $FromVersion
+  }
   if($PersistedDamageZip){
     $damageControl=Get-Content -LiteralPath $stagedControlPath -Raw
     if(-not$damageControl.Contains('local persisted_damage_probe = false')){throw '[mir422-persisted-damage-fixture-anchor]'}
@@ -757,7 +760,7 @@ $loadExitCode = if ($requiresReloadProof) {
 }
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
 $loadText = Get-Content -Raw -LiteralPath $log
-if ($mir42UpgradeSpecialized -and $SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $loadText }
+if (($mir42UpgradeSpecialized -and (($SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') -or ($SelectedTarget-ceq'f200' -and $Archetype-ceq'base-default')))) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $loadText }
 if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $loadText -Stage upgrade }
 if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $loadText -Stage upgrade -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
 $loadMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
@@ -795,7 +798,7 @@ if ($requiresReloadProof) {
   } else { Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
-  if ($mir42UpgradeSpecialized -and $SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $reloadText }
+  if (($mir42UpgradeSpecialized -and (($SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') -or ($SelectedTarget-ceq'f200' -and $Archetype-ceq'base-default')))) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $reloadText }
   if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $reloadText -Stage reload }
   if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $reloadText -Stage reload -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
   if (-not $reloadText.Contains($reloadMarker)) {
@@ -815,7 +818,7 @@ if ($requiresReloadProof) {
     throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
   }
   $secondReloadText = Get-Content -Raw -LiteralPath $log
-  if ($mir42UpgradeSpecialized -and $SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $secondReloadText }
+  if (($mir42UpgradeSpecialized -and (($SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') -or ($SelectedTarget-ceq'f200' -and $Archetype-ceq'base-default')))) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $secondReloadText }
   if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $secondReloadText -Stage reload }
   if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $secondReloadText -Stage reload -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
   if (-not $secondReloadText.Contains($reloadMarker)) {
