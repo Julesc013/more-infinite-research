@@ -7,6 +7,30 @@
   ],
   "paths": [
     {
+      "pattern": "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/k2_imersite_version_controls.lua",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
+      "pattern": "tests/runtime/Test-MIRModernLaunchReturn*.ps1",
+      "scenarios": [],
+      "tags": [],
+      "groups": []
+    },
+    {
       "pattern": "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
       "scenarios": [],
       "tags": [],
@@ -728,6 +752,12 @@
       "tags": [],
       "groups": [],
       "pattern": "tests/runtime/Test-MIRResearchBrowser.ps1"
+    },
+    {
+      "scenarios": [],
+      "tags": [],
+      "groups": [],
+      "pattern": "tests/tooling/Test-MIRNativeProbeResources.ps1"
     },
     {
       "scenarios": [],

@@ -11,6 +11,16 @@ local function append(index, key, value)
   table.insert(index[key], value)
 end
 
+local function fuel_is_definitely_zero(value)
+  -- Omission means 0J. Only exclude a recognized zero-energy declaration;
+  -- unknown representations must not hide a possible native return from the
+  -- safety graph. This is not a positive fuel/actor acquisition contract.
+  if value == nil then return true end
+  if type(value) ~= "string" then return false end
+  local amount = string.match(value, "^%s*([%d%.]+)%s*[kMGTPEZYRQ]?[JW]%s*$")
+  return amount ~= nil and tonumber(amount) == 0
+end
+
 local function build()
   local context = compiler_context.current()
   local cached = context:state_view("item_prototype_index")
@@ -30,9 +40,27 @@ local function build()
   local placeable_items_by_entity_type = {}
   local placeable_items_by_entity_name = {}
   local module_items_by_tier = {}
+  local spoilage_transitions = {}
+  local fuel_burning_transitions = {}
   local item_rows, placeable_rows, module_rows = 0, 0, 0
   lookup.each_item_prototype(function(name, prototype, item_type)
     item_rows = item_rows + 1
+    -- ItemPrototype loads spoil_result only for positive spoil_ticks. Keep
+    -- this native conversion in the shared index; recipe facts cannot see it.
+    if type(prototype) == "table" and type(prototype.spoil_ticks) == "number"
+      and prototype.spoil_ticks > 0 and type(prototype.spoil_result) == "string"
+      and prototype.spoil_result ~= "" then
+      spoilage_transitions[#spoilage_transitions + 1] = {
+        source = name, result = prototype.spoil_result, ticks = prototype.spoil_ticks
+      }
+    end
+    if type(prototype) == "table" and type(prototype.burnt_result) == "string"
+      and prototype.burnt_result ~= "" and not fuel_is_definitely_zero(prototype.fuel_value) then
+      fuel_burning_transitions[#fuel_burning_transitions + 1] = {
+        source = name, result = prototype.burnt_result, fuel_value = deepcopy(prototype.fuel_value),
+        fuel_category = deepcopy(prototype.fuel_category), fuel_categories = deepcopy(prototype.fuel_categories)
+      }
+    end
     local entity_type = type(prototype) == "table"
       and prototype.place_result
       and entity_type_by_name[prototype.place_result]
@@ -54,6 +82,8 @@ local function build()
   for _, names in pairs(placeable_items_by_entity_type) do table.sort(names) end
   for _, names in pairs(placeable_items_by_entity_name) do table.sort(names) end
   for _, names in pairs(module_items_by_tier) do table.sort(names) end
+  table.sort(spoilage_transitions, function(left, right) return left.source < right.source end)
+  table.sort(fuel_burning_transitions, function(left, right) return left.source < right.source end)
 
   local canonical = {
     schema = SCHEMA,
@@ -61,6 +91,8 @@ local function build()
     placeable_items_by_entity_type = placeable_items_by_entity_type,
     placeable_items_by_entity_name = placeable_items_by_entity_name,
     module_items_by_tier = module_items_by_tier,
+    spoilage_transitions = spoilage_transitions,
+    fuel_burning_transitions = fuel_burning_transitions,
     metrics = {
       entity_rows = entity_rows,
       item_rows = item_rows,
@@ -129,6 +161,18 @@ end
 
 function M.snapshot()
   return deepcopy(build())
+end
+
+function M.for_each_spoilage(callback)
+  for _, transition in ipairs(build().spoilage_transitions) do
+    callback(transition.source, transition.result, transition.ticks)
+  end
+end
+
+function M.for_each_fuel_burning(callback)
+  for _, transition in ipairs(build().fuel_burning_transitions) do
+    callback(deepcopy(transition))
+  end
 end
 
 return M

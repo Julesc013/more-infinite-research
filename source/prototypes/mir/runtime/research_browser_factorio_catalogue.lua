@@ -1,38 +1,36 @@
 -- Factorio port for the portable research DTO surface. This is the only
 -- browser-surface module that reads force technologies or prototype fields.
+-- The caller supplies its engine host; this module imports no MIR state.
 local M = {schema = 1, catalogue_limit = 30000}
 local progression_depth_limit = 128
 -- These are prototype-derived facts. Keep them outside saved state and rebuild
 -- after a script reload; each snapshot still reads force-local research state.
 local static_by_force = {}
 
--- Manual, current-surface observation. No LuaObjects, production history or
+-- Manual observation with explicit host scope. No LuaObjects, production history or
 -- writable statistics are retained. Item statistics use per-minute rates;
 -- input is production and output is consumption, not an inventory count.
-function M.production_snapshot(force, surface, technology, precision, tick)
+function M.production_snapshot(force, surface, technology, precision, tick, host)
   local ok, snapshot = pcall(function()
     if not (force and force.valid and surface and surface.valid and technology and technology.valid
         and technology.force.index == force.index and type(precision) == "number") then return nil end
+    if not host or (host.production_scope ~= "surface" and host.production_scope ~= "force") then return nil end
     local ingredients = technology.research_unit_ingredients
     if not ingredients or #ingredients == 0 or #ingredients > 16 then return nil end
-    local statistics = force.get_item_production_statistics(surface)
+    local statistics = host.production_statistics(force, surface)
     if not (statistics and statistics.valid) then return nil end
     local rows = {}
     for _, ingredient in ipairs(ingredients) do
-      local identity = {name = ingredient.name, quality = "normal"}
       rows[#rows + 1] = {
         name = ingredient.name, quality = "normal",
-        produced = statistics.get_flow_count{
-          name = identity, category = "input", precision_index = precision, count = false
-        },
-        consumed = statistics.get_flow_count{
-          name = identity, category = "output", precision_index = precision, count = false
-        }
+        produced = host.item_flow_count(statistics, ingredient.name, true, precision),
+        consumed = host.item_flow_count(statistics, ingredient.name, false, precision)
       }
     end
     return {schema = 1, kind = "science-production-snapshot", technology_id = technology.name,
-      force_index = force.index, force_name = force.name, surface_index = surface.index,
-      surface_name = surface.name, tick = tick, rows = rows}
+      force_index = force.index, force_name = force.name, scope = host.production_scope,
+      surface_index = host.production_scope == "surface" and surface.index or nil,
+      surface_name = host.production_scope == "surface" and surface.name or nil, tick = tick, rows = rows}
   end)
   return ok and snapshot or nil
 end
@@ -94,9 +92,9 @@ function M.forget_force(index)
   end
 end
 
-local function available(technology)
+local function available(technology, host)
   if not technology.enabled or technology.researched or technology.prototype.hidden
-      or technology.prototype.research_trigger then return false end
+      or host.is_trigger_research(technology.prototype) then return false end
   for _, prerequisite in pairs(technology.prerequisites) do
     if not prerequisite.researched then return false end
   end
@@ -166,8 +164,9 @@ end
 
 -- The returned value contains plain scalar copies only. MIR facts are not
 -- read here and can be omitted entirely by a non-MIR consumer.
-function M.snapshot(force)
+function M.snapshot(force, host)
   if not force or not force.valid then return nil, "invalid-force" end
+  if type(host) ~= "table" or type(host.is_trigger_research) ~= "function" then return nil, "missing-host" end
   local static, reason = static_catalogue(force)
   if not static then return nil, reason end
   local queued, rows = {}, {}
@@ -177,7 +176,7 @@ function M.snapshot(force)
     if technology then
       rows[#rows + 1] = {
         key = fact.key,
-        available = available(technology),
+        available = available(technology, host),
         researched = technology.researched == true,
         queued = queued[fact.key] == true,
         infinite = fact.infinite,

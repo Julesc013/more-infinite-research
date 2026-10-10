@@ -1,11 +1,11 @@
 ---
 title: "MIR 4.2 Nine-Target Candidate and Playtest Matrix"
 status: current
-applies_to: "MIR 4.2.1 construction and historical MIR 4.2.0 preparation"
+applies_to: "MIR 4.2.2 construction and retained MIR 4.2.1/4.2.0 evidence"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-09
+last_reviewed: 2026-10-10
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -15,6 +15,14 @@ source_of_truth_for:
 # MIR 4.2 nine-target candidate and playtest matrix
 
 This page turns the current nine-target release-cut selection into a reviewable preparation matrix. It does not allocate a candidate, freeze a source, authorize support, change viewer behavior, or authorize a release transition. The [release runbook](../RELEASE-RUNBOOK.md) and the [nine-target release-cut programme](../../.mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json) remain the controlling authorities.
+
+## MIR 4.2.2 private construction contract
+
+The existing [joined candidate writer](../../tools/commands/release/New-MIR42FourTargetCandidate.ps1) accepts explicit `-SourceVersion 4.2.2`. It selects all nine targets and emits [construction manifest V3](../../spec/schemas/mir42-four-target-deterministic-candidate-manifest-v3.schema.json), with `4.2.21002`, `4.2.20002`, `4.2.11002`, `4.2.10002`, `4.2.01702`, `4.2.01602`, `4.2.01502`, `4.2.01402` and `4.2.01302`. An explicit four-target subset is refused. The current-source materializers, target records and deterministic two-build comparison are retained. Omitting the source version preserves the historical 4.2.0 default; V1 and V2 retain their original source and package meanings.
+
+Controlled tests consume the actual identity projection, manifest writer and engine/seal construction readers. They reject mixed source patches, mismatched target/path pairs, incomplete construction and qualification/publication grants. The upgrade version resolver recognizes V3 construction records and all nine `CCC02` final-manifest identities. These tests use metadata and tiny archive fixtures; no current nine-package construction or native upgrade has been executed by this change. Earlier 4.2.1 results below remain evidence for their recorded bytes only.
+
+The shared published-predecessor reader now selects `v4.2.1` explicitly for candidate source `4.2.2`, pinning the exact [published manifest](../../fixtures/release-inputs/mir422-published-421-manifest.json), main commit `27c4777c27b3287f18df02e200235a1870bac465`, release ID `407909462` and nine `CCC01` identities. It compares current GitHub metadata, local/remote source tags and each local ZIP's bytes and content inventory. Its default still selects the original `v4.2.0-stable` predecessor for 4.2.1. Neither publication's exceptional acceptance supplies a new native result, signature or technical seal. The modern base-upgrade caller consumes explicit `-SourceVersion 4.2.2` through the existing [current-input workflow](../maintainer/fixture-workflow.md). The joined engine runner, reconciliation, criterion, campaign, independent-rehash and technical-seal readers now derive their maintenance source and predecessor selection from the candidate. They distinguish 4.2.1 and 4.2.2 evidence statuses, reject mixed source versions and preserve required custody, signing, review and restore checks. Historical target records supply baseline metadata without requiring obsolete terminal archive bytes for a maintenance candidate; the selected published predecessor still requires complete byte verification. The release-asset and publication-authorization readers also bind the selected source, all nine package identities and exact predecessor custody; older authorizations cannot authorize 4.2.2. Actual current nine-target execution, joined acceptance, sealing and publication remain outstanding.
 
 ## MIR 4.2.1 private construction
 

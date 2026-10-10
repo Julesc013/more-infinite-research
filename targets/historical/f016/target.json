@@ -36,28 +36,28 @@
     {
       "output_path": "changelog.txt",
       "source_path": "source/presentation/historical/f016/changelog.txt.template",
-      "source_sha256": "43D2AB87C23589D1BCDC9CD2DB9E8E3CC155CA8F27FE5C0E04CBC4AD2FEAED54",
-      "source_bytes": 1462,
-      "output_bytes": 1462,
-      "output_sha256": "43D2AB87C23589D1BCDC9CD2DB9E8E3CC155CA8F27FE5C0E04CBC4AD2FEAED54"
+      "source_sha256": "B53354A3206B7D7F94BC48F54005A4CC0444DCDA28F060CB6893418FA861A945",
+      "source_bytes": 2274,
+      "output_bytes": 2274,
+      "output_sha256": "B53354A3206B7D7F94BC48F54005A4CC0444DCDA28F060CB6893418FA861A945"
     },
     {
       "output_path": "README.md",
       "source_path": "source/presentation/f100/README.md.template",
       "transform": "historical-readme-template-v1",
-      "source_sha256": "84E308C5EDBCD4E8EF9BC590C1DE581511AA17AE35520910A8734F6D3CED181F",
-      "source_bytes": 4701,
-      "output_bytes": 4568,
-      "output_sha256": "F890259236DD196CF2B88021182053D07047C1BA79E61DD6EA3A96D9A6F1CF9E"
+      "source_sha256": "DF4679E4DCE50FF5FBED8501373F9C52F1A87EEBE64B6001E31551B4FD626BC7",
+      "source_bytes": 4728,
+      "output_bytes": 4595,
+      "output_sha256": "6BBF7DC0D4E30AF0F6ADFA34CB72CBDDB05F37FE28FB4B8C82A58FA6E3465F6A"
     },
     {
       "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
       "source_path": "source/adapters/historical/legacy-reduced/target_profiles.lua.template",
       "transform": "legacy-target-profile-template-v1",
-      "source_sha256": "24B6590C75666474FAF50CD1509F9CB707A854B0062EA8F59CA7A81207B30DEC",
-      "source_bytes": 4562,
-      "output_bytes": 4271,
-      "output_sha256": "BC0854AA134E7ADC2637D686D02D1C9FF5B6CDD494FF9D30114DC5C5DFF974D5"
+      "source_sha256": "50A6D79E7962DA514CBBDEC07EBB1B47BC3B0CC046C36E99A5F51EC37D1FD08E",
+      "source_bytes": 4596,
+      "output_bytes": 4305,
+      "output_sha256": "FB50732C567D8ADE7FA06DA50F71C18E77DFB1E5797BD65C426C31E460EBD831"
     }
   ],
   "patches": [
@@ -70,5 +70,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "697707E49C7165BBCCA685FEB9553F535FAE234122167390A13EA50C42CB17E1"
+  "record_sha256": "24C549E3AD2B79F5AEACCB7F874A1E2BEECEE2C9764E3E64385B768A545C2B22"
 }

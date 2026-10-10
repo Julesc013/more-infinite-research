@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "kind": "MIR42FinalReleaseManifestV1",
+  "status": "accepted-for-publication-with-disclosed-qualification-gaps",
+  "source_tag": "v4.2.1",
+  "source_version": "4.2.1",
+  "source": {
+    "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+    "tree": "f626b340ab60d3bdb0536874e6dcbdff6833eaf5"
+  },
+  "built_from_dev_commit": "3f93d4f51db02b27d0800fa13ba9de694cab552e",
+  "promotion_candidate_commit": "836c4c19c763a3996c1011ec22a13eaba18fb2c3",
+  "promotion_pull_request": "https://github.com/Julesc013/more-infinite-research/pull/599",
+  "package_source_sha256": "F7422011D2EBA19FA8A858ED1AC67EA3D388CB9492B1C1BCEAF9CE66F77C141E",
+  "candidate_manifest_sha256": "D4CFA16F3EF263892997A12D9B67B3DC3280AF0A7E66A5C935B50F0587247B77",
+  "targets": [
+    {
+      "target": "f210",
+      "distribution_version": "4.2.21001",
+      "filename": "more-infinite-research_4.2.21001.zip",
+      "factorio_version": "2.1",
+      "distribution_tag": "dist/f210/v4.2.21001",
+      "content_sha256": "605810BB70E55E9955C24C87521A8F53753194CD6E28C50EA32C0527CEC5FCF6",
+      "entry_count": 342,
+      "bytes": 1419453,
+      "sha256": "5B1F56479D490DCA116EC373809C63138513B5A7AEBDDE1871DAB7373709A396"
+    },
+    {
+      "target": "f200",
+      "distribution_version": "4.2.20001",
+      "filename": "more-infinite-research_4.2.20001.zip",
+      "factorio_version": "2.0",
+      "distribution_tag": "dist/f200/v4.2.20001",
+      "content_sha256": "DDE5819F24DCC4C174F8F04E11FC92A325790E750E65E0AC47449C35D7813EE0",
+      "entry_count": 340,
+      "bytes": 1415574,
+      "sha256": "EDD4A15F1C405C4B2F8487D86FC16F8C0A06470F71D3B4D05B4CAB8329D41732"
+    },
+    {
+      "target": "f110",
+      "distribution_version": "4.2.11001",
+      "filename": "more-infinite-research_4.2.11001.zip",
+      "factorio_version": "1.1",
+      "distribution_tag": "dist/f110/v4.2.11001",
+      "content_sha256": "902026EC5C7CF759E391A69CFBD32FF6CD49856EA933225CF53FA858C932D9A6",
+      "entry_count": 280,
+      "bytes": 678465,
+      "sha256": "81847FC97DC08A89FF82F4747897393EF62384BE5FF98179000DBA2048201B7D"
+    },
+    {
+      "target": "f100",
+      "distribution_version": "4.2.10001",
+      "filename": "more-infinite-research_4.2.10001.zip",
+      "factorio_version": "1.0",
+      "distribution_tag": "dist/f100/v4.2.10001",
+      "content_sha256": "66FCC117D57B5D65BFE14F314082FE7B418E1718C7BC51CE57F1756F3E8B11E7",
+      "entry_count": 280,
+      "bytes": 678466,
+      "sha256": "7C7FDC49630E7A8920CA71F1E396CFBD1378873EC26D7FA4543CBEFF8B3E2298"
+    },
+    {
+      "target": "f017",
+      "distribution_version": "4.2.01701",
+      "filename": "more-infinite-research_4.2.01701.zip",
+      "factorio_version": "0.17",
+      "distribution_tag": "dist/f017/v4.2.01701",
+      "content_sha256": "7F5182E7A25473333016077B586A26C23BE9C61B514136C54811F07CA009471C",
+      "entry_count": 280,
+      "bytes": 664081,
+      "sha256": "57DE1175BD03298740A695D006BC69724A534E92A71C2AC9CD4F14A8647C6B03"
+    },
+    {
+      "target": "f016",
+      "distribution_version": "4.2.01601",
+      "filename": "more-infinite-research_4.2.01601.zip",
+      "factorio_version": "0.16",
+      "distribution_tag": "dist/f016/v4.2.01601",
+      "content_sha256": "B2D927B65877A997449AA1F5537774A54984B069C611A92967826B7B0D47F6D7",
+      "entry_count": 280,
+      "bytes": 664347,
+      "sha256": "172C1C939023CC238A7FBF83084391D2D00C81807C692E7C71D87C2725D069FD"
+    },
+    {
+      "target": "f015",
+      "distribution_version": "4.2.01501",
+      "filename": "more-infinite-research_4.2.01501.zip",
+      "factorio_version": "0.15",
+      "distribution_tag": "dist/f015/v4.2.01501",
+      "content_sha256": "31F1B3A47EFF9274C3E54F244DDF5AA30A3FCD1FB113B458E6DB6F59CB2A58F5",
+      "entry_count": 280,
+      "bytes": 664338,
+      "sha256": "2C7B4FF1F6CF16620F29C9FC05F209CED970334DAE31981DBBC98FC7502ABE71"
+    },
+    {
+      "target": "f014",
+      "distribution_version": "4.2.01401",
+      "filename": "more-infinite-research_4.2.01401.zip",
+      "factorio_version": "0.14",
+      "distribution_tag": "dist/f014/v4.2.01401",
+      "content_sha256": "75C3AD8C0063FB1ED8932451FC9EE75ACED2A88B7E68544DED1C9B5EA6A012C0",
+      "entry_count": 280,
+      "bytes": 664601,
+      "sha256": "FC969A8BF83E36C9306138CB80BD0328E343DF3A631C485B65CF40B83B61A00D"
+    },
+    {
+      "target": "f013",
+      "distribution_version": "4.2.01301",
+      "filename": "more-infinite-research_4.2.01301.zip",
+      "factorio_version": "0.13",
+      "distribution_tag": "dist/f013/v4.2.01301",
+      "content_sha256": "EAEB014B5A430BFCDE2F8DFAAF82F3EB26436D91A38155B310CE26AC8CC51783",
+      "entry_count": 280,
+      "bytes": 664600,
+      "sha256": "0A9AB6E951AD9FED8A741158A6DF2AF04B2A81A86B2F402BD291AAC027D8CCD9"
+    }
+  ],
+  "signed": false,
+  "immutable": false,
+  "packages_rebuilt_after_acceptance": false,
+  "acceptance": {
+    "basis": "Maintainer requested immediate release of the accepted 3f93d4f package set from main. The promoted source includes the necessary package-excluded proof-lineage repair from PR #598 after the original candidate failed CI. Package bytes are unchanged; qualification gaps remain disclosed.",
+    "full_technical_seal": false,
+    "independent_review": false,
+    "protected_signing_and_restore": false,
+    "inherited_420_waiver": false,
+    "pending_checks": "release-notes.md",
+    "remaining_programme": "MIR-4.2.2-backlog.md"
+  },
+  "predecessor": {
+    "tag": "v4.2.0-stable",
+    "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+    "release_id": 402577876,
+    "manifest_sha256": "E5F658F253F4E3E22C38A9B08394CE8554CECD20C4583BC5D23AA72D027E93A9"
+  },
+  "manual_portal_order": [
+    "f210",
+    "f200",
+    "f110",
+    "f100",
+    "f017",
+    "f016",
+    "f015",
+    "f014",
+    "f013"
+  ],
+  "portal_interval_hours": 6,
+  "acceptance_record_kind": "MIR421MaintainerAcceptedReleaseV1",
+  "version_contract": {
+    "source_version": "4.2.1",
+    "source_patch": 1,
+    "formula": "100 * integer(CCC) + source patch",
+    "component_width": 5,
+    "distribution_exception": false
+  },
+  "github_prerelease": false,
+  "frozen_development_commit": "7ced01db3eb89095cce2d3285ca30ce76f00ed81",
+  "package_excluded_correction": {
+    "pull_request": 598,
+    "file": "tests/mir4/Test-MIR4IntegrationProgramme.ps1",
+    "reason": "Recognize exact-tree frozen-source lineage after the governed squash promotion; retain all historical blob/hash checks.",
+    "packages_changed": false,
+    "original_accepted_source": "3f93d4f51db02b27d0800fa13ba9de694cab552e"
+  }
+}

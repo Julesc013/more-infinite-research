@@ -1,0 +1,96 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0132",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Select explicit 4.2.2 identities in the existing governed native package inputs.",
+  "details": [
+    "The modern current-candidate reader, F210 wrapper and governed package builder accept explicit source 4.2.2 while preserving the 4.2.1 default. The child receives the selected source version and matching distribution patch.",
+    "Tiny controlled archives and actual governed child execution cover F210/F200 source 4.2.1 and 4.2.2, wrong-version and changed-byte refusal. The browser README helper uses the same explicitly selected patch transform.",
+    "This repository-only change prepares current native inputs. It grants no native gameplay, graphical, save, release or historical-target acceptance; unchanged callers keep their previous explicit/default selection."
+  ],
+  "semantic_domains": [
+    "packaging",
+    "release-tooling"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Explicit current native candidate, governed builder and README identity selection; gameplay qualification remains separate."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Explicit current native candidate, governed builder and README identity selection; gameplay qualification remains separate."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "These selected native adapters support F210/F200 only."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "These selected native adapters support F210/F200 only."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "These selected native adapters support F210/F200 only."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "These selected native adapters support F210/F200 only."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "These selected native adapters support F210/F200 only."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "These selected native adapters support F210/F200 only."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "These selected native adapters support F210/F200 only."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/RELEASE-RUNBOOK.md"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/tooling/Test-MIRNativeProbeResources.ps1: explicit current-candidate and governed source-version controls"
+    }
+  ]
+}

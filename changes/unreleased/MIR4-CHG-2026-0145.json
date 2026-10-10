@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0145",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Separate Research Library availability from optional settings-profile tools.",
+  "details": [
+    "Library shortcuts and runtime registration use the explicit research_library target capability. Both modern targets preserve their existing Library and profile tools.",
+    "Profile export controls are omitted when profiles are unavailable, and stale export actions cannot call the codec or write a file. Target validation requires a composed Library host and data-stage entry point.",
+    "The existing browser fixture consumes actual stages, both coordinators and registered handlers. Historical targets remain disabled pending their real host adapters and native interaction/save qualification."
+  ],
+  "semantic_domains": [
+    "presentation",
+    "runtime",
+    "target-portability"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Independent Library capability preserves existing enabled modern functionality; current native qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Independent Library capability preserves existing enabled modern functionality; current native qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Library remains disabled; no historical support is added by the explicit capability declaration."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Library remains disabled; no historical support is added by the explicit capability declaration."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Library remains disabled; no historical support is added by the explicit capability declaration."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Library remains disabled; no historical support is added by the explicit capability declaration."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Library remains disabled; no historical support is added by the explicit capability declaration."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Library remains disabled; no historical support is added by the explicit capability declaration."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Library remains disabled; no historical support is added by the explicit capability declaration."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "A16/A21, UI-01-UI-04 and PLAT-UI-01: separate the Library capability from settings-profile tools; historical host portability remains open."
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}

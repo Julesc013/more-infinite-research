@@ -30,7 +30,7 @@ stub("prototypes.mir.platform.factorio.prototype_lookup", {
     for name, prototype in pairs(world.item_prototypes) do callback(name, prototype, prototype.type or "item") end
   end,
   each_entity_prototype = function(callback)
-    for _, prototype_type in ipairs({"lab", "assembling-machine", "offshore-pump", "boiler"}) do
+    for _, prototype_type in ipairs({"lab", "assembling-machine", "rocket-silo", "cargo-landing-pad", "offshore-pump", "boiler"}) do
       for name, prototype in pairs(data.raw[prototype_type] or {}) do callback(name, prototype, prototype_type) end
     end
   end
@@ -166,6 +166,7 @@ route_policy = require("prototypes.mir.capabilities.science_integration.producti
 
 local function reset(next_world, fixture_fluid_crafter)
   world = next_world
+  _G.feature_flags = world.feature_flags
   -- Existing fluid-shape fixtures need independently acquired placement
   -- actors, separate from their output/filter oracle. These resources are
   -- controlled fixture inputs, not a source policy or native placement claim.
@@ -204,6 +205,9 @@ local function reset(next_world, fixture_fluid_crafter)
     unit = world.units or {},
     turret = world.turrets or {},
     ["assembling-machine"] = world.assembling_machines or {},
+    ["rocket-silo"] = world.rocket_silos or {},
+    ["rocket-silo-rocket"] = world.rockets or {},
+    ["cargo-landing-pad"] = world.landing_pads or {},
     tile = world.tiles or {},
     ["offshore-pump"] = world.offshore_pumps or {},
     boiler = world.boilers or {},
@@ -578,6 +582,472 @@ local function route_fact(output, ingredients, options)
       surface_conditions = options.surface_conditions
     }}
   }
+end
+
+-- Native spoilage is a conditional item source, not a recipe and not an
+-- unconditional seed. These controlled prototypes exercise actual acquisition
+-- and science traversal, without claiming native production or freshness.
+do
+  local function spoilage_world(locked)
+    local w = {
+      feature_flags = {spoiling = true},
+      item_prototypes = {
+        bacteria = {spoil_ticks = 3600, spoil_result = "ore"}, ore = {}, starter = {}
+      },
+      labs = {lab = {inputs = {"ore", "starter"}}}, techs = {},
+      recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+      resources = {seed = {minable = {result = locked and "starter" or "bacteria", count = 1}}}
+    }
+    if locked then
+      w.techs.Culture = technology("starter", "culture")
+      w.recipe_prototypes.culture = {enabled = false}
+      w.recipe_facts.culture = route_fact("bacteria", {{name = "starter", amount = 1}}, {enabled = false})
+      w.producers.bacteria = {"culture"}
+      w.unlockers.culture = {"Culture"}
+    end
+    return w
+  end
+  local previous_version = target_profile.current_factorio_version
+  for _, version in ipairs({"2.0", "2.1"}) do
+    target_profile.current_factorio_version = version
+    reset(spoilage_world())
+    local witness = feasibility.acquisition_witness("ore")
+    check("SPOIL01-" .. version, witness and witness.kind == "item-spoilage"
+      and witness.prototype == "bacteria" and witness.spoil_ticks == 3600
+      and witness.ingredients and witness.ingredients[1].product.name == "bacteria",
+      "An acquired item can spoil into a declared item while preserving its seed witness")
+    check("SPOIL02-" .. version, production.pack_production_status("ore", {}) == "non-recipe"
+      and feasibility.acquisition_witness({type = "fluid", name = "ore"}) == nil,
+      "A lab-listed spoilage item can supply science without inventing a same-named fluid")
+    if witness then witness.ingredients[1].product.name = "mutated" end
+    local repeated = feasibility.acquisition_witness("ore")
+    check("SPOIL03-" .. version, repeated and repeated.ingredients[1].product.name == "bacteria"
+      and context.states.compiler_telemetry.counters.item_prototype_index_builds == 1,
+      "Returned proofs are private and normal queries share one item index per context")
+
+    reset(spoilage_world(true))
+    local status = production.pack_production_status("ore", {})
+    local route = production.independent_pack_acquisition_witness("ore", "unrelated", {}, {})
+    check("SPOIL04-" .. version, status == "research" and route
+      and route.source.kind == "item-spoilage" and table.concat(route.unlockers, ",") == "Culture"
+      and table.concat(production.prereq_techs_for_science_pack("ore"), ",") == "Culture",
+      "The spoilage input retains its recipe unlock in science progression")
+    check("SPOIL05-" .. version, feasibility.source_witness("ore") == nil
+      and production.independent_pack_acquisition_witness("ore", "Culture", {}, {}) == nil,
+      "A warmed future route cannot become initial or bypass its required unlock")
+    world.recipe_facts.culture.variants[1].ingredients = {{name = "ore", amount = 1}}
+    world.recipe_source_epoch = 2
+    check("SPOIL06-" .. version, production.pack_production_status("ore", {}) == "unreachable",
+      "Replacing the seed recipe invalidates a cached spoilage route")
+
+    local w = spoilage_world(true)
+    w.techs.Culture = technology("ore", "culture")
+    reset(w)
+    check("SPOIL07-" .. version, production.pack_production_status("ore", {}) == "unreachable",
+      "Science cannot fund the research that first acquires its own spoilage input")
+    w = spoilage_world()
+    w.resources = {}
+    w.item_prototypes.ore = {spoil_ticks = 60, spoil_result = "bacteria"}
+    reset(w)
+    check("SPOIL08-" .. version, feasibility.acquisition_witness("ore") == nil,
+      "An unseeded native spoilage cycle cannot bootstrap acquisition")
+    w = spoilage_world()
+    w.resources = {}
+    w.recipe_facts.recycle = route_fact("bacteria", {{name = "ore", amount = 1}})
+    w.producers.bacteria = {"recycle"}
+    reset(w)
+    check("SPOIL09-" .. version, feasibility.acquisition_witness("ore") == nil,
+      "An unseeded mixed recipe and spoilage cycle cannot bootstrap acquisition")
+    w.item_prototypes["other-seed"] = {spoil_ticks = 30, spoil_result = "ore"}
+    w.resources.seed = {minable = {result = "other-seed", count = 1}}
+    reset(w)
+    local alternative = feasibility.acquisition_witness("ore")
+    check("SPOIL10-" .. version, alternative and alternative.prototype == "other-seed",
+      "A cyclic earlier input cannot hide another acquired spoilage source")
+    w = spoilage_world()
+    w.item_prototypes.ore = {spoil_ticks = 60, spoil_result = "aged-pack"}
+    w.item_prototypes["aged-pack"] = {}
+    reset(w)
+    local chain = feasibility.acquisition_witness("aged-pack")
+    check("SPOIL11-" .. version, chain and chain.ingredients[1].kind == "item-spoilage",
+      "A seeded multi-step spoilage chain retains both conversions")
+
+    for index, flag in ipairs({false, "true", 1}) do
+      w = spoilage_world(); w.feature_flags.spoiling = flag; reset(w)
+      check("SPOIL12-" .. version .. "-" .. index, feasibility.acquisition_witness("ore") == nil,
+        "Only the engine's enabled spoiling feature grants the conversion")
+    end
+    w = spoilage_world(); w.feature_flags = nil; reset(w)
+    check("SPOIL13-" .. version, feasibility.acquisition_witness("ore") == nil,
+      "Missing feature facts do not grant positive spoilage acquisition")
+    for index, ticks in ipairs({0, -1, "60", math.huge, 0/0}) do
+      w = spoilage_world(); w.item_prototypes.bacteria.spoil_ticks = ticks; reset(w)
+      check("SPOIL14-" .. version .. "-" .. index, feasibility.acquisition_witness("ore") == nil,
+        "Disabled or invalid spoil durations cannot supply items")
+    end
+    w = spoilage_world()
+    w.item_prototypes.bacteria.spoil_result = nil
+    w.item_prototypes.bacteria.spoil_to_trigger_result = {items_per_trigger = 1, trigger = {}}
+    reset(w)
+    check("SPOIL15-" .. version, feasibility.acquisition_witness("ore") == nil,
+      "A spoil trigger alone does not declare an item product")
+
+    reset(spoilage_world())
+    data.raw.item = world.item_prototypes
+    local visits = 0
+    local observer = {reserve_visit = function()
+      visits = visits + 1; return true
+    end}
+    local diagnostic = feasibility.acquisition_witness("ore", {diagnostic_observer = observer})
+    check("SPOIL16-" .. version, diagnostic and diagnostic.kind == "item-spoilage"
+      and visits > 0 and context.states.item_prototype_index == nil,
+      "A cold diagnostic follows spoilage without building the comprehensive index")
+    for index = 1, 100 do data.raw.item["filler-" .. index] = {} end
+    visits = 0
+    observer.reserve_visit = function()
+      if visits >= 8 then return false end
+      visits = visits + 1; return true
+    end
+    check("SPOIL17-" .. version,
+      feasibility.acquisition_witness("ore", {diagnostic_observer = observer}) == nil
+      and visits == 8 and context.states.item_prototype_index == nil,
+      "An incomplete diagnostic scan cannot grant a spoilage route or warm the item index")
+  end
+  target_profile.current_factorio_version = "1.1"
+  reset(spoilage_world())
+  check("SPOIL18", feasibility.acquisition_witness("ore") == nil,
+    "Spoilage fields cannot grant a capability to a historical target")
+  target_profile.current_factorio_version = previous_version
+end
+
+-- Rocket-silo crafts count toward construction; their recipe products are
+-- ignored by the engine (RocketSiloPrototype.rocket_parts_required). A launch
+-- product is a separate process and cannot be inferred from that recipe.
+do
+  local previous_version = target_profile.current_factorio_version
+  for _, version in ipairs({"2.0", "2.1"}) do
+    target_profile.current_factorio_version = version
+    reset({
+      item_prototypes = {
+        pack = {type = "item"}, part = {type = "item"},
+        ["silo-kit"] = {type = "item", place_result = "silo"},
+        ["assembler-kit"] = {type = "item", place_result = "assembler"}
+      },
+      labs = {lab = {inputs = {"pack"}}}, techs = {}, recipe_prototypes = {}, unlockers = {},
+      resources = {
+        ore = {minable = {result = "ore", count = 1}},
+        silo = {minable = {result = "silo-kit", count = 1}},
+        assembler = {minable = {result = "assembler-kit", count = 1}}
+      },
+      recipe_facts = {
+        parts = route_fact("part", {{name = "ore", amount = 1}}, {categories = {"rocket-building"}}),
+        pack = route_fact("pack", {{name = "part", amount = 1}})
+      },
+      producers = {part = {"parts"}, pack = {"pack"}},
+      rocket_silos = {silo = {
+        name = "silo", crafting_categories = {"rocket-building"}, fixed_recipe = "parts",
+        rocket_parts_required = 100, rocket_entity = "rocket"
+      }}
+    })
+    check("ROCKET01-" .. version,
+      feasibility.initial_recipe_witness("parts", "part") == nil,
+      "An obtainable silo does not emit the item listed in its construction recipe")
+    check("ROCKET02-" .. version,
+      feasibility.acquisition_witness("part") == nil,
+      "The shared item-acquisition solver rejects phantom silo recipe products")
+    check("ROCKET03-" .. version,
+      production.pack_production_status("pack", {}) == "unreachable",
+      "A downstream science recipe cannot consume the silo's discarded product")
+
+    -- An ordinary assembler may legitimately share the category. Reject the
+    -- silo actor, not the recipe name or the category as a whole.
+    world.assembling_machines = {
+      assembler = {crafting_categories = {"rocket-building"}, fixed_recipe = "parts"}
+    }
+    data.raw["assembling-machine"] = world.assembling_machines
+    world.recipe_source_epoch = 2
+    reset(world)
+    local part = feasibility.acquisition_witness("part")
+    check("ROCKET04-" .. version,
+      part and part.machine and part.machine.prototype_type == "assembling-machine"
+        and production.pack_production_status("pack", {}) == "initial",
+      "A separate obtainable assembler proves the real output and downstream science route")
+    world.assembling_machines.assembler = nil
+    world.recipe_source_epoch = 3
+    check("ROCKET05-" .. version,
+      feasibility.acquisition_witness("part") == nil
+        and production.pack_production_status("pack", {}) == "unreachable",
+      "Removing the real producer invalidates its warm acquisition and science results")
+
+    world.recipe_facts.parts = route_fact("ignored-fluid", {}, {
+      categories = {"rocket-building"},
+      results = {{type = "fluid", name = "ignored-fluid", amount = 10}}
+    })
+    world.rocket_silos.silo.fluid_boxes = {{production_type = "output"}}
+    world.recipe_source_epoch = 4
+    check("ROCKET06-" .. version,
+      feasibility.initial_recipe_witness("parts", {type = "fluid", name = "ignored-fluid"}) == nil,
+      "Adding output ports cannot make a silo emit discarded fluid recipe products")
+  end
+  target_profile.current_factorio_version = previous_version
+end
+
+-- A04: a launch return needs the payload, silo, construction and receiver.
+-- Its construction recipe has no obtainable ordinary product.
+do
+  local function launch_world(locked)
+    local w = {
+      item_prototypes = {
+        pack = {type = "tool"}, seed = {type = "tool"},
+        payload = {type = "item", send_to_orbit_mode = "automated",
+          rocket_launch_products = {{type = "item", name = "pack", amount = 1000}}},
+        ["silo-kit"] = {type = "item", place_result = "silo"},
+        ["pad-kit"] = {type = "item", place_result = "pad"}
+      },
+      labs = {lab = {inputs = {"seed", "pack"}}},
+      resources = {ore = {minable = {result = "ore", count = 1}},
+        seed = {minable = {result = "seed", count = 1}}},
+      techs = {}, recipe_prototypes = {}, unlockers = {},
+      recipe_facts = {
+        payload = route_fact("payload", {{name = "ore", amount = 1}}, {enabled = not locked}),
+        silo = route_fact("silo-kit", {{name = "ore", amount = 1}}, {enabled = not locked}),
+        pad = route_fact("pad-kit", {{name = "ore", amount = 1}}, {enabled = not locked}),
+        parts = route_fact("ignored-part", {{name = "ore", amount = 10}},
+          {enabled = not locked, categories = {"rocket-building"}})
+      },
+      producers = {payload = {"payload"}, ["silo-kit"] = {"silo"}, ["pad-kit"] = {"pad"}, ["ignored-part"] = {"parts"}},
+      rocket_silos = {silo = {name = "silo", crafting_categories = {"rocket-building"},
+        fixed_recipe = "parts", crafting_speed = 1, rocket_parts_required = 100,
+        rocket_entity = "rocket", to_be_inserted_to_rocket_inventory_size = 1}},
+      rockets = {rocket = {name = "rocket", inventory_size = 1}},
+      landing_pads = {pad = {name = "pad", inventory_size = 20}}
+    }
+    for _, recipe in ipairs({"payload", "silo", "parts", "pad"}) do
+      w.recipe_prototypes[recipe] = {enabled = not locked}
+      if locked then
+        local gate = "unlock-" .. recipe
+        w.techs[gate] = technology("seed", recipe)
+        w.unlockers[recipe] = {gate}
+      end
+    end
+    return w
+  end
+  local previous_version = target_profile.current_factorio_version
+  for _, version in ipairs({"2.0", "2.1"}) do
+    target_profile.current_factorio_version = version
+    reset(launch_world(false))
+    local witness = feasibility.acquisition_witness("pack")
+    check("LAUNCH01-" .. version, witness and witness.kind == "rocket-launch"
+      and witness.payload == "payload" and witness.machine.prototype == "silo"
+      and witness.receiver and witness.receiver.prototype == "pad"
+      and witness.recipe_witness.recipe == "parts" and witness.recipe_witness.crafts == 100,
+      "Payload, obtainable silo, receiver and construction crafts prove a concrete launch product")
+    check("LAUNCH02-" .. version, production.pack_production_status("pack", {}) == "non-recipe"
+      and feasibility.acquisition_witness("ignored-part") == nil,
+      "Initial launch science is available without inventing a construction recipe output")
+    reset(launch_world(true))
+    local status = production.pack_production_status("pack", {})
+    local route = production.independent_pack_acquisition_witness("pack", "unrelated", {}, {})
+    check("LAUNCH03-" .. version, status == "research" and route
+      and table.concat(route.unlockers, ",") == "unlock-pad,unlock-parts,unlock-payload,unlock-silo",
+      "Launch science retains all four independent research gates")
+    check("LAUNCH04-" .. version, feasibility.source_witness("pack") == nil
+      and production.independent_pack_acquisition_witness("pack", "unlock-parts", {}, {}) == nil,
+      "A future launch is not initial and cannot bootstrap its own construction unlock")
+    for _, gate in ipairs({"unlock-parts", "unlock-payload", "unlock-silo", "unlock-pad"}) do
+      local w = launch_world(true)
+      w.techs[gate] = technology("pack", gate:sub(8))
+      reset(w)
+      check("LAUNCH05-" .. version .. "-" .. gate,
+        production.pack_production_status("pack", {}) == "unreachable",
+        "Launch research cannot consume its own return pack through any required gate")
+    end
+    local mutations = {
+      payload = function(w) w.recipe_facts.payload.variants[1].ingredients = {{name = "pack", amount = 1}} end,
+      construction = function(w) w.recipe_facts.parts.variants[1].ingredients = {{name = "pack", amount = 1}} end,
+      silo = function(w) w.recipe_facts.silo.variants[1].ingredients = {{name = "pack", amount = 1}} end,
+      receiver_cycle = function(w) w.recipe_facts.pad.variants[1].ingredients = {{name = "pack", amount = 1}} end,
+      receiver_missing = function(w) w.landing_pads = {} end,
+      receiver_item = function(w) w.item_prototypes["pad-kit"].place_result = nil end,
+      receiver_unobtainable = function(w) w.producers["pad-kit"] = {} end,
+      receiver_inventory = function(w) w.landing_pads.pad.inventory_size = 0 end,
+      category = function(w) w.rocket_silos.silo.crafting_categories = {"other"} end,
+      rocket = function(w) w.rockets.rocket = nil end,
+      payload_slot = function(w) w.rocket_silos.silo.to_be_inserted_to_rocket_inventory_size = 0 end,
+      rocket_slot = function(w) w.rockets.rocket.inventory_size = 0 end,
+      speed = function(w) w.rocket_silos.silo.crafting_speed = 0 end,
+      crafts = function(w) w.rocket_silos.silo.rocket_parts_required = 0 end,
+      mode = function(w) w.item_prototypes.payload.send_to_orbit_mode = "not-sendable" end,
+      absent_mode = function(w) w.item_prototypes.payload.send_to_orbit_mode = nil end,
+      platform = function(w) w.rocket_silos.silo.launch_to_space_platforms = true end,
+      yield = function(w) w.item_prototypes.payload.rocket_launch_products[1].amount = 0 end,
+      fluid = function(w) w.item_prototypes.payload.rocket_launch_products[1].type = "fluid" end
+    }
+    for name, mutate in pairs(mutations) do
+      local w = launch_world(false); mutate(w); reset(w)
+      check("LAUNCH06-" .. version .. "-" .. name,
+        feasibility.acquisition_witness("pack") == nil,
+        "An incomplete or cyclic launch process cannot establish acquisition")
+    end
+    local w = launch_world(false)
+    w.planets = {a = {surface_properties = {pressure = 1}}, b = {surface_properties = {pressure = 2}}}
+    w.rocket_silos.silo.surface_conditions = {{property = "pressure", min = 1, max = 1}}
+    w.recipe_facts.parts.variants[1].surface_conditions = {{property = "pressure", min = 2, max = 2}}
+    reset(w)
+    check("LAUNCH07-" .. version, feasibility.acquisition_witness("pack") == nil,
+      "Silo and construction recipe need the same surface witness")
+    w.recipe_facts.parts.variants[1].surface_conditions = {{property = "pressure", min = 1, max = 1}}
+    w.item_prototypes.payload.send_to_orbit_mode = "manual"
+    reset(w)
+    check("LAUNCH08-" .. version, feasibility.acquisition_witness("pack") ~= nil,
+      "A concrete matching surface and manual launch mode remain usable")
+
+    w = launch_world(false)
+    w.recipe_facts.parts.hidden = true
+    w.recipe_facts.parts.variants[1].hidden = true
+    w.recipe_facts.parts.variants[1].results = {{type = "fluid", name = "discarded", amount = 10}}
+    reset(w)
+    check("LAUNCH09-" .. version, feasibility.acquisition_witness("pack") ~= nil,
+      "A hidden fixed construction recipe works without an output port for its discarded products")
+    w.recipe_facts.parts.variants[1].ingredients = {{type = "fluid", name = "water", amount = 10}}
+    reset(w)
+    local water_source = {source_witness = function(name, kind) return name == "water" and kind == "fluid" end}
+    check("LAUNCH10-" .. version, feasibility.acquisition_witness("pack", water_source) == nil,
+      "Construction cannot consume fluid through a silo without an input port")
+    w.rocket_silos.silo.fluid_boxes = {{production_type = "input"}}
+    reset(w)
+    check("LAUNCH11-" .. version, feasibility.acquisition_witness("pack", water_source) ~= nil,
+      "An obtainable fluid input and compatible silo port complete construction")
+    check("LAUNCH12-" .. version, feasibility.acquisition_witness("pack") == nil,
+      "A fluid port alone never proves the construction fluid obtainable")
+    w.rocket_silos.silo.fluid_boxes[1].filter = "oil"
+    reset(w)
+    check("LAUNCH-FILTER-REJECT-" .. version, feasibility.acquisition_witness("pack", water_source) == nil,
+      "An independently available construction fluid cannot enter a silo port filtered for another fluid")
+    w.rocket_silos.silo.fluid_boxes[1].filter = "water"
+    reset(w)
+    check("LAUNCH-FILTER-ACCEPT-" .. version, feasibility.acquisition_witness("pack", water_source) ~= nil,
+      "A matching silo input filter preserves the complete launch acquisition route")
+
+    w = launch_world(true)
+    w.techs["alternate-parts"] = technology("seed", "parts")
+    w.unlockers.parts = {"unlock-parts", "alternate-parts"}
+    reset(w)
+    local independent = production.independent_pack_acquisition_witness("pack", "alternate-parts", {}, {})
+    check("LAUNCH13-" .. version, independent
+      and table.concat(independent.unlockers, ",") == "unlock-pad,unlock-parts,unlock-payload,unlock-silo"
+      and independent.recipe == nil and independent.source.kind == "rocket-launch",
+      "Excluding one construction unlock retains an independent alternative without inventing a pack recipe")
+    check("LAUNCH14-" .. version,
+      table.concat(production.prereq_techs_for_science_pack("pack"), ",")
+        == "alternate-parts,unlock-pad,unlock-payload,unlock-silo",
+      "The planner's consumed prerequisite service retains every selected launch gate")
+    check("LAUNCH15-" .. version,
+      production.independent_pack_acquisition_witness("pack", "unlock-payload", {}, {}) == nil,
+      "A warmed root route cannot bypass an excluded required payload unlock")
+
+    w = launch_world(false)
+    w.rocket_silos["a-unusable"] = {name = "a-unusable", fixed_recipe = "parts"}
+    w.item_prototypes["earlier-payload"] = {type = "item", send_to_orbit_mode = "manual",
+      rocket_launch_products = {{type = "item", name = "pack", amount = 1}}}
+    reset(w)
+    check("LAUNCH16-" .. version, feasibility.acquisition_witness("pack").payload == "payload",
+      "Unobtainable payload and unusable silo alternatives cannot hide a later complete launch")
+    local visits = 0
+    local observer = {reserve_visit = function()
+      if visits >= 3 then return false end
+      visits = visits + 1; return true
+    end}
+    check("LAUNCH17-" .. version,
+      feasibility.acquisition_witness("pack", {diagnostic_observer = observer}) == nil and visits == 3,
+      "A bounded launch inspection cannot turn incomplete work into acquisition")
+    reset(launch_world(true))
+    local before_replacement = production.pack_production_status("pack", {})
+    world.recipe_facts.parts.variants[1].ingredients = {{name = "pack", amount = 1}}
+    world.recipe_source_epoch = 2
+    check("LAUNCH18-" .. version, before_replacement == "research"
+      and production.pack_production_status("pack", {}) == "unreachable",
+      "Replacing construction inputs invalidates a warmed launch acquisition and science frontier")
+
+    w = launch_world(false)
+    w.landing_pads = {}
+    w.rocket_silos.silo.can_launch_without_landing_pads = true
+    reset(w)
+    check("LAUNCH20-" .. version, feasibility.acquisition_witness("pack") == nil,
+      "Permission to launch without a pad does not supply a receiver for returned items")
+
+    w = launch_world(false)
+    w.planets = {a = {surface_properties = {pressure = 1}},
+      b = {surface_properties = {pressure = 2}}, c = {surface_properties = {pressure = 3}}}
+    w.rocket_silos.silo.surface_conditions = {{property = "pressure", min = 1, max = 2}}
+    w.recipe_facts.parts.variants[1].surface_conditions = {{property = "pressure", min = 2, max = 3}}
+    w.landing_pads.pad.surface_conditions = {{property = "pressure", min = 3, max = 3}}
+    reset(w)
+    check("LAUNCH21-" .. version, feasibility.acquisition_witness("pack") == nil,
+      "A receiver on another surface cannot receive this silo's return")
+    w.landing_pads.pad.surface_conditions = {{property = "pressure", min = 1, max = 1}}
+    reset(w)
+    check("LAUNCH22-" .. version, feasibility.acquisition_witness("pack") == nil,
+      "Receiver and silo overlap is insufficient when construction requires another surface")
+    w.landing_pads.pad.surface_conditions = {{property = "pressure", min = 2, max = 2}}
+    reset(w)
+    check("LAUNCH23-" .. version, feasibility.acquisition_witness("pack") ~= nil,
+      "The same surface admits silo, construction and receiver together")
+
+    w = launch_world(false)
+    w.landing_pads["a-unobtainable"] = {name = "a-unobtainable", inventory_size = 20}
+    reset(w)
+    local alternative = feasibility.acquisition_witness("pack")
+    check("LAUNCH24-" .. version, alternative and alternative.receiver
+      and alternative.receiver.prototype == "pad",
+      "An earlier unobtainable receiver cannot hide an obtainable alternative")
+
+    reset(launch_world(true))
+    check("LAUNCH25-" .. version,
+      production.independent_pack_acquisition_witness("pack", "unrelated", {}, {}) ~= nil
+      and production.independent_pack_acquisition_witness("pack", "unlock-pad", {}, {}) == nil,
+      "A warm launch witness cannot bypass an excluded receiver unlock")
+    world.recipe_facts.pad.variants[1].ingredients = {{name = "pack", amount = 1}}
+    world.recipe_source_epoch = 2
+    check("LAUNCH26-" .. version, production.pack_production_status("pack", {}) == "unreachable",
+      "Replacing receiver acquisition invalidates a warmed launch frontier")
+
+    w = launch_world(true)
+    w.techs["alternate-pad"] = technology("seed", "pad")
+    w.unlockers.pad = {"unlock-pad", "alternate-pad"}
+    reset(w)
+    local receiver_alternative = production.independent_pack_acquisition_witness("pack", "alternate-pad", {}, {})
+    check("LAUNCH27-" .. version, receiver_alternative
+      and table.concat(receiver_alternative.unlockers, ",") == "unlock-pad,unlock-parts,unlock-payload,unlock-silo",
+      "An independent receiver unlock remains usable when its sibling is excluded")
+
+    w = launch_world(false)
+    w.planets = {a = {surface_properties = {pressure = 1}}, b = {surface_properties = {pressure = 2}}}
+    w.rocket_silos.silo.surface_conditions = {{property = "pressure", min = 1, max = 1}}
+    w.landing_pads["a-wrong-surface"] = {name = "a-wrong-surface", inventory_size = 20,
+      surface_conditions = {{property = "pressure", min = 2, max = 2}}}
+    w.item_prototypes["other-pad"] = {type = "item", place_result = "a-wrong-surface"}
+    w.resources["other-pad"] = {minable = {result = "other-pad", count = 1}}
+    reset(w)
+    local surface_alternative = feasibility.acquisition_witness("pack")
+    check("LAUNCH28-" .. version, surface_alternative and surface_alternative.receiver
+      and surface_alternative.receiver.prototype == "pad",
+      "An acquired but incompatible receiver cannot hide a later matching receiver")
+    if surface_alternative and surface_alternative.receiver then
+      surface_alternative.receiver.prototype = "changed-by-consumer"
+    end
+    local fresh_witness = feasibility.acquisition_witness("pack")
+    check("LAUNCH29-" .. version, fresh_witness and fresh_witness.receiver
+      and fresh_witness.receiver.prototype == "pad" and w.landing_pads.pad.name == "pad"
+      and w.landing_pads.pad.surface_conditions == nil
+      and w.recipe_facts.parts.variants[1].surface_conditions == nil,
+      "Returned witnesses and merged surface constraints cannot mutate prototypes or subsequent results")
+  end
+  target_profile.current_factorio_version = "1.1"
+  reset(launch_world(false))
+  check("LAUNCH19", feasibility.acquisition_witness("pack") == nil,
+    "Modern return semantics do not silently enable an unqualified historical launch contract")
+  target_profile.current_factorio_version = previous_version
 end
 
 local function feasibility_world()

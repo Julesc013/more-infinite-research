@@ -1,7 +1,8 @@
 # The maintenance scenario reuses the continuation profile's exact dependency
 # releases. Its assertion fixture replaces that profile's fresh-game fixture.
 function Read-MIR421K2UpgradeProfile {
-  param([Parameter(Mandatory)][string]$Path)
+  param([Parameter(Mandatory)][string]$Path,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   $profile=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -Depth 20
   if($profile.schema-ne1-or$profile.target-cne'f210'-or$profile.factorio_line-cne'2.1'-or
      $profile.engine_version-cne'2.1.21'-or$profile.settings_mode-cne'Defaults') {throw '[mir421-k2-upgrade-profile]'}
@@ -11,11 +12,13 @@ function Read-MIR421K2UpgradeProfile {
   $expected=[ordered]@{base='2.1.21';'elevated-rails'='2.1.21';quality='2.1.21';recycler='2.1.21';'space-age'='2.1.21';
     flib='0.17.2';'k2so-assets'='1.0.7';Krastorio2='2.1.3';'Krastorio2-spaced-out'='2.0.13';
     Krastorio2Assets='2.1.0';Krastorio2MenuSimulations='2.1.0';'xy-k2so-enhancements-nulls-fork'='0.8.3';
-    'more-infinite-research'='4.2.21001';'mir-fixture-assert-k2-213-imersite-continuation'='0.1.3'}
+    'more-infinite-research'=('4.2.2100'+([version]$SourceVersion).Build);'mir-fixture-assert-k2-213-imersite-continuation'=$(if($SourceVersion-ceq'4.2.2'){@('0.1.4')}else{@('0.1.3','0.1.4')})}
+  # Both retained profile versions select the same dependency releases. The
+  # fresh-game fixture is excluded below and replaced by the upgrade fixture.
   if(@($profile.mods).Count-ne$expected.Count){throw '[mir421-k2-upgrade-selection]'}
   foreach($name in $expected.Keys){
     $rows=@($profile.mods|Where-Object name -CEQ $name)
-    if($rows.Count-ne1-or$rows[0].enabled-isnot[bool]-or-not$rows[0].enabled-or$rows[0].version-cne$expected[$name]){throw "[mir421-k2-upgrade-selection] $name"}
+    if($rows.Count-ne1-or$rows[0].enabled-isnot[bool]-or-not$rows[0].enabled-or$rows[0].version-cnotin@($expected[$name])){throw "[mir421-k2-upgrade-selection] $name"}
   }
   $builtins=@('base','elevated-rails','quality','recycler','space-age')
   $dependencies=@($profile.mods|Where-Object {$_.name-cnotin$builtins-and$_.name-cne'more-infinite-research'-and$_.name-cne'mir-fixture-assert-k2-213-imersite-continuation'})
@@ -26,21 +29,27 @@ function Read-MIR421K2UpgradeProfile {
     if($null-eq$property-or[string]$property.Value-cnotmatch'^[0-9A-F]{64}$'){throw "[mir421-k2-upgrade-archive-hash] $filename"}
     [pscustomobject]@{file_name=$filename;expected_sha256=[string]$property.Value;identity=@{name=$row.name;version=$row.version}}
   })
-  return [pscustomobject]@{profile=$profile;inputs=$inputs;sha256=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+  return [pscustomobject]@{profile=$profile;inputs=$inputs;source_version=$SourceVersion;sha256=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
 }
 
 function Assert-MIR421K2UpgradeTransition {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
-    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@())
-  if($Target-cne'f210'-or$FromVersion-cne'4.2.21000'-or$ToVersion-cne'4.2.21001'-or
-     $FixtureName-cne'assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001'-or$Archetype-or$SpaceIsFake-or$SourceOnlyFixtureNames.Count){
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+  $patch=([version]$SourceVersion).Build
+  $expectedFrom='4.2.2100'+($patch-1);$expectedTo='4.2.2100'+$patch
+  $expectedFixture='assert-upgrade-k2-imersite-'+$expectedFrom.Replace('.','-')+'-to-'+$expectedTo.Replace('.','-')
+  if($Target-cne'f210'-or$FromVersion-cne$expectedFrom-or$ToVersion-cne$expectedTo-or
+     $FixtureName-cne$expectedFixture-or$Archetype-or$SpaceIsFake-or$SourceOnlyFixtureNames.Count){
     throw '[mir421-k2-upgrade-transition]'
   }
 }
 
 function Assert-MIR421K2UpgradeMarker {
-  param([string]$Text,[ValidateSet('source','upgrade','reload')][string]$Stage,[ValidateSet(0,3)][int]$Cap=3)
-  if(-not$Text.Contains("[mir-fixture] K2-421 maintenance state verified stage=$Stage;cap=$Cap")){throw "[mir421-k2-upgrade-$Stage-marker]"}
+  param([string]$Text,[ValidateSet('source','upgrade','reload')][string]$Stage,[ValidateSet(0,3)][int]$Cap=3,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+  $token=$SourceVersion.Replace('.','')
+  if($Text-notmatch ('\[mir-fixture\] K2-'+$token+' maintenance state verified stage='+$Stage+';cap='+$Cap+'(?:\r?\n|$)')){throw "[mir421-k2-upgrade-$Stage-marker]"}
 }
 
 # Use the shared settings writer. Cap three deliberately has no override so

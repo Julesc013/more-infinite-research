@@ -36,6 +36,7 @@ $modules=[ordered]@{
  'prototypes.mir.compatibility.policies.k2_science_phase'='source/prototypes/mir/compatibility/policies/k2_science_phase.lua'
  'prototypes.mir.index.recipe_risk_facts'='source/prototypes/mir/index/recipe_risk_facts.lua'
  'prototypes.mir.index.recipe_facts'='source/prototypes/mir/index/recipe_facts.lua'
+ 'prototypes.mir.index.item_prototype_facts'='source/prototypes/mir/index/item_prototype_facts.lua'
  'prototypes.mir.domain.facts.recipe_semantics'='source/prototypes/mir/domain/facts/recipe_semantics.lua'
  'prototypes.mir.index.recycling'='source/prototypes/mir/index/recycling.lua'
  'prototypes.mir.policy.productivity_cap_scope'='source/prototypes/mir/policy/productivity_cap_scope.lua'

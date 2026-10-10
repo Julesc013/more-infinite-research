@@ -1,0 +1,99 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0147",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Adapt Library catalogue fields, production counters and recipe navigation to the selected host.",
+  "details": [
+    "The generic catalogue receives an explicit host and imports no MIR state. Historical host reads never probe the missing research_trigger property; modern trigger research and shared hidden/prerequisite gates remain intact.",
+    "The modern host retains per-surface normal-quality rates. The game API host reads force-wide production and consumption using its native string-name and input-boolean query. The shared core rejects unknown or inconsistent scopes, and the existing panel labels force-wide observations as all surfaces.",
+    "Recipe navigation opens the current recipe in the modern native encyclopedia. Older hosts avoid the absent API and explain that their affected-recipe list is informational. Native technology-window navigation is preserved on both API families.",
+    "Strict controlled host objects and actual click/selection callbacks exercise both API shapes, missing recipes, compact/full recipe lists, foreign controls and separate player state. Historical Library remains disabled; native statistics, GUI, lifecycle, locale/event and complete host composition acceptance remain pending.",
+    "The retained standalone no-MIR runner refuses obsolete profile materialization before resolving inputs. Its scenario and the Tin explanation fixture consume the explicit host contract; their native acceptance remains separate."
+  ],
+  "semantic_domains": [
+    "presentation",
+    "runtime",
+    "target-portability"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared catalogue explicitly consumes its modern host; surface-specific rates and trigger semantics retained. Native acceptance remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared catalogue explicitly consumes its modern host; surface-specific rates and trigger semantics retained. Native acceptance remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Inactive game-host catalogue and statistics adapters enter composed source; historical Library remains disabled and native acceptance pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Inactive game-host catalogue and statistics adapters enter composed source; historical Library remains disabled and native acceptance pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Inactive game-host catalogue and statistics adapters enter composed source; historical Library remains disabled and native acceptance pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Inactive game-host catalogue and statistics adapters enter composed source; historical Library remains disabled and native acceptance pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Inactive game-host catalogue and statistics adapters enter composed source; historical Library remains disabled and native acceptance pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Inactive game-host catalogue and statistics adapters enter composed source; historical Library remains disabled and native acceptance pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Inactive game-host catalogue and statistics adapters enter composed source; historical Library remains disabled and native acceptance pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "A16/A21, UI-01-UI-04 and PLAT-UI-01: separate the Library capability from settings-profile tools; historical host portability remains open."
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}

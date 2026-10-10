@@ -31,10 +31,12 @@ $maintenanceSealAssertions=0
 $script:mir42CandidateStubCalls = [Collections.Generic.List[string]]::new()
 $script:mir42CandidateStubFailureTarget = ''
 $script:mir42CandidateReceiptAssertions = 0
+$script:mir422ConstructionAssertions = 0
 
 function Assert-MIR42CandidateBuildTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Message)
   if (-not $Condition) { throw "[mir42-candidate-build-test] $Message" }
+  if ($Message.StartsWith('422-',[StringComparison]::Ordinal)) { $script:mir422ConstructionAssertions++ }
 }
 
 function New-MIR4TargetPackage {
@@ -236,15 +238,15 @@ try {
   Assert-MIR42CandidateBuildTest (@($patchDescriptors|Where-Object{[string]$_.source_version-cne'4.2.1'-or[bool]$_.public_output_authorized-or[bool]$_.publication_authorized}).Count-eq0) 'nine-target-requested-source-private-boundary'
   Assert-MIR42CandidateBuildTest (@($nineDescriptors|Where-Object{[string]$_.source_version-cne'4.2.0'}).Count-eq0) 'historical-default-source-preserved'
   $unsupportedSourceRejected=$false
-  try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2'|Out-Null}catch{$unsupportedSourceRejected=$true}
+  try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.3'|Out-Null}catch{$unsupportedSourceRejected=$true}
   Assert-MIR42CandidateBuildTest $unsupportedSourceRejected 'unsupported-source-version-rejected'
-  foreach ($schemaVersion in @(1,2)) {
+  foreach ($schemaVersion in @(1,2,3)) {
     $versionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $repo -Manifest ([pscustomobject]@{schema=$schemaVersion;kind="MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"})
-    $expectedSource = if ($schemaVersion -eq 1) { '4.2.0' } else { '4.2.1' }
-    Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -eq 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
+    $expectedSource = @('4.2.0','4.2.1','4.2.2')[$schemaVersion-1]
+    Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -ge 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
   }
   foreach ($badContract in @(
-    [pscustomobject]@{schema=3;kind='MIR42FourTargetDeterministicCandidateManifestV3'},
+    [pscustomobject]@{schema=4;kind='MIR42FourTargetDeterministicCandidateManifestV4'},
     [pscustomobject]@{schema=2;kind='MIR42FourTargetDeterministicCandidateManifestV1'}
   )) {
     $rejected = $false
@@ -289,16 +291,18 @@ try {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $patchVersions[$i]
     $secondHashes = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash -Algorithm SHA256 | ForEach-Object Hash)
     Assert-MIR42CandidateBuildTest (($firstHashes -join '|') -ceq ($secondHashes -join '|')) "patch-metadata-idempotence-$i"
-    # A current authored entry must survive unchanged, rather than acquiring a
-    # construction-only entry that would need mutation after candidate acceptance.
+    # A historical-source construction prepends its own identity without
+    # rewriting the authored entry for the later source patch.
     $target = [string]$patchDescriptors[$i].target
     $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
     $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
     $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
-    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and $authoredVersion.Groups[1].Value -ceq $patchVersions[$i]) "patch-authored-current-version-$i"
     [IO.File]::WriteAllText((Join-Path $tree 'changelog.txt'), $authoredHistory, $utf8)
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $patchVersions[$i]
-    Assert-MIR42CandidateBuildTest ([IO.File]::ReadAllText((Join-Path $tree 'changelog.txt')) -ceq $authoredHistory) "patch-authored-current-changelog-unchanged-$i"
+    $writtenAuthoredHistory = [IO.File]::ReadAllText((Join-Path $tree 'changelog.txt'))
+    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and
+      $writtenAuthoredHistory.StartsWith("---------------------------------------------------------------------------------------------------`nVersion: $($patchVersions[$i])`n", [StringComparison]::Ordinal) -and
+      $writtenAuthoredHistory.EndsWith($authoredHistory, [StringComparison]::Ordinal)) "patch-authored-prior-changelog-preserved-$i"
   }
   $negativeTree = Join-Path $identityRoot 'f210'
   foreach ($badVersion in @('4.2.21002','4.2.20001','4.2.99901')) {
@@ -328,6 +332,71 @@ try {
   $schemaRoot = Join-Path $identityRoot 'schema'
   New-Item -ItemType Directory -Force -Path $schemaRoot | Out-Null
   $schemaComplete = Write-MIR42FourTargetManifest -OutputRoot $schemaRoot -Preflight $schemaPreflight -Rows $schemaRows -Failures @()
+  # Exercise the existing writer and consumed envelope readers for the next
+  # maintenance cut. These metadata rows are not built or qualified packages.
+  $currentDescriptors=@(Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2')
+  $currentVersions=@('4.2.21002','4.2.20002','4.2.11002','4.2.10002','4.2.01702','4.2.01602','4.2.01502','4.2.01402','4.2.01302')
+  Assert-MIR42CandidateBuildTest (($currentDescriptors.target-join'|')-ceq($patchDescriptors.target-join'|')-and($currentDescriptors.distribution_version-join'|')-ceq($currentVersions-join'|')) '422-default-selects-nine-exact-identities'
+  for($i=0;$i-lt$currentVersions.Count;$i++){
+    $currentIdentity=Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $currentDescriptors[$i].target -SourceVersion '4.2.2'
+    Assert-MIR42CandidateBuildTest ($currentIdentity.source_version-ceq'4.2.2'-and$currentIdentity.distribution_version-ceq$currentVersions[$i]-and$currentIdentity.package_name-ceq("more-infinite-research_"+$currentVersions[$i]+'.zip')) "422-release-identity-$i"
+    $target = [string]$currentDescriptors[$i].target
+    $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
+    $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
+    $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
+    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and $authoredVersion.Groups[1].Value -ceq $currentVersions[$i]) "422-authored-current-changelog-version-$i"
+  }
+  $rejected=$false
+  try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2' -SelectedTargets @('f210','f200','f110','f100')|Out-Null}catch{$rejected=$_.Exception.Message-match'mir42-candidate-target-selection-unsupported'}
+  Assert-MIR42CandidateBuildTest $rejected '422-rejects-four-target-selection'
+  $currentPreflight=$schemaPreflight|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  $currentPreflight.target_authority=@($currentDescriptors|Select-Object target,target_id,source_version,distribution_version)
+  $currentRows=@(foreach($d in $currentDescriptors){[pscustomobject]@{target=$d.target;distribution_version=$d.distribution_version;asset=@{path="assets/$($d.target)/more-infinite-research_$($d.distribution_version).zip";bytes=1;sha256=('A'*64)};content_sha256=('B'*64);entry_count=1}})
+  $currentRoot=Join-Path $identityRoot 'schema-422';New-Item -ItemType Directory -Path $currentRoot|Out-Null
+  $currentManifest=Write-MIR42FourTargetManifest -OutputRoot $currentRoot -Preflight $currentPreflight -Rows $currentRows -Failures @()
+  $currentContract=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $currentManifest
+  $currentEnvelope=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $currentRoot 'candidate-manifest.json')
+  Assert-MIR42CandidateBuildTest ($currentManifest.schema-eq3-and$currentContract.source_version-ceq'4.2.2'-and$currentEnvelope.source_version-ceq'4.2.2'-and$currentEnvelope.nine_targets-and-not$currentManifest.publication_authorized-and$currentManifest.qualification-ceq'not-performed') '422-writer-and-consumed-readers-preserve-private-boundary'
+  $currentEvidenceCandidate=[pscustomobject]@{scope='nine-target';targets=$currentManifest.targets;identity=[pscustomobject]@{record=$currentManifest}}
+  $currentEvidence=Get-MIR42EngineEvidenceBindingContract -Candidate $currentEvidenceCandidate -PublishedMaintenance
+  $currentCampaign=Get-MIR42JoinedCampaignInputContract -Candidate $currentEvidenceCandidate -PublishedMaintenance
+  $currentSeal=Get-MIR42TechnicalSealInputContract -Candidate $currentEvidenceCandidate -PublishedMaintenance
+  $currentIndependent=Get-MIR42IndependentScopeContract -Scope 'nine-target' -PublishedMaintenance -SourceVersion '4.2.2'
+  foreach($field in @('evidence_status','binder_status','campaign_status','independent_status','seal_status')){
+    Assert-MIR42CandidateBuildTest ($currentSeal.$field.StartsWith('MIR-4.2.2-NINE-TARGET-MAINTENANCE-')) ('422-maintenance-reader-selects-'+$field)
+  }
+  Assert-MIR42CandidateBuildTest ($currentIndependent.reconciliation_status-ceq$currentEvidence.evidence_status-and$currentIndependent.rehash_status-ceq$currentSeal.independent_status-and$currentCampaign.maintenance_source_version-ceq'4.2.2') '422-evidence-campaign-seal-readers-agree-on-version'
+  foreach($criterion in @('fresh-exact-loads','target-omissions')){
+    $criterionContract=Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance -SourceVersion '4.2.2'
+    $expectedStatus=if($criterion-ceq'fresh-exact-loads'){$currentEvidence.binder_status}else{$currentEvidence.evidence_status}
+    Assert-MIR42CandidateBuildTest ($criterionContract.status-ceq$expectedStatus) ('422-criterion-consumes-'+$criterion)
+    Assert-MIR42CandidateBuildTest ((Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance).status-cne$criterionContract.status) ('422-criterion-does-not-relabel-421-'+$criterion)
+  }
+  foreach($target in @('f017','f016','f015','f014','f013')){
+    $historicalIdentity=Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target $target -SourceVersion '4.2.2' -PredecessorIdentityOnly
+    Assert-MIR42CandidateBuildTest ($null-eq$historicalIdentity.inventory-and$historicalIdentity.identity.source_version-ceq'4.2.2'-and$historicalIdentity.record.target-ceq$target) ('422-historical-provenance-does-not-require-terminal-archive-'+$target)
+  }
+  foreach($mutate in @(
+    {param($m)$m.target_authority[0].source_version='4.2.1'},
+    {param($m)$m.targets[0].distribution_version='4.2.21001'},
+    {param($m)$m.targets[0].asset.path='assets/f210/more-infinite-research_4.2.21001.zip'},
+    {param($m)$m.targets[0].target='f200'},
+    {param($m)$m.targets=@($m.targets[0])},
+    {param($m)$m.publication_authorized=$true},
+    {param($m)$m.qualification='passed'}
+  )){
+    $invalid=$currentManifest|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+    & $mutate $invalid
+    $invalid.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $invalid
+    $rejected=$false
+    try{Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $invalid|Out-Null}catch{$rejected=$_.Exception.Message-match'mir42-seal-candidate-manifest-schema'}
+    Assert-MIR42CandidateBuildTest $rejected '422-rejects-mixed-version-target-or-authority'
+  }
+  $currentPartial=Write-MIR42FourTargetManifest -OutputRoot $currentRoot -Preflight $currentPreflight -Rows @($currentRows[0]) -Failures @(@{target='f200';message='controlled incomplete construction'})
+  Assert-MIR42CandidateBuildTest (-not$currentPartial.build_complete-and$currentPartial.schema-eq3) '422-partial-state-retained'
+  $rejected=$false
+  try{Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $currentRoot 'candidate-manifest.json')|Out-Null}catch{$rejected=$_.Exception.Message-match'mir42-engine-candidate-manifest-invalid'}
+  Assert-MIR42CandidateBuildTest $rejected '422-partial-construction-not-engine-acceptance'
   Assert-MIR42CandidateBuildTest ($schemaComplete.schema -eq 2 -and $schemaComplete.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV2' -and (Test-MIR4BootstrapRecordHash -Record $schemaComplete)) 'patch-v2-manifest-writer-and-record-hash'
   $sealVersion=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $schemaComplete
   Assert-MIR42CandidateBuildTest ($sealVersion.source_version-ceq'4.2.1'-and$sealVersion.requires_nine_targets) 'seal-reader-selects-v2-nine-target-contract-without-qualification'
@@ -550,13 +619,71 @@ try {
   try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $invalidPinPath|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
   Assert-MIR42CandidateBuildTest $rejected 'published-predecessor-refuses-same-size-changed-manifest-by-raw-hash'
   $maintenanceCustodyAssertions++
+  # Exact 4.2.1 publication, selected explicitly for 4.2.2. The release's
+  # disclosed gaps remain in the receipt; synthetic API metadata is not a
+  # remote readback or native qualification.
+  $published421Path=Join-Path $repo 'fixtures/release-inputs/mir422-published-421-manifest.json'
+  $published421=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published421Path -CandidateSourceVersion '4.2.2'
+  $assets421=@(for($i=0;$i-lt9;$i++){
+    $row=$published421.manifest.targets[$i]
+    [pscustomobject]@{id=$i+1;name=$row.filename;size=$row.bytes;digest=('sha256:'+[string]$row.sha256).ToLowerInvariant();state='uploaded'}
+  })
+  $assets421+=,[pscustomobject]@{id=10;name='mir-4.2.1.release.json';size=$published421.bytes;digest=('sha256:'+$published421.sha256).ToLowerInvariant();state='uploaded'}
+  $assets421+=@(for($i=11;$i-le16;$i++){[pscustomobject]@{id=$i;name="controlled-supporting-asset-$i";size=1;digest=('sha256:'+('a'*64));state='uploaded'}})
+  $metadata421=[pscustomobject]@{id=407909462;tag_name='v4.2.1';draft=$false;prerelease=$false;immutable=$false;assets=$assets421}
+  $rows421=@(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published421 -ReleaseMetadata $metadata421 -CandidateSourceVersion '4.2.2')
+  Assert-MIR42CandidateBuildTest ($rows421.Count-eq9-and-not$published421.manifest.signed-and-not$published421.manifest.acceptance.full_technical_seal-and-not$published421.manifest.acceptance.independent_review-and-not$published421.manifest.acceptance.protected_signing_and_restore) '422-predecessor-retains-disclosed-acceptance-gaps'
+  foreach($row in $rows421){
+    Assert-MIR42CandidateBuildTest ($row.version-ceq('4.2.'+$row.target.Substring(1)+'01')) ('422-predecessor-exact-CCC01-'+$row.target)
+    $tinyRoot=Join-Path $identityRoot ('published-421-archive-input/'+$row.target)
+    $tinyTree=Join-Path $tinyRoot ('more-infinite-research_'+$row.version)
+    New-Item -ItemType Directory -Path $tinyTree -Force|Out-Null
+    $tinyInfo=[ordered]@{name='more-infinite-research';version=$row.version;factorio_version=$script:MIR42FourTargetLines[$row.target]}
+    [IO.File]::WriteAllText((Join-Path $tinyTree 'info.json'),($tinyInfo|ConvertTo-Json -Compress),$utf8)
+    $tinyArchive=Join-Path $tinyRoot $row.filename
+    Write-MIR4DeterministicRawTreeArchive -SourceRoot $tinyTree -EntryRoot (Split-Path -Leaf $tinyTree) -OutputPath $tinyArchive -ContainmentRoot $identityRoot
+    $archiveInput=Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target $row.target -Path $tinyArchive -SourceVersion '4.2.1'
+    Assert-MIR42CandidateBuildTest ($archiveInput.distribution_version-ceq$row.version-and$archiveInput.qualification-ceq'not-run') ('422-predecessor-archive-reader-explicit-version-'+$row.target)
+    $rejected=$false
+    try{Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target $row.target -Path $tinyArchive|Out-Null}catch{$rejected=$_.Exception.Message-ceq('[mir42-preflight-package-root] '+$row.target)}
+    Assert-MIR42CandidateBuildTest $rejected ('422-predecessor-archive-reader-keeps-420-default-'+$row.target)
+  }
+  foreach($case in $metadataMutations.GetEnumerator()){
+    $invalid=$metadata421|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+    & $case.Value $invalid
+    $rejected=$false
+    try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published421 -ReleaseMetadata $invalid -CandidateSourceVersion '4.2.2'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir42-maintenance-predecessor-')}
+    Assert-MIR42CandidateBuildTest $rejected ('422-predecessor-refuses-'+$case.Key)
+  }
+  foreach($case in @(
+    @{path=$published421Path;version='4.2.1'},
+    @{path=$publishedPin.path;version='4.2.2'}
+  )){
+    $rejected=$false
+    try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $case.path -CandidateSourceVersion $case.version|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+    Assert-MIR42CandidateBuildTest $rejected ('422-predecessor-refuses-cross-release-'+$case.version)
+  }
+  $changed421=Join-Path $identityRoot 'changed-421-published-manifest.json'
+  $bytes421=[IO.File]::ReadAllBytes($published421.path);$bytes421[100]=$bytes421[100]-bxor1
+  [IO.File]::WriteAllBytes($changed421,$bytes421)
+  $rejected=$false
+  try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $changed421 -CandidateSourceVersion '4.2.2'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+  Assert-MIR42CandidateBuildTest $rejected '422-predecessor-refuses-same-size-changed-manifest'
+  $rejected=$false
+  try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published421 -ReleaseMetadata $metadata421|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-release-metadata]'}
+  Assert-MIR42CandidateBuildTest $rejected '422-predecessor-metadata-default-remains-420'
   $scopeCandidates=@($patchDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})
   Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $scopeCandidates
   $maintenanceEvidenceAssertions++
+  $currentScopeCandidates=@($currentDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})
+  Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $currentScopeCandidates
+  Assert-MIR42IndependentMaintenanceScope -Scope 'nine-target' -SourceVersion '4.2.2'
+  $mixedScope=@($scopeCandidates[0])+@($currentScopeCandidates|Select-Object -Skip 1)
   foreach($case in @(
     @{scope='four-target';rows=@($scopeCandidates|Select-Object -First 4)},
     @{scope='nine-target';rows=@($nineDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})},
-    @{scope='nine-target';rows=@($scopeCandidates|Select-Object -First 8)}
+    @{scope='nine-target';rows=@($scopeCandidates|Select-Object -First 8)},
+    @{scope='nine-target';rows=$mixedScope}
   )){
     $rejected=$false
     try{Assert-MIR42MaintenanceReconciliationScope -Scope $case.scope -Candidates $case.rows}catch{$rejected=$_.Exception.Message-ceq'[mir42-reconciliation-maintenance-candidate-scope]'}
@@ -811,7 +938,7 @@ try {
   Assert-MIR42CandidateBuildTest ($rejected-and-not(Test-Path -LiteralPath (Join-Path $identityRoot 'must-not-create.json'))) 'maintenance-criterion-cli-forwards-and-refuses-out-of-scope-option'
   $maintenanceCriterionAssertions++
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2.1-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; source_versions=@('4.2.0','4.2.1','4.2.2'); current_maintenance_contract_assertions=$script:mir422ConstructionAssertions; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 
@@ -944,7 +1071,7 @@ try {
       $entry = $archive.GetEntry("more-infinite-research_$version/README.md")
       $reader = [IO.StreamReader]::new($entry.Open())
       try { $readme = $reader.ReadToEnd() } finally { $reader.Dispose() }
-      Assert-MIR42CandidateBuildTest ($readme.Contains("# More Infinite Research $version") -and $readme.Contains("More Infinite Research $version is") -and $readme.Contains("more-infinite-research_$version.zip") -and -not $readme.Contains('4.2.10001')) "patch-historical-readme-package-identity-$target"
+      Assert-MIR42CandidateBuildTest ($readme.Contains("# More Infinite Research $version") -and $readme.Contains("More Infinite Research $version is") -and $readme.Contains("more-infinite-research_$version.zip") -and $readme -notmatch '4\.2\.100[0-9]{2}') "patch-historical-readme-package-identity-$target"
       Assert-MIR42CandidateBuildTest ($readme.Contains("Earlier fresh-load evidence used $($frozenRecord.engine.version);") -and $readme.Contains("The exact published $($frozenRecord.predecessor.version) archive remains a historical predecessor record.") -and $readme.Contains('Consult the matching release record for native qualification of this exact package.')) "patch-historical-readme-evidence-boundary-$target"
     } finally { $archive.Dispose() }
   }

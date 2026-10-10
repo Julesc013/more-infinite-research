@@ -319,26 +319,37 @@ function Assert-MIRDevelopmentContractsCommandInventorySourceDriftRegression {
   $probeRoot=Join-Path $tempRoot ('mir-development-command-inventory-'+[guid]::NewGuid().ToString('N').Substring(0,16))
   if(-not[IO.Path]::GetFullPath($probeRoot).StartsWith($tempRoot.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-development-command-inventory-probe-root]' }
   try {
-    New-Item -ItemType Directory -Force -Path $tempRoot | Out-Null
-    & git clone --quiet --shared --no-checkout $RepoRoot $probeRoot
-    if($LASTEXITCODE-ne0) { throw '[mir4-development-command-inventory-probe-clone]' }
-    & git -C $probeRoot checkout --quiet HEAD
-    if($LASTEXITCODE-ne0) { throw '[mir4-development-command-inventory-probe-checkout]' }
+    # The real inventory reader uses source files and the router's syntax;
+    # it needs no Git history, package payload or copy of the checkout.
+    foreach($relative in @('tools/mir/cli','tools/mir/domain/safety','tools/commands',
+        'tools/lib','scripts','governance/automation','contracts/repository')) {
+      New-Item -ItemType Directory -Force -Path (Join-Path $probeRoot $relative)|Out-Null
+    }
+    [IO.File]::WriteAllText((Join-Path $probeRoot 'tools/mir.ps1'),"# controlled public entrypoint`n",[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $probeRoot 'tools/mir/cli/Invoke-MIRCommandRouter.ps1'),
+      '.\tools\mir.ps1 mir4 release-engine <command>'+[char]10,[Text.UTF8Encoding]::new($false))
     $probeSource=Join-Path $probeRoot 'tools/mir/domain/safety/SafetyKernel.ps1'
+    [IO.File]::WriteAllText($probeSource,"# controlled internal source`n",[Text.UTF8Encoding]::new($false))
+    $schema='contracts/repository/mir4-command-inventory-v1.schema.json'
+    [IO.File]::WriteAllBytes((Join-Path $probeRoot $schema),[IO.File]::ReadAllBytes((Join-Path $RepoRoot $schema)))
+    . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
+    Update-MIR4CommandInventoryV1 -RepoRoot $probeRoot|Out-Null
+    Update-MIR4CommandInventoryV1 -RepoRoot $probeRoot -Check|Out-Null
     [IO.File]::AppendAllText($probeSource,"`n# isolated development-contract inventory drift probe`n",[Text.UTF8Encoding]::new($false))
-    . (Join-Path $probeRoot 'tools/mir/application/tooling/CommandInventory.ps1')
     $rejected=$false
     try { Update-MIR4CommandInventoryV1 -RepoRoot $probeRoot -Check|Out-Null } catch { $rejected=$_.Exception.Message-match'mir4-command-inventory-stale' }
     if(-not$rejected) { throw '[mir4-development-command-inventory-source-drift]' }
+    $files=@(Get-ChildItem -LiteralPath $probeRoot -Recurse -File)
+    Write-Host "Development-contract inventory drift rejected with $($files.Count) fixture files, $(($files|Measure-Object Length -Sum).Sum) bytes and no checkout copy."
   } finally {
     if(Test-Path -LiteralPath $probeRoot) {
       $cleanupRoot=(Resolve-Path -LiteralPath $probeRoot).ProviderPath
       if(-not $cleanupRoot.StartsWith($tempRoot.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -or
          (Get-Item -LiteralPath $cleanupRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint -or
          (Split-Path -Leaf $cleanupRoot) -notlike 'mir-development-command-inventory-*') { throw '[mir4-development-command-inventory-cleanup-root]' }
-      # Windows scanners can briefly hold a file from the fresh clone after
-      # Git exits. Retry this verified fixture root instead of leaving a large
-      # failed probe behind or weakening the path/reparse safeguards above.
+      Assert-MIRDevelopmentContractsNoReparsePoint -Root $cleanupRoot
+      # Windows scanners can briefly hold a generated fixture file. Retry
+      # this verified root without weakening its path/reparse safeguards.
       for($attempt=1;$attempt-le5;$attempt++) {
         try { Remove-Item -LiteralPath $cleanupRoot -Recurse -Force -ErrorAction Stop; break }
         catch {

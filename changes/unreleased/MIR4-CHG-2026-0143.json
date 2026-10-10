@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0143",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Reject material productivity returns through burnt fuel items.",
+  "details": [
+    "The existing typed material graph now includes declared fuel-burning item returns. Mixed recipe, spoilage and fuel paths remain withheld when they can return an input, and recipe-only certificates cannot override those native paths.",
+    "Missing or recognized zero fuel energy adds no burning edge. Unknown energy shapes remain conservative. Relevant fuel energy/category facts and alternate native output producers bind route fingerprints; unrelated transitions preserve existing bindings.",
+    "Controlled canonical Lua regressions reproduce the predecessor failure and check native returns, certificate refusal, typed identities, copied facts and one shared item scan. Current-package burner availability, production, catalogue changes and save acceptance remain pending."
+  ],
+  "semantic_domains": [
+    "compatibility",
+    "progression"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Modern material productivity guard consumes declared fuel-burning returns; controlled checks pass and native qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Modern material productivity guard consumes declared fuel-burning returns; controlled checks pass and native qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared item-index compatibility is checked separately."
+    },
+    {
+      "target": "F100",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared item-index compatibility is checked separately."
+    },
+    {
+      "target": "F017",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared item-index compatibility is checked separately."
+    },
+    {
+      "target": "F016",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared item-index compatibility is checked separately."
+    },
+    {
+      "target": "F015",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared item-index compatibility is checked separately."
+    },
+    {
+      "target": "F014",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared item-index compatibility is checked separately."
+    },
+    {
+      "target": "F013",
+      "disposition": "not-applicable",
+      "reason": "Historical targets do not emit modern recipe-productivity material families; shared item-index compatibility is checked separately."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "none",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "Accepted material/process safety programme: native burnt_result conversions missing from recipe/spoilage return graph"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_routes.lua: direct/mixed fuel returns, zero energy, recipe-certificate refusal and relevant binding"
+    },
+    {
+      "kind": "document",
+      "value": "docs/capabilities/recipe-productivity.md"
+    }
+  ]
+}

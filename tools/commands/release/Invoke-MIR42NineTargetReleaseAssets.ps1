@@ -28,6 +28,7 @@ param(
   [string]$MaintainerAuthorizationPath = '',
   [string]$MainReadbackPath = '',
   [string]$PublishedMaintenancePredecessorManifestPath = '',
+  [string]$MaintenanceUpgradeEvidencePath = '',
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 )
 
@@ -48,7 +49,7 @@ switch ($Mode) {
       -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
       -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath -ProgrammePath $ProgrammePath -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
     Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -TechnicalSealPath $TechnicalSealPath `
-      -PromotionPlan $promotion -SourceVersion $SourceVersion -ReleaseTag $ReleaseTag -AssetRoot $AssetRoot -OutputPath $OutputPath | ConvertTo-Json -Depth 50
+      -PromotionPlan $promotion -MaintenanceUpgradeEvidencePath $MaintenanceUpgradeEvidencePath -SourceVersion $SourceVersion -ReleaseTag $ReleaseTag -AssetRoot $AssetRoot -OutputPath $OutputPath | ConvertTo-Json -Depth 50
   }
   'VerifyBytes' {
     if ([string]::IsNullOrWhiteSpace($FrozenInventoryPath) -or [string]::IsNullOrWhiteSpace($DownloadedAssetRoot)) { throw '[mir42-nine-release-assets-download-inputs-required]' }

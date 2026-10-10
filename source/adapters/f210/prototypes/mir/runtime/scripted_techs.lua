@@ -7,7 +7,9 @@ local planet_discovery_recovery = require("prototypes.mir.runtime.planet_discove
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local runtime_state = require("prototypes.mir.runtime.state")
 
-local research_browser = require("prototypes.mir.runtime.research_browser")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
+local research_browser = target_line.feature_enabled("research_library")
+  and require("prototypes.mir.runtime.research_browser") or nil
 
 local M = {}
 M.requires_features = {"scripted_techs", "productivity_family_adoption"}
@@ -18,9 +20,9 @@ local features = {
   passive_repair,
   productivity_family_adoption,
   maximum_level_control,
-  planet_discovery_recovery,
-  research_browser
+  planet_discovery_recovery
 }
+if research_browser then features[#features + 1] = research_browser end
 
 for _, feature in ipairs(features) do
   if type(feature.requires_features) ~= "table" then
@@ -75,11 +77,11 @@ local function register_event(event_id, handler)
 end
 
 function M.register()
-  research_browser.register()
+  if research_browser then research_browser.register() end
   passive_repair.register()
   script.on_load(function()
     passive_repair.on_load()
-    research_browser.on_load()
+    if research_browser then research_browser.on_load() end
   end)
   script.on_init(function(event)
     run_all("on_init", event)

@@ -4,11 +4,13 @@ local factorio_catalogue = require("prototypes.mir.runtime.research_browser_fact
 local mir_provider = require("prototypes.mir.runtime.research_browser_mir_provider")
 local runtime_state = require("prototypes.mir.runtime.state")
 local factorio_runtime_state = require("prototypes.mir.platform.factorio.runtime_state")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
+local browser_host = require("prototypes.mir.platform.factorio.browser_host")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local codec = require("prototypes.mir.settings.profile_codec")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
-local M = {requires_features = {"settings_profiles"}}
+local M = {requires_features = {"research_library"}}
 local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
 local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 320
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
@@ -182,7 +184,7 @@ local catalogue_cache = {}
 local function catalogue(force)
   local cached = catalogue_cache[force.index]
   if cached and cached.tick == game.tick then return cached.value end
-  local result = factorio_catalogue.snapshot(force)
+  local result = factorio_catalogue.snapshot(force, browser_host)
   if not result then return nil end
   -- Dynamic cap/level facts must be refreshed with the copied Force snapshot.
   -- Only the pure core is cache-safe; provider state is never retained here.
@@ -243,7 +245,7 @@ local function pump_translation_requests(player, cache)
     local technology = player.force.technologies[key]
     if technology then
       local request, subjects, limited = factorio_catalogue.translation_request(
-        technology, prototypes, translation_queue.discovery_subject_limit)
+        technology, browser_host.prototype_collections(), translation_queue.discovery_subject_limit)
       translation_queue.dispatch(cache, key, game.tick, function()
         return player.request_translation(request)
       end, subjects, limited)
@@ -479,7 +481,7 @@ local function settings_rows(player, parent, v)
   local function group(key, title, specs, scope)
     local names, matches = {}, search == "" or string.find(search_text(key), search, 1, true)
     for _, spec in ipairs(specs) do
-      local prototype = prototypes.mod_setting[spec.name]
+      local prototype = browser_host.prototype_collections().mod_setting[spec.name]
       if prototype and prototype.mod == "more-infinite-research" then
         names[#names + 1] = spec.name
         assigned[spec.name] = true
@@ -498,7 +500,7 @@ local function settings_rows(player, parent, v)
   for _, spec in ipairs(settings_catalog.base_extension_specs()) do
     group(spec.key, {"technology-name." .. (spec.locale_key or spec.key)}, settings_catalog.base_extension_setting_specs(spec.key), "research")
   end
-  for name, prototype in pairs(prototypes.mod_setting) do
+  for name, prototype in pairs(browser_host.prototype_collections().mod_setting) do
     if prototype.mod == "more-infinite-research" and not assigned[name] then group(name, prototype.localised_name, {{name = name}}, "options") end
   end
   local visible = {}
@@ -550,7 +552,7 @@ local function settings_rows(player, parent, v)
     local field_width = math.floor((detail_width - 40) * 0.55)
     local value_width = detail_width - 40 - field_width
     for _, name in ipairs(selected.names) do
-      local prototype = prototypes.mod_setting[name]
+      local prototype = browser_host.prototype_collections().mod_setting[name]
       local scope = prototype.setting_type
       local values = scope == "runtime-global" and settings.global or scope == "runtime-per-user" and settings.get_player_settings(player) or settings.startup
       local value = values and values[name] and values[name].value
@@ -720,7 +722,7 @@ local function add_research_startup_settings(parent, portable, maximum_width)
   local profile_summary = imported_profile_summary()
   local rows = {}
   for _, spec in ipairs(specs) do
-    local prototype = prototypes.mod_setting[spec.name]
+    local prototype = browser_host.prototype_collections().mod_setting[spec.name]
     if prototype and prototype.mod == "more-infinite-research" and prototype.setting_type == "startup" then
       local comparison = startup_comparison(spec.name, prototype, profile_summary)
       if settings_catalog.validate_value(spec.name, comparison.effective) then
@@ -829,8 +831,10 @@ local function detail(player, parent, v, c, width)
     local list = recipe_parent.add{type = compact_detail and "drop-down" or "list-box", name = PREFIX .. "recipe_entries", items = items, tags = {mir_browser = "recipe-list", mir_browser_section = "recipe-list"}}
     list.style.width = compact_detail and width - 24 or width
     if not compact_detail then list.style.height = recipe_height end
-    list.tooltip = {"mir-browser.recipe-select-hint"}
-    if not compact_detail then label(container, {"mir-browser.recipe-select-hint"}, width - 24) end
+    local recipe_hint = {browser_host.recipe_browser_available
+      and "mir-browser.recipe-select-hint" or "mir-browser.recipe-list-only-hint"}
+    list.tooltip = recipe_hint
+    if not compact_detail then label(container, recipe_hint, width - 24) end
   end
 end
 local function filter_dropdown(parent, caption, items, selected_index, action, width)
@@ -1098,7 +1102,7 @@ local function report_text(player)
   if v.report_settings then
     lines[#lines + 1] = "\nEFFECTIVE MIR STARTUP SETTINGS"
     local settings_names = {}
-    for name, prototype in pairs(prototypes.mod_setting) do
+    for name, prototype in pairs(browser_host.prototype_collections().mod_setting) do
       if prototype.mod == "more-infinite-research" and prototype.setting_type == "startup"
           and name ~= codec.import_setting_name then settings_names[#settings_names + 1] = name end
     end
@@ -1136,9 +1140,11 @@ local function debug_rows(player, body, v, width)
     local checkbox = tools.add{type = "checkbox", state = v[option[1]] == true, caption = {"mir-browser." .. option[2]}, tags = {mir_browser = option[1]}}
     checkbox.style.maximal_width = text_width
   end
-  section(tools, {"mir-browser.configuration"}, text_width)
-  label(tools, {"mir-browser.profile-purpose"}, text_width)
-  button(tools, "export", {"mir-browser.export"})
+  if target_line.feature_enabled("settings_profiles") then
+    section(tools, {"mir-browser.configuration"}, text_width)
+    label(tools, {"mir-browser.profile-purpose"}, text_width)
+    button(tools, "export", {"mir-browser.export"})
+  end
   section(tools, {"mir-browser.layout"}, text_width)
   button(tools, "layout-reset", {"mir-browser.reset-layout"})
   section(tools, {"mir-browser.startup-crash"}, text_width)
@@ -1300,7 +1306,7 @@ local function export(player)
   local decoded = codec.decode(text)
   local _, _, invalid = codec.count_recognized_settings(decoded)
   if invalid ~= 0 then player.print({"mir-browser.invalid-profile"}); return end
-  helpers.write_file("more-infinite-research/settings/browser-profile.txt", text .. "\n", false, player.index)
+  browser_host.write_file("more-infinite-research/settings/browser-profile.txt", text .. "\n", false, player.index)
   player.print({"mir-browser.exported"})
 end
 local function event_player(event)
@@ -1372,16 +1378,17 @@ local function click(event)
     if not (panel and panel.valid and panel.tags.mir_browser_section == "production-load") then return end
     local precision = defines.flow_precision_index and defines.flow_precision_index.one_minute
     local report = core.production_load_check(factorio_catalogue.production_snapshot(
-      player.force, player.surface, player.force.technologies[v.selected], precision, game.tick))
+      player.force, player.surface, player.force.technologies[v.selected], precision, game.tick, browser_host))
     panel.clear()
     local width = element.parent.style.maximal_width
     if not report then label(panel, {"mir-browser.production-unavailable"}, width); return end
-    label(panel, {"mir-browser.production-scope", report.force_name, report.surface_name}, width)
+    label(panel, report.scope == "force" and {"mir-browser.production-scope-force", report.force_name}
+      or {"mir-browser.production-scope", report.force_name, report.surface_name}, width)
     label(panel, {"mir-browser.production-snapshot", tostring(report.tick)}, width)
     label(panel, {"mir-browser.production-note"}, width)
     for _, row in ipairs(report.rows) do
       local balance = (row.balance < 0 and "-" or "") .. displayed_number(math.abs(row.balance))
-      local item = prototypes.item[row.name]
+      local item = browser_host.prototype_collections().item[row.name]
       local caption = item and {"?", item.localised_name, row.name} or row.name
       label(panel, {"mir-browser.production-row", caption,
         displayed_number(row.produced), displayed_number(row.consumed), balance}, width)
@@ -1416,7 +1423,7 @@ local function click(event)
     v.result_token, v.settings_list_token = nil, nil
   elseif action == "report-export" then
     local path = "more-infinite-research/reports/browser-" .. player.index .. "-" .. game.tick .. ".txt"
-    helpers.write_file(path, report_text(player) .. "\n", false, player.index)
+    browser_host.write_file(path, report_text(player) .. "\n", false, player.index)
     player.print({"mir-browser.report-written", "script-output/" .. path})
     v.report_status = {"mir-browser.report-saved", "browser-" .. player.index .. "-" .. game.tick .. ".txt"}
     v.report_destination = "script-output/" .. path
@@ -1430,7 +1437,9 @@ local function click(event)
     v.detail_token = nil
     debug_preview(player)[PREFIX .. "report"].text = report_text(player)
     return
-  elseif action == "export" then export(player)
+  elseif action == "export" then
+    if not target_line.feature_enabled("settings_profiles") then return end
+    export(player)
   elseif action == "refresh" then
     local translations = translation_state()
     local cache = translations[player.index]
@@ -1466,7 +1475,7 @@ local function selection(event)
   if action == "recipe-list" then
     local v = view(player)
     local id = (v.recipe_ids or {})[event.element.selected_index]
-    if id and prototypes.recipe[id] then player.open_factoriopedia_gui(prototypes.recipe[id]) end
+    if id then browser_host.open_recipe(player, id) end
     return
   end
   if action == "research-list" or action == "setting-list" then
@@ -1631,6 +1640,7 @@ local function shortcut(event)
   if player.gui.screen[ROOT] then close(player) else render(player) end
 end
 function M.register()
+  if not target_line.feature_enabled("research_library") then return end
   remote.add_interface("more-infinite-research-browser", {
     open = function(player_index, options)
       local player = game.get_player(player_index)
@@ -1749,7 +1759,7 @@ function M.register()
       return
     end
     if action ~= "setting" then return end
-    local name = element.tags.setting; local prototype = prototypes.mod_setting[name]
+    local name = element.tags.setting; local prototype = browser_host.prototype_collections().mod_setting[name]
     if not prototype or prototype.mod ~= "more-infinite-research" then return end
     local scope = prototype.setting_type
     if scope == "startup" or (scope == "runtime-global" and not player.admin) then return end
@@ -1773,18 +1783,20 @@ function M.register()
     translations[event.player_index] = nil
     locale_generations[event.player_index] = nil
   end)
-  script.on_event(defines.events.on_player_locale_changed, function(event)
-    local player = event_player(event)
-    if player then
-      local translations, locale_generations = translation_state()
-      local cache = translations[event.player_index]
-      if cache then
-        translation_queue.invalidate_locale(cache, player.locale,
-          next_locale_generation(locale_generations, cache, event.player_index))
+  if defines.events.on_player_locale_changed then
+    script.on_event(defines.events.on_player_locale_changed, function(event)
+      local player = event_player(event)
+      if player then
+        local translations, locale_generations = translation_state()
+        local cache = translations[event.player_index]
+        if cache then
+          translation_queue.invalidate_locale(cache, player.locale,
+            next_locale_generation(locale_generations, cache, event.player_index))
+        end
+        if player.gui.screen[ROOT] then render(player) end
       end
-      if player.gui.screen[ROOT] then render(player) end
-    end
-  end)
+    end)
+  end
   script.on_event(defines.events.on_player_changed_force, function(event)
     local player = event_player(event)
     if player then
@@ -1809,8 +1821,10 @@ function M.register()
       schedule_open_force_refresh(event.research and event.research.force or event.force)
     end)
   end
-  script.on_event(defines.events.on_research_moved, function(event)
-    schedule_open_force_refresh(event.force)
-  end)
+  if defines.events.on_research_moved then
+    script.on_event(defines.events.on_research_moved, function(event)
+      schedule_open_force_refresh(event.force)
+    end)
+  end
 end
 return M

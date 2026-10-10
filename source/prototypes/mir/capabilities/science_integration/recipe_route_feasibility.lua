@@ -40,9 +40,10 @@ function M.sort_acquisition_producers(names, index)
   return names
 end
 
-local MACHINE_TYPES = {
-  "assembling-machine", "furnace", "mining-drill", "rocket-silo"
-}
+-- A rocket silo counts completed crafts toward its rocket; the engine ignores
+-- the construction recipe's products. It cannot witness ordinary item/fluid
+-- acquisition. Launch products need their own complete process witness.
+local MACHINE_TYPES = {"assembling-machine", "furnace", "mining-drill"}
 
 local function handcrafting_prototype_type()
   local profile = target_profiles.current()
@@ -234,8 +235,7 @@ local function fluid_port_requirements(variant, results, options)
   -- Category membership alone cannot give a character a fluid inventory.
   -- Inspect the typed declarations, including coproducts, so an otherwise
   -- reachable fluid source cannot manufacture a hand-crafting witness.
-  local required = {input = 0, output = 0}
-  local seen = {input = {}, output = {}}
+  local required = {input = 0, output = 0, names = {input = {}, output = {}}}
   for direction, entries in ipairs({normalized_ingredients(variant), results or {}}) do
     local key = direction == 1 and "input" or "output"
     for _, entry in ipairs(entries) do
@@ -246,8 +246,8 @@ local function fluid_port_requirements(variant, results, options)
         -- Duplicate native products are permitted. Count distinct fluid
         -- identities, not probability/quantity entries for the same fluid;
         -- exact slot assignment remains a native qualification boundary.
-        if not seen[key][identity.name] then
-          seen[key][identity.name] = true
+        if not required.names[key][identity.name] then
+          required.names[key][identity.name] = true
           required[key] = required[key] + 1
         end
       end
@@ -257,17 +257,47 @@ local function fluid_port_requirements(variant, results, options)
   return required
 end
 
-local function fluid_port_counts(machine, options)
-  local counts = {input = 0, output = 0}
+local function fluid_port_facts(machine, options)
+  local counts = {input = 0, output = 0, unfiltered = {input = 0, output = 0},
+    filters = {input = {}, output = {}}}
   for _, box in ipairs(machine.fluid_boxes or {}) do
     if not diagnostic_visit(options) then return nil end
     if type(box) == "table" then
       local kind = box.production_type
-      if kind == "input" or kind == "input-output" then counts.input = counts.input + 1 end
-      if kind == "output" or kind == "input-output" then counts.output = counts.output + 1 end
+      for _, direction in ipairs({"input", "output"}) do
+        if kind == direction or kind == "input-output" then
+          counts[direction] = counts[direction] + 1
+          if box.filter == nil then
+            counts.unfiltered[direction] = counts.unfiltered[direction] + 1
+          elseif type(box.filter) == "string" and box.filter ~= "" then
+            counts.filters[direction][box.filter] = true
+          end
+        end
+      end
     end
   end
   return counts
+end
+
+local function fluid_ports_compatible(ports, required, options)
+  if not required then return true end
+  if not ports then return false end
+  for _, direction in ipairs({"input", "output"}) do
+    if ports[direction] < required[direction] then return false end
+    -- Each filtered box accepts one identity. Reserve those matches first;
+    -- only remaining distinct fluids consume unfiltered boxes. This avoids
+    -- both greedy-order rejection and reusing one free port for two fluids.
+    -- Exact native slot indices and temperature assignment remain separate.
+    local free = ports.unfiltered[direction]
+    for name in pairs(required.names[direction]) do
+      if not diagnostic_visit(options) then return false end
+      if not ports.filters[direction][name] then
+        free = free - 1
+        if free < 0 then return false end
+      end
+    end
+  end
+  return true
 end
 
 local function copy_options(options)
@@ -413,7 +443,7 @@ local function category_set_from_prototypes(state, options)
       for _, category in ipairs(machine.crafting_categories or {}) do
         if not diagnostic_visit(options) then return categories end
         if not ports then
-          ports = fluid_port_counts(machine, options)
+          ports = fluid_port_facts(machine, options)
           if not ports then return categories end
         end
         categories[category] = categories[category] or {}
@@ -448,6 +478,13 @@ local function surface_conditions_satisfied(conditions, properties, options)
     if not diagnostic_visit(options) then return false end
     local property = condition.property
     local value = property and properties and properties[property] or nil
+    if value == nil and property then
+      -- A planet/surface overrides only selected properties. The engine uses
+      -- the declared SurfacePropertyPrototype default for the rest (notably
+      -- Nauvis pressure/gravity). Zero is an explicit override, not absence.
+      local definition = data_raw.prototypes("surface-property")[property]
+      value = definition and definition.default_value or nil
+    end
     if type(value) ~= "number" then return false end
     if condition.min ~= nil and value < condition.min then return false end
     if condition.max ~= nil and value > condition.max then return false end
@@ -700,6 +737,58 @@ local function offshore_pump_output_fluids(pump, options, tile_fluids)
   return fluids, true
 end
 
+local function append_launch_sources(sources, options)
+  -- This contract covers modern send-to-orbit returns. Older engines and
+  -- platform logistics require their own native contract, not foreign fields.
+  local line = target_profiles.current_factorio_version
+  if line ~= "2.0" and line ~= "2.1" then return true end
+  if next(data_raw.prototypes("rocket-silo")) == nil then return true end
+  local complete = true
+  prototype_lookup.each_item_prototype(function(name, item)
+    if not complete then return end
+    if not diagnostic_visit(options) then complete = false; return end
+    if item.send_to_orbit_mode ~= "manual" and item.send_to_orbit_mode ~= "automated" then return end
+    for _, product in ipairs(item.rocket_launch_products or {}) do
+      if not diagnostic_visit(options) then complete = false; return end
+      local identity = normalize_identity(product)
+      if identity and identity.type == "item" and entry_positive(product) then
+        local key = identity_key(identity)
+        sources[key] = sources[key] or {}
+        table.insert(sources[key], {kind = "rocket-launch", prototype = name,
+          payload = name, product = identity, declared_product = deepcopy(product)})
+      end
+    end
+  end)
+  return complete
+end
+
+local function append_spoilage_sources(sources, options)
+  local line = target_profiles.current_factorio_version
+  if (line ~= "2.0" and line ~= "2.1") or not data_raw.feature_enabled("spoiling") then return true end
+  local function append(source, result, ticks)
+    if type(result) ~= "string" or result == "" or not finite_positive(ticks) then return end
+    local identity = {type = "item", name = result}
+    local key = identity_key(identity)
+    sources[key] = sources[key] or {}
+    table.insert(sources[key], {kind = "item-spoilage", prototype = source,
+      input = {type = "item", name = source}, product = identity, spoil_ticks = ticks})
+  end
+  if options.diagnostic_observer == nil then
+    item_prototype_facts.for_each_spoilage(append)
+  else
+    -- Like placement lookup, a cold diagnostic reserves raw visits instead
+    -- of constructing a comprehensive item/entity index outside its budget.
+    for _, item_type in ipairs(prototype_lookup.item_types()) do
+      if not diagnostic_visit(options) then return false end
+      for name, item in pairs(data_raw.prototypes(item_type)) do
+        if not diagnostic_visit(options) then return false end
+        append(name, item.spoil_result, item.spoil_ticks)
+      end
+    end
+  end
+  return true
+end
+
 local function default_source_catalog(state, options)
   if state.source_catalog then return state.source_catalog end
   local sources = {}
@@ -740,6 +829,8 @@ local function default_source_catalog(state, options)
     end
   end
   if not append_boiler_sources(sources, options) then return sources end
+  if not append_launch_sources(sources, options) then return sources end
+  if not append_spoilage_sources(sources, options) then return sources end
   for _, candidates in pairs(sources) do
     table.sort(candidates, function(left, right)
       local left_actor = not not (left.source_actor or left.mining_actor and left.mining_actor.required)
@@ -753,7 +844,7 @@ local function default_source_catalog(state, options)
   return sources
 end
 
-local acquisition_witness, placement_items_for_machine
+local acquisition_witness, placement_items_for_machine, rocket_launch_witness
 
 local function source_actor_witness(actor, options, state)
   local checkpoint = diagnostic_checkpoint(options)
@@ -856,6 +947,15 @@ local function source_witness(identity, options, state)
   for _, witness in ipairs(default_source_catalog(state, options)[identity_key(identity)] or {}) do
     if not diagnostic_visit(options) then return nil end
     diagnostic_rollback(options, source_checkpoint)
+    if witness.kind == "rocket-launch" then
+      options.recipe_index = options.recipe_index or state.recipe_index or recipe_facts.index_view()
+      state = query_state(state, options.recipe_index)
+      local launched = rocket_launch_witness(witness, identity, options, state)
+      if launched then
+        diagnostic_rollback(options, source_checkpoint)
+        return launched
+      end
+    end
     local temperature = witness.temperature
     if witness.heating_maximum then
       temperature = math.min(witness.heating_maximum, identity.maximum_temperature or witness.heating_maximum)
@@ -863,7 +963,7 @@ local function source_witness(identity, options, state)
     local heating_applicable = not witness.heating_maximum
       or finite_temperature(witness.heating_minimum) and temperature >= witness.heating_minimum
         and (identity.minimum_temperature ~= nil or identity.maximum_temperature ~= nil)
-    if heating_applicable and temperature_satisfied(temperature, identity)
+    if witness.kind ~= "rocket-launch" and heating_applicable and temperature_satisfied(temperature, identity)
       and surface_satisfied(witness.surface_conditions, options, state) then
       local copied = deepcopy(witness)
       copied.product = deepcopy(identity)
@@ -872,7 +972,7 @@ local function source_witness(identity, options, state)
       copied.source_actor = nil
       copied.mining_actor = nil
       local input = witness.mining_input and witness.mining_input.identity
-        or witness.kind == "boiler-conversion" and witness.input
+        or (witness.kind == "boiler-conversion" or witness.kind == "item-spoilage") and witness.input
       if input and witness.kind == "boiler-conversion" then
         -- A boiler can heat a colder seed, including the same fluid. It cannot
         -- use its own hot output to bootstrap or act as a cooling route.
@@ -910,9 +1010,9 @@ end
 function M.source_witness(identity, options, state)
   local candidate = normalize_identity(identity)
   if not candidate then return nil end
-  -- Unconditional sources need no recipe index. Conditional mining, pumps
-  -- and boilers resolve their input/placement dependencies on demand. Without
-  -- a research callback only initial acquisition can prove this preflight.
+  -- Unconditional sources need no recipe index. Conditional mining, pumps,
+  -- boilers and spoilage resolve input/placement dependencies on demand.
+  -- Without a research callback only initial acquisition proves this preflight.
   return source_witness(candidate, copy_options(options), source_query_state(state))
 end
 
@@ -1093,8 +1193,8 @@ local function machine_acquisition_witness(machines, category, recipe_name, opti
     if not diagnostic_visit(options) then return nil end
     diagnostic_rollback(options, checkpoint)
     local ports = machine.fluid_ports
-    local fluid_compatible = not required_ports or (not machine.handcrafting and ports
-      and ports.input >= required_ports.input and ports.output >= required_ports.output)
+    local fluid_compatible = not required_ports or (not machine.handcrafting
+      and fluid_ports_compatible(ports, required_ports, options))
     if fluid_compatible
       and (machine.fixed_recipe == nil or machine.fixed_recipe == recipe_name)
       and surface_satisfied(machine.surface_conditions, options, state) then
@@ -1138,6 +1238,7 @@ compatible_machine = function(category, recipe_name, options, state, required_po
     -- the optional research alternative is absent in this first pass.
     local initial_options = copy_options(options)
     initial_options.research_unlock_witness = nil
+    initial_options.research_recipe_unlock_witness = nil
     local checkpoint = diagnostic_checkpoint(options)
     local witness = machine_acquisition_witness(machines, category, recipe_name, initial_options, state, required_ports)
     diagnostic_rollback(options, checkpoint)
@@ -1146,7 +1247,7 @@ compatible_machine = function(category, recipe_name, options, state, required_po
   return machine_acquisition_witness(machines, category, recipe_name, options, state, required_ports)
 end
 
-local function route_for_recipe(recipe_name, output_identity, options, state, require_enabled)
+local function route_for_recipe(recipe_name, output_identity, options, state, require_enabled, construction)
   if not diagnostic_visit(options) then return nil end
   local fact = options.recipe_index.facts[recipe_name]
   if not fact then
@@ -1158,7 +1259,7 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
     })
     return nil
   end
-  if fact.hidden == true then
+  if fact.hidden == true and not construction then
     record_diagnostic_failure(options, {
       kind = "identity",
       recipe = recipe_name,
@@ -1175,7 +1276,19 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
     -- would manufacture a mixed failure tree.
     diagnostic_rollback(options, route_checkpoint)
     local variant_name = variant.name or "default"
-    if variant.hidden == true then
+    local surface_conditions = variant.surface_conditions
+    if construction then
+      surface_conditions = deepcopy(surface_conditions or {})
+      for _, condition in ipairs(construction.prototype.surface_conditions or {}) do
+        if not diagnostic_visit(options) then return nil end
+        table.insert(surface_conditions, condition)
+      end
+      for _, condition in ipairs(construction.receiver.surface_conditions or {}) do
+        if not diagnostic_visit(options) then return nil end
+        table.insert(surface_conditions, condition)
+      end
+    end
+    if variant.hidden == true and not construction then
       record_diagnostic_failure(options, {
         kind = "identity",
         recipe = recipe_name,
@@ -1194,7 +1307,7 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
     else
       local results = normalized_results(variant, options)
       if not diagnostic_visit(options) then return nil
-      elseif not results_include_positive(results, output_identity, options, fact.schema == 2) then
+      elseif not construction and not results_include_positive(results, output_identity, options, fact.schema == 2) then
         record_diagnostic_failure(options, {
           kind = "identity",
           recipe = recipe_name,
@@ -1211,7 +1324,7 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
           identity = deepcopy(output_identity),
           reason = "invalid-energy-required"
         })
-      elseif not surface_satisfied(variant.surface_conditions, options, state) then
+      elseif not surface_satisfied(surface_conditions, options, state) then
         record_diagnostic_failure(options, {
           kind = "identity",
           recipe = recipe_name,
@@ -1221,14 +1334,26 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
         })
       else
         local machine_witness
-        local required_ports = fluid_port_requirements(variant, results, options)
+        -- Construction consumes ingredients but discards all recipe products.
+        local required_ports = fluid_port_requirements(variant, construction and {} or results, options)
         if required_ports == nil then return nil end
         local categories = variant.categories or {"crafting"}
         local machine_checkpoint = diagnostic_checkpoint(options)
         for _, category in ipairs(categories) do
           if not diagnostic_visit(options) then return nil end
           diagnostic_rollback(options, machine_checkpoint)
-          machine_witness = compatible_machine(category, recipe_name, options, state, required_ports)
+          if construction then
+            for _, declared in ipairs(construction.prototype.crafting_categories or {}) do
+              if not diagnostic_visit(options) then return nil end
+              local ports = construction.fluid_ports
+              if declared == category and fluid_ports_compatible(ports, required_ports, options) then
+                machine_witness = construction.placement
+                break
+              end
+            end
+          else
+            machine_witness = compatible_machine(category, recipe_name, options, state, required_ports)
+          end
           if machine_witness then break end
         end
         if machine_witness then
@@ -1268,10 +1393,11 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
             -- are a structural failure of the selected route.
             diagnostic_rollback(options, route_checkpoint)
             return {
-              kind = "recipe",
+              kind = construction and "rocket-construction" or "recipe",
               recipe = recipe_name,
               variant = variant.name or "default",
               output = deepcopy(output_identity),
+              crafts = construction and construction.prototype.rocket_parts_required or nil,
               machine = machine_witness,
               ingredients = ingredient_witnesses
             }
@@ -1292,6 +1418,77 @@ local function route_for_recipe(recipe_name, output_identity, options, state, re
   return nil
 end
 
+rocket_launch_witness = function(source, identity, options, state)
+  local key = acquisition_key(identity)
+  if state.visiting[key] then return nil end
+  state.visiting[key] = true
+  local function resolve()
+    -- Modern launch products arrive at a cargo landing pad on the launching
+    -- surface. Permission to launch without one is not item acquisition.
+    -- Keep this receiver's research in the same witness as the payload/silo.
+    local receivers = {}
+    for name in pairs(data_raw.prototypes("cargo-landing-pad")) do
+      if not diagnostic_visit(options) then return nil end
+      table.insert(receivers, name)
+    end
+    table.sort(receivers)
+    local names = {}
+    for name in pairs(data_raw.prototypes("rocket-silo")) do
+      if not diagnostic_visit(options) then return nil end
+      table.insert(names, name)
+    end
+    table.sort(names)
+    for _, name in ipairs(names) do
+      if not diagnostic_visit(options) then return nil end
+      local silo = data_raw.prototypes("rocket-silo")[name]
+      local rocket = data_raw.prototypes("rocket-silo-rocket")[silo.rocket_entity]
+      local recipe = silo.fixed_recipe
+      if type(recipe) == "string" and recipe ~= "" and rocket
+        and silo.launch_to_space_platforms ~= true
+        and finite_positive(silo.to_be_inserted_to_rocket_inventory_size)
+        and finite_positive(rocket.inventory_size) and finite_positive(silo.crafting_speed)
+        and finite_positive(silo.rocket_parts_required) and silo.rocket_parts_required % 1 == 0 then
+        local placement = source_actor_witness({prototype = name, prototype_type = "rocket-silo"}, options, state)
+        local ports = fluid_port_facts(silo, options)
+        if placement and ports then
+          local checkpoint = diagnostic_checkpoint(options)
+          for _, receiver_name in ipairs(receivers) do
+            if not diagnostic_visit(options) then return nil end
+            diagnostic_rollback(options, checkpoint)
+            local receiver = data_raw.prototypes("cargo-landing-pad")[receiver_name]
+            local received = finite_positive(receiver.inventory_size)
+              and source_actor_witness({prototype = receiver_name, prototype_type = "cargo-landing-pad"}, options, state)
+            if received then
+              local actor = {prototype = silo, placement = placement, fluid_ports = ports, receiver = receiver}
+              local function construct(require_enabled)
+                return route_for_recipe(recipe, nil, options, state, require_enabled, actor)
+              end
+              local construction = construct(true)
+              if not construction and type(options.research_recipe_unlock_witness) == "function" then
+                construction = options.research_recipe_unlock_witness(recipe, state, function() return construct(false) end)
+              end
+              local payload = construction and acquisition_witness({type = "item", name = source.payload}, options, state)
+              if payload then
+                local result = deepcopy(source)
+                result.product = deepcopy(identity)
+                result.machine = placement
+                result.receiver = received
+                result.recipe_witness = construction
+                result.ingredients = {payload}
+                return result
+              end
+            end
+          end
+        end
+      end
+    end
+    return nil
+  end
+  local result = resolve()
+  state.visiting[key] = nil
+  return result
+end
+
 local function cacheable(options)
   return type(options.source_witness) ~= "function"
     and type(options.machine_category_witness) ~= "function"
@@ -1300,6 +1497,7 @@ local function cacheable(options)
     -- technology/science traversal.  A conclusion from that branch must not
     -- become a reusable acquisition answer for another traversal.
     and type(options.research_unlock_witness) ~= "function"
+    and type(options.research_recipe_unlock_witness) ~= "function"
 end
 
 local function stable_cacheable(options)
@@ -1315,6 +1513,7 @@ local STABLE_SOURCE_KINDS = {
   ["entity-loot"] = true,
   ["offshore-pump"] = true,
   ["boiler-conversion"] = true,
+  ["item-spoilage"] = true,
   ["fluid-mixing"] = true
 }
 
@@ -1516,6 +1715,7 @@ function M.initial_recipe_witness(recipe_name, output, options, state)
   -- research-unlocked ingredient may establish a later route, but it must not
   -- turn an enabled outer recipe into an initial acquisition witness.
   initial_options.research_unlock_witness = nil
+  initial_options.research_recipe_unlock_witness = nil
   return M.recipe_witness(recipe_name, output, initial_options, state)
 end
 

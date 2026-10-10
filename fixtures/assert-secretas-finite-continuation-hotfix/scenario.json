@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "source_version": "4.2.2",
+  "target": "f210",
+  "engine_version": "2.1.21",
+  "engine_sha256": "703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1",
+  "runtime_api_sha256": "F21602449EC6C077AFB4A26311EF075AF7AEDB8C067D53B9CC87EFCCCA4D761F",
+  "dependencies": [
+    {"name": "secretas", "version": "1.0.37", "sha256": "92A4210E4A914F3F8850CAFDD328C061A6B25937DB543F3042B0A7C7F95F201C"},
+    {"name": "pretty-frozeta", "version": "1.0.1", "sha256": "2F4855940329AAB0A73D5F5FE59DA975FB98039249C21488ACE3C0E60D0BC31F"}
+  ],
+  "settings_mode": "Defaults",
+  "timeout_seconds": 120,
+  "scope": "Focused native finite-8 to MIR infinite-9 reward, queue, fractional progress and two reloads; not the reporter save, full catalogue comparison, cap gameplay or general Secretas support."
+}

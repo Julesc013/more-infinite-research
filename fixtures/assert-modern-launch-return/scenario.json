@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "source_version": "4.2.2",
+  "settings_mode": "Defaults",
+  "scope": "Base-only native rocket construction, satellite return, lab consumption and saved research; declared factory setup, not an early-game playthrough, upgrade or graphical claim.",
+  "targets": {
+    "f200": {
+      "factorio_line": "2.0",
+      "engine_version": "2.0.77",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "runtime_api_sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+    },
+    "f210": {
+      "factorio_line": "2.1",
+      "engine_version": "2.1.21",
+      "engine_sha256": "703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1",
+      "runtime_api_sha256": "F21602449EC6C077AFB4A26311EF075AF7AEDB8C067D53B9CC87EFCCCA4D761F"
+    }
+  },
+  "setup": ["research required prerequisites", "place silo, landing pad and lab", "supply 1000 each processing-unit, low-density-structure and rocket-fuel", "supply one satellite", "supply non-space lab ingredients", "supply electrical buffer energy", "accelerate simulation ticks tenfold"],
+  "assertions": ["ordinary lab-speed and weapon-speed level-seven continuations retain space science and launch prerequisite closure", "100 native construction crafts consume exact inputs", "one native satellite launch returns 1000 space science", "lab consumes only science transferred from the receiver", "positive fractional research progress, queue and retained science survive one completed-save reload"],
+  "required_reload_count": 1,
+  "production_timeout_seconds": 180,
+  "fixture_tick_limit": 60000
+}
