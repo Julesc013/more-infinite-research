@@ -301,6 +301,20 @@ try {
         try{$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}
         if($Variant -ceq 'duplicate-module' -and $module -ceq $modules[0]){$null=$zip.CreateEntry($entryName)}
       }
+      $target=if($Line -ceq '2.1'){'f210'}else{'f200'}
+      $capabilitySources=@{
+        'prototypes/mir/stage/data.lua'='source/prototypes/mir/stage/data.lua'
+        'prototypes/mir/stage/control.lua'='source/prototypes/mir/stage/control.lua'
+        'prototypes/mir/runtime/scripted_techs.lua'="source/adapters/$target/prototypes/mir/runtime/scripted_techs.lua"
+        'prototypes/mir/platform/factorio/target_profiles.lua'="source/adapters/$target/prototypes/mir/platform/factorio/target_profiles.lua"
+      }
+      foreach($name in $capabilitySources.Keys){
+        $bytes=[IO.File]::ReadAllBytes((Join-Path $repo $capabilitySources[$name]))
+        if($Variant -ceq 'changed-coordinator' -and $name.EndsWith('/scripted_techs.lua')){$bytes[0]=$bytes[0] -bxor 1}
+        if($Variant -ceq 'changed-capability' -and $name.EndsWith('/target_profiles.lua')){$bytes[0]=$bytes[0] -bxor 1}
+        $entry=$zip.CreateEntry($root+'/'+$name);$stream=$entry.Open()
+        try{$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}
+      }
       $extra=switch -CaseSensitive ($Variant) {
         'outside' {'outside/extra.lua'}
         'root-case' {$root.ToUpperInvariant()+'/extra.lua'}
@@ -318,6 +332,10 @@ try {
     $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor 2 -SourcePatch 1
     $valid=New-ControlledBrowserArchive -Line $line -Identity $identity
     $checked=Test-BrowserCandidate -Candidate $valid -Line $line -Identity $identity -Repository $repo
+    foreach($variant in @('changed-coordinator','changed-capability')){
+      $mismatch=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant $variant
+      Refuses-Probe {Test-BrowserCandidate -Candidate $mismatch -Line $line -Identity $identity -Repository $repo} 'differs from the controlled source'
+    }
     Assert-Probe ($checked.info.version -ceq $identity.distribution_version -and $checked.sha256 -ceq (Get-FileHash -LiteralPath $valid).Hash) "actual browser $line validator lost exact patch-one identity or input hash."
     if($line -ceq '2.1') {
       $tinChecked=Test-TinBrowserCandidate -Candidate $valid -Line $line -Identity $identity -Repository $repo

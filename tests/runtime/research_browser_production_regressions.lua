@@ -111,6 +111,9 @@ return function(core, adapter, host_source, check)
     ["prototypes.mir.runtime.research_browser_mir_provider"] = {},
     ["prototypes.mir.runtime.state"] = {bucket = function(name) return buckets[name] end},
     ["prototypes.mir.platform.factorio.runtime_state"] = {root = function() return {} end},
+    ["prototypes.mir.platform.factorio.target_line"] = {feature_enabled = function(name)
+      return name == "research_library" or name == "settings_profiles"
+    end},
     ["prototypes.mir.runtime.startup_settings"] = {},
     ["prototypes.mir.settings.profile_codec"] = {},
     ["prototypes.mir.settings.catalog"] = {}, ["prototypes.mir.streams.registry"] = {}

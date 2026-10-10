@@ -89,13 +89,22 @@ try {
     }).Count -ne 0) {
   throw '[mir-browser-candidate-identity] Candidate filename, root and metadata must encode the selected source version and target.'
  }
+ $bindings=@{}
  foreach($name in @('research_browser.lua','research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')) {
-  $entry=@($archive.Entries | Where-Object FullName -CEQ "$packageRoot/prototypes/mir/runtime/$name")
+  $bindings["prototypes/mir/runtime/$name"]="source/prototypes/mir/runtime/$name"
+ }
+ foreach($stage in @('data','control')){$bindings["prototypes/mir/stage/$stage.lua"]="source/prototypes/mir/stage/$stage.lua"}
+ $adapter=if($Target -ceq '2.1'){'f210'}else{'f200'}
+ $bindings['prototypes/mir/runtime/scripted_techs.lua']="source/adapters/$adapter/prototypes/mir/runtime/scripted_techs.lua"
+ $bindings['prototypes/mir/platform/factorio/target_profiles.lua']="source/adapters/$adapter/prototypes/mir/platform/factorio/target_profiles.lua"
+ foreach($name in $bindings.Keys) {
+  $sourcePath=Join-Path $repo $bindings[$name]
+  $entry=@($archive.Entries | Where-Object FullName -CEQ "$packageRoot/$name")
   if($entry.Count -ne 1) { throw "Candidate must contain exactly one $name." }
-  if($entry[0].Length -ne (Get-Item -LiteralPath (Join-Path $repo "source/prototypes/mir/runtime/$name")).Length){throw "Candidate $name differs from the controlled source under test."}
+  if($entry[0].Length -ne (Get-Item -LiteralPath $sourcePath).Length){throw "Candidate $name differs from the controlled source under test."}
   $stream=$entry[0].Open()
   try { $moduleHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)) } finally { $stream.Dispose() }
-  if($moduleHash -cne (Get-FileHash (Join-Path $repo "source/prototypes/mir/runtime/$name")).Hash) { throw "Candidate $name differs from the controlled source under test." }
+  if($moduleHash -cne (Get-FileHash -LiteralPath $sourcePath).Hash) { throw "Candidate $name differs from the controlled source under test." }
  }
  return [pscustomobject]@{info=$info;sha256=(Get-FileHash -LiteralPath $candidate).Hash}
 } finally { $archive.Dispose() }
@@ -190,6 +199,16 @@ if($hostTestSource.Contains(']====]')) { throw 'Host fixture source collides wit
 [void]$lua.AppendLine('local browser_host_test_source=[====[')
 [void]$lua.AppendLine($hostTestSource)
 [void]$lua.AppendLine(']====]')
+[void]$lua.AppendLine('local browser_capability_sources={coordinators={}}')
+foreach($entry in @(
+ @{key='data_stage';path='source/prototypes/mir/stage/data.lua'},
+ @{key='control_stage';path='source/prototypes/mir/stage/control.lua'},
+ @{key='coordinators.f210';path='source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua'},
+ @{key='coordinators.f200';path='source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua'})) {
+ $text=[IO.File]::ReadAllText((Join-Path $repo $entry.path)).Replace("`r`n","`n")
+ if($text.Contains(']====]')){throw 'Library capability source collides with its Lua delimiter.'}
+ [void]$lua.AppendLine('browser_capability_sources.'+$entry.key+'=[====['+$text+']====]')
+}
 [void]$lua.AppendLine('local check_browser_handler_regressions=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_handler_regressions.lua')))
 [void]$lua.AppendLine('end)()')
@@ -212,7 +231,7 @@ $capMutant=$coreTestSource.Replace($capAnchor,$capAnchor.Replace('finite_nonnega
 [void]$lua.AppendLine('local browser_core_positive_default_mutant=(function()')
 [void]$lua.AppendLine($capMutant)
 [void]$lua.AppendLine('end)()')
-$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
+$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source,browser_capability_sources); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
 [void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player',$coreChecks))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 if($PrepareInputsOnly) {

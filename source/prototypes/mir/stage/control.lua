@@ -13,7 +13,8 @@ end
 
 function M.run()
   assert_runtime_stage()
-  if target_line.feature_enabled("scripted_techs") or target_line.feature_enabled("productivity_family_adoption") then
+  if target_line.feature_enabled("scripted_techs") or target_line.feature_enabled("productivity_family_adoption")
+      or target_line.feature_enabled("research_library") then
     require("prototypes.mir.runtime.scripted_techs").register()
   end
   if target_line.feature_enabled("settings_profiles") then
