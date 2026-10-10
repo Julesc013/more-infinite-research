@@ -26,9 +26,9 @@ $progressionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduc
 $progressionPlannerIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
 if([string]$record.predecessor.record_sha256-cne[string]$v6.record_sha256-or
   [string]$manifest.predecessor_record_sha256-cne[string]$v6.source_manifest.record_sha256-or
-   @($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne375-or
+   @($manifest.bindings).Count-ne377-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne377-or
    $migrated.Count-ne359-or@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-ne359-or
-   $introduced.Count-ne16-or$scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or$progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or
+   $introduced.Count-ne18-or$scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or$progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or
   [string]$progressionIntroduced[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
   [string]$progressionIntroduced[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
   (@($progressionIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
@@ -52,7 +52,12 @@ foreach($forgery in @(
   @{id='substituted-predecessor';mutate={param($r)$r.bindings[0].provenance.predecessor_source_path='src/mod/forged/predecessor.lua'}},
   @{id='missing-predecessor';mutate={param($r)$r.bindings=@($r.bindings|Select-Object -Skip 1)}},
   @{id='duplicated-predecessor';mutate={param($r)$r.bindings[1]=($r.bindings[0]|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20)}},
-  @{id='changed-scope';mutate={param($r)$r.bindings[0].target_scope=@('f210')}}
+  @{id='changed-scope';mutate={param($r)$r.bindings[0].target_scope=@('f210')}},
+  @{id='browser-overlap';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').target_scope=@('f210','f200')}},
+  @{id='browser-substitution';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').source_path='source/adapters/runtime-capabilities/forged.lua'}},
+  @{id='browser-output';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').output_path='prototypes/mir/platform/factorio/forged.lua'}},
+  @{id='browser-transform';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').transform='forged-transform'}},
+  @{id='browser-identity';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').provenance.introduction_id='undeclared-introduction'}}
 )){
   $copy=$manifest|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
   &$forgery.mutate $copy;$copy.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $copy
