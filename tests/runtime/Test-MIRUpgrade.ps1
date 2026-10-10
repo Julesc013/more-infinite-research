@@ -785,10 +785,11 @@ if ($requiresReloadProof) {
   $upgradedSave = $governedUpgradedSave
   # Keep the finite-era save/CLI contract already proved by candidate retention.
   $benchmarkMap = if ($historicalLine -eq '0.13') { [IO.Path]::GetFileNameWithoutExtension($upgradedSave) } else { $upgradedSave }
-  $serverReload = $isHistoricalTerminalFixture -and $historicalLine -in @('0.15','0.16')
+  $serverReload = $isHistoricalTerminalFixture -and $historicalLine -in @('0.13','0.14','0.15','0.16')
   $reloadArgs = if ($serverReload) {
-    # The 0.15 and 0.16 graphical benchmark paths reject the saved equipment-grid
-    # table before fixture assertions. Load each save through the normal server path.
+    # 0.13/0.14 benchmarks initialize graphics and texture atlases; 0.15/0.16
+    # also reject saved equipment-grid tables. All four support the same normal
+    # server reload and fresh on_load/next-tick oracle, without that unrelated GUI.
     $nativeBaseArgs + @('--server-settings',$serverSettings,'--start-server',$upgradedSave)
   } else {
     $benchmarkArgs = $nativeBaseArgs + @("--benchmark", $benchmarkMap, "--benchmark-ticks", "1")

@@ -122,6 +122,14 @@ function Test-MaintenanceFixtureCallSites {
   $modern=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Extent.Text.StartsWith("if (`$FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000'")},$true))
   $historicalBlocks=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Extent.Text.StartsWith('if ($isHistoricalTerminalFixture) {') -and $n.Extent.Text.Contains('$historical = Resolve-MIRHistoricalUpgradeTransition')},$true))
   Assert-LibraryTest ($resolver.Count-eq1-and$modern.Count-eq1-and$historicalBlocks.Count-eq1) 'upgrade fixture specialization call sites are unambiguous'
+  $reloadChoice=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$serverReload'},$true))
+  Assert-LibraryTest ($reloadChoice.Count-eq1) 'one historical reload transport selection'
+  foreach($historicalLine in @('0.13','0.14','0.15','0.16','0.17')){
+    foreach($isHistoricalTerminalFixture in @($true,$false)){
+      . ([scriptblock]::Create($reloadChoice[0].Extent.Text))
+      Assert-LibraryTest ($serverReload-eq($isHistoricalTerminalFixture-and$historicalLine-cne'0.17')) 'supported historical cold reloads select the normal server transport'
+    }
+  }
   . ([scriptblock]::Create($resolver[0].Extent.Text))
   foreach($targetToken in @('210','200','110','100','017','016','015','014','013')){foreach($patch in @(1,2)){
     $code=$targetToken
