@@ -1783,18 +1783,20 @@ function M.register()
     translations[event.player_index] = nil
     locale_generations[event.player_index] = nil
   end)
-  script.on_event(defines.events.on_player_locale_changed, function(event)
-    local player = event_player(event)
-    if player then
-      local translations, locale_generations = translation_state()
-      local cache = translations[event.player_index]
-      if cache then
-        translation_queue.invalidate_locale(cache, player.locale,
-          next_locale_generation(locale_generations, cache, event.player_index))
+  if defines.events.on_player_locale_changed then
+    script.on_event(defines.events.on_player_locale_changed, function(event)
+      local player = event_player(event)
+      if player then
+        local translations, locale_generations = translation_state()
+        local cache = translations[event.player_index]
+        if cache then
+          translation_queue.invalidate_locale(cache, player.locale,
+            next_locale_generation(locale_generations, cache, event.player_index))
+        end
+        if player.gui.screen[ROOT] then render(player) end
       end
-      if player.gui.screen[ROOT] then render(player) end
-    end
-  end)
+    end)
+  end
   script.on_event(defines.events.on_player_changed_force, function(event)
     local player = event_player(event)
     if player then
@@ -1819,8 +1821,10 @@ function M.register()
       schedule_open_force_refresh(event.research and event.research.force or event.force)
     end)
   end
-  script.on_event(defines.events.on_research_moved, function(event)
-    schedule_open_force_refresh(event.force)
-  end)
+  if defines.events.on_research_moved then
+    script.on_event(defines.events.on_research_moved, function(event)
+      schedule_open_force_refresh(event.force)
+    end)
+  end
 end
 return M

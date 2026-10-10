@@ -25,6 +25,7 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
     }
     local defines_events = {}
     for _, name in ipairs(event_names) do defines_events[name] = name end
+    for _, name in ipairs(options and options.missing_events or {}) do defines_events[name] = nil end
     local catalogue_module = {}
     if catalogue_source then
       local actual = assert(load(catalogue_source, "actual_browser_catalogue_fixture", "t", {
@@ -64,7 +65,10 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
       defines = {events = defines_events, input_action = {}},
       script = {
         active_mods = {base = "2.1.20", ["more-infinite-research"] = "4.2.0"},
-        on_event = function(id, callback) events[id] = callback end,
+        on_event = function(id, callback)
+          assert(id ~= nil and defines_events[id] ~= nil, "unsupported event registration: " .. tostring(id))
+          events[id] = callback
+        end,
         on_nth_tick = function() end
       },
       remote = {add_interface = function() end},
@@ -153,6 +157,7 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
     set_player(fixture_player)
     return {
       on_gui_click = events.on_gui_click,
+      events = events,
       on_gui_selection_state_changed = events.on_gui_selection_state_changed,
       on_gui_closed = events.on_gui_closed,
       on_gui_location_changed = events.on_gui_location_changed,
@@ -361,6 +366,24 @@ return function(host_source_string, check, catalogue_source_string, capability_s
     "handler regression receives trusted browser host source")
   expect(check, type(check) == "function", "handler regression receives an assertion function")
   local host_factory = make_host_factory(host_source_string, catalogue_source_string, capability_sources.host_adapters.modern)
+  for _, missing in ipairs{
+      {"on_player_locale_changed", "on_research_moved", "on_research_cancelled"},
+      {"on_player_locale_changed", "on_research_moved"}, {}} do
+    local fixture = fixture_from(host_factory, {missing_events = missing}, check)
+    for _, name in ipairs{"on_player_locale_changed", "on_research_moved", "on_research_cancelled"} do
+      local available = true
+      for _, absent in ipairs(missing) do if absent == name then available = false end end
+      expect(check, (fixture.events[name] ~= nil) == available,
+        "optional " .. name .. " is registered exactly when provided by the host")
+    end
+    for _, name in ipairs{"on_gui_click", "on_string_translated", "on_research_started",
+        "on_player_changed_force", "on_player_removed"} do
+      expect(check, type(fixture.events[name]) == "function",
+        "event adaptation preserves supported " .. name .. " handling")
+    end
+    expect(check, fixture.metrics.gameplay_mutations == 0 and fixture.metrics.destroy_calls == 0,
+      "event registration changes no research or open view")
+  end
   for _, family in ipairs{"game", "modern"} do
     local fixture = fixture_from(host_factory, {platform_source = capability_sources.host_adapters[family]}, check)
     local calls, recipe = {}, {name = "selected-recipe"}
