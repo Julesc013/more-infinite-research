@@ -1,6 +1,13 @@
 -- Runtime-only Library services. Resolve engine objects inside callbacks,
 -- never while control.lua is being loaded or from persisted state.
-local M = {production_scope = "surface"}
+local M = {production_scope = "surface", recipe_browser_available = true}
+
+function M.open_recipe(player, name)
+  local recipe = prototypes.recipe[name]
+  if not recipe then return false end
+  player.open_factoriopedia_gui(recipe)
+  return true
+end
 
 function M.is_trigger_research(prototype)
   return prototype.research_trigger ~= nil

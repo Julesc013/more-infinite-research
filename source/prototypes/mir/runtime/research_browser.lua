@@ -831,8 +831,10 @@ local function detail(player, parent, v, c, width)
     local list = recipe_parent.add{type = compact_detail and "drop-down" or "list-box", name = PREFIX .. "recipe_entries", items = items, tags = {mir_browser = "recipe-list", mir_browser_section = "recipe-list"}}
     list.style.width = compact_detail and width - 24 or width
     if not compact_detail then list.style.height = recipe_height end
-    list.tooltip = {"mir-browser.recipe-select-hint"}
-    if not compact_detail then label(container, {"mir-browser.recipe-select-hint"}, width - 24) end
+    local recipe_hint = {browser_host.recipe_browser_available
+      and "mir-browser.recipe-select-hint" or "mir-browser.recipe-list-only-hint"}
+    list.tooltip = recipe_hint
+    if not compact_detail then label(container, recipe_hint, width - 24) end
   end
 end
 local function filter_dropdown(parent, caption, items, selected_index, action, width)
@@ -1473,7 +1475,7 @@ local function selection(event)
   if action == "recipe-list" then
     local v = view(player)
     local id = (v.recipe_ids or {})[event.element.selected_index]
-    if id and browser_host.prototype_collections().recipe[id] then player.open_factoriopedia_gui(browser_host.prototype_collections().recipe[id]) end
+    if id then browser_host.open_recipe(player, id) end
     return
   end
   if action == "research-list" or action == "setting-list" then

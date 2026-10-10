@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 53858,
-      "expected_sha256": "354E8D51AE84FAF8C81BFD00ED069F8DB4992D7AAB1BF01FB49D0B1A9F53088F",
+      "expected_bytes": 53969,
+      "expected_sha256": "7BA69976745572401D34887CF5D8E6539F6D7E664CA8C2ECFFDE142C28862EDD",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 93134,
-      "expected_sha256": "4E027E4F9655EAD4B36A0F0D3C653A85D3CD0D841046E9C3491C5B425079E739",
+      "expected_bytes": 93140,
+      "expected_sha256": "A2F10264488D435550474D8318822011FDB10C5F3CB6B16FD27B0C2A92A9227D",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3932,8 +3932,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Select the Library prototype/export API adapter for this engine; historical Library remains disabled.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 833,
-      "expected_sha256": "AFCDA469AB81AF1CD787A6A7A94AB254C30CE2930B4BA87BFD8CEB40184DD4A5",
+      "expected_bytes": 1041,
+      "expected_sha256": "5BC0F04E1505123C04B08CB2D24C1F7AE1B66C1C44E8523F7BD4846E9358C544",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3947,5 +3947,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "C82CD2EB53EFD591179981F681249CC8A3040B732683A5C1045329898CCA9270"
+  "record_sha256": "E727F2298E5CD07CEC8B4790D602BEEF100E38CBD607F73CC73EA5B8D6918A30"
 }

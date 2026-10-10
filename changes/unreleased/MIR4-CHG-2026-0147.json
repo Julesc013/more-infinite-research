@@ -4,11 +4,12 @@
   "change_id": "MIR4-CHG-2026-0147",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Adapt Library catalogue fields and explicitly scoped production counters to the selected host.",
+  "summary": "Adapt Library catalogue fields, production counters and recipe navigation to the selected host.",
   "details": [
     "The generic catalogue receives an explicit host and imports no MIR state. Historical host reads never probe the missing research_trigger property; modern trigger research and shared hidden/prerequisite gates remain intact.",
     "The modern host retains per-surface normal-quality rates. The game API host reads force-wide production and consumption using its native string-name and input-boolean query. The shared core rejects unknown or inconsistent scopes, and the existing panel labels force-wide observations as all surfaces.",
-    "Strict controlled host objects and actual click callbacks exercise both API shapes. Historical Library remains disabled; native statistics, GUI, lifecycle, locale/event and complete host composition acceptance remain pending.",
+    "Recipe navigation opens the current recipe in the modern native encyclopedia. Older hosts avoid the absent API and explain that their affected-recipe list is informational. Native technology-window navigation is preserved on both API families.",
+    "Strict controlled host objects and actual click/selection callbacks exercise both API shapes, missing recipes, compact/full recipe lists, foreign controls and separate player state. Historical Library remains disabled; native statistics, GUI, lifecycle, locale/event and complete host composition acceptance remain pending.",
     "The retained standalone no-MIR runner refuses obsolete profile materialization before resolving inputs. Its scenario and the Tin explanation fixture consume the explicit host contract; their native acceptance remains separate."
   ],
   "semantic_domains": [

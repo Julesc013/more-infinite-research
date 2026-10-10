@@ -2085,10 +2085,10 @@
         "predecessor_source_path": "src/mod/families/modern/locale/en/more-infinite-research.cfg"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 53858,
-      "source_sha256": "354E8D51AE84FAF8C81BFD00ED069F8DB4992D7AAB1BF01FB49D0B1A9F53088F",
-      "output_bytes": 53858,
-      "output_sha256": "354E8D51AE84FAF8C81BFD00ED069F8DB4992D7AAB1BF01FB49D0B1A9F53088F"
+      "source_bytes": 53969,
+      "source_sha256": "7BA69976745572401D34887CF5D8E6539F6D7E664CA8C2ECFFDE142C28862EDD",
+      "output_bytes": 53969,
+      "output_sha256": "7BA69976745572401D34887CF5D8E6539F6D7E664CA8C2ECFFDE142C28862EDD"
     },
     {
       "layer": "capability",
@@ -7288,10 +7288,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 93134,
-      "source_sha256": "4E027E4F9655EAD4B36A0F0D3C653A85D3CD0D841046E9C3491C5B425079E739",
-      "output_bytes": 93134,
-      "output_sha256": "4E027E4F9655EAD4B36A0F0D3C653A85D3CD0D841046E9C3491C5B425079E739"
+      "source_bytes": 93140,
+      "source_sha256": "A2F10264488D435550474D8318822011FDB10C5F3CB6B16FD27B0C2A92A9227D",
+      "output_bytes": 93140,
+      "output_sha256": "A2F10264488D435550474D8318822011FDB10C5F3CB6B16FD27B0C2A92A9227D"
     },
     {
       "layer": "capability",
@@ -7676,10 +7676,10 @@
         "reason": "Library runtime prototype collections and player-local file export use the selected engine API; no historical Library enablement."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 1160,
-      "source_sha256": "F20C2055ADBBB04A90113A696A6677ED59E843B813F41A3E88E34B94D6868701",
-      "output_bytes": 1160,
-      "output_sha256": "F20C2055ADBBB04A90113A696A6677ED59E843B813F41A3E88E34B94D6868701"
+      "source_bytes": 1399,
+      "source_sha256": "B625A1FDB29FEB9EB05125FEF60533BE6E857499A9B966A901447FF4BE4FA087",
+      "output_bytes": 1399,
+      "output_sha256": "B625A1FDB29FEB9EB05125FEF60533BE6E857499A9B966A901447FF4BE4FA087"
     },
     {
       "layer": "adapter",
@@ -7696,10 +7696,10 @@
         "reason": "Library runtime prototype collections and player-local file export use the selected engine API; no historical Library enablement."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 833,
-      "source_sha256": "AFCDA469AB81AF1CD787A6A7A94AB254C30CE2930B4BA87BFD8CEB40184DD4A5",
-      "output_bytes": 833,
-      "output_sha256": "AFCDA469AB81AF1CD787A6A7A94AB254C30CE2930B4BA87BFD8CEB40184DD4A5"
+      "source_bytes": 1041,
+      "source_sha256": "5BC0F04E1505123C04B08CB2D24C1F7AE1B66C1C44E8523F7BD4846E9358C544",
+      "output_bytes": 1041,
+      "output_sha256": "5BC0F04E1505123C04B08CB2D24C1F7AE1B66C1C44E8523F7BD4846E9358C544"
     }
   ],
   "invariants": {
@@ -7709,5 +7709,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "8818DD894ECC7795911F897FDD192D57E2F39CFE897D6A0D64F128A30A9C9839"
+  "record_sha256": "9CFDF60C01A1E4EF16620EBF95B32B628EF41A248BAB3D5F6810E52237A116F4"
 }

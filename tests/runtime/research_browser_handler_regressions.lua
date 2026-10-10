@@ -80,6 +80,10 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
       get_player = function(index) return player and index == player.index and player or nil end,
       connected_players = {}, players = {}, forces = {}
     }
+    if options and options.platform_source then
+      modules["prototypes.mir.platform.factorio.browser_host"] = assert(load(
+        options.platform_source, "actual_recipe_navigation_host", "t", env))()
+    end
     setmetatable(env, {__index = function(_, key)
       error("unexpected host global access: " .. tostring(key))
     end})
@@ -149,6 +153,7 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
     set_player(fixture_player)
     return {
       on_gui_click = events.on_gui_click,
+      on_gui_selection_state_changed = events.on_gui_selection_state_changed,
       on_gui_closed = events.on_gui_closed,
       on_gui_location_changed = events.on_gui_location_changed,
       player = fixture_player,
@@ -162,6 +167,7 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
       metrics = metrics,
       host = host,
       catalogue = catalogue_module,
+      environment = env,
       state = buckets.research_browser,
       peer_view = peer_view
     }
@@ -355,6 +361,40 @@ return function(host_source_string, check, catalogue_source_string, capability_s
     "handler regression receives trusted browser host source")
   expect(check, type(check) == "function", "handler regression receives an assertion function")
   local host_factory = make_host_factory(host_source_string, catalogue_source_string, capability_sources.host_adapters.modern)
+  for _, family in ipairs{"game", "modern"} do
+    local fixture = fixture_from(host_factory, {platform_source = capability_sources.host_adapters[family]}, check)
+    local calls, recipe = {}, {name = "selected-recipe"}
+    fixture.environment.prototypes.recipe = {[recipe.name] = recipe}
+    fixture.environment.game.recipe_prototypes = {[recipe.name] = recipe}
+    fixture.state.players[1].recipe_ids = {recipe.name, "missing-recipe"}
+    if family == "modern" then
+      fixture.player.open_factoriopedia_gui = function(value) calls[#calls + 1] = value end
+    end
+    setmetatable(fixture.player, {__index = function(_, key)
+      error("Unsupported player property: " .. key)
+    end})
+    for _, kind in ipairs{"list-box", "drop-down"} do
+      local element = {valid = true, type = kind, selected_index = 1,
+        tags = {mir_browser = "recipe-list"}, parent = fixture.root}
+      fixture.on_gui_selection_state_changed{player_index = 1, element = element}
+      expect(check, fixture.root.valid and fixture.metrics.destroy_calls == 0,
+        family .. " recipe navigation preserves the Library root in " .. kind)
+      element.selected_index = 2
+      fixture.on_gui_selection_state_changed{player_index = 1, element = element}
+      element.selected_index = 3
+      fixture.on_gui_selection_state_changed{player_index = 1, element = element}
+      element.selected_index, element.parent = 1, nil
+      fixture.on_gui_selection_state_changed{player_index = 1, element = element}
+    end
+    expect(check, #calls == (family == "modern" and 2 or 0),
+      family .. " opens only available, owned recipe selections through its supported API")
+    if family == "modern" then
+      expect(check, calls[1] == recipe and calls[2] == recipe,
+        "modern list and compact dropdown open the selected current recipe prototype")
+    end
+    expect(check, fixture.metrics.gameplay_mutations == 0 and fixture.state.players[2] == fixture.peer_view,
+      family .. " recipe navigation preserves force research and the other player's view")
+  end
   local fixture = fixture_from(host_factory, nil, check)
   expect(check, #fixture.host.requires_features == 1
     and fixture.host.requires_features[1] == "research_library",
