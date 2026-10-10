@@ -2,11 +2,13 @@
 function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
-  # Only the disposable prepared fixture changes. Its SIF counterpart keeps
-  # 0.1.0; base upgrades to 4.2.1/4.2.2 use 0.1.1/0.1.2 respectively so
-  # different prepared bytes never compete for one installed mod identity.
-  $fixtureVersion=if($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1',
+    [switch]$SpaceIsFake)
+  # Only the disposable prepared fixture changes. Retain SIF 4.2.1 at 0.1.0
+  # and base 4.2.1/4.2.2 at 0.1.1/0.1.2; SIF 4.2.2 uses 0.1.3 so distinct
+  # prepared bytes never compete for one installed mod identity.
+  if($SpaceIsFake -and $Target -cnotin @('f210','f200')){throw '[mir421-sif-target]'}
+  $fixtureVersion=if($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
@@ -42,11 +44,14 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
 }
 
 function Get-MIR421SpaceFakeUpgradeDescriptor {
-  param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype)
+  param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   $code = switch -CaseSensitive ($Target) { 'f210' { '210' }; 'f200' { '200' }; default { throw '[mir421-sif-target]' } }
   $expectedFixture = "assert-upgrade-4-0-${code}00-to-4-1-${code}00"
   $expectedArchetype = if ($Target -ceq 'f210') { 'base-continuations' } else { 'base-default' }
-  if ($FromVersion -cne "4.2.${code}00" -or $ToVersion -cne "4.2.${code}01" -or
+  $patch=([version]$SourceVersion).Build
+  $predecessorSourceVersion='4.2.'+($patch-1)
+  if ($FromVersion -cne ('4.2.'+$code+($patch-1).ToString('00')) -or $ToVersion -cne ('4.2.'+$code+$patch.ToString('00')) -or
       $FixtureName -cne $expectedFixture -or $Archetype -cne $expectedArchetype) { throw '[mir421-sif-transition]' }
   $line = if ($Target -ceq 'f210') { '2.1' } else { '2.0' }
   $inputs = if ($Target -ceq 'f210') { @(
@@ -58,7 +63,8 @@ function Get-MIR421SpaceFakeUpgradeDescriptor {
     [pscustomobject]@{name='space-is-fake';version='1.0.60';sha256='860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC'},
     [pscustomobject]@{name='cr-commons';version='1.0.27';sha256='6F3622AE6270F9B365A9E2E07FA5E07B61B2BBFCAB3A4D930CC410EBDEB63B92'}
   ) }
-  return [pscustomobject]@{request='SIF-01';line=$line;target=$Target;inputs=$inputs;mod_names=@($inputs | ForEach-Object name)}
+  return [pscustomobject]@{request='SIF-01';line=$line;target=$Target;inputs=$inputs;mod_names=@($inputs | ForEach-Object name);
+    source_version=$SourceVersion;predecessor_source_version=$predecessorSourceVersion;scenario="SIF-01-published-$predecessorSourceVersion-to-$SourceVersion"}
 }
 
 function Resolve-MIR421SpaceFakeUpgradeInputs {

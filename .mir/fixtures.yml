@@ -665,6 +665,23 @@ fixtures:
       - direct-master-library-with-no-dependency-staging-and-restored-controls
       - no-natural-acquisition-production-throughput-or-broader-profile-claim
 
+  k2-213-imersite-maintenance-upgrade-422:
+    requires_features: []
+    path: fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002
+    harness: tests/runtime/Test-MIRUpgrade.ps1
+    input_profile: fixtures/run-profiles/k2-213-imersite-f210-422.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - published-ccc01-predecessor-custody-and-current-ccc02-candidate
+      - already-finite-imersite-domain-and-earned-levels-retained
+      - default-cap-three-withholds-continuation-and-preserves-six-percent-powder
+      - explicit-zero-cap-preserves-existing-level-five-and-eight-percent-powder
+      - independent-crystal-owner-retains-ten-percent
+      - selected-queue-and-completed-work-through-two-distinct-native-reloads
+      - direct-master-library-with-no-dependency-staging-and-restored-controls
+      - no-natural-acquisition-production-throughput-or-broader-profile-claim
+
   k2-213-imersite-continuation-migration:
     requires_features: []
     path: fixtures/assert-k2-213-imersite-continuation-migration

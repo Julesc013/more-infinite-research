@@ -205,13 +205,12 @@ foreach($target in @('f210','f200')){
   Assert-MIR421CurrentUpgradeInputMode @mode;$currentAssertions++
   $mode422=$mode.Clone();$mode422.SourceVersion='4.2.2';$mode422.FromVersion="4.2.${code}01";$mode422.ToVersion="4.2.${code}02"
   Assert-MIR421CurrentUpgradeInputMode @mode422;$currentAssertions++
-  foreach($case in @('SourceVersion','FromVersion','ToVersion','SpaceIsFake','K2ImersiteInputProfile','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
+  foreach($case in @('SourceVersion','FromVersion','ToVersion','K2ImersiteInputProfile','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
     $invalid422=$mode422.Clone()
     $invalid422[$case]=switch($case){
       'SourceVersion' {'4.2.1'}
       'FromVersion' {"4.2.${code}00"}
       'ToVersion' {"4.2.${code}01"}
-      'SpaceIsFake' {$true}
       'K2ImersiteInputProfile' {'old-k2-profile.json'}
       'SourceOnlyFixtureNames' {@('unrequested')}
       'PublishedPredecessorManifest' {''}
@@ -223,6 +222,13 @@ foreach($target in @('f210','f200')){
   }
   $sif=$mode.Clone();$sif.SpaceIsFake=$true;$sif.Archetype=if($target-ceq'f210'){'base-continuations'}else{'base-default'}
   Assert-MIR421CurrentUpgradeInputMode @sif;$currentAssertions++
+  $sif422=$sif.Clone();$sif422.SourceVersion='4.2.2';$sif422.FromVersion="4.2.${code}01";$sif422.ToVersion="4.2.${code}02"
+  Assert-MIR421CurrentUpgradeInputMode @sif422;$currentAssertions++
+  foreach($field in @('SourceVersion','FromVersion','ToVersion','Archetype')){
+    $invalid422=$sif422.Clone();$invalid422[$field]=switch($field){'SourceVersion'{'4.2.1'};'FromVersion'{"4.2.${code}00"};'ToVersion'{"4.2.${code}01"};'Archetype'{'space-age-native-owner'}}
+    $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @invalid422}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-')}
+    if(-not$rejected){throw "4.2.2 SIF invalid mode accepted: $target $field"};$currentAssertions++
+  }
   foreach($case in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SourceOnlyFixtureNames','SelectedReleaseManifest','PublishedPredecessorManifest','Retention','K2ImersiteInputProfile')){
     $mutated=$mode.Clone()
     $mutated[$case]=switch($case){
@@ -278,4 +284,59 @@ try {
     $currentAssertions++
   }
 } finally { $RepoRoot=$RepoRootOriginal }
+# Consume the real outer descriptor and result assignments, not a matching
+# string: a missing SourceVersion argument must fail the 4.2.2 case.
+$sifCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$sifDescriptor'-and$n.Right.Extent.Text.StartsWith('Get-MIR421SpaceFakeUpgradeDescriptor ')},$true))
+$sifResults=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$result.native_scenario'-and$n.Right.Extent.Text-ceq'$sifDescriptor.scenario'},$true))
+if($sifCalls.Count-ne1-or$sifResults.Count-ne1){throw 'SIF caller or result is missing or ambiguous'}
+foreach($SelectedTarget in @('f210','f200')){foreach($patch in @(1,2)){
+  $code=$SelectedTarget.Substring(1);$SourceVersion="4.2.$patch";$FromVersion="4.2.${code}0$($patch-1)";$ToVersion="4.2.${code}0$patch"
+  $FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";$Archetype=if($SelectedTarget-ceq'f210'){'base-continuations'}else{'base-default'}
+  . ([scriptblock]::Create($sifCalls[0].Extent.Text))
+  $result=[ordered]@{};. ([scriptblock]::Create($sifResults[0].Extent.Text))
+  if($sifDescriptor.source_version-cne$SourceVersion-or$result.native_scenario-cne"SIF-01-published-4.2.$($patch-1)-to-4.2.$patch"){throw 'SIF caller lost source or predecessor identity'}
+  $currentAssertions++
+}}
+$profile422=Join-Path $RepoRoot 'fixtures/run-profiles/k2-213-imersite-f210-422.json'
+$k2ReaderCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$k2Inputs'-and$n.Right.Extent.Text.StartsWith('Read-MIR421K2UpgradeProfile ')},$true))
+$k2Selectors=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$k2Scenario'},$true))
+$reloadSelectors=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$requiresReloadProof'},$true))
+$k2MarkerCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.CommandAst]-and$n.GetCommandName()-ceq'Assert-MIR421K2UpgradeMarker'},$true))
+$k2ResultCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$result.native_scenario'-and$n.Right.Extent.Text.StartsWith("'K2-'" )},$true))
+if($k2ReaderCalls.Count-ne1-or$k2Selectors.Count-ne1-or$reloadSelectors.Count-ne1-or$k2MarkerCalls.Count-ne4-or$k2ResultCalls.Count-ne1){throw 'K2 maintenance call sites changed'}
+foreach($patch in @(1,2)){
+  $SourceVersion="4.2.$patch";$FromVersion="4.2.2100$($patch-1)";$ToVersion="4.2.2100$patch"
+  $FixtureName='assert-upgrade-k2-imersite-'+$FromVersion.Replace('.','-')+'-to-'+$ToVersion.Replace('.','-')
+  $K2ImersiteInputProfile=if($patch-eq1){$profilePath}else{$profile422}
+  . ([scriptblock]::Create($k2ReaderCalls[0].Extent.Text))
+  if($k2Inputs.source_version-cne$SourceVersion-or($k2Inputs.inputs|ConvertTo-Json -Depth 10 -Compress)-cne($bound.inputs|ConvertTo-Json -Depth 10 -Compress)){throw 'K2 caller changed the selected source or dependency bytes'}
+  $mode=@{Target='f210';FromVersion=$FromVersion;ToVersion=$ToVersion;FixtureName=$FixtureName;Archetype='';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile=$K2ImersiteInputProfile;SourceVersion=$SourceVersion}
+  Assert-MIR421CurrentUpgradeInputMode @mode
+  . ([scriptblock]::Create($k2Selectors[0].Extent.Text));. ([scriptblock]::Create($reloadSelectors[0].Extent.Text))
+  if(-not$k2Scenario-or-not$requiresReloadProof){throw 'Current K2 fixture bypassed its scenario or reload path'}
+  $info=Get-Content (Join-Path $RepoRoot ('fixtures/'+$FixtureName+'/info.json')) -Raw|ConvertFrom-Json
+  if($info.version-cne"0.1.$patch"-or$info.dependencies-cnotcontains"more-infinite-research >= $FromVersion"){throw 'K2 prepared identity or predecessor differs'}
+  $result=[ordered]@{};. ([scriptblock]::Create($k2ResultCalls[0].Extent.Text))
+  if($result.native_scenario-cne"K2-42$patch-published-4.2.$($patch-1)-to-$SourceVersion"){throw 'K2 result identity differs'}
+  $k2Assertions+=5
+  foreach($K2ImersiteCap in @(0,3)){
+    $createText="[mir-fixture] K2-42$patch maintenance state verified stage=source;cap=$K2ImersiteCap"
+    $loadText="[mir-fixture] K2-42$patch maintenance state verified stage=upgrade;cap=$K2ImersiteCap"
+    $reloadText=$secondReloadText="[mir-fixture] K2-42$patch maintenance state verified stage=reload;cap=$K2ImersiteCap"
+    foreach($call in $k2MarkerCalls){. ([scriptblock]::Create($call.Extent.Text));$k2Assertions++}
+    foreach($stage in @('source','upgrade','reload')){foreach($wrong in @("[mir-fixture] K2-42$(3-$patch) maintenance state verified stage=$stage;cap=$K2ImersiteCap", "[mir-fixture] K2-42$patch maintenance state verified stage=$stage;cap=$K2ImersiteCap-incomplete")){
+      $rejected=$false;try{Assert-MIR421K2UpgradeMarker -Text $wrong -Stage $stage -Cap $K2ImersiteCap -SourceVersion $SourceVersion}catch{$rejected=$_.Exception.Message.Contains('marker]')}
+      if(-not$rejected){throw 'Wrong-version or incomplete K2 marker accepted'};$k2Assertions++
+    }}
+  }
+  foreach($wrongProfile in @($(if($patch-eq1){$profile422}else{$profilePath}))){
+    $rejected=$false;try{Read-MIR421K2UpgradeProfile -Path $wrongProfile -SourceVersion $SourceVersion|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-selection]')}
+    if(-not$rejected){throw 'K2 opposite source profile accepted'};$k2Assertions++
+  }
+  foreach($field in @('SourceVersion','FromVersion','ToVersion','FixtureName','K2ImersiteInputProfile')){
+    $bad=$mode.Clone();$bad[$field]=switch($field){'SourceVersion'{"4.2.$(3-$patch)"};'K2ImersiteInputProfile'{''};default{'wrong'}}
+    $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-')}
+    if(-not$rejected){throw "K2 mixed maintenance mode accepted: $field"};$k2Assertions++
+  }
+}
 [pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

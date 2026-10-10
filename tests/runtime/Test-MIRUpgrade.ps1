@@ -92,11 +92,11 @@ function Assert-MIR421CurrentUpgradeInputMode {
   if ($FromVersion -cne ('4.2.'+$code+$fromPatch.ToString('00')) -or $ToVersion -cne ('4.2.'+$code+$toPatch.ToString('00')) -or $SourceOnlyFixtureNames.Count) {
     throw '[mir421-current-upgrade-transition]'
   }
-  if ($K2ImersiteInputProfile -or $FixtureName -ceq 'assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001') {
+  if ($K2ImersiteInputProfile -or $FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002')) {
     if (-not $K2ImersiteInputProfile) { throw '[mir421-k2-upgrade-inputs-required]' }
-    Assert-MIR421K2UpgradeTransition -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake $SpaceIsFake -SourceOnlyFixtureNames $SourceOnlyFixtureNames
+    Assert-MIR421K2UpgradeTransition -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake $SpaceIsFake -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SourceVersion $SourceVersion
   } elseif ($SpaceIsFake) {
-    $null=Get-MIR421SpaceFakeUpgradeDescriptor -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype
+    $null=Get-MIR421SpaceFakeUpgradeDescriptor -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SourceVersion $SourceVersion
   } elseif ($FixtureName -cne "assert-upgrade-4-0-${code}00-to-4-1-${code}00" -or $Archetype -cnotin @('','base-default')) {
     throw '[mir421-current-upgrade-scenario]'
   }
@@ -315,9 +315,9 @@ $script:upgradeActivations=@()
 . (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
 . (Join-Path $RepoRoot 'tests/support/MIR421K2Upgrade.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
-$k2Scenario=$FixtureName -ceq 'assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001'
+$k2Scenario=$FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002')
 if($k2Scenario -or $K2ImersiteInputProfile){
-  Assert-MIR421K2UpgradeTransition -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -SourceOnlyFixtureNames $SourceOnlyFixtureNames
+  Assert-MIR421K2UpgradeTransition -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SourceVersion $SourceVersion
   if(-not$K2ImersiteInputProfile-or(-not$SelectedReleaseManifest-and-not$SourceMaterializationPath)-or-not$PublishedMaintenancePredecessorManifestPath-or$Retention-cne'Always'){throw '[mir421-k2-upgrade-inputs-required]'}
 }
 if($PSBoundParameters.ContainsKey('K2ImersiteCap')-and-not$k2Scenario){throw '[mir421-k2-upgrade-input-mode]'}
@@ -363,7 +363,7 @@ if ($SpaceIsFake) {
   if ((-not $SelectedReleaseManifest -and -not $currentMaterialization) -or -not $PublishedMaintenancePredecessorManifestPath) { throw '[mir421-sif-manifests-required]' }
   if (-not $OutputPath -or (Test-Path -LiteralPath $OutputPath) -or $Retention -cne 'Always') { throw '[mir421-sif-fresh-retained-output-required]' }
   $null=Resolve-MIR441RecoveryScratchPath -Path $(if([IO.Path]::IsPathRooted($OutputPath)){$OutputPath}else{Join-Path $RepoRoot $OutputPath})
-  $sifDescriptor=Get-MIR421SpaceFakeUpgradeDescriptor -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype
+  $sifDescriptor=Get-MIR421SpaceFakeUpgradeDescriptor -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SourceVersion $SourceVersion
   $engineBaseInfo=Get-Content -LiteralPath (Join-Path $engineData 'base/info.json') -Raw|ConvertFrom-Json
   if(([version]$engineBaseInfo.version).ToString(2)-cne$sifDescriptor.line){throw '[mir421-sif-engine-authority] Configured engine does not match the selected target.'}
   if (-not $currentMaterialization) {
@@ -376,7 +376,7 @@ if ($SpaceIsFake) {
 }
 $k2Inputs=$null
 if($k2Scenario){
-  $k2Inputs=Read-MIR421K2UpgradeProfile -Path (Resolve-MIRUpgradePath $K2ImersiteInputProfile)
+  $k2Inputs=Read-MIR421K2UpgradeProfile -Path (Resolve-MIRUpgradePath $K2ImersiteInputProfile) -SourceVersion $SourceVersion
   if((Get-FileHash -LiteralPath $factorio).Hash-cne$k2Inputs.profile.engine_sha256-or
      (Get-FileHash -LiteralPath (Join-Path (Split-Path -Parent $engineData) 'doc-html/runtime-api.json')).Hash-cne$k2Inputs.profile.runtime_api_sha256){throw '[mir421-k2-upgrade-engine-identity]'}
   $sifInputs=@($k2Inputs.inputs)
@@ -496,8 +496,8 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   if ($targetCode -cin @('210','200','110','100') -and
       (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
        ($FromVersion -ceq "4.2.${targetCode}01" -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
-      -not $SpaceIsFake -and $Archetype -cin @('','base-default')) {
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion
+      ($SpaceIsFake -or $Archetype -cin @('','base-default'))) {
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -SpaceIsFake:$SpaceIsFake
   }
 }
 if ($isHistoricalTerminalFixture) {
@@ -605,7 +605,7 @@ if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $is
 }
 $createText = Get-Content -Raw -LiteralPath $log
 if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $createText -Stage source }
-if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $createText -Stage source -Cap $K2ImersiteCap }
+if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $createText -Stage source -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
 if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete$archetypeSuffix")) {
   $sourceInitArgs = $nativeBaseArgs + @(
     "--start-server", $save, "--until-tick", "1"
@@ -641,6 +641,7 @@ $nativeBaseArgs=@('--config',$config,'--no-log-rotation','--mod-directory',$mods
 
 $requiresReloadProof = $FixtureName -in @(
   'assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001',
+  'assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002',
   "assert-upgrade-3-2-11-to-4-0-21000",
   "assert-upgrade-2-5-11-to-4-0-20000",
   "assert-upgrade-3-2-2-to-3-2-3",
@@ -690,7 +691,7 @@ $loadExitCode = if ($requiresReloadProof) {
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
 $loadText = Get-Content -Raw -LiteralPath $log
 if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $loadText -Stage upgrade }
-if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $loadText -Stage upgrade -Cap $K2ImersiteCap }
+if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $loadText -Stage upgrade -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
 $loadMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
 if (-not $loadText.Contains($loadMarker)) {
   throw "MIR $ToVersion upgrade proof marker is missing: $loadMarker. Temporary root: $root"
@@ -727,7 +728,7 @@ if ($requiresReloadProof) {
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
   if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $reloadText -Stage reload }
-  if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $reloadText -Stage reload -Cap $K2ImersiteCap }
+  if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $reloadText -Stage reload -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
   if (-not $reloadText.Contains($reloadMarker)) {
     throw "MIR $ToVersion upgraded-save reload proof marker is missing: $reloadMarker. Temporary root: $root"
   }
@@ -746,7 +747,7 @@ if ($requiresReloadProof) {
   }
   $secondReloadText = Get-Content -Raw -LiteralPath $log
   if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $secondReloadText -Stage reload }
-  if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $secondReloadText -Stage reload -Cap $K2ImersiteCap }
+  if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $secondReloadText -Stage reload -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
   if (-not $secondReloadText.Contains($reloadMarker)) {
     throw "MIR $ToVersion upgraded-save second-reload proof marker is missing: $reloadMarker. Temporary root: $root"
   }
@@ -843,6 +844,12 @@ if ($SpaceIsFake) {
 }
 if($k2Scenario){
   if(-not$reloadEvidence-or-not$secondReloadEvidence){throw '[mir421-k2-upgrade-two-reloads-required]'}
+  if($SourceVersion-ceq'4.2.2'){
+    $assertions=@('published-4.2.1-k2-finite-earned-domain-retained','independent-crystal-ten-percent-retained',
+      'existing-queue-level-and-completed-work-retained','configured-imersite-cap-and-fixture-storage-retained',
+      'exact-archive-selection-and-library-controls-restored','upgraded-save-reload-passed','upgraded-save-second-reload-passed')
+    $assertions+=if($K2ImersiteCap-eq0){@('existing-powder-level-five-and-eight-percent-retained')}else{@('default-cap-three-withholds-continuation-and-preserves-six-percent-powder')}
+  }else{
   $assertions=@('published-4.2.0-k2-earned-levels-one-through-three-retained','powder-six-percent-and-native-crystal-ten-percent-retained',
     'copper-queue-level-three-and-completed-work-retained-before-progression',
     'configured-imersite-cap-and-fixture-storage-retained','exact-archive-selection-and-library-controls-restored',
@@ -850,6 +857,7 @@ if($k2Scenario){
   $assertions+=if($K2ImersiteCap-eq0){@('new-powder-continuation-completes-level-four',
     'powder-eight-percent-and-independent-crystal-ten-percent-after-completion','queued-next-level-five-and-42-percent-progress-through-two-reloads')
   }else{@('published-default-cap-three-retained','cap-three-continuation-withheld','copper-queue-and-completed-work-through-two-reloads')}
+  }
 }
 $sifTerminal=Complete-MIRLibraryActivation -Activation $script:upgradeActivation
 $result = [ordered]@{
@@ -881,12 +889,12 @@ if ($secondReloadEvidence) {
   $result.second_reload_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $secondReloadEvidence).Hash
 }
 if ($SpaceIsFake) {
-  $result.native_scenario='SIF-01-published-4.2.0-to-4.2.1'
+  $result.native_scenario=$sifDescriptor.scenario
   $result.dependency_inputs=$sifTerminal.selected
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Algorithm SHA256).Hash
 }
 if($k2Scenario){
-  $result.native_scenario='K2-421-published-4.2.0-to-4.2.1'
+  $result.native_scenario='K2-'+$SourceVersion.Replace('.','')+'-published-4.2.'+(([version]$SourceVersion).Build-1)+'-to-'+$SourceVersion
   $result.input_profile_sha256=$k2Inputs.sha256
   $result.dependency_inputs=$sifTerminal.selected
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $fixture 'control.lua')).Hash

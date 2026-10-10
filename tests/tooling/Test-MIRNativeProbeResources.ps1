@@ -147,6 +147,15 @@ try {
     $sifArguments=@{Target=$target;FromVersion="4.2.${code}00";ToVersion="4.2.${code}01";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype=$(if($target -ceq 'f210'){'base-continuations'}else{'base-default'})}
     $descriptor=Get-MIR421SpaceFakeUpgradeDescriptor @sifArguments
     Assert-Probe ($descriptor.inputs.Count -eq 2 -and ($descriptor.mod_names -join '|') -ceq 'space-is-fake|cr-commons' -and $descriptor.request -ceq 'SIF-01') "exact $target native dependency profile lost its inputs."
+    Assert-Probe ($descriptor.scenario-ceq'SIF-01-published-4.2.0-to-4.2.1') 'Default SIF transition identity changed.'
+    $sif422=$sifArguments.Clone();$sif422.SourceVersion='4.2.2';$sif422.FromVersion="4.2.${code}01";$sif422.ToVersion="4.2.${code}02"
+    $descriptor422=Get-MIR421SpaceFakeUpgradeDescriptor @sif422
+    Assert-Probe ($descriptor422.scenario-ceq'SIF-01-published-4.2.1-to-4.2.2'-and
+      ($descriptor422.inputs.sha256-join'|')-ceq($descriptor.inputs.sha256-join'|')) '4.2.2 SIF changes dependency bytes or mislabels its predecessor.'
+    foreach($field in @('SourceVersion','FromVersion','ToVersion')){
+      $bad=$sif422.Clone();$bad[$field]=switch($field){'SourceVersion'{'4.2.1'};'FromVersion'{"4.2.${code}00"};'ToVersion'{"4.2.${code}01"}}
+      Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor @bad} 'sif-transition'
+    }
     $bad=$sifArguments.Clone();$bad.ToVersion="4.2.${code}02"
     Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor @bad} 'sif-transition'
     $bad=$sifArguments.Clone();$bad.FromVersion="4.1.${code}00"
