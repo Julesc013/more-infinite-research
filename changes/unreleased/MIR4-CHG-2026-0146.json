@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0146",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Compose Library prototype lookup and file export through narrow runtime host adapters.",
+  "details": [
+    "The shared viewer and MIR provider read current prototype collections through the selected host adapter. Profile and diagnostic export preserve content, append behavior and requesting-player destination.",
+    "F210/F200 use the existing prototypes/helpers APIs. F110/F100 compose the documented game API adapter, with no module-load game access, retained runtime objects or invented mod-data evidence. Historical Library capability stays disabled.",
+    "Actual controlled production-display callbacks pass with each prototype backend; predecessor code fails when the modern prototypes global is absent. Native GUI, historical statistics, events, locale, queue handoff and saved-state qualification remain open.",
+    "Refresh all five historical adapter projections through their existing transform writer and teach the runtime registration reader the reviewed guarded Library callback. These repair construction and tooling failures introduced by the prior capability change; they add no historical support or native qualification."
+  ],
+  "semantic_domains": [
+    "presentation",
+    "runtime",
+    "target-portability"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared Library/provider lookup and export use the modern host adapter; native UI and saved-state acceptance remain pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared Library/provider lookup and export use the modern host adapter; native UI and saved-state acceptance remain pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Inactive game API adapter enters the composed source; historical Library availability and native acceptance remain unqualified."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Inactive game API adapter enters the composed source; historical Library availability and native acceptance remain unqualified."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Inactive game API adapter enters the composed source; historical Library availability and native acceptance remain unqualified."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Inactive game API adapter enters the composed source; historical Library availability and native acceptance remain unqualified."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Inactive game API adapter enters the composed source; historical Library availability and native acceptance remain unqualified."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Inactive game API adapter enters the composed source; historical Library availability and native acceptance remain unqualified."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Inactive game API adapter enters the composed source; historical Library availability and native acceptance remain unqualified."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "A16/A21, UI-01-UI-04 and PLAT-UI-01: separate the Library capability from settings-profile tools; historical host portability remains open."
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}

@@ -1112,9 +1112,13 @@ function M.production_load_check(snapshot)
   end
   if type(snapshot) ~= "table" or snapshot.schema ~= 1 or snapshot.kind ~= "science-production-snapshot"
       or not scalar_name(snapshot.technology_id) or not scalar_name(snapshot.force_name)
-      or not scalar_name(snapshot.surface_name) or not positive_index(snapshot.force_index)
-      or not positive_index(snapshot.surface_index) or not nonnegative(snapshot.tick)
+      or not positive_index(snapshot.force_index) or not nonnegative(snapshot.tick)
       or snapshot.tick ~= math.floor(snapshot.tick) or type(snapshot.rows) ~= "table" then return nil end
+  if snapshot.scope == "surface" then
+    if not scalar_name(snapshot.surface_name) or not positive_index(snapshot.surface_index) then return nil end
+  elseif snapshot.scope == "force" then
+    if snapshot.surface_name ~= nil or snapshot.surface_index ~= nil then return nil end
+  else return nil end
   local count = 0
   for index in pairs(snapshot.rows) do
     count = count + 1
@@ -1131,7 +1135,7 @@ function M.production_load_check(snapshot)
     rows[index] = {name = row.name, produced = row.produced, consumed = row.consumed,
       balance = row.produced - row.consumed}
   end
-  return {technology_id = snapshot.technology_id, force_index = snapshot.force_index,
+  return {technology_id = snapshot.technology_id, scope = snapshot.scope, force_index = snapshot.force_index,
     force_name = snapshot.force_name, surface_index = snapshot.surface_index,
     surface_name = snapshot.surface_name, tick = snapshot.tick, rows = rows}
 end

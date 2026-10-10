@@ -5,12 +5,14 @@ param(
  [string]$EvidenceRoot='build/results/mir42-overnight'
 )
 $ErrorActionPreference='Stop'
+throw '[mir-native-obsolete-runner] The retained no-MIR scenario still creates a populated mod directory and pins an old engine. Convert it to the direct-library runner before native execution. No engine or staging was started.'
 $repo=(Resolve-Path $RepoRoot).Path
 $engine=(Resolve-Path $FactorioBin).Path
 $fixtureSource=Join-Path $repo 'fixtures/portable-research-surface-no-mir'
 $coreSource=Join-Path $repo 'source/prototypes/mir/runtime/research_browser_core.lua'
 $adapterSource=Join-Path $repo 'source/prototypes/mir/runtime/research_browser_factorio_catalogue.lua'
-foreach($path in @($fixtureSource,$coreSource,$adapterSource)) { if(-not(Test-Path -LiteralPath $path)){throw "Missing portable no-MIR input: $path"} }
+$hostSource=Join-Path $repo 'source/prototypes/mir/platform/factorio/browser_host.lua'
+foreach($path in @($fixtureSource,$coreSource,$adapterSource,$hostSource)) { if(-not(Test-Path -LiteralPath $path)){throw "Missing portable no-MIR input: $path"} }
 $fixtureInfo=Get-Content -Raw (Join-Path $fixtureSource 'info.json')|ConvertFrom-Json
 if(@($fixtureInfo.dependencies|Where-Object{[string]$_ -match 'more-infinite-research'}).Count){throw 'No-MIR fixture declares MIR.'}
 $coreRaw=Get-Content -Raw $coreSource
@@ -22,7 +24,7 @@ $fixture=Join-Path $run 'mods/portable-research-surface-no-mir_1.0.0'
 New-Item -ItemType Directory -Force (Split-Path $fixture -Parent) | Out-Null
 Copy-Item -LiteralPath $fixtureSource -Destination $fixture -Recurse
 $lua=[Text.StringBuilder]::new()
-foreach($module in @(@{name='portable_core';path=$coreSource},@{name='portable_factorio_catalogue';path=$adapterSource})) {
+foreach($module in @(@{name='portable_core';path=$coreSource},@{name='portable_factorio_catalogue';path=$adapterSource},@{name='portable_browser_host';path=$hostSource})) {
  [void]$lua.AppendLine("local $($module.name)=(function()")
  [void]$lua.AppendLine([IO.File]::ReadAllText($module.path))
  [void]$lua.AppendLine('end)()')

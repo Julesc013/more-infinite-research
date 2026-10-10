@@ -217,6 +217,16 @@ function Assert-MIR4RuntimeRegistrationPlan {
   return $true
 }
 
+function Get-MIR4RuntimeOnLoadSourceRegistration {
+  param([Parameter(Mandatory)][string]$HostText)
+  $registrations = @([regex]::Matches($HostText, 'script\s*\.\s*on_load\s*\('))
+  # Recognize the reviewed coordinator, including its Library capability guard.
+  # Additional statements, alternate guards and extra registrations stay denied.
+  $approved = @([regex]::Matches($HostText, 'script\s*\.\s*on_load\s*\(\s*function\s*\(\s*\)\s*passive_repair\s*\.\s*on_load\s*\(\s*\)\s*if\s+research_browser\s+then\s+research_browser\s*\.\s*on_load\s*\(\s*\)\s*end\s*end\s*\)'))
+  if ($registrations.Count -ne 1 -or $approved.Count -ne 1) { throw '[mir4-runtime-on-load-registration]' }
+  return [pscustomobject]@{registration_count=$registrations.Count;approved_registration_count=$approved.Count}
+}
+
 function New-MIR4RuntimeRegistrationPlan {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$RuntimeFeatures)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
@@ -253,11 +263,9 @@ function New-MIR4RuntimeRegistrationPlan {
       $hostDispatcherPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $hostPackage -RelativePath 'prototypes/mir/runtime/scripted_techs.lua'
       $hostStagePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $hostPackage -RelativePath 'prototypes/mir/stage/control.lua'
       $hostText = (Get-Content -Raw -LiteralPath $hostDispatcherPath) + "`n" + (Get-Content -Raw -LiteralPath $hostStagePath)
-      $hostRegistrations = @([regex]::Matches($hostText, 'script\s*\.\s*on_load\s*\('))
-      $approvedRegistrations = @([regex]::Matches($hostText, 'script\s*\.\s*on_load\s*\(\s*function\s*\(\s*\)\s*passive_repair\s*\.\s*on_load\s*\(\s*\)\s*research_browser\s*\.\s*on_load\s*\(\s*\)\s*end\s*\)'))
-      if ($hostRegistrations.Count -ne 1 -or $approvedRegistrations.Count -ne 1) { throw '[mir4-runtime-on-load-registration]' }
+      $registration = Get-MIR4RuntimeOnLoadSourceRegistration -HostText $hostText
       [ordered]@{
-        target=$hostTarget;approved_handler='anonymous-coordinator';approved_callbacks=@('passive_repair.on_load','research_browser.on_load');registration_count=$hostRegistrations.Count;approved_registration_count=$approvedRegistrations.Count
+        target=$hostTarget;approved_handler='anonymous-coordinator';approved_callbacks=@('passive_repair.on_load','research_browser.on_load');registration_count=$registration.registration_count;approved_registration_count=$registration.approved_registration_count
         source_identity=[ordered]@{
           dispatcher=[ordered]@{path='prototypes/mir/runtime/scripted_techs.lua';sha256=(Get-MIR4PlatformInputSha256 $hostDispatcherPath)}
           stage=[ordered]@{path='prototypes/mir/stage/control.lua';sha256=(Get-MIR4PlatformInputSha256 $hostStagePath)}

@@ -303,6 +303,7 @@ try {
       }
       $target=if($Line -ceq '2.1'){'f210'}else{'f200'}
       $capabilitySources=@{
+        'prototypes/mir/platform/factorio/browser_host.lua'='source/prototypes/mir/platform/factorio/browser_host.lua'
         'prototypes/mir/stage/data.lua'='source/prototypes/mir/stage/data.lua'
         'prototypes/mir/stage/control.lua'='source/prototypes/mir/stage/control.lua'
         'prototypes/mir/runtime/scripted_techs.lua'="source/adapters/$target/prototypes/mir/runtime/scripted_techs.lua"
@@ -312,6 +313,7 @@ try {
         $bytes=[IO.File]::ReadAllBytes((Join-Path $repo $capabilitySources[$name]))
         if($Variant -ceq 'changed-coordinator' -and $name.EndsWith('/scripted_techs.lua')){$bytes[0]=$bytes[0] -bxor 1}
         if($Variant -ceq 'changed-capability' -and $name.EndsWith('/target_profiles.lua')){$bytes[0]=$bytes[0] -bxor 1}
+        if($Variant -ceq 'changed-browser-host' -and $name.EndsWith('/browser_host.lua')){$bytes[0]=$bytes[0] -bxor 1}
         $entry=$zip.CreateEntry($root+'/'+$name);$stream=$entry.Open()
         try{$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}
       }
@@ -332,7 +334,7 @@ try {
     $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor 2 -SourcePatch 1
     $valid=New-ControlledBrowserArchive -Line $line -Identity $identity
     $checked=Test-BrowserCandidate -Candidate $valid -Line $line -Identity $identity -Repository $repo
-    foreach($variant in @('changed-coordinator','changed-capability')){
+    foreach($variant in @('changed-coordinator','changed-capability','changed-browser-host')){
       $mismatch=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant $variant
       Refuses-Probe {Test-BrowserCandidate -Candidate $mismatch -Line $line -Identity $identity -Repository $repo} 'differs from the controlled source'
     }

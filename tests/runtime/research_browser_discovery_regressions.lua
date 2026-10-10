@@ -167,7 +167,8 @@ return function(core, adapter, check, host_source)
       return 201
     end}
   local pump = actual_function("pump_translation_requests", {
-    translation_queue = queue, factorio_catalogue = adapter, prototypes = library, game = {tick = 10}})
+    translation_queue = queue, factorio_catalogue = adapter, prototypes = library,
+    browser_host = {prototype_collections = function() return library end}, game = {tick = 10}})
   queue.reset_catalogue(cache, {key}, "actual-host")
   pump(player, cache)
   check(calls == 1 and cache.outstanding == 1 and cache.pending_by_id[201].discovery_subjects == 3,

@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 53757,
-      "expected_sha256": "AA4438663C797F4DD2AD2B32016D0763F7152E8615D5BE6AE608E7AF012896D9",
+      "expected_bytes": 53969,
+      "expected_sha256": "7BA69976745572401D34887CF5D8E6539F6D7E664CA8C2ECFFDE142C28862EDD",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3859,6 +3859,22 @@
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
       ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/browser_host.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/adapters/runtime-capabilities/game-browser-host.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Select the Library prototype/export API adapter for this engine; historical Library remains disabled.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1399,
+      "expected_sha256": "B625A1FDB29FEB9EB05125FEF60533BE6E857499A9B966A901447FF4BE4FA087",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
     }
   ],
   "invariants": {
@@ -3867,5 +3883,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "DD1AE29D3F76AFFA1CB127E58A23DF50DA77F99B021266FB60B448C4669487D0"
+  "record_sha256": "3D2E9E98008403F0783F4186706DA524EDA3507593515CAFA0B831C0EF551678"
 }

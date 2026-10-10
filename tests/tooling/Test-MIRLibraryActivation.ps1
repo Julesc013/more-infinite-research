@@ -147,7 +147,7 @@ try{
     'MIRF200BobTinPersistedState','MIRF200BobTinProductionGain',
     'MIRF210CurrentBobAngelFinalRoutesObserver','MIRF210CurrentBobAngelTinRouteObserver',
     'MIRF210CurrentBobAngelGunmetalInvarQualification','MIRK2213ImersiteMigration','MIRPassiveRepair',
-    'MIRCandidateRetention',
+    'MIRCandidateRetention','MIRPortableResearchSurfaceNoMir',
     'scripts/Measure-MIRPerformanceRegression.ps1','scripts/Invoke-MIRPerformanceQualification.ps1'
   )
   $absentRoot=Join-Path $root 'must-not-create-retired-run'
