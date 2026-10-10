@@ -6,6 +6,7 @@ param(
  [string]$LibraryDirectory='',
  [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
+ [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1',
  [switch]$Graphics,
  [ValidateSet('low','very-low')][string]$GraphicsPreset='low',
  [ValidateSet('None','Defaults','RawOptIn','ImportedOptIn','RawOptInImportedOff')][string]$DlcIconCase='None',
@@ -38,7 +39,7 @@ $run=$resources.root
 $activation=$null
 $candidate=''
 $targetKey=if($Target -ceq '2.0'){'f200'}else{'f210'}
-$expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch 1
+$expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch ([int]$SourceVersion.Split('.')[2])
 function Get-MIRBrowserIconCase([string]$Case) {
  switch -CaseSensitive ($Case) {
   'None' { return $null }
@@ -86,15 +87,25 @@ try {
       $_.FullName -cmatch '[\\\x00]' -or
       @($_.FullName.TrimEnd('/').Split('/') | Where-Object {$_ -in @('','.','..')}).Count -gt 0
     }).Count -ne 0) {
-  throw '[mir-browser-candidate-identity] Candidate filename, root and metadata must encode source 4.2.1 for the selected target.'
+  throw '[mir-browser-candidate-identity] Candidate filename, root and metadata must encode the selected source version and target.'
  }
+ $bindings=@{}
  foreach($name in @('research_browser.lua','research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')) {
-  $entry=@($archive.Entries | Where-Object FullName -CEQ "$packageRoot/prototypes/mir/runtime/$name")
+  $bindings["prototypes/mir/runtime/$name"]="source/prototypes/mir/runtime/$name"
+ }
+ foreach($stage in @('data','control')){$bindings["prototypes/mir/stage/$stage.lua"]="source/prototypes/mir/stage/$stage.lua"}
+ $adapter=if($Target -ceq '2.1'){'f210'}else{'f200'}
+ $bindings['prototypes/mir/runtime/scripted_techs.lua']="source/adapters/$adapter/prototypes/mir/runtime/scripted_techs.lua"
+ $bindings['prototypes/mir/platform/factorio/target_profiles.lua']="source/adapters/$adapter/prototypes/mir/platform/factorio/target_profiles.lua"
+ $bindings['prototypes/mir/platform/factorio/browser_host.lua']='source/prototypes/mir/platform/factorio/browser_host.lua'
+ foreach($name in $bindings.Keys) {
+  $sourcePath=Join-Path $repo $bindings[$name]
+  $entry=@($archive.Entries | Where-Object FullName -CEQ "$packageRoot/$name")
   if($entry.Count -ne 1) { throw "Candidate must contain exactly one $name." }
-  if($entry[0].Length -ne (Get-Item -LiteralPath (Join-Path $repo "source/prototypes/mir/runtime/$name")).Length){throw "Candidate $name differs from the controlled source under test."}
+  if($entry[0].Length -ne (Get-Item -LiteralPath $sourcePath).Length){throw "Candidate $name differs from the controlled source under test."}
   $stream=$entry[0].Open()
   try { $moduleHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)) } finally { $stream.Dispose() }
-  if($moduleHash -cne (Get-FileHash (Join-Path $repo "source/prototypes/mir/runtime/$name")).Hash) { throw "Candidate $name differs from the controlled source under test." }
+  if($moduleHash -cne (Get-FileHash -LiteralPath $sourcePath).Hash) { throw "Candidate $name differs from the controlled source under test." }
  }
  return [pscustomobject]@{info=$info;sha256=(Get-FileHash -LiteralPath $candidate).Hash}
 } finally { $archive.Dispose() }
@@ -123,6 +134,9 @@ New-Item -ItemType Directory -Force $fixture | Out-Null
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/browser_fixture_data.lua') -Destination (Join-Path $fixture 'data.lua')
 Initialize-MIRBrowserIconFixture -Fixture $fixture -Repository $repo -Case $DlcIconCase
 $lua=[Text.StringBuilder]::new()
+[void]$lua.AppendLine('local browser_platform=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/platform/factorio/browser_host.lua')))
+[void]$lua.AppendLine('end)()')
 foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{name='browser_catalogue';path='research_browser_factorio_catalogue.lua'},@{name='browser_actions';path='research_browser_actions.lua'})) {
  [void]$lua.AppendLine("local $($module.name)=(function()")
  [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo "source/prototypes/mir/runtime/$($module.path)")))
@@ -142,6 +156,9 @@ local browser_omission_provider=(function()
   local settings=browser_omission_runtime_settings
   local require=function(name)
     if name=="prototypes.mir.core.fingerprint" then return browser_omission_fingerprint
+    elseif name=="prototypes.mir.platform.factorio.browser_host" then return {
+      prototype_collections=function() return browser_omission_prototypes end
+    }
     elseif name=="prototypes.mir.runtime.maximum_level_control" then return browser_omission_controller
     elseif name=="prototypes.mir.settings.catalog" then return {
       spec=function(setting_name) return browser_omission_registered_settings[setting_name] end,
@@ -172,7 +189,7 @@ $browserTestText=[IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research
 [void]$lua.AppendLine('local check_browser_hidden_regressions=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_hidden_regressions.lua')))
 [void]$lua.AppendLine('end)()')
-[void]$lua.AppendLine('check_browser_hidden_regressions(browser_catalogue,browser_actions,function(ok,message) assert(ok,message) end)')
+[void]$lua.AppendLine('check_browser_hidden_regressions(browser_catalogue,browser_actions,function(ok,message) assert(ok,message) end,browser_platform)')
 [void]$lua.AppendLine('local check_browser_native_discovery=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_native_discovery.lua')))
 [void]$lua.AppendLine('end)()')
@@ -189,6 +206,18 @@ if($hostTestSource.Contains(']====]')) { throw 'Host fixture source collides wit
 [void]$lua.AppendLine('local browser_host_test_source=[====[')
 [void]$lua.AppendLine($hostTestSource)
 [void]$lua.AppendLine(']====]')
+[void]$lua.AppendLine('local browser_capability_sources={coordinators={},host_adapters={}}')
+foreach($entry in @(
+ @{key='data_stage';path='source/prototypes/mir/stage/data.lua'},
+ @{key='control_stage';path='source/prototypes/mir/stage/control.lua'},
+ @{key='coordinators.f210';path='source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua'},
+ @{key='coordinators.f200';path='source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua'},
+ @{key='host_adapters.modern';path='source/prototypes/mir/platform/factorio/browser_host.lua'},
+ @{key='host_adapters.game';path='source/adapters/runtime-capabilities/game-browser-host.lua'})) {
+ $text=[IO.File]::ReadAllText((Join-Path $repo $entry.path)).Replace("`r`n","`n")
+ if($text.Contains(']====]')){throw 'Library capability source collides with its Lua delimiter.'}
+ [void]$lua.AppendLine('browser_capability_sources.'+$entry.key+'=[====['+$text+']====]')
+}
 [void]$lua.AppendLine('local check_browser_handler_regressions=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_handler_regressions.lua')))
 [void]$lua.AppendLine('end)()')
@@ -211,13 +240,13 @@ $capMutant=$coreTestSource.Replace($capAnchor,$capAnchor.Replace('finite_nonnega
 [void]$lua.AppendLine('local browser_core_positive_default_mutant=(function()')
 [void]$lua.AppendLine($capMutant)
 [void]$lua.AppendLine('end)()')
-$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
+$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source,browser_capability_sources); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check,browser_capability_sources.host_adapters.modern); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check,browser_capability_sources.host_adapters.game,true); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
 [void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player',$coreChecks))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 if($PrepareInputsOnly) {
  $preparedRoot=Join-Path $run 'prepared-fixtures';[IO.Directory]::CreateDirectory($preparedRoot)|Out-Null
  $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-browser-test' -Version '1.0.0' -ModsDir $preparedRoot
- Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_commit=$sourceCommit;dlc_icon_case=$DlcIconCase;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
+ Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_version=$SourceVersion;distribution_version=$expectedIdentity.distribution_version;source_commit=$sourceCommit;dlc_icon_case=$DlcIconCase;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
  Write-Output "Browser fixture prepared without native execution or library writes: $run"
  return
 }
@@ -316,6 +345,7 @@ if((Get-FileHash -LiteralPath $engine).Hash -cne $engineSha256 -or
    (& git -C $repo rev-parse HEAD).Trim() -cne $sourceCommit){throw '[mir-browser-input-drift] Engine or source changed during the native run.'}
 $result | Add-Member source_commit $sourceCommit
 $result | Add-Member source_tree $sourceTree
+$result | Add-Member source_version $SourceVersion
 $result | Add-Member distribution_version $expectedIdentity.distribution_version
 $result | Add-Member resource_policy @{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'}
 $result | Add-Member resource_runs $resources.runs.ToArray()
@@ -334,7 +364,7 @@ Write-Output "Evidence: $run"
   try{$cleanup=Complete-MIRLibraryActivation -Activation $activation;$activation=$null}
   catch{$cleanup=@{status='recovery-required';library=$activation.library;error=$_.Exception.Message}}
  }
- try { Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{status='failed';target=$Target;candidate=$candidate;error=$failure.Exception.Message;library_activation=$cleanup;resource_runs=$resources.runs.ToArray()}) }
+ try { Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{status='failed';target=$Target;source_version=$SourceVersion;distribution_version=$expectedIdentity.distribution_version;candidate=$candidate;error=$failure.Exception.Message;library_activation=$cleanup;resource_runs=$resources.runs.ToArray()}) }
  catch { Write-Warning "Browser failure receipt exceeded its remaining budget; retained ledgers are in $run." }
  throw $failure
 }

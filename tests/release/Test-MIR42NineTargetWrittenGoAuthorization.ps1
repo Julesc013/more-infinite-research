@@ -1,6 +1,7 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 [CmdletBinding()]
-param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
+param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
+  [ValidateSet('4.2.1','4.2.2')][string]$MaintenanceSourceVersion='4.2.1')
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -108,41 +109,69 @@ try {
   Write-MIR4BootstrapRecord -Record $authorization -Path $invalidAuthorizationPath | Out-Null
   Assert-MIR42WrittenGoReject -Action { Read-MIR42NineTargetWrittenReleaseAuthorization -Path $invalidAuthorizationPath } -Pattern '\[mir42-release-go-schema\]' -Code 'synthetic-technical-acceptance-rejected'
 
+  $maintenancePatch=([version]$MaintenanceSourceVersion).Build.ToString('D2')
+  $waiverProperty=if($MaintenanceSourceVersion-ceq'4.2.2'){'inherit_predecessor_testing_waivers'}else{'inherit_420_testing_waivers'}
+  $maintenanceConstraints=[ordered]@{preserve_published_420=$true;fabricate_signatures_or_review=$false;mutable_github_release_required=$true;mod_portal_maintainer_managed=$true}
+  $maintenanceConstraints[$waiverProperty]=$false
+  if($MaintenanceSourceVersion-ceq'4.2.2'){$maintenanceConstraints.preserve_published_421=$true}
   $maintenanceAuthorization=[pscustomobject][ordered]@{
-    schema=1;kind='MIR421MaintainerWrittenReleaseAuthorizationV1';status='written-maintainer-authorization-awaiting-technical-acceptance'
+    schema=1;kind=('MIR'+$MaintenanceSourceVersion.Replace('.','')+'MaintainerWrittenReleaseAuthorizationV1');status='written-maintainer-authorization-awaiting-technical-acceptance'
     recorded_from_user_turn_date='2026-10-06';timezone='Australia/Sydney'
-    release=[ordered]@{source_version='4.2.1';tag='v4.2.1';selected_targets=@($script:MIR42ReleaseAssetTargets)}
+    release=[ordered]@{source_version=$MaintenanceSourceVersion;tag=('v'+$MaintenanceSourceVersion);selected_targets=@($script:MIR42ReleaseAssetTargets)}
     written_authorizations=$authorization.written_authorizations
-    constraints=[ordered]@{preserve_published_420=$true;inherit_420_testing_waivers=$false;fabricate_signatures_or_review=$false;mutable_github_release_required=$true;mod_portal_maintainer_managed=$true}
+    constraints=$maintenanceConstraints
     technical_acceptance='not-established-by-this-authorization';final_byte_binding='required-before-publication'
     personal_playthrough='not-a-prerequisite-for-authorized-execution';secret_values_present=$false;record_sha256=''
   }
   $maintenanceAuthorizationPath=Join-Path $root 'maintenance-authorization.json'
   Write-MIR4BootstrapRecord -Record $maintenanceAuthorization -Path $maintenanceAuthorizationPath | Out-Null
   $maintenanceIdentity=Read-MIR42NineTargetWrittenReleaseAuthorization -Path $maintenanceAuthorizationPath
-  Assert-MIR42WrittenGoTest -Condition ([string]$maintenanceIdentity.record.technical_acceptance -ceq 'not-established-by-this-authorization' -and -not $maintenanceIdentity.record.constraints.inherit_420_testing_waivers) -Code 'maintenance-conditional-authority-establishes-no-pass-or-waiver'
-  $inventoryRecord.release.source_version='4.2.1';$inventoryRecord.release.tag='v4.2.1'
-  $custody=New-MIR421ReleaseAssetCustodyFixture -RepoRoot $repo
+  Assert-MIR42WrittenGoTest -Condition ([string]$maintenanceIdentity.record.technical_acceptance -ceq 'not-established-by-this-authorization' -and -not $maintenanceIdentity.record.constraints.$waiverProperty) -Code 'maintenance-conditional-authority-establishes-no-pass-or-waiver'
+  $inventoryRecord.release.source_version=$MaintenanceSourceVersion;$inventoryRecord.release.tag='v'+$MaintenanceSourceVersion
+  $custody=New-MIR421ReleaseAssetCustodyFixture -RepoRoot $repo -CandidateSourceVersion $MaintenanceSourceVersion
   $inventoryRecord | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $custody
-  foreach ($row in $inventoryRecord.package_assets) { $row.distribution_version=$row.distribution_version.Substring(0,$row.distribution_version.Length - 2) + '01' }
+  foreach ($row in $inventoryRecord.package_assets) { $row.distribution_version=$row.distribution_version.Substring(0,$row.distribution_version.Length - 2) + $maintenancePatch }
   $maintenanceMain=$mainReadback | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
-  foreach ($row in $maintenanceMain.target_assets) { $row.distribution_version=$row.distribution_version.Substring(0,$row.distribution_version.Length - 2) + '01' }
+  foreach ($row in $maintenanceMain.target_assets) { $row.distribution_version=$row.distribution_version.Substring(0,$row.distribution_version.Length - 2) + $maintenancePatch }
   $maintenanceMain | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $custody
   $maintenanceMainPath=Join-Path $root 'maintenance-main-readback.json'
   Write-MIR4BootstrapRecord -Record $maintenanceMain -Path $maintenanceMainPath | Out-Null
   $maintenanceOutput=Join-Path $primary 'build/release-authorization/maintenance-written-go.json'
   $maintenanceBound=New-MIR42NineTargetPublicationAuthorization -RepoRoot $repo -PrimaryRepoRoot $primary -MaintainerAuthorizationPath $maintenanceAuthorizationPath -MainReadbackPath $maintenanceMainPath -FrozenInventoryPath $frozenInventoryPath -OutputPath $maintenanceOutput
-  Assert-MIR42WrittenGoTest -Condition ([string]$maintenanceBound.record.kind -ceq 'MIR42NineTargetMaintenancePublicationAuthorizationV1' -and [string]$maintenanceBound.record.release.source_version -ceq '4.2.1' -and [string]$maintenanceBound.record.release.tag -ceq 'v4.2.1' -and [bool]$maintenanceBound.record.github_publication_authorized -and -not [bool]$maintenanceBound.record.mod_portal_upload_authorized -and -not [bool]$maintenanceBound.record.written_maintainer_authorization.additional_playtest_prompt_waived -and -not [bool]$maintenanceBound.record.written_maintainer_authorization.gameplay_receipt_claimed) -Code 'maintenance-bound-authority-preserves-technical-acceptance-condition'
+  Assert-MIR42WrittenGoTest -Condition ([string]$maintenanceBound.record.kind -ceq 'MIR42NineTargetMaintenancePublicationAuthorizationV1' -and [string]$maintenanceBound.record.release.source_version -ceq $MaintenanceSourceVersion -and [string]$maintenanceBound.record.release.tag -ceq ('v'+$MaintenanceSourceVersion) -and [bool]$maintenanceBound.record.github_publication_authorized -and -not [bool]$maintenanceBound.record.mod_portal_upload_authorized -and -not [bool]$maintenanceBound.record.written_maintainer_authorization.additional_playtest_prompt_waived -and -not [bool]$maintenanceBound.record.written_maintainer_authorization.gameplay_receipt_claimed) -Code 'maintenance-bound-authority-preserves-technical-acceptance-condition'
   Assert-MIR42WrittenGoTest -Condition ((ConvertTo-MIR4BootstrapCanonicalJson -Value $maintenanceBound.record.published_maintenance_predecessor) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $custody)) -Code 'maintenance-publication-custody-preserved'
   $forbiddenOutput=Join-Path $primary 'build/release-authorization/old-go-must-not-authorize-maintenance.json'
   Assert-MIR42WrittenGoReject -Action { New-MIR42NineTargetPublicationAuthorization -RepoRoot $repo -PrimaryRepoRoot $primary -MaintainerAuthorizationPath $authorizationPath -MainReadbackPath $maintenanceMainPath -FrozenInventoryPath $frozenInventoryPath -OutputPath $forbiddenOutput } -Pattern '^\[mir42-release-go-authorization-version-binding\]$' -Code 'old-go-cannot-authorize-maintenance'
   Assert-MIR42WrittenGoTest -Condition (-not (Test-Path -LiteralPath $forbiddenOutput)) -Code 'old-go-no-output'
+  if($MaintenanceSourceVersion-ceq'4.2.2'){
+    $prior=$maintenanceAuthorization | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+    $prior.kind='MIR421MaintainerWrittenReleaseAuthorizationV1'
+    $prior.release.source_version='4.2.1';$prior.release.tag='v4.2.1'
+    $prior.constraints.PSObject.Properties.Remove('preserve_published_421')
+    $prior.constraints.PSObject.Properties.Remove('inherit_predecessor_testing_waivers')
+    $prior.constraints | Add-Member -NotePropertyName inherit_420_testing_waivers -NotePropertyValue $false
+    $priorPath=Join-Path $root 'prior-maintenance-authorization.json'
+    Write-MIR4BootstrapRecord -Record $prior -Path $priorPath | Out-Null
+    $priorIdentity=Read-MIR42NineTargetWrittenReleaseAuthorization -Path $priorPath
+    Assert-MIR42WrittenGoTest ($priorIdentity.record.release.source_version-ceq'4.2.1') 'prior-maintenance-authority-remains-readable'
+    Assert-MIR42WrittenGoReject -Action { New-MIR42NineTargetPublicationAuthorization -RepoRoot $repo -PrimaryRepoRoot $primary -MaintainerAuthorizationPath $priorPath -MainReadbackPath $maintenanceMainPath -FrozenInventoryPath $frozenInventoryPath -OutputPath $forbiddenOutput } -Pattern '^\[mir42-release-go-authorization-version-binding\]$' -Code '421-authority-cannot-authorize-422'
+    Assert-MIR42WrittenGoTest (-not(Test-Path -LiteralPath $forbiddenOutput)) '421-authority-no-422-output'
+    $prior.release.source_version='4.2.2';$prior.release.tag='v4.2.2'
+    Write-MIR4BootstrapRecord -Record $prior -Path $priorPath | Out-Null
+    Assert-MIR42WrittenGoReject -Action { Read-MIR42NineTargetWrittenReleaseAuthorization -Path $priorPath } -Pattern '^\[mir42-release-go-schema\]$' -Code '421-authority-cannot-be-relabelled-422'
+    $priorMain=$maintenanceMain | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+    $priorMain.published_maintenance_predecessor=New-MIR421ReleaseAssetCustodyFixture -RepoRoot $repo
+    $priorMainPath=Join-Path $root 'prior-predecessor-main.json'
+    Write-MIR4BootstrapRecord -Record $priorMain -Path $priorMainPath | Out-Null
+    Assert-MIR42WrittenGoReject -Action { New-MIR42NineTargetPublicationAuthorization -RepoRoot $repo -PrimaryRepoRoot $primary -MaintainerAuthorizationPath $maintenanceAuthorizationPath -MainReadbackPath $priorMainPath -FrozenInventoryPath $frozenInventoryPath -OutputPath $forbiddenOutput } -Pattern '^\[mir42-release-assets-maintenance-predecessor\]$' -Code 'wrong-published-predecessor-cannot-authorize-422'
+    Assert-MIR42WrittenGoTest (-not(Test-Path -LiteralPath $forbiddenOutput)) 'wrong-predecessor-no-422-output'
+  }
   foreach ($case in @('inherited-waiver','synthetic-acceptance','stable-tag','old-decisions')) {
     $invalid=$maintenanceAuthorization | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
     switch ($case) {
-      'inherited-waiver' { $invalid.constraints.inherit_420_testing_waivers=$true }
+      'inherited-waiver' { $invalid.constraints.$waiverProperty=$true }
       'synthetic-acceptance' { $invalid.technical_acceptance='accepted' }
-      'stable-tag' { $invalid.release.tag='v4.2.1-stable' }
+      'stable-tag' { $invalid.release.tag='v'+$MaintenanceSourceVersion+'-stable' }
       'old-decisions' { $invalid | Add-Member -NotePropertyName maintainer_decisions -NotePropertyValue $authorization.maintainer_decisions }
     }
     $invalidPath=Join-Path $root ($case + '.json')
@@ -167,4 +196,8 @@ $manualWaiverFailure = $null
 try { & $manualWaiverTest -RepoRoot $repo -SelfTest } catch { $manualWaiverFailure = $_ }
 Assert-MIR42WrittenGoTest -Condition ($null -eq $manualWaiverFailure) -Code 'manual-written-waiver-negative-contract'
 
-Write-Output "MIR42-NINE-TARGET-WRITTEN-GO-AUTHORIZATION-PASSED assertions=$script:mir42WrittenGoControlAssertions structural-only engines=0 signing=0 publication=0"
+Write-Output "MIR42-NINE-TARGET-WRITTEN-GO-AUTHORIZATION-PASSED maintenance=$MaintenanceSourceVersion assertions=$script:mir42WrittenGoControlAssertions structural-only engines=0 signing=0 publication=0"
+if($MaintenanceSourceVersion-ceq'4.2.1'){
+  & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -RepoRoot $repo -MaintenanceSourceVersion '4.2.2'
+  if($LASTEXITCODE-ne0){throw '[mir422-written-go-controls-failed]'}
+}

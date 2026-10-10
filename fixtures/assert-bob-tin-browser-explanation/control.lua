@@ -6,6 +6,7 @@ local wrong_schema_name = "mir-browser-wrong-schema-row-regression"
 local extra_field_name = "mir-browser-extra-field-row-regression"
 local core = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_core")
 local catalogue_adapter = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_factorio_catalogue")
+local browser_host = require("__more-infinite-research__/prototypes/mir/platform/factorio/browser_host")
 local provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
 
 local function fail(message) error("[mir-bob-tin-browser-explanation] " .. message) end
@@ -33,7 +34,7 @@ local function capture_facts(element, out)
 end
 
 local function detail_for(force)
-  local catalogue = catalogue_adapter.snapshot(force)
+  local catalogue = catalogue_adapter.snapshot(force, browser_host)
   check(catalogue and catalogue.schema == 1, "Factorio catalogue adapter did not return a copied DTO")
   local enrichment = provider.snapshot(force)
   check(enrichment and enrichment.schema == 2 and enrichment.kind == "portable-research-enrichment", "provider did not return schema-2 portable enrichment")
@@ -241,7 +242,7 @@ local function assert_duplicate_public_row_negative(force)
 end
 
 local function assert_non_recipe_regression(force)
-  local catalogue, enrichment = catalogue_adapter.snapshot(force), provider.snapshot(force)
+  local catalogue, enrichment = catalogue_adapter.snapshot(force, browser_host), provider.snapshot(force)
   local detail = core.detail(catalogue, non_recipe_name, enrichment)
   check(detail and detail.enrichment and detail.enrichment.family == "browser_non_recipe_regression"
     and detail.enrichment.action == "emit", "non-recipe family/action enrichment regressed")

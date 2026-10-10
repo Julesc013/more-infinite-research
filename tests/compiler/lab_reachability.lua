@@ -66,6 +66,56 @@ run(raw, function(owner)
   check('LR06', telemetry and telemetry.counters.item_prototype_index_builds == 1,
     'Normal lab queries reuse the existing item prototype index')
 end)
+-- Nauvis inherits pressure/gravity from SurfacePropertyPrototype defaults.
+-- Missing overrides are not missing physical properties. Keep the default
+-- bound to a real buildable surface and respect explicit overrides.
+for _, case in ipairs({
+  {id='inherited', default=1000, expected=true},
+  {id='explicit', default=10, override=1000, expected=true},
+  {id='zero-override', default=1000, override=0, expected=false},
+  {id='wrong-default', default=10, expected=false},
+  {id='undefined', expected=false},
+  {id='no-surface', default=1000, no_surface=true, expected=false},
+  {id='orbital-only', default=1000, no_surface=true, orbital=true, expected=false}
+}) do
+  raw = world()
+  raw.recipe.make_lab.surface_conditions={{property='pressure',min=1000,max=1000}}
+  raw['surface-property']={pressure={type='surface-property',name='pressure',default_value=case.default}}
+  raw.planet=not case.no_surface and {nauvis={type='planet',name='nauvis',surface_properties={pressure=case.override}}} or {}
+  raw['space-location']=case.orbital and {orbit={type='space-location',name='orbit',surface_properties={pressure=1000}}} or {}
+  run(raw, function()
+    local before=fingerprint.of(data.raw)
+    check('LR-SURFACE-'..case.id,
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Lab acquisition uses declared surface defaults without inventing a surface or overriding explicit values')
+    check('LR-SURFACE-'..case.id..'-immutable',fingerprint.of(data.raw)==before,
+      'Surface admission does not mutate prototypes')
+  end)
+end
+-- A spoilage result can also be a lab placement item. Exercise the real item
+-- index, recipe facts, lab service and researchability together, with no
+-- unconditional acquisition stub or Factorio process.
+do
+  local previous_flags = _G.feature_flags
+  for _, case in ipairs({
+    {id = 'enabled', flag = true, seed = true, expected = true},
+    {id = 'disabled', flag = false, seed = true, expected = false},
+    {id = 'unseeded', flag = true, seed = false, expected = false}
+  }) do
+    _G.feature_flags = {spoiling = case.flag}
+    raw = world()
+    raw.item['perishable-kit'] = {type = 'item', name = 'perishable-kit',
+      spoil_ticks = 60, spoil_result = 'lab-kit'}
+    raw.recipe.make_lab = case.seed and recipe('make_lab', 'perishable-kit') or nil
+    run(raw, function()
+      check('LR-SPOIL-' .. case.id,
+        (researchability.technology_researchability_reason('Probe') == nil) == case.expected,
+        'The real lab service requires an acquired spoilage input and the enabled engine capability')
+    end)
+  end
+  _G.feature_flags = previous_flags
+end
+
 -- Historical engines use the player prototype for handcrafting. The selected
 -- adapter owns that capability; an unrelated prototype table cannot grant it.
 do
@@ -908,6 +958,10 @@ for _, case in ipairs({
   {id='same-name-item',item=true,expected=true},
   {id='acquired-input-machine',machine=true,expected=true},
   {id='acquired-output-machine',machine=true,output=true,expected=true},
+  {id='wrong-input-fluid-filter',machine=true,filter='acid',expected=false},
+  {id='matching-input-fluid-filter',machine=true,filter='water',expected=true},
+  {id='wrong-output-fluid-filter',machine=true,output=true,filter='acid',expected=false},
+  {id='matching-output-fluid-filter',machine=true,output=true,filter='water',expected=true},
   {id='missing-machine-kit',machine=true,missing_kit=true,expected=false},
   {id='machine-without-fluid-ports',machine=true,no_ports=true,expected=false},
   {id='machine-output-port-only',machine=true,wrong_direction=true,expected=false},
@@ -917,8 +971,18 @@ for _, case in ipairs({
   {id='bidirectional-output',machine=true,output=true,ports={'input-output'},expected=true},
   {id='two-fluid-inputs-one-port',machine=true,two_fluids=true,expected=false},
   {id='two-fluid-inputs-two-ports',machine=true,two_fluids=true,ports={'input','output','input'},expected=true},
+  {id='two-fluids-shared-unfiltered-port',machine=true,two_fluids=true,ports={'input','input'},filters={'oil'},expected=false},
+  {id='two-fluids-dedicated-then-free',machine=true,two_fluids=true,ports={'input','input'},filters={'water'},expected=true},
+  {id='two-fluids-free-then-dedicated',machine=true,two_fluids=true,ports={'input','input'},filters={[2]='water'},expected=true},
+  {id='two-fluids-duplicate-filter',machine=true,two_fluids=true,ports={'input','input'},filters={'water','water'},expected=false},
+  {id='two-fluids-distinct-filters',machine=true,two_fluids=true,ports={'input','input'},filters={'water','acid'},expected=true},
   {id='two-fluid-outputs-one-port',machine=true,output=true,two_fluids=true,expected=false},
   {id='two-fluid-outputs-two-ports',machine=true,output=true,two_fluids=true,ports={'output','input','output'},expected=true},
+  {id='two-output-fluids-shared-free-port',machine=true,output=true,two_fluids=true,ports={'output','output'},filters={'oil'},expected=false},
+  {id='two-output-fluids-dedicated-then-free',machine=true,output=true,two_fluids=true,ports={'output','output'},filters={'water'},expected=true},
+  {id='two-output-fluids-distinct-filters',machine=true,output=true,two_fluids=true,ports={'output','output'},filters={'acid','water'},expected=true},
+  {id='wrong-input-filter-item-alternative',machine=true,filter='acid',alternative=true,expected=true},
+  {id='duplicate-fluid-products-filtered-port',machine=true,output=true,duplicate=true,filter='water',expected=true},
   {id='dry-machine-item-alternative',machine=true,no_ports=true,alternative=true,expected=true},
   {id='duplicate-fluid-products-one-port',machine=true,output=true,duplicate=true,expected=true},
   {id='alternative-item-route',alternative=true,expected=true}
@@ -939,11 +1003,17 @@ for _, case in ipairs({
     raw.recipe.make_water.results[1].type = 'fluid'
   end
   if case.machine then add_fluid_builder(raw) end
+  if case.filter then
+    raw['assembling-machine'].builder.fluid_boxes[case.output and 2 or 1].filter=case.filter
+  end
   if case.ports then
     raw['assembling-machine'].builder.fluid_boxes = {}
     for index, kind in ipairs(case.ports) do
       raw['assembling-machine'].builder.fluid_boxes[index] = {production_type=kind}
     end
+  end
+  for index, filter in pairs(case.filters or {}) do
+    raw['assembling-machine'].builder.fluid_boxes[index].filter=filter
   end
   if case.no_ports then raw['assembling-machine'].builder.fluid_boxes = nil end
   if case.wrong_direction then raw['assembling-machine'].builder.fluid_boxes = {{production_type='output'}} end
@@ -987,6 +1057,29 @@ run(raw, function()
   check('LRF/frontier/gate',#gates==1 and gates[1]=='BuilderUnlock',
     'The fluid-producing science route retains its actual machine unlock')
 end)
+-- A filtered early machine cannot erase the later compatible machine's
+-- research gate, or bootstrap its own unlock from the pack being assessed.
+for _, self_locked in ipairs({false, true}) do
+  raw = fluid_world()
+  add_fluid_builder(raw)
+  raw.recipe.make_B.ingredients = {{type='fluid',name='water',amount=1}}
+  raw['assembling-machine'].builder.fluid_boxes[1].filter = 'oil'
+  raw['assembling-machine'].late_builder = {name='late_builder',crafting_categories={'crafting'},
+    fluid_boxes={{production_type='input',filter='water'}}}
+  raw.item['late-kit'] = {type='item',name='late-kit',place_result='late_builder'}
+  raw.recipe.make_late_builder = recipe('make_late_builder','late-kit',false)
+  raw.technology.LateBuilder = research({self_locked and 'B' or 'A'})
+  raw.technology.LateBuilder.effects = {{type='unlock-recipe',recipe='make_late_builder'}}
+  run(raw, function()
+    check('LRF/filter-frontier/'..tostring(self_locked),
+      production.pack_production_status('B',{})==(self_locked and 'unreachable' or 'research'),
+      'Only the compatible machine can contribute an acquisition witness')
+    local gates=production.prereq_techs_for_science_pack('B')
+    check('LRF/filter-frontier/gates/'..tostring(self_locked),
+      self_locked and #gates==0 or not self_locked and #gates==1 and gates[1]=='LateBuilder',
+      'The science frontier preserves the compatible machine gate and rejects self-locking')
+  end)
+end
 -- Temperature is part of fluid acquisition, including the pack's actual
 -- machine/source/unlock chain. All worlds below are complete controlled
 -- inputs; these checks do not claim native heat, throughput or logistics proof.

@@ -112,13 +112,19 @@
       "tests": ["static.immutable-input-staging"]
     },
     {
+      "id": "upgrade-manifest-inputs",
+      "patterns": ["^tests/tooling/Test-MIRUpgradeManifest[.]ps1$", "^tests/runtime/Test-MIRUpgrade[.]ps1$", "^tests/support/MIR421(?:K2|SpaceFake)Upgrade[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210[.]json$"],
+      "tests": ["static.upgrade-manifest-inputs"]
+    },
+    {
       "id": "mir42-candidate-construction",
       "patterns": [
+        "^fixtures/release-inputs/mir42[12]-published-42[01]-manifest[.]json$",
         "^tests/release/Test-MIR42FourTargetCandidateBuild[.]ps1$",
         "^tools/commands/release/New-MIR42(?:FourTarget|HistoricalPlaytest)Candidate[.]ps1$",
         "^tools/mir/application/package/TargetMaterializer[.]ps1$",
         "^tools/mir/application/release/readiness/MIR42(?:CandidateBuild|FourTargetPreflight)[.]ps1$",
-        "^spec/schemas/mir42-four-target-deterministic-candidate-manifest-v[12][.]schema[.]json$",
+        "^spec/schemas/mir42-four-target-deterministic-candidate-manifest-v[123][.]schema[.]json$",
         "^targets/historical/",
         "^source/package-source[.]json$",
         "^targets/package-authority[.]json$"
@@ -137,7 +143,7 @@
     },
     {
       "id": "mir42-nine-target-evidence",
-      "patterns": ["^tools/mir/application/release/readiness/MIR42(?:EvidenceReconciliation|IndependentEvidenceRehash|TechnicalSeal|ProtectedMainPromotion|ProtectedMainChecks|ReleaseAssets)[.]ps1$", "^tools/commands/release/Invoke-MIR42NineTarget(?:EvidenceReconciliation|IndependentEvidenceRehash|SealPromotion|ReleaseAssets)[.]ps1$", "^tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme[.]ps1$", "^tests/release/Test-MIR42NineTarget(?:EvidenceGenerators|EntryPointScope|TechnicalSeal|ReleaseAuthority|Promotion|ReleaseAssets|WrittenGoAuthorization)[.]ps1$", "^tests/release/Test-MIR42ProtectedMainChecks[.]ps1$", "^[.]mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1[.]json$", "^spec/schemas/mir42-maintainer-written-release-authorization-v1[.]schema[.]json$"],
+      "patterns": ["^tools/mir/application/release/readiness/MIR42(?:EvidenceReconciliation|IndependentEvidenceRehash|TechnicalSeal|ProtectedMainPromotion|ProtectedMainChecks|ReleaseAssets)[.]ps1$", "^tools/commands/release/Invoke-MIR42NineTarget(?:EvidenceReconciliation|IndependentEvidenceRehash|SealPromotion|ReleaseAssets)[.]ps1$", "^tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme[.]ps1$", "^tests/release/Test-MIR42NineTarget(?:EvidenceGenerators|EntryPointScope|TechnicalSeal|ReleaseAuthority|Promotion|ReleaseAssets|WrittenGoAuthorization)[.]ps1$", "^tests/release/Test-MIR42ProtectedMainChecks[.]ps1$", "^[.]mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1[.]json$", "^spec/schemas/mir42[12]?-maintainer-written-release-authorization-v1[.]schema[.]json$", "^tests/support/MIR421ReleaseAssetControls[.]ps1$", "^fixtures/release-inputs/mir42[12]-published-42[01]-manifest[.]json$"],
       "tests": ["static.mir42-nine-target-evidence-generators", "static.mir42-nine-target-entrypoint-scope", "static.mir42-nine-target-seal-readers", "static.mir42-nine-target-release-authority", "static.mir42-nine-target-promotion", "static.mir42-nine-target-release-assets", "static.mir42-nine-target-written-go-authorization", "static.mir42-protected-main-checks"]
     },
     {
@@ -422,7 +428,7 @@
     },
     {
       "id": "direct-library-activation",
-      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tools/lib/workspace/RepoPaths[.]ps1$", "^tools/lib/validation/(?:FactorioProcess|ImmutableInputStaging)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/support/MIR421SpaceFakeUpgrade[.]ps1$", "^tests/runtime/Test-MIR(?:K2213ImersiteContinuation|Upgrade)[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210[.]json$"],
+      "patterns": ["^tools/lib/compatibility/(?:LibraryActivation|FactorioRunner)[.]ps1$", "^tools/lib/workspace/RepoPaths[.]ps1$", "^tools/lib/validation/(?:FactorioProcess|ImmutableInputStaging)[.]ps1$", "^tests/tooling/Test-MIRLibraryActivation[.]ps1$", "^tests/support/MIR421SpaceFakeUpgrade[.]ps1$", "^tests/runtime/Test-MIR(?:K2213ImersiteContinuation|Upgrade)[.]ps1$", "^fixtures/run-profiles/k2-213-imersite-f210(?:-422)?[.]json$", "^fixtures/assert-upgrade-(?:4-0-(?:210|200|110|100)00-to-4-1-(?:210|200|110|100)00|historical-terminal-to-mir42)/"],
       "tests": ["static.direct-library-activation"]
     },
     {
@@ -432,8 +438,13 @@
     },
     {
       "id": "native-probe-resources",
-      "patterns": ["^tools/lib/validation/(?:NativeProbeResources|BrowserContinuityInputs)[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/Test-MIR(?:ResearchBrowser|BrowserPersonalStateContinuity|42CapOwnershipMultiforce)[.]ps1$"],
+      "patterns": ["^tools/lib/validation/(?:NativeProbeResources|BrowserContinuityInputs)[.]ps1$", "^tests/tooling/Test-MIRNativeProbeResources[.]ps1$", "^tests/runtime/k2_imersite_version_controls[.]lua$", "^tests/runtime/Test-MIR(?:ResearchBrowser|BrowserPersonalStateContinuity|42CapOwnershipMultiforce)[.]ps1$"],
       "tests": ["static.immutable-input-staging", "static.direct-library-activation", "runtime.material-route-guard", "runtime.research-browser"]
+    },
+    {
+      "id": "modern-launch-return-harness",
+      "patterns": ["^tests/runtime/Test-MIRModernLaunchReturn(?:Static)?[.]ps1$", "^tests/runtime/modern_launch_return_controls[.]lua$", "^fixtures/assert-modern-launch-return/"],
+      "tests": ["static.modern-launch-return-harness"]
     },
     {
       "id": "artifact-storage-optimization",

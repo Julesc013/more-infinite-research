@@ -2,6 +2,58 @@
   "schema": 2,
   "tests": [
     {
+      "id": "static.mir422-secretas-native-harness",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRSecretasFiniteContinuation.ps1",
+        "tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+        "tests/runtime/secretas_finite_native_fixture_controls.lua",
+        "tests/compiler/run_emergency_catalogue_controls.py",
+        "fixtures/assert-secretas-finite-continuation-hotfix/**",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tests/support/MIR421SpaceFakeUpgrade.ps1"
+      ]
+    },
+    {
+      "id": "static.upgrade-manifest-inputs",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRUpgradeManifest.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/tooling/Test-MIRUpgradeManifest.ps1",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/support/MIR421K2Upgrade.ps1",
+        "tests/support/MIR421SpaceFakeUpgrade.ps1",
+        "tools/lib/validation/MIR4DistributionIdentity.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
+        "fixtures/run-profiles/k2-213-imersite-f210.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
+        "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
+        "targets/historical/**"
+      ]
+    },
+    {
+      "id": "static.modern-launch-return-harness",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRModernLaunchReturnStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRModernLaunchReturn.ps1",
+        "tests/runtime/Test-MIRModernLaunchReturnStatic.ps1",
+        "tests/runtime/modern_launch_return_controls.lua",
+        "fixtures/assert-modern-launch-return/**"
+      ]
+    },
+    {
       "id": "static.mir4-historical-runtime-inputs",
       "kind": "static",
       "layer": "F0",
@@ -72,6 +124,8 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
+        "fixtures/release-inputs/mir421-published-420-manifest.json",
+        "fixtures/release-inputs/mir422-published-421-manifest.json",
         "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
         "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
         "tools/mir/application/package/TargetMaterializer.ps1",
@@ -81,6 +135,7 @@
         "tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v1.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v2.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v3.schema.json",
         "source:source/package-source.json",
         "targets/package-authority.json",
         "targets/historical/**",
@@ -151,6 +206,10 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
+        "tests/support/MIR421ReleaseAssetControls.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "fixtures/release-inputs/mir421-published-420-manifest.json",
+        "fixtures/release-inputs/mir422-published-421-manifest.json",
         "scripts/Collect-MIRPlayerReport.cmd",
         "scripts/Collect-MIRPlayerReport.ps1",
         "tools/commands/release/New-MIR42SupportCollectorBundle.ps1",
@@ -190,6 +249,10 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
+        "tests/support/MIR421ReleaseAssetControls.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "fixtures/release-inputs/mir421-published-420-manifest.json",
+        "fixtures/release-inputs/mir422-published-421-manifest.json",
         "tests/release/Test-MIRManualReleaseReview.ps1",
         "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
         "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
@@ -199,7 +262,9 @@
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/validation/ReleaseAttestations.ps1",
         "spec/schemas/manual-release-attestation.schema.json",
-        "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json"
+        "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir421-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir422-maintainer-written-release-authorization-v1.schema.json"
       ]
     },
     {
@@ -452,7 +517,12 @@
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
         "tests/runtime/Test-MIRK2213ImersiteMigration.ps1",
         "tests/runtime/Test-MIRPassiveRepair.ps1",
-        "tests/tooling/Test-MIRLibraryActivation.ps1"
+        "tests/tooling/Test-MIRLibraryActivation.ps1",
+        "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/**",
+        "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/**",
+        "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/**",
+        "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/**",
+        "fixtures/assert-upgrade-historical-terminal-to-mir42/**"
       ]
     },
     {
@@ -481,6 +551,12 @@
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "fixtures/run-profiles/k2-213-imersite-f210.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/assert-k2-213-imersite-continuation/info.json",
+        "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
+        "fixtures/assert-k2-213-imersite-continuation/control.lua",
+        "tests/runtime/k2_imersite_version_controls.lua",
         "tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/runtime/Test-MIRF210CurrentBobAngelTinRouteObserver.ps1",
@@ -1181,6 +1257,8 @@
         "manual-review-attestation",
         "spec/schemas/manual-release-attestation.schema.json",
         "spec/schemas/mir42-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir421-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir422-maintainer-written-release-authorization-v1.schema.json",
         "tests/release/Test-MIRManualReleaseReview.ps1",
         "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
@@ -5174,6 +5252,8 @@
         "source:source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
         "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
         "source:source/prototypes/mir/index/recipe_unlocks.lua",
+        "source:source/prototypes/mir/index/item_prototype_facts.lua",
+        "source:source/prototypes/mir/platform/factorio/prototype_lookup.lua",
         "source:source/prototypes/mir/platform/factorio/data_raw.lua"
       ]
     },
@@ -5939,6 +6019,7 @@
         "source:source/prototypes/mir/families/material_progression.lua",
         "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/prototypes/mir/index/recipe_risk_facts.lua",
+        "source:source/prototypes/mir/index/item_prototype_facts.lua",
         "source:source/prototypes/mir/core/deepcopy.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",

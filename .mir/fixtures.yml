@@ -166,6 +166,21 @@ real_mod_gates:
     status: required
 
 fixtures:
+  modern-launch-return:
+    requires_features: []
+    path: fixtures/assert-modern-launch-return
+    harness: tests/runtime/Test-MIRModernLaunchReturn.ps1
+    input_profile: fixtures/assert-modern-launch-return/scenario.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - explicit-current-422-package-source-and-engine-bindings
+      - base-only-direct-library-selection-and-control-restoration
+      - unmodified-100-craft-construction-and-satellite-return-of-1000-space-science
+      - returned-science-consumed-by-lab-for-level-seven-continuation
+      - completed-production-save-and-independent-reload-preserve-earned-progress
+      - declared-factory-setup-without-an-early-game-playthrough-claim
+
   portable-research-surface-no-mir:
     requires_features: []
     path: fixtures/portable-research-surface-no-mir
@@ -584,6 +599,7 @@ fixtures:
     shipped: false
     external_mod_identity: bobplates
     qualification_status: unqualified
+    candidate_versions: ["4.2.21001", "4.2.21002"]
     exact_version_envelope:
       base: "2.1.21"
       boblibrary: "3.0.1"
@@ -608,6 +624,8 @@ fixtures:
     external_mod_identity: Krastorio2-spaced-out
     planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213-imersite-continuation
     input_profile: fixtures/run-profiles/k2-213-imersite-f210.json
+    maintenance_input_profile: fixtures/run-profiles/k2-213-imersite-f210-422.json
+    candidate_versions: ["4.2.21001", "4.2.21002"]
     exact_version_envelope:
       base: "2.1.21"
       Krastorio2: "2.1.3"
@@ -621,7 +639,7 @@ fixtures:
       - legacy-level-three-current-research-queue-and-42-percent-progress-preserved
       - actual-unmodified-crusher-output-after-reload-324-powder-and-sand-versus-300-from-equal-300-ore
       - one-fresh-create-and-single-bounded-reload
-      - supplied-current-421-candidate-and-materialization-bindings-verified-without-a-new-zip
+      - supplied-explicit-421-or-422-candidate-and-materialization-bindings-verified-without-a-new-zip
       - explicit-flat-library-selection-with-no-dependency-staging
       - portable-current-input-profile-without-historical-private-receipt
       - one-owned-row-budget-governs-engine-version-create-and-reload
@@ -644,6 +662,23 @@ fixtures:
       - explicit-zero-cap-shared-settings-override-preserved-through-upgrade
       - newly-available-level-four-powder-continuation-earns-eight-percent
       - level-five-queued-at-42-percent-through-two-distinct-native-reloads
+      - direct-master-library-with-no-dependency-staging-and-restored-controls
+      - no-natural-acquisition-production-throughput-or-broader-profile-claim
+
+  k2-213-imersite-maintenance-upgrade-422:
+    requires_features: []
+    path: fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002
+    harness: tests/runtime/Test-MIRUpgrade.ps1
+    input_profile: fixtures/run-profiles/k2-213-imersite-f210-422.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - published-ccc01-predecessor-custody-and-current-ccc02-candidate
+      - already-finite-imersite-domain-and-earned-levels-retained
+      - default-cap-three-withholds-continuation-and-preserves-six-percent-powder
+      - explicit-zero-cap-preserves-existing-level-five-and-eight-percent-powder
+      - independent-crystal-owner-retains-ten-percent
+      - selected-queue-and-completed-work-through-two-distinct-native-reloads
       - direct-master-library-with-no-dependency-staging-and-restored-controls
       - no-natural-acquisition-production-throughput-or-broader-profile-claim
 

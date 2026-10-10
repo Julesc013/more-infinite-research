@@ -1205,6 +1205,7 @@ modules:
     - prototypes/mir/platform/factorio/target_line.lua
     - prototypes/mir/platform/factorio/target_profiles.lua
     - prototypes/mir/platform/factorio/runtime_state.lua
+    - prototypes/mir/platform/factorio/browser_host.lua
     - prototypes/mir/platform/factorio/environment_identity.lua
     - prototypes/mir/platform/factorio/effect_target_inventory.lua
   settings:

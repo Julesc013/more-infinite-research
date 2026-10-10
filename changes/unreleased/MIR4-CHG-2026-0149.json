@@ -1,0 +1,103 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0149",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Honor inherited laboratory surface defaults and continue eligible finite upstream research ranges.",
+  "details": [
+    "Laboratory admission now reads a surface-property prototype's default when the selected surface has no explicit value, while an explicit surface value, including zero, remains authoritative. This prevents a missing inherited pressure value from withholding an otherwise acquired Biolab route.",
+    "Base continuation planning now finds the actual terminal technology in an eligible finite numeric range, preserves its prerequisite and science ingredients, and starts MIR continuation after that terminal level. True infinite owners, equivalent owners and configured caps remain exclusion conditions.",
+    "Controlled source checks cover laboratory reachability with 628 assertions on F210 and F200, finite continuation planning with 11 assertions on F210 and F200, and five reduced Secretas-shaped Biolab/researchability controls. The reduced model checks the reported admission shape; it is not broad Secretas or Frozeta compatibility acceptance.",
+    "Nine correctly numbered private packages were constructed twice per target with matching bytes. The full-state Space Age upgrade fixture now activates for maintenance versions, requires a complete-state proof marker on upgrade and both reloads, and has 19 controlled callback assertions rejecting lost technologies, levels, progress, recipe bonuses and queue entries. Native Factorio loading, published 4.2.1-to-4.2.2 upgrade/reload, and saved-state acceptance remain pending. This correction does not reconstruct research already lost in a save without surviving state.",
+    "The exact F210 Secretas 1.0.37/Frozeta 1.0.1 continuation fixture and direct-library consumer are prepared. Sixty Lua callback controls test reward/state refusal, and host marker controls reject incomplete native results. Fixture preparation consumed the current supplied package without Factorio or archive-library writes. Actual cargo reward and two reloads remain unexecuted."
+  ],
+  "semantic_domains": [
+    "science-integration",
+    "progression",
+    "compatibility"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared laboratory admission and finite continuation code are corrected; controlled source coverage exists and package, native and upgrade acceptance remain pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared laboratory admission and finite continuation code are corrected; controlled source coverage exists and package, native and upgrade acceptance remain pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "The shared finite-continuation source changes; exact package, engine and upgrade acceptance remain pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "The shared finite-continuation source changes; exact package, engine and upgrade acceptance remain pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "The shared finite-continuation source changes; exact package, engine and upgrade acceptance remain pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "The shared finite-continuation source changes; exact package, engine and upgrade acceptance remain pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "The shared finite-continuation source changes; exact package, engine and upgrade acceptance remain pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "The shared finite-continuation source changes; exact package, engine and upgrade acceptance remain pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "The shared finite-continuation source changes; exact package, engine and upgrade acceptance remain pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "GitHub issue #621: emergency catalogue-preservation and finite-continuation reports."
+    },
+    {
+      "kind": "finding",
+      "value": "A04 science/laboratory contract; exact reporter environment and upgrade closure remain open."
+    },
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-integration-and-delivery-plan.md"
+    }
+  ]
+}

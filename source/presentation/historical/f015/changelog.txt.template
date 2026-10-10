@@ -1,4 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.2.01502
+
+  Changes:
+
+    - Update the Factorio 0.15 distribution identity and package guidance for source 4.2.2.
+    - Preserve the reduced target research and settings surface.
+    - Continue eligible base research after a finite numeric upstream level range from its
+      actual terminal technology, preserving the finite chain and true-infinite ownership checks.
+    - Research Library host adapters remain disabled on this target; this package does not enable a backport.
+
+  Info:
+
+    - Use 4.2.01502 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+    - Preserve original saves before upgrading from the published 4.2.1 package for the same Factorio target.
+
+---------------------------------------------------------------------------------------------------
 Version: 4.2.01501
 
   Changes:

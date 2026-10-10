@@ -3,7 +3,8 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   # The static contract exports an unqualified template by default. A supplied
   # private candidate is inspected separately by the existing bundle contract.
-  [string]$CandidateZip=''
+  [string]$CandidateZip='',
+  [switch]$RegistrationOnly
 )
 
 $ErrorActionPreference='Stop'
@@ -13,6 +14,37 @@ $ErrorActionPreference='Stop'
 $hostedReceiptOnly=Test-MIR4HostedReceiptOnly
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4RuntimeContinuityAuthority -RepoRoot $RepoRoot
+foreach($target in @('f210','f200')){
+  $dispatcherPath=Join-Path $RepoRoot "source/adapters/$target/prototypes/mir/runtime/scripted_techs.lua"
+  $dispatcher=[IO.File]::ReadAllText($dispatcherPath)
+  $stage=[IO.File]::ReadAllText((Join-Path $RepoRoot 'source/prototypes/mir/stage/control.lua'))
+  $guard='if research_browser then research_browser.on_load() end'
+  if([regex]::Matches($dispatcher,[regex]::Escape($guard)).Count-ne1){throw '[mir4-w04-guarded-load-fixture-anchor]'}
+  $actual=Get-MIR4RuntimeOnLoadSourceRegistration -HostText ($dispatcher+"`n"+$stage)
+  if($actual.registration_count-ne1-or$actual.approved_registration_count-ne1){throw '[mir4-w04-guarded-load-source]'}
+  foreach($case in @(
+    @{name='unguarded';body=$dispatcher.Replace($guard,'research_browser.on_load()')},
+    @{name='inverted';body=$dispatcher.Replace($guard,'if not research_browser then research_browser.on_load() end')},
+    @{name='missing';body=$dispatcher.Replace($guard,'')},
+    @{name='mutation';body=$dispatcher.Replace($guard,$guard+' storage.changed = true')},
+    @{name='unknown';body=$dispatcher.Replace($guard,$guard+' unknown.on_load()')},
+    @{name='duplicate';body=$dispatcher+"`nscript.on_load(function() end)"},
+    @{name='swapped';body=$dispatcher.Replace('passive_repair.on_load()','TEMP_CALLBACK').Replace($guard,'passive_repair.on_load()').Replace('TEMP_CALLBACK',$guard)}
+  )){
+    $rejected=$false
+    try{Get-MIR4RuntimeOnLoadSourceRegistration -HostText ($case.body+"`n"+$stage)|Out-Null}
+    catch{if($_.Exception.Message-cne'[mir4-runtime-on-load-registration]'){throw};$rejected=$true}
+    if(-not$rejected){throw "[mir4-w04-invalid-load-source-accepted] $target/$($case.name)"}
+  }
+}
+# The same writer consumes current composed dispatcher/stage bytes. This mode
+# avoids unrelated SDK generation or native campaigns when selecting this fix.
+if($RegistrationOnly){
+  $plan=New-MIR4RuntimeRegistrationPlan -RepoRoot $RepoRoot -RuntimeFeatures $authority.runtime_features
+  Assert-MIR4RuntimeRegistrationPlan -Plan $plan|Out-Null
+  Write-Host '[ok] Current composed runtime registration and 16 guarded callback source cases passed.'
+  return
+}
 $providers=@(New-MIR4NormalizedTargetProviders -RepoRoot $RepoRoot)
 $runtimeA=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers $providers -SourceIdentity $null
 $runtimeB=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers @($providers|Sort-Object id -Descending) -SourceIdentity $null

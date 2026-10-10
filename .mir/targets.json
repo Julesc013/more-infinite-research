@@ -2,6 +2,12 @@
   "schema": 2,
   "current_target_source": "info.json.factorio_version",
   "feature_requirements": {
+    "research_library": {
+      "prototype_shapes": [],
+      "emitter_families": [],
+      "runtime_consumer": "prototypes/mir/runtime/research_browser.lua",
+      "data_stage_emitter": "prototypes/mir/stage/data.lua"
+    },
     "productivity_family_adoption": {
       "prototype_shapes": [
         "mod_data"
@@ -73,6 +79,7 @@
         "module_permissions": true,
         "recipe_productivity": true,
         "settings_profiles": true,
+        "research_library": true,
         "scripted_techs": true,
         "technology_constant_overlays": true,
         "productivity_family_adoption": true
@@ -163,6 +170,7 @@
         "module_permissions": true,
         "recipe_productivity": true,
         "settings_profiles": true,
+        "research_library": true,
         "scripted_techs": true,
         "technology_constant_overlays": true,
         "productivity_family_adoption": false
@@ -239,6 +247,7 @@
         "module_permissions": false,
         "recipe_productivity": false,
         "settings_profiles": false,
+        "research_library": false,
         "scripted_techs": false,
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
@@ -308,6 +317,7 @@
         "module_permissions": false,
         "recipe_productivity": false,
         "settings_profiles": false,
+        "research_library": false,
         "scripted_techs": false,
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
@@ -377,6 +387,7 @@
         "module_permissions": false,
         "recipe_productivity": false,
         "settings_profiles": false,
+        "research_library": false,
         "scripted_techs": false,
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
@@ -431,6 +442,7 @@
         "module_permissions": false,
         "recipe_productivity": false,
         "settings_profiles": false,
+        "research_library": false,
         "scripted_techs": false,
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
@@ -485,6 +497,7 @@
         "module_permissions": false,
         "recipe_productivity": false,
         "settings_profiles": false,
+        "research_library": false,
         "scripted_techs": false,
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
@@ -540,6 +553,7 @@
         "module_permissions": false,
         "recipe_productivity": false,
         "settings_profiles": false,
+        "research_library": false,
         "scripted_techs": false,
         "technology_constant_overlays": false,
         "productivity_family_adoption": false

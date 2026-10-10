@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0'
+  [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0'
 )
 
 Set-StrictMode -Version Latest
@@ -13,9 +13,10 @@ if (-not (Test-Path -LiteralPath $module -PathType Leaf)) { throw "[mir42-releas
 . $module
 . (Join-Path $repo 'tests/support/MIR42StartupCollectorControls.ps1')
 . (Join-Path $repo 'tests/support/MIR421ReleaseAssetControls.ps1')
-$maintenance=$SourceVersion -ceq '4.2.1'
+. (Join-Path $repo 'tests/support/MIR422ReleaseUpgradeControls.ps1')
+$maintenance=$SourceVersion -cin @('4.2.1','4.2.2')
 $releaseTag='v' + $SourceVersion
-$patchSuffix=if ($maintenance) { '01' } else { '00' }
+$patchSuffix=([version]$SourceVersion).Build.ToString('D2')
 $script:mir42ReleaseAssetControlAssertions=0
 
 function Assert-MIR42ReleaseAssetsTest {
@@ -60,6 +61,7 @@ function Copy-MIR42ReleaseAssetsFixtureTree {
 
 $root = Join-Path $repo ('build/tmp/mir42-release-assets-' + [guid]::NewGuid().ToString('N'))
 $candidateReader = (Get-Item Function:Get-MIR42ExactFourTargetCandidate).ScriptBlock
+$previousDefaults=$PSDefaultParameterValues.Clone()
 try {
   $collectorControls=Invoke-MIR42StartupCollectorControls -RepoRoot $repo -Root (Join-Path $root 'collector-controls')
   $candidateRoot = Join-Path $root 'candidate'
@@ -133,14 +135,14 @@ try {
     . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1')
     $preflight=[pscustomobject]@{
       source=[ordered]@{commit=$source.commit;tree=$source.tree};package_authority_sha256=('A' * 64);package_source_sha256=$source.package_source_sha256
-      target_authority=@(foreach ($target in $targets) { [ordered]@{target=$target.target;target_id=('factorio-' + $lineByTarget[$target.target]);source_version='4.2.1';distribution_version=$target.distribution_version} })
+      target_authority=@(foreach ($target in $targets) { [ordered]@{target=$target.target;target_id=('factorio-' + $lineByTarget[$target.target]);source_version=$SourceVersion;distribution_version=$target.distribution_version} })
       resource_admission=[ordered]@{admitted=$true;minimum_free_memory_bytes=1;minimum_free_work_bytes=1}
     }
     $rows=@(foreach ($target in $targets) { [pscustomobject]@{target=$target.target;distribution_version=$target.distribution_version;asset=[ordered]@{path=('assets/' + $target.target + '/' + [IO.Path]::GetFileName($target.archive_path));bytes=1;sha256=$target.archive_sha256};content_sha256=$target.content_sha256;entry_count=$target.entry_count} })
     $manifestRoot=Join-Path $root 'schema-manifest'
     New-Item -ItemType Directory -Path $manifestRoot | Out-Null
     $script:mir42ReleaseAssetsFixtureCandidate.identity.record=Write-MIR42FourTargetManifest -OutputRoot $manifestRoot -Preflight $preflight -Rows $rows -Failures @()
-    $custody=New-MIR421ReleaseAssetCustodyFixture -RepoRoot $repo
+    $custody=New-MIR421ReleaseAssetCustodyFixture -RepoRoot $repo -CandidateSourceVersion $SourceVersion
   }
   $sealRecord = [pscustomobject][ordered]@{
     schema=1;kind='MIR42NineTargetTechnicalSealV1';status='MIR-4.2-NINE-TARGET-TECHNICALLY-SEALED-AWAITING-PROTECTED-MAIN-PR'
@@ -150,7 +152,7 @@ try {
   $sealPath = Join-Path $root 'technical-seal.json'
   if ($maintenance) {
     $sealRecord.kind='MIR42NineTargetMaintenanceTechnicalSealV1'
-    $sealRecord.status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-TECHNICALLY-SEALED-AWAITING-PROTECTED-MAIN-PR'
+    $sealRecord.status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-TECHNICALLY-SEALED-AWAITING-PROTECTED-MAIN-PR"
     $sealRecord.candidate_manifest.record_sha256=$script:mir42ReleaseAssetsFixtureCandidate.identity.record.record_sha256
     $sealRecord | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $custody
   }
@@ -182,9 +184,9 @@ try {
   $componentsRecord = [pscustomobject][ordered]@{schema=1;kind='MIR42NineTargetComponentInventoryV1';status='MIR-4.2-NINE-TARGET-COMPONENTS-FROZEN-NONPUBLIC';release=$releaseBinding;source=$source;candidate_manifest=$fixtureCandidateBinding;player_assets=$fixtureTargetRows;human_go_required_after_main_readback=$true;tagging_authorized=$false;publication_authorized=$false;record_sha256=''}
   if ($maintenance) {
     $fixtureCandidateBinding.record_sha256=$script:mir42ReleaseAssetsFixtureCandidate.identity.record.record_sha256
-    $qualificationRecord.kind='MIR42NineTargetMaintenanceReleaseQualificationSummaryV1';$qualificationRecord.status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-TECHNICALLY-QUALIFIED-NONPUBLIC'
-    $provenanceRecord.kind='MIR42NineTargetMaintenanceReleaseProvenanceV1';$provenanceRecord.status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-PROVENANCE-FROZEN-NONPUBLIC'
-    $componentsRecord.kind='MIR42NineTargetMaintenanceComponentInventoryV1';$componentsRecord.status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-COMPONENTS-FROZEN-NONPUBLIC'
+    $qualificationRecord.kind='MIR42NineTargetMaintenanceReleaseQualificationSummaryV1';$qualificationRecord.status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-TECHNICALLY-QUALIFIED-NONPUBLIC"
+    $provenanceRecord.kind='MIR42NineTargetMaintenanceReleaseProvenanceV1';$provenanceRecord.status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-PROVENANCE-FROZEN-NONPUBLIC"
+    $componentsRecord.kind='MIR42NineTargetMaintenanceComponentInventoryV1';$componentsRecord.status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-COMPONENTS-FROZEN-NONPUBLIC"
     foreach ($record in @($qualificationRecord,$provenanceRecord,$componentsRecord)) { $record | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $custody }
   }
   $qualificationPath = Join-Path $assetRoot "mir-$SourceVersion.qualification.json"
@@ -218,20 +220,25 @@ try {
   }
   if ($maintenance) {
     $releaseManifestRecord.kind='MIR42NineTargetMaintenanceReleaseManifestV1'
-    $releaseManifestRecord.status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-RELEASE-MANIFEST-FROZEN-NONPUBLIC'
+    $releaseManifestRecord.status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-RELEASE-MANIFEST-FROZEN-NONPUBLIC"
     $releaseManifestRecord | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $custody
   }
   Write-MIR4BootstrapRecord -Record $releaseManifestRecord -Path (Join-Path $assetRoot "mir-$SourceVersion.release.json") | Out-Null
   Set-Item Function:Get-MIR42ExactFourTargetCandidate -Value { param($RepoRoot,$CandidateManifestPath) return $script:mir42ReleaseAssetsFixtureCandidate }
 
+  if ($SourceVersion -ceq '4.2.2') {
+    $upgradeControls=Invoke-MIR422ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
+    $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
+    Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 13 -and $upgradeControls.native_runs -eq 0) 'complete-upgrade-evidence-opposing-controls'
+  }
   $inventoryPath = Join-Path $root 'frozen-inventory.json'
   $inventory = Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $promotionPlan -SourceVersion $SourceVersion -ReleaseTag $releaseTag -AssetRoot $assetRoot -OutputPath $inventoryPath
   $expectedKind=if ($maintenance) { 'MIR42NineTargetMaintenanceReleaseAssetInventoryV1' } else { 'MIR42NineTargetReleaseAssetInventoryV1' }
   Assert-MIR42ReleaseAssetsTest -Condition ([string]$inventory.record.kind -ceq $expectedKind -and @($inventory.record.package_assets).Count -eq 9 -and @($inventory.record.github_assets).Count -eq 16 -and @($inventory.record.mod_portal_upload_texts).Count -eq 9 -and -not [bool]$inventory.record.signature.signature_verified -and -not [bool]$inventory.record.publication_authorized) -Code 'nine-asset-inventory-frozen-nonpublic'
   $readInventory = Read-MIR42NineTargetReleaseAssetInventory -Path $inventoryPath
   Assert-MIR42ReleaseAssetsTest -Condition ([string]$readInventory.sha256 -ceq [string]$inventory.sha256) -Code 'frozen-inventory-self-hash-reader'
-  foreach ($suffix in @('00','02')) {
-    if (-not $maintenance -and $suffix -ceq '00') { continue }
+  foreach ($suffix in @('00','01','02')) {
+    if ($suffix -ceq $patchSuffix) { continue }
     $wrongPatch=$inventory.record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
     $wrongPatch.package_assets[8].distribution_version='4.2.013' + $suffix
     $wrongPath=Join-Path $root ('wrong-patch-' + $suffix + '.json')
@@ -240,7 +247,7 @@ try {
     try { Read-MIR42NineTargetReleaseAssetInventory -Path $wrongPath | Out-Null } catch { $rejected=$_.Exception.Message -ceq '[mir42-release-assets-distribution-identity] f013' }
     Assert-MIR42ReleaseAssetsTest -Condition $rejected -Code ('codec-rejects-ninth-patch-' + $suffix)
   }
-  foreach ($wrongTag in @('v4.2.1-stable','v4.2.0','v4.2.2')) {
+  foreach ($wrongTag in @('v4.2.1-stable','v4.2.2-stable','v4.2.0','v4.2.1','v4.2.2')) {
     if ($wrongTag -ceq $releaseTag) { continue }
     $output=Join-Path $root ('wrong-tag-' + $wrongTag + '.json')
     $rejected=$false
@@ -259,10 +266,10 @@ try {
     $output=Join-Path $root 'mismatched-custody.json';$rejected=$false
     try { Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $drift -SourceVersion $SourceVersion -ReleaseTag $releaseTag -AssetRoot $assetRoot -OutputPath $output | Out-Null } catch { $rejected=$_.Exception.Message -ceq '[mir42-release-assets-seal-maintenance-custody]' }
     Assert-MIR42ReleaseAssetsTest -Condition ($rejected -and -not (Test-Path -LiteralPath $output)) -Code 'mismatched-maintenance-custody-no-output'
-    $drift.published_maintenance_predecessor.targets[8].version='4.2.01301'
+    $drift.published_maintenance_predecessor.targets[8].version='4.2.013'+$patchSuffix
     $output=Join-Path $root 'wrong-predecessor-version.json';$rejected=$false
     try { Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $drift -SourceVersion $SourceVersion -ReleaseTag $releaseTag -AssetRoot $assetRoot -OutputPath $output | Out-Null } catch { $rejected=$_.Exception.Message -ceq '[mir42-release-assets-maintenance-predecessor-target] 8/version' }
-    Assert-MIR42ReleaseAssetsTest -Condition ($rejected -and -not (Test-Path -LiteralPath $output)) -Code 'source-zero-predecessor-required'
+    Assert-MIR42ReleaseAssetsTest -Condition ($rejected -and -not (Test-Path -LiteralPath $output)) -Code 'selected-published-predecessor-required'
   }
 
   foreach ($case in @(
@@ -390,7 +397,7 @@ try {
   Copy-MIR42ReleaseAssetsFixtureTree -Source $assetRoot -Destination $metadataRoot
   $ninth=$targets[8];$metadataPath=Join-Path $metadataRoot ('assets/f013/' + [IO.Path]::GetFileName($ninth.archive_path))
   Remove-Item -LiteralPath $metadataPath -Force
-  New-MIR42ReleaseAssetsFixtureZip -Path $metadataPath -Root ('more-infinite-research_' + $ninth.distribution_version) -Version '4.2.01302' -Line '0.13'
+  New-MIR42ReleaseAssetsFixtureZip -Path $metadataPath -Root ('more-infinite-research_' + $ninth.distribution_version) -Version '4.2.01303' -Line '0.13'
   $badArchive=Get-MIR4ArchiveInventory -Path $metadataPath
   $savedCandidate=$script:mir42ReleaseAssetsFixtureCandidate
   $script:mir42ReleaseAssetsFixtureCandidate=$savedCandidate | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
@@ -421,6 +428,7 @@ try {
   catch { $downloadDriftRejected = $_.Exception.Message -match ('^\[mir42-release-assets-downloaded-byte\].*' + [regex]::Escape("mir-$SourceVersion.components.json")) }
   Assert-MIR42ReleaseAssetsTest -Condition $downloadDriftRejected -Code 'downloaded-byte-drift-rejected'
 } finally {
+  $PSDefaultParameterValues=$previousDefaults
   Set-Item Function:Get-MIR42ExactFourTargetCandidate -Value $candidateReader
   $buildRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
   if (-not $root.StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-release-assets-test-fixture-containment]' }
@@ -432,6 +440,8 @@ if (-not $maintenance) {
   # Use a fresh script scope after the legacy fixtures have been retired. The
   # module's dot-source guards must not reuse parent functions without their
   # script-scoped constants. This remains one serial test process tree.
-  & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -RepoRoot $repo -SourceVersion '4.2.1'
-  if ($LASTEXITCODE -ne 0) { throw '[mir42-release-assets-maintenance-controls-failed]' }
+  foreach ($maintenanceVersion in @('4.2.1','4.2.2')) {
+    & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -RepoRoot $repo -SourceVersion $maintenanceVersion
+    if ($LASTEXITCODE -ne 0) { throw "[mir42-release-assets-maintenance-controls-failed] $maintenanceVersion" }
+  }
 }

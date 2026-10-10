@@ -66,9 +66,9 @@ $scienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introd
 $repairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
 $progressionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
 $progressionPlannerBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
-if(@($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne375-or
+if(@($manifest.bindings).Count-ne377-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne377-or
    $migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or
-   $introducedBindings.Count-ne16-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or$progressionBindings.Count-ne1-or$progressionPlannerBindings.Count-ne1-or
+   $introducedBindings.Count-ne18-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or$progressionBindings.Count-ne1-or$progressionPlannerBindings.Count-ne1-or
    [string]$progressionBindings[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
    [string]$progressionBindings[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
    (@($progressionBindings[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
@@ -84,6 +84,7 @@ if(@($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Obj
    [string]$repairBindings[0].provenance.kind-cne'current-introduction'){
   throw '[mir4-editable-source-binding-uniqueness]'
 }
+Assert-MIR4ComposablePackageSourceV3Succession -Current $manifest -Predecessor (Get-MIR4ComposablePackageSourceV2Predecessor -RepoRoot $repo)|Out-Null
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
 if(@($targetOutputs|Sort-Object -Unique).Count-ne$targetOutputs.Count){throw '[mir4-editable-source-target-output-uniqueness]'}
 if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or(@($support.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'){throw '[mir4-editable-source-four-target-authority]'}
@@ -160,9 +161,9 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  # The staged material declaration and its shared continuation planner add
-  # two entries to every current target.
-  $expectedDelta=if($target-in@('f210','f200')){37}else{106}
+  # Material declarations, continuation planner and the selected Library host
+  # add three entries to every current target; adapter scopes never overlap.
+  $expectedDelta=if($target-in@('f210','f200')){38}else{107}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

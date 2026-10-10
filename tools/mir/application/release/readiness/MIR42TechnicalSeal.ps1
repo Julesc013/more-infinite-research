@@ -178,13 +178,14 @@ function Get-MIR42EngineEvidenceBindingContract {
   if ($PublishedMaintenance) {
     if ($scope -cne 'nine-target') { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -cne '4.2.1') { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    $contract | Add-Member -NotePropertyName maintenance_source_version -NotePropertyValue ([string]$version.source_version)
     $contract.evidence_kind = 'MIR42NineTargetMaintenanceEvidenceReconciliationV1'
-    $contract.evidence_status = 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'
+    $contract.evidence_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"
     $contract.engine_run_kind = 'MIR42NineTargetMaintenanceEngineRunV1'
     $contract.engine_run_status = 'nine-target-maintenance-base-default-real-engine-probes-passed-private-unqualified'
     $contract.binder_kind = 'MIR42NineTargetMaintenanceRealEngineEvidenceBinderV1'
-    $contract.binder_status = 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'
+    $contract.binder_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED"
   }
   return $contract
 }
@@ -201,7 +202,7 @@ function Get-MIR42JoinedCampaignInputContract {
   $contract = Get-MIR42EngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance:$PublishedMaintenance
   if ($PublishedMaintenance) {
     $contract.campaign_kind = 'MIR42NineTargetMaintenanceRealEngineCandidateCampaignV1'
-    $contract.campaign_status = 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED'
+    $contract.campaign_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED"
   }
   return $contract
 }
@@ -1451,10 +1452,11 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
   $contract = Get-MIR42EngineEvidenceBindingContract -Candidate $candidate -PublishedMaintenance:$maintenanceRequested
   $maintenanceInputs = $null
   if ($maintenanceRequested) {
-    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contract.maintenance_source_version
+    $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-engine-evidence-maintenance-release-readback]' }
     $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $contract.maintenance_source_version
   }
   $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate -PublishedMaintenanceInputs $maintenanceInputs
   $engineInput = Read-MIR42SealRecord -Path $EngineRunPath -Code 'mir42-engine-evidence-engine-run'
@@ -1537,10 +1539,11 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
   $contract = Get-MIR42JoinedCampaignInputContract -Candidate $candidate -PublishedMaintenance:$maintenanceRequested
   $maintenanceInputs = $null
   if ($maintenanceRequested) {
-    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contract.maintenance_source_version
+    $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-joined-campaign-maintenance-release-readback]' }
     $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $contract.maintenance_source_version
   }
   $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate -PublishedMaintenanceInputs $maintenanceInputs
   $binder = Read-MIR42SealRecord -Path $EngineEvidencePath -Code 'mir42-joined-campaign-engine-evidence'
@@ -1744,7 +1747,7 @@ function Get-MIR42SealIndependentInputContract {
   $contract = Get-MIR42JoinedCampaignInputContract -Candidate $Candidate -PublishedMaintenance:$PublishedMaintenance
   if ($PublishedMaintenance) {
     $contract.independent_kind = 'MIR42NineTargetMaintenanceIndependentEvidenceRehashV1'
-    $contract.independent_status = 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED'
+    $contract.independent_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED"
   }
   return $contract
 }
@@ -1754,7 +1757,7 @@ function Get-MIR42TechnicalSealInputContract {
   $contract = Get-MIR42SealIndependentInputContract -Candidate $Candidate -PublishedMaintenance:$PublishedMaintenance
   if ($PublishedMaintenance) {
     $contract.seal_kind = 'MIR42NineTargetMaintenanceTechnicalSealV1'
-    $contract.seal_status = 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-TECHNICALLY-SEALED-AWAITING-PROTECTED-MAIN-PR'
+    $contract.seal_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-TECHNICALLY-SEALED-AWAITING-PROTECTED-MAIN-PR"
   }
   return $contract
 }
@@ -2408,9 +2411,10 @@ function Get-MIR42TechnicalSealReadinessForScope {
   if ($maintenanceRequested) {
     if ($checks.candidate) {
       try {
-        $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+        $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contract.maintenance_source_version
+        $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
         if ($LASTEXITCODE -ne 0) { throw '[mir42-maintenance-readiness-release-readback]' }
-        $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+        $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $contract.maintenance_source_version
         $state.maintenance_inputs = $maintenanceInputs
         $checks.maintenance_predecessor = $true
       } catch { $checks.maintenance_predecessor = $false; $blockers.Add($_.Exception.Message) }

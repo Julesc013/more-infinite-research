@@ -1,5 +1,7 @@
 local from_version = "4.0.21000"
 local to_version = "4.1.21000"
+local persisted_damage_probe = false
+local damage_version = "4.2.21001"
 local archetype = settings.startup["mir-upgrade-archetype"].value
 local expected_progress = 0.42
 local epsilon = 0.000001
@@ -23,20 +25,119 @@ local function has_recipe_effect(value,recipe_name) for _,effect in pairs((value
 -- state and every recipe's live research bonus, including the reported rows.
 -- Escaped version patterns survive the runner's exact template substitutions.
 local complete_catalogue_upgrade = archetype == "space-age-native-owner"
-  and from_version:match("^4%.1%.21000$") and to_version:match("^4%.2%.21000$")
+  and (from_version:match("^4%.1%.21000$") or from_version:match("^4%.2%.210%d%d$"))
+  and to_version:match("^4%.2%.210%d%d$")
+local force_effect_fields = {
+  "artillery_range_modifier", "beacon_distribution_modifier", "belt_stack_size_bonus",
+  "bulk_inserter_capacity_bonus", "character_build_distance_bonus", "character_health_bonus",
+  "character_inventory_slots_bonus", "character_item_drop_distance_bonus",
+  "character_item_pickup_distance_bonus", "character_loot_pickup_distance_bonus",
+  "character_reach_distance_bonus", "character_resource_reach_distance_bonus",
+  "character_running_speed_modifier", "following_robots_lifetime_modifier",
+  "inserter_stack_size_bonus", "laboratory_productivity_bonus", "laboratory_speed_modifier",
+  "manual_crafting_speed_modifier", "manual_mining_speed_modifier", "mining_drill_productivity_bonus",
+  "train_braking_force_bonus", "worker_robots_battery_modifier",
+  "worker_robots_speed_modifier", "worker_robots_storage_bonus"
+}
+local function scalar_copy(value)
+  if type(value) == "table" then
+    local out = {}
+    for key, item in pairs(value) do
+      if type(key) ~= "string" and type(key) ~= "number" then fail("non-scalar snapshot key") end
+      out[key] = scalar_copy(item)
+    end
+    return out
+  end
+  if value == nil or type(value) == "string" or type(value) == "number" or type(value) == "boolean" then return value end
+  fail("unsupported snapshot value " .. type(value))
+end
+local function equal_state(left, right)
+  if type(left) ~= type(right) then return false end
+  if type(left) == "number" then return math.abs(left - right) <= epsilon end
+  if type(left) ~= "table" then return left == right end
+  for key, value in pairs(left) do if not equal_state(value, right[key]) then return false end end
+  for key in pairs(right) do if left[key] == nil then return false end end
+  return true
+end
+local function prototype_state(technology)
+  local prototype = technology.prototype
+  if not prototype then fail("technology prototype missing: " .. technology.name) end
+  local prerequisites = {}
+  for name in pairs(prototype.prerequisites) do prerequisites[#prerequisites + 1] = name end
+  table.sort(prerequisites)
+  local ingredients = {}
+  for _, ingredient in pairs(technology.research_unit_ingredients) do
+    ingredients[#ingredients + 1] = {name = ingredient.name, amount = ingredient.amount}
+  end
+  table.sort(ingredients, function(a, b) return a.name < b.name end)
+  return {
+    order = prototype.order, hidden = prototype.hidden,
+    hidden_in_factoriopedia = prototype.hidden_in_factoriopedia,
+    max_level = prototype.max_level, prerequisites = prerequisites,
+    ingredients = ingredients, effects = scalar_copy(prototype.effects),
+    unit_count = technology.research_unit_count,
+    unit_count_formula = technology.research_unit_count_formula or false,
+    unit_energy = technology.research_unit_energy
+  }
+end
 local function complete_state(force)
-  local state = {technologies = {}, bonuses = {}, queue = {}}
+  local state = {technologies = {}, bonuses = {}, queue = {}, effects = {}, settings = {}}
   for name, technology in pairs(force.technologies) do
     state.technologies[name] = {
       level = technology.level, researched = technology.researched,
-      enabled = technology.enabled, saved_progress = technology.saved_progress
+      enabled = technology.enabled, visible_when_disabled = technology.visible_when_disabled,
+      saved_progress = technology.saved_progress, prototype = prototype_state(technology)
     }
   end
+  for _, name in ipairs(force_effect_fields) do
+    if type(force[name]) ~= "number" then fail("force effect unavailable: " .. name) end
+    state.effects[name] = force[name]
+  end
+  for name, setting in pairs(settings.startup) do state.settings[name] = scalar_copy(setting.value) end
   for name, recipe in pairs(force.recipes) do state.bonuses[name] = recipe.productivity_bonus end
   for _, technology in ipairs(force.research_queue or {}) do state.queue[#state.queue + 1] = technology.name end
+  state.current_research = force.current_research and force.current_research.name or false
+  state.research_progress = force.research_progress
   return state
 end
+local added_422_setting_defaults = {}
+if to_version == "4.2.21002" then
+  -- Explicit settings added by the retained 4.2.2 material declarations.
+  -- Existing values (including imports) still compare exactly below.
+  local families = {"glycerol", "hydrochloric_acid", "hydrofluoric_acid", "nitric_acid",
+    "py_acid_gas", "py_earth_flower_sample", "py_earth_generic_sample", "py_earth_jute_sample",
+    "py_earth_palmtree_sample", "py_earth_potato_sample", "py_earth_shroom_sample",
+    "py_earth_sunflower_sample", "py_earth_tropical_tree_sample", "py_earth_venus_fly_sample",
+    "py_glycerol", "py_log", "py_treated_wood", "py_wood"}
+  local defaults = {enable=true, ["effect-per-level"]=2, ["max-level"]=0,
+    ["research-time"]=30, ["cost-base"]=200, ["cost-growth"]=2, ["cost-linear-increment"]=0}
+  for _, family in ipairs(families) do
+    for suffix, value in pairs(defaults) do
+      added_422_setting_defaults["ips-" .. suffix .. "-research_material_" .. family] = value
+    end
+  end
+end
+local function restored_promethium_frontier(name, before, after)
+  if (from_version ~= "4.2.21001" and not persisted_damage_probe) or to_version ~= "4.2.21002" then return false end
+  if name ~= "research-speed-7" and name ~= "recipe-prod-research_cargo_bay_unloading_distance-1"
+    and name ~= "recipe-prod-research_cargo_landing_pad_count-1" then return false end
+  local expected = scalar_copy(before)
+  for _, prerequisite in ipairs(expected.prerequisites) do
+    if prerequisite == "promethium-science-pack" then return false end
+  end
+  for _, ingredient in ipairs(expected.ingredients) do
+    if ingredient.name == "promethium-science-pack" then return false end
+  end
+  expected.prerequisites[#expected.prerequisites + 1] = "promethium-science-pack"
+  table.sort(expected.prerequisites)
+  expected.ingredients[#expected.ingredients + 1] = {name="promethium-science-pack",amount=1}
+  table.sort(expected.ingredients, function(a,b) return a.name < b.name end)
+  -- These exact three corrections restore the published 4.2.0 science policy.
+  -- Every other definition field and all earned state still compare exactly.
+  return equal_state(expected, after)
+end
 local function verify_complete_state(force, expected)
+  local observed = complete_state(force)
   local technology_count, recipe_count = 0, 0
   for name, before in pairs(expected.technologies) do
     local after = force.technologies[name]
@@ -45,6 +146,11 @@ local function verify_complete_state(force, expected)
       fail("existing technology state changed: " .. name)
     end
     if math.abs(after.saved_progress - before.saved_progress) > epsilon then fail("saved research progress changed: " .. name) end
+    if after.visible_when_disabled ~= before.visible_when_disabled then fail("technology visibility changed: " .. name) end
+    if not equal_state(observed.technologies[name].prototype, before.prototype)
+      and not restored_promethium_frontier(name, before.prototype, observed.technologies[name].prototype) then
+      fail("technology definition changed: " .. name)
+    end
     technology_count = technology_count + 1
   end
   for name, before in pairs(expected.bonuses) do
@@ -55,10 +161,44 @@ local function verify_complete_state(force, expected)
   local queue = {}
   for _, technology in ipairs(force.research_queue or {}) do queue[#queue + 1] = technology.name end
   if not same_names(queue, expected.queue) then fail("research queue changed") end
+  if not equal_state(observed.effects, expected.effects) then fail("earned force effect changed") end
+  for name, value in pairs(expected.settings) do
+    if not equal_state(observed.settings[name], value) then
+      fail("startup/imported settings changed: " .. name .. "; expected=" .. tostring(value) .. "; observed=" .. tostring(observed.settings[name]))
+    end
+  end
+  for name, value in pairs(observed.settings) do
+    if expected.settings[name] == nil and not equal_state(added_422_setting_defaults[name], value) then
+      fail("startup/imported settings changed: unexpected " .. name)
+    end
+  end
+  if observed.current_research ~= expected.current_research or not equal_state(observed.research_progress, expected.research_progress) then fail("active research progress changed") end
   for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do
-    if not expected.technologies[name] or not force.technologies[name] then fail("reported technology absent: " .. name) end
+    if not force.technologies[name] then fail("reported technology absent: " .. name) end
+  end
+  for name, after in pairs(observed.technologies) do
+    if not expected.technologies[name] and after.researched then fail("new research was awarded without earning it: " .. name) end
   end
   log("[mir-fixture] complete Space Age state retained technologies=" .. technology_count .. " recipes=" .. recipe_count)
+end
+local function all_force_states()
+  local out = {}
+  for name, force in pairs(game.forces) do out[name] = complete_state(force) end
+  return out
+end
+local function export_state(stage)
+  -- Independent evaluator output. Product code never reads this snapshot.
+  helpers.write_file("mir-upgrade-full-state-" .. stage .. ".json", helpers.table_to_json({
+    from_version = from_version, to_version = to_version, stage = stage,
+    active_mods = scalar_copy(script.active_mods), forces = all_force_states()
+  }))
+end
+local function verify_all_forces(expected)
+  for name, state in pairs(expected) do
+    local force = game.forces[name]
+    if not force then fail("force disappeared: " .. name) end
+    verify_complete_state(force, state)
+  end
 end
 
 script.on_init(function()
@@ -72,13 +212,39 @@ script.on_init(function()
   if not force.add_research(tech) then fail("could not queue research") end
   force.research_progress=expected_progress
   storage.mir_upgrade_fixture={archetype=archetype,technology=profile.technology,technology_level=tech.level,research_progress=force.research_progress,research_unit_count=tech.research_unit_count,science=science_names(tech),source_version=from_version}
-  if complete_catalogue_upgrade then storage.mir_upgrade_fixture.complete_state = complete_state(force) end
+  if complete_catalogue_upgrade then
+    if not persisted_damage_probe then
+      storage.mir_upgrade_fixture.complete_state = complete_state(force)
+      storage.mir_upgrade_fixture.complete_forces = all_force_states()
+    end
+    export_state("source")
+  end
   log("[mir-fixture] "..from_version.." upgrade source proof complete archetype="..archetype)
 end)
 
 script.on_configuration_changed(function()
-  if script.active_mods["more-infinite-research"]~=to_version then fail("upgraded save used wrong MIR version") end
   local state=storage.mir_upgrade_fixture;if not state or state.source_version~=from_version then fail("fixture storage did not survive") end
+  if persisted_damage_probe and script.active_mods["more-infinite-research"] == damage_version then
+    if state.damage_complete or state.complete_forces then fail("unexpected pre-damage evaluator state in damaged save") end
+    local force = game.forces.player
+    local tech = technology()
+    if tech.level ~= state.technology_level or not force.current_research
+      or force.current_research.name ~= profile.technology then fail("unaffected research changed during damage reproduction") end
+    -- Test-only new work after the damaging upgrade. Product recovery cannot
+    -- consult any pre-damage snapshot: only the external evaluator retains it.
+    force.research_progress = 0.57
+    state.research_progress = force.research_progress
+    state.research_unit_count = tech.research_unit_count
+    state.science = science_names(tech)
+    state.complete_forces = all_force_states()
+    state.complete_state = state.complete_forces.player
+    state.damage_complete = true
+    export_state("persisted-damage")
+    log("[mir-fixture] published 4.2.1 damage state captured;post-upgrade-progress=0.57")
+    return
+  end
+  if script.active_mods["more-infinite-research"]~=to_version then fail("upgraded save used wrong MIR version") end
+  if persisted_damage_probe and not state.damage_complete then fail("persisted 4.2.1 damage phase missing") end
   local force=game.forces.player;local tech=technology()
   if tech.level~=state.technology_level then fail("technology level did not survive") end
   if not force.current_research or force.current_research.name~=profile.technology then fail("current research did not survive") end
@@ -92,16 +258,27 @@ script.on_configuration_changed(function()
   elseif archetype=="mod-set-configuration-change" then if script.active_mods[profile.source_only_mod] or prototypes.recipe[profile.target_recipe] or has_recipe_effect(tech,profile.target_recipe) then fail("removed subject survived sanitation") end end
   if complete_catalogue_upgrade then
     if not state.complete_state then fail("complete source state missing") end
-    verify_complete_state(game.forces.player, state.complete_state)
+    if not state.complete_forces then fail("complete source forces missing") end
+    export_state("candidate-before-check")
+    verify_all_forces(state.complete_forces)
+    export_state("upgrade")
   end
   state.upgrade_complete=true;log("[mir-fixture] "..from_version.." to "..to_version.." upgrade proof complete archetype="..archetype)
 end)
 local checked_complete_reload = false
 script.on_event(defines.events.on_tick,function()
   local state=storage.mir_upgrade_fixture
+  if persisted_damage_probe and state and state.damage_complete and not state.upgrade_complete then
+    if not state.damage_save_requested then
+      state.damage_save_requested=true
+      game.server_save("mir-422-persisted-damage")
+    end
+    return
+  end
   if state and state.upgrade_complete then
     if complete_catalogue_upgrade and not checked_complete_reload then
-      verify_complete_state(game.forces.player, state.complete_state)
+      verify_all_forces(state.complete_forces)
+      export_state("reload")
       checked_complete_reload = true
     end
     if not state.server_save_requested then state.server_save_requested=true;game.server_save("mir-4121000-upgraded") end

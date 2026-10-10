@@ -12,8 +12,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 52715,
-      "expected_sha256": "AD48C0768142FF4882D6C70EA1DEAE26AE2DE52024F794F1648A20F7F9864288",
+      "expected_bytes": 53526,
+      "expected_sha256": "7B0C69B137F8AFB72258CCFB8256E02F5C86A5EA85001459E7CC8A6084600B7E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 53757,
-      "expected_sha256": "AA4438663C797F4DD2AD2B32016D0763F7152E8615D5BE6AE608E7AF012896D9",
+      "expected_bytes": 53969,
+      "expected_sha256": "7BA69976745572401D34887CF5D8E6539F6D7E664CA8C2ECFFDE142C28862EDD",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -860,8 +860,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 50842,
-      "expected_sha256": "D6E3A83A49B199C0D03235F84BF44956C51EC8999CB2CE334FCA9B25C59025D2",
+      "expected_bytes": 54248,
+      "expected_sha256": "40ED72168431ADF4A2B369076D8C30205BA35433B8EFAE228B0DF851B5D3A127",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 75216,
-      "expected_sha256": "0B20AA308B4DE11F99EF93944B9222EFF752F1EE49A7EE471B9C7ED0F5AAE5BD",
+      "expected_bytes": 76869,
+      "expected_sha256": "9AE58510F38F4F40CBA31C3CE03C02468302457A745CA722277C202D43DD57B8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 68604,
-      "expected_sha256": "F16361077D8BAC801F1E6BADCA21906667127A875C40A57F3E4558B255842E0F",
+      "expected_bytes": 78648,
+      "expected_sha256": "59A08424978BF563FE4626502CF05586E9FCE54DABE68F1D051A290687F1B94E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2268,8 +2268,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4553,
-      "expected_sha256": "298A193018072E6DBDE4B4EB9EABA3DDDC84F471D6685B0C85B09FED42D152B8",
+      "expected_bytes": 6751,
+      "expected_sha256": "0CF2381A602CB5178E0BEEF44A82B7B09E5647A9A1E0CF0ECBD8332691597D66",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2636,8 +2636,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16422,
-      "expected_sha256": "B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6",
+      "expected_bytes": 16665,
+      "expected_sha256": "BE724348A09C6F6E81F87340320513C5D01A6BBBA7936763C8C4F08B81AF6ED9",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3148,8 +3148,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6036,
-      "expected_sha256": "88D07CED23E909D58B8D9A671F30625CB81839E5170FFFCECAD0097352489220",
+      "expected_bytes": 6104,
+      "expected_sha256": "51500379A47E1433472185927264CBA8183FD1CCC1C961EAAA26E526F2B6C34E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3836,8 +3836,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4701,
-      "expected_sha256": "84E308C5EDBCD4E8EF9BC590C1DE581511AA17AE35520910A8734F6D3CED181F",
+      "expected_bytes": 4728,
+      "expected_sha256": "DF4679E4DCE50FF5FBED8501373F9C52F1A87EEBE64B6001E31551B4FD626BC7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3859,6 +3859,22 @@
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
       ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/browser_host.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/adapters/runtime-capabilities/game-browser-host.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Select the Library prototype/export API adapter for this engine; historical Library remains disabled.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1399,
+      "expected_sha256": "B625A1FDB29FEB9EB05125FEF60533BE6E857499A9B966A901447FF4BE4FA087",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
     }
   ],
   "invariants": {
@@ -3867,5 +3883,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "ECDA0F54A2A140263C2C169DA2D4180592E32B8D134DD27EAF3F62FDD488CA5C"
+  "record_sha256": "E72BB6890B51169F440F166F2014A53727CB52FEDE93F799711A1D20E10CB4D5"
 }

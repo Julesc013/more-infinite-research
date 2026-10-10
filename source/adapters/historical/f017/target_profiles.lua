@@ -52,6 +52,7 @@ local M = {
         module_permissions = false,
         recipe_productivity = false,
         settings_profiles = false,
+        research_library = false,
         scripted_techs = false,
         technology_constant_overlays = false,
         productivity_family_adoption = false

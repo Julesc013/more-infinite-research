@@ -651,6 +651,9 @@ local function acquisition_children(witness)
   local children = {}
   if witness.recipe_witness then table.insert(children, witness.recipe_witness) end
   for _, ingredient in ipairs(witness.ingredients or {}) do table.insert(children, ingredient) end
+  if witness.receiver and witness.receiver.acquisition then
+    table.insert(children, witness.receiver.acquisition)
+  end
   local machine = witness.machine
   if machine then
     if machine.acquisition then table.insert(children, machine.acquisition) end
@@ -731,6 +734,87 @@ local function negative_witness_memo_key(identity, context, state, visiting_pack
   }, "\0")
 end
 
+-- Recipe execution and item output share one research-unlock authority. A
+-- rocket construction craft has no obtainable output, but its unlock still
+-- needs exactly the same research, active-pair and self-output checks.
+local function research_unlocked_recipe_witness(
+  recipe_name, options, visiting_packs, visiting_technologies, build_witness, identity
+)
+  local context = active_unlock_context(options)
+  local witness_checkpoint = diagnostic_checkpoint(options)
+  local unlockers = {}
+  for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
+    if not diagnostic_visit(options.diagnostic_observer, options.diagnostic_depth or 0) then return nil end
+    table.insert(unlockers, technology_name)
+  end
+  sort_unlockers(unlockers, options.diagnostic_observer)
+  for _, technology_name in ipairs(unlockers) do
+    if not diagnostic_visit(options.diagnostic_observer, options.diagnostic_depth or 0) then return nil end
+    -- Recipe/unlocker pairs are alternatives. Keep only the active pair's
+    -- trace so a failed earlier pair cannot mask the final selected pair
+    -- or a later successful pair.
+    diagnostic_rollback(options, witness_checkpoint)
+    local pair_key = unlock_pair_key(recipe_name, technology_name)
+    -- The precise recipe/technology pair is active while its ingredients
+    -- are being proved. Reopening that same pair is an unseeded loop, but
+    -- a different recipe unlocked by the already-proved technology is a
+    -- legitimate intermediate (for example, a component accompanying the
+    -- circuit unlocked by one early technology).
+    local rejection = technology_name == options.excluded_unlocker and "excluded-unlocker"
+        or context.pairs[pair_key] and "active-unlock-pair" or nil
+    if rejection == nil and context.technologies[technology_name] == nil then
+      rejection = contextual_technology_researchability_reason(
+        technology_name,
+        recipe_name,
+        options,
+        visiting_packs,
+        visiting_technologies
+      )
+    end
+    if rejection == nil then
+      local previous_technology = context.technologies[technology_name]
+      context.pairs[pair_key] = true
+      context.technologies[technology_name] = (previous_technology or 0) + 1
+      local recipe_witness = build_witness()
+      context.pairs[pair_key] = nil
+      if previous_technology then
+        context.technologies[technology_name] = previous_technology
+      else
+        context.technologies[technology_name] = nil
+      end
+      if recipe_witness then
+        -- A successful research-unlocked route selects this branch. Drop
+        -- provisional observations from rejected recipe/unlocker pairs.
+        diagnostic_rollback(options, witness_checkpoint)
+        local result = {
+          kind = "research-unlocked-recipe",
+          recipe = recipe_name,
+          unlocker = technology_name,
+          recipe_witness = recipe_witness
+        }
+        return result
+      end
+    elseif rejection == "active-unlock-pair" then
+      record_diagnostic_failure(options, {
+        kind = "cycle",
+        recipe = recipe_name,
+        technology = technology_name,
+        identity = deepcopy(identity),
+        reason = rejection
+      })
+    else
+      record_diagnostic_failure(options, {
+        kind = "technology",
+        recipe = recipe_name,
+        technology = technology_name,
+        identity = deepcopy(identity),
+        reason = rejection
+      })
+    end
+  end
+  return nil
+end
+
 local function research_unlocked_output_witness(identity, options, state, visiting_packs, visiting_technologies)
   local context = active_unlock_context(options)
   local memo_key, positive_memo, negative_key, negative_memo
@@ -763,94 +847,32 @@ local function research_unlocked_output_witness(identity, options, state, visiti
     diagnostic_rollback(options, witness_checkpoint)
     local fact = canonical_recipe_facts.view(recipe_name)
     if fact and fact.enabled_without_research ~= true then
-      local unlockers = {}
-      for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
-        if not diagnostic_visit(options.diagnostic_observer, options.diagnostic_depth or 0) then return nil end
-        table.insert(unlockers, technology_name)
-      end
-      sort_unlockers(unlockers, options.diagnostic_observer)
-      for _, technology_name in ipairs(unlockers) do
-        if not diagnostic_visit(options.diagnostic_observer, options.diagnostic_depth or 0) then return nil end
-        -- Recipe/unlocker pairs are alternatives. Keep only the active pair's
-        -- trace so a failed earlier pair cannot mask the final selected pair
-        -- or a later successful pair.
-        diagnostic_rollback(options, witness_checkpoint)
-        local pair_key = unlock_pair_key(recipe_name, technology_name)
-        -- The precise recipe/technology pair is active while its ingredients
-        -- are being proved. Reopening that same pair is an unseeded loop, but
-        -- a different recipe unlocked by the already-proved technology is a
-        -- legitimate intermediate (for example, a component accompanying the
-        -- circuit unlocked by one early technology).
-        local rejection = context.pairs[pair_key] and "active-unlock-pair" or nil
-        if rejection == nil and context.technologies[technology_name] == nil then
-          rejection = contextual_technology_researchability_reason(
-            technology_name,
-            recipe_name,
-            options,
-            visiting_packs,
-            visiting_technologies
-          )
-        end
-        if rejection == nil then
-          local previous_technology = context.technologies[technology_name]
-          context.pairs[pair_key] = true
-          context.technologies[technology_name] = (previous_technology or 0) + 1
-          local recipe_witness = route_feasibility.recipe_witness(recipe_name, identity, options, state)
-          context.pairs[pair_key] = nil
-          if previous_technology then
-            context.technologies[technology_name] = previous_technology
-          else
-            context.technologies[technology_name] = nil
+      local result = research_unlocked_recipe_witness(
+        recipe_name, options, visiting_packs, visiting_technologies,
+        function() return route_feasibility.recipe_witness(recipe_name, identity, options, state) end,
+        identity)
+      if result then
+        if positive_memo then
+          local entries = positive_memo[memo_key]
+          if not entries then
+            entries = {}
+            positive_memo[memo_key] = entries
           end
-          if recipe_witness then
-            -- A successful research-unlocked route selects this branch. Drop
-            -- provisional observations from rejected recipe/unlocker pairs.
-            diagnostic_rollback(options, witness_checkpoint)
-            local result = {
-              kind = "research-unlocked-recipe",
-              recipe = recipe_name,
-              unlocker = technology_name,
-              recipe_witness = recipe_witness
-            }
-            if positive_memo then
-              local entries = positive_memo[memo_key]
-              if not entries then
-                entries = {}
-                positive_memo[memo_key] = entries
-              end
-              if #entries < RESEARCH_UNLOCK_POSITIVE_MEMO_LIMIT
-                and (options.research_unlock_positive_memo_entries or 0)
-                  < RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT then
-                local dependencies = {pairs = {}, required_technologies = {}}
-                witness_unlock_dependencies(result, context.technologies, dependencies)
-                table.insert(entries, {
-                  witness = deepcopy(result),
-                  pairs = dependencies.pairs,
-                  required_technologies = dependencies.required_technologies
-                })
-                options.research_unlock_positive_memo_entries
-                  = (options.research_unlock_positive_memo_entries or 0) + 1
-              end
-            end
-            return result
+          if #entries < RESEARCH_UNLOCK_POSITIVE_MEMO_LIMIT
+            and (options.research_unlock_positive_memo_entries or 0)
+              < RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT then
+            local dependencies = {pairs = {}, required_technologies = {}}
+            witness_unlock_dependencies(result, context.technologies, dependencies)
+            table.insert(entries, {
+              witness = deepcopy(result),
+              pairs = dependencies.pairs,
+              required_technologies = dependencies.required_technologies
+            })
+            options.research_unlock_positive_memo_entries
+              = (options.research_unlock_positive_memo_entries or 0) + 1
           end
-        elseif rejection == "active-unlock-pair" then
-          record_diagnostic_failure(options, {
-            kind = "cycle",
-            recipe = recipe_name,
-            technology = technology_name,
-            identity = deepcopy(identity),
-            reason = rejection
-          })
-        else
-          record_diagnostic_failure(options, {
-            kind = "technology",
-            recipe = recipe_name,
-            technology = technology_name,
-            identity = deepcopy(identity),
-            reason = rejection
-          })
         end
+        return result
       end
     end
   end
@@ -880,6 +902,10 @@ local function production_witness_options(visiting_packs, visiting_technologies,
       visiting_packs,
       visiting_technologies
     )
+  end
+  options.research_recipe_unlock_witness = function(recipe_name, state, build_witness)
+    return research_unlocked_recipe_witness(
+      recipe_name, options, visiting_packs, visiting_technologies, build_witness)
   end
   return options
 end
@@ -1098,6 +1124,21 @@ local function production_routes(
 )
   local routes = {}
   local witness_options = production_witness_options(visiting_packs, visiting_technologies, observer)
+  -- Conditional non-recipe processes carry the same complete research gates
+  -- as a recipe route. Keep their source identity separate from recipe names:
+  -- a satellite return is not an ordinary recipe producing the returned pack.
+  local source_options = production_witness_options(visiting_packs, visiting_technologies, observer)
+  source_options.excluded_unlocker = excluded_unlocker
+  local source = route_feasibility.source_witness(recipe_status.pack_name, source_options, witness_state)
+  if source then
+    local route = aggregate_research_route(nil, selected_research_unlock_pairs(source),
+      visiting_packs, excluded_unlocker, visiting_technologies, observer, source, source_options)
+    if route then
+      route.source = {kind = source.kind, prototype = source.prototype}
+      route.provenance.source = deepcopy(route.source)
+      table.insert(routes, route)
+    end
+  end
   -- All candidates belong to one immutable recipe snapshot and exact active
   -- traversal. Sharing the query state reuses only raw indexes and the
   -- context-free positive witnesses owned by recipe_route_feasibility; its
@@ -1340,7 +1381,7 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
   -- machine observations held by recipe-route feasibility. Completed contextual pack answers retain every active traversal input and
   -- are discarded when root or stable acquisition knowledge advances. A bounded diagnostic always gets a fresh state so its
   -- work cap still covers every inspected prototype.
-  local witness_state = route_witness_state_for_query(observer)
+  local witness_state = route_witness_state_for_query(observer) or {}
   local contextual_owner, contextual_key, contextual_root_generation, contextual_acquisition_generation
   if observer == nil and not reusable then
     -- This entry point takes no parent production options. production_routes
@@ -1393,7 +1434,7 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
 
   local recipe_status = recipe_facts.pack_recipe_status(pack_name, observer)
   if diagnostic_indeterminate(observer) then return "indeterminate", nil, exists end
-  if recipe_status and recipe_status.has_recipe then
+  if recipe_status then
     visiting_packs[pack_name] = true
     local selected = route_policy.select(production_routes(
       recipe_status,
@@ -1746,15 +1787,16 @@ function M.independent_pack_acquisition_witness(
   -- This witness is deliberately independent of an unlocker. A direct source
   -- remains valid even if the pack also has a recipe unlocked by the
   -- technology under assessment.
+  local witness_state = route_witness_state_for_query(observer) or {}
   local direct_source = route_feasibility.source_witness(
     pack_name,
     observer and {diagnostic_observer = observer} or nil,
-    route_witness_state_for_query(observer)
+    witness_state
   )
   if direct_source then return direct_source end
   local recipe_status = recipe_facts.pack_recipe_status(pack_name, observer)
   if diagnostic_indeterminate(observer) then return nil end
-  if not recipe_status or not recipe_status.has_recipe then return nil end
+  if not recipe_status then return nil end
 
   local witness_visiting = copy_visitation_without(visiting_packs, pack_name)
   witness_visiting[pack_name] = true
@@ -1764,7 +1806,7 @@ function M.independent_pack_acquisition_witness(
     excluded_unlocker,
     visiting_technologies,
     observer,
-    route_witness_state_for_query(observer)
+    witness_state
   ))
   witness_visiting[pack_name] = nil
   return selected and deepcopy(selected) or nil

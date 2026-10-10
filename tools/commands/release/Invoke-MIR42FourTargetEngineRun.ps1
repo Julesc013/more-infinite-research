@@ -104,7 +104,7 @@ function Get-MIR42HistoricalEngineDescriptor {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0',
     [string]$EnginePath = ''
   )
   $expected = $script:MIR42HistoricalTerminalInputs[$Target]
@@ -142,7 +142,7 @@ function Get-MIR42HistoricalEngineDescriptor {
     throw "[mir42-$Target-engine-authority]"
   }
   $selectedEngine = $recordEngine
-  if ($SourceVersion -ceq '4.2.1') {
+  if ($SourceVersion -cne '4.2.0') {
     if ([string]::IsNullOrWhiteSpace($EnginePath) -or -not [IO.Path]::IsPathFullyQualified($EnginePath)) {
       throw "[mir421-$Target-local-engine-binding-required]"
     }
@@ -277,7 +277,7 @@ function Invoke-MIR42HistoricalFreshLoad {
     [Parameter(Mandatory)][string]$CandidateSha256,
     [Parameter(Mandatory)][string]$LibraryDirectory,
     [Parameter(Mandatory)][string]$Version,
-    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion='4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion='4.2.0',
     [Parameter(Mandatory)][string]$FreshRoot,
     [Parameter(Mandatory)][string]$SourceCommit,
     [Parameter(Mandatory)][int]$DeadlineSeconds
@@ -509,13 +509,14 @@ if ($isNineTargetCandidate) {
 
 $maintenanceInputs = $null
 if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
-  if ($sourceVersion -cne '4.2.1' -or -not $isNineTargetCandidate) {
+  if ($sourceVersion -cnotin @('4.2.1','4.2.2') -or -not $isNineTargetCandidate) {
     throw '[mir42-engine-maintenance-predecessor-candidate-scope]'
   }
-  $releaseText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+  $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $sourceVersion
+  $releaseText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
   if ($LASTEXITCODE -ne 0) { throw '[mir42-engine-maintenance-predecessor-release-readback]' }
   $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-    -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($releaseText | ConvertFrom-Json -Depth 100 -DateKind String)
+    -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($releaseText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $sourceVersion
   foreach ($input in $maintenanceInputs.targets) {
     $target = [string]$input.target
     if ($target -in $script:MIR42ModernEngineTargets -and
@@ -728,6 +729,7 @@ foreach ($target in $targets) {
   $stderrPath = Join-Path $rowRoot 'harness-stderr.txt'
   $args = @('-NoProfile','-File',$harness,'-RepoRoot',$repo,'-FactorioBin',$row.engine,
     '-FromZip',$row.predecessor,'-ToZip',$row.candidate,'-FromVersion',$row.from,'-ToVersion',$row.to,
+    '-SourceVersion',$(if($sourceVersion -ceq '4.2.0'){'4.2.1'}else{$sourceVersion}),
     '-FixtureName',$row.fixture,'-Archetype','base-default','-OutputPath',$receiptPath,
     '-LocalModLibraryDirs',$libraryBindings[$target],
     '-WorkRoot',(Join-Path $rowRoot 'work'),'-Retention','OnFailure',

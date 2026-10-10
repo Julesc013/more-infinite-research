@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0129",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Reject research routes that depend on discarded rocket-silo construction recipe products.",
+  "details": [
+    "Rocket-silo crafting advances rocket construction and does not produce the recipe's declared items or fluids. The shared acquisition solver no longer accepts a silo as an ordinary output-producing machine.",
+    "An independently obtainable ordinary assembler can still supply the same recipe/category. Controlled recipe, item-acquisition and downstream-science checks reproduce the old false admission, preserve that real alternative, and reject stale results after its removal.",
+    "The A04 satellite launch-product acquisition route remains unfinished. This correction grants no new launch, native output, catalogue or save qualification and does not alter the published 4.2.1 packages."
+  ],
+  "semantic_domains": ["compatibility", "progression"],
+  "audiences": ["players", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Shared acquisition rejects silo-only recipe outputs; controlled regression is covered and native catalogue/save qualification remains pending."},
+    {"target":"F200","disposition":"affected","reason":"Shared acquisition rejects silo-only recipe outputs; controlled regression is covered and native catalogue/save qualification remains pending."},
+    {"target":"F110","disposition":"affected","reason":"Shared acquisition guard changes; target-specific emitted behavior remains unqualified."},
+    {"target":"F100","disposition":"affected","reason":"Shared acquisition guard changes; target-specific emitted behavior remains unqualified."},
+    {"target":"F017","disposition":"affected","reason":"Shared acquisition guard changes; target-specific emitted behavior remains unqualified."},
+    {"target":"F016","disposition":"affected","reason":"Shared acquisition guard changes; target-specific emitted behavior remains unqualified."},
+    {"target":"F015","disposition":"affected","reason":"Shared acquisition guard changes; target-specific emitted behavior remains unqualified."},
+    {"target":"F014","disposition":"affected","reason":"Shared acquisition guard changes; target-specific emitted behavior remains unqualified."},
+    {"target":"F013","disposition":"affected","reason":"Shared acquisition guard changes; target-specific emitted behavior remains unqualified."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"unknown","settings":"none","migration":"unknown","compatibility":"changed","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"A04: launch acquisition follow-up retained in the published 4.2.2 backlog"},
+    {"kind":"finding","value":"tests/compiler/researchability_planning.lua: ROCKET01 through ROCKET06"},
+    {"kind":"document","value":"docs/capabilities/science-integration.md"}
+  ]
+}

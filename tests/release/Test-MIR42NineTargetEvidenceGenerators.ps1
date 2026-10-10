@@ -66,6 +66,20 @@ function Assert-MIR42NineGeneratorHistoricalArchiveRequired {
       (([string]$failure.FullyQualifiedErrorId -match 'PathNotFound') -or
        ([string]$failure.CategoryInfo.Category -ceq 'ObjectNotFound'))
     Assert-MIR42NineGeneratorTest -Condition $missingExpectedPredecessor -Code "missing-archive-rejected-$Target"
+    # Historical engine metadata remains usable when an old mod archive has
+    # been retired. This does not authenticate any selected upgrade package.
+    foreach ($sourceVersion in @('4.2.1','4.2.2')) {
+      $metadata = Get-MIR42QualificationHistoricalAuthority -RepoRoot $fixtureRoot -Target $Target -SourceVersion $sourceVersion -PredecessorIdentityOnly
+      Assert-MIR42NineGeneratorTest -Condition ($null -eq $metadata.inventory -and $metadata.identity.source_version -ceq $sourceVersion) -Code "retired-archive-metadata-$sourceVersion-$Target"
+    }
+    $receipt = [pscustomobject]@{factorio_binary_version=([string]$fixture.record.engine.version+'.1');factorio_binary_sha256=[string]$fixture.record.engine.sha256}
+    $environment = Get-MIR42QualificationEnvironment -RepoRoot $fixtureRoot -Target $Target -Receipt $receipt
+    Assert-MIR42NineGeneratorTest -Condition ($environment.binary_sha256 -ceq $fixture.record.engine.sha256) -Code "retired-archive-engine-metadata-$Target"
+    $receipt.factorio_binary_sha256='0'*64
+    $rejected=$false
+    try { Get-MIR42QualificationEnvironment -RepoRoot $fixtureRoot -Target $Target -Receipt $receipt | Out-Null }
+    catch { $rejected=$_.Exception.Message -ceq "[mir42-qualification-environment-historical] $Target" }
+    Assert-MIR42NineGeneratorTest -Condition $rejected -Code "retired-archive-engine-hash-refused-$Target"
   } finally {
     $buildRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build'))
     if (-not [IO.Path]::GetFullPath($fixtureRoot).StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-nine-generator-fixture-containment]' }

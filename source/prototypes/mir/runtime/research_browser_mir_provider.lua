@@ -6,6 +6,7 @@ local settings_catalog = require("prototypes.mir.settings.catalog")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local maximum_level_control = require("prototypes.mir.runtime.maximum_level_control")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local browser_host = require("prototypes.mir.platform.factorio.browser_host")
 
 local M = {schema = 2, catalogue_limit = 30000}
 
@@ -14,6 +15,7 @@ local function bounded_string(value)
 end
 
 local function mod_data(name)
+  local prototypes = browser_host.prototype_collections()
   local prototype = prototypes.mod_data and prototypes.mod_data[name]
   return prototype and prototype.data or nil
 end
@@ -81,6 +83,7 @@ local function scalar_equal(left, right)
 end
 
 local function comparison(name)
+  local prototypes = browser_host.prototype_collections()
   local prototype = prototypes.mod_setting and prototypes.mod_setting[name]
   local setting = settings and settings.startup and settings.startup[name]
   local catalog_spec = settings_catalog.spec(name)
@@ -213,7 +216,7 @@ local MAXIMUM_LEVEL_FINALIZER_ADAPTER = "factorio-data-final-fixes-v1"
 
 local function prototype_is_runtime_infinite(technology_id, prototype_table)
   local technologies = prototype_table
-    or (prototypes and prototypes.technology)
+    or browser_host.prototype_collections().technology
   local technology = technologies and technologies[technology_id]
   local maximum = technology and technology.max_level or nil
   return maximum == "infinite"

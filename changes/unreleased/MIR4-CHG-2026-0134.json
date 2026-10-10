@@ -1,0 +1,95 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0134",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Prepare a governed native rocket-return and saved-research acceptance test.",
+  "details": [
+    "A shared package-excluded fixture declares exact base-only F200/F210 inputs and checks unmodified rocket construction, satellite return, lab consumption and a completed-save reload. Factory prerequisites, entities, non-space supplies and power are explicit setup.",
+    "The runner consumes a supplied current 4.2.2 candidate, uses the configured master library directly, verifies exact loaded selection, restores small controls and retains output inside the checkout. The small fixture is prepared once without copying dependency payloads.",
+    "Host observation-reader and actual Lua callback controls reject wrong inputs and corrupted saved facts. This is prepared acceptance tooling; no native execution or qualification is claimed by its implementation."
+  ],
+  "semantic_domains": [
+    "testing"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Prepared base-only native launch, lab-consumption and saved-state harness; execution and qualification pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Prepared base-only native launch, lab-consumption and saved-state harness; execution and qualification pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "Modern native launch fixture does not select this historical target."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "Modern native launch fixture does not select this historical target."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Modern native launch fixture does not select this historical target."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Modern native launch fixture does not select this historical target."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Modern native launch fixture does not select this historical target."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Modern native launch fixture does not select this historical target."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Modern native launch fixture does not select this historical target."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/maintainer/fixture-workflow.md"
+    },
+    {
+      "kind": "finding",
+      "value": "A04 modern launch-return native qualification pending"
+    }
+  ]
+}

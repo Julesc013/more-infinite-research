@@ -70,7 +70,49 @@ function Restore-MIRLibraryControls {
       (-not $row.exists -and ($bytes.Length -ne 0 -or $row.sha256 -ne ''))){throw '[mir-library-recovery-hash]'}
     $decoded[$name]=$bytes
   }
+  Restore-MIRLibraryOwnedArchiveVisibility -LibraryDirectory $LibraryDirectory -Journal $Journal
   foreach($name in @('mod-list.json','mod-settings.dat')){Write-MIRLibraryControl -Path (Join-Path $LibraryDirectory $name) -Bytes $decoded[$name] -Absent:(-not $Journal.controls[$name].exists)}
+}
+
+function Assert-MIRLibraryOwnedArchiveCheckout {
+  param([string]$LibraryDirectory)
+  $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..')).TrimEnd('\','/')
+  $library=[IO.Path]::GetFullPath($LibraryDirectory)
+  if(-not $library.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){
+    throw '[mir-library-owned-version-checkout] Legacy MIR version selection requires a checkout-local flat library.'
+  }
+  Assert-MIRLibraryPath $library
+}
+
+function Restore-MIRLibraryOwnedArchiveVisibility {
+  param([string]$LibraryDirectory,$Journal)
+  # Journals written before the legacy version selector contain only controls.
+  # Do not turn an absent member (or @($null)) into a phantom archive row.
+  if(-not $Journal.Contains('owned_archive_visibility')){return}
+  if($null-eq$Journal.owned_archive_visibility-or$Journal.owned_archive_visibility-isnot[array]){throw '[mir-library-owned-version-journal]'}
+  $planned=@($Journal.owned_archive_visibility)
+  if(-not $planned.Count){return}
+  Assert-MIRLibraryOwnedArchiveCheckout $LibraryDirectory
+  if($planned.Count-gt64){throw '[mir-library-owned-version-budget]'}
+  $validated=@(foreach($row in $planned){
+    if($row.original_name-cnotmatch '^(more-infinite-research|mir-fixture-[A-Za-z0-9._-]+)_[0-9]+[.][0-9]+[.][0-9]+[.]zip$'-or
+      $row.hidden_name-cne($row.original_name+'.mir-hidden-'+$Journal.archive_visibility_id)-or
+      $Journal.archive_visibility_id-cnotmatch '^[0-9a-f]{32}$'-or$row.sha256-cnotmatch '^[0-9A-F]{64}$'){
+      throw '[mir-library-owned-version-journal]'
+    }
+    $original=Join-Path $LibraryDirectory $row.original_name
+    $hidden=Join-Path $LibraryDirectory $row.hidden_name
+    $hasOriginal=Test-Path -LiteralPath $original -PathType Leaf
+    $hasHidden=Test-Path -LiteralPath $hidden -PathType Leaf
+    if($hasOriginal-eq$hasHidden){throw '[mir-library-owned-version-recovery-ambiguous]'}
+    $actual=if($hasOriginal){$original}else{$hidden}
+    Assert-MIRLibraryPath $actual
+    if((Get-MIRImmutableInputFileIdentity $actual)-cne$row.file_identity-or
+      (Get-MIRImmutableInputSha256 $actual)-cne$row.sha256){throw '[mir-library-owned-version-recovery-identity]'}
+    [pscustomobject]@{original=$original;hidden=$hidden;restore=$hasHidden}
+  })
+  if(@($planned|Group-Object original_name|Where-Object Count -GT 1).Count){throw '[mir-library-owned-version-journal]'}
+  foreach($row in $validated){if($row.restore){[IO.File]::Move($row.hidden,$row.original,$false)}}
 }
 
 function Get-MIRLibraryInventory {
@@ -137,7 +179,8 @@ function Start-MIRLibraryActivation {
     [Parameter(Mandatory)][string]$ProfilePath,
     [Parameter(Mandatory)][Collections.IDictionary]$ArchiveHashes,
     [ValidateSet('Defaults','File')][string]$SettingsMode='Defaults',
-    [string]$SettingsPath='',[string]$SettingsSha256=''
+    [string]$SettingsPath='',[string]$SettingsSha256='',
+    [string[]]$PrePinMIROwnedArchiveNames=@()
   )
   if(-not(Test-Path -LiteralPath $LibraryDirectory -PathType Container)){
     throw "[mir-library-missing] Supply the exact selected archive library: $LibraryDirectory"
@@ -191,6 +234,29 @@ function Start-MIRLibraryActivation {
     }
     if($ArchiveHashes.Count -ne @($selected|Where-Object {-not $_.builtin}).Count){throw '[mir-library-unused-hash]'}
     Assert-MIRLibraryDependencies -Selected $selected.ToArray()
+    $visibilityId=[guid]::NewGuid().ToString('N')
+    $visibility=@()
+    # An empty conditional result from a caller binds as null in PowerShell.
+    # Modern engines do not need the historical owned-name selector.
+    if($null-eq$PrePinMIROwnedArchiveNames){$PrePinMIROwnedArchiveNames=@()}
+    if($PrePinMIROwnedArchiveNames.Count){
+      Assert-MIRLibraryOwnedArchiveCheckout $library
+      if(@($PrePinMIROwnedArchiveNames|Sort-Object -Unique).Count-ne$PrePinMIROwnedArchiveNames.Count){throw '[mir-library-owned-version-names]'}
+      $base=@($selected|Where-Object {$_.builtin-and$_.name-ceq'base'})[0]
+      if(([version]$base.version)-ge[version]'0.17.0'){throw '[mir-library-owned-version-engine]'}
+      foreach($name in $PrePinMIROwnedArchiveNames){
+        if($name-cne'more-infinite-research'-and$name-cnotmatch '^mir-fixture-[A-Za-z0-9._-]+$'){throw '[mir-library-owned-version-dependency-forbidden]'}
+        $chosen=@($selected|Where-Object name -CEQ $name)
+        if($chosen.Count-ne1-or$chosen[0].builtin){throw '[mir-library-owned-version-selection]'}
+        foreach($other in @($inventory|Where-Object {$_.name-ceq$name-and$_.version-cne$chosen[0].version})){
+          $filename=[IO.Path]::GetFileName($other.path)
+          $hidden=$filename+'.mir-hidden-'+$visibilityId
+          if(Test-Path -LiteralPath (Join-Path $library $hidden)){throw '[mir-library-owned-version-destination]'}
+          $visibility+=@{original_name=$filename;hidden_name=$hidden;file_identity=$other.identity;sha256=Get-MIRImmutableInputSha256 $other.path}
+        }
+      }
+      if($visibility.Count-gt64){throw '[mir-library-owned-version-budget]'}
+    }
     $settings=$null
     if($SettingsMode -ceq 'File'){
       $settings=Read-MIRLibraryControl $SettingsPath
@@ -202,8 +268,10 @@ function Start-MIRLibraryActivation {
     })
     $activeBytes=[Text.UTF8Encoding]::new($false).GetBytes((@{mods=$activeRows}|ConvertTo-Json -Depth 8))
     $controls=@{};foreach($name in @('mod-list.json','mod-settings.dat')){$controls[$name]=Read-MIRLibraryControl (Join-Path $library $name)}
-    $journal=[ordered]@{kind='MIRDirectLibraryActivationV1';library=$library;owner_pid=$PID;owner_started_utc=(Get-Process -Id $PID).StartTime.ToUniversalTime().ToString('o');controls=$controls}
+    $journal=[ordered]@{kind='MIRDirectLibraryActivationV1';library=$library;owner_pid=$PID;owner_started_utc=(Get-Process -Id $PID).StartTime.ToUniversalTime().ToString('o');controls=$controls;archive_visibility_id=$visibilityId;owned_archive_visibility=$visibility}
     Write-MIRLibraryControl -Path $journalPath -Bytes ([Text.UTF8Encoding]::new($false).GetBytes(($journal|ConvertTo-Json -Depth 8)))
+    foreach($row in $visibility){[IO.File]::Move((Join-Path $library $row.original_name),(Join-Path $library $row.hidden_name),$false)}
+    if($visibility.Count){$inventory=@(Get-MIRLibraryInventory -LibraryDirectory $library -EngineDataDirectory $EngineDataDirectory)}
     Write-MIRLibraryControl -Path (Join-Path $library 'mod-list.json') -Bytes $activeBytes
     if($null -eq $settings){Write-MIRLibraryControl -Path (Join-Path $library 'mod-settings.dat') -Absent}else{Write-MIRLibraryControl -Path (Join-Path $library 'mod-settings.dat') -Bytes ([Convert]::FromBase64String($settings.bytes))}
     return [pscustomobject]@{library=$library;engine_data=(Resolve-Path -LiteralPath $EngineDataDirectory).Path;lock=$lock;handles=$handles;journal=$journal;selected=$selected.ToArray();inventory=$inventory;mod_list_bytes=$activeBytes;profile_sha256=$profile.sha256;closed=$false}
@@ -362,7 +430,8 @@ function Complete-MIRLibraryActivation {
   try{
     Restore-MIRLibraryControls -LibraryDirectory $Activation.library -Journal $Activation.journal
     [IO.File]::Delete((Join-Path $Activation.library '.mir-active-profile.json'))
-    return [ordered]@{status='restored-direct-library-controls';profile_sha256=$Activation.profile_sha256;dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0;selected=@($Activation.selected|Select-Object name,version,path,builtin,identity,sha256,bytes)}
+    $hiddenCount=if($Activation.journal.Contains('owned_archive_visibility')){@($Activation.journal.owned_archive_visibility).Count}else{0}
+    return [ordered]@{status='restored-direct-library-controls';profile_sha256=$Activation.profile_sha256;dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0;owned_archive_names_temporarily_hidden=$hiddenCount;selected=@($Activation.selected|Select-Object name,version,path,builtin,identity,sha256,bytes)}
   }finally{
     foreach($handle in $Activation.handles){$handle.Dispose()};$Activation.lock.Dispose();$Activation.closed=$true
   }

@@ -5,9 +5,9 @@ local factorio_mods = require("prototypes.mir.platform.factorio.mods")
 
 function M.run()
   require("prototypes.mir.streams.registry")
-  -- The browser host exists only on the modern settings-profile targets.
-  -- Keep the shared data stage from installing a dead shortcut on F100/F110.
-  if not target_line.feature_enabled("settings_profiles") then return end
+  -- Library availability is independent of optional settings-profile tools.
+  -- Historical targets keep this off until their host adapters are qualified.
+  if not target_line.feature_enabled("research_library") then return end
   -- Only an active provider establishes that its resource root is available.
   -- A saved/imported cosmetic preference cannot prove installed DLC files.
   -- Share the same stage-safe provider query as the technology icon builder.

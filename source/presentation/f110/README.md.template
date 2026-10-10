@@ -1,6 +1,6 @@
-# More Infinite Research 4.2.11001
+# More Infinite Research 4.2.11002
 
-More Infinite Research 4.2.11001 is a Factorio 1.1 reduced-target maintenance package from source 4.2.1.
+More Infinite Research 4.2.11002 is a Factorio 1.1 reduced-target maintenance package from source 4.2.2.
 
 It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.1 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.
 
@@ -54,11 +54,11 @@ Earlier fresh-load evidence remains bound to its original package and Factorio 1
 
 The exact published 1.9.3 archive remains a historical predecessor record. The maintenance upgrade starts from the published 4.2.0 package for this target; its evidence is separate from that older predecessor.
 
-Source `v4.2.0-stable` maps to target packages ending `00`; canonical `v4.2.1` maps to `01`. Preserve original saves and keep startup settings unchanged for the first load. Replace private or withdrawn ZIPs sharing the new version explicitly and verify the published checksum. Same-version replacement does not itself rerun version-gated migrations or reset earned research.
+Source `v4.2.0-stable` maps to target packages ending `00`; canonical `v4.2.1` maps to `01`, and `v4.2.2` maps to `02`. Preserve original saves and keep startup settings unchanged for the first load. Replace private or withdrawn ZIPs sharing the new version explicitly and verify the published checksum. Same-version replacement does not itself rerun version-gated migrations or reset earned research.
 
 ## Installation
 
-Place `more-infinite-research_4.2.11001.zip` in the Factorio 1.1 `mods` directory. Do not unpack it.
+Place `more-infinite-research_4.2.11002.zip` in the Factorio 1.1 `mods` directory. Do not unpack it.
 
 The modern Research Library is not included in this reduced package.
 

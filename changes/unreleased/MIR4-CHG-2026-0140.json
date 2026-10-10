@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0140",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Carry 4.2.2 identities through nine-target upgrades, evidence and publication inputs.",
+  "details": [
+    "The existing joined engine runner selects the matching published predecessor and forwards the source version to its upgrade worker. All nine prepared maintenance fixtures have separate 4.2.1 and 4.2.2 identities while retaining the existing continuity assertions.",
+    "Reconciliation, criterion, campaign, independent-rehash and technical-seal readers consume the selected maintenance version. Historical metadata no longer demands obsolete terminal archives for maintenance candidates; custody of the selected published predecessor remains mandatory.",
+    "Focused checks exercise preparation branches, version and scope refusals, direct-library activation and evidence contracts. These controls establish no native gameplay, upgrade, joined qualification, seal or publication.",
+    "Release-asset and publication-authorization readers bind 4.2.2 to the published 4.2.1 predecessor. Exact target versions, support records and main readback remain mandatory; older authorizations and inherited testing waivers are rejected."
+  ],
+  "semantic_domains": [
+    "testing",
+    "release"
+  ],
+  "audiences": [
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Joined maintenance input and evidence consumers; current native execution remains pending."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "omit",
+    "github": "include",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/maintainer/fixture-workflow.md"
+    },
+    {
+      "kind": "finding",
+      "value": "A14/X17 current upgrade execution and joined acceptance remain pending"
+    }
+  ]
+}

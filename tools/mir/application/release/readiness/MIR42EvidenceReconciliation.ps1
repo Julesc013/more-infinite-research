@@ -122,7 +122,8 @@ function Resolve-MIR42QualificationChildPath {
 
 function Get-MIR42QualificationHistoricalAuthority {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1')][string]$SourceVersion = '4.2.0')
+    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0',
+    [switch]$PredecessorIdentityOnly)
   $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
   $baselineIdentity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch 0
   if ($identity.PSObject.Properties.Name -notcontains 'target_record_path' -or
@@ -153,10 +154,13 @@ function Get-MIR42QualificationHistoricalAuthority {
     throw "[mir42-qualification-historical-predecessor-path] $Target"
   }
   $predecessorPath = Join-Path $RepoRoot ([string]$record.predecessor.archive)
-  $inventory = Get-MIR4ArchiveInventory -Path $predecessorPath
-  if ([string]$inventory.archive_sha256 -cne [string]$seal.archive_sha256 -or [int64]$inventory.bytes -ne [int64]$seal.bytes -or
+  $inventory = $null
+  if (-not $PredecessorIdentityOnly) {
+    $inventory = Get-MIR4ArchiveInventory -Path $predecessorPath
+    if ([string]$inventory.archive_sha256 -cne [string]$seal.archive_sha256 -or [int64]$inventory.bytes -ne [int64]$seal.bytes -or
       [string]$inventory.content_sha256 -cne [string]$seal.content_sha256 -or [int]$inventory.entry_count -ne [int]$seal.entries) {
-    throw "[mir42-qualification-historical-predecessor-binding] $Target"
+      throw "[mir42-qualification-historical-predecessor-binding] $Target"
+    }
   }
   return [pscustomobject][ordered]@{identity=$identity;record=$record;record_path=$recordPath;seal=$seal;seal_path=$sealPath;predecessor_path=$predecessorPath;inventory=$inventory}
 }
@@ -251,7 +255,7 @@ function Get-MIR42QualificationCandidateRows {
     }
     $historical = $null
     if ($target -in $script:MIR42QualificationHistoricalTargets) {
-      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $target -SourceVersion ([string]$versionContract.source_version)
+      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $target -SourceVersion ([string]$versionContract.source_version) -PredecessorIdentityOnly:([string]$versionContract.source_version -cne '4.2.0')
       foreach ($field in @('materializer','base_materializer_target','target_record','factorio_line','engine','predecessor','public_output_authorized','publication_authorized')) {
         if ($row.PSObject.Properties.Name -notcontains $field) { throw "[mir42-qualification-historical-target-row-field] $target/$field" }
       }
@@ -354,7 +358,9 @@ function Get-MIR42QualificationEnvironment {
     throw "[mir42-qualification-environment-identity] $Target"
   }
   if ($Target -in $script:MIR42QualificationHistoricalTargets) {
-    $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $Target
+    # Engine identity is independent of the bytes of an obsolete mod archive.
+    # The selected predecessor is authenticated separately by the caller.
+    $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $RepoRoot -Target $Target -PredecessorIdentityOnly
     if (-not (Test-MIR42QualificationHistoricalFileVersion -Target $Target -AuthorityVersion ([string]$historical.record.engine.version) -ObservedVersion $receiptVersion) -or
         [string]$receiptSha -cne [string]$historical.record.engine.sha256) {
       throw "[mir42-qualification-environment-historical] $Target"
@@ -500,7 +506,8 @@ function Get-MIR42QualificationUpgradeReceipt {
 function Assert-MIR42MaintenanceReconciliationScope {
   param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][object[]]$Candidates)
   if ($Scope -cne 'nine-target' -or $Candidates.Count -ne 9 -or
-      @($Candidates | Where-Object { [string]$_.identity.source_version -cne '4.2.1' }).Count -ne 0) {
+      @($Candidates | Where-Object { [string]$_.identity.source_version -cnotin @('4.2.1','4.2.2') }).Count -ne 0 -or
+      @($Candidates | ForEach-Object { [string]$_.identity.source_version } | Sort-Object -Unique).Count -ne 1) {
     throw '[mir42-reconciliation-maintenance-candidate-scope]'
   }
 }
@@ -537,10 +544,12 @@ function Invoke-MIR42EvidenceReconciliationShared {
   $maintenanceInputs = $null
   if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
     Assert-MIR42MaintenanceReconciliationScope -Scope $scope -Candidates $candidates
-    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    $maintenanceSourceVersion = [string]$candidates[0].identity.source_version
+    $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $maintenanceSourceVersion
+    $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-reconciliation-maintenance-release-readback]' }
     $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $maintenanceSourceVersion
   }
   $output = Assert-MIR42QualificationOutputRoot -RepoRoot $repo -OutputRoot $OutputRoot
 
@@ -598,8 +607,8 @@ function Invoke-MIR42EvidenceReconciliationShared {
   $result = [pscustomobject][ordered]@{
     schema = 1
     kind = if ($null -ne $maintenanceInputs) { 'MIR42NineTargetMaintenanceEvidenceReconciliationV1' } else { [string]$contract.kind }
-    status = if ($null -ne $maintenanceInputs) { 'MIR-4.2.1-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED' } else { [string]$contract.status }
-    reconciliation_scope = if ($null -ne $maintenanceInputs) { 'The nine supplied upgrade receipts and logs match the exact candidate ZIP bytes and authenticated published 4.2.0 predecessor archives; historical terminal records retain baseline provenance only. This command does not execute Factorio or establish release qualification.' } elseif ($scope -ceq 'four-target') { 'The four supplied upgrade receipts and logs match the exact candidate ZIP bytes and supplied predecessor archives; this command does not execute Factorio or establish governed predecessor custody.' } else { 'The nine supplied upgrade receipts and logs match the exact candidate ZIP bytes, modern predecessor archives, and historical terminal-seal predecessor chains; this command does not execute Factorio or establish release qualification.' }
+    status = if ($null -ne $maintenanceInputs) { "MIR-$maintenanceSourceVersion-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED" } else { [string]$contract.status }
+    reconciliation_scope = if ($null -ne $maintenanceInputs) { "The nine supplied upgrade receipts and logs match the exact candidate ZIP bytes and authenticated published $($maintenanceInputs.source_tag) predecessor archives; historical terminal records retain baseline provenance only. This command does not execute Factorio or establish release qualification." } elseif ($scope -ceq 'four-target') { 'The four supplied upgrade receipts and logs match the exact candidate ZIP bytes and supplied predecessor archives; this command does not execute Factorio or establish governed predecessor custody.' } else { 'The nine supplied upgrade receipts and logs match the exact candidate ZIP bytes, modern predecessor archives, and historical terminal-seal predecessor chains; this command does not execute Factorio or establish release qualification.' }
     source = [pscustomobject][ordered]@{
       commit = [string]$candidates[0].source.commit
       tree = [string]$candidates[0].source.tree
@@ -696,19 +705,20 @@ function Resolve-MIR42CriterionEvidenceOutputPath {
 }
 
 function Get-MIR42CriterionObservationContract {
-  param([Parameter(Mandatory)][string]$Criterion,[switch]$PublishedMaintenance)
+  param([Parameter(Mandatory)][string]$Criterion,[switch]$PublishedMaintenance,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   if ($PublishedMaintenance -and $Criterion -cnotin @('fresh-exact-loads','target-omissions')) {
     throw '[mir42-maintenance-criterion-input-scope]'
   }
   if ($Criterion -ceq 'fresh-exact-loads') {
     if ($PublishedMaintenance) {
-      return [pscustomobject]@{kind='MIR42NineTargetMaintenanceRealEngineEvidenceBinderV1';status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'}
+      return [pscustomobject]@{kind='MIR42NineTargetMaintenanceRealEngineEvidenceBinderV1';status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED"}
     }
     return [pscustomobject]@{kind='MIR42NineTargetRealEngineEvidenceBinderV1';status='MIR-4.2-NINE-TARGET-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'}
   }
   if ($Criterion -ceq 'target-omissions') {
     if ($PublishedMaintenance) {
-      return [pscustomobject]@{kind='MIR42NineTargetMaintenanceEvidenceReconciliationV1';status='MIR-4.2.1-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'}
+      return [pscustomobject]@{kind='MIR42NineTargetMaintenanceEvidenceReconciliationV1';status="MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"}
     }
     return [pscustomobject]@{kind='MIR42NineTargetEvidenceReconciliationV1';status='MIR-4.2-NINE-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'}
   }
@@ -760,9 +770,10 @@ function Get-MIR42CriterionEvidenceObservation {
     [Parameter(Mandatory)][string]$Criterion,
     [Parameter(Mandatory)]$Candidate,
     [Parameter(Mandatory)][string]$Code,
-    $PublishedMaintenanceInputs = $null
+    $PublishedMaintenanceInputs = $null,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1'
   )
-  $contract = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs)
+  $contract = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs) -SourceVersion $SourceVersion
   $record = Read-MIR42QualificationBootstrapRecord -Path $Path -Code $Code
   $candidateManifest = $Candidate.candidate_manifest
   $source = $Candidate.source
@@ -773,7 +784,7 @@ function Get-MIR42CriterionEvidenceObservation {
     [string]$record.source.package_source_sha256 -ceq [string]$source.package_source_sha256 -and
     [string]$record.candidate_manifest.sha256 -ceq [string]$candidateManifest.sha256 -and
     [string]$record.candidate_manifest.record_sha256 -ceq [string]$candidateManifest.record_sha256
-  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2') -and
+  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3') -and
     [string]$record.record_sha256 -ceq [string]$candidateManifest.record_sha256 -and
     (Get-MIR4Sha256File -Path $Path) -ceq [string]$candidateManifest.sha256
   if ($candidateConstruction) {
@@ -833,12 +844,15 @@ function New-MIR42NineTargetCriterionEvidence {
   $candidateRows = Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$candidateRows[0].scope -cne 'nine-target') { throw '[mir42-criterion-evidence-candidate-scope]' }
   $maintenanceInputs = $null
+  $maintenanceSourceVersion = '4.2.1'
   if ($maintenanceRequested) {
     Assert-MIR42MaintenanceReconciliationScope -Scope ([string]$candidateRows[0].scope) -Candidates $candidateRows
-    $metadataText = (& gh api 'repos/Julesc013/more-infinite-research/releases/tags/v4.2.0-stable' | Out-String)
+    $maintenanceSourceVersion = [string]$candidateRows[0].identity.source_version
+    $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $maintenanceSourceVersion
+    $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-criterion-maintenance-release-readback]' }
     $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $PublishedMaintenancePredecessorManifestPath `
-      -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String)
+      -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $maintenanceSourceVersion
   }
   $candidate = [pscustomobject][ordered]@{
     source = [pscustomobject][ordered]@{
@@ -866,7 +880,7 @@ function New-MIR42NineTargetCriterionEvidence {
   if ($ObservationPaths.Count -eq 0) { throw '[mir42-criterion-evidence-observations-required]' }
   $evidence = @(
     foreach ($path in $ObservationPaths) {
-      Get-MIR42CriterionEvidenceObservation -Path $path -Criterion $Criterion -Candidate $candidate -Code 'mir42-criterion-evidence-observation' -PublishedMaintenanceInputs $maintenanceInputs
+      Get-MIR42CriterionEvidenceObservation -Path $path -Criterion $Criterion -Candidate $candidate -Code 'mir42-criterion-evidence-observation' -PublishedMaintenanceInputs $maintenanceInputs -SourceVersion $maintenanceSourceVersion
     }
   )
   if (@($evidence.path | Sort-Object -Unique).Count -ne $evidence.Count -or [string]::IsNullOrWhiteSpace($Claim) -or [string]::IsNullOrWhiteSpace($KnownLimitations)) {
