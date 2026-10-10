@@ -956,8 +956,24 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   $repairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
   $progressionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
   $progressionPlannerIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
+  $browserIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0146'})
+  $browserSources=[ordered]@{
+    'source/prototypes/mir/platform/factorio/browser_host.lua'='f210|f200'
+    'source/adapters/runtime-capabilities/game-browser-host.lua'='f110|f100'
+  }
+  if($browserIntroduced.Count-ne2){throw '[mir4-package-presentation-v7-source-succession]'}
+  foreach($expected in $browserSources.GetEnumerator()){
+    $rows=@($browserIntroduced|Where-Object{[string]$_.source_path-ceq$expected.Key})
+    if($rows.Count-ne1-or[string]$rows[0].layer-cne'adapter'-or
+       [string]$rows[0].semantic_class-cne'target-compatibility-shim'-or
+       [string]$rows[0].output_path-cne'prototypes/mir/platform/factorio/browser_host.lua'-or
+       [string]$rows[0].transform-cne'copy-exact-bytes'-or
+       (@($rows[0].target_scope)-join'|')-cne$expected.Value){
+      throw '[mir4-package-presentation-v7-source-succession]'
+    }
+  }
   if([string]$Current.predecessor_record_sha256-cne[string]$Predecessor.record_sha256-or
-     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne16-or
+     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne18-or
      $scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or$progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or
      [string]$progressionIntroduced[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
      [string]$progressionIntroduced[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
