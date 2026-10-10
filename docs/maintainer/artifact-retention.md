@@ -18,6 +18,8 @@ source_of_truth_for:
 
 Local storage retains enough exact material to replay or diagnose a result without turning every worktree, engine run, or staging directory into a second archive. This page is the current retention policy. It does not widen a cleanup command's implementation scope or grant deletion, candidate, release, or publication authority.
 
+The development-contract command-inventory drift check uses a tiny text fixture under `build/tmp` and the canonical inventory writer. It verifies the baseline, changes one source input and requires the stale-inventory rejection, then removes the verified fixture root. It creates no Git clone or worktree and needs no engine, dependency archive or package payload. Full package-construction checks retain their separate evidence requirements.
+
 ## Storage Classes
 
 | Location | Class | Retention |
