@@ -121,7 +121,14 @@ local function verify_complete_state(force, expected)
   for _, technology in ipairs(force.research_queue or {}) do queue[#queue + 1] = technology.name end
   if not same_names(queue, expected.queue) then fail("research queue changed") end
   if not equal_state(observed.effects, expected.effects) then fail("earned force effect changed") end
-  if not equal_state(observed.settings, expected.settings) then fail("startup/imported settings changed") end
+  for name, value in pairs(expected.settings) do
+    if not equal_state(observed.settings[name], value) then
+      fail("startup/imported settings changed: " .. name .. "; expected=" .. tostring(value) .. "; observed=" .. tostring(observed.settings[name]))
+    end
+  end
+  for name in pairs(observed.settings) do
+    if expected.settings[name] == nil then fail("startup/imported settings changed: unexpected " .. name) end
+  end
   if observed.current_research ~= expected.current_research or not equal_state(observed.research_progress, expected.research_progress) then fail("active research progress changed") end
   for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do
     if not force.technologies[name] then fail("reported technology absent: " .. name) end
@@ -187,6 +194,7 @@ script.on_configuration_changed(function()
   if complete_catalogue_upgrade then
     if not state.complete_state then fail("complete source state missing") end
     if not state.complete_forces then fail("complete source forces missing") end
+    export_state("candidate-before-check")
     verify_all_forces(state.complete_forces)
     export_state("upgrade")
   end
