@@ -98,6 +98,23 @@ local function complete_state(force)
   state.research_progress = force.research_progress
   return state
 end
+local added_422_setting_defaults = {}
+if to_version == "4.2.21002" then
+  -- Explicit settings added by the retained 4.2.2 material declarations.
+  -- Existing values (including imports) still compare exactly below.
+  local families = {"glycerol", "hydrochloric_acid", "hydrofluoric_acid", "nitric_acid",
+    "py_acid_gas", "py_earth_flower_sample", "py_earth_generic_sample", "py_earth_jute_sample",
+    "py_earth_palmtree_sample", "py_earth_potato_sample", "py_earth_shroom_sample",
+    "py_earth_sunflower_sample", "py_earth_tropical_tree_sample", "py_earth_venus_fly_sample",
+    "py_glycerol", "py_log", "py_treated_wood", "py_wood"}
+  local defaults = {enable=true, ["effect-per-level"]=2, ["max-level"]=0,
+    ["research-time"]=30, ["cost-base"]=200, ["cost-growth"]=2, ["cost-linear-increment"]=0}
+  for _, family in ipairs(families) do
+    for suffix, value in pairs(defaults) do
+      added_422_setting_defaults["ips-" .. suffix .. "-research_material_" .. family] = value
+    end
+  end
+end
 local function verify_complete_state(force, expected)
   local observed = complete_state(force)
   local technology_count, recipe_count = 0, 0
@@ -126,8 +143,10 @@ local function verify_complete_state(force, expected)
       fail("startup/imported settings changed: " .. name .. "; expected=" .. tostring(value) .. "; observed=" .. tostring(observed.settings[name]))
     end
   end
-  for name in pairs(observed.settings) do
-    if expected.settings[name] == nil then fail("startup/imported settings changed: unexpected " .. name) end
+  for name, value in pairs(observed.settings) do
+    if expected.settings[name] == nil and not equal_state(added_422_setting_defaults[name], value) then
+      fail("startup/imported settings changed: unexpected " .. name)
+    end
   end
   if observed.current_research ~= expected.current_research or not equal_state(observed.research_progress, expected.research_progress) then fail("active research progress changed") end
   for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do

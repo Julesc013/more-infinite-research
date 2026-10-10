@@ -81,6 +81,21 @@ for _, case in ipairs(mutations) do
 end
 local f=fixture("4.2.21001","4.2.21002")
 check(table.concat(f.logs,"\n"):find("external snapshot mir-upgrade-full-state-source.json=source",1,true)~=nil,"independent source output required")
+local added=fixture("4.2.21000","4.2.21002")
+added.env.settings.startup["ips-enable-research_material_glycerol"]={value=true}
+added.env.settings.startup["ips-cost-linear-increment-research_material_py_wood"]={value=0}
+local allowed,reason=pcall(added.callbacks.upgrade)
+check(allowed,"only the exact adopted new setting defaults may appear: "..tostring(reason))
+for _, change in ipairs({
+  {"ips-enable-research_material_glycerol",false},
+  {"ips-cost-base-research_material_py_wood",201},
+  {"ips-enable-research_material_unreviewed",true}
+}) do
+  local control=fixture("4.2.21000","4.2.21002")
+  control.env.settings.startup[change[1]]={value=change[2]}
+  local accepted,why=pcall(control.callbacks.upgrade)
+  check(not accepted and tostring(why):find("startup/imported settings changed",1,true),"unreviewed new settings must fail")
+end
 f.force.technologies["recipe-prod-research_ice-1"]=nil
 f.env.storage.mir_upgrade_fixture.complete_forces.player.technologies["recipe-prod-research_ice-1"]=nil
 f.env.storage.mir_upgrade_fixture.complete_state.technologies["recipe-prod-research_ice-1"]=nil

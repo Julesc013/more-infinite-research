@@ -188,7 +188,7 @@ function Test-MaintenanceFixtureCallSites {
     Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$FixtureName)) -Destination $stagedFixture -Recurse
     . ([scriptblock]::Create($modern[0].Extent.Text))
     $read=Get-Content -LiteralPath (Join-Path $stagedFixture 'info.json') -Raw|ConvertFrom-Json
-    $expectedSpaceAgeFixture=if($patch-eq2){'0.1.9'}else{'0.1.4'}
+    $expectedSpaceAgeFixture=if($patch-eq2){'0.1.11'}else{'0.1.4'}
     Assert-LibraryTest ($read.version-ceq$expectedSpaceAgeFixture-and$read.dependencies-ccontains"more-infinite-research >= $FromVersion") "$patch Space Age caller isolates full-state fixture identity"
     $beforeIdentity=Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json')
     Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target f210 -SourceVersion $SourceVersion -SpaceAge
@@ -201,7 +201,7 @@ function Test-MaintenanceFixtureCallSites {
   Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$FixtureName)) -Destination $stagedFixture -Recurse
   . ([scriptblock]::Create($modern[0].Extent.Text))
   $read=Get-Content -LiteralPath (Join-Path $stagedFixture 'info.json') -Raw|ConvertFrom-Json
-  Assert-LibraryTest ($read.version-ceq'0.1.10'-and$read.dependencies-ccontains"more-infinite-research >= $FromVersion") 'direct CCC00 Space Age caller has a distinct full-state fixture identity'
+  Assert-LibraryTest ($read.version-ceq'0.1.12'-and$read.dependencies-ccontains"more-infinite-research >= $FromVersion") 'direct CCC00 Space Age caller has a distinct full-state fixture identity'
   $beforeIdentity=Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json')
   Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target f210 -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceAge
   Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json'))-ceq$beforeIdentity) 'direct CCC00 Space Age fixture identity is idempotent'

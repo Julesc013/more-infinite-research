@@ -27,7 +27,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if(-not$fromMatch.Success-or([int]$fromMatch.Groups['patch'].Value-ge$sourcePatch)){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromPatch=[int]$fromMatch.Groups['patch'].Value
   $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
-  $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.10'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.9'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.12'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.11'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
