@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0148",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Register optional Library events only when the engine exposes them.",
+  "details": [
+    "The shared Library no longer passes absent locale-change or research-queue-move event IDs to the engine registration API. Both handlers remain active on supported modern engines.",
+    "The actual registration function is exercised with the 1.0, 1.1 and modern event sets. Tests reject unsupported IDs, retain supported research, translation and player handlers, and reproduce the predecessor failure.",
+    "Historical Library remains disabled. Event guards do not supply older-engine locale identity or locale invalidation, and do not qualify historical GUI, save or multiplayer behavior."
+  ],
+  "semantic_domains": [
+    "presentation",
+    "runtime",
+    "target-portability"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared event registrations now require the supplied engine event; modern handlers retained and native acceptance pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared event registrations now require the supplied engine event; modern handlers retained and native acceptance pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Inactive shared event registration is adapted without enabling historical Library; remaining host and native acceptance are open."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Inactive shared event registration is adapted without enabling historical Library; remaining host and native acceptance are open."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Inactive shared event registration is adapted without enabling historical Library; remaining host and native acceptance are open."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Inactive shared event registration is adapted without enabling historical Library; remaining host and native acceptance are open."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Inactive shared event registration is adapted without enabling historical Library; remaining host and native acceptance are open."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Inactive shared event registration is adapted without enabling historical Library; remaining host and native acceptance are open."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Inactive shared event registration is adapted without enabling historical Library; remaining host and native acceptance are open."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "A16/A21, UI-01-UI-04 and PLAT-UI-01: separate the Library capability from settings-profile tools; historical host portability remains open."
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}
