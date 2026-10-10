@@ -115,6 +115,25 @@ if to_version == "4.2.21002" then
     end
   end
 end
+local function restored_promethium_frontier(name, before, after)
+  if from_version ~= "4.2.21001" or to_version ~= "4.2.21002" then return false end
+  if name ~= "research-speed-7" and name ~= "recipe-prod-research_cargo_bay_unloading_distance-1"
+    and name ~= "recipe-prod-research_cargo_landing_pad_count-1" then return false end
+  local expected = scalar_copy(before)
+  for _, prerequisite in ipairs(expected.prerequisites) do
+    if prerequisite == "promethium-science-pack" then return false end
+  end
+  for _, ingredient in ipairs(expected.ingredients) do
+    if ingredient.name == "promethium-science-pack" then return false end
+  end
+  expected.prerequisites[#expected.prerequisites + 1] = "promethium-science-pack"
+  table.sort(expected.prerequisites)
+  expected.ingredients[#expected.ingredients + 1] = {name="promethium-science-pack",amount=1}
+  table.sort(expected.ingredients, function(a,b) return a.name < b.name end)
+  -- These exact three corrections restore the published 4.2.0 science policy.
+  -- Every other definition field and all earned state still compare exactly.
+  return equal_state(expected, after)
+end
 local function verify_complete_state(force, expected)
   local observed = complete_state(force)
   local technology_count, recipe_count = 0, 0
@@ -126,7 +145,10 @@ local function verify_complete_state(force, expected)
     end
     if math.abs(after.saved_progress - before.saved_progress) > epsilon then fail("saved research progress changed: " .. name) end
     if after.visible_when_disabled ~= before.visible_when_disabled then fail("technology visibility changed: " .. name) end
-    if not equal_state(observed.technologies[name].prototype, before.prototype) then fail("technology definition changed: " .. name) end
+    if not equal_state(observed.technologies[name].prototype, before.prototype)
+      and not restored_promethium_frontier(name, before.prototype, observed.technologies[name].prototype) then
+      fail("technology definition changed: " .. name)
+    end
     technology_count = technology_count + 1
   end
   for name, before in pairs(expected.bonuses) do

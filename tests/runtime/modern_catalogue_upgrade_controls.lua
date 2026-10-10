@@ -86,6 +86,31 @@ added.env.settings.startup["ips-enable-research_material_glycerol"]={value=true}
 added.env.settings.startup["ips-cost-linear-increment-research_material_py_wood"]={value=0}
 local allowed,reason=pcall(added.callbacks.upgrade)
 check(allowed,"only the exact adopted new setting defaults may appear: "..tostring(reason))
+local function add_promethium(technology)
+  technology.prototype.prerequisites["promethium-science-pack"]={}
+  technology.research_unit_ingredients[#technology.research_unit_ingredients+1]={name="promethium-science-pack",amount=1}
+end
+local repair=fixture("4.2.21001","4.2.21002")
+add_promethium(repair.force.technologies["recipe-prod-research_cargo_bay_unloading_distance-1"])
+local repaired,why=pcall(repair.callbacks.upgrade)
+check(repaired,"exact published science restoration must be accepted: "..tostring(why))
+repair.reload();repair.callbacks.tick()
+check(repair.env.storage.mir_upgrade_fixture.upgrade_complete,"exact science repair survives reload")
+for _, change in ipairs({
+  function(control) add_promethium(control.force.technologies["weapon-shooting-speed-7"]) end,
+  function(control)
+    local technology=control.force.technologies["recipe-prod-research_cargo_bay_unloading_distance-1"]
+    add_promethium(technology);technology.research_unit_ingredients[2].amount=2
+  end,
+  function(control)
+    local technology=control.force.technologies["recipe-prod-research_cargo_bay_unloading_distance-1"]
+    add_promethium(technology);technology.prototype.effects[1].modifier=3
+  end
+}) do
+  local control=fixture("4.2.21001","4.2.21002");change(control)
+  local accepted,reason=pcall(control.callbacks.upgrade)
+  check(not accepted and tostring(reason):find("technology definition changed",1,true),"science repair cannot conceal other definition changes")
+end
 for _, change in ipairs({
   {"ips-enable-research_material_glycerol",false},
   {"ips-cost-base-research_material_py_wood",201},
