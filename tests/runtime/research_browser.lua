@@ -301,7 +301,7 @@ script.on_nth_tick(1,function()
   check(force.add_research("mir-browser-progress"),"initial queue")
   force.research_progress=0.375
   local before=snapshot(force)
-  local catalogue=browser_catalogue.snapshot(force)
+  local catalogue=browser_catalogue.snapshot(force,browser_platform)
   local full_enrichment=browser_provider.snapshot(force)
   local list_enrichment=browser_provider.list_snapshot(force)
   check(browser_core.normalize_enrichment(list_enrichment)~=nil and next(list_enrichment.details)==nil,
@@ -339,18 +339,18 @@ script.on_nth_tick(1,function()
     prototype=cache_prototype,prerequisites={}}
   local cache_force={valid=true,index=937,name="catalogue-cache-force",
     technologies={[cache_technology.name]=cache_technology},research_queue={}}
-  local cache_first=browser_catalogue.snapshot(cache_force)
+  local cache_first=browser_catalogue.snapshot(cache_force,browser_platform)
   check(cache_first.rows[1].available and not cache_first.rows[1].researched
     and not cache_first.rows[1].queued and static_reads==2,
     "catalogue cache builds prototype facts once")
   cache_technology.researched=true
   cache_force.research_queue={cache_technology}
-  local cache_second=browser_catalogue.snapshot(cache_force)
+  local cache_second=browser_catalogue.snapshot(cache_force,browser_platform)
   check(not cache_second.rows[1].available and cache_second.rows[1].researched
     and cache_second.rows[1].queued and static_reads==2,
     "catalogue cache retains static facts while live force state changes")
   cache_force.name="catalogue-cache-reused-index"
-  local cache_reused=browser_catalogue.snapshot(cache_force)
+  local cache_reused=browser_catalogue.snapshot(cache_force,browser_platform)
   check(cache_reused.rows[1].researched and static_reads==4,
     "catalogue cache rebuilds when a force index is reused")
   local shortcut=prototypes.shortcut["mir-research-browser"]
@@ -552,7 +552,7 @@ script.on_nth_tick(1,function()
   local queued_before=browser_core.query(catalogue,{mode=1,status=4,page=1,search="mir-browser-test-finite"})
   check(#queued_before.rows==0,"initial snapshot excludes unqueued research")
   check(force.add_research("mir-browser-test-finite"),"queue mutation")
-  local refreshed_catalogue=browser_catalogue.snapshot(force)
+  local refreshed_catalogue=browser_catalogue.snapshot(force,browser_platform)
   local queued_after=browser_core.query(refreshed_catalogue,{mode=1,status=4,page=1,search="mir-browser-test-finite"})
   check(#queued_after.rows==1 and queued_after.rows[1].queued,"second snapshot exposes queued research")
   check(force.add_research("mir-browser-queue-later"),"second pending research")

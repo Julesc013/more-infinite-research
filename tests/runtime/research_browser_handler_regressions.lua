@@ -9,7 +9,7 @@ local function expect(check, condition, message)
   if not condition then error(message) end
 end
 
-local function make_host_factory(host_source, catalogue_source)
+local function make_host_factory(host_source, catalogue_source, platform_source)
   local function make_environment(options)
     local events, buckets = {}, {}
     local metrics = {render_calls = 0, gameplay_mutations = 0, destroy_calls = 0, shortcut_calls = 0}
@@ -27,9 +27,11 @@ local function make_host_factory(host_source, catalogue_source)
     for _, name in ipairs(event_names) do defines_events[name] = name end
     local catalogue_module = {}
     if catalogue_source then
-      catalogue_module = assert(load(catalogue_source, "actual_browser_catalogue_fixture", "t", {
+      local actual = assert(load(catalogue_source, "actual_browser_catalogue_fixture", "t", {
         type = type, pairs = pairs, ipairs = ipairs, table = table, math = math, string = string
       }))()
+      local platform = assert(load(platform_source, "actual_catalogue_host_fixture", "t", {}))()
+      catalogue_module = setmetatable({snapshot = function(force) return actual.snapshot(force, platform) end}, {__index = actual})
     end
     local modules = {
       ["prototypes.mir.runtime.research_browser_core"] = {
@@ -78,6 +80,10 @@ local function make_host_factory(host_source, catalogue_source)
       get_player = function(index) return player and index == player.index and player or nil end,
       connected_players = {}, players = {}, forces = {}
     }
+    if options and options.platform_source then
+      modules["prototypes.mir.platform.factorio.browser_host"] = assert(load(
+        options.platform_source, "actual_recipe_navigation_host", "t", env))()
+    end
     setmetatable(env, {__index = function(_, key)
       error("unexpected host global access: " .. tostring(key))
     end})
@@ -147,6 +153,7 @@ local function make_host_factory(host_source, catalogue_source)
     set_player(fixture_player)
     return {
       on_gui_click = events.on_gui_click,
+      on_gui_selection_state_changed = events.on_gui_selection_state_changed,
       on_gui_closed = events.on_gui_closed,
       on_gui_location_changed = events.on_gui_location_changed,
       player = fixture_player,
@@ -160,6 +167,7 @@ local function make_host_factory(host_source, catalogue_source)
       metrics = metrics,
       host = host,
       catalogue = catalogue_module,
+      environment = env,
       state = buckets.research_browser,
       peer_view = peer_view
     }
@@ -204,14 +212,43 @@ local function invoke_and_assert_inert(fixture, element_name, check)
     element_name .. " click cannot mutate gameplay")
 end
 
-local function check_capability_stages(sources, check)
+local function check_capability_stages(sources, check, catalogue_source)
   expect(check, type(sources) == "table", "Library capability controls receive actual stage and coordinator source")
-  for family, source in pairs(sources.host_adapters) do
+  for _, family in ipairs{"game", "modern"} do
+    local source = sources.host_adapters[family]
     local reads, writes = 0, {}
     local env = setmetatable({}, {__index = function(_, key)
       error("Library adapter read " .. key .. " before its runtime callback")
     end})
     local adapter = assert(load(source, "actual-library-host-" .. family, "t", env))()
+    local catalogue = assert(load(catalogue_source, "actual-host-catalogue", "t", {
+      type = type, pairs = pairs, ipairs = ipairs, table = table, math = math, string = string
+    }))()
+    local trigger, trigger_reads = nil, 0
+    local prototype = setmetatable({hidden = false, max_level = 1, order = ""}, {__index = function(_, key)
+      if key == "research_trigger" and family == "modern" then trigger_reads = trigger_reads + 1; return trigger end
+      error("unsupported technology property: " .. key)
+    end})
+    local technology = {name = "host-field-probe", enabled = true, researched = false,
+      prototype = prototype, prerequisites = {}}
+    local force = {valid = true, index = 903, name = "host-field-probe",
+      research_queue = {}, technologies = {[technology.name] = technology}}
+    expect(check, catalogue.snapshot(force, adapter).rows[1].available,
+      family .. " catalogues ordinary research through only supported prototype fields")
+    trigger = {type = "craft-item", item = "iron-plate", count = 1}
+    expect(check, catalogue.snapshot(force, adapter).rows[1].available == (family ~= "modern"),
+      family .. " honors the engine's trigger-research capability")
+    expect(check, family == "modern" and trigger_reads == 2 or family ~= "modern" and trigger_reads == 0,
+      family .. " never probes a missing historical research_trigger field")
+    prototype.hidden = true
+    expect(check, not catalogue.snapshot(force, adapter).rows[1].available,
+      family .. " keeps hidden research out of the available catalogue")
+    prototype.hidden = false; trigger = nil
+    technology.prerequisites.locked = {name = "locked", researched = false, prerequisites = {}}
+    expect(check, not catalogue.snapshot(force, adapter).rows[1].available,
+      family .. " retains prerequisite requirements")
+    local absent, reason = catalogue.snapshot(force)
+    expect(check, absent == nil and reason == "missing-host", "missing host does not guess an engine API")
     local function write_file(path, contents, append, player_index)
       writes[#writes + 1] = {path, contents, append, player_index}
       return "controlled-result"
@@ -319,11 +356,45 @@ end
 -- host_source_string is trusted project source supplied by the test harness.
 -- The isolated load environment exists only inside this regression fixture.
 return function(host_source_string, check, catalogue_source_string, capability_sources)
-  check_capability_stages(capability_sources, check)
+  check_capability_stages(capability_sources, check, catalogue_source_string)
   expect(check, type(host_source_string) == "string" and #host_source_string > 0,
     "handler regression receives trusted browser host source")
   expect(check, type(check) == "function", "handler regression receives an assertion function")
-  local host_factory = make_host_factory(host_source_string, catalogue_source_string)
+  local host_factory = make_host_factory(host_source_string, catalogue_source_string, capability_sources.host_adapters.modern)
+  for _, family in ipairs{"game", "modern"} do
+    local fixture = fixture_from(host_factory, {platform_source = capability_sources.host_adapters[family]}, check)
+    local calls, recipe = {}, {name = "selected-recipe"}
+    fixture.environment.prototypes.recipe = {[recipe.name] = recipe}
+    fixture.environment.game.recipe_prototypes = {[recipe.name] = recipe}
+    fixture.state.players[1].recipe_ids = {recipe.name, "missing-recipe"}
+    if family == "modern" then
+      fixture.player.open_factoriopedia_gui = function(value) calls[#calls + 1] = value end
+    end
+    setmetatable(fixture.player, {__index = function(_, key)
+      error("Unsupported player property: " .. key)
+    end})
+    for _, kind in ipairs{"list-box", "drop-down"} do
+      local element = {valid = true, type = kind, selected_index = 1,
+        tags = {mir_browser = "recipe-list"}, parent = fixture.root}
+      fixture.on_gui_selection_state_changed{player_index = 1, element = element}
+      expect(check, fixture.root.valid and fixture.metrics.destroy_calls == 0,
+        family .. " recipe navigation preserves the Library root in " .. kind)
+      element.selected_index = 2
+      fixture.on_gui_selection_state_changed{player_index = 1, element = element}
+      element.selected_index = 3
+      fixture.on_gui_selection_state_changed{player_index = 1, element = element}
+      element.selected_index, element.parent = 1, nil
+      fixture.on_gui_selection_state_changed{player_index = 1, element = element}
+    end
+    expect(check, #calls == (family == "modern" and 2 or 0),
+      family .. " opens only available, owned recipe selections through its supported API")
+    if family == "modern" then
+      expect(check, calls[1] == recipe and calls[2] == recipe,
+        "modern list and compact dropdown open the selected current recipe prototype")
+    end
+    expect(check, fixture.metrics.gameplay_mutations == 0 and fixture.state.players[2] == fixture.peer_view,
+      family .. " recipe navigation preserves force research and the other player's view")
+  end
   local fixture = fixture_from(host_factory, nil, check)
   expect(check, #fixture.host.requires_features == 1
     and fixture.host.requires_features[1] == "research_library",
