@@ -32,7 +32,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
     $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
   }
   if($Target-ceq'f200'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake){
-    $fixtureVersion=if($direct420To422){'0.1.22'}else{'0.1.23'}
+    $fixtureVersion=if($direct420To422){'0.1.24'}else{'0.1.25'}
   }
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
@@ -68,7 +68,7 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
     '["base-default"]={technology="mining-productivity-4",level=5}')
   $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "4.2.20002" then')
   $control=$control.Replace('complete Space Age state retained','complete research state retained')
-  $control=$control.Replace('mir-4121000-upgraded','mir-4120000-upgraded')
+  $control=$control.Replace('mir-4121000-upgraded','mir-4220002-upgraded')
   [IO.File]::WriteAllText((Join-Path $FixtureDirectory 'control.lua'),$control,[Text.UTF8Encoding]::new($false))
 }
 
