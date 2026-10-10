@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "source_version": "4.2.2",
+  "target": "f200",
+  "engine_version": "2.0.77",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "runtime_api_sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+  "dependencies": [
+    {"name": "secretas", "version": "1.0.33", "sha256": "C5C8F83433B56D80682819BDDBAF1D85F56433A834AE4FB0F1F28371F8C3A290"},
+    {"name": "pretty-frozeta", "version": "0.1.0", "sha256": "AB5A168C606544E85798E6CAD6477E1154C2AD6509C402234D1AFC76F1D05195"}
+  ],
+  "settings_mode": "Defaults",
+  "timeout_seconds": 120,
+  "scope": "Focused F200 Secretas 1.0.33 finite-8 to MIR infinite-9 reward, queue, fractional progress and two reloads. This does not qualify the incompatible F210 Secretas 1.0.37 archive or the reporter save."
+}
