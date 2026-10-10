@@ -1,4 +1,35 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.2.21002
+
+  Bugfixes:
+
+    - Honor declared surface-property defaults when admitting an acquired laboratory,
+      while preserving explicit surface overrides.
+    - Continue eligible base research after a finite numeric upstream level range from its
+      actual terminal technology, preserving the finite chain and true-infinite ownership checks.
+    - Refine recipe-productivity and science-route admission from completed recipe outputs,
+      compatible fluid handling and valid acquisition routes.
+    - Keep unsafe return and recycling paths from admitting unreachable research while retaining
+      verified native spoilage acquisition.
+    - Adapt the Research Library to the supported Factorio 2.1 catalogue, recipe, statistics
+      and event APIs.
+
+  Changes:
+
+    - Keep the Research Library available independently of optional settings-profile import tools.
+    - Show a force-wide science-production summary when this engine supplies force-wide statistics.
+
+  Compatibility:
+
+    - Route admission remains conditional on the actual enabled mod set and its completed data stage.
+    - Historical Research Library hosts remain disabled; this package does not enable a backport.
+
+  Info:
+
+    - Use 4.2.21002 for source 4.2.2. The final 02 identifies the source patch, not a packaging retry.
+    - Preserve original saves before upgrading from the published 4.2.1 package for the same Factorio target.
+
+---------------------------------------------------------------------------------------------------
 Version: 4.2.21001
 
   Bugfixes:

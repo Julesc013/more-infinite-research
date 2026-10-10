@@ -388,7 +388,7 @@ Ages are measured against the newest governed review date, 2026-10-10, so checko
 | docs/releases/mir4-4.0-whole-platform-programme.md | current | 2026-08-23 | 48 | current-window |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | archived | 2026-08-17 | 54 | current-window |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | current | 2026-09-11 | 29 | current-window |
-| docs/releases/mir4-integration-and-delivery-plan.md | current | 2026-10-09 | 1 | current-window |
+| docs/releases/mir4-integration-and-delivery-plan.md | current | 2026-10-10 | 0 | current-window |
 | docs/releases/mir4-post-4.0-roadmap.md | current | 2026-09-07 | 33 | current-window |
 | docs/releases/mir42-compatibility-playtest-plan.md | current | 2026-09-27 | 13 | current-window |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | current | 2026-10-10 | 0 | current-window |
