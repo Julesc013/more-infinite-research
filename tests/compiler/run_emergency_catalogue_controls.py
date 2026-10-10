@@ -27,6 +27,9 @@ CASES = {
     "secretas-biolab-f210": (
         "f210", Path("tests/compiler/secretas_biolab_researchability.lua"),
     ),
+    "modern-upgrade-oracle-f210": (
+        "f210", Path("tests/runtime/modern_catalogue_upgrade_controls.lua"),
+    ),
 }
 PASS = re.compile(r"^MIR-[A-Z0-9-]+-PASS\s+(\d+)\s*$")
 MAX_OUTPUT_LINES = 12
@@ -87,6 +90,7 @@ def write_receipt(path, receipt):
 def install_module_tracker(runtime, target):
     """Record source files resolved by the adapter-then-shared package path."""
     runtime.globals().SOURCE_ROOT = (REPO / "source").as_posix()
+    runtime.globals().REPO_ROOT = REPO.as_posix()
     runtime.execute(
         'package.path = SOURCE_ROOT .. "/adapters/%s/?.lua;" .. '
         'SOURCE_ROOT .. "/?.lua;" .. package.path' % target
@@ -144,6 +148,9 @@ def project_inputs(runtime, test_path):
         relative_to_repo(Path(__file__)): sha256(Path(__file__)),
         relative_to_repo(test_path): sha256(test_path),
     }
+    if test_path.name == "modern_catalogue_upgrade_controls.lua":
+        fixture = REPO / "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
+        hashes[relative_to_repo(fixture)] = sha256(fixture)
     for module in modules:
         source = (REPO / "source" / module).resolve()
         if not source.is_file():
@@ -208,6 +215,7 @@ def main(argv):
         "finite-f210",
         "finite-f200",
         "secretas-biolab-f210",
+        "modern-upgrade-oracle-f210",
     ]
     receipt = {
         "contract": "controlled source checks only; not native Factorio, package, or save evidence",

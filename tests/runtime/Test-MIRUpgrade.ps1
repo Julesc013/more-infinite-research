@@ -97,6 +97,10 @@ function Assert-MIR421CurrentUpgradeInputMode {
     Assert-MIR421K2UpgradeTransition -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake $SpaceIsFake -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SourceVersion $SourceVersion
   } elseif ($SpaceIsFake) {
     $null=Get-MIR421SpaceFakeUpgradeDescriptor -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SourceVersion $SourceVersion
+  } elseif ($Archetype-ceq'space-age-native-owner') {
+    if($Target-cne'f210'-or$SourceVersion-cne'4.2.2'-or$FixtureName-cne'assert-upgrade-4-0-21000-to-4-1-21000'){
+      throw '[mir421-current-upgrade-scenario]'
+    }
   } elseif ($FixtureName -cne "assert-upgrade-4-0-${code}00-to-4-1-${code}00" -or $Archetype -cnotin @('','base-default')) {
     throw '[mir421-current-upgrade-scenario]'
   }
@@ -496,8 +500,8 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   if ($targetCode -cin @('210','200','110','100') -and
       (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
        ($FromVersion -ceq "4.2.${targetCode}01" -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
-      ($SpaceIsFake -or $Archetype -cin @('','base-default'))) {
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -SpaceIsFake:$SpaceIsFake
+      ($SpaceIsFake -or $Archetype -cin @('','base-default') -or ($targetCode-ceq'210' -and $Archetype-ceq'space-age-native-owner'))) {
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -SpaceIsFake:$SpaceIsFake -SpaceAge:($Archetype-ceq'space-age-native-owner')
   }
 }
 if ($isHistoricalTerminalFixture) {
@@ -690,6 +694,7 @@ $loadExitCode = if ($requiresReloadProof) {
 }
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
 $loadText = Get-Content -Raw -LiteralPath $log
+if ($mir42UpgradeSpecialized -and $SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $loadText }
 if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $loadText -Stage upgrade }
 if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $loadText -Stage upgrade -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
 $loadMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
@@ -727,6 +732,7 @@ if ($requiresReloadProof) {
   } else { Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
+  if ($mir42UpgradeSpecialized -and $SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $reloadText }
   if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $reloadText -Stage reload }
   if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $reloadText -Stage reload -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
   if (-not $reloadText.Contains($reloadMarker)) {
@@ -746,6 +752,7 @@ if ($requiresReloadProof) {
     throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
   }
   $secondReloadText = Get-Content -Raw -LiteralPath $log
+  if ($mir42UpgradeSpecialized -and $SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $secondReloadText }
   if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $secondReloadText -Stage reload }
   if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $secondReloadText -Stage reload -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
   if (-not $secondReloadText.Contains($reloadMarker)) {

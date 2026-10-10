@@ -251,6 +251,20 @@ foreach($target in @('f210','f200')){
   if(-not$rejected){throw "Current-package SIF archetype accepted: $target"};$currentAssertions++
 }
 $currentK2=@{Target='f210';FromVersion='4.2.21000';ToVersion='4.2.21001';FixtureName='assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001';Archetype='';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile=$profilePath}
+$currentSpaceAge=@{Target='f210';FromVersion='4.2.21001';ToVersion='4.2.21002';FixtureName='assert-upgrade-4-0-21000-to-4-1-21000';Archetype='space-age-native-owner';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';SourceVersion='4.2.2'}
+Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge;$currentAssertions++
+foreach($field in @('Target','FromVersion','ToVersion','FixtureName','SourceVersion','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
+  $bad=$currentSpaceAge.Clone();$bad[$field]=switch($field){
+    'Target'{'f200'};'FromVersion'{'4.2.21000'};'ToVersion'{'4.2.21003'};'FixtureName'{'wrong'};'SourceVersion'{'4.2.1'};'SourceOnlyFixtureNames'{@('extra')};'PublishedPredecessorManifest'{''};'Retention'{'Never'}
+  }
+  $refused=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$refused=$_.Exception.Message.StartsWith('[mir421-')}
+  if(-not$refused){throw "Current Space Age mode accepted invalid $field"};$currentAssertions++
+}
+Assert-MIR42CompleteCatalogueUpgradeMarker -Text '[mir-fixture] complete Space Age state retained technologies=5 recipes=1';$currentAssertions++
+foreach($text in @('[mir-fixture] ordinary upgrade proof complete','[mir-fixture] complete Space Age state retained technologies=0 recipes=0')){
+  $refused=$false;try{Assert-MIR42CompleteCatalogueUpgradeMarker -Text $text}catch{$refused=$_.Exception.Message.StartsWith('[mir42-complete-catalogue-upgrade-marker]')}
+  if(-not$refused){throw 'Incomplete full-state marker accepted'};$currentAssertions++
+}
 Assert-MIR421CurrentUpgradeInputMode @currentK2;$currentAssertions++
 $currentK2.K2ImersiteInputProfile=''
 $rejected=$false

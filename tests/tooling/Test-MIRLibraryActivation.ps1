@@ -125,6 +125,20 @@ function Test-MaintenanceFixtureCallSites {
     Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json'))-ceq$beforeIdentity) "$sifCode/$patch SIF fixture identity is idempotent"
     if($patch-eq2){Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$sifCode) -SourceVersion $SourceVersion} 'mir421-modern-base-fixture-template'}
   }}
+  foreach($patch in @(1,2)){
+    $SourceVersion="4.2.$patch";$FromVersion="4.2.2100$($patch-1)";$ToVersion="4.2.2100$patch"
+    $SpaceIsFake=$false;$Archetype='space-age-native-owner'
+    $FixtureName='assert-upgrade-4-0-21000-to-4-1-21000'
+    $stagedFixture=Join-Path $root "owned-fixtures/caller-space-age-$patch"
+    Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$FixtureName)) -Destination $stagedFixture -Recurse
+    . ([scriptblock]::Create($modern[0].Extent.Text))
+    $read=Get-Content -LiteralPath (Join-Path $stagedFixture 'info.json') -Raw|ConvertFrom-Json
+    Assert-LibraryTest ($read.version-ceq"0.1.$($patch+3)"-and$read.dependencies-ccontains"more-infinite-research >= $FromVersion") "$patch Space Age caller isolates full-state fixture identity"
+    $beforeIdentity=Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json')
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target f210 -SourceVersion $SourceVersion -SpaceAge
+    Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json'))-ceq$beforeIdentity) "$patch full-state fixture identity is idempotent"
+    Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target f210 -SourceVersion $SourceVersion -SpaceIsFake} 'mir421-modern-base-fixture-template'
+  }
 }
 Test-MaintenanceFixtureCallSites
 $baseFixtureArchive=New-TestArchive $fixtureName '0.1.1' -InfoJson (Get-Content -LiteralPath (Join-Path $baseFixture 'info.json') -Raw)

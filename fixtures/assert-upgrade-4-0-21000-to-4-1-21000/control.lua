@@ -23,7 +23,8 @@ local function has_recipe_effect(value,recipe_name) for _,effect in pairs((value
 -- state and every recipe's live research bonus, including the reported rows.
 -- Escaped version patterns survive the runner's exact template substitutions.
 local complete_catalogue_upgrade = archetype == "space-age-native-owner"
-  and from_version:match("^4%.1%.21000$") and to_version:match("^4%.2%.21000$")
+  and (from_version:match("^4%.1%.21000$") or from_version:match("^4%.2%.210%d%d$"))
+  and to_version:match("^4%.2%.210%d%d$")
 local function complete_state(force)
   local state = {technologies = {}, bonuses = {}, queue = {}}
   for name, technology in pairs(force.technologies) do

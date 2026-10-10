@@ -1,14 +1,25 @@
 # Optional native scenario inputs for the existing manifest-driven upgrade runner.
+function Assert-MIR42CompleteCatalogueUpgradeMarker {
+  param([Parameter(Mandatory)][string]$Text)
+  $markers=[regex]::Matches($Text,'\[mir-fixture\] complete Space Age state retained technologies=(?<technologies>[0-9]+) recipes=(?<recipes>[0-9]+)')
+  if($markers.Count-eq0-or @($markers|Where-Object {[int]$_.Groups['technologies'].Value-lt3-or[int]$_.Groups['recipes'].Value-lt1}).Count){
+    throw '[mir42-complete-catalogue-upgrade-marker] Full-state oracle did not execute successfully.'
+  }
+}
+
 function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target,
     [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1',
-    [switch]$SpaceIsFake)
+    [switch]$SpaceIsFake,
+    [switch]$SpaceAge)
   # Only the disposable prepared fixture changes. Retain SIF 4.2.1 at 0.1.0
-  # and base 4.2.1/4.2.2 at 0.1.1/0.1.2; SIF 4.2.2 uses 0.1.3 so distinct
+  # and base 4.2.1/4.2.2 at 0.1.1/0.1.2; SIF 4.2.2 uses 0.1.3 and the
+  # complete Space Age fixtures use 0.1.4/0.1.5 so distinct
   # prepared bytes never compete for one installed mod identity.
   if($SpaceIsFake -and $Target -cnotin @('f210','f200')){throw '[mir421-sif-target]'}
-  $fixtureVersion=if($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  if($SpaceAge -and ($SpaceIsFake -or $Target-cne'f210')){throw '[mir422-space-age-fixture-target]'}
+  $fixtureVersion=if($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.5'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
