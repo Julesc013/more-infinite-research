@@ -66,6 +66,32 @@ run(raw, function(owner)
   check('LR06', telemetry and telemetry.counters.item_prototype_index_builds == 1,
     'Normal lab queries reuse the existing item prototype index')
 end)
+-- Nauvis inherits pressure/gravity from SurfacePropertyPrototype defaults.
+-- Missing overrides are not missing physical properties. Keep the default
+-- bound to a real buildable surface and respect explicit overrides.
+for _, case in ipairs({
+  {id='inherited', default=1000, expected=true},
+  {id='explicit', default=10, override=1000, expected=true},
+  {id='zero-override', default=1000, override=0, expected=false},
+  {id='wrong-default', default=10, expected=false},
+  {id='undefined', expected=false},
+  {id='no-surface', default=1000, no_surface=true, expected=false},
+  {id='orbital-only', default=1000, no_surface=true, orbital=true, expected=false}
+}) do
+  raw = world()
+  raw.recipe.make_lab.surface_conditions={{property='pressure',min=1000,max=1000}}
+  raw['surface-property']={pressure={type='surface-property',name='pressure',default_value=case.default}}
+  raw.planet=not case.no_surface and {nauvis={type='planet',name='nauvis',surface_properties={pressure=case.override}}} or {}
+  raw['space-location']=case.orbital and {orbit={type='space-location',name='orbit',surface_properties={pressure=1000}}} or {}
+  run(raw, function()
+    local before=fingerprint.of(data.raw)
+    check('LR-SURFACE-'..case.id,
+      (researchability.technology_researchability_reason('Probe')==nil)==case.expected,
+      'Lab acquisition uses declared surface defaults without inventing a surface or overriding explicit values')
+    check('LR-SURFACE-'..case.id..'-immutable',fingerprint.of(data.raw)==before,
+      'Surface admission does not mutate prototypes')
+  end)
+end
 -- A spoilage result can also be a lab placement item. Exercise the real item
 -- index, recipe facts, lab service and researchability together, with no
 -- unconditional acquisition stub or Factorio process.

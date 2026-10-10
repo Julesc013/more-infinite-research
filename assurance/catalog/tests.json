@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 230,
+  "test_count": 231,
   "tests": [
     {
       "id": "docs.check",
@@ -8187,6 +8187,32 @@
       "matrix": null
     },
     {
+      "id": "static.mir422-secretas-native-harness",
+      "proposition": "The governed test 'static.mir422-secretas-native-harness' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRSecretasFiniteContinuation.ps1",
+        "tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+        "tests/runtime/secretas_finite_native_fixture_controls.lua",
+        "tests/compiler/run_emergency_catalogue_controls.py",
+        "fixtures/assert-secretas-finite-continuation-hotfix/**",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tests/support/MIR421SpaceFakeUpgrade.ps1"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.modern-launch-return-harness",
       "proposition": "The governed test 'static.modern-launch-return-harness' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -8362,6 +8388,9 @@
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
+        "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
         "targets/historical/**"
       ],
       "captured_artifacts": [],
@@ -8418,11 +8447,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 69,
-      "runtime-upgrade": 58,
+      "runtime-upgrade": 59,
       "compiler-static": 19,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 217,
+    "canonical_test_commands": 218,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8435,5 +8464,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:bc196da6e8fc055729f2d03749551760aec43cba8981f2b3576d4a1b43f4c454"
+  "digest": "sha256:ec1484807356953252fe5f08c5b056e4861dfe533db4570886495c03500fb6f1"
 }

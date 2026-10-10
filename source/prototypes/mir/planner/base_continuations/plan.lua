@@ -68,7 +68,7 @@ local function plan_chain(key)
     return classify.rejected_candidate(key, "disabled")
   end
 
-  local levels, by_level, has_infinite = discover.chain(chain_key)
+  local levels, by_level, has_infinite, terminal_by_level = discover.chain(chain_key)
 
   if has_infinite or #levels == 0 then
     D.extension(D.extension_fields(key, "skipped", has_infinite and "already_infinite" or "no_vanilla_chain"))
@@ -76,6 +76,9 @@ local function plan_chain(key)
   end
 
   local detected_highest = levels[#levels]
+  for terminal_level, _ in pairs(terminal_by_level or {}) do
+    if terminal_level > detected_highest then detected_highest = terminal_level end
+  end
   local min_level = spec.min_level or (detected_highest + 1)
   if detected_highest < min_level - 1 then
     -- Vanilla chain does not reach the expected prerequisite tier.
@@ -94,7 +97,7 @@ local function plan_chain(key)
     desired_new_level = min_level
   end
 
-  local base_tech = by_level[base_level]
+  local base_tech = (terminal_by_level or {})[base_level] or by_level[base_level]
   if not base_tech or not base_tech.unit then
     D.extension(D.extension_fields(key, "skipped", "missing_base_unit"))
     return classify.rejected_candidate(key, "missing_base_unit", "progression_safe")
@@ -103,7 +106,8 @@ local function plan_chain(key)
     D.extension(D.extension_fields(key, "skipped", "base_already_infinite"))
     return classify.rejected_candidate(key, "base_already_infinite", "output_identity_safe")
   end
-  local base_researchability_reason = science_packs.technology_researchability_reason(chain_key .. "-" .. base_level)
+  local base_technology_name = base_tech.name or (chain_key .. "-" .. base_level)
+  local base_researchability_reason = science_packs.technology_researchability_reason(base_technology_name)
   if base_researchability_reason then
     D.extension(D.extension_fields(key, "skipped", "unresearchable_base_technology_" .. base_researchability_reason))
     return classify.rejected_candidate(key, "unresearchable_base_technology_" .. base_researchability_reason, "science_compatible")
@@ -228,7 +232,7 @@ local function plan_chain(key)
     localised_description = technology_risk.append_tooltip(
       spec.localised_description or base_tech.localised_description or {"technology-description." .. locale_key},
       spec.technology_risk),
-    prerequisites = qualify.build_prerequisites(chain_key .. "-" .. base_level, base_tech.prerequisites),
+    prerequisites = qualify.build_prerequisites(base_technology_name, base_tech.prerequisites),
     effects = {},
     unit = {},
     max_level = "infinite",
@@ -246,14 +250,14 @@ local function plan_chain(key)
   end
   effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)
   if not qualify.prefer_this_mod_for_competing_techs() then
-    local other_choice = discover.find_any_infinite_extension(chain_key .. "-" .. base_level, new_name)
+    local other_choice = discover.find_any_infinite_extension(base_technology_name, new_name)
     if other_choice then
       log("[more-infinite-research] Skipping extension for " .. key .. ": competing infinite tech kept from other mod (" .. other_choice .. ").")
       D.extension(D.extension_fields(key, "skipped", "competing_infinite_kept"))
       return classify.rejected_candidate(key, "competing_infinite_kept", "owner_conflict_free")
     end
   end
-  local existing = discover.find_equivalent_infinite_extension(chain_key .. "-" .. base_level, desired_effects)
+  local existing = discover.find_equivalent_infinite_extension(base_technology_name, desired_effects)
   if existing then
     log("[more-infinite-research] Skipping extension for " .. key .. ": equivalent infinite tech already exists (" .. existing .. ").")
     D.extension(D.extension_fields(key, "skipped", "equivalent_infinite_exists"))
@@ -307,7 +311,7 @@ local function plan_chain(key)
     operation = "emit_base_extension",
     key = key,
     manifest_id = spec.manifest_id or ("base-continuation/" .. key),
-    base_technology_name = chain_key .. "-" .. base_level,
+    base_technology_name = base_technology_name,
     technology_name = new.name,
     technology = new,
     planned_max_level = max_level_value,

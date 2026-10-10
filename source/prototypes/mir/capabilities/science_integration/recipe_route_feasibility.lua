@@ -478,6 +478,13 @@ local function surface_conditions_satisfied(conditions, properties, options)
     if not diagnostic_visit(options) then return false end
     local property = condition.property
     local value = property and properties and properties[property] or nil
+    if value == nil and property then
+      -- A planet/surface overrides only selected properties. The engine uses
+      -- the declared SurfacePropertyPrototype default for the rest (notably
+      -- Nauvis pressure/gravity). Zero is an explicit override, not absence.
+      local definition = data_raw.prototypes("surface-property")[property]
+      value = definition and definition.default_value or nil
+    end
     if type(value) ~= "number" then return false end
     if condition.min ~= nil and value < condition.min then return false end
     if condition.max ~= nil and value > condition.max then return false end

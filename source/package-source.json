@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 78233,
-      "source_sha256": "79B09BEA607955B5A75F98DF96F14D41FAA6BF6CE1AE990DD60DB1B6CBF5D5D7",
-      "output_bytes": 78233,
-      "output_sha256": "79B09BEA607955B5A75F98DF96F14D41FAA6BF6CE1AE990DD60DB1B6CBF5D5D7"
+      "source_bytes": 78648,
+      "source_sha256": "59A08424978BF563FE4626502CF05586E9FCE54DABE68F1D051A290687F1B94E",
+      "output_bytes": 78648,
+      "output_sha256": "59A08424978BF563FE4626502CF05586E9FCE54DABE68F1D051A290687F1B94E"
     },
     {
       "layer": "capability",
@@ -6465,10 +6465,10 @@
         "predecessor_source_path": "targets/f100/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 52715,
-      "source_sha256": "AD48C0768142FF4882D6C70EA1DEAE26AE2DE52024F794F1648A20F7F9864288",
-      "output_bytes": 52715,
-      "output_sha256": "AD48C0768142FF4882D6C70EA1DEAE26AE2DE52024F794F1648A20F7F9864288"
+      "source_bytes": 53526,
+      "source_sha256": "7B0C69B137F8AFB72258CCFB8256E02F5C86A5EA85001459E7CC8A6084600B7E",
+      "output_bytes": 53526,
+      "output_sha256": "7B0C69B137F8AFB72258CCFB8256E02F5C86A5EA85001459E7CC8A6084600B7E"
     },
     {
       "layer": "presentation",
@@ -6525,10 +6525,10 @@
         "predecessor_source_path": "targets/f100/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 4701,
-      "source_sha256": "84E308C5EDBCD4E8EF9BC590C1DE581511AA17AE35520910A8734F6D3CED181F",
-      "output_bytes": 4701,
-      "output_sha256": "84E308C5EDBCD4E8EF9BC590C1DE581511AA17AE35520910A8734F6D3CED181F"
+      "source_bytes": 4728,
+      "source_sha256": "DF4679E4DCE50FF5FBED8501373F9C52F1A87EEBE64B6001E31551B4FD626BC7",
+      "output_bytes": 4728,
+      "output_sha256": "DF4679E4DCE50FF5FBED8501373F9C52F1A87EEBE64B6001E31551B4FD626BC7"
     },
     {
       "layer": "presentation",
@@ -6543,10 +6543,10 @@
         "predecessor_source_path": "targets/f110/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 52697,
-      "source_sha256": "BB90358693FBB77EC1F386B3C36F1D430BC86CE8F82AEA70417291359743FD31",
-      "output_bytes": 52697,
-      "output_sha256": "BB90358693FBB77EC1F386B3C36F1D430BC86CE8F82AEA70417291359743FD31"
+      "source_bytes": 53508,
+      "source_sha256": "50D660DCB7BBE27C9240907389F6649C48D824B050EBFACE3C69FA40E4D80812",
+      "output_bytes": 53508,
+      "output_sha256": "50D660DCB7BBE27C9240907389F6649C48D824B050EBFACE3C69FA40E4D80812"
     },
     {
       "layer": "presentation",
@@ -6579,10 +6579,10 @@
         "predecessor_source_path": "targets/f110/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 4692,
-      "source_sha256": "21D21BD16A1A5A5578AC431D2C3158184FEF3BB130E842AA028796A6F57E5585",
-      "output_bytes": 4692,
-      "output_sha256": "21D21BD16A1A5A5578AC431D2C3158184FEF3BB130E842AA028796A6F57E5585"
+      "source_bytes": 4719,
+      "source_sha256": "C4FE17968CC5FB0B026BF8E97C0F5337C97A1F081B8C867EB771D74F4938222E",
+      "output_bytes": 4719,
+      "output_sha256": "C4FE17968CC5FB0B026BF8E97C0F5337C97A1F081B8C867EB771D74F4938222E"
     },
     {
       "layer": "presentation",
@@ -6597,10 +6597,10 @@
         "predecessor_source_path": "targets/f200/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 81986,
-      "source_sha256": "6A8A686AB827D362B6D9CF6F2DBB2ED9AAD6A2F6899E5DA30246FD03BF2C082B",
-      "output_bytes": 81986,
-      "output_sha256": "6A8A686AB827D362B6D9CF6F2DBB2ED9AAD6A2F6899E5DA30246FD03BF2C082B"
+      "source_bytes": 83510,
+      "source_sha256": "C9712B3971286FC0B2AB1ECE13B86875E6B24FB4BD77994FDCDB32C61103A4DC",
+      "output_bytes": 83510,
+      "output_sha256": "C9712B3971286FC0B2AB1ECE13B86875E6B24FB4BD77994FDCDB32C61103A4DC"
     },
     {
       "layer": "presentation",
@@ -6669,10 +6669,10 @@
         "predecessor_source_path": "targets/f200/files/prototypes/mir/planner/base_continuations/plan.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 16712,
-      "source_sha256": "23F8B4E2DCF0E20F65E4E77F444BC8F95316AAB60E21BAE72B4887676F4FAF93",
-      "output_bytes": 16712,
-      "output_sha256": "23F8B4E2DCF0E20F65E4E77F444BC8F95316AAB60E21BAE72B4887676F4FAF93"
+      "source_bytes": 16955,
+      "source_sha256": "661DC5E0D8E80CD5AA8A7CBDDF06288E96A9A9B5F01A3D500D0B1F714FCEB758",
+      "output_bytes": 16955,
+      "output_sha256": "661DC5E0D8E80CD5AA8A7CBDDF06288E96A9A9B5F01A3D500D0B1F714FCEB758"
     },
     {
       "layer": "adapter",
@@ -6852,10 +6852,10 @@
         "predecessor_source_path": "targets/f210/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 83725,
-      "source_sha256": "A6F8A23AFF5A54659EEA6E4E4DF3C7F8CFD81E40DB9EAF81EA4E1D658965FF1A",
-      "output_bytes": 83725,
-      "output_sha256": "A6F8A23AFF5A54659EEA6E4E4DF3C7F8CFD81E40DB9EAF81EA4E1D658965FF1A"
+      "source_bytes": 85249,
+      "source_sha256": "8F0561D09EED76EBE4FB35D52072272D7187FDAE4B827512A91D80388175A411",
+      "output_bytes": 85249,
+      "output_sha256": "8F0561D09EED76EBE4FB35D52072272D7187FDAE4B827512A91D80388175A411"
     },
     {
       "layer": "presentation",
@@ -6973,10 +6973,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/discover.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4280,
-      "source_sha256": "39BEF285336001C1EEB815696CC313842874DEC3197D5DAFABE6811D9A2CF681",
-      "output_bytes": 4280,
-      "output_sha256": "39BEF285336001C1EEB815696CC313842874DEC3197D5DAFABE6811D9A2CF681"
+      "source_bytes": 5053,
+      "source_sha256": "3B5DEC11FFE633C8F75AFE05CBAF8E57E07CDF04D112D49DC35976949920A1C3",
+      "output_bytes": 5053,
+      "output_sha256": "3B5DEC11FFE633C8F75AFE05CBAF8E57E07CDF04D112D49DC35976949920A1C3"
     },
     {
       "layer": "capability",
@@ -7013,10 +7013,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/plan.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 16422,
-      "source_sha256": "B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6",
-      "output_bytes": 16422,
-      "output_sha256": "B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6"
+      "source_bytes": 16665,
+      "source_sha256": "BE724348A09C6F6E81F87340320513C5D01A6BBBA7936763C8C4F08B81AF6ED9",
+      "output_bytes": 16665,
+      "output_sha256": "BE724348A09C6F6E81F87340320513C5D01A6BBBA7936763C8C4F08B81AF6ED9"
     },
     {
       "layer": "capability",
@@ -7288,10 +7288,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 93140,
-      "source_sha256": "A2F10264488D435550474D8318822011FDB10C5F3CB6B16FD27B0C2A92A9227D",
-      "output_bytes": 93140,
-      "output_sha256": "A2F10264488D435550474D8318822011FDB10C5F3CB6B16FD27B0C2A92A9227D"
+      "source_bytes": 93275,
+      "source_sha256": "5DAD134AC15280F43FA8341539D0827FEFDE283F7B005B738E2D121F44CC9F43",
+      "output_bytes": 93275,
+      "output_sha256": "5DAD134AC15280F43FA8341539D0827FEFDE283F7B005B738E2D121F44CC9F43"
     },
     {
       "layer": "capability",
@@ -7462,10 +7462,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1222,
-      "source_sha256": "6AB77767E1289DDFA0EF1F601466F3AB690A17BDA2BA6D48FBE73ED1ADE6B111",
-      "output_bytes": 1222,
-      "output_sha256": "6AB77767E1289DDFA0EF1F601466F3AB690A17BDA2BA6D48FBE73ED1ADE6B111"
+      "source_bytes": 2034,
+      "source_sha256": "689DA5AC3D70C2C0449B9B2CB6760A21F5C530B85114E73735D84CC4CB35E50A",
+      "output_bytes": 2034,
+      "output_sha256": "689DA5AC3D70C2C0449B9B2CB6760A21F5C530B85114E73735D84CC4CB35E50A"
     },
     {
       "layer": "presentation",
@@ -7500,10 +7500,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1462,
-      "source_sha256": "43D2AB87C23589D1BCDC9CD2DB9E8E3CC155CA8F27FE5C0E04CBC4AD2FEAED54",
-      "output_bytes": 1462,
-      "output_sha256": "43D2AB87C23589D1BCDC9CD2DB9E8E3CC155CA8F27FE5C0E04CBC4AD2FEAED54"
+      "source_bytes": 2274,
+      "source_sha256": "B53354A3206B7D7F94BC48F54005A4CC0444DCDA28F060CB6893418FA861A945",
+      "output_bytes": 2274,
+      "output_sha256": "B53354A3206B7D7F94BC48F54005A4CC0444DCDA28F060CB6893418FA861A945"
     },
     {
       "layer": "presentation",
@@ -7538,10 +7538,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1462,
-      "source_sha256": "20F5E4CC2E97247A25ED155F1D6F33CDC79DBE83D566634E78E96701A009A308",
-      "output_bytes": 1462,
-      "output_sha256": "20F5E4CC2E97247A25ED155F1D6F33CDC79DBE83D566634E78E96701A009A308"
+      "source_bytes": 2274,
+      "source_sha256": "3DE4F6ECEF81A28A4941F731E450AC0F03ADB7C5B1907CA6B6666EFD4A8105BE",
+      "output_bytes": 2274,
+      "output_sha256": "3DE4F6ECEF81A28A4941F731E450AC0F03ADB7C5B1907CA6B6666EFD4A8105BE"
     },
     {
       "layer": "presentation",
@@ -7576,10 +7576,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1690,
-      "source_sha256": "FB548DE04D2FEE1627593C03A7221844774E0772B8FBBB3EAA010104B628E4DF",
-      "output_bytes": 1690,
-      "output_sha256": "FB548DE04D2FEE1627593C03A7221844774E0772B8FBBB3EAA010104B628E4DF"
+      "source_bytes": 2502,
+      "source_sha256": "58C761D9FA12FBB4AC28FAD73C6200A4A5B136BC6BA3FF8857ACAF012D0A6635",
+      "output_bytes": 2502,
+      "output_sha256": "58C761D9FA12FBB4AC28FAD73C6200A4A5B136BC6BA3FF8857ACAF012D0A6635"
     },
     {
       "layer": "presentation",
@@ -7614,10 +7614,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 1690,
-      "source_sha256": "2ADEFB45FF0BE304B8B8FC5B7B376DE052FA1E43B6351BD12E2D69F40B896E07",
-      "output_bytes": 1690,
-      "output_sha256": "2ADEFB45FF0BE304B8B8FC5B7B376DE052FA1E43B6351BD12E2D69F40B896E07"
+      "source_bytes": 2502,
+      "source_sha256": "D302D92FDED4A8E6110FCCD4F67839415D05801296B6425D7A257090EF80CA46",
+      "output_bytes": 2502,
+      "output_sha256": "D302D92FDED4A8E6110FCCD4F67839415D05801296B6425D7A257090EF80CA46"
     },
     {
       "layer": "shared",
@@ -7709,5 +7709,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "9CFDF60C01A1E4EF16620EBF95B32B628EF41A248BAB3D5F6810E52237A116F4"
+  "record_sha256": "7A4B1B9E1FEE020F088AC32CAB57EB9D67DEEE7B1ABBDEC3E55611B6390ED8C2"
 }

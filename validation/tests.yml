@@ -2,6 +2,22 @@
   "schema": 2,
   "tests": [
     {
+      "id": "static.mir422-secretas-native-harness",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRSecretasFiniteContinuation.ps1",
+        "tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+        "tests/runtime/secretas_finite_native_fixture_controls.lua",
+        "tests/compiler/run_emergency_catalogue_controls.py",
+        "fixtures/assert-secretas-finite-continuation-hotfix/**",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tests/support/MIR421SpaceFakeUpgrade.ps1"
+      ]
+    },
+    {
       "id": "static.upgrade-manifest-inputs",
       "kind": "static",
       "layer": "F0",
@@ -18,6 +34,9 @@
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
+        "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
         "targets/historical/**"
       ]
     },

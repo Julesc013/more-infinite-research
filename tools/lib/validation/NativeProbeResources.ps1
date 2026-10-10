@@ -41,7 +41,7 @@ function Assert-MIRNativeProbeF210Candidate([bool]$Condition,[string]$Message) {
 }
 function Read-MIRNativeProbeCurrentCandidate {
   param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
-    [ValidateSet('f210','f200')][string]$Target='f210',
+    [ValidateSet('f210','f200','f110','f100')][string]$Target='f210',
     [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
   Assert-MIRNativeProbeF210Candidate (-not [string]::IsNullOrWhiteSpace($Archive) -and -not [string]::IsNullOrWhiteSpace($ReceiptPath)) 'supply candidate and canonical materialization receipt'
   $candidate = (Resolve-Path -LiteralPath $Archive).Path
@@ -64,7 +64,7 @@ function Read-MIRNativeProbeCurrentCandidate {
     Assert-MIRNativeProbeF210Candidate ($null -ne $entry -and $entry.Length -le 64KB) 'candidate info differs'
     $reader = [IO.StreamReader]::new($entry.Open())
     try {$info = $reader.ReadToEnd() | ConvertFrom-Json} finally {$reader.Dispose()}
-    $line=if($Target -ceq 'f200'){'2.0'}else{'2.1'}
+    $line=switch -CaseSensitive ($Target){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'}}
     Assert-MIRNativeProbeF210Candidate ($info.name -ceq 'more-infinite-research' -and $info.version -ceq $identity.distribution_version -and $info.factorio_version -ceq $line) 'candidate metadata differs'
     $state = Get-MIR4TargetMaterializerState -RepoRoot $Repository -Target $Target
     $selection = Get-MIR4TargetMaterializationBindings -State $state

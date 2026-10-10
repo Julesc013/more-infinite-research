@@ -45,7 +45,7 @@ end
 
 function M.chain(chain_key)
   local pattern = "^" .. escape_pattern(chain_key) .. "%-(%d+)$"
-  local levels, by_level = {}, {}
+  local levels, by_level, terminal_by_level, terminal_start = {}, {}, {}, {}
   local has_infinite = false
   for name, tech in pairs(data_raw.prototypes("technology")) do
     local level = tonumber(string.match(name, pattern))
@@ -53,10 +53,23 @@ function M.chain(chain_key)
       if tech.max_level == "infinite" then has_infinite = true end
       table.insert(levels, level)
       by_level[level] = tech
+      -- A finite numeric max_level represents the end of this prototype's
+      -- level range.  The continuation must start after that terminal level,
+      -- but it must still anchor its prerequisite to this real prototype
+      -- name (for example, worker-robots-storage-4, not a fictional -8).
+      local terminal_level = level
+      if type(tech.max_level) == "number" and tech.max_level < math.huge
+          and tech.max_level >= level then
+        terminal_level = math.floor(tech.max_level)
+      end
+      if not terminal_start[terminal_level] or level > terminal_start[terminal_level] then
+        terminal_by_level[terminal_level] = tech
+        terminal_start[terminal_level] = level
+      end
     end
   end
   table.sort(levels)
-  return levels, by_level, has_infinite
+  return levels, by_level, has_infinite, terminal_by_level
 end
 
 function M.technology(name)

@@ -3,6 +3,27 @@
   "profiles": {
     "2.1": [
       {
+        "name": "secretas-finite-continuation-hotfix",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [
+          "secretas",
+          "pretty-frozeta",
+          "mir-fixture-assert-secretas-finite-continuation-hotfix"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": ["space-age", "local-mod-library", "runtime", "hotfix"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {"id": "factorio-load-and-assertion-fixtures-pass", "type": "factorio-load-and-assertion-fixtures-pass"}
+        ]
+      },
+      {
         "name": "aai-loader-belt-productivity",
         "target_profile": "2.1",
         "kind": "runtime",

@@ -36,19 +36,19 @@
     {
       "output_path": "changelog.txt",
       "source_path": "source/presentation/historical/f014/changelog.txt.template",
-      "source_sha256": "FB548DE04D2FEE1627593C03A7221844774E0772B8FBBB3EAA010104B628E4DF",
-      "source_bytes": 1690,
-      "output_bytes": 1690,
-      "output_sha256": "FB548DE04D2FEE1627593C03A7221844774E0772B8FBBB3EAA010104B628E4DF"
+      "source_sha256": "58C761D9FA12FBB4AC28FAD73C6200A4A5B136BC6BA3FF8857ACAF012D0A6635",
+      "source_bytes": 2502,
+      "output_bytes": 2502,
+      "output_sha256": "58C761D9FA12FBB4AC28FAD73C6200A4A5B136BC6BA3FF8857ACAF012D0A6635"
     },
     {
       "output_path": "README.md",
       "source_path": "source/presentation/f100/README.md.template",
       "transform": "historical-readme-template-v1",
-      "source_sha256": "84E308C5EDBCD4E8EF9BC590C1DE581511AA17AE35520910A8734F6D3CED181F",
-      "source_bytes": 4701,
-      "output_bytes": 4568,
-      "output_sha256": "49163641BE2512E8F8078E4DFE0CF5E153394409A97E4A37579AA5AB3F2EF930"
+      "source_sha256": "DF4679E4DCE50FF5FBED8501373F9C52F1A87EEBE64B6001E31551B4FD626BC7",
+      "source_bytes": 4728,
+      "output_bytes": 4595,
+      "output_sha256": "A61F205C8D98946ABBC8B0290615E9D00904D8D6FA0632E41561FFC6CA39A09E"
     },
     {
       "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
@@ -75,12 +75,12 @@
     },
     {
       "output_path": "prototypes/mir/planner/base_continuations/plan.lua",
-      "base_sha256": "B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6",
+      "base_sha256": "BE724348A09C6F6E81F87340320513C5D01A6BBBA7936763C8C4F08B81AF6ED9",
       "find": "  new.unit = {\n    count_formula = cost_model.count_formula,\n    ingredients = resolved_ingredients,\n    time = research_time\n  }",
       "replace": "  local legacy_numeric_research_cost = target_line.feature_enabled(\"legacy_numeric_research_cost\")\n  new.unit = {\n    count_formula = legacy_numeric_research_cost and nil or cost_model.count_formula,\n    count = legacy_numeric_research_cost and math.ceil(cost_model.base_cost) or nil,\n    ingredients = resolved_ingredients,\n    time = research_time\n  }"
     }
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "7830516F6766A905BF73CA4F3E0A39547716CCC351FC438BB16012D81DC1C55B"
+  "record_sha256": "8DA245BCF4DD288F8CB4E8028B3D081A63205B6DB8DB57F5C756F9AFC4EDB6D7"
 }

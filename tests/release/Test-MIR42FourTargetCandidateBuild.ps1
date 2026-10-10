@@ -291,16 +291,18 @@ try {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $patchVersions[$i]
     $secondHashes = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash -Algorithm SHA256 | ForEach-Object Hash)
     Assert-MIR42CandidateBuildTest (($firstHashes -join '|') -ceq ($secondHashes -join '|')) "patch-metadata-idempotence-$i"
-    # A current authored entry must survive unchanged, rather than acquiring a
-    # construction-only entry that would need mutation after candidate acceptance.
+    # A historical-source construction prepends its own identity without
+    # rewriting the authored entry for the later source patch.
     $target = [string]$patchDescriptors[$i].target
     $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
     $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
     $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
-    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and $authoredVersion.Groups[1].Value -ceq $patchVersions[$i]) "patch-authored-current-version-$i"
     [IO.File]::WriteAllText((Join-Path $tree 'changelog.txt'), $authoredHistory, $utf8)
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $patchVersions[$i]
-    Assert-MIR42CandidateBuildTest ([IO.File]::ReadAllText((Join-Path $tree 'changelog.txt')) -ceq $authoredHistory) "patch-authored-current-changelog-unchanged-$i"
+    $writtenAuthoredHistory = [IO.File]::ReadAllText((Join-Path $tree 'changelog.txt'))
+    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and
+      $writtenAuthoredHistory.StartsWith("---------------------------------------------------------------------------------------------------`nVersion: $($patchVersions[$i])`n", [StringComparison]::Ordinal) -and
+      $writtenAuthoredHistory.EndsWith($authoredHistory, [StringComparison]::Ordinal)) "patch-authored-prior-changelog-preserved-$i"
   }
   $negativeTree = Join-Path $identityRoot 'f210'
   foreach ($badVersion in @('4.2.21002','4.2.20001','4.2.99901')) {
@@ -338,6 +340,11 @@ try {
   for($i=0;$i-lt$currentVersions.Count;$i++){
     $currentIdentity=Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $currentDescriptors[$i].target -SourceVersion '4.2.2'
     Assert-MIR42CandidateBuildTest ($currentIdentity.source_version-ceq'4.2.2'-and$currentIdentity.distribution_version-ceq$currentVersions[$i]-and$currentIdentity.package_name-ceq("more-infinite-research_"+$currentVersions[$i]+'.zip')) "422-release-identity-$i"
+    $target = [string]$currentDescriptors[$i].target
+    $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
+    $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
+    $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
+    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and $authoredVersion.Groups[1].Value -ceq $currentVersions[$i]) "422-authored-current-changelog-version-$i"
   }
   $rejected=$false
   try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2' -SelectedTargets @('f210','f200','f110','f100')|Out-Null}catch{$rejected=$_.Exception.Message-match'mir42-candidate-target-selection-unsupported'}
@@ -1064,7 +1071,7 @@ try {
       $entry = $archive.GetEntry("more-infinite-research_$version/README.md")
       $reader = [IO.StreamReader]::new($entry.Open())
       try { $readme = $reader.ReadToEnd() } finally { $reader.Dispose() }
-      Assert-MIR42CandidateBuildTest ($readme.Contains("# More Infinite Research $version") -and $readme.Contains("More Infinite Research $version is") -and $readme.Contains("more-infinite-research_$version.zip") -and -not $readme.Contains('4.2.10001')) "patch-historical-readme-package-identity-$target"
+      Assert-MIR42CandidateBuildTest ($readme.Contains("# More Infinite Research $version") -and $readme.Contains("More Infinite Research $version is") -and $readme.Contains("more-infinite-research_$version.zip") -and $readme -notmatch '4\.2\.100[0-9]{2}') "patch-historical-readme-package-identity-$target"
       Assert-MIR42CandidateBuildTest ($readme.Contains("Earlier fresh-load evidence used $($frozenRecord.engine.version);") -and $readme.Contains("The exact published $($frozenRecord.predecessor.version) archive remains a historical predecessor record.") -and $readme.Contains('Consult the matching release record for native qualification of this exact package.')) "patch-historical-readme-evidence-boundary-$target"
     } finally { $archive.Dispose() }
   }

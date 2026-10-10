@@ -13,6 +13,7 @@ if (-not (Test-Path -LiteralPath $module -PathType Leaf)) { throw "[mir42-releas
 . $module
 . (Join-Path $repo 'tests/support/MIR42StartupCollectorControls.ps1')
 . (Join-Path $repo 'tests/support/MIR421ReleaseAssetControls.ps1')
+. (Join-Path $repo 'tests/support/MIR422ReleaseUpgradeControls.ps1')
 $maintenance=$SourceVersion -cin @('4.2.1','4.2.2')
 $releaseTag='v' + $SourceVersion
 $patchSuffix=([version]$SourceVersion).Build.ToString('D2')
@@ -60,6 +61,7 @@ function Copy-MIR42ReleaseAssetsFixtureTree {
 
 $root = Join-Path $repo ('build/tmp/mir42-release-assets-' + [guid]::NewGuid().ToString('N'))
 $candidateReader = (Get-Item Function:Get-MIR42ExactFourTargetCandidate).ScriptBlock
+$previousDefaults=$PSDefaultParameterValues.Clone()
 try {
   $collectorControls=Invoke-MIR42StartupCollectorControls -RepoRoot $repo -Root (Join-Path $root 'collector-controls')
   $candidateRoot = Join-Path $root 'candidate'
@@ -224,6 +226,11 @@ try {
   Write-MIR4BootstrapRecord -Record $releaseManifestRecord -Path (Join-Path $assetRoot "mir-$SourceVersion.release.json") | Out-Null
   Set-Item Function:Get-MIR42ExactFourTargetCandidate -Value { param($RepoRoot,$CandidateManifestPath) return $script:mir42ReleaseAssetsFixtureCandidate }
 
+  if ($SourceVersion -ceq '4.2.2') {
+    $upgradeControls=Invoke-MIR422ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
+    $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
+    Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 13 -and $upgradeControls.native_runs -eq 0) 'complete-upgrade-evidence-opposing-controls'
+  }
   $inventoryPath = Join-Path $root 'frozen-inventory.json'
   $inventory = Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $promotionPlan -SourceVersion $SourceVersion -ReleaseTag $releaseTag -AssetRoot $assetRoot -OutputPath $inventoryPath
   $expectedKind=if ($maintenance) { 'MIR42NineTargetMaintenanceReleaseAssetInventoryV1' } else { 'MIR42NineTargetReleaseAssetInventoryV1' }
@@ -421,6 +428,7 @@ try {
   catch { $downloadDriftRejected = $_.Exception.Message -match ('^\[mir42-release-assets-downloaded-byte\].*' + [regex]::Escape("mir-$SourceVersion.components.json")) }
   Assert-MIR42ReleaseAssetsTest -Condition $downloadDriftRejected -Code 'downloaded-byte-drift-rejected'
 } finally {
+  $PSDefaultParameterValues=$previousDefaults
   Set-Item Function:Get-MIR42ExactFourTargetCandidate -Value $candidateReader
   $buildRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
   if (-not $root.StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-release-assets-test-fixture-containment]' }

@@ -189,7 +189,13 @@ function Assert-MIR42PublishedMaintenancePredecessorMetadata {
 function Get-MIR42PublishedMaintenancePredecessorInputs {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)]$ReleaseMetadata,
-    [ValidateSet('4.2.1','4.2.2')][string]$CandidateSourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2')][string]$CandidateSourceVersion='4.2.1',
+    [AllowEmptyString()][string]$SelectedTarget='',
+    [AllowEmptyString()][string]$SelectedArchivePath='')
+  if(([bool]$SelectedTarget)-ne([bool]$SelectedArchivePath)-or
+      ($SelectedTarget-and$SelectedTarget-cnotin$script:MIR42FourTargetLines.Keys)){
+    throw '[mir42-maintenance-predecessor-selected-input]'
+  }
   $contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
   $pinned = Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $ManifestPath -CandidateSourceVersion $CandidateSourceVersion
   $published = @(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $pinned -ReleaseMetadata $ReleaseMetadata -CandidateSourceVersion $CandidateSourceVersion)
@@ -211,9 +217,13 @@ function Get-MIR42PublishedMaintenancePredecessorInputs {
     throw '[mir42-maintenance-predecessor-remote-source-tag]'
   }
   $root = Split-Path -Parent $pinned.path
+  # Selected native work verifies only its supplied archive in place. Release
+  # custody retains the default complete nine-archive verification. Both modes
+  # authenticate the full frozen manifest, public asset metadata and source tag.
+  $selectedPublished=if($SelectedTarget){@($published|Where-Object target -CEQ $SelectedTarget)}else{$published}
   $rows = @(
-    foreach ($row in $published) {
-      $path = Join-Path $root $row.filename
+    foreach ($row in $selectedPublished) {
+      $path = if($SelectedTarget){$SelectedArchivePath}else{Join-Path $root $row.filename}
       $input = Get-MIR42FourTargetArchiveInput -RepoRoot $RepoRoot -Target $row.target -Path $path -SourceVersion $contract.source_version
       if ([string]$input.archive.sha256 -cne $row.sha256 -or [int64]$input.archive.bytes -ne $row.bytes -or
           [string]$input.content_sha256 -cne $row.content_sha256 -or [int]$input.entry_count -ne $row.entry_count) {
@@ -224,10 +234,12 @@ function Get-MIR42PublishedMaintenancePredecessorInputs {
         github_asset_id=$row.github_asset_id;github_digest=$row.github_digest}
     }
   )
-  return [pscustomobject][ordered]@{release_id=[int64]$ReleaseMetadata.id;source_tag=$contract.source_tag;
+  $result=[pscustomobject][ordered]@{release_id=[int64]$ReleaseMetadata.id;source_tag=$contract.source_tag;
     source=$pinned.manifest.source;tag_object=$tagObject;remote_tag_readback=$true;
     manifest=[ordered]@{path=$pinned.path;sha256=$pinned.sha256;bytes=$pinned.bytes};
     signed=$false;targets=$rows;native_qualification='not-performed';release_qualification='not-performed'}
+  if($SelectedTarget){$result|Add-Member -NotePropertyName local_custody_scope -NotePropertyValue 'selected-native-archive'}
+  return $result
 }
 
 function Assert-MIR42FourTargetOutputRoot {
