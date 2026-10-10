@@ -32,7 +32,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
     $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
   }
   if($Target-ceq'f200'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake){
-    $fixtureVersion=if($direct420To422){'0.1.24'}else{'0.1.25'}
+    $fixtureVersion=if($direct420To422){'0.1.26'}else{'0.1.27'}
   }
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
@@ -69,6 +69,22 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "4.2.20002" then')
   $control=$control.Replace('complete Space Age state retained','complete research state retained')
   $control=$control.Replace('mir-4121000-upgraded','mir-4220002-upgraded')
+  $reviewed=@'
+local reviewed_420_frontier = require("mir422_reviewed_science_delta")
+local function reviewed_frontier_delta(name, before, after)
+  if from_version ~= "4.2.20000" or to_version ~= "4.2.20002" then return false end
+  local row = reviewed_420_frontier[name]
+  if not row or not equal_state(before.prerequisites, row.before.prerequisites)
+    or not equal_state(before.ingredients, row.before.ingredients) then return false end
+  local expected = scalar_copy(before)
+  expected.prerequisites, expected.ingredients = row.after.prerequisites, row.after.ingredients
+  return equal_state(expected, after)
+end
+
+'@
+  $control=$control.Replace('local function restored_promethium_frontier',($reviewed+"`n"+'local function restored_promethium_frontier'))
+  $control=$control.Replace('and not restored_promethium_frontier(name, before.prototype, observed.technologies[name].prototype)',
+    'and not reviewed_frontier_delta(name, before.prototype, observed.technologies[name].prototype)')
   [IO.File]::WriteAllText((Join-Path $FixtureDirectory 'control.lua'),$control,[Text.UTF8Encoding]::new($false))
 }
 
