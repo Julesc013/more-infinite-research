@@ -205,13 +205,12 @@ foreach($target in @('f210','f200')){
   Assert-MIR421CurrentUpgradeInputMode @mode;$currentAssertions++
   $mode422=$mode.Clone();$mode422.SourceVersion='4.2.2';$mode422.FromVersion="4.2.${code}01";$mode422.ToVersion="4.2.${code}02"
   Assert-MIR421CurrentUpgradeInputMode @mode422;$currentAssertions++
-  foreach($case in @('SourceVersion','FromVersion','ToVersion','SpaceIsFake','K2ImersiteInputProfile','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
+  foreach($case in @('SourceVersion','FromVersion','ToVersion','K2ImersiteInputProfile','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
     $invalid422=$mode422.Clone()
     $invalid422[$case]=switch($case){
       'SourceVersion' {'4.2.1'}
       'FromVersion' {"4.2.${code}00"}
       'ToVersion' {"4.2.${code}01"}
-      'SpaceIsFake' {$true}
       'K2ImersiteInputProfile' {'old-k2-profile.json'}
       'SourceOnlyFixtureNames' {@('unrequested')}
       'PublishedPredecessorManifest' {''}
@@ -223,6 +222,13 @@ foreach($target in @('f210','f200')){
   }
   $sif=$mode.Clone();$sif.SpaceIsFake=$true;$sif.Archetype=if($target-ceq'f210'){'base-continuations'}else{'base-default'}
   Assert-MIR421CurrentUpgradeInputMode @sif;$currentAssertions++
+  $sif422=$sif.Clone();$sif422.SourceVersion='4.2.2';$sif422.FromVersion="4.2.${code}01";$sif422.ToVersion="4.2.${code}02"
+  Assert-MIR421CurrentUpgradeInputMode @sif422;$currentAssertions++
+  foreach($field in @('SourceVersion','FromVersion','ToVersion','Archetype')){
+    $invalid422=$sif422.Clone();$invalid422[$field]=switch($field){'SourceVersion'{'4.2.1'};'FromVersion'{"4.2.${code}00"};'ToVersion'{"4.2.${code}01"};'Archetype'{'space-age-native-owner'}}
+    $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @invalid422}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-')}
+    if(-not$rejected){throw "4.2.2 SIF invalid mode accepted: $target $field"};$currentAssertions++
+  }
   foreach($case in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SourceOnlyFixtureNames','SelectedReleaseManifest','PublishedPredecessorManifest','Retention','K2ImersiteInputProfile')){
     $mutated=$mode.Clone()
     $mutated[$case]=switch($case){
@@ -278,4 +284,17 @@ try {
     $currentAssertions++
   }
 } finally { $RepoRoot=$RepoRootOriginal }
+# Consume the real outer descriptor and result assignments, not a matching
+# string: a missing SourceVersion argument must fail the 4.2.2 case.
+$sifCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$sifDescriptor'-and$n.Right.Extent.Text.StartsWith('Get-MIR421SpaceFakeUpgradeDescriptor ')},$true))
+$sifResults=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$result.native_scenario'-and$n.Right.Extent.Text-ceq'$sifDescriptor.scenario'},$true))
+if($sifCalls.Count-ne1-or$sifResults.Count-ne1){throw 'SIF caller or result is missing or ambiguous'}
+foreach($SelectedTarget in @('f210','f200')){foreach($patch in @(1,2)){
+  $code=$SelectedTarget.Substring(1);$SourceVersion="4.2.$patch";$FromVersion="4.2.${code}0$($patch-1)";$ToVersion="4.2.${code}0$patch"
+  $FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";$Archetype=if($SelectedTarget-ceq'f210'){'base-continuations'}else{'base-default'}
+  . ([scriptblock]::Create($sifCalls[0].Extent.Text))
+  $result=[ordered]@{};. ([scriptblock]::Create($sifResults[0].Extent.Text))
+  if($sifDescriptor.source_version-cne$SourceVersion-or$result.native_scenario-cne"SIF-01-published-4.2.$($patch-1)-to-4.2.$patch"){throw 'SIF caller lost source or predecessor identity'}
+  $currentAssertions++
+}}
 [pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

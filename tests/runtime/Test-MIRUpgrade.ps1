@@ -96,7 +96,7 @@ function Assert-MIR421CurrentUpgradeInputMode {
     if (-not $K2ImersiteInputProfile) { throw '[mir421-k2-upgrade-inputs-required]' }
     Assert-MIR421K2UpgradeTransition -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake $SpaceIsFake -SourceOnlyFixtureNames $SourceOnlyFixtureNames
   } elseif ($SpaceIsFake) {
-    $null=Get-MIR421SpaceFakeUpgradeDescriptor -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype
+    $null=Get-MIR421SpaceFakeUpgradeDescriptor -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SourceVersion $SourceVersion
   } elseif ($FixtureName -cne "assert-upgrade-4-0-${code}00-to-4-1-${code}00" -or $Archetype -cnotin @('','base-default')) {
     throw '[mir421-current-upgrade-scenario]'
   }
@@ -363,7 +363,7 @@ if ($SpaceIsFake) {
   if ((-not $SelectedReleaseManifest -and -not $currentMaterialization) -or -not $PublishedMaintenancePredecessorManifestPath) { throw '[mir421-sif-manifests-required]' }
   if (-not $OutputPath -or (Test-Path -LiteralPath $OutputPath) -or $Retention -cne 'Always') { throw '[mir421-sif-fresh-retained-output-required]' }
   $null=Resolve-MIR441RecoveryScratchPath -Path $(if([IO.Path]::IsPathRooted($OutputPath)){$OutputPath}else{Join-Path $RepoRoot $OutputPath})
-  $sifDescriptor=Get-MIR421SpaceFakeUpgradeDescriptor -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype
+  $sifDescriptor=Get-MIR421SpaceFakeUpgradeDescriptor -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SourceVersion $SourceVersion
   $engineBaseInfo=Get-Content -LiteralPath (Join-Path $engineData 'base/info.json') -Raw|ConvertFrom-Json
   if(([version]$engineBaseInfo.version).ToString(2)-cne$sifDescriptor.line){throw '[mir421-sif-engine-authority] Configured engine does not match the selected target.'}
   if (-not $currentMaterialization) {
@@ -496,8 +496,8 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   if ($targetCode -cin @('210','200','110','100') -and
       (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
        ($FromVersion -ceq "4.2.${targetCode}01" -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
-      -not $SpaceIsFake -and $Archetype -cin @('','base-default')) {
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion
+      ($SpaceIsFake -or $Archetype -cin @('','base-default'))) {
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -SpaceIsFake:$SpaceIsFake
   }
 }
 if ($isHistoricalTerminalFixture) {
@@ -881,7 +881,7 @@ if ($secondReloadEvidence) {
   $result.second_reload_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $secondReloadEvidence).Hash
 }
 if ($SpaceIsFake) {
-  $result.native_scenario='SIF-01-published-4.2.0-to-4.2.1'
+  $result.native_scenario=$sifDescriptor.scenario
   $result.dependency_inputs=$sifTerminal.selected
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Algorithm SHA256).Hash
 }

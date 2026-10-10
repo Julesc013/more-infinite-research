@@ -108,6 +108,23 @@ function Test-MaintenanceFixtureCallSites {
     $control=Get-Content -LiteralPath (Join-Path $stagedFixture 'control.lua') -Raw
     Assert-LibraryTest ($control.Contains($FromVersion)-and$control.Contains($ToVersion)-and-not$control.Contains('__MIR_UPGRADE_')) "$code/$patch real caller specializes continuity assertions"
   }}
+  foreach($sifCode in @('210','200')){foreach($patch in @(1,2)){
+    $SourceVersion="4.2.$patch";$FromVersion="4.2.${sifCode}0$($patch-1)";$ToVersion="4.2.${sifCode}0$patch"
+    $SpaceIsFake=$true;$Archetype=if($sifCode-ceq'210'){'base-continuations'}else{'base-default'}
+    $FixtureName="assert-upgrade-4-0-${sifCode}00-to-4-1-${sifCode}00"
+    $stagedFixture=Join-Path $root "owned-fixtures/caller-sif-$sifCode-$patch"
+    Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$FixtureName)) -Destination $stagedFixture -Recurse
+    . ([scriptblock]::Create($modern[0].Extent.Text))
+    $read=Get-Content -LiteralPath (Join-Path $stagedFixture 'info.json') -Raw|ConvertFrom-Json
+    $expected=if($patch-eq1){'0.1.0'}else{'0.1.3'}
+    Assert-LibraryTest ($read.version-ceq$expected-and$read.dependencies-ccontains"more-infinite-research >= $FromVersion") "$sifCode/$patch SIF caller isolates its fixture identity from base upgrades"
+    $sifControl=Add-MIR421SpaceFakeUpgradeOracle -ControlText (Get-Content -LiteralPath (Join-Path $stagedFixture 'control.lua') -Raw)
+    Assert-LibraryTest ($sifControl.Contains($FromVersion)-and$sifControl.Contains($ToVersion)-and$sifControl.Contains('sif.capture()')-and$sifControl.Contains('sif.verify("upgrade")')-and$sifControl.Contains('sif.verify("reload")')) "$sifCode/$patch SIF caller preserves the native oracle at every phase"
+    $beforeIdentity=Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json')
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$sifCode) -SourceVersion $SourceVersion -SpaceIsFake
+    Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json'))-ceq$beforeIdentity) "$sifCode/$patch SIF fixture identity is idempotent"
+    if($patch-eq2){Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$sifCode) -SourceVersion $SourceVersion} 'mir421-modern-base-fixture-template'}
+  }}
 }
 Test-MaintenanceFixtureCallSites
 $baseFixtureArchive=New-TestArchive $fixtureName '0.1.1' -InfoJson (Get-Content -LiteralPath (Join-Path $baseFixture 'info.json') -Raw)
