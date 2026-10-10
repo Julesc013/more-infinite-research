@@ -1,6 +1,6 @@
 {
   "name": "mir-fixture-assert-secretas-finite-continuation-hotfix",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "title": "MIR Fixture - Secretas finite robot storage continuation",
   "author": "MIR maintainers",
   "factorio_version": "2.1",

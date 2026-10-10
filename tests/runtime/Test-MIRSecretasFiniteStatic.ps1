@@ -14,7 +14,7 @@ $scratch=Join-Path $repo ('build/tmp/secretas-selected-fixture-'+[guid]::NewGuid
 $source=Join-Path $repo 'fixtures/assert-secretas-finite-continuation-hotfix'
 $selected=New-SecretasSelectedFixture -Source $source -Run $scratch -SelectedTarget f200
 $info=Get-Content -LiteralPath (Join-Path $selected 'info.json') -Raw|ConvertFrom-Json
-Assert-Secretas ($info.version-ceq'0.1.1'-and$info.factorio_version-ceq'2.0') 'F200 private identity'
+Assert-Secretas ($info.version-ceq'0.1.3'-and$info.factorio_version-ceq'2.0') 'F200 private identity'
 Assert-Secretas (($info.dependencies-join'|')-ceq'base = 2.0.77|space-age = 2.0.77|secretas = 1.0.33|pretty-frozeta = 0.1.0|more-infinite-research = 4.2.20002') 'F200 exact dependencies'
 $control=Get-Content -LiteralPath (Join-Path $selected 'control.lua') -Raw
 Assert-Secretas ($control.Contains('"4.2.20002"')-and$control.Contains('"2.0.77"')-and-not$control.Contains('"2.1.21"')) 'F200 runtime identity'

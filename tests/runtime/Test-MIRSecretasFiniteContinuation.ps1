@@ -27,7 +27,7 @@ function New-SecretasSelectedFixture([string]$Source,[string]$Run,[string]$Selec
   $selected=Join-Path $Run 'fixture-source'
   [IO.Directory]::CreateDirectory($selected)|Out-Null
   $info=Get-Content -LiteralPath (Join-Path $Source 'info.json') -Raw|ConvertFrom-Json
-  $info.version='0.1.1';$info.factorio_version='2.0'
+  $info.version='0.1.3';$info.factorio_version='2.0'
   $info.dependencies=@('base = 2.0.77','space-age = 2.0.77','secretas = 1.0.33','pretty-frozeta = 0.1.0','more-infinite-research = 4.2.20002')
   $info|ConvertTo-Json -Depth 8|Set-Content -LiteralPath (Join-Path $selected 'info.json')
   $control=Get-Content -LiteralPath (Join-Path $Source 'control.lua') -Raw
@@ -36,6 +36,7 @@ function New-SecretasSelectedFixture([string]$Source,[string]$Run,[string]$Selec
     $control=$control.Replace($pair[0],$pair[1])
   }
   [IO.File]::WriteAllText((Join-Path $selected 'control.lua'),$control,[Text.UTF8Encoding]::new($false))
+  Copy-Item -LiteralPath (Join-Path $Source 'data-final-fixes.lua') -Destination (Join-Path $selected 'data-final-fixes.lua')
   return $selected
 }
 function Assert-SecretasMarker([string]$Text,[string]$Stage){
@@ -49,7 +50,7 @@ function Invoke-SecretasEngine([string]$Stage,[string[]]$Arguments,[scriptblock]
   $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $argsList -TimeoutSeconds $scenario.timeout_seconds -CompletionPredicate $Completion
   Assert-Secretas ([bool]$actor.result.passed) "$Stage engine failed"
   $log=Join-Path $run ($Stage+'.factorio.log');Copy-Item -LiteralPath $live -Destination $log
-  $loaded=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log
+  $loaded=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver $info.name
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources
   [pscustomobject]@{log=$log;actor=$actor;loaded=$loaded}
 }
