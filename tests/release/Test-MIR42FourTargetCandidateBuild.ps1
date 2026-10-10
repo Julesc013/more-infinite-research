@@ -1071,7 +1071,7 @@ try {
       $entry = $archive.GetEntry("more-infinite-research_$version/README.md")
       $reader = [IO.StreamReader]::new($entry.Open())
       try { $readme = $reader.ReadToEnd() } finally { $reader.Dispose() }
-      Assert-MIR42CandidateBuildTest ($readme.Contains("# More Infinite Research $version") -and $readme.Contains("More Infinite Research $version is") -and $readme.Contains("more-infinite-research_$version.zip") -and -not $readme.Contains('4.2.10001')) "patch-historical-readme-package-identity-$target"
+      Assert-MIR42CandidateBuildTest ($readme.Contains("# More Infinite Research $version") -and $readme.Contains("More Infinite Research $version is") -and $readme.Contains("more-infinite-research_$version.zip") -and $readme -notmatch '4\.2\.100[0-9]{2}') "patch-historical-readme-package-identity-$target"
       Assert-MIR42CandidateBuildTest ($readme.Contains("Earlier fresh-load evidence used $($frozenRecord.engine.version);") -and $readme.Contains("The exact published $($frozenRecord.predecessor.version) archive remains a historical predecessor record.") -and $readme.Contains('Consult the matching release record for native qualification of this exact package.')) "patch-historical-readme-evidence-boundary-$target"
     } finally { $archive.Dispose() }
   }
