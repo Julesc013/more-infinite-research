@@ -4,11 +4,12 @@ local factorio_catalogue = require("prototypes.mir.runtime.research_browser_fact
 local mir_provider = require("prototypes.mir.runtime.research_browser_mir_provider")
 local runtime_state = require("prototypes.mir.runtime.state")
 local factorio_runtime_state = require("prototypes.mir.platform.factorio.runtime_state")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local codec = require("prototypes.mir.settings.profile_codec")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
-local M = {requires_features = {"settings_profiles"}}
+local M = {requires_features = {"research_library"}}
 local ROOT, PREFIX, SHORTCUT = "mir_research_browser", "mir_browser_", "mir-research-browser"
 local RESEARCH_LIST_WIDTH, RESEARCH_DETAIL_WIDTH = 360, 320
 local RESEARCH_LIST_MIN_WIDTH, RESEARCH_DETAIL_MIN_WIDTH = 240, 280
@@ -1136,9 +1137,11 @@ local function debug_rows(player, body, v, width)
     local checkbox = tools.add{type = "checkbox", state = v[option[1]] == true, caption = {"mir-browser." .. option[2]}, tags = {mir_browser = option[1]}}
     checkbox.style.maximal_width = text_width
   end
-  section(tools, {"mir-browser.configuration"}, text_width)
-  label(tools, {"mir-browser.profile-purpose"}, text_width)
-  button(tools, "export", {"mir-browser.export"})
+  if target_line.feature_enabled("settings_profiles") then
+    section(tools, {"mir-browser.configuration"}, text_width)
+    label(tools, {"mir-browser.profile-purpose"}, text_width)
+    button(tools, "export", {"mir-browser.export"})
+  end
   section(tools, {"mir-browser.layout"}, text_width)
   button(tools, "layout-reset", {"mir-browser.reset-layout"})
   section(tools, {"mir-browser.startup-crash"}, text_width)
@@ -1430,7 +1433,9 @@ local function click(event)
     v.detail_token = nil
     debug_preview(player)[PREFIX .. "report"].text = report_text(player)
     return
-  elseif action == "export" then export(player)
+  elseif action == "export" then
+    if not target_line.feature_enabled("settings_profiles") then return end
+    export(player)
   elseif action == "refresh" then
     local translations = translation_state()
     local cache = translations[player.index]
@@ -1631,6 +1636,7 @@ local function shortcut(event)
   if player.gui.screen[ROOT] then close(player) else render(player) end
 end
 function M.register()
+  if not target_line.feature_enabled("research_library") then return end
   remote.add_interface("more-infinite-research-browser", {
     open = function(player_index, options)
       local player = game.get_player(player_index)

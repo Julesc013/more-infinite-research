@@ -10,7 +10,7 @@ local function expect(check, condition, message)
 end
 
 local function make_host_factory(host_source, catalogue_source)
-  local function make_environment()
+  local function make_environment(options)
     local events, buckets = {}, {}
     local metrics = {render_calls = 0, gameplay_mutations = 0, destroy_calls = 0, shortcut_calls = 0}
     local player
@@ -44,6 +44,11 @@ local function make_host_factory(host_source, catalogue_source)
         end
       },
       ["prototypes.mir.platform.factorio.runtime_state"] = {root = function() return {} end},
+      ["prototypes.mir.platform.factorio.target_line"] = {feature_enabled = function(name)
+        if name == "research_library" then return not (options and options.disable_library) end
+        if name == "settings_profiles" then return not (options and options.disable_profiles) end
+        return false
+      end},
       ["prototypes.mir.runtime.startup_settings"] = {},
       ["prototypes.mir.settings.profile_codec"] = {},
       ["prototypes.mir.settings.catalog"] = {},
@@ -102,7 +107,7 @@ local function make_host_factory(host_source, catalogue_source)
         "if event.element and event.element.valid and event.element.name == ROOT then close(player) end", 1)
       if count ~= 1 then error("close ownership mutation anchor not found") end
     end
-    local env, events, metrics, buckets, set_player, catalogue_module = make_environment()
+    local env, events, metrics, buckets, set_player, catalogue_module = make_environment(options)
     local chunk, load_error = load(source, "research_browser_handler_fixture", "t", env)
     if not chunk then error(load_error) end
     local host = chunk()
@@ -198,14 +203,89 @@ local function invoke_and_assert_inert(fixture, element_name, check)
     element_name .. " click cannot mutate gameplay")
 end
 
+local function check_capability_stages(sources, check)
+  expect(check, type(sources) == "table", "Library capability controls receive actual stage and coordinator source")
+  for _, library in ipairs{false, true} do
+    for _, profiles in ipairs{false, true} do
+      local features = {research_library = library, settings_profiles = profiles}
+      local shortcuts, registrations = {}, {}
+      local modules = {
+        ["prototypes.mir.platform.factorio.target_line"] = {feature_enabled = function(name) return features[name] == true end},
+        ["prototypes.mir.platform.factorio.data_raw"] = {extend = function(rows) shortcuts = rows end},
+        ["prototypes.mir.platform.factorio.mods"] = {exists = function() return false end},
+        ["prototypes.mir.streams.registry"] = {},
+        ["prototypes.mir.runtime.scripted_techs"] = {register = function() registrations.library = true end},
+        ["prototypes.mir.runtime.settings_profile"] = {register = function() registrations.profiles = true end}
+      }
+      local env = {script = {}, type = type, error = error, rawget = rawget, _G = {},
+        require = function(name) return assert(modules[name], "unexpected stage module: " .. name) end}
+      assert(load(sources.data_stage, "actual-library-data-stage", "t", env))().run()
+      expect(check, (#shortcuts == 1) == library,
+        "shortcut availability follows Library capability independently of settings profiles")
+      if library then
+        expect(check, shortcuts[1].name == "mir-research-browser"
+          and shortcuts[1].icon == "__base__/graphics/icons/lab.png",
+          "independent Library capability preserves shortcut identity and absent-DLC fallback")
+      end
+      assert(load(sources.control_stage, "actual-library-control-stage", "t", env))().run()
+      expect(check, (registrations.library == true) == library
+        and (registrations.profiles == true) == profiles,
+        "Library and profile registration are independently selected without gameplay effects")
+
+      for target, source in pairs(sources.coordinators) do
+        local callbacks, calls, loads = {}, {}, 0
+        local browser = {requires_features = {"research_library"}}
+        for _, method in ipairs{"register", "on_load", "on_init", "on_configuration_changed"} do
+          local key = method
+          browser[key] = function() calls[key] = (calls[key] or 0) + 1 end
+        end
+        local no_op = function() end
+        local environment = {type = type, error = error, ipairs = ipairs,
+          script = {on_load = function(fn) callbacks.load = fn end,
+            on_init = function(fn) callbacks.init = fn end,
+            on_configuration_changed = function(fn) callbacks.configure = fn end,
+            on_event = no_op}, defines = {events = {}}}
+        environment.require = function(name)
+          if name == "prototypes.mir.platform.factorio.target_line" then return modules[name] end
+          if name == "prototypes.mir.runtime.research_browser" then loads = loads + 1; return browser end
+          if name == "prototypes.mir.runtime.state" then return {bucket = function() return {} end} end
+          if name == "prototypes.mir.runtime.startup_settings" then return {get = function() return false end} end
+          return {requires_features = {}, register = no_op, on_load = no_op}
+        end
+        assert(load(source, "actual-library-coordinator-" .. target, "t", environment))().register()
+        callbacks.load(); callbacks.init(); callbacks.configure()
+        expect(check, loads == (library and 1 or 0), target .. " loads the host only when the Library is supported")
+        for _, method in ipairs{"register", "on_load", "on_init", "on_configuration_changed"} do
+          expect(check, (calls[method] or 0) == (library and 1 or 0),
+            target .. " dispatches Library " .. method .. " independently of profile support")
+        end
+      end
+    end
+  end
+end
+
 -- host_source_string is trusted project source supplied by the test harness.
 -- The isolated load environment exists only inside this regression fixture.
-return function(host_source_string, check, catalogue_source_string)
+return function(host_source_string, check, catalogue_source_string, capability_sources)
+  check_capability_stages(capability_sources, check)
   expect(check, type(host_source_string) == "string" and #host_source_string > 0,
     "handler regression receives trusted browser host source")
   expect(check, type(check) == "function", "handler regression receives an assertion function")
   local host_factory = make_host_factory(host_source_string, catalogue_source_string)
   local fixture = fixture_from(host_factory, nil, check)
+  expect(check, #fixture.host.requires_features == 1
+    and fixture.host.requires_features[1] == "research_library",
+    "Library availability declares its own capability, independently of settings profiles")
+  local disabled = host_factory{disable_library = true}
+  expect(check, disabled.on_gui_click == nil and disabled.on_gui_closed == nil,
+    "a target without the Library installs no browser GUI callbacks")
+  local without_profiles = fixture_from(host_factory, {disable_profiles = true}, check)
+  local export_button = {valid = true, tags = {mir_browser = "export"}, parent = without_profiles.root}
+  local export_ok, export_error = pcall(without_profiles.on_gui_click, {
+    player_index = without_profiles.player.index, element = export_button})
+  expect(check, export_ok, "a stale profile-export action is inert without profile support: " .. tostring(export_error))
+  expect(check, without_profiles.root.valid and without_profiles.metrics.gameplay_mutations == 0,
+    "disabling profile export retains the Library and gameplay state")
   -- Factorio dispatches selection/text events separately; these click probes
   -- ensure the broad click subscription cannot rebuild controls while those
   -- controls are being operated.
