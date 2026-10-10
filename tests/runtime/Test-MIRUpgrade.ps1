@@ -76,6 +76,20 @@ function Resolve-MIRUpgradeManifestVersion {
   return [string]$identity.distribution_version
 }
 
+function Resolve-MIR42UpgradePredecessorReaderVersion {
+  param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$FromVersion,
+    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+  if($Target-cnotmatch '^f(?<code>210|200|110|100|017|016|015|014|013)$'){throw '[mir42-upgrade-predecessor-target]'}
+  $code=$Matches.code
+  if($FromVersion-cnotmatch ('^4[.]2[.]'+$code+'(?<patch>00|01)$')){throw '[mir42-upgrade-predecessor-version]'}
+  $patch=[int]$Matches.patch
+  if($patch-ge([version]$SourceVersion).Build){throw '[mir42-upgrade-predecessor-version]'}
+  # Reuse the existing exact published-custody reader for that predecessor.
+  # This selects its frozen release contract; the actual candidate retains
+  # SourceVersion, its current materialization and its CCC02 identity.
+  return '4.2.'+($patch+1)
+}
+
 function Assert-MIR421CurrentUpgradeInputMode {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,
     [string]$Archetype,[bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),
@@ -88,8 +102,9 @@ function Assert-MIR421CurrentUpgradeInputMode {
   }
   $code=$Target.Substring(1)
   $toPatch=([version]$SourceVersion).Build
-  $fromPatch=$toPatch-1
-  if ($FromVersion -cne ('4.2.'+$code+$fromPatch.ToString('00')) -or $ToVersion -cne ('4.2.'+$code+$toPatch.ToString('00')) -or $SourceOnlyFixtureNames.Count) {
+  $fromPatches=if($SourceVersion-ceq'4.2.2'){@(0,1)}else{@(0)}
+  $allowedFrom=@($fromPatches|ForEach-Object {'4.2.'+$code+$_.ToString('00')})
+  if ($FromVersion -cnotin $allowedFrom -or $ToVersion -cne ('4.2.'+$code+$toPatch.ToString('00')) -or $SourceOnlyFixtureNames.Count) {
     throw '[mir421-current-upgrade-transition]'
   }
   if ($K2ImersiteInputProfile -or $FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002')) {
@@ -352,10 +367,11 @@ $sifInputs=@()
 $publishedInputs=$null
 if ($SpaceIsFake -or $k2Scenario -or $currentMaterialization -or $PublishedMaintenancePredecessorManifestPath) {
   . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
-  $predecessorContract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $SourceVersion
+  $predecessorReaderVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $SelectedTarget -FromVersion $FromVersion -SourceVersion $SourceVersion
+  $predecessorContract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $predecessorReaderVersion
   $metadataText=(& gh api ('repos/Julesc013/more-infinite-research/releases/tags/'+$predecessorContract.source_tag) | Out-String)
   if ($LASTEXITCODE -ne 0) { throw '[mir421-upgrade-release-metadata]' }
-  $publishedInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $SourceVersion
+  $publishedInputs=Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $RepoRoot -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $predecessorReaderVersion -SelectedTarget $SelectedTarget -SelectedArchivePath $from
   $predecessor=@($publishedInputs.targets | Where-Object target -CEQ $SelectedTarget)
   if ($predecessor.Count -ne 1 -or [string]$predecessor[0].path -cne $from -or
       [string]$predecessor[0].version -cne $FromVersion -or
@@ -499,9 +515,9 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo.Replace($dependencyFrom, "more-infinite-research >= $FromVersion"), [Text.UTF8Encoding]::new($false))
   if ($targetCode -cin @('210','200','110','100') -and
       (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
-       ($FromVersion -ceq "4.2.${targetCode}01" -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
+       ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
       ($SpaceIsFake -or $Archetype -cin @('','base-default') -or ($targetCode-ceq'210' -and $Archetype-ceq'space-age-native-owner'))) {
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -SpaceIsFake:$SpaceIsFake -SpaceAge:($Archetype-ceq'space-age-native-owner')
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceIsFake:$SpaceIsFake -SpaceAge:($Archetype-ceq'space-age-native-owner')
   }
 }
 if ($isHistoricalTerminalFixture) {
@@ -529,8 +545,8 @@ if ($isHistoricalTerminalFixture) {
   [IO.File]::WriteAllText($stagedControlPath, $stagedControl, [Text.UTF8Encoding]::new($false))
   $targetCode=([string]$historical.line).Replace('.','').PadLeft(3,'0')
   if (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
-      ($FromVersion -ceq "4.2.${targetCode}01" -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) {
-    Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion
+      ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) {
+    Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion
   }
 }
 if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {

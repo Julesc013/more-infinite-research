@@ -11,20 +11,27 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target,
     [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1',
+    [AllowEmptyString()][string]$FromVersion='',
     [switch]$SpaceIsFake,
     [switch]$SpaceAge)
-  # Only the disposable prepared fixture changes. Retain SIF 4.2.1 at 0.1.0
-  # and base 4.2.1/4.2.2 at 0.1.1/0.1.2; SIF 4.2.2 uses 0.1.3 and the
-  # complete Space Age fixtures use 0.1.4/0.1.5 so distinct
-  # prepared bytes never compete for one installed mod identity.
+  # Only the disposable prepared fixture changes. Identity includes the
+  # predecessor when 4.2.2 tests both CCC00 -> CCC02 and CCC01 -> CCC02:
+  # their specialized control.lua bytes differ and must never share a library
+  # archive name/version.
   if($SpaceIsFake -and $Target -cnotin @('f210','f200')){throw '[mir421-sif-target]'}
   if($SpaceAge -and ($SpaceIsFake -or $Target-cne'f210')){throw '[mir422-space-age-fixture-target]'}
-  $fixtureVersion=if($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.5'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  $code=$Target.Substring(1)
+  $sourcePatch=([version]$SourceVersion).Build
+  if([string]::IsNullOrWhiteSpace($FromVersion)){$FromVersion='4.2.'+$code+($sourcePatch-1).ToString('00')}
+  $fromMatch=[regex]::Match($FromVersion,('^4[.]2[.]'+$code+'(?<patch>00|01)$'))
+  if(-not$fromMatch.Success-or([int]$fromMatch.Groups['patch'].Value-ge$sourcePatch)){throw '[mir42-upgrade-fixture-predecessor]'}
+  $fromPatch=[int]$fromMatch.Groups['patch'].Value
+  $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
+  $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.8'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.5'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
   $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
-  $code=$Target.Substring(1)
   $line=switch($Target){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'}}
   if($info.name-cne"mir-fixture-assert-upgrade-4-0-${code}00-to-4-1-${code}00"-or
     $info.factorio_version-cne$line-or$info.version-cnotin@('0.1.0',$fixtureVersion)){
@@ -38,12 +45,19 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
 function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2')][string]$SourceVersion)
+    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2')][string]$SourceVersion,
+    [AllowEmptyString()][string]$FromVersion='')
+  $code=$Target.Substring(1)
+  $sourcePatch=([version]$SourceVersion).Build
+  if([string]::IsNullOrWhiteSpace($FromVersion)){$FromVersion='4.2.'+$code+($sourcePatch-1).ToString('00')}
+  $fromMatch=[regex]::Match($FromVersion,('^4[.]2[.]'+$code+'(?<patch>00|01)$'))
+  if(-not$fromMatch.Success-or([int]$fromMatch.Groups['patch'].Value-ge$sourcePatch)){throw '[mir42-upgrade-fixture-predecessor]'}
+  $fromPatch=[int]$fromMatch.Groups['patch'].Value
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
   $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
-  $fixtureVersion='1.0.'+([version]$SourceVersion).Build
+  $fixtureVersion=if($SourceVersion-ceq'4.2.2'-and$fromPatch-eq0){'1.0.3'}else{'1.0.'+$sourcePatch}
   $line='0.'+[int]$Target.Substring(1)
   if($info.name-cne'mir-fixture-assert-upgrade-historical-terminal-to-mir42'-or
     $info.factorio_version-cne$line-or$info.version-cnotin@('1.0.0',$fixtureVersion)){
@@ -61,9 +75,11 @@ function Get-MIR421SpaceFakeUpgradeDescriptor {
   $expectedFixture = "assert-upgrade-4-0-${code}00-to-4-1-${code}00"
   $expectedArchetype = if ($Target -ceq 'f210') { 'base-continuations' } else { 'base-default' }
   $patch=([version]$SourceVersion).Build
-  $predecessorSourceVersion='4.2.'+($patch-1)
-  if ($FromVersion -cne ('4.2.'+$code+($patch-1).ToString('00')) -or $ToVersion -cne ('4.2.'+$code+$patch.ToString('00')) -or
+  $fromPatches=if($SourceVersion-ceq'4.2.2'){@(0,1)}else{@(0)}
+  $allowedFrom=@($fromPatches|ForEach-Object {'4.2.'+$code+$_.ToString('00')})
+  if ($FromVersion -cnotin $allowedFrom -or $ToVersion -cne ('4.2.'+$code+$patch.ToString('00')) -or
       $FixtureName -cne $expectedFixture -or $Archetype -cne $expectedArchetype) { throw '[mir421-sif-transition]' }
+  $predecessorSourceVersion='4.2.'+[int]$FromVersion.Substring($FromVersion.Length-2)
   $line = if ($Target -ceq 'f210') { '2.1' } else { '2.0' }
   $inputs = if ($Target -ceq 'f210') { @(
     # 1.0.76 fails native 2.1.21 item validation before save creation; 1.0.78

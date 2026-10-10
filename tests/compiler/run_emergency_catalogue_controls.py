@@ -30,6 +30,9 @@ CASES = {
     "modern-upgrade-oracle-f210": (
         "f210", Path("tests/runtime/modern_catalogue_upgrade_controls.lua"),
     ),
+    "secretas-native-oracle": (
+        "f210", Path("tests/runtime/secretas_finite_native_fixture_controls.lua"),
+    ),
 }
 PASS = re.compile(r"^MIR-[A-Z0-9-]+-PASS\s+(\d+)\s*$")
 MAX_OUTPUT_LINES = 12
@@ -151,6 +154,9 @@ def project_inputs(runtime, test_path):
     if test_path.name == "modern_catalogue_upgrade_controls.lua":
         fixture = REPO / "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
         hashes[relative_to_repo(fixture)] = sha256(fixture)
+    if test_path.name == "secretas_finite_native_fixture_controls.lua":
+        fixture = REPO / "fixtures/assert-secretas-finite-continuation-hotfix/control.lua"
+        hashes[relative_to_repo(fixture)] = sha256(fixture)
     for module in modules:
         source = (REPO / "source" / module).resolve()
         if not source.is_file():
@@ -168,6 +174,9 @@ def execute_case(lua_runtime, name, target, relative_test):
     status = "failed"
     failure = None
     try:
+        if test_path.name == "secretas_finite_native_fixture_controls.lua":
+            fixture = REPO / "fixtures/assert-secretas-finite-continuation-hotfix/control.lua"
+            runtime.globals().MIR_SECRETAS_FINITE_CONTROL_SOURCE = fixture.read_text(encoding="utf-8-sig")
         runtime.execute(test_path.read_text(encoding="utf-8-sig"))
         markers = [PASS.match(line) for line in output]
         markers = [marker for marker in markers if marker]

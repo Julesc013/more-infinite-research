@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 230,
+  "test_count": 231,
   "tests": [
     {
       "id": "docs.check",
@@ -8187,6 +8187,32 @@
       "matrix": null
     },
     {
+      "id": "static.mir422-secretas-native-harness",
+      "proposition": "The governed test 'static.mir422-secretas-native-harness' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRSecretasFiniteContinuation.ps1",
+        "tests/runtime/Test-MIRSecretasFiniteStatic.ps1",
+        "tests/runtime/secretas_finite_native_fixture_controls.lua",
+        "tests/compiler/run_emergency_catalogue_controls.py",
+        "fixtures/assert-secretas-finite-continuation-hotfix/**",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tests/support/MIR421SpaceFakeUpgrade.ps1"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.modern-launch-return-harness",
       "proposition": "The governed test 'static.modern-launch-return-harness' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -8421,11 +8447,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 69,
-      "runtime-upgrade": 58,
+      "runtime-upgrade": 59,
       "compiler-static": 19,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 217,
+    "canonical_test_commands": 218,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8438,5 +8464,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a1af70667bdc9b1b15ccab429ba2c8bdfc3430de2e243ce606376dc746ea3315"
+  "digest": "sha256:ec1484807356953252fe5f08c5b056e4861dfe533db4570886495c03500fb6f1"
 }

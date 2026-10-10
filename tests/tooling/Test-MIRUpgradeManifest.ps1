@@ -14,6 +14,9 @@ if($historicalFunctions.Count -ne 1){throw 'Historical transition resolver missi
 $currentFunctions=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Assert-MIR421CurrentUpgradeInputMode'},$true))
 if($currentFunctions.Count -ne 1){throw 'Current-package input mode validator missing or ambiguous'}
 . ([scriptblock]::Create($currentFunctions[0].Extent.Text))
+$predecessorFunctions=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Resolve-MIR42UpgradePredecessorReaderVersion'},$true))
+if($predecessorFunctions.Count -ne 1){throw 'Published predecessor selector missing or ambiguous'}
+. ([scriptblock]::Create($predecessorFunctions[0].Extent.Text))
 $testRoot=Join-Path $RepoRoot ('build/handoff/mir421-upgrade-manifest/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $testRoot|Out-Null
 $manifestPath=$SelectedManifestPath
@@ -199,17 +202,31 @@ $k2Assertions+=2
 # These controlled inputs prove readers and rejection paths, never native saves.
 . (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
 $currentAssertions=0
+foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
+  $code=$target.Substring(1)
+  foreach($oldPatch in @(0,1)){
+    $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion ("4.2.${code}0"+$oldPatch) -SourceVersion 4.2.2
+    if($readerVersion-cne('4.2.'+($oldPatch+1))){throw 'Wrong published custody contract selected for direct path'}
+    $currentAssertions++
+  }
+  foreach($badFrom in @("4.1.${code}00","4.2.${code}02","4.2.${code}03",'4.2.99900')){
+    $refused=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $badFrom -SourceVersion 4.2.2|Out-Null}catch{$refused=$_.Exception.Message.StartsWith('[mir42-upgrade-predecessor-')}
+    if(-not$refused){throw 'Invalid published predecessor accepted'};$currentAssertions++
+  }
+}
 foreach($target in @('f210','f200')){
   $code=$target.Substring(1)
   $mode=@{Target=$target;FromVersion="4.2.${code}00";ToVersion="4.2.${code}01";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile=''}
   Assert-MIR421CurrentUpgradeInputMode @mode;$currentAssertions++
   $mode422=$mode.Clone();$mode422.SourceVersion='4.2.2';$mode422.FromVersion="4.2.${code}01";$mode422.ToVersion="4.2.${code}02"
   Assert-MIR421CurrentUpgradeInputMode @mode422;$currentAssertions++
+  $direct422=$mode422.Clone();$direct422.FromVersion="4.2.${code}00"
+  Assert-MIR421CurrentUpgradeInputMode @direct422;$currentAssertions++
   foreach($case in @('SourceVersion','FromVersion','ToVersion','K2ImersiteInputProfile','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
     $invalid422=$mode422.Clone()
     $invalid422[$case]=switch($case){
       'SourceVersion' {'4.2.1'}
-      'FromVersion' {"4.2.${code}00"}
+      'FromVersion' {"4.2.${code}02"}
       'ToVersion' {"4.2.${code}01"}
       'K2ImersiteInputProfile' {'old-k2-profile.json'}
       'SourceOnlyFixtureNames' {@('unrequested')}
@@ -224,8 +241,13 @@ foreach($target in @('f210','f200')){
   Assert-MIR421CurrentUpgradeInputMode @sif;$currentAssertions++
   $sif422=$sif.Clone();$sif422.SourceVersion='4.2.2';$sif422.FromVersion="4.2.${code}01";$sif422.ToVersion="4.2.${code}02"
   Assert-MIR421CurrentUpgradeInputMode @sif422;$currentAssertions++
+  $directSif422=$sif422.Clone();$directSif422.FromVersion="4.2.${code}00"
+  Assert-MIR421CurrentUpgradeInputMode @directSif422;$currentAssertions++
+  $directDescriptor=Get-MIR421SpaceFakeUpgradeDescriptor -Target $target -FromVersion $directSif422.FromVersion -ToVersion $directSif422.ToVersion -FixtureName $directSif422.FixtureName -Archetype $directSif422.Archetype -SourceVersion 4.2.2
+  if($directDescriptor.predecessor_source_version-cne'4.2.0'-or$directDescriptor.scenario-cne'SIF-01-published-4.2.0-to-4.2.2'){throw 'Direct SIF predecessor identity was lost'}
+  $currentAssertions++
   foreach($field in @('SourceVersion','FromVersion','ToVersion','Archetype')){
-    $invalid422=$sif422.Clone();$invalid422[$field]=switch($field){'SourceVersion'{'4.2.1'};'FromVersion'{"4.2.${code}00"};'ToVersion'{"4.2.${code}01"};'Archetype'{'space-age-native-owner'}}
+    $invalid422=$sif422.Clone();$invalid422[$field]=switch($field){'SourceVersion'{'4.2.1'};'FromVersion'{"4.2.${code}02"};'ToVersion'{"4.2.${code}01"};'Archetype'{'space-age-native-owner'}}
     $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @invalid422}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-')}
     if(-not$rejected){throw "4.2.2 SIF invalid mode accepted: $target $field"};$currentAssertions++
   }
@@ -253,9 +275,11 @@ foreach($target in @('f210','f200')){
 $currentK2=@{Target='f210';FromVersion='4.2.21000';ToVersion='4.2.21001';FixtureName='assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001';Archetype='';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile=$profilePath}
 $currentSpaceAge=@{Target='f210';FromVersion='4.2.21001';ToVersion='4.2.21002';FixtureName='assert-upgrade-4-0-21000-to-4-1-21000';Archetype='space-age-native-owner';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';SourceVersion='4.2.2'}
 Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge;$currentAssertions++
+$directSpaceAge=$currentSpaceAge.Clone();$directSpaceAge.FromVersion='4.2.21000'
+Assert-MIR421CurrentUpgradeInputMode @directSpaceAge;$currentAssertions++
 foreach($field in @('Target','FromVersion','ToVersion','FixtureName','SourceVersion','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
   $bad=$currentSpaceAge.Clone();$bad[$field]=switch($field){
-    'Target'{'f200'};'FromVersion'{'4.2.21000'};'ToVersion'{'4.2.21003'};'FixtureName'{'wrong'};'SourceVersion'{'4.2.1'};'SourceOnlyFixtureNames'{@('extra')};'PublishedPredecessorManifest'{''};'Retention'{'Never'}
+    'Target'{'f200'};'FromVersion'{'4.2.21002'};'ToVersion'{'4.2.21003'};'FixtureName'{'wrong'};'SourceVersion'{'4.2.1'};'SourceOnlyFixtureNames'{@('extra')};'PublishedPredecessorManifest'{''};'Retention'{'Never'}
   }
   $refused=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$refused=$_.Exception.Message.StartsWith('[mir421-')}
   if(-not$refused){throw "Current Space Age mode accepted invalid $field"};$currentAssertions++
@@ -272,6 +296,18 @@ try{Assert-MIR421CurrentUpgradeInputMode @currentK2}catch{$rejected=$_.Exception
 if(-not$rejected){throw 'Current-package K2 mode accepted without its locked profile'};$currentAssertions++
 # Execute the actual caller statements with a recording reader, so adding a
 # validator parameter without forwarding it cannot pass these controls.
+$predecessorSelectCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$predecessorReaderVersion'},$true))
+$publishedInputCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$publishedInputs'-and$n.Right.Extent.Text.StartsWith('Get-MIR42PublishedMaintenancePredecessorInputs ')},$true))
+if($predecessorSelectCalls.Count-ne1-or$publishedInputCalls.Count-ne1){throw 'Published input call missing or ambiguous'}
+function Get-MIR42PublishedMaintenancePredecessorInputs {param($RepoRoot,$ManifestPath,$ReleaseMetadata,$CandidateSourceVersion,$SelectedTarget,$SelectedArchivePath) return [pscustomobject]@{reader=$CandidateSourceVersion;target=$SelectedTarget;archive=$SelectedArchivePath}}
+foreach($SelectedTarget in @('f210','f200')){foreach($oldPatch in @(0,1)){
+  $code=$SelectedTarget.Substring(1);$SourceVersion='4.2.2';$FromVersion="4.2.${code}0$oldPatch"
+  $from='explicit-selected-published.zip';$PublishedMaintenancePredecessorManifestPath='explicit-frozen-manifest.json';$metadataText='{}'
+  . ([scriptblock]::Create($predecessorSelectCalls[0].Extent.Text))
+  . ([scriptblock]::Create($publishedInputCalls[0].Extent.Text))
+  if($publishedInputs.reader-cne('4.2.'+($oldPatch+1))-or$publishedInputs.target-cne$SelectedTarget-or$publishedInputs.archive-cne$from-or$SourceVersion-cne'4.2.2'){throw 'Published caller lost predecessor/archive/candidate identity'}
+  $currentAssertions++
+}}
 $readerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$currentMaterialization'-and$node.Right.Extent.Text.StartsWith('Read-MIRNativeProbeCurrentCandidate ')},$true))
 if($readerCalls.Count-ne1){throw 'Current candidate reader assignment missing or ambiguous'}
 $modeCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR421CurrentUpgradeInputMode'},$true))
