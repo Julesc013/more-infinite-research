@@ -3859,6 +3859,22 @@
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
       ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/browser_host.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/adapters/runtime-capabilities/game-browser-host.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Select the Library prototype/export API adapter for this engine; historical Library remains disabled.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 635,
+      "expected_sha256": "6D6F34BE9800BB6FA90E73A104E8D8B211BF69127D962B9EB81786EEAA5B6FCF",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
     }
   ],
   "invariants": {
@@ -3867,5 +3883,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "840C8A004493A7E55FD5D8DEF32964D1ABE3203C56B0AA2997FF8FF4D0E5F121"
+  "record_sha256": "FD0009BE14D7A02F8EB5BA5D37AE7B9469AD2589E19B85DBE8A750DB2D34340F"
 }

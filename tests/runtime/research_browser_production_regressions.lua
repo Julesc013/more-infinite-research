@@ -1,6 +1,6 @@
 -- Actual core, Factorio adapter and registered click consumer. Controlled
 -- statistics do not qualify native production, GUI, saves or multiplayer.
-return function(core, adapter, host_source, check)
+return function(core, adapter, host_source, check, host_adapter_source, game_api)
   check(type(adapter.production_snapshot) == "function", "adapter supplies an opt-in science snapshot")
   check(type(core.production_load_check) == "function", "core evaluates copied science rates")
   local queries, reads = {}, 0
@@ -129,6 +129,15 @@ return function(core, adapter, host_source, check)
     prototypes = {item = {["automation-science-pack"] = {localised_name = {"custom.science-pack"}}}},
     require = function(name) return assert(modules[name], "unexpected module " .. name) end
   }, {__index = function(_, key) error("unexpected host read: " .. key) end})
+  check(type(host_adapter_source) == "string", "production consumer receives the actual platform adapter")
+  if game_api then
+    for _, kind in ipairs{"item", "fluid", "recipe", "technology", "mod_setting"} do
+      env.game[kind .. "_prototypes"] = env.prototypes[kind] or {}
+    end
+    env.prototypes = nil
+  end
+  modules["prototypes.mir.platform.factorio.browser_host"] = assert(load(
+    host_adapter_source, "actual-production-host-adapter", "t", env))()
   -- Give register its actual event names without installing any background
   -- callback capable of sampling statistics.
   for name in host_source:gmatch("defines%.events%.([%w_]+)") do env.defines.events[name] = name end

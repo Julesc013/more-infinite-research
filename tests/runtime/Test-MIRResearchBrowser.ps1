@@ -97,6 +97,7 @@ try {
  $adapter=if($Target -ceq '2.1'){'f210'}else{'f200'}
  $bindings['prototypes/mir/runtime/scripted_techs.lua']="source/adapters/$adapter/prototypes/mir/runtime/scripted_techs.lua"
  $bindings['prototypes/mir/platform/factorio/target_profiles.lua']="source/adapters/$adapter/prototypes/mir/platform/factorio/target_profiles.lua"
+ $bindings['prototypes/mir/platform/factorio/browser_host.lua']='source/prototypes/mir/platform/factorio/browser_host.lua'
  foreach($name in $bindings.Keys) {
   $sourcePath=Join-Path $repo $bindings[$name]
   $entry=@($archive.Entries | Where-Object FullName -CEQ "$packageRoot/$name")
@@ -152,6 +153,9 @@ local browser_omission_provider=(function()
   local settings=browser_omission_runtime_settings
   local require=function(name)
     if name=="prototypes.mir.core.fingerprint" then return browser_omission_fingerprint
+    elseif name=="prototypes.mir.platform.factorio.browser_host" then return {
+      prototype_collections=function() return browser_omission_prototypes end
+    }
     elseif name=="prototypes.mir.runtime.maximum_level_control" then return browser_omission_controller
     elseif name=="prototypes.mir.settings.catalog" then return {
       spec=function(setting_name) return browser_omission_registered_settings[setting_name] end,
@@ -199,12 +203,14 @@ if($hostTestSource.Contains(']====]')) { throw 'Host fixture source collides wit
 [void]$lua.AppendLine('local browser_host_test_source=[====[')
 [void]$lua.AppendLine($hostTestSource)
 [void]$lua.AppendLine(']====]')
-[void]$lua.AppendLine('local browser_capability_sources={coordinators={}}')
+[void]$lua.AppendLine('local browser_capability_sources={coordinators={},host_adapters={}}')
 foreach($entry in @(
  @{key='data_stage';path='source/prototypes/mir/stage/data.lua'},
  @{key='control_stage';path='source/prototypes/mir/stage/control.lua'},
  @{key='coordinators.f210';path='source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua'},
- @{key='coordinators.f200';path='source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua'})) {
+ @{key='coordinators.f200';path='source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua'},
+ @{key='host_adapters.modern';path='source/prototypes/mir/platform/factorio/browser_host.lua'},
+ @{key='host_adapters.game';path='source/adapters/runtime-capabilities/game-browser-host.lua'})) {
  $text=[IO.File]::ReadAllText((Join-Path $repo $entry.path)).Replace("`r`n","`n")
  if($text.Contains(']====]')){throw 'Library capability source collides with its Lua delimiter.'}
  [void]$lua.AppendLine('browser_capability_sources.'+$entry.key+'=[====['+$text+']====]')
@@ -231,7 +237,7 @@ $capMutant=$coreTestSource.Replace($capAnchor,$capAnchor.Replace('finite_nonnega
 [void]$lua.AppendLine('local browser_core_positive_default_mutant=(function()')
 [void]$lua.AppendLine($capMutant)
 [void]$lua.AppendLine('end)()')
-$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source,browser_capability_sources); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
+$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source,browser_capability_sources); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check,browser_capability_sources.host_adapters.modern); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check,browser_capability_sources.host_adapters.game,true); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
 [void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player',$coreChecks))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 if($PrepareInputsOnly) {

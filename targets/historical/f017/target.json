@@ -45,10 +45,10 @@
     {
       "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
       "source_path": "source/adapters/historical/f017/target_profiles.lua",
-      "source_sha256": "87C0AF930FDD81732BF40CE329E8B9194160D25D587FC54B6EAF5CAF958CEF62",
-      "source_bytes": 3270,
-      "output_bytes": 3270,
-      "output_sha256": "87C0AF930FDD81732BF40CE329E8B9194160D25D587FC54B6EAF5CAF958CEF62"
+      "source_sha256": "17DE3B482789596ED46CE0591C2151F85C3BC056ADFF824875A073CFFE86D21D",
+      "source_bytes": 3304,
+      "output_bytes": 3304,
+      "output_sha256": "17DE3B482789596ED46CE0591C2151F85C3BC056ADFF824875A073CFFE86D21D"
     }
   ],
   "patches": [
@@ -61,5 +61,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "E81A28128E89F43C92FDE813DAAAD537A047EBD6D00115DB967810AB219BD590"
+  "record_sha256": "39F6B70DEFA382FDEA40B5CED7C65E137AE4162CD49C3EE739D9D9BED58F0F20"
 }

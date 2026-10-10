@@ -5531,9 +5531,9 @@
     {
       "path": "tools/mir/application/runtime/RuntimeStateModel.ps1",
       "classification": "canonical-internal",
-      "sha256": "E58FCE3D62ECAEB5E53B735BF5B916F7BF00BF2E72F3A9C68926FAEFBE009716",
+      "sha256": "77D86CC4A75106F4ABBF5CE39C84B7BFADD551303162F846CBC030940F7D5F73",
       "hash_mode": "canonical-text-v1",
-      "lines": 435,
+      "lines": 443,
       "package_visible": false
     },
     {
@@ -6050,5 +6050,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:5886680db413b636d9cbed0470650b10c859292d616e97aa12de39de1e7d8a26"
+  "digest": "sha256:49108be691fc25f0cd0a6aa859c328a897b0e19a5244b51fbbb73fa8a1f9f743"
 }

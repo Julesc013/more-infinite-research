@@ -7288,10 +7288,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 92663,
-      "source_sha256": "E03E7411963A4D2791B2D7B7FAAFC50464F7105B09DB154EE463DFA0E5FC19C5",
-      "output_bytes": 92663,
-      "output_sha256": "E03E7411963A4D2791B2D7B7FAAFC50464F7105B09DB154EE463DFA0E5FC19C5"
+      "source_bytes": 93011,
+      "source_sha256": "BFDF88EBAB95E689DDAF5C5220CDD15BF93DC366B61124ECA76D8149D4F656A6",
+      "output_bytes": 93011,
+      "output_sha256": "BFDF88EBAB95E689DDAF5C5220CDD15BF93DC366B61124ECA76D8149D4F656A6"
     },
     {
       "layer": "capability",
@@ -7364,10 +7364,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 33387,
-      "source_sha256": "BB3A1877DC7CB69358B6C6D0F88CAEA716C4479E9D35DCF3880240D5D11FCACC",
-      "output_bytes": 33387,
-      "output_sha256": "BB3A1877DC7CB69358B6C6D0F88CAEA716C4479E9D35DCF3880240D5D11FCACC"
+      "source_bytes": 33590,
+      "source_sha256": "7493EDA611B8D5B0693E5F95CC1C2D92472968DD42CC9B155750EC180EF2A971",
+      "output_bytes": 33590,
+      "output_sha256": "7493EDA611B8D5B0693E5F95CC1C2D92472968DD42CC9B155750EC180EF2A971"
     },
     {
       "layer": "capability",
@@ -7660,6 +7660,46 @@
       "source_sha256": "E9A563B8FCFD6F82DACF21D876B83D5CFC2745E2C586D3ABD01D7C757B95BF17",
       "output_bytes": 8790,
       "output_sha256": "E9A563B8FCFD6F82DACF21D876B83D5CFC2745E2C586D3ABD01D7C757B95BF17"
+    },
+    {
+      "layer": "adapter",
+      "target_scope": [
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/platform/factorio/browser_host.lua",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/adapters/runtime-capabilities/game-browser-host.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR4-CHG-2026-0146",
+        "reason": "Library runtime prototype collections and player-local file export use the selected engine API; no historical Library enablement."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 635,
+      "source_sha256": "6D6F34BE9800BB6FA90E73A104E8D8B211BF69127D962B9EB81786EEAA5B6FCF",
+      "output_bytes": 635,
+      "output_sha256": "6D6F34BE9800BB6FA90E73A104E8D8B211BF69127D962B9EB81786EEAA5B6FCF"
+    },
+    {
+      "layer": "adapter",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/platform/factorio/browser_host.lua",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "source/prototypes/mir/platform/factorio/browser_host.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR4-CHG-2026-0146",
+        "reason": "Library runtime prototype collections and player-local file export use the selected engine API; no historical Library enablement."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 357,
+      "source_sha256": "A8D9BAFAA8383D5059F63DE600F8FEEA9848B179186D07E59F809615644ABD44",
+      "output_bytes": 357,
+      "output_sha256": "A8D9BAFAA8383D5059F63DE600F8FEEA9848B179186D07E59F809615644ABD44"
     }
   ],
   "invariants": {
@@ -7669,5 +7709,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "A01EC16A5833973F34AF4F546446A5FBCD476D2D977242262898700D16833820"
+  "record_sha256": "0DA947AE46B7947400DEB31B81562EC1A2E1CDC63E46336EE81DBAF98F17B489"
 }

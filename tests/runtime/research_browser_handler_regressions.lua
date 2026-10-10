@@ -44,6 +44,7 @@ local function make_host_factory(host_source, catalogue_source)
         end
       },
       ["prototypes.mir.platform.factorio.runtime_state"] = {root = function() return {} end},
+      ["prototypes.mir.platform.factorio.browser_host"] = {prototype_collections = function() return {} end},
       ["prototypes.mir.platform.factorio.target_line"] = {feature_enabled = function(name)
         if name == "research_library" then return not (options and options.disable_library) end
         if name == "settings_profiles" then return not (options and options.disable_profiles) end
@@ -205,6 +206,57 @@ end
 
 local function check_capability_stages(sources, check)
   expect(check, type(sources) == "table", "Library capability controls receive actual stage and coordinator source")
+  for family, source in pairs(sources.host_adapters) do
+    local reads, writes = 0, {}
+    local env = setmetatable({}, {__index = function(_, key)
+      error("Library adapter read " .. key .. " before its runtime callback")
+    end})
+    local adapter = assert(load(source, "actual-library-host-" .. family, "t", env))()
+    local function write_file(path, contents, append, player_index)
+      writes[#writes + 1] = {path, contents, append, player_index}
+      return "controlled-result"
+    end
+    local function collections(generation)
+      local result = {}
+      for _, kind in ipairs{"item", "fluid", "recipe", "technology", "mod_setting"} do
+        result[kind] = {marker = generation .. ":" .. kind}
+      end
+      return result
+    end
+    local first, second = collections("first"), collections("reloaded")
+    local function install(value)
+      if family == "modern" then
+        env.prototypes, env.helpers = value, {write_file = write_file}
+      else
+        env.game = setmetatable({write_file = write_file}, {__index = function(_, key)
+          for kind, collection in pairs(value) do
+            if key == kind .. "_prototypes" then reads = reads + 1; return collection end
+          end
+          error("Legacy Library adapter queried unsupported game property " .. key)
+        end})
+      end
+    end
+    install(first)
+    local captured = adapter.prototype_collections()
+    for kind, value in pairs(first) do
+      expect(check, captured[kind] == value, family .. " retains the actual " .. kind .. " prototype collection")
+    end
+    expect(check, captured.mod_data == nil, family .. " invents no mod-data evidence when absent")
+    install(second)
+    expect(check, adapter.prototype_collections().technology == second.technology
+      and captured.technology == first.technology, family .. " resolves current runtime objects without retaining a previous host")
+    expect(check, adapter.write_file("more-infinite-research/reports/test.txt", "line\n", false, 7) == "controlled-result",
+      family .. " preserves the engine file-output result")
+    expect(check, #writes == 1 and writes[1][1] == "more-infinite-research/reports/test.txt"
+      and writes[1][2] == "line\n" and writes[1][3] == false and writes[1][4] == 7,
+      family .. " preserves report bytes, append mode and the requesting player destination")
+    if family == "modern" then
+      second.mod_data = {marker = "current-modern-evidence"}
+      expect(check, adapter.prototype_collections() == second
+        and adapter.prototype_collections().mod_data == second.mod_data,
+        "modern Library keeps the native registry and mod-data identity")
+    else expect(check, reads == 10, "legacy Library reads only its five supported prototype collections per request") end
+  end
   for _, library in ipairs{false, true} do
     for _, profiles in ipairs{false, true} do
       local features = {research_library = library, settings_profiles = profiles}

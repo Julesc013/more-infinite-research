@@ -5,6 +5,7 @@ local mir_provider = require("prototypes.mir.runtime.research_browser_mir_provid
 local runtime_state = require("prototypes.mir.runtime.state")
 local factorio_runtime_state = require("prototypes.mir.platform.factorio.runtime_state")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local browser_host = require("prototypes.mir.platform.factorio.browser_host")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local codec = require("prototypes.mir.settings.profile_codec")
 local settings_catalog = require("prototypes.mir.settings.catalog")
@@ -244,7 +245,7 @@ local function pump_translation_requests(player, cache)
     local technology = player.force.technologies[key]
     if technology then
       local request, subjects, limited = factorio_catalogue.translation_request(
-        technology, prototypes, translation_queue.discovery_subject_limit)
+        technology, browser_host.prototype_collections(), translation_queue.discovery_subject_limit)
       translation_queue.dispatch(cache, key, game.tick, function()
         return player.request_translation(request)
       end, subjects, limited)
@@ -480,7 +481,7 @@ local function settings_rows(player, parent, v)
   local function group(key, title, specs, scope)
     local names, matches = {}, search == "" or string.find(search_text(key), search, 1, true)
     for _, spec in ipairs(specs) do
-      local prototype = prototypes.mod_setting[spec.name]
+      local prototype = browser_host.prototype_collections().mod_setting[spec.name]
       if prototype and prototype.mod == "more-infinite-research" then
         names[#names + 1] = spec.name
         assigned[spec.name] = true
@@ -499,7 +500,7 @@ local function settings_rows(player, parent, v)
   for _, spec in ipairs(settings_catalog.base_extension_specs()) do
     group(spec.key, {"technology-name." .. (spec.locale_key or spec.key)}, settings_catalog.base_extension_setting_specs(spec.key), "research")
   end
-  for name, prototype in pairs(prototypes.mod_setting) do
+  for name, prototype in pairs(browser_host.prototype_collections().mod_setting) do
     if prototype.mod == "more-infinite-research" and not assigned[name] then group(name, prototype.localised_name, {{name = name}}, "options") end
   end
   local visible = {}
@@ -551,7 +552,7 @@ local function settings_rows(player, parent, v)
     local field_width = math.floor((detail_width - 40) * 0.55)
     local value_width = detail_width - 40 - field_width
     for _, name in ipairs(selected.names) do
-      local prototype = prototypes.mod_setting[name]
+      local prototype = browser_host.prototype_collections().mod_setting[name]
       local scope = prototype.setting_type
       local values = scope == "runtime-global" and settings.global or scope == "runtime-per-user" and settings.get_player_settings(player) or settings.startup
       local value = values and values[name] and values[name].value
@@ -721,7 +722,7 @@ local function add_research_startup_settings(parent, portable, maximum_width)
   local profile_summary = imported_profile_summary()
   local rows = {}
   for _, spec in ipairs(specs) do
-    local prototype = prototypes.mod_setting[spec.name]
+    local prototype = browser_host.prototype_collections().mod_setting[spec.name]
     if prototype and prototype.mod == "more-infinite-research" and prototype.setting_type == "startup" then
       local comparison = startup_comparison(spec.name, prototype, profile_summary)
       if settings_catalog.validate_value(spec.name, comparison.effective) then
@@ -1099,7 +1100,7 @@ local function report_text(player)
   if v.report_settings then
     lines[#lines + 1] = "\nEFFECTIVE MIR STARTUP SETTINGS"
     local settings_names = {}
-    for name, prototype in pairs(prototypes.mod_setting) do
+    for name, prototype in pairs(browser_host.prototype_collections().mod_setting) do
       if prototype.mod == "more-infinite-research" and prototype.setting_type == "startup"
           and name ~= codec.import_setting_name then settings_names[#settings_names + 1] = name end
     end
@@ -1303,7 +1304,7 @@ local function export(player)
   local decoded = codec.decode(text)
   local _, _, invalid = codec.count_recognized_settings(decoded)
   if invalid ~= 0 then player.print({"mir-browser.invalid-profile"}); return end
-  helpers.write_file("more-infinite-research/settings/browser-profile.txt", text .. "\n", false, player.index)
+  browser_host.write_file("more-infinite-research/settings/browser-profile.txt", text .. "\n", false, player.index)
   player.print({"mir-browser.exported"})
 end
 local function event_player(event)
@@ -1384,7 +1385,7 @@ local function click(event)
     label(panel, {"mir-browser.production-note"}, width)
     for _, row in ipairs(report.rows) do
       local balance = (row.balance < 0 and "-" or "") .. displayed_number(math.abs(row.balance))
-      local item = prototypes.item[row.name]
+      local item = browser_host.prototype_collections().item[row.name]
       local caption = item and {"?", item.localised_name, row.name} or row.name
       label(panel, {"mir-browser.production-row", caption,
         displayed_number(row.produced), displayed_number(row.consumed), balance}, width)
@@ -1419,7 +1420,7 @@ local function click(event)
     v.result_token, v.settings_list_token = nil, nil
   elseif action == "report-export" then
     local path = "more-infinite-research/reports/browser-" .. player.index .. "-" .. game.tick .. ".txt"
-    helpers.write_file(path, report_text(player) .. "\n", false, player.index)
+    browser_host.write_file(path, report_text(player) .. "\n", false, player.index)
     player.print({"mir-browser.report-written", "script-output/" .. path})
     v.report_status = {"mir-browser.report-saved", "browser-" .. player.index .. "-" .. game.tick .. ".txt"}
     v.report_destination = "script-output/" .. path
@@ -1471,7 +1472,7 @@ local function selection(event)
   if action == "recipe-list" then
     local v = view(player)
     local id = (v.recipe_ids or {})[event.element.selected_index]
-    if id and prototypes.recipe[id] then player.open_factoriopedia_gui(prototypes.recipe[id]) end
+    if id and browser_host.prototype_collections().recipe[id] then player.open_factoriopedia_gui(browser_host.prototype_collections().recipe[id]) end
     return
   end
   if action == "research-list" or action == "setting-list" then
@@ -1755,7 +1756,7 @@ function M.register()
       return
     end
     if action ~= "setting" then return end
-    local name = element.tags.setting; local prototype = prototypes.mod_setting[name]
+    local name = element.tags.setting; local prototype = browser_host.prototype_collections().mod_setting[name]
     if not prototype or prototype.mod ~= "more-infinite-research" then return end
     local scope = prototype.setting_type
     if scope == "startup" or (scope == "runtime-global" and not player.admin) then return end
