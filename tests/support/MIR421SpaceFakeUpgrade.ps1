@@ -106,7 +106,7 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
   $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
-  $fixtureVersion=if($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.4'}else{'1.0.5'}}else{'1.0.'+$sourcePatch}
+  $fixtureVersion=if($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.6'}else{'1.0.7'}}else{'1.0.'+$sourcePatch}
   $line='0.'+[int]$Target.Substring(1)
   if($info.name-cne'mir-fixture-assert-upgrade-historical-terminal-to-mir42'-or
     $info.factorio_version-cne$line-or$info.version-cnotin@('1.0.0',$fixtureVersion)){

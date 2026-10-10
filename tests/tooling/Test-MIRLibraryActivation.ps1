@@ -85,7 +85,7 @@ foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(1,
   Write-TestJson $path $info
   Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $prepared -Target $target -SourceVersion "4.2.$patch"
   $read=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json
-  $historicalFixtureVersion=if($patch-eq2){'1.0.5'}else{'1.0.1'}
+  $historicalFixtureVersion=if($patch-eq2){'1.0.7'}else{'1.0.1'}
   Assert-LibraryTest ($read.version-ceq$historicalFixtureVersion-and$read.name-ceq$info.name-and($read.dependencies-join'|')-ceq($info.dependencies-join'|')) "$target maintenance fixture $patch retains metadata under a distinct identity"
   $hash=Get-MIRImmutableInputSha256 $path
   Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $prepared -Target $target -SourceVersion "4.2.$patch"
@@ -106,7 +106,7 @@ foreach($target in @('f017','f016','f015','f014','f013')){
   Write-TestJson $path $info
   Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $prepared -Target $target -SourceVersion '4.2.2' -FromVersion $fromVersion
   $read=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json
-  Assert-LibraryTest ($read.version-ceq'1.0.4'-and$read.name-ceq$info.name-and($read.dependencies-join'|')-ceq($info.dependencies-join'|')) "$target direct CCC00 historical fixture has a separate identity"
+  Assert-LibraryTest ($read.version-ceq'1.0.6'-and$read.name-ceq$info.name-and($read.dependencies-join'|')-ceq($info.dependencies-join'|')) "$target direct CCC00 historical fixture has a separate identity"
   $hash=Get-MIRImmutableInputSha256 $path
   Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $prepared -Target $target -SourceVersion '4.2.2' -FromVersion $fromVersion
   Assert-LibraryTest ((Get-MIRImmutableInputSha256 $path)-ceq$hash) "$target direct CCC00 historical fixture identity is idempotent"
@@ -141,7 +141,7 @@ function Test-MaintenanceFixtureCallSites {
     $block=if($isHistoricalTerminalFixture){$historicalBlocks[0]}else{$modern[0]}
     . ([scriptblock]::Create($block.Extent.Text))
     $read=Get-Content -LiteralPath (Join-Path $stagedFixture 'info.json') -Raw|ConvertFrom-Json
-    $version=if($patch-eq1){if($isHistoricalTerminalFixture){'1.0.1'}else{'0.1.1'}}elseif($isHistoricalTerminalFixture){'1.0.5'}else{switch($targetToken){'210'{'0.1.19'};'200'{'0.1.27'};default{'0.1.29'}}}
+    $version=if($patch-eq1){if($isHistoricalTerminalFixture){'1.0.1'}else{'0.1.1'}}elseif($isHistoricalTerminalFixture){'1.0.7'}else{switch($targetToken){'210'{'0.1.19'};'200'{'0.1.27'};default{'0.1.29'}}}
     Assert-LibraryTest ($read.version-ceq$version-and$read.dependencies -ccontains "more-infinite-research >= $FromVersion") "$code/$patch real caller chooses a distinct prepared fixture and predecessor"
     $control=Get-Content -LiteralPath (Join-Path $stagedFixture 'control.lua') -Raw
     Assert-LibraryTest ($control.Contains($FromVersion)-and$control.Contains($ToVersion)-and-not$control.Contains('__MIR_UPGRADE_')) "$code/$patch real caller specializes continuity assertions"
@@ -155,7 +155,7 @@ function Test-MaintenanceFixtureCallSites {
     $block=if($isHistoricalTerminalFixture){$historicalBlocks[0]}else{$modern[0]}
     . ([scriptblock]::Create($block.Extent.Text))
     $read=Get-Content -LiteralPath (Join-Path $stagedFixture 'info.json') -Raw|ConvertFrom-Json
-    $version=if($isHistoricalTerminalFixture){'1.0.4'}else{switch($targetToken){'210'{'0.1.18'};'200'{'0.1.26'};default{'0.1.28'}}}
+    $version=if($isHistoricalTerminalFixture){'1.0.6'}else{switch($targetToken){'210'{'0.1.18'};'200'{'0.1.26'};default{'0.1.28'}}}
     Assert-LibraryTest ($read.version-ceq$version-and$read.dependencies -ccontains "more-infinite-research >= $FromVersion") "$code direct CCC00 caller chooses a distinct prepared fixture"
     $control=Get-Content -LiteralPath (Join-Path $stagedFixture 'control.lua') -Raw
     Assert-LibraryTest ($control.Contains($FromVersion)-and$control.Contains($ToVersion)-and-not$control.Contains('__MIR_UPGRADE_')) "$code direct CCC00 caller specializes continuity assertions"
