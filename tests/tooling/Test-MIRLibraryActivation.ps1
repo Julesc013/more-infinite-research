@@ -862,6 +862,13 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
     [IO.File]::WriteAllBytes((Join-Path $library 'mod-list.json'),$oldList)
     [IO.File]::WriteAllBytes((Join-Path $library 'mod-settings.dat'),$oldSettings)
     $arguments=@{LibraryDirectory=$library;EngineDataDirectory=$data;ProfilePath=$legacyProfile;ArchiveHashes=@{'more-infinite-research_4.2.01600.zip'=$original[$owned[0]].hash};PrePinMIROwnedArchiveNames=@('more-infinite-research')}
+    $noSelector=$arguments.Clone();$noSelector.PrePinMIROwnedArchiveNames=$null
+    $active=Start-MIRLibraryActivation @noSelector
+    try{
+      Assert-LibraryTest (@(Get-ChildItem $library -Filter '*.zip').Count-eq4) 'null selector keeps all archive names visible'
+      $terminal=Complete-MIRLibraryActivation $active
+      Assert-LibraryTest ($terminal.owned_archive_names_temporarily_hidden-eq0) 'null selector restores ordinary controls'
+    }finally{if(-not$active.closed){$null=Complete-MIRLibraryActivation $active}}
     $duplicate=$arguments.Clone();$duplicate.PrePinMIROwnedArchiveNames=@('more-infinite-research','more-infinite-research')
     Assert-LibraryRefusal {Start-MIRLibraryActivation @duplicate} 'mir-library-owned-version-names'
     $foreignArgs=$arguments.Clone();$foreignArgs.PrePinMIROwnedArchiveNames=@('other-mod')

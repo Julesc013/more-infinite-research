@@ -435,10 +435,20 @@ $archetypeSuffix = if ($Archetype) { " archetype=$Archetype" } else { "" }
 $artifactSlug = if ($Archetype) { $Archetype } else { "default" }
 if ($SpaceIsFake) { $artifactSlug='sif-'+$artifactSlug }
 if ($k2Scenario) { $artifactSlug='k2-imersite-maintenance-cap-'+$K2ImersiteCap }
+if ($PersistedDamageZip) { $artifactSlug='persisted-damage-'+$artifactSlug }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = "build/p/validation-upgrades/$ToVersion-upgrade-$artifactSlug-proof.json"
 }
 $output = if ([System.IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
+if (-not $PrepareInputsOnly) {
+  $evidenceDirectory = Split-Path -Parent $output
+  $evidencePrefix = "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-"
+  if (Test-Path -LiteralPath $evidenceDirectory) {
+    if (@(Get-ChildItem -LiteralPath $evidenceDirectory -File | Where-Object { $_.Name.StartsWith($evidencePrefix, [StringComparison]::Ordinal) }).Count) {
+      throw '[mir-upgrade-existing-evidence] Preserve prior logs and select a fresh output directory.'
+    }
+  }
+}
 $output=Resolve-MIR441RecoveryScratchPath -Path $output
 if(Test-Path -LiteralPath $output){throw '[mir-upgrade-fresh-output-required] Preserve the previous result and select a fresh output path.'}
 $outputParent = Split-Path -Parent $output

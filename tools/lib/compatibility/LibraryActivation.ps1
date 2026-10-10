@@ -236,6 +236,9 @@ function Start-MIRLibraryActivation {
     Assert-MIRLibraryDependencies -Selected $selected.ToArray()
     $visibilityId=[guid]::NewGuid().ToString('N')
     $visibility=@()
+    # An empty conditional result from a caller binds as null in PowerShell.
+    # Modern engines do not need the historical owned-name selector.
+    if($null-eq$PrePinMIROwnedArchiveNames){$PrePinMIROwnedArchiveNames=@()}
     if($PrePinMIROwnedArchiveNames.Count){
       Assert-MIRLibraryOwnedArchiveCheckout $library
       if(@($PrePinMIROwnedArchiveNames|Sort-Object -Unique).Count-ne$PrePinMIROwnedArchiveNames.Count){throw '[mir-library-owned-version-names]'}
