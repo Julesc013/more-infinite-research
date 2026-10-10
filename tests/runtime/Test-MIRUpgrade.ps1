@@ -977,8 +977,13 @@ if($k2Scenario){
 if($publishedInputs){$result.published_maintenance_predecessor=$publishedInputs}
 if($PersistedDamageZip){
   if((Get-FileHash -LiteralPath $damageSave).Hash-cne$damageSaveHash){throw '[mir422-persisted-damage-input-mutated]'}
+  $damageSnapshots=@(foreach($stage in @('source','persisted-damage','upgrade','reload')){
+    $snapshot=Join-Path $userdata ('script-output/mir-upgrade-full-state-'+$stage+'.json')
+    if(-not(Test-Path -LiteralPath $snapshot -PathType Leaf)){throw '[mir422-persisted-damage-evaluator-snapshot-missing]'}
+    [ordered]@{stage=$stage;path=$snapshot;sha256=(Get-FileHash -LiteralPath $snapshot).Hash;bytes=(Get-Item -LiteralPath $snapshot).Length}
+  })
   $result.native_scenario='reduced-published420-persisted421-damage-to422-survivor-preservation'
-  $result.persisted_damage=[ordered]@{published_intermediate=$damageInputs;save_path=$damageSave;save_sha256=$damageSaveHash;log=(Split-Path -Leaf $damageEvidence);log_sha256=(Get-FileHash -LiteralPath $damageEvidence).Hash;post_damage_progress=0.57;controls=$damageTerminal;pre_damage_snapshot_is_external_only=$true;lost_history_recovered=$false}
+  $result.persisted_damage=[ordered]@{published_intermediate=$damageInputs;save_path=$damageSave;save_sha256=$damageSaveHash;log=(Split-Path -Leaf $damageEvidence);log_sha256=(Get-FileHash -LiteralPath $damageEvidence).Hash;post_damage_progress=0.57;controls=$damageTerminal;evaluator_snapshots=$damageSnapshots;pre_damage_snapshot_is_external_only=$true;lost_history_recovered=$false}
 }
 if($currentMaterialization){
   $result.candidate_materialization=[ordered]@{path=$SourceMaterializationPath;sha256=(Get-FileHash -LiteralPath (Resolve-MIRUpgradePath $SourceMaterializationPath)).Hash;record_sha256=$currentMaterialization.receipt.record_sha256;package_source_sha256=$currentMaterialization.receipt.package_source_sha256}
