@@ -30,6 +30,9 @@ CASES = {
     "modern-upgrade-oracle-f210": (
         "f210", Path("tests/runtime/modern_catalogue_upgrade_controls.lua"),
     ),
+    "historical-complete-upgrade-oracle": (
+        "f110", Path("tests/runtime/historical_complete_upgrade_controls.lua"),
+    ),
     "secretas-native-oracle": (
         "f210", Path("tests/runtime/secretas_finite_native_fixture_controls.lua"),
     ),
@@ -154,6 +157,9 @@ def project_inputs(runtime, test_path):
     if test_path.name == "modern_catalogue_upgrade_controls.lua":
         fixture = REPO / "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
         hashes[relative_to_repo(fixture)] = sha256(fixture)
+    if test_path.name == "historical_complete_upgrade_controls.lua":
+        oracle = REPO / "tests/support/MIR422HistoricalCompleteState.lua"
+        hashes[relative_to_repo(oracle)] = sha256(oracle)
     if test_path.name == "secretas_finite_native_fixture_controls.lua":
         fixture = REPO / "fixtures/assert-secretas-finite-continuation-hotfix/control.lua"
         hashes[relative_to_repo(fixture)] = sha256(fixture)

@@ -34,6 +34,9 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if($Target-ceq'f200'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake){
     $fixtureVersion=if($direct420To422){'0.1.26'}else{'0.1.27'}
   }
+  if($Target-cin@('f110','f100')-and$SourceVersion-ceq'4.2.2'){
+    $fixtureVersion=if($direct420To422){'0.1.28'}else{'0.1.29'}
+  }
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
@@ -103,7 +106,7 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
   $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
-  $fixtureVersion=if($SourceVersion-ceq'4.2.2'-and$fromPatch-eq0){'1.0.3'}else{'1.0.'+$sourcePatch}
+  $fixtureVersion=if($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.4'}else{'1.0.5'}}else{'1.0.'+$sourcePatch}
   $line='0.'+[int]$Target.Substring(1)
   if($info.name-cne'mir-fixture-assert-upgrade-historical-terminal-to-mir42'-or
     $info.factorio_version-cne$line-or$info.version-cnotin@('1.0.0',$fixtureVersion)){
@@ -112,6 +115,36 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   if($info.version-ceq$fixtureVersion){return}
   $info.version=$fixtureVersion
   [IO.File]::WriteAllText($path,($info|ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false))
+}
+
+function Set-MIR422HistoricalCompleteStateUpgradeOracle {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$FixtureDirectory,
+    [Parameter(Mandatory)][ValidateSet('f110','f100','f017','f016','f015','f014','f013')][string]$Target,
+    [Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
+  $line=switch($Target){f110{'1.1'};f100{'1.0'};default{'0.'+[int]$Target.Substring(1)}}
+  $path=Join-Path $FixtureDirectory 'control.lua'
+  $text=Get-Content -LiteralPath $path -Raw
+  $prefix='local complete_state_oracle = require("mir422_complete_state").new("'+$line+'", "'+$FromVersion+'", "'+$ToVersion+'")'+"`n"
+  if($Target-cin@('f110','f100')){
+    $source='  log("[mir-fixture] " .. from_version .. " upgrade source proof complete archetype=" .. archetype)'
+    $upgrade='  state.upgrade_complete = true'
+    $tick='script.on_event(defines.events.on_tick, function()'
+    $reload='    log("[mir-fixture] " .. to_version .. " upgraded save reload proof complete archetype=" .. archetype)'
+    foreach($anchor in @($source,$upgrade,$tick,$reload)){if(-not$text.Contains($anchor)){throw '[mir422-historical-complete-oracle-anchor]'}}
+    $text=$text.Replace($source,('  complete_state_oracle.capture()'+"`n"+$source))
+    $text=$text.Replace($upgrade,('  complete_state_oracle.verify("upgrade")'+"`n"+$upgrade))
+    $text=$text.Replace($reload,'    verify_complete_state_after_load = true')
+    $text=$text.Replace($tick,($tick+"`n"+'  if verify_complete_state_after_load then'+"`n"+'    complete_state_oracle.verify("reload")'+"`n"+$reload+"`n"+'    verify_complete_state_after_load = false'+"`n"+'  end'))
+    $prefix+='local verify_complete_state_after_load = false'+"`n"
+  }else{
+    $source='  seed_source_state()'
+    $check='local function assert_retained_state(phase)'
+    foreach($anchor in @($source,$check)){if(-not$text.Contains($anchor)){throw '[mir422-historical-complete-oracle-anchor]'}}
+    $text=$text.Replace($source,($source+"`n"+'  complete_state_oracle.capture()'))
+    $text=$text.Replace($check,($check+"`n"+'  complete_state_oracle.verify(phase == "reload" and "reload" or "upgrade")'))
+  }
+  Copy-Item -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR422HistoricalCompleteState.lua') -Destination (Join-Path $FixtureDirectory 'mir422_complete_state.lua')
+  [IO.File]::WriteAllText($path,($prefix+$text),[Text.UTF8Encoding]::new($false))
 }
 
 function Get-MIR421SpaceFakeUpgradeDescriptor {

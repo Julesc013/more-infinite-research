@@ -202,6 +202,13 @@ $k2Assertions+=2
 # These controlled inputs prove readers and rejection paths, never native saves.
 . (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
 $currentAssertions=0
+foreach($target in @('f110','f100')){
+  $code=$target.Substring(1)
+  foreach($patch in @(0,1)){
+    Assert-MIR421CurrentUpgradeInputMode -Target $target -FromVersion ("4.2.${code}0"+$patch) -ToVersion "4.2.${code}02" -FixtureName "assert-upgrade-4-0-${code}00-to-4-1-${code}00" -Archetype base-default -SpaceIsFake $false -PublishedPredecessorManifest 'published.json' -Retention Always -SourceVersion 4.2.2
+    $currentAssertions++
+  }
+}
 foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
   $code=$target.Substring(1)
   foreach($oldPatch in @(0,1)){

@@ -153,7 +153,7 @@ try {
     Assert-Probe ($descriptor422.scenario-ceq'SIF-01-published-4.2.1-to-4.2.2'-and
       ($descriptor422.inputs.sha256-join'|')-ceq($descriptor.inputs.sha256-join'|')) '4.2.2 SIF changes dependency bytes or mislabels its predecessor.'
     foreach($field in @('SourceVersion','FromVersion','ToVersion')){
-      $bad=$sif422.Clone();$bad[$field]=switch($field){'SourceVersion'{'4.2.1'};'FromVersion'{"4.2.${code}00"};'ToVersion'{"4.2.${code}01"}}
+      $bad=$sif422.Clone();$bad[$field]=switch($field){'SourceVersion'{'4.2.1'};'FromVersion'{"4.2.${code}02"};'ToVersion'{"4.2.${code}01"}}
       Refuses-Probe {Get-MIR421SpaceFakeUpgradeDescriptor @bad} 'sif-transition'
     }
     $bad=$sifArguments.Clone();$bad.ToVersion="4.2.${code}02"
@@ -563,13 +563,13 @@ try {
     # their mocked membership is not a player package or native acceptance.
     $binding.output_bytes=$bytes.Length
     $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
-    foreach($target in @('f210','f200')) {
+    foreach($target in @('f210','f200','f110','f100')) {
       foreach($sourceVersion in @('4.2.1','4.2.2')) {
         $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch ([int]$sourceVersion.Split('.')[2])
         $caseRoot=Join-Path $run ($target+'-'+$sourceVersion);[IO.Directory]::CreateDirectory($caseRoot)|Out-Null
         $candidate=Join-Path $caseRoot $identity.package_name
         $receiptPath=Join-Path $caseRoot 'materialized.json'
-        $line=if($target-ceq'f210'){'2.1'}else{'2.0'}
+        $line=switch($target){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'}}
         $info=@{name='more-infinite-research';version=$identity.distribution_version;factorio_version=$line}|ConvertTo-Json -Compress
         $zip=[IO.Compression.ZipFile]::Open($candidate,[IO.Compression.ZipArchiveMode]::Create)
         try {

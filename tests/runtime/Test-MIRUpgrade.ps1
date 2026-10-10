@@ -98,7 +98,7 @@ function Assert-MIR421CurrentUpgradeInputMode {
     [string]$SelectedReleaseManifest,[string]$PublishedPredecessorManifest,[string]$Retention,
     [string]$K2ImersiteInputProfile='',
     [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
-  if ($Target -cnotin @('f210','f200') -or $SelectedReleaseManifest -or
+  if ($Target -cnotin @('f210','f200','f110','f100') -or $SelectedReleaseManifest -or
       -not $PublishedPredecessorManifest -or $Retention -cne 'Always') {
     throw '[mir421-current-upgrade-input-mode]'
   }
@@ -541,6 +541,9 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   if($targetCode-ceq'200'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake-and$Archetype-ceq'base-default'){
     Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -FromVersion $FromVersion
   }
+  if($targetCode-cin@('110','100')-and$SourceVersion-ceq'4.2.2'-and$Archetype-ceq'base-default'){
+    Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -FromVersion $FromVersion -ToVersion $ToVersion
+  }
   if($PersistedDamageZip){
     $damageControl=Get-Content -LiteralPath $stagedControlPath -Raw
     if(-not$damageControl.Contains('local persisted_damage_probe = false')){throw '[mir422-persisted-damage-fixture-anchor]'}
@@ -577,6 +580,9 @@ if ($isHistoricalTerminalFixture) {
   if (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
       ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) {
     Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion
+    if($SourceVersion-ceq'4.2.2'){
+      Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -FromVersion $FromVersion -ToVersion $ToVersion
+    }
   }
 }
 if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
@@ -731,6 +737,8 @@ $requiresReloadProof = $FixtureName -in @(
     "assert-upgrade-historical-terminal-to-mir42"
   )
 $governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
+$requiresCompleteCatalogue = $SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake-and-not$k2Scenario-and
+  (($mir42UpgradeSpecialized-and$Archetype-cin@('base-default','space-age-native-owner'))-or$isHistoricalTerminalFixture)
 $governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"
 Assert-MIRFactorioPathBudget -Path $governedUpgradedSave -Context "Upgrade governed-save path"
 $governedUpgradeMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
@@ -760,7 +768,7 @@ $loadExitCode = if ($requiresReloadProof) {
 }
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
 $loadText = Get-Content -Raw -LiteralPath $log
-if (($mir42UpgradeSpecialized -and (($SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') -or ($SelectedTarget-ceq'f200' -and $Archetype-ceq'base-default')))) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $loadText }
+if ($requiresCompleteCatalogue) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $loadText }
 if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $loadText -Stage upgrade }
 if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $loadText -Stage upgrade -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
 $loadMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
@@ -798,7 +806,7 @@ if ($requiresReloadProof) {
   } else { Invoke-MIRUpgradeFactorioProcess -FilePath $factorio -Arguments $reloadArgs }
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
-  if (($mir42UpgradeSpecialized -and (($SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') -or ($SelectedTarget-ceq'f200' -and $Archetype-ceq'base-default')))) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $reloadText }
+  if ($requiresCompleteCatalogue) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $reloadText }
   if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $reloadText -Stage reload }
   if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $reloadText -Stage reload -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
   if (-not $reloadText.Contains($reloadMarker)) {
@@ -818,7 +826,7 @@ if ($requiresReloadProof) {
     throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
   }
   $secondReloadText = Get-Content -Raw -LiteralPath $log
-  if (($mir42UpgradeSpecialized -and (($SelectedTarget-ceq'f210' -and $Archetype-ceq'space-age-native-owner') -or ($SelectedTarget-ceq'f200' -and $Archetype-ceq'base-default')))) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $secondReloadText }
+  if ($requiresCompleteCatalogue) { Assert-MIR42CompleteCatalogueUpgradeMarker -Text $secondReloadText }
   if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $secondReloadText -Stage reload }
   if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $secondReloadText -Stage reload -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
   if (-not $secondReloadText.Contains($reloadMarker)) {
@@ -960,6 +968,16 @@ if ($reloadEvidence) {
 if ($secondReloadEvidence) {
   $result.second_reload_log = (Split-Path -Leaf $secondReloadEvidence)
   $result.second_reload_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $secondReloadEvidence).Hash
+}
+if($requiresCompleteCatalogue){
+  $result.full_state_evaluator_snapshots=@(foreach($stage in @('source','upgrade','reload')){
+    $snapshot=Join-Path $userdata ('script-output/mir-upgrade-full-state-'+$stage+'.json')
+    if(-not(Test-Path -LiteralPath $snapshot -PathType Leaf)){throw '[mir422-full-state-snapshot-missing]'}
+    $snapshotValue=Get-Content -LiteralPath $snapshot -Raw|ConvertFrom-Json -Depth 100
+    if($snapshotValue.from_version-cne$FromVersion-or$snapshotValue.to_version-cne$ToVersion-or$snapshotValue.stage-cne$stage){throw '[mir422-full-state-snapshot-identity]'}
+    [ordered]@{stage=$stage;path=$snapshot;sha256=(Get-FileHash -LiteralPath $snapshot).Hash;bytes=(Get-Item -LiteralPath $snapshot).Length}
+  })
+  $result.assertions+=@('all-existing-technology-state-and-definitions-retained','all-exposed-earned-effects-retained','all-supported-research-queue-retained','full-state-oracle-executed-upgrade-and-two-reloads')
 }
 if ($SpaceIsFake) {
   $result.native_scenario=$sifDescriptor.scenario
