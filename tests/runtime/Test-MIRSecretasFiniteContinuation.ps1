@@ -115,7 +115,7 @@ $profile=Join-Path $run 'selection.json';$selection.mod_list|ConvertTo-Json -Dep
 $userdata=Join-Path $run 'userdata';[IO.Directory]::CreateDirectory((Join-Path $userdata 'saves'))|Out-Null
 $config=Join-Path $run 'config.ini'
 "[path]`nread-data=$($engineData.Replace('\','/'))`nwrite-data=$($userdata.Replace('\','/'))`n[other]`nenable-new-mods=false`ncheck-updates=false`ndisable-blueprint-storage=true`nenable-blueprint-storage-cloud-sync=false`n[graphics]`ncache-sprite-atlas=false`n"|Set-Content -LiteralPath $config
-$server=Join-Path $run 'server-settings.json';@{name='MIR private Secretas hotfix';visibility=@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false;autosave_interval=0}|ConvertTo-Json -Depth 5|Set-Content -LiteralPath $server
+$server=Join-Path $run 'server-settings.json';@{name='MIR private Secretas hotfix';description='Private finite cargo continuation acceptance';visibility=@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false;autosave_interval=0}|ConvertTo-Json -Depth 5|Set-Content -LiteralPath $server
 $record=[ordered]@{kind='MIRSecretasFiniteContinuationV1';status='pending';native_qualification=$false;source_commit=$source;scenario=Get-SecretasArtifact $scenarioPath;fixture=Get-SecretasArtifact $fixtureArchive;candidate=$candidate.receipt;engine=Get-SecretasArtifact $engine;scope=$scenario.scope;preparation_controls=$preparationReceipt;new_fixture_bytes_installed=$newFixtureBytes;dependency_payload_bytes_copied=0;archive_links_created=0;dependency_extractions=0}
 $activation=$null
 try{
