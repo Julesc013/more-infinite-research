@@ -8362,6 +8362,9 @@
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
+        "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
         "targets/historical/**"
       ],
       "captured_artifacts": [],
@@ -8435,5 +8438,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:bc196da6e8fc055729f2d03749551760aec43cba8981f2b3576d4a1b43f4c454"
+  "digest": "sha256:a1af70667bdc9b1b15ccab429ba2c8bdfc3430de2e243ce606376dc746ea3315"
 }
