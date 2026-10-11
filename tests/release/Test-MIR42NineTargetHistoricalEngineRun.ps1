@@ -67,7 +67,7 @@ function Assert-MIR42EngineSharedInputs {
   function Refuses([scriptblock]$Action,[string]$Expected){$failure='';try{& $Action|Out-Null}catch{$failure=$_.Exception.Message};Check ($failure.Contains($Expected)) "expected $Expected; got $failure"}
   $script:engineSharedAssertions=0
   $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot ('build/tmp/engine-link-controls-'+[guid]::NewGuid().ToString('N')))
-  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','Assert-MIR42EngineLibraryArchives')){
+  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives')){
     Import-MIR42EngineRunnerFunction -Path $runnerPath -Name $name
   }
   try {
@@ -243,17 +243,24 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       $mods=$Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]
       $save=$Arguments[[Array]::IndexOf($Arguments,'--create')+1]
       Check ($NativeActor -and $DeadlineSeconds -eq 60 -and $Arguments -contains '--no-log-rotation') 'fresh actor changed arguments or deadline.'
-      Check (($Arguments -contains '--disable-audio') -eq ($freshLine -notin @('0.13','0.14'))) 'historical audio capability changed.'
+      Check ($PowerShell -ceq $engine -and $Arguments -notcontains '-NoProfile' -and $Arguments -notcontains '-File') 'fresh actor retained a nested PowerShell worker.'
+      Check (($Arguments -contains '--disable-audio') -eq ($freshLine -notin @('0.13','0.14'))) 'fresh audio capability changed.'
       $modList=Get-Content -Raw -LiteralPath (Join-Path $mods 'mod-list.json')|ConvertFrom-Json
-      Check (($modList.mods.name -join '|') -ceq 'base|more-infinite-research' -and (Get-Content -Raw $config).Contains('[path]') -and $mods -ceq $sourceRoot) 'fresh load lost direct library or private configuration.'
+      $selected=@($modList.mods|Where-Object enabled)
+      $selectedCount=if($freshEnableSpaceAge){6}else{2}
+      Check ($selected.Count -eq $selectedCount -and (Get-Content -Raw $config).Contains('[path]') -and $mods -ceq $sourceRoot) 'fresh load lost direct library or private configuration.'
+      if(-not $freshIsModern){Check (($selected.name -join '|') -ceq 'base|more-infinite-research') 'historical fresh load changed its selected archive set.'}
       Check (-not(Test-Path -LiteralPath (Join-Path $mods 'mod-settings.dat'))) 'fresh load inherited settings.'
-      $display=(($freshVersion -split '\.')|ForEach-Object {[int]$_})-join '.'
+      $display=if($freshIsModern){$freshVersion}else{(($freshVersion -split '\.')|ForEach-Object {[int]$_})-join '.'}
       $userPath=[regex]::Match((Get-Content -Raw $config),'(?m)^write-data=(.+)$').Groups[1].Value.Trim()
       $log=Join-Path $userPath 'factorio-current.log'
       if($freshFailure -cne 'missing'){[IO.File]::WriteAllText($save,'tiny save')}
-      [IO.File]::WriteAllText($log,"Loading mod base $freshLine.1 (data.lua)`nLoading mod more-infinite-research $display (data.lua)`nFactorio initialised`nCreating new map`nMap version controlled`n$freshFailure")
+      [IO.File]::WriteAllLines($log,@($selected|ForEach-Object {
+        $loggedVersion=if($_.name-ceq'more-infinite-research'){$display}else{[string]$_.version}
+        "Loading mod $($_.name) $loggedVersion (data.lua)"
+      })+@('Factorio initialised','Creating new map','Map version controlled',$freshFailure))
       [IO.File]::WriteAllText($StdoutPath,'tiny controlled output');[IO.File]::WriteAllText($StderrPath,'')
-      return 0
+      if($freshFailure -ceq 'exit'){return 3};return 0
     }
     $engineRoot=Join-Path $scratch 'controlled-engine';$engine=Join-Path $engineRoot 'bin/x64/factorio.exe'
     $null=New-Item -ItemType Directory -Path (Split-Path -Parent $engine),(Join-Path $engineRoot 'data/base')
@@ -261,7 +268,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $oldList='{"mods":[{"name":"base","enabled":true}]}';$oldSettings=[byte[]](5,4,3,2,1)
     [IO.File]::WriteAllText((Join-Path $sourceRoot 'mod-list.json'),$oldList)
     [IO.File]::WriteAllBytes((Join-Path $sourceRoot 'mod-settings.dat'),$oldSettings)
-    $freshFailure='';$freshRoots=[Collections.Generic.List[string]]::new()
+    $freshFailure='';$freshIsModern=$false;$freshEnableSpaceAge=$false;$freshRoots=[Collections.Generic.List[string]]::new()
     foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(0,1,2)){
       $freshLine='0.'+$target.Substring(2);$freshVersion='4.2.'+$target.Substring(1)+('0'+$patch)
       [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
@@ -349,10 +356,75 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
         Check (@(Get-ChildItem -LiteralPath $validationRoot -Directory -Recurse|Where-Object Name -EQ 'mods').Count -eq 0) 'modern smoke recreated a mods stage.'
       }
     }
+    # The canonical release runner now invokes Factorio itself.  Exercise its
+    # actual modern fresh-loader wrapper with the same direct-library adapter
+    # and native-actor seam as historical targets; no ScenarioWorker is used.
+    $modernLoaderSha=Get-MIR42EngineRunSha $runnerPath
+    $runtimeScenarioRegistry=Join-Path $RepoRoot 'validation/scenarios/runtime.json'
+    $modernRoots=[Collections.Generic.List[string]]::new()
+    foreach($case in @(
+      @{target='f210';scenario='package-zip-base';spaceAge=$false},
+      @{target='f210';scenario='package-zip-space-age';spaceAge=$true},
+      @{target='f200';scenario='package-zip-base';spaceAge=$false},
+      @{target='f110';scenario='package-zip-base';spaceAge=$false},
+      @{target='f100';scenario='package-zip-base';spaceAge=$false}
+    )){
+      $target=[string]$case.target
+      $freshLine=switch($target){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'}}
+      $freshVersion=[string]$rows[$target].to
+      $freshIsModern=$true;$freshEnableSpaceAge=[bool]$case.spaceAge;$freshFailure=''
+      [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
+      $root=Join-Path $exactRoot ('modern-'+$target+'-'+[string]$case.scenario);$modernRoots.Add($root)
+      $inventory=Get-MIR4ArchiveInventory -Path $rows[$target].candidate
+      $modernParams=@{
+        Target=$target;Scenario=[string]$case.scenario;FactorioLine=$freshLine;FactorioBinaryVersion="$freshLine.1"
+        Engine=$engine;EngineSha256=$engineHash;Candidate=$rows[$target].candidate;CandidateSha256=$rows[$target].candidate_sha256
+        CandidateContentSha256=[string]$inventory.content_sha256;PackageSourceSha256=('B'*64);LibraryDirectory=$sourceRoot
+        Version=$freshVersion;FreshRoot=$root;SourceCommit=('A'*40);DirectLoaderSha256=$modernLoaderSha
+        RuntimeScenarioRegistryPath=$runtimeScenarioRegistry;DeadlineSeconds=60
+      }
+      $result=Invoke-MIR42ModernFreshLoad @modernParams
+      $summary=Get-Content -Raw -LiteralPath $result.receipt.path|ConvertFrom-Json -Depth 100
+      $expectedScenarioSha=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes([string]$case.scenario)))
+      $expectedGroupSha=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes('exact-dist')))
+      Check ([int]$summary.schema-eq2-and$summary.status-ceq'passed'-and$summary.git_commit-ceq('A'*40)-and$summary.validation_package_sha256-ceq$rows[$target].candidate_sha256-and$summary.validation_package_content_sha256-ceq[string]$inventory.content_sha256) "$target/$($case.scenario) lost exact schema-2 candidate identity."
+      Check ($summary.validation_harness_sha256-ceq$modernLoaderSha-and$summary.target_profile_sha256-ceq''-and$summary.execution_kind-ceq'direct-native-fresh-load'-and$summary.direct_loader.sha256-ceq$modernLoaderSha-and$summary.runtime_scenario_registry.sha256-ceq(Get-MIR42EngineRunSha $runtimeScenarioRegistry)-and$summary.expected_scenarios_sha256-ceq$expectedScenarioSha-and$summary.required_groups_sha256-ceq$expectedGroupSha-and$summary.expected_scenarios.Count-eq1-and$summary.expected_scenarios[0]-ceq[string]$case.scenario-and$summary.scenarios.Count-eq1-and$summary.scenarios[0].assertions_executed-eq6-and$summary.assertions_executed-eq6) "$target/$($case.scenario) recorded ScenarioWorker provenance or incomplete direct evidence."
+      Check ((Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json')) -ceq $oldList -and -not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'modern direct fresh actor failed to restore controls.'
+      Check ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $sourceRoot 'mod-settings.dat'))) -ceq [Convert]::ToBase64String($oldSettings)) 'modern direct fresh actor failed to restore settings.'
+      $libraryReceipt=Get-Content -Raw -LiteralPath (Join-Path $root 'library-inputs.json')|ConvertFrom-Json -Depth 30
+      Check ($libraryReceipt.status-ceq'restored-direct-library-controls'-and$libraryReceipt.archive_links_created-eq0-and$libraryReceipt.dependency_payload_bytes_copied-eq0-and-not(Test-Path (Join-Path $root 'work/user/mods'))) 'modern direct fresh actor materialized a profile or did not restore activation.'
+    }
+    $target='f200';$freshLine='2.0';$freshVersion=[string]$rows[$target].to;$freshIsModern=$true;$freshEnableSpaceAge=$false
+    [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version='2.0.1';dependencies=@()}|ConvertTo-Json))
+    $modernFailureParams=@{
+      Target=$target;Scenario='package-zip-base';FactorioLine=$freshLine;FactorioBinaryVersion='2.0.1'
+      Engine=$engine;EngineSha256=$engineHash;Candidate=$rows[$target].candidate;CandidateSha256=$rows[$target].candidate_sha256
+      CandidateContentSha256=[string](Get-MIR4ArchiveInventory -Path $rows[$target].candidate).content_sha256;PackageSourceSha256=('B'*64);LibraryDirectory=$sourceRoot
+      Version=$freshVersion;SourceCommit=('A'*40);DirectLoaderSha256=$modernLoaderSha;RuntimeScenarioRegistryPath=$runtimeScenarioRegistry;DeadlineSeconds=60
+    }
+    foreach($failure in @(
+      @{name='missing';code='output-missing'},
+      @{name='Error controlled';code='log-content'},
+      @{name='exit';code='process-exit'}
+    )){
+      $freshFailure=[string]$failure.name;$modernFailureParams.FreshRoot=Join-Path $exactRoot ('modern-failure-'+[guid]::NewGuid().ToString('N'))
+      Refuses {Invoke-MIR42ModernFreshLoad @modernFailureParams} ([string]$failure.code)
+      Check (-not(Test-Path (Join-Path $modernFailureParams.FreshRoot 'summary.json'))-and(Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json'))-ceq$oldList-and-not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'failed modern direct actor accepted evidence or left controls active.'
+    }
+    $freshFailure='';$modernFailureParams.FreshRoot=Join-Path $exactRoot 'modern-drift';$modernFailureParams.CandidateSha256='0'*64
+    Refuses {Invoke-MIR42ModernFreshLoad @modernFailureParams} 'input-drift'
+    Check (-not(Test-Path (Join-Path $modernFailureParams.FreshRoot 'summary.json'))-and(Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json'))-ceq$oldList-and-not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'drifted modern direct actor accepted evidence or changed controls.'
+    $invalidFamily=$modernFailureParams.Clone();$invalidFamily.CandidateSha256=$rows.f200.candidate_sha256;$invalidFamily.Scenario='package-zip-space-age';$invalidFamily.FreshRoot=Join-Path $exactRoot 'modern-invalid-family'
+    Refuses {Invoke-MIR42ModernFreshLoad @invalidFamily} 'modern-fresh-target-binding'
+    Check (-not(Test-Path (Join-Path $invalidFamily.FreshRoot 'summary.json'))) 'non-F210 Space Age selection produced evidence.'
+    $invalidArchive=$modernFailureParams.Clone();$invalidArchive.CandidateSha256=$rows.f200.candidate_sha256;$invalidArchive.Version='4.2.20002';$invalidArchive.FreshRoot=Join-Path $exactRoot 'modern-invalid-archive'
+    Refuses {Invoke-MIR42ModernFreshLoad @invalidArchive} 'modern-fresh-archive-version'
+    Check (-not(Test-Path (Join-Path $invalidArchive.FreshRoot 'summary.json'))) 'wrong modern archive version produced evidence.'
+    Check ($modernRoots.Count-eq5) 'modern direct loader omitted a required base or Space Age control.'
     foreach($target in $originals.Keys){Check ((Test-Path -LiteralPath $originals[$target] -PathType Leaf) -and (Get-MIRImmutableInputSha256 $originals[$target]) -ceq $rows[$target].candidate_sha256) 'stage retirement lost or changed a shared source input.'}
     Write-Output "MIR42-ENGINE-DIRECT-LIBRARY-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=18 fresh_version_controls=15 factorio_processes=0 archive_copies_created=0 archive_links_created=0"
   } finally {
-    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','Assert-MIR42EngineLibraryArchives','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
+    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
     if(Test-Path -LiteralPath $scratch){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny engine controls';Remove-Item -LiteralPath $scratch -Recurse -Force}
   }
 }
@@ -625,12 +697,15 @@ if (-not $harness.Contains("`$serverReload = `$isHistoricalTerminalFixture -and 
 }
 $historicalFreshCall = $runner.IndexOf('$freshLoads = @(Invoke-MIR42HistoricalFreshLoad -Target $target',[StringComparison]::Ordinal)
 $historicalFreshBranch = if ($historicalFreshCall -ge 0) { $runner.LastIndexOf('if ($isHistoricalTarget) {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
-$modernFreshCall = $runner.IndexOf("`$freshArgs = @('-NoProfile'",[StringComparison]::Ordinal)
+$modernFreshCall = $runner.IndexOf('$fresh = Invoke-MIR42ModernFreshLoad -Target $target',[StringComparison]::Ordinal)
 $modernFreshElse = if ($historicalFreshCall -ge 0) { $runner.IndexOf('} else {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
 if ($historicalFreshBranch -lt 0 -or $historicalFreshCall -le $historicalFreshBranch -or
     $modernFreshElse -le $historicalFreshCall -or $modernFreshCall -le $modernFreshElse -or
-    -not $runner.Contains("[mir42-`$Target-historical-fresh-log-content]")) {
-  throw 'historical-fresh-load-must-bypass-modern-scenario-worker'
+    -not $runner.Contains("[mir42-`$Target-historical-fresh-log-content]") -or
+    -not $runner.Contains('function Invoke-MIR42DirectFreshLoad {') -or
+    -not $runner.Contains('Invoke-MIR42BoundedUpgrade -PowerShell $Engine') -or
+    $runner.Contains('-ScenarioWorker')) {
+  throw 'historical-and-modern-fresh-loads-must-use-direct-native-actors'
 }
 foreach ($needle in @('$isHistoricalTerminalFixture = $FixtureName -eq ''assert-upgrade-historical-terminal-to-mir42''','$isLegacyFactorio = $isHistoricalTerminalFixture -or','MIR historical upgrade specialization requires an exact terminal predecessor','historical-terminal-source-state-retained','historical-terminal-infinite-bonus-retained-where-supported','$historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo','$historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target','kind=$runKind','status=$runStatus')) {
   if (-not ($runner.Contains($needle) -or $harness.Contains($needle))) { throw "historical-runtime-contract $needle" }

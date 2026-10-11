@@ -3051,9 +3051,9 @@
     {
       "path": "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
       "classification": "canonical-internal",
-      "sha256": "4F369A1A678A433A799D120F5A5AE6FBF0C7DE23C1AC32E856D6BC332A62F723",
+      "sha256": "C221BEF078B8F60CA365D9F30781FDA6D4E94018CE641D79D4E7F0BF40C440B2",
       "hash_mode": "canonical-text-v1",
-      "lines": 881,
+      "lines": 1004,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:9067a6751a42265f25d5c27d9837956efc6ee861c396768b1e8cb1b7c58ffab4"
+  "digest": "sha256:b2c528aba85a840370d73fc8f70d72c7d9c9dbfac80224d591dc980024d87fd1"
 }
