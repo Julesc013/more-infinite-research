@@ -899,7 +899,9 @@ foreach ($target in $targets) {
   $stdoutPath = Join-Path $rowRoot 'harness-stdout.txt'
   $stderrPath = Join-Path $rowRoot 'harness-stderr.txt'
   $args = @('-NoProfile','-File',$harness,'-RepoRoot',$repo,'-FactorioBin',$row.engine,
-    '-FromZip',$row.predecessor,'-ToZip',$row.candidate,'-FromVersion',$row.from,'-ToVersion',$row.to,
+    # The manifest reader binds the construction archive's exact path. The
+    # native actor still selects its identical, preverified library archive.
+    '-FromZip',$row.predecessor,'-ToZip',$row.candidate_authority_path,'-FromVersion',$row.from,'-ToVersion',$row.to,
     '-SourceVersion',$(if($sourceVersion -ceq '4.2.0'){'4.2.1'}else{$sourceVersion}),
     # The established F210 complete-state oracle is native Space Age only.
     '-FixtureName',$row.fixture,'-Archetype',$(if($sourceVersion -ceq '4.2.3' -and $target -ceq 'f210'){'space-age-native-owner'}else{'base-default'}),'-OutputPath',$receiptPath,

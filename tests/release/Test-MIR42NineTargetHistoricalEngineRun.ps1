@@ -193,11 +193,11 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $ast=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$tokens,[ref]$errors)
     $argumentNode=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Extent.Text.StartsWith('$args = @(')},$true))
     Check ($argumentNode.Count -eq 1) 'upgrade argument construction is ambiguous.'
-    $harness='controlled harness';$repo=$RepoRoot;$rowRoot=Join-Path $exactRoot 'row';$row=$rows.f210;$row.engine='controlled';$row.fixture='controlled';$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
+    $harness='controlled harness';$repo=$RepoRoot;$rowRoot=Join-Path $exactRoot 'row';$row=$rows.f210;$row.engine='controlled';$row.fixture='controlled';$row.candidate_authority_path=Join-Path $scratch 'exact-construction-candidate.zip';$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
     $target='f210';$libraryBindings=@{f210=$sourceRoot};$sourceVersion='4.2.2'
     . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
     Check ($builtArguments[[Array]::IndexOf($builtArguments,'-ExpectedPeakMemoryMiB')+1] -ceq '256' -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -gt 0 -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -lt 4) 'upgrade worker lost the declared peak or remaining output allowance.'
-    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-LocalModLibraryDirs')+1] -ceq $sourceRoot) 'upgrade worker lost the selected direct library.'
+    Check ($row.candidate_authority_path -cne $row.candidate -and $builtArguments[[Array]::IndexOf($builtArguments,'-ToZip')+1] -ceq $row.candidate_authority_path -and $builtArguments[[Array]::IndexOf($builtArguments,'-LocalModLibraryDirs')+1] -ceq $sourceRoot) 'upgrade worker did not retain distinct construction authority and selected direct library.'
     Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SourceVersion')+1] -ceq '4.2.2') 'upgrade worker lost its maintenance source version.'
     $sourceVersion='4.2.3';$target='f210'
     . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
