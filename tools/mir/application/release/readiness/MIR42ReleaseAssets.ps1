@@ -42,7 +42,7 @@ function Test-MIR422SavedScalarEqual {
 }
 
 function Assert-MIR422CompleteSavedState {
-  param([Collections.IDictionary]$Before,[Collections.IDictionary]$After)
+  param([Collections.IDictionary]$Before,[Collections.IDictionary]$After,[switch]$RequireExactResearchDefinitions)
   if($Before.forces-isnot[Collections.IDictionary]-or$After.forces-isnot[Collections.IDictionary]-or$Before.forces.Count-lt1-or$Before.forces.Count-ne$After.forces.Count){throw '[mir422-upgrade-forces]'}
   foreach($force in $Before.forces.Keys){
     if(-not$After.forces.Contains($force)){throw '[mir422-upgrade-force-missing]'}
@@ -50,10 +50,22 @@ function Assert-MIR422CompleteSavedState {
     if($old-isnot[Collections.IDictionary]-or$new-isnot[Collections.IDictionary]-or
       $old.technologies-isnot[Collections.IDictionary]-or$new.technologies-isnot[Collections.IDictionary]){throw '[mir422-upgrade-catalogue-shape]'}
     if($old.technologies.Count-lt3){throw '[mir422-upgrade-empty-catalogue]'}
+    # A direct 4.2.2 -> performance-only 4.2.3 transition must preserve the
+    # complete catalogue, including unresearched technologies and definitions.
+    # Older predecessors keep their reviewed feature/definition allowances.
+    if($RequireExactResearchDefinitions-and$old.technologies.Count-ne$new.technologies.Count){throw '[mir423-upgrade-technology-set]'}
     foreach($name in $old.technologies.Keys){
       if(-not$new.technologies.Contains($name)){throw "[mir422-upgrade-technology-missing] $force/$name"}
       if($old.technologies[$name]-isnot[Collections.IDictionary]-or$new.technologies[$name]-isnot[Collections.IDictionary]){throw '[mir422-upgrade-technology-shape]'}
       $a=$old.technologies[$name].Clone();$b=$new.technologies[$name].Clone()
+      if($RequireExactResearchDefinitions){
+        $definitions=@('prototype','definition'|Where-Object {$a.Contains($_)})
+        if($definitions.Count-lt1){throw '[mir423-upgrade-definition-missing]'}
+        foreach($definition in $definitions){
+          if($a[$definition]-isnot[Collections.IDictionary]-or-not$b.Contains($definition)-or$b[$definition]-isnot[Collections.IDictionary]-or
+            -not(Test-MIR422SavedScalarEqual $a[$definition] $b[$definition])){throw "[mir423-upgrade-research-definition] $force/$name"}
+        }
+      }
       # The native oracle compares complete definitions with its exact reviewed
       # science-frontier deltas. Independently require every earned state here.
       foreach($definition in @('prototype','definition')){$null=$a.Remove($definition);$null=$b.Remove($definition)}
@@ -67,6 +79,7 @@ function Assert-MIR422CompleteSavedState {
     foreach($field in @('bonuses','recipes','settings')){
       if($old.Contains($field)){
         if($old[$field]-isnot[Collections.IDictionary]-or-not$new.Contains($field)-or$new[$field]-isnot[Collections.IDictionary]){throw "[mir422-upgrade-state-map] $field"}
+        if($RequireExactResearchDefinitions-and$field-ceq'settings'-and-not(Test-MIR422SavedScalarEqual $old[$field] $new[$field])){throw '[mir423-upgrade-settings]'}
         foreach($name in $old[$field].Keys){if(-not$new[$field].Contains($name)-or-not(Test-MIR422SavedScalarEqual $old[$field][$name] $new[$field][$name])){throw "[mir422-upgrade-earned-effect] $force/$field/$name"}}
       }
     }
@@ -248,7 +261,7 @@ function Assert-MIR423NativeUpgradeProof {
     $states[$snapshot.stage]=$s
   }
   if((($states.Keys|Sort-Object)-join'|')-cne'reload|source|upgrade'){throw '[mir423-upgrade-snapshot-set]'}
-  foreach($phase in @('upgrade','reload')){Assert-MIR422CompleteSavedState $states.source $states[$phase]}
+  foreach($phase in @('upgrade','reload')){Assert-MIR422CompleteSavedState $states.source $states[$phase] -RequireExactResearchDefinitions:($patch-eq2)}
   return $proof
 }
 

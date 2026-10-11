@@ -396,6 +396,21 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   $profileAnchor='["base-default"]={technology="mining-productivity-4",level=5}'
   if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1){throw '[mir423-f200-bob-angel-oracle-anchor]'}
   $control=$control.Replace($profileAnchor,$profileAnchor+', ["f200-bob-angel"]={technology="mining-productivity-4",level=5}')
+  # This is deliberately narrower than the retained generic complete-state
+  # oracle: 4.2.20002 -> 4.2.20003 is performance-only for this exact
+  # Bob/Angel input, so even an unresearched extra technology is a failure.
+  # Earlier predecessor lanes retain their reviewed feature allowances.
+  $permissiveTechnologySetGuard='(?m)^  for name, after in pairs\(observed\.technologies\) do\r?\n    if not expected\.technologies\[name\] and after\.researched then fail\("new research was awarded without earning it: " \.\. name\) end\r?\n  end$'
+  $technologySetGuard=[regex]::new($permissiveTechnologySetGuard)
+  if($technologySetGuard.Matches($control).Count-ne1){throw '[mir423-f200-bob-angel-performance-only-anchor]'}
+  $strictTechnologySetGuard=@'
+  for name in pairs(observed.technologies) do
+    if not expected.technologies[name] then
+      fail("new technology added in performance-only upgrade: " .. name)
+    end
+  end
+'@.TrimEnd()
+  $control=$technologySetGuard.Replace($control,$strictTechnologySetGuard,1)
   [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
   $settings=Get-Content -LiteralPath $settingsPath -Raw
   $settingsAnchor='default_value="base-default",allowed_values={"base-default"}'

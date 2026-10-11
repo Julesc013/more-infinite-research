@@ -14,6 +14,9 @@ function Invoke-MIR423ReleaseUpgradeControls {
       $predecessor=Get-MIR423PublishedUpgradePredecessor -Target $package.target -PredecessorSourceVersion $sourceVersion
       $from='4.2.'+$package.target.Substring(1)+$patch.ToString('00');$to=$package.distribution_version
       $state=@{forces=@{player=@{technologies=@{a=@{researched=$true;level=2};b=@{researched=$false;level=1};c=@{researched=$false;level=1}};bonuses=@{plate=0.1};settings=@{kept=$true};effects=@{speed=0.1};ammo=@{bullet=0.1};gun_speed=@{};turret=@{};queue=@('b');current_research='b';research_progress=0.42}};from_version=$from;to_version=$to}
+      foreach($technology in $state.forces.player.technologies.Values){
+        $technology.prototype=@{effects=@(@{type='mining-drill-productivity-bonus';modifier=0.02});ingredients=@(@{name='automation-science-pack';amount=1});prerequisites=@();research_unit_count=100;research_unit_energy=30;max_level=10}
+      }
       $snapshots=@(foreach($phase in @('source','upgrade','reload')){
         $snapshot=Clone-UpgradeControl $state;$snapshot.stage=$phase
         $reference=Write-UpgradeControlJson (Join-Path $directory ($phase+'.json')) $snapshot
@@ -68,5 +71,42 @@ function Invoke-MIR423ReleaseUpgradeControls {
   $badRow=Clone-UpgradeControl $rows[0];$badRow.receipt=Write-UpgradeControlJson (Join-Path (Split-Path $rows[0].receipt.path) 'missing-full-state-assertion.json') $badReceipt
   $refused=$false;try{$null=Assert-MIR423NativeUpgradeProof $badRow $PackageAssets[0]}catch{$refused=$_.Exception.Message-ceq'[mir423-upgrade-full-state-oracle-assertion]'}
   if(-not$refused){throw '423 upgrade controls accepted a receipt without its full-state oracle assertion'};$checks++
+  # Bind opposing full snapshots and receipt hashes, so these mutations reach
+  # the semantic evaluator rather than failing an unrelated custody check.
+  function Write-ChangedUpgradeControlRow($row,$mutation,$stem){
+    $changedRow=Clone-UpgradeControl $row
+    $changedReceipt=Get-Content $row.receipt.path -Raw|ConvertFrom-Json -AsHashtable -Depth 100
+    $snapshot=Get-Content $row.snapshots[1].path -Raw|ConvertFrom-Json -AsHashtable -Depth 100
+    &$mutation $snapshot
+    $reference=Write-UpgradeControlJson (Join-Path (Split-Path $row.receipt.path) ($stem+'-snapshot.json')) $snapshot
+    $changedRow.snapshots[1]=@{stage='upgrade';path=$reference.path;sha256=$reference.sha256}
+    $changedReceipt.full_state_evaluator_snapshots=$changedRow.snapshots
+    $changedRow.receipt=Write-UpgradeControlJson (Join-Path (Split-Path $row.receipt.path) ($stem+'-receipt.json')) $changedReceipt
+    return $changedRow
+  }
+  $mutations=@(
+    @{stem='new-unresearched';code='[mir423-upgrade-technology-set]';change={$args[0].forces.player.technologies.d=@{researched=$false;level=1}}},
+    @{stem='removed-technology';code='[mir423-upgrade-technology-set]';change={$null=$args[0].forces.player.technologies.Remove('b')}},
+    @{stem='replaced-technology';code='[mir422-upgrade-technology-missing]';change={$null=$args[0].forces.player.technologies.Remove('b');$args[0].forces.player.technologies.d=@{researched=$false;level=1}}},
+    @{stem='changed-effect';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.effects[0].modifier=0.03}},
+    @{stem='changed-science';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.ingredients[0].name='chemical-science-pack'}},
+    @{stem='changed-cost';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.research_unit_count=200}},
+    @{stem='missing-definition';code='[mir423-upgrade-research-definition]';change={$null=$args[0].forces.player.technologies.a.Remove('prototype')}},
+    @{stem='new-setting';code='[mir423-upgrade-settings]';change={$args[0].forces.player.settings.new_default=$true}}
+  )
+  foreach($case in $mutations){
+    $badRow=Write-ChangedUpgradeControlRow $rows[2] $case.change $case.stem
+    $refused=$false
+    try{$null=Assert-MIR423NativeUpgradeProof $badRow $PackageAssets[0]}catch{$refused=$_.Exception.Message.StartsWith($case.code,[StringComparison]::Ordinal)}
+    if(-not$refused){throw ('423 upgrade controls accepted performance-only mutation: '+$case.stem)};$checks++
+  }
+  $priorPatchDelta={
+    $args[0].forces.player.technologies.d=@{researched=$false;level=1}
+    $args[0].forces.player.technologies.a.prototype.effects[0].modifier=0.03
+  }
+  foreach($olderRow in @($rows[0],$rows[1])){
+    $allowedRow=Write-ChangedUpgradeControlRow $olderRow $priorPatchDelta 'prior-patch-feature-delta'
+    $null=Assert-MIR423NativeUpgradeProof $allowedRow $PackageAssets[0];$checks++
+  }
   return [pscustomobject]@{path=$path;checks=$checks;native_runs=0}
 }

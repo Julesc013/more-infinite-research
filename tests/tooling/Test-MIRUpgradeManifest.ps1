@@ -235,6 +235,7 @@ foreach($from in @('4.2.20000','4.2.20001','4.2.20002')){
   Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200OracleRoot -FromVersion $from -ToVersion '4.2.20003'
   $f200Control=Get-Content -LiteralPath (Join-Path $f200OracleRoot 'control.lua') -Raw
   if(-not$f200Control.Contains($f200ReviewedGuard)){throw "F200 reviewed delta did not reject the $from predecessor"}
+  if($f200Control.Contains('new technology added in performance-only upgrade')){throw "F200 reviewed delta unexpectedly applied Bob/Angel performance-only strictness to the $from predecessor"}
   $currentAssertions++
 }
 $bobAngelProfilePath=Join-Path $RepoRoot 'fixtures/run-profiles/f200-bob-angel-upgrade-422.json'
@@ -272,8 +273,24 @@ try {
   $bobAngelControl=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'control.lua') -Raw
   $bobAngelSettings=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'settings.lua') -Raw
   if($bobAngelInfo.version-cne'0.1.33'-or-not$bobAngelControl.Contains('["f200-bob-angel"]={technology="mining-productivity-4",level=5}')-or
-     $bobAngelSettings-notmatch 'default_value="f200-bob-angel",allowed_values=\{"base-default","f200-bob-angel"\}'){
+     $bobAngelSettings-notmatch 'default_value="f200-bob-angel",allowed_values=\{"base-default","f200-bob-angel"\}'-or
+     -not$bobAngelControl.Contains('new technology added in performance-only upgrade: " .. name')-or
+     $bobAngelControl.Contains('not expected.technologies[name] and after.researched then fail("new research was awarded without earning it: " .. name)')){
     throw 'Bob/Angel full-state fixture did not receive its unique staged identity and selected oracle'}
+  $f200BobAngelAssertions++
+  # The host oracle states the policy independently of the staged Lua text so
+  # the opposing row demonstrates that a new *unresearched* technology fails.
+  $assertExactTechnologySet={
+    param([hashtable]$Expected,[hashtable]$Observed)
+    foreach($name in $Expected.Keys){if(-not$Observed.ContainsKey($name)){throw "missing technology: $name"}}
+    foreach($name in $Observed.Keys){if(-not$Expected.ContainsKey($name)){throw "unexpected technology: $name"}}
+  }
+  $expectedTechnologies=@{established=[pscustomobject]@{researched=$true}}
+  & $assertExactTechnologySet $expectedTechnologies @{established=[pscustomobject]@{researched=$true}}
+  $f200BobAngelAssertions++
+  $rejected=$false
+  try{& $assertExactTechnologySet $expectedTechnologies @{established=[pscustomobject]@{researched=$true};unearned=[pscustomobject]@{researched=$false}}}catch{$rejected=$_.Exception.Message-ceq'unexpected technology: unearned'}
+  if(-not$rejected){throw 'Bob/Angel performance-only technology-set control accepted an unresearched addition'}
   $f200BobAngelAssertions++
   $bobAngelSelection=@([pscustomobject]@{name='base';version='2.0.77'},[pscustomobject]@{name='angelsbioprocessinggraphics';version='2.0.0'},[pscustomobject]@{name='mir423-startup-observer';version='1.0.0'},[pscustomobject]@{name='more-infinite-research';version='4.2.20003'})
   $bobAngelSnapshot=[pscustomobject]@{active_mods=[pscustomobject]@{base='2.0.77';angelsbioprocessinggraphics='2.0.0';'mir423-startup-observer'='1.0.0';'more-infinite-research'='4.2.20003'}}
