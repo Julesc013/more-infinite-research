@@ -288,4 +288,37 @@ expect_error(function() fingerprint.canonical(mixed_cycle) end,
 check(fingerprint.canonical({true, {}, false}) == '[true,[],false]',
   "a diagnostic failure cannot retain another call's buffer cursor")
 
+local length_fixture = {nested = {{[0] = "zero", [2] = "two"}, {quoted = escaped}}}
+local canonical_length_fixture = fingerprint.canonical(length_fixture)
+fingerprint.reset_metrics()
+check(fingerprint.canonical_length(length_fixture) == #canonical_length_fixture,
+  "counting canonical writer preserves exact mixed-key bytes")
+local length_metrics = fingerprint.metrics()
+check(length_metrics.canonical_calls == 1 and length_metrics.canonical_bytes == #canonical_length_fixture,
+  "counting canonical writer remains visible as one canonicalization pass")
+expect_error(function() fingerprint.canonical_length({nested = cyclic}) end,
+  "cyclic table at $.nested.self")
+
+local compilation_snapshot = require("prototypes.mir.domain.compiler.compilation_snapshot")
+local qualification_snapshot = compilation_snapshot.new({
+  fact_domains = {
+    recipes = {}, technologies = {}, items = {}, entities = {}, labs = {}, science_packs = {}
+  },
+  relationship_indexes = {}, owner_index = {}, graph_input = {}, effect_target_inventory = {},
+  provider_inputs = {}, stream_inputs = {plan = {schema = 1, plan_fingerprint = "mir32-stream"}},
+  base_continuation_inputs = {operations = {}}, source_fingerprints = {},
+  structural_sharing = {reused_domains = {}, copied_domains = {"stream_inputs"}}, metrics = {}
+})
+check(compilation_snapshot.is_trusted(qualification_snapshot), "qualification snapshot is trusted")
+local copied_qualification_snapshot = compilation_snapshot.snapshot(qualification_snapshot)
+local expected_qualification_snapshot_bytes = #fingerprint.canonical(copied_qualification_snapshot)
+local snapshot_metrics_before = require("prototypes.mir.core.trusted_record").metrics().CompilationSnapshot
+local actual_qualification_snapshot_bytes = compilation_snapshot.snapshot_canonical_bytes(qualification_snapshot)
+local snapshot_metrics_after = require("prototypes.mir.core.trusted_record").metrics().CompilationSnapshot
+check(actual_qualification_snapshot_bytes == expected_qualification_snapshot_bytes,
+  "qualification snapshot counting preserves the public projection byte count")
+check(snapshot_metrics_after.explicit_snapshots == snapshot_metrics_before.explicit_snapshots
+  and snapshot_metrics_after.full_copies == snapshot_metrics_before.full_copies,
+  "qualification snapshot measurement does not create a defensive snapshot copy")
+
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)

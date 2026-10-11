@@ -176,18 +176,38 @@ diagnose = function(root)
   error("Fingerprint diagnostic traversal did not reproduce invalid input.", 3)
 end
 
-function M.canonical(value)
-  local out = {}
-  encode(value, {}, "$", false, value, out, 0)
-  local text = table.concat(out)
-  local bytes = #text
+local function record_canonical_metrics(bytes)
   metrics.canonical_calls = metrics.canonical_calls + 1
   metrics.canonical_bytes = metrics.canonical_bytes + bytes
   metrics.maximum_canonical_bytes = math.max(metrics.maximum_canonical_bytes, bytes)
   if bytes > ONE_MIB then
     metrics.serializations_over_one_mib = metrics.serializations_over_one_mib + 1
   end
+end
+
+function M.canonical(value)
+  local out = {}
+  encode(value, {}, "$", false, value, out, 0)
+  local text = table.concat(out)
+  local bytes = #text
+  record_canonical_metrics(bytes)
   return text
+end
+
+-- Traverse through the same canonical writer without retaining its complete
+-- text. This remains a canonicalization pass for telemetry and preserves the
+-- normal invalid-input diagnostics, while callers that need only a byte
+-- budget do not allocate a second serialized copy of a trusted record.
+function M.canonical_length(value)
+  local bytes = 0
+  local counting_sink = setmetatable({}, {
+    __newindex = function(_, _, token)
+      bytes = bytes + #token
+    end
+  })
+  encode(value, {}, "$", false, value, counting_sink, 0)
+  record_canonical_metrics(bytes)
+  return bytes
 end
 
 local function hash_canonical(text)

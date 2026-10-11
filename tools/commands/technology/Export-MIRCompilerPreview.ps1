@@ -109,6 +109,9 @@ foreach ($budget in @($budgetProfile.artifacts | Sort-Object kind)) {
   $kind = [string]$budget.kind
   $counter = [string]$counterByKind[$kind]
   $observed = if ($telemetryCounters -and $null -ne $telemetryCounters.$counter) { [long]$telemetryCounters.$counter } else { $null }
+  # Evidence freezes telemetry before its own serialization. A zero self-size
+  # is an unavailable observation, not proof that the emitted envelope is empty.
+  if ($kind -ceq 'mir-compiler-evidence-public' -and $observed -eq 0) { $observed = $null }
   $status = if ($null -eq $observed) { "not-observed" } elseif ($observed -le [long]$budget.max_canonical_bytes) { "pass" } else { "over-budget" }
   $budgets += [pscustomobject][ordered]@{
     kind = $kind

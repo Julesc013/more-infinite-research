@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0150",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Construct compiler evidence once and count qualification snapshot bytes without retaining serialized copies.",
+  "details": [
+    "Public compiler evidence freezes telemetry before its own serialization, then enforces the exact final byte budget once. Live telemetry records emitted sizes afterward; the preview exporter treats an unavailable self-size as not observed.",
+    "Qualification snapshot byte counting uses the same canonical writer and validation as serialization. Public snapshot callers retain defensive copies; ordering, encoding and invalid-input rejection remain authoritative.",
+    "Controlled native F210 checks pass 85 snapshot/canonical assertions and 11 publication assertions, including fatal budget rejection, older-engine and diagnostics branches. Compiler static and preview export controls also pass.",
+    "Gameplay decisions, research identities, settings and migrations are unchanged. Actual-package startup, memory, semantic output, all nine targets and 27 predecessor upgrades still require qualification; no native startup speedup is claimed."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance",
+    "diagnostics"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Shared compiler publication and canonical writer change; target-specific package, performance and save qualification remains pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/reference/schemas/compiler-evidence.md"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/publication_measurement.lua and technology_design_characterization.lua: executed publication and canonical-size controls"
+    }
+  ]
+}

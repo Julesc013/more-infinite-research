@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-10.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-11.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -263,7 +263,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/schemas/compatibility-claim.md | Compatibility Claim Schema | current | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/schemas/compatibility-pack.md | CompatibilityPack Schema | current | developer | reference | mir-maintainers | 2026-07-24 |
 | docs/reference/schemas/compiler-boundary.md | Compiler Boundary Schemas | current | developer | reference | mir-maintainers | 2026-07-24 |
-| docs/reference/schemas/compiler-evidence.md | CompilerEvidence Schema | current | developer | reference | mir-maintainers | 2026-07-20 |
+| docs/reference/schemas/compiler-evidence.md | CompilerEvidence Schema | current | developer | reference | mir-maintainers | 2026-10-11 |
 | docs/reference/schemas/compiler-provider.md | CompilerProvider Schema | current | developer | reference | mir-maintainers | 2026-07-13 |
 | docs/reference/schemas/compiler-runtime-contracts.md | Compiler Runtime Contracts | current | developer | reference | mir-maintainers | 2026-07-24 |
 | docs/reference/schemas/decision-record.md | Decision Records And Stream Specs | current | developer | reference | mir-maintainers | 2026-07-12 |
@@ -388,7 +388,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | MIR 4.2 community implementation outcomes | current | maintainer | release-plan | mir-maintainers | 2026-09-11 |
-| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-10-10 |
+| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-10-11 |
 | docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-07 |
 | docs/releases/mir42-compatibility-playtest-plan.md | MIR 4.2 Compatibility Scope and Player Playtest Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-27 |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | MIR 4.2 Nine-Target Candidate and Playtest Matrix | current | release-manager | release-plan | mir-maintainers | 2026-10-10 |

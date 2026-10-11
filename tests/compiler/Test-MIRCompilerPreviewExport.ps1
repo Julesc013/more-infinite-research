@@ -52,6 +52,18 @@ try {
   if (-not (Test-Path -LiteralPath (Join-Path $outputPath "technology-catalog.full.json"))) {
     throw "Compiler PREVIEW export omitted the exact full catalog."
   }
+  $prepublication = Get-Content -Raw -LiteralPath $evidencePath | ConvertFrom-Json
+  $prepublication.telemetry.counters.compiler_evidence_public_bytes = 0
+  $prepublication | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $evidencePath -Encoding UTF8
+  & (Join-Path $RepoRoot "tools\commands\technology\Export-MIRCompilerPreview.ps1") `
+    -CatalogPath $catalogPath -EvidencePath $evidencePath -OutputDirectory $outputPath -Top 10
+  $summary = Get-Content -Raw -LiteralPath (Join-Path $outputPath "compiler-preview-summary.json") | ConvertFrom-Json
+  $selfBudget = @($summary.public_artifact_budgets | Where-Object kind -CEQ 'mir-compiler-evidence-public')
+  if ($selfBudget.Count -ne 1 -or $selfBudget[0].status -cne 'not-observed' -or
+      $null -ne $selfBudget[0].observed_canonical_bytes -or
+      @($summary.public_artifact_budgets | Where-Object status -EQ 'pass').Count -ne 3) {
+    throw 'Compiler PREVIEW treated pre-publication self-size as a passed byte-budget observation.'
+  }
 } finally {
   $tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
   $resolvedRoot = [IO.Path]::GetFullPath($root)

@@ -122,7 +122,7 @@ local function compile_active(context)
     snapshot_construction_milliseconds = (input_snapshot.metrics.construction_seconds or 0) * 1000,
     snapshot_peak_memory_bytes = input_snapshot.metrics.peak_memory_bytes,
     input_snapshot_bytes = input_snapshot.metrics.snapshot_bytes,
-    qualification_snapshot_bytes = #fingerprint.canonical(compilation_snapshot_contract.snapshot(final_snapshot)),
+    qualification_snapshot_bytes = compilation_snapshot_contract.snapshot_canonical_bytes(final_snapshot),
     snapshot_reused_domains = final_snapshot.metrics.reused_domain_count,
     snapshot_copied_domains = final_snapshot.metrics.copied_domain_count,
     qualification_snapshot_construction_milliseconds = math.max(0, now() - qualification_started) * 1000,
