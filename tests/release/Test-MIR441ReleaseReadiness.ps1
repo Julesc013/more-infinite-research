@@ -9,12 +9,17 @@ function Test-MIR441ResourceRecovery {
   if($actual.memory.commit_limit_bytes-le0-or$actual.memory.committed_bytes-le0-or$actual.memory.free_bytes-le0){throw 'Native physical/commit readings unavailable'}
   $root=Join-Path $repo ('build/tmp/mir441-recovery-fixture-'+[guid]::NewGuid().ToString('N'))
   $policy=[pscustomobject]@{minimum_free_ram_gib=4}
-  $script:RecoveryFault='';$script:RecoveryChildPid=Join-Path $root 'child.pid'
+  $script:RecoveryFault='';$script:RecoverySnapshotOverride=$null;$script:RecoveryChildPid=Join-Path $root 'child.pid'
+  function New-MIR441RecoverySnapshot {
+    param([int64]$TotalBytes=16GB,[int64]$FreeBytes=12GB,[int64]$CommittedBytes=4GB,[int64]$CommitLimitBytes=20GB)
+    [pscustomobject]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');memory=[pscustomobject]@{total_bytes=$TotalBytes;free_bytes=$FreeBytes;committed_bytes=$CommittedBytes;commit_limit_bytes=$CommitLimitBytes};system_volume=[pscustomobject]@{free_bytes=100GB};work_volume=[pscustomobject]@{free_bytes=100GB}}
+  }
   function Get-MIR441ResourceSnapshot {
     param([string]$WorkRoot)
     if($script:RecoveryFault-eq'monitor'-and(Test-Path -LiteralPath $script:RecoveryChildPid)){throw 'simulated-monitor-failure'}
-    $snapshot=[pscustomobject]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');memory=[pscustomobject]@{total_bytes=16GB;free_bytes=12GB;committed_bytes=4GB;commit_limit_bytes=20GB};system_volume=[pscustomobject]@{free_bytes=100GB};work_volume=[pscustomobject]@{free_bytes=100GB}}
-    switch($script:RecoveryFault){'physical'{$snapshot.memory.free_bytes=4GB};'commit'{$snapshot.memory.committed_bytes=16GB};'disk'{$snapshot.system_volume.free_bytes=20GB};'work'{$snapshot.work_volume.free_bytes=20GB};'runtime-commit'{if(Test-Path -LiteralPath $script:RecoveryChildPid){$snapshot.memory.committed_bytes=19GB}}}
+    if($null-ne$script:RecoverySnapshotOverride){return $script:RecoverySnapshotOverride}
+    $snapshot=New-MIR441RecoverySnapshot
+    switch($script:RecoveryFault){'physical'{$snapshot.memory.free_bytes=4GB};'commit'{$snapshot.memory.committed_bytes=17GB};'disk'{$snapshot.system_volume.free_bytes=20GB};'work'{$snapshot.work_volume.free_bytes=20GB};'runtime-commit'{if(Test-Path -LiteralPath $script:RecoveryChildPid){$snapshot.memory.committed_bytes=19GB}}}
     return $snapshot
   }
   function Write-MIR441Json {
@@ -25,6 +30,20 @@ function Test-MIR441ResourceRecovery {
     $caught='';try{&$Action|Out-Null}catch{$caught=$_.Exception.Message}
     if($caught-notmatch[regex]::Escape($Expected)){throw "Expected $Expected, got $caught"}
   }
+  $physicalFraction=[int64]([double](16GB)*.2)
+  $normalLimits=Get-MIR441ResourceLimits -Policy $policy -Snapshot (New-MIR441RecoverySnapshot)
+  if($normalLimits.commit_bytes-ne$physicalFraction-or$normalLimits.physical_bytes-ne4GB){throw 'Normal physical/commit reserve baseline changed'}
+  $smallLimits=Get-MIR441ResourceLimits -Policy ([pscustomobject]@{}) -Snapshot (New-MIR441RecoverySnapshot -TotalBytes 8GB -FreeBytes 6GB -CommitLimitBytes 64GB)
+  if($smallLimits.commit_bytes-ne2GB){throw 'Commit reserve lost its 2 GiB physical-memory floor'}
+  $largePagefileLimits=Get-MIR441ResourceLimits -Policy $policy -Snapshot (New-MIR441RecoverySnapshot -CommitLimitBytes 64GB)
+  if($largePagefileLimits.commit_bytes-ne$physicalFraction-or$largePagefileLimits.commit_bytes-eq[int64]([double](64GB)*.2)){throw 'Commit reserve still follows pagefile-scaled CommitLimit'}
+  $boundaryPeak=512MB;$boundaryRequired=$largePagefileLimits.commit_bytes+$boundaryPeak;$boundaryLimit=64GB
+  try {
+    $script:RecoverySnapshotOverride=New-MIR441RecoverySnapshot -CommittedBytes ($boundaryLimit-$boundaryRequired) -CommitLimitBytes $boundaryLimit
+    $null=Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $root -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes $boundaryPeak
+    $script:RecoverySnapshotOverride=New-MIR441RecoverySnapshot -CommittedBytes ($boundaryLimit-$boundaryRequired+1) -CommitLimitBytes $boundaryLimit
+    Refuses {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $root -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes $boundaryPeak} 'resource-admission-commit'
+  } finally {$script:RecoverySnapshotOverride=$null}
   foreach($case in @(@('physical','memory'),@('commit','commit'),@('disk','system-disk'),@('work','work-disk'))){
     $script:RecoveryFault=$case[0]
     Refuses {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $root -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1MB} ('resource-admission-'+$case[1])
@@ -145,7 +164,7 @@ Start-Sleep -Seconds 20
         if($function.Count-ne1){throw "Upgrade process adapter missing or ambiguous: $name"}
         . ([scriptblock]::Create($function[0].Extent.Text))
       }
-      $upgradePolicy=$policy;$upgradeWriteBytes=1MB;$upgradePeakBytes=1GB
+      $upgradePolicy=$policy;$upgradeWriteBytes=1MB;$upgradePeakBytes=1GB;$k2Scenario=$false;$f200BobAngelScenario=$false
       $script:upgradeProcessIndex=0;$script:upgradeResourceRuns=@()
       # This check runs PowerShell through the real upgrade process adapter and
       # governor. Library activation/loaded-mod checks have their own real
@@ -153,7 +172,7 @@ Start-Sleep -Seconds 20
       $script:upgradeActivation=[pscustomobject]@{controlled_resource_test=$true}
       $script:upgradeResourceContext=[pscustomobject]@{controlled_resource_test=$true}
       function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments) if(-not$Activation.controlled_resource_test){throw 'Unexpected activation in resource-only control'}}
-      function Assert-MIRLibraryLoadedSelection {param($Activation,$LogPath,[switch]$LatestInvocation) if(-not$Activation.controlled_resource_test){throw 'Unexpected selection in resource-only control'}}
+      function Assert-MIRLibraryLoadedSelection {param($Activation,$LogPath,[switch]$LatestInvocation,[string]$ActiveModsObserver,[string]$ActiveModsObserverScript) if(-not$Activation.controlled_resource_test){throw 'Unexpected selection in resource-only control'}}
       function Get-MIRNativeProbeRemainingOutputBytes {param($Context) if(-not$Context.controlled_resource_test){throw 'Unexpected output context in resource-only control'};return $upgradeWriteBytes}
       if((Invoke-MIRUpgradeFactorioProcess -FilePath $pwsh -Arguments @('-NoProfile','-Command','exit 0'))-ne0){throw 'Upgrade process adapter lost the exit code'}
       if($script:upgradeResourceRuns.Count-ne1-or-not(Test-Path $script:upgradeResourceRuns[0].ledger)-or$script:upgradeResourceRuns[0].completion_predicate_observed){throw 'Upgrade process adapter lost resource evidence'}
@@ -196,7 +215,7 @@ Start-Sleep -Seconds 20
     $null=Resolve-MIR441RecoveryScratchPath -Path $root
     Remove-Item -LiteralPath $root -Recurse -Force
   }
-  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;out_of_root=$true;characterization_admission=$true;upgrade_admission=$true;upgrade_process_adapter=$true;save_reload_oracle=$true;completion_predicate=$true;predicate_failure_cancellation=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;process_budget_cancellation=$true;triggering_memory_sample=$true;sampled_private_memory_peak=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
+  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;physical_anchored_commit_reserve=$true;commit_boundary_refusal=$true;out_of_root=$true;characterization_admission=$true;upgrade_admission=$true;upgrade_process_adapter=$true;save_reload_oracle=$true;completion_predicate=$true;predicate_failure_cancellation=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;process_budget_cancellation=$true;triggering_memory_sample=$true;sampled_private_memory_peak=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
 }
 if($ResourceRecoveryOnly){Test-MIR441ResourceRecovery;return}
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')

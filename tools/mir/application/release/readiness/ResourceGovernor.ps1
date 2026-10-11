@@ -52,11 +52,13 @@ function Get-MIR441ResourceSnapshot {
 
 function Get-MIR441ResourceLimits {
   param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Snapshot)
-  # Recovery keeps the existing 20 GiB development reserve and stricter caller limits.
+  # Physical headroom retains the authored caller policy.  CommitLimit includes
+  # pagefile capacity, so its reserve instead tracks installed physical memory:
+  # a pagefile resize must not change the retained execution margin.
   $value={param($name) $property=$Policy.PSObject.Properties[$name];if($null-ne$property){[double]$property.Value*1GB}else{[double]0}}
   return [pscustomobject]@{
     physical_bytes=[int64][Math]::Max([Math]::Max(2GB,[double]$Snapshot.memory.total_bytes*.2),[Math]::Max((&$value 'minimum_free_ram_gib'),(&$value 'hard_stop_free_ram_gib')))
-    commit_bytes=[int64][Math]::Max(2GB,[double]$Snapshot.memory.commit_limit_bytes*.2)
+    commit_bytes=[int64][Math]::Max(2GB,[double]$Snapshot.memory.total_bytes*.2)
     system_bytes=[int64][Math]::Max(20GB,[Math]::Max((&$value 'system_drive_hard_stop_free_gib'),(&$value 'system_drive_target_free_gib')))
     work_bytes=[int64][Math]::Max(20GB,(&$value 'work_volume_reserve_gib'))
   }
