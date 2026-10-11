@@ -434,6 +434,10 @@ function Invoke-MIRDirectLibraryOrdinaryWindowSample {
     # its first-use cost cannot be recorded as Factorio startup work.
     Initialize-MIRDirectLibraryWindowObservationInterop
     $windowObservations=[Collections.Generic.List[object]]::new();$launchNotBefore=[DateTime]::UtcNow
+    # The governed process invokes this completion predicate from its own
+    # dynamic scope. Bind the selected observer before closing over it so a
+    # host-controlled observer remains available there as well.
+    $observeOrdinaryWindow=${function:Get-MIRDirectLibraryOrdinaryWindowObservation}
     $completion={
       if($windowObservations.Count){return $true}
       # A visible splash/loading window is not the selected observation
@@ -442,7 +446,7 @@ function Invoke-MIRDirectLibraryOrdinaryWindowSample {
       if(-not(Test-Path -LiteralPath $engineLog -PathType Leaf)){return $false}
       try{$currentLog=[IO.File]::ReadAllText($engineLog)}catch{return $false}
       if($currentLog -notmatch '(?m)^\s*\d+[.]\d+ Factorio initialised\s*$'){return $false}
-      $window=Get-MIRDirectLibraryOrdinaryWindowObservation -FactorioBin $FactorioBin -LaunchNotBefore $launchNotBefore
+      $window=& $observeOrdinaryWindow -FactorioBin $FactorioBin -LaunchNotBefore $launchNotBefore
       if($null-eq$window){return $false}
       $windowObservations.Add($window);return $true
     }.GetNewClosure()
