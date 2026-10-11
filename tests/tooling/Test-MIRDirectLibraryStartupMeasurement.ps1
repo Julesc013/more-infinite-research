@@ -138,7 +138,9 @@ try{
   # direct-library guard. Its capture endpoint is deliberately weaker than a
   # rendered, responsive main-menu claim.
   $ordinaryConfigSource=Join-Path $root 'ordinary-player-config.ini'
-  $ordinaryConfigText=@'
+  # Keep the fixture CRLF-specific: Git checkout settings must not decide
+  # whether the mock INI reader is exercised against the hosted Windows form.
+  $ordinaryConfigText=(@'
 [path]
 read-data=C:\Factorio\data
 write-data=C:\Factorio\write-data
@@ -154,7 +156,8 @@ master-volume=0.500000
 [other]
 enable-new-mods=true
 loading-multithreading=true
-'@
+'@ -replace "`r?`n","`r`n")
+  Assert-DirectStartup ($ordinaryConfigText.Contains("`r`n") -and -not [regex]::IsMatch($ordinaryConfigText,'(?<!\r)\n')) 'ordinary player configuration fixture does not force CRLF.'
   [IO.File]::WriteAllText($ordinaryConfigSource,$ordinaryConfigText,[Text.UTF8Encoding]::new($false))
   $ordinaryInput=Get-MIRDirectLibraryOrdinaryPlayerConfigInput -Path $ordinaryConfigSource
   $ordinaryPrivate=Join-Path $root 'ordinary-private-config.ini'
@@ -167,7 +170,7 @@ loading-multithreading=true
   $uppercaseOrdinaryIdentity=New-MIRDirectLibraryOrdinaryPlayerConfig -PlayerConfigInput (Get-MIRDirectLibraryOrdinaryPlayerConfigInput -Path $uppercaseOrdinaryConfig) -Path (Join-Path $root 'ordinary-private-config-uppercase.ini') -EngineDataDirectory $data -WriteDataDirectory (Join-Path $root 'ordinary-write-data-uppercase')
   Assert-DirectStartup ($uppercaseOrdinaryIdentity.overrides.enable_new_mods-eq$false-and(Get-Content -Raw -LiteralPath $uppercaseOrdinaryIdentity.private_config.path).Contains('enable-new-mods=false')) 'case-insensitive ordinary custody keys were not normalized and copied.'
   $badOrdinaryConfig=Join-Path $root 'ordinary-player-config-duplicate.ini'
-  [IO.File]::WriteAllText($badOrdinaryConfig,($ordinaryConfigText -replace 'write-data=C:\\Factorio\\write-data',"READ-DATA=C:\\Factorio\\duplicate`nwrite-data=C:\\Factorio\\write-data"),[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($badOrdinaryConfig,($ordinaryConfigText -replace 'write-data=C:\\Factorio\\write-data',"READ-DATA=C:\\Factorio\\duplicate`r`nwrite-data=C:\\Factorio\\write-data"),[Text.UTF8Encoding]::new($false))
   $badOrdinaryRejected=$false;try{New-MIRDirectLibraryOrdinaryPlayerConfig -PlayerConfigInput (Get-MIRDirectLibraryOrdinaryPlayerConfigInput -Path $badOrdinaryConfig) -Path (Join-Path $root 'ordinary-private-config-duplicate.ini') -EngineDataDirectory $data -WriteDataDirectory (Join-Path $root 'ordinary-write-data')|Out-Null}catch{$badOrdinaryRejected=$_.Exception.Message-ceq'[mir-direct-startup-ordinary-player-config-keys]'}
   Assert-DirectStartup $badOrdinaryRejected 'ordinary player configuration with duplicate custody keys was accepted.'
   $script:ordinaryArguments=@();$script:ordinaryCompletionObserved=$true;$script:ordinaryLogInitialised=$true;$script:ordinaryWindowReturned=$false;$script:ordinaryObserverScript=''
@@ -185,7 +188,7 @@ loading-multithreading=true
   function Invoke-MIRNativeProbeFactorioProcess {
     param($Context,$FilePath,$Arguments,$TimeoutSeconds,$CompletionPredicate)
     $config=[string]$Arguments[[Array]::IndexOf($Arguments,'--config')+1]
-    $writeData=[regex]::Match((Get-Content -Raw -LiteralPath $config),'(?m)^write-data=(?<path>.+)$').Groups['path'].Value
+    $writeData=[regex]::Match((Get-Content -Raw -LiteralPath $config),'(?m)^write-data=(?<path>[^\r\n]+)\r?$').Groups['path'].Value
     [IO.Directory]::CreateDirectory($writeData)|Out-Null
     $nativeLog=if($script:ordinaryLogInitialised){'1.250 Factorio initialised'}else{'0.100 Starting Factorio'}
     [IO.File]::WriteAllText((Join-Path $writeData 'factorio-current.log'),$nativeLog,[Text.UTF8Encoding]::new($false))
