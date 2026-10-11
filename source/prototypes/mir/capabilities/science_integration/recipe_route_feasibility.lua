@@ -17,6 +17,15 @@ local M = {}
 -- context/service back-reference inside public state snapshots.
 local state_contexts = setmetatable({}, {__mode = "k"})
 
+-- Producer selection repeats for every nested acquisition request. Retain
+-- only the already-normalized name ordering and keep the query state bounded;
+-- route, temperature, source, ownership, and active-set decisions stay live.
+local PRODUCER_ORDERING_MAX_ENTRIES = 256
+local PRODUCER_ORDERING_MAX_NODES = 4096
+local PRODUCER_ORDERING_MAX_ESTIMATED_BYTES = 512 * 1024
+local PRODUCER_ORDERING_ENTRY_ESTIMATED_BYTES = 96
+local PRODUCER_ORDERING_NAME_ESTIMATED_BYTES = 40
+
 function M.bind_state_context(state, context)
   state_contexts[state] = context
   return state
@@ -362,6 +371,27 @@ local function recipe_source_epoch()
   return recipe_facts.source_epoch and recipe_facts.source_epoch() or nil
 end
 
+local function copy_names(values)
+  local copied = {}
+  for index, value in ipairs(values or {}) do copied[index] = value end
+  return copied
+end
+
+local function producer_ordering_estimated_bytes(identity, names)
+  local total = PRODUCER_ORDERING_ENTRY_ESTIMATED_BYTES + #identity
+  for _, name in ipairs(names) do
+    total = total + PRODUCER_ORDERING_NAME_ESTIMATED_BYTES + #name
+  end
+  return total
+end
+
+-- A supplied index can be an intentionally narrow fixture or a caller-owned
+-- transient table. Do not make its mutable identity a cache authority. The
+-- canonical index is Context-owned and replaced with the recipe source epoch.
+local function owned_recipe_index(index)
+  return index ~= nil and index == compiler_context.current():state_view("recipe_index")
+end
+
 local function reset_state(state, epoch, context, recipe_index)
   state = state or {}
   local next_stable_generation = (state.stable_acquisition_generation or 0) + 1
@@ -373,6 +403,10 @@ local function reset_state(state, epoch, context, recipe_index)
   state.visiting = {}
   state.acquisition_memo = {}
   state.stable_acquisition_memo = {}
+  state.producer_orderings = {}
+  state.producer_ordering_entry_count = 0
+  state.producer_ordering_node_count = 0
+  state.producer_ordering_estimated_bytes = 0
   state.machine_categories = nil
   state.machine_placement_items = {}
   state.mining_drills = nil
@@ -1016,7 +1050,7 @@ function M.source_witness(identity, options, state)
   return source_witness(candidate, copy_options(options), source_query_state(state))
 end
 
-local function sorted_producers(index, output_identity, options)
+local function sorted_producers(index, output_identity, options, state)
   local producers = {}
   local exact = index.by_output_identity and index.by_output_identity[identity_key(output_identity)]
   -- Fixture and historical callers may still expose only the legacy index.
@@ -1036,7 +1070,28 @@ local function sorted_producers(index, output_identity, options)
     table.sort(producers)
     return producers
   end
-  return M.sort_acquisition_producers(producers, index)
+  -- The forward-before-recycling sort is structural and reusable, but only
+  -- for the immutable canonical index owned by this CompilerContext.  A
+  -- caller-supplied index may change under us, so it keeps the exact uncached
+  -- path.  Cache copies never escape: a route caller can mutate its local
+  -- alternative list without corrupting a later query.
+  if not owned_recipe_index(index) then
+    return M.sort_acquisition_producers(producers, index)
+  end
+  local key = identity_key(output_identity)
+  local cached = state.producer_orderings[key]
+  if cached then return copy_names(cached) end
+  M.sort_acquisition_producers(producers, index)
+  local bytes = producer_ordering_estimated_bytes(key, producers)
+  if state.producer_ordering_entry_count < PRODUCER_ORDERING_MAX_ENTRIES
+    and state.producer_ordering_node_count + #producers <= PRODUCER_ORDERING_MAX_NODES
+    and state.producer_ordering_estimated_bytes + bytes <= PRODUCER_ORDERING_MAX_ESTIMATED_BYTES then
+    state.producer_orderings[key] = copy_names(producers)
+    state.producer_ordering_entry_count = state.producer_ordering_entry_count + 1
+    state.producer_ordering_node_count = state.producer_ordering_node_count + #producers
+    state.producer_ordering_estimated_bytes = state.producer_ordering_estimated_bytes + bytes
+  end
+  return producers
 end
 
 placement_items_for_machine = function(name, options, state)
@@ -1587,7 +1642,7 @@ local function acquisition_witness_impl(output_identity, options, state)
   end
 
   state.visiting[key] = true
-  for _, recipe_name in ipairs(sorted_producers(options.recipe_index, output_identity, options)) do
+  for _, recipe_name in ipairs(sorted_producers(options.recipe_index, output_identity, options, state)) do
     if not diagnostic_visit(options) then
       state.visiting[key] = nil
       return nil

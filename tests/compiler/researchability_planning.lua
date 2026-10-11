@@ -1150,6 +1150,138 @@ local rejected_acquisition = feasibility.acquisition_witness("component", {
 check("RS03", rejected_acquisition == nil and return_branch_visits >= 2,
   "An infeasible forward producer still reaches the retained recycling alternative and rejects its unseeded cycle")
 
+-- Normal typed producer selection may retain only its copied structural order.
+-- It neither merges item/fluid identities nor changes the lexical traversal
+-- used by a bounded diagnostic. The query state is caller-visible here solely
+-- to prove that stored arrays are not aliases of the source index.
+do
+(function()
+local typed_order_world = {
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
+  recipe_facts = {
+    ["z-item-forward"] = route_fact("same", {}, {
+      results = {{type = "item", name = "same", amount = 1, probability = 1}}
+    }),
+    ["a-item-recycling"] = route_fact("same", {}, {
+      source_class = "recycling",
+      results = {{type = "item", name = "same", amount = 1, probability = 1}}
+    }),
+    ["m-fluid-forward"] = route_fact("same", {}, {
+      results = {{type = "fluid", name = "same", amount = 1, probability = 1}}
+    })
+  },
+  producers = {same = {"a-item-recycling", "z-item-forward", "m-fluid-forward"}},
+  producers_identity = {
+    ["item\0same"] = {"a-item-recycling", "z-item-forward"},
+    ["fluid\0same"] = {"m-fluid-forward"}
+  }
+}
+reset(typed_order_world, true)
+local canonical_facade = package.loaded["prototypes.mir.index.recipe_facts"]
+local original_index_view = canonical_facade.index_view
+canonical_facade.index_view = function() return context.states.recipe_index end
+local owned_state = {}
+local original_producer_sort = feasibility.sort_acquisition_producers
+local producer_sort_calls = 0
+feasibility.sort_acquisition_producers = function(names, index)
+  producer_sort_calls = producer_sort_calls + 1
+  return original_producer_sort(names, index)
+end
+local item_witness = feasibility.acquisition_witness({type = "item", name = "same"}, {
+  source_witness = function() return nil end
+}, owned_state)
+local contextual_item_witness = feasibility.acquisition_witness({type = "item", name = "same"}, {
+  source_witness = function() return nil end
+}, owned_state)
+feasibility.sort_acquisition_producers = original_producer_sort
+local fluid_witness = feasibility.acquisition_witness({type = "fluid", name = "same"}, nil, owned_state)
+local item_order = owned_state.producer_orderings["item\0same"]
+local fluid_order = owned_state.producer_orderings["fluid\0same"]
+check("PO01", item_witness and item_witness.recipe == "z-item-forward"
+  and contextual_item_witness and contextual_item_witness.recipe == "z-item-forward"
+  and fluid_witness and fluid_witness.recipe == "m-fluid-forward"
+  and item_order and fluid_order and item_order[1] == "z-item-forward"
+  and fluid_order[1] == "m-fluid-forward"
+  and item_order ~= typed_order_world.producers_identity["item\0same"]
+  and fluid_order ~= typed_order_world.producers_identity["fluid\0same"]
+  and owned_state.producer_ordering_entry_count == 2 and producer_sort_calls == 1,
+  "Owned typed producer orders retain forward precedence and reuse one sort across contextual queries without item/fluid aliasing")
+
+local diagnostic_state = {}
+local lexical_observer = {visits = 0, limit = 1000}
+function lexical_observer:reserve_visit()
+  if self.visits >= self.limit then return false end
+  self.visits = self.visits + 1
+  return true
+end
+function lexical_observer:is_stopped() return self.visits >= self.limit end
+local diagnostic_witness = feasibility.acquisition_witness({type = "item", name = "same"}, {
+  diagnostic_observer = lexical_observer
+}, diagnostic_state)
+check("PO02", diagnostic_witness and diagnostic_witness.recipe == "a-item-recycling"
+  and diagnostic_state.producer_ordering_entry_count == 0
+  and next(diagnostic_state.producer_orderings) == nil,
+  "Diagnostic producer traversal remains lexical and bypasses retained ordering")
+
+local supplied_index = {
+  facts = typed_order_world.recipe_facts,
+  by_output = typed_order_world.producers,
+  by_output_identity = typed_order_world.producers_identity
+}
+local supplied_state = {}
+local supplied_witness = feasibility.acquisition_witness({type = "item", name = "same"}, {
+  recipe_index = supplied_index
+}, supplied_state)
+check("PO03", supplied_witness and supplied_witness.recipe == "z-item-forward"
+  and supplied_state.producer_ordering_entry_count == 0
+  and next(supplied_state.producer_orderings) == nil,
+  "An explicitly supplied mutable recipe index keeps the uncached producer-order path")
+
+local prior_recipe_index_epoch = context:state_epoch("recipe_index")
+typed_order_world.producers_identity["item\0same"] = {"a-item-recycling"}
+typed_order_world.recipe_source_epoch = 2
+context:replace_epoch("recipe_index", {
+  facts = typed_order_world.recipe_facts,
+  by_output = typed_order_world.producers,
+  by_output_identity = typed_order_world.producers_identity
+}, prior_recipe_index_epoch)
+owned_state.acquisition_memo = {}
+owned_state.stable_acquisition_memo = {}
+local replaced_item = feasibility.acquisition_witness({type = "item", name = "same"}, nil, owned_state)
+local replaced_order = owned_state.producer_orderings["item\0same"]
+check("PO04", replaced_item and replaced_item.recipe == "a-item-recycling"
+  and replaced_order and replaced_order[1] == "a-item-recycling"
+  and owned_state.producer_ordering_entry_count == 1
+  and context:state_epoch("recipe_index") > prior_recipe_index_epoch,
+  "A recipe-source/index epoch replacement drops the old typed producer ordering before reuse")
+
+local function capped_producer_order_world(width)
+  local facts, names, prototypes = {}, {}, {}
+  for index = 1, width do
+    local recipe = string.format("producer-%04d", index)
+    names[#names + 1] = recipe
+    facts[recipe] = route_fact("capped-producer", {{name = "ore", amount = 1}})
+    prototypes[recipe] = {name = recipe}
+  end
+  return {
+    item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = prototypes,
+    recipe_facts = facts, producers = { ["capped-producer"] = names }, unlockers = {},
+    producers_identity = { ["item\0capped-producer"] = names },
+    resources = {ore = {minable = {result = "ore", count = 1}}}
+  }
+end
+reset(capped_producer_order_world(4097))
+local capped_state = {}
+local capped_witness = feasibility.acquisition_witness("capped-producer", nil, capped_state)
+check("PO05", capped_witness and capped_witness.recipe == "producer-0001"
+  and capped_state.producer_ordering_entry_count == 0
+  and capped_state.producer_ordering_node_count == 0
+  and next(capped_state.producer_orderings) == nil,
+  "A producer set above the retained-node cap keeps the exact uncached forward ordering")
+canonical_facade.index_view = original_index_view
+end)()
+end
+
 -- A recursive failure is conditional on its parent visitation set. In this
 -- A <-> B graph, A's independent ore route must permit a later root B query;
 -- the first nested B rejection must never poison the reusable root memo.
@@ -1817,6 +1949,11 @@ progression_order_world.recipe_facts["a-recycling"] = route_fact(
   "component", {{name = "ore", amount = 1}}, {enabled = false})
 progression_order_world.techs.RecyclingUnlock.prerequisites = {"OrdinaryUnlock"}
 reset(progression_order_world)
+do
+(function()
+local canonical_facade = package.loaded["prototypes.mir.index.recipe_facts"]
+local original_index_view = canonical_facade.index_view
+canonical_facade.index_view = function() return context.states.recipe_index end
 local early_route = production.production_route_for_pack("order-pack")
 local early_pairs = early_route and early_route.provenance.selected_research_unlock_pairs or {}
 local has_early, has_late = false, false
@@ -1826,6 +1963,15 @@ for _, pair in ipairs(early_pairs) do
 end
 check("RS06", early_route and has_early and not has_late,
   "An earlier ordinary unlock wins over an alphabetically earlier later ordinary supplier")
+local ordering_owner = context:state_view("science_pack_production")
+local cached_component_order = ordering_owner.output_recipe_orderings["item\0component"]
+check("RS06A", cached_component_order and cached_component_order[1] == "z-ordinary"
+  and cached_component_order ~= progression_order_world.producers.component
+  and ordering_owner.output_recipe_ordering_entry_count > 0,
+  "Progression/source-class producer ordering is retained as an owned copied output list")
+canonical_facade.index_view = original_index_view
+end)()
+end
 
 progression_order_world.recipe_facts["z-ordinary"] = route_fact(
   "component", {{name = "missing", amount = 1}}, {enabled = false})
@@ -3206,19 +3352,27 @@ check("CP09", production.pack_production_status("P", {unrelated = true}, {Unlock
   "A changed active technology boundary cannot borrow a successful contextual pack answer")
 check("CP10", production.pack_production_status("P", {Q = true}) == "unreachable",
   "An active required science pack cannot borrow another pack traversal's success")
+do
+(function()
 local before_diagnostic_memo = contextual_owner.contextual_pack_status_memo
 local before_diagnostic_count = contextual_owner.contextual_pack_status_count
 local before_diagnostic_static_facts = contextual_owner.static_unlock_facts
 local before_diagnostic_static_count = contextual_owner.static_unlock_facts_entry_count
 local before_diagnostic_static_nodes = contextual_owner.static_unlock_facts_node_count
+local before_diagnostic_output_orders = contextual_owner.output_recipe_orderings
+local before_diagnostic_output_order_count = contextual_owner.output_recipe_ordering_entry_count
 local diagnostic_context_status = production.pack_production_status("P", {unrelated = true}, {}, bounded_observer(1))
 check("CP07", diagnostic_context_status == "indeterminate"
   and contextual_owner.contextual_pack_status_memo == before_diagnostic_memo
   and contextual_owner.contextual_pack_status_count == before_diagnostic_count
   and contextual_owner.static_unlock_facts == before_diagnostic_static_facts
   and contextual_owner.static_unlock_facts_entry_count == before_diagnostic_static_count
-  and contextual_owner.static_unlock_facts_node_count == before_diagnostic_static_nodes,
+  and contextual_owner.static_unlock_facts_node_count == before_diagnostic_static_nodes
+  and contextual_owner.output_recipe_orderings == before_diagnostic_output_orders
+  and contextual_owner.output_recipe_ordering_entry_count == before_diagnostic_output_order_count,
   "A diagnostic budget remains indeterminate and never reads or writes contextual or shared structural reuse")
+end)()
+end
 world.recipe_source_epoch = 2
 world.resources = {}
 data.raw.resource = {}

@@ -39,6 +39,15 @@ local STATIC_UNLOCK_FACTS_MAX_ESTIMATED_BYTES = 512 * 1024
 local STATIC_UNLOCK_FACTS_ENTRY_ESTIMATED_BYTES = 160
 local STATIC_UNLOCK_FACTS_NAME_ESTIMATED_BYTES = 48
 
+-- Output recipe ordering is used while testing research-unlocked producer
+-- alternatives. Retain only copied names, never a route decision or an index
+-- reference, and fall back to the established sort after a bounded budget.
+local OUTPUT_RECIPE_ORDERING_MAX_ENTRIES = 256
+local OUTPUT_RECIPE_ORDERING_MAX_NODES = 4096
+local OUTPUT_RECIPE_ORDERING_MAX_ESTIMATED_BYTES = 512 * 1024
+local OUTPUT_RECIPE_ORDERING_ENTRY_ESTIMATED_BYTES = 112
+local OUTPUT_RECIPE_ORDERING_NAME_ESTIMATED_BYTES = 40
+
 local function positive_limit(value, default, maximum)
   value = tonumber(value)
   if value == nil then return default end
@@ -256,6 +265,14 @@ local function science_pack_production_state()
     -- so retaining the index itself here would duplicate a whole graph.
     static_unlock_facts_index_epoch = nil,
     static_unlock_facts_index_fingerprint = nil,
+    output_recipe_orderings = {},
+    output_recipe_ordering_entry_count = 0,
+    output_recipe_ordering_node_count = 0,
+    output_recipe_ordering_estimated_bytes = 0,
+    output_recipe_ordering_recipe_source_epoch = source_epoch,
+    output_recipe_ordering_recipe_index_epoch = nil,
+    output_recipe_ordering_technology_index_epoch = nil,
+    output_recipe_ordering_technology_index_fingerprint = nil,
     root_entry_generation = 0,
     contextual_acquisition_generation = 0,
     -- This state owns only source-epoch-stable structural observations. It
@@ -308,6 +325,47 @@ local function copy_names(values)
   local copied = {}
   for index, value in ipairs(values or {}) do copied[index] = value end
   return copied
+end
+
+local function output_recipe_ordering_estimated_bytes(key, names)
+  local total = OUTPUT_RECIPE_ORDERING_ENTRY_ESTIMATED_BYTES + #key
+  for _, name in ipairs(names) do
+    total = total + OUTPUT_RECIPE_ORDERING_NAME_ESTIMATED_BYTES + #name
+  end
+  return total
+end
+
+local function reset_output_recipe_orderings(state, recipe_source_epoch, recipe_index_epoch,
+  technology_index_epoch, technology_index_fingerprint)
+  state.output_recipe_orderings = {}
+  state.output_recipe_ordering_entry_count = 0
+  state.output_recipe_ordering_node_count = 0
+  state.output_recipe_ordering_estimated_bytes = 0
+  state.output_recipe_ordering_recipe_source_epoch = recipe_source_epoch
+  state.output_recipe_ordering_recipe_index_epoch = recipe_index_epoch
+  state.output_recipe_ordering_technology_index_epoch = technology_index_epoch
+  state.output_recipe_ordering_technology_index_fingerprint = technology_index_fingerprint
+end
+
+-- The canonical recipe and technology indexes are immutable Context-owned
+-- snapshots. A raw or caller-owned recipe map is deliberately not a producer
+-- ordering cache key: it keeps the normal one-shot sort instead.
+local function output_recipe_ordering_state(recipe_index, technology_index)
+  local context = compiler_context.current()
+  if recipe_index ~= context:state_view("recipe_index") then return nil end
+  local state = science_pack_production_state()
+  local recipe_source_epoch = canonical_recipe_facts.source_epoch()
+  local recipe_index_epoch = context:state_epoch("recipe_index")
+  local technology_index_epoch = context:state_epoch("technology_researchability_index")
+  local technology_index_fingerprint = technology_index.index_fingerprint
+  if state.output_recipe_ordering_recipe_source_epoch ~= recipe_source_epoch
+    or state.output_recipe_ordering_recipe_index_epoch ~= recipe_index_epoch
+    or state.output_recipe_ordering_technology_index_epoch ~= technology_index_epoch
+    or state.output_recipe_ordering_technology_index_fingerprint ~= technology_index_fingerprint then
+    reset_output_recipe_orderings(state, recipe_source_epoch, recipe_index_epoch,
+      technology_index_epoch, technology_index_fingerprint)
+  end
+  return state
 end
 
 local function reset_static_unlock_facts(state, index_epoch, index_fingerprint, source_epoch)
@@ -582,16 +640,16 @@ local function output_recipe_names(identity, observer)
     or type(identity.name) ~= "string" or identity.name == "" then
     return {}
   end
-  local names = {}
   -- The normalized output index is typed.  A research-unlocked fluid
   -- intermediate (for example, molten solder) must be resolved through its
   -- fluid identity; falling back to an item name would either reject a real
   -- route or conflate same-named products.
-  for _, recipe_name in ipairs(canonical_recipe_facts.recipes_by_output_identity_view(identity.type, identity.name) or {}) do
-    if not diagnostic_visit(observer, 0) then break end
-    table.insert(names, recipe_name)
-  end
   if observer ~= nil then
+    local names = {}
+    for _, recipe_name in ipairs(canonical_recipe_facts.recipes_by_output_identity_view(identity.type, identity.name) or {}) do
+      if not diagnostic_visit(observer, 0) then break end
+      table.insert(names, recipe_name)
+    end
     table.sort(names)
     return names
   end
@@ -599,8 +657,15 @@ local function output_recipe_names(identity, observer)
   -- ordinary unlock over an alphabetically earlier planetary recipe. Every
   -- chosen pair still passes contextual researchability and ingredient proof,
   -- and later/recycling alternatives remain available after a failed route.
-  local facts = canonical_recipe_facts.index_view().facts or {}
-  local index, keys = graph_index(), {}
+  local recipe_index = canonical_recipe_facts.index_view()
+  local index = graph_index()
+  local ordering_state = output_recipe_ordering_state(recipe_index, index)
+  local cache_key = identity.type .. "\0" .. identity.name
+  if ordering_state and ordering_state.output_recipe_orderings[cache_key] then
+    return copy_names(ordering_state.output_recipe_orderings[cache_key])
+  end
+  local names = copy_names(canonical_recipe_facts.recipes_by_output_identity_view(identity.type, identity.name) or {})
+  local facts, keys = recipe_index.facts or {}, {}
   local state = progression_key_state(index)
   local unknown = {math.huge, math.huge, math.huge, math.huge}
   for _, recipe_name in ipairs(names) do
@@ -623,6 +688,17 @@ local function output_recipe_names(identity, observer)
     if progression_key_less(keys[right], keys[left]) then return false end
     return left < right
   end)
+  if ordering_state then
+    local bytes = output_recipe_ordering_estimated_bytes(cache_key, names)
+    if ordering_state.output_recipe_ordering_entry_count < OUTPUT_RECIPE_ORDERING_MAX_ENTRIES
+      and ordering_state.output_recipe_ordering_node_count + #names <= OUTPUT_RECIPE_ORDERING_MAX_NODES
+      and ordering_state.output_recipe_ordering_estimated_bytes + bytes <= OUTPUT_RECIPE_ORDERING_MAX_ESTIMATED_BYTES then
+      ordering_state.output_recipe_orderings[cache_key] = copy_names(names)
+      ordering_state.output_recipe_ordering_entry_count = ordering_state.output_recipe_ordering_entry_count + 1
+      ordering_state.output_recipe_ordering_node_count = ordering_state.output_recipe_ordering_node_count + #names
+      ordering_state.output_recipe_ordering_estimated_bytes = ordering_state.output_recipe_ordering_estimated_bytes + bytes
+    end
+  end
   return names
 end
 
