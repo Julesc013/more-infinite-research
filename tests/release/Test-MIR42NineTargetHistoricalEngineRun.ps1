@@ -150,6 +150,45 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $legacyStdout=Join-Path $exactRoot 'upgrade-worker.stdout.txt';$legacyStderr=Join-Path $exactRoot 'upgrade-worker.stderr.txt'
     $code=Invoke-MIR42BoundedUpgrade -PowerShell (Get-Command pwsh).Source -Arguments @('-NoProfile','-Command','[Console]::WriteLine("tiny governed-worker transport")') -StdoutPath $legacyStdout -StderrPath $legacyStderr -DeadlineSeconds 15
     Check ($code -eq 0 -and $resources.runs.Count -eq 2 -and (Get-Content -Raw $legacyStdout).Contains('tiny governed-worker transport')) 'upgrade transport took a second governor or lost its output.'
+    # Exercise the imported real bounded helper's provider dispatch.  These
+    # stubs only synthesize the native-provider return contract; no process is
+    # started.  A direct Factorio fresh load must select the provider that
+    # reports child-only Factorio IDs and clock metadata.
+    $genericProvider=(Get-Item -LiteralPath 'function:Invoke-MIRNativeProbeProcess').ScriptBlock
+    $factorioProvider=(Get-Item -LiteralPath 'function:Invoke-MIRNativeProbeFactorioProcess').ScriptBlock
+    $script:mir42DirectActorDispatch=[Collections.Generic.List[string]]::new()
+    $script:mir42DirectGenericStdout=Join-Path $exactRoot 'dispatch-generic-provider.stdout'
+    $script:mir42DirectGenericStderr=Join-Path $exactRoot 'dispatch-generic-provider.stderr'
+    $script:mir42DirectFactorioStdout=Join-Path $exactRoot 'dispatch-factorio-provider.stdout'
+    $script:mir42DirectFactorioStderr=Join-Path $exactRoot 'dispatch-factorio-provider.stderr'
+    try {
+      Set-Item -LiteralPath 'function:local:Invoke-MIRNativeProbeProcess' -Value {
+        param($Context,$FilePath,$Arguments,$TimeoutSeconds)
+        $script:mir42DirectActorDispatch.Add('generic')
+        [IO.File]::WriteAllText($script:mir42DirectGenericStdout,'generic provider')
+        [IO.File]::WriteAllText($script:mir42DirectGenericStderr,'')
+        return [pscustomobject]@{stdout=$script:mir42DirectGenericStdout;stderr=$script:mir42DirectGenericStderr;result=[pscustomobject]@{exit_code=0}}
+      }
+      Set-Item -LiteralPath 'function:local:Invoke-MIRNativeProbeFactorioProcess' -Value {
+        param($Context,$FilePath,$Arguments,$TimeoutSeconds)
+        $script:mir42DirectActorDispatch.Add('factorio')
+        [IO.File]::WriteAllText($script:mir42DirectFactorioStdout,'factorio provider')
+        [IO.File]::WriteAllText($script:mir42DirectFactorioStderr,'')
+        return [pscustomobject]@{stdout=$script:mir42DirectFactorioStdout;stderr=$script:mir42DirectFactorioStderr;result=[pscustomobject]@{exit_code=0}}
+      }
+      $genericDispatchStdout=Join-Path $exactRoot 'dispatch-generic.stdout';$genericDispatchStderr=Join-Path $exactRoot 'dispatch-generic.stderr'
+      $genericDispatchExit=Invoke-MIR42BoundedUpgrade -PowerShell 'controlled-generic.exe' -Arguments @('--generic') -StdoutPath $genericDispatchStdout -StderrPath $genericDispatchStderr -DeadlineSeconds 15 -NativeActor
+      Check ($genericDispatchExit -eq 0 -and @($script:mir42DirectActorDispatch).Count -eq 1 -and $script:mir42DirectActorDispatch[0] -ceq 'generic' -and (Get-Content -Raw $genericDispatchStdout) -ceq 'generic provider') 'native generic actor used the Factorio-only provider.'
+      $factorioDispatchStdout=Join-Path $exactRoot 'dispatch-factorio.stdout';$factorioDispatchStderr=Join-Path $exactRoot 'dispatch-factorio.stderr'
+      $factorioDispatchExit=Invoke-MIR42BoundedUpgrade -PowerShell 'controlled-factorio.exe' -Arguments @('--factorio') -StdoutPath $factorioDispatchStdout -StderrPath $factorioDispatchStderr -DeadlineSeconds 15 -NativeActor -FactorioActor
+      Check ($factorioDispatchExit -eq 0 -and @($script:mir42DirectActorDispatch).Count -eq 2 -and $script:mir42DirectActorDispatch[1] -ceq 'factorio' -and (Get-Content -Raw $factorioDispatchStdout) -ceq 'factorio provider') 'native Factorio actor did not use the Factorio provider.'
+      Refuses {Invoke-MIR42BoundedUpgrade -PowerShell 'controlled-invalid.exe' -Arguments @('--invalid') -StdoutPath (Join-Path $exactRoot 'dispatch-invalid.stdout') -StderrPath (Join-Path $exactRoot 'dispatch-invalid.stderr') -DeadlineSeconds 15 -FactorioActor} 'factorio-actor-requires-native-governor'
+      Check (@($script:mir42DirectActorDispatch).Count -eq 2) 'invalid Factorio actor reached a provider.'
+    } finally {
+      Set-Item -LiteralPath 'function:local:Invoke-MIRNativeProbeProcess' -Value $genericProvider
+      Set-Item -LiteralPath 'function:local:Invoke-MIRNativeProbeFactorioProcess' -Value $factorioProvider
+      Remove-Variable -Name mir42DirectActorDispatch,mir42DirectGenericStdout,mir42DirectGenericStderr,mir42DirectFactorioStdout,mir42DirectFactorioStderr -Scope Script -ErrorAction SilentlyContinue
+    }
     $tokens=$null;$errors=$null
     $ast=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$tokens,[ref]$errors)
     $argumentNode=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Extent.Text.StartsWith('$args = @(')},$true))
@@ -238,11 +277,11 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     # The following actor synthesizes outputs, solely to exercise retained
     # fresh-load oracles and version admission. It proves no native gameplay.
     function Invoke-MIR42BoundedUpgrade {
-      param($PowerShell,$Arguments,$StdoutPath,$StderrPath,$DeadlineSeconds,[switch]$NativeActor)
+      param($PowerShell,$Arguments,$StdoutPath,$StderrPath,$DeadlineSeconds,[switch]$NativeActor,[switch]$FactorioActor)
       $config=$Arguments[[Array]::IndexOf($Arguments,'--config')+1]
       $mods=$Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]
       $save=$Arguments[[Array]::IndexOf($Arguments,'--create')+1]
-      Check ($NativeActor -and $DeadlineSeconds -eq 60 -and $Arguments -contains '--no-log-rotation') 'fresh actor changed arguments or deadline.'
+      Check ($NativeActor -and $FactorioActor -and $DeadlineSeconds -eq 60 -and $Arguments -contains '--no-log-rotation') 'fresh actor changed provider, arguments, or deadline.'
       Check ($PowerShell -ceq $engine -and $Arguments -notcontains '-NoProfile' -and $Arguments -notcontains '-File') 'fresh actor retained a nested PowerShell worker.'
       Check (($Arguments -contains '--disable-audio') -eq ($freshLine -notin @('0.13','0.14'))) 'fresh audio capability changed.'
       $modList=Get-Content -Raw -LiteralPath (Join-Path $mods 'mod-list.json')|ConvertFrom-Json
@@ -705,6 +744,7 @@ if ($historicalFreshBranch -lt 0 -or $historicalFreshCall -le $historicalFreshBr
     -not $runner.Contains('throw "[$ErrorPrefix-log-content] $log"') -or
     -not $runner.Contains('function Invoke-MIR42DirectFreshLoad {') -or
     -not $runner.Contains('Invoke-MIR42BoundedUpgrade -PowerShell $Engine') -or
+    -not $runner.Contains('-NativeActor -FactorioActor') -or
     $runner.Contains('-ScenarioWorker')) {
   throw 'historical-and-modern-fresh-loads-must-use-direct-native-actors'
 }

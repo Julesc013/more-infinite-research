@@ -194,14 +194,19 @@ function Assert-MIR42HistoricalUpgradeHarness {
 function Invoke-MIR42BoundedUpgrade {
   param([Parameter(Mandatory)][string]$PowerShell,[Parameter(Mandatory)][string[]]$Arguments,
     [Parameter(Mandatory)][string]$StdoutPath,[Parameter(Mandatory)][string]$StderrPath,
-    [Parameter(Mandatory)][int]$DeadlineSeconds,[switch]$NativeActor)
+    [Parameter(Mandatory)][int]$DeadlineSeconds,[switch]$NativeActor,[switch]$FactorioActor)
+  if($FactorioActor -and -not $NativeActor){throw '[mir42-factorio-actor-requires-native-governor]'}
   foreach($path in @($StdoutPath,$StderrPath)){
     $null=Assert-MIRImmutableInputPathWithin -Path $path -Root $resources.root -Context 'Engine row capture'
   }
   # Fresh-load actors have no inner governor. The existing upgrade harness
   # governs its own native actors, so its outer deadline must not take that lock.
   if($NativeActor){
-    $actor=Invoke-MIRNativeProbeProcess -Context $resources -FilePath $PowerShell -Arguments $Arguments -TimeoutSeconds $DeadlineSeconds
+    $actor=if($FactorioActor){
+      Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $PowerShell -Arguments $Arguments -TimeoutSeconds $DeadlineSeconds
+    }else{
+      Invoke-MIRNativeProbeProcess -Context $resources -FilePath $PowerShell -Arguments $Arguments -TimeoutSeconds $DeadlineSeconds
+    }
     foreach($capture in @(@{source=$actor.stdout;destination=$StdoutPath},@{source=$actor.stderr;destination=$StderrPath})){
       if([IO.Path]::GetFullPath($capture.source) -cne [IO.Path]::GetFullPath($capture.destination)){
         Move-Item -LiteralPath $capture.source -Destination $capture.destination
@@ -327,7 +332,7 @@ function Invoke-MIR42DirectFreshLoad {
     if ($FactorioLine -notin @('0.13','0.14')) { $arguments += '--disable-audio' }
     $arguments += @('--mod-directory',$mods,'--create',$save)
     Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $Engine -Arguments $arguments
-    $exitCode = Invoke-MIR42BoundedUpgrade -PowerShell $Engine -Arguments $arguments -StdoutPath $stdout -StderrPath $stderr -DeadlineSeconds $DeadlineSeconds -NativeActor
+    $exitCode = Invoke-MIR42BoundedUpgrade -PowerShell $Engine -Arguments $arguments -StdoutPath $stdout -StderrPath $stderr -DeadlineSeconds $DeadlineSeconds -NativeActor -FactorioActor
     if ($exitCode -ne 0) { throw "[$ErrorPrefix-process-exit] $exitCode" }
     if (-not (Test-Path -LiteralPath $save -PathType Leaf) -or -not (Test-Path -LiteralPath $log -PathType Leaf)) {
       throw "[$ErrorPrefix-output-missing]"
