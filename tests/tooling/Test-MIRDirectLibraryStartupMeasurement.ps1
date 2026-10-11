@@ -133,10 +133,85 @@ try{
   $graphicalConfig=(Get-Content -Raw -LiteralPath (Join-Path $root 'graphical-run/config.ini')).Contains('[graphics]')
   $graphicalArgumentsBound=($script:graphicalArguments -contains '--benchmark-graphics')-and($script:graphicalArguments -contains '--force-graphics-preset')-and($script:graphicalArguments -contains '--single-thread-loading')-and($script:graphicalArguments -contains '--benchmark-ticks')-and($script:graphicalArguments -notcontains '--create')
   Assert-DirectStartup ($graphicalArgumentsBound-and$graphicalConfig) 'graphical diagnostic does not retain the bounded browser graphics launch shape.'
+  # The ordinary-window diagnostic must copy an actual player configuration
+  # verbatim apart from the three custody controls required by the existing
+  # direct-library guard. Its capture endpoint is deliberately weaker than a
+  # rendered, responsive main-menu claim.
+  $ordinaryConfigSource=Join-Path $root 'ordinary-player-config.ini'
+  $ordinaryConfigText=@'
+[path]
+read-data=C:\Factorio\data
+write-data=C:\Factorio\write-data
+
+[graphics]
+full-screen=true
+cache-sprite-atlas=true
+video-memory-usage=all
+
+[sound]
+master-volume=0.500000
+
+[other]
+enable-new-mods=true
+loading-multithreading=true
+'@
+  [IO.File]::WriteAllText($ordinaryConfigSource,$ordinaryConfigText,[Text.UTF8Encoding]::new($false))
+  $ordinaryInput=Get-MIRDirectLibraryOrdinaryPlayerConfigInput -Path $ordinaryConfigSource
+  $ordinaryPrivate=Join-Path $root 'ordinary-private-config.ini'
+  $ordinaryIdentity=New-MIRDirectLibraryOrdinaryPlayerConfig -PlayerConfigInput $ordinaryInput -Path $ordinaryPrivate -EngineDataDirectory $data -WriteDataDirectory (Join-Path $root 'ordinary-write-data')
+  $ordinaryPrivateText=Get-Content -Raw -LiteralPath $ordinaryPrivate
+  Assert-DirectStartup ($ordinaryIdentity.source.sha256-ceq$ordinaryInput.sha256-and$ordinaryPrivateText.Contains('full-screen=true')-and$ordinaryPrivateText.Contains('cache-sprite-atlas=true')-and$ordinaryPrivateText.Contains('video-memory-usage=all')-and$ordinaryPrivateText.Contains('master-volume=0.500000')-and$ordinaryPrivateText.Contains('loading-multithreading=true')-and$ordinaryPrivateText.Contains(('read-data='+$data))-and$ordinaryPrivateText.Contains(('write-data='+(Join-Path $root 'ordinary-write-data')))-and$ordinaryPrivateText.Contains('enable-new-mods=false')) 'ordinary player configuration did not preserve ordinary graphics, sound, and thread-loading choices around its private custody overrides.'
+  $uppercaseOrdinaryConfig=Join-Path $root 'ordinary-player-config-uppercase.ini'
+  $uppercaseOrdinaryText=$ordinaryConfigText.Replace('read-data','READ-DATA').Replace('write-data','WRITE-DATA').Replace('enable-new-mods','ENABLE-NEW-MODS')
+  [IO.File]::WriteAllText($uppercaseOrdinaryConfig,$uppercaseOrdinaryText,[Text.UTF8Encoding]::new($false))
+  $uppercaseOrdinaryIdentity=New-MIRDirectLibraryOrdinaryPlayerConfig -PlayerConfigInput (Get-MIRDirectLibraryOrdinaryPlayerConfigInput -Path $uppercaseOrdinaryConfig) -Path (Join-Path $root 'ordinary-private-config-uppercase.ini') -EngineDataDirectory $data -WriteDataDirectory (Join-Path $root 'ordinary-write-data-uppercase')
+  Assert-DirectStartup ($uppercaseOrdinaryIdentity.overrides.enable_new_mods-eq$false-and(Get-Content -Raw -LiteralPath $uppercaseOrdinaryIdentity.private_config.path).Contains('enable-new-mods=false')) 'case-insensitive ordinary custody keys were not normalized and copied.'
+  $badOrdinaryConfig=Join-Path $root 'ordinary-player-config-duplicate.ini'
+  [IO.File]::WriteAllText($badOrdinaryConfig,($ordinaryConfigText -replace 'write-data=C:\\Factorio\\write-data',"READ-DATA=C:\\Factorio\\duplicate`nwrite-data=C:\\Factorio\\write-data"),[Text.UTF8Encoding]::new($false))
+  $badOrdinaryRejected=$false;try{New-MIRDirectLibraryOrdinaryPlayerConfig -PlayerConfigInput (Get-MIRDirectLibraryOrdinaryPlayerConfigInput -Path $badOrdinaryConfig) -Path (Join-Path $root 'ordinary-private-config-duplicate.ini') -EngineDataDirectory $data -WriteDataDirectory (Join-Path $root 'ordinary-write-data')|Out-Null}catch{$badOrdinaryRejected=$_.Exception.Message-ceq'[mir-direct-startup-ordinary-player-config-keys]'}
+  Assert-DirectStartup $badOrdinaryRejected 'ordinary player configuration with duplicate custody keys was accepted.'
+  $script:ordinaryArguments=@();$script:ordinaryCompletionObserved=$true;$script:ordinaryLogInitialised=$true;$script:ordinaryWindowReturned=$false;$script:ordinaryObserverScript=''
+  function Start-MIRLibraryActivation {param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode)[pscustomobject]@{library=$LibraryDirectory;selected=@();closed=$false}}
+  function Add-MIRNativeProbeLibraryActivation {param($Context,$Activation)}
+  function Complete-MIRLibraryActivation {param($Activation);$Activation.closed=$true;[pscustomobject]@{status='restored'}}
+  function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments);$script:ordinaryArguments=@($Arguments)}
+  function Assert-MIRLibraryLoadedSelection {param($Activation,$LogPath,[switch]$LatestInvocation,$ActiveModsObserver,[ValidateSet('data-final-fixes.lua','control.lua')]$ActiveModsObserverScript='data-final-fixes.lua');$script:ordinaryObserverScript=$ActiveModsObserverScript;@('base@2.0.77')}
+  function Get-MIRDirectLibraryOrdinaryWindowObservation {
+    param($FactorioBin,$LaunchNotBefore)
+    if($script:ordinaryWindowReturned){return $null}
+    $script:ordinaryWindowReturned=$true;$observed=[DateTime]::UtcNow
+    [pscustomobject]@{pid=123;process_started_utc=$observed.AddSeconds(-2).ToString('o');observed_utc=$observed.ToString('o');observed_seconds_since_process_start=2.0;window_handle=[int64]4321;window_visible=$true;window_minimized=$false;window_foreground=$false;capture=[pscustomobject]@{attempted=$false;succeeded=$false;print_window_returned=$false;complete='not-observable';unoccluded='not-observable';path='';sha256='';bytes=0;bounds=[ordered]@{left=1;top=2;width=640;height=480};error='automatic-window-image-not-attempted'}}
+  }
+  function Invoke-MIRNativeProbeFactorioProcess {
+    param($Context,$FilePath,$Arguments,$TimeoutSeconds,$CompletionPredicate)
+    $config=[string]$Arguments[[Array]::IndexOf($Arguments,'--config')+1]
+    $writeData=[regex]::Match((Get-Content -Raw -LiteralPath $config),'(?m)^write-data=(?<path>.+)$').Groups['path'].Value
+    [IO.Directory]::CreateDirectory($writeData)|Out-Null
+    $nativeLog=if($script:ordinaryLogInitialised){'1.250 Factorio initialised'}else{'0.100 Starting Factorio'}
+    [IO.File]::WriteAllText((Join-Path $writeData 'factorio-current.log'),$nativeLog,[Text.UTF8Encoding]::new($false))
+    $observed=if($null-ne$CompletionPredicate){[bool](& $CompletionPredicate)}else{$false}
+    $ledger=Join-Path $Context.root 'mock-ordinary-ledger.json';[IO.File]::WriteAllText($ledger,'{}',[Text.UTF8Encoding]::new($false))
+    [pscustomobject]@{result=[pscustomobject]@{passed=$true;timed_out=$false;completion_predicate_observed=([bool]($observed-and$script:ordinaryCompletionObserved));exit_code=0;duration_seconds=3.5;peak_working_set_bytes=2048;peak_sampled_private_bytes=1024};ledger=$ledger}
+  }
+  $ordinaryResult=Invoke-MIRDirectLibraryOrdinaryWindowSample -FactorioBin (Join-Path $root 'factorio.exe') -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot (Join-Path $root 'ordinary-run') -WriteDataRoot (Join-Path $root 'ordinary-write-data-run') -Label 'without-mir' -Resources ([pscustomobject]@{root=$root}) -MirArchive $null -TimeoutSeconds 30 -OrdinaryPlayerConfig $ordinaryInput
+  $forbiddenOrdinaryArguments=@('--benchmark-graphics','--force-graphics-preset','--single-thread-loading','--disable-audio','--window-size','--create')
+  Assert-DirectStartup ($ordinaryResult.endpoint_class-ceq'ordinary-native-window-diagnostic'-and$ordinaryResult.menu_ready_confirmation-ceq'unavailable-from-engine-log-window-observation'-and$ordinaryResult.ready_endpoint.Contains('not proof')-and-not$ordinaryResult.window.capture.attempted-and-not$ordinaryResult.window.capture.succeeded-and$ordinaryResult.window.capture.complete-ceq'not-observable'-and$ordinaryResult.window.capture.unoccluded-ceq'not-observable'-and$ordinaryResult.window.capture.error-ceq'automatic-window-image-not-attempted'-and$ordinaryResult.ordinary_player_config.preserved_settings_sha256-ceq$ordinaryIdentity.preserved_settings_sha256-and($script:ordinaryObserverScript-ceq'data-final-fixes.lua')-and(@($forbiddenOrdinaryArguments|Where-Object {$script:ordinaryArguments-contains$_}).Count-eq0)-and($script:ordinaryArguments-contains'--config')-and($script:ordinaryArguments-contains'--mod-directory')-and($script:ordinaryArguments-contains'--no-log-rotation')) 'ordinary window diagnostic used a benchmark launch shape, omitted custody evidence, changed its data-stage observer contract, or claimed menu confirmation.'
+  $script:ordinaryWindowReturned=$false;$script:ordinaryCompletionObserved=$false;$ordinaryEndpointRejected=$false
+  try{Invoke-MIRDirectLibraryOrdinaryWindowSample -FactorioBin (Join-Path $root 'factorio.exe') -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot (Join-Path $root 'ordinary-run-no-endpoint') -WriteDataRoot (Join-Path $root 'ordinary-write-data-no-endpoint') -Label 'without-mir' -Resources ([pscustomobject]@{root=$root}) -MirArchive $null -TimeoutSeconds 30 -OrdinaryPlayerConfig $ordinaryInput|Out-Null}catch{$ordinaryEndpointRejected=$_.Exception.Message-ceq'[mir-direct-startup-ordinary-window-process]'}finally{$script:ordinaryCompletionObserved=$true}
+  Assert-DirectStartup $ordinaryEndpointRejected 'ordinary window diagnostic accepted a native result without its selected visible-window completion predicate.'
+  $script:ordinaryWindowReturned=$false;$script:ordinaryLogInitialised=$false;$ordinarySplashRejected=$false
+  try{Invoke-MIRDirectLibraryOrdinaryWindowSample -FactorioBin (Join-Path $root 'factorio.exe') -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot (Join-Path $root 'ordinary-run-before-initialised') -WriteDataRoot (Join-Path $root 'ordinary-write-data-before-initialised') -Label 'without-mir' -Resources ([pscustomobject]@{root=$root}) -MirArchive $null -TimeoutSeconds 30 -OrdinaryPlayerConfig $ordinaryInput|Out-Null}catch{$ordinarySplashRejected=$_.Exception.Message-ceq'[mir-direct-startup-ordinary-window-process]'}finally{$script:ordinaryLogInitialised=$true}
+  Assert-DirectStartup ($ordinarySplashRejected-and-not$script:ordinaryWindowReturned) 'ordinary window diagnostic accepted or captured a splash/loading window before the Factorio initialisation boundary.'
   $source=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
-  Assert-DirectStartup ($source.Contains('Invoke-MIRNativeProbeFactorioProcess')-and$source.Contains('Add-MIRNativeProbeLibraryActivation')-and$source.Contains('changed-configuration')-and$source.Contains('same-selection')-and$source.Contains('prior_selection_label')-and$source.Contains('warm-repeat')-and$source.Contains('headless-create-diagnostic')-and$source.Contains('graphical-player-ready-diagnostic')-and$source.Contains('Get-MIRDirectLibraryPlayerReadyObserverArchive')-and$source.Contains('Invoke-MIRDirectLibraryPlayerReadyPreparation')-and$source.Contains('--benchmark-graphics')-and$source.Contains('[MIR_PLAYER_READY]')-and$source.Contains('engine_log_player_ready_seconds')-and$source.Contains('factorio-current.log')-and$source.Contains('ready-initialised')-and$source.Contains('ready-save-map-data')-and$source.Contains('run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot)')-and-not$source.Contains('[Diagnostics.Process]::Start')) 'runner bypasses the governed native process actor, does not bind the base-only graphical observer and its prepared save, or mislabels the player-ready diagnostic.'
+  Assert-DirectStartup ($source.Contains('Invoke-MIRNativeProbeFactorioProcess')-and$source.Contains('Add-MIRNativeProbeLibraryActivation')-and$source.Contains('changed-configuration')-and$source.Contains('same-selection')-and$source.Contains('prior_selection_label')-and$source.Contains('warm-repeat')-and$source.Contains('headless-create-diagnostic')-and$source.Contains('graphical-player-ready-diagnostic')-and$source.Contains('ordinary-native-window-diagnostic')-and$source.Contains('Get-MIRDirectLibraryPlayerReadyObserverArchive')-and$source.Contains('Invoke-MIRDirectLibraryPlayerReadyPreparation')-and$source.Contains('New-MIRDirectLibraryOrdinaryPlayerConfig')-and$source.Contains('automatic-window-image-not-attempted')-and$source.Contains('menu_ready_confirmation')-and$source.Contains('--benchmark-graphics')-and$source.Contains('[MIR_PLAYER_READY]')-and$source.Contains('engine_log_player_ready_seconds')-and$source.Contains('factorio-current.log')-and$source.Contains('ready-initialised')-and$source.Contains('ready-save-map-data')-and$source.Contains('run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot)')-and-not$source.Contains('PrintWindow')-and-not$source.Contains('[Diagnostics.Process]::Start')) 'runner bypasses the governed native process actor, does not bind the base-only graphical observer and its prepared save, or omits the bounded ordinary-window diagnostic.'
   $entry=Get-Content -Raw -LiteralPath (Join-Path $repo 'scripts/Measure-MIRPerformanceRegression.ps1')
-  Assert-DirectStartup ($entry.Contains('Invoke-MIRDirectLibraryStartupMeasurement')-and$entry.Contains('ObserveStartup')-and$entry.Contains('ObserveResearchAll')-and$entry.Contains('ActiveModsObserver')-and$entry.Contains('GraphicalPlayerReady')-and$entry.Contains('PlayerReadyObserverArchive')-and$entry.Contains('PlayerReadyBenchmarkTicks')-and$entry.Contains('ExpectedPeakMemoryMiB')-and$entry.Contains('mir-native-obsolete-runner')) 'performance entrypoint does not preserve the research-all and obsolete-campaign branches around direct-library measurement or forward the selected graphical diagnostic.'
+  Assert-DirectStartup ($entry.Contains('Invoke-MIRDirectLibraryStartupMeasurement')-and$entry.Contains('ObserveStartup')-and$entry.Contains('ObserveResearchAll')-and$entry.Contains('ActiveModsObserver')-and$entry.Contains('GraphicalPlayerReady')-and$entry.Contains('PlayerReadyObserverArchive')-and$entry.Contains('PlayerReadyBenchmarkTicks')-and$entry.Contains('OrdinaryMenu')-and$entry.Contains('OrdinaryPlayerConfigPath')-and$entry.Contains('endpoint-mode-conflict')-and$entry.Contains('ExpectedPeakMemoryMiB')-and$entry.Contains('mir-native-obsolete-runner')) 'performance entrypoint does not preserve the research-all and obsolete-campaign branches around direct-library measurement or forward its selected endpoint mode.'
+  $entryPath=Join-Path $repo 'scripts/Measure-MIRPerformanceRegression.ps1'
+  $startupCliInputs=@{RepoRoot=$repo;ObserveStartup=$true;FactorioBin='fixture-factorio.exe';LocalModZipDir='fixture-library';StartupProfileTemplatePath='fixture-profile.json';Published422Archive='fixture-published.zip';Published422ManifestPath='fixture-manifest.json';Published422ManifestSha256=('0'*64);StartupOutputRoot='fixture-output';ExpectedSourceCommit=('0'*40)}
+  $conflictingEndpointRejected=$false;try{& $entryPath @startupCliInputs -GraphicalPlayerReady -OrdinaryMenu|Out-Null}catch{$conflictingEndpointRejected=$_.Exception.Message-ceq'[mir-direct-startup-endpoint-mode-conflict]'}
+  Assert-DirectStartup $conflictingEndpointRejected 'performance entrypoint accepted simultaneous graphical-player and ordinary-window endpoint flags.'
+  $missingOrdinaryConfigRejected=$false;try{& $entryPath @startupCliInputs -OrdinaryMenu|Out-Null}catch{$missingOrdinaryConfigRejected=$_.Exception.Message-ceq'[mir-direct-startup-input-required] OrdinaryPlayerConfigPath'}
+  Assert-DirectStartup $missingOrdinaryConfigRejected 'performance entrypoint accepted ordinary-window mode without an explicit player configuration input.'
   $accepted=@((Get-Command Read-MIRNativeProbeCurrentCandidate).Parameters['SourceVersion'].Attributes|Where-Object {$_ -is [Management.Automation.ValidateSetAttribute]}|ForEach-Object ValidValues)
   Assert-DirectStartup ('4.2.3'-in$accepted) 'native candidate reader rejects the 4.2.3 materialization identity.'
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')

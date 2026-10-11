@@ -149,6 +149,124 @@ function New-MIRDirectLibraryStartupConfig {
   [IO.File]::WriteAllText($Path,$text,[Text.UTF8Encoding]::new($false))
 }
 
+function Get-MIRDirectLibraryStartupTextSha256 {
+  param([Parameter(Mandatory)][string]$Text)
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($Text)))
+}
+
+function Get-MIRDirectLibraryOrdinaryPlayerConfigInput {
+  param([Parameter(Mandatory)][string]$Path)
+  $resolved=(Resolve-Path -LiteralPath $Path).Path
+  Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $resolved -PathType Leaf) 'ordinary-player-config-file'
+  $item=Get-Item -LiteralPath $resolved
+  Assert-MIRDirectLibraryStartupMeasurement ($item.Length -gt 0 -and $item.Length -le 1MB) 'ordinary-player-config-size'
+  [pscustomobject][ordered]@{path=$resolved;sha256=Get-MIRImmutableInputSha256 -Path $resolved;bytes=[int64]$item.Length}
+}
+
+function Get-MIRDirectLibraryOrdinaryConfigProtectedText {
+  param([Parameter(Mandatory)][AllowEmptyString()][string[]]$Lines)
+  $section='';$protected=[Collections.Generic.List[string]]::new()
+  foreach($line in $Lines){
+    $header=[regex]::Match($line,'^\s*\[(?<section>[^\]]+)\]\s*(?:;.*)?$')
+    if($header.Success){$section=$header.Groups['section'].Value.Trim().ToLowerInvariant();$protected.Add($line);continue}
+    $setting=[regex]::Match($line,'^(?<prefix>\s*)(?<key>[A-Za-z0-9_-]+)\s*=')
+    $key=if($setting.Success){$setting.Groups['key'].Value.ToLowerInvariant()}else{''}
+    if($setting.Success-and(($section-ceq'path'-and$key-ceq'read-data')-or($section-ceq'path'-and$key-ceq'write-data')-or($section-ceq'other'-and$key-ceq'enable-new-mods'))){continue}
+    $protected.Add($line)
+  }
+  return ($protected -join "`n")
+}
+
+function New-MIRDirectLibraryOrdinaryPlayerConfig {
+  param(
+    [Parameter(Mandatory)]$PlayerConfigInput,[Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$EngineDataDirectory,[Parameter(Mandatory)][string]$WriteDataDirectory
+  )
+  $source=(Resolve-Path -LiteralPath ([string]$PlayerConfigInput.path)).Path
+  Assert-MIRDirectLibraryStartupMeasurement ((Get-MIRImmutableInputSha256 -Path $source) -ceq [string]$PlayerConfigInput.sha256) 'ordinary-player-config-drift'
+  $encoding=[Text.UTF8Encoding]::new($false,$true)
+  try{$text=[IO.File]::ReadAllText($source,$encoding)}catch{throw '[mir-direct-startup-ordinary-player-config-encoding]'}
+  $newline=if($text.Contains("`r`n")){"`r`n"}else{"`n"};$lines=[Collections.Generic.List[string]]::new([regex]::Split($text,"`r?`n"))
+  $sections=@{path=0;other=0};$settings=@{read_data=@();write_data=@();enable_new_mods=@()};$section=''
+  for($index=0;$index-lt$lines.Count;$index++){
+    $header=[regex]::Match($lines[$index],'^\s*\[(?<section>[^\]]+)\]\s*(?:;.*)?$')
+    if($header.Success){$section=$header.Groups['section'].Value.Trim().ToLowerInvariant();if($sections.ContainsKey($section)){$sections[$section]++};continue}
+    $setting=[regex]::Match($lines[$index],'^(?<prefix>\s*)(?<key>[A-Za-z0-9_-]+)(?<equals>\s*=\s*)(?<value>.*)$')
+    if(-not$setting.Success){continue}
+    $key=$setting.Groups['key'].Value.ToLowerInvariant()
+    if($section-ceq'path'-and$key-ceq'read-data'){$settings.read_data+=,$index}
+    elseif($section-ceq'path'-and$key-ceq'write-data'){$settings.write_data+=,$index}
+    elseif($section-ceq'other'-and$key-ceq'enable-new-mods'){$settings.enable_new_mods+=,$index}
+  }
+  Assert-MIRDirectLibraryStartupMeasurement ($sections.path-eq1-and$sections.other-eq1) 'ordinary-player-config-sections'
+  Assert-MIRDirectLibraryStartupMeasurement ($settings.read_data.Count-eq1-and$settings.write_data.Count-eq1-and$settings.enable_new_mods.Count-le1) 'ordinary-player-config-keys'
+  $pathValues=@{read_data=$EngineDataDirectory;write_data=$WriteDataDirectory}
+  foreach($pair in @(@('read_data','read-data'),@('write_data','write-data'))){
+    $index=[int]$settings[$pair[0]][0];$setting=[regex]::Match($lines[$index],'^(?<prefix>\s*)(?<key>[A-Za-z0-9_-]+)(?<equals>\s*=\s*)(?<value>.*)$')
+    $lines[$index]=$setting.Groups['prefix'].Value+$pair[1]+$setting.Groups['equals'].Value+$pathValues[$pair[0]]
+  }
+  if($settings.enable_new_mods.Count-eq1){
+    $index=[int]$settings.enable_new_mods[0];$setting=[regex]::Match($lines[$index],'^(?<prefix>\s*)(?<key>[A-Za-z0-9_-]+)(?<equals>\s*=\s*)(?<value>.*)$')
+    $lines[$index]=$setting.Groups['prefix'].Value+'enable-new-mods'+$setting.Groups['equals'].Value+'false'
+  }else{
+    $insertAt=$lines.Count
+    for($index=0;$index-lt$lines.Count;$index++){
+      $header=[regex]::Match($lines[$index],'^\s*\[(?<section>[^\]]+)\]\s*(?:;.*)?$')
+      if($header.Success-and$header.Groups['section'].Value.Trim().ToLowerInvariant()-ceq'other'){$insertAt=$index+1;break}
+    }
+    $lines.Insert($insertAt,'enable-new-mods=false')
+  }
+  $privateText=$lines -join $newline
+  $sourceLines=[regex]::Split($text,"`r?`n")
+  Assert-MIRDirectLibraryStartupMeasurement ((Get-MIRDirectLibraryOrdinaryConfigProtectedText -Lines $sourceLines) -ceq (Get-MIRDirectLibraryOrdinaryConfigProtectedText -Lines $lines.ToArray())) 'ordinary-player-config-preservation'
+  [IO.File]::WriteAllText($Path,$privateText,[Text.UTF8Encoding]::new($false))
+  [pscustomobject][ordered]@{
+    source=[pscustomobject][ordered]@{path=$source;sha256=[string]$PlayerConfigInput.sha256;bytes=[int64]$PlayerConfigInput.bytes}
+    private_config=[pscustomobject][ordered]@{path=$Path;sha256=Get-MIRImmutableInputSha256 -Path $Path;bytes=[int64](Get-Item -LiteralPath $Path).Length}
+    preserved_settings_sha256=Get-MIRDirectLibraryStartupTextSha256 -Text (Get-MIRDirectLibraryOrdinaryConfigProtectedText -Lines $lines.ToArray())
+    overrides=[ordered]@{read_data=$EngineDataDirectory;write_data=$WriteDataDirectory;enable_new_mods=$false}
+  }
+}
+
+function Initialize-MIRDirectLibraryWindowObservationInterop {
+  if($null-ne('MIRDirectLibraryWindowObservationNative' -as [type])){return}
+  Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class MIRDirectLibraryWindowObservationNative {
+  [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
+  [DllImport("user32.dll", SetLastError=true)] public static extern bool IsWindowVisible(IntPtr handle);
+  [DllImport("user32.dll", SetLastError=true)] public static extern bool IsIconic(IntPtr handle);
+  [DllImport("user32.dll", SetLastError=true)] public static extern bool GetWindowRect(IntPtr handle, out RECT rect);
+  [DllImport("user32.dll", SetLastError=true)] public static extern uint GetWindowThreadProcessId(IntPtr handle, out uint processId);
+  [DllImport("user32.dll", SetLastError=true)] public static extern IntPtr GetForegroundWindow();
+}
+'@
+}
+
+function Get-MIRDirectLibraryOrdinaryWindowObservation {
+  param([Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][datetime]$LaunchNotBefore)
+  Initialize-MIRDirectLibraryWindowObservationInterop
+  $binary=(Resolve-Path -LiteralPath $FactorioBin).Path
+  $candidates=@(Get-Process -Name factorio -ErrorAction SilentlyContinue|Where-Object {
+    try{([IO.Path]::GetFullPath($_.Path)-ceq$binary)-and$_.StartTime.ToUniversalTime()-ge$LaunchNotBefore.ToUniversalTime()}catch{$false}
+  })
+  if($candidates.Count-eq0){return $null}
+  Assert-MIRDirectLibraryStartupMeasurement ($candidates.Count-eq1) 'ordinary-window-owned-process'
+  $process=$candidates[0]
+  try{
+    $process.Refresh();$handle=$process.MainWindowHandle
+    if($process.HasExited -or $handle -eq [IntPtr]::Zero -or -not [MIRDirectLibraryWindowObservationNative]::IsWindowVisible($handle) -or [MIRDirectLibraryWindowObservationNative]::IsIconic($handle)){return $null}
+    [uint32]$windowPid=0;$null=[MIRDirectLibraryWindowObservationNative]::GetWindowThreadProcessId($handle,[ref]$windowPid)
+    Assert-MIRDirectLibraryStartupMeasurement ($windowPid-eq[uint32]$process.Id) 'ordinary-window-owned-handle'
+    $rect=New-Object MIRDirectLibraryWindowObservationNative+RECT;$rectKnown=[MIRDirectLibraryWindowObservationNative]::GetWindowRect($handle,[ref]$rect)
+    $width=if($rectKnown){[int]$rect.Right-[int]$rect.Left}else{0};$height=if($rectKnown){[int]$rect.Bottom-[int]$rect.Top}else{0}
+    $observed=[DateTimeOffset]::UtcNow;$started=[DateTimeOffset]$process.StartTime.ToUniversalTime()
+    $capture=[pscustomobject][ordered]@{attempted=$false;succeeded=$false;print_window_returned=$false;complete='not-observable';unoccluded='not-observable';path='';sha256='';bytes=0;bounds=[ordered]@{left=$(if($rectKnown){[int]$rect.Left}else{$null});top=$(if($rectKnown){[int]$rect.Top}else{$null});width=$width;height=$height};error='automatic-window-image-not-attempted'}
+    return [pscustomobject][ordered]@{pid=$process.Id;process_started_utc=$started.ToString('o');observed_utc=$observed.ToString('o');observed_seconds_since_process_start=[Math]::Round(($observed-$started).TotalSeconds,6);window_handle=$handle.ToInt64();window_visible=$true;window_minimized=$false;window_foreground=([MIRDirectLibraryWindowObservationNative]::GetForegroundWindow() -eq $handle);capture=$capture}
+  }finally{$process.Dispose()}
+}
+
 function Invoke-MIRDirectLibraryStartupSample {
   param(
     [Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$EngineDataDirectory,
@@ -295,6 +413,69 @@ function Invoke-MIRDirectLibraryGraphicalPlayerReadySample {
   }
 }
 
+function Invoke-MIRDirectLibraryOrdinaryWindowSample {
+  param(
+    [Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$EngineDataDirectory,
+    [Parameter(Mandatory)][object[]]$BaseRows,[Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][string]$WriteDataRoot,[Parameter(Mandatory)][string]$Label,
+    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,3600)][int]$TimeoutSeconds=300,[Parameter(Mandatory)]$OrdinaryPlayerConfig,[string]$ActiveModsObserver=''
+  )
+  [IO.Directory]::CreateDirectory($RunRoot)|Out-Null
+  [IO.Directory]::CreateDirectory($WriteDataRoot)|Out-Null
+  $profile=Join-Path $RunRoot 'selection.json';$config=Join-Path $RunRoot 'config.ini';$log=Join-Path $RunRoot 'factorio.log';$engineLog=Join-Path $WriteDataRoot 'factorio-current.log'
+  Write-MIRDirectLibraryStartupProfile -Path $profile -BaseRows $BaseRows -MirArchive $MirArchive
+  $configIdentity=New-MIRDirectLibraryOrdinaryPlayerConfig -PlayerConfigInput $OrdinaryPlayerConfig -Path $config -EngineDataDirectory $EngineDataDirectory -WriteDataDirectory $WriteDataRoot
+  $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory -BaseRows $BaseRows -MirArchive $MirArchive
+  $activation=$null
+  try {
+    $activation=Start-MIRLibraryActivation -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory -ProfilePath $profile -ArchiveHashes $hashes -SettingsMode Defaults
+    Add-MIRNativeProbeLibraryActivation -Context $Resources -Activation $activation
+    if(Test-Path -LiteralPath $engineLog){Remove-Item -LiteralPath $engineLog -Force}
+    # Compile/load the tiny Win32 interop before the timed native process so
+    # its first-use cost cannot be recorded as Factorio startup work.
+    Initialize-MIRDirectLibraryWindowObservationInterop
+    $windowObservations=[Collections.Generic.List[object]]::new();$launchNotBefore=[DateTime]::UtcNow
+    $completion={
+      if($windowObservations.Count){return $true}
+      # A visible splash/loading window is not the selected observation
+      # endpoint. Wait until this owned invocation has written Factorio's
+      # initialisation boundary before inspecting its native window.
+      if(-not(Test-Path -LiteralPath $engineLog -PathType Leaf)){return $false}
+      try{$currentLog=[IO.File]::ReadAllText($engineLog)}catch{return $false}
+      if($currentLog -notmatch '(?m)^\s*\d+[.]\d+ Factorio initialised\s*$'){return $false}
+      $window=Get-MIRDirectLibraryOrdinaryWindowObservation -FactorioBin $FactorioBin -LaunchNotBefore $launchNotBefore
+      if($null-eq$window){return $false}
+      $windowObservations.Add($window);return $true
+    }.GetNewClosure()
+    # The copied player configuration retains graphics, sound, and threaded
+    # loading choices. These custody arguments select only the isolated config,
+    # master archive library, and a new log invocation boundary.
+    $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation')
+    Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $FactorioBin -Arguments $arguments
+    $native=Invoke-MIRNativeProbeFactorioProcess -Context $Resources -FilePath $FactorioBin -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $completion
+    Assert-MIRDirectLibraryStartupMeasurement ($native.result.passed -and -not $native.result.timed_out -and $native.result.completion_predicate_observed) 'ordinary-window-process'
+    Assert-MIRDirectLibraryStartupMeasurement ($windowObservations.Count-eq1) 'ordinary-window-observation'
+    Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $engineLog -PathType Leaf) 'ordinary-window-engine-current-log'
+    [IO.File]::Copy($engineLog,$log,$true)
+    $logText=Get-Content -Raw -LiteralPath $log
+    Assert-MIRDirectLibraryStartupMeasurement ($logText -match '(?m)^\s*\d+[.]\d+ Factorio initialised\s*$') 'ordinary-window-initialised'
+    $observerIdentity=$null
+    if(-not [string]::IsNullOrWhiteSpace($ActiveModsObserver)){
+      $observerRows=@($activation.selected|Where-Object {$_.name -ceq $ActiveModsObserver})
+      Assert-MIRDirectLibraryStartupMeasurement ($observerRows.Count-eq1) 'ordinary-window-active-mods-observer-selection'
+      $observer=$observerRows[0]
+      Assert-MIRDirectLibraryStartupMeasurement (-not [bool]$observer.builtin -and [string]$observer.sha256 -match '^[A-Fa-f0-9]{64}$') 'ordinary-window-active-mods-observer-identity'
+      $observerIdentity=[ordered]@{name=[string]$observer.name;version=[string]$observer.version;archive=[IO.Path]::GetFileName([string]$observer.path);sha256=[string]$observer.sha256}
+    }
+    $loaded=@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation -ActiveModsObserver $ActiveModsObserver -ActiveModsObserverScript data-final-fixes.lua)
+    $initialised=[regex]::Matches($logText,'(?m)^\s*(?<seconds>\d+[.]\d+) Factorio initialised\s*$')|Select-Object -Last 1
+    $window=$windowObservations[0];$capture=$window.capture
+    $captureRecord=[ordered]@{attempted=[bool]$capture.attempted;succeeded=[bool]$capture.succeeded;print_window_returned=[bool]$capture.print_window_returned;complete=[string]$capture.complete;unoccluded=[string]$capture.unoccluded;path=$(if([string]::IsNullOrWhiteSpace([string]$capture.path)){''}else{[IO.Path]::GetRelativePath($Resources.root,[string]$capture.path).Replace('\','/')});sha256=[string]$capture.sha256;bytes=[int64]$capture.bytes;bounds=$capture.bounds;error=[string]$capture.error}
+    [pscustomobject][ordered]@{label=$Label;run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot).Replace('\','/');elapsed_seconds=[double]$native.result.duration_seconds;engine_log_initialised_seconds=[double]::Parse($initialised.Groups['seconds'].Value,[Globalization.CultureInfo]::InvariantCulture);exit_code=$native.result.exit_code;endpoint_class='ordinary-native-window-diagnostic';ready_endpoint='An ordinary Factorio launch using the copied player configuration exposed a visible, non-minimized native window after Factorio initialised. No automatic window image is taken because its synchronous rendering call is not safely bounded here; this is not proof that the main menu was rendered, responsive, or interactable.';menu_ready_confirmation='unavailable-from-engine-log-window-observation';ordinary_player_config=[ordered]@{source=$configIdentity.source;private_config=[ordered]@{path=[IO.Path]::GetRelativePath($Resources.root,[string]$configIdentity.private_config.path).Replace('\','/');sha256=$configIdentity.private_config.sha256;bytes=$configIdentity.private_config.bytes};preserved_settings_sha256=$configIdentity.preserved_settings_sha256;overrides=$configIdentity.overrides};window=[ordered]@{pid=[int]$window.pid;process_started_utc=[string]$window.process_started_utc;observed_utc=[string]$window.observed_utc;observed_seconds_since_process_start=[double]$window.observed_seconds_since_process_start;window_handle=[int64]$window.window_handle;visible=[bool]$window.window_visible;minimized=[bool]$window.window_minimized;foreground=[bool]$window.window_foreground;capture=$captureRecord};loaded_selection=$loaded;active_mods_observer=$observerIdentity;process_memory=[ordered]@{peak_working_set_bytes=[int64]$native.result.peak_working_set_bytes;peak_sampled_private_bytes=[int64]$native.result.peak_sampled_private_bytes;measurement='NativeProbeResources monitored process tree; values are not whole-system memory'};resource_ledger=[IO.Path]::GetRelativePath($Resources.root,$native.ledger).Replace('\','/');log=[IO.Path]::GetRelativePath($RunRoot,$log).Replace('\','/');engine_current_log=[IO.Path]::GetRelativePath($Resources.root,$engineLog).Replace('\','/')}
+  } finally {
+    if($null-ne$activation -and -not $activation.closed){Complete-MIRLibraryActivation -Activation $activation|Out-Null}
+  }
+}
+
 function Invoke-MIRDirectLibraryStartupMeasurement {
   [CmdletBinding()]
   param(
@@ -304,7 +485,8 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
     [ValidateSet('f200','f210')][string]$Target='f200',[ValidateRange(0,5)][int]$WarmupRuns=1,[ValidateRange(1,25)][int]$MeasuredRuns=3,[ValidateRange(1,3600)][int]$TimeoutSeconds=300,
     [Parameter(Mandatory)][ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB,[ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
     [Parameter(Mandatory)][ValidatePattern('^[0-9A-Fa-f]{40}$')][string]$SourceCommit,[string]$ActiveModsObserver='',
-    [switch]$GraphicalPlayerReady,[string]$PlayerReadyObserverArchive='',[ValidateRange(1,720)][int]$PlayerReadyBenchmarkTicks=60
+    [switch]$GraphicalPlayerReady,[string]$PlayerReadyObserverArchive='',[ValidateRange(1,720)][int]$PlayerReadyBenchmarkTicks=60,
+    [switch]$OrdinaryMenu,[string]$OrdinaryPlayerConfigPath=''
   )
   $repo=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path
   $observedCommit=(& git -C $repo rev-parse HEAD).Trim().ToLowerInvariant()
@@ -321,6 +503,8 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
   $publishedManifest=Assert-MIRDirectLibraryPublished422Manifest -ManifestPath $Published422ManifestPath -ExpectedSha256 $Published422ManifestSha256 -PublishedArchive $published -Target $Target
   $hasCandidate=-not [string]::IsNullOrWhiteSpace($CandidateArchive)
   Assert-MIRDirectLibraryStartupMeasurement (($hasCandidate -and -not $Preliminary) -or (-not $hasCandidate -and $Preliminary)) 'candidate-mode'
+  Assert-MIRDirectLibraryStartupMeasurement (-not($GraphicalPlayerReady-and$OrdinaryMenu)) 'endpoint-mode-conflict'
+  Assert-MIRDirectLibraryStartupMeasurement ((-not$OrdinaryMenu)-or-not[string]::IsNullOrWhiteSpace($OrdinaryPlayerConfigPath)) 'ordinary-player-config-required'
   $candidate=$null;$candidateMaterialization=$null
   if($hasCandidate){
     Assert-MIRDirectLibraryStartupMeasurement (-not [string]::IsNullOrWhiteSpace($CandidateMaterializationArchive) -and -not [string]::IsNullOrWhiteSpace($CandidateMaterializationReceiptPath)) 'candidate-materialization-inputs'
@@ -334,6 +518,8 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
     Assert-MIRDirectLibraryStartupMeasurement ([string]$candidateMaterialization.receipt.archive_sha256 -ceq [string]$candidate.sha256) 'candidate-materialization-archive'
   }
   $base=Read-MIRDirectLibraryStartupProfile -Path $template
+  $ordinaryPlayerConfig=$null
+  if($OrdinaryMenu){$ordinaryPlayerConfig=Get-MIRDirectLibraryOrdinaryPlayerConfigInput -Path $OrdinaryPlayerConfigPath}
   $playerReadyObserver=$null;$selectedActiveModsObserver=$ActiveModsObserver
   if($GraphicalPlayerReady){
     Assert-MIRDirectLibraryStartupMeasurement (-not [string]::IsNullOrWhiteSpace($PlayerReadyObserverArchive)) 'player-ready-observer-required'
@@ -384,6 +570,8 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
           $preparation=@($preparations|Where-Object {$_.label -ceq [string]$kind.label})
           Assert-MIRDirectLibraryStartupMeasurement ($preparation.Count -eq 1) 'player-ready-preparation-selection'
           $record=Invoke-MIRDirectLibraryGraphicalPlayerReadySample -FactorioBin $engine -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot $runRoot -WriteDataRoot $writeDataRoot -PreparedSave $preparedSaves[[string]$kind.label] -PreparedSaveSha256 ([string]$preparation[0].prepared_save_sha256) -Label $kind.label -Resources $resources -MirArchive $kind.archive -TimeoutSeconds $TimeoutSeconds -PlayerReadyBenchmarkTicks $PlayerReadyBenchmarkTicks -ActiveModsObserver $selectedActiveModsObserver
+        } elseif($OrdinaryMenu) {
+          $record=Invoke-MIRDirectLibraryOrdinaryWindowSample -FactorioBin $engine -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot $runRoot -WriteDataRoot $writeDataRoot -Label $kind.label -Resources $resources -MirArchive $kind.archive -TimeoutSeconds $TimeoutSeconds -OrdinaryPlayerConfig $ordinaryPlayerConfig -ActiveModsObserver $selectedActiveModsObserver
         } else {
           $record=Invoke-MIRDirectLibraryStartupSample -FactorioBin $engine -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot $runRoot -WriteDataRoot $writeDataRoot -Label $kind.label -Resources $resources -MirArchive $kind.archive -TimeoutSeconds $TimeoutSeconds -ActiveModsObserver $selectedActiveModsObserver
         }
@@ -399,16 +587,17 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
       $previousSelection=[string]$kind.label
     }
     }
-    $inputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate_423=$(if($hasCandidate){[ordered]@{archive=$candidate;materialization=[ordered]@{archive_path=$candidateMaterialization.path;archive_sha256=$candidateMaterialization.receipt.archive_sha256;receipt_path=$CandidateMaterializationReceiptPath;receipt_sha256=Get-MIRImmutableInputSha256 -Path $CandidateMaterializationReceiptPath;source_version=$candidateMaterialization.receipt.source_version;package_source_sha256=$candidateMaterialization.receipt.package_source_sha256;source_manifest_sha256=$candidateMaterialization.receipt.source_manifest_sha256}}}else{$null})}
-    $endpointClass=if($GraphicalPlayerReady){'graphical-player-ready-diagnostic'}else{'headless-create-diagnostic'}
+    $inputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate_423=$(if($hasCandidate){[ordered]@{archive=$candidate;materialization=[ordered]@{archive_path=$candidateMaterialization.path;archive_sha256=$candidateMaterialization.receipt.archive_sha256;receipt_path=$CandidateMaterializationReceiptPath;receipt_sha256=Get-MIRImmutableInputSha256 -Path $CandidateMaterializationReceiptPath;source_version=$candidateMaterialization.receipt.source_version;package_source_sha256=$candidateMaterialization.receipt.package_source_sha256;source_manifest_sha256=$candidateMaterialization.receipt.source_manifest_sha256}}}else{$null})}
+    $endpointClass=if($GraphicalPlayerReady){'graphical-player-ready-diagnostic'}elseif($OrdinaryMenu){'ordinary-native-window-diagnostic'}else{'headless-create-diagnostic'}
     $notes=@('Elapsed time is native process start-to-exit time recorded by NativeProbeResources.','Peak process values are monitored process-tree samples, not whole-system memory.','Each selected configuration retains one private write-data root across blocks; per-sample logs and saves stay isolated.','Each first sample records its actual prior selection and whether it changed; immediate repeats are marked warm-repeat.','All configurations use the same selected archive library serially; controls are restored after every sample.')
     if($GraphicalPlayerReady){$notes+=@('Each configuration receives one neutral base-only observer save before samples. Preparation processes are recorded separately and are not startup samples.','Graphical process elapsed includes the bounded post-ready benchmark and exit. engine_log_player_ready_seconds is recorded separately from the Factorio log. This diagnostic is not a main-menu readiness or full-startup claim.')}
+    if($OrdinaryMenu){$notes+=@('Each configuration uses a fresh private copy of the same explicit player configuration. Only read-data, write-data, and enable-new-mods=false are changed for custody; graphics, sound, and thread-loading choices remain source-controlled.','The endpoint records a visible native window and seconds from its actual native process start only after its current log records Factorio initialised. Automatic image capture is not attempted because it is not safely bounded in the timed watchdog. This does not prove main-menu render, responsiveness, or interaction; separate visual confirmation is required.')}
     $result=[pscustomobject][ordered]@{schema=1;kind='MIRDirectLibraryStartupMeasurementV1';status='completed';mode=$(if($hasCandidate){'matched-three-input'}else{'preliminary-two-input'});target=$Target;source_observation=$sourceObservation;factorio=$engineIdentity;library=$library;profile_template_sha256=$templateSha;inputs=$inputs;endpoint_class=$endpointClass;preparations=@($preparations);resource_context=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;processes=@($resources.runs)};samples=@($records);library_controls_restored=(-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json')));measurement_notes=$notes}
     Write-MIRNativeProbeResult -Context $resources -Record $result;return $result
   } catch {
     if($null-ne$resources){
-      $failureInputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate_423=$(if($hasCandidate -and $null-ne$candidate){[ordered]@{archive=$candidate;materialization=$candidateMaterialization}}else{$null})}
-      $failure=[pscustomobject][ordered]@{schema=1;kind='MIRDirectLibraryStartupMeasurementV1';status='failed';mode=$(if($hasCandidate){'matched-three-input'}else{'preliminary-two-input'});target=$Target;source_observation=$sourceObservation;factorio=$engineIdentity;library=$library;profile_template_sha256=$templateSha;inputs=$failureInputs;endpoint_class=$(if($GraphicalPlayerReady){'graphical-player-ready-diagnostic'}else{'headless-create-diagnostic'});current_label=$currentLabel;preparations=$(if($null-ne$preparations){@($preparations)}else{@()});samples_so_far=$(if($null-ne$records){@($records)}else{@()});error=$_.Exception.Message;library_controls_restored=(-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json')));resource_context=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;processes=@($resources.runs)}}
+      $failureInputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate_423=$(if($hasCandidate -and $null-ne$candidate){[ordered]@{archive=$candidate;materialization=$candidateMaterialization}}else{$null})}
+      $failure=[pscustomobject][ordered]@{schema=1;kind='MIRDirectLibraryStartupMeasurementV1';status='failed';mode=$(if($hasCandidate){'matched-three-input'}else{'preliminary-two-input'});target=$Target;source_observation=$sourceObservation;factorio=$engineIdentity;library=$library;profile_template_sha256=$templateSha;inputs=$failureInputs;endpoint_class=$(if($GraphicalPlayerReady){'graphical-player-ready-diagnostic'}elseif($OrdinaryMenu){'ordinary-native-window-diagnostic'}else{'headless-create-diagnostic'});current_label=$currentLabel;preparations=$(if($null-ne$preparations){@($preparations)}else{@()});samples_so_far=$(if($null-ne$records){@($records)}else{@()});error=$_.Exception.Message;library_controls_restored=(-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json')));resource_context=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;processes=@($resources.runs)}}
       try{Write-MIRNativeProbeResult -Context $resources -Record $failure}catch{Write-Warning "[mir-direct-startup-failure-receipt] $($_.Exception.Message)"}
     }
     throw
