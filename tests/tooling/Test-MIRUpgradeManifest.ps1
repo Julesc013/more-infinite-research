@@ -210,6 +210,7 @@ $k2Assertions+=2
 . (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
 . (Join-Path $RepoRoot 'tools/lib/compatibility/LibraryActivation.ps1')
+. (Join-Path $RepoRoot 'tools/lib/workspace/RepoPaths.ps1')
 $currentAssertions=0
 $f200BobAngelAssertions=0
 $f210OracleRoot=Join-Path $RepoRoot ('build/tmp/mir423-f210-oracle-control-'+[Guid]::NewGuid().ToString('N'))
@@ -527,6 +528,10 @@ foreach($SelectedTarget in @('f210','f200')){foreach($patch in @(1,2)){
   $currentAssertions++
 }}
 $profile422=Join-Path $RepoRoot 'fixtures/run-profiles/k2-213-imersite-f210-422.json'
+$fixtureRootAuthority=Resolve-MIRRepoPath -RepoRoot $RepoRoot -Id 'fixtures.root'
+if($fixtureRootAuthority.id-cne'fixtures.root'-or$fixtureRootAuthority.relative_path-cne'fixtures'-or$fixtureRootAuthority.alias-or$fixtureRootAuthority.mode-cne'canonical'){
+  throw 'K2 upgrade fixture root authority is not canonical'}
+$fixtureRoot=Join-Path $RepoRoot ([string]$fixtureRootAuthority.relative_path)
 $k2ReaderCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$k2Inputs'-and$n.Right.Extent.Text.StartsWith('Read-MIR421K2UpgradeProfile ')},$true))
 $k2Selectors=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$k2Scenario'},$true))
 $reloadSelectors=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$requiresReloadProof'},$true))
@@ -543,7 +548,10 @@ foreach($patch in @(1,2)){
   Assert-MIR421CurrentUpgradeInputMode @mode
   . ([scriptblock]::Create($k2Selectors[0].Extent.Text));. ([scriptblock]::Create($reloadSelectors[0].Extent.Text))
   if(-not$k2Scenario-or-not$requiresReloadProof){throw 'Current K2 fixture bypassed its scenario or reload path'}
-  $info=Get-Content (Join-Path $RepoRoot ('fixtures/'+$FixtureName+'/info.json')) -Raw|ConvertFrom-Json
+  # The exact transition validator owns FixtureName; fixture bytes are read
+  # through the canonical fixture-root authority, never a package-root path.
+  $fixtureInfoPath=Join-Path (Join-Path $fixtureRoot $FixtureName) 'info.json'
+  $info=Get-Content -LiteralPath $fixtureInfoPath -Raw|ConvertFrom-Json
   if($info.version-cne"0.1.$patch"-or$info.dependencies-cnotcontains"more-infinite-research >= $FromVersion"){throw 'K2 prepared identity or predecessor differs'}
   $result=[ordered]@{};. ([scriptblock]::Create($k2ResultCalls[0].Extent.Text))
   if($result.native_scenario-cne"K2-42$patch-published-4.2.$($patch-1)-to-$SourceVersion"){throw 'K2 result identity differs'}
