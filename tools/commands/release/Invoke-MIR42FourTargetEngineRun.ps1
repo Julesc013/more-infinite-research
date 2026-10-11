@@ -548,8 +548,18 @@ if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPa
   $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $predecessorReaderVersion
   $releaseText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
   if ($LASTEXITCODE -ne 0) { throw '[mir42-engine-maintenance-predecessor-release-readback]' }
+  # The maintained published archives live once in the explicit direct
+  # libraries.  Bind their expected, versioned filenames before the frozen
+  # publication reader verifies bytes; never reconstruct a profile or assume
+  # archives were copied beside the retained manifest fixture.
+  $publishedArchiveBindings = @{}
+  foreach ($target in $targets) {
+    $publishedIdentity = Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion $requestedPredecessorSourceVersion
+    $publishedArchiveBindings[$target] = Join-Path $libraryBindings[$target] ([string]$publishedIdentity.package_name)
+  }
   $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-    -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($releaseText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $predecessorReaderVersion
+    -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($releaseText | ConvertFrom-Json -Depth 100 -DateKind String) `
+    -CandidateSourceVersion $predecessorReaderVersion -ArchiveBindings $publishedArchiveBindings
   foreach ($input in $maintenanceInputs.targets) {
     $target = [string]$input.target
     if ($target -in $script:MIR42ModernEngineTargets -and

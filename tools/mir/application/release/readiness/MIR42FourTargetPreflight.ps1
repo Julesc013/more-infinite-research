@@ -200,7 +200,8 @@ function Get-MIR42PublishedMaintenancePredecessorInputs {
     [Parameter(Mandatory)]$ReleaseMetadata,
     [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$CandidateSourceVersion='4.2.1',
     [AllowEmptyString()][string]$SelectedTarget='',
-    [AllowEmptyString()][string]$SelectedArchivePath='')
+    [AllowEmptyString()][string]$SelectedArchivePath='',
+    [System.Collections.IDictionary]$ArchiveBindings=$null)
   if(([bool]$SelectedTarget)-ne([bool]$SelectedArchivePath)-or
       ($SelectedTarget-and$SelectedTarget-cnotin$script:MIR42FourTargetLines.Keys)){
     throw '[mir42-maintenance-predecessor-selected-input]'
@@ -226,13 +227,36 @@ function Get-MIR42PublishedMaintenancePredecessorInputs {
     throw '[mir42-maintenance-predecessor-remote-source-tag]'
   }
   $root = Split-Path -Parent $pinned.path
+  $archiveBindingsSupplied = $null -ne $ArchiveBindings
+  if ($archiveBindingsSupplied -and $SelectedTarget) {
+    throw '[mir42-maintenance-predecessor-archive-bindings-mode]'
+  }
+  if ($archiveBindingsSupplied) {
+    $publishedTargets = @($published | ForEach-Object { [string]$_.target })
+    $bindingTargets = @($ArchiveBindings.Keys | ForEach-Object { [string]$_ })
+    if ($bindingTargets.Count -ne $publishedTargets.Count -or
+        @($bindingTargets | Where-Object { $_ -cnotin $publishedTargets }).Count -ne 0 -or
+        @($publishedTargets | Where-Object { -not $ArchiveBindings.Contains($_) }).Count -ne 0) {
+      throw '[mir42-maintenance-predecessor-archive-bindings-targets]'
+    }
+  }
   # Selected native work verifies only its supplied archive in place. Release
   # custody retains the default complete nine-archive verification. Both modes
   # authenticate the full frozen manifest, public asset metadata and source tag.
   $selectedPublished=if($SelectedTarget){@($published|Where-Object target -CEQ $SelectedTarget)}else{$published}
   $rows = @(
     foreach ($row in $selectedPublished) {
-      $path = if($SelectedTarget){$SelectedArchivePath}else{Join-Path $root $row.filename}
+      $path = if ($SelectedTarget) {
+        $SelectedArchivePath
+      } elseif ($archiveBindingsSupplied) {
+        $binding = $ArchiveBindings[[string]$row.target]
+        if ($binding -isnot [string] -or [string]::IsNullOrWhiteSpace($binding) -or -not [IO.Path]::IsPathFullyQualified($binding)) {
+          throw ('[mir42-maintenance-predecessor-archive-bindings-path] ' + [string]$row.target)
+        }
+        [IO.Path]::GetFullPath($binding)
+      } else {
+        Join-Path $root $row.filename
+      }
       $input = Get-MIR42FourTargetArchiveInput -RepoRoot $RepoRoot -Target $row.target -Path $path -SourceVersion $contract.source_version
       if ([string]$input.archive.sha256 -cne $row.sha256 -or [int64]$input.archive.bytes -ne $row.bytes -or
           [string]$input.content_sha256 -cne $row.content_sha256 -or [int]$input.entry_count -ne $row.entry_count) {

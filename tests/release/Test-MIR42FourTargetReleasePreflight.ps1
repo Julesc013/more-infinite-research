@@ -68,6 +68,88 @@ try {
   $rejected = $false
   try { Invoke-MIR42FourTargetReleasePreflight -RepoRoot $repo -FinalSourceCommit $head -F210Zip $zips.f210 -F200Zip $zips.f200 -F110Zip $zips.f110 -F100Zip $bad -OutputRoot (Join-Path $root 'bad-result') | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-preflight-package-excluded-entry' }
   Assert-MIR42PreflightTest $rejected 'mir42-preflight-package-excluded-rejected'
+
+  # Exercise the published-reader custody switch without a release API call.
+  # Archive identities remain checked by the real reader; these controlled
+  # inputs prove it accepts only an exact complete direct-library map and keeps
+  # the former adjacent-fixture and single-target modes available.
+  $allZips = @{}
+  foreach ($target in $zips.Keys) { $allZips[$target] = [IO.Path]::GetFullPath($zips[$target]) }
+  foreach ($target in $historicalZips.Keys) { $allZips[$target] = [IO.Path]::GetFullPath($historicalZips[$target]) }
+  $readerRows = @(
+    foreach ($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')) {
+      [pscustomobject]@{target=$target;version=('4.2.'+$target.Substring(1)+'02');filename=('published-'+$target+'.zip');bytes=1;sha256=($target.PadRight(64,'A').Substring(0,64));content_sha256=(('C' * 64) -join '');entry_count=1;github_asset_id=1;github_digest=('sha256:'+($target.PadRight(64,'A').Substring(0,64)).ToLowerInvariant())}
+    }
+  )
+  $adjacent = @{}
+  foreach ($row in $readerRows) { $adjacent[[string]$row.target] = [IO.Path]::GetFullPath((Join-Path $root ([string]$row.filename))) }
+  $readerFunctions = @{}
+  foreach ($name in @('Get-MIR42PublishedMaintenancePredecessorContract','Read-MIR42PublishedMaintenancePredecessorManifest','Assert-MIR42PublishedMaintenancePredecessorMetadata','Get-MIR42FourTargetArchiveInput')) {
+    $readerFunctions[$name] = (Get-Item -LiteralPath ('function:'+$name)).ScriptBlock
+  }
+  $hadGitFunction = Test-Path -LiteralPath 'function:git'
+  if ($hadGitFunction) { $readerFunctions.git = (Get-Item -LiteralPath 'function:git').ScriptBlock }
+  try {
+    $script:readerExpectedPaths = $allZips
+    $script:readerAdjacentPaths = $adjacent
+    $script:readerRows = $readerRows
+    Set-Item -LiteralPath function:Get-MIR42PublishedMaintenancePredecessorContract -Value {
+      param($CandidateSourceVersion)
+      [pscustomobject]@{source_tag='v4.2.2';source_version='4.2.2'}
+    }
+    Set-Item -LiteralPath function:Read-MIR42PublishedMaintenancePredecessorManifest -Value {
+      param($ManifestPath,$CandidateSourceVersion)
+      [pscustomobject]@{path=$ManifestPath;sha256=(('D' * 64) -join '');bytes=1;manifest=[pscustomobject]@{source=[pscustomobject]@{commit=(('A' * 40) -join '');tree=(('B' * 40) -join '')}}}
+    }
+    Set-Item -LiteralPath function:Assert-MIR42PublishedMaintenancePredecessorMetadata -Value {
+      param($PinnedManifest,$ReleaseMetadata,$CandidateSourceVersion)
+      return @($script:readerRows)
+    }
+    Set-Item -LiteralPath function:Get-MIR42FourTargetArchiveInput -Value {
+      param($RepoRoot,$Target,$Path,$SourceVersion)
+      $full = [IO.Path]::GetFullPath($Path)
+      $expected = @($script:readerExpectedPaths[[string]$Target],$script:readerAdjacentPaths[[string]$Target])
+      $row = @($script:readerRows | Where-Object { [string]$_.target -ceq $Target })[0]
+      $valid = $expected -contains $full
+      [pscustomobject]@{archive=[pscustomobject]@{path=$full;sha256=$(if($valid){[string]$row.sha256}else{(('E' * 64) -join '')});bytes=$(if($valid){1}else{2})};content_sha256=$(if($valid){(('C' * 64) -join '')}else{(('F' * 64) -join '')});entry_count=1}
+    }
+    Set-Item -LiteralPath function:git -Value {
+      param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Arguments)
+      $joined = $Arguments -join ' '
+      $global:LASTEXITCODE = 0
+      if ($joined -match 'ls-remote') { return @(((('C' * 40) -join '')+"`trefs/tags/v4.2.2"),((('A' * 40) -join '')+"`trefs/tags/v4.2.2^{}")) }
+      if ($joined.Contains('^{tree}')) { return (('B' * 40) -join '') }
+      if ($joined.Contains('^{}')) { return (('A' * 40) -join '') }
+      return (('C' * 40) -join '')
+    }
+    $readerManifest = Join-Path $root 'frozen-published.json'
+    $direct = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $readerManifest -ReleaseMetadata ([pscustomobject]@{id=1}) -CandidateSourceVersion '4.2.3' -ArchiveBindings $allZips
+    Assert-MIR42PreflightTest ((@($direct.targets.target) -join '|') -ceq 'f210|f200|f110|f100|f017|f016|f015|f014|f013') 'mir42-preflight-direct-library-bindings-complete'
+    Assert-MIR42PreflightTest (@($direct.targets | Where-Object { [string]$_.path -cne [string]$allZips[[string]$_.target] }).Count -eq 0) 'mir42-preflight-direct-library-bindings-paths'
+    $adjacentResult = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $readerManifest -ReleaseMetadata ([pscustomobject]@{id=1}) -CandidateSourceVersion '4.2.3'
+    Assert-MIR42PreflightTest (@($adjacentResult.targets | Where-Object { [string]$_.path -cne [string]$adjacent[[string]$_.target] }).Count -eq 0) 'mir42-preflight-adjacent-custody-retained'
+    $selectedResult = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $readerManifest -ReleaseMetadata ([pscustomobject]@{id=1}) -CandidateSourceVersion '4.2.3' -SelectedTarget f210 -SelectedArchivePath $allZips.f210
+    Assert-MIR42PreflightTest (@($selectedResult.targets).Count -eq 1 -and [string]$selectedResult.targets[0].path -ceq [string]$allZips.f210) 'mir42-preflight-selected-custody-retained'
+    foreach ($case in @('partial','extra','wrong','relative')) {
+      $bindings = @{}
+      foreach ($target in $allZips.Keys) { $bindings[$target] = $allZips[$target] }
+      $code = switch ($case) {
+        'partial' { $bindings = @{f210=$allZips.f210}; 'mir42-maintenance-predecessor-archive-bindings-targets' }
+        'extra' { $bindings.f999 = $allZips.f210; 'mir42-maintenance-predecessor-archive-bindings-targets' }
+        'wrong' { $bindings.f200 = $allZips.f210; 'mir42-maintenance-predecessor-local-custody' }
+        'relative' { $bindings.f200 = 'published-f200.zip'; 'mir42-maintenance-predecessor-archive-bindings-path' }
+      }
+      $rejected = $false
+      try { Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $readerManifest -ReleaseMetadata ([pscustomobject]@{id=1}) -CandidateSourceVersion '4.2.3' -ArchiveBindings $bindings | Out-Null } catch { $rejected = $_.Exception.Message -match $code }
+      Assert-MIR42PreflightTest $rejected ('mir42-preflight-direct-library-'+$case+'-rejected')
+    }
+    $rejected = $false
+    try { Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $readerManifest -ReleaseMetadata ([pscustomobject]@{id=1}) -CandidateSourceVersion '4.2.3' -SelectedTarget f210 -SelectedArchivePath $allZips.f210 -ArchiveBindings $allZips | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-maintenance-predecessor-archive-bindings-mode' }
+    Assert-MIR42PreflightTest $rejected 'mir42-preflight-direct-library-mixed-mode-rejected'
+  } finally {
+    foreach ($name in @('Get-MIR42PublishedMaintenancePredecessorContract','Read-MIR42PublishedMaintenancePredecessorManifest','Assert-MIR42PublishedMaintenancePredecessorMetadata','Get-MIR42FourTargetArchiveInput')) { Set-Item -LiteralPath ('function:'+$name) -Value $readerFunctions[$name] }
+    if ($hadGitFunction) { Set-Item -LiteralPath function:git -Value $readerFunctions.git } else { Remove-Item -LiteralPath function:git -ErrorAction SilentlyContinue }
+  }
   Write-Host '[ok] MIR 4.2 nine-target preflight binds exact archive inputs and keeps all qualification and release gates closed.'
 } finally {
   if (Test-Path -LiteralPath $root) {

@@ -28,6 +28,7 @@ param(
   [string]$MaintainerAuthorizationPath = '',
   [string]$MainReadbackPath = '',
   [string]$PublishedMaintenancePredecessorManifestPath = '',
+  [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null,
   [string]$MaintenanceUpgradeEvidencePath = '',
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 )
@@ -47,7 +48,7 @@ switch ($Mode) {
       -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
       -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath `
       -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
-      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath -ProgrammePath $ProgrammePath -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
+      -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -OfflineRestoreDrillPath $OfflineRestoreDrillPath -ProgrammePath $ProgrammePath -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath -PublishedMaintenanceArchiveBindings $PublishedMaintenanceArchiveBindings
     Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -TechnicalSealPath $TechnicalSealPath `
       -PromotionPlan $promotion -MaintenanceUpgradeEvidencePath $MaintenanceUpgradeEvidencePath -SourceVersion $SourceVersion -ReleaseTag $ReleaseTag -AssetRoot $AssetRoot -OutputPath $OutputPath | ConvertTo-Json -Depth 50
   }

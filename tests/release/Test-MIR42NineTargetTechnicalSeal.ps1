@@ -90,6 +90,16 @@ function Test-MIR42MaintenanceSealConsumption {
     SourceFreezeAuthorityPath='unread-control.json';ReviewerAttestationPath='unread-control.json'
     SshKeygenPath='unread-control.exe';PublishedMaintenancePredecessorManifestPath='unread-published-control.json'
   }
+  $archiveBindings = @{f210='C:\\synthetic-nonrelease\\more-infinite-research_4.2.21002.zip'}
+  $unscopedArguments = @{}; foreach ($key in $arguments.Keys) { $unscopedArguments[$key] = $arguments[$key] }
+  $null = $unscopedArguments.Remove('PublishedMaintenancePredecessorManifestPath')
+  $unscopedArguments.PublishedMaintenanceArchiveBindings = $archiveBindings
+  $failure='';try { Get-MIR42PromotionTechnicalSealReadiness -RequiredScope nine-target @unscopedArguments | Out-Null } catch { $failure=$_.Exception.Message }
+  Assert-MIR42NineSealTest -Condition ($failure -ceq '[mir42-maintenance-promotion-archive-bindings-scope]') -Code 'maintenance-promotion-refuses-unscoped-archive-bindings'
+  $failure='';try { New-MIR42FourTargetRealEngineEvidenceBinder -RepoRoot $RepoRoot -CandidateManifestPath 'absent-maintenance-control.json' -EvidenceReconciliationPath 'unread-control.json' -EngineRunPath 'unread-control.json' -OutputPath 'unwritten-control.json' -PublishedMaintenanceArchiveBindings $archiveBindings | Out-Null } catch { $failure=$_.Exception.Message }
+  Assert-MIR42NineSealTest -Condition ($failure -ceq '[mir42-engine-evidence-maintenance-archive-bindings-scope]') -Code 'maintenance-engine-evidence-refuses-unscoped-archive-bindings'
+  $failure='';try { New-MIR42NineTargetJoinedRealEngineCampaign -RepoRoot $RepoRoot -CandidateManifestPath 'absent-maintenance-control.json' -EvidenceReconciliationPath 'unread-control.json' -EngineEvidencePath 'unread-control.json' -CriterionEvidencePaths @('unread-control.json') -OutputPath 'unwritten-control.json' -PublishedMaintenanceArchiveBindings $archiveBindings | Out-Null } catch { $failure=$_.Exception.Message }
+  Assert-MIR42NineSealTest -Condition ($failure -ceq '[mir42-joined-campaign-maintenance-archive-bindings-scope]') -Code 'maintenance-joined-campaign-refuses-unscoped-archive-bindings'
   # Missing candidate admission prevents all network, engine, signing and
   # promotion execution. The specific maintenance blocker proves propagation.
   $readiness = Get-MIR42PromotionTechnicalSealReadiness -RequiredScope nine-target @arguments

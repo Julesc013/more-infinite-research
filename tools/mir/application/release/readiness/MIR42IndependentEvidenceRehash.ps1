@@ -249,7 +249,8 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-independent-maintenance-release-readback]' }
     $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion ([string]$versionContract.source_version)
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) `
+      -CandidateSourceVersion ([string]$versionContract.source_version) -ArchiveBindings $PredecessorZips
     if ($qualification.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor') {
       throw '[mir42-independent-maintenance-custody-missing]'
     }

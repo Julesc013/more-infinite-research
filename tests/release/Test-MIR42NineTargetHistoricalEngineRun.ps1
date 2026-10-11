@@ -192,14 +192,21 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     Check ($maintenanceNode.Count-eq1) 'maintenance input call site is ambiguous.'
     function gh {param($Verb,$Route);$script:observedReleaseRoute=$Route;$global:LASTEXITCODE=0;return '{}'}
     function Get-MIR42PublishedMaintenancePredecessorInputs {
-      param($RepoRoot,$ManifestPath,$ReleaseMetadata,$CandidateSourceVersion)
+      param($RepoRoot,$ManifestPath,$ReleaseMetadata,$CandidateSourceVersion,$ArchiveBindings)
       $script:observedCustodySource=$CandidateSourceVersion
       Check ($ManifestPath-ceq'controlled-published.json') 'joined runner dropped the supplied manifest.'
+      Check ($ArchiveBindings -is [Collections.IDictionary] -and $ArchiveBindings.Count -eq $targets.Count) 'joined runner omitted complete explicit direct-library custody.'
+      foreach($id in $targets){
+        $version='4.2.'+$id.Substring(1)+'0'+(([version]$CandidateSourceVersion).Build-1)
+        $expected=[IO.Path]::GetFullPath((Join-Path $sourceRoot ('more-infinite-research_'+$version+'.zip')))
+        Check ([IO.Path]::GetFullPath([string]$ArchiveBindings[$id])-ceq$expected) "$id did not bind the expected published archive in its explicit library."
+      }
       return [pscustomobject]@{targets=@($selected.Keys|ForEach-Object {[pscustomobject]@{target=$_;path=$selected[$_].predecessor;version=('4.2.'+$_.Substring(1)+'0'+(([version]$CandidateSourceVersion).Build-1))}})}
     }
     try{
       $PublishedMaintenancePredecessorManifestPath='controlled-published.json';$isNineTargetCandidate=$true
       $script:MIR42ModernEngineTargets=@('f210','f200','f110','f100')
+      $targets=@($rows.Keys);$libraryBindings=@{};foreach($id in $targets){$libraryBindings[$id]=$sourceRoot}
       # Legacy maintenance candidates keep their immediate predecessor.  A
       # 423 candidate must also select each retained 420/421/422 publication.
       foreach($sourceVersion in @('4.2.1','4.2.2')){

@@ -1447,9 +1447,13 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
     [Parameter(Mandatory)][string]$EvidenceReconciliationPath,
     [Parameter(Mandatory)][string]$EngineRunPath,
     [Parameter(Mandatory)][string]$OutputPath,
-    [string]$PublishedMaintenancePredecessorManifestPath = ''
+    [string]$PublishedMaintenancePredecessorManifestPath = '',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  if ($null -ne $PublishedMaintenanceArchiveBindings -and [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
+    throw '[mir42-engine-evidence-maintenance-archive-bindings-scope]'
+  }
   $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   $scope = Get-MIR42SealCandidateScope -Candidate $candidate -Code 'mir42-engine-evidence-candidate'
   $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
@@ -1459,8 +1463,10 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
     $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contract.maintenance_source_version
     $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-engine-evidence-maintenance-release-readback]' }
-    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $contract.maintenance_source_version
+    $maintenanceArguments = @{RepoRoot=$repo;ManifestPath=$PublishedMaintenancePredecessorManifestPath
+      ReleaseMetadata=($metadataText | ConvertFrom-Json -Depth 100 -DateKind String);CandidateSourceVersion=$contract.maintenance_source_version}
+    if ($null -ne $PublishedMaintenanceArchiveBindings) { $maintenanceArguments.ArchiveBindings = $PublishedMaintenanceArchiveBindings }
+    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs @maintenanceArguments
   }
   $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate -PublishedMaintenanceInputs $maintenanceInputs
   $engineInput = Read-MIR42SealRecord -Path $EngineRunPath -Code 'mir42-engine-evidence-engine-run'
@@ -1533,10 +1539,14 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
     [Parameter(Mandatory)][string]$EngineEvidencePath,
     [Parameter(Mandatory)][string[]]$CriterionEvidencePaths,
     [Parameter(Mandatory)][string]$OutputPath,
-    [string]$PublishedMaintenancePredecessorManifestPath = ''
+    [string]$PublishedMaintenancePredecessorManifestPath = '',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  if ($null -ne $PublishedMaintenanceArchiveBindings -and [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
+    throw '[mir42-joined-campaign-maintenance-archive-bindings-scope]'
+  }
   $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   Assert-MIR42SealTargetSet -Rows @($candidate.targets) -Scope 'nine-target' -Code 'mir42-joined-campaign-candidate'
   $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
@@ -1546,8 +1556,10 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
     $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contract.maintenance_source_version
     $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-joined-campaign-maintenance-release-readback]' }
-    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $contract.maintenance_source_version
+    $maintenanceArguments = @{RepoRoot=$repo;ManifestPath=$PublishedMaintenancePredecessorManifestPath
+      ReleaseMetadata=($metadataText | ConvertFrom-Json -Depth 100 -DateKind String);CandidateSourceVersion=$contract.maintenance_source_version}
+    if ($null -ne $PublishedMaintenanceArchiveBindings) { $maintenanceArguments.ArchiveBindings = $PublishedMaintenanceArchiveBindings }
+    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs @maintenanceArguments
   }
   $reconciliation = Get-MIR42ExactQualificationReceipt -Path $EvidenceReconciliationPath -Candidate $candidate -PublishedMaintenanceInputs $maintenanceInputs
   $binder = Read-MIR42SealRecord -Path $EngineEvidencePath -Code 'mir42-joined-campaign-engine-evidence'
@@ -2396,9 +2408,11 @@ function Get-MIR42TechnicalSealReadinessForScope {
     [string]$ReviewerAttestationPath='',
     [string]$SshKeygenPath='',
     [string]$ProgrammePath='',
-    [string]$PublishedMaintenancePredecessorManifestPath=''
+    [string]$PublishedMaintenancePredecessorManifestPath='',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings=$null
   )
   $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
+  if ($null -ne $PublishedMaintenanceArchiveBindings -and -not $maintenanceRequested) { throw '[mir42-maintenance-readiness-archive-bindings-scope]' }
   if ($maintenanceRequested -and $RequiredScope -cne 'nine-target') { throw '[mir42-maintenance-readiness-candidate-scope]' }
   $maintenanceInputs = $null
   $contract = Get-MIR42SealScopeContract -Scope $RequiredScope
@@ -2418,7 +2432,10 @@ function Get-MIR42TechnicalSealReadinessForScope {
         $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contract.maintenance_source_version
         $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
         if ($LASTEXITCODE -ne 0) { throw '[mir42-maintenance-readiness-release-readback]' }
-        $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $contract.maintenance_source_version
+        $maintenanceArguments = @{RepoRoot=$repo;ManifestPath=$PublishedMaintenancePredecessorManifestPath
+          ReleaseMetadata=($metadataText | ConvertFrom-Json -Depth 100 -DateKind String);CandidateSourceVersion=$contract.maintenance_source_version}
+        if ($null -ne $PublishedMaintenanceArchiveBindings) { $maintenanceArguments.ArchiveBindings = $PublishedMaintenanceArchiveBindings }
+        $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs @maintenanceArguments
         $state.maintenance_inputs = $maintenanceInputs
         $checks.maintenance_predecessor = $true
       } catch { $checks.maintenance_predecessor = $false; $blockers.Add($_.Exception.Message) }
@@ -2508,7 +2525,8 @@ function Get-MIR42NineTargetTechnicalSealReadiness {
     [string]$ReviewerAttestationPath='',
     [string]$SshKeygenPath='',
     [string]$ProgrammePath='',
-    [string]$PublishedMaintenancePredecessorManifestPath=''
+    [string]$PublishedMaintenancePredecessorManifestPath='',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings=$null
   )
   Get-MIR42TechnicalSealReadinessForScope @PSBoundParameters -RequiredScope 'nine-target'
 }
@@ -2556,6 +2574,7 @@ function New-MIR42NineTargetTechnicalSeal {
     [AllowEmptyString()][string]$SshKeygenPath='',
     [AllowEmptyString()][string]$ProgrammePath='',
     [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath='',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings=$null,
     [Parameter(Mandatory)][string]$OutputPath
   )
   New-MIR42TechnicalSealForScope @PSBoundParameters -RequiredScope 'nine-target'
@@ -2569,7 +2588,8 @@ function New-MIR42NineTargetRealEngineEvidenceBinder {
     [Parameter(Mandatory)][string]$EvidenceReconciliationPath,
     [Parameter(Mandatory)][string]$EngineRunPath,
     [Parameter(Mandatory)][string]$OutputPath,
-    [string]$PublishedMaintenancePredecessorManifestPath = ''
+    [string]$PublishedMaintenancePredecessorManifestPath = '',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null
   )
   $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath
   Assert-MIR42SealTargetSet -Rows @($candidate.targets) -Scope 'nine-target' -Code 'mir42-nine-target-engine-evidence-candidate'
@@ -2597,13 +2617,14 @@ function New-MIR42TechnicalSealForScope {
     [AllowEmptyString()][string]$SshKeygenPath='',
     [AllowEmptyString()][string]$ProgrammePath='',
     [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath='',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings=$null,
     [Parameter(Mandatory)][string]$OutputPath
   )
   $readiness = Get-MIR42TechnicalSealReadinessForScope -RequiredScope $RequiredScope -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
     -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
     -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath `
-    -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
+    -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath -PublishedMaintenanceArchiveBindings $PublishedMaintenanceArchiveBindings
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-seal-not-authorized] $($readiness.blockers -join '; ')" }
   $state = $readiness._state
   $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)

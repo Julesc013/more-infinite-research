@@ -512,6 +512,37 @@ function Assert-MIR42MaintenanceReconciliationScope {
   }
 }
 
+function Assert-MIR42MaintenanceArchiveBindingEquality {
+  param(
+    [Parameter(Mandatory)][hashtable]$PredecessorZips,
+    [Parameter(Mandatory)][System.Collections.IDictionary]$ArchiveBindings,
+    [Parameter(Mandatory)][string[]]$Targets
+  )
+
+  $providedTargets = @($ArchiveBindings.Keys | ForEach-Object { [string]$_ })
+  if ($providedTargets.Count -ne $Targets.Count -or
+      @($providedTargets | Where-Object { $_ -cnotin $Targets }).Count -ne 0 -or
+      @($Targets | Where-Object { -not $ArchiveBindings.Contains($_) }).Count -ne 0) {
+    throw '[mir42-reconciliation-maintenance-archive-bindings]'
+  }
+  foreach ($target in $Targets) {
+    $expected = [string]$PredecessorZips[$target]
+    $provided = $ArchiveBindings[$target]
+    if ($provided -isnot [string] -or [string]::IsNullOrWhiteSpace($expected) -or [string]::IsNullOrWhiteSpace($provided)) {
+      throw '[mir42-reconciliation-maintenance-archive-bindings]'
+    }
+    try {
+      $expectedPath = [IO.Path]::GetFullPath($expected)
+      $providedPath = [IO.Path]::GetFullPath($provided)
+    } catch {
+      throw '[mir42-reconciliation-maintenance-archive-bindings]'
+    }
+    if (-not $expectedPath.Equals($providedPath,[StringComparison]::OrdinalIgnoreCase)) {
+      throw '[mir42-reconciliation-maintenance-archive-bindings]'
+    }
+  }
+}
+
 function Invoke-MIR42EvidenceReconciliationShared {
   [CmdletBinding()]
   param(
@@ -521,7 +552,8 @@ function Invoke-MIR42EvidenceReconciliationShared {
     [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
     [Parameter(Mandatory)][string]$OutputRoot,
     [ValidateSet('four-target','nine-target')][string]$RequiredScope,
-    [string]$PublishedMaintenancePredecessorManifestPath = ''
+    [string]$PublishedMaintenancePredecessorManifestPath = '',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -542,14 +574,24 @@ function Invoke-MIR42EvidenceReconciliationShared {
     throw '[mir42-reconciliation-input-target-set]'
   }
   $maintenanceInputs = $null
-  if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
+  $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
+  if ($null -ne $PublishedMaintenanceArchiveBindings -and -not $maintenanceRequested) {
+    throw '[mir42-reconciliation-maintenance-archive-bindings-scope]'
+  }
+  if ($maintenanceRequested) {
     Assert-MIR42MaintenanceReconciliationScope -Scope $scope -Candidates $candidates
     $maintenanceSourceVersion = [string]$candidates[0].identity.source_version
     $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $maintenanceSourceVersion
     $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-reconciliation-maintenance-release-readback]' }
+    $archiveBindings = $PredecessorZips
+    if ($null -ne $PublishedMaintenanceArchiveBindings) {
+      Assert-MIR42MaintenanceArchiveBindingEquality -PredecessorZips $PredecessorZips -ArchiveBindings $PublishedMaintenanceArchiveBindings -Targets @($contract.targets)
+      $archiveBindings = $PublishedMaintenanceArchiveBindings
+    }
     $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $maintenanceSourceVersion
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) `
+      -CandidateSourceVersion $maintenanceSourceVersion -ArchiveBindings $archiveBindings
   }
   $output = Assert-MIR42QualificationOutputRoot -RepoRoot $repo -OutputRoot $OutputRoot
 
@@ -674,13 +716,14 @@ function Invoke-MIR42NineTargetEvidenceReconciliation {
     [Parameter(Mandatory)][hashtable]$PredecessorZips,
     [Parameter(Mandatory)][hashtable]$UpgradeReceipts,
     [Parameter(Mandatory)][string]$OutputRoot,
-    [string]$PublishedMaintenancePredecessorManifestPath = ''
+    [string]$PublishedMaintenancePredecessorManifestPath = '',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null
   )
   $manifest = Read-MIR42QualificationBootstrapRecord -Path $CandidateManifestPath -Code 'mir42-reconciliation-entrypoint-candidate'
   if ((Get-MIR42QualificationTargetScope -Rows @($manifest.targets) -Code 'mir42-reconciliation-entrypoint') -cne 'nine-target') {
     throw '[mir42-reconciliation-entrypoint-target-scope]'
   }
-  return Invoke-MIR42EvidenceReconciliationShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -RequiredScope 'nine-target' -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
+  return Invoke-MIR42EvidenceReconciliationShared -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -RequiredScope 'nine-target' -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath -PublishedMaintenanceArchiveBindings $PublishedMaintenanceArchiveBindings
 }
 
 $script:MIR42ReleaseAcceptanceCriteria = @(
@@ -836,10 +879,14 @@ function New-MIR42NineTargetCriterionEvidence {
     [Parameter(Mandatory)][string]$Claim,
     [Parameter(Mandatory)][string]$KnownLimitations,
     [Parameter(Mandatory)][string]$OutputPath,
-    [string]$PublishedMaintenancePredecessorManifestPath = ''
+    [string]$PublishedMaintenancePredecessorManifestPath = '',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
+  if ($null -ne $PublishedMaintenanceArchiveBindings -and -not $maintenanceRequested) {
+    throw '[mir42-criterion-maintenance-archive-bindings-scope]'
+  }
   $null = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:$maintenanceRequested
   $candidateRows = Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$candidateRows[0].scope -cne 'nine-target') { throw '[mir42-criterion-evidence-candidate-scope]' }
@@ -851,8 +898,10 @@ function New-MIR42NineTargetCriterionEvidence {
     $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $maintenanceSourceVersion
     $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-criterion-maintenance-release-readback]' }
-    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $PublishedMaintenancePredecessorManifestPath `
-      -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $maintenanceSourceVersion
+    $maintenanceArguments = @{RepoRoot=$repo;ManifestPath=$PublishedMaintenancePredecessorManifestPath
+      ReleaseMetadata=($metadataText | ConvertFrom-Json -Depth 100 -DateKind String);CandidateSourceVersion=$maintenanceSourceVersion}
+    if ($null -ne $PublishedMaintenanceArchiveBindings) { $maintenanceArguments.ArchiveBindings = $PublishedMaintenanceArchiveBindings }
+    $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs @maintenanceArguments
   }
   $candidate = [pscustomobject][ordered]@{
     source = [pscustomobject][ordered]@{

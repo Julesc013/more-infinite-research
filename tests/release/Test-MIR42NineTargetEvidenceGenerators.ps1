@@ -223,7 +223,35 @@ $nineCommand = Get-Command Invoke-MIR42NineTargetEvidenceReconciliation -Command
 $fourRehash = Get-Command Invoke-MIR42FourTargetIndependentEvidenceRehash -CommandType Function
 $nineRehash = Get-Command Invoke-MIR42NineTargetIndependentEvidenceRehash -CommandType Function
 Assert-MIR42NineGeneratorTest -Condition ($fourCommand.Parameters.Keys -contains 'F210PredecessorZip' -and $fourCommand.Parameters.Keys -contains 'F100UpgradeReceipt' -and $fourRehash.Parameters.Keys -contains 'F210PredecessorZip') -Code 'four-positional-contract-preserved'
-Assert-MIR42NineGeneratorTest -Condition ($nineCommand.Parameters.Keys -contains 'PredecessorZips' -and $nineCommand.Parameters.Keys -contains 'UpgradeReceipts' -and $nineRehash.Parameters.Keys -contains 'PredecessorZips' -and $nineRehash.Parameters.Keys -contains 'UpgradeReceipts' -and $nineCommand.Parameters.Keys -notcontains 'F210PredecessorZip') -Code 'nine-keyed-input-contract'
+Assert-MIR42NineGeneratorTest -Condition ($nineCommand.Parameters.Keys -contains 'PredecessorZips' -and $nineCommand.Parameters.Keys -contains 'UpgradeReceipts' -and $nineCommand.Parameters.Keys -contains 'PublishedMaintenanceArchiveBindings' -and $nineRehash.Parameters.Keys -contains 'PredecessorZips' -and $nineRehash.Parameters.Keys -contains 'UpgradeReceipts' -and $nineCommand.Parameters.Keys -notcontains 'F210PredecessorZip') -Code 'nine-keyed-input-contract'
+$directArchiveBindings = @{}
+foreach ($target in $script:MIR42QualificationNineTargets) { $directArchiveBindings[$target] = [IO.Path]::GetFullPath((Join-Path $repo ('build/test-results/' + $target + '.zip'))) }
+Assert-MIR42MaintenanceArchiveBindingEquality -PredecessorZips $directArchiveBindings -ArchiveBindings $directArchiveBindings -Targets $script:MIR42QualificationNineTargets
+$mismatchedArchiveBindings = @{}
+foreach ($target in $script:MIR42QualificationNineTargets) { $mismatchedArchiveBindings[$target] = $directArchiveBindings[$target] }
+$mismatchedArchiveBindings.f200 = $directArchiveBindings.f210
+$rejected = $false
+try { Assert-MIR42MaintenanceArchiveBindingEquality -PredecessorZips $directArchiveBindings -ArchiveBindings $mismatchedArchiveBindings -Targets $script:MIR42QualificationNineTargets } catch { $rejected = $_.Exception.Message -ceq '[mir42-reconciliation-maintenance-archive-bindings]' }
+Assert-MIR42NineGeneratorTest -Condition $rejected -Code 'maintenance-direct-library-binding-mismatch-refused'
+$originalReadCandidate = (Get-Item -LiteralPath Function:Read-MIR42QualificationBootstrapRecord).ScriptBlock
+$originalSharedReconciliation = (Get-Item -LiteralPath Function:Invoke-MIR42EvidenceReconciliationShared).ScriptBlock
+try {
+  $script:capturedPublishedMaintenanceArchiveBindings = $null
+  Set-Item -LiteralPath Function:Read-MIR42QualificationBootstrapRecord -Value {
+    param($Path,$Code)
+    [pscustomobject]@{targets=@($script:MIR42QualificationNineTargets | ForEach-Object { [pscustomobject]@{target=$_} })}
+  }
+  Set-Item -LiteralPath Function:Invoke-MIR42EvidenceReconciliationShared -Value {
+    param($RepoRoot,$CandidateManifestPath,$PredecessorZips,$UpgradeReceipts,$OutputRoot,$RequiredScope,$PublishedMaintenancePredecessorManifestPath,$PublishedMaintenanceArchiveBindings)
+    $script:capturedPublishedMaintenanceArchiveBindings = $PublishedMaintenanceArchiveBindings
+    [pscustomobject]@{status='controlled'}
+  }
+  $null = Invoke-MIR42NineTargetEvidenceReconciliation -RepoRoot $repo -CandidateManifestPath 'controlled.json' -PredecessorZips $directArchiveBindings -UpgradeReceipts $directArchiveBindings -OutputRoot (Join-Path $repo 'build/test-results/controlled') -PublishedMaintenancePredecessorManifestPath 'controlled-published.json' -PublishedMaintenanceArchiveBindings $directArchiveBindings
+  Assert-MIR42NineGeneratorTest -Condition ($script:capturedPublishedMaintenanceArchiveBindings -is [System.Collections.IDictionary] -and $script:capturedPublishedMaintenanceArchiveBindings.Count -eq $directArchiveBindings.Count) -Code 'maintenance-direct-library-binding-forwarded'
+} finally {
+  Set-Item -LiteralPath Function:Read-MIR42QualificationBootstrapRecord -Value $originalReadCandidate
+  Set-Item -LiteralPath Function:Invoke-MIR42EvidenceReconciliationShared -Value $originalSharedReconciliation
+}
 $baseEvidence = (@(& git -C $repo show '8835c01b82c26cfb7634e1727e33903c9c6a39d7:tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1') -join "`n")
 if ($LASTEXITCODE -ne 0) { throw '[mir42-nine-generator-baseline-evidence]' }
 $baseIndependent = (@(& git -C $repo show '8835c01b82c26cfb7634e1727e33903c9c6a39d7:tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1') -join "`n")
