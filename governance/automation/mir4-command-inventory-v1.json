@@ -3307,9 +3307,9 @@
     {
       "path": "tools/commands/technology/Export-MIRCompilerPreview.ps1",
       "classification": "canonical-internal",
-      "sha256": "470C8C0D8199B9D1F621D106E04412B074F023CA6F209C6EDCE05966215AEDD0",
+      "sha256": "32479B0B8DA165EC1840C759AD9EC46367AF1B64F0DC666FB6C9DB48C4244B0F",
       "hash_mode": "canonical-text-v1",
-      "lines": 204,
+      "lines": 223,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8deb7f431ea70a372cb13cad57a8186846d7ae9c8855a3121e2f27091d77ecfa"
+  "digest": "sha256:0f0e2d54cd887f23844b323e403a2b727cf2bbc7653791f8fa92374000c218bc"
 }

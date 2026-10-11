@@ -6,6 +6,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Pat
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
 $root = Join-Path ([IO.Path]::GetTempPath()) ("mir-compiler-preview-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $root | Out-Null
 
@@ -45,6 +46,12 @@ try {
       @($summary.public_artifact_budgets | Where-Object status -eq "pass").Count -ne 4 -or
       [string]::IsNullOrWhiteSpace([string]$summary.summary_sha256)) {
     throw "Compiler PREVIEW JSON summary is incomplete or incorrect."
+  }
+  $reviewRequired = @($summary.ambiguous_cases | Where-Object candidate_id -ceq "beta")
+  $rejected = @($summary.rejected_designs | Where-Object candidate_id -ceq "gamma")
+  if ($reviewRequired.Count -ne 1 -or [string]$reviewRequired[0].reasons -cne "ambiguous-membership" -or
+      $rejected.Count -ne 1 -or [string]$rejected[0].reasons -cne "hard-gate-failed") {
+    throw "Compiler PREVIEW does not preserve optional review and rejection reason fields."
   }
   foreach ($heading in @("Selected decisions", "Ambiguous or review-required cases", "Rejected designs", "Ecosystem-dependent provider decisions", "Public artifact budgets")) {
     if (-not $markdown.Contains($heading)) { throw "Compiler PREVIEW Markdown omits: $heading" }
