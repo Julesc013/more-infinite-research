@@ -8,7 +8,7 @@ function New-MIR421ReleaseAssetCustodyFixture {
   $pinPath=switch($CandidateSourceVersion){
     '4.2.1' {'fixtures/release-inputs/mir421-published-420-manifest.json'}
     '4.2.2' {'fixtures/release-inputs/mir422-published-421-manifest.json'}
-    '4.2.3' {'dist/release-4.2.2/assets/mir-4.2.2.release.json'}
+    '4.2.3' {'fixtures/release-inputs/mir423-published-422-manifest.json'}
   }
   $pin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $RepoRoot $pinPath) -CandidateSourceVersion $CandidateSourceVersion
   return [pscustomobject][ordered]@{

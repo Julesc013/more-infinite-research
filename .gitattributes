@@ -5,6 +5,8 @@
 fixtures/release-inputs/mir421-published-420-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Preserve the exact published 4.2.1 receipt bytes for 4.2.2 predecessor custody.
 fixtures/release-inputs/mir422-published-421-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the exact published 4.2.2 receipt bytes for 4.2.3 predecessor custody.
+fixtures/release-inputs/mir423-published-422-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 .mir/evidence/**/*.md text eol=lf
 .mir/evidence/**/*.txt text eol=lf

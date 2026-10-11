@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "kind": "MIR42FinalReleaseManifestV1",
+  "acceptance_record_kind": "MIR422FreshEmergencyAcceptanceV1",
+  "status": "emergency-accepted-with-disclosed-qualification-gaps",
+  "source_tag": "v4.2.2",
+  "source_version": "4.2.2",
+  "source": {
+    "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+    "tree": "a4364a9268352f690c0d4b5670870d818c3312e6"
+  },
+  "built_from_dev_commit": "2ec7790d21870d9d276c5e5c36510bf06c1e82f3",
+  "frozen_development_commit": "a460aca98bfd0b55795c5645283442819b4fb26f",
+  "promotion_candidate_commit": "9a711be341d85531b66c1500ade43d5c41ccecae",
+  "promotion_pull_request": "https://github.com/Julesc013/more-infinite-research/pull/624",
+  "package_source_sha256": "7DE5C203AC29CACB4B41AEEAF86C462C3B5005F05F177B161C6D7F01CAF379BB",
+  "candidate_manifest_sha256": "781A6B5ADE855EC1EF96A74BD94E4C9A17EA0EE54A4EBFEA6785D69000F8CCAE",
+  "targets": [
+    {
+      "target": "f210",
+      "distribution_version": "4.2.21002",
+      "filename": "more-infinite-research_4.2.21002.zip",
+      "factorio_version": "2.1",
+      "distribution_tag": "dist/f210/v4.2.21002",
+      "bytes": 1425122,
+      "sha256": "E1303B101002618F5B2112A6EF32EE9D6A95EBEF01825A0AE17D1DA54FDCDC8B",
+      "content_sha256": "A297927611DB49CBA4B251DF4693C428E0B0EA5F849F80934F9F0E0D4C8345A2",
+      "entry_count": 343
+    },
+    {
+      "target": "f200",
+      "distribution_version": "4.2.20002",
+      "filename": "more-infinite-research_4.2.20002.zip",
+      "factorio_version": "2.0",
+      "distribution_tag": "dist/f200/v4.2.20002",
+      "bytes": 1421262,
+      "sha256": "14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65",
+      "content_sha256": "99EEF1021703BB88C08F9BDEB36C669855A812C14396B803FFA5C8C5B77181C0",
+      "entry_count": 341
+    },
+    {
+      "target": "f110",
+      "distribution_version": "4.2.11002",
+      "filename": "more-infinite-research_4.2.11002.zip",
+      "factorio_version": "1.1",
+      "distribution_tag": "dist/f110/v4.2.11002",
+      "bytes": 683635,
+      "sha256": "6036204349DECB630F8AA7DB704E30E0CC656ED3F6362A7CCF401CF471DA748B",
+      "content_sha256": "4A062021E95554B4BDBEB40E8933B08BC419775663F95637D73FF6B86FC45CD7",
+      "entry_count": 281
+    },
+    {
+      "target": "f100",
+      "distribution_version": "4.2.10002",
+      "filename": "more-infinite-research_4.2.10002.zip",
+      "factorio_version": "1.0",
+      "distribution_tag": "dist/f100/v4.2.10002",
+      "bytes": 683635,
+      "sha256": "4AD1B280B76BB7C82603AC76C56043173C47A5C9C5C838C3F1758175529CBDD7",
+      "content_sha256": "21DE2F88938F431D55B93145E10486CB1778E3B4374B02636CA663D65C6C981D",
+      "entry_count": 281
+    },
+    {
+      "target": "f017",
+      "distribution_version": "4.2.01702",
+      "filename": "more-infinite-research_4.2.01702.zip",
+      "factorio_version": "0.17",
+      "distribution_tag": "dist/f017/v4.2.01702",
+      "bytes": 669296,
+      "sha256": "62ACAD4B8EE253A13389676174CA1CA3DEB33CFD05E1B53540E361AF46460A95",
+      "content_sha256": "E8990D6B8C9B02823388E3CD2E4BF1C285F5D25309FC0914569D0A338E9987E4",
+      "entry_count": 281
+    },
+    {
+      "target": "f016",
+      "distribution_version": "4.2.01602",
+      "filename": "more-infinite-research_4.2.01602.zip",
+      "factorio_version": "0.16",
+      "distribution_tag": "dist/f016/v4.2.01602",
+      "bytes": 669556,
+      "sha256": "B6790F3681652B4D9A1623F553DFB41508365C6A277151E52D34D3F8E465A760",
+      "content_sha256": "D16EC85C4A3FF134228AD56507C93E3CD7B97AE5500075F941A1BAF510BE21E2",
+      "entry_count": 281
+    },
+    {
+      "target": "f015",
+      "distribution_version": "4.2.01502",
+      "filename": "more-infinite-research_4.2.01502.zip",
+      "factorio_version": "0.15",
+      "distribution_tag": "dist/f015/v4.2.01502",
+      "bytes": 669545,
+      "sha256": "EFC5D7E61875A0E22CC3B19CBCE4A96F97A1C41E81026075E61BCA424894C064",
+      "content_sha256": "77CACD5CB32B5FA8F59ECC840B18977807EA264E6E1ADA04C761768D0D186976",
+      "entry_count": 281
+    },
+    {
+      "target": "f014",
+      "distribution_version": "4.2.01402",
+      "filename": "more-infinite-research_4.2.01402.zip",
+      "factorio_version": "0.14",
+      "distribution_tag": "dist/f014/v4.2.01402",
+      "bytes": 669795,
+      "sha256": "41901B33CD1CD491BAE07F88A310F74BF0157471F3DCFBC1EC5EF04C8EDAC567",
+      "content_sha256": "BCF63B94464D923D004D9C672DD396CF0F7725A6825F6EDE75752AD0A455BA28",
+      "entry_count": 281
+    },
+    {
+      "target": "f013",
+      "distribution_version": "4.2.01302",
+      "filename": "more-infinite-research_4.2.01302.zip",
+      "factorio_version": "0.13",
+      "distribution_tag": "dist/f013/v4.2.01302",
+      "bytes": 669797,
+      "sha256": "12DA8857921078779AA6092F7E95571F3FE8417EDBC35763EA41FFDF717098BB",
+      "content_sha256": "65168E36874351C6A3B9A4D0A3F9FD9121B276DC9B5573567C978DE67FBBCA14",
+      "entry_count": 281
+    }
+  ],
+  "signed": false,
+  "immutable": false,
+  "github_prerelease": false,
+  "version_contract": {
+    "source_version": "4.2.2",
+    "source_patch": 2,
+    "formula": "100 * integer(CCC) + source patch",
+    "component_width": 5,
+    "distribution_exception": false
+  },
+  "acceptance": {
+    "kind": "MIR422FreshEmergencyAcceptanceV1",
+    "recorded_utc": "2026-10-10T12:46:01.703791+00:00",
+    "user_instruction": "well, is it fucking ready or not? are all the bugs fixed and migrations stable? we need to skip or parallelize or dow hetever we have to do to safely and stably release this as tag `v4.2.2`",
+    "accepted_implementation_head": "2ec7790d21870d9d276c5e5c36510bf06c1e82f3",
+    "accepted_tree": "a4364a9268352f690c0d4b5670870d818c3312e6",
+    "package_source_sha256": "7DE5C203AC29CACB4B41AEEAF86C462C3B5005F05F177B161C6D7F01CAF379BB",
+    "candidate_manifest_sha256": "781A6B5ADE855EC1EF96A74BD94E4C9A17EA0EE54A4EBFEA6785D69000F8CCAE",
+    "maintenance_upgrade_evidence_sha256": "D999504AE35CFBD96530CFD5941399E5644F941F8369A4F16CAAE2096E2283CC",
+    "basis": "Fresh immediate emergency release instruction after disclosure of readiness limits; skip repeated unrelated campaigns, retain native defect/upgrade/state checks and exact bytes. This records the executor interpretation of the user instruction, not a fabricated signature or review.",
+    "native_target_predecessor_rows": 18,
+    "persisted_damage_executed": true,
+    "lost_history_recovered": false,
+    "full_technical_seal": false,
+    "signing_performed": false,
+    "production_restore_performed": false,
+    "independent_human_review_performed": false,
+    "broad_hosted_campaign_completion_required_for_this_emergency_cut": false,
+    "pending_checks_are_passes": false,
+    "inherited_predecessor_waiver": false,
+    "external_controls_changed": false,
+    "manual_portal_uploads": true
+  },
+  "predecessors": [
+    {
+      "tag": "v4.2.0-stable",
+      "release_id": 402577876,
+      "manifest_sha256": "E5F658F253F4E3E22C38A9B08394CE8554CECD20C4583BC5D23AA72D027E93A9"
+    },
+    {
+      "tag": "v4.2.1",
+      "release_id": 407909462,
+      "manifest_sha256": "A05168C240A571D5989683BD15CB6C764292E368CAC6911BE30FA9E9052F5AEC"
+    }
+  ],
+  "manual_portal_order": [
+    "f210",
+    "f200",
+    "f110",
+    "f100",
+    "f017",
+    "f016",
+    "f015",
+    "f014",
+    "f013"
+  ],
+  "portal_interval_hours": 6
+}

@@ -213,7 +213,7 @@ function Get-MIR423PublishedUpgradePredecessor {
   $manifestRelative=switch($sourcePatch){
     0 {'fixtures/release-inputs/mir421-published-420-manifest.json'}
     1 {'fixtures/release-inputs/mir422-published-421-manifest.json'}
-    2 {'dist/release-4.2.2/assets/mir-4.2.2.release.json'}
+    2 {'fixtures/release-inputs/mir423-published-422-manifest.json'}
   }
   $pin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $mir42ReleaseAssetsRepoRoot $manifestRelative) -CandidateSourceVersion $contractVersion
   $published=@($pin.manifest.targets|Where-Object target -CEQ $Target)
@@ -328,7 +328,7 @@ function Assert-MIR42ReleaseAssetMaintenancePredecessor {
   $pinPath = switch ($CandidateSourceVersion) {
     '4.2.1' { 'fixtures/release-inputs/mir421-published-420-manifest.json' }
     '4.2.2' { 'fixtures/release-inputs/mir422-published-421-manifest.json' }
-    '4.2.3' { 'dist/release-4.2.2/assets/mir-4.2.2.release.json' }
+    '4.2.3' { 'fixtures/release-inputs/mir423-published-422-manifest.json' }
   }
   $pin = Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $mir42ReleaseAssetsRepoRoot $pinPath) -CandidateSourceVersion $CandidateSourceVersion
   for ($index=0; $index -lt $script:MIR42ReleaseAssetTargets.Count; $index++) {

@@ -7860,6 +7860,7 @@
         "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
         "fixtures/release-inputs/mir421-published-420-manifest.json",
         "fixtures/release-inputs/mir422-published-421-manifest.json",
+        "fixtures/release-inputs/mir423-published-422-manifest.json",
         "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
         "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
         "tools/mir/application/package/TargetMaterializer.ps1",
@@ -8025,6 +8026,7 @@
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
         "fixtures/release-inputs/mir421-published-420-manifest.json",
         "fixtures/release-inputs/mir422-published-421-manifest.json",
+        "fixtures/release-inputs/mir423-published-422-manifest.json",
         "scripts/Collect-MIRPlayerReport.cmd",
         "scripts/Collect-MIRPlayerReport.ps1",
         "tools/commands/release/New-MIR42SupportCollectorBundle.ps1",
@@ -8144,6 +8146,7 @@
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
         "fixtures/release-inputs/mir421-published-420-manifest.json",
         "fixtures/release-inputs/mir422-published-421-manifest.json",
+        "fixtures/release-inputs/mir423-published-422-manifest.json",
         "tests/release/Test-MIRManualReleaseReview.ps1",
         "tools/commands/release/Invoke-MIR42NineTargetReleaseAssets.ps1",
         "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
@@ -8500,5 +8503,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8892851066b3295b3c33c10fca47cd7e4042743353dedac9e4e6df230275520f"
+  "digest": "sha256:58f12a8a87ab67e71a0b86be9b037573a0ed94843674ee5fd7ce4270ff7f49d5"
 }

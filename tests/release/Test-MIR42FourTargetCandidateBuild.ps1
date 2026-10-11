@@ -698,6 +698,18 @@ try {
   $rejected=$false
   try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published421 -ReleaseMetadata $metadata421|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-release-metadata]'}
   Assert-MIR42CandidateBuildTest $rejected '422-predecessor-metadata-default-remains-420'
+  # Exact 4.2.2 publication, selected explicitly for a 4.2.3 candidate.
+  # This portable pinned input has the same recorded bytes as the local dist
+  # custody copy, but host validation must not depend on ignored dist output.
+  $published422Path=Join-Path $repo 'fixtures/release-inputs/mir423-published-422-manifest.json'
+  $published422=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published422Path -CandidateSourceVersion '4.2.3'
+  Assert-MIR42CandidateBuildTest ($published422.sha256 -ceq '157E001794BA7D0D0303C35085DEADC7BAA70606FA98CCCFD102E0D4FFAB3DDB' -and $published422.bytes -eq 7311 -and [string]$published422.manifest.source_tag -ceq 'v4.2.2') '423-predecessor-portable-published-manifest'
+  $changed422=Join-Path $identityRoot 'changed-422-published-manifest.json'
+  $bytes422=[IO.File]::ReadAllBytes($published422.path);$bytes422[100]=$bytes422[100]-bxor1
+  [IO.File]::WriteAllBytes($changed422,$bytes422)
+  $rejected=$false
+  try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $changed422 -CandidateSourceVersion '4.2.3'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+  Assert-MIR42CandidateBuildTest $rejected '423-predecessor-portable-manifest-refuses-same-size-changed-bytes'
   $scopeCandidates=@($patchDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})
   Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $scopeCandidates
   $maintenanceEvidenceAssertions++
