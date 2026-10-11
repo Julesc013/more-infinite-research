@@ -2886,6 +2886,166 @@ check("RP05", production.pack_production_status("Gamma", {}, {}) == "unreachable
   "A recipe-source epoch replacement discards primed root knowledge")
 end
 
+-- Structural unlock facts are shared by unlock ordering and concrete route
+-- assembly, but only while the graph/index and recipe source agree. The
+-- concrete acquisition decision remains contextual and gets recomputed here.
+(function()
+local function static_unlock_fact_world()
+  return {
+    item_prototypes = {
+      ["static-pack"] = {type = "item"}, ["static-component"] = {type = "item"}
+    },
+    labs = {lab = {inputs = {"static-pack"}}},
+    techs = {
+      StaticBefore = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}},
+      StaticUnlock = {
+        enabled = true, prerequisites = {"StaticBefore"},
+        research_trigger = {type = "craft-item", item = "lab"},
+        effects = {{type = "unlock-recipe", recipe = "make-static-component"}}
+      }
+    },
+    recipe_prototypes = {
+      ["make-static-pack"] = {name = "make-static-pack"},
+      ["make-static-component"] = {name = "make-static-component"}
+    },
+    recipe_facts = {
+      ["make-static-pack"] = route_fact("static-pack", {{name = "static-component", amount = 1}}),
+      ["make-static-component"] = route_fact("static-component", {}, {enabled = false})
+    },
+    producers = {
+      ["static-pack"] = {"make-static-pack"}, ["static-component"] = {"make-static-component"}
+    },
+    unlockers = { ["make-static-component"] = {"StaticUnlock"} }
+  }
+end
+
+local graph_researchability = require("prototypes.mir.graph.researchability_index")
+local original_reachable_names = graph_researchability.reachable_names
+local reachable_name_calls = 0
+graph_researchability.reachable_names = function(...)
+  reachable_name_calls = reachable_name_calls + 1
+  return original_reachable_names(...)
+end
+
+reset(static_unlock_fact_world())
+local static_status, static_gate = production.pack_production_status("static-pack", {})
+local static_owner = context:state_view("science_pack_production")
+local retained_static_fact = static_owner.static_unlock_facts.StaticUnlock
+-- Rebuild the contextual researchability answer. Its two graph traversals
+-- remain necessary (root qualification and active mechanism assessment); a
+-- third traversal for route metadata would mean the shared structural fact was
+-- not reused.
+static_owner.technology_mechanism_memo = {}
+local calls_before_shared_route = reachable_name_calls
+local first_static_route = production.independent_pack_acquisition_witness("static-pack", "Other", {}, {})
+local shared_route_calls = reachable_name_calls - calls_before_shared_route
+graph_researchability.reachable_names = original_reachable_names
+check("SU01", static_status == "research" and static_gate == "StaticUnlock"
+  and retained_static_fact and table.concat(retained_static_fact.prerequisite_closure, ",") == "StaticBefore"
+  and first_static_route and first_static_route.unlocker == "StaticUnlock"
+  and table.concat(first_static_route.prerequisite_closure, ",") == "StaticBefore"
+  and shared_route_calls == 2,
+  "A rebuilt contextual technology check reuses its retained structural unlock fact rather than traversing it a third time")
+
+first_static_route.prerequisite_closure[1] = "corrupt"
+local second_static_route = production.independent_pack_acquisition_witness("static-pack", "Other", {}, {})
+check("SU02", second_static_route and table.concat(second_static_route.prerequisite_closure, ",") == "StaticBefore"
+  and table.concat(static_owner.static_unlock_facts.StaticUnlock.prerequisite_closure, ",") == "StaticBefore",
+  "A consumer cannot mutate retained structural facts through an exported route")
+
+local original_fact_table = static_owner.static_unlock_facts
+local current_index = context:state_view("technology_researchability_index")
+context:replace_epoch("technology_researchability_index", current_index)
+local index_replaced_route = production.independent_pack_acquisition_witness("static-pack", "Other", {}, {})
+check("SU03", index_replaced_route and index_replaced_route.unlocker == "StaticUnlock"
+  and static_owner.static_unlock_facts ~= original_fact_table
+  and static_owner.static_unlock_facts_index_epoch == context:state_epoch("technology_researchability_index"),
+  "Replacing the owned graph-index epoch discards and rebuilds shared structural unlock facts")
+
+local source_epoch_owner = static_owner
+world.recipe_source_epoch = 2
+local source_replaced_route = production.independent_pack_acquisition_witness("static-pack", "Other", {}, {})
+local source_epoch_replacement = context:state_view("science_pack_production")
+check("SU04", source_replaced_route and source_replaced_route.unlocker == "StaticUnlock"
+  and source_epoch_replacement ~= source_epoch_owner
+  and source_epoch_replacement.static_unlock_facts_recipe_source_epoch == 2,
+  "A recipe-source epoch replacement discards shared structural facts with the rest of the source-bound production state")
+
+local function capped_static_unlock_world(width)
+  local world = {item_prototypes = {}, labs = {lab = {inputs = {}}}, techs = {},
+    recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {}}
+  for index = 1, width do
+    local suffix = string.format("%03d", index)
+    local pack, prior, unlock = "cap-pack-" .. suffix, "CapPrior" .. suffix, "CapUnlock" .. suffix
+    local recipe = "make-" .. pack
+    world.item_prototypes[pack] = {type = "item"}
+    table.insert(world.labs.lab.inputs, pack)
+    world.techs[prior] = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}}
+    world.techs[unlock] = {
+      enabled = true, prerequisites = {prior}, research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = recipe}}
+    }
+    world.recipe_prototypes[recipe] = {name = recipe}
+    world.recipe_facts[recipe] = route_fact(pack, {}, {enabled = false})
+    world.producers[pack] = {recipe}
+    world.unlockers[recipe] = {unlock}
+  end
+  return world
+end
+
+local STATIC_FACT_CAP_WIDTH = 257
+reset(capped_static_unlock_world(STATIC_FACT_CAP_WIDTH))
+production.prime_root_pack_statuses(context)
+local capped_owner = context:state_view("science_pack_production")
+local capped_last_pack, capped_last_unlock = "cap-pack-257", "CapUnlock257"
+local uncached_capped_route = production.independent_pack_acquisition_witness(capped_last_pack, "Other", {}, {})
+local capped_telemetry = context:state_view("compiler_telemetry").counters
+check("SU05", production.pack_production_status(capped_last_pack, {}) == "research"
+  and uncached_capped_route and uncached_capped_route.unlocker == capped_last_unlock
+  and capped_owner.static_unlock_facts_entry_count == 256
+  and capped_owner.static_unlock_facts[capped_last_unlock] == nil
+  and capped_owner.static_unlock_facts_node_count <= 4096
+  and capped_owner.static_unlock_facts_estimated_bytes <= 512 * 1024
+  and capped_telemetry.technology_closure_cache_entries == 256,
+  "A bounded structural-fact cache falls back to exact route analysis after its entry cap without losing the final pack")
+
+-- The node limit is separate from the entry limit. A single broad technology
+-- must still yield its real route, but cannot retain an unbounded closure.
+local function node_capped_static_unlock_world(width)
+  local prerequisites, techs = {}, {}
+  for index = 1, width do
+    local name = string.format("NodePrior%04d", index)
+    prerequisites[#prerequisites + 1] = name
+    techs[name] = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}}
+  end
+  techs.NodeCapUnlock = {
+    enabled = true, prerequisites = prerequisites,
+    research_trigger = {type = "craft-item", item = "lab"},
+    effects = {{type = "unlock-recipe", recipe = "make-node-cap-pack"}}
+  }
+  return {
+    item_prototypes = {["node-cap-pack"] = {type = "item"}},
+    labs = {lab = {inputs = {"node-cap-pack"}}}, techs = techs,
+    recipe_prototypes = {["make-node-cap-pack"] = {name = "make-node-cap-pack"}},
+    recipe_facts = {["make-node-cap-pack"] = route_fact("node-cap-pack", {}, {enabled = false})},
+    producers = {["node-cap-pack"] = {"make-node-cap-pack"}},
+    unlockers = {["make-node-cap-pack"] = {"NodeCapUnlock"}}
+  }
+end
+
+local STATIC_FACT_NODE_CAP_WIDTH = 4097
+reset(node_capped_static_unlock_world(STATIC_FACT_NODE_CAP_WIDTH))
+local node_capped_status, node_capped_gate = production.pack_production_status("node-cap-pack", {})
+local node_capped_route = production.production_route_for_pack("node-cap-pack")
+local node_capped_owner = context:state_view("science_pack_production")
+check("SU06", node_capped_status == "research" and node_capped_gate == "NodeCapUnlock"
+  and node_capped_route and #node_capped_route.prerequisite_closure == STATIC_FACT_NODE_CAP_WIDTH
+  and node_capped_owner.static_unlock_facts.NodeCapUnlock == nil
+  and node_capped_owner.static_unlock_facts_entry_count == 0
+  and node_capped_owner.static_unlock_facts_node_count == 0,
+  "A prerequisite closure above the node cap remains exact for this route without entering shared retained state")
+end)()
+
 reset({
   item_prototypes = {["free-pack"] = {type = "item"}, ["active-pack"] = {type = "item"}},
   labs = {lab = {inputs = {"free-pack", "active-pack"}}},
@@ -3048,11 +3208,17 @@ check("CP10", production.pack_production_status("P", {Q = true}) == "unreachable
   "An active required science pack cannot borrow another pack traversal's success")
 local before_diagnostic_memo = contextual_owner.contextual_pack_status_memo
 local before_diagnostic_count = contextual_owner.contextual_pack_status_count
+local before_diagnostic_static_facts = contextual_owner.static_unlock_facts
+local before_diagnostic_static_count = contextual_owner.static_unlock_facts_entry_count
+local before_diagnostic_static_nodes = contextual_owner.static_unlock_facts_node_count
 local diagnostic_context_status = production.pack_production_status("P", {unrelated = true}, {}, bounded_observer(1))
 check("CP07", diagnostic_context_status == "indeterminate"
   and contextual_owner.contextual_pack_status_memo == before_diagnostic_memo
-  and contextual_owner.contextual_pack_status_count == before_diagnostic_count,
-  "A diagnostic budget remains indeterminate and never reads or writes contextual answer reuse")
+  and contextual_owner.contextual_pack_status_count == before_diagnostic_count
+  and contextual_owner.static_unlock_facts == before_diagnostic_static_facts
+  and contextual_owner.static_unlock_facts_entry_count == before_diagnostic_static_count
+  and contextual_owner.static_unlock_facts_node_count == before_diagnostic_static_nodes,
+  "A diagnostic budget remains indeterminate and never reads or writes contextual or shared structural reuse")
 world.recipe_source_epoch = 2
 world.resources = {}
 data.raw.resource = {}

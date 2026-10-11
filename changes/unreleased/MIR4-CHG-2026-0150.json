@@ -4,11 +4,13 @@
   "change_id": "MIR4-CHG-2026-0150",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Construct compiler evidence once and count qualification snapshot bytes without retaining serialized copies.",
+  "summary": "Reduce repeated compiler evidence construction and science acquisition metadata work.",
   "details": [
     "Public compiler evidence freezes telemetry before its own serialization, then enforces the exact final byte budget once. Live telemetry records emitted sizes afterward; the preview exporter treats an unavailable self-size as not observed.",
     "Qualification snapshot byte counting uses the same canonical writer and validation as serialization. Public snapshot callers retain defensive copies; ordering, encoding and invalid-input rejection remain authoritative.",
+    "Unlock ordering and route assembly share bounded prerequisite and science-burden facts within the existing recipe and researchability-index epochs. Contextual acquisition decisions and bounded diagnostic traversals remain independent; exported route arrays retain defensive copies.",
     "Controlled native F210 checks pass 85 snapshot/canonical assertions and 11 publication assertions, including fatal budget rejection, older-engine and diagnostics branches. Compiler static and preview export controls also pass.",
+    "A fresh bounded native F210 module fixture passes 374 researchability and 628 laboratory assertions, including shared-fact traversal reduction, caller mutation isolation, epoch invalidation, entry/node-cap fallback and unchanged active research/science guards. The fixture reads one private ZIP and restores its direct-library controls.",
     "Gameplay decisions, research identities, settings and migrations are unchanged. Actual-package startup, memory, semantic output, all nine targets and 27 predecessor upgrades still require qualification; no native startup speedup is claimed."
   ],
   "semantic_domains": [

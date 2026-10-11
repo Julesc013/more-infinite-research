@@ -7,6 +7,7 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local researchability_index = require("prototypes.mir.graph.researchability_index")
 local route_policy = require("prototypes.mir.capabilities.science_integration.production_route_policy")
 local route_feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 
@@ -27,6 +28,16 @@ local PROJECTION_MAX_LIMITS = {
   depth = 128,
   bytes = 262144
 }
+
+-- Structural unlock facts are useful to both ordering and route assembly, but
+-- retaining every transitive closure would replace repeated work with an
+-- unbounded all-pairs allocation.  Keep the shared facts deliberately small.
+-- An entry that cannot fit is still calculated for its one caller.
+local STATIC_UNLOCK_FACTS_MAX_ENTRIES = 256
+local STATIC_UNLOCK_FACTS_MAX_NODES = 4096
+local STATIC_UNLOCK_FACTS_MAX_ESTIMATED_BYTES = 512 * 1024
+local STATIC_UNLOCK_FACTS_ENTRY_ESTIMATED_BYTES = 160
+local STATIC_UNLOCK_FACTS_NAME_ESTIMATED_BYTES = 48
 
 local function positive_limit(value, default, maximum)
   value = tonumber(value)
@@ -236,6 +247,15 @@ local function science_pack_production_state()
     technology_mechanism_memo = {},
     contextual_pack_status_memo = {},
     contextual_pack_status_count = 0,
+    static_unlock_facts = {},
+    static_unlock_facts_entry_count = 0,
+    static_unlock_facts_node_count = 0,
+    static_unlock_facts_estimated_bytes = 0,
+    static_unlock_facts_recipe_source_epoch = source_epoch,
+    -- Keep only scalar provenance. CompilerContext snapshots copy this state,
+    -- so retaining the index itself here would duplicate a whole graph.
+    static_unlock_facts_index_epoch = nil,
+    static_unlock_facts_index_fingerprint = nil,
     root_entry_generation = 0,
     contextual_acquisition_generation = 0,
     -- This state owns only source-epoch-stable structural observations. It
@@ -282,6 +302,89 @@ end
 
 local function ingredient_name(ingredient)
   return type(ingredient) == "table" and (ingredient.name or ingredient[1]) or nil
+end
+
+local function copy_names(values)
+  local copied = {}
+  for index, value in ipairs(values or {}) do copied[index] = value end
+  return copied
+end
+
+local function reset_static_unlock_facts(state, index_epoch, index_fingerprint, source_epoch)
+  state.static_unlock_facts = {}
+  state.static_unlock_facts_entry_count = 0
+  state.static_unlock_facts_node_count = 0
+  state.static_unlock_facts_estimated_bytes = 0
+  state.static_unlock_facts_recipe_source_epoch = source_epoch
+  state.static_unlock_facts_index_epoch = index_epoch
+  state.static_unlock_facts_index_fingerprint = index_fingerprint
+end
+
+local function static_unlock_fact_estimated_bytes(prerequisite_closure, science_burden)
+  local total = STATIC_UNLOCK_FACTS_ENTRY_ESTIMATED_BYTES
+  for _, name in ipairs(prerequisite_closure) do
+    total = total + STATIC_UNLOCK_FACTS_NAME_ESTIMATED_BYTES + #name
+  end
+  for _, name in ipairs(science_burden) do
+    total = total + STATIC_UNLOCK_FACTS_NAME_ESTIMATED_BYTES + #name
+  end
+  return total
+end
+
+-- These facts contain only immutable graph/technology structure.  They do not
+-- answer whether a technology is legal in the caller's active acquisition
+-- traversal; contextual researchability remains the authority for that.
+local function static_unlock_facts(index, technology_name)
+  local context = compiler_context.current()
+  local state = science_pack_production_state()
+  local source_epoch = canonical_recipe_facts.source_epoch()
+  local index_epoch = context:state_epoch("technology_researchability_index")
+  local index_fingerprint = index.index_fingerprint
+  if state.static_unlock_facts_recipe_source_epoch ~= source_epoch
+    or state.static_unlock_facts_index_epoch ~= index_epoch
+    or state.static_unlock_facts_index_fingerprint ~= index_fingerprint then
+    reset_static_unlock_facts(state, index_epoch, index_fingerprint, source_epoch)
+  end
+
+  local cached = state.static_unlock_facts[technology_name]
+  if cached then return cached end
+
+  local names = researchability_index.reachable_names(index, technology_name)
+  local prerequisite_closure, science_burden_set = {}, {}
+  for _, candidate_name in ipairs(names) do
+    if candidate_name ~= technology_name then table.insert(prerequisite_closure, candidate_name) end
+    local candidate = data_raw.technology(candidate_name)
+    for _, ingredient in ipairs(((candidate and candidate.unit) or {}).ingredients or {}) do
+      local name = ingredient_name(ingredient)
+      if name then science_burden_set[name] = true end
+    end
+  end
+  table.sort(prerequisite_closure)
+  local science_burden = {}
+  for name in pairs(science_burden_set) do table.insert(science_burden, name) end
+  table.sort(science_burden)
+
+  local facts = {
+    prerequisite_closure = prerequisite_closure,
+    science_burden = science_burden,
+    prerequisite_count = #prerequisite_closure,
+    science_burden_count = #science_burden,
+    unlock_depth = index.unlock_depths[technology_name],
+    structurally_reachable = index.structural_failures[technology_name] == false
+  }
+  local nodes = #prerequisite_closure + #science_burden
+  local bytes = static_unlock_fact_estimated_bytes(prerequisite_closure, science_burden)
+  if state.static_unlock_facts_entry_count < STATIC_UNLOCK_FACTS_MAX_ENTRIES
+    and state.static_unlock_facts_node_count + nodes <= STATIC_UNLOCK_FACTS_MAX_NODES
+    and state.static_unlock_facts_estimated_bytes + bytes <= STATIC_UNLOCK_FACTS_MAX_ESTIMATED_BYTES then
+    state.static_unlock_facts[technology_name] = facts
+    state.static_unlock_facts_entry_count = state.static_unlock_facts_entry_count + 1
+    state.static_unlock_facts_node_count = state.static_unlock_facts_node_count + nodes
+    state.static_unlock_facts_estimated_bytes = state.static_unlock_facts_estimated_bytes + bytes
+    telemetry.observe_max("technology_closure_cache_entries", state.static_unlock_facts_entry_count)
+    telemetry.observe_max("technology_closure_cached_nodes", state.static_unlock_facts_node_count)
+  end
+  return facts
 end
 
 -- A projection observer may stop only its private traversal. Normal admission
@@ -367,35 +470,45 @@ local function route_for_unlocker(
       diagnostic_observer = observer
     })
   end
-  local index, technology_names, closure_complete
+  local index, technology_names, closure_complete, static_facts
   if observer then
     technology_names, closure_complete = bounded_technology_names(technology_name, observer)
     if not closure_complete then rejection = rejection or "diagnostic-budget-exhausted" end
   else
     index = graph_index()
-    technology_names = researchability_index.reachable_names(index, technology_name)
+    static_facts = static_unlock_facts(index, technology_name)
   end
-  local prerequisite_closure, science_burden_set = {}, {}
-  for _, candidate_name in ipairs(technology_names) do
-    if not diagnostic_visit(observer, 0) then
-      rejection = rejection or "diagnostic-budget-exhausted"
-      break
-    end
-    if candidate_name ~= technology_name then table.insert(prerequisite_closure, candidate_name) end
-    local candidate = data_raw.technology(candidate_name)
-    for _, ingredient in ipairs(((candidate and candidate.unit) or {}).ingredients or {}) do
+  local prerequisite_closure, science_burden
+  if static_facts then
+    -- A route is returned to ordinary callers and later copied by the route
+    -- policy. Keep the retained cache private by handing each route fresh
+    -- arrays, rather than relying on every downstream consumer to be read-only.
+    prerequisite_closure = copy_names(static_facts.prerequisite_closure)
+    science_burden = copy_names(static_facts.science_burden)
+  else
+    prerequisite_closure = {}
+    local science_burden_set = {}
+    for _, candidate_name in ipairs(technology_names) do
       if not diagnostic_visit(observer, 0) then
         rejection = rejection or "diagnostic-budget-exhausted"
         break
       end
-      local name = ingredient_name(ingredient)
-      if name then science_burden_set[name] = true end
+      if candidate_name ~= technology_name then table.insert(prerequisite_closure, candidate_name) end
+      local candidate = data_raw.technology(candidate_name)
+      for _, ingredient in ipairs(((candidate and candidate.unit) or {}).ingredients or {}) do
+        if not diagnostic_visit(observer, 0) then
+          rejection = rejection or "diagnostic-budget-exhausted"
+          break
+        end
+        local name = ingredient_name(ingredient)
+        if name then science_burden_set[name] = true end
+      end
     end
+    table.sort(prerequisite_closure)
+    science_burden = {}
+    for name in pairs(science_burden_set) do table.insert(science_burden, name) end
+    table.sort(science_burden)
   end
-  table.sort(prerequisite_closure)
-  local science_burden = {}
-  for name in pairs(science_burden_set) do table.insert(science_burden, name) end
-  table.sort(science_burden)
 
   local technology = data_raw.technology(technology_name) or {}
   local unit = technology.unit or {}
@@ -439,19 +552,9 @@ local function unlock_progression_key(technology_name, index)
   local state = progression_key_state(index)
   local cached = state.unlock_progression_keys[technology_name]
   if cached then return cached end
-  local names = researchability_index.reachable_names(index, technology_name)
-  local science = {}
-  for _, name in ipairs(names) do
-    local technology = data_raw.technology(name)
-    for _, ingredient in ipairs(((technology and technology.unit) or {}).ingredients or {}) do
-      local pack = ingredient_name(ingredient)
-      if pack then science[pack] = true end
-    end
-  end
-  local science_count = 0
-  for _ in pairs(science) do science_count = science_count + 1 end
-  local key = {index.structural_failures[technology_name] == false and 0 or 1,
-    science_count, #names - 1, index.unlock_depths[technology_name] or math.huge}
+  local facts = static_unlock_facts(index, technology_name)
+  local key = {facts.structurally_reachable and 0 or 1,
+    facts.science_burden_count, facts.prerequisite_count, facts.unlock_depth or math.huge}
   state.unlock_progression_keys[technology_name] = key
   return key
 end

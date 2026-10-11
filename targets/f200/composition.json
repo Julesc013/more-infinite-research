@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 76869,
-      "expected_sha256": "9AE58510F38F4F40CBA31C3CE03C02468302457A745CA722277C202D43DD57B8",
+      "expected_bytes": 81995,
+      "expected_sha256": "17267DA9AC3CA1515EAA29D3416ADEA7DA78A8F41E0C4A3CD8675F2A0868503E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3947,5 +3947,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "1ABF0A49B54A58D31AFA182AAFBB75571C96BA8779E2010780A7CF19C10B90C8"
+  "record_sha256": "16A82956D6E6B18D8B623026C56301C5D576883881BEA240DD857D455AC59C9F"
 }

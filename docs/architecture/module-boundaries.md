@@ -5,7 +5,7 @@ applies_to: "4.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-11
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -25,6 +25,8 @@ This page records current MIR 4 authority and package boundaries while retaining
 `source/` is the sole editable player-source authority. `source/package-source.json`, `targets/package-authority.json`, `targets/registry.json`, and `targets/support-policy.json` define the source-to-target contract; target composition selects shared components and narrow platform adapters, not a second editable mod tree. `tools/mir/application/package/TargetMaterializer.ps1` is the sole current package writer and writes to the caller's explicit output root; current development and qualification runners keep their generated packages beneath ignored `build/` roots. The repository-root Factorio-shaped projection remains historical reconstruction material and cannot be reactivated as package source.
 
 The package-excluded operational plane consists of documentation, fixtures, tests, tools, contracts, governance, `build`, `dist`, and `.mir` authorities. `.mir/control/paths.yml` owns their current logical paths, `.mir/modules.yml` assigns module ownership, and Markdown front matter owns editable document metadata. `tools/commands/docs/Update-MIRDocumentationIndex.ps1` is the writer for `.mir/docs.yml` and generated documentation views; never hand-edit those projections. A preview, shadow, compatibility reader, or historical reconstruction does not gain player mutation, package, release, signing, promotion, tagging, or publication authority merely by existing.
+
+Science acquisition's existing `science_pack_production` state owns bounded static unlock facts shared by progression ordering and route metadata. Recipe-source changes or replacement of the owned researchability index invalidate those facts. The cache retains at most 256 entries, 4096 names and 512 KiB of estimated storage; a full cache falls back to exact computation. These are structural facts, while each contextual acquisition decision still checks its active research and science guards. Diagnostic queries bypass this cache and exported route arrays are copied. The storage estimate is not a measurement of process memory, and the cache grants no new research or compatibility claim.
 
 The Research Library's `runtime/research_browser_factorio_catalogue.lua` adapter owns copied static catalogue facts by force index. The real browser merge callback forgets the merged source index while preserving the destination cache and reading its current research state. Invalid or unknown source identities do not evict unrelated forces. The existing handler fixture consumes the actual adapter source to check cleanup, destination reuse and personal-state isolation. A bounded standalone source reproducer also measures retained Lua heap across 100 merges with 300 technologies per force; this is source-cache evidence, not native RAM, save or multiplayer qualification. The accepted presentation and native queue authority remain unchanged.
 
