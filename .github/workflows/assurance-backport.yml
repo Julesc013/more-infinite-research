@@ -32,7 +32,7 @@ jobs:
           MIR_BACKPORT_BASELINE_SHA: ${{ inputs.baseline_sha }}
           MIR_BACKPORT_TARGET: ${{ matrix.target }}
         run: ./tools/mir.ps1 assurance backport --target $env:MIR_BACKPORT_TARGET --baseline $env:MIR_BACKPORT_BASELINE_SHA --output "build/results/assurance/backport-$($env:MIR_BACKPORT_TARGET).json"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           include-hidden-files: true
           name: assurance-backport-plan-${{ matrix.target }}-${{ inputs.candidate_sha }}

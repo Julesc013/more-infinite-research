@@ -150,7 +150,7 @@ jobs:
           $context = "build/results/verification-context/${{ steps.export.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation record-context -ContextPath $context `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           include-hidden-files: true
           name: mir-v5-context
@@ -192,7 +192,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind static,evaluation -ExcludeTask shadow.equivalence -SourceRepoRoot source `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           include-hidden-files: true
           name: mir-v5-evidence-static
@@ -233,7 +233,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind package -ExcludeTask verification.context -SourceRepoRoot source `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           include-hidden-files: true
           name: mir-v5-evidence-package
@@ -284,7 +284,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation environment -ContextPath $context `
             -BatchId '${{ matrix.batch_id }}' -FactorioBin $env:FACTORIO_BIN `
             -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
           include-hidden-files: true
@@ -337,7 +337,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation approved-delta -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
           include-hidden-files: true
@@ -390,7 +390,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation ecosystem -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -LocalModDir $env:MIR_LOCAL_MOD_ZIPS -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
           include-hidden-files: true
@@ -443,7 +443,7 @@ jobs:
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE `
             -LocalModZipDir $env:MIR_LOCAL_MOD_ZIPS -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
           include-hidden-files: true
@@ -478,7 +478,7 @@ jobs:
           $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind manual -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
           include-hidden-files: true
@@ -669,12 +669,12 @@ jobs:
           $path = 'build/results/control-plane-v5/target-qualification-attestation.json'
           [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($path))) | Out-Null
           [IO.File]::WriteAllText($path, ($record | ConvertTo-Json -Depth 10), [Text.UTF8Encoding]::new($false))
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: mir-v5-target-qualification-${{ inputs.target }}-${{ github.run_id }}-attempt-${{ github.run_attempt }}
           path: build/results/control-plane-v5/target-qualification-attestation.json
           if-no-files-found: error
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
         with:
           include-hidden-files: true
