@@ -69,6 +69,48 @@ function Invoke-MIRAssuranceSelfTest {
     throw "Unknown scenario fixture mod ID was accepted by the evidence fingerprint resolver."
   }
 
+  $declaredExternalFixtureFingerprint = Get-MIRAssuranceScenarioFixtureFingerprint -Test ([pscustomobject]@{
+    id = "scenario/2.1/secretas-finite-continuation-hotfix"
+    scenario = [pscustomobject]@{
+      name = "secretas-finite-continuation-hotfix"
+      group = "local-mod-library"
+      fixtures = @(
+        "secretas",
+        "pretty-frozeta",
+        "mir-fixture-assert-secretas-finite-continuation-hotfix"
+      )
+    }
+  })
+  $declaredExternalInputs = @($declaredExternalFixtureFingerprint.external_inputs)
+  if ([string]$declaredExternalFixtureFingerprint.kind -ne 'scenario-fixtures' -or
+      @($declaredExternalFixtureFingerprint.patterns) -notcontains 'fixtures/assert-secretas-finite-continuation-hotfix/**' -or
+      $declaredExternalInputs.Count -ne 2 -or
+      @($declaredExternalInputs | Where-Object {
+        [string]$_.name -ceq 'secretas' -and
+        [string]$_.version -ceq '1.0.37' -and
+        [string]$_.expected_sha256 -ceq '92A4210E4A914F3F8850CAFDD328C061A6B25937DB543F3042B0A7C7F95F201C' -and
+        [string]$_.state -ceq 'declared-external-archive' -and
+        [string]$_.declaration_path -ceq 'fixtures/assert-secretas-finite-continuation-hotfix/scenario.json'
+      }).Count -ne 1) {
+    throw 'Scenario fixture fingerprint did not preserve the exact declared Secretas upstream archive descriptor.'
+  }
+  $undeclaredExternalFixtureRejected = $false
+  try {
+    $null = Get-MIRAssuranceScenarioFixtureFingerprint -Test ([pscustomobject]@{
+      id = 'scenario/2.1/undeclared-external-fixture'
+      scenario = [pscustomobject]@{
+        name = 'undeclared-external-fixture'
+        group = 'local-mod-library'
+        fixtures = @('secretas-typo', 'mir-fixture-assert-secretas-finite-continuation-hotfix')
+      }
+    })
+  } catch {
+    $undeclaredExternalFixtureRejected = $_.Exception.Message -match 'does not resolve to a repository fixture or an exact declared upstream archive'
+  }
+  if (-not $undeclaredExternalFixtureRejected) {
+    throw 'Scenario fixture fingerprint accepted an undeclared upstream mod ID.'
+  }
+
   $baseMaterial = [ordered]@{test="a"; candidate="a"; binary="a"; harness="a"; settings="a"}
   $base = Get-MIRAssuranceJsonHash -Value $baseMaterial
   foreach ($field in @("candidate", "binary", "harness", "settings")) {
@@ -256,6 +298,63 @@ function Invoke-MIRAssuranceSelfTest {
       }
       Remove-Item -LiteralPath $scenarioPlanningRoot -Recurse -Force
     }
+  }
+
+  # A hosted development selection deliberately uses its full static profile
+  # when an input is unknown.  The lower-level planner must preserve that
+  # boundary; auto and ordinary named profiles still add the native unknown
+  # fallback tests.
+  $unknownFallbackConfig = ($Context.config | ConvertTo-Json -Depth 40 | ConvertFrom-Json -Depth 40)
+  $unknownFallbackConfig.classes = @()
+  $unknownFallbackConfig.profiles.'mir4-development' = @('self-test.unknown-static')
+  $unknownFallbackConfig.profiles.auto = @()
+  $unknownFallbackConfig.profiles | Add-Member -NotePropertyName 'self-test.full' -NotePropertyValue @('self-test.unknown-static')
+  $unknownFallbackConfig.unknown_policy.tests = @('self-test.unknown-runtime')
+  $unknownFallbackCatalog = [pscustomobject]@{
+    tests=@(
+      [pscustomobject][ordered]@{
+        id='self-test.unknown-static';kind='static';layer='F0';command='self-test.unknown-static'
+        requires_factorio=$false;requires_candidate=$false;inputs=@('test-catalog')
+      },
+      [pscustomobject][ordered]@{
+        id='self-test.unknown-runtime';kind='runtime';layer='F3';command='self-test.unknown-runtime'
+        requires_factorio=$true;requires_candidate=$false;inputs=@('test-catalog')
+      }
+    )
+  }
+  $unknownFallbackContext = $Context.PSObject.Copy()
+  $unknownFallbackContext.config = $unknownFallbackConfig
+  $unknownFallbackContext.catalog = $unknownFallbackCatalog
+  $unknownFallbackContext.reuse_enabled = $false
+  $unknownFallbackContext.rerun_tests = @()
+  $originalUnknownFallbackArgs = @($script:Args)
+  try {
+    $script:Args = @('--profile', 'mir4-development', '--baseline', 'HEAD^', '--no-reuse')
+    $developmentFallbackPlan = Get-MIRAssurancePlan -Context $unknownFallbackContext
+    if (-not [bool]$developmentFallbackPlan.classification.escalated -or
+        [bool]$developmentFallbackPlan.requires_factorio -or
+        @($developmentFallbackPlan.tests).Count -ne 1 -or
+        [string]$developmentFallbackPlan.tests[0].id -ne 'self-test.unknown-static' -or
+        [bool]$developmentFallbackPlan.tests[0].requires_factorio) {
+      throw 'Escalated mir4-development planning did not retain its complete static fallback boundary.'
+    }
+
+    $script:Args = @('--profile', 'auto', '--baseline', 'HEAD^', '--no-reuse')
+    $autoUnknownPlan = Get-MIRAssurancePlan -Context $unknownFallbackContext
+    if (-not [bool]$autoUnknownPlan.classification.escalated -or
+        -not [bool]$autoUnknownPlan.requires_factorio -or
+        @($autoUnknownPlan.tests | Where-Object { [string]$_.id -ceq 'self-test.unknown-runtime' }).Count -ne 1) {
+      throw 'Automatic planning did not retain conservative native escalation for an unknown input.'
+    }
+
+    $script:Args = @('--profile', 'self-test.full', '--baseline', 'HEAD^', '--no-reuse')
+    $fullUnknownPlan = Get-MIRAssurancePlan -Context $unknownFallbackContext
+    if (-not [bool]$fullUnknownPlan.requires_factorio -or
+        @($fullUnknownPlan.tests | Where-Object { [string]$_.id -ceq 'self-test.unknown-runtime' }).Count -ne 1) {
+      throw 'Explicit non-development planning did not retain conservative native escalation for an unknown input.'
+    }
+  } finally {
+    $script:Args = $originalUnknownFallbackArgs
   }
 
   foreach ($candidateId in @("C1", "C21", "2.5-P1", "2.5-P99", "10.12-P3")) {
