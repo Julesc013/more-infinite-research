@@ -147,6 +147,116 @@ function Invoke-MIRAssuranceSelfTest {
   if ((Get-MIRAssuranceJsonHash -Value $dependencyA) -ne (Get-MIRAssuranceJsonHash -Value $dependencyB)) {
     throw "Version-only metadata unexpectedly invalidated the dependency contract."
   }
+  # Hosted static planning intentionally starts before an archive exists. It may
+  # bind a source-fallback domain manifest, but must remain distinguishable from
+  # a real candidate and fail closed before any candidate-dependent execution.
+  $scenarioPlanningRoot = Join-Path $artifactRoot ('scenario-domain-planning-self-test-' + [guid]::NewGuid().ToString('N'))
+  $missingCandidatePath = Join-Path $scenarioPlanningRoot 'missing-candidate.zip'
+  $presentCandidatePath = Join-Path $scenarioPlanningRoot 'present-candidate.zip'
+  $scenarioPlanningConfig = ($Context.config | ConvertTo-Json -Depth 40 | ConvertFrom-Json -Depth 40)
+  $scenarioPlanningConfig.profiles | Add-Member -NotePropertyName 'self-test-domain-planning' -NotePropertyValue @('self-test.domain-planning')
+  # The self-test's owned synthetic profile has no changed-input claim. Do not
+  # import unrelated dirty-tree escalation rows into its one-row plan fixture.
+  $scenarioPlanningConfig.unknown_policy.tests = @()
+  $scenarioPlanningCatalog = [pscustomobject]@{
+    tests=@(
+      [pscustomobject][ordered]@{
+        id='self-test.domain-planning';kind='factorio-scenario';layer='F3';command='self-test-domain-planning'
+        requires_factorio=$true;requires_candidate=$true;inputs=@('scenario-domains')
+        domain_dependencies=@('data','dependency-contract')
+        scenario=[pscustomobject][ordered]@{name='self-test-domain-planning';kind='runtime';group='self-test';fixtures=@()}
+      }
+    )
+  }
+  $missingCandidateContext = $Context.PSObject.Copy()
+  $missingCandidateContext.candidate = $missingCandidatePath
+  $missingCandidateContext.config = $scenarioPlanningConfig
+  $missingCandidateContext.catalog = $scenarioPlanningCatalog
+  $missingCandidateContext.reuse_enabled = $false
+  $missingCandidateContext.rerun_tests = @()
+  $presentCandidateContext = $Context.PSObject.Copy()
+  $presentCandidateContext.candidate = $presentCandidatePath
+  $presentCandidateContext.config = $scenarioPlanningConfig
+  $presentCandidateContext.catalog = $scenarioPlanningCatalog
+  $presentCandidateContext.reuse_enabled = $false
+  $presentCandidateContext.rerun_tests = @()
+  $originalScenarioPlanningArgs = @($script:Args)
+  try {
+    New-Item -ItemType Directory -Force -Path $scenarioPlanningRoot | Out-Null
+    Add-Type -AssemblyName System.IO.Compression
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $archive = [IO.Compression.ZipFile]::Open($presentCandidatePath, [IO.Compression.ZipArchiveMode]::Create)
+    try {
+      $root = "$([string]$Context.info.name)_$([string]$Context.info.version)"
+      foreach ($entryValue in @(
+        [ordered]@{path="$root/info.json";content=(($Context.info | ConvertTo-Json -Depth 20) + "`n")},
+        [ordered]@{path="$root/prototypes/mir/planning-self-test.lua";content="return {}\n"}
+      )) {
+        $entry = $archive.CreateEntry([string]$entryValue.path)
+        $stream = $entry.Open()
+        $writer = [IO.StreamWriter]::new($stream, [Text.UTF8Encoding]::new($false))
+        try { $writer.Write([string]$entryValue.content) }
+        finally { $writer.Dispose() }
+      }
+    } finally { $archive.Dispose() }
+
+    $script:Args = @('--profile', 'self-test-domain-planning', '--baseline', 'HEAD', '--no-reuse')
+    $missingCandidatePlan = Get-MIRAssurancePlan -Context $missingCandidateContext
+    $missingScenarioTests = @($missingCandidatePlan.tests | Where-Object { [string]$_.kind -eq 'factorio-scenario' })
+    if ([string]$missingCandidatePlan.candidate_descriptor.state -ne 'missing' -or
+        [string]$missingCandidatePlan.domain_manifest.artifact.state -ne 'source-fallback' -or
+        [string]$missingCandidatePlan.domain_manifest.artifact.path -ne '' -or
+        [string]$missingCandidatePlan.domain_manifest.artifact.sha256 -ne '' -or
+        $missingScenarioTests.Count -eq 0) {
+      throw 'A missing candidate did not produce an explicit source-fallback scenario plan.'
+    }
+    $missingDomainFingerprint = $missingScenarioTests[0].fingerprint.inputs['scenario-domains']
+    if ($null -eq $missingDomainFingerprint -or
+        [string]$missingScenarioTests[0].fingerprint.inputs['candidate-source'].candidate_descriptor_sha256 -ne [string]$missingCandidatePlan.candidate_descriptor.descriptor_sha256) {
+      throw 'A source-fallback scenario plan did not retain its missing candidate binding.'
+    }
+
+    $presentCandidatePlan = Get-MIRAssurancePlan -Context $presentCandidateContext
+    if ([string]$presentCandidatePlan.candidate_descriptor.state -ne 'present' -or
+        [string]$presentCandidatePlan.domain_manifest.artifact.state -ne 'present' -or
+        [string]::IsNullOrWhiteSpace([string]$presentCandidatePlan.domain_manifest.artifact.sha256) -or
+        [string]$presentCandidatePlan.plan_material_sha256 -eq [string]$missingCandidatePlan.plan_material_sha256) {
+      throw 'Scenario planning did not distinguish present candidate bytes from a source fallback.'
+    }
+
+    $candidateExecutionRejected = $false
+    try {
+      $null = Invoke-MIRAssuranceTest -Test ([pscustomobject][ordered]@{
+        id='self-test.missing-candidate-execution';safe_test_id='self-test.missing-candidate-execution'
+        requires_factorio=$false;requires_candidate=$true;inputs=@('candidate')
+      }) -Plan $missingCandidatePlan -Context $missingCandidateContext
+    } catch {
+      $candidateExecutionRejected = $_.Exception.Message -match 'requires the exact candidate archive'
+    }
+    if (-not $candidateExecutionRejected) {
+      throw 'A source-fallback plan was allowed to execute a candidate-dependent test.'
+    }
+
+    $candidateGateRejected = $false
+    try {
+      $null = Invoke-MIRAssuranceGate -Plan $missingCandidatePlan -Context $missingCandidateContext
+    } catch {
+      $candidateGateRejected = $_.Exception.Message -match 'Exact candidate archive is required to calculate scenario domains'
+    }
+    if (-not $candidateGateRejected) {
+      throw 'A source-fallback plan was allowed to establish a native verification gate.'
+    }
+  } finally {
+    $script:Args = $originalScenarioPlanningArgs
+    if (Test-Path -LiteralPath $scenarioPlanningRoot) {
+      $resolvedScenarioPlanningRoot = [IO.Path]::GetFullPath($scenarioPlanningRoot)
+      $resolvedArtifactRoot = [IO.Path]::GetFullPath($artifactRoot)
+      if (-not $resolvedScenarioPlanningRoot.StartsWith($resolvedArtifactRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Refusing to remove scenario-domain planning self-test material outside the artifact root.'
+      }
+      Remove-Item -LiteralPath $scenarioPlanningRoot -Recurse -Force
+    }
+  }
 
   foreach ($candidateId in @("C1", "C21", "2.5-P1", "2.5-P99", "10.12-P3")) {
     if (-not (Test-MIRAssuranceReleaseCandidateId -CandidateId $candidateId)) {

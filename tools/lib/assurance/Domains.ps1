@@ -290,7 +290,10 @@ function Get-MIRAssuranceScenarioDomainFingerprint {
     [Parameter(Mandatory)]$Test,
     [Parameter(Mandatory)]$Context
   )
-  $manifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
+  # Scenario-domain fingerprints are plan material. A hosted static plan may bind a
+  # source-fallback manifest when no archive exists yet; execution and gate paths
+  # still require the exact candidate before they can produce native evidence.
+  $manifest = Get-MIRAssuranceDomainManifest -Context $Context
   $dependencies = @($Test.domain_dependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique)
   $selected = [ordered]@{}
   foreach ($dependency in $dependencies) {
@@ -461,7 +464,9 @@ function Expand-MIRAssuranceTests {
         "configuration-change" { "F4" }
         default { "F3" }
       }
-      $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
+      # Matrix expansion is planning only. When the archive is intentionally
+      # absent, bind the source fallback instead of fabricating a package identity.
+      $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context
       $dependencies = Get-MIRAssuranceScenarioDomainDependencies -Scenario $record -DomainManifest $domainManifest
       $inputs = @("factorio", "verification-profile", "scenario-record", "scenario-fixtures", "scenario-harness")
       if ([string]$record.kind -eq "package") { $inputs += "candidate" }

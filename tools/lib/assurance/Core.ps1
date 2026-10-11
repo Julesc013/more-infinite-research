@@ -679,7 +679,10 @@ function Get-MIRAssurancePlan {
   }
   Write-MIRAssuranceTiming -Label "plan-inputs" -Stopwatch $timing
   if (@($expanded | Where-Object { $_.kind -eq "factorio-scenario" }).Count -gt 0) {
-    $plan["domain_manifest"] = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
+    # Plan construction may represent an intentionally absent archive with the
+    # explicit source-fallback manifest. Native execution, gates, and seals
+    # independently demand an exact candidate.
+    $plan["domain_manifest"] = Get-MIRAssuranceDomainManifest -Context $Context
   }
   $plan = Add-MIRAssurancePlanDecisions -Plan $plan -Context $Context
   Write-MIRAssuranceTiming -Label "fingerprints" -Stopwatch $timing
