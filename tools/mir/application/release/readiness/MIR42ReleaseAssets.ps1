@@ -59,7 +59,11 @@ function Assert-MIR422CompleteSavedState {
       if($old.technologies[$name]-isnot[Collections.IDictionary]-or$new.technologies[$name]-isnot[Collections.IDictionary]){throw '[mir422-upgrade-technology-shape]'}
       $a=$old.technologies[$name].Clone();$b=$new.technologies[$name].Clone()
       if($RequireExactResearchDefinitions){
-        $definitions=@('prototype','definition'|Where-Object {$a.Contains($_)})
+        $definitionFields=@('prototype','definition')
+        foreach($definition in $definitionFields){
+          if($a.Contains($definition)-ne$b.Contains($definition)){throw "[mir423-upgrade-definition-set] $force/$name/$definition"}
+        }
+        $definitions=@($definitionFields|Where-Object {$a.Contains($_)})
         if($definitions.Count-lt1){throw '[mir423-upgrade-definition-missing]'}
         foreach($definition in $definitions){
           if($a[$definition]-isnot[Collections.IDictionary]-or-not$b.Contains($definition)-or$b[$definition]-isnot[Collections.IDictionary]-or

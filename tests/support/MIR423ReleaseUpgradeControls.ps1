@@ -84,15 +84,30 @@ function Invoke-MIR423ReleaseUpgradeControls {
     $changedRow.receipt=Write-UpgradeControlJson (Join-Path (Split-Path $row.receipt.path) ($stem+'-receipt.json')) $changedReceipt
     return $changedRow
   }
+  function Write-ChangedUpgradeControlSourceRow($row,$mutation,$stem){
+    $changedRow=Clone-UpgradeControl $row
+    $changedReceipt=Get-Content $row.receipt.path -Raw|ConvertFrom-Json -AsHashtable -Depth 100
+    $snapshot=Get-Content $row.snapshots[0].path -Raw|ConvertFrom-Json -AsHashtable -Depth 100
+    if($snapshot.stage-cne'source'){throw '423 upgrade control source snapshot order changed'}
+    &$mutation $snapshot
+    $reference=Write-UpgradeControlJson (Join-Path (Split-Path $row.receipt.path) ($stem+'-snapshot.json')) $snapshot
+    $changedRow.snapshots[0]=@{stage='source';path=$reference.path;sha256=$reference.sha256}
+    $changedReceipt.full_state_evaluator_snapshots=$changedRow.snapshots
+    $changedRow.receipt=Write-UpgradeControlJson (Join-Path (Split-Path $row.receipt.path) ($stem+'-receipt.json')) $changedReceipt
+    return $changedRow
+  }
   $mutations=@(
     @{stem='new-unresearched';code='[mir423-upgrade-technology-set]';change={$args[0].forces.player.technologies.d=@{researched=$false;level=1}}},
     @{stem='removed-technology';code='[mir423-upgrade-technology-set]';change={$null=$args[0].forces.player.technologies.Remove('b')}},
     @{stem='replaced-technology';code='[mir422-upgrade-technology-missing]';change={$null=$args[0].forces.player.technologies.Remove('b');$args[0].forces.player.technologies.d=@{researched=$false;level=1}}},
+    @{stem='target-definition-added';code='[mir423-upgrade-definition-set]';change={$args[0].forces.player.technologies.a.definition=@{alternate=$true}}},
     @{stem='changed-effect';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.effects[0].modifier=0.03}},
     @{stem='changed-science';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.ingredients[0].name='chemical-science-pack'}},
     @{stem='changed-cost';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.research_unit_count=200}},
-    @{stem='missing-definition';code='[mir423-upgrade-research-definition]';change={$null=$args[0].forces.player.technologies.a.Remove('prototype')}},
-    @{stem='new-setting';code='[mir423-upgrade-settings]';change={$args[0].forces.player.settings.new_default=$true}}
+    @{stem='missing-definition';code='[mir423-upgrade-definition-set]';change={$null=$args[0].forces.player.technologies.a.Remove('prototype')}},
+    @{stem='new-setting';code='[mir423-upgrade-settings]';change={$args[0].forces.player.settings.new_default=$true}},
+    @{stem='changed-setting';code='[mir423-upgrade-settings]';change={$args[0].forces.player.settings.kept=$false}},
+    @{stem='removed-setting';code='[mir423-upgrade-settings]';change={$null=$args[0].forces.player.settings.Remove('kept')}}
   )
   foreach($case in $mutations){
     $badRow=Write-ChangedUpgradeControlRow $rows[2] $case.change $case.stem
@@ -100,6 +115,10 @@ function Invoke-MIR423ReleaseUpgradeControls {
     try{$null=Assert-MIR423NativeUpgradeProof $badRow $PackageAssets[0]}catch{$refused=$_.Exception.Message.StartsWith($case.code,[StringComparison]::Ordinal)}
     if(-not$refused){throw ('423 upgrade controls accepted performance-only mutation: '+$case.stem)};$checks++
   }
+  $sourceDefinitionRow=Write-ChangedUpgradeControlSourceRow $rows[2] {$args[0].forces.player.technologies.a.definition=@{alternate=$true}} 'source-definition-missing-from-target'
+  $refused=$false
+  try{$null=Assert-MIR423NativeUpgradeProof $sourceDefinitionRow $PackageAssets[0]}catch{$refused=$_.Exception.Message.StartsWith('[mir423-upgrade-definition-set]',[StringComparison]::Ordinal)}
+  if(-not$refused){throw '423 upgrade controls accepted a source definition missing from the target'};$checks++
   $priorPatchDelta={
     $args[0].forces.player.technologies.d=@{researched=$false;level=1}
     $args[0].forces.player.technologies.a.prototype.effects[0].modifier=0.03
