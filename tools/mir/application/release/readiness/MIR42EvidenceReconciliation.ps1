@@ -122,7 +122,7 @@ function Resolve-MIR42QualificationChildPath {
 
 function Get-MIR42QualificationHistoricalAuthority {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0',
     [switch]$PredecessorIdentityOnly)
   $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
   $baselineIdentity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch 0
@@ -506,7 +506,7 @@ function Get-MIR42QualificationUpgradeReceipt {
 function Assert-MIR42MaintenanceReconciliationScope {
   param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][object[]]$Candidates)
   if ($Scope -cne 'nine-target' -or $Candidates.Count -ne 9 -or
-      @($Candidates | Where-Object { [string]$_.identity.source_version -cnotin @('4.2.1','4.2.2') }).Count -ne 0 -or
+      @($Candidates | Where-Object { [string]$_.identity.source_version -cnotin @('4.2.1','4.2.2','4.2.3') }).Count -ne 0 -or
       @($Candidates | ForEach-Object { [string]$_.identity.source_version } | Sort-Object -Unique).Count -ne 1) {
     throw '[mir42-reconciliation-maintenance-candidate-scope]'
   }
@@ -706,7 +706,7 @@ function Resolve-MIR42CriterionEvidenceOutputPath {
 
 function Get-MIR42CriterionObservationContract {
   param([Parameter(Mandatory)][string]$Criterion,[switch]$PublishedMaintenance,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
   if ($PublishedMaintenance -and $Criterion -cnotin @('fresh-exact-loads','target-omissions')) {
     throw '[mir42-maintenance-criterion-input-scope]'
   }
@@ -771,7 +771,7 @@ function Get-MIR42CriterionEvidenceObservation {
     [Parameter(Mandatory)]$Candidate,
     [Parameter(Mandatory)][string]$Code,
     $PublishedMaintenanceInputs = $null,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1'
+    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1'
   )
   $contract = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs) -SourceVersion $SourceVersion
   $record = Read-MIR42QualificationBootstrapRecord -Path $Path -Code $Code
@@ -784,7 +784,7 @@ function Get-MIR42CriterionEvidenceObservation {
     [string]$record.source.package_source_sha256 -ceq [string]$source.package_source_sha256 -and
     [string]$record.candidate_manifest.sha256 -ceq [string]$candidateManifest.sha256 -and
     [string]$record.candidate_manifest.record_sha256 -ceq [string]$candidateManifest.record_sha256
-  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3') -and
+  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4') -and
     [string]$record.record_sha256 -ceq [string]$candidateManifest.record_sha256 -and
     (Get-MIR4Sha256File -Path $Path) -ceq [string]$candidateManifest.sha256
   if ($candidateConstruction) {

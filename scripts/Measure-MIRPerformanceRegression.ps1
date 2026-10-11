@@ -9,24 +9,47 @@ param(
   [string]$OutputPath = ".mir\evidence\3.2.1-performance-regression.json",
   [string]$ArtifactRoot = "",
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
-  [ValidateRange(5, 25)][int]$MeasuredRuns = 5,
+  # The retained research-all consumer enforces its own campaign minimum.
+  # Startup diagnostics may use one measured balanced block while an input
+  # set is being admitted; release acceptance selects five or more.
+  [ValidateRange(1, 25)][int]$MeasuredRuns = 5,
   [switch]$ProbeSmokeOnly,
   [string]$CompatSmokeLaneId = "",
   [switch]$ObserveResearchAll,
   [switch]$PrepareResearchAllInputs,
-  [ValidateSet('f200','f210')][string]$Target='f210',
   [string]$SourceMaterializationPath='',
+  [switch]$ObserveStartup,
+  [string]$StartupProfileTemplatePath='',
+  [string]$Published422Archive='',
+  [string]$Published422ManifestPath='',
+  [string]$Published422ManifestSha256='',
+  [string]$StartupCandidateArchive='',
+  [string]$CandidateMaterializationArchive='',
+  [string]$CandidateMaterializationReceiptPath='',
+  [switch]$PreliminaryStartup,
+  [string]$StartupOutputRoot='',
+  [string]$ActiveModsObserver='',
+  [ValidateSet('f200','f210')][string]$Target='f210',
+  [ValidateRange(1,3600)][int]$TimeoutSeconds=300,
   [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB=1024,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
 )
 
-if($ObserveResearchAll -or $PrepareResearchAllInputs){
+if(($ObserveResearchAll-or$PrepareResearchAllInputs)-and$ObserveStartup){throw '[mir-direct-startup-mode-conflict]'}
+if($ObserveResearchAll-or$PrepareResearchAllInputs){
   . (Join-Path $RepoRoot 'tools/lib/validation/ResearchAllPerformance.ps1')
   Invoke-MIRResearchAllPerformance -RepoRoot $RepoRoot -Target $Target -Candidate $Candidate -PriorRelease $PriorRelease -FactorioBin $FactorioBin -ExpectedSourceCommit $ExpectedSourceCommit -LibraryDirectory $LocalModZipDir -SourceMaterializationPath $SourceMaterializationPath -OutputRoot $ArtifactRoot -PrepareInputsOnly:$PrepareResearchAllInputs -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
   return
 }
-
-throw '[mir-native-obsolete-runner] The legacy performance campaign stages populated mod directories. Use an explicitly selected direct-library native consumer; this campaign must be migrated before it can provide new performance evidence.'
+if($ObserveStartup){
+  foreach($pair in @(@('FactorioBin',$FactorioBin),@('LibraryDirectory',$LocalModZipDir),@('StartupProfileTemplatePath',$StartupProfileTemplatePath),@('Published422Archive',$Published422Archive),@('Published422ManifestPath',$Published422ManifestPath),@('Published422ManifestSha256',$Published422ManifestSha256),@('StartupOutputRoot',$StartupOutputRoot))){if([string]::IsNullOrWhiteSpace([string]$pair[1])){throw "[mir-direct-startup-input-required] $($pair[0])"}}
+  if($ExpectedPeakMemoryMiB-le0){throw '[mir441-resource-peak-budget-required] Declare the native probe peak memory budget.'}
+  . (Join-Path $RepoRoot 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
+  $parameters=@{FactorioBin=$FactorioBin;LibraryDirectory=$LocalModZipDir;ProfileTemplatePath=$StartupProfileTemplatePath;Published422Archive=$Published422Archive;Published422ManifestPath=$Published422ManifestPath;Published422ManifestSha256=$Published422ManifestSha256;CandidateArchive=$StartupCandidateArchive;CandidateMaterializationArchive=$CandidateMaterializationArchive;CandidateMaterializationReceiptPath=$CandidateMaterializationReceiptPath;OutputRoot=$StartupOutputRoot;Target=$Target;WarmupRuns=$WarmupRuns;MeasuredRuns=$MeasuredRuns;TimeoutSeconds=$TimeoutSeconds;ExpectedPeakMemoryMiB=$ExpectedPeakMemoryMiB;MaxNewOutputMiB=$MaxNewOutputMiB;SourceCommit=$ExpectedSourceCommit;Preliminary=$PreliminaryStartup;ActiveModsObserver=$ActiveModsObserver}
+  Invoke-MIRDirectLibraryStartupMeasurement @parameters
+  return
+}
+throw '[mir-native-obsolete-runner] The legacy performance campaign stages populated mod directories. Use -ObserveStartup for the selected direct-library startup diagnostic or the retained research-all consumer.'
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "validation\ReleaseAttestations.ps1")

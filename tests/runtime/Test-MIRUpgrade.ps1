@@ -7,7 +7,7 @@ param(
   [string]$SelectedReleaseManifest = '',
   [string]$SourceMaterializationPath = '',
   [string]$SelectedTarget = '',
-  [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1',
+  [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.1',
   [switch]$SpaceIsFake,
   [string]$K2ImersiteInputProfile = '',
   [ValidateSet(0,3)][int]$K2ImersiteCap = 3,
@@ -42,7 +42,7 @@ $ErrorActionPreference = "Stop"
 function Resolve-MIRUpgradeManifestVersion {
   param([Parameter(Mandatory)][string]$ManifestPath,[Parameter(Mandatory)][string]$CandidatePath,[string]$Target='')
   $manifest=Get-Content -Raw -LiteralPath $ManifestPath | ConvertFrom-Json -Depth 100
-  if ($manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3')) {
+  if ($manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4')) {
     . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
     $candidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $ManifestPath
     $rows=@($candidate.targets | Where-Object {
@@ -80,10 +80,10 @@ function Resolve-MIRUpgradeManifestVersion {
 
 function Resolve-MIR42UpgradePredecessorReaderVersion {
   param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$FromVersion,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
   if($Target-cnotmatch '^f(?<code>210|200|110|100|017|016|015|014|013)$'){throw '[mir42-upgrade-predecessor-target]'}
   $code=$Matches.code
-  if($FromVersion-cnotmatch ('^4[.]2[.]'+$code+'(?<patch>00|01)$')){throw '[mir42-upgrade-predecessor-version]'}
+  if($FromVersion-cnotmatch ('^4[.]2[.]'+$code+'(?<patch>00|01|02)$')){throw '[mir42-upgrade-predecessor-version]'}
   $patch=[int]$Matches.patch
   if($patch-ge([version]$SourceVersion).Build){throw '[mir42-upgrade-predecessor-version]'}
   # Reuse the existing exact published-custody reader for that predecessor.
@@ -97,14 +97,14 @@ function Assert-MIR421CurrentUpgradeInputMode {
     [string]$Archetype,[bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),
     [string]$SelectedReleaseManifest,[string]$PublishedPredecessorManifest,[string]$Retention,
     [string]$K2ImersiteInputProfile='',
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
   if ($Target -cnotin @('f210','f200','f110','f100') -or $SelectedReleaseManifest -or
       -not $PublishedPredecessorManifest -or $Retention -cne 'Always') {
     throw '[mir421-current-upgrade-input-mode]'
   }
   $code=$Target.Substring(1)
   $toPatch=([version]$SourceVersion).Build
-  $fromPatches=if($SourceVersion-ceq'4.2.2'){@(0,1)}else{@(0)}
+  $fromPatches=0..(($toPatch)-1)
   $allowedFrom=@($fromPatches|ForEach-Object {'4.2.'+$code+$_.ToString('00')})
   if ($FromVersion -cnotin $allowedFrom -or $ToVersion -cne ('4.2.'+$code+$toPatch.ToString('00')) -or $SourceOnlyFixtureNames.Count) {
     throw '[mir421-current-upgrade-transition]'
@@ -115,7 +115,7 @@ function Assert-MIR421CurrentUpgradeInputMode {
   } elseif ($SpaceIsFake) {
     $null=Get-MIR421SpaceFakeUpgradeDescriptor -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SourceVersion $SourceVersion
   } elseif ($Archetype-ceq'space-age-native-owner') {
-    if($Target-cne'f210'-or$SourceVersion-cne'4.2.2'-or$FixtureName-cne'assert-upgrade-4-0-21000-to-4-1-21000'){
+    if($Target-cne'f210'-or$SourceVersion-cnotin@('4.2.2','4.2.3')-or$FixtureName-cne'assert-upgrade-4-0-21000-to-4-1-21000'){
       throw '[mir421-current-upgrade-scenario]'
     }
   } elseif ($FixtureName -cne "assert-upgrade-4-0-${code}00-to-4-1-${code}00" -or $Archetype -cnotin @('','base-default')) {
@@ -544,15 +544,19 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo.Replace($dependencyFrom, "more-infinite-research >= $FromVersion"), [Text.UTF8Encoding]::new($false))
   if ($targetCode -cin @('210','200','110','100') -and
       (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
-       ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) -and
+       ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2') -or
+       ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01","4.2.${targetCode}02") -and $ToVersion -ceq "4.2.${targetCode}03" -and $SourceVersion -ceq '4.2.3')) -and
       ($SpaceIsFake -or $Archetype -cin @('','base-default') -or ($targetCode-ceq'210' -and $Archetype-ceq'space-age-native-owner'))) {
     Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceIsFake:$SpaceIsFake -SpaceAge:($Archetype-ceq'space-age-native-owner')
   }
-  if($targetCode-ceq'200'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake-and$Archetype-ceq'base-default'){
-    Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -FromVersion $FromVersion
+  if($targetCode-ceq'200'-and$SourceVersion-cin@('4.2.2','4.2.3')-and-not$SpaceIsFake-and$Archetype-ceq'base-default'){
+    Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
   }
-  if($targetCode-cin@('110','100')-and$SourceVersion-ceq'4.2.2'-and$Archetype-ceq'base-default'){
+  if($targetCode-cin@('110','100')-and$SourceVersion-cin@('4.2.2','4.2.3')-and$Archetype-ceq'base-default'){
     Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -FromVersion $FromVersion -ToVersion $ToVersion
+  }
+  if($targetCode-ceq'210'-and$SourceVersion-ceq'4.2.3'-and-not$SpaceIsFake-and$Archetype-ceq'space-age-native-owner'-and$FromVersion-ceq'4.2.21001'){
+    Set-MIR423F210InheritedPromethiumDefinitionDelta -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
   }
   if($PersistedDamageZip){
     $damageControl=Get-Content -LiteralPath $stagedControlPath -Raw
@@ -588,9 +592,10 @@ if ($isHistoricalTerminalFixture) {
   [IO.File]::WriteAllText($stagedControlPath, $stagedControl, [Text.UTF8Encoding]::new($false))
   $targetCode=([string]$historical.line).Replace('.','').PadLeft(3,'0')
   if (($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
-      ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2')) {
+      ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2') -or
+      ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01","4.2.${targetCode}02") -and $ToVersion -ceq "4.2.${targetCode}03" -and $SourceVersion -ceq '4.2.3')) {
     Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion
-    if($SourceVersion-ceq'4.2.2'){
+    if($SourceVersion-cin@('4.2.2','4.2.3')){
       Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -FromVersion $FromVersion -ToVersion $ToVersion
     }
   }
@@ -748,7 +753,7 @@ $requiresReloadProof = $FixtureName -in @(
     "assert-upgrade-historical-terminal-to-mir42"
   )
 $governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
-$requiresCompleteCatalogue = $SourceVersion-ceq'4.2.2'-and-not$SpaceIsFake-and-not$k2Scenario-and
+$requiresCompleteCatalogue = $SourceVersion-cin@('4.2.2','4.2.3')-and-not$SpaceIsFake-and-not$k2Scenario-and
   (($mir42UpgradeSpecialized-and$Archetype-cin@('base-default','space-age-native-owner'))-or$isHistoricalTerminalFixture)
 $governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"
 Assert-MIRFactorioPathBudget -Path $governedUpgradedSave -Context "Upgrade governed-save path"

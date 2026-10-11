@@ -1,11 +1,15 @@
 Set-StrictMode -Version Latest
 
 function New-MIR421ReleaseAssetCustodyFixture {
-  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet('4.2.1','4.2.2')][string]$CandidateSourceVersion='4.2.1')
+  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet('4.2.1','4.2.2','4.2.3')][string]$CandidateSourceVersion='4.2.1')
   # Structural fixtures only: IDs and paths are synthetic. No network, native
   # campaign, signature or actual release qualification is claimed here.
   $contract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
-  $pinPath=if($CandidateSourceVersion-ceq'4.2.2'){'fixtures/release-inputs/mir422-published-421-manifest.json'}else{'fixtures/release-inputs/mir421-published-420-manifest.json'}
+  $pinPath=switch($CandidateSourceVersion){
+    '4.2.1' {'fixtures/release-inputs/mir421-published-420-manifest.json'}
+    '4.2.2' {'fixtures/release-inputs/mir422-published-421-manifest.json'}
+    '4.2.3' {'dist/release-4.2.2/assets/mir-4.2.2.release.json'}
+  }
   $pin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $RepoRoot $pinPath) -CandidateSourceVersion $CandidateSourceVersion
   return [pscustomobject][ordered]@{
     release_id=$contract.release_id;source_tag=$contract.source_tag;source=$pin.manifest.source

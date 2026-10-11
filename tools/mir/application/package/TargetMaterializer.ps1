@@ -126,7 +126,7 @@ function Get-MIR4TargetMaterializationBindings {
 function Get-MIR4PrivatePatchPackageReadmeBytes {
   [CmdletBinding()]
   param([Parameter(Mandatory)][byte[]]$ReadmeBytes,[Parameter(Mandatory)][string]$DistributionVersion,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.1')
   if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
   $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
   if ([int]$decoded.source_patch -ne [int]($SourceVersion.Split('.')[2])) { throw '[mir4-private-patch-package-source-patch]' }
@@ -144,7 +144,7 @@ function Write-MIR4PrivatePatchPackageIdentity {
   param(
     [Parameter(Mandatory)][string]$Tree,
     [Parameter(Mandatory)][string]$DistributionVersion,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1'
+    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.1'
   )
 
   if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
@@ -238,7 +238,7 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -in @('4.2.1','4.2.2')) {
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3')) {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output

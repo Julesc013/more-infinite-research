@@ -198,17 +198,18 @@ function Get-MIR42CandidateTargetDescriptors {
     targets are composed through their bounded target records and historical
     materializer.  This selector is deliberately narrow: a release candidate is
     either the established modern four or the ordered nine-target candidate.
-    Source 4.2.1 and 4.2.2 construction require all nine targets.
+    Maintenance construction from 4.2.1 through 4.2.3 requires all nine
+    targets.
   #>
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [string[]]$SelectedTargets = $script:MIR42CanonicalCandidateTargets,
-    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0'
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0'
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  if ($SourceVersion -cin @('4.2.1','4.2.2') -and -not $PSBoundParameters.ContainsKey('SelectedTargets')) {
+  if ($SourceVersion -cin @('4.2.1','4.2.2','4.2.3') -and -not $PSBoundParameters.ContainsKey('SelectedTargets')) {
     $SelectedTargets = $script:MIR42NineTargetCandidateOrder
   }
   $selected = @($SelectedTargets | ForEach-Object { ([string]$_).Trim().ToLowerInvariant() })
@@ -220,7 +221,7 @@ function Get-MIR42CandidateTargetDescriptors {
   }
   $canonicalSelection = ($selected -join '|') -ceq ($script:MIR42CanonicalCandidateTargets -join '|')
   $nineSelection = ($selected -join '|') -ceq ($script:MIR42NineTargetCandidateOrder -join '|')
-  if ((-not $canonicalSelection -and -not $nineSelection) -or ($SourceVersion -cin @('4.2.1','4.2.2') -and -not $nineSelection)) {
+  if ((-not $canonicalSelection -and -not $nineSelection) -or ($SourceVersion -cin @('4.2.1','4.2.2','4.2.3') -and -not $nineSelection)) {
     throw '[mir42-candidate-target-selection-unsupported]'
   }
 
@@ -401,7 +402,7 @@ function Write-MIR42FourTargetManifest {
   }
   $scope = if ($targetCount -eq 4) { 'four-target' } else { 'nine-target' }
   $sourceVersions = @($Preflight.target_authority.source_version | Sort-Object -Unique)
-  if ($sourceVersions.Count -ne 1 -or $sourceVersions[0] -notin @('4.2.0','4.2.1','4.2.2')) {
+  if ($sourceVersions.Count -ne 1 -or $sourceVersions[0] -notin @('4.2.0','4.2.1','4.2.2','4.2.3')) {
     throw '[mir42-candidate-manifest-source-version]'
   }
   $manifestVersion = [int]$sourceVersions[0].Split('.')[2] + 1
@@ -455,7 +456,7 @@ function New-MIR42FourTargetCandidate {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-fA-F]{40}$')][string]$FinalSourceCommit,
     [Parameter(Mandatory)][ValidatePattern('^[A-Z0-9][A-Z0-9.-]{0,47}$')][string]$BuildId,
-    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0',
     [string[]]$SelectedTargets = $script:MIR42CanonicalCandidateTargets,
     [string]$OutputRoot,
     [ValidateRange(1, 9223372036854775807)][Int64]$MinimumFreeMemoryBytes = 1GB,
@@ -463,7 +464,7 @@ function New-MIR42FourTargetCandidate {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  if ($SourceVersion -cin @('4.2.1','4.2.2') -and -not $PSBoundParameters.ContainsKey('SelectedTargets')) {
+  if ($SourceVersion -cin @('4.2.1','4.2.2','4.2.3') -and -not $PSBoundParameters.ContainsKey('SelectedTargets')) {
     $SelectedTargets = $script:MIR42NineTargetCandidateOrder
   }
   $descriptors = @(Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SelectedTargets $SelectedTargets -SourceVersion $SourceVersion)

@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0'
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0'
 )
 
 Set-StrictMode -Version Latest
@@ -14,7 +14,8 @@ if (-not (Test-Path -LiteralPath $module -PathType Leaf)) { throw "[mir42-releas
 . (Join-Path $repo 'tests/support/MIR42StartupCollectorControls.ps1')
 . (Join-Path $repo 'tests/support/MIR421ReleaseAssetControls.ps1')
 . (Join-Path $repo 'tests/support/MIR422ReleaseUpgradeControls.ps1')
-$maintenance=$SourceVersion -cin @('4.2.1','4.2.2')
+. (Join-Path $repo 'tests/support/MIR423ReleaseUpgradeControls.ps1')
+$maintenance=$SourceVersion -cin @('4.2.1','4.2.2','4.2.3')
 $releaseTag='v' + $SourceVersion
 $patchSuffix=([version]$SourceVersion).Build.ToString('D2')
 $script:mir42ReleaseAssetControlAssertions=0
@@ -230,6 +231,10 @@ try {
     $upgradeControls=Invoke-MIR422ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
     $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
     Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 13 -and $upgradeControls.native_runs -eq 0) 'complete-upgrade-evidence-opposing-controls'
+  } elseif ($SourceVersion -ceq '4.2.3') {
+    $upgradeControls=Invoke-MIR423ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
+    $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
+    Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 9 -and $upgradeControls.native_runs -eq 0) '423-complete-upgrade-evidence-opposing-controls'
   }
   $inventoryPath = Join-Path $root 'frozen-inventory.json'
   $inventory = Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $promotionPlan -SourceVersion $SourceVersion -ReleaseTag $releaseTag -AssetRoot $assetRoot -OutputPath $inventoryPath
@@ -440,7 +445,7 @@ if (-not $maintenance) {
   # Use a fresh script scope after the legacy fixtures have been retired. The
   # module's dot-source guards must not reuse parent functions without their
   # script-scoped constants. This remains one serial test process tree.
-  foreach ($maintenanceVersion in @('4.2.1','4.2.2')) {
+  foreach ($maintenanceVersion in @('4.2.1','4.2.2','4.2.3')) {
     & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -RepoRoot $repo -SourceVersion $maintenanceVersion
     if ($LASTEXITCODE -ne 0) { throw "[mir42-release-assets-maintenance-controls-failed] $maintenanceVersion" }
   }

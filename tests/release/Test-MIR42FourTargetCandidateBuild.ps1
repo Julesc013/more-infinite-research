@@ -237,16 +237,19 @@ try {
   Assert-MIR42CandidateBuildTest $patchFourRejected 'patch-rejects-explicit-four-target-selection'
   Assert-MIR42CandidateBuildTest (@($patchDescriptors|Where-Object{[string]$_.source_version-cne'4.2.1'-or[bool]$_.public_output_authorized-or[bool]$_.publication_authorized}).Count-eq0) 'nine-target-requested-source-private-boundary'
   Assert-MIR42CandidateBuildTest (@($nineDescriptors|Where-Object{[string]$_.source_version-cne'4.2.0'}).Count-eq0) 'historical-default-source-preserved'
-  $unsupportedSourceRejected=$false
-  try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.3'|Out-Null}catch{$unsupportedSourceRejected=$true}
-  Assert-MIR42CandidateBuildTest $unsupportedSourceRejected 'unsupported-source-version-rejected'
-  foreach ($schemaVersion in @(1,2,3)) {
+  $performanceDescriptors=@(Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.3')
+  $performanceVersions=@('4.2.21003','4.2.20003','4.2.11003','4.2.10003','4.2.01703','4.2.01603','4.2.01503','4.2.01403','4.2.01303')
+  Assert-MIR42CandidateBuildTest (($performanceDescriptors.target-join'|')-ceq($patchDescriptors.target-join'|')-and($performanceDescriptors.distribution_version-join'|')-ceq($performanceVersions-join'|')-and@($performanceDescriptors|Where-Object{[string]$_.source_version-cne'4.2.3'-or[bool]$_.public_output_authorized-or[bool]$_.publication_authorized}).Count-eq0) '423-default-selects-nine-private-exact-identities'
+  $performanceFourRejected=$false
+  try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.3' -SelectedTargets @('f210','f200','f110','f100')|Out-Null}catch{$performanceFourRejected=$_.Exception.Message-match'mir42-candidate-target-selection-unsupported'}
+  Assert-MIR42CandidateBuildTest $performanceFourRejected '423-rejects-four-target-selection'
+  foreach ($schemaVersion in @(1,2,3,4)) {
     $versionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $repo -Manifest ([pscustomobject]@{schema=$schemaVersion;kind="MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"})
-    $expectedSource = @('4.2.0','4.2.1','4.2.2')[$schemaVersion-1]
+    $expectedSource = @('4.2.0','4.2.1','4.2.2','4.2.3')[$schemaVersion-1]
     Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -ge 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
   }
   foreach ($badContract in @(
-    [pscustomobject]@{schema=4;kind='MIR42FourTargetDeterministicCandidateManifestV4'},
+    [pscustomobject]@{schema=5;kind='MIR42FourTargetDeterministicCandidateManifestV5'},
     [pscustomobject]@{schema=2;kind='MIR42FourTargetDeterministicCandidateManifestV1'}
   )) {
     $rejected = $false
@@ -354,6 +357,29 @@ try {
   $currentRows=@(foreach($d in $currentDescriptors){[pscustomobject]@{target=$d.target;distribution_version=$d.distribution_version;asset=@{path="assets/$($d.target)/more-infinite-research_$($d.distribution_version).zip";bytes=1;sha256=('A'*64)};content_sha256=('B'*64);entry_count=1}})
   $currentRoot=Join-Path $identityRoot 'schema-422';New-Item -ItemType Directory -Path $currentRoot|Out-Null
   $currentManifest=Write-MIR42FourTargetManifest -OutputRoot $currentRoot -Preflight $currentPreflight -Rows $currentRows -Failures @()
+  $performancePreflight=$schemaPreflight|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  $performancePreflight.target_authority=@($performanceDescriptors|Select-Object target,target_id,source_version,distribution_version)
+  $performanceRows=@(foreach($d in $performanceDescriptors){[pscustomobject]@{target=$d.target;distribution_version=$d.distribution_version;asset=@{path="assets/$($d.target)/more-infinite-research_$($d.distribution_version).zip";bytes=1;sha256=('A'*64)};content_sha256=('B'*64);entry_count=1}})
+  $performanceRoot=Join-Path $identityRoot 'schema-423';New-Item -ItemType Directory -Path $performanceRoot|Out-Null
+  $performanceManifest=Write-MIR42FourTargetManifest -OutputRoot $performanceRoot -Preflight $performancePreflight -Rows $performanceRows -Failures @()
+  Assert-MIR42CandidateBuildTest ($performanceManifest.schema-eq4-and$performanceManifest.kind-ceq'MIR42FourTargetDeterministicCandidateManifestV4'-and$performanceManifest.status-ceq'private-deterministic-nine-target-candidate-built-unqualified'-and(Test-MIR4BootstrapRecordHash -Record $performanceManifest)) '423-writer-selects-v4-nine-target-private-boundary'
+  $performanceContract=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $performanceManifest
+  $performanceEnvelope=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $performanceRoot 'candidate-manifest.json')
+  Assert-MIR42CandidateBuildTest ($performanceContract.source_version-ceq'4.2.3'-and$performanceEnvelope.source_version-ceq'4.2.3'-and$performanceEnvelope.nine_targets-and-not$performanceManifest.publication_authorized-and$performanceManifest.qualification-ceq'not-performed') '423-writer-and-consumed-readers-preserve-private-boundary'
+  $performanceEvidenceCandidate=[pscustomobject]@{scope='nine-target';targets=$performanceManifest.targets;identity=[pscustomobject]@{record=$performanceManifest}}
+  $performanceEvidence=Get-MIR42EngineEvidenceBindingContract -Candidate $performanceEvidenceCandidate -PublishedMaintenance
+  $performanceCampaign=Get-MIR42JoinedCampaignInputContract -Candidate $performanceEvidenceCandidate -PublishedMaintenance
+  $performanceSeal=Get-MIR42TechnicalSealInputContract -Candidate $performanceEvidenceCandidate -PublishedMaintenance
+  $performanceIndependent=Get-MIR42IndependentScopeContract -Scope 'nine-target' -PublishedMaintenance -SourceVersion '4.2.3'
+  foreach($field in @('evidence_status','binder_status','campaign_status','independent_status','seal_status')){
+    Assert-MIR42CandidateBuildTest ($performanceSeal.$field.StartsWith('MIR-4.2.3-NINE-TARGET-MAINTENANCE-')) ('423-maintenance-reader-selects-'+$field)
+  }
+  Assert-MIR42CandidateBuildTest ($performanceIndependent.reconciliation_status-ceq$performanceEvidence.evidence_status-and$performanceIndependent.rehash_status-ceq$performanceSeal.independent_status-and$performanceCampaign.maintenance_source_version-ceq'4.2.3') '423-evidence-campaign-seal-readers-agree-on-version'
+  foreach($criterion in @('fresh-exact-loads','target-omissions')){
+    $criterionContract=Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance -SourceVersion '4.2.3'
+    $expectedStatus=if($criterion-ceq'fresh-exact-loads'){$performanceEvidence.binder_status}else{$performanceEvidence.evidence_status}
+    Assert-MIR42CandidateBuildTest ($criterionContract.status-ceq$expectedStatus) ('423-criterion-consumes-'+$criterion)
+  }
   $currentContract=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $currentManifest
   $currentEnvelope=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $currentRoot 'candidate-manifest.json')
   Assert-MIR42CandidateBuildTest ($currentManifest.schema-eq3-and$currentContract.source_version-ceq'4.2.2'-and$currentEnvelope.source_version-ceq'4.2.2'-and$currentEnvelope.nine_targets-and-not$currentManifest.publication_authorized-and$currentManifest.qualification-ceq'not-performed') '422-writer-and-consumed-readers-preserve-private-boundary'
@@ -938,7 +964,7 @@ try {
   Assert-MIR42CandidateBuildTest ($rejected-and-not(Test-Path -LiteralPath (Join-Path $identityRoot 'must-not-create.json'))) 'maintenance-criterion-cli-forwards-and-refuses-out-of-scope-option'
   $maintenanceCriterionAssertions++
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.2-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; source_versions=@('4.2.0','4.2.1','4.2.2'); current_maintenance_contract_assertions=$script:mir422ConstructionAssertions; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=3; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.2-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; source_versions=@('4.2.0','4.2.1','4.2.2','4.2.3'); current_maintenance_contract_assertions=$script:mir422ConstructionAssertions; target_identities=9; metadata_idempotence_checks=9; invalid_version_refusals=2; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 

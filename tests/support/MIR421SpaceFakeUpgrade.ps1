@@ -10,7 +10,7 @@ function Assert-MIR42CompleteCatalogueUpgradeMarker {
 function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1',
+    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1',
     [AllowEmptyString()][string]$FromVersion='',
     [switch]$SpaceIsFake,
     [switch]$SpaceAge)
@@ -23,11 +23,11 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   $code=$Target.Substring(1)
   $sourcePatch=([version]$SourceVersion).Build
   if([string]::IsNullOrWhiteSpace($FromVersion)){$FromVersion='4.2.'+$code+($sourcePatch-1).ToString('00')}
-  $fromMatch=[regex]::Match($FromVersion,('^4[.]2[.]'+$code+'(?<patch>00|01)$'))
+  $fromMatch=[regex]::Match($FromVersion,('^4[.]2[.]'+$code+'(?<patch>00|01|02)$'))
   if(-not$fromMatch.Success-or([int]$fromMatch.Groups['patch'].Value-ge$sourcePatch)){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromPatch=[int]$fromMatch.Groups['patch'].Value
   $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
-  $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  $fixtureVersion=if($SourceVersion-ceq'4.2.3'){'0.1.'+(30+$fromPatch)}elseif($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   if($Target-ceq'f210'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceAge){
     $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
   }
@@ -51,9 +51,27 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   [IO.File]::WriteAllText($path,($info|ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false))
 }
 
+function Set-MIR423F210InheritedPromethiumDefinitionDelta {
+  param([Parameter(Mandatory)][string]$FixtureDirectory,
+    [Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
+  # This only changes the disposable CCC03 fixture produced by the existing
+  # per-predecessor construction. Published fixture bytes retain their custody.
+  if($FromVersion-cne'4.2.21001'){throw '[mir423-f210-oracle-predecessor]'}
+  if($ToVersion-cne'4.2.21003'){throw '[mir423-f210-oracle-version]'}
+  $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
+  $path=Join-Path $directory 'control.lua'
+  Assert-MIRLibraryPath $path
+  $text=Get-Content -LiteralPath $path -Raw
+  $old='if (from_version ~= "4.2.21001" and not persisted_damage_probe) or to_version ~= "4.2.21002" then return false end'
+  $new='if from_version ~= "4.2.21001" or to_version ~= "4.2.21003" then return false end'
+  if([regex]::Matches($text,[regex]::Escape($old)).Count-ne1){throw '[mir423-f210-oracle-anchor]'}
+  [IO.File]::WriteAllText($path,$text.Replace($old,$new),[Text.UTF8Encoding]::new($false))
+}
+
 function Set-MIR422F200CompleteStateUpgradeOracle {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$FixtureDirectory,
-    [Parameter(Mandatory)][ValidateSet('4.2.20000','4.2.20001')][string]$FromVersion)
+    [Parameter(Mandatory)][ValidateSet('4.2.20000','4.2.20001','4.2.20002')][string]$FromVersion,
+    [Parameter(Mandatory)][ValidateSet('4.2.20002','4.2.20003')][string]$ToVersion)
   # Reuse the complete canonical oracle. Only its private native test copy is
   # adapted to F200 base research; Space Age-only expected rows do not exist in
   # that environment. Every observed technology, recipe and force still compares.
@@ -66,16 +84,16 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $rows='  for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do'
   if(-not$control.Contains($rows)){throw '[mir422-f200-complete-oracle-reported-rows]'}
   $control=$control.Replace($rows,'  for _, name in ipairs({}) do')
-  $control=$control.Replace('"4.0.21000"','"'+$FromVersion+'"').Replace('"4.1.21000"','"4.2.20002"')
+  $control=$control.Replace('"4.0.21000"','"'+$FromVersion+'"').Replace('"4.1.21000"','"'+$ToVersion+'"')
   $control=$control.Replace('["base-default"]={technology="recipe-prod-research_iron-1",level=3}',
     '["base-default"]={technology="mining-productivity-4",level=5}')
-  $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "4.2.20002" then')
+  $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "'+$ToVersion+'" then')
   $control=$control.Replace('complete Space Age state retained','complete research state retained')
-  $control=$control.Replace('mir-4121000-upgraded','mir-4220002-upgraded')
+  $control=$control.Replace('mir-4121000-upgraded',('mir-'+$ToVersion.Replace('.','')+'-upgraded'))
   $reviewed=@'
 local reviewed_420_frontier = require("mir422_reviewed_science_delta")
 local function reviewed_frontier_delta(name, before, after)
-  if from_version ~= "4.2.20000" or to_version ~= "4.2.20002" then return false end
+  if from_version ~= "4.2.20000" or to_version ~= "__MIR_F200_TO_VERSION__" then return false end
   local row = reviewed_420_frontier[name]
   if not row or not equal_state(before.prerequisites, row.before.prerequisites)
     or not equal_state(before.ingredients, row.before.ingredients) then return false end
@@ -85,6 +103,7 @@ local function reviewed_frontier_delta(name, before, after)
 end
 
 '@
+  $reviewed=$reviewed.Replace('__MIR_F200_TO_VERSION__',$ToVersion)
   $control=$control.Replace('local function restored_promethium_frontier',($reviewed+"`n"+'local function restored_promethium_frontier'))
   $control=$control.Replace('and not restored_promethium_frontier(name, before.prototype, observed.technologies[name].prototype)',
     'and not reviewed_frontier_delta(name, before.prototype, observed.technologies[name].prototype)')
@@ -94,19 +113,19 @@ end
 function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion,
     [AllowEmptyString()][string]$FromVersion='')
   $code=$Target.Substring(1)
   $sourcePatch=([version]$SourceVersion).Build
   if([string]::IsNullOrWhiteSpace($FromVersion)){$FromVersion='4.2.'+$code+($sourcePatch-1).ToString('00')}
-  $fromMatch=[regex]::Match($FromVersion,('^4[.]2[.]'+$code+'(?<patch>00|01)$'))
+  $fromMatch=[regex]::Match($FromVersion,('^4[.]2[.]'+$code+'(?<patch>00|01|02)$'))
   if(-not$fromMatch.Success-or([int]$fromMatch.Groups['patch'].Value-ge$sourcePatch)){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromPatch=[int]$fromMatch.Groups['patch'].Value
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
   $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
-  $fixtureVersion=if($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.6'}else{'1.0.7'}}else{'1.0.'+$sourcePatch}
+  $fixtureVersion=if($SourceVersion-ceq'4.2.3'){'1.0.'+(8+$fromPatch)}elseif($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.6'}else{'1.0.7'}}else{'1.0.'+$sourcePatch}
   $line='0.'+[int]$Target.Substring(1)
   if($info.name-cne'mir-fixture-assert-upgrade-historical-terminal-to-mir42'-or
     $info.factorio_version-cne$line-or$info.version-cnotin@('1.0.0',$fixtureVersion)){

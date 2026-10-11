@@ -68,7 +68,7 @@ function Assert-MIR42NineGeneratorHistoricalArchiveRequired {
     Assert-MIR42NineGeneratorTest -Condition $missingExpectedPredecessor -Code "missing-archive-rejected-$Target"
     # Historical engine metadata remains usable when an old mod archive has
     # been retired. This does not authenticate any selected upgrade package.
-    foreach ($sourceVersion in @('4.2.1','4.2.2')) {
+    foreach ($sourceVersion in @('4.2.1','4.2.2','4.2.3')) {
       $metadata = Get-MIR42QualificationHistoricalAuthority -RepoRoot $fixtureRoot -Target $Target -SourceVersion $sourceVersion -PredecessorIdentityOnly
       Assert-MIR42NineGeneratorTest -Condition ($null -eq $metadata.inventory -and $metadata.identity.source_version -ceq $sourceVersion) -Code "retired-archive-metadata-$sourceVersion-$Target"
     }
@@ -108,7 +108,7 @@ Assert-MIR42NineGeneratorTest -Condition ([string]$nineContract.kind -ceq 'MIR42
 Assert-MIR42NineGeneratorTest -Condition ([string]$nineIndependentContract.rehash_kind -ceq 'MIR42NineTargetIndependentEvidenceRehashV1' -and [string]$nineIndependentContract.target_requirement -ceq 'all_nine_targets_required') -Code 'nine-independent-contract'
 
 function Test-MIR42NineCriterionEvidenceWriter {
-  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet(1,2)][int]$SchemaVersion=1)
+  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet(1,2,3,4)][int]$SchemaVersion=1)
 
   $root = Join-Path $RepoRoot ('build/test-results/mir42-nine-criterion-evidence-' + [guid]::NewGuid().ToString('N'))
   New-Item -ItemType Directory -Force -Path $root | Out-Null
@@ -198,7 +198,7 @@ function Test-MIR42NineCriterionEvidenceWriter {
   }
 }
 
-foreach($schemaVersion in @(1,2)){Test-MIR42NineCriterionEvidenceWriter -RepoRoot $repo -SchemaVersion $schemaVersion}
+foreach($schemaVersion in @(1,2,3,4)){Test-MIR42NineCriterionEvidenceWriter -RepoRoot $repo -SchemaVersion $schemaVersion}
 
 $rejected = $false
 try { $null = Get-MIR42QualificationTargetScope -Rows @($modernRows + [pscustomobject][ordered]@{target='f017'}) -Code 'mir42-nine-generator-opposing' } catch { $rejected = $_.Exception.Message -match '^\[mir42-nine-generator-opposing-target-set\]' }

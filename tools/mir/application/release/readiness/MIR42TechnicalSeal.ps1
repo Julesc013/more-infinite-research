@@ -178,7 +178,7 @@ function Get-MIR42EngineEvidenceBindingContract {
   if ($PublishedMaintenance) {
     if ($scope -cne 'nine-target') { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $contract | Add-Member -NotePropertyName maintenance_source_version -NotePropertyValue ([string]$version.source_version)
     $contract.evidence_kind = 'MIR42NineTargetMaintenanceEvidenceReconciliationV1'
     $contract.evidence_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"
@@ -1421,9 +1421,13 @@ function Get-MIR42BoundEngineRun {
     Assert-MIR42SealPropertyNames -Value $row[0] -Expected @('target','status','archive','engine_execution') -Code 'mir42-seal-engine-run-target-shape'
     Assert-MIR42SealPropertyNames -Value $row[0].archive -Expected @('path','sha256') -Code 'mir42-seal-engine-run-archive-shape'
     $archivePath = Resolve-MIR42SealImmutableFile -Path ([string]$row[0].archive.path) -Sha256 ([string]$row[0].archive.sha256) -Code 'mir42-seal-engine-run-archive'
-    $expectedStagedArchive = [IO.Path]::GetFullPath((Join-Path (Split-Path -Parent $run.path) ("staged-assets/$([string]$candidateTarget.target)/" + [IO.Path]::GetFileName([string]$candidateTarget.archive_path))))
+    $runRoot = [IO.Path]::GetFullPath((Split-Path -Parent $run.path)).TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar
+    # Engine actors must select the exact archive that already lives in their
+    # declared flat library. A byte-identical per-run copy or hard-link is not
+    # an additional authority and must not be accepted as native evidence.
     if ([string]$row[0].status -cne 'passed' -or
-        $archivePath -cne $expectedStagedArchive -or
+        [IO.Path]::GetFileName($archivePath) -cne [IO.Path]::GetFileName([string]$candidateTarget.archive_path) -or
+        $archivePath.StartsWith($runRoot,[StringComparison]::OrdinalIgnoreCase) -or
         [string]$row[0].archive.sha256 -cne [string]$candidateTarget.archive_sha256) {
       throw "[mir42-seal-engine-run-target-binding] $([string]$candidateTarget.target)"
     }

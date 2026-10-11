@@ -18,6 +18,7 @@ param(
   [Parameter(Mandatory)][string]$OutputRoot,
   [string]$LibraryBindingsPath = '',
   [string]$PublishedMaintenancePredecessorManifestPath = '',
+  [string]$PublishedMaintenancePredecessorSourceVersion = '',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 512,
   [ValidateRange(60,900)][int]$RowDeadlineSeconds = 180
@@ -27,7 +28,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 # The script-wide trap also handles import and preflight failures. Initialize
 # its cleanup state before any of those operations can fail under StrictMode.
-$inputLeases=[Collections.Generic.List[object]]::new()
+$libraryArchiveBindings=[Collections.Generic.List[object]]::new()
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
@@ -104,7 +105,7 @@ function Get-MIR42HistoricalEngineDescriptor {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0',
     [string]$EnginePath = ''
   )
   $expected = $script:MIR42HistoricalTerminalInputs[$Target]
@@ -277,7 +278,7 @@ function Invoke-MIR42HistoricalFreshLoad {
     [Parameter(Mandatory)][string]$CandidateSha256,
     [Parameter(Mandatory)][string]$LibraryDirectory,
     [Parameter(Mandatory)][string]$Version,
-    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion='4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.0',
     [Parameter(Mandatory)][string]$FreshRoot,
     [Parameter(Mandatory)][string]$SourceCommit,
     [Parameter(Mandatory)][int]$DeadlineSeconds
@@ -372,27 +373,39 @@ function Invoke-MIR42HistoricalFreshLoad {
   }
 }
 
-function New-MIR42EngineArchiveStage {
-  param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)]$Row,
-    [Parameter(Mandatory)][string]$OutputRoot,[Parameter(Mandatory)][string]$SourceVersion,
-    [Parameter(Mandatory)][string]$SourceCommit,[Parameter(Mandatory)]$Context,
-    [Parameter(Mandatory)][AllowEmptyCollection()]$Leases)
-  $stageRoot=Join-Path $OutputRoot "staged-assets/$Target"
-  $stageDirectory=Join-Path $stageRoot 'archives'
-  $staged=Join-Path $stageDirectory ([IO.Path]::GetFileName($Row.candidate))
-  New-Item -ItemType Directory -Force -Path $stageRoot | Out-Null
-  $inputs=@(
-    [ordered]@{source_path=$Row.candidate;file_name=[IO.Path]::GetFileName($Row.candidate);expected_sha256=$Row.candidate_sha256;role='candidate';identity=@{target=$Target;version=$Row.to;source_version=$SourceVersion};provenance=@{kind='verified-candidate-manifest';source_commit=$SourceCommit};immutable=$true},
-    [ordered]@{source_path=$Row.predecessor;file_name=[IO.Path]::GetFileName($Row.predecessor);expected_sha256=$Row.predecessor_sha256;role='predecessor';identity=@{target=$Target;version=$Row.from};provenance=@{kind='verified-predecessor-authority';source_version=$SourceVersion};immutable=$true}
+function Assert-MIR42EngineLibraryArchives {
+  param(
+    [Parameter(Mandatory)][string]$Target,
+    [Parameter(Mandatory)]$Row,
+    [Parameter(Mandatory)][string]$LibraryDirectory
   )
-  $lease=New-MIRImmutableInputLease -RunRoot $stageRoot -StageDirectory $stageDirectory -Inputs $inputs -RequireHardLinks
-  $Leases.Add($lease)
-  Add-MIRNativeProbeImmutableLease -Context $Context -Lease $lease
-  if ((Get-MIR42EngineRunSha -Path $staged) -cne $Row.candidate_sha256) { throw "[mir42-$Target-staged-candidate-hash]" }
-  $Row.candidate=$staged
-  if ((Get-MIR42EngineRunSha -Path $Row.predecessor) -cne $Row.predecessor_sha256) { throw "[mir42-$Target-locked-predecessor-hash]" }
+  # The engine and upgrade actors select the real flat archive library. Do not
+  # create a profile, copy, hard link, or per-run archive stage: the caller
+  # must make each exact candidate and predecessor available once in that
+  # declared library before it asks to run native acceptance.
+  Assert-MIRLibraryPath $LibraryDirectory
+  $library=(Resolve-Path -LiteralPath $LibraryDirectory).Path
+  $bindings=[Collections.Generic.List[object]]::new()
+  foreach($definition in @(
+    [ordered]@{role='candidate';version=[string]$Row.to;sha256=[string]$Row.candidate_sha256},
+    [ordered]@{role='predecessor';version=[string]$Row.from;sha256=[string]$Row.predecessor_sha256}
+  )){
+    $role=[string]$definition.role
+    $authorityPath=Assert-MIR42EngineRunFile -Path ([string]$Row[$role]) -Label "mir42-$Target-$role-authority"
+    $expectedName='more-infinite-research_'+[string]$definition.version+'.zip'
+    if([IO.Path]::GetFileName($authorityPath)-cne$expectedName){throw "[mir42-$Target-library-$role-name]"}
+    if((Get-MIR42EngineRunSha -Path $authorityPath)-cne[string]$definition.sha256){throw "[mir42-$Target-library-$role-authority-hash]"}
+    $libraryPath=Join-Path $library $expectedName
+    if(-not(Test-Path -LiteralPath $libraryPath -PathType Leaf)){throw "[mir42-$Target-library-$role-missing] $expectedName"}
+    $libraryPath=(Resolve-Path -LiteralPath $libraryPath).Path
+    if((Get-MIR42EngineRunSha -Path $libraryPath)-cne[string]$definition.sha256){throw "[mir42-$Target-library-$role-hash] $expectedName"}
+    if((Get-MIR42EngineRunArchiveVersion -Path $libraryPath)-cne[string]$definition.version){throw "[mir42-$Target-library-$role-version] $expectedName"}
+    $Row[$role+'_authority_path']=$authorityPath
+    $Row[$role]=$libraryPath
+    $bindings.Add([pscustomobject][ordered]@{role=$role;authority_path=$authorityPath;library_path=$libraryPath;sha256=[string]$definition.sha256;version=[string]$definition.version})
+  }
+  return [pscustomobject][ordered]@{target=$Target;library=$library;archives=@($bindings.ToArray());archive_copies_created=0;archive_links_created=0;populated_profiles_created=0}
 }
-
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $candidateVersion = Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath $CandidateManifestPath
 $manifestPath = [string]$candidateVersion.path
@@ -429,7 +442,6 @@ $libraryBindings=Get-MIR42EngineLibraryBindings -Path $LibraryBindingsPath -Targ
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $out -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
 trap {
   $failure=$_
-  foreach($inputLease in $inputLeases){if(-not $inputLease.closed){try {$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed} catch {}}}
   throw $failure
 }
 
@@ -508,15 +520,36 @@ if ($isNineTargetCandidate) {
 }
 
 $maintenanceInputs = $null
+if ([string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath) -and
+    -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorSourceVersion)) {
+  throw '[mir42-engine-maintenance-predecessor-selection-input]'
+}
 if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
-  if ($sourceVersion -cnotin @('4.2.1','4.2.2') -or -not $isNineTargetCandidate) {
+  if ($sourceVersion -cnotin @('4.2.1','4.2.2','4.2.3') -or -not $isNineTargetCandidate) {
     throw '[mir42-engine-maintenance-predecessor-candidate-scope]'
   }
-  $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $sourceVersion
+  $directPredecessorSourceVersion = '4.2.' + (([version]$sourceVersion).Build - 1)
+  $requestedPredecessorSourceVersion = if ([string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorSourceVersion)) {
+    $directPredecessorSourceVersion
+  } else {
+    $PublishedMaintenancePredecessorSourceVersion
+  }
+  $permittedPredecessorSourceVersions = if ($sourceVersion -ceq '4.2.3') {
+    @('4.2.0','4.2.1','4.2.2')
+  } else {
+    @($directPredecessorSourceVersion)
+  }
+  if ($requestedPredecessorSourceVersion -cnotin $permittedPredecessorSourceVersions) {
+    throw '[mir42-engine-maintenance-predecessor-selection]'
+  }
+  # The frozen-manifest reader is keyed by the release immediately after the
+  # requested predecessor: 420 -> its 421 reader, 421 -> 422, 422 -> 423.
+  $predecessorReaderVersion = '4.2.' + (([version]$requestedPredecessorSourceVersion).Build + 1)
+  $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $predecessorReaderVersion
   $releaseText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
   if ($LASTEXITCODE -ne 0) { throw '[mir42-engine-maintenance-predecessor-release-readback]' }
   $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-    -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($releaseText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $sourceVersion
+    -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($releaseText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion $predecessorReaderVersion
   foreach ($input in $maintenanceInputs.targets) {
     $target = [string]$input.target
     if ($target -in $script:MIR42ModernEngineTargets -and
@@ -654,7 +687,7 @@ $runner = Assert-MIR42EngineRunFile -Path $PSCommandPath -Label 'mir42-engine-ru
 New-Item -ItemType Directory -Force -Path $out | Out-Null
 foreach ($target in $targets) {
   $row = $selected[$target]
-  New-MIR42EngineArchiveStage -Target $target -Row $row -OutputRoot $out -SourceVersion $sourceVersion -SourceCommit $head -Context $resources -Leases $inputLeases
+  $libraryArchiveBindings.Add((Assert-MIR42EngineLibraryArchives -Target $target -Row $row -LibraryDirectory $libraryBindings[$target]))
 }
 $results = [Collections.Generic.List[object]]::new()
 $processTotal = 0
@@ -688,7 +721,7 @@ foreach ($target in $targets) {
         throw "[mir42-$target-$scenario-engine-drift-before]"
       }
       if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) {
-        throw "[mir42-$target-$scenario-staged-candidate-drift-before]"
+        throw "[mir42-$target-$scenario-library-candidate-drift-before]"
       }
       $null = Invoke-MIR42BoundedUpgrade -PowerShell $pwsh -Arguments $freshArgs -StdoutPath $freshStdout -StderrPath $freshStderr -DeadlineSeconds $RowDeadlineSeconds -NativeActor
 
@@ -696,7 +729,7 @@ foreach ($target in $targets) {
         throw "[mir42-$target-$scenario-engine-drift-after]"
       }
       if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) {
-        throw "[mir42-$target-$scenario-staged-candidate-drift-after]"
+        throw "[mir42-$target-$scenario-library-candidate-drift-after]"
       }
       $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json -Depth 100 -DateKind String
       $candidateRow = @($manifest.targets | Where-Object { [string]$_.target -ceq $target })[0]
@@ -730,15 +763,21 @@ foreach ($target in $targets) {
   $args = @('-NoProfile','-File',$harness,'-RepoRoot',$repo,'-FactorioBin',$row.engine,
     '-FromZip',$row.predecessor,'-ToZip',$row.candidate,'-FromVersion',$row.from,'-ToVersion',$row.to,
     '-SourceVersion',$(if($sourceVersion -ceq '4.2.0'){'4.2.1'}else{$sourceVersion}),
-    '-FixtureName',$row.fixture,'-Archetype','base-default','-OutputPath',$receiptPath,
+    # The established F210 complete-state oracle is native Space Age only.
+    '-FixtureName',$row.fixture,'-Archetype',$(if($sourceVersion -ceq '4.2.3' -and $target -ceq 'f210'){'space-age-native-owner'}else{'base-default'}),'-OutputPath',$receiptPath,
     '-LocalModLibraryDirs',$libraryBindings[$target],
     '-WorkRoot',(Join-Path $rowRoot 'work'),'-Retention','OnFailure',
     '-ExpectedPeakMemoryMiB',([string]$ExpectedPeakMemoryMiB),'-MaxNewOutputMiB',([string][int][Math]::Floor((Get-MIRNativeProbeRemainingOutputBytes -Context $resources)/1MB)))
-  if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-staged-candidate-drift-before-upgrade]" }
+  if ($null -ne $maintenanceInputs) {
+    # Bind the child receipt to the exact selected published predecessor too;
+    # the outer candidate manifest remains the authority for current bytes.
+    $args += @('-SelectedTarget',$target,'-SelectedReleaseManifest',$manifestPath,'-PublishedMaintenancePredecessorManifestPath',$PublishedMaintenancePredecessorManifestPath)
+  }
+  if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-library-candidate-drift-before-upgrade]" }
   if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) { throw "[mir42-$target-engine-drift-before-upgrade]" }
   $exitCode = Invoke-MIR42BoundedUpgrade -PowerShell $pwsh -Arguments $args -StdoutPath $stdoutPath -StderrPath $stderrPath -DeadlineSeconds $RowDeadlineSeconds
   if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) { throw "[mir42-$target-engine-drift-after-upgrade]" }
-  if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-staged-candidate-drift-after-upgrade]" }
+  if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-library-candidate-drift-after-upgrade]" }
   $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 50 -DateKind String
   $requiredAssertions = @('exact-candidate-normal-mod-directory-load','upgraded-save-reload-passed','upgraded-save-second-reload-passed')
   if ($isHistoricalTarget) {
@@ -818,8 +857,7 @@ if ($isNineTargetCandidate) {
   }
 }
 $recordPath = Join-Path $out 'engine-run.json'
-foreach($inputLease in $inputLeases){if(-not $inputLease.closed){$null=Complete-MIRImmutableInputLease -Lease $inputLease -Outcome passed}}
-$resourceRecord=[ordered]@{kind='MIR42EngineRunResourceDiagnosticsV1';source_commit=$head;source_version=$sourceVersion;expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;shared_alias_bytes=$resources.shared_alias_bytes;memory_enforcement='sampled-watchdog-not-hard-cap';process_inventory=@($resources.runs);input_staging=@($inputLeases|ForEach-Object {$_.record});release_qualification='not-performed'}
+$resourceRecord=[ordered]@{kind='MIR42EngineRunResourceDiagnosticsV1';source_commit=$head;source_version=$sourceVersion;expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;shared_alias_bytes=$resources.shared_alias_bytes;memory_enforcement='sampled-watchdog-not-hard-cap';process_inventory=@($resources.runs);input_staging=@();direct_library_archives=@($libraryArchiveBindings.ToArray());release_qualification='not-performed'}
 $resourceJson=($resourceRecord|ConvertTo-Json -Depth 40)+"`n"
 if([Text.Encoding]::UTF8.GetByteCount($resourceJson) -ge (Get-MIRNativeProbeRemainingOutputBytes -Context $resources)){throw '[mir441-resource-output-budget]'}
 [IO.File]::WriteAllText((Join-Path $out 'engine-run.resources.json'),$resourceJson,[Text.UTF8Encoding]::new($false))

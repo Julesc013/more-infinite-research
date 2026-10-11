@@ -243,13 +243,14 @@ try {
   $browserBinding=[scriptblock]::Create($browserAst.ParamBlock.Extent.Text+"`n"+($selectionStatements-join"`n")+'; return $expectedIdentity')
   foreach($case in @(
     @{target='2.1';source='4.2.1';version='4.2.21001'},@{target='2.1';source='4.2.2';version='4.2.21002'},
-    @{target='2.0';source='4.2.1';version='4.2.20001'},@{target='2.0';source='4.2.2';version='4.2.20002'}
+    @{target='2.1';source='4.2.3';version='4.2.21003'},
+    @{target='2.0';source='4.2.1';version='4.2.20001'},@{target='2.0';source='4.2.2';version='4.2.20002'},
+    @{target='2.0';source='4.2.3';version='4.2.20003'}
   )){
     $selected=& $browserBinding -RepoRoot $repo -Target $case.target -SourceVersion $case.source
     Assert-Probe ($selected.distribution_version-ceq$case.version) 'browser caller selected the wrong maintenance identity.'
   }
   Assert-Probe ((& $browserBinding -RepoRoot $repo).distribution_version-ceq'4.2.21001') 'browser default changed.'
-  Refuses-Probe {& $browserBinding -RepoRoot $repo -SourceVersion '4.2.3'} 'SourceVersion'
   foreach($name in @('Resolve-BrowserEnginePath','Test-BrowserCandidate')) {
     $definitions=@($browserAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
     Assert-Probe ($definitions.Count -eq 1) "expected one actual browser admission function: $name"
@@ -378,15 +379,18 @@ try {
       $invalid=New-ControlledBrowserArchive -Line $line -Identity $currentIdentity -Variant $case.variant
       Refuses-Probe {Test-BrowserCandidate -Candidate $invalid -Line $line -Identity $currentIdentity -Repository $repo} $case.error
     }
+    $candidate423=& $browserBinding -RepoRoot $repo -Target $line -SourceVersion '4.2.3'
+    $archive423=New-ControlledBrowserArchive -Line $line -Identity $candidate423
+    $checked423=Test-BrowserCandidate -Candidate $archive423 -Line $line -Identity $candidate423 -Repository $repo
+    Assert-Probe ($checked423.info.version-ceq$candidate423.distribution_version-and$checked423.sha256-ceq(Get-FileHash $archive423).Hash) 'browser rejected or mislabeled the explicit 4.2.3 archive.'
   }
   $continuityAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1'),[ref]$browserTokens,[ref]$browserErrors)
   Assert-Probe ($browserErrors.Count-eq 0) 'continuity harness syntax differs.'
   $continuityBinding=[scriptblock]::Create($continuityAst.ParamBlock.Extent.Text+'; return $SourceVersion')
-  foreach($version in @('4.2.0','4.2.1','4.2.2')){
+  foreach($version in @('4.2.0','4.2.1','4.2.2','4.2.3')){
     Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion $version)-ceq$version) 'continuity caller rejected a retained source version.'
   }
   Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo)-ceq'4.2.1') 'continuity default changed.'
-  Refuses-Probe {& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion '4.2.3'} 'SourceVersion'
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   foreach($name in @('Fail','Assert-True','Assert-Equal','Get-Sha256','Get-ZipEntry','Get-ZipEntrySha256','Get-ZipEntryText','Normalize-ZipMember','Test-Candidate')){
     $definitions=@($continuityAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
@@ -621,7 +625,10 @@ try {
         $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
       }
     }
-    Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion '4.2.3'} 'SourceVersion'
+    # 4.2.3 is a valid reader identity. A 4.2.2 controlled receipt must
+    # still be refused as an identity mismatch rather than by an obsolete
+    # caller allow-list.
+    Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion '4.2.3'} 'materialization identity differs'
 
     $flat=Join-Path $run 'flat-library';New-Item -ItemType Directory -Path $flat|Out-Null
     $dependency=Join-Path $flat 'controlled-k2_1.0.0.zip'
@@ -909,10 +916,8 @@ function New-MIR4TargetPackage {
     $nextIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch 2
     Assert-Probe ($nextPackage.target-ceq$target-and$nextPackage.source_version-ceq'4.2.2'-and$nextPackage.distribution_version-ceq$nextIdentity.distribution_version-and$nextPackage.candidate_id.StartsWith($target.ToUpperInvariant()+'-SCIENCE-LAUNCH-')) 'governed child lost explicit source patch two.'
   }
-  $driverHash=(Get-FileHash -LiteralPath (Join-Path $context.root 'materialize.ps1')).Hash
-  $driverProcessIndex=$context.process_index
-  Refuses-Probe {New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.2.3'} 'SourceVersion'
-  Assert-Probe ($driverProcessIndex-eq$context.process_index-and(Get-FileHash -LiteralPath (Join-Path $context.root 'materialize.ps1')).Hash-ceq$driverHash) 'unknown source version changed the driver or launched a process.'
+  $patchThreePackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.2.3'
+  Assert-Probe ($patchThreePackage.source_version-ceq'4.2.3'-and$patchThreePackage.distribution_version-ceq'4.2.21003'-and$patchThreePackage.target-ceq'f210') 'governed materializer rejected or misprojected source patch three.'
   $echo=Join-Path $context.root 'argv-echo.ps1'
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
@@ -1106,10 +1111,12 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
 '@
     [IO.File]::WriteAllText($worker,$workerText,[Text.UTF8Encoding]::new($false))
     $currentMirInput=New-BrowserInput 'more-infinite-research' '4.2.20002' 'mir-candidate'
-    foreach($sourceVersion in @('4.2.1','4.2.2')){
+    $candidate423Input=New-BrowserInput 'more-infinite-research' '4.2.20003' 'mir-candidate'
+    foreach($sourceVersion in @('4.2.1','4.2.2','4.2.3')){
     $parameters=[ordered]@{CandidateArchive=$mirInput.source_path;RepositoryRoot=$repo;Target='F200';FactorioExe=$pwsh;TimeoutSeconds=30;StageLimit='Initial';InputMode='ScriptedFixture';SourceVersion='4.2.1';LibraryDirectory=$browserLibrary;Operation='Run'}
     $parameters.SourceVersion=$sourceVersion
     if($sourceVersion-ceq'4.2.2'){$parameters.CandidateArchive=$currentMirInput.source_path}
+    if($sourceVersion-ceq'4.2.3'){$parameters.CandidateArchive=$candidate423Input.source_path}
     $output=@(Invoke-MIRBrowserContinuityGovernedRun -RepositoryRoot $repo -ScriptPath $worker -Parameters $parameters -OutputRoot $fixture -ExpectedPeakMemoryMiB 512 -MaxNewOutputMiB 8)
     $resultPath=($output|Where-Object{$_-like'MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=*'}).Substring('MIR_BROWSER_CONTINUITY_GOVERNED_RESULT='.Length)
     $result=Get-Content -LiteralPath $resultPath -Raw|ConvertFrom-Json -Depth 40 -DateKind String
@@ -1124,7 +1131,7 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     Assert-MIRBrowserContinuityTerminalReceipt -Receipt $fallback.library_input_receipts[0] -JobRoot (Join-Path (Split-Path -Parent $resultPath) 'worker')
     Assert-Probe ($fallback.library_input_receipts[0].status-ceq'restored-direct-library-controls') 'browser fallback reader lost its direct-library receipt.'
     Assert-Probe ($fallback.source_version-ceq$sourceVersion-and$fallback.candidate.archive_sha256-ceq(Get-FileHash $parameters.CandidateArchive).Hash) 'browser owned worker lost the selected maintenance version or bytes.'
-    $expectedVersion=if($sourceVersion-ceq'4.2.2'){'4.2.20002'}else{'4.2.20001'}
+    $expectedVersion=switch($sourceVersion){'4.2.1'{'4.2.20001'};'4.2.2'{'4.2.20002'};'4.2.3'{'4.2.20003'}}
     Assert-Probe ((@($fallback.library_input_receipts[0].selected|Where-Object name -CEQ 'more-infinite-research').version)-ceq$expectedVersion) 'browser worker selected a different installed maintenance version.'
     }
   }

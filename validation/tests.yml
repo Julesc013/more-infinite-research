@@ -123,6 +123,7 @@
       "command": "./tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
       "requires_factorio": false,
       "inputs": [
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v4.schema.json",
         "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
         "fixtures/release-inputs/mir421-published-420-manifest.json",
         "fixtures/release-inputs/mir422-published-421-manifest.json",
@@ -205,6 +206,7 @@
       "command": "./tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
       "requires_factorio": false,
       "inputs": [
+        "tests/support/MIR423ReleaseUpgradeControls.ps1",
         "tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
         "tests/support/MIR421ReleaseAssetControls.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
@@ -248,6 +250,7 @@
       "command": "./tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
       "requires_factorio": false,
       "inputs": [
+        "spec/schemas/mir423-maintainer-written-release-authorization-v1.schema.json",
         "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
         "tests/support/MIR421ReleaseAssetControls.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
@@ -464,6 +467,20 @@
         "tools/commands/workspace/**",
         "tools/maintenance/**",
         "tests/tooling/Test-MIRLayout.ps1"
+      ]
+    },
+    {
+      "id": "static.direct-library-startup-measurement",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1",
+        "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "scripts/Measure-MIRPerformanceRegression.ps1"
       ]
     },
     {
@@ -5238,6 +5255,9 @@
         "tests/compiler/Test-MIRResearchabilityPlanning.ps1",
         "tests/compiler/researchability_planning.lua",
         "tests/compiler/lab_reachability.lua",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/mir/application/release/F210QualificationPolicy.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
