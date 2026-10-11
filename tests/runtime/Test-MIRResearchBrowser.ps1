@@ -349,7 +349,8 @@ $result | Add-Member source_version $SourceVersion
 $result | Add-Member distribution_version $expectedIdentity.distribution_version
 $result | Add-Member resource_policy @{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'}
 $result | Add-Member resource_runs $resources.runs.ToArray()
-$result | Add-Member factorio_driver_sha256 (Get-FileHash -LiteralPath (Join-Path $run 'factorio-driver.ps1')).Hash
+$result | Add-Member native_launch_scope 'direct-factorio-process-v1'
+$result | Add-Member resource_governor_sha256 (Get-FileHash -LiteralPath (Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1')).Hash
 $result | Add-Member resource_adapter_sha256 (Get-FileHash -LiteralPath (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')).Hash
 $terminal=Complete-MIRLibraryActivation -Activation $activation
 $activation=$null

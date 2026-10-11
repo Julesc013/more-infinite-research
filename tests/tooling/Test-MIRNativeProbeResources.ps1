@@ -844,10 +844,14 @@ try {
   Refuses-Probe {Get-MIRNativeProbeRemainingOutputBytes -Context $context} 'resource-output-budget'
   Remove-Item -LiteralPath $budgetFile
   $pwsh=(Get-Command pwsh).Source
-  $run=Invoke-MIRNativeProbeProcess -Context $context -FilePath $pwsh -Arguments @('-NoProfile','-Command','Write-Output $env:TEMP') -TimeoutSeconds 20
+  $parentApp=[Environment]::GetEnvironmentVariable('SteamAppId');$parentGame=[Environment]::GetEnvironmentVariable('SteamGameId')
+  $parentTemp=[Environment]::GetEnvironmentVariable('TEMP');$parentTmp=[Environment]::GetEnvironmentVariable('TMP')
+  $run=Invoke-MIRNativeProbeProcess -Context $context -FilePath $pwsh -Arguments @('-NoProfile','-Command','[ordered]@{temp=$env:TEMP;tmp=$env:TMP;steam_app=$env:SteamAppId;steam_game=$env:SteamGameId}|ConvertTo-Json -Compress') -TimeoutSeconds 20
   Assert-Probe ($run.result.passed -and (Test-Path -LiteralPath $run.ledger)) 'actual owned small process did not retain its resource ledger.'
-  $privateTemp=(Get-Content -LiteralPath $run.stdout -Raw).Trim()
-  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $privateTemp) -and -not (Test-Path -LiteralPath $privateTemp)) 'process temp was not isolated and retired.'
+  $plainChild=Get-Content -LiteralPath $run.stdout -Raw|ConvertFrom-Json
+  $privateTemp=[string]$plainChild.temp
+  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $privateTemp) -and(Test-MIR441PathContained -Root $context.root -Path ([string]$plainChild.tmp))-and-not(Test-Path -LiteralPath $privateTemp)-and-not(Test-Path -LiteralPath ([string]$plainChild.tmp))) 'process temp was not isolated and retired.'
+  Assert-Probe ([string]$plainChild.steam_app -ceq [string]$parentApp -and [string]$plainChild.steam_game -ceq [string]$parentGame) 'ordinary governed process unexpectedly received Factorio Steam identity.'
   Refuses-Probe {Invoke-MIRNativeProbeProcess -Context $context -FilePath $pwsh -Arguments @('-NoProfile','-Command','exit 7') -TimeoutSeconds 20} 'mir441-process-exit'
   Assert-Probe ($context.runs[$context.runs.Count-1].status -ceq 'interrupted' -and (Test-Path -LiteralPath $context.runs[$context.runs.Count-1].ledger)) 'failed actor lost its ledger reference.'
   $terminal=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed
@@ -938,15 +942,15 @@ function New-MIR4TargetPackage {
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
 [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
-[ordered]@{values=@($Values);steam_app=$env:SteamAppId;steam_game=$env:SteamGameId;temp=$env:TEMP} | ConvertTo-Json -Compress
+[ordered]@{values=@($Values);steam_app=$env:SteamAppId;steam_game=$env:SteamGameId;temp=$env:TEMP;tmp=$env:TMP} | ConvertTo-Json -Compress
 '@,[Text.UTF8Encoding]::new($false))
-  $parentApp=[Environment]::GetEnvironmentVariable('SteamAppId');$parentGame=[Environment]::GetEnvironmentVariable('SteamGameId')
   $literalValues=@('path with spaces','literal $(Get-Process) ; "quote" & marker','Unicode: π')
   $nativeActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $pwsh -Arguments (@('-NoProfile','-File',$echo)+$literalValues) -TimeoutSeconds 30
   $echoed=Get-Content -LiteralPath $nativeActor.stdout -Raw | ConvertFrom-Json
-  Assert-Probe (($echoed.values | ConvertTo-Json -Compress) -ceq ($literalValues | ConvertTo-Json -Compress)) 'native wrapper changed literal argument data.'
-  Assert-Probe ($echoed.steam_app -ceq '427520' -and $echoed.steam_game -ceq '427520' -and [Environment]::GetEnvironmentVariable('SteamAppId') -ceq $parentApp -and [Environment]::GetEnvironmentVariable('SteamGameId') -ceq $parentGame) 'Steam launch identifiers escaped the owned child.'
-  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $echoed.temp) -and -not (Test-Path -LiteralPath $echoed.temp) -and (Test-Path -LiteralPath $nativeActor.ledger)) 'native wrapper bypassed the private-temp or resource ledger authority.'
+  Assert-Probe (($echoed.values | ConvertTo-Json -Compress) -ceq ($literalValues | ConvertTo-Json -Compress)) 'direct native actor changed literal argument data.'
+  Assert-Probe ($echoed.steam_app -ceq '427520' -and $echoed.steam_game -ceq '427520' -and [Environment]::GetEnvironmentVariable('SteamAppId') -ceq $parentApp -and [Environment]::GetEnvironmentVariable('SteamGameId') -ceq $parentGame -and [Environment]::GetEnvironmentVariable('TEMP') -ceq $parentTemp -and [Environment]::GetEnvironmentVariable('TMP') -ceq $parentTmp) 'Factorio Steam identity or private custody environment escaped the owned child.'
+  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $echoed.temp) -and(Test-MIR441PathContained -Root $context.root -Path $echoed.tmp)-and-not(Test-Path -LiteralPath $echoed.temp)-and-not(Test-Path -LiteralPath $echoed.tmp)-and(Test-Path -LiteralPath $nativeActor.ledger)-and-not(Test-Path -LiteralPath (Join-Path $context.root 'factorio-driver.ps1'))) 'direct native actor bypassed private-temp or resource-ledger custody, or retained a wrapper driver.'
+  Assert-Probe ($nativeActor.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$nativeActor.result.duration_measurement.historical_scope-ceq'governed-powershell-wrapper-tree-start-to-exit'-and$nativeActor.result.duration_measurement.comparability-ceq'scope-changed; compare only fresh direct-native measurements; no product-speedup claim') 'native actor timing scope is not explicit and non-comparable to historical wrapper timing.'
   $priorIndex=$context.process_index
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $pwsh -Arguments @('x'*20KB)} 'argument-budget'
   Assert-Probe ($context.process_index -eq $priorIndex) 'oversized argument data launched an actor.'
@@ -959,7 +963,7 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   & $compiler /nologo /target:winexe ('/out:'+$guiBinary) $guiSource
   if($LASTEXITCODE-ne0){throw 'Controlled GUI compilation failed'}
   $guiActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $guiBinary -Arguments @($guiMarker) -TimeoutSeconds 15
-  Assert-Probe ((Test-Path -LiteralPath $guiMarker)-and([IO.File]::ReadAllText($guiMarker)-ceq'finished')-and$guiActor.result.exit_code-eq0) 'native wrapper returned before the GUI child completed.'
+  Assert-Probe ((Test-Path -LiteralPath $guiMarker)-and([IO.File]::ReadAllText($guiMarker)-ceq'finished')-and$guiActor.result.exit_code-eq0-and$guiActor.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit') 'direct native actor returned before the GUI child completed or lost direct clock scope.'
   $actorRows=@(Assert-ControlledProbeActorInventory -Runs @($context.runs) -RunRoot $context.root)
   Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows|Select-Object -Skip 1) -RunRoot $context.root} 'native-probe-actor-missing'
   Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$actorRows[0]) -RunRoot $context.root} 'native-probe-actor-duplicate'

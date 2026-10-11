@@ -200,16 +200,23 @@ function Invoke-MIRNativeProbeProcess {
     [Parameter(Mandatory)][string]$FilePath,
     [Parameter(Mandatory)][string[]]$Arguments,
     [ValidateRange(1,3600)][int]$TimeoutSeconds=120,
+    [switch]$FactorioSteamIdentity,
     [scriptblock]$CompletionPredicate
   )
   $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   $Context.process_index++
   $prefix=Join-Path $Context.root ('process-'+$Context.process_index)
   try {
-    $result=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $Context.root `
-      -Policy $Context.policy -EstimatedPeakBytes $remaining -ExpectedPeakMemoryBytes $Context.peak_memory_bytes `
-      -LedgerPath ($prefix+'.resources.jsonl') -StdoutPath ($prefix+'.stdout.txt') -StderrPath ($prefix+'.stderr.txt') `
-      -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $CompletionPredicate
+    $governorArguments=@{
+      FilePath=$FilePath;Arguments=$Arguments;WorkRoot=$Context.root;Policy=$Context.policy
+      EstimatedPeakBytes=$remaining;ExpectedPeakMemoryBytes=$Context.peak_memory_bytes
+      LedgerPath=($prefix+'.resources.jsonl');StdoutPath=($prefix+'.stdout.txt');StderrPath=($prefix+'.stderr.txt')
+      TimeoutSeconds=$TimeoutSeconds;CompletionPredicate=$CompletionPredicate
+    }
+    # Do not add an unknown named parameter to existing non-Factorio mock
+    # actors. Only the direct Factorio actor opts into fixed child Steam IDs.
+    if($FactorioSteamIdentity){$governorArguments.FactorioSteamIdentity=$true}
+    $result=Invoke-MIR441MonitoredProcess @governorArguments
     $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   } catch {
     $Context.runs.Add([pscustomobject]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$_.Exception.Message})
@@ -236,40 +243,24 @@ function Invoke-MIRNativeProbeFactorioProcess {
     [scriptblock]$CompletionPredicate
   )
   if($Arguments.Count -lt 1 -or $Arguments.Count -gt 128){throw '[mir-native-probe-argument-budget]'}
+  # Retain the historical data-size guard even though the direct actor no
+  # longer serializes its arguments through a PowerShell wrapper.
   $payload=[Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-Json -InputObject $Arguments -Compress))
   if($payload.Length -gt 16KB){throw '[mir-native-probe-argument-budget]'}
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
-  $driver=Join-Path $Context.root 'factorio-driver.ps1'
-  # Steam identifiers exist only in this owned child. The shared governor
-  # measures/cancels the complete PowerShell plus native-engine process tree.
-  # Arguments cross this boundary as data, never interpolated shell commands.
-  $driverText=@'
-param([Parameter(Mandatory)][string]$NativeExecutable,[Parameter(Mandatory)][string]$ArgumentsBase64)
-$ErrorActionPreference='Stop'
-$nativeArguments=[string[]]([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($ArgumentsBase64)) | ConvertFrom-Json)
-$env:SteamAppId='427520';$env:SteamGameId='427520'
-[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
-# A GUI-subsystem executable can return from PowerShell's call operator before
-# it finishes. Keep this monitored parent alive until the native child exits.
-$start=[Diagnostics.ProcessStartInfo]::new()
-$start.FileName=$NativeExecutable;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
-$start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
-$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
-foreach($argument in $nativeArguments){[void]$start.ArgumentList.Add($argument)}
-$native=[Diagnostics.Process]::new();$native.StartInfo=$start
-try{
- if(-not $native.Start()){throw 'Native engine did not start.'}
- $stdoutCopy=$native.StandardOutput.BaseStream.CopyToAsync([Console]::OpenStandardOutput())
- $stderrCopy=$native.StandardError.BaseStream.CopyToAsync([Console]::OpenStandardError())
- $native.WaitForExit()
- $null=$stdoutCopy.GetAwaiter().GetResult();$null=$stderrCopy.GetAwaiter().GetResult()
- $nativeExitCode=$native.ExitCode
-}finally{$native.Dispose()}
-exit $nativeExitCode
-'@
-  [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
-  return Invoke-MIRNativeProbeProcess -Context $Context -FilePath (Get-Command pwsh).Source -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $CompletionPredicate `
-    -Arguments @('-NoProfile','-File',$driver,'-NativeExecutable',$FilePath,'-ArgumentsBase64',[Convert]::ToBase64String($payload))
+  # The same governed ProcessStartInfo already owns the process lifetime,
+  # streamed stdout/stderr, process tree, timeout and cleanup. Start Factorio
+  # directly so its duration is native executable start-to-exit, rather than
+  # the historical PowerShell-wrapper tree duration. This clock-scope repair
+  # removes developer harness work; it is not product-speedup evidence.
+  $run=Invoke-MIRNativeProbeProcess -Context $Context -FilePath $FilePath -Arguments $Arguments -TimeoutSeconds $TimeoutSeconds `
+    -FactorioSteamIdentity -CompletionPredicate $CompletionPredicate
+  $run.result | Add-Member -NotePropertyName duration_measurement -NotePropertyValue ([ordered]@{
+    scope='direct-native-executable-start-to-exit'
+    historical_scope='governed-powershell-wrapper-tree-start-to-exit'
+    comparability='scope-changed; compare only fresh direct-native measurements; no product-speedup claim'
+  }) -Force
+  return $run
 }
 
 function New-MIRNativeProbeTargetPackage {

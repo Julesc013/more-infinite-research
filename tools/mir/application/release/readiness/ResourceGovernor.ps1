@@ -127,6 +127,7 @@ function Invoke-MIR441MonitoredProcess {
     [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0,
     [ValidateRange(1,5)][int]$SampleSeconds=1,[ValidateRange(1,86400)][int]$TimeoutSeconds=900,
     [string]$StdoutPath='',[string]$StderrPath='',[switch]$AllowNonZeroExit,
+    [switch]$FactorioSteamIdentity,
     [scriptblock]$CompletionPredicate=$null
   )
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
@@ -148,6 +149,10 @@ function Invoke-MIR441MonitoredProcess {
     New-Item -ItemType Directory -Force -Path $temp|Out-Null
     $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=$FilePath;$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.WorkingDirectory=$work
     $start.Environment['TEMP']=$temp;$start.Environment['TMP']=$temp
+    # Factorio only needs these fixed Steam identifiers in its owned child.
+    # Keep this narrow option separate from the governor's custody variables:
+    # callers cannot supply arbitrary child environment keys or replace TEMP/TMP.
+    if($FactorioSteamIdentity){$start.Environment['SteamAppId']='427520';$start.Environment['SteamGameId']='427520'}
     foreach($argument in $Arguments){[void]$start.ArgumentList.Add($argument)}
     $start.RedirectStandardOutput=[bool]$StdoutPath;$start.RedirectStandardError=[bool]$StderrPath
     $process=[Diagnostics.Process]::new();$process.StartInfo=$start
