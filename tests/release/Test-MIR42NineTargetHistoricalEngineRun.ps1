@@ -412,7 +412,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check (-not(Test-Path (Join-Path $modernFailureParams.FreshRoot 'summary.json'))-and(Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json'))-ceq$oldList-and-not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'failed modern direct actor accepted evidence or left controls active.'
     }
     $freshFailure='';$modernFailureParams.FreshRoot=Join-Path $exactRoot 'modern-drift';$modernFailureParams.CandidateSha256='0'*64
-    Refuses {Invoke-MIR42ModernFreshLoad @modernFailureParams} 'input-drift'
+    Refuses {Invoke-MIR42ModernFreshLoad @modernFailureParams} 'modern-fresh-archive-content'
     Check (-not(Test-Path (Join-Path $modernFailureParams.FreshRoot 'summary.json'))-and(Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json'))-ceq$oldList-and-not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'drifted modern direct actor accepted evidence or changed controls.'
     $invalidFamily=$modernFailureParams.Clone();$invalidFamily.CandidateSha256=$rows.f200.candidate_sha256;$invalidFamily.Scenario='package-zip-space-age';$invalidFamily.FreshRoot=Join-Path $exactRoot 'modern-invalid-family'
     Refuses {Invoke-MIR42ModernFreshLoad @invalidFamily} 'modern-fresh-target-binding'
@@ -701,7 +701,8 @@ $modernFreshCall = $runner.IndexOf('$fresh = Invoke-MIR42ModernFreshLoad -Target
 $modernFreshElse = if ($historicalFreshCall -ge 0) { $runner.IndexOf('} else {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
 if ($historicalFreshBranch -lt 0 -or $historicalFreshCall -le $historicalFreshBranch -or
     $modernFreshElse -le $historicalFreshCall -or $modernFreshCall -le $modernFreshElse -or
-    -not $runner.Contains("[mir42-`$Target-historical-fresh-log-content]") -or
+    -not $runner.Contains('-ErrorPrefix "mir42-$Target-historical-fresh"') -or
+    -not $runner.Contains('throw "[$ErrorPrefix-log-content] $log"') -or
     -not $runner.Contains('function Invoke-MIR42DirectFreshLoad {') -or
     -not $runner.Contains('Invoke-MIR42BoundedUpgrade -PowerShell $Engine') -or
     $runner.Contains('-ScenarioWorker')) {
