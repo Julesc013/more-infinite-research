@@ -947,9 +947,9 @@
     {
       "path": "scripts/Measure-MIRPerformanceRegression.ps1",
       "classification": "canonical-internal",
-      "sha256": "1F87162B97755E805F40E8598831AC538FB7C43B203DF279851D28644B0D9C1A",
+      "sha256": "7E4CA4A482D6368D9D4741D49FE779BED28D2CCF25B55D459D31950DC1EBBBD7",
       "hash_mode": "canonical-text-v1",
-      "lines": 881,
+      "lines": 885,
       "package_visible": false
     },
     {
@@ -4459,9 +4459,9 @@
     {
       "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
       "classification": "canonical-internal",
-      "sha256": "1A1BE20DAE5400F8A46C8F50353A42859BB9D756ECEAA1E12BE3D8DD5A42128B",
+      "sha256": "EC638984026F7E9095588F0E00CF1F64EE3958D7A4EBFC7BA483096987E80E03",
       "hash_mode": "canonical-text-v1",
-      "lines": 251,
+      "lines": 417,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:0f0e2d54cd887f23844b323e403a2b727cf2bbc7653791f8fa92374000c218bc"
+  "digest": "sha256:e6bc112c1e4bf878fbab01792db03b04c1731d873cb2ce611c85ca921c0da456"
 }

@@ -18,10 +18,27 @@ function Write-TestArchive([string]$Library,[string]$Version){
   }finally{$zip.Dispose()}
   return $archive
 }
+function Write-PlayerReadyObserverArchive([string]$Library,[string]$Name='mir423-player-ready-observer',[string]$Version='1.0.0',[string[]]$Dependencies=@('base')){
+  $archive=Join-Path $Library ($Name+'_'+$Version+'.zip')
+  $zip=[IO.Compression.ZipFile]::Open($archive,[IO.Compression.ZipArchiveMode]::Create)
+  try{
+    $root=$Name+'_'+$Version
+    foreach($entryText in @(
+      @{path='info.json';text=(@{name=$Name;version=$Version;factorio_version='2.0';dependencies=$Dependencies}|ConvertTo-Json -Compress)},
+      @{path='control.lua';text='log("[MIR_ACTIVE_MODS] base@2.0.77|mir423-player-ready-observer@1.0.0"); log("[MIR_PLAYER_READY] {\"schema\":1,\"kind\":\"mir423-player-ready-observer\",\"status\":\"passed\",\"connected_players\":1,\"native_players\":1,\"gui_root_valid\":true,\"first_usable_tick\":1}")'}
+    )){
+      $entry=$zip.CreateEntry($root+'/'+$entryText.path)
+      $writer=[IO.StreamWriter]::new($entry.Open(),[Text.UTF8Encoding]::new($false))
+      try{$writer.Write([string]$entryText.text)}finally{$writer.Dispose()}
+    }
+  }finally{$zip.Dispose()}
+  return $archive
+}
 try{
   $library=Join-Path $root 'library';$data=Join-Path $root 'engine/data';[IO.Directory]::CreateDirectory($library)|Out-Null;[IO.Directory]::CreateDirectory((Join-Path $data 'base'))|Out-Null
   [IO.File]::WriteAllText((Join-Path $data 'base/info.json'),(@{name='base';version='2.0.77';dependencies=@()}|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
   $published=Write-TestArchive -Library $library -Version '4.2.20002';$candidate=Write-TestArchive -Library $library -Version '4.2.20003'
+  $playerReadyArchive=Write-PlayerReadyObserverArchive -Library $library
   $publishedSha=Get-MIRImmutableInputSha256 -Path $published;$manifest=Join-Path $root 'mir-4.2.2.release.json'
   [IO.File]::WriteAllText($manifest,(@{release=@{source_version='4.2.2'};package_assets=@(@{target='f200';distribution_version='4.2.20002';sha256=$publishedSha})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
   $template=Join-Path $root 'profile.json';[IO.File]::WriteAllText($template,(@{mods=@(@{name='base';version='2.0.77';enabled=$true},@{name='more-infinite-research';version='4.2.20002';enabled=$true})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
@@ -36,6 +53,30 @@ try{
   Assert-DirectStartup ((@($selected.mods|Where-Object {$_.enabled}).name-join'|')-ceq'base|more-infinite-research'-and(@($selected.mods|Where-Object name -CEQ 'more-infinite-research')[0].version-ceq'4.2.20003')) 'candidate selection was not explicitly version-pinned.'
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -MirArchive $candidateIdentity
   Assert-DirectStartup ($hashes.Count-eq1-and$hashes.ContainsKey('more-infinite-research_4.2.20003.zip')-and$hashes['more-infinite-research_4.2.20003.zip']-ceq$candidateIdentity.sha256) 'selected archive hash set is incomplete or mutable.'
+  $playerReady=Get-MIRDirectLibraryPlayerReadyObserverArchive -Archive $playerReadyArchive -LibraryDirectory $library -Target f200
+  Assert-DirectStartup ($playerReady.name-ceq'mir423-player-ready-observer'-and$playerReady.version-ceq'1.0.0'-and$playerReady.target-ceq'f200'-and$playerReady.sha256-ceq(Get-MIRImmutableInputSha256 -Path $playerReadyArchive)) 'base-only graphical observer is not exact library input.'
+  $graphicalBase=@(Add-MIRDirectLibraryPlayerReadyObserverSelection -BaseRows $base -Observer $playerReady)
+  $graphicalSelection=Join-Path $root 'graphical-selection.json';Write-MIRDirectLibraryStartupProfile -Path $graphicalSelection -BaseRows $graphicalBase -MirArchive $null
+  $graphicalSelected=Get-Content -Raw -LiteralPath $graphicalSelection|ConvertFrom-Json
+  Assert-DirectStartup ((@($graphicalSelected.mods|Where-Object {$_.enabled}).name-join'|')-ceq'base|mir423-player-ready-observer') 'graphical observer is not selected identically for the no-MIR arm.'
+  $graphicalHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $graphicalBase -MirArchive $candidateIdentity
+  Assert-DirectStartup ($graphicalHashes.ContainsKey('mir423-player-ready-observer_1.0.0.zip')-and$graphicalHashes['mir423-player-ready-observer_1.0.0.zip']-ceq$playerReady.sha256) 'graphical observer archive is not hash-bound with the package selection.'
+  $badObserver=Write-PlayerReadyObserverArchive -Library $library -Name 'mir423-player-ready-observer-bad' -Dependencies @('base','more-infinite-research')
+  $badObserverRejected=$false;try{Get-MIRDirectLibraryPlayerReadyObserverArchive -Archive $badObserver -LibraryDirectory $library -Target f200|Out-Null}catch{$badObserverRejected=$_.Exception.Message-ceq'[mir-direct-startup-player-ready-observer-dependencies]'}
+  Assert-DirectStartup $badObserverRejected 'observer with non-base dependency was accepted.'
+  $readyLog=Join-Path $root 'player-ready.log'
+  [IO.File]::WriteAllText($readyLog,'1.250 Script @__mir423-player-ready-observer__/control.lua:1: [MIR_PLAYER_READY] {"schema":1,"kind":"mir423-player-ready-observer","status":"passed","connected_players":1,"native_players":1,"gui_root_valid":true,"first_usable_tick":1}',[Text.UTF8Encoding]::new($false))
+  $ready=Read-MIRDirectLibraryPlayerReadyMarker -LogPath $readyLog
+  Assert-DirectStartup ($ready.engine_log_seconds-eq1.25-and[long]$ready.marker.first_usable_tick-eq1-and[bool]$ready.marker.gui_root_valid) 'graphical player-ready marker did not bind log time and GUI root at tick one.'
+  [IO.File]::WriteAllText($readyLog,'1.250 Script @__mir423-player-ready-observer__/control.lua:1: [MIR_PLAYER_READY] {"schema":1,"kind":"mir423-player-ready-observer","status":"passed","connected_players":1,"native_players":1,"gui_root_valid":false,"first_usable_tick":1}',[Text.UTF8Encoding]::new($false))
+  $badReadyRejected=$false;try{Read-MIRDirectLibraryPlayerReadyMarker -LogPath $readyLog|Out-Null}catch{$badReadyRejected=$_.Exception.Message-ceq'[mir-direct-startup-player-ready-marker-gui-root]'}
+  Assert-DirectStartup $badReadyRejected 'invalid graphical GUI-root marker was accepted.'
+  [IO.File]::WriteAllText($readyLog,'1.250 Script @__mir423-player-ready-observer__/control.lua:1: [MIR_PLAYER_READY] {"schema":1,"kind":"mir423-player-ready-observer","status":"passed","connected_players":"1","native_players":1,"gui_root_valid":true,"first_usable_tick":1}',[Text.UTF8Encoding]::new($false))
+  $stringPlayerRejected=$false;try{Read-MIRDirectLibraryPlayerReadyMarker -LogPath $readyLog|Out-Null}catch{$stringPlayerRejected=$_.Exception.Message-ceq'[mir-direct-startup-player-ready-marker-player]'}
+  Assert-DirectStartup $stringPlayerRejected 'string-valued player readiness was accepted.'
+  [IO.File]::WriteAllText($readyLog,'1.250 Script @__mir423-player-ready-observer__/control.lua:1: [MIR_PLAYER_READY] {"schema":1,"kind":"mir423-player-ready-observer","status":"passed","connected_players":1,"native_players":1,"gui_root_valid":"false","first_usable_tick":1.5}',[Text.UTF8Encoding]::new($false))
+  $typedGuiRejected=$false;try{Read-MIRDirectLibraryPlayerReadyMarker -LogPath $readyLog|Out-Null}catch{$typedGuiRejected=$_.Exception.Message-ceq'[mir-direct-startup-player-ready-marker-gui-root]'}
+  Assert-DirectStartup $typedGuiRejected 'string GUI or fractional tick readiness was accepted.'
   $outside=Join-Path $root 'outside.zip';Copy-Item -LiteralPath $candidate -Destination $outside
   $refused=$false;try{Get-MIRDirectLibraryStartupArchive -Archive $outside -LibraryDirectory $library|Out-Null}catch{$refused=$_.Exception.Message-ceq'[mir-direct-startup-archive-not-in-selected-library]'}
   Assert-DirectStartup $refused 'archive outside selected library was accepted.'
@@ -61,10 +102,41 @@ try{
   $observerRejected=$false
   try{Assert-MIRLibraryLoadedSelection -Activation $observerActivation -LogPath $observerLog -ActiveModsObserver $observerName|Out-Null}catch{$observerRejected=$_.Exception.Message-ceq'[mir-library-loaded-selection] Actual mod names/versions differ from the profile.'}
   Assert-DirectStartup $observerRejected 'mismatching observer table was accepted.'
+  # Exercise the graphical diagnostic's narrow launch shape without starting
+  # Factorio. The native process, library transaction and loaded-selection
+  # actor are replaced only inside this host control.
+  $script:graphicalArguments=@();$script:mutatePreparedSave=$false
+  $script:graphicalObserverSelection=[pscustomobject]@{name=$playerReady.name;version=$playerReady.version;path=$playerReady.path;sha256=$playerReady.sha256;builtin=$false}
+  function Start-MIRLibraryActivation {param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode)[pscustomobject]@{library=$LibraryDirectory;selected=@($script:graphicalObserverSelection);closed=$false}}
+  function Add-MIRNativeProbeLibraryActivation {param($Context,$Activation)}
+  function Complete-MIRLibraryActivation {param($Activation);$Activation.closed=$true;[pscustomobject]@{status='restored'}}
+  function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments);$script:graphicalArguments=@($Arguments)}
+  function Assert-MIRLibraryLoadedSelection {param($Activation,$LogPath,[switch]$LatestInvocation,$ActiveModsObserver);@('base@2.0.77',$ActiveModsObserver+'@1.0.0')}
+  function Invoke-MIRNativeProbeFactorioProcess {
+    param($Context,$FilePath,$Arguments,$TimeoutSeconds)
+    $config=[string]$Arguments[[Array]::IndexOf($Arguments,'--config')+1]
+    $writeData=[regex]::Match((Get-Content -Raw -LiteralPath $config),'(?m)^write-data=(?<path>.+)$').Groups['path'].Value
+    [IO.Directory]::CreateDirectory($writeData)|Out-Null
+    [IO.File]::WriteAllText((Join-Path $writeData 'factorio-current.log'),'1.250 Script @__mir423-player-ready-observer__/control.lua:1: [MIR_PLAYER_READY] {"schema":1,"kind":"mir423-player-ready-observer","status":"passed","connected_players":1,"native_players":1,"gui_root_valid":true,"first_usable_tick":1}',[Text.UTF8Encoding]::new($false))
+    if($script:mutatePreparedSave){$save=[string]$Arguments[[Array]::IndexOf($Arguments,'--benchmark-graphics')+1];[IO.File]::AppendAllText($save,'mutated',[Text.UTF8Encoding]::new($false))}
+    $ledger=Join-Path $Context.root 'mock-graphical-ledger.json';[IO.File]::WriteAllText($ledger,'{}',[Text.UTF8Encoding]::new($false))
+    [pscustomobject]@{result=[pscustomobject]@{passed=$true;timed_out=$false;exit_code=0;duration_seconds=2.5;peak_working_set_bytes=1024;peak_sampled_private_bytes=512};ledger=$ledger}
+  }
+  $prepared=Join-Path $root 'prepared-neutral.zip';[IO.File]::WriteAllText($prepared,'fixture',[Text.UTF8Encoding]::new($false))
+  $preparedSha=Get-MIRImmutableInputSha256 -Path $prepared
+  $graphicalResult=Invoke-MIRDirectLibraryGraphicalPlayerReadySample -FactorioBin (Join-Path $root 'factorio.exe') -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $graphicalBase -RunRoot (Join-Path $root 'graphical-run') -WriteDataRoot (Join-Path $root 'graphical-write-data') -PreparedSave $prepared -PreparedSaveSha256 $preparedSha -Label 'without-mir' -Resources ([pscustomobject]@{root=$root}) -MirArchive $null -TimeoutSeconds 30 -PlayerReadyBenchmarkTicks 60 -ActiveModsObserver $playerReady.name
+  Assert-DirectStartup ($graphicalResult.endpoint_class-ceq'graphical-player-ready-diagnostic'-and$graphicalResult.elapsed_seconds-eq2.5-and$graphicalResult.engine_log_player_ready_seconds-eq1.25-and$graphicalResult.player_ready_marker.gui_root_valid-and$graphicalResult.prepared_save_sha256_before-ceq$preparedSha-and$graphicalResult.prepared_save_sha256_after-ceq$preparedSha-and$graphicalResult.active_mods_observer.sha256-ceq$playerReady.sha256-and$graphicalResult.ready_endpoint.Contains('not a main-menu')) 'graphical diagnostic did not distinguish the usable-player marker from whole-process elapsed and immutable prepared-save evidence.'
+  $wrongSaveRejected=$false;try{Invoke-MIRDirectLibraryGraphicalPlayerReadySample -FactorioBin (Join-Path $root 'factorio.exe') -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $graphicalBase -RunRoot (Join-Path $root 'graphical-wrong-save') -WriteDataRoot (Join-Path $root 'graphical-wrong-save-data') -PreparedSave $prepared -PreparedSaveSha256 ('0'*64) -Label 'without-mir' -Resources ([pscustomobject]@{root=$root}) -MirArchive $null -TimeoutSeconds 30 -PlayerReadyBenchmarkTicks 60 -ActiveModsObserver $playerReady.name|Out-Null}catch{$wrongSaveRejected=$_.Exception.Message-ceq'[mir-direct-startup-player-ready-prepared-save-before]'}
+  Assert-DirectStartup $wrongSaveRejected 'mismatched preparation save identity was accepted.'
+  $script:mutatePreparedSave=$true;$mutatedSaveRejected=$false;try{Invoke-MIRDirectLibraryGraphicalPlayerReadySample -FactorioBin (Join-Path $root 'factorio.exe') -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $graphicalBase -RunRoot (Join-Path $root 'graphical-mutated-save') -WriteDataRoot (Join-Path $root 'graphical-mutated-save-data') -PreparedSave $prepared -PreparedSaveSha256 $preparedSha -Label 'without-mir' -Resources ([pscustomobject]@{root=$root}) -MirArchive $null -TimeoutSeconds 30 -PlayerReadyBenchmarkTicks 60 -ActiveModsObserver $playerReady.name|Out-Null}catch{$mutatedSaveRejected=$_.Exception.Message-ceq'[mir-direct-startup-player-ready-prepared-save-after]'}finally{$script:mutatePreparedSave=$false}
+  Assert-DirectStartup $mutatedSaveRejected 'prepared save changed by graphical invocation was accepted.'
+  $graphicalConfig=(Get-Content -Raw -LiteralPath (Join-Path $root 'graphical-run/config.ini')).Contains('[graphics]')
+  $graphicalArgumentsBound=($script:graphicalArguments -contains '--benchmark-graphics')-and($script:graphicalArguments -contains '--force-graphics-preset')-and($script:graphicalArguments -contains '--single-thread-loading')-and($script:graphicalArguments -contains '--benchmark-ticks')-and($script:graphicalArguments -notcontains '--create')
+  Assert-DirectStartup ($graphicalArgumentsBound-and$graphicalConfig) 'graphical diagnostic does not retain the bounded browser graphics launch shape.'
   $source=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
-  Assert-DirectStartup ($source.Contains('Invoke-MIRNativeProbeFactorioProcess')-and$source.Contains('Add-MIRNativeProbeLibraryActivation')-and$source.Contains('changed-configuration')-and$source.Contains('same-selection')-and$source.Contains('prior_selection_label')-and$source.Contains('warm-repeat')-and$source.Contains('headless-create-diagnostic')-and$source.Contains('factorio-current.log')-and$source.Contains('ready-initialised')-and$source.Contains('ready-save-map-data')-and$source.Contains('-ActiveModsObserver $ActiveModsObserver')-and$source.Contains('active_mods_observer=$observerIdentity')-and$source.Contains('run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot)')-and-not$source.Contains('[Diagnostics.Process]::Start')) 'runner bypasses the governed native process actor, does not snapshot the actual engine log and validate the save endpoint, mislabels balanced cache state, or does not bind the asset-only observer.'
+  Assert-DirectStartup ($source.Contains('Invoke-MIRNativeProbeFactorioProcess')-and$source.Contains('Add-MIRNativeProbeLibraryActivation')-and$source.Contains('changed-configuration')-and$source.Contains('same-selection')-and$source.Contains('prior_selection_label')-and$source.Contains('warm-repeat')-and$source.Contains('headless-create-diagnostic')-and$source.Contains('graphical-player-ready-diagnostic')-and$source.Contains('Get-MIRDirectLibraryPlayerReadyObserverArchive')-and$source.Contains('Invoke-MIRDirectLibraryPlayerReadyPreparation')-and$source.Contains('--benchmark-graphics')-and$source.Contains('[MIR_PLAYER_READY]')-and$source.Contains('engine_log_player_ready_seconds')-and$source.Contains('factorio-current.log')-and$source.Contains('ready-initialised')-and$source.Contains('ready-save-map-data')-and$source.Contains('run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot)')-and-not$source.Contains('[Diagnostics.Process]::Start')) 'runner bypasses the governed native process actor, does not bind the base-only graphical observer and its prepared save, or mislabels the player-ready diagnostic.'
   $entry=Get-Content -Raw -LiteralPath (Join-Path $repo 'scripts/Measure-MIRPerformanceRegression.ps1')
-  Assert-DirectStartup ($entry.Contains('Invoke-MIRDirectLibraryStartupMeasurement')-and$entry.Contains('ObserveStartup')-and$entry.Contains('ObserveResearchAll')-and$entry.Contains('ActiveModsObserver')-and$entry.Contains('ExpectedPeakMemoryMiB')-and$entry.Contains('mir-native-obsolete-runner')) 'performance entrypoint does not preserve the research-all and obsolete-campaign branches around direct-library measurement or forward the selected observer.'
+  Assert-DirectStartup ($entry.Contains('Invoke-MIRDirectLibraryStartupMeasurement')-and$entry.Contains('ObserveStartup')-and$entry.Contains('ObserveResearchAll')-and$entry.Contains('ActiveModsObserver')-and$entry.Contains('GraphicalPlayerReady')-and$entry.Contains('PlayerReadyObserverArchive')-and$entry.Contains('PlayerReadyBenchmarkTicks')-and$entry.Contains('ExpectedPeakMemoryMiB')-and$entry.Contains('mir-native-obsolete-runner')) 'performance entrypoint does not preserve the research-all and obsolete-campaign branches around direct-library measurement or forward the selected graphical diagnostic.'
   $accepted=@((Get-Command Read-MIRNativeProbeCurrentCandidate).Parameters['SourceVersion'].Attributes|Where-Object {$_ -is [Management.Automation.ValidateSetAttribute]}|ForEach-Object ValidValues)
   Assert-DirectStartup ('4.2.3'-in$accepted) 'native candidate reader rejects the 4.2.3 materialization identity.'
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')

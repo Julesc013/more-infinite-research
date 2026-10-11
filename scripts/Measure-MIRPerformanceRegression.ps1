@@ -29,6 +29,9 @@ param(
   [switch]$PreliminaryStartup,
   [string]$StartupOutputRoot='',
   [string]$ActiveModsObserver='',
+  [switch]$GraphicalPlayerReady,
+  [string]$PlayerReadyObserverArchive='',
+  [ValidateRange(1,720)][int]$PlayerReadyBenchmarkTicks=60,
   [ValidateSet('f200','f210')][string]$Target='f210',
   [ValidateRange(1,3600)][int]$TimeoutSeconds=300,
   [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB=1024,
@@ -43,9 +46,10 @@ if($ObserveResearchAll-or$PrepareResearchAllInputs){
 }
 if($ObserveStartup){
   foreach($pair in @(@('FactorioBin',$FactorioBin),@('LibraryDirectory',$LocalModZipDir),@('StartupProfileTemplatePath',$StartupProfileTemplatePath),@('Published422Archive',$Published422Archive),@('Published422ManifestPath',$Published422ManifestPath),@('Published422ManifestSha256',$Published422ManifestSha256),@('StartupOutputRoot',$StartupOutputRoot))){if([string]::IsNullOrWhiteSpace([string]$pair[1])){throw "[mir-direct-startup-input-required] $($pair[0])"}}
+  if($GraphicalPlayerReady-and[string]::IsNullOrWhiteSpace($PlayerReadyObserverArchive)){throw '[mir-direct-startup-input-required] PlayerReadyObserverArchive'}
   if($ExpectedPeakMemoryMiB-le0){throw '[mir441-resource-peak-budget-required] Declare the native probe peak memory budget.'}
   . (Join-Path $RepoRoot 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
-  $parameters=@{FactorioBin=$FactorioBin;LibraryDirectory=$LocalModZipDir;ProfileTemplatePath=$StartupProfileTemplatePath;Published422Archive=$Published422Archive;Published422ManifestPath=$Published422ManifestPath;Published422ManifestSha256=$Published422ManifestSha256;CandidateArchive=$StartupCandidateArchive;CandidateMaterializationArchive=$CandidateMaterializationArchive;CandidateMaterializationReceiptPath=$CandidateMaterializationReceiptPath;OutputRoot=$StartupOutputRoot;Target=$Target;WarmupRuns=$WarmupRuns;MeasuredRuns=$MeasuredRuns;TimeoutSeconds=$TimeoutSeconds;ExpectedPeakMemoryMiB=$ExpectedPeakMemoryMiB;MaxNewOutputMiB=$MaxNewOutputMiB;SourceCommit=$ExpectedSourceCommit;Preliminary=$PreliminaryStartup;ActiveModsObserver=$ActiveModsObserver}
+  $parameters=@{FactorioBin=$FactorioBin;LibraryDirectory=$LocalModZipDir;ProfileTemplatePath=$StartupProfileTemplatePath;Published422Archive=$Published422Archive;Published422ManifestPath=$Published422ManifestPath;Published422ManifestSha256=$Published422ManifestSha256;CandidateArchive=$StartupCandidateArchive;CandidateMaterializationArchive=$CandidateMaterializationArchive;CandidateMaterializationReceiptPath=$CandidateMaterializationReceiptPath;OutputRoot=$StartupOutputRoot;Target=$Target;WarmupRuns=$WarmupRuns;MeasuredRuns=$MeasuredRuns;TimeoutSeconds=$TimeoutSeconds;ExpectedPeakMemoryMiB=$ExpectedPeakMemoryMiB;MaxNewOutputMiB=$MaxNewOutputMiB;SourceCommit=$ExpectedSourceCommit;Preliminary=$PreliminaryStartup;ActiveModsObserver=$ActiveModsObserver;GraphicalPlayerReady=$GraphicalPlayerReady;PlayerReadyObserverArchive=$PlayerReadyObserverArchive;PlayerReadyBenchmarkTicks=$PlayerReadyBenchmarkTicks}
   Invoke-MIRDirectLibraryStartupMeasurement @parameters
   return
 }
