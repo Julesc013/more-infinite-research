@@ -223,28 +223,20 @@ local function hash_canonical(text)
   local hash = 2166136261
   local index = 1
   local length = #text
-  -- Preserve the exact MIR32 recurrence while amortizing the Lua-to-C call
-  -- used to read canonical bytes. The modulus remains applied after every
-  -- byte, so this is identity-compatible with the scalar implementation.
+  -- Expand sixteen applications of h' = (h * 65599 + byte) mod p into
+  -- one polynomial reduction. Split the incoming 32-bit hash at 16 bits:
+  -- both products and the entire sum then stay below 2^50, hence remain
+  -- exact integers even on hosts whose Lua numbers are IEEE doubles.
+  -- Coefficients are 65599^k mod p, with p = 4294967291; the high-word
+  -- coefficient is (65536 * 65599^16) mod p. Public MIR32 bytes stay exact.
   while index + 15 <= length do
     local b1, b2, b3, b4, b5, b6, b7, b8,
       b9, b10, b11, b12, b13, b14, b15, b16 = string.byte(text, index, index + 15)
-    hash = (hash * 65599 + b1) % 4294967291
-    hash = (hash * 65599 + b2) % 4294967291
-    hash = (hash * 65599 + b3) % 4294967291
-    hash = (hash * 65599 + b4) % 4294967291
-    hash = (hash * 65599 + b5) % 4294967291
-    hash = (hash * 65599 + b6) % 4294967291
-    hash = (hash * 65599 + b7) % 4294967291
-    hash = (hash * 65599 + b8) % 4294967291
-    hash = (hash * 65599 + b9) % 4294967291
-    hash = (hash * 65599 + b10) % 4294967291
-    hash = (hash * 65599 + b11) % 4294967291
-    hash = (hash * 65599 + b12) % 4294967291
-    hash = (hash * 65599 + b13) % 4294967291
-    hash = (hash * 65599 + b14) % 4294967291
-    hash = (hash * 65599 + b15) % 4294967291
-    hash = (hash * 65599 + b16) % 4294967291
+    hash = ((hash % 65536) * 995218484 + math.floor(hash / 65536) * 3560253589
+      + b1 * 412560925 + b2 * 1384565098 + b3 * 3943398063 + b4 * 2768719420
+      + b5 * 647177936 + b6 * 990682743 + b7 * 3942737328 + b8 * 3220614473
+      + b9 * 3002971012 + b10 * 3426381976 + b11 * 506879193 + b12 * 1222258819
+      + b13 * 780915824 + b14 * 8261510 + b15 * 65599 + b16) % 4294967291
     index = index + 16
   end
   while index + 7 <= length do

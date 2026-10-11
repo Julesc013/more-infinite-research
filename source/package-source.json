@@ -3238,10 +3238,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/core/fingerprint.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 11414,
-      "source_sha256": "FB2E7EA7914DB7FDA045DE063D8EC267CD2457AEF76ED1D043ECE2030ED39E26",
-      "output_bytes": 11414,
-      "output_sha256": "FB2E7EA7914DB7FDA045DE063D8EC267CD2457AEF76ED1D043ECE2030ED39E26"
+      "source_bytes": 11301,
+      "source_sha256": "F59B32D50D3FA1BF3E68E196CB6EDDB667CE2E14CFE4180FDB88EFBFCFE9E831",
+      "output_bytes": 11301,
+      "output_sha256": "F59B32D50D3FA1BF3E68E196CB6EDDB667CE2E14CFE4180FDB88EFBFCFE9E831"
     },
     {
       "layer": "capability",
@@ -7709,5 +7709,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "04936DA6E22455548712A00B47FF636775EC2A4E89701C55F814FDC0A21CC4D9"
+  "record_sha256": "25C3F30D713F59B7134345A10E312A70162A13AD4CE8581AEC2EACF5921C2F4E"
 }

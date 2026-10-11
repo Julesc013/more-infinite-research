@@ -255,6 +255,24 @@ for _, length in ipairs({0, 1, 7, 8, 15, 16, 17, 65536, 65537}) do
   check(fingerprint.of_canonical(text) == expected, "cold scalar digest parity " .. length)
   check(fingerprint.of_canonical(text) == expected, "warm scalar digest parity " .. length)
 end
+-- Independent scalar oracle for the fused polynomial reduction. Cover each
+-- tail length after several sixteen-byte blocks, all byte values, maximal
+-- byte coefficients, and payloads above the cache's retained-text cutoff.
+do
+  local all_bytes = {}
+  for byte = 0, 255 do all_bytes[#all_bytes + 1] = string.char(byte) end
+  all_bytes = table.concat(all_bytes)
+  for length = 0, 95 do
+    for pattern, text in ipairs({string.rep(string.char(0), length),
+      string.rep(string.char(255), length), all_bytes:sub(1, length)}) do
+      check(fingerprint.of_canonical(text) == scalar_digest(text),
+        "fused binary block scalar parity " .. pattern .. ":" .. length)
+    end
+  end
+  for _, text in ipairs({string.rep(all_bytes, 257), string.rep(string.char(255), 65537)}) do
+    check(fingerprint.of_canonical(text) == scalar_digest(text), "fused uncached scalar parity")
+  end
+end
 for index = 1, 4100 do fingerprint.of_canonical("fifo-eviction-" .. index) end
 local cache_metrics = fingerprint.metrics()
 check(cache_metrics.hash_cache_entries <= 4096 and cache_metrics.hash_cache_bytes <= 2 * 1024 * 1024,
