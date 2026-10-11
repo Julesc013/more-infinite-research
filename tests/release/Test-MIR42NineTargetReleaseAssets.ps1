@@ -397,12 +397,16 @@ try {
   }
 
   # All upstream hashes deliberately match this controlled ZIP; only its
-  # info.json version is wrong. Byte binding alone must not freeze this asset.
+  # info.json version is wrong. Select the next numeric suffix so this remains
+  # an opposing case for every supported 4.2 source patch, including CCC03.
+  # Byte binding alone must not freeze this asset.
   $metadataRoot=Join-Path $root 'matching-hashes-wrong-metadata'
   Copy-MIR42ReleaseAssetsFixtureTree -Source $assetRoot -Destination $metadataRoot
   $ninth=$targets[8];$metadataPath=Join-Path $metadataRoot ('assets/f013/' + [IO.Path]::GetFileName($ninth.archive_path))
   Remove-Item -LiteralPath $metadataPath -Force
-  New-MIR42ReleaseAssetsFixtureZip -Path $metadataPath -Root ('more-infinite-research_' + $ninth.distribution_version) -Version '4.2.01303' -Line '0.13'
+  $wrongF013Version='4.2.013'+(([version]$SourceVersion).Build+1).ToString('D2')
+  Assert-MIR42ReleaseAssetsTest -Condition ($wrongF013Version -cne [string]$ninth.distribution_version) -Code 'wrong-metadata-fixture-version'
+  New-MIR42ReleaseAssetsFixtureZip -Path $metadataPath -Root ('more-infinite-research_' + $ninth.distribution_version) -Version $wrongF013Version -Line '0.13'
   $badArchive=Get-MIR4ArchiveInventory -Path $metadataPath
   $savedCandidate=$script:mir42ReleaseAssetsFixtureCandidate
   $script:mir42ReleaseAssetsFixtureCandidate=$savedCandidate | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String

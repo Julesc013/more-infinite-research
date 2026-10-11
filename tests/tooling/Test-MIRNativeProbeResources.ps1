@@ -17,6 +17,22 @@ function Refuses-Probe([scriptblock]$Action,[string]$Expected) {
   try { & $Action | Out-Null } catch { $failure=$_.Exception.Message }
   Assert-Probe ($failure.Contains($Expected)) "expected $Expected; got $failure"
 }
+function Assert-ControlledProbeActorInventory {
+  param([Parameter(Mandatory)][object[]]$Runs,[Parameter(Mandatory)][string]$RunRoot)
+  $expectedIndices=@(1..11)
+  $indices=@($Runs|ForEach-Object {[int]$_.index})
+  if(@($indices|Sort-Object -Unique).Count-ne$indices.Count){throw '[native-probe-actor-duplicate]'}
+  if($indices.Count-lt$expectedIndices.Count){throw '[native-probe-actor-missing]'}
+  if($indices.Count-gt$expectedIndices.Count){throw '[native-probe-actor-extra]'}
+  if((@($indices|Sort-Object)-join',')-cne($expectedIndices-join',')){throw '[native-probe-actor-identity]'}
+  $ordered=@($Runs|Sort-Object index)
+  foreach($row in $ordered){
+    $expectedStatus=if([int]$row.index-eq2){'interrupted'}else{'passed'}
+    $expectedLedger=Join-Path $RunRoot ('process-'+[int]$row.index+'.resources.jsonl')
+    if([string]$row.status-cne$expectedStatus-or[IO.Path]::GetFullPath([string]$row.ledger)-cne[IO.Path]::GetFullPath($expectedLedger)-or-not(Test-Path -LiteralPath $expectedLedger -PathType Leaf)){throw '[native-probe-actor-identity]'}
+  }
+  return $ordered
+}
 # Fake capacity is confined to tiny controlled process/metadata fixtures.
 # This suite never launches Factorio or the real package materializer.
 function Get-MIR441ResourceSnapshot {
@@ -944,8 +960,17 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   if($LASTEXITCODE-ne0){throw 'Controlled GUI compilation failed'}
   $guiActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $guiBinary -Arguments @($guiMarker) -TimeoutSeconds 15
   Assert-Probe ((Test-Path -LiteralPath $guiMarker)-and([IO.File]::ReadAllText($guiMarker)-ceq'finished')-and$guiActor.result.exit_code-eq0) 'native wrapper returned before the GUI child completed.'
-  Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$context.runs.Count}
-  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 10) 'reserved result did not preserve actual actor inventory.'
+  $actorRows=@(Assert-ControlledProbeActorInventory -Runs @($context.runs) -RunRoot $context.root)
+  Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows|Select-Object -Skip 1) -RunRoot $context.root} 'native-probe-actor-missing'
+  Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$actorRows[0]) -RunRoot $context.root} 'native-probe-actor-duplicate'
+  $extraActor=[pscustomobject]@{index=12;status='passed';ledger=(Join-Path $context.root 'process-12.resources.jsonl')}
+  Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$extraActor) -RunRoot $context.root} 'native-probe-actor-extra'
+  $actorRecord=@($actorRows|ForEach-Object {[ordered]@{index=[int]$_.index;status=[string]$_.status;ledger=[IO.Path]::GetFileName([string]$_.ledger)}})
+  Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$actorRecord.Count;actors=$actorRecord}
+  $resultActorRows=@((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actors)
+  $expectedActorIdentities=@($actorRecord|ForEach-Object {([int]$_.index).ToString()+'|'+[string]$_.status+'|'+[string]$_.ledger})
+  $resultActorIdentities=@($resultActorRows|ForEach-Object {([int]$_.index).ToString()+'|'+[string]$_.status+'|'+[string]$_.ledger})
+  Assert-Probe ($resultActorRows.Count-eq11-and($resultActorIdentities-join"`n")-ceq($expectedActorIdentities-join"`n")) 'reserved result did not preserve all admitted actor identities.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'
