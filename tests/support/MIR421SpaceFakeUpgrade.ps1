@@ -316,3 +316,114 @@ function Add-MIR421SpaceFakeUpgradeOracle {
   }
   return 'local sif = require("mir421_space_fake_upgrade")' + "`n" + $ControlText
 }
+
+function Read-MIR423F200BobAngelUpgradeProfile {
+  param([Parameter(Mandatory)][string]$Path)
+  $profile=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -Depth 20
+  if($profile.schema-ne1-or$profile.kind-cne'MIR423F200BobAngelObservedUpgradeProfileV1'-or
+     $profile.identity-cne'f200-bob-angel-observed-2026-10-11'-or
+     $profile.status-cne'acquired-and-locked-not-load-tested'-or$profile.target-cne'f200'-or
+     $profile.factorio_line-cne'2.0'-or$profile.engine_version-cne'2.0.77'-or$profile.settings_mode-cne'Defaults'-or
+     [string]$profile.engine_sha256-cnotmatch'^[0-9A-F]{64}$'){
+    throw '[mir423-f200-bob-angel-profile]'
+  }
+  $lock=$profile.source_lock
+  if($null-eq$lock-or$lock.path-cne'C:\Projects\Factorio\testmods\profiles\2.0\bob-angel--with-mir\lock.json'-or
+     $lock.sha256-cne'00193B07816DBB0043FDDC0BC801A67BCE47041EC60C171D6837F2141CBF9FED'-or
+     $lock.identity_sha256-cne'AF1B932BF627053685FEC050FF97CC71F50A682B89A64FDACA3223F81771BF22'-or
+     $lock.status-cne'acquired-and-locked-not-load-tested'){
+    throw '[mir423-f200-bob-angel-custody]'
+  }
+  $expected=[ordered]@{
+    angelsbioprocessing='2.0.3';angelsbioprocessinggraphics='2.0.0';angelspetrochem='2.0.3';angelspetrochemgraphics='2.0.1';
+    angelsrefining='2.0.4';angelsrefininggraphics='2.0.0';angelssmelting='2.0.5';angelssmeltinggraphics='2.0.0';
+    bobelectronics='2.1.1';boblibrary='2.1.0';bobores='2.1.2';bobplates='2.1.1';bobrevamp='2.1.1'
+  }
+  $expectedArchives=[ordered]@{
+    'angelsbioprocessing_2.0.3.zip'='766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B';
+    'angelsbioprocessinggraphics_2.0.0.zip'='8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66';
+    'angelspetrochem_2.0.3.zip'='DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D';
+    'angelspetrochemgraphics_2.0.1.zip'='B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262';
+    'angelsrefining_2.0.4.zip'='8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42';
+    'angelsrefininggraphics_2.0.0.zip'='0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25';
+    'angelssmelting_2.0.5.zip'='6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4';
+    'angelssmeltinggraphics_2.0.0.zip'='D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF';
+    'bobelectronics_2.1.1.zip'='BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3';
+    'boblibrary_2.1.0.zip'='1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B';
+    'bobores_2.1.2.zip'='BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94';
+    'bobplates_2.1.1.zip'='A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B';
+    'bobrevamp_2.1.1.zip'='CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB'
+  }
+  $mods=@($profile.upstream_mods)
+  if($mods.Count-ne$expected.Count-or@($mods|Group-Object name|Where-Object Count -GT 1).Count){throw '[mir423-f200-bob-angel-selection]'}
+  if($null-eq$profile.archive_sha256-or@($profile.archive_sha256.PSObject.Properties).Count-ne$expected.Count){throw '[mir423-f200-bob-angel-archive-count]'}
+  $inputs=@()
+  foreach($name in $expected.Keys){
+    $row=@($mods|Where-Object name -CEQ $name)
+    if($row.Count-ne1-or$row[0].enabled-isnot[bool]-or-not$row[0].enabled-or$row[0].version-cne$expected[$name]){throw "[mir423-f200-bob-angel-selection] $name"}
+    $filename=$name+'_'+$expected[$name]+'.zip'
+    $hashProperty=$profile.archive_sha256.PSObject.Properties[$filename]
+    if($null-eq$hashProperty-or[string]$hashProperty.Value-cne$expectedArchives[$filename]){throw "[mir423-f200-bob-angel-archive-hash] $filename"}
+    $inputs+=,[pscustomobject]@{file_name=$filename;expected_sha256=[string]$hashProperty.Value;identity=[ordered]@{name=$name;version=$expected[$name]};role='acquired-bob-angel-upstream'}
+  }
+  $observer=$profile.observer
+  if($null-eq$observer-or$observer.name-cne'mir423-startup-observer'-or$observer.version-cne'1.0.0'-or
+     $observer.file_name-cne'mir423-startup-observer_1.0.0.zip'-or$observer.sha256-cne'9DE91C1A748B9BE9592C4A8ACBA8A35983B115A32582F200B5A5D22812AC1F23'-or
+     $observer.script-cne'data-final-fixes.lua'){
+    throw '[mir423-f200-bob-angel-observer]'
+  }
+  $inputs+=,[pscustomobject]@{file_name=[string]$observer.file_name;expected_sha256=[string]$observer.sha256;identity=[ordered]@{name=[string]$observer.name;version=[string]$observer.version};role='honest-active-mods-observer'}
+  return [pscustomobject]@{profile=$profile;inputs=$inputs;observer=$observer;sha256=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+}
+
+function Assert-MIR423F200BobAngelUpgradeTransition {
+  param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.3')
+  if($Target-cne'f200'-or$FromVersion-cne'4.2.20002'-or$ToVersion-cne'4.2.20003'-or
+     $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'f200-bob-angel'-or
+     $SpaceIsFake-or$SourceOnlyFixtureNames.Count-or$SourceVersion-cne'4.2.3'){
+    throw '[mir423-f200-bob-angel-transition]'
+  }
+}
+
+function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
+  param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
+  if($FromVersion-cne'4.2.20002'-or$ToVersion-cne'4.2.20003'){throw '[mir423-f200-bob-angel-oracle-transition]'}
+  $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
+  $controlPath=Join-Path $directory 'control.lua';$settingsPath=Join-Path $directory 'settings.lua';$infoPath=Join-Path $directory 'info.json'
+  foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
+  $control=Get-Content -LiteralPath $controlPath -Raw
+  $profileAnchor='["base-default"]={technology="mining-productivity-4",level=5}'
+  if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1){throw '[mir423-f200-bob-angel-oracle-anchor]'}
+  $control=$control.Replace($profileAnchor,$profileAnchor+', ["f200-bob-angel"]={technology="mining-productivity-4",level=5}')
+  [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
+  $settings=Get-Content -LiteralPath $settingsPath -Raw
+  $settingsAnchor='default_value="base-default",allowed_values={"base-default"}'
+  if([regex]::Matches($settings,[regex]::Escape($settingsAnchor)).Count-ne1){throw '[mir423-f200-bob-angel-settings-anchor]'}
+  $settings=$settings.Replace($settingsAnchor,'default_value="f200-bob-angel",allowed_values={"base-default","f200-bob-angel"}')
+  [IO.File]::WriteAllText($settingsPath,$settings,[Text.UTF8Encoding]::new($false))
+  $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
+  if($info.version-cne'0.1.32'){throw '[mir423-f200-bob-angel-fixture-identity]'}
+  $info.version='0.1.33'
+  [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))
+}
+
+function Assert-MIR423F200BobAngelFullStateActiveMods {
+  param([Parameter(Mandatory)]$Snapshot,[Parameter(Mandatory)][object[]]$ExpectedSelection,[Parameter(Mandatory)][ValidateSet('source','upgrade','reload')][string]$Stage)
+  if($null-eq$Snapshot.active_mods){throw "[mir423-f200-bob-angel-active-mods] $Stage"}
+  $expected=[ordered]@{}
+  foreach($row in $ExpectedSelection){
+    $name=[string]$row.name;$version=[string]$row.version
+    if([string]::IsNullOrWhiteSpace($name)-or$version-cnotmatch'^\d+[.]\d+[.]\d+$'-or$expected.Contains($name)){throw "[mir423-f200-bob-angel-selection] $Stage"}
+    $expected[$name]=$version
+  }
+  $actual=[ordered]@{}
+  foreach($property in @($Snapshot.active_mods.PSObject.Properties)){
+    $name=[string]$property.Name;$version=[string]$property.Value
+    if([string]::IsNullOrWhiteSpace($name)-or$version-cnotmatch'^\d+[.]\d+[.]\d+$'-or$actual.Contains($name)){throw "[mir423-f200-bob-angel-active-mods] $Stage"}
+    $actual[$name]=$version
+  }
+  if($actual.Count-ne$expected.Count){throw "[mir423-f200-bob-angel-active-mods] $Stage"}
+  foreach($name in $expected.Keys){if(-not$actual.Contains($name)-or$actual[$name]-cne$expected[$name]){throw "[mir423-f200-bob-angel-active-mods] $Stage"}}
+  return [pscustomobject]@{stage=$Stage;active_mods=@($actual.Keys|Sort-Object|ForEach-Object {[ordered]@{name=$_;version=$actual[$_]}})}
+}

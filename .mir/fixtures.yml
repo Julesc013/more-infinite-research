@@ -682,6 +682,21 @@ fixtures:
       - direct-master-library-with-no-dependency-staging-and-restored-controls
       - no-natural-acquisition-production-throughput-or-broader-profile-claim
 
+  f200-bob-angel-maintenance-upgrade-423:
+    requires_features: []
+    path: fixtures/assert-upgrade-4-0-20000-to-4-1-20000
+    harness: tests/runtime/Test-MIRUpgrade.ps1
+    input_profile: fixtures/run-profiles/f200-bob-angel-upgrade-422.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - published-ccc02-predecessor-custody-and-current-f200-ccc03-candidate
+      - exact-thirteen-bob-angel-upstream-archives-engine-and-observed-mod-table
+      - full-research-definitions-effects-science-levels-queues-progress-and-settings
+      - two-distinct-cold-reloads-with-full-state-comparisons
+      - direct-master-library-with-restored-controls-and-no-dependency-staging
+      - no-large-modpack-reporter-or-broader-profile-claim
+
   k2-213-imersite-continuation-migration:
     requires_features: []
     path: fixtures/assert-k2-213-imersite-continuation-migration

@@ -8424,6 +8424,7 @@
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/run-profiles/f200-bob-angel-upgrade-422.json",
         "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
         "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
         "targets/historical/**"
@@ -8499,5 +8500,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:21fa1c919e0bfcfcc92d0c218874a0fa69cd352c8f2b9c0015b09d57bf02f3d5"
+  "digest": "sha256:8892851066b3295b3c33c10fca47cd7e4042743353dedac9e4e6df230275520f"
 }

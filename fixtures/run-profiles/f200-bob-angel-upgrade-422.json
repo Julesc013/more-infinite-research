@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "kind": "MIR423F200BobAngelObservedUpgradeProfileV1",
+  "identity": "f200-bob-angel-observed-2026-10-11",
+  "status": "acquired-and-locked-not-load-tested",
+  "source_lock": {
+    "path": "C:\\Projects\\Factorio\\testmods\\profiles\\2.0\\bob-angel--with-mir\\lock.json",
+    "sha256": "00193B07816DBB0043FDDC0BC801A67BCE47041EC60C171D6837F2141CBF9FED",
+    "identity_sha256": "AF1B932BF627053685FEC050FF97CC71F50A682B89A64FDACA3223F81771BF22",
+    "status": "acquired-and-locked-not-load-tested"
+  },
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine_version": "2.0.77",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "settings_mode": "Defaults",
+  "upstream_mods": [
+    { "name": "angelsbioprocessing", "version": "2.0.3", "enabled": true },
+    { "name": "angelsbioprocessinggraphics", "version": "2.0.0", "enabled": true },
+    { "name": "angelspetrochem", "version": "2.0.3", "enabled": true },
+    { "name": "angelspetrochemgraphics", "version": "2.0.1", "enabled": true },
+    { "name": "angelsrefining", "version": "2.0.4", "enabled": true },
+    { "name": "angelsrefininggraphics", "version": "2.0.0", "enabled": true },
+    { "name": "angelssmelting", "version": "2.0.5", "enabled": true },
+    { "name": "angelssmeltinggraphics", "version": "2.0.0", "enabled": true },
+    { "name": "bobelectronics", "version": "2.1.1", "enabled": true },
+    { "name": "boblibrary", "version": "2.1.0", "enabled": true },
+    { "name": "bobores", "version": "2.1.2", "enabled": true },
+    { "name": "bobplates", "version": "2.1.1", "enabled": true },
+    { "name": "bobrevamp", "version": "2.1.1", "enabled": true }
+  ],
+  "archive_sha256": {
+    "angelsbioprocessing_2.0.3.zip": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B",
+    "angelsbioprocessinggraphics_2.0.0.zip": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66",
+    "angelspetrochem_2.0.3.zip": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D",
+    "angelspetrochemgraphics_2.0.1.zip": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262",
+    "angelsrefining_2.0.4.zip": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42",
+    "angelsrefininggraphics_2.0.0.zip": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25",
+    "angelssmelting_2.0.5.zip": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4",
+    "angelssmeltinggraphics_2.0.0.zip": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF",
+    "bobelectronics_2.1.1.zip": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3",
+    "boblibrary_2.1.0.zip": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B",
+    "bobores_2.1.2.zip": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94",
+    "bobplates_2.1.1.zip": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B",
+    "bobrevamp_2.1.1.zip": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB"
+  },
+  "observer": {
+    "name": "mir423-startup-observer",
+    "version": "1.0.0",
+    "file_name": "mir423-startup-observer_1.0.0.zip",
+    "sha256": "9DE91C1A748B9BE9592C4A8ACBA8A35983B115A32582F200B5A5D22812AC1F23",
+    "script": "data-final-fixes.lua"
+  }
+}

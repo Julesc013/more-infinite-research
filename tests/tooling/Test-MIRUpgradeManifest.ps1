@@ -21,6 +21,8 @@ $completeCatalogueAssignments=@($ast.FindAll({param($node)$node-is[Management.Au
 if($completeCatalogueAssignments.Count-ne1){throw 'Complete-catalogue applicability assignment missing or ambiguous'}
 $completeCatalogueMarkerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR42CompleteCatalogueUpgradeMarker'},$true))
 if($completeCatalogueMarkerCalls.Count-ne3){throw 'Complete-catalogue marker must be enforced for upgrade and both reloads'}
+$snapshotRetainerFunctions=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Copy-MIRCompleteCatalogueSnapshotEvidence'},$true))
+if($snapshotRetainerFunctions.Count-ne1){throw 'Complete-catalogue snapshot retainer missing or ambiguous'}
 $completeCatalogueEvaluator=[scriptblock]::Create($completeCatalogueAssignments[0].Right.Extent.Text)
 $testRoot=Join-Path $RepoRoot ('build/handoff/mir421-upgrade-manifest/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $testRoot|Out-Null
@@ -209,6 +211,7 @@ $k2Assertions+=2
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
 . (Join-Path $RepoRoot 'tools/lib/compatibility/LibraryActivation.ps1')
 $currentAssertions=0
+$f200BobAngelAssertions=0
 $f210OracleRoot=Join-Path $RepoRoot ('build/tmp/mir423-f210-oracle-control-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $f210OracleRoot|Out-Null
 $f210OracleControl=Join-Path $f210OracleRoot 'control.lua'
@@ -234,6 +237,84 @@ foreach($from in @('4.2.20000','4.2.20001','4.2.20002')){
   if(-not$f200Control.Contains($f200ReviewedGuard)){throw "F200 reviewed delta did not reject the $from predecessor"}
   $currentAssertions++
 }
+$bobAngelProfilePath=Join-Path $RepoRoot 'fixtures/run-profiles/f200-bob-angel-upgrade-422.json'
+$bobAngelInputs=Read-MIR423F200BobAngelUpgradeProfile -Path $bobAngelProfilePath
+if($bobAngelInputs.inputs.Count-ne14-or@($bobAngelInputs.inputs|Where-Object role -CEQ 'acquired-bob-angel-upstream').Count-ne13-or
+   @($bobAngelInputs.inputs|Where-Object {$_.identity.name-ceq'mir423-startup-observer'-and$_.role-ceq'honest-active-mods-observer'}).Count-ne1-or
+   @($bobAngelInputs.inputs|Where-Object {$_.identity.name-like '*graphics'}).Count-ne4){throw 'Bob/Angel profile did not retain its exact upstream closure and graphics inputs'}
+$f200BobAngelAssertions++
+$bobAngelMutation=Join-Path $testRoot 'f200-bob-angel-upgrade-profile.json'
+foreach($case in @('engine','status','source-lock-status','missing-upstream','wrong-hash','extra-upstream','observer','mir-injection')){
+  $mutated=Get-Content -LiteralPath $bobAngelProfilePath -Raw|ConvertFrom-Json -Depth 20
+  $code=switch($case){
+    'engine' {$mutated.engine_version='2.0.76';'[mir423-f200-bob-angel-profile]'}
+    'status' {$mutated.status='qualified';'[mir423-f200-bob-angel-profile]'}
+    'source-lock-status' {$mutated.source_lock.status='qualified';'[mir423-f200-bob-angel-custody]'}
+    'missing-upstream' {$mutated.upstream_mods=@($mutated.upstream_mods|Where-Object name -CNE 'angelssmeltinggraphics');'[mir423-f200-bob-angel-selection]'}
+    'wrong-hash' {$mutated.archive_sha256.'bobplates_2.1.1.zip'='0'*64;'[mir423-f200-bob-angel-archive-hash]'}
+    'extra-upstream' {$mutated.upstream_mods+=@{name='unrequested';version='1.0.0';enabled=$true};'[mir423-f200-bob-angel-selection]'}
+    'observer' {$mutated.observer.script='control.lua';'[mir423-f200-bob-angel-observer]'}
+    'mir-injection' {$mutated.upstream_mods[0].name='more-infinite-research';'[mir423-f200-bob-angel-selection]'}
+  }
+  $mutated|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $bobAngelMutation
+  $rejected=$false
+  try{Read-MIR423F200BobAngelUpgradeProfile -Path $bobAngelMutation|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith($code)}
+  if(-not$rejected){throw "Bob/Angel profile rejection missing: $case"};$f200BobAngelAssertions++
+}
+$bobAngelFixture=Join-Path $RepoRoot ('build/tmp/mir423-f200-bob-angel-fixture-'+[Guid]::NewGuid().ToString('N'))
+$bobAngelFixtureSucceeded=$false
+try {
+  Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $bobAngelFixture -Recurse
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $bobAngelFixture -Target f200 -SourceVersion '4.2.3' -FromVersion '4.2.20002'
+  Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $bobAngelFixture -FromVersion '4.2.20002' -ToVersion '4.2.20003'
+  Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $bobAngelFixture -FromVersion '4.2.20002' -ToVersion '4.2.20003'
+  $bobAngelInfo=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'info.json') -Raw|ConvertFrom-Json
+  $bobAngelControl=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'control.lua') -Raw
+  $bobAngelSettings=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'settings.lua') -Raw
+  if($bobAngelInfo.version-cne'0.1.33'-or-not$bobAngelControl.Contains('["f200-bob-angel"]={technology="mining-productivity-4",level=5}')-or
+     $bobAngelSettings-notmatch 'default_value="f200-bob-angel",allowed_values=\{"base-default","f200-bob-angel"\}'){
+    throw 'Bob/Angel full-state fixture did not receive its unique staged identity and selected oracle'}
+  $f200BobAngelAssertions++
+  $bobAngelSelection=@([pscustomobject]@{name='base';version='2.0.77'},[pscustomobject]@{name='angelsbioprocessinggraphics';version='2.0.0'},[pscustomobject]@{name='mir423-startup-observer';version='1.0.0'},[pscustomobject]@{name='more-infinite-research';version='4.2.20003'})
+  $bobAngelSnapshot=[pscustomobject]@{active_mods=[pscustomobject]@{base='2.0.77';angelsbioprocessinggraphics='2.0.0';'mir423-startup-observer'='1.0.0';'more-infinite-research'='4.2.20003'}}
+  $bobAngelReceipt=Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $bobAngelSnapshot -ExpectedSelection $bobAngelSelection -Stage upgrade
+  if($bobAngelReceipt.active_mods.Count-ne4-or@($bobAngelReceipt.active_mods|Where-Object name -CEQ 'angelsbioprocessinggraphics').Count-ne1){throw 'Bob/Angel full-state active-mod receipt omitted asset-only graphics'}
+  $f200BobAngelAssertions++
+  $bobAngelSnapshot.active_mods.angelsbioprocessinggraphics='2.0.1'
+  $rejected=$false;try{Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $bobAngelSnapshot -ExpectedSelection $bobAngelSelection -Stage upgrade|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir423-f200-bob-angel-active-mods]')}
+  if(-not$rejected){throw 'Bob/Angel full-state active-mod comparison accepted a graphics version mismatch'};$f200BobAngelAssertions++
+  $bobAngelFixtureSucceeded=$true
+} catch {
+  if(-not(Test-Path -LiteralPath $bobAngelFixture -PathType Container)){New-Item -ItemType Directory -Force -Path $bobAngelFixture|Out-Null}
+  [IO.File]::WriteAllText((Join-Path $bobAngelFixture 'TEST-FAILURE-RETAINED.txt'),("Bob/Angel staged-fixture host control failed and was retained for inspection.`n" + $_.Exception.Message + "`n"),[Text.UTF8Encoding]::new($false))
+  throw
+} finally {
+  if($bobAngelFixtureSucceeded){Remove-Item -LiteralPath $bobAngelFixture -Recurse -Force}
+}
+if(Test-Path -LiteralPath $bobAngelFixture){throw 'Bob/Angel staged fixture was not cleaned after a successful host control'}
+$f200BobAngelAssertions++
+& {
+  param([string]$FunctionText,[string]$Root)
+  . ([scriptblock]::Create($FunctionText))
+  $userdata=Join-Path $Root 'full-state-userdata'
+  $output=Join-Path $Root 'full-state-output'
+  $live=Join-Path $userdata 'script-output/mir-upgrade-full-state-reload.json'
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $live))|Out-Null
+  [IO.Directory]::CreateDirectory($output)|Out-Null
+  @{from_version='4.2.20002';to_version='4.2.20003';stage='reload';state='first'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $first=Copy-MIRCompleteCatalogueSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-1 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.2.20003' -ArtifactSlug 'f200-bob-angel' -FromVersion '4.2.20002'
+  @{from_version='4.2.20002';to_version='4.2.20003';stage='reload';state='second'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $second=Copy-MIRCompleteCatalogueSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-2 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.2.20003' -ArtifactSlug 'f200-bob-angel' -FromVersion '4.2.20002'
+  if($first.stage-cne'reload-1'-or$second.stage-cne'reload-2'-or$first.snapshot_stage-cne'reload'-or$second.snapshot_stage-cne'reload'-or
+     $first.sha256-ceq$second.sha256-or-not(Test-Path -LiteralPath $first.path)-or-not(Test-Path -LiteralPath $second.path)){throw 'Complete-catalogue reload snapshots were not retained independently'}
+  $firstState=Get-Content -LiteralPath $first.path -Raw|ConvertFrom-Json
+  $secondState=Get-Content -LiteralPath $second.path -Raw|ConvertFrom-Json
+  if($firstState.state-cne'first'-or$secondState.state-cne'second'){throw 'First reload snapshot was overwritten by the second reload'}
+  @{from_version='4.2.20002';to_version='4.2.20003';stage='upgrade'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $rejected=$false;try{Copy-MIRCompleteCatalogueSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-2 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.2.20003' -ArtifactSlug 'f200-bob-angel' -FromVersion '4.2.20002'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir422-full-state-snapshot-identity]'}
+  if(-not$rejected){throw 'Complete-catalogue snapshot retainer accepted the wrong live stage'}
+} $snapshotRetainerFunctions[0].Extent.Text $testRoot
+$f200BobAngelAssertions+=3
 foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
   $isHistorical=$target-cin@('f017','f016','f015','f014','f013')
   foreach($patch in @(0,1,2)){
@@ -251,6 +332,9 @@ foreach($excluded in @('SpaceIsFake','k2Scenario','Archetype','SourceVersion')){
   if(& $completeCatalogueEvaluator){throw "Complete-catalogue gate accepted excluded $excluded scenario"}
   $currentAssertions++
 }
+$SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='f200-bob-angel'
+if(-not(& $completeCatalogueEvaluator)){throw 'Bob/Angel complete-catalogue gate is absent'}
+$f200BobAngelAssertions++
 foreach($target in @('f110','f100')){
   $code=$target.Substring(1)
   foreach($patch in @(0,1)){
@@ -365,6 +449,13 @@ $currentK2.K2ImersiteInputProfile=''
 $rejected=$false
 try{Assert-MIR421CurrentUpgradeInputMode @currentK2}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-inputs-required]')}
 if(-not$rejected){throw 'Current-package K2 mode accepted without its locked profile'};$currentAssertions++
+$currentBobAngel=@{Target='f200';FromVersion='4.2.20002';ToVersion='4.2.20003';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='f200-bob-angel';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile=$bobAngelProfilePath;SourceVersion='4.2.3'}
+Assert-MIR421CurrentUpgradeInputMode @currentBobAngel;$f200BobAngelAssertions++
+foreach($field in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SpaceIsFake','SourceOnlyFixtureNames','K2ImersiteInputProfile','F200BobAngelInputProfile','SourceVersion')){
+  $bad=$currentBobAngel.Clone();$bad[$field]=switch($field){'SpaceIsFake'{$true};'SourceOnlyFixtureNames'{@('extra')};'K2ImersiteInputProfile'{'k2.json'};'F200BobAngelInputProfile'{''};'SourceVersion'{'4.2.2'};default{'wrong'}}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message -match '^\[mir42(?:1|3)-'}
+  if(-not$rejected){throw "Bob/Angel current-package mode accepted invalid $field"};$f200BobAngelAssertions++
+}
 # Execute the actual caller statements with a recording reader, so adding a
 # validator parameter without forwarding it cannot pass these controls.
 $predecessorSelectCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$predecessorReaderVersion'},$true))
@@ -394,7 +485,7 @@ try {
     $FromVersion=if($SourceVersion-ceq'4.2.3'){'4.2.21002'}elseif($SourceVersion-ceq'4.2.2'){'4.2.21001'}else{'4.2.21000'}
     $ToVersion=if($SourceVersion-ceq'4.2.3'){'4.2.21003'}elseif($SourceVersion-ceq'4.2.2'){'4.2.21002'}else{'4.2.21001'}
     $FixtureName='assert-upgrade-4-0-21000-to-4-1-21000';$Archetype='base-default';$SpaceIsFake=$false
-    $SourceOnlyFixtureNames=@();$SelectedReleaseManifest='';$PublishedMaintenancePredecessorManifestPath='published.json';$Retention='Always';$K2ImersiteInputProfile=''
+    $SourceOnlyFixtureNames=@();$SelectedReleaseManifest='';$PublishedMaintenancePredecessorManifestPath='published.json';$Retention='Always';$K2ImersiteInputProfile='';$F200BobAngelInputProfile=''
     . ([scriptblock]::Create($modeCalls[0].Extent.Text))
     . ([scriptblock]::Create($readerCalls[0].Extent.Text))
     if($currentMaterialization.source-cne$SourceVersion-or$currentMaterialization.target-cne'f210'-or$currentMaterialization.archive-cne$to-or$currentMaterialization.receipt-cne$SourceMaterializationPath){throw 'Upgrade caller dropped explicit candidate selection'}
@@ -460,4 +551,4 @@ foreach($patch in @(1,2)){
     if(-not$rejected){throw "K2 mixed maintenance mode accepted: $field"};$k2Assertions++
   }
 }
-[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
