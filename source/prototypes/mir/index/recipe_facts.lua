@@ -1,4 +1,5 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
@@ -7,6 +8,7 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 local SCHEMA = 2
+local RECIPE_DOMAIN_FIELDS = {"facts", "names", "schema"}
 
 -- replace_source() is a controlled pre-snapshot operation, not a general
 -- mutable-prototype escape hatch. The science indexes below deliberately
@@ -442,6 +444,44 @@ local function build()
   return rebuild(context)
 end
 
+-- The full recipe index and the compiler snapshot's recipes domain share the
+-- same owned facts/names/schema fields.  Keep only their scalar digests and
+-- byte count under the Context epoch: no canonical text or mutable index
+-- reference escapes into this cache.  The projection helper validates every
+-- field of the complete index, so the full digest retains its established
+-- identity while the later snapshot need not traverse the shared facts again.
+local function new_fingerprint_material(context, index)
+  local full, recipe_domain, recipe_domain_bytes = fingerprint.of_map_with_projection(
+    index, RECIPE_DOMAIN_FIELDS)
+  return {
+    recipe_source_epoch = source_epoch(context),
+    recipe_index_epoch = context:state_epoch("recipe_index"),
+    full = full,
+    recipe_domain = recipe_domain,
+    recipe_domain_bytes = recipe_domain_bytes
+  }
+end
+
+local function fingerprint_material(context)
+  local index = build()
+  local source = source_epoch(context)
+  local index_epoch = context:state_epoch("recipe_index")
+  local cached = context:state_view("recipe_index_fingerprint_material")
+  if cached
+    and cached.recipe_source_epoch == source
+    and cached.recipe_index_epoch == index_epoch then
+    return cached
+  end
+  local material = new_fingerprint_material(context, index)
+  if cached then
+    context:replace_epoch("recipe_index_fingerprint_material", material,
+      context:state_epoch("recipe_index_fingerprint_material"))
+  else
+    context:set_state("recipe_index_fingerprint_material", material)
+  end
+  return material
+end
+
 -- Builds the same canonical index from an explicit prototype map.
 -- Offline review and scale tooling use this without mutating the prototype registry
 -- or the active CompilerContext.
@@ -478,10 +518,26 @@ function M.replace_source(recipe_prototypes, expected_epoch)
   -- never observe a stale recipe snapshot.  Downstream caches key themselves
   -- to source_epoch() and refresh lazily on their next query.
   if context:has_state("recipe_index") then rebuild(context) end
-  if context:has_state("recipe_index_fingerprint") then
+  if context:has_state("recipe_index_fingerprint_material") then
+    local material = new_fingerprint_material(context, build())
+    context:replace_epoch(
+      "recipe_index_fingerprint_material",
+      material,
+      context:state_epoch("recipe_index_fingerprint_material")
+    )
+    if context:has_state("recipe_index_fingerprint") then
+      context:replace_epoch(
+        "recipe_index_fingerprint",
+        material.full,
+        context:state_epoch("recipe_index_fingerprint")
+      )
+    end
+  elseif context:has_state("recipe_index_fingerprint") then
+    -- Retain the established state name for an already-active legacy
+    -- context even if it predates the paired projection material.
     context:replace_epoch(
       "recipe_index_fingerprint",
-      require("prototypes.mir.core.fingerprint").of(build()),
+      fingerprint.of(build()),
       context:state_epoch("recipe_index_fingerprint")
     )
   end
@@ -522,9 +578,35 @@ end
 
 function M.fingerprint()
   local context = compiler_context.current()
-  return context:state_view("recipe_index_fingerprint", function()
-    return require("prototypes.mir.core.fingerprint").of(build())
-  end)
+  local material = fingerprint_material(context)
+  local cached = context:state_view("recipe_index_fingerprint")
+  if cached == nil then
+    return context:set_state("recipe_index_fingerprint", material.full)
+  end
+  if cached ~= material.full then
+    return context:replace_epoch("recipe_index_fingerprint", material.full,
+      context:state_epoch("recipe_index_fingerprint"))
+  end
+  return cached
+end
+
+-- This is intentionally narrower than a public snapshot API.  The adapter
+-- may reuse the digest only for the exact Context-owned index it just read;
+-- supplied, copied, or caller-owned indexes receive no trusted component.
+function M.snapshot_recipe_domain_fingerprint(index)
+  local context = compiler_context.current()
+  if index == nil or index ~= context:state_view("recipe_index") then return nil end
+  local material = fingerprint_material(context)
+  if material.recipe_source_epoch ~= source_epoch(context)
+    or material.recipe_index_epoch ~= context:state_epoch("recipe_index") then
+    return nil
+  end
+  return {
+    fingerprint = material.recipe_domain,
+    canonical_bytes = material.recipe_domain_bytes,
+    recipe_source_epoch = material.recipe_source_epoch,
+    recipe_index_epoch = material.recipe_index_epoch
+  }
 end
 
 function M.recipes_by_output_view(name)

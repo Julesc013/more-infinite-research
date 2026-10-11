@@ -4,14 +4,16 @@
   "change_id": "MIR4-CHG-2026-0150",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Reduce repeated compiler evidence construction and science acquisition metadata work.",
+  "summary": "Reduce repeated compiler evidence, science metadata and recipe-fact serialization work.",
   "details": [
     "Public compiler evidence freezes telemetry before its own serialization, then enforces the exact final byte budget once. Live telemetry records emitted sizes afterward; the preview exporter treats an unavailable self-size as not observed.",
     "Qualification snapshot byte counting uses the same canonical writer and validation as serialization. Public snapshot callers retain defensive copies; ordering, encoding and invalid-input rejection remain authoritative.",
     "Unlock ordering and route assembly share bounded prerequisite and science-burden facts within the existing recipe and researchability-index epochs. Contextual acquisition decisions and bounded diagnostic traversals remain independent; exported route arrays retain defensive copies.",
     "Typed producer orderings share sorting work only for Context-owned recipe indexes. Copied names, independent entry/node/storage limits, epoch invalidation and exact uncached fallback preserve forward/progression preference; mutable supplied indexes and diagnostics bypass retained ordering.",
     "MIR32 hashing batches sixteen byte recurrences into one polynomial reduction with a split incoming hash. Intermediate values remain exact on double-number Lua engines; fingerprint bytes, scalar tails, validation and cache limits remain unchanged.",
-    "Controlled native F210 checks pass 375 snapshot/canonical/hash assertions and 11 publication assertions, including binary block boundaries, uncached long-payload scalar parity, fatal budget rejection, older-engine and diagnostics branches. Compiler static and preview export controls also pass.",
+    "The Context-owned recipe index and compilation snapshot share one validated encoding and rolling hash of their common fact fields. Modular fragment composition preserves both distinct original MIR32 digests; only scalar identities and exact byte counts survive the source/index epoch. Copied indexes receive no trusted component, and public supplied snapshot fingerprints retain deep verification.",
+    "Scalar projection and snapshot metadata reports shared canonical bytes separately from newly serialized bytes. It retains no large canonical text and grants no startup-speed or whole-process memory claim.",
+    "Controlled native F210 checks pass 636 snapshot/canonical/hash/ownership assertions and 11 publication assertions, including binary and fragment boundaries, uncached long-payload scalar parity, exact full/projection digests, copied-index refusal, source/index epoch replacement, separate contexts, forged supplied-domain rejection and fatal publication budget rejection. Independent double-number arithmetic checks pass 75,062 composition cases. Compiler static and preview export controls remain required on the completed unit.",
     "A fresh bounded native F210 module fixture passes 380 researchability and 628 laboratory assertions, including shared-fact traversal reduction, typed producer sort reuse, diagnostic and mutable-index bypass, caller mutation isolation, epoch invalidation, entry/node-cap fallback and unchanged active research/science guards. The fixture reads one private ZIP and restores its direct-library controls.",
     "Gameplay decisions, research identities, settings and migrations are unchanged. Actual-package startup, memory, semantic output, all nine targets and 27 predecessor upgrades still require qualification; no native startup speedup is claimed."
   ],

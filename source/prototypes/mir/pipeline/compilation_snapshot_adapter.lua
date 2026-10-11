@@ -130,6 +130,11 @@ function M.capture(options)
   local started_at, memory_before = now(), memory_bytes()
   local relationship_index = relationships.view("input")
   local recipe_index = recipe_facts.index_view()
+  -- Only the exact Context-owned recipe index can supply this component.  The
+  -- scalar digest was derived while validating the complete immutable index;
+  -- copied or caller-owned tables deliberately fall back to snapshot.new's
+  -- ordinary canonicalization and deep verification path.
+  local recipe_domain = recipe_facts.snapshot_recipe_domain_fingerprint(recipe_index)
   local graph = graph_snapshot.new(data_raw.prototypes("technology"))
   local domains = {
     recipes = {schema = recipe_index.schema, names = recipe_index.names, facts = recipe_index.facts},
@@ -151,6 +156,7 @@ function M.capture(options)
   })
   local result = snapshot_contract.new({
     fact_domains = domains,
+    domain_fingerprints = recipe_domain and {recipes = recipe_domain.fingerprint} or {},
     relationship_indexes = relationship_index,
     owner_index = owners,
     graph_input = graph,
@@ -167,8 +173,17 @@ function M.capture(options)
       construction_seconds = math.max(0, now() - started_at),
       memory_before_bytes = memory_before,
       memory_after_bytes = memory_bytes(),
-      deep_copy_count = 3
+      deep_copy_count = 3,
+      -- This is the exact public recipes-domain byte length whose encoder and
+      -- rolling digest were shared with the full owned recipe index. It is
+      -- not a byte reduction claim or a retained serialized representation.
+      reused_recipe_canonical_bytes = recipe_domain and recipe_domain.canonical_bytes or 0
     }
+  }, {
+    -- The adapter created every component in this call and recipe_domain is
+    -- admitted only for the current Context-owned index above.  Keep the
+    -- public constructor's supplied-component verification fail-closed.
+    trusted_components = recipe_domain ~= nil
   })
   result.metrics.peak_memory_bytes = math.max(result.metrics.memory_before_bytes, result.metrics.memory_after_bytes)
   result.metrics.snapshot_bytes = #fingerprint.canonical(snapshot_contract.snapshot(result))

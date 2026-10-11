@@ -41,6 +41,11 @@ $modules=[ordered]@{
   'prototypes.mir.core.fingerprint'='source/prototypes/mir/core/fingerprint.lua'
   'prototypes.mir.core.trusted_record'='source/prototypes/mir/core/trusted_record.lua'
   'prototypes.mir.domain.compiler.compilation_snapshot'='source/prototypes/mir/domain/compiler/compilation_snapshot.lua'
+  'prototypes.mir.domain.compiler.execution_mode'='source/prototypes/mir/domain/compiler/execution_mode.lua'
+  'prototypes.mir.pipeline.compiler_context'='source/prototypes/mir/pipeline/compiler_context.lua'
+  'prototypes.mir.index.recipe_facts'='source/prototypes/mir/index/recipe_facts.lua'
+  'prototypes.mir.graph.snapshot'='source/prototypes/mir/graph/snapshot.lua'
+  'prototypes.mir.pipeline.compilation_snapshot_adapter'='source/prototypes/mir/pipeline/compilation_snapshot_adapter.lua'
   'prototypes.mir.pipeline.compiler_orchestrator.publication'='source/prototypes/mir/pipeline/compiler_orchestrator/publication.lua'
   'prototypes.mir.domain.effects.metadata'='source/prototypes/mir/domain/effects/metadata.lua'
   'prototypes.mir.domain.effects.generated_target_contracts'='source/prototypes/mir/domain/effects/generated_target_contracts.lua'
@@ -94,8 +99,8 @@ try{
     throw "TechnologyDesign characterization failed: $nativeLog"
   }
   $assertionCount=[int]$Matches[1]
-  if($assertionCount-ne375) {
-    throw "TechnologyDesign characterization expected 375 assertions, observed $assertionCount`: $nativeLog"
+  if($assertionCount-ne636) {
+    throw "TechnologyDesign characterization expected 636 assertions, observed $assertionCount`: $nativeLog"
   }
   if($log-notmatch'MIR-PUBLICATION-MEASUREMENT-PASS ([0-9]+)') {
     throw "Publication measurement characterization failed: $nativeLog"
