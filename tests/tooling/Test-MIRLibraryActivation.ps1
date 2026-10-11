@@ -356,6 +356,12 @@ try{
     [IO.File]::WriteAllLines($log,@($stageLine,$observerLine))
     Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log} 'mir-library-loaded-selection'
     Assert-LibraryTest (@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha).Count-eq2) 'explicit native observer includes asset-only identities'
+    $controlObserverLine=$observerLine.Replace('/data-final-fixes.lua:','/control.lua:')
+    [IO.File]::WriteAllLines($log,@($stageLine,$controlObserverLine))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha} 'mir-library-loaded-observation'
+    Assert-LibraryTest (@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha -ActiveModsObserverScript control.lua).Count-eq2) 'explicit control observer includes asset-only identities'
+    [IO.File]::WriteAllLines($log,@($stageLine,$observerLine))
+    Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver alpha -ActiveModsObserverScript control.lua} 'mir-library-loaded-observation'
     Assert-LibraryRefusal {Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -ActiveModsObserver unrequested} 'mir-library-loaded-observer'
     foreach($invalid in @('base@2.1.20','base@2.1.20|alpha@9.0.0','base@2.1.20|base@2.1.20',($complete+'|unrequested@1.0.0'))){
       [IO.File]::WriteAllLines($log,@($stageLine,('0.3 Script @__alpha__/data-final-fixes.lua:8: [MIR_ACTIVE_MODS] '+$invalid)))

@@ -111,7 +111,7 @@ try{
   function Add-MIRNativeProbeLibraryActivation {param($Context,$Activation)}
   function Complete-MIRLibraryActivation {param($Activation);$Activation.closed=$true;[pscustomobject]@{status='restored'}}
   function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments);$script:graphicalArguments=@($Arguments)}
-  function Assert-MIRLibraryLoadedSelection {param($Activation,$LogPath,[switch]$LatestInvocation,$ActiveModsObserver);@('base@2.0.77',$ActiveModsObserver+'@1.0.0')}
+  function Assert-MIRLibraryLoadedSelection {param($Activation,$LogPath,[switch]$LatestInvocation,$ActiveModsObserver,[ValidateSet('data-final-fixes.lua','control.lua')]$ActiveModsObserverScript='data-final-fixes.lua');if($ActiveModsObserverScript-cne'control.lua'){throw 'Graphical player-ready observer must explicitly select control.lua.'};@('base@2.0.77',$ActiveModsObserver+'@1.0.0')}
   function Invoke-MIRNativeProbeFactorioProcess {
     param($Context,$FilePath,$Arguments,$TimeoutSeconds)
     $config=[string]$Arguments[[Array]::IndexOf($Arguments,'--config')+1]

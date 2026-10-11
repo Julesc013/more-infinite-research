@@ -3667,7 +3667,7 @@
     {
       "path": "tools/lib/compatibility/LibraryActivation.ps1",
       "classification": "canonical-internal",
-      "sha256": "58E86A70D9156D090AA208F9905DB9F4848ECC3C9F0A1BA73173F2A3DC6E704D",
+      "sha256": "4E25FEDD94E48D0F92E18835D5A49C638A10A81C4C43CA42E0FC734E001A3F85",
       "hash_mode": "canonical-text-v1",
       "lines": 439,
       "package_visible": false
@@ -4459,7 +4459,7 @@
     {
       "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
       "classification": "canonical-internal",
-      "sha256": "EC638984026F7E9095588F0E00CF1F64EE3958D7A4EBFC7BA483096987E80E03",
+      "sha256": "944F6BBD9E665B5C71E471A964A885A77C90A2240C401216A60FA5C3975DECD5",
       "hash_mode": "canonical-text-v1",
       "lines": 417,
       "package_visible": false
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e6bc112c1e4bf878fbab01792db03b04c1731d873cb2ce611c85ca921c0da456"
+  "digest": "sha256:71d34d37cd3d510f5c1a96f8144790d7aac60cd73cb7ec8221f4549c7780bf30"
 }

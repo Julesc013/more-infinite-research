@@ -363,7 +363,7 @@ function Assert-MIRLibraryActivation {
 }
 
 function Assert-MIRLibraryLoadedSelection {
-  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath,[switch]$LatestInvocation,[string]$ActiveModsObserver='')
+  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath,[switch]$LatestInvocation,[string]$ActiveModsObserver='',[ValidateSet('data-final-fixes.lua','control.lua')][string]$ActiveModsObserverScript='data-final-fixes.lua')
   $text=[IO.File]::ReadAllText($LogPath)
   if($LatestInvocation){
     $starts=[regex]::Matches($text,'(?m)^[ \t]*[0-9]+\.[0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}; Factorio [0-9]+\.[0-9]+\.[0-9]+ ')
@@ -380,7 +380,7 @@ function Assert-MIRLibraryLoadedSelection {
     # hash-bound fixture may report Factorio's full mods table instead. Never
     # infer a missing version from filenames or ignore contradictory log rows.
     if(@($Activation.selected|Where-Object name -CEQ $ActiveModsObserver).Count-ne1){throw '[mir-library-loaded-observer] Observer is not selected.'}
-    $pattern='(?m)^[ \t]*[0-9]+\.[0-9]+ Script @__'+[regex]::Escape($ActiveModsObserver)+'__/data-final-fixes[.]lua:[0-9]+: \[MIR_ACTIVE_MODS\] ([^\r\n]+)\r?$'
+    $pattern='(?m)^[ \t]*[0-9]+\.[0-9]+ Script @__'+[regex]::Escape($ActiveModsObserver)+'__/'+[regex]::Escape($ActiveModsObserverScript)+':[0-9]+: \[MIR_ACTIVE_MODS\] ([^\r\n]+)\r?$'
     $reports=[regex]::Matches($text,$pattern)
     if($reports.Count-ne1){throw '[mir-library-loaded-observation] Expected one complete native mod table.'}
     $rows=@($reports[0].Groups[1].Value.Split('|'))
