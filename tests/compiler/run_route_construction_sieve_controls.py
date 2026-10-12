@@ -133,6 +133,9 @@ package.preload["prototypes.mir.graph.researchability_index"] = function()
     reachable_names = function(index, name) return copy(index.closures[name] or {name}) end
   }
 end
+package.preload["prototypes.mir.capabilities.science_integration.technology_researchability"] = function()
+  return {reason_with_context = function() return nil end}
+end
 package.preload["prototypes.mir.capabilities.science_integration.recipe_route_feasibility"] = function()
   return {}
 end

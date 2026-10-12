@@ -69,6 +69,7 @@ for _, name in ipairs({
   "prototypes.mir.core.deepcopy",
   "prototypes.mir.pipeline.compiler_context",
   "prototypes.mir.graph.researchability_index",
+  "prototypes.mir.capabilities.science_integration.technology_researchability",
   "prototypes.mir.capabilities.science_integration.production_route_policy",
   "prototypes.mir.report.compiler_telemetry"
 }) do

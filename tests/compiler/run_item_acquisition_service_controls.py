@@ -79,6 +79,9 @@ package.preload["prototypes.mir.pipeline.compiler_context"] = function()
   return {current = function() return context end}
 end
 package.preload["prototypes.mir.graph.researchability_index"] = function() return {} end
+package.preload["prototypes.mir.capabilities.science_integration.technology_researchability"] = function()
+  return {reason_with_context = function() return nil end}
+end
 package.preload["prototypes.mir.capabilities.science_integration.production_route_policy"] = function() return {} end
 package.preload["prototypes.mir.report.compiler_telemetry"] = function()
   return {count = function() end, observe_max = function() end}

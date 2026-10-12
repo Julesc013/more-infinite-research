@@ -7,6 +7,7 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local researchability_index = require("prototypes.mir.graph.researchability_index")
 local route_policy = require("prototypes.mir.capabilities.science_integration.production_route_policy")
 local route_feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+local technology_researchability = require("prototypes.mir.capabilities.science_integration.technology_researchability")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
@@ -47,6 +48,17 @@ local OUTPUT_RECIPE_ORDERING_MAX_NODES = 4096
 local OUTPUT_RECIPE_ORDERING_MAX_ESTIMATED_BYTES = 512 * 1024
 local OUTPUT_RECIPE_ORDERING_ENTRY_ESTIMATED_BYTES = 112
 local OUTPUT_RECIPE_ORDERING_NAME_ESTIMATED_BYTES = 40
+
+-- Lab compatibility asks only whether a concrete placement item is available.
+-- Keep a compact Context-owned answer cache for completed true results; it
+-- deliberately owns neither a production witness nor an explanation tree.
+-- A full acquisition proof remains the fallback whenever this bounded cache
+-- cannot establish that its contextual inputs are still exact.
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_MAX_KEYS = 512
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_MAX_ESTIMATED_BYTES = 256 * 1024
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_ENTRY_ESTIMATED_BYTES = 96
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_KEY_MAX_CONTEXT_ENTRIES = 256
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_KEY_MAX_CONTEXT_BYTES = 16 * 1024
 
 local function positive_limit(value, default, maximum)
   value = tonumber(value)
@@ -275,6 +287,16 @@ local function science_pack_production_state()
     output_recipe_ordering_technology_index_fingerprint = nil,
     root_entry_generation = 0,
     contextual_acquisition_generation = 0,
+    contextual_boolean_acquisition_memo = {},
+    contextual_boolean_acquisition_memo_key_count = 0,
+    contextual_boolean_acquisition_memo_estimated_bytes = 0,
+    contextual_boolean_acquisition_memo_source_epoch = nil,
+    contextual_boolean_acquisition_memo_recipe_index_epoch = nil,
+    contextual_boolean_acquisition_memo_research_index_epoch = nil,
+    contextual_boolean_acquisition_memo_research_index_fingerprint = nil,
+    contextual_boolean_acquisition_memo_root_generation = nil,
+    contextual_boolean_acquisition_memo_stable_generation = nil,
+    contextual_boolean_acquisition_memo_bindings = nil,
     -- This state owns only source-epoch-stable structural observations. It
     -- deliberately cannot retain an acquisition result that depends on an
     -- active science-pack or technology traversal.
@@ -292,6 +314,25 @@ local function science_pack_resolution_cache()
   return science_pack_production_state().entries
 end
 
+local function reset_contextual_boolean_acquisition_memo(owner, reason)
+  local discarded = owner.contextual_boolean_acquisition_memo_key_count or 0
+  owner.contextual_boolean_acquisition_memo = {}
+  owner.contextual_boolean_acquisition_memo_key_count = 0
+  owner.contextual_boolean_acquisition_memo_estimated_bytes = 0
+  owner.contextual_boolean_acquisition_memo_source_epoch = nil
+  owner.contextual_boolean_acquisition_memo_recipe_index_epoch = nil
+  owner.contextual_boolean_acquisition_memo_research_index_epoch = nil
+  owner.contextual_boolean_acquisition_memo_research_index_fingerprint = nil
+  owner.contextual_boolean_acquisition_memo_root_generation = nil
+  owner.contextual_boolean_acquisition_memo_stable_generation = nil
+  owner.contextual_boolean_acquisition_memo_bindings = nil
+  if discarded > 0 then
+    telemetry.count("science_contextual_boolean_acquisition_invalidations")
+    telemetry.count("science_contextual_boolean_acquisition_entries_discarded", discarded)
+    if reason then telemetry.count("science_contextual_boolean_acquisition_invalidation_" .. reason) end
+  end
+end
+
 local function remember_root_pack_status(pack_name, entry)
   local owner = science_pack_production_state()
   owner.entries[pack_name] = entry
@@ -302,6 +343,7 @@ local function remember_root_pack_status(pack_name, entry)
   owner.root_entry_generation = owner.root_entry_generation + 1
   owner.contextual_pack_status_memo = {}
   owner.contextual_pack_status_count = 0
+  reset_contextual_boolean_acquisition_memo(owner, "root_generation")
 end
 
 local function science_pack_route_witness_state()
@@ -2146,6 +2188,144 @@ local function item_acquisition_witness_for_query(item_name, visiting_packs, vis
     route_witness_state_for_query(observer))
 end
 
+local function framed_contextual_boolean_active_map_key(values)
+  -- A Boolean answer crosses fresh lab queries, so take a compact exact
+  -- snapshot of the active cycle guards rather than retaining caller maps.
+  -- These guards are flat, string-keyed true sets in the canonical compiler.
+  -- Any other shape simply uses the established cold proof path.
+  if values == nil then return "" end
+  if type(values) ~= "table" or getmetatable(values) ~= nil then return nil end
+  local fields, count, bytes = {}, 0, 0
+  for name, active in pairs(values) do
+    if type(name) ~= "string" or active ~= true then return nil end
+    count = count + 1
+    if count > CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_KEY_MAX_CONTEXT_ENTRIES then return nil end
+    local field = #name .. ":" .. name
+    bytes = bytes + #field
+    if bytes > CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_KEY_MAX_CONTEXT_BYTES then return nil end
+    fields[count] = field
+  end
+  table.sort(fields)
+  return table.concat(fields)
+end
+
+local function contextual_boolean_acquisition_key(item_name, visiting_packs, visiting_technologies, state)
+  local pack_guards = framed_contextual_boolean_active_map_key(visiting_packs)
+  local technology_guards = framed_contextual_boolean_active_map_key(visiting_technologies)
+  local acquisition_guards = framed_contextual_boolean_active_map_key(state and state.visiting)
+  if pack_guards == nil or technology_guards == nil or acquisition_guards == nil then return nil end
+  local fields = {"item", item_name, pack_guards, technology_guards, acquisition_guards}
+  for index, value in ipairs(fields) do fields[index] = #value .. ":" .. value end
+  return table.concat(fields)
+end
+
+local function canonical_boolean_acquisition_services_match(context)
+  -- The companion in lab_compatibility verifies its private witness/available
+  -- pairing before calling this function. Here we verify every live service
+  -- that can participate in the underlying contextual acquisition proof.
+  -- A custom service is allowed to use the public cold path, never this memo.
+  return context:service("science.technology_researchability_reason")
+      == technology_researchability.reason_with_context
+    and context:service("science.pack_production_status") == M.pack_production_status
+    and context:service("science.independent_pack_acquisition_witness")
+      == M.independent_pack_acquisition_witness
+    and context:service("science.item_acquisition_witness") == M.item_acquisition_witness
+end
+
+local function contextual_boolean_acquisition_generation(context, owner, state)
+  if type(owner) ~= "table" or type(state) ~= "table" or owner.route_witness_state ~= state
+    or not canonical_boolean_acquisition_services_match(context)
+    or not route_feasibility.state_context_matches(state, context) then return nil end
+  local source_epoch = canonical_recipe_facts.source_epoch()
+  local recipe_index = context:state_view("recipe_index")
+  local research_index = context:state_view("technology_researchability_index")
+  if owner.recipe_source_epoch ~= source_epoch or state.recipe_source_epoch ~= source_epoch
+    or type(recipe_index) ~= "table" or state.recipe_index ~= recipe_index
+    or type(research_index) ~= "table" then return nil end
+  return {
+    source_epoch = source_epoch,
+    route_witness_state = state,
+    recipe_index = recipe_index,
+    research_index = research_index,
+    recipe_index_epoch = context:state_epoch("recipe_index"),
+    research_index_epoch = context:state_epoch("technology_researchability_index"),
+    research_index_fingerprint = research_index.index_fingerprint,
+    root_generation = owner.root_entry_generation,
+    stable_generation = state.stable_acquisition_generation or 0
+  }
+end
+
+local function contextual_boolean_acquisition_bindings(generation)
+  -- The owner outlives a source/index replacement.  Retain no old graph just
+  -- to validate a Boolean answer: weak values establish identity while the
+  -- live Context remains its real owner.
+  return setmetatable({
+    route_witness_state = generation.route_witness_state,
+    recipe_index = generation.recipe_index,
+    research_index = generation.research_index
+  }, {__mode = "v"})
+end
+
+local function contextual_boolean_acquisition_memo_is_current(owner, generation)
+  local bindings = owner.contextual_boolean_acquisition_memo_bindings
+  return owner.contextual_boolean_acquisition_memo_source_epoch == generation.source_epoch
+    and owner.contextual_boolean_acquisition_memo_recipe_index_epoch == generation.recipe_index_epoch
+    and owner.contextual_boolean_acquisition_memo_research_index_epoch == generation.research_index_epoch
+    and owner.contextual_boolean_acquisition_memo_research_index_fingerprint
+      == generation.research_index_fingerprint
+    and owner.contextual_boolean_acquisition_memo_root_generation == generation.root_generation
+    and owner.contextual_boolean_acquisition_memo_stable_generation == generation.stable_generation
+    and type(bindings) == "table"
+    and bindings.route_witness_state == generation.route_witness_state
+    and bindings.recipe_index == generation.recipe_index
+    and bindings.research_index == generation.research_index
+end
+
+local function contextual_boolean_acquisition_memo_owner(state, observer)
+  if observer ~= nil then return nil end
+  local context = compiler_context.current()
+  local owner = context:state_view("science_pack_production")
+  if type(owner) ~= "table" or owner.route_witness_state ~= state then return nil end
+  if not canonical_boolean_acquisition_services_match(context) then
+    reset_contextual_boolean_acquisition_memo(owner, "service_identity")
+    telemetry.count("science_contextual_boolean_acquisition_service_bypasses")
+    return nil
+  end
+  local generation = contextual_boolean_acquisition_generation(context, owner, state)
+  if not generation then return nil end
+  if not contextual_boolean_acquisition_memo_is_current(owner, generation) then
+    reset_contextual_boolean_acquisition_memo(owner, "generation")
+    owner.contextual_boolean_acquisition_memo_source_epoch = generation.source_epoch
+    owner.contextual_boolean_acquisition_memo_recipe_index_epoch = generation.recipe_index_epoch
+    owner.contextual_boolean_acquisition_memo_research_index_epoch = generation.research_index_epoch
+    owner.contextual_boolean_acquisition_memo_research_index_fingerprint
+      = generation.research_index_fingerprint
+    owner.contextual_boolean_acquisition_memo_root_generation = generation.root_generation
+    owner.contextual_boolean_acquisition_memo_stable_generation = generation.stable_generation
+    owner.contextual_boolean_acquisition_memo_bindings = contextual_boolean_acquisition_bindings(generation)
+  end
+  return owner, generation
+end
+
+local function contextual_boolean_acquisition_can_retain(owner, generation, state, key,
+  visiting_packs, visiting_technologies)
+  local context = compiler_context.current()
+  local current = contextual_boolean_acquisition_generation(context, owner, state)
+  if not current or not contextual_boolean_acquisition_memo_is_current(owner, generation)
+    or current.source_epoch ~= generation.source_epoch
+    or current.recipe_index_epoch ~= generation.recipe_index_epoch
+    or current.research_index_epoch ~= generation.research_index_epoch
+    or current.research_index_fingerprint ~= generation.research_index_fingerprint
+    or current.root_generation ~= generation.root_generation
+    or current.stable_generation ~= generation.stable_generation then return false end
+  return contextual_boolean_acquisition_key(
+    key.item_name, visiting_packs, visiting_technologies, state) == key.value
+end
+
+local function contextual_boolean_acquisition_entry_bytes(key)
+  return CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_ENTRY_ESTIMATED_BYTES + #key
+end
+
 function M.item_acquisition_witness(item_name, visiting_packs, visiting_technologies, observer)
   if type(item_name) == "string" and item_name ~= "" then
     telemetry.count("science_item_acquisition_witness_queries")
@@ -2165,13 +2345,70 @@ end
 -- caller must still prove that the paired public witness service remains the
 -- canonical implementation; a later replacement retains the public path.
 function M.item_acquisition_available(item_name, visiting_packs, visiting_technologies, observer)
-  if compiler_context.current():service("science.item_acquisition_witness") ~= M.item_acquisition_witness then
+  local context = compiler_context.current()
+  if context:service("science.item_acquisition_witness") ~= M.item_acquisition_witness then
     return nil, false
+  end
+  visiting_packs = visiting_packs or {}
+  visiting_technologies = visiting_technologies or {}
+  local state = route_witness_state_for_query(observer)
+  local owner, generation, memo_input
+  if type(item_name) == "string" and item_name ~= "" and state then
+    owner, generation = contextual_boolean_acquisition_memo_owner(state, observer)
+    if owner then
+      local key = contextual_boolean_acquisition_key(item_name, visiting_packs, visiting_technologies, state)
+      if key ~= nil then
+        memo_input = {item_name = item_name, value = key}
+        if owner.contextual_boolean_acquisition_memo[key] then
+          telemetry.count("science_contextual_boolean_acquisition_hits")
+          telemetry.count("science_item_acquisition_boolean_queries")
+          telemetry.count("science_item_acquisition_witness_copies_avoided")
+          return true, true
+        end
+        telemetry.count("science_contextual_boolean_acquisition_misses")
+        local bytes = contextual_boolean_acquisition_entry_bytes(key)
+        -- This is intentionally before the acquisition proof: a globally full
+        -- cache cannot admit the answer no matter which witness the proof
+        -- would find, so avoid scanning a graph solely to reject retention.
+        if owner.contextual_boolean_acquisition_memo_key_count
+            >= CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_MAX_KEYS
+          or owner.contextual_boolean_acquisition_memo_estimated_bytes + bytes
+            > CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_MAX_ESTIMATED_BYTES then
+          telemetry.count("science_contextual_boolean_acquisition_capacity_refusals")
+          owner, generation, memo_input = nil, nil, nil
+        end
+      else
+        telemetry.count("science_contextual_boolean_acquisition_context_refusals")
+        owner, generation = nil, nil
+      end
+    elseif observer == nil and type(item_name) == "string" and item_name ~= "" then
+      telemetry.count("science_contextual_boolean_acquisition_context_refusals")
+    end
   end
   local witness = item_acquisition_witness_for_query(item_name, visiting_packs, visiting_technologies, observer)
   if type(item_name) == "string" and item_name ~= "" then
     telemetry.count("science_item_acquisition_boolean_queries")
-    if witness then telemetry.count("science_item_acquisition_witness_copies_avoided") end
+    if witness then
+      telemetry.count("science_item_acquisition_witness_copies_avoided")
+      if owner and generation and memo_input then
+        if contextual_boolean_acquisition_can_retain(
+          owner, generation, state, memo_input, visiting_packs, visiting_technologies) then
+          owner.contextual_boolean_acquisition_memo[memo_input.value] = true
+          owner.contextual_boolean_acquisition_memo_key_count
+            = owner.contextual_boolean_acquisition_memo_key_count + 1
+          owner.contextual_boolean_acquisition_memo_estimated_bytes
+            = owner.contextual_boolean_acquisition_memo_estimated_bytes
+              + contextual_boolean_acquisition_entry_bytes(memo_input.value)
+          telemetry.count("science_contextual_boolean_acquisition_completed_answers")
+        else
+          -- A successful witness remains valid for this call. It simply may
+          -- not become a Context answer after another fact or active guard
+          -- changed while the proof ran.
+          reset_contextual_boolean_acquisition_memo(owner, "during_proof")
+          telemetry.count("science_contextual_boolean_acquisition_generation_refusals")
+        end
+      end
+    end
   end
   return witness and true or false, true
 end
