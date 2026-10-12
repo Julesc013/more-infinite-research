@@ -830,6 +830,7 @@ local RESEARCH_UNLOCK_NEGATIVE_MEMO_LIMIT = 8192
 -- the same children, including native capture's launcher and ammunition.
 local function acquisition_children(witness)
   local children = {}
+  if type(witness) ~= "table" then return children end
   if witness.recipe_witness then table.insert(children, witness.recipe_witness) end
   for _, ingredient in ipairs(witness.ingredients or {}) do table.insert(children, ingredient) end
   if witness.receiver and witness.receiver.acquisition then
@@ -845,38 +846,55 @@ local function acquisition_children(witness)
 end
 
 local function witness_avoids_active_identities(witness, visiting, root_key)
-  if type(witness) ~= "table" then return true end
-  local output = witness.output or witness.product
-  if type(output) == "table" and output.type and output.name then
-    local key = identity_key(output)
-    -- The queried output is necessarily active while its acquisition is being
-    -- resolved. It is safe here because this witness has already established
-    -- one complete route for that output; every other active output remains a
-    -- cycle boundary.
-    if key ~= root_key and visiting[key] then return false end
+  -- Witnesses can share one already-proved subroute.  Traverse each table
+  -- instance once for this reuse decision, but keep the marks local: a memo
+  -- witness is later returned to callers and must not retain a stale summary.
+  -- `active` distinguishes a DAG alias from an actual table back-edge.
+  local active, completed = {}, {}
+  local function visit(node)
+    if type(node) ~= "table" then return true end
+    if completed[node] then return true end
+    if active[node] then return false end
+    active[node] = true
+    local output = node.output or node.product
+    if type(output) == "table" and output.type and output.name then
+      local key = identity_key(output)
+      -- The queried output is necessarily active while its acquisition is being
+      -- resolved. It is safe here because this witness has already established
+      -- one complete route for that output; every other active output remains a
+      -- cycle boundary.
+      if key ~= root_key and visiting[key] then return false end
+    end
+    for _, child in ipairs(acquisition_children(node)) do
+      if not visit(child) then return false end
+    end
+    active[node] = nil
+    completed[node] = true
+    return true
   end
-  for _, child in ipairs(acquisition_children(witness)) do
-    if not witness_avoids_active_identities(child, visiting, root_key) then return false end
-  end
-  return true
+  return visit(witness)
 end
 
 local function witness_unlock_dependencies(witness, entry_technologies, dependencies)
-  if type(witness) ~= "table" then return end
-  if witness.kind == "research-unlocked-recipe" then
-    local unlocker = witness.unlocker
-    if type(witness.recipe) == "string" and type(unlocker) == "string" then
-      dependencies.pairs[unlock_pair_key(witness.recipe, unlocker)] = true
-      -- This technology was accepted by the active-context shortcut rather
-      -- than a new researchability query. Reuse requires the same already
-      -- proven ancestor; unrelated active technologies do not enter the key.
-      if entry_technologies[unlocker] ~= nil then
-        dependencies.required_technologies[unlocker] = true
+  local pending, seen = {witness}, {}
+  while #pending > 0 do
+    local node = table.remove(pending)
+    if type(node) == "table" and not seen[node] then
+      seen[node] = true
+      if node.kind == "research-unlocked-recipe" then
+        local unlocker = node.unlocker
+        if type(node.recipe) == "string" and type(unlocker) == "string" then
+          dependencies.pairs[unlock_pair_key(node.recipe, unlocker)] = true
+          -- This technology was accepted by the active-context shortcut rather
+          -- than a new researchability query. Reuse requires the same already
+          -- proven ancestor; unrelated active technologies do not enter the key.
+          if entry_technologies[unlocker] ~= nil then
+            dependencies.required_technologies[unlocker] = true
+          end
+        end
       end
+      for _, child in ipairs(acquisition_children(node)) do table.insert(pending, child) end
     end
-  end
-  for _, child in ipairs(acquisition_children(witness)) do
-    witness_unlock_dependencies(child, entry_technologies, dependencies)
   end
 end
 
@@ -1075,6 +1093,12 @@ local function production_witness_options(visiting_packs, visiting_technologies,
       and science_pack_production_state().technology_mechanism_memo or {},
     diagnostic_observer = diagnostic_observer
   }
+  if diagnostic_observer == nil then
+    -- The route compiler consumes only scalar selected gates/provenance from
+    -- these witnesses. Its Context-owned state may therefore borrow private
+    -- memo DAG nodes; public, custom, and diagnostic calls retain copies.
+    route_feasibility.enable_compiler_owned_witness_sharing(options)
+  end
   options.research_unlock_witness = function(identity, state)
     return research_unlocked_output_witness(
       identity,
@@ -1095,20 +1119,23 @@ end
 -- research-unlocked recipe nodes so the route policy can require every
 -- technology that the chosen branch actually needs, including nested inputs.
 local function selected_research_unlock_pairs(witness)
-  local pairs, seen = {}, {}
-  local function visit(node)
-    if type(node) ~= "table" then return end
-    if node.kind == "research-unlocked-recipe"
-      and type(node.recipe) == "string" and type(node.unlocker) == "string" then
-      local key = node.recipe .. "\0" .. node.unlocker
-      if not seen[key] then
-        seen[key] = true
-        table.insert(pairs, {recipe = node.recipe, unlocker = node.unlocker})
+  local pairs, seen_pairs, seen_nodes = {}, {}, {}
+  local pending = {witness}
+  while #pending > 0 do
+    local node = table.remove(pending)
+    if type(node) == "table" and not seen_nodes[node] then
+      seen_nodes[node] = true
+      if node.kind == "research-unlocked-recipe"
+        and type(node.recipe) == "string" and type(node.unlocker) == "string" then
+        local key = node.recipe .. "\0" .. node.unlocker
+        if not seen_pairs[key] then
+          seen_pairs[key] = true
+          table.insert(pairs, {recipe = node.recipe, unlocker = node.unlocker})
+        end
       end
+      for _, child in ipairs(acquisition_children(node)) do table.insert(pending, child) end
     end
-    for _, child in ipairs(acquisition_children(node)) do visit(child) end
   end
-  visit(witness)
   table.sort(pairs, function(left, right)
     if left.recipe ~= right.recipe then return left.recipe < right.recipe end
     return left.unlocker < right.unlocker
@@ -1295,6 +1322,71 @@ local function aggregate_research_route(
   }
 end
 
+local function route_gate_set(route)
+  local gates, count = {}, 0
+  local function add(name)
+    if name and not gates[name] then gates[name], count = true, count + 1 end
+  end
+  for _, name in ipairs(route.unlockers or {}) do add(name) end
+  add(route.unlocker)
+  for _, name in ipairs(route.prerequisite_closure or {}) do add(name) end
+  return gates, count
+end
+
+-- The outer unlocker and its complete acyclic prerequisite closure are a
+-- lower bound on every realized research route. Inner gates can only add to
+-- that set. Quantify all outer unlockers: aggregation may rebind to another
+-- declared unlocker already supplied by an ingredient's selected route.
+local function disabled_producer_cannot_win(recipe_name, routes, excluded_unlocker, observer, prepared)
+  if observer ~= nil or excluded_unlocker ~= nil or #routes == 0 then return false end
+  prepared = prepared or {routes = {}, lower = {}}
+  local unlockers = recipe_facts.unlockers_for_recipe(recipe_name)
+  if #unlockers == 0 then return false end
+  local index = graph_index()
+  for _, technology_name in ipairs(unlockers) do
+    local facts = static_unlock_facts(index, technology_name)
+    if facts.structurally_reachable ~= true then return false end
+    local lower_entry = prepared.lower[technology_name]
+    if not lower_entry or lower_entry.facts ~= facts then
+      local gates, count = route_gate_set({unlockers = {technology_name},
+        prerequisite_closure = facts.prerequisite_closure})
+      lower_entry = {facts = facts, gates = gates, count = count}
+      prepared.lower[technology_name] = lower_entry
+    end
+    local lower, lower_count = lower_entry.gates, lower_entry.count
+    local defeated = false
+    for _, route in ipairs(routes) do
+      if route.reachable == true then
+        local entry = prepared.routes[route]
+        if not entry then
+          local gates, count = route_gate_set(route)
+          entry = {gates = gates, count = count}
+          prepared.routes[route] = entry
+        end
+        local gates, count = entry.gates, entry.count
+        local contained = count <= lower_count
+        if contained then
+          for name in pairs(gates) do
+            if not lower[name] then contained = false; break end
+          end
+        end
+        if contained then
+          local direct = route.unlockers or {}
+          -- With the same sole maximal gate, any inner gate is either
+          -- implied by it or makes a strict superset. Equal closed sets have
+          -- the same science, depth, count and time; the earlier recipe wins.
+          local equal_loses = count == lower_count and #direct == 1
+            and direct[1] == technology_name
+            and tostring(route.recipe or "") < tostring(recipe_name)
+          if count < lower_count or equal_loses then defeated = true; break end
+        end
+      end
+    end
+    if not defeated then return false end
+  end
+  return true
+end
+
 local function initial_production_route(recipe_name, initial_witness)
   return {
     recipe = recipe_name, initial = true, unlockers = {}, prerequisite_closure = {},
@@ -1331,7 +1423,10 @@ local function production_routes(
       table.insert(routes, route)
     end
   end
-  local initial_attempts = {}
+  local initial_attempts, sieved_producers, evaluated_producers = {}, 0, 0
+  -- Only completed immutable routes and source-bound lower facts enter this
+  -- query-local preparation. Ordinary helper callers do not retain it.
+  local sieve_prepared = {routes = {}, lower = {}}
   if observer == nil then
     -- Every initial record has identical gates and numeric rank. Lexical
     -- recipe order therefore proves the same winner before researched
@@ -1396,7 +1491,12 @@ local function production_routes(
         )
         if route then table.insert(routes, route) end
       end
+    elseif disabled_producer_cannot_win(recipe_name, routes, excluded_unlocker, observer, sieve_prepared) then
+      sieved_producers = sieved_producers + 1
+      telemetry.count("science_disabled_producers_sieved")
     else
+      evaluated_producers = evaluated_producers + 1
+      if observer == nil then telemetry.count("science_disabled_producers_constructed") end
       local witness = route_feasibility.recipe_witness(
         recipe_name, recipe_status.pack_name, witness_options, witness_state)
       if witness then
@@ -1432,6 +1532,17 @@ local function production_routes(
           end
         end
       end
+    end
+  end
+  if sieved_producers > 0 then
+    for _, route in ipairs(routes) do
+      route.provenance = route.provenance or {}
+      route.provenance.route_enumeration = {
+        strategy = "proven-gate-lower-bound", complete = false,
+        recipe_candidate_count = #(recipe_status.recipes or {}),
+        disabled_producers_evaluated = evaluated_producers,
+        disabled_producers_sieved = sieved_producers
+      }
     end
   end
   return routes
@@ -1985,9 +2096,13 @@ end
 -- structural witness does not certify native placement, power or throughput.
 function M.item_acquisition_witness(item_name, visiting_packs, visiting_technologies, observer)
   if type(item_name) ~= "string" or item_name == "" then return nil end
-  return route_feasibility.acquisition_witness({type = "item", name = item_name},
+  local witness = route_feasibility.acquisition_witness({type = "item", name = item_name},
     production_witness_options(visiting_packs or {}, visiting_technologies or {}, observer),
     route_witness_state_for_query(observer))
+  -- production_witness_options may borrow compiler-owned memo DAG nodes while
+  -- proving this route. This exported service is consumed outside that private
+  -- lifetime, so it must never expose a mutable memo node to its caller.
+  return witness and deepcopy(witness) or nil
 end
 
 function M.independent_pack_acquisition_witness(

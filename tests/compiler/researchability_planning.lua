@@ -3463,6 +3463,47 @@ check('D25A', trace_exhaustion_projection and trace_exhaustion_projection.status
   and projection_visits_within(trace_exhaustion_projection, 5),
   'Trace-stage recipe-status exhaustion is explicit indeterminate rather than nil')
 
+;(function()
+  local function sieve_world()
+    return {
+      item_prototypes = {Seed = {type = "item"}, Pack = {type = "item"}},
+      labs = {lab = {inputs = {"Seed", "Pack"}}},
+      techs = {Gate = {enabled = true, unit = {count = 1, time = 1, ingredients = {{"Seed", 1}}},
+        effects = {{type = "unlock-recipe", recipe = "A-pack"}, {type = "unlock-recipe", recipe = "Z-pack"}}}},
+      recipe_prototypes = {
+        seed = {type = "recipe", name = "seed", enabled = true, ingredients = {}, results = {{type = "item", name = "Seed", amount = 1}}},
+        ["A-pack"] = {type = "recipe", name = "A-pack", enabled = false, ingredients = {}, results = {{type = "item", name = "Pack", amount = 1}}},
+        ["Z-pack"] = {type = "recipe", name = "Z-pack", enabled = false, ingredients = {}, results = {{type = "item", name = "Pack", amount = 1}}}
+      },
+      recipe_facts = {seed = route_fact("Seed"), ["A-pack"] = route_fact("Pack", {}, {enabled = false}),
+        ["Z-pack"] = route_fact("Pack", {}, {enabled = false})},
+      producers = {Seed = {"seed"}, Pack = {"A-pack", "Z-pack"}},
+      unlockers = {["A-pack"] = {"Gate"}, ["Z-pack"] = {"Gate"}}
+    }
+  end
+  for _, reverse in ipairs({false, true}) do
+    local w = sieve_world()
+    if reverse then w.producers.Pack = {"Z-pack", "A-pack"} end
+    reset(w)
+    local original, later_calls = feasibility.recipe_witness, 0
+    feasibility.recipe_witness = function(name, ...)
+      if name == "Z-pack" then later_calls = later_calls + 1 end
+      return original(name, ...)
+    end
+    local status = production.pack_production_status("Pack")
+    local route = production.production_route_for_pack("Pack")
+    feasibility.recipe_witness = original
+    check("SIEVE-WINNER-" .. tostring(reverse), status == "research" and route and route.recipe == "A-pack",
+      "The gate-bound sieve retains the same reachable recipe across producer insertion orders")
+    check("SIEVE-CONSTRUCTION-" .. tostring(reverse), later_calls == 0 and route
+      and route.provenance.route_enumeration.disabled_producers_sieved == 1,
+      "A later recipe with the same necessary sole gate is skipped before its feasibility construction")
+    check("SIEVE-COUNTS-" .. tostring(reverse), route and route.provenance.selection_counts_complete == false
+      and route.provenance.route_enumeration.complete == false,
+      "Every possible selected route reports incomplete enumeration after pruning")
+  end
+end)()
+
 -- Reload the actual lab and recipe-facts source for the assertions below. The
 -- established planner worlds above intentionally stub recipe facts, so they
 -- cannot prove that a fresh diagnostic avoids its normal full-index builder.
@@ -3951,6 +3992,8 @@ end)()
   check("ACQ-NEGATIVE-POSITIVE", feasibility.acquisition_witness("seeded", {recipe_index = index}, state) ~= nil,
     "An unrestricted positive proof cannot turn a contextual failure into global impossibility")
 end)()
+
+
 
 if #failures > 0 then error(table.concat(failures, "\n")) end
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)
