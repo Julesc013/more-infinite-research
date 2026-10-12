@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 91240,
-      "source_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D",
-      "output_bytes": 91240,
-      "output_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D"
+      "source_bytes": 99055,
+      "source_sha256": "F354C6DB5DF5EC802D0330D0FCF39876C1196FFEC5D6E603AD52E34308CCF886",
+      "output_bytes": 99055,
+      "output_sha256": "F354C6DB5DF5EC802D0330D0FCF39876C1196FFEC5D6E603AD52E34308CCF886"
     },
     {
       "layer": "capability",
@@ -6031,10 +6031,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/report/compiler_telemetry.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4890,
-      "source_sha256": "0AE4E6F80423DED9C5073AF05EFCBCAD2423A58FA7CD04EE334A39110B953010",
-      "output_bytes": 4890,
-      "output_sha256": "0AE4E6F80423DED9C5073AF05EFCBCAD2423A58FA7CD04EE334A39110B953010"
+      "source_bytes": 5060,
+      "source_sha256": "E9C0F17B07FD05A7C04CBCF25886BDD2D170B04033ACFE3F84ECCA461797C1AE",
+      "output_bytes": 5060,
+      "output_sha256": "E9C0F17B07FD05A7C04CBCF25886BDD2D170B04033ACFE3F84ECCA461797C1AE"
     },
     {
       "layer": "capability",
@@ -7709,5 +7709,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "865900305B35347C7EE3CA74BFA9A1ADD7E99005754B1F3DAD31A2E0E1530F88"
+  "record_sha256": "DE0588FE331FC35C448EC9747C49E1BC847607899EDF259C7735756C4DA2AB90"
 }

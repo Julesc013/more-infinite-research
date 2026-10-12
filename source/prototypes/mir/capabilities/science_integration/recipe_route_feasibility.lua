@@ -1742,6 +1742,214 @@ local function stable_acquisition_witness(witness)
   return true
 end
 
+-- Private compiler queries can receive an internally owned memo DAG.  The
+-- ordinary classifier revisits every shared witness branch, so establish each
+-- plain witness node once for this invocation only.  Do not retain this table
+-- topology: a later query must inspect its current values, and public or
+-- diagnostic callers retain the exact current classifier below.
+local STABLE_WITNESS_COMPLETED_NODE_LIMIT = 256
+
+local function report_private_stable_witness_metrics(metrics, completed_nodes,
+  witness_nodes, completed_hits, refused_cycle, fell_back, fast_path)
+  -- The optional metrics argument is test-only. Keep operational counting local
+  -- and publish it once so production does not allocate telemetry per visited
+  -- witness node.
+  if type(metrics) == "table" then
+    metrics.completed_nodes = completed_nodes
+    metrics.witness_nodes = witness_nodes
+    metrics.completed_hits = completed_hits
+    metrics.refused_cycle = refused_cycle
+    metrics.fell_back = fell_back or false
+    metrics.fast_path = fast_path or false
+  end
+end
+
+local function private_stable_acquisition_fast_result(witness)
+  if type(witness) ~= "table" then return false, true, false end
+  if getmetatable(witness) ~= nil then
+    return stable_acquisition_witness(witness), true, true
+  end
+  local kind = witness.kind
+  if not STABLE_SOURCE_KINDS[kind] and kind ~= "recipe" then
+    -- The current classifier returns before inspecting children for an
+    -- unsupported kind, so this is the same current-value result.
+    return false, true, false
+  end
+
+  local machine = witness.machine
+  if machine then
+    if type(machine) ~= "table" or getmetatable(machine) ~= nil then
+      return stable_acquisition_witness(witness), true, true
+    end
+    if kind == "recipe" and machine.kind ~= "machine-placement"
+      and machine.kind ~= "machine-capture" and machine.kind ~= "character-crafting" then
+      return false, true, false
+    end
+    if STABLE_SOURCE_KINDS[kind] and machine.kind ~= "machine-placement" then
+      return false, true, false
+    end
+  elseif kind == "recipe" then
+    return false, true, false
+  end
+
+  local ingredients = witness.ingredients
+  if not ingredients then
+    if STABLE_SOURCE_KINDS[kind] and not machine then return true, true, false end
+    if kind == "recipe" and machine and machine.kind == "character-crafting" then
+      return true, true, false
+    end
+    return nil, false, false
+  end
+  if type(ingredients) ~= "table" or getmetatable(ingredients) ~= nil then
+    return stable_acquisition_witness(witness), true, true
+  end
+  if next(ingredients) == nil then
+    if STABLE_SOURCE_KINDS[kind] and not machine then return true, true, false end
+    if kind == "recipe" and machine and machine.kind == "character-crafting" then
+      return true, true, false
+    end
+    return nil, false, false
+  end
+  if kind ~= "recipe" or not machine or machine.kind ~= "character-crafting" then
+    return nil, false, false
+  end
+  for _, ingredient in ipairs(ingredients) do
+    if type(ingredient) ~= "table" then return false, true, false end
+    if getmetatable(ingredient) ~= nil then
+      return stable_acquisition_witness(witness), true, true
+    end
+    -- A plain leaf has no machine or ingredient work. `false` is equivalent to
+    -- an absent optional field in the current classifier.
+    if not STABLE_SOURCE_KINDS[ingredient.kind] or ingredient.machine or ingredient.ingredients then
+      return nil, false, false
+    end
+  end
+  return true, true, false
+end
+
+local function private_stable_acquisition_witness(witness, metrics)
+  local fast_result, has_fast_result, fell_back = private_stable_acquisition_fast_result(witness)
+  if has_fast_result then
+    report_private_stable_witness_metrics(metrics, 0, 0, 0, false, fell_back, true)
+    return fast_result
+  end
+
+  local completed = {}
+  local active = {}
+  local completed_nodes = 0
+  local witness_nodes = 0
+  local completed_hits = 0
+  local refused_cycle = false
+
+  local function plain_table(value)
+    return type(value) == "table" and getmetatable(value) == nil
+  end
+
+  local walk
+  local function all_ingredients(ingredients)
+    -- Preserve `witness.ingredients or {}`. A false optional collection is
+    -- absent; a truthy non-table or metatable-backed collection must use the
+    -- original current-value classifier.
+    if not ingredients then return true, false end
+    if not plain_table(ingredients) then return nil, true end
+    for _, ingredient in ipairs(ingredients) do
+      local result, fallback = walk(ingredient)
+      if fallback or not result then return result, fallback end
+    end
+    return true, false
+  end
+
+  local function machine_result(machine)
+    if not plain_table(machine) then return nil, true end
+    if machine.kind == "machine-placement" then
+      return walk(machine.acquisition)
+    elseif machine.kind == "machine-capture" then
+      local launcher, fallback = walk(machine.launcher)
+      if fallback or not launcher then return launcher, fallback end
+      return walk(machine.ammunition)
+    elseif machine.kind == "character-crafting" then
+      return true, false
+    end
+    return false, false
+  end
+
+  walk = function(node)
+    if type(node) ~= "table" then return false, false end
+    if not plain_table(node) then return nil, true end
+    if active[node] then
+      -- This classifier is used only to decide whether the route earns a
+      -- stable memo. A structural back-edge can refuse that memo without
+      -- rejecting the already-proven acquisition route.
+      refused_cycle = true
+      return false, false
+    end
+    if completed[node] ~= nil then
+      completed_hits = completed_hits + 1
+      return completed[node], false
+    end
+
+    active[node] = true
+    witness_nodes = witness_nodes + 1
+    local result, fallback
+    if STABLE_SOURCE_KINDS[node.kind] then
+      local machine = node.machine
+      if machine then
+        if not plain_table(machine) then
+          result, fallback = nil, true
+        elseif machine.kind ~= "machine-placement" then
+          result, fallback = false, false
+        else
+          result, fallback = walk(machine.acquisition)
+        end
+      else
+        result, fallback = true, false
+      end
+      if result and not fallback then
+        result, fallback = all_ingredients(node.ingredients)
+      end
+    elseif node.kind ~= "recipe" then
+      result, fallback = false, false
+    else
+      local machine = node.machine
+      if not machine then
+        result, fallback = false, false
+      else
+        result, fallback = machine_result(machine)
+        if result and not fallback then
+          result, fallback = all_ingredients(node.ingredients)
+        end
+      end
+    end
+    active[node] = nil
+    if fallback then return nil, true end
+    -- Reaching the metadata cap does not change the classification. Continue
+    -- the exact traversal but stop retaining newly completed nodes, so a large
+    -- acyclic graph cannot become falsely unstable merely because it is large.
+    if completed_nodes < STABLE_WITNESS_COMPLETED_NODE_LIMIT then
+      completed[node] = result
+      completed_nodes = completed_nodes + 1
+    end
+    return result, false
+  end
+
+  local result, fallback = walk(witness)
+  if fallback then
+    result = stable_acquisition_witness(witness)
+  else
+    fallback = false
+  end
+  report_private_stable_witness_metrics(metrics, completed_nodes, witness_nodes,
+    completed_hits, refused_cycle, fallback, false)
+  return result
+end
+
+local function stable_acquisition_witness_for_query(witness, share_private_memo, metrics)
+  if share_private_memo then
+    return private_stable_acquisition_witness(witness, metrics)
+  end
+  return stable_acquisition_witness(witness)
+end
+
 local function initial_failure_probe(state, options)
   if options.initial_failure_probe or options.diagnostic_observer ~= nil
     or options.diagnostic_failure ~= nil or not cacheable(options)
@@ -1805,7 +2013,7 @@ local function acquisition_witness_impl(output_identity, options, state)
   local acquisition_checkpoint = diagnostic_checkpoint(options)
   local direct = source_witness(output_identity, options, state)
   if direct then
-    if may_use_stable and stable_acquisition_witness(direct) then
+    if may_use_stable and stable_acquisition_witness_for_query(direct, share_private_memo) then
       if state.stable_acquisition_memo[key] == nil then
         state.stable_acquisition_generation = state.stable_acquisition_generation + 1
       end
@@ -1831,7 +2039,7 @@ local function acquisition_witness_impl(output_identity, options, state)
       -- provisional failures from other producers cannot be propagated as the
       -- selected branch's explanation.
       diagnostic_rollback(options, acquisition_checkpoint)
-      if may_use_stable and stable_acquisition_witness(witness) then
+      if may_use_stable and stable_acquisition_witness_for_query(witness, share_private_memo) then
         if state.stable_acquisition_memo[key] == nil then
           state.stable_acquisition_generation = state.stable_acquisition_generation + 1
         end
@@ -1878,7 +2086,7 @@ local function acquisition_witness_impl(output_identity, options, state)
       state.visiting[key] = nil
       diagnostic_rollback(options, acquisition_checkpoint)
       local witness = {kind = "fluid-mixing", output = deepcopy(output_identity), ingredients = {cold, hot}}
-      if may_use_stable and stable_acquisition_witness(witness) then
+      if may_use_stable and stable_acquisition_witness_for_query(witness, share_private_memo) then
         if state.stable_acquisition_memo[key] == nil then
           state.stable_acquisition_generation = state.stable_acquisition_generation + 1
         end

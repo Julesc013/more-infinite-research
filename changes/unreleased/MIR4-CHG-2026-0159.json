@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0159",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Classify private acquisition witness DAGs without revisiting shared branches.",
+  "details": [
+    "Use per-invocation completed and active sets only for the existing actual compiler-owned query capability. Shallow source and hand-crafting witnesses bypass graph allocations; shared branches are classified once per call. No persistent mutable-pointer cache is introduced.",
+    "Preserve the original classifier for public, foreign, custom and diagnostic paths and for metatables. A plain back-edge declines only stable memo admission. The 256-node completed-metadata limit stops retention while continuing exact classification; it never changes an acquisition answer.",
+    "Hoist the constant telemetry state factory while retaining Context state, epoch and freeze checks on every counter call. Counter values and snapshot boundaries remain unchanged.",
+    "Source controls pass: 1024 private DAG assertions and 2216 full researchability assertions for each F210 and F200 setup, plus memo isolation and enabled-producer controls. Native current-package and saved-state qualification remains pending."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance",
+    "diagnostics"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/Test-MIRPrivateStableWitnessDag.ps1: alias, current-value mutation, bypass, metatable, cycle and over-cap controls"
+    },
+    {
+      "kind": "finding",
+      "value": "build/tmp/mir430-telemetry-factory-results.json: actual Context scopes/epochs and equal snapshot digest; source-only"
+    }
+  ]
+}

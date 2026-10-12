@@ -99,13 +99,17 @@ local REQUIRED_PHASES = {
 }
 local WITNESS_LIMIT = 64
 
+local function new_state()
+  local counters, phases = {}, {}
+  for _, name in ipairs(REQUIRED_COUNTERS) do counters[name] = 0 end
+  for _, name in ipairs(REQUIRED_PHASES) do phases[name] = {runs = 0, seconds = 0} end
+  return {counters = counters, phases = phases, witnesses = {}}
+end
+
 local function state()
-  return compiler_context.current():state_view("compiler_telemetry", function()
-    local counters, phases = {}, {}
-    for _, name in ipairs(REQUIRED_COUNTERS) do counters[name] = 0 end
-    for _, name in ipairs(REQUIRED_PHASES) do phases[name] = {runs = 0, seconds = 0} end
-    return {counters = counters, phases = phases, witnesses = {}}
-  end)
+  -- Keep Context ownership and epoch/freeze checks on every call, but do not
+  -- allocate another identical factory closure for each hot-loop counter.
+  return compiler_context.current():state_view("compiler_telemetry", new_state)
 end
 
 local function now()
