@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0152",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Bind current package, startup and Library probes to full MIR 4.3 source identities.",
+  "details": [
+    "Admit explicit 4.3.0 and 4.3.1 destinations in current metadata, startup and Library probe callers while preserving historical defaults. Validate source minor and patch together so cross-minor identities cannot be relabelled.",
+    "Preserve exact throwing resource snapshots in admission and interrupted-process receipts without changing memory, commit, disk or process cleanup thresholds.",
+    "Controlled startup and native-probe actor tests cover 4.3 propagation, wrong-minor rejection, README identity and existing resource recovery. They run no Factorio and establish no final release qualification."
+  ],
+  "semantic_domains": [
+    "tooling",
+    "release",
+    "performance"
+  ],
+  "audiences": [
+    "maintainers",
+    "contributors"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F200",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "omit",
+    "target_changelog": "omit",
+    "github": "omit",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/tooling/Test-MIRNativeProbeResources.ps1: 634 controlled assertions; no native Factorio or actual materialization"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1 and tests/release/Test-MIR441ReleaseReadiness.ps1: source identity and resource recovery controls"
+    }
+  ]
+}

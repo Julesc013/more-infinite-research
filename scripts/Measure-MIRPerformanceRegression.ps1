@@ -26,6 +26,7 @@ param(
   [string]$StartupCandidateArchive='',
   [string]$CandidateMaterializationArchive='',
   [string]$CandidateMaterializationReceiptPath='',
+  [ValidateSet('4.2.3','4.3.0','4.3.1')][string]$StartupCandidateSourceVersion='4.2.3',
   [switch]$PreliminaryStartup,
   [string]$StartupOutputRoot='',
   [string]$ActiveModsObserver='',
@@ -54,7 +55,7 @@ if($ObserveStartup){
   if($OrdinaryMenu-and[string]::IsNullOrWhiteSpace($OrdinaryPlayerConfigPath)){throw '[mir-direct-startup-input-required] OrdinaryPlayerConfigPath'}
   if($ExpectedPeakMemoryMiB-le0){throw '[mir441-resource-peak-budget-required] Declare the native probe peak memory budget.'}
   . (Join-Path $RepoRoot 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
-  $parameters=@{FactorioBin=$FactorioBin;LibraryDirectory=$LocalModZipDir;ProfileTemplatePath=$StartupProfileTemplatePath;Published422Archive=$Published422Archive;Published422ManifestPath=$Published422ManifestPath;Published422ManifestSha256=$Published422ManifestSha256;CandidateArchive=$StartupCandidateArchive;CandidateMaterializationArchive=$CandidateMaterializationArchive;CandidateMaterializationReceiptPath=$CandidateMaterializationReceiptPath;OutputRoot=$StartupOutputRoot;Target=$Target;WarmupRuns=$WarmupRuns;MeasuredRuns=$MeasuredRuns;TimeoutSeconds=$TimeoutSeconds;ExpectedPeakMemoryMiB=$ExpectedPeakMemoryMiB;MaxNewOutputMiB=$MaxNewOutputMiB;AdmissionWaitSeconds=$AdmissionWaitSeconds;SourceCommit=$ExpectedSourceCommit;Preliminary=$PreliminaryStartup;ActiveModsObserver=$ActiveModsObserver;GraphicalPlayerReady=$GraphicalPlayerReady;PlayerReadyObserverArchive=$PlayerReadyObserverArchive;PlayerReadyBenchmarkTicks=$PlayerReadyBenchmarkTicks;OrdinaryMenu=$OrdinaryMenu;OrdinaryPlayerConfigPath=$OrdinaryPlayerConfigPath}
+  $parameters=@{FactorioBin=$FactorioBin;LibraryDirectory=$LocalModZipDir;ProfileTemplatePath=$StartupProfileTemplatePath;Published422Archive=$Published422Archive;Published422ManifestPath=$Published422ManifestPath;Published422ManifestSha256=$Published422ManifestSha256;CandidateArchive=$StartupCandidateArchive;CandidateMaterializationArchive=$CandidateMaterializationArchive;CandidateMaterializationReceiptPath=$CandidateMaterializationReceiptPath;StartupCandidateSourceVersion=$StartupCandidateSourceVersion;OutputRoot=$StartupOutputRoot;Target=$Target;WarmupRuns=$WarmupRuns;MeasuredRuns=$MeasuredRuns;TimeoutSeconds=$TimeoutSeconds;ExpectedPeakMemoryMiB=$ExpectedPeakMemoryMiB;MaxNewOutputMiB=$MaxNewOutputMiB;AdmissionWaitSeconds=$AdmissionWaitSeconds;SourceCommit=$ExpectedSourceCommit;Preliminary=$PreliminaryStartup;ActiveModsObserver=$ActiveModsObserver;GraphicalPlayerReady=$GraphicalPlayerReady;PlayerReadyObserverArchive=$PlayerReadyObserverArchive;PlayerReadyBenchmarkTicks=$PlayerReadyBenchmarkTicks;OrdinaryMenu=$OrdinaryMenu;OrdinaryPlayerConfigPath=$OrdinaryPlayerConfigPath}
   Invoke-MIRDirectLibraryStartupMeasurement @parameters
   return
 }

@@ -27,7 +27,14 @@ function Test-MIR441ResourceRecovery {
     [IO.File]::AppendAllText($Path,($Value|ConvertTo-Json -Depth 8 -Compress)+[Environment]::NewLine)
   }
   function Refuses([scriptblock]$Action,[string]$Expected){
-    $caught='';try{&$Action|Out-Null}catch{$caught=$_.Exception.Message}
+    $caught='';try{&$Action|Out-Null}catch{
+      $caught=$_.Exception.Message
+      if($Expected.StartsWith('resource-admission-')){
+        $details=$_.Exception.Data['mir441_resource_admission']
+        if($null-eq$details-or$null-eq$details.snapshot-or$null-eq$details.limits-or
+          $details.expected_peak_memory_bytes-lt0){throw 'Admission refusal lost its exact snapshot or limits'}
+      }
+    }
     if($caught-notmatch[regex]::Escape($Expected)){throw "Expected $Expected, got $caught"}
   }
   $physicalFraction=[int64]([double](16GB)*.2)
@@ -156,6 +163,10 @@ Start-Sleep -Seconds 20
       if(@(Get-ChildItem -LiteralPath $root -Directory -Filter 'temp-*').Count){throw 'Cancelled job left temporary output'}
       $last=Get-Content -LiteralPath $invoke.LedgerPath -Tail 1|ConvertFrom-Json
       if($last.phase-cne'interrupted'){throw 'Interrupted job was not recorded as interrupted'}
+      if($fault-eq'runtime-commit'-and($null-eq$last.resource_admission-or
+        $last.resource_admission.snapshot.memory.committed_bytes-ne19GB)){
+        throw 'Live commit interruption lost the actual throwing snapshot'
+      }
     }
     $script:RecoveryFault=''
     # Inject separate working-set/private observations while supervising a real

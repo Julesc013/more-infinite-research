@@ -6,7 +6,7 @@ param(
  [string]$LibraryDirectory='',
  [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
- [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1',
+ [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1',
  [switch]$Graphics,
  [ValidateSet('low','very-low')][string]$GraphicsPreset='low',
  [ValidateSet('None','Defaults','RawOptIn','ImportedOptIn','RawOptInImportedOff')][string]$DlcIconCase='None',
@@ -39,7 +39,9 @@ $run=$resources.root
 $activation=$null
 $candidate=''
 $targetKey=if($Target -ceq '2.0'){'f200'}else{'f210'}
-$expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch ([int]$SourceVersion.Split('.')[2])
+$sourceVersionParts=@($SourceVersion.Split('.'))
+if($sourceVersionParts.Count -ne 3){throw '[mir-browser-source-version]'}
+$expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor ([int]$sourceVersionParts[1]) -SourcePatch ([int]$sourceVersionParts[2])
 function Get-MIRBrowserIconCase([string]$Case) {
  switch -CaseSensitive ($Case) {
   'None' { return $null }

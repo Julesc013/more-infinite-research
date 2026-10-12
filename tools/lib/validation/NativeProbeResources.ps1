@@ -42,7 +42,7 @@ function Assert-MIRNativeProbeF210Candidate([bool]$Condition,[string]$Message) {
 function Read-MIRNativeProbeCurrentCandidate {
   param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
     [ValidateSet('f210','f200','f110','f100')][string]$Target='f210',
-    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1')
   Assert-MIRNativeProbeF210Candidate (-not [string]::IsNullOrWhiteSpace($Archive) -and -not [string]::IsNullOrWhiteSpace($ReceiptPath)) 'supply candidate and canonical materialization receipt'
   $candidate = (Resolve-Path -LiteralPath $Archive).Path
   $receipt = Get-Content -LiteralPath $ReceiptPath -Raw | ConvertFrom-Json -Depth 30 -DateKind String
@@ -87,7 +87,7 @@ function Read-MIRNativeProbeCurrentCandidate {
 }
 function Read-MIRNativeProbeF210CurrentCandidate {
   param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
-    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1')
   Read-MIRNativeProbeCurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $ReceiptPath -Target f210 -SourceVersion $SourceVersion
 }
 function New-MIRNativeProbeResourceContext {
@@ -268,11 +268,12 @@ function New-MIRNativeProbeTargetPackage {
     [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$RepoRoot,
     [ValidateSet('F210-TIN-OBS','F210-CURRENT-BA-FINAL-ROUTES-OBSERVER','BROWSER','SCIENCE-LAUNCH')][string]$CandidatePrefix='F210-TIN-OBS',
     [ValidateSet('f210','f200')][string]$Target='f210',
-    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1'
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1'
   )
   $targetKey=$Target.ToLowerInvariant()
   if($CandidatePrefix -cnotin @('BROWSER','SCIENCE-LAUNCH') -and $targetKey -cne 'f210'){throw '[mir-native-probe-observer-target]'}
-  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch ([int]$SourceVersion.Split('.')[2])
+  if($SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$'){throw '[mir-native-probe-source-version]'}
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor ([int]$Matches.minor) -SourcePatch ([int]$Matches.patch)
   $prefix=if($CandidatePrefix -cin @('BROWSER','SCIENCE-LAUNCH')){$targetKey.ToUpperInvariant()+'-'+$CandidatePrefix}else{$CandidatePrefix}
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   $driver=Join-Path $Context.root 'materialize.ps1'
