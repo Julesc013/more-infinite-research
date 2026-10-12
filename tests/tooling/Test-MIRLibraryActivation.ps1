@@ -142,6 +142,10 @@ Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirect
 Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Target f210} 'mir441-resource-output-root'
 function Test-MaintenanceFixtureCallSites {
   $PersistedDamageZip=''
+  # The real runner initializes this from its optional F200 Bob/Angel input
+  # profile before specializing fixture contents.  This AST-only caller test
+  # exercises the ordinary lanes, so keep that optional lane explicitly off.
+  $f200BobAngelScenario=$false
   $tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$tokens,[ref]$errors)
   Assert-LibraryTest (-not$errors.Count) 'upgrade fixture caller parses'
@@ -636,8 +640,9 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
       . ([scriptblock]::Create($function[0].Extent.Text))
       $script:upgradeActivation=$activation;$script:upgradeProcessIndex=0;$script:upgradeResourceRuns=@()
       # This controlled actor represents the ordinary base upgrade. The actual
-      # adapter also supports a K2 observer; initialize that scenario explicitly.
-      $k2Scenario=$false
+       # adapter also supports K2 and F200 Bob/Angel observers; initialize
+       # both optional scenarios explicitly.
+       $k2Scenario=$false;$f200BobAngelScenario=$false
       $suiteRoot=$root;$root=Join-Path $suiteRoot 'upgrade-actor-run'
       [IO.Directory]::CreateDirectory($root)|Out-Null
       $script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=2MB;result_reserve_bytes=64KB}
@@ -884,21 +889,25 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
     $library=Join-Path $root 'legacy-library';$data=Join-Path $root 'legacy-engine/data'
     [IO.Directory]::CreateDirectory($library)|Out-Null
     [IO.Directory]::CreateDirectory((Join-Path $data 'base'))|Out-Null
-    Write-TestJson (Join-Path $data 'base/info.json') @{name='base';version='0.16.51';dependencies=@()}
-    $owned=foreach($v in @('4.2.01600','4.2.01601','4.2.01602')){
-      New-TestArchive 'more-infinite-research' $v -InfoJson (@{name='more-infinite-research';version=$v;factorio_version='0.16';dependencies=@('base')}|ConvertTo-Json)
+    Write-TestJson (Join-Path $data 'base/info.json') @{name='base';version='0.13.20';dependencies=@()}
+    $owned=foreach($v in @('4.2.01300','4.2.01301','4.2.01302')){
+      New-TestArchive 'more-infinite-research' $v -InfoJson (@{name='more-infinite-research';version=$v;factorio_version='0.13';dependencies=@('base')}|ConvertTo-Json)
     }
-    $foreign=New-TestArchive 'other-mod' '1.0.0' -InfoJson (@{name='other-mod';version='1.0.0';factorio_version='0.16';dependencies=@('base')}|ConvertTo-Json)
-    $original=@{};foreach($path in @($owned)+@($foreign)){$original[$path]=@{hash=Get-MIRImmutableInputSha256 $path;id=Get-MIRImmutableInputFileIdentity $path}}
+    $disabledFixtureName='mir-fixture-assert-upgrade-historical-terminal-to-mir42'
+    $disabledFixtures=foreach($v in @('1.0.8','1.0.10')){
+      New-TestArchive $disabledFixtureName $v -InfoJson (@{name=$disabledFixtureName;version=$v;factorio_version='0.13';dependencies=@('base','more-infinite-research >= 4.2.01300')}|ConvertTo-Json)
+    }
+    $foreign=New-TestArchive 'other-mod' '1.0.0' -InfoJson (@{name='other-mod';version='1.0.0';factorio_version='0.13';dependencies=@('base')}|ConvertTo-Json)
+    $original=@{};foreach($path in @($owned)+@($disabledFixtures)+@($foreign)){$original[$path]=@{hash=Get-MIRImmutableInputSha256 $path;id=Get-MIRImmutableInputFileIdentity $path}}
     $legacyProfile=Join-Path $profiles 'legacy.json'
-    Write-TestJson $legacyProfile @{mods=@(@{name='base';version='0.16.51';enabled=$true},@{name='more-infinite-research';version='4.2.01600';enabled=$true})}
+    Write-TestJson $legacyProfile @{mods=@(@{name='base';version='0.13.20';enabled=$true},@{name='more-infinite-research';version='4.2.01300';enabled=$true})}
     [IO.File]::WriteAllBytes((Join-Path $library 'mod-list.json'),$oldList)
     [IO.File]::WriteAllBytes((Join-Path $library 'mod-settings.dat'),$oldSettings)
-    $arguments=@{LibraryDirectory=$library;EngineDataDirectory=$data;ProfilePath=$legacyProfile;ArchiveHashes=@{'more-infinite-research_4.2.01600.zip'=$original[$owned[0]].hash};PrePinMIROwnedArchiveNames=@('more-infinite-research')}
-    $noSelector=$arguments.Clone();$noSelector.PrePinMIROwnedArchiveNames=$null
+    $arguments=@{LibraryDirectory=$library;EngineDataDirectory=$data;ProfilePath=$legacyProfile;ArchiveHashes=@{'more-infinite-research_4.2.01300.zip'=$original[$owned[0]].hash};PrePinMIROwnedArchiveNames=@('more-infinite-research');HideDisabledMIROwnedFixtureArchiveNames=@($disabledFixtureName)}
+    $noSelector=$arguments.Clone();$noSelector.PrePinMIROwnedArchiveNames=$null;$noSelector.HideDisabledMIROwnedFixtureArchiveNames=$null
     $active=Start-MIRLibraryActivation @noSelector
     try{
-      Assert-LibraryTest (@(Get-ChildItem $library -Filter '*.zip').Count-eq4) 'null selector keeps all archive names visible'
+      Assert-LibraryTest (@(Get-ChildItem $library -Filter '*.zip').Count-eq6) 'null selector keeps all archive names visible'
       $terminal=Complete-MIRLibraryActivation $active
       Assert-LibraryTest ($terminal.owned_archive_names_temporarily_hidden-eq0) 'null selector restores ordinary controls'
     }finally{if(-not$active.closed){$null=Complete-MIRLibraryActivation $active}}
@@ -906,13 +915,28 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
     Assert-LibraryRefusal {Start-MIRLibraryActivation @duplicate} 'mir-library-owned-version-names'
     $foreignArgs=$arguments.Clone();$foreignArgs.PrePinMIROwnedArchiveNames=@('other-mod')
     Assert-LibraryRefusal {Start-MIRLibraryActivation @foreignArgs} 'mir-library-owned-version-dependency-forbidden'
-    $badHash=$arguments.Clone();$badHash.ArchiveHashes=@{'more-infinite-research_4.2.01600.zip'=('0'*64)}
+    $duplicateDisabled=$arguments.Clone();$duplicateDisabled.HideDisabledMIROwnedFixtureArchiveNames=@($disabledFixtureName,$disabledFixtureName)
+    Assert-LibraryRefusal {Start-MIRLibraryActivation @duplicateDisabled} 'mir-library-owned-version-names'
+    $foreignDisabled=$arguments.Clone();$foreignDisabled.HideDisabledMIROwnedFixtureArchiveNames=@('other-mod')
+    Assert-LibraryRefusal {Start-MIRLibraryActivation @foreignDisabled} 'mir-library-owned-version-dependency-forbidden'
+    $malformedDisabled=$arguments.Clone();$malformedDisabled.HideDisabledMIROwnedFixtureArchiveNames=@('mir-fixture-invalid/name')
+    Assert-LibraryRefusal {Start-MIRLibraryActivation @malformedDisabled} 'mir-library-owned-version-dependency-forbidden'
+    $missingDisabled=$arguments.Clone();$missingDisabled.HideDisabledMIROwnedFixtureArchiveNames=@('mir-fixture-missing')
+    Assert-LibraryRefusal {Start-MIRLibraryActivation @missingDisabled} 'mir-library-owned-version-disabled-missing'
+    $overlapDisabled=$arguments.Clone();$overlapDisabled.PrePinMIROwnedArchiveNames=@('more-infinite-research',$disabledFixtureName)
+    Assert-LibraryRefusal {Start-MIRLibraryActivation @overlapDisabled} 'mir-library-owned-version-names'
+    $selectedFixtureProfile=Join-Path $profiles 'legacy-selected-fixture.json'
+    Write-TestJson $selectedFixtureProfile @{mods=@(@{name='base';version='0.13.20';enabled=$true},@{name='more-infinite-research';version='4.2.01300';enabled=$true},@{name=$disabledFixtureName;version='1.0.8';enabled=$true})}
+    $selectedFixture=$arguments.Clone();$selectedFixture.ProfilePath=$selectedFixtureProfile;$selectedFixture.ArchiveHashes=@{'more-infinite-research_4.2.01300.zip'=$original[$owned[0]].hash;($disabledFixtureName+'_1.0.8.zip')=$original[$disabledFixtures[0]].hash}
+    Assert-LibraryRefusal {Start-MIRLibraryActivation @selectedFixture} 'mir-library-owned-version-disabled-selection'
+    $badHash=$arguments.Clone();$badHash.ArchiveHashes=@{'more-infinite-research_4.2.01300.zip'=('0'*64)}
     Assert-LibraryRefusal {Start-MIRLibraryActivation @badHash} 'mir-library-hash-mismatch'
-    Assert-LibraryTest (@(Get-ChildItem $library -Filter '*.zip').Count-eq4) 'refusal leaves every archive visible'
+    Assert-LibraryTest (@(Get-ChildItem $library -Filter '*.zip').Count-eq6) 'refusal leaves every archive visible'
     foreach($interrupted in @($false,$true,'partial')){
       $active=Start-MIRLibraryActivation @arguments
       try{
         Assert-LibraryTest (@(Get-ChildItem $library -Filter '*.zip').Count-eq2) 'only selected MIR version and untouched dependency remain visible'
+        Assert-LibraryTest (-not(@(Get-ChildItem $library -Filter ($disabledFixtureName+'_*.zip')).Count)) 'disabled owned fixture versions are all hidden'
         Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity $foreign)-ceq$original[$foreign].id) 'dependency path and identity unchanged'
         Assert-LibraryRefusal {Start-MIRLibraryActivation @arguments} 'mir-library-busy'
         Assert-MIRLibraryActivation -Activation $active
@@ -930,10 +954,66 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
           $active=Start-MIRLibraryActivation @arguments
         }
         $terminal=Complete-MIRLibraryActivation $active
-        Assert-LibraryTest ($terminal.owned_archive_names_temporarily_hidden-eq2-and$terminal.dependency_payload_bytes_copied-eq0-and$terminal.archive_links_created-eq0) 'owned-name selection restores without copying or linking'
+        Assert-LibraryTest ($terminal.owned_archive_names_temporarily_hidden-eq4-and$terminal.dependency_payload_bytes_copied-eq0-and$terminal.archive_links_created-eq0) 'owned-name selection restores without copying or linking'
       }finally{if(-not$active.closed){$null=Complete-MIRLibraryActivation $active}}
       foreach($path in $original.Keys){Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity $path)-ceq$original[$path].id-and(Get-MIRImmutableInputSha256 $path)-ceq$original[$path].hash) 'restored original archive identity and bytes'}
       Assert-LibraryTest ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $library 'mod-list.json')))-ceq[Convert]::ToBase64String($oldList)) 'prior selection restored after legacy activation'
+    }
+    $packageProfile=Join-Path $profiles 'f013-fresh-package.json'
+    $packageActivation=$null;$packageTerminal=$null
+    $packageActivation=Start-MIRPackageLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $packageProfile -Version '4.2.01300' -CandidateSha256 $original[$owned[0]].hash -HideDisabledOwnedFixtureArchives
+    try{
+      Assert-LibraryTest (@(Get-ChildItem $library -Filter '*.zip').Count-eq2) 'F013 package activation hides disabled owned fixture archives'
+      Assert-LibraryTest (-not(@(Get-ChildItem $library -Filter ($disabledFixtureName+'_*.zip')).Count)) 'F013 package activation leaves no duplicate fixture identity visible'
+      Assert-LibraryTest ((@($packageActivation.selected|ForEach-Object name|Sort-Object)-join'|')-ceq'base|more-infinite-research') 'F013 package activation selects no fixture'
+    }finally{
+      if($null -ne $packageActivation -and -not $packageActivation.closed){$packageTerminal=Complete-MIRLibraryActivation $packageActivation}
+    }
+    Assert-LibraryTest ($packageTerminal.owned_archive_names_temporarily_hidden-eq4-and$packageTerminal.dependency_payload_bytes_copied-eq0-and$packageTerminal.archive_links_created-eq0-and$packageTerminal.archive_extractions-eq0) 'F013 package selection restores without staging or copies'
+    foreach($path in $original.Keys){Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity $path)-ceq$original[$path].id-and(Get-MIRImmutableInputSha256 $path)-ceq$original[$path].hash) 'F013 package activation restores fixture and archive identities'}
+    $f014Data=Join-Path $root 'legacy-engine-f014/data';[IO.Directory]::CreateDirectory((Join-Path $f014Data 'base'))|Out-Null
+    Write-TestJson (Join-Path $f014Data 'base/info.json') @{name='base';version='0.14.23';dependencies=@()}
+    $f014Profile=Join-Path $profiles 'f014-package.json'
+    Assert-LibraryRefusal {Start-MIRPackageLibraryActivation -LibraryDirectory $library -EngineDataDirectory $f014Data -ProfilePath $f014Profile -Version '4.2.01300' -CandidateSha256 $original[$owned[0]].hash -HideDisabledOwnedFixtureArchives} 'mir-package-library-disabled-fixture-engine'
+    Assert-LibraryTest (-not(Test-Path -LiteralPath $f014Profile)) 'non-F013 package selector refuses before writing a profile'
+    # Retain the original pre-0.17 selected-MIR recovery case separately from
+    # F013's disabled-fixture suppression.  F016 still needs exact selected
+    # archive visibility even though it tolerates duplicate fixture versions.
+    & {
+      $library=Join-Path $root 'legacy-f016-library';$f016Data=Join-Path $root 'legacy-engine-f016/data'
+      [IO.Directory]::CreateDirectory($library)|Out-Null
+      [IO.Directory]::CreateDirectory((Join-Path $f016Data 'base'))|Out-Null
+      Write-TestJson (Join-Path $f016Data 'base/info.json') @{name='base';version='0.16.51';dependencies=@()}
+      $f016Owned=foreach($v in @('4.2.01600','4.2.01601','4.2.01602')){
+        New-TestArchive 'more-infinite-research' $v -InfoJson (@{name='more-infinite-research';version=$v;factorio_version='0.16';dependencies=@('base')}|ConvertTo-Json)
+      }
+      $f016Foreign=New-TestArchive 'other-mod' '1.0.0' -InfoJson (@{name='other-mod';version='1.0.0';factorio_version='0.16';dependencies=@('base')}|ConvertTo-Json)
+      $f016Original=@{};foreach($path in @($f016Owned)+@($f016Foreign)){$f016Original[$path]=@{hash=Get-MIRImmutableInputSha256 $path;id=Get-MIRImmutableInputFileIdentity $path}}
+      $f016Profile=Join-Path $profiles 'f016-selected-mir.json'
+      Write-TestJson $f016Profile @{mods=@(@{name='base';version='0.16.51';enabled=$true},@{name='more-infinite-research';version='4.2.01600';enabled=$true})}
+      $f016Args=@{LibraryDirectory=$library;EngineDataDirectory=$f016Data;ProfilePath=$f016Profile;ArchiveHashes=@{'more-infinite-research_4.2.01600.zip'=$f016Original[$f016Owned[0]].hash};PrePinMIROwnedArchiveNames=@('more-infinite-research')}
+      foreach($interrupted in @($false,$true,'partial')){
+        $f016Activation=Start-MIRLibraryActivation @f016Args
+        try{
+          Assert-LibraryTest (@(Get-ChildItem $library -Filter '*.zip').Count-eq2) 'F016 selected-MIR visibility hides only alternate MIR archives'
+          Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity $f016Foreign)-ceq$f016Original[$f016Foreign].id) 'F016 selected-MIR visibility leaves foreign archive identity unchanged'
+          if($interrupted){
+            foreach($handle in $f016Activation.handles){$handle.Dispose()};$f016Activation.lock.Dispose();$f016Activation.closed=$true
+            $journalPath=Join-Path $library '.mir-active-profile.json'
+            $journal=Get-Content $journalPath -Raw|ConvertFrom-Json -AsHashtable -DateKind String
+            if($interrupted-is[string]-and$interrupted-ceq'partial'){
+              $first=$journal.owned_archive_visibility[0]
+              [IO.File]::Move((Join-Path $library $first.hidden_name),(Join-Path $library $first.original_name),$false)
+            }
+            $journal.owner_pid=[int]::MaxValue
+            Write-TestJson $journalPath $journal
+            $f016Activation=Start-MIRLibraryActivation @f016Args
+          }
+          $f016Terminal=Complete-MIRLibraryActivation $f016Activation
+          Assert-LibraryTest ($f016Terminal.owned_archive_names_temporarily_hidden-eq2-and$f016Terminal.dependency_payload_bytes_copied-eq0-and$f016Terminal.archive_links_created-eq0-and$f016Terminal.archive_extractions-eq0) 'F016 selected-MIR recovery restores without staging or copies'
+        }finally{if(-not$f016Activation.closed){$null=Complete-MIRLibraryActivation $f016Activation}}
+        foreach($path in $f016Original.Keys){Assert-LibraryTest ((Get-MIRImmutableInputFileIdentity $path)-ceq$f016Original[$path].id-and(Get-MIRImmutableInputSha256 $path)-ceq$f016Original[$path].hash) 'F016 selected-MIR recovery restores archive identity and bytes'}
+      }
     }
     $oldJournal=@{kind='MIRDirectLibraryActivationV1';library=$library;controls=@{}}
     foreach($control in @('mod-list.json','mod-settings.dat')){$oldJournal.controls[$control]=Read-MIRLibraryControl (Join-Path $library $control)}

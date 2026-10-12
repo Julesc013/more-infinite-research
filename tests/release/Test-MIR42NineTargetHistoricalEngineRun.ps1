@@ -286,6 +286,12 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check (($Arguments -contains '--disable-audio') -eq ($freshLine -notin @('0.13','0.14'))) 'fresh audio capability changed.'
       $modList=Get-Content -Raw -LiteralPath (Join-Path $mods 'mod-list.json')|ConvertFrom-Json
       $selected=@($modList.mods|Where-Object enabled)
+      $disabledFixtureArchives=@(Get-ChildItem -LiteralPath $mods -File -Filter 'mir-fixture-disabled-f013-fresh_*.zip')
+      $expectedVisibleFixtureCount=if(-not $freshIsModern -and $freshLine -ceq '0.13'){0}else{2}
+      Check ($disabledFixtureArchives.Count -eq $expectedVisibleFixtureCount) 'only F013 fresh loading may suppress disabled owned fixture versions.'
+      if(-not $freshIsModern -and $freshLine -ceq '0.13'){
+        Check (@(Get-ChildItem -LiteralPath $mods -File -Filter 'more-infinite-research_*.zip').Count -eq 1) 'F013 fresh loading left duplicate MIR versions visible.'
+      }
       $selectedCount=if($freshEnableSpaceAge){6}else{2}
       Check ($selected.Count -eq $selectedCount -and (Get-Content -Raw $config).Contains('[path]') -and $mods -ceq $sourceRoot) 'fresh load lost direct library or private configuration.'
       if(-not $freshIsModern){Check (($selected.name -join '|') -ceq 'base|more-infinite-research') 'historical fresh load changed its selected archive set.'}
@@ -307,12 +313,21 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $oldList='{"mods":[{"name":"base","enabled":true}]}';$oldSettings=[byte[]](5,4,3,2,1)
     [IO.File]::WriteAllText((Join-Path $sourceRoot 'mod-list.json'),$oldList)
     [IO.File]::WriteAllBytes((Join-Path $sourceRoot 'mod-settings.dat'),$oldSettings)
+    $disabledFixtureOriginals=@(foreach($version in @('1.0.9','1.0.10')){
+      $path=Join-Path $sourceRoot "mir-fixture-disabled-f013-fresh_$version.zip"
+      $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
+      try{
+        $writer=[IO.StreamWriter]::new($zip.CreateEntry("mir-fixture-disabled-f013-fresh_$version/info.json").Open())
+        try{$writer.Write((@{name='mir-fixture-disabled-f013-fresh';version=$version;factorio_version='0.13';dependencies=@('base')}|ConvertTo-Json -Compress))}finally{$writer.Dispose()}
+      }finally{$zip.Dispose()}
+      @{path=$path;sha256=Get-MIRImmutableInputSha256 $path;identity=Get-MIRImmutableInputFileIdentity $path}
+    })
     $freshFailure='';$freshIsModern=$false;$freshEnableSpaceAge=$false;$freshRoots=[Collections.Generic.List[string]]::new()
-    foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(0,1,2)){
+    foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(0,1,2,3)){
       $freshLine='0.'+$target.Substring(2);$freshVersion='4.2.'+$target.Substring(1)+('0'+$patch)
       [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
       $candidate=Join-Path $sourceRoot "more-infinite-research_$freshVersion.zip"
-      if($patch-eq2){Write-TinyEngineArchive $candidate $freshVersion $freshLine}
+      if($patch-ge2){Write-TinyEngineArchive $candidate $freshVersion $freshLine}
       $root=Join-Path $exactRoot "fresh-$target-$patch";$freshRoots.Add($root)
       $freshParams=@{Target=$target;FactorioLine=$freshLine;Engine=$engine;EngineSha256=$engineHash;Candidate=$candidate;CandidateSha256=Get-MIRImmutableInputSha256 $candidate;Version=$freshVersion;SourceVersion="4.2.$patch";FreshRoot=$root;SourceCommit=('A'*40);DeadlineSeconds=60;LibraryDirectory=$sourceRoot}
       $result=Invoke-MIR42HistoricalFreshLoad @freshParams
@@ -320,8 +335,11 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check ($receipt.candidate.version -ceq $freshVersion -and (Test-MIR4BootstrapRecordHash $receipt) -and $receipt.library_input_receipt.status -ceq 'restored-direct-library-controls') "$target/$patch did not preserve the fresh receipt or restore controls."
       Check (-not(Test-Path -LiteralPath (Join-Path $root 'work/user/mods')) -and $receipt.library_input_receipt.archive_links_created -eq 0 -and $receipt.library_input_receipt.dependency_payload_bytes_copied -eq 0) "$target/$patch materialized fresh inputs."
       Check ((Get-Content -Raw -LiteralPath (Join-Path $sourceRoot 'mod-list.json')) -ceq $oldList -and [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $sourceRoot 'mod-settings.dat'))) -ceq [Convert]::ToBase64String($oldSettings)) 'fresh actor failed to restore controls.'
+      foreach($fixture in $disabledFixtureOriginals){
+        Check ((Get-MIRImmutableInputSha256 $fixture.path) -ceq $fixture.sha256 -and (Get-MIRImmutableInputFileIdentity $fixture.path) -ceq $fixture.identity) 'fresh actor changed disabled fixture bytes or file identity.'
+      }
     }}
-    Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'selection.json')}|Sort-Object -Unique).Count -eq 15) 'fresh definitions share identities.'
+    Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'selection.json')}|Sort-Object -Unique).Count -eq 20) 'fresh definitions share identities.'
     $freshVersion='4.2.01301';$freshParams.SourceVersion='4.2.1'
     $freshParams.Candidate=Join-Path $sourceRoot 'more-infinite-research_4.2.01301.zip'
     $freshParams.CandidateSha256=Get-MIRImmutableInputSha256 $freshParams.Candidate
@@ -461,7 +479,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     Check (-not(Test-Path (Join-Path $invalidArchive.FreshRoot 'summary.json'))) 'wrong modern archive version produced evidence.'
     Check ($modernRoots.Count-eq5) 'modern direct loader omitted a required base or Space Age control.'
     foreach($target in $originals.Keys){Check ((Test-Path -LiteralPath $originals[$target] -PathType Leaf) -and (Get-MIRImmutableInputSha256 $originals[$target]) -ceq $rows[$target].candidate_sha256) 'stage retirement lost or changed a shared source input.'}
-    Write-Output "MIR42-ENGINE-DIRECT-LIBRARY-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=18 fresh_version_controls=15 factorio_processes=0 archive_copies_created=0 archive_links_created=0"
+    Write-Output "MIR42-ENGINE-DIRECT-LIBRARY-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=18 fresh_version_controls=20 factorio_processes=0 archive_copies_created=0 archive_links_created=0"
   } finally {
     foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
     if(Test-Path -LiteralPath $scratch){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny engine controls';Remove-Item -LiteralPath $scratch -Recurse -Force}
@@ -745,6 +763,8 @@ if ($historicalFreshBranch -lt 0 -or $historicalFreshCall -le $historicalFreshBr
     -not $runner.Contains('function Invoke-MIR42DirectFreshLoad {') -or
     -not $runner.Contains('Invoke-MIR42BoundedUpgrade -PowerShell $Engine') -or
     -not $runner.Contains('-NativeActor -FactorioActor') -or
+    -not $runner.Contains('-HideDisabledOwnedFixtureArchives:($Target -ceq ''f013'')') -or
+    -not $runner.Contains('-EnableSpaceAge:$EnableSpaceAge -HideDisabledOwnedFixtureArchives:$HideDisabledOwnedFixtureArchives') -or
     $runner.Contains('-ScenarioWorker')) {
   throw 'historical-and-modern-fresh-loads-must-use-direct-native-actors'
 }

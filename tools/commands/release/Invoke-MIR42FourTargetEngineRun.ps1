@@ -290,6 +290,7 @@ function Invoke-MIR42DirectFreshLoad {
     [Parameter(Mandatory)][string]$ErrorPrefix,
     [switch]$EnableSpaceAge,
     [switch]$RequireMapVersion,
+    [switch]$HideDisabledOwnedFixtureArchives,
     [switch]$ModernConfig
   )
   $work = Join-Path $FreshRoot 'work'
@@ -321,7 +322,7 @@ function Invoke-MIR42DirectFreshLoad {
   [IO.File]::WriteAllLines($config, $configLines, [Text.UTF8Encoding]::new($false))
   $activation=Start-MIRPackageLibraryActivation -LibraryDirectory $LibraryDirectory -EngineDataDirectory $readData `
     -ProfilePath (Join-Path $FreshRoot 'selection.json') -Version $Version -CandidateSha256 $CandidateSha256 `
-    -EnableSpaceAge:$EnableSpaceAge
+    -EnableSpaceAge:$EnableSpaceAge -HideDisabledOwnedFixtureArchives:$HideDisabledOwnedFixtureArchives
   try {
     $mods=$activation.library
     $stagedCandidates=@($activation.selected|Where-Object name -CEQ 'more-infinite-research')
@@ -386,7 +387,8 @@ function Invoke-MIR42HistoricalFreshLoad {
   $direct=Invoke-MIR42DirectFreshLoad -Target $Target -Scenario 'package-zip-base' -FactorioLine $FactorioLine `
     -Engine $Engine -EngineSha256 $EngineSha256 -Candidate $Candidate -CandidateSha256 $CandidateSha256 `
     -LibraryDirectory $LibraryDirectory -Version $Version -ExpectedLogVersion $displayVersion -FreshRoot $FreshRoot `
-    -DeadlineSeconds $DeadlineSeconds -ErrorPrefix "mir42-$Target-historical-fresh" -RequireMapVersion
+    -DeadlineSeconds $DeadlineSeconds -ErrorPrefix "mir42-$Target-historical-fresh" -RequireMapVersion `
+    -HideDisabledOwnedFixtureArchives:($Target -ceq 'f013')
   $record = [ordered]@{
     schema=1;kind='MIR42HistoricalFreshLoadV1';status='passed';target=$Target
     source_commit=$SourceCommit;factorio_line=$FactorioLine
