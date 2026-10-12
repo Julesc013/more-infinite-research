@@ -89,6 +89,39 @@ $child=Start-Process -FilePath (Get-Process -Id $PID).Path -ArgumentList @('-NoP
 Start-Sleep -Seconds 20
 '@
     [IO.File]::WriteAllText($parent,$parentText.Replace('__CHILD_PID__',$script:RecoveryChildPid))
+    function Get-MIR441LegacyOwnedProcessIds {
+      param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$StartedUtc)
+      $all=@(Get-CimInstance -ClassName Win32_Process -ErrorAction Stop);$ids=[Collections.Generic.HashSet[int]]::new();[void]$ids.Add($Process.Id)
+      do{$changed=$false;foreach($row in $all){if($row.CreationDate-and$row.CreationDate.ToUniversalTime()-ge$StartedUtc-and$ids.Contains([int]$row.ParentProcessId)-and$ids.Add([int]$row.ProcessId)){$changed=$true}}}while($changed)
+      return [pscustomobject]@{ids=@($ids);win32_rows=$all.Count}
+    }
+    $directParent=$null;$directTree=$null;$foreign=$null;$ownedTreeLegacyRows=0;$ownedTreeDescendants=0;$ownedTreeQueries=0
+    try{
+      $foreign=Start-Process -FilePath $pwsh -ArgumentList @('-NoProfile','-Command','Start-Sleep -Seconds 20') -WindowStyle Hidden -PassThru
+      $directParent=Start-Process -FilePath $pwsh -ArgumentList @('-NoProfile','-File',$parent) -WindowStyle Hidden -PassThru
+      $deadline=[DateTime]::UtcNow.AddSeconds(5)
+      while(-not(Test-Path -LiteralPath $script:RecoveryChildPid) -and[DateTime]::UtcNow-lt$deadline){Start-Sleep -Milliseconds 50}
+      if(-not(Test-Path -LiteralPath $script:RecoveryChildPid)){throw 'Owned child tree did not start'}
+      $directStarted=$directParent.StartTime.ToUniversalTime();$legacyTree=Get-MIR441LegacyOwnedProcessIds -Process $directParent -StartedUtc $directStarted;$directTree=Get-MIR441OwnedProcessTree -Process $directParent -StartedUtc $directStarted
+      $childId=[int][IO.File]::ReadAllText($script:RecoveryChildPid)
+      $legacyIds=@($legacyTree.ids|Sort-Object -Unique)
+      $directIds=@(@($directParent.Id)+@($directTree.children|ForEach-Object {[int]$_.id})|Sort-Object -Unique)
+      if(($legacyIds-join'|')-cne($directIds-join'|')-or$directIds-notcontains$childId-or$directIds-contains$foreign.Id){throw "Owned process traversal changed ownership child=$childId foreign=$($foreign.Id) legacy=$($legacyIds-join'|') direct=$($directIds-join'|')"}
+      if($directTree.working_set_bytes-le0-or$directTree.private_bytes-le0){throw 'Owned process traversal lost process memory'}
+      $futureTree=Get-MIR441OwnedProcessTree -Process $directParent -StartedUtc $directStarted.AddHours(1)
+      if(@($futureTree.children).Count-ne0){throw 'Owned process traversal admitted an old child'}
+      function Get-CimInstance {
+        [CmdletBinding()]
+        param([string]$ClassName,[string]$Filter)
+        throw 'simulated-owned-process-cim-failure'
+      }
+      try{Refuses {Get-MIR441OwnedProcessTree -Process $directParent -StartedUtc $directStarted} 'simulated-owned-process-cim-failure'}finally{Remove-Item -LiteralPath Function:Get-CimInstance -Force}
+      $ownedTreeLegacyRows=[int]$legacyTree.win32_rows;$ownedTreeDescendants=@($directTree.children).Count;$ownedTreeQueries=1+$ownedTreeDescendants
+    }finally{
+      if($null-ne$directParent){try{Stop-MIR441OwnedProcess -Process $directParent -Children $(if($null-ne$directTree){$directTree.children}else{@()})}finally{$directParent.Dispose()}}
+      if($null-ne$foreign){try{Stop-MIR441OwnedProcess -Process $foreign}finally{$foreign.Dispose()}}
+      if(Test-Path -LiteralPath $script:RecoveryChildPid){$childId=[int][IO.File]::ReadAllText($script:RecoveryChildPid);if(Get-Process -Id $childId -ErrorAction SilentlyContinue){throw 'Owned child survived direct cancellation'};Remove-Item -LiteralPath $script:RecoveryChildPid -Force}
+    }
     $invoke.Arguments=@('-NoProfile','-File',$parent)
     $completion={Test-Path -LiteralPath $script:RecoveryChildPid -PathType Leaf}
     $completed=Invoke-MIR441MonitoredProcess @invoke -CompletionPredicate $completion
@@ -215,7 +248,7 @@ Start-Sleep -Seconds 20
     $null=Resolve-MIR441RecoveryScratchPath -Path $root
     Remove-Item -LiteralPath $root -Recurse -Force
   }
-  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;physical_anchored_commit_reserve=$true;commit_boundary_refusal=$true;out_of_root=$true;characterization_admission=$true;upgrade_admission=$true;upgrade_process_adapter=$true;save_reload_oracle=$true;completion_predicate=$true;predicate_failure_cancellation=$true;serialization=$true;child_cancellation=$true;monitor_failure_cancellation=$true;temp_cleanup=$true;process_budget_cancellation=$true;triggering_memory_sample=$true;sampled_private_memory_peak=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
+  [pscustomobject]@{status='MIR441-RESOURCE-RECOVERY-TESTS-PASSED';thresholds=4;physical_anchored_commit_reserve=$true;commit_boundary_refusal=$true;out_of_root=$true;characterization_admission=$true;upgrade_admission=$true;upgrade_process_adapter=$true;save_reload_oracle=$true;completion_predicate=$true;predicate_failure_cancellation=$true;serialization=$true;child_cancellation=$true;owned_descendant_traversal=$true;owned_descendant_foreign_excluded=$true;owned_descendant_cim_failure_fail_closed=$true;owned_descendant_count=$ownedTreeDescendants;owned_descendant_query_count=$ownedTreeQueries;legacy_win32_process_rows=$ownedTreeLegacyRows;monitor_failure_cancellation=$true;temp_cleanup=$true;process_budget_cancellation=$true;triggering_memory_sample=$true;sampled_private_memory_peak=$true;real_disk_fill=$false;real_memory_exhaustion=$false;memory_enforcement='sampled-watchdog-not-hard-cap'}
 }
 if($ResourceRecoveryOnly){Test-MIR441ResourceRecovery;return}
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
@@ -256,7 +289,7 @@ $acceptedChangePaths=@(Get-ChildItem -LiteralPath (Join-Path $repo 'changes/unre
   $record=Get-Content -Raw -LiteralPath $_.FullName|ConvertFrom-Json -Depth 100
   if([string]$record.status-ceq'accepted'){[IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/')}
 }|Sort-Object)
-Assert-MIR441Test ($resourceText-match'EnumerateFileSystemInfos'-and$resourceText-match'Write-MIR441Json'-and$resourceText-match'commit_limit_bytes'-and$commonText-match'AppendAllText'-and$commonText-match'Assert-MIR441CleanTrackedSource') 'mir441-streaming-resource-governor'
+Assert-MIR441Test ($resourceText-match'EnumerateFileSystemInfos'-and$resourceText-match'Write-MIR441Json'-and$resourceText-match'commit_limit_bytes'-and$resourceText-match'Get-CimInstance -ClassName Win32_Process -Filter'-and$resourceText-notmatch'Get-CimInstance Win32_Process -ErrorAction Stop'-and$commonText-match'AppendAllText'-and$commonText-match'Assert-MIR441CleanTrackedSource') 'mir441-streaming-resource-governor'
 Assert-MIR441Test ($buildText-notmatch'ForEach-Object\s+-Parallel|Start-Job|Start-ThreadJob'-and$buildText-match'foreach\(\$target') 'mir441-serial-materializer'
 Assert-MIR441Test ($commonText-match'merge-base --is-ancestor'-and$buildText-match'Assert-MIR441MainAncestor') 'mir441-main-ancestry-before-candidate-build'
 Assert-MIR441Test ($buildText-match"-SourceVersion '4[.]1[.]0'"-and$materializerText-match'\$info[.]version\s*=\s*\[string\]\$identity[.]distribution_version') 'mir441-candidate-version-materialized-from-intent'
