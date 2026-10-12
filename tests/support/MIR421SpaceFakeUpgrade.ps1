@@ -13,7 +13,8 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
     [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1',
     [AllowEmptyString()][string]$FromVersion='',
     [switch]$SpaceIsFake,
-    [switch]$SpaceAge)
+    [switch]$SpaceAge,
+    [switch]$HistoricalSettingsOracle)
   # Only the disposable prepared fixture changes. Identity includes the
   # predecessor when 4.2.2 tests both CCC00 -> CCC02 and CCC01 -> CCC02:
   # their specialized control.lua bytes differ and must never share a library
@@ -26,8 +27,12 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   $fromMatch=[regex]::Match($FromVersion,('^4[.]2[.]'+$code+'(?<patch>00|01|02)$'))
   if(-not$fromMatch.Success-or([int]$fromMatch.Groups['patch'].Value-ge$sourcePatch)){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromPatch=[int]$fromMatch.Groups['patch'].Value
+  if($HistoricalSettingsOracle-and($Target-cne'f210'-or$SourceVersion-cne'4.2.3'-or$FromVersion-cne'4.2.21000'-or-not$SpaceAge-or$SpaceIsFake)){
+    throw '[mir423-f210-settings-oracle-transition]'
+  }
   $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
   $fixtureVersion=if($SourceVersion-ceq'4.2.3'){'0.1.'+(30+$fromPatch)}elseif($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  if($HistoricalSettingsOracle){$fixtureVersion='0.1.33'}
   if($Target-ceq'f210'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceAge){
     $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
   }
@@ -49,6 +54,34 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if($info.version-ceq$fixtureVersion){return}
   $info.version=$fixtureVersion
   [IO.File]::WriteAllText($path,($info|ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false))
+}
+
+function Set-MIR423F210HistoricalSettingDefaultOracle {
+  param([Parameter(Mandatory)][string]$FixtureDirectory,
+    [Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
+  # The shared fixture already contains the reviewed 18-family by seven-default
+  # allowance introduced in published 4.2.1 and retained in 4.2.2.  This
+  # changes only the private CCC00 -> CCC03 copy's guard; all existing settings
+  # and every other added setting continue through the exact-equality oracle.
+  if($FromVersion-cne'4.2.21000'){throw '[mir423-f210-settings-oracle-predecessor]'}
+  if($ToVersion-cne'4.2.21003'){throw '[mir423-f210-settings-oracle-version]'}
+  $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
+  $path=Join-Path $directory 'control.lua'
+  Assert-MIRLibraryPath $path
+  $text=Get-Content -LiteralPath $path -Raw
+  $old='if to_version == "4.2.21002" then'
+  $new='if from_version == "4.2.21000" and to_version == "4.2.21003" then'
+  $required=@(
+    'local added_422_setting_defaults = {}',
+    'local families = {"glycerol", "hydrochloric_acid", "hydrofluoric_acid", "nitric_acid",',
+    'local defaults = {enable=true, ["effect-per-level"]=2, ["max-level"]=0,',
+    '    ["research-time"]=30, ["cost-base"]=200, ["cost-growth"]=2, ["cost-linear-increment"]=0}',
+    'if expected.settings[name] == nil and not equal_state(added_422_setting_defaults[name], value) then'
+  )
+  if(@($required|Where-Object {-not$text.Contains($_)}).Count-ne0-or[regex]::Matches($text,[regex]::Escape($old)).Count-ne1){
+    throw '[mir423-f210-settings-oracle-anchor]'
+  }
+  [IO.File]::WriteAllText($path,$text.Replace($old,$new),[Text.UTF8Encoding]::new($false))
 }
 
 function Set-MIR423F210InheritedPromethiumDefinitionDelta {

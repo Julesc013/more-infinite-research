@@ -107,10 +107,22 @@ function Get-MIR441TreeUsage {
 
 function Get-MIR441OwnedProcessTree {
   param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$StartedUtc)
-  $all=@(Get-CimInstance Win32_Process -ErrorAction Stop);$ids=[Collections.Generic.HashSet[int]]::new();[void]$ids.Add($Process.Id)
-  do{$changed=$false;foreach($row in $all){if($row.CreationDate-and$row.CreationDate.ToUniversalTime()-ge$StartedUtc-and$ids.Contains([int]$row.ParentProcessId)-and$ids.Add([int]$row.ProcessId)){$changed=$true}}}while($changed)
+  # Query only direct children of processes we have already established as
+  # owned.  A full Win32_Process snapshot retained every machine process on
+  # each watchdog sample even when the governed process had no children.
+  $ids=[Collections.Generic.HashSet[int]]::new();$owned=[Collections.Generic.List[int]]::new();$pending=[Collections.Generic.Queue[int]]::new()
+  $rootId=[int]$Process.Id;[void]$ids.Add($rootId);$owned.Add($rootId);$pending.Enqueue($rootId)
+  while($pending.Count){
+    $parentId=$pending.Dequeue()
+    foreach($row in @(Get-CimInstance -ClassName Win32_Process -Filter ("ParentProcessId=$parentId") -ErrorAction Stop)){
+      $childId=[int]$row.ProcessId
+      if($row.CreationDate-and$row.CreationDate.ToUniversalTime()-ge$StartedUtc-and$ids.Add($childId)){
+        $owned.Add($childId);$pending.Enqueue($childId)
+      }
+    }
+  }
   [int64]$working=0;[int64]$private=0;$children=@()
-  foreach($row in $all){if(-not$ids.Contains([int]$row.ProcessId)){continue};try{$p=Get-Process -Id $row.ProcessId -ErrorAction Stop;$working+=$p.WorkingSet64;$private+=$p.PrivateMemorySize64;if($row.ProcessId-ne$Process.Id){$children+=[pscustomobject]@{id=$p.Id;started_utc=$p.StartTime.ToUniversalTime()}};$p.Dispose()}catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}}
+  foreach($id in $owned){try{$p=Get-Process -Id $id -ErrorAction Stop;$working+=$p.WorkingSet64;$private+=$p.PrivateMemorySize64;if($id-ne$rootId){$children+=[pscustomobject]@{id=$p.Id;started_utc=$p.StartTime.ToUniversalTime()}};$p.Dispose()}catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}}
   return [pscustomobject]@{working_set_bytes=$working;private_bytes=$private;children=$children}
 }
 
