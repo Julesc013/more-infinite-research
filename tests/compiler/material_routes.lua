@@ -4,6 +4,7 @@ local productivity_owners, recipe_unlocks, technologies = {}, {}, {}
 local generated_owners = {}
 local observation_enabled, observation_rows = false, {}
 local planning_input_available = true
+local recipe_index_mode = "typed"
 local function stub(name, value)
   -- Keep the profile provider identity shared by already-loaded consumers.
   if name == "prototypes.mir.platform.factorio.target_profiles" and value and package.loaded[name] then
@@ -53,13 +54,62 @@ stub("prototypes.mir.domain.facts.generated_technology_registry", {
   contains=function(name) return generated_owners[name] ~= nil end,
   is_stream=function(name) return generated_owners[name]==true or generated_owners[name]=="stream" end
 })
+local function test_recipe_index_identity(entry)
+  if type(entry) ~= "table" or type(entry.name) ~= "string" or entry.name == "" then return nil end
+  return (entry.type or "item") .. "\0" .. entry.name
+end
+local function append_test_recipe_index(index, identity, recipe_name)
+  if not identity then return end
+  local names = index[identity] or {}
+  index[identity] = names
+  if names[#names] ~= recipe_name then names[#names+1] = recipe_name end
+end
+local function test_recipe_index()
+  local names, by_ingredient_identity, by_output_identity = {}, {}, {}
+  for recipe_name, fact in pairs(records) do
+    names[#names+1] = recipe_name
+    local ingredients, outputs = {}, {}
+    for _, variant in ipairs(fact.variants or {}) do
+      for _, entry in ipairs(variant.ingredients or {}) do ingredients[test_recipe_index_identity(entry)] = true end
+      for _, entry in ipairs(variant.results or {}) do outputs[test_recipe_index_identity(entry)] = true end
+    end
+    for identity in pairs(ingredients) do append_test_recipe_index(by_ingredient_identity, identity, recipe_name) end
+    for identity in pairs(outputs) do append_test_recipe_index(by_output_identity, identity, recipe_name) end
+  end
+  table.sort(names)
+  for _, index in ipairs({by_ingredient_identity, by_output_identity}) do
+    for _, recipe_names in pairs(index) do table.sort(recipe_names) end
+  end
+  local facts = records
+  if recipe_index_mode == "indexed-no-fact-scan" then
+    facts = setmetatable({}, {
+      __index=records,
+      __pairs=function() error("typed return-cone lookup must not scan indexed facts") end
+    })
+  end
+  if recipe_index_mode == "missing-typed" then
+    local index = {schema=2, facts=facts, names=names}
+    cached.recipe_index = index
+    return index
+  end
+  if recipe_index_mode == "malformed-typed" then
+    by_ingredient_identity["item\0plate"] = {"missing-recipe"}
+  end
+  local index = {
+    schema=2, facts=facts, names=names,
+    by_ingredient_identity=by_ingredient_identity,
+    by_output_identity=by_output_identity
+  }
+  cached.recipe_index = recipe_index_mode == "unowned-typed" and {} or index
+  return index
+end
 stub("prototypes.mir.index.recipe_facts", {
   for_each=function(callback)
     builds=builds+1
     for name, fact in pairs(records) do callback(name, fact) end
   end,
   view=function(name) return records[name] end,
-  index_view=function() return {facts=records} end,
+  index_view=test_recipe_index,
   candidate_names=function()
     local names = {}
     for name in pairs(records) do names[#names+1] = name end
@@ -81,6 +131,7 @@ local function recipe(input,output,input_type,output_type)
 end
 local function environment(value, items)
   records=value; cached={}; builds=0
+  recipe_index_mode="typed"
   item_prototypes=items or {}; item_scans=0
   productivity_owners, recipe_unlocks, technologies = {}, {}, {}
 end
@@ -232,6 +283,41 @@ end
 local valid_route=canonical_route("smelting","ore","plate")
 local valid_certificate=certificate("ore","plate")
 local valid_risk_row=risk_row("smelting");
+
+-- The return-cone boundary must use the exact typed recipe indexes.  This
+-- world includes a hidden consumer and a zero-result direct producer because
+-- both remain certificate facts, while an identically named fluid input must
+-- remain outside an item route.  The proxy rejects a full facts scan.
+local indexed_cone_world={
+  smelting=canonical_route("smelting","ore","plate"),
+  downstream=canonical_route("downstream","plate","gear"),
+  hidden_consumer=canonical_route("hidden-consumer","plate","hidden-gear"),
+  zero_direct_producer=canonical_route("zero-direct-producer","scrap","plate"),
+  fluid_consumer=canonical_route("fluid-consumer","plate","brine",{ingredients={type="fluid"}}),
+  unrelated=canonical_route("unrelated","coal","ash")
+}
+indexed_cone_world.hidden_consumer.hidden=true
+indexed_cone_world.hidden_consumer.variants[1].hidden=true
+indexed_cone_world.zero_direct_producer.variants[1].results[1].amount=0
+environment(indexed_cone_world)
+recipe_index_mode="indexed-no-fact-scan"
+local indexed_cone=assert(matcher.relevant_route_fingerprints(indexed_cone_world.smelting,1))
+check(indexed_cone.relevant_recipe_count==4 and indexed_cone.direct_output_producer_count==2,
+  "typed indexes retain hidden consumers and zero-result direct producers without crossing item/fluid identities")
+recipe_index_mode="missing-typed";cached={}
+local missing_typed_cone=assert(matcher.relevant_route_fingerprints(indexed_cone_world.smelting,1))
+check(missing_typed_cone.return_graph_fingerprint==indexed_cone.return_graph_fingerprint
+  and missing_typed_cone.relevant_recipe_count==indexed_cone.relevant_recipe_count
+  and missing_typed_cone.direct_output_producer_count==indexed_cone.direct_output_producer_count,
+  "missing typed indexes use the exact full-scan return-cone oracle")
+recipe_index_mode="malformed-typed";cached={}
+local malformed_typed_cone=assert(matcher.relevant_route_fingerprints(indexed_cone_world.smelting,1))
+check(malformed_typed_cone.return_graph_fingerprint==indexed_cone.return_graph_fingerprint,
+  "malformed typed indexes fail closed to the full-scan return-cone oracle");
+recipe_index_mode="unowned-typed";cached={}
+local unowned_typed_cone=assert(matcher.relevant_route_fingerprints(indexed_cone_world.smelting,1))
+check(unowned_typed_cone.return_graph_fingerprint==indexed_cone.return_graph_fingerprint,
+  "a caller-owned index uses the full-scan boundary without trusting its projections");
 (function()
   local item_index = require("prototypes.mir.index.item_prototype_facts")
   for _, case in ipairs({

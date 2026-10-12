@@ -333,6 +333,43 @@ local function pack_world(seed, initial_first)
   }
 end
 
+(function()
+  local initial, future = feasibility.initial_recipe_witness, feasibility.recipe_witness
+  local function run_priority(reverse)
+    reset(pack_world(true, reverse))
+    world.recipe_facts["0-unavailable"] = {enabled_without_research = true, result_names = {"A"}}
+    world.recipe_prototypes["0-unavailable"] = {name = "0-unavailable"}
+    table.insert(world.producers.A, "0-unavailable")
+    world.recipe_facts["Z-initial"] = {enabled_without_research = true, result_names = {"A"}}
+    world.recipe_prototypes["Z-initial"] = {name = "Z-initial"}
+    table.insert(world.producers.A, "Z-initial")
+    local tried = {}
+    feasibility.initial_recipe_witness = function(name, ...)
+      tried[#tried + 1] = name
+      if name == "0-unavailable" then return nil end
+      return initial(name, ...)
+    end
+    feasibility.recipe_witness = function(name, output, options, state)
+      if options and options.require_enabled == true then return future(name, output, options, state) end
+      error("Initial priority must not construct a researched alternative: " .. name)
+    end
+    local ok, status = pcall(production.pack_production_status, "A", {})
+    feasibility.initial_recipe_witness, feasibility.recipe_witness = initial, future
+    local selected = ok and production.production_route_for_pack("A")
+    check("IP-" .. tostring(reverse), status == "initial" and selected
+      and selected.recipe == "A-initial" and #tried == 2
+      and tried[1] == "0-unavailable" and tried[2] == "A-initial",
+      "Initial selection skips an invalid lexical candidate and stops at the proven lexical winner")
+    check("IP-COUNTS-" .. tostring(reverse), selected
+      and selected.provenance.selection_counts_complete == false
+      and selected.provenance.route_enumeration.initial_recipes_evaluated == 2
+      and selected.provenance.route_enumeration.recipe_candidate_count == 4,
+      "Skipped alternatives have explicitly incomplete selection counts")
+  end
+  run_priority(true)
+  run_priority(false)
+end)();
+
 -- An initially available A must make B researchable in both cold query orders.
 reset(pack_world(true, true))
 local a = production.pack_production_status("A", {})
@@ -3662,6 +3699,214 @@ check("YP31", product_acquisition_witness({amount = 1, shared_probability = {min
 target_profile.prototype_shapes.product_probability_fields = modern_fields
 end)()
 end
+
+-- Characterize the retained selector at Git blob cc5322bb71fc9046f1b9126f534009f739f5087f.
+-- This oracle is test-only; the player package has one selector.
+(function()
+local original_policy = (function()
+local deepcopy = require("prototypes.mir.core.deepcopy")
+
+local M = {
+  policy_id = "SciencePackProductionRoutePolicyV1"
+}
+
+local function as_set(values)
+  local out = {}
+  for _, value in ipairs(values or {}) do out[value] = true end
+  return out
+end
+
+local function strict_subset(left, right)
+  local left_set = as_set(left)
+  local right_set = as_set(right)
+  local strictly_smaller = false
+  for value in pairs(left_set) do
+    if not right_set[value] then return false end
+  end
+  for value in pairs(right_set) do
+    if not left_set[value] then strictly_smaller = true end
+  end
+  return strictly_smaller
+end
+
+local function sorted_gates(route)
+  local gates, seen = {}, {}
+  for _, technology_name in ipairs(route.unlockers or {}) do
+    if technology_name and not seen[technology_name] then
+      seen[technology_name] = true
+      table.insert(gates, technology_name)
+    end
+  end
+  -- Legacy singleton routes remain comparable while the planner consumes the
+  -- plural gate contract.
+  if route.unlocker and not seen[route.unlocker] then
+    seen[route.unlocker] = true
+    table.insert(gates, route.unlocker)
+  end
+  for _, technology_name in ipairs(route.prerequisite_closure or {}) do
+    if technology_name and not seen[technology_name] then
+      seen[technology_name] = true
+      table.insert(gates, technology_name)
+    end
+  end
+  table.sort(gates)
+  return gates
+end
+
+local function graph_precedes(left, right)
+  return strict_subset(sorted_gates(left), sorted_gates(right))
+end
+
+local function retain_undominated(routes, precedes)
+  local retained = {}
+  for candidate_index, candidate in ipairs(routes) do
+    local dominated = false
+    for other_index, other in ipairs(routes) do
+      if candidate_index ~= other_index and precedes(other, candidate) then
+        dominated = true
+        break
+      end
+    end
+    if not dominated then table.insert(retained, candidate) end
+  end
+  return retained
+end
+
+local function numeric(value)
+  return type(value) == "number" and value or math.huge
+end
+
+local function progression_less(left, right)
+  local left_progression = left.progression_key or {}
+  local right_progression = right.progression_key or {}
+  for _, field in ipairs({
+    "science_burden_count",
+    "prerequisite_count",
+    "unlock_depth",
+    "research_count",
+    "research_time"
+  }) do
+    local left_value = numeric(left_progression[field])
+    local right_value = numeric(right_progression[field])
+    if left_value ~= right_value then return left_value < right_value end
+  end
+  local left_gates = table.concat(sorted_gates(left), "\0")
+  local right_gates = table.concat(sorted_gates(right), "\0")
+  if left_gates ~= right_gates then return left_gates < right_gates end
+  return tostring(left.recipe or "") < tostring(right.recipe or "")
+end
+
+function M.select(routes)
+  local reachable = {}
+  for _, route in ipairs(routes or {}) do
+    if route.reachable == true then table.insert(reachable, route) end
+  end
+  if #reachable == 0 then return nil end
+  local reachable_count = #reachable
+
+  local initial = {}
+  for _, route in ipairs(reachable) do
+    if route.initial == true then table.insert(initial, route) end
+  end
+  if #initial > 0 then reachable = initial end
+
+  local graph_frontier = retain_undominated(reachable, graph_precedes)
+  local burden_frontier = retain_undominated(graph_frontier, function(left, right)
+    return strict_subset(left.science_burden, right.science_burden)
+  end)
+  table.sort(burden_frontier, progression_less)
+
+  local selected = deepcopy(burden_frontier[1])
+  selected.provenance = selected.provenance or {}
+  selected.provenance.selection_policy = M.policy_id
+  selected.provenance.candidate_route_count = #(routes or {})
+  selected.provenance.reachable_route_count = reachable_count
+  selected.provenance.graph_frontier_count = #graph_frontier
+  selected.provenance.science_burden_frontier_count = #burden_frontier
+  return selected
+end
+
+return M
+end)()
+local copy = require("prototypes.mir.core.deepcopy")
+local function equal(a, b)
+  if type(a) ~= type(b) then return false end
+  if type(a) ~= "table" then return a == b end
+  for k, v in pairs(a) do if not equal(v, b[k]) then return false end end
+  for k in pairs(b) do if a[k] == nil then return false end end
+  return true
+end
+local function compare(routes, id)
+  local before = copy(routes)
+  local old, current = original_policy.select(routes), route_policy.select(routes)
+  check("PF-" .. id, equal(old, current) and equal(routes, before),
+    "Prepared frontiers preserve the complete selected record, counts and input")
+  if current then
+    current.provenance.test_mutation = true
+    current.unlockers = {"private-result"}
+    check("PF-COPY-" .. id, equal(routes, before), "Selected records retain copy isolation")
+  end
+end
+compare({}, "empty")
+local choices = {{}, {"a"}, {"b"}, {"a", "b"}}
+for gates_a = 1, 4 do for gates_b = 1, 4 do
+for science_a = 1, 4 do for science_b = 1, 4 do
+  local routes = {
+    {recipe = "z", reachable = true, unlockers = choices[gates_a],
+      science_burden = choices[science_a], progression_key = {science_burden_count = 0}},
+    {recipe = "a", reachable = true, unlockers = choices[gates_b],
+      science_burden = choices[science_b], progression_key = {science_burden_count = 1}},
+    {recipe = "c", reachable = true, unlockers = {"a", "b", "c"},
+      science_burden = {}, progression_key = {science_burden_count = 0}}
+  }
+  compare(routes, gates_a .. gates_b .. science_a .. science_b)
+  compare({routes[3], routes[2], routes[1]}, "reverse-" .. gates_a .. gates_b .. science_a .. science_b)
+end end end end
+local seed = 433
+local function random(n)
+  seed = (seed * 48271) % 2147483647
+  return seed % n
+end
+for case = 1, 400 do
+  local routes = {}
+  for index = 1, 2 + random(9) do
+    local gates, burden, closure = {}, {}, {}
+    for n = 1, random(7) do gates[#gates + 1] = "g" .. random(5) end
+    for n = 1, random(7) do burden[#burden + 1] = "s" .. random(5) end
+    for n = 1, random(4) do closure[#closure + 1] = "g" .. random(5) end
+    routes[#routes + 1] = {recipe = "r" .. random(4), marker = index,
+      reachable = random(4) ~= 0, initial = random(8) == 0,
+      unlockers = gates, unlocker = random(2) == 0 and "g2" or nil,
+      prerequisite_closure = closure, science_burden = burden,
+      progression_key = {science_burden_count = random(4), prerequisite_count = random(4),
+        unlock_depth = random(4), research_count = random(4), research_time = random(4)}}
+  end
+  compare(routes, "random-" .. case)
+end
+local ties = {}
+for index = 1, 8 do
+  ties[index] = {recipe = "same", marker = index, reachable = true,
+    unlockers = {"a", "a"}, science_burden = {"s", "s"}}
+end
+compare(ties, "complete-ties")
+local scaling = {}
+for index = 1, 128 do
+  local gates = {}
+  for n = 1, 12 do gates[#gates + 1] = "shared-" .. n end
+  gates[#gates + 1] = "unique-" .. index
+  scaling[index] = {recipe = "recipe-" .. index, reachable = true,
+    unlockers = gates, science_burden = {"s"}}
+end
+local sort, old_calls, new_calls = table.sort, 0, 0
+table.sort = function(...) old_calls = old_calls + 1; return sort(...) end
+local old = original_policy.select(scaling)
+table.sort = function(...) new_calls = new_calls + 1; return sort(...) end
+local current = route_policy.select(scaling)
+table.sort = sort
+check("PF-SCALE", equal(old, current) and old_calls > 30000 and new_calls <= 131,
+  "128 incomparable routes prepare once and retain the original winner")
+end)()
+
 
 if #failures > 0 then error(table.concat(failures, "\n")) end
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

@@ -297,6 +297,8 @@ local function remember_root_pack_status(pack_name, entry)
   owner.entries[pack_name] = entry
   -- Any nested root can change the selected route of a contextual query.
   -- Discard completed contextual answers whenever root knowledge advances.
+  telemetry.count("science_root_generation_invalidations")
+  telemetry.count("science_contextual_answers_discarded", owner.contextual_pack_status_count or 0)
   owner.root_entry_generation = owner.root_entry_generation + 1
   owner.contextual_pack_status_memo = {}
   owner.contextual_pack_status_count = 0
@@ -1293,6 +1295,17 @@ local function aggregate_research_route(
   }
 end
 
+local function initial_production_route(recipe_name, initial_witness)
+  return {
+    recipe = recipe_name, initial = true, unlockers = {}, prerequisite_closure = {},
+    science_burden = {}, reachable = true, reachability = {status = "reachable"},
+    progression_key = {science_burden_count = 0, prerequisite_count = 0,
+      unlock_depth = 0, research_count = 0, research_time = 0},
+    provenance = {route_policy = route_policy.policy_id, recipe = recipe_name,
+      structural_route_witness = initial_witness.kind}
+  }
+end
+
 local function production_routes(
   recipe_status,
   visiting_packs,
@@ -1318,6 +1331,36 @@ local function production_routes(
       table.insert(routes, route)
     end
   end
+  local initial_attempts = {}
+  if observer == nil then
+    -- Every initial record has identical gates and numeric rank. Lexical
+    -- recipe order therefore proves the same winner before researched
+    -- alternatives are constructed. Exact diagnostic projections retain
+    -- their exhaustive, budgeted traversal below.
+    local names, evaluated = copy_names(recipe_status.recipes or {}), 0
+    table.sort(names)
+    for _, recipe_name in ipairs(names) do
+      local recipe = canonical_recipe_facts.view(recipe_name)
+      if recipe and recipe.enabled_without_research == true then
+        evaluated = evaluated + 1
+        local witness = route_feasibility.initial_recipe_witness(
+          recipe_name, recipe_status.pack_name, witness_options, witness_state)
+        initial_attempts[recipe_name] = witness or false
+        if witness then
+          telemetry.count("science_initial_priority_selections")
+          telemetry.count("science_initial_recipe_evaluations", evaluated)
+          local selected = initial_production_route(recipe_name, witness)
+          selected.provenance.route_enumeration = {
+            strategy = "initial-priority-prefix", complete = false,
+            recipe_candidate_count = #names, initial_recipes_evaluated = evaluated,
+            researched_recipe_routes_evaluated = 0
+          }
+          return {selected}
+        end
+      end
+    end
+    telemetry.count("science_initial_recipe_evaluations", evaluated)
+  end
   -- All candidates belong to one immutable recipe snapshot and exact active
   -- traversal. Sharing the query state reuses only raw indexes and the
   -- context-free positive witnesses owned by recipe_route_feasibility; its
@@ -1327,30 +1370,13 @@ local function production_routes(
     if not diagnostic_visit(observer, 0) then break end
     local recipe = canonical_recipe_facts.view(recipe_name)
     if recipe and recipe.enabled_without_research == true then
-      local initial_witness = route_feasibility.initial_recipe_witness(
-        recipe_name, recipe_status.pack_name, witness_options, witness_state)
+      local initial_witness = initial_attempts[recipe_name]
+      if initial_witness == nil then
+        initial_witness = route_feasibility.initial_recipe_witness(
+          recipe_name, recipe_status.pack_name, witness_options, witness_state)
+      end
       if initial_witness then
-        table.insert(routes, {
-          recipe = recipe_name,
-          initial = true,
-          unlockers = {},
-          prerequisite_closure = {},
-          science_burden = {},
-          reachable = true,
-          reachability = {status = "reachable"},
-          progression_key = {
-            science_burden_count = 0,
-            prerequisite_count = 0,
-            unlock_depth = 0,
-            research_count = 0,
-            research_time = 0
-          },
-          provenance = {
-            route_policy = route_policy.policy_id,
-            recipe = recipe_name,
-            structural_route_witness = initial_witness.kind
-          }
-        })
+        table.insert(routes, initial_production_route(recipe_name, initial_witness))
       else
         -- The outer recipe is enabled, but one of its inputs may become
         -- available through research. This is a future route, never an
