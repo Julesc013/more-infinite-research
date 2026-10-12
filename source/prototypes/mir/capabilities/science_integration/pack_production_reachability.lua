@@ -898,12 +898,55 @@ local function witness_unlock_dependencies(witness, entry_technologies, dependen
   end
 end
 
+-- A positive memo entry owns its witness for this query. Summarize the exact
+-- output identities once, then check the smaller active demand set on reuse.
+-- Large or cyclic graphs retain the existing complete traversal. This bound
+-- limits retained metadata; it never changes a reachability answer.
+local function memo_witness_identity_summary(witness)
+  local identities, active, complete = {}, {}, {}
+  local nodes, identity_count = 0, 0
+  local function visit(node)
+    if type(node) ~= "table" then return true end
+    if active[node] then return false end
+    if complete[node] then return true end
+    nodes = nodes + 1
+    if nodes > 256 or getmetatable(node) ~= nil then return false end
+    for _, field in ipairs({"output", "product", "ingredients", "machine", "receiver"}) do
+      local value = node[field]
+      if type(value) == "table" and getmetatable(value) ~= nil then return false end
+    end
+    active[node] = true
+    local output = node.output or node.product
+    if type(output) == "table" and output.type and output.name then
+      local key = identity_key(output)
+      if not identities[key] then
+        identities[key] = true
+        identity_count = identity_count + 1
+        if identity_count > 256 then return false end
+      end
+    end
+    for _, child in ipairs(acquisition_children(node)) do
+      if not visit(child) then return false end
+    end
+    active[node], complete[node] = nil, true
+    return true
+  end
+  if not visit(witness) then return nil end
+  return identities
+end
+
 local function positive_witness_reusable(entry, context, state, root_key)
   for technology_name in pairs(entry.required_technologies) do
     if context.technologies[technology_name] == nil then return false end
   end
   for pair_key in pairs(entry.pairs) do
     if context.pairs[pair_key] then return false end
+  end
+  if entry.output_identities then
+    for key, present in pairs(state.visiting) do
+      if present and key ~= root_key and entry.output_identities[key] then return false end
+    end
+    return true
   end
   return witness_avoids_active_identities(entry.witness, state.visiting, root_key)
 end
@@ -1062,8 +1105,10 @@ local function research_unlocked_output_witness(identity, options, state, visiti
               < RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT then
             local dependencies = {pairs = {}, required_technologies = {}}
             witness_unlock_dependencies(result, context.technologies, dependencies)
+            local owned_witness = deepcopy(result)
             table.insert(entries, {
-              witness = deepcopy(result),
+              witness = owned_witness,
+              output_identities = memo_witness_identity_summary(owned_witness),
               pairs = dependencies.pairs,
               required_technologies = dependencies.required_technologies
             })

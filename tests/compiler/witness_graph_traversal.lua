@@ -173,6 +173,55 @@ check(pair_names(hooks.selected_research_unlock_pairs(first))
     == pair_names(hooks.selected_research_unlock_pairs(second)),
   "Permutation of witness child order must not alter canonical selected-pair output")
 
+local summary = hooks.memo_witness_identity_summary(alias_root)
+check(summary ~= nil and summary["item\0alias-root"] and summary["item\0alias-leaf-output"],
+  "A private memo summary retains every shared witness output identity")
+local memo_entry = {witness = alias_root, output_identities = summary,
+  pairs = {}, required_technologies = {}}
+local identity_names = {"item\0alias-root", "item\0alias-output", "item\0alias-leaf-output", "fluid\0alias-output"}
+for mask = 0, 15 do
+  local visiting = {}
+  for index, name in ipairs(identity_names) do
+    if math.floor(mask / 2^(index - 1)) % 2 == 1 then visiting[name] = true end
+  end
+  check(hooks.positive_witness_reusable(memo_entry, {pairs = {}, technologies = {}},
+      {visiting = visiting}, "item\0alias-root")
+    == hooks.witness_avoids_active_identities(alias_root, visiting, "item\0alias-root"),
+    "Private identity summaries must match complete traversal under every opposing active subset")
+end
+_G.__witness_identity_calls = 0
+check(hooks.positive_witness_reusable(memo_entry, {pairs = {}, technologies = {}},
+  {visiting = {["item\0alias-root"] = true}}, "item\0alias-root"),
+  "A completed memo summary admits its already-proven queried root")
+check(_G.__witness_identity_calls == 0,
+  "Warm summary reuse must not revisit witness nodes")
+memo_entry.required_technologies = {required = true}
+check(not hooks.positive_witness_reusable(memo_entry, {pairs = {}, technologies = {}},
+  {visiting = {}}, "item\0alias-root"), "An identity summary must not bypass a required technology")
+memo_entry.required_technologies = {}
+memo_entry.pairs = {active_pair = true}
+check(not hooks.positive_witness_reusable(memo_entry, {pairs = {active_pair = true}, technologies = {}},
+  {visiting = {}}, "item\0alias-root"), "An identity summary must not bypass an active unlock pair")
+check(hooks.memo_witness_identity_summary(cycle) == nil,
+  "A cyclic graph must retain the complete conservative reuse path")
+local cyclic_entry = {witness = cycle, output_identities = hooks.memo_witness_identity_summary(cycle),
+  pairs = {}, required_technologies = {}}
+check(not hooks.positive_witness_reusable(cyclic_entry, {pairs = {}, technologies = {}},
+  {visiting = {}}, "item\0different-root"), "A cyclic summary refusal must never admit its witness")
+local wide = {ingredients = {}}
+for index = 1, 257 do wide.ingredients[index] = {output = {type = "item", name = "wide-" .. index}} end
+check(hooks.memo_witness_identity_summary(wide) == nil,
+  "A large witness must refuse metadata retention without using a partial summary")
+check(not hooks.positive_witness_reusable({witness = wide, pairs = {}, required_technologies = {}},
+  {pairs = {}, technologies = {}}, {visiting = {["item\0wide-257"] = true}}, "item\0other"),
+  "Capacity refusal must still inspect the conflicting identity beyond the metadata limit")
+check(hooks.memo_witness_identity_summary(setmetatable({}, {})) == nil,
+  "Caller-defined table behavior must not become immutable summary authority")
+check(hooks.memo_witness_identity_summary({output = setmetatable({type = "item", name = "virtual"}, {})}) == nil,
+  "A virtual output identity must retain live traversal behavior")
+check(hooks.memo_witness_identity_summary({machine = setmetatable({}, {})}) == nil,
+  "A virtual machine child container must retain live traversal behavior")
+
 print("MIR-WITNESS-GRAPH-TRAVERSAL-PASS " .. assertions)
 return {
   assertions = assertions,

@@ -4459,9 +4459,9 @@
     {
       "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
       "classification": "canonical-internal",
-      "sha256": "F5A0EA5A0A005256A47E9C9BA1DBC7D5461EFC8DA0EEE2418A7B34C7B164D823",
+      "sha256": "7DAFFB5AD5D928099B99A306954E1E9113965CE4D06FFCC51F74C55847F24D63",
       "hash_mode": "canonical-text-v1",
-      "lines": 674,
+      "lines": 689,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:bfef5c5fc6dc5cd70c05fe0cc67a6aa30fa20d25b07accdc636f24b55185b018"
+  "digest": "sha256:fb1922080f79171b4e52314f8d516add1e3a5fe0e47414677ea0fd84a807d73e"
 }

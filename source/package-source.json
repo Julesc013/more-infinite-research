@@ -2964,10 +2964,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 94020,
-      "source_sha256": "6EABE76DEE30508AEAC82D1AD2A404D7226871F75F115BD95F8F2C07C877C07D",
-      "output_bytes": 94020,
-      "output_sha256": "6EABE76DEE30508AEAC82D1AD2A404D7226871F75F115BD95F8F2C07C877C07D"
+      "source_bytes": 95877,
+      "source_sha256": "1DE79C14B40197365189B594B787CCF15FC77C5F91A31FFF08C4879D86E66DF7",
+      "output_bytes": 95877,
+      "output_sha256": "1DE79C14B40197365189B594B787CCF15FC77C5F91A31FFF08C4879D86E66DF7"
     },
     {
       "layer": "capability",
@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 89285,
-      "source_sha256": "064FB0510428350B2C49BA913D88F8012BAAA61D2F75416D0F75DFEFCD66CFB1",
-      "output_bytes": 89285,
-      "output_sha256": "064FB0510428350B2C49BA913D88F8012BAAA61D2F75416D0F75DFEFCD66CFB1"
+      "source_bytes": 91240,
+      "source_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D",
+      "output_bytes": 91240,
+      "output_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D"
     },
     {
       "layer": "capability",
@@ -7709,5 +7709,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "394B6C673AC74D36866E85EBFBECBB541673E49B3393B7225FDB5A12F67FF3F4"
+  "record_sha256": "865900305B35347C7EE3CA74BFA9A1ADD7E99005754B1F3DAD31A2E0E1530F88"
 }

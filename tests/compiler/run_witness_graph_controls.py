@@ -34,6 +34,8 @@ def instrument_source(source: str) -> str:
 M.__mir_witness_graph_test_hooks = {
   acquisition_children = acquisition_children,
   witness_avoids_active_identities = witness_avoids_active_identities,
+  memo_witness_identity_summary = memo_witness_identity_summary,
+  positive_witness_reusable = positive_witness_reusable,
   witness_unlock_dependencies = witness_unlock_dependencies,
   selected_research_unlock_pairs = selected_research_unlock_pairs
 }

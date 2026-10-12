@@ -417,6 +417,21 @@ local function copy_names(values)
   return copied
 end
 
+-- The ordinary acquisition pass accepts only an enabled, non-hidden recipe
+-- variant.  This is intentionally narrower than every other route property:
+-- output quantity/probability/temperature, ingredients, machines and surface
+-- conditions still require the complete route proof below.  The canonical
+-- fact index is immutable for its source epoch, so this cheap shape test can
+-- safely remove candidates which the enabled-only pass would always reject.
+local function has_enabled_visible_variant(fact)
+  if type(fact) ~= "table" then return true end
+  if fact.hidden == true then return false end
+  for _, variant in ipairs(variants_for(fact)) do
+    if variant.hidden ~= true and variant.enabled == true then return true end
+  end
+  return false
+end
+
 local function producer_ordering_estimated_bytes(identity, names)
   local total = PRODUCER_ORDERING_ENTRY_ESTIMATED_BYTES + #identity
   for _, name in ipairs(names) do
@@ -430,6 +445,17 @@ end
 -- canonical index is Context-owned and replaced with the recipe source epoch.
 local function owned_recipe_index(index)
   return index ~= nil and index == compiler_context.current():state_view("recipe_index")
+end
+
+-- Diagnostics expose the rejected producer branches themselves.  Keep their
+-- complete, uncached order so an enabled-only sieve cannot suppress a caller
+-- callback or alter a bounded rejection trace.  The same applies to a
+-- caller-owned index: only the Context-owned immutable snapshot can support
+-- this query-local ordering cache.
+local function may_sieve_enabled_producers(index, options)
+  return options.diagnostic_observer == nil
+    and options.diagnostic_failure == nil
+    and owned_recipe_index(index)
 end
 
 local function compiler_owned_route_witness_state(state, context)
@@ -1151,6 +1177,17 @@ function M.source_witness(identity, options, state)
 end
 
 local function sorted_producers(index, output_identity, options, state)
+  -- A retained normal ordering is keyed by the typed output identity and the
+  -- immutable Context-owned recipe index. Check it before copying the raw
+  -- producer bucket: diagnostics and caller-owned indexes deliberately stay
+  -- on their complete uncached paths below.
+  local cache_eligible = may_sieve_enabled_producers(index, options)
+  local key = cache_eligible and identity_key(output_identity) or nil
+  if key then
+    local cached = state.producer_orderings[key]
+    if cached then return copy_names(cached) end
+  end
+
   local producers = {}
   local exact = index.by_output_identity and index.by_output_identity[identity_key(output_identity)]
   -- Fixture and historical callers may still expose only the legacy index.
@@ -1175,12 +1212,18 @@ local function sorted_producers(index, output_identity, options, state)
   -- caller-supplied index may change under us, so it keeps the exact uncached
   -- path.  Cache copies never escape: a route caller can mutate its local
   -- alternative list without corrupting a later query.
-  if not owned_recipe_index(index) then
+  if not cache_eligible then
     return M.sort_acquisition_producers(producers, index)
   end
-  local key = identity_key(output_identity)
-  local cached = state.producer_orderings[key]
-  if cached then return copy_names(cached) end
+  local eligible = {}
+  for _, recipe_name in ipairs(producers) do
+    if has_enabled_visible_variant(index.facts[recipe_name]) then
+      table.insert(eligible, recipe_name)
+    else
+      telemetry.count("science_initial_disabled_producers_sieved")
+    end
+  end
+  producers = eligible
   M.sort_acquisition_producers(producers, index)
   local bytes = producer_ordering_estimated_bytes(key, producers)
   if state.producer_ordering_entry_count < PRODUCER_ORDERING_MAX_ENTRIES
