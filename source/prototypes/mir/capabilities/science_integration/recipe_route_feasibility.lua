@@ -10,12 +10,19 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local item_prototype_facts = require("prototypes.mir.index.item_prototype_facts")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 -- Live CompilerContext ownership is private identity, not serializable cache
 -- data. Weak keys keep query-local states collectible without retaining a
 -- context/service back-reference inside public state snapshots.
 local state_contexts = setmetatable({}, {__mode = "k"})
+-- Failed enabled-only acquisition can be proved without the caller's active
+-- ancestors. Such a completed failure remains false under further exclusions.
+-- Keep these probes private: they must not warm the caller's positive witness
+-- cache or change its selected producer through a different traversal order.
+local initial_failure_probes = setmetatable({}, {__mode = "k"})
+local INITIAL_FAILURE_PROBE_LIMIT = 256
 
 -- Producer selection repeats for every nested acquisition request. Retain
 -- only the already-normalized name ordering and keep the query state bounded;
@@ -1303,6 +1310,7 @@ compatible_machine = function(category, recipe_name, options, state, required_po
 end
 
 local function route_for_recipe(recipe_name, output_identity, options, state, require_enabled, construction)
+  telemetry.count("science_recipe_route_evaluations")
   if not diagnostic_visit(options) then return nil end
   local fact = options.recipe_index.facts[recipe_name]
   if not fact then
@@ -1598,6 +1606,27 @@ local function stable_acquisition_witness(witness)
   return true
 end
 
+local function initial_failure_probe(state, options)
+  if options.initial_failure_probe or options.diagnostic_observer ~= nil
+    or options.diagnostic_failure ~= nil or not cacheable(options)
+    or not owned_recipe_index(options.recipe_index) then return nil end
+  local probe = initial_failure_probes[state]
+  local context = compiler_context.current()
+  if not probe or probe.state.recipe_source_epoch ~= state.recipe_source_epoch
+    or not M.state_context_matches(probe.state, context)
+    or probe.state.recipe_index ~= options.recipe_index then
+    local isolated = new_state(options.recipe_index)
+    -- These completed structural catalogs are immutable in the source epoch.
+    -- Mutable active sets, results and witnesses stay in the isolated state.
+    for _, name in ipairs({"source_catalog", "machine_categories",
+      "machine_placement_items", "mining_drills", "capturable_spawners",
+      "surface_locations"}) do isolated[name] = state[name] end
+    probe = {state = isolated, attempted = {}, failures = {}, count = 0}
+    initial_failure_probes[state] = probe
+  end
+  return probe
+end
+
 -- A source witness or one enabled recipe alternative proves a product. The
 -- active acquisition-demand set makes recursive requirements AND, recipe alternatives
 -- OR, and rejects unseeded cycles. Default raw-prototype scans are cached only
@@ -1605,8 +1634,15 @@ end
 local function acquisition_witness_impl(output_identity, options, state)
   if not diagnostic_visit(options) then return nil end
   local key = acquisition_key(output_identity)
+  telemetry.count("science_acquisition_evaluations")
+  local initial_probe = initial_failure_probe(state, options)
+  if initial_probe and initial_probe.failures[key] then
+    telemetry.count("science_initial_failure_cache_hits")
+    return nil
+  end
   local may_use_stable = stable_cacheable(options)
   if may_use_stable and state.stable_acquisition_memo[key] ~= nil then
+    telemetry.count("science_stable_witness_cache_hits")
     return deepcopy(state.stable_acquisition_memo[key])
   end
   -- A recursive answer is conditional on the caller's active cycle set. Only
@@ -1716,6 +1752,30 @@ local function acquisition_witness_impl(output_identity, options, state)
   end
   state.visiting[key] = nil
   if may_cache then state.acquisition_memo[key] = false end
+  if initial_probe and root_query then
+    if not initial_probe.attempted[key] and initial_probe.count < INITIAL_FAILURE_PROBE_LIMIT then
+      initial_probe.attempted[key] = true
+      initial_probe.count = initial_probe.count + 1
+      initial_probe.failures[key] = true
+    end
+  elseif initial_probe and not initial_probe.attempted[key] then
+    if initial_probe.count < INITIAL_FAILURE_PROBE_LIMIT then
+      initial_probe.attempted[key] = true
+      initial_probe.count = initial_probe.count + 1
+      telemetry.count("science_initial_failure_distinct_probes")
+      local unrestricted = copy_options(options)
+      unrestricted.initial_failure_probe = true
+      -- No active ancestry enters this proof. Only a completed nil answer is
+      -- admitted to the failure cache; a positive answer never substitutes for
+      -- the caller's contextual selection or bypasses its cycle boundary.
+      if not acquisition_witness(output_identity, unrestricted, initial_probe.state) then
+        initial_probe.failures[key] = true
+        telemetry.count("science_initial_failure_proofs")
+      end
+    else
+      telemetry.count("science_initial_failure_capacity_refusals")
+    end
+  end
   record_diagnostic_failure(options, {
     kind = "ingredient",
     identity = deepcopy(output_identity),

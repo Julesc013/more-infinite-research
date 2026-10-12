@@ -3908,5 +3908,49 @@ check("PF-SCALE", equal(old, current) and old_calls > 30000 and new_calls <= 131
 end)()
 
 
+-- A failed restricted branch cannot itself establish a global failure. Only
+-- the isolated enabled-only proof may suppress repeated initial acquisition.
+;(function()
+  local blocked = route_fact("blocked", {}, {enabled = false})
+  blocked.enabled_without_research = false
+  reset({item_prototypes = {blocked = {type = "item"}},
+    recipe_facts = {locked = blocked},
+    producers_identity = {["item\0blocked"] = {"locked"}}})
+  local index = context.states.recipe_index
+  local reads, facts = 0, index.facts
+  index.facts = setmetatable({}, {__index = function(_, name)
+    reads = reads + 1; return facts[name]
+  end})
+  local state = {}
+  feasibility.bind_state_context(state, context)
+  -- Initialize before imposing the caller's active ancestry.
+  feasibility.acquisition_witness("missing", {recipe_index = index}, state)
+  state.visiting["item\0ancestor"] = true
+  local first = feasibility.acquisition_witness("blocked", {recipe_index = index}, state)
+  local first_reads = reads
+  local second = feasibility.acquisition_witness("blocked", {recipe_index = index}, state)
+  check("ACQ-NEGATIVE-PROOF", first == nil and second == nil and reads == first_reads,
+    "A completed unrestricted initial failure suppresses repeated restricted searches")
+  blocked.enabled_without_research = true
+  blocked.variants[1].enabled = true
+  world.recipe_source_epoch = (world.recipe_source_epoch or 1) + 1
+  check("ACQ-NEGATIVE-EPOCH", feasibility.acquisition_witness("blocked", {recipe_index = index}, state) ~= nil,
+    "Changing the recipe source epoch retires prior initial failures")
+
+  local seeded = route_fact("seeded", {{name = "seed", amount = 1}})
+  reset({item_prototypes = {seed = {type = "item"}, seeded = {type = "item"}},
+    resources = {seed = {minable = {result = "seed", count = 1}}},
+    recipe_facts = {seeded = seeded},
+    producers_identity = {["item\0seeded"] = {"seeded"}}})
+  index = context.states.recipe_index; state = {}
+  feasibility.acquisition_witness("missing", {recipe_index = index}, state)
+  state.visiting["item\0seed"] = true
+  check("ACQ-NEGATIVE-CONTEXT", feasibility.acquisition_witness("seeded", {recipe_index = index}, state) == nil,
+    "An active ingredient remains a cycle boundary in the caller")
+  state.visiting["item\0seed"] = nil
+  check("ACQ-NEGATIVE-POSITIVE", feasibility.acquisition_witness("seeded", {recipe_index = index}, state) ~= nil,
+    "An unrestricted positive proof cannot turn a contextual failure into global impossibility")
+end)()
+
 if #failures > 0 then error(table.concat(failures, "\n")) end
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

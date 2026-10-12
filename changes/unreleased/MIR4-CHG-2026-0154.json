@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0154",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Reuse independently completed initial-acquisition failures across restricted recipe branches.",
+  "details": [
+    "A normal query may reuse an initial failure only after an isolated enabled-only acquisition proof finishes without the caller active ancestors. The proof uses the same owned typed recipe index, sources, machines, surfaces and temperature demand.",
+    "Retain at most 256 attempted identities per source and Context lifetime. Positive isolated answers never substitute for the caller route; custom callbacks, diagnostic observations and unowned indexes bypass this cache. Capacity refusal uses the existing complete search.",
+    "Add compact acquisition evaluation, stable witness, contextual answer, invalidation and cache refusal counters. These counters report work and do not authorize a gameplay shortcut.",
+    "2210 Lua 5.2 characterization checks pass, including global-failure reuse, source epoch retirement and the opposing seeded route blocked only by active ancestry. Independent source review passed. Exact candidate native comparison remains pending due prelaunch headroom refusal."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance",
+    "diagnostics"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/researchability_planning.lua: ACQ-NEGATIVE-PROOF/EPOCH/CONTEXT/POSITIVE controls"
+    },
+    {
+      "kind": "finding",
+      "value": "Native Galore instruction probe on first integrated candidate: prime_root_pack_statuses9.435s; no speedup claim for this pending candidate"
+    }
+  ]
+}

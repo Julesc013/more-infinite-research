@@ -1561,6 +1561,7 @@ end
 -- Keeping it private prevents a diagnostic projection from re-entering the
 -- public/cache-owning pack_production_status surface of its parent context.
 local function resolve_pack_production_status(pack_name, visiting_packs, visiting_technologies, observer)
+  if observer == nil then telemetry.count("science_pack_contextual_questions") end
   if not pack_name then return "unreachable", nil, false end
   local exists = pack_registry.science_pack_exists(pack_name, observer)
   if diagnostic_indeterminate(observer) then return "indeterminate", nil, exists end
@@ -1578,7 +1579,10 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
   -- A nonempty traversal still never writes a conditional answer to root entries.
   local root_cache = observer == nil and science_pack_resolution_cache() or nil
   local cached = root_cache and root_cache[pack_name] or nil
-  if cached then return cached.status, cached.prerequisite, exists end
+  if cached then
+    telemetry.count("science_pack_root_cache_hits")
+    return cached.status, cached.prerequisite, exists
+  end
 
   local reusable = observer == nil and not has_active_traversal(visiting_packs, visiting_technologies)
 
@@ -1607,8 +1611,10 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
     contextual_key = table.concat(fields)
     local cached_context = contextual_owner.contextual_pack_status_memo[contextual_key]
     if cached_context then
+      telemetry.count("science_pack_contextual_cache_hits")
       return cached_context.status, cached_context.prerequisite, exists
     end
+    telemetry.count("science_pack_contextual_cache_misses")
   end
   local function remember_contextual_status(status, prerequisite)
     if contextual_owner
@@ -1619,6 +1625,9 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
       contextual_owner.contextual_pack_status_memo[contextual_key] = {status = status, prerequisite = prerequisite}
       contextual_owner.contextual_pack_status_count
         = contextual_owner.contextual_pack_status_count + 1
+      telemetry.count("science_pack_contextual_completed_answers")
+    elseif contextual_owner and contextual_owner.contextual_pack_status_count >= 8192 then
+      telemetry.count("science_pack_contextual_capacity_refusals")
     end
   end
 
