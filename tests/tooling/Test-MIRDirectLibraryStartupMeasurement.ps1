@@ -8,6 +8,12 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $root=Join-Path $repo ('build/tmp/direct-library-startup-controls-'+[guid]::NewGuid().ToString('N'))
 $assertions=0
 function Assert-DirectStartup([bool]$Condition,[string]$Message){if(-not $Condition){throw "Direct-library startup controls: $Message"};$script:assertions++}
+$startupCaller=(Get-Command Invoke-MIRDirectLibraryStartupMeasurement).ScriptBlock.Ast
+foreach($name in @('Invoke-MIRDirectLibraryStartupSample','Invoke-MIRDirectLibraryPlayerReadyPreparation')){
+  $calls=@($startupCaller.FindAll({param($node) $node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq$name},$true))
+  $seedBindings=@($calls|ForEach-Object {$_.CommandElements|Where-Object {$_-is[Management.Automation.Language.CommandParameterAst]-and$_.ParameterName-ceq'MapGenerationSeed'}})
+  Assert-DirectStartup ($calls.Count-eq1-and$seedBindings.Count-eq1-and(Get-Command $name).Parameters.ContainsKey('MapGenerationSeed')) "The actual $name caller must bind the declared deterministic seed parameter."
+}
 function Write-TestArchive([string]$Library,[string]$Version){
   $archive=Join-Path $Library ('more-infinite-research_'+$Version+'.zip')
   $zip=[IO.Compression.ZipFile]::Open($archive,[IO.Compression.ZipArchiveMode]::Create)
