@@ -611,4 +611,120 @@ foreach($patch in @(1,2)){
     if(-not$rejected){throw "K2 mixed maintenance mode accepted: $field"};$k2Assertions++
   }
 }
-[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+# 4.3 destinations retain the full current-package contract while binding each
+# row to an exact published 4.2 predecessor.  These are host-only controls:
+# they build no package and never launch an engine.
+$mir43Assertions=0
+$allUpgradeTargets=@('f210','f200','f110','f100','f017','f016','f015','f014','f013')
+foreach($sourceVersion in @('4.3.0','4.3.1')){
+  foreach($target in $allUpgradeTargets){
+    $code=$target.Substring(1)
+    foreach($oldPatch in 0..2){
+      $from="4.2.${code}0$oldPatch"
+      $to='4.3.'+$code+([version]$sourceVersion).Build.ToString('00')
+      $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
+      $mode=@{Target=$target;FromVersion=$from;ToVersion=$to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion=$sourceVersion}
+      Assert-MIR421CurrentUpgradeInputMode @mode
+      $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $from -SourceVersion $sourceVersion
+      if($readerVersion-cne('4.2.'+($oldPatch+1))){throw "4.3 selected incorrect published predecessor custody: $target/$sourceVersion/$oldPatch"}
+      $mir43Assertions+=2
+    }
+    foreach($invalid in @(
+      @{from="4.3.${code}00";to=('4.3.'+$code+'01');kind='same-minor-predecessor'},
+      @{from="4.1.${code}00";to=('4.3.'+$code+'00');kind='unpublished-predecessor'},
+      @{from="4.2.${code}02";to=('4.2.'+$code+'03');kind='wrong-destination'}
+    )){
+      $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
+      $mode=@{Target=$target;FromVersion=$invalid.from;ToVersion=$invalid.to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.1'}
+      $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-current-upgrade-')}
+      if(-not$rejected){throw "4.3 current mode accepted $($invalid.kind): $target"}
+      $mir43Assertions++
+    }
+    $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion "4.3.${code}00" -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir42-upgrade-predecessor-version]')}
+    if(-not$rejected){throw "4.3 predecessor custody was inferred without a published reader: $target"}
+    $mir43Assertions++
+  }
+}
+foreach($target in @('f017','f016','f015','f014','f013')){
+  $code=$target.Substring(1)
+  $wrong=@{Target=$target;FromVersion="4.2.${code}02";ToVersion="4.3.${code}00";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.0'}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrong}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
+  if(-not$rejected){throw "4.3 historical target accepted a modern fixture: $target"}
+  $mir43Assertions++
+}
+foreach($case in $historicalCases){
+  foreach($sourceVersion in @('4.3.0','4.3.1')){
+    $to='4.3.'+$case.code+([version]$sourceVersion).Build.ToString('00')
+    $resolved=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion ('4.2.'+$case.code+'02') -ToVersion $to
+    if($resolved.target-cne$to-or$resolved.predecessor_kind-cne'same-target-maintenance'){
+      throw "4.3 historical cross-minor transition binding differs: $($case.code)/$sourceVersion"
+    }
+    $mir43Assertions++
+  }
+}
+foreach($sourceVersion in @('4.3.0','4.3.1')){
+  foreach($target in $allUpgradeTargets){
+    $isHistorical=$target-cin@('f017','f016','f015','f014','f013')
+    $SourceVersion=$sourceVersion;$SpaceIsFake=$false;$k2Scenario=$false
+    $mir42UpgradeSpecialized=-not$isHistorical;$isHistoricalTerminalFixture=$isHistorical;$Archetype='base-default'
+    if(-not(& $completeCatalogueEvaluator)){throw "4.3 complete-catalogue gate is absent for $target/$sourceVersion"}
+    $mir43Assertions++
+  }
+}
+# Fixture versions must distinguish every 4.2 predecessor and destination
+# patch, without modifying the checked-in templates.
+$mir43FixtureRoot=Join-Path $RepoRoot ('build/tmp/mir43-upgrade-fixture-identities-'+[Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force -Path $mir43FixtureRoot|Out-Null
+foreach($sourceVersion in @('4.3.0','4.3.1')){
+  foreach($target in @('f210','f200','f110','f100')){
+    $code=$target.Substring(1)
+    foreach($oldPatch in 0..2){
+      $fixtureRoot=Join-Path $mir43FixtureRoot ('mir43-modern-'+$target+'-'+$sourceVersion.Replace('.','-')+'-'+$oldPatch)
+      $fixtureName='assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'
+      Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$fixtureName)) -Destination $fixtureRoot -Recurse
+      Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion $sourceVersion -FromVersion ('4.2.'+$code+$oldPatch.ToString('00'))
+      $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+      $expected='0.1.'+(40+3*([version]$sourceVersion).Build+$oldPatch)
+      if($info.version-cne$expected){throw "4.3 modern fixture identity collision: $target/$sourceVersion/$oldPatch"}
+      $mir43Assertions++
+    }
+  }
+  foreach($target in @('f017','f016','f015','f014','f013')){
+    $code=$target.Substring(1)
+    foreach($oldPatch in 0..2){
+      $fixtureRoot=Join-Path $mir43FixtureRoot ('mir43-historical-'+$target+'-'+$sourceVersion.Replace('.','-')+'-'+$oldPatch)
+      Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-historical-terminal-to-mir42') -Destination $fixtureRoot -Recurse
+      $from='4.2.'+$code+$oldPatch.ToString('00')
+      $infoPath=Join-Path $fixtureRoot 'info.json'
+      $infoText=Get-Content -LiteralPath $infoPath -Raw
+      [IO.File]::WriteAllText($infoPath,$infoText.Replace('@@FACTORIO_LINE@@',('0.'+[int]$code)).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$from),[Text.UTF8Encoding]::new($false))
+      Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion $sourceVersion -FromVersion $from
+      $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+      $expected='1.0.'+(20+3*([version]$sourceVersion).Build+$oldPatch)
+      if($info.version-cne$expected){throw "4.3 historical fixture identity collision: $target/$sourceVersion/$oldPatch"}
+      $mir43Assertions++
+    }
+  }
+}
+$f200Mir43Oracle=Join-Path $mir43FixtureRoot 'mir43-f200-full-state-oracle'
+New-Item -ItemType Directory -Force -Path $f200Mir43Oracle|Out-Null
+Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Mir43Oracle -FromVersion '4.2.20002' -ToVersion '4.3.20000'
+$f200Mir43Control=Get-Content -LiteralPath (Join-Path $f200Mir43Oracle 'control.lua') -Raw
+if($f200Mir43Control.Contains('reviewed_420_frontier')){throw '4.3 F200 full-state oracle retained a 4.2-only definition-delta allowance'}
+$mir43Assertions++
+$rejected=$false;try{Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Mir43Oracle -FromVersion '4.3.20000' -ToVersion '4.3.20001'}catch{$rejected=$_.Exception.Message-ceq'[mir422-f200-complete-oracle-transition]'}
+if(-not$rejected){throw '4.3 F200 full-state oracle inferred an unreviewed 4.3 predecessor'}
+$mir43Assertions++
+Remove-Item -LiteralPath $mir43FixtureRoot -Recurse -Force
+# The matrix has a single current-destination route with exact argument
+# propagation and demands both reload receipts for it.
+$matrixTokens=$null;$matrixErrors=$null
+$matrixAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgradeMatrix.ps1'),[ref]$matrixTokens,[ref]$matrixErrors)
+if($matrixErrors.Count){throw 'Upgrade matrix syntax error'}
+$matrixText=$matrixAst.Extent.Text
+foreach($needle in @('$SourceMaterializationPath','$SelectedTarget','$SourceVersion','$PublishedMaintenancePredecessorManifestPath','$arguments.SourceMaterializationPath=$SourceMaterializationPath','$arguments.SelectedTarget=$SelectedTarget','$arguments.SourceVersion=$SourceVersion','$arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath','($currentDestination -or $FixtureName')){
+  if(-not$matrixText.Contains($needle)){throw "4.3 upgrade matrix lost current destination control: $needle"}
+  $mir43Assertions++
+}
+
+[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

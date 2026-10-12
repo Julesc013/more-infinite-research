@@ -123,13 +123,29 @@ function Get-MIR4TargetMaterializationBindings {
   }
 }
 
+function Resolve-MIR4CurrentPackageMetadataSourceVersion {
+  param([Parameter(Mandatory)][string]$SourceVersion)
+
+  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')
+  if ($SourceVersion -cnotin $admitted -or $SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$') {
+    throw '[mir4-current-package-metadata-source-version]'
+  }
+  return [pscustomobject][ordered]@{
+    source_version = $SourceVersion
+    source_minor = [int]$Matches.minor
+    source_patch = [int]$Matches.patch
+  }
+}
+
 function Get-MIR4PrivatePatchPackageReadmeBytes {
   [CmdletBinding()]
   param([Parameter(Mandatory)][byte[]]$ReadmeBytes,[Parameter(Mandatory)][string]$DistributionVersion,
-    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.1')
-  if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+    [string]$SourceVersion = '4.2.1')
+  $source = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion $SourceVersion
+  if ($DistributionVersion -cnotmatch '^4[.][0-9]{1,5}[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
   $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
-  if ([int]$decoded.source_patch -ne [int]($SourceVersion.Split('.')[2])) { throw '[mir4-private-patch-package-source-patch]' }
+  $expected = New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$decoded.distribution_target_code) -SourceMinor $source.source_minor -SourcePatch $source.source_patch
+  if ($DistributionVersion -cne [string]$expected.distribution_version) { throw '[mir4-private-patch-package-source-identity]' }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $readme = $utf8.GetString($ReadmeBytes).Replace("`r`n", "`n")
   # Package bytes identify their source. Qualification belongs to the external
@@ -144,16 +160,18 @@ function Write-MIR4PrivatePatchPackageIdentity {
   param(
     [Parameter(Mandatory)][string]$Tree,
     [Parameter(Mandatory)][string]$DistributionVersion,
-    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.1'
+    [string]$SourceVersion = '4.2.1'
   )
 
-  if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+  $source = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion $SourceVersion
+  if ($DistributionVersion -cnotmatch '^4[.][0-9]{1,5}[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
   $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
-  if ([int]$decoded.source_patch -ne [int]($SourceVersion.Split('.')[2])) { throw '[mir4-private-patch-package-source-patch]' }
+  $expected = New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$decoded.distribution_target_code) -SourceMinor $source.source_minor -SourcePatch $source.source_patch
+  if ($DistributionVersion -cne [string]$expected.distribution_version) { throw '[mir4-private-patch-package-source-identity]' }
   $targetLines = @{ '210'='2.1'; '200'='2.0'; '110'='1.1'; '100'='1.0'; '017'='0.17'; '016'='0.16'; '015'='0.15'; '014'='0.14'; '013'='0.13' }
   $targetCode = [string]$decoded.distribution_target_code
   if (-not $targetLines.ContainsKey($targetCode)) { throw '[mir4-private-patch-package-target]' }
-  $baseline = New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetCode -SourceMinor 2 -SourcePatch 0
+  $baseline = New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetCode -SourceMinor $source.source_minor -SourcePatch 0
   $infoPath = Join-Path $Tree 'info.json'
   $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json -Depth 20 -DateKind String
   if ([string]$info.name -cne 'more-infinite-research' -or
@@ -238,7 +256,7 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3')) {
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output

@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0155",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Sieve research routes that cannot win and reuse private witness graphs without expanded copies.",
+  "details": [
+    "Before recursive feasibility, reject a disabled producer only when every declared outer unlocker has a complete reachable gate lower bound already defeated by an established route. Preserve prerequisite then science filtering, ties and explicit uncomputed totals.",
+    "Walk shared witness nodes once per query. Memo-owned graphs may be borrowed only by the exact compiler route state or privately registered isolated failure probes. Public, custom and diagnostic calls retain graph copies and mutation isolation.",
+    "Retire isolated failure-probe witness results after each proof while retaining completed immutable catalogs. Preserve source epochs, active ancestry, surfaces, temperatures, machine and energy requirements, and contextual research callbacks.",
+    "Source controls pass: 2216 researchability, 25 sieve, 26 graph, 18 memo and 5 public-service assertions under Lua 5.2. One private F200 Galore create diagnostic completed in 16.16s at 429MiB peak working set; ordinary menu, paired repeats, full incident and release qualification remain pending."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance",
+    "diagnostics"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/Test-MIRRouteConstructionSieve.ps1; tests/compiler/Test-MIRWitnessGraphTraversal.ps1; tests/compiler/Test-MIRWitnessMemoIsolation.ps1"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/researchability_planning.lua: SIEVE end-to-end opposing controls"
+    }
+  ]
+}

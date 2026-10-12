@@ -6,6 +6,8 @@ $script:MIR42HistoricalCandidateTargets = @('f017', 'f016', 'f015', 'f014', 'f01
 $script:MIR42NineTargetCandidateOrder = @($script:MIR42CanonicalCandidateTargets + $script:MIR42HistoricalCandidateTargets)
 $script:MIR42CanonicalCandidateLines = [ordered]@{ f210 = '2.1'; f200 = '2.0'; f110 = '1.1'; f100 = '1.0' }
 $script:MIR42HistoricalCandidateLines = [ordered]@{ f017 = '0.17'; f016 = '0.16'; f015 = '0.15'; f014 = '0.14'; f013 = '0.13' }
+$script:MIR42CandidateSourceVersions = @('4.2.0', '4.2.1', '4.2.2', '4.2.3', '4.3.0', '4.3.1')
+$script:MIR42MaintenanceCandidateSourceVersions = @('4.2.1', '4.2.2', '4.2.3', '4.3.0', '4.3.1')
 if (-not (Get-Command Test-MIR4BootstrapRecordHash -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir42CandidateBuildRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 }
@@ -192,24 +194,41 @@ function Assert-MIR42HistoricalCandidateTargetRecord {
   }
 }
 
+function Get-MIR42CandidateManifestSchemaVersion {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)]
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')]
+    [string]$SourceVersion
+  )
+
+  switch ($SourceVersion) {
+    '4.2.0' { return 1 }
+    '4.2.1' { return 2 }
+    '4.2.2' { return 3 }
+    '4.2.3' { return 4 }
+    '4.3.0' { return 5 }
+    '4.3.1' { return 6 }
+  }
+}
+
 function Get-MIR42CandidateTargetDescriptors {
   <#
     The existing canonical materializer owns the modern four targets.  Historical
     targets are composed through their bounded target records and historical
     materializer.  This selector is deliberately narrow: a release candidate is
     either the established modern four or the ordered nine-target candidate.
-    Maintenance construction from 4.2.1 through 4.2.3 requires all nine
-    targets.
+    Maintenance construction requires all nine targets.
   #>
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [string[]]$SelectedTargets = $script:MIR42CanonicalCandidateTargets,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0'
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0'
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  if ($SourceVersion -cin @('4.2.1','4.2.2','4.2.3') -and -not $PSBoundParameters.ContainsKey('SelectedTargets')) {
+  if ($SourceVersion -cin $script:MIR42MaintenanceCandidateSourceVersions -and -not $PSBoundParameters.ContainsKey('SelectedTargets')) {
     $SelectedTargets = $script:MIR42NineTargetCandidateOrder
   }
   $selected = @($SelectedTargets | ForEach-Object { ([string]$_).Trim().ToLowerInvariant() })
@@ -221,7 +240,7 @@ function Get-MIR42CandidateTargetDescriptors {
   }
   $canonicalSelection = ($selected -join '|') -ceq ($script:MIR42CanonicalCandidateTargets -join '|')
   $nineSelection = ($selected -join '|') -ceq ($script:MIR42NineTargetCandidateOrder -join '|')
-  if ((-not $canonicalSelection -and -not $nineSelection) -or ($SourceVersion -cin @('4.2.1','4.2.2','4.2.3') -and -not $nineSelection)) {
+  if ((-not $canonicalSelection -and -not $nineSelection) -or ($SourceVersion -cin $script:MIR42MaintenanceCandidateSourceVersions -and -not $nineSelection)) {
     throw '[mir42-candidate-target-selection-unsupported]'
   }
 
@@ -259,7 +278,7 @@ function Get-MIR42CandidateTargetDescriptors {
     }
     $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100 -DateKind String
     Assert-MIR42HistoricalCandidateTargetRecord -Target $target -Record $record
-    $identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch ([int]($SourceVersion.Split('.')[2]))
+    $identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]($SourceVersion.Split('.')[1])) -SourcePatch ([int]($SourceVersion.Split('.')[2]))
     $descriptors.Add([pscustomobject][ordered]@{
       target = $target
       target_id = "factorio-$([string]$record.factorio_line)"
@@ -402,10 +421,10 @@ function Write-MIR42FourTargetManifest {
   }
   $scope = if ($targetCount -eq 4) { 'four-target' } else { 'nine-target' }
   $sourceVersions = @($Preflight.target_authority.source_version | Sort-Object -Unique)
-  if ($sourceVersions.Count -ne 1 -or $sourceVersions[0] -notin @('4.2.0','4.2.1','4.2.2','4.2.3')) {
+  if ($sourceVersions.Count -ne 1 -or $sourceVersions[0] -notin $script:MIR42CandidateSourceVersions) {
     throw '[mir42-candidate-manifest-source-version]'
   }
-  $manifestVersion = [int]$sourceVersions[0].Split('.')[2] + 1
+  $manifestVersion = Get-MIR42CandidateManifestSchemaVersion -SourceVersion $sourceVersions[0]
   $complete = $Failures.Count -eq 0 -and $Rows.Count -eq $targetCount
   $manifest = [pscustomobject][ordered]@{
     schema = $manifestVersion
@@ -456,7 +475,7 @@ function New-MIR42FourTargetCandidate {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-fA-F]{40}$')][string]$FinalSourceCommit,
     [Parameter(Mandatory)][ValidatePattern('^[A-Z0-9][A-Z0-9.-]{0,47}$')][string]$BuildId,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0',
     [string[]]$SelectedTargets = $script:MIR42CanonicalCandidateTargets,
     [string]$OutputRoot,
     [ValidateRange(1, 9223372036854775807)][Int64]$MinimumFreeMemoryBytes = 1GB,
@@ -464,7 +483,7 @@ function New-MIR42FourTargetCandidate {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  if ($SourceVersion -cin @('4.2.1','4.2.2','4.2.3') -and -not $PSBoundParameters.ContainsKey('SelectedTargets')) {
+  if ($SourceVersion -cin $script:MIR42MaintenanceCandidateSourceVersions -and -not $PSBoundParameters.ContainsKey('SelectedTargets')) {
     $SelectedTargets = $script:MIR42NineTargetCandidateOrder
   }
   $descriptors = @(Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SelectedTargets $SelectedTargets -SourceVersion $SourceVersion)
@@ -490,7 +509,7 @@ function New-MIR42FourTargetCandidate {
   $identities = [ordered]@{}
   $expectedVersions = [ordered]@{}
   foreach ($target in $script:MIR42CanonicalCandidateTargets) {
-    $projected = New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch ([int]($SourceVersion.Split('.')[2]))
+    $projected = New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]($SourceVersion.Split('.')[1])) -SourcePatch ([int]($SourceVersion.Split('.')[2]))
     $expectedVersions[$target] = [string]$projected.distribution_version
   }
   foreach ($descriptor in $descriptors) {

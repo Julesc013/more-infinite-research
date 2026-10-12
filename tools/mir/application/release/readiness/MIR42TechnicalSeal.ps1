@@ -178,7 +178,7 @@ function Get-MIR42EngineEvidenceBindingContract {
   if ($PublishedMaintenance) {
     if ($scope -cne 'nine-target') { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $contract | Add-Member -NotePropertyName maintenance_source_version -NotePropertyValue ([string]$version.source_version)
     $contract.evidence_kind = 'MIR42NineTargetMaintenanceEvidenceReconciliationV1'
     $contract.evidence_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"
@@ -194,7 +194,7 @@ function Get-MIR42IndividualEngineEvidenceBindingContract {
   param([Parameter(Mandatory)]$Candidate,[switch]$PublishedMaintenance)
   if (-not $PublishedMaintenance) { throw '[mir42-individual-engine-run-maintenance-required]' }
   $contract = Get-MIR42EngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance
-  if ([string]$contract.maintenance_source_version -cne '4.2.3') {
+  if ([string]$contract.maintenance_source_version -cnotin @('4.2.3','4.3.0')) {
     throw '[mir42-individual-engine-run-source-version]'
   }
   $contract.engine_run_kind = 'MIR42NineTargetMaintenanceIndividualEngineRunV1'
@@ -1127,8 +1127,8 @@ function Assert-MIR42FreshEngineLoads {
     $logText = Get-Content -Raw -LiteralPath ([string]$fresh.log.path)
     $logModVersion = [string]$Target.distribution_version
     if ($targetId -in $script:MIR42SealHistoricalTargets) {
-      if ($logModVersion -notmatch '^4[.]2[.]([0-9]+)$') { throw "[mir42-seal-historical-distribution-version] $targetId" }
-      $logModVersion = '4.2.' + [int]$Matches[1]
+      if ($logModVersion -notmatch '^4[.](2|3)[.]([0-9]+)$') { throw "[mir42-seal-historical-distribution-version] $targetId" }
+      $logModVersion = '4.' + $Matches[1] + '.' + [int]$Matches[2]
     }
     if (-not $logText.Contains("Loading mod more-infinite-research $logModVersion ") -or
         -not $logText.Contains('Factorio initialised') -or -not $logText.Contains('Creating new map')) {
@@ -1602,7 +1602,8 @@ function Assert-MIR42IndividualUpgradeReceipt {
     snapshots = @($snapshots | ForEach-Object { [pscustomobject]@{stage=[string]$_.stage;path=[string]$_.path;sha256=[string]$_.sha256} })
   }
   $package = [pscustomobject]@{target=[string]$CandidateTarget.target;sha256=[string]$CandidateTarget.archive_sha256}
-  $null = Assert-MIR423NativeUpgradeProof -Row $upgradeRow -Package $package
+  $candidateSourceVersion = (Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance).maintenance_source_version
+  $null = Assert-MIR423NativeUpgradeProof -Row $upgradeRow -Package $package -CandidateSourceVersion $candidateSourceVersion
   $selectedCustody = [ordered]@{
     release_id = [int64]$PublishedMaintenanceInputs.release_id
     source_tag = [string]$PublishedMaintenanceInputs.source_tag
@@ -1739,7 +1740,7 @@ function Get-MIR42BoundIndividualEngineRun {
     }
     $freshTarget = [pscustomobject]@{
       target=$target
-      target_id=(Get-MIR42ReleaseTargetIdentity -RepoRoot $mir42SealRepoRoot -Target $target -SourceVersion '4.2.3').target_id
+      target_id=(Get-MIR42ReleaseTargetIdentity -RepoRoot $mir42SealRepoRoot -Target $target -SourceVersion $contract.maintenance_source_version).target_id
       distribution_version=[string]$candidateTarget.distribution_version
       archive=[pscustomobject]@{
         path=[string]$proof.native_candidate_archive.path

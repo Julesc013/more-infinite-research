@@ -6,7 +6,7 @@ param(
  [string]$LibraryDirectory='',
  [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
- [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1',
+ [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1',
  [switch]$Graphics,
  [ValidateSet('low','very-low')][string]$GraphicsPreset='low',
  [ValidateSet('None','Defaults','RawOptIn','ImportedOptIn','RawOptInImportedOff')][string]$DlcIconCase='None',
@@ -39,7 +39,9 @@ $run=$resources.root
 $activation=$null
 $candidate=''
 $targetKey=if($Target -ceq '2.0'){'f200'}else{'f210'}
-$expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor 2 -SourcePatch ([int]$SourceVersion.Split('.')[2])
+$sourceVersionParts=@($SourceVersion.Split('.'))
+if($sourceVersionParts.Count -ne 3){throw '[mir-browser-source-version]'}
+$expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor ([int]$sourceVersionParts[1]) -SourcePatch ([int]$sourceVersionParts[2])
 function Get-MIRBrowserIconCase([string]$Case) {
  switch -CaseSensitive ($Case) {
   'None' { return $null }
@@ -240,7 +242,7 @@ $capMutant=$coreTestSource.Replace($capAnchor,$capAnchor.Replace('finite_nonnega
 [void]$lua.AppendLine('local browser_core_positive_default_mutant=(function()')
 [void]$lua.AppendLine($capMutant)
 [void]$lua.AppendLine('end)()')
-$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source,browser_capability_sources); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check,browser_capability_sources.host_adapters.modern); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check,browser_capability_sources.host_adapters.game,true); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
+$coreChecks='check_omissions(check); check_browser_core_regressions(browser_core,check); check_browser_handler_regressions(browser_host_test_source,check,browser_catalogue_test_source,browser_capability_sources,browser_core); check_browser_discovery_regressions(browser_core,browser_catalogue,check,browser_host_test_source); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check,browser_capability_sources.host_adapters.modern); check_browser_production_regressions(browser_core,browser_catalogue,browser_host_test_source,check,browser_capability_sources.host_adapters.game,true); check_browser_native_discovery_regressions(browser_core,browser_catalogue,browser_native_discovery_source,browser_native_discovery_data_source,check); check(not pcall(check_browser_core_regressions,browser_core_positive_default_mutant,function(ok,message) assert(ok,message) end),"negative control detects positive-only default cap validation"); local force=game.forces.player'
 [void]$lua.AppendLine($browserTestText.Replace('local force=game.forces.player',$coreChecks))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 if($PrepareInputsOnly) {

@@ -72,7 +72,7 @@ function Get-MIRDirectLibraryStartupArchive {
     try {$info=$reader.ReadToEnd()|ConvertFrom-Json -AsHashtable} finally {$reader.Dispose()}
   } finally {$zip.Dispose()}
   Assert-MIRDirectLibraryStartupMeasurement ([string]$info.name -ceq 'more-infinite-research') 'archive-name'
-  Assert-MIRDirectLibraryStartupMeasurement ([string]$info.version -match '^4[.]2[.]\d{5}$') 'archive-version'
+  Assert-MIRDirectLibraryStartupMeasurement ([string]$info.version -match '^4[.][0-9]{1,5}[.]\d{5}$') 'archive-version'
   Assert-MIRDirectLibraryStartupMeasurement ([IO.Path]::GetFileName($path) -ceq ('more-infinite-research_'+[string]$info.version+'.zip')) 'archive-filename'
   [pscustomobject][ordered]@{path=$path;name=[string]$info.name;version=[string]$info.version;sha256=Get-MIRImmutableInputSha256 -Path $path}
 }
@@ -318,12 +318,18 @@ function Invoke-MIRDirectLibraryStartupSample {
   param(
     [Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$EngineDataDirectory,
     [Parameter(Mandatory)][object[]]$BaseRows,[Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][string]$WriteDataRoot,[Parameter(Mandatory)][string]$Label,
-    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,3600)][int]$TimeoutSeconds=300,[string]$ActiveModsObserver=''
+    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,3600)][int]$TimeoutSeconds=300,[string]$ActiveModsObserver='',
+    [uint32]$MapGenerationSeed=400200
   )
   [IO.Directory]::CreateDirectory($RunRoot)|Out-Null
   [IO.Directory]::CreateDirectory($WriteDataRoot)|Out-Null
   $profile=Join-Path $RunRoot 'selection.json';$config=Join-Path $RunRoot 'config.ini';$log=Join-Path $RunRoot 'factorio.log';$saveDirectory=Join-Path $RunRoot 'saves';$save=Join-Path $saveDirectory 'startup-ready.zip';$engineLog=Join-Path $WriteDataRoot 'factorio-current.log'
   [IO.Directory]::CreateDirectory($saveDirectory)|Out-Null
+  # Map creation is a separate diagnostic endpoint. Bind its random input so
+  # map allocation and saving do not add uncontrolled variation between arms.
+  $mapGenerationPath=Join-Path $RunRoot 'map-gen-settings.json'
+  [IO.File]::WriteAllText($mapGenerationPath,(@{seed=$MapGenerationSeed}|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+  $mapGenerationSha=Get-MIRImmutableInputSha256 -Path $mapGenerationPath
   Write-MIRDirectLibraryStartupProfile -Path $profile -BaseRows $BaseRows -MirArchive $MirArchive
   # The first sample and immediate warm-repeat samples for one selected
   # configuration share this private write-data root. Per-sample logs and
@@ -340,11 +346,12 @@ function Invoke-MIRDirectLibraryStartupSample {
     # repeat. The engine log is not: remove only this owned previous log so
     # every snapshot has a native invocation boundary from this run.
     if(Test-Path -LiteralPath $engineLog){Remove-Item -LiteralPath $engineLog -Force}
-    $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio','--create',$save)
+    $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio','--map-gen-settings',$mapGenerationPath,'--create',$save)
     Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $FactorioBin -Arguments $arguments
     $native=Invoke-MIRNativeProbeFactorioProcess -Context $Resources -FilePath $FactorioBin -Arguments $arguments -TimeoutSeconds $TimeoutSeconds
     Assert-MIRDirectLibraryStartupMeasurement ($native.result.passed -and -not $native.result.timed_out -and $native.result.exit_code -eq 0) 'process-exit'
     Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $save -PathType Leaf) 'ready-save'
+    Assert-MIRDirectLibraryStartupMeasurement ((Get-MIRImmutableInputSha256 -Path $mapGenerationPath)-ceq$mapGenerationSha) 'map-generation-input-changed'
     # Factorio 2.0 writes its actual current log beneath write-data. Snapshot
     # it after process exit so the per-sample evidence survives the warm run.
     Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $engineLog -PathType Leaf) 'engine-current-log'
@@ -364,7 +371,7 @@ function Invoke-MIRDirectLibraryStartupSample {
     }
     $loaded=@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation -ActiveModsObserver $ActiveModsObserver)
     $initialised=[regex]::Matches($logText,'(?m)^\s*(?<seconds>\d+[.]\d+) Factorio initialised\s*$')|Select-Object -Last 1
-    [pscustomobject][ordered]@{label=$Label;run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot).Replace('\','/');elapsed_seconds=[double]$native.result.duration_seconds;engine_log_initialised_seconds=[double]::Parse($initialised.Groups['seconds'].Value,[Globalization.CultureInfo]::InvariantCulture);exit_code=$native.result.exit_code;endpoint_class='headless-create-diagnostic';ready_endpoint='Factorio --create exits successfully after the actual current log records initialisation and map creation, with one initial map-data entry in the new save ZIP';ready_save=[IO.Path]::GetRelativePath($RunRoot,$save).Replace('\','/');ready_save_map_entry=$mapEntry;loaded_selection=$loaded;active_mods_observer=$observerIdentity;process_memory=[ordered]@{peak_working_set_bytes=[int64]$native.result.peak_working_set_bytes;peak_sampled_private_bytes=[int64]$native.result.peak_sampled_private_bytes;measurement='NativeProbeResources monitored process tree; values are not whole-system memory'};resource_ledger=[IO.Path]::GetRelativePath($Resources.root,$native.ledger).Replace('\','/');log=[IO.Path]::GetRelativePath($RunRoot,$log).Replace('\','/');engine_current_log=[IO.Path]::GetRelativePath($Resources.root,$engineLog).Replace('\','/')}
+    [pscustomobject][ordered]@{label=$Label;run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot).Replace('\','/');elapsed_seconds=[double]$native.result.duration_seconds;engine_log_initialised_seconds=[double]::Parse($initialised.Groups['seconds'].Value,[Globalization.CultureInfo]::InvariantCulture);exit_code=$native.result.exit_code;endpoint_class='headless-create-diagnostic';ready_endpoint='Factorio --create exits successfully after the actual current log records initialisation and map creation, with one initial map-data entry in the new save ZIP';ready_save=[IO.Path]::GetRelativePath($RunRoot,$save).Replace('\','/');ready_save_map_entry=$mapEntry;map_generation=[ordered]@{seed=$MapGenerationSeed;path=[IO.Path]::GetRelativePath($Resources.root,$mapGenerationPath).Replace('\','/');sha256=$mapGenerationSha};loaded_selection=$loaded;active_mods_observer=$observerIdentity;process_memory=[ordered]@{peak_working_set_bytes=[int64]$native.result.peak_working_set_bytes;peak_sampled_private_bytes=[int64]$native.result.peak_sampled_private_bytes;measurement='NativeProbeResources monitored process tree; values are not whole-system memory'};resource_ledger=[IO.Path]::GetRelativePath($Resources.root,$native.ledger).Replace('\','/');log=[IO.Path]::GetRelativePath($RunRoot,$log).Replace('\','/');engine_current_log=[IO.Path]::GetRelativePath($Resources.root,$engineLog).Replace('\','/')}
   } finally {
     if($null -ne $activation -and -not $activation.closed){Complete-MIRLibraryActivation -Activation $activation|Out-Null}
   }
@@ -374,12 +381,16 @@ function Invoke-MIRDirectLibraryPlayerReadyPreparation {
   param(
     [Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$EngineDataDirectory,
     [Parameter(Mandatory)][object[]]$BaseRows,[Parameter(Mandatory)][string]$PreparationRoot,[Parameter(Mandatory)][string]$WriteDataRoot,[Parameter(Mandatory)][string]$Label,
-    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,3600)][int]$TimeoutSeconds=300,[Parameter(Mandatory)][string]$ActiveModsObserver,[Parameter(Mandatory)]$PlayerReadyObserver
+    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,3600)][int]$TimeoutSeconds=300,[Parameter(Mandatory)][string]$ActiveModsObserver,[Parameter(Mandatory)]$PlayerReadyObserver,
+    [uint32]$MapGenerationSeed=400200
   )
   [IO.Directory]::CreateDirectory($PreparationRoot)|Out-Null
   [IO.Directory]::CreateDirectory($WriteDataRoot)|Out-Null
   $profile=Join-Path $PreparationRoot 'selection.json';$config=Join-Path $PreparationRoot 'config.ini';$saveDirectory=Join-Path $PreparationRoot 'saves';$save=Join-Path $saveDirectory 'neutral-player-ready.zip';$engineLog=Join-Path $WriteDataRoot 'factorio-current.log';$log=Join-Path $PreparationRoot 'factorio.log'
   [IO.Directory]::CreateDirectory($saveDirectory)|Out-Null
+  $mapGenerationPath=Join-Path $PreparationRoot 'map-gen-settings.json'
+  [IO.File]::WriteAllText($mapGenerationPath,(@{seed=$MapGenerationSeed}|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+  $mapGenerationSha=Get-MIRImmutableInputSha256 -Path $mapGenerationPath
   Write-MIRDirectLibraryStartupProfile -Path $profile -BaseRows $BaseRows -MirArchive $MirArchive
   New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $EngineDataDirectory -WriteDataDirectory $WriteDataRoot
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory -BaseRows $BaseRows -MirArchive $MirArchive
@@ -389,11 +400,12 @@ function Invoke-MIRDirectLibraryPlayerReadyPreparation {
     Add-MIRNativeProbeLibraryActivation -Context $Resources -Activation $activation
     Assert-MIRDirectLibraryStartupMeasurement (-not(Test-Path -LiteralPath $save)) 'player-ready-preparation-save-preexisting'
     if(Test-Path -LiteralPath $engineLog){Remove-Item -LiteralPath $engineLog -Force}
-    $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio','--create',$save)
+    $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio','--map-gen-settings',$mapGenerationPath,'--create',$save)
     Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $FactorioBin -Arguments $arguments
     $native=Invoke-MIRNativeProbeFactorioProcess -Context $Resources -FilePath $FactorioBin -Arguments $arguments -TimeoutSeconds $TimeoutSeconds
     Assert-MIRDirectLibraryStartupMeasurement ($native.result.passed -and -not $native.result.timed_out -and $native.result.exit_code -eq 0) 'player-ready-preparation-process-exit'
     Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $save -PathType Leaf) 'player-ready-preparation-save'
+    Assert-MIRDirectLibraryStartupMeasurement ((Get-MIRImmutableInputSha256 -Path $mapGenerationPath)-ceq$mapGenerationSha) 'player-ready-map-generation-input-changed'
     Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $engineLog -PathType Leaf) 'player-ready-preparation-log'
     [IO.File]::Copy($engineLog,$log,$true)
     $logText=Get-Content -Raw -LiteralPath $log
@@ -401,7 +413,7 @@ function Invoke-MIRDirectLibraryPlayerReadyPreparation {
     $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation -ActiveModsObserver $ActiveModsObserver -ActiveModsObserverScript control.lua
     $zip=[IO.Compression.ZipFile]::OpenRead($save)
     try {$entries=@($zip.Entries|Where-Object {$_.FullName -match '(^|/)level(?:-init)?[.]dat$'});Assert-MIRDirectLibraryStartupMeasurement ($entries.Count -eq 1) 'player-ready-preparation-map-data'}finally{$zip.Dispose()}
-    [pscustomobject][ordered]@{label=$Label;scenario=[string]$PlayerReadyObserver.scenario;prepared_save=[IO.Path]::GetRelativePath($Resources.root,$save).Replace('\','/');prepared_save_sha256=Get-MIRImmutableInputSha256 -Path $save;preparation_log=[IO.Path]::GetRelativePath($Resources.root,$log).Replace('\','/');resource_ledger=[IO.Path]::GetRelativePath($Resources.root,$native.ledger).Replace('\','/');measurement='preparation only; the native --create process is not a startup sample and contributes no elapsed value to comparison samples'}
+    [pscustomobject][ordered]@{label=$Label;scenario=[string]$PlayerReadyObserver.scenario;prepared_save=[IO.Path]::GetRelativePath($Resources.root,$save).Replace('\','/');prepared_save_sha256=Get-MIRImmutableInputSha256 -Path $save;map_generation=[ordered]@{seed=$MapGenerationSeed;path=[IO.Path]::GetRelativePath($Resources.root,$mapGenerationPath).Replace('\','/');sha256=$mapGenerationSha};preparation_log=[IO.Path]::GetRelativePath($Resources.root,$log).Replace('\','/');resource_ledger=[IO.Path]::GetRelativePath($Resources.root,$native.ledger).Replace('\','/');measurement='preparation only; the native --create process is not a startup sample and contributes no elapsed value to comparison samples'}
   } finally {
     if($null -ne $activation -and -not $activation.closed){Complete-MIRLibraryActivation -Activation $activation|Out-Null}
   }
@@ -532,7 +544,9 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
   param(
     [Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$ProfileTemplatePath,
     [Parameter(Mandatory)][string]$Published422Archive,[Parameter(Mandatory)][string]$Published422ManifestPath,[Parameter(Mandatory)][string]$Published422ManifestSha256,
-    [string]$CandidateArchive='',[string]$CandidateMaterializationArchive='',[string]$CandidateMaterializationReceiptPath='',[switch]$Preliminary,[Parameter(Mandatory)][string]$OutputRoot,
+    [string]$CandidateArchive='',[string]$CandidateMaterializationArchive='',[string]$CandidateMaterializationReceiptPath='',
+    [ValidateSet('4.2.3','4.3.0','4.3.1')][string]$StartupCandidateSourceVersion='4.2.3',
+    [switch]$Preliminary,[Parameter(Mandatory)][string]$OutputRoot,
     [ValidateSet('f200','f210')][string]$Target='f200',[ValidateRange(0,5)][int]$WarmupRuns=1,[ValidateRange(1,25)][int]$MeasuredRuns=3,[ValidateRange(1,3600)][int]$TimeoutSeconds=300,
     [Parameter(Mandatory)][ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB,[ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,[ValidateRange(0,300)][int]$AdmissionWaitSeconds=0,
     [Parameter(Mandatory)][ValidatePattern('^[0-9A-Fa-f]{40}$')][string]$SourceCommit,[string]$ActiveModsObserver='',
@@ -551,6 +565,9 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
   $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $data
   $published=Get-MIRDirectLibraryStartupArchive -Archive $Published422Archive -LibraryDirectory $library;$code=$Target.Substring(1)
   Assert-MIRDirectLibraryStartupMeasurement ($published.version -ceq "4.2.${code}02") 'published-identity'
+  $seedTarget=if($Target-ceq'f200'){'2.0'}else{'2.1'}
+  $seedProfile=Get-Content -LiteralPath (Join-Path $repo ('validation/profiles/factorio-'+$seedTarget+'.json')) -Raw|ConvertFrom-Json
+  $mapGenerationSeed=[uint32]$seedProfile.deterministic_seed
   $publishedManifest=Assert-MIRDirectLibraryPublished422Manifest -ManifestPath $Published422ManifestPath -ExpectedSha256 $Published422ManifestSha256 -PublishedArchive $published -Target $Target
   $hasCandidate=-not [string]::IsNullOrWhiteSpace($CandidateArchive)
   Assert-MIRDirectLibraryStartupMeasurement (($hasCandidate -and -not $Preliminary) -or (-not $hasCandidate -and $Preliminary)) 'candidate-mode'
@@ -560,12 +577,16 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
   if($hasCandidate){
     Assert-MIRDirectLibraryStartupMeasurement (-not [string]::IsNullOrWhiteSpace($CandidateMaterializationArchive) -and -not [string]::IsNullOrWhiteSpace($CandidateMaterializationReceiptPath)) 'candidate-materialization-inputs'
     # NativeProbeResources owns receipt validation but deliberately does not
-    # load the package materializer at module import time. The matched
-    # candidate path needs that authoritative reader and its dependencies.
+    # load package identity authority at module import time. Load both the
+    # canonical identity reader and the materializer before resolving the
+    # selected candidate, so a preloaded partial package API cannot omit the
+    # identity resolver used by this caller.
+    . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
     . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+    $candidateIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $Target -SourceVersion $StartupCandidateSourceVersion
     $candidate=Get-MIRDirectLibraryStartupArchive -Archive $CandidateArchive -LibraryDirectory $library
-    Assert-MIRDirectLibraryStartupMeasurement ($candidate.version -ceq "4.2.${code}03") 'candidate-identity'
-    $candidateMaterialization=Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateMaterializationArchive -ReceiptPath $CandidateMaterializationReceiptPath -Target $Target -SourceVersion '4.2.3'
+    Assert-MIRDirectLibraryStartupMeasurement ($candidate.version -ceq [string]$candidateIdentity.distribution_version) 'candidate-identity'
+    $candidateMaterialization=Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateMaterializationArchive -ReceiptPath $CandidateMaterializationReceiptPath -Target $Target -SourceVersion $StartupCandidateSourceVersion
     Assert-MIRDirectLibraryStartupMeasurement ([string]$candidateMaterialization.receipt.archive_sha256 -ceq [string]$candidate.sha256) 'candidate-materialization-archive'
   }
   $base=Read-MIRDirectLibraryStartupProfile -Path $template
@@ -592,12 +613,12 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
     $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
     [IO.Directory]::CreateDirectory($resources.root)|Out-Null;$records=[Collections.Generic.List[object]]::new();$preparations=[Collections.Generic.List[object]]::new()
     $kinds=@([pscustomobject]@{label='without-mir';archive=$null},[pscustomobject]@{label='released-4.2.2';archive=$published})
-    if($hasCandidate){$kinds+=,[pscustomobject]@{label='candidate-4.2.3';archive=$candidate}}
+    if($hasCandidate){$kinds+=,[pscustomobject]@{label=('candidate-'+$StartupCandidateSourceVersion);archive=$candidate}}
     if($GraphicalPlayerReady){
       foreach($kind in $kinds){
         $currentLabel=[string]$kind.label
         $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy $resources.policy -WorkRoot $resources.root -EstimatedPeakBytes (Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -ExpectedPeakMemoryBytes $resources.peak_memory_bytes -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase ('preparation:'+[string]$kind.label)))
-        $preparation=Invoke-MIRDirectLibraryPlayerReadyPreparation -FactorioBin $engine -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -PreparationRoot (Join-Path $resources.root ('preparations/'+$kind.label)) -WriteDataRoot (Join-Path $resources.root ('write-data/'+$kind.label)) -Label $kind.label -Resources $resources -MirArchive $kind.archive -TimeoutSeconds $TimeoutSeconds -ActiveModsObserver $selectedActiveModsObserver -PlayerReadyObserver $playerReadyObserver
+        $preparation=Invoke-MIRDirectLibraryPlayerReadyPreparation -FactorioBin $engine -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -PreparationRoot (Join-Path $resources.root ('preparations/'+$kind.label)) -WriteDataRoot (Join-Path $resources.root ('write-data/'+$kind.label)) -Label $kind.label -Resources $resources -MirArchive $kind.archive -TimeoutSeconds $TimeoutSeconds -ActiveModsObserver $selectedActiveModsObserver -MapGenerationSeed $mapGenerationSeed -PlayerReadyObserver $playerReadyObserver
         $preparations.Add($preparation);$preparedSaves[[string]$kind.label]=Join-Path $resources.root ([string]$preparation.prepared_save)
       }
     }
@@ -630,7 +651,7 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
         } elseif($OrdinaryMenu) {
           $record=Invoke-MIRDirectLibraryOrdinaryWindowSample -FactorioBin $engine -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot $runRoot -WriteDataRoot $writeDataRoot -Label $kind.label -Resources $resources -MirArchive $kind.archive -TimeoutSeconds $TimeoutSeconds -OrdinaryPlayerConfig $ordinaryPlayerConfig -ActiveModsObserver $selectedActiveModsObserver
         } else {
-          $record=Invoke-MIRDirectLibraryStartupSample -FactorioBin $engine -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot $runRoot -WriteDataRoot $writeDataRoot -Label $kind.label -Resources $resources -MirArchive $kind.archive -TimeoutSeconds $TimeoutSeconds -ActiveModsObserver $selectedActiveModsObserver
+          $record=Invoke-MIRDirectLibraryStartupSample -FactorioBin $engine -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot $runRoot -WriteDataRoot $writeDataRoot -Label $kind.label -Resources $resources -MirArchive $kind.archive -TimeoutSeconds $TimeoutSeconds -ActiveModsObserver $selectedActiveModsObserver -MapGenerationSeed $mapGenerationSeed
         }
         $record|Add-Member -NotePropertyName sample -NotePropertyValue $ordinal
         $record|Add-Member -NotePropertyName measurement_block -NotePropertyValue $block
@@ -645,7 +666,7 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
       $previousSelection=[string]$kind.label
     }
     }
-    $inputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate_423=$(if($hasCandidate){[ordered]@{archive=$candidate;materialization=[ordered]@{archive_path=$candidateMaterialization.path;archive_sha256=$candidateMaterialization.receipt.archive_sha256;receipt_path=$CandidateMaterializationReceiptPath;receipt_sha256=Get-MIRImmutableInputSha256 -Path $CandidateMaterializationReceiptPath;source_version=$candidateMaterialization.receipt.source_version;package_source_sha256=$candidateMaterialization.receipt.package_source_sha256;source_manifest_sha256=$candidateMaterialization.receipt.source_manifest_sha256}}}else{$null})}
+    $inputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate=$(if($hasCandidate){[ordered]@{source_version=$StartupCandidateSourceVersion;archive=$candidate;materialization=[ordered]@{archive_path=$candidateMaterialization.path;archive_sha256=$candidateMaterialization.receipt.archive_sha256;receipt_path=$CandidateMaterializationReceiptPath;receipt_sha256=Get-MIRImmutableInputSha256 -Path $CandidateMaterializationReceiptPath;source_version=$candidateMaterialization.receipt.source_version;package_source_sha256=$candidateMaterialization.receipt.package_source_sha256;source_manifest_sha256=$candidateMaterialization.receipt.source_manifest_sha256}}}else{$null})}
     $endpointClass=if($GraphicalPlayerReady){'graphical-player-ready-diagnostic'}elseif($OrdinaryMenu){'ordinary-native-window-diagnostic'}else{'headless-create-diagnostic'}
     $notes=@('Elapsed time is native process start-to-exit time recorded by NativeProbeResources.','Peak process values are monitored process-tree samples, not whole-system memory.','Each selected configuration retains one private write-data root across blocks; per-sample logs and saves stay isolated.','Each first sample records its actual prior selection and whether it changed; immediate repeats are marked warm-repeat.','All configurations use the same selected archive library serially; controls are restored after every sample.','Optional pre-launch admission waiting is recorded separately from every native startup elapsed time. It repeats only the existing physical-memory or commit admission check, retains only bounded first/last refusal snapshots, and never retries a governed sample after launch.')
     if($GraphicalPlayerReady){$notes+=@('Each configuration receives one neutral base-only observer save before samples. Preparation processes are recorded separately and are not startup samples.','Graphical process elapsed includes the bounded post-ready benchmark and exit. engine_log_player_ready_seconds is recorded separately from the Factorio log. This diagnostic is not a main-menu readiness or full-startup claim.')}
@@ -657,7 +678,7 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
     $admissionWaitFailure=$_.Exception.Data['mir_direct_startup_admission_wait']
     if($null-ne$admissionWaitFailure){$admissionWaits.Add($admissionWaitFailure)}
     if($null-ne$resources){
-      $failureInputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate_423=$(if($hasCandidate -and $null-ne$candidate){[ordered]@{archive=$candidate;materialization=$candidateMaterialization}}else{$null})}
+      $failureInputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate=$(if($hasCandidate -and $null-ne$candidate){[ordered]@{source_version=$StartupCandidateSourceVersion;archive=$candidate;materialization=$candidateMaterialization}}else{$null})}
       $failure=[pscustomobject][ordered]@{schema=1;kind='MIRDirectLibraryStartupMeasurementV1';status='failed';mode=$(if($hasCandidate){'matched-three-input'}else{'preliminary-two-input'});target=$Target;source_observation=$sourceObservation;factorio=$engineIdentity;library=$library;profile_template_sha256=$templateSha;inputs=$failureInputs;endpoint_class=$(if($GraphicalPlayerReady){'graphical-player-ready-diagnostic'}elseif($OrdinaryMenu){'ordinary-native-window-diagnostic'}else{'headless-create-diagnostic'});current_label=$currentLabel;preparations=$(if($null-ne$preparations){@($preparations)}else{@()});admission_wait_seconds=$AdmissionWaitSeconds;admission_waits=@($admissionWaits);samples_so_far=$(if($null-ne$records){@($records)}else{@()});error=$_.Exception.Message;library_controls_restored=(-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json')));resource_context=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;processes=@($resources.runs)}}
       $failure|Add-Member -NotePropertyName duration_measurement -NotePropertyValue $durationMeasurement
       try{Write-MIRNativeProbeResult -Context $resources -Record $failure}catch{Write-Warning "[mir-direct-startup-failure-receipt] $($_.Exception.Message)"}

@@ -202,7 +202,8 @@ function Read-MIR423UpgradeProofReference {
 }
 
 function Get-MIR423PublishedUpgradePredecessor {
-  param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$PredecessorSourceVersion)
+  param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$PredecessorSourceVersion,
+    [ValidateSet('4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.3')
   $sourcePatch=([version]$PredecessorSourceVersion).Build
   $contractVersion=switch($sourcePatch){
     0 {'4.2.1'}
@@ -222,68 +223,73 @@ function Get-MIR423PublishedUpgradePredecessor {
 }
 
 function Assert-MIR423NativeUpgradeProof {
-  param($Row,$Package)
+  param($Row,$Package,[ValidateSet('4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.3')
   $proof=Read-MIR423UpgradeProofReference $Row.receipt
   $r=$proof.record;$dir=Split-Path $proof.path
   $code=$Row.target.Substring(1);$patch=([version]$Row.predecessor_source_version).Build
-  $from='4.2.'+$code+$patch.ToString('00');$to='4.2.'+$code+'03'
-  if($patch-notin @(0,1,2)-or$r.schema-ne3-or$r.status-cne'passed'-or$r.factorio_processes-lt4-or$r.from.version-cne$from-or$r.to.version-cne$to-or$r.to.sha256-cne$Package.sha256){throw '[mir423-upgrade-native-binding]'}
-  $published=Get-MIR423PublishedUpgradePredecessor -Target $Row.target -PredecessorSourceVersion $Row.predecessor_source_version
-  if($r.from.sha256-cne$published.target.sha256-or$r.published_maintenance_predecessor.source_tag-cne$published.source_tag-or$r.published_maintenance_predecessor.manifest.sha256-cne$published.manifest.sha256){throw '[mir423-upgrade-published-predecessor]'}
-  foreach($a in @('exact-candidate-normal-mod-directory-load','upgraded-save-reload-passed','upgraded-save-second-reload-passed')){if($a-cnotin$r.assertions){throw '[mir423-upgrade-phase-skipped]'}}
-  if($r.resource_ledgers.Count-ne$r.factorio_processes){throw '[mir423-upgrade-process-ledgers]'}
+  $candidate=[version]$CandidateSourceVersion
+  $from='4.2.'+$code+$patch.ToString('00')
+  $to=(New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $candidate.Minor -SourcePatch $candidate.Build).distribution_version
+  $errorPrefix='mir'+$CandidateSourceVersion.Replace('.','')+'-upgrade'
+  if($patch-notin @(0,1,2)-or$r.schema-ne3-or$r.status-cne'passed'-or$r.factorio_processes-lt4-or$r.from.version-cne$from-or$r.to.version-cne$to-or$r.to.sha256-cne$Package.sha256){throw "[$errorPrefix-native-binding]"}
+  $published=Get-MIR423PublishedUpgradePredecessor -Target $Row.target -PredecessorSourceVersion $Row.predecessor_source_version -CandidateSourceVersion $CandidateSourceVersion
+  if($r.from.sha256-cne$published.target.sha256-or$r.published_maintenance_predecessor.source_tag-cne$published.source_tag-or$r.published_maintenance_predecessor.manifest.sha256-cne$published.manifest.sha256){throw "[$errorPrefix-published-predecessor]"}
+  foreach($a in @('exact-candidate-normal-mod-directory-load','upgraded-save-reload-passed','upgraded-save-second-reload-passed')){if($a-cnotin$r.assertions){throw "[$errorPrefix-phase-skipped]"}}
+  if($r.resource_ledgers.Count-ne$r.factorio_processes){throw "[$errorPrefix-process-ledgers]"}
   foreach($ledger in $r.resource_ledgers){
-    if([IO.Path]::GetFileName($ledger.filename)-cne$ledger.filename){throw '[mir423-upgrade-log-path]'}
-    $null=Resolve-MIR42SealImmutableFile -Path (Join-Path $dir $ledger.filename) -Sha256 $ledger.sha256 -Code 'mir423-upgrade-resource-ledger'
-    if($ledger.exit_code-ne0-and$ledger.completion_predicate_observed-cne$true){throw '[mir423-upgrade-process-failed]'}
+    if([IO.Path]::GetFileName($ledger.filename)-cne$ledger.filename){throw "[$errorPrefix-log-path]"}
+    $null=Resolve-MIR42SealImmutableFile -Path (Join-Path $dir $ledger.filename) -Sha256 $ledger.sha256 -Code ($errorPrefix+'-resource-ledger')
+    if($ledger.exit_code-ne0-and$ledger.completion_predicate_observed-cne$true){throw "[$errorPrefix-process-failed]"}
   }
   foreach($stage in @('create','load','reload','second_reload')){
-    $name=$r[$stage+'_log'];if([IO.Path]::GetFileName($name)-cne$name){throw '[mir423-upgrade-log-path]'}
-    $log=Resolve-MIR42SealImmutableFile -Path (Join-Path $dir $name) -Sha256 $r[$stage+'_log_sha256'] -Code 'mir423-upgrade-log'
+    $name=$r[$stage+'_log'];if([IO.Path]::GetFileName($name)-cne$name){throw "[$errorPrefix-log-path]"}
+    $log=Resolve-MIR42SealImmutableFile -Path (Join-Path $dir $name) -Sha256 $r[$stage+'_log_sha256'] -Code ($errorPrefix+'-log')
     if($stage-cne'create'){
       $markers=[regex]::Matches((Get-Content $log -Raw),'\[mir-fixture\] complete (?:Space Age|research) state retained technologies=(?<technologies>[0-9]+) recipes=(?<recipes>[0-9]+)')
-      if($markers.Count-lt1-or@($markers|Where-Object {[int]$_.Groups['technologies'].Value-lt3-or[int]$_.Groups['recipes'].Value-lt1}).Count){throw '[mir423-upgrade-full-state-phase-skipped]'}
+      if($markers.Count-lt1-or@($markers|Where-Object {[int]$_.Groups['technologies'].Value-lt3-or[int]$_.Groups['recipes'].Value-lt1}).Count){throw "[$errorPrefix-full-state-phase-skipped]"}
     }
   }
-  if($r.library_activation.status-cne'restored-direct-library-controls'-or$r.library_activation.dependency_payload_bytes_copied-ne0-or$r.library_activation.archive_links_created-ne0-or$r.library_activation.archive_extractions-ne0){throw '[mir423-upgrade-library-restoration]'}
-  if($r.Contains('persisted_damage')){throw '[mir423-upgrade-damage-scenario-not-transferable]'}
+  if($r.library_activation.status-cne'restored-direct-library-controls'-or$r.library_activation.dependency_payload_bytes_copied-ne0-or$r.library_activation.archive_links_created-ne0-or$r.library_activation.archive_extractions-ne0){throw "[$errorPrefix-library-restoration]"}
+  if($r.Contains('persisted_damage')){throw "[$errorPrefix-damage-scenario-not-transferable]"}
   foreach($assertion in @('all-existing-technology-state-and-definitions-retained','all-exposed-earned-effects-retained','all-supported-research-queue-retained','full-state-oracle-executed-upgrade-and-two-reloads')){
-    if($assertion-cnotin$r.assertions){throw '[mir423-upgrade-full-state-oracle-assertion]'}
+    if($assertion-cnotin$r.assertions){throw "[$errorPrefix-full-state-oracle-assertion]"}
   }
-  if(-not$r.Contains('full_state_evaluator_snapshots')){throw '[mir423-upgrade-receipt-snapshot-required]'}
+  if(-not$r.Contains('full_state_evaluator_snapshots')){throw "[$errorPrefix-receipt-snapshot-required]"}
   $receiptSnapshots=@($r.full_state_evaluator_snapshots)
-  if($receiptSnapshots.Count-ne$Row.snapshots.Count){throw '[mir423-upgrade-receipt-snapshot-set]'}
+  if($receiptSnapshots.Count-ne$Row.snapshots.Count){throw "[$errorPrefix-receipt-snapshot-set]"}
   foreach($snapshot in $Row.snapshots){
     $bound=@($receiptSnapshots|Where-Object stage -CEQ $snapshot.stage)
-    if($bound.Count-ne1-or$bound[0].path-cne$snapshot.path-or$bound[0].sha256-cne$snapshot.sha256){throw '[mir423-upgrade-receipt-snapshot-binding]'}
+    if($bound.Count-ne1-or$bound[0].path-cne$snapshot.path-or$bound[0].sha256-cne$snapshot.sha256){throw "[$errorPrefix-receipt-snapshot-binding]"}
   }
   $states=@{}
   foreach($snapshot in $Row.snapshots){
-    if($states.Contains($snapshot.stage)-or$snapshot.stage-cnotin@('source','upgrade','reload')){throw '[mir423-upgrade-snapshot-stage]'}
+    if($states.Contains($snapshot.stage)-or$snapshot.stage-cnotin@('source','upgrade','reload')){throw "[$errorPrefix-snapshot-stage]"}
     $ref=[pscustomobject]@{path=$snapshot.path;sha256=$snapshot.sha256};$s=(Read-MIR423UpgradeProofReference $ref).record
-    if($s.stage-cne$snapshot.stage-or$s.from_version-cne$from-or$s.to_version-cne$to){throw '[mir423-upgrade-snapshot-binding]'}
+    if($s.stage-cne$snapshot.stage-or$s.from_version-cne$from-or$s.to_version-cne$to){throw "[$errorPrefix-snapshot-binding]"}
     $states[$snapshot.stage]=$s
   }
-  if((($states.Keys|Sort-Object)-join'|')-cne'reload|source|upgrade'){throw '[mir423-upgrade-snapshot-set]'}
-  foreach($phase in @('upgrade','reload')){Assert-MIR422CompleteSavedState $states.source $states[$phase] -RequireExactResearchDefinitions:($patch-eq2)}
+  if((($states.Keys|Sort-Object)-join'|')-cne'reload|source|upgrade'){throw "[$errorPrefix-snapshot-set]"}
+  foreach($phase in @('upgrade','reload')){Assert-MIR422CompleteSavedState $states.source $states[$phase] -RequireExactResearchDefinitions:($candidate.Minor -gt 2 -or $patch-eq2)}
   return $proof
 }
 
 function Assert-MIR423MaintenanceUpgradeEvidence {
-  param([string]$Path,[object[]]$PackageAssets)
-  if([string]::IsNullOrWhiteSpace($Path)){throw '[mir423-upgrade-evidence-required]'}
+  param([string]$Path,[object[]]$PackageAssets,[ValidateSet('4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.3')
+  $errorPrefix='mir'+$CandidateSourceVersion.Replace('.','')+'-upgrade'
+  if([string]::IsNullOrWhiteSpace($Path)){throw "[$errorPrefix-evidence-required]"}
   $bundle=Read-MIR423UpgradeProofReference ([pscustomobject]@{path=[IO.Path]::GetFullPath($Path);sha256=(Get-FileHash $Path).Hash}) -MaximumBytes 256KB
   $r=$bundle.record
-  if($r.schema-ne1-or$r.kind-cne'MIR423MaintenanceUpgradeEvidenceV1'-or$r.source_version-cne'4.2.3'-or$r.rows.Count-ne27){throw '[mir423-upgrade-matrix-cardinality]'}
+  $kind='MIR'+$CandidateSourceVersion.Replace('.','')+'MaintenanceUpgradeEvidenceV1'
+  if($r.schema-ne1-or$r.kind-cne$kind-or$r.source_version-cne$CandidateSourceVersion-or$r.rows.Count-ne27){throw "[$errorPrefix-matrix-cardinality]"}
   $seen=@{}
   foreach($row in $r.rows){
     $key=$row.target+'|'+$row.predecessor_source_version
-    if($seen.Contains($key)-or$row.target-cnotin$script:MIR42ReleaseAssetTargets-or$row.predecessor_source_version-cnotin@('4.2.0','4.2.1','4.2.2')){throw '[mir423-upgrade-matrix-identity]'}
+    if($seen.Contains($key)-or$row.target-cnotin$script:MIR42ReleaseAssetTargets-or$row.predecessor_source_version-cnotin@('4.2.0','4.2.1','4.2.2')){throw "[$errorPrefix-matrix-identity]"}
     $seen[$key]=$true;$package=@($PackageAssets|Where-Object target -CEQ $row.target)
-    if($package.Count-ne1){throw '[mir423-upgrade-package-cardinality]'}
-    $null=Assert-MIR423NativeUpgradeProof $row $package[0]
+    if($package.Count-ne1){throw "[$errorPrefix-package-cardinality]"}
+    $null=Assert-MIR423NativeUpgradeProof $row $package[0] -CandidateSourceVersion $CandidateSourceVersion
   }
-  foreach($target in $script:MIR42ReleaseAssetTargets){foreach($predecessor in @('4.2.0','4.2.1','4.2.2')){if(-not$seen.Contains($target+'|'+$predecessor)){throw '[mir423-upgrade-matrix-coverage]'}}}
+  foreach($target in $script:MIR42ReleaseAssetTargets){foreach($predecessor in @('4.2.0','4.2.1','4.2.2')){if(-not$seen.Contains($target+'|'+$predecessor)){throw "[$errorPrefix-matrix-coverage]"}}}
   return [pscustomobject]@{path=$bundle.path;sha256=(Get-FileHash $bundle.path).Hash}
 }
 
@@ -291,14 +297,14 @@ function Assert-MIR423MaintenanceUpgradeEvidence {
 function Get-MIR42ReleaseAssetVersionContract {
   param([Parameter(Mandatory)][string]$SourceVersion,[Parameter(Mandatory)][string]$ReleaseTag)
 
-  if ($SourceVersion -cnotin @('4.2.0','4.2.1','4.2.2','4.2.3') -or $ReleaseTag -cne ('v' + $SourceVersion)) {
+  if ($SourceVersion -cnotin @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0') -or $ReleaseTag -cne ('v' + $SourceVersion)) {
     throw '[mir42-release-assets-version-contract]'
   }
-  $maintenance = $SourceVersion -cin @('4.2.1','4.2.2','4.2.3')
+  $maintenance = $SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0')
   $prefix = if ($maintenance) { 'MIR42NineTargetMaintenance' } else { 'MIR42NineTarget' }
   $statusPrefix = if ($maintenance) { "MIR-$SourceVersion-NINE-TARGET-MAINTENANCE" } else { 'MIR-4.2-NINE-TARGET' }
   return [pscustomobject][ordered]@{
-    source_version=$SourceVersion;tag=$ReleaseTag;maintenance=$maintenance;source_patch=[int]$SourceVersion.Split('.')[2]
+    source_version=$SourceVersion;tag=$ReleaseTag;maintenance=$maintenance;source_minor=[int]$SourceVersion.Split('.')[1];source_patch=[int]$SourceVersion.Split('.')[2]
     inventory_kind=($prefix + 'ReleaseAssetInventoryV1');inventory_status=($statusPrefix + '-RELEASE-ASSETS-FROZEN-NONPUBLIC')
     publication_kind=($prefix + 'PublicationAuthorizationV1');publication_status=($statusPrefix + '-WRITTEN-GO-BOUND-TO-MAIN-AND-FROZEN-ASSETS')
     support_paths=@('SHA256SUMS.txt','SHA256SUMS.txt.sig',"mir-$SourceVersion.qualification.json", "mir-$SourceVersion.provenance.json", "mir-$SourceVersion.components.json", "mir-$SourceVersion.release.json",$script:MIR42SupportCollectorAssetName)
@@ -308,7 +314,7 @@ function Get-MIR42ReleaseAssetVersionContract {
 }
 
 function Assert-MIR42ReleaseAssetMaintenancePredecessor {
-  param([Parameter(Mandatory)]$Inputs,[ValidateSet('4.2.1','4.2.2','4.2.3')][string]$CandidateSourceVersion='4.2.1')
+  param([Parameter(Mandatory)]$Inputs,[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.1')
 
   # This validates carried custody, not a native pass. The public CLI obtains
   # these inputs through the existing complete promotion/readiness reader.
@@ -329,6 +335,7 @@ function Assert-MIR42ReleaseAssetMaintenancePredecessor {
     '4.2.1' { 'fixtures/release-inputs/mir421-published-420-manifest.json' }
     '4.2.2' { 'fixtures/release-inputs/mir422-published-421-manifest.json' }
     '4.2.3' { 'fixtures/release-inputs/mir423-published-422-manifest.json' }
+    '4.3.0' { 'fixtures/release-inputs/mir423-published-422-manifest.json' }
   }
   $pin = Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $mir42ReleaseAssetsRepoRoot $pinPath) -CandidateSourceVersion $CandidateSourceVersion
   for ($index=0; $index -lt $script:MIR42ReleaseAssetTargets.Count; $index++) {
@@ -345,7 +352,7 @@ function Assert-MIR42ReleaseAssetMaintenancePredecessor {
 
 function Assert-MIR42ReleaseAssetDistributionIdentity {
   param([Parameter(Mandatory)]$Row,[Parameter(Mandatory)]$Contract,[Parameter(Mandatory)][string]$Name)
-  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$Row.target).Substring(1) -SourceMinor 2 -SourcePatch ([int]$Contract.source_patch)
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$Row.target).Substring(1) -SourceMinor ([int]$Contract.source_minor) -SourcePatch ([int]$Contract.source_patch)
   if ([string]$Row.distribution_version -cne [string]$identity.distribution_version -or
       $Name -cne ('more-infinite-research_' + [string]$identity.distribution_version + '.zip')) {
     throw "[mir42-release-assets-distribution-identity] $([string]$Row.target)"
@@ -626,7 +633,7 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     [Parameter(Mandatory)][string]$CandidateManifestPath,
     [Parameter(Mandatory)][string]$TechnicalSealPath,
     [Parameter(Mandatory)]$PromotionPlan,
-    [Parameter(Mandatory)][ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0')][string]$SourceVersion,
     [Parameter(Mandatory)][string]$ReleaseTag,
     [string]$MaintenanceUpgradeEvidencePath = "",
     [Parameter(Mandatory)][string]$AssetRoot,
@@ -685,6 +692,7 @@ function Get-MIR42NineTargetReleaseAssetInventory {
   $upgradeEvidence = switch ($SourceVersion) {
     '4.2.2' { Assert-MIR422MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) }
     '4.2.3' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) }
+    '4.3.0' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) -CandidateSourceVersion '4.3.0' }
     default { $null }
   }
   foreach ($path in $versionContract.support_paths) { $expectedPaths.Add($path) }
@@ -775,7 +783,7 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     record_sha256 = ''
   }
   if ($versionContract.maintenance) { $inventory | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $maintenanceInputs }
-  if ($SourceVersion -cin @('4.2.2','4.2.3')) { $inventory | Add-Member -NotePropertyName maintenance_upgrade_evidence -NotePropertyValue $upgradeEvidence }
+  if ($SourceVersion -cin @('4.2.2','4.2.3','4.3.0')) { $inventory | Add-Member -NotePropertyName maintenance_upgrade_evidence -NotePropertyValue $upgradeEvidence }
   return Write-MIR42ReleaseAssetInventoryRecord -Record $inventory -OutputPath $output
 }
 
@@ -785,7 +793,7 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
   $versionContract = Get-MIR42ReleaseAssetVersionContract -SourceVersion ([string]$Record.release.source_version) -ReleaseTag ([string]$Record.release.tag)
   $expectedProperties=@('schema','kind','status','release','source','candidate_manifest','technical_seal','promotion_plan','package_assets','github_assets','checksum','signature','qualification','provenance','components','release_manifest','release_notes','mod_portal_upload_texts','asset_root_file_set_sha256','protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized','public_readback_verified','record_sha256')
   if ($versionContract.maintenance) { $expectedProperties += 'published_maintenance_predecessor' }
-  if ($versionContract.source_version -cin @('4.2.2','4.2.3')) { $expectedProperties += 'maintenance_upgrade_evidence' }
+  if ($versionContract.source_version -cin @('4.2.2','4.2.3','4.3.0')) { $expectedProperties += 'maintenance_upgrade_evidence' }
   Assert-MIR42ReleaseAssetProperties -Value $Record -Expected $expectedProperties -Code 'mir42-release-assets-inventory'
   if ($versionContract.maintenance) { Assert-MIR42ReleaseAssetMaintenancePredecessor -Inputs $Record.published_maintenance_predecessor -CandidateSourceVersion $versionContract.source_version }
   Assert-MIR42ReleaseAssetBooleanFlags -Value $Record -Fields @('protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized','public_readback_verified') -Code 'mir42-release-assets-inventory'
@@ -821,6 +829,9 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
   } elseif ($versionContract.source_version -ceq '4.2.3') {
     $evidence=Read-MIR423UpgradeProofReference $Record.maintenance_upgrade_evidence -MaximumBytes 256KB
     $null=Assert-MIR423MaintenanceUpgradeEvidence -Path $evidence.path -PackageAssets @($Record.package_assets)
+  } elseif ($versionContract.source_version -ceq '4.3.0') {
+    $evidence=Read-MIR423UpgradeProofReference $Record.maintenance_upgrade_evidence -MaximumBytes 256KB
+    $null=Assert-MIR423MaintenanceUpgradeEvidence -Path $evidence.path -PackageAssets @($Record.package_assets) -CandidateSourceVersion '4.3.0'
   }
   $public = @($Record.github_assets)
   if ($public.Count -ne 16) { throw '[mir42-release-assets-inventory-github-count]' }
@@ -978,7 +989,7 @@ function Read-MIR42NineTargetWrittenReleaseAuthorization {
 function Read-MIR42NineTargetProtectedMainReadbackForPublication {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$Path,[switch]$PublishedMaintenance,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0')][string]$SourceVersion='4.2.1')
 
   $identity = Read-MIR42SealRecord -Path $Path -Code 'mir42-release-go-main-readback'
   $record = $identity.record

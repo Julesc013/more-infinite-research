@@ -69,10 +69,21 @@ function Assert-MIR441ResourceAdmission {
   $null=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot
   if($EstimatedPeakBytes-lt0-or$EstimatedPeakBytes-gt2GB-or$ExpectedPeakMemoryBytes-lt0){throw '[mir441-resource-staging-budget]'}
   $snapshot=Get-MIR441ResourceSnapshot -WorkRoot $WorkRoot;$limits=Get-MIR441ResourceLimits -Policy $Policy -Snapshot $snapshot
-  if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){throw '[mir441-resource-admission-memory]'}
-  if([int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){throw '[mir441-resource-admission-commit]'}
-  if([int64]$snapshot.system_volume.free_bytes-lt$limits.system_bytes+2*$EstimatedPeakBytes){throw '[mir441-resource-admission-system-disk]'}
-  if([int64]$snapshot.work_volume.free_bytes-lt$limits.work_bytes+2*$EstimatedPeakBytes){throw '[mir441-resource-admission-work-disk]'}
+  $failure=''
+  if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-memory]'}
+  elseif([int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-commit]'}
+  elseif([int64]$snapshot.system_volume.free_bytes-lt$limits.system_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-system-disk]'}
+  elseif([int64]$snapshot.work_volume.free_bytes-lt$limits.work_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-work-disk]'}
+  if($failure){
+    # Retain the actual throwing snapshot; a later sample cannot explain a
+    # prelaunch refusal or live interruption. Admission thresholds are exact.
+    $exception=[InvalidOperationException]::new($failure)
+    $exception.Data['mir441_resource_admission']=[ordered]@{
+      snapshot=$snapshot;limits=$limits;estimated_peak_bytes=$EstimatedPeakBytes;
+      expected_peak_memory_bytes=$ExpectedPeakMemoryBytes
+    }
+    throw $exception
+  }
   return $snapshot
 }
 
@@ -206,7 +217,7 @@ function Invoke-MIR441MonitoredProcess {
     $failure=$_
     if($null-ne$process){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children)}catch{}}
     Stop-MIR441OwnedProcess -Process $process -Children $children
-    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
+    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
     throw $failure
   }finally{
     try{Stop-MIR441OwnedProcess -Process $process -Children $children}finally{
