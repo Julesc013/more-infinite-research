@@ -817,6 +817,7 @@ function Get-MIR42CriterionEvidenceObservation {
     [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1'
   )
   $contract = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs) -SourceVersion $SourceVersion
+  $individualFreshInput = $null -ne $PublishedMaintenanceInputs -and $SourceVersion -ceq '4.2.3'
   $record = Read-MIR42QualificationBootstrapRecord -Path $Path -Code $Code
   $candidateManifest = $Candidate.candidate_manifest
   $source = $Candidate.source
@@ -835,8 +836,12 @@ function Get-MIR42CriterionEvidenceObservation {
   }
   $kindAndStateValid = switch ($Criterion) {
     'fresh-exact-loads' {
-      $candidateBound -and [string]$record.kind -ceq [string]$contract.kind -and
-        [string]$record.status -ceq [string]$contract.status -and
+      $candidateBound -and (
+        ([string]$record.kind -ceq [string]$contract.kind -and [string]$record.status -ceq [string]$contract.status) -or
+        ($individualFreshInput -and [string]$record.kind -ceq 'MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1' -and
+          [string]$record.status -ceq 'MIR-4.2.3-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED' -and
+          $record.PSObject.Properties.Name -contains 'engine_input_kind' -and [string]$record.engine_input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads')
+      ) -and
         [string]$record.release_qualification -ceq 'not-performed' -and [string]$record.release_acceptance -ceq 'not-performed'
     }
     'target-omissions' {

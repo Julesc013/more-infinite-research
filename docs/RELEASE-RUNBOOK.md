@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-10
+last_reviewed: 2026-10-12
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -59,6 +59,8 @@ The 4.2.2 package-writer extension accepts explicit `-SourceVersion 4.2.2` in th
 For 4.2.2 predecessor custody, explicitly select candidate source `4.2.2` in `Get-MIR42PublishedMaintenancePredecessorInputs`. The shared reader authenticates the retained `v4.2.1` manifest and nine `CCC01` ZIPs against live publication metadata, local/remote tags and archive inventories. Its historical default remains the `v4.2.0-stable` predecessor for 4.2.1. The [modern current-package base-upgrade workflow](maintainer/fixture-workflow.md) consumes the new selection; the joined engine, reconciliation, criterion, campaign, independent-rehash and technical-seal callers now select the same maintenance version and published predecessor. Their focused controls establish input and reader behavior only. Current native execution, candidate-bound acceptance and actual sealing remain outstanding; the release-asset and publication-authorization readers now select 4.2.2 as well. Their controlled asset/readback tests do not establish a live publication. Authenticating published input bytes does not transfer either predecessor's disclosed acceptance exceptions or supply a current save, signing, review or recovery result.
 
 For F210/F200 native probes, `Read-MIRNativeProbeCurrentCandidate`, its F210 wrapper and `New-MIRNativeProbeTargetPackage` now accept explicit `-SourceVersion 4.2.2`; their default remains 4.2.1. The governed child receives the selected source version and matching codec identity, and the reader still verifies the receipt, current source fingerprint, archive inventory and exact runtime bindings. A CCC02 archive is rejected by a default CCC01 invocation. `SCIENCE-LAUNCH` identifies the selected two-target probe through the existing builder. The browser README identity helper also accepts explicit 4.2.2. Individual runners must pass that selection before claiming current-release execution; this helper adoption does not qualify an old caller, prior result, package or gameplay scenario.
+
+For performance-only 4.2.3, `Invoke-MIR42NineTargetSealPromotion.ps1 -Mode EngineEvidence -EngineRunPath <path>` also reads the distinct `MIR42NineTargetMaintenanceIndividualEngineRunV1` contract. It binds nine independently executed published-4.2.2 upgrade receipts and ten fresh-load summaries: F210 base and Space Age, plus one base case for each other target. The reader authenticates the frozen candidate, published predecessors, exact engines and archives, logs, saved-state comparisons, native resource records, and both reloads before constructing the engine binder. The binder and joined campaign retain the individual-input provenance. Schedule each native case under exclusive ownership with the retained memory reserves and watchdogs. Final release inventory still requires all 27 published CCC00/CCC01/CCC02-to-CCC03 upgrade outcomes; the normal review, signing, recovery, promotion and publication gates apply to either native-input path.
 
 
 1. Reconcile exact repository, programme, queue, branch, and external-state identity.
