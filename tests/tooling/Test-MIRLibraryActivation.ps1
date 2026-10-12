@@ -249,6 +249,19 @@ function Test-MaintenanceFixtureCallSites {
   $beforeIdentity=Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json')
   Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target f210 -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceAge
   Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json'))-ceq$beforeIdentity) 'direct CCC00 Space Age fixture identity is idempotent'
+
+  $SourceVersion='4.2.3';$FromVersion='4.2.21000';$ToVersion='4.2.21003'
+  $SpaceIsFake=$false;$Archetype='space-age-native-owner';$FixtureName='assert-upgrade-4-0-21000-to-4-1-21000'
+  $stagedFixture=Join-Path $root 'owned-fixtures/caller-space-age-420-to-423'
+  Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$FixtureName)) -Destination $stagedFixture -Recurse
+  . ([scriptblock]::Create($modern[0].Extent.Text))
+  $read=Get-Content -LiteralPath (Join-Path $stagedFixture 'info.json') -Raw|ConvertFrom-Json
+  $control=Get-Content -LiteralPath (Join-Path $stagedFixture 'control.lua') -Raw
+  Assert-LibraryTest ($read.version-ceq'0.1.33'-and$read.dependencies-ccontains"more-infinite-research >= $FromVersion"-and
+    $control.Contains('if from_version == "4.2.21000" and to_version == "4.2.21003" then')-and-not$control.Contains('if to_version == "4.2.21002" then')) 'direct CCC00 to CCC03 Space Age caller gives the historical settings oracle an isolated identity'
+  $beforeIdentity=Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json')
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target f210 -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceAge -HistoricalSettingsOracle
+  Assert-LibraryTest ((Get-MIRImmutableInputSha256 (Join-Path $stagedFixture 'info.json'))-ceq$beforeIdentity) 'direct CCC00 to CCC03 historical settings fixture identity is idempotent'
 }
 Test-MaintenanceFixtureCallSites
 $baseFixtureArchive=New-TestArchive $fixtureName '0.1.1' -InfoJson (Get-Content -LiteralPath (Join-Path $baseFixture 'info.json') -Raw)

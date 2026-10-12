@@ -229,6 +229,41 @@ foreach($invalid in @(@{from='4.2.21000';to='4.2.21003';code='[mir423-f210-oracl
 [IO.File]::WriteAllText($f210OracleControl,('function restored_promethium_frontier()'+"`n"+'if from_version ~= "4.2.21000" or to_version ~= "4.2.21003" then return false end'+"`n"+'end'),[Text.UTF8Encoding]::new($false))
 $refused=$false;try{Set-MIR423F210InheritedPromethiumDefinitionDelta -FixtureDirectory $f210OracleRoot -FromVersion '4.2.21001' -ToVersion '4.2.21003'}catch{$refused=$_.Exception.Message-ceq'[mir423-f210-oracle-anchor]'}
 if(-not$refused){throw '4.2.3 F210 oracle accepted a mismatched inherited definition delta'};$currentAssertions++
+$f210SettingsOracleRoot=Join-Path $RepoRoot ('build/tmp/mir423-f210-settings-oracle-control-'+[Guid]::NewGuid().ToString('N'))
+$f210SharedControlPath=Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua'
+$f210SharedControl=Get-Content -LiteralPath $f210SharedControlPath -Raw
+$f210SharedControlSha256=(Get-FileHash -LiteralPath $f210SharedControlPath -Algorithm SHA256).Hash
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210SettingsOracleRoot -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210SettingsOracleRoot -Target f210 -SourceVersion '4.2.3' -FromVersion '4.2.21000' -SpaceAge -HistoricalSettingsOracle
+Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $f210SettingsOracleRoot -FromVersion '4.2.21000' -ToVersion '4.2.21003'
+$f210SettingsControl=Get-Content -LiteralPath (Join-Path $f210SettingsOracleRoot 'control.lua') -Raw
+$f210SettingsInfo=Get-Content -LiteralPath (Join-Path $f210SettingsOracleRoot 'info.json') -Raw|ConvertFrom-Json
+$f210HistoricalSettingsFamilies=@('glycerol','hydrochloric_acid','hydrofluoric_acid','nitric_acid','py_acid_gas','py_earth_flower_sample','py_earth_generic_sample','py_earth_jute_sample','py_earth_palmtree_sample','py_earth_potato_sample','py_earth_shroom_sample','py_earth_sunflower_sample','py_earth_tropical_tree_sample','py_earth_venus_fly_sample','py_glycerol','py_log','py_treated_wood','py_wood')
+$f210HistoricalSettingsDefaults=[ordered]@{'enable'=$true;'effect-per-level'=2;'max-level'=0;'research-time'=30;'cost-base'=200;'cost-growth'=2;'cost-linear-increment'=0}
+$f210HistoricalSettingsGuard='if from_version == "4.2.21000" and to_version == "4.2.21003" then'
+$f210OriginalSettingsGuard='if to_version == "4.2.21002" then'
+$f210ExpectedSettingsControl=$f210SharedControl.Replace($f210OriginalSettingsGuard,$f210HistoricalSettingsGuard)
+if($f210SettingsInfo.version-cne'0.1.33'-or($f210HistoricalSettingsFamilies.Count*$f210HistoricalSettingsDefaults.Count)-ne126-or
+   $f210SettingsControl-cne$f210ExpectedSettingsControl-or
+   [regex]::Matches($f210SettingsControl,[regex]::Escape($f210HistoricalSettingsGuard)).Count-ne1-or
+   $f210SettingsControl.Contains($f210OriginalSettingsGuard)){
+  throw '4.2.3 F210 historical settings oracle did not retain its exact reviewed allowance'}
+$currentAssertions++
+foreach($invalid in @(@{from='4.2.21001';to='4.2.21003';code='[mir423-f210-settings-oracle-predecessor]'},@{from='4.2.21000';to='4.2.21001';code='[mir423-f210-settings-oracle-version]'},@{from='4.2.21000';to='4.2.21002';code='[mir423-f210-settings-oracle-version]'})){
+  $refused=$false;try{Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $f210SettingsOracleRoot -FromVersion $invalid.from -ToVersion $invalid.to}catch{$refused=$_.Exception.Message-ceq$invalid.code}
+  if(-not$refused){throw "4.2.3 F210 historical settings oracle accepted invalid $($invalid.from) to $($invalid.to) binding"};$currentAssertions++
+}
+foreach($invalidIdentity in @(@{from='4.2.21001';space=$true},@{from='4.2.21000';space=$false})){
+  $refused=$false;try{Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210SettingsOracleRoot -Target f210 -SourceVersion '4.2.3' -FromVersion $invalidIdentity.from -SpaceAge:$invalidIdentity.space -HistoricalSettingsOracle}catch{$refused=$_.Exception.Message-ceq'[mir423-f210-settings-oracle-transition]'}
+  if(-not$refused){throw '4.2.3 F210 historical settings fixture identity accepted a non-exact scope'};$currentAssertions++
+}
+$f210SettingsAnchorRoot=Join-Path $RepoRoot ('build/tmp/mir423-f210-settings-oracle-anchor-'+[Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force -Path $f210SettingsAnchorRoot|Out-Null
+[IO.File]::WriteAllText((Join-Path $f210SettingsAnchorRoot 'control.lua'),$f210SettingsControl.Replace('local added_422_setting_defaults = {}','local wrong_setting_defaults = {}'),[Text.UTF8Encoding]::new($false))
+$refused=$false;try{Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $f210SettingsAnchorRoot -FromVersion '4.2.21000' -ToVersion '4.2.21003'}catch{$refused=$_.Exception.Message-ceq'[mir423-f210-settings-oracle-anchor]'}
+if(-not$refused){throw '4.2.3 F210 historical settings oracle accepted an altered complete-state guard'};$currentAssertions++
+if((Get-FileHash -LiteralPath $f210SharedControlPath -Algorithm SHA256).Hash-cne$f210SharedControlSha256){throw '4.2.3 F210 settings specialization mutated the shared fixture'}
+$currentAssertions++
 $f200OracleRoot=Join-Path $RepoRoot ('build/tmp/mir423-f200-oracle-control-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $f200OracleRoot|Out-Null
 $f200ReviewedGuard='if from_version ~= "4.2.20000" or to_version ~= "4.2.20003" then return false end'
