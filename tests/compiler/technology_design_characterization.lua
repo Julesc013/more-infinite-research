@@ -1,6 +1,10 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 local gate = require("prototypes.mir.domain.technology.gate")
+local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local technology_catalog = require("prototypes.mir.planner.technology_catalog")
+local public_compiler_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
 
 local assertions = 0
 local function check(condition, message)
@@ -219,6 +223,276 @@ check(continuation.materialization.kind == "continuation"
   and continuation.maturity.runtime_action == "continuation", "base continuation construction")
 check(technology_design.save_identity_projection(continuation).technology_id
   == "mir-fixture-continuation", "save identity projection")
+
+-- The player catalog can defer a diagnostic only when the exact final primary
+-- alternative has already qualified and policy will select it.  The catalog
+-- must describe that omission explicitly, retain normal diagnostics in every
+-- other case, and never let a partial inventory pass as an export inventory.
+local function catalog_gates(state)
+  local gates = {}
+  for _, gate_name in ipairs(hard_gate_authority.order()) do
+    if state == "failed" and gate_name == "loop_safe" then
+      gates[gate_name] = gate.failed("catalog-fixture:" .. gate_name, "fixture-failed", {})
+    elseif state == "pending" and gate_name == "loop_safe" then
+      gates[gate_name] = gate.pending("catalog-fixture:" .. gate_name)
+    else
+      gates[gate_name] = gate.passed("catalog-fixture:" .. gate_name, {"fixture-passed"})
+    end
+  end
+  return gates
+end
+
+local function catalog_emit_row(suffix, action, gate_state)
+  local result = row({
+    action = action or "emit",
+    reason = "catalog-fixture-" .. suffix,
+    stream_key = "fixture-catalog-" .. suffix,
+    manifest_id = "fixture-catalog-" .. suffix,
+    technology_name = "mir-fixture-catalog-" .. suffix,
+    gates = catalog_gates(gate_state)
+  })
+  result.fields.localised_name = {"technology-name." .. result.technology_name}
+  result.fields.localised_description = {"technology-description." .. result.technology_name}
+  result.fields.order = "p[" .. result.stream_key .. "]"
+  result.technology_design = technology_design.from_generation_row(result)
+  return result
+end
+
+local function catalog_adopt_row(suffix)
+  local owner = "fixture-native-" .. suffix
+  local result = row({
+    action = "adopt",
+    reason = "catalog-adopt-" .. suffix,
+    stream_key = "fixture-adopt-" .. suffix,
+    manifest_id = "fixture-adopt-" .. suffix,
+    gates = catalog_gates(),
+    fields = {
+      localised_name = {"technology-name." .. owner},
+      localised_description = {"technology-description." .. owner},
+      order = "p[fixture-adopt-" .. suffix .. "]"
+    }
+  })
+  result.technology_name = nil
+  local expected = {
+    name = owner,
+    effects = deepcopy(result.fields.effects),
+    prerequisites = deepcopy(result.fields.prerequisites),
+    unit = {
+      ingredients = deepcopy(result.fields.ingredients),
+      count_formula = result.fields.count_formula,
+      time = result.fields.research_time
+    },
+    max_level = result.fields.max_level,
+    localised_name = deepcopy(result.fields.localised_name),
+    localised_description = deepcopy(result.fields.localised_description),
+    icon = result.fields.icon,
+    icon_size = result.fields.icon_size,
+    order = result.fields.order,
+    level = result.fields.level,
+    enabled = result.fields.enabled,
+    hidden = result.fields.hidden,
+    upgrade = result.fields.upgrade
+  }
+  result.adoption = {
+    owner = owner,
+    operation = "fixture-preserve",
+    configured_fields = {},
+    expected_snapshot = expected,
+    input_fingerprint = "mir32-01234567",
+    output_fingerprint = "mir32-01234567"
+  }
+  local provisional = technology_design.from_generation_row(result)
+  result.adoption.output_fingerprint = provisional.prototype_fingerprint
+  result.technology_design = technology_design.from_generation_row(result)
+  check(technology_design.assert_generation_row(result), "adopt fixture retains its exact native projection")
+  return result
+end
+
+local function catalog_operation(row_value)
+  return {stream_key = row_value.stream_key, technology_design = row_value.technology_design}
+end
+
+local function finalize_catalog(row_value, defer)
+  local operations = (row_value.action == "emit" or row_value.action == "adopt")
+    and {catalog_operation(row_value)} or {}
+  return technology_catalog.finalize(
+    {row_value},
+    {fixture = "catalog-deferred-diagnostics"},
+    operations,
+    {defer_diagnostic_alternatives = defer == true}
+  )
+end
+
+local catalog_emit = catalog_emit_row("emit")
+local catalog_full = finalize_catalog(catalog_emit, false)
+local catalog_deferred = finalize_catalog(catalog_emit, true)
+check(catalog_full.schema == 4 and catalog_full.alternative_evaluation.mode == "full-diagnostics"
+  and catalog_full.alternative_evaluation.complete
+  and catalog_full.alternative_evaluation.evaluated_alternatives == 2
+  and catalog_full.alternative_evaluation.deferred_diagnostic_alternatives == 0,
+  "default final catalog retains its complete diagnostic inventory")
+check(#catalog_full.candidates[1].alternatives == 2
+  and catalog_full.candidates[1].diagnostic_evaluation.state == "constructed",
+  "default final catalog records its constructed diagnostic binding")
+check(catalog_deferred.alternative_evaluation.mode == "player-selected-primary-plus-required-fallbacks"
+  and not catalog_deferred.alternative_evaluation.complete
+  and catalog_deferred.alternative_evaluation.evaluated_alternatives == 1
+  and catalog_deferred.alternative_evaluation.deferred_diagnostic_alternatives == 1
+  and #catalog_deferred.candidates[1].alternatives == 1,
+  "qualified final emit omits only its otherwise-losing diagnostic")
+check(catalog_deferred.candidates[1].diagnostic_evaluation.state == "deferred-primary-qualified"
+  and catalog_deferred.current_selections[1].action == "emit"
+  and fingerprint.of(catalog_full.current_selections) == fingerprint.of(catalog_deferred.current_selections),
+  "deferred final emit preserves the exact selected vector")
+check(technology_catalog.require_full_diagnostics(catalog_full) == catalog_full,
+  "complete catalog satisfies full diagnostics guard")
+expect_error(function() technology_catalog.require_full_diagnostics(catalog_deferred) end,
+  "full diagnostics are required")
+
+local catalog_adopt = catalog_adopt_row("qualified")
+local catalog_adopt_full = finalize_catalog(catalog_adopt, false)
+local catalog_adopt_deferred = finalize_catalog(catalog_adopt, true)
+check(catalog_adopt_deferred.candidates[1].diagnostic_evaluation.state == "deferred-primary-qualified"
+  and #catalog_adopt_deferred.candidates[1].alternatives == 1
+  and catalog_adopt_deferred.current_selections[1].action == "adopt"
+  and fingerprint.of(catalog_adopt_full.current_selections)
+    == fingerprint.of(catalog_adopt_deferred.current_selections),
+  "qualified final adopt defers only its diagnostic and preserves selection")
+
+local catalog_skip = catalog_emit_row("skip", "skip")
+local catalog_skip_final = finalize_catalog(catalog_skip, true)
+check(catalog_skip_final.alternative_evaluation.mode == "full-diagnostics"
+  and catalog_skip_final.alternative_evaluation.complete
+  and #catalog_skip_final.candidates[1].alternatives == 2
+  and catalog_skip_final.candidates[1].diagnostic_evaluation.state == "constructed"
+  and catalog_skip_final.current_selections[1].action == "diagnose",
+  "skip retains the full required diagnostic fallback")
+
+local catalog_failed = technology_catalog.from_preselection_rows(
+  {catalog_emit_row("failed", "emit", "failed")},
+  {fixture = "catalog-failed"},
+  {phase = "final", defer_diagnostic_alternatives = true, defer_validation = true, children_admitted = true}
+)
+check(catalog_failed.alternative_evaluation.mode == "full-diagnostics"
+  and catalog_failed.alternative_evaluation.complete
+  and #catalog_failed.candidates[1].alternatives == 2
+  and catalog_failed.candidates[1].diagnostic_evaluation.state == "constructed",
+  "rejected primary retains a complete diagnostic fallback")
+check(technology_catalog.verify_untrusted(deepcopy(catalog_failed)),
+  "rejected primary complete fallback remains a valid final catalog")
+
+local catalog_unresolved = technology_catalog.from_preselection_rows(
+  {catalog_emit_row("unresolved", "emit", "pending")},
+  {fixture = "catalog-unresolved"},
+  {phase = "final", defer_diagnostic_alternatives = true, defer_validation = true, children_admitted = true}
+)
+check(catalog_unresolved.alternative_evaluation.mode == "full-diagnostics"
+  and #catalog_unresolved.candidates[1].alternatives == 2
+  and catalog_unresolved.candidates[1].diagnostic_evaluation.state == "constructed",
+  "unresolved primary cannot omit its diagnostic")
+expect_error(function() technology_catalog.verify_untrusted(deepcopy(catalog_unresolved)) end,
+  "final qualification has an unresolved hard gate")
+
+local catalog_preselection = technology_catalog.from_preselection_rows(
+  {catalog_emit_row("preselection")},
+  {fixture = "catalog-preselection"},
+  {phase = "preselection", defer_diagnostic_alternatives = true}
+)
+check(catalog_preselection.alternative_evaluation.mode == "full-diagnostics"
+  and catalog_preselection.alternative_evaluation.complete
+  and #catalog_preselection.candidates[1].alternatives == 2
+  and catalog_preselection.candidates[1].diagnostic_evaluation.state == "constructed",
+  "preselection never omits diagnostic alternatives")
+
+local selected_permutation_left = catalog_emit_row("permutation-left")
+local selected_permutation_right = catalog_emit_row("permutation-right")
+local function finalize_permutation(rows)
+  local operations = {}
+  for _, row_value in ipairs(rows) do table.insert(operations, catalog_operation(row_value)) end
+  return technology_catalog.finalize(
+    rows, {fixture = "catalog-permutation"}, operations,
+    {defer_diagnostic_alternatives = true}
+  )
+end
+local permutation_forward = finalize_permutation({selected_permutation_left, selected_permutation_right})
+local permutation_reverse = finalize_permutation({selected_permutation_right, selected_permutation_left})
+check(fingerprint.of(permutation_forward.current_selections) == fingerprint.of(permutation_reverse.current_selections)
+  and permutation_forward.alternative_evaluation.deferred_diagnostic_alternatives == 2
+  and permutation_reverse.alternative_evaluation.deferred_diagnostic_alternatives == 2,
+  "deferred primary selection remains permutation independent")
+
+local forged_deferred_binding = technology_catalog.snapshot(catalog_deferred)
+forged_deferred_binding.candidates[1].diagnostic_evaluation.primary_design_fingerprint = "mir32-forged"
+expect_error(function() technology_catalog.verify_untrusted(forged_deferred_binding) end,
+  "deferred diagnostic primary proof is invalid")
+local forged_deferred_diagnostic = technology_catalog.snapshot(catalog_deferred)
+forged_deferred_diagnostic.candidates[1].diagnostic_evaluation.diagnostic_design_fingerprint = "mir32-invented"
+expect_error(function() technology_catalog.verify_untrusted(forged_deferred_diagnostic) end,
+  "deferred diagnostic evaluation contains an unknown field")
+local forged_evaluation_field = technology_catalog.snapshot(catalog_deferred)
+forged_evaluation_field.alternative_evaluation.invented_total = 1
+expect_error(function() technology_catalog.verify_untrusted(forged_evaluation_field) end,
+  "alternative evaluation state contains an unknown field")
+local forged_deferred_count = technology_catalog.snapshot(catalog_deferred)
+forged_deferred_count.alternative_evaluation.evaluated_alternatives = 2
+expect_error(function() technology_catalog.verify_untrusted(forged_deferred_count) end,
+  "alternative evaluation counts are invalid")
+local forged_rejected_qualification = technology_catalog.snapshot(catalog_deferred)
+local rejected_qualification = deepcopy(catalog_failed.qualifications[1])
+forged_rejected_qualification.qualifications[1] = rejected_qualification
+forged_rejected_qualification.candidates[1].alternatives[1].qualification_fingerprint
+  = rejected_qualification.qualification_fingerprint
+forged_rejected_qualification.candidates[1].diagnostic_evaluation.primary_qualification_fingerprint
+  = rejected_qualification.qualification_fingerprint
+forged_rejected_qualification.alternative_qualifications[1].qualification_fingerprint
+  = rejected_qualification.qualification_fingerprint
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_qualification) end,
+  "alternative qualification does not bind its candidate")
+local unbound_qualification = technology_catalog.snapshot(catalog_deferred)
+table.insert(unbound_qualification.qualifications, deepcopy(catalog_failed.qualifications[1]))
+expect_error(function() technology_catalog.verify_untrusted(unbound_qualification) end,
+  "qualification inventory does not match alternatives")
+local missing_alternative_mapping = technology_catalog.snapshot(catalog_deferred)
+table.remove(missing_alternative_mapping.alternative_qualifications, 1)
+expect_error(function() technology_catalog.verify_untrusted(missing_alternative_mapping) end,
+  "alternative qualification mappings are incomplete")
+local duplicate_alternative_mapping = technology_catalog.snapshot(catalog_deferred)
+table.insert(duplicate_alternative_mapping.alternative_qualifications,
+  deepcopy(duplicate_alternative_mapping.alternative_qualifications[1]))
+expect_error(function() technology_catalog.verify_untrusted(duplicate_alternative_mapping) end,
+  "alternative qualification mapping is duplicated")
+local duplicate_deferred_selection = technology_catalog.snapshot(catalog_deferred)
+table.insert(duplicate_deferred_selection.current_selections,
+  deepcopy(duplicate_deferred_selection.current_selections[1]))
+expect_error(function() technology_catalog.verify_untrusted(duplicate_deferred_selection) end,
+  "deferred diagnostic primary selection is invalid")
+local missing_deferred_selection = technology_catalog.snapshot(catalog_deferred)
+table.remove(missing_deferred_selection.current_selections, 1)
+expect_error(function() technology_catalog.verify_untrusted(missing_deferred_selection) end,
+  "deferred diagnostic primary selection is invalid")
+
+local caller_snapshot = technology_catalog.snapshot(catalog_deferred)
+caller_snapshot.candidates[1].diagnostic_evaluation.state = "forged"
+caller_snapshot.alternative_evaluation.evaluated_alternatives = 99
+local caller_snapshot_again = technology_catalog.snapshot(catalog_deferred)
+check(caller_snapshot_again.candidates[1].diagnostic_evaluation.state == "deferred-primary-qualified"
+  and caller_snapshot_again.alternative_evaluation.evaluated_alternatives == 1,
+  "catalog query snapshots isolate deferred-evaluation metadata")
+
+local public_full_catalog = public_compiler_artifacts.technology_catalog(catalog_full, {})
+local public_deferred_catalog = public_compiler_artifacts.technology_catalog(catalog_deferred, {})
+check(public_full_catalog.schema == 2 and public_full_catalog.alternative_evaluation.complete
+  and public_full_catalog.counts.evaluated_alternatives == 2
+  and public_full_catalog.counts.deferred_diagnostic_alternatives == 0,
+  "public complete catalog reports complete evaluated inventory")
+check(public_deferred_catalog.schema == 2 and not public_deferred_catalog.alternative_evaluation.complete
+  and public_deferred_catalog.counts.evaluated_alternatives == 1
+  and public_deferred_catalog.counts.deferred_diagnostic_alternatives == 1,
+  "public partial catalog reports evaluated and deferred counts honestly")
+local forged_public_catalog = technology_catalog.snapshot(catalog_deferred)
+forged_public_catalog.alternative_evaluation.evaluated_alternatives = 2
+expect_error(function() public_compiler_artifacts.technology_catalog(forged_public_catalog, {}) end,
+  "evaluated alternative count differs")
 
 -- Compare cold and warm digests against the pre-cache scalar recurrence,
 -- including byte-block boundaries, binary text and the cache's size cutoff.

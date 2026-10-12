@@ -49,7 +49,7 @@ local function graph_copy(value, copied)
   return out
 end
 
-local context = {states = {}, epochs = {}}
+local context = {states = {}, epochs = {}, services = {}}
 function context:state_view(name, factory)
   if self.states[name] == nil and factory then self.states[name] = factory() end
   return self.states[name]
@@ -57,7 +57,8 @@ end
 function context:set_state(name, value) self.states[name] = value; return value end
 function context:replace_epoch(name, value) self.states[name] = value; return value end
 function context:state_epoch(name) return self.epochs[name] or 0 end
-function context:service() return nil end
+function context:service(name) return self.services[name] end
+_G.TEST_SERVICE_CONTEXT = context
 
 _G.TEST_PRIVATE_WITNESS = {
   kind = "private-root",
@@ -90,6 +91,7 @@ package.preload["prototypes.mir.capabilities.science_integration.recipe_route_fe
     end,
     acquisition_witness = function(identity, options, state)
       table.insert(_G.TEST_ACQUISITION_CALLS, {identity = identity, options = options, state = state})
+      if _G.TEST_ACQUISITION_RETURN_FALSE then return false end
       return _G.TEST_PRIVATE_WITNESS
     end
   }
@@ -98,6 +100,10 @@ end
     )
     module = runtime.execute(source)
     runtime.globals().ITEM_ACQUISITION_SERVICE_MODULE = module
+    runtime.execute(
+        'TEST_SERVICE_CONTEXT.services["science.item_acquisition_witness"] '
+        '= ITEM_ACQUISITION_SERVICE_MODULE.item_acquisition_witness'
+    )
     result = runtime.execute(fixture)
     record = {
         "status": "MIR-ITEM-ACQUISITION-SERVICE-ISOLATION-CONTROLS-PASSED",

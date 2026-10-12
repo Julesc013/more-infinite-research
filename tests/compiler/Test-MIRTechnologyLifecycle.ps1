@@ -282,4 +282,5 @@ try {
   if (Test-Path -LiteralPath $tempRoot) { Remove-Item -LiteralPath $tempRoot -Recurse -Force }
 }
 
+& (Join-Path $RepoRoot 'tests/compiler/Test-MIRTechnologyCatalogEvaluation.ps1') -RepoRoot $RepoRoot
 Write-Host "[ok] MIR technology lifecycle schemas, catalogs, diffs, decisions, transitions, and migrations passed."

@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-12.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-13.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -282,7 +282,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/schemas/stream-spec.md | StreamSpec Schema | current | developer | reference | mir-maintainers | 2026-07-25 |
 | docs/reference/schemas/technology-applicability-envelope.md | TechnologyApplicabilityEnvelope Schema | current | developer | reference | mir-maintainers | 2026-07-18 |
 | docs/reference/schemas/technology-design.md | TechnologyDesign Schema | current | developer | reference | mir-maintainers | 2026-07-23 |
-| docs/reference/schemas/technology-lifecycle.md | Technology Lifecycle Schemas | current | developer | reference | mir-maintainers | 2026-08-03 |
+| docs/reference/schemas/technology-lifecycle.md | Technology Lifecycle Schemas | current | developer | reference | mir-maintainers | 2026-10-13 |
 | docs/reference/settings-reference.md | Settings Reference | archived | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/settings.md | Settings Reference | current | developer | reference | mir-maintainers | 2026-10-07 |
 | docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-10-12 |

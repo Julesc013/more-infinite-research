@@ -21,6 +21,25 @@ check(#TEST_ACQUISITION_CALLS == 2 and TEST_ACQUISITION_CALLS[1].options.private
     and TEST_ACQUISITION_CALLS[1].state == TEST_ACQUISITION_CALLS[2].state,
   "The opposing control must exercise repeated compiler-owned private acquisition calls")
 
+local available, paired = service.item_acquisition_available("public-item")
+check(available == true and paired == true and #TEST_ACQUISITION_CALLS == 3,
+  "The canonical Boolean companion proves the same private route without exporting a witness")
+check(type(available) == "boolean",
+  "The Boolean companion cannot expose a mutable private witness graph")
+
+TEST_ACQUISITION_RETURN_FALSE = true
+local false_witness = service.item_acquisition_witness("public-item")
+local false_available, false_paired = service.item_acquisition_available("public-item")
+TEST_ACQUISITION_RETURN_FALSE = nil
+check(false_witness == nil and false_available == false and false_paired == true
+    and #TEST_ACQUISITION_CALLS == 5,
+  "A false solver result has the same unavailable meaning through public and Boolean consumers")
+
+TEST_SERVICE_CONTEXT.services["science.item_acquisition_witness"] = function() return nil end
+local stale_available, stale_paired = service.item_acquisition_available("public-item")
+check(stale_available == nil and stale_paired == false and #TEST_ACQUISITION_CALLS == 5,
+  "A stale Boolean companion refuses a later replaced public witness service")
+
 first.ingredients[1].kind = "caller-mutated-child"
 first.machine.launcher.kind = "caller-mutated-launcher"
 check(TEST_PRIVATE_WITNESS.ingredients[1].kind == "private-child"

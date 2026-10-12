@@ -34,9 +34,19 @@ function S.ensure_services(context)
     context:set_service(SERVICE_PREFIX .. "independent_pack_acquisition_witness",
       pack_production_reachability.independent_pack_acquisition_witness)
   end
+  local installed_canonical_item_acquisition_witness = false
   if not context:has_service(SERVICE_PREFIX .. "item_acquisition_witness") then
     context:set_service(SERVICE_PREFIX .. "item_acquisition_witness",
       pack_production_reachability.item_acquisition_witness)
+    installed_canonical_item_acquisition_witness = true
+  end
+  if installed_canonical_item_acquisition_witness
+    and not context:has_service(SERVICE_PREFIX .. "item_acquisition_available") then
+    lab_compatibility.install_item_acquisition_companion(
+      context,
+      pack_production_reachability.item_acquisition_witness,
+      pack_production_reachability.item_acquisition_available
+    )
   end
   if not context:has_service(SERVICE_PREFIX .. "prereq_tech_for_science_pack") then
     context:set_service(SERVICE_PREFIX .. "prereq_tech_for_science_pack",

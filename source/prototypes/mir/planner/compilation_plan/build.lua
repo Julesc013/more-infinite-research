@@ -508,6 +508,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       generation_plan_fingerprint = stream_artifact.plan_fingerprint,
       compilation_plan_fingerprint = artifact.compilation_fingerprint,
       trusted_designs = true,
+      defer_diagnostic_alternatives = compiler_inputs.defer_diagnostic_alternatives == true,
       base_candidates = final_base_candidates
     }
   )

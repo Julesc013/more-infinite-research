@@ -6,6 +6,22 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local item_facts = require("prototypes.mir.index.item_prototype_facts")
 
 local M = {}
+-- Companion service records are mutable Context tables. Retain the canonical
+-- pairing in this module-private weak-key registry so Lab admission never
+-- trusts fields supplied or later replaced by an external record. Values
+-- deliberately retain only functions, never the record key itself.
+local known_item_acquisition_companions = setmetatable({}, {__mode = "k"})
+
+function M.install_item_acquisition_companion(context, witness, available)
+  if type(context) ~= "table" or type(context.set_service) ~= "function"
+    or type(witness) ~= "function" or type(available) ~= "function" then
+    error("MIR canonical item-acquisition companion requires Context and function services.", 2)
+  end
+  local companion = {witness = witness, available = available}
+  context:set_service("science.item_acquisition_available", companion)
+  known_item_acquisition_companions[companion] = {witness = witness, available = available}
+  return companion
+end
 
 local function pack_production_status(...)
   local service = compiler_context.current():service("science.pack_production_status")
@@ -53,7 +69,28 @@ local function lab_accepts_all(lab, packs, diagnostic_observer)
   return true
 end
 
-local function lab_acquisition_witness(lab_name, diagnostic_observer, reachability_context)
+-- The ordinary compiler needs only a yes/no answer for lab placement.  A
+-- paired Boolean companion can therefore avoid copying a complete private
+-- witness graph that this module never exposes.  An observer, unknown
+-- companion, or replaced witness service always retains the public witness
+-- path: its result and callback behavior are externally observable.
+local function item_acquisition_available(item_name, service, context, diagnostic_observer)
+  if not diagnostic_observer then
+    local companion = compiler_context.current():service("science.item_acquisition_available")
+    local registered = type(companion) == "table" and known_item_acquisition_companions[companion] or nil
+    if registered and companion.witness == registered.witness
+      and companion.available == registered.available and registered.witness == service then
+      local available, paired = registered.available(item_name,
+        context.visiting_packs or {}, context.visiting_technologies or {})
+      if paired == true then return available and true or false end
+    end
+  end
+  local witness = service(item_name, context.visiting_packs or {},
+    context.visiting_technologies or {}, diagnostic_observer)
+  return witness and true or false
+end
+
+local function lab_acquisition_available(lab_name, diagnostic_observer, reachability_context)
   local context = reachability_context or {}
   local service = compiler_context.current():service("science.item_acquisition_witness")
   if not service then error("MIR item-acquisition service is not registered in CompilerContext.", 2) end
@@ -77,11 +114,9 @@ local function lab_acquisition_witness(lab_name, diagnostic_observer, reachabili
   end
   for _, name in ipairs(items) do
     if not diagnostic_visit(diagnostic_observer) then return nil end
-    local witness = service(name, context.visiting_packs or {},
-      context.visiting_technologies or {}, diagnostic_observer)
-    if witness then return witness end
+    if item_acquisition_available(name, service, context, diagnostic_observer) then return true end
   end
-  return nil
+  return false
 end
 
 function M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
@@ -89,7 +124,7 @@ function M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
   for name, lab in pairs(data_raw.prototypes("lab")) do
     if not diagnostic_visit(diagnostic_observer) then return false end
     if lab_accepts_all(lab, packs, diagnostic_observer)
-      and lab_acquisition_witness(name, diagnostic_observer, reachability_context) then return true end
+      and lab_acquisition_available(name, diagnostic_observer, reachability_context) then return true end
   end
   return false
 end
@@ -195,7 +230,7 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
     end
     local candidate_has_required = contains_required(candidate, required)
     if candidate_has_required and contains_phase_trigger(candidate, required_any_packs)
-      and #candidate > 0 and lab_acquisition_witness(entry.name)
+      and #candidate > 0 and lab_acquisition_available(entry.name)
       and (not best or #candidate > #best) then
       best, best_lab = candidate, entry.name
     end

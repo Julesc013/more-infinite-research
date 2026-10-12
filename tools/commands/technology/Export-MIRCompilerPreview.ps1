@@ -6,6 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot '../../mir/application/technology/TechnologyAcceptance.ps1')
 
 function Get-MIRJsonSha256 {
   param($Value)
@@ -38,9 +39,7 @@ function Get-MIRQualificationDecisionValue {
 
 $resolvedCatalog = (Resolve-Path -LiteralPath $CatalogPath).Path
 $catalog = Get-Content -Raw -LiteralPath $resolvedCatalog | ConvertFrom-Json
-if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -ne "final") {
-  throw "Compiler PREVIEW export requires the exact final TechnologyCatalog schema 3 artifact."
-}
+Assert-MIR4FullTechnologyCatalog -Catalog $catalog
 foreach ($field in @("catalog_fingerprint", "generation_plan_fingerprint", "compilation_plan_fingerprint")) {
   if ([string]::IsNullOrWhiteSpace([string]$catalog.$field)) {
     throw "Compiler PREVIEW catalog field is required: $field"

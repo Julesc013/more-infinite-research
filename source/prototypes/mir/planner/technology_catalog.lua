@@ -13,5 +13,6 @@ return {
   assert_trusted = validate.assert_trusted,
   is_trusted = validate.is_trusted,
   authority_projection = query.authority_projection,
+  require_full_diagnostics = query.require_full_diagnostics,
   snapshot = query.snapshot
 }

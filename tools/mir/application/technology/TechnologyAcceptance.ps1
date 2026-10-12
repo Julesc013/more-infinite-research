@@ -1,5 +1,63 @@
 . (Join-Path $PSScriptRoot '../../domain/targets/TargetKey.ps1')
 
+# Schema 3 is the preserved complete historical contract. Schema 4 explicitly
+# separates player evaluation from complete developer diagnostics; a partial
+# player catalogue cannot be promoted into a complete review inventory.
+function Test-MIR4TechnologyCatalogInteger {
+  param($Value)
+  $numeric = $Value -is [int] -or $Value -is [long] -or $Value -is [double] -or $Value -is [decimal]
+  return $numeric -and [double]$Value -ge 0 -and
+    -not [double]::IsInfinity([double]$Value) -and
+    -not [double]::IsNaN([double]$Value) -and
+    [double]$Value -eq [Math]::Floor([double]$Value)
+}
+
+function Assert-MIR4FullTechnologyCatalog {
+  param([Parameter(Mandatory)]$Catalog)
+  if ([int]$Catalog.schema -notin @(3,4) -or [string]$Catalog.phase -cne 'final') {
+    throw '[mir4-technology-catalog-schema] Final TechnologyCatalog schema 3 or 4 is required.'
+  }
+  if ([int]$Catalog.schema -eq 3) { return }
+  $evaluationProperty = $Catalog.PSObject.Properties['alternative_evaluation']
+  $evaluation = if ($null -ne $evaluationProperty) { $evaluationProperty.Value } else { $null }
+  if ($null -eq $evaluation -or [string]$evaluation.mode -cne 'full-diagnostics' -or
+      $evaluation.complete -isnot [bool] -or $evaluation.complete -ne $true -or
+      $null -eq $evaluation.PSObject.Properties['deferred_diagnostic_alternatives'] -or
+      -not (Test-MIR4TechnologyCatalogInteger $evaluation.deferred_diagnostic_alternatives) -or
+      [int]$evaluation.deferred_diagnostic_alternatives -ne 0) {
+    throw '[mir4-technology-catalog-full-diagnostics-required] Capture PREVIEW diagnostics before full export, review or acceptance.'
+  }
+  $evaluatedCount = 0
+  foreach ($candidate in @($Catalog.candidates)) {
+    $evaluatedCount += @($candidate.alternatives).Count
+    $candidateEvaluation = $candidate.PSObject.Properties['diagnostic_evaluation']
+    if ($null -eq $candidateEvaluation -or [string]$candidateEvaluation.Value.state -cne 'constructed') {
+      throw '[mir4-technology-catalog-full-diagnostics-required] Candidate diagnostic evaluation is incomplete.'
+    }
+    $diagnostic = $candidateEvaluation.Value
+    foreach ($field in @('alternative_id','design_fingerprint','qualification_fingerprint')) {
+      if ($null -eq $diagnostic.PSObject.Properties[$field] -or [string]::IsNullOrWhiteSpace([string]$diagnostic.$field)) {
+        throw '[mir4-technology-catalog-full-diagnostics-required] Constructed diagnostic binding is missing.'
+      }
+    }
+    $diagnosticAlternatives = @($candidate.alternatives | Where-Object {
+      [string]$_.alternative_id -ceq [string]$diagnostic.alternative_id
+    })
+    if ($diagnosticAlternatives.Count -ne 1 -or
+        [string]$diagnosticAlternatives[0].action -cne 'diagnose' -or
+        [string]$diagnosticAlternatives[0].disposition -cne 'safe-diagnostic' -or
+        [string]$diagnosticAlternatives[0].design_fingerprint -cne [string]$diagnostic.design_fingerprint -or
+        [string]$diagnosticAlternatives[0].qualification_fingerprint -cne [string]$diagnostic.qualification_fingerprint) {
+      throw '[mir4-technology-catalog-full-diagnostics-required] Constructed diagnostic is not bound to its exact evaluated alternative.'
+    }
+  }
+  if ($null -eq $evaluation.PSObject.Properties['evaluated_alternatives'] -or
+      -not (Test-MIR4TechnologyCatalogInteger $evaluation.evaluated_alternatives) -or
+      [int]$evaluation.evaluated_alternatives -ne $evaluatedCount) {
+    throw '[mir4-technology-catalog-evaluation-count] Evaluated alternative count differs from its complete inventory.'
+  }
+}
+
 function Get-MIR4AcceptanceSha256 {
   param([Parameter(Mandatory)]$Value)
   $digestValue = $Value | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
@@ -24,9 +82,10 @@ function New-MIR4TechnologyAcceptanceQueue {
     throw "[mir4-acceptance-ecosystem] Unknown ecosystem '$Ecosystem'."
   }
   $catalog = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $CatalogPath) | ConvertFrom-Json -Depth 100
-  if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -cne 'final' -or [bool]$catalog.mutation_authority -or
+  Assert-MIR4FullTechnologyCatalog -Catalog $catalog
+  if ([bool]$catalog.mutation_authority -or
       [string]$catalog.selection_authority -cne 'deterministic-policy-v2') {
-    throw '[mir4-acceptance-catalog] Exact non-mutating final TechnologyCatalog schema 3 is required.'
+    throw '[mir4-acceptance-catalog] Exact non-mutating final complete TechnologyCatalog is required.'
   }
   foreach ($field in @('catalog_fingerprint', 'selection_fingerprint')) {
     if ([string]::IsNullOrWhiteSpace([string]$catalog.$field)) { throw "[mir4-acceptance-catalog-field] $field" }

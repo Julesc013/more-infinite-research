@@ -4,8 +4,12 @@ local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
 
-M.SCHEMA = 3
+M.SCHEMA = 4
 M.PHASES = {preselection = true, final = true}
+M.ALTERNATIVE_EVALUATION_MODES = {
+  ["full-diagnostics"] = true,
+  ["player-selected-primary-plus-required-fallbacks"] = true
+}
 M.authority = trusted_record.new("TechnologyCatalog")
 
 function M.alternative_id(design, action)
@@ -19,6 +23,34 @@ end
 
 function M.safe_diagnostic_row(diagnostic_design)
   return {action = "diagnose", gates = diagnostic_design.gates}
+end
+
+function M.constructed_diagnostic_evaluation(alternative)
+  return {
+    state = "constructed",
+    alternative_id = alternative.alternative_id,
+    design_fingerprint = alternative.design_fingerprint,
+    qualification_fingerprint = alternative.qualification_fingerprint
+  }
+end
+
+function M.deferred_diagnostic_evaluation(primary)
+  return {
+    state = "deferred-primary-qualified",
+    primary_alternative_id = primary.alternative_id,
+    primary_design_fingerprint = primary.design_fingerprint,
+    primary_qualification_fingerprint = primary.qualification_fingerprint
+  }
+end
+
+function M.alternative_evaluation(mode, evaluated_alternatives, deferred_diagnostic_alternatives)
+  local deferred = deferred_diagnostic_alternatives or 0
+  return {
+    mode = mode,
+    complete = deferred == 0,
+    evaluated_alternatives = evaluated_alternatives or 0,
+    deferred_diagnostic_alternatives = deferred
+  }
 end
 
 function M.final_qualification_row(row)
@@ -80,6 +112,7 @@ function M.preselection_material(catalog)
     candidate_catalog_fingerprint = catalog.candidate_catalog_fingerprint,
     qualification_catalog_fingerprint = catalog.qualification_catalog_fingerprint,
     alternative_qualifications = catalog.alternative_qualifications,
+    alternative_evaluation = catalog.alternative_evaluation,
     context_fingerprint = catalog.context_fingerprint,
     mutation_authority = catalog.mutation_authority,
     selection_authority = catalog.selection_authority,
@@ -109,7 +142,8 @@ function M.candidate_catalog_material(candidates)
       candidate_id = candidate.candidate_id,
       candidate_fingerprint = candidate.candidate_fingerprint,
       selection_key = candidate.selection_key,
-      alternatives = alternatives
+      alternatives = alternatives,
+      diagnostic_evaluation = candidate.diagnostic_evaluation
     })
   end
   return out
