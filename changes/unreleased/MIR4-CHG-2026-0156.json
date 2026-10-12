@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0156",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Bind 4.3.0 release assets and individual native evidence to full destination identities.",
+  "details": [
+    "Admit source 4.3.0 in release asset and technical evidence readers. Select the exact published 4.2.2 predecessor receipt without inheriting its historical qualification or unsigned acceptance.",
+    "Require all nine 4.3.CCC00 assets and the exact 27 direct 4.2.0, 4.2.1 and 4.2.2 upgrade rows. Preserve full state and require exact research definitions across the minor crossing. Historical log identities retain the actual source minor.",
+    "Keep 4.3.1 release custody refused until a qualified 4.3.0 publication provides actual pinned inputs. Preserve signing, protected-main, independent review, recovery and publication gates.",
+    "Controlled checks pass: 4.3.0 assets 40 assertions, 4.2.3 assets 41, release contract 7, and technical-seal source/reference/individual controls. These checks create no actual engine passes, signatures, seals or publication authority."
+  ],
+  "semantic_domains": [
+    "tooling",
+    "release",
+    "performance"
+  ],
+  "audiences": [
+    "maintainers",
+    "contributors"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F200",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "omit",
+    "target_changelog": "omit",
+    "github": "omit",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/release/Test-MIR430ReleaseContract.ps1",
+      "kind": "finding"
+    },
+    {
+      "value": "tests/release/Test-MIR42NineTargetReleaseAssets.ps1 and Test-MIR42NineTargetTechnicalSeal.ps1",
+      "kind": "finding"
+    }
+  ]
+}
