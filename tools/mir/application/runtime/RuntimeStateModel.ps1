@@ -34,7 +34,7 @@ function Get-MIR4RuntimeContinuityAuthority {
   foreach ($flag in @('semantic_authority','player_package_mutation_authorized','runtime_registration_mutation_authorized','migration_execution_authorized','public_support_authorized','signing_or_sealing_authorized','publication_authorized')) {
     if ([bool]$authority.$flag) { throw "[mir4-runtime-continuity-boundary] $flag" }
   }
-  if (@($authority.runtime_features.id | Sort-Object -Unique).Count -ne 7) { throw '[mir4-runtime-feature-count]' }
+  if (@($authority.runtime_features.id | Sort-Object -Unique).Count -ne 8) { throw '[mir4-runtime-feature-count]' }
   if (@($authority.state_specs.id | Sort-Object -Unique).Count -ne 5) { throw '[mir4-state-spec-count]' }
   if (@($authority.registration_groups.id | Sort-Object -Unique).Count -ne 9) { throw '[mir4-registration-group-count]' }
   if (@($authority.migration_edges.id | Sort-Object -Unique).Count -ne 10) { throw '[mir4-migration-edge-count]' }
@@ -171,7 +171,7 @@ function Assert-MIR4RuntimeRegistrationPlan {
   $callbackIds = @(
     if ($callbacksPresent) { $onLoad.callbacks | ForEach-Object { [string]$_ } }
   )
-  $approvedCallbackIds = @('passive_repair.on_load','research_browser.on_load')
+  $approvedCallbackIds = @('passive_repair.on_load','research_browser.on_load','compiler_profile_notice.on_load')
   $countPresent = if ($onLoadDictionary) { $onLoad.Contains('registration_count') } else { $null -ne $onLoad.PSObject.Properties['registration_count'] }
   $readonlyPresent = if ($onLoadDictionary) { $onLoad.Contains('read_only_restoration') } else { $null -ne $onLoad.PSObject.Properties['read_only_restoration'] }
   if (-not $registeredPresent -or -not $mutationPresent -or $registeredValue -isnot [bool] -or $mutationValue -isnot [bool]) { throw '[mir4-runtime-on-load-registration]' }
@@ -211,9 +211,20 @@ function Assert-MIR4RuntimeRegistrationPlan {
   $onTickDictionary = $onTick -is [Collections.IDictionary]
   $tickRegisteredPresent = if ($onTickDictionary) { $onTick.Contains('registered') } else { $null -ne $onTick.PSObject.Properties['registered'] }
   $tickBudgetPresent = if ($onTickDictionary) { $onTick.Contains('budget') } else { $null -ne $onTick.PSObject.Properties['budget'] }
-  if (-not $tickRegisteredPresent -or -not $tickBudgetPresent -or $onTick.registered -isnot [bool] -or
-      ($onTick.budget -isnot [int] -and $onTick.budget -isnot [long]) -or $onTick.budget -ne 0 -or
-      $mutationValue -or $onTick.registered) { throw '[mir4-runtime-idle-or-load-mutation]' }
+  $tickConditionalPresent = if ($onTickDictionary) { $onTick.Contains('conditional_one_shot') } else { $null -ne $onTick.PSObject.Properties['conditional_one_shot'] }
+  $tickOwnerPresent = if ($onTickDictionary) { $onTick.Contains('owner') } else { $null -ne $onTick.PSObject.Properties['owner'] }
+  $tickHandlerPresent = if ($onTickDictionary) { $onTick.Contains('handler') } else { $null -ne $onTick.PSObject.Properties['handler'] }
+  $tickUnsubscribePresent = if ($onTickDictionary) { $onTick.Contains('unsubscribes_before_delivery') } else { $null -ne $onTick.PSObject.Properties['unsubscribes_before_delivery'] }
+  if (-not $tickRegisteredPresent -or -not $tickBudgetPresent -or -not $tickConditionalPresent -or
+      -not $tickOwnerPresent -or -not $tickHandlerPresent -or -not $tickUnsubscribePresent -or
+      $onTick.registered -isnot [bool] -or $onTick.conditional_one_shot -isnot [bool] -or
+      $onTick.unsubscribes_before_delivery -isnot [bool] -or
+      ($onTick.budget -isnot [int] -and $onTick.budget -isnot [long]) -or $onTick.budget -ne 1 -or
+      -not [bool]$onTick.registered -or -not [bool]$onTick.conditional_one_shot -or
+      -not [bool]$onTick.unsubscribes_before_delivery -or
+      [string]$onTick.owner -cne 'compiler_profile_notice.on_load' -or
+      [string]$onTick.handler -cne 'compiler_profile_notice.deliver_deferred_load_notice' -or
+      $mutationValue) { throw '[mir4-runtime-idle-or-load-mutation]' }
   return $true
 }
 
@@ -222,7 +233,7 @@ function Get-MIR4RuntimeOnLoadSourceRegistration {
   $registrations = @([regex]::Matches($HostText, 'script\s*\.\s*on_load\s*\('))
   # Recognize the reviewed coordinator, including its Library capability guard.
   # Additional statements, alternate guards and extra registrations stay denied.
-  $approved = @([regex]::Matches($HostText, 'script\s*\.\s*on_load\s*\(\s*function\s*\(\s*\)\s*passive_repair\s*\.\s*on_load\s*\(\s*\)\s*if\s+research_browser\s+then\s+research_browser\s*\.\s*on_load\s*\(\s*\)\s*end\s*end\s*\)'))
+  $approved = @([regex]::Matches($HostText, 'script\s*\.\s*on_load\s*\(\s*function\s*\(\s*\)\s*passive_repair\s*\.\s*on_load\s*\(\s*\)\s*if\s+research_browser\s+then\s+research_browser\s*\.\s*on_load\s*\(\s*\)\s*end\s*compiler_profile_notice\s*\.\s*on_load\s*\(\s*\)\s*end\s*\)'))
   if ($registrations.Count -ne 1 -or $approved.Count -ne 1) { throw '[mir4-runtime-on-load-registration]' }
   return [pscustomobject]@{registration_count=$registrations.Count;approved_registration_count=$approved.Count}
 }
@@ -256,7 +267,18 @@ function New-MIR4RuntimeRegistrationPlan {
       [ordered]@{id=[string]$group.id;registration=$registration;filter=[string]$group.filter;subscribers=$subscribers}
     }
   )
-  $combined = $dispatcherText + "`n" + $stageText
+  $noticePath = Resolve-MIR4RuntimeProgrammePath -RepoRoot $repo -RelativePath 'prototypes/mir/runtime/compiler_profile_notice.lua'
+  $noticeText = Get-Content -Raw -LiteralPath $noticePath
+  $runtimeSourceRoot = Join-Path $repo 'source/prototypes/mir/runtime'
+  $onTickSources = @(
+    Get-ChildItem -LiteralPath $runtimeSourceRoot -Recurse -File -Filter '*.lua' |
+      Where-Object { (Get-Content -Raw -LiteralPath $_.FullName) -match 'defines\.events\.on_tick' } |
+      ForEach-Object { [System.IO.Path]::GetRelativePath((Join-Path $repo 'source'), $_.FullName).Replace('\','/') }
+  )
+  if ($onTickSources.Count -ne 1 -or $onTickSources[0] -cne 'prototypes/mir/runtime/compiler_profile_notice.lua' -or
+      @([regex]::Matches($noticeText, 'script\s*\.\s*on_event\s*\(\s*defines\s*\.\s*events\s*\.\s*on_tick\s*,')).Count -ne 2 -or
+      $noticeText -notmatch 'script\s*\.\s*on_event\s*\(\s*defines\s*\.\s*events\s*\.\s*on_tick\s*,\s*deliver_deferred_load_notice\s*\)' -or
+      $noticeText -notmatch 'script\s*\.\s*on_event\s*\(\s*defines\s*\.\s*events\s*\.\s*on_tick\s*,\s*nil\s*\)') { throw '[mir4-runtime-unbudgeted-on-tick]' }
   $onLoadHosts = @(
     foreach ($hostTarget in @('f210','f200')) {
       $hostPackage = if ($hostTarget -ceq 'f210') { $targetPackage } else { New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $hostTarget }
@@ -265,7 +287,7 @@ function New-MIR4RuntimeRegistrationPlan {
       $hostText = (Get-Content -Raw -LiteralPath $hostDispatcherPath) + "`n" + (Get-Content -Raw -LiteralPath $hostStagePath)
       $registration = Get-MIR4RuntimeOnLoadSourceRegistration -HostText $hostText
       [ordered]@{
-        target=$hostTarget;approved_handler='anonymous-coordinator';approved_callbacks=@('passive_repair.on_load','research_browser.on_load');registration_count=$registration.registration_count;approved_registration_count=$registration.approved_registration_count
+        target=$hostTarget;approved_handler='anonymous-coordinator';approved_callbacks=@('passive_repair.on_load','research_browser.on_load','compiler_profile_notice.on_load');registration_count=$registration.registration_count;approved_registration_count=$registration.approved_registration_count
         source_identity=[ordered]@{
           dispatcher=[ordered]@{path='prototypes/mir/runtime/scripted_techs.lua';sha256=(Get-MIR4PlatformInputSha256 $hostDispatcherPath)}
           stage=[ordered]@{path='prototypes/mir/stage/control.lua';sha256=(Get-MIR4PlatformInputSha256 $hostStagePath)}
@@ -277,13 +299,12 @@ function New-MIR4RuntimeRegistrationPlan {
     kind='MIR4RuntimeRegistrationPlanV1';schema=1;owner='prototypes/mir/runtime/scripted_techs.lua';owner_sha256=(Get-MIR4PlatformInputSha256 $dispatcherPath);groups=$groups
     ordering='authority-array-preserved-as-explicit-ordinal';filter_before_dispatch=$true;one_registration_per_group=$true
     on_load=[ordered]@{
-      registered=$true;handler='anonymous-coordinator';callbacks=@('passive_repair.on_load','research_browser.on_load');read_only_restoration=$true;registration_count=1;hosts=$onLoadHosts
+      registered=$true;handler='anonymous-coordinator';callbacks=@('passive_repair.on_load','research_browser.on_load','compiler_profile_notice.on_load');read_only_restoration=$true;registration_count=1;hosts=$onLoadHosts
       persistent_mutation=$false
-    };on_tick=[ordered]@{registered=($combined -match 'defines\.events\.on_tick');budget=0}
+    };on_tick=[ordered]@{registered=$true;conditional_one_shot=$true;owner='compiler_profile_notice.on_load';handler='compiler_profile_notice.deliver_deferred_load_notice';budget=1;unsubscribes_before_delivery=$true}
     cross_feature_state_mutation=$false;duplicate_rejection=$true;maximum_diagnostics_per_dispatch=64
-    law_results=[ordered]@{unique_groups=$true;unique_subscribers=$true;stable_order=$true;filter_before_dispatch=$true;no_on_load_mutation=$true;no_idle_tick=$true;namespace_isolation=$true;bounded_diagnostics=$true;all_passed=$true}
+    law_results=[ordered]@{unique_groups=$true;unique_subscribers=$true;stable_order=$true;filter_before_dispatch=$true;no_on_load_mutation=$true;one_shot_on_load_tick=$true;no_idle_tick=$true;namespace_isolation=$true;bounded_diagnostics=$true;all_passed=$true}
   }
-  if ($plan.on_tick.registered) { throw '[mir4-runtime-unbudgeted-on-tick]' }
   Assert-MIR4RuntimeRegistrationPlan -Plan $plan | Out-Null
   return $plan
 }
@@ -307,7 +328,7 @@ function New-MIR4RuntimeStateMatrix {
   $record = [pscustomobject][ordered]@{
     schema=1;kind='MIR4RuntimeStateMatrixV1';programme_id=[string]$authority.programme_id;source_identity=(New-MIR4RuntimeSourceIdentity $SourceIdentity)
     authority='.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json';maturity='shadow';runtime_feature_specs=$features;state_specs=$states;registration_plan=$registration;targets=$targets
-    invariants=@('terminal-runtime-remains-player-authority','runtime-never-mutates-prototypes','state-owned-under-mir-namespace','backend-derived-from-target-profile','field-aware-state-classification','one-registration-per-event-filter-group','filter-before-dispatch','stable-subscriber-order','no-on-load-persistent-mutation','no-idle-on-tick','no-cross-feature-state-mutation','bounded-diagnostics')
+    invariants=@('terminal-runtime-remains-player-authority','runtime-never-mutates-prototypes','state-owned-under-mir-namespace','backend-derived-from-target-profile','field-aware-state-classification','one-registration-per-event-filter-group','filter-before-dispatch','stable-subscriber-order','no-on-load-persistent-mutation','one-shot-on-load-notice-tick','no-idle-on-tick','no-cross-feature-state-mutation','bounded-diagnostics')
     package_visible=$false;runtime_mutation_authorized=$false;public_release_proof=$false;digest=''
   }
   Add-MIR4PlatformDigest $record | Out-Null

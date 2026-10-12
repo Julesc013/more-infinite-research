@@ -12,7 +12,7 @@
     "source_identity": {"type":["object","null"]},
     "authority": {"const":".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"},
     "maturity": {"const":"shadow"},
-    "runtime_feature_specs": {"type":"array","minItems":7,"maxItems":7,"items":{"$ref":"#/$defs/runtimeFeatureSpec"}},
+    "runtime_feature_specs": {"type":"array","minItems":8,"maxItems":8,"items":{"$ref":"#/$defs/runtimeFeatureSpec"}},
     "state_specs": {"type":"array","minItems":5,"maxItems":5,"items":{"$ref":"#/$defs/stateSpec"}},
     "registration_plan": {"type":"object"},
     "targets": {"type":"array","minItems":17,"maxItems":17},

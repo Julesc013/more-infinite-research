@@ -1,1 +1,3 @@
+if log then log("[more-infinite-research] startup-stage=data-updates begin") end
 require("prototypes.mir.stage.data_updates").run()
+if log then log("[more-infinite-research] startup-stage=data-updates end") end

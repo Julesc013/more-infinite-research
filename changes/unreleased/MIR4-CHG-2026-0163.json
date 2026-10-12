@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0163",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Use a limited classic compiler by default and retain full support as an explicit startup option.",
+  "details": [
+    "Classic bypasses generic acquisition, alternative-route, provider, material and catalogue analysis before the full pipeline is imported. A finite declared direct-bonus and native-continuation core uses the existing checked transformation plan and technology emitter.",
+    "Classic omits recipe productivity, inferred mod support, material progression, competing-owner replacements and weapon-speed redistribution. Research and saved investment outside the core are not preserved. Select Full before opening a factory that needs MIR 4.2 research; Full may still load slowly.",
+    "Direct bonuses use a declared common science vector. Classic native continuations inherit fixed-count native units; native formula tails are unsupported. Applicability records and Library status identify reduced scope; omitted research is not claimed unreachable.",
+    "Classic limits total declared candidates, technology scanning, prerequisite checks and copied native values. The named compatibility-cycle repair also uses a shared work limit in Classic, with incomplete analysis reported explicitly and no fallback into the full compiler.",
+    "Correct native-effect capability records for braking, research speed, robot storage and inserter capacity, including modern bulk and historical stack inserter effects.",
+    "Classic does not apply high scoped productivity-cap overrides that require recycling-graph inference. Existing recipe caps stay unchanged; Full retains that guarded feature.",
+    "Historical 0.x targets retain their reduced numeric-unit path. Native startup and save qualification remain required."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Default Classic narrows research support; Full retains the broad compiler. Current-package startup and upgrade evidence required."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Default Classic narrows research support; Full retains the broad compiler. Current-package startup and upgrade evidence required."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Default Classic narrows research support; Full retains the broad compiler. Current-package startup and upgrade evidence required."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Default Classic narrows research support; Full retains the broad compiler. Current-package startup and upgrade evidence required."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Historical 0.x routes retain the reduced compiler and numeric-unit contract; actual release package and predecessor evidence remain required."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Historical 0.x routes retain the reduced compiler and numeric-unit contract; actual release package and predecessor evidence remain required."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Historical 0.x routes retain the reduced compiler and numeric-unit contract; actual release package and predecessor evidence remain required."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Historical 0.x routes retain the reduced compiler and numeric-unit contract; actual release package and predecessor evidence remain required."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Historical 0.x routes retain the reduced compiler and numeric-unit contract; actual release package and predecessor evidence remain required."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "repair-required",
+    "settings": "changed",
+    "migration": "required",
+    "compatibility": "changed",
+    "public_contract": "changed",
+    "support_claim": "narrowed"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/classic_profile_routing.lua: earliest default/full selection"
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}

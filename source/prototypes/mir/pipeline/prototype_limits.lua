@@ -2,7 +2,6 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local effective_settings = require("prototypes.mir.settings.effective")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
-local cap_scope = require("prototypes.mir.policy.productivity_cap_scope")
 local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 
 local P = {}
@@ -63,14 +62,19 @@ end
 
 local has_category = recipe_semantics.has_recipe_category
 
-local function apply_recipe_productivity_cap(value, recycling_chance)
+local function apply_recipe_productivity_cap(value, recycling_chance, options)
   if value == nil then return 0 end
 
   local changed = 0
   local scoped = effective_settings.get(prototype_limit_settings.self_recycling_scope_setting_name) == true
   local scope_threshold = inverse_recycling_productivity_bonus(recycling_chance)
   local scope_active = scoped and value > scope_threshold + EPSILON
-  local scope_classifier = scope_active and cap_scope.build(scope_threshold) or nil
+  if scope_active and options and options.allow_material_analysis == false then
+    log("[more-infinite-research] Classic compiler: scoped productivity-cap override not evaluated; recipe caps remain unchanged.")
+    return 0, "not-evaluated-classic-material-scope"
+  end
+  local scope_classifier = scope_active
+    and require("prototypes.mir.policy.productivity_cap_scope").build(scope_threshold) or nil
   local approved = 0
   local rejected = 0
   local skipped_recycling = 0
@@ -233,12 +237,14 @@ local function apply_positive_power_floor()
   return changed
 end
 
-function P.apply()
+function P.apply(options)
   local productivity_cap = selected("productivity")
   local recycling = apply_recycling_return_chance(productivity_cap)
+  local productivity, productivity_status = apply_recipe_productivity_cap(productivity_cap, recycling.chance, options)
   local changed = {
     recycling = recycling,
-    productivity = apply_recipe_productivity_cap(productivity_cap, recycling.chance),
+    productivity = productivity,
+    productivity_status = productivity_status,
     efficiency = apply_effect_receiver_limit("consumption_limits", "low", selected("efficiency")),
     pollution = apply_effect_receiver_limit("pollution_limits", "low", selected("pollution")),
     speed_floor = apply_effect_receiver_limit("speed_limits", "low", selected("speed_floor")),

@@ -1,10 +1,11 @@
-local profile_codec = require("prototypes.mir.settings.profile_codec")
-local settings_catalog = require("prototypes.mir.settings.catalog")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
+local IMPORT_SETTING_NAME = "mir-settings-profile-import"
+local function codec() return require("prototypes.mir.settings.profile_codec") end
+local function catalog() return require("prototypes.mir.settings.catalog") end
 
 local function raw_setting(name)
   local setting = settings and settings.startup and settings.startup[name]
@@ -28,10 +29,10 @@ local function load_import_profile(context)
   if state.loaded then return state.profile end
   state.loaded = true
 
-  local text = raw_setting(profile_codec.import_setting_name)
+  local text = raw_setting(IMPORT_SETTING_NAME)
   if text == nil or text == "" then return nil end
 
-  local profile, err = profile_codec.decode(text)
+  local profile, err = codec().decode(text)
   if not profile then
     state.error = err
     if log then
@@ -50,9 +51,9 @@ end
 
 function M.get(name, context)
   local profile = load_import_profile(context)
-  if profile and name ~= profile_codec.import_setting_name and setting_exists(name) then
+  if profile and name ~= IMPORT_SETTING_NAME and setting_exists(name) then
     local imported = profile.settings and profile.settings[name]
-    if imported ~= nil and settings_catalog.validate_value(name, imported) then
+    if imported ~= nil and catalog().validate_value(name, imported) then
       return imported
     end
   end
@@ -65,7 +66,7 @@ function M.import_status(context)
   local state = import_state(context)
 
   if state.profile then
-    local recognized, unknown, invalid = profile_codec.count_recognized_settings(state.profile)
+    local recognized, unknown, invalid = codec().count_recognized_settings(state.profile)
     return {
       active = true,
       recognized = recognized,
@@ -90,7 +91,7 @@ end
 
 function M.snapshot(context)
   local values = {}
-  for _, name in ipairs(settings_catalog.setting_names({registered_only = true})) do
+  for _, name in ipairs(catalog().setting_names({registered_only = true})) do
     values[name] = M.get(name, context)
   end
   local result = {

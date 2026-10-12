@@ -404,6 +404,33 @@ local function same_array(left, right)
   return true
 end
 
+local CLASSIC_UNSUPPORTED_CLASSES = {
+  "automatic-families",
+  "competing-owner-replacements",
+  "generic-mod-inference",
+  "material-progression",
+  "recipe-productivity",
+  "weapon-speed-redistribution"
+}
+
+local function valid_compiler_scope(scope)
+  if type(scope) ~= "table" or scope.schema ~= 1 or scope.profile ~= "classic"
+      or scope.full_catalog_status ~= "not-evaluated"
+      or (scope.state ~= "available" and scope.state ~= "unavailable") then
+    return false
+  end
+  if scope.state == "unavailable" then
+    return only_fields(scope, {schema = true, state = true, profile = true, full_catalog_status = true})
+  end
+  return only_fields(scope, {schema = true, state = true, profile = true, full_catalog_status = true,
+      supported_manifest_ids = true, unsupported_classes = true, omitted_research_not_preserved = true})
+    and sorted_unique_strings(scope.supported_manifest_ids)
+    and #scope.supported_manifest_ids <= M.catalogue_limit
+    and sorted_unique_strings(scope.unsupported_classes)
+    and same_array(scope.unsupported_classes, CLASSIC_UNSUPPORTED_CLASSES)
+    and scope.omitted_research_not_preserved == true
+end
+
 local function valid_setting(value, expected_name, expected_type)
   local values_are_valid = type(value) == "table"
     and type(value.default) == expected_type and type(value.raw_direct) == expected_type
@@ -590,7 +617,7 @@ function M.normalize_enrichment(enrichment)
   if enrichment.schema == 1 then return enrichment end
   if not only_fields(enrichment, {schema = true, kind = true, caps = true, families = true, details = true,
       recipe_ids = true,
-      runtime_settings_bindings = true})
+      runtime_settings_bindings = true, compiler_scope = true})
     or enrichment.schema ~= M.enrichment_schema or enrichment.kind ~= M.enrichment_kind
     or type(enrichment.caps) ~= "table" or type(enrichment.families) ~= "table"
     or type(enrichment.details) ~= "table" then
@@ -599,6 +626,7 @@ function M.normalize_enrichment(enrichment)
   local runtime_settings_bindings = enrichment.runtime_settings_bindings
   if runtime_settings_bindings == nil then runtime_settings_bindings = {} end
   if type(runtime_settings_bindings) ~= "table" then return nil end
+  if enrichment.compiler_scope ~= nil and not valid_compiler_scope(enrichment.compiler_scope) then return nil end
   -- Rich details may be populated for only the selected subject. List facts
   -- stay complete, and every supplied detail must still belong to a family.
   local recipe_ids = enrichment.recipe_ids
