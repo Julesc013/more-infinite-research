@@ -947,9 +947,9 @@
     {
       "path": "scripts/Measure-MIRPerformanceRegression.ps1",
       "classification": "canonical-internal",
-      "sha256": "C4C8F7F396B40422952C11DCF3B56C7EB2371441D757AE559A56F6B1067BB5E3",
+      "sha256": "1AC8B5BFB088A8AA5251E3EF1BA8F70656AE17BDFE08C805032B8CF1823369A3",
       "hash_mode": "canonical-text-v1",
-      "lines": 890,
+      "lines": 891,
       "package_visible": false
     },
     {
@@ -3179,7 +3179,7 @@
     {
       "path": "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
       "classification": "canonical-internal",
-      "sha256": "A51CE3B207C9A528D2280E3509EDBCC1A7FAF519398A42166DC65578B2C929F2",
+      "sha256": "A24EB9B5CA4C04E8D9CE5C01C9929BE987FAE3C4411A8E5C36A0BC899001C2D3",
       "hash_mode": "canonical-text-v1",
       "lines": 23,
       "package_visible": false
@@ -3187,9 +3187,9 @@
     {
       "path": "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
       "classification": "historical",
-      "sha256": "FA8FAA953C6B972EA7B0AB37F9414C0A4EBC2F801BFD031D115F03B2B03CF3F7",
+      "sha256": "1D0DB85E9441EBDB632BDED3615235ABD4B9F975416FEFAC3D52209E0A7F5E4E",
       "hash_mode": "canonical-text-v1",
-      "lines": 309,
+      "lines": 313,
       "package_visible": false
     },
     {
@@ -4443,9 +4443,9 @@
     {
       "path": "tools/lib/validation/BrowserContinuityInputs.ps1",
       "classification": "canonical-internal",
-      "sha256": "6ADAE528FCEE95548FBE5400E51B9D4F9296EC02994545568CE9208EEC1F3060",
+      "sha256": "4E0A2119DF09CB19FBFE0C322F5E20307AA9E4B51BAB905868FFB1F4E98F6279",
       "hash_mode": "canonical-text-v1",
-      "lines": 203,
+      "lines": 206,
       "package_visible": false
     },
     {
@@ -4459,9 +4459,9 @@
     {
       "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
       "classification": "canonical-internal",
-      "sha256": "61391DF1D0AAD2C5319769570584D24AE755B5C14C2D258F56972475067E3E76",
+      "sha256": "F5A0EA5A0A005256A47E9C9BA1DBC7D5461EFC8DA0EEE2418A7B34C7B164D823",
       "hash_mode": "canonical-text-v1",
-      "lines": 668,
+      "lines": 674,
       "package_visible": false
     },
     {
@@ -4499,9 +4499,9 @@
     {
       "path": "tools/lib/validation/NativeProbeResources.ps1",
       "classification": "canonical-internal",
-      "sha256": "CC6B2F534E7C2824FE0734F2D68B77A9BD3FA8A70FDB60471EA8CA454A0D3ACB",
+      "sha256": "DD9D288F5EC3FDA19ED308898BBDF540889F1748CFF94C1C1AE993433495D423",
       "hash_mode": "canonical-text-v1",
-      "lines": 296,
+      "lines": 297,
       "package_visible": false
     },
     {
@@ -5187,9 +5187,9 @@
     {
       "path": "tools/mir/application/package/TargetMaterializer.ps1",
       "classification": "canonical-internal",
-      "sha256": "573C311F97F7D2A35C91957E40D1EB2E4E9034236170EF80982D9E9EC4D35B23",
+      "sha256": "B96C63A68E29AEC4214F563E89BC31A68FE149D4BCBD3306BCDA1D1AC31DF172",
       "hash_mode": "canonical-text-v1",
-      "lines": 513,
+      "lines": 531,
       "package_visible": false
     },
     {
@@ -5331,9 +5331,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
       "classification": "canonical-internal",
-      "sha256": "46713CFE082811F66C9DE974030B23717647FEB064FBC26CBA3DAC95EF143D17",
+      "sha256": "D1D74D4F8A716D79ED17EC9B43F2FFD8D426B25E45179D8ABD68EC60FE8009F5",
       "hash_mode": "canonical-text-v1",
-      "lines": 693,
+      "lines": 712,
       "package_visible": false
     },
     {
@@ -5347,9 +5347,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
       "classification": "canonical-internal",
-      "sha256": "CEF98F7B9333D582156F47A85041157A1FB1259CC53B7C0FF3FFC804607C3E09",
+      "sha256": "C59EEDF5B3B44391AB2B1020EB50812A1867168DE42A1C43D64C2D0D2C2B8639",
       "hash_mode": "canonical-text-v1",
-      "lines": 504,
+      "lines": 506,
       "package_visible": false
     },
     {
@@ -5427,9 +5427,9 @@
     {
       "path": "tools/mir/application/release/readiness/ResourceGovernor.ps1",
       "classification": "canonical-internal",
-      "sha256": "631829C8D18BE7590E67D38A30C5B73243C293A21CC5A63CD9869CE594D6F54A",
+      "sha256": "6364E776ED034549B33F66BD67EE24435619E945D4D3C16DF373D2374757EF5A",
       "hash_mode": "canonical-text-v1",
-      "lines": 221,
+      "lines": 232,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7ad1a34d5dab68d7c6b3ee26e5589635ccecd93e634aeb62815480e04b5b13ca"
+  "digest": "sha256:0a75617c8ab23455f9e249913f6c0643e47fb24deca0bd468193de69f796c599"
 }

@@ -6,6 +6,10 @@ param(
   [Parameter(Mandatory)][string]$ToZip,
   [Parameter(Mandatory)][string]$FromVersion,
   [Parameter(Mandatory)][string]$ToVersion,
+  [string]$SourceMaterializationPath = '',
+  [string]$SelectedTarget = '',
+  [ValidateSet('','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '',
+  [string]$PublishedMaintenancePredecessorManifestPath = '',
   [string]$FixtureName = "assert-upgrade-3-2-3-to-3-2-5",
   [string]$OutputPath = "build/results/assurance/3.2.5-upgrade-proof.json",
   [string]$WorkRoot = "",
@@ -26,6 +30,13 @@ $null=Resolve-MIR441RecoveryScratchPath -Path $upgradeWorkRoot
 if ($ExpectedPeakMemoryMiB -le 0) { throw '[mir441-resource-peak-budget-required] Declare the upgrade peak memory budget.' }
 $null=Assert-MIR441ResourceAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $upgradeWorkRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB)
 $runner = Join-Path $RepoRoot "tests\runtime\Test-MIRUpgrade.ps1"
+$currentDestination=-not[string]::IsNullOrWhiteSpace($SourceMaterializationPath)
+if($currentDestination-and([string]::IsNullOrWhiteSpace($SelectedTarget)-or[string]::IsNullOrWhiteSpace($SourceVersion)-or[string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath))){
+  throw '[mir-upgrade-matrix-current-inputs] Current-source matrix rows require exact materialization, target, source version and published predecessor custody.'
+}
+if(-not$currentDestination-and($SelectedTarget-or$SourceVersion-or$PublishedMaintenancePredecessorManifestPath)){
+  throw '[mir-upgrade-matrix-current-inputs] Current-source matrix controls require a materialization receipt.'
+}
 $output = if ([IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
 $outputParent = Split-Path -Parent $output
 if (-not (Test-Path -LiteralPath $outputParent)) { New-Item -ItemType Directory -Force -Path $outputParent | Out-Null }
@@ -37,6 +48,12 @@ $cases = @(
   [ordered]@{ id = "base-continuations"; source_only = @() },
   [ordered]@{ id = "mod-set-configuration-change"; source_only = @("upgrade-modset-source") }
 )
+if($currentDestination){
+  # Current destination receipts are exercised through the canonical base
+  # fixture per target.  Optional scenario fixtures retain their own exact
+  # input profiles and are not silently relabelled as a 4.3 upgrade matrix.
+  $cases=@([ordered]@{ id='base-default'; source_only=@() })
+}
 
 $privateLocalPlaytestFixtures = @(
   'assert-upgrade-2-5-11-to-4-0-20000',
@@ -77,6 +94,12 @@ foreach ($case in $cases) {
     MaxNewOutputMiB = $MaxNewOutputMiB
     Retention = $Retention
   }
+  if($currentDestination){
+    $arguments.SourceMaterializationPath=$SourceMaterializationPath
+    $arguments.SelectedTarget=$SelectedTarget
+    $arguments.SourceVersion=$SourceVersion
+    $arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath
+  }
   & $runner @arguments
   if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $rowOutput -PathType Leaf)) {
     throw "Upgrade matrix row failed: $($case.id)"
@@ -89,7 +112,7 @@ foreach ($case in $cases) {
   if ($assertions.Count -eq 0) {
     throw "Upgrade matrix row published no named assertions: $($case.id)"
   }
-  if ($FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10", "assert-upgrade-3-2-11-to-4-0-21000", "assert-upgrade-4-0-21000-to-4-1-21000") + $privateLocalPlaytestFixtures) -and
+  if (($currentDestination -or $FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10", "assert-upgrade-3-2-11-to-4-0-21000", "assert-upgrade-4-0-21000-to-4-1-21000") + $privateLocalPlaytestFixtures)) -and
       ("upgraded-save-reload-passed" -notin $assertions -or
        "upgraded-save-second-reload-passed" -notin $assertions -or
        [string]::IsNullOrWhiteSpace([string]$result.second_reload_log) -or
@@ -140,6 +163,9 @@ $factorioVersion = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
     version = $ToVersion
     archive = (Split-Path -Leaf $to)
     archive_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash
+    source_version = if($currentDestination){$SourceVersion}else{''}
+    target = if($currentDestination){$SelectedTarget}else{''}
+    materialization = if($currentDestination){$SourceMaterializationPath}else{''}
   }
   required_archetypes = @($cases | ForEach-Object { [string]$_.id })
   retention = $Retention

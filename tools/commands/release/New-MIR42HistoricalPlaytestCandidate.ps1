@@ -2,7 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
@@ -161,7 +161,11 @@ function Copy-MIR42HistoricalAdapter {
 $targetState = Get-MIR42HistoricalTargetRecord -TargetId $Target
 $record = $targetState.record
 $sourceManifest = Get-MIR42HistoricalSourceManifest
-$identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch ([int]($SourceVersion.Split('.')[2]))
+$sourceVersionParts = $SourceVersion.Split('.')
+$sourceMinor = [int]$sourceVersionParts[1]
+$sourcePatch = [int]$sourceVersionParts[2]
+$baselineSourceVersion = "4.$sourceMinor.0"
+$identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor $sourceMinor -SourcePatch $sourcePatch
 $distributionVersion = [string]$identity.distribution_version
 if ($RefreshSourceBindings) {
   if ($SourceVersion -cne '4.2.0') { throw '[mir42-historical-refresh-source-version]' }
@@ -200,14 +204,14 @@ $sourceTree = (& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 $rows = @()
 foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   $base = New-MIR4TargetPackage -RepoRoot $repo -Target ([string]$record.base_materializer_target) `
-    -CandidateId "$CandidateId-BASE-$letter" -OutputRoot (Join-Path $output 'base')
+    -CandidateId "$CandidateId-BASE-$letter" -SourceVersion $baselineSourceVersion -OutputRoot (Join-Path $output 'base')
   $candidateParent = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "$Target/$CandidateId/$letter"
   Remove-MIR4BuildTree -OutputRoot $output -Path $candidateParent
   New-Item -ItemType Directory -Force -Path $candidateParent | Out-Null
   $tree = Join-Path $candidateParent "more-infinite-research_$distributionVersion"
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
-  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3')) {
+  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.
     $readmePath = Join-Path $tree 'README.md'
