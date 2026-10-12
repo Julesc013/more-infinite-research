@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-10-13
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -32,10 +32,14 @@ MIR uses one governed record chain for fixed and procedural technology work. `.m
 | `TechnologyApplicabilityEnvelope` schema 1 | Binds approved scope to exact Factorio lines, features, mods, finite structural predicates, positive and negative examples, and a maximum count of newly matched subjects. |
 | `TechnologyPromotion` schema 1 | Advances an identity through one permitted transition and binds an approval plus exact design fingerprint. |
 | `TechnologyMigration` schema 1 | Governs released identity changes and their save behavior. |
-| `TechnologyCatalog` schema 3 | Canonically inventories every materializing, rejected, and safe diagnostic alternative with its exact design and total qualification after sanitation and graph proof, then records deterministic selections and exact GenerationPlan/CompilationPlan bindings. It has no mutation or publication authority. |
+| `TechnologyCatalog` schema 4 | Records exact constructed alternatives and qualifications after sanitation and graph proof, deterministic selections, GenerationPlan/CompilationPlan bindings, and explicit evaluated/deferred diagnostic scope. It has no mutation or publication authority. |
 | `TechnologyPromotionAdmission` schema 1 | Fails closed over the exact catalog alternative, passing quality assessment, approval, applicability envelope, evidence, identity edge, migration policy, and field locks. |
 
-Every compilation materializes the context-owned schema-3 catalog after sanitation and graph proof. The catalog's pure selection policy sorts independent alternatives, excludes rejections, records one current selection per candidate, and preserves rejected designs for audit. Every hard-gate key is present and resolved as passed, failed, or not-applicable with authority. GenerationPlan and CompilationPlan are exact projections of the catalog selections. Diagnostics control only additional views; they do not control whether the exact canonical catalog is published. The catalog cannot publish or mutate a prototype.
+Every compilation constructs the context-owned schema-4 catalog after sanitation and graph proof. The catalog's pure selection policy sorts independent alternatives, excludes rejections, records one current selection per candidate, and preserves rejected designs for audit. Every constructed qualification has a complete hard-gate vector resolved as passed, failed, or not-applicable with authority. GenerationPlan and CompilationPlan are exact projections of the catalog selections. The catalog cannot publish or mutate a prototype.
+
+Ordinary player construction can omit a safe diagnostic alternative only after the exact final `emit` or `adopt` primary has a `qualified` SafetyQualification. That primary necessarily wins the existing selection policy. Its candidate records `diagnostic_evaluation.state=deferred-primary-qualified` with the primary alternative, design, and qualification identities; no omitted diagnostic design or qualification is fabricated. Failed, skipped, unresolved, and preselection cases retain their full alternative construction. The catalog fingerprints this evaluation scope and records constructed and deferred counts separately.
+
+`alternative_evaluation.mode=full-diagnostics` identifies a complete inventory. A catalog with omissions uses `player-selected-primary-plus-required-fallbacks` and `complete=false`. PREVIEW and generation diagnostics always request complete construction. The schema-2 public projection carries the evaluation scope and separately names evaluated alternatives and deferred diagnostics. Export, review, assessment, promotion admission, and acceptance tools reject an incomplete schema-4 inventory and require a complete diagnostic capture. They still read preserved complete historical schema-3 artifacts.
 
 Reviewed automatic generation is not authorized by an external pack's self-description. A pack must reference an exact authorization in MIR's source-owned promotion registry, and the pack ID, family ID, provider ID, provider version, trust class, and authorization ID must all match. Only `mir-reviewed` and `protected-release` satisfy reviewed mode; `fixture-only`, `local-user`, and `external-mod-author` remain non-promoting evidence classes.
 

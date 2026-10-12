@@ -8,6 +8,7 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
 local environment_adapter = require("prototypes.mir.platform.factorio.environment_identity")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local effect_target_inventory = require("prototypes.mir.platform.factorio.effect_target_inventory")
 local compilation_snapshot_adapter = require("prototypes.mir.pipeline.compilation_snapshot_adapter")
 local policy_snapshot_adapter = require("prototypes.mir.pipeline.policy_snapshot_adapter")
@@ -106,6 +107,8 @@ local function compile_active(context)
     base_candidates = base_candidates,
     input_sanitation_ledger = input_sanitation_ledger,
     stream_plan_trusted = true,
+    defer_diagnostic_alternatives = not diagnostics.enabled()
+      and not execution_mode.include_full_diagnostics(policy_snapshot.execution_mode),
     effect_target_inventory = effect_target_inventory.capture()
   })
   local qualification_started = now()

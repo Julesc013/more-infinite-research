@@ -139,7 +139,7 @@ local function context()
       qualification_fingerprint = "mir32-qualification",
       compiler_input = {input_fingerprint = "mir32-input"},
       stream_plan = {rows = {}},
-      technology_catalog = {schema = 3, catalog_fingerprint = "mir32-catalog"},
+      technology_catalog = {schema = 4, catalog_fingerprint = "mir32-catalog"},
       input_sanitation_ledger = {},
       base_extension_operations = {},
       pure_compilation = {execution_mode = "SAFE"}

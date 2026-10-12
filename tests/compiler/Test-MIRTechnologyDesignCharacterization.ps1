@@ -52,6 +52,20 @@ $modules=[ordered]@{
   'prototypes.mir.integrity.effect_contracts'='source/prototypes/mir/integrity/effect_contracts.lua'
   'prototypes.mir.domain.technology.gate'='source/prototypes/mir/domain/technology/gate.lua'
   'prototypes.mir.domain.technology.technology_design'='source/prototypes/mir/domain/technology/technology_design.lua'
+  'prototypes.mir.domain.technology.generated_hard_gate_authority'='source/prototypes/mir/domain/technology/generated_hard_gate_authority.lua'
+  'prototypes.mir.domain.technology.hard_gate_authority'='source/prototypes/mir/domain/technology/hard_gate_authority.lua'
+  'prototypes.mir.domain.technology.safety_qualification'='source/prototypes/mir/domain/technology/safety_qualification.lua'
+  'prototypes.mir.domain.technology.technology_qualification'='source/prototypes/mir/domain/technology/technology_qualification.lua'
+  'prototypes.mir.domain.technology.technology_candidate'='source/prototypes/mir/domain/technology/technology_candidate.lua'
+  'prototypes.mir.planner.technology_selection_policy'='source/prototypes/mir/planner/technology_selection_policy.lua'
+  'prototypes.mir.planner.technology_catalog'='source/prototypes/mir/planner/technology_catalog.lua'
+  'prototypes.mir.planner.technology_catalog.model'='source/prototypes/mir/planner/technology_catalog/model.lua'
+  'prototypes.mir.planner.technology_catalog.index'='source/prototypes/mir/planner/technology_catalog/index.lua'
+  'prototypes.mir.planner.technology_catalog.validate'='source/prototypes/mir/planner/technology_catalog/validate.lua'
+  'prototypes.mir.planner.technology_catalog.build'='source/prototypes/mir/planner/technology_catalog/build.lua'
+  'prototypes.mir.planner.technology_catalog.query'='source/prototypes/mir/planner/technology_catalog/query.lua'
+  'prototypes.mir.domain.compiler.public_artifact_budget'='source/prototypes/mir/domain/compiler/public_artifact_budget.lua'
+  'prototypes.mir.report.public_compiler_artifacts'='source/prototypes/mir/report/public_compiler_artifacts.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')
@@ -99,8 +113,8 @@ try{
     throw "TechnologyDesign characterization failed: $nativeLog"
   }
   $assertionCount=[int]$Matches[1]
-  if($assertionCount-ne636) {
-    throw "TechnologyDesign characterization expected 636 assertions, observed $assertionCount`: $nativeLog"
+  if($assertionCount-ne665) {
+    throw "TechnologyDesign characterization expected 665 assertions, observed $assertionCount`: $nativeLog"
   }
   if($log-notmatch'MIR-PUBLICATION-MEASUREMENT-PASS ([0-9]+)') {
     throw "Publication measurement characterization failed: $nativeLog"

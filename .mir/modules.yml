@@ -1550,7 +1550,9 @@ mutation_commands:
     - stream planning and emission consume TechnologyDesign schema 2 without changing released technology identities
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
-    - the schema-3 TechnologyCatalog is finalized once after sanitation and graph proof, preserves rejected designs, publishes as one exact artifact, and has no mutation authority
+    - the schema-4 TechnologyCatalog is finalized once after sanitation and graph proof, preserves rejected designs, binds exact evaluated and deferred alternative scope, publishes as one exact artifact, and has no mutation authority
+    - ordinary player catalog construction may defer only the safe diagnostic alternative of an exact final qualified emit or adopt primary; failed unresolved rejected and preselection cases retain complete alternatives and gates
+    - PREVIEW and generation diagnostics construct complete catalogs; full export review assessment and acceptance reject incomplete schema-4 player evaluation rather than inventing missing alternatives or qualifications
     - TechnologyCatalog finalization admits each unexposed child once then rechecks all catalog cross-references selections and resolved statuses without repeating child registry lookups
     - synchronous catalog candidate and qualification construction reuses exact designs and gate vectors already admitted during the same unexposed build while public constructors retain full admission
     - stream compilation produces source rows only; CompilationPlan is the sole TechnologyCatalog construction and finalization owner and no transient catalog is discarded

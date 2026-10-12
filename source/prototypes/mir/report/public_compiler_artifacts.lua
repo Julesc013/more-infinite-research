@@ -136,9 +136,25 @@ function M.coverage(artifact)
 end
 
 function M.technology_catalog(catalog, provider_resolution)
-  if type(catalog) ~= "table" or catalog.schema ~= 3
-    or type(catalog.catalog_fingerprint) ~= "string" then
-    error("TechnologyCatalog public projection requires the final schema-3 catalog.", 2)
+  local evaluation = type(catalog) == "table" and catalog.alternative_evaluation or nil
+  if type(catalog) ~= "table" or catalog.schema ~= 4
+    or catalog.phase ~= "final"
+    or type(catalog.catalog_fingerprint) ~= "string"
+    or type(evaluation) ~= "table" or type(evaluation.mode) ~= "string"
+    or type(evaluation.complete) ~= "boolean"
+    or type(evaluation.evaluated_alternatives) ~= "number"
+    or evaluation.evaluated_alternatives < 0
+    or evaluation.evaluated_alternatives ~= math.floor(evaluation.evaluated_alternatives)
+    or type(evaluation.deferred_diagnostic_alternatives) ~= "number"
+    or evaluation.deferred_diagnostic_alternatives < 0
+    or evaluation.deferred_diagnostic_alternatives ~= math.floor(evaluation.deferred_diagnostic_alternatives)
+    or evaluation.complete ~= (evaluation.deferred_diagnostic_alternatives == 0)
+    or (evaluation.mode == "full-diagnostics" and evaluation.deferred_diagnostic_alternatives ~= 0)
+    or (evaluation.mode == "player-selected-primary-plus-required-fallbacks"
+      and evaluation.deferred_diagnostic_alternatives == 0)
+    or (evaluation.mode ~= "full-diagnostics"
+      and evaluation.mode ~= "player-selected-primary-plus-required-fallbacks") then
+    error("TechnologyCatalog public projection requires the final schema-4 catalog.", 2)
   end
   local selected, samples = {}, {rejected = {}, review_required = {}}
   local reason_histogram = {}
@@ -154,6 +170,9 @@ function M.technology_catalog(catalog, provider_resolution)
   end
   for _, candidate in ipairs(catalog.candidates or {}) do
     alternative_count = alternative_count + #(candidate.alternatives or {})
+  end
+  if alternative_count ~= evaluation.evaluated_alternatives then
+    error("TechnologyCatalog public projection evaluated alternative count differs from its catalog contract.", 2)
   end
   for _, qualification in ipairs(catalog.qualifications or {}) do
     local decision = qualification.qualification_decision or qualification.decision
@@ -189,13 +208,20 @@ function M.technology_catalog(catalog, provider_resolution)
   for provider_id in pairs(provider_ids) do table.insert(provider_summary.providers, provider_id) end
   table.sort(provider_summary.providers)
   local public = {
-    schema = 1,
+    schema = 2,
     kind = "mir-technology-catalog-public",
     technology_catalog_schema = catalog.schema,
     catalog_fingerprint = catalog.catalog_fingerprint,
+    alternative_evaluation = {
+      mode = evaluation.mode,
+      complete = evaluation.complete,
+      evaluated_alternatives = evaluation.evaluated_alternatives,
+      deferred_diagnostic_alternatives = evaluation.deferred_diagnostic_alternatives
+    },
     counts = {
       candidates = #(catalog.candidates or {}),
-      alternatives = alternative_count,
+      evaluated_alternatives = alternative_count,
+      deferred_diagnostic_alternatives = evaluation.deferred_diagnostic_alternatives,
       selected = #selected,
       rejected = rejected_count,
       review_required = review_count
