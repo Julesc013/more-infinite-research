@@ -877,7 +877,7 @@ $technologyCatalogText = $technologyCatalogFacadeText + "`n" + (Read-MIRFilesTex
 ))
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog/*" -Text $technologyCatalogText -Needle "technology_candidate.from_design"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog/*" -Text $technologyCatalogText -Needle "technology_qualification.from_design"
-Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog/model.lua" -Text $technologyCatalogText -Needle 'M.SCHEMA = 3'
+Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog/model.lua" -Text $technologyCatalogText -Needle 'M.SCHEMA = 4'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog/*" -Text $technologyCatalogText -Needle "function M.finalize(rows, context_material, compilation_operations, options)"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog/*" -Text $technologyCatalogText -Needle "candidate_catalog_fingerprint = catalog.candidate_catalog_fingerprint"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "function M.authority_projection(catalog)"
