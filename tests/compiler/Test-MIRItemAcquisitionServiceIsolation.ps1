@@ -19,7 +19,7 @@ if($LASTEXITCODE -ne 0){throw "Item acquisition service isolation controls faile
 $recordLine=$output | Where-Object {$_ -match '^\{.*"status": "MIR-ITEM-ACQUISITION-SERVICE-ISOLATION-CONTROLS-PASSED".*\}$'} | Select-Object -Last 1
 if(-not $recordLine){throw "Item acquisition service isolation controls produced no success record: $($output -join [Environment]::NewLine)"}
 $record=$recordLine | ConvertFrom-Json
-if([int]$record.assertions -lt 5 -or [int]$record.calls -ne 2 -or [int]$record.factorio_processes -ne 0){
+if([int]$record.assertions -lt 9 -or [int]$record.calls -ne 5 -or [int]$record.factorio_processes -ne 0){
   throw 'Item acquisition service isolation controls did not retain their expected public-boundary behavior.'
 }
 [pscustomobject]@{

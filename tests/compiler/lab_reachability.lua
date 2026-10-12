@@ -12,6 +12,7 @@ package.loaded['prototypes.mir.settings.effective'] = {get = function() return l
 local context = require('prototypes.mir.pipeline.compiler_context')
 local lab = require('prototypes.mir.capabilities.science_integration.lab_compatibility')
 local production = require('prototypes.mir.capabilities.science_integration.pack_production_reachability')
+local science = require('prototypes.mir.capabilities.science_integration.science_packs')
 local researchability = require('prototypes.mir.capabilities.science_integration.technology_researchability')
 local recipe_facts = require('prototypes.mir.index.recipe_facts')
 local item_facts = require('prototypes.mir.index.item_prototype_facts')
@@ -40,8 +41,22 @@ local function run(raw, callback, technology_reason)
   local owner = context.new()
   owner:set_service('science.pack_production_status', production.pack_production_status)
   owner:set_service('science.item_acquisition_witness', production.item_acquisition_witness or function() return nil end)
+  lab.install_item_acquisition_companion(
+    owner,
+    production.item_acquisition_witness,
+    production.item_acquisition_available
+  )
   owner:set_service('science.independent_pack_acquisition_witness', production.independent_pack_acquisition_witness)
   owner:set_service('science.technology_researchability_reason', technology_reason or researchability.reason_with_context)
+  owner:freeze_services()
+  return context.with_active(owner, callback, owner)
+end
+
+local function run_with_registered_services(raw, configure, callback)
+  _G.data = {raw = raw, extend = function() error('Unexpected prototype mutation') end}
+  local owner = context.new()
+  configure(owner)
+  science.ensure_services(owner)
   owner:freeze_services()
   return context.with_active(owner, callback, owner)
 end
@@ -56,6 +71,8 @@ run(raw, function(owner)
   local ingredients = {{'A', 2}, {'B', 3}}
   local before = fingerprint.of(data.raw)
   check('LR02', lab.valid_research_ingredients(ingredients), 'An enabled lab-item recipe admits a complete lab')
+  check('LR02/warm', lab.valid_research_ingredients(ingredients),
+    'A warm lab query retains the same contextual admission result')
   check('LR03', researchability.technology_researchability_reason('Probe') == nil,
     'Actual researchability consumes the lab acquisition witness')
   check('LR04', lab.best_lab_compatible_ingredients(ingredients, 'probe', {'A', 'B'}) ~= nil,
@@ -65,6 +82,101 @@ run(raw, function(owner)
   local telemetry = owner:state_view('compiler_telemetry')
   check('LR06', telemetry and telemetry.counters.item_prototype_index_builds == 1,
     'Normal lab queries reuse the existing item prototype index')
+  check('LR06/boolean', (telemetry.counters.science_item_acquisition_boolean_queries or 0) >= 1
+      and (telemetry.counters.science_item_acquisition_witness_copies or 0) == 0,
+    'An ordinary compiler-owned lab query uses the paired Boolean service without exporting a witness copy')
+end)
+raw = world()
+local custom_before_calls = 0
+run_with_registered_services(raw, function(owner)
+  owner:set_service('science.item_acquisition_witness', function(item_name)
+    custom_before_calls = custom_before_calls + 1
+    return item_name == 'lab-kit' and {kind = 'custom-before-registration'} or nil
+  end)
+end, function(owner)
+  check('LR06/custom-before/companion', owner:service('science.item_acquisition_available') == nil,
+    'A context that supplied its own acquisition witness before service registration receives no canonical Boolean companion')
+  check('LR06/custom-before/result', lab.valid_research_ingredients({{'A', 1}, {'B', 1}})
+      and custom_before_calls >= 1,
+    'A pre-registered custom acquisition witness remains the lab admission authority')
+end)
+raw = world()
+local custom_false_before_calls = 0
+run_with_registered_services(raw, function(owner)
+  owner:set_service('science.item_acquisition_witness', function()
+    custom_false_before_calls = custom_false_before_calls + 1
+    return false
+  end)
+end, function(owner)
+  check('LR06/custom-false-before/companion', owner:service('science.item_acquisition_available') == nil,
+    'A false-returning custom witness before registration still has no canonical Boolean companion')
+  check('LR06/custom-false-before/result', not lab.valid_research_ingredients({{'A', 1}, {'B', 1}})
+      and custom_false_before_calls >= 1,
+    'A false-returning custom witness retains the original falsey rejection semantics')
+end)
+local first_companion, second_companion
+raw = world()
+run_with_registered_services(raw, function() end, function(owner)
+  first_companion = owner:service('science.item_acquisition_available')
+end)
+raw = world()
+run_with_registered_services(raw, function() end, function(owner)
+  second_companion = owner:service('science.item_acquisition_available')
+  check('LR06/canonical/fresh-companion', type(first_companion) == 'table'
+      and type(second_companion) == 'table' and first_companion ~= second_companion
+      and first_companion.witness == production.item_acquisition_witness
+      and second_companion.witness == production.item_acquisition_witness
+      and first_companion.available == production.item_acquisition_available
+      and second_companion.available == production.item_acquisition_available
+      and first_companion.matches == nil and second_companion.matches == nil,
+    'Canonical Boolean companion metadata is fresh per Context while its implementation identities remain stable')
+end)
+raw = world()
+local tampered_available_calls = 0
+run_with_registered_services(raw, function() end, function(owner)
+  local companion = owner:service('science.item_acquisition_available')
+  companion.available = function()
+    tampered_available_calls = tampered_available_calls + 1
+    return true, true
+  end
+  companion.matches = function() return true end
+  check('LR06/canonical/tampered-available', lab.valid_research_ingredients({{'A', 1}, {'B', 1}})
+      and tampered_available_calls == 0,
+    'A mutated Boolean availability function cannot bypass the registered canonical pairing, including a forged legacy matcher')
+end)
+raw = world()
+local forged_companion_calls = 0
+run_with_registered_services(raw, function() end, function(owner)
+  local canonical_witness = owner:service('science.item_acquisition_witness')
+  owner.services['science.item_acquisition_available'] = {
+    witness = canonical_witness,
+    available = function()
+      forged_companion_calls = forged_companion_calls + 1
+      return true, true
+    end,
+    matches = function() return true end
+  }
+  check('LR06/canonical/forged-companion', lab.valid_research_ingredients({{'A', 1}, {'B', 1}})
+      and forged_companion_calls == 0,
+    'An unregistered forged companion cannot bypass the canonical private pairing')
+end)
+raw = world()
+local custom_after_calls = 0
+run_with_registered_services(raw, function() end, function(owner)
+  local companion = owner:service('science.item_acquisition_available')
+  check('LR06/custom-after/paired', type(companion) == 'table'
+      and companion.witness == production.item_acquisition_witness,
+    'Canonical registration binds a Boolean companion to its original witness service')
+  -- Deliberately model a later replacement used by existing adversarial
+  -- controls. The frozen Context API prevents ordinary reassignment, but the
+  -- consumer must still not trust a stale companion through direct mutation.
+  owner.services['science.item_acquisition_witness'] = function(item_name)
+    custom_after_calls = custom_after_calls + 1
+    return false
+  end
+  check('LR06/custom-after/result', not lab.valid_research_ingredients({{'A', 1}, {'B', 1}})
+      and custom_after_calls >= 1,
+    'A later custom witness replacement bypasses the stale canonical Boolean companion')
 end)
 -- Nauvis inherits pressure/gravity from SurfacePropertyPrototype defaults.
 -- Missing overrides are not missing physical properties. Keep the default
@@ -689,6 +801,10 @@ run(raw, function(owner)
     and observer.stopped and observer.visits == 8, 'Cold lab acquisition reserves bounded diagnostic work')
   check('LR22', owner:state_view('item_prototype_index') == nil,
     'A capped diagnostic cannot build the normal comprehensive item index')
+  local diagnostic_telemetry = owner:state_view('compiler_telemetry')
+  local diagnostic_counters = diagnostic_telemetry and diagnostic_telemetry.counters or {}
+  check('LR22/boolean-bypass', (diagnostic_counters.science_item_acquisition_boolean_queries or 0) == 0,
+    'A bounded diagnostic retains the public witness path and never enters the Boolean companion')
   check('LR23', lab.valid_research_ingredients({{'A', 1}, {'B', 1}}),
     'A stopped diagnostic cannot poison ordinary lab admission')
 end)

@@ -2943,10 +2943,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/lab_compatibility.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 9306,
-      "source_sha256": "3308A351BDF32EF469EE00BFE95F0BF8807388D79AAA23F15AFDD1BD32C508E3",
-      "output_bytes": 9306,
-      "output_sha256": "3308A351BDF32EF469EE00BFE95F0BF8807388D79AAA23F15AFDD1BD32C508E3"
+      "source_bytes": 11428,
+      "source_sha256": "97AC936B1E9920AC503011EF063D39FA0E59D8ACCB5B0746BB4B32D30C83E39B",
+      "output_bytes": 11428,
+      "output_sha256": "97AC936B1E9920AC503011EF063D39FA0E59D8ACCB5B0746BB4B32D30C83E39B"
     },
     {
       "layer": "capability",
@@ -2964,10 +2964,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 95877,
-      "source_sha256": "1DE79C14B40197365189B594B787CCF15FC77C5F91A31FFF08C4879D86E66DF7",
-      "output_bytes": 95877,
-      "output_sha256": "1DE79C14B40197365189B594B787CCF15FC77C5F91A31FFF08C4879D86E66DF7"
+      "source_bytes": 97293,
+      "source_sha256": "A8DE6081E643F4980AF33F290141528073D62E11A13D99CB0F222C098590A412",
+      "output_bytes": 97293,
+      "output_sha256": "A8DE6081E643F4980AF33F290141528073D62E11A13D99CB0F222C098590A412"
     },
     {
       "layer": "capability",
@@ -3070,10 +3070,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_packs.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4973,
-      "source_sha256": "81DCE816D87EC11B9F4893AA84B31ADA7169D418916E19C8C77ACEB3B3604C9D",
-      "output_bytes": 4973,
-      "output_sha256": "81DCE816D87EC11B9F4893AA84B31ADA7169D418916E19C8C77ACEB3B3604C9D"
+      "source_bytes": 5433,
+      "source_sha256": "D1954FDFDDE5BF21D8A2082605C452A7257540768758BA40B0DE7D2D624FC26D",
+      "output_bytes": 5433,
+      "output_sha256": "D1954FDFDDE5BF21D8A2082605C452A7257540768758BA40B0DE7D2D624FC26D"
     },
     {
       "layer": "capability",
@@ -7709,5 +7709,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "B3B198FEB13DD55131B990D12F34CF8AA402E54962772DA32933FAD827B7A952"
+  "record_sha256": "EAE711378FB7F5CB872DE76A2BF87FFA5690D488655D038EBBC9F670F023A967"
 }

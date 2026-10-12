@@ -2139,15 +2139,41 @@ end
 -- is introduced. The shared solver also acquires a matching machine's concrete
 -- placement item without borrowing a circular or later-only bootstrap. This
 -- structural witness does not certify native placement, power or throughput.
-function M.item_acquisition_witness(item_name, visiting_packs, visiting_technologies, observer)
+local function item_acquisition_witness_for_query(item_name, visiting_packs, visiting_technologies, observer)
   if type(item_name) ~= "string" or item_name == "" then return nil end
-  local witness = route_feasibility.acquisition_witness({type = "item", name = item_name},
+  return route_feasibility.acquisition_witness({type = "item", name = item_name},
     production_witness_options(visiting_packs or {}, visiting_technologies or {}, observer),
     route_witness_state_for_query(observer))
+end
+
+function M.item_acquisition_witness(item_name, visiting_packs, visiting_technologies, observer)
+  if type(item_name) == "string" and item_name ~= "" then
+    telemetry.count("science_item_acquisition_witness_queries")
+  end
+  local witness = item_acquisition_witness_for_query(item_name, visiting_packs, visiting_technologies, observer)
+  if not witness then return nil end
   -- production_witness_options may borrow compiler-owned memo DAG nodes while
   -- proving this route. This exported service is consumed outside that private
   -- lifetime, so it must never expose a mutable memo node to its caller.
-  return witness and deepcopy(witness) or nil
+  telemetry.count("science_item_acquisition_witness_copies")
+  return deepcopy(witness)
+end
+
+-- Laboratory admissibility needs only the truth of the same contextual
+-- acquisition proof.  This companion deliberately returns no witness, so a
+-- compiler-owned caller cannot observe or mutate a private memo DAG.  The
+-- caller must still prove that the paired public witness service remains the
+-- canonical implementation; a later replacement retains the public path.
+function M.item_acquisition_available(item_name, visiting_packs, visiting_technologies, observer)
+  if compiler_context.current():service("science.item_acquisition_witness") ~= M.item_acquisition_witness then
+    return nil, false
+  end
+  local witness = item_acquisition_witness_for_query(item_name, visiting_packs, visiting_technologies, observer)
+  if type(item_name) == "string" and item_name ~= "" then
+    telemetry.count("science_item_acquisition_boolean_queries")
+    if witness then telemetry.count("science_item_acquisition_witness_copies_avoided") end
+  end
+  return witness and true or false, true
 end
 
 function M.independent_pack_acquisition_witness(
