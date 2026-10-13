@@ -125,6 +125,8 @@ function Test-MIR43HistoricalCandidateAuthentication {
   Assert-MIR42CandidateBuildTest (
     [string]$controls.status -ceq 'passed' -and
     [int]$controls.assertions -eq 4 -and
+    [int]$controls.authority_input_assertions -eq 5 -and
+    [int]$controls.receipt_custody_assertions -eq 6 -and
     -not [bool]$controls.native_factorio -and
     -not [bool]$controls.package_materialization -and
     -not (Test-Path -LiteralPath (Join-Path $OutputRoot 'opposing'))
@@ -132,6 +134,8 @@ function Test-MIR43HistoricalCandidateAuthentication {
   return [pscustomobject][ordered]@{
     authority_projection_checks = $projectionChecks
     authentication_assertions = [int]$controls.assertions
+    authority_input_assertions = [int]$controls.authority_input_assertions
+    receipt_custody_assertions = [int]$controls.receipt_custody_assertions
     authentic_candidate_zip_builds = 2
     factorio_processes = 0
   }
@@ -354,6 +358,8 @@ try {
       source_versions = @('4.3.0','4.3.1')
       authority_projection_checks = [int]$historicalAuthentication.authority_projection_checks
       authentication_assertions = [int]$historicalAuthentication.authentication_assertions
+      authority_input_assertions = [int]$historicalAuthentication.authority_input_assertions
+      receipt_custody_assertions = [int]$historicalAuthentication.receipt_custody_assertions
       authentic_candidate_zip_builds = [int]$historicalAuthentication.authentic_candidate_zip_builds
       factorio_processes = [int]$historicalAuthentication.factorio_processes
       qualification = 'not-performed'
@@ -1271,6 +1277,24 @@ try {
     Assert-MIR42CandidateBuildTest ([string]$row.target_record.path -ceq "targets/historical/$target/target.json" -and -not [bool]$row.public_output_authorized -and -not [bool]$row.publication_authorized) "nine-historical-row-binding-$target"
     Assert-MIR42CandidateBuildTest ([string]$row.engine.sha256 -match '^[A-Fa-f0-9]{64}$' -and [string]$row.predecessor.sha256 -match '^[A-Fa-f0-9]{64}$') "nine-historical-row-engine-predecessor-$target"
     Assert-MIR42CandidateBuildTest ([string]$row.historical_materializer_manifest_sha256 -match '^[A-Fa-f0-9]{64}$') "nine-historical-row-manifest-receipt-$target"
+    $retainedManifestPath = Join-Path $nineRoot "materializations/$target.json"
+    $retainedManifestIdentity = if (Test-Path -LiteralPath $retainedManifestPath -PathType Leaf) {
+      Get-MIR4RawFileIdentity -Path $retainedManifestPath
+    } else { $null }
+    $retainedManifest = if (Test-Path -LiteralPath $retainedManifestPath -PathType Leaf) {
+      Get-Content -Raw -LiteralPath $retainedManifestPath | ConvertFrom-Json -Depth 100 -DateKind String
+    } else { $null }
+    Assert-MIR42CandidateBuildTest (
+      $null -ne $retainedManifest -and
+      $null -ne $retainedManifestIdentity -and
+      $null -ne $row.historical_materializer_manifest -and
+      [string]$row.historical_materializer_manifest.path -ceq "materializations/$target.json" -and
+      [int64]$row.historical_materializer_manifest.bytes -eq [int64]$retainedManifestIdentity.bytes -and
+      [string]$row.historical_materializer_manifest.sha256 -ceq [string]$retainedManifestIdentity.sha256 -and
+      [string]$row.historical_materializer_manifest.record_sha256 -ceq [string]$row.historical_materializer_manifest_sha256 -and
+      (Test-MIR4BootstrapRecordHash -Record $retainedManifest) -and
+      [string]$retainedManifest.record_sha256 -ceq [string]$row.historical_materializer_manifest_sha256
+    ) "nine-historical-row-retains-self-hashed-construction-manifest-$target"
     $asset = Join-Path $nineRoot ([string]$row.asset.path)
     Assert-MIR42CandidateBuildTest ((Get-MIR4Sha256File -Path $asset) -ceq [string]$row.asset.sha256) "nine-historical-row-custody-$target"
   }

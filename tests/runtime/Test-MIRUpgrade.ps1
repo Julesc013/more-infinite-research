@@ -107,7 +107,9 @@ function Assert-MIR421CurrentUpgradeInputMode {
     [string]$SelectedReleaseManifest,[string]$PublishedPredecessorManifest,[string]$Retention,
     [string]$K2ImersiteInputProfile='',[string]$F200BobAngelInputProfile='',
     [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1')
-  if ($Target -cnotin @('f210','f200','f110','f100','f017','f016','f015','f014','f013') -or $SelectedReleaseManifest -or
+  $requiresHistoricalCombinedCandidate=[bool]($Target-cin@('f017','f016','f015','f014','f013')-and$SourceVersion-cin@('4.3.0','4.3.1'))
+  if ($Target -cnotin @('f210','f200','f110','f100','f017','f016','f015','f014','f013') -or
+      (($requiresHistoricalCombinedCandidate-and-not$SelectedReleaseManifest)-or((-not$requiresHistoricalCombinedCandidate)-and$SelectedReleaseManifest)) -or
       -not $PublishedPredecessorManifest -or $Retention -cne 'Always') {
     throw '[mir421-current-upgrade-input-mode]'
   }
@@ -426,14 +428,27 @@ $engineData=Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Paren
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
 $currentMaterialization=$null
+$historicalCombinedCandidate=$null
+$historicalCombinedTarget=$null
 $isHistoricalCurrentCandidate=[bool]($SourceMaterializationPath -and $SourceVersion -cin @('4.3.0','4.3.1') -and $SelectedTarget -cin @('f017','f016','f015','f014','f013'))
 if($SourceMaterializationPath){
   # Modern packages are authenticated by the canonical materializer receipt.
   # Historical targets have no canonical materializer surface: their input is
   # an exact historical-candidate authentication manifest instead.
   if($isHistoricalCurrentCandidate){
+    if(-not$SelectedReleaseManifest){throw '[mir-upgrade-historical-candidate-manifest-required]'}
+    . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+    $historicalCombinedCandidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath (Resolve-MIRUpgradePath $SelectedReleaseManifest)
+    $historicalRows=@($historicalCombinedCandidate.targets|Where-Object {[string]$_.target-ceq$SelectedTarget})
+    if($historicalRows.Count-ne1){throw '[mir-upgrade-historical-candidate-target]'}
+    $historicalCombinedTarget=$historicalRows[0]
+    $expectedArchive=[IO.Path]::GetFullPath([string]$historicalCombinedTarget.archive_path)
+    if($expectedArchive-cne[IO.Path]::GetFullPath($to)-or[string]$historicalCombinedTarget.distribution_version-cne$ToVersion){throw '[mir-upgrade-historical-candidate-target]'}
+    $suppliedReceipt=Resolve-MIRUpgradePath $SourceMaterializationPath
+    if([IO.Path]::GetFullPath($suppliedReceipt)-cne[IO.Path]::GetFullPath([string]$historicalCombinedTarget.historical_materializer_manifest_path)){throw '[mir-upgrade-historical-candidate-receipt-path]'}
     . (Join-Path $RepoRoot 'tests/support/MIR43HistoricalCandidateAuthentication.ps1')
-    $currentMaterialization=Read-MIR43HistoricalCurrentCandidate -Repository $RepoRoot -Archive $to -ManifestPath (Resolve-MIRUpgradePath $SourceMaterializationPath) -Target $SelectedTarget -SourceVersion $SourceVersion
+    $currentMaterialization=Read-MIR43HistoricalCurrentCandidate -Repository $RepoRoot -Archive $to -ManifestPath $suppliedReceipt -Target $SelectedTarget -SourceVersion $SourceVersion -ExpectedReceiptDescriptor $historicalCombinedTarget.historical_materializer_manifest
+    if([string]$currentMaterialization.receipt_custody-cne'combined-candidate-bound'){throw '[mir-upgrade-historical-candidate-receipt-custody]'}
   }else{
     . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
     . (Join-Path $RepoRoot 'tools/mir/application/package/TargetMaterializer.ps1')
@@ -1239,6 +1254,14 @@ if($currentMaterialization){
       target_record_sha256=$currentMaterialization.receipt.target_record.sha256
       member_projection_sha256=$currentMaterialization.projection.member_projection_sha256
       canonical_source_manifest_sha256=$currentMaterialization.projection.canonical_base.source_manifest_sha256
+      receipt_custody=[string]$currentMaterialization.receipt_custody
+      retained_receipt=$currentMaterialization.receipt_descriptor
+      combined_candidate_manifest=[ordered]@{
+        path=(Resolve-MIRUpgradePath $SelectedReleaseManifest)
+        sha256=(Get-FileHash -LiteralPath (Resolve-MIRUpgradePath $SelectedReleaseManifest)).Hash
+        record_sha256=[string]$historicalCombinedCandidate.identity.record.record_sha256
+        target=$SelectedTarget
+      }
     }
   }else{
     $result.candidate_materialization=[ordered]@{path=$SourceMaterializationPath;sha256=(Get-FileHash -LiteralPath (Resolve-MIRUpgradePath $SourceMaterializationPath)).Hash;record_sha256=$currentMaterialization.receipt.record_sha256;package_source_sha256=$currentMaterialization.receipt.package_source_sha256}

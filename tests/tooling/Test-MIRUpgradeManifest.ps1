@@ -728,19 +728,25 @@ foreach($sourceVersion in @('4.3.0','4.3.1')){
       $from="4.2.${code}0$oldPatch"
       $to='4.3.'+$code+([version]$sourceVersion).Build.ToString('00')
       $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
-      $mode=@{Target=$target;FromVersion=$from;ToVersion=$to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion=$sourceVersion}
+      $mode=@{Target=$target;FromVersion=$from;ToVersion=$to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion=$sourceVersion}
       Assert-MIR421CurrentUpgradeInputMode @mode
       $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $from -SourceVersion $sourceVersion
       if($readerVersion-cne('4.2.'+($oldPatch+1))){throw "4.3 selected incorrect published predecessor custody: $target/$sourceVersion/$oldPatch"}
       $mir43Assertions+=2
     }
+    $custodyMode=$mode.Clone()
+    $custodyMode.SelectedReleaseManifest=if($target-cin@('f017','f016','f015','f014','f013')){''}else{'candidate.json'}
+    $rejected=$false
+    try{Assert-MIR421CurrentUpgradeInputMode @custodyMode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-input-mode]'}
+    if(-not$rejected){throw "4.3 current mode accepted absent historical or unexpected modern combined custody: $target/$sourceVersion"}
+    $mir43Assertions++
     foreach($invalid in @(
       @{from="4.3.${code}00";to=('4.3.'+$code+'01');kind='same-minor-predecessor'},
       @{from="4.1.${code}00";to=('4.3.'+$code+'00');kind='unpublished-predecessor'},
       @{from="4.2.${code}02";to=('4.2.'+$code+'03');kind='wrong-destination'}
     )){
       $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
-      $mode=@{Target=$target;FromVersion=$invalid.from;ToVersion=$invalid.to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.1'}
+      $mode=@{Target=$target;FromVersion=$invalid.from;ToVersion=$invalid.to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.1'}
       $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-current-upgrade-')}
       if(-not$rejected){throw "4.3 current mode accepted $($invalid.kind): $target"}
       $mir43Assertions++
@@ -752,7 +758,7 @@ foreach($sourceVersion in @('4.3.0','4.3.1')){
 }
 foreach($target in @('f017','f016','f015','f014','f013')){
   $code=$target.Substring(1)
-  $wrong=@{Target=$target;FromVersion="4.2.${code}02";ToVersion="4.3.${code}00";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.0'}
+  $wrong=@{Target=$target;FromVersion="4.2.${code}02";ToVersion="4.3.${code}00";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.0'}
   $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrong}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
   if(-not$rejected){throw "4.3 historical target accepted a modern fixture: $target"}
   $mir43Assertions++
@@ -843,7 +849,7 @@ $matrixTokens=$null;$matrixErrors=$null
 $matrixAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgradeMatrix.ps1'),[ref]$matrixTokens,[ref]$matrixErrors)
 if($matrixErrors.Count){throw 'Upgrade matrix syntax error'}
 $matrixText=$matrixAst.Extent.Text
-foreach($needle in @('$SourceMaterializationPath','$SelectedTarget','$SourceVersion','$UpgradePolicy','$PublishedMaintenancePredecessorManifestPath','$arguments.SourceMaterializationPath=$SourceMaterializationPath','$arguments.SelectedTarget=$SelectedTarget','$arguments.SourceVersion=$SourceVersion','$arguments.UpgradePolicy=$UpgradePolicy','$arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath','($currentDestination -or $FixtureName')){
+foreach($needle in @('$SourceMaterializationPath','$SelectedReleaseManifest','$SelectedTarget','$SourceVersion','$UpgradePolicy','$PublishedMaintenancePredecessorManifestPath','$arguments.SourceMaterializationPath=$SourceMaterializationPath','$arguments.SelectedReleaseManifest=$SelectedReleaseManifest','$arguments.SelectedTarget=$SelectedTarget','$arguments.SourceVersion=$SourceVersion','$arguments.UpgradePolicy=$UpgradePolicy','$arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath','($currentDestination -or $FixtureName')){
   if(-not$matrixText.Contains($needle)){throw "4.3 upgrade matrix lost current destination control: $needle"}
   $mir43Assertions++
 }

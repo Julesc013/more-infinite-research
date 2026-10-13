@@ -740,6 +740,85 @@ function Test-MIR42IndividualNativeInputReader {
   Write-Output ('MIR42-INDIVIDUAL-NATIVE-INPUT-READER-PASSED assertions=' + $checks + ' native-records=0 engines=0')
 }
 
+function Test-MIR42HistoricalReceiptCustodyProjection {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $root = Join-Path $RepoRoot ('build/test-results/mir43-historical-receipt-custody-' + [guid]::NewGuid().ToString('N'))
+  [IO.Directory]::CreateDirectory((Join-Path $root 'materializations')) | Out-Null
+  $checks = 0
+  function New-MIR42HistoricalReceiptControlRow([string]$Path) {
+    $identity = Get-MIR4RawFileIdentity -Path $Path
+    $record = Read-MIR42SealRecord -Path $Path -Code 'mir42-historical-receipt-control'
+    return [pscustomobject][ordered]@{
+      historical_materializer_manifest_sha256 = [string]$record.record.record_sha256
+      historical_materializer_manifest = [pscustomobject][ordered]@{
+        path = 'materializations/f017.json'
+        bytes = [int64]$identity.bytes
+        sha256 = [string]$identity.sha256
+        record_sha256 = [string]$record.record.record_sha256
+      }
+    }
+  }
+  function Assert-MIR42HistoricalReceiptControlRejected($Action,[string]$Expected,[string]$Code) {
+    $failure = ''
+    try { $null = & $Action } catch { $failure = $_.Exception.Message }
+    Assert-MIR42NineSealTest -Condition ($failure.StartsWith($Expected,[StringComparison]::Ordinal)) -Code $Code
+  }
+  try {
+    $receiptPath = Join-Path $root 'materializations/f017.json'
+    $receipt = [pscustomobject][ordered]@{schema=1;kind='MIR43HistoricalReceiptCustodyControlV1';target='f017';record_sha256=''}
+    Write-MIR4BootstrapRecord -Record $receipt -Path $receiptPath | Out-Null
+    $row = New-MIR42HistoricalReceiptControlRow -Path $receiptPath
+    $verified = Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target f017 -Row $row
+    Assert-MIR42NineSealTest -Condition (
+      [string]$verified.path -ceq (Resolve-Path -LiteralPath $receiptPath).Path -and
+      [string]$verified.descriptor.path -ceq 'materializations/f017.json' -and
+      [int64]$verified.descriptor.bytes -eq [int64]$row.historical_materializer_manifest.bytes -and
+      [string]$verified.descriptor.sha256 -ceq [string]$row.historical_materializer_manifest.sha256 -and
+      [string]$verified.descriptor.record_sha256 -ceq [string]$row.historical_materializer_manifest_sha256
+    ) -Code 'historical-receipt-custody-accepted'
+    $checks++
+
+    $wrongPath = $row | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20
+    $wrongPath.historical_materializer_manifest.path = 'materializations/f016.json'
+    Assert-MIR42HistoricalReceiptControlRejected { Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target f017 -Row $wrongPath } '[mir42-seal-candidate-historical-receipt-path]' 'historical-receipt-custody-path-rejected'
+    $checks++
+    $wrongRaw = $row | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20
+    $wrongRaw.historical_materializer_manifest.sha256 = '0' * 64
+    Assert-MIR42HistoricalReceiptControlRejected { Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target f017 -Row $wrongRaw } '[mir42-seal-candidate-historical-receipt-sha256]' 'historical-receipt-custody-raw-hash-rejected'
+    $checks++
+    $wrongPin = $row | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20
+    $wrongPin.historical_materializer_manifest_sha256 = '0' * 64
+    Assert-MIR42HistoricalReceiptControlRejected { Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target f017 -Row $wrongPin } '[mir42-seal-candidate-historical-receipt-legacy-pin]' 'historical-receipt-custody-legacy-pin-rejected'
+    $checks++
+    $wrongShape = $row | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20
+    $wrongShape.historical_materializer_manifest | Add-Member -NotePropertyName extra -NotePropertyValue 'forged'
+    Assert-MIR42HistoricalReceiptControlRejected { Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target f017 -Row $wrongShape } '[mir42-seal-candidate-historical-receipt-shape]' 'historical-receipt-custody-shape-rejected'
+    $checks++
+
+    # Bind a raw receipt even when its descriptor is self-consistent: the
+    # reader must still reject a malformed logical record rather than treating
+    # raw custody as a substitute for the recorded construction proof.
+    [IO.File]::WriteAllText($receiptPath, '{"schema":1,"record_sha256":"' + ('0' * 64) + '"}', [Text.UTF8Encoding]::new($false))
+    $invalidIdentity = Get-MIR4RawFileIdentity -Path $receiptPath
+    $invalidRow = [pscustomobject][ordered]@{
+      historical_materializer_manifest_sha256 = ('0' * 64)
+      historical_materializer_manifest = [pscustomobject][ordered]@{path='materializations/f017.json';bytes=[int64]$invalidIdentity.bytes;sha256=[string]$invalidIdentity.sha256;record_sha256=('0' * 64)}
+    }
+    Assert-MIR42HistoricalReceiptControlRejected { Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target f017 -Row $invalidRow } '[mir42-seal-candidate-historical-receipt-record-hash]' 'historical-receipt-custody-self-hash-rejected'
+    $checks++
+  } finally {
+    $buildRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/test-results')).TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar
+    $resolvedRoot = [IO.Path]::GetFullPath($root).TrimEnd('\','/')
+    if (-not (($resolvedRoot + [IO.Path]::DirectorySeparatorChar).StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)) -or
+        [IO.Path]::GetFileName($resolvedRoot) -notlike 'mir43-historical-receipt-custody-*') {
+      throw '[mir43-historical-receipt-custody-fixture-containment]'
+    }
+    if (Test-Path -LiteralPath $resolvedRoot) { Remove-Item -LiteralPath $resolvedRoot -Recurse -Force }
+  }
+  Write-Output ('MIR43-HISTORICAL-RECEIPT-CUSTODY-PROJECTION-PASSED assertions=' + $checks + ' native-records=0')
+}
+
 function Test-MIR430ClassicSnapshotProjection {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $ErrorActionPreference = 'Stop'
@@ -836,6 +915,26 @@ function Test-MIR430ClassicSnapshotProjection {
     } catch { $failure = $_.Exception.Message }
     Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir430-upgrade-full-state-phase-skipped]',[StringComparison]::Ordinal)) -Code 'classic-seal-forged-policy-does-not-project-classic-snapshots'
     $checks++
+
+    # A forged historical receipt must be rejected before its policy can select
+    # the Classic snapshot projection.  This exercises the individual seal
+    # boundary independently of the matrix reader's matching guard.
+    $historicalRow = @((Get-Content -LiteralPath $control.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100).rows | Where-Object {
+      [string]$_.target -ceq 'f017' -and [string]$_.predecessor_source_version -ceq '4.2.2'
+    })[0]
+    $historicalProof = Get-Content -LiteralPath $historicalRow.receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+    $historicalInput = [pscustomobject]@{target='f017';path='host-only-predecessor.zip';sha256=[string]$historicalProof.from.sha256;version=[string]$historicalProof.from.version}
+    $historicalPublished = [pscustomobject]@{release_id=1;source_tag=[string]$historicalProof.published_maintenance_predecessor.source_tag;source=[pscustomobject]@{commit=('D'*40);tree=('E'*40)};tag_object=('9'*40);remote_tag_readback=$true;manifest=[pscustomobject]@{path='host-only-manifest.json';sha256=[string]$historicalProof.published_maintenance_predecessor.manifest.sha256;bytes=1};signed=$false;targets=@($historicalInput);native_qualification='not-performed';release_qualification='not-performed'}
+    $historicalForged = New-ClassicSealReceiptRow -Row $historicalRow -Commit $commit -EngineHash $engineHash -EngineVersion $engineVersion -Published $historicalPublished
+    $historicalRecord = Copy-ClassicSealValue $historicalForged.receipt
+    $historicalRecord.upgrade_policy = @{kind='MIR430ClassicReducedUpgradePolicyV1'}
+    $historicalForged.row.receipt = Write-ClassicSealJson (Join-Path (Split-Path -Parent $historicalForged.row.receipt.path) 'forged-historical-classic.json') $historicalRecord
+    $failure = ''
+    try {
+      $null = Assert-MIR42IndividualUpgradeReceipt -ReceiptReference $historicalForged.row.receipt -CandidateTarget (@($packages | Where-Object { $_.target -ceq 'f017' })[0]) -PublishedInput $historicalInput -PublishedMaintenanceInputs $historicalPublished -Engine ([pscustomobject]@{path=$enginePath;sha256=$engineHash;version=$engineVersion}) -HarnessExitCode 0 -Candidate $candidate
+    } catch { $failure = $_.Exception.Message }
+    Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir42-individual-engine-run-classic-target]',[StringComparison]::Ordinal)) -Code 'classic-seal-historical-policy-rejected-before-projection'
+    $checks++
   } finally {
     Set-Item -LiteralPath Function:script:Get-MIR42IndividualEngineEvidenceBindingContract -Value $contractReader
     Set-Item -LiteralPath Function:script:Assert-MIR42IndividualNativeCandidateSelection -Value $nativeSelectionReader
@@ -854,6 +953,7 @@ function Test-MIR430ClassicSnapshotProjection {
 if (-not $OnlyClassicSealSnapshotProjection) {
   Test-MIR42IndividualNativeInputReader -RepoRoot $repo
 }
+Test-MIR42HistoricalReceiptCustodyProjection -RepoRoot $repo
 Test-MIR430ClassicSnapshotProjection -RepoRoot $repo
 
 if ($OnlyClassicSealSnapshotProjection) {

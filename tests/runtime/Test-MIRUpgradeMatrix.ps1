@@ -7,6 +7,7 @@ param(
   [Parameter(Mandatory)][string]$FromVersion,
   [Parameter(Mandatory)][string]$ToVersion,
   [string]$SourceMaterializationPath = '',
+  [string]$SelectedReleaseManifest = '',
   [string]$SelectedTarget = '',
   [ValidateSet('','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '',
   [ValidateSet('Full','Classic')][string]$UpgradePolicy = 'Full',
@@ -37,6 +38,10 @@ if($currentDestination-and([string]::IsNullOrWhiteSpace($SelectedTarget)-or[stri
 }
 if(-not$currentDestination-and($SelectedTarget-or$SourceVersion-or$PublishedMaintenancePredecessorManifestPath)){
   throw '[mir-upgrade-matrix-current-inputs] Current-source matrix controls require a materialization receipt.'
+}
+$historicalCurrentDestination=$currentDestination-and$SourceVersion-cin@('4.3.0','4.3.1')-and$SelectedTarget-cin@('f017','f016','f015','f014','f013')
+if(($historicalCurrentDestination-and[string]::IsNullOrWhiteSpace($SelectedReleaseManifest))-or(-not$historicalCurrentDestination-and$SelectedReleaseManifest)){
+  throw '[mir-upgrade-matrix-historical-candidate-custody] Historical 4.3 rows require the frozen combined candidate manifest; other matrix modes do not accept it.'
 }
 if($UpgradePolicy -ceq 'Classic' -and (-not $currentDestination -or $SourceVersion -cne '4.3.0' -or $SelectedTarget -cnotin @('f210','f200','f110','f100'))){
   throw '[mir430-classic-upgrade-matrix-mode] Classic reduced-policy rows require an exact modern 4.3.0 current-source destination.'
@@ -100,6 +105,7 @@ foreach ($case in $cases) {
   }
   if($currentDestination){
     $arguments.SourceMaterializationPath=$SourceMaterializationPath
+    if($historicalCurrentDestination){$arguments.SelectedReleaseManifest=$SelectedReleaseManifest}
     $arguments.SelectedTarget=$SelectedTarget
     $arguments.SourceVersion=$SourceVersion
     $arguments.UpgradePolicy=$UpgradePolicy

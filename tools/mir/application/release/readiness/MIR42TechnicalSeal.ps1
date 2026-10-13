@@ -828,6 +828,71 @@ function Get-MIR42SealCandidateConstructionVersionContract {
   return $contract
 }
 
+# A 4.3 historical candidate preserves its construction manifest beside the
+# selected ZIP.  The manifest's self hash alone is a logical identity; bind it
+# to the copied file's raw identity as well, so a reformatted but otherwise
+# self-consistent receipt cannot be substituted at native-reader time.
+function Get-MIR42HistoricalMaterializerReceiptCustody {
+  param(
+    [Parameter(Mandatory)][string]$Root,
+    [Parameter(Mandatory)][string]$Target,
+    [Parameter(Mandatory)]$Row
+  )
+
+  foreach ($field in @('historical_materializer_manifest_sha256','historical_materializer_manifest')) {
+    if ($Row.PSObject.Properties.Name -notcontains $field) {
+      throw "[mir42-seal-candidate-historical-receipt-field] $Target/$field"
+    }
+  }
+  $descriptor = $Row.historical_materializer_manifest
+  if ($null -eq $descriptor) {
+    throw "[mir42-seal-candidate-historical-receipt-shape] $Target"
+  }
+  Assert-MIR42SealPropertyNames -Value $descriptor -Expected @('path','bytes','sha256','record_sha256') -Code 'mir42-seal-candidate-historical-receipt-shape'
+  $expectedPath = "materializations/$Target.json"
+  if ([string]$descriptor.path -cne $expectedPath) {
+    throw "[mir42-seal-candidate-historical-receipt-path] $Target"
+  }
+  [int64]$expectedBytes = 0
+  if (-not [int64]::TryParse([string]$descriptor.bytes, [Globalization.NumberStyles]::None, [Globalization.CultureInfo]::InvariantCulture, [ref]$expectedBytes) -or
+      $expectedBytes -le 0) {
+    throw "[mir42-seal-candidate-historical-receipt-bytes] $Target"
+  }
+  foreach ($field in @('sha256','record_sha256')) {
+    if ([string]$descriptor.$field -notmatch '^[A-F0-9]{64}$') {
+      throw "[mir42-seal-candidate-historical-receipt-$field] $Target"
+    }
+  }
+  if ([string]$Row.historical_materializer_manifest_sha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$Row.historical_materializer_manifest_sha256 -cne [string]$descriptor.record_sha256) {
+    throw "[mir42-seal-candidate-historical-receipt-legacy-pin] $Target"
+  }
+  $receiptPath = Resolve-MIR42SealContainedArtifactPath -Root $Root -RelativePath $expectedPath -Code 'mir42-seal-candidate-historical-receipt'
+  if (-not (Test-Path -LiteralPath $receiptPath -PathType Leaf)) {
+    throw "[mir42-seal-candidate-historical-receipt-missing] $Target"
+  }
+  $raw = Get-MIR4RawFileIdentity -Path $receiptPath
+  if ([int64]$raw.bytes -ne $expectedBytes) {
+    throw "[mir42-seal-candidate-historical-receipt-bytes] $Target"
+  }
+  if ([string]$raw.sha256 -cne [string]$descriptor.sha256) {
+    throw "[mir42-seal-candidate-historical-receipt-sha256] $Target"
+  }
+  $receipt = Read-MIR42SealRecord -Path $receiptPath -Code 'mir42-seal-candidate-historical-receipt'
+  if ([string]$receipt.record.record_sha256 -cne [string]$descriptor.record_sha256) {
+    throw "[mir42-seal-candidate-historical-receipt-record-sha256] $Target"
+  }
+  return [pscustomobject][ordered]@{
+    descriptor = [pscustomobject][ordered]@{
+      path = $expectedPath
+      bytes = $expectedBytes
+      sha256 = [string]$descriptor.sha256
+      record_sha256 = [string]$descriptor.record_sha256
+    }
+    path = $receipt.path
+  }
+}
+
 function Get-MIR42ExactFourTargetCandidate {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$CandidateManifestPath)
   $candidateInput = Read-MIR42SealRecord -Path $CandidateManifestPath -Code 'mir42-seal-candidate'
@@ -925,6 +990,7 @@ function Get-MIR42ExactFourTargetCandidate {
         [string]$row.package_source_sha256 -cne [string]$candidate.package_source_sha256) {
       throw "[mir42-seal-candidate-target-row-drift] $([string]$target.target)"
     }
+    $historicalReceipt = $null
     if ($expected.PSObject.Properties.Name -contains 'target_record_path') {
       foreach ($field in @('materializer','base_materializer_target','target_record','factorio_line','public_output_authorized','publication_authorized')) {
         if ($row.PSObject.Properties.Name -notcontains $field) { throw "[mir42-seal-candidate-historical-row-field] $([string]$target.target)/$field" }
@@ -941,15 +1007,23 @@ function Get-MIR42ExactFourTargetCandidate {
           [string]$targetRecord.sha256 -cne [string]$expected.target_record_file_sha256) {
         throw "[mir42-seal-candidate-historical-target-record-binding] $([string]$target.target)"
       }
+      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1')) {
+        $historicalReceipt = Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target ([string]$target.target) -Row $row
+      }
     }
-    $rows.Add([pscustomobject][ordered]@{
+    $returned = [ordered]@{
       target = [string]$target.target
       distribution_version = [string]$target.distribution_version
       archive_sha256 = [string]$target.asset.sha256
       content_sha256 = [string]$target.content_sha256
       entry_count = [int]$target.entry_count
       archive_path = $assetPath
-    })
+    }
+    if ($null -ne $historicalReceipt) {
+      $returned.historical_materializer_manifest = $historicalReceipt.descriptor
+      $returned.historical_materializer_manifest_path = $historicalReceipt.path
+    }
+    $rows.Add([pscustomobject]$returned)
   }
   return [pscustomobject][ordered]@{identity=$candidateInput;source=$source;scope=$targetScope;targets=@($rows)}
 }
@@ -1601,6 +1675,12 @@ function Assert-MIR42IndividualUpgradeReceipt {
     $receipt.Contains('upgrade_policy') -and
     $receipt.upgrade_policy -is [Collections.IDictionary] -and
     [string]$receipt.upgrade_policy.kind -ceq 'MIR430ClassicReducedUpgradePolicyV1'
+  # A reduced Classic receipt is a modern-target contract.  Decide this before
+  # choosing its snapshot field so a forged historical receipt cannot select
+  # the relaxed branch merely by carrying a self-consistent Classic payload.
+  if ($receipt.Contains('upgrade_policy') -and [string]$CandidateTarget.target -cnotin @('f210','f200','f110','f100')) {
+    throw '[mir42-individual-engine-run-classic-target]'
+  }
   $snapshotField = if ($classicReducedPolicy) { 'classic_upgrade_evaluator_snapshots' } else { 'full_state_evaluator_snapshots' }
   $snapshots = if ($receipt.Contains($snapshotField)) { @($receipt[$snapshotField]) } else { @() }
   $upgradeRow = [pscustomobject]@{

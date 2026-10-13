@@ -6840,7 +6840,9 @@
         ".mir/compatibility.yml",
         ".mir/targets.json",
         ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+        "governance/repository/mir430-classic-runtime-notice-v1.json",
         "spec/schemas/mir4-runtime-state-matrix-v1.schema.json",
+        "spec/schemas/mir430-classic-runtime-notice-v1.schema.json",
         "spec/schemas/mir4-migration-graph-matrix-v1.schema.json",
         "spec/schemas/mir4-continuity-bundle-v1.schema.json",
         "tools/mir/application/runtime/RuntimeStateModel.ps1",
@@ -6869,7 +6871,9 @@
       "inputs": [
         ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+        "governance/repository/mir430-classic-runtime-notice-v1.json",
         ".mir/targets.json",
+        "spec/schemas/mir430-classic-runtime-notice-v1.schema.json",
         "spec/schemas/mir4-runtime-state-matrix-v1.schema.json",
         "spec/schemas/mir4-migration-graph-matrix-v1.schema.json",
         "spec/schemas/mir4-continuity-bundle-v1.schema.json",
@@ -8503,5 +8507,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:58f12a8a87ab67e71a0b86be9b037573a0ed94843674ee5fd7ce4270ff7f49d5"
+  "digest": "sha256:fab4f804d9b9edbabd23f189bd03702aa0d0cd75c1a74211f73aaa8f0938b71a"
 }
