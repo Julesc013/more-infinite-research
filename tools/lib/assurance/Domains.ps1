@@ -290,7 +290,10 @@ function Get-MIRAssuranceScenarioDomainFingerprint {
     [Parameter(Mandatory)]$Test,
     [Parameter(Mandatory)]$Context
   )
-  $manifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
+  # Scenario-domain fingerprints are plan material. A hosted static plan may bind a
+  # source-fallback manifest when no archive exists yet; execution and gate paths
+  # still require the exact candidate before they can produce native evidence.
+  $manifest = Get-MIRAssuranceDomainManifest -Context $Context
   $dependencies = @($Test.domain_dependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique)
   $selected = [ordered]@{}
   foreach ($dependency in $dependencies) {
@@ -356,11 +359,97 @@ function Get-MIRAssuranceFixturePathByModId {
   return [string]$matches[0]
 }
 
+function Get-MIRAssuranceScenarioExternalFixtureDescriptors {
+  param(
+    [Parameter(Mandatory)]$Test,
+    [Parameter(Mandatory)][AllowEmptyCollection()][string[]]$RepositoryFixturePaths,
+    [Parameter(Mandatory)][AllowEmptyCollection()][string[]]$ExternalModIds
+  )
+
+  $descriptors = @()
+  foreach ($modId in @($ExternalModIds | Sort-Object -Unique)) {
+    if ($modId -notmatch '^[A-Za-z0-9_-]+$') {
+      throw "Scenario fixture mod ID '$modId' has an unsafe identity."
+    }
+
+    $descriptorMatches = @()
+    foreach ($fixturePath in @($RepositoryFixturePaths | Sort-Object -Unique)) {
+      $descriptorPath = Join-Path $repo ($fixturePath.Replace('/', '\') + '\scenario.json')
+      if (-not (Test-Path -LiteralPath $descriptorPath -PathType Leaf)) { continue }
+
+      try {
+        $descriptor = Get-Content -Raw -LiteralPath $descriptorPath | ConvertFrom-Json
+      } catch {
+        throw "Scenario fixture descriptor is not valid JSON: $fixturePath/scenario.json"
+      }
+      if ([int]$descriptor.schema -ne 1 -or $null -eq $descriptor.dependencies) {
+        throw "Scenario fixture descriptor has no schema-1 dependency declaration: $fixturePath/scenario.json"
+      }
+
+      $declared = @($descriptor.dependencies | Where-Object { [string]$_.name -ceq $modId })
+      if ($declared.Count -gt 1) {
+        throw "Scenario fixture descriptor declares upstream mod '$modId' more than once: $fixturePath/scenario.json"
+      }
+      if ($declared.Count -eq 0) { continue }
+
+      $dependency = $declared[0]
+      $version = [string]$dependency.version
+      $expectedSha256 = [string]$dependency.sha256
+      if ([string]::IsNullOrWhiteSpace($version) -or $expectedSha256 -notmatch '^[A-Fa-f0-9]{64}$') {
+        throw "Scenario fixture descriptor has an invalid exact archive declaration for upstream mod '$modId': $fixturePath/scenario.json"
+      }
+
+      $infoPath = Join-Path $repo ($fixturePath.Replace('/', '\') + '\info.json')
+      try {
+        $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
+      } catch {
+        throw "Repository fixture metadata is not valid JSON: $fixturePath/info.json"
+      }
+      $requiredDependency = "$modId = $version"
+      if (@($info.dependencies | ForEach-Object { ([string]$_).Trim() } | Where-Object { $_ -ceq $requiredDependency }).Count -ne 1) {
+        throw "Scenario fixture descriptor is not bound by its repository fixture dependency: $fixturePath/info.json -> $requiredDependency"
+      }
+
+      $descriptorMatches += [pscustomobject][ordered]@{
+        state='declared-external-archive'
+        name=$modId
+        version=$version
+        expected_sha256=$expectedSha256.ToUpperInvariant()
+        declaration_path="$fixturePath/scenario.json"
+        declaring_fixture=$fixturePath
+      }
+    }
+
+    if ($descriptorMatches.Count -eq 0) {
+      throw "Scenario fixture mod ID '$modId' does not resolve to a repository fixture or an exact declared upstream archive."
+    }
+    if ($descriptorMatches.Count -ne 1) {
+      throw "Scenario fixture mod ID '$modId' has ambiguous declared upstream archive bindings: $((@($descriptorMatches | ForEach-Object { $_.declaration_path }) -join ', '))."
+    }
+    $descriptors += $descriptorMatches[0]
+  }
+  return @($descriptors | Sort-Object name, version, declaration_path)
+}
+
 function Get-MIRAssuranceScenarioFixtureFingerprint {
   param([Parameter(Mandatory)]$Test)
   $patterns = @(".mir/fixtures.yml")
-  foreach ($fixture in @($Test.scenario.fixtures)) {
-    $fixturePath = Get-MIRAssuranceFixturePathByModId -ModId ([string]$fixture)
+  $repositoryFixturePaths = @()
+  $externalModIds = @()
+  $fixtureIds = @($Test.scenario.fixtures | ForEach-Object { [string]$_ })
+  $duplicates = @($fixtureIds | Group-Object | Where-Object Count -gt 1 | Select-Object -ExpandProperty Name)
+  if ($duplicates.Count -gt 0) {
+    throw "Scenario '$($Test.scenario.name)' declares duplicate fixture mod ID(s): $($duplicates -join ', ')."
+  }
+  foreach ($fixture in $fixtureIds) {
+    try {
+      $repositoryFixturePaths += Get-MIRAssuranceFixturePathByModId -ModId $fixture
+    } catch {
+      if ($_.Exception.Message -notmatch 'does not resolve to a repository-owned fixture directory') { throw }
+      $externalModIds += $fixture
+    }
+  }
+  foreach ($fixturePath in @($repositoryFixturePaths | Sort-Object -Unique)) {
     $patterns += "$fixturePath/**"
   }
   if ([string]$Test.scenario.group -eq "local-mod-library") {
@@ -369,7 +458,22 @@ function Get-MIRAssuranceScenarioFixtureFingerprint {
       "validation/scenarios/local-*.json"
     )
   }
-  return Get-MIRAssurancePatternFingerprint -Patterns @($patterns | Sort-Object -Unique)
+  $repository = Get-MIRAssurancePatternFingerprint -Patterns @($patterns | Sort-Object -Unique)
+  $externalInputs = @(Get-MIRAssuranceScenarioExternalFixtureDescriptors -Test $Test -RepositoryFixturePaths $repositoryFixturePaths -ExternalModIds $externalModIds)
+  if ($externalInputs.Count -eq 0) { return $repository }
+
+  $material = [ordered]@{
+    repository=$repository
+    external_inputs=$externalInputs
+  }
+  return [ordered]@{
+    kind='scenario-fixtures'
+    repository=$repository
+    patterns=@($repository.patterns)
+    file_count=[int]$repository.file_count
+    external_inputs=$externalInputs
+    sha256=(Get-MIRAssuranceJsonHash -Value $material)
+  }
 }
 
 function Get-MIRAssuranceScenarioHarnessFingerprint {
@@ -461,7 +565,9 @@ function Expand-MIRAssuranceTests {
         "configuration-change" { "F4" }
         default { "F3" }
       }
-      $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
+      # Matrix expansion is planning only. When the archive is intentionally
+      # absent, bind the source fallback instead of fabricating a package identity.
+      $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context
       $dependencies = Get-MIRAssuranceScenarioDomainDependencies -Scenario $record -DomainManifest $domainManifest
       $inputs = @("factorio", "verification-profile", "scenario-record", "scenario-fixtures", "scenario-harness")
       if ([string]$record.kind -eq "package") { $inputs += "candidate" }

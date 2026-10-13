@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/package/TargetMaterializer.ps1')
 $assertions = 0
 foreach ($code in @('210','200','110','100','017','016','015','014','013')) {
-  foreach ($patch in @(0,1,2)) {
+  foreach ($patch in @(0,1,2,3)) {
     $expected = "4.2.$code$($patch.ToString('D2'))"
     $identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor 2 -SourcePatch $patch -DistributionVersion $expected
     if ($identity.source_version -cne "4.2.$patch" -or $identity.distribution_version -cne $expected -or
@@ -31,7 +31,7 @@ foreach ($code in @('210','200','110','100','017','016','015','014','013')) {
     $assertions++
   }
 }
-foreach ($tag in @('v4.2.0','v4.2.1','v4.2.2')) {
+foreach ($tag in @('v4.2.0','v4.2.1','v4.2.2','v4.2.3')) {
   $manifest=[pscustomobject]@{kind='MIR42FinalReleaseManifestV1';source_tag=$tag}
   if ((Get-MIR4FinalManifestSourceVersion $manifest) -cne $tag.Substring(1)) { throw '[mir42-canonical-source-tag]' }
   $assertions++
@@ -99,6 +99,19 @@ try {
     $after = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash | ForEach-Object Hash)
     if (-not $rejected -or ($before -join '|') -cne ($after -join '|')) { throw '[mir422-wrong-patch-mutated-input]' }
     $assertions++
+    # Source 4.2.3 is a separate exact identity, never an increment of an
+    # already rewritten private tree.
+    $info.version="4.2.${code}00"
+    [IO.File]::WriteAllText($infoPath, ($info | ConvertTo-Json), $utf8)
+    [IO.File]::WriteAllText($historyPath, $history, $utf8)
+    [IO.File]::WriteAllText($readmePath, $readme, $utf8)
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion "4.2.${code}03" -SourceVersion '4.2.3'
+    $written = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
+    $writtenHistory = [IO.File]::ReadAllText($historyPath)
+    if ($written.version -cne "4.2.${code}03" -or
+        -not $writtenHistory.Contains("Version: 4.2.${code}03`n") -or -not $writtenHistory.Contains('source 4.2.3.') -or
+        [IO.File]::ReadAllText($readmePath) -cne "MIR 4.2.${code}03, source 4.2.3.`n`n$readme") { throw '[mir423-package-metadata]' }
+    $assertions++
   }
 } finally {
   if (Test-Path -LiteralPath $root) {
@@ -108,4 +121,4 @@ try {
     Remove-Item -LiteralPath $resolved -Recurse -Force
   }
 }
-[pscustomobject]@{status='passed';targets=9;assertions=$assertions;source_4_2_0_suffix='00';source_4_2_1_suffix='01';source_4_2_2_suffix='02';mismatched_source_patch_rejected=$true;historical_leading_zero_retained=$true;one_time_source_tag_bound=$true;factorio_processes=0;candidate_qualification='not-performed'} | ConvertTo-Json
+[pscustomobject]@{status='passed';targets=9;assertions=$assertions;source_4_2_0_suffix='00';source_4_2_1_suffix='01';source_4_2_2_suffix='02';source_4_2_3_suffix='03';mismatched_source_patch_rejected=$true;historical_leading_zero_retained=$true;one_time_source_tag_bound=$true;factorio_processes=0;candidate_qualification='not-performed'} | ConvertTo-Json

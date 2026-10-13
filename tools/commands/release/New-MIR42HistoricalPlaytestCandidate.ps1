@@ -2,10 +2,11 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
-  [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
+  [switch]$AuthenticationProjection,
   [switch]$Check
 )
 
@@ -13,6 +14,36 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+
+function Set-MIR42HistoricalBaselinePackageIdentity {
+  param([string]$Tree, $Record, [string]$BaselineSourceVersion)
+  # The verified adapter remains a pinned 4.2 baseline. Project its identity
+  # only in this private build tree before the normal patch writer validates
+  # the requested minor. Never broaden that writer's accepted input versions.
+  if ($BaselineSourceVersion -cnotmatch '^4[.](?<minor>2|3)[.]0$') {
+    throw '[mir42-historical-baseline-projection]'
+  }
+  $sourceMinor = [int]$Matches.minor
+  if ([string]$Record.target -cnotmatch '^f(017|016|015|014|013)$') {
+    throw '[mir42-historical-baseline-projection]'
+  }
+  $code = ([string]$Record.target).Substring(1)
+  $pinned = New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor 2 -SourcePatch 0
+  $projected = New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $sourceMinor -SourcePatch 0
+  $path = Join-Path $Tree 'info.json'
+  $info = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 20 -DateKind String
+  if ([string]$Record.distribution_version -cne [string]$pinned.distribution_version -or
+      [string]$Record.factorio_line -cne ('0.' + [int]$code) -or
+      [string]$info.name -cne 'more-infinite-research' -or
+      [string]$info.version -cne [string]$Record.distribution_version -or
+      [string]$info.factorio_version -cne [string]$Record.factorio_line) {
+    throw '[mir42-historical-baseline-input-identity]'
+  }
+  if ([string]$info.version -cne [string]$projected.distribution_version) {
+    $info.version = [string]$projected.distribution_version
+    [IO.File]::WriteAllText($path, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), [Text.UTF8Encoding]::new($false))
+  }
+}
 
 function Get-MIR42HistoricalTargetRecord {
   param([string]$TargetId)
@@ -158,11 +189,189 @@ function Copy-MIR42HistoricalAdapter {
   }
 }
 
+# This is deliberately a projection, not a second archive writer.  It starts
+# from the canonical f100 materializer selection and applies the same bounded
+# historical adapter, patch, and package-identity operations that the writer
+# applies to its private tree.  Native input readers use it to verify every
+# member of an already-built historical package without materializing another
+# tree or ZIP.
+function Get-MIR42HistoricalCandidateAuthenticationProjection {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$TargetId,
+    [Parameter(Mandatory)]$Record,
+    [Parameter(Mandatory)]$SourceManifest,
+    [Parameter(Mandatory)][string]$SourceVersion,
+    [Parameter(Mandatory)][string]$TargetRecordPath
+  )
+
+  if ($SourceVersion -cnotmatch '^4[.](?<minor>2|3)[.](?<patch>[0-9]{1,2})$') {
+    throw '[mir42-historical-authentication-source-version]'
+  }
+  $sourceMinor = [int]$Matches.minor
+  $sourcePatch = [int]$Matches.patch
+  $identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $TargetId.Substring(1) -SourceMinor $sourceMinor -SourcePatch $sourcePatch
+  $distributionRoot = 'more-infinite-research_' + [string]$identity.distribution_version
+  $baseState = Get-MIR4TargetMaterializerState -RepoRoot $RepoRoot -Target f100
+  $baseSelection = Get-MIR4TargetMaterializationBindings -State $baseState
+  $memberBytes = [Collections.Generic.Dictionary[string, byte[]]]::new([StringComparer]::Ordinal)
+  foreach ($binding in @($baseSelection.bindings)) {
+    $path = [string]$binding.output_path
+    Assert-MIR4PortableArchivePath -Path $path
+    if (-not $memberBytes.TryAdd($path, (Read-MIR4CanonicalSourceBindingBytes -State $baseState -Binding $binding))) {
+      throw "[mir42-historical-authentication-base-member-collision] $path"
+    }
+  }
+
+  foreach ($adapter in @($Record.adapter_files)) {
+    $path = [string]$adapter.output_path
+    Assert-MIR4PortableArchivePath -Path $path
+    if (-not $memberBytes.ContainsKey($path)) {
+      throw "[mir42-historical-authentication-adapter-output-missing] $path"
+    }
+    $memberBytes[$path] = ConvertTo-MIR42HistoricalAdapterBytes -Adapter $adapter -Record $Record -SourceManifest $SourceManifest
+  }
+  $utf8 = [Text.UTF8Encoding]::new($false)
+  foreach ($patch in @($Record.patches)) {
+    $path = [string]$patch.output_path
+    Assert-MIR4PortableArchivePath -Path $path
+    if (-not $memberBytes.ContainsKey($path)) {
+      throw "[mir42-historical-authentication-patch-output-missing] $path"
+    }
+    $originalBytes = $memberBytes[$path]
+    if ((Get-MIR4Sha256Bytes -Bytes $originalBytes) -cne [string]$patch.base_sha256) {
+      throw "[mir42-historical-authentication-patch-base-drift] $path"
+    }
+    $original = $utf8.GetString($originalBytes)
+    $find = [string]$patch.find
+    if ([regex]::Matches($original, [regex]::Escape($find)).Count -ne 1) {
+      throw "[mir42-historical-authentication-patch-anchor] $path"
+    }
+    $memberBytes[$path] = $utf8.GetBytes($original.Replace($find, [string]$patch.replace))
+  }
+
+  foreach ($required in @('info.json', 'changelog.txt', 'README.md')) {
+    if (-not $memberBytes.ContainsKey($required)) {
+      throw "[mir42-historical-authentication-identity-member-missing] $required"
+    }
+  }
+  $pinned = New-MIR4DistributionIdentityProjection -DistributionTargetCode $TargetId.Substring(1) -SourceMinor 2 -SourcePatch 0
+  $projectedBaseline = New-MIR4DistributionIdentityProjection -DistributionTargetCode $TargetId.Substring(1) -SourceMinor $sourceMinor -SourcePatch 0
+  $baselineInfo = $utf8.GetString($memberBytes['info.json']) | ConvertFrom-Json -Depth 20 -DateKind String
+  if ([string]$Record.distribution_version -cne [string]$pinned.distribution_version -or
+      [string]$Record.factorio_line -cne ('0.' + [int]$TargetId.Substring(1)) -or
+      [string]$baselineInfo.name -cne 'more-infinite-research' -or
+      [string]$baselineInfo.version -cne [string]$Record.distribution_version -or
+      [string]$baselineInfo.factorio_version -cne [string]$Record.factorio_line) {
+    throw '[mir42-historical-authentication-baseline-identity]'
+  }
+  $baselineInfo.version = [string]$projectedBaseline.distribution_version
+  $memberBytes['info.json'] = $utf8.GetBytes((($baselineInfo | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"))
+
+  if ($SourceVersion -cne '4.2.0') {
+    $baselineVersion = [string]$Record.distribution_version
+    $distributionVersion = [string]$identity.distribution_version
+    $readme = $utf8.GetString($memberBytes['README.md'])
+    foreach ($anchor in @("# More Infinite Research $baselineVersion", "More Infinite Research $baselineVersion is", "more-infinite-research_$baselineVersion.zip")) {
+      if ([regex]::Matches($readme, [regex]::Escape($anchor)).Count -ne 1) {
+        throw "[mir42-historical-authentication-readme-maintenance-identity] $anchor"
+      }
+      $readme = $readme.Replace($anchor, $anchor.Replace($baselineVersion, $distributionVersion))
+    }
+    $memberBytes['README.md'] = $utf8.GetBytes($readme)
+
+    $info = $utf8.GetString($memberBytes['info.json']) | ConvertFrom-Json -Depth 20 -DateKind String
+    if ([string]$info.name -cne 'more-infinite-research' -or
+        [string]$info.version -notin @([string]$projectedBaseline.distribution_version, [string]$identity.distribution_version) -or
+        [string]$info.factorio_version -cne [string]$Record.factorio_line) {
+      throw '[mir42-historical-authentication-maintenance-info]'
+    }
+    $info.version = [string]$identity.distribution_version
+    $memberBytes['info.json'] = $utf8.GetBytes((($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"))
+
+    $changelog = $utf8.GetString($memberBytes['changelog.txt']).Replace("`r`n", "`n")
+    $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
+    if (-not $firstVersion.Success) { throw '[mir42-historical-authentication-changelog-identity]' }
+    if ($firstVersion.Groups[1].Value -cne [string]$identity.distribution_version) {
+      $entry = "---------------------------------------------------------------------------------------------------`nVersion: $($identity.distribution_version)`n  Info:`n    - Target package from source $SourceVersion.`n"
+      $changelog = $entry + $changelog
+    }
+    $memberBytes['changelog.txt'] = $utf8.GetBytes($changelog)
+    $memberBytes['README.md'] = Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $memberBytes['README.md'] -DistributionVersion ([string]$identity.distribution_version) -SourceVersion $SourceVersion
+  }
+
+  $members = @(
+    foreach ($path in @($memberBytes.Keys | Sort-Object -CaseSensitive)) {
+      $bytes = $memberBytes[$path]
+      [pscustomobject][ordered]@{ path = $path; bytes = [int64]$bytes.Length; sha256 = Get-MIR4Sha256Bytes -Bytes $bytes }
+    }
+  )
+  $lines = @($members | ForEach-Object { "$([string]$_.path)`t$([int64]$_.bytes)`t$([string]$_.sha256)" })
+  $head = (& git -C $RepoRoot rev-parse HEAD).Trim()
+  $tree = (& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim()
+  if ($LASTEXITCODE -ne 0 -or $head -cnotmatch '^[a-f0-9]{40}$' -or $tree -cnotmatch '^[a-f0-9]{40}$') {
+    throw '[mir42-historical-authentication-source-identity]'
+  }
+  return [pscustomobject][ordered]@{
+    schema = 1
+    kind = 'MIR42HistoricalCandidateAuthenticationProjectionV1'
+    target = $TargetId
+    source_version = $SourceVersion
+    distribution_version = [string]$identity.distribution_version
+    distribution_root = $distributionRoot
+    factorio_line = [string]$Record.factorio_line
+    source = [ordered]@{ commit = $head; tree = $tree }
+    target_record = [ordered]@{ path = [IO.Path]::GetRelativePath($RepoRoot, $TargetRecordPath).Replace('\', '/'); sha256 = [string]$Record.record_sha256 }
+    canonical_base = [ordered]@{
+      target = 'f100'
+      package_authority_sha256 = [string]$baseState.authority.record_sha256
+      source_manifest_sha256 = [string]$baseState.manifest.record_sha256
+      target_registry_sha256 = [string]$baseState.registry.record_sha256
+      support_policy_sha256 = [string]$baseState.support.record_sha256
+      target_overlay_sha256 = [string]$baseState.composition.record_sha256
+      source_binding_count = @($baseSelection.bindings).Count
+    }
+    members = $members
+    member_projection_sha256 = Get-MIR4Sha256String -Value ($lines -join "`n")
+  }
+}
+
+function Assert-MIR42HistoricalAuthenticationProjectionInventory {
+  param([Parameter(Mandatory)]$Projection, [Parameter(Mandatory)]$Inventory)
+  $expected = @{}
+  foreach ($entry in @($Projection.members)) {
+    $path = [string]$entry.path
+    if ($expected.ContainsKey($path)) { throw "[mir42-historical-authentication-projection-collision] $path" }
+    $expected[$path] = $entry
+  }
+  if ([string]$Inventory.root -cne [string]$Projection.distribution_root -or
+      [int]$Inventory.entry_count -ne $expected.Count) {
+    throw '[mir42-historical-authentication-package-membership]'
+  }
+  foreach ($entry in @($Inventory.entries)) {
+    $path = [string]$entry.path
+    if (-not $expected.ContainsKey($path) -or [int64]$entry.raw_bytes -ne [int64]$expected[$path].bytes -or
+        [string]$entry.raw_sha256 -cne [string]$expected[$path].sha256) {
+      throw "[mir42-historical-authentication-package-member] $path"
+    }
+  }
+}
+
 $targetState = Get-MIR42HistoricalTargetRecord -TargetId $Target
 $record = $targetState.record
 $sourceManifest = Get-MIR42HistoricalSourceManifest
-$identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch ([int]($SourceVersion.Split('.')[2]))
+$sourceVersionParts = $SourceVersion.Split('.')
+$sourceMinor = [int]$sourceVersionParts[1]
+$sourcePatch = [int]$sourceVersionParts[2]
+$baselineSourceVersion = "4.$sourceMinor.0"
+$identity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor $sourceMinor -SourcePatch $sourcePatch
 $distributionVersion = [string]$identity.distribution_version
+if ($AuthenticationProjection) {
+  if ($RefreshSourceBindings -or $Check) { throw '[mir42-historical-authentication-projection-mode]' }
+  Get-MIR42HistoricalCandidateAuthenticationProjection -RepoRoot $repo -TargetId $Target -Record $record -SourceManifest $sourceManifest `
+    -SourceVersion $SourceVersion -TargetRecordPath $targetState.path
+  return
+}
 if ($RefreshSourceBindings) {
   if ($SourceVersion -cne '4.2.0') { throw '[mir42-historical-refresh-source-version]' }
   if ($Check) { throw '[mir42-historical-refresh-check-conflict]' }
@@ -197,17 +406,24 @@ New-Item -ItemType Directory -Force -Path $output | Out-Null
 
 $sourceCommit = (& git -C $repo rev-parse HEAD).Trim()
 $sourceTree = (& git -C $repo rev-parse 'HEAD^{tree}').Trim()
+$memberProjection = Get-MIR42HistoricalCandidateAuthenticationProjection -RepoRoot $repo -TargetId $Target -Record $record -SourceManifest $sourceManifest `
+  -SourceVersion $SourceVersion -TargetRecordPath $targetState.path
+if ([string]$memberProjection.source.commit -cne $sourceCommit -or [string]$memberProjection.source.tree -cne $sourceTree -or
+    [string]$memberProjection.distribution_version -cne $distributionVersion) {
+  throw '[mir42-historical-authentication-projection-source]'
+}
 $rows = @()
 foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   $base = New-MIR4TargetPackage -RepoRoot $repo -Target ([string]$record.base_materializer_target) `
-    -CandidateId "$CandidateId-BASE-$letter" -OutputRoot (Join-Path $output 'base')
+    -CandidateId "$CandidateId-BASE-$letter" -SourceVersion $baselineSourceVersion -OutputRoot (Join-Path $output 'base')
   $candidateParent = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "$Target/$CandidateId/$letter"
   Remove-MIR4BuildTree -OutputRoot $output -Path $candidateParent
   New-Item -ItemType Directory -Force -Path $candidateParent | Out-Null
   $tree = Join-Path $candidateParent "more-infinite-research_$distributionVersion"
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
-  if ($SourceVersion -in @('4.2.1','4.2.2')) {
+  Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion $baselineSourceVersion
+  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.
     $readmePath = Join-Path $tree 'README.md'
@@ -228,6 +444,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   $archive = Join-Path $candidateParent "more-infinite-research_$distributionVersion.zip"
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot (Split-Path -Leaf $tree) -OutputPath $archive -ContainmentRoot $output
   $inventory = Get-MIR4ArchiveInventory -Path $archive
+  Assert-MIR42HistoricalAuthenticationProjectionInventory -Projection $memberProjection -Inventory $inventory
   $forbidden = @($inventory.entries | Where-Object { $_.path -match '^(?:\.mir|\.codex|\.github|build|dist|docs|tests|tools|scripts)/' })
   if ($forbidden.Count -gt 0) { throw "[mir42-historical-package-forbidden-path] $Target" }
   $rows += [pscustomobject][ordered]@{
@@ -258,6 +475,15 @@ $manifest = [pscustomobject][ordered]@{
   distribution_version = $distributionVersion
   engine = $record.engine
   predecessor = $record.predecessor
+  authentication_projection = [ordered]@{
+    schema = [int]$memberProjection.schema
+    kind = [string]$memberProjection.kind
+    source_version = [string]$memberProjection.source_version
+    distribution_root = [string]$memberProjection.distribution_root
+    canonical_base = $memberProjection.canonical_base
+    member_count = @($memberProjection.members).Count
+    member_projection_sha256 = [string]$memberProjection.member_projection_sha256
+  }
   builds = $rows
   distribution = [ordered]@{ path = [IO.Path]::GetRelativePath($repo, $distribution).Replace('\', '/'); sha256 = [string]$rows[0].archive_sha256; content_sha256 = [string]$rows[0].content_sha256; entry_count = [int]$rows[0].entry_count }
   # This row is a construction input for a later combined candidate.  It does
@@ -289,7 +515,7 @@ $manifest = [pscustomobject][ordered]@{
     public_output_authorized = $false
     publication_authorized = $false
   }
-  assertions = @('current-canonical-f100-base-materialization', 'source-manifest-authoritative-adapter-selection', 'target-specific-profile-adapter', 'target-specific-metadata', 'bounded-research-cost-publication-omission', 'byte-identical-repeated-builds', 'package-path-exclusion')
+  assertions = @('current-canonical-f100-base-materialization', 'source-manifest-authoritative-adapter-selection', 'target-specific-profile-adapter', 'target-specific-metadata', 'bounded-research-cost-publication-omission', 'byte-identical-repeated-builds', 'package-path-exclusion', 'canonical-in-memory-member-authentication-projection')
   exact_engine_runtime = 'not-run'
   public_output_authorized = $false
   publication_authorized = $false

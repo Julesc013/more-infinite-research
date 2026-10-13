@@ -67,15 +67,12 @@ function Assert-MIR42EngineSharedInputs {
   function Refuses([scriptblock]$Action,[string]$Expected){$failure='';try{& $Action|Out-Null}catch{$failure=$_.Exception.Message};Check ($failure.Contains($Expected)) "expected $Expected; got $failure"}
   $script:engineSharedAssertions=0
   $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot ('build/tmp/engine-link-controls-'+[guid]::NewGuid().ToString('N')))
-  $inputLeases=[Collections.Generic.List[object]]::new()
-  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','New-MIR42EngineArchiveStage')){
+  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives')){
     Import-MIR42EngineRunnerFunction -Path $runnerPath -Name $name
   }
   try {
     $null=New-Item -ItemType Directory -Path $scratch
-    # A fresh PowerShell scope must preserve failures before lease allocation.
-    # Running in this test scope would accidentally supply its own $inputLeases
-    # and conceal the StrictMode regression in the runner's script-wide trap.
+    # A fresh PowerShell scope must preserve failures before any output allocation.
     $earlyFailure=Join-Path $scratch 'early-failure.ps1'
     [IO.File]::WriteAllText($earlyFailure,@'
 param([string]$Repository,[string]$Scratch)
@@ -124,25 +121,23 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Write-TinyEngineArchive $candidate $to $line;Write-TinyEngineArchive $predecessor $from $line
       $row=[ordered]@{candidate=$candidate;candidate_sha256=Get-MIRImmutableInputSha256 $candidate;predecessor=$predecessor;predecessor_sha256=Get-MIRImmutableInputSha256 $predecessor;to=$to;from=$from}
       $rows[$target]=$row;$originals[$target]=$candidate
-      New-MIR42EngineArchiveStage -Target $target -Row $row -OutputRoot $exactRoot -SourceVersion '4.2.1' -SourceCommit ('A'*40) -Context $resources -Leases $inputLeases
-      $lease=$inputLeases[$inputLeases.Count-1]
-      Check ($lease.record.require_hard_links -and $lease.record.inputs.Count -eq 2) "$target did not lease both inputs."
-      foreach($input in $lease.record.inputs){Check ($input.staging_mode -ceq 'hardlink' -and (Get-MIRImmutableInputFileIdentity $input.source_path) -ceq (Get-MIRImmutableInputFileIdentity $input.stage_path)) "$target copied $($input.role)."}
-      Check ($row.candidate -cne $candidate -and $row.predecessor -ceq $predecessor) "$target changed predecessor authority or failed to select the candidate alias."
-      Refuses {[IO.File]::WriteAllText($candidate,'attempted mutation')} 'used by another process'
+      $binding=Assert-MIR42EngineLibraryArchives -Target $target -Row $row -LibraryDirectory $sourceRoot
+      Check ($binding.archives.Count -eq 2 -and $binding.archive_copies_created -eq 0 -and $binding.archive_links_created -eq 0 -and $binding.populated_profiles_created -eq 0) "$target created a non-library input."
+      Check ($row.candidate -ceq $candidate -and $row.predecessor -ceq $predecessor -and $row.candidate_authority_path -ceq $candidate -and $row.predecessor_authority_path -ceq $predecessor) "$target changed an exact direct-library authority."
     }
-    Check ($resources.aliases.Count -eq 18 -and $resources.shared_alias_bytes -eq [int64](($inputLeases|ForEach-Object {$_.record.inputs}|ForEach-Object {(Get-Item -LiteralPath $_.stage_path).Length}|Measure-Object -Sum).Sum)) 'archive alias accounting differs.'
-    Check ((Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -gt 0) 'tiny aliases exhausted the output budget.'
+    Check ($resources.aliases.Count -eq 0 -and $resources.shared_alias_bytes -eq 0) 'direct libraries created archive aliases.'
+    Check ((Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -gt 0) 'direct-library controls exhausted the output budget.'
+    $libraryBinder=(Get-Command Assert-MIR42EngineLibraryArchives -CommandType Function).ScriptBlock.ToString()
+    Check ($libraryBinder -notmatch 'New-MIRImmutableInputLease|HardLink|Copy-Item|New-Item') 'library binding retained archive staging.'
 
-    $script:engineArchiveCopies=0
-    function New-Item {[CmdletBinding()]param([string]$ItemType,[string[]]$Path,[string]$Target,[switch]$Force);if($ItemType -ceq 'HardLink'){throw 'controlled link failure'};Microsoft.PowerShell.Management\New-Item @PSBoundParameters}
-    function Copy-Item {$script:engineArchiveCopies++;throw 'copy attempted'}
-    try {
-      $blocked=[ordered]@{};foreach($key in $rows.f210.Keys){$blocked[$key]=$rows.f210[$key]}
-      Refuses {New-MIR42EngineArchiveStage -Target blocked -Row $blocked -OutputRoot $exactRoot -SourceVersion '4.2.1' -SourceCommit ('A'*40) -Context $resources -Leases $inputLeases} 'requires a verified hard link'
-      Check ($script:engineArchiveCopies -eq 0) 'unavailable link invoked archive copying.'
-    } finally {Remove-Item Function:\New-Item;Remove-Item Function:\Copy-Item}
-
+    $missingTarget='missing';$missingVersion='4.2.99901';$missingAuthority=Join-Path $scratch "more-infinite-research_$missingVersion.zip"
+    Write-TinyEngineArchive $missingAuthority $missingVersion '2.0'
+    $missingRow=[ordered]@{candidate=$missingAuthority;candidate_sha256=Get-MIRImmutableInputSha256 $missingAuthority;predecessor=$predecessor;predecessor_sha256=Get-MIRImmutableInputSha256 $predecessor;to=$missingVersion;from=$from}
+    Refuses {Assert-MIR42EngineLibraryArchives -Target $missingTarget -Row $missingRow -LibraryDirectory $sourceRoot} 'library-candidate-missing'
+    $mismatchVersion='4.2.99801';$mismatchAuthority=Join-Path $scratch "more-infinite-research_$mismatchVersion.zip";$mismatchLibrary=Join-Path $sourceRoot "more-infinite-research_$mismatchVersion.zip"
+    Write-TinyEngineArchive $mismatchAuthority $mismatchVersion '2.0';Write-TinyEngineArchive $mismatchLibrary $mismatchVersion '2.1'
+    $mismatchRow=[ordered]@{candidate=$mismatchAuthority;candidate_sha256=Get-MIRImmutableInputSha256 $mismatchAuthority;predecessor=$predecessor;predecessor_sha256=Get-MIRImmutableInputSha256 $predecessor;to=$mismatchVersion;from=$from}
+    Refuses {Assert-MIR42EngineLibraryArchives -Target 'mismatch' -Row $mismatchRow -LibraryDirectory $sourceRoot} 'library-candidate-hash'
     # Real governed child proves capture relocation and the shared inventory.
     $stdout=Join-Path $exactRoot 'row.stdout.txt';$stderr=Join-Path $exactRoot 'row.stderr.txt'
     $code=Invoke-MIR42BoundedUpgrade -PowerShell (Get-Command pwsh).Source -Arguments @('-NoProfile','-Command','[Console]::WriteLine("tiny actor"); [Console]::Error.WriteLine("tiny stderr")') -StdoutPath $stdout -StderrPath $stderr -DeadlineSeconds 15 -NativeActor
@@ -155,16 +150,64 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $legacyStdout=Join-Path $exactRoot 'upgrade-worker.stdout.txt';$legacyStderr=Join-Path $exactRoot 'upgrade-worker.stderr.txt'
     $code=Invoke-MIR42BoundedUpgrade -PowerShell (Get-Command pwsh).Source -Arguments @('-NoProfile','-Command','[Console]::WriteLine("tiny governed-worker transport")') -StdoutPath $legacyStdout -StderrPath $legacyStderr -DeadlineSeconds 15
     Check ($code -eq 0 -and $resources.runs.Count -eq 2 -and (Get-Content -Raw $legacyStdout).Contains('tiny governed-worker transport')) 'upgrade transport took a second governor or lost its output.'
+    # Exercise the imported real bounded helper's provider dispatch.  These
+    # stubs only synthesize the native-provider return contract; no process is
+    # started.  A direct Factorio fresh load must select the provider that
+    # reports child-only Factorio IDs and clock metadata.
+    $genericProvider=(Get-Item -LiteralPath 'function:Invoke-MIRNativeProbeProcess').ScriptBlock
+    $factorioProvider=(Get-Item -LiteralPath 'function:Invoke-MIRNativeProbeFactorioProcess').ScriptBlock
+    $script:mir42DirectActorDispatch=[Collections.Generic.List[string]]::new()
+    $script:mir42DirectGenericStdout=Join-Path $exactRoot 'dispatch-generic-provider.stdout'
+    $script:mir42DirectGenericStderr=Join-Path $exactRoot 'dispatch-generic-provider.stderr'
+    $script:mir42DirectFactorioStdout=Join-Path $exactRoot 'dispatch-factorio-provider.stdout'
+    $script:mir42DirectFactorioStderr=Join-Path $exactRoot 'dispatch-factorio-provider.stderr'
+    try {
+      Set-Item -LiteralPath 'function:local:Invoke-MIRNativeProbeProcess' -Value {
+        param($Context,$FilePath,$Arguments,$TimeoutSeconds)
+        $script:mir42DirectActorDispatch.Add('generic')
+        [IO.File]::WriteAllText($script:mir42DirectGenericStdout,'generic provider')
+        [IO.File]::WriteAllText($script:mir42DirectGenericStderr,'')
+        return [pscustomobject]@{stdout=$script:mir42DirectGenericStdout;stderr=$script:mir42DirectGenericStderr;result=[pscustomobject]@{exit_code=0}}
+      }
+      Set-Item -LiteralPath 'function:local:Invoke-MIRNativeProbeFactorioProcess' -Value {
+        param($Context,$FilePath,$Arguments,$TimeoutSeconds)
+        $script:mir42DirectActorDispatch.Add('factorio')
+        [IO.File]::WriteAllText($script:mir42DirectFactorioStdout,'factorio provider')
+        [IO.File]::WriteAllText($script:mir42DirectFactorioStderr,'')
+        return [pscustomobject]@{stdout=$script:mir42DirectFactorioStdout;stderr=$script:mir42DirectFactorioStderr;result=[pscustomobject]@{exit_code=0}}
+      }
+      $genericDispatchStdout=Join-Path $exactRoot 'dispatch-generic.stdout';$genericDispatchStderr=Join-Path $exactRoot 'dispatch-generic.stderr'
+      $genericDispatchExit=Invoke-MIR42BoundedUpgrade -PowerShell 'controlled-generic.exe' -Arguments @('--generic') -StdoutPath $genericDispatchStdout -StderrPath $genericDispatchStderr -DeadlineSeconds 15 -NativeActor
+      Check ($genericDispatchExit -eq 0 -and @($script:mir42DirectActorDispatch).Count -eq 1 -and $script:mir42DirectActorDispatch[0] -ceq 'generic' -and (Get-Content -Raw $genericDispatchStdout) -ceq 'generic provider') 'native generic actor used the Factorio-only provider.'
+      $factorioDispatchStdout=Join-Path $exactRoot 'dispatch-factorio.stdout';$factorioDispatchStderr=Join-Path $exactRoot 'dispatch-factorio.stderr'
+      $factorioDispatchExit=Invoke-MIR42BoundedUpgrade -PowerShell 'controlled-factorio.exe' -Arguments @('--factorio') -StdoutPath $factorioDispatchStdout -StderrPath $factorioDispatchStderr -DeadlineSeconds 15 -NativeActor -FactorioActor
+      Check ($factorioDispatchExit -eq 0 -and @($script:mir42DirectActorDispatch).Count -eq 2 -and $script:mir42DirectActorDispatch[1] -ceq 'factorio' -and (Get-Content -Raw $factorioDispatchStdout) -ceq 'factorio provider') 'native Factorio actor did not use the Factorio provider.'
+      Refuses {Invoke-MIR42BoundedUpgrade -PowerShell 'controlled-invalid.exe' -Arguments @('--invalid') -StdoutPath (Join-Path $exactRoot 'dispatch-invalid.stdout') -StderrPath (Join-Path $exactRoot 'dispatch-invalid.stderr') -DeadlineSeconds 15 -FactorioActor} 'factorio-actor-requires-native-governor'
+      Check (@($script:mir42DirectActorDispatch).Count -eq 2) 'invalid Factorio actor reached a provider.'
+    } finally {
+      Set-Item -LiteralPath 'function:local:Invoke-MIRNativeProbeProcess' -Value $genericProvider
+      Set-Item -LiteralPath 'function:local:Invoke-MIRNativeProbeFactorioProcess' -Value $factorioProvider
+      Remove-Variable -Name mir42DirectActorDispatch,mir42DirectGenericStdout,mir42DirectGenericStderr,mir42DirectFactorioStdout,mir42DirectFactorioStderr -Scope Script -ErrorAction SilentlyContinue
+    }
     $tokens=$null;$errors=$null
     $ast=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$tokens,[ref]$errors)
     $argumentNode=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Extent.Text.StartsWith('$args = @(')},$true))
     Check ($argumentNode.Count -eq 1) 'upgrade argument construction is ambiguous.'
-    $harness='controlled harness';$repo=$RepoRoot;$rowRoot=Join-Path $exactRoot 'row';$row=$rows.f210;$row.engine='controlled';$row.fixture='controlled';$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
+    $harness='controlled harness';$repo=$RepoRoot;$rowRoot=Join-Path $exactRoot 'row';$row=$rows.f210;$row.engine='controlled';$row.fixture='controlled';$row.candidate_authority_path=Join-Path $scratch 'exact-construction-candidate.zip';$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
     $target='f210';$libraryBindings=@{f210=$sourceRoot};$sourceVersion='4.2.2'
     . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
     Check ($builtArguments[[Array]::IndexOf($builtArguments,'-ExpectedPeakMemoryMiB')+1] -ceq '256' -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -gt 0 -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -lt 4) 'upgrade worker lost the declared peak or remaining output allowance.'
-    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-LocalModLibraryDirs')+1] -ceq $sourceRoot) 'upgrade worker lost the selected direct library.'
+    Check ($row.candidate_authority_path -cne $row.candidate -and $builtArguments[[Array]::IndexOf($builtArguments,'-ToZip')+1] -ceq $row.candidate_authority_path -and $builtArguments[[Array]::IndexOf($builtArguments,'-LocalModLibraryDirs')+1] -ceq $sourceRoot) 'upgrade worker did not retain distinct construction authority and selected direct library.'
     Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SourceVersion')+1] -ceq '4.2.2') 'upgrade worker lost its maintenance source version.'
+    $sourceVersion='4.2.3';$target='f210'
+    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
+    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SourceVersion')+1] -ceq '4.2.3' -and $builtArguments[[Array]::IndexOf($builtArguments,'-Archetype')+1] -ceq 'space-age-native-owner') '423 F210 upgrade lost its complete-state native fixture.'
+    $maintenanceInputs=[pscustomobject]@{targets=@()};$CandidateManifestPath='controlled-candidate-manifest.json';$manifestPath=$CandidateManifestPath;$PublishedMaintenancePredecessorManifestPath='controlled-published.json'
+    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'if($null-ne$maintenanceInputs){$builtArguments += @(''-SelectedTarget'',$target,''-SelectedReleaseManifest'',$manifestPath,''-PublishedMaintenancePredecessorManifestPath'',$PublishedMaintenancePredecessorManifestPath)}'))
+    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SelectedTarget')+1] -ceq 'f210' -and $builtArguments[[Array]::IndexOf($builtArguments,'-SelectedReleaseManifest')+1] -ceq 'controlled-candidate-manifest.json' -and $builtArguments[[Array]::IndexOf($builtArguments,'-PublishedMaintenancePredecessorManifestPath')+1] -ceq 'controlled-published.json') '423 upgrade worker lost its exact current candidate or published predecessor binding.'
+    $target='f200'
+    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
+    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-Archetype')+1] -ceq 'base-default') '423 non-F210 upgrade changed the base fixture.'
     $sourceVersion='4.2.0'
     . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
     Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SourceVersion')+1] -ceq '4.2.1') 'original base-upgrade invocation lost the harness historical default.'
@@ -174,7 +217,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     foreach($historicalTarget in @('f017','f016','f015','f014','f013')){
       $boundEngine=Join-Path $scratch "relocated/$historicalTarget/factorio.exe"
       $baseline=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget
-      foreach($patch in @(1,2)){
+      foreach($patch in @(1,2,3)){
         $descriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion "4.2.$patch" -EnginePath $boundEngine
         Check ($descriptor.to-ceq('4.2.'+$historicalTarget.Substring(1)+'0'+$patch)-and$descriptor.engine-ceq$boundEngine-and$descriptor.historical.engine.sha256-ceq$baseline.historical.engine.sha256-and$descriptor.historical.predecessor.sha256-ceq$baseline.historical.predecessor.sha256) "$historicalTarget maintenance $patch changed its retained authority or target identity."
         foreach($badPath in @('','relative/factorio.exe')){
@@ -188,47 +231,81 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     Check ($maintenanceNode.Count-eq1) 'maintenance input call site is ambiguous.'
     function gh {param($Verb,$Route);$script:observedReleaseRoute=$Route;$global:LASTEXITCODE=0;return '{}'}
     function Get-MIR42PublishedMaintenancePredecessorInputs {
-      param($RepoRoot,$ManifestPath,$ReleaseMetadata,$CandidateSourceVersion)
+      param($RepoRoot,$ManifestPath,$ReleaseMetadata,$CandidateSourceVersion,$ArchiveBindings)
       $script:observedCustodySource=$CandidateSourceVersion
       Check ($ManifestPath-ceq'controlled-published.json') 'joined runner dropped the supplied manifest.'
+      Check ($ArchiveBindings -is [Collections.IDictionary] -and $ArchiveBindings.Count -eq $targets.Count) 'joined runner omitted complete explicit direct-library custody.'
+      foreach($id in $targets){
+        $version='4.2.'+$id.Substring(1)+'0'+(([version]$CandidateSourceVersion).Build-1)
+        $expected=[IO.Path]::GetFullPath((Join-Path $sourceRoot ('more-infinite-research_'+$version+'.zip')))
+        Check ([IO.Path]::GetFullPath([string]$ArchiveBindings[$id])-ceq$expected) "$id did not bind the expected published archive in its explicit library."
+      }
       return [pscustomobject]@{targets=@($selected.Keys|ForEach-Object {[pscustomobject]@{target=$_;path=$selected[$_].predecessor;version=('4.2.'+$_.Substring(1)+'0'+(([version]$CandidateSourceVersion).Build-1))}})}
     }
     try{
       $PublishedMaintenancePredecessorManifestPath='controlled-published.json';$isNineTargetCandidate=$true
       $script:MIR42ModernEngineTargets=@('f210','f200','f110','f100')
+      $targets=@($rows.Keys);$libraryBindings=@{};foreach($id in $targets){$libraryBindings[$id]=$sourceRoot}
+      # Legacy maintenance candidates keep their immediate predecessor.  A
+      # 423 candidate must also select each retained 420/421/422 publication.
       foreach($sourceVersion in @('4.2.1','4.2.2')){
+        $PublishedMaintenancePredecessorSourceVersion=''
         $selected=[ordered]@{}
         foreach($id in $rows.Keys){$selected[$id]=[ordered]@{predecessor=$rows[$id].predecessor;from='unselected'}}
         . ([scriptblock]::Create($maintenanceNode[0].Extent.Text))
-        $tag=if($sourceVersion-ceq'4.2.2'){'v4.2.1'}else{'v4.2.0-stable'}
+        $tag=switch($sourceVersion){'4.2.1'{'v4.2.0-stable'};'4.2.2'{'v4.2.1'};'4.2.3'{'v4.2.2'}}
         Check ($script:observedReleaseRoute-ceq('repos/Julesc013/more-infinite-research/releases/tags/'+$tag)-and$script:observedCustodySource-ceq$sourceVersion) 'joined runner selected the wrong publication or custody contract.'
         foreach($id in $selected.Keys){Check ($selected[$id].from-ceq('4.2.'+$id.Substring(1)+'0'+(([version]$sourceVersion).Build-1))-and$selected[$id].maintenance_predecessor.target-ceq$id) "$id lost selected published predecessor identity."}
       }
+      foreach($predecessorSourceVersion in @('4.2.0','4.2.1','4.2.2')){
+        $sourceVersion='4.2.3';$PublishedMaintenancePredecessorSourceVersion=$predecessorSourceVersion
+        $selected=[ordered]@{}
+        foreach($id in $rows.Keys){$selected[$id]=[ordered]@{predecessor=$rows[$id].predecessor;from='unselected'}}
+        . ([scriptblock]::Create($maintenanceNode[0].Extent.Text))
+        $readerVersion='4.2.'+(([version]$predecessorSourceVersion).Build+1)
+        $tag=switch($readerVersion){'4.2.1'{'v4.2.0-stable'};'4.2.2'{'v4.2.1'};'4.2.3'{'v4.2.2'}}
+        Check ($script:observedReleaseRoute-ceq('repos/Julesc013/more-infinite-research/releases/tags/'+$tag)-and$script:observedCustodySource-ceq$readerVersion) '423 did not select the exact predecessor publication or custody reader.'
+        foreach($id in $selected.Keys){Check ($selected[$id].from-ceq('4.2.'+$id.Substring(1)+'0'+(([version]$predecessorSourceVersion).Build)) -and $selected[$id].maintenance_predecessor.target-ceq$id) "$id lost the selected 423 predecessor identity."}
+      }
       $sourceVersion='4.2.0'
+      $PublishedMaintenancePredecessorSourceVersion=''
       Refuses {. ([scriptblock]::Create($maintenanceNode[0].Extent.Text))} 'maintenance-predecessor-candidate-scope'
-      $sourceVersion='4.2.2';$isNineTargetCandidate=$false
+      $sourceVersion='4.2.3';$isNineTargetCandidate=$false;$PublishedMaintenancePredecessorSourceVersion='4.2.0'
       Refuses {. ([scriptblock]::Create($maintenanceNode[0].Extent.Text))} 'maintenance-predecessor-candidate-scope'
     }finally{Remove-Item Function:\gh;Remove-Item Function:\Get-MIR42PublishedMaintenancePredecessorInputs}
 
     # The following actor synthesizes outputs, solely to exercise retained
     # fresh-load oracles and version admission. It proves no native gameplay.
     function Invoke-MIR42BoundedUpgrade {
-      param($PowerShell,$Arguments,$StdoutPath,$StderrPath,$DeadlineSeconds,[switch]$NativeActor)
+      param($PowerShell,$Arguments,$StdoutPath,$StderrPath,$DeadlineSeconds,[switch]$NativeActor,[switch]$FactorioActor)
       $config=$Arguments[[Array]::IndexOf($Arguments,'--config')+1]
       $mods=$Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]
       $save=$Arguments[[Array]::IndexOf($Arguments,'--create')+1]
-      Check ($NativeActor -and $DeadlineSeconds -eq 60 -and $Arguments -contains '--no-log-rotation') 'fresh actor changed arguments or deadline.'
-      Check (($Arguments -contains '--disable-audio') -eq ($freshLine -notin @('0.13','0.14'))) 'historical audio capability changed.'
+      Check ($NativeActor -and $FactorioActor -and $DeadlineSeconds -eq 60 -and $Arguments -contains '--no-log-rotation') 'fresh actor changed provider, arguments, or deadline.'
+      Check ($PowerShell -ceq $engine -and $Arguments -notcontains '-NoProfile' -and $Arguments -notcontains '-File') 'fresh actor retained a nested PowerShell worker.'
+      Check (($Arguments -contains '--disable-audio') -eq ($freshLine -notin @('0.13','0.14'))) 'fresh audio capability changed.'
       $modList=Get-Content -Raw -LiteralPath (Join-Path $mods 'mod-list.json')|ConvertFrom-Json
-      Check (($modList.mods.name -join '|') -ceq 'base|more-infinite-research' -and (Get-Content -Raw $config).Contains('[path]') -and $mods -ceq $sourceRoot) 'fresh load lost direct library or private configuration.'
+      $selected=@($modList.mods|Where-Object enabled)
+      $disabledFixtureArchives=@(Get-ChildItem -LiteralPath $mods -File -Filter 'mir-fixture-disabled-f013-fresh_*.zip')
+      $expectedVisibleFixtureCount=if(-not $freshIsModern -and $freshLine -ceq '0.13'){0}else{2}
+      Check ($disabledFixtureArchives.Count -eq $expectedVisibleFixtureCount) 'only F013 fresh loading may suppress disabled owned fixture versions.'
+      if(-not $freshIsModern -and $freshLine -ceq '0.13'){
+        Check (@(Get-ChildItem -LiteralPath $mods -File -Filter 'more-infinite-research_*.zip').Count -eq 1) 'F013 fresh loading left duplicate MIR versions visible.'
+      }
+      $selectedCount=if($freshEnableSpaceAge){6}else{2}
+      Check ($selected.Count -eq $selectedCount -and (Get-Content -Raw $config).Contains('[path]') -and $mods -ceq $sourceRoot) 'fresh load lost direct library or private configuration.'
+      if(-not $freshIsModern){Check (($selected.name -join '|') -ceq 'base|more-infinite-research') 'historical fresh load changed its selected archive set.'}
       Check (-not(Test-Path -LiteralPath (Join-Path $mods 'mod-settings.dat'))) 'fresh load inherited settings.'
-      $display=(($freshVersion -split '\.')|ForEach-Object {[int]$_})-join '.'
+      $display=if($freshIsModern){$freshVersion}else{(($freshVersion -split '\.')|ForEach-Object {[int]$_})-join '.'}
       $userPath=[regex]::Match((Get-Content -Raw $config),'(?m)^write-data=(.+)$').Groups[1].Value.Trim()
       $log=Join-Path $userPath 'factorio-current.log'
       if($freshFailure -cne 'missing'){[IO.File]::WriteAllText($save,'tiny save')}
-      [IO.File]::WriteAllText($log,"Loading mod base $freshLine.1 (data.lua)`nLoading mod more-infinite-research $display (data.lua)`nFactorio initialised`nCreating new map`nMap version controlled`n$freshFailure")
+      [IO.File]::WriteAllLines($log,@($selected|ForEach-Object {
+        $loggedVersion=if($_.name-ceq'more-infinite-research'){$display}else{[string]$_.version}
+        "Loading mod $($_.name) $loggedVersion (data.lua)"
+      })+@('Factorio initialised','Creating new map','Map version controlled',$freshFailure))
       [IO.File]::WriteAllText($StdoutPath,'tiny controlled output');[IO.File]::WriteAllText($StderrPath,'')
-      return 0
+      if($freshFailure -ceq 'exit'){return 3};return 0
     }
     $engineRoot=Join-Path $scratch 'controlled-engine';$engine=Join-Path $engineRoot 'bin/x64/factorio.exe'
     $null=New-Item -ItemType Directory -Path (Split-Path -Parent $engine),(Join-Path $engineRoot 'data/base')
@@ -236,12 +313,21 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $oldList='{"mods":[{"name":"base","enabled":true}]}';$oldSettings=[byte[]](5,4,3,2,1)
     [IO.File]::WriteAllText((Join-Path $sourceRoot 'mod-list.json'),$oldList)
     [IO.File]::WriteAllBytes((Join-Path $sourceRoot 'mod-settings.dat'),$oldSettings)
-    $freshFailure='';$freshRoots=[Collections.Generic.List[string]]::new()
-    foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(0,1,2)){
+    $disabledFixtureOriginals=@(foreach($version in @('1.0.9','1.0.10')){
+      $path=Join-Path $sourceRoot "mir-fixture-disabled-f013-fresh_$version.zip"
+      $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
+      try{
+        $writer=[IO.StreamWriter]::new($zip.CreateEntry("mir-fixture-disabled-f013-fresh_$version/info.json").Open())
+        try{$writer.Write((@{name='mir-fixture-disabled-f013-fresh';version=$version;factorio_version='0.13';dependencies=@('base')}|ConvertTo-Json -Compress))}finally{$writer.Dispose()}
+      }finally{$zip.Dispose()}
+      @{path=$path;sha256=Get-MIRImmutableInputSha256 $path;identity=Get-MIRImmutableInputFileIdentity $path}
+    })
+    $freshFailure='';$freshIsModern=$false;$freshEnableSpaceAge=$false;$freshRoots=[Collections.Generic.List[string]]::new()
+    foreach($target in @('f017','f016','f015','f014','f013')){foreach($patch in @(0,1,2,3)){
       $freshLine='0.'+$target.Substring(2);$freshVersion='4.2.'+$target.Substring(1)+('0'+$patch)
       [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
       $candidate=Join-Path $sourceRoot "more-infinite-research_$freshVersion.zip"
-      if($patch-eq2){Write-TinyEngineArchive $candidate $freshVersion $freshLine}
+      if($patch-ge2){Write-TinyEngineArchive $candidate $freshVersion $freshLine}
       $root=Join-Path $exactRoot "fresh-$target-$patch";$freshRoots.Add($root)
       $freshParams=@{Target=$target;FactorioLine=$freshLine;Engine=$engine;EngineSha256=$engineHash;Candidate=$candidate;CandidateSha256=Get-MIRImmutableInputSha256 $candidate;Version=$freshVersion;SourceVersion="4.2.$patch";FreshRoot=$root;SourceCommit=('A'*40);DeadlineSeconds=60;LibraryDirectory=$sourceRoot}
       $result=Invoke-MIR42HistoricalFreshLoad @freshParams
@@ -249,8 +335,11 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check ($receipt.candidate.version -ceq $freshVersion -and (Test-MIR4BootstrapRecordHash $receipt) -and $receipt.library_input_receipt.status -ceq 'restored-direct-library-controls') "$target/$patch did not preserve the fresh receipt or restore controls."
       Check (-not(Test-Path -LiteralPath (Join-Path $root 'work/user/mods')) -and $receipt.library_input_receipt.archive_links_created -eq 0 -and $receipt.library_input_receipt.dependency_payload_bytes_copied -eq 0) "$target/$patch materialized fresh inputs."
       Check ((Get-Content -Raw -LiteralPath (Join-Path $sourceRoot 'mod-list.json')) -ceq $oldList -and [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $sourceRoot 'mod-settings.dat'))) -ceq [Convert]::ToBase64String($oldSettings)) 'fresh actor failed to restore controls.'
+      foreach($fixture in $disabledFixtureOriginals){
+        Check ((Get-MIRImmutableInputSha256 $fixture.path) -ceq $fixture.sha256 -and (Get-MIRImmutableInputFileIdentity $fixture.path) -ceq $fixture.identity) 'fresh actor changed disabled fixture bytes or file identity.'
+      }
     }}
-    Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'selection.json')}|Sort-Object -Unique).Count -eq 15) 'fresh definitions share identities.'
+    Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'selection.json')}|Sort-Object -Unique).Count -eq 20) 'fresh definitions share identities.'
     $freshVersion='4.2.01301';$freshParams.SourceVersion='4.2.1'
     $freshParams.Candidate=Join-Path $sourceRoot 'more-infinite-research_4.2.01301.zip'
     $freshParams.CandidateSha256=Get-MIRImmutableInputSha256 $freshParams.Candidate
@@ -324,22 +413,75 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
         Check (@(Get-ChildItem -LiteralPath $validationRoot -Directory -Recurse|Where-Object Name -EQ 'mods').Count -eq 0) 'modern smoke recreated a mods stage.'
       }
     }
-    foreach($lease in $inputLeases){if(-not $lease.closed){$terminal=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed;$null=Assert-MIRImmutableInputTerminalReceipt -Receipt $terminal}}
-    foreach($lease in $inputLeases){
-      $root=[string]$lease.record.run_root
-      if($lease.record.state -ceq 'failed'){
-        Refuses {Assert-MIRImmutableInputLeaseReclaimable -RunRoot $root -Context 'failed tiny engine stage'} 'retains immutable-input custody'
-        continue
+    # The canonical release runner now invokes Factorio itself.  Exercise its
+    # actual modern fresh-loader wrapper with the same direct-library adapter
+    # and native-actor seam as historical targets; no ScenarioWorker is used.
+    $modernLoaderSha=Get-MIR42EngineRunSha $runnerPath
+    $runtimeScenarioRegistry=Join-Path $RepoRoot 'validation/scenarios/runtime.json'
+    $modernRoots=[Collections.Generic.List[string]]::new()
+    foreach($case in @(
+      @{target='f210';scenario='package-zip-base';spaceAge=$false},
+      @{target='f210';scenario='package-zip-space-age';spaceAge=$true},
+      @{target='f200';scenario='package-zip-base';spaceAge=$false},
+      @{target='f110';scenario='package-zip-base';spaceAge=$false},
+      @{target='f100';scenario='package-zip-base';spaceAge=$false}
+    )){
+      $target=[string]$case.target
+      $freshLine=switch($target){f210{'2.1'};f200{'2.0'};f110{'1.1'};f100{'1.0'}}
+      $freshVersion=[string]$rows[$target].to
+      $freshIsModern=$true;$freshEnableSpaceAge=[bool]$case.spaceAge;$freshFailure=''
+      [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
+      $root=Join-Path $exactRoot ('modern-'+$target+'-'+[string]$case.scenario);$modernRoots.Add($root)
+      $inventory=Get-MIR4ArchiveInventory -Path $rows[$target].candidate
+      $modernParams=@{
+        Target=$target;Scenario=[string]$case.scenario;FactorioLine=$freshLine;FactorioBinaryVersion="$freshLine.1"
+        Engine=$engine;EngineSha256=$engineHash;Candidate=$rows[$target].candidate;CandidateSha256=$rows[$target].candidate_sha256
+        CandidateContentSha256=[string]$inventory.content_sha256;PackageSourceSha256=('B'*64);LibraryDirectory=$sourceRoot
+        Version=$freshVersion;FreshRoot=$root;SourceCommit=('A'*40);DirectLoaderSha256=$modernLoaderSha
+        RuntimeScenarioRegistryPath=$runtimeScenarioRegistry;DeadlineSeconds=60
       }
-      $null=Assert-MIRImmutableInputLeaseReclaimable -RunRoot $root -Context 'completed tiny engine stage'
-      $null=Assert-MIRImmutableInputPathWithin -Path $root -Root $exactRoot -Context 'owned tiny stage retirement'
-      Remove-Item -LiteralPath $root -Recurse
+      $result=Invoke-MIR42ModernFreshLoad @modernParams
+      $summary=Get-Content -Raw -LiteralPath $result.receipt.path|ConvertFrom-Json -Depth 100
+      $expectedScenarioSha=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes([string]$case.scenario)))
+      $expectedGroupSha=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes('exact-dist')))
+      Check ([int]$summary.schema-eq2-and$summary.status-ceq'passed'-and$summary.git_commit-ceq('A'*40)-and$summary.validation_package_sha256-ceq$rows[$target].candidate_sha256-and$summary.validation_package_content_sha256-ceq[string]$inventory.content_sha256) "$target/$($case.scenario) lost exact schema-2 candidate identity."
+      Check ($summary.validation_harness_sha256-ceq$modernLoaderSha-and$summary.target_profile_sha256-ceq''-and$summary.execution_kind-ceq'direct-native-fresh-load'-and$summary.direct_loader.sha256-ceq$modernLoaderSha-and$summary.runtime_scenario_registry.sha256-ceq(Get-MIR42EngineRunSha $runtimeScenarioRegistry)-and$summary.expected_scenarios_sha256-ceq$expectedScenarioSha-and$summary.required_groups_sha256-ceq$expectedGroupSha-and$summary.expected_scenarios.Count-eq1-and$summary.expected_scenarios[0]-ceq[string]$case.scenario-and$summary.scenarios.Count-eq1-and$summary.scenarios[0].assertions_executed-eq6-and$summary.assertions_executed-eq6) "$target/$($case.scenario) recorded ScenarioWorker provenance or incomplete direct evidence."
+      Check ((Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json')) -ceq $oldList -and -not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'modern direct fresh actor failed to restore controls.'
+      Check ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $sourceRoot 'mod-settings.dat'))) -ceq [Convert]::ToBase64String($oldSettings)) 'modern direct fresh actor failed to restore settings.'
+      $libraryReceipt=Get-Content -Raw -LiteralPath (Join-Path $root 'library-inputs.json')|ConvertFrom-Json -Depth 30
+      Check ($libraryReceipt.status-ceq'restored-direct-library-controls'-and$libraryReceipt.archive_links_created-eq0-and$libraryReceipt.dependency_payload_bytes_copied-eq0-and-not(Test-Path (Join-Path $root 'work/user/mods'))) 'modern direct fresh actor materialized a profile or did not restore activation.'
     }
+    $target='f200';$freshLine='2.0';$freshVersion=[string]$rows[$target].to;$freshIsModern=$true;$freshEnableSpaceAge=$false
+    [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version='2.0.1';dependencies=@()}|ConvertTo-Json))
+    $modernFailureParams=@{
+      Target=$target;Scenario='package-zip-base';FactorioLine=$freshLine;FactorioBinaryVersion='2.0.1'
+      Engine=$engine;EngineSha256=$engineHash;Candidate=$rows[$target].candidate;CandidateSha256=$rows[$target].candidate_sha256
+      CandidateContentSha256=[string](Get-MIR4ArchiveInventory -Path $rows[$target].candidate).content_sha256;PackageSourceSha256=('B'*64);LibraryDirectory=$sourceRoot
+      Version=$freshVersion;SourceCommit=('A'*40);DirectLoaderSha256=$modernLoaderSha;RuntimeScenarioRegistryPath=$runtimeScenarioRegistry;DeadlineSeconds=60
+    }
+    foreach($failure in @(
+      @{name='missing';code='output-missing'},
+      @{name='Error controlled';code='log-content'},
+      @{name='exit';code='process-exit'}
+    )){
+      $freshFailure=[string]$failure.name;$modernFailureParams.FreshRoot=Join-Path $exactRoot ('modern-failure-'+[guid]::NewGuid().ToString('N'))
+      Refuses {Invoke-MIR42ModernFreshLoad @modernFailureParams} ([string]$failure.code)
+      Check (-not(Test-Path (Join-Path $modernFailureParams.FreshRoot 'summary.json'))-and(Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json'))-ceq$oldList-and-not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'failed modern direct actor accepted evidence or left controls active.'
+    }
+    $freshFailure='';$modernFailureParams.FreshRoot=Join-Path $exactRoot 'modern-drift';$modernFailureParams.CandidateSha256='0'*64
+    Refuses {Invoke-MIR42ModernFreshLoad @modernFailureParams} 'modern-fresh-archive-content'
+    Check (-not(Test-Path (Join-Path $modernFailureParams.FreshRoot 'summary.json'))-and(Get-Content -Raw (Join-Path $sourceRoot 'mod-list.json'))-ceq$oldList-and-not(Test-Path (Join-Path $sourceRoot '.mir-active-profile.json'))) 'drifted modern direct actor accepted evidence or changed controls.'
+    $invalidFamily=$modernFailureParams.Clone();$invalidFamily.CandidateSha256=$rows.f200.candidate_sha256;$invalidFamily.Scenario='package-zip-space-age';$invalidFamily.FreshRoot=Join-Path $exactRoot 'modern-invalid-family'
+    Refuses {Invoke-MIR42ModernFreshLoad @invalidFamily} 'modern-fresh-target-binding'
+    Check (-not(Test-Path (Join-Path $invalidFamily.FreshRoot 'summary.json'))) 'non-F210 Space Age selection produced evidence.'
+    $invalidArchive=$modernFailureParams.Clone();$invalidArchive.CandidateSha256=$rows.f200.candidate_sha256;$invalidArchive.Version='4.2.20002';$invalidArchive.FreshRoot=Join-Path $exactRoot 'modern-invalid-archive'
+    Refuses {Invoke-MIR42ModernFreshLoad @invalidArchive} 'modern-fresh-archive-version'
+    Check (-not(Test-Path (Join-Path $invalidArchive.FreshRoot 'summary.json'))) 'wrong modern archive version produced evidence.'
+    Check ($modernRoots.Count-eq5) 'modern direct loader omitted a required base or Space Age control.'
     foreach($target in $originals.Keys){Check ((Test-Path -LiteralPath $originals[$target] -PathType Leaf) -and (Get-MIRImmutableInputSha256 $originals[$target]) -ceq $rows[$target].candidate_sha256) 'stage retirement lost or changed a shared source input.'}
-    Write-Output "MIR42-ENGINE-SHARED-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=18 fresh_version_controls=15 factorio_processes=0"
+    Write-Output "MIR42-ENGINE-DIRECT-LIBRARY-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=18 fresh_version_controls=20 factorio_processes=0 archive_copies_created=0 archive_links_created=0"
   } finally {
-    foreach($lease in $inputLeases){if(-not $lease.closed){$null=Complete-MIRImmutableInputLease -Lease $lease -Outcome failed}}
-    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42HistoricalFreshLoad','New-MIR42EngineArchiveStage','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
+    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
     if(Test-Path -LiteralPath $scratch){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny engine controls';Remove-Item -LiteralPath $scratch -Recurse -Force}
   }
 }
@@ -612,12 +754,19 @@ if (-not $harness.Contains("`$serverReload = `$isHistoricalTerminalFixture -and 
 }
 $historicalFreshCall = $runner.IndexOf('$freshLoads = @(Invoke-MIR42HistoricalFreshLoad -Target $target',[StringComparison]::Ordinal)
 $historicalFreshBranch = if ($historicalFreshCall -ge 0) { $runner.LastIndexOf('if ($isHistoricalTarget) {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
-$modernFreshCall = $runner.IndexOf("`$freshArgs = @('-NoProfile'",[StringComparison]::Ordinal)
+$modernFreshCall = $runner.IndexOf('$fresh = Invoke-MIR42ModernFreshLoad -Target $target',[StringComparison]::Ordinal)
 $modernFreshElse = if ($historicalFreshCall -ge 0) { $runner.IndexOf('} else {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
 if ($historicalFreshBranch -lt 0 -or $historicalFreshCall -le $historicalFreshBranch -or
     $modernFreshElse -le $historicalFreshCall -or $modernFreshCall -le $modernFreshElse -or
-    -not $runner.Contains("[mir42-`$Target-historical-fresh-log-content]")) {
-  throw 'historical-fresh-load-must-bypass-modern-scenario-worker'
+    -not $runner.Contains('-ErrorPrefix "mir42-$Target-historical-fresh"') -or
+    -not $runner.Contains('throw "[$ErrorPrefix-log-content] $log"') -or
+    -not $runner.Contains('function Invoke-MIR42DirectFreshLoad {') -or
+    -not $runner.Contains('Invoke-MIR42BoundedUpgrade -PowerShell $Engine') -or
+    -not $runner.Contains('-NativeActor -FactorioActor') -or
+    -not $runner.Contains('-HideDisabledOwnedFixtureArchives:($Target -ceq ''f013'')') -or
+    -not $runner.Contains('-EnableSpaceAge:$EnableSpaceAge -HideDisabledOwnedFixtureArchives:$HideDisabledOwnedFixtureArchives') -or
+    $runner.Contains('-ScenarioWorker')) {
+  throw 'historical-and-modern-fresh-loads-must-use-direct-native-actors'
 }
 foreach ($needle in @('$isHistoricalTerminalFixture = $FixtureName -eq ''assert-upgrade-historical-terminal-to-mir42''','$isLegacyFactorio = $isHistoricalTerminalFixture -or','MIR historical upgrade specialization requires an exact terminal predecessor','historical-terminal-source-state-retained','historical-terminal-infinite-bonus-retained-where-supported','$historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo','$historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target','kind=$runKind','status=$runStatus')) {
   if (-not ($runner.Contains($needle) -or $harness.Contains($needle))) { throw "historical-runtime-contract $needle" }

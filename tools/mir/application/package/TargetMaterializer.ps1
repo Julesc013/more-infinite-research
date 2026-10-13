@@ -123,13 +123,29 @@ function Get-MIR4TargetMaterializationBindings {
   }
 }
 
+function Resolve-MIR4CurrentPackageMetadataSourceVersion {
+  param([Parameter(Mandatory)][string]$SourceVersion)
+
+  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')
+  if ($SourceVersion -cnotin $admitted -or $SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$') {
+    throw '[mir4-current-package-metadata-source-version]'
+  }
+  return [pscustomobject][ordered]@{
+    source_version = $SourceVersion
+    source_minor = [int]$Matches.minor
+    source_patch = [int]$Matches.patch
+  }
+}
+
 function Get-MIR4PrivatePatchPackageReadmeBytes {
   [CmdletBinding()]
   param([Parameter(Mandatory)][byte[]]$ReadmeBytes,[Parameter(Mandatory)][string]$DistributionVersion,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1')
-  if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+    [string]$SourceVersion = '4.2.1')
+  $source = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion $SourceVersion
+  if ($DistributionVersion -cnotmatch '^4[.][0-9]{1,5}[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
   $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
-  if ([int]$decoded.source_patch -ne [int]($SourceVersion.Split('.')[2])) { throw '[mir4-private-patch-package-source-patch]' }
+  $expected = New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$decoded.distribution_target_code) -SourceMinor $source.source_minor -SourcePatch $source.source_patch
+  if ($DistributionVersion -cne [string]$expected.distribution_version) { throw '[mir4-private-patch-package-source-identity]' }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $readme = $utf8.GetString($ReadmeBytes).Replace("`r`n", "`n")
   # Package bytes identify their source. Qualification belongs to the external
@@ -144,16 +160,18 @@ function Write-MIR4PrivatePatchPackageIdentity {
   param(
     [Parameter(Mandatory)][string]$Tree,
     [Parameter(Mandatory)][string]$DistributionVersion,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1'
+    [string]$SourceVersion = '4.2.1'
   )
 
-  if ($DistributionVersion -cnotmatch '^4[.]2[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+  $source = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion $SourceVersion
+  if ($DistributionVersion -cnotmatch '^4[.][0-9]{1,5}[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
   $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
-  if ([int]$decoded.source_patch -ne [int]($SourceVersion.Split('.')[2])) { throw '[mir4-private-patch-package-source-patch]' }
+  $expected = New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$decoded.distribution_target_code) -SourceMinor $source.source_minor -SourcePatch $source.source_patch
+  if ($DistributionVersion -cne [string]$expected.distribution_version) { throw '[mir4-private-patch-package-source-identity]' }
   $targetLines = @{ '210'='2.1'; '200'='2.0'; '110'='1.1'; '100'='1.0'; '017'='0.17'; '016'='0.16'; '015'='0.15'; '014'='0.14'; '013'='0.13' }
   $targetCode = [string]$decoded.distribution_target_code
   if (-not $targetLines.ContainsKey($targetCode)) { throw '[mir4-private-patch-package-target]' }
-  $baseline = New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetCode -SourceMinor 2 -SourcePatch 0
+  $baseline = New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetCode -SourceMinor $source.source_minor -SourcePatch 0
   $infoPath = Join-Path $Tree 'info.json'
   $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json -Depth 20 -DateKind String
   if ([string]$info.name -cne 'more-infinite-research' -or
@@ -238,7 +256,7 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -in @('4.2.1','4.2.2')) {
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output
@@ -410,7 +428,7 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
 
 function Update-MIR4CurrentSourceBindings {
   [CmdletBinding()]
-  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check,[scriptblock]$HistoricalAdapterProjector)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   # Refresh only existing, admitted paths. Membership, target scope, transforms,
   # versioning and support remain separately reviewed authorities.
@@ -469,6 +487,30 @@ function Update-MIR4CurrentSourceBindings {
        [bool]$historical.public_output_authorized -or [bool]$historical.publication_authorized -or
        -not(Test-MIR4BootstrapRecordHash -Record $historical)) { throw "[mir4-source-refresh-historical-record] $target" }
     $historicalChanged=$false
+    foreach($adapter in @($historical.adapter_files)) {
+      $rows=@($manifest.bindings | Where-Object {
+        $target -in @($_.target_scope) -and [string]$_.output_path -ceq [string]$adapter.output_path -and
+        [string]$_.source_path -ceq [string]$adapter.source_path
+      })
+      if($rows.Count -ne 1) { throw "[mir4-source-refresh-historical-adapter-binding] $target/$($adapter.output_path)" }
+      if([string]$adapter.source_sha256 -ceq [string]$rows[0].source_sha256 -and
+         [int64]$adapter.source_bytes -eq [int64]$rows[0].source_bytes) { continue }
+      if(-not $HistoricalAdapterProjector) { throw "[mir4-source-refresh-historical-renderer-required] $target/$($adapter.output_path)" }
+      # Execute the existing constructor's transform through the CLI adapter.
+      # Remove only the old output assertion from this private projection;
+      # retain all source/path/target checks before calculating its new pin.
+      $projection=$adapter | ConvertTo-Json -Depth 30 | ConvertFrom-Json -Depth 30
+      $projection.source_bytes=[int64]$rows[0].source_bytes
+      $projection.source_sha256=[string]$rows[0].source_sha256
+      $projection.PSObject.Properties.Remove('output_bytes')
+      $projection.PSObject.Properties.Remove('output_sha256')
+      $projectedBytes=[byte[]]@(& $HistoricalAdapterProjector $projection $historical $manifest)
+      $adapter.source_bytes=$projection.source_bytes
+      $adapter.source_sha256=$projection.source_sha256
+      $adapter.output_bytes=[int64]$projectedBytes.Length
+      $adapter.output_sha256=Get-MIR4Sha256Bytes -Bytes $projectedBytes
+      $historicalChanged=$true
+    }
     foreach($patch in @($historical.patches)) {
       $rows=@($manifest.bindings | Where-Object { [string]$_.output_path -ceq [string]$patch.output_path -and 'f100' -in @($_.target_scope) })
       if($rows.Count -ne 1 -or [string]$rows[0].transform -cne 'copy-exact-bytes' -or

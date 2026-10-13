@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0158",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Bind a deterministic map seed into native startup diagnostic creation.",
+  "details": [
+    "Use the selected engine profile deterministic seed for actual headless startup sample and player-ready preparation calls. Each owned run writes a map-generation input, passes it to Factorio and verifies its SHA-256 remains unchanged.",
+    "Record the actual seed and input hash with the result. Preserve ordinary-menu measurement separately and preserve all resource reserves and input-selection restoration.",
+    "49 focused startup controls pass, including actual caller-to-callee seed binding. The first seed-bound native attempt was refused by memory admission before Factorio launch; it establishes no native timing or seed readback."
+  ],
+  "semantic_domains": [
+    "tooling",
+    "release",
+    "performance"
+  ],
+  "audiences": [
+    "maintainers",
+    "contributors"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F200",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "omit",
+    "target_changelog": "omit",
+    "github": "omit",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1: 49 controlled source/tooling assertions, no native engine"
+    },
+    {
+      "kind": "finding",
+      "value": "build/tmp/mir430-galore-candidate-pilot9-summary.json: incomplete prelaunch memory admission; no sample"
+    }
+  ]
+}

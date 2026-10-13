@@ -4,7 +4,6 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local factorio_mods = require("prototypes.mir.platform.factorio.mods")
 
 function M.run()
-  require("prototypes.mir.streams.registry")
   -- Library availability is independent of optional settings-profile tools.
   -- Historical targets keep this off until their host adapters are qualified.
   if not target_line.feature_enabled("research_library") then return end

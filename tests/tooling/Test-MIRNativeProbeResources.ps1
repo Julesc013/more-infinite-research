@@ -17,6 +17,22 @@ function Refuses-Probe([scriptblock]$Action,[string]$Expected) {
   try { & $Action | Out-Null } catch { $failure=$_.Exception.Message }
   Assert-Probe ($failure.Contains($Expected)) "expected $Expected; got $failure"
 }
+function Assert-ControlledProbeActorInventory {
+  param([Parameter(Mandatory)][object[]]$Runs,[Parameter(Mandatory)][string]$RunRoot)
+  $expectedIndices=@(1..13)
+  $indices=@($Runs|ForEach-Object {[int]$_.index})
+  if(@($indices|Sort-Object -Unique).Count-ne$indices.Count){throw '[native-probe-actor-duplicate]'}
+  if($indices.Count-lt$expectedIndices.Count){throw '[native-probe-actor-missing]'}
+  if($indices.Count-gt$expectedIndices.Count){throw '[native-probe-actor-extra]'}
+  if((@($indices|Sort-Object)-join',')-cne($expectedIndices-join',')){throw '[native-probe-actor-identity]'}
+  $ordered=@($Runs|Sort-Object index)
+  foreach($row in $ordered){
+    $expectedStatus=if([int]$row.index-eq2){'interrupted'}else{'passed'}
+    $expectedLedger=Join-Path $RunRoot ('process-'+[int]$row.index+'.resources.jsonl')
+    if([string]$row.status-cne$expectedStatus-or[IO.Path]::GetFullPath([string]$row.ledger)-cne[IO.Path]::GetFullPath($expectedLedger)-or-not(Test-Path -LiteralPath $expectedLedger -PathType Leaf)){throw '[native-probe-actor-identity]'}
+  }
+  return $ordered
+}
 # Fake capacity is confined to tiny controlled process/metadata fixtures.
 # This suite never launches Factorio or the real package materializer.
 function Get-MIR441ResourceSnapshot {
@@ -235,7 +251,7 @@ try {
   Assert-Probe ($browserErrors.Count -eq 0) 'browser harness syntax differs.'
   # Execute the real argument contract and identity selection without launching
   # the harness, allocating a native environment or duplicating the codec.
-  $selectionStatements=@(foreach($variable in @('targetKey','expectedIdentity')){
+  $selectionStatements=@(foreach($variable in @('targetKey','sourceVersionParts','expectedIdentity')){
     $statement=@($browserAst.EndBlock.Statements|Where-Object{$_ -is [Management.Automation.Language.AssignmentStatementAst] -and $_.Left.Extent.Text -ceq ('$'+$variable)})
     Assert-Probe ($statement.Count-eq1) "browser identity assignment missing: $variable"
     $statement[0].Extent.Text
@@ -243,13 +259,16 @@ try {
   $browserBinding=[scriptblock]::Create($browserAst.ParamBlock.Extent.Text+"`n"+($selectionStatements-join"`n")+'; return $expectedIdentity')
   foreach($case in @(
     @{target='2.1';source='4.2.1';version='4.2.21001'},@{target='2.1';source='4.2.2';version='4.2.21002'},
-    @{target='2.0';source='4.2.1';version='4.2.20001'},@{target='2.0';source='4.2.2';version='4.2.20002'}
+    @{target='2.1';source='4.2.3';version='4.2.21003'},@{target='2.1';source='4.3.0';version='4.3.21000'},
+    @{target='2.1';source='4.3.1';version='4.3.21001'},
+    @{target='2.0';source='4.2.1';version='4.2.20001'},@{target='2.0';source='4.2.2';version='4.2.20002'},
+    @{target='2.0';source='4.2.3';version='4.2.20003'},@{target='2.0';source='4.3.0';version='4.3.20000'},
+    @{target='2.0';source='4.3.1';version='4.3.20001'}
   )){
     $selected=& $browserBinding -RepoRoot $repo -Target $case.target -SourceVersion $case.source
     Assert-Probe ($selected.distribution_version-ceq$case.version) 'browser caller selected the wrong maintenance identity.'
   }
   Assert-Probe ((& $browserBinding -RepoRoot $repo).distribution_version-ceq'4.2.21001') 'browser default changed.'
-  Refuses-Probe {& $browserBinding -RepoRoot $repo -SourceVersion '4.2.3'} 'SourceVersion'
   foreach($name in @('Resolve-BrowserEnginePath','Test-BrowserCandidate')) {
     $definitions=@($browserAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
     Assert-Probe ($definitions.Count -eq 1) "expected one actual browser admission function: $name"
@@ -378,15 +397,20 @@ try {
       $invalid=New-ControlledBrowserArchive -Line $line -Identity $currentIdentity -Variant $case.variant
       Refuses-Probe {Test-BrowserCandidate -Candidate $invalid -Line $line -Identity $currentIdentity -Repository $repo} $case.error
     }
+    foreach($sourceVersion in @('4.2.3','4.3.0','4.3.1')){
+      $selectedCandidate=& $browserBinding -RepoRoot $repo -Target $line -SourceVersion $sourceVersion
+      $selectedArchive=New-ControlledBrowserArchive -Line $line -Identity $selectedCandidate
+      $selectedChecked=Test-BrowserCandidate -Candidate $selectedArchive -Line $line -Identity $selectedCandidate -Repository $repo
+      Assert-Probe ($selectedChecked.info.version-ceq$selectedCandidate.distribution_version-and$selectedChecked.sha256-ceq(Get-FileHash $selectedArchive).Hash) "browser rejected or mislabeled the explicit $sourceVersion archive."
+    }
   }
   $continuityAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1'),[ref]$browserTokens,[ref]$browserErrors)
   Assert-Probe ($browserErrors.Count-eq 0) 'continuity harness syntax differs.'
   $continuityBinding=[scriptblock]::Create($continuityAst.ParamBlock.Extent.Text+'; return $SourceVersion')
-  foreach($version in @('4.2.0','4.2.1','4.2.2')){
+  foreach($version in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
     Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion $version)-ceq$version) 'continuity caller rejected a retained source version.'
   }
   Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo)-ceq'4.2.1') 'continuity default changed.'
-  Refuses-Probe {& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion '4.2.3'} 'SourceVersion'
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   foreach($name in @('Fail','Assert-True','Assert-Equal','Get-Sha256','Get-ZipEntry','Get-ZipEntrySha256','Get-ZipEntryText','Normalize-ZipMember','Test-Candidate')){
     $definitions=@($continuityAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
@@ -397,12 +421,13 @@ try {
     $Target=$target.ToUpperInvariant();$line=if($target-ceq'f210'){'2.1'}else{'2.0'};$TargetContract=@{factorio_line=$line}
     $hostPath=Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua';$locale=Join-Path $repo 'source/locale/en/more-infinite-research.cfg'
     $readmePath=Join-Path $repo "source/presentation/$target/README.md.template"
-    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2')){
-      $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch ([int]$sourceVersion.Split('.')[2])
+    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
+      $sourceParts=@($sourceVersion.Split('.'))
+      $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
       $ExpectedDistributionVersion=$identity.distribution_version;$ExpectedPackageRoot='more-infinite-research_'+$ExpectedDistributionVersion
       $ExpectedReadmeSha256=Get-MIRBrowserContinuityReadmeSha256 -RepositoryRoot $repo -Target $target -SourceVersion $sourceVersion -ReadmePath $readmePath
       $readmeBytes=[IO.File]::ReadAllBytes($readmePath)
-      if($sourceVersion-cin@('4.2.1','4.2.2')){
+      if($sourceVersion -cne '4.2.0'){
         $readmeBytes=Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readmeBytes -DistributionVersion $ExpectedDistributionVersion -SourceVersion $sourceVersion
         Assert-Probe ((Get-MIR4Sha256Bytes -Bytes (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readmeBytes -DistributionVersion $ExpectedDistributionVersion -SourceVersion $sourceVersion))-ceq$ExpectedReadmeSha256) 'private readme identity transformation is not idempotent.'
       }
@@ -426,7 +451,7 @@ try {
     }
     Refuses-Probe {Get-MIRBrowserContinuityReadmeSha256 -RepositoryRoot $repo -Target $target -SourceVersion '4.2.1' -ReadmePath $hostPath} 'readme-authority'
   }
-  Refuses-Probe {Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes ([byte[]]@(65)) -DistributionVersion '4.2.21002'} 'source-patch'
+  Refuses-Probe {Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes ([byte[]]@(65)) -DistributionVersion '4.2.21002'} 'source-identity'
   $source=Join-Path $fixture 'dependency.zip'
   [IO.File]::WriteAllBytes($source,[byte[]]::new(128KB))
   $archiveInput=[ordered]@{source_path=$source;file_name='dependency.zip';expected_sha256=Get-MIRImmutableInputSha256 $source;role='dependency-mod';identity=@{name='controlled'};provenance=@{kind='tiny-controlled-fixture'};immutable=$true}
@@ -558,14 +583,15 @@ try {
     Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath} 'candidate binding size differs'
     Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath} 'candidate binding size differs'
 
-    # Consume the actual current-candidate reader for both explicit maintenance
-    # versions. These tiny synthetic ZIPs isolate version/content refusal;
+    # Consume the actual current-candidate reader for every admitted current
+    # source identity. These tiny synthetic ZIPs isolate version/content refusal;
     # their mocked membership is not a player package or native acceptance.
     $binding.output_bytes=$bytes.Length
     $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
     foreach($target in @('f210','f200','f110','f100')) {
-      foreach($sourceVersion in @('4.2.1','4.2.2')) {
-        $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch ([int]$sourceVersion.Split('.')[2])
+      foreach($sourceVersion in @('4.2.1','4.2.2','4.3.0','4.3.1')) {
+        $sourceParts=$sourceVersion.Split('.')
+        $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
         $caseRoot=Join-Path $run ($target+'-'+$sourceVersion);[IO.Directory]::CreateDirectory($caseRoot)|Out-Null
         $candidate=Join-Path $caseRoot $identity.package_name
         $receiptPath=Join-Path $caseRoot 'materialized.json'
@@ -586,7 +612,7 @@ try {
         $selected=@{Repository=$repo;Archive=$candidate;ReceiptPath=$receiptPath;Target=$target;SourceVersion=$sourceVersion}
         $read=Read-MIRNativeProbeCurrentCandidate @selected
         Assert-Probe ($read.path-ceq$candidate-and$read.receipt.source_version-ceq$sourceVersion) "explicit $target/$sourceVersion reader lost its selected identity."
-        if($target-ceq'f210') {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
           $wrapped=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
           Assert-Probe ($wrapped.receipt.archive_sha256-ceq$inventory.archive_sha256) 'F210 wrapper lost explicit source selection.'
           $tinRead=Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
@@ -595,7 +621,7 @@ try {
           Assert-Probe ($k2Read.receipt.source_version-ceq$sourceVersion-and$k2Read.receipt.archive_sha256-ceq$inventory.archive_sha256) 'K2 caller lost explicit maintenance identity.'
         }
         $other=if($sourceVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
-        if($target-ceq'f210') {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
           Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
           Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
           if($sourceVersion-ceq'4.2.2') {
@@ -607,21 +633,25 @@ try {
         if($sourceVersion-ceq'4.2.2') {
           Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -Target $target} 'materialization identity differs'
         }
-        $record.distribution_version=$record.distribution_version.Substring(0,$record.distribution_version.Length-2)+'00';Save-ControlledTinRecord
+        $wrongPatch=if($identity.source_patch-eq0){'01'}else{'00'}
+        $record.distribution_version=$record.distribution_version.Substring(0,$record.distribution_version.Length-2)+$wrongPatch;Save-ControlledTinRecord
         Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'materialization identity differs'
         $record.distribution_version=$identity.distribution_version;$record.package_source_sha256='0'*64;Save-ControlledTinRecord
         Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'source fingerprint differs'
         $record.package_source_sha256=$savedFingerprint;Save-ControlledTinRecord
         $binding.output_sha256='0'*64
         Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'binding hash differs'
-        if($target-ceq'f210') {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
           Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
           Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
         }
         $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
       }
     }
-    Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion '4.2.3'} 'SourceVersion'
+    # 4.3.1 is a valid reader identity. A 4.3.1 controlled receipt must
+    # still be refused as an identity mismatch rather than by an obsolete
+    # caller allow-list.
+    Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion '4.2.3'} 'materialization identity differs'
 
     $flat=Join-Path $run 'flat-library';New-Item -ItemType Directory -Path $flat|Out-Null
     $dependency=Join-Path $flat 'controlled-k2_1.0.0.zip'
@@ -821,10 +851,14 @@ try {
   Refuses-Probe {Get-MIRNativeProbeRemainingOutputBytes -Context $context} 'resource-output-budget'
   Remove-Item -LiteralPath $budgetFile
   $pwsh=(Get-Command pwsh).Source
-  $run=Invoke-MIRNativeProbeProcess -Context $context -FilePath $pwsh -Arguments @('-NoProfile','-Command','Write-Output $env:TEMP') -TimeoutSeconds 20
+  $parentApp=[Environment]::GetEnvironmentVariable('SteamAppId');$parentGame=[Environment]::GetEnvironmentVariable('SteamGameId')
+  $parentTemp=[Environment]::GetEnvironmentVariable('TEMP');$parentTmp=[Environment]::GetEnvironmentVariable('TMP')
+  $run=Invoke-MIRNativeProbeProcess -Context $context -FilePath $pwsh -Arguments @('-NoProfile','-Command','[ordered]@{temp=$env:TEMP;tmp=$env:TMP;steam_app=$env:SteamAppId;steam_game=$env:SteamGameId}|ConvertTo-Json -Compress') -TimeoutSeconds 20
   Assert-Probe ($run.result.passed -and (Test-Path -LiteralPath $run.ledger)) 'actual owned small process did not retain its resource ledger.'
-  $privateTemp=(Get-Content -LiteralPath $run.stdout -Raw).Trim()
-  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $privateTemp) -and -not (Test-Path -LiteralPath $privateTemp)) 'process temp was not isolated and retired.'
+  $plainChild=Get-Content -LiteralPath $run.stdout -Raw|ConvertFrom-Json
+  $privateTemp=[string]$plainChild.temp
+  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $privateTemp) -and(Test-MIR441PathContained -Root $context.root -Path ([string]$plainChild.tmp))-and-not(Test-Path -LiteralPath $privateTemp)-and-not(Test-Path -LiteralPath ([string]$plainChild.tmp))) 'process temp was not isolated and retired.'
+  Assert-Probe ([string]$plainChild.steam_app -ceq [string]$parentApp -and [string]$plainChild.steam_game -ceq [string]$parentGame) 'ordinary governed process unexpectedly received Factorio Steam identity.'
   Refuses-Probe {Invoke-MIRNativeProbeProcess -Context $context -FilePath $pwsh -Arguments @('-NoProfile','-Command','exit 7') -TimeoutSeconds 20} 'mir441-process-exit'
   Assert-Probe ($context.runs[$context.runs.Count-1].status -ceq 'interrupted' -and (Test-Path -LiteralPath $context.runs[$context.runs.Count-1].ledger)) 'failed actor lost its ledger reference.'
   $terminal=Complete-MIRImmutableInputLease -Lease $lease -Outcome passed
@@ -909,23 +943,25 @@ function New-MIR4TargetPackage {
     $nextIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 2 -SourcePatch 2
     Assert-Probe ($nextPackage.target-ceq$target-and$nextPackage.source_version-ceq'4.2.2'-and$nextPackage.distribution_version-ceq$nextIdentity.distribution_version-and$nextPackage.candidate_id.StartsWith($target.ToUpperInvariant()+'-SCIENCE-LAUNCH-')) 'governed child lost explicit source patch two.'
   }
-  $driverHash=(Get-FileHash -LiteralPath (Join-Path $context.root 'materialize.ps1')).Hash
-  $driverProcessIndex=$context.process_index
-  Refuses-Probe {New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.2.3'} 'SourceVersion'
-  Assert-Probe ($driverProcessIndex-eq$context.process_index-and(Get-FileHash -LiteralPath (Join-Path $context.root 'materialize.ps1')).Hash-ceq$driverHash) 'unknown source version changed the driver or launched a process.'
+  $patchThreePackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.2.3'
+  Assert-Probe ($patchThreePackage.source_version-ceq'4.2.3'-and$patchThreePackage.distribution_version-ceq'4.2.21003'-and$patchThreePackage.target-ceq'f210') 'governed materializer rejected or misprojected source patch three.'
+  $minorThreePackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -Target f200 -CandidatePrefix BROWSER -SourceVersion '4.3.0'
+  Assert-Probe ($minorThreePackage.source_version-ceq'4.3.0'-and$minorThreePackage.distribution_version-ceq'4.3.20000'-and$minorThreePackage.target-ceq'f200') 'governed materializer rejected or misprojected the 4.3.0 release identity.'
+  $minorThreePatchPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.3.1'
+  Assert-Probe ($minorThreePatchPackage.source_version-ceq'4.3.1'-and$minorThreePatchPackage.distribution_version-ceq'4.3.21001'-and$minorThreePatchPackage.target-ceq'f210') 'governed materializer rejected or misprojected the 4.3.1 patch identity.'
   $echo=Join-Path $context.root 'argv-echo.ps1'
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
 [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
-[ordered]@{values=@($Values);steam_app=$env:SteamAppId;steam_game=$env:SteamGameId;temp=$env:TEMP} | ConvertTo-Json -Compress
+[ordered]@{values=@($Values);steam_app=$env:SteamAppId;steam_game=$env:SteamGameId;temp=$env:TEMP;tmp=$env:TMP} | ConvertTo-Json -Compress
 '@,[Text.UTF8Encoding]::new($false))
-  $parentApp=[Environment]::GetEnvironmentVariable('SteamAppId');$parentGame=[Environment]::GetEnvironmentVariable('SteamGameId')
   $literalValues=@('path with spaces','literal $(Get-Process) ; "quote" & marker','Unicode: π')
   $nativeActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $pwsh -Arguments (@('-NoProfile','-File',$echo)+$literalValues) -TimeoutSeconds 30
   $echoed=Get-Content -LiteralPath $nativeActor.stdout -Raw | ConvertFrom-Json
-  Assert-Probe (($echoed.values | ConvertTo-Json -Compress) -ceq ($literalValues | ConvertTo-Json -Compress)) 'native wrapper changed literal argument data.'
-  Assert-Probe ($echoed.steam_app -ceq '427520' -and $echoed.steam_game -ceq '427520' -and [Environment]::GetEnvironmentVariable('SteamAppId') -ceq $parentApp -and [Environment]::GetEnvironmentVariable('SteamGameId') -ceq $parentGame) 'Steam launch identifiers escaped the owned child.'
-  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $echoed.temp) -and -not (Test-Path -LiteralPath $echoed.temp) -and (Test-Path -LiteralPath $nativeActor.ledger)) 'native wrapper bypassed the private-temp or resource ledger authority.'
+  Assert-Probe (($echoed.values | ConvertTo-Json -Compress) -ceq ($literalValues | ConvertTo-Json -Compress)) 'direct native actor changed literal argument data.'
+  Assert-Probe ($echoed.steam_app -ceq '427520' -and $echoed.steam_game -ceq '427520' -and [Environment]::GetEnvironmentVariable('SteamAppId') -ceq $parentApp -and [Environment]::GetEnvironmentVariable('SteamGameId') -ceq $parentGame -and [Environment]::GetEnvironmentVariable('TEMP') -ceq $parentTemp -and [Environment]::GetEnvironmentVariable('TMP') -ceq $parentTmp) 'Factorio Steam identity or private custody environment escaped the owned child.'
+  Assert-Probe ((Test-MIR441PathContained -Root $context.root -Path $echoed.temp) -and(Test-MIR441PathContained -Root $context.root -Path $echoed.tmp)-and-not(Test-Path -LiteralPath $echoed.temp)-and-not(Test-Path -LiteralPath $echoed.tmp)-and(Test-Path -LiteralPath $nativeActor.ledger)-and-not(Test-Path -LiteralPath (Join-Path $context.root 'factorio-driver.ps1'))) 'direct native actor bypassed private-temp or resource-ledger custody, or retained a wrapper driver.'
+  Assert-Probe ($nativeActor.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$nativeActor.result.duration_measurement.historical_scope-ceq'governed-powershell-wrapper-tree-start-to-exit'-and$nativeActor.result.duration_measurement.comparability-ceq'scope-changed; compare only fresh direct-native measurements; no product-speedup claim') 'native actor timing scope is not explicit and non-comparable to historical wrapper timing.'
   $priorIndex=$context.process_index
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $pwsh -Arguments @('x'*20KB)} 'argument-budget'
   Assert-Probe ($context.process_index -eq $priorIndex) 'oversized argument data launched an actor.'
@@ -938,9 +974,18 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   & $compiler /nologo /target:winexe ('/out:'+$guiBinary) $guiSource
   if($LASTEXITCODE-ne0){throw 'Controlled GUI compilation failed'}
   $guiActor=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $guiBinary -Arguments @($guiMarker) -TimeoutSeconds 15
-  Assert-Probe ((Test-Path -LiteralPath $guiMarker)-and([IO.File]::ReadAllText($guiMarker)-ceq'finished')-and$guiActor.result.exit_code-eq0) 'native wrapper returned before the GUI child completed.'
-  Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$context.runs.Count}
-  Assert-Probe ((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actor_count -eq 10) 'reserved result did not preserve actual actor inventory.'
+  Assert-Probe ((Test-Path -LiteralPath $guiMarker)-and([IO.File]::ReadAllText($guiMarker)-ceq'finished')-and$guiActor.result.exit_code-eq0-and$guiActor.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit') 'direct native actor returned before the GUI child completed or lost direct clock scope.'
+  $actorRows=@(Assert-ControlledProbeActorInventory -Runs @($context.runs) -RunRoot $context.root)
+  Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows|Select-Object -Skip 1) -RunRoot $context.root} 'native-probe-actor-missing'
+  Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$actorRows[0]) -RunRoot $context.root} 'native-probe-actor-duplicate'
+  $extraActor=[pscustomobject]@{index=14;status='passed';ledger=(Join-Path $context.root 'process-14.resources.jsonl')}
+  Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$extraActor) -RunRoot $context.root} 'native-probe-actor-extra'
+  $actorRecord=@($actorRows|ForEach-Object {[ordered]@{index=[int]$_.index;status=[string]$_.status;ledger=[IO.Path]::GetFileName([string]$_.ledger)}})
+  Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$actorRecord.Count;actors=$actorRecord}
+  $resultActorRows=@((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actors)
+  $expectedActorIdentities=@($actorRecord|ForEach-Object {([int]$_.index).ToString()+'|'+[string]$_.status+'|'+[string]$_.ledger})
+  $resultActorIdentities=@($resultActorRows|ForEach-Object {([int]$_.index).ToString()+'|'+[string]$_.status+'|'+[string]$_.ledger})
+  Assert-Probe ($resultActorRows.Count-eq13-and($resultActorIdentities-join"`n")-ceq($expectedActorIdentities-join"`n")) 'reserved result did not preserve all admitted actor identities.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'
@@ -1106,10 +1151,16 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
 '@
     [IO.File]::WriteAllText($worker,$workerText,[Text.UTF8Encoding]::new($false))
     $currentMirInput=New-BrowserInput 'more-infinite-research' '4.2.20002' 'mir-candidate'
-    foreach($sourceVersion in @('4.2.1','4.2.2')){
+    $candidate423Input=New-BrowserInput 'more-infinite-research' '4.2.20003' 'mir-candidate'
+    $candidate430Input=New-BrowserInput 'more-infinite-research' '4.3.20000' 'mir-candidate'
+    $candidate431Input=New-BrowserInput 'more-infinite-research' '4.3.20001' 'mir-candidate'
+    foreach($sourceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
     $parameters=[ordered]@{CandidateArchive=$mirInput.source_path;RepositoryRoot=$repo;Target='F200';FactorioExe=$pwsh;TimeoutSeconds=30;StageLimit='Initial';InputMode='ScriptedFixture';SourceVersion='4.2.1';LibraryDirectory=$browserLibrary;Operation='Run'}
     $parameters.SourceVersion=$sourceVersion
     if($sourceVersion-ceq'4.2.2'){$parameters.CandidateArchive=$currentMirInput.source_path}
+    if($sourceVersion-ceq'4.2.3'){$parameters.CandidateArchive=$candidate423Input.source_path}
+    if($sourceVersion-ceq'4.3.0'){$parameters.CandidateArchive=$candidate430Input.source_path}
+    if($sourceVersion-ceq'4.3.1'){$parameters.CandidateArchive=$candidate431Input.source_path}
     $output=@(Invoke-MIRBrowserContinuityGovernedRun -RepositoryRoot $repo -ScriptPath $worker -Parameters $parameters -OutputRoot $fixture -ExpectedPeakMemoryMiB 512 -MaxNewOutputMiB 8)
     $resultPath=($output|Where-Object{$_-like'MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=*'}).Substring('MIR_BROWSER_CONTINUITY_GOVERNED_RESULT='.Length)
     $result=Get-Content -LiteralPath $resultPath -Raw|ConvertFrom-Json -Depth 40 -DateKind String
@@ -1124,7 +1175,7 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     Assert-MIRBrowserContinuityTerminalReceipt -Receipt $fallback.library_input_receipts[0] -JobRoot (Join-Path (Split-Path -Parent $resultPath) 'worker')
     Assert-Probe ($fallback.library_input_receipts[0].status-ceq'restored-direct-library-controls') 'browser fallback reader lost its direct-library receipt.'
     Assert-Probe ($fallback.source_version-ceq$sourceVersion-and$fallback.candidate.archive_sha256-ceq(Get-FileHash $parameters.CandidateArchive).Hash) 'browser owned worker lost the selected maintenance version or bytes.'
-    $expectedVersion=if($sourceVersion-ceq'4.2.2'){'4.2.20002'}else{'4.2.20001'}
+    $expectedVersion=switch($sourceVersion){'4.2.1'{'4.2.20001'};'4.2.2'{'4.2.20002'};'4.2.3'{'4.2.20003'};'4.3.0'{'4.3.20000'};'4.3.1'{'4.3.20001'}}
     Assert-Probe ((@($fallback.library_input_receipts[0].selected|Where-Object name -CEQ 'more-infinite-research').version)-ceq$expectedVersion) 'browser worker selected a different installed maintenance version.'
     }
   }

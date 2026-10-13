@@ -41,7 +41,7 @@
     "report->capabilities","report->core","report->domain","report->emit","report->families","report->index","report->integrity","report->pipeline","report->platform","report->settings",
     "runtime->core","runtime->domain","runtime->platform","runtime->settings","runtime->streams",
     "settings->core","settings->domain","settings->pipeline","settings->platform","settings->streams",
-    "stage->compatibility","stage->pipeline","stage->platform","stage->report","stage->runtime","stage->settings","stage->streams",
+    "stage->compatibility","stage->pipeline","stage->platform","stage->report","stage->runtime","stage->settings",
     "streams->compatibility","streams->core","streams->domain","streams->platform"
   ],
   "forbidden_edges": ["domain->emit","graph->emit","planner->emit"],

@@ -333,6 +333,43 @@ local function pack_world(seed, initial_first)
   }
 end
 
+(function()
+  local initial, future = feasibility.initial_recipe_witness, feasibility.recipe_witness
+  local function run_priority(reverse)
+    reset(pack_world(true, reverse))
+    world.recipe_facts["0-unavailable"] = {enabled_without_research = true, result_names = {"A"}}
+    world.recipe_prototypes["0-unavailable"] = {name = "0-unavailable"}
+    table.insert(world.producers.A, "0-unavailable")
+    world.recipe_facts["Z-initial"] = {enabled_without_research = true, result_names = {"A"}}
+    world.recipe_prototypes["Z-initial"] = {name = "Z-initial"}
+    table.insert(world.producers.A, "Z-initial")
+    local tried = {}
+    feasibility.initial_recipe_witness = function(name, ...)
+      tried[#tried + 1] = name
+      if name == "0-unavailable" then return nil end
+      return initial(name, ...)
+    end
+    feasibility.recipe_witness = function(name, output, options, state)
+      if options and options.require_enabled == true then return future(name, output, options, state) end
+      error("Initial priority must not construct a researched alternative: " .. name)
+    end
+    local ok, status = pcall(production.pack_production_status, "A", {})
+    feasibility.initial_recipe_witness, feasibility.recipe_witness = initial, future
+    local selected = ok and production.production_route_for_pack("A")
+    check("IP-" .. tostring(reverse), status == "initial" and selected
+      and selected.recipe == "A-initial" and #tried == 2
+      and tried[1] == "0-unavailable" and tried[2] == "A-initial",
+      "Initial selection skips an invalid lexical candidate and stops at the proven lexical winner")
+    check("IP-COUNTS-" .. tostring(reverse), selected
+      and selected.provenance.selection_counts_complete == false
+      and selected.provenance.route_enumeration.initial_recipes_evaluated == 2
+      and selected.provenance.route_enumeration.recipe_candidate_count == 4,
+      "Skipped alternatives have explicitly incomplete selection counts")
+  end
+  run_priority(true)
+  run_priority(false)
+end)();
+
 -- An initially available A must make B researchable in both cold query orders.
 reset(pack_world(true, true))
 local a = production.pack_production_status("A", {})
@@ -1150,6 +1187,138 @@ local rejected_acquisition = feasibility.acquisition_witness("component", {
 check("RS03", rejected_acquisition == nil and return_branch_visits >= 2,
   "An infeasible forward producer still reaches the retained recycling alternative and rejects its unseeded cycle")
 
+-- Normal typed producer selection may retain only its copied structural order.
+-- It neither merges item/fluid identities nor changes the lexical traversal
+-- used by a bounded diagnostic. The query state is caller-visible here solely
+-- to prove that stored arrays are not aliases of the source index.
+do
+(function()
+local typed_order_world = {
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
+  recipe_facts = {
+    ["z-item-forward"] = route_fact("same", {}, {
+      results = {{type = "item", name = "same", amount = 1, probability = 1}}
+    }),
+    ["a-item-recycling"] = route_fact("same", {}, {
+      source_class = "recycling",
+      results = {{type = "item", name = "same", amount = 1, probability = 1}}
+    }),
+    ["m-fluid-forward"] = route_fact("same", {}, {
+      results = {{type = "fluid", name = "same", amount = 1, probability = 1}}
+    })
+  },
+  producers = {same = {"a-item-recycling", "z-item-forward", "m-fluid-forward"}},
+  producers_identity = {
+    ["item\0same"] = {"a-item-recycling", "z-item-forward"},
+    ["fluid\0same"] = {"m-fluid-forward"}
+  }
+}
+reset(typed_order_world, true)
+local canonical_facade = package.loaded["prototypes.mir.index.recipe_facts"]
+local original_index_view = canonical_facade.index_view
+canonical_facade.index_view = function() return context.states.recipe_index end
+local owned_state = {}
+local original_producer_sort = feasibility.sort_acquisition_producers
+local producer_sort_calls = 0
+feasibility.sort_acquisition_producers = function(names, index)
+  producer_sort_calls = producer_sort_calls + 1
+  return original_producer_sort(names, index)
+end
+local item_witness = feasibility.acquisition_witness({type = "item", name = "same"}, {
+  source_witness = function() return nil end
+}, owned_state)
+local contextual_item_witness = feasibility.acquisition_witness({type = "item", name = "same"}, {
+  source_witness = function() return nil end
+}, owned_state)
+feasibility.sort_acquisition_producers = original_producer_sort
+local fluid_witness = feasibility.acquisition_witness({type = "fluid", name = "same"}, nil, owned_state)
+local item_order = owned_state.producer_orderings["item\0same"]
+local fluid_order = owned_state.producer_orderings["fluid\0same"]
+check("PO01", item_witness and item_witness.recipe == "z-item-forward"
+  and contextual_item_witness and contextual_item_witness.recipe == "z-item-forward"
+  and fluid_witness and fluid_witness.recipe == "m-fluid-forward"
+  and item_order and fluid_order and item_order[1] == "z-item-forward"
+  and fluid_order[1] == "m-fluid-forward"
+  and item_order ~= typed_order_world.producers_identity["item\0same"]
+  and fluid_order ~= typed_order_world.producers_identity["fluid\0same"]
+  and owned_state.producer_ordering_entry_count == 2 and producer_sort_calls == 1,
+  "Owned typed producer orders retain forward precedence and reuse one sort across contextual queries without item/fluid aliasing")
+
+local diagnostic_state = {}
+local lexical_observer = {visits = 0, limit = 1000}
+function lexical_observer:reserve_visit()
+  if self.visits >= self.limit then return false end
+  self.visits = self.visits + 1
+  return true
+end
+function lexical_observer:is_stopped() return self.visits >= self.limit end
+local diagnostic_witness = feasibility.acquisition_witness({type = "item", name = "same"}, {
+  diagnostic_observer = lexical_observer
+}, diagnostic_state)
+check("PO02", diagnostic_witness and diagnostic_witness.recipe == "a-item-recycling"
+  and diagnostic_state.producer_ordering_entry_count == 0
+  and next(diagnostic_state.producer_orderings) == nil,
+  "Diagnostic producer traversal remains lexical and bypasses retained ordering")
+
+local supplied_index = {
+  facts = typed_order_world.recipe_facts,
+  by_output = typed_order_world.producers,
+  by_output_identity = typed_order_world.producers_identity
+}
+local supplied_state = {}
+local supplied_witness = feasibility.acquisition_witness({type = "item", name = "same"}, {
+  recipe_index = supplied_index
+}, supplied_state)
+check("PO03", supplied_witness and supplied_witness.recipe == "z-item-forward"
+  and supplied_state.producer_ordering_entry_count == 0
+  and next(supplied_state.producer_orderings) == nil,
+  "An explicitly supplied mutable recipe index keeps the uncached producer-order path")
+
+local prior_recipe_index_epoch = context:state_epoch("recipe_index")
+typed_order_world.producers_identity["item\0same"] = {"a-item-recycling"}
+typed_order_world.recipe_source_epoch = 2
+context:replace_epoch("recipe_index", {
+  facts = typed_order_world.recipe_facts,
+  by_output = typed_order_world.producers,
+  by_output_identity = typed_order_world.producers_identity
+}, prior_recipe_index_epoch)
+owned_state.acquisition_memo = {}
+owned_state.stable_acquisition_memo = {}
+local replaced_item = feasibility.acquisition_witness({type = "item", name = "same"}, nil, owned_state)
+local replaced_order = owned_state.producer_orderings["item\0same"]
+check("PO04", replaced_item and replaced_item.recipe == "a-item-recycling"
+  and replaced_order and replaced_order[1] == "a-item-recycling"
+  and owned_state.producer_ordering_entry_count == 1
+  and context:state_epoch("recipe_index") > prior_recipe_index_epoch,
+  "A recipe-source/index epoch replacement drops the old typed producer ordering before reuse")
+
+local function capped_producer_order_world(width)
+  local facts, names, prototypes = {}, {}, {}
+  for index = 1, width do
+    local recipe = string.format("producer-%04d", index)
+    names[#names + 1] = recipe
+    facts[recipe] = route_fact("capped-producer", {{name = "ore", amount = 1}})
+    prototypes[recipe] = {name = recipe}
+  end
+  return {
+    item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = prototypes,
+    recipe_facts = facts, producers = { ["capped-producer"] = names }, unlockers = {},
+    producers_identity = { ["item\0capped-producer"] = names },
+    resources = {ore = {minable = {result = "ore", count = 1}}}
+  }
+end
+reset(capped_producer_order_world(4097))
+local capped_state = {}
+local capped_witness = feasibility.acquisition_witness("capped-producer", nil, capped_state)
+check("PO05", capped_witness and capped_witness.recipe == "producer-0001"
+  and capped_state.producer_ordering_entry_count == 0
+  and capped_state.producer_ordering_node_count == 0
+  and next(capped_state.producer_orderings) == nil,
+  "A producer set above the retained-node cap keeps the exact uncached forward ordering")
+canonical_facade.index_view = original_index_view
+end)()
+end
+
 -- A recursive failure is conditional on its parent visitation set. In this
 -- A <-> B graph, A's independent ore route must permit a later root B query;
 -- the first nested B rejection must never poison the reusable root memo.
@@ -1817,6 +1986,11 @@ progression_order_world.recipe_facts["a-recycling"] = route_fact(
   "component", {{name = "ore", amount = 1}}, {enabled = false})
 progression_order_world.techs.RecyclingUnlock.prerequisites = {"OrdinaryUnlock"}
 reset(progression_order_world)
+do
+(function()
+local canonical_facade = package.loaded["prototypes.mir.index.recipe_facts"]
+local original_index_view = canonical_facade.index_view
+canonical_facade.index_view = function() return context.states.recipe_index end
 local early_route = production.production_route_for_pack("order-pack")
 local early_pairs = early_route and early_route.provenance.selected_research_unlock_pairs or {}
 local has_early, has_late = false, false
@@ -1826,6 +2000,15 @@ for _, pair in ipairs(early_pairs) do
 end
 check("RS06", early_route and has_early and not has_late,
   "An earlier ordinary unlock wins over an alphabetically earlier later ordinary supplier")
+local ordering_owner = context:state_view("science_pack_production")
+local cached_component_order = ordering_owner.output_recipe_orderings["item\0component"]
+check("RS06A", cached_component_order and cached_component_order[1] == "z-ordinary"
+  and cached_component_order ~= progression_order_world.producers.component
+  and ordering_owner.output_recipe_ordering_entry_count > 0,
+  "Progression/source-class producer ordering is retained as an owned copied output list")
+canonical_facade.index_view = original_index_view
+end)()
+end
 
 progression_order_world.recipe_facts["z-ordinary"] = route_fact(
   "component", {{name = "missing", amount = 1}}, {enabled = false})
@@ -2886,6 +3069,166 @@ check("RP05", production.pack_production_status("Gamma", {}, {}) == "unreachable
   "A recipe-source epoch replacement discards primed root knowledge")
 end
 
+-- Structural unlock facts are shared by unlock ordering and concrete route
+-- assembly, but only while the graph/index and recipe source agree. The
+-- concrete acquisition decision remains contextual and gets recomputed here.
+(function()
+local function static_unlock_fact_world()
+  return {
+    item_prototypes = {
+      ["static-pack"] = {type = "item"}, ["static-component"] = {type = "item"}
+    },
+    labs = {lab = {inputs = {"static-pack"}}},
+    techs = {
+      StaticBefore = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}},
+      StaticUnlock = {
+        enabled = true, prerequisites = {"StaticBefore"},
+        research_trigger = {type = "craft-item", item = "lab"},
+        effects = {{type = "unlock-recipe", recipe = "make-static-component"}}
+      }
+    },
+    recipe_prototypes = {
+      ["make-static-pack"] = {name = "make-static-pack"},
+      ["make-static-component"] = {name = "make-static-component"}
+    },
+    recipe_facts = {
+      ["make-static-pack"] = route_fact("static-pack", {{name = "static-component", amount = 1}}),
+      ["make-static-component"] = route_fact("static-component", {}, {enabled = false})
+    },
+    producers = {
+      ["static-pack"] = {"make-static-pack"}, ["static-component"] = {"make-static-component"}
+    },
+    unlockers = { ["make-static-component"] = {"StaticUnlock"} }
+  }
+end
+
+local graph_researchability = require("prototypes.mir.graph.researchability_index")
+local original_reachable_names = graph_researchability.reachable_names
+local reachable_name_calls = 0
+graph_researchability.reachable_names = function(...)
+  reachable_name_calls = reachable_name_calls + 1
+  return original_reachable_names(...)
+end
+
+reset(static_unlock_fact_world())
+local static_status, static_gate = production.pack_production_status("static-pack", {})
+local static_owner = context:state_view("science_pack_production")
+local retained_static_fact = static_owner.static_unlock_facts.StaticUnlock
+-- Rebuild the contextual researchability answer. Its two graph traversals
+-- remain necessary (root qualification and active mechanism assessment); a
+-- third traversal for route metadata would mean the shared structural fact was
+-- not reused.
+static_owner.technology_mechanism_memo = {}
+local calls_before_shared_route = reachable_name_calls
+local first_static_route = production.independent_pack_acquisition_witness("static-pack", "Other", {}, {})
+local shared_route_calls = reachable_name_calls - calls_before_shared_route
+graph_researchability.reachable_names = original_reachable_names
+check("SU01", static_status == "research" and static_gate == "StaticUnlock"
+  and retained_static_fact and table.concat(retained_static_fact.prerequisite_closure, ",") == "StaticBefore"
+  and first_static_route and first_static_route.unlocker == "StaticUnlock"
+  and table.concat(first_static_route.prerequisite_closure, ",") == "StaticBefore"
+  and shared_route_calls == 2,
+  "A rebuilt contextual technology check reuses its retained structural unlock fact rather than traversing it a third time")
+
+first_static_route.prerequisite_closure[1] = "corrupt"
+local second_static_route = production.independent_pack_acquisition_witness("static-pack", "Other", {}, {})
+check("SU02", second_static_route and table.concat(second_static_route.prerequisite_closure, ",") == "StaticBefore"
+  and table.concat(static_owner.static_unlock_facts.StaticUnlock.prerequisite_closure, ",") == "StaticBefore",
+  "A consumer cannot mutate retained structural facts through an exported route")
+
+local original_fact_table = static_owner.static_unlock_facts
+local current_index = context:state_view("technology_researchability_index")
+context:replace_epoch("technology_researchability_index", current_index)
+local index_replaced_route = production.independent_pack_acquisition_witness("static-pack", "Other", {}, {})
+check("SU03", index_replaced_route and index_replaced_route.unlocker == "StaticUnlock"
+  and static_owner.static_unlock_facts ~= original_fact_table
+  and static_owner.static_unlock_facts_index_epoch == context:state_epoch("technology_researchability_index"),
+  "Replacing the owned graph-index epoch discards and rebuilds shared structural unlock facts")
+
+local source_epoch_owner = static_owner
+world.recipe_source_epoch = 2
+local source_replaced_route = production.independent_pack_acquisition_witness("static-pack", "Other", {}, {})
+local source_epoch_replacement = context:state_view("science_pack_production")
+check("SU04", source_replaced_route and source_replaced_route.unlocker == "StaticUnlock"
+  and source_epoch_replacement ~= source_epoch_owner
+  and source_epoch_replacement.static_unlock_facts_recipe_source_epoch == 2,
+  "A recipe-source epoch replacement discards shared structural facts with the rest of the source-bound production state")
+
+local function capped_static_unlock_world(width)
+  local world = {item_prototypes = {}, labs = {lab = {inputs = {}}}, techs = {},
+    recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {}}
+  for index = 1, width do
+    local suffix = string.format("%03d", index)
+    local pack, prior, unlock = "cap-pack-" .. suffix, "CapPrior" .. suffix, "CapUnlock" .. suffix
+    local recipe = "make-" .. pack
+    world.item_prototypes[pack] = {type = "item"}
+    table.insert(world.labs.lab.inputs, pack)
+    world.techs[prior] = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}}
+    world.techs[unlock] = {
+      enabled = true, prerequisites = {prior}, research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = recipe}}
+    }
+    world.recipe_prototypes[recipe] = {name = recipe}
+    world.recipe_facts[recipe] = route_fact(pack, {}, {enabled = false})
+    world.producers[pack] = {recipe}
+    world.unlockers[recipe] = {unlock}
+  end
+  return world
+end
+
+local STATIC_FACT_CAP_WIDTH = 257
+reset(capped_static_unlock_world(STATIC_FACT_CAP_WIDTH))
+production.prime_root_pack_statuses(context)
+local capped_owner = context:state_view("science_pack_production")
+local capped_last_pack, capped_last_unlock = "cap-pack-257", "CapUnlock257"
+local uncached_capped_route = production.independent_pack_acquisition_witness(capped_last_pack, "Other", {}, {})
+local capped_telemetry = context:state_view("compiler_telemetry").counters
+check("SU05", production.pack_production_status(capped_last_pack, {}) == "research"
+  and uncached_capped_route and uncached_capped_route.unlocker == capped_last_unlock
+  and capped_owner.static_unlock_facts_entry_count == 256
+  and capped_owner.static_unlock_facts[capped_last_unlock] == nil
+  and capped_owner.static_unlock_facts_node_count <= 4096
+  and capped_owner.static_unlock_facts_estimated_bytes <= 512 * 1024
+  and capped_telemetry.technology_closure_cache_entries == 256,
+  "A bounded structural-fact cache falls back to exact route analysis after its entry cap without losing the final pack")
+
+-- The node limit is separate from the entry limit. A single broad technology
+-- must still yield its real route, but cannot retain an unbounded closure.
+local function node_capped_static_unlock_world(width)
+  local prerequisites, techs = {}, {}
+  for index = 1, width do
+    local name = string.format("NodePrior%04d", index)
+    prerequisites[#prerequisites + 1] = name
+    techs[name] = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}}
+  end
+  techs.NodeCapUnlock = {
+    enabled = true, prerequisites = prerequisites,
+    research_trigger = {type = "craft-item", item = "lab"},
+    effects = {{type = "unlock-recipe", recipe = "make-node-cap-pack"}}
+  }
+  return {
+    item_prototypes = {["node-cap-pack"] = {type = "item"}},
+    labs = {lab = {inputs = {"node-cap-pack"}}}, techs = techs,
+    recipe_prototypes = {["make-node-cap-pack"] = {name = "make-node-cap-pack"}},
+    recipe_facts = {["make-node-cap-pack"] = route_fact("node-cap-pack", {}, {enabled = false})},
+    producers = {["node-cap-pack"] = {"make-node-cap-pack"}},
+    unlockers = {["make-node-cap-pack"] = {"NodeCapUnlock"}}
+  }
+end
+
+local STATIC_FACT_NODE_CAP_WIDTH = 4097
+reset(node_capped_static_unlock_world(STATIC_FACT_NODE_CAP_WIDTH))
+local node_capped_status, node_capped_gate = production.pack_production_status("node-cap-pack", {})
+local node_capped_route = production.production_route_for_pack("node-cap-pack")
+local node_capped_owner = context:state_view("science_pack_production")
+check("SU06", node_capped_status == "research" and node_capped_gate == "NodeCapUnlock"
+  and node_capped_route and #node_capped_route.prerequisite_closure == STATIC_FACT_NODE_CAP_WIDTH
+  and node_capped_owner.static_unlock_facts.NodeCapUnlock == nil
+  and node_capped_owner.static_unlock_facts_entry_count == 0
+  and node_capped_owner.static_unlock_facts_node_count == 0,
+  "A prerequisite closure above the node cap remains exact for this route without entering shared retained state")
+end)()
+
 reset({
   item_prototypes = {["free-pack"] = {type = "item"}, ["active-pack"] = {type = "item"}},
   labs = {lab = {inputs = {"free-pack", "active-pack"}}},
@@ -3046,13 +3389,27 @@ check("CP09", production.pack_production_status("P", {unrelated = true}, {Unlock
   "A changed active technology boundary cannot borrow a successful contextual pack answer")
 check("CP10", production.pack_production_status("P", {Q = true}) == "unreachable",
   "An active required science pack cannot borrow another pack traversal's success")
+do
+(function()
 local before_diagnostic_memo = contextual_owner.contextual_pack_status_memo
 local before_diagnostic_count = contextual_owner.contextual_pack_status_count
+local before_diagnostic_static_facts = contextual_owner.static_unlock_facts
+local before_diagnostic_static_count = contextual_owner.static_unlock_facts_entry_count
+local before_diagnostic_static_nodes = contextual_owner.static_unlock_facts_node_count
+local before_diagnostic_output_orders = contextual_owner.output_recipe_orderings
+local before_diagnostic_output_order_count = contextual_owner.output_recipe_ordering_entry_count
 local diagnostic_context_status = production.pack_production_status("P", {unrelated = true}, {}, bounded_observer(1))
 check("CP07", diagnostic_context_status == "indeterminate"
   and contextual_owner.contextual_pack_status_memo == before_diagnostic_memo
-  and contextual_owner.contextual_pack_status_count == before_diagnostic_count,
-  "A diagnostic budget remains indeterminate and never reads or writes contextual answer reuse")
+  and contextual_owner.contextual_pack_status_count == before_diagnostic_count
+  and contextual_owner.static_unlock_facts == before_diagnostic_static_facts
+  and contextual_owner.static_unlock_facts_entry_count == before_diagnostic_static_count
+  and contextual_owner.static_unlock_facts_node_count == before_diagnostic_static_nodes
+  and contextual_owner.output_recipe_orderings == before_diagnostic_output_orders
+  and contextual_owner.output_recipe_ordering_entry_count == before_diagnostic_output_order_count,
+  "A diagnostic budget remains indeterminate and never reads or writes contextual or shared structural reuse")
+end)()
+end
 world.recipe_source_epoch = 2
 world.resources = {}
 data.raw.resource = {}
@@ -3105,6 +3462,47 @@ check('D25A', trace_exhaustion_projection and trace_exhaustion_projection.status
   and projection_truncated(trace_exhaustion_projection, 'nodes')
   and projection_visits_within(trace_exhaustion_projection, 5),
   'Trace-stage recipe-status exhaustion is explicit indeterminate rather than nil')
+
+;(function()
+  local function sieve_world()
+    return {
+      item_prototypes = {Seed = {type = "item"}, Pack = {type = "item"}},
+      labs = {lab = {inputs = {"Seed", "Pack"}}},
+      techs = {Gate = {enabled = true, unit = {count = 1, time = 1, ingredients = {{"Seed", 1}}},
+        effects = {{type = "unlock-recipe", recipe = "A-pack"}, {type = "unlock-recipe", recipe = "Z-pack"}}}},
+      recipe_prototypes = {
+        seed = {type = "recipe", name = "seed", enabled = true, ingredients = {}, results = {{type = "item", name = "Seed", amount = 1}}},
+        ["A-pack"] = {type = "recipe", name = "A-pack", enabled = false, ingredients = {}, results = {{type = "item", name = "Pack", amount = 1}}},
+        ["Z-pack"] = {type = "recipe", name = "Z-pack", enabled = false, ingredients = {}, results = {{type = "item", name = "Pack", amount = 1}}}
+      },
+      recipe_facts = {seed = route_fact("Seed"), ["A-pack"] = route_fact("Pack", {}, {enabled = false}),
+        ["Z-pack"] = route_fact("Pack", {}, {enabled = false})},
+      producers = {Seed = {"seed"}, Pack = {"A-pack", "Z-pack"}},
+      unlockers = {["A-pack"] = {"Gate"}, ["Z-pack"] = {"Gate"}}
+    }
+  end
+  for _, reverse in ipairs({false, true}) do
+    local w = sieve_world()
+    if reverse then w.producers.Pack = {"Z-pack", "A-pack"} end
+    reset(w)
+    local original, later_calls = feasibility.recipe_witness, 0
+    feasibility.recipe_witness = function(name, ...)
+      if name == "Z-pack" then later_calls = later_calls + 1 end
+      return original(name, ...)
+    end
+    local status = production.pack_production_status("Pack")
+    local route = production.production_route_for_pack("Pack")
+    feasibility.recipe_witness = original
+    check("SIEVE-WINNER-" .. tostring(reverse), status == "research" and route and route.recipe == "A-pack",
+      "The gate-bound sieve retains the same reachable recipe across producer insertion orders")
+    check("SIEVE-CONSTRUCTION-" .. tostring(reverse), later_calls == 0 and route
+      and route.provenance.route_enumeration.disabled_producers_sieved == 1,
+      "A later recipe with the same necessary sole gate is skipped before its feasibility construction")
+    check("SIEVE-COUNTS-" .. tostring(reverse), route and route.provenance.selection_counts_complete == false
+      and route.provenance.route_enumeration.complete == false,
+      "Every possible selected route reports incomplete enumeration after pruning")
+  end
+end)()
 
 -- Reload the actual lab and recipe-facts source for the assertions below. The
 -- established planner worlds above intentionally stub recipe facts, so they
@@ -3342,6 +3740,260 @@ check("YP31", product_acquisition_witness({amount = 1, shared_probability = {min
 target_profile.prototype_shapes.product_probability_fields = modern_fields
 end)()
 end
+
+-- Characterize the retained selector at Git blob cc5322bb71fc9046f1b9126f534009f739f5087f.
+-- This oracle is test-only; the player package has one selector.
+(function()
+local original_policy = (function()
+local deepcopy = require("prototypes.mir.core.deepcopy")
+
+local M = {
+  policy_id = "SciencePackProductionRoutePolicyV1"
+}
+
+local function as_set(values)
+  local out = {}
+  for _, value in ipairs(values or {}) do out[value] = true end
+  return out
+end
+
+local function strict_subset(left, right)
+  local left_set = as_set(left)
+  local right_set = as_set(right)
+  local strictly_smaller = false
+  for value in pairs(left_set) do
+    if not right_set[value] then return false end
+  end
+  for value in pairs(right_set) do
+    if not left_set[value] then strictly_smaller = true end
+  end
+  return strictly_smaller
+end
+
+local function sorted_gates(route)
+  local gates, seen = {}, {}
+  for _, technology_name in ipairs(route.unlockers or {}) do
+    if technology_name and not seen[technology_name] then
+      seen[technology_name] = true
+      table.insert(gates, technology_name)
+    end
+  end
+  -- Legacy singleton routes remain comparable while the planner consumes the
+  -- plural gate contract.
+  if route.unlocker and not seen[route.unlocker] then
+    seen[route.unlocker] = true
+    table.insert(gates, route.unlocker)
+  end
+  for _, technology_name in ipairs(route.prerequisite_closure or {}) do
+    if technology_name and not seen[technology_name] then
+      seen[technology_name] = true
+      table.insert(gates, technology_name)
+    end
+  end
+  table.sort(gates)
+  return gates
+end
+
+local function graph_precedes(left, right)
+  return strict_subset(sorted_gates(left), sorted_gates(right))
+end
+
+local function retain_undominated(routes, precedes)
+  local retained = {}
+  for candidate_index, candidate in ipairs(routes) do
+    local dominated = false
+    for other_index, other in ipairs(routes) do
+      if candidate_index ~= other_index and precedes(other, candidate) then
+        dominated = true
+        break
+      end
+    end
+    if not dominated then table.insert(retained, candidate) end
+  end
+  return retained
+end
+
+local function numeric(value)
+  return type(value) == "number" and value or math.huge
+end
+
+local function progression_less(left, right)
+  local left_progression = left.progression_key or {}
+  local right_progression = right.progression_key or {}
+  for _, field in ipairs({
+    "science_burden_count",
+    "prerequisite_count",
+    "unlock_depth",
+    "research_count",
+    "research_time"
+  }) do
+    local left_value = numeric(left_progression[field])
+    local right_value = numeric(right_progression[field])
+    if left_value ~= right_value then return left_value < right_value end
+  end
+  local left_gates = table.concat(sorted_gates(left), "\0")
+  local right_gates = table.concat(sorted_gates(right), "\0")
+  if left_gates ~= right_gates then return left_gates < right_gates end
+  return tostring(left.recipe or "") < tostring(right.recipe or "")
+end
+
+function M.select(routes)
+  local reachable = {}
+  for _, route in ipairs(routes or {}) do
+    if route.reachable == true then table.insert(reachable, route) end
+  end
+  if #reachable == 0 then return nil end
+  local reachable_count = #reachable
+
+  local initial = {}
+  for _, route in ipairs(reachable) do
+    if route.initial == true then table.insert(initial, route) end
+  end
+  if #initial > 0 then reachable = initial end
+
+  local graph_frontier = retain_undominated(reachable, graph_precedes)
+  local burden_frontier = retain_undominated(graph_frontier, function(left, right)
+    return strict_subset(left.science_burden, right.science_burden)
+  end)
+  table.sort(burden_frontier, progression_less)
+
+  local selected = deepcopy(burden_frontier[1])
+  selected.provenance = selected.provenance or {}
+  selected.provenance.selection_policy = M.policy_id
+  selected.provenance.candidate_route_count = #(routes or {})
+  selected.provenance.reachable_route_count = reachable_count
+  selected.provenance.graph_frontier_count = #graph_frontier
+  selected.provenance.science_burden_frontier_count = #burden_frontier
+  return selected
+end
+
+return M
+end)()
+local copy = require("prototypes.mir.core.deepcopy")
+local function equal(a, b)
+  if type(a) ~= type(b) then return false end
+  if type(a) ~= "table" then return a == b end
+  for k, v in pairs(a) do if not equal(v, b[k]) then return false end end
+  for k in pairs(b) do if a[k] == nil then return false end end
+  return true
+end
+local function compare(routes, id)
+  local before = copy(routes)
+  local old, current = original_policy.select(routes), route_policy.select(routes)
+  check("PF-" .. id, equal(old, current) and equal(routes, before),
+    "Prepared frontiers preserve the complete selected record, counts and input")
+  if current then
+    current.provenance.test_mutation = true
+    current.unlockers = {"private-result"}
+    check("PF-COPY-" .. id, equal(routes, before), "Selected records retain copy isolation")
+  end
+end
+compare({}, "empty")
+local choices = {{}, {"a"}, {"b"}, {"a", "b"}}
+for gates_a = 1, 4 do for gates_b = 1, 4 do
+for science_a = 1, 4 do for science_b = 1, 4 do
+  local routes = {
+    {recipe = "z", reachable = true, unlockers = choices[gates_a],
+      science_burden = choices[science_a], progression_key = {science_burden_count = 0}},
+    {recipe = "a", reachable = true, unlockers = choices[gates_b],
+      science_burden = choices[science_b], progression_key = {science_burden_count = 1}},
+    {recipe = "c", reachable = true, unlockers = {"a", "b", "c"},
+      science_burden = {}, progression_key = {science_burden_count = 0}}
+  }
+  compare(routes, gates_a .. gates_b .. science_a .. science_b)
+  compare({routes[3], routes[2], routes[1]}, "reverse-" .. gates_a .. gates_b .. science_a .. science_b)
+end end end end
+local seed = 433
+local function random(n)
+  seed = (seed * 48271) % 2147483647
+  return seed % n
+end
+for case = 1, 400 do
+  local routes = {}
+  for index = 1, 2 + random(9) do
+    local gates, burden, closure = {}, {}, {}
+    for n = 1, random(7) do gates[#gates + 1] = "g" .. random(5) end
+    for n = 1, random(7) do burden[#burden + 1] = "s" .. random(5) end
+    for n = 1, random(4) do closure[#closure + 1] = "g" .. random(5) end
+    routes[#routes + 1] = {recipe = "r" .. random(4), marker = index,
+      reachable = random(4) ~= 0, initial = random(8) == 0,
+      unlockers = gates, unlocker = random(2) == 0 and "g2" or nil,
+      prerequisite_closure = closure, science_burden = burden,
+      progression_key = {science_burden_count = random(4), prerequisite_count = random(4),
+        unlock_depth = random(4), research_count = random(4), research_time = random(4)}}
+  end
+  compare(routes, "random-" .. case)
+end
+local ties = {}
+for index = 1, 8 do
+  ties[index] = {recipe = "same", marker = index, reachable = true,
+    unlockers = {"a", "a"}, science_burden = {"s", "s"}}
+end
+compare(ties, "complete-ties")
+local scaling = {}
+for index = 1, 128 do
+  local gates = {}
+  for n = 1, 12 do gates[#gates + 1] = "shared-" .. n end
+  gates[#gates + 1] = "unique-" .. index
+  scaling[index] = {recipe = "recipe-" .. index, reachable = true,
+    unlockers = gates, science_burden = {"s"}}
+end
+local sort, old_calls, new_calls = table.sort, 0, 0
+table.sort = function(...) old_calls = old_calls + 1; return sort(...) end
+local old = original_policy.select(scaling)
+table.sort = function(...) new_calls = new_calls + 1; return sort(...) end
+local current = route_policy.select(scaling)
+table.sort = sort
+check("PF-SCALE", equal(old, current) and old_calls > 30000 and new_calls <= 131,
+  "128 incomparable routes prepare once and retain the original winner")
+end)()
+
+
+-- A failed restricted branch cannot itself establish a global failure. Only
+-- the isolated enabled-only proof may suppress repeated initial acquisition.
+;(function()
+  local blocked = route_fact("blocked", {}, {enabled = false})
+  blocked.enabled_without_research = false
+  reset({item_prototypes = {blocked = {type = "item"}},
+    recipe_facts = {locked = blocked},
+    producers_identity = {["item\0blocked"] = {"locked"}}})
+  local index = context.states.recipe_index
+  local reads, facts = 0, index.facts
+  index.facts = setmetatable({}, {__index = function(_, name)
+    reads = reads + 1; return facts[name]
+  end})
+  local state = {}
+  feasibility.bind_state_context(state, context)
+  -- Initialize before imposing the caller's active ancestry.
+  feasibility.acquisition_witness("missing", {recipe_index = index}, state)
+  state.visiting["item\0ancestor"] = true
+  local first = feasibility.acquisition_witness("blocked", {recipe_index = index}, state)
+  local first_reads = reads
+  local second = feasibility.acquisition_witness("blocked", {recipe_index = index}, state)
+  check("ACQ-NEGATIVE-PROOF", first == nil and second == nil and reads == first_reads,
+    "A completed unrestricted initial failure suppresses repeated restricted searches")
+  blocked.enabled_without_research = true
+  blocked.variants[1].enabled = true
+  world.recipe_source_epoch = (world.recipe_source_epoch or 1) + 1
+  check("ACQ-NEGATIVE-EPOCH", feasibility.acquisition_witness("blocked", {recipe_index = index}, state) ~= nil,
+    "Changing the recipe source epoch retires prior initial failures")
+
+  local seeded = route_fact("seeded", {{name = "seed", amount = 1}})
+  reset({item_prototypes = {seed = {type = "item"}, seeded = {type = "item"}},
+    resources = {seed = {minable = {result = "seed", count = 1}}},
+    recipe_facts = {seeded = seeded},
+    producers_identity = {["item\0seeded"] = {"seeded"}}})
+  index = context.states.recipe_index; state = {}
+  feasibility.acquisition_witness("missing", {recipe_index = index}, state)
+  state.visiting["item\0seed"] = true
+  check("ACQ-NEGATIVE-CONTEXT", feasibility.acquisition_witness("seeded", {recipe_index = index}, state) == nil,
+    "An active ingredient remains a cycle boundary in the caller")
+  state.visiting["item\0seed"] = nil
+  check("ACQ-NEGATIVE-POSITIVE", feasibility.acquisition_witness("seeded", {recipe_index = index}, state) ~= nil,
+    "An unrestricted positive proof cannot turn a contextual failure into global impossibility")
+end)()
+
+
 
 if #failures > 0 then error(table.concat(failures, "\n")) end
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

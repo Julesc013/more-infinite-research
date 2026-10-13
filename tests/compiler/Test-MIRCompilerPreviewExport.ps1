@@ -6,6 +6,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Pat
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
 $root = Join-Path ([IO.Path]::GetTempPath()) ("mir-compiler-preview-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $root | Out-Null
 
@@ -46,11 +47,29 @@ try {
       [string]::IsNullOrWhiteSpace([string]$summary.summary_sha256)) {
     throw "Compiler PREVIEW JSON summary is incomplete or incorrect."
   }
+  $reviewRequired = @($summary.ambiguous_cases | Where-Object candidate_id -ceq "beta")
+  $rejected = @($summary.rejected_designs | Where-Object candidate_id -ceq "gamma")
+  if ($reviewRequired.Count -ne 1 -or [string]$reviewRequired[0].reasons -cne "ambiguous-membership" -or
+      $rejected.Count -ne 1 -or [string]$rejected[0].reasons -cne "hard-gate-failed") {
+    throw "Compiler PREVIEW does not preserve optional review and rejection reason fields."
+  }
   foreach ($heading in @("Selected decisions", "Ambiguous or review-required cases", "Rejected designs", "Ecosystem-dependent provider decisions", "Public artifact budgets")) {
     if (-not $markdown.Contains($heading)) { throw "Compiler PREVIEW Markdown omits: $heading" }
   }
   if (-not (Test-Path -LiteralPath (Join-Path $outputPath "technology-catalog.full.json"))) {
     throw "Compiler PREVIEW export omitted the exact full catalog."
+  }
+  $prepublication = Get-Content -Raw -LiteralPath $evidencePath | ConvertFrom-Json
+  $prepublication.telemetry.counters.compiler_evidence_public_bytes = 0
+  $prepublication | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $evidencePath -Encoding UTF8
+  & (Join-Path $RepoRoot "tools\commands\technology\Export-MIRCompilerPreview.ps1") `
+    -CatalogPath $catalogPath -EvidencePath $evidencePath -OutputDirectory $outputPath -Top 10
+  $summary = Get-Content -Raw -LiteralPath (Join-Path $outputPath "compiler-preview-summary.json") | ConvertFrom-Json
+  $selfBudget = @($summary.public_artifact_budgets | Where-Object kind -CEQ 'mir-compiler-evidence-public')
+  if ($selfBudget.Count -ne 1 -or $selfBudget[0].status -cne 'not-observed' -or
+      $null -ne $selfBudget[0].observed_canonical_bytes -or
+      @($summary.public_artifact_budgets | Where-Object status -EQ 'pass').Count -ne 3) {
+    throw 'Compiler PREVIEW treated pre-publication self-size as a passed byte-budget observation.'
   }
 } finally {
   $tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())

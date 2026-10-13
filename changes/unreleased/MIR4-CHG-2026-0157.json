@@ -1,0 +1,98 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0157",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Sieve impossible enabled-only producers and reuse bounded private witness identity summaries.",
+  "details": [
+    "Prepare enabled-only producer ordering from the owned immutable typed recipe index. Remove only recipes with no visible enabled variant; retain unknown facts, mixed variants, hidden-policy distinctions and full quantity, temperature, surface, machine and ingredient proof.",
+    "Preserve complete diagnostic and foreign-index traversal and researched-output fallback. Warm owned-index cache hits return isolated names before reading or copying the producer bucket. Misses retain the existing complete proof and bounded source-epoch cache.",
+    "Summarize output identities only for query-owned positive memo witnesses. Keep technology and unlock-pair guards. Cycles, metatables and more than 256 nodes refuse metadata retention and fall back to complete traversal, without changing an acquisition answer.",
+    "Source checks pass: 2216 researchability, 13 enabled-producer and 54 witness graph assertions. They include temperature/surface counterexamples, all active subsets, a conflict beyond the metadata limit and zero repeated bucket reads. Destination qualification remains pending."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance",
+    "diagnostics"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "value": "tests/compiler/Test-MIREnabledProducerSieve.ps1 and Test-MIRWitnessGraphTraversal.ps1",
+      "kind": "finding"
+    },
+    {
+      "value": "Incomplete private instruction probe completed data stage: 363443 inner recipe evaluations; no completed startup or speedup claim from that run",
+      "kind": "finding"
+    }
+  ]
+}

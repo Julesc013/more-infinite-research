@@ -14,6 +14,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Pat
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $MirRepoRoot 'tools/mir/application/technology/TechnologyAcceptance.ps1')
 function Get-MIRJsonSha256 {
   param($Value)
   $json = $Value | ConvertTo-Json -Depth 100 -Compress
@@ -31,7 +32,8 @@ $profiles = Read-MIRJson $ProfilePath
 $migration = if ($MigrationPath) { Read-MIRJson $MigrationPath } else { $null }
 $rejected = @()
 $review = @()
-if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -ne "final" -or [bool]$catalog.mutation_authority) { $rejected += "catalog-authority" }
+try { Assert-MIR4FullTechnologyCatalog -Catalog $catalog } catch { $rejected += "catalog-full-diagnostics-required" }
+if ([bool]$catalog.mutation_authority) { $rejected += "catalog-authority" }
 $candidate = @($catalog.candidates | Where-Object { [string]$_.candidate_id -eq [string]$promotion.candidate_id })
 $selection = @($catalog.current_selections | Where-Object { [string]$_.candidate_id -eq [string]$promotion.candidate_id })
 if ($candidate.Count -ne 1 -or $selection.Count -ne 1) { $rejected += "candidate-selection-cardinality" }

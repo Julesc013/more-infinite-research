@@ -180,7 +180,8 @@ function Start-MIRLibraryActivation {
     [Parameter(Mandatory)][Collections.IDictionary]$ArchiveHashes,
     [ValidateSet('Defaults','File')][string]$SettingsMode='Defaults',
     [string]$SettingsPath='',[string]$SettingsSha256='',
-    [string[]]$PrePinMIROwnedArchiveNames=@()
+    [string[]]$PrePinMIROwnedArchiveNames=@(),
+    [string[]]$HideDisabledMIROwnedFixtureArchiveNames=@()
   )
   if(-not(Test-Path -LiteralPath $LibraryDirectory -PathType Container)){
     throw "[mir-library-missing] Supply the exact selected archive library: $LibraryDirectory"
@@ -237,11 +238,16 @@ function Start-MIRLibraryActivation {
     $visibilityId=[guid]::NewGuid().ToString('N')
     $visibility=@()
     # An empty conditional result from a caller binds as null in PowerShell.
-    # Modern engines do not need the historical owned-name selector.
+    # Modern engines do not need the historical owned-name selector.  Older
+    # engines also inspect disabled archive names, so a narrowly bounded
+    # package fresh-load may hide its unselected owned fixture names in the
+    # same durable transaction as an exact selected version.
     if($null-eq$PrePinMIROwnedArchiveNames){$PrePinMIROwnedArchiveNames=@()}
-    if($PrePinMIROwnedArchiveNames.Count){
+    if($null-eq$HideDisabledMIROwnedFixtureArchiveNames){$HideDisabledMIROwnedFixtureArchiveNames=@()}
+    $ownedVisibilityNames=@($PrePinMIROwnedArchiveNames)+@($HideDisabledMIROwnedFixtureArchiveNames)
+    if($ownedVisibilityNames.Count){
       Assert-MIRLibraryOwnedArchiveCheckout $library
-      if(@($PrePinMIROwnedArchiveNames|Sort-Object -Unique).Count-ne$PrePinMIROwnedArchiveNames.Count){throw '[mir-library-owned-version-names]'}
+      if(@($ownedVisibilityNames|Sort-Object -Unique).Count-ne$ownedVisibilityNames.Count){throw '[mir-library-owned-version-names]'}
       $base=@($selected|Where-Object {$_.builtin-and$_.name-ceq'base'})[0]
       if(([version]$base.version)-ge[version]'0.17.0'){throw '[mir-library-owned-version-engine]'}
       foreach($name in $PrePinMIROwnedArchiveNames){
@@ -249,6 +255,18 @@ function Start-MIRLibraryActivation {
         $chosen=@($selected|Where-Object name -CEQ $name)
         if($chosen.Count-ne1-or$chosen[0].builtin){throw '[mir-library-owned-version-selection]'}
         foreach($other in @($inventory|Where-Object {$_.name-ceq$name-and$_.version-cne$chosen[0].version})){
+          $filename=[IO.Path]::GetFileName($other.path)
+          $hidden=$filename+'.mir-hidden-'+$visibilityId
+          if(Test-Path -LiteralPath (Join-Path $library $hidden)){throw '[mir-library-owned-version-destination]'}
+          $visibility+=@{original_name=$filename;hidden_name=$hidden;file_identity=$other.identity;sha256=Get-MIRImmutableInputSha256 $other.path}
+        }
+      }
+      foreach($name in $HideDisabledMIROwnedFixtureArchiveNames){
+        if($name-cnotmatch '^mir-fixture-[A-Za-z0-9._-]+$'){throw '[mir-library-owned-version-dependency-forbidden]'}
+        if(@($selected|Where-Object name -CEQ $name).Count){throw '[mir-library-owned-version-disabled-selection]'}
+        $hiddenRows=@($inventory|Where-Object {$_.name-ceq$name -and (-not $_.builtin)})
+        if(-not $hiddenRows.Count){throw '[mir-library-owned-version-disabled-missing]'}
+        foreach($other in $hiddenRows){
           $filename=[IO.Path]::GetFileName($other.path)
           $hidden=$filename+'.mir-hidden-'+$visibilityId
           if(Test-Path -LiteralPath (Join-Path $library $hidden)){throw '[mir-library-owned-version-destination]'}
@@ -288,13 +306,22 @@ function Start-MIRPackageLibraryActivation {
     [Parameter(Mandatory)][string]$ProfilePath,
     [Parameter(Mandatory)][string]$Version,
     [Parameter(Mandatory)][string]$CandidateSha256,
-    [switch]$EnableSpaceAge
+    [switch]$EnableSpaceAge,
+    [switch]$HideDisabledOwnedFixtureArchives
   )
   # A package smoke uses the same library transaction as progression/upgrade
   # consumers. Only this small selection document is generated for the run.
   . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
   $profile=Resolve-MIR441RecoveryScratchPath -Path $ProfilePath
   $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory)
+  $disabledFixtures=@()
+  if($HideDisabledOwnedFixtureArchives){
+    $base=@($inventory|Where-Object {$_.builtin-and$_.name-ceq'base'})
+    if($base.Count-ne1){throw '[mir-package-library-disabled-fixture-engine]'}
+    $baseVersion=[version]$base[0].version
+    if($baseVersion.Major-ne0-or$baseVersion.Minor-ne13){throw '[mir-package-library-disabled-fixture-engine]'}
+    $disabledFixtures=@($inventory|Where-Object {(-not $_.builtin) -and $_.name -match '^mir-fixture-[A-Za-z0-9._-]+$'}|ForEach-Object name|Sort-Object -Unique)
+  }
   $names=@('base');if($EnableSpaceAge){
     $names+=@('quality','elevated-rails','space-age')
     if(@($inventory|Where-Object {$_.builtin -and $_.name -ceq 'recycler'}).Count){$names+='recycler'}
@@ -307,7 +334,12 @@ function Start-MIRPackageLibraryActivation {
   $mods+=@{name='more-infinite-research';version=$Version;enabled=$true}
   [IO.Directory]::CreateDirectory((Split-Path -Parent $profile))|Out-Null
   [IO.File]::WriteAllText($profile,(@{mods=$mods}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
-  return Start-MIRLibraryActivation -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory -ProfilePath $profile -ArchiveHashes @{("more-infinite-research_$Version.zip")=$CandidateSha256}
+  $activation=@{LibraryDirectory=$LibraryDirectory;EngineDataDirectory=$EngineDataDirectory;ProfilePath=$profile;ArchiveHashes=@{("more-infinite-research_$Version.zip")=$CandidateSha256}}
+  if($HideDisabledOwnedFixtureArchives){
+    $activation.PrePinMIROwnedArchiveNames=@('more-infinite-research')
+    $activation.HideDisabledMIROwnedFixtureArchiveNames=$disabledFixtures
+  }
+  return Start-MIRLibraryActivation @activation
 }
 
 function Assert-MIRLibraryFixtureArchive {
@@ -363,7 +395,7 @@ function Assert-MIRLibraryActivation {
 }
 
 function Assert-MIRLibraryLoadedSelection {
-  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath,[switch]$LatestInvocation,[string]$ActiveModsObserver='')
+  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath,[switch]$LatestInvocation,[string]$ActiveModsObserver='',[ValidateSet('data-final-fixes.lua','control.lua')][string]$ActiveModsObserverScript='data-final-fixes.lua')
   $text=[IO.File]::ReadAllText($LogPath)
   if($LatestInvocation){
     $starts=[regex]::Matches($text,'(?m)^[ \t]*[0-9]+\.[0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}; Factorio [0-9]+\.[0-9]+\.[0-9]+ ')
@@ -380,7 +412,7 @@ function Assert-MIRLibraryLoadedSelection {
     # hash-bound fixture may report Factorio's full mods table instead. Never
     # infer a missing version from filenames or ignore contradictory log rows.
     if(@($Activation.selected|Where-Object name -CEQ $ActiveModsObserver).Count-ne1){throw '[mir-library-loaded-observer] Observer is not selected.'}
-    $pattern='(?m)^[ \t]*[0-9]+\.[0-9]+ Script @__'+[regex]::Escape($ActiveModsObserver)+'__/data-final-fixes[.]lua:[0-9]+: \[MIR_ACTIVE_MODS\] ([^\r\n]+)\r?$'
+    $pattern='(?m)^[ \t]*[0-9]+\.[0-9]+ Script @__'+[regex]::Escape($ActiveModsObserver)+'__/'+[regex]::Escape($ActiveModsObserverScript)+':[0-9]+: \[MIR_ACTIVE_MODS\] ([^\r\n]+)\r?$'
     $reports=[regex]::Matches($text,$pattern)
     if($reports.Count-ne1){throw '[mir-library-loaded-observation] Expected one complete native mod table.'}
     $rows=@($reports[0].Groups[1].Value.Split('|'))

@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0162",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Reuse completed availability answers for compiler-owned lab checks.",
+  "details": [
+    "A bounded positive cache serves complete Boolean acquisition queries. It binds the item identity, active material ancestry and research context to the owned source indexes and generations. Selected witnesses and route provenance use the existing solver.",
+    "Only completed true answers with unchanged source, root and stable acquisition generations are retained. Diagnostic and custom services bypass reuse. False, pending or exhausted analysis never becomes a retained conclusion. Capacity refusal falls back to computation.",
+    "Opposing controls compare cold and warmed availability followed by public witness and selected-route checks, including descendant memo history. Native startup, saved-state and release qualification remain separate."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared contextual science integration reuses completed Boolean availability; native destination qualification remains required."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared contextual science integration reuses completed Boolean availability; native destination qualification remains required."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared contextual science integration reuses completed Boolean availability; native destination qualification remains required."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared contextual science integration reuses completed Boolean availability; native destination qualification remains required."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "preserved",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/contextual_boolean_acquisition_memo.lua: canonical ownership, ancestry keys and generation refusal"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/contextual_boolean_route_policy.lua: actual feasibility and public-route preservation"
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}

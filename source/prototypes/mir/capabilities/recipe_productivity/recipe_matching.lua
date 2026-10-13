@@ -204,6 +204,94 @@ local function route_identities(recipe, field)
   return out
 end
 
+-- Recipe facts use a NUL-delimited identity in their immutable lookup tables,
+-- while the material graph keeps its private typed identities separated with
+-- record-separator.  Keep conversion at this boundary so a same-named item
+-- and fluid can never share an indexed return-cone membership query.
+local function recipe_index_identity(identity)
+  if type(identity) ~= "string" then return nil end
+  local separator = string.find(identity, "\30", 1, true)
+  if not separator or separator == 1 or separator == #identity then return nil end
+  return string.sub(identity, 1, separator - 1) .. "\0" .. string.sub(identity, separator + 1)
+end
+
+local function indexed_recipe_names(index, names, selected)
+  if type(names) ~= "table" then return false end
+  local previous, count = nil, 0
+  for ordinal, recipe_name in ipairs(names) do
+    if ordinal ~= count + 1 or type(recipe_name) ~= "string" or recipe_name == ""
+      or (previous and previous >= recipe_name) or type(index.facts[recipe_name]) ~= "table" then
+      return false
+    end
+    selected[recipe_name] = true
+    previous, count = recipe_name, ordinal
+  end
+  -- ipairs deliberately stops at the first gap.  The canonical index has
+  -- dense arrays, so reject a substituted or partial bucket rather than
+  -- accepting an empty-safe boundary.
+  for key in pairs(names) do
+    if type(key) ~= "number" or key < 1 or key ~= math.floor(key) or key > count then return false end
+  end
+  return true
+end
+
+-- The authoritative recipe-fact index already records every ingredient and
+-- result identity, including hidden variants and zero-result facts.  Query it
+-- directly after graph reachability instead of rescanning all facts for every
+-- route.  A missing, malformed, or replaced typed projection returns nil so
+-- the caller can preserve the established full-scan semantics.
+local function indexed_relevant_return_facts(index, reached, outputs)
+  if index ~= compiler_context.current():state_view("recipe_index")
+    or type(index) ~= "table" or index.schema ~= 2 or type(index.facts) ~= "table"
+    or type(index.by_ingredient_identity) ~= "table" or type(index.by_output_identity) ~= "table" then
+    return nil
+  end
+  local selected, direct_output_producers = {}, {}
+  for _, identity in ipairs(sorted_keys(reached)) do
+    local key = recipe_index_identity(identity)
+    if not key or not indexed_recipe_names(index, index.by_ingredient_identity[key] or {}, selected) then
+      return nil
+    end
+  end
+  for _, identity in ipairs(sorted_keys(outputs)) do
+    local key = recipe_index_identity(identity)
+    if not key or not indexed_recipe_names(index, index.by_output_identity[key] or {}, selected) then
+      return nil
+    end
+    for _, recipe_name in ipairs(index.by_output_identity[key] or {}) do
+      direct_output_producers[recipe_name] = true
+    end
+  end
+  return selected, direct_output_producers
+end
+
+-- Retain the direct fact scan as the conservative compatibility path for a
+-- noncanonical index.  Normal compilation uses the typed projections above;
+-- this path prevents an incomplete index from granting an empty boundary.
+local function scanned_relevant_return_facts(index, reached, outputs)
+  local selected, direct_output_producers = {}, {}
+  for recipe_name, fact in pairs(index.facts) do
+    local consumes_reached = false
+    for _, variant in ipairs(fact.variants or {}) do
+      for _, entry in ipairs(variant.ingredients or {}) do
+        if reached[typed_identity(entry)] then consumes_reached = true; break end
+      end
+      if consumes_reached then break end
+    end
+    if consumes_reached then selected[recipe_name] = true end
+    for _, variant in ipairs(fact.variants or {}) do
+      for _, entry in ipairs(variant.results or {}) do
+        if outputs[typed_identity(entry)] then
+          selected[recipe_name] = true
+          direct_output_producers[recipe_name] = true
+          break
+        end
+      end
+    end
+  end
+  return selected, direct_output_producers
+end
+
 -- Build the exact typed return cone for one productivity route.  It includes
 -- every recipe which consumes a value reachable from the route's result, plus
 -- every direct producer of that result.  Therefore a disconnected extension
@@ -238,25 +326,12 @@ local function relevant_return_graph(recipe)
 
   local index = recipe_facts.index_view()
   if type(index) ~= "table" or type(index.facts) ~= "table" then return nil, "recipe-index" end
-  local selected, direct_output_producers = {}, {}
-  for recipe_name, fact in pairs(index.facts) do
-    local consumes_reached = false
-    for _, variant in ipairs(fact.variants or {}) do
-      for _, entry in ipairs(variant.ingredients or {}) do
-        if reached[typed_identity(entry)] then consumes_reached = true; break end
-      end
-      if consumes_reached then break end
-    end
-    if consumes_reached then selected[recipe_name] = true end
-    for _, variant in ipairs(fact.variants or {}) do
-      for _, entry in ipairs(variant.results or {}) do
-        if outputs[typed_identity(entry)] then
-          selected[recipe_name] = true
-          direct_output_producers[recipe_name] = true
-          break
-        end
-      end
-    end
+  local selected, direct_output_producers = indexed_relevant_return_facts(index, reached, outputs)
+  if not selected then
+    telemetry.count("material_return_graph_index_fallbacks", 1)
+    selected, direct_output_producers = scanned_relevant_return_facts(index, reached, outputs)
+  else
+    telemetry.count("material_return_graph_index_queries", 1)
   end
   local facts = {}
   for _, recipe_name in ipairs(sorted_keys(selected)) do

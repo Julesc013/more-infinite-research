@@ -354,6 +354,27 @@ try {
   & git -C $temporaryRepo add tracked.txt
   & git -C $temporaryRepo commit -qm 'fixture'
   $cleanCommit=(& git -C $temporaryRepo rev-parse HEAD).Trim()
+  [IO.File]::WriteAllText((Join-Path $temporaryRepo '.gitattributes'),"raw-crlf.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol`n",[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText((Join-Path $temporaryRepo 'raw-crlf.json'),"clean-crlf`r`n",[Text.UTF8Encoding]::new($false))
+  & git -C $temporaryRepo add .gitattributes raw-crlf.json
+  & git -C $temporaryRepo commit -qm 'allow pinned crlf fixture'
+  $crlfAllowedCommit=(& git -C $temporaryRepo rev-parse HEAD).Trim()
+  $crlfAllowed=Assert-MIR4DevelopmentWhitespace -RepoRoot $temporaryRepo -SourceCommit $crlfAllowedCommit -Baseline $cleanCommit
+  Assert-MIRDevelopmentCISelection -Condition ($crlfAllowed.status -eq 'passed') -Message 'Pinned CRLF bytes were rejected despite the scoped whitespace policy.'
+  [IO.File]::WriteAllText((Join-Path $temporaryRepo 'raw-crlf.json'),"trailing-space `r`n",[Text.UTF8Encoding]::new($false))
+  & git -C $temporaryRepo add raw-crlf.json
+  & git -C $temporaryRepo commit -qm 'pinned crlf trailing space fixture'
+  $crlfSpaceCommit=(& git -C $temporaryRepo rev-parse HEAD).Trim()
+  Assert-MIRDevelopmentCanonicalCoverageRejected -Action {
+    Assert-MIR4DevelopmentWhitespace -RepoRoot $temporaryRepo -SourceCommit $crlfSpaceCommit -Baseline $crlfAllowedCommit
+  } -Code '[mir4-development-whitespace]' -Message 'Pinned CRLF input accepted an actual trailing space.'
+  [IO.File]::WriteAllText((Join-Path $temporaryRepo 'raw-crlf.json'),"trailing-tab`t`r`n",[Text.UTF8Encoding]::new($false))
+  & git -C $temporaryRepo add raw-crlf.json
+  & git -C $temporaryRepo commit -qm 'pinned crlf trailing tab fixture'
+  $crlfTabCommit=(& git -C $temporaryRepo rev-parse HEAD).Trim()
+  Assert-MIRDevelopmentCanonicalCoverageRejected -Action {
+    Assert-MIR4DevelopmentWhitespace -RepoRoot $temporaryRepo -SourceCommit $crlfTabCommit -Baseline $crlfSpaceCommit
+  } -Code '[mir4-development-whitespace]' -Message 'Pinned CRLF input accepted an actual trailing tab.'
   [IO.File]::WriteAllText((Join-Path $temporaryRepo 'tracked.txt'),"trailing `n",[Text.UTF8Encoding]::new($false))
   & git -C $temporaryRepo add tracked.txt
   & git -C $temporaryRepo commit -qm 'committed whitespace fixture'

@@ -616,7 +616,13 @@ function Get-MIRAssurancePlan {
   } else {
     $testIds = @($profileProperty.Value | ForEach-Object { [string]$_ })
   }
-  if ($classification.escalated) {
+  # The hosted development selector intentionally turns an unknown change into
+  # the complete, static mir4-development profile.  Do not append the general
+  # native unknown-policy matrix after that explicit fallback has been chosen:
+  # it would change the selected static safety boundary into a candidate and
+  # engine-dependent plan.  Auto and every other profile retain the ordinary
+  # conservative unknown escalation.
+  if ($classification.escalated -and $profile -ne "mir4-development") {
     $testIds += @($Context.config.unknown_policy.tests | ForEach-Object { [string]$_ })
   }
   if ($impactSelection.requires_full -and $testIds -contains "runtime.affected") {
@@ -679,7 +685,10 @@ function Get-MIRAssurancePlan {
   }
   Write-MIRAssuranceTiming -Label "plan-inputs" -Stopwatch $timing
   if (@($expanded | Where-Object { $_.kind -eq "factorio-scenario" }).Count -gt 0) {
-    $plan["domain_manifest"] = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
+    # Plan construction may represent an intentionally absent archive with the
+    # explicit source-fallback manifest. Native execution, gates, and seals
+    # independently demand an exact candidate.
+    $plan["domain_manifest"] = Get-MIRAssuranceDomainManifest -Context $Context
   }
   $plan = Add-MIRAssurancePlanDecisions -Plan $plan -Context $Context
   Write-MIRAssuranceTiming -Label "fingerprints" -Stopwatch $timing

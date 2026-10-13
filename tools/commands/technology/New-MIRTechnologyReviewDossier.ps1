@@ -6,6 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot '../../mir/application/technology/TechnologyAcceptance.ps1')
 function Get-MIRJsonSha256 {
   param($Value)
   $json = $Value | ConvertTo-Json -Depth 100 -Compress
@@ -14,7 +15,7 @@ function Get-MIRJsonSha256 {
   return ([BitConverter]::ToString($hash)).Replace("-", "")
 }
 $catalog = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $CatalogPath) | ConvertFrom-Json
-if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -ne "final") { throw "Final TechnologyCatalog schema 3 is required." }
+Assert-MIR4FullTechnologyCatalog -Catalog $catalog
 $candidate = @($catalog.candidates | Where-Object { [string]$_.candidate_id -eq $CandidateId })
 $selection = @($catalog.current_selections | Where-Object { [string]$_.candidate_id -eq $CandidateId })
 if ($candidate.Count -ne 1 -or $selection.Count -ne 1) { throw "Review dossier candidate or selection is ambiguous: $CandidateId" }

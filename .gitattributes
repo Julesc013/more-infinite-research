@@ -5,6 +5,15 @@
 fixtures/release-inputs/mir421-published-420-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Preserve the exact published 4.2.1 receipt bytes for 4.2.2 predecessor custody.
 fixtures/release-inputs/mir422-published-421-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the exact published 4.2.2 receipt bytes for 4.2.3 predecessor custody.
+fixtures/release-inputs/mir423-published-422-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Emergency startup-profile inputs and their observation schema are raw-hash
+# pinned. Retain their CRLF bytes while still checking actual whitespace.
+fixtures/run-profiles/mir430-startup-bob-angel-f200.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+fixtures/run-profiles/mir430-startup-galore-space-age-f200.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+fixtures/run-profiles/mir430-startup-omni-bob-angel-46-f200.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+spec/schemas/mir430-classic-startup-stress-observation-v1.schema.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 .mir/evidence/**/*.md text eol=lf
 .mir/evidence/**/*.txt text eol=lf

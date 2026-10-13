@@ -10,12 +10,34 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local item_prototype_facts = require("prototypes.mir.index.item_prototype_facts")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 -- Live CompilerContext ownership is private identity, not serializable cache
 -- data. Weak keys keep query-local states collectible without retaining a
 -- context/service back-reference inside public state snapshots.
 local state_contexts = setmetatable({}, {__mode = "k"})
+-- Failed enabled-only acquisition can be proved without the caller's active
+-- ancestors. Such a completed failure remains false under further exclusions.
+-- Keep these probes private: they must not warm the caller's positive witness
+-- cache or change its selected producer through a different traversal order.
+local initial_failure_probes = setmetatable({}, {__mode = "k"})
+local INITIAL_FAILURE_PROBE_LIMIT = 256
+-- The capability is an opaque local marker rather than an option boolean. It
+-- lets the compiler's private science-route query borrow memo-owned witness
+-- nodes without allowing an ordinary caller to opt into mutable sharing.
+local PRIVATE_WITNESS_MARKER = {}
+local private_witness_options = setmetatable({}, {__mode = "k"})
+local private_failure_probe_states = setmetatable({}, {__mode = "k"})
+
+-- Producer selection repeats for every nested acquisition request. Retain
+-- only the already-normalized name ordering and keep the query state bounded;
+-- route, temperature, source, ownership, and active-set decisions stay live.
+local PRODUCER_ORDERING_MAX_ENTRIES = 256
+local PRODUCER_ORDERING_MAX_NODES = 4096
+local PRODUCER_ORDERING_MAX_ESTIMATED_BYTES = 512 * 1024
+local PRODUCER_ORDERING_ENTRY_ESTIMATED_BYTES = 96
+local PRODUCER_ORDERING_NAME_ESTIMATED_BYTES = 40
 
 function M.bind_state_context(state, context)
   state_contexts[state] = context
@@ -24,6 +46,14 @@ end
 
 function M.state_context_matches(state, context)
   return state ~= nil and state_contexts[state] == context
+end
+
+function M.enable_compiler_owned_witness_sharing(options)
+  if type(options) ~= "table" then
+    error("MIR compiler-owned witness sharing requires an options table.", 2)
+  end
+  private_witness_options[options] = PRIVATE_WITNESS_MARKER
+  return options
 end
 
 -- Acquisition alternatives remain complete, but ordinary production is tried
@@ -303,7 +333,26 @@ end
 local function copy_options(options)
   local copied = {}
   for key, value in pairs(options or {}) do copied[key] = value end
+  if type(options) == "table" and private_witness_options[options] == PRIVATE_WITNESS_MARKER then
+    private_witness_options[copied] = PRIVATE_WITNESS_MARKER
+  end
   return copied
+end
+
+-- Witnesses are plain result data, but their selected subroutes may form a
+-- DAG after a private memo hit. Preserve that topology when isolating a
+-- caller, including the machine/receiver/capture branches, without retaining
+-- the caller's mutation in the memo.
+local function clone_witness_graph(value, copied)
+  if type(value) ~= "table" then return value end
+  copied = copied or {}
+  if copied[value] ~= nil then return copied[value] end
+  local out = {}
+  copied[value] = out
+  for key, member in pairs(value) do
+    out[clone_witness_graph(key, copied)] = clone_witness_graph(member, copied)
+  end
+  return out
 end
 
 local function resolved_options(options)
@@ -362,6 +411,102 @@ local function recipe_source_epoch()
   return recipe_facts.source_epoch and recipe_facts.source_epoch() or nil
 end
 
+local function copy_names(values)
+  local copied = {}
+  for index, value in ipairs(values or {}) do copied[index] = value end
+  return copied
+end
+
+-- The ordinary acquisition pass accepts only an enabled, non-hidden recipe
+-- variant.  This is intentionally narrower than every other route property:
+-- output quantity/probability/temperature, ingredients, machines and surface
+-- conditions still require the complete route proof below.  The canonical
+-- fact index is immutable for its source epoch, so this cheap shape test can
+-- safely remove candidates which the enabled-only pass would always reject.
+local function has_enabled_visible_variant(fact)
+  if type(fact) ~= "table" then return true end
+  if fact.hidden == true then return false end
+  for _, variant in ipairs(variants_for(fact)) do
+    if variant.hidden ~= true and variant.enabled == true then return true end
+  end
+  return false
+end
+
+local function producer_ordering_estimated_bytes(identity, names)
+  local total = PRODUCER_ORDERING_ENTRY_ESTIMATED_BYTES + #identity
+  for _, name in ipairs(names) do
+    total = total + PRODUCER_ORDERING_NAME_ESTIMATED_BYTES + #name
+  end
+  return total
+end
+
+-- A supplied index can be an intentionally narrow fixture or a caller-owned
+-- transient table. Do not make its mutable identity a cache authority. The
+-- canonical index is Context-owned and replaced with the recipe source epoch.
+local function owned_recipe_index(index)
+  return index ~= nil and index == compiler_context.current():state_view("recipe_index")
+end
+
+-- Diagnostics expose the rejected producer branches themselves.  Keep their
+-- complete, uncached order so an enabled-only sieve cannot suppress a caller
+-- callback or alter a bounded rejection trace.  The same applies to a
+-- caller-owned index: only the Context-owned immutable snapshot can support
+-- this query-local ordering cache.
+local function may_sieve_enabled_producers(index, options)
+  return options.diagnostic_observer == nil
+    and options.diagnostic_failure == nil
+    and owned_recipe_index(index)
+end
+
+local function compiler_owned_route_witness_state(state, context)
+  -- Only the science-pack compiler owns a state whose acquisition memos can
+  -- be borrowed. A Context match and canonical recipe index alone are not
+  -- enough: public callers can legitimately use both while still expecting
+  -- an isolated witness result.
+  local production = context:state_view("science_pack_production")
+  return type(production) == "table" and production.route_witness_state == state
+end
+
+local function private_witness_memo_allowed(options, state)
+  if type(options) ~= "table" or type(state) ~= "table" then return false end
+  local context = compiler_context.current()
+  local private_compiler_query = private_witness_options[options] == PRIVATE_WITNESS_MARKER
+    and compiler_owned_route_witness_state(state, context)
+  local private_failure_probe = options.initial_failure_probe == true
+    and private_failure_probe_states[state] == PRIVATE_WITNESS_MARKER
+  if not private_compiler_query and not private_failure_probe then return false end
+  -- A diagnostic trace and an explicit failure callback are externally
+  -- observable. They must retain the ordinary isolated result behavior.
+  if options.diagnostic_observer ~= nil or options.diagnostic_failure ~= nil then return false end
+  -- Custom structural witnesses can return caller-owned tables. They are never
+  -- a private DAG authority even when a caller happens to hold this module's
+  -- options capability.
+  if type(options.source_witness) == "function"
+    or type(options.machine_category_witness) == "function"
+    or type(options.surface_witness) == "function" then return false end
+  return M.state_context_matches(state, context)
+    and state.recipe_source_epoch == recipe_source_epoch()
+    and state.recipe_index ~= nil
+    and state.recipe_index == options.recipe_index
+    and owned_recipe_index(options.recipe_index)
+end
+
+local function memo_witness_for_caller(witness, share_private)
+  if share_private then
+    telemetry.count("science_private_witness_memo_hits")
+    return witness
+  end
+  telemetry.count("science_isolated_witness_memo_hits")
+  return clone_witness_graph(witness)
+end
+
+local function retain_witness_memo(memo, key, witness)
+  -- Store a dedicated graph even for a private query: a public warm caller
+  -- must never receive the cold route's mutable result table.
+  telemetry.count("science_witness_memo_graph_clones")
+  memo[key] = clone_witness_graph(witness)
+end
+
 local function reset_state(state, epoch, context, recipe_index)
   state = state or {}
   local next_stable_generation = (state.stable_acquisition_generation or 0) + 1
@@ -373,6 +518,10 @@ local function reset_state(state, epoch, context, recipe_index)
   state.visiting = {}
   state.acquisition_memo = {}
   state.stable_acquisition_memo = {}
+  state.producer_orderings = {}
+  state.producer_ordering_entry_count = 0
+  state.producer_ordering_node_count = 0
+  state.producer_ordering_estimated_bytes = 0
   state.machine_categories = nil
   state.machine_placement_items = {}
   state.mining_drills = nil
@@ -381,6 +530,17 @@ local function reset_state(state, epoch, context, recipe_index)
   state.surface_locations = nil
   state.surface_results = {}
   return state
+end
+
+local function retire_private_probe_witness_memos(state)
+  -- A failure probe publishes only a completed nil result. Keep its immutable
+  -- catalogs for later probes but drop every positive/negative witness graph
+  -- as soon as this proof ends, so the probe cannot grow into a second route
+  -- catalogue beside its parent state.
+  state.visiting = {}
+  state.acquisition_memo = {}
+  state.stable_acquisition_memo = {}
+  state.stable_acquisition_generation = (state.stable_acquisition_generation or 0) + 1
 end
 
 local function new_state(recipe_index)
@@ -1016,7 +1176,18 @@ function M.source_witness(identity, options, state)
   return source_witness(candidate, copy_options(options), source_query_state(state))
 end
 
-local function sorted_producers(index, output_identity, options)
+local function sorted_producers(index, output_identity, options, state)
+  -- A retained normal ordering is keyed by the typed output identity and the
+  -- immutable Context-owned recipe index. Check it before copying the raw
+  -- producer bucket: diagnostics and caller-owned indexes deliberately stay
+  -- on their complete uncached paths below.
+  local cache_eligible = may_sieve_enabled_producers(index, options)
+  local key = cache_eligible and identity_key(output_identity) or nil
+  if key then
+    local cached = state.producer_orderings[key]
+    if cached then return copy_names(cached) end
+  end
+
   local producers = {}
   local exact = index.by_output_identity and index.by_output_identity[identity_key(output_identity)]
   -- Fixture and historical callers may still expose only the legacy index.
@@ -1036,7 +1207,34 @@ local function sorted_producers(index, output_identity, options)
     table.sort(producers)
     return producers
   end
-  return M.sort_acquisition_producers(producers, index)
+  -- The forward-before-recycling sort is structural and reusable, but only
+  -- for the immutable canonical index owned by this CompilerContext.  A
+  -- caller-supplied index may change under us, so it keeps the exact uncached
+  -- path.  Cache copies never escape: a route caller can mutate its local
+  -- alternative list without corrupting a later query.
+  if not cache_eligible then
+    return M.sort_acquisition_producers(producers, index)
+  end
+  local eligible = {}
+  for _, recipe_name in ipairs(producers) do
+    if has_enabled_visible_variant(index.facts[recipe_name]) then
+      table.insert(eligible, recipe_name)
+    else
+      telemetry.count("science_initial_disabled_producers_sieved")
+    end
+  end
+  producers = eligible
+  M.sort_acquisition_producers(producers, index)
+  local bytes = producer_ordering_estimated_bytes(key, producers)
+  if state.producer_ordering_entry_count < PRODUCER_ORDERING_MAX_ENTRIES
+    and state.producer_ordering_node_count + #producers <= PRODUCER_ORDERING_MAX_NODES
+    and state.producer_ordering_estimated_bytes + bytes <= PRODUCER_ORDERING_MAX_ESTIMATED_BYTES then
+    state.producer_orderings[key] = copy_names(producers)
+    state.producer_ordering_entry_count = state.producer_ordering_entry_count + 1
+    state.producer_ordering_node_count = state.producer_ordering_node_count + #producers
+    state.producer_ordering_estimated_bytes = state.producer_ordering_estimated_bytes + bytes
+  end
+  return producers
 end
 
 placement_items_for_machine = function(name, options, state)
@@ -1248,6 +1446,7 @@ compatible_machine = function(category, recipe_name, options, state, required_po
 end
 
 local function route_for_recipe(recipe_name, output_identity, options, state, require_enabled, construction)
+  telemetry.count("science_recipe_route_evaluations")
   if not diagnostic_visit(options) then return nil end
   local fact = options.recipe_index.facts[recipe_name]
   if not fact then
@@ -1543,6 +1742,28 @@ local function stable_acquisition_witness(witness)
   return true
 end
 
+local function initial_failure_probe(state, options)
+  if options.initial_failure_probe or options.diagnostic_observer ~= nil
+    or options.diagnostic_failure ~= nil or not cacheable(options)
+    or not owned_recipe_index(options.recipe_index) then return nil end
+  local probe = initial_failure_probes[state]
+  local context = compiler_context.current()
+  if not probe or probe.state.recipe_source_epoch ~= state.recipe_source_epoch
+    or not M.state_context_matches(probe.state, context)
+    or probe.state.recipe_index ~= options.recipe_index then
+    local isolated = new_state(options.recipe_index)
+    -- These completed structural catalogs are immutable in the source epoch.
+    -- Mutable active sets, results and witnesses stay in the isolated state.
+    for _, name in ipairs({"source_catalog", "machine_categories",
+      "machine_placement_items", "mining_drills", "capturable_spawners",
+      "surface_locations"}) do isolated[name] = state[name] end
+    private_failure_probe_states[isolated] = PRIVATE_WITNESS_MARKER
+    probe = {state = isolated, attempted = {}, failures = {}, count = 0}
+    initial_failure_probes[state] = probe
+  end
+  return probe
+end
+
 -- A source witness or one enabled recipe alternative proves a product. The
 -- active acquisition-demand set makes recursive requirements AND, recipe alternatives
 -- OR, and rejects unseeded cycles. Default raw-prototype scans are cached only
@@ -1550,9 +1771,17 @@ end
 local function acquisition_witness_impl(output_identity, options, state)
   if not diagnostic_visit(options) then return nil end
   local key = acquisition_key(output_identity)
+  telemetry.count("science_acquisition_evaluations")
+  local initial_probe = initial_failure_probe(state, options)
+  if initial_probe and initial_probe.failures[key] then
+    telemetry.count("science_initial_failure_cache_hits")
+    return nil
+  end
   local may_use_stable = stable_cacheable(options)
+  local share_private_memo = private_witness_memo_allowed(options, state)
   if may_use_stable and state.stable_acquisition_memo[key] ~= nil then
-    return deepcopy(state.stable_acquisition_memo[key])
+    telemetry.count("science_stable_witness_cache_hits")
+    return memo_witness_for_caller(state.stable_acquisition_memo[key], share_private_memo)
   end
   -- A recursive answer is conditional on the caller's active cycle set. Only
   -- a root query can safely memoize a positive or negative acquisition result;
@@ -1562,7 +1791,7 @@ local function acquisition_witness_impl(output_identity, options, state)
   if may_cache and state.acquisition_memo[key] ~= nil then
     local cached = state.acquisition_memo[key]
     if cached == false then return nil end
-    return deepcopy(cached)
+    return memo_witness_for_caller(cached, share_private_memo)
   end
   if state.visiting[key] then
     record_diagnostic_failure(options, {
@@ -1580,14 +1809,14 @@ local function acquisition_witness_impl(output_identity, options, state)
       if state.stable_acquisition_memo[key] == nil then
         state.stable_acquisition_generation = state.stable_acquisition_generation + 1
       end
-      state.stable_acquisition_memo[key] = deepcopy(direct)
+      retain_witness_memo(state.stable_acquisition_memo, key, direct)
     end
-    if may_cache then state.acquisition_memo[key] = deepcopy(direct) end
+    if may_cache then retain_witness_memo(state.acquisition_memo, key, direct) end
     return direct
   end
 
   state.visiting[key] = true
-  for _, recipe_name in ipairs(sorted_producers(options.recipe_index, output_identity, options)) do
+  for _, recipe_name in ipairs(sorted_producers(options.recipe_index, output_identity, options, state)) do
     if not diagnostic_visit(options) then
       state.visiting[key] = nil
       return nil
@@ -1606,9 +1835,9 @@ local function acquisition_witness_impl(output_identity, options, state)
         if state.stable_acquisition_memo[key] == nil then
           state.stable_acquisition_generation = state.stable_acquisition_generation + 1
         end
-        state.stable_acquisition_memo[key] = deepcopy(witness)
+        retain_witness_memo(state.stable_acquisition_memo, key, witness)
       end
-      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      if may_cache then retain_witness_memo(state.acquisition_memo, key, witness) end
       return witness
     end
   end
@@ -1630,7 +1859,7 @@ local function acquisition_witness_impl(output_identity, options, state)
     local witness = options.research_unlock_witness(deepcopy(output_identity), state)
     if witness then
       state.visiting[key] = nil
-      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      if may_cache then retain_witness_memo(state.acquisition_memo, key, witness) end
       return witness
     end
   end
@@ -1653,14 +1882,40 @@ local function acquisition_witness_impl(output_identity, options, state)
         if state.stable_acquisition_memo[key] == nil then
           state.stable_acquisition_generation = state.stable_acquisition_generation + 1
         end
-        state.stable_acquisition_memo[key] = deepcopy(witness)
+        retain_witness_memo(state.stable_acquisition_memo, key, witness)
       end
-      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      if may_cache then retain_witness_memo(state.acquisition_memo, key, witness) end
       return witness
     end
   end
   state.visiting[key] = nil
   if may_cache then state.acquisition_memo[key] = false end
+  if initial_probe and root_query then
+    if not initial_probe.attempted[key] and initial_probe.count < INITIAL_FAILURE_PROBE_LIMIT then
+      initial_probe.attempted[key] = true
+      initial_probe.count = initial_probe.count + 1
+      initial_probe.failures[key] = true
+    end
+  elseif initial_probe and not initial_probe.attempted[key] then
+    if initial_probe.count < INITIAL_FAILURE_PROBE_LIMIT then
+      initial_probe.attempted[key] = true
+      initial_probe.count = initial_probe.count + 1
+      telemetry.count("science_initial_failure_distinct_probes")
+      local unrestricted = copy_options(options)
+      unrestricted.initial_failure_probe = true
+      -- No active ancestry enters this proof. Only a completed nil answer is
+      -- admitted to the failure cache; a positive answer never substitutes for
+      -- the caller's contextual selection or bypasses its cycle boundary.
+      local established = acquisition_witness(output_identity, unrestricted, initial_probe.state)
+      retire_private_probe_witness_memos(initial_probe.state)
+      if not established then
+        initial_probe.failures[key] = true
+        telemetry.count("science_initial_failure_proofs")
+      end
+    else
+      telemetry.count("science_initial_failure_capacity_refusals")
+    end
+  end
   record_diagnostic_failure(options, {
     kind = "ingredient",
     identity = deepcopy(output_identity),

@@ -50,6 +50,16 @@ function M.emit_generation_plan(artifact)
   })
 end
 
+function M.emit_compiler_profile(artifact)
+  if not artifact then return end
+  return emit({
+    type = "mod-data",
+    name = "more-infinite-research-compiler-profile",
+    data_type = "more-infinite-research.compiler-profile-v1",
+    data = artifact
+  })
+end
+
 function M.emit_maximum_level_policy(artifact)
   if not artifact then return end
   return emit({
@@ -85,7 +95,7 @@ function M.emit_internal_technology_catalog(artifact)
   return emit({
     type = "mod-data",
     name = "more-infinite-research-technology-catalog-internal",
-    data_type = "more-infinite-research.technology-catalog-v3-internal",
+    data_type = "more-infinite-research.technology-catalog-v4-internal",
     data = artifact
   })
 end

@@ -393,8 +393,10 @@ function Get-MIR42PromotionTechnicalSealReadiness {
     [Parameter(Mandatory)][string]$ReviewerAttestationPath,
     [Parameter(Mandatory)][string]$SshKeygenPath,
     [AllowEmptyString()][string]$ProgrammePath='',
-    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath=''
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath='',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings=$null
   )
+  if ($null -ne $PublishedMaintenanceArchiveBindings -and [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) { throw '[mir42-maintenance-promotion-archive-bindings-scope]' }
   if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath) -and $RequiredScope -cne 'nine-target') { throw '[mir42-maintenance-promotion-candidate-scope]' }
   $arguments = @{
     RepoRoot=$RepoRoot;CandidateManifestPath=$CandidateManifestPath;QualificationPath=$QualificationPath
@@ -408,6 +410,7 @@ function Get-MIR42PromotionTechnicalSealReadiness {
   if ($RequiredScope -ceq 'nine-target') {
     if (-not [string]::IsNullOrWhiteSpace($ProgrammePath)) { $arguments.ProgrammePath = $ProgrammePath }
     if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) { $arguments.PublishedMaintenancePredecessorManifestPath = $PublishedMaintenancePredecessorManifestPath }
+    if ($null -ne $PublishedMaintenanceArchiveBindings) { $arguments.PublishedMaintenanceArchiveBindings = $PublishedMaintenanceArchiveBindings }
     return Get-MIR42NineTargetTechnicalSealReadiness @arguments
   }
   return Get-MIR42FourTargetTechnicalSealReadiness @arguments
@@ -436,7 +439,8 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
     [Parameter(Mandatory)][string]$SshKeygenPath,
     [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
     [AllowEmptyString()][string]$ProgrammePath='',
-    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath=''
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath='',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings=$null
   )
   if ($PostPromotionReadback -and $RequiredScope -cne 'nine-target') { throw '[mir42-main-readback-nine-scope-required]' }
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -444,7 +448,7 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
     -QualificationPath $QualificationPath -RealEngineCampaignPath $RealEngineCampaignPath -IndependentVerificationPath $IndependentVerificationPath `
     -SigningCeremonyPath $SigningCeremonyPath -T16TrustRootPath $T16TrustRootPath -OperatorTrustSourcePath $OperatorTrustSourcePath -T16ProtectedRootPath $T16ProtectedRootPath -T16ImmutableAnchorPath $T16ImmutableAnchorPath -T16ApprovedOwnerSid $T16ApprovedOwnerSid -T16ApprovedMutationSids $T16ApprovedMutationSids `
     -SourceFreezeAuthorityPath $SourceFreezeAuthorityPath -ReviewerAttestationPath $ReviewerAttestationPath -SshKeygenPath $SshKeygenPath -ProgrammePath $ProgrammePath `
-    -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath
+    -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath -PublishedMaintenanceArchiveBindings $PublishedMaintenanceArchiveBindings
   if (-not [bool]$readiness.technical_seal_authorized) { throw "[mir42-promotion-verified-seal-inputs] $($readiness.blockers -join '; ')" }
   $contract = Assert-MIR42PromotionReadinessScope -Readiness $readiness -RequiredScope $RequiredScope
   $candidate = $readiness._state.candidate
@@ -610,7 +614,8 @@ function Get-MIR42NineTargetProtectedMainPromotionPlan {
     [Parameter(Mandatory)][string]$SshKeygenPath,
     [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
     [AllowEmptyString()][string]$ProgrammePath='',
-    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath=''
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath='',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings=$null
   )
   return Get-MIR42ProtectedMainPromotionPlanShared -RequiredScope 'nine-target' @PSBoundParameters
 }
@@ -723,7 +728,8 @@ function Get-MIR42NineTargetProtectedMainReadback {
     [Parameter(Mandatory)][string]$SshKeygenPath,
     [Parameter(Mandatory)][string]$OfflineRestoreDrillPath,
     [AllowEmptyString()][string]$ProgrammePath='',
-    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath=''
+    [AllowEmptyString()][string]$PublishedMaintenancePredecessorManifestPath='',
+    [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings=$null
   )
   # RepoRoot is the clean, pinned qualification checkout. PrimaryRepoRoot is
   # the completed-work handoff on actual main. Reconstruct all accepted proof

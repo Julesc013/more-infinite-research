@@ -9,30 +9,49 @@ local validate = require("prototypes.mir.planner.technology_catalog.validate")
 
 local M = {}
 
+local function append_qualified_alternative(candidate, qualifications, alternative_qualifications,
+  design, row, action, disposition, options)
+  local qualification = technology_qualification.from_design(
+    design,
+    row,
+    {status = "UNMEASURED"},
+    {
+      validated = true,
+      trusted_design_verified = true,
+      trusted_gates_verified = options.children_admitted == true,
+      trusted_cached_verified = options.children_admitted == true
+    }
+  )
+  local alternative = model.alternative_record(design, qualification, action, disposition)
+  table.insert(candidate.alternatives, alternative)
+  table.insert(qualifications, qualification)
+  table.insert(alternative_qualifications, {
+    candidate_id = candidate.candidate_id,
+    alternative_id = alternative.alternative_id,
+    design_fingerprint = alternative.design_fingerprint,
+    qualification_fingerprint = alternative.qualification_fingerprint,
+    decision = alternative.qualification_decision
+  })
+  return alternative
+end
+
 function M.from_preselection_rows(rows, context_material, options)
   options = options or {}
   local candidates, qualifications, alternative_qualifications, by_id = {}, {}, {}, {}
+  local defer_diagnostic_alternatives = options.phase == "final"
+    and options.defer_diagnostic_alternatives == true
+  local deferred_diagnostic_alternatives = 0
   for _, row in ipairs(rows or {}) do
     if options.phase == "final" then row = model.final_qualification_row(row) end
     local primary_design = row.technology_design or technology_design.from_generation_row(row)
     if options.trusted_designs then technology_design.assert_trusted(primary_design)
     else technology_design.verify_untrusted(primary_design) end
-    local diagnostic_design = technology_design.as_diagnostic_alternative(
-      primary_design,
-      row.reason,
-      {
-        validated = options.trusted_designs == true,
-        source_trusted_verified = options.trusted_designs == true
-      }
-    )
-    local diagnostic_row = model.safe_diagnostic_row(diagnostic_design)
-    local designs = {}
+    local primary_action, primary_disposition
     if row.action == "emit" or row.action == "adopt" then
-      table.insert(designs, {design = primary_design, row = row, action = row.action, disposition = "materialize"})
+      primary_action, primary_disposition = row.action, "materialize"
     else
-      table.insert(designs, {design = primary_design, row = row, action = "reject", disposition = "rejected"})
+      primary_action, primary_disposition = "reject", "rejected"
     end
-    table.insert(designs, {design = diagnostic_design, row = diagnostic_row, action = "diagnose", disposition = "safe-diagnostic"})
 
     local candidate = technology_candidate.from_design(primary_design, row, {
       validated = true,
@@ -46,28 +65,34 @@ function M.from_preselection_rows(rows, context_material, options)
     by_id[candidate.candidate_id] = candidate
     table.insert(candidates, candidate)
 
-    for _, entry in ipairs(designs) do
-      local qualification = technology_qualification.from_design(
-        entry.design,
-        entry.row,
-        {status = "UNMEASURED"},
+    local primary = append_qualified_alternative(
+      candidate, qualifications, alternative_qualifications,
+      primary_design, row, primary_action, primary_disposition, options)
+
+    -- The final policy always selects a qualified materializing primary ahead
+    -- of diagnose. In player mode the diagnostic can therefore remain
+    -- explicitly unevaluated; every other state retains the exact full
+    -- diagnostic construction and qualification record.
+    local defer_diagnostic = defer_diagnostic_alternatives
+      and primary_disposition == "materialize"
+      and primary.qualification_decision == "qualified"
+    if defer_diagnostic then
+      candidate.diagnostic_evaluation = model.deferred_diagnostic_evaluation(primary)
+      deferred_diagnostic_alternatives = deferred_diagnostic_alternatives + 1
+    else
+      local diagnostic_design = technology_design.as_diagnostic_alternative(
+        primary_design,
+        row.reason,
         {
-          validated = true,
-          trusted_design_verified = true,
-          trusted_gates_verified = options.children_admitted == true,
-          trusted_cached_verified = options.children_admitted == true
+          validated = options.trusted_designs == true,
+          source_trusted_verified = options.trusted_designs == true
         }
       )
-      local alternative = model.alternative_record(entry.design, qualification, entry.action, entry.disposition)
-      table.insert(candidate.alternatives, alternative)
-      table.insert(qualifications, qualification)
-      table.insert(alternative_qualifications, {
-        candidate_id = candidate.candidate_id,
-        alternative_id = alternative.alternative_id,
-        design_fingerprint = alternative.design_fingerprint,
-        qualification_fingerprint = alternative.qualification_fingerprint,
-        decision = alternative.qualification_decision
-      })
+      local diagnostic = append_qualified_alternative(
+        candidate, qualifications, alternative_qualifications,
+        diagnostic_design, model.safe_diagnostic_row(diagnostic_design),
+        "diagnose", "safe-diagnostic", options)
+      candidate.diagnostic_evaluation = model.constructed_diagnostic_evaluation(diagnostic)
     end
     table.sort(candidate.alternatives, function(left, right) return left.alternative_id < right.alternative_id end)
   end
@@ -86,6 +111,10 @@ function M.from_preselection_rows(rows, context_material, options)
     candidates = candidates,
     qualifications = qualifications,
     alternative_qualifications = alternative_qualifications,
+    alternative_evaluation = model.alternative_evaluation(
+      deferred_diagnostic_alternatives > 0
+          and "player-selected-primary-plus-required-fallbacks" or "full-diagnostics",
+      #alternative_qualifications, deferred_diagnostic_alternatives),
     current_selections = {},
     context_fingerprint = fingerprint.of(context_material or {}),
     mutation_authority = false,

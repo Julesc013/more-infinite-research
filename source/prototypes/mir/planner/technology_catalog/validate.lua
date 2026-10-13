@@ -9,16 +9,110 @@ local model = require("prototypes.mir.planner.technology_catalog.model")
 
 local M = {}
 
+local function nonnegative_integer(value)
+  return type(value) == "number" and value >= 0 and value == math.floor(value)
+end
+
+local function verify_exact_fields(value, allowed, label)
+  for key in pairs(value) do
+    if not allowed[key] then
+      error("TechnologyCatalog " .. label .. " contains an unknown field: " .. tostring(key), 3)
+    end
+  end
+end
+
+local function verify_evaluation_shape(evaluation)
+  if type(evaluation) ~= "table"
+    or not model.ALTERNATIVE_EVALUATION_MODES[evaluation.mode]
+    or type(evaluation.complete) ~= "boolean"
+    or not nonnegative_integer(evaluation.evaluated_alternatives)
+    or not nonnegative_integer(evaluation.deferred_diagnostic_alternatives) then
+    error("TechnologyCatalog alternative evaluation state is invalid.", 3)
+  end
+  verify_exact_fields(evaluation, {
+    mode = true, complete = true,
+    evaluated_alternatives = true, deferred_diagnostic_alternatives = true
+  }, "alternative evaluation state")
+end
+
+local function nonempty_string(value)
+  return type(value) == "string" and value ~= ""
+end
+
+local function verify_diagnostic_evaluation(catalog, indexes, candidate)
+  local evaluation = candidate.diagnostic_evaluation
+  if type(evaluation) ~= "table" or type(evaluation.state) ~= "string" then
+    error("TechnologyCatalog candidate diagnostic evaluation is invalid: "
+      .. tostring(candidate.candidate_id), 3)
+  end
+  if evaluation.state == "constructed" then
+    verify_exact_fields(evaluation, {
+      state = true, alternative_id = true, design_fingerprint = true, qualification_fingerprint = true
+    }, "constructed diagnostic evaluation")
+    if not nonempty_string(evaluation.alternative_id)
+      or not nonempty_string(evaluation.design_fingerprint)
+      or not nonempty_string(evaluation.qualification_fingerprint) then
+      error("TechnologyCatalog constructed diagnostic binding is invalid: "
+        .. tostring(candidate.candidate_id), 3)
+    end
+    local alternative = indexer.alternative(indexes, candidate.candidate_id, evaluation.alternative_id)
+    if not alternative or alternative.action ~= "diagnose" or alternative.disposition ~= "safe-diagnostic"
+      or alternative.design_fingerprint ~= evaluation.design_fingerprint
+      or alternative.qualification_fingerprint ~= evaluation.qualification_fingerprint then
+      error("TechnologyCatalog constructed diagnostic binding is invalid: "
+        .. tostring(candidate.candidate_id), 3)
+    end
+    return false
+  end
+  if evaluation.state ~= "deferred-primary-qualified" then
+    error("TechnologyCatalog diagnostic evaluation state is unknown: "
+      .. tostring(evaluation.state), 3)
+  end
+  verify_exact_fields(evaluation, {
+    state = true, primary_alternative_id = true,
+    primary_design_fingerprint = true, primary_qualification_fingerprint = true
+  }, "deferred diagnostic evaluation")
+  if catalog.phase ~= "final"
+    or catalog.alternative_evaluation.mode ~= "player-selected-primary-plus-required-fallbacks"
+    or not nonempty_string(evaluation.primary_alternative_id)
+    or not nonempty_string(evaluation.primary_design_fingerprint)
+    or not nonempty_string(evaluation.primary_qualification_fingerprint) then
+    error("TechnologyCatalog deferred diagnostic is outside its player final-mode contract.", 3)
+  end
+  local primary = indexer.alternative(indexes, candidate.candidate_id, evaluation.primary_alternative_id)
+  local qualification = primary and indexer.qualification(indexes, primary.qualification_fingerprint)
+  if not primary or primary.action ~= "emit" and primary.action ~= "adopt"
+    or primary.disposition ~= "materialize" or primary.qualification_decision ~= "qualified"
+    or primary.design_fingerprint ~= evaluation.primary_design_fingerprint
+    or primary.qualification_fingerprint ~= evaluation.primary_qualification_fingerprint
+    or not qualification or qualification.candidate_id ~= candidate.candidate_id
+    or qualification.design_fingerprint ~= primary.design_fingerprint
+    or qualification.decision ~= "qualified" then
+    error("TechnologyCatalog deferred diagnostic primary proof is invalid: "
+      .. tostring(candidate.candidate_id), 3)
+  end
+  if #candidate.alternatives ~= 1 then
+    error("TechnologyCatalog deferred diagnostic retained an unevaluated alternative: "
+      .. tostring(candidate.candidate_id), 3)
+  end
+  return primary
+end
+
 local function verify(catalog, options)
   options = options or {}
   if type(catalog) ~= "table" or catalog.schema ~= model.SCHEMA
     or type(catalog.candidates) ~= "table" or type(catalog.qualifications) ~= "table"
     or type(catalog.alternative_qualifications) ~= "table" or type(catalog.current_selections) ~= "table"
+    or type(catalog.alternative_evaluation) ~= "table"
     or not model.PHASES[catalog.phase]
     or catalog.mutation_authority ~= false or catalog.selection_authority ~= "deterministic-policy-v2"
     or type(catalog.generation_plan_fingerprint) ~= "string"
     or type(catalog.compilation_plan_fingerprint) ~= "string" then
-    error("TechnologyCatalog schema 3 canonical inventory is required.", 2)
+    error("TechnologyCatalog schema 4 canonical inventory is required.", 2)
+  end
+  verify_evaluation_shape(catalog.alternative_evaluation)
+  if catalog.phase ~= "final" and catalog.alternative_evaluation.mode ~= "full-diagnostics" then
+    error("TechnologyCatalog preselection must retain full diagnostics.", 2)
   end
   if type(catalog.base_candidates) ~= "table" then
     error("TechnologyCatalog base continuation inventory is required.", 2)
@@ -29,8 +123,14 @@ local function verify(catalog, options)
       if options.trusted_children then technology_qualification.assert_trusted(qualification)
       else technology_qualification.verify_untrusted(qualification) end
     end
+    if indexer.qualification(indexes, qualification.qualification_fingerprint) then
+      error("TechnologyCatalog qualification fingerprint is duplicated: "
+        .. tostring(qualification.qualification_fingerprint), 2)
+    end
     indexer.add_qualification(indexes, qualification)
   end
+  local alternative_count, deferred_count = 0, 0
+  local qualification_use = {}
   for _, candidate in ipairs(catalog.candidates) do
     if not options.trusted_children_verified then
       if options.trusted_children then technology_candidate.assert_trusted(candidate)
@@ -40,11 +140,22 @@ local function verify(catalog, options)
       error("TechnologyCatalog candidate alternatives are invalid.", 2)
     end
     for _, alternative in ipairs(candidate.alternatives) do
+      alternative_count = alternative_count + 1
       local key = indexer.alternative_key(candidate.candidate_id, alternative.alternative_id)
       if indexes.alternatives[key] then error("TechnologyCatalog alternative is duplicated: " .. key, 2) end
-      if not indexer.qualification(indexes, alternative.qualification_fingerprint) then
+      local qualification = indexer.qualification(indexes, alternative.qualification_fingerprint)
+      if not qualification then
         error("TechnologyCatalog alternative lacks an exact qualification: " .. key, 2)
       end
+      if qualification.candidate_id ~= candidate.candidate_id
+        or qualification.design_fingerprint ~= alternative.design_fingerprint
+        or qualification.decision ~= alternative.qualification_decision then
+        error("TechnologyCatalog alternative qualification does not bind its candidate: " .. key, 2)
+      end
+      if qualification_use[alternative.qualification_fingerprint] then
+        error("TechnologyCatalog qualification is reused by multiple alternatives: " .. key, 2)
+      end
+      qualification_use[alternative.qualification_fingerprint] = true
       if type(alternative.technology_design) ~= "table"
         or alternative.technology_design.design_fingerprint ~= alternative.design_fingerprint then
         error("TechnologyCatalog alternative lacks its exact preserved TechnologyDesign: " .. key, 2)
@@ -55,6 +166,31 @@ local function verify(catalog, options)
       end
       indexer.add_alternative(indexes, candidate.candidate_id, alternative)
     end
+  end
+  if #catalog.qualifications ~= alternative_count then
+    error("TechnologyCatalog qualification inventory does not match alternatives.", 2)
+  end
+  for qualification_fingerprint in pairs(indexes.qualifications) do
+    if not qualification_use[qualification_fingerprint] then
+      error("TechnologyCatalog qualification lacks an alternative binding: "
+        .. qualification_fingerprint, 2)
+    end
+  end
+  local deferred_primaries = {}
+  for _, candidate in ipairs(catalog.candidates) do
+    local primary = verify_diagnostic_evaluation(catalog, indexes, candidate)
+    if primary then
+      deferred_count = deferred_count + 1
+      deferred_primaries[candidate.candidate_id] = primary
+    end
+  end
+  local evaluation = catalog.alternative_evaluation
+  if evaluation.evaluated_alternatives ~= alternative_count
+    or evaluation.deferred_diagnostic_alternatives ~= deferred_count
+    or evaluation.complete ~= (deferred_count == 0)
+    or (evaluation.mode == "full-diagnostics" and deferred_count ~= 0)
+    or (evaluation.mode == "player-selected-primary-plus-required-fallbacks" and deferred_count == 0) then
+    error("TechnologyCatalog alternative evaluation counts are invalid.", 2)
   end
   if catalog.phase == "final" then
     for _, qualification in ipairs(catalog.qualifications) do
@@ -70,6 +206,7 @@ local function verify(catalog, options)
       end
     end
   end
+  local mapped_alternatives, mapping_count = {}, 0
   for _, mapping in ipairs(catalog.alternative_qualifications) do
     local alternative = indexer.alternative(indexes, mapping.candidate_id, mapping.alternative_id)
     if not alternative or alternative.design_fingerprint ~= mapping.design_fingerprint
@@ -77,7 +214,22 @@ local function verify(catalog, options)
       or alternative.qualification_decision ~= mapping.decision then
       error("TechnologyCatalog alternative qualification mapping is invalid.", 2)
     end
+    local key = indexer.alternative_key(mapping.candidate_id, mapping.alternative_id)
+    if mapped_alternatives[key] then
+      error("TechnologyCatalog alternative qualification mapping is duplicated: " .. key, 2)
+    end
+    mapped_alternatives[key] = true
+    mapping_count = mapping_count + 1
   end
+  if mapping_count ~= alternative_count then
+    error("TechnologyCatalog alternative qualification mappings are incomplete.", 2)
+  end
+  for key in pairs(indexes.alternatives) do
+    if not mapped_alternatives[key] then
+      error("TechnologyCatalog alternative qualification mapping is missing: " .. key, 2)
+    end
+  end
+  local selections_by_candidate = {}
   for _, selection in ipairs(catalog.current_selections) do
     local alternative = indexer.alternative(indexes, selection.candidate_id, selection.alternative_id)
     local acceptable = alternative and (alternative.qualification_decision == "qualified"
@@ -88,6 +240,20 @@ local function verify(catalog, options)
       or alternative.qualification_fingerprint ~= selection.qualification_fingerprint then
       error("TechnologyCatalog current selection is invalid or rejected.", 2)
     end
+    local selections = selections_by_candidate[selection.candidate_id] or {}
+    table.insert(selections, selection)
+    selections_by_candidate[selection.candidate_id] = selections
+  end
+  for candidate_id, primary in pairs(deferred_primaries) do
+    local selections = selections_by_candidate[candidate_id] or {}
+    local selection = selections[1]
+    if #selections ~= 1 or not selection
+      or selection.alternative_id ~= primary.alternative_id
+      or selection.action ~= primary.action
+      or selection.design_fingerprint ~= primary.design_fingerprint
+      or selection.qualification_fingerprint ~= primary.qualification_fingerprint then
+      error("TechnologyCatalog deferred diagnostic primary selection is invalid: " .. candidate_id, 2)
+    end
   end
   if options.verify_fingerprints ~= false then
     if catalog.candidate_catalog_fingerprint ~= fingerprint.of(model.candidate_catalog_material(catalog.candidates))
@@ -95,7 +261,7 @@ local function verify(catalog, options)
       or catalog.preselection_catalog_fingerprint ~= fingerprint.of(model.preselection_material(catalog))
       or catalog.selection_fingerprint ~= fingerprint.of(catalog.current_selections)
       or catalog.catalog_fingerprint ~= fingerprint.of(model.catalog_material(catalog)) then
-      error("TechnologyCatalog schema 3 fingerprints are invalid.", 2)
+      error("TechnologyCatalog schema 4 fingerprints are invalid.", 2)
     end
   end
   return true

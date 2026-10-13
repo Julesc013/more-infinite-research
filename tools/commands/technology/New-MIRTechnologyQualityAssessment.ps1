@@ -8,6 +8,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot '../../mir/application/technology/TechnologyAcceptance.ps1')
 
 function Get-MIRJsonSha256 {
   param($Value)
@@ -26,8 +27,9 @@ function Get-MIRProperty {
 }
 
 $catalog = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $CatalogPath) | ConvertFrom-Json
-if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -ne "final" -or [bool]$catalog.mutation_authority) {
-  throw "Final TechnologyCatalog schema 3 canonical artifact is required."
+Assert-MIR4FullTechnologyCatalog -Catalog $catalog
+if ([bool]$catalog.mutation_authority) {
+  throw "Final TechnologyCatalog canonical artifact must be non-mutating."
 }
 $candidate = @($catalog.candidates | Where-Object { [string]$_.candidate_id -eq $CandidateId })
 if ($candidate.Count -ne 1) { throw "Technology candidate must resolve exactly once: $CandidateId" }

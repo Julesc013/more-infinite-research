@@ -1,1 +1,3 @@
+if log then log("[more-infinite-research] startup-stage=settings begin") end
 require("prototypes.mir.stage.settings").run()
+if log then log("[more-infinite-research] startup-stage=settings end") end
