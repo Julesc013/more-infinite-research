@@ -1650,7 +1650,12 @@ function Get-MIR42CriterionEvidenceObservation {
     [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1'
   )
   $contract = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs) -SourceVersion $SourceVersion
-  $individualFreshInput = $null -ne $PublishedMaintenanceInputs -and $SourceVersion -ceq '4.2.3'
+  # Individual native receipts contain the direct predecessor upgrades and
+  # fresh-load evidence in one authenticated input.  The Technical Seal
+  # admits this representation for these maintenance releases; criterion
+  # consumption must retain the same bounded version contract.
+  $individualFreshInput = $null -ne $PublishedMaintenanceInputs -and $SourceVersion -cin @('4.2.3','4.3.0','4.3.1')
+  $individualFreshStatus = "MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED"
   $record = Read-MIR42QualificationBootstrapRecord -Path $Path -Code $Code
   $candidateManifest = $Candidate.candidate_manifest
   $source = $Candidate.source
@@ -1661,7 +1666,7 @@ function Get-MIR42CriterionEvidenceObservation {
     [string]$record.source.package_source_sha256 -ceq [string]$source.package_source_sha256 -and
     [string]$record.candidate_manifest.sha256 -ceq [string]$candidateManifest.sha256 -and
     [string]$record.candidate_manifest.record_sha256 -ceq [string]$candidateManifest.record_sha256
-  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4') -and
+  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4','MIR42FourTargetDeterministicCandidateManifestV5','MIR42FourTargetDeterministicCandidateManifestV6') -and
     [string]$record.record_sha256 -ceq [string]$candidateManifest.record_sha256 -and
     (Get-MIR4Sha256File -Path $Path) -ceq [string]$candidateManifest.sha256
   if ($candidateConstruction) {
@@ -1672,7 +1677,7 @@ function Get-MIR42CriterionEvidenceObservation {
       $candidateBound -and (
         ([string]$record.kind -ceq [string]$contract.kind -and [string]$record.status -ceq [string]$contract.status) -or
         ($individualFreshInput -and [string]$record.kind -ceq 'MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1' -and
-          [string]$record.status -ceq 'MIR-4.2.3-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED' -and
+          [string]$record.status -ceq $individualFreshStatus -and
           $record.PSObject.Properties.Name -contains 'engine_input_kind' -and [string]$record.engine_input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads')
       ) -and
         [string]$record.release_qualification -ceq 'not-performed' -and [string]$record.release_acceptance -ceq 'not-performed'
