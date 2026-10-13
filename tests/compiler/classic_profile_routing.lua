@@ -3,7 +3,7 @@
 -- This control intentionally loads the data-final-fixes stage with isolated
 -- preload sentinels.  It proves the selected branch without loading the
 -- opposing compiler, which is the property needed to avoid the full science
--- and material planner in the ordinary startup profile.
+-- and material planner when the reduced profile is explicitly selected.
 
 local assertions, failures = 0, {}
 
@@ -51,30 +51,29 @@ local function load_final_stage(profile, classic, full, factorio_version)
   return require(FINAL_STAGE)
 end
 
--- An absent setting is the release default.  The full compiler sentinel must
--- never be required merely to select the classic branch.
+-- Explicit Classic selection must bypass the full compiler sentinel.
 local classic_calls, full_calls = 0, 0
-local classic_stage = load_final_stage(nil, function()
+local classic_stage = load_final_stage("classic", function()
   classic_calls = classic_calls + 1
   return {profile = "classic", result = "classic-emitted"}
 end, nil)
 local classic_result = classic_stage.run()
 check("CPR-01", classic_calls == 1 and classic_result and classic_result.profile == "classic",
-  "An absent profile setting must select and return the classic compiler")
+  "An explicit reduced profile setting must select and return the classic compiler")
 check("CPR-02", full_calls == 0 and package.loaded[FULL] == nil,
   "Classic selection must not require full pipeline commands")
 check("CPR-03", package.loaded[CLASSIC] ~= nil,
   "Classic selection must require the classic compiler only after selection")
 
--- The explicit full opt-in reverses that load relationship.
-local full_stage = load_final_stage("full", nil, function(options)
+-- An absent setting in an existing configuration must retain Full.
+local full_stage = load_final_stage(nil, nil, function(options)
   full_calls = full_calls + 1
   return {profile = "full", return_snapshot = options and options.return_snapshot}
 end)
 local full_result = full_stage.run()
 check("CPR-04", full_calls == 1 and full_result and full_result.profile == "full"
   and full_result.return_snapshot == false,
-  "The explicit full profile must preserve the normal no-snapshot command invocation")
+  "The default full profile must preserve the normal no-snapshot command invocation")
 check("CPR-05", package.loaded[CLASSIC] == nil and package.loaded[FULL] ~= nil,
   "Full selection must not require the classic compiler")
 
@@ -97,12 +96,12 @@ unload(PROFILE)
 _G.settings = {startup = {}}
 local profile = require(PROFILE)
 local descriptor = profile.prototype()
-check("CPR-07", profile.name == "mir-compiler-profile" and profile.get() == "classic",
-  "The standalone reader must default to classic without a settings catalogue")
+check("CPR-07", profile.name == "mir-compiler-profile" and profile.get() == "full",
+  "An existing startup configuration without the new setting must retain the full catalogue")
 check("CPR-08", descriptor.type == "string-setting" and descriptor.setting_type == "startup"
-  and descriptor.default_value == "classic" and descriptor.allowed_values[1] == "classic"
+  and descriptor.default_value == "full" and descriptor.allowed_values[1] == "classic"
   and descriptor.allowed_values[2] == "full",
-  "The profile setting must expose only the classic and full startup choices")
+  "The profile setting must default to full while exposing only classic and full startup choices")
 _G.settings = {startup = {["mir-compiler-profile"] = {value = "unsafe-unknown"}}}
 local invalid_ok, invalid_reason = pcall(profile.get)
 check("CPR-09", invalid_ok == false and tostring(invalid_reason):find("Unsupported MIR compiler profile", 1, true) ~= nil,

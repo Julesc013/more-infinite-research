@@ -227,6 +227,3 @@ try {
   if (-not ([IO.Path]::GetFullPath($root) + [IO.Path]::DirectorySeparatorChar).StartsWith($build + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir430-performance-test-containment]' }
   if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
 }
-
-
-

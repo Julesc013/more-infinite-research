@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 55861,
-      "expected_sha256": "21830FA85BBE0112A5FD8BFF8F98A42E6DB169208C9109F8D5BF079D12D0219D",
+      "expected_bytes": 55903,
+      "expected_sha256": "9A4C7880318A3AA1D4822754119EF8E0BB79E274C1E93367EFF6803C9DC3C678",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3836,8 +3836,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5774,
-      "expected_sha256": "FA36F428D184DE11805F0C706369AACC6D8F0A907F196252175451C93DF8D8AA",
+      "expected_bytes": 5913,
+      "expected_sha256": "95E6B47E25E7224FC2077EAB3A0D5DF238E068A6F7825F236F4BEDFFC67B401F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3884,8 +3884,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f100 without another emitter.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 1120,
-      "expected_sha256": "5C0D3C70816504CC3BA6D3921C20AFD0850B47F142AE613BCCFDC3ED38653DBD",
+      "expected_bytes": 1246,
+      "expected_sha256": "BD99F3C7430DE75F3C6F9D2F5DA73E8CCFBF84124C9819E6E918A88E346D7391",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3932,8 +3932,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f100 without another emitter.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 31428,
-      "expected_sha256": "47BA7396AAAAF540B668C1CC19509BA4B295F4CDC1A1D29676F9A480B37B60E9",
+      "expected_bytes": 31440,
+      "expected_sha256": "E27F977788B3FECF52AAEB4374763AC4A72796833BF395D7160E07D9A1FB2296",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3963,5 +3963,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "066FC8B10F1A866A4221E15854E09FE181F9FC18D2D45D6D006709FEEDD9D7E9"
+  "record_sha256": "129F1CE3E0DC74A1AC8EC87C0E723304F996DF23B3FAF86A515464C5A4548B41"
 }

@@ -1,4 +1,4 @@
--- Fast, declared planning for the default classic compiler mode.
+-- Fast, declared planning for the explicitly selected reduced compiler mode.
 --
 -- This module deliberately does not import stream discovery, science
 -- acquisition, recipe matching, ownership inference, catalog construction,

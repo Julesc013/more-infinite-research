@@ -2085,10 +2085,10 @@
         "predecessor_source_path": "src/mod/families/modern/locale/en/more-infinite-research.cfg"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 55861,
-      "source_sha256": "21830FA85BBE0112A5FD8BFF8F98A42E6DB169208C9109F8D5BF079D12D0219D",
-      "output_bytes": 55861,
-      "output_sha256": "21830FA85BBE0112A5FD8BFF8F98A42E6DB169208C9109F8D5BF079D12D0219D"
+      "source_bytes": 55903,
+      "source_sha256": "9A4C7880318A3AA1D4822754119EF8E0BB79E274C1E93367EFF6803C9DC3C678",
+      "output_bytes": 55903,
+      "output_sha256": "9A4C7880318A3AA1D4822754119EF8E0BB79E274C1E93367EFF6803C9DC3C678"
     },
     {
       "layer": "capability",
@@ -6525,10 +6525,10 @@
         "predecessor_source_path": "targets/f100/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 5774,
-      "source_sha256": "FA36F428D184DE11805F0C706369AACC6D8F0A907F196252175451C93DF8D8AA",
-      "output_bytes": 5774,
-      "output_sha256": "FA36F428D184DE11805F0C706369AACC6D8F0A907F196252175451C93DF8D8AA"
+      "source_bytes": 5913,
+      "source_sha256": "95E6B47E25E7224FC2077EAB3A0D5DF238E068A6F7825F236F4BEDFFC67B401F",
+      "output_bytes": 5913,
+      "output_sha256": "95E6B47E25E7224FC2077EAB3A0D5DF238E068A6F7825F236F4BEDFFC67B401F"
     },
     {
       "layer": "presentation",
@@ -6579,10 +6579,10 @@
         "predecessor_source_path": "targets/f110/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 5765,
-      "source_sha256": "2B6A45116CED78132BEFC94877638B595AACEFDB465C5552914598D1E3E51060",
-      "output_bytes": 5765,
-      "output_sha256": "2B6A45116CED78132BEFC94877638B595AACEFDB465C5552914598D1E3E51060"
+      "source_bytes": 5904,
+      "source_sha256": "06E67AA5119368A51379787053B85364E7145AC0CF2B44A97A406B7EF044F183",
+      "output_bytes": 5904,
+      "output_sha256": "06E67AA5119368A51379787053B85364E7145AC0CF2B44A97A406B7EF044F183"
     },
     {
       "layer": "presentation",
@@ -6834,10 +6834,10 @@
         "predecessor_source_path": "targets/f200/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 80734,
-      "source_sha256": "1329E6E35BC2C907768C3876CED81621ED8E9FD297B4BBF6D303EA25EB063571",
-      "output_bytes": 80734,
-      "output_sha256": "1329E6E35BC2C907768C3876CED81621ED8E9FD297B4BBF6D303EA25EB063571"
+      "source_bytes": 80873,
+      "source_sha256": "D6228357C7027B8EDE416080A4D65AF03BFB2A19E2CAC8D0A0929B6B1917A59C",
+      "output_bytes": 80873,
+      "output_sha256": "D6228357C7027B8EDE416080A4D65AF03BFB2A19E2CAC8D0A0929B6B1917A59C"
     },
     {
       "layer": "presentation",
@@ -7269,10 +7269,10 @@
         "predecessor_source_path": "targets/f210/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 79676,
-      "source_sha256": "0740CD49BD7D0E8FCDF3204F34663DB1B535E6ED7CEA8971DF2F1D5F0B5BC16A",
-      "output_bytes": 79676,
-      "output_sha256": "0740CD49BD7D0E8FCDF3204F34663DB1B535E6ED7CEA8971DF2F1D5F0B5BC16A"
+      "source_bytes": 79815,
+      "source_sha256": "49D5A6578D7C4648DBA4C63622844B7DDFC1C640E0073216A72E8B7D1E48C9CC",
+      "output_bytes": 79815,
+      "output_sha256": "49D5A6578D7C4648DBA4C63622844B7DDFC1C640E0073216A72E8B7D1E48C9CC"
     },
     {
       "layer": "capability",
@@ -7718,10 +7718,10 @@
         "reason": "Explicitly reduced classic compiler selected before full proof analysis, using the existing emitter."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 1120,
-      "source_sha256": "5C0D3C70816504CC3BA6D3921C20AFD0850B47F142AE613BCCFDC3ED38653DBD",
-      "output_bytes": 1120,
-      "output_sha256": "5C0D3C70816504CC3BA6D3921C20AFD0850B47F142AE613BCCFDC3ED38653DBD"
+      "source_bytes": 1246,
+      "source_sha256": "BD99F3C7430DE75F3C6F9D2F5DA73E8CCFBF84124C9819E6E918A88E346D7391",
+      "output_bytes": 1246,
+      "output_sha256": "BD99F3C7430DE75F3C6F9D2F5DA73E8CCFBF84124C9819E6E918A88E346D7391"
     },
     {
       "layer": "capability",
@@ -7784,10 +7784,10 @@
         "reason": "Explicitly reduced classic compiler selected before full proof analysis, using the existing emitter."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 31428,
-      "source_sha256": "47BA7396AAAAF540B668C1CC19509BA4B295F4CDC1A1D29676F9A480B37B60E9",
-      "output_bytes": 31428,
-      "output_sha256": "47BA7396AAAAF540B668C1CC19509BA4B295F4CDC1A1D29676F9A480B37B60E9"
+      "source_bytes": 31440,
+      "source_sha256": "E27F977788B3FECF52AAEB4374763AC4A72796833BF395D7160E07D9A1FB2296",
+      "output_bytes": 31440,
+      "output_sha256": "E27F977788B3FECF52AAEB4374763AC4A72796833BF395D7160E07D9A1FB2296"
     },
     {
       "layer": "capability",
@@ -7819,5 +7819,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "137DBFA82D53050AC1269CDC55A2662542160CC5AC96561577234300038F306F"
+  "record_sha256": "3B9EE71BF0C3A9A79FE307B60A4D0E3B0E8A2DAE1ADD545B89009E01266E9893"
 }

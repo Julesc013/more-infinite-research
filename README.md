@@ -301,7 +301,7 @@ These extend selected finite vanilla chains into infinite continuations.
 
 ## Startup Settings
 
-The MIR 4.3 development candidate adds a **Compiler profile** startup setting. **Classic** is the default: a finite set of declared direct bonuses and native research continuations, with the generic acquisition and alternative-route compiler bypassed. Recipe productivity, material progression, inferred mod support, competing-owner replacements and weapon-speed redistribution are omitted. Existing module permissions, prototype limits, pipeline extent and supported scripted effects remain separate services.
+The MIR 4.3 development candidate adds a **Compiler profile** startup setting. **Full** is the default and retains the broad research compiler, including the performance optimizations developed for this update. **Classic** is an explicit reduced-support option: a finite set of declared direct bonuses and native research continuations, with the generic acquisition and alternative-route compiler bypassed. Recipe productivity, material progression, inferred mod support, competing-owner replacements and weapon-speed redistribution are omitted in Classic. Existing module permissions, prototype limits, pipeline extent and supported scripted effects remain separate services.
 
 Historical Factorio 0.x targets retain their existing reduced compiler and numeric research-unit contracts; this new profile applies to the four modern target compositions.
 

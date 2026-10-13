@@ -1,6 +1,6 @@
 # More Infinite Research
 
-**MIR 4.3 upgrade warning — modern targets (1.0 and newer):** the default **Classic** compiler has reduced support. It offers five direct character bonuses and up to six validated native continuations. Broad automatic mod inference, material progression and recipe-productivity research are omitted. Previously generated research, levels, effects and progress outside this core are **not preserved**.
+**MIR 4.3 compiler profiles — modern targets (1.0 and newer):** **Full** is the default and retains broad automatic research support with the performance optimizations in this update. **Classic** is an explicit reduced-support option. It offers five direct character bonuses and up to six validated native continuations, omitting broad automatic mod inference, material progression and recipe-productivity research. If you select Classic, previously generated research, levels, effects and progress outside this core are **not preserved**.
 
 Before opening an existing factory that needs MIR 4.2 research, choose **Full** in the `mir-compiler-profile` startup setting, restart Factorio and load an untouched backup. Full may still load slowly. If Classic has already loaded the factory, quit without saving; selecting Full after a Classic resave cannot restore lost investment. Historical Factorio 0.x packages retain their existing reduced path.
 

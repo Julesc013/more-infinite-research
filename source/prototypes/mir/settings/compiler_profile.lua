@@ -7,7 +7,9 @@ function M.get(factorio_line)
   -- They do not share the modern startup/profile contract.
   if type(factorio_line) == "string" and factorio_line:match("^0%.") then return "full" end
   local setting = settings and settings.startup and settings.startup[M.name]
-  local value = setting and setting.value or "classic"
+  -- Existing factories must keep the broad catalogue unless the player
+  -- explicitly selects the reduced profile before loading.
+  local value = setting and setting.value or "full"
   if value ~= "classic" and value ~= "full" then
     error("Unsupported MIR compiler profile: " .. tostring(value), 2)
   end
@@ -19,7 +21,7 @@ function M.prototype()
     type = "string-setting",
     name = M.name,
     setting_type = "startup",
-    default_value = "classic",
+    default_value = "full",
     allowed_values = {"classic", "full"},
     order = "a-000-compiler-profile",
     localised_name = {"mod-setting-name.mir-compiler-profile"},
