@@ -224,6 +224,15 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
           Refuses {Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion "4.2.$patch" -EnginePath $badPath} "mir421-$historicalTarget-local-engine-binding-required"
         }
       }
+      foreach($sourceVersion in @('4.3.0','4.3.1')){
+        $source=[version]$sourceVersion
+        $descriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion $sourceVersion -EnginePath $boundEngine
+        $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $historicalTarget.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build
+        Check ($descriptor.to-ceq[string]$identity.distribution_version-and$descriptor.engine-ceq$boundEngine-and$descriptor.historical.engine.sha256-ceq$baseline.historical.engine.sha256-and$descriptor.historical.predecessor.sha256-ceq$baseline.historical.predecessor.sha256) "$historicalTarget $sourceVersion changed its retained authority or target identity."
+        foreach($badPath in @('','relative/factorio.exe')){
+          Refuses {Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion $sourceVersion -EnginePath $badPath} "mir421-$historicalTarget-local-engine-binding-required"
+        }
+      }
     }
     # Exercise the actual joined-runner call site. Published byte custody is
     # tested separately by the real predecessor reader; no network runs here.
@@ -340,6 +349,19 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       }
     }}
     Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'selection.json')}|Sort-Object -Unique).Count -eq 20) 'fresh definitions share identities.'
+    $release43HistoricalRoots=[Collections.Generic.List[string]]::new()
+    foreach($sourceVersion in @('4.3.0','4.3.1')){
+      $source=[version]$sourceVersion;$target='f013';$freshLine='0.13'
+      $freshVersion=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build).distribution_version
+      [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
+      $candidate=Join-Path $sourceRoot "more-infinite-research_$freshVersion.zip";Write-TinyEngineArchive $candidate $freshVersion $freshLine
+      $root=Join-Path $exactRoot ('fresh-'+$target+'-'+$sourceVersion.Replace('.','-'));$release43HistoricalRoots.Add($root)
+      $release43Params=@{Target=$target;FactorioLine=$freshLine;Engine=$engine;EngineSha256=$engineHash;Candidate=$candidate;CandidateSha256=Get-MIRImmutableInputSha256 $candidate;Version=$freshVersion;SourceVersion=$sourceVersion;FreshRoot=$root;SourceCommit=('A'*40);DeadlineSeconds=60;LibraryDirectory=$sourceRoot}
+      $result=Invoke-MIR42HistoricalFreshLoad @release43Params
+      $receipt=Get-Content -Raw -LiteralPath $result.receipt.path|ConvertFrom-Json -Depth 100
+      Check ($receipt.candidate.version-ceq$freshVersion-and(Test-MIR4BootstrapRecordHash $receipt)-and$receipt.library_input_receipt.status-ceq'restored-direct-library-controls') "$sourceVersion historical fresh load did not retain its exact identity or restore controls."
+    }
+    Check ($release43HistoricalRoots.Count-eq2) '4.3 historical fresh-load controls omitted an admitted source version.'
     $freshVersion='4.2.01301';$freshParams.SourceVersion='4.2.1'
     $freshParams.Candidate=Join-Path $sourceRoot 'more-infinite-research_4.2.01301.zip'
     $freshParams.CandidateSha256=Get-MIRImmutableInputSha256 $freshParams.Candidate
@@ -347,6 +369,13 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       $freshParams.Version=$badVersion;$freshParams.FreshRoot=Join-Path $exactRoot ('rejected-'+$badVersion)
       Refuses {Invoke-MIR42HistoricalFreshLoad @freshParams} 'historical-fresh-target-binding'
       Check (-not (Test-Path $freshParams.FreshRoot)) 'bad maintenance identity allocated staging.'
+    }
+    $release431Version='4.3.01301';$release431Candidate=Join-Path $sourceRoot "more-infinite-research_$release431Version.zip"
+    $release431HistoricalParams=@{Target='f013';FactorioLine='0.13';Engine=$engine;EngineSha256=$engineHash;Candidate=$release431Candidate;CandidateSha256=Get-MIRImmutableInputSha256 $release431Candidate;Version=$release431Version;SourceVersion='4.3.1';SourceCommit=('A'*40);DeadlineSeconds=60;LibraryDirectory=$sourceRoot}
+    foreach($badVersion in @('4.3.01302','4.2.01301')){
+      $release431HistoricalParams.Version=$badVersion;$release431HistoricalParams.FreshRoot=Join-Path $exactRoot ('rejected-'+$badVersion)
+      Refuses {Invoke-MIR42HistoricalFreshLoad @release431HistoricalParams} 'historical-fresh-target-binding'
+      Check (-not(Test-Path $release431HistoricalParams.FreshRoot)) 'invalid 4.3 historical identity allocated staging.'
     }
     $freshParams.Version='4.2.01301';$freshParams.FactorioLine='0.14'
     Refuses {Invoke-MIR42HistoricalFreshLoad @freshParams} 'historical-fresh-target-binding'
@@ -451,6 +480,20 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       $libraryReceipt=Get-Content -Raw -LiteralPath (Join-Path $root 'library-inputs.json')|ConvertFrom-Json -Depth 30
       Check ($libraryReceipt.status-ceq'restored-direct-library-controls'-and$libraryReceipt.archive_links_created-eq0-and$libraryReceipt.dependency_payload_bytes_copied-eq0-and-not(Test-Path (Join-Path $root 'work/user/mods'))) 'modern direct fresh actor materialized a profile or did not restore activation.'
     }
+    $release43ModernRoots=[Collections.Generic.List[string]]::new();$release431ModernCandidate='';$release431ModernInventory=$null
+    foreach($sourceVersion in @('4.3.0','4.3.1')){
+      $source=[version]$sourceVersion;$target='f200';$freshLine='2.0';$freshIsModern=$true;$freshEnableSpaceAge=$false;$freshFailure=''
+      $freshVersion=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build).distribution_version
+      [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
+      $candidate=Join-Path $sourceRoot "more-infinite-research_$freshVersion.zip";Write-TinyEngineArchive $candidate $freshVersion $freshLine
+      $inventory=Get-MIR4ArchiveInventory -Path $candidate;$root=Join-Path $exactRoot ('modern-'+$sourceVersion.Replace('.','-'));$release43ModernRoots.Add($root)
+      $release43ModernParams=@{Target=$target;Scenario='package-zip-base';FactorioLine=$freshLine;FactorioBinaryVersion="$freshLine.1";Engine=$engine;EngineSha256=$engineHash;Candidate=$candidate;CandidateSha256=Get-MIRImmutableInputSha256 $candidate;CandidateContentSha256=[string]$inventory.content_sha256;PackageSourceSha256=('B'*64);LibraryDirectory=$sourceRoot;Version=$freshVersion;FreshRoot=$root;SourceCommit=('A'*40);DirectLoaderSha256=$modernLoaderSha;RuntimeScenarioRegistryPath=$runtimeScenarioRegistry;DeadlineSeconds=60}
+      $result=Invoke-MIR42ModernFreshLoad @release43ModernParams
+      $summary=Get-Content -Raw -LiteralPath $result.receipt.path|ConvertFrom-Json -Depth 100
+      Check ($summary.status-ceq'passed'-and$summary.mir_version-ceq$freshVersion-and$summary.validation_package_sha256-ceq$release43ModernParams.CandidateSha256-and$summary.validation_package_content_sha256-ceq[string]$inventory.content_sha256) "$sourceVersion modern fresh load did not retain exact source/target identity."
+      if($sourceVersion-ceq'4.3.1'){$release431ModernCandidate=$candidate;$release431ModernInventory=$inventory}
+    }
+    Check ($release43ModernRoots.Count-eq2-and-not[string]::IsNullOrWhiteSpace($release431ModernCandidate)) '4.3 modern fresh-load controls omitted an admitted source version.'
     $target='f200';$freshLine='2.0';$freshVersion=[string]$rows[$target].to;$freshIsModern=$true;$freshEnableSpaceAge=$false
     [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version='2.0.1';dependencies=@()}|ConvertTo-Json))
     $modernFailureParams=@{
@@ -477,9 +520,14 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $invalidArchive=$modernFailureParams.Clone();$invalidArchive.CandidateSha256=$rows.f200.candidate_sha256;$invalidArchive.Version='4.2.20002';$invalidArchive.FreshRoot=Join-Path $exactRoot 'modern-invalid-archive'
     Refuses {Invoke-MIR42ModernFreshLoad @invalidArchive} 'modern-fresh-archive-version'
     Check (-not(Test-Path (Join-Path $invalidArchive.FreshRoot 'summary.json'))) 'wrong modern archive version produced evidence.'
+    foreach($badVersion in @('4.3.20002','4.4.20001')){
+      $invalidRelease43=$modernFailureParams.Clone();$invalidRelease43.Candidate=$release431ModernCandidate;$invalidRelease43.CandidateSha256=Get-MIRImmutableInputSha256 $release431ModernCandidate;$invalidRelease43.CandidateContentSha256=[string]$release431ModernInventory.content_sha256;$invalidRelease43.Version=$badVersion;$invalidRelease43.FreshRoot=Join-Path $exactRoot ('modern-invalid-'+$badVersion.Replace('.','-'))
+      Refuses {Invoke-MIR42ModernFreshLoad @invalidRelease43} 'modern-fresh-target-binding'
+      Check (-not(Test-Path (Join-Path $invalidRelease43.FreshRoot 'summary.json'))) 'invalid 4.3 modern identity produced evidence.'
+    }
     Check ($modernRoots.Count-eq5) 'modern direct loader omitted a required base or Space Age control.'
     foreach($target in $originals.Keys){Check ((Test-Path -LiteralPath $originals[$target] -PathType Leaf) -and (Get-MIRImmutableInputSha256 $originals[$target]) -ceq $rows[$target].candidate_sha256) 'stage retirement lost or changed a shared source input.'}
-    Write-Output "MIR42-ENGINE-DIRECT-LIBRARY-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=18 fresh_version_controls=20 factorio_processes=0 archive_copies_created=0 archive_links_created=0"
+    Write-Output "MIR42-ENGINE-DIRECT-LIBRARY-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=22 fresh_version_controls=24 factorio_processes=0 archive_copies_created=0 archive_links_created=0"
   } finally {
     foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
     if(Test-Path -LiteralPath $scratch){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny engine controls';Remove-Item -LiteralPath $scratch -Recurse -Force}
@@ -797,4 +845,4 @@ $secondReload = $harness.IndexOf('$secondReloadExitCode = ',[StringComparison]::
 if ($firstClear -lt 0 -or $firstReload -lt 0 -or $secondClear -le $firstReload -or $secondReload -le $secondClear -or
     $runner.Contains('$targetRow.engine.path') -or $runner.Contains('kind=(if ($isNineTargetCandidate)') -or $runner.Contains('status=(if ($isNineTargetCandidate)')) { throw 'historical-runner-shape-or-reload-log-scope' }
 
-Write-Output 'MIR42-NINE-TARGET-HISTORICAL-ENGINE-RUN-PRECHECK-PASSED targets=5 source_versions=2 record_selectors=3 engines=0'
+Write-Output 'MIR42-NINE-TARGET-HISTORICAL-ENGINE-RUN-PRECHECK-PASSED targets=5 source_versions=6 record_selectors=3 engines=0'
