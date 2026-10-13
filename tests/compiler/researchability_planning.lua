@@ -1929,6 +1929,35 @@ canonical_recipe_facts.recipes_by_output_identity_view = normal_shared_output_lo
 check("U05B", memo_status == "research" and shared_inner_output_lookups == 1,
   "A complete inner unlock witness is reused across sibling routes with unrelated active unlockers")
 
+-- U05B has already exercised the real local witness memo through 12 sibling
+-- candidates. Keep the additional assertion in a nested function so this
+-- large controlled Lua fixture does not enlarge its outer local-variable frame.
+;(function()
+  local memo_route_first = production.production_route_for_pack("memo-pack")
+  local memo_first_pairs = memo_route_first and memo_route_first.provenance
+    and memo_route_first.provenance.selected_research_unlock_pairs or {}
+  local memo_first_signature = {}
+  for _, pair in ipairs(memo_first_pairs) do
+    memo_first_signature[#memo_first_signature + 1] = pair.recipe .. "\0" .. pair.unlocker
+  end
+  if memo_first_pairs[1] then memo_first_pairs[1].recipe = "caller-mutated-memo-route" end
+  local memo_route_second = production.production_route_for_pack("memo-pack")
+  local memo_second_pairs = memo_route_second and memo_route_second.provenance
+    and memo_route_second.provenance.selected_research_unlock_pairs or {}
+  local memo_second_signature = {}
+  for _, pair in ipairs(memo_second_pairs) do
+    memo_second_signature[#memo_second_signature + 1] = pair.recipe .. "\0" .. pair.unlocker
+  end
+  check("U05C", memo_route_first and memo_route_second
+    and memo_route_first ~= memo_route_second
+    and memo_route_first.recipe == "memo-pack-01"
+    and table.concat(memo_first_signature, ",")
+      == "memo-outer-01-recipe\0OuterUnlock1,memo-pack-01\0RootUnlock,shared-inner-recipe\0SharedInnerUnlock"
+    and table.concat(memo_second_signature, ",")
+      == "memo-outer-01-recipe\0OuterUnlock1,memo-pack-01\0RootUnlock,shared-inner-recipe\0SharedInnerUnlock",
+    "The normal same-options memo route retains its selected gates and the public route boundary isolates caller mutation")
+end)()
+
 -- Locked typed-output alternatives use the same normal producer ordering.
 -- Count real technology service evaluations, rather than pre-cache entries.
 local locked_order_world = {
