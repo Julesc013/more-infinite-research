@@ -98,6 +98,8 @@ try {
  foreach($stage in @('data','control')){$bindings["prototypes/mir/stage/$stage.lua"]="source/prototypes/mir/stage/$stage.lua"}
  $adapter=if($Target -ceq '2.1'){'f210'}else{'f200'}
  $bindings['prototypes/mir/runtime/scripted_techs.lua']="source/adapters/$adapter/prototypes/mir/runtime/scripted_techs.lua"
+ $bindings['prototypes/mir/settings/compiler_profile.lua']='source/prototypes/mir/settings/compiler_profile.lua'
+ $bindings['prototypes/mir/platform/factorio/target_line.lua']='source/prototypes/mir/platform/factorio/target_line.lua'
  $bindings['prototypes/mir/platform/factorio/target_profiles.lua']="source/adapters/$adapter/prototypes/mir/platform/factorio/target_profiles.lua"
  $bindings['prototypes/mir/platform/factorio/browser_host.lua']='source/prototypes/mir/platform/factorio/browser_host.lua'
  foreach($name in $bindings.Keys) {
@@ -147,10 +149,42 @@ foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{n
 [void]$lua.AppendLine('local browser_omission_prototypes={mod_data={},mod_setting={}}')
 [void]$lua.AppendLine('local browser_omission_controller_bindings={}')
 [void]$lua.AppendLine('local browser_omission_controller={runtime_settings_bindings=function() return browser_omission_controller_bindings end}')
-[void]$lua.AppendLine('local browser_omission_runtime_settings={startup={}}')
+[void]$lua.AppendLine('local browser_omission_runtime_settings={startup={["mir-compiler-profile"]={value="full"}}}')
 [void]$lua.AppendLine('local browser_omission_registered_settings={["ips-max-level-bridge"]={name="ips-max-level-bridge",type="int-setting"}}')
 [void]$lua.AppendLine('local browser_omission_fingerprint=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/core/fingerprint.lua')))
+[void]$lua.AppendLine('end)()')
+$browserOmissionProviderPath=Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua'
+$browserOmissionProviderSource=[IO.File]::ReadAllText($browserOmissionProviderPath)
+$browserOmissionRequiredModules=@([regex]::Matches($browserOmissionProviderSource,'require\(\s*["'']([^"'']+)["'']\s*\)')|ForEach-Object{$_.Groups[1].Value}|Sort-Object -Unique)
+$browserOmissionAdmittedModules=@(
+  'prototypes.mir.core.fingerprint',
+  'prototypes.mir.domain.compiler.classic_declarations',
+  'prototypes.mir.platform.factorio.browser_host',
+  'prototypes.mir.platform.factorio.target_line',
+  'prototypes.mir.runtime.maximum_level_control',
+  'prototypes.mir.runtime.startup_settings',
+  'prototypes.mir.settings.catalog',
+  'prototypes.mir.settings.compiler_profile',
+  'prototypes.mir.settings.profile_codec'
+)|Sort-Object
+if(($browserOmissionRequiredModules -join "`n") -cne ($browserOmissionAdmittedModules -join "`n")) {
+  throw '[mir-browser-omission-provider-dependencies] Controlled provider dependencies changed; admit each dependency explicitly before a native Browser run.'
+}
+$browserTargetAdapter=if($Target -ceq '2.1'){'f210'}else{'f200'}
+[void]$lua.AppendLine('local browser_omission_compiler_profile=(function()')
+[void]$lua.AppendLine('local settings=browser_omission_runtime_settings')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/settings/compiler_profile.lua')))
+[void]$lua.AppendLine('end)()')
+[void]$lua.AppendLine('local browser_omission_target_profiles=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo "source/adapters/$browserTargetAdapter/prototypes/mir/platform/factorio/target_profiles.lua")))
+[void]$lua.AppendLine('end)()')
+[void]$lua.AppendLine('local browser_omission_target_line=(function()')
+[void]$lua.AppendLine('local require=function(name) if name=="prototypes.mir.platform.factorio.target_profiles" then return browser_omission_target_profiles end error("[mir-browser-omission-provider-dependency] "..tostring(name),2) end')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/platform/factorio/target_line.lua')))
+[void]$lua.AppendLine('end)()')
+[void]$lua.AppendLine('local browser_omission_classic_declarations=(function()')
+[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/domain/compiler/classic_declarations.lua')))
 [void]$lua.AppendLine('end)()')
 [void]$lua.AppendLine(@'
 local browser_omission_provider=(function()
@@ -158,6 +192,9 @@ local browser_omission_provider=(function()
   local settings=browser_omission_runtime_settings
   local require=function(name)
     if name=="prototypes.mir.core.fingerprint" then return browser_omission_fingerprint
+    elseif name=="prototypes.mir.settings.compiler_profile" then return browser_omission_compiler_profile
+    elseif name=="prototypes.mir.platform.factorio.target_line" then return browser_omission_target_line
+    elseif name=="prototypes.mir.domain.compiler.classic_declarations" then return browser_omission_classic_declarations
     elseif name=="prototypes.mir.platform.factorio.browser_host" then return {
       prototype_collections=function() return browser_omission_prototypes end
     }
@@ -177,11 +214,11 @@ local browser_omission_provider=(function()
     elseif name=="prototypes.mir.settings.profile_codec" then return {
       import_setting_name="mir-profile-import",decode=function() return nil end
     }
-    end
-    return {}
+    error("[mir-browser-omission-provider-dependency] "..tostring(name),2)
   end
 '@)
-[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua')))
+[void]$lua.AppendLine('assert(browser_omission_compiler_profile.get(browser_omission_target_line.factorio_version)=="full","[mir-browser-omission-provider-profile] Controlled provider must execute the real Full profile selector")')
+[void]$lua.AppendLine($browserOmissionProviderSource)
 [void]$lua.AppendLine('end)()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_omissions.lua')))
 [void]$lua.AppendLine('local check_browser_core_regressions=(function()')
