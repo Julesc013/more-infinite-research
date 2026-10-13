@@ -142,10 +142,11 @@ Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirect
 Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Target f210} 'mir441-resource-output-root'
 function Test-MaintenanceFixtureCallSites {
   $PersistedDamageZip=''
-  # The real runner initializes this from its optional F200 Bob/Angel input
-  # profile before specializing fixture contents.  This AST-only caller test
-  # exercises the ordinary lanes, so keep that optional lane explicitly off.
-  $f200BobAngelScenario=$false
+  # The real runner initializes these from optional F200 named-profile inputs
+  # before specializing fixture contents. This AST-only caller test exercises
+  # ordinary lanes, so both named-profile paths must stay explicitly inactive.
+  $f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false;$classicReducedPolicy=$false
+  Assert-LibraryTest (-not $f200BobAngelScenario -and -not $f200GaloreSpaceAgeScenario -and -not $classicReducedPolicy) 'ordinary fixture caller disables named and reduced-profile inputs'
   $tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$tokens,[ref]$errors)
   Assert-LibraryTest (-not$errors.Count) 'upgrade fixture caller parses'
@@ -653,9 +654,9 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
       . ([scriptblock]::Create($function[0].Extent.Text))
       $script:upgradeActivation=$activation;$script:upgradeProcessIndex=0;$script:upgradeResourceRuns=@()
       # This controlled actor represents the ordinary base upgrade. The actual
-       # adapter also supports K2 and F200 Bob/Angel observers; initialize
-       # both optional scenarios explicitly.
-       $k2Scenario=$false;$f200BobAngelScenario=$false
+       # adapter also supports K2 and named F200 profile observers; initialize
+       # all optional scenarios explicitly for this ordinary base actor.
+       $k2Scenario=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false
       $suiteRoot=$root;$root=Join-Path $suiteRoot 'upgrade-actor-run'
       [IO.Directory]::CreateDirectory($root)|Out-Null
       $script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=2MB;result_reserve_bytes=64KB}
