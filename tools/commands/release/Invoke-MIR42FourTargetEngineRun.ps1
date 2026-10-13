@@ -105,7 +105,7 @@ function Get-MIR42HistoricalEngineDescriptor {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0',
     [string]$EnginePath = ''
   )
   $expected = $script:MIR42HistoricalTerminalInputs[$Target]
@@ -373,12 +373,13 @@ function Invoke-MIR42HistoricalFreshLoad {
     [Parameter(Mandatory)][string]$CandidateSha256,
     [Parameter(Mandatory)][string]$LibraryDirectory,
     [Parameter(Mandatory)][string]$Version,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.0',
     [Parameter(Mandatory)][string]$FreshRoot,
     [Parameter(Mandatory)][string]$SourceCommit,
     [Parameter(Mandatory)][int]$DeadlineSeconds
   )
-  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch ([int]($SourceVersion.Split('.')[2]))
+  $sourceParts = $SourceVersion.Split('.')
+  $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
   if ($FactorioLine -cne ('0.' + $Target.Substring(2)) -or $Version -cne [string]$identity.distribution_version) {
     throw "[mir42-$Target-historical-fresh-target-binding]"
   }
@@ -441,9 +442,13 @@ function Invoke-MIR42ModernFreshLoad {
     'f110' { '1.1' }
     'f100' { '1.0' }
   }
-  $versionMatch = [regex]::Match($Version,('^4[.]2[.]' + [regex]::Escape($Target.Substring(1)) + '(?<source_patch>[0-9]{2})$'))
+  $versionMatch = [regex]::Match($Version,('^4[.](?<source_minor>2|3)[.]' + [regex]::Escape($Target.Substring(1)) + '(?<source_patch>[0-9]{2})$'))
+  $sourceVersion = if ($versionMatch.Success) {
+    '4.' + $versionMatch.Groups['source_minor'].Value + '.' + [string]([int]$versionMatch.Groups['source_patch'].Value)
+  } else { '' }
   if ($FactorioLine -cne $expectedLine -or -not $versionMatch.Success -or
-      $Version -cne [string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch ([int]$versionMatch.Groups['source_patch'].Value)).distribution_version -or
+      $sourceVersion -cnotin @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1') -or
+      $Version -cne [string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor ([int]$versionMatch.Groups['source_minor'].Value) -SourcePatch ([int]$versionMatch.Groups['source_patch'].Value)).distribution_version -or
       -not $FactorioBinaryVersion.StartsWith($FactorioLine + '.',[StringComparison]::Ordinal) -or
       ($Scenario -ceq 'package-zip-space-age' -and $Target -cne 'f210')) {
     throw "[mir42-$Target-$Scenario-modern-fresh-target-binding]"
