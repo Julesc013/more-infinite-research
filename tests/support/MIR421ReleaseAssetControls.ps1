@@ -25,7 +25,7 @@ function New-MIR421ReleaseAssetCustodyFixture {
   }
 }
 
-function Invoke-MIR430ReleaseUpgradeControls {
+function Invoke-MIR430FullReleaseUpgradeControls {
   param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets)
 
   # Host-only structural controls. The release reader still binds all 27
@@ -153,4 +153,103 @@ function Invoke-MIR430ReleaseUpgradeControls {
     Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $changed -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0' } $mutation.code ('a retained-state mutation: ' + $mutation.stem)
   }
   return [pscustomobject]@{path=$path;checks=$script:mir430UpgradeControlChecks;native_runs=0}
+}
+
+function Invoke-MIR430ReleaseUpgradeControls {
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets)
+
+  # Host-only structural controls for the explicit reduced Classic policy. The
+  # older full-oracle factory remains above for the opt-in Full compiler; this
+  # evidence must never present a catalogue-reduction result as full state
+  # preservation.
+  [IO.Directory]::CreateDirectory($Root)|Out-Null
+  function Write-MIR430ClassicControlJson($Path,$Value){
+    $Value|ConvertTo-Json -Depth 100|Set-Content -LiteralPath $Path -Encoding utf8
+    [ordered]@{path=$Path;sha256=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+  }
+  function Copy-MIR430ClassicControlValue($Value){$Value|ConvertTo-Json -Depth 100|ConvertFrom-Json -AsHashtable -Depth 100}
+  function Assert-MIR430ClassicControlRejected($Action,[string]$Code,[string]$Name){
+    $rejected=$false;try{&$Action}catch{$rejected=$_.Exception.Message.StartsWith($Code,[StringComparison]::Ordinal)}
+    if(-not$rejected){throw "430 Classic upgrade controls accepted $Name"};$script:mir430ClassicControlChecks++
+  }
+  function New-MIR430ClassicSnapshot($Stage,$From,$To){
+    $base=@{name='mining-productivity-4';level=4;researched=$true;enabled=$true;unit_count=100;unit_energy=30;effects=@(@{type='mining-drill-productivity-bonus';modifier=0.02});force_modifier=0.08}
+    $core=@{name='recipe-prod-research_character_crafting_speed-1';level=3;researched=$false;enabled=$true;unit_count=100;unit_energy=60;effects=@(@{type='character-crafting-speed';modifier=0.05});current_research='recipe-prod-research_character_crafting_speed-1';research_progress=0.42;queue=@('recipe-prod-research_character_crafting_speed-1');force_modifier=0.10}
+    [ordered]@{schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage=$Stage;from_version=$From;to_version=$To;
+      compiler_profile=if($Stage-ceq'source'){$false}else{'classic'};full_catalog_status=if($Stage-ceq'source'){'source-full'}else{'not-evaluated'};
+      base=$base;retained_core=$core;omitted=@{technology_id='recipe-prod-research_iron-1';source_present=$true;candidate_present=($Stage-ceq'source');consequence=if($Stage-ceq'source'){'not-yet-applied'}else{'removed-reduced-policy-no-preservation'}}}
+  }
+  $script:mir430ClassicControlChecks=0
+  $rows=@()
+  foreach($package in $PackageAssets){
+    foreach($patch in @(0,1,2)){
+      $sourceVersion='4.2.'+$patch;$directory=Join-Path $Root ($package.target+'-'+$patch);[IO.Directory]::CreateDirectory($directory)|Out-Null
+      $predecessor=Get-MIR423PublishedUpgradePredecessor -Target $package.target -PredecessorSourceVersion $sourceVersion -CandidateSourceVersion '4.3.0'
+      $from='4.2.'+$package.target.Substring(1)+$patch.ToString('00');$to=[string]$package.distribution_version
+      $classic=$package.target-cin@('f210','f200','f110','f100')
+      if($classic){
+        $snapshots=@();foreach($stage in @('source','upgrade','reload')){
+          $reference=Write-MIR430ClassicControlJson (Join-Path $directory ($stage+'.json')) (New-MIR430ClassicSnapshot $stage $from $to)
+          $snapshots+=[ordered]@{stage=$stage;path=$reference.path;sha256=$reference.sha256}
+        }
+        $receipt=[ordered]@{
+          schema=3;status='passed';factorio_processes=4;from=@{version=$from;sha256=$predecessor.target.sha256};to=@{version=$to;sha256=$package.sha256}
+          published_maintenance_predecessor=@{source_tag=$predecessor.source_tag;manifest=@{sha256=$predecessor.manifest.sha256}}
+          assertions=@('exact-candidate-normal-mod-directory-load','upgraded-save-reload-passed','upgraded-save-second-reload-passed','classic-profile-setting-verified','classic-base-research-integrity-retained','classic-retained-core-level-effect-queue-and-completed-work-retained','classic-omitted-mir-research-disposition-recorded','classic-reduced-policy-oracle-executed-upgrade-and-two-reloads')
+          upgrade_policy=@{schema=1;kind='MIR430ClassicReducedUpgradePolicyV1';compiler_profile='classic';full_catalog_status='not-evaluated';omitted_research_not_preserved=$true;fixture_scope='known-classic-core-and-omission-v1'}
+          classic_profile_setting=@{name='mir-compiler-profile';value='classic';source='candidate-runtime-snapshot'}
+          classic_omission_dispositions=@(@{technology_id='recipe-prod-research_character_crafting_speed-1';disposition='retained-existing-investment-definition-changed';consequence='classic-declared-core-definition'},@{technology_id='recipe-prod-research_iron-1';disposition='removed';consequence='removed-reduced-policy-no-preservation'})
+          resource_ledgers=@();library_activation=@{status='restored-direct-library-controls';dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0};classic_upgrade_evaluator_snapshots=$snapshots
+        }
+      }else{
+        # Historical targets retain the pre-existing exact Full policy.  This
+        # mixed matrix catches a Classic reader from accidentally relaxing a
+        # legacy target merely because the release source is 4.3.0.
+        $state=@{forces=@{player=@{technologies=@{a=@{researched=$true;level=2};b=@{researched=$false;level=1};c=@{researched=$false;level=1}};bonuses=@{plate=0.1};settings=@{kept=$true};effects=@{speed=0.1};ammo=@{bullet=0.1};gun_speed=@{};turret=@{};queue=@('b');current_research='b';research_progress=0.42}};from_version=$from;to_version=$to}
+        foreach($technology in $state.forces.player.technologies.Values){$technology.prototype=@{effects=@(@{type='mining-drill-productivity-bonus';modifier=0.02});ingredients=@(@{name='automation-science-pack';amount=1});prerequisites=@();research_unit_count=100;research_unit_energy=30;max_level=10}}
+        $snapshots=@();foreach($stage in @('source','upgrade','reload')){
+          $snapshot=Copy-MIR430ClassicControlValue $state;$snapshot.stage=$stage
+          $reference=Write-MIR430ClassicControlJson (Join-Path $directory ($stage+'.json')) $snapshot
+          $snapshots+=[ordered]@{stage=$stage;path=$reference.path;sha256=$reference.sha256}
+        }
+        $receipt=[ordered]@{
+          schema=3;status='passed';factorio_processes=4;from=@{version=$from;sha256=$predecessor.target.sha256};to=@{version=$to;sha256=$package.sha256}
+          published_maintenance_predecessor=@{source_tag=$predecessor.source_tag;manifest=@{sha256=$predecessor.manifest.sha256}}
+          assertions=@('exact-candidate-normal-mod-directory-load','upgraded-save-reload-passed','upgraded-save-second-reload-passed','all-existing-technology-state-and-definitions-retained','all-exposed-earned-effects-retained','all-supported-research-queue-retained','full-state-oracle-executed-upgrade-and-two-reloads')
+          resource_ledgers=@();library_activation=@{status='restored-direct-library-controls';dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0};full_state_evaluator_snapshots=$snapshots
+        }
+      }
+      foreach($stage in @('create','load','reload','second_reload')){
+        $log=Join-Path $directory ($stage+'.txt');$message=if($classic){if($stage-ceq'create'){'classic reduced-policy source proof complete'}elseif($stage-ceq'load'){'classic reduced-policy upgrade proof complete'}else{'classic reduced-policy reload proof complete'}}else{'complete research state retained technologies=3 recipes=1'}
+        [IO.File]::WriteAllText($log,'[mir-fixture] '+$message,[Text.UTF8Encoding]::new($false));$receipt[$stage+'_log']=Split-Path $log -Leaf;$receipt[$stage+'_log_sha256']=(Get-FileHash $log -Algorithm SHA256).Hash
+        $ledger=Join-Path $directory ($stage+'.resources.jsonl');[IO.File]::WriteAllText($ledger,'{"synthetic_host_control":true}',[Text.UTF8Encoding]::new($false));$receipt.resource_ledgers+=@{filename=(Split-Path $ledger -Leaf);sha256=(Get-FileHash $ledger -Algorithm SHA256).Hash;exit_code=0;completion_predicate_observed=$false}
+      }
+      $receiptReference=Write-MIR430ClassicControlJson (Join-Path $directory 'receipt.json') $receipt
+      $rows+=[pscustomobject]@{target=$package.target;predecessor_source_version=$sourceVersion;receipt=$receiptReference;snapshots=$snapshots}
+    }
+  }
+  $bundle=@{schema=1;kind='MIR430MaintenanceUpgradeEvidenceV1';source_version='4.3.0';rows=$rows}
+  $path=Join-Path $Root 'evidence.json';$null=Write-MIR430ClassicControlJson $path $bundle
+  $null=Assert-MIR423MaintenanceUpgradeEvidence -Path $path -PackageAssets $PackageAssets -CandidateSourceVersion '4.3.0';$script:mir430ClassicControlChecks++
+  function New-MIR430ClassicChangedRow($Row,$Stem,$Mutate){
+    $changed=Copy-MIR430ClassicControlValue $Row;$receipt=Get-Content $Row.receipt.path -Raw|ConvertFrom-Json -AsHashtable -Depth 100
+    &$Mutate $receipt $changed
+    $changed.receipt=Write-MIR430ClassicControlJson (Join-Path (Split-Path $Row.receipt.path -Parent) ($Stem+'-receipt.json')) $receipt
+    return $changed
+  }
+  Assert-MIR430ClassicControlRejected {Assert-MIR423NativeUpgradeProof -Row (New-MIR430ClassicChangedRow $rows[0] 'missing-disposition' {param($receipt,$changed) $receipt.classic_omission_dispositions=@($receipt.classic_omission_dispositions|Select-Object -First 1)}) -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0'} '[mir430-classic-upgrade-disposition-set]' 'a missing omission disposition'
+  Assert-MIR430ClassicControlRejected {Assert-MIR423NativeUpgradeProof -Row (New-MIR430ClassicChangedRow $rows[0] 'full-claim' {param($receipt,$changed) $receipt.assertions+=@('full-state-oracle-executed-upgrade-and-two-reloads')}) -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0'} '[mir430-classic-upgrade-full-preservation-claim]' 'a false full-preservation assertion'
+  Assert-MIR430ClassicControlRejected {Assert-MIR423NativeUpgradeProof -Row (New-MIR430ClassicChangedRow $rows[0] 'full-setting' {param($receipt,$changed) $receipt.classic_profile_setting.value='full'}) -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0'} '[mir430-classic-upgrade-setting]' 'a forged Full setting'
+  Assert-MIR430ClassicControlRejected {Assert-MIR423NativeUpgradeProof -Row (New-MIR430ClassicChangedRow $rows[0] 'omission-policy' {param($receipt,$changed) $receipt.upgrade_policy.omitted_research_not_preserved=$false}) -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0'} '[mir430-classic-upgrade-policy]' 'a false omission-policy acknowledgement'
+  Assert-MIR430ClassicControlRejected {Assert-MIR423NativeUpgradeProof -Row (New-MIR430ClassicChangedRow $rows[0] 'forged-full-snapshots' {param($receipt,$changed) $receipt.full_state_evaluator_snapshots=@()}) -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0'} '[mir430-classic-upgrade-full-preservation-claim]' 'a forged full-state snapshot set'
+  foreach($case in @(
+    @{stem='base';code='[mir430-classic-upgrade-base-integrity]';change={param($snapshot) $snapshot.base.force_modifier=0}},
+    @{stem='core-effect';code='[mir430-classic-upgrade-retained-core-definition]';change={param($snapshot) $snapshot.retained_core.effects[0].modifier=0.03}},
+    @{stem='omitted-present';code='[mir430-classic-upgrade-omission-state]';change={param($snapshot) $snapshot.omitted.candidate_present=$true}}
+  )){
+    $changed=Copy-MIR430ClassicControlValue $rows[0];$receipt=Get-Content $rows[0].receipt.path -Raw|ConvertFrom-Json -AsHashtable -Depth 100;$snapshot=Get-Content $changed.snapshots[1].path -Raw|ConvertFrom-Json -AsHashtable -Depth 100;&$case.change $snapshot
+    $reference=Write-MIR430ClassicControlJson (Join-Path (Split-Path $rows[0].receipt.path -Parent) ($case.stem+'-snapshot.json')) $snapshot;$changed.snapshots[1]=@{stage='upgrade';path=$reference.path;sha256=$reference.sha256};$receipt.classic_upgrade_evaluator_snapshots=$changed.snapshots;$changed.receipt=Write-MIR430ClassicControlJson (Join-Path (Split-Path $rows[0].receipt.path -Parent) ($case.stem+'-receipt.json')) $receipt
+    Assert-MIR430ClassicControlRejected {Assert-MIR423NativeUpgradeProof -Row $changed -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0'} $case.code ('a '+$case.stem+' snapshot mutation')
+  }
+  return [pscustomobject]@{path=$path;checks=$script:mir430ClassicControlChecks;native_runs=0}
 }

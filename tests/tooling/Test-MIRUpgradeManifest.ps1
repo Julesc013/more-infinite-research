@@ -19,11 +19,23 @@ if($predecessorFunctions.Count -ne 1){throw 'Published predecessor selector miss
 . ([scriptblock]::Create($predecessorFunctions[0].Extent.Text))
 $completeCatalogueAssignments=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$requiresCompleteCatalogue'},$true))
 if($completeCatalogueAssignments.Count-ne1){throw 'Complete-catalogue applicability assignment missing or ambiguous'}
+$classicPolicyAssignments=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$classicReducedPolicy'},$true))
+if($classicPolicyAssignments.Count-ne1){throw 'Classic reduced-policy applicability assignment missing or ambiguous'}
 $completeCatalogueMarkerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR42CompleteCatalogueUpgradeMarker'},$true))
 if($completeCatalogueMarkerCalls.Count-ne3){throw 'Complete-catalogue marker must be enforced for upgrade and both reloads'}
+$classicMarkerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR430ClassicUpgradeMarker'},$true))
+if($classicMarkerCalls.Count-ne4){throw 'Classic reduced-policy marker must be enforced for source, upgrade, and both reloads'}
 $snapshotRetainerFunctions=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Copy-MIRCompleteCatalogueSnapshotEvidence'},$true))
 if($snapshotRetainerFunctions.Count-ne1){throw 'Complete-catalogue snapshot retainer missing or ambiguous'}
+$classicHelper=Join-Path $RepoRoot 'tests/support/MIR430ClassicUpgrade.ps1'
+if(-not(Test-Path -LiteralPath $classicHelper -PathType Leaf)){throw 'Classic reduced-policy upgrade helper missing'}
+. $classicHelper
+$classicTemplate=Get-MIR430ClassicUpgradeFixtureControl -FromVersion '4.2.10002' -ToVersion '4.3.10000'
+foreach($needle in @('local state_root = storage or global','game.write_file','game.table_to_json','state_root.mir430_classic_upgrade','recipe-prod-research_character_crafting_speed-1','recipe-prod-research_iron-1')){
+  if(-not$classicTemplate.Contains($needle)){throw "Classic upgrade fixture lost target-local compatibility support: $needle"}
+}
 $completeCatalogueEvaluator=[scriptblock]::Create($completeCatalogueAssignments[0].Right.Extent.Text)
+$classicReducedPolicy=$false
 $testRoot=Join-Path $RepoRoot ('build/handoff/mir421-upgrade-manifest/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $testRoot|Out-Null
 $manifestPath=$SelectedManifestPath
@@ -368,10 +380,103 @@ $f200BobAngelAssertions++
   if(-not$rejected){throw 'Complete-catalogue snapshot retainer accepted the wrong live stage'}
 } $snapshotRetainerFunctions[0].Extent.Text $testRoot
 $f200BobAngelAssertions+=3
+& {
+  param([string]$Root)
+  $userdata=Join-Path $Root 'classic-state-userdata'
+  $output=Join-Path $Root 'classic-state-output'
+  $live=Join-Path $userdata 'script-output/mir-upgrade-classic-state-reload.json'
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $live))|Out-Null
+  [IO.Directory]::CreateDirectory($output)|Out-Null
+  @{schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage='reload';from_version='4.2.20002';to_version='4.3.20000';sequence='first'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $first=Copy-MIR430ClassicUpgradeSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-1 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.3.20000' -ArtifactSlug 'f200-classic' -FromVersion '4.2.20002'
+  @{schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage='reload';from_version='4.2.20002';to_version='4.3.20000';sequence='second'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $second=Copy-MIR430ClassicUpgradeSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-2 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.3.20000' -ArtifactSlug 'f200-classic' -FromVersion '4.2.20002'
+  if($first.stage-cne'reload-1'-or$second.stage-cne'reload-2'-or$first.sha256-ceq$second.sha256-or-not(Test-Path -LiteralPath $first.path)-or-not(Test-Path -LiteralPath $second.path)){throw 'Classic reload snapshots were not retained independently'}
+  @{schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage='upgrade';from_version='4.2.20002';to_version='4.3.20000'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $rejected=$false;try{Copy-MIR430ClassicUpgradeSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-2 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.3.20000' -ArtifactSlug 'f200-classic' -FromVersion '4.2.20002'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir430-classic-upgrade-snapshot-identity]'}
+  if(-not$rejected){throw 'Classic snapshot retainer accepted the wrong live stage'}
+} $testRoot
+$mir43ClassicSnapshotAssertions=3
+# These controls are deliberately synthetic host-only records. They prove the
+# Classic receipt validator rejects corrupted candidate-bound snapshot content;
+# they do not claim a Factorio upgrade or an exhaustive saved-catalogue pass.
+$classicDispositionAssertions=& {
+  function Copy-MIR430ClassicSyntheticValue($Value){
+    return ($Value|ConvertTo-Json -Depth 100|ConvertFrom-Json -AsHashtable -Depth 100)
+  }
+  $directIds=@(
+    'recipe-prod-research_inventory_capacity-1',
+    'recipe-prod-research_character_crafting_speed-1',
+    'recipe-prod-research_character_mining_speed-1',
+    'recipe-prod-research_character_reach-1',
+    'recipe-prod-research_character_walking_speed-1'
+  )
+  $directEffects=@{
+    'recipe-prod-research_inventory_capacity-1'=@(@{type='character-inventory-slots-bonus';modifier=1},@{type='character-logistic-trash-slots';modifier=1})
+    'recipe-prod-research_character_crafting_speed-1'=@(@{type='character-crafting-speed';modifier=0.05})
+    'recipe-prod-research_character_mining_speed-1'=@(@{type='character-mining-speed';modifier=0.05})
+    'recipe-prod-research_character_reach-1'=@(@{type='character-reach-distance';modifier=10},@{type='character-build-distance';modifier=10},@{type='character-resource-reach-distance';modifier=10},@{type='character-item-drop-distance';modifier=10})
+    'recipe-prod-research_character_walking_speed-1'=@(@{type='character-running-speed';modifier=0.05})
+  }
+  $rows=@(foreach($id in $directIds){
+    [ordered]@{name=$id;level=3;researched=$false;enabled=$true;unit_count=8000;unit_energy=60;
+      unit_ingredients=@(@{name='utility-science-pack';amount=1});prerequisites=@('utility-science-pack');
+      effects=$directEffects[$id];hidden=$false;max_level='infinite'}
+  })
+  function New-MIR430ClassicSyntheticSnapshot([string]$Stage){
+    return [ordered]@{
+      schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage=$Stage
+      mir_prefix_technologies=$rows;declared_direct_ids=$directIds
+      declared_direct_technologies=(Copy-MIR430ClassicSyntheticValue $rows)
+      base=@{name='mining-productivity-4';level=4;researched=$true;enabled=$true}
+      base_force_effects=@{mining_drill_productivity_bonus=0.4}
+      native_technologies=@(@{name='braking-force-1';level=1;researched=$true;enabled=$true})
+      native_force_effects=@{train_braking_force_bonus=0.1;laboratory_speed_modifier=0.1;worker_robots_storage_bonus=1;inserter_stack_size_bonus=1}
+      native_gun_speed_modifiers=@{bullet=0.1;laser=0.2}
+      declared_direct_force_effects=@{character_inventory_slots_bonus=1;character_trash_slot_count=1;manual_crafting_speed_modifier=0.05;manual_mining_speed_modifier=0.05;character_reach_distance_bonus=10;character_build_distance_bonus=10;character_resource_reach_distance_bonus=10;character_item_drop_distance_bonus=10;character_running_speed_modifier=0.05}
+      current_research='recipe-prod-research_character_crafting_speed-1';research_progress=0.42;research_queue=$directIds
+    }
+  }
+  function Assert-MIR430ClassicSyntheticReject($Action,[string]$Expected){
+    $rejected=$false
+    try{& $Action}catch{$rejected=$_.Exception.Message.StartsWith($Expected)}
+    if(-not$rejected){throw "Classic synthetic snapshot corruption did not reject $Expected"}
+  }
+  $source=New-MIR430ClassicSyntheticSnapshot source
+  $candidate=Copy-MIR430ClassicSyntheticValue $source
+  $candidate.stage='reload'
+  $positive=Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $candidate
+  if($positive.source_mir_prefix_count-ne5-or$positive.candidate_mir_prefix_count-ne5-or$positive.dispositions.Count-ne5){throw 'Classic synthetic snapshot did not retain five declared rows'}
+  $assertions=1
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate;$bad.research_queue=@($directIds[0])
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-current-queue-state]';$assertions++
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate;$bad.research_progress=0.41
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-current-work-state]';$assertions++
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate;$bad.native_gun_speed_modifiers.bullet=0.3
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-base-native-state]';$assertions++
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate
+    $bad.mir_prefix_technologies+=,[ordered]@{name='recipe-prod-research_unexpected-1';level=1;researched=$false;enabled=$true;unit_count=1;unit_energy=1;unit_ingredients=@();prerequisites=@();effects=@();hidden=$false;max_level='infinite'}
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-undeclared-candidate-prefix]';$assertions++
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate
+    $bad.declared_direct_technologies=@($bad.declared_direct_technologies|Select-Object -First 4)
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-declared-direct-catalog]';$assertions++
+  $assertions
+}
+$mir43ClassicSnapshotAssertions+=[int]$classicDispositionAssertions
 foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
   $isHistorical=$target-cin@('f017','f016','f015','f014','f013')
   foreach($patch in @(0,1,2)){
-    $SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false
+    $SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false
     $mir42UpgradeSpecialized=-not$isHistorical;$isHistoricalTerminalFixture=$isHistorical
     $Archetype=if($target-ceq'f210'){'space-age-native-owner'}elseif(-not$isHistorical){'base-default'}else{''}
     $requiresCompleteCatalogue=& $completeCatalogueEvaluator
@@ -380,12 +485,12 @@ foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f0
   }
 }
 foreach($excluded in @('SpaceIsFake','k2Scenario','Archetype','SourceVersion')){
-  $SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='base-default'
+  $SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='base-default'
   switch($excluded){'SpaceIsFake'{$SpaceIsFake=$true};'k2Scenario'{$k2Scenario=$true};'Archetype'{$Archetype='unsupported'};'SourceVersion'{$SourceVersion='4.2.1'}}
   if(& $completeCatalogueEvaluator){throw "Complete-catalogue gate accepted excluded $excluded scenario"}
   $currentAssertions++
 }
-$SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='f200-bob-angel'
+$SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='f200-bob-angel'
 if(-not(& $completeCatalogueEvaluator)){throw 'Bob/Angel complete-catalogue gate is absent'}
 $f200BobAngelAssertions++
 foreach($target in @('f110','f100')){
@@ -673,6 +778,22 @@ foreach($sourceVersion in @('4.3.0','4.3.1')){
 }
 # Fixture versions must distinguish every 4.2 predecessor and destination
 # patch, without modifying the checked-in templates.
+# Classic deliberately records a bounded retained-core/omission proof instead
+# of claiming complete 4.2 catalogue preservation.  The Full opt-in retains
+# the existing complete catalogue gate under otherwise identical inputs.
+foreach($target in @('f210','f200','f110','f100')){
+  $code=$target.Substring(1)
+  foreach($patch in @(0,1,2)){
+    $SourceVersion='4.3.0';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$true
+    $mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='base-default'
+    if(& $completeCatalogueEvaluator){throw "Classic 4.3.0 incorrectly requires complete-catalogue proof for $target predecessor $patch"}
+    Assert-MIR430ClassicUpgradeMode -Target $target -SourceVersion $SourceVersion -FromVersion ('4.2.'+$code+$patch.ToString('00')) -ToVersion ('4.3.'+$code+'00') -FixtureName ('assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00') -Archetype $Archetype
+    $mir43Assertions+=2
+  }
+}
+$SourceVersion='4.3.0';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='base-default'
+if(-not(& $completeCatalogueEvaluator)){throw 'Full 4.3.0 opt-in lost complete-catalogue gate'}
+$mir43Assertions++
 $mir43FixtureRoot=Join-Path $RepoRoot ('build/tmp/mir43-upgrade-fixture-identities-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $mir43FixtureRoot|Out-Null
 foreach($sourceVersion in @('4.3.0','4.3.1')){
@@ -722,9 +843,9 @@ $matrixTokens=$null;$matrixErrors=$null
 $matrixAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgradeMatrix.ps1'),[ref]$matrixTokens,[ref]$matrixErrors)
 if($matrixErrors.Count){throw 'Upgrade matrix syntax error'}
 $matrixText=$matrixAst.Extent.Text
-foreach($needle in @('$SourceMaterializationPath','$SelectedTarget','$SourceVersion','$PublishedMaintenancePredecessorManifestPath','$arguments.SourceMaterializationPath=$SourceMaterializationPath','$arguments.SelectedTarget=$SelectedTarget','$arguments.SourceVersion=$SourceVersion','$arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath','($currentDestination -or $FixtureName')){
+foreach($needle in @('$SourceMaterializationPath','$SelectedTarget','$SourceVersion','$UpgradePolicy','$PublishedMaintenancePredecessorManifestPath','$arguments.SourceMaterializationPath=$SourceMaterializationPath','$arguments.SelectedTarget=$SelectedTarget','$arguments.SourceVersion=$SourceVersion','$arguments.UpgradePolicy=$UpgradePolicy','$arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath','($currentDestination -or $FixtureName')){
   if(-not$matrixText.Contains($needle)){throw "4.3 upgrade matrix lost current destination control: $needle"}
   $mir43Assertions++
 }
 
-[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;mir43_classic_snapshot_assertions=$mir43ClassicSnapshotAssertions;mir43_classic_snapshot_control_kind='synthetic-host-only-classic-disposition-controls-v1';mir43_classic_snapshot_native_engine_launched=$false;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

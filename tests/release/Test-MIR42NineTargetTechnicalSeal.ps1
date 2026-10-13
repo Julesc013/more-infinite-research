@@ -1,6 +1,9 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 [CmdletBinding()]
-param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
+param(
+  [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
+  [switch]$OnlyClassicSealSnapshotProjection
+)
 
 Set-StrictMode -Version Latest
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -78,7 +81,9 @@ function Test-MIR42ConsumedEngineRunReferences {
   Write-Output ('MIR42-ENGINE-REFERENCE-CONTRACT-PASSED assertions=' + $assertions + ' native-records=0 engines=0')
 }
 
-Test-MIR42ConsumedEngineRunReferences -RepoRoot $repo
+if (-not $OnlyClassicSealSnapshotProjection) {
+  Test-MIR42ConsumedEngineRunReferences -RepoRoot $repo
+}
 
 function Test-MIR42MaintenanceSealConsumption {
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -139,7 +144,9 @@ function Test-MIR42MaintenanceSealConsumption {
   Write-Output 'MIR42-MAINTENANCE-SEAL-CONSUMPTION-PASSED propagation_checks=4 custody_expression_checks=6 seals=0 engines=0 signatures=0 remote_mutations=0'
 }
 
-Test-MIR42MaintenanceSealConsumption -RepoRoot $repo
+if (-not $OnlyClassicSealSnapshotProjection) {
+  Test-MIR42MaintenanceSealConsumption -RepoRoot $repo
+}
 
 function Get-MIR42NineSealCommittedHistoricalFixture {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Target)
@@ -239,7 +246,9 @@ function Test-MIR42NineCriterionEvidenceReader {
   Assert-MIR42NineSealTest -Condition $rejected -Code 'criterion-reader-unrecognized-rejected'
 }
 
-Test-MIR42NineCriterionEvidenceReader -RepoRoot $repo
+if (-not $OnlyClassicSealSnapshotProjection) {
+  Test-MIR42NineCriterionEvidenceReader -RepoRoot $repo
+}
 
 Assert-MIR42SealCandidateScopeMatch -Rows @($nine.targets) -Candidate $nine -Code 'mir42-nine-seal-match'
 $rejected = $false
@@ -731,6 +740,124 @@ function Test-MIR42IndividualNativeInputReader {
   Write-Output ('MIR42-INDIVIDUAL-NATIVE-INPUT-READER-PASSED assertions=' + $checks + ' native-records=0 engines=0')
 }
 
-Test-MIR42IndividualNativeInputReader -RepoRoot $repo
+function Test-MIR430ClassicSnapshotProjection {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $ErrorActionPreference = 'Stop'
+  . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1')
+  . (Join-Path $RepoRoot 'tests/support/MIR421ReleaseAssetControls.ps1')
+  $root = Join-Path $RepoRoot ('build/test-results/mir430-classic-seal-projection-' + [guid]::NewGuid().ToString('N'))
+  [IO.Directory]::CreateDirectory($root) | Out-Null
+  $checks = 0
+  $contractReader = (Get-Command Get-MIR42IndividualEngineEvidenceBindingContract -CommandType Function -ErrorAction Stop).ScriptBlock
+  $nativeSelectionReader = (Get-Command Assert-MIR42IndividualNativeCandidateSelection -CommandType Function -ErrorAction Stop).ScriptBlock
+  $ledgerReader = (Get-Command Assert-MIR42IndividualResourceLedgers -CommandType Function -ErrorAction Stop).ScriptBlock
+  function Write-ClassicSealJson([string]$Path,$Value) {
+    $Value | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $Path -Encoding utf8NoBOM
+    return [pscustomobject]@{path=$Path;sha256=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+  }
+  function Copy-ClassicSealValue($Value) { $Value | ConvertTo-Json -Depth 100 | ConvertFrom-Json -AsHashtable -Depth 100 }
+  function New-ClassicSealReceiptRow($Row,[string]$Commit,[string]$EngineHash,[string]$EngineVersion,$Published) {
+    $record = Get-Content -LiteralPath $Row.receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+    $record.git_commit = $Commit
+    $record.factorio_binary_sha256 = $EngineHash
+    $record.factorio_binary_version = $EngineVersion
+    $record.published_maintenance_predecessor = [ordered]@{
+      release_id=[int64]$Published.release_id;source_tag=[string]$Published.source_tag;source=$Published.source
+      tag_object=[string]$Published.tag_object;remote_tag_readback=[bool]$Published.remote_tag_readback;manifest=$Published.manifest
+      signed=[bool]$Published.signed;targets=@($Published.targets);native_qualification=[string]$Published.native_qualification
+      release_qualification=[string]$Published.release_qualification;local_custody_scope='selected-native-archive'
+    }
+    $reference = Write-ClassicSealJson (Join-Path (Split-Path -Parent $Row.receipt.path) ('seal-' + [guid]::NewGuid().ToString('N') + '.json')) $record
+    return [pscustomobject]@{row=[pscustomobject]@{target=$Row.target;predecessor_source_version=$Row.predecessor_source_version;receipt=$reference;snapshots=$Row.snapshots};receipt=$record}
+  }
+  try {
+    Set-Item -LiteralPath Function:script:Get-MIR42IndividualEngineEvidenceBindingContract -Value {
+      param($Candidate,[switch]$PublishedMaintenance)
+      if (-not $PublishedMaintenance) { throw '[mir42-individual-engine-run-maintenance-required]' }
+      return [pscustomobject]@{maintenance_source_version='4.3.0'}
+    }
+    # The native archive and process-ledger checks have dedicated controls. This
+    # fixture isolates the seal's field projection while retaining the actual
+    # policy reader, immutable snapshot references, and phase-log checks.
+    Set-Item -LiteralPath Function:script:Assert-MIR42IndividualNativeCandidateSelection -Value {
+      param($Receipt,$ReceiptPath,$CandidateTarget)
+      return [pscustomobject]@{path='host-only';sha256=[string]$CandidateTarget.archive_sha256;bytes=1;identity='host-only'}
+    }
+    Set-Item -LiteralPath Function:script:Assert-MIR42IndividualResourceLedgers -Value { param($Receipt,$ReceiptPath) }
+    $packages = @(
+      foreach ($target in $script:MIR42SealNineTargetCandidates) {
+        [pscustomobject]@{target=$target;distribution_version=('4.3.' + $target.Substring(1) + '00');sha256=('A' * 64);archive_sha256=('A' * 64)}
+      }
+    )
+    $control = Invoke-MIR430ReleaseUpgradeControls -Root (Join-Path $root 'controls') -PackageAssets $packages
+    Assert-MIR42NineSealTest -Condition ([int]$control.checks -gt 0 -and [int]$control.native_runs -eq 0) -Code 'classic-seal-control-fixture-host-only'
+    $enginePath = (Get-Command pwsh -ErrorAction Stop).Source
+    $engineHash = (Get-FileHash -LiteralPath $enginePath -Algorithm SHA256).Hash
+    $engineVersion = [string](Get-Item -LiteralPath $enginePath).VersionInfo.FileVersion
+    $commit = 'A' * 40
+    $candidate = [pscustomobject]@{source=[pscustomobject]@{commit=$commit}}
 
-Write-Output 'MIR42-NINE-TARGET-TECHNICAL-SEAL-PASSED scopes=4,9 historical=5 engines=0'
+    foreach ($case in @(
+      @{target='f210';policy='classic';snapshot_field='classic_upgrade_evaluator_snapshots'},
+      @{target='f017';policy='full';snapshot_field='full_state_evaluator_snapshots'}
+    )) {
+      $original = @((Get-Content -LiteralPath $control.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100).rows | Where-Object {
+        [string]$_.target -ceq $case.target -and [string]$_.predecessor_source_version -ceq '4.2.2'
+      })
+      Assert-MIR42NineSealTest -Condition ($original.Count -eq 1) -Code ('classic-seal-row-' + $case.target)
+      $proof = Get-Content -LiteralPath $original[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $publishedInput = [pscustomobject]@{target=$case.target;path='host-only-predecessor.zip';sha256=[string]$proof.from.sha256;version=[string]$proof.from.version}
+      $published = [pscustomobject]@{
+        release_id=1;source_tag=[string]$proof.published_maintenance_predecessor.source_tag;source=[pscustomobject]@{commit=('D' * 40);tree=('E' * 40)}
+        tag_object=('9' * 40);remote_tag_readback=$true;manifest=[pscustomobject]@{path='host-only-manifest.json';sha256=[string]$proof.published_maintenance_predecessor.manifest.sha256;bytes=1}
+        signed=$false;targets=@($publishedInput);native_qualification='not-performed';release_qualification='not-performed'
+      }
+      $sealed = New-ClassicSealReceiptRow -Row $original[0] -Commit $commit -EngineHash $engineHash -EngineVersion $engineVersion -Published $published
+      $candidateTarget = @($packages | Where-Object { [string]$_.target -ceq $case.target })[0]
+      $result = Assert-MIR42IndividualUpgradeReceipt -ReceiptReference $sealed.row.receipt -CandidateTarget $candidateTarget -PublishedInput $publishedInput -PublishedMaintenanceInputs $published -Engine ([pscustomobject]@{path=$enginePath;sha256=$engineHash;version=$engineVersion}) -HarnessExitCode 0 -Candidate $candidate
+      Assert-MIR42NineSealTest -Condition ($result.execution.predecessor_upgrade -and $result.execution.reload_count -eq 2) -Code ('classic-seal-projection-' + $case.policy)
+      $checks++
+    }
+
+    $classicRow = @((Get-Content -LiteralPath $control.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100).rows | Where-Object {
+      [string]$_.target -ceq 'f210' -and [string]$_.predecessor_source_version -ceq '4.2.2'
+    })[0]
+    $classicProof = Get-Content -LiteralPath $classicRow.receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+    $classicInput = [pscustomobject]@{target='f210';path='host-only-predecessor.zip';sha256=[string]$classicProof.from.sha256;version=[string]$classicProof.from.version}
+    $classicPublished = [pscustomobject]@{release_id=1;source_tag=[string]$classicProof.published_maintenance_predecessor.source_tag;source=[pscustomobject]@{commit=('D'*40);tree=('E'*40)};tag_object=('9'*40);remote_tag_readback=$true;manifest=[pscustomobject]@{path='host-only-manifest.json';sha256=[string]$classicProof.published_maintenance_predecessor.manifest.sha256;bytes=1};signed=$false;targets=@($classicInput);native_qualification='not-performed';release_qualification='not-performed'}
+    $forged = New-ClassicSealReceiptRow -Row $classicRow -Commit $commit -EngineHash $engineHash -EngineVersion $engineVersion -Published $classicPublished
+    $forgedRecord = Copy-ClassicSealValue $forged.receipt
+    $forgedRecord.upgrade_policy.kind = 'forged-classic-policy'
+    $forgedReference = Write-ClassicSealJson (Join-Path (Split-Path -Parent $forged.row.receipt.path) 'forged-policy.json') $forgedRecord
+    $forged.row.receipt = $forgedReference
+    $failure = ''
+    try {
+      $null = Assert-MIR42IndividualUpgradeReceipt -ReceiptReference $forged.row.receipt -CandidateTarget (@($packages | Where-Object { $_.target -ceq 'f210' })[0]) -PublishedInput $classicInput -PublishedMaintenanceInputs $classicPublished -Engine ([pscustomobject]@{path=$enginePath;sha256=$engineHash;version=$engineVersion}) -HarnessExitCode 0 -Candidate $candidate
+    } catch { $failure = $_.Exception.Message }
+    Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir430-upgrade-full-state-phase-skipped]',[StringComparison]::Ordinal)) -Code 'classic-seal-forged-policy-does-not-project-classic-snapshots'
+    $checks++
+  } finally {
+    Set-Item -LiteralPath Function:script:Get-MIR42IndividualEngineEvidenceBindingContract -Value $contractReader
+    Set-Item -LiteralPath Function:script:Assert-MIR42IndividualNativeCandidateSelection -Value $nativeSelectionReader
+    Set-Item -LiteralPath Function:script:Assert-MIR42IndividualResourceLedgers -Value $ledgerReader
+    $buildRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build')).TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar
+    $resolvedRoot = [IO.Path]::GetFullPath($root).TrimEnd('\','/')
+    if (-not (($resolvedRoot + [IO.Path]::DirectorySeparatorChar).StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)) -or
+        [IO.Path]::GetFileName($resolvedRoot) -notlike 'mir430-classic-seal-projection-*') {
+      throw '[mir430-classic-seal-fixture-containment]'
+    }
+    if (Test-Path -LiteralPath $resolvedRoot) { Remove-Item -LiteralPath $resolvedRoot -Recurse -Force }
+  }
+  Write-Output ('MIR430-CLASSIC-SEAL-SNAPSHOT-PROJECTION-PASSED assertions=' + $checks + ' native-records=0')
+}
+
+if (-not $OnlyClassicSealSnapshotProjection) {
+  Test-MIR42IndividualNativeInputReader -RepoRoot $repo
+}
+Test-MIR430ClassicSnapshotProjection -RepoRoot $repo
+
+if ($OnlyClassicSealSnapshotProjection) {
+  Write-Output 'MIR430-CLASSIC-TECHNICAL-SEAL-PROJECTION-PASSED engines=0'
+} else {
+  Write-Output 'MIR42-NINE-TARGET-TECHNICAL-SEAL-PASSED scopes=4,9 historical=5 engines=0'
+}

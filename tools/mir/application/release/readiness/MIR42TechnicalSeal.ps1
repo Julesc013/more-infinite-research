@@ -1592,9 +1592,17 @@ function Assert-MIR42IndividualUpgradeReceipt {
       $productVersion -cne $engineProductVersion -or $receiptProductVersion -cne $productVersion) {
     throw '[mir42-individual-engine-run-engine-version]'
   }
-  # Let the native-proof reader retain ownership of the public missing-snapshot
-  # diagnostic.  Avoid strict-mode projection before that proof runs.
-  $snapshots = if ($receipt.Contains('full_state_evaluator_snapshots')) { @($receipt.full_state_evaluator_snapshots) } else { @() }
+  $candidateSourceVersion = (Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance).maintenance_source_version
+  # The reduced 4.3.0 Classic proof deliberately carries its bounded snapshots
+  # under a different field.  Keep the strict/historical projection on the
+  # full-state field: the native-proof reader owns all policy and missing-field
+  # diagnostics after this exact candidate/policy selection.
+  $classicReducedPolicy = $candidateSourceVersion -ceq '4.3.0' -and
+    $receipt.Contains('upgrade_policy') -and
+    $receipt.upgrade_policy -is [Collections.IDictionary] -and
+    [string]$receipt.upgrade_policy.kind -ceq 'MIR430ClassicReducedUpgradePolicyV1'
+  $snapshotField = if ($classicReducedPolicy) { 'classic_upgrade_evaluator_snapshots' } else { 'full_state_evaluator_snapshots' }
+  $snapshots = if ($receipt.Contains($snapshotField)) { @($receipt[$snapshotField]) } else { @() }
   $upgradeRow = [pscustomobject]@{
     target = [string]$CandidateTarget.target
     predecessor_source_version = '4.2.2'
@@ -1602,7 +1610,6 @@ function Assert-MIR42IndividualUpgradeReceipt {
     snapshots = @($snapshots | ForEach-Object { [pscustomobject]@{stage=[string]$_.stage;path=[string]$_.path;sha256=[string]$_.sha256} })
   }
   $package = [pscustomobject]@{target=[string]$CandidateTarget.target;sha256=[string]$CandidateTarget.archive_sha256}
-  $candidateSourceVersion = (Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance).maintenance_source_version
   $null = Assert-MIR423NativeUpgradeProof -Row $upgradeRow -Package $package -CandidateSourceVersion $candidateSourceVersion
   $selectedCustody = [ordered]@{
     release_id = [int64]$PublishedMaintenanceInputs.release_id

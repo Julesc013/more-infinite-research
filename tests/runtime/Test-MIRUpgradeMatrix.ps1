@@ -9,6 +9,7 @@ param(
   [string]$SourceMaterializationPath = '',
   [string]$SelectedTarget = '',
   [ValidateSet('','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '',
+  [ValidateSet('Full','Classic')][string]$UpgradePolicy = 'Full',
   [string]$PublishedMaintenancePredecessorManifestPath = '',
   [string]$FixtureName = "assert-upgrade-3-2-3-to-3-2-5",
   [string]$OutputPath = "build/results/assurance/3.2.5-upgrade-proof.json",
@@ -36,6 +37,9 @@ if($currentDestination-and([string]::IsNullOrWhiteSpace($SelectedTarget)-or[stri
 }
 if(-not$currentDestination-and($SelectedTarget-or$SourceVersion-or$PublishedMaintenancePredecessorManifestPath)){
   throw '[mir-upgrade-matrix-current-inputs] Current-source matrix controls require a materialization receipt.'
+}
+if($UpgradePolicy -ceq 'Classic' -and (-not $currentDestination -or $SourceVersion -cne '4.3.0' -or $SelectedTarget -cnotin @('f210','f200','f110','f100'))){
+  throw '[mir430-classic-upgrade-matrix-mode] Classic reduced-policy rows require an exact modern 4.3.0 current-source destination.'
 }
 $output = if ([IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
 $outputParent = Split-Path -Parent $output
@@ -98,6 +102,7 @@ foreach ($case in $cases) {
     $arguments.SourceMaterializationPath=$SourceMaterializationPath
     $arguments.SelectedTarget=$SelectedTarget
     $arguments.SourceVersion=$SourceVersion
+    $arguments.UpgradePolicy=$UpgradePolicy
     $arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath
   }
   & $runner @arguments
@@ -111,6 +116,14 @@ foreach ($case in $cases) {
   $assertions = @($result.assertions | ForEach-Object { [string]$_ } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
   if ($assertions.Count -eq 0) {
     throw "Upgrade matrix row published no named assertions: $($case.id)"
+  }
+  if($UpgradePolicy-ceq'Classic'){
+    foreach($required in @('classic-profile-setting-verified','classic-base-research-integrity-retained','classic-retained-core-level-effect-queue-and-completed-work-retained','classic-omitted-mir-research-disposition-recorded','classic-reduced-policy-oracle-executed-upgrade-and-two-reloads')){
+      if($required-cnotin$assertions){throw "Classic upgrade matrix row omitted required reduced-policy assertion: $($case.id)/$required"}
+    }
+    if(@($assertions|Where-Object {$_-cin@('all-existing-technology-state-and-definitions-retained','all-exposed-earned-effects-retained','all-supported-research-queue-retained','full-state-oracle-executed-upgrade-and-two-reloads')}).Count){
+      throw "Classic upgrade matrix row incorrectly claims full preservation: $($case.id)"
+    }
   }
   if (($currentDestination -or $FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10", "assert-upgrade-3-2-11-to-4-0-21000", "assert-upgrade-4-0-21000-to-4-1-21000") + $privateLocalPlaytestFixtures)) -and
       ("upgraded-save-reload-passed" -notin $assertions -or
@@ -136,6 +149,7 @@ foreach ($case in $cases) {
     expanded_root_disposition = [string]$cleanup.status
     expanded_root_bytes = [int64]$cleanup.bytes
     assertions = $assertions
+    upgrade_policy = $UpgradePolicy
   }
 }
 
@@ -168,6 +182,7 @@ $factorioVersion = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
     materialization = if($currentDestination){$SourceMaterializationPath}else{''}
   }
   required_archetypes = @($cases | ForEach-Object { [string]$_.id })
+  upgrade_policy = $UpgradePolicy
   retention = $Retention
   expanded_roots_removed = @($rows | Where-Object expanded_root_disposition -eq 'removed').Count
   expanded_roots_retained = @($rows | Where-Object expanded_root_disposition -eq 'retained').Count

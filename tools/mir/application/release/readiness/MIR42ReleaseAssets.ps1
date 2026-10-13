@@ -222,6 +222,96 @@ function Get-MIR423PublishedUpgradePredecessor {
   return [pscustomobject]@{source_patch=$sourcePatch;source_tag=(Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contractVersion).source_tag;manifest=$pin;target=$published[0]}
 }
 
+function Assert-MIR430ClassicSavedState {
+  param([Collections.IDictionary]$Source,[Collections.IDictionary]$After)
+  foreach($state in @($Source,$After)){
+    if($state.schema-ne1-or$state.kind-cne'MIR430ClassicUpgradeSnapshotV1'-or
+        $state.base-isnot[Collections.IDictionary]-or$state.retained_core-isnot[Collections.IDictionary]-or
+        $state.omitted-isnot[Collections.IDictionary]){throw '[mir430-classic-upgrade-snapshot-shape]'}
+  }
+  if($After.compiler_profile-cne'classic'-or$After.full_catalog_status-cne'not-evaluated'){
+    throw '[mir430-classic-upgrade-profile]'
+  }
+  if($Source.full_catalog_status-cne'source-full') { throw '[mir430-classic-upgrade-source-scope]' }
+  if($Source.base.name-cne'mining-productivity-4'-or$After.base.name-cne'mining-productivity-4'-or
+      -not(Test-MIR422SavedScalarEqual $Source.base $After.base)){
+    throw '[mir430-classic-upgrade-base-integrity]'
+  }
+  # PowerShell variables are case-insensitive: do not shadow the $After
+  # snapshot parameter with a lower-case core record.
+  $before=$Source.retained_core;$afterCore=$After.retained_core
+  if($before.name-cne'recipe-prod-research_character_crafting_speed-1'-or
+      $afterCore.name-cne$before.name-or$afterCore.current_research-cne$afterCore.name-or
+      $afterCore.level-ne$before.level-or$afterCore.researched-ne$before.researched-or
+      $afterCore.unit_count-isnot[ValueType]-or[double]$afterCore.unit_count-le0-or
+      $before.unit_count-isnot[ValueType]-or[double]$before.unit_count-le0){
+    throw '[mir430-classic-upgrade-retained-core-state]'
+  }
+  $expected=[Math]::Max(0.0,[Math]::Min(1.0,([double]$before.research_progress)*([double]$before.unit_count)/([double]$afterCore.unit_count)))
+  if([Math]::Abs(([double]$afterCore.research_progress)-$expected)-gt0.000001-or
+      -not(Test-MIR422SavedScalarEqual $before.queue $afterCore.queue)-or
+      -not(Test-MIR422SavedScalarEqual $before.force_modifier $afterCore.force_modifier)){
+    throw '[mir430-classic-upgrade-retained-core-progress]'
+  }
+  if($afterCore.effects-isnot[array]-or$afterCore.effects.Count-ne1-or$afterCore.effects[0]-isnot[Collections.IDictionary]-or
+      $afterCore.effects[0].type-cne'character-crafting-speed'-or[double]$afterCore.effects[0].modifier-ne0.05-or
+      $afterCore.effects[0].Contains('ammo_category')){
+    throw '[mir430-classic-upgrade-retained-core-definition]'
+  }
+  # Use exact JSON keys at this receipt boundary.  The evidence can be read
+  # into an OrderedHashtable, whose adapted member lookup is not the contract.
+  $sourceOmitted=$Source['omitted'];$afterOmitted=$After['omitted']
+  if($sourceOmitted.technology_id-cne'recipe-prod-research_iron-1'-or$afterOmitted.technology_id-cne$sourceOmitted.technology_id-or
+      $sourceOmitted.source_present-ne$true-or$sourceOmitted.candidate_present-ne$true-or
+      $afterOmitted.source_present-ne$true-or$afterOmitted.candidate_present-ne$false-or
+      $afterOmitted.consequence-cne'removed-reduced-policy-no-preservation'){
+    throw '[mir430-classic-upgrade-omission-state]'
+  }
+}
+
+function Assert-MIR430ClassicNativeUpgradeProof {
+  param($Record,[Collections.IDictionary]$States)
+  $policy=$Record.upgrade_policy
+  if($policy-isnot[Collections.IDictionary]-or$policy.schema-ne1-or
+      $policy.kind-cne'MIR430ClassicReducedUpgradePolicyV1'-or$policy.compiler_profile-cne'classic'-or
+      $policy.full_catalog_status-cne'not-evaluated'-or$policy.omitted_research_not_preserved-ne$true-or
+      $policy.fixture_scope-cne'known-classic-core-and-omission-v1'){
+    throw '[mir430-classic-upgrade-policy]'
+  }
+  if($Record.Contains('full_state_evaluator_snapshots')-or
+      @($Record.assertions|Where-Object {$_-cin@('all-existing-technology-state-and-definitions-retained','all-exposed-earned-effects-retained','all-supported-research-queue-retained','full-state-oracle-executed-upgrade-and-two-reloads')}).Count){
+    throw '[mir430-classic-upgrade-full-preservation-claim]'
+  }
+  foreach($assertion in @('classic-profile-setting-verified','classic-base-research-integrity-retained',
+      'classic-retained-core-level-effect-queue-and-completed-work-retained',
+      'classic-omitted-mir-research-disposition-recorded',
+      'classic-reduced-policy-oracle-executed-upgrade-and-two-reloads')){
+    if($assertion-cnotin$Record.assertions){throw '[mir430-classic-upgrade-assertion]'}
+  }
+  if($Record.classic_profile_setting-isnot[Collections.IDictionary]-or
+      $Record.classic_profile_setting.name-cne'mir-compiler-profile'-or
+      $Record.classic_profile_setting.value-cne'classic'-or
+      $Record.classic_profile_setting.source-cne'candidate-runtime-snapshot'){
+    throw '[mir430-classic-upgrade-setting]'
+  }
+  $rows=@($Record.classic_omission_dispositions)
+  if($rows.Count-ne2){throw '[mir430-classic-upgrade-disposition-set]'}
+  $byId=@{}
+  foreach($row in $rows){
+    if($row-isnot[Collections.IDictionary]-or[string]::IsNullOrWhiteSpace([string]$row.technology_id)-or$byId.Contains($row.technology_id)){
+      throw '[mir430-classic-upgrade-disposition-shape]'
+    }
+    $byId[$row.technology_id]=$row
+  }
+  $core=$byId['recipe-prod-research_character_crafting_speed-1'];$omitted=$byId['recipe-prod-research_iron-1']
+  if($null-eq$core-or$core.disposition-cne'retained-existing-investment-definition-changed'-or$core.consequence-cne'classic-declared-core-definition'-or
+      $null-eq$omitted-or$omitted.disposition-cne'removed'-or$omitted.consequence-cne'removed-reduced-policy-no-preservation'){
+    throw '[mir430-classic-upgrade-disposition-binding]'
+  }
+  Assert-MIR430ClassicSavedState -Source $States.source -After $States.upgrade
+  Assert-MIR430ClassicSavedState -Source $States.source -After $States.reload
+}
+
 function Assert-MIR423NativeUpgradeProof {
   param($Row,$Package,[ValidateSet('4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.3')
   $proof=Read-MIR423UpgradeProofReference $Row.receipt
@@ -241,16 +331,38 @@ function Assert-MIR423NativeUpgradeProof {
     $null=Resolve-MIR42SealImmutableFile -Path (Join-Path $dir $ledger.filename) -Sha256 $ledger.sha256 -Code ($errorPrefix+'-resource-ledger')
     if($ledger.exit_code-ne0-and$ledger.completion_predicate_observed-cne$true){throw "[$errorPrefix-process-failed]"}
   }
+  $classic=$CandidateSourceVersion-ceq'4.3.0'-and$r.Contains('upgrade_policy')-and$r.upgrade_policy-is[Collections.IDictionary]-and$r.upgrade_policy.kind-ceq'MIR430ClassicReducedUpgradePolicyV1'
+  if($CandidateSourceVersion-cne'4.3.0'-and$r.Contains('upgrade_policy')){throw "[$errorPrefix-upgrade-policy]"}
   foreach($stage in @('create','load','reload','second_reload')){
     $name=$r[$stage+'_log'];if([IO.Path]::GetFileName($name)-cne$name){throw "[$errorPrefix-log-path]"}
     $log=Resolve-MIR42SealImmutableFile -Path (Join-Path $dir $name) -Sha256 $r[$stage+'_log_sha256'] -Code ($errorPrefix+'-log')
-    if($stage-cne'create'){
+    if($classic){
+      $needle=switch($stage){'create'{'classic reduced-policy source proof complete'};'load'{'classic reduced-policy upgrade proof complete'};default{'classic reduced-policy reload proof complete'}}
+      if(-not(Get-Content $log -Raw).Contains($needle)){throw "[$errorPrefix-classic-phase-skipped]"}
+    }elseif($stage-cne'create'){
       $markers=[regex]::Matches((Get-Content $log -Raw),'\[mir-fixture\] complete (?:Space Age|research) state retained technologies=(?<technologies>[0-9]+) recipes=(?<recipes>[0-9]+)')
       if($markers.Count-lt1-or@($markers|Where-Object {[int]$_.Groups['technologies'].Value-lt3-or[int]$_.Groups['recipes'].Value-lt1}).Count){throw "[$errorPrefix-full-state-phase-skipped]"}
     }
   }
   if($r.library_activation.status-cne'restored-direct-library-controls'-or$r.library_activation.dependency_payload_bytes_copied-ne0-or$r.library_activation.archive_links_created-ne0-or$r.library_activation.archive_extractions-ne0){throw "[$errorPrefix-library-restoration]"}
   if($r.Contains('persisted_damage')){throw "[$errorPrefix-damage-scenario-not-transferable]"}
+  if($classic){
+    if(-not$r.Contains('classic_upgrade_evaluator_snapshots')){throw "[$errorPrefix-classic-receipt-snapshot-required]"}
+    $receiptSnapshots=@($r.classic_upgrade_evaluator_snapshots)
+    if($receiptSnapshots.Count-ne$Row.snapshots.Count){throw "[$errorPrefix-classic-receipt-snapshot-set]"}
+    $states=@{}
+    foreach($snapshot in $Row.snapshots){
+      $bound=@($receiptSnapshots|Where-Object stage -CEQ $snapshot.stage)
+      if($bound.Count-ne1-or$bound[0].path-cne$snapshot.path-or$bound[0].sha256-cne$snapshot.sha256){throw "[$errorPrefix-classic-receipt-snapshot-binding]"}
+      if($states.Contains($snapshot.stage)-or$snapshot.stage-cnotin@('source','upgrade','reload')){throw "[$errorPrefix-classic-snapshot-stage]"}
+      $ref=[pscustomobject]@{path=$snapshot.path;sha256=$snapshot.sha256};$s=(Read-MIR423UpgradeProofReference $ref).record
+      if($s.stage-cne$snapshot.stage-or$s.from_version-cne$from-or$s.to_version-cne$to){throw "[$errorPrefix-classic-snapshot-binding]"}
+      $states[$snapshot.stage]=$s
+    }
+    if((($states.Keys|Sort-Object)-join'|')-cne'reload|source|upgrade'){throw "[$errorPrefix-classic-snapshot-set]"}
+    Assert-MIR430ClassicNativeUpgradeProof -Record $r -States $states
+    return $proof
+  }
   foreach($assertion in @('all-existing-technology-state-and-definitions-retained','all-exposed-earned-effects-retained','all-supported-research-queue-retained','full-state-oracle-executed-upgrade-and-two-reloads')){
     if($assertion-cnotin$r.assertions){throw "[$errorPrefix-full-state-oracle-assertion]"}
   }
