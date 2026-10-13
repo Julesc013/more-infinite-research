@@ -1212,11 +1212,12 @@ function Read-MIR42NineTargetWrittenReleaseAuthorization {
 
   $authorizationPath = (Resolve-Path -LiteralPath $Path).Path
   $inputRecord = Get-Content -Raw -LiteralPath $authorizationPath | ConvertFrom-Json -Depth 100 -DateKind String
-  $maintenance = [string]$inputRecord.kind -cin @('MIR421MaintainerWrittenReleaseAuthorizationV1','MIR422MaintainerWrittenReleaseAuthorizationV1','MIR423MaintainerWrittenReleaseAuthorizationV1')
+  $maintenance = [string]$inputRecord.kind -cin @('MIR421MaintainerWrittenReleaseAuthorizationV1','MIR422MaintainerWrittenReleaseAuthorizationV1','MIR423MaintainerWrittenReleaseAuthorizationV1','MIR430MaintainerWrittenReleaseAuthorizationV1')
   $schemaName = switch -CaseSensitive ([string]$inputRecord.kind) {
     'MIR421MaintainerWrittenReleaseAuthorizationV1' { 'mir421-maintainer-written-release-authorization-v1.schema.json' }
     'MIR422MaintainerWrittenReleaseAuthorizationV1' { 'mir422-maintainer-written-release-authorization-v1.schema.json' }
     'MIR423MaintainerWrittenReleaseAuthorizationV1' { 'mir423-maintainer-written-release-authorization-v1.schema.json' }
+    'MIR430MaintainerWrittenReleaseAuthorizationV1' { 'mir430-maintainer-written-release-authorization-v1.schema.json' }
     default { 'mir42-maintainer-written-release-authorization-v1.schema.json' }
   }
   $schemaPath = Join-Path $mir42ReleaseAssetsRepoRoot ('spec/schemas/' + $schemaName)
