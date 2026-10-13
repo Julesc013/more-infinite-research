@@ -12,6 +12,10 @@ return {
 
   global = {
     {
+      key = "mir-compiler-profile",
+      ui_visibility = { mode = "always" }
+    },
+    {
       key = "ips-require-space-gate",
       ui_visibility = { mode = "always" }
     },

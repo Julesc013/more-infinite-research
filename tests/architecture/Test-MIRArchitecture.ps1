@@ -145,7 +145,8 @@ function Assert-MIRNoPatternInLuaTree {
   $matches = @(
     foreach ($entry in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix (($RelativeRoot.TrimEnd('/')) + '/')) {
       if ([string]$entry.output_path -like '*.lua' -and $ExcludeRelative -notcontains [string]$entry.output_path) {
-        Select-String -LiteralPath ([string]$entry.source_file) -Pattern $Pattern
+        Select-String -LiteralPath ([string]$entry.source_file) -Pattern $Pattern |
+          Where-Object { -not $_.Line.TrimStart().StartsWith('--') }
       }
     }
   )
@@ -165,7 +166,8 @@ function Assert-MIRNoPatternInLuaFile {
   $path = Get-MIRPath -RelativePath $RelativePath
   if (-not (Test-Path -LiteralPath $path)) { return }
 
-  $matches = @(Select-String -LiteralPath $path -Pattern $Pattern)
+  $matches = @(Select-String -LiteralPath $path -Pattern $Pattern |
+    Where-Object { -not $_.Line.TrimStart().StartsWith('--') })
   if ($matches.Count -gt 0) {
     $matches | Write-Host
     throw $Message
@@ -226,7 +228,7 @@ $entrypoints = @(
     Root = "data.lua"
     StageModule = "prototypes.mir.stage.data"
     StagePath = "prototypes/mir/stage/data.lua"
-    StageNeedle = 'require("prototypes.mir.streams.registry")'
+    StageNeedle = 'target_line.feature_enabled("research_library")'
   },
   @{
     Root = "data-updates.lua"
@@ -251,13 +253,23 @@ $entrypoints = @(
 foreach ($entry in $entrypoints) {
   $rootText = Read-MIRFile -RelativePath $entry.Root
   $rootCodeLines = @(Get-MIRCodeLines -Text $rootText)
-  if ($rootCodeLines.Count -ne 1) {
-    throw "$($entry.Root) must be a thin one-line stage wrapper."
-  }
-
   $expectedRoot = 'require("' + $entry.StageModule + '").run()'
-  if ($rootCodeLines[0] -ne $expectedRoot) {
-    throw "$($entry.Root) must call $expectedRoot."
+  $expectedLines = @($expectedRoot)
+  if ($entry.Root -ne 'control.lua') {
+    $stageName = switch ($entry.Root) {
+      'settings.lua' { 'settings' }
+      'data.lua' { 'data' }
+      'data-updates.lua' { 'data-updates' }
+      'data-final-fixes.lua' { 'data-final-fixes' }
+    }
+    $expectedLines = @(
+      ('if log then log("[more-infinite-research] startup-stage=' + $stageName + ' begin") end'),
+      $expectedRoot,
+      ('if log then log("[more-infinite-research] startup-stage=' + $stageName + ' end") end')
+    )
+  }
+  if (($rootCodeLines -join "`n") -cne ($expectedLines -join "`n")) {
+    throw "$($entry.Root) must contain only its stage call and the declared startup attribution markers."
   }
 
   $stageText = Read-MIRFile -RelativePath $entry.StagePath
@@ -521,7 +533,12 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'commands.run_all({return_snapshot = false})'
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'return require("prototypes.mir.pipeline.commands").run_all({return_snapshot = false})'
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'if compiler_profile.get(target_line.factorio_version) == "classic" then'
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'return require("prototypes.mir.pipeline.classic_compiler").run()'
+if ($dataFinalFixesStageText -match '(?m)^local\s+\w+\s*=\s*require\("prototypes[.]mir[.]pipeline[.]commands"\)') {
+  throw 'The full command DAG must be imported only after the Classic profile returns.'
+}
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua") -Needle 'compiler_context.new({execution_mode = options.execution_mode})'
 if ($dataFinalFixesStageText -match 'commands\.run\("') {
   throw "Data-final-fixes stage must execute the governed command DAG, not name individual commands."

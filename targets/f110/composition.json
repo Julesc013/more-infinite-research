@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 53969,
-      "expected_sha256": "7BA69976745572401D34887CF5D8E6539F6D7E664CA8C2ECFFDE142C28862EDD",
+      "expected_bytes": 55903,
+      "expected_sha256": "9A4C7880318A3AA1D4822754119EF8E0BB79E274C1E93367EFF6803C9DC3C678",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -1900,8 +1900,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3305,
-      "expected_sha256": "344BC028E8E2F0951A6573BA36D07386A287DD28C47719632CE1A4FD2793CEFB",
+      "expected_bytes": 3567,
+      "expected_sha256": "02DB2CEB2E8023594D49E7D45EF2A095E395B29837C216AE5463973E1D1F4849",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2556,8 +2556,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4218,
-      "expected_sha256": "FE610E353775389BE52507A52640C169B1D5C8B4DAC25F8B9E0D4747DE000B30",
+      "expected_bytes": 4331,
+      "expected_sha256": "0245B41FF53F3B82761B1CDA987CE4A235712FAE414FD9C8DE6661DF3D8F6146",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2764,8 +2764,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9538,
-      "expected_sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2",
+      "expected_bytes": 11287,
+      "expected_sha256": "C6D419A2F26933137FC633E4B3A6DC3573834F7A9EDC6ADAE0232BF15A94BE64",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3148,8 +3148,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6104,
-      "expected_sha256": "51500379A47E1433472185927264CBA8183FD1CCC1C961EAAA26E526F2B6C34E",
+      "expected_bytes": 6454,
+      "expected_sha256": "F28121BAE32DD120AE2ACB18842228046A9EF447FAA89A49E42DDDF620B03AB9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3676,8 +3676,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2965,
-      "expected_sha256": "4A50344CF38C88A3C8D80BEE25956F99421C5BDDE5AD91D862145863FECFF495",
+      "expected_bytes": 2992,
+      "expected_sha256": "B4B552DEFBFB2934E810377CB08CCD0FC7166030A7076FC83BD11B06EA9BA660",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3740,8 +3740,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 152,
-      "expected_sha256": "CD43DDECC7CCAFFCDA431830B5CAEBFA361393E4ED5D4836B228B652F2480998",
+      "expected_bytes": 435,
+      "expected_sha256": "EB24F4ADC759E0C0133B0537F79F3219B2ED73406ECEF3192712BD969845796E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3836,8 +3836,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4719,
-      "expected_sha256": "C4FE17968CC5FB0B026BF8E97C0F5337C97A1F081B8C867EB771D74F4938222E",
+      "expected_bytes": 5904,
+      "expected_sha256": "06E67AA5119368A51379787053B85364E7145AC0CF2B44A97A406B7EF044F183",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3875,6 +3875,86 @@
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
       ]
+    },
+    {
+      "path": "prototypes/mir/settings/compiler_profile.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/settings/compiler_profile.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1246,
+      "expected_sha256": "BD99F3C7430DE75F3C6F9D2F5DA73E8CCFBF84124C9819E6E918A88E346D7391",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/classic_compiler.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/classic_compiler.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4131,
+      "expected_sha256": "E04AE9C4EB3ED8BAD8EBC644ED176020C6ABB68F04E3C5D6C779559B3AA86167",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/classic_declarations.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/classic_declarations.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4417,
+      "expected_sha256": "43A03B8633D397DF6A1EEBEC70674900037278F8AE0AFB0CB434BAA133642617",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/classic/plan.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/classic/plan.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 31440,
+      "expected_sha256": "E27F977788B3FECF52AAEB4374763AC4A72796833BF395D7160E07D9A1FB2296",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/compiler_profile_notice.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2961,
+      "expected_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
     }
   ],
   "invariants": {
@@ -3883,5 +3963,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "F45CF41523E3260EF3836300432B4056689F048FE68C776A1E4F76B148AC0549"
+  "record_sha256": "EC816E5CBBDD9ED16500960CA8CF5F0EA9C62759A6BCB87308F5476DF975371D"
 }

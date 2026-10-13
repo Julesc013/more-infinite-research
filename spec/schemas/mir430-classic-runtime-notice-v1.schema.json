@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir430-classic-runtime-notice-v1.schema.json",
+  "title": "MIR 4.3 Classic Runtime Notice Authority V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "authority_id", "predecessor", "feature", "registration_subscribers", "on_load", "on_tick", "runtime_registration_mutation_authorized", "migration_execution_authorized", "public_support_authorized", "signing_or_sealing_authorized", "publication_authorized", "scope"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR430ClassicRuntimeNoticeAuthorityV1"},
+    "authority_id": {"const": "MIR430-CLASSIC-RUNTIME-NOTICE-V1"},
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "programme_id"],
+      "properties": {
+        "path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"},
+        "kind": {"const": "MIR4RuntimeContinuityProgrammeV1"},
+        "programme_id": {"const": "M4C02-09-24H"}
+      }
+    },
+    "feature": {"type": "object"},
+    "registration_subscribers": {"type": "array", "minItems": 2, "maxItems": 2},
+    "on_load": {"type": "object"},
+    "on_tick": {"type": "object"},
+    "runtime_registration_mutation_authorized": {"const": false},
+    "migration_execution_authorized": {"const": false},
+    "public_support_authorized": {"const": false},
+    "signing_or_sealing_authorized": {"const": false},
+    "publication_authorized": {"const": false},
+    "scope": {"type": "string", "minLength": 1}
+  }
+}

@@ -216,6 +216,13 @@ function Invoke-MIRNativeProbeProcess {
     # Do not add an unknown named parameter to existing non-Factorio mock
     # actors. Only the direct Factorio actor opts into fixed child Steam IDs.
     if($FactorioSteamIdentity){$governorArguments.FactorioSteamIdentity=$true}
+    # Library validation builds temporary archive inventories. Release those
+    # completed host allocations before admission measures the native child.
+    # The active lease, inventories and process/machine reserves remain live.
+    $activationProperty=$Context.PSObject.Properties['library_activation']
+    if($null -ne $activationProperty -and $null -ne $activationProperty.Value -and -not $activationProperty.Value.closed){
+      [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
+    }
     $result=Invoke-MIR441MonitoredProcess @governorArguments
     $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   } catch {

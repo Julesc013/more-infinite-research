@@ -654,6 +654,20 @@ function New-MIR42FourTargetCandidate {
           throw "[mir42-nine-target-historical-custody] $target"
         }
 
+        # Preserve the exact construction receipt before retiring its owned
+        # work tree. Native historical authentication needs the authority and
+        # member-projection pins, not only their hash in the target row.
+        $receiptPath = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath "materializations/$target.json"
+        if (Test-Path -LiteralPath $receiptPath) { throw "[mir42-candidate-receipt-collision] $target" }
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $receiptPath) | Out-Null
+        $receiptIdentity = Get-MIR4RawFileIdentity -Path $constructionManifestPath
+        Copy-Item -LiteralPath $constructionManifestPath -Destination $receiptPath -ErrorAction Stop
+        $retainedIdentity = Get-MIR4RawFileIdentity -Path $receiptPath
+        if ([string]$retainedIdentity.sha256 -cne [string]$receiptIdentity.sha256 -or
+            [int64]$retainedIdentity.bytes -ne [int64]$receiptIdentity.bytes) {
+          throw "[mir42-nine-target-historical-receipt-custody] $target"
+        }
+
         $row = [pscustomobject][ordered]@{
           schema = 1
           kind = 'MIR42FourTargetCandidateRowV1'
@@ -682,6 +696,12 @@ function New-MIR42FourTargetCandidate {
           engine = $descriptor.engine
           predecessor = $descriptor.predecessor
           historical_materializer_manifest_sha256 = [string]$constructionRow.historical_materializer_manifest_sha256
+          historical_materializer_manifest = [pscustomobject][ordered]@{
+            path = "materializations/$target.json"
+            bytes = [int64]$retainedIdentity.bytes
+            sha256 = [string]$retainedIdentity.sha256
+            record_sha256 = [string]$constructionRow.historical_materializer_manifest_sha256
+          }
           qualification = 'not-performed'
           technical_seal = 'not-performed'
           signing = 'not-performed'

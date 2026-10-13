@@ -1210,6 +1210,7 @@ modules:
     - prototypes/mir/platform/factorio/effect_target_inventory.lua
   settings:
     - prototypes/mir/settings/registry.lua
+    - prototypes/mir/settings/compiler_profile.lua
     - prototypes/mir/settings/catalog.lua
     - prototypes/mir/settings/cost_contract.lua
     - prototypes/mir/settings/automatic_compiler_contract.lua
@@ -1235,6 +1236,7 @@ modules:
     - prototypes/streams/direct-effects.lua
   pipeline:
     - prototypes/mir/pipeline/commands.lua
+    - prototypes/mir/pipeline/classic_compiler.lua
     - prototypes/mir/pipeline/compiler_context.lua
     - prototypes/mir/pipeline/compiler_orchestrator.lua
     - prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua
@@ -1267,6 +1269,7 @@ modules:
     - prototypes/mir/index/rule_surfaces.lua
     - prototypes/mir/index/recycling.lua
   domain:
+    - prototypes/mir/domain/compiler/classic_declarations.lua
     - prototypes/mir/domain/facts/registry.lua
     - prototypes/mir/domain/facts/recipe_semantics.lua
     - prototypes/mir/domain/facts/generated_technology_registry.lua
@@ -1376,6 +1379,7 @@ modules:
     - prototypes/mir/presentation/icon_builder.lua
   planner:
     - prototypes/mir/planner/compiler.lua
+    - prototypes/mir/planner/classic/plan.lua
     - prototypes/mir/planner/compilation_plan.lua
     - prototypes/mir/planner/compilation_plan/model.lua
     - prototypes/mir/planner/compilation_plan/build.lua
@@ -1466,6 +1470,7 @@ modules:
     - prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua
     - prototypes/mir/compatibility/repairs/registry.lua
   runtime:
+    - prototypes/mir/runtime/compiler_profile_notice.lua
     - prototypes/mir/runtime/scripted_techs.lua
     - prototypes/mir/runtime/settings_resolver.lua
     - prototypes/mir/runtime/startup_settings.lua
@@ -1539,6 +1544,8 @@ mutation_commands:
     - graph researchability consumes a snapshot-owned stable node view and externally owned graph maps remain defensive copies
     - graph qualification establishes one sorted technology name authority for snapshot SCC and reverse-edge construction and shares its freshly owned sorted prerequisite arrays and reverse edges with the immutable graph pipeline
     - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry
+    - classic profile selection precedes full pipeline imports and compiles only the finite declared core through the same trusted transformation envelopes and emitter
+    - classic applicability records cannot claim generic acquisition provider material ownership or catalogue analysis was performed and omitted 4.2 research investment is explicitly not preserved
     - SAFE and PREVIEW retain review-required candidates without aborting startup while REVIEWED STRICT_CI and RELEASE apply their exact captured review policy
     - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence and uses private validation-once authority so owned planning finalization and publication never rehash its complete disposition collections
     - normal loads publish only bounded public catalog projections; full catalogs require preview diagnostics validation or offline export
@@ -2005,6 +2012,8 @@ validation_tooling:
     mir4_semantic_compiler_gate: tests/mir4/Test-MIR4SemanticCompilationW03.ps1
     mir4_runtime_state_model: tools/mir/application/runtime/RuntimeStateModel.ps1
     mir4_runtime_continuity_authority: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
+    mir4_runtime_continuity_classic_notice_authority: governance/repository/mir430-classic-runtime-notice-v1.json
+    mir4_runtime_continuity_classic_notice_schema: spec/schemas/mir430-classic-runtime-notice-v1.schema.json
     mir4_runtime_continuity_migration_authority: governance/repository/migrations/runtime-continuity-tooling-v1.json
     mir4_runtime_continuity_migration_proof: assurance/repository/runtime-continuity-tooling-v1.json
     mir4_runtime_continuity_migration_receipt: releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json

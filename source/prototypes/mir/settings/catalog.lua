@@ -116,7 +116,7 @@ end
 
 local function with_profile_export(spec)
   local out = clone_spec(spec)
-  if out.name == M.import_setting_name then
+  if out.name == M.import_setting_name or out.name == "mir-compiler-profile" then
     out.profile_export = false
     return out
   end
@@ -126,6 +126,7 @@ end
 
 function M.global_setting_prototypes()
   local out = {
+    require("prototypes.mir.settings.compiler_profile").prototype(),
     {
       type = "bool-setting",
       name = "ips-require-space-gate",
@@ -508,6 +509,7 @@ end
 
 function M.validate_value(name, value)
   if name == M.import_setting_name then return false, "profile import setting is not importable" end
+  if name == "mir-compiler-profile" then return false, "compiler profile requires a direct startup selection" end
 
   local spec = M.spec(name)
   if not spec then return false, "unknown setting" end

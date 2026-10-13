@@ -8,7 +8,7 @@ param(
   [string]$LocalModZipDir = "",
   [string]$OutputPath = ".mir\evidence\3.2.1-performance-regression.json",
   [string]$ArtifactRoot = "",
-  [ValidateRange(1, 10)][int]$WarmupRuns = 1,
+  [ValidateRange(0, 5)][int]$WarmupRuns = 1,
   # The retained research-all consumer enforces its own campaign minimum.
   # Startup diagnostics may use one measured balanced block while an input
   # set is being admitted; release acceptance selects five or more.
@@ -28,6 +28,7 @@ param(
   [string]$CandidateMaterializationReceiptPath='',
   [ValidateSet('4.2.3','4.3.0','4.3.1')][string]$StartupCandidateSourceVersion='4.2.3',
   [switch]$PreliminaryStartup,
+  [switch]$StartupCandidateOnly,
   [string]$StartupOutputRoot='',
   [string]$ActiveModsObserver='',
   [switch]$GraphicalPlayerReady,
@@ -49,13 +50,20 @@ if($ObserveResearchAll-or$PrepareResearchAllInputs){
   return
 }
 if($ObserveStartup){
-  foreach($pair in @(@('FactorioBin',$FactorioBin),@('LibraryDirectory',$LocalModZipDir),@('StartupProfileTemplatePath',$StartupProfileTemplatePath),@('Published422Archive',$Published422Archive),@('Published422ManifestPath',$Published422ManifestPath),@('Published422ManifestSha256',$Published422ManifestSha256),@('StartupOutputRoot',$StartupOutputRoot))){if([string]::IsNullOrWhiteSpace([string]$pair[1])){throw "[mir-direct-startup-input-required] $($pair[0])"}}
+  if($StartupCandidateOnly-and($PreliminaryStartup-or$GraphicalPlayerReady-or$OrdinaryMenu)){throw '[mir-direct-startup-candidate-only-mode]'}
+  $requiredInputs=@(@('FactorioBin',$FactorioBin),@('LibraryDirectory',$LocalModZipDir),@('StartupProfileTemplatePath',$StartupProfileTemplatePath),@('StartupOutputRoot',$StartupOutputRoot))
+  if($StartupCandidateOnly){
+    $requiredInputs+=@(@('StartupCandidateArchive',$StartupCandidateArchive),@('CandidateMaterializationArchive',$CandidateMaterializationArchive),@('CandidateMaterializationReceiptPath',$CandidateMaterializationReceiptPath))
+  }else{
+    $requiredInputs+=@(@('Published422Archive',$Published422Archive),@('Published422ManifestPath',$Published422ManifestPath),@('Published422ManifestSha256',$Published422ManifestSha256))
+  }
+  foreach($pair in $requiredInputs){if([string]::IsNullOrWhiteSpace([string]$pair[1])){throw "[mir-direct-startup-input-required] $($pair[0])"}}
   if($GraphicalPlayerReady-and$OrdinaryMenu){throw '[mir-direct-startup-endpoint-mode-conflict]'}
   if($GraphicalPlayerReady-and[string]::IsNullOrWhiteSpace($PlayerReadyObserverArchive)){throw '[mir-direct-startup-input-required] PlayerReadyObserverArchive'}
   if($OrdinaryMenu-and[string]::IsNullOrWhiteSpace($OrdinaryPlayerConfigPath)){throw '[mir-direct-startup-input-required] OrdinaryPlayerConfigPath'}
   if($ExpectedPeakMemoryMiB-le0){throw '[mir441-resource-peak-budget-required] Declare the native probe peak memory budget.'}
   . (Join-Path $RepoRoot 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
-  $parameters=@{FactorioBin=$FactorioBin;LibraryDirectory=$LocalModZipDir;ProfileTemplatePath=$StartupProfileTemplatePath;Published422Archive=$Published422Archive;Published422ManifestPath=$Published422ManifestPath;Published422ManifestSha256=$Published422ManifestSha256;CandidateArchive=$StartupCandidateArchive;CandidateMaterializationArchive=$CandidateMaterializationArchive;CandidateMaterializationReceiptPath=$CandidateMaterializationReceiptPath;StartupCandidateSourceVersion=$StartupCandidateSourceVersion;OutputRoot=$StartupOutputRoot;Target=$Target;WarmupRuns=$WarmupRuns;MeasuredRuns=$MeasuredRuns;TimeoutSeconds=$TimeoutSeconds;ExpectedPeakMemoryMiB=$ExpectedPeakMemoryMiB;MaxNewOutputMiB=$MaxNewOutputMiB;AdmissionWaitSeconds=$AdmissionWaitSeconds;SourceCommit=$ExpectedSourceCommit;Preliminary=$PreliminaryStartup;ActiveModsObserver=$ActiveModsObserver;GraphicalPlayerReady=$GraphicalPlayerReady;PlayerReadyObserverArchive=$PlayerReadyObserverArchive;PlayerReadyBenchmarkTicks=$PlayerReadyBenchmarkTicks;OrdinaryMenu=$OrdinaryMenu;OrdinaryPlayerConfigPath=$OrdinaryPlayerConfigPath}
+  $parameters=@{FactorioBin=$FactorioBin;LibraryDirectory=$LocalModZipDir;ProfileTemplatePath=$StartupProfileTemplatePath;Published422Archive=$Published422Archive;Published422ManifestPath=$Published422ManifestPath;Published422ManifestSha256=$Published422ManifestSha256;CandidateArchive=$StartupCandidateArchive;CandidateMaterializationArchive=$CandidateMaterializationArchive;CandidateMaterializationReceiptPath=$CandidateMaterializationReceiptPath;StartupCandidateSourceVersion=$StartupCandidateSourceVersion;OutputRoot=$StartupOutputRoot;Target=$Target;WarmupRuns=$WarmupRuns;MeasuredRuns=$MeasuredRuns;TimeoutSeconds=$TimeoutSeconds;ExpectedPeakMemoryMiB=$ExpectedPeakMemoryMiB;MaxNewOutputMiB=$MaxNewOutputMiB;AdmissionWaitSeconds=$AdmissionWaitSeconds;SourceCommit=$ExpectedSourceCommit;Preliminary=$PreliminaryStartup;CandidateOnly=$StartupCandidateOnly;ActiveModsObserver=$ActiveModsObserver;GraphicalPlayerReady=$GraphicalPlayerReady;PlayerReadyObserverArchive=$PlayerReadyObserverArchive;PlayerReadyBenchmarkTicks=$PlayerReadyBenchmarkTicks;OrdinaryMenu=$OrdinaryMenu;OrdinaryPlayerConfigPath=$OrdinaryPlayerConfigPath}
   Invoke-MIRDirectLibraryStartupMeasurement @parameters
   return
 }

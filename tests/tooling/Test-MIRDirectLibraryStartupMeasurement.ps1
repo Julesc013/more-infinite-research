@@ -270,7 +270,54 @@ loading-multithreading=true
   }
   $crossMinorRejected=$false;try{Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes ([byte[]]@(65)) -DistributionVersion '4.2.20001' -SourceVersion '4.3.1'|Out-Null}catch{$crossMinorRejected=$_.Exception.Message-ceq'[mir4-private-patch-package-source-identity]'}
   Assert-DirectStartup $crossMinorRejected 'materializer accepted a distribution version from the wrong source minor.'
+  # Exercise the actual orchestration with controlled process actors. The
+  # predecessor actor deliberately fails if candidate-only mode touches it.
+  $stressCandidate=Write-TestArchive -Library $library -Version '4.3.20000'
+  $stressCandidateSha=Get-MIRImmutableInputSha256 -Path $stressCandidate
+  $stressReceipt=Join-Path $root 'controlled-stress-materialization.json'
+  [IO.File]::WriteAllText($stressReceipt,'{}',[Text.UTF8Encoding]::new($false))
+  $stressEngine=Join-Path $root 'engine/bin/x64/factorio.exe'
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $stressEngine))|Out-Null
+  [IO.File]::WriteAllText($stressEngine,'controlled-process-actor-not-an-engine',[Text.UTF8Encoding]::new($false))
+  $script:stressCalls=[Collections.Generic.List[object]]::new()
+  function Wait-MIRDirectLibraryStartupAdmission {param($Policy,$WorkRoot,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes,$AdmissionWaitSeconds,$Phase);[pscustomobject]@{status='controlled-no-native-actor'}}
+  function New-MIRNativeProbeResourceContext {param($RepoRoot,$OutputRoot,$ExpectedPeakMemoryMiB,$MaxNewOutputMiB,[switch]$UseExactOutputRoot);[pscustomobject]@{root=$OutputRoot;policy=[pscustomobject]@{minimum_free_ram_gib=4};peak_memory_bytes=[int64]$ExpectedPeakMemoryMiB*1MB;max_new_output_bytes=[int64]$MaxNewOutputMiB*1MB;runs=@()}}
+  function Get-MIRNativeProbeRemainingOutputBytes {param($Context);[int64]1MB}
+  function Read-MIRNativeProbeCurrentCandidate {
+    param($Repository,$Archive,$ReceiptPath,$Target,$SourceVersion)
+    [pscustomobject]@{path=$Archive;receipt=[pscustomobject]@{archive_sha256=$stressCandidateSha;source_version=$SourceVersion;package_source_sha256=('0'*64);source_manifest_sha256=('0'*64)}}
+  }
+  function Assert-MIRDirectLibraryPublished422Manifest {throw 'Controlled predecessor must never execute in candidate-only mode.'}
+  function Invoke-MIRDirectLibraryStartupSample {
+    param($FactorioBin,$LibraryDirectory,$EngineDataDirectory,$BaseRows,$RunRoot,$WriteDataRoot,$Label,$Resources,$MirArchive,$TimeoutSeconds,$ActiveModsObserver,$MapGenerationSeed)
+    $script:stressCalls.Add([pscustomobject]@{label=$Label;archive=$MirArchive;seed=$MapGenerationSeed})
+    [pscustomobject]@{label=$Label;endpoint_class='headless-create-diagnostic';exit_code=0;controlled_actor=$true}
+  }
+  function Write-MIRNativeProbeResult {param($Context,$Record)}
+  $stressArgs=@{FactorioBin=$stressEngine;LibraryDirectory=$library;ProfileTemplatePath=$template;CandidateArchive=$stressCandidate;CandidateMaterializationArchive=$stressCandidate;CandidateMaterializationReceiptPath=$stressReceipt;StartupCandidateSourceVersion='4.3.0';OutputRoot=(Join-Path $root 'candidate-only-run');Target='f200';WarmupRuns=0;MeasuredRuns=1;TimeoutSeconds=1;ExpectedPeakMemoryMiB=1;MaxNewOutputMiB=1;SourceCommit=(& git -C $repo rev-parse HEAD).Trim();CandidateOnly=$true}
+  $stressResult=Invoke-MIRDirectLibraryStartupMeasurement @stressArgs
+  Assert-DirectStartup ($stressResult.mode-ceq'candidate-only-stress-diagnostic'-and$null-eq$stressResult.inputs.published_422-and$stressResult.samples.Count-eq2) 'candidate-only orchestration invented a comparison or did not perform the selected cold/warm pair.'
+  Assert-DirectStartup ($script:stressCalls.Count-eq2-and@($script:stressCalls|Where-Object {$_.label-cne'candidate-4.3.0'-or$_.archive.sha256-cne$stressCandidateSha}).Count-eq0) 'candidate-only orchestration called a baseline or a different candidate.'
+  Assert-DirectStartup ($stressResult.samples[0].cache_state-ceq'initial-selection'-and$stressResult.samples[1].cache_state-ceq'warm-repeat'-and$stressResult.samples[0].sample-eq1-and$stressResult.samples[1].sample-eq2) 'candidate-only sample sequencing is not explicit.'
+  Assert-DirectStartup (@($stressResult.measurement_notes|Where-Object {$_-match'no relative speedup'}).Count-eq1) 'candidate-only result lacks its comparison limitation.'
+  foreach($case in @('missing-comparison','preliminary','supplied-comparison','graphical')){
+    $argsCopy=$stressArgs.Clone();$argsCopy.OutputRoot=Join-Path $root ('reject-'+$case)
+    $code=switch($case){
+      'missing-comparison' {$argsCopy.CandidateOnly=$false;'published-inputs'}
+      'preliminary' {$argsCopy.Preliminary=$true;'candidate-only-mode'}
+      'supplied-comparison' {$argsCopy.Published422Archive=$published;'candidate-only-no-comparison'}
+      'graphical' {$argsCopy.GraphicalPlayerReady=$true;'candidate-only-mode'}
+    }
+    $rejected=$false
+    try{Invoke-MIRDirectLibraryStartupMeasurement @argsCopy|Out-Null}catch{$rejected=$_.Exception.Message-ceq('[mir-direct-startup-'+$code+']')}
+    Assert-DirectStartup $rejected ('candidate-only mode did not reject '+$case)
+  }
+  $zeroWarmupBound=$false
+  try{& $entryPath @startupCliInputs -WarmupRuns 0 -StartupCandidateOnly -PreliminaryStartup|Out-Null}catch{$zeroWarmupBound=$_.Exception.Message-ceq'[mir-direct-startup-candidate-only-mode]'}
+  Assert-DirectStartup $zeroWarmupBound 'actual public caller still rejects the callee zero-warmup binding before mode validation.'
   [pscustomobject][ordered]@{status='MIR-DIRECT-LIBRARY-STARTUP-CONTROLS-PASSED';assertions=$assertions;engine_runs=0;archive_copies_created=0;archive_links_created=0;populated_profiles_created=0}
 }finally{
+  $buildPrefix=[IO.Path]::GetFullPath((Join-Path $repo 'build'))+[IO.Path]::DirectorySeparatorChar
+  if(-not [IO.Path]::GetFullPath($root).StartsWith($buildPrefix,[StringComparison]::OrdinalIgnoreCase)){throw 'Preserve fixture outside the intended build workspace.'}
   if(Test-Path -LiteralPath $root){Remove-Item -LiteralPath $root -Recurse -Force}
 }

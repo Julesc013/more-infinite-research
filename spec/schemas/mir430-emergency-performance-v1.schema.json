@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir430-emergency-performance-v1.schema.json",
+  "title": "MIR 4.3.0 adopted emergency startup acceptance policy, not execution evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","authority_id","source_version","status","max_mir_startup_seconds","minimum_samples_per_profile","compiler_profile","default_settings_mode","catalogue_definition_capture_kind","required_stages","required_profiles","allowed_observer","ordinary_menu_status","library_first_use_status","relative_overhead_status","timeout_status","reporter_environment_status","basis","release_deadline_utc","record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR430EmergencyPerformanceAcceptanceV1"},
+    "authority_id": {"const": "MIR430-EMERGENCY-PERFORMANCE-V1"},
+    "source_version": {"const": "4.3.0"},
+    "status": {"const": "adopted-maintainer-emergency-acceptance-not-evidence"},
+    "max_mir_startup_seconds": {"const": 60},
+    "minimum_samples_per_profile": {"const": 1},
+    "compiler_profile": {"const": "full"},
+    "default_settings_mode": {"const": "canonical-absent-default"},
+    "catalogue_definition_capture_kind": {"const": "MIR430FullDefaultPrototypeCaptureV1"},
+    "required_stages": {"const": ["settings","data","data-updates","data-final-fixes"]},
+    "required_profiles": {"type":"array","minItems":3,"maxItems":3,"items":{"type":"object","additionalProperties":false,"required":["id","target","definition"],"properties":{"id":{"enum":["f200-galore-space-age","f200-bob-angel","f200-omni-bob-angel-46"]},"target":{"const":"f200"},"definition":{"$ref":"#/$defs/file"}}}},
+    "allowed_observer": {"type":"object","additionalProperties":false,"required":["name","version","archive_sha256","source_files"],"properties":{"name":{"const":"mir430-compiler-profile-ablation"},"version":{"const":"1.0.4"},"archive_sha256":{"$ref":"#/$defs/sha256"},"source_files":{"type":"array","minItems":4,"maxItems":4,"items":{"$ref":"#/$defs/file"}}}},
+    "ordinary_menu_status": {"const":"separate-native-acceptance-required"},
+    "library_first_use_status": {"const":"separate-native-acceptance-required"},
+    "relative_overhead_status": {"const":"long-term-target-not-emergency-release-gate"},
+    "timeout_status": {"const":"incomplete-not-a-pass"},
+    "reporter_environment_status": {"const":"not-supplied-not-qualified-by-these-profiles"},
+    "basis": {"type":"string","minLength":1},
+    "release_deadline_utc": {"const":"2026-10-13T09:00:00Z"},
+    "record_sha256": {"$ref":"#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type":"string","pattern":"^[A-F0-9]{64}$"},
+    "file": {"type":"object","additionalProperties":false,"required":["path","bytes","sha256"],"properties":{"path":{"type":"string","pattern":"^fixtures/(?:run-profiles|assert-mir430-startup-work)/[A-Za-z0-9._-]+$"},"bytes":{"type":"integer","minimum":1},"sha256":{"$ref":"#/$defs/sha256"}}}
+  }
+}

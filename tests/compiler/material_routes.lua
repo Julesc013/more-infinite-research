@@ -1306,6 +1306,16 @@ end)()
       end
     end
   end
+  -- A high scoped cap is optional material inference. Classic must neither
+  -- build that graph nor replace its guard with an unchecked cap override.
+  local previous_build=scope.build
+  scope.build=function() error("Classic invoked excluded cap-scope inference") end
+  recipes={manufacture={name="manufacture",ingredients={{"ore",1}},results={{"component",1}},maximum_productivity=2}}
+  local classic_changed=limits.apply({allow_material_analysis=false})
+  check(classic_changed.productivity==0,"Classic leaves the excluded scoped cap unapplied")
+  check(classic_changed.productivity_status=="not-evaluated-classic-material-scope","Classic reports the scoped cap uncomputed")
+  check(recipes.manufacture.maximum_productivity==2,"Classic preserves the actual cap rather than emitting an unchecked override")
+  scope.build=previous_build
   data_module.prototypes=previous_prototypes
   profile_module.current=previous_current
   effective.get=previous_get

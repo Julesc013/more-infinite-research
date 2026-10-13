@@ -1,1 +1,3 @@
+if log then log("[more-infinite-research] startup-stage=data begin") end
 require("prototypes.mir.stage.data").run()
+if log then log("[more-infinite-research] startup-stage=data end") end

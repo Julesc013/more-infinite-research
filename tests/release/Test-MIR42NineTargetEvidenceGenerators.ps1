@@ -127,7 +127,7 @@ function Test-MIR42NineCriterionEvidenceWriter {
   }
   $candidateRows = @(
     foreach ($target in $script:MIR42QualificationNineTargets) {
-      [pscustomobject][ordered]@{target=$target;scope='nine-target';source=$constructionSource;package_source_sha256=$source.package_source_sha256;candidate_manifest=$candidateReference}
+      [pscustomobject][ordered]@{target=$target;scope='nine-target';identity=[pscustomobject][ordered]@{source_version='4.2.1';distribution_version=('4.2.' + $target.Substring(1) + '00')};source=$constructionSource;package_source_sha256=$source.package_source_sha256;candidate_manifest=$candidateReference}
     }
   )
   $originalCandidateRows = (Get-Item Function:Get-MIR42QualificationCandidateRows).ScriptBlock

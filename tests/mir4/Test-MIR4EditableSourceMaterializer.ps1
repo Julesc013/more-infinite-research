@@ -66,9 +66,9 @@ $scienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introd
 $repairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
 $progressionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
 $progressionPlannerBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
-if(@($manifest.bindings).Count-ne377-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne377-or
+if(@($manifest.bindings).Count-ne382-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne382-or
    $migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or
-   $introducedBindings.Count-ne18-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or$progressionBindings.Count-ne1-or$progressionPlannerBindings.Count-ne1-or
+   $introducedBindings.Count-ne23-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or$progressionBindings.Count-ne1-or$progressionPlannerBindings.Count-ne1-or
    [string]$progressionBindings[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
    [string]$progressionBindings[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
    (@($progressionBindings[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
@@ -161,9 +161,10 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  # Material declarations, continuation planner and the selected Library host
-  # add three entries to every current target; adapter scopes never overlap.
-  $expectedDelta=if($target-in@('f210','f200')){38}else{107}
+  # The five named Classic modules extend the earlier admitted composition;
+  # the frozen baseline identities above remain exact and adapter scopes do
+  # not overlap. Current semantic changes are not historical byte parity.
+  $expectedDelta=if($target-in@('f210','f200')){43}else{112}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

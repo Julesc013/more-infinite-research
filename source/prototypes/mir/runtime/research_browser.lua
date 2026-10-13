@@ -360,6 +360,32 @@ local function section(parent, caption, width)
   return heading
 end
 
+local function classic_scope_status(parent, enrichment, width)
+  local scope = enrichment and enrichment.compiler_scope
+  local status = parent[PREFIX .. "compiler_scope"]
+  local caption = nil
+  if type(scope) == "table" and scope.profile == "classic"
+      and scope.full_catalog_status == "not-evaluated" then
+    if scope.state == "available" and type(scope.supported_manifest_ids) == "table" then
+      caption = {"mir-browser.compiler-scope-classic", #scope.supported_manifest_ids}
+    elseif scope.state == "unavailable" then
+      caption = {"mir-browser.compiler-scope-unavailable"}
+    end
+  end
+  if not caption then
+    if status and status.valid then status.destroy() end
+    return
+  end
+  if not (status and status.valid) then
+    status = label(parent, caption, width)
+    status.name = PREFIX .. "compiler_scope"
+    status.style.font = "default-semibold"
+  else
+    status.caption = caption
+  end
+  status.style.maximal_width = width
+end
+
 update_translation_index = function(results, cache, v)
   -- Share the fixed count row instead of adding another child below a short
   -- list. Localization progress must not enlarge the retained result region.
@@ -1266,6 +1292,7 @@ render = function(player)
     local c = catalogue(player.force)
     if not c then label(body, {"mir-browser.catalogue-limit", core.catalogue_limit}); return end
     local cache = ensure_translation_catalogue(player, c)
+    classic_scope_status(body, c.enrichment, width - 64)
     if not has_family(c.family_names, v.family) then v.family = "all" end
     local filters = body[PREFIX .. "filters"]
     if not filters then

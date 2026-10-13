@@ -79,7 +79,7 @@ Ages are measured against the newest governed review date, 2026-10-13, so checko
 | docs/architecture/mir4-runtime-continuity.md | current | 2026-08-23 | 51 | current-window |
 | docs/architecture/mir4-semantic-compiler.md | current | 2026-08-23 | 51 | current-window |
 | docs/architecture/mir4-target-compiler.md | current | 2026-08-28 | 46 | current-window |
-| docs/architecture/module-boundaries.md | current | 2026-10-11 | 2 | current-window |
+| docs/architecture/module-boundaries.md | current | 2026-10-13 | 0 | current-window |
 | docs/architecture/native-owner-binding.md | current | 2026-07-20 | 85 | current-window |
 | docs/architecture/procedural-compatibility-kernel.md | current | 2026-08-03 | 71 | current-window |
 | docs/architecture/README.md | current | 2026-08-08 | 66 | current-window |

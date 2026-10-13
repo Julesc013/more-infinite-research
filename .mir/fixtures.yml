@@ -166,6 +166,24 @@ real_mod_gates:
     status: required
 
 fixtures:
+  mir430-startup-stress-work:
+    requires_features: []
+    path: fixtures/assert-mir430-startup-work
+    input_profiles:
+      - fixtures/run-profiles/mir430-startup-galore-space-age-f200.json
+      - fixtures/run-profiles/mir430-startup-bob-angel-f200.json
+      - fixtures/run-profiles/mir430-startup-omni-bob-angel-46-f200.json
+    authority: governance/repository/mir430-emergency-performance-v1.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - exact-available-f200-seven-fourteen-and-forty-six-mod-selections
+      - actual-full-default-and-selected-setting-readback
+      - matched-published-422-complete-catalogue-and-definition-preservation
+      - four-completed-native-mir-stage-spans-with-sixty-second-total-ceiling
+      - native-logs-resource-ledgers-and-archive-settings-engine-candidate-bindings
+      - no-reporter-313-mod-or-ordinary-menu-claim-from-headless-diagnostics
+
   modern-launch-return:
     requires_features: []
     path: fixtures/assert-modern-launch-return

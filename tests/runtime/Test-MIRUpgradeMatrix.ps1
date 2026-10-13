@@ -6,9 +6,12 @@ param(
   [Parameter(Mandatory)][string]$ToZip,
   [Parameter(Mandatory)][string]$FromVersion,
   [Parameter(Mandatory)][string]$ToVersion,
+  [string[]]$LocalModLibraryDirs = @(),
   [string]$SourceMaterializationPath = '',
+  [string]$SelectedReleaseManifest = '',
   [string]$SelectedTarget = '',
   [ValidateSet('','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '',
+  [ValidateSet('Full','Classic')][string]$UpgradePolicy = 'Full',
   [string]$PublishedMaintenancePredecessorManifestPath = '',
   [string]$FixtureName = "assert-upgrade-3-2-3-to-3-2-5",
   [string]$OutputPath = "build/results/assurance/3.2.5-upgrade-proof.json",
@@ -24,6 +27,10 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+if (@($LocalModLibraryDirs).Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$LocalModLibraryDirs[0]) -or
+    -not (Test-Path -LiteralPath $LocalModLibraryDirs[0] -PathType Container)) {
+  throw '[mir-upgrade-matrix-library-required] Supply exactly one flat archive library; retired profile staging is unsupported.'
+}
 if ($WorkRoot -and -not [IO.Path]::IsPathRooted($WorkRoot)) { throw 'Upgrade -WorkRoot must be an absolute controlled path.' }
 $upgradeWorkRoot=if($WorkRoot){$WorkRoot}else{Join-Path $RepoRoot 'build/p/validation-upgrades'}
 $null=Resolve-MIR441RecoveryScratchPath -Path $upgradeWorkRoot
@@ -36,6 +43,13 @@ if($currentDestination-and([string]::IsNullOrWhiteSpace($SelectedTarget)-or[stri
 }
 if(-not$currentDestination-and($SelectedTarget-or$SourceVersion-or$PublishedMaintenancePredecessorManifestPath)){
   throw '[mir-upgrade-matrix-current-inputs] Current-source matrix controls require a materialization receipt.'
+}
+$historicalCurrentDestination=$currentDestination-and$SourceVersion-cin@('4.3.0','4.3.1')-and$SelectedTarget-cin@('f017','f016','f015','f014','f013')
+if(($historicalCurrentDestination-and[string]::IsNullOrWhiteSpace($SelectedReleaseManifest))-or(-not$historicalCurrentDestination-and$SelectedReleaseManifest)){
+  throw '[mir-upgrade-matrix-historical-candidate-custody] Historical 4.3 rows require the frozen combined candidate manifest; other matrix modes do not accept it.'
+}
+if($UpgradePolicy -ceq 'Classic' -and (-not $currentDestination -or $SourceVersion -cne '4.3.0' -or $SelectedTarget -cnotin @('f210','f200','f110','f100'))){
+  throw '[mir430-classic-upgrade-matrix-mode] Classic reduced-policy rows require an exact modern 4.3.0 current-source destination.'
 }
 $output = if ([IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
 $outputParent = Split-Path -Parent $output
@@ -85,6 +99,7 @@ foreach ($case in $cases) {
     ToZip = $ToZip
     FromVersion = $FromVersion
     ToVersion = $ToVersion
+    LocalModLibraryDirs = @($LocalModLibraryDirs)
     FixtureName = $FixtureName
     Archetype = [string]$case.id
     SourceOnlyFixtureNames = @($case.source_only)
@@ -96,8 +111,10 @@ foreach ($case in $cases) {
   }
   if($currentDestination){
     $arguments.SourceMaterializationPath=$SourceMaterializationPath
+    if($historicalCurrentDestination){$arguments.SelectedReleaseManifest=$SelectedReleaseManifest}
     $arguments.SelectedTarget=$SelectedTarget
     $arguments.SourceVersion=$SourceVersion
+    $arguments.UpgradePolicy=$UpgradePolicy
     $arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath
   }
   & $runner @arguments
@@ -111,6 +128,14 @@ foreach ($case in $cases) {
   $assertions = @($result.assertions | ForEach-Object { [string]$_ } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
   if ($assertions.Count -eq 0) {
     throw "Upgrade matrix row published no named assertions: $($case.id)"
+  }
+  if($UpgradePolicy-ceq'Classic'){
+    foreach($required in @('classic-profile-setting-verified','classic-base-research-integrity-retained','classic-retained-core-level-effect-queue-and-completed-work-retained','classic-omitted-mir-research-disposition-recorded','classic-reduced-policy-oracle-executed-upgrade-and-two-reloads')){
+      if($required-cnotin$assertions){throw "Classic upgrade matrix row omitted required reduced-policy assertion: $($case.id)/$required"}
+    }
+    if(@($assertions|Where-Object {$_-cin@('all-existing-technology-state-and-definitions-retained','all-exposed-earned-effects-retained','all-supported-research-queue-retained','full-state-oracle-executed-upgrade-and-two-reloads')}).Count){
+      throw "Classic upgrade matrix row incorrectly claims full preservation: $($case.id)"
+    }
   }
   if (($currentDestination -or $FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10", "assert-upgrade-3-2-11-to-4-0-21000", "assert-upgrade-4-0-21000-to-4-1-21000") + $privateLocalPlaytestFixtures)) -and
       ("upgraded-save-reload-passed" -notin $assertions -or
@@ -136,6 +161,7 @@ foreach ($case in $cases) {
     expanded_root_disposition = [string]$cleanup.status
     expanded_root_bytes = [int64]$cleanup.bytes
     assertions = $assertions
+    upgrade_policy = $UpgradePolicy
   }
 }
 
@@ -168,6 +194,7 @@ $factorioVersion = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
     materialization = if($currentDestination){$SourceMaterializationPath}else{''}
   }
   required_archetypes = @($cases | ForEach-Object { [string]$_.id })
+  upgrade_policy = $UpgradePolicy
   retention = $Retention
   expanded_roots_removed = @($rows | Where-Object expanded_root_disposition -eq 'removed').Count
   expanded_roots_retained = @($rows | Where-Object expanded_root_disposition -eq 'retained').Count

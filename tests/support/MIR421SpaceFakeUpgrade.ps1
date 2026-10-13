@@ -27,17 +27,21 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if([string]::IsNullOrWhiteSpace($FromVersion)){
     $FromVersion=if($source.Minor-eq3){'4.2.'+$code+'02'}else{'4.2.'+$code+($sourcePatch-1).ToString('00')}
   }
+  # Published 4.1.20000 is a deliberately narrow, independently authenticated
+  # F200 predecessor for the 4.3.0 Full preservation fixture. It receives a
+  # distinct disposable fixture version and is never a 4.2 maintenance row.
+  $published410F200=[bool]($Target-ceq'f200'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.1.20000'-and-not$SpaceIsFake-and-not$SpaceAge-and-not$HistoricalSettingsOracle)
   $fromMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3)[.]'+$code+'(?<patch>00|01|02)$'))
-  if(-not$fromMatch.Success){throw '[mir42-upgrade-fixture-predecessor]'}
-  $fromMinor=[int]$fromMatch.Groups['minor'].Value
-  $fromPatch=[int]$fromMatch.Groups['patch'].Value
-  if(($source.Minor-eq2-and($fromMinor-ne2-or$fromPatch-ge$sourcePatch)) -or
-     ($source.Minor-eq3-and($fromMinor-ne2-or$fromPatch-gt2))){throw '[mir42-upgrade-fixture-predecessor]'}
+  if(-not$published410F200-and-not$fromMatch.Success){throw '[mir42-upgrade-fixture-predecessor]'}
+  $fromMinor=if($fromMatch.Success){[int]$fromMatch.Groups['minor'].Value}else{1}
+  $fromPatch=if($fromMatch.Success){[int]$fromMatch.Groups['patch'].Value}else{0}
+  if(-not$published410F200-and(($source.Minor-eq2-and($fromMinor-ne2-or$fromPatch-ge$sourcePatch)) -or
+     ($source.Minor-eq3-and($fromMinor-ne2-or$fromPatch-gt2)))){throw '[mir42-upgrade-fixture-predecessor]'}
   if($HistoricalSettingsOracle-and($Target-cne'f210'-or$SourceVersion-cne'4.2.3'-or$FromVersion-cne'4.2.21000'-or-not$SpaceAge-or$SpaceIsFake)){
     throw '[mir423-f210-settings-oracle-transition]'
   }
   $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
-  $fixtureVersion=if($source.Minor-eq3){'0.1.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'0.1.'+(30+$fromPatch)}elseif($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  $fixtureVersion=if($published410F200){'0.1.49'}elseif($source.Minor-eq3){'0.1.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'0.1.'+(30+$fromPatch)}elseif($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   if($HistoricalSettingsOracle){$fixtureVersion='0.1.33'}
   if($Target-ceq'f210'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceAge){
     $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
@@ -115,7 +119,8 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $fromMatch=[regex]::Match($FromVersion,'^4[.]2[.]200(?<patch>00|01|02)$')
   $legacyTransition=$toMatch.Success-and$fromMatch.Success-and([int]$fromMatch.Groups['patch'].Value-lt[int]$toMatch.Groups['patch'].Value)
   $crossMinorTransition=[regex]::IsMatch($ToVersion,'^4[.]3[.]200(?:00|01)$')-and[regex]::IsMatch($FromVersion,'^4[.]2[.]200(?:00|01|02)$')
-  if(-not($legacyTransition-or$crossMinorTransition)){throw '[mir422-f200-complete-oracle-transition]'}
+  $published410Transition=$ToVersion-ceq'4.3.20000'-and$FromVersion-ceq'4.1.20000'
+  if(-not($legacyTransition-or$crossMinorTransition-or$published410Transition)){throw '[mir422-f200-complete-oracle-transition]'}
   # Reuse the complete canonical oracle. Only its private native test copy is
   # adapted to F200 base research; Space Age-only expected rows do not exist in
   # that environment. Every observed technology, recipe and force still compares.
@@ -134,6 +139,14 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "'+$ToVersion+'" then')
   $control=$control.Replace('complete Space Age state retained','complete research state retained')
   $control=$control.Replace('mir-4121000-upgraded',('mir-'+$ToVersion.Replace('.','')+'-upgraded'))
+  if($ToVersion -match '^4[.]3[.]200(?:00|01)$') {
+    # Only the newly introduced, preservation-capable selector is admitted.
+    # Source snapshots stay unchanged; all old settings and all research
+    # definitions/investment still pass through the complete equality oracle.
+    $settingAnchor='local added_422_setting_defaults = {}'
+    if(-not $control.Contains($settingAnchor)){throw '[mir430-full-upgrade-setting-anchor]'}
+    $control=$control.Replace($settingAnchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')
+  }
   if($ToVersion -match '^4[.]2[.]') {
   $reviewed=@'
 local reviewed_420_frontier = require("mir422_reviewed_science_delta")
@@ -154,6 +167,81 @@ end
     'and not reviewed_frontier_delta(name, before.prototype, observed.technologies[name].prototype)')
   }
   [IO.File]::WriteAllText((Join-Path $FixtureDirectory 'control.lua'),$control,[Text.UTF8Encoding]::new($false))
+}
+
+function Assert-MIR430Published410F200FullUpgradeTransition {
+  param(
+    [Parameter(Mandatory)][string]$Target,
+    [Parameter(Mandatory)][string]$SourceVersion,
+    [Parameter(Mandatory)][string]$FromVersion,
+    [Parameter(Mandatory)][string]$ToVersion,
+    [Parameter(Mandatory)][string]$FixtureName,
+    [Parameter(Mandatory)][string]$Archetype,
+    [bool]$SpaceIsFake,
+    [ValidateSet('Full','Classic')][string]$UpgradePolicy='Full'
+  )
+  if($Target-cne'f200'-or$SourceVersion-cne'4.3.0'-or$FromVersion-cne'4.1.20000'-or$ToVersion-cne'4.3.20000'-or
+    $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'base-default'-or$SpaceIsFake){
+    throw '[mir430-published410-upgrade-transition]'
+  }
+  if($UpgradePolicy-cne'Full'){throw '[mir430-published410-upgrade-profile]'}
+}
+
+function Read-MIR430Published410F200ReleaseInput {
+  param(
+    [Parameter(Mandatory)]$ReleaseMetadata,
+    [Parameter(Mandatory)][string]$ReleaseManifestPath,
+    [Parameter(Mandatory)][string]$ArchivePath
+  )
+  $expectedReleaseId=383203807
+  $expectedTag='v4.1.0'
+  $expectedCommit='3562377b520cccb071b97b3968946eae7024c950'
+  $expectedTree='e094f72aa59ecb994f12bb33c399022f20e94165'
+  $expectedManifestName='mir-4.1.0.release.json'
+  $expectedManifestAssetId=545663306
+  $expectedManifestSha='3A79B5291E1969058C12DBDD5A599FBFFB90F1C4CCFC5E4428453929E0A7365D'
+  $expectedManifestBytes=2847
+  $expectedArchiveName='more-infinite-research_4.1.20000.zip'
+  $expectedArchiveAssetId=545663038
+  $expectedArchiveSha='7E4EEB5D0E42152F7416CAA0BCA6274A4FDDA242AFBEDAFBAD8788CEDA2ECF34'
+  $expectedArchiveBytes=1059713
+  if(-not(Test-Path -LiteralPath $ArchivePath -PathType Leaf) -or
+    (Split-Path -Leaf $ArchivePath)-cne$expectedArchiveName-or
+    (Get-Item -LiteralPath $ArchivePath).Length-ne$expectedArchiveBytes-or
+    (Get-FileHash -LiteralPath $ArchivePath -Algorithm SHA256).Hash-cne$expectedArchiveSha){
+    throw '[mir430-published410-archive]'
+  }
+  if([int64]$ReleaseMetadata.id-ne$expectedReleaseId-or[string]$ReleaseMetadata.tag_name-cne$expectedTag-or
+    [string]$ReleaseMetadata.target_commitish-cne$expectedCommit){throw '[mir430-published410-release-metadata]'}
+  $manifestAssets=@($ReleaseMetadata.assets|Where-Object {[string]$_.name-ceq$expectedManifestName})
+  $archiveAssets=@($ReleaseMetadata.assets|Where-Object {[string]$_.name-ceq$expectedArchiveName})
+  if($manifestAssets.Count-ne1-or[long]$manifestAssets[0].id-ne$expectedManifestAssetId-or[long]$manifestAssets[0].size-ne$expectedManifestBytes-or
+    [string]$manifestAssets[0].digest-cne('sha256:'+$expectedManifestSha.ToLowerInvariant())-or
+    $archiveAssets.Count-ne1-or[long]$archiveAssets[0].id-ne$expectedArchiveAssetId-or[long]$archiveAssets[0].size-ne$expectedArchiveBytes-or
+    [string]$archiveAssets[0].digest-cne('sha256:'+$expectedArchiveSha.ToLowerInvariant())){
+    throw '[mir430-published410-release-asset]'
+  }
+  if(-not(Test-Path -LiteralPath $ReleaseManifestPath -PathType Leaf)-or
+    (Get-Item -LiteralPath $ReleaseManifestPath).Length-ne$expectedManifestBytes-or
+    (Get-FileHash -LiteralPath $ReleaseManifestPath -Algorithm SHA256).Hash-cne$expectedManifestSha){
+    throw '[mir430-published410-release-manifest]'
+  }
+  try{$manifest=Get-Content -LiteralPath $ReleaseManifestPath -Raw|ConvertFrom-Json -Depth 100 -DateKind String}catch{throw '[mir430-published410-release-manifest]'}
+  if([int]$manifest.schema-ne1-or[string]$manifest.kind-cne'MIR441ReleaseManifestV1'-or[string]$manifest.status-cne'technically-qualified-unpublished'-or
+    [string]$manifest.title-cne'MIR 4.1.0'-or[string]$manifest.tag-cne$expectedTag-or[string]$manifest.source.commit-cne$expectedCommit-or
+    [string]$manifest.source.tree-cne$expectedTree-or[string]$manifest.manifest_asset.path-cne$expectedManifestName){
+    throw '[mir430-published410-release-manifest]'
+  }
+  $manifestArchive=@($manifest.github_assets|Where-Object {[string]$_.path-ceq('assets/'+$expectedArchiveName)})
+  if($manifestArchive.Count-ne1-or[string]$manifestArchive[0].sha256-cne$expectedArchiveSha-or[long]$manifestArchive[0].bytes-ne$expectedArchiveBytes){
+    throw '[mir430-published410-release-manifest]'
+  }
+  return [pscustomobject][ordered]@{
+    kind='MIR430Published410PredecessorV1';release_id=$expectedReleaseId;source_tag=$expectedTag
+    source=[ordered]@{commit=$expectedCommit;tree=$expectedTree}
+    manifest=[ordered]@{path=$ReleaseManifestPath;asset_id=$expectedManifestAssetId;sha256=$expectedManifestSha;bytes=$expectedManifestBytes}
+    targets=@([pscustomobject][ordered]@{target='f200';version='4.1.20000';path=$ArchivePath;sha256=$expectedArchiveSha;bytes=$expectedArchiveBytes;github_asset_id=$expectedArchiveAssetId})
+  }
 }
 
 function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
@@ -216,6 +304,68 @@ function Set-MIR422HistoricalCompleteStateUpgradeOracle {
   }
   Copy-Item -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR422HistoricalCompleteState.lua') -Destination (Join-Path $FixtureDirectory 'mir422_complete_state.lua')
   [IO.File]::WriteAllText($path,($prefix+$text),[Text.UTF8Encoding]::new($false))
+}
+
+function Set-MIR430FullCompilerProfileUpgradeAllowance {
+  param(
+    [Parameter(Mandatory)][ValidateSet('f210','f110','f100')][string]$Target,
+    [Parameter(Mandatory)][string]$FixtureDirectory,
+    [Parameter(Mandatory)][string]$FromVersion,
+    [Parameter(Mandatory)][string]$ToVersion,
+    [switch]$BaseDefaultCompleteState
+  )
+  $code=$Target.Substring(1)
+  if($FromVersion-cnotin@("4.2.${code}00","4.2.${code}01","4.2.${code}02")-or$ToVersion-cnotin@("4.3.${code}00","4.3.${code}01")){
+    throw '[mir430-full-upgrade-setting-transition]'
+  }
+  if($BaseDefaultCompleteState-and($Target-cne'f210'-or$FromVersion-cne'4.2.21002'-or$ToVersion-cne'4.3.21000')){
+    throw '[mir430-full-upgrade-base-snapshot-transition]'
+  }
+  $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
+  if($Target-ceq'f210'){
+    $path=Join-Path $directory 'control.lua';Assert-MIRLibraryPath $path
+    $text=Get-Content -LiteralPath $path -Raw
+    $anchor='local added_422_setting_defaults = {}'
+    $completeStateGate='  and to_version:match("^4%.2%.210%d%d$")'
+    $completeStateArchetype='archetype == "space-age-native-owner"'
+    $completeStateReportedRows='  for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do'
+    $completeStateHooks=@('    export_state("source")','    export_state("upgrade")','      export_state("reload")')
+    if([regex]::Matches($text,[regex]::Escape($anchor)).Count-ne1){throw '[mir430-full-upgrade-setting-anchor]'}
+    if([regex]::Matches($text,[regex]::Escape($completeStateGate)).Count-ne1-or
+       @($completeStateHooks|Where-Object {-not$text.Contains($_)}).Count){
+      throw '[mir430-full-upgrade-complete-state-anchor]'
+    }
+    $baseFullSnapshot=[bool]$BaseDefaultCompleteState
+    if($baseFullSnapshot-and(
+        [regex]::Matches($text,[regex]::Escape($completeStateArchetype)).Count-ne1-or
+        [regex]::Matches($text,[regex]::Escape($completeStateReportedRows)).Count-ne1)){
+      throw '[mir430-full-upgrade-base-snapshot-anchor]'
+    }
+    $text=$text.Replace($anchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')
+    # The same Full fixture that authorizes the newly added selector must retain
+    # the complete-state path on the exact cross-minor F210 destination. The
+    # source, upgrade and reload hooks above remain mandatory and are checked
+    # before this private fixture transformation.
+    $text=$text.Replace($completeStateGate,('  and (to_version:match("^4%.2%.210%d%d$") or to_version == "'+$ToVersion+'")'))
+    if($baseFullSnapshot){
+      # The exact published F210 Base predecessor needs the same source,
+      # upgrade and reload proof as the Space Age lane.  Do not admit Base
+      # snapshots for another predecessor or destination through this hook.
+      $text=$text.Replace($completeStateArchetype,'(archetype == "space-age-native-owner" or archetype == "base-default")')
+      # These three named rows are a Space Age incident regression check.  The
+      # complete comparator above remains exhaustive for Base; its source
+      # snapshot proves these Space Age-only technologies were never present.
+      $text=$text.Replace($completeStateReportedRows,'  for _, name in ipairs({}) do')
+    }
+    [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
+    return
+  }
+  $path=Join-Path $directory 'mir422_complete_state.lua';Assert-MIRLibraryPath $path
+  $text=Get-Content -LiteralPath $path -Raw
+  $anchor="        for _, field in ipairs({`"effects`", `"settings`", `"queue`", `"research_queue_enabled`", `"current_research`", `"research_progress`"}) do`n          if not equal(before[field], after[field]) then fail(`"saved force state changed: `" .. force_name .. `"/`" .. field) end`n        end"
+  $replacement="        for _, field in ipairs({`"effects`", `"settings`", `"queue`", `"research_queue_enabled`", `"current_research`", `"research_progress`"}) do`n          local retained = equal(before[field], after[field])`n          if field == `"settings`" and before[field][`"mir-compiler-profile`"] == nil and after[field][`"mir-compiler-profile`"] == `"full`" then`n            local expected_settings = copy(before[field])`n            expected_settings[`"mir-compiler-profile`"] = `"full`"`n            retained = equal(expected_settings, after[field])`n          end`n          if not retained then fail(`"saved force state changed: `" .. force_name .. `"/`" .. field) end`n        end"
+  if([regex]::Matches($text,[regex]::Escape($anchor)).Count-ne1){throw '[mir430-full-upgrade-setting-anchor]'}
+  [IO.File]::WriteAllText($path,$text.Replace($anchor,$replacement),[Text.UTF8Encoding]::new($false))
 }
 
 function Get-MIR421SpaceFakeUpgradeDescriptor {
@@ -430,17 +580,21 @@ function Read-MIR423F200BobAngelUpgradeProfile {
 
 function Assert-MIR423F200BobAngelUpgradeTransition {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
-    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.3')
-  if($Target-cne'f200'-or$FromVersion-cne'4.2.20002'-or$ToVersion-cne'4.2.20003'-or
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.3')
+  $maintenance=[bool]($SourceVersion-ceq'4.2.3'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.2.20003')
+  $full430=[bool]($SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20000')
+  if($Target-cne'f200'-or-not($maintenance-or$full430)-or
      $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'f200-bob-angel'-or
-     $SpaceIsFake-or$SourceOnlyFixtureNames.Count-or$SourceVersion-cne'4.2.3'){
+     $SpaceIsFake-or$SourceOnlyFixtureNames.Count){
     throw '[mir423-f200-bob-angel-transition]'
   }
 }
 
 function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
-  if($FromVersion-cne'4.2.20002'-or$ToVersion-cne'4.2.20003'){throw '[mir423-f200-bob-angel-oracle-transition]'}
+  $maintenance=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.2.20003')
+  $full430=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20000')
+  if(-not($maintenance-or$full430)){throw '[mir423-f200-bob-angel-oracle-transition]'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $controlPath=Join-Path $directory 'control.lua';$settingsPath=Join-Path $directory 'settings.lua';$infoPath=Join-Path $directory 'info.json'
   foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
@@ -449,8 +603,8 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1){throw '[mir423-f200-bob-angel-oracle-anchor]'}
   $control=$control.Replace($profileAnchor,$profileAnchor+', ["f200-bob-angel"]={technology="mining-productivity-4",level=5}')
   # This is deliberately narrower than the retained generic complete-state
-  # oracle: 4.2.20002 -> 4.2.20003 is performance-only for this exact
-  # Bob/Angel input, so even an unresearched extra technology is a failure.
+  # oracle. Both the 4.2 performance lane and the exact 4.3 Full lane reject
+  # even an unresearched extra technology for this fixed Bob/Angel input.
   # Earlier predecessor lanes retain their reviewed feature allowances.
   $permissiveTechnologySetGuard='(?m)^  for name, after in pairs\(observed\.technologies\) do\r?\n    if not expected\.technologies\[name\] and after\.researched then fail\("new research was awarded without earning it: " \.\. name\) end\r?\n  end$'
   $technologySetGuard=[regex]::new($permissiveTechnologySetGuard)
@@ -470,8 +624,10 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   $settings=$settings.Replace($settingsAnchor,'default_value="f200-bob-angel",allowed_values={"base-default","f200-bob-angel"}')
   [IO.File]::WriteAllText($settingsPath,$settings,[Text.UTF8Encoding]::new($false))
   $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
-  if($info.version-cne'0.1.32'){throw '[mir423-f200-bob-angel-fixture-identity]'}
-  $info.version='0.1.33'
+  $expectedVersion=if($full430){'0.1.42'}else{'0.1.32'}
+  $nextVersion=if($full430){'0.1.42'}else{'0.1.33'}
+  if($info.version-cne$expectedVersion){throw '[mir423-f200-bob-angel-fixture-identity]'}
+  $info.version=$nextVersion
   [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))
 }
 

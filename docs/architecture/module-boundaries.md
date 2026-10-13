@@ -5,7 +5,7 @@ applies_to: "4.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-11
+last_reviewed: 2026-10-13
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -21,6 +21,12 @@ Updated: 2026-10-07
 This page records current MIR 4 authority and package boundaries while retaining explicitly labelled historical transitions that explain them.
 
 ## Current MIR 4 boundaries
+
+The 4.3 candidate selects a compiler profile before importing the data-final-fixes pipeline. The independent `settings/compiler_profile` selector defaults to `full`, including when the setting is absent, retaining the broad pipeline and established research. Explicit `classic` is a reduced comparison profile: it plans only a finite declared direct-effect and native-continuation core. It never asks the generic science-acquisition, alternative-route, provider, material or catalogue analyses to establish omitted support. Its explicit applicability and rejection records describe declared checks, not a successful full-world analysis. Both profiles construct trusted `TechnologyDesign` records, the same `TransformationOperation`/`TransformationPlan` envelopes and a plan-bound `MutationJournal`, then call the same technology emitter.
+
+Explicit Classic deliberately removes research outside that core. Missing broad support is `not-evaluated`, and omitted saved investment is not preserved. The startup setting, runtime Library status and comparison materials must expose this support reduction. Classic omission tests cannot qualify the Full release. All legacy settings remain registered; Full is required for factories that need the established research. Registering setting declarations is distinct from running prototype-stage acquisition proofs. Independent module permissions, prototype limits, pipeline extent, cap control and supported scripted effects remain separate services; classic does not invoke full competing-owner replacements or weapon-speed redistribution. Release acceptance compares Full against published 4.2.2 on unchanged upstream inputs and settings. Direct 4.1 observations distinguish inherited 4.2 changes from new candidate regressions; they do not require restoring the 4.1 catalogue. Current-package native startup and upgrade evidence remain required before release claims.
+
+Classic limits its native catalogue scan to 16,384 technologies and each declared chain to 64 levels. A shared lab preparation accepts at most 256 labs with 64 inputs each. Each of the eleven possible candidates uses at most 64 enabled ancestors with 64 prerequisites per ancestor. Before copying a native tail, total nested visits are limited to 256, string bytes to 64 KiB and depth to eight, with smaller limits on effects, ingredients and icons. Capacity exhaustion omits the affected optional support explicitly and never invokes Full as a fallback. Native continuation costs currently accept fixed positive numeric counts; arbitrary inherited formulas are outside this profile. The four lifecycle entrypoints emit begin/end markers for native log attribution across settings, data, updates and final fixes; those markers never select research according to elapsed time.
 
 `source/` is the sole editable player-source authority. `source/package-source.json`, `targets/package-authority.json`, `targets/registry.json`, and `targets/support-policy.json` define the source-to-target contract; target composition selects shared components and narrow platform adapters, not a second editable mod tree. `tools/mir/application/package/TargetMaterializer.ps1` is the sole current package writer and writes to the caller's explicit output root; current development and qualification runners keep their generated packages beneath ignored `build/` roots. The repository-root Factorio-shaped projection remains historical reconstruction material and cannot be reactivated as package source.
 

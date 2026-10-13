@@ -14,20 +14,39 @@ $ErrorActionPreference='Stop'
 $hostedReceiptOnly=Test-MIR4HostedReceiptOnly
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4RuntimeContinuityAuthority -RepoRoot $RepoRoot
+$currentAuthority=Get-MIR4ClassicRuntimeNoticeAuthority -RepoRoot $RepoRoot
+$effectiveAuthority=Get-MIR4RuntimeEffectiveContinuityAuthority -RepoRoot $RepoRoot
+if(@($authority.runtime_features).Count-ne7-or@($authority.runtime_features|Where-Object id -eq 'runtime.compiler-profile-notice').Count-ne0-or
+   @($authority.registration_groups|Where-Object id -eq 'lifecycle.init')[0].subscribers -contains 'runtime.compiler-profile-notice:on_init' -or
+   @($authority.registration_groups|Where-Object id -eq 'lifecycle.configuration-changed')[0].subscribers -contains 'runtime.compiler-profile-notice:on_configuration_changed'){
+  throw '[mir4-w04-frozen-authority-rewritten]'
+}
+if([string]$currentAuthority.authority_id-cne'MIR430-CLASSIC-RUNTIME-NOTICE-V1'-or
+   @($effectiveAuthority.runtime_features).Count-ne8-or
+   @($effectiveAuthority.runtime_features|Where-Object id -eq 'runtime.compiler-profile-notice').Count-ne1-or
+   -not(@(@($effectiveAuthority.registration_groups|Where-Object id -eq 'lifecycle.init')[0].subscribers)-contains 'runtime.compiler-profile-notice:on_init') -or
+   -not(@(@($effectiveAuthority.registration_groups|Where-Object id -eq 'lifecycle.configuration-changed')[0].subscribers)-contains 'runtime.compiler-profile-notice:on_configuration_changed')){
+  throw '[mir4-w04-current-notice-authority]'
+}
+if((@(@($effectiveAuthority.registration_groups|Where-Object id -eq 'lifecycle.configuration-changed')[0].subscribers)-join'|')-cne
+   'runtime.spoilage-preservation:on_configuration_changed|runtime.agricultural-growth-speed:on_configuration_changed|runtime.productivity-family-adoption:on_configuration_changed|runtime.maximum-level-control:on_configuration_changed|runtime.compiler-profile-notice:on_configuration_changed|runtime.planet-discovery-recovery:on_configuration_changed'){
+  throw '[mir4-w04-current-notice-order]'
+}
 foreach($target in @('f210','f200')){
   $dispatcherPath=Join-Path $RepoRoot "source/adapters/$target/prototypes/mir/runtime/scripted_techs.lua"
   $dispatcher=[IO.File]::ReadAllText($dispatcherPath)
   $stage=[IO.File]::ReadAllText((Join-Path $RepoRoot 'source/prototypes/mir/stage/control.lua'))
   $guard='if research_browser then research_browser.on_load() end'
-  if([regex]::Matches($dispatcher,[regex]::Escape($guard)).Count-ne1){throw '[mir4-w04-guarded-load-fixture-anchor]'}
+  $noticeGuard='compiler_profile_notice.on_load()'
+  if([regex]::Matches($dispatcher,[regex]::Escape($guard)).Count-ne1-or[regex]::Matches($dispatcher,[regex]::Escape($noticeGuard)).Count-ne1){throw '[mir4-w04-guarded-load-fixture-anchor]'}
   $actual=Get-MIR4RuntimeOnLoadSourceRegistration -HostText ($dispatcher+"`n"+$stage)
   if($actual.registration_count-ne1-or$actual.approved_registration_count-ne1){throw '[mir4-w04-guarded-load-source]'}
   foreach($case in @(
     @{name='unguarded';body=$dispatcher.Replace($guard,'research_browser.on_load()')},
     @{name='inverted';body=$dispatcher.Replace($guard,'if not research_browser then research_browser.on_load() end')},
-    @{name='missing';body=$dispatcher.Replace($guard,'')},
+    @{name='missing';body=$dispatcher.Replace($noticeGuard,'')},
     @{name='mutation';body=$dispatcher.Replace($guard,$guard+' storage.changed = true')},
-    @{name='unknown';body=$dispatcher.Replace($guard,$guard+' unknown.on_load()')},
+    @{name='unknown';body=$dispatcher.Replace($noticeGuard,$noticeGuard+' unknown.on_load()')},
     @{name='duplicate';body=$dispatcher+"`nscript.on_load(function() end)"},
     @{name='swapped';body=$dispatcher.Replace('passive_repair.on_load()','TEMP_CALLBACK').Replace($guard,'passive_repair.on_load()').Replace('TEMP_CALLBACK',$guard)}
   )){
@@ -40,7 +59,7 @@ foreach($target in @('f210','f200')){
 # The same writer consumes current composed dispatcher/stage bytes. This mode
 # avoids unrelated SDK generation or native campaigns when selecting this fix.
 if($RegistrationOnly){
-  $plan=New-MIR4RuntimeRegistrationPlan -RepoRoot $RepoRoot -RuntimeFeatures $authority.runtime_features
+  $plan=New-MIR4RuntimeRegistrationPlan -RepoRoot $RepoRoot -RuntimeFeatures $effectiveAuthority.runtime_features
   Assert-MIR4RuntimeRegistrationPlan -Plan $plan|Out-Null
   Write-Host '[ok] Current composed runtime registration and 16 guarded callback source cases passed.'
   return
@@ -49,11 +68,11 @@ $providers=@(New-MIR4NormalizedTargetProviders -RepoRoot $RepoRoot)
 $runtimeA=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers $providers -SourceIdentity $null
 $runtimeB=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers @($providers|Sort-Object id -Descending) -SourceIdentity $null
 if($runtimeA.digest-cne$runtimeB.digest){throw '[mir4-w04-runtime-determinism]'}
-if(@($runtimeA.runtime_feature_specs).Count-ne 7-or@($runtimeA.state_specs).Count-ne 5-or@($runtimeA.registration_plan.groups).Count-ne 9-or@($runtimeA.targets).Count-ne 17){throw '[mir4-w04-runtime-contract-counts]'}
+if(@($runtimeA.runtime_feature_specs).Count-ne 8-or@($runtimeA.state_specs).Count-ne 5-or@($runtimeA.registration_plan.groups).Count-ne 9-or@($runtimeA.targets).Count-ne 17){throw '[mir4-w04-runtime-contract-counts]'}
 foreach($feature in @($runtimeA.runtime_feature_specs)){if([string]$feature.source_sha256-cne(Get-MIR4PlatformInputSha256 (Resolve-MIR4RuntimeProgrammePath -RepoRoot $RepoRoot -RelativePath ([string]$feature.source)))){throw "[mir4-w04-runtime-source-canonical-hash] $($feature.id)"}}
 if([string]$runtimeA.registration_plan.owner_sha256-cne(Get-MIR4PlatformInputSha256 (Resolve-MIR4RuntimeProgrammePath -RepoRoot $RepoRoot -RelativePath ([string]$runtimeA.registration_plan.owner)))){throw '[mir4-w04-runtime-owner-canonical-hash]'}
 $onLoad=$runtimeA.registration_plan.on_load;$onLoadHosts=@($onLoad.hosts)
-$approvedOnLoadCallbacks=@('passive_repair.on_load','research_browser.on_load');$onLoadCallbacks=@($onLoad.callbacks|ForEach-Object{[string]$_});if(-not$runtimeA.registration_plan.law_results.all_passed-or-not$onLoad.registered-or[string]$onLoad.handler-cne'anonymous-coordinator'-or$onLoadCallbacks.Count-ne$approvedOnLoadCallbacks.Count-or($onLoadCallbacks-join'|')-cne($approvedOnLoadCallbacks-join'|')-or-not[bool]$onLoad.read_only_restoration-or[int]$onLoad.registration_count-ne1-or$onLoad.persistent_mutation-or$runtimeA.registration_plan.on_tick.registered-or-not$runtimeA.registration_plan.filter_before_dispatch-or$onLoadHosts.Count-ne2-or(@($onLoadHosts.target|Sort-Object)-join'|')-cne'f200|f210'){throw '[mir4-w04-dispatcher-laws]'}
+$approvedOnLoadCallbacks=@('passive_repair.on_load','research_browser.on_load','compiler_profile_notice.on_load');$onLoadCallbacks=@($onLoad.callbacks|ForEach-Object{[string]$_});$onTick=$runtimeA.registration_plan.on_tick;if(-not$runtimeA.registration_plan.law_results.all_passed-or-not$onLoad.registered-or[string]$onLoad.handler-cne'anonymous-coordinator'-or$onLoadCallbacks.Count-ne$approvedOnLoadCallbacks.Count-or($onLoadCallbacks-join'|')-cne($approvedOnLoadCallbacks-join'|')-or-not[bool]$onLoad.read_only_restoration-or[int]$onLoad.registration_count-ne1-or$onLoad.persistent_mutation-or-not$onTick.registered-or-not$onTick.conditional_one_shot-or-not$onTick.unsubscribes_before_delivery-or[int]$onTick.budget-ne1-or[string]$onTick.owner-cne'compiler_profile_notice.on_load'-or[string]$onTick.handler-cne'compiler_profile_notice.deliver_deferred_load_notice'-or-not$runtimeA.registration_plan.law_results.one_shot_on_load_tick-or-not$runtimeA.registration_plan.filter_before_dispatch-or$onLoadHosts.Count-ne2-or(@($onLoadHosts.target|Sort-Object)-join'|')-cne'f200|f210'){throw '[mir4-w04-dispatcher-laws]'}
 foreach($target in @('f210','f200')){$hostEntry=@($onLoadHosts|Where-Object target -eq $target)[0];$context=New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target;$dispatcher=Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath 'prototypes/mir/runtime/scripted_techs.lua';$stage=Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath 'prototypes/mir/stage/control.lua';$hostCallbacks=@($hostEntry.approved_callbacks|ForEach-Object{[string]$_});if([string]$hostEntry.approved_handler-cne'anonymous-coordinator'-or$hostCallbacks.Count-ne$approvedOnLoadCallbacks.Count-or($hostCallbacks-join'|')-cne($approvedOnLoadCallbacks-join'|')-or[int]$hostEntry.registration_count-ne1-or[int]$hostEntry.approved_registration_count-ne1-or[string]$hostEntry.source_identity.dispatcher.path-cne'prototypes/mir/runtime/scripted_techs.lua'-or[string]$hostEntry.source_identity.dispatcher.sha256-cne(Get-MIR4PlatformInputSha256 $dispatcher)-or[string]$hostEntry.source_identity.stage.path-cne'prototypes/mir/stage/control.lua'-or[string]$hostEntry.source_identity.stage.sha256-cne(Get-MIR4PlatformInputSha256 $stage)){throw "[mir4-w04-on-load-host-identity] $target"}}
 $f210=@($runtimeA.targets|Where-Object { $_.target -eq 'f210' })[0]
 $f110=@($runtimeA.targets|Where-Object { $_.target -eq 'f110' })[0]
@@ -72,12 +91,12 @@ $unknownOnLoad=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom
 $unknownOnLoad.on_load.handler='unknown-coordinator'
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $unknownOnLoad|Out-Null;throw '[mir4-w04-unknown-on-load-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}
 foreach($callbackForm in @(
-  @{name='swapped';callbacks=@('research_browser.on_load','passive_repair.on_load')},
+  @{name='swapped';callbacks=@('research_browser.on_load','passive_repair.on_load','compiler_profile_notice.on_load')},
   @{name='missing';callbacks=@('passive_repair.on_load')},
-  @{name='extra';callbacks=@('passive_repair.on_load','research_browser.on_load','unknown.on_load')}
+  @{name='extra';callbacks=@('passive_repair.on_load','research_browser.on_load','compiler_profile_notice.on_load','unknown.on_load')}
 )){$invalidCallbacks=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json;$invalidCallbacks.on_load.callbacks=@($callbackForm.callbacks);try{Assert-MIR4RuntimeRegistrationPlan -Plan $invalidCallbacks|Out-Null;throw "[mir4-w04-$($callbackForm.name)-on-load-callbacks-accepted]"}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}}
 $invalidHostCallbacks=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
-$invalidHostCallbacks.on_load.hosts[0].approved_callbacks=@('research_browser.on_load','passive_repair.on_load')
+$invalidHostCallbacks.on_load.hosts[0].approved_callbacks=@('research_browser.on_load','passive_repair.on_load','compiler_profile_notice.on_load')
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $invalidHostCallbacks|Out-Null;throw '[mir4-w04-swapped-host-on-load-callbacks-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}
 $duplicateOnLoad=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $duplicateOnLoad.on_load.registration_count=2
@@ -94,6 +113,9 @@ try{Assert-MIR4RuntimeRegistrationPlan -Plan $missingOnLoad|Out-Null;throw '[mir
 $missingOnTick=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $missingOnTick.PSObject.Properties.Remove('on_tick')
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $missingOnTick|Out-Null;throw '[mir4-w04-missing-on-tick-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-idle-or-load-mutation]')){throw}}
+$recurringTick=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
+$recurringTick.on_tick.conditional_one_shot=$false
+try{Assert-MIR4RuntimeRegistrationPlan -Plan $recurringTick|Out-Null;throw '[mir4-w04-recurring-tick-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-idle-or-load-mutation]')){throw}}
 $textReadonly=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $textReadonly.on_load.read_only_restoration='false'
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $textReadonly|Out-Null;throw '[mir4-w04-text-readonly-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-on-load-registration]')){throw}}

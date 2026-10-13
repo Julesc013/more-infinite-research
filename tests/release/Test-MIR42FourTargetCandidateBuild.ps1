@@ -1,6 +1,7 @@
 [CmdletBinding()]
-param([switch]$IdentityContractsOnly,[switch]$MaterializerReceiptContractsOnly)
+param([switch]$IdentityContractsOnly,[switch]$MaterializerReceiptContractsOnly,[switch]$HistoricalIdentityProjectionOnly,[switch]$HistoricalAuthenticationOnly)
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
@@ -37,6 +38,108 @@ function Assert-MIR42CandidateBuildTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Message)
   if (-not $Condition) { throw "[mir42-candidate-build-test] $Message" }
   if ($Message.StartsWith('422-',[StringComparison]::Ordinal)) { $script:mir422ConstructionAssertions++ }
+}
+
+function Test-MIR43HistoricalBaselineProjection {
+  param([string]$OutputRoot)
+  $checks = 0
+  $utf8 = [Text.UTF8Encoding]::new($false)
+  foreach ($target in @('f017','f016','f015','f014','f013')) {
+    $record = Get-Content -Raw -LiteralPath (Join-Path $repo "targets/historical/$target/target.json") | ConvertFrom-Json -Depth 100 -DateKind String
+    foreach ($sourceVersion in @('4.2.2','4.3.0','4.3.1')) {
+      $tree = Join-Path $OutputRoot "$target/$sourceVersion"
+      [IO.Directory]::CreateDirectory($tree) | Out-Null
+      $template = Join-Path $repo "source/presentation/historical/$target/info.json.template"
+      [IO.File]::WriteAllBytes((Join-Path $tree 'info.json'), [IO.File]::ReadAllBytes($template))
+      $history = "---------------------------------------------------------------------------------------------------`nVersion: $($record.distribution_version)`n  Changes:`n    - Retained authored entry.`n"
+      [IO.File]::WriteAllText((Join-Path $tree 'changelog.txt'), $history, $utf8)
+      $minor = [int]$sourceVersion.Split('.')[1]
+      $patch = [int]$sourceVersion.Split('.')[2]
+      $version = (New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $minor -SourcePatch $patch).distribution_version
+      Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion "4.$minor.0"
+      Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $version -SourceVersion $sourceVersion
+      $info = Get-Content -Raw -LiteralPath (Join-Path $tree 'info.json') | ConvertFrom-Json -Depth 20
+      Assert-MIR42CandidateBuildTest ([string]$info.version -ceq $version -and [string]$info.factorio_version -ceq [string]$record.factorio_line -and [string]$info.title -ceq 'More Infinite Research') "$sourceVersion-historical-real-adapter-identity-$target"
+      Assert-MIR42CandidateBuildTest ([IO.File]::ReadAllText((Join-Path $tree 'changelog.txt')).EndsWith($history,[StringComparison]::Ordinal)) "$sourceVersion-historical-preserves-authored-history-$target"
+      $checks += 2
+    }
+  }
+  $record = Get-Content -Raw -LiteralPath (Join-Path $repo 'targets/historical/f017/target.json') | ConvertFrom-Json -Depth 100 -DateKind String
+  foreach ($bad in @('version','factorio_version','name','record-line')) {
+    $tree = Join-Path $OutputRoot "negative-$bad"
+    [IO.Directory]::CreateDirectory($tree) | Out-Null
+    $info = Get-Content -Raw -LiteralPath (Join-Path $repo 'source/presentation/historical/f017/info.json.template') | ConvertFrom-Json -Depth 20
+    $testRecord = $record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+    switch ($bad) {
+      'version' {$info.version='4.2.01701'}
+      'factorio_version' {$info.factorio_version='0.13'}
+      'name' {$info.name='another-mod'}
+      'record-line' {$info.factorio_version='0.13';$testRecord.factorio_line='0.13'}
+    }
+    $path = Join-Path $tree 'info.json'
+    [IO.File]::WriteAllText($path, ($info | ConvertTo-Json -Depth 20), $utf8)
+    $before = Get-MIR4Sha256File -Path $path
+    $rejected = $false
+    try { Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $testRecord -BaselineSourceVersion '4.3.0' }
+    catch { $rejected = $_.Exception.Message -ceq '[mir42-historical-baseline-input-identity]' }
+    Assert-MIR42CandidateBuildTest ($rejected -and (Get-MIR4Sha256File -Path $path) -ceq $before) "historical-baseline-refuses-$bad-without-write"
+    $checks++
+  }
+  return $checks
+}
+
+function Test-MIR43HistoricalCandidateAuthentication {
+  param([Parameter(Mandatory)][string]$OutputRoot)
+
+  . (Join-Path $repo 'tests/support/MIR43HistoricalCandidateAuthentication.ps1')
+  $projectionChecks = 0
+  foreach ($sourceVersion in @('4.3.0','4.3.1')) {
+    foreach ($target in @('f017','f016','f015','f014','f013')) {
+      $projection = Get-MIR43HistoricalCandidateAuthenticationProjection -Repository $repo -Target $target -SourceVersion $sourceVersion
+      Assert-MIR42CandidateBuildTest (
+        [string]$projection.target -ceq $target -and
+        [string]$projection.source_version -ceq $sourceVersion -and
+        [string]$projection.canonical_base.target -ceq 'f100' -and
+        [string]$projection.source.commit -ceq ((& git -C $repo rev-parse HEAD).Trim()) -and
+        [string]$projection.source.tree -ceq ((& git -C $repo rev-parse 'HEAD^{tree}').Trim()) -and
+        @($projection.members).Count -gt 0 -and
+        [string]$projection.member_projection_sha256 -match '^[0-9A-F]{64}$'
+      ) "historical-authentication-projection-current-authorities-$sourceVersion-$target"
+      $projectionChecks++
+    }
+  }
+
+  $writer = Join-Path $repo 'tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1'
+  $manifestRows = @(& $writer -RepoRoot $repo -Target f017 -SourceVersion '4.3.0' -CandidateId 'AUTHENTICATION-CONTROL' -OutputRoot $OutputRoot -Repetitions 2 -Check)
+  Assert-MIR42CandidateBuildTest ($manifestRows.Count -eq 1) 'historical-authentication-fixture-manifest-count'
+  $manifest = $manifestRows[0]
+  $manifestPath = Join-Path $OutputRoot 'manifests/f017.json'
+  $archive = Join-Path $repo ([string]$manifest.distribution.path)
+  Assert-MIR42CandidateBuildTest (
+    (Test-Path -LiteralPath $manifestPath -PathType Leaf) -and
+    (Test-Path -LiteralPath $archive -PathType Leaf) -and
+    [string]$manifest.target -ceq 'f017' -and
+    [string]$manifest.candidate_row.source_version -ceq '4.3.0'
+  ) 'historical-authentication-fixture-identity'
+  $controls = Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls -Repository $repo -Archive $archive -ManifestPath $manifestPath `
+    -Target f017 -SourceVersion '4.3.0' -WorkRoot (Join-Path $OutputRoot 'opposing')
+  Assert-MIR42CandidateBuildTest (
+    [string]$controls.status -ceq 'passed' -and
+    [int]$controls.assertions -eq 4 -and
+    [int]$controls.authority_input_assertions -eq 5 -and
+    [int]$controls.receipt_custody_assertions -eq 6 -and
+    -not [bool]$controls.native_factorio -and
+    -not [bool]$controls.package_materialization -and
+    -not (Test-Path -LiteralPath (Join-Path $OutputRoot 'opposing'))
+  ) 'historical-authentication-opposing-controls'
+  return [pscustomobject][ordered]@{
+    authority_projection_checks = $projectionChecks
+    authentication_assertions = [int]$controls.assertions
+    authority_input_assertions = [int]$controls.authority_input_assertions
+    receipt_custody_assertions = [int]$controls.receipt_custody_assertions
+    authentic_candidate_zip_builds = 2
+    factorio_processes = 0
+  }
 }
 
 function New-MIR4TargetPackage {
@@ -221,6 +324,9 @@ foreach ($entryPoint in @(
     ($sourceValues -join '|') -ceq ($admittedCandidateSources -join '|')
   ) "candidate-entrypoint-current-source-admission-$([IO.Path]::GetFileNameWithoutExtension($entryPoint))"
   if ($entryPoint.EndsWith('New-MIR42HistoricalPlaytestCandidate.ps1', [StringComparison]::Ordinal)) {
+    $identityHelpers = @($entryAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Set-MIR42HistoricalBaselinePackageIdentity'}, $true))
+    Assert-MIR42CandidateBuildTest ($identityHelpers.Count -eq 1) 'historical-baseline-projection-helper'
+    . ([scriptblock]::Create($identityHelpers[0].Extent.Text))
     $baseMaterializers = @($entryAst.FindAll({ param($node) $node -is [Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'New-MIR4TargetPackage' }, $true))
     Assert-MIR42CandidateBuildTest (
       $baseMaterializers.Count -eq 1 -and $baseMaterializers[0].Extent.Text -match '-SourceVersion\s+\$baselineSourceVersion'
@@ -234,11 +340,33 @@ $nineRoot = $root + '-nine'
 $identityRoot = $root + '-identity'
 $patchRoot = $root + '-patch'
 $receiptRoot = $root + '-receipts'
+$historicalAuthenticationRoot = $root + '-historical-authentication'
 $historicalRecordHashes = @{}
 foreach ($target in @('f017','f016','f015','f014','f013')) {
   $historicalRecordHashes[$target] = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $repo "targets/historical/$target/target.json")).Hash
 }
 try {
+  $historicalIdentityChecks = Test-MIR43HistoricalBaselineProjection -OutputRoot (Join-Path $identityRoot 'historical-baseline')
+  if ($HistoricalIdentityProjectionOnly) {
+    [pscustomobject]@{status='MIR-4.3-HISTORICAL-IDENTITY-PROJECTION-CONTROLS-PASSED';checks=$historicalIdentityChecks;targets=5;source_versions=@('4.2.2','4.3.0','4.3.1');engine_runs=0;actual_candidate_zip_builds=0}
+    return
+  }
+  if ($HistoricalAuthenticationOnly) {
+    $historicalAuthentication = Test-MIR43HistoricalCandidateAuthentication -OutputRoot $historicalAuthenticationRoot
+    [pscustomobject][ordered]@{
+      status = 'MIR-4.3-HISTORICAL-CANDIDATE-AUTHENTICATION-CONTROLS-PASSED'
+      targets = 5
+      source_versions = @('4.3.0','4.3.1')
+      authority_projection_checks = [int]$historicalAuthentication.authority_projection_checks
+      authentication_assertions = [int]$historicalAuthentication.authentication_assertions
+      authority_input_assertions = [int]$historicalAuthentication.authority_input_assertions
+      receipt_custody_assertions = [int]$historicalAuthentication.receipt_custody_assertions
+      authentic_candidate_zip_builds = [int]$historicalAuthentication.authentic_candidate_zip_builds
+      factorio_processes = [int]$historicalAuthentication.factorio_processes
+      qualification = 'not-performed'
+    }
+    return
+  }
   if ($MaterializerReceiptContractsOnly) {
     Test-MIR42RetainedMaterializerReceipts -OutputRoot $receiptRoot
     [pscustomobject]@{status='MIR-4.2.1-RETAINED-MATERIALIZER-RECEIPTS-PASSED';receipt_assertions=$script:mir42CandidateReceiptAssertions;canonical_packages=2;native_candidate_readers=2;factorio_processes=0;qualification='not-performed'}
@@ -1076,15 +1204,36 @@ try {
   $legacyCriterion=Get-MIR42CriterionObservationContract -Criterion 'fresh-exact-loads'
   Assert-MIR42CandidateBuildTest ($legacyCriterion.kind-ceq'MIR42NineTargetRealEngineEvidenceBinderV1') 'maintenance-criterion-preserves-default-contract'
   $maintenanceCriterionAssertions++
+  # The source-specific contract is selected after reading the candidate.
+  # Test the CLI's real named-argument forwarding with a controlled boundary;
+  # the preceding controls separately enforce the 4.2 maintenance restriction.
+  $criterionCliRepo=Join-Path $identityRoot 'criterion-cli-binding-repo'
+  $criterionCliLibrary=Join-Path $criterionCliRepo 'tools/mir/application/release/readiness'
+  New-Item -ItemType Directory -Force -Path $criterionCliLibrary|Out-Null
+  [IO.File]::WriteAllText((Join-Path $criterionCliLibrary 'MIR42EvidenceReconciliation.ps1'),@'
+function New-MIR42NineTargetCriterionEvidence {
+  param($RepoRoot,$CandidateManifestPath,$Criterion,$ObservationPaths,$ObservedTargets,$NotApplicableTargetReasons,$Claim,$KnownLimitations,$OutputPath,$PublishedMaintenancePredecessorManifestPath,$PublishedMaintenanceArchiveBindings)
+  if($PublishedMaintenancePredecessorManifestPath-cne'not-read.json'-or$Criterion-cne'performance-telemetry'){
+    throw '[controlled-criterion-cli-missing-maintenance-binding]'
+  }
+  throw '[mir42-maintenance-criterion-input-scope]'
+}
+'@,[Text.UTF8Encoding]::new($false))
   $rejected=$false
   try{
-    & (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetEvidenceReconciliation.ps1') -Mode Criterion -RepoRoot $repo `
+    & (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetEvidenceReconciliation.ps1') -Mode Criterion -RepoRoot $criterionCliRepo `
       -CandidateManifestPath (Join-Path $identityRoot 'not-read.json') -Criterion 'performance-telemetry' -ObservationPaths @('not-read.json') `
       -ObservedTargets @('f210') -Claim 'source flag-forwarding control' -KnownLimitations 'not native' `
       -OutputPath (Join-Path $identityRoot 'must-not-create.json') -PublishedMaintenancePredecessorManifestPath 'not-read.json'|Out-Null
   }catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-criterion-input-scope]'}
   Assert-MIR42CandidateBuildTest ($rejected-and-not(Test-Path -LiteralPath (Join-Path $identityRoot 'must-not-create.json'))) 'maintenance-criterion-cli-forwards-and-refuses-out-of-scope-option'
   $maintenanceCriterionAssertions++
+  foreach($criterion in $script:MIR42ReleaseAcceptanceCriteria){
+    $current=Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance -SourceVersion '4.3.0'
+    $dedicated=$criterion-cin@('fresh-exact-loads','target-omissions')
+    Assert-MIR42CandidateBuildTest ($(if($dedicated){$null-ne$current-and-not[string]::IsNullOrWhiteSpace([string]$current.kind)}else{$null-eq$current})) ('mir430-criterion-contract-admitted-'+$criterion)
+    $maintenanceCriterionAssertions++
+  }
   if ($IdentityContractsOnly) {
     [pscustomobject][ordered]@{ status='MIR-4.3-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; source_versions=@('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1'); current_maintenance_contract_assertions=$script:mir422ConstructionAssertions; target_identities=9; mir43_source_versions=@('4.3.0','4.3.1'); mir43_target_identities=18; mir43_manifest_contracts=2; metadata_idempotence_checks=9; invalid_version_refusals=2; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
@@ -1150,6 +1299,24 @@ try {
     Assert-MIR42CandidateBuildTest ([string]$row.target_record.path -ceq "targets/historical/$target/target.json" -and -not [bool]$row.public_output_authorized -and -not [bool]$row.publication_authorized) "nine-historical-row-binding-$target"
     Assert-MIR42CandidateBuildTest ([string]$row.engine.sha256 -match '^[A-Fa-f0-9]{64}$' -and [string]$row.predecessor.sha256 -match '^[A-Fa-f0-9]{64}$') "nine-historical-row-engine-predecessor-$target"
     Assert-MIR42CandidateBuildTest ([string]$row.historical_materializer_manifest_sha256 -match '^[A-Fa-f0-9]{64}$') "nine-historical-row-manifest-receipt-$target"
+    $retainedManifestPath = Join-Path $nineRoot "materializations/$target.json"
+    $retainedManifestIdentity = if (Test-Path -LiteralPath $retainedManifestPath -PathType Leaf) {
+      Get-MIR4RawFileIdentity -Path $retainedManifestPath
+    } else { $null }
+    $retainedManifest = if (Test-Path -LiteralPath $retainedManifestPath -PathType Leaf) {
+      Get-Content -Raw -LiteralPath $retainedManifestPath | ConvertFrom-Json -Depth 100 -DateKind String
+    } else { $null }
+    Assert-MIR42CandidateBuildTest (
+      $null -ne $retainedManifest -and
+      $null -ne $retainedManifestIdentity -and
+      $null -ne $row.historical_materializer_manifest -and
+      [string]$row.historical_materializer_manifest.path -ceq "materializations/$target.json" -and
+      [int64]$row.historical_materializer_manifest.bytes -eq [int64]$retainedManifestIdentity.bytes -and
+      [string]$row.historical_materializer_manifest.sha256 -ceq [string]$retainedManifestIdentity.sha256 -and
+      [string]$row.historical_materializer_manifest.record_sha256 -ceq [string]$row.historical_materializer_manifest_sha256 -and
+      (Test-MIR4BootstrapRecordHash -Record $retainedManifest) -and
+      [string]$retainedManifest.record_sha256 -ceq [string]$row.historical_materializer_manifest_sha256
+    ) "nine-historical-row-retains-self-hashed-construction-manifest-$target"
     $asset = Join-Path $nineRoot ([string]$row.asset.path)
     Assert-MIR42CandidateBuildTest ((Get-MIR4Sha256File -Path $asset) -ceq [string]$row.asset.sha256) "nine-historical-row-custody-$target"
   }
@@ -1236,7 +1403,7 @@ try {
     engine_runs = 0
   }
 } finally {
-  foreach ($path in @($root, $partialRoot, $historicalRoot, $nineRoot, $identityRoot, $patchRoot, $receiptRoot)) {
+  foreach ($path in @($root, $partialRoot, $historicalRoot, $nineRoot, $identityRoot, $patchRoot, $receiptRoot, $historicalAuthenticationRoot)) {
     if (Test-Path -LiteralPath $path) {
       $resolvedPath = (Resolve-Path -LiteralPath $path).Path
       $null = Assert-MIR4DescendantPath -Root (Join-Path $repo 'build') -Path $resolvedPath
