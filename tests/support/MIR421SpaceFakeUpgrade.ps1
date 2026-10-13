@@ -134,6 +134,14 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "'+$ToVersion+'" then')
   $control=$control.Replace('complete Space Age state retained','complete research state retained')
   $control=$control.Replace('mir-4121000-upgraded',('mir-'+$ToVersion.Replace('.','')+'-upgraded'))
+  if($ToVersion -match '^4[.]3[.]200(?:00|01)$') {
+    # Only the newly introduced, preservation-capable selector is admitted.
+    # Source snapshots stay unchanged; all old settings and all research
+    # definitions/investment still pass through the complete equality oracle.
+    $settingAnchor='local added_422_setting_defaults = {}'
+    if(-not $control.Contains($settingAnchor)){throw '[mir430-full-upgrade-setting-anchor]'}
+    $control=$control.Replace($settingAnchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')
+  }
   if($ToVersion -match '^4[.]2[.]') {
   $reviewed=@'
 local reviewed_420_frontier = require("mir422_reviewed_science_delta")

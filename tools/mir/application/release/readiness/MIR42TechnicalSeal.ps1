@@ -43,7 +43,7 @@ $script:MIR42SealVerifierDependencyPaths = @(
   'spec/schemas/mir430-classic-startup-stress-observation-v1.schema.json',
   'fixtures/run-profiles/mir430-startup-galore-space-age-f200.json',
   'fixtures/run-profiles/mir430-startup-bob-angel-f200.json',
-  'fixtures/run-profiles/mir430-startup-omni-bob-angel-46.json',
+  'fixtures/run-profiles/mir430-startup-omni-bob-angel-46-f200.json',
   'fixtures/assert-mir430-startup-work/info.json',
   'fixtures/assert-mir430-startup-work/settings-updates.lua',
   'fixtures/assert-mir430-startup-work/data-final-fixes.lua',
@@ -1681,21 +1681,13 @@ function Assert-MIR42IndividualUpgradeReceipt {
     throw '[mir42-individual-engine-run-engine-version]'
   }
   $candidateSourceVersion = (Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance).maintenance_source_version
-  # The reduced 4.3.0 Classic proof deliberately carries its bounded snapshots
-  # under a different field.  Keep the strict/historical projection on the
-  # full-state field: the native-proof reader owns all policy and missing-field
-  # diagnostics after this exact candidate/policy selection.
-  $classicReducedPolicy = $candidateSourceVersion -ceq '4.3.0' -and
-    $receipt.Contains('upgrade_policy') -and
-    $receipt.upgrade_policy -is [Collections.IDictionary] -and
-    [string]$receipt.upgrade_policy.kind -ceq 'MIR430ClassicReducedUpgradePolicyV1'
-  # A reduced Classic receipt is a modern-target contract.  Decide this before
-  # choosing its snapshot field so a forged historical receipt cannot select
-  # the relaxed branch merely by carrying a self-consistent Classic payload.
-  if ($receipt.Contains('upgrade_policy') -and [string]$CandidateTarget.target -cnotin @('f210','f200','f110','f100')) {
-    throw '[mir42-individual-engine-run-classic-target]'
+  # The seal is release evidence, so it always binds the complete Full
+  # preservation oracle. Classic remains available for private
+  # characterization but cannot select a reduced snapshot field here.
+  if ($candidateSourceVersion -ceq '4.3.0' -and $receipt.Contains('upgrade_policy')) {
+    throw '[mir430-upgrade-classic-reduced-policy-not-release-preservation]'
   }
-  $snapshotField = if ($classicReducedPolicy) { 'classic_upgrade_evaluator_snapshots' } else { 'full_state_evaluator_snapshots' }
+  $snapshotField = 'full_state_evaluator_snapshots'
   $snapshots = if ($receipt.Contains($snapshotField)) { @($receipt[$snapshotField]) } else { @() }
   $upgradeRow = [pscustomobject]@{
     target = [string]$CandidateTarget.target

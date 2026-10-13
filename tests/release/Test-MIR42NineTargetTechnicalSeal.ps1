@@ -823,6 +823,10 @@ function Test-MIR430ClassicSnapshotProjection {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $ErrorActionPreference = 'Stop'
   . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1')
+  $requiredStressProfile = 'fixtures/run-profiles/mir430-startup-omni-bob-angel-46-f200.json'
+  Assert-MIR42NineSealTest -Condition ($script:MIR42SealVerifierDependencyPaths -contains $requiredStressProfile) -Code 'mir430-stress-profile-dependency-is-current'
+  Assert-MIR42NineSealTest -Condition (-not ($script:MIR42SealVerifierDependencyPaths -contains 'fixtures/run-profiles/mir430-startup-omni-bob-angel-46.json')) -Code 'mir430-stress-profile-dependency-does-not-name-absent-fixture'
+  Assert-MIR42NineSealTest -Condition (Test-Path -LiteralPath (Join-Path $RepoRoot $requiredStressProfile) -PathType Leaf) -Code 'mir430-stress-profile-dependency-exists'
   . (Join-Path $RepoRoot 'tests/support/MIR421ReleaseAssetControls.ps1')
   $root = Join-Path $RepoRoot ('build/test-results/mir430-classic-seal-projection-' + [guid]::NewGuid().ToString('N'))
   [IO.Directory]::CreateDirectory($root) | Out-Null
@@ -877,7 +881,7 @@ function Test-MIR430ClassicSnapshotProjection {
     $candidate = [pscustomobject]@{source=[pscustomobject]@{commit=$commit}}
 
     foreach ($case in @(
-      @{target='f210';policy='classic';snapshot_field='classic_upgrade_evaluator_snapshots'},
+      @{target='f210';policy='full';snapshot_field='full_state_evaluator_snapshots'},
       @{target='f017';policy='full';snapshot_field='full_state_evaluator_snapshots'}
     )) {
       $original = @((Get-Content -LiteralPath $control.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100).rows | Where-Object {
@@ -906,14 +910,14 @@ function Test-MIR430ClassicSnapshotProjection {
     $classicPublished = [pscustomobject]@{release_id=1;source_tag=[string]$classicProof.published_maintenance_predecessor.source_tag;source=[pscustomobject]@{commit=('D'*40);tree=('E'*40)};tag_object=('9'*40);remote_tag_readback=$true;manifest=[pscustomobject]@{path='host-only-manifest.json';sha256=[string]$classicProof.published_maintenance_predecessor.manifest.sha256;bytes=1};signed=$false;targets=@($classicInput);native_qualification='not-performed';release_qualification='not-performed'}
     $forged = New-ClassicSealReceiptRow -Row $classicRow -Commit $commit -EngineHash $engineHash -EngineVersion $engineVersion -Published $classicPublished
     $forgedRecord = Copy-ClassicSealValue $forged.receipt
-    $forgedRecord.upgrade_policy.kind = 'forged-classic-policy'
+    $forgedRecord.upgrade_policy = @{kind='MIR430ClassicReducedUpgradePolicyV1'}
     $forgedReference = Write-ClassicSealJson (Join-Path (Split-Path -Parent $forged.row.receipt.path) 'forged-policy.json') $forgedRecord
     $forged.row.receipt = $forgedReference
     $failure = ''
     try {
       $null = Assert-MIR42IndividualUpgradeReceipt -ReceiptReference $forged.row.receipt -CandidateTarget (@($packages | Where-Object { $_.target -ceq 'f210' })[0]) -PublishedInput $classicInput -PublishedMaintenanceInputs $classicPublished -Engine ([pscustomobject]@{path=$enginePath;sha256=$engineHash;version=$engineVersion}) -HarnessExitCode 0 -Candidate $candidate
     } catch { $failure = $_.Exception.Message }
-    Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir430-upgrade-full-state-phase-skipped]',[StringComparison]::Ordinal)) -Code 'classic-seal-forged-policy-does-not-project-classic-snapshots'
+    Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir430-upgrade-classic-reduced-policy-not-release-preservation]',[StringComparison]::Ordinal)) -Code 'classic-seal-forged-policy-cannot-enter-release-preservation'
     $checks++
 
     # A forged historical receipt must be rejected before its policy can select
@@ -933,7 +937,7 @@ function Test-MIR430ClassicSnapshotProjection {
     try {
       $null = Assert-MIR42IndividualUpgradeReceipt -ReceiptReference $historicalForged.row.receipt -CandidateTarget (@($packages | Where-Object { $_.target -ceq 'f017' })[0]) -PublishedInput $historicalInput -PublishedMaintenanceInputs $historicalPublished -Engine ([pscustomobject]@{path=$enginePath;sha256=$engineHash;version=$engineVersion}) -HarnessExitCode 0 -Candidate $candidate
     } catch { $failure = $_.Exception.Message }
-    Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir42-individual-engine-run-classic-target]',[StringComparison]::Ordinal)) -Code 'classic-seal-historical-policy-rejected-before-projection'
+    Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir430-upgrade-classic-reduced-policy-not-release-preservation]',[StringComparison]::Ordinal)) -Code 'classic-seal-historical-policy-rejected-before-projection'
     $checks++
   } finally {
     Set-Item -LiteralPath Function:script:Get-MIR42IndividualEngineEvidenceBindingContract -Value $contractReader
