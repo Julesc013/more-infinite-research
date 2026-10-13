@@ -67,11 +67,33 @@ function Assert-MIR42EngineSharedInputs {
   function Refuses([scriptblock]$Action,[string]$Expected){$failure='';try{& $Action|Out-Null}catch{$failure=$_.Exception.Message};Check ($failure.Contains($Expected)) "expected $Expected; got $failure"}
   $script:engineSharedAssertions=0
   $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot ('build/tmp/engine-link-controls-'+[guid]::NewGuid().ToString('N')))
-  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives')){
+  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42EngineMaintenanceSelection','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives')){
     Import-MIR42EngineRunnerFunction -Path $runnerPath -Name $name
   }
   try {
     $null=New-Item -ItemType Directory -Path $scratch
+    foreach($case in @(
+      @{candidate='4.2.1';requested='';source='4.2.0';reader='4.2.1'},
+      @{candidate='4.2.2';requested='';source='4.2.1';reader='4.2.2'},
+      @{candidate='4.2.3';requested='';source='4.2.2';reader='4.2.3'},
+      @{candidate='4.2.3';requested='4.2.0';source='4.2.0';reader='4.2.1'},
+      @{candidate='4.2.3';requested='4.2.1';source='4.2.1';reader='4.2.2'},
+      @{candidate='4.3.0';requested='';source='4.2.2';reader='4.2.3'},
+      @{candidate='4.3.1';requested='';source='4.3.0';reader='4.3.1'},
+      @{candidate='4.3.1';requested='4.3.0';source='4.3.0';reader='4.3.1'},
+      @{candidate='4.3.1';requested='4.2.2';source='4.2.2';reader='4.2.3'}
+    )){
+      $selection=Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion $case.candidate -RequestedPredecessorSourceVersion $case.requested
+      Check ($selection.source_version-ceq$case.source-and$selection.reader_version-ceq$case.reader) ('frozen predecessor reader selection '+$case.candidate+'/'+$case.requested)
+      $selectedContract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $selection.reader_version
+      Check ($selectedContract.source_version-ceq$selection.source_version) 'selected reader authenticates a different predecessor'
+    }
+    foreach($invalid in @('4.1.0','4.2.0','4.2.1','4.3.1','4.3.2')){
+      Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.1' -RequestedPredecessorSourceVersion $invalid} 'mir42-engine-maintenance-predecessor-selection'
+    }
+    Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.2.2' -RequestedPredecessorSourceVersion '4.2.0'} 'mir42-engine-maintenance-predecessor-selection'
+    Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.0' -RequestedPredecessorSourceVersion '4.3.0'} 'mir42-engine-maintenance-predecessor-selection'
+    Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.2'} 'mir42-engine-maintenance-predecessor-candidate-scope'
     # A fresh PowerShell scope must preserve failures before any output allocation.
     $earlyFailure=Join-Path $scratch 'early-failure.ps1'
     [IO.File]::WriteAllText($earlyFailure,@'
