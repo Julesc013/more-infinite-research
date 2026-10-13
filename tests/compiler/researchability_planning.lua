@@ -870,10 +870,10 @@ do
     return w
   end
 
-  -- This is the relevant F200 Base prototype shape.  In particular,
+  -- This is the relevant F200/F210 Base prototype shape. In both engines,
   -- rocket-silo-rocket has inventory_size = 0: the payload is staged in the
   -- rocket silo's to_be_inserted_to_rocket_inventory_size instead.
-  local function base_f200_launch_world()
+  local function base_modern_launch_world()
     return {
       item_prototypes = {
         ["space-science-pack"] = {type = "tool"},
@@ -1125,43 +1125,46 @@ do
       and w.recipe_facts.parts.variants[1].surface_conditions == nil,
       "Returned witnesses and merged surface constraints cannot mutate prototypes or subsequent results")
   end
-  target_profile.current_factorio_version = "2.0"
-  local base = base_f200_launch_world()
-  reset(base)
-  local base_witness = feasibility.acquisition_witness("space-science-pack")
-  check("LAUNCH-F200-BASE-01", base_witness and base_witness.kind == "rocket-launch"
-    and base_witness.payload == "satellite" and base_witness.machine.prototype == "rocket-silo"
-    and base_witness.receiver and base_witness.receiver.prototype == "cargo-landing-pad"
-    and base_witness.recipe_witness.recipe == "rocket-part" and base_witness.recipe_witness.crafts == 100
-    and production.pack_production_status("space-science-pack", {}) == "non-recipe",
-    "F200 Base satellite launch accepts its stock zero-sized rocket entity while retaining silo payload staging")
-
-  base = base_f200_launch_world()
-  base.rockets["rocket-silo-rocket"].inventory_size = nil
-  reset(base)
-  check("LAUNCH-F200-BASE-02", feasibility.acquisition_witness("space-science-pack") ~= nil,
-    "A defaulted rocket entity inventory field is not treated as the payload staging capacity")
-
-  base = base_f200_launch_world()
-  base.rocket_silos["rocket-silo"].to_be_inserted_to_rocket_inventory_size = 0
-  reset(base)
-  check("LAUNCH-F200-BASE-03", feasibility.acquisition_witness("space-science-pack") == nil,
-    "F200 Base still requires the silo's positive payload staging slot")
-
-  for index, invalid_size in ipairs({-1, math.huge, 0 / 0}) do
-    base = base_f200_launch_world()
-    base.rockets["rocket-silo-rocket"].inventory_size = invalid_size
+  for _, version in ipairs({"2.0", "2.1"}) do
+    target_profile.current_factorio_version = version
+    local target = version == "2.0" and "F200" or "F210"
+    local base = base_modern_launch_world()
     reset(base)
-    check("LAUNCH-F200-BASE-04-" .. index,
-      feasibility.acquisition_witness("space-science-pack") == nil,
-      "Negative or non-finite rocket entity metadata cannot establish a launch route")
-  end
+    local base_witness = feasibility.acquisition_witness("space-science-pack")
+    check("LAUNCH-" .. target .. "-BASE-01", base_witness and base_witness.kind == "rocket-launch"
+      and base_witness.payload == "satellite" and base_witness.machine.prototype == "rocket-silo"
+      and base_witness.receiver and base_witness.receiver.prototype == "cargo-landing-pad"
+      and base_witness.recipe_witness.recipe == "rocket-part" and base_witness.recipe_witness.crafts == 100
+      and production.pack_production_status("space-science-pack", {}) == "non-recipe",
+      target .. " Base satellite launch accepts its stock zero-sized rocket entity while retaining silo payload staging")
 
-  base = base_f200_launch_world()
-  base.rockets["rocket-silo-rocket"] = "malformed-rocket-prototype"
-  reset(base)
-  check("LAUNCH-F200-BASE-05", feasibility.acquisition_witness("space-science-pack") == nil,
-    "A malformed rocket entity prototype is rejected before its metadata is inspected")
+    base = base_modern_launch_world()
+    base.rocket_silos["rocket-silo"].to_be_inserted_to_rocket_inventory_size = 0
+    reset(base)
+    check("LAUNCH-" .. target .. "-BASE-02", feasibility.acquisition_witness("space-science-pack") == nil,
+      target .. " Base still requires the silo's positive payload staging slot")
+
+    base = base_modern_launch_world()
+    base.rockets["rocket-silo-rocket"].inventory_size = nil
+    reset(base)
+    check("LAUNCH-" .. target .. "-BASE-03", feasibility.acquisition_witness("space-science-pack") == nil,
+      target .. " Base requires the rocket entity's declared inventory size")
+
+    for index, invalid_size in ipairs({-1, 0.5, "0", math.huge, 0 / 0}) do
+      base = base_modern_launch_world()
+      base.rockets["rocket-silo-rocket"].inventory_size = invalid_size
+      reset(base)
+      check("LAUNCH-" .. target .. "-BASE-04-" .. index,
+        feasibility.acquisition_witness("space-science-pack") == nil,
+        "Negative, fractional, non-numeric, or non-finite rocket entity metadata cannot establish a launch route")
+    end
+
+    base = base_modern_launch_world()
+    base.rockets["rocket-silo-rocket"] = "malformed-rocket-prototype"
+    reset(base)
+    check("LAUNCH-" .. target .. "-BASE-05", feasibility.acquisition_witness("space-science-pack") == nil,
+      "A malformed rocket entity prototype is rejected before its metadata is inspected")
+  end
   target_profile.current_factorio_version = "1.1"
   reset(launch_world(false))
   check("LAUNCH19", feasibility.acquisition_witness("pack") == nil,

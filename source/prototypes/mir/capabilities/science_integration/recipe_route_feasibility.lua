@@ -93,6 +93,10 @@ local function finite_nonnegative(value)
   return type(value) == "number" and value == value and value >= 0 and value < math.huge
 end
 
+local function finite_nonnegative_integer(value)
+  return finite_nonnegative(value) and value % 1 == 0
+end
+
 local function finite_temperature(value)
   return type(value) == "number" and value == value and math.abs(value) < math.huge
 end
@@ -1644,12 +1648,12 @@ rocket_launch_witness = function(source, identity, options, state)
       local recipe = silo.fixed_recipe
       if type(recipe) == "string" and recipe ~= "" and type(rocket) == "table"
         and silo.launch_to_space_platforms ~= true
-        -- RocketSiloRocketPrototype inventory_size is not the payload staging
-        -- capacity.  Base F200 declares it as zero, while the silo declares
-        -- the item slot that actually receives the payload.  Keep malformed
-        -- declared metadata out, but accept zero and an engine-default field.
+        -- RocketSiloRocketPrototype inventory_size is required unsigned
+        -- metadata, not the payload staging capacity. Base F200/F210 declares
+        -- it as zero; the silo declares the positive item slot that stages the
+        -- payload. Keep malformed or fractional declared metadata out.
         and finite_positive(silo.to_be_inserted_to_rocket_inventory_size)
-        and (rocket.inventory_size == nil or finite_nonnegative(rocket.inventory_size))
+        and finite_nonnegative_integer(rocket.inventory_size)
         and finite_positive(silo.crafting_speed)
         and finite_positive(silo.rocket_parts_required) and silo.rocket_parts_required % 1 == 0 then
         local placement = source_actor_witness({prototype = name, prototype_type = "rocket-silo"}, options, state)
