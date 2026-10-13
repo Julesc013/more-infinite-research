@@ -8467,6 +8467,7 @@
         "tools/lib/validation/SettingsOverrides.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "fixtures/release-inputs/mir431-published-430-manifest.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
@@ -8546,5 +8547,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:6f2ddb9aea42ba381b8822202ae301a4ff51b78b42da2a86ef4e9098ca26193b"
+  "digest": "sha256:7b51ce8fbd02385961feef86cff2aa96767dff086c235dba7e8f9496470fc18f"
 }
