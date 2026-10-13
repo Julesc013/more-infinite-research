@@ -214,6 +214,7 @@ local browser_omission_provider=(function()
     elseif name=="prototypes.mir.settings.profile_codec" then return {
       import_setting_name="mir-profile-import",decode=function() return nil end
     }
+    end
     error("[mir-browser-omission-provider-dependency] "..tostring(name),2)
   end
 '@)
