@@ -14,6 +14,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
     [AllowEmptyString()][string]$FromVersion='',
     [switch]$SpaceIsFake,
     [switch]$SpaceAge,
+    [switch]$F200GaloreSpaceAge,
     [switch]$HistoricalSettingsOracle)
   # Only the disposable prepared fixture changes. Identity includes the
   # predecessor when 4.2.2 tests both CCC00 -> CCC02 and CCC01 -> CCC02:
@@ -21,6 +22,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   # archive name/version.
   if($SpaceIsFake -and $Target -cnotin @('f210','f200')){throw '[mir421-sif-target]'}
   if($SpaceAge -and ($SpaceIsFake -or $Target-cne'f210')){throw '[mir422-space-age-fixture-target]'}
+  if($F200GaloreSpaceAge-and($Target-cne'f200'-or$SpaceIsFake-or$SpaceAge-or$HistoricalSettingsOracle)){throw '[mir431-f200-galore-fixture-target]'}
   $code=$Target.Substring(1)
   $source=[version]$SourceVersion
   $sourcePatch=$source.Build
@@ -44,7 +46,10 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
     throw '[mir423-f210-settings-oracle-transition]'
   }
   $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
-  $fixtureVersion=if($published410F200){'0.1.49'}elseif($source.Minor-eq3){'0.1.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'0.1.'+(30+$fromPatch)}elseif($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  $fixtureVersion=if($F200GaloreSpaceAge){
+    if($SourceVersion-cne'4.3.1'){throw '[mir431-f200-galore-fixture-transition]'}
+    if($FromVersion-ceq'4.3.20000'){'0.1.50'}elseif($FromVersion-ceq'4.2.20002'){'0.1.51'}else{throw '[mir431-f200-galore-fixture-transition]'}
+  }elseif($published410F200){'0.1.49'}elseif($source.Minor-eq3){'0.1.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'0.1.'+(30+$fromPatch)}elseif($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   if($HistoricalSettingsOracle){$fixtureVersion='0.1.33'}
   if($Target-ceq'f210'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceAge){
     $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
@@ -315,7 +320,7 @@ function Set-MIR422HistoricalCompleteStateUpgradeOracle {
 
 function Set-MIR430FullCompilerProfileUpgradeAllowance {
   param(
-    [Parameter(Mandatory)][ValidateSet('f210','f110','f100')][string]$Target,
+    [Parameter(Mandatory)][ValidateSet('f210','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
     [Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][string]$FromVersion,
     [Parameter(Mandatory)][string]$ToVersion,
@@ -325,6 +330,9 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
   $crossMinorTransition=$FromVersion-cin@("4.2.${code}00","4.2.${code}01","4.2.${code}02")-and$ToVersion-cin@("4.3.${code}00","4.3.${code}01")
   $published430Maintenance=$FromVersion-ceq("4.3.${code}00")-and$ToVersion-ceq("4.3.${code}01")
   if(-not($crossMinorTransition-or$published430Maintenance)){
+    throw '[mir430-full-upgrade-setting-transition]'
+  }
+  if($Target-cin@('f017','f016','f015','f014','f013')-and-not$crossMinorTransition){
     throw '[mir430-full-upgrade-setting-transition]'
   }
   $baseCompleteStateTransition=$Target-ceq'f210'-and(
@@ -536,6 +544,101 @@ function Add-MIR421SpaceFakeUpgradeOracle {
     $ControlText=$ControlText.Replace($pair[0],$pair[1])
   }
   return 'local sif = require("mir421_space_fake_upgrade")' + "`n" + $ControlText
+}
+
+function Read-MIR431F200GaloreSpaceAgeUpgradeProfile {
+  param([Parameter(Mandatory)][string]$Path)
+  $profile=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -Depth 20
+  if($profile.schema-ne1-or$profile.kind-cne'MIR430NamedStartupStressProfileV1'-or
+     $profile.id-cne'f200-galore-space-age'-or$profile.target-cne'f200'-or
+     $profile.status-cne'acquired-exact-selection-not-native-qualified'-or
+     $profile.claim_scope-cne'specified-available-inputs-not-reporter-313-mod-environment'-or
+     $null-eq$profile.engine-or$profile.engine.version-cne'2.0.77'-or
+     [string]$profile.engine.sha256-cne'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'){
+    throw '[mir431-f200-galore-profile]'
+  }
+  $expectedMods=[ordered]@{
+    base='2.0.77';'elevated-rails'='2.0.77';quality='2.0.77';'space-age'='2.0.77';
+    galore_lib='2.2.0';vanilla_galore_continued='1.4.2';space_age_galore='1.6.3'
+  }
+  $expectedArchives=[ordered]@{
+    'galore_lib_2.2.0.zip'=[ordered]@{name='galore_lib';version='2.2.0';bytes=77415;sha256='D473E10294091F45D77F181907FC777CEE181B18EB57B8B914D02E0D2C1C3FE2'}
+    'vanilla_galore_continued_1.4.2.zip'=[ordered]@{name='vanilla_galore_continued';version='1.4.2';bytes=113591;sha256='18ECF427C4671B7036C2AE278C19FF4E7853E68428D515F7A52095CB6D5DCF0C'}
+    'space_age_galore_1.6.3.zip'=[ordered]@{name='space_age_galore';version='1.6.3';bytes=149753;sha256='0C758F793E783082258F62705A17F40E917B9BBFC3B1D77ABF2A32E954CDE3B4'}
+  }
+  $expectedBuiltins=[ordered]@{
+    base=[ordered]@{version='2.0.77';info_sha256='FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786'}
+    'elevated-rails'=[ordered]@{version='2.0.77';info_sha256='310A4C06D65F08199A76780388BA93C333BB752B1258415EA4D5211D9A681089'}
+    quality=[ordered]@{version='2.0.77';info_sha256='2C2578FD84CC2E920C944C90047EAA5A1F6984A1CE07C246FC1906D90C5505AD'}
+    'space-age'=[ordered]@{version='2.0.77';info_sha256='F8957FC975949BB647B64CA246A4DE7F981232C4AB47C4DB4F60CCEA6AEF5E1A'}
+  }
+  $mods=@($profile.mods)
+  if($mods.Count-ne$expectedMods.Count-or@($mods|Group-Object name|Where-Object Count -GT 1).Count){throw '[mir431-f200-galore-selection]'}
+  foreach($name in $expectedMods.Keys){
+    $row=@($mods|Where-Object name -CEQ $name)
+    if($row.Count-ne1-or$row[0].enabled-isnot[bool]-or-not$row[0].enabled-or$row[0].version-cne$expectedMods[$name]){throw "[mir431-f200-galore-selection] $name"}
+  }
+  $archives=@($profile.archive_pins)
+  if($archives.Count-ne$expectedArchives.Count-or@($archives|Group-Object filename|Where-Object Count -GT 1).Count){throw '[mir431-f200-galore-archive-count]'}
+  $inputs=@()
+  foreach($filename in $expectedArchives.Keys){
+    $expected=$expectedArchives[$filename];$row=@($archives|Where-Object filename -CEQ $filename)
+    if($row.Count-ne1-or$row[0].name-cne$expected.name-or$row[0].version-cne$expected.version-or
+       [int64]$row[0].bytes-ne[int64]$expected.bytes-or[string]$row[0].sha256-cne$expected.sha256){throw "[mir431-f200-galore-archive] $filename"}
+    $inputs+=,[pscustomobject]@{file_name=$filename;expected_sha256=$expected.sha256;identity=[ordered]@{name=$expected.name;version=$expected.version};role='acquired-galore-space-age-upstream'}
+  }
+  $builtins=@($profile.builtin_pins)
+  if($builtins.Count-ne$expectedBuiltins.Count-or@($builtins|Group-Object name|Where-Object Count -GT 1).Count){throw '[mir431-f200-galore-builtin-count]'}
+  $builtinPins=@()
+  foreach($name in $expectedBuiltins.Keys){
+    $expected=$expectedBuiltins[$name];$row=@($builtins|Where-Object name -CEQ $name)
+    if($row.Count-ne1-or$row[0].version-cne$expected.version-or[string]$row[0].info_sha256-cne$expected.info_sha256){throw "[mir431-f200-galore-builtin] $name"}
+    $builtinPins+=,[pscustomobject]@{name=$name;version=$expected.version;info_sha256=$expected.info_sha256}
+  }
+  return [pscustomobject]@{profile=$profile;inputs=$inputs;builtin_pins=$builtinPins;sha256=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+}
+
+function Assert-MIR431F200GaloreSpaceAgeUpgradeTransition {
+  param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.3.1')
+  if($Target-cne'f200'-or$SourceVersion-cne'4.3.1'-or$FromVersion-cnotin@('4.2.20002','4.3.20000')-or$ToVersion-cne'4.3.20001'-or
+     $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'f200-galore-space-age'-or
+     $SpaceIsFake-or$SourceOnlyFixtureNames.Count){throw '[mir431-f200-galore-transition]'}
+}
+
+function Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle {
+  param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
+  $direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20001')
+  $immediate=[bool]($FromVersion-ceq'4.3.20000'-and$ToVersion-ceq'4.3.20001')
+  if(-not($direct-or$immediate)){throw '[mir431-f200-galore-oracle-transition]'}
+  $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
+  $controlPath=Join-Path $directory 'control.lua';$settingsPath=Join-Path $directory 'settings.lua';$infoPath=Join-Path $directory 'info.json'
+  foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
+  $control=Get-Content -LiteralPath $controlPath -Raw
+  $profileAnchor='["base-default"]={technology="mining-productivity-4",level=5}'
+  if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1){throw '[mir431-f200-galore-oracle-anchor]'}
+  $control=$control.Replace($profileAnchor,$profileAnchor+', ["f200-galore-space-age"]={technology="mining-productivity-4",level=5,requires_space_age=true}')
+  [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
+  $settings=Get-Content -LiteralPath $settingsPath -Raw
+  $settingsAnchor='default_value="base-default",allowed_values={"base-default"}'
+  if([regex]::Matches($settings,[regex]::Escape($settingsAnchor)).Count-ne1){throw '[mir431-f200-galore-settings-anchor]'}
+  $settings=$settings.Replace($settingsAnchor,'default_value="f200-galore-space-age",allowed_values={"base-default","f200-galore-space-age"}')
+  [IO.File]::WriteAllText($settingsPath,$settings,[Text.UTF8Encoding]::new($false))
+  $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
+  $expectedVersion=if($direct){'0.1.51'}else{'0.1.50'}
+  if($info.version-cne$expectedVersion){throw '[mir431-f200-galore-fixture-identity]'}
+}
+
+function Assert-MIR431F200GaloreSpaceAgeFullStateActiveMods {
+  param([Parameter(Mandatory)]$Snapshot,[Parameter(Mandatory)][object[]]$ExpectedSelection,[Parameter(Mandatory)][ValidateSet('source','upgrade','reload')][string]$Stage)
+  if($null-eq$Snapshot.active_mods){throw "[mir431-f200-galore-active-mods] $Stage"}
+  $expected=[ordered]@{}
+  foreach($row in $ExpectedSelection){$name=[string]$row.name;$version=[string]$row.version;if([string]::IsNullOrWhiteSpace($name)-or$version-cnotmatch'^\d+[.]\d+[.]\d+$'-or$expected.Contains($name)){throw "[mir431-f200-galore-selection] $Stage"};$expected[$name]=$version}
+  $actual=[ordered]@{}
+  foreach($property in @($Snapshot.active_mods.PSObject.Properties)){$name=[string]$property.Name;$version=[string]$property.Value;if([string]::IsNullOrWhiteSpace($name)-or$version-cnotmatch'^\d+[.]\d+[.]\d+$'-or$actual.Contains($name)){throw "[mir431-f200-galore-active-mods] $Stage"};$actual[$name]=$version}
+  if($actual.Count-ne$expected.Count){throw "[mir431-f200-galore-active-mods] $Stage"}
+  foreach($name in $expected.Keys){if(-not$actual.Contains($name)-or$actual[$name]-cne$expected[$name]){throw "[mir431-f200-galore-active-mods] $Stage"}}
+  return [pscustomobject]@{stage=$Stage;active_mods=@($actual.Keys|Sort-Object|ForEach-Object {[ordered]@{name=$_;version=$actual[$_]}})}
 }
 
 function Read-MIR423F200BobAngelUpgradeProfile {
