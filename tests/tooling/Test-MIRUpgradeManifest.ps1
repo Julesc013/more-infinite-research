@@ -17,6 +17,7 @@ if($currentFunctions.Count -ne 1){throw 'Current-package input mode validator mi
 $predecessorFunctions=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Resolve-MIR42UpgradePredecessorReaderVersion'},$true))
 if($predecessorFunctions.Count -ne 1){throw 'Published predecessor selector missing or ambiguous'}
 . ([scriptblock]::Create($predecessorFunctions[0].Extent.Text))
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
 $completeCatalogueAssignments=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$requiresCompleteCatalogue'},$true))
 if($completeCatalogueAssignments.Count-ne1){throw 'Complete-catalogue applicability assignment missing or ambiguous'}
 $classicPolicyAssignments=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$classicReducedPolicy'},$true))
@@ -594,6 +595,15 @@ foreach($from in @('4.2.21000','4.2.21001')){
 # 4.2.2 predecessor and complete-state fixture. It is not a generic DLC bypass.
 $currentSpaceAge430=$currentSpaceAge.Clone();$currentSpaceAge430.SourceVersion='4.3.0';$currentSpaceAge430.FromVersion='4.2.21002';$currentSpaceAge430.ToVersion='4.3.21000'
 Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge430;$currentAssertions++
+# 4.3.1 retains both exact Full Space Age paths: direct published 4.2.2 and
+# immediate published 4.3.0.  A neighbouring 4.2 patch cannot enter either.
+$currentSpaceAge431Direct=$currentSpaceAge430.Clone();$currentSpaceAge431Direct.SourceVersion='4.3.1';$currentSpaceAge431Direct.ToVersion='4.3.21001'
+Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge431Direct;$currentAssertions++
+$currentSpaceAge431Immediate=$currentSpaceAge431Direct.Clone();$currentSpaceAge431Immediate.FromVersion='4.3.21000'
+Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge431Immediate;$currentAssertions++
+$bad=$currentSpaceAge431Direct.Clone();$bad.FromVersion='4.2.21001'
+$rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
+if(-not$rejected){throw '4.3.1 Full Space Age mode admitted an unpublished 4.2 predecessor'};$currentAssertions++
 foreach($field in @('Target','FromVersion','ToVersion','FixtureName','SourceVersion','SpaceIsFake')){
   $bad=$currentSpaceAge430.Clone();$bad[$field]=switch($field){
     'Target'{'f200'};'FromVersion'{'4.2.21001'};'ToVersion'{'4.3.21001'};'FixtureName'{'wrong'};'SourceVersion'{'4.3.1'};'SpaceIsFake'{$true}
@@ -623,6 +633,14 @@ Assert-MIR421CurrentUpgradeInputMode @currentBobAngel;$f200BobAngelAssertions++
 # The exact locked F200 profile also has one Full 4.3 preservation lane.
 $currentBobAngel430=$currentBobAngel.Clone();$currentBobAngel430.SourceVersion='4.3.0';$currentBobAngel430.ToVersion='4.3.20000'
 Assert-MIR421CurrentUpgradeInputMode @currentBobAngel430;$f200BobAngelAssertions++
+# The locked Bob/Angel profile has the same two exact Full 4.3.1 lanes.
+$currentBobAngel431Direct=$currentBobAngel430.Clone();$currentBobAngel431Direct.SourceVersion='4.3.1';$currentBobAngel431Direct.ToVersion='4.3.20001'
+Assert-MIR421CurrentUpgradeInputMode @currentBobAngel431Direct;$f200BobAngelAssertions++
+$currentBobAngel431Immediate=$currentBobAngel431Direct.Clone();$currentBobAngel431Immediate.FromVersion='4.3.20000'
+Assert-MIR421CurrentUpgradeInputMode @currentBobAngel431Immediate;$f200BobAngelAssertions++
+$bad=$currentBobAngel431Direct.Clone();$bad.FromVersion='4.2.20001'
+$rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
+if(-not$rejected){throw '4.3.1 Full Bob/Angel mode admitted an unpublished 4.2 predecessor'};$f200BobAngelAssertions++
 foreach($field in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SpaceIsFake','SourceOnlyFixtureNames','K2ImersiteInputProfile','F200BobAngelInputProfile','SourceVersion')){
   $bad=$currentBobAngel.Clone();$bad[$field]=switch($field){'SpaceIsFake'{$true};'SourceOnlyFixtureNames'{@('extra')};'K2ImersiteInputProfile'{'k2.json'};'F200BobAngelInputProfile'{''};'SourceVersion'{'4.2.2'};default{'wrong'}}
   $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message -match '^\[mir42(?:1|3)-'}
@@ -647,6 +665,25 @@ foreach($SelectedTarget in @('f210','f200')){foreach($sourcePatch in @(2,3)){for
   if($publishedInputs.reader-cne('4.2.'+($oldPatch+1))-or$publishedInputs.target-cne$SelectedTarget-or$publishedInputs.archive-cne$from-or$SourceVersion-cne("4.2.$sourcePatch")){throw 'Published caller lost predecessor/archive/candidate identity'}
   $currentAssertions++
 }}}
+# Exercise the real reader-selection and published-input caller for both 4.3.1
+# lanes.  The direct lane must retain the 4.2.3 reader; the immediate lane must
+# use only the 4.3.1 reader.
+foreach($SelectedTarget in @('f210','f200')){
+  $code=$SelectedTarget.Substring(1)
+  foreach($binding in @(
+    [pscustomobject]@{from=('4.2.'+$code+'02');reader='4.2.3'},
+    [pscustomobject]@{from=('4.3.'+$code+'00');reader='4.3.1'}
+  )){
+    $SourceVersion='4.3.1';$FromVersion=$binding.from
+    $from='explicit-selected-published.zip';$PublishedMaintenancePredecessorManifestPath='explicit-frozen-manifest.json';$metadataText='{}'
+    . ([scriptblock]::Create($predecessorSelectCalls[0].Extent.Text))
+    . ([scriptblock]::Create($publishedInputCalls[0].Extent.Text))
+    if($publishedInputs.reader-cne$binding.reader-or$publishedInputs.target-cne$SelectedTarget-or$publishedInputs.archive-cne$from){
+      throw "4.3.1 published caller lost exact predecessor reader: $SelectedTarget/$($binding.from)"
+    }
+    $currentAssertions++
+  }
+}
 $readerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$currentMaterialization'-and$node.Right.Extent.Text.StartsWith('Read-MIRNativeProbeCurrentCandidate ')},$true))
 if($readerCalls.Count-ne1){throw 'Current candidate reader assignment missing or ambiguous'}
 $modeCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR421CurrentUpgradeInputMode'},$true))
@@ -657,10 +694,17 @@ $RepoRootOriginal=$RepoRoot
 try {
   function Resolve-MIRUpgradePath {param([string]$Path) return $Path}
   function Read-MIRNativeProbeCurrentCandidate {param($Repository,$Archive,$ReceiptPath,$Target,$SourceVersion) [pscustomobject]@{source=$SourceVersion;target=$Target;archive=$Archive;receipt=$ReceiptPath}}
-  foreach($SourceVersion in @('4.2.1','4.2.2','4.2.3')){
+  $currentModes=@(
+    [pscustomobject]@{source='4.2.1';from='4.2.21000';to='4.2.21001'},
+    [pscustomobject]@{source='4.2.2';from='4.2.21001';to='4.2.21002'},
+    [pscustomobject]@{source='4.2.3';from='4.2.21002';to='4.2.21003'},
+    [pscustomobject]@{source='4.3.1';from='4.2.21002';to='4.3.21001'},
+    [pscustomobject]@{source='4.3.1';from='4.3.21000';to='4.3.21001'}
+  )
+  foreach($currentMode in $currentModes){
+    $SourceVersion=$currentMode.source
     $SelectedTarget='f210';$to='selected.zip';$SourceMaterializationPath='selected-receipt.json'
-    $FromVersion=if($SourceVersion-ceq'4.2.3'){'4.2.21002'}elseif($SourceVersion-ceq'4.2.2'){'4.2.21001'}else{'4.2.21000'}
-    $ToVersion=if($SourceVersion-ceq'4.2.3'){'4.2.21003'}elseif($SourceVersion-ceq'4.2.2'){'4.2.21002'}else{'4.2.21001'}
+    $FromVersion=$currentMode.from;$ToVersion=$currentMode.to
     $FixtureName='assert-upgrade-4-0-21000-to-4-1-21000';$Archetype='base-default';$SpaceIsFake=$false
     $SourceOnlyFixtureNames=@();$SelectedReleaseManifest='';$PublishedMaintenancePredecessorManifestPath='published.json';$Retention='Always';$K2ImersiteInputProfile='';$F200BobAngelInputProfile=''
     . ([scriptblock]::Create($modeCalls[0].Extent.Text))
@@ -735,46 +779,129 @@ foreach($patch in @(1,2)){
     if(-not$rejected){throw "K2 mixed maintenance mode accepted: $field"};$k2Assertions++
   }
 }
-# 4.3 destinations retain the full current-package contract while binding each
-# row to an exact published 4.2 predecessor.  These are host-only controls:
-# they build no package and never launch an engine.
+# 4.3.0 destinations retain the full current-package contract while binding
+# each row to an exact published 4.2 predecessor.  4.3.1 retains two required
+# Full lanes for every target: direct published 4.2.2 and immediate published
+# 4.3.0.  They use different exact custody readers.  These host-only controls
+# build no package and never launch an engine.
 $mir43Assertions=0
 $allUpgradeTargets=@('f210','f200','f110','f100','f017','f016','f015','f014','f013')
-foreach($sourceVersion in @('4.3.0','4.3.1')){
-  foreach($target in $allUpgradeTargets){
-    $code=$target.Substring(1)
-    foreach($oldPatch in 0..2){
-      $from="4.2.${code}0$oldPatch"
-      $to='4.3.'+$code+([version]$sourceVersion).Build.ToString('00')
-      $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
-      $mode=@{Target=$target;FromVersion=$from;ToVersion=$to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion=$sourceVersion}
-      Assert-MIR421CurrentUpgradeInputMode @mode
-      $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $from -SourceVersion $sourceVersion
-      if($readerVersion-cne('4.2.'+($oldPatch+1))){throw "4.3 selected incorrect published predecessor custody: $target/$sourceVersion/$oldPatch"}
-      $mir43Assertions+=2
-    }
-    $custodyMode=$mode.Clone()
-    $custodyMode.SelectedReleaseManifest=if($target-cin@('f017','f016','f015','f014','f013')){''}else{'candidate.json'}
+foreach($target in $allUpgradeTargets){
+  $code=$target.Substring(1)
+  $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
+  $combinedCustody=if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''}
+  foreach($oldPatch in 0..2){
+    $from="4.2.${code}0$oldPatch"
+    $mode=@{Target=$target;FromVersion=$from;ToVersion=('4.3.'+$code+'00');FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$combinedCustody;PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.0'}
+    Assert-MIR421CurrentUpgradeInputMode @mode
+    $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $from -SourceVersion '4.3.0'
+    if($readerVersion-cne('4.2.'+($oldPatch+1))){throw "4.3.0 selected incorrect published predecessor custody: $target/$oldPatch"}
+    $mir43Assertions+=2
+  }
+  $custodyMode=$mode.Clone()
+  $custodyMode.SelectedReleaseManifest=if($combinedCustody){''}else{'candidate.json'}
+  $rejected=$false
+  try{Assert-MIR421CurrentUpgradeInputMode @custodyMode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-input-mode]'}
+  if(-not$rejected){throw "4.3.0 current mode accepted the wrong custody shape: $target"}
+  $mir43Assertions++
+
+  $published422Direct=@{Target=$target;FromVersion=('4.2.'+$code+'02');ToVersion=('4.3.'+$code+'01');FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$combinedCustody;PublishedPredecessorManifest='published-422.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.1'}
+  Assert-MIR421CurrentUpgradeInputMode @published422Direct
+  $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $published422Direct.FromVersion -SourceVersion $published422Direct.SourceVersion
+  if($readerVersion-cne'4.2.3'){throw "4.3.1 selected incorrect direct 4.2.2 predecessor custody: $target"}
+  $mir43Assertions+=2
+
+  $published430=@{Target=$target;FromVersion=('4.3.'+$code+'00');ToVersion=('4.3.'+$code+'01');FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$combinedCustody;PublishedPredecessorManifest='published-430.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.1'}
+  Assert-MIR421CurrentUpgradeInputMode @published430
+  $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $published430.FromVersion -SourceVersion $published430.SourceVersion
+  if($readerVersion-cne'4.3.1'){throw "4.3.1 selected incorrect immediate 4.3.0 predecessor custody: $target"}
+  $mir43Assertions+=2
+  foreach($releaseMode in @($published422Direct,$published430)){
+    $custodyMode=$releaseMode.Clone()
+    $custodyMode.SelectedReleaseManifest=if($combinedCustody){''}else{'candidate.json'}
     $rejected=$false
     try{Assert-MIR421CurrentUpgradeInputMode @custodyMode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-input-mode]'}
-    if(-not$rejected){throw "4.3 current mode accepted absent historical or unexpected modern combined custody: $target/$sourceVersion"}
+    if(-not$rejected){throw "4.3.1 current mode accepted the wrong custody shape: $target/$($releaseMode.FromVersion)"}
     $mir43Assertions++
-    foreach($invalid in @(
-      @{from="4.3.${code}00";to=('4.3.'+$code+'01');kind='same-minor-predecessor'},
-      @{from="4.1.${code}00";to=('4.3.'+$code+'00');kind='unpublished-predecessor'},
-      @{from="4.2.${code}02";to=('4.2.'+$code+'03');kind='wrong-destination'}
-    )){
-      $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
-      $mode=@{Target=$target;FromVersion=$invalid.from;ToVersion=$invalid.to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.1'}
-      $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-current-upgrade-')}
-      if(-not$rejected){throw "4.3 current mode accepted $($invalid.kind): $target"}
-      $mir43Assertions++
-    }
-    $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion "4.3.${code}00" -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir42-upgrade-predecessor-version]')}
-    if(-not$rejected){throw "4.3 predecessor custody was inferred without a published reader: $target"}
+  }
+  foreach($invalid in @(
+    @{from="4.2.${code}01";to=('4.3.'+$code+'01');kind='unpublished-prior-minor-predecessor'},
+    @{from=('4.3.'+$code+'01');to=('4.3.'+$code+'01');kind='current-version-predecessor'},
+    @{from=('4.2.'+$code+'02');to=('4.3.'+$code+'00');kind='wrong-destination'}
+  )){
+    $bad=$published430.Clone();$bad.FromVersion=$invalid.from;$bad.ToVersion=$invalid.to
+    $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-current-upgrade-')}
+    if(-not$rejected){throw "4.3.1 current mode accepted $($invalid.kind): $target"}
+    $mir43Assertions++
+  }
+  foreach($badFrom in @("4.2.${code}01",("4.3.${code}01"))){
+    $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $badFrom -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir42-upgrade-predecessor-version]')}
+    if(-not$rejected){throw "4.3.1 predecessor reader accepted an unpinned predecessor: $target/$badFrom"}
     $mir43Assertions++
   }
 }
+$rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target 'f999' -FromVersion '4.3.99900' -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-target]'}
+if(-not$rejected){throw '4.3.1 predecessor reader accepted an unselected target'}
+$mir43Assertions++
+
+# The 4.3.1 reader consumes only the published 4.3.0 release receipt.  The
+# raw manifest hash, release metadata and target assets are independently
+# bound; its disclosed signing and qualification state never becomes a grant
+# for the successor.
+$published430Path=Join-Path $RepoRoot 'fixtures/release-inputs/mir431-published-430-manifest.json'
+$published430=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published430Path -CandidateSourceVersion '4.3.1'
+$published430Contract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.3.1'
+if($published430Contract.source_version-cne'4.3.0'-or$published430Contract.source_tag-cne'v4.3.0'-or
+   $published430Contract.release_id-ne411700807-or$published430Contract.asset_count-ne15-or
+   $published430.sha256-cne$published430Contract.manifest_sha256-or$published430.bytes-ne$published430Contract.manifest_bytes-or
+   [string]$published430.manifest.status-cne'emergency-accepted-with-disclosed-qualification-gaps'){
+  throw '4.3.1 published 4.3.0 predecessor contract differs'
+}
+$published430Assets=@(for($i=0;$i-lt@($published430.manifest.targets).Count;$i++){
+  $row=$published430.manifest.targets[$i]
+  [pscustomobject]@{id=($i+1);name=[string]$row.filename;size=[int64]$row.bytes;digest=('sha256:'+[string]$row.sha256).ToLowerInvariant();state='uploaded'}
+})
+$published430Assets+=,[pscustomobject]@{id=637109443;name='mir-4.3.0.manifest.json';size=[int64]$published430.bytes;digest=('sha256:'+[string]$published430.sha256).ToLowerInvariant();state='uploaded'}
+foreach($i in 11..15){$published430Assets+=,[pscustomobject]@{id=$i;name=('controlled-430-supporting-asset-'+$i);size=1;digest=('sha256:'+('a'*64));state='uploaded'}}
+$published430Metadata=[pscustomobject]@{id=411700807;tag_name='v4.3.0';target_commitish='main';draft=$false;prerelease=$false;immutable=$false;assets=$published430Assets}
+$published430Rows=@(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published430 -ReleaseMetadata $published430Metadata -CandidateSourceVersion '4.3.1')
+if($published430Rows.Count-ne9-or(@($published430Rows.target)-join'|')-cne'f210|f200|f110|f100|f017|f016|f015|f014|f013' -or
+   @($published430Rows|Where-Object {$_.version-cne('4.3.'+$_.target.Substring(1)+'00')}).Count){
+  throw '4.3.1 published 4.3.0 predecessor target binding differs'
+}
+$mir43Assertions+=2
+foreach($mutation in @(
+  @{name='target-commitish';apply={param($m)$m.target_commitish='other'};code='[mir42-maintenance-predecessor-release-metadata]'},
+  @{name='manifest-digest';apply={param($m)($m.assets|Where-Object name -ceq 'mir-4.3.0.manifest.json')[0].digest='sha256:'+('0'*64)};code='[mir42-maintenance-predecessor-published-manifest]'},
+  @{name='selected-target-digest';apply={param($m)($m.assets|Where-Object name -ceq 'more-infinite-research_4.3.21000.zip')[0].digest='sha256:'+('0'*64)};code='[mir42-maintenance-predecessor-published-asset]'}
+)){
+  $invalid=$published430Metadata|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  & $mutation.apply $invalid
+  $rejected=$false;try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published430 -ReleaseMetadata $invalid -CandidateSourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith($mutation.code)}
+  if(-not$rejected){throw "4.3.1 published reader accepted invalid $($mutation.name)"}
+  $mir43Assertions++
+}
+$changed430=Join-Path $testRoot 'changed-published-430-manifest.json'
+$changed430Bytes=[IO.File]::ReadAllBytes($published430Path);$changed430Bytes[100]=$changed430Bytes[100]-bxor1
+[IO.File]::WriteAllBytes($changed430,$changed430Bytes)
+$rejected=$false;try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $changed430 -CandidateSourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+if(-not$rejected){throw '4.3.1 published reader accepted changed 4.3.0 manifest bytes'}
+$rejected=$false;try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $RepoRoot 'fixtures/release-inputs/mir423-published-422-manifest.json') -CandidateSourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+if(-not$rejected){throw '4.3.1 published reader accepted a prior-minor manifest'}
+$mir43Assertions+=2
+# The direct 4.2.2 lane selects the retained 4.2.3 reader rather than trying
+# to parse a 4.2 receipt through the 4.3.1 reader.  This binds its own exact
+# pin and rejects the immediate-predecessor manifest under that reader.
+$published422Path=Join-Path $RepoRoot 'fixtures/release-inputs/mir423-published-422-manifest.json'
+$published422=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published422Path -CandidateSourceVersion '4.2.3'
+$published422Contract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.2.3'
+if($published422Contract.source_version-cne'4.2.2'-or$published422Contract.source_tag-cne'v4.2.2'-or
+   $published422.sha256-cne$published422Contract.manifest_sha256-or$published422.bytes-ne$published422Contract.manifest_bytes){
+  throw '4.3.1 direct 4.2.2 predecessor contract differs'
+}
+$rejected=$false;try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published430Path -CandidateSourceVersion '4.2.3'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+if(-not$rejected){throw '4.3.1 direct 4.2.2 reader accepted the immediate 4.3.0 manifest'}
+$mir43Assertions+=2
 foreach($target in @('f017','f016','f015','f014','f013')){
   $code=$target.Substring(1)
   $wrong=@{Target=$target;FromVersion="4.2.${code}02";ToVersion="4.3.${code}00";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.0'}
@@ -811,11 +938,14 @@ $mir43Assertions+=3
 foreach($case in $historicalCases){
   foreach($sourceVersion in @('4.3.0','4.3.1')){
     $to='4.3.'+$case.code+([version]$sourceVersion).Build.ToString('00')
-    $resolved=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion ('4.2.'+$case.code+'02') -ToVersion $to
-    if($resolved.target-cne$to-or$resolved.predecessor_kind-cne'same-target-maintenance'){
-      throw "4.3 historical cross-minor transition binding differs: $($case.code)/$sourceVersion"
+    $fromVersions=if($sourceVersion-ceq'4.3.1'){@(('4.2.'+$case.code+'02'),('4.3.'+$case.code+'00'))}else{@('4.2.'+$case.code+'02')}
+    foreach($from in $fromVersions){
+      $resolved=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion $from -ToVersion $to
+      if($resolved.target-cne$to-or$resolved.predecessor_kind-cne'same-target-maintenance'){
+        throw "4.3 historical cross-minor transition binding differs: $($case.code)/$sourceVersion/$from"
+      }
+      $mir43Assertions++
     }
-    $mir43Assertions++
   }
 }
 foreach($sourceVersion in @('4.3.0','4.3.1')){
@@ -850,30 +980,37 @@ New-Item -ItemType Directory -Force -Path $mir43FixtureRoot|Out-Null
 foreach($sourceVersion in @('4.3.0','4.3.1')){
   foreach($target in @('f210','f200','f110','f100')){
     $code=$target.Substring(1)
-    foreach($oldPatch in 0..2){
-      $fixtureRoot=Join-Path $mir43FixtureRoot ('mir43-modern-'+$target+'-'+$sourceVersion.Replace('.','-')+'-'+$oldPatch)
+    $predecessors=if($sourceVersion-ceq'4.3.1'){@(
+      [pscustomobject]@{label='direct-422';from=('4.2.'+$code+'02');identity_patch=2},
+      [pscustomobject]@{label='immediate-430';from=('4.3.'+$code+'00');identity_patch=0}
+    )}else{@(0..2|ForEach-Object {[pscustomobject]@{label=('published-42-'+$_);from=('4.2.'+$code+$_.ToString('00'));identity_patch=$_}})}
+    foreach($predecessor in $predecessors){
+      $fixtureRoot=Join-Path $mir43FixtureRoot ('mir43-modern-'+$target+'-'+$sourceVersion.Replace('.','-')+'-'+$predecessor.label)
       $fixtureName='assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'
       Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$fixtureName)) -Destination $fixtureRoot -Recurse
-      Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion $sourceVersion -FromVersion ('4.2.'+$code+$oldPatch.ToString('00'))
+      Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion $sourceVersion -FromVersion $predecessor.from
       $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
-      $expected='0.1.'+(40+3*([version]$sourceVersion).Build+$oldPatch)
-      if($info.version-cne$expected){throw "4.3 modern fixture identity collision: $target/$sourceVersion/$oldPatch"}
+      $expected='0.1.'+(40+3*([version]$sourceVersion).Build+$predecessor.identity_patch)
+      if($info.version-cne$expected){throw "4.3 modern fixture identity collision: $target/$sourceVersion/$($predecessor.label)"}
       $mir43Assertions++
     }
   }
   foreach($target in @('f017','f016','f015','f014','f013')){
     $code=$target.Substring(1)
-    foreach($oldPatch in 0..2){
-      $fixtureRoot=Join-Path $mir43FixtureRoot ('mir43-historical-'+$target+'-'+$sourceVersion.Replace('.','-')+'-'+$oldPatch)
+    $predecessors=if($sourceVersion-ceq'4.3.1'){@(
+      [pscustomobject]@{label='direct-422';from=('4.2.'+$code+'02');identity_patch=2},
+      [pscustomobject]@{label='immediate-430';from=('4.3.'+$code+'00');identity_patch=0}
+    )}else{@(0..2|ForEach-Object {[pscustomobject]@{label=('published-42-'+$_);from=('4.2.'+$code+$_.ToString('00'));identity_patch=$_}})}
+    foreach($predecessor in $predecessors){
+      $fixtureRoot=Join-Path $mir43FixtureRoot ('mir43-historical-'+$target+'-'+$sourceVersion.Replace('.','-')+'-'+$predecessor.label)
       Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-historical-terminal-to-mir42') -Destination $fixtureRoot -Recurse
-      $from='4.2.'+$code+$oldPatch.ToString('00')
       $infoPath=Join-Path $fixtureRoot 'info.json'
       $infoText=Get-Content -LiteralPath $infoPath -Raw
-      [IO.File]::WriteAllText($infoPath,$infoText.Replace('@@FACTORIO_LINE@@',('0.'+[int]$code)).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$from),[Text.UTF8Encoding]::new($false))
-      Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion $sourceVersion -FromVersion $from
+      [IO.File]::WriteAllText($infoPath,$infoText.Replace('@@FACTORIO_LINE@@',('0.'+[int]$code)).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$predecessor.from),[Text.UTF8Encoding]::new($false))
+      Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion $sourceVersion -FromVersion $predecessor.from
       $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
-      $expected='1.0.'+(20+3*([version]$sourceVersion).Build+$oldPatch)
-      if($info.version-cne$expected){throw "4.3 historical fixture identity collision: $target/$sourceVersion/$oldPatch"}
+      $expected='1.0.'+(20+3*([version]$sourceVersion).Build+$predecessor.identity_patch)
+      if($info.version-cne$expected){throw "4.3 historical fixture identity collision: $target/$sourceVersion/$($predecessor.label)"}
       $mir43Assertions++
     }
   }
@@ -884,8 +1021,11 @@ Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $
 $f200Mir43Control=Get-Content -LiteralPath (Join-Path $f200Mir43Oracle 'control.lua') -Raw
 if($f200Mir43Control.Contains('reviewed_420_frontier')){throw '4.3 F200 full-state oracle retained a 4.2-only definition-delta allowance'}
 $mir43Assertions++
-$rejected=$false;try{Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Mir43Oracle -FromVersion '4.3.20000' -ToVersion '4.3.20001'}catch{$rejected=$_.Exception.Message-ceq'[mir422-f200-complete-oracle-transition]'}
-if(-not$rejected){throw '4.3 F200 full-state oracle inferred an unreviewed 4.3 predecessor'}
+$f200Mir431Oracle=Join-Path $mir43FixtureRoot 'mir431-f200-full-state-oracle'
+New-Item -ItemType Directory -Force -Path $f200Mir431Oracle|Out-Null
+Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Mir431Oracle -FromVersion '4.3.20000' -ToVersion '4.3.20001'
+$f200Mir431Control=Get-Content -LiteralPath (Join-Path $f200Mir431Oracle 'control.lua') -Raw
+if($f200Mir431Control.Contains('reviewed_420_frontier')-or-not$f200Mir431Control.Contains('"4.3.20000"')-or-not$f200Mir431Control.Contains('"4.3.20001"')){throw '4.3.1 F200 full-state oracle differs'}
 $mir43Assertions++
 $f200Published410Fixture=Join-Path $mir43FixtureRoot 'mir43-f200-published-410-full-state-oracle'
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $f200Published410Fixture -Recurse

@@ -192,7 +192,7 @@ function Get-MIR42EngineEvidenceBindingContract {
   if ($PublishedMaintenance) {
     if ($scope -cne 'nine-target') { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $contract | Add-Member -NotePropertyName maintenance_source_version -NotePropertyValue ([string]$version.source_version)
     $contract.evidence_kind = 'MIR42NineTargetMaintenanceEvidenceReconciliationV1'
     $contract.evidence_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"
@@ -208,7 +208,7 @@ function Get-MIR42IndividualEngineEvidenceBindingContract {
   param([Parameter(Mandatory)]$Candidate,[switch]$PublishedMaintenance)
   if (-not $PublishedMaintenance) { throw '[mir42-individual-engine-run-maintenance-required]' }
   $contract = Get-MIR42EngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance
-  if ([string]$contract.maintenance_source_version -cnotin @('4.2.3','4.3.0')) {
+  if ([string]$contract.maintenance_source_version -cnotin @('4.2.3','4.3.0','4.3.1')) {
     throw '[mir42-individual-engine-run-source-version]'
   }
   $contract.engine_run_kind = 'MIR42NineTargetMaintenanceIndividualEngineRunV1'
@@ -1684,14 +1684,15 @@ function Assert-MIR42IndividualUpgradeReceipt {
   # The seal is release evidence, so it always binds the complete Full
   # preservation oracle. Classic remains available for private
   # characterization but cannot select a reduced snapshot field here.
-  if ($candidateSourceVersion -ceq '4.3.0' -and $receipt.Contains('upgrade_policy')) {
-    throw '[mir430-upgrade-classic-reduced-policy-not-release-preservation]'
+  if ($candidateSourceVersion -cin @('4.3.0','4.3.1') -and $receipt.Contains('upgrade_policy')) {
+    $prefix = 'mir' + $candidateSourceVersion.Replace('.', '') + '-upgrade'
+    throw "[$prefix-classic-reduced-policy-not-release-preservation]"
   }
   $snapshotField = 'full_state_evaluator_snapshots'
   $snapshots = if ($receipt.Contains($snapshotField)) { @($receipt[$snapshotField]) } else { @() }
   $upgradeRow = [pscustomobject]@{
     target = [string]$CandidateTarget.target
-    predecessor_source_version = '4.2.2'
+    predecessor_source_version = if ($candidateSourceVersion -ceq '4.3.1') { '4.3.0' } else { '4.2.2' }
     receipt = [pscustomobject]@{path=$receiptPath;sha256=[string]$ReceiptReference.sha256}
     snapshots = @($snapshots | ForEach-Object { [pscustomobject]@{stage=[string]$_.stage;path=[string]$_.path;sha256=[string]$_.sha256} })
   }
