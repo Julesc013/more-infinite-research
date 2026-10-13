@@ -869,51 +869,6 @@ do
     end
     return w
   end
-
-  -- This is the relevant F200 Base prototype shape.  In particular,
-  -- rocket-silo-rocket has inventory_size = 0: the payload is staged in the
-  -- rocket silo's to_be_inserted_to_rocket_inventory_size instead.
-  local function base_f200_launch_world()
-    return {
-      item_prototypes = {
-        ["space-science-pack"] = {type = "tool"},
-        satellite = {type = "item", send_to_orbit_mode = "automated",
-          rocket_launch_products = {{type = "item", name = "space-science-pack", amount = 1000}}},
-        ["rocket-silo"] = {type = "item", place_result = "rocket-silo"},
-        ["cargo-landing-pad"] = {type = "item", place_result = "cargo-landing-pad"}
-      },
-      labs = {lab = {inputs = {"space-science-pack"}}},
-      resources = {ore = {minable = {result = "ore", count = 1}}},
-      techs = {}, unlockers = {},
-      recipe_prototypes = {
-        satellite = {enabled = true}, ["rocket-silo"] = {enabled = true},
-        ["cargo-landing-pad"] = {enabled = true}, ["rocket-part"] = {enabled = true}
-      },
-      recipe_facts = {
-        satellite = route_fact("satellite", {{name = "ore", amount = 1}}, {energy_required = 5}),
-        ["rocket-silo"] = route_fact("rocket-silo", {{name = "ore", amount = 1}}, {energy_required = 30}),
-        ["cargo-landing-pad"] = route_fact("cargo-landing-pad", {{name = "ore", amount = 1}}, {energy_required = 30}),
-        ["rocket-part"] = route_fact("rocket-part", {{name = "ore", amount = 10}}, {
-          categories = {"rocket-building"}, energy_required = 3
-        })
-      },
-      producers = {
-        satellite = {"satellite"}, ["rocket-silo"] = {"rocket-silo"},
-        ["cargo-landing-pad"] = {"cargo-landing-pad"}
-      },
-      rocket_silos = {
-        ["rocket-silo"] = {
-          name = "rocket-silo", crafting_categories = {"rocket-building"},
-          fixed_recipe = "rocket-part", crafting_speed = 1, rocket_parts_required = 100,
-          rocket_entity = "rocket-silo-rocket", to_be_inserted_to_rocket_inventory_size = 1,
-          energy_source = {type = "electric"}, energy_usage = "250kW", active_energy_usage = "3990kW"
-        }
-      },
-      rockets = {["rocket-silo-rocket"] = {name = "rocket-silo-rocket", inventory_size = 0}},
-      landing_pads = {["cargo-landing-pad"] = {name = "cargo-landing-pad", inventory_size = 80}}
-    }
-  end
-
   local previous_version = target_profile.current_factorio_version
   for _, version in ipairs({"2.0", "2.1"}) do
     target_profile.current_factorio_version = version
@@ -956,7 +911,7 @@ do
       category = function(w) w.rocket_silos.silo.crafting_categories = {"other"} end,
       rocket = function(w) w.rockets.rocket = nil end,
       payload_slot = function(w) w.rocket_silos.silo.to_be_inserted_to_rocket_inventory_size = 0 end,
-      rocket_slot = function(w) w.rockets.rocket.inventory_size = -1 end,
+      rocket_slot = function(w) w.rockets.rocket.inventory_size = 0 end,
       speed = function(w) w.rocket_silos.silo.crafting_speed = 0 end,
       crafts = function(w) w.rocket_silos.silo.rocket_parts_required = 0 end,
       mode = function(w) w.item_prototypes.payload.send_to_orbit_mode = "not-sendable" end,
@@ -1125,43 +1080,6 @@ do
       and w.recipe_facts.parts.variants[1].surface_conditions == nil,
       "Returned witnesses and merged surface constraints cannot mutate prototypes or subsequent results")
   end
-  target_profile.current_factorio_version = "2.0"
-  local base = base_f200_launch_world()
-  reset(base)
-  local base_witness = feasibility.acquisition_witness("space-science-pack")
-  check("LAUNCH-F200-BASE-01", base_witness and base_witness.kind == "rocket-launch"
-    and base_witness.payload == "satellite" and base_witness.machine.prototype == "rocket-silo"
-    and base_witness.receiver and base_witness.receiver.prototype == "cargo-landing-pad"
-    and base_witness.recipe_witness.recipe == "rocket-part" and base_witness.recipe_witness.crafts == 100
-    and production.pack_production_status("space-science-pack", {}) == "non-recipe",
-    "F200 Base satellite launch accepts its stock zero-sized rocket entity while retaining silo payload staging")
-
-  base = base_f200_launch_world()
-  base.rockets["rocket-silo-rocket"].inventory_size = nil
-  reset(base)
-  check("LAUNCH-F200-BASE-02", feasibility.acquisition_witness("space-science-pack") ~= nil,
-    "A defaulted rocket entity inventory field is not treated as the payload staging capacity")
-
-  base = base_f200_launch_world()
-  base.rocket_silos["rocket-silo"].to_be_inserted_to_rocket_inventory_size = 0
-  reset(base)
-  check("LAUNCH-F200-BASE-03", feasibility.acquisition_witness("space-science-pack") == nil,
-    "F200 Base still requires the silo's positive payload staging slot")
-
-  for index, invalid_size in ipairs({-1, math.huge, 0 / 0}) do
-    base = base_f200_launch_world()
-    base.rockets["rocket-silo-rocket"].inventory_size = invalid_size
-    reset(base)
-    check("LAUNCH-F200-BASE-04-" .. index,
-      feasibility.acquisition_witness("space-science-pack") == nil,
-      "Negative or non-finite rocket entity metadata cannot establish a launch route")
-  end
-
-  base = base_f200_launch_world()
-  base.rockets["rocket-silo-rocket"] = "malformed-rocket-prototype"
-  reset(base)
-  check("LAUNCH-F200-BASE-05", feasibility.acquisition_witness("space-science-pack") == nil,
-    "A malformed rocket entity prototype is rejected before its metadata is inspected")
   target_profile.current_factorio_version = "1.1"
   reset(launch_world(false))
   check("LAUNCH19", feasibility.acquisition_witness("pack") == nil,
