@@ -1,6 +1,6 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 [CmdletBinding()]
-param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
+param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,[switch]$Normal431TelemetryOnly)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -305,7 +305,66 @@ function Test-MIR42NineCriterionEvidenceWriter {
   }
 }
 
+function Test-MIR431NormalPerformanceTelemetryBinding {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $source = [pscustomobject][ordered]@{commit=('a' * 40);tree=('b' * 40);package_source_sha256=('C' * 64)}
+  $candidateReference = [pscustomobject][ordered]@{sha256=('D' * 64);record_sha256=('E' * 64)}
+  $candidate = [pscustomobject][ordered]@{source=$source;candidate_manifest=$candidateReference}
+  $engineCandidate = [pscustomobject][ordered]@{
+    source=$source;identity=[pscustomobject][ordered]@{sha256=$candidateReference.sha256;record=[pscustomobject][ordered]@{record_sha256=$candidateReference.record_sha256}}
+    scope='nine-target';targets=@($script:MIR42QualificationNineTargets | ForEach-Object {[pscustomobject][ordered]@{target=$_}})
+  }
+  $reference = [pscustomobject][ordered]@{path='individual-engine-run.json';sha256=('F' * 64);record_sha256=('1' * 64)}
+  $published = [pscustomobject][ordered]@{targets=@($script:MIR42QualificationNineTargets | ForEach-Object {[pscustomobject][ordered]@{target=$_}})}
+  $record = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42NineTargetCriterionObservationV1';status='passed';criterion='performance-telemetry'
+    telemetry_scope='bounded-candidate-load-and-upgrade-resource-observation';compiler_profile='full'
+    source=$source;candidate_manifest=$candidateReference;individual_engine_run=$reference;record_sha256=('2' * 64)
+  }
+  $original = Get-Item Function:Get-MIR42BoundEngineRun -ErrorAction SilentlyContinue
+  $script:mir431NormalPerformanceBoundTargets = @($script:MIR42QualificationNineTargets)
+  try {
+    Set-Item Function:Get-MIR42BoundEngineRun -Value {
+      param($Reference,$Candidate,$PublishedMaintenanceInputs)
+      [pscustomobject][ordered]@{
+        path='individual-engine-run.json';sha256=('F' * 64);input_kind='individual-upgrade-receipts-and-fresh-loads'
+        record=[pscustomobject][ordered]@{record_sha256=('1' * 64);targets=@($script:mir431NormalPerformanceBoundTargets | ForEach-Object {[pscustomobject][ordered]@{target=$_}})}
+      }
+    }
+    $accepted = Assert-MIR431NormalPerformanceTelemetryObservation -Record $record -Candidate $candidate -IndividualEngineCandidate $engineCandidate -PublishedMaintenanceInputs $published -Code 'mir431-normal-performance-test'
+    Assert-MIR42NineGeneratorTest -Condition ([string]$accepted.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads') -Code '431-normal-performance-binds-individual-engine-run'
+
+    $cases = @(
+      [pscustomobject]@{name='source';mutate={param($value) $value.source=[pscustomobject]@{commit=('0'*40);tree=$source.tree;package_source_sha256=$source.package_source_sha256}};expected='binding'}
+      [pscustomobject]@{name='candidate';mutate={param($value) $value.candidate_manifest=[pscustomobject]@{sha256=('0'*64);record_sha256=$candidateReference.record_sha256}};expected='binding'}
+      [pscustomobject]@{name='missing-ref';mutate={param($value) $value.PSObject.Properties.Remove('individual_engine_run')};expected='shape'}
+      [pscustomobject]@{name='changed-ref';mutate={param($value) $value.individual_engine_run=[pscustomobject]@{path='individual-engine-run.json';sha256=('0'*64);record_sha256=('1'*64)}};expected='engine-run-binding'}
+    )
+    foreach ($case in $cases) {
+      $testRecord = $record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+      & $case.mutate $testRecord
+      $rejected = $false
+      try { Assert-MIR431NormalPerformanceTelemetryObservation -Record $testRecord -Candidate $candidate -IndividualEngineCandidate $engineCandidate -PublishedMaintenanceInputs $published -Code 'mir431-normal-performance-test' | Out-Null } catch { $rejected = $_.Exception.Message -match ('mir431-normal-performance-test-' + $case.expected) }
+      Assert-MIR42NineGeneratorTest -Condition $rejected -Code ('431-normal-performance-'+$case.name+'-rejected')
+    }
+    $script:mir431NormalPerformanceBoundTargets = @($script:MIR42QualificationNineTargets | Select-Object -SkipLast 1)
+    $rejected = $false
+    try { Assert-MIR431NormalPerformanceTelemetryObservation -Record $record -Candidate $candidate -IndividualEngineCandidate $engineCandidate -PublishedMaintenanceInputs $published -Code 'mir431-normal-performance-test' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir431-normal-performance-test-engine-run-binding' }
+    Assert-MIR42NineGeneratorTest -Condition $rejected -Code '431-normal-performance-target-set-rejected'
+  } finally {
+    if ($null -eq $original) { Remove-Item Function:Get-MIR42BoundEngineRun -ErrorAction SilentlyContinue } else { Set-Item Function:Get-MIR42BoundEngineRun -Value $original.ScriptBlock }
+    Remove-Variable -Name mir431NormalPerformanceBoundTargets -Scope Script -ErrorAction SilentlyContinue
+  }
+}
+
+if ($Normal431TelemetryOnly) {
+  Test-MIR431NormalPerformanceTelemetryBinding -RepoRoot $repo
+  Write-Output 'MIR431-NORMAL-PERFORMANCE-TELEMETRY-PASSED assertions=6 engines=0 controlled_evidence_only=true'
+  return
+}
 foreach($schemaVersion in @(1,2,3,4,5,6)){Test-MIR42NineCriterionEvidenceWriter -RepoRoot $repo -SchemaVersion $schemaVersion}
+Test-MIR431NormalPerformanceTelemetryBinding -RepoRoot $repo
 
 $rejected = $false
 try { $null = Get-MIR42QualificationTargetScope -Rows @($modernRows + [pscustomobject][ordered]@{target='f017'}) -Code 'mir42-nine-generator-opposing' } catch { $rejected = $_.Exception.Message -match '^\[mir42-nine-generator-opposing-target-set\]' }
