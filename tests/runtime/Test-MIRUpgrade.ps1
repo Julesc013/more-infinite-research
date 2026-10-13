@@ -108,14 +108,20 @@ function Assert-MIR421CurrentUpgradeInputMode {
     [string]$K2ImersiteInputProfile='',[string]$F200BobAngelInputProfile='',
     [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1')
   $requiresHistoricalCombinedCandidate=[bool]($Target-cin@('f017','f016','f015','f014','f013')-and$SourceVersion-cin@('4.3.0','4.3.1'))
+  $published410F200=[bool]($Target-ceq'f200'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.1.20000'-and$ToVersion-ceq'4.3.20000'-and
+    $FixtureName-ceq'assert-upgrade-4-0-20000-to-4-1-20000'-and$Archetype-ceq'base-default'-and-not$SpaceIsFake-and-not$SourceOnlyFixtureNames.Count-and-not$SelectedReleaseManifest-and-not$PublishedPredecessorManifest)
+  $hasRequiredCustody=if($published410F200){-not$SelectedReleaseManifest-and-not$PublishedPredecessorManifest}else{
+    (($requiresHistoricalCombinedCandidate-and$SelectedReleaseManifest)-or((-not$requiresHistoricalCombinedCandidate)-and-not$SelectedReleaseManifest)) -and $PublishedPredecessorManifest
+  }
   if ($Target -cnotin @('f210','f200','f110','f100','f017','f016','f015','f014','f013') -or
-      (($requiresHistoricalCombinedCandidate-and-not$SelectedReleaseManifest)-or((-not$requiresHistoricalCombinedCandidate)-and$SelectedReleaseManifest)) -or
-      -not $PublishedPredecessorManifest -or $Retention -cne 'Always') {
+      -not$hasRequiredCustody -or $Retention -cne 'Always') {
     throw '[mir421-current-upgrade-input-mode]'
   }
   $code=$Target.Substring(1)
   $source=[version]$SourceVersion
-  if($source.Minor-eq2){
+  if($published410F200){
+    $allowedFrom=@('4.1.20000')
+  } elseif($source.Minor-eq2){
     $fromPatches=0..($source.Build-1)
     $allowedFrom=@($fromPatches|ForEach-Object {'4.2.'+$code+$_.ToString('00')})
   } else {
@@ -466,7 +472,11 @@ if($SourceMaterializationPath){
 $sifDescriptor=$null
 $sifInputs=@()
 $publishedInputs=$null
-if ($SpaceIsFake -or $k2Scenario -or $currentMaterialization -or $PublishedMaintenancePredecessorManifestPath) {
+$published410Inputs=$null
+$predecessor=@()
+$published410F200=[bool]($SelectedTarget-ceq'f200'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.1.20000'-and$ToVersion-ceq'4.3.20000'-and
+  $FixtureName-ceq'assert-upgrade-4-0-20000-to-4-1-20000'-and$Archetype-ceq'base-default'-and-not$SpaceIsFake-and-not$SelectedReleaseManifest-and-not$PublishedMaintenancePredecessorManifestPath)
+if (-not$published410F200-and($SpaceIsFake -or $k2Scenario -or $currentMaterialization -or $PublishedMaintenancePredecessorManifestPath)) {
   . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
   $predecessorReaderVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $SelectedTarget -FromVersion $FromVersion -SourceVersion $SourceVersion
   $predecessorContract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $predecessorReaderVersion
@@ -531,6 +541,10 @@ $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
 $isHistoricalTerminalFixture = $FixtureName -eq 'assert-upgrade-historical-terminal-to-mir42'
 $isLegacyFactorio = $isHistoricalTerminalFixture -or ([string]$factorioVersionInfo.ProductVersion -match '^(?:0|1)[.]')
 $classicReducedPolicy=$UpgradePolicy -ceq 'Classic'
+if($published410F200){
+  Assert-MIR430Published410F200FullUpgradeTransition -Target $SelectedTarget -SourceVersion $SourceVersion -FromVersion $FromVersion -ToVersion $ToVersion `
+    -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -UpgradePolicy $UpgradePolicy
+}
 if($classicReducedPolicy){
   Assert-MIR430ClassicUpgradeMode -Target $SelectedTarget -SourceVersion $SourceVersion -FromVersion $FromVersion -ToVersion $ToVersion `
     -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) `
@@ -580,8 +594,24 @@ $fixtureSources = Join-Path $root 'fixture-sources'
 $userdata = Join-Path $root "userdata"
 $saves = Join-Path $userdata "saves"
 New-Item -ItemType Directory -Force -Path $fixtureSources, $userdata, $saves | Out-Null
+  if($published410F200){
+    $published410MetadataText=(& gh api 'repos/Julesc013/more-infinite-research/releases/383203807'|Out-String)
+    if($LASTEXITCODE-ne0){throw '[mir430-published410-release-metadata]'}
+    $published410ManifestPath=Join-Path $root 'published-mir-4.1.0.release.json'
+    # gh api writes JSON to stdout and has no binary-output flag. Use the
+    # release asset downloader so the signed bytes remain bytes, not a
+    # PowerShell string re-serialization of this pinned historical manifest.
+    & gh release download v4.1.0 --repo Julesc013/more-infinite-research --pattern 'mir-4.1.0.release.json' --dir $root
+    if($LASTEXITCODE-ne0){throw '[mir430-published410-release-manifest]'}
+    $downloaded410ManifestPath=Join-Path $root 'mir-4.1.0.release.json'
+    if(-not(Test-Path -LiteralPath $downloaded410ManifestPath -PathType Leaf)){throw '[mir430-published410-release-manifest]'}
+    Move-Item -LiteralPath $downloaded410ManifestPath -Destination $published410ManifestPath
+    $published410Inputs=Read-MIR430Published410F200ReleaseInput -ReleaseMetadata ($published410MetadataText|ConvertFrom-Json -Depth 100 -DateKind String) -ReleaseManifestPath $published410ManifestPath -ArchivePath $from
+    $predecessor=@($published410Inputs.targets|Where-Object target -CEQ $SelectedTarget)
+    if($predecessor.Count-ne1-or[string]$predecessor[0].path-cne$from-or[string]$predecessor[0].version-cne$FromVersion){throw '[mir430-published410-predecessor]'}
+  }
 $upgradeRequest=if($SpaceIsFake){'SIF-01'}else{'native-upgrade'}
-$sourceHash=if($publishedInputs){$predecessor[0].sha256}else{(Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash}
+  $sourceHash=if($publishedInputs -or $published410Inputs){$predecessor[0].sha256}else{(Get-FileHash -LiteralPath $from -Algorithm SHA256).Hash}
 $script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=$upgradeWriteBytes;result_reserve_bytes=64KB}
 $config = Join-Path $root "config.ini"
 @(
@@ -641,7 +671,8 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
     ($FromVersion -ceq "4.2.${targetCode}00" -and $ToVersion -ceq "4.2.${targetCode}01" -and $SourceVersion -ceq '4.2.1') -or
     ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01") -and $ToVersion -ceq "4.2.${targetCode}02" -and $SourceVersion -ceq '4.2.2') -or
     ($FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01","4.2.${targetCode}02") -and $ToVersion -ceq "4.2.${targetCode}03" -and $SourceVersion -ceq '4.2.3') -or
-    ($SourceVersion -cin @('4.3.0','4.3.1') -and $FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01","4.2.${targetCode}02") -and $ToVersion -ceq ('4.3.'+$targetCode+([version]$SourceVersion).Build.ToString('00')))
+    ($SourceVersion -cin @('4.3.0','4.3.1') -and $FromVersion -cin @("4.2.${targetCode}00","4.2.${targetCode}01","4.2.${targetCode}02") -and $ToVersion -ceq ('4.3.'+$targetCode+([version]$SourceVersion).Build.ToString('00'))) -or
+    ($targetCode-ceq'200'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.1.20000'-and$ToVersion-ceq'4.3.20000')
   )
   $mir42UpgradeSpecialized=$true
   $fixtureFrom = "4.0.$code"
@@ -669,6 +700,9 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
     if($f210HistoricalSettingOracle){
       Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
     }
+    if($targetCode-ceq'210'-and$SourceVersion-cin@('4.3.0','4.3.1')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-ceq'base-default'){
+      Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
+    }
   }
   if($targetCode-ceq'200'-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-cin@('base-default','f200-bob-angel')){
     Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
@@ -678,6 +712,9 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   }
   if($targetCode-cin@('110','100')-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1')-and-not$classicReducedPolicy-and$Archetype-ceq'base-default'){
     Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -FromVersion $FromVersion -ToVersion $ToVersion
+    if($SourceVersion-cin@('4.3.0','4.3.1')){
+      Set-MIR430FullCompilerProfileUpgradeAllowance -Target ('f'+$targetCode) -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
+    }
   }
   if($targetCode-ceq'210'-and$SourceVersion-ceq'4.2.3'-and-not$SpaceIsFake-and$Archetype-ceq'space-age-native-owner'-and$FromVersion-ceq'4.2.21001'){
     Set-MIR423F210InheritedPromethiumDefinitionDelta -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
@@ -787,7 +824,7 @@ if ($PrepareInputsOnly) {
     $archive=Publish-MIRModDirectoryArchive -Source $directory -Name $info.name -Version $info.version -ModsDir $preparedRoot
     [ordered]@{name=$info.name;version=$info.version;path=$archive;sha256=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash}
   })
-  [ordered]@{schema=1;kind='MIRUpgradePreparedInputsV1';status='prepared-not-native-tested';from_version=$FromVersion;to_version=$ToVersion;archetype=$Archetype;fixtures=$prepared;dependency_inputs=if($SpaceIsFake){$sifDescriptor.inputs}elseif($k2Scenario){$k2Inputs.inputs}elseif($f200BobAngelScenario){$f200BobAngelInputs.inputs}else{@()};factorio_processes=0}|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $output -Encoding utf8
+  [ordered]@{schema=1;kind='MIRUpgradePreparedInputsV1';status='prepared-not-native-tested';from_version=$FromVersion;to_version=$ToVersion;archetype=$Archetype;fixtures=$prepared;dependency_inputs=if($SpaceIsFake){$sifDescriptor.inputs}elseif($k2Scenario){$k2Inputs.inputs}elseif($f200BobAngelScenario){$f200BobAngelInputs.inputs}else{@()};published_410_predecessor=$published410Inputs;factorio_processes=0}|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $output -Encoding utf8
   Write-Host "[ok] Upgrade assertion fixtures prepared without archive-library writes or native execution: $output"
   return
 }
@@ -1156,6 +1193,9 @@ $result = [ordered]@{
   create_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $createEvidence).Hash
   load_log = (Split-Path -Leaf $loadEvidence)
   load_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $loadEvidence).Hash
+}
+if($published410Inputs){
+  $result.published_410_predecessor=$published410Inputs
 }
 if ($reloadEvidence) {
   $result.reload_log = (Split-Path -Leaf $reloadEvidence)

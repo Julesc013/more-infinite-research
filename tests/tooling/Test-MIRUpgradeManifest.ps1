@@ -763,6 +763,32 @@ foreach($target in @('f017','f016','f015','f014','f013')){
   if(-not$rejected){throw "4.3 historical target accepted a modern fixture: $target"}
   $mir43Assertions++
 }
+# A single published 4.1 reader exists for the directly acquired F200 archive.
+# It is deliberately outside the retained 4.2 predecessor reader and cannot
+# admit another target, destination, policy, or a synthetic 4.2 manifest.
+$published410Mode=@{Target='f200';FromVersion='4.1.20000';ToVersion='4.3.20000';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.0'}
+Assert-MIR421CurrentUpgradeInputMode @published410Mode
+Assert-MIR430Published410F200FullUpgradeTransition -Target $published410Mode.Target -SourceVersion $published410Mode.SourceVersion -FromVersion $published410Mode.FromVersion -ToVersion $published410Mode.ToVersion -FixtureName $published410Mode.FixtureName -Archetype $published410Mode.Archetype -SpaceIsFake $published410Mode.SpaceIsFake -UpgradePolicy Full
+$mir43Assertions+=2
+foreach($invalid in @(
+  @{field='Target';value='f210';code='[mir421-current-upgrade-input-mode]'},
+  @{field='ToVersion';value='4.3.20001';code='[mir421-current-upgrade-input-mode]'},
+  @{field='SourceVersion';value='4.3.1';code='[mir421-current-upgrade-input-mode]'},
+  @{field='PublishedPredecessorManifest';value='published-4.2.json';code='[mir421-current-upgrade-transition]'}
+)){
+  $bad=$published410Mode.Clone();$bad[$invalid.field]=$invalid.value
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message-ceq$invalid.code}
+  if(-not$rejected){throw "Published 4.1 F200 mode admitted invalid $($invalid.field)"}
+  $mir43Assertions++
+}
+$rejected=$false;try{Assert-MIR430Published410F200FullUpgradeTransition -Target f200 -SourceVersion '4.3.0' -FromVersion '4.1.20000' -ToVersion '4.3.20000' -FixtureName 'assert-upgrade-4-0-20000-to-4-1-20000' -Archetype base-default -SpaceIsFake:$false -UpgradePolicy Classic}catch{$rejected=$_.Exception.Message-ceq'[mir430-published410-upgrade-profile]'}
+if(-not$rejected){throw 'Published 4.1 F200 transition admitted the destructive Classic policy'}
+$rejected=$false;try{Assert-MIR430Published410F200FullUpgradeTransition -Target f200 -SourceVersion '4.3.0' -FromVersion '4.1.20001' -ToVersion '4.3.20000' -FixtureName 'assert-upgrade-4-0-20000-to-4-1-20000' -Archetype base-default -SpaceIsFake:$false -UpgradePolicy Full}catch{$rejected=$_.Exception.Message-ceq'[mir430-published410-upgrade-transition]'}
+if(-not$rejected){throw 'Published 4.1 F200 transition inferred a non-published archive'}
+$wrong410Archive=Join-Path $testRoot 'not-the-published-410.zip';[IO.File]::WriteAllText($wrong410Archive,'not a published archive',[Text.UTF8Encoding]::new($false))
+$rejected=$false;try{Read-MIR430Published410F200ReleaseInput -ReleaseMetadata ([pscustomobject]@{}) -ReleaseManifestPath $wrong410Archive -ArchivePath $wrong410Archive|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir430-published410-archive]'}
+if(-not$rejected){throw 'Published 4.1 reader admitted an unrelated archive'}
+$mir43Assertions+=3
 foreach($case in $historicalCases){
   foreach($sourceVersion in @('4.3.0','4.3.1')){
     $to='4.3.'+$case.code+([version]$sourceVersion).Build.ToString('00')
@@ -842,6 +868,37 @@ $mir43Assertions++
 $rejected=$false;try{Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Mir43Oracle -FromVersion '4.3.20000' -ToVersion '4.3.20001'}catch{$rejected=$_.Exception.Message-ceq'[mir422-f200-complete-oracle-transition]'}
 if(-not$rejected){throw '4.3 F200 full-state oracle inferred an unreviewed 4.3 predecessor'}
 $mir43Assertions++
+$f200Published410Fixture=Join-Path $mir43FixtureRoot 'mir43-f200-published-410-full-state-oracle'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $f200Published410Fixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f200Published410Fixture -Target f200 -SourceVersion '4.3.0' -FromVersion '4.1.20000'
+Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Published410Fixture -FromVersion '4.1.20000' -ToVersion '4.3.20000'
+$f200Published410Info=Get-Content -LiteralPath (Join-Path $f200Published410Fixture 'info.json') -Raw|ConvertFrom-Json
+$f200Published410Control=Get-Content -LiteralPath (Join-Path $f200Published410Fixture 'control.lua') -Raw
+if($f200Published410Info.version-cne'0.1.49'-or-not$f200Published410Control.Contains('"4.1.20000"')-or-not$f200Published410Control.Contains('"4.3.20000"')){
+  throw 'Published 4.1 F200 fixture identity or complete-state oracle differs'
+}
+$mir43Assertions++
+$f210FullSettingFixture=Join-Path $mir43FixtureRoot 'mir43-f210-full-setting-allowance'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210FullSettingFixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210FullSettingFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21002'
+Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210FullSettingFixture -FromVersion '4.2.21002' -ToVersion '4.3.21000'
+if(-not(Get-Content -LiteralPath (Join-Path $f210FullSettingFixture 'control.lua') -Raw).Contains('local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')){
+  throw 'F210 Full selector allowance was not bound to the complete-state fixture'
+}
+$mir43Assertions++
+foreach($target in @('f110','f100')){
+  $code=$target.Substring(1)
+  $fixturePath=Join-Path $mir43FixtureRoot ('mir43-'+$target+'-full-setting-allowance')
+  Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00')) -Destination $fixturePath -Recurse
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixturePath -Target $target -SourceVersion '4.3.0' -FromVersion ('4.2.'+$code+'02')
+  Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixturePath -Target $target -FromVersion ('4.2.'+$code+'02') -ToVersion ('4.3.'+$code+'00')
+  Set-MIR430FullCompilerProfileUpgradeAllowance -Target $target -FixtureDirectory $fixturePath -FromVersion ('4.2.'+$code+'02') -ToVersion ('4.3.'+$code+'00')
+  $allowance=Get-Content -LiteralPath (Join-Path $fixturePath 'mir422_complete_state.lua') -Raw
+  if(-not$allowance.Contains('before[field]["mir-compiler-profile"] == nil')-or-not$allowance.Contains('expected_settings["mir-compiler-profile"] = "full"')){
+    throw "$target Full selector allowance was not bound to the complete-state oracle"
+  }
+  $mir43Assertions++
+}
 Remove-Item -LiteralPath $mir43FixtureRoot -Recurse -Force
 # The matrix has a single current-destination route with exact argument
 # propagation and demands both reload receipts for it.
