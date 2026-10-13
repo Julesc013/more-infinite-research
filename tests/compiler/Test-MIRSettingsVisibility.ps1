@@ -183,6 +183,11 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle "setting_ids_are_stable = true"
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.global_setting_prototypes()"
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'local compiler_profile = require("prototypes.mir.settings.compiler_profile")'
+$globalSettingPrototypeBlock = [regex]::Match($catalogText, '(?s)function M\.global_setting_prototypes\(\)(.*?)\r?\nend\r?\n\r?\nfunction M\.stream_setting_specs').Groups[1].Value
+if ([string]::IsNullOrWhiteSpace($globalSettingPrototypeBlock)) { throw 'Settings catalogue global-prototype boundary was not found.' }
+Assert-NoPattern -RelativePath "prototypes/mir/settings/catalog.lua" -Text $globalSettingPrototypeBlock -Pattern 'require\("prototypes\.mir\.settings\.compiler_profile"\)'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $globalSettingPrototypeBlock -Needle 'compiler_profile.prototype()'
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.validate_value(name, value)"
 Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'name = "mir-prototype-pollution-cap"'
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'name = prototype_limit_settings.positive_power_floor_setting_name'
