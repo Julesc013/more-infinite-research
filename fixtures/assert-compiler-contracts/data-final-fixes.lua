@@ -57,6 +57,7 @@ local c9_contracts = {
   compiler = require("__more-infinite-research__.prototypes.mir.planner.compiler"),
   hard_gate_authority = require("__more-infinite-research__.prototypes.mir.domain.technology.hard_gate_authority"),
   provider_claim = require("__more-infinite-research__.prototypes.mir.providers.pipeline.provider_claim"),
+  provider_decision = require("__more-infinite-research__.prototypes.mir.providers.pipeline.decision"),
   transformation_operation = require("__more-infinite-research__.prototypes.mir.domain.compiler.transformation_operation"),
   transformation_plan = require("__more-infinite-research__.prototypes.mir.domain.compiler.transformation_plan"),
   mutation_journal = require("__more-infinite-research__.prototypes.mir.domain.compiler.mutation_journal"),
@@ -1996,6 +1997,62 @@ end
   if conflicting_claims.status ~= "REVIEW_REQUIRED"
     or conflicting_claims.code ~= "conflicting_same_stream_claim" then
     fail("different same-stream provider claims did not fail closed")
+  end
+
+  local decision_rule = {
+    provider_id = "fixture-decision-provider", id = "fixture-decision-rule",
+    capability = "recipe-productivity", family = "fixture-decision-family",
+    required_evidence = {"fixture-decision-evidence"}, targets = {"2.1"}
+  }
+  local decision_candidate = {
+    recipe = "iron-gear-wheel", item = "iron-gear-wheel", identity = "fixture-decision-identity",
+    candidate_fingerprint = "mir32-fixture-decision-candidate", partition_key = "fixture-decision",
+    source = "compatibility-pack-seed", pack = "fixture-decision-pack",
+    evidence = {"fixture-decision-candidate-evidence"}
+  }
+  local decision_classification = {
+    risk_fact = {risk_fingerprint = "mir32-fixture-decision-risk", hard_flags = {}, review_flags = {}},
+    risk_disposition = "PASS"
+  }
+  local decision_pack = {kind = "exact-reviewed", pack = "fixture-decision-pack", evidence = {"fixture-decision-pack-evidence"}}
+  local legacy_before = fingerprint.metrics().fingerprint_calls
+  local legacy_decision = c9_contracts.provider_decision.build(
+    decision_rule, "fixture-stream", decision_candidate, decision_classification, decision_pack, 0.01, "attach")
+  legacy_decision.unlock_depth = 7
+  c9_contracts.provider_decision.refresh_fingerprint(legacy_decision)
+  local legacy_calls = fingerprint.metrics().fingerprint_calls - legacy_before
+  local optimized_before = fingerprint.metrics().fingerprint_calls
+  local optimized_decision = c9_contracts.provider_decision.build(
+    decision_rule, "fixture-stream", decision_candidate, decision_classification, decision_pack, 0.01, "attach", 7)
+  local optimized_calls = fingerprint.metrics().fingerprint_calls - optimized_before
+  if legacy_calls ~= 4 or optimized_calls ~= 2
+    or fingerprint.canonical(legacy_decision) ~= fingerprint.canonical(optimized_decision)
+    or legacy_decision.claim_fingerprint ~= optimized_decision.claim_fingerprint
+    or legacy_decision.decision_fingerprint ~= optimized_decision.decision_fingerprint then
+    fail("provider construction did not preserve legacy depth/fingerprint output while removing the redundant pair")
+  end
+  local seven_argument = c9_contracts.provider_decision.build(
+    decision_rule, "fixture-stream", decision_candidate, decision_classification, decision_pack, 0.01, "attach")
+  if seven_argument.unlock_depth ~= nil then
+    fail("provider decision build no longer preserves the seven-argument API")
+  end
+  local original_claim, original_decision = optimized_decision.claim_fingerprint, optimized_decision.decision_fingerprint
+  optimized_decision.cardinality = {schema = 2, status = "PASS", candidate_count = 1}
+  c9_contracts.provider_decision.refresh_fingerprint(optimized_decision)
+  if optimized_decision.claim_fingerprint ~= original_claim
+    or optimized_decision.decision_fingerprint == original_decision then
+    fail("provider budget metadata did not retain an explicit decision refresh")
+  end
+  original_claim, original_decision = optimized_decision.claim_fingerprint, optimized_decision.decision_fingerprint
+  optimized_decision.final_state = "review-required"
+  optimized_decision.decision = "review-required"
+  optimized_decision.blocker = "fixture-arbitration"
+  optimized_decision.risk_disposition = "REVIEW_REQUIRED"
+  optimized_decision.ambiguity = {code = "fixture-arbitration", candidate_streams = {"fixture-stream"}}
+  c9_contracts.provider_decision.refresh_fingerprint(optimized_decision)
+  if optimized_decision.claim_fingerprint == original_claim
+    or optimized_decision.decision_fingerprint == original_decision then
+    fail("provider action/risk arbitration did not retain an explicit full refresh")
   end
 end)()
 
