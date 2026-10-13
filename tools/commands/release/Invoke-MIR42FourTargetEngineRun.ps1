@@ -101,6 +101,33 @@ function Get-MIR42EngineCandidateVersionContract {
   }
 }
 
+function Get-MIR42EngineMaintenanceSelection {
+  param([Parameter(Mandatory)][string]$CandidateSourceVersion,[string]$RequestedPredecessorSourceVersion='')
+  if ($CandidateSourceVersion -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) {
+    throw '[mir42-engine-maintenance-predecessor-candidate-scope]'
+  }
+  $direct = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
+  $requested = if ([string]::IsNullOrWhiteSpace($RequestedPredecessorSourceVersion)) {
+    [string]$direct.source_version
+  } else { $RequestedPredecessorSourceVersion }
+  $permitted = switch -CaseSensitive ($CandidateSourceVersion) {
+    '4.2.3' { @('4.2.0','4.2.1','4.2.2') }
+    '4.3.1' { @('4.2.2','4.3.0') }
+    default { @([string]$direct.source_version) }
+  }
+  if ($requested -cnotin $permitted) { throw '[mir42-engine-maintenance-predecessor-selection]' }
+  # Select the existing frozen-publication reader for the chosen predecessor.
+  # Its exact manifest, release metadata and archive checks still run below.
+  $reader = switch -CaseSensitive ($requested) {
+    '4.2.0' { '4.2.1' }
+    '4.2.1' { '4.2.2' }
+    '4.2.2' { '4.2.3' }
+    '4.3.0' { '4.3.1' }
+    default { throw '[mir42-engine-maintenance-predecessor-selection]' }
+  }
+  return [pscustomobject]@{source_version=$requested;reader_version=$reader}
+}
+
 function Get-MIR42HistoricalEngineDescriptor {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -680,26 +707,13 @@ if ([string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath) -
   throw '[mir42-engine-maintenance-predecessor-selection-input]'
 }
 if (-not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
-  if ($sourceVersion -cnotin @('4.2.1','4.2.2','4.2.3') -or -not $isNineTargetCandidate) {
+  if (-not $isNineTargetCandidate) {
     throw '[mir42-engine-maintenance-predecessor-candidate-scope]'
   }
-  $directPredecessorSourceVersion = '4.2.' + (([version]$sourceVersion).Build - 1)
-  $requestedPredecessorSourceVersion = if ([string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorSourceVersion)) {
-    $directPredecessorSourceVersion
-  } else {
-    $PublishedMaintenancePredecessorSourceVersion
-  }
-  $permittedPredecessorSourceVersions = if ($sourceVersion -ceq '4.2.3') {
-    @('4.2.0','4.2.1','4.2.2')
-  } else {
-    @($directPredecessorSourceVersion)
-  }
-  if ($requestedPredecessorSourceVersion -cnotin $permittedPredecessorSourceVersions) {
-    throw '[mir42-engine-maintenance-predecessor-selection]'
-  }
-  # The frozen-manifest reader is keyed by the release immediately after the
-  # requested predecessor: 420 -> its 421 reader, 421 -> 422, 422 -> 423.
-  $predecessorReaderVersion = '4.2.' + (([version]$requestedPredecessorSourceVersion).Build + 1)
+  $maintenanceSelection = Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion $sourceVersion `
+    -RequestedPredecessorSourceVersion $PublishedMaintenancePredecessorSourceVersion
+  $requestedPredecessorSourceVersion = [string]$maintenanceSelection.source_version
+  $predecessorReaderVersion = [string]$maintenanceSelection.reader_version
   $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $predecessorReaderVersion
   $releaseText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
   if ($LASTEXITCODE -ne 0) { throw '[mir42-engine-maintenance-predecessor-release-readback]' }
