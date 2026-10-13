@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "kind": "MIR430NamedStartupStressProfileV1",
+  "id": "f200-bob-angel",
+  "target": "f200",
+  "status": "acquired-exact-selection-not-native-qualified",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "mods": [
+    {
+      "name": "angelsbioprocessing",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelsbioprocessinggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochem",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochemgraphics",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefining",
+      "version": "2.0.4",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefininggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelssmelting",
+      "version": "2.0.5",
+      "enabled": true
+    },
+    {
+      "name": "angelssmeltinggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "bobelectronics",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "boblibrary",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobores",
+      "version": "2.1.2",
+      "enabled": true
+    },
+    {
+      "name": "bobplates",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobrevamp",
+      "version": "2.1.1",
+      "enabled": true
+    }
+  ],
+  "archive_pins": [
+    {
+      "name": "angelsbioprocessing",
+      "version": "2.0.3",
+      "filename": "angelsbioprocessing_2.0.3.zip",
+      "bytes": 167665,
+      "sha256": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B"
+    },
+    {
+      "name": "angelsbioprocessinggraphics",
+      "version": "2.0.0",
+      "filename": "angelsbioprocessinggraphics_2.0.0.zip",
+      "bytes": 28984409,
+      "sha256": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66"
+    },
+    {
+      "name": "angelspetrochem",
+      "version": "2.0.3",
+      "filename": "angelspetrochem_2.0.3.zip",
+      "bytes": 171774,
+      "sha256": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D"
+    },
+    {
+      "name": "angelspetrochemgraphics",
+      "version": "2.0.1",
+      "filename": "angelspetrochemgraphics_2.0.1.zip",
+      "bytes": 21046201,
+      "sha256": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262"
+    },
+    {
+      "name": "angelsrefining",
+      "version": "2.0.4",
+      "filename": "angelsrefining_2.0.4.zip",
+      "bytes": 524566,
+      "sha256": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42"
+    },
+    {
+      "name": "angelsrefininggraphics",
+      "version": "2.0.0",
+      "filename": "angelsrefininggraphics_2.0.0.zip",
+      "bytes": 85675072,
+      "sha256": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25"
+    },
+    {
+      "name": "angelssmelting",
+      "version": "2.0.5",
+      "filename": "angelssmelting_2.0.5.zip",
+      "bytes": 198937,
+      "sha256": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4"
+    },
+    {
+      "name": "angelssmeltinggraphics",
+      "version": "2.0.0",
+      "filename": "angelssmeltinggraphics_2.0.0.zip",
+      "bytes": 43682108,
+      "sha256": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF"
+    },
+    {
+      "name": "bobelectronics",
+      "version": "2.1.1",
+      "filename": "bobelectronics_2.1.1.zip",
+      "bytes": 464241,
+      "sha256": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3"
+    },
+    {
+      "name": "boblibrary",
+      "version": "2.1.0",
+      "filename": "boblibrary_2.1.0.zip",
+      "bytes": 5538241,
+      "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B"
+    },
+    {
+      "name": "bobores",
+      "version": "2.1.2",
+      "filename": "bobores_2.1.2.zip",
+      "bytes": 150993,
+      "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94"
+    },
+    {
+      "name": "bobplates",
+      "version": "2.1.1",
+      "filename": "bobplates_2.1.1.zip",
+      "bytes": 7477119,
+      "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B"
+    },
+    {
+      "name": "bobrevamp",
+      "version": "2.1.1",
+      "filename": "bobrevamp_2.1.1.zip",
+      "bytes": 289565,
+      "sha256": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB"
+    }
+  ],
+  "builtin_pins": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "info_sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+    }
+  ],
+  "claim_scope": "specified-available-inputs-not-reporter-313-mod-environment"
+}

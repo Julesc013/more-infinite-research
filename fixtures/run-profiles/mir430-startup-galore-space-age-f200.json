@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "kind": "MIR430NamedStartupStressProfileV1",
+  "id": "f200-galore-space-age",
+  "target": "f200",
+  "status": "acquired-exact-selection-not-native-qualified",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "galore_lib",
+      "version": "2.2.0",
+      "enabled": true
+    },
+    {
+      "name": "vanilla_galore_continued",
+      "version": "1.4.2",
+      "enabled": true
+    },
+    {
+      "name": "space_age_galore",
+      "version": "1.6.3",
+      "enabled": true
+    }
+  ],
+  "archive_pins": [
+    {
+      "name": "galore_lib",
+      "version": "2.2.0",
+      "filename": "galore_lib_2.2.0.zip",
+      "bytes": 77415,
+      "sha256": "D473E10294091F45D77F181907FC777CEE181B18EB57B8B914D02E0D2C1C3FE2"
+    },
+    {
+      "name": "vanilla_galore_continued",
+      "version": "1.4.2",
+      "filename": "vanilla_galore_continued_1.4.2.zip",
+      "bytes": 113591,
+      "sha256": "18ECF427C4671B7036C2AE278C19FF4E7853E68428D515F7A52095CB6D5DCF0C"
+    },
+    {
+      "name": "space_age_galore",
+      "version": "1.6.3",
+      "filename": "space_age_galore_1.6.3.zip",
+      "bytes": 149753,
+      "sha256": "0C758F793E783082258F62705A17F40E917B9BBFC3B1D77ABF2A32E954CDE3B4"
+    }
+  ],
+  "builtin_pins": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "info_sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "info_sha256": "310A4C06D65F08199A76780388BA93C333BB752B1258415EA4D5211D9A681089"
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "info_sha256": "2C2578FD84CC2E920C944C90047EAA5A1F6984A1CE07C246FC1906D90C5505AD"
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "info_sha256": "F8957FC975949BB647B64CA246A4DE7F981232C4AB47C4DB4F60CCEA6AEF5E1A"
+    }
+  ],
+  "claim_scope": "specified-available-inputs-not-reporter-313-mod-environment"
+}

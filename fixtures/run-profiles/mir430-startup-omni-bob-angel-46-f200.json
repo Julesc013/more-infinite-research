@@ -1,0 +1,562 @@
+{
+  "schema": 1,
+  "kind": "MIR430NamedStartupStressProfileV1",
+  "id": "f200-omni-bob-angel-46",
+  "target": "f200",
+  "status": "acquired-exact-selection-not-native-qualified",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-crawler",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-petro",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-smelting",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsaddons-storage",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsbioprocessing",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelsbioprocessinggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelsinfiniteores",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochem",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefining",
+      "version": "2.0.4",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefininggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "angelssmelting",
+      "version": "2.0.5",
+      "enabled": true
+    },
+    {
+      "name": "angelssmeltinggraphics",
+      "version": "2.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bobassembly",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobelectronics",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobenemies",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobequipment",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobgreenhouse",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobinserters",
+      "version": "2.0.3",
+      "enabled": true
+    },
+    {
+      "name": "boblibrary",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "boblogistics",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobmining",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobmodules",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobores",
+      "version": "2.1.2",
+      "enabled": true
+    },
+    {
+      "name": "bobplates",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobpower",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobrevamp",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobtech",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "bobvehicleequipment",
+      "version": "2.1.1",
+      "enabled": true
+    },
+    {
+      "name": "bobwarfare",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "omniab-space-age-compat",
+      "version": "1.3.7",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter",
+      "version": "4.2.12",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter_compression",
+      "version": "4.2.11",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter_crystal",
+      "version": "4.2.8",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter_energy",
+      "version": "3.2.10",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter_fluid",
+      "version": "4.2.7",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter_move",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter_science",
+      "version": "4.2.4",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter_water",
+      "version": "4.2.1",
+      "enabled": true
+    },
+    {
+      "name": "omnimatter_wood",
+      "version": "4.2.4",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochemgraphics",
+      "version": "2.0.1",
+      "enabled": true
+    },
+    {
+      "name": "omnilib",
+      "version": "4.2.13",
+      "enabled": true
+    }
+  ],
+  "archive_pins": [
+    {
+      "name": "angelsaddons-mobility",
+      "version": "2.0.1",
+      "filename": "angelsaddons-mobility_2.0.1.zip",
+      "bytes": 97491,
+      "sha256": "F596F3E0FF0322DCD7008F4EBDC173671E26967BDF8E3390FC4FBDEA9E414D88"
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-crawler",
+      "version": "2.0.0",
+      "filename": "angelsaddons-mobility-graphics-crawler_2.0.0.zip",
+      "bytes": 205351307,
+      "sha256": "2876A3B426C895A474EF5B7BFA6C6DDAD5AC9AA48AD4B8AE46485C449CCE2745"
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-petro",
+      "version": "2.0.0",
+      "filename": "angelsaddons-mobility-graphics-petro_2.0.0.zip",
+      "bytes": 130225666,
+      "sha256": "F4C7FD4097DEDB728D881C130FE77C78E36094859E4254FFCFF709452F6E13C7"
+    },
+    {
+      "name": "angelsaddons-mobility-graphics-smelting",
+      "version": "2.0.0",
+      "filename": "angelsaddons-mobility-graphics-smelting_2.0.0.zip",
+      "bytes": 163797396,
+      "sha256": "3D3347F7FB0BB607D873E45A2A0568021CC16174DEE301455F4177751A733BB2"
+    },
+    {
+      "name": "angelsaddons-storage",
+      "version": "2.0.1",
+      "filename": "angelsaddons-storage_2.0.1.zip",
+      "bytes": 2261342,
+      "sha256": "F8D2AA584EE344B9E74903AF5CED05A3A00B04C976F20C87F5128C0BD180A7EF"
+    },
+    {
+      "name": "angelsbioprocessing",
+      "version": "2.0.3",
+      "filename": "angelsbioprocessing_2.0.3.zip",
+      "bytes": 167665,
+      "sha256": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B"
+    },
+    {
+      "name": "angelsbioprocessinggraphics",
+      "version": "2.0.0",
+      "filename": "angelsbioprocessinggraphics_2.0.0.zip",
+      "bytes": 28984409,
+      "sha256": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66"
+    },
+    {
+      "name": "angelsinfiniteores",
+      "version": "2.0.3",
+      "filename": "angelsinfiniteores_2.0.3.zip",
+      "bytes": 25655344,
+      "sha256": "3AFBA78BAD970A6244208B348FC30B362E37C61043F78709772EB06868176C63"
+    },
+    {
+      "name": "angelspetrochem",
+      "version": "2.0.3",
+      "filename": "angelspetrochem_2.0.3.zip",
+      "bytes": 171774,
+      "sha256": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D"
+    },
+    {
+      "name": "angelsrefining",
+      "version": "2.0.4",
+      "filename": "angelsrefining_2.0.4.zip",
+      "bytes": 524566,
+      "sha256": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42"
+    },
+    {
+      "name": "angelsrefininggraphics",
+      "version": "2.0.0",
+      "filename": "angelsrefininggraphics_2.0.0.zip",
+      "bytes": 85675072,
+      "sha256": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25"
+    },
+    {
+      "name": "angelssmelting",
+      "version": "2.0.5",
+      "filename": "angelssmelting_2.0.5.zip",
+      "bytes": 198937,
+      "sha256": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4"
+    },
+    {
+      "name": "angelssmeltinggraphics",
+      "version": "2.0.0",
+      "filename": "angelssmeltinggraphics_2.0.0.zip",
+      "bytes": 43682108,
+      "sha256": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF"
+    },
+    {
+      "name": "bobassembly",
+      "version": "2.1.0",
+      "filename": "bobassembly_2.1.0.zip",
+      "bytes": 15786563,
+      "sha256": "CB839BB8381D26C9DA23109A31FB59AD8191068A3589D05AC8F051EC59ABBBDD"
+    },
+    {
+      "name": "bobelectronics",
+      "version": "2.1.1",
+      "filename": "bobelectronics_2.1.1.zip",
+      "bytes": 464241,
+      "sha256": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3"
+    },
+    {
+      "name": "bobenemies",
+      "version": "2.1.0",
+      "filename": "bobenemies_2.1.0.zip",
+      "bytes": 1308485,
+      "sha256": "FAB90D7B0C57D4E35323D4036C5B1B0046BF30A9BCAFC8687F42270497DEDD62"
+    },
+    {
+      "name": "bobequipment",
+      "version": "2.1.0",
+      "filename": "bobequipment_2.1.0.zip",
+      "bytes": 1466634,
+      "sha256": "046EB8090849A521F6A4740401E20111AEAC494FC4FE0610ABE5786D65A00304"
+    },
+    {
+      "name": "bobgreenhouse",
+      "version": "2.1.0",
+      "filename": "bobgreenhouse_2.1.0.zip",
+      "bytes": 312315,
+      "sha256": "3DBFF76267D97ECFC73BD83F32B95EFB55159FA8B46DDCD4EFD0274D08DCBE3D"
+    },
+    {
+      "name": "bobinserters",
+      "version": "2.0.3",
+      "filename": "bobinserters_2.0.3.zip",
+      "bytes": 176163,
+      "sha256": "FC2A6FB6B9816FF1D37E304A0A714270839E3366C93D4859AEE0AB9A9AECF765"
+    },
+    {
+      "name": "boblibrary",
+      "version": "2.1.0",
+      "filename": "boblibrary_2.1.0.zip",
+      "bytes": 5538241,
+      "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B"
+    },
+    {
+      "name": "boblogistics",
+      "version": "2.1.1",
+      "filename": "boblogistics_2.1.1.zip",
+      "bytes": 21919808,
+      "sha256": "07297FA72B1792C4483D30EA1705ECD4C7390B246E24B6B58663862445E500E5"
+    },
+    {
+      "name": "bobmining",
+      "version": "2.1.0",
+      "filename": "bobmining_2.1.0.zip",
+      "bytes": 3487095,
+      "sha256": "4E6296035852433362705E7CB02E5CE5A8E4F48F4139A606B868AE56D5698782"
+    },
+    {
+      "name": "bobmodules",
+      "version": "2.1.0",
+      "filename": "bobmodules_2.1.0.zip",
+      "bytes": 4795684,
+      "sha256": "36E676ED16F67E01F4737778F8359CB72D04F0316ED21279138511935447CE60"
+    },
+    {
+      "name": "bobores",
+      "version": "2.1.2",
+      "filename": "bobores_2.1.2.zip",
+      "bytes": 150993,
+      "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94"
+    },
+    {
+      "name": "bobplates",
+      "version": "2.1.1",
+      "filename": "bobplates_2.1.1.zip",
+      "bytes": 7477119,
+      "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B"
+    },
+    {
+      "name": "bobpower",
+      "version": "2.1.0",
+      "filename": "bobpower_2.1.0.zip",
+      "bytes": 3038550,
+      "sha256": "5D9E82962B8F1780416B6759E583C674982CB000B578A286B60A75D072D49B5B"
+    },
+    {
+      "name": "bobrevamp",
+      "version": "2.1.1",
+      "filename": "bobrevamp_2.1.1.zip",
+      "bytes": 289565,
+      "sha256": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB"
+    },
+    {
+      "name": "bobtech",
+      "version": "2.1.0",
+      "filename": "bobtech_2.1.0.zip",
+      "bytes": 8217926,
+      "sha256": "7F721AFB56C7CF56D16DAF03E4582C7650381719C63F6DD7C714BE7FF83F2D25"
+    },
+    {
+      "name": "bobvehicleequipment",
+      "version": "2.1.1",
+      "filename": "bobvehicleequipment_2.1.1.zip",
+      "bytes": 3584350,
+      "sha256": "81D91ADCD36C6721BB3EB83D155901953F6BF42D481D823533FB2F27978A92B1"
+    },
+    {
+      "name": "bobwarfare",
+      "version": "2.1.0",
+      "filename": "bobwarfare_2.1.0.zip",
+      "bytes": 4500268,
+      "sha256": "071C8DC3EBAE6D624A8E47BDDBA2C9432E1E2BF9D7E2EF151E95DF36788E9545"
+    },
+    {
+      "name": "omniab-space-age-compat",
+      "version": "1.3.7",
+      "filename": "omniab-space-age-compat_1.3.7.zip",
+      "bytes": 218177,
+      "sha256": "1AFAB69C907576410980E51FE5CEAEA8B4DF34D84FEF25F28A7D557F368B8DB6"
+    },
+    {
+      "name": "omnimatter",
+      "version": "4.2.12",
+      "filename": "omnimatter_4.2.12.zip",
+      "bytes": 19688942,
+      "sha256": "05DF07A6BEA0A42A55C329DCCD690724C869EEA906BF9929CF9C50FBA4B998A8"
+    },
+    {
+      "name": "omnimatter_compression",
+      "version": "4.2.11",
+      "filename": "omnimatter_compression_4.2.11.zip",
+      "bytes": 1568844,
+      "sha256": "653C6A8DFFC5B4C0F13E5F981936FF42C31C0457674EFE37DECC72F590D9766E"
+    },
+    {
+      "name": "omnimatter_crystal",
+      "version": "4.2.8",
+      "filename": "omnimatter_crystal_4.2.8.zip",
+      "bytes": 7575607,
+      "sha256": "9CDB9BFF8A01F600F866C76458BC37D1E1126FE923FD59B8249C2545ECA4E679"
+    },
+    {
+      "name": "omnimatter_energy",
+      "version": "3.2.10",
+      "filename": "omnimatter_energy_3.2.10.zip",
+      "bytes": 19416986,
+      "sha256": "BDC306BE904214AA10D8D6C543186F33A1ED8B23A3BD9613E085A47399B2CCBF"
+    },
+    {
+      "name": "omnimatter_fluid",
+      "version": "4.2.7",
+      "filename": "omnimatter_fluid_4.2.7.zip",
+      "bytes": 2217867,
+      "sha256": "B42F53AAE98564B31ABEE8787A1A8FCB40ED2A70A36B2EACB2A4EF18DF82E9E4"
+    },
+    {
+      "name": "omnimatter_move",
+      "version": "2.1.0",
+      "filename": "omnimatter_move_2.1.0.zip",
+      "bytes": 35589,
+      "sha256": "712A283D97D8A4F8A42EEBBDFB130A5B9224A3696B67758D3972AD9519E226AA"
+    },
+    {
+      "name": "omnimatter_science",
+      "version": "4.2.4",
+      "filename": "omnimatter_science_4.2.4.zip",
+      "bytes": 92092,
+      "sha256": "CFE768217AB56B2125B82CB2F08B4EFD0BEE07ED097D291D8B205F4DC24B8C75"
+    },
+    {
+      "name": "omnimatter_water",
+      "version": "4.2.1",
+      "filename": "omnimatter_water_4.2.1.zip",
+      "bytes": 80610,
+      "sha256": "0091386190017C853B522A703CE1ACDC77AAE9CAB30277EFED0D31469E68740C"
+    },
+    {
+      "name": "omnimatter_wood",
+      "version": "4.2.4",
+      "filename": "omnimatter_wood_4.2.4.zip",
+      "bytes": 206009,
+      "sha256": "F2DB58516522B7FD90662FBA0D44FCCD937F666BF8C2396A1A15F66A007F7484"
+    },
+    {
+      "name": "angelspetrochemgraphics",
+      "version": "2.0.1",
+      "filename": "angelspetrochemgraphics_2.0.1.zip",
+      "bytes": 21046201,
+      "sha256": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262"
+    },
+    {
+      "name": "omnilib",
+      "version": "4.2.13",
+      "filename": "omnilib_4.2.13.zip",
+      "bytes": 151766,
+      "sha256": "1751893E1E39055396B39290100F97946F94BEA1027A22E4B7BFE7DA9255DC40"
+    }
+  ],
+  "builtin_pins": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "info_sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "info_sha256": "F8957FC975949BB647B64CA246A4DE7F981232C4AB47C4DB4F60CCEA6AEF5E1A"
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "info_sha256": "2C2578FD84CC2E920C944C90047EAA5A1F6984A1CE07C246FC1906D90C5505AD"
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "info_sha256": "310A4C06D65F08199A76780388BA93C333BB752B1258415EA4D5211D9A681089"
+    }
+  ],
+  "claim_scope": "specified-available-inputs-not-reporter-313-mod-environment"
+}

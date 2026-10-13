@@ -732,6 +732,497 @@ $script:MIR42ReleaseAcceptanceCriteria = @(
   'deterministic-reconstruction'
 )
 
+
+$script:MIR430EmergencyPerformanceAuthorityPath = 'governance/repository/mir430-emergency-performance-v1.json'
+$script:MIR430EmergencyPerformanceStages = @('settings','data','data-updates','data-final-fixes')
+
+function Assert-MIR430PerformancePropertyNames {
+  param([Parameter(Mandatory)]$Value,[Parameter(Mandatory)][string[]]$Expected,[Parameter(Mandatory)][string]$Code)
+  $actual = @($Value.PSObject.Properties | ForEach-Object { [string]$_.Name })
+  if ($actual.Count -ne $Expected.Count -or @($actual | Where-Object { $_ -cnotin $Expected }).Count -ne 0) {
+    throw "[$Code]"
+  }
+}
+
+function Get-MIR430PerformanceTextSha256 {
+  param([Parameter(Mandatory)][string]$Text)
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($Text)))
+}
+
+function Get-MIR430EmergencyPerformanceAuthority {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $authorityPath = Join-Path $repo $script:MIR430EmergencyPerformanceAuthorityPath
+  $authority = Read-MIR42QualificationBootstrapRecord -Path $authorityPath -Code 'mir430-performance-authority'
+  $authoritySchema = Join-Path $repo 'spec/schemas/mir430-emergency-performance-v1.schema.json'
+  if (-not (Test-Path -LiteralPath $authoritySchema -PathType Leaf) -or -not ((Get-Content -Raw -LiteralPath $authorityPath) | Test-Json -SchemaFile $authoritySchema -ErrorAction SilentlyContinue)) {
+    throw '[mir430-performance-authority-schema]'
+  }
+  Assert-MIR430PerformancePropertyNames -Value $authority -Expected @(
+    'schema','kind','authority_id','source_version','status','max_mir_startup_seconds','minimum_samples_per_profile','minimum_generated_mir_technologies',
+    'compiler_profile','required_stages','required_profiles','allowed_observer','ordinary_menu_status','library_first_use_status',
+    'relative_overhead_status','timeout_status','reporter_environment_status','basis','release_deadline_utc','record_sha256'
+  ) -Code 'mir430-performance-authority-shape'
+  if ([int]$authority.schema -ne 1 -or [string]$authority.kind -cne 'MIR430EmergencyPerformanceAcceptanceV1' -or
+      [string]$authority.authority_id -cne 'MIR430-EMERGENCY-PERFORMANCE-V1' -or [string]$authority.source_version -cne '4.3.0' -or
+      [string]$authority.status -cne 'adopted-maintainer-emergency-acceptance-not-evidence' -or
+      [double]$authority.max_mir_startup_seconds -ne 60.0 -or [int]$authority.minimum_samples_per_profile -ne 1 -or [int]$authority.minimum_generated_mir_technologies -lt 1 -or
+      [string]$authority.compiler_profile -cne 'classic' -or
+      (@($authority.required_stages | ForEach-Object { [string]$_ }) -join '|') -cne ($script:MIR430EmergencyPerformanceStages -join '|')) {
+    throw '[mir430-performance-authority-binding]'
+  }
+  Assert-MIR430PerformancePropertyNames -Value $authority.allowed_observer -Expected @('name','version','archive_sha256','source_files') -Code 'mir430-performance-authority-observer-shape'
+  if ([string]$authority.allowed_observer.name -cne 'mir430-compiler-profile-ablation' -or
+      [string]$authority.allowed_observer.version -cne '1.0.0' -or [string]$authority.allowed_observer.archive_sha256 -notmatch '^[A-F0-9]{64}$' -or
+      @($authority.allowed_observer.source_files).Count -ne 3) {
+    throw '[mir430-performance-authority-observer-binding]'
+  }
+  foreach ($sourceFile in @($authority.allowed_observer.source_files)) {
+    Assert-MIR430PerformancePropertyNames -Value $sourceFile -Expected @('path','bytes','sha256') -Code 'mir430-performance-authority-observer-source-shape'
+    if ([string]$sourceFile.path -notmatch '^fixtures/assert-mir430-startup-work/[a-z-]+[.](?:json|lua)$' -or [int64]$sourceFile.bytes -le 0 -or [string]$sourceFile.sha256 -notmatch '^[A-F0-9]{64}$') {
+      throw '[mir430-performance-authority-observer-source-binding]'
+    }
+    $sourcePath = Join-Path $repo ([string]$sourceFile.path)
+    if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf) -or [int64](Get-Item -LiteralPath $sourcePath).Length -ne [int64]$sourceFile.bytes -or
+        (Get-MIR4Sha256File -Path $sourcePath) -cne [string]$sourceFile.sha256) {
+      throw '[mir430-performance-authority-observer-source-file]'
+    }
+  }
+  $profiles = @($authority.required_profiles)
+  if ($profiles.Count -ne 3 -or (@($profiles | ForEach-Object { [string]$_.id }) -join '|') -cne 'f200-galore-space-age|f200-bob-angel|f200-omni-bob-angel-46') {
+    throw '[mir430-performance-authority-profiles]'
+  }
+  $resolvedProfiles = [Collections.Generic.List[object]]::new()
+  foreach ($required in $profiles) {
+    Assert-MIR430PerformancePropertyNames -Value $required -Expected @('id','target','definition') -Code 'mir430-performance-authority-profile-shape'
+    Assert-MIR430PerformancePropertyNames -Value $required.definition -Expected @('path','bytes','sha256') -Code 'mir430-performance-authority-profile-definition-shape'
+    if ([string]$required.target -cne 'f200' -or [string]$required.definition.path -notmatch '^fixtures/run-profiles/mir430-startup-[a-z0-9-]+-f200[.]json$' -or
+        [int64]$required.definition.bytes -le 0 -or [string]$required.definition.sha256 -notmatch '^[A-F0-9]{64}$') {
+      throw "[mir430-performance-authority-profile-binding] $([string]$required.id)"
+    }
+    $definitionPath = Join-Path $repo ([string]$required.definition.path)
+    if (-not (Test-Path -LiteralPath $definitionPath -PathType Leaf) -or [int64](Get-Item -LiteralPath $definitionPath).Length -ne [int64]$required.definition.bytes -or
+        (Get-MIR4Sha256File -Path $definitionPath) -cne [string]$required.definition.sha256) {
+      throw "[mir430-performance-authority-profile-file] $([string]$required.id)"
+    }
+    $profileSchema = Join-Path $repo 'spec/schemas/mir430-named-startup-stress-profile-v1.schema.json'
+    if (-not (Test-Path -LiteralPath $profileSchema -PathType Leaf) -or -not ((Get-Content -Raw -LiteralPath $definitionPath) | Test-Json -SchemaFile $profileSchema -ErrorAction SilentlyContinue)) {
+      throw "[mir430-performance-authority-profile-schema] $([string]$required.id)"
+    }
+    try { $definition = Get-Content -Raw -LiteralPath $definitionPath | ConvertFrom-Json -Depth 100 -DateKind String }
+    catch { throw "[mir430-performance-authority-profile-json] $([string]$required.id)" }
+    Assert-MIR430PerformancePropertyNames -Value $definition -Expected @('schema','kind','id','target','status','engine','mods','archive_pins','builtin_pins','claim_scope') -Code 'mir430-performance-profile-shape'
+    Assert-MIR430PerformancePropertyNames -Value $definition.engine -Expected @('version','sha256') -Code 'mir430-performance-profile-engine-shape'
+    if ([int]$definition.schema -ne 1 -or [string]$definition.kind -cne 'MIR430NamedStartupStressProfileV1' -or
+        [string]$definition.id -cne [string]$required.id -or [string]$definition.target -cne [string]$required.target -or
+        [string]$definition.status -cne 'acquired-exact-selection-not-native-qualified' -or [string]$definition.engine.version -notmatch '^2[.]0[.]\d+$' -or
+        [string]$definition.engine.sha256 -notmatch '^[A-F0-9]{64}$' -or @($definition.mods).Count -eq 0 -or
+        [string]$definition.claim_scope -cne 'specified-available-inputs-not-reporter-313-mod-environment') {
+      throw "[mir430-performance-profile-binding] $([string]$required.id)"
+    }
+    $resolvedProfiles.Add([pscustomobject][ordered]@{id=[string]$required.id;target=[string]$required.target;definition=$required.definition;profile=$definition})
+  }
+  return [pscustomobject][ordered]@{path=$authorityPath;sha256=(Get-MIR4Sha256File -Path $authorityPath);record=$authority;profiles=@($resolvedProfiles)}
+}
+
+function Resolve-MIR430PerformanceEvidenceFile {
+  param([Parameter(Mandatory)][string]$ObservationPath,[Parameter(Mandatory)]$Descriptor,[Parameter(Mandatory)][string]$Code)
+
+  Assert-MIR430PerformancePropertyNames -Value $Descriptor -Expected @('path','sha256') -Code "$Code-shape"
+  if ([string]::IsNullOrWhiteSpace([string]$Descriptor.path) -or [string]$Descriptor.sha256 -notmatch '^[A-F0-9]{64}$') { throw "[$Code-binding]" }
+  $root = Split-Path -Parent ((Resolve-Path -LiteralPath $ObservationPath).Path)
+  $candidate = if ([IO.Path]::IsPathRooted([string]$Descriptor.path)) { [string]$Descriptor.path } else { Join-Path $root ([string]$Descriptor.path) }
+  if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { throw "[$Code-missing]" }
+  $path = (Resolve-Path -LiteralPath $candidate).Path
+  if ((Get-MIR4Sha256File -Path $path) -cne [string]$Descriptor.sha256) { throw "[$Code-hash]" }
+  return $path
+}
+
+function Get-MIR430PerformanceLedgerCompletion {
+  param([Parameter(Mandatory)][string]$Path)
+
+  $item = Get-Item -LiteralPath $Path
+  if ($item.Length -le 0 -or $item.Length -gt 16MB) { throw '[mir430-performance-resource-ledger-size]' }
+  $lines = @(Get-Content -LiteralPath $Path)
+  if ($lines.Count -eq 0 -or $lines.Count -gt 10000) { throw '[mir430-performance-resource-ledger-lines]' }
+  $rows = [Collections.Generic.List[object]]::new()
+  foreach ($line in $lines) {
+    if ([string]::IsNullOrWhiteSpace($line)) { throw '[mir430-performance-resource-ledger-json]' }
+    try { $rows.Add(($line | ConvertFrom-Json -Depth 50 -DateKind String)) }
+    catch { throw '[mir430-performance-resource-ledger-json]' }
+  }
+  foreach ($row in $rows) {
+    if (($row.PSObject.Properties.Name -contains 'timed_out' -and [bool]$row.timed_out) -or
+        ($row.PSObject.Properties.Name -contains 'phase' -and [string]$row.phase -in @('interrupted','refused','timeout','timed-out')) -or
+        ($row.PSObject.Properties.Name -contains 'error' -and -not [string]::IsNullOrWhiteSpace([string]$row.error))) {
+      throw '[mir430-performance-resource-ledger-incomplete]'
+    }
+  }
+  $final = $rows[$rows.Count - 1]
+  if ([string]$final.phase -cne 'completed' -or [int]$final.exit_code -ne 0 -or
+      -not ($final.PSObject.Properties.Name -contains 'peak_working_set_bytes') -or -not ($final.PSObject.Properties.Name -contains 'peak_sampled_private_bytes')) {
+    throw '[mir430-performance-resource-ledger-completion]'
+  }
+}
+
+function Get-MIR430PerformanceParsedStages {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string[]]$Stages)
+
+  $item = Get-Item -LiteralPath $Path
+  if ($item.Length -le 0 -or $item.Length -gt 64MB) { throw '[mir430-performance-log-size]' }
+  $text = Get-Content -Raw -LiteralPath $Path
+  $marker = [regex]::new('(?m)^\s*(?<seconds>[0-9]+(?:\.[0-9]+)?)\s+.*\[more-infinite-research\] startup-stage=(?<stage>settings|data|data-updates|data-final-fixes) (?<edge>begin|end)\s*$')
+  $events = @($marker.Matches($text))
+  if ($events.Count -ne ($Stages.Count * 2)) { throw '[mir430-performance-stage-marker-count]' }
+  $profileMarker = [regex]::new('(?m)^\s*[0-9]+(?:\.[0-9]+)?\s+.*\[MIR430-ABLATION\] actual-profile=classic\s*$')
+  if ($profileMarker.Matches($text).Count -ne 1) { throw '[mir430-performance-classic-selection]' }
+  $parsed = [Collections.Generic.List[object]]::new()
+  $eventIndex = 0
+  $last = -1.0
+  foreach ($stage in $Stages) {
+    $begin = $events[$eventIndex];$end = $events[$eventIndex + 1];$eventIndex += 2
+    if ($begin.Groups['stage'].Value -cne $stage -or $begin.Groups['edge'].Value -cne 'begin' -or
+        $end.Groups['stage'].Value -cne $stage -or $end.Groups['edge'].Value -cne 'end') {
+      throw '[mir430-performance-stage-order]'
+    }
+    $beginSeconds = 0.0;$endSeconds = 0.0
+    if (-not [double]::TryParse($begin.Groups['seconds'].Value,[Globalization.NumberStyles]::AllowDecimalPoint,[Globalization.CultureInfo]::InvariantCulture,[ref]$beginSeconds) -or
+        -not [double]::TryParse($end.Groups['seconds'].Value,[Globalization.NumberStyles]::AllowDecimalPoint,[Globalization.CultureInfo]::InvariantCulture,[ref]$endSeconds) -or
+        [double]::IsNaN($beginSeconds) -or [double]::IsInfinity($beginSeconds) -or [double]::IsNaN($endSeconds) -or [double]::IsInfinity($endSeconds) -or
+        $beginSeconds -lt $last -or $endSeconds -lt $beginSeconds) {
+      throw '[mir430-performance-stage-time]'
+    }
+    $last = $endSeconds
+    $parsed.Add([pscustomobject][ordered]@{stage=$stage;begin_seconds=$beginSeconds;end_seconds=$endSeconds;elapsed_seconds=($endSeconds - $beginSeconds)})
+  }
+  $technologyMarker = [regex]::new('(?m)^\s*[0-9]+(?:\.[0-9]+)?\s+.*\[MIR430-ABLATION\] technology-names=(?<names>.*)\s*$')
+  $technologyLines = @($technologyMarker.Matches($text))
+  if ($technologyLines.Count -ne 1) { throw '[mir430-performance-generated-technology-marker]' }
+  $technologyNames = @([regex]::Matches($technologyLines[0].Groups['names'].Value,'["''](?<name>recipe-prod-research_[^"'']+)["'']') | ForEach-Object { [string]$_.Groups['name'].Value } | Sort-Object -Unique)
+  return [pscustomobject][ordered]@{stages=@($parsed);generated_mir_technologies=$technologyNames.Count}
+}
+
+function Get-MIR430PerformanceCandidateTarget {
+  param([Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$Code)
+
+  $rows = if ($Candidate.PSObject.Properties.Name -contains 'target_rows') { @($Candidate.target_rows) } else { @($Candidate.targets) }
+  $match = @($rows | Where-Object { [string]$_.target -ceq $Target })
+  if ($match.Count -ne 1) { throw "[$Code-target] $Target" }
+  $row = $match[0]
+  $archive = if ($row.PSObject.Properties.Name -contains 'archive') { $row.archive } else {
+    [pscustomobject][ordered]@{
+      path=[string]$row.archive_path
+      sha256=[string]$row.archive_sha256
+      bytes=[int64](Get-Item -LiteralPath ([string]$row.archive_path)).Length
+      content_sha256=[string]$row.content_sha256
+      entry_count=[int]$row.entry_count
+    }
+  }
+  Assert-MIR430PerformancePropertyNames -Value $archive -Expected @('path','sha256','bytes','content_sha256','entry_count') -Code "$Code-archive-shape"
+  return [pscustomobject][ordered]@{
+    target=$Target
+    source_version=[string]$Candidate.source_version
+    package_source_sha256=[string]$Candidate.source.package_source_sha256
+    distribution_version=$(if ($row.PSObject.Properties.Name -contains 'identity') {[string]$row.identity.distribution_version} else {[string]$row.distribution_version})
+    archive=[pscustomobject][ordered]@{sha256=[string]$archive.sha256;bytes=[int64]$archive.bytes;content_sha256=[string]$archive.content_sha256;entry_count=[int]$archive.entry_count}
+  }
+}
+
+function Resolve-MIR430PerformanceInvocationArtifact {
+  param([Parameter(Mandatory)][string]$InvocationPath,[Parameter(Mandatory)][string]$RelativePath,[Parameter(Mandatory)][string]$Code)
+  if ([string]::IsNullOrWhiteSpace($RelativePath)) { throw "[$Code-path]" }
+  $root = [IO.Path]::GetFullPath((Split-Path -Parent $InvocationPath)).TrimEnd([char[]]@('/','\'))
+  $candidate = if ([IO.Path]::IsPathRooted($RelativePath)) {[IO.Path]::GetFullPath($RelativePath)} else {[IO.Path]::GetFullPath((Join-Path $root $RelativePath))}
+  $prefix = $root + [IO.Path]::DirectorySeparatorChar
+  if (-not $candidate.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase) -or -not (Test-Path -LiteralPath $candidate -PathType Leaf)) { throw "[$Code-path]" }
+  return $candidate
+}
+
+function Get-MIR430ExpectedProfileLoadedSelection {
+  param([Parameter(Mandatory)]$ProfileDefinition,[Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Authority,[Parameter(Mandatory)][string]$Code)
+  $declared = @($ProfileDefinition.mods)
+  $pins = @($ProfileDefinition.builtin_pins) + @($ProfileDefinition.archive_pins)
+  $declaredByName = @{}
+  foreach ($row in $declared) {
+    if (-not [bool]$row.enabled -or [string]::IsNullOrWhiteSpace([string]$row.name) -or [string]::IsNullOrWhiteSpace([string]$row.version) -or $declaredByName.ContainsKey([string]$row.name)) { throw "[$Code-profile-selection]" }
+    $declaredByName[[string]$row.name] = [string]$row.version
+  }
+  $pinnedByName = @{}
+  foreach ($pin in $pins) {
+    if ([string]::IsNullOrWhiteSpace([string]$pin.name) -or [string]::IsNullOrWhiteSpace([string]$pin.version) -or $pinnedByName.ContainsKey([string]$pin.name)) { throw "[$Code-profile-pins]" }
+    $pinnedByName[[string]$pin.name] = [string]$pin.version
+  }
+  if ($declaredByName.Count -ne $pinnedByName.Count) { throw "[$Code-profile-pins]" }
+  foreach ($name in $pinnedByName.Keys) {
+    if (-not $declaredByName.ContainsKey($name) -or [string]$declaredByName[$name] -cne [string]$pinnedByName[$name]) { throw "[$Code-profile-pins]" }
+  }
+  $selection = [Collections.Generic.List[string]]::new()
+  foreach ($name in $declaredByName.Keys) { $selection.Add($name + '@' + $declaredByName[$name]) }
+  $selection.Add('more-infinite-research@' + [string]$CandidateTarget.distribution_version)
+  $selection.Add([string]$Authority.record.allowed_observer.name + '@' + [string]$Authority.record.allowed_observer.version)
+  return @($selection | Sort-Object)
+}
+
+function Get-MIR430ExpectedProfileArchiveSelection {
+  param([Parameter(Mandatory)]$ProfileDefinition,[Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Authority,[Parameter(Mandatory)][string]$Code)
+  $expected = [Collections.Generic.List[object]]::new()
+  foreach ($pin in @($ProfileDefinition.builtin_pins)) {
+    if ([string]::IsNullOrWhiteSpace([string]$pin.name) -or [string]::IsNullOrWhiteSpace([string]$pin.version) -or [string]$pin.info_sha256 -notmatch '^[A-F0-9]{64}$') { throw "[$Code-profile-pins]" }
+    $expected.Add([pscustomobject][ordered]@{name=[string]$pin.name;version=[string]$pin.version;sha256=[string]$pin.info_sha256;builtin=$true;bytes=$null})
+  }
+  foreach ($pin in @($ProfileDefinition.archive_pins)) {
+    if ([string]::IsNullOrWhiteSpace([string]$pin.name) -or [string]::IsNullOrWhiteSpace([string]$pin.version) -or [string]$pin.sha256 -notmatch '^[A-F0-9]{64}$') { throw "[$Code-profile-pins]" }
+    $expected.Add([pscustomobject][ordered]@{name=[string]$pin.name;version=[string]$pin.version;sha256=[string]$pin.sha256;builtin=$false;bytes=[int64]$pin.bytes})
+  }
+  $expected.Add([pscustomobject][ordered]@{name='more-infinite-research';version=[string]$CandidateTarget.distribution_version;sha256=[string]$CandidateTarget.archive.sha256;builtin=$false;bytes=[int64]$CandidateTarget.archive.bytes})
+  $expected.Add([pscustomobject][ordered]@{name=[string]$Authority.record.allowed_observer.name;version=[string]$Authority.record.allowed_observer.version;sha256=[string]$Authority.record.allowed_observer.archive_sha256;builtin=$false;bytes=$null})
+  $keys = @($expected | ForEach-Object { $_.name + '@' + $_.version })
+  if (@($keys | Sort-Object -Unique).Count -ne $keys.Count) { throw "[$Code-profile-pins]" }
+  return @($expected | Sort-Object name,version)
+}
+
+function Get-MIR430PerformanceLogIdentity {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$ObserverName,[Parameter(Mandatory)][string]$Code)
+  $text = Get-Content -Raw -LiteralPath $Path
+  $headers = @([regex]::Matches($text,'(?m)^\s*[0-9]+(?:[.]?[0-9]+)?\s+.*; Factorio (?<version>[0-9]+[.][0-9]+[.][0-9]+) '))
+  if ($headers.Count -ne 1) { throw "[$Code-engine-log]" }
+  $loaded = @([regex]::Matches($text,'(?m)Loading mod (?:settings )?(?<name>[^\r\n]+?) (?<version>[0-9]+[.][0-9]+[.][0-9]+) \(') | ForEach-Object {
+    [string]$_.Groups['name'].Value + '@' + ([version]$_.Groups['version'].Value).ToString()
+  } | Where-Object { $_ -notlike 'core@*' } | Sort-Object -Unique)
+  if ($loaded.Count -eq 0) { throw "[$Code-loaded-log]" }
+  $marker = '(?m)^\s*[0-9]+(?:[.][0-9]+)? Script @__' + [regex]::Escape($ObserverName) + '__/data-final-fixes[.]lua:[0-9]+: \[MIR_ACTIVE_MODS\] (?<mods>[^\r\n]+)\r?$'
+  $reported = @([regex]::Matches($text,$marker))
+  if ($reported.Count -ne 1) { throw "[$Code-active-mods]" }
+  $active = [Collections.Generic.List[string]]::new()
+  foreach ($row in @($reported[0].Groups['mods'].Value.Split('|'))) {
+    if ($row -cnotmatch '^(?<name>.+)@(?<version>[0-9]+[.][0-9]+[.][0-9]+)$') { throw "[$Code-active-mods]" }
+    $active.Add([string]$Matches['name'] + '@' + ([version]$Matches['version']).ToString())
+  }
+  $activeSelection = @($active | Sort-Object)
+  if ($activeSelection.Count -eq 0 -or @($activeSelection | Sort-Object -Unique).Count -ne $activeSelection.Count) { throw "[$Code-active-mods]" }
+  return [pscustomobject][ordered]@{engine_version=([version]$headers[0].Groups['version'].Value).ToString();loaded_selection=$loaded;active_selection=$activeSelection}
+}
+
+function Get-MIR430PerformanceInvocationSample {
+  param(
+    [Parameter(Mandatory)][string]$ObservationPath,[Parameter(Mandatory)]$Invocation,[Parameter(Mandatory)]$ProfileDefinition,
+    [Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Authority,[Parameter(Mandatory)][string]$ObservedLogPath,
+    [Parameter(Mandatory)][string]$ObservedLedgerPath,[Parameter(Mandatory)][string]$Code
+  )
+  Assert-MIR430PerformancePropertyNames -Value $Invocation -Expected @('path','sha256','sample_label','sample_ordinal') -Code "$Code-invocation-shape"
+  if ([string]::IsNullOrWhiteSpace([string]$Invocation.sample_label) -or [int]$Invocation.sample_ordinal -lt 1) { throw "[$Code-invocation-binding]" }
+  $path = Resolve-MIR430PerformanceEvidenceFile -ObservationPath $ObservationPath -Descriptor ([pscustomobject][ordered]@{path=[string]$Invocation.path;sha256=[string]$Invocation.sha256}) -Code "$Code-invocation"
+  $item = Get-Item -LiteralPath $path
+  if ($item.Length -le 0 -or $item.Length -gt 64MB) { throw "[$Code-invocation-size]" }
+  try { $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100 -DateKind String } catch { throw "[$Code-invocation-json]" }
+  foreach ($field in @('schema','kind','status','mode','target','factorio','inputs','endpoint_class','resource_context','samples','library','library_controls_restored')) {
+    if ($record.PSObject.Properties.Name -notcontains $field) { throw "[$Code-invocation-shape]" }
+  }
+  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIRDirectLibraryStartupMeasurementV1' -or [string]$record.status -cne 'completed' -or
+      [string]$record.mode -cnotin @('matched-three-input','candidate-only-stress-diagnostic') -or
+      [string]$record.target -cne 'f200' -or [string]$record.endpoint_class -cne 'headless-create-diagnostic' -or -not [bool]$record.library_controls_restored) { throw "[$Code-invocation-state]" }
+  if ($record.factorio.PSObject.Properties.Name -notcontains 'sha256' -or $record.factorio.PSObject.Properties.Name -notcontains 'base_version' -or
+      [string]$record.factorio.sha256 -cne [string]$ProfileDefinition.engine.sha256 -or [string]$record.factorio.base_version -cne [string]$ProfileDefinition.engine.version) { throw "[$Code-invocation-engine]" }
+  if ($record.inputs.PSObject.Properties.Name -notcontains 'candidate' -or $null -eq $record.inputs.candidate -or
+      [string]$record.inputs.candidate.source_version -cne [string]$CandidateTarget.source_version -or
+      [string]$record.inputs.candidate.archive.sha256 -cne [string]$CandidateTarget.archive.sha256 -or
+      [string]$record.inputs.candidate.materialization.source_version -cne [string]$CandidateTarget.source_version -or
+      [string]$record.inputs.candidate.materialization.archive_sha256 -cne [string]$CandidateTarget.archive.sha256 -or
+      [string]$record.inputs.candidate.materialization.package_source_sha256 -cne [string]$CandidateTarget.package_source_sha256) { throw "[$Code-invocation-candidate]" }
+  $matches = @($record.samples | Where-Object { [string]$_.label -ceq [string]$Invocation.sample_label -and [int]$_.sample -eq [int]$Invocation.sample_ordinal })
+  if ($matches.Count -ne 1) { throw "[$Code-invocation-sample]" }
+  $sample = $matches[0]
+  foreach ($field in @('label','sample','run_relative_path','exit_code','endpoint_class','ready_save','map_generation','loaded_selection','active_mods_observer','resource_ledger','log','engine_current_log','execution_controls')) {
+    if ($sample.PSObject.Properties.Name -notcontains $field) { throw "[$Code-invocation-sample]" }
+  }
+  if ([int]$sample.exit_code -ne 0 -or [string]$sample.endpoint_class -cne 'headless-create-diagnostic') { throw "[$Code-invocation-sample]" }
+  $run = [string]$sample.run_relative_path
+  if ([string]::IsNullOrWhiteSpace($run)) { throw "[$Code-invocation-sample]" }
+  $relativeRun = $run.TrimEnd([char[]]@('/','\'))
+  Assert-MIR430PerformancePropertyNames -Value $sample.execution_controls -Expected @('engine_sha256','arguments_sha256','config','selection','mod_settings','library_directory') -Code "$Code-invocation-controls-shape"
+  if ([string]$sample.execution_controls.engine_sha256 -cne [string]$record.factorio.sha256 -or
+      [string]$sample.execution_controls.engine_sha256 -cne [string]$ProfileDefinition.engine.sha256 -or
+      [string]$sample.execution_controls.arguments_sha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$sample.execution_controls.library_directory -cne [string]$record.library) { throw "[$Code-invocation-controls]" }
+  Assert-MIR430PerformancePropertyNames -Value $sample.execution_controls.config -Expected @('path','sha256') -Code "$Code-invocation-controls-shape"
+  Assert-MIR430PerformancePropertyNames -Value $sample.execution_controls.selection -Expected @('path','sha256') -Code "$Code-invocation-controls-shape"
+  Assert-MIR430PerformancePropertyNames -Value $sample.execution_controls.mod_settings -Expected @('kind','present') -Code "$Code-invocation-controls-shape"
+  if ([string]$sample.execution_controls.mod_settings.kind -cne 'canonical-absent-default' -or [bool]$sample.execution_controls.mod_settings.present) { throw "[$Code-invocation-settings]" }
+  $sampleLog = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ($relativeRun + '/' + [string]$sample.log) -Code "$Code-invocation-log"
+  $sampleLedger = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ([string]$sample.resource_ledger) -Code "$Code-invocation-ledger"
+  if ([string](Get-MIR4Sha256File -Path $sampleLog) -cne [string](Get-MIR4Sha256File -Path $ObservedLogPath) -or
+      [string](Get-MIR4Sha256File -Path $sampleLedger) -cne [string](Get-MIR4Sha256File -Path $ObservedLedgerPath)) { throw "[$Code-invocation-evidence]" }
+  $processes = @($record.resource_context.processes | Where-Object {
+    [string]$_.status -ceq 'passed' -and $null -ne $_.result -and [bool]$_.result.passed -and [int]$_.result.exit_code -eq 0 -and
+    (Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ([string]$_.ledger) -Code "$Code-invocation-ledger") -ceq $sampleLedger
+  })
+  if ($processes.Count -ne 1) { throw "[$Code-invocation-ledger]" }
+  $expectedSelection = Get-MIR430ExpectedProfileLoadedSelection -ProfileDefinition $ProfileDefinition -CandidateTarget $CandidateTarget -Authority $Authority -Code $Code
+  $reportedSelection = @($sample.loaded_selection | ForEach-Object { [string]$_ } | Sort-Object)
+  if (($reportedSelection -join '|') -cne ($expectedSelection -join '|')) { throw "[$Code-invocation-selection]" }
+  if ([string]$sample.active_mods_observer.name -cne [string]$Authority.record.allowed_observer.name -or
+      [string]$sample.active_mods_observer.version -cne [string]$Authority.record.allowed_observer.version -or
+      [string]$sample.active_mods_observer.sha256 -cne [string]$Authority.record.allowed_observer.archive_sha256) { throw "[$Code-invocation-observer]" }
+  if ($sample.PSObject.Properties.Name -notcontains 'loaded_archives') { throw "[$Code-invocation-archives]" }
+  $expectedArchives = Get-MIR430ExpectedProfileArchiveSelection -ProfileDefinition $ProfileDefinition -CandidateTarget $CandidateTarget -Authority $Authority -Code $Code
+  $actualArchives = @($sample.loaded_archives)
+  if ($actualArchives.Count -ne $expectedArchives.Count) { throw "[$Code-invocation-archives]" }
+  $actualArchiveByKey = @{}
+  foreach ($archive in $actualArchives) {
+    Assert-MIR430PerformancePropertyNames -Value $archive -Expected @('name','version','sha256','builtin','bytes') -Code "$Code-invocation-archive-shape"
+    $key = [string]$archive.name + '@' + [string]$archive.version
+    if ([string]::IsNullOrWhiteSpace([string]$archive.name) -or [string]::IsNullOrWhiteSpace([string]$archive.version) -or [string]$archive.sha256 -notmatch '^[A-F0-9]{64}$' -or
+        $archive.builtin -isnot [bool] -or [int64]$archive.bytes -le 0 -or $actualArchiveByKey.ContainsKey($key)) { throw "[$Code-invocation-archives]" }
+    $actualArchiveByKey[$key] = $archive
+  }
+  foreach ($expectedArchive in $expectedArchives) {
+    $key = [string]$expectedArchive.name + '@' + [string]$expectedArchive.version
+    if (-not $actualArchiveByKey.ContainsKey($key)) { throw "[$Code-invocation-archives]" }
+    $actualArchive = $actualArchiveByKey[$key]
+    if ([string]$actualArchive.sha256 -cne [string]$expectedArchive.sha256 -or [bool]$actualArchive.builtin -ne [bool]$expectedArchive.builtin -or
+        ($null -ne $expectedArchive.bytes -and [int64]$actualArchive.bytes -ne [int64]$expectedArchive.bytes)) { throw "[$Code-invocation-archives]" }
+  }
+  $selectionPath = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ($relativeRun + '/selection.json') -Code "$Code-invocation-selection"
+  $configPath = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ($relativeRun + '/config.ini') -Code "$Code-invocation-config"
+  $controlConfig = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ($relativeRun + '/' + [string]$sample.execution_controls.config.path) -Code "$Code-invocation-controls"
+  $controlSelection = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ($relativeRun + '/' + [string]$sample.execution_controls.selection.path) -Code "$Code-invocation-controls"
+  if ($controlConfig -cne $configPath -or $controlSelection -cne $selectionPath -or
+      [string](Get-MIR4Sha256File -Path $controlConfig) -cne [string]$sample.execution_controls.config.sha256 -or
+      [string](Get-MIR4Sha256File -Path $controlSelection) -cne [string]$sample.execution_controls.selection.sha256) { throw "[$Code-invocation-controls]" }
+  Assert-MIR430PerformancePropertyNames -Value $sample.map_generation -Expected @('seed','path','sha256') -Code "$Code-invocation-controls-shape"
+  if ([int64]$sample.map_generation.seed -lt 0 -or [int64]$sample.map_generation.seed -gt [uint32]::MaxValue -or [string]$sample.map_generation.sha256 -notmatch '^[A-F0-9]{64}$') { throw "[$Code-invocation-controls]" }
+  $mapGeneration = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ([string]$sample.map_generation.path) -Code "$Code-invocation-controls"
+  $readySave = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ($relativeRun + '/' + [string]$sample.ready_save) -Code "$Code-invocation-controls"
+  $engineCurrentLog = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ([string]$sample.engine_current_log) -Code "$Code-invocation-controls"
+  if ([string](Get-MIR4Sha256File -Path $mapGeneration) -cne [string]$sample.map_generation.sha256) { throw "[$Code-invocation-controls]" }
+  $configText = Get-Content -Raw -LiteralPath $controlConfig
+  $writeData = [regex]::Match($configText,'(?m)^write-data=(?<path>[^\r\n]+)\s*$')
+  $readData = [regex]::Match($configText,'(?m)^read-data=(?<path>[^\r\n]+)\s*$')
+  if (-not $writeData.Success -or -not $readData.Success -or [string]::IsNullOrWhiteSpace($writeData.Groups['path'].Value) -or [string]::IsNullOrWhiteSpace($readData.Groups['path'].Value) -or
+      [IO.Path]::GetFullPath((Join-Path $writeData.Groups['path'].Value 'factorio-current.log')) -cne $engineCurrentLog) { throw "[$Code-invocation-controls]" }
+  $launchArguments = @('--config',$controlConfig,'--mod-directory',[string]$sample.execution_controls.library_directory,'--no-log-rotation','--disable-audio','--map-gen-settings',$mapGeneration,'--create',$readySave)
+  $launchArgumentSha = Get-MIR430PerformanceTextSha256 -Text (ConvertTo-Json -InputObject $launchArguments -Compress)
+  if ($launchArgumentSha -cne [string]$sample.execution_controls.arguments_sha256) { throw "[$Code-invocation-controls]" }
+  try { $selection = Get-Content -Raw -LiteralPath $selectionPath | ConvertFrom-Json -Depth 20 -DateKind String } catch { throw "[$Code-invocation-selection]" }
+  $selectionRows = @($selection.mods | ForEach-Object { if (-not [bool]$_.enabled) { throw "[$Code-invocation-selection]" }; [string]$_.name + '@' + [string]$_.version } | Sort-Object)
+  if (($selectionRows -join '|') -cne ($expectedSelection -join '|')) { throw "[$Code-invocation-selection]" }
+  $config = Get-Content -Raw -LiteralPath $configPath
+  if ($config -notmatch '(?m)^enable-new-mods=false\s*$' -or $config -notmatch '(?m)^read-data=' -or $config -notmatch '(?m)^write-data=') { throw "[$Code-invocation-config]" }
+  $logIdentity = Get-MIR430PerformanceLogIdentity -Path $sampleLog -ObserverName ([string]$Authority.record.allowed_observer.name) -Code "$Code-invocation"
+  if ([string]$logIdentity.engine_version -cne [string]$ProfileDefinition.engine.version -or
+      ($logIdentity.active_selection -join '|') -cne ($expectedSelection -join '|') -or
+      @($logIdentity.loaded_selection | Where-Object { $_ -cnotin $expectedSelection }).Count -ne 0) { throw "[$Code-invocation-log-binding]" }
+  return [pscustomobject][ordered]@{path=$path;sample=$sample}
+}
+function Assert-MIR430ClassicStartupStressObservation {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)][string]$Code
+  )
+
+  $authority = Get-MIR430EmergencyPerformanceAuthority -RepoRoot $RepoRoot
+  if ([string]$Candidate.source_version -cne [string]$authority.record.source_version) { throw "[$Code-source-version]" }
+  $record = Read-MIR42QualificationBootstrapRecord -Path $Path -Code $Code
+  $schema = Join-Path $RepoRoot 'spec/schemas/mir430-classic-startup-stress-observation-v1.schema.json'
+  if (-not (Test-Path -LiteralPath $schema -PathType Leaf) -or -not ((Get-Content -Raw -LiteralPath $Path) | Test-Json -SchemaFile $schema -ErrorAction SilentlyContinue)) {
+    throw "[$Code-schema]"
+  }
+  Assert-MIR430PerformancePropertyNames -Value $record -Expected @(
+    'schema','kind','status','source','candidate_manifest','authority','compiler_profile','profiles','record_sha256'
+  ) -Code "$Code-shape"
+  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR430ClassicStartupStressObservationV1' -or [string]$record.status -cne 'completed' -or
+      [string]$record.compiler_profile -cne [string]$authority.record.compiler_profile -or
+      [string]$record.source.commit -cne [string]$Candidate.source.commit -or [string]$record.source.tree -cne [string]$Candidate.source.tree -or
+      [string]$record.source.package_source_sha256 -cne [string]$Candidate.source.package_source_sha256 -or
+      [string]$record.candidate_manifest.sha256 -cne [string]$Candidate.candidate_manifest.sha256 -or
+      [string]$record.candidate_manifest.record_sha256 -cne [string]$Candidate.candidate_manifest.record_sha256) {
+    throw "[$Code-binding]"
+  }
+  Assert-MIR430PerformancePropertyNames -Value $record.authority -Expected @('path','sha256','record_sha256') -Code "$Code-authority-shape"
+  if ([string]$record.authority.path -cne $script:MIR430EmergencyPerformanceAuthorityPath -or [string]$record.authority.sha256 -cne [string]$authority.sha256 -or
+      [string]$record.authority.record_sha256 -cne [string]$authority.record.record_sha256) {
+    throw "[$Code-authority-binding]"
+  }
+  $profiles = @($record.profiles)
+  if ($profiles.Count -ne $authority.profiles.Count -or (@($profiles | ForEach-Object { [string]$_.id }) -join '|') -cne (@($authority.profiles | ForEach-Object { [string]$_.id }) -join '|')) {
+    throw "[$Code-profiles]"
+  }
+  foreach ($expected in $authority.profiles) {
+    $profile = @($profiles | Where-Object { [string]$_.id -ceq [string]$expected.id })[0]
+    Assert-MIR430PerformancePropertyNames -Value $profile -Expected @('id','target','definition','settings','engine','candidate','observer','samples') -Code "$Code-profile-shape"
+    if ([string]$profile.target -cne [string]$expected.target -or
+        (ConvertTo-MIR4BootstrapCanonicalJson -Value $profile.definition) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected.definition) -or
+        (ConvertTo-MIR4BootstrapCanonicalJson -Value $profile.engine) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected.profile.engine) -or
+        (ConvertTo-MIR4BootstrapCanonicalJson -Value $profile.observer) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $authority.record.allowed_observer)) {
+      throw "[$Code-profile-binding] $([string]$expected.id)"
+    }
+    $rawSettingsClaim = $false
+    if ([string]$profile.settings.kind -ceq 'raw-sha256') {
+      Assert-MIR430PerformancePropertyNames -Value $profile.settings -Expected @('kind','path','sha256') -Code "$Code-settings-shape"
+      $settingsPath = Resolve-MIR430PerformanceEvidenceFile -ObservationPath $Path -Descriptor ([pscustomobject][ordered]@{path=[string]$profile.settings.path;sha256=[string]$profile.settings.sha256}) -Code "$Code-settings"
+      if ([string]::IsNullOrWhiteSpace($settingsPath)) { throw "[$Code-settings-binding]" }
+      $rawSettingsClaim = $true
+    } elseif ([string]$profile.settings.kind -ceq 'canonical-absent-default') {
+      Assert-MIR430PerformancePropertyNames -Value $profile.settings -Expected @('kind') -Code "$Code-settings-shape"
+    } else {
+      throw "[$Code-settings-kind]"
+    }
+    $candidateTarget = Get-MIR430PerformanceCandidateTarget -Candidate $Candidate -Target ([string]$expected.target) -Code $Code
+    Assert-MIR430PerformancePropertyNames -Value $profile.candidate -Expected @('target','source_version','distribution_version','archive') -Code "$Code-candidate-shape"
+    Assert-MIR430PerformancePropertyNames -Value $profile.candidate.archive -Expected @('sha256','bytes','content_sha256','entry_count') -Code "$Code-candidate-archive-shape"
+    $candidateClaim = [pscustomobject][ordered]@{target=[string]$candidateTarget.target;source_version=[string]$candidateTarget.source_version;distribution_version=[string]$candidateTarget.distribution_version;archive=$candidateTarget.archive}
+    if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $profile.candidate) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $candidateClaim)) {
+      throw "[$Code-candidate-binding] $([string]$expected.id)"
+    }
+    $samples = @($profile.samples)
+    if ($samples.Count -lt [int]$authority.record.minimum_samples_per_profile -or @($samples | ForEach-Object { [string]$_.label } | Sort-Object -Unique).Count -ne $samples.Count) {
+      throw "[$Code-samples] $([string]$expected.id)"
+    }
+    foreach ($sample in $samples) {
+      Assert-MIR430PerformancePropertyNames -Value $sample -Expected @('label','status','endpoint_class','exit_code','log','resource_ledger','stages','total_seconds','invocation') -Code "$Code-sample-shape"
+      if ([string]::IsNullOrWhiteSpace([string]$sample.label) -or [string]$sample.status -cne 'completed' -or [string]$sample.endpoint_class -cne 'headless-create-diagnostic' -or [int]$sample.exit_code -ne 0) {
+        throw "[$Code-sample-state] $([string]$expected.id)"
+      }
+      $logPath = Resolve-MIR430PerformanceEvidenceFile -ObservationPath $Path -Descriptor $sample.log -Code "$Code-log"
+      $ledgerPath = Resolve-MIR430PerformanceEvidenceFile -ObservationPath $Path -Descriptor $sample.resource_ledger -Code "$Code-resource-ledger"
+      Get-MIR430PerformanceLedgerCompletion -Path $ledgerPath
+      $null = Get-MIR430PerformanceInvocationSample -ObservationPath $Path -Invocation $sample.invocation -ProfileDefinition $expected.profile -CandidateTarget $candidateTarget -Authority $authority -ObservedLogPath $logPath -ObservedLedgerPath $ledgerPath -Code "$Code-$([string]$expected.id)"
+      # DirectLibraryStartupMeasurement's headless path captures only the
+      # activation Defaults lease. A caller-supplied settings-file hash is not
+      # evidence that this invocation used that file.
+      if ($rawSettingsClaim) { throw "[$Code-settings-binding] $([string]$expected.id)" }
+      $parsedResult = Get-MIR430PerformanceParsedStages -Path $logPath -Stages @($authority.record.required_stages)
+      if ([int]$parsedResult.generated_mir_technologies -lt [int]$authority.record.minimum_generated_mir_technologies) { throw "[$Code-generated-technology-count] $([string]$expected.id)" }
+      $parsed = @($parsedResult.stages)
+      $reported = @($sample.stages)
+      if ($reported.Count -ne $parsed.Count) { throw "[$Code-stage-count] $([string]$expected.id)" }
+      $total = 0.0
+      for ($index = 0; $index -lt $parsed.Count; $index++) {
+        Assert-MIR430PerformancePropertyNames -Value $reported[$index] -Expected @('stage','begin_seconds','end_seconds','elapsed_seconds') -Code "$Code-stage-shape"
+        foreach ($field in @('begin_seconds','end_seconds','elapsed_seconds')) {
+          if (-not ($reported[$index].$field -is [ValueType]) -or [double]::IsNaN([double]$reported[$index].$field) -or [double]::IsInfinity([double]$reported[$index].$field)) { throw "[$Code-stage-number]" }
+        }
+        if ([string]$reported[$index].stage -cne [string]$parsed[$index].stage -or
+            [double]$reported[$index].begin_seconds -ne [double]$parsed[$index].begin_seconds -or
+            [double]$reported[$index].end_seconds -ne [double]$parsed[$index].end_seconds -or
+            [double]$reported[$index].elapsed_seconds -ne [double]$parsed[$index].elapsed_seconds) {
+          throw "[$Code-stage-claim] $([string]$expected.id)"
+        }
+        $total += [double]$parsed[$index].elapsed_seconds
+      }
+      if (-not ($sample.total_seconds -is [ValueType]) -or [double]::IsNaN([double]$sample.total_seconds) -or [double]::IsInfinity([double]$sample.total_seconds) -or
+          [double]$sample.total_seconds -ne $total) {
+        throw "[$Code-total-claim] $([string]$expected.id)"
+      }
+      if ($total -gt [double]$authority.record.max_mir_startup_seconds) { throw "[$Code-threshold] $([string]$expected.id)" }
+    }
+  }
+  return [pscustomobject][ordered]@{path=(Resolve-Path -LiteralPath $Path).Path;sha256=(Get-MIR4Sha256File -Path $Path);record=$record;authority=$authority}
+}
+
 function Resolve-MIR42CriterionEvidenceOutputPath {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path)
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -749,8 +1240,9 @@ function Resolve-MIR42CriterionEvidenceOutputPath {
 
 function Get-MIR42CriterionObservationContract {
   param([Parameter(Mandatory)][string]$Criterion,[switch]$PublishedMaintenance,
-    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
-  if ($PublishedMaintenance -and $Criterion -cnotin @('fresh-exact-loads','target-omissions')) {
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1')
+  $emergencyClassic = $SourceVersion -cin @('4.3.0','4.3.1')
+  if ($PublishedMaintenance -and -not $emergencyClassic -and $Criterion -cnotin @('fresh-exact-loads','target-omissions')) {
     throw '[mir42-maintenance-criterion-input-scope]'
   }
   if ($Criterion -ceq 'fresh-exact-loads') {
@@ -814,7 +1306,7 @@ function Get-MIR42CriterionEvidenceObservation {
     [Parameter(Mandatory)]$Candidate,
     [Parameter(Mandatory)][string]$Code,
     $PublishedMaintenanceInputs = $null,
-    [ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1'
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1'
   )
   $contract = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs) -SourceVersion $SourceVersion
   $individualFreshInput = $null -ne $PublishedMaintenanceInputs -and $SourceVersion -ceq '4.2.3'
@@ -852,9 +1344,14 @@ function Get-MIR42CriterionEvidenceObservation {
     'package-exclusion' { $candidateConstruction -and [bool]$record.build_complete }
     'deterministic-reconstruction' { $candidateConstruction -and [bool]$record.build_complete }
     'performance-telemetry' {
-      $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetCriterionObservationV1' -and
-        [string]$record.status -ceq 'passed' -and [string]$record.criterion -ceq $Criterion -and
-        [string]$record.telemetry_scope -ceq 'bounded-candidate-load-and-upgrade-resource-observation'
+      if ($SourceVersion -cin @('4.3.0','4.3.1')) {
+        $candidateBound -and [string]$record.kind -ceq 'MIR430ClassicStartupStressObservationV1' -and
+          [string]$record.status -ceq 'completed' -and [string]$record.compiler_profile -ceq 'classic'
+      } else {
+        $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetCriterionObservationV1' -and
+          [string]$record.status -ceq 'passed' -and [string]$record.criterion -ceq $Criterion -and
+          [string]$record.telemetry_scope -ceq 'bounded-candidate-load-and-upgrade-resource-observation'
+      }
     }
     default {
       $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetCriterionObservationV1' -and
@@ -862,8 +1359,11 @@ function Get-MIR42CriterionEvidenceObservation {
     }
   }
   if (-not $kindAndStateValid) { throw "[$Code-binding] $Criterion" }
-  if ($null -ne $PublishedMaintenanceInputs) {
+  if ($null -ne $PublishedMaintenanceInputs -and $SourceVersion -cnotin @('4.3.0','4.3.1')) {
     Assert-MIR42MaintenanceCriterionObservation -Record $record -Criterion $Criterion -PublishedInputs $PublishedMaintenanceInputs
+  }
+  if ($Criterion -ceq 'performance-telemetry' -and $SourceVersion -cin @('4.3.0','4.3.1')) {
+    $null = Assert-MIR430ClassicStartupStressObservation -RepoRoot $mir42QualificationRoot -Path $Path -Candidate $Candidate -Code $Code
   }
   return [pscustomobject][ordered]@{
     path = (Resolve-Path -LiteralPath $Path).Path
@@ -892,14 +1392,13 @@ function New-MIR42NineTargetCriterionEvidence {
   if ($null -ne $PublishedMaintenanceArchiveBindings -and -not $maintenanceRequested) {
     throw '[mir42-criterion-maintenance-archive-bindings-scope]'
   }
-  $null = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:$maintenanceRequested
   $candidateRows = Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$candidateRows[0].scope -cne 'nine-target') { throw '[mir42-criterion-evidence-candidate-scope]' }
   $maintenanceInputs = $null
-  $maintenanceSourceVersion = '4.2.1'
+  $maintenanceSourceVersion = [string]$candidateRows[0].identity.source_version
+  $null = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:$maintenanceRequested -SourceVersion $maintenanceSourceVersion
   if ($maintenanceRequested) {
     Assert-MIR42MaintenanceReconciliationScope -Scope ([string]$candidateRows[0].scope) -Candidates $candidateRows
-    $maintenanceSourceVersion = [string]$candidateRows[0].identity.source_version
     $predecessorContract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $maintenanceSourceVersion
     $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-criterion-maintenance-release-readback]' }
@@ -915,7 +1414,9 @@ function New-MIR42NineTargetCriterionEvidence {
       package_source_sha256 = [string]$candidateRows[0].package_source_sha256
     }
     candidate_manifest = $candidateRows[0].candidate_manifest
+    source_version = $maintenanceSourceVersion
     targets = @($candidateRows | ForEach-Object { [string]$_.target })
+    target_rows = @($candidateRows)
   }
   $observed = @($ObservedTargets | ForEach-Object { [string]$_ })
   $notApplicable = @(
@@ -930,6 +1431,12 @@ function New-MIR42NineTargetCriterionEvidence {
       (@($observed + $notApplicableTargets | Sort-Object { [array]::IndexOf($candidate.targets, [string]$_) }) -join '|') -cne ($candidate.targets -join '|') -or
       @($notApplicable | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.reason) }).Count -ne 0) {
     throw '[mir42-criterion-evidence-target-coverage]'
+  }
+  if ($Criterion -ceq 'performance-telemetry' -and $maintenanceSourceVersion -cin @('4.3.0','4.3.1')) {
+    $expectedUnobserved = @($candidate.targets | Where-Object { $_ -cne 'f200' })
+    if (($observed -join '|') -cne 'f200' -or ($notApplicableTargets -join '|') -cne ($expectedUnobserved -join '|')) {
+      throw '[mir430-performance-criterion-target-scope]'
+    }
   }
   if ($ObservationPaths.Count -eq 0) { throw '[mir42-criterion-evidence-observations-required]' }
   $evidence = @(

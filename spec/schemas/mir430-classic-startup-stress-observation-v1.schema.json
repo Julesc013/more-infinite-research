@@ -1,0 +1,442 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir430-classic-startup-stress-observation-v1.schema.json",
+  "title": "MIR 4.3.0 Classic named startup stress observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "source",
+    "candidate_manifest",
+    "authority",
+    "compiler_profile",
+    "profiles",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "kind": {
+      "const": "MIR430ClassicStartupStressObservationV1"
+    },
+    "status": {
+      "const": "completed"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "candidate_manifest": {
+      "$ref": "#/$defs/hashReference"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "record_sha256"
+      ],
+      "properties": {
+        "path": {
+          "const": "governance/repository/mir430-emergency-performance-v1.json"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "record_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "compiler_profile": {
+      "const": "classic"
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/profile"
+      }
+    },
+    "record_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commit",
+        "tree",
+        "package_source_sha256"
+      ],
+      "properties": {
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "tree": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "package_source_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "hashReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "record_sha256"
+      ],
+      "properties": {
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "record_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "fileReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "bytes",
+        "content_sha256",
+        "entry_count"
+      ],
+      "properties": {
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "entry_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "begin_seconds",
+        "end_seconds",
+        "elapsed_seconds"
+      ],
+      "properties": {
+        "stage": {
+          "enum": [
+            "settings",
+            "data",
+            "data-updates",
+            "data-final-fixes"
+          ]
+        },
+        "begin_seconds": {
+          "type": "number"
+        },
+        "end_seconds": {
+          "type": "number"
+        },
+        "elapsed_seconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "status",
+        "endpoint_class",
+        "exit_code",
+        "log",
+        "resource_ledger",
+        "stages",
+        "total_seconds",
+        "invocation"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "const": "completed"
+        },
+        "endpoint_class": {
+          "const": "headless-create-diagnostic"
+        },
+        "exit_code": {
+          "const": 0
+        },
+        "log": {
+          "$ref": "#/$defs/fileReference"
+        },
+        "resource_ledger": {
+          "$ref": "#/$defs/fileReference"
+        },
+        "stages": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/stage"
+          }
+        },
+        "total_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "invocation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "sample_label",
+            "sample_ordinal"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "sample_label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sample_ordinal": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "target",
+        "definition",
+        "settings",
+        "engine",
+        "candidate",
+        "observer",
+        "samples"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "f200-galore-space-age",
+            "f200-bob-angel",
+            "f200-omni-bob-angel-46"
+          ]
+        },
+        "target": {
+          "const": "f200"
+        },
+        "definition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "bytes",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^fixtures/run-profiles/mir430-startup-[a-z0-9-]+-f200[.]json$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        "settings": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "canonical-absent-default"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "path",
+                "sha256"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "raw-sha256"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "$ref": "#/$defs/sha256"
+                }
+              }
+            }
+          ]
+        },
+        "engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "sha256"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^2[.]0[.]\\d+$"
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        "candidate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "target",
+            "source_version",
+            "distribution_version",
+            "archive"
+          ],
+          "properties": {
+            "target": {
+              "const": "f200"
+            },
+            "source_version": {
+              "const": "4.3.0"
+            },
+            "distribution_version": {
+              "pattern": "^4[.]3[.]2\\d{4}$"
+            },
+            "archive": {
+              "$ref": "#/$defs/archive"
+            }
+          }
+        },
+        "observer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version",
+            "archive_sha256",
+            "source_files"
+          ],
+          "properties": {
+            "name": {
+              "const": "mir430-compiler-profile-ablation"
+            },
+            "version": {
+              "const": "1.0.0"
+            },
+            "archive_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "source_files": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "path",
+                  "bytes",
+                  "sha256"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "pattern": "^fixtures/assert-mir430-startup-work/[A-Za-z0-9._-]+$"
+                  },
+                  "bytes": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "sha256": {
+                    "$ref": "#/$defs/sha256"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "samples": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sample"
+          }
+        }
+      }
+    }
+  }
+}

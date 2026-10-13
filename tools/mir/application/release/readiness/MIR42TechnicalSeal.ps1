@@ -22,6 +22,9 @@ if (-not (Get-Command Test-MIR4FixedFactorioEngineIdentity -ErrorAction Silently
 if (-not (Get-Command Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir42SealRepoRoot 'tools/mir/application/release/F210QualificationPolicy.ps1')
 }
+if (-not (Get-Command Assert-MIR430ClassicStartupStressObservation -ErrorAction SilentlyContinue)) {
+  . (Join-Path $mir42SealRepoRoot 'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1')
+}
 
 $script:MIR42SealTargets = @('f210', 'f200', 'f110', 'f100')
 $script:MIR42SealNineTargetCandidates = @('f210', 'f200', 'f110', 'f100', 'f017', 'f016', 'f015', 'f014', 'f013')
@@ -33,6 +36,17 @@ $script:MIR42SealReleaseAcceptanceCriteria = @(
 )
 $script:MIR42SealVerifierDependencyPaths = @(
   'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1',
+  'tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1',
+  'governance/repository/mir430-emergency-performance-v1.json',
+  'spec/schemas/mir430-emergency-performance-v1.schema.json',
+  'spec/schemas/mir430-named-startup-stress-profile-v1.schema.json',
+  'spec/schemas/mir430-classic-startup-stress-observation-v1.schema.json',
+  'fixtures/run-profiles/mir430-startup-galore-space-age-f200.json',
+  'fixtures/run-profiles/mir430-startup-bob-angel-f200.json',
+  'fixtures/run-profiles/mir430-startup-omni-bob-angel-46.json',
+  'fixtures/assert-mir430-startup-work/info.json',
+  'fixtures/assert-mir430-startup-work/settings-updates.lua',
+  'fixtures/assert-mir430-startup-work/data-final-fixes.lua',
   'tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1',
   'spec/schemas/mir42-nine-target-release-cut-programme-v1.schema.json',
   'tools/commands/release/Invoke-MIR42FourTargetSealPromotion.ps1',
@@ -1934,6 +1948,39 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
   return (Write-MIR42NormalizedRecord -Record $record -OutputPath $OutputPath -Code 'mir42-engine-evidence-output')
 }
 
+function Assert-MIR430SealPerformanceCriterionEvidence {
+  param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)]$Candidate)
+
+  $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
+  if ([string]$version.source_version -cnotin @('4.3.0','4.3.1')) { return }
+  $evidence = @($Record.evidence)
+  if ($evidence.Count -ne 1) { throw '[mir430-seal-performance-evidence-count]' }
+  $path = Resolve-MIR42SealImmutableFile -Path ([string]$evidence[0].path) -Sha256 ([string]$evidence[0].sha256) -Code 'mir430-seal-performance-observation'
+  $adapterRows = @(
+    foreach ($target in @($Candidate.targets)) {
+      [pscustomobject][ordered]@{
+        target = [string]$target.target
+        identity = [pscustomobject][ordered]@{distribution_version=[string]$target.distribution_version}
+        archive = [pscustomobject][ordered]@{
+          path = [string]$target.archive_path
+          sha256 = [string]$target.archive_sha256
+          bytes = [int64](Get-Item -LiteralPath ([string]$target.archive_path)).Length
+          content_sha256 = [string]$target.content_sha256
+          entry_count = [int]$target.entry_count
+        }
+      }
+    }
+  )
+  $adapter = [pscustomobject][ordered]@{
+    source = $Candidate.source
+    candidate_manifest = [pscustomobject][ordered]@{sha256=[string]$Candidate.identity.sha256;record_sha256=[string]$Candidate.identity.record.record_sha256}
+    source_version = [string]$version.source_version
+    target_rows = $adapterRows
+  }
+  $verified = Assert-MIR430ClassicStartupStressObservation -RepoRoot $mir42SealRepoRoot -Path $path -Candidate $adapter -Code 'mir430-seal-performance-observation'
+  if ([string]$verified.record.record_sha256 -cne [string]$evidence[0].record_sha256) { throw '[mir430-seal-performance-observation-binding]' }
+}
+
 function Get-MIR42NineTargetCriterionEvidenceRecord {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate)
 
@@ -1948,6 +1995,9 @@ function Get-MIR42NineTargetCriterionEvidenceRecord {
       [string]$record.candidate_manifest.sha256 -cne [string]$Candidate.identity.sha256 -or
       [string]$record.candidate_manifest.record_sha256 -cne [string]$Candidate.identity.record.record_sha256) {
     throw '[mir42-joined-campaign-criterion-binding]'
+  }
+  if ([string]$record.criterion -ceq 'performance-telemetry') {
+    Assert-MIR430SealPerformanceCriterionEvidence -Record $record -Candidate $Candidate
   }
   return $identity
 }

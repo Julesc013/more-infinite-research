@@ -296,6 +296,28 @@
       ]
     },
     {
+      "id": "static.mir430-classic-startup-performance-criterion",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR430ClassicStartupPerformanceCriterion.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/release/Test-MIR430ClassicStartupPerformanceCriterion.ps1",
+        "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
+        "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
+        "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+        "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "governance/repository/mir430-emergency-performance-v1.json",
+        "spec/schemas/mir430-classic-startup-stress-observation-v1.schema.json",
+        "spec/schemas/mir430-emergency-performance-v1.schema.json",
+        "spec/schemas/mir430-named-startup-stress-profile-v1.schema.json",
+        "fixtures/run-profiles/mir430-startup-*-f200.json",
+        "fixtures/assert-mir430-startup-work/**"
+      ]
+    },
+    {
       "id": "static.mir42-nine-target-evidence-generators",
       "kind": "static",
       "layer": "F0",
@@ -306,6 +328,12 @@
         "tests/release/Test-MIR42FourTargetEvidenceReconciliation.ps1",
         "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
         "tools/mir/application/release/readiness/MIR42IndependentEvidenceRehash.ps1",
+        "governance/repository/mir430-emergency-performance-v1.json",
+        "spec/schemas/mir430-classic-startup-stress-observation-v1.schema.json",
+        "spec/schemas/mir430-emergency-performance-v1.schema.json",
+        "spec/schemas/mir430-named-startup-stress-profile-v1.schema.json",
+        "fixtures/run-profiles/mir430-startup-*-f200.json",
+        "fixtures/assert-mir430-startup-work/**",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
         "tools/lib/validation/FactorioVersionPolicy.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
