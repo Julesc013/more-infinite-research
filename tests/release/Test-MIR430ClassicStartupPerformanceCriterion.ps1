@@ -318,6 +318,58 @@ try {
   } finally {
     Set-Item Function:Get-MIR42SealCandidateConstructionVersionContract -Value $originalVersionContract
   }
+  # 4.3.1 must use the ordinary nine-target criterion path. It must not
+  # silently reuse the 4.3.0 emergency stress authority, and its one normal
+  # observation must resolve the authenticated individual engine-run reader.
+  $normalTargets = @(
+    foreach ($target in @($script:MIR42QualificationNineTargets)) {
+      [pscustomobject][ordered]@{target=$target;distribution_version=('4.3.'+$target.Substring(1)+'01');archive_path=$archive;archive_sha256=('A'*64);content_sha256=('B'*64);entry_count=1}
+    }
+  )
+  $normalSealCandidate = [pscustomobject][ordered]@{
+    source=$source;identity=[pscustomobject][ordered]@{sha256=[string]$candidate.candidate_manifest.sha256;record=[pscustomobject][ordered]@{record_sha256=[string]$candidate.candidate_manifest.record_sha256}}
+    scope='nine-target';targets=$normalTargets
+  }
+  $normalEngineReference = [ordered]@{path='individual-engine-run.json';sha256=('F'*64);record_sha256=('1'*64)}
+  $normalObservationRecord = [ordered]@{
+    schema=1;kind='MIR42NineTargetCriterionObservationV1';status='passed';criterion='performance-telemetry'
+    telemetry_scope='bounded-candidate-load-and-upgrade-resource-observation';compiler_profile='full';source=$source;candidate_manifest=$candidate.candidate_manifest
+    individual_engine_run=$normalEngineReference;record_sha256=''
+  }
+  $normalObservationPath = Join-Path $root 'normal-431-observation.json'
+  Write-MIR4BootstrapRecord -Record ([pscustomobject]$normalObservationRecord) -Path $normalObservationPath | Out-Null
+  $normalObservation = Read-MIR42SealRecord -Path $normalObservationPath -Code 'mir431-test-normal-observation'
+  $normalCriterionPath = Join-Path $root 'normal-431-criterion.json'
+  $normalCriterionRecord = [pscustomobject][ordered]@{
+    schema=1;kind='MIR42NineTargetReleaseAcceptanceCriterionEvidenceV1';status='passed';criterion='performance-telemetry';source=$source;candidate_manifest=$candidate.candidate_manifest
+    observed_targets=@($script:MIR42QualificationNineTargets);not_applicable_targets=@();evidence=@([ordered]@{path=$normalObservationPath;sha256=(Get-MIR4Sha256File -Path $normalObservationPath);record_sha256=[string]$normalObservation.record.record_sha256})
+    limits=[ordered]@{claim='controlled normal-431 contract fixture only';known_limitations='native execution is not claimed by this fixture'};record_sha256=''
+  }
+  Write-MIR4BootstrapRecord -Record $normalCriterionRecord -Path $normalCriterionPath | Out-Null
+  $normalPublishedInputs = [pscustomobject][ordered]@{targets=@($script:MIR42QualificationNineTargets | ForEach-Object {[pscustomobject][ordered]@{target=$_}})}
+  $originalVersionContract = (Get-Item Function:Get-MIR42SealCandidateConstructionVersionContract).ScriptBlock
+  $originalBoundEngineRun = (Get-Item Function:Get-MIR42BoundEngineRun).ScriptBlock
+  try {
+    Set-Item Function:Get-MIR42SealCandidateConstructionVersionContract -Value { param($RepoRoot,$Manifest) [pscustomobject]@{source_version='4.3.1'} }
+    Set-Item Function:Get-MIR42BoundEngineRun -Value {
+      param($Reference,$Candidate,$PublishedMaintenanceInputs)
+      [pscustomobject][ordered]@{path='individual-engine-run.json';sha256=('F'*64);input_kind='individual-upgrade-receipts-and-fresh-loads';record=[pscustomobject][ordered]@{record_sha256=('1'*64);targets=@($script:MIR42QualificationNineTargets | ForEach-Object {[pscustomobject][ordered]@{target=$_}})}}
+    }
+    $sealed = Get-MIR42NineTargetCriterionEvidenceRecord -Path $normalCriterionPath -Candidate $normalSealCandidate -PublishedMaintenanceInputs $normalPublishedInputs
+    Assert-MIR430PerformanceTest -Condition ([string]$sealed.record.criterion -ceq 'performance-telemetry') -Code '431-technical-seal-binds-normal-engine-evidence'
+    $normalObservationRecord.individual_engine_run.sha256='0'*64
+    Write-MIR4BootstrapRecord -Record ([pscustomobject]$normalObservationRecord) -Path $normalObservationPath | Out-Null
+    $changedObservation = Read-MIR42SealRecord -Path $normalObservationPath -Code 'mir431-test-normal-observation-changed'
+    $normalCriterionRecord.evidence[0].sha256=(Get-MIR4Sha256File -Path $normalObservationPath)
+    $normalCriterionRecord.evidence[0].record_sha256=[string]$changedObservation.record.record_sha256
+    Write-MIR4BootstrapRecord -Record $normalCriterionRecord -Path $normalCriterionPath | Out-Null
+    $rejected=$false
+    try { Get-MIR42NineTargetCriterionEvidenceRecord -Path $normalCriterionPath -Candidate $normalSealCandidate -PublishedMaintenanceInputs $normalPublishedInputs | Out-Null } catch { $rejected=$_.Exception.Message -match '^\[mir431-seal-performance-observation-(?:engine-run-binding|binding)\]$' }
+    Assert-MIR430PerformanceTest -Condition $rejected -Code '431-technical-seal-rejects-changed-engine-reference'
+  } finally {
+    Set-Item Function:Get-MIR42SealCandidateConstructionVersionContract -Value $originalVersionContract
+    Set-Item Function:Get-MIR42BoundEngineRun -Value $originalBoundEngineRun
+  }
   $candidateRows = @(
     foreach ($target in @($script:MIR42QualificationNineTargets)) {
       [pscustomobject][ordered]@{

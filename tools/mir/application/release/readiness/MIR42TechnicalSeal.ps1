@@ -1945,7 +1945,7 @@ function Assert-MIR430SealPerformanceCriterionEvidence {
   param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)]$Candidate)
 
   $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-  if ([string]$version.source_version -cnotin @('4.3.0','4.3.1')) { return }
+  if ([string]$version.source_version -cne '4.3.0') { return }
   $evidence = @($Record.evidence)
   if ($evidence.Count -ne 1) { throw '[mir430-seal-performance-evidence-count]' }
   $path = Resolve-MIR42SealImmutableFile -Path ([string]$evidence[0].path) -Sha256 ([string]$evidence[0].sha256) -Code 'mir430-seal-performance-observation'
@@ -1974,8 +1974,36 @@ function Assert-MIR430SealPerformanceCriterionEvidence {
   if ([string]$verified.record.record_sha256 -cne [string]$evidence[0].record_sha256) { throw '[mir430-seal-performance-observation-binding]' }
 }
 
+function Assert-MIR431SealPerformanceCriterionEvidence {
+  param(
+    [Parameter(Mandatory)]$Record,
+    [Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)]$PublishedMaintenanceInputs
+  )
+
+  $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
+  if ([string]$version.source_version -cne '4.3.1') { return }
+  $evidence = @($Record.evidence)
+  if ($evidence.Count -ne 1) { throw '[mir431-seal-performance-evidence-count]' }
+  $path = Resolve-MIR42SealImmutableFile -Path ([string]$evidence[0].path) -Sha256 ([string]$evidence[0].sha256) -Code 'mir431-seal-performance-observation'
+  $observation = Read-MIR42SealRecord -Path $path -Code 'mir431-seal-performance-observation'
+  if ([string]$observation.record.record_sha256 -cne [string]$evidence[0].record_sha256) { throw '[mir431-seal-performance-observation-binding]' }
+  $observationCandidate = [pscustomobject][ordered]@{
+    source = $Candidate.source
+    candidate_manifest = [pscustomobject][ordered]@{
+      sha256 = [string]$Candidate.identity.sha256
+      record_sha256 = [string]$Candidate.identity.record.record_sha256
+    }
+  }
+  $bound = Assert-MIR431NormalPerformanceTelemetryObservation -Record $observation.record -Candidate $observationCandidate -IndividualEngineCandidate $Candidate -PublishedMaintenanceInputs $PublishedMaintenanceInputs -Code 'mir431-seal-performance-observation'
+  if ([string]$bound.sha256 -cne [string]$observation.record.individual_engine_run.sha256 -or
+      [string]$bound.record.record_sha256 -cne [string]$observation.record.individual_engine_run.record_sha256) {
+    throw '[mir431-seal-performance-observation-binding]'
+  }
+}
+
 function Get-MIR42NineTargetCriterionEvidenceRecord {
-  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate)
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Candidate,$PublishedMaintenanceInputs = $null)
 
   $identity = Read-MIR42SealRecord -Path $Path -Code 'mir42-joined-campaign-criterion'
   $record = $identity.record
@@ -1991,6 +2019,11 @@ function Get-MIR42NineTargetCriterionEvidenceRecord {
   }
   if ([string]$record.criterion -ceq 'performance-telemetry') {
     Assert-MIR430SealPerformanceCriterionEvidence -Record $record -Candidate $Candidate
+    $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
+    if ([string]$version.source_version -ceq '4.3.1') {
+      if ($null -eq $PublishedMaintenanceInputs) { throw '[mir431-seal-performance-maintenance-custody-required]' }
+      Assert-MIR431SealPerformanceCriterionEvidence -Record $record -Candidate $Candidate -PublishedMaintenanceInputs $PublishedMaintenanceInputs
+    }
   }
   return $identity
 }
@@ -2052,7 +2085,7 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
   if ($CriterionEvidencePaths.Count -ne $script:MIR42SealReleaseAcceptanceCriteria.Count) { throw '[mir42-joined-campaign-criterion-count]' }
   $criteriaByName = @{}
   foreach ($path in $CriterionEvidencePaths) {
-    $criterion = Get-MIR42NineTargetCriterionEvidenceRecord -Path $path -Candidate $candidate
+    $criterion = Get-MIR42NineTargetCriterionEvidenceRecord -Path $path -Candidate $candidate -PublishedMaintenanceInputs $maintenanceInputs
     $name = [string]$criterion.record.criterion
     if ($criteriaByName.ContainsKey($name)) { throw "[mir42-joined-campaign-criterion-duplicate] $name" }
     $criteriaByName[$name] = $criterion
