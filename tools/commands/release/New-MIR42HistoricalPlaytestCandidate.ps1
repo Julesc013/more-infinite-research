@@ -14,6 +14,36 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 
+function Set-MIR42HistoricalBaselinePackageIdentity {
+  param([string]$Tree, $Record, [string]$BaselineSourceVersion)
+  # The verified adapter remains a pinned 4.2 baseline. Project its identity
+  # only in this private build tree before the normal patch writer validates
+  # the requested minor. Never broaden that writer's accepted input versions.
+  if ($BaselineSourceVersion -cnotmatch '^4[.](?<minor>2|3)[.]0$') {
+    throw '[mir42-historical-baseline-projection]'
+  }
+  $sourceMinor = [int]$Matches.minor
+  if ([string]$Record.target -cnotmatch '^f(017|016|015|014|013)$') {
+    throw '[mir42-historical-baseline-projection]'
+  }
+  $code = ([string]$Record.target).Substring(1)
+  $pinned = New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor 2 -SourcePatch 0
+  $projected = New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $sourceMinor -SourcePatch 0
+  $path = Join-Path $Tree 'info.json'
+  $info = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 20 -DateKind String
+  if ([string]$Record.distribution_version -cne [string]$pinned.distribution_version -or
+      [string]$Record.factorio_line -cne ('0.' + [int]$code) -or
+      [string]$info.name -cne 'more-infinite-research' -or
+      [string]$info.version -cne [string]$Record.distribution_version -or
+      [string]$info.factorio_version -cne [string]$Record.factorio_line) {
+    throw '[mir42-historical-baseline-input-identity]'
+  }
+  if ([string]$info.version -cne [string]$projected.distribution_version) {
+    $info.version = [string]$projected.distribution_version
+    [IO.File]::WriteAllText($path, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), [Text.UTF8Encoding]::new($false))
+  }
+}
+
 function Get-MIR42HistoricalTargetRecord {
   param([string]$TargetId)
   $path = Join-Path $repo "targets/historical/$TargetId/target.json"
@@ -211,6 +241,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   $tree = Join-Path $candidateParent "more-infinite-research_$distributionVersion"
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
+  Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion $baselineSourceVersion
   if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.

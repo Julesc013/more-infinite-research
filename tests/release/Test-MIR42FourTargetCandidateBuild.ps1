@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([switch]$IdentityContractsOnly,[switch]$MaterializerReceiptContractsOnly)
+param([switch]$IdentityContractsOnly,[switch]$MaterializerReceiptContractsOnly,[switch]$HistoricalIdentityProjectionOnly)
 
 Set-StrictMode -Version Latest
 
@@ -37,6 +37,54 @@ function Assert-MIR42CandidateBuildTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Message)
   if (-not $Condition) { throw "[mir42-candidate-build-test] $Message" }
   if ($Message.StartsWith('422-',[StringComparison]::Ordinal)) { $script:mir422ConstructionAssertions++ }
+}
+
+function Test-MIR43HistoricalBaselineProjection {
+  param([string]$OutputRoot)
+  $checks = 0
+  $utf8 = [Text.UTF8Encoding]::new($false)
+  foreach ($target in @('f017','f016','f015','f014','f013')) {
+    $record = Get-Content -Raw -LiteralPath (Join-Path $repo "targets/historical/$target/target.json") | ConvertFrom-Json -Depth 100 -DateKind String
+    foreach ($sourceVersion in @('4.2.2','4.3.0','4.3.1')) {
+      $tree = Join-Path $OutputRoot "$target/$sourceVersion"
+      [IO.Directory]::CreateDirectory($tree) | Out-Null
+      $template = Join-Path $repo "source/presentation/historical/$target/info.json.template"
+      [IO.File]::WriteAllBytes((Join-Path $tree 'info.json'), [IO.File]::ReadAllBytes($template))
+      $history = "---------------------------------------------------------------------------------------------------`nVersion: $($record.distribution_version)`n  Changes:`n    - Retained authored entry.`n"
+      [IO.File]::WriteAllText((Join-Path $tree 'changelog.txt'), $history, $utf8)
+      $minor = [int]$sourceVersion.Split('.')[1]
+      $patch = [int]$sourceVersion.Split('.')[2]
+      $version = (New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $minor -SourcePatch $patch).distribution_version
+      Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion "4.$minor.0"
+      Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $version -SourceVersion $sourceVersion
+      $info = Get-Content -Raw -LiteralPath (Join-Path $tree 'info.json') | ConvertFrom-Json -Depth 20
+      Assert-MIR42CandidateBuildTest ([string]$info.version -ceq $version -and [string]$info.factorio_version -ceq [string]$record.factorio_line -and [string]$info.title -ceq 'More Infinite Research') "$sourceVersion-historical-real-adapter-identity-$target"
+      Assert-MIR42CandidateBuildTest ([IO.File]::ReadAllText((Join-Path $tree 'changelog.txt')).EndsWith($history,[StringComparison]::Ordinal)) "$sourceVersion-historical-preserves-authored-history-$target"
+      $checks += 2
+    }
+  }
+  $record = Get-Content -Raw -LiteralPath (Join-Path $repo 'targets/historical/f017/target.json') | ConvertFrom-Json -Depth 100 -DateKind String
+  foreach ($bad in @('version','factorio_version','name','record-line')) {
+    $tree = Join-Path $OutputRoot "negative-$bad"
+    [IO.Directory]::CreateDirectory($tree) | Out-Null
+    $info = Get-Content -Raw -LiteralPath (Join-Path $repo 'source/presentation/historical/f017/info.json.template') | ConvertFrom-Json -Depth 20
+    $testRecord = $record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+    switch ($bad) {
+      'version' {$info.version='4.2.01701'}
+      'factorio_version' {$info.factorio_version='0.13'}
+      'name' {$info.name='another-mod'}
+      'record-line' {$info.factorio_version='0.13';$testRecord.factorio_line='0.13'}
+    }
+    $path = Join-Path $tree 'info.json'
+    [IO.File]::WriteAllText($path, ($info | ConvertTo-Json -Depth 20), $utf8)
+    $before = Get-MIR4Sha256File -Path $path
+    $rejected = $false
+    try { Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $testRecord -BaselineSourceVersion '4.3.0' }
+    catch { $rejected = $_.Exception.Message -ceq '[mir42-historical-baseline-input-identity]' }
+    Assert-MIR42CandidateBuildTest ($rejected -and (Get-MIR4Sha256File -Path $path) -ceq $before) "historical-baseline-refuses-$bad-without-write"
+    $checks++
+  }
+  return $checks
 }
 
 function New-MIR4TargetPackage {
@@ -221,6 +269,9 @@ foreach ($entryPoint in @(
     ($sourceValues -join '|') -ceq ($admittedCandidateSources -join '|')
   ) "candidate-entrypoint-current-source-admission-$([IO.Path]::GetFileNameWithoutExtension($entryPoint))"
   if ($entryPoint.EndsWith('New-MIR42HistoricalPlaytestCandidate.ps1', [StringComparison]::Ordinal)) {
+    $identityHelpers = @($entryAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Set-MIR42HistoricalBaselinePackageIdentity'}, $true))
+    Assert-MIR42CandidateBuildTest ($identityHelpers.Count -eq 1) 'historical-baseline-projection-helper'
+    . ([scriptblock]::Create($identityHelpers[0].Extent.Text))
     $baseMaterializers = @($entryAst.FindAll({ param($node) $node -is [Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'New-MIR4TargetPackage' }, $true))
     Assert-MIR42CandidateBuildTest (
       $baseMaterializers.Count -eq 1 -and $baseMaterializers[0].Extent.Text -match '-SourceVersion\s+\$baselineSourceVersion'
@@ -239,6 +290,11 @@ foreach ($target in @('f017','f016','f015','f014','f013')) {
   $historicalRecordHashes[$target] = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $repo "targets/historical/$target/target.json")).Hash
 }
 try {
+  $historicalIdentityChecks = Test-MIR43HistoricalBaselineProjection -OutputRoot (Join-Path $identityRoot 'historical-baseline')
+  if ($HistoricalIdentityProjectionOnly) {
+    [pscustomobject]@{status='MIR-4.3-HISTORICAL-IDENTITY-PROJECTION-CONTROLS-PASSED';checks=$historicalIdentityChecks;targets=5;source_versions=@('4.2.2','4.3.0','4.3.1');engine_runs=0;actual_candidate_zip_builds=0}
+    return
+  }
   if ($MaterializerReceiptContractsOnly) {
     Test-MIR42RetainedMaterializerReceipts -OutputRoot $receiptRoot
     [pscustomobject]@{status='MIR-4.2.1-RETAINED-MATERIALIZER-RECEIPTS-PASSED';receipt_assertions=$script:mir42CandidateReceiptAssertions;canonical_packages=2;native_candidate_readers=2;factorio_processes=0;qualification='not-performed'}
