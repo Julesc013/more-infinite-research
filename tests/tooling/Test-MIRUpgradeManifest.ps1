@@ -400,8 +400,11 @@ try {
     $info=Get-Content -LiteralPath (Join-Path $galoreFixture 'info.json') -Raw|ConvertFrom-Json
     $control=Get-Content -LiteralPath (Join-Path $galoreFixture 'control.lua') -Raw
     $settings=Get-Content -LiteralPath (Join-Path $galoreFixture 'settings.lua') -Raw
-    foreach($needle in @('complete_catalogue_upgrade = true','export_state("source")','export_state("upgrade")','export_state("reload")','["f200-galore-space-age"]={technology="mining-productivity-4",level=5,requires_space_age=true}')){
+    foreach($needle in @('complete_catalogue_upgrade = true','export_state("source")','export_state("upgrade")','export_state("reload")','["f200-galore-space-age"]={technology="mining-productivity-3",level=5,requires_space_age=true}')){
       if(-not$control.Contains($needle)){throw "Galore complete-state fixture lost required hook: $needle"}
+    }
+    if($control.Contains('["f200-galore-space-age"]={technology="mining-productivity-4",level=5,requires_space_age=true}')){
+      throw 'Galore complete-state fixture retained the unavailable mining-productivity-4 seed'
     }
     if($info.version-cne$binding.fixture_version-or$settings-notmatch 'default_value="f200-galore-space-age",allowed_values=\{"base-default","f200-galore-space-age"\}'){
       throw 'Galore complete-state fixture identity or selected profile differs'

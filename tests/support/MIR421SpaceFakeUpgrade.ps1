@@ -616,8 +616,14 @@ function Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle {
   foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
   $control=Get-Content -LiteralPath $controlPath -Raw
   $profileAnchor='["base-default"]={technology="mining-productivity-4",level=5}'
-  if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1){throw '[mir431-f200-galore-oracle-anchor]'}
-  $control=$control.Replace($profileAnchor,$profileAnchor+', ["f200-galore-space-age"]={technology="mining-productivity-4",level=5,requires_space_age=true}')
+  $galoreProfile='["f200-galore-space-age"]={technology="mining-productivity-3",level=5,requires_space_age=true}'
+  $obsoleteGaloreProfile='["f200-galore-space-age"]={technology="mining-productivity-4",level=5,requires_space_age=true}'
+  if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1-or$control.Contains($galoreProfile)-or$control.Contains($obsoleteGaloreProfile)){throw '[mir431-f200-galore-oracle-anchor]'}
+  # The exact pinned Galore+Space Age input retires mining-productivity-4 and
+  # makes mining-productivity-3 the infinite native continuation.  Seed the
+  # same existing owner so source creation exercises an earned level and queue.
+  $control=$control.Replace($profileAnchor,$profileAnchor+', '+$galoreProfile)
+  if([regex]::Matches($control,[regex]::Escape($galoreProfile)).Count-ne1-or$control.Contains($obsoleteGaloreProfile)){throw '[mir431-f200-galore-oracle-seed]'}
   [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
   $settings=Get-Content -LiteralPath $settingsPath -Raw
   $settingsAnchor='default_value="base-default",allowed_values={"base-default"}'
