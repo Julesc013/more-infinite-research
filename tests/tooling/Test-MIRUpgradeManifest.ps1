@@ -922,6 +922,30 @@ if(-not$missingSourceText.Contains('    export_state("source")')){throw 'F210 so
 $rejected=$false;try{Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210MissingSourceFixture -FromVersion '4.2.21002' -ToVersion '4.3.21000'}catch{$rejected=$_.Exception.Message-ceq'[mir430-full-upgrade-complete-state-anchor]'}
 if(-not$rejected){throw 'F210 Full fixture admitted a missing source complete-state hook'}
 $mir43Assertions++
+$f210BaseFullFixture=Join-Path $mir43FixtureRoot 'mir43-f210-base-full-setting-allowance'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210BaseFullFixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210BaseFullFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21002'
+Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210BaseFullFixture -FromVersion '4.2.21002' -ToVersion '4.3.21000'
+$f210BaseFullControl=Get-Content -LiteralPath (Join-Path $f210BaseFullFixture 'control.lua') -Raw
+foreach($needle in @(
+  '(archetype == "space-age-native-owner" or archetype == "base-default")',
+  'to_version == "4.3.21000"',
+  'export_state("source")',
+  'export_state("upgrade")',
+  'export_state("reload")'
+)){
+  if(-not$f210BaseFullControl.Contains($needle)){throw "F210 Base Full fixture lost complete-state hook: $needle"}
+}
+$mir43Assertions++
+$f210WrongBaseBindingFixture=Join-Path $mir43FixtureRoot 'mir43-f210-base-wrong-snapshot-binding'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210WrongBaseBindingFixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210WrongBaseBindingFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21001'
+Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210WrongBaseBindingFixture -FromVersion '4.2.21001' -ToVersion '4.3.21000'
+$f210WrongBaseBindingControl=Get-Content -LiteralPath (Join-Path $f210WrongBaseBindingFixture 'control.lua') -Raw
+if($f210WrongBaseBindingControl.Contains('(archetype == "space-age-native-owner" or archetype == "base-default")')){
+  throw 'F210 Base complete-state snapshots admitted an unbound predecessor'
+}
+$mir43Assertions++
 foreach($target in @('f110','f100')){
   $code=$target.Substring(1)
   $fixturePath=Join-Path $mir43FixtureRoot ('mir43-'+$target+'-full-setting-allowance')

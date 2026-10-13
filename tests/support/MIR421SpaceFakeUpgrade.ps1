@@ -323,11 +323,16 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
     $text=Get-Content -LiteralPath $path -Raw
     $anchor='local added_422_setting_defaults = {}'
     $completeStateGate='  and to_version:match("^4%.2%.210%d%d$")'
+    $completeStateArchetype='archetype == "space-age-native-owner"'
     $completeStateHooks=@('    export_state("source")','    export_state("upgrade")','      export_state("reload")')
     if([regex]::Matches($text,[regex]::Escape($anchor)).Count-ne1){throw '[mir430-full-upgrade-setting-anchor]'}
     if([regex]::Matches($text,[regex]::Escape($completeStateGate)).Count-ne1-or
        @($completeStateHooks|Where-Object {-not$text.Contains($_)}).Count){
       throw '[mir430-full-upgrade-complete-state-anchor]'
+    }
+    $baseFullSnapshot=$FromVersion-ceq'4.2.21002'-and$ToVersion-ceq'4.3.21000'
+    if($baseFullSnapshot-and[regex]::Matches($text,[regex]::Escape($completeStateArchetype)).Count-ne1){
+      throw '[mir430-full-upgrade-base-snapshot-anchor]'
     }
     $text=$text.Replace($anchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')
     # The same Full fixture that authorizes the newly added selector must retain
@@ -335,6 +340,12 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
     # source, upgrade and reload hooks above remain mandatory and are checked
     # before this private fixture transformation.
     $text=$text.Replace($completeStateGate,('  and (to_version:match("^4%.2%.210%d%d$") or to_version == "'+$ToVersion+'")'))
+    if($baseFullSnapshot){
+      # The exact published F210 Base predecessor needs the same source,
+      # upgrade and reload proof as the Space Age lane.  Do not admit Base
+      # snapshots for another predecessor or destination through this hook.
+      $text=$text.Replace($completeStateArchetype,'(archetype == "space-age-native-owner" or archetype == "base-default")')
+    }
     [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
     return
   }
