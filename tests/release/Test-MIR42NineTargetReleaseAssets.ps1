@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0')][string]$SourceVersion = '4.2.0'
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0'
 )
 
 Set-StrictMode -Version Latest
@@ -15,7 +15,7 @@ if (-not (Test-Path -LiteralPath $module -PathType Leaf)) { throw "[mir42-releas
 . (Join-Path $repo 'tests/support/MIR421ReleaseAssetControls.ps1')
 . (Join-Path $repo 'tests/support/MIR422ReleaseUpgradeControls.ps1')
 . (Join-Path $repo 'tests/support/MIR423ReleaseUpgradeControls.ps1')
-$maintenance=$SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0')
+$maintenance=$SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')
 $releaseTag='v' + $SourceVersion
 $sourceMinor=([version]$SourceVersion).Minor
 $patchSuffix=([version]$SourceVersion).Build.ToString('D2')
@@ -33,9 +33,11 @@ $wrapper = Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetRelease
 if (-not (Test-Path -LiteralPath $wrapper -PathType Leaf)) { throw "[mir42-release-assets-test-wrapper-missing] $wrapper" }
 $wrapperText = Get-Content -Raw -LiteralPath $wrapper
 Assert-MIR42ReleaseAssetsTest -Condition ($wrapperText -match 'Get-MIR42NineTargetProtectedMainPromotionPlan' -and $wrapperText -match '-PromotionPlan \$promotion' -and $wrapperText -notmatch '\$PublicReleaseObserver') -Code 'wrapper-reconstructs-promotion-and-hides-observer'
+$known431=Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.3.1' -ReleaseTag 'v4.3.1'
+Assert-MIR42ReleaseAssetsTest -Condition ($known431.maintenance -and $known431.source_minor-eq3 -and $known431.source_patch-eq1) -Code '431-release-contract-admits-current-maintenance-only'
 $futureVersionRejected=$false
-try { Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.3.1' -ReleaseTag 'v4.3.1' | Out-Null } catch { $futureVersionRejected=$_.Exception.Message-ceq'[mir42-release-assets-version-contract]' }
-Assert-MIR42ReleaseAssetsTest -Condition $futureVersionRejected -Code 'unpublished-431-cannot-borrow-430-or-422-custody'
+try { Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.3.2' -ReleaseTag 'v4.3.2' | Out-Null } catch { $futureVersionRejected=$_.Exception.Message-ceq'[mir42-release-assets-version-contract]' }
+Assert-MIR42ReleaseAssetsTest -Condition $futureVersionRejected -Code 'unknown-432-cannot-borrow-431-custody'
 
 function New-MIR42ReleaseAssetsFixtureZip {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Version,[Parameter(Mandatory)][string]$Line)
@@ -243,6 +245,10 @@ try {
     $upgradeControls=Invoke-MIR430ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
     $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
     Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 9 -and $upgradeControls.native_runs -eq 0) '430-complete-upgrade-evidence-opposing-controls'
+  } elseif ($SourceVersion -ceq '4.3.1') {
+    $upgradeControls=Invoke-MIR431ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
+    $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
+    Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 9 -and $upgradeControls.native_runs -eq 0) '431-full-direct-and-immediate-upgrade-evidence-opposing-controls'
   }
   $inventoryPath = Join-Path $root 'frozen-inventory.json'
   $inventory = Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $promotionPlan -SourceVersion $SourceVersion -ReleaseTag $releaseTag -AssetRoot $assetRoot -OutputPath $inventoryPath
@@ -260,7 +266,7 @@ try {
     try { Read-MIR42NineTargetReleaseAssetInventory -Path $wrongPath | Out-Null } catch { $rejected=$_.Exception.Message -ceq '[mir42-release-assets-distribution-identity] f013' }
     Assert-MIR42ReleaseAssetsTest -Condition $rejected -Code ('codec-rejects-ninth-patch-' + $suffix)
   }
-  foreach ($wrongTag in @('v4.2.1-stable','v4.2.2-stable','v4.2.0','v4.2.1','v4.2.2')) {
+  foreach ($wrongTag in @('v4.2.1-stable','v4.2.2-stable','v4.2.0','v4.2.1','v4.2.2','v4.3.0','v4.3.2')) {
     if ($wrongTag -ceq $releaseTag) { continue }
     $output=Join-Path $root ('wrong-tag-' + $wrongTag + '.json')
     $rejected=$false

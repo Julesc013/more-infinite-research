@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
 function New-MIR421ReleaseAssetCustodyFixture {
-  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.1')
+  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$CandidateSourceVersion='4.2.1')
   # Structural fixtures only: IDs and paths are synthetic. No network, native
   # campaign, signature or actual release qualification is claimed here.
   $contract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
@@ -10,6 +10,7 @@ function New-MIR421ReleaseAssetCustodyFixture {
     '4.2.2' {'fixtures/release-inputs/mir422-published-421-manifest.json'}
     '4.2.3' {'fixtures/release-inputs/mir423-published-422-manifest.json'}
     '4.3.0' {'fixtures/release-inputs/mir423-published-422-manifest.json'}
+    '4.3.1' {'fixtures/release-inputs/mir431-published-430-manifest.json'}
   }
   $pin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $RepoRoot $pinPath) -CandidateSourceVersion $CandidateSourceVersion
   return [pscustomobject][ordered]@{
@@ -25,11 +26,11 @@ function New-MIR421ReleaseAssetCustodyFixture {
   }
 }
 function Invoke-MIR430FullReleaseUpgradeControls {
-  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets)
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets,[ValidateSet('4.3.0','4.3.1')][string]$CandidateSourceVersion='4.3.0')
 
-  # Host-only structural controls. The release reader still binds all 27
-  # predecessor receipts, but a 4.3.0 destination must retain exact research
-  # definitions for every supported 4.2 predecessor, not just 4.2.2.
+  # Host-only structural controls. 4.3.0 proves all direct 4.2.x inputs;
+  # 4.3.1 proves its direct published 4.2.2 input and exact 4.3.0 predecessor.
+  # Both paths require the same complete definition and saved-state oracle.
   [IO.Directory]::CreateDirectory($Root) | Out-Null
   function Write-MIR430UpgradeJson($Path,$Value) {
     $Value | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $Path
@@ -41,7 +42,7 @@ function Invoke-MIR430FullReleaseUpgradeControls {
   function Assert-MIR430Rejected($Action,[string]$Expected,[string]$Description) {
     $rejected = $false
     try { & $Action } catch { $rejected = $_.Exception.Message.StartsWith($Expected,[StringComparison]::Ordinal) }
-    if (-not $rejected) { throw "430 upgrade controls accepted $Description" }
+    if (-not $rejected) { throw "upgrade controls accepted $Description" }
     $script:mir430UpgradeControlChecks++
   }
   function New-MIR430ChangedRow($Row,$Mutation,[string]$Stem,[string]$Stage='upgrade') {
@@ -59,14 +60,15 @@ function Invoke-MIR430FullReleaseUpgradeControls {
   }
 
   $script:mir430UpgradeControlChecks = 0
+  $predecessorVersions = if ($CandidateSourceVersion -ceq '4.3.1') { @('4.2.2','4.3.0') } else { @('4.2.0','4.2.1','4.2.2') }
   $rows = @()
   foreach ($package in $PackageAssets) {
-    foreach ($patch in @(0,1,2)) {
-      $sourceVersion = '4.2.' + $patch
-      $directory = Join-Path $Root ($package.target + '-' + $patch)
+    foreach ($sourceVersion in $predecessorVersions) {
+      $source = [version]$sourceVersion
+      $directory = Join-Path $Root ($package.target + '-' + $sourceVersion.Replace('.','-'))
       [IO.Directory]::CreateDirectory($directory) | Out-Null
-      $predecessor = Get-MIR423PublishedUpgradePredecessor -Target $package.target -PredecessorSourceVersion $sourceVersion -CandidateSourceVersion '4.3.0'
-      $from = '4.2.' + $package.target.Substring(1) + $patch.ToString('00')
+      $predecessor = Get-MIR423PublishedUpgradePredecessor -Target $package.target -PredecessorSourceVersion $sourceVersion -CandidateSourceVersion $CandidateSourceVersion
+      $from = '4.' + $source.Minor + '.' + $package.target.Substring(1) + $source.Build.ToString('00')
       $to = [string]$package.distribution_version
       $state = @{
         forces=@{player=@{
@@ -107,37 +109,46 @@ function Invoke-MIR430FullReleaseUpgradeControls {
       $rows += [pscustomobject]@{target=$package.target;predecessor_source_version=$sourceVersion;receipt=$receiptReference;snapshots=$snapshots}
     }
   }
-  $bundle = @{schema=1;kind='MIR430MaintenanceUpgradeEvidenceV1';source_version='4.3.0';rows=$rows}
+  $bundle = @{schema=1;kind=('MIR' + $CandidateSourceVersion.Replace('.','') + 'MaintenanceUpgradeEvidenceV1');source_version=$CandidateSourceVersion;rows=$rows}
   $path = Join-Path $Root 'evidence.json'
   $null = Write-MIR430UpgradeJson $path $bundle
-  $null = Assert-MIR423MaintenanceUpgradeEvidence -Path $path -PackageAssets $PackageAssets -CandidateSourceVersion '4.3.0'
+  $null = Assert-MIR423MaintenanceUpgradeEvidence -Path $path -PackageAssets $PackageAssets -CandidateSourceVersion $CandidateSourceVersion
   $script:mir430UpgradeControlChecks++
 
   $missing = Copy-MIR430UpgradeValue $bundle
-  $missing.rows = @($missing.rows | Select-Object -First 26)
+  $missing.rows = @($missing.rows | Select-Object -First ($rows.Count - 1))
   $missingPath = Join-Path $Root 'missing.json'
   $null = Write-MIR430UpgradeJson $missingPath $missing
-  Assert-MIR430Rejected { Assert-MIR423MaintenanceUpgradeEvidence -Path $missingPath -PackageAssets $PackageAssets -CandidateSourceVersion '4.3.0' } '[mir430-upgrade-matrix-cardinality]' 'a missing predecessor row'
+  $errorPrefix = 'mir' + $CandidateSourceVersion.Replace('.','') + '-upgrade'
+  Assert-MIR430Rejected { Assert-MIR423MaintenanceUpgradeEvidence -Path $missingPath -PackageAssets $PackageAssets -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-matrix-cardinality]') 'a missing predecessor row'
   $duplicate = Copy-MIR430UpgradeValue $bundle
   $duplicate.rows[2] = $duplicate.rows[0]
   $duplicatePath = Join-Path $Root 'duplicate.json'
   $null = Write-MIR430UpgradeJson $duplicatePath $duplicate
-  Assert-MIR430Rejected { Assert-MIR423MaintenanceUpgradeEvidence -Path $duplicatePath -PackageAssets $PackageAssets -CandidateSourceVersion '4.3.0' } '[mir430-upgrade-matrix-identity]' 'a duplicate predecessor row'
+  Assert-MIR430Rejected { Assert-MIR423MaintenanceUpgradeEvidence -Path $duplicatePath -PackageAssets $PackageAssets -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-matrix-identity]') 'a duplicate predecessor row'
+  if ($CandidateSourceVersion -ceq '4.3.1') {
+    $wrongPredecessor = Copy-MIR430UpgradeValue $rows[0]
+    $wrongPredecessor.predecessor_source_version = '4.2.1'
+    Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $wrongPredecessor -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } '[mir423-upgrade-predecessor-version]' 'an obsolete 4.2.1 predecessor for 4.3.1'
+  }
 
   $wrongPackage = Copy-MIR430UpgradeValue $PackageAssets[0]
   $wrongPackage.sha256 = if ([string]$PackageAssets[0].sha256 -ceq ('A' * 64)) { 'B' * 64 } else { 'A' * 64 }
-  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $rows[0] -Package $wrongPackage -CandidateSourceVersion '4.3.0' } '[mir430-upgrade-native-binding]' 'a wrong candidate archive'
+  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $rows[0] -Package $wrongPackage -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-native-binding]') 'a wrong candidate archive'
   $wrongMinorReceipt = Get-Content -LiteralPath $rows[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
-  $wrongMinorReceipt.to.version = '4.2.' + $PackageAssets[0].target.Substring(1) + '03'
+  $wrongMinorReceipt.to.version = '4.' + ([version]$CandidateSourceVersion).Minor + '.' + $PackageAssets[0].target.Substring(1) + (([version]$CandidateSourceVersion).Build + 1).ToString('00')
   $wrongMinorRow = Copy-MIR430UpgradeValue $rows[0]
   $wrongMinorRow.receipt = Write-MIR430UpgradeJson (Join-Path (Split-Path -Parent $rows[0].receipt.path) 'wrong-destination-minor.json') $wrongMinorReceipt
-  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $wrongMinorRow -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0' } '[mir430-upgrade-native-binding]' 'a 4.2 destination projection'
+  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $wrongMinorRow -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-native-binding]') 'a 4.2 destination projection'
 
-  $badReceipt = Get-Content -LiteralPath $rows[2].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
-  $badReceipt.published_maintenance_predecessor.source_tag = 'v4.2.1'
-  $publishedRow = Copy-MIR430UpgradeValue $rows[2]
-  $publishedRow.receipt = Write-MIR430UpgradeJson (Join-Path (Split-Path -Parent $rows[2].receipt.path) 'wrong-published.json') $badReceipt
-  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $publishedRow -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0' } '[mir430-upgrade-published-predecessor]' 'the wrong published predecessor'
+  # Bind the receipt and package from the same direct row.  A fixed row index
+  # would pair a different target after the 4.3.1 matrix gained its immediate
+  # predecessor lane, turning this hash/tag control into a no-op.
+  $badReceipt = Get-Content -LiteralPath $rows[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+  $badReceipt.published_maintenance_predecessor.source_tag = 'v-not-the-published-predecessor'
+  $publishedRow = Copy-MIR430UpgradeValue $rows[0]
+  $publishedRow.receipt = Write-MIR430UpgradeJson (Join-Path (Split-Path -Parent $rows[0].receipt.path) 'wrong-published.json') $badReceipt
+  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $publishedRow -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-published-predecessor]') 'the wrong published predecessor'
 
   $mutations = @(
     @{stem='old-definition';stage='upgrade';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.effects[0].modifier=0.03}},
@@ -146,11 +157,11 @@ function Invoke-MIR430FullReleaseUpgradeControls {
     @{stem='old-source-definition';stage='source';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.research_unit_count=200}},
     @{stem='missing-noncore-technology';stage='source';code='[mir423-upgrade-technology-set]';change={param($snapshot) $snapshot.forces.player.technologies.'requested-noncore-research'=@{researched=$false;level=1;prototype=@{effects=@(@{type='laboratory-speed';modifier=0.1});ingredients=@(@{name='automation-science-pack';amount=1});prerequisites=@();research_unit_count=100;research_unit_energy=30;max_level=10}}}}
   )
-  # Index 0 is the 4.2.0 predecessor. It deliberately proves the minor-crossing
-  # contract does not retain 4.2.3's old "prior patch delta" allowance.
+  # Index 0 is the direct published predecessor for this candidate. It
+  # deliberately proves no prior-patch definition allowance crosses releases.
   foreach ($mutation in $mutations) {
     $changed = New-MIR430ChangedRow -Row $rows[0] -Mutation $mutation.change -Stem $mutation.stem -Stage $mutation.stage
-    Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $changed -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0' } $mutation.code ('a retained-state mutation: ' + $mutation.stem)
+    Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $changed -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } $mutation.code ('a retained-state mutation: ' + $mutation.stem)
   }
   $fullProfile = New-MIR430ChangedRow -Row $rows[0] -Mutation { param($snapshot) $snapshot.forces.player.settings['mir-compiler-profile'] = 'full' } -Stem 'new-full-compiler-profile' -Stage 'upgrade'
   $fullProfileReceipt = Get-Content -LiteralPath $fullProfile.receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
@@ -160,21 +171,21 @@ function Invoke-MIR430FullReleaseUpgradeControls {
   $fullProfile.snapshots[2] = @{stage='reload';path=$reloadReference.path;sha256=$reloadReference.sha256}
   $fullProfileReceipt.full_state_evaluator_snapshots = $fullProfile.snapshots
   $fullProfile.receipt = Write-MIR430UpgradeJson (Join-Path (Split-Path -Parent $fullProfile.receipt.path) 'new-full-compiler-profile-receipt.json') $fullProfileReceipt
-  $null = Assert-MIR423NativeUpgradeProof -Row $fullProfile -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0'
+  $null = Assert-MIR423NativeUpgradeProof -Row $fullProfile -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion
   $script:mir430UpgradeControlChecks++
   $classicProfile = New-MIR430ChangedRow -Row $rows[0] -Mutation { param($snapshot) $snapshot.forces.player.settings['mir-compiler-profile'] = 'classic' } -Stem 'new-classic-compiler-profile' -Stage 'upgrade'
-  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $classicProfile -Package $PackageAssets[0] -CandidateSourceVersion '4.3.0' } '[mir423-upgrade-settings]' 'a new Classic compiler-profile setting'
+  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $classicProfile -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } '[mir423-upgrade-settings]' 'a new Classic compiler-profile setting'
   return [pscustomobject]@{path=$path;checks=$script:mir430UpgradeControlChecks;native_runs=0}
 }
 
 function Invoke-MIR430ReleaseUpgradeControls {
-  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets)
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets,[ValidateSet('4.3.0','4.3.1')][string]$CandidateSourceVersion='4.3.0')
 
   # The release matrix is Full-only. Build its complete-state controls first,
   # then prove that a Classic omission receipt cannot be admitted in place of
   # them. Classic compiler behavior is characterized by compiler fixtures; it
   # is not release-preservation evidence.
-  $full = Invoke-MIR430FullReleaseUpgradeControls -Root (Join-Path $Root 'full') -PackageAssets $PackageAssets
+  $full = Invoke-MIR430FullReleaseUpgradeControls -Root (Join-Path $Root 'full') -PackageAssets $PackageAssets -CandidateSourceVersion $CandidateSourceVersion
   $bundle = Get-Content -LiteralPath $full.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
   $row = @($bundle.rows | Where-Object { [string]$_.target -ceq 'f200' -and [string]$_.predecessor_source_version -ceq '4.2.2' })
   if ($row.Count -ne 1) { throw '430 release controls could not locate the Full f200 4.2.2 row' }
@@ -188,10 +199,15 @@ function Invoke-MIR430ReleaseUpgradeControls {
   $classicRow = $row[0] | ConvertTo-Json -Depth 100 | ConvertFrom-Json -AsHashtable -Depth 100
   $classicRow.receipt = @{path=$classicPath;sha256=(Get-FileHash -LiteralPath $classicPath -Algorithm SHA256).Hash}
   $rejected = $false
-  try { $null = Assert-MIR423NativeUpgradeProof -Row $classicRow -Package (@($PackageAssets | Where-Object { [string]$_.target -ceq 'f200' })[0]) -CandidateSourceVersion '4.3.0' }
-  catch { $rejected = $_.Exception.Message -ceq '[mir430-upgrade-classic-reduced-policy-not-release-preservation]' }
-  if (-not $rejected) { throw '430 release controls accepted a Classic omission receipt as preservation evidence' }
+  try { $null = Assert-MIR423NativeUpgradeProof -Row $classicRow -Package (@($PackageAssets | Where-Object { [string]$_.target -ceq 'f200' })[0]) -CandidateSourceVersion $CandidateSourceVersion }
+  catch { $rejected = $_.Exception.Message -ceq ('[mir' + $CandidateSourceVersion.Replace('.','') + '-upgrade-classic-reduced-policy-not-release-preservation]') }
+  if (-not $rejected) { throw 'release controls accepted a Classic omission receipt as preservation evidence' }
   return [pscustomobject]@{path=$full.path;checks=([int]$full.checks + 1);native_runs=0}
+}
+
+function Invoke-MIR431ReleaseUpgradeControls {
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets)
+  return Invoke-MIR430ReleaseUpgradeControls -Root $Root -PackageAssets $PackageAssets -CandidateSourceVersion '4.3.1'
 }
 
 function Invoke-MIR430ClassicCharacterizationControls {
