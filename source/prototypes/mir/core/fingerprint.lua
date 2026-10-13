@@ -1,8 +1,11 @@
 local M = {}
 local ONE_MIB = 1024 * 1024
 local MAXIMUM_QUOTED_STRING_CACHE_ENTRIES = 4096
+local MAXIMUM_NUMERIC_TEXT_CACHE_ENTRIES = 4096
 local quoted_string_cache = {}
 local quoted_string_cache_entries = 0
+local numeric_text_cache = {}
+local numeric_text_cache_entries = 0
 local MAXIMUM_HASH_CACHE_ENTRIES = 4096
 local MAXIMUM_HASH_CACHE_BYTES = 2 * ONE_MIB
 local MAXIMUM_HASH_CACHE_TEXT_BYTES = 64 * 1024
@@ -16,11 +19,35 @@ local metrics = {
   fingerprint_calls = 0,
   hash_cache_hits = 0,
   hash_computations = 0,
+  numeric_text_cache_hits = 0,
+  numeric_text_computations = 0,
   map_projection_calls = 0,
   shared_projection_bytes = 0,
   serializations_over_one_mib = 0,
   maximum_canonical_bytes = 0
 }
+
+local function numeric_text(value)
+  -- Scalar values are immutable. Keep the established %.17g bytes without
+  -- caching a record, its validation, or any table's changing contents.
+  -- Signed zeros compare equal; NaN cannot be used as a Lua table key.
+  if value ~= 0 and value == value then
+    local cached = numeric_text_cache[value]
+    if cached then
+      metrics.numeric_text_cache_hits = metrics.numeric_text_cache_hits + 1
+      return cached
+    end
+    metrics.numeric_text_computations = metrics.numeric_text_computations + 1
+    local encoded = string.format("%.17g", value)
+    if numeric_text_cache_entries < MAXIMUM_NUMERIC_TEXT_CACHE_ENTRIES then
+      numeric_text_cache[value] = encoded
+      numeric_text_cache_entries = numeric_text_cache_entries + 1
+    end
+    return encoded
+  end
+  metrics.numeric_text_computations = metrics.numeric_text_computations + 1
+  return string.format("%.17g", value)
+end
 
 local function map_keys(value, path, diagnostic, root)
   local keys = {}
@@ -31,7 +58,7 @@ local function map_keys(value, path, diagnostic, root)
         key = key, sort_key = "s:" .. key, encoded = string.format("%q", key), path = "." .. key
       }
     elseif key_kind == "number" then
-      local encoded = string.format("%.17g", key)
+      local encoded = numeric_text(key)
       keys[#keys + 1] = {
         key = key, sort_key = "n:" .. encoded, encoded = "[" .. encoded .. "]", path = "[" .. encoded .. "]"
       }
@@ -94,7 +121,7 @@ encode = function(value, seen, path, diagnostic, root, out, count)
   local kind = type(value)
   if kind == "nil" then out[count + 1] = "null"; return count + 1 end
   if kind == "boolean" then out[count + 1] = value and "true" or "false"; return count + 1 end
-  if kind == "number" then out[count + 1] = string.format("%.17g", value); return count + 1 end
+  if kind == "number" then out[count + 1] = numeric_text(value); return count + 1 end
   if kind == "string" then out[count + 1] = quoted_string(value); return count + 1 end
   if kind ~= "table" then
     if not diagnostic then return diagnose(root) end
@@ -388,6 +415,9 @@ function M.metrics()
     fingerprint_calls = metrics.fingerprint_calls,
     hash_cache_hits = metrics.hash_cache_hits,
     hash_computations = metrics.hash_computations,
+    numeric_text_cache_entries = numeric_text_cache_entries,
+    numeric_text_cache_hits = metrics.numeric_text_cache_hits,
+    numeric_text_computations = metrics.numeric_text_computations,
     map_projection_calls = metrics.map_projection_calls,
     shared_projection_bytes = metrics.shared_projection_bytes,
     hash_cache_entries = hash_cache_entries,
