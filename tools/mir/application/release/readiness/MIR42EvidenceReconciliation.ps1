@@ -506,7 +506,7 @@ function Get-MIR42QualificationUpgradeReceipt {
 function Assert-MIR42MaintenanceReconciliationScope {
   param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][object[]]$Candidates)
   if ($Scope -cne 'nine-target' -or $Candidates.Count -ne 9 -or
-      @($Candidates | Where-Object { [string]$_.identity.source_version -cnotin @('4.2.1','4.2.2','4.2.3') }).Count -ne 0 -or
+      @($Candidates | Where-Object { [string]$_.identity.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1') }).Count -ne 0 -or
       @($Candidates | ForEach-Object { [string]$_.identity.source_version } | Sort-Object -Unique).Count -ne 1) {
     throw '[mir42-reconciliation-maintenance-candidate-scope]'
   }
