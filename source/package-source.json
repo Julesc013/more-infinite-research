@@ -1494,10 +1494,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/settings/catalog.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 21281,
-      "source_sha256": "EED52137873E4DE45DBA2CB4CD915B71D5DBB0E3202C098588113EC2FC609D54",
-      "output_bytes": 21281,
-      "output_sha256": "EED52137873E4DE45DBA2CB4CD915B71D5DBB0E3202C098588113EC2FC609D54"
+      "source_bytes": 21323,
+      "source_sha256": "303F4D37C484780372213BDE5E97D0CDC3A322AA5B175D45620A014B91EF28D9",
+      "output_bytes": 21323,
+      "output_sha256": "303F4D37C484780372213BDE5E97D0CDC3A322AA5B175D45620A014B91EF28D9"
     },
     {
       "layer": "shared",
@@ -7819,5 +7819,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "4269200518DE15232F1E560D7021CF650AC494708410585FD7EEA4D9B09EDE83"
+  "record_sha256": "F3616DCB805ECE24E3972774656D56F8738B63D6A40D6EAB563BC0B0FC52C264"
 }

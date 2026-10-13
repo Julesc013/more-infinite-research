@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 233,
+  "test_count": 234,
   "tests": [
     {
       "id": "docs.check",
@@ -8445,6 +8445,36 @@
       "matrix": null
     },
     {
+      "id": "static.settings-catalogue-lifecycle",
+      "proposition": "The governed test 'static.settings-catalogue-lifecycle' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/runtime/Test-MIRSettingsCatalogueLifecycle.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIRSettingsCatalogueLifecycle.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRSettingsCatalogueLifecycle.ps1",
+        "tests/runtime/run_settings_catalogue_lifecycle_controls.py",
+        "source:source/prototypes/mir/settings/catalog.lua",
+        "source:source/prototypes/mir/settings/compiler_profile.lua",
+        "source:source/prototypes/mir/platform/factorio/target_line.lua",
+        "source:source/prototypes/mir/runtime/research_browser_mir_provider.lua",
+        "source:source/prototypes/mir/runtime/startup_settings.lua",
+        "source:source/prototypes/mir/runtime/maximum_level_control.lua",
+        "source:source/prototypes/mir/core/fingerprint.lua",
+        "source:source/adapters/f200/prototypes/mir/platform/factorio/target_profiles.lua",
+        "source:source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.upgrade-manifest-inputs",
       "proposition": "The governed test 'static.upgrade-manifest-inputs' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -8530,11 +8560,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 70,
-      "runtime-upgrade": 60,
+      "runtime-upgrade": 61,
       "compiler-static": 19,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 220,
+    "canonical_test_commands": 221,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8547,5 +8577,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7b51ce8fbd02385961feef86cff2aa96767dff086c235dba7e8f9496470fc18f"
+  "digest": "sha256:cc91fa8c668c8e35d7540160c1d927aac22c6b00778078803f19b04deccfbcb4"
 }
