@@ -197,7 +197,7 @@ function Invoke-MIRUpgradeMonitoredProcess {
   $prefix=Join-Path $root ('process-'+$script:upgradeProcessIndex)
   $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $script:upgradeResourceContext
   $run=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $root `
-    -LedgerPath ($prefix+'.resources.jsonl') -Policy $upgradePolicy -EstimatedPeakBytes $remaining `
+    -LedgerPath ($prefix+'.resources.jsonl') -Policy $upgradeResourcePolicy -EstimatedPeakBytes $remaining `
     -ExpectedPeakMemoryBytes $upgradePeakBytes -TimeoutSeconds ([int][Math]::Ceiling($TimeoutMs/1000)) `
     -StdoutPath ($prefix+'.stdout.txt') -StderrPath ($prefix+'.stderr.txt') -AllowNonZeroExit `
     -CompletionPredicate $CompletionPredicate
@@ -380,12 +380,12 @@ $generatedUpgradeRoot = if ([string]::IsNullOrWhiteSpace($WorkRoot)) {
 $resolvedUpgradeRoot=Resolve-MIR441RecoveryScratchPath -Path $generatedUpgradeRoot
 if (-not $PrepareInputsOnly -and $LocalModLibraryDirs.Count -ne 1) { throw '[mir-upgrade-library-required] Supply exactly one flat archive library; retired profile staging is unsupported.' }
 if (-not $PrepareInputsOnly -and $ExpectedPeakMemoryMiB -le 0) { throw '[mir441-resource-peak-budget-required] Declare the upgrade peak memory budget.' }
-$upgradePolicy=[pscustomobject]@{minimum_free_ram_gib=4}
+$upgradeResourcePolicy=[pscustomobject]@{minimum_free_ram_gib=4}
 $upgradePeakBytes=[int64]$ExpectedPeakMemoryMiB*1MB
 $upgradeWriteBytes=[int64]$MaxNewOutputMiB*1MB
 # Refuse before source resolution, staging, evidence allocation or any engine.
 if (-not $PrepareInputsOnly) {
-  $null=Assert-MIR441ResourceAdmission -Policy $upgradePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
+  $null=Assert-MIR441ResourceAdmission -Policy $upgradeResourcePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
 } elseif ([IO.DriveInfo]::new([IO.Path]::GetPathRoot($resolvedUpgradeRoot)).AvailableFreeSpace -lt 544MB) {
   throw '[mir-upgrade-preparation-capacity] Small fixture preparation requires 32 MiB output allowance plus 512 MiB headroom; this does not admit a native run.'
 }

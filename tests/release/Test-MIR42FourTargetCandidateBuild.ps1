@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param([switch]$IdentityContractsOnly,[switch]$MaterializerReceiptContractsOnly,[switch]$HistoricalIdentityProjectionOnly,[switch]$HistoricalAuthenticationOnly)
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
@@ -1203,15 +1204,36 @@ try {
   $legacyCriterion=Get-MIR42CriterionObservationContract -Criterion 'fresh-exact-loads'
   Assert-MIR42CandidateBuildTest ($legacyCriterion.kind-ceq'MIR42NineTargetRealEngineEvidenceBinderV1') 'maintenance-criterion-preserves-default-contract'
   $maintenanceCriterionAssertions++
+  # The source-specific contract is selected after reading the candidate.
+  # Test the CLI's real named-argument forwarding with a controlled boundary;
+  # the preceding controls separately enforce the 4.2 maintenance restriction.
+  $criterionCliRepo=Join-Path $identityRoot 'criterion-cli-binding-repo'
+  $criterionCliLibrary=Join-Path $criterionCliRepo 'tools/mir/application/release/readiness'
+  New-Item -ItemType Directory -Force -Path $criterionCliLibrary|Out-Null
+  [IO.File]::WriteAllText((Join-Path $criterionCliLibrary 'MIR42EvidenceReconciliation.ps1'),@'
+function New-MIR42NineTargetCriterionEvidence {
+  param($RepoRoot,$CandidateManifestPath,$Criterion,$ObservationPaths,$ObservedTargets,$NotApplicableTargetReasons,$Claim,$KnownLimitations,$OutputPath,$PublishedMaintenancePredecessorManifestPath,$PublishedMaintenanceArchiveBindings)
+  if($PublishedMaintenancePredecessorManifestPath-cne'not-read.json'-or$Criterion-cne'performance-telemetry'){
+    throw '[controlled-criterion-cli-missing-maintenance-binding]'
+  }
+  throw '[mir42-maintenance-criterion-input-scope]'
+}
+'@,[Text.UTF8Encoding]::new($false))
   $rejected=$false
   try{
-    & (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetEvidenceReconciliation.ps1') -Mode Criterion -RepoRoot $repo `
+    & (Join-Path $repo 'tools/commands/release/Invoke-MIR42NineTargetEvidenceReconciliation.ps1') -Mode Criterion -RepoRoot $criterionCliRepo `
       -CandidateManifestPath (Join-Path $identityRoot 'not-read.json') -Criterion 'performance-telemetry' -ObservationPaths @('not-read.json') `
       -ObservedTargets @('f210') -Claim 'source flag-forwarding control' -KnownLimitations 'not native' `
       -OutputPath (Join-Path $identityRoot 'must-not-create.json') -PublishedMaintenancePredecessorManifestPath 'not-read.json'|Out-Null
   }catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-criterion-input-scope]'}
   Assert-MIR42CandidateBuildTest ($rejected-and-not(Test-Path -LiteralPath (Join-Path $identityRoot 'must-not-create.json'))) 'maintenance-criterion-cli-forwards-and-refuses-out-of-scope-option'
   $maintenanceCriterionAssertions++
+  foreach($criterion in $script:MIR42ReleaseAcceptanceCriteria){
+    $current=Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance -SourceVersion '4.3.0'
+    $dedicated=$criterion-cin@('fresh-exact-loads','target-omissions')
+    Assert-MIR42CandidateBuildTest ($(if($dedicated){$null-ne$current-and-not[string]::IsNullOrWhiteSpace([string]$current.kind)}else{$null-eq$current})) ('mir430-criterion-contract-admitted-'+$criterion)
+    $maintenanceCriterionAssertions++
+  }
   if ($IdentityContractsOnly) {
     [pscustomobject][ordered]@{ status='MIR-4.3-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; source_versions=@('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1'); current_maintenance_contract_assertions=$script:mir422ConstructionAssertions; target_identities=9; mir43_source_versions=@('4.3.0','4.3.1'); mir43_target_identities=18; mir43_manifest_contracts=2; metadata_idempotence_checks=9; invalid_version_refusals=2; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return

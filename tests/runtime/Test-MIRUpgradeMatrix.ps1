@@ -6,6 +6,7 @@ param(
   [Parameter(Mandatory)][string]$ToZip,
   [Parameter(Mandatory)][string]$FromVersion,
   [Parameter(Mandatory)][string]$ToVersion,
+  [string[]]$LocalModLibraryDirs = @(),
   [string]$SourceMaterializationPath = '',
   [string]$SelectedReleaseManifest = '',
   [string]$SelectedTarget = '',
@@ -26,6 +27,10 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+if (@($LocalModLibraryDirs).Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$LocalModLibraryDirs[0]) -or
+    -not (Test-Path -LiteralPath $LocalModLibraryDirs[0] -PathType Container)) {
+  throw '[mir-upgrade-matrix-library-required] Supply exactly one flat archive library; retired profile staging is unsupported.'
+}
 if ($WorkRoot -and -not [IO.Path]::IsPathRooted($WorkRoot)) { throw 'Upgrade -WorkRoot must be an absolute controlled path.' }
 $upgradeWorkRoot=if($WorkRoot){$WorkRoot}else{Join-Path $RepoRoot 'build/p/validation-upgrades'}
 $null=Resolve-MIR441RecoveryScratchPath -Path $upgradeWorkRoot
@@ -94,6 +99,7 @@ foreach ($case in $cases) {
     ToZip = $ToZip
     FromVersion = $FromVersion
     ToVersion = $ToVersion
+    LocalModLibraryDirs = @($LocalModLibraryDirs)
     FixtureName = $FixtureName
     Archetype = [string]$case.id
     SourceOnlyFixtureNames = @($case.source_only)

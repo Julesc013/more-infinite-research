@@ -849,9 +849,119 @@ $matrixTokens=$null;$matrixErrors=$null
 $matrixAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgradeMatrix.ps1'),[ref]$matrixTokens,[ref]$matrixErrors)
 if($matrixErrors.Count){throw 'Upgrade matrix syntax error'}
 $matrixText=$matrixAst.Extent.Text
-foreach($needle in @('$SourceMaterializationPath','$SelectedReleaseManifest','$SelectedTarget','$SourceVersion','$UpgradePolicy','$PublishedMaintenancePredecessorManifestPath','$arguments.SourceMaterializationPath=$SourceMaterializationPath','$arguments.SelectedReleaseManifest=$SelectedReleaseManifest','$arguments.SelectedTarget=$SelectedTarget','$arguments.SourceVersion=$SourceVersion','$arguments.UpgradePolicy=$UpgradePolicy','$arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath','($currentDestination -or $FixtureName')){
+foreach($needle in @('$LocalModLibraryDirs','$SourceMaterializationPath','$SelectedReleaseManifest','$SelectedTarget','$SourceVersion','$UpgradePolicy','$PublishedMaintenancePredecessorManifestPath','LocalModLibraryDirs = @($LocalModLibraryDirs)','$arguments.SourceMaterializationPath=$SourceMaterializationPath','$arguments.SelectedReleaseManifest=$SelectedReleaseManifest','$arguments.SelectedTarget=$SelectedTarget','$arguments.SourceVersion=$SourceVersion','$arguments.UpgradePolicy=$UpgradePolicy','$arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath','($currentDestination -or $FixtureName')){
   if(-not$matrixText.Contains($needle)){throw "4.3 upgrade matrix lost current destination control: $needle"}
   $mir43Assertions++
+}
+
+# The public UpgradePolicy parameter is a validated caller contract.  The
+# native resource governor needs a different object, so it must never reuse
+# that variable name (PowerShell variable names are case-insensitive).  Parse
+# assignments and command arguments instead of accepting a text-only check.
+$upgradeTokens=$null;$upgradeErrors=$null
+$upgradeAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$upgradeTokens,[ref]$upgradeErrors)
+if($upgradeErrors.Count){throw 'Upgrade runner syntax error'}
+$upgradeParameters=@($upgradeAst.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath-ieq'UpgradePolicy'})
+if($upgradeParameters.Count-ne1){throw 'Upgrade runner lost its validated UpgradePolicy parameter'}
+function Get-MIRUpgradePolicyAssignments {
+  param([Parameter(Mandatory)][Management.Automation.Language.Ast]$Ast)
+  @($Ast.FindAll({param($node)
+    $node-is[Management.Automation.Language.AssignmentStatementAst]-and
+    $node.Left-is[Management.Automation.Language.VariableExpressionAst]-and
+    $node.Left.VariablePath.UserPath-ieq'UpgradePolicy'
+  },$true))
+}
+$upgradePolicyAssignments=@(Get-MIRUpgradePolicyAssignments -Ast $upgradeAst)
+if($upgradePolicyAssignments.Count){throw 'Upgrade runner overwrites the validated UpgradePolicy parameter'}
+$collisionTokens=$null;$collisionErrors=$null
+$lowercaseCollisionAst=[Management.Automation.Language.Parser]::ParseInput('$upgradePolicy=[pscustomobject]@{minimum_free_ram_gib=4}',[ref]$collisionTokens,[ref]$collisionErrors)
+if($collisionErrors.Count-or-not @(Get-MIRUpgradePolicyAssignments -Ast $lowercaseCollisionAst).Count){throw 'Upgrade runner collision guard would admit the original lowercase resource-policy assignment'}
+$resourcePolicyAssignments=@($upgradeAst.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and
+  $node.Left-is[Management.Automation.Language.VariableExpressionAst]-and
+  $node.Left.VariablePath.UserPath-ieq'upgradeResourcePolicy'
+},$true))
+if($resourcePolicyAssignments.Count-ne1){throw 'Upgrade runner lacks one distinct resource-policy object'}
+$policyConsumers=@($upgradeAst.FindAll({param($node)
+  if($node-isnot[Management.Automation.Language.CommandAst]){return $false}
+  $elements=@($node.CommandElements)
+  $name=if($elements.Count){[string]$elements[0].Extent.Text}else{''}
+  $name-cin@('Assert-MIR441ResourceAdmission','Invoke-MIR441MonitoredProcess')
+},$true))
+if($policyConsumers.Count-ne2){throw 'Upgrade runner has an ambiguous resource-policy consumer set'}
+foreach($consumer in $policyConsumers){
+  $elements=@($consumer.CommandElements);$policyIndex=-1
+  for($index=1;$index-lt$elements.Count;$index++){
+    if([string]$elements[$index].Extent.Text-ceq'-Policy'){$policyIndex=$index;break}
+  }
+  if($policyIndex-lt0-or$policyIndex-ge($elements.Count-1)-or
+     $elements[$policyIndex+1]-isnot[Management.Automation.Language.VariableExpressionAst]-or
+     $elements[$policyIndex+1].VariablePath.UserPath-ine'upgradeResourcePolicy'){
+    throw 'Upgrade runner does not pass its distinct resource policy to the governed invocation'
+  }
+}
+$mir43Assertions+=5
+
+# Exercise the wrapper's real named-argument call shape with a controlled
+# callee. No engine or mod archive is launched: the fake runner records what
+# the matrix passes and emits only the minimum schema/cleanup receipts which
+# the matrix itself requires.
+$matrixBindingRoot=Join-Path $testRoot 'matrix-direct-library-binding'
+$matrixBindingRepo=Join-Path $matrixBindingRoot 'repo'
+$matrixBindingLibrary=Join-Path $matrixBindingRoot 'flat-library'
+$matrixBindingWork=Join-Path $matrixBindingRoot 'work'
+$matrixBindingOutput=Join-Path $matrixBindingRoot 'matrix.json'
+$resolvedTestRoot=[IO.Path]::GetFullPath($testRoot)
+$resolvedMatrixBindingRoot=[IO.Path]::GetFullPath($matrixBindingRoot)
+$matrixBindingRelative=[IO.Path]::GetRelativePath($resolvedTestRoot,$resolvedMatrixBindingRoot)
+if([IO.Path]::IsPathRooted($matrixBindingRelative)-or$matrixBindingRelative-ceq'..'-or$matrixBindingRelative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar)){
+  throw 'Upgrade matrix controlled cleanup root escapes the owned test root'
+}
+New-Item -ItemType Directory -Force -Path (Join-Path $matrixBindingRepo 'tests/runtime'),(Join-Path $matrixBindingRepo 'tools/mir/application/release/readiness'),$matrixBindingLibrary,$matrixBindingWork|Out-Null
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgradeMatrix.ps1') -Destination (Join-Path $matrixBindingRepo 'tests/runtime/Test-MIRUpgradeMatrix.ps1') -Force
+[IO.File]::WriteAllText((Join-Path $matrixBindingRepo 'tools/mir/application/release/readiness/ResourceGovernor.ps1'),@'
+function Resolve-MIR441RecoveryScratchPath { param([string]$Path) return $Path }
+function Assert-MIR441ResourceAdmission { if($env:MIR_MATRIX_ALLOW_RESOURCE -ceq '1'){return $null}; throw '[matrix-test-resource-admission-called]' }
+'@,[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $matrixBindingRepo 'tests/runtime/Test-MIRUpgrade.ps1'),@'
+param(
+  [string]$RepoRoot,[string]$FactorioBin,[string]$FromZip,[string]$ToZip,[string]$FromVersion,[string]$ToVersion,
+  [string[]]$LocalModLibraryDirs,[string]$FixtureName,[string]$Archetype,[string[]]$SourceOnlyFixtureNames,
+  [string]$OutputPath,[string]$WorkRoot,[int]$ExpectedPeakMemoryMiB,[int]$MaxNewOutputMiB,[string]$Retention,
+  [Parameter(ValueFromRemainingArguments=$true)]$Ignored
+)
+$bindingPath=Join-Path $WorkRoot ('binding-'+$Archetype+'.json')
+[IO.File]::WriteAllText($bindingPath,([ordered]@{local_mod_library_dirs=@($LocalModLibraryDirs);archetype=$Archetype}|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+$result=[ordered]@{schema=2;status='passed';archetype=$Archetype;assertions=@('upgraded-save-reload-passed','upgraded-save-second-reload-passed');second_reload_log='controlled-second.log';second_reload_log_sha256=('A'*64)}
+[IO.File]::WriteAllText($OutputPath,($result|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+$cleanup=Join-Path (Split-Path -Parent $OutputPath) ($ToVersion+'-upgrade-'+$Archetype+'-cleanup.json')
+[IO.File]::WriteAllText($cleanup,([ordered]@{status='retained';run_status='passed';contained=$true;bytes=0}|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+$global:LASTEXITCODE=0
+'@,[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $matrixBindingRoot 'factorio.exe'),'controlled-factorio',[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $matrixBindingRoot 'from.zip'),'controlled-from',[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $matrixBindingRoot 'to.zip'),'controlled-to',[Text.UTF8Encoding]::new($false))
+$matrixPath=Join-Path $matrixBindingRepo 'tests/runtime/Test-MIRUpgradeMatrix.ps1'
+$matrixBaseArgs=@{RepoRoot=$matrixBindingRepo;FactorioBin=(Join-Path $matrixBindingRoot 'factorio.exe');FromZip=(Join-Path $matrixBindingRoot 'from.zip');ToZip=(Join-Path $matrixBindingRoot 'to.zip');FromVersion='4.2.20002';ToVersion='4.3.20000';OutputPath=$matrixBindingOutput;WorkRoot=$matrixBindingWork;ExpectedPeakMemoryMiB=1;MaxNewOutputMiB=1;Retention='Always'}
+$hadMatrixAllowResource=Test-Path Env:MIR_MATRIX_ALLOW_RESOURCE
+$savedMatrixAllowResource=if($hadMatrixAllowResource){[string]$env:MIR_MATRIX_ALLOW_RESOURCE}else{''}
+try {
+  $missingLibraryRejected=$false
+  try { & $matrixPath @matrixBaseArgs | Out-Null } catch { $missingLibraryRejected=$_.Exception.Message-ceq'[mir-upgrade-matrix-library-required] Supply exactly one flat archive library; retired profile staging is unsupported.' }
+  if(-not$missingLibraryRejected){throw 'Upgrade matrix admitted a missing direct-library input or reached resource admission first'}
+  $env:MIR_MATRIX_ALLOW_RESOURCE='1'
+  $matrixArgs=$matrixBaseArgs.Clone();$matrixArgs.LocalModLibraryDirs=@($matrixBindingLibrary)
+  & $matrixPath @matrixArgs | Out-Null
+  $bindings=@(Get-ChildItem -LiteralPath $matrixBindingWork -Filter 'binding-*.json' -File)
+  if($bindings.Count-ne5){throw 'Upgrade matrix did not execute every controlled direct-library row'}
+  foreach($bindingPath in $bindings){
+    $binding=Get-Content -Raw -LiteralPath $bindingPath.FullName|ConvertFrom-Json -Depth 10
+    if(@($binding.local_mod_library_dirs).Count-ne1-or[IO.Path]::GetFullPath([string]$binding.local_mod_library_dirs[0])-cne[IO.Path]::GetFullPath($matrixBindingLibrary)){throw 'Upgrade matrix did not forward the exact one-library direct input'}
+  }
+  $mir43Assertions+=2
+} finally {
+  if($hadMatrixAllowResource){$env:MIR_MATRIX_ALLOW_RESOURCE=$savedMatrixAllowResource}else{Remove-Item Env:MIR_MATRIX_ALLOW_RESOURCE -ErrorAction SilentlyContinue}
+  if(Test-Path -LiteralPath $matrixBindingRoot){Remove-Item -LiteralPath $matrixBindingRoot -Recurse -Force}
 }
 
 [pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;mir43_classic_snapshot_assertions=$mir43ClassicSnapshotAssertions;mir43_classic_snapshot_control_kind='synthetic-host-only-classic-disposition-controls-v1';mir43_classic_snapshot_native_engine_launched=$false;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
