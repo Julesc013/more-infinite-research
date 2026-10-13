@@ -41,9 +41,12 @@ local initial_calls = TEST_BOOLEAN_ACQUISITION_CALLS
 local available, paired = production.item_acquisition_available("lab-kit", {pack = true}, {technology = true})
 check(available == true and paired == true and TEST_BOOLEAN_ACQUISITION_CALLS == initial_calls + 1,
   "A canonical completed positive answer must use the cold acquisition proof once")
+local reads_before_hit = TEST_BOOLEAN_SERVICE_READS
 available, paired = production.item_acquisition_available("lab-kit", {pack = true}, {technology = true})
 check(available == true and paired == true and TEST_BOOLEAN_ACQUISITION_CALLS == initial_calls + 1,
   "An exact fresh Boolean query must reuse only the retained true answer")
+check(TEST_BOOLEAN_SERVICE_READS - reads_before_hit == 5,
+  "A warm answer checks the public pairing once and the four live proof services once")
 check((owner.contextual_boolean_acquisition_memo_key_count or 0) == 1,
   "The Boolean memo retains one compact answer, never a witness graph")
 
@@ -142,6 +145,19 @@ local unavailable, unpaired = production.item_acquisition_available("lab-kit", {
 check(unavailable == nil and unpaired == false and TEST_BOOLEAN_ACQUISITION_CALLS == before_witness_replacement,
   "A replaced public witness service refuses Boolean use before any cached or cold result")
 canonical_services()
+
+reset_cache()
+TEST_BOOLEAN_MUTATE_SERVICE = true
+production.item_acquisition_available("proof-service-race", {pack = true}, {technology = true})
+TEST_BOOLEAN_MUTATE_SERVICE = false
+check((owner.contextual_boolean_acquisition_memo_key_count or 0) == 0,
+  "A service replacement during proof still fails the independent retention check")
+canonical_services()
+local before_service_recovery = TEST_BOOLEAN_ACQUISITION_CALLS
+production.item_acquisition_available("proof-service-race", {pack = true}, {technology = true})
+production.item_acquisition_available("proof-service-race", {pack = true}, {technology = true})
+check(TEST_BOOLEAN_ACQUISITION_CALLS == before_service_recovery + 1,
+  "After restoring a proof-time replaced service, only a fresh proof may seed a warm answer")
 
 owner.contextual_boolean_acquisition_memo_key_count = 512
 local before_capacity = TEST_BOOLEAN_ACQUISITION_CALLS

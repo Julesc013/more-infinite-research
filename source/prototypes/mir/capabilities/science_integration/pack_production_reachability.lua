@@ -2233,9 +2233,9 @@ local function canonical_boolean_acquisition_services_match(context)
 end
 
 local function contextual_boolean_acquisition_generation(context, owner, state)
-  if type(owner) ~= "table" or type(state) ~= "table" or owner.route_witness_state ~= state
-    or not canonical_boolean_acquisition_services_match(context)
-    or not route_feasibility.state_context_matches(state, context) then return nil end
+  if type(owner) ~= "table" or type(state) ~= "table" or owner.route_witness_state ~= state then return nil end
+  if not canonical_boolean_acquisition_services_match(context) then return nil, "service_identity" end
+  if not route_feasibility.state_context_matches(state, context) then return nil end
   local source_epoch = canonical_recipe_facts.source_epoch()
   local recipe_index = context:state_view("recipe_index")
   local research_index = context:state_view("technology_researchability_index")
@@ -2286,12 +2286,15 @@ local function contextual_boolean_acquisition_memo_owner(state, observer)
   local context = compiler_context.current()
   local owner = context:state_view("science_pack_production")
   if type(owner) ~= "table" or owner.route_witness_state ~= state then return nil end
-  if not canonical_boolean_acquisition_services_match(context) then
+  -- The generation reader validates the live services once. A second
+  -- identical lookup immediately before it cannot establish another fact.
+  -- Retention after the proof still invokes that reader independently.
+  local generation, refusal = contextual_boolean_acquisition_generation(context, owner, state)
+  if refusal == "service_identity" then
     reset_contextual_boolean_acquisition_memo(owner, "service_identity")
     telemetry.count("science_contextual_boolean_acquisition_service_bypasses")
     return nil
   end
-  local generation = contextual_boolean_acquisition_generation(context, owner, state)
   if not generation then return nil end
   if not contextual_boolean_acquisition_memo_is_current(owner, generation) then
     reset_contextual_boolean_acquisition_memo(owner, "generation")

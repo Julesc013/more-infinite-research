@@ -45,6 +45,8 @@ _G.TEST_BOOLEAN_MUTATE_STABLE = false
 _G.TEST_BOOLEAN_MUTATE_PACK_GUARDS = nil
 _G.TEST_BOOLEAN_MUTATE_RECIPE_EPOCH = false
 _G.TEST_BOOLEAN_MUTATE_SOURCE = false
+_G.TEST_BOOLEAN_MUTATE_SERVICE = false
+_G.TEST_BOOLEAN_SERVICE_READS = 0
 _G.TEST_BOOLEAN_WITNESS = {
   kind = "boolean-private-root",
   output = {type = "item", name = "lab-kit"},
@@ -70,7 +72,10 @@ function context:replace_epoch(name, value)
   return value
 end
 function context:state_epoch(name) return self.epochs[name] end
-function context:service(name) return self.services[name] end
+function context:service(name)
+  _G.TEST_BOOLEAN_SERVICE_READS = _G.TEST_BOOLEAN_SERVICE_READS + 1
+  return self.services[name]
+end
 _G.TEST_BOOLEAN_CONTEXT = context
 
 local recipe_index = {kind = "recipe-index"}
@@ -172,6 +177,9 @@ package.preload["prototypes.mir.capabilities.science_integration.recipe_route_fe
       end
       if _G.TEST_BOOLEAN_MUTATE_SOURCE then
         _G.TEST_BOOLEAN_SOURCE_EPOCH = "boolean-epoch-b"
+      end
+      if _G.TEST_BOOLEAN_MUTATE_SERVICE then
+        context.services["science.pack_production_status"] = function() return "foreign" end
       end
       if _G.TEST_BOOLEAN_RETURN_FALSE then return nil end
       return _G.TEST_BOOLEAN_WITNESS
