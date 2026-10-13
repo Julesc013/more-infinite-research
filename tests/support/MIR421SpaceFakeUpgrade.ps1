@@ -322,8 +322,20 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
     $path=Join-Path $directory 'control.lua';Assert-MIRLibraryPath $path
     $text=Get-Content -LiteralPath $path -Raw
     $anchor='local added_422_setting_defaults = {}'
+    $completeStateGate='  and to_version:match("^4%.2%.210%d%d$")'
+    $completeStateHooks=@('    export_state("source")','    export_state("upgrade")','      export_state("reload")')
     if([regex]::Matches($text,[regex]::Escape($anchor)).Count-ne1){throw '[mir430-full-upgrade-setting-anchor]'}
-    [IO.File]::WriteAllText($path,$text.Replace($anchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}'),[Text.UTF8Encoding]::new($false))
+    if([regex]::Matches($text,[regex]::Escape($completeStateGate)).Count-ne1-or
+       @($completeStateHooks|Where-Object {-not$text.Contains($_)}).Count){
+      throw '[mir430-full-upgrade-complete-state-anchor]'
+    }
+    $text=$text.Replace($anchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')
+    # The same Full fixture that authorizes the newly added selector must retain
+    # the complete-state path on the exact cross-minor F210 destination. The
+    # source, upgrade and reload hooks above remain mandatory and are checked
+    # before this private fixture transformation.
+    $text=$text.Replace($completeStateGate,('  and (to_version:match("^4%.2%.210%d%d$") or to_version == "'+$ToVersion+'")'))
+    [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
     return
   }
   $path=Join-Path $directory 'mir422_complete_state.lua';Assert-MIRLibraryPath $path

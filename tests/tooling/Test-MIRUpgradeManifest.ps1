@@ -899,11 +899,28 @@ if($f200Published410Info.version-cne'0.1.49'-or-not$f200Published410Control.Cont
 $mir43Assertions++
 $f210FullSettingFixture=Join-Path $mir43FixtureRoot 'mir43-f210-full-setting-allowance'
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210FullSettingFixture -Recurse
-Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210FullSettingFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21002'
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210FullSettingFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21002' -SpaceAge
 Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210FullSettingFixture -FromVersion '4.2.21002' -ToVersion '4.3.21000'
-if(-not(Get-Content -LiteralPath (Join-Path $f210FullSettingFixture 'control.lua') -Raw).Contains('local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')){
-  throw 'F210 Full selector allowance was not bound to the complete-state fixture'
+$f210FullControl=Get-Content -LiteralPath (Join-Path $f210FullSettingFixture 'control.lua') -Raw
+foreach($needle in @(
+  'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}',
+  'to_version == "4.3.21000"',
+  'export_state("source")',
+  'export_state("upgrade")',
+  'export_state("reload")'
+)){
+  if(-not$f210FullControl.Contains($needle)){throw "F210 Full fixture lost complete-state hook: $needle"}
 }
+$mir43Assertions++
+$f210MissingSourceFixture=Join-Path $mir43FixtureRoot 'mir43-f210-full-missing-source-hook'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210MissingSourceFixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210MissingSourceFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21002' -SpaceAge
+$f210MissingSourceControl=Join-Path $f210MissingSourceFixture 'control.lua'
+$missingSourceText=Get-Content -LiteralPath $f210MissingSourceControl -Raw
+if(-not$missingSourceText.Contains('    export_state("source")')){throw 'F210 source-hook opposing fixture anchor changed'}
+[IO.File]::WriteAllText($f210MissingSourceControl,$missingSourceText.Replace('    export_state("source")','    -- source export removed'),[Text.UTF8Encoding]::new($false))
+$rejected=$false;try{Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210MissingSourceFixture -FromVersion '4.2.21002' -ToVersion '4.3.21000'}catch{$rejected=$_.Exception.Message-ceq'[mir430-full-upgrade-complete-state-anchor]'}
+if(-not$rejected){throw 'F210 Full fixture admitted a missing source complete-state hook'}
 $mir43Assertions++
 foreach($target in @('f110','f100')){
   $code=$target.Substring(1)
