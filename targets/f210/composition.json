@@ -3804,8 +3804,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 78630,
-      "expected_sha256": "6BABED2D869CF90E8729539380DBDAD2488906C990AA4D20449213A667E67E21",
+      "expected_bytes": 79676,
+      "expected_sha256": "0740CD49BD7D0E8FCDF3204F34663DB1B535E6ED7CEA8971DF2F1D5F0B5BC16A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3884,8 +3884,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the separate bounded MIR enrichment provider for F210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 37493,
-      "expected_sha256": "C3020EA1E9D267CADEA951E0C6AAEA7C62A27DE5C6A2F9ABF986BFA3305407FC",
+      "expected_bytes": 37501,
+      "expected_sha256": "8AC9BF88637B2C13D54CE1BADDCF2EBCBC5B42FBCAB6B9BF29E7DA4AC45EB2CA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "copied-provider-dtos-only",
@@ -3973,10 +3973,10 @@
       ]
     },
     {
-      "path": "prototypes/mir/planner/classic/declarations.lua",
+      "path": "prototypes/mir/domain/compiler/classic_declarations.lua",
       "operation": "add",
       "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/planner/classic/declarations.lua",
+      "source_path": "source/prototypes/mir/domain/compiler/classic_declarations.lua",
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f210 without another emitter.",
       "capability_disposition": "included-for-target",
@@ -3996,8 +3996,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f210 without another emitter.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 31238,
-      "expected_sha256": "938A5D604660046993F7CC52052EEACDC283252DEB0B89CB79E46510F6A98468",
+      "expected_bytes": 31428,
+      "expected_sha256": "47BA7396AAAAF540B668C1CC19509BA4B295F4CDC1A1D29676F9A480B37B60E9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -4027,5 +4027,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "B4540717FAB864E1783A348DF31DA947248B22BA076EE21B7F52C3A8A23FF2A6"
+  "record_sha256": "376D61BB0A020530BFCF720E6924FA034EF6723342E43A12B50641478734F694"
 }

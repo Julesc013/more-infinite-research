@@ -343,6 +343,14 @@ check(find(ancestor_shape.base_candidates, "braking-force").reason == "classic_n
 data.raw.technology["braking-force-1"].prerequisites = {}
 data.raw.technology["classic-bounded-ancestor"] = nil
 
+local saved_native_max_level = data.raw.technology["braking-force-1"].max_level
+data.raw.technology["braking-force-1"].max_level = 4294967295
+local continuation_level_bound = plan.compile()
+check(find(continuation_level_bound.base_candidates, "braking-force").reason
+  == "classic_native_continuation_level_bound",
+  "a native terminal at uint32 maximum is rejected before an overflowing continuation is built")
+data.raw.technology["braking-force-1"].max_level = saved_native_max_level
+
 local overwide_effects = {}
 for index = 1, 65 do overwide_effects[index] = {type = "character-mining-speed", modifier = 0.01} end
 data.raw.technology["braking-force-1"].effects = overwide_effects

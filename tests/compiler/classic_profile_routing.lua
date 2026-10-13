@@ -198,7 +198,7 @@ local actual_context = actual_classic.run()
 local actual_selected = actual_context:state_snapshot("classic_compilation_plan")
 local actual_profile = actual_context:state_snapshot("classic_profile")
 local actual_receipt = actual_context:state_snapshot("classic_mutation_journal")
-local expected_direct = require("prototypes.mir.planner.classic.declarations").direct_streams
+local expected_direct = require("prototypes.mir.domain.compiler.classic_declarations").direct_streams
 local emitted_direct = 0
 for _, declaration in pairs(expected_direct) do
   local technology = data.raw.technology[declaration.technology_name]

@@ -768,7 +768,7 @@ end
 -- continuation identities depend on the observed tail, so they are omitted
 -- here rather than guessed from a declaration list.
 local function f200_classic_profile(force)
-  local declarations = require("prototypes.mir.planner.classic.declarations")
+  local declarations = require("prototypes.mir.domain.compiler.classic_declarations")
   local ids = {}
   for _, declaration in pairs(declarations.direct_streams or {}) do
     local technology = force and force.technologies and force.technologies[declaration.technology_name]

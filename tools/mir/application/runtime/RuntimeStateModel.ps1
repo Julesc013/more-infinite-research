@@ -34,7 +34,9 @@ function Get-MIR4RuntimeContinuityAuthority {
   foreach ($flag in @('semantic_authority','player_package_mutation_authorized','runtime_registration_mutation_authorized','migration_execution_authorized','public_support_authorized','signing_or_sealing_authorized','publication_authorized')) {
     if ([bool]$authority.$flag) { throw "[mir4-runtime-continuity-boundary] $flag" }
   }
-  if (@($authority.runtime_features.id | Sort-Object -Unique).Count -ne 8) { throw '[mir4-runtime-feature-count]' }
+  # This is a frozen W04 predecessor.  Current runtime additions are read from
+  # a separate append-only authority below; do not rewrite this inventory.
+  if (@($authority.runtime_features.id | Sort-Object -Unique).Count -ne 7) { throw '[mir4-runtime-feature-count]' }
   if (@($authority.state_specs.id | Sort-Object -Unique).Count -ne 5) { throw '[mir4-state-spec-count]' }
   if (@($authority.registration_groups.id | Sort-Object -Unique).Count -ne 9) { throw '[mir4-registration-group-count]' }
   if (@($authority.migration_edges.id | Sort-Object -Unique).Count -ne 10) { throw '[mir4-migration-edge-count]' }
@@ -43,6 +45,109 @@ function Get-MIR4RuntimeContinuityAuthority {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir4-runtime-terminal-authority] $relative" }
   }
   return $authority
+}
+
+function Get-MIR4ClassicRuntimeNoticeAuthority {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = Get-MIR4PlatformRepoRoot $RepoRoot
+  $relative = 'governance/repository/mir430-classic-runtime-notice-v1.json'
+  $path = Join-Path $repo $relative
+  $schemaPath = Join-Path $repo 'spec/schemas/mir430-classic-runtime-notice-v1.schema.json'
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or -not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) {
+    throw '[mir430-classic-runtime-notice-authority-missing]'
+  }
+  $raw = Get-Content -Raw -LiteralPath $path
+  if (-not ($raw | Test-Json -SchemaFile $schemaPath)) { throw '[mir430-classic-runtime-notice-authority-schema]' }
+  $authority = $raw | ConvertFrom-Json
+  if ([string]$authority.predecessor.path -cne '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json' -or
+      [string]$authority.predecessor.kind -cne 'MIR4RuntimeContinuityProgrammeV1' -or
+      [string]$authority.predecessor.programme_id -cne 'M4C02-09-24H') { throw '[mir430-classic-runtime-notice-predecessor]' }
+  foreach ($flag in @('runtime_registration_mutation_authorized','migration_execution_authorized','public_support_authorized','signing_or_sealing_authorized','publication_authorized')) {
+    if ($authority.$flag -isnot [bool] -or [bool]$authority.$flag) { throw "[mir430-classic-runtime-notice-boundary] $flag" }
+  }
+  $feature = $authority.feature
+  if ([string]$feature.id -cne 'runtime.compiler-profile-notice' -or [int]$feature.version -ne 1 -or
+      [string]$feature.source -cne 'prototypes/mir/runtime/compiler_profile_notice.lua' -or
+      (@($feature.handlers) -join '|') -cne 'on_init|on_load|on_configuration_changed' -or
+      (@($feature.target_requirements) -join '|') -cne 'scripted_techs' -or @($feature.state_ids).Count -ne 0 -or
+      [string]$feature.determinism -cne 'one-shot-load-selection-and-connected-player-order' -or
+      [int]$feature.complexity_budget.one_shot_tick -ne 1 -or [string]$feature.complexity_budget.player_scan -cne 'O(connected_players)' -or
+      [int]$feature.complexity_budget.idle_tick -ne 0 -or [int]$feature.complexity_budget.diagnostics_per_dispatch -ne 0 -or
+      (@($feature.migration_refs) -join '|') -cne 'migration.same-target|migration.profile-schema' -or
+      [string]$feature.disable_or_removal -cne 'full-profile-is-silent-and-no-persistent-notice-state-is-retained') {
+    throw '[mir430-classic-runtime-notice-feature]'
+  }
+  $expectedSubscribers = [ordered]@{
+    'lifecycle.init' = [ordered]@{registration='script.on_init';placement='append';subscriber='runtime.compiler-profile-notice:on_init'}
+    'lifecycle.configuration-changed' = [ordered]@{registration='script.on_configuration_changed';placement='before:runtime.planet-discovery-recovery:on_configuration_changed';subscriber='runtime.compiler-profile-notice:on_configuration_changed'}
+  }
+  $actualGroups = @($authority.registration_subscribers | ForEach-Object { [string]$_.group_id })
+  if ($actualGroups.Count -ne $expectedSubscribers.Count -or (@($actualGroups | Sort-Object) -join '|') -cne (@($expectedSubscribers.Keys | Sort-Object) -join '|')) {
+    throw '[mir430-classic-runtime-notice-subscriber-groups]'
+  }
+  foreach ($groupId in @($expectedSubscribers.Keys)) {
+    $row = @($authority.registration_subscribers | Where-Object { [string]$_.group_id -ceq $groupId })
+    $expected = $expectedSubscribers[$groupId]
+    if ($row.Count -ne 1 -or [string]$row[0].registration -cne [string]$expected.registration -or [string]$row[0].placement -cne [string]$expected.placement -or
+        (@($row[0].subscribers) -join '|') -cne [string]$expected.subscriber) { throw "[mir430-classic-runtime-notice-subscriber] $groupId" }
+  }
+  if ([string]$authority.on_load.owner -cne 'prototypes/mir/runtime/scripted_techs.lua' -or
+      [string]$authority.on_load.handler -cne 'anonymous-coordinator' -or
+      (@($authority.on_load.callbacks) -join '|') -cne 'compiler_profile_notice.on_load' -or
+      $authority.on_load.read_only_restoration -isnot [bool] -or -not [bool]$authority.on_load.read_only_restoration -or
+      [int]$authority.on_load.registration_count -ne 1) { throw '[mir430-classic-runtime-notice-on-load]' }
+  if ([string]$authority.on_tick.owner -cne 'compiler_profile_notice.on_load' -or
+      [string]$authority.on_tick.handler -cne 'compiler_profile_notice.deliver_deferred_load_notice' -or
+      $authority.on_tick.registered -isnot [bool] -or -not [bool]$authority.on_tick.registered -or
+      $authority.on_tick.conditional_one_shot -isnot [bool] -or -not [bool]$authority.on_tick.conditional_one_shot -or
+      $authority.on_tick.unsubscribes_before_delivery -isnot [bool] -or -not [bool]$authority.on_tick.unsubscribes_before_delivery -or
+      [int]$authority.on_tick.budget -ne 1) { throw '[mir430-classic-runtime-notice-on-tick]' }
+  return $authority
+}
+
+function Get-MIR4RuntimeEffectiveContinuityAuthority {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = Get-MIR4PlatformRepoRoot $RepoRoot
+  $base = Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
+  $current = Get-MIR4ClassicRuntimeNoticeAuthority -RepoRoot $repo
+  $effective = $base | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+  $featureIds = @($base.runtime_features | ForEach-Object { [string]$_.id })
+  if ($featureIds -contains [string]$current.feature.id) { throw '[mir430-classic-runtime-notice-feature-collision]' }
+  $effective.runtime_features = @($base.runtime_features) + @($current.feature)
+  $additionsByGroup = @{}
+  foreach ($addition in @($current.registration_subscribers)) {
+    $groupId = [string]$addition.group_id
+    if ($additionsByGroup.ContainsKey($groupId)) { throw "[mir430-classic-runtime-notice-duplicate-group] $groupId" }
+    $additionsByGroup[$groupId] = [ordered]@{placement=[string]$addition.placement;subscribers=@($addition.subscribers | ForEach-Object { [string]$_ })}
+  }
+  $effectiveGroups = @(
+    foreach ($group in @($base.registration_groups)) {
+      $groupId = [string]$group.id
+      $subscribers = @($group.subscribers | ForEach-Object { [string]$_ })
+      if ($additionsByGroup.ContainsKey($groupId)) {
+        $addition = $additionsByGroup[$groupId]
+        if ([string]$addition.placement -ceq 'append') {
+          $subscribers += @($addition.subscribers)
+        } elseif ([string]$addition.placement -clike 'before:*') {
+          $anchor = ([string]$addition.placement).Substring('before:'.Length)
+          $index = [array]::IndexOf([string[]]$subscribers, $anchor)
+          if ($index -lt 0) { throw "[mir430-classic-runtime-notice-placement-anchor] $groupId" }
+          $before = if ($index -eq 0) { @() } else { @($subscribers[0..($index - 1)]) }
+          $subscribers = $before + @($addition.subscribers) + @($subscribers[$index..($subscribers.Count - 1)])
+        } else { throw "[mir430-classic-runtime-notice-placement] $groupId" }
+        $additionsByGroup.Remove($groupId)
+      }
+      [pscustomobject][ordered]@{id=$groupId;registration=[string]$group.registration;filter=[string]$group.filter;subscribers=$subscribers}
+    }
+  )
+  if ($additionsByGroup.Count -ne 0) { throw '[mir430-classic-runtime-notice-unknown-group]' }
+  $effective.registration_groups = $effectiveGroups
+  $reference = [ordered]@{
+    path='governance/repository/mir430-classic-runtime-notice-v1.json';kind=[string]$current.kind;authority_id=[string]$current.authority_id
+    sha256=(Get-MIR4PlatformInputSha256 (Join-Path $repo 'governance/repository/mir430-classic-runtime-notice-v1.json'))
+  }
+  $effective | Add-Member -NotePropertyName current_additive_authority -NotePropertyValue $reference
+  return $effective
 }
 
 function New-MIR4RuntimeSourceIdentity {
@@ -92,7 +197,7 @@ function Get-MIR4RuntimeTargetDisposition {
 function New-MIR4RuntimeFeatureSpecs {
   param([Parameter(Mandatory)][string]$RepoRoot,[AllowNull()]$Providers)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
-  $authority = Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
+  $authority = Get-MIR4RuntimeEffectiveContinuityAuthority -RepoRoot $repo
   $contexts = @(Get-MIR4RuntimeTargetContexts -RepoRoot $repo -Providers $Providers)
   return @(
     foreach ($feature in @($authority.runtime_features | Sort-Object id)) {
@@ -120,6 +225,8 @@ function New-MIR4RuntimeFeatureSpecs {
 function New-MIR4StateSpecs {
   param([Parameter(Mandatory)][string]$RepoRoot,[AllowNull()]$Providers,[Parameter(Mandatory)]$RuntimeFeatures)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
+  # State buckets remain entirely owned by the frozen W04 predecessor.  The
+  # current notice authority declares no persistent state.
   $authority = Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
   $contexts = @(Get-MIR4RuntimeTargetContexts -RepoRoot $repo -Providers $Providers)
   $featureById = @{}; foreach ($feature in @($RuntimeFeatures)) { $featureById[[string]$feature.id] = $feature }
@@ -229,11 +336,12 @@ function Assert-MIR4RuntimeRegistrationPlan {
 }
 
 function Get-MIR4RuntimeOnLoadSourceRegistration {
-  param([Parameter(Mandatory)][string]$HostText)
+  param([Parameter(Mandatory)][string]$HostText,[string]$NoticeCallback='compiler_profile_notice.on_load')
   $registrations = @([regex]::Matches($HostText, 'script\s*\.\s*on_load\s*\('))
   # Recognize the reviewed coordinator, including its Library capability guard.
   # Additional statements, alternate guards and extra registrations stay denied.
-  $approved = @([regex]::Matches($HostText, 'script\s*\.\s*on_load\s*\(\s*function\s*\(\s*\)\s*passive_repair\s*\.\s*on_load\s*\(\s*\)\s*if\s+research_browser\s+then\s+research_browser\s*\.\s*on_load\s*\(\s*\)\s*end\s*compiler_profile_notice\s*\.\s*on_load\s*\(\s*\)\s*end\s*\)'))
+  $approvedPattern = 'script\s*\.\s*on_load\s*\(\s*function\s*\(\s*\)\s*passive_repair\s*\.\s*on_load\s*\(\s*\)\s*if\s+research_browser\s+then\s+research_browser\s*\.\s*on_load\s*\(\s*\)\s*end\s*' + [regex]::Escape($NoticeCallback) + '\s*\(\s*\)\s*end\s*\)'
+  $approved = @([regex]::Matches($HostText, $approvedPattern))
   if ($registrations.Count -ne 1 -or $approved.Count -ne 1) { throw '[mir4-runtime-on-load-registration]' }
   return [pscustomobject]@{registration_count=$registrations.Count;approved_registration_count=$approved.Count}
 }
@@ -245,7 +353,9 @@ function New-MIR4RuntimeRegistrationPlan {
     . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
   }
   $targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
-  $authority = Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
+  $authority = Get-MIR4RuntimeEffectiveContinuityAuthority -RepoRoot $repo
+  $noticeAuthority = Get-MIR4ClassicRuntimeNoticeAuthority -RepoRoot $repo
+  $onLoadCallbacks = @('passive_repair.on_load','research_browser.on_load') + @($noticeAuthority.on_load.callbacks | ForEach-Object { [string]$_ })
   $featureById = @{}; foreach ($feature in @($RuntimeFeatures)) { $featureById[[string]$feature.id] = $feature }
   $dispatcherPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/runtime/scripted_techs.lua'
   $stagePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/stage/control.lua'
@@ -267,17 +377,18 @@ function New-MIR4RuntimeRegistrationPlan {
       [ordered]@{id=[string]$group.id;registration=$registration;filter=[string]$group.filter;subscribers=$subscribers}
     }
   )
-  $noticePath = Resolve-MIR4RuntimeProgrammePath -RepoRoot $repo -RelativePath 'prototypes/mir/runtime/compiler_profile_notice.lua'
+  $noticePath = Resolve-MIR4RuntimeProgrammePath -RepoRoot $repo -RelativePath ([string]$noticeAuthority.feature.source)
   $noticeText = Get-Content -Raw -LiteralPath $noticePath
+  $onTickSourceHandler = @([string]$noticeAuthority.on_tick.handler -split '\.')[-1]
   $runtimeSourceRoot = Join-Path $repo 'source/prototypes/mir/runtime'
   $onTickSources = @(
     Get-ChildItem -LiteralPath $runtimeSourceRoot -Recurse -File -Filter '*.lua' |
       Where-Object { (Get-Content -Raw -LiteralPath $_.FullName) -match 'defines\.events\.on_tick' } |
       ForEach-Object { [System.IO.Path]::GetRelativePath((Join-Path $repo 'source'), $_.FullName).Replace('\','/') }
   )
-  if ($onTickSources.Count -ne 1 -or $onTickSources[0] -cne 'prototypes/mir/runtime/compiler_profile_notice.lua' -or
+  if ($onTickSources.Count -ne 1 -or $onTickSources[0] -cne [string]$noticeAuthority.feature.source -or
       @([regex]::Matches($noticeText, 'script\s*\.\s*on_event\s*\(\s*defines\s*\.\s*events\s*\.\s*on_tick\s*,')).Count -ne 2 -or
-      $noticeText -notmatch 'script\s*\.\s*on_event\s*\(\s*defines\s*\.\s*events\s*\.\s*on_tick\s*,\s*deliver_deferred_load_notice\s*\)' -or
+      $noticeText -notmatch ('script\s*\.\s*on_event\s*\(\s*defines\s*\.\s*events\s*\.\s*on_tick\s*,\s*' + [regex]::Escape($onTickSourceHandler) + '\s*\)') -or
       $noticeText -notmatch 'script\s*\.\s*on_event\s*\(\s*defines\s*\.\s*events\s*\.\s*on_tick\s*,\s*nil\s*\)') { throw '[mir4-runtime-unbudgeted-on-tick]' }
   $onLoadHosts = @(
     foreach ($hostTarget in @('f210','f200')) {
@@ -285,9 +396,9 @@ function New-MIR4RuntimeRegistrationPlan {
       $hostDispatcherPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $hostPackage -RelativePath 'prototypes/mir/runtime/scripted_techs.lua'
       $hostStagePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $hostPackage -RelativePath 'prototypes/mir/stage/control.lua'
       $hostText = (Get-Content -Raw -LiteralPath $hostDispatcherPath) + "`n" + (Get-Content -Raw -LiteralPath $hostStagePath)
-      $registration = Get-MIR4RuntimeOnLoadSourceRegistration -HostText $hostText
+      $registration = Get-MIR4RuntimeOnLoadSourceRegistration -HostText $hostText -NoticeCallback ([string]$noticeAuthority.on_load.callbacks[0])
       [ordered]@{
-        target=$hostTarget;approved_handler='anonymous-coordinator';approved_callbacks=@('passive_repair.on_load','research_browser.on_load','compiler_profile_notice.on_load');registration_count=$registration.registration_count;approved_registration_count=$registration.approved_registration_count
+        target=$hostTarget;approved_handler=[string]$noticeAuthority.on_load.handler;approved_callbacks=$onLoadCallbacks;registration_count=$registration.registration_count;approved_registration_count=$registration.approved_registration_count
         source_identity=[ordered]@{
           dispatcher=[ordered]@{path='prototypes/mir/runtime/scripted_techs.lua';sha256=(Get-MIR4PlatformInputSha256 $hostDispatcherPath)}
           stage=[ordered]@{path='prototypes/mir/stage/control.lua';sha256=(Get-MIR4PlatformInputSha256 $hostStagePath)}
@@ -299,9 +410,9 @@ function New-MIR4RuntimeRegistrationPlan {
     kind='MIR4RuntimeRegistrationPlanV1';schema=1;owner='prototypes/mir/runtime/scripted_techs.lua';owner_sha256=(Get-MIR4PlatformInputSha256 $dispatcherPath);groups=$groups
     ordering='authority-array-preserved-as-explicit-ordinal';filter_before_dispatch=$true;one_registration_per_group=$true
     on_load=[ordered]@{
-      registered=$true;handler='anonymous-coordinator';callbacks=@('passive_repair.on_load','research_browser.on_load','compiler_profile_notice.on_load');read_only_restoration=$true;registration_count=1;hosts=$onLoadHosts
+      registered=$true;handler=[string]$noticeAuthority.on_load.handler;callbacks=$onLoadCallbacks;read_only_restoration=[bool]$noticeAuthority.on_load.read_only_restoration;registration_count=[int]$noticeAuthority.on_load.registration_count;hosts=$onLoadHosts
       persistent_mutation=$false
-    };on_tick=[ordered]@{registered=$true;conditional_one_shot=$true;owner='compiler_profile_notice.on_load';handler='compiler_profile_notice.deliver_deferred_load_notice';budget=1;unsubscribes_before_delivery=$true}
+    };on_tick=[ordered]@{registered=[bool]$noticeAuthority.on_tick.registered;conditional_one_shot=[bool]$noticeAuthority.on_tick.conditional_one_shot;owner=[string]$noticeAuthority.on_tick.owner;handler=[string]$noticeAuthority.on_tick.handler;budget=[int]$noticeAuthority.on_tick.budget;unsubscribes_before_delivery=[bool]$noticeAuthority.on_tick.unsubscribes_before_delivery}
     cross_feature_state_mutation=$false;duplicate_rejection=$true;maximum_diagnostics_per_dispatch=64
     law_results=[ordered]@{unique_groups=$true;unique_subscribers=$true;stable_order=$true;filter_before_dispatch=$true;no_on_load_mutation=$true;one_shot_on_load_tick=$true;no_idle_tick=$true;namespace_isolation=$true;bounded_diagnostics=$true;all_passed=$true}
   }
@@ -313,6 +424,7 @@ function New-MIR4RuntimeStateMatrix {
   param([Parameter(Mandatory)][string]$RepoRoot,[AllowNull()]$Providers,[AllowNull()]$SourceIdentity)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
   $authority = Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
+  $effectiveAuthority = Get-MIR4RuntimeEffectiveContinuityAuthority -RepoRoot $repo
   $contexts = @(Get-MIR4RuntimeTargetContexts -RepoRoot $repo -Providers $Providers)
   $features = @(New-MIR4RuntimeFeatureSpecs -RepoRoot $repo -Providers @($contexts.provider))
   $states = @(New-MIR4StateSpecs -RepoRoot $repo -Providers @($contexts.provider) -RuntimeFeatures $features)
@@ -327,7 +439,7 @@ function New-MIR4RuntimeStateMatrix {
   )
   $record = [pscustomobject][ordered]@{
     schema=1;kind='MIR4RuntimeStateMatrixV1';programme_id=[string]$authority.programme_id;source_identity=(New-MIR4RuntimeSourceIdentity $SourceIdentity)
-    authority='.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json';maturity='shadow';runtime_feature_specs=$features;state_specs=$states;registration_plan=$registration;targets=$targets
+    authority='.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json';current_additive_authority=$effectiveAuthority.current_additive_authority;maturity='shadow';runtime_feature_specs=$features;state_specs=$states;registration_plan=$registration;targets=$targets
     invariants=@('terminal-runtime-remains-player-authority','runtime-never-mutates-prototypes','state-owned-under-mir-namespace','backend-derived-from-target-profile','field-aware-state-classification','one-registration-per-event-filter-group','filter-before-dispatch','stable-subscriber-order','no-on-load-persistent-mutation','one-shot-on-load-notice-tick','no-idle-on-tick','no-cross-feature-state-mutation','bounded-diagnostics')
     package_visible=$false;runtime_mutation_authorized=$false;public_release_proof=$false;digest=''
   }

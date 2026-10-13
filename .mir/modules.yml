@@ -1269,6 +1269,7 @@ modules:
     - prototypes/mir/index/rule_surfaces.lua
     - prototypes/mir/index/recycling.lua
   domain:
+    - prototypes/mir/domain/compiler/classic_declarations.lua
     - prototypes/mir/domain/facts/registry.lua
     - prototypes/mir/domain/facts/recipe_semantics.lua
     - prototypes/mir/domain/facts/generated_technology_registry.lua
@@ -1378,7 +1379,6 @@ modules:
     - prototypes/mir/presentation/icon_builder.lua
   planner:
     - prototypes/mir/planner/compiler.lua
-    - prototypes/mir/planner/classic/declarations.lua
     - prototypes/mir/planner/classic/plan.lua
     - prototypes/mir/planner/compilation_plan.lua
     - prototypes/mir/planner/compilation_plan/model.lua
@@ -2012,6 +2012,8 @@ validation_tooling:
     mir4_semantic_compiler_gate: tests/mir4/Test-MIR4SemanticCompilationW03.ps1
     mir4_runtime_state_model: tools/mir/application/runtime/RuntimeStateModel.ps1
     mir4_runtime_continuity_authority: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
+    mir4_runtime_continuity_classic_notice_authority: governance/repository/mir430-classic-runtime-notice-v1.json
+    mir4_runtime_continuity_classic_notice_schema: spec/schemas/mir430-classic-runtime-notice-v1.schema.json
     mir4_runtime_continuity_migration_authority: governance/repository/migrations/runtime-continuity-tooling-v1.json
     mir4_runtime_continuity_migration_proof: assurance/repository/runtime-continuity-tooling-v1.json
     mir4_runtime_continuity_migration_receipt: releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json

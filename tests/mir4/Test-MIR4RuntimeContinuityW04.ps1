@@ -14,6 +14,24 @@ $ErrorActionPreference='Stop'
 $hostedReceiptOnly=Test-MIR4HostedReceiptOnly
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4RuntimeContinuityAuthority -RepoRoot $RepoRoot
+$currentAuthority=Get-MIR4ClassicRuntimeNoticeAuthority -RepoRoot $RepoRoot
+$effectiveAuthority=Get-MIR4RuntimeEffectiveContinuityAuthority -RepoRoot $RepoRoot
+if(@($authority.runtime_features).Count-ne7-or@($authority.runtime_features|Where-Object id -eq 'runtime.compiler-profile-notice').Count-ne0-or
+   @($authority.registration_groups|Where-Object id -eq 'lifecycle.init')[0].subscribers -contains 'runtime.compiler-profile-notice:on_init' -or
+   @($authority.registration_groups|Where-Object id -eq 'lifecycle.configuration-changed')[0].subscribers -contains 'runtime.compiler-profile-notice:on_configuration_changed'){
+  throw '[mir4-w04-frozen-authority-rewritten]'
+}
+if([string]$currentAuthority.authority_id-cne'MIR430-CLASSIC-RUNTIME-NOTICE-V1'-or
+   @($effectiveAuthority.runtime_features).Count-ne8-or
+   @($effectiveAuthority.runtime_features|Where-Object id -eq 'runtime.compiler-profile-notice').Count-ne1-or
+   -not(@(@($effectiveAuthority.registration_groups|Where-Object id -eq 'lifecycle.init')[0].subscribers)-contains 'runtime.compiler-profile-notice:on_init') -or
+   -not(@(@($effectiveAuthority.registration_groups|Where-Object id -eq 'lifecycle.configuration-changed')[0].subscribers)-contains 'runtime.compiler-profile-notice:on_configuration_changed')){
+  throw '[mir4-w04-current-notice-authority]'
+}
+if((@(@($effectiveAuthority.registration_groups|Where-Object id -eq 'lifecycle.configuration-changed')[0].subscribers)-join'|')-cne
+   'runtime.spoilage-preservation:on_configuration_changed|runtime.agricultural-growth-speed:on_configuration_changed|runtime.productivity-family-adoption:on_configuration_changed|runtime.maximum-level-control:on_configuration_changed|runtime.compiler-profile-notice:on_configuration_changed|runtime.planet-discovery-recovery:on_configuration_changed'){
+  throw '[mir4-w04-current-notice-order]'
+}
 foreach($target in @('f210','f200')){
   $dispatcherPath=Join-Path $RepoRoot "source/adapters/$target/prototypes/mir/runtime/scripted_techs.lua"
   $dispatcher=[IO.File]::ReadAllText($dispatcherPath)
@@ -41,7 +59,7 @@ foreach($target in @('f210','f200')){
 # The same writer consumes current composed dispatcher/stage bytes. This mode
 # avoids unrelated SDK generation or native campaigns when selecting this fix.
 if($RegistrationOnly){
-  $plan=New-MIR4RuntimeRegistrationPlan -RepoRoot $RepoRoot -RuntimeFeatures $authority.runtime_features
+  $plan=New-MIR4RuntimeRegistrationPlan -RepoRoot $RepoRoot -RuntimeFeatures $effectiveAuthority.runtime_features
   Assert-MIR4RuntimeRegistrationPlan -Plan $plan|Out-Null
   Write-Host '[ok] Current composed runtime registration and 16 guarded callback source cases passed.'
   return

@@ -122,7 +122,7 @@ check("CBR-08", modern.list_snapshot(force).compiler_scope == nil,
 
 _G.settings = {startup = {["mir-compiler-profile"] = {value = "classic"}}}
 local legacy, legacy_prototypes = provider_for(false)
-local declarations = require("prototypes.mir.planner.classic.declarations")
+local declarations = require("prototypes.mir.domain.compiler.classic_declarations")
 local reach = declarations.direct_streams.research_character_reach
 local mining = declarations.direct_streams.research_character_mining_speed
 local legacy_force = {valid = true, technologies = {

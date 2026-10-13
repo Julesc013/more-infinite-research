@@ -13,6 +13,8 @@ function Assert-MIR4RuntimeContinuityV1 {
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $compatibilityBefore=(Get-FileHash -LiteralPath (Join-Path $repo '.mir/compatibility.yml') -Algorithm SHA256).Hash
 $providers=@(New-MIR4NormalizedTargetProviders -RepoRoot $repo)
+$baselineAuthority=Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
+$currentAuthority=Get-MIR4ClassicRuntimeNoticeAuthority -RepoRoot $repo
 $runtime=New-MIR4RuntimeStateMatrix -RepoRoot $repo -Providers $providers -SourceIdentity $null
 $runtimeReverse=New-MIR4RuntimeStateMatrix -RepoRoot $repo -Providers @($providers|Sort-Object id -Descending) -SourceIdentity $null
 $migration=New-MIR4MigrationGraphMatrix -RepoRoot $repo -Providers $providers -SourceIdentity $null
@@ -22,6 +24,12 @@ $continuity=New-MIR4ContinuityBundle -RepoRoot $repo -Providers $providers -Sour
 Assert-MIR4RuntimeContinuityV1 ($providers.Count-eq17-and@($runtime.targets).Count-eq17-and@($continuity.targets).Count-eq17) 'mir4-runtime-continuity-target-count'
 Assert-MIR4RuntimeContinuityV1 ([string]$runtime.digest-ceq[string]$runtimeReverse.digest-and[string]$migration.digest-ceq[string]$migrationReverse.digest) 'mir4-runtime-continuity-order-parity'
 Assert-MIR4RuntimeContinuityV1 (@($runtime.runtime_feature_specs).Count-eq8-and@($runtime.state_specs).Count-eq5-and@($runtime.registration_plan.groups).Count-eq9-and@($migration.edges).Count-eq10) 'mir4-runtime-continuity-contract-counts'
+Assert-MIR4RuntimeContinuityV1 (@($baselineAuthority.runtime_features).Count-eq7-and@($baselineAuthority.runtime_features|Where-Object id -eq 'runtime.compiler-profile-notice').Count-eq0) 'mir4-runtime-continuity-frozen-predecessor'
+Assert-MIR4RuntimeContinuityV1 ([string]$currentAuthority.authority_id-ceq'MIR430-CLASSIC-RUNTIME-NOTICE-V1'-and
+  [string]$runtime.current_additive_authority.path-ceq'governance/repository/mir430-classic-runtime-notice-v1.json'-and
+  [string]$runtime.current_additive_authority.kind-ceq'MIR430ClassicRuntimeNoticeAuthorityV1'-and
+  [string]$runtime.current_additive_authority.authority_id-ceq'MIR430-CLASSIC-RUNTIME-NOTICE-V1'-and
+  [string]$runtime.current_additive_authority.sha256-ceq(Get-MIR4PlatformInputSha256 (Join-Path $repo 'governance/repository/mir430-classic-runtime-notice-v1.json'))) 'mir4-runtime-continuity-current-notice-authority'
 Assert-MIR4RuntimeContinuityV1 ([bool]$runtime.registration_plan.law_results.all_passed-and[bool]$migration.law_results.all_passed) 'mir4-runtime-continuity-laws'
 Assert-MIR4RuntimeContinuityV1 (-not[bool]$runtime.package_visible-and-not[bool]$migration.package_visible-and-not[bool]$continuity.package_visible-and-not[bool]$runtime.runtime_mutation_authorized-and-not[bool]$migration.migration_execution_authorized-and-not[bool]$continuity.runtime_mutation_authorized) 'mir4-runtime-continuity-authority-firewall'
 Assert-MIR4RuntimeContinuityV1 (-not[bool]$runtime.public_release_proof-and-not[bool]$migration.public_release_proof-and-not[bool]$continuity.public_release_proof) 'mir4-runtime-continuity-public-proof-firewall'
@@ -43,7 +51,7 @@ $record=[ordered]@{
   public_release_proof=[bool]$runtime.public_release_proof-or[bool]$migration.public_release_proof-or[bool]$continuity.public_release_proof
 }
 $parity=Get-MIR4CanonicalDigestV1 -Value $record -Domain 'mir4:runtime-continuity-functional-parity:1'
-Assert-MIR4RuntimeContinuityV1 ([string]$parity-ceq'sha256:e73a3b214729b89f3ccb527d58594ffdd81325bc9a1a616e99c02ecebe16355c') 'mir4-runtime-continuity-functional-parity' ([string]$parity)
+Assert-MIR4RuntimeContinuityV1 ([string]$parity-ceq'sha256:36b6c0b8a3d3365469c135bfbab023481420956f726cf07f5948da5d42b26031') 'mir4-runtime-continuity-functional-parity' ([string]$parity)
 
 $tampered=$runtime.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $tampered.groups=@($tampered.groups)+@($tampered.groups[0])

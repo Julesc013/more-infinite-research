@@ -21,6 +21,8 @@ $script:MIR4PlatformInputPaths = @(
   'spec/schemas/mir4-whole-platform-programme-v1.schema.json',
   'spec/schemas/mir4-technology-acceptance-queue-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json',
+  'governance/repository/mir430-classic-runtime-notice-v1.json',
+  'spec/schemas/mir430-classic-runtime-notice-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-F210-MEP-Discovery-ContractV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json',

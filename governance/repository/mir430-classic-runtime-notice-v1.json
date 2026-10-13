@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "MIR430ClassicRuntimeNoticeAuthorityV1",
+  "authority_id": "MIR430-CLASSIC-RUNTIME-NOTICE-V1",
+  "predecessor": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+    "kind": "MIR4RuntimeContinuityProgrammeV1",
+    "programme_id": "M4C02-09-24H"
+  },
+  "feature": {
+    "id": "runtime.compiler-profile-notice",
+    "version": 1,
+    "source": "prototypes/mir/runtime/compiler_profile_notice.lua",
+    "handlers": ["on_init", "on_load", "on_configuration_changed"],
+    "target_requirements": ["scripted_techs"],
+    "state_ids": [],
+    "determinism": "one-shot-load-selection-and-connected-player-order",
+    "complexity_budget": {"one_shot_tick": 1, "player_scan": "O(connected_players)", "idle_tick": 0, "diagnostics_per_dispatch": 0},
+    "migration_refs": ["migration.same-target", "migration.profile-schema"],
+    "disable_or_removal": "full-profile-is-silent-and-no-persistent-notice-state-is-retained"
+  },
+  "registration_subscribers": [
+    {"group_id": "lifecycle.init", "registration": "script.on_init", "placement": "append", "subscribers": ["runtime.compiler-profile-notice:on_init"]},
+    {"group_id": "lifecycle.configuration-changed", "registration": "script.on_configuration_changed", "placement": "before:runtime.planet-discovery-recovery:on_configuration_changed", "subscribers": ["runtime.compiler-profile-notice:on_configuration_changed"]}
+  ],
+  "on_load": {
+    "owner": "prototypes/mir/runtime/scripted_techs.lua",
+    "handler": "anonymous-coordinator",
+    "callbacks": ["compiler_profile_notice.on_load"],
+    "read_only_restoration": true,
+    "registration_count": 1
+  },
+  "on_tick": {
+    "owner": "compiler_profile_notice.on_load",
+    "handler": "compiler_profile_notice.deliver_deferred_load_notice",
+    "registered": true,
+    "conditional_one_shot": true,
+    "unsubscribes_before_delivery": true,
+    "budget": 1
+  },
+  "runtime_registration_mutation_authorized": false,
+  "migration_execution_authorized": false,
+  "public_support_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "scope": "Current additive declaration for the Classic compiler scope notice. It augments the frozen W04 programme without rewriting its historical feature inventory or registration subscribers."
+}

@@ -21,7 +21,7 @@ SOURCES = (
     Path("source/prototypes/mir/stage/data_final_fixes.lua"),
     Path("source/prototypes/mir/pipeline/classic_compiler.lua"),
     Path("source/prototypes/mir/planner/classic/plan.lua"),
-    Path("source/prototypes/mir/planner/classic/declarations.lua"),
+    Path("source/prototypes/mir/domain/compiler/classic_declarations.lua"),
     Path("source/prototypes/mir/planner/compiler.lua"),
 )
 

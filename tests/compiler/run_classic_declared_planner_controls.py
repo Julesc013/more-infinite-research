@@ -23,7 +23,7 @@ def main() -> int:
     runtime_dir = Path(args.lua_runtime_dir).resolve()
     fixture_path = repo / "tests/compiler/classic_declared_planner.lua"
     source_paths = [
-        repo / "source/prototypes/mir/planner/classic/declarations.lua",
+        repo / "source/prototypes/mir/domain/compiler/classic_declarations.lua",
         repo / "source/prototypes/mir/planner/classic/plan.lua",
         repo / "source/adapters/f200/prototypes/mir/platform/factorio/target_profiles.lua",
         repo / "source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua",

@@ -3836,8 +3836,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4719,
-      "expected_sha256": "C4FE17968CC5FB0B026BF8E97C0F5337C97A1F081B8C867EB771D74F4938222E",
+      "expected_bytes": 5765,
+      "expected_sha256": "2B6A45116CED78132BEFC94877638B595AACEFDB465C5552914598D1E3E51060",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3909,10 +3909,10 @@
       ]
     },
     {
-      "path": "prototypes/mir/planner/classic/declarations.lua",
+      "path": "prototypes/mir/domain/compiler/classic_declarations.lua",
       "operation": "add",
       "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/planner/classic/declarations.lua",
+      "source_path": "source/prototypes/mir/domain/compiler/classic_declarations.lua",
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
       "capability_disposition": "included-for-target",
@@ -3932,8 +3932,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 31238,
-      "expected_sha256": "938A5D604660046993F7CC52052EEACDC283252DEB0B89CB79E46510F6A98468",
+      "expected_bytes": 31428,
+      "expected_sha256": "47BA7396AAAAF540B668C1CC19509BA4B295F4CDC1A1D29676F9A480B37B60E9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3963,5 +3963,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "168007BB68C3BF83DBF4114BE29C8B733CE58C89109F1C5ED38E435B194ADE59"
+  "record_sha256": "7D8B5709FEF860173793FCF6EEB70779D099E26EFB36C2FA3B13B05AAFE7539B"
 }

@@ -40,18 +40,6 @@
       "disable_or_removal": "dispatcher-not-registered-when-target-feature-disabled"
     },
     {
-      "id": "runtime.compiler-profile-notice",
-      "version": 1,
-      "source": "prototypes/mir/runtime/compiler_profile_notice.lua",
-      "handlers": ["on_init", "on_load", "on_configuration_changed"],
-      "target_requirements": ["scripted_techs"],
-      "state_ids": [],
-      "determinism": "one-shot-load-selection-and-connected-player-order",
-      "complexity_budget": {"one_shot_tick": 1, "player_scan": "O(connected_players)", "idle_tick": 0, "diagnostics_per_dispatch": 0},
-      "migration_refs": ["migration.same-target", "migration.profile-schema"],
-      "disable_or_removal": "full-profile-is-silent-and-no-persistent-notice-state-is-retained"
-    },
-    {
       "id": "runtime.spoilage-preservation",
       "version": 1,
       "source": "prototypes/mir/runtime/effects/spoilage_preservation.lua",
@@ -193,8 +181,8 @@
     }
   ],
   "registration_groups": [
-    {"id":"lifecycle.init","registration":"script.on_init","filter":"none","subscribers":["runtime.spoilage-preservation:on_init","runtime.agricultural-growth-speed:on_init","runtime.productivity-family-adoption:on_init","runtime.maximum-level-control:on_init","runtime.compiler-profile-notice:on_init"]},
-    {"id":"lifecycle.configuration-changed","registration":"script.on_configuration_changed","filter":"none","subscribers":["runtime.spoilage-preservation:on_configuration_changed","runtime.agricultural-growth-speed:on_configuration_changed","runtime.productivity-family-adoption:on_configuration_changed","runtime.maximum-level-control:on_configuration_changed","runtime.compiler-profile-notice:on_configuration_changed","runtime.planet-discovery-recovery:on_configuration_changed"]},
+    {"id":"lifecycle.init","registration":"script.on_init","filter":"none","subscribers":["runtime.spoilage-preservation:on_init","runtime.agricultural-growth-speed:on_init","runtime.productivity-family-adoption:on_init","runtime.maximum-level-control:on_init"]},
+    {"id":"lifecycle.configuration-changed","registration":"script.on_configuration_changed","filter":"none","subscribers":["runtime.spoilage-preservation:on_configuration_changed","runtime.agricultural-growth-speed:on_configuration_changed","runtime.productivity-family-adoption:on_configuration_changed","runtime.maximum-level-control:on_configuration_changed","runtime.planet-discovery-recovery:on_configuration_changed"]},
     {"id":"event.research-finished","registration":"defines.events.on_research_finished","filter":"valid-research-then-technology-name","subscribers":["runtime.spoilage-preservation:on_research_finished","runtime.agricultural-growth-speed:on_research_finished","runtime.maximum-level-control:on_research_finished"]},
     {"id":"event.research-reversed","registration":"defines.events.on_research_reversed","filter":"valid-research-then-technology-name","subscribers":["runtime.spoilage-preservation:on_research_reversed","runtime.agricultural-growth-speed:on_research_reversed","runtime.maximum-level-control:on_research_reversed"]},
     {"id":"event.research-queued","registration":"defines.events.on_research_queued","filter":"valid-research-then-technology-name","subscribers":["runtime.maximum-level-control:on_research_queued"]},

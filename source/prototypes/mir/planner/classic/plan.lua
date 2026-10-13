@@ -17,7 +17,7 @@ local research_cost_model = require("prototypes.mir.domain.research_cost.model")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local base_builder = require("prototypes.mir.planner.base_continuation_builder")
-local declarations = require("prototypes.mir.planner.classic.declarations")
+local declarations = require("prototypes.mir.domain.compiler.classic_declarations")
 
 local M = {}
 
@@ -608,6 +608,9 @@ local function native_continuation(key, context, chain, prepared_labs, catalog_r
   local terminal_level = chain.levels[#chain.levels]
   for level in pairs(chain.terminals or {}) do
     if level > terminal_level then terminal_level = level end
+  end
+  if not native_uint32(terminal_level) or terminal_level >= MAXIMUM_NATIVE_UINT32 then
+    return nil, base_candidate(key, "reject", "classic_native_continuation_level_bound")
   end
   local tail = (chain.terminals or {})[terminal_level] or chain.by_level[terminal_level]
   if not tail or type(tail.name) ~= "string" or #tail.name > 1024 or type(tail.unit) ~= "table" then

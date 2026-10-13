@@ -15,7 +15,7 @@ SOURCES = (
     Path("source/prototypes/mir/runtime/research_browser_core.lua"),
     Path("source/prototypes/mir/runtime/research_browser.lua"),
     Path("source/prototypes/mir/settings/compiler_profile.lua"),
-    Path("source/prototypes/mir/planner/classic/declarations.lua"),
+    Path("source/prototypes/mir/domain/compiler/classic_declarations.lua"),
     Path("source/locale/en/more-infinite-research.cfg"),
 )
 
