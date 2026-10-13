@@ -4,10 +4,10 @@
   "change_id": "MIR4-CHG-2026-0163",
   "status": "draft",
   "change_type": "changed",
-  "summary": "Use a limited classic compiler by default and retain full support as an explicit startup option.",
+  "summary": "Keep Full research support as the default and isolate the explicitly reduced Classic option.",
   "details": [
-    "Classic bypasses generic acquisition, alternative-route, provider, material and catalogue analysis before the full pipeline is imported. A finite declared direct-bonus and native-continuation core uses the existing checked transformation plan and technology emitter.",
-    "Classic omits recipe productivity, inferred mod support, material progression, competing-owner replacements and weapon-speed redistribution. Research and saved investment outside the core are not preserved. Select Full before opening a factory that needs MIR 4.2 research; Full may still load slowly.",
+    "Full is the startup default and the missing-setting fallback. It retains the broad compiler, registered research families and normal ownership and progression checks. Current-package performance and preservation evidence is required before release.",
+    "Classic is an explicit reduced option that omits recipe productivity, inferred mod support, material progression, competing-owner replacements and weapon-speed redistribution. Research and saved investment outside its declared core are not preserved; Classic cannot satisfy the release preservation gate.",
     "Direct bonuses use a declared common science vector. Classic native continuations inherit fixed-count native units; native formula tails are unsupported. Applicability records and Library status identify reduced scope; omitted research is not claimed unreachable.",
     "Classic limits total declared candidates, technology scanning, prerequisite checks and copied native values. The named compatibility-cycle repair also uses a shared work limit in Classic, with incomplete analysis reported explicitly and no fallback into the full compiler.",
     "Correct native-effect capability records for braking, research speed, robot storage and inserter capacity, including modern bulk and historical stack inserter effects.",
@@ -26,22 +26,22 @@
     {
       "target": "F210",
       "disposition": "affected",
-      "reason": "Default Classic narrows research support; Full retains the broad compiler. Current-package startup and upgrade evidence required."
+      "reason": "Full retains broad research support as the default and fallback; Classic is an explicit reduced option. Qualification must bind to the actual Full release configuration."
     },
     {
       "target": "F200",
       "disposition": "affected",
-      "reason": "Default Classic narrows research support; Full retains the broad compiler. Current-package startup and upgrade evidence required."
+      "reason": "Full retains broad research support as the default and fallback; Classic is an explicit reduced option. Qualification must bind to the actual Full release configuration."
     },
     {
       "target": "F110",
       "disposition": "affected",
-      "reason": "Default Classic narrows research support; Full retains the broad compiler. Current-package startup and upgrade evidence required."
+      "reason": "Full retains broad research support as the default and fallback; Classic is an explicit reduced option. Qualification must bind to the actual Full release configuration."
     },
     {
       "target": "F100",
       "disposition": "affected",
-      "reason": "Default Classic narrows research support; Full retains the broad compiler. Current-package startup and upgrade evidence required."
+      "reason": "Full retains broad research support as the default and fallback; Classic is an explicit reduced option. Qualification must bind to the actual Full release configuration."
     },
     {
       "target": "F017",
