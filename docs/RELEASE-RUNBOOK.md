@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-12
+last_reviewed: 2026-10-14
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -51,6 +51,12 @@ This later maintainer acceptance superseded the earlier conditional publication 
 For 4.2.2, the same asset command takes `-SourceVersion 4.2.2 -ReleaseTag v4.2.2 -PublishedMaintenancePredecessorManifestPath <published-421-manifest>`. The inventory, support records, main readback and publication authorization must retain that exact predecessor custody and all nine `CCC02` identities. The [4.2.2 conditional authorization schema](../spec/schemas/mir422-maintainer-written-release-authorization-v1.schema.json) preserves both published predecessors and rejects inherited testing waivers. A 4.2.1 authorization cannot authorize or be relabelled for 4.2.2. This contract records the current execution authority only; actual qualification, signatures, review, restore, protected-main readback and final-byte binding remain required.
 
 For the emergency 4.2.2 cut, Inventory additionally requires `-MaintenanceUpgradeEvidencePath <bundle>`. The bundle contains all eighteen target/predecessor results (published CCC00 and CCC01 to the same CCC02 bytes), complete supported saved-state snapshots and full-state phase logs, plus the separately persisted damaged-save case. The frozen inventory binds its hash; inventory readback and publication authorization revalidate every referenced input. Missing, skipped, mismatched or changed evidence prevents publication. A successful ordinary 4.2.1 upgrade does not prove recovery from a save already persisted after technology removal.
+
+## Published 4.3.0 and active 4.3.1
+
+Published [v4.3.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.3.0) identifies commit `0e2703d7b545b97a2bdb308a02d84857288b6dc1` and release `411700807`. Its nine player ZIPs and fifteen public assets were anonymously downloaded and verified. Keep those bytes and original receipts intact. The unsigned, partially qualified emergency publication was explicitly limited to that candidate; it does not supply signing, review, qualification or acceptance for 4.3.1.
+
+For the immediate 4.3.1 continuation, preserve the released Full configuration and research baseline. Bind actual 4.3.0-to-4.3.1 results and retain direct 4.2.2-to-4.3.1 coverage. Definition and saved-state comparisons must describe the same candidate/profile used for performance acceptance. Source 4.3.1 produces `4.3.21001`, `4.3.20001`, `4.3.11001`, `4.3.10001`, `4.3.01701`, `4.3.01601`, `4.3.01501`, `4.3.01401` and `4.3.01301`; `01` is the source patch. Use the existing readers and materializers with the exact published predecessor custody, and retain all normal readiness gates below. Preparation alone establishes neither a qualified package nor publication. Portal uploads remain maintainer-managed and separately observed.
 
 ## Readiness order
 
