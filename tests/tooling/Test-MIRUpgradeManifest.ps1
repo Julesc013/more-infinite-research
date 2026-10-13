@@ -226,6 +226,7 @@ $k2Assertions+=2
 . (Join-Path $RepoRoot 'tools/lib/workspace/RepoPaths.ps1')
 $currentAssertions=0
 $f200BobAngelAssertions=0
+$f200GaloreSpaceAgeAssertions=0
 $f210OracleRoot=Join-Path $RepoRoot ('build/tmp/mir423-f210-oracle-control-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $f210OracleRoot|Out-Null
 $f210OracleControl=Join-Path $f210OracleRoot 'control.lua'
@@ -359,6 +360,78 @@ try {
 }
 if(Test-Path -LiteralPath $bobAngelFixture){throw 'Bob/Angel staged fixture was not cleaned after a successful host control'}
 $f200BobAngelAssertions++
+$galoreProfilePath=Join-Path $RepoRoot 'fixtures/run-profiles/mir430-startup-galore-space-age-f200.json'
+$galoreInputs=Read-MIR431F200GaloreSpaceAgeUpgradeProfile -Path $galoreProfilePath
+if($galoreInputs.inputs.Count-ne3-or$galoreInputs.builtin_pins.Count-ne4-or
+   @($galoreInputs.inputs|Where-Object role -CEQ 'acquired-galore-space-age-upstream').Count-ne3){
+  throw 'Galore profile did not retain its exact selected upstream and builtin closure'
+}
+$f200GaloreSpaceAgeAssertions++
+$galoreMutation=Join-Path $testRoot 'f200-galore-space-age-upgrade-profile.json'
+foreach($case in @('engine','status','missing-space-age','extra-mod','wrong-archive','missing-builtin','wrong-builtin','wrong-scope')){
+  $mutated=Get-Content -LiteralPath $galoreProfilePath -Raw|ConvertFrom-Json -Depth 20
+  $code=switch($case){
+    'engine' {$mutated.engine.version='2.0.76';'[mir431-f200-galore-profile]'}
+    'status' {$mutated.status='qualified';'[mir431-f200-galore-profile]'}
+    'missing-space-age' {$mutated.mods=@($mutated.mods|Where-Object name -CNE 'space-age');'[mir431-f200-galore-selection]'}
+    'extra-mod' {$mutated.mods+=@{name='unrequested';version='1.0.0';enabled=$true};'[mir431-f200-galore-selection]'}
+    'wrong-archive' {$mutated.archive_pins[0].sha256='0'*64;'[mir431-f200-galore-archive]'}
+    'missing-builtin' {$mutated.builtin_pins=@($mutated.builtin_pins|Where-Object name -CNE 'quality');'[mir431-f200-galore-builtin-count]'}
+    'wrong-builtin' {$mutated.builtin_pins[0].info_sha256='0'*64;'[mir431-f200-galore-builtin]'}
+    'wrong-scope' {$mutated.claim_scope='all-reporters-qualified';'[mir431-f200-galore-profile]'}
+  }
+  $mutated|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $galoreMutation
+  $rejected=$false
+  try{Read-MIR431F200GaloreSpaceAgeUpgradeProfile -Path $galoreMutation|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith($code)}
+  if(-not$rejected){throw "Galore profile rejection missing: $case"};$f200GaloreSpaceAgeAssertions++
+}
+$galoreFixture=Join-Path $RepoRoot ('build/tmp/mir431-f200-galore-space-age-fixture-'+[Guid]::NewGuid().ToString('N'))
+$galoreFixtureSucceeded=$false
+try {
+  foreach($binding in @(
+    [pscustomobject]@{from='4.2.20002';to='4.3.20001';fixture_version='0.1.51'},
+    [pscustomobject]@{from='4.3.20000';to='4.3.20001';fixture_version='0.1.50'}
+  )){
+    if(Test-Path -LiteralPath $galoreFixture){Remove-Item -LiteralPath $galoreFixture -Recurse -Force}
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $galoreFixture -Recurse
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $galoreFixture -Target f200 -SourceVersion '4.3.1' -FromVersion $binding.from -F200GaloreSpaceAge
+    Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $galoreFixture -FromVersion $binding.from -ToVersion $binding.to
+    Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle -FixtureDirectory $galoreFixture -FromVersion $binding.from -ToVersion $binding.to
+    $info=Get-Content -LiteralPath (Join-Path $galoreFixture 'info.json') -Raw|ConvertFrom-Json
+    $control=Get-Content -LiteralPath (Join-Path $galoreFixture 'control.lua') -Raw
+    $settings=Get-Content -LiteralPath (Join-Path $galoreFixture 'settings.lua') -Raw
+    foreach($needle in @('complete_catalogue_upgrade = true','export_state("source")','export_state("upgrade")','export_state("reload")','["f200-galore-space-age"]={technology="mining-productivity-4",level=5,requires_space_age=true}')){
+      if(-not$control.Contains($needle)){throw "Galore complete-state fixture lost required hook: $needle"}
+    }
+    if($info.version-cne$binding.fixture_version-or$settings-notmatch 'default_value="f200-galore-space-age",allowed_values=\{"base-default","f200-galore-space-age"\}'){
+      throw 'Galore complete-state fixture identity or selected profile differs'
+    }
+    $f200GaloreSpaceAgeAssertions++
+  }
+  $rejected=$false;try{Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $galoreFixture -Target f210 -SourceVersion '4.3.1' -FromVersion '4.2.21002' -F200GaloreSpaceAge}catch{$rejected=$_.Exception.Message-ceq'[mir431-f200-galore-fixture-target]'}
+  if(-not$rejected){throw 'Galore fixture identity accepted a non-F200 target'};$f200GaloreSpaceAgeAssertions++
+  $rejected=$false;try{Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle -FixtureDirectory $galoreFixture -FromVersion '4.2.20001' -ToVersion '4.3.20001'}catch{$rejected=$_.Exception.Message-ceq'[mir431-f200-galore-oracle-transition]'}
+  if(-not$rejected){throw 'Galore complete-state oracle accepted an unpublished predecessor'};$f200GaloreSpaceAgeAssertions++
+  $galoreFixtureSucceeded=$true
+} catch {
+  if(-not(Test-Path -LiteralPath $galoreFixture -PathType Container)){New-Item -ItemType Directory -Force -Path $galoreFixture|Out-Null}
+  [IO.File]::WriteAllText((Join-Path $galoreFixture 'TEST-FAILURE-RETAINED.txt'),("Galore staged-fixture host control failed and was retained for inspection.`n" + $_.Exception.Message + "`n"),[Text.UTF8Encoding]::new($false))
+  throw
+} finally {
+  if($galoreFixtureSucceeded-and(Test-Path -LiteralPath $galoreFixture)){Remove-Item -LiteralPath $galoreFixture -Recurse -Force}
+}
+if(Test-Path -LiteralPath $galoreFixture){throw 'Galore staged fixture was not cleaned after a successful host control'}
+$galoreSelection=@(
+  [pscustomobject]@{name='base';version='2.0.77'},[pscustomobject]@{name='elevated-rails';version='2.0.77'},[pscustomobject]@{name='quality';version='2.0.77'},[pscustomobject]@{name='space-age';version='2.0.77'},
+  [pscustomobject]@{name='galore_lib';version='2.2.0'},[pscustomobject]@{name='vanilla_galore_continued';version='1.4.2'},[pscustomobject]@{name='space_age_galore';version='1.6.3'},
+  [pscustomobject]@{name='assert-upgrade-4-0-20000-to-4-1-20000';version='0.1.51'},[pscustomobject]@{name='more-infinite-research';version='4.3.20001'}
+)
+$galoreSnapshot=[pscustomobject]@{active_mods=[pscustomobject]@{base='2.0.77';'elevated-rails'='2.0.77';quality='2.0.77';'space-age'='2.0.77';galore_lib='2.2.0';vanilla_galore_continued='1.4.2';space_age_galore='1.6.3';'assert-upgrade-4-0-20000-to-4-1-20000'='0.1.51';'more-infinite-research'='4.3.20001'}}
+$galoreReceipt=Assert-MIR431F200GaloreSpaceAgeFullStateActiveMods -Snapshot $galoreSnapshot -ExpectedSelection $galoreSelection -Stage upgrade
+if($galoreReceipt.active_mods.Count-ne9){throw 'Galore full-state active-mod receipt omitted selected mods'};$f200GaloreSpaceAgeAssertions++
+$galoreSnapshot.active_mods.space_age_galore='1.6.4'
+$rejected=$false;try{Assert-MIR431F200GaloreSpaceAgeFullStateActiveMods -Snapshot $galoreSnapshot -ExpectedSelection $galoreSelection -Stage upgrade|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir431-f200-galore-active-mods]')}
+if(-not$rejected){throw 'Galore full-state active-mod comparison accepted a version mismatch'};$f200GaloreSpaceAgeAssertions++
 & {
   param([string]$FunctionText,[string]$Root)
   . ([scriptblock]::Create($FunctionText))
@@ -648,9 +721,28 @@ foreach($field in @('Target','FromVersion','ToVersion','FixtureName','Archetype'
 }
 foreach($field in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SpaceIsFake','SourceOnlyFixtureNames','K2ImersiteInputProfile','F200BobAngelInputProfile','SourceVersion')){
   $bad=$currentBobAngel430.Clone();$bad[$field]=switch($field){'SpaceIsFake'{$true};'SourceOnlyFixtureNames'{@('extra')};'K2ImersiteInputProfile'{'k2.json'};'F200BobAngelInputProfile'{''};'SourceVersion'{'4.3.1'};default{'wrong'}}
-  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message -match '^\[mir42(?:1|3)-'}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message -match '^\[mir4(?:21|23|31)-'}
   if(-not$rejected){throw "4.3 Full Bob/Angel mode accepted invalid $field"};$f200BobAngelAssertions++
 }
+$currentGalore=@{Target='f200';FromVersion='4.2.20002';ToVersion='4.3.20001';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='f200-galore-space-age';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-422.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile=$galoreProfilePath;SourceVersion='4.3.1'}
+Assert-MIR421CurrentUpgradeInputMode @currentGalore;$f200GaloreSpaceAgeAssertions++
+$currentGaloreImmediate=$currentGalore.Clone();$currentGaloreImmediate.FromVersion='4.3.20000';$currentGaloreImmediate.PublishedPredecessorManifest='published-430.json'
+Assert-MIR421CurrentUpgradeInputMode @currentGaloreImmediate;$f200GaloreSpaceAgeAssertions++
+foreach($field in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SpaceIsFake','SourceOnlyFixtureNames','K2ImersiteInputProfile','F200BobAngelInputProfile','F200GaloreSpaceAgeInputProfile','SourceVersion')){
+  $bad=$currentGalore.Clone();$bad[$field]=switch($field){
+    'SpaceIsFake'{$true};'SourceOnlyFixtureNames'{@('extra')};'K2ImersiteInputProfile'{'k2.json'};'F200BobAngelInputProfile'{'bob.json'};'F200GaloreSpaceAgeInputProfile'{''};'SourceVersion'{'4.3.0'};default{'wrong'}
+  }
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message -match '^\[mir4(?:21|23|31)-'}
+  if(-not$rejected){throw "4.3.1 Full Galore mode accepted invalid $field"};$f200GaloreSpaceAgeAssertions++
+}
+$mixedGalore=$currentGalore.Clone();$mixedGalore.F200BobAngelInputProfile='bob.json'
+$rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mixedGalore}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-input-mode]'}
+if(-not$rejected){throw 'Galore mode accepted a second profile input'};$f200GaloreSpaceAgeAssertions++
+$SourceVersion='4.3.1';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='f200-galore-space-age'
+if(-not(& $completeCatalogueEvaluator)){throw 'Galore complete-catalogue gate is absent'};$f200GaloreSpaceAgeAssertions++
+$classicReducedPolicy=$true
+if(& $completeCatalogueEvaluator){throw 'Galore complete-catalogue gate admitted a Classic policy'};$f200GaloreSpaceAgeAssertions++
+$classicReducedPolicy=$false
 # Execute the actual caller statements with a recording reader, so adding a
 # validator parameter without forwarding it cannot pass these controls.
 $predecessorSelectCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$predecessorReaderVersion'},$true))
@@ -706,7 +798,7 @@ try {
     $SelectedTarget='f210';$to='selected.zip';$SourceMaterializationPath='selected-receipt.json'
     $FromVersion=$currentMode.from;$ToVersion=$currentMode.to
     $FixtureName='assert-upgrade-4-0-21000-to-4-1-21000';$Archetype='base-default';$SpaceIsFake=$false
-    $SourceOnlyFixtureNames=@();$SelectedReleaseManifest='';$PublishedMaintenancePredecessorManifestPath='published.json';$Retention='Always';$K2ImersiteInputProfile='';$F200BobAngelInputProfile=''
+    $SourceOnlyFixtureNames=@();$SelectedReleaseManifest='';$PublishedMaintenancePredecessorManifestPath='published.json';$Retention='Always';$K2ImersiteInputProfile='';$F200BobAngelInputProfile='';$F200GaloreSpaceAgeInputProfile=''
     . ([scriptblock]::Create($modeCalls[0].Extent.Text))
     . ([scriptblock]::Create($readerCalls[0].Extent.Text))
     if($currentMaterialization.source-cne$SourceVersion-or$currentMaterialization.target-cne'f210'-or$currentMaterialization.archive-cne$to-or$currentMaterialization.receipt-cne$SourceMaterializationPath){throw 'Upgrade caller dropped explicit candidate selection'}
@@ -1101,6 +1193,44 @@ foreach($target in @('f110','f100')){
   }
   $mir43Assertions++
 }
+foreach($target in @('f017','f016','f015','f014','f013')){
+  $code=$target.Substring(1)
+  $fixturePath=Join-Path $mir43FixtureRoot ('mir431-'+$target+'-direct422-full-setting-allowance')
+  Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-historical-terminal-to-mir42') -Destination $fixturePath -Recurse
+  $infoPath=Join-Path $fixturePath 'info.json'
+  $infoText=Get-Content -LiteralPath $infoPath -Raw
+  [IO.File]::WriteAllText($infoPath,$infoText.Replace('@@FACTORIO_LINE@@',('0.'+[int]$code)).Replace('@@MIR_UPGRADE_FROM_VERSION@@',('4.2.'+$code+'02')),[Text.UTF8Encoding]::new($false))
+  Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixturePath -Target $target -SourceVersion '4.3.1' -FromVersion ('4.2.'+$code+'02')
+  Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixturePath -Target $target -FromVersion ('4.2.'+$code+'02') -ToVersion ('4.3.'+$code+'01')
+  Set-MIR430FullCompilerProfileUpgradeAllowance -Target $target -FixtureDirectory $fixturePath -FromVersion ('4.2.'+$code+'02') -ToVersion ('4.3.'+$code+'01')
+  $allowance=Get-Content -LiteralPath (Join-Path $fixturePath 'mir422_complete_state.lua') -Raw
+  foreach($needle in @('before[field]["mir-compiler-profile"] == nil','after[field]["mir-compiler-profile"] == "full"','expected_settings["mir-compiler-profile"] = "full"','retained = equal(expected_settings, after[field])')){
+    if(-not$allowance.Contains($needle)){throw "$target historical Full selector allowance was not bound to the complete-state oracle: $needle"}
+  }
+  $mir43Assertions++
+  $rejected=$false;try{Set-MIR430FullCompilerProfileUpgradeAllowance -Target $target -FixtureDirectory $fixturePath -FromVersion ('4.3.'+$code+'00') -ToVersion ('4.3.'+$code+'01')}catch{$rejected=$_.Exception.Message-ceq'[mir430-full-upgrade-setting-transition]'}
+  if(-not$rejected){throw "$target historical Full selector allowance admitted an immediate predecessor"};$mir43Assertions++
+}
+function Test-MIR431HistoricalFullSettingAllowance {
+  param([hashtable]$Before,[hashtable]$After)
+  if($Before.ContainsKey('mir-compiler-profile')-or-not$After.ContainsKey('mir-compiler-profile')-or$After['mir-compiler-profile']-cne'full'){return $false}
+  $expected=[ordered]@{}
+  foreach($key in $Before.Keys){$expected[$key]=$Before[$key]}
+  $expected['mir-compiler-profile']='full'
+  if($expected.Count-ne$After.Count){return $false}
+  foreach($key in $expected.Keys){if(-not$After.ContainsKey($key)-or$After[$key]-cne$expected[$key]){return $false}}
+  return $true
+}
+if(-not(Test-MIR431HistoricalFullSettingAllowance -Before @{existing='retained'} -After @{existing='retained';'mir-compiler-profile'='full'})){throw 'Historical Full selector setting allowance rejected the exact added Full setting'}
+foreach($case in @(
+  @{before=@{'mir-compiler-profile'='classic'};after=@{'mir-compiler-profile'='full'}},
+  @{before=@{existing='retained'};after=@{existing='retained';'mir-compiler-profile'='classic'}},
+  @{before=@{existing='retained'};after=@{existing='retained';'mir-compiler-profile'='full';unrelated='added'}},
+  @{before=@{existing='retained'};after=@{existing='changed';'mir-compiler-profile'='full'}}
+)){
+  if(Test-MIR431HistoricalFullSettingAllowance -Before $case.before -After $case.after){throw 'Historical Full selector setting allowance accepted a changed existing, Classic, or unrelated setting'}
+  $mir43Assertions++
+}
 Remove-Item -LiteralPath $mir43FixtureRoot -Recurse -Force
 # The matrix has a single current-destination route with exact argument
 # propagation and demands both reload receipts for it.
@@ -1223,4 +1353,4 @@ try {
   if(Test-Path -LiteralPath $matrixBindingRoot){Remove-Item -LiteralPath $matrixBindingRoot -Recurse -Force}
 }
 
-[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;mir43_classic_snapshot_assertions=$mir43ClassicSnapshotAssertions;mir43_classic_snapshot_control_kind='synthetic-host-only-classic-disposition-controls-v1';mir43_classic_snapshot_native_engine_launched=$false;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;f200_galore_space_age_upgrade_assertions=$f200GaloreSpaceAgeAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;mir43_classic_snapshot_assertions=$mir43ClassicSnapshotAssertions;mir43_classic_snapshot_control_kind='synthetic-host-only-classic-disposition-controls-v1';mir43_classic_snapshot_native_engine_launched=$false;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
