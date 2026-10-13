@@ -2299,7 +2299,9 @@ function New-MIR42NineTargetReleaseCutProgramme {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
-    [Parameter(Mandatory)][string]$OutputPath
+    [Parameter(Mandatory)][string]$OutputPath,
+    [switch]$RefreshPendingAuthority,
+    [string]$CheckpointRoot = ''
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $previousRelative = (Get-MIR42SealScopeContract -Scope 'four-target').programme_path
@@ -2364,11 +2366,86 @@ function New-MIR42NineTargetReleaseCutProgramme {
     $expected = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme | ConvertFrom-Json -Depth 100 -DateKind String
     $expected.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $expected
     if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $existing.record) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected)) {
+      if ($RefreshPendingAuthority -and (Test-MIR42NineTargetPendingAuthorityRefresh -Existing $existing.record -Expected $expected)) {
+        if ([string]::IsNullOrWhiteSpace($CheckpointRoot)) { throw '[mir42-nine-programme-pending-refresh-checkpoint-required]' }
+        return (Write-MIR42NineTargetPendingAuthorityRefresh -RepoRoot $repo -Record $expected -OutputPath $OutputPath -CheckpointRoot $CheckpointRoot).record
+      }
       throw '[mir42-nine-programme-existing-authority-preserved]'
     }
     return $existing.record
   }
   Write-MIR42NormalizedRecord -Record $programme -OutputPath $OutputPath -Code 'mir42-nine-programme-output'
+}
+
+function Test-MIR42NineTargetPendingAuthorityRefresh {
+  param([Parameter(Mandatory)]$Existing,[Parameter(Mandatory)]$Expected)
+  # This refresh is deliberately narrower than a release transition: it may
+  # replace only the file/record fingerprints of the five historical target
+  # records after their canonical inputs changed.  Every other pending
+  # authority field, including all gates and predecessor bindings, must
+  # already be byte-for-byte equivalent to the current construction.
+  if ($Existing.PSObject.Properties.Name -contains 'written_transition_authorization' -or
+      [string]$Existing.status -cne 'active-current-4.2-release-cut-pre-freeze-no-transition-authority' -or
+      [string]$Existing.candidate.state -cne 'unallocated' -or
+      [bool]$Existing.release_transition_authority -or [bool]$Existing.publication_authorized -or
+      @($Existing.transition_gate.PSObject.Properties | Where-Object { $_.Value -isnot [bool] -or [bool]$_.Value }).Count -ne 0) {
+    return $false
+  }
+  $candidate = ConvertTo-MIR4BootstrapCanonicalJson -Value $Existing | ConvertFrom-Json -Depth 100 -DateKind String
+  $expectedHistorical = @($Expected.historical_predecessor_authorities)
+  $candidateHistorical = @($candidate.historical_predecessor_authorities)
+  if ($candidateHistorical.Count -ne $expectedHistorical.Count -or $candidateHistorical.Count -ne $script:MIR42SealHistoricalTargets.Count) { return $false }
+  for ($index = 0; $index -lt $candidateHistorical.Count; $index++) {
+    $old = $candidateHistorical[$index]
+    $current = $expectedHistorical[$index]
+    if ([string]$old.target -cne [string]$current.target -or
+        [string]$old.target_record.path -cne [string]$current.target_record.path -or
+        [string]$old.target_record.sha256 -notmatch '^[A-F0-9]{64}$' -or
+        [string]$old.target_record.record_sha256 -notmatch '^[A-F0-9]{64}$') {
+      return $false
+    }
+    $old.target_record.sha256 = [string]$current.target_record.sha256
+    $old.target_record.record_sha256 = [string]$current.target_record.record_sha256
+  }
+  $candidate.record_sha256 = [string]$Expected.record_sha256
+  return (ConvertTo-MIR4BootstrapCanonicalJson -Value $candidate) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $Expected)
+}
+
+function Write-MIR42NineTargetPendingAuthorityRefresh {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Record,
+    [Parameter(Mandatory)][string]$OutputPath,
+    [Parameter(Mandatory)][string]$CheckpointRoot
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $output = [IO.Path]::GetFullPath($OutputPath)
+  $expectedOutput = [IO.Path]::GetFullPath((Join-Path $repo (Get-MIR42SealScopeContract -Scope 'nine-target').programme_path))
+  $buildRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
+  $checkpoint = [IO.Path]::GetFullPath($CheckpointRoot)
+  if (-not $output.Equals($expectedOutput,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-nine-programme-pending-refresh-output-path]' }
+  if (-not $checkpoint.StartsWith($buildRoot + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-nine-programme-pending-refresh-checkpoint-containment]' }
+  $old = Read-MIR42SealRecord -Path $output -Code 'mir42-nine-programme-pending-refresh-existing'
+  if (-not (Test-MIR42NineTargetPendingAuthorityRefresh -Existing $old.record -Expected $Record)) { throw '[mir42-nine-programme-pending-refresh-authority]' }
+  $oldSha = [string]$old.sha256
+  $checkpointPath = Join-Path $checkpoint (([IO.Path]::GetFileNameWithoutExtension($output)) + '-before-pending-authority-refresh-' + $oldSha + '.json')
+  if (-not (Test-Path -LiteralPath $checkpointPath -PathType Leaf)) {
+    New-Item -ItemType Directory -Force -Path $checkpoint | Out-Null
+    [IO.File]::Copy($output,$checkpointPath,$false)
+  }
+  if ((Get-FileHash -LiteralPath $checkpointPath -Algorithm SHA256).Hash.ToUpperInvariant() -cne $oldSha) { throw '[mir42-nine-programme-pending-refresh-checkpoint-hash]' }
+  $temporary = Join-Path (Split-Path -Parent $output) (([IO.Path]::GetFileName($output)) + '.' + [guid]::NewGuid().ToString('N') + '.tmp')
+  $backup = $temporary + '.bak'
+  try {
+    Write-MIR42NormalizedRecord -Record $Record -OutputPath $temporary -Code 'mir42-nine-programme-pending-refresh-output' | Out-Null
+    [IO.File]::Replace($temporary,$output,$backup)
+  } finally {
+    if (Test-Path -LiteralPath $temporary -PathType Leaf) { Remove-Item -LiteralPath $temporary -Force }
+    if (Test-Path -LiteralPath $backup -PathType Leaf) { Remove-Item -LiteralPath $backup -Force }
+  }
+  $written = Read-MIR42SealRecord -Path $output -Code 'mir42-nine-programme-pending-refresh-readback'
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $written.record) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $Record)) { throw '[mir42-nine-programme-pending-refresh-readback]' }
+  return [pscustomobject][ordered]@{record=$written.record;checkpoint_path=$checkpointPath;checkpoint_sha256=$oldSha}
 }
 
 function Read-MIR42NineTargetProgrammeWrittenAuthorization {

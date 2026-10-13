@@ -125,6 +125,42 @@ try {
   New-MIR42NineTargetReleaseCutProgramme -RepoRoot $repo -OutputPath $programmePath | Out-Null
   Assert-NineAuthority ((Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash -ceq $preparedHash) 'identical-preparation-preserves-bytes'
 
+  # A canonical historical target record can change while this pending
+  # programme is still pre-freeze.  The default writer must preserve the
+  # stale authority; the explicit refresh may replace only those five
+  # target-record fingerprint pairs and must checkpoint the original bytes.
+  $stalePending = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme | ConvertFrom-Json -Depth 100 -DateKind String
+  $stalePending.historical_predecessor_authorities[0].target_record.sha256 = 'A' * 64
+  $stalePending.historical_predecessor_authorities[0].target_record.record_sha256 = 'B' * 64
+  $stalePending = Write-MIR42NormalizedRecord -Record $stalePending -OutputPath $programmePath -Code 'mir42-nine-test-pending-refresh-stale'
+  $stalePendingHash=(Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash
+  Assert-NineAuthorityReject { New-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $programmePath } 'mir42-nine-programme-existing-authority-preserved' 'stale-pending-default-preserved'
+  $refreshCheckpointRoot = Join-Path $scratch 'build/release-programme-checkpoints'
+  $refreshedPending = New-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $programmePath -RefreshPendingAuthority -CheckpointRoot $refreshCheckpointRoot
+  Assert-NineAuthority ((ConvertTo-MIR4BootstrapCanonicalJson -Value $refreshedPending) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $programme) -and
+    -not [bool]$refreshedPending.release_transition_authority -and -not [bool]$refreshedPending.publication_authorized -and
+    @($refreshedPending.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'pending-refresh-preserves-gates'
+  $refreshCheckpoint = Join-Path $refreshCheckpointRoot (([IO.Path]::GetFileNameWithoutExtension($programmePath)) + '-before-pending-authority-refresh-' + $stalePendingHash + '.json')
+  Assert-NineAuthority ((Test-Path -LiteralPath $refreshCheckpoint -PathType Leaf) -and
+    (Get-FileHash -LiteralPath $refreshCheckpoint -Algorithm SHA256).Hash -ceq $stalePendingHash -and
+    (ConvertTo-MIR4BootstrapCanonicalJson -Value (Read-MIR42SealRecord -Path $refreshCheckpoint -Code 'mir42-nine-test-pending-refresh-checkpoint').record) -ceq
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $stalePending)) 'pending-refresh-checkpoints-original-authority'
+
+  $unsafePending = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme | ConvertFrom-Json -Depth 100 -DateKind String
+  $unsafePending.direct_predecessors[-1].sha256 = 'C' * 64
+  Write-MIR42NormalizedRecord -Record $unsafePending -OutputPath $programmePath -Code 'mir42-nine-test-pending-refresh-predecessor' | Out-Null
+  $unsafePendingHash=(Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash
+  Assert-NineAuthorityReject { New-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $programmePath -RefreshPendingAuthority -CheckpointRoot $refreshCheckpointRoot } 'mir42-nine-programme-existing-authority-preserved' 'pending-refresh-cannot-change-predecessor'
+  Assert-NineAuthority ((Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash -ceq $unsafePendingHash) 'rejected-pending-refresh-preserves-predecessor-bytes'
+  $unsafePending = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme | ConvertFrom-Json -Depth 100 -DateKind String
+  $unsafePending.transition_gate.source_freeze = $true
+  Write-MIR42NormalizedRecord -Record $unsafePending -OutputPath $programmePath -Code 'mir42-nine-test-pending-refresh-gate' | Out-Null
+  $unsafePendingHash=(Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash
+  Assert-NineAuthorityReject { New-MIR42NineTargetReleaseCutProgramme -RepoRoot $scratch -OutputPath $programmePath -RefreshPendingAuthority -CheckpointRoot $refreshCheckpointRoot } 'mir42-nine-programme-existing-authority-preserved' 'pending-refresh-cannot-change-gate'
+  Assert-NineAuthority ((Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash -ceq $unsafePendingHash) 'rejected-pending-refresh-preserves-gate-bytes'
+  Remove-Item -LiteralPath $programmePath
+  $programme = New-MIR42NineTargetReleaseCutProgramme -RepoRoot $repo -OutputPath $programmePath
+
   $programme.transition_gate.source_freeze='false'
   Write-MIR42NormalizedRecord -Record $programme -OutputPath $programmePath -Code 'mir42-nine-test-boolean-type' | Out-Null
   Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' } 'mir42-seal-current-programme-schema' 'text-cannot-grant-transition'
