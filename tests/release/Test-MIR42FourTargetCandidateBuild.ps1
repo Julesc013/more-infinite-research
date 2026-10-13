@@ -953,17 +953,25 @@ try {
   $maintenanceEvidenceAssertions++
   $currentScopeCandidates=@($currentDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})
   Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $currentScopeCandidates
+  $mir430ScopeCandidates=@($mir43DescriptorSets['4.3.0']|ForEach-Object {[pscustomobject]@{identity=$_}})
+  Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $mir430ScopeCandidates
+  $maintenanceEvidenceAssertions++
+  $mir431ScopeCandidates=@($mir43DescriptorSets['4.3.1']|ForEach-Object {[pscustomobject]@{identity=$_}})
+  Assert-MIR42MaintenanceReconciliationScope -Scope 'nine-target' -Candidates $mir431ScopeCandidates
+  $maintenanceEvidenceAssertions++
   Assert-MIR42IndependentMaintenanceScope -Scope 'nine-target' -SourceVersion '4.2.2'
   $mixedScope=@($scopeCandidates[0])+@($currentScopeCandidates|Select-Object -Skip 1)
+  $mixed431Scope=@($scopeCandidates[0])+@($mir431ScopeCandidates|Select-Object -Skip 1)
   foreach($case in @(
-    @{scope='four-target';rows=@($scopeCandidates|Select-Object -First 4)},
-    @{scope='nine-target';rows=@($nineDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})},
-    @{scope='nine-target';rows=@($scopeCandidates|Select-Object -First 8)},
-    @{scope='nine-target';rows=$mixedScope}
+    @{name='four-target';scope='four-target';rows=@($scopeCandidates|Select-Object -First 4)},
+    @{name='unsupported-420';scope='nine-target';rows=@($nineDescriptors|ForEach-Object {[pscustomobject]@{identity=$_}})},
+    @{name='short';scope='nine-target';rows=@($scopeCandidates|Select-Object -First 8)},
+    @{name='legacy-mixed';scope='nine-target';rows=$mixedScope},
+    @{name='431-mixed';scope='nine-target';rows=$mixed431Scope}
   )){
     $rejected=$false
     try{Assert-MIR42MaintenanceReconciliationScope -Scope $case.scope -Candidates $case.rows}catch{$rejected=$_.Exception.Message-ceq'[mir42-reconciliation-maintenance-candidate-scope]'}
-    Assert-MIR42CandidateBuildTest $rejected 'maintenance-reconciliation-refuses-wrong-scope-version-or-count'
+    Assert-MIR42CandidateBuildTest $rejected ('maintenance-reconciliation-refuses-'+$case.name)
     $maintenanceEvidenceAssertions++
   }
   Assert-MIR42IndependentMaintenanceScope -Scope 'nine-target' -SourceVersion '4.2.1'
