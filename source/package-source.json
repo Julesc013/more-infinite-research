@@ -45,10 +45,10 @@
         "predecessor_source_path": "src/mod/generation/lifecycle/data-final-fixes.lua.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 55,
-      "source_sha256": "70AC7A3036FF553AAA53F1B3D0A3D3FA827B7BD7852E09AC4D16D884A31B1C71",
-      "output_bytes": 55,
-      "output_sha256": "70AC7A3036FF553AAA53F1B3D0A3D3FA827B7BD7852E09AC4D16D884A31B1C71"
+      "source_bytes": 223,
+      "source_sha256": "2C1CB52080BA1B73A2DCDBDC617F918ADC7CB743CAFF5422F61D6BE1CDB22930",
+      "output_bytes": 223,
+      "output_sha256": "2C1CB52080BA1B73A2DCDBDC617F918ADC7CB743CAFF5422F61D6BE1CDB22930"
     },
     {
       "layer": "shared",
@@ -66,10 +66,10 @@
         "predecessor_source_path": "src/mod/generation/lifecycle/data-updates.lua.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 51,
-      "source_sha256": "B9A7B194DF1DDCBFE9A7A4025EC98FB8F5F7794B575E4EBA1498F628EA4FC868",
-      "output_bytes": 51,
-      "output_sha256": "B9A7B194DF1DDCBFE9A7A4025EC98FB8F5F7794B575E4EBA1498F628EA4FC868"
+      "source_bytes": 211,
+      "source_sha256": "18EA44AA66EE8321C36B5C3271AB06FBF28ABD246C68EA8B92945FA751CDF811",
+      "output_bytes": 211,
+      "output_sha256": "18EA44AA66EE8321C36B5C3271AB06FBF28ABD246C68EA8B92945FA751CDF811"
     },
     {
       "layer": "shared",
@@ -87,10 +87,10 @@
         "predecessor_source_path": "src/mod/generation/lifecycle/data.lua.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 43,
-      "source_sha256": "F8960D123D2626DEDA5D1E4F02ACA07C749FE7FD94A951FB45422B8077D03518",
-      "output_bytes": 43,
-      "output_sha256": "F8960D123D2626DEDA5D1E4F02ACA07C749FE7FD94A951FB45422B8077D03518"
+      "source_bytes": 187,
+      "source_sha256": "99B39402887B8A5971891B0275015D2FF250E45BA3BFED0230D8B65FE65EA856",
+      "output_bytes": 187,
+      "output_sha256": "99B39402887B8A5971891B0275015D2FF250E45BA3BFED0230D8B65FE65EA856"
     },
     {
       "layer": "shared",
@@ -423,10 +423,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/compatibility/repairs/registry.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 221,
-      "source_sha256": "BAD4B16F2C7AB1A66AA9008F49016D528FE6936ADE8D2C137E0F869C871FDCD2",
-      "output_bytes": 221,
-      "output_sha256": "BAD4B16F2C7AB1A66AA9008F49016D528FE6936ADE8D2C137E0F869C871FDCD2"
+      "source_bytes": 488,
+      "source_sha256": "DCED275D96102E0589373F600437EC935CD51B2C7C3600FF1E2B57A66E4534C5",
+      "output_bytes": 488,
+      "output_sha256": "DCED275D96102E0589373F600437EC935CD51B2C7C3600FF1E2B57A66E4534C5"
     },
     {
       "layer": "shared",
@@ -444,10 +444,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4096,
-      "source_sha256": "597D084EE9A9C0BB21C2D47000B8075B4D90EC71D0D42BB428952BE5823F17E3",
-      "output_bytes": 4096,
-      "output_sha256": "597D084EE9A9C0BB21C2D47000B8075B4D90EC71D0D42BB428952BE5823F17E3"
+      "source_bytes": 13237,
+      "source_sha256": "B828A35F24EBA686D8059B16ED5877A879F75B7DC82676C8F68EB5F44DEF791D",
+      "output_bytes": 13237,
+      "output_sha256": "B828A35F24EBA686D8059B16ED5877A879F75B7DC82676C8F68EB5F44DEF791D"
     },
     {
       "layer": "shared",
@@ -1032,10 +1032,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/pipeline/prototype_limits.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 10675,
-      "source_sha256": "E942DD3466F6DE188CF032F83FF2E5C47A88B59064923D5547172375275C36ED",
-      "output_bytes": 10675,
-      "output_sha256": "E942DD3466F6DE188CF032F83FF2E5C47A88B59064923D5547172375275C36ED"
+      "source_bytes": 11051,
+      "source_sha256": "10164B7BC4495DAA2DD29211C66938256A9BD04FDCDDAE369F7C8F4739C06CD6",
+      "output_bytes": 11051,
+      "output_sha256": "10164B7BC4495DAA2DD29211C66938256A9BD04FDCDDAE369F7C8F4739C06CD6"
     },
     {
       "layer": "shared",
@@ -1494,10 +1494,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/settings/catalog.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 21060,
-      "source_sha256": "FBB5BEA30C2C41DFD9700ADEDF4E00AEF2FCF048CE4DE8FBD1FA78F558C6E025",
-      "output_bytes": 21060,
-      "output_sha256": "FBB5BEA30C2C41DFD9700ADEDF4E00AEF2FCF048CE4DE8FBD1FA78F558C6E025"
+      "source_bytes": 21281,
+      "source_sha256": "EED52137873E4DE45DBA2CB4CD915B71D5DBB0E3202C098588113EC2FC609D54",
+      "output_bytes": 21281,
+      "output_sha256": "EED52137873E4DE45DBA2CB4CD915B71D5DBB0E3202C098588113EC2FC609D54"
     },
     {
       "layer": "shared",
@@ -1641,10 +1641,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/settings/registry.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3214,
-      "source_sha256": "ACD34FD2E41B524514B75E0BA0B97948766D5708BDF8B86B1ED553843033C442",
-      "output_bytes": 3214,
-      "output_sha256": "ACD34FD2E41B524514B75E0BA0B97948766D5708BDF8B86B1ED553843033C442"
+      "source_bytes": 3305,
+      "source_sha256": "860D7E6F613D9ECAE1D240C738C42A0F0E8BB485621BF96C5924146D65E34060",
+      "output_bytes": 3305,
+      "output_sha256": "860D7E6F613D9ECAE1D240C738C42A0F0E8BB485621BF96C5924146D65E34060"
     },
     {
       "layer": "shared",
@@ -1788,10 +1788,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/stage/data.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 1432,
-      "source_sha256": "810B89887793B03DCAA5D35A572A8B7A21AA1203A4812670BEE483C5D7332475",
-      "output_bytes": 1432,
-      "output_sha256": "810B89887793B03DCAA5D35A572A8B7A21AA1203A4812670BEE483C5D7332475"
+      "source_bytes": 1387,
+      "source_sha256": "8EF544E1E7D7D3EC95BEB83F748B36E4FB90192CBBC6155D44DCF024F362361D",
+      "output_bytes": 1387,
+      "output_sha256": "8EF544E1E7D7D3EC95BEB83F748B36E4FB90192CBBC6155D44DCF024F362361D"
     },
     {
       "layer": "shared",
@@ -1851,10 +1851,10 @@
         "predecessor_source_path": "src/mod/generation/lifecycle/settings.lua.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 47,
-      "source_sha256": "1C7B5AC2024532390BC77E655325CAC7680D05EA553B842FDB3E45AF3518F59E",
-      "output_bytes": 47,
-      "output_sha256": "1C7B5AC2024532390BC77E655325CAC7680D05EA553B842FDB3E45AF3518F59E"
+      "source_bytes": 199,
+      "source_sha256": "5E5DBC03D7D1AC3AC3977CF4FF1C349847ED29E4FF295F19B5B6DE18889CBD7A",
+      "output_bytes": 199,
+      "output_sha256": "5E5DBC03D7D1AC3AC3977CF4FF1C349847ED29E4FF295F19B5B6DE18889CBD7A"
     },
     {
       "layer": "shared",
@@ -2085,10 +2085,10 @@
         "predecessor_source_path": "src/mod/families/modern/locale/en/more-infinite-research.cfg"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 53969,
-      "source_sha256": "7BA69976745572401D34887CF5D8E6539F6D7E664CA8C2ECFFDE142C28862EDD",
-      "output_bytes": 53969,
-      "output_sha256": "7BA69976745572401D34887CF5D8E6539F6D7E664CA8C2ECFFDE142C28862EDD"
+      "source_bytes": 55903,
+      "source_sha256": "9A4C7880318A3AA1D4822754119EF8E0BB79E274C1E93367EFF6803C9DC3C678",
+      "output_bytes": 55903,
+      "output_sha256": "9A4C7880318A3AA1D4822754119EF8E0BB79E274C1E93367EFF6803C9DC3C678"
     },
     {
       "layer": "capability",
@@ -2901,10 +2901,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 54248,
-      "source_sha256": "40ED72168431ADF4A2B369076D8C30205BA35433B8EFAE228B0DF851B5D3A127",
-      "output_bytes": 54248,
-      "output_sha256": "40ED72168431ADF4A2B369076D8C30205BA35433B8EFAE228B0DF851B5D3A127"
+      "source_bytes": 57837,
+      "source_sha256": "BF226BD4075C203F0A1804632999B75C114CADF4B45C028634E700621BE89D49",
+      "output_bytes": 57837,
+      "output_sha256": "BF226BD4075C203F0A1804632999B75C114CADF4B45C028634E700621BE89D49"
     },
     {
       "layer": "capability",
@@ -2943,10 +2943,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/lab_compatibility.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 9306,
-      "source_sha256": "3308A351BDF32EF469EE00BFE95F0BF8807388D79AAA23F15AFDD1BD32C508E3",
-      "output_bytes": 9306,
-      "output_sha256": "3308A351BDF32EF469EE00BFE95F0BF8807388D79AAA23F15AFDD1BD32C508E3"
+      "source_bytes": 11428,
+      "source_sha256": "97AC936B1E9920AC503011EF063D39FA0E59D8ACCB5B0746BB4B32D30C83E39B",
+      "output_bytes": 11428,
+      "output_sha256": "97AC936B1E9920AC503011EF063D39FA0E59D8ACCB5B0746BB4B32D30C83E39B"
     },
     {
       "layer": "capability",
@@ -2964,10 +2964,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 76869,
-      "source_sha256": "9AE58510F38F4F40CBA31C3CE03C02468302457A745CA722277C202D43DD57B8",
-      "output_bytes": 76869,
-      "output_sha256": "9AE58510F38F4F40CBA31C3CE03C02468302457A745CA722277C202D43DD57B8"
+      "source_bytes": 110819,
+      "source_sha256": "76DB77B8B4D6FB8CCA7AA2FC7A6BF06689C2F7D566C9D6768D74E5B718600557",
+      "output_bytes": 110819,
+      "output_sha256": "76DB77B8B4D6FB8CCA7AA2FC7A6BF06689C2F7D566C9D6768D74E5B718600557"
     },
     {
       "layer": "capability",
@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 78648,
-      "source_sha256": "59A08424978BF563FE4626502CF05586E9FCE54DABE68F1D051A290687F1B94E",
-      "output_bytes": 78648,
-      "output_sha256": "59A08424978BF563FE4626502CF05586E9FCE54DABE68F1D051A290687F1B94E"
+      "source_bytes": 91240,
+      "source_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D",
+      "output_bytes": 91240,
+      "output_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D"
     },
     {
       "layer": "capability",
@@ -3028,10 +3028,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3935,
-      "source_sha256": "BDA0708224D9D38A4A8C8CCEDD8D2D0A8BE0659F949F036E88F4F8BD0A10BA71",
-      "output_bytes": 3935,
-      "output_sha256": "BDA0708224D9D38A4A8C8CCEDD8D2D0A8BE0659F949F036E88F4F8BD0A10BA71"
+      "source_bytes": 5145,
+      "source_sha256": "8F2E2550426FBC80A5EF105FAD341D7B7790656D097DA757D4E10CECE95B58FF",
+      "output_bytes": 5145,
+      "output_sha256": "8F2E2550426FBC80A5EF105FAD341D7B7790656D097DA757D4E10CECE95B58FF"
     },
     {
       "layer": "capability",
@@ -3070,10 +3070,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_packs.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4973,
-      "source_sha256": "81DCE816D87EC11B9F4893AA84B31ADA7169D418916E19C8C77ACEB3B3604C9D",
-      "output_bytes": 4973,
-      "output_sha256": "81DCE816D87EC11B9F4893AA84B31ADA7169D418916E19C8C77ACEB3B3604C9D"
+      "source_bytes": 5433,
+      "source_sha256": "D1954FDFDDE5BF21D8A2082605C452A7257540768758BA40B0DE7D2D624FC26D",
+      "output_bytes": 5433,
+      "output_sha256": "D1954FDFDDE5BF21D8A2082605C452A7257540768758BA40B0DE7D2D624FC26D"
     },
     {
       "layer": "capability",
@@ -3238,10 +3238,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/core/fingerprint.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 10740,
-      "source_sha256": "79F5BC3BA8FECDFF5CAA526B3416010DDBA4D370711CF72EC04B47A85EAF9433",
-      "output_bytes": 10740,
-      "output_sha256": "79F5BC3BA8FECDFF5CAA526B3416010DDBA4D370711CF72EC04B47A85EAF9433"
+      "source_bytes": 15511,
+      "source_sha256": "868B82A6791B61AEFAE8D986582623B7D734227F945071591707526F3AD271CF",
+      "output_bytes": 15511,
+      "output_sha256": "868B82A6791B61AEFAE8D986582623B7D734227F945071591707526F3AD271CF"
     },
     {
       "layer": "capability",
@@ -3260,9 +3260,9 @@
       },
       "transform": "copy-exact-bytes",
       "source_bytes": 1023,
-      "source_sha256": "D201F32A123AC1DC015C5C1CC62DCF5716659C9694EF620D3103CE4A84CF985E",
+      "source_sha256": "2D445B9AA73183F45F7B7616A2130809009C8779BB913456B58F02576D964E5C",
       "output_bytes": 1023,
-      "output_sha256": "D201F32A123AC1DC015C5C1CC62DCF5716659C9694EF620D3103CE4A84CF985E"
+      "output_sha256": "2D445B9AA73183F45F7B7616A2130809009C8779BB913456B58F02576D964E5C"
     },
     {
       "layer": "capability",
@@ -3322,10 +3322,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/domain/compiler/compilation_snapshot.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 12836,
-      "source_sha256": "921F13B156F6B2CC158E08B2087F1F3CA767A04DACCD55327990D36ADC838780",
-      "output_bytes": 12836,
-      "output_sha256": "921F13B156F6B2CC158E08B2087F1F3CA767A04DACCD55327990D36ADC838780"
+      "source_bytes": 13323,
+      "source_sha256": "F4F0948D961B84B1D68A1F932DB663D31219D58B826B2CDF24C8F226EDE7A8CA",
+      "output_bytes": 13323,
+      "output_sha256": "F4F0948D961B84B1D68A1F932DB663D31219D58B826B2CDF24C8F226EDE7A8CA"
     },
     {
       "layer": "capability",
@@ -4207,10 +4207,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/emit/mod_data.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3305,
-      "source_sha256": "D50772611479EE5A659512167020E5F6782FDD7FE41456B01C5004D98E5AEF1A",
-      "output_bytes": 3305,
-      "output_sha256": "D50772611479EE5A659512167020E5F6782FDD7FE41456B01C5004D98E5AEF1A"
+      "source_bytes": 3567,
+      "source_sha256": "02DB2CEB2E8023594D49E7D45EF2A095E395B29837C216AE5463973E1D1F4849",
+      "output_bytes": 3567,
+      "output_sha256": "02DB2CEB2E8023594D49E7D45EF2A095E395B29837C216AE5463973E1D1F4849"
     },
     {
       "layer": "capability",
@@ -4731,10 +4731,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/index/recipe_facts.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 23402,
-      "source_sha256": "4DF61F522F2683E60C758A49312DC6400CD2F8CAEE873B12892AA746EF5278E3",
-      "output_bytes": 23402,
-      "output_sha256": "4DF61F522F2683E60C758A49312DC6400CD2F8CAEE873B12892AA746EF5278E3"
+      "source_bytes": 26796,
+      "source_sha256": "7FBB91E48D02190D3DE4C0328A7DC24E4010D2D6E260913F1B367B7FE274D936",
+      "output_bytes": 26796,
+      "output_sha256": "7FBB91E48D02190D3DE4C0328A7DC24E4010D2D6E260913F1B367B7FE274D936"
     },
     {
       "layer": "capability",
@@ -4878,10 +4878,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/pipeline/compilation_snapshot_adapter.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 6374,
-      "source_sha256": "8A96F4149CA7E1B221BD61BF04324D246A72FA7FA54D9A00ED2F5582494C1705",
-      "output_bytes": 6374,
-      "output_sha256": "8A96F4149CA7E1B221BD61BF04324D246A72FA7FA54D9A00ED2F5582494C1705"
+      "source_bytes": 7442,
+      "source_sha256": "E8514B9A82A231E8265903BBE683BA26229DF1AA0E38A2C0B5972809FCE82BA0",
+      "output_bytes": 7442,
+      "output_sha256": "E8514B9A82A231E8265903BBE683BA26229DF1AA0E38A2C0B5972809FCE82BA0"
     },
     {
       "layer": "capability",
@@ -4941,10 +4941,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 10522,
-      "source_sha256": "692EFF4E7A6D7A8E84E9F1B28CAD8761793B1FEE534228CAAC9B89C50AB13A09",
-      "output_bytes": 10522,
-      "output_sha256": "692EFF4E7A6D7A8E84E9F1B28CAD8761793B1FEE534228CAAC9B89C50AB13A09"
+      "source_bytes": 10733,
+      "source_sha256": "CF3D7C9041B574B3BB77D7CF9D5B036CF65AF9DD20ED7A89B03EA8CD9EE3B17F",
+      "output_bytes": 10733,
+      "output_sha256": "CF3D7C9041B574B3BB77D7CF9D5B036CF65AF9DD20ED7A89B03EA8CD9EE3B17F"
     },
     {
       "layer": "capability",
@@ -5004,10 +5004,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 7818,
-      "source_sha256": "8A28E7E1F9CE5363B244624AE9A31DADC33E542266FB2F8DB47B2336950C6E68",
-      "output_bytes": 7818,
-      "output_sha256": "8A28E7E1F9CE5363B244624AE9A31DADC33E542266FB2F8DB47B2336950C6E68"
+      "source_bytes": 7826,
+      "source_sha256": "416B70BB99D3BF4F1FF2E57B72E11FDE11EB9372192E4E3B4E57CCC1F6B61AFE",
+      "output_bytes": 7826,
+      "output_sha256": "416B70BB99D3BF4F1FF2E57B72E11FDE11EB9372192E4E3B4E57CCC1F6B61AFE"
     },
     {
       "layer": "capability",
@@ -5067,10 +5067,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4218,
-      "source_sha256": "FE610E353775389BE52507A52640C169B1D5C8B4DAC25F8B9E0D4747DE000B30",
-      "output_bytes": 4218,
-      "output_sha256": "FE610E353775389BE52507A52640C169B1D5C8B4DAC25F8B9E0D4747DE000B30"
+      "source_bytes": 4331,
+      "source_sha256": "0245B41FF53F3B82761B1CDA987CE4A235712FAE414FD9C8DE6661DF3D8F6146",
+      "output_bytes": 4331,
+      "output_sha256": "0245B41FF53F3B82761B1CDA987CE4A235712FAE414FD9C8DE6661DF3D8F6146"
     },
     {
       "layer": "capability",
@@ -5212,10 +5212,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/build.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 32308,
-      "source_sha256": "41D35180C1DB3035A71F3563D69F2FB3B08113FC34580092F877F796D0E57763",
-      "output_bytes": 32308,
-      "output_sha256": "41D35180C1DB3035A71F3563D69F2FB3B08113FC34580092F877F796D0E57763"
+      "source_bytes": 32401,
+      "source_sha256": "D68006FA7BCD8F29B4B49950078AD89CE3FEA653B66F13C00F37C97760301607",
+      "output_bytes": 32401,
+      "output_sha256": "D68006FA7BCD8F29B4B49950078AD89CE3FEA653B66F13C00F37C97760301607"
     },
     {
       "layer": "capability",
@@ -5296,10 +5296,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/compiler.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 9538,
-      "source_sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2",
-      "output_bytes": 9538,
-      "output_sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2"
+      "source_bytes": 11287,
+      "source_sha256": "C6D419A2F26933137FC633E4B3A6DC3573834F7A9EDC6ADAE0232BF15A94BE64",
+      "output_bytes": 11287,
+      "output_sha256": "C6D419A2F26933137FC633E4B3A6DC3573834F7A9EDC6ADAE0232BF15A94BE64"
     },
     {
       "layer": "capability",
@@ -5485,10 +5485,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 700,
-      "source_sha256": "6EFFE39695549D2FFB52FEA96EE7AA9383F78C969CB8834528572A2DDE2BF34F",
-      "output_bytes": 700,
-      "output_sha256": "6EFFE39695549D2FFB52FEA96EE7AA9383F78C969CB8834528572A2DDE2BF34F"
+      "source_bytes": 761,
+      "source_sha256": "2445FDE1C88E4266F25FAA9A8D1D1B4ACA540189592ECA37813E82738573745A",
+      "output_bytes": 761,
+      "output_sha256": "2445FDE1C88E4266F25FAA9A8D1D1B4ACA540189592ECA37813E82738573745A"
     },
     {
       "layer": "capability",
@@ -5506,10 +5506,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/model.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 5126,
-      "source_sha256": "720A88AE6653492933A731D9321F2D244BE68F34F6771E5AB2DEAC4F90CB4FDF",
-      "output_bytes": 5126,
-      "output_sha256": "720A88AE6653492933A731D9321F2D244BE68F34F6771E5AB2DEAC4F90CB4FDF"
+      "source_bytes": 6289,
+      "source_sha256": "8A9C9170D79BC092285C53A24B78AEE6B1A27A8AF98CCFFA74C85BDC7AC1F10F",
+      "output_bytes": 6289,
+      "output_sha256": "8A9C9170D79BC092285C53A24B78AEE6B1A27A8AF98CCFFA74C85BDC7AC1F10F"
     },
     {
       "layer": "capability",
@@ -5548,10 +5548,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/query.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 1066,
-      "source_sha256": "7A7711D1D16D65D32585AA3B5BFE99FD3B5AD51833A5CCC413F09294966FF78F",
-      "output_bytes": 1066,
-      "output_sha256": "7A7711D1D16D65D32585AA3B5BFE99FD3B5AD51833A5CCC413F09294966FF78F"
+      "source_bytes": 1485,
+      "source_sha256": "230BBA6EE84FA5E49CB47EF79A07F2F4078AD7BD33843640A36C48CDA94DCEC9",
+      "output_bytes": 1485,
+      "output_sha256": "230BBA6EE84FA5E49CB47EF79A07F2F4078AD7BD33843640A36C48CDA94DCEC9"
     },
     {
       "layer": "capability",
@@ -5569,10 +5569,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/build.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 7354,
-      "source_sha256": "0A2560165C8E0CC281ACC807A883D113429064EB43A11F5EADF1645AAD363D92",
-      "output_bytes": 7354,
-      "output_sha256": "0A2560165C8E0CC281ACC807A883D113429064EB43A11F5EADF1645AAD363D92"
+      "source_bytes": 8696,
+      "source_sha256": "CA27B3BFC2F74E32CCFFE44DEC3459B06BA139C0AB506F6DF1C7FB625B2A07E5",
+      "output_bytes": 8696,
+      "output_sha256": "CA27B3BFC2F74E32CCFFE44DEC3459B06BA139C0AB506F6DF1C7FB625B2A07E5"
     },
     {
       "layer": "capability",
@@ -5590,10 +5590,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/validate.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 6621,
-      "source_sha256": "7F6B801C60819AA41278DA6DEA2BF45F8E329BCC3395DBCB1DFA035170D5ADBA",
-      "output_bytes": 6621,
-      "output_sha256": "7F6B801C60819AA41278DA6DEA2BF45F8E329BCC3395DBCB1DFA035170D5ADBA"
+      "source_bytes": 14914,
+      "source_sha256": "400C23ECEBFD90D2A3A0F16B8C214B35ABEEC924F03C6C722C00003AB574FB1F",
+      "output_bytes": 14914,
+      "output_sha256": "400C23ECEBFD90D2A3A0F16B8C214B35ABEEC924F03C6C722C00003AB574FB1F"
     },
     {
       "layer": "capability",
@@ -6094,10 +6094,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/report/public_compiler_artifacts.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 12391,
-      "source_sha256": "335A17A08570D9122D7ADFA27B63B253405D4CF057538B0C0CE46C9710BE5008",
-      "output_bytes": 12391,
-      "output_sha256": "335A17A08570D9122D7ADFA27B63B253405D4CF057538B0C0CE46C9710BE5008"
+      "source_bytes": 14040,
+      "source_sha256": "CFB4CB2BC030FC31BD969903CA6ABF1F9660270308BD20902744D9A2EB049C2C",
+      "output_bytes": 14040,
+      "output_sha256": "CFB4CB2BC030FC31BD969903CA6ABF1F9660270308BD20902744D9A2EB049C2C"
     },
     {
       "layer": "capability",
@@ -6260,10 +6260,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/settings/effective.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 2965,
-      "source_sha256": "4A50344CF38C88A3C8D80BEE25956F99421C5BDDE5AD91D862145863FECFF495",
-      "output_bytes": 2965,
-      "output_sha256": "4A50344CF38C88A3C8D80BEE25956F99421C5BDDE5AD91D862145863FECFF495"
+      "source_bytes": 2992,
+      "source_sha256": "B4B552DEFBFB2934E810377CB08CCD0FC7166030A7076FC83BD11B06EA9BA660",
+      "output_bytes": 2992,
+      "output_sha256": "B4B552DEFBFB2934E810377CB08CCD0FC7166030A7076FC83BD11B06EA9BA660"
     },
     {
       "layer": "capability",
@@ -6344,10 +6344,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/stage/data_final_fixes.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 152,
-      "source_sha256": "CD43DDECC7CCAFFCDA431830B5CAEBFA361393E4ED5D4836B228B652F2480998",
-      "output_bytes": 152,
-      "output_sha256": "CD43DDECC7CCAFFCDA431830B5CAEBFA361393E4ED5D4836B228B652F2480998"
+      "source_bytes": 435,
+      "source_sha256": "EB24F4ADC759E0C0133B0537F79F3219B2ED73406ECEF3192712BD969845796E",
+      "output_bytes": 435,
+      "output_sha256": "EB24F4ADC759E0C0133B0537F79F3219B2ED73406ECEF3192712BD969845796E"
     },
     {
       "layer": "capability",
@@ -6502,10 +6502,10 @@
         "predecessor_source_path": "targets/f100/files/prototypes/mir/platform/factorio/target_profiles.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 6104,
-      "source_sha256": "51500379A47E1433472185927264CBA8183FD1CCC1C961EAAA26E526F2B6C34E",
-      "output_bytes": 6104,
-      "output_sha256": "51500379A47E1433472185927264CBA8183FD1CCC1C961EAAA26E526F2B6C34E"
+      "source_bytes": 6454,
+      "source_sha256": "F28121BAE32DD120AE2ACB18842228046A9EF447FAA89A49E42DDDF620B03AB9",
+      "output_bytes": 6454,
+      "output_sha256": "F28121BAE32DD120AE2ACB18842228046A9EF447FAA89A49E42DDDF620B03AB9"
     },
     {
       "layer": "presentation",
@@ -6525,10 +6525,10 @@
         "predecessor_source_path": "targets/f100/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 4728,
-      "source_sha256": "DF4679E4DCE50FF5FBED8501373F9C52F1A87EEBE64B6001E31551B4FD626BC7",
-      "output_bytes": 4728,
-      "output_sha256": "DF4679E4DCE50FF5FBED8501373F9C52F1A87EEBE64B6001E31551B4FD626BC7"
+      "source_bytes": 5913,
+      "source_sha256": "95E6B47E25E7224FC2077EAB3A0D5DF238E068A6F7825F236F4BEDFFC67B401F",
+      "output_bytes": 5913,
+      "output_sha256": "95E6B47E25E7224FC2077EAB3A0D5DF238E068A6F7825F236F4BEDFFC67B401F"
     },
     {
       "layer": "presentation",
@@ -6579,10 +6579,10 @@
         "predecessor_source_path": "targets/f110/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 4719,
-      "source_sha256": "C4FE17968CC5FB0B026BF8E97C0F5337C97A1F081B8C867EB771D74F4938222E",
-      "output_bytes": 4719,
-      "output_sha256": "C4FE17968CC5FB0B026BF8E97C0F5337C97A1F081B8C867EB771D74F4938222E"
+      "source_bytes": 5904,
+      "source_sha256": "06E67AA5119368A51379787053B85364E7145AC0CF2B44A97A406B7EF044F183",
+      "output_bytes": 5904,
+      "output_sha256": "06E67AA5119368A51379787053B85364E7145AC0CF2B44A97A406B7EF044F183"
     },
     {
       "layer": "presentation",
@@ -6762,10 +6762,10 @@
         "predecessor_source_path": "targets/f200/files/prototypes/mir/platform/factorio/target_profiles.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 17146,
-      "source_sha256": "BCB53481F6B4528A9693B25B18B0539103D29CD8031F6AA1DF6EBB549AD465AE",
-      "output_bytes": 17146,
-      "output_sha256": "BCB53481F6B4528A9693B25B18B0539103D29CD8031F6AA1DF6EBB549AD465AE"
+      "source_bytes": 17844,
+      "source_sha256": "7D8FBA75389D19B0E8E0FB3F7708A0C28C3865F9A656DC417AC0693FD1AB7532",
+      "output_bytes": 17844,
+      "output_sha256": "7D8FBA75389D19B0E8E0FB3F7708A0C28C3865F9A656DC417AC0693FD1AB7532"
     },
     {
       "layer": "adapter",
@@ -6816,10 +6816,10 @@
         "predecessor_source_path": "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3742,
-      "source_sha256": "B74AF45D6F69F9E7C9B77C22C7AEE546103D62D05E122CF32C211E300E0D3B03",
-      "output_bytes": 3742,
-      "output_sha256": "B74AF45D6F69F9E7C9B77C22C7AEE546103D62D05E122CF32C211E300E0D3B03"
+      "source_bytes": 3897,
+      "source_sha256": "27D5630DC888DE6C2A6940AA875EF9E9FA861AF216FC840C725AEAEB5F18D389",
+      "output_bytes": 3897,
+      "output_sha256": "27D5630DC888DE6C2A6940AA875EF9E9FA861AF216FC840C725AEAEB5F18D389"
     },
     {
       "layer": "presentation",
@@ -6834,10 +6834,10 @@
         "predecessor_source_path": "targets/f200/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 79688,
-      "source_sha256": "4E65542D8EBFE801936C2B738CEB68FCE14AFA5DAF2DEC062DC638532D409C20",
-      "output_bytes": 79688,
-      "output_sha256": "4E65542D8EBFE801936C2B738CEB68FCE14AFA5DAF2DEC062DC638532D409C20"
+      "source_bytes": 80873,
+      "source_sha256": "D6228357C7027B8EDE416080A4D65AF03BFB2A19E2CAC8D0A0929B6B1917A59C",
+      "output_bytes": 80873,
+      "output_sha256": "D6228357C7027B8EDE416080A4D65AF03BFB2A19E2CAC8D0A0929B6B1917A59C"
     },
     {
       "layer": "presentation",
@@ -7175,10 +7175,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/platform/factorio/target_profiles.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 17146,
-      "source_sha256": "1C727B788D67F16D0AA3B9A3FF856545EAC3529D80025C35BAF89BC383AC6DE7",
-      "output_bytes": 17146,
-      "output_sha256": "1C727B788D67F16D0AA3B9A3FF856545EAC3529D80025C35BAF89BC383AC6DE7"
+      "source_bytes": 17844,
+      "source_sha256": "16D192F5279F7E7430CCD4DB486B5DEDA8CBC0976C9CED5582071D0B03116A78",
+      "output_bytes": 17844,
+      "output_sha256": "16D192F5279F7E7430CCD4DB486B5DEDA8CBC0976C9CED5582071D0B03116A78"
     },
     {
       "layer": "capability",
@@ -7251,10 +7251,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3865,
-      "source_sha256": "E4812434404D3213079B7D21EC5006ECA3C766E90111AA2A344E74932B780559",
-      "output_bytes": 3865,
-      "output_sha256": "E4812434404D3213079B7D21EC5006ECA3C766E90111AA2A344E74932B780559"
+      "source_bytes": 4020,
+      "source_sha256": "A6707469B87F253252CE1BD11B24B6AAFF3D0B80BD5EF35DA433D8610C1669EE",
+      "output_bytes": 4020,
+      "output_sha256": "A6707469B87F253252CE1BD11B24B6AAFF3D0B80BD5EF35DA433D8610C1669EE"
     },
     {
       "layer": "presentation",
@@ -7269,10 +7269,10 @@
         "predecessor_source_path": "targets/f210/generation/README.md.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 78630,
-      "source_sha256": "6BABED2D869CF90E8729539380DBDAD2488906C990AA4D20449213A667E67E21",
-      "output_bytes": 78630,
-      "output_sha256": "6BABED2D869CF90E8729539380DBDAD2488906C990AA4D20449213A667E67E21"
+      "source_bytes": 79815,
+      "source_sha256": "49D5A6578D7C4648DBA4C63622844B7DDFC1C640E0073216A72E8B7D1E48C9CC",
+      "output_bytes": 79815,
+      "output_sha256": "49D5A6578D7C4648DBA4C63622844B7DDFC1C640E0073216A72E8B7D1E48C9CC"
     },
     {
       "layer": "capability",
@@ -7288,10 +7288,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 93275,
-      "source_sha256": "5DAD134AC15280F43FA8341539D0827FEFDE283F7B005B738E2D121F44CC9F43",
-      "output_bytes": 93275,
-      "output_sha256": "5DAD134AC15280F43FA8341539D0827FEFDE283F7B005B738E2D121F44CC9F43"
+      "source_bytes": 96086,
+      "source_sha256": "FF0F10494B38753BD17609CA5FE8ABBFD8BF967D54C23F24CEFFECB4FCCF56C0",
+      "output_bytes": 96086,
+      "output_sha256": "FF0F10494B38753BD17609CA5FE8ABBFD8BF967D54C23F24CEFFECB4FCCF56C0"
     },
     {
       "layer": "capability",
@@ -7326,10 +7326,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 52696,
-      "source_sha256": "61FC45B0A233EBBBF89466721F747131F8A60BB42900A897D39EC4BBEAA6C244",
-      "output_bytes": 52696,
-      "output_sha256": "61FC45B0A233EBBBF89466721F747131F8A60BB42900A897D39EC4BBEAA6C244"
+      "source_bytes": 53983,
+      "source_sha256": "DDE3318580A3C24177BC3A924556126C29CB97087F18A0940958B9FBE7DF77F4",
+      "output_bytes": 53983,
+      "output_sha256": "DDE3318580A3C24177BC3A924556126C29CB97087F18A0940958B9FBE7DF77F4"
     },
     {
       "layer": "capability",
@@ -7364,10 +7364,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 33590,
-      "source_sha256": "7493EDA611B8D5B0693E5F95CC1C2D92472968DD42CC9B155750EC180EF2A971",
-      "output_bytes": 33590,
-      "output_sha256": "7493EDA611B8D5B0693E5F95CC1C2D92472968DD42CC9B155750EC180EF2A971"
+      "source_bytes": 37501,
+      "source_sha256": "8AC9BF88637B2C13D54CE1BADDCF2EBCBC5B42FBCAB6B9BF29E7DA4AC45EB2CA",
+      "output_bytes": 37501,
+      "output_sha256": "8AC9BF88637B2C13D54CE1BADDCF2EBCBC5B42FBCAB6B9BF29E7DA4AC45EB2CA"
     },
     {
       "layer": "capability",
@@ -7700,6 +7700,116 @@
       "source_sha256": "5BC0F04E1505123C04B08CB2D24C1F7AE1B66C1C44E8523F7BD4846E9358C544",
       "output_bytes": 1041,
       "output_sha256": "5BC0F04E1505123C04B08CB2D24C1F7AE1B66C1C44E8523F7BD4846E9358C544"
+    },
+    {
+      "layer": "capability",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/settings/compiler_profile.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/settings/compiler_profile.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR4-CHG-2026-0163",
+        "reason": "Explicitly reduced classic compiler selected before full proof analysis, using the existing emitter."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 1246,
+      "source_sha256": "BD99F3C7430DE75F3C6F9D2F5DA73E8CCFBF84124C9819E6E918A88E346D7391",
+      "output_bytes": 1246,
+      "output_sha256": "BD99F3C7430DE75F3C6F9D2F5DA73E8CCFBF84124C9819E6E918A88E346D7391"
+    },
+    {
+      "layer": "capability",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/pipeline/classic_compiler.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/pipeline/classic_compiler.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR4-CHG-2026-0163",
+        "reason": "Explicitly reduced classic compiler selected before full proof analysis, using the existing emitter."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 4131,
+      "source_sha256": "E04AE9C4EB3ED8BAD8EBC644ED176020C6ABB68F04E3C5D6C779559B3AA86167",
+      "output_bytes": 4131,
+      "output_sha256": "E04AE9C4EB3ED8BAD8EBC644ED176020C6ABB68F04E3C5D6C779559B3AA86167"
+    },
+    {
+      "layer": "capability",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/domain/compiler/classic_declarations.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/domain/compiler/classic_declarations.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR4-CHG-2026-0163",
+        "reason": "Explicitly reduced classic compiler selected before full proof analysis, using the existing emitter."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 4417,
+      "source_sha256": "43A03B8633D397DF6A1EEBEC70674900037278F8AE0AFB0CB434BAA133642617",
+      "output_bytes": 4417,
+      "output_sha256": "43A03B8633D397DF6A1EEBEC70674900037278F8AE0AFB0CB434BAA133642617"
+    },
+    {
+      "layer": "capability",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/planner/classic/plan.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/planner/classic/plan.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR4-CHG-2026-0163",
+        "reason": "Explicitly reduced classic compiler selected before full proof analysis, using the existing emitter."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 31440,
+      "source_sha256": "E27F977788B3FECF52AAEB4374763AC4A72796833BF395D7160E07D9A1FB2296",
+      "output_bytes": 31440,
+      "output_sha256": "E27F977788B3FECF52AAEB4374763AC4A72796833BF395D7160E07D9A1FB2296"
+    },
+    {
+      "layer": "capability",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/runtime/compiler_profile_notice.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR4-CHG-2026-0163",
+        "reason": "Explicitly reduced classic compiler selected before full proof analysis, using the existing emitter."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 2961,
+      "source_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D",
+      "output_bytes": 2961,
+      "output_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D"
     }
   ],
   "invariants": {
@@ -7709,5 +7819,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "7A4B1B9E1FEE020F088AC32CAB57EB9D67DEEE7B1ABBDEC3E55611B6390ED8C2"
+  "record_sha256": "3B9EE71BF0C3A9A79FE307B60A4D0E3B0E8A2DAE1ADD545B89009E01266E9893"
 }

@@ -9,9 +9,12 @@ local function expect(check, condition, message)
   if not condition then error(message) end
 end
 
-local function make_host_factory(host_source, catalogue_source, platform_source)
+local function make_host_factory(host_source, catalogue_source, platform_source, core)
   local function make_environment(options)
-    local events, buckets = {}, {}
+    local events, buckets, nth_ticks, nth_tick_history = {}, {}, {}, {}
+    local browser_bucket = options and options.browser_state or {}
+    local runtime_root = options and options.runtime_root or {mir = {research_browser = browser_bucket}}
+    buckets.research_browser = browser_bucket
     local metrics = {render_calls = 0, gameplay_mutations = 0, destroy_calls = 0, shortcut_calls = 0}
     local player
     local event_names = {
@@ -36,7 +39,8 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
     end
     local modules = {
       ["prototypes.mir.runtime.research_browser_core"] = {
-        translation_queue = {}, detail_string_limit = 1024, catalogue_limit = 30000
+        translation_queue = core.translation_queue, detail_string_limit = core.detail_string_limit,
+        catalogue_limit = core.catalogue_limit
       },
       ["prototypes.mir.runtime.research_browser_factorio_catalogue"] = catalogue_module,
       ["prototypes.mir.runtime.research_browser_mir_provider"] = {},
@@ -46,7 +50,7 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
           return buckets[name]
         end
       },
-      ["prototypes.mir.platform.factorio.runtime_state"] = {root = function() return {} end},
+      ["prototypes.mir.platform.factorio.runtime_state"] = {root = function() return runtime_root end},
       ["prototypes.mir.platform.factorio.browser_host"] = {prototype_collections = function() return {} end},
       ["prototypes.mir.platform.factorio.target_line"] = {feature_enabled = function(name)
         if name == "research_library" then return not (options and options.disable_library) end
@@ -69,7 +73,10 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
           assert(id ~= nil and defines_events[id] ~= nil, "unsupported event registration: " .. tostring(id))
           events[id] = callback
         end,
-        on_nth_tick = function() end
+        on_nth_tick = function(interval, callback)
+          nth_ticks[interval] = callback
+          nth_tick_history[#nth_tick_history + 1] = {interval = interval, callback = callback}
+        end
       },
       remote = {add_interface = function() end},
       commands = {add_command = function() end},
@@ -91,7 +98,8 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
     setmetatable(env, {__index = function(_, key)
       error("unexpected host global access: " .. tostring(key))
     end})
-    return env, events, metrics, buckets, function(value) player = value end, catalogue_module
+    return env, events, metrics, buckets, function(value) player = value end, catalogue_module,
+      nth_ticks, nth_tick_history
   end
 
   return function(options)
@@ -118,7 +126,14 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
         "if event.element and event.element.valid and event.element.name == ROOT then close(player) end", 1)
       if count ~= 1 then error("close ownership mutation anchor not found") end
     end
-    local env, events, metrics, buckets, set_player, catalogue_module = make_environment(options)
+    if options and options.mutate_translation_maintenance_always_active then
+      local count
+      source, count = string.gsub(source,
+        "set_translation_maintenance_subscription%(translations_need_maintenance%(translations%)%)",
+        "set_translation_maintenance_subscription(true)", 1)
+      if count ~= 1 then error("translation maintenance mutation anchor not found") end
+    end
+    local env, events, metrics, buckets, set_player, catalogue_module, nth_ticks, nth_tick_history = make_environment(options)
     local chunk, load_error = load(source, "research_browser_handler_fixture", "t", env)
     if not chunk then error(load_error) end
     local host = chunk()
@@ -130,7 +145,8 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
     -- The foreign control advertises a destructive MIR action but does not
     -- belong to the player's root, so ownership must reject it first.
     local foreign_button = {valid = true, type = "button", tags = {mir_browser = "close"}}
-    local fixture_player = {valid = true, index = 1, gui = {screen = {mir_research_browser = root}}}
+    local fixture_player = {valid = true, connected = true, locale = "en", index = 1,
+      gui = {screen = {mir_research_browser = root}}}
     fixture_player.force = setmetatable({}, {
       __index = function() error("lifecycle fixture must not read force gameplay") end,
       __newindex = function()
@@ -150,10 +166,9 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
     -- A second player's pending search and saved view share this namespace.
     -- Lifecycle callbacks for player 1 must leave that peer's state intact.
     local peer_view = {location = {x = 30, y = 40}, search = "peer search"}
-    buckets.research_browser = {
-      players = {[1] = {location = root.location}, [2] = peer_view},
-      pending_search_refresh = {[1] = 10, [2] = 20}
-    }
+    local browser_state = buckets.research_browser
+    browser_state.players = {[1] = {location = root.location}, [2] = peer_view}
+    browser_state.pending_search_refresh = {[1] = 10, [2] = 20}
     set_player(fixture_player)
     return {
       on_gui_click = events.on_gui_click,
@@ -174,6 +189,8 @@ local function make_host_factory(host_source, catalogue_source, platform_source)
       catalogue = catalogue_module,
       environment = env,
       state = buckets.research_browser,
+      nth_ticks = nth_ticks,
+      nth_tick_history = nth_tick_history,
       peer_view = peer_view
     }
   end
@@ -360,12 +377,15 @@ end
 
 -- host_source_string is trusted project source supplied by the test harness.
 -- The isolated load environment exists only inside this regression fixture.
-return function(host_source_string, check, catalogue_source_string, capability_sources)
+return function(host_source_string, check, catalogue_source_string, capability_sources, core)
   check_capability_stages(capability_sources, check, catalogue_source_string)
   expect(check, type(host_source_string) == "string" and #host_source_string > 0,
     "handler regression receives trusted browser host source")
   expect(check, type(check) == "function", "handler regression receives an assertion function")
-  local host_factory = make_host_factory(host_source_string, catalogue_source_string, capability_sources.host_adapters.modern)
+  expect(check, type(core) == "table" and type(core.translation_queue) == "table",
+    "handler regression receives the actual translation queue")
+  local host_factory = make_host_factory(host_source_string, catalogue_source_string,
+    capability_sources.host_adapters.modern, core)
   for _, missing in ipairs{
       {"on_player_locale_changed", "on_research_moved", "on_research_cancelled"},
       {"on_player_locale_changed", "on_research_moved"}, {}} do
@@ -422,6 +442,51 @@ return function(host_source_string, check, catalogue_source_string, capability_s
   expect(check, #fixture.host.requires_features == 1
     and fixture.host.requires_features[1] == "research_library",
     "Library availability declares its own capability, independently of settings profiles")
+  expect(check, fixture.nth_ticks[61] == nil,
+    "a never-opened Library installs no translation-maintenance timer")
+
+  local function pending_translation_cache(id)
+    local queue = core.translation_queue
+    local cache = queue.new("en", 1)
+    queue.reset_catalogue(cache, {"translated-tech"}, "handler-translation-" .. tostring(id))
+    expect(check, queue.requested(cache, "translated-tech", id, 0),
+      "handler fixture creates a real outstanding translation request")
+    return cache
+  end
+  local pending_cache = pending_translation_cache(701)
+  local translation_lifecycle = fixture_from(host_factory, {browser_state = {
+    translations = {[1] = pending_cache}, translation_locale_generations = {[1] = 1}
+  }}, check)
+  translation_lifecycle.host.on_load()
+  expect(check, type(translation_lifecycle.nth_ticks[61]) == "function",
+    "load restores translation maintenance only for an outstanding callback")
+  translation_lifecycle.on_gui_closed{player_index = 1, element = translation_lifecycle.root}
+  expect(check, type(translation_lifecycle.nth_ticks[61]) == "function",
+    "closing the Library retains translation maintenance until its callback settles")
+  translation_lifecycle.events.on_string_translated{
+    player_index = 1, id = 701, translated = true, result = "Translated technology"
+  }
+  expect(check, translation_lifecycle.nth_ticks[61] == nil
+    and pending_cache.outstanding == 0 and next(pending_cache.pending_by_id) == nil,
+    "a settled closed Library retires translation maintenance without rebuilding its view")
+
+  local removed_cache = pending_translation_cache(702)
+  local removal_lifecycle = fixture_from(host_factory, {browser_state = {
+    translations = {[1] = removed_cache}, translation_locale_generations = {[1] = 1}
+  }}, check)
+  removal_lifecycle.host.on_load()
+  removal_lifecycle.events.on_player_removed{player_index = 1}
+  expect(check, removal_lifecycle.nth_ticks[61] == nil,
+    "removing the final pending player retires translation maintenance")
+  local unconditional_timer = fixture_from(host_factory, {
+    mutate_translation_maintenance_always_active = true,
+    browser_state = {translations = {[1] = pending_translation_cache(703)}, translation_locale_generations = {[1] = 1}}
+  }, check)
+  unconditional_timer.host.on_load()
+  unconditional_timer.events.on_player_removed{player_index = 1}
+  expect(check, type(unconditional_timer.nth_ticks[61]) == "function",
+    "negative control detects unconditional translation maintenance after pending work settles")
+
   local disabled = host_factory{disable_library = true}
   expect(check, disabled.on_gui_click == nil and disabled.on_gui_closed == nil,
     "a target without the Library installs no browser GUI callbacks")

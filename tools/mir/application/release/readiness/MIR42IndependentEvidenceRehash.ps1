@@ -42,7 +42,7 @@ function Resolve-MIR42IndependentChild {
 
 function Get-MIR42IndependentScopeContract {
   param([Parameter(Mandatory)][ValidateSet('four-target','nine-target')][string]$Scope,[switch]$PublishedMaintenance,
-    [ValidateSet('4.2.0','4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
   if ($PublishedMaintenance) {
     Assert-MIR42IndependentMaintenanceScope -Scope $Scope -SourceVersion $SourceVersion
     return [pscustomobject][ordered]@{
@@ -134,7 +134,7 @@ function Get-MIR42IndependentEngine {
 
 function Assert-MIR42IndependentMaintenanceScope {
   param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][string]$SourceVersion)
-  if ($Scope -cne 'nine-target' -or $SourceVersion -cnotin @('4.2.1','4.2.2')) {
+  if ($Scope -cne 'nine-target' -or $SourceVersion -cnotin @('4.2.1','4.2.2','4.2.3')) {
     throw '[mir42-independent-maintenance-candidate-scope]'
   }
 }
@@ -249,7 +249,8 @@ function Invoke-MIR42IndependentEvidenceRehashShared {
     $metadataText = (& gh api ('repos/Julesc013/more-infinite-research/releases/tags/' + $predecessorContract.source_tag) | Out-String)
     if ($LASTEXITCODE -ne 0) { throw '[mir42-independent-maintenance-release-readback]' }
     $maintenanceInputs = Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo `
-      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) -CandidateSourceVersion ([string]$versionContract.source_version)
+      -ManifestPath $PublishedMaintenancePredecessorManifestPath -ReleaseMetadata ($metadataText | ConvertFrom-Json -Depth 100 -DateKind String) `
+      -CandidateSourceVersion ([string]$versionContract.source_version) -ArchiveBindings $PredecessorZips
     if ($qualification.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor') {
       throw '[mir42-independent-maintenance-custody-missing]'
     }

@@ -367,6 +367,8 @@ paths:
   mir4.target-registry.historical-v5: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
   mir4.semantic-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json
   mir4.runtime-continuity.programme: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
+  mir4.runtime-continuity.classic-notice-authority: governance/repository/mir430-classic-runtime-notice-v1.json
+  mir4.runtime-continuity.classic-notice-schema: spec/schemas/mir430-classic-runtime-notice-v1.schema.json
   mir4.module-ecosystem.programme: .mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json
   mir4.processir-synthesis.programme: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
   mir4.processir-exact-t12.authority: .mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json

@@ -13,7 +13,8 @@ param(
   [string]$Claim = '',
   [string]$KnownLimitations = '',
   [string]$OutputPath = '',
-  [string]$PublishedMaintenancePredecessorManifestPath = ''
+  [string]$PublishedMaintenancePredecessorManifestPath = '',
+  [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null
 )
 
 $ErrorActionPreference = 'Stop'
@@ -25,7 +26,7 @@ switch ($Mode) {
     if ($PredecessorZips.Count -eq 0 -or $UpgradeReceipts.Count -eq 0 -or [string]::IsNullOrWhiteSpace($OutputRoot)) {
       throw '[mir42-nine-reconciliation-inputs-required]'
     }
-    Invoke-MIR42NineTargetEvidenceReconciliation -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath | ConvertTo-Json -Depth 100
+    Invoke-MIR42NineTargetEvidenceReconciliation -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath -PredecessorZips $PredecessorZips -UpgradeReceipts $UpgradeReceipts -OutputRoot $OutputRoot -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath -PublishedMaintenanceArchiveBindings $PublishedMaintenanceArchiveBindings | ConvertTo-Json -Depth 100
   }
   'Criterion' {
     foreach ($value in @($Criterion,$Claim,$KnownLimitations,$OutputPath)) {
@@ -35,6 +36,6 @@ switch ($Mode) {
     New-MIR42NineTargetCriterionEvidence -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath -Criterion $Criterion `
       -ObservationPaths $ObservationPaths -ObservedTargets $ObservedTargets -NotApplicableTargetReasons $NotApplicableTargetReasons `
       -Claim $Claim -KnownLimitations $KnownLimitations -OutputPath $OutputPath `
-      -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath | ConvertTo-Json -Depth 100
+      -PublishedMaintenancePredecessorManifestPath $PublishedMaintenancePredecessorManifestPath -PublishedMaintenanceArchiveBindings $PublishedMaintenanceArchiveBindings | ConvertTo-Json -Depth 100
   }
 }

@@ -261,27 +261,43 @@ function M.qualify(base, values)
   }, {trusted_components = true})
 end
 
-function M.snapshot(record, options)
+local function public_snapshot_material(record)
+  return {
+    schema = record.schema,
+    record_type = record.record_type,
+    base_snapshot_fingerprint = record.base_snapshot_fingerprint,
+    domain_fingerprints = record.domain_fingerprints,
+    relationship_fingerprint = record.relationship_fingerprint,
+    owner_index_fingerprint = record.owner_index_fingerprint,
+    graph_input_fingerprint = record.graph_input_fingerprint,
+    effect_target_inventory_fingerprint = record.effect_target_inventory_fingerprint,
+    provider_input_fingerprint = record.provider_input_fingerprint,
+    stream_input_fingerprint = record.stream_input_fingerprint,
+    base_continuation_input_fingerprint = record.base_continuation_input_fingerprint,
+    source_fingerprints = record.source_fingerprints,
+    structural_sharing = record.structural_sharing,
+    metrics = record.metrics,
+    snapshot_fingerprint = record.snapshot_fingerprint
+  }
+end
+
+local function assert_snapshot_record(record)
   if M.is_trusted(record) then M.assert_trusted(record) else M.verify_untrusted(record) end
+end
+
+-- This is intentionally not M.snapshot(record): snapshot is an observable
+-- defensive-copy API, while telemetry needs only the exact canonical length
+-- of the same public projection.
+function M.snapshot_canonical_bytes(record)
+  assert_snapshot_record(record)
+  return fingerprint.canonical_length(public_snapshot_material(record))
+end
+
+function M.snapshot(record, options)
+  assert_snapshot_record(record)
   authority.count_snapshot()
   if not (options and options.full) then
-    return deepcopy({
-      schema = record.schema,
-      record_type = record.record_type,
-      base_snapshot_fingerprint = record.base_snapshot_fingerprint,
-      domain_fingerprints = record.domain_fingerprints,
-      relationship_fingerprint = record.relationship_fingerprint,
-      owner_index_fingerprint = record.owner_index_fingerprint,
-      graph_input_fingerprint = record.graph_input_fingerprint,
-      effect_target_inventory_fingerprint = record.effect_target_inventory_fingerprint,
-      provider_input_fingerprint = record.provider_input_fingerprint,
-      stream_input_fingerprint = record.stream_input_fingerprint,
-      base_continuation_input_fingerprint = record.base_continuation_input_fingerprint,
-      source_fingerprints = record.source_fingerprints,
-      structural_sharing = record.structural_sharing,
-      metrics = record.metrics,
-      snapshot_fingerprint = record.snapshot_fingerprint
-    })
+    return deepcopy(public_snapshot_material(record))
   end
   authority.count_full_copy()
   return deepcopy(record)

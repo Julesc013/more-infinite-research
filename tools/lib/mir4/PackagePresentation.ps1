@@ -957,6 +957,25 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   $progressionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
   $progressionPlannerIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
   $browserIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0146'})
+  $classicIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
+  $classicSources=@(
+    'source/prototypes/mir/settings/compiler_profile.lua',
+    'source/prototypes/mir/pipeline/classic_compiler.lua',
+    'source/prototypes/mir/domain/compiler/classic_declarations.lua',
+    'source/prototypes/mir/planner/classic/plan.lua',
+    'source/prototypes/mir/runtime/compiler_profile_notice.lua'
+  )
+  if($classicIntroduced.Count-ne$classicSources.Count){throw '[mir4-package-presentation-v7-source-succession]'}
+  foreach($source in $classicSources){
+    $rows=@($classicIntroduced|Where-Object{[string]$_.source_path-ceq$source})
+    if($rows.Count-ne1-or[string]$rows[0].layer-cne'capability'-or
+       [string]$rows[0].semantic_class-cne'target-overlay'-or
+       [string]$rows[0].output_path-cne$source.Substring('source/'.Length)-or
+       [string]$rows[0].transform-cne'copy-exact-bytes'-or
+       (@($rows[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){
+      throw '[mir4-package-presentation-v7-source-succession]'
+    }
+  }
   $browserSources=[ordered]@{
     'source/prototypes/mir/platform/factorio/browser_host.lua'='f210|f200'
     'source/adapters/runtime-capabilities/game-browser-host.lua'='f110|f100'
@@ -973,7 +992,7 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
     }
   }
   if([string]$Current.predecessor_record_sha256-cne[string]$Predecessor.record_sha256-or
-     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne18-or
+     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne23-or
      $scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or$progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or
      [string]$progressionIntroduced[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
      [string]$progressionIntroduced[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or

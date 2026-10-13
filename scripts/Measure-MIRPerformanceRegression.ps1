@@ -8,25 +8,66 @@ param(
   [string]$LocalModZipDir = "",
   [string]$OutputPath = ".mir\evidence\3.2.1-performance-regression.json",
   [string]$ArtifactRoot = "",
-  [ValidateRange(1, 10)][int]$WarmupRuns = 1,
-  [ValidateRange(5, 25)][int]$MeasuredRuns = 5,
+  [ValidateRange(0, 5)][int]$WarmupRuns = 1,
+  # The retained research-all consumer enforces its own campaign minimum.
+  # Startup diagnostics may use one measured balanced block while an input
+  # set is being admitted; release acceptance selects five or more.
+  [ValidateRange(1, 25)][int]$MeasuredRuns = 5,
   [switch]$ProbeSmokeOnly,
   [string]$CompatSmokeLaneId = "",
   [switch]$ObserveResearchAll,
   [switch]$PrepareResearchAllInputs,
-  [ValidateSet('f200','f210')][string]$Target='f210',
   [string]$SourceMaterializationPath='',
+  [switch]$ObserveStartup,
+  [string]$StartupProfileTemplatePath='',
+  [string]$Published422Archive='',
+  [string]$Published422ManifestPath='',
+  [string]$Published422ManifestSha256='',
+  [string]$StartupCandidateArchive='',
+  [string]$CandidateMaterializationArchive='',
+  [string]$CandidateMaterializationReceiptPath='',
+  [ValidateSet('4.2.3','4.3.0','4.3.1')][string]$StartupCandidateSourceVersion='4.2.3',
+  [switch]$PreliminaryStartup,
+  [switch]$StartupCandidateOnly,
+  [string]$StartupOutputRoot='',
+  [string]$ActiveModsObserver='',
+  [switch]$GraphicalPlayerReady,
+  [string]$PlayerReadyObserverArchive='',
+  [ValidateRange(1,720)][int]$PlayerReadyBenchmarkTicks=60,
+  [switch]$OrdinaryMenu,
+  [string]$OrdinaryPlayerConfigPath='',
+  [ValidateSet('f200','f210')][string]$Target='f210',
+  [ValidateRange(1,3600)][int]$TimeoutSeconds=300,
   [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB=1024,
-  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
+  [ValidateRange(0,300)][int]$AdmissionWaitSeconds=0
 )
 
-if($ObserveResearchAll -or $PrepareResearchAllInputs){
+if(($ObserveResearchAll-or$PrepareResearchAllInputs)-and$ObserveStartup){throw '[mir-direct-startup-mode-conflict]'}
+if($ObserveResearchAll-or$PrepareResearchAllInputs){
   . (Join-Path $RepoRoot 'tools/lib/validation/ResearchAllPerformance.ps1')
   Invoke-MIRResearchAllPerformance -RepoRoot $RepoRoot -Target $Target -Candidate $Candidate -PriorRelease $PriorRelease -FactorioBin $FactorioBin -ExpectedSourceCommit $ExpectedSourceCommit -LibraryDirectory $LocalModZipDir -SourceMaterializationPath $SourceMaterializationPath -OutputRoot $ArtifactRoot -PrepareInputsOnly:$PrepareResearchAllInputs -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
   return
 }
-
-throw '[mir-native-obsolete-runner] The legacy performance campaign stages populated mod directories. Use an explicitly selected direct-library native consumer; this campaign must be migrated before it can provide new performance evidence.'
+if($ObserveStartup){
+  if($StartupCandidateOnly-and($PreliminaryStartup-or$GraphicalPlayerReady-or$OrdinaryMenu)){throw '[mir-direct-startup-candidate-only-mode]'}
+  $requiredInputs=@(@('FactorioBin',$FactorioBin),@('LibraryDirectory',$LocalModZipDir),@('StartupProfileTemplatePath',$StartupProfileTemplatePath),@('StartupOutputRoot',$StartupOutputRoot))
+  if($StartupCandidateOnly){
+    $requiredInputs+=@(@('StartupCandidateArchive',$StartupCandidateArchive),@('CandidateMaterializationArchive',$CandidateMaterializationArchive),@('CandidateMaterializationReceiptPath',$CandidateMaterializationReceiptPath))
+  }else{
+    $requiredInputs+=@(@('Published422Archive',$Published422Archive),@('Published422ManifestPath',$Published422ManifestPath),@('Published422ManifestSha256',$Published422ManifestSha256))
+  }
+  foreach($pair in $requiredInputs){if([string]::IsNullOrWhiteSpace([string]$pair[1])){throw "[mir-direct-startup-input-required] $($pair[0])"}}
+  if($GraphicalPlayerReady-and$OrdinaryMenu){throw '[mir-direct-startup-endpoint-mode-conflict]'}
+  if($GraphicalPlayerReady-and[string]::IsNullOrWhiteSpace($PlayerReadyObserverArchive)){throw '[mir-direct-startup-input-required] PlayerReadyObserverArchive'}
+  if($OrdinaryMenu-and[string]::IsNullOrWhiteSpace($OrdinaryPlayerConfigPath)){throw '[mir-direct-startup-input-required] OrdinaryPlayerConfigPath'}
+  if($ExpectedPeakMemoryMiB-le0){throw '[mir441-resource-peak-budget-required] Declare the native probe peak memory budget.'}
+  . (Join-Path $RepoRoot 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
+  $parameters=@{FactorioBin=$FactorioBin;LibraryDirectory=$LocalModZipDir;ProfileTemplatePath=$StartupProfileTemplatePath;Published422Archive=$Published422Archive;Published422ManifestPath=$Published422ManifestPath;Published422ManifestSha256=$Published422ManifestSha256;CandidateArchive=$StartupCandidateArchive;CandidateMaterializationArchive=$CandidateMaterializationArchive;CandidateMaterializationReceiptPath=$CandidateMaterializationReceiptPath;StartupCandidateSourceVersion=$StartupCandidateSourceVersion;OutputRoot=$StartupOutputRoot;Target=$Target;WarmupRuns=$WarmupRuns;MeasuredRuns=$MeasuredRuns;TimeoutSeconds=$TimeoutSeconds;ExpectedPeakMemoryMiB=$ExpectedPeakMemoryMiB;MaxNewOutputMiB=$MaxNewOutputMiB;AdmissionWaitSeconds=$AdmissionWaitSeconds;SourceCommit=$ExpectedSourceCommit;Preliminary=$PreliminaryStartup;CandidateOnly=$StartupCandidateOnly;ActiveModsObserver=$ActiveModsObserver;GraphicalPlayerReady=$GraphicalPlayerReady;PlayerReadyObserverArchive=$PlayerReadyObserverArchive;PlayerReadyBenchmarkTicks=$PlayerReadyBenchmarkTicks;OrdinaryMenu=$OrdinaryMenu;OrdinaryPlayerConfigPath=$OrdinaryPlayerConfigPath}
+  Invoke-MIRDirectLibraryStartupMeasurement @parameters
+  return
+}
+throw '[mir-native-obsolete-runner] The legacy performance campaign stages populated mod directories. Use -ObserveStartup for the selected direct-library startup diagnostic or the retained research-all consumer.'
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "validation\ReleaseAttestations.ps1")

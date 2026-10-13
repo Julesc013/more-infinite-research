@@ -16,6 +16,8 @@ local metrics = {
   fingerprint_calls = 0,
   hash_cache_hits = 0,
   hash_computations = 0,
+  map_projection_calls = 0,
+  shared_projection_bytes = 0,
   serializations_over_one_mib = 0,
   maximum_canonical_bytes = 0
 }
@@ -176,18 +178,38 @@ diagnose = function(root)
   error("Fingerprint diagnostic traversal did not reproduce invalid input.", 3)
 end
 
-function M.canonical(value)
-  local out = {}
-  encode(value, {}, "$", false, value, out, 0)
-  local text = table.concat(out)
-  local bytes = #text
+local function record_canonical_metrics(bytes)
   metrics.canonical_calls = metrics.canonical_calls + 1
   metrics.canonical_bytes = metrics.canonical_bytes + bytes
   metrics.maximum_canonical_bytes = math.max(metrics.maximum_canonical_bytes, bytes)
   if bytes > ONE_MIB then
     metrics.serializations_over_one_mib = metrics.serializations_over_one_mib + 1
   end
+end
+
+function M.canonical(value)
+  local out = {}
+  encode(value, {}, "$", false, value, out, 0)
+  local text = table.concat(out)
+  local bytes = #text
+  record_canonical_metrics(bytes)
   return text
+end
+
+-- Traverse through the same canonical writer without retaining its complete
+-- text. This remains a canonicalization pass for telemetry and preserves the
+-- normal invalid-input diagnostics, while callers that need only a byte
+-- budget do not allocate a second serialized copy of a trusted record.
+function M.canonical_length(value)
+  local bytes = 0
+  local counting_sink = setmetatable({}, {
+    __newindex = function(_, _, token)
+      bytes = bytes + #token
+    end
+  })
+  encode(value, {}, "$", false, value, counting_sink, 0)
+  record_canonical_metrics(bytes)
+  return bytes
 end
 
 local function hash_canonical(text)
@@ -203,28 +225,20 @@ local function hash_canonical(text)
   local hash = 2166136261
   local index = 1
   local length = #text
-  -- Preserve the exact MIR32 recurrence while amortizing the Lua-to-C call
-  -- used to read canonical bytes. The modulus remains applied after every
-  -- byte, so this is identity-compatible with the scalar implementation.
+  -- Expand sixteen applications of h' = (h * 65599 + byte) mod p into
+  -- one polynomial reduction. Split the incoming 32-bit hash at 16 bits:
+  -- both products and the entire sum then stay below 2^50, hence remain
+  -- exact integers even on hosts whose Lua numbers are IEEE doubles.
+  -- Coefficients are 65599^k mod p, with p = 4294967291; the high-word
+  -- coefficient is (65536 * 65599^16) mod p. Public MIR32 bytes stay exact.
   while index + 15 <= length do
     local b1, b2, b3, b4, b5, b6, b7, b8,
       b9, b10, b11, b12, b13, b14, b15, b16 = string.byte(text, index, index + 15)
-    hash = (hash * 65599 + b1) % 4294967291
-    hash = (hash * 65599 + b2) % 4294967291
-    hash = (hash * 65599 + b3) % 4294967291
-    hash = (hash * 65599 + b4) % 4294967291
-    hash = (hash * 65599 + b5) % 4294967291
-    hash = (hash * 65599 + b6) % 4294967291
-    hash = (hash * 65599 + b7) % 4294967291
-    hash = (hash * 65599 + b8) % 4294967291
-    hash = (hash * 65599 + b9) % 4294967291
-    hash = (hash * 65599 + b10) % 4294967291
-    hash = (hash * 65599 + b11) % 4294967291
-    hash = (hash * 65599 + b12) % 4294967291
-    hash = (hash * 65599 + b13) % 4294967291
-    hash = (hash * 65599 + b14) % 4294967291
-    hash = (hash * 65599 + b15) % 4294967291
-    hash = (hash * 65599 + b16) % 4294967291
+    hash = ((hash % 65536) * 995218484 + math.floor(hash / 65536) * 3560253589
+      + b1 * 412560925 + b2 * 1384565098 + b3 * 3943398063 + b4 * 2768719420
+      + b5 * 647177936 + b6 * 990682743 + b7 * 3942737328 + b8 * 3220614473
+      + b9 * 3002971012 + b10 * 3426381976 + b11 * 506879193 + b12 * 1222258819
+      + b13 * 780915824 + b14 * 8261510 + b15 * 65599 + b16) % 4294967291
     index = index + 16
   end
   while index + 7 <= length do
@@ -275,6 +289,98 @@ function M.of_canonical(text)
   return hash_canonical(text)
 end
 
+-- A map and a smaller map projection often contain the same large owned
+-- field. Encode and hash each field once, then compose the two exact MIR32
+-- byte streams. No table identity or verification result is retained.
+-- h(a .. b) = h(b) + (h(a) - initial) * 65599^#b (mod p).
+-- Split products at 16 bits so every intermediate is below 2^49 on doubles.
+local function multiply_mod(left, right)
+  return ((left % 65536) * right
+    + math.floor(left / 65536) * ((65536 * right) % 4294967291)) % 4294967291
+end
+
+local function power_for_length(length)
+  local power, base = 1, 65599
+  while length > 0 do
+    if length % 2 == 1 then power = multiply_mod(power, base) end
+    length = math.floor(length / 2)
+    if length > 0 then base = multiply_mod(base, base) end
+  end
+  return power
+end
+
+local function append_fragment(hash, fragment_hash, power)
+  return (fragment_hash + multiply_mod((hash - 2166136261) % 4294967291, power)) % 4294967291
+end
+
+function M.of_map_with_projection(value, projection_keys)
+  if type(value) ~= "table" or type(projection_keys) ~= "table"
+    or getmetatable(value) ~= nil or getmetatable(projection_keys) ~= nil then
+    error("Fingerprint map projection requires a string-keyed map and key array.", 2)
+  end
+  -- Owned record roots and key arrays have no virtual fields. Refuse
+  -- metatables rather than letting __pairs/__index define another projection.
+  local keys = string_map_keys(value)
+  local key_array = table_shape(projection_keys, "$", false, projection_keys)
+  if not keys or not key_array then
+    error("Fingerprint map projection requires a string-keyed map and key array.", 2)
+  end
+  local selected, selected_count = {}, 0
+  for _, key in ipairs(projection_keys) do
+    if type(key) ~= "string" or rawget(value, key) == nil or selected[key] then
+      error("Fingerprint map projection keys must be distinct existing strings.", 2)
+    end
+    selected[key] = true
+    selected_count = selected_count + 1
+  end
+  table.sort(keys)
+  metrics.map_projection_calls = metrics.map_projection_calls + 1
+  metrics.fingerprint_calls = metrics.fingerprint_calls + 2
+  if #keys == 0 then
+    record_canonical_metrics(2)
+    record_canonical_metrics(2)
+    local digest = hash_canonical("[]")
+    return digest, digest, 2
+  end
+
+  local full_hash = (2166136261 * 65599 + 123) % 4294967291
+  local projected_hash = full_hash
+  local full_bytes, projected_bytes, projected_fields = 2, 2, 0
+  for index, key in ipairs(keys) do
+    local out = {}
+    -- Keep the root in the ancestry set: a back-reference to the input map
+    -- remains invalid, just as it is in the ordinary canonical traversal.
+    encode(value[key], {[value] = true}, "$", false, value, out, 0)
+    local fragment = quoted_string(key) .. ":" .. table.concat(out)
+    local bytes = #fragment
+    local fragment_hash = tonumber(string.sub(hash_canonical(fragment), 7), 16)
+    local power = power_for_length(bytes)
+    if index > 1 then
+      full_hash = (full_hash * 65599 + 44) % 4294967291
+      full_bytes = full_bytes + 1
+    end
+    full_hash = append_fragment(full_hash, fragment_hash, power)
+    full_bytes = full_bytes + bytes
+    if selected[key] then
+      if projected_fields > 0 then
+        projected_hash = (projected_hash * 65599 + 44) % 4294967291
+        projected_bytes = projected_bytes + 1
+      end
+      projected_hash = append_fragment(projected_hash, fragment_hash, power)
+      projected_bytes = projected_bytes + bytes
+      projected_fields = projected_fields + 1
+      metrics.shared_projection_bytes = metrics.shared_projection_bytes + bytes
+    end
+  end
+  full_hash = (full_hash * 65599 + 125) % 4294967291
+  record_canonical_metrics(full_bytes)
+  record_canonical_metrics(projected_bytes)
+  local full_digest = "mir32-" .. string.format("%08x", full_hash)
+  if selected_count == 0 then return full_digest, hash_canonical("[]"), 2 end
+  projected_hash = (projected_hash * 65599 + 125) % 4294967291
+  return full_digest, "mir32-" .. string.format("%08x", projected_hash), projected_bytes
+end
+
 function M.metrics()
   return {
     canonical_calls = metrics.canonical_calls,
@@ -282,6 +388,8 @@ function M.metrics()
     fingerprint_calls = metrics.fingerprint_calls,
     hash_cache_hits = metrics.hash_cache_hits,
     hash_computations = metrics.hash_computations,
+    map_projection_calls = metrics.map_projection_calls,
+    shared_projection_bytes = metrics.shared_projection_bytes,
     hash_cache_entries = hash_cache_entries,
     hash_cache_bytes = hash_cache_bytes,
     serializations_over_one_mib = metrics.serializations_over_one_mib,

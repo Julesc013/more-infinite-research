@@ -27,6 +27,7 @@ local VIEW_SCHEMA = 3
 local render
 local refresh_scheduled_forces
 local refresh_scheduled_searches
+local maintain_translations
 local update_research_results
 local update_navigation
 local update_translation_index
@@ -102,6 +103,32 @@ local function set_search_refresh_subscription(active)
   script.on_nth_tick(SEARCH_REFRESH_TICKS, active and refresh_scheduled_searches or nil)
 end
 
+-- Translation callbacks are only needed while Factorio still owns an issued
+-- request ID.  Unlike force/search refreshes they can arrive after a view has
+-- closed, so retain this subscription until every retained ID has either
+-- completed or expired.
+local function set_translation_maintenance_subscription(active)
+  script.on_nth_tick(TRANSLATION_MAINTENANCE_TICKS, active and maintain_translations or nil)
+end
+
+local function saved_translation_caches()
+  local root = factorio_runtime_state.root()
+  local namespace = type(root) == "table" and root.mir
+  local browser = type(namespace) == "table" and namespace.research_browser
+  local translations = type(browser) == "table" and browser.translations
+  return type(translations) == "table" and translations or nil
+end
+
+local function translations_need_maintenance(translations)
+  for _, cache in pairs(translations or {}) do
+    if type(cache) == "table" and type(cache.pending_by_id) == "table"
+        and next(cache.pending_by_id) ~= nil then
+      return true
+    end
+  end
+  return false
+end
+
 -- Factorio can deliver a translation callback after a save/load or a
 -- configuration change. Retain only plain records in the established runtime
 -- bucket so those issued IDs still occupy their shared bounded window; no
@@ -112,6 +139,11 @@ local function translation_state()
   value.translation_locale_generations = type(value.translation_locale_generations) == "table"
     and value.translation_locale_generations or {}
   return value.translations, value.translation_locale_generations
+end
+
+local function refresh_translation_maintenance_subscription()
+  local translations = translation_state()
+  set_translation_maintenance_subscription(translations_need_maintenance(translations))
 end
 
 local function next_locale_generation(generations, cache, player_index)
@@ -328,6 +360,32 @@ local function section(parent, caption, width)
   return heading
 end
 
+local function classic_scope_status(parent, enrichment, width)
+  local scope = enrichment and enrichment.compiler_scope
+  local status = parent[PREFIX .. "compiler_scope"]
+  local caption = nil
+  if type(scope) == "table" and scope.profile == "classic"
+      and scope.full_catalog_status == "not-evaluated" then
+    if scope.state == "available" and type(scope.supported_manifest_ids) == "table" then
+      caption = {"mir-browser.compiler-scope-classic", #scope.supported_manifest_ids}
+    elseif scope.state == "unavailable" then
+      caption = {"mir-browser.compiler-scope-unavailable"}
+    end
+  end
+  if not caption then
+    if status and status.valid then status.destroy() end
+    return
+  end
+  if not (status and status.valid) then
+    status = label(parent, caption, width)
+    status.name = PREFIX .. "compiler_scope"
+    status.style.font = "default-semibold"
+  else
+    status.caption = caption
+  end
+  status.style.maximal_width = width
+end
+
 update_translation_index = function(results, cache, v)
   -- Share the fixed count row instead of adding another child below a short
   -- list. Localization progress must not enlarge the retained result region.
@@ -382,6 +440,7 @@ local function close(player, preserve_shortcut_state)
     view(player).location = frame.location
     frame.destroy()
   end
+  refresh_translation_maintenance_subscription()
   if not preserve_shortcut_state then set_shortcut_toggled(player, false) end
 end
 local function family_caption(family)
@@ -1233,6 +1292,7 @@ render = function(player)
     local c = catalogue(player.force)
     if not c then label(body, {"mir-browser.catalogue-limit", core.catalogue_limit}); return end
     local cache = ensure_translation_catalogue(player, c)
+    classic_scope_status(body, c.enrichment, width - 64)
     if not has_family(c.family_names, v.family) then v.family = "all" end
     local filters = body[PREFIX .. "filters"]
     if not filters then
@@ -1272,6 +1332,7 @@ render = function(player)
   else debug_rows(player, body, v, width) end
   if not player.opened or player.opened ~= frame then player.opened = frame end
   set_shortcut_toggled(player, true)
+  refresh_translation_maintenance_subscription()
 end
 
 local function refresh_search_results(player)
@@ -1500,6 +1561,7 @@ function M.on_init()
   mir_provider.invalidate_omissions()
   set_force_refresh_subscription(false)
   set_search_refresh_subscription(false)
+  set_translation_maintenance_subscription(false)
   for _, player in pairs(game.players) do
     remove_legacy_top_button(player)
     set_shortcut_toggled(player, false)
@@ -1535,6 +1597,7 @@ function M.on_configuration_changed()
   for _, player in pairs(game.players) do
     if not player.gui.screen[ROOT] then set_shortcut_toggled(player, false) end
   end
+  refresh_translation_maintenance_subscription()
 end
 
 local function schedule_open_force_refresh(force)
@@ -1584,9 +1647,10 @@ local function translated(event)
     if needs_name_index(view(player)) then pump_translation_requests(player, cache) end
     if current_generation then refresh_translated_view(player, cache) end
   end
+  refresh_translation_maintenance_subscription()
 end
 
-local function maintain_translations(event)
+maintain_translations = function(event)
   local translations, locale_generations = translation_state()
   for player_index, cache in pairs(translations) do
     local player = game.get_player(player_index)
@@ -1603,6 +1667,7 @@ local function maintain_translations(event)
       end
     end
   end
+  set_translation_maintenance_subscription(translations_need_maintenance(translations))
 end
 
 -- Research completion can arrive in a burst. Build the force catalogue once
@@ -1631,6 +1696,7 @@ function M.on_load()
     if type(player_index) == "number" and type(due_tick) == "number" then search_active = true; break end
   end
   set_search_refresh_subscription(search_active)
+  set_translation_maintenance_subscription(translations_need_maintenance(saved_translation_caches()))
 end
 
 local function shortcut(event)
@@ -1734,7 +1800,6 @@ function M.register()
     if was_empty then set_search_refresh_subscription(true) end
   end)
   script.on_event(defines.events.on_string_translated, translated)
-  script.on_nth_tick(TRANSLATION_MAINTENANCE_TICKS, maintain_translations)
   script.on_event(defines.events.on_lua_shortcut, shortcut)
   script.on_event(defines.events.on_gui_confirmed, function(event)
     local player = event_player(event)
@@ -1782,6 +1847,7 @@ function M.register()
     local translations, locale_generations = translation_state()
     translations[event.player_index] = nil
     locale_generations[event.player_index] = nil
+    refresh_translation_maintenance_subscription()
   end)
   if defines.events.on_player_locale_changed then
     script.on_event(defines.events.on_player_locale_changed, function(event)
@@ -1794,6 +1860,7 @@ function M.register()
             next_locale_generation(locale_generations, cache, event.player_index))
         end
         if player.gui.screen[ROOT] then render(player) end
+        refresh_translation_maintenance_subscription()
       end
     end)
   end
@@ -1809,6 +1876,7 @@ function M.register()
         translation_queue.reset_catalogue(cache, {}, nil)
       end
       if player.gui.screen[ROOT] then render(player) end
+      refresh_translation_maintenance_subscription()
     end
   end)
   for _, id in ipairs{defines.events.on_player_display_resolution_changed, defines.events.on_player_display_scale_changed} do

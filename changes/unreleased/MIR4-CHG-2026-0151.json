@@ -1,0 +1,99 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0151",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Avoid redundant science-route construction and material scans; stop idle Library translation maintenance.",
+  "details": [
+    "Prepare route comparison sets and ranking keys once, filter strict supersets by cardinality in the existing prerequisite-then-science order, and retain the original final-sort tie behavior.",
+    "Prove initial recipes in lexical winner order before constructing research-dependent alternatives. Retain direct-source precedence and contextual feasibility. Initial-priority provenance explicitly marks alternative selection counts incomplete; bounded rejection diagnostics retain exhaustive traversal.",
+    "Select material-return facts through Context-owned typed consumer and producer buckets, preserving hidden and zero-result facts, variants and native transitions. Unowned or malformed indexes use the established exact scan fallback.",
+    "Subscribe Library translation maintenance only while issued callbacks remain pending, and reconstruct the subscription read-only after loading. Settled closed or never-opened views retain no translation-maintenance timer.",
+    "Controlled Lua 5.2 checks cover complete selector records, staged filtering, duplicates, ties, copy isolation, initial precedence, indexed membership and Library subscription lifecycle. Native Galore startup and final package/save/client acceptance remain pending; no player speedup is claimed by these controls."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance",
+    "diagnostics"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Selected compiler and Library capabilities change; exact target-package and destination-upgrade qualification remains pending."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/researchability_planning.lua: selector characterization and initial-priority opposing controls"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/material_routes.lua and tests/runtime/research_browser_handler_regressions.lua: indexed return boundaries and conditional subscription controls"
+    }
+  ]
+}

@@ -1,5 +1,4 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local context_construction = require("prototypes.mir.pipeline.compiler_orchestrator.context_construction")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local maximum_level_binding = target_line.feature_enabled("scripted_techs")
   and require("prototypes.mir.domain.technology." .. "maximum_level_binding") or nil
@@ -36,9 +35,8 @@ local function append_cap_description(technology, source, maximum)
   return prefix
 end
 
-function M.apply(context)
+function M.apply_policy(policy)
   if not maximum_level_binding then return end
-  local policy = context_construction.maximum_level_policy(context)
   local applied, blocked, observations = {}, {}, {}
   for _, binding in ipairs(policy.bindings or {}) do
     local technology = data_raw.technology(binding.technology_id)
@@ -79,12 +77,20 @@ function M.apply(context)
     }
   end
   local observed_policy = maximum_level_binding.observe_finalizers(policy, observations)
-  context:replace_epoch(
-    "maximum_level_policy", observed_policy, context:state_epoch("maximum_level_policy"))
   log("[more-infinite-research] Applied truthful finite-cap presentation"
     .. " count=" .. tostring(#applied)
     .. " blocked=" .. tostring(#blocked)
     .. " technologies=" .. table.concat(applied, ",") .. ".")
+  return observed_policy
+end
+
+function M.apply(context)
+  if not maximum_level_binding then return end
+  local policy = require("prototypes.mir.pipeline.compiler_orchestrator.context_construction")
+    .maximum_level_policy(context)
+  local observed_policy = M.apply_policy(policy)
+  context:replace_epoch(
+    "maximum_level_policy", observed_policy, context:state_epoch("maximum_level_policy"))
 end
 
 return M

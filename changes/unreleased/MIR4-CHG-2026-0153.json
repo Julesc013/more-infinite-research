@@ -1,0 +1,97 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0153",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Admit MIR 4.3 candidate construction and direct historical upgrade destinations.",
+  "details": [
+    "Project all nine 4.3.0 and 4.3.1 distribution identities from the full source version, while validating unchanged historical target authority. Preserve clean source, deterministic construction and package exclusions.",
+    "Add distinct V5 and V6 candidate manifest contracts. Route direct 4.2.0, 4.2.1 and 4.2.2 predecessors into actual 4.3 destinations with distinct fixture identities and unchanged full-state and two-reload acceptance gates.",
+    "Controlled candidate identity and upgrade-manifest tests pass without engine execution or package construction. A 4.3.0 to 4.3.1 upgrade still requires exact published 4.3.0 custody before admission."
+  ],
+  "semantic_domains": [
+    "tooling",
+    "release",
+    "performance"
+  ],
+  "audiences": [
+    "maintainers",
+    "contributors"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F200",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Package-excluded tooling binds destination identities and resource evidence; this change adds no runtime behavior or qualification claim."
+    }
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "omit",
+    "target_changelog": "omit",
+    "github": "omit",
+    "mod_portal": "omit",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/release/Test-MIR42FourTargetCandidateBuild.ps1 -IdentityContractsOnly: 18 destination identities and V5/V6 contracts"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/tooling/Test-MIRUpgradeManifest.ps1: 278 new source-bound 4.3 controls; no native engine"
+    }
+  ]
+}

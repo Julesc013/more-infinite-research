@@ -112,12 +112,14 @@ function M.publish(context)
     telemetry.count("research_cost_support_public_bytes", research_cost_support_bytes)
   end
   telemetry.observe_max("context_state_keys", context:state_key_count())
-  local public_evidence
-  for _ = 1, publishes_mod_data and 4 or 0 do
-    context_construction.record_work_volume()
-    evidence_input.telemetry = telemetry.snapshot()
-    public_evidence = public_artifacts.compiler_evidence(evidence_input)
-    local evidence_bytes = public_artifacts.assert_byte_budget(public_evidence)
+  -- Public evidence freezes telemetry before its own canonicalization and
+  -- budget check. Reconstructing it to embed its own size repeats expensive
+  -- work and makes the payload's telemetry depend on that reconstruction.
+  context_construction.record_work_volume()
+  evidence_input.telemetry = telemetry.snapshot()
+  local public_evidence = public_artifacts.compiler_evidence(evidence_input)
+  local evidence_bytes = public_artifacts.assert_byte_budget(public_evidence)
+  if publishes_mod_data then
     telemetry.observe_max("compiler_evidence_public_bytes", evidence_bytes)
     local counters = telemetry.snapshot().counters
     telemetry.observe_max("public_artifact_total_bytes",
@@ -128,9 +130,6 @@ function M.publish(context)
       + evidence_bytes)
   end
   context_construction.record_work_volume()
-  evidence_input.telemetry = telemetry.snapshot()
-  public_evidence = public_artifacts.compiler_evidence(evidence_input)
-  public_artifacts.assert_byte_budget(public_evidence)
   local internal_evidence = include_internal and publishes_mod_data
     and compiler_evidence.build(evidence_input) or nil
   if research_cost_support then

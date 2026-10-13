@@ -6,6 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot '../../mir/application/technology/TechnologyAcceptance.ps1')
 
 function Get-MIRJsonSha256 {
   param($Value)
@@ -27,11 +28,18 @@ function ConvertTo-MIRMarkdownCell {
   return ([string]$Value).Replace("|", "\|").Replace("`r", " ").Replace("`n", " ")
 }
 
+function Get-MIRQualificationDecisionValue {
+  param($Qualification)
+  $current = $Qualification.PSObject.Properties['qualification_decision']
+  if ($null -ne $current -and $current.Value) { return [string]$current.Value }
+  $legacy = $Qualification.PSObject.Properties['decision']
+  if ($null -ne $legacy) { return [string]$legacy.Value }
+  return ''
+}
+
 $resolvedCatalog = (Resolve-Path -LiteralPath $CatalogPath).Path
 $catalog = Get-Content -Raw -LiteralPath $resolvedCatalog | ConvertFrom-Json
-if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -ne "final") {
-  throw "Compiler PREVIEW export requires the exact final TechnologyCatalog schema 3 artifact."
-}
+Assert-MIR4FullTechnologyCatalog -Catalog $catalog
 foreach ($field in @("catalog_fingerprint", "generation_plan_fingerprint", "compilation_plan_fingerprint")) {
   if ([string]::IsNullOrWhiteSpace([string]$catalog.$field)) {
     throw "Compiler PREVIEW catalog field is required: $field"
@@ -63,12 +71,24 @@ $selected = @($catalog.current_selections | ForEach-Object {
 $ambiguous = @()
 $rejected = @()
 foreach ($qualification in @($catalog.qualifications)) {
-  $decision = [string]$(if ($qualification.qualification_decision) { $qualification.qualification_decision } else { $qualification.decision })
+  $decision = Get-MIRQualificationDecisionValue $qualification
+  # Both fields are optional across the established catalog rows.  Access them
+  # through the property bag so strict PowerShell callers can still export a
+  # review-required row that supplies only the older `reasons` field.
+  $rejectionReasons = $qualification.PSObject.Properties['rejection_reasons']
+  $reasons = $qualification.PSObject.Properties['reasons']
+  $reasonValue = if ($null -ne $rejectionReasons -and $rejectionReasons.Value) {
+    $rejectionReasons.Value
+  } elseif ($null -ne $reasons) {
+    $reasons.Value
+  } else {
+    $null
+  }
   $row = [pscustomobject][ordered]@{
     candidate_id = [string]$qualification.candidate_id
     alternative_id = [string]$qualification.alternative_id
     decision = $decision
-    reasons = ConvertTo-MIRReasonText $(if ($qualification.rejection_reasons) { $qualification.rejection_reasons } else { $qualification.reasons })
+    reasons = ConvertTo-MIRReasonText $reasonValue
     design_fingerprint = [string]$qualification.design_fingerprint
     qualification_fingerprint = [string]$qualification.qualification_fingerprint
   }
@@ -109,6 +129,9 @@ foreach ($budget in @($budgetProfile.artifacts | Sort-Object kind)) {
   $kind = [string]$budget.kind
   $counter = [string]$counterByKind[$kind]
   $observed = if ($telemetryCounters -and $null -ne $telemetryCounters.$counter) { [long]$telemetryCounters.$counter } else { $null }
+  # Evidence freezes telemetry before its own serialization. A zero self-size
+  # is an unavailable observation, not proof that the emitted envelope is empty.
+  if ($kind -ceq 'mir-compiler-evidence-public' -and $observed -eq 0) { $observed = $null }
   $status = if ($null -eq $observed) { "not-observed" } elseif ($observed -le [long]$budget.max_canonical_bytes) { "pass" } else { "over-budget" }
   $budgets += [pscustomobject][ordered]@{
     kind = $kind
@@ -143,12 +166,10 @@ $summary = [ordered]@{
     qualifications = @($catalog.qualifications).Count
     selections = @($catalog.current_selections).Count
     ambiguous_or_review_required = @($catalog.qualifications | Where-Object {
-      ([string]$_.qualification_decision) -in @("proposal", "review-required", "REVIEW_REQUIRED", "ambiguous") -or
-      ([string]$_.decision) -in @("proposal", "review-required", "REVIEW_REQUIRED", "ambiguous")
+      (Get-MIRQualificationDecisionValue $_) -in @("proposal", "review-required", "REVIEW_REQUIRED", "ambiguous")
     }).Count
     rejected = @($catalog.qualifications | Where-Object {
-      ([string]$_.qualification_decision) -in @("rejected", "REJECTED", "failed") -or
-      ([string]$_.decision) -in @("rejected", "REJECTED", "failed")
+      (Get-MIRQualificationDecisionValue $_) -in @("rejected", "REJECTED", "failed")
     }).Count
     provider_decisions = $providerDecisions.Count
   }

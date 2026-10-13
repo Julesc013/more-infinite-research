@@ -75,6 +75,7 @@ local M = {
         "pyhightech"
       },
       supported_effect_types = {
+        "bulk-inserter-capacity-bonus",
         "cargo-landing-pad-count",
         "character-build-distance",
         "character-crafting-speed",
@@ -86,9 +87,13 @@ local M = {
         "character-resource-reach-distance",
         "character-running-speed",
         "gun-speed",
+        "inserter-stack-size-bonus",
         "laboratory-productivity",
+        "laboratory-speed",
         "max-cargo-bay-unloading-distance",
-        "worker-robot-battery"
+        "train-braking-force-bonus",
+        "worker-robot-battery",
+        "worker-robot-storage"
       },
       required_validation_groups = {
         "static",
@@ -166,6 +171,7 @@ local M = {
         "pyhightech"
       },
       supported_effect_types = {
+        "bulk-inserter-capacity-bonus",
         "character-build-distance",
         "character-crafting-speed",
         "character-inventory-slots-bonus",
@@ -176,8 +182,12 @@ local M = {
         "character-resource-reach-distance",
         "character-running-speed",
         "gun-speed",
+        "inserter-stack-size-bonus",
         "laboratory-productivity",
-        "worker-robot-battery"
+        "laboratory-speed",
+        "train-braking-force-bonus",
+        "worker-robot-battery",
+        "worker-robot-storage"
       },
       required_validation_groups = {
         "static",
@@ -248,8 +258,13 @@ local M = {
         "character-resource-reach-distance",
         "character-running-speed",
         "gun-speed",
+        "inserter-stack-size-bonus",
         "laboratory-productivity",
-        "worker-robot-battery"
+        "laboratory-speed",
+        "stack-inserter-capacity-bonus",
+        "train-braking-force-bonus",
+        "worker-robot-battery",
+        "worker-robot-storage"
       },
       required_validation_groups = {
         "static",
@@ -318,8 +333,13 @@ local M = {
         "character-resource-reach-distance",
         "character-running-speed",
         "gun-speed",
+        "inserter-stack-size-bonus",
         "laboratory-productivity",
-        "worker-robot-battery"
+        "laboratory-speed",
+        "stack-inserter-capacity-bonus",
+        "train-braking-force-bonus",
+        "worker-robot-battery",
+        "worker-robot-storage"
       },
       required_validation_groups = {
         "static",

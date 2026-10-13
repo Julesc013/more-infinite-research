@@ -4,12 +4,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot '../../mir/application/technology/TechnologyAcceptance.ps1')
 
 $resolved = (Resolve-Path -LiteralPath $CatalogPath).Path
 $catalog = Get-Content -Raw -LiteralPath $resolved | ConvertFrom-Json
-if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -ne "final") {
-  throw "Export requires the exact final TechnologyCatalog schema 3 artifact."
-}
+Assert-MIR4FullTechnologyCatalog -Catalog $catalog
 if ([bool]$catalog.mutation_authority -or [string]$catalog.selection_authority -ne "deterministic-policy-v2") {
   throw "TechnologyCatalog authority fields are invalid."
 }
@@ -45,4 +44,4 @@ $destination = [IO.Path]::GetFullPath($OutputPath)
 if (-not [string]::Equals($resolved, $destination, [StringComparison]::OrdinalIgnoreCase)) {
   [IO.File]::Copy($resolved, $destination, $true)
 }
-Write-Host "[ok] copied exact MIR TechnologyCatalog schema 3 artifact $OutputPath candidates=$(@($catalog.candidates).Count)"
+Write-Host "[ok] copied exact complete MIR TechnologyCatalog schema $($catalog.schema) artifact $OutputPath candidates=$(@($catalog.candidates).Count)"

@@ -1,0 +1,100 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0161",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Avoid copying acquisition proof graphs for compiler-owned Boolean lab checks.",
+  "details": [
+    "A Boolean companion uses the same acquisition solver, contextual guards and source epochs as the copy-isolated witness service. Lab checks discard no full graph copy when they need only existence.",
+    "Canonical service ownership is checked at use time. Custom replacements and diagnostic observers keep the existing witness path, and the public service continues returning isolated graphs. No new reachability cache or admission rule is introduced.",
+    "Focused opposing controls cover Boolean equivalence, contextual self-locks, service replacement, diagnostic observers and public-copy isolation. These source controls do not establish a native startup improvement, save preservation or incident resolution."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared contextual science integration removes discarded witness copies; native destination qualification remains required."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared contextual science integration removes discarded witness copies; native destination qualification remains required."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared contextual science integration removes discarded witness copies; native destination qualification remains required."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared contextual science integration removes discarded witness copies; native destination qualification remains required."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Historical target compositions do not import the changed contextual science integration modules; retained release and upgrade requirements still apply."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "preserved",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/lab_reachability.lua: canonical Boolean and custom/observer fallback controls"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/item_acquisition_service_isolation.lua: public witness isolation and Boolean solver parity"
+    },
+    {
+      "kind": "document",
+      "value": "docs/architecture/module-boundaries.md"
+    }
+  ]
+}

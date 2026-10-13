@@ -86,8 +86,13 @@ local M = {
         "character-resource-reach-distance",
         "character-running-speed",
         "gun-speed",
+        "inserter-stack-size-bonus",
         "laboratory-productivity",
-        "worker-robot-battery"
+        "laboratory-speed",
+        "stack-inserter-capacity-bonus",
+        "train-braking-force-bonus",
+        "worker-robot-battery",
+        "worker-robot-storage"
       },
       required_validation_groups = {
         "static",
@@ -156,8 +161,13 @@ local M = {
         "character-resource-reach-distance",
         "character-running-speed",
         "gun-speed",
+        "inserter-stack-size-bonus",
         "laboratory-productivity",
-        "worker-robot-battery"
+        "laboratory-speed",
+        "stack-inserter-capacity-bonus",
+        "train-braking-force-bonus",
+        "worker-robot-battery",
+        "worker-robot-storage"
       },
       required_validation_groups = {
         "static",

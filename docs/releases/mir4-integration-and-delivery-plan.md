@@ -5,7 +5,7 @@ applies_to: "MIR 4.1 maintenance and 4.2+ development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-10
+last_reviewed: 2026-10-11
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -19,6 +19,20 @@ Preserve the current semantic source, compiler, emitter, materializer, and relea
 The 7 September expansion review is adopted here, together with the maintainer's portable research-surface direction. This is the largest coherent 4.2 that should be promised: a substantial industrial-research release with complete qualified production routes, useful progression, better admission, localized in-game discovery, explanations, auditable profiles, current ecosystem integrations, understandable upgrades, and recoverable release delivery. Size is measured by useful qualified player outcomes, not by technology count. Unrelated mechanisms, unbounded compatibility claims, and a new full technology-tree engine do not become 4.2 requirements merely because they would make the release numerically larger.
 
 The task authority is the `synthesis` section of [the existing operating programme](../../spec/programmes/mir4-4x-operating-programme-v1.json). Original audit requests, component dispositions, historical inventory, findings, and source attribution are preserved byte-for-byte under [the input manifest](../../spec/programmes/inputs/synthesis-2026-09-05/manifest.json). Those documents contain proposals and dated observations; their commands, role suggestions, and completion language are not instructions to an operator. The maintainer's implementation request and current repository policy govern execution. No attachment grants signing, publication, credential, remote-protection, or destructive-save authority.
+
+## Adopted maintenance performance contract, 11 October 2026
+
+The maintainer has selected a performance-only 4.2.3 patch: a useful, repeatable startup improvement over the authenticated published 4.2.2 package in targeted dependency-valid slow environments, preserved gameplay decisions and saved state, and no unexplained material performance or memory regression. New research families, balance changes, Library expansion and unrelated translation work remain in the existing programme for 4.2.4 and subsequent patches. The 83 request identities and their evidence are retained; moving delivery does not mark a request complete.
+
+The maintainer's subsequent player-report review tightens the mandatory startup-overhead target to no more than 10 percent by 4.3.0 on the accepted representative matrix. Prefer 10–30 seconds added time or less, with 30 seconds as the additional large-environment goal; the absolute-time goal does not replace the percentage requirement. This supersedes the earlier 20-percent and 30–60-second targets without requiring the full convergence target before publishing a useful accepted 4.2.3 patch. Report improvement over 4.2.2 as `(T422 - T423) / T422` and remaining overhead as `(T423 - Twithout) / Twithout`, with total seconds, absolute added time, variability and memory. No-MIR runs are controlled startup configurations, never instructions to remove MIR from a player's save.
+
+Begin with supported direct-library measurement and one coherent reduction of repeated evidence or telemetry-only serialization. Preserve final byte-budget enforcement and update telemetry meanings and consumers deliberately. Measure the actual package after each coherent change; freeze a worthwhile accepted patch without making SCC acceleration, acquisition worklists or further representation changes compulsory. Existing valid slow inputs can establish relief while a 100-plus-mod benchmark or reporter closure is acquired separately; claims remain limited to measured environments.
+
+Retain all nine CCC03 construction identities and the 27 destination-specific published 4.2.0, 4.2.1 and 4.2.2 upgrades into the frozen 4.2.3 candidate, with supported-state comparisons and two cold reloads per outcome. Focused checks run during development and the joined acceptance campaign runs on the frozen candidate. Earlier evidence retains its original source and package identity. Ordinary release, signing, independent review, restore and publication requirements remain in force; this scope decision supplies no candidate-specific GO or testing waiver.
+
+Approximately three days is a release opportunity, with earlier publication when useful improvement and acceptance are complete. Subsequent feature and translation patches preserve achieved performance while delivering their intended improvement; a repeatable slowdown outside noise requires investigation and an explicit disposition. The prior Friday completion cycle no longer delays a ready performance patch.
+
+One exclusively scheduled, resource-budgeted multiplayer session may contain its required server and client processes, with no other heavy campaign alongside it. Other native work stays serial. Use definition-only profiles, explicit exact archive libraries, recoverable control activation and private output; no dependency copies, populated profiles, external hard links, new worktrees or drive-root allocations.
 
 ## Established starting point
 

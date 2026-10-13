@@ -4,15 +4,26 @@
   "title": "MIR 4 Runtime State Matrix V1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema","kind","programme_id","source_identity","authority","maturity","runtime_feature_specs","state_specs","registration_plan","targets","invariants","package_visible","runtime_mutation_authorized","public_release_proof","digest"],
+  "required": ["schema","kind","programme_id","source_identity","authority","current_additive_authority","maturity","runtime_feature_specs","state_specs","registration_plan","targets","invariants","package_visible","runtime_mutation_authorized","public_release_proof","digest"],
   "properties": {
     "schema": {"const":1},
     "kind": {"const":"MIR4RuntimeStateMatrixV1"},
     "programme_id": {"const":"M4C02-09-24H"},
     "source_identity": {"type":["object","null"]},
     "authority": {"const":".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"},
+    "current_additive_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path","kind","authority_id","sha256"],
+      "properties": {
+        "path": {"const":"governance/repository/mir430-classic-runtime-notice-v1.json"},
+        "kind": {"const":"MIR430ClassicRuntimeNoticeAuthorityV1"},
+        "authority_id": {"const":"MIR430-CLASSIC-RUNTIME-NOTICE-V1"},
+        "sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+      }
+    },
     "maturity": {"const":"shadow"},
-    "runtime_feature_specs": {"type":"array","minItems":7,"maxItems":7,"items":{"$ref":"#/$defs/runtimeFeatureSpec"}},
+    "runtime_feature_specs": {"type":"array","minItems":8,"maxItems":8,"items":{"$ref":"#/$defs/runtimeFeatureSpec"}},
     "state_specs": {"type":"array","minItems":5,"maxItems":5,"items":{"$ref":"#/$defs/stateSpec"}},
     "registration_plan": {"type":"object"},
     "targets": {"type":"array","minItems":17,"maxItems":17},

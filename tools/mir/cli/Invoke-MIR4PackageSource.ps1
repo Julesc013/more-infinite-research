@@ -16,7 +16,21 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 if ($Command -in @('refresh','refresh-check')) {
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
-  Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check:($Command -ceq 'refresh-check') | ConvertTo-Json -Depth 6
+  # Reuse the historical constructor's exact pure transforms without running
+  # its executable package-building entry point or maintaining another renderer.
+  $adapterPath=Join-Path $repo 'tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1'
+  $adapterTokens=$null;$adapterErrors=$null
+  $adapterAst=[Management.Automation.Language.Parser]::ParseFile($adapterPath,[ref]$adapterTokens,[ref]$adapterErrors)
+  if($adapterErrors.Count) { throw '[mir4-source-refresh-historical-renderer-parse]' }
+  foreach($name in @('Get-MIR42HistoricalSourceBytes','ConvertTo-MIR42HistoricalAdapterBytes')) {
+    $functions=@($adapterAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
+    if($functions.Count -ne 1) { throw "[mir4-source-refresh-historical-renderer-function] $name" }
+    . ([scriptblock]::Create($functions[0].Extent.Text))
+  }
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check:($Command -ceq 'refresh-check') -HistoricalAdapterProjector {
+    param($adapter,$record,$manifest)
+    ConvertTo-MIR42HistoricalAdapterBytes -Adapter $adapter -Record $record -SourceManifest $manifest
+  } | ConvertTo-Json -Depth 6
   return
 }
 if ($Command -eq 'runtime-replay') {

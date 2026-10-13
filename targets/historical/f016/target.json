@@ -45,10 +45,10 @@
       "output_path": "README.md",
       "source_path": "source/presentation/f100/README.md.template",
       "transform": "historical-readme-template-v1",
-      "source_sha256": "DF4679E4DCE50FF5FBED8501373F9C52F1A87EEBE64B6001E31551B4FD626BC7",
-      "source_bytes": 4728,
-      "output_bytes": 4595,
-      "output_sha256": "6BBF7DC0D4E30AF0F6ADFA34CB72CBDDB05F37FE28FB4B8C82A58FA6E3465F6A"
+      "source_sha256": "95E6B47E25E7224FC2077EAB3A0D5DF238E068A6F7825F236F4BEDFFC67B401F",
+      "source_bytes": 5913,
+      "output_bytes": 5780,
+      "output_sha256": "B18BF3D544E74081594577665621966D1BF5B738DBAFD42F36614234230D8504"
     },
     {
       "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
@@ -63,12 +63,12 @@
   "patches": [
     {
       "output_path": "prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
-      "base_sha256": "8A28E7E1F9CE5363B244624AE9A31DADC33E542266FB2F8DB47B2336950C6E68",
+      "base_sha256": "416B70BB99D3BF4F1FF2E57B72E11FDE11EB9372192E4E3B4E57CCC1F6B61AFE",
       "find": "  [\"1.0\"] = \"omit-unqualified\"",
       "replace": "  [\"1.0\"] = \"omit-unqualified\",\n  [\"0.16\"] = \"omit-unqualified\""
     }
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "24C549E3AD2B79F5AEACCB7F874A1E2BEECEE2C9764E3E64385B768A545C2B22"
+  "record_sha256": "0ED90415E6423CE9D57A7973725EE7238765FDE0F6A2B34B97A1CBCFC1E7D494"
 }

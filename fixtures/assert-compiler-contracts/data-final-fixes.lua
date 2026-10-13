@@ -92,7 +92,7 @@ end
   }) do
     local canonical = fingerprint.canonical(value)
     if fingerprint.of_canonical(canonical) ~= scalar_hash(canonical) then
-      fail("MIR32 eight-byte hash reads changed the scalar recurrence")
+      fail("MIR32 batched hash changed the scalar recurrence")
     end
   end
 end)();

@@ -17,6 +17,25 @@ if($currentFunctions.Count -ne 1){throw 'Current-package input mode validator mi
 $predecessorFunctions=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Resolve-MIR42UpgradePredecessorReaderVersion'},$true))
 if($predecessorFunctions.Count -ne 1){throw 'Published predecessor selector missing or ambiguous'}
 . ([scriptblock]::Create($predecessorFunctions[0].Extent.Text))
+$completeCatalogueAssignments=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$requiresCompleteCatalogue'},$true))
+if($completeCatalogueAssignments.Count-ne1){throw 'Complete-catalogue applicability assignment missing or ambiguous'}
+$classicPolicyAssignments=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$classicReducedPolicy'},$true))
+if($classicPolicyAssignments.Count-ne1){throw 'Classic reduced-policy applicability assignment missing or ambiguous'}
+$completeCatalogueMarkerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR42CompleteCatalogueUpgradeMarker'},$true))
+if($completeCatalogueMarkerCalls.Count-ne3){throw 'Complete-catalogue marker must be enforced for upgrade and both reloads'}
+$classicMarkerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR430ClassicUpgradeMarker'},$true))
+if($classicMarkerCalls.Count-ne4){throw 'Classic reduced-policy marker must be enforced for source, upgrade, and both reloads'}
+$snapshotRetainerFunctions=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Copy-MIRCompleteCatalogueSnapshotEvidence'},$true))
+if($snapshotRetainerFunctions.Count-ne1){throw 'Complete-catalogue snapshot retainer missing or ambiguous'}
+$classicHelper=Join-Path $RepoRoot 'tests/support/MIR430ClassicUpgrade.ps1'
+if(-not(Test-Path -LiteralPath $classicHelper -PathType Leaf)){throw 'Classic reduced-policy upgrade helper missing'}
+. $classicHelper
+$classicTemplate=Get-MIR430ClassicUpgradeFixtureControl -FromVersion '4.2.10002' -ToVersion '4.3.10000'
+foreach($needle in @('local state_root = storage or global','game.write_file','game.table_to_json','state_root.mir430_classic_upgrade','recipe-prod-research_character_crafting_speed-1','recipe-prod-research_iron-1')){
+  if(-not$classicTemplate.Contains($needle)){throw "Classic upgrade fixture lost target-local compatibility support: $needle"}
+}
+$completeCatalogueEvaluator=[scriptblock]::Create($completeCatalogueAssignments[0].Right.Extent.Text)
+$classicReducedPolicy=$false
 $testRoot=Join-Path $RepoRoot ('build/handoff/mir421-upgrade-manifest/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $testRoot|Out-Null
 $manifestPath=$SelectedManifestPath
@@ -38,7 +57,7 @@ if(-not $manifestPath){
 $manifest=Get-Content -Raw $manifestPath|ConvertFrom-Json -Depth 100
 $assertions=0
 foreach($row in $manifest.targets){
-  $construction=$manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3')
+  $construction=$manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4')
   $relative=if($construction){$row.asset.path}else{$row.filename}
   $zip=Join-Path (Split-Path $manifestPath -Parent) $relative
   $version=Resolve-MIRUpgradeManifestVersion -ManifestPath $manifestPath -CandidatePath $zip -Target $row.target
@@ -201,7 +220,279 @@ if($overrideInfo.version-cne'0.1.210'-or$overrideInfo.factorio_version-cne'2.1'-
 $k2Assertions+=2
 # These controlled inputs prove readers and rejection paths, never native saves.
 . (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+. (Join-Path $RepoRoot 'tools/lib/compatibility/LibraryActivation.ps1')
+. (Join-Path $RepoRoot 'tools/lib/workspace/RepoPaths.ps1')
 $currentAssertions=0
+$f200BobAngelAssertions=0
+$f210OracleRoot=Join-Path $RepoRoot ('build/tmp/mir423-f210-oracle-control-'+[Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force -Path $f210OracleRoot|Out-Null
+$f210OracleControl=Join-Path $f210OracleRoot 'control.lua'
+$f210OldDelta='if (from_version ~= "4.2.21001" and not persisted_damage_probe) or to_version ~= "4.2.21002" then return false end'
+$f210NewDelta='if from_version ~= "4.2.21001" or to_version ~= "4.2.21003" then return false end'
+[IO.File]::WriteAllText($f210OracleControl,('function restored_promethium_frontier()'+"`n"+$f210OldDelta+"`n"+'end'),[Text.UTF8Encoding]::new($false))
+Set-MIR423F210InheritedPromethiumDefinitionDelta -FixtureDirectory $f210OracleRoot -FromVersion '4.2.21001' -ToVersion '4.2.21003'
+if((Get-Content -LiteralPath $f210OracleControl -Raw).Contains($f210OldDelta)-or-not(Get-Content -LiteralPath $f210OracleControl -Raw).Contains($f210NewDelta)){throw '4.2.3 F210 oracle did not bind the inherited reviewed definition delta'}
+$currentAssertions++
+foreach($invalid in @(@{from='4.2.21000';to='4.2.21003';code='[mir423-f210-oracle-predecessor]'},@{from='4.2.21002';to='4.2.21003';code='[mir423-f210-oracle-predecessor]'},@{from='4.2.21001';to='4.2.21002';code='[mir423-f210-oracle-version]'})){
+  $refused=$false;try{Set-MIR423F210InheritedPromethiumDefinitionDelta -FixtureDirectory $f210OracleRoot -FromVersion $invalid.from -ToVersion $invalid.to}catch{$refused=$_.Exception.Message-ceq$invalid.code}
+  if(-not$refused){throw "4.2.3 F210 oracle accepted invalid $($invalid.from) to $($invalid.to) binding"};$currentAssertions++
+}
+[IO.File]::WriteAllText($f210OracleControl,('function restored_promethium_frontier()'+"`n"+'if from_version ~= "4.2.21000" or to_version ~= "4.2.21003" then return false end'+"`n"+'end'),[Text.UTF8Encoding]::new($false))
+$refused=$false;try{Set-MIR423F210InheritedPromethiumDefinitionDelta -FixtureDirectory $f210OracleRoot -FromVersion '4.2.21001' -ToVersion '4.2.21003'}catch{$refused=$_.Exception.Message-ceq'[mir423-f210-oracle-anchor]'}
+if(-not$refused){throw '4.2.3 F210 oracle accepted a mismatched inherited definition delta'};$currentAssertions++
+$f210SettingsOracleRoot=Join-Path $RepoRoot ('build/tmp/mir423-f210-settings-oracle-control-'+[Guid]::NewGuid().ToString('N'))
+$f210SharedControlPath=Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua'
+$f210SharedControl=Get-Content -LiteralPath $f210SharedControlPath -Raw
+$f210SharedControlSha256=(Get-FileHash -LiteralPath $f210SharedControlPath -Algorithm SHA256).Hash
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210SettingsOracleRoot -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210SettingsOracleRoot -Target f210 -SourceVersion '4.2.3' -FromVersion '4.2.21000' -SpaceAge -HistoricalSettingsOracle
+Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $f210SettingsOracleRoot -FromVersion '4.2.21000' -ToVersion '4.2.21003'
+$f210SettingsControl=Get-Content -LiteralPath (Join-Path $f210SettingsOracleRoot 'control.lua') -Raw
+$f210SettingsInfo=Get-Content -LiteralPath (Join-Path $f210SettingsOracleRoot 'info.json') -Raw|ConvertFrom-Json
+$f210HistoricalSettingsFamilies=@('glycerol','hydrochloric_acid','hydrofluoric_acid','nitric_acid','py_acid_gas','py_earth_flower_sample','py_earth_generic_sample','py_earth_jute_sample','py_earth_palmtree_sample','py_earth_potato_sample','py_earth_shroom_sample','py_earth_sunflower_sample','py_earth_tropical_tree_sample','py_earth_venus_fly_sample','py_glycerol','py_log','py_treated_wood','py_wood')
+$f210HistoricalSettingsDefaults=[ordered]@{'enable'=$true;'effect-per-level'=2;'max-level'=0;'research-time'=30;'cost-base'=200;'cost-growth'=2;'cost-linear-increment'=0}
+$f210HistoricalSettingsGuard='if from_version == "4.2.21000" and to_version == "4.2.21003" then'
+$f210OriginalSettingsGuard='if to_version == "4.2.21002" then'
+$f210ExpectedSettingsControl=$f210SharedControl.Replace($f210OriginalSettingsGuard,$f210HistoricalSettingsGuard)
+if($f210SettingsInfo.version-cne'0.1.33'-or($f210HistoricalSettingsFamilies.Count*$f210HistoricalSettingsDefaults.Count)-ne126-or
+   $f210SettingsControl-cne$f210ExpectedSettingsControl-or
+   [regex]::Matches($f210SettingsControl,[regex]::Escape($f210HistoricalSettingsGuard)).Count-ne1-or
+   $f210SettingsControl.Contains($f210OriginalSettingsGuard)){
+  throw '4.2.3 F210 historical settings oracle did not retain its exact reviewed allowance'}
+$currentAssertions++
+foreach($invalid in @(@{from='4.2.21001';to='4.2.21003';code='[mir423-f210-settings-oracle-predecessor]'},@{from='4.2.21000';to='4.2.21001';code='[mir423-f210-settings-oracle-version]'},@{from='4.2.21000';to='4.2.21002';code='[mir423-f210-settings-oracle-version]'})){
+  $refused=$false;try{Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $f210SettingsOracleRoot -FromVersion $invalid.from -ToVersion $invalid.to}catch{$refused=$_.Exception.Message-ceq$invalid.code}
+  if(-not$refused){throw "4.2.3 F210 historical settings oracle accepted invalid $($invalid.from) to $($invalid.to) binding"};$currentAssertions++
+}
+foreach($invalidIdentity in @(@{from='4.2.21001';space=$true},@{from='4.2.21000';space=$false})){
+  $refused=$false;try{Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210SettingsOracleRoot -Target f210 -SourceVersion '4.2.3' -FromVersion $invalidIdentity.from -SpaceAge:$invalidIdentity.space -HistoricalSettingsOracle}catch{$refused=$_.Exception.Message-ceq'[mir423-f210-settings-oracle-transition]'}
+  if(-not$refused){throw '4.2.3 F210 historical settings fixture identity accepted a non-exact scope'};$currentAssertions++
+}
+$f210SettingsAnchorRoot=Join-Path $RepoRoot ('build/tmp/mir423-f210-settings-oracle-anchor-'+[Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force -Path $f210SettingsAnchorRoot|Out-Null
+[IO.File]::WriteAllText((Join-Path $f210SettingsAnchorRoot 'control.lua'),$f210SettingsControl.Replace('local added_422_setting_defaults = {}','local wrong_setting_defaults = {}'),[Text.UTF8Encoding]::new($false))
+$refused=$false;try{Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $f210SettingsAnchorRoot -FromVersion '4.2.21000' -ToVersion '4.2.21003'}catch{$refused=$_.Exception.Message-ceq'[mir423-f210-settings-oracle-anchor]'}
+if(-not$refused){throw '4.2.3 F210 historical settings oracle accepted an altered complete-state guard'};$currentAssertions++
+if((Get-FileHash -LiteralPath $f210SharedControlPath -Algorithm SHA256).Hash-cne$f210SharedControlSha256){throw '4.2.3 F210 settings specialization mutated the shared fixture'}
+$currentAssertions++
+$f200OracleRoot=Join-Path $RepoRoot ('build/tmp/mir423-f200-oracle-control-'+[Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force -Path $f200OracleRoot|Out-Null
+$f200ReviewedGuard='if from_version ~= "4.2.20000" or to_version ~= "4.2.20003" then return false end'
+foreach($from in @('4.2.20000','4.2.20001','4.2.20002')){
+  Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200OracleRoot -FromVersion $from -ToVersion '4.2.20003'
+  $f200Control=Get-Content -LiteralPath (Join-Path $f200OracleRoot 'control.lua') -Raw
+  if(-not$f200Control.Contains($f200ReviewedGuard)){throw "F200 reviewed delta did not reject the $from predecessor"}
+  if($f200Control.Contains('new technology added in performance-only upgrade')){throw "F200 reviewed delta unexpectedly applied Bob/Angel performance-only strictness to the $from predecessor"}
+  $currentAssertions++
+}
+$bobAngelProfilePath=Join-Path $RepoRoot 'fixtures/run-profiles/f200-bob-angel-upgrade-422.json'
+$bobAngelInputs=Read-MIR423F200BobAngelUpgradeProfile -Path $bobAngelProfilePath
+if($bobAngelInputs.inputs.Count-ne14-or@($bobAngelInputs.inputs|Where-Object role -CEQ 'acquired-bob-angel-upstream').Count-ne13-or
+   @($bobAngelInputs.inputs|Where-Object {$_.identity.name-ceq'mir423-startup-observer'-and$_.role-ceq'honest-active-mods-observer'}).Count-ne1-or
+   @($bobAngelInputs.inputs|Where-Object {$_.identity.name-like '*graphics'}).Count-ne4){throw 'Bob/Angel profile did not retain its exact upstream closure and graphics inputs'}
+$f200BobAngelAssertions++
+$bobAngelMutation=Join-Path $testRoot 'f200-bob-angel-upgrade-profile.json'
+foreach($case in @('engine','status','source-lock-status','missing-upstream','wrong-hash','extra-upstream','observer','mir-injection')){
+  $mutated=Get-Content -LiteralPath $bobAngelProfilePath -Raw|ConvertFrom-Json -Depth 20
+  $code=switch($case){
+    'engine' {$mutated.engine_version='2.0.76';'[mir423-f200-bob-angel-profile]'}
+    'status' {$mutated.status='qualified';'[mir423-f200-bob-angel-profile]'}
+    'source-lock-status' {$mutated.source_lock.status='qualified';'[mir423-f200-bob-angel-custody]'}
+    'missing-upstream' {$mutated.upstream_mods=@($mutated.upstream_mods|Where-Object name -CNE 'angelssmeltinggraphics');'[mir423-f200-bob-angel-selection]'}
+    'wrong-hash' {$mutated.archive_sha256.'bobplates_2.1.1.zip'='0'*64;'[mir423-f200-bob-angel-archive-hash]'}
+    'extra-upstream' {$mutated.upstream_mods+=@{name='unrequested';version='1.0.0';enabled=$true};'[mir423-f200-bob-angel-selection]'}
+    'observer' {$mutated.observer.script='control.lua';'[mir423-f200-bob-angel-observer]'}
+    'mir-injection' {$mutated.upstream_mods[0].name='more-infinite-research';'[mir423-f200-bob-angel-selection]'}
+  }
+  $mutated|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $bobAngelMutation
+  $rejected=$false
+  try{Read-MIR423F200BobAngelUpgradeProfile -Path $bobAngelMutation|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith($code)}
+  if(-not$rejected){throw "Bob/Angel profile rejection missing: $case"};$f200BobAngelAssertions++
+}
+$bobAngelFixture=Join-Path $RepoRoot ('build/tmp/mir423-f200-bob-angel-fixture-'+[Guid]::NewGuid().ToString('N'))
+$bobAngelFixtureSucceeded=$false
+try {
+  Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $bobAngelFixture -Recurse
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $bobAngelFixture -Target f200 -SourceVersion '4.2.3' -FromVersion '4.2.20002'
+  Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $bobAngelFixture -FromVersion '4.2.20002' -ToVersion '4.2.20003'
+  Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $bobAngelFixture -FromVersion '4.2.20002' -ToVersion '4.2.20003'
+  $bobAngelInfo=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'info.json') -Raw|ConvertFrom-Json
+  $bobAngelControl=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'control.lua') -Raw
+  $bobAngelSettings=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'settings.lua') -Raw
+  if($bobAngelInfo.version-cne'0.1.33'-or-not$bobAngelControl.Contains('["f200-bob-angel"]={technology="mining-productivity-4",level=5}')-or
+     $bobAngelSettings-notmatch 'default_value="f200-bob-angel",allowed_values=\{"base-default","f200-bob-angel"\}'-or
+     -not$bobAngelControl.Contains('new technology added in performance-only upgrade: " .. name')-or
+     $bobAngelControl.Contains('not expected.technologies[name] and after.researched then fail("new research was awarded without earning it: " .. name)')){
+    throw 'Bob/Angel full-state fixture did not receive its unique staged identity and selected oracle'}
+  $f200BobAngelAssertions++
+  # The host oracle states the policy independently of the staged Lua text so
+  # the opposing row demonstrates that a new *unresearched* technology fails.
+  $assertExactTechnologySet={
+    param([hashtable]$Expected,[hashtable]$Observed)
+    foreach($name in $Expected.Keys){if(-not$Observed.ContainsKey($name)){throw "missing technology: $name"}}
+    foreach($name in $Observed.Keys){if(-not$Expected.ContainsKey($name)){throw "unexpected technology: $name"}}
+  }
+  $expectedTechnologies=@{established=[pscustomobject]@{researched=$true}}
+  & $assertExactTechnologySet $expectedTechnologies @{established=[pscustomobject]@{researched=$true}}
+  $f200BobAngelAssertions++
+  $rejected=$false
+  try{& $assertExactTechnologySet $expectedTechnologies @{established=[pscustomobject]@{researched=$true};unearned=[pscustomobject]@{researched=$false}}}catch{$rejected=$_.Exception.Message-ceq'unexpected technology: unearned'}
+  if(-not$rejected){throw 'Bob/Angel performance-only technology-set control accepted an unresearched addition'}
+  $f200BobAngelAssertions++
+  $bobAngelSelection=@([pscustomobject]@{name='base';version='2.0.77'},[pscustomobject]@{name='angelsbioprocessinggraphics';version='2.0.0'},[pscustomobject]@{name='mir423-startup-observer';version='1.0.0'},[pscustomobject]@{name='more-infinite-research';version='4.2.20003'})
+  $bobAngelSnapshot=[pscustomobject]@{active_mods=[pscustomobject]@{base='2.0.77';angelsbioprocessinggraphics='2.0.0';'mir423-startup-observer'='1.0.0';'more-infinite-research'='4.2.20003'}}
+  $bobAngelReceipt=Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $bobAngelSnapshot -ExpectedSelection $bobAngelSelection -Stage upgrade
+  if($bobAngelReceipt.active_mods.Count-ne4-or@($bobAngelReceipt.active_mods|Where-Object name -CEQ 'angelsbioprocessinggraphics').Count-ne1){throw 'Bob/Angel full-state active-mod receipt omitted asset-only graphics'}
+  $f200BobAngelAssertions++
+  $bobAngelSnapshot.active_mods.angelsbioprocessinggraphics='2.0.1'
+  $rejected=$false;try{Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $bobAngelSnapshot -ExpectedSelection $bobAngelSelection -Stage upgrade|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir423-f200-bob-angel-active-mods]')}
+  if(-not$rejected){throw 'Bob/Angel full-state active-mod comparison accepted a graphics version mismatch'};$f200BobAngelAssertions++
+  $bobAngelFixtureSucceeded=$true
+} catch {
+  if(-not(Test-Path -LiteralPath $bobAngelFixture -PathType Container)){New-Item -ItemType Directory -Force -Path $bobAngelFixture|Out-Null}
+  [IO.File]::WriteAllText((Join-Path $bobAngelFixture 'TEST-FAILURE-RETAINED.txt'),("Bob/Angel staged-fixture host control failed and was retained for inspection.`n" + $_.Exception.Message + "`n"),[Text.UTF8Encoding]::new($false))
+  throw
+} finally {
+  if($bobAngelFixtureSucceeded){Remove-Item -LiteralPath $bobAngelFixture -Recurse -Force}
+}
+if(Test-Path -LiteralPath $bobAngelFixture){throw 'Bob/Angel staged fixture was not cleaned after a successful host control'}
+$f200BobAngelAssertions++
+& {
+  param([string]$FunctionText,[string]$Root)
+  . ([scriptblock]::Create($FunctionText))
+  $userdata=Join-Path $Root 'full-state-userdata'
+  $output=Join-Path $Root 'full-state-output'
+  $live=Join-Path $userdata 'script-output/mir-upgrade-full-state-reload.json'
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $live))|Out-Null
+  [IO.Directory]::CreateDirectory($output)|Out-Null
+  @{from_version='4.2.20002';to_version='4.2.20003';stage='reload';state='first'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $first=Copy-MIRCompleteCatalogueSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-1 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.2.20003' -ArtifactSlug 'f200-bob-angel' -FromVersion '4.2.20002'
+  @{from_version='4.2.20002';to_version='4.2.20003';stage='reload';state='second'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $second=Copy-MIRCompleteCatalogueSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-2 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.2.20003' -ArtifactSlug 'f200-bob-angel' -FromVersion '4.2.20002'
+  if($first.stage-cne'reload-1'-or$second.stage-cne'reload-2'-or$first.snapshot_stage-cne'reload'-or$second.snapshot_stage-cne'reload'-or
+     $first.sha256-ceq$second.sha256-or-not(Test-Path -LiteralPath $first.path)-or-not(Test-Path -LiteralPath $second.path)){throw 'Complete-catalogue reload snapshots were not retained independently'}
+  $firstState=Get-Content -LiteralPath $first.path -Raw|ConvertFrom-Json
+  $secondState=Get-Content -LiteralPath $second.path -Raw|ConvertFrom-Json
+  if($firstState.state-cne'first'-or$secondState.state-cne'second'){throw 'First reload snapshot was overwritten by the second reload'}
+  @{from_version='4.2.20002';to_version='4.2.20003';stage='upgrade'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $rejected=$false;try{Copy-MIRCompleteCatalogueSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-2 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.2.20003' -ArtifactSlug 'f200-bob-angel' -FromVersion '4.2.20002'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir422-full-state-snapshot-identity]'}
+  if(-not$rejected){throw 'Complete-catalogue snapshot retainer accepted the wrong live stage'}
+} $snapshotRetainerFunctions[0].Extent.Text $testRoot
+$f200BobAngelAssertions+=3
+& {
+  param([string]$Root)
+  $userdata=Join-Path $Root 'classic-state-userdata'
+  $output=Join-Path $Root 'classic-state-output'
+  $live=Join-Path $userdata 'script-output/mir-upgrade-classic-state-reload.json'
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $live))|Out-Null
+  [IO.Directory]::CreateDirectory($output)|Out-Null
+  @{schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage='reload';from_version='4.2.20002';to_version='4.3.20000';sequence='first'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $first=Copy-MIR430ClassicUpgradeSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-1 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.3.20000' -ArtifactSlug 'f200-classic' -FromVersion '4.2.20002'
+  @{schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage='reload';from_version='4.2.20002';to_version='4.3.20000';sequence='second'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $second=Copy-MIR430ClassicUpgradeSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-2 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.3.20000' -ArtifactSlug 'f200-classic' -FromVersion '4.2.20002'
+  if($first.stage-cne'reload-1'-or$second.stage-cne'reload-2'-or$first.sha256-ceq$second.sha256-or-not(Test-Path -LiteralPath $first.path)-or-not(Test-Path -LiteralPath $second.path)){throw 'Classic reload snapshots were not retained independently'}
+  @{schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage='upgrade';from_version='4.2.20002';to_version='4.3.20000'}|ConvertTo-Json -Compress|Set-Content -LiteralPath $live -Encoding utf8
+  $rejected=$false;try{Copy-MIR430ClassicUpgradeSnapshotEvidence -SnapshotStage reload -EvidenceStage reload-2 -UserdataRoot $userdata -OutputParent $output -ToVersion '4.3.20000' -ArtifactSlug 'f200-classic' -FromVersion '4.2.20002'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir430-classic-upgrade-snapshot-identity]'}
+  if(-not$rejected){throw 'Classic snapshot retainer accepted the wrong live stage'}
+} $testRoot
+$mir43ClassicSnapshotAssertions=3
+# These controls are deliberately synthetic host-only records. They prove the
+# Classic receipt validator rejects corrupted candidate-bound snapshot content;
+# they do not claim a Factorio upgrade or an exhaustive saved-catalogue pass.
+$classicDispositionAssertions=& {
+  function Copy-MIR430ClassicSyntheticValue($Value){
+    return ($Value|ConvertTo-Json -Depth 100|ConvertFrom-Json -AsHashtable -Depth 100)
+  }
+  $directIds=@(
+    'recipe-prod-research_inventory_capacity-1',
+    'recipe-prod-research_character_crafting_speed-1',
+    'recipe-prod-research_character_mining_speed-1',
+    'recipe-prod-research_character_reach-1',
+    'recipe-prod-research_character_walking_speed-1'
+  )
+  $directEffects=@{
+    'recipe-prod-research_inventory_capacity-1'=@(@{type='character-inventory-slots-bonus';modifier=1},@{type='character-logistic-trash-slots';modifier=1})
+    'recipe-prod-research_character_crafting_speed-1'=@(@{type='character-crafting-speed';modifier=0.05})
+    'recipe-prod-research_character_mining_speed-1'=@(@{type='character-mining-speed';modifier=0.05})
+    'recipe-prod-research_character_reach-1'=@(@{type='character-reach-distance';modifier=10},@{type='character-build-distance';modifier=10},@{type='character-resource-reach-distance';modifier=10},@{type='character-item-drop-distance';modifier=10})
+    'recipe-prod-research_character_walking_speed-1'=@(@{type='character-running-speed';modifier=0.05})
+  }
+  $rows=@(foreach($id in $directIds){
+    [ordered]@{name=$id;level=3;researched=$false;enabled=$true;unit_count=8000;unit_energy=60;
+      unit_ingredients=@(@{name='utility-science-pack';amount=1});prerequisites=@('utility-science-pack');
+      effects=$directEffects[$id];hidden=$false;max_level='infinite'}
+  })
+  function New-MIR430ClassicSyntheticSnapshot([string]$Stage){
+    return [ordered]@{
+      schema=1;kind='MIR430ClassicUpgradeSnapshotV1';stage=$Stage
+      mir_prefix_technologies=$rows;declared_direct_ids=$directIds
+      declared_direct_technologies=(Copy-MIR430ClassicSyntheticValue $rows)
+      base=@{name='mining-productivity-4';level=4;researched=$true;enabled=$true}
+      base_force_effects=@{mining_drill_productivity_bonus=0.4}
+      native_technologies=@(@{name='braking-force-1';level=1;researched=$true;enabled=$true})
+      native_force_effects=@{train_braking_force_bonus=0.1;laboratory_speed_modifier=0.1;worker_robots_storage_bonus=1;inserter_stack_size_bonus=1}
+      native_gun_speed_modifiers=@{bullet=0.1;laser=0.2}
+      declared_direct_force_effects=@{character_inventory_slots_bonus=1;character_trash_slot_count=1;manual_crafting_speed_modifier=0.05;manual_mining_speed_modifier=0.05;character_reach_distance_bonus=10;character_build_distance_bonus=10;character_resource_reach_distance_bonus=10;character_item_drop_distance_bonus=10;character_running_speed_modifier=0.05}
+      current_research='recipe-prod-research_character_crafting_speed-1';research_progress=0.42;research_queue=$directIds
+    }
+  }
+  function Assert-MIR430ClassicSyntheticReject($Action,[string]$Expected){
+    $rejected=$false
+    try{& $Action}catch{$rejected=$_.Exception.Message.StartsWith($Expected)}
+    if(-not$rejected){throw "Classic synthetic snapshot corruption did not reject $Expected"}
+  }
+  $source=New-MIR430ClassicSyntheticSnapshot source
+  $candidate=Copy-MIR430ClassicSyntheticValue $source
+  $candidate.stage='reload'
+  $positive=Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $candidate
+  if($positive.source_mir_prefix_count-ne5-or$positive.candidate_mir_prefix_count-ne5-or$positive.dispositions.Count-ne5){throw 'Classic synthetic snapshot did not retain five declared rows'}
+  $assertions=1
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate;$bad.research_queue=@($directIds[0])
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-current-queue-state]';$assertions++
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate;$bad.research_progress=0.41
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-current-work-state]';$assertions++
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate;$bad.native_gun_speed_modifiers.bullet=0.3
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-base-native-state]';$assertions++
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate
+    $bad.mir_prefix_technologies+=,[ordered]@{name='recipe-prod-research_unexpected-1';level=1;researched=$false;enabled=$true;unit_count=1;unit_energy=1;unit_ingredients=@();prerequisites=@();effects=@();hidden=$false;max_level='infinite'}
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-undeclared-candidate-prefix]';$assertions++
+  Assert-MIR430ClassicSyntheticReject {
+    $bad=Copy-MIR430ClassicSyntheticValue $candidate
+    $bad.declared_direct_technologies=@($bad.declared_direct_technologies|Select-Object -First 4)
+    Get-MIR430ClassicCatalogDisposition -Source $source -Candidate $bad|Out-Null
+  } '[mir430-classic-upgrade-declared-direct-catalog]';$assertions++
+  $assertions
+}
+$mir43ClassicSnapshotAssertions+=[int]$classicDispositionAssertions
+foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
+  $isHistorical=$target-cin@('f017','f016','f015','f014','f013')
+  foreach($patch in @(0,1,2)){
+    $SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false
+    $mir42UpgradeSpecialized=-not$isHistorical;$isHistoricalTerminalFixture=$isHistorical
+    $Archetype=if($target-ceq'f210'){'space-age-native-owner'}elseif(-not$isHistorical){'base-default'}else{''}
+    $requiresCompleteCatalogue=& $completeCatalogueEvaluator
+    if(-not$requiresCompleteCatalogue){throw "4.2.3 complete-catalogue gate is absent for $target predecessor $patch"}
+    $currentAssertions++
+  }
+}
+foreach($excluded in @('SpaceIsFake','k2Scenario','Archetype','SourceVersion')){
+  $SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='base-default'
+  switch($excluded){'SpaceIsFake'{$SpaceIsFake=$true};'k2Scenario'{$k2Scenario=$true};'Archetype'{$Archetype='unsupported'};'SourceVersion'{$SourceVersion='4.2.1'}}
+  if(& $completeCatalogueEvaluator){throw "Complete-catalogue gate accepted excluded $excluded scenario"}
+  $currentAssertions++
+}
+$SourceVersion='4.2.3';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='f200-bob-angel'
+if(-not(& $completeCatalogueEvaluator)){throw 'Bob/Angel complete-catalogue gate is absent'}
+$f200BobAngelAssertions++
 foreach($target in @('f110','f100')){
   $code=$target.Substring(1)
   foreach($patch in @(0,1)){
@@ -214,6 +505,11 @@ foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f0
   foreach($oldPatch in @(0,1)){
     $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion ("4.2.${code}0"+$oldPatch) -SourceVersion 4.2.2
     if($readerVersion-cne('4.2.'+($oldPatch+1))){throw 'Wrong published custody contract selected for direct path'}
+    $currentAssertions++
+  }
+  foreach($oldPatch in @(0,1,2)){
+    $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion ("4.2.${code}0"+$oldPatch) -SourceVersion 4.2.3
+    if($readerVersion-cne('4.2.'+($oldPatch+1))){throw '423 selected the wrong published custody contract for a retained predecessor'}
     $currentAssertions++
   }
   foreach($badFrom in @("4.1.${code}00","4.2.${code}02","4.2.${code}03",'4.2.99900')){
@@ -229,6 +525,10 @@ foreach($target in @('f210','f200')){
   Assert-MIR421CurrentUpgradeInputMode @mode422;$currentAssertions++
   $direct422=$mode422.Clone();$direct422.FromVersion="4.2.${code}00"
   Assert-MIR421CurrentUpgradeInputMode @direct422;$currentAssertions++
+  foreach($oldPatch in @(0,1,2)){
+    $mode423=$mode422.Clone();$mode423.SourceVersion='4.2.3';$mode423.FromVersion="4.2.${code}0$oldPatch";$mode423.ToVersion="4.2.${code}03"
+    Assert-MIR421CurrentUpgradeInputMode @mode423;$currentAssertions++
+  }
   foreach($case in @('SourceVersion','FromVersion','ToVersion','K2ImersiteInputProfile','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
     $invalid422=$mode422.Clone()
     $invalid422[$case]=switch($case){
@@ -284,6 +584,23 @@ $currentSpaceAge=@{Target='f210';FromVersion='4.2.21001';ToVersion='4.2.21002';F
 Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge;$currentAssertions++
 $directSpaceAge=$currentSpaceAge.Clone();$directSpaceAge.FromVersion='4.2.21000'
 Assert-MIR421CurrentUpgradeInputMode @directSpaceAge;$currentAssertions++
+$currentSpaceAge423=$currentSpaceAge.Clone();$currentSpaceAge423.SourceVersion='4.2.3';$currentSpaceAge423.FromVersion='4.2.21002';$currentSpaceAge423.ToVersion='4.2.21003'
+Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge423;$currentAssertions++
+foreach($from in @('4.2.21000','4.2.21001')){
+  $directSpaceAge423=$currentSpaceAge423.Clone();$directSpaceAge423.FromVersion=$from
+  Assert-MIR421CurrentUpgradeInputMode @directSpaceAge423;$currentAssertions++
+}
+# The current 4.3 Full Space Age path remains bound to the same published
+# 4.2.2 predecessor and complete-state fixture. It is not a generic DLC bypass.
+$currentSpaceAge430=$currentSpaceAge.Clone();$currentSpaceAge430.SourceVersion='4.3.0';$currentSpaceAge430.FromVersion='4.2.21002';$currentSpaceAge430.ToVersion='4.3.21000'
+Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge430;$currentAssertions++
+foreach($field in @('Target','FromVersion','ToVersion','FixtureName','SourceVersion','SpaceIsFake')){
+  $bad=$currentSpaceAge430.Clone();$bad[$field]=switch($field){
+    'Target'{'f200'};'FromVersion'{'4.2.21001'};'ToVersion'{'4.3.21001'};'FixtureName'{'wrong'};'SourceVersion'{'4.3.1'};'SpaceIsFake'{$true}
+  }
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-')}
+  if(-not$rejected){throw "4.3 Full Space Age mode accepted invalid $field"};$currentAssertions++
+}
 foreach($field in @('Target','FromVersion','ToVersion','FixtureName','SourceVersion','SourceOnlyFixtureNames','PublishedPredecessorManifest','Retention')){
   $bad=$currentSpaceAge.Clone();$bad[$field]=switch($field){
     'Target'{'f200'};'FromVersion'{'4.2.21002'};'ToVersion'{'4.2.21003'};'FixtureName'{'wrong'};'SourceVersion'{'4.2.1'};'SourceOnlyFixtureNames'{@('extra')};'PublishedPredecessorManifest'{''};'Retention'{'Never'}
@@ -301,20 +618,35 @@ $currentK2.K2ImersiteInputProfile=''
 $rejected=$false
 try{Assert-MIR421CurrentUpgradeInputMode @currentK2}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-k2-upgrade-inputs-required]')}
 if(-not$rejected){throw 'Current-package K2 mode accepted without its locked profile'};$currentAssertions++
+$currentBobAngel=@{Target='f200';FromVersion='4.2.20002';ToVersion='4.2.20003';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='f200-bob-angel';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile=$bobAngelProfilePath;SourceVersion='4.2.3'}
+Assert-MIR421CurrentUpgradeInputMode @currentBobAngel;$f200BobAngelAssertions++
+# The exact locked F200 profile also has one Full 4.3 preservation lane.
+$currentBobAngel430=$currentBobAngel.Clone();$currentBobAngel430.SourceVersion='4.3.0';$currentBobAngel430.ToVersion='4.3.20000'
+Assert-MIR421CurrentUpgradeInputMode @currentBobAngel430;$f200BobAngelAssertions++
+foreach($field in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SpaceIsFake','SourceOnlyFixtureNames','K2ImersiteInputProfile','F200BobAngelInputProfile','SourceVersion')){
+  $bad=$currentBobAngel.Clone();$bad[$field]=switch($field){'SpaceIsFake'{$true};'SourceOnlyFixtureNames'{@('extra')};'K2ImersiteInputProfile'{'k2.json'};'F200BobAngelInputProfile'{''};'SourceVersion'{'4.2.2'};default{'wrong'}}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message -match '^\[mir42(?:1|3)-'}
+  if(-not$rejected){throw "Bob/Angel current-package mode accepted invalid $field"};$f200BobAngelAssertions++
+}
+foreach($field in @('Target','FromVersion','ToVersion','FixtureName','Archetype','SpaceIsFake','SourceOnlyFixtureNames','K2ImersiteInputProfile','F200BobAngelInputProfile','SourceVersion')){
+  $bad=$currentBobAngel430.Clone();$bad[$field]=switch($field){'SpaceIsFake'{$true};'SourceOnlyFixtureNames'{@('extra')};'K2ImersiteInputProfile'{'k2.json'};'F200BobAngelInputProfile'{''};'SourceVersion'{'4.3.1'};default{'wrong'}}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message -match '^\[mir42(?:1|3)-'}
+  if(-not$rejected){throw "4.3 Full Bob/Angel mode accepted invalid $field"};$f200BobAngelAssertions++
+}
 # Execute the actual caller statements with a recording reader, so adding a
 # validator parameter without forwarding it cannot pass these controls.
 $predecessorSelectCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$predecessorReaderVersion'},$true))
 $publishedInputCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$publishedInputs'-and$n.Right.Extent.Text.StartsWith('Get-MIR42PublishedMaintenancePredecessorInputs ')},$true))
 if($predecessorSelectCalls.Count-ne1-or$publishedInputCalls.Count-ne1){throw 'Published input call missing or ambiguous'}
 function Get-MIR42PublishedMaintenancePredecessorInputs {param($RepoRoot,$ManifestPath,$ReleaseMetadata,$CandidateSourceVersion,$SelectedTarget,$SelectedArchivePath) return [pscustomobject]@{reader=$CandidateSourceVersion;target=$SelectedTarget;archive=$SelectedArchivePath}}
-foreach($SelectedTarget in @('f210','f200')){foreach($oldPatch in @(0,1)){
-  $code=$SelectedTarget.Substring(1);$SourceVersion='4.2.2';$FromVersion="4.2.${code}0$oldPatch"
+foreach($SelectedTarget in @('f210','f200')){foreach($sourcePatch in @(2,3)){foreach($oldPatch in 0..($sourcePatch-1)){
+  $code=$SelectedTarget.Substring(1);$SourceVersion="4.2.$sourcePatch";$FromVersion="4.2.${code}0$oldPatch"
   $from='explicit-selected-published.zip';$PublishedMaintenancePredecessorManifestPath='explicit-frozen-manifest.json';$metadataText='{}'
   . ([scriptblock]::Create($predecessorSelectCalls[0].Extent.Text))
   . ([scriptblock]::Create($publishedInputCalls[0].Extent.Text))
-  if($publishedInputs.reader-cne('4.2.'+($oldPatch+1))-or$publishedInputs.target-cne$SelectedTarget-or$publishedInputs.archive-cne$from-or$SourceVersion-cne'4.2.2'){throw 'Published caller lost predecessor/archive/candidate identity'}
+  if($publishedInputs.reader-cne('4.2.'+($oldPatch+1))-or$publishedInputs.target-cne$SelectedTarget-or$publishedInputs.archive-cne$from-or$SourceVersion-cne("4.2.$sourcePatch")){throw 'Published caller lost predecessor/archive/candidate identity'}
   $currentAssertions++
-}}
+}}}
 $readerCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$currentMaterialization'-and$node.Right.Extent.Text.StartsWith('Read-MIRNativeProbeCurrentCandidate ')},$true))
 if($readerCalls.Count-ne1){throw 'Current candidate reader assignment missing or ambiguous'}
 $modeCalls=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Assert-MIR421CurrentUpgradeInputMode'},$true))
@@ -325,12 +657,12 @@ $RepoRootOriginal=$RepoRoot
 try {
   function Resolve-MIRUpgradePath {param([string]$Path) return $Path}
   function Read-MIRNativeProbeCurrentCandidate {param($Repository,$Archive,$ReceiptPath,$Target,$SourceVersion) [pscustomobject]@{source=$SourceVersion;target=$Target;archive=$Archive;receipt=$ReceiptPath}}
-  foreach($SourceVersion in @('4.2.1','4.2.2')){
+  foreach($SourceVersion in @('4.2.1','4.2.2','4.2.3')){
     $SelectedTarget='f210';$to='selected.zip';$SourceMaterializationPath='selected-receipt.json'
-    $FromVersion=if($SourceVersion-ceq'4.2.2'){'4.2.21001'}else{'4.2.21000'}
-    $ToVersion=if($SourceVersion-ceq'4.2.2'){'4.2.21002'}else{'4.2.21001'}
+    $FromVersion=if($SourceVersion-ceq'4.2.3'){'4.2.21002'}elseif($SourceVersion-ceq'4.2.2'){'4.2.21001'}else{'4.2.21000'}
+    $ToVersion=if($SourceVersion-ceq'4.2.3'){'4.2.21003'}elseif($SourceVersion-ceq'4.2.2'){'4.2.21002'}else{'4.2.21001'}
     $FixtureName='assert-upgrade-4-0-21000-to-4-1-21000';$Archetype='base-default';$SpaceIsFake=$false
-    $SourceOnlyFixtureNames=@();$SelectedReleaseManifest='';$PublishedMaintenancePredecessorManifestPath='published.json';$Retention='Always';$K2ImersiteInputProfile=''
+    $SourceOnlyFixtureNames=@();$SelectedReleaseManifest='';$PublishedMaintenancePredecessorManifestPath='published.json';$Retention='Always';$K2ImersiteInputProfile='';$F200BobAngelInputProfile=''
     . ([scriptblock]::Create($modeCalls[0].Extent.Text))
     . ([scriptblock]::Create($readerCalls[0].Extent.Text))
     if($currentMaterialization.source-cne$SourceVersion-or$currentMaterialization.target-cne'f210'-or$currentMaterialization.archive-cne$to-or$currentMaterialization.receipt-cne$SourceMaterializationPath){throw 'Upgrade caller dropped explicit candidate selection'}
@@ -355,6 +687,10 @@ foreach($SelectedTarget in @('f210','f200')){foreach($patch in @(1,2)){
   $currentAssertions++
 }}
 $profile422=Join-Path $RepoRoot 'fixtures/run-profiles/k2-213-imersite-f210-422.json'
+$fixtureRootAuthority=Resolve-MIRRepoPath -RepoRoot $RepoRoot -Id 'fixtures.root'
+if($fixtureRootAuthority.id-cne'fixtures.root'-or$fixtureRootAuthority.relative_path-cne'fixtures'-or$fixtureRootAuthority.alias-or$fixtureRootAuthority.mode-cne'canonical'){
+  throw 'K2 upgrade fixture root authority is not canonical'}
+$fixtureRoot=Join-Path $RepoRoot ([string]$fixtureRootAuthority.relative_path)
 $k2ReaderCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$k2Inputs'-and$n.Right.Extent.Text.StartsWith('Read-MIR421K2UpgradeProfile ')},$true))
 $k2Selectors=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$k2Scenario'},$true))
 $reloadSelectors=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$requiresReloadProof'},$true))
@@ -371,7 +707,10 @@ foreach($patch in @(1,2)){
   Assert-MIR421CurrentUpgradeInputMode @mode
   . ([scriptblock]::Create($k2Selectors[0].Extent.Text));. ([scriptblock]::Create($reloadSelectors[0].Extent.Text))
   if(-not$k2Scenario-or-not$requiresReloadProof){throw 'Current K2 fixture bypassed its scenario or reload path'}
-  $info=Get-Content (Join-Path $RepoRoot ('fixtures/'+$FixtureName+'/info.json')) -Raw|ConvertFrom-Json
+  # The exact transition validator owns FixtureName; fixture bytes are read
+  # through the canonical fixture-root authority, never a package-root path.
+  $fixtureInfoPath=Join-Path (Join-Path $fixtureRoot $FixtureName) 'info.json'
+  $info=Get-Content -LiteralPath $fixtureInfoPath -Raw|ConvertFrom-Json
   if($info.version-cne"0.1.$patch"-or$info.dependencies-cnotcontains"more-infinite-research >= $FromVersion"){throw 'K2 prepared identity or predecessor differs'}
   $result=[ordered]@{};. ([scriptblock]::Create($k2ResultCalls[0].Extent.Text))
   if($result.native_scenario-cne"K2-42$patch-published-4.2.$($patch-1)-to-$SourceVersion"){throw 'K2 result identity differs'}
@@ -396,4 +735,352 @@ foreach($patch in @(1,2)){
     if(-not$rejected){throw "K2 mixed maintenance mode accepted: $field"};$k2Assertions++
   }
 }
-[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;current_package_input_mode_assertions=$currentAssertions;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+# 4.3 destinations retain the full current-package contract while binding each
+# row to an exact published 4.2 predecessor.  These are host-only controls:
+# they build no package and never launch an engine.
+$mir43Assertions=0
+$allUpgradeTargets=@('f210','f200','f110','f100','f017','f016','f015','f014','f013')
+foreach($sourceVersion in @('4.3.0','4.3.1')){
+  foreach($target in $allUpgradeTargets){
+    $code=$target.Substring(1)
+    foreach($oldPatch in 0..2){
+      $from="4.2.${code}0$oldPatch"
+      $to='4.3.'+$code+([version]$sourceVersion).Build.ToString('00')
+      $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
+      $mode=@{Target=$target;FromVersion=$from;ToVersion=$to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion=$sourceVersion}
+      Assert-MIR421CurrentUpgradeInputMode @mode
+      $readerVersion=Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $from -SourceVersion $sourceVersion
+      if($readerVersion-cne('4.2.'+($oldPatch+1))){throw "4.3 selected incorrect published predecessor custody: $target/$sourceVersion/$oldPatch"}
+      $mir43Assertions+=2
+    }
+    $custodyMode=$mode.Clone()
+    $custodyMode.SelectedReleaseManifest=if($target-cin@('f017','f016','f015','f014','f013')){''}else{'candidate.json'}
+    $rejected=$false
+    try{Assert-MIR421CurrentUpgradeInputMode @custodyMode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-input-mode]'}
+    if(-not$rejected){throw "4.3 current mode accepted absent historical or unexpected modern combined custody: $target/$sourceVersion"}
+    $mir43Assertions++
+    foreach($invalid in @(
+      @{from="4.3.${code}00";to=('4.3.'+$code+'01');kind='same-minor-predecessor'},
+      @{from="4.1.${code}00";to=('4.3.'+$code+'00');kind='unpublished-predecessor'},
+      @{from="4.2.${code}02";to=('4.2.'+$code+'03');kind='wrong-destination'}
+    )){
+      $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"}
+      $mode=@{Target=$target;FromVersion=$invalid.from;ToVersion=$invalid.to;FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.1'}
+      $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-current-upgrade-')}
+      if(-not$rejected){throw "4.3 current mode accepted $($invalid.kind): $target"}
+      $mir43Assertions++
+    }
+    $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion "4.3.${code}00" -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir42-upgrade-predecessor-version]')}
+    if(-not$rejected){throw "4.3 predecessor custody was inferred without a published reader: $target"}
+    $mir43Assertions++
+  }
+}
+foreach($target in @('f017','f016','f015','f014','f013')){
+  $code=$target.Substring(1)
+  $wrong=@{Target=$target;FromVersion="4.2.${code}02";ToVersion="4.3.${code}00";FixtureName="assert-upgrade-4-0-${code}00-to-4-1-${code}00";Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($target-cin@('f017','f016','f015','f014','f013')){'candidate.json'}else{''});PublishedPredecessorManifest='published.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.0'}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrong}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
+  if(-not$rejected){throw "4.3 historical target accepted a modern fixture: $target"}
+  $mir43Assertions++
+}
+# A single published 4.1 reader exists for the directly acquired F200 archive.
+# It is deliberately outside the retained 4.2 predecessor reader and cannot
+# admit another target, destination, policy, or a synthetic 4.2 manifest.
+$published410Mode=@{Target='f200';FromVersion='4.1.20000';ToVersion='4.3.20000';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.3.0'}
+Assert-MIR421CurrentUpgradeInputMode @published410Mode
+Assert-MIR430Published410F200FullUpgradeTransition -Target $published410Mode.Target -SourceVersion $published410Mode.SourceVersion -FromVersion $published410Mode.FromVersion -ToVersion $published410Mode.ToVersion -FixtureName $published410Mode.FixtureName -Archetype $published410Mode.Archetype -SpaceIsFake $published410Mode.SpaceIsFake -UpgradePolicy Full
+$mir43Assertions+=2
+foreach($invalid in @(
+  @{field='Target';value='f210';code='[mir421-current-upgrade-input-mode]'},
+  @{field='ToVersion';value='4.3.20001';code='[mir421-current-upgrade-input-mode]'},
+  @{field='SourceVersion';value='4.3.1';code='[mir421-current-upgrade-input-mode]'},
+  @{field='PublishedPredecessorManifest';value='published-4.2.json';code='[mir421-current-upgrade-transition]'}
+)){
+  $bad=$published410Mode.Clone();$bad[$invalid.field]=$invalid.value
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message-ceq$invalid.code}
+  if(-not$rejected){throw "Published 4.1 F200 mode admitted invalid $($invalid.field)"}
+  $mir43Assertions++
+}
+$rejected=$false;try{Assert-MIR430Published410F200FullUpgradeTransition -Target f200 -SourceVersion '4.3.0' -FromVersion '4.1.20000' -ToVersion '4.3.20000' -FixtureName 'assert-upgrade-4-0-20000-to-4-1-20000' -Archetype base-default -SpaceIsFake:$false -UpgradePolicy Classic}catch{$rejected=$_.Exception.Message-ceq'[mir430-published410-upgrade-profile]'}
+if(-not$rejected){throw 'Published 4.1 F200 transition admitted the destructive Classic policy'}
+$rejected=$false;try{Assert-MIR430Published410F200FullUpgradeTransition -Target f200 -SourceVersion '4.3.0' -FromVersion '4.1.20001' -ToVersion '4.3.20000' -FixtureName 'assert-upgrade-4-0-20000-to-4-1-20000' -Archetype base-default -SpaceIsFake:$false -UpgradePolicy Full}catch{$rejected=$_.Exception.Message-ceq'[mir430-published410-upgrade-transition]'}
+if(-not$rejected){throw 'Published 4.1 F200 transition inferred a non-published archive'}
+$wrong410Archive=Join-Path $testRoot 'not-the-published-410.zip';[IO.File]::WriteAllText($wrong410Archive,'not a published archive',[Text.UTF8Encoding]::new($false))
+$rejected=$false;try{Read-MIR430Published410F200ReleaseInput -ReleaseMetadata ([pscustomobject]@{}) -ReleaseManifestPath $wrong410Archive -ArchivePath $wrong410Archive|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir430-published410-archive]'}
+if(-not$rejected){throw 'Published 4.1 reader admitted an unrelated archive'}
+$mir43Assertions+=3
+foreach($case in $historicalCases){
+  foreach($sourceVersion in @('4.3.0','4.3.1')){
+    $to='4.3.'+$case.code+([version]$sourceVersion).Build.ToString('00')
+    $resolved=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion ('4.2.'+$case.code+'02') -ToVersion $to
+    if($resolved.target-cne$to-or$resolved.predecessor_kind-cne'same-target-maintenance'){
+      throw "4.3 historical cross-minor transition binding differs: $($case.code)/$sourceVersion"
+    }
+    $mir43Assertions++
+  }
+}
+foreach($sourceVersion in @('4.3.0','4.3.1')){
+  foreach($target in $allUpgradeTargets){
+    $isHistorical=$target-cin@('f017','f016','f015','f014','f013')
+    $SourceVersion=$sourceVersion;$SpaceIsFake=$false;$k2Scenario=$false
+    $mir42UpgradeSpecialized=-not$isHistorical;$isHistoricalTerminalFixture=$isHistorical;$Archetype='base-default'
+    if(-not(& $completeCatalogueEvaluator)){throw "4.3 complete-catalogue gate is absent for $target/$sourceVersion"}
+    $mir43Assertions++
+  }
+}
+# Fixture versions must distinguish every 4.2 predecessor and destination
+# patch, without modifying the checked-in templates.
+# Classic deliberately records a bounded retained-core/omission proof instead
+# of claiming complete 4.2 catalogue preservation.  The Full opt-in retains
+# the existing complete catalogue gate under otherwise identical inputs.
+foreach($target in @('f210','f200','f110','f100')){
+  $code=$target.Substring(1)
+  foreach($patch in @(0,1,2)){
+    $SourceVersion='4.3.0';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$true
+    $mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='base-default'
+    if(& $completeCatalogueEvaluator){throw "Classic 4.3.0 incorrectly requires complete-catalogue proof for $target predecessor $patch"}
+    Assert-MIR430ClassicUpgradeMode -Target $target -SourceVersion $SourceVersion -FromVersion ('4.2.'+$code+$patch.ToString('00')) -ToVersion ('4.3.'+$code+'00') -FixtureName ('assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00') -Archetype $Archetype
+    $mir43Assertions+=2
+  }
+}
+$SourceVersion='4.3.0';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false;$mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$Archetype='base-default'
+if(-not(& $completeCatalogueEvaluator)){throw 'Full 4.3.0 opt-in lost complete-catalogue gate'}
+$mir43Assertions++
+$mir43FixtureRoot=Join-Path $RepoRoot ('build/tmp/mir43-upgrade-fixture-identities-'+[Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force -Path $mir43FixtureRoot|Out-Null
+foreach($sourceVersion in @('4.3.0','4.3.1')){
+  foreach($target in @('f210','f200','f110','f100')){
+    $code=$target.Substring(1)
+    foreach($oldPatch in 0..2){
+      $fixtureRoot=Join-Path $mir43FixtureRoot ('mir43-modern-'+$target+'-'+$sourceVersion.Replace('.','-')+'-'+$oldPatch)
+      $fixtureName='assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'
+      Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$fixtureName)) -Destination $fixtureRoot -Recurse
+      Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion $sourceVersion -FromVersion ('4.2.'+$code+$oldPatch.ToString('00'))
+      $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+      $expected='0.1.'+(40+3*([version]$sourceVersion).Build+$oldPatch)
+      if($info.version-cne$expected){throw "4.3 modern fixture identity collision: $target/$sourceVersion/$oldPatch"}
+      $mir43Assertions++
+    }
+  }
+  foreach($target in @('f017','f016','f015','f014','f013')){
+    $code=$target.Substring(1)
+    foreach($oldPatch in 0..2){
+      $fixtureRoot=Join-Path $mir43FixtureRoot ('mir43-historical-'+$target+'-'+$sourceVersion.Replace('.','-')+'-'+$oldPatch)
+      Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-historical-terminal-to-mir42') -Destination $fixtureRoot -Recurse
+      $from='4.2.'+$code+$oldPatch.ToString('00')
+      $infoPath=Join-Path $fixtureRoot 'info.json'
+      $infoText=Get-Content -LiteralPath $infoPath -Raw
+      [IO.File]::WriteAllText($infoPath,$infoText.Replace('@@FACTORIO_LINE@@',('0.'+[int]$code)).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$from),[Text.UTF8Encoding]::new($false))
+      Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion $sourceVersion -FromVersion $from
+      $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+      $expected='1.0.'+(20+3*([version]$sourceVersion).Build+$oldPatch)
+      if($info.version-cne$expected){throw "4.3 historical fixture identity collision: $target/$sourceVersion/$oldPatch"}
+      $mir43Assertions++
+    }
+  }
+}
+$f200Mir43Oracle=Join-Path $mir43FixtureRoot 'mir43-f200-full-state-oracle'
+New-Item -ItemType Directory -Force -Path $f200Mir43Oracle|Out-Null
+Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Mir43Oracle -FromVersion '4.2.20002' -ToVersion '4.3.20000'
+$f200Mir43Control=Get-Content -LiteralPath (Join-Path $f200Mir43Oracle 'control.lua') -Raw
+if($f200Mir43Control.Contains('reviewed_420_frontier')){throw '4.3 F200 full-state oracle retained a 4.2-only definition-delta allowance'}
+$mir43Assertions++
+$rejected=$false;try{Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Mir43Oracle -FromVersion '4.3.20000' -ToVersion '4.3.20001'}catch{$rejected=$_.Exception.Message-ceq'[mir422-f200-complete-oracle-transition]'}
+if(-not$rejected){throw '4.3 F200 full-state oracle inferred an unreviewed 4.3 predecessor'}
+$mir43Assertions++
+$f200Published410Fixture=Join-Path $mir43FixtureRoot 'mir43-f200-published-410-full-state-oracle'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $f200Published410Fixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f200Published410Fixture -Target f200 -SourceVersion '4.3.0' -FromVersion '4.1.20000'
+Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Published410Fixture -FromVersion '4.1.20000' -ToVersion '4.3.20000'
+$f200Published410Info=Get-Content -LiteralPath (Join-Path $f200Published410Fixture 'info.json') -Raw|ConvertFrom-Json
+$f200Published410Control=Get-Content -LiteralPath (Join-Path $f200Published410Fixture 'control.lua') -Raw
+if($f200Published410Info.version-cne'0.1.49'-or-not$f200Published410Control.Contains('"4.1.20000"')-or-not$f200Published410Control.Contains('"4.3.20000"')){
+  throw 'Published 4.1 F200 fixture identity or complete-state oracle differs'
+}
+$mir43Assertions++
+$f210FullSettingFixture=Join-Path $mir43FixtureRoot 'mir43-f210-full-setting-allowance'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210FullSettingFixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210FullSettingFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21002' -SpaceAge
+Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210FullSettingFixture -FromVersion '4.2.21002' -ToVersion '4.3.21000'
+$f210FullControl=Get-Content -LiteralPath (Join-Path $f210FullSettingFixture 'control.lua') -Raw
+foreach($needle in @(
+  'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}',
+  'to_version == "4.3.21000"',
+  'export_state("source")',
+  'export_state("upgrade")',
+  'export_state("reload")',
+  'for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do'
+)){
+  if(-not$f210FullControl.Contains($needle)){throw "F210 Full fixture lost complete-state hook: $needle"}
+}
+$mir43Assertions++
+$f210MissingSourceFixture=Join-Path $mir43FixtureRoot 'mir43-f210-full-missing-source-hook'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210MissingSourceFixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210MissingSourceFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21002' -SpaceAge
+$f210MissingSourceControl=Join-Path $f210MissingSourceFixture 'control.lua'
+$missingSourceText=Get-Content -LiteralPath $f210MissingSourceControl -Raw
+if(-not$missingSourceText.Contains('    export_state("source")')){throw 'F210 source-hook opposing fixture anchor changed'}
+[IO.File]::WriteAllText($f210MissingSourceControl,$missingSourceText.Replace('    export_state("source")','    -- source export removed'),[Text.UTF8Encoding]::new($false))
+$rejected=$false;try{Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210MissingSourceFixture -FromVersion '4.2.21002' -ToVersion '4.3.21000'}catch{$rejected=$_.Exception.Message-ceq'[mir430-full-upgrade-complete-state-anchor]'}
+if(-not$rejected){throw 'F210 Full fixture admitted a missing source complete-state hook'}
+$mir43Assertions++
+$f210BaseFullFixture=Join-Path $mir43FixtureRoot 'mir43-f210-base-full-setting-allowance'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210BaseFullFixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210BaseFullFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21002'
+Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210BaseFullFixture -FromVersion '4.2.21002' -ToVersion '4.3.21000' -BaseDefaultCompleteState
+$f210BaseFullControl=Get-Content -LiteralPath (Join-Path $f210BaseFullFixture 'control.lua') -Raw
+foreach($needle in @(
+  '(archetype == "space-age-native-owner" or archetype == "base-default")',
+  'to_version == "4.3.21000"',
+  'export_state("source")',
+  'export_state("upgrade")',
+  'export_state("reload")',
+  'for _, name in ipairs({}) do'
+)){
+  if(-not$f210BaseFullControl.Contains($needle)){throw "F210 Base Full fixture lost complete-state hook: $needle"}
+}
+$mir43Assertions++
+$f210WrongBaseBindingFixture=Join-Path $mir43FixtureRoot 'mir43-f210-base-wrong-snapshot-binding'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210WrongBaseBindingFixture -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210WrongBaseBindingFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21001'
+$rejected=$false;try{Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210WrongBaseBindingFixture -FromVersion '4.2.21001' -ToVersion '4.3.21000' -BaseDefaultCompleteState}catch{$rejected=$_.Exception.Message-ceq'[mir430-full-upgrade-base-snapshot-transition]'}
+if(-not$rejected){throw 'F210 Base complete-state snapshots admitted an unbound predecessor'}
+$mir43Assertions++
+$rejected=$false;try{Set-MIR430FullCompilerProfileUpgradeAllowance -Target f110 -FixtureDirectory $f210WrongBaseBindingFixture -FromVersion '4.2.11002' -ToVersion '4.3.11000' -BaseDefaultCompleteState}catch{$rejected=$_.Exception.Message-ceq'[mir430-full-upgrade-base-snapshot-transition]'}
+if(-not$rejected){throw 'F110 accepted the F210 Base complete-state switch'}
+$mir43Assertions++
+foreach($target in @('f110','f100')){
+  $code=$target.Substring(1)
+  $fixturePath=Join-Path $mir43FixtureRoot ('mir43-'+$target+'-full-setting-allowance')
+  Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00')) -Destination $fixturePath -Recurse
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixturePath -Target $target -SourceVersion '4.3.0' -FromVersion ('4.2.'+$code+'02')
+  Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixturePath -Target $target -FromVersion ('4.2.'+$code+'02') -ToVersion ('4.3.'+$code+'00')
+  Set-MIR430FullCompilerProfileUpgradeAllowance -Target $target -FixtureDirectory $fixturePath -FromVersion ('4.2.'+$code+'02') -ToVersion ('4.3.'+$code+'00')
+  $allowance=Get-Content -LiteralPath (Join-Path $fixturePath 'mir422_complete_state.lua') -Raw
+  if(-not$allowance.Contains('before[field]["mir-compiler-profile"] == nil')-or-not$allowance.Contains('expected_settings["mir-compiler-profile"] = "full"')){
+    throw "$target Full selector allowance was not bound to the complete-state oracle"
+  }
+  $mir43Assertions++
+}
+Remove-Item -LiteralPath $mir43FixtureRoot -Recurse -Force
+# The matrix has a single current-destination route with exact argument
+# propagation and demands both reload receipts for it.
+$matrixTokens=$null;$matrixErrors=$null
+$matrixAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgradeMatrix.ps1'),[ref]$matrixTokens,[ref]$matrixErrors)
+if($matrixErrors.Count){throw 'Upgrade matrix syntax error'}
+$matrixText=$matrixAst.Extent.Text
+foreach($needle in @('$LocalModLibraryDirs','$SourceMaterializationPath','$SelectedReleaseManifest','$SelectedTarget','$SourceVersion','$UpgradePolicy','$PublishedMaintenancePredecessorManifestPath','LocalModLibraryDirs = @($LocalModLibraryDirs)','$arguments.SourceMaterializationPath=$SourceMaterializationPath','$arguments.SelectedReleaseManifest=$SelectedReleaseManifest','$arguments.SelectedTarget=$SelectedTarget','$arguments.SourceVersion=$SourceVersion','$arguments.UpgradePolicy=$UpgradePolicy','$arguments.PublishedMaintenancePredecessorManifestPath=$PublishedMaintenancePredecessorManifestPath','($currentDestination -or $FixtureName')){
+  if(-not$matrixText.Contains($needle)){throw "4.3 upgrade matrix lost current destination control: $needle"}
+  $mir43Assertions++
+}
+
+# The public UpgradePolicy parameter is a validated caller contract.  The
+# native resource governor needs a different object, so it must never reuse
+# that variable name (PowerShell variable names are case-insensitive).  Parse
+# assignments and command arguments instead of accepting a text-only check.
+$upgradeTokens=$null;$upgradeErrors=$null
+$upgradeAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$upgradeTokens,[ref]$upgradeErrors)
+if($upgradeErrors.Count){throw 'Upgrade runner syntax error'}
+$upgradeParameters=@($upgradeAst.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath-ieq'UpgradePolicy'})
+if($upgradeParameters.Count-ne1){throw 'Upgrade runner lost its validated UpgradePolicy parameter'}
+function Get-MIRUpgradePolicyAssignments {
+  param([Parameter(Mandatory)][Management.Automation.Language.Ast]$Ast)
+  @($Ast.FindAll({param($node)
+    $node-is[Management.Automation.Language.AssignmentStatementAst]-and
+    $node.Left-is[Management.Automation.Language.VariableExpressionAst]-and
+    $node.Left.VariablePath.UserPath-ieq'UpgradePolicy'
+  },$true))
+}
+$upgradePolicyAssignments=@(Get-MIRUpgradePolicyAssignments -Ast $upgradeAst)
+if($upgradePolicyAssignments.Count){throw 'Upgrade runner overwrites the validated UpgradePolicy parameter'}
+$collisionTokens=$null;$collisionErrors=$null
+$lowercaseCollisionAst=[Management.Automation.Language.Parser]::ParseInput('$upgradePolicy=[pscustomobject]@{minimum_free_ram_gib=4}',[ref]$collisionTokens,[ref]$collisionErrors)
+if($collisionErrors.Count-or-not @(Get-MIRUpgradePolicyAssignments -Ast $lowercaseCollisionAst).Count){throw 'Upgrade runner collision guard would admit the original lowercase resource-policy assignment'}
+$resourcePolicyAssignments=@($upgradeAst.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and
+  $node.Left-is[Management.Automation.Language.VariableExpressionAst]-and
+  $node.Left.VariablePath.UserPath-ieq'upgradeResourcePolicy'
+},$true))
+if($resourcePolicyAssignments.Count-ne1){throw 'Upgrade runner lacks one distinct resource-policy object'}
+$policyConsumers=@($upgradeAst.FindAll({param($node)
+  if($node-isnot[Management.Automation.Language.CommandAst]){return $false}
+  $elements=@($node.CommandElements)
+  $name=if($elements.Count){[string]$elements[0].Extent.Text}else{''}
+  $name-cin@('Assert-MIR441ResourceAdmission','Invoke-MIR441MonitoredProcess')
+},$true))
+if($policyConsumers.Count-ne2){throw 'Upgrade runner has an ambiguous resource-policy consumer set'}
+foreach($consumer in $policyConsumers){
+  $elements=@($consumer.CommandElements);$policyIndex=-1
+  for($index=1;$index-lt$elements.Count;$index++){
+    if([string]$elements[$index].Extent.Text-ceq'-Policy'){$policyIndex=$index;break}
+  }
+  if($policyIndex-lt0-or$policyIndex-ge($elements.Count-1)-or
+     $elements[$policyIndex+1]-isnot[Management.Automation.Language.VariableExpressionAst]-or
+     $elements[$policyIndex+1].VariablePath.UserPath-ine'upgradeResourcePolicy'){
+    throw 'Upgrade runner does not pass its distinct resource policy to the governed invocation'
+  }
+}
+$mir43Assertions+=5
+
+# Exercise the wrapper's real named-argument call shape with a controlled
+# callee. No engine or mod archive is launched: the fake runner records what
+# the matrix passes and emits only the minimum schema/cleanup receipts which
+# the matrix itself requires.
+$matrixBindingRoot=Join-Path $testRoot 'matrix-direct-library-binding'
+$matrixBindingRepo=Join-Path $matrixBindingRoot 'repo'
+$matrixBindingLibrary=Join-Path $matrixBindingRoot 'flat-library'
+$matrixBindingWork=Join-Path $matrixBindingRoot 'work'
+$matrixBindingOutput=Join-Path $matrixBindingRoot 'matrix.json'
+$resolvedTestRoot=[IO.Path]::GetFullPath($testRoot)
+$resolvedMatrixBindingRoot=[IO.Path]::GetFullPath($matrixBindingRoot)
+$matrixBindingRelative=[IO.Path]::GetRelativePath($resolvedTestRoot,$resolvedMatrixBindingRoot)
+if([IO.Path]::IsPathRooted($matrixBindingRelative)-or$matrixBindingRelative-ceq'..'-or$matrixBindingRelative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar)){
+  throw 'Upgrade matrix controlled cleanup root escapes the owned test root'
+}
+New-Item -ItemType Directory -Force -Path (Join-Path $matrixBindingRepo 'tests/runtime'),(Join-Path $matrixBindingRepo 'tools/mir/application/release/readiness'),$matrixBindingLibrary,$matrixBindingWork|Out-Null
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgradeMatrix.ps1') -Destination (Join-Path $matrixBindingRepo 'tests/runtime/Test-MIRUpgradeMatrix.ps1') -Force
+[IO.File]::WriteAllText((Join-Path $matrixBindingRepo 'tools/mir/application/release/readiness/ResourceGovernor.ps1'),@'
+function Resolve-MIR441RecoveryScratchPath { param([string]$Path) return $Path }
+function Assert-MIR441ResourceAdmission { if($env:MIR_MATRIX_ALLOW_RESOURCE -ceq '1'){return $null}; throw '[matrix-test-resource-admission-called]' }
+'@,[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $matrixBindingRepo 'tests/runtime/Test-MIRUpgrade.ps1'),@'
+param(
+  [string]$RepoRoot,[string]$FactorioBin,[string]$FromZip,[string]$ToZip,[string]$FromVersion,[string]$ToVersion,
+  [string[]]$LocalModLibraryDirs,[string]$FixtureName,[string]$Archetype,[string[]]$SourceOnlyFixtureNames,
+  [string]$OutputPath,[string]$WorkRoot,[int]$ExpectedPeakMemoryMiB,[int]$MaxNewOutputMiB,[string]$Retention,
+  [Parameter(ValueFromRemainingArguments=$true)]$Ignored
+)
+$bindingPath=Join-Path $WorkRoot ('binding-'+$Archetype+'.json')
+[IO.File]::WriteAllText($bindingPath,([ordered]@{local_mod_library_dirs=@($LocalModLibraryDirs);archetype=$Archetype}|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+$result=[ordered]@{schema=2;status='passed';archetype=$Archetype;assertions=@('upgraded-save-reload-passed','upgraded-save-second-reload-passed');second_reload_log='controlled-second.log';second_reload_log_sha256=('A'*64)}
+[IO.File]::WriteAllText($OutputPath,($result|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+$cleanup=Join-Path (Split-Path -Parent $OutputPath) ($ToVersion+'-upgrade-'+$Archetype+'-cleanup.json')
+[IO.File]::WriteAllText($cleanup,([ordered]@{status='retained';run_status='passed';contained=$true;bytes=0}|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+$global:LASTEXITCODE=0
+'@,[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $matrixBindingRoot 'factorio.exe'),'controlled-factorio',[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $matrixBindingRoot 'from.zip'),'controlled-from',[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $matrixBindingRoot 'to.zip'),'controlled-to',[Text.UTF8Encoding]::new($false))
+$matrixPath=Join-Path $matrixBindingRepo 'tests/runtime/Test-MIRUpgradeMatrix.ps1'
+$matrixBaseArgs=@{RepoRoot=$matrixBindingRepo;FactorioBin=(Join-Path $matrixBindingRoot 'factorio.exe');FromZip=(Join-Path $matrixBindingRoot 'from.zip');ToZip=(Join-Path $matrixBindingRoot 'to.zip');FromVersion='4.2.20002';ToVersion='4.3.20000';OutputPath=$matrixBindingOutput;WorkRoot=$matrixBindingWork;ExpectedPeakMemoryMiB=1;MaxNewOutputMiB=1;Retention='Always'}
+$hadMatrixAllowResource=Test-Path Env:MIR_MATRIX_ALLOW_RESOURCE
+$savedMatrixAllowResource=if($hadMatrixAllowResource){[string]$env:MIR_MATRIX_ALLOW_RESOURCE}else{''}
+try {
+  $missingLibraryRejected=$false
+  try { & $matrixPath @matrixBaseArgs | Out-Null } catch { $missingLibraryRejected=$_.Exception.Message-ceq'[mir-upgrade-matrix-library-required] Supply exactly one flat archive library; retired profile staging is unsupported.' }
+  if(-not$missingLibraryRejected){throw 'Upgrade matrix admitted a missing direct-library input or reached resource admission first'}
+  $env:MIR_MATRIX_ALLOW_RESOURCE='1'
+  $matrixArgs=$matrixBaseArgs.Clone();$matrixArgs.LocalModLibraryDirs=@($matrixBindingLibrary)
+  & $matrixPath @matrixArgs | Out-Null
+  $bindings=@(Get-ChildItem -LiteralPath $matrixBindingWork -Filter 'binding-*.json' -File)
+  if($bindings.Count-ne5){throw 'Upgrade matrix did not execute every controlled direct-library row'}
+  foreach($bindingPath in $bindings){
+    $binding=Get-Content -Raw -LiteralPath $bindingPath.FullName|ConvertFrom-Json -Depth 10
+    if(@($binding.local_mod_library_dirs).Count-ne1-or[IO.Path]::GetFullPath([string]$binding.local_mod_library_dirs[0])-cne[IO.Path]::GetFullPath($matrixBindingLibrary)){throw 'Upgrade matrix did not forward the exact one-library direct input'}
+  }
+  $mir43Assertions+=2
+} finally {
+  if($hadMatrixAllowResource){$env:MIR_MATRIX_ALLOW_RESOURCE=$savedMatrixAllowResource}else{Remove-Item Env:MIR_MATRIX_ALLOW_RESOURCE -ErrorAction SilentlyContinue}
+  if(Test-Path -LiteralPath $matrixBindingRoot){Remove-Item -LiteralPath $matrixBindingRoot -Recurse -Force}
+}
+
+[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;mir43_classic_snapshot_assertions=$mir43ClassicSnapshotAssertions;mir43_classic_snapshot_control_kind='synthetic-host-only-classic-disposition-controls-v1';mir43_classic_snapshot_native_engine_launched=$false;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json

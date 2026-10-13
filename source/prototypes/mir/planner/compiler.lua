@@ -115,6 +115,41 @@ local function base_operation(operation, policy)
   })
 end
 
+-- The finite declared profile supplies already checked rows. It deliberately
+-- does not request world snapshots, provider inference or catalogue expansion.
+-- Both profiles use these same operation constructors and the same emitter.
+function M.compile_declared_plan(stream_plan, base_plan, identity)
+  assert(type(identity) == "table" and type(identity.profile_fingerprint) == "string"
+    and type(identity.source_fingerprint) == "string", "Declared compiler identity is required.")
+  local policy = {policy_fingerprint = identity.profile_fingerprint}
+  local operations, subjects = {}, {}
+  local function append(record, kind)
+    local unresolved, failed = gate_disposition(record)
+    if #unresolved > 0 or #failed > 0 then
+      error("Declared compiler cannot emit an unresolved or failed design: "
+        .. tostring(record.technology_name), 2)
+    end
+    if subjects[record.technology_name] then
+      error("Declared compiler output identity is duplicated: " .. tostring(record.technology_name), 2)
+    end
+    subjects[record.technology_name] = true
+    table.insert(operations, kind == "stream" and stream_operation(record, policy)
+      or base_operation(record, policy))
+  end
+  for _, row in ipairs(stream_plan.rows or {}) do
+    if row.action == "emit" then append(row, "stream")
+    elseif row.action ~= "skip" then error("Declared compiler accepts create/skip rows only.", 2) end
+  end
+  for _, row in ipairs(base_plan or {}) do append(row, "base-continuation") end
+  return transformation_plan.new({
+    phase = "declared-classic-core",
+    execution_mode = "SAFE",
+    compilation_snapshot_fingerprint = identity.source_fingerprint,
+    policy_fingerprint = identity.profile_fingerprint,
+    operations = operations
+  })
+end
+
 function M.compile(snapshot, policy)
   if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)
   else compilation_snapshot.verify_untrusted(snapshot) end

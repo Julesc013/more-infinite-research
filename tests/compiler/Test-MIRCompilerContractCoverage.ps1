@@ -96,6 +96,7 @@ $budgetProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$ma
 $budgetContract = Read-MIRCurrentTargetText 'prototypes/mir/domain/compiler/public_artifact_budget.lua'
 $publicProjector = Read-MIRCurrentTargetText 'prototypes/mir/report/public_compiler_artifacts.lua'
 $coveragePublisher = Read-MIRCurrentTargetText 'prototypes/mir/report/coverage.lua'
+$publication = Read-MIRCurrentTargetText 'prototypes/mir/pipeline/compiler_orchestrator/publication.lua'
 if ([int]$budgetProfile.schema -ne 1 -or [int]$budgetProfile.sample_limit -le 0) {
   throw "Public compiler artifact budget profile is invalid."
 }
@@ -110,6 +111,19 @@ foreach ($artifact in @($budgetProfile.artifacts)) {
 if (-not $publicProjector.Contains('artifact_budget.limit(artifact and artifact.kind)') -or
     -not $coveragePublisher.Contains('public_artifacts.assert_byte_budget(public)')) {
   throw "One or more public compiler artifacts bypass the hard canonical-byte budget."
+}
+$evidenceConstruction = [regex]::Matches($publication,
+  'public_artifacts[.]compiler_evidence\(evidence_input\)').Count
+if ($evidenceConstruction -ne 1 -or $publication -match 'for\s+_\s*=\s*1\s*,\s*publishes_mod_data\s+and\s+4') {
+  throw "Compiler evidence publication must construct one byte-budgeted, pre-publication telemetry projection."
+}
+$telemetrySnapshot = $publication.IndexOf('evidence_input.telemetry = telemetry.snapshot()')
+$publicEvidence = $publication.IndexOf('local public_evidence = public_artifacts.compiler_evidence(evidence_input)')
+$byteBudget = $publication.IndexOf('local evidence_bytes = public_artifacts.assert_byte_budget(public_evidence)')
+$evidenceBytes = $publication.IndexOf('telemetry.observe_max("compiler_evidence_public_bytes", evidence_bytes)')
+if ($telemetrySnapshot -lt 0 -or $publicEvidence -le $telemetrySnapshot -or
+    $byteBudget -le $publicEvidence -or $evidenceBytes -le $byteBudget) {
+  throw "Compiler evidence must freeze telemetry before construction and record exact artifact bytes afterward."
 }
 & (Join-Path $repo 'tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1') -RepoRoot $repo
 $expectedActions = @("disabled", "preview", "apply")

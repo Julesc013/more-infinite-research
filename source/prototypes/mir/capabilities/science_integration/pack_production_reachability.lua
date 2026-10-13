@@ -7,6 +7,8 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local researchability_index = require("prototypes.mir.graph.researchability_index")
 local route_policy = require("prototypes.mir.capabilities.science_integration.production_route_policy")
 local route_feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+local technology_researchability = require("prototypes.mir.capabilities.science_integration.technology_researchability")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 
@@ -27,6 +29,36 @@ local PROJECTION_MAX_LIMITS = {
   depth = 128,
   bytes = 262144
 }
+
+-- Structural unlock facts are useful to both ordering and route assembly, but
+-- retaining every transitive closure would replace repeated work with an
+-- unbounded all-pairs allocation.  Keep the shared facts deliberately small.
+-- An entry that cannot fit is still calculated for its one caller.
+local STATIC_UNLOCK_FACTS_MAX_ENTRIES = 256
+local STATIC_UNLOCK_FACTS_MAX_NODES = 4096
+local STATIC_UNLOCK_FACTS_MAX_ESTIMATED_BYTES = 512 * 1024
+local STATIC_UNLOCK_FACTS_ENTRY_ESTIMATED_BYTES = 160
+local STATIC_UNLOCK_FACTS_NAME_ESTIMATED_BYTES = 48
+
+-- Output recipe ordering is used while testing research-unlocked producer
+-- alternatives. Retain only copied names, never a route decision or an index
+-- reference, and fall back to the established sort after a bounded budget.
+local OUTPUT_RECIPE_ORDERING_MAX_ENTRIES = 256
+local OUTPUT_RECIPE_ORDERING_MAX_NODES = 4096
+local OUTPUT_RECIPE_ORDERING_MAX_ESTIMATED_BYTES = 512 * 1024
+local OUTPUT_RECIPE_ORDERING_ENTRY_ESTIMATED_BYTES = 112
+local OUTPUT_RECIPE_ORDERING_NAME_ESTIMATED_BYTES = 40
+
+-- Lab compatibility asks only whether a concrete placement item is available.
+-- Keep a compact Context-owned answer cache for completed true results; it
+-- deliberately owns neither a production witness nor an explanation tree.
+-- A full acquisition proof remains the fallback whenever this bounded cache
+-- cannot establish that its contextual inputs are still exact.
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_MAX_KEYS = 512
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_MAX_ESTIMATED_BYTES = 256 * 1024
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_ENTRY_ESTIMATED_BYTES = 96
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_KEY_MAX_CONTEXT_ENTRIES = 256
+local CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_KEY_MAX_CONTEXT_BYTES = 16 * 1024
 
 local function positive_limit(value, default, maximum)
   value = tonumber(value)
@@ -236,8 +268,35 @@ local function science_pack_production_state()
     technology_mechanism_memo = {},
     contextual_pack_status_memo = {},
     contextual_pack_status_count = 0,
+    static_unlock_facts = {},
+    static_unlock_facts_entry_count = 0,
+    static_unlock_facts_node_count = 0,
+    static_unlock_facts_estimated_bytes = 0,
+    static_unlock_facts_recipe_source_epoch = source_epoch,
+    -- Keep only scalar provenance. CompilerContext snapshots copy this state,
+    -- so retaining the index itself here would duplicate a whole graph.
+    static_unlock_facts_index_epoch = nil,
+    static_unlock_facts_index_fingerprint = nil,
+    output_recipe_orderings = {},
+    output_recipe_ordering_entry_count = 0,
+    output_recipe_ordering_node_count = 0,
+    output_recipe_ordering_estimated_bytes = 0,
+    output_recipe_ordering_recipe_source_epoch = source_epoch,
+    output_recipe_ordering_recipe_index_epoch = nil,
+    output_recipe_ordering_technology_index_epoch = nil,
+    output_recipe_ordering_technology_index_fingerprint = nil,
     root_entry_generation = 0,
     contextual_acquisition_generation = 0,
+    contextual_boolean_acquisition_memo = {},
+    contextual_boolean_acquisition_memo_key_count = 0,
+    contextual_boolean_acquisition_memo_estimated_bytes = 0,
+    contextual_boolean_acquisition_memo_source_epoch = nil,
+    contextual_boolean_acquisition_memo_recipe_index_epoch = nil,
+    contextual_boolean_acquisition_memo_research_index_epoch = nil,
+    contextual_boolean_acquisition_memo_research_index_fingerprint = nil,
+    contextual_boolean_acquisition_memo_root_generation = nil,
+    contextual_boolean_acquisition_memo_stable_generation = nil,
+    contextual_boolean_acquisition_memo_bindings = nil,
     -- This state owns only source-epoch-stable structural observations. It
     -- deliberately cannot retain an acquisition result that depends on an
     -- active science-pack or technology traversal.
@@ -255,14 +314,36 @@ local function science_pack_resolution_cache()
   return science_pack_production_state().entries
 end
 
+local function reset_contextual_boolean_acquisition_memo(owner, reason)
+  local discarded = owner.contextual_boolean_acquisition_memo_key_count or 0
+  owner.contextual_boolean_acquisition_memo = {}
+  owner.contextual_boolean_acquisition_memo_key_count = 0
+  owner.contextual_boolean_acquisition_memo_estimated_bytes = 0
+  owner.contextual_boolean_acquisition_memo_source_epoch = nil
+  owner.contextual_boolean_acquisition_memo_recipe_index_epoch = nil
+  owner.contextual_boolean_acquisition_memo_research_index_epoch = nil
+  owner.contextual_boolean_acquisition_memo_research_index_fingerprint = nil
+  owner.contextual_boolean_acquisition_memo_root_generation = nil
+  owner.contextual_boolean_acquisition_memo_stable_generation = nil
+  owner.contextual_boolean_acquisition_memo_bindings = nil
+  if discarded > 0 then
+    telemetry.count("science_contextual_boolean_acquisition_invalidations")
+    telemetry.count("science_contextual_boolean_acquisition_entries_discarded", discarded)
+    if reason then telemetry.count("science_contextual_boolean_acquisition_invalidation_" .. reason) end
+  end
+end
+
 local function remember_root_pack_status(pack_name, entry)
   local owner = science_pack_production_state()
   owner.entries[pack_name] = entry
   -- Any nested root can change the selected route of a contextual query.
   -- Discard completed contextual answers whenever root knowledge advances.
+  telemetry.count("science_root_generation_invalidations")
+  telemetry.count("science_contextual_answers_discarded", owner.contextual_pack_status_count or 0)
   owner.root_entry_generation = owner.root_entry_generation + 1
   owner.contextual_pack_status_memo = {}
   owner.contextual_pack_status_count = 0
+  reset_contextual_boolean_acquisition_memo(owner, "root_generation")
 end
 
 local function science_pack_route_witness_state()
@@ -282,6 +363,130 @@ end
 
 local function ingredient_name(ingredient)
   return type(ingredient) == "table" and (ingredient.name or ingredient[1]) or nil
+end
+
+local function copy_names(values)
+  local copied = {}
+  for index, value in ipairs(values or {}) do copied[index] = value end
+  return copied
+end
+
+local function output_recipe_ordering_estimated_bytes(key, names)
+  local total = OUTPUT_RECIPE_ORDERING_ENTRY_ESTIMATED_BYTES + #key
+  for _, name in ipairs(names) do
+    total = total + OUTPUT_RECIPE_ORDERING_NAME_ESTIMATED_BYTES + #name
+  end
+  return total
+end
+
+local function reset_output_recipe_orderings(state, recipe_source_epoch, recipe_index_epoch,
+  technology_index_epoch, technology_index_fingerprint)
+  state.output_recipe_orderings = {}
+  state.output_recipe_ordering_entry_count = 0
+  state.output_recipe_ordering_node_count = 0
+  state.output_recipe_ordering_estimated_bytes = 0
+  state.output_recipe_ordering_recipe_source_epoch = recipe_source_epoch
+  state.output_recipe_ordering_recipe_index_epoch = recipe_index_epoch
+  state.output_recipe_ordering_technology_index_epoch = technology_index_epoch
+  state.output_recipe_ordering_technology_index_fingerprint = technology_index_fingerprint
+end
+
+-- The canonical recipe and technology indexes are immutable Context-owned
+-- snapshots. A raw or caller-owned recipe map is deliberately not a producer
+-- ordering cache key: it keeps the normal one-shot sort instead.
+local function output_recipe_ordering_state(recipe_index, technology_index)
+  local context = compiler_context.current()
+  if recipe_index ~= context:state_view("recipe_index") then return nil end
+  local state = science_pack_production_state()
+  local recipe_source_epoch = canonical_recipe_facts.source_epoch()
+  local recipe_index_epoch = context:state_epoch("recipe_index")
+  local technology_index_epoch = context:state_epoch("technology_researchability_index")
+  local technology_index_fingerprint = technology_index.index_fingerprint
+  if state.output_recipe_ordering_recipe_source_epoch ~= recipe_source_epoch
+    or state.output_recipe_ordering_recipe_index_epoch ~= recipe_index_epoch
+    or state.output_recipe_ordering_technology_index_epoch ~= technology_index_epoch
+    or state.output_recipe_ordering_technology_index_fingerprint ~= technology_index_fingerprint then
+    reset_output_recipe_orderings(state, recipe_source_epoch, recipe_index_epoch,
+      technology_index_epoch, technology_index_fingerprint)
+  end
+  return state
+end
+
+local function reset_static_unlock_facts(state, index_epoch, index_fingerprint, source_epoch)
+  state.static_unlock_facts = {}
+  state.static_unlock_facts_entry_count = 0
+  state.static_unlock_facts_node_count = 0
+  state.static_unlock_facts_estimated_bytes = 0
+  state.static_unlock_facts_recipe_source_epoch = source_epoch
+  state.static_unlock_facts_index_epoch = index_epoch
+  state.static_unlock_facts_index_fingerprint = index_fingerprint
+end
+
+local function static_unlock_fact_estimated_bytes(prerequisite_closure, science_burden)
+  local total = STATIC_UNLOCK_FACTS_ENTRY_ESTIMATED_BYTES
+  for _, name in ipairs(prerequisite_closure) do
+    total = total + STATIC_UNLOCK_FACTS_NAME_ESTIMATED_BYTES + #name
+  end
+  for _, name in ipairs(science_burden) do
+    total = total + STATIC_UNLOCK_FACTS_NAME_ESTIMATED_BYTES + #name
+  end
+  return total
+end
+
+-- These facts contain only immutable graph/technology structure.  They do not
+-- answer whether a technology is legal in the caller's active acquisition
+-- traversal; contextual researchability remains the authority for that.
+local function static_unlock_facts(index, technology_name)
+  local context = compiler_context.current()
+  local state = science_pack_production_state()
+  local source_epoch = canonical_recipe_facts.source_epoch()
+  local index_epoch = context:state_epoch("technology_researchability_index")
+  local index_fingerprint = index.index_fingerprint
+  if state.static_unlock_facts_recipe_source_epoch ~= source_epoch
+    or state.static_unlock_facts_index_epoch ~= index_epoch
+    or state.static_unlock_facts_index_fingerprint ~= index_fingerprint then
+    reset_static_unlock_facts(state, index_epoch, index_fingerprint, source_epoch)
+  end
+
+  local cached = state.static_unlock_facts[technology_name]
+  if cached then return cached end
+
+  local names = researchability_index.reachable_names(index, technology_name)
+  local prerequisite_closure, science_burden_set = {}, {}
+  for _, candidate_name in ipairs(names) do
+    if candidate_name ~= technology_name then table.insert(prerequisite_closure, candidate_name) end
+    local candidate = data_raw.technology(candidate_name)
+    for _, ingredient in ipairs(((candidate and candidate.unit) or {}).ingredients or {}) do
+      local name = ingredient_name(ingredient)
+      if name then science_burden_set[name] = true end
+    end
+  end
+  table.sort(prerequisite_closure)
+  local science_burden = {}
+  for name in pairs(science_burden_set) do table.insert(science_burden, name) end
+  table.sort(science_burden)
+
+  local facts = {
+    prerequisite_closure = prerequisite_closure,
+    science_burden = science_burden,
+    prerequisite_count = #prerequisite_closure,
+    science_burden_count = #science_burden,
+    unlock_depth = index.unlock_depths[technology_name],
+    structurally_reachable = index.structural_failures[technology_name] == false
+  }
+  local nodes = #prerequisite_closure + #science_burden
+  local bytes = static_unlock_fact_estimated_bytes(prerequisite_closure, science_burden)
+  if state.static_unlock_facts_entry_count < STATIC_UNLOCK_FACTS_MAX_ENTRIES
+    and state.static_unlock_facts_node_count + nodes <= STATIC_UNLOCK_FACTS_MAX_NODES
+    and state.static_unlock_facts_estimated_bytes + bytes <= STATIC_UNLOCK_FACTS_MAX_ESTIMATED_BYTES then
+    state.static_unlock_facts[technology_name] = facts
+    state.static_unlock_facts_entry_count = state.static_unlock_facts_entry_count + 1
+    state.static_unlock_facts_node_count = state.static_unlock_facts_node_count + nodes
+    state.static_unlock_facts_estimated_bytes = state.static_unlock_facts_estimated_bytes + bytes
+    telemetry.observe_max("technology_closure_cache_entries", state.static_unlock_facts_entry_count)
+    telemetry.observe_max("technology_closure_cached_nodes", state.static_unlock_facts_node_count)
+  end
+  return facts
 end
 
 -- A projection observer may stop only its private traversal. Normal admission
@@ -367,35 +572,45 @@ local function route_for_unlocker(
       diagnostic_observer = observer
     })
   end
-  local index, technology_names, closure_complete
+  local index, technology_names, closure_complete, static_facts
   if observer then
     technology_names, closure_complete = bounded_technology_names(technology_name, observer)
     if not closure_complete then rejection = rejection or "diagnostic-budget-exhausted" end
   else
     index = graph_index()
-    technology_names = researchability_index.reachable_names(index, technology_name)
+    static_facts = static_unlock_facts(index, technology_name)
   end
-  local prerequisite_closure, science_burden_set = {}, {}
-  for _, candidate_name in ipairs(technology_names) do
-    if not diagnostic_visit(observer, 0) then
-      rejection = rejection or "diagnostic-budget-exhausted"
-      break
-    end
-    if candidate_name ~= technology_name then table.insert(prerequisite_closure, candidate_name) end
-    local candidate = data_raw.technology(candidate_name)
-    for _, ingredient in ipairs(((candidate and candidate.unit) or {}).ingredients or {}) do
+  local prerequisite_closure, science_burden
+  if static_facts then
+    -- A route is returned to ordinary callers and later copied by the route
+    -- policy. Keep the retained cache private by handing each route fresh
+    -- arrays, rather than relying on every downstream consumer to be read-only.
+    prerequisite_closure = copy_names(static_facts.prerequisite_closure)
+    science_burden = copy_names(static_facts.science_burden)
+  else
+    prerequisite_closure = {}
+    local science_burden_set = {}
+    for _, candidate_name in ipairs(technology_names) do
       if not diagnostic_visit(observer, 0) then
         rejection = rejection or "diagnostic-budget-exhausted"
         break
       end
-      local name = ingredient_name(ingredient)
-      if name then science_burden_set[name] = true end
+      if candidate_name ~= technology_name then table.insert(prerequisite_closure, candidate_name) end
+      local candidate = data_raw.technology(candidate_name)
+      for _, ingredient in ipairs(((candidate and candidate.unit) or {}).ingredients or {}) do
+        if not diagnostic_visit(observer, 0) then
+          rejection = rejection or "diagnostic-budget-exhausted"
+          break
+        end
+        local name = ingredient_name(ingredient)
+        if name then science_burden_set[name] = true end
+      end
     end
+    table.sort(prerequisite_closure)
+    science_burden = {}
+    for name in pairs(science_burden_set) do table.insert(science_burden, name) end
+    table.sort(science_burden)
   end
-  table.sort(prerequisite_closure)
-  local science_burden = {}
-  for name in pairs(science_burden_set) do table.insert(science_burden, name) end
-  table.sort(science_burden)
 
   local technology = data_raw.technology(technology_name) or {}
   local unit = technology.unit or {}
@@ -439,19 +654,9 @@ local function unlock_progression_key(technology_name, index)
   local state = progression_key_state(index)
   local cached = state.unlock_progression_keys[technology_name]
   if cached then return cached end
-  local names = researchability_index.reachable_names(index, technology_name)
-  local science = {}
-  for _, name in ipairs(names) do
-    local technology = data_raw.technology(name)
-    for _, ingredient in ipairs(((technology and technology.unit) or {}).ingredients or {}) do
-      local pack = ingredient_name(ingredient)
-      if pack then science[pack] = true end
-    end
-  end
-  local science_count = 0
-  for _ in pairs(science) do science_count = science_count + 1 end
-  local key = {index.structural_failures[technology_name] == false and 0 or 1,
-    science_count, #names - 1, index.unlock_depths[technology_name] or math.huge}
+  local facts = static_unlock_facts(index, technology_name)
+  local key = {facts.structurally_reachable and 0 or 1,
+    facts.science_burden_count, facts.prerequisite_count, facts.unlock_depth or math.huge}
   state.unlock_progression_keys[technology_name] = key
   return key
 end
@@ -479,16 +684,16 @@ local function output_recipe_names(identity, observer)
     or type(identity.name) ~= "string" or identity.name == "" then
     return {}
   end
-  local names = {}
   -- The normalized output index is typed.  A research-unlocked fluid
   -- intermediate (for example, molten solder) must be resolved through its
   -- fluid identity; falling back to an item name would either reject a real
   -- route or conflate same-named products.
-  for _, recipe_name in ipairs(canonical_recipe_facts.recipes_by_output_identity_view(identity.type, identity.name) or {}) do
-    if not diagnostic_visit(observer, 0) then break end
-    table.insert(names, recipe_name)
-  end
   if observer ~= nil then
+    local names = {}
+    for _, recipe_name in ipairs(canonical_recipe_facts.recipes_by_output_identity_view(identity.type, identity.name) or {}) do
+      if not diagnostic_visit(observer, 0) then break end
+      table.insert(names, recipe_name)
+    end
     table.sort(names)
     return names
   end
@@ -496,8 +701,15 @@ local function output_recipe_names(identity, observer)
   -- ordinary unlock over an alphabetically earlier planetary recipe. Every
   -- chosen pair still passes contextual researchability and ingredient proof,
   -- and later/recycling alternatives remain available after a failed route.
-  local facts = canonical_recipe_facts.index_view().facts or {}
-  local index, keys = graph_index(), {}
+  local recipe_index = canonical_recipe_facts.index_view()
+  local index = graph_index()
+  local ordering_state = output_recipe_ordering_state(recipe_index, index)
+  local cache_key = identity.type .. "\0" .. identity.name
+  if ordering_state and ordering_state.output_recipe_orderings[cache_key] then
+    return copy_names(ordering_state.output_recipe_orderings[cache_key])
+  end
+  local names = copy_names(canonical_recipe_facts.recipes_by_output_identity_view(identity.type, identity.name) or {})
+  local facts, keys = recipe_index.facts or {}, {}
   local state = progression_key_state(index)
   local unknown = {math.huge, math.huge, math.huge, math.huge}
   for _, recipe_name in ipairs(names) do
@@ -520,6 +732,17 @@ local function output_recipe_names(identity, observer)
     if progression_key_less(keys[right], keys[left]) then return false end
     return left < right
   end)
+  if ordering_state then
+    local bytes = output_recipe_ordering_estimated_bytes(cache_key, names)
+    if ordering_state.output_recipe_ordering_entry_count < OUTPUT_RECIPE_ORDERING_MAX_ENTRIES
+      and ordering_state.output_recipe_ordering_node_count + #names <= OUTPUT_RECIPE_ORDERING_MAX_NODES
+      and ordering_state.output_recipe_ordering_estimated_bytes + bytes <= OUTPUT_RECIPE_ORDERING_MAX_ESTIMATED_BYTES then
+      ordering_state.output_recipe_orderings[cache_key] = copy_names(names)
+      ordering_state.output_recipe_ordering_entry_count = ordering_state.output_recipe_ordering_entry_count + 1
+      ordering_state.output_recipe_ordering_node_count = ordering_state.output_recipe_ordering_node_count + #names
+      ordering_state.output_recipe_ordering_estimated_bytes = ordering_state.output_recipe_ordering_estimated_bytes + bytes
+    end
+  end
   return names
 end
 
@@ -649,6 +872,7 @@ local RESEARCH_UNLOCK_NEGATIVE_MEMO_LIMIT = 8192
 -- the same children, including native capture's launcher and ammunition.
 local function acquisition_children(witness)
   local children = {}
+  if type(witness) ~= "table" then return children end
   if witness.recipe_witness then table.insert(children, witness.recipe_witness) end
   for _, ingredient in ipairs(witness.ingredients or {}) do table.insert(children, ingredient) end
   if witness.receiver and witness.receiver.acquisition then
@@ -664,39 +888,93 @@ local function acquisition_children(witness)
 end
 
 local function witness_avoids_active_identities(witness, visiting, root_key)
-  if type(witness) ~= "table" then return true end
-  local output = witness.output or witness.product
-  if type(output) == "table" and output.type and output.name then
-    local key = identity_key(output)
-    -- The queried output is necessarily active while its acquisition is being
-    -- resolved. It is safe here because this witness has already established
-    -- one complete route for that output; every other active output remains a
-    -- cycle boundary.
-    if key ~= root_key and visiting[key] then return false end
+  -- Witnesses can share one already-proved subroute.  Traverse each table
+  -- instance once for this reuse decision, but keep the marks local: a memo
+  -- witness is later returned to callers and must not retain a stale summary.
+  -- `active` distinguishes a DAG alias from an actual table back-edge.
+  local active, completed = {}, {}
+  local function visit(node)
+    if type(node) ~= "table" then return true end
+    if completed[node] then return true end
+    if active[node] then return false end
+    active[node] = true
+    local output = node.output or node.product
+    if type(output) == "table" and output.type and output.name then
+      local key = identity_key(output)
+      -- The queried output is necessarily active while its acquisition is being
+      -- resolved. It is safe here because this witness has already established
+      -- one complete route for that output; every other active output remains a
+      -- cycle boundary.
+      if key ~= root_key and visiting[key] then return false end
+    end
+    for _, child in ipairs(acquisition_children(node)) do
+      if not visit(child) then return false end
+    end
+    active[node] = nil
+    completed[node] = true
+    return true
   end
-  for _, child in ipairs(acquisition_children(witness)) do
-    if not witness_avoids_active_identities(child, visiting, root_key) then return false end
-  end
-  return true
+  return visit(witness)
 end
 
 local function witness_unlock_dependencies(witness, entry_technologies, dependencies)
-  if type(witness) ~= "table" then return end
-  if witness.kind == "research-unlocked-recipe" then
-    local unlocker = witness.unlocker
-    if type(witness.recipe) == "string" and type(unlocker) == "string" then
-      dependencies.pairs[unlock_pair_key(witness.recipe, unlocker)] = true
-      -- This technology was accepted by the active-context shortcut rather
-      -- than a new researchability query. Reuse requires the same already
-      -- proven ancestor; unrelated active technologies do not enter the key.
-      if entry_technologies[unlocker] ~= nil then
-        dependencies.required_technologies[unlocker] = true
+  local pending, seen = {witness}, {}
+  while #pending > 0 do
+    local node = table.remove(pending)
+    if type(node) == "table" and not seen[node] then
+      seen[node] = true
+      if node.kind == "research-unlocked-recipe" then
+        local unlocker = node.unlocker
+        if type(node.recipe) == "string" and type(unlocker) == "string" then
+          dependencies.pairs[unlock_pair_key(node.recipe, unlocker)] = true
+          -- This technology was accepted by the active-context shortcut rather
+          -- than a new researchability query. Reuse requires the same already
+          -- proven ancestor; unrelated active technologies do not enter the key.
+          if entry_technologies[unlocker] ~= nil then
+            dependencies.required_technologies[unlocker] = true
+          end
+        end
       end
+      for _, child in ipairs(acquisition_children(node)) do table.insert(pending, child) end
     end
   end
-  for _, child in ipairs(acquisition_children(witness)) do
-    witness_unlock_dependencies(child, entry_technologies, dependencies)
+end
+
+-- A positive memo entry owns its witness for this query. Summarize the exact
+-- output identities once, then check the smaller active demand set on reuse.
+-- Large or cyclic graphs retain the existing complete traversal. This bound
+-- limits retained metadata; it never changes a reachability answer.
+local function memo_witness_identity_summary(witness)
+  local identities, active, complete = {}, {}, {}
+  local nodes, identity_count = 0, 0
+  local function visit(node)
+    if type(node) ~= "table" then return true end
+    if active[node] then return false end
+    if complete[node] then return true end
+    nodes = nodes + 1
+    if nodes > 256 or getmetatable(node) ~= nil then return false end
+    for _, field in ipairs({"output", "product", "ingredients", "machine", "receiver"}) do
+      local value = node[field]
+      if type(value) == "table" and getmetatable(value) ~= nil then return false end
+    end
+    active[node] = true
+    local output = node.output or node.product
+    if type(output) == "table" and output.type and output.name then
+      local key = identity_key(output)
+      if not identities[key] then
+        identities[key] = true
+        identity_count = identity_count + 1
+        if identity_count > 256 then return false end
+      end
+    end
+    for _, child in ipairs(acquisition_children(node)) do
+      if not visit(child) then return false end
+    end
+    active[node], complete[node] = nil, true
+    return true
   end
+  if not visit(witness) then return nil end
+  return identities
 end
 
 local function positive_witness_reusable(entry, context, state, root_key)
@@ -705,6 +983,12 @@ local function positive_witness_reusable(entry, context, state, root_key)
   end
   for pair_key in pairs(entry.pairs) do
     if context.pairs[pair_key] then return false end
+  end
+  if entry.output_identities then
+    for key, present in pairs(state.visiting) do
+      if present and key ~= root_key and entry.output_identities[key] then return false end
+    end
+    return true
   end
   return witness_avoids_active_identities(entry.witness, state.visiting, root_key)
 end
@@ -863,8 +1147,10 @@ local function research_unlocked_output_witness(identity, options, state, visiti
               < RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT then
             local dependencies = {pairs = {}, required_technologies = {}}
             witness_unlock_dependencies(result, context.technologies, dependencies)
+            local owned_witness = deepcopy(result)
             table.insert(entries, {
-              witness = deepcopy(result),
+              witness = owned_witness,
+              output_identities = memo_witness_identity_summary(owned_witness),
               pairs = dependencies.pairs,
               required_technologies = dependencies.required_technologies
             })
@@ -894,6 +1180,12 @@ local function production_witness_options(visiting_packs, visiting_technologies,
       and science_pack_production_state().technology_mechanism_memo or {},
     diagnostic_observer = diagnostic_observer
   }
+  if diagnostic_observer == nil then
+    -- The route compiler consumes only scalar selected gates/provenance from
+    -- these witnesses. Its Context-owned state may therefore borrow private
+    -- memo DAG nodes; public, custom, and diagnostic calls retain copies.
+    route_feasibility.enable_compiler_owned_witness_sharing(options)
+  end
   options.research_unlock_witness = function(identity, state)
     return research_unlocked_output_witness(
       identity,
@@ -914,20 +1206,23 @@ end
 -- research-unlocked recipe nodes so the route policy can require every
 -- technology that the chosen branch actually needs, including nested inputs.
 local function selected_research_unlock_pairs(witness)
-  local pairs, seen = {}, {}
-  local function visit(node)
-    if type(node) ~= "table" then return end
-    if node.kind == "research-unlocked-recipe"
-      and type(node.recipe) == "string" and type(node.unlocker) == "string" then
-      local key = node.recipe .. "\0" .. node.unlocker
-      if not seen[key] then
-        seen[key] = true
-        table.insert(pairs, {recipe = node.recipe, unlocker = node.unlocker})
+  local pairs, seen_pairs, seen_nodes = {}, {}, {}
+  local pending = {witness}
+  while #pending > 0 do
+    local node = table.remove(pending)
+    if type(node) == "table" and not seen_nodes[node] then
+      seen_nodes[node] = true
+      if node.kind == "research-unlocked-recipe"
+        and type(node.recipe) == "string" and type(node.unlocker) == "string" then
+        local key = node.recipe .. "\0" .. node.unlocker
+        if not seen_pairs[key] then
+          seen_pairs[key] = true
+          table.insert(pairs, {recipe = node.recipe, unlocker = node.unlocker})
+        end
       end
+      for _, child in ipairs(acquisition_children(node)) do table.insert(pending, child) end
     end
-    for _, child in ipairs(acquisition_children(node)) do visit(child) end
   end
-  visit(witness)
   table.sort(pairs, function(left, right)
     if left.recipe ~= right.recipe then return left.recipe < right.recipe end
     return left.unlocker < right.unlocker
@@ -1114,6 +1409,82 @@ local function aggregate_research_route(
   }
 end
 
+local function route_gate_set(route)
+  local gates, count = {}, 0
+  local function add(name)
+    if name and not gates[name] then gates[name], count = true, count + 1 end
+  end
+  for _, name in ipairs(route.unlockers or {}) do add(name) end
+  add(route.unlocker)
+  for _, name in ipairs(route.prerequisite_closure or {}) do add(name) end
+  return gates, count
+end
+
+-- The outer unlocker and its complete acyclic prerequisite closure are a
+-- lower bound on every realized research route. Inner gates can only add to
+-- that set. Quantify all outer unlockers: aggregation may rebind to another
+-- declared unlocker already supplied by an ingredient's selected route.
+local function disabled_producer_cannot_win(recipe_name, routes, excluded_unlocker, observer, prepared)
+  if observer ~= nil or excluded_unlocker ~= nil or #routes == 0 then return false end
+  prepared = prepared or {routes = {}, lower = {}}
+  local unlockers = recipe_facts.unlockers_for_recipe(recipe_name)
+  if #unlockers == 0 then return false end
+  local index = graph_index()
+  for _, technology_name in ipairs(unlockers) do
+    local facts = static_unlock_facts(index, technology_name)
+    if facts.structurally_reachable ~= true then return false end
+    local lower_entry = prepared.lower[technology_name]
+    if not lower_entry or lower_entry.facts ~= facts then
+      local gates, count = route_gate_set({unlockers = {technology_name},
+        prerequisite_closure = facts.prerequisite_closure})
+      lower_entry = {facts = facts, gates = gates, count = count}
+      prepared.lower[technology_name] = lower_entry
+    end
+    local lower, lower_count = lower_entry.gates, lower_entry.count
+    local defeated = false
+    for _, route in ipairs(routes) do
+      if route.reachable == true then
+        local entry = prepared.routes[route]
+        if not entry then
+          local gates, count = route_gate_set(route)
+          entry = {gates = gates, count = count}
+          prepared.routes[route] = entry
+        end
+        local gates, count = entry.gates, entry.count
+        local contained = count <= lower_count
+        if contained then
+          for name in pairs(gates) do
+            if not lower[name] then contained = false; break end
+          end
+        end
+        if contained then
+          local direct = route.unlockers or {}
+          -- With the same sole maximal gate, any inner gate is either
+          -- implied by it or makes a strict superset. Equal closed sets have
+          -- the same science, depth, count and time; the earlier recipe wins.
+          local equal_loses = count == lower_count and #direct == 1
+            and direct[1] == technology_name
+            and tostring(route.recipe or "") < tostring(recipe_name)
+          if count < lower_count or equal_loses then defeated = true; break end
+        end
+      end
+    end
+    if not defeated then return false end
+  end
+  return true
+end
+
+local function initial_production_route(recipe_name, initial_witness)
+  return {
+    recipe = recipe_name, initial = true, unlockers = {}, prerequisite_closure = {},
+    science_burden = {}, reachable = true, reachability = {status = "reachable"},
+    progression_key = {science_burden_count = 0, prerequisite_count = 0,
+      unlock_depth = 0, research_count = 0, research_time = 0},
+    provenance = {route_policy = route_policy.policy_id, recipe = recipe_name,
+      structural_route_witness = initial_witness.kind}
+  }
+end
+
 local function production_routes(
   recipe_status,
   visiting_packs,
@@ -1139,6 +1510,39 @@ local function production_routes(
       table.insert(routes, route)
     end
   end
+  local initial_attempts, sieved_producers, evaluated_producers = {}, 0, 0
+  -- Only completed immutable routes and source-bound lower facts enter this
+  -- query-local preparation. Ordinary helper callers do not retain it.
+  local sieve_prepared = {routes = {}, lower = {}}
+  if observer == nil then
+    -- Every initial record has identical gates and numeric rank. Lexical
+    -- recipe order therefore proves the same winner before researched
+    -- alternatives are constructed. Exact diagnostic projections retain
+    -- their exhaustive, budgeted traversal below.
+    local names, evaluated = copy_names(recipe_status.recipes or {}), 0
+    table.sort(names)
+    for _, recipe_name in ipairs(names) do
+      local recipe = canonical_recipe_facts.view(recipe_name)
+      if recipe and recipe.enabled_without_research == true then
+        evaluated = evaluated + 1
+        local witness = route_feasibility.initial_recipe_witness(
+          recipe_name, recipe_status.pack_name, witness_options, witness_state)
+        initial_attempts[recipe_name] = witness or false
+        if witness then
+          telemetry.count("science_initial_priority_selections")
+          telemetry.count("science_initial_recipe_evaluations", evaluated)
+          local selected = initial_production_route(recipe_name, witness)
+          selected.provenance.route_enumeration = {
+            strategy = "initial-priority-prefix", complete = false,
+            recipe_candidate_count = #names, initial_recipes_evaluated = evaluated,
+            researched_recipe_routes_evaluated = 0
+          }
+          return {selected}
+        end
+      end
+    end
+    telemetry.count("science_initial_recipe_evaluations", evaluated)
+  end
   -- All candidates belong to one immutable recipe snapshot and exact active
   -- traversal. Sharing the query state reuses only raw indexes and the
   -- context-free positive witnesses owned by recipe_route_feasibility; its
@@ -1148,30 +1552,13 @@ local function production_routes(
     if not diagnostic_visit(observer, 0) then break end
     local recipe = canonical_recipe_facts.view(recipe_name)
     if recipe and recipe.enabled_without_research == true then
-      local initial_witness = route_feasibility.initial_recipe_witness(
-        recipe_name, recipe_status.pack_name, witness_options, witness_state)
+      local initial_witness = initial_attempts[recipe_name]
+      if initial_witness == nil then
+        initial_witness = route_feasibility.initial_recipe_witness(
+          recipe_name, recipe_status.pack_name, witness_options, witness_state)
+      end
       if initial_witness then
-        table.insert(routes, {
-          recipe = recipe_name,
-          initial = true,
-          unlockers = {},
-          prerequisite_closure = {},
-          science_burden = {},
-          reachable = true,
-          reachability = {status = "reachable"},
-          progression_key = {
-            science_burden_count = 0,
-            prerequisite_count = 0,
-            unlock_depth = 0,
-            research_count = 0,
-            research_time = 0
-          },
-          provenance = {
-            route_policy = route_policy.policy_id,
-            recipe = recipe_name,
-            structural_route_witness = initial_witness.kind
-          }
-        })
+        table.insert(routes, initial_production_route(recipe_name, initial_witness))
       else
         -- The outer recipe is enabled, but one of its inputs may become
         -- available through research. This is a future route, never an
@@ -1191,7 +1578,12 @@ local function production_routes(
         )
         if route then table.insert(routes, route) end
       end
+    elseif disabled_producer_cannot_win(recipe_name, routes, excluded_unlocker, observer, sieve_prepared) then
+      sieved_producers = sieved_producers + 1
+      telemetry.count("science_disabled_producers_sieved")
     else
+      evaluated_producers = evaluated_producers + 1
+      if observer == nil then telemetry.count("science_disabled_producers_constructed") end
       local witness = route_feasibility.recipe_witness(
         recipe_name, recipe_status.pack_name, witness_options, witness_state)
       if witness then
@@ -1227,6 +1619,17 @@ local function production_routes(
           end
         end
       end
+    end
+  end
+  if sieved_producers > 0 then
+    for _, route in ipairs(routes) do
+      route.provenance = route.provenance or {}
+      route.provenance.route_enumeration = {
+        strategy = "proven-gate-lower-bound", complete = false,
+        recipe_candidate_count = #(recipe_status.recipes or {}),
+        disabled_producers_evaluated = evaluated_producers,
+        disabled_producers_sieved = sieved_producers
+      }
     end
   end
   return routes
@@ -1356,6 +1759,7 @@ end
 -- Keeping it private prevents a diagnostic projection from re-entering the
 -- public/cache-owning pack_production_status surface of its parent context.
 local function resolve_pack_production_status(pack_name, visiting_packs, visiting_technologies, observer)
+  if observer == nil then telemetry.count("science_pack_contextual_questions") end
   if not pack_name then return "unreachable", nil, false end
   local exists = pack_registry.science_pack_exists(pack_name, observer)
   if diagnostic_indeterminate(observer) then return "indeterminate", nil, exists end
@@ -1373,7 +1777,10 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
   -- A nonempty traversal still never writes a conditional answer to root entries.
   local root_cache = observer == nil and science_pack_resolution_cache() or nil
   local cached = root_cache and root_cache[pack_name] or nil
-  if cached then return cached.status, cached.prerequisite, exists end
+  if cached then
+    telemetry.count("science_pack_root_cache_hits")
+    return cached.status, cached.prerequisite, exists
+  end
 
   local reusable = observer == nil and not has_active_traversal(visiting_packs, visiting_technologies)
 
@@ -1402,8 +1809,10 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
     contextual_key = table.concat(fields)
     local cached_context = contextual_owner.contextual_pack_status_memo[contextual_key]
     if cached_context then
+      telemetry.count("science_pack_contextual_cache_hits")
       return cached_context.status, cached_context.prerequisite, exists
     end
+    telemetry.count("science_pack_contextual_cache_misses")
   end
   local function remember_contextual_status(status, prerequisite)
     if contextual_owner
@@ -1414,6 +1823,9 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
       contextual_owner.contextual_pack_status_memo[contextual_key] = {status = status, prerequisite = prerequisite}
       contextual_owner.contextual_pack_status_count
         = contextual_owner.contextual_pack_status_count + 1
+      telemetry.count("science_pack_contextual_completed_answers")
+    elseif contextual_owner and contextual_owner.contextual_pack_status_count >= 8192 then
+      telemetry.count("science_pack_contextual_capacity_refusals")
     end
   end
 
@@ -1769,11 +2181,236 @@ end
 -- is introduced. The shared solver also acquires a matching machine's concrete
 -- placement item without borrowing a circular or later-only bootstrap. This
 -- structural witness does not certify native placement, power or throughput.
-function M.item_acquisition_witness(item_name, visiting_packs, visiting_technologies, observer)
+local function item_acquisition_witness_for_query(item_name, visiting_packs, visiting_technologies, observer)
   if type(item_name) ~= "string" or item_name == "" then return nil end
   return route_feasibility.acquisition_witness({type = "item", name = item_name},
     production_witness_options(visiting_packs or {}, visiting_technologies or {}, observer),
     route_witness_state_for_query(observer))
+end
+
+local function framed_contextual_boolean_active_map_key(values)
+  -- A Boolean answer crosses fresh lab queries, so take a compact exact
+  -- snapshot of the active cycle guards rather than retaining caller maps.
+  -- These guards are flat, string-keyed true sets in the canonical compiler.
+  -- Any other shape simply uses the established cold proof path.
+  if values == nil then return "" end
+  if type(values) ~= "table" or getmetatable(values) ~= nil then return nil end
+  local fields, count, bytes = {}, 0, 0
+  for name, active in pairs(values) do
+    if type(name) ~= "string" or active ~= true then return nil end
+    count = count + 1
+    if count > CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_KEY_MAX_CONTEXT_ENTRIES then return nil end
+    local field = #name .. ":" .. name
+    bytes = bytes + #field
+    if bytes > CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_KEY_MAX_CONTEXT_BYTES then return nil end
+    fields[count] = field
+  end
+  table.sort(fields)
+  return table.concat(fields)
+end
+
+local function contextual_boolean_acquisition_key(item_name, visiting_packs, visiting_technologies, state)
+  local pack_guards = framed_contextual_boolean_active_map_key(visiting_packs)
+  local technology_guards = framed_contextual_boolean_active_map_key(visiting_technologies)
+  local acquisition_guards = framed_contextual_boolean_active_map_key(state and state.visiting)
+  if pack_guards == nil or technology_guards == nil or acquisition_guards == nil then return nil end
+  local fields = {"item", item_name, pack_guards, technology_guards, acquisition_guards}
+  for index, value in ipairs(fields) do fields[index] = #value .. ":" .. value end
+  return table.concat(fields)
+end
+
+local function canonical_boolean_acquisition_services_match(context)
+  -- The companion in lab_compatibility verifies its private witness/available
+  -- pairing before calling this function. Here we verify every live service
+  -- that can participate in the underlying contextual acquisition proof.
+  -- A custom service is allowed to use the public cold path, never this memo.
+  return context:service("science.technology_researchability_reason")
+      == technology_researchability.reason_with_context
+    and context:service("science.pack_production_status") == M.pack_production_status
+    and context:service("science.independent_pack_acquisition_witness")
+      == M.independent_pack_acquisition_witness
+    and context:service("science.item_acquisition_witness") == M.item_acquisition_witness
+end
+
+local function contextual_boolean_acquisition_generation(context, owner, state)
+  if type(owner) ~= "table" or type(state) ~= "table" or owner.route_witness_state ~= state
+    or not canonical_boolean_acquisition_services_match(context)
+    or not route_feasibility.state_context_matches(state, context) then return nil end
+  local source_epoch = canonical_recipe_facts.source_epoch()
+  local recipe_index = context:state_view("recipe_index")
+  local research_index = context:state_view("technology_researchability_index")
+  if owner.recipe_source_epoch ~= source_epoch or state.recipe_source_epoch ~= source_epoch
+    or type(recipe_index) ~= "table" or state.recipe_index ~= recipe_index
+    or type(research_index) ~= "table" then return nil end
+  return {
+    source_epoch = source_epoch,
+    route_witness_state = state,
+    recipe_index = recipe_index,
+    research_index = research_index,
+    recipe_index_epoch = context:state_epoch("recipe_index"),
+    research_index_epoch = context:state_epoch("technology_researchability_index"),
+    research_index_fingerprint = research_index.index_fingerprint,
+    root_generation = owner.root_entry_generation,
+    stable_generation = state.stable_acquisition_generation or 0
+  }
+end
+
+local function contextual_boolean_acquisition_bindings(generation)
+  -- The owner outlives a source/index replacement.  Retain no old graph just
+  -- to validate a Boolean answer: weak values establish identity while the
+  -- live Context remains its real owner.
+  return setmetatable({
+    route_witness_state = generation.route_witness_state,
+    recipe_index = generation.recipe_index,
+    research_index = generation.research_index
+  }, {__mode = "v"})
+end
+
+local function contextual_boolean_acquisition_memo_is_current(owner, generation)
+  local bindings = owner.contextual_boolean_acquisition_memo_bindings
+  return owner.contextual_boolean_acquisition_memo_source_epoch == generation.source_epoch
+    and owner.contextual_boolean_acquisition_memo_recipe_index_epoch == generation.recipe_index_epoch
+    and owner.contextual_boolean_acquisition_memo_research_index_epoch == generation.research_index_epoch
+    and owner.contextual_boolean_acquisition_memo_research_index_fingerprint
+      == generation.research_index_fingerprint
+    and owner.contextual_boolean_acquisition_memo_root_generation == generation.root_generation
+    and owner.contextual_boolean_acquisition_memo_stable_generation == generation.stable_generation
+    and type(bindings) == "table"
+    and bindings.route_witness_state == generation.route_witness_state
+    and bindings.recipe_index == generation.recipe_index
+    and bindings.research_index == generation.research_index
+end
+
+local function contextual_boolean_acquisition_memo_owner(state, observer)
+  if observer ~= nil then return nil end
+  local context = compiler_context.current()
+  local owner = context:state_view("science_pack_production")
+  if type(owner) ~= "table" or owner.route_witness_state ~= state then return nil end
+  if not canonical_boolean_acquisition_services_match(context) then
+    reset_contextual_boolean_acquisition_memo(owner, "service_identity")
+    telemetry.count("science_contextual_boolean_acquisition_service_bypasses")
+    return nil
+  end
+  local generation = contextual_boolean_acquisition_generation(context, owner, state)
+  if not generation then return nil end
+  if not contextual_boolean_acquisition_memo_is_current(owner, generation) then
+    reset_contextual_boolean_acquisition_memo(owner, "generation")
+    owner.contextual_boolean_acquisition_memo_source_epoch = generation.source_epoch
+    owner.contextual_boolean_acquisition_memo_recipe_index_epoch = generation.recipe_index_epoch
+    owner.contextual_boolean_acquisition_memo_research_index_epoch = generation.research_index_epoch
+    owner.contextual_boolean_acquisition_memo_research_index_fingerprint
+      = generation.research_index_fingerprint
+    owner.contextual_boolean_acquisition_memo_root_generation = generation.root_generation
+    owner.contextual_boolean_acquisition_memo_stable_generation = generation.stable_generation
+    owner.contextual_boolean_acquisition_memo_bindings = contextual_boolean_acquisition_bindings(generation)
+  end
+  return owner, generation
+end
+
+local function contextual_boolean_acquisition_can_retain(owner, generation, state, key,
+  visiting_packs, visiting_technologies)
+  local context = compiler_context.current()
+  local current = contextual_boolean_acquisition_generation(context, owner, state)
+  if not current or not contextual_boolean_acquisition_memo_is_current(owner, generation)
+    or current.source_epoch ~= generation.source_epoch
+    or current.recipe_index_epoch ~= generation.recipe_index_epoch
+    or current.research_index_epoch ~= generation.research_index_epoch
+    or current.research_index_fingerprint ~= generation.research_index_fingerprint
+    or current.root_generation ~= generation.root_generation
+    or current.stable_generation ~= generation.stable_generation then return false end
+  return contextual_boolean_acquisition_key(
+    key.item_name, visiting_packs, visiting_technologies, state) == key.value
+end
+
+local function contextual_boolean_acquisition_entry_bytes(key)
+  return CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_ENTRY_ESTIMATED_BYTES + #key
+end
+
+function M.item_acquisition_witness(item_name, visiting_packs, visiting_technologies, observer)
+  if type(item_name) == "string" and item_name ~= "" then
+    telemetry.count("science_item_acquisition_witness_queries")
+  end
+  local witness = item_acquisition_witness_for_query(item_name, visiting_packs, visiting_technologies, observer)
+  if not witness then return nil end
+  -- production_witness_options may borrow compiler-owned memo DAG nodes while
+  -- proving this route. This exported service is consumed outside that private
+  -- lifetime, so it must never expose a mutable memo node to its caller.
+  telemetry.count("science_item_acquisition_witness_copies")
+  return deepcopy(witness)
+end
+
+-- Laboratory admissibility needs only the truth of the same contextual
+-- acquisition proof.  This companion deliberately returns no witness, so a
+-- compiler-owned caller cannot observe or mutate a private memo DAG.  The
+-- caller must still prove that the paired public witness service remains the
+-- canonical implementation; a later replacement retains the public path.
+function M.item_acquisition_available(item_name, visiting_packs, visiting_technologies, observer)
+  local context = compiler_context.current()
+  if context:service("science.item_acquisition_witness") ~= M.item_acquisition_witness then
+    return nil, false
+  end
+  visiting_packs = visiting_packs or {}
+  visiting_technologies = visiting_technologies or {}
+  local state = route_witness_state_for_query(observer)
+  local owner, generation, memo_input
+  if type(item_name) == "string" and item_name ~= "" and state then
+    owner, generation = contextual_boolean_acquisition_memo_owner(state, observer)
+    if owner then
+      local key = contextual_boolean_acquisition_key(item_name, visiting_packs, visiting_technologies, state)
+      if key ~= nil then
+        memo_input = {item_name = item_name, value = key}
+        if owner.contextual_boolean_acquisition_memo[key] then
+          telemetry.count("science_contextual_boolean_acquisition_hits")
+          telemetry.count("science_item_acquisition_boolean_queries")
+          telemetry.count("science_item_acquisition_witness_copies_avoided")
+          return true, true
+        end
+        telemetry.count("science_contextual_boolean_acquisition_misses")
+        local bytes = contextual_boolean_acquisition_entry_bytes(key)
+        -- This is intentionally before the acquisition proof: a globally full
+        -- cache cannot admit the answer no matter which witness the proof
+        -- would find, so avoid scanning a graph solely to reject retention.
+        if owner.contextual_boolean_acquisition_memo_key_count
+            >= CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_MAX_KEYS
+          or owner.contextual_boolean_acquisition_memo_estimated_bytes + bytes
+            > CONTEXTUAL_BOOLEAN_ACQUISITION_MEMO_MAX_ESTIMATED_BYTES then
+          telemetry.count("science_contextual_boolean_acquisition_capacity_refusals")
+          owner, generation, memo_input = nil, nil, nil
+        end
+      else
+        telemetry.count("science_contextual_boolean_acquisition_context_refusals")
+        owner, generation = nil, nil
+      end
+    elseif observer == nil and type(item_name) == "string" and item_name ~= "" then
+      telemetry.count("science_contextual_boolean_acquisition_context_refusals")
+    end
+  end
+  local witness = item_acquisition_witness_for_query(item_name, visiting_packs, visiting_technologies, observer)
+  if type(item_name) == "string" and item_name ~= "" then
+    telemetry.count("science_item_acquisition_boolean_queries")
+    if witness then
+      telemetry.count("science_item_acquisition_witness_copies_avoided")
+      if owner and generation and memo_input then
+        if contextual_boolean_acquisition_can_retain(
+          owner, generation, state, memo_input, visiting_packs, visiting_technologies) then
+          owner.contextual_boolean_acquisition_memo[memo_input.value] = true
+          owner.contextual_boolean_acquisition_memo_key_count
+            = owner.contextual_boolean_acquisition_memo_key_count + 1
+          owner.contextual_boolean_acquisition_memo_estimated_bytes
+            = owner.contextual_boolean_acquisition_memo_estimated_bytes
+              + contextual_boolean_acquisition_entry_bytes(memo_input.value)
+          telemetry.count("science_contextual_boolean_acquisition_completed_answers")
+        else
+          -- A successful witness remains valid for this call. It simply may
+          -- not become a Context answer after another fact or active guard
+          -- changed while the proof ran.
+          reset_contextual_boolean_acquisition_memo(owner, "during_proof")
+          telemetry.count("science_contextual_boolean_acquisition_generation_refusals")
+        end
+      end
+    end
+  end
+  return witness and true or false, true
 end
 
 function M.independent_pack_acquisition_witness(

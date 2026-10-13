@@ -230,7 +230,7 @@ Assert-NoPattern `
   -Text $profileCodecText `
   -Pattern 'local value = value_resolver and value_resolver\(name\) or setting_value\(name\)'
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "function M.get(name, context)"
-Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "settings_catalog.validate_value(name, imported)"
+Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "catalog().validate_value(name, imported)"
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-export"'
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-import-check"'
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle 'Use --compact to omit defaults.'

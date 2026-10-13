@@ -1,0 +1,102 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0160",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Avoid diagnostic alternative construction after a final primary is qualified.",
+  "details": [
+    "Keep the existing chosen primary and all safety gates; defer only a diagnostic alternative that cannot win against a final qualified emit or adopt primary. Failed, skipped, unresolved and preselection cases retain full fallback analysis.",
+    "TechnologyCatalog schema 4 fingerprints constructed and deferred scope. Public schema 2 reports evaluated and deferred counts separately. PREVIEW and generation diagnostics retain complete inventories; full offline tools reject partial captures.",
+    "Controlled Lua 5.2 characterization passes 665 assertions, including emitted selection parity, real gate vectors and forged imports. Offline source checks do not establish native startup, saves, multiplayer, or incident resolution."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance",
+    "diagnostics",
+    "tooling"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Shared compiler catalogue construction and offline readers change; destination-specific native qualification remains required."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "compatible",
+    "public_contract": "changed",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/technology_design_characterization.lua: 665 source-host assertions; no native engine"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/Test-MIRTechnologyCatalogEvaluation.ps1: complete historical/current readers and partial pre-write rejection"
+    },
+    {
+      "kind": "document",
+      "value": "docs/reference/schemas/technology-lifecycle.md"
+    }
+  ]
+}

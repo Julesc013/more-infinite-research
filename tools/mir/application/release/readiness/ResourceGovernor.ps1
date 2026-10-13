@@ -52,11 +52,13 @@ function Get-MIR441ResourceSnapshot {
 
 function Get-MIR441ResourceLimits {
   param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Snapshot)
-  # Recovery keeps the existing 20 GiB development reserve and stricter caller limits.
+  # Physical headroom retains the authored caller policy.  CommitLimit includes
+  # pagefile capacity, so its reserve instead tracks installed physical memory:
+  # a pagefile resize must not change the retained execution margin.
   $value={param($name) $property=$Policy.PSObject.Properties[$name];if($null-ne$property){[double]$property.Value*1GB}else{[double]0}}
   return [pscustomobject]@{
     physical_bytes=[int64][Math]::Max([Math]::Max(2GB,[double]$Snapshot.memory.total_bytes*.2),[Math]::Max((&$value 'minimum_free_ram_gib'),(&$value 'hard_stop_free_ram_gib')))
-    commit_bytes=[int64][Math]::Max(2GB,[double]$Snapshot.memory.commit_limit_bytes*.2)
+    commit_bytes=[int64][Math]::Max(2GB,[double]$Snapshot.memory.total_bytes*.2)
     system_bytes=[int64][Math]::Max(20GB,[Math]::Max((&$value 'system_drive_hard_stop_free_gib'),(&$value 'system_drive_target_free_gib')))
     work_bytes=[int64][Math]::Max(20GB,(&$value 'work_volume_reserve_gib'))
   }
@@ -67,10 +69,21 @@ function Assert-MIR441ResourceAdmission {
   $null=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot
   if($EstimatedPeakBytes-lt0-or$EstimatedPeakBytes-gt2GB-or$ExpectedPeakMemoryBytes-lt0){throw '[mir441-resource-staging-budget]'}
   $snapshot=Get-MIR441ResourceSnapshot -WorkRoot $WorkRoot;$limits=Get-MIR441ResourceLimits -Policy $Policy -Snapshot $snapshot
-  if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){throw '[mir441-resource-admission-memory]'}
-  if([int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){throw '[mir441-resource-admission-commit]'}
-  if([int64]$snapshot.system_volume.free_bytes-lt$limits.system_bytes+2*$EstimatedPeakBytes){throw '[mir441-resource-admission-system-disk]'}
-  if([int64]$snapshot.work_volume.free_bytes-lt$limits.work_bytes+2*$EstimatedPeakBytes){throw '[mir441-resource-admission-work-disk]'}
+  $failure=''
+  if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-memory]'}
+  elseif([int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-commit]'}
+  elseif([int64]$snapshot.system_volume.free_bytes-lt$limits.system_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-system-disk]'}
+  elseif([int64]$snapshot.work_volume.free_bytes-lt$limits.work_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-work-disk]'}
+  if($failure){
+    # Retain the actual throwing snapshot; a later sample cannot explain a
+    # prelaunch refusal or live interruption. Admission thresholds are exact.
+    $exception=[InvalidOperationException]::new($failure)
+    $exception.Data['mir441_resource_admission']=[ordered]@{
+      snapshot=$snapshot;limits=$limits;estimated_peak_bytes=$EstimatedPeakBytes;
+      expected_peak_memory_bytes=$ExpectedPeakMemoryBytes
+    }
+    throw $exception
+  }
   return $snapshot
 }
 
@@ -105,10 +118,22 @@ function Get-MIR441TreeUsage {
 
 function Get-MIR441OwnedProcessTree {
   param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$StartedUtc)
-  $all=@(Get-CimInstance Win32_Process -ErrorAction Stop);$ids=[Collections.Generic.HashSet[int]]::new();[void]$ids.Add($Process.Id)
-  do{$changed=$false;foreach($row in $all){if($row.CreationDate-and$row.CreationDate.ToUniversalTime()-ge$StartedUtc-and$ids.Contains([int]$row.ParentProcessId)-and$ids.Add([int]$row.ProcessId)){$changed=$true}}}while($changed)
+  # Query only direct children of processes we have already established as
+  # owned.  A full Win32_Process snapshot retained every machine process on
+  # each watchdog sample even when the governed process had no children.
+  $ids=[Collections.Generic.HashSet[int]]::new();$owned=[Collections.Generic.List[int]]::new();$pending=[Collections.Generic.Queue[int]]::new()
+  $rootId=[int]$Process.Id;[void]$ids.Add($rootId);$owned.Add($rootId);$pending.Enqueue($rootId)
+  while($pending.Count){
+    $parentId=$pending.Dequeue()
+    foreach($row in @(Get-CimInstance -ClassName Win32_Process -Filter ("ParentProcessId=$parentId") -ErrorAction Stop)){
+      $childId=[int]$row.ProcessId
+      if($row.CreationDate-and$row.CreationDate.ToUniversalTime()-ge$StartedUtc-and$ids.Add($childId)){
+        $owned.Add($childId);$pending.Enqueue($childId)
+      }
+    }
+  }
   [int64]$working=0;[int64]$private=0;$children=@()
-  foreach($row in $all){if(-not$ids.Contains([int]$row.ProcessId)){continue};try{$p=Get-Process -Id $row.ProcessId -ErrorAction Stop;$working+=$p.WorkingSet64;$private+=$p.PrivateMemorySize64;if($row.ProcessId-ne$Process.Id){$children+=[pscustomobject]@{id=$p.Id;started_utc=$p.StartTime.ToUniversalTime()}};$p.Dispose()}catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}}
+  foreach($id in $owned){try{$p=Get-Process -Id $id -ErrorAction Stop;$working+=$p.WorkingSet64;$private+=$p.PrivateMemorySize64;if($id-ne$rootId){$children+=[pscustomobject]@{id=$p.Id;started_utc=$p.StartTime.ToUniversalTime()}};$p.Dispose()}catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}}
   return [pscustomobject]@{working_set_bytes=$working;private_bytes=$private;children=$children}
 }
 
@@ -127,6 +152,7 @@ function Invoke-MIR441MonitoredProcess {
     [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0,
     [ValidateRange(1,5)][int]$SampleSeconds=1,[ValidateRange(1,86400)][int]$TimeoutSeconds=900,
     [string]$StdoutPath='',[string]$StderrPath='',[switch]$AllowNonZeroExit,
+    [switch]$FactorioSteamIdentity,
     [scriptblock]$CompletionPredicate=$null
   )
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
@@ -148,6 +174,10 @@ function Invoke-MIR441MonitoredProcess {
     New-Item -ItemType Directory -Force -Path $temp|Out-Null
     $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=$FilePath;$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.WorkingDirectory=$work
     $start.Environment['TEMP']=$temp;$start.Environment['TMP']=$temp
+    # Factorio only needs these fixed Steam identifiers in its owned child.
+    # Keep this narrow option separate from the governor's custody variables:
+    # callers cannot supply arbitrary child environment keys or replace TEMP/TMP.
+    if($FactorioSteamIdentity){$start.Environment['SteamAppId']='427520';$start.Environment['SteamGameId']='427520'}
     foreach($argument in $Arguments){[void]$start.ArgumentList.Add($argument)}
     $start.RedirectStandardOutput=[bool]$StdoutPath;$start.RedirectStandardError=[bool]$StderrPath
     $process=[Diagnostics.Process]::new();$process.StartInfo=$start
@@ -187,7 +217,7 @@ function Invoke-MIR441MonitoredProcess {
     $failure=$_
     if($null-ne$process){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children)}catch{}}
     Stop-MIR441OwnedProcess -Process $process -Children $children
-    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
+    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
     throw $failure
   }finally{
     try{Stop-MIR441OwnedProcess -Process $process -Children $children}finally{
