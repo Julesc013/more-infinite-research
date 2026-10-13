@@ -546,17 +546,21 @@ function Read-MIR423F200BobAngelUpgradeProfile {
 
 function Assert-MIR423F200BobAngelUpgradeTransition {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
-    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.3')
-  if($Target-cne'f200'-or$FromVersion-cne'4.2.20002'-or$ToVersion-cne'4.2.20003'-or
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.3')
+  $maintenance=[bool]($SourceVersion-ceq'4.2.3'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.2.20003')
+  $full430=[bool]($SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20000')
+  if($Target-cne'f200'-or-not($maintenance-or$full430)-or
      $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'f200-bob-angel'-or
-     $SpaceIsFake-or$SourceOnlyFixtureNames.Count-or$SourceVersion-cne'4.2.3'){
+     $SpaceIsFake-or$SourceOnlyFixtureNames.Count){
     throw '[mir423-f200-bob-angel-transition]'
   }
 }
 
 function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
-  if($FromVersion-cne'4.2.20002'-or$ToVersion-cne'4.2.20003'){throw '[mir423-f200-bob-angel-oracle-transition]'}
+  $maintenance=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.2.20003')
+  $full430=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20000')
+  if(-not($maintenance-or$full430)){throw '[mir423-f200-bob-angel-oracle-transition]'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $controlPath=Join-Path $directory 'control.lua';$settingsPath=Join-Path $directory 'settings.lua';$infoPath=Join-Path $directory 'info.json'
   foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
@@ -565,8 +569,8 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1){throw '[mir423-f200-bob-angel-oracle-anchor]'}
   $control=$control.Replace($profileAnchor,$profileAnchor+', ["f200-bob-angel"]={technology="mining-productivity-4",level=5}')
   # This is deliberately narrower than the retained generic complete-state
-  # oracle: 4.2.20002 -> 4.2.20003 is performance-only for this exact
-  # Bob/Angel input, so even an unresearched extra technology is a failure.
+  # oracle. Both the 4.2 performance lane and the exact 4.3 Full lane reject
+  # even an unresearched extra technology for this fixed Bob/Angel input.
   # Earlier predecessor lanes retain their reviewed feature allowances.
   $permissiveTechnologySetGuard='(?m)^  for name, after in pairs\(observed\.technologies\) do\r?\n    if not expected\.technologies\[name\] and after\.researched then fail\("new research was awarded without earning it: " \.\. name\) end\r?\n  end$'
   $technologySetGuard=[regex]::new($permissiveTechnologySetGuard)
@@ -586,8 +590,10 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   $settings=$settings.Replace($settingsAnchor,'default_value="f200-bob-angel",allowed_values={"base-default","f200-bob-angel"}')
   [IO.File]::WriteAllText($settingsPath,$settings,[Text.UTF8Encoding]::new($false))
   $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
-  if($info.version-cne'0.1.32'){throw '[mir423-f200-bob-angel-fixture-identity]'}
-  $info.version='0.1.33'
+  $expectedVersion=if($full430){'0.1.42'}else{'0.1.32'}
+  $nextVersion=if($full430){'0.1.42'}else{'0.1.33'}
+  if($info.version-cne$expectedVersion){throw '[mir423-f200-bob-angel-fixture-identity]'}
+  $info.version=$nextVersion
   [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))
 }
 

@@ -135,7 +135,7 @@ function Assert-MIR421CurrentUpgradeInputMode {
   }
   if($K2ImersiteInputProfile-and$F200BobAngelInputProfile){throw '[mir421-current-upgrade-input-mode]'}
   if($F200BobAngelInputProfile){
-    if($source.Minor-ne2-or$SpaceIsFake-or$K2ImersiteInputProfile){throw '[mir421-current-upgrade-input-mode]'}
+    if($SpaceIsFake-or$K2ImersiteInputProfile){throw '[mir421-current-upgrade-input-mode]'}
     Assert-MIR423F200BobAngelUpgradeTransition -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake $SpaceIsFake -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SourceVersion $SourceVersion
   } elseif ($K2ImersiteInputProfile -or $FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002')) {
     if ($source.Minor-ne2-or-not $K2ImersiteInputProfile) { throw '[mir421-k2-upgrade-inputs-required]' }
@@ -144,7 +144,9 @@ function Assert-MIR421CurrentUpgradeInputMode {
     if($source.Minor-ne2){throw '[mir421-current-upgrade-scenario]'}
     $null=Get-MIR421SpaceFakeUpgradeDescriptor -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SourceVersion $SourceVersion
   } elseif ($Archetype-ceq'space-age-native-owner') {
-    if($Target-cne'f210'-or$SourceVersion-cnotin@('4.2.2','4.2.3')-or$FixtureName-cne'assert-upgrade-4-0-21000-to-4-1-21000'){
+    $full430=[bool]($SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.2.21002'-and$ToVersion-ceq'4.3.21000')
+    $maintenance=[bool]($SourceVersion-cin@('4.2.2','4.2.3'))
+    if($Target-cne'f210'-or-not($maintenance-or$full430)-or$FixtureName-cne'assert-upgrade-4-0-21000-to-4-1-21000'){
       throw '[mir421-current-upgrade-scenario]'
     }
   } elseif ($Target -cin @('f017','f016','f015','f014','f013')) {
@@ -541,6 +543,15 @@ $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
 $isHistoricalTerminalFixture = $FixtureName -eq 'assert-upgrade-historical-terminal-to-mir42'
 $isLegacyFactorio = $isHistoricalTerminalFixture -or ([string]$factorioVersionInfo.ProductVersion -match '^(?:0|1)[.]')
 $classicReducedPolicy=$UpgradePolicy -ceq 'Classic'
+$fullPreservationSpecialization=[bool](
+  ($SelectedTarget-ceq'f210'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.2.21002'-and$ToVersion-ceq'4.3.21000'-and
+    $FixtureName-ceq'assert-upgrade-4-0-21000-to-4-1-21000'-and$Archetype-ceq'space-age-native-owner'-and-not$SpaceIsFake) -or
+  ($SelectedTarget-ceq'f200'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20000'-and
+    $FixtureName-ceq'assert-upgrade-4-0-20000-to-4-1-20000'-and$Archetype-ceq'f200-bob-angel'-and-not$SpaceIsFake-and$f200BobAngelScenario)
+)
+if($fullPreservationSpecialization-and$UpgradePolicy-cne'Full'){
+  throw '[mir430-complete-preservation-upgrade-policy]'
+}
 if($published410F200){
   Assert-MIR430Published410F200FullUpgradeTransition -Target $SelectedTarget -SourceVersion $SourceVersion -FromVersion $FromVersion -ToVersion $ToVersion `
     -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -UpgradePolicy $UpgradePolicy
@@ -700,7 +711,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
     if($f210HistoricalSettingOracle){
       Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
     }
-    if($targetCode-ceq'210'-and$SourceVersion-cin@('4.3.0','4.3.1')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-ceq'base-default'){
+    if($targetCode-ceq'210'-and$SourceVersion-cin@('4.3.0','4.3.1')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-cin@('base-default','space-age-native-owner')){
       Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
     }
   }
