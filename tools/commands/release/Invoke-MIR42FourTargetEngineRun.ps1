@@ -128,6 +128,33 @@ function Get-MIR42EngineMaintenanceSelection {
   return [pscustomobject]@{source_version=$requested;reader_version=$reader}
 }
 
+function Get-MIR42EngineMaintenanceHarnessArguments {
+  param(
+    [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
+    [Parameter(Mandatory)][ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion,
+    [Parameter(Mandatory)][string]$CandidateManifestPath,
+    [string]$SourceMaterializationPath = '',
+    [Parameter(Mandatory)][string]$PublishedPredecessorManifestPath
+  )
+  $modern = $Target -cin @('f210','f200','f110','f100')
+  $currentMaterialization = ($modern -and $SourceVersion -cin @('4.2.3','4.3.0','4.3.1')) -or
+    (-not $modern -and $SourceVersion -cin @('4.3.0','4.3.1'))
+  $arguments = @('-SelectedTarget',$Target,
+    '-PublishedMaintenancePredecessorManifestPath',$PublishedPredecessorManifestPath)
+  if ($currentMaterialization) {
+    if ([string]::IsNullOrWhiteSpace($SourceMaterializationPath)) {
+      throw '[mir42-engine-maintenance-materialization-required]'
+    }
+    # Match the existing harness input modes: modern materializer custody is
+    # sufficient; historical receipts also require their combined candidate.
+    $arguments += @('-SourceMaterializationPath',$SourceMaterializationPath,'-Retention','Always')
+    if (-not $modern) { $arguments += @('-SelectedReleaseManifest',$CandidateManifestPath) }
+  } else {
+    $arguments += @('-SelectedReleaseManifest',$CandidateManifestPath,'-Retention','OnFailure')
+  }
+  return $arguments
+}
+
 function Get-MIR42HistoricalEngineDescriptor {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -927,12 +954,16 @@ foreach ($target in $targets) {
     # The established F210 complete-state oracle is native Space Age only.
     '-FixtureName',$row.fixture,'-Archetype',$(if($sourceVersion -ceq '4.2.3' -and $target -ceq 'f210'){'space-age-native-owner'}else{'base-default'}),'-OutputPath',$receiptPath,
     '-LocalModLibraryDirs',$libraryBindings[$target],
-    '-WorkRoot',(Join-Path $rowRoot 'work'),'-Retention','OnFailure',
+    '-WorkRoot',(Join-Path $rowRoot 'work'),
     '-ExpectedPeakMemoryMiB',([string]$ExpectedPeakMemoryMiB),'-MaxNewOutputMiB',([string][int][Math]::Floor((Get-MIRNativeProbeRemainingOutputBytes -Context $resources)/1MB)))
   if ($null -ne $maintenanceInputs) {
-    # Bind the child receipt to the exact selected published predecessor too;
-    # the outer candidate manifest remains the authority for current bytes.
-    $args += @('-SelectedTarget',$target,'-SelectedReleaseManifest',$manifestPath,'-PublishedMaintenancePredecessorManifestPath',$PublishedMaintenancePredecessorManifestPath)
+    # The child authenticates the exact materializer receipt and predecessor;
+    # the outer candidate manifest still binds every selected archive.
+    $args += @(Get-MIR42EngineMaintenanceHarnessArguments -Target $target -SourceVersion $sourceVersion `
+      -CandidateManifestPath $manifestPath -SourceMaterializationPath (Join-Path $candidateRoot "materializations/$target.json") `
+      -PublishedPredecessorManifestPath $PublishedMaintenancePredecessorManifestPath)
+  } else {
+    $args += @('-Retention','OnFailure')
   }
   if ((Get-MIR42EngineRunSha -Path $row.candidate) -cne $row.candidate_sha256) { throw "[mir42-$target-library-candidate-drift-before-upgrade]" }
   if ((Get-MIR42EngineRunSha -Path $row.engine) -cne $row.engine_sha256) { throw "[mir42-$target-engine-drift-before-upgrade]" }
