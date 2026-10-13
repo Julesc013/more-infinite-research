@@ -9,6 +9,7 @@ local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local test_overrides = require("prototypes.mir.settings.test_overrides")
+local compiler_profile = require("prototypes.mir.settings.compiler_profile")
 
 local M = {}
 local spec_by_name_cache = nil
@@ -126,7 +127,7 @@ end
 
 function M.global_setting_prototypes()
   local out = {
-    require("prototypes.mir.settings.compiler_profile").prototype(),
+    compiler_profile.prototype(),
     {
       type = "bool-setting",
       name = "ips-require-space-gate",
